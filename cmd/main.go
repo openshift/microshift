@@ -45,4 +45,5 @@ func newCommand() *cobra.Command {
 	cmd.AddCommand(cmds.InitCmd)
 	cmd.AddCommand(cmds.ControllerCmd)
 	cmd.AddCommand(cmds.NodeCmd)
+	return cmd
 }
