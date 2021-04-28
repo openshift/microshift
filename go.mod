@@ -6,6 +6,7 @@ replace (
 	github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 	github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
+	github.com/onsi/ginkgo => github.com/openshift/ginkgo v4.5.0-origin.1+incompatible
 	k8s.io/api => k8s.io/api v0.20.4
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.20.4
 	k8s.io/apimachinery => k8s.io/apimachinery v0.20.4
@@ -32,7 +33,6 @@ replace (
 	k8s.io/metrics => k8s.io/metrics v0.20.4
 	k8s.io/mount-utils => k8s.io/mount-utils v0.20.4
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.20.4
-    github.com/onsi/ginkgo => github.com/openshift/ginkgo v4.5.0-origin.1+incompatible
 )
 
 require (
@@ -158,7 +158,7 @@ require (
 	github.com/openshift/apiserver-library-go v0.0.0-20210426120049-59b0e972bfb7 // indirect
 	github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e // indirect
 	github.com/openshift/client-go v0.0.0-20210331195552-cf6c2669e01f // indirect
-	github.com/openshift/library-go v0.0.0-20210331235027-66936e2fcc52 // indirect
+	github.com/openshift/library-go v0.0.0-20210331235027-66936e2fcc52
 	github.com/openshift/openshift-apiserver v0.0.0-alpha.0.0.20210324042139-a0f41548179e
 	github.com/openshift/openshift-controller-manager v0.0.0-alpha.0.0.20210204125221-e0755cd0dca5
 	github.com/openshift/runtime-utils v0.0.0-20200415173359-c45d4ff3f912 // indirect
