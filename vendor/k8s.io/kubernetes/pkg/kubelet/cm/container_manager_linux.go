@@ -983,7 +983,6 @@ func ensureSystemCgroups(rootCgroupPath string, manager cgroups.Manager) error {
 
 			pids = append(pids, pid)
 		}
-		klog.Infof("Found %d PIDs in root, %d of them are not to be moved", len(allPids), len(allPids)-len(pids))
 
 		// Check if we have moved all the non-kernel PIDs.
 		if len(pids) == 0 {
@@ -1029,7 +1028,7 @@ func (cm *containerManagerImpl) GetDevices(podUID, containerName string) []*podr
 }
 
 func (cm *containerManagerImpl) GetCPUs(podUID, containerName string) []int64 {
-	return cm.cpuManager.GetCPUs(podUID, containerName)
+	return cm.cpuManager.GetCPUs(podUID, containerName).ToSliceNoSortInt64()
 }
 
 func (cm *containerManagerImpl) ShouldResetExtendedResourceCapacity() bool {

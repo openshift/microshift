@@ -367,6 +367,7 @@ func (s *Server) InstallDefaultHandlers(enableCAdvisorJSONEndpoints bool) {
 		Recursive: true,
 	}
 	r.RawMustRegister(metrics.NewPrometheusCollector(prometheusHostAdapter{s.host}, containerPrometheusLabelsFunc(s.host), includedMetrics, clock.RealClock{}, cadvisorOpts))
+	r.RawMustRegister(metrics.NewPrometheusMachineCollector(prometheusHostAdapter{s.host}, includedMetrics))
 	s.restfulCont.Handle(cadvisorMetricsPath,
 		compbasemetrics.HandlerFor(r, compbasemetrics.HandlerOpts{ErrorHandling: compbasemetrics.ContinueOnError}),
 	)
@@ -906,7 +907,7 @@ var statusesNoTracePred = httplog.StatusIsNot(
 
 // ServeHTTP responds to HTTP requests on the Kubelet.
 func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	handler := httplog.WithLogging(s.restfulCont, statusesNoTracePred)
+	handler := httplog.WithLogging(s.restfulCont, statusesNoTracePred, nil)
 
 	// monitor http requests
 	var serverType string
