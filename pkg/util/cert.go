@@ -34,7 +34,7 @@ func GenCerts(svcName string, dir, certFilename, keyFilename string) (string, er
 }
 
 // Kubeconfig creates a kubeconfig
-func Kubeconfig(path, endpoint, clusterCA, clientCert, clientKey string) error {
+func Kubeconfig(dir, filename, endpoint, clusterCA string) error {
 	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
 apiVersion: v1
 kind: Config
@@ -58,6 +58,19 @@ users:
     client-certificate-data: ${ClientCert}
     client-key-data: ${ClientKey}
 `))
+	ca, err := crypto.MakeSelfSignedCAConfig("kubeconfig", 790)
+	if err != nil {
+		return err
+	}
+
+	certBuff := &bytes.Buffer{}
+	keyBuff := &bytes.Buffer{}
+	if err := ca.WriteCertConfig(certBuff, keyBuff); err != nil {
+		return err
+	}
+	clientCert := certBuff.String()
+	clientKey := keyBuff.String()
+
 	data := struct {
 		Endpoint   string
 		ClusterCA  string
@@ -69,6 +82,9 @@ users:
 		ClientCert: clientCert,
 		ClientKey:  clientKey,
 	}
+
+	os.MkdirAll(dir, 0700)
+	path := filepath.Join(dir, filename)
 
 	output, err := os.Create(path)
 	if err != nil {

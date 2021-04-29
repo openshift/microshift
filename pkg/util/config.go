@@ -9,10 +9,14 @@ import (
 	"text/template"
 )
 
+const (
+	port = 32444
+)
+
 // KubeAPIServerConfig creates a config for kube-apiserver to use in --openshift-config option
-func KubeAPIServerConfig() error {
+func KubeAPIServerConfig(path, svcCIDR string) error {
 	// based on https://github.com/openshift/cluster-kube-apiserver-operator/blob/master/bindata/v4.1.0/config/defaultconfig.yaml
-	apiConfigTemplate := template.Must(template.New("config").Parse(`
+	configTemplate := template.Must(template.New("config").Parse(`
 admission:
   pluginConfig:
     network.openshift.io/ExternalIPRanger:
@@ -62,7 +66,7 @@ apiServerArguments:
     - PodTolerationRestriction
     - Priority
     - ResourceQuota
-    - RuntimeClass
+    - Class
     - ServiceAccount
     - StorageObjectInUseProtection
     - TaintNodesByCondition
@@ -172,18 +176,31 @@ authConfig:
 consolePublicURL: ""
 projectConfig:
   defaultNodeSelector: ""
-servicesSubnet: 10.3.0.0/16 # ServiceCIDR # set by observe_network.go
+servicesSubnet: {{.ServiceCIDR}} # 10.3.0.0/16 # ServiceCIDR # set by observe_network.go
 servingInfo:
   bindAddress: 0.0.0.0:6443 # set by observe_network.go
   bindNetwork: tcp4 # set by observe_network.go
   namedCertificates: null # set by observe_apiserver.go
 	`))
-	return nil
+	data := struct {
+		ServiceCIDR string
+	}{
+		ServiceCIDR: svcCIDR,
+	}
+
+	output, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer output.Close()
+
+	return configTemplate.Execute(output, &data)
+
 }
 
 // KubeControllerManagerConfig creates a config for kube-controller-manager in option --openshift-config
-func KubeControllerManagerConfig() error {
-	cmConfigTemplate := template.Must(template.New("config").Parse(`
+func KubeControllerManagerConfig(path string) error {
+	configTemplate := template.Must(template.New("config").Parse(`
 apiVersion: kubecontrolplane.config.openshift.io/v1
 kind: KubeControllerManagerConfig  
 extendedArguments:
@@ -232,12 +249,36 @@ extendedArguments:
   - "150" # this is a historical values
   kube-api-burst:
   - "300" # this is a historical values`))
-	return nil
+	data := struct {
+		ClientCACert, KubeConfig, ServingCert, ServingKey, ServingClientCert,
+		IngressDomain, EtcdUrl, EtcdCert, EtcdKey, EtcdCA string
+	}{
+		/*
+			ClientCACert:      ,
+			KubeConfig:        ,
+			ServingCert:       ,
+			ServingKey:        ,
+			ServingClientCert: ,
+			IngressDomain:     ,
+			EtcdUrl:           ,
+			EtcdCA:            ,
+			EtcdCert:          ,
+			EtcdKey:           ,
+		*/
+	}
+
+	output, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer output.Close()
+
+	return configTemplate.Execute(output, &data)
 }
 
 // OpenShiftAPIServerConfig creates a config for openshift-apiserver to use
-func OpenShiftAPIServerConfig() error {
-	ocpAPIConfigTemplate = template.Must(template.New("apiserver-config.yaml").Parse(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
+func OpenShiftAPIServerConfig(path string) error {
+	configTemplate := template.Must(template.New("apiserver-config.yaml").Parse(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftAPIServerConfig
 aggregatorConfig:
   allowedNames:
@@ -330,17 +371,17 @@ storageConfig:
 		*/
 	}
 
-	output, err := os.Create()
+	output, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer output.Close()
 
-	return ocpAPIConfigTemplate.Execute(output, &data)
+	return configTemplate.Execute(output, &data)
 }
 
-func OpenShiftControllerManagerConfig() error {
-	ocpControllManagerConfigTemplate = template.Must(template.New("controller-manager-config.yaml").Parse(`
+func OpenShiftControllerManagerConfig(path string) error {
+	configTemplate := template.Must(template.New("controller-manager-config.yaml").Parse(`
 apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftControllerManagerConfig
 build:
@@ -353,40 +394,26 @@ deployer:
 	format: {{.DeployerName}}
 dockerPullSecret:
 	internalRegistryHostname: {{.ImageRegistryUrl}}
+kubeClientConfig:
+  kubeConfig: {{.KubeConfig}}  
 ingress:
 	ingressIPNetworkCIDR: ''
-kubeClientConfig:
-	kubeConfig: {{.KubeConfig}}
-servingInfo:
-	bindAddress: "0.0.0.0:8445"
-	certFile: {{.ServingCert}}
-	keyFile: {{.ServingKey}}
-	clientCA: {{.ServingClientCert}}
 	`))
+
 	data := struct {
-		ClientCACert, KubeConfig, ServingCert, ServingKey, ServingClientCert,
-		IngressDomain, EtcdUrl, EtcdCert, EtcdKey, EtcdCA string
+		KubeConfig, BuilderImage, DeployerName, ImageRegistryUrl string
 	}{
-		/*
-			ClientCACert:      ,
-			KubeConfig:        ,
-			ServingCert:       ,
-			ServingKey:        ,
-			ServingClientCert: ,
-			IngressDomain:     ,
-			EtcdUrl:           ,
-			EtcdCA:            ,
-			EtcdCert:          ,
-			EtcdKey:           ,
-		*/
+    KubeConfig: ,
+		BuilderImage:     "docker-build",
+		DeployerName:     "docker-build",
+		ImageRegistryUrl: "image-registry.openshift-image-registry.svc:5000",
 	}
 
-	output, err := os.Create()
+	output, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer output.Close()
 
-	return ocpAPIConfigTemplate.Execute(output, &data)
-
+	return configTemplate.Execute(output, &data)
 }
