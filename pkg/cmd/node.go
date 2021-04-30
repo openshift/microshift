@@ -16,8 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
@@ -36,18 +34,19 @@ var NodeCmd = &cobra.Command{
 }
 
 func startNode(args []string) error {
-	kubelet(args)
-	kubeProxy(args)
+	startKubelet(args)
+	startKubeProxy(args)
+	return nil
 }
 
-func kubelet(args []string) {
+func startKubelet(args []string) {
 	command := kubelet.NewKubeletCommand()
 	go func() {
 		logrus.Fatalf("kubelet exited: %v", command.Execute())
 	}()
 }
 
-func kubeProxy(args []string) {
+func startKubeProxy(args []string) {
 	command := kubeproxy.NewProxyCommand()
 	go func() {
 		logrus.Fatalf("kube-proxy exited: %v", command.Execute())

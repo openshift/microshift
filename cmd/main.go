@@ -1,13 +1,17 @@
 package main
 
 import (
+	goflag "flag"
+	"fmt"
 	"math/rand"
 	"os"
-	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
+	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/component-base/logs"
 
 	cmds "github.com/openshift/microshift/pkg/cmd"
@@ -16,7 +20,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	pflag.CommandLine.SetNormalizeFunc(utilflag.WordSepNormalizeFunc)
+	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 	pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 
 	logs.InitLogs()

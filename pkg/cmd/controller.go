@@ -16,13 +16,14 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	etcd "go.etcd.io/etcd/embed"
 
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
@@ -41,7 +42,7 @@ var ControllerCmd = &cobra.Command{
 }
 
 func startController(args []string) error {
-	etcd(args)
+	startEtcd(args)
 
 	kubeAPIServer(args)
 	kubeControllerManager(args)
@@ -53,7 +54,8 @@ func startController(args []string) error {
 	return nil
 }
 
-func etcd(args []string) {
+func startEtcd(args []string) {
+	cfg := etcd.NewConfig()
 	e, err := etcd.StartEtcd(cfg)
 	if err != nil {
 		logrus.Fatalf("etcd failed to start %v", err)
@@ -87,7 +89,7 @@ func kubeScheduler(args []string) {
 	}()
 }
 
-func newOpenshiftApiServerCommand() *cobra.Command {
+func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "openshift-apiserver",
 		Short: "Command for the OpenShift API Server",
@@ -102,7 +104,7 @@ func newOpenshiftApiServerCommand() *cobra.Command {
 	return cmd
 }
 func ocpAPIServer(args []string) {
-	stopCh := genericapiserver.SetupSignalHandler()
+	stopCh := genericapiserver.SetupSignalHandler(false)
 	command := newOpenshiftApiServerCommand(stopCh)
 	startArgs := append(args, "start")
 	command.SetArgs(startArgs)
@@ -111,7 +113,7 @@ func ocpAPIServer(args []string) {
 	}()
 }
 
-func newOpenShiftControllerManagerCommand() *cobra.Command {
+func newOpenShiftControllerManagerCommand(stopCh <-chan struct{}) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "openshift-controller-manager",
 		Short: "Command for the OpenShift Controllers",
@@ -126,7 +128,7 @@ func newOpenShiftControllerManagerCommand() *cobra.Command {
 }
 
 func ocpControllerManager(args []string) {
-	stopCh := genericapiserver.SetupSignalHandler()
+	stopCh := genericapiserver.SetupSignalHandler(false)
 	command := newOpenShiftControllerManagerCommand(stopCh)
 	startArgs := append(args, "start")
 	command.SetArgs(startArgs)

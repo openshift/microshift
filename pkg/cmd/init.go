@@ -16,8 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/util"
@@ -42,22 +40,24 @@ func initAll(args []string) error {
 		return err
 	}
 	// create kubeconfig for kube-scheduler, kubelet, openshift-apiserver,controller-manager
-	if err := util.Kubeconfig(); err != nil {
-		return err
-	}
+	/*
+		if err := util.Kubeconfig(); err != nil {
+			return err
+		}
+	*/
 	return nil
 }
 
 func initCerts() error {
 	// etcd
 	// etcd-cafile: /etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca/ca-bundle.crt
-	if err := util.GenCerts("etcd-cafile", "/etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca",
+	if _, err := util.GenCerts("etcd-cafile", "/etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca",
 		"ca-bundle.crt", "ca-bundle.key"); err != nil {
 		return err
 	}
 	// etcd-certfile: /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.crt
 	// etcd-keyfile: /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.key
-	if err := util.GenCerts("etcd-cert", "/etc/kubernetes/static-pod-resources/secrets/etcd-client",
+	if _, err := util.GenCerts("etcd-cert", "/etc/kubernetes/static-pod-resources/secrets/etcd-client",
 		"tls.crt", "tls.key"); err != nil {
 		return err
 	}
@@ -96,18 +96,20 @@ func initCerts() error {
 }
 
 func initServerConfig() error {
-	if err := util.KubeAPIServerConfig(); err != nil {
-		return err
-	}
-	if err := util.KubeControllerManagerConfig(); err != nil {
-		return err
-	}
-	if err := util.OpenShiftAPIServerConfig(); err != nil {
-		return err
-	}
-	if err := util.OpenShiftControllerManagerConfig(); err != nil {
-		return err
-	}
+	/*
+		if err := util.KubeAPIServerConfig(); err != nil {
+			return err
+		}
+		if err := util.KubeControllerManagerConfig(); err != nil {
+			return err
+		}
+		if err := util.OpenShiftAPIServerConfig(); err != nil {
+			return err
+		}
+		if err := util.OpenShiftControllerManagerConfig(); err != nil {
+			return err
+		}
+	*/
 
 	return nil
 }
