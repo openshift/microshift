@@ -18,9 +18,6 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-
-	kubeproxy "k8s.io/kubernetes/cmd/kube-proxy/app"
-	kubelet "k8s.io/kubernetes/cmd/kubelet/app"
 )
 
 // nodeCmd represents the node command
