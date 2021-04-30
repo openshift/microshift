@@ -48,7 +48,7 @@ func kubelet(args []string) {
 }
 
 func kubeProxy(args []string) {
-	command := proxy.NewProxyCommand()
+	command := kubeproxy.NewProxyCommand()
 	go func() {
 		logrus.Fatalf("kube-proxy exited: %v", command.Execute())
 	}()

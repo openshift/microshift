@@ -1,10 +1,7 @@
 package util
 
 import (
-	"bytes"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strconv"
 	"text/template"
 )
@@ -403,7 +400,7 @@ ingress:
 	data := struct {
 		KubeConfig, BuilderImage, DeployerName, ImageRegistryUrl string
 	}{
-    KubeConfig: ,
+		//KubeConfig: ,
 		BuilderImage:     "docker-build",
 		DeployerName:     "docker-build",
 		ImageRegistryUrl: "image-registry.openshift-image-registry.svc:5000",
