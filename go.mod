@@ -4,35 +4,36 @@ go 1.16
 
 replace (
 	github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
-	github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
 	github.com/onsi/ginkgo => github.com/openshift/ginkgo v4.5.0-origin.1+incompatible
-	k8s.io/api => k8s.io/api v0.20.4
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.20.4
-	k8s.io/apimachinery => k8s.io/apimachinery v0.20.4
+	k8s.io/api => k8s.io/api v0.20.0
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.20.0
+	k8s.io/apimachinery => k8s.io/apimachinery v0.20.0
 	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20210222103016-a023730276fe
-	k8s.io/cli-runtime => k8s.io/cli-runtime v0.20.4
-	k8s.io/client-go => k8s.io/client-go v0.20.4
-	k8s.io/cloud-provider => k8s.io/cloud-provider v0.20.4
-	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.20.4
-	k8s.io/code-generator => k8s.io/code-generator v0.20.4
-	k8s.io/component-base => k8s.io/component-base v0.20.4
-	k8s.io/component-helpers => k8s.io/component-helpers v0.20.4
-	k8s.io/controller-manager => k8s.io/controller-manager v0.20.4
-	k8s.io/cri-api => k8s.io/cri-api v0.20.4
-	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.20.4
-	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.20.4
-	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.20.4
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.20.0
+	k8s.io/client-go => k8s.io/client-go v0.20.0
+	k8s.io/cloud-provider => k8s.io/cloud-provider v0.20.0
+	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.20.0
+	k8s.io/code-generator => k8s.io/code-generator v0.20.0
+	k8s.io/component-base => k8s.io/component-base v0.20.0
+	k8s.io/component-helpers => k8s.io/component-helpers v0.20.0
+	k8s.io/controller-manager => k8s.io/controller-manager v0.20.0
+	k8s.io/cri-api => k8s.io/cri-api v0.20.0
+	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.20.0
+	k8s.io/kube-aggregator => github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20210430024024-e3fdce453fbd
+	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.20.0
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20201113171705-d219536bb9fd
-	k8s.io/kube-proxy => k8s.io/kube-proxy v0.20.4
-	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.20.4
-	k8s.io/kubectl => k8s.io/kubectl v0.20.4
-	k8s.io/kubelet => k8s.io/kubelet v0.20.4
+	k8s.io/kube-proxy => k8s.io/kube-proxy v0.20.0
+	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.20.0
+	k8s.io/kubectl => k8s.io/kubectl v0.20.0
+	k8s.io/kubelet => k8s.io/kubelet v0.20.0
 	k8s.io/kubernetes => github.com/openshift/kubernetes v1.20.1-0.20210426184014-5feb30e1bd36
-	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.20.4
-	k8s.io/metrics => k8s.io/metrics v0.20.4
-	k8s.io/mount-utils => k8s.io/mount-utils v0.20.4
-	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.20.4
+	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.20.0
+	k8s.io/metrics => k8s.io/metrics v0.20.0
+	k8s.io/mount-utils => k8s.io/mount-utils v0.20.0
+	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.20.0
+	github.com/google/cadvisor => github.com/google/cadvisor v0.38.5
+	github.com/docker/docker => github.com/docker/docker v17.12.0-ce-rc1.0.20200916142827-bd33bbf0497b+incompatible
 )
 
 require (
@@ -176,7 +177,7 @@ require (
 	github.com/russross/blackfriday v1.5.2 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/seccomp/libseccomp-golang v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.7.0 // indirect
+	github.com/sirupsen/logrus v1.7.0
 	github.com/soheilhy/cmux v0.1.4 // indirect
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v1.1.1
@@ -218,7 +219,7 @@ require (
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	k8s.io/api v0.21.0-rc.0 // indirect
 	k8s.io/apiextensions-apiserver v0.21.0-rc.0 // indirect
-	k8s.io/apimachinery v0.21.0-rc.0 // indirect
+	k8s.io/apimachinery v0.21.0-rc.0
 	k8s.io/apiserver v0.21.0-rc.0 // indirect
 	k8s.io/cli-runtime v0.20.4 // indirect
 	k8s.io/client-go v0.21.0-rc.0 // indirect
@@ -232,7 +233,7 @@ require (
 	k8s.io/csi-translation-lib v0.20.4 // indirect
 	k8s.io/heapster v1.2.0-beta.1 // indirect
 	k8s.io/klog/v2 v2.8.0 // indirect
-	k8s.io/kube-aggregator v0.21.0-rc.0 // indirect
+	//k8s.io/kube-aggregator v0.21.0-rc.0 // indirect
 	k8s.io/kube-controller-manager v0.0.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20201113171705-d219536bb9fd // indirect
 	k8s.io/kube-proxy v0.0.0 // indirect
