@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	kubeproxy "k8s.io/kubernetes/cmd/kube-proxy/app"
@@ -29,7 +30,26 @@ var NodeCmd = &cobra.Command{
 	Use:   "node",
 	Short: "openshift node start",
 	Long:  `openshift node start`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("node called")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return startNode(args)
 	},
+}
+
+func startNode(args []string) error {
+	kubelet(args)
+	kubeProxy(args)
+}
+
+func kubelet(args []string) {
+	command := kubelet.NewKubeletCommand()
+	go func() {
+		logrus.Fatalf("kubelet exited: %v", command.Execute())
+	}()
+}
+
+func kubeProxy(args []string) {
+	command := proxy.NewProxyCommand()
+	go func() {
+		logrus.Fatalf("kube-proxy exited: %v", command.Execute())
+	}()
 }
