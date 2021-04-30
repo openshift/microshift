@@ -98,7 +98,7 @@ func (t *awsElasticBlockStoreCSITranslator) TranslateInTreeInlineVolumeToCSI(vol
 		ObjectMeta: metav1.ObjectMeta{
 			// Must be unique per disk as it is used as the unique part of the
 			// staging path
-			Name: fmt.Sprintf("%s-%s", AWSEBSDriverName, volumeHandle),
+			Name: fmt.Sprintf("%s-%s", AWSEBSDriverName, ebsSource.VolumeID),
 		},
 		Spec: v1.PersistentVolumeSpec{
 			PersistentVolumeSource: v1.PersistentVolumeSource{

@@ -65,10 +65,11 @@ func Client(address, namespace string) (ContainerdClient, error) {
 		tryConn.Close()
 
 		connParams := grpc.ConnectParams{
-			Backoff: backoff.DefaultConfig,
+			Backoff: backoff.Config{
+				BaseDelay: baseBackoffDelay,
+				MaxDelay:  maxBackoffDelay,
+			},
 		}
-		connParams.Backoff.BaseDelay = baseBackoffDelay
-		connParams.Backoff.MaxDelay = maxBackoffDelay
 		gopts := []grpc.DialOption{
 			grpc.WithInsecure(),
 			grpc.WithContextDialer(dialer.ContextDialer),
