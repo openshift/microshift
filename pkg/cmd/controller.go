@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	etcd "go.etcd.io/etcd/embed"
@@ -35,10 +36,102 @@ var ControllerCmd = &cobra.Command{
 	Short: "openshift controller",
 	Long:  `openshift controller`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return startController()
+		return startController(args)
 	},
 }
 
-func startController() error {
+func startController(args []string) error {
+	etcd(args)
+
+	kubeAPIServer(args)
+	kubeControllerManager(args)
+	kubeScheduler(args)
+	//TODO: cloud provider
+
+	ocpAPIServer(args)
+	ocpControllerManager(args)
 	return nil
+}
+
+func etcd(args []string) {
+	e, err := etcd.StartEtcd(cfg)
+	if err != nil {
+		logrus.Fatalf("etcd failed to start %v", err)
+	}
+	defer e.Close()
+	select {
+	case <-e.Server.ReadyNotify():
+		logrus.Info("Server is ready!")
+	}
+	logrus.Fatalf("etcd exited: %v", e.Err())
+}
+
+func kubeAPIServer(args []string) {
+	command := kubeapiserver.NewAPIServerCommand()
+	go func() {
+		logrus.Fatalf("kube-apiserver exited: %v", command.Execute())
+	}()
+}
+
+func kubeControllerManager(args []string) {
+	command := kubecm.NewControllerManagerCommand()
+	go func() {
+		logrus.Fatalf("controller-manager exited: %v", command.Execute())
+	}()
+}
+
+func kubeScheduler(args []string) {
+	command := kubescheduler.NewSchedulerCommand()
+	go func() {
+		logrus.Fatalf("kube-scheduler exited: %v", command.Execute())
+	}()
+}
+
+func newOpenshiftApiServerCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "openshift-apiserver",
+		Short: "Command for the OpenShift API Server",
+		Run: func(cmd *cobra.Command, args []string) {
+			cmd.Help()
+			os.Exit(1)
+		},
+	}
+	start := openshift_apiserver.NewOpenShiftAPIServerCommand("start", os.Stdout, os.Stderr, stopCh)
+	cmd.AddCommand(start)
+
+	return cmd
+}
+func ocpAPIServer(args []string) {
+	stopCh := genericapiserver.SetupSignalHandler()
+	command := newOpenshiftApiServerCommand(stopCh)
+	startArgs := append(args, "start")
+	command.SetArgs(startArgs)
+	go func() {
+		logrus.Fatalf("ocp apiserver exited: %v", command.Execute())
+	}()
+}
+
+func newOpenShiftControllerManagerCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "openshift-controller-manager",
+		Short: "Command for the OpenShift Controllers",
+		Run: func(cmd *cobra.Command, args []string) {
+			cmd.Help()
+			os.Exit(1)
+		},
+	}
+	start := openshift_controller_manager.NewOpenShiftControllerManagerCommand("start", os.Stdout, os.Stderr)
+	cmd.AddCommand(start)
+	return cmd
+}
+
+func ocpControllerManager(args []string) {
+	stopCh := genericapiserver.SetupSignalHandler()
+	command := newOpenShiftControllerManagerCommand(stopCh)
+	startArgs := append(args, "start")
+	command.SetArgs(startArgs)
+
+	go func() {
+		logrus.Fatalf("ocp controller-manager exited: %v", command.Execute())
+	}()
 }
