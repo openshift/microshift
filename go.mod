@@ -4,12 +4,14 @@ go 1.16
 
 replace (
 	github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
+	github.com/docker/docker => github.com/docker/docker v17.12.0-ce-rc1.0.20200916142827-bd33bbf0497b+incompatible
+	github.com/google/cadvisor => github.com/google/cadvisor v0.38.5
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
 	github.com/onsi/ginkgo => github.com/openshift/ginkgo v4.5.0-origin.1+incompatible
 	k8s.io/api => k8s.io/api v0.20.0
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.20.0
 	k8s.io/apimachinery => k8s.io/apimachinery v0.20.0
-	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20210222103016-a023730276fe
+	k8s.io/apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20210430024024-e3fdce453fbd //github.com/openshift/kubernetes-apiserver v0.0.0-20210222103016-a023730276fe
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.20.0
 	k8s.io/client-go => k8s.io/client-go v0.20.0
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.20.0
@@ -17,7 +19,7 @@ replace (
 	k8s.io/code-generator => k8s.io/code-generator v0.20.0
 	k8s.io/component-base => k8s.io/component-base v0.20.0
 	k8s.io/component-helpers => k8s.io/component-helpers v0.20.0
-	k8s.io/controller-manager => k8s.io/controller-manager v0.20.0
+	k8s.io/controller-manager => github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20210430024024-e3fdce453fbd
 	k8s.io/cri-api => k8s.io/cri-api v0.20.0
 	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.20.0
 	k8s.io/kube-aggregator => github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20210430024024-e3fdce453fbd
@@ -32,8 +34,6 @@ replace (
 	k8s.io/metrics => k8s.io/metrics v0.20.0
 	k8s.io/mount-utils => k8s.io/mount-utils v0.20.0
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.20.0
-	github.com/google/cadvisor => github.com/google/cadvisor v0.38.5
-	github.com/docker/docker => github.com/docker/docker v17.12.0-ce-rc1.0.20200916142827-bd33bbf0497b+incompatible
 )
 
 require (

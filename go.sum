@@ -774,6 +774,10 @@ github.com/openshift/kubernetes-apiserver v0.0.0-20210222103016-a023730276fe h1:
 github.com/openshift/kubernetes-apiserver v0.0.0-20210222103016-a023730276fe/go.mod h1:Mc80thBKOyy7tbvFtB4kJv1kbdD0eIH8k8vianJcbFM=
 github.com/openshift/kubernetes-apiserver v0.0.0-20210419140141-620426e63a99 h1:KrCYRAJcgZYzMCB1PjJHJMYPu/d+dEkelq5eYyi0fDw=
 github.com/openshift/kubernetes-apiserver v0.0.0-20210419140141-620426e63a99/go.mod h1:w2YSn4/WIwYuxG5zJmcqtRdtqgW/J2JRgFAqps3bBpg=
+github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20210430024024-e3fdce453fbd h1:lnNwGppcG4/MRojU+xBn7iYsVMD+XnQosIDtGycsFTw=
+github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20210430024024-e3fdce453fbd/go.mod h1:ED6HfkyjucTiWY56MfTsOW48qtYewvR5IODc4JRMc6k=
+github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20210430024024-e3fdce453fbd h1:DnYq0TTLDaQJKtKHK6ba/H/sjLzkg3cqChVDuTZS6G4=
+github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20210430024024-e3fdce453fbd/go.mod h1:C4aXxyoP3zkEJSMu98FCHF7lNDSNcBxMe13/JNk3WX8=
 github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20210430024024-e3fdce453fbd h1:Q24j1dTXMCmjPdIBWLgEq4TzdM4XwYWBSGL6dedSOEk=
 github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20210430024024-e3fdce453fbd/go.mod h1:1q1yp9zAz75t3BOwP11lXWu9bKOEVr2D+Uuq/0tgaTc=
 github.com/openshift/library-go v0.0.0-20191003152030-97c62d8a2901/go.mod h1:NBttNjZpWwup/nthuLbPAPSYC8Qyo+BBK5bCtFoyYjo=
@@ -1406,6 +1410,8 @@ k8s.io/apimachinery v0.20.4/go.mod h1:WlLqWAHZGg07AeltaI0MV5uk1Omp8xaN0JGLY6gkRp
 k8s.io/apimachinery v0.21.0-rc.0/go.mod h1:jbreFvJo3ov9rj7eWT7+sYiRx+qZuCYXwWT1bcDswPY=
 k8s.io/apimachinery v0.21.0 h1:3Fx+41if+IRavNcKOz09FwEXDBG6ORh6iMsTSelhkMA=
 k8s.io/apimachinery v0.21.0/go.mod h1:jbreFvJo3ov9rj7eWT7+sYiRx+qZuCYXwWT1bcDswPY=
+k8s.io/apiserver v0.20.0 h1:0MwO4xCoqZwhoLbFyyBSJdu55CScp4V4sAgX6z4oPBY=
+k8s.io/apiserver v0.20.0/go.mod h1:6gRIWiOkvGvQt12WTYmsiYoUyYW0FXSiMdNl4m+sxY8=
 k8s.io/cli-runtime v0.20.0 h1:UfTR9vGUWshJpwuekl7MqRmWumNs5tvqPj20qnmOns8=
 k8s.io/cli-runtime v0.20.0/go.mod h1:C5tewU1SC1t09D7pmkk83FT4lMAw+bvMDuRxA7f0t2s=
 k8s.io/cli-runtime v0.20.4 h1:jVU13lBeebHLtarHeHkoIi3uRONFzccmP7hHLzEoQ4w=
