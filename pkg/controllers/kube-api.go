@@ -16,14 +16,37 @@ limitations under the License.
 package controllers
 
 import (
+	"time"
+
 	"github.com/sirupsen/logrus"
+
+	"github.com/openshift/microshift/pkg/constant"
+
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
+	genericcontrollermanager "k8s.io/controller-manager/app"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
 )
 
-func KubeAPIServer(args []string, ready chan bool) {
+func KubeAPIServer(args []string, ready chan bool) error {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.KubeAPIKubeconfigPath)
+	if err != nil {
+		return err
+	}
+
+	versionedClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return err
+	}
+
 	command := kubeapiserver.NewAPIServerCommand()
 	go func() {
 		logrus.Fatalf("kube-apiserver exited: %v", command.Execute())
 	}()
+	err = genericcontrollermanager.WaitForAPIServer(versionedClient, 10*time.Second)
+	if err != nil {
+		logrus.Fatalf("Failed to wait for apiserver being healthy: %v", err)
+	}
 	ready <- true
+	return nil
 }
