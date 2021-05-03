@@ -21,7 +21,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	etcd "go.etcd.io/etcd/embed"
+	"github.com/openshift/microshift/pkg/controllers"
 
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
@@ -42,7 +42,9 @@ var ControllerCmd = &cobra.Command{
 }
 
 func startController(args []string) error {
-	startEtcd(args)
+	if err := controllers.StartEtcd(); err != nil {
+		return err
+	}
 
 	kubeAPIServer(args)
 	kubeControllerManager(args)
@@ -52,20 +54,6 @@ func startController(args []string) error {
 	ocpAPIServer(args)
 	ocpControllerManager(args)
 	return nil
-}
-
-func startEtcd(args []string) {
-	cfg := etcd.NewConfig()
-	e, err := etcd.StartEtcd(cfg)
-	if err != nil {
-		logrus.Fatalf("etcd failed to start %v", err)
-	}
-	defer e.Close()
-	select {
-	case <-e.Server.ReadyNotify():
-		logrus.Info("Server is ready!")
-	}
-	logrus.Fatalf("etcd exited: %v", e.Err())
 }
 
 func kubeAPIServer(args []string) {
