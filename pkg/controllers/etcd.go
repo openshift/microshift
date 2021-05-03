@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	etcd "go.etcd.io/etcd/embed"
@@ -26,7 +27,11 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 )
 
-func StartEtcd() error {
+const (
+	etcdStartupTimeout = 10
+)
+
+func StartEtcd(ready chan bool) error {
 	hostname, err := os.Hostname()
 	if err != nil {
 		return fmt.Errorf("failed to get hostname: %v", err)
@@ -62,12 +67,17 @@ func StartEtcd() error {
 	if err != nil {
 		return fmt.Errorf("etcd failed to start: %v", err)
 	}
-	defer e.Close()
-	select {
-	case <-e.Server.ReadyNotify():
-		logrus.Info("Server is ready!")
-	}
-	return fmt.Errorf("etcd exited: %v", e.Err())
+	go func() {
+		select {
+		case <-e.Server.ReadyNotify():
+			logrus.Info("Server is ready!")
+			ready <- true
+		case <-time.After(etcdStartupTimeout * time.Second):
+			e.Server.Stop()
+			logrus.Fatalf("etcd failed to start in %d seconds", etcdStartupTimeout)
+		}
+	}()
+	return nil
 }
 
 func setURL(hostnames []string, port string) []url.URL {

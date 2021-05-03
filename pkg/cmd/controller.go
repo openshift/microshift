@@ -24,7 +24,7 @@ import (
 	"github.com/openshift/microshift/pkg/controllers"
 
 	genericapiserver "k8s.io/apiserver/pkg/server"
-	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
+
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
 
@@ -42,39 +42,45 @@ var ControllerCmd = &cobra.Command{
 }
 
 func startController(args []string) error {
-	if err := controllers.StartEtcd(); err != nil {
+	etcdReadyCh := make(chan bool, 1)
+	if err := controllers.StartEtcd(etcdReadyCh); err != nil {
 		return err
 	}
-
-	kubeAPIServer(args)
-	kubeControllerManager(args)
-	kubeScheduler(args)
+	<-etcdReadyCh
+	kubeAPIReadyCh := make(chan bool, 1)
+	controllers.KubeAPIServer(args, kubeAPIReadyCh)
+	<-kubeAPIReadyCh
+	kubeCMReadyCh := make(chan bool, 1)
+	kubeControllerManager(args, kubeCMReadyCh)
+	<-kubeCMReadyCh
+	kubeSchedulerReadyCh := make(chan bool, 1)
+	kubeScheduler(args, kubeSchedulerReadyCh)
+	<-kubeSchedulerReadyCh
 	//TODO: cloud provider
 
-	ocpAPIServer(args)
-	ocpControllerManager(args)
+	ocpAPIReadyCh := make(chan bool, 1)
+	ocpAPIServer(args, ocpAPIReadyCh)
+	<-ocpAPIReadyCh
+	ocpCMReadyCh := make(chan bool, 1)
+	ocpControllerManager(args, ocpCMReadyCh)
+	<-ocpCMReadyCh
 	return nil
 }
 
-func kubeAPIServer(args []string) {
-	command := kubeapiserver.NewAPIServerCommand()
-	go func() {
-		logrus.Fatalf("kube-apiserver exited: %v", command.Execute())
-	}()
-}
-
-func kubeControllerManager(args []string) {
+func kubeControllerManager(args []string, ready chan bool) {
 	command := kubecm.NewControllerManagerCommand()
 	go func() {
 		logrus.Fatalf("controller-manager exited: %v", command.Execute())
 	}()
+	ready <- true
 }
 
-func kubeScheduler(args []string) {
+func kubeScheduler(args []string, ready chan bool) {
 	command := kubescheduler.NewSchedulerCommand()
 	go func() {
 		logrus.Fatalf("kube-scheduler exited: %v", command.Execute())
 	}()
+	ready <- true
 }
 
 func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
@@ -91,7 +97,7 @@ func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
 
 	return cmd
 }
-func ocpAPIServer(args []string) {
+func ocpAPIServer(args []string, ready chan bool) {
 	stopCh := genericapiserver.SetupSignalHandler(false)
 	command := newOpenshiftApiServerCommand(stopCh)
 	startArgs := append(args, "start")
@@ -99,6 +105,7 @@ func ocpAPIServer(args []string) {
 	go func() {
 		logrus.Fatalf("ocp apiserver exited: %v", command.Execute())
 	}()
+	ready <- true
 }
 
 func newOpenShiftControllerManagerCommand(stopCh <-chan struct{}) *cobra.Command {
@@ -115,7 +122,7 @@ func newOpenShiftControllerManagerCommand(stopCh <-chan struct{}) *cobra.Command
 	return cmd
 }
 
-func ocpControllerManager(args []string) {
+func ocpControllerManager(args []string, ready chan bool) {
 	stopCh := genericapiserver.SetupSignalHandler(false)
 	command := newOpenShiftControllerManagerCommand(stopCh)
 	startArgs := append(args, "start")
@@ -124,4 +131,5 @@ func ocpControllerManager(args []string) {
 	go func() {
 		logrus.Fatalf("ocp controller-manager exited: %v", command.Execute())
 	}()
+	ready <- true
 }
