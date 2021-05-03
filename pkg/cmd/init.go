@@ -16,6 +16,9 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/util"
@@ -50,6 +53,29 @@ func initAll(args []string) error {
 
 func initCerts() error {
 	// etcd
+	hostname, err := os.Hostname()
+	if err != nil {
+		return fmt.Errorf("failed to get hostname: %v", err)
+	}
+	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
+	if _, err := util.GenCerts("cert-file", "/etc/kubernetes/static-pod-certs/secrets/etcd-all-serving",
+		"etcd-serving-"+hostname+".crt", "etcd-serving-"+hostname+".key"); err != nil {
+		return err
+	}
+	if _, err := util.GenCerts("trusted-ca-file", "/etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca",
+		"ca-bundle.crt", "ca-bundle.key"); err != nil {
+		return err
+	}
+
+	if _, err := util.GenCerts("peer-cert-file", "/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer",
+		"etcd-peer-"+hostname+".crt", "etcd-peer-"+hostname+".key"); err != nil {
+		return err
+	}
+	if _, err := util.GenCerts("peer-trusted-ca-file", "/etc/kubernetes/static-pod-certs/configmaps/etcd-peer-client-ca",
+		"ca-bundle.crt", "ca-bundle.key"); err != nil {
+		return err
+	}
+
 	// etcd-cafile: /etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca/ca-bundle.crt
 	if _, err := util.GenCerts("etcd-cafile", "/etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca",
 		"ca-bundle.crt", "ca-bundle.key"); err != nil {
@@ -66,7 +92,7 @@ func initCerts() error {
 	if _, err := util.GenCerts("kube-apiserver",
 		"/etc/kubernetes/static-pod-certs/configmaps/client-ca/",
 		"ca-bundle.crt",
-		"ca-bundle.key"); err != nil{
+		"ca-bundle.key"); err != nil {
 		return err
 	}
 	// kubelet
@@ -74,21 +100,21 @@ func initCerts() error {
 	if _, err := util.GenCerts("kubelet-cert",
 		"/etc/kubernetes/static-pod-resources/configmaps/kubelet-serving-ca",
 		"ca-bundle.crt",
-		"ca-bundle.key"); err != nil{
+		"ca-bundle.key"); err != nil {
 		return err
 	}
 	// kubelet-client-certificate: /etc/kubernetes/static-pod-resources/secrets/kubelet-client/tls.crt
 	if _, err := util.GenCerts("kubelet-client-certificate",
 		"/etc/kubernetes/static-pod-resources/secrets/kubelet-client",
 		"tls.crt",
-		"tls.key"); err != nil{
+		"tls.key"); err != nil {
 		return err
 	}
 	// kubelet-client-key: /etc/kubernetes/static-pod-resources/secrets/kubelet-client/tls.key
 	if _, err := util.GenCerts("/etc/kubernetes/static-pod-resources/secrets/kubelet-client/",
 		"/etc/kubernetes/static-pod-resources/secrets/kubelet-client",
 		"tls.crt",
-		"tls.key"); err != nil{
+		"tls.key"); err != nil {
 		return err
 	}
 	// proxy client
@@ -97,7 +123,7 @@ func initCerts() error {
 	if _, err := util.GenCerts("proxy-client",
 		"/etc/kubernetes/static-pod-certs/secrets/aggregator-client/",
 		"tls.crt",
-		"tls.key"); err != nil{
+		"tls.key"); err != nil {
 		return err
 	}
 	// request header
@@ -105,7 +131,7 @@ func initCerts() error {
 	if _, err := util.GenCerts("requestheader-client-ca-file",
 		"/etc/kubernetes/static-pod-certs/configmaps/aggregator-client-ca/ca-bundle.crt",
 		"ca-bundle.crt",
-		"ca-bundle.key"); err != nil{
+		"ca-bundle.key"); err != nil {
 		return err
 	}
 	// tls
@@ -114,7 +140,7 @@ func initCerts() error {
 	if _, err := util.GenCerts("tls",
 		"/etc/kubernetes/static-pod-certs/secrets/service-network-serving-certkey",
 		"tls.crt",
-		"tls.key"); err != nil{
+		"tls.key"); err != nil {
 		return err
 	}
 	// kube-controller-manager
@@ -122,14 +148,14 @@ func initCerts() error {
 	if _, err := util.GenCerts("kube-controller-manager",
 		"/etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/",
 		"ca-bundle.crt",
-		"ca-bundle.key"); err != nil{
+		"ca-bundle.key"); err != nil {
 		return err
 	}
 	// service-account-private-key-file: /etc/kubernetes/static-pod-resources/secrets/service-account-private-key/service-account.key
 	if _, err := util.GenCerts("service-account-private-key-file",
 		"/etc/kubernetes/static-pod-resources/secrets/service-account-private-key",
 		"service-account.crt",
-		"service-account.key"); err != nil{
+		"service-account.key"); err != nil {
 		return err
 	}
 	// cluster-signing-cert-file: /etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.crt
@@ -137,7 +163,7 @@ func initCerts() error {
 	if _, err := util.GenCerts("cluster-signing-key-file",
 		"/etc/kubernetes/static-pod-certs/secrets/csr-signer",
 		"tls.crt",
-		"tls.key"); err != nil{
+		"tls.key"); err != nil {
 		return err
 	}
 	// kube-scheduler
