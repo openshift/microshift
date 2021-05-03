@@ -36,24 +36,6 @@ func StartEtcd() error {
 		return fmt.Errorf("failed to get host IP: %v", err)
 	}
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
-	if _, err := util.GenCerts("cert-file", "/etc/kubernetes/static-pod-certs/secrets/etcd-all-serving",
-		"etcd-serving-"+hostname+".crt", "etcd-serving-"+hostname+".key"); err != nil {
-		return err
-	}
-	if _, err := util.GenCerts("trusted-ca-file", "/etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca",
-		"ca-bundle.crt", "ca-bundle.key"); err != nil {
-		return err
-	}
-
-	if _, err := util.GenCerts("peer-cert-file", "/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer",
-		"etcd-peer-"+hostname+".crt", "etcd-peer-"+hostname+".key"); err != nil {
-		return err
-	}
-	if _, err := util.GenCerts("peer-trusted-ca-file", "/etc/kubernetes/static-pod-certs/configmaps/etcd-peer-client-ca",
-		"ca-bundle.crt", "ca-bundle.key"); err != nil {
-		return err
-	}
-
 	cfg := etcd.NewConfig()
 	cfg.Logger = "zap"
 	cfg.Dir = "/var/lib/etcd/"
