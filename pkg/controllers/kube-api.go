@@ -16,11 +16,13 @@ limitations under the License.
 package controllers
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/microshift/pkg/constant"
+	"github.com/openshift/microshift/pkg/util"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -29,6 +31,26 @@ import (
 )
 
 func KubeAPIServer(args []string, ready chan bool) error {
+	ip, err := util.GetHostIP()
+	if err != nil {
+		return fmt.Errorf("failed to get host IP: %v", err)
+	}
+
+	command := kubeapiserver.NewAPIServerCommand()
+	apiArgs := []string{
+		"--openshift-config=/etc/kubernetes/static-pod-resources/configmaps/config/config.yaml",
+		"--advertise-address=" + ip,
+	}
+	if err := command.ParseFlags(apiArgs); err != nil {
+		return err
+	}
+	logrus.Infof("starting kube-apiserver, args: %v", apiArgs)
+
+	go func() {
+		logrus.Fatalf("kube-apiserver exited: %v", command.RunE(command, nil))
+	}()
+
+	logrus.Info("waiting for kube-apiserver")
 	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.KubeAPIKubeconfigPath)
 	if err != nil {
 		return err
@@ -39,10 +61,6 @@ func KubeAPIServer(args []string, ready chan bool) error {
 		return err
 	}
 
-	command := kubeapiserver.NewAPIServerCommand()
-	go func() {
-		logrus.Fatalf("kube-apiserver exited: %v", command.Execute())
-	}()
 	err = genericcontrollermanager.WaitForAPIServer(versionedClient, 10*time.Second)
 	if err != nil {
 		logrus.Fatalf("Failed to wait for apiserver being healthy: %v", err)
