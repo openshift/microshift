@@ -2,35 +2,53 @@ package util
 
 import (
 	"bytes"
-	"io/ioutil"
+	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
+	"time"
 
 	"github.com/openshift/library-go/pkg/crypto"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-// GenCerts creates TLS or CA bundles
-// GenCerts("service-ca", "/var/lib/openshift/service-ca/key", "tls.crt", "tls.key")
-// GenCerts("service-ca-signer", "/var/lib/openshift/service-ca/ca-cabundle", "ca-bundle.crt", "ca-bundle.key")
-func GenCerts(svcName string, dir, certFilename, keyFilename string) (string, error) {
-	ca, err := crypto.MakeSelfSignedCAConfig(svcName, 790)
+var (
+	rootCA *crypto.CA
+)
+
+const (
+	defaultDurationDays = 365
+	defaultDuration     = defaultDurationDays * 24 * time.Hour
+	defaultHostname     = "localhost"
+)
+
+func BuildCA(hostname string, duration time.Duration) (*crypto.CA, error) {
+	rootCaConfig, err := crypto.MakeSelfSignedCAConfigForDuration(hostname, duration)
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("failed to create root-signer CA: %v", err)
 	}
+	ca := &crypto.CA{
+		Config:          rootCaConfig,
+		SerialGenerator: &crypto.RandomSerialGenerator{},
+	}
+	return ca, nil
+}
 
-	certBuff := &bytes.Buffer{}
-	keyBuff := &bytes.Buffer{}
-	if err := ca.WriteCertConfig(certBuff, keyBuff); err != nil {
-		return "", err
+// GenCerts creates certs and keys
+// GenCerts("/var/lib/openshift/service-ca/key", "tls.crt", "tls.key", "example.com")
+func GenCerts(dir, certFilename, keyFilename string, svcName ...string) error {
+	var err error
+	if rootCA == nil {
+		rootCA, err = BuildCA(defaultHostname, defaultDuration)
+		if err != nil {
+			return err
+		}
 	}
-	os.MkdirAll(dir, 0700)
 	certPath := filepath.Join(dir, certFilename)
-	ioutil.WriteFile(certPath, certBuff.Bytes(), 0644)
 	keyPath := filepath.Join(dir, keyFilename)
-	ioutil.WriteFile(keyPath, keyBuff.Bytes(), 0644)
-
-	return dir, nil
+	s := sets.NewString(svcName...)
+	_, err = rootCA.MakeAndWriteServerCert(certPath, keyPath, s, defaultDurationDays)
+	return err
 }
 
 // Kubeconfig creates a kubeconfig

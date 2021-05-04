@@ -27,6 +27,17 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 )
 
+var (
+	tlsCipherSuites = []string{
+		"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+		"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+		"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+		"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+		"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
+		"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
+	}
+)
+
 const (
 	etcdStartupTimeout = 10
 )
@@ -42,26 +53,28 @@ func StartEtcd(ready chan bool) error {
 	}
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	cfg := etcd.NewConfig()
+	cfg.ForceNewCluster = true //TODO
 	cfg.Logger = "zap"
 	cfg.Dir = "/var/lib/etcd/"
 	cfg.APUrls = setURL([]string{ip}, ":2380")
 	cfg.LPUrls = setURL([]string{"0.0.0.0"}, ":2380")
 	cfg.ACUrls = setURL([]string{ip}, ":2379")
-	cfg.LCUrls = setURL([]string{"0.0.0.0"}, ":2379")
+	cfg.LCUrls = setURL([]string{"127.0.0.1", ip}, ":2379")
 	cfg.Name = hostname
-	cfg.InitialCluster = "default=https://0.0.0.0:2380," + hostname + "=" + "https://" + ip + ":2380"
+	cfg.InitialCluster = "default=https://127.0.0.1:2380," + hostname + "=" + "https://" + ip + ":2380"
 
+	cfg.CipherSuites = tlsCipherSuites
 	cfg.ClientTLSInfo.CertFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-serving/" + "etcd-serving-" + hostname + ".crt"
 	cfg.ClientTLSInfo.KeyFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-serving/" + "etcd-serving-" + hostname + ".key"
 	cfg.ClientTLSInfo.TrustedCAFile = "/etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca/ca-bundle.crt"
-	cfg.ClientTLSInfo.ClientCertAuth = true
-	cfg.ClientTLSInfo.InsecureSkipVerify = false //TODO
+	cfg.ClientTLSInfo.ClientCertAuth = false
+	cfg.ClientTLSInfo.InsecureSkipVerify = true //TODO
 
 	cfg.PeerTLSInfo.CertFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer/" + "etcd-peer-" + hostname + ".crt"
 	cfg.PeerTLSInfo.KeyFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer/" + "etcd-peer-" + hostname + ".key"
 	cfg.PeerTLSInfo.TrustedCAFile = "/etc/kubernetes/static-pod-certs/configmaps/etcd-peer-client-ca/ca-bundle.crt"
-	cfg.PeerTLSInfo.ClientCertAuth = true
-	cfg.PeerTLSInfo.InsecureSkipVerify = false //TODO
+	cfg.PeerTLSInfo.ClientCertAuth = false
+	cfg.PeerTLSInfo.InsecureSkipVerify = true //TODO
 
 	e, err := etcd.StartEtcd(cfg)
 	if err != nil {
