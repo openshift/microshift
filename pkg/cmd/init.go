@@ -167,11 +167,30 @@ func initCerts() error {
 		return err
 	}
 	// kube-scheduler
-
+	// client-cert-key
+	// /etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key
+	if _, err := util.GenCerts("kube-scheduler",
+	"/etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key",
+	"tls.crt",
+	"tls.key"); err != nil {
+		return err
+	}
 	// openshift-apiserver
-
+	// /run/secrets/serving-cert
+	if _, err := util.GenCerts("openshift-apiserver",
+	"/run/secrets/serving-cert",
+	"tls.crt",
+	"tls.key"); err != nil {
+		return err
+	}
 	// openshift-controller-manager
-
+	// /run/secrets/serving-cert
+	if _, err := util.GenCerts("openshift-controller-manager",
+	"/run/secrets/serving-cert",
+	"tls.crt",
+	"tls.key"); err != nil {
+		return err
+	}
 	return nil
 }
 
