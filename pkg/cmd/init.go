@@ -179,24 +179,21 @@ func initCerts() error {
 	// kube-scheduler
 	// client-cert-key
 	// /etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key
-	if _, err := util.GenCerts("kube-scheduler",
-	"/etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key",
+	if err := util.GenCerts("/etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key",
 	"tls.crt",
 	"tls.key"); err != nil {
 		return err
 	}
 	// openshift-apiserver
 	// /run/secrets/serving-cert
-	if _, err := util.GenCerts("openshift-apiserver",
-	"/run/secrets/serving-cert",
+	if err := util.GenCerts("/run/secrets/serving-cert",
 	"tls.crt",
 	"tls.key"); err != nil {
 		return err
 	}
 	// openshift-controller-manager
 	// /run/secrets/serving-cert
-	if _, err := util.GenCerts("openshift-controller-manager",
-	"/run/secrets/serving-cert",
+	if err := util.GenCerts("/run/secrets/serving-cert",
 	"tls.crt",
 	"tls.key"); err != nil {
 		return err
@@ -205,20 +202,17 @@ func initCerts() error {
 }
 
 func initServerConfig() error {
-	/*
-		if err := util.KubeAPIServerConfig(); err != nil {
+		if err := util.KubeAPIServerConfig("/etc/kubernetes/static-pod-resources/configmaps/config/config.yaml", "" /*svc CIDR*/); err != nil {
 			return err
 		}
-		if err := util.KubeControllerManagerConfig(); err != nil {
+		if err := util.KubeControllerManagerConfig("/etc/kubernetes/static-pod-resources/configmaps/config/config.yaml"); err != nil {
 			return err
 		}
-		if err := util.OpenShiftAPIServerConfig(); err != nil {
+		if err := util.OpenShiftAPIServerConfig("/var/run/configmaps/config/config.yaml"); err != nil {
 			return err
 		}
-		if err := util.OpenShiftControllerManagerConfig(); err != nil {
+		if err := util.OpenShiftControllerManagerConfig("/var/run/configmaps/config/config.yaml"); err != nil {
 			return err
 		}
-	*/
-
 	return nil
 }
