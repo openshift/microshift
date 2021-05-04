@@ -181,21 +181,24 @@ func initCerts() error {
 	// /etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key
 	if err := util.GenCerts("/etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key",
 	"tls.crt",
-	"tls.key"); err != nil {
+	"tls.key",
+	"localhost", ip, "127.0.0.1", hostname); err != nil {
 		return err
 	}
 	// openshift-apiserver
 	// /run/secrets/serving-cert
 	if err := util.GenCerts("/run/secrets/serving-cert",
 	"tls.crt",
-	"tls.key"); err != nil {
+	"tls.key",
+	"localhost", ip, "127.0.0.1", hostname); err != nil {
 		return err
 	}
 	// openshift-controller-manager
 	// /run/secrets/serving-cert
 	if err := util.GenCerts("/run/secrets/serving-cert",
 	"tls.crt",
-	"tls.key"); err != nil {
+	"tls.key",
+	"localhost", ip, "127.0.0.1", hostname); err != nil {
 		return err
 	}
 	return nil
