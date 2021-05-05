@@ -68,13 +68,13 @@ func StartEtcd(ready chan bool) error {
 	cfg.ClientTLSInfo.KeyFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-serving/" + "etcd-serving-" + hostname + ".key"
 	cfg.ClientTLSInfo.TrustedCAFile = "/etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca/ca-bundle.crt"
 	cfg.ClientTLSInfo.ClientCertAuth = false
-	cfg.ClientTLSInfo.InsecureSkipVerify = true //TODO
+	cfg.ClientTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
 	cfg.PeerTLSInfo.CertFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer/" + "etcd-peer-" + hostname + ".crt"
 	cfg.PeerTLSInfo.KeyFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer/" + "etcd-peer-" + hostname + ".key"
 	cfg.PeerTLSInfo.TrustedCAFile = "/etc/kubernetes/static-pod-certs/configmaps/etcd-peer-client-ca/ca-bundle.crt"
 	cfg.PeerTLSInfo.ClientCertAuth = false
-	cfg.PeerTLSInfo.InsecureSkipVerify = true //TODO
+	cfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
 	e, err := etcd.StartEtcd(cfg)
 	if err != nil {
