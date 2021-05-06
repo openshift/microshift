@@ -53,15 +53,18 @@ func StartEtcd(ready chan bool) error {
 	}
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	cfg := etcd.NewConfig()
-	cfg.ForceNewCluster = true //TODO
+	cfg.ClusterState = "new"
+	//cfg.ForceNewCluster = true //TODO
 	cfg.Logger = "zap"
 	cfg.Dir = "/var/lib/etcd/"
 	cfg.APUrls = setURL([]string{ip}, ":2380")
-	cfg.LPUrls = setURL([]string{"0.0.0.0"}, ":2380")
+	cfg.LPUrls = setURL([]string{ip}, ":2380")
 	cfg.ACUrls = setURL([]string{ip}, ":2379")
 	cfg.LCUrls = setURL([]string{"127.0.0.1", ip}, ":2379")
+	cfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, ":2381")
+
 	cfg.Name = hostname
-	cfg.InitialCluster = "default=https://127.0.0.1:2380," + hostname + "=" + "https://" + ip + ":2380"
+	cfg.InitialCluster = hostname + "=" + "https://" + ip + ":2380"
 
 	cfg.CipherSuites = tlsCipherSuites
 	cfg.ClientTLSInfo.CertFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-serving/etcd-serving.crt"
