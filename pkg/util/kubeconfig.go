@@ -7,7 +7,7 @@ import (
 )
 
 // Kubeconfig creates a kubeconfig
-func Kubeconfig(dir, filename, endpoint string) error {
+func Kubeconfig(path, endpoint string) error {
 	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
 apiVersion: v1
 kind: Config
@@ -45,9 +45,7 @@ users:
 		ClientCert: clientCert,
 		ClientKey:  clientKey,
 	}
-
-	os.MkdirAll(dir, 0700)
-	path := filepath.Join(dir, filename)
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 
 	output, err := os.Create(path)
 	if err != nil {
