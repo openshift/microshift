@@ -71,11 +71,6 @@ apiServerArguments:
     - "true"
   anonymous-auth:
     - "true"
-  authorization-mode:
-    - Scope
-    - SystemMasters
-    - RBAC
-    - Node
   audit-log-format:
     - json
   audit-log-maxbackup:
