@@ -10,6 +10,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
+	"encoding/base64"
 	"encoding/pem"
 	"io/ioutil"
 	"math"
@@ -54,23 +55,29 @@ func GenCA(hostname []string, commonName, organizationalUnit string, duration ti
 	return key, ca, err
 }
 
-func StoreRootCA(dir, certFilename, keyFilename string) {
-	if rootCA != nil && rootKey != nil {
-		certBuff := CertToPem(rootCA)
-		keyBuff := PrivateKeyToPem(rootKey)
-		os.MkdirAll(dir, 0700)
-		certPath := filepath.Join(dir, certFilename)
-		keyPath := filepath.Join(dir, keyFilename)
-		ioutil.WriteFile(certPath, certBuff, 0644)
-		ioutil.WriteFile(keyPath, keyBuff, 0644)
+func StoreRootCA(dir, certFilename, keyFilename string) error {
+	if rootCA == nil || rootKey == nil {
+		var err error
+		rootKey, rootCA, err = GenCA([]string{defaultHostname}, defaultCommonName, defaultOrganizationalUnit, defaultDuration)
+		if err != nil {
+			return err
+		}
 	}
+	certBuff := CertToPem(rootCA)
+	keyBuff := PrivateKeyToPem(rootKey)
+	os.MkdirAll(dir, 0700)
+	certPath := filepath.Join(dir, certFilename)
+	keyPath := filepath.Join(dir, keyFilename)
+	ioutil.WriteFile(certPath, certBuff, 0644)
+	ioutil.WriteFile(keyPath, keyBuff, 0644)
+	return nil
 }
 
 // GenCerts creates certs and keys
 // GenCerts("/var/lib/openshift/service-ca/key", "tls.crt", "tls.key", "example.com")
 func GenCerts(dir, certFilename, keyFilename string, svcName []string) error {
 	var err error
-	if rootCA == nil {
+	if rootCA == nil || rootKey == nil {
 		rootKey, rootCA, err = GenCA([]string{defaultHostname}, defaultCommonName, defaultOrganizationalUnit, defaultDuration)
 		if err != nil {
 			return err
@@ -346,4 +353,7 @@ func IPAddressesDNSNames(hosts []string) ([]net.IP, []string) {
 	}
 
 	return ips, dns
+}
+func Base64(data []byte) string {
+	return base64.StdEncoding.EncodeToString(data)
 }

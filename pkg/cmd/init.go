@@ -63,114 +63,113 @@ func initCerts() error {
 		return fmt.Errorf("failed to get host IP: %v", err)
 	}
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
-	if err := util.GenCerts("/etc/kubernetes/static-pod-certs/secrets/etcd-all-serving",
-		"etcd-serving-"+hostname+".crt", "etcd-serving-"+hostname+".key",
+	if err := util.GenCerts("/etc/kubernetes/ushift-certs/secrets/etcd-all-serving",
+		"etcd-serving.crt", "etcd-serving.key",
 		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
-	if err := util.GenCerts("/etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca",
+	if err := util.GenCerts("/etc/kubernetes/ushift-certs/configmaps/etcd-serving-ca",
 		"ca-bundle.crt", "ca-bundle.key",
 		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
 
-	if err := util.GenCerts("/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer",
-		"etcd-peer-"+hostname+".crt", "etcd-peer-"+hostname+".key",
+	if err := util.StoreRootCA("/etc/kubernetes/ushift-certs/secrets/etcd-all-peer",
+		"etcd-peer.crt", "etcd-peer.key"); err != nil {
+		return err
+	}
+	if err := util.StoreRootCA("/etc/kubernetes/ushift-certs/configmaps/etcd-peer-client-ca",
+		"ca-bundle.crt", "ca-bundle.key"); err != nil {
+		return err
+	}
+
+	// kube-apiserver
+	// etcd-cafile: /etc/kubernetes/ushift-resources/configmaps/etcd-serving-ca/ca-bundle.crt
+	if err := util.StoreRootCA("/etc/kubernetes/ushift-resources/configmaps/etcd-serving-ca",
+		"ca-bundle.crt", "ca-bundle.key"); err != nil {
+		return err
+	}
+	// etcd-certfile: /etc/kubernetes/ushift-resources/secrets/etcd-client/tls.crt
+	// etcd-keyfile: /etc/kubernetes/ushift-resources/secrets/etcd-client/tls.key
+	if err := util.GenCerts("/etc/kubernetes/ushift-resources/secrets/etcd-client",
+		"tls.crt", "tls.key",
 		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
-	if err := util.GenCerts("/etc/kubernetes/static-pod-certs/configmaps/etcd-peer-client-ca",
-		"ca-bundle.crt", "ca-bundle.key",
-		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
+	// kube-apiserver
+	// client-ca-file: /etc/kubernetes/ushift-certs/configmaps/client-ca/ca-bundle.crt
+	if err := util.StoreRootCA("/etc/kubernetes/ushift-certs/configmaps/client-ca/",
+		"ca-bundle.crt", "ca-bundle.key"); err != nil {
 		return err
 	}
 	/*
-			// etcd-cafile: /etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca/ca-bundle.crt
-			if err := util.GenCerts(hostname, "/etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca",
-				"ca-bundle.crt", "ca-bundle.key"); err != nil {
-				return err
-			}
-			// etcd-certfile: /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.crt
-			// etcd-keyfile: /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.key
-			if err := util.GenCerts(hostname, "/etc/kubernetes/static-pod-resources/secrets/etcd-client",
-				"tls.crt", "tls.key"); err != nil {
-				return err
-			}
-			// kube-apiserver
-			// client-ca-file: /etc/kubernetes/static-pod-certs/configmaps/client-ca/ca-bundle.crt
-			if err := util.GenCerts("kube-apiserver",
-				"/etc/kubernetes/static-pod-certs/configmaps/client-ca/",
-				"ca-bundle.crt",
-				"ca-bundle.key"); err != nil {
-				return err
-			}
 			// kubelet
-			// kubelet-certificate-authority: /etc/kubernetes/static-pod-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
+			// kubelet-certificate-authority: /etc/kubernetes/ushift-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
 			if err := util.GenCerts("kubelet-cert",
-				"/etc/kubernetes/static-pod-resources/configmaps/kubelet-serving-ca",
+				"/etc/kubernetes/ushift-resources/configmaps/kubelet-serving-ca",
 				"ca-bundle.crt",
 				"ca-bundle.key"); err != nil {
 				return err
 			}
-			// kubelet-client-certificate: /etc/kubernetes/static-pod-resources/secrets/kubelet-client/tls.crt
+			// kubelet-client-certificate: /etc/kubernetes/ushift-resources/secrets/kubelet-client/tls.crt
 			if err := util.GenCerts("kubelet-client-certificate",
-				"/etc/kubernetes/static-pod-resources/secrets/kubelet-client",
+				"/etc/kubernetes/ushift-resources/secrets/kubelet-client",
 				"tls.crt",
 				"tls.key"); err != nil {
 				return err
 			}
-			// kubelet-client-key: /etc/kubernetes/static-pod-resources/secrets/kubelet-client/tls.key
-			if err := util.GenCerts("/etc/kubernetes/static-pod-resources/secrets/kubelet-client/",
-				"/etc/kubernetes/static-pod-resources/secrets/kubelet-client",
+			// kubelet-client-key: /etc/kubernetes/ushift-resources/secrets/kubelet-client/tls.key
+			if err := util.GenCerts("/etc/kubernetes/ushift-resources/secrets/kubelet-client/",
+				"/etc/kubernetes/ushift-resources/secrets/kubelet-client",
 				"tls.crt",
 				"tls.key"); err != nil {
 				return err
 			}
 			// proxy client
-			// proxy-client-cert-file: /etc/kubernetes/static-pod-certs/secrets/aggregator-client/tls.crt
-			// proxy-client-key-file: /etc/kubernetes/static-pod-certs/secrets/aggregator-client/tls.key
+			// proxy-client-cert-file: /etc/kubernetes/ushift-certs/secrets/aggregator-client/tls.crt
+			// proxy-client-key-file: /etc/kubernetes/ushift-certs/secrets/aggregator-client/tls.key
 			if err := util.GenCerts("proxy-client",
-				"/etc/kubernetes/static-pod-certs/secrets/aggregator-client/",
+				"/etc/kubernetes/ushift-certs/secrets/aggregator-client/",
 				"tls.crt",
 				"tls.key"); err != nil {
 				return err
 			}
 			// request header
-			// requestheader-client-ca-file: /etc/kubernetes/static-pod-certs/configmaps/aggregator-client-ca/ca-bundle.crt
+			// requestheader-client-ca-file: /etc/kubernetes/ushift-certs/configmaps/aggregator-client-ca/ca-bundle.crt
 			if err := util.GenCerts("requestheader-client-ca-file",
-				"/etc/kubernetes/static-pod-certs/configmaps/aggregator-client-ca/ca-bundle.crt",
+				"/etc/kubernetes/ushift-certs/configmaps/aggregator-client-ca/ca-bundle.crt",
 				"ca-bundle.crt",
 				"ca-bundle.key"); err != nil {
 				return err
 			}
 			// tls
-			// tls-cert-file: /etc/kubernetes/static-pod-certs/secrets/service-network-serving-certkey/tls.crt
-			// tls-private-key-file: /etc/kubernetes/static-pod-certs/secrets/service-network-serving-certkey/tls.key
+			// tls-cert-file: /etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey/tls.crt
+			// tls-private-key-file: /etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey/tls.key
 			if err := util.GenCerts("tls",
-				"/etc/kubernetes/static-pod-certs/secrets/service-network-serving-certkey",
+				"/etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey",
 				"tls.crt",
 				"tls.key"); err != nil {
 				return err
 			}
 			// kube-controller-manager
-			// root-ca-file: /etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/ca-bundle.crt
+			// root-ca-file: /etc/kubernetes/ushift-resources/configmaps/serviceaccount-ca/ca-bundle.crt
 			if err := util.GenCerts("kube-controller-manager",
-				"/etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/",
+				"/etc/kubernetes/ushift-resources/configmaps/serviceaccount-ca/",
 				"ca-bundle.crt",
 				"ca-bundle.key"); err != nil {
 				return err
 			}
-			// service-account-private-key-file: /etc/kubernetes/static-pod-resources/secrets/service-account-private-key/service-account.key
+			// service-account-private-key-file: /etc/kubernetes/ushift-resources/secrets/service-account-private-key/service-account.key
 			if err := util.GenCerts("service-account-private-key-file",
-				"/etc/kubernetes/static-pod-resources/secrets/service-account-private-key",
+				"/etc/kubernetes/ushift-resources/secrets/service-account-private-key",
 				"service-account.crt",
 				"service-account.key"); err != nil {
 				return err
 			}
-			// cluster-signing-cert-file: /etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.crt
-			// cluster-signing-key-file: /etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.key
+			// cluster-signing-cert-file: /etc/kubernetes/ushift-certs/secrets/csr-signer/tls.crt
+			// cluster-signing-key-file: /etc/kubernetes/ushift-certs/secrets/csr-signer/tls.key
 			if err := util.GenCerts("cluster-signing-key-file",
-				"/etc/kubernetes/static-pod-certs/secrets/csr-signer",
+				"/etc/kubernetes/ushift-certs/secrets/csr-signer",
 				"tls.crt",
 				"tls.key"); err != nil {
 				return err
@@ -178,9 +177,9 @@ func initCerts() error {
 
 		// kube-scheduler
 		// client-cert-key
-		// /etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key
+		// /etc/kubernetes/ushift-certs/secrets/kube-scheduler-client-cert-key
 		if _, err := util.GenCerts("kube-scheduler",
-			"/etc/kubernetes/static-pod-certs/secrets/kube-scheduler-client-cert-key",
+			"/etc/kubernetes/ushift-certs/secrets/kube-scheduler-client-cert-key",
 			"tls.crt",
 			"tls.key"); err != nil {
 			return err

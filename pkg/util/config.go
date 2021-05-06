@@ -42,9 +42,9 @@ apiServerArguments:
   audit-log-path:
     - /var/log/kube-apiserver/audit.log
   audit-policy-file:
-    - /etc/kubernetes/static-pod-resources/configmaps/kube-apiserver-audit-policies/default.yaml
+    - /etc/kubernetes/ushift-resources/configmaps/kube-apiserver-audit-policies/default.yaml
   client-ca-file:
-    - /etc/kubernetes/static-pod-certs/configmaps/client-ca/ca-bundle.crt
+    - /etc/kubernetes/ushift-certs/configmaps/client-ca/ca-bundle.crt
   enable-admission-plugins:
     - CertificateApproval
     - CertificateSigning
@@ -100,11 +100,11 @@ apiServerArguments:
   endpoint-reconciler-type:
     - "lease"
   etcd-cafile:
-    - /etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca/ca-bundle.crt
+    - /etc/kubernetes/ushift-resources/configmaps/etcd-serving-ca/ca-bundle.crt
   etcd-certfile:
-    - /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.crt
+    - /etc/kubernetes/ushift-resources/secrets/etcd-client/tls.crt
   etcd-keyfile:
-    - /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.key
+    - /etc/kubernetes/ushift-resources/secrets/etcd-client/tls.key
   etcd-prefix:
     - kubernetes.io
   event-ttl:
@@ -116,11 +116,11 @@ apiServerArguments:
   insecure-port:
     - "0"
   kubelet-certificate-authority:
-    - /etc/kubernetes/static-pod-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
+    - /etc/kubernetes/ushift-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
   kubelet-client-certificate:
-    - /etc/kubernetes/static-pod-resources/secrets/kubelet-client/tls.crt
+    - /etc/kubernetes/ushift-resources/secrets/kubelet-client/tls.crt
   kubelet-client-key:
-    - /etc/kubernetes/static-pod-resources/secrets/kubelet-client/tls.key
+    - /etc/kubernetes/ushift-resources/secrets/kubelet-client/tls.key
   kubelet-https:
     - "true"
   kubelet-preferred-address-types:
@@ -138,15 +138,15 @@ apiServerArguments:
   min-request-timeout:
     - "3600"
   proxy-client-cert-file:
-    - /etc/kubernetes/static-pod-certs/secrets/aggregator-client/tls.crt
+    - /etc/kubernetes/ushift-certs/secrets/aggregator-client/tls.crt
   proxy-client-key-file:
-    - /etc/kubernetes/static-pod-certs/secrets/aggregator-client/tls.key
+    - /etc/kubernetes/ushift-certs/secrets/aggregator-client/tls.key
   requestheader-allowed-names:
     - kube-apiserver-proxy
     - system:kube-apiserver-proxy
     - system:openshift-aggregator
   requestheader-client-ca-file:
-    - /etc/kubernetes/static-pod-certs/configmaps/aggregator-client-ca/ca-bundle.crt
+    - /etc/kubernetes/ushift-certs/configmaps/aggregator-client-ca/ca-bundle.crt
   requestheader-extra-headers-prefix:
     - X-Remote-Extra-
   requestheader-group-headers:
@@ -165,9 +165,9 @@ apiServerArguments:
   storage-media-type:
     - application/vnd.kubernetes.protobuf
   tls-cert-file:
-    - /etc/kubernetes/static-pod-certs/secrets/service-network-serving-certkey/tls.crt
+    - /etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey/tls.crt
   tls-private-key-file:
-    - /etc/kubernetes/static-pod-certs/secrets/service-network-serving-certkey/tls.key
+    - /etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey/tls.key
 authConfig:
   oauthMetadataFile: ""
 consolePublicURL: ""
@@ -212,9 +212,9 @@ extendedArguments:
   flex-volume-plugin-dir:
   - "/etc/kubernetes/kubelet-plugins/volume/exec" # created by machine-config-operator, owned by storage team/hekumar@redhat.com
   pv-recycler-pod-template-filepath-nfs: # owned by storage team/fbertina@redhat.com
-  - "/etc/kubernetes/static-pod-resources/configmaps/recycler-config/recycler-pod.yaml"
+  - "/etc/kubernetes/ushift-resources/configmaps/recycler-config/recycler-pod.yaml"
   pv-recycler-pod-template-filepath-hostpath: # owned by storage team/fbertina@redhat.com
-  - "/etc/kubernetes/static-pod-resources/configmaps/recycler-config/recycler-pod.yaml"
+  - "/etc/kubernetes/ushift-resources/configmaps/recycler-config/recycler-pod.yaml"
   leader-elect:
   - "true"
   leader-elect-retry-period:
@@ -235,13 +235,13 @@ extendedArguments:
   cert-dir:
   - "/var/run/kubernetes"
   root-ca-file:
-  - "/etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/ca-bundle.crt"
+  - "/etc/kubernetes/ushift-resources/configmaps/serviceaccount-ca/ca-bundle.crt"
   service-account-private-key-file:
-  - "/etc/kubernetes/static-pod-resources/secrets/service-account-private-key/service-account.key"
+  - "/etc/kubernetes/ushift-resources/secrets/service-account-private-key/service-account.key"
   cluster-signing-cert-file:
-  - "/etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.crt"
+  - "/etc/kubernetes/ushift-certs/secrets/csr-signer/tls.crt"
   cluster-signing-key-file:
-  - "/etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.key"
+  - "/etc/kubernetes/ushift-certs/secrets/csr-signer/tls.key"
   kube-api-qps:
   - "150" # this is a historical values
   kube-api-burst:

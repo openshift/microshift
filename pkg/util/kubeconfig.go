@@ -7,13 +7,13 @@ import (
 )
 
 // Kubeconfig creates a kubeconfig
-func Kubeconfig(dir, filename, endpoint, clusterCA string) error {
+func Kubeconfig(dir, filename, endpoint string) error {
 	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
 apiVersion: v1
 kind: Config
 preferences:
   colors: true
-current-context: ushift-ctx
+current-context: ushift
 contexts:
 - context:
     cluster: ushift
@@ -31,6 +31,7 @@ users:
     client-certificate-data: ${ClientCert}
     client-key-data: ${ClientKey}
 `))
+	clusterCA := Base64(CertToPem(rootCA))
 	clientCert := ""
 	clientKey := ""
 	data := struct {
