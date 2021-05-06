@@ -64,7 +64,7 @@ func startController(args []string) error {
 	ocpCMReadyCh := make(chan bool, 1)
 	ocpControllerManager(args, ocpCMReadyCh)
 	<-ocpCMReadyCh
-	return nil
+	select {}
 }
 
 func kubeControllerManager(args []string, ready chan bool) {

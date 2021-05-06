@@ -38,8 +38,9 @@ func KubeAPIServer(args []string, ready chan bool) error {
 
 	command := kubeapiserver.NewAPIServerCommand()
 	apiArgs := []string{
-		"--openshift-config=/etc/kubernetes/static-pod-resources/configmaps/config/config.yaml",
+		"--openshift-config=/etc/kubernetes/ushift-resources/kube-apiserver/config/config.yaml",
 		"--advertise-address=" + ip,
+		"-v=3",
 	}
 	if err := command.ParseFlags(apiArgs); err != nil {
 		return err
