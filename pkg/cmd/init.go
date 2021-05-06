@@ -205,20 +205,17 @@ func initCerts() error {
 }
 
 func initServerConfig() error {
-	/*
-		if err := util.KubeAPIServerConfig(); err != nil {
+		if err := util.KubeAPIServerConfig("/etc/kubernetes/static-pod-resources/configmaps/config/config.yaml", "" /*svc CIDR*/); err != nil {
 			return err
 		}
-		if err := util.KubeControllerManagerConfig(); err != nil {
+		if err := util.KubeControllerManagerConfig("/etc/kubernetes/static-pod-resources/configmaps/config/config.yaml"); err != nil {
 			return err
 		}
-		if err := util.OpenShiftAPIServerConfig(); err != nil {
+		if err := util.OpenShiftAPIServerConfig("/var/run/configmaps/config/config.yaml"); err != nil {
 			return err
 		}
-		if err := util.OpenShiftControllerManagerConfig(); err != nil {
+		if err := util.OpenShiftControllerManagerConfig("/var/run/configmaps/config/config.yaml"); err != nil {
 			return err
 		}
-	*/
-
 	return nil
 }
