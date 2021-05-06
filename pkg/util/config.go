@@ -1,6 +1,7 @@
 package util
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -11,12 +12,52 @@ const (
 	port = 32444
 )
 
+func kubeAPIAuditPolicyFile(path string) error {
+	data := []byte(`
+apiVersion: audit.k8s.io/v1beta1
+kind: Policy
+metadata:
+  name: Default
+# Don't generate audit events for all requests in RequestReceived stage.
+omitStages:
+- "RequestReceived"
+rules:
+# Don't log requests for events
+- level: None
+  resources:
+  - group: ""
+    resources: ["events"]
+# Don't log oauth tokens as metadata.name is the secret
+- level: None
+  resources:
+  - group: "oauth.openshift.io"
+    resources: ["oauthaccesstokens", "oauthauthorizetokens"]
+# Don't log authenticated requests to certain non-resource URL paths.
+- level: None
+  userGroups: ["system:authenticated", "system:unauthenticated"]
+  nonResourceURLs:
+  - "/api*" # Wildcard matching.
+  - "/version"
+  - "/healthz"
+  - "/readyz"
+# A catch-all rule to log all other requests at the Metadata level.
+- level: Metadata
+  # Long-running requests like watches that fall under this rule will not
+  # generate an audit event in RequestReceived.
+  omitStages:
+  - "RequestReceived"`)
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
+}
+
 // KubeAPIServerConfig creates a config for kube-apiserver to use in --openshift-config option
 func KubeAPIServerConfig(path, svcCIDR string) error {
 	// based on https://github.com/openshift/cluster-kube-apiserver-operator/blob/master/bindata/v4.1.0/config/defaultconfig.yaml
 	configTemplate := template.Must(template.New("config").Parse(`
 apiVersion: kubecontrolplane.config.openshift.io/v1  
-kind: KubeAPIServerConfig  
+kind: KubeAPIServerConfig
+serviceAccountPublicKeyFiles:
+  - /etc/kubernetes/ushift-resources/kube-apiserver/sa-public-key/serving-ca.pub
 admission:
   pluginConfig:
     network.openshift.io/ExternalIPRanger:
@@ -45,9 +86,7 @@ apiServerArguments:
   audit-log-path:
     - /var/log/kube-apiserver/audit.log
   audit-policy-file:
-    - /etc/kubernetes/ushift-resources/configmaps/kube-apiserver-audit-policies/default.yaml
-  client-ca-file:
-    - /etc/kubernetes/ushift-certs/configmaps/client-ca/ca-bundle.crt
+    - /etc/kubernetes/ushift-resources/kube-apiserver-audit-policies/default.yaml
   enable-admission-plugins:
     - CertificateApproval
     - CertificateSigning
@@ -66,7 +105,6 @@ apiServerArguments:
     - PodTolerationRestriction
     - Priority
     - ResourceQuota
-    - Class
     - ServiceAccount
     - StorageObjectInUseProtection
     - TaintNodesByCondition
@@ -102,14 +140,6 @@ apiServerArguments:
     - "true"
   endpoint-reconciler-type:
     - "lease"
-  etcd-cafile:
-    - /etc/kubernetes/ushift-resources/configmaps/etcd-serving-ca/ca-bundle.crt
-  etcd-certfile:
-    - /etc/kubernetes/ushift-resources/secrets/etcd-client/tls.crt
-  etcd-keyfile:
-    - /etc/kubernetes/ushift-resources/secrets/etcd-client/tls.key
-  etcd-prefix:
-    - kubernetes.io
   event-ttl:
     - 3h
   goaway-chance:
@@ -119,11 +149,11 @@ apiServerArguments:
   insecure-port:
     - "0"
   kubelet-certificate-authority:
-    - /etc/kubernetes/ushift-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
+    - /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
   kubelet-client-certificate:
-    - /etc/kubernetes/ushift-resources/secrets/kubelet-client/tls.crt
+    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/kubelet-client/tls.crt
   kubelet-client-key:
-    - /etc/kubernetes/ushift-resources/secrets/kubelet-client/tls.key
+    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/kubelet-client/tls.key
   kubelet-https:
     - "true"
   kubelet-preferred-address-types:
@@ -141,15 +171,15 @@ apiServerArguments:
   min-request-timeout:
     - "3600"
   proxy-client-cert-file:
-    - /etc/kubernetes/ushift-certs/secrets/aggregator-client/tls.crt
+    - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client/tls.crt
   proxy-client-key-file:
-    - /etc/kubernetes/ushift-certs/secrets/aggregator-client/tls.key
+    - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client/tls.key
   requestheader-allowed-names:
     - kube-apiserver-proxy
     - system:kube-apiserver-proxy
     - system:openshift-aggregator
   requestheader-client-ca-file:
-    - /etc/kubernetes/ushift-certs/configmaps/aggregator-client-ca/ca-bundle.crt
+    - /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
   requestheader-extra-headers-prefix:
     - X-Remote-Extra-
   requestheader-group-headers:
@@ -168,9 +198,23 @@ apiServerArguments:
   storage-media-type:
     - application/vnd.kubernetes.protobuf
   tls-cert-file:
-    - /etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey/tls.crt
+    - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt
   tls-private-key-file:
-    - /etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey/tls.key
+    - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key
+  service-account-issuer:
+    - https://kubernetes.default.svc
+  service-account-signing-key-file:
+    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-signing-key/service-account.key
+  etcd-cafile:
+    - /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
+  etcd-certfile:
+    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client/tls.crt
+  etcd-keyfile:
+    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client/tls.key
+  etcd-prefix:
+    - kubernetes.io
+  etcd-servers:
+    - https://127.0.0.1:2379
 authConfig:
   oauthMetadataFile: ""
 consolePublicURL: ""
@@ -181,6 +225,10 @@ servingInfo:
   bindAddress: 0.0.0.0:6443 # set by observe_network.go
   bindNetwork: tcp4 # set by observe_network.go
   namedCertificates: null # set by observe_apiserver.go`))
+
+	if err := kubeAPIAuditPolicyFile("/etc/kubernetes/ushift-resources/kube-apiserver-audit-policies/default.yaml"); err != nil {
+		return err
+	}
 	data := struct {
 		ServiceCIDR string
 	}{
@@ -236,18 +284,11 @@ extendedArguments:
   - "0"
   cert-dir:
   - "/var/run/kubernetes"
-  root-ca-file:
-  - "/etc/kubernetes/ushift-resources/configmaps/serviceaccount-ca/ca-bundle.crt"
-  service-account-private-key-file:
-  - "/etc/kubernetes/ushift-resources/secrets/service-account-private-key/service-account.key"
-  cluster-signing-cert-file:
-  - "/etc/kubernetes/ushift-certs/secrets/csr-signer/tls.crt"
-  cluster-signing-key-file:
-  - "/etc/kubernetes/ushift-certs/secrets/csr-signer/tls.key"
   kube-api-qps:
   - "150" # this is a historical values
   kube-api-burst:
-  - "300" # this is a historical values`))
+  - "300" # this is a historical values
+  `))
 	data := struct {
 		ClientCACert, KubeConfig, ServingCert, ServingKey, ServingClientCert,
 		IngressDomain, EtcdUrl, EtcdCert, EtcdKey, EtcdCA string

@@ -89,7 +89,7 @@ func GenCerts(dir, certFilename, keyFilename string, svcName []string) error {
 		IPAddresses:  ip,
 		Validity:     defaultDuration,
 		IsCA:         false,
-		KeyUsages:    x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature, /*| x509.KeyUsageCertSign*/
+		KeyUsages:    x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		ExtKeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		Subject:      pkix.Name{CommonName: dns[0], OrganizationalUnit: []string{defaultOrganizationalUnit}},
 	}
@@ -105,6 +105,27 @@ func GenCerts(dir, certFilename, keyFilename string, svcName []string) error {
 	ioutil.WriteFile(certPath, certBuff, 0644)
 	ioutil.WriteFile(keyPath, keyBuff, 0644)
 	return err
+}
+
+// GenKeys generates and save rsa keys
+func GenKeys(dir, pubFilename, keyFilename string) error {
+	key, err := PrivateKey()
+	if err != nil {
+		return err
+	}
+	pub := &key.PublicKey
+	pubBuff, err := PublicKeyToPem(pub)
+	if err != nil {
+		return err
+	}
+	keyBuff := PrivateKeyToPem(key)
+	os.MkdirAll(dir, 0700)
+	pubPath := filepath.Join(dir, pubFilename)
+	keyPath := filepath.Join(dir, keyFilename)
+	ioutil.WriteFile(pubPath, pubBuff, 0644)
+	ioutil.WriteFile(keyPath, keyBuff, 0644)
+	return err
+
 }
 
 // based on github.com/hypershift/certs/tls.go

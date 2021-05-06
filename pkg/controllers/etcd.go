@@ -66,13 +66,13 @@ func StartEtcd(ready chan bool) error {
 	cfg.CipherSuites = tlsCipherSuites
 	cfg.ClientTLSInfo.CertFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-serving/etcd-serving.crt"
 	cfg.ClientTLSInfo.KeyFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-serving/etcd-serving.key"
-	cfg.ClientTLSInfo.TrustedCAFile = "/etc/kubernetes/ushift-certs/configmaps/etcd-serving-ca/ca-bundle.crt"
+	cfg.ClientTLSInfo.TrustedCAFile = "/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt"
 	cfg.ClientTLSInfo.ClientCertAuth = false
 	cfg.ClientTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
 	cfg.PeerTLSInfo.CertFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-peer/etcd-peer.crt"
 	cfg.PeerTLSInfo.KeyFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-peer/etcd-peer.key"
-	cfg.PeerTLSInfo.TrustedCAFile = "/etc/kubernetes/ushift-certs/configmaps/etcd-peer-client-ca/ca-bundle.crt"
+	cfg.PeerTLSInfo.TrustedCAFile = "/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt"
 	cfg.PeerTLSInfo.ClientCertAuth = false
 	cfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
