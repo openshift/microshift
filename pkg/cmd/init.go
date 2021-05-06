@@ -68,14 +68,14 @@ func initCerts() error {
 		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
-	if err := util.GenCerts("/etc/kubernetes/ushift-certs/configmaps/etcd-serving-ca",
-		"ca-bundle.crt", "ca-bundle.key",
-		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
+	if err := util.StoreRootCA("/etc/kubernetes/ushift-certs/configmaps/etcd-serving-ca",
+		"ca-bundle.crt", "ca-bundle.key"); err != nil {
 		return err
 	}
 
-	if err := util.StoreRootCA("/etc/kubernetes/ushift-certs/secrets/etcd-all-peer",
-		"etcd-peer.crt", "etcd-peer.key"); err != nil {
+	if err := util.GenCerts("/etc/kubernetes/ushift-certs/secrets/etcd-all-peer",
+		"etcd-peer.crt", "etcd-peer.key",
+		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
 	if err := util.StoreRootCA("/etc/kubernetes/ushift-certs/configmaps/etcd-peer-client-ca",
@@ -205,17 +205,17 @@ func initCerts() error {
 }
 
 func initServerConfig() error {
-		if err := util.KubeAPIServerConfig("/etc/kubernetes/static-pod-resources/configmaps/config/config.yaml", "" /*svc CIDR*/); err != nil {
-			return err
-		}
-		if err := util.KubeControllerManagerConfig("/etc/kubernetes/static-pod-resources/configmaps/config/config.yaml"); err != nil {
-			return err
-		}
-		if err := util.OpenShiftAPIServerConfig("/var/run/configmaps/config/config.yaml"); err != nil {
-			return err
-		}
-		if err := util.OpenShiftControllerManagerConfig("/var/run/configmaps/config/config.yaml"); err != nil {
-			return err
-		}
+	if err := util.KubeAPIServerConfig("/etc/kubernetes/ushift-resources/kube-apiserver/config/config.yaml", "" /*svc CIDR*/); err != nil {
+		return err
+	}
+	if err := util.KubeControllerManagerConfig("/etc/kubernetes/ushift-resources/kube-controller-manager/config/config.yaml"); err != nil {
+		return err
+	}
+	if err := util.OpenShiftAPIServerConfig("/etc/kubernetes/ushift-resources/openshift-apiserver/config/config.yaml"); err != nil {
+		return err
+	}
+	if err := util.OpenShiftControllerManagerConfig("/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml"); err != nil {
+		return err
+	}
 	return nil
 }

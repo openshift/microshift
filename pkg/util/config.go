@@ -2,6 +2,7 @@ package util
 
 import (
 	"os"
+	"path/filepath"
 	"strconv"
 	"text/template"
 )
@@ -14,6 +15,8 @@ const (
 func KubeAPIServerConfig(path, svcCIDR string) error {
 	// based on https://github.com/openshift/cluster-kube-apiserver-operator/blob/master/bindata/v4.1.0/config/defaultconfig.yaml
 	configTemplate := template.Must(template.New("config").Parse(`
+apiVersion: kubecontrolplane.config.openshift.io/v1  
+kind: KubeAPIServerConfig  
 admission:
   pluginConfig:
     network.openshift.io/ExternalIPRanger:
@@ -177,14 +180,13 @@ servicesSubnet: {{.ServiceCIDR}} # 10.3.0.0/16 # ServiceCIDR # set by observe_ne
 servingInfo:
   bindAddress: 0.0.0.0:6443 # set by observe_network.go
   bindNetwork: tcp4 # set by observe_network.go
-  namedCertificates: null # set by observe_apiserver.go
-	`))
+  namedCertificates: null # set by observe_apiserver.go`))
 	data := struct {
 		ServiceCIDR string
 	}{
 		ServiceCIDR: svcCIDR,
 	}
-
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	output, err := os.Create(path)
 	if err != nil {
 		return err
@@ -263,7 +265,7 @@ extendedArguments:
 			EtcdKey:           ,
 		*/
 	}
-
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	output, err := os.Create(path)
 	if err != nil {
 		return err
@@ -367,7 +369,7 @@ storageConfig:
 			EtcdKey:           ,
 		*/
 	}
-
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	output, err := os.Create(path)
 	if err != nil {
 		return err
@@ -405,7 +407,7 @@ ingress:
 		DeployerName:     "docker-build",
 		ImageRegistryUrl: "image-registry.openshift-image-registry.svc:5000",
 	}
-
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	output, err := os.Create(path)
 	if err != nil {
 		return err

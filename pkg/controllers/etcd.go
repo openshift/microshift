@@ -64,15 +64,15 @@ func StartEtcd(ready chan bool) error {
 	cfg.InitialCluster = "default=https://127.0.0.1:2380," + hostname + "=" + "https://" + ip + ":2380"
 
 	cfg.CipherSuites = tlsCipherSuites
-	cfg.ClientTLSInfo.CertFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-serving/" + "etcd-serving-" + hostname + ".crt"
-	cfg.ClientTLSInfo.KeyFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-serving/" + "etcd-serving-" + hostname + ".key"
-	cfg.ClientTLSInfo.TrustedCAFile = "/etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca/ca-bundle.crt"
+	cfg.ClientTLSInfo.CertFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-serving/etcd-serving.crt"
+	cfg.ClientTLSInfo.KeyFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-serving/etcd-serving.key"
+	cfg.ClientTLSInfo.TrustedCAFile = "/etc/kubernetes/ushift-certs/configmaps/etcd-serving-ca/ca-bundle.crt"
 	cfg.ClientTLSInfo.ClientCertAuth = false
 	cfg.ClientTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
-	cfg.PeerTLSInfo.CertFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer/" + "etcd-peer-" + hostname + ".crt"
-	cfg.PeerTLSInfo.KeyFile = "/etc/kubernetes/static-pod-certs/secrets/etcd-all-peer/" + "etcd-peer-" + hostname + ".key"
-	cfg.PeerTLSInfo.TrustedCAFile = "/etc/kubernetes/static-pod-certs/configmaps/etcd-peer-client-ca/ca-bundle.crt"
+	cfg.PeerTLSInfo.CertFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-peer/etcd-peer.crt"
+	cfg.PeerTLSInfo.KeyFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-peer/etcd-peer.key"
+	cfg.PeerTLSInfo.TrustedCAFile = "/etc/kubernetes/ushift-certs/configmaps/etcd-peer-client-ca/ca-bundle.crt"
 	cfg.PeerTLSInfo.ClientCertAuth = false
 	cfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
