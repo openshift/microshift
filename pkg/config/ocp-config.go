@@ -1,15 +1,15 @@
 package config
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"text/template"
 )
 
 // OpenShiftAPIServerConfig creates a config for openshift-apiserver to use
 func OpenShiftAPIServerConfig(path string) error {
-	configTemplate := template.Must(template.New("apiserver-config.yaml").Parse(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
+	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftAPIServerConfig
 aggregatorConfig:
   allowedNames:
@@ -19,7 +19,6 @@ aggregatorConfig:
   - system:kube-apiserver-proxy
   - system:openshift-aggregator
   - system:admin
-  clientCA: {{.ClientCACert}}
   extraHeaderPrefixes:
   - X-Remote-Extra-
   groupHeaders:
@@ -63,52 +62,23 @@ auditConfig:
     - level: Metadata
       omitStages:
       - RequestReceived
-kubeClientConfig:
-  kubeConfig: {{.KubeConfig}}
-servingInfo:
-  bindAddress: "0.0.0.0:` + strconv.Itoa(port) + `" 
-  certFile: {{.ServingCert}}
-  keyFile: {{.ServingKey}}
-  clientCA: {{.ServingClientCert}}
 imagePolicyConfig:
   internalRegistryHostname: image-registry.openshift-image-registry.svc:5000
 projectConfig:
   projectRequestMessage: ''
 routingConfig:
-  subdomain: {{.IngressDomain}}
+  subdomain: "ushift.testing"
+kubeClientConfig:
+  kubeConfig: /etc/kubernetes/ushift-resources/openshift-apiserver/kubeconfig/kubeconfig
 storageConfig:
   urls:
-  - {{.EtcdUrl}}
-  certFile: {{.EtcdCert}}
-  keyFile: {{.EtcdKey}}
-  ca: {{.EtcdCA}}
-  `))
-
-	data := struct {
-		ClientCACert, KubeConfig, ServingCert, ServingKey, ServingClientCert,
-		IngressDomain, EtcdUrl, EtcdCert, EtcdKey, EtcdCA string
-	}{
-		/*
-			ClientCACert:      ,
-			KubeConfig:        ,
-			ServingCert:       ,
-			ServingKey:        ,
-			ServingClientCert: ,
-			IngressDomain:     ,
-			EtcdUrl:           ,
-			EtcdCA:            ,
-			EtcdCert:          ,
-			EtcdKey:           ,
-		*/
-	}
+  - https://127.0.0.1:2379
+  certFile: /etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client/tls.crt
+  keyFile: /etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client/tls.key
+  ca: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
+  `)
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	output, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer output.Close()
-
-	return configTemplate.Execute(output, &data)
+	return ioutil.WriteFile(path, data, 0644)
 }
 
 func OpenShiftControllerManagerConfig(path string) error {

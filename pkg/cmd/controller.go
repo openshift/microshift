@@ -16,20 +16,13 @@ limitations under the License.
 package cmd
 
 import (
-	"os"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/controllers"
 
-	genericapiserver "k8s.io/apiserver/pkg/server"
-
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
-
-	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
-	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 )
 
 var ControllerCmd = &cobra.Command{
@@ -48,6 +41,7 @@ func startController(args []string) error {
 	}
 	<-etcdReadyCh
 	kubeAPIReadyCh := make(chan bool, 1)
+	logrus.Infof("starting kube-apiserver")
 	controllers.KubeAPIServer(args, kubeAPIReadyCh)
 	<-kubeAPIReadyCh
 	kubeCMReadyCh := make(chan bool, 1)
@@ -58,11 +52,13 @@ func startController(args []string) error {
 	<-kubeSchedulerReadyCh
 	//TODO: cloud provider
 
+	logrus.Infof("starting openshift-apiserver")
 	ocpAPIReadyCh := make(chan bool, 1)
-	ocpAPIServer(args, ocpAPIReadyCh)
+	controllers.OCPAPIServer(args, ocpAPIReadyCh)
 	<-ocpAPIReadyCh
+
 	ocpCMReadyCh := make(chan bool, 1)
-	ocpControllerManager(args, ocpCMReadyCh)
+	controllers.OCPControllerManager(args, ocpCMReadyCh)
 	<-ocpCMReadyCh
 	select {}
 }
@@ -79,57 +75,6 @@ func kubeScheduler(args []string, ready chan bool) {
 	command := kubescheduler.NewSchedulerCommand()
 	go func() {
 		logrus.Fatalf("kube-scheduler exited: %v", command.Execute())
-	}()
-	ready <- true
-}
-
-func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "openshift-apiserver",
-		Short: "Command for the OpenShift API Server",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
-			os.Exit(1)
-		},
-	}
-	start := openshift_apiserver.NewOpenShiftAPIServerCommand("start", os.Stdout, os.Stderr, stopCh)
-	cmd.AddCommand(start)
-
-	return cmd
-}
-func ocpAPIServer(args []string, ready chan bool) {
-	stopCh := genericapiserver.SetupSignalHandler(false)
-	command := newOpenshiftApiServerCommand(stopCh)
-	startArgs := append(args, "start")
-	command.SetArgs(startArgs)
-	go func() {
-		logrus.Fatalf("ocp apiserver exited: %v", command.Execute())
-	}()
-	ready <- true
-}
-
-func newOpenShiftControllerManagerCommand(stopCh <-chan struct{}) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "openshift-controller-manager",
-		Short: "Command for the OpenShift Controllers",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
-			os.Exit(1)
-		},
-	}
-	start := openshift_controller_manager.NewOpenShiftControllerManagerCommand("start", os.Stdout, os.Stderr)
-	cmd.AddCommand(start)
-	return cmd
-}
-
-func ocpControllerManager(args []string, ready chan bool) {
-	stopCh := genericapiserver.SetupSignalHandler(false)
-	command := newOpenShiftControllerManagerCommand(stopCh)
-	startArgs := append(args, "start")
-	command.SetArgs(startArgs)
-
-	go func() {
-		logrus.Fatalf("ocp controller-manager exited: %v", command.Execute())
 	}()
 	ready <- true
 }
