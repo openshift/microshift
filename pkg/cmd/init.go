@@ -21,6 +21,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 )
 
@@ -216,16 +217,16 @@ func initCerts() error {
 }
 
 func initServerConfig() error {
-	if err := util.KubeAPIServerConfig("/etc/kubernetes/ushift-resources/kube-apiserver/config/config.yaml", "" /*svc CIDR*/); err != nil {
+	if err := config.KubeAPIServerConfig("/etc/kubernetes/ushift-resources/kube-apiserver/config/config.yaml", "" /*svc CIDR*/); err != nil {
 		return err
 	}
-	if err := util.KubeControllerManagerConfig("/etc/kubernetes/ushift-resources/kube-controller-manager/config/config.yaml"); err != nil {
+	if err := config.KubeControllerManagerConfig("/etc/kubernetes/ushift-resources/kube-controller-manager/config/config.yaml"); err != nil {
 		return err
 	}
-	if err := util.OpenShiftAPIServerConfig("/etc/kubernetes/ushift-resources/openshift-apiserver/config/config.yaml"); err != nil {
+	if err := config.OpenShiftAPIServerConfig("/etc/kubernetes/ushift-resources/openshift-apiserver/config/config.yaml"); err != nil {
 		return err
 	}
-	if err := util.OpenShiftControllerManagerConfig("/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml"); err != nil {
+	if err := config.OpenShiftControllerManagerConfig("/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml"); err != nil {
 		return err
 	}
 	return nil
