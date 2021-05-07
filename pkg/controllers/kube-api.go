@@ -40,7 +40,7 @@ func KubeAPIServer(args []string, ready chan bool) error {
 	apiArgs := []string{
 		"--openshift-config=/etc/kubernetes/ushift-resources/kube-apiserver/config/config.yaml",
 		"--advertise-address=" + ip,
-		"-v=3",
+		//"-v=3",
 	}
 	if err := command.ParseFlags(apiArgs); err != nil {
 		return err
@@ -62,7 +62,7 @@ func KubeAPIServer(args []string, ready chan bool) error {
 		return err
 	}
 
-	err = genericcontrollermanager.WaitForAPIServer(versionedClient, 100*time.Second)
+	err = genericcontrollermanager.WaitForAPIServer(versionedClient, 10*time.Second)
 	if err != nil {
 		logrus.Fatalf("Failed to wait for apiserver being healthy: %v", err)
 	}
