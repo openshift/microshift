@@ -108,6 +108,11 @@ apiServerArguments:
     - "10"
   audit-log-maxsize:
     - "100"
+  authorization-mode:
+    - Scope
+    - SystemMasters
+    - RBAC
+    - Node    
   audit-log-path:
     - /var/log/kube-apiserver/audit.log
   audit-policy-file:
@@ -249,6 +254,41 @@ apiServerArguments:
     - kubernetes.io
   etcd-servers:
     - https://127.0.0.1:2379
+auditConfig:
+  auditFilePath: "/var/log/kube-apiserver/audit.log"
+  enabled: true
+  logFormat: json
+  maximumFileSizeMegabytes: 100
+  maximumRetainedFiles: 10
+  policyConfiguration:
+    apiVersion: audit.k8s.io/v1beta1
+    kind: Policy
+    omitStages:
+    - RequestReceived
+    rules:
+    - level: None
+      resources:
+      - group: ''
+        resources:
+        - events
+    - level: None
+      resources:
+      - group: oauth.openshift.io
+        resources:
+        - oauthaccesstokens
+        - oauthauthorizetokens
+    - level: None
+      nonResourceURLs:
+      - "/api*"
+      - "/version"
+      - "/healthz"
+      - "/readyz"
+      userGroups:
+      - system:authenticated
+      - system:unauthenticated
+    - level: Metadata
+      omitStages:
+      - RequestReceived    
 authConfig:
   oauthMetadataFile: "/etc/kubernetes/ushift-resources/kube-apiserver/oauthMetadata"
   requestHeader:
@@ -273,7 +313,7 @@ servicesSubnet: {{.ServiceCIDR}} # 10.3.0.0/16 # ServiceCIDR # set by observe_ne
 servingInfo:
   bindAddress: 0.0.0.0:6443 # set by observe_network.go
   bindNetwork: tcp4 # set by observe_network.go
-  namedCertificates: null # set by observe_apiserver.go`))
+`))
 
 	if err := kubeAPIOAuthMetadataFile("/etc/kubernetes/ushift-resources/kube-apiserver/oauthMetadata"); err != nil {
 		return err
