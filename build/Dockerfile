@@ -1,11 +1,11 @@
-FROM golang:1.16
-LABEL name=microshift-build
+FROM docker.io/golang:1.16
+LABEL name=ushift-build
 
-ENV GOPATH=/opt/app-root
+ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache
 
 WORKDIR $GOPATH/src/github.com/microshift
 
-VOLUME /opt/app-root/src/microshift
+VOLUME go_cache:/mnt/cache
 
 RUN \
 printf "%s\n" \
