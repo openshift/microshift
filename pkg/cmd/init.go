@@ -91,7 +91,7 @@ func initCerts() error {
 	}
 	if err := util.GenCerts("/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey",
 		"tls.crt", "tls.key",
-		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
+		[]string{ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost", "kube-apiserver"}); err != nil {
 		return err
 	}
 
@@ -101,12 +101,12 @@ func initCerts() error {
 	}
 	if err := util.GenCerts("/etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client",
 		"tls.crt", "tls.key",
-		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
+		[]string{"system:admin"}); err != nil {
 		return err
 	}
 	if err := util.GenCerts("/etc/kubernetes/ushift-resources/kube-apiserver/secrets/kubelet-client",
 		"tls.crt", "tls.key",
-		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
+		[]string{"kube-apiserver", "system:kube-apiserver"}); err != nil {
 		return err
 	}
 	if err := util.GenKeys("/etc/kubernetes/ushift-resources/kube-apiserver/sa-public-key",
