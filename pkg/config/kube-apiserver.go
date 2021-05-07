@@ -49,6 +49,37 @@ rules:
 	return ioutil.WriteFile(path, data, 0644)
 }
 
+func kubeAPIOAuthMetadataFile(path string) error {
+	data := []byte(`
+  {
+    "issuer": "https://oauth-openshift.ushift.testing",
+    "authorization_endpoint": "https://oauth-openshift.ushift.testing/oauth/authorize",
+    "token_endpoint": "https://oauth-openshift.ushift.testing/oauth/token",
+    "scopes_supported": [
+      "user:check-access",
+      "user:full",
+      "user:info",
+      "user:list-projects",
+      "user:list-scoped-projects"
+    ],
+    "response_types_supported": [
+      "code",
+      "token"
+    ],
+    "grant_types_supported": [
+      "authorization_code",
+      "implicit"
+    ],
+    "code_challenge_methods_supported": [
+      "plain",
+      "S256"
+    ]
+  }  
+`)
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
+}
+
 // KubeAPIServerConfig creates a config for kube-apiserver to use in --openshift-config option
 func KubeAPIServerConfig(path, svcCIDR string) error {
 	// based on https://github.com/openshift/cluster-kube-apiserver-operator/blob/master/bindata/v4.1.0/config/defaultconfig.yaml
@@ -169,9 +200,18 @@ apiServerArguments:
   proxy-client-key-file:
     - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client/tls.key
   requestheader-allowed-names:
+    - aggregator
+    - system:aggregator
+    - openshift-apiserver
+    - system:openshift-apiserver
+    - kube-apiserver
+    - system:kube-apiserver
+    - system:openshift-aggregator
+    - system:auth-proxy
     - kube-apiserver-proxy
     - system:kube-apiserver-proxy
     - system:openshift-aggregator
+    - openshift-aggregator
   requestheader-client-ca-file:
     - /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
   requestheader-extra-headers-prefix:
@@ -210,7 +250,22 @@ apiServerArguments:
   etcd-servers:
     - https://127.0.0.1:2379
 authConfig:
-  oauthMetadataFile: ""
+  oauthMetadataFile: "/etc/kubernetes/ushift-resources/kube-apiserver/oauthMetadata"
+  requestHeader:
+    clientCA: "/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt"
+    clientCommonNames:
+    - kube-apiserver
+    - system:kube-apiserver
+    - kube-apiserver-proxy
+    - system:kube-apiserver-proxy
+    - system:openshift-aggregator
+    extraHeaderPrefixes:
+    - X-Remote-Extra-
+    groupHeaders:
+    - X-Remote-Group
+    usernameHeaders:
+    - X-Remote-User
+  webhookTokenAuthenticators:
 consolePublicURL: ""
 projectConfig:
   defaultNodeSelector: ""
@@ -220,6 +275,9 @@ servingInfo:
   bindNetwork: tcp4 # set by observe_network.go
   namedCertificates: null # set by observe_apiserver.go`))
 
+	if err := kubeAPIOAuthMetadataFile("/etc/kubernetes/ushift-resources/kube-apiserver/oauthMetadata"); err != nil {
+		return err
+	}
 	if err := kubeAPIAuditPolicyFile("/etc/kubernetes/ushift-resources/kube-apiserver-audit-policies/default.yaml"); err != nil {
 		return err
 	}

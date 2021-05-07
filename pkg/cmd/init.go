@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/constant"
 	"github.com/openshift/microshift/pkg/util"
 )
 
@@ -44,11 +45,10 @@ func initAll(args []string) error {
 		return err
 	}
 	// create kubeconfig for kube-scheduler, kubelet, openshift-apiserver,controller-manager
-	/*
-		if err := util.Kubeconfig(); err != nil {
-			return err
-		}
-	*/
+	if err := initKubeconfig(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -227,6 +227,22 @@ func initServerConfig() error {
 		return err
 	}
 	if err := config.OpenShiftControllerManagerConfig("/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func initKubeconfig() error {
+	if err := util.Kubeconfig(constant.AdminKubeconfigPath, []string{"system:admin", "system:masters"}); err != nil {
+		return err
+	}
+	if err := util.Kubeconfig(constant.KubeAPIKubeconfigPath, []string{"kube-apiserver", "system:kube-apiserver"}); err != nil {
+		return err
+	}
+	if err := util.Kubeconfig(constant.KubeControllerManagerKubeconfigPath, []string{"kube-controller-manager", "system:kube-controller-manager"}); err != nil {
+		return err
+	}
+	if err := util.Kubeconfig(constant.KubeSchedulerKubeconfigPath, []string{"kube-scheduler", "system:kube-scheduler"}); err != nil {
 		return err
 	}
 	return nil

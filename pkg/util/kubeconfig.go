@@ -7,7 +7,7 @@ import (
 )
 
 // Kubeconfig creates a kubeconfig
-func Kubeconfig(path, endpoint string) error {
+func Kubeconfig(path string, svcName []string) error {
 	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
 apiVersion: v1
 kind: Config
@@ -22,25 +22,27 @@ contexts:
   name: ushift
 clusters:
 - cluster:
-    server: ${Endpoint}
-    certificate-authority-data: ${ClusterCA}
+    server: https://127.0.0.1:6443
+    certificate-authority-data: {{.ClusterCA}}
   name: ushift
 users:
 - name: ushift
   user:
-    client-certificate-data: ${ClientCert}
-    client-key-data: ${ClientKey}
+    client-certificate-data: {{.ClientCert}}
+    client-key-data: {{.ClientKey}}
 `))
-	clusterCA := Base64(CertToPem(rootCA))
-	clientCert := ""
-	clientKey := ""
+	certBuff, keyBuff, err := GenCertsBuff(svcName)
+	if err != nil {
+		return err
+	}
+	clusterCA := Base64(CertToPem(GetRootCA()))
+	clientCert := Base64(certBuff)
+	clientKey := Base64(keyBuff)
 	data := struct {
-		Endpoint   string
 		ClusterCA  string
 		ClientCert string
 		ClientKey  string
 	}{
-		Endpoint:   endpoint,
 		ClusterCA:  clusterCA,
 		ClientCert: clientCert,
 		ClientKey:  clientKey,
