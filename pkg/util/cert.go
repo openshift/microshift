@@ -42,6 +42,10 @@ const (
 	ValidityTenYears = 10 * ValidityOneYear
 )
 
+func GetRootCA() *x509.Certificate {
+	return rootCA
+}
+
 func GenCA(hostname []string, commonName, organizationalUnit string, duration time.Duration) (*rsa.PrivateKey, *x509.Certificate, error) {
 	cfg := &CertCfg{
 		DNSNames:     hostname,
@@ -73,16 +77,8 @@ func StoreRootCA(dir, certFilename, keyFilename string) error {
 	return nil
 }
 
-// GenCerts creates certs and keys
-// GenCerts("/var/lib/openshift/service-ca/key", "tls.crt", "tls.key", "example.com")
-func GenCerts(dir, certFilename, keyFilename string, svcName []string) error {
-	var err error
-	if rootCA == nil || rootKey == nil {
-		rootKey, rootCA, err = GenCA([]string{defaultHostname}, defaultCommonName, defaultOrganizationalUnit, defaultDuration)
-		if err != nil {
-			return err
-		}
-	}
+// GenCertsBuff create cert and key buff
+func GenCertsBuff(svcName []string) ([]byte, []byte, error) {
 	ip, dns := IPAddressesDNSNames(svcName)
 	cfg := &CertCfg{
 		DNSNames:     dns,
@@ -95,11 +91,28 @@ func GenCerts(dir, certFilename, keyFilename string, svcName []string) error {
 	}
 	key, ca, err := cfg.GenerateSignedCertificate(rootKey, rootCA)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	certBuff := CertToPem(ca)
 	keyBuff := PrivateKeyToPem(key)
+	return certBuff, keyBuff, nil
+}
+
+// GenCerts creates certs and keys
+// GenCerts("/var/lib/openshift/service-ca/key", "tls.crt", "tls.key", "example.com")
+func GenCerts(dir, certFilename, keyFilename string, svcName []string) error {
+	var err error
+	if rootCA == nil || rootKey == nil {
+		rootKey, rootCA, err = GenCA([]string{defaultHostname}, defaultCommonName, defaultOrganizationalUnit, defaultDuration)
+		if err != nil {
+			return err
+		}
+	}
 	os.MkdirAll(dir, 0700)
+	certBuff, keyBuff, err := GenCertsBuff(svcName)
+	if err != nil {
+		return err
+	}
 	certPath := filepath.Join(dir, certFilename)
 	keyPath := filepath.Join(dir, keyFilename)
 	ioutil.WriteFile(certPath, certBuff, 0644)

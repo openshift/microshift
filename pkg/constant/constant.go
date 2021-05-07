@@ -16,5 +16,8 @@ limitations under the License.
 package constant
 
 const (
-	KubeAPIKubeconfigPath = "/etc/kubernetes/static-pod-resources/configmaps/kube-apiserver-cert-syncer-kubeconfig/kubeconfig"
+	AdminKubeconfigPath                 = "/etc/kubernetes/ushift-resources/kubeadmin/kubeconfig"
+	KubeAPIKubeconfigPath               = "/etc/kubernetes/ushift-resources/kube-apiserver/kubeconfig"
+	KubeControllerManagerKubeconfigPath = "/etc/kubernetes/ushift-resources/kube-controller-manager/kubeconfig"
+	KubeSchedulerKubeconfigPath         = "/etc/kubernetes/ushift-resources/kube-scheduler/kubeconfig"
 )
