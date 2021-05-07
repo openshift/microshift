@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
+
+	"github.com/openshift/microshift/pkg/constant"
 )
 
 // OpenShiftAPIServerConfig creates a config for openshift-apiserver to use
@@ -25,9 +27,24 @@ aggregatorConfig:
   - X-Remote-Group
   usernameHeaders:
   - X-Remote-User
+kubeClientConfig:
+  kubeConfig:  ` + constant.AdminKubeconfigPath + `
 apiServerArguments:
   minimal-shutdown-duration:
   - 30s
+  anonymous-auth:
+  - "false"
+  audit-log-format:
+  - json
+  audit-log-maxbackup:
+  - "10"
+  audit-log-maxsize:
+  - "100"
+  authorization-mode:
+  - Scope
+  - SystemMasters
+  - RBAC
+  - Node
 auditConfig:
   auditFilePath: "/var/log/openshift-apiserver/audit.log"
   enabled: true
@@ -68,8 +85,11 @@ projectConfig:
   projectRequestMessage: ''
 routingConfig:
   subdomain: "ushift.testing"
-kubeClientConfig:
-  kubeConfig: /etc/kubernetes/ushift-resources/openshift-apiserver/kubeconfig/kubeconfig
+servingInfo:
+  bindAddress: "0.0.0.0:32444"
+  certFile: /etc/kubernetes/ushift-resources/ocp-apiserver/secrets/tls.crt
+  keyFile: /etc/kubernetes/ushift-resources/ocp-apiserver/secrets/tls.key
+  ca: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
 storageConfig:
   urls:
   - https://127.0.0.1:2379

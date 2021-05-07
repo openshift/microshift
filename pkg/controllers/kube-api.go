@@ -52,7 +52,8 @@ func KubeAPIServer(args []string, ready chan bool) error {
 	}()
 
 	logrus.Info("waiting for kube-apiserver")
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.KubeAPIKubeconfigPath)
+
+	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
 	if err != nil {
 		return err
 	}
@@ -68,5 +69,6 @@ func KubeAPIServer(args []string, ready chan bool) error {
 	}
 	logrus.Info("kube-apiserver is ready")
 	ready <- true
+
 	return nil
 }

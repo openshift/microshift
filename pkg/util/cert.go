@@ -46,23 +46,25 @@ func GetRootCA() *x509.Certificate {
 	return rootCA
 }
 
-func GenCA(hostname []string, commonName, organizationalUnit string, duration time.Duration) (*rsa.PrivateKey, *x509.Certificate, error) {
+func GenCA(svcName []string, commonName, organizationalUnit string, duration time.Duration) (*rsa.PrivateKey, *x509.Certificate, error) {
+	ip, dns := IPAddressesDNSNames(svcName)
 	cfg := &CertCfg{
-		DNSNames:     hostname,
-		Validity:     duration,
-		IsCA:         true,
-		KeyUsages:    x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		ExtKeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		Subject:      pkix.Name{CommonName: commonName, OrganizationalUnit: []string{organizationalUnit}},
+		DNSNames:    dns,
+		IPAddresses: ip,
+		Validity:    duration,
+		IsCA:        true,
+		KeyUsages:   x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		//ExtKeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		Subject: pkix.Name{CommonName: dns[0], OrganizationalUnit: []string{defaultOrganizationalUnit}},
 	}
 	key, ca, err := cfg.GenerateSelfSignedCertificate()
 	return key, ca, err
 }
 
-func StoreRootCA(dir, certFilename, keyFilename string) error {
+func StoreRootCA(dir, certFilename, keyFilename string, svcName []string) error {
 	if rootCA == nil || rootKey == nil {
 		var err error
-		rootKey, rootCA, err = GenCA([]string{defaultHostname}, defaultCommonName, defaultOrganizationalUnit, defaultDuration)
+		rootKey, rootCA, err = GenCA(svcName, defaultCommonName, defaultOrganizationalUnit, defaultDuration)
 		if err != nil {
 			return err
 		}

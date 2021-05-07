@@ -66,7 +66,8 @@ func initCerts() error {
 	// store root CA for all
 	//TODO generate ca bundles for each component
 	if err := util.StoreRootCA("/etc/kubernetes/ushift-certs/ca-bundle",
-		"ca-bundle.crt", "ca-bundle.key"); err != nil {
+		"ca-bundle.crt", "ca-bundle.key",
+		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
 
@@ -111,6 +112,13 @@ func initCerts() error {
 	}
 	if err := util.GenKeys("/etc/kubernetes/ushift-resources/kube-apiserver/sa-public-key",
 		"serving-ca.pub", "serving-ca.key"); err != nil {
+		return err
+	}
+
+	// ocp
+	if err := util.GenCerts("/etc/kubernetes/ushift-resources/ocp-apiserver/secrets",
+		"tls.crt", "tls.key",
+		[]string{"system:admin"}); err != nil {
 		return err
 	}
 

@@ -40,6 +40,12 @@ func startController(args []string) error {
 		return err
 	}
 	<-etcdReadyCh
+
+	logrus.Infof("starting openshift-apiserver")
+	ocpAPIReadyCh := make(chan bool, 1)
+	controllers.OCPAPIServer(args, ocpAPIReadyCh)
+	<-ocpAPIReadyCh
+
 	kubeAPIReadyCh := make(chan bool, 1)
 	logrus.Infof("starting kube-apiserver")
 	controllers.KubeAPIServer(args, kubeAPIReadyCh)
@@ -51,11 +57,6 @@ func startController(args []string) error {
 	kubeScheduler(args, kubeSchedulerReadyCh)
 	<-kubeSchedulerReadyCh
 	//TODO: cloud provider
-
-	logrus.Infof("starting openshift-apiserver")
-	ocpAPIReadyCh := make(chan bool, 1)
-	controllers.OCPAPIServer(args, ocpAPIReadyCh)
-	<-ocpAPIReadyCh
 
 	ocpCMReadyCh := make(chan bool, 1)
 	controllers.OCPControllerManager(args, ocpCMReadyCh)
