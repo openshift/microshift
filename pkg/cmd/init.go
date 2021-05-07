@@ -91,7 +91,7 @@ func initCerts() error {
 	}
 	if err := util.GenCerts("/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey",
 		"tls.crt", "tls.key",
-		[]string{ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost", "kube-apiserver"}); err != nil {
+		[]string{"kube-apiserver", ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
 

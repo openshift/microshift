@@ -350,7 +350,7 @@ func (c *completedConfig) WithOpenAPIAggregationController(delegatedAPIServer *g
 	// no openapi config previously set. An alternative to stripping this data away would be to create and append a new apiserver to the head
 	// of the delegation chain altogether, then pass that to the controller. But in the spirit of simplicity, we'll just strip default
 	// openapi fields that may have been previously set.
-	//delegatedAPIServer.RemoveOpenAPIData()
+	delegatedAPIServer.RemoveOpenAPIData()
 
 	specDownloader := aggregator.NewDownloader()
 	openAPIAggregator, err := aggregator.BuildAndRegisterAggregator(
