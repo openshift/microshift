@@ -20,8 +20,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/controllers"
-
-	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
 )
 
@@ -49,10 +47,12 @@ func startController(args []string) error {
 	ocpAPIReadyCh := make(chan bool, 1)
 	controllers.OCPAPIServer(args, ocpAPIReadyCh)
 	<-ocpAPIReadyCh
-	select {}
+
 	kubeCMReadyCh := make(chan bool, 1)
-	kubeControllerManager(args, kubeCMReadyCh)
+	controllers.KubeControllerManager(kubeCMReadyCh)
 	<-kubeCMReadyCh
+
+	select {}
 	/*
 		kubeSchedulerReadyCh := make(chan bool, 1)
 		kubeScheduler(args, kubeSchedulerReadyCh)
@@ -64,14 +64,6 @@ func startController(args []string) error {
 	controllers.OCPControllerManager(args, ocpCMReadyCh)
 	<-ocpCMReadyCh
 	select {}
-}
-
-func kubeControllerManager(args []string, ready chan bool) {
-	command := kubecm.NewControllerManagerCommand()
-	go func() {
-		logrus.Fatalf("controller-manager exited: %v", command.Execute())
-	}()
-	ready <- true
 }
 
 func kubeScheduler(args []string, ready chan bool) {
