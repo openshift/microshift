@@ -25,6 +25,8 @@ import (
 
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
+
+	"github.com/openshift/microshift/pkg/constant"
 )
 
 func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
@@ -42,11 +44,19 @@ func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
 	return cmd
 }
 func OCPAPIServer(_ []string, ready chan bool) error {
-	stopCh := genericapiserver.SetupSignalHandler(false)
+	stopCh := make(chan struct{}) //genericapiserver.SetupSignalHandler(false)
 	command := newOpenshiftApiServerCommand(stopCh)
 	args := []string{
 		"start",
 		"--config=/etc/kubernetes/ushift-resources/openshift-apiserver/config/config.yaml",
+		"--authorization-kubeconfig=" + constant.AdminKubeconfigPath,
+		"--authentication-kubeconfig=" + constant.AdminKubeconfigPath,
+		"--requestheader-client-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
+		"--requestheader-allowed-names=kube-apiserver-proxy,system:kube-apiserver-proxy,system:openshift-aggregator",
+		"--requestheader-username-headers=X-Remote-User",
+		"--requestheader-group-headers=X-Remote-Group",
+		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
+		"--client-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
 	}
 	command.SetArgs(args)
 	logrus.Infof("starting openshift-apiserver, args: %v", args)

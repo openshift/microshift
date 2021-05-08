@@ -44,18 +44,21 @@ func startController(args []string) error {
 	logrus.Infof("starting kube-apiserver")
 	controllers.KubeAPIServer(args, kubeAPIReadyCh)
 	<-kubeAPIReadyCh
-	kubeCMReadyCh := make(chan bool, 1)
-	kubeControllerManager(args, kubeCMReadyCh)
-	<-kubeCMReadyCh
-	kubeSchedulerReadyCh := make(chan bool, 1)
-	kubeScheduler(args, kubeSchedulerReadyCh)
-	<-kubeSchedulerReadyCh
-	//TODO: cloud provider
 
 	logrus.Infof("starting openshift-apiserver")
 	ocpAPIReadyCh := make(chan bool, 1)
 	controllers.OCPAPIServer(args, ocpAPIReadyCh)
 	<-ocpAPIReadyCh
+	select {}
+	kubeCMReadyCh := make(chan bool, 1)
+	kubeControllerManager(args, kubeCMReadyCh)
+	<-kubeCMReadyCh
+	/*
+		kubeSchedulerReadyCh := make(chan bool, 1)
+		kubeScheduler(args, kubeSchedulerReadyCh)
+		<-kubeSchedulerReadyCh
+	*/
+	//TODO: cloud provider
 
 	ocpCMReadyCh := make(chan bool, 1)
 	controllers.OCPControllerManager(args, ocpCMReadyCh)

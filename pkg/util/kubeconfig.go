@@ -7,18 +7,17 @@ import (
 )
 
 // Kubeconfig creates a kubeconfig
-func Kubeconfig(path string, svcName []string) error {
+func Kubeconfig(path, common string, svcName []string) error {
 	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
 apiVersion: v1
 kind: Config
-preferences:
-  colors: true
 current-context: ushift
+preferences: {}
 contexts:
 - context:
     cluster: ushift
     namespace: default
-    user: ushift
+    user: user
   name: ushift
 clusters:
 - cluster:
@@ -26,12 +25,12 @@ clusters:
     certificate-authority-data: {{.ClusterCA}}
   name: ushift
 users:
-- name: ushift
+- name: user
   user:
     client-certificate-data: {{.ClientCert}}
     client-key-data: {{.ClientKey}}
 `))
-	certBuff, keyBuff, err := GenCertsBuff(svcName)
+	certBuff, keyBuff, err := GenCertsBuff(common, svcName)
 	if err != nil {
 		return err
 	}

@@ -112,7 +112,7 @@ apiServerArguments:
     - Scope
     - SystemMasters
     - RBAC
-    - Node    
+    - Node
   audit-log-path:
     - /var/log/kube-apiserver/audit.log
   audit-policy-file:
@@ -205,6 +205,7 @@ apiServerArguments:
   proxy-client-key-file:
     - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client/tls.key
   requestheader-allowed-names:
+    - system:admin
     - aggregator
     - system:aggregator
     - openshift-apiserver
@@ -241,7 +242,7 @@ apiServerArguments:
   tls-private-key-file:
     - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key
   service-account-issuer:
-    - https://kubernetes.default.svc
+    - "https://kubernetes.svc"
   service-account-signing-key-file:
     - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-signing-key/service-account.key
   etcd-cafile:
