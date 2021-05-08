@@ -29,11 +29,9 @@ var (
 )
 
 const (
-	defaultDurationDays       = 365
-	defaultDuration           = defaultDurationDays * 24 * time.Hour
-	defaultHostname           = "localhost"
-	defaultCommonName         = "cluster-signer"
-	defaultOrganizationalUnit = "openshift"
+	defaultDurationDays = 365
+	defaultDuration     = defaultDurationDays * 24 * time.Hour
+	defaultHostname     = "localhost"
 
 	keySize = 2048
 
@@ -46,25 +44,23 @@ func GetRootCA() *x509.Certificate {
 	return rootCA
 }
 
-func GenCA(svcName []string, commonName, organizationalUnit string, duration time.Duration) (*rsa.PrivateKey, *x509.Certificate, error) {
-	ip, dns := IPAddressesDNSNames(svcName)
+func GenCA(common string, svcName []string, duration time.Duration) (*rsa.PrivateKey, *x509.Certificate, error) {
+	_, dns := IPAddressesDNSNames(svcName)
 	cfg := &CertCfg{
-		DNSNames:    dns,
-		IPAddresses: ip,
-		Validity:    duration,
-		IsCA:        true,
-		KeyUsages:   x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		//ExtKeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		Subject: pkix.Name{CommonName: dns[0], OrganizationalUnit: []string{defaultOrganizationalUnit}},
+		Validity:     duration,
+		IsCA:         true,
+		KeyUsages:    x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		ExtKeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		Subject:      pkix.Name{CommonName: common, Organization: dns},
 	}
 	key, ca, err := cfg.GenerateSelfSignedCertificate()
 	return key, ca, err
 }
 
-func StoreRootCA(dir, certFilename, keyFilename string, svcName []string) error {
+func StoreRootCA(common, dir, certFilename, keyFilename string, svcName []string) error {
 	if rootCA == nil || rootKey == nil {
 		var err error
-		rootKey, rootCA, err = GenCA(svcName, defaultCommonName, defaultOrganizationalUnit, defaultDuration)
+		rootKey, rootCA, err = GenCA(common, svcName, defaultDuration)
 		if err != nil {
 			return err
 		}
@@ -80,16 +76,16 @@ func StoreRootCA(dir, certFilename, keyFilename string, svcName []string) error 
 }
 
 // GenCertsBuff create cert and key buff
-func GenCertsBuff(svcName []string) ([]byte, []byte, error) {
+func GenCertsBuff(common string, svcName []string) ([]byte, []byte, error) {
 	ip, dns := IPAddressesDNSNames(svcName)
 	cfg := &CertCfg{
 		DNSNames:     dns,
 		IPAddresses:  ip,
 		Validity:     defaultDuration,
 		IsCA:         false,
-		KeyUsages:    x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		KeyUsages:    x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 		ExtKeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		Subject:      pkix.Name{CommonName: dns[0], OrganizationalUnit: []string{defaultOrganizationalUnit}},
+		Subject:      pkix.Name{CommonName: common, Organization: dns},
 	}
 	key, ca, err := cfg.GenerateSignedCertificate(rootKey, rootCA)
 	if err != nil {
@@ -102,16 +98,13 @@ func GenCertsBuff(svcName []string) ([]byte, []byte, error) {
 
 // GenCerts creates certs and keys
 // GenCerts("/var/lib/openshift/service-ca/key", "tls.crt", "tls.key", "example.com")
-func GenCerts(dir, certFilename, keyFilename string, svcName []string) error {
+func GenCerts(common, dir, certFilename, keyFilename string, svcName []string) error {
 	var err error
 	if rootCA == nil || rootKey == nil {
-		rootKey, rootCA, err = GenCA([]string{defaultHostname}, defaultCommonName, defaultOrganizationalUnit, defaultDuration)
-		if err != nil {
-			return err
-		}
+		return err
 	}
 	os.MkdirAll(dir, 0700)
-	certBuff, keyBuff, err := GenCertsBuff(svcName)
+	certBuff, keyBuff, err := GenCertsBuff(common, svcName)
 	if err != nil {
 		return err
 	}
@@ -229,7 +222,7 @@ func (cfg *CertCfg) SelfSignedCertificate(key *rsa.PrivateKey) (*x509.Certificat
 		Subject:               cfg.Subject,
 	}
 	// verifies that the CN and/or OU for the cert is set
-	if len(cfg.Subject.CommonName) == 0 || len(cfg.Subject.OrganizationalUnit) == 0 {
+	if len(cfg.Subject.CommonName) == 0 {
 		return nil, errors.Errorf("certification's subject is not set, or invalid")
 	}
 	pub := key.Public()

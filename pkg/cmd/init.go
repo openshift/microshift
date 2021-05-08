@@ -65,49 +65,52 @@ func initCerts() error {
 	}
 	// store root CA for all
 	//TODO generate ca bundles for each component
-	if err := util.StoreRootCA("/etc/kubernetes/ushift-certs/ca-bundle",
+	if err := util.StoreRootCA("https://kubernetes.svc", "/etc/kubernetes/ushift-certs/ca-bundle",
 		"ca-bundle.crt", "ca-bundle.key",
-		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
+		[]string{"https://kubernetes.svc"}); err != nil {
 		return err
 	}
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
-	if err := util.GenCerts("/etc/kubernetes/ushift-certs/secrets/etcd-all-serving",
+	if err := util.GenCerts("etcd-server", "/etc/kubernetes/ushift-certs/secrets/etcd-all-serving",
 		"etcd-serving.crt", "etcd-serving.key",
 		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
 
-	if err := util.GenCerts("/etc/kubernetes/ushift-certs/secrets/etcd-all-peer",
+	if err := util.GenCerts("etcd-peer", "/etc/kubernetes/ushift-certs/secrets/etcd-all-peer",
 		"etcd-peer.crt", "etcd-peer.key",
 		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
 
 	// kube-apiserver
-	if err := util.GenCerts("/etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client",
+	if err := util.GenCerts("etcd-client", "/etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client",
 		"tls.crt", "tls.key",
 		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
 		return err
 	}
-	if err := util.GenCerts("/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey",
+	if err := util.GenCerts("kube-apiserver", "/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey",
 		"tls.crt", "tls.key",
 		[]string{"kube-apiserver", ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
-
+	if err := util.GenKeys("/etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-key",
+		"service-account.crt", "service-account.key"); err != nil {
+		return err
+	}
 	if err := util.GenKeys("/etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-signing-key",
 		"service-account.crt", "service-account.key"); err != nil {
 		return err
 	}
-	if err := util.GenCerts("/etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client",
+	if err := util.GenCerts("system:masters", "/etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client",
 		"tls.crt", "tls.key",
-		[]string{"system:admin"}); err != nil {
+		[]string{"system:admin", "system:masters"}); err != nil {
 		return err
 	}
-	if err := util.GenCerts("/etc/kubernetes/ushift-resources/kube-apiserver/secrets/kubelet-client",
+	if err := util.GenCerts("system:masters", "/etc/kubernetes/ushift-resources/kube-apiserver/secrets/kubelet-client",
 		"tls.crt", "tls.key",
-		[]string{"kube-apiserver", "system:kube-apiserver"}); err != nil {
+		[]string{"kube-apiserver", "system:kube-apiserver", "system:masters"}); err != nil {
 		return err
 	}
 	if err := util.GenKeys("/etc/kubernetes/ushift-resources/kube-apiserver/sa-public-key",
@@ -116,9 +119,9 @@ func initCerts() error {
 	}
 
 	// ocp
-	if err := util.GenCerts("/etc/kubernetes/ushift-resources/ocp-apiserver/secrets",
+	if err := util.GenCerts("openshift-apiserver", "/etc/kubernetes/ushift-resources/ocp-apiserver/secrets",
 		"tls.crt", "tls.key",
-		[]string{"system:admin"}); err != nil {
+		[]string{"system:admin", "system:masters"}); err != nil {
 		return err
 	}
 
@@ -241,16 +244,16 @@ func initServerConfig() error {
 }
 
 func initKubeconfig() error {
-	if err := util.Kubeconfig(constant.AdminKubeconfigPath, []string{"system:admin", "system:masters"}); err != nil {
+	if err := util.Kubeconfig(constant.AdminKubeconfigPath, "system:admin", []string{"system:masters"}); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(constant.KubeAPIKubeconfigPath, []string{"kube-apiserver", "system:kube-apiserver"}); err != nil {
+	if err := util.Kubeconfig(constant.KubeAPIKubeconfigPath, "kube-apiserver", []string{"system:kube-apiserver", "system:masters"}); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(constant.KubeControllerManagerKubeconfigPath, []string{"kube-controller-manager", "system:kube-controller-manager"}); err != nil {
+	if err := util.Kubeconfig(constant.KubeControllerManagerKubeconfigPath, "kube-controller-manager", []string{"system:kube-controller-manager"}); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(constant.KubeSchedulerKubeconfigPath, []string{"kube-scheduler", "system:kube-scheduler"}); err != nil {
+	if err := util.Kubeconfig(constant.KubeSchedulerKubeconfigPath, "kube-scheduler", []string{"system:kube-scheduler"}); err != nil {
 		return err
 	}
 	return nil
