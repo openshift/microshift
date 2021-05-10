@@ -213,7 +213,6 @@ apiServerArguments:
     - kube-apiserver
     - system:kube-apiserver
     - system:openshift-aggregator
-    - system:auth-proxy
     - kube-apiserver-proxy
     - system:kube-apiserver-proxy
     - system:openshift-aggregator
