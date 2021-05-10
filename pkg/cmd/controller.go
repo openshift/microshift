@@ -52,7 +52,6 @@ func startController(args []string) error {
 	controllers.KubeControllerManager(kubeCMReadyCh)
 	<-kubeCMReadyCh
 
-	select {}
 	/*
 		kubeSchedulerReadyCh := make(chan bool, 1)
 		kubeScheduler(args, kubeSchedulerReadyCh)
@@ -61,7 +60,7 @@ func startController(args []string) error {
 	//TODO: cloud provider
 
 	ocpCMReadyCh := make(chan bool, 1)
-	controllers.OCPControllerManager(args, ocpCMReadyCh)
+	controllers.OCPControllerManager(ocpCMReadyCh)
 	<-ocpCMReadyCh
 	select {}
 }

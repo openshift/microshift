@@ -121,7 +121,12 @@ func initCerts() error {
 	// ocp
 	if err := util.GenCerts("openshift-apiserver", "/etc/kubernetes/ushift-resources/ocp-apiserver/secrets",
 		"tls.crt", "tls.key",
-		[]string{"system:admin", "system:masters"}); err != nil {
+		[]string{"openshift-apiserver", ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		return err
+	}
+	if err := util.GenCerts("openshift-controller-manager", "/etc/kubernetes/ushift-resources/ocp-controller-manager/secrets",
+		"tls.crt", "tls.key",
+		[]string{"openshift-controller-manager", ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
 

@@ -34,6 +34,10 @@ apiServerArguments:
   - 30s
   anonymous-auth:
   - "false"
+  authorization-kubeconfig:
+  - ` + constant.AdminKubeconfigPath + `
+  authentication-kubeconfig:
+  - ` + constant.AdminKubeconfigPath + `
   audit-log-format:
   - json
   audit-log-maxbackup:
@@ -86,7 +90,7 @@ projectConfig:
 routingConfig:
   subdomain: "ushift.testing"
 servingInfo:
-  bindAddress: "0.0.0.0:32444"
+  bindAddress: "0.0.0.0:8444"
   certFile: /etc/kubernetes/ushift-resources/ocp-apiserver/secrets/tls.crt
   keyFile: /etc/kubernetes/ushift-resources/ocp-apiserver/secrets/tls.key
   ca: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
@@ -105,23 +109,15 @@ func OpenShiftControllerManagerConfig(path string) error {
 	configTemplate := template.Must(template.New("controller-manager-config.yaml").Parse(`
 apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftControllerManagerConfig
-build:
-	buildDefaults:
-	resources: {}
-	imageTemplateFormat:
-	format: {{.BuilderImage}}
-deployer:
-	imageTemplateFormat:
-	format: {{.DeployerName}}
-dockerPullSecret:
-	internalRegistryHostname: {{.ImageRegistryUrl}}
 kubeClientConfig:
-  kubeConfig: {{.KubeConfig}}  
-ingress:
-	ingressIPNetworkCIDR: ''
-	`))
+  kubeConfig: ` + constant.AdminKubeconfigPath + `
+servingInfo:
+  bindAddress: "0.0.0.0:8445"
+  certFile: /etc/kubernetes/ushift-resources/ocp-controller-manager/secrets/tls.crt
+  keyFile:  /etc/kubernetes/ushift-resources/ocp-controller-manager/secrets/tls.key
+  clientCA: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt`))
 
-	data := struct {
+	data := struct { //TODO
 		KubeConfig, BuilderImage, DeployerName, ImageRegistryUrl string
 	}{
 		//KubeConfig: ,
