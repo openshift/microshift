@@ -1,0 +1,213 @@
+package controllers
+
+import (
+	"context"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/openshift/microshift/pkg/assets"
+	"github.com/openshift/microshift/pkg/constant"
+
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+
+	"k8s.io/apimachinery/pkg/util/intstr"
+	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
+	apiregistrationclientv1 "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/typed/apiregistration/v1"
+)
+
+func createAPIHeadlessSvc() error {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+	if err != nil {
+		return err
+	}
+
+	client := coreclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "core-agent"))
+	svc := &corev1.Service{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Service",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "openshift-apiserver",
+			Namespace: "default",
+		},
+		Spec: corev1.ServiceSpec{
+			ClusterIP: "None",
+			Ports: []corev1.ServicePort{
+				{
+					Protocol:   corev1.ProtocolTCP,
+					Port:       443,
+					TargetPort: intstr.FromInt(443),
+				},
+			},
+		},
+	}
+	_, err = client.Services("default").Get(context.TODO(), svc.Name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		logrus.Infof("creating svc %s", svc.Name)
+		_, err = client.Services("default").Create(context.TODO(), svc, metav1.CreateOptions{})
+		if err != nil {
+			return err
+		}
+		endpoints := &corev1.Endpoints{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Endpoints",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "openshift-apiserver",
+				Namespace: "default",
+			},
+			/*
+				Subsets: []corev1.EndpointSubset{
+					corev1.EndpointSubset{
+						Addresses: []corev1.EndpointAddress{
+							corev1.EndpointAddress{
+								IP: cfg.AdvertiseIP,
+							},
+						},
+						Ports: []corev1.EndpointPort{
+							corev1.EndpointPort{
+								Port: port,
+							},
+						},
+					},
+				},*/
+		}
+
+		k8s_endpoints, err := client.Endpoints("default").Get(context.TODO(), "kubernetes", metav1.GetOptions{})
+		if err != nil {
+			logrus.Infof("failed to find kubernetes endpoints")
+		}
+		subsets := endpoints.Subsets
+		for _, sub := range k8s_endpoints.Subsets {
+			addr := sub.Addresses
+			ports := []corev1.EndpointPort{
+				corev1.EndpointPort{
+					Port: 8444, // ocp apiserver port
+				},
+			}
+			subsets = append(subsets,
+				corev1.EndpointSubset{
+					Addresses: addr,
+					Ports:     ports,
+				})
+		}
+		endpoints.Subsets = subsets
+		_, err = client.Endpoints("default").Get(context.TODO(), endpoints.Name, metav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			logrus.Infof("creating endpoints %s", endpoints.Name)
+			_, err = client.Endpoints("default").Create(context.TODO(), endpoints, metav1.CreateOptions{})
+			return err
+		}
+	}
+	return nil
+}
+func trimFirst(s string, sep string) string {
+	parts := strings.Split(s, sep)
+	return strings.Join(parts[1:], sep)
+}
+
+func createAPIRegistration() error {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+	if err != nil {
+		return err
+	}
+	client := apiregistrationclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "apiregistration-agent"))
+	for _, apiSvc := range []string{
+		"v1.apps.openshift.io",
+		"v1.authorization.openshift.io",
+		"v1.build.openshift.io",
+		"v1.image.openshift.io",
+		//"v1.oauth.openshift.io", //TODO check if they exist
+		//"v1.user.openshift.io"
+		"v1.project.openshift.io",
+		"v1.quota.openshift.io",
+		"v1.route.openshift.io",
+		"v1.security.openshift.io",
+		"v1.template.openshift.io",
+	} {
+		api := &apiregistrationv1.APIService{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "APIService",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: apiSvc,
+			},
+			Spec: apiregistrationv1.APIServiceSpec{
+				Service: &apiregistrationv1.ServiceReference{
+					Name:      "openshift-apiserver",
+					Namespace: "default",
+				},
+				Group:                 trimFirst(apiSvc, "."),
+				GroupPriorityMinimum:  9900,
+				Version:               "v1",
+				InsecureSkipTLSVerify: true,
+				VersionPriority:       15,
+			},
+		}
+		_, err = client.APIServices().Get(context.TODO(), api.Name, metav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			logrus.Infof("creating api registration %s", api.Name)
+			_, err = client.APIServices().Create(context.TODO(), api, metav1.CreateOptions{})
+		}
+	}
+	return nil
+}
+
+func applySCCs() error {
+	var (
+		sccs = []string{
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml",
+		}
+	)
+	if err := assets.ApplySCCs(sccs, nil); err != nil {
+		logrus.Warningf("failed to apply sccs: %v", err)
+		return err
+	}
+	return nil
+}
+
+func PrepareOCP() error {
+	if err := assets.ApplyNamespaces([]string{
+		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
+	}); err != nil {
+		logrus.Warningf("failed to apply openshift namespaces %v", err)
+		return err
+	}
+	if err := assets.ApplyCRDs(); err != nil {
+		logrus.Warningf("failed to apply openshift CRDs %v", err)
+		return err
+	}
+	return nil
+}
+
+func StartOCPAPIComponents() error {
+	// ocp api service registration
+	if err := createAPIHeadlessSvc(); err != nil {
+		logrus.Warningf("failed to apply headless svc %v", err)
+		return err
+	}
+	if err := createAPIRegistration(); err != nil {
+		logrus.Warningf("failed to register api %v", err)
+		return err
+	}
+	if err := applySCCs(); err != nil {
+		logrus.Warningf("failed to apply sccs: %v", err)
+		return err
+	}
+	return nil
+}
