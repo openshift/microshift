@@ -43,7 +43,7 @@ func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
 
 	return cmd
 }
-func OCPAPIServer(_ []string, ready chan bool) error {
+func OCPAPIServer(ready chan bool) error {
 	stopCh := make(chan struct{}) //genericapiserver.SetupSignalHandler(false)
 	command := newOpenshiftApiServerCommand(stopCh)
 	args := []string{
@@ -58,10 +58,14 @@ func OCPAPIServer(_ []string, ready chan bool) error {
 		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
 		"--client-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
 	}
-	command.SetArgs(args)
+	if err := command.ParseFlags(args); err != nil {
+		logrus.Fatalf("failed to parse flags:%v", err)
+	}
 	logrus.Infof("starting openshift-apiserver, args: %v", args)
+
 	go func() {
-		logrus.Fatalf("ocp apiserver exited: %v", command.Execute())
+		command.RunE(command, nil)
+		logrus.Fatalf("controller-manager exited")
 	}()
 
 	ready <- true

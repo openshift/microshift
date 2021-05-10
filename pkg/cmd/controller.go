@@ -40,12 +40,12 @@ func startController(args []string) error {
 	<-etcdReadyCh
 	kubeAPIReadyCh := make(chan bool, 1)
 	logrus.Infof("starting kube-apiserver")
-	controllers.KubeAPIServer(args, kubeAPIReadyCh)
+	controllers.KubeAPIServer(kubeAPIReadyCh)
 	<-kubeAPIReadyCh
 
 	logrus.Infof("starting openshift-apiserver")
 	ocpAPIReadyCh := make(chan bool, 1)
-	controllers.OCPAPIServer(args, ocpAPIReadyCh)
+	controllers.OCPAPIServer(ocpAPIReadyCh)
 	<-ocpAPIReadyCh
 
 	kubeCMReadyCh := make(chan bool, 1)
