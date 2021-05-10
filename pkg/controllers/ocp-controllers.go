@@ -21,7 +21,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	genericapiserver "k8s.io/apiserver/pkg/server"
+	//genericapiserver "k8s.io/apiserver/pkg/server"
 
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
@@ -58,14 +58,10 @@ func OCPAPIServer(ready chan bool) error {
 		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
 		"--client-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
 	}
-	if err := command.ParseFlags(args); err != nil {
-		logrus.Fatalf("failed to parse flags:%v", err)
-	}
+	command.SetArgs(args)
 	logrus.Infof("starting openshift-apiserver, args: %v", args)
-
 	go func() {
-		command.RunE(command, nil)
-		logrus.Fatalf("controller-manager exited")
+		logrus.Fatalf("ocp apiserver exited: %v", command.Execute())
 	}()
 
 	ready <- true
@@ -86,9 +82,12 @@ func newOpenShiftControllerManagerCommand(stopCh <-chan struct{}) *cobra.Command
 	return cmd
 }
 
-func OCPControllerManager(args []string, ready chan bool) {
-	stopCh := genericapiserver.SetupSignalHandler(false)
+func OCPControllerManager(ready chan bool) {
+	stopCh := make(chan struct{}) //genericapiserver.SetupSignalHandler(false)
 	command := newOpenShiftControllerManagerCommand(stopCh)
+	args := []string{
+		"--config=/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml",
+	}
 	startArgs := append(args, "start")
 	command.SetArgs(startArgs)
 

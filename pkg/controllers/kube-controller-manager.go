@@ -31,6 +31,8 @@ func KubeControllerManager(ready chan bool) {
 		"--allocate-node-cidrs=false",
 		//"--allocate-node-cidrs=true",
 		//"--cluster-cidr=",
+		"--authorization-kubeconfig=" + constant.AdminKubeconfigPath,
+		"--authentication-kubeconfig=" + constant.AdminKubeconfigPath,
 		"--root-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
 		"--bind-address=127.0.0.1",
 		"--secure-port=10257",
