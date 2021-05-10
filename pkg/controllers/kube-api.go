@@ -30,7 +30,7 @@ import (
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
 )
 
-func KubeAPIServer(args []string, ready chan bool) error {
+func KubeAPIServer(ready chan bool) error {
 	ip, err := util.GetHostIP()
 	if err != nil {
 		return fmt.Errorf("failed to get host IP: %v", err)
