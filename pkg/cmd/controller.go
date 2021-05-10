@@ -43,14 +43,18 @@ func startController(args []string) error {
 	controllers.KubeAPIServer(kubeAPIReadyCh)
 	<-kubeAPIReadyCh
 
+	kubeCMReadyCh := make(chan bool, 1)
+	controllers.KubeControllerManager(kubeCMReadyCh)
+	<-kubeCMReadyCh
+
+	if err := controllers.PrepareOCP(); err != nil {
+		return err
+	}
+
 	logrus.Infof("starting openshift-apiserver")
 	ocpAPIReadyCh := make(chan bool, 1)
 	controllers.OCPAPIServer(ocpAPIReadyCh)
 	<-ocpAPIReadyCh
-
-	kubeCMReadyCh := make(chan bool, 1)
-	controllers.KubeControllerManager(kubeCMReadyCh)
-	<-kubeCMReadyCh
 
 	/*
 		kubeSchedulerReadyCh := make(chan bool, 1)
@@ -62,6 +66,11 @@ func startController(args []string) error {
 	ocpCMReadyCh := make(chan bool, 1)
 	controllers.OCPControllerManager(ocpCMReadyCh)
 	<-ocpCMReadyCh
+
+	if err := controllers.StartOCPAPIComponents(); err != nil {
+		return err
+	}
+
 	select {}
 }
 
