@@ -7,10 +7,6 @@ import (
 	"text/template"
 )
 
-const (
-	port = 32444
-)
-
 func kubeAPIAuditPolicyFile(path string) error {
 	data := []byte(`
 apiVersion: audit.k8s.io/v1beta1
