@@ -88,7 +88,7 @@ imagePolicyConfig:
 projectConfig:
   projectRequestMessage: ''
 routingConfig:
-  subdomain: "ushift.testing"
+  subdomain: ` + constant.DomainName + `
 servingInfo:
   bindAddress: "0.0.0.0:8444"
   certFile: /etc/kubernetes/ushift-resources/ocp-apiserver/secrets/tls.crt

@@ -20,4 +20,8 @@ const (
 	KubeAPIKubeconfigPath               = "/etc/kubernetes/ushift-resources/kube-apiserver/kubeconfig"
 	KubeControllerManagerKubeconfigPath = "/etc/kubernetes/ushift-resources/kube-controller-manager/kubeconfig"
 	KubeSchedulerKubeconfigPath         = "/etc/kubernetes/ushift-resources/kube-scheduler/kubeconfig"
+	ClusterCIDR                         = "10.42.0.0/16"
+	ServiceCIDR                         = "10.43.0.0/16"
+	ClusterDNS                          = "10.43.0.10"
+	DomainName                          = "ushift.testing"
 )

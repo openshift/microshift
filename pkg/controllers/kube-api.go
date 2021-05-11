@@ -70,7 +70,7 @@ func KubeAPIServer(ready chan bool) error {
 		"--service-account-issuer=https://kubernetes.svc",
 		"--service-account-key-file=/etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-key/service-account.key",
 		"--service-account-signing-key-file=/etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-signing-key/service-account.key",
-		"--service-cluster-ip-range=10.43.0.0/16",
+		"--service-cluster-ip-range=" + constant.ServiceCIDR,
 		"--storage-backend=etcd3",
 		"--tls-cert-file=/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
 		"--tls-private-key-file=/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
