@@ -44,6 +44,9 @@ func initAll(args []string) error {
 	if err := initServerConfig(); err != nil {
 		return err
 	}
+	if err := initNodeConfig(); err != nil {
+		return err
+	}
 	// create kubeconfig for kube-scheduler, kubelet, openshift-apiserver,controller-manager
 	if err := initKubeconfig(); err != nil {
 		return err
@@ -129,106 +132,6 @@ func initCerts() error {
 		[]string{"openshift-controller-manager", ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
-
-	/*
-			// kubelet
-			// kubelet-certificate-authority: /etc/kubernetes/ushift-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
-			if err := util.GenCerts("kubelet-cert",
-				"/etc/kubernetes/ushift-resources/configmaps/kubelet-serving-ca",
-				"ca-bundle.crt",
-				"ca-bundle.key"); err != nil {
-				return err
-			}
-			// kubelet-client-certificate: /etc/kubernetes/ushift-resources/secrets/kubelet-client/tls.crt
-			if err := util.GenCerts("kubelet-client-certificate",
-				"/etc/kubernetes/ushift-resources/secrets/kubelet-client",
-				"tls.crt",
-				"tls.key"); err != nil {
-				return err
-			}
-			// kubelet-client-key: /etc/kubernetes/ushift-resources/secrets/kubelet-client/tls.key
-			if err := util.GenCerts("/etc/kubernetes/ushift-resources/secrets/kubelet-client/",
-				"/etc/kubernetes/ushift-resources/secrets/kubelet-client",
-				"tls.crt",
-				"tls.key"); err != nil {
-				return err
-			}
-			// proxy client
-			// proxy-client-cert-file: /etc/kubernetes/ushift-certs/secrets/aggregator-client/tls.crt
-			// proxy-client-key-file: /etc/kubernetes/ushift-certs/secrets/aggregator-client/tls.key
-			if err := util.GenCerts("proxy-client",
-				"/etc/kubernetes/ushift-certs/secrets/aggregator-client/",
-				"tls.crt",
-				"tls.key"); err != nil {
-				return err
-			}
-			// request header
-			// requestheader-client-ca-file: /etc/kubernetes/ushift-certs/configmaps/aggregator-client-ca/ca-bundle.crt
-			if err := util.GenCerts("requestheader-client-ca-file",
-				"/etc/kubernetes/ushift-certs/configmaps/aggregator-client-ca/ca-bundle.crt",
-				"ca-bundle.crt",
-				"ca-bundle.key"); err != nil {
-				return err
-			}
-			// tls
-			// tls-cert-file: /etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey/tls.crt
-			// tls-private-key-file: /etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey/tls.key
-			if err := util.GenCerts("tls",
-				"/etc/kubernetes/ushift-certs/secrets/service-network-serving-certkey",
-				"tls.crt",
-				"tls.key"); err != nil {
-				return err
-			}
-			// kube-controller-manager
-			// root-ca-file: /etc/kubernetes/ushift-resources/configmaps/serviceaccount-ca/ca-bundle.crt
-			if err := util.GenCerts("kube-controller-manager",
-				"/etc/kubernetes/ushift-resources/configmaps/serviceaccount-ca/",
-				"ca-bundle.crt",
-				"ca-bundle.key"); err != nil {
-				return err
-			}
-			// service-account-private-key-file: /etc/kubernetes/ushift-resources/secrets/service-account-private-key/service-account.key
-			if err := util.GenCerts("service-account-private-key-file",
-				"/etc/kubernetes/ushift-resources/secrets/service-account-private-key",
-				"service-account.crt",
-				"service-account.key"); err != nil {
-				return err
-			}
-			// cluster-signing-cert-file: /etc/kubernetes/ushift-certs/secrets/csr-signer/tls.crt
-			// cluster-signing-key-file: /etc/kubernetes/ushift-certs/secrets/csr-signer/tls.key
-			if err := util.GenCerts("cluster-signing-key-file",
-				"/etc/kubernetes/ushift-certs/secrets/csr-signer",
-				"tls.crt",
-				"tls.key"); err != nil {
-				return err
-			}
-
-		// kube-scheduler
-		// client-cert-key
-		// /etc/kubernetes/ushift-certs/secrets/kube-scheduler-client-cert-key
-		if _, err := util.GenCerts("kube-scheduler",
-			"/etc/kubernetes/ushift-certs/secrets/kube-scheduler-client-cert-key",
-			"tls.crt",
-			"tls.key"); err != nil {
-			return err
-		}
-		// openshift-apiserver
-		// /run/secrets/serving-cert
-		if _, err := util.GenCerts("openshift-apiserver",
-			"/run/secrets/serving-cert",
-			"tls.crt",
-			"tls.key"); err != nil {
-			return err
-		}
-		// openshift-controller-manager
-		// /run/secrets/serving-cert
-		if _, err := util.GenCerts("openshift-controller-manager",
-			"/run/secrets/serving-cert",
-			"tls.crt",
-			"tls.key"); err != nil {
-			return err
-		}
-	*/
 	return nil
 }
 
@@ -248,6 +151,16 @@ func initServerConfig() error {
 	return nil
 }
 
+func initNodeConfig() error {
+	if err := config.KubeletConfig("/etc/kubernetes/ushift-resources/kubelet/config/config.yaml"); err != nil {
+		return err
+	}
+	if err := config.OpenShiftSDNConfig("/etc/kubernetes/ushift-resources/openshift-sdn/config/config.yaml"); err != nil {
+		return err
+	}
+	return nil
+}
+
 func initKubeconfig() error {
 	if err := util.Kubeconfig(constant.AdminKubeconfigPath, "system:admin", []string{"system:masters"}); err != nil {
 		return err
@@ -259,6 +172,9 @@ func initKubeconfig() error {
 		return err
 	}
 	if err := util.Kubeconfig(constant.KubeSchedulerKubeconfigPath, "kube-scheduler", []string{"system:kube-scheduler"}); err != nil {
+		return err
+	}
+	if err := util.Kubeconfig(constant.KubeletKubeconfigPath, "kubelet", []string{"system:node", "system:node-bootstrapper"}); err != nil {
 		return err
 	}
 	return nil
