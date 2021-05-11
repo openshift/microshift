@@ -20,7 +20,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/controllers"
-	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
 )
 
 var ControllerCmd = &cobra.Command{
@@ -56,11 +55,11 @@ func startController(args []string) error {
 	controllers.OCPAPIServer(ocpAPIReadyCh)
 	<-ocpAPIReadyCh
 
-	/*
-		kubeSchedulerReadyCh := make(chan bool, 1)
-		kubeScheduler(args, kubeSchedulerReadyCh)
-		<-kubeSchedulerReadyCh
-	*/
+	logrus.Infof("starting kube-scheduler")
+	kubeSchedulerReadyCh := make(chan bool, 1)
+	controllers.KubeScheduler(kubeSchedulerReadyCh)
+	<-kubeSchedulerReadyCh
+
 	//TODO: cloud provider
 
 	ocpCMReadyCh := make(chan bool, 1)
@@ -72,12 +71,4 @@ func startController(args []string) error {
 	}
 
 	select {}
-}
-
-func kubeScheduler(args []string, ready chan bool) {
-	command := kubescheduler.NewSchedulerCommand()
-	go func() {
-		logrus.Fatalf("kube-scheduler exited: %v", command.Execute())
-	}()
-	ready <- true
 }

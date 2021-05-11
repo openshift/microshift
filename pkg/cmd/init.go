@@ -130,6 +130,15 @@ func initCerts() error {
 		return err
 	}
 
+	// kube-scheduler
+	// /etc/kubernetes/ushift-certs/secrets/kube-scheduler-client-cert-key
+	if err := util.GenCerts("kube-scheduler", "/etc/kubernetes/ushift-resources/kube-scheduler/secrets",
+		"tls.crt",
+		"tls.key",
+		[]string{"kube-scheduler", "system:kube-scheduler", "system:masters"}); err != nil {
+		return err
+	}
+
 	/*
 			// kubelet
 			// kubelet-certificate-authority: /etc/kubernetes/ushift-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
@@ -203,15 +212,6 @@ func initCerts() error {
 				return err
 			}
 
-		// kube-scheduler
-		// client-cert-key
-		// /etc/kubernetes/ushift-certs/secrets/kube-scheduler-client-cert-key
-		if _, err := util.GenCerts("kube-scheduler",
-			"/etc/kubernetes/ushift-certs/secrets/kube-scheduler-client-cert-key",
-			"tls.crt",
-			"tls.key"); err != nil {
-			return err
-		}
 		// openshift-apiserver
 		// /run/secrets/serving-cert
 		if _, err := util.GenCerts("openshift-apiserver",
@@ -243,6 +243,9 @@ func initServerConfig() error {
 		return err
 	}
 	if err := config.OpenShiftControllerManagerConfig("/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml"); err != nil {
+		return err
+	}
+	if err := config.KubeSchedulerConfig("/etc/kubernetes/ushift-resources/kube-scheduler/config/config.yaml"); err != nil {
 		return err
 	}
 	return nil
