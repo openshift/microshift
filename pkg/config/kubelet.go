@@ -30,7 +30,7 @@ kubeAPIQPS: 50
 kubeAPIBurst: 100
 rotateCertificates: false  #TODO
 serializeImagePulls: false
-staticPodPath: /etc/kubernetes/manifests
+# staticPodPath: /etc/kubernetes/manifests
 systemCgroups: /system.slice
 featureGates:
   APIPriorityAndFairness: true
@@ -38,7 +38,7 @@ featureGates:
   # Will be removed in future openshift/api update https://github.com/openshift/api/commit/c8c8f6d0f4a8ac4ff4ad7d1a84b27e1aa7ebf9b4
   RemoveSelfLink: false
   NodeDisruptionExclusion: true
-  RotateKubeletServerCertificate: true
+  RotateKubeletServerCertificate: false #TODO
   SCTPSupport: true
   ServiceNodeExclusion: true
   SupportPodPidsLimit: true

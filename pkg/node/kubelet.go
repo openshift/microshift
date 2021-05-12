@@ -60,7 +60,7 @@ func StartKubelet() error {
 		"--node-ip=" + ip,
 		"--minimum-container-ttl-duration=6m0s",
 		"--volume-plugin-dir=/etc/kubernetes/kubelet-plugins/volume/exec",
-		"--register-with-taints=node-role.kubernetes.io/master=:NoSchedule",
+		//"--register-with-taints=node-role.kubernetes.io/master=:NoSchedule",
 		"--fail-swap-on=false",
 		//"--pod-infra-container-image=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6eedefd9c899f7bd95978594d3a7f18fc3d9b54a53b70f58b29a3fb97bb65511
 		"--v=2",
