@@ -51,8 +51,8 @@ func StartKubelet() error {
 	command := kubelet.NewKubeletCommand()
 	args := []string{
 		"--config=/etc/kubernetes/ushift-resources/kubelet/config/config.yaml",
-		"--bootstrap-kubeconfig=" + constant.KubeletKubeconfigPath,
-		"--kubeconfig=" + constant.KubeletKubeconfigPath,
+		"--bootstrap-kubeconfig=" + constant.AdminKubeconfigPath,
+		"--kubeconfig=" + constant.AdminKubeconfigPath,
 		"--container-runtime=remote",
 		"--container-runtime-endpoint=/var/run/crio/crio.sock",
 		"--runtime-cgroups=/system.slice/crio.service",
@@ -65,14 +65,14 @@ func StartKubelet() error {
 		//"--pod-infra-container-image=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6eedefd9c899f7bd95978594d3a7f18fc3d9b54a53b70f58b29a3fb97bb65511
 		"--v=2",
 	}
-
+	//command.DisableFlagParsing = false
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
 	}
 	logrus.Infof("starting kubelet %s, args: %v", ip, args)
 
 	go func() {
-		command.Run(command, nil)
+		command.Run(command, args)
 		logrus.Fatalf("kubelet exited")
 	}()
 

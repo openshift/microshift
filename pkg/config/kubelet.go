@@ -18,11 +18,12 @@ authentication:
     clientCAFile: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
   anonymous:
     enabled: false
-cgroupDriver: systemd
+cgroupDriver: "systemd"
 cgroupRoot: /
+failSwapOn: false
 clusterDNS:
   - ` + constant.ClusterDNS + `
-clusterDomain: cluster.local
+clusterDomain: ` + constant.DomainName + `
 containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50
