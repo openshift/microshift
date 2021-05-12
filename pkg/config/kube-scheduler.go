@@ -28,9 +28,9 @@ func KubeSchedulerConfig(path string) error {
 	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta1
 kind: KubeSchedulerConfiguration
 clientConnection:
-  kubeconfig:"` + constant.KubeSchedulerKubeconfigPath + `
+  kubeconfig: ` + constant.KubeSchedulerKubeconfigPath + `
 leaderElection:
-  leaderElect: true`)
+  leaderElect: false`)
 
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	return ioutil.WriteFile(path, data, 0644)
