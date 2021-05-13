@@ -148,6 +148,9 @@ func initServerConfig() error {
 	if err := config.OpenShiftControllerManagerConfig("/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml"); err != nil {
 		return err
 	}
+	if err := config.KubeSchedulerConfig("/etc/kubernetes/ushift-resources/kube-scheduler/config/config.yaml"); err != nil {
+		return err
+	}
 	return nil
 }
 
