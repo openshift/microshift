@@ -28,9 +28,9 @@ func KubeControllerManager(ready chan bool) {
 	args := []string{
 		"--kubeconfig=" + constant.AdminKubeconfigPath, //KubeControllerManagerKubeconfigPath,
 		"--service-account-private-key-file=/etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-key/service-account.key",
-		"--allocate-node-cidrs=false",
-		//"--allocate-node-cidrs=true",
-		//"--cluster-cidr=",
+		//"--allocate-node-cidrs=false",
+		"--allocate-node-cidrs=true",
+		"--cluster-cidr=" + constant.ClusterCIDR, //TODO param
 		"--authorization-kubeconfig=" + constant.AdminKubeconfigPath,
 		"--authentication-kubeconfig=" + constant.AdminKubeconfigPath,
 		"--root-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
