@@ -32,6 +32,13 @@ var ControllerCmd = &cobra.Command{
 }
 
 func startController(args []string) error {
+	if err := startControllerOnly(); err != nil {
+		return err
+	}
+	select {}
+}
+
+func startControllerOnly() error {
 	etcdReadyCh := make(chan bool, 1)
 	if err := controllers.StartEtcd(etcdReadyCh); err != nil {
 		return err
@@ -69,6 +76,5 @@ func startController(args []string) error {
 	if err := controllers.StartOCPAPIComponents(); err != nil {
 		return err
 	}
-
-	select {}
+	return nil
 }

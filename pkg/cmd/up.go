@@ -16,28 +16,27 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-
-	"github.com/openshift/microshift/pkg/node"
 )
 
-// nodeCmd represents the node command
-var NodeCmd = &cobra.Command{
-	Use:   "node",
-	Short: "openshift node start",
-	Long:  `openshift node start`,
+var UpCmd = &cobra.Command{
+	Use:   "up",
+	Short: "openshift cluster up",
+	Long:  `openshift cluster up`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return startNode(args)
+		return startCluster(args)
 	},
 }
 
-func startNode(args []string) error {
+func startCluster(args []string) error {
+	logrus.Info("starting controllers")
+	if err := startControllerOnly(); err != nil {
+		return err
+	}
+	logrus.Info("starting node")
 	if err := startNodeOnly(); err != nil {
 		return err
 	}
 	select {}
-}
-
-func startNodeOnly() error {
-	return node.StartKubelet()
 }
