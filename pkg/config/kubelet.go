@@ -42,7 +42,7 @@ featureGates:
   SCTPSupport: true
   ServiceNodeExclusion: true
   SupportPodPidsLimit: true
-serverTLSBootstrap: true`)
+serverTLSBootstrap: false #TODO`)
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	return ioutil.WriteFile(path, data, 0644)
 }
