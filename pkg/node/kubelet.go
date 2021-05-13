@@ -56,14 +56,14 @@ func StartKubelet() error {
 		"--container-runtime=remote",
 		"--container-runtime-endpoint=/var/run/crio/crio.sock",
 		"--runtime-cgroups=/system.slice/crio.service",
-		"--node-labels=node-role.kubernetes.io/master,node.openshift.io/os_id=rhcos",
+		//"--node-labels=node-role.kubernetes.io/master,node.openshift.io/os_id=rhcos",
 		"--node-ip=" + ip,
-		"--minimum-container-ttl-duration=6m0s",
+		//"--minimum-container-ttl-duration=6m0s",
 		"--volume-plugin-dir=/etc/kubernetes/kubelet-plugins/volume/exec",
-		"--register-with-taints=node-role.kubernetes.io/master=:NoSchedule",
-		"--fail-swap-on=false",
+		//"--register-with-taints=node-role.kubernetes.io/master=:NoSchedule",
+		//"--fail-swap-on=false",
 		//"--pod-infra-container-image=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6eedefd9c899f7bd95978594d3a7f18fc3d9b54a53b70f58b29a3fb97bb65511
-		"--v=2",
+		"--v=3",
 	}
 	//command.DisableFlagParsing = false
 	if err := command.ParseFlags(args); err != nil {
