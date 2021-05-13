@@ -123,8 +123,8 @@ func runCommand(cmd *cobra.Command, opts *options.Options, registryOptions ...Op
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go func() {
-		//stopCh := server.SetupSignalHandler(true)
-		//<-stopCh
+		stopCh := make(chan struct {}) //server.SetupSignalHandler(true)
+		<-stopCh
 		cancel()
 	}()
 

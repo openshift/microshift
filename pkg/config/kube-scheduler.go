@@ -28,7 +28,7 @@ func KubeSchedulerConfig(path string) error {
 	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta1
 kind: KubeSchedulerConfiguration
 clientConnection:
-  kubeconfig: ` + constant.KubeSchedulerKubeconfigPath + `
+  kubeconfig: ` + constant.AdminKubeconfigPath + `
 leaderElection:
   leaderElect: false`)
 
