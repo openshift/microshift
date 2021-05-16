@@ -1,0 +1,18 @@
+language: go
+branches:
+  only:
+    - main
+
+go: 1.16.x
+
+before_script:
+  - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
+  - go get -u golang.org/x/lint/golint
+
+script:
+  - sh ./verify.sh
+
+deploy:
+  - provider: script
+    script:
+    - sh ./deploy.sh
