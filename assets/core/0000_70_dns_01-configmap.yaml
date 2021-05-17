@@ -1,0 +1,24 @@
+apiVersion: v1
+data:
+  Corefile: |
+    .:5353 {
+        errors
+        health
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+            pods insecure
+            upstream
+            fallthrough in-addr.arpa ip6.arpa
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf {
+            policy sequential
+        }
+        cache 30
+        reload
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    dns.operator.openshift.io/owning-dns: default
+  name: dns-default
+  namespace: openshift-dns

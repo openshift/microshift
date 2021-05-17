@@ -1,0 +1,26 @@
+kind: Service
+apiVersion: v1
+metadata:
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: router-certs-default
+  labels:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  name: router-internal-default
+  namespace: openshift-ingress     
+spec:
+  selector:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
+  - name: metrics
+    port: 1936
+    protocol: TCP
+    targetPort: 1936

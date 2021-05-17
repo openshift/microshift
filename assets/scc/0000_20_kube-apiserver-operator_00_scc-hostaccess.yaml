@@ -1,0 +1,45 @@
+allowHostDirVolumePlugin: true
+allowHostIPC: true
+allowHostNetwork: true
+allowHostPID: true
+allowHostPorts: true
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: false
+allowedCapabilities:
+apiVersion: security.openshift.io/v1
+defaultAddCapabilities:
+fsGroup:
+  type: MustRunAs
+groups: []
+kind: SecurityContextConstraints
+metadata:
+  annotations:
+    include.release.openshift.io/self-managed-high-availability: "true"
+    release.openshift.io/create-only: "true"
+    kubernetes.io/description: 'hostaccess allows access to all host namespaces but
+      still requires pods to be run with a UID and SELinux context that are allocated
+      to the namespace. WARNING: this SCC allows host access to namespaces, file systems,
+      and PIDS.  It should only be used by trusted pods.  Grant with caution.'
+  name: hostaccess
+priority:
+readOnlyRootFilesystem: false
+requiredDropCapabilities:
+- KILL
+- MKNOD
+- SETUID
+- SETGID
+runAsUser:
+  type: MustRunAsRange
+seLinuxContext:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+users: []
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- hostPath
+- persistentVolumeClaim
+- projected
+- secret

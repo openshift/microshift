@@ -1,0 +1,11 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  annotations:
+    openshift.io/node-selector: ""
+  name: openshift-dns-operator
+  labels:
+    # set value to avoid depending on kube admission that depends on openshift apis
+    openshift.io/run-level: "0"
+    # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
+    openshift.io/cluster-monitoring: "true"
