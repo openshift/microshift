@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: openshift-service-ca-operator
+  name: service-ca-operator
+  labels:
+    app: service-ca-operator

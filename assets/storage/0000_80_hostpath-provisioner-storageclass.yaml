@@ -1,0 +1,6 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: kubevirt-hostpath-provisioner
+provisioner: kubevirt.io/hostpath-provisioner
+reclaimPolicy: Delete

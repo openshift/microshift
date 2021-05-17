@@ -1,0 +1,25 @@
+# Role for the operator itself.
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: dns-operator
+  namespace: openshift-dns-operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - endpoints
+  - events
+  - configmaps
+  verbs:
+  - "*"
+
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - services
+  verbs:
+  - "*"

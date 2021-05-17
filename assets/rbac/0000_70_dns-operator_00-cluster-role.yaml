@@ -1,0 +1,98 @@
+# Cluster role for the operator itself.
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openshift-dns-operator
+rules:
+- apiGroups:
+  - operator.openshift.io
+  resources:
+  - dnses
+  verbs:
+  - "*"
+
+- apiGroups:
+  - operator.openshift.io
+  resources:
+  - dnses/status
+  verbs:
+  - update
+
+- apiGroups:
+  - apps
+  - extensions
+  resources:
+  - daemonsets
+  verbs:
+  - "*"
+
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - services
+  - serviceaccounts
+  - configmaps
+  - endpoints
+  - pods
+  verbs:
+  - "*"
+
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - create
+  - update
+  - get
+
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  verbs:
+  - update
+
+- apiGroups:
+  - config.openshift.io
+  resources:
+  - clusteroperators
+  - networks
+  verbs:
+  - create
+  - get
+
+- apiGroups:
+  - config.openshift.io
+  resources:
+  - clusteroperators/status
+  verbs:
+  - update

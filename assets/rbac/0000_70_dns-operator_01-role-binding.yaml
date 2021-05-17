@@ -1,0 +1,14 @@
+# Binds the operator role to its Service Account.
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: dns-operator
+  namespace: openshift-dns-operator
+subjects:
+- kind: ServiceAccount
+  name: dns-operator
+  namespace: openshift-dns-operator
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: dns-operator
