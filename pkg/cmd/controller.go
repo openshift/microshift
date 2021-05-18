@@ -19,6 +19,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
+	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/controllers"
 )
 
@@ -74,6 +75,10 @@ func startControllerOnly() error {
 	<-ocpCMReadyCh
 
 	if err := controllers.StartOCPAPIComponents(); err != nil {
+		return err
+	}
+
+	if err := components.StartComponents(); err != nil {
 		return err
 	}
 	return nil
