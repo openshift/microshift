@@ -7,6 +7,9 @@
 // assets/apps/0000_70_dns_01-daemonset.yaml
 // assets/apps/0000_80_openshift-router-deployment.yaml
 // assets/apps/000_80_hostpath-provisioner-daemonset.yaml
+// assets/apps/ovs-ds.yaml
+// assets/apps/sdn-controller-ds.yaml
+// assets/apps/sdn-ds.yaml
 package assets
 
 import (
@@ -789,6 +792,571 @@ func assetsApps000_80_hostpathProvisionerDaemonsetYaml() (*asset, error) {
 	return a, nil
 }
 
+var _assetsAppsOvsDsYaml = []byte(`apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: ovs
+  name: ovs
+  namespace: openshift-sdn
+spec:
+  selector:
+    matchLabels:
+      app: ovs
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ovs
+        component: network
+        openshift.io/component: network
+        type: infra
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: network.operator.openshift.io/external-openvswitch
+                operator: DoesNotExist
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          #!/bin/bash
+          set -euo pipefail
+          export SYSTEMD_IGNORE_CHROOT=yes
+
+          # systemctl cannot be used in a separate PID namespace to reach
+          # the systemd running in PID 1. Therefore we need to use the dbus API
+          systemctl_restart(){
+            gdbus call \
+              --system \
+              --dest org.freedesktop.systemd1 \
+              --object-path /org/freedesktop/systemd1/unit/"$(svc_encode_name ${1})"_2eservice \
+              --method org.freedesktop.systemd1.Unit.Restart "replace"
+          }
+          svc_encode_name(){
+            # systemd encodes some characters, so far we only need to encode
+            # the character "-" but there may be more in the future.
+            echo "${1//-/_2d}"
+          }
+
+            # In some very strange corner cases, the owner for /run/openvswitch
+            # can be wrong, so we need to clean up and restart.
+            ovs_uid=$(chroot /host id -u openvswitch)
+            ovs_gid=$(chroot /host id -g openvswitch)
+            chown -R "${ovs_uid}:${ovs_gid}" /run/openvswitch
+            if [[ ! -S /run/openvswitch/db.sock ]]; then
+              systemctl_restart ovsdb-server
+            fi
+            # We need to explicitly exit on SIGTERM, see https://github.com/openshift/cluster-dns-operator/issues/65
+            function quit {
+                exit 0
+            }
+            trap quit SIGTERM
+            # Don't need to worry about restoring flows; this can only change if we've rebooted
+            tail --pid=$BASHPID -F /host/var/log/openvswitch/ovs-vswitchd.log /host/var/log/openvswitch/ovsdb-server.log &
+            wait
+        image: quay.io/openshift/okd-content@sha256:71dbab00e9803acb3bcf859607d9d3ed445b6f3a063ecedd6b3ea02a7a8fdd80
+        imagePullPolicy: IfNotPresent
+        name: openvswitch
+        resources:
+          requests:
+            cpu: 15m
+            memory: 400Mi
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: host-modules
+          readOnly: true
+        - mountPath: /run
+          name: host-run
+        - mountPath: /sys
+          name: host-sys
+          readOnly: true
+        - mountPath: /etc/openvswitch
+          name: host-config-openvswitch
+        - mountPath: /host
+          name: host-slash
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-node-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: sdn
+      serviceAccountName: sdn
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - operator: Exists
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: ""
+        name: host-modules
+      - hostPath:
+          path: /run
+          type: ""
+        name: host-run
+      - hostPath:
+          path: /sys
+          type: ""
+        name: host-sys
+      - hostPath:
+          path: /var/lib/openvswitch
+          type: DirectoryOrCreate
+        name: host-config-openvswitch
+      - hostPath:
+          path: /
+          type: ""
+        name: host-slash
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+`)
+
+func assetsAppsOvsDsYamlBytes() ([]byte, error) {
+	return _assetsAppsOvsDsYaml, nil
+}
+
+func assetsAppsOvsDsYaml() (*asset, error) {
+	bytes, err := assetsAppsOvsDsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/apps/ovs-ds.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsAppsSdnControllerDsYaml = []byte(`apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: sdn-controller
+  name: sdn-controller
+  namespace: openshift-sdn
+spec:
+  selector:
+    matchLabels:
+      app: sdn-controller
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: sdn-controller
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          if [[ -f /env/_master ]]; then
+            set -o allexport
+            source /env/_master
+            set +o allexport
+          fi
+
+          exec openshift-sdn-controller --v=${OPENSHIFT_SDN_LOG_LEVEL:-2}
+        env:
+        - name: KUBERNETES_SERVICE_PORT
+          value: "6443"
+        - name: KUBERNETES_SERVICE_HOST
+          value: api-int.crc.testing
+        image: quay.io/openshift/okd-content@sha256:71dbab00e9803acb3bcf859607d9d3ed445b6f3a063ecedd6b3ea02a7a8fdd80
+        imagePullPolicy: IfNotPresent
+        name: sdn-controller
+        resources:
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /env
+          name: env-overrides
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      priorityClassName: system-cluster-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccount: sdn-controller
+      serviceAccountName: sdn-controller
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - effect: NoSchedule
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: env-overrides
+          optional: true
+        name: env-overrides
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+`)
+
+func assetsAppsSdnControllerDsYamlBytes() ([]byte, error) {
+	return _assetsAppsSdnControllerDsYaml, nil
+}
+
+func assetsAppsSdnControllerDsYaml() (*asset, error) {
+	bytes, err := assetsAppsSdnControllerDsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/apps/sdn-controller-ds.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsAppsSdnDsYaml = []byte(`apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: sdn
+  name: sdn
+  namespace: openshift-sdn
+spec:
+  selector:
+    matchLabels:
+      app: sdn
+  template:
+    metadata:
+      labels:
+        app: sdn
+        component: network
+        openshift.io/component: network
+        type: infra
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          #!/bin/bash
+          set -euo pipefail
+
+          # if another process is listening on the cni-server socket, wait until it exits
+          trap 'kill $(jobs -p); rm -f /etc/cni/net.d/80-openshift-network.conf ; exit 0' TERM
+          retries=0
+          while true; do
+            if echo 'test' | socat - UNIX-CONNECT:/var/run/openshift-sdn/cniserver/socket &>/dev/null; then
+              echo "warning: Another process is currently listening on the CNI socket, waiting 15s ..." 2>&1
+              sleep 15 & wait
+              (( retries += 1 ))
+            else
+              break
+            fi
+            if [[ "${retries}" -gt 40 ]]; then
+              echo "error: Another process is currently listening on the CNI socket, exiting" 2>&1
+              exit 1
+            fi
+          done
+
+          # local environment overrides
+          if [[ -f /etc/sysconfig/openshift-sdn ]]; then
+            set -o allexport
+            source /etc/sysconfig/openshift-sdn
+            set +o allexport
+          fi
+          #BUG: cdc accidentally mounted /etc/sysconfig/openshift-sdn as DirectoryOrCreate; clean it up so we can ultimately mount /etc/sysconfig/openshift-sdn as FileOrCreate
+          # Once this is released, then we can mount it properly
+          if [[ -d /etc/sysconfig/openshift-sdn ]]; then
+            rmdir /etc/sysconfig/openshift-sdn || true
+          fi
+
+          # configmap-based overrides
+          if [[ -f /env/${K8S_NODE_NAME} ]]; then
+            set -o allexport
+            source /env/${K8S_NODE_NAME}
+            set +o allexport
+          fi
+
+          # Take over network functions on the node
+          rm -f /etc/cni/net.d/80-openshift-network.conf
+          cp -f /opt/cni/bin/openshift-sdn /host/opt/cni/bin/
+
+          # Launch the network process
+          exec /usr/bin/openshift-sdn-node \
+            --node-name ${K8S_NODE_NAME} --node-ip ${K8S_NODE_IP} \
+            --proxy-config /config/kube-proxy-config.yaml \
+            --v ${OPENSHIFT_SDN_LOG_LEVEL:-2}
+        env:
+        - name: KUBERNETES_SERVICE_PORT
+          value: "6443"
+        - name: KUBERNETES_SERVICE_HOST
+          value: 10.43.0.1
+        - name: OPENSHIFT_DNS_DOMAIN
+          value: ushift.testing
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: quay.io/openshift/okd-content@sha256:71dbab00e9803acb3bcf859607d9d3ed445b6f3a063ecedd6b3ea02a7a8fdd80
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - rm
+              - -f
+              - /etc/cni/net.d/80-openshift-network.conf
+              - /host/opt/cni/bin/openshift-sdn
+        name: sdn
+        ports:
+        - containerPort: 10256
+          hostPort: 10256
+          name: healthz
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - test
+            - -f
+            - /etc/cni/net.d/80-openshift-network.conf
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /config
+          name: config
+          readOnly: true
+        - mountPath: /env
+          name: env-overrides
+        - mountPath: /var/run
+          name: host-var-run
+        - mountPath: /var/run/dbus/
+          name: host-var-run-dbus
+          readOnly: true
+        - mountPath: /var/run/openvswitch/
+          name: host-var-run-ovs
+          readOnly: true
+        - mountPath: /var/run/kubernetes/
+          name: host-var-run-kubernetes
+          readOnly: true
+        - mountPath: /run/netns
+          mountPropagation: HostToContainer
+          name: host-run-netns
+          readOnly: true
+        - mountPath: /host/var/run/netns
+          mountPropagation: HostToContainer
+          name: host-var-run-netns
+          readOnly: true
+        - mountPath: /var/run/openshift-sdn
+          name: host-var-run-openshift-sdn
+        - mountPath: /host
+          mountPropagation: HostToContainer
+          name: host-slash
+          readOnly: true
+        - mountPath: /host/opt/cni/bin
+          name: host-cni-bin
+        - mountPath: /etc/cni/net.d
+          name: host-cni-conf
+        - mountPath: /var/lib/cni/networks/openshift-sdn
+          name: host-var-lib-cni-networks-openshift-sdn
+        - mountPath: /lib/modules
+          name: host-modules
+          readOnly: true
+        - mountPath: /etc/sysconfig
+          name: etc-sysconfig
+          readOnly: true
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          #!/bin/bash
+          set -euo pipefail
+          TLS_PK=/etc/pki/tls/metrics-certs/tls.key
+          TLS_CERT=/etc/pki/tls/metrics-certs/tls.crt
+
+          # As the secret mount is optional we must wait for the files to be present.
+          # The service is created in monitor.yaml and this is created in sdn.yaml.
+          # If it isn't created there is probably an issue so we want to crashloop.
+          TS=$(date +%s)
+          WARN_TS=$(( ${TS} + $(( 20 * 60)) ))
+          HAS_LOGGED_INFO=0
+
+          log_missing_certs(){
+              CUR_TS=$(date +%s)
+              if [[ "${CUR_TS}" -gt "WARN_TS"  ]]; then
+                echo $(date -Iseconds) WARN: sdn-metrics-certs not mounted after 20 minutes.
+              elif [[ "${HAS_LOGGED_INFO}" -eq 0 ]] ; then
+                echo $(date -Iseconds) INFO: sdn-metrics-certs not mounted. Waiting 20 minutes.
+                HAS_LOGGED_INFO=1
+              fi
+          }
+
+          while [[ ! -f "${TLS_PK}" ||  ! -f "${TLS_CERT}" ]] ; do
+            log_missing_certs
+            sleep 5
+          done
+
+          echo $(date -Iseconds) INFO: sdn-metrics-certs mounted, starting kube-rbac-proxy
+          exec /usr/bin/kube-rbac-proxy \
+            --logtostderr \
+            --secure-listen-address=:9101 \
+            --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 \
+            --upstream=http://127.0.0.1:29101/ \
+            --tls-private-key-file=${TLS_PK} \
+            --tls-cert-file=${TLS_CERT}
+        image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f2949b3fe8d329347f1fba5b1474fe4f0b210c6719e482675d10180c1d60bf7b
+        imagePullPolicy: IfNotPresent
+        name: kube-rbac-proxy
+        ports:
+        - containerPort: 9101
+          hostPort: 9101
+          name: https
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /etc/pki/tls/metrics-certs
+          name: sdn-metrics-certs
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      hostPID: true
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-node-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: sdn
+      serviceAccountName: sdn
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - operator: Exists
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: sdn-config
+        name: config
+      - configMap:
+          defaultMode: 420
+          name: env-overrides
+          optional: true
+        name: env-overrides
+      - hostPath:
+          path: /etc/sysconfig
+          type: ""
+        name: etc-sysconfig
+      - hostPath:
+          path: /lib/modules
+          type: ""
+        name: host-modules
+      - hostPath:
+          path: /var/run
+          type: ""
+        name: host-var-run
+      - hostPath:
+          path: /run/netns
+          type: ""
+        name: host-run-netns
+      - hostPath:
+          path: /var/run/netns
+          type: ""
+        name: host-var-run-netns
+      - hostPath:
+          path: /var/run/dbus
+          type: ""
+        name: host-var-run-dbus
+      - hostPath:
+          path: /var/run/openvswitch
+          type: ""
+        name: host-var-run-ovs
+      - hostPath:
+          path: /var/run/kubernetes
+          type: ""
+        name: host-var-run-kubernetes
+      - hostPath:
+          path: /var/run/openshift-sdn
+          type: ""
+        name: host-var-run-openshift-sdn
+      - hostPath:
+          path: /
+          type: ""
+        name: host-slash
+      - hostPath:
+          path: /var/lib/cni/bin
+          type: ""
+        name: host-cni-bin
+      - hostPath:
+          path: /var/run/multus/cni/net.d
+          type: ""
+        name: host-cni-conf
+      - hostPath:
+          path: /var/lib/cni/networks/openshift-sdn
+          type: ""
+        name: host-var-lib-cni-networks-openshift-sdn
+      - name: sdn-metrics-certs
+        secret:
+          defaultMode: 420
+          optional: true
+          secretName: sdn-metrics-certs
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate`)
+
+func assetsAppsSdnDsYamlBytes() ([]byte, error) {
+	return _assetsAppsSdnDsYaml, nil
+}
+
+func assetsAppsSdnDsYaml() (*asset, error) {
+	bytes, err := assetsAppsSdnDsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/apps/sdn-ds.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -848,6 +1416,9 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/apps/0000_70_dns_01-daemonset.yaml":                       assetsApps0000_70_dns_01DaemonsetYaml,
 	"assets/apps/0000_80_openshift-router-deployment.yaml":            assetsApps0000_80_openshiftRouterDeploymentYaml,
 	"assets/apps/000_80_hostpath-provisioner-daemonset.yaml":          assetsApps000_80_hostpathProvisionerDaemonsetYaml,
+	"assets/apps/ovs-ds.yaml":                                         assetsAppsOvsDsYaml,
+	"assets/apps/sdn-controller-ds.yaml":                              assetsAppsSdnControllerDsYaml,
+	"assets/apps/sdn-ds.yaml":                                         assetsAppsSdnDsYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -900,6 +1471,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_70_dns_01-daemonset.yaml":                       {assetsApps0000_70_dns_01DaemonsetYaml, map[string]*bintree{}},
 			"0000_80_openshift-router-deployment.yaml":            {assetsApps0000_80_openshiftRouterDeploymentYaml, map[string]*bintree{}},
 			"000_80_hostpath-provisioner-daemonset.yaml":          {assetsApps000_80_hostpathProvisionerDaemonsetYaml, map[string]*bintree{}},
+			"ovs-ds.yaml":            {assetsAppsOvsDsYaml, map[string]*bintree{}},
+			"sdn-controller-ds.yaml": {assetsAppsSdnControllerDsYaml, map[string]*bintree{}},
+			"sdn-ds.yaml":            {assetsAppsSdnDsYaml, map[string]*bintree{}},
 		}},
 	}},
 }}

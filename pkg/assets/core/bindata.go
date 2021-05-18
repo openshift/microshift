@@ -22,6 +22,7 @@
 // assets/core/0000_80_openshift-router-service-account.yaml
 // assets/core/0000_80_openshift-router-service.yaml
 // assets/core/0001_00_cluster-version-operator_03_service.yaml
+// assets/core/openshift-sdn-cm.yaml
 package assets
 
 import (
@@ -703,6 +704,79 @@ func assetsCore0001_00_clusterVersionOperator_03_serviceYaml() (*asset, error) {
 	return a, nil
 }
 
+var _assetsCoreOpenshiftSdnCmYaml = []byte(`apiVersion: v1
+data:
+  kube-proxy-config.yaml: |-
+    apiVersion: kubeproxy.config.k8s.io/v1alpha1
+    bindAddress: 0.0.0.0
+    bindAddressHardFail: false
+    clientConnection:
+      acceptContentTypes: ""
+      burst: 0
+      contentType: ""
+      kubeconfig: ""
+      qps: 0
+    clusterCIDR: 10.217.0.0/22
+    configSyncPeriod: 0s
+    conntrack:
+      maxPerCore: null
+      min: null
+      tcpCloseWaitTimeout: null
+      tcpEstablishedTimeout: null
+    detectLocalMode: ""
+    enableProfiling: false
+    featureGates:
+      EndpointSlice: false
+      EndpointSliceProxying: false
+    healthzBindAddress: 0.0.0.0:10256
+    hostnameOverride: ""
+    iptables:
+      masqueradeAll: false
+      masqueradeBit: 0
+      minSyncPeriod: 0s
+      syncPeriod: 0s
+    ipvs:
+      excludeCIDRs: null
+      minSyncPeriod: 0s
+      scheduler: ""
+      strictARP: false
+      syncPeriod: 0s
+      tcpFinTimeout: 0s
+      tcpTimeout: 0s
+      udpTimeout: 0s
+    kind: KubeProxyConfiguration
+    metricsBindAddress: 0.0.0.0:29101
+    mode: unidling+iptables
+    nodePortAddresses: null
+    oomScoreAdj: null
+    portRange: ""
+    showHiddenMetricsForVersion: ""
+    udpIdleTimeout: 0s
+    winkernel:
+      enableDSR: false
+      networkName: ""
+      sourceVip: ""
+kind: ConfigMap
+metadata:
+  name: sdn-config
+  namespace: openshift-sdn
+`)
+
+func assetsCoreOpenshiftSdnCmYamlBytes() ([]byte, error) {
+	return _assetsCoreOpenshiftSdnCmYaml, nil
+}
+
+func assetsCoreOpenshiftSdnCmYaml() (*asset, error) {
+	bytes, err := assetsCoreOpenshiftSdnCmYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/openshift-sdn-cm.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -777,6 +851,7 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/core/0000_80_openshift-router-service-account.yaml":                  assetsCore0000_80_openshiftRouterServiceAccountYaml,
 	"assets/core/0000_80_openshift-router-service.yaml":                          assetsCore0000_80_openshiftRouterServiceYaml,
 	"assets/core/0001_00_cluster-version-operator_03_service.yaml":               assetsCore0001_00_clusterVersionOperator_03_serviceYaml,
+	"assets/core/openshift-sdn-cm.yaml":                                          assetsCoreOpenshiftSdnCmYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -844,6 +919,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_80_openshift-router-service-account.yaml":                  {assetsCore0000_80_openshiftRouterServiceAccountYaml, map[string]*bintree{}},
 			"0000_80_openshift-router-service.yaml":                          {assetsCore0000_80_openshiftRouterServiceYaml, map[string]*bintree{}},
 			"0001_00_cluster-version-operator_03_service.yaml":               {assetsCore0001_00_clusterVersionOperator_03_serviceYaml, map[string]*bintree{}},
+			"openshift-sdn-cm.yaml":                                          {assetsCoreOpenshiftSdnCmYaml, map[string]*bintree{}},
 		}},
 	}},
 }}
