@@ -63,7 +63,7 @@ func StartKubelet() error {
 		//"--register-with-taints=node-role.kubernetes.io/master=:NoSchedule",
 		//"--fail-swap-on=false",
 		//"--pod-infra-container-image=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6eedefd9c899f7bd95978594d3a7f18fc3d9b54a53b70f58b29a3fb97bb65511
-		"--v=3",
+		"--v=2",
 	}
 	//command.DisableFlagParsing = false
 	if err := command.ParseFlags(args); err != nil {
