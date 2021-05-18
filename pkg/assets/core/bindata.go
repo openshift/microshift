@@ -709,14 +709,14 @@ data:
   kube-proxy-config.yaml: |-
     apiVersion: kubeproxy.config.k8s.io/v1alpha1
     bindAddress: 0.0.0.0
-    bindAddressHardFail: false
+    #bindAddressHardFail: false
     clientConnection:
       acceptContentTypes: ""
       burst: 0
       contentType: ""
       kubeconfig: ""
       qps: 0
-    clusterCIDR: 10.217.0.0/22
+    clusterCIDR: 10.42.0.0/16
     configSyncPeriod: 0s
     conntrack:
       maxPerCore: null
