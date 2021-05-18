@@ -98,8 +98,8 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
-      serviceAccount: sdn
-      serviceAccountName: sdn
+      #serviceAccount: sdn
+      #serviceAccountName: sdn
       terminationGracePeriodSeconds: 30
       tolerations:
       - operator: Exists

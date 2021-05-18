@@ -892,8 +892,8 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
-      serviceAccount: sdn
-      serviceAccountName: sdn
+      #serviceAccount: sdn
+      #serviceAccountName: sdn
       terminationGracePeriodSeconds: 30
       tolerations:
       - operator: Exists
@@ -995,8 +995,8 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
-      serviceAccount: sdn-controller
-      serviceAccountName: sdn-controller
+      #serviceAccount: sdn-controller
+      #serviceAccountName: sdn-controller
       terminationGracePeriodSeconds: 30
       tolerations:
       - effect: NoSchedule
@@ -1238,7 +1238,7 @@ spec:
             --upstream=http://127.0.0.1:29101/ \
             --tls-private-key-file=${TLS_PK} \
             --tls-cert-file=${TLS_CERT}
-        image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f2949b3fe8d329347f1fba5b1474fe4f0b210c6719e482675d10180c1d60bf7b
+        image: quay.io/openshift/okd-content@sha256:1aa5bb03d0485ec2db2c7871a1eeaef83e9eabf7e9f1bc2c841cf1a759817c99
         imagePullPolicy: IfNotPresent
         name: kube-rbac-proxy
         ports:
@@ -1265,8 +1265,8 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
-      serviceAccount: sdn
-      serviceAccountName: sdn
+      #serviceAccount: sdn
+      #serviceAccountName: sdn
       terminationGracePeriodSeconds: 30
       tolerations:
       - operator: Exists
@@ -1340,7 +1340,8 @@ spec:
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 1
-    type: RollingUpdate`)
+    type: RollingUpdate
+`)
 
 func assetsAppsSdnDsYamlBytes() ([]byte, error) {
 	return _assetsAppsSdnDsYaml, nil
