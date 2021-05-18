@@ -54,8 +54,8 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
-      serviceAccount: sdn-controller
-      serviceAccountName: sdn-controller
+      #serviceAccount: sdn-controller
+      #serviceAccountName: sdn-controller
       terminationGracePeriodSeconds: 30
       tolerations:
       - effect: NoSchedule
