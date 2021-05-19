@@ -285,10 +285,10 @@ spec:
       volumes:
         - name: signing-key
           hostPath:
-            path: /var/lib/openshift/service-ca/key
+            path: {{.KeyDir}}
         - name: signing-cabundle
           hostPath:
-            path: /var/lib/openshift/service-ca/ca-cabundle
+            path: {{.CADir}}
       #nodeSelector:
       #  node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"
@@ -1108,7 +1108,7 @@ spec:
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         - name: KUBERNETES_SERVICE_HOST
-          value: 10.43.0.1
+          value: 127.0.0.1
         - name: OPENSHIFT_DNS_DOMAIN
           value: ushift.testing
         - name: K8S_NODE_NAME

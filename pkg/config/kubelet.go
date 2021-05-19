@@ -89,3 +89,17 @@ featureGates:
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	return ioutil.WriteFile(path, data, 0644)
 }
+
+func KubeProxyConfig(path string) error {
+	data := []byte(`
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+clientConnection:
+   kubeconfig: ` + constant.AdminKubeconfigPath + `
+hostnameOverride: 127.0.0.1
+mode:
+featureGates:
+   AllAlpha: false`)
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
+}
