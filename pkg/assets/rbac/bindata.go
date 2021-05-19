@@ -1,6 +1,9 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // assets/rbac/0000_00_cluster-version-operator_02_roles.yaml
+// assets/rbac/0000_00_flannel-clusterrole.yaml
+// assets/rbac/0000_00_flannel-clusterrolebinding.yaml
+// assets/rbac/0000_00_podsecuritypolicy-flannel.yaml
 // assets/rbac/0000_50_service-ca-operator_00_roles.yaml
 // assets/rbac/0000_60_service-ca_00_roles.yaml
 // assets/rbac/0000_70_dns-operator_00-cluster-role.yaml
@@ -90,6 +93,140 @@ func assetsRbac0000_00_clusterVersionOperator_02_rolesYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/rbac/0000_00_cluster-version-operator_02_roles.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsRbac0000_00_flannelClusterroleYaml = []byte(`kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flannel
+rules:
+- apiGroups: ['extensions']
+  resources: ['podsecuritypolicies']
+  verbs: ['use']
+  resourceNames: ['psp.flannel.unprivileged']
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/status
+  verbs:
+  - patch`)
+
+func assetsRbac0000_00_flannelClusterroleYamlBytes() ([]byte, error) {
+	return _assetsRbac0000_00_flannelClusterroleYaml, nil
+}
+
+func assetsRbac0000_00_flannelClusterroleYaml() (*asset, error) {
+	bytes, err := assetsRbac0000_00_flannelClusterroleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/rbac/0000_00_flannel-clusterrole.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsRbac0000_00_flannelClusterrolebindingYaml = []byte(`kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flannel
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flannel
+subjects:
+- kind: ServiceAccount
+  name: flannel
+  namespace: kube-system`)
+
+func assetsRbac0000_00_flannelClusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsRbac0000_00_flannelClusterrolebindingYaml, nil
+}
+
+func assetsRbac0000_00_flannelClusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsRbac0000_00_flannelClusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/rbac/0000_00_flannel-clusterrolebinding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsRbac0000_00_podsecuritypolicyFlannelYaml = []byte(`apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: psp.flannel.unprivileged
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: docker/default
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+    apparmor.security.beta.kubernetes.io/defaultProfileName: runtime/default
+spec:
+  privileged: false
+  volumes:
+  - configMap
+  - secret
+  - emptyDir
+  - hostPath
+  allowedHostPaths:
+  - pathPrefix: "/etc/cni/net.d"
+  - pathPrefix: "/etc/kube-flannel"
+  - pathPrefix: "/run/flannel"
+  readOnlyRootFilesystem: false
+  # Users and groups
+  runAsUser:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  # Privilege Escalation
+  allowPrivilegeEscalation: false
+  defaultAllowPrivilegeEscalation: false
+  # Capabilities
+  allowedCapabilities: ['NET_ADMIN', 'NET_RAW']
+  defaultAddCapabilities: []
+  requiredDropCapabilities: []
+  # Host namespaces
+  hostPID: false
+  hostIPC: false
+  hostNetwork: true
+  hostPorts:
+  - min: 0
+    max: 65535
+  # SELinux
+  seLinux:
+    # SELinux is unused in CaaSP
+    rule: 'RunAsAny'`)
+
+func assetsRbac0000_00_podsecuritypolicyFlannelYamlBytes() ([]byte, error) {
+	return _assetsRbac0000_00_podsecuritypolicyFlannelYaml, nil
+}
+
+func assetsRbac0000_00_podsecuritypolicyFlannelYaml() (*asset, error) {
+	bytes, err := assetsRbac0000_00_podsecuritypolicyFlannelYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/rbac/0000_00_podsecuritypolicy-flannel.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -675,6 +812,9 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
 	"assets/rbac/0000_00_cluster-version-operator_02_roles.yaml":       assetsRbac0000_00_clusterVersionOperator_02_rolesYaml,
+	"assets/rbac/0000_00_flannel-clusterrole.yaml":                     assetsRbac0000_00_flannelClusterroleYaml,
+	"assets/rbac/0000_00_flannel-clusterrolebinding.yaml":              assetsRbac0000_00_flannelClusterrolebindingYaml,
+	"assets/rbac/0000_00_podsecuritypolicy-flannel.yaml":               assetsRbac0000_00_podsecuritypolicyFlannelYaml,
 	"assets/rbac/0000_50_service-ca-operator_00_roles.yaml":            assetsRbac0000_50_serviceCaOperator_00_rolesYaml,
 	"assets/rbac/0000_60_service-ca_00_roles.yaml":                     assetsRbac0000_60_serviceCa_00_rolesYaml,
 	"assets/rbac/0000_70_dns-operator_00-cluster-role.yaml":            assetsRbac0000_70_dnsOperator_00ClusterRoleYaml,
@@ -733,6 +873,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"rbac": {nil, map[string]*bintree{
 			"0000_00_cluster-version-operator_02_roles.yaml":       {assetsRbac0000_00_clusterVersionOperator_02_rolesYaml, map[string]*bintree{}},
+			"0000_00_flannel-clusterrole.yaml":                     {assetsRbac0000_00_flannelClusterroleYaml, map[string]*bintree{}},
+			"0000_00_flannel-clusterrolebinding.yaml":              {assetsRbac0000_00_flannelClusterrolebindingYaml, map[string]*bintree{}},
+			"0000_00_podsecuritypolicy-flannel.yaml":               {assetsRbac0000_00_podsecuritypolicyFlannelYaml, map[string]*bintree{}},
 			"0000_50_service-ca-operator_00_roles.yaml":            {assetsRbac0000_50_serviceCaOperator_00_rolesYaml, map[string]*bintree{}},
 			"0000_60_service-ca_00_roles.yaml":                     {assetsRbac0000_60_serviceCa_00_rolesYaml, map[string]*bintree{}},
 			"0000_70_dns-operator_00-cluster-role.yaml":            {assetsRbac0000_70_dnsOperator_00ClusterRoleYaml, map[string]*bintree{}},
