@@ -39,10 +39,10 @@ spec:
       volumes:
         - name: signing-key
           hostPath:
-            path: /var/lib/openshift/service-ca/key
+            path: {{.KeyDir}}
         - name: signing-cabundle
           hostPath:
-            path: /var/lib/openshift/service-ca/ca-cabundle
+            path: {{.CADir}}
       #nodeSelector:
       #  node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"

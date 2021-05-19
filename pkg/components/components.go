@@ -25,7 +25,7 @@ func StartComponents() error {
 	}
 	if err := util.GenCerts("service-ca", "/etc/kubernetes/ushift-resources/service-ca/secrets/service-ca",
 		"tls.crt", "tls.key",
-		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
+		[]string{"localhost", ip, "127.0.0.1", hostname, "10.43.0.1"}); err != nil {
 		return err
 	}
 
