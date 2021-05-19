@@ -86,9 +86,21 @@ func StartKubelet() error {
 --proxy-config /config/kube-proxy-config.yaml
 --v 2
 */
-func StartKubeProxy(args []string) {
+func StartKubeProxy() {
 	command := kubeproxy.NewProxyCommand()
+	args := []string{
+		"--config=/etc/kubernetes/ushift-resources/kube-proxy/config/config.yaml",
+		"--master=https://127.0.0.1:6443",
+		"-v=2",
+	}
+	if err := command.ParseFlags(args); err != nil {
+		logrus.Fatalf("failed to parse flags:%v", err)
+	}
+	logrus.Infof("starting kube-proxy, args: %v", args)
+
 	go func() {
-		logrus.Fatalf("kube-proxy exited: %v", command.Execute())
+		command.Run(command, args)
+		logrus.Fatalf("kube-proxy exited")
 	}()
+
 }

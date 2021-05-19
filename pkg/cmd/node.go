@@ -39,5 +39,9 @@ func startNode(args []string) error {
 }
 
 func startNodeOnly() error {
-	return node.StartKubelet()
+	if err := node.StartKubelet(); err != nil {
+		return err
+	}
+	node.StartKubeProxy()
+	return nil
 }

@@ -95,7 +95,7 @@ func initCerts() error {
 	}
 	if err := util.GenCerts("kube-apiserver", "/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey",
 		"tls.crt", "tls.key",
-		[]string{"kube-apiserver", ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		[]string{"kube-apiserver", ip, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost", "10.43.0.1"}); err != nil {
 		return err
 	}
 	if err := util.GenKeys("/etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-key",
@@ -159,6 +159,9 @@ func initNodeConfig() error {
 		return err
 	}
 	if err := config.OpenShiftSDNConfig("/etc/kubernetes/ushift-resources/openshift-sdn/config/config.yaml"); err != nil {
+		return err
+	}
+	if err := config.KubeProxyConfig("/etc/kubernetes/ushift-resources/kube-proxy/config/config.yaml"); err != nil {
 		return err
 	}
 	return nil
