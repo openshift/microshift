@@ -121,6 +121,12 @@ func initCerts() error {
 		return err
 	}
 
+	if err := util.GenCerts("kubelet", "/etc/kubernetes/ushift-resources/kubelet/secrets/kubelet-client",
+		"tls.crt", "tls.key",
+		[]string{"localhost", ip, "127.0.0.1", hostname}); err != nil {
+		return err
+	}
+
 	// ocp
 	if err := util.GenCerts("openshift-apiserver", "/etc/kubernetes/ushift-resources/ocp-apiserver/secrets",
 		"tls.crt", "tls.key",

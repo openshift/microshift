@@ -34,6 +34,8 @@ authentication:
     clientCAFile: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
   anonymous:
     enabled: false
+tlsCertFile: /etc/kubernetes/ushift-resources/kubelet/secrets/kubelet-client/tls.crt
+tlsPrivateKeyFile: /etc/kubernetes/ushift-resources/kubelet/secrets/kubelet-client/tls.key
 cgroupDriver: "systemd"
 cgroupRoot: /
 failSwapOn: false
