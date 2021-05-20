@@ -1,6 +1,8 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // assets/core/0000_00_cluster-version-operator_00_namespace.yaml
+// assets/core/0000_00_flannel-configmap.yaml
+// assets/core/0000_00_flannel-service-account.yaml
 // assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
 // assets/core/0000_50_service-ca-operator_01_namespace.yaml
 // assets/core/0000_50_service-ca-operator_02_service.yaml
@@ -99,6 +101,79 @@ func assetsCore0000_00_clusterVersionOperator_00_namespaceYaml() (*asset, error)
 	}
 
 	info := bindataFileInfo{name: "assets/core/0000_00_cluster-version-operator_00_namespace.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCore0000_00_flannelConfigmapYaml = []byte(`kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kube-flannel-cfg
+  namespace: kube-system
+  labels:
+    tier: node
+    app: flannel
+data:
+  cni-conf.json: |
+    {
+      "name": "cbr0",
+      "cniVersion": "0.3.1",
+      "plugins": [
+        {
+          "type": "flannel",
+          "delegate": {
+            "hairpinMode": true,
+            "isDefaultGateway": true
+          }
+        },
+        {
+          "type": "portmap",
+          "capabilities": {
+            "portMappings": true
+          }
+        }
+      ]
+    }
+  net-conf.json: |
+    {
+      "Network": "10.42.0.0/16",
+      "Backend": {
+        "Type": "vxlan"
+      }
+    }`)
+
+func assetsCore0000_00_flannelConfigmapYamlBytes() ([]byte, error) {
+	return _assetsCore0000_00_flannelConfigmapYaml, nil
+}
+
+func assetsCore0000_00_flannelConfigmapYaml() (*asset, error) {
+	bytes, err := assetsCore0000_00_flannelConfigmapYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_00_flannel-configmap.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCore0000_00_flannelServiceAccountYaml = []byte(`apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flannel
+  namespace: kube-system`)
+
+func assetsCore0000_00_flannelServiceAccountYamlBytes() ([]byte, error) {
+	return _assetsCore0000_00_flannelServiceAccountYaml, nil
+}
+
+func assetsCore0000_00_flannelServiceAccountYaml() (*asset, error) {
+	bytes, err := assetsCore0000_00_flannelServiceAccountYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_00_flannel-service-account.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -830,6 +905,8 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
 	"assets/core/0000_00_cluster-version-operator_00_namespace.yaml":             assetsCore0000_00_clusterVersionOperator_00_namespaceYaml,
+	"assets/core/0000_00_flannel-configmap.yaml":                                 assetsCore0000_00_flannelConfigmapYaml,
+	"assets/core/0000_00_flannel-service-account.yaml":                           assetsCore0000_00_flannelServiceAccountYaml,
 	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml": assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
 	"assets/core/0000_50_service-ca-operator_01_namespace.yaml":                  assetsCore0000_50_serviceCaOperator_01_namespaceYaml,
 	"assets/core/0000_50_service-ca-operator_02_service.yaml":                    assetsCore0000_50_serviceCaOperator_02_serviceYaml,
@@ -898,6 +975,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"core": {nil, map[string]*bintree{
 			"0000_00_cluster-version-operator_00_namespace.yaml":             {assetsCore0000_00_clusterVersionOperator_00_namespaceYaml, map[string]*bintree{}},
+			"0000_00_flannel-configmap.yaml":                                 {assetsCore0000_00_flannelConfigmapYaml, map[string]*bintree{}},
+			"0000_00_flannel-service-account.yaml":                           {assetsCore0000_00_flannelServiceAccountYaml, map[string]*bintree{}},
 			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml": {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
 			"0000_50_service-ca-operator_01_namespace.yaml":                  {assetsCore0000_50_serviceCaOperator_01_namespaceYaml, map[string]*bintree{}},
 			"0000_50_service-ca-operator_02_service.yaml":                    {assetsCore0000_50_serviceCaOperator_02_serviceYaml, map[string]*bintree{}},

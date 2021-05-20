@@ -1,6 +1,7 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // assets/apps/0000_00_cluster-version-operator_03_deployment.yaml
+// assets/apps/0000_00_flannel-daemonset.yaml
 // assets/apps/0000_50_service-ca-operator_05_deploy.yaml
 // assets/apps/0000_60_service-ca_05_deploy.yaml
 // assets/apps/0000_70_dns-operator_02-deployment.yaml
@@ -159,6 +160,112 @@ func assetsApps0000_00_clusterVersionOperator_03_deploymentYaml() (*asset, error
 	}
 
 	info := bindataFileInfo{name: "assets/apps/0000_00_cluster-version-operator_03_deployment.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsApps0000_00_flannelDaemonsetYaml = []byte(`apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-flannel-ds
+  namespace: kube-system
+  labels:
+    tier: node
+    app: flannel
+spec:
+  selector:
+    matchLabels:
+      app: flannel
+  template:
+    metadata:
+      labels:
+        tier: node
+        app: flannel
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      serviceAccountName: flannel
+      initContainers:
+      - name: install-cni
+        image: quay.io/coreos/flannel:v0.14.0
+        command:
+        - cp
+        args:
+        - -f
+        - /etc/kube-flannel/cni-conf.json
+        - /etc/cni/net.d/10-flannel.conflist
+        volumeMounts:
+        - name: cni
+          mountPath: /etc/cni/net.d
+        - name: flannel-cfg
+          mountPath: /etc/kube-flannel/
+      containers:
+      - name: kube-flannel
+        image: quay.io/coreos/flannel:v0.14.0
+        command:
+        - /opt/bin/flanneld
+        args:
+        - --ip-masq
+        - --kube-subnet-mgr
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "50Mi"
+          limits:
+            cpu: "100m"
+            memory: "50Mi"
+        securityContext:
+          privileged: false
+          capabilities:
+            add: ["NET_ADMIN", "NET_RAW"]
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: run
+          mountPath: /run/flannel
+        - name: flannel-cfg
+          mountPath: /etc/kube-flannel/
+      volumes:
+      - name: run
+        hostPath:
+          path: /run/flannel
+      - name: cni
+        hostPath:
+          path: /etc/cni/net.d
+      - name: flannel-cfg
+        configMap:
+          name: kube-flannel-cfg`)
+
+func assetsApps0000_00_flannelDaemonsetYamlBytes() ([]byte, error) {
+	return _assetsApps0000_00_flannelDaemonsetYaml, nil
+}
+
+func assetsApps0000_00_flannelDaemonsetYaml() (*asset, error) {
+	bytes, err := assetsApps0000_00_flannelDaemonsetYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/apps/0000_00_flannel-daemonset.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1411,6 +1518,7 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
 	"assets/apps/0000_00_cluster-version-operator_03_deployment.yaml": assetsApps0000_00_clusterVersionOperator_03_deploymentYaml,
+	"assets/apps/0000_00_flannel-daemonset.yaml":                      assetsApps0000_00_flannelDaemonsetYaml,
 	"assets/apps/0000_50_service-ca-operator_05_deploy.yaml":          assetsApps0000_50_serviceCaOperator_05_deployYaml,
 	"assets/apps/0000_60_service-ca_05_deploy.yaml":                   assetsApps0000_60_serviceCa_05_deployYaml,
 	"assets/apps/0000_70_dns-operator_02-deployment.yaml":             assetsApps0000_70_dnsOperator_02DeploymentYaml,
@@ -1466,6 +1574,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"apps": {nil, map[string]*bintree{
 			"0000_00_cluster-version-operator_03_deployment.yaml": {assetsApps0000_00_clusterVersionOperator_03_deploymentYaml, map[string]*bintree{}},
+			"0000_00_flannel-daemonset.yaml":                      {assetsApps0000_00_flannelDaemonsetYaml, map[string]*bintree{}},
 			"0000_50_service-ca-operator_05_deploy.yaml":          {assetsApps0000_50_serviceCaOperator_05_deployYaml, map[string]*bintree{}},
 			"0000_60_service-ca_05_deploy.yaml":                   {assetsApps0000_60_serviceCa_05_deployYaml, map[string]*bintree{}},
 			"0000_70_dns-operator_02-deployment.yaml":             {assetsApps0000_70_dnsOperator_02DeploymentYaml, map[string]*bintree{}},

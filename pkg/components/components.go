@@ -23,5 +23,9 @@ func StartComponents() error {
 		logrus.Warningf("failed to start DNS controller: %v", err)
 		return err
 	}
+	if err := startFlannel(); err != nil {
+		logrus.Warning("failed to start Flannel: %v", err)
+		return err
+	}
 	return nil
 }
