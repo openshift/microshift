@@ -37,6 +37,10 @@ else
 build: build_ctr
 endif
 
+.PHONY: vendor
+vendor:
+	./hack/vendoring.sh
+
 clean:
 	rm -f _output/bin/ushift
 ifdef CTR_CMD
