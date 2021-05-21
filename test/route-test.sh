@@ -31,8 +31,14 @@ kubectl wait --for=condition=available -n test-route deployment/nginx  --timeout
 kubectl expose -n test-route deployment/nginx
 oc expose  -n test-route service nginx
 
+curl --connect-timeout 5 http://$(kubectl get svc nginx -n test-route -o=jsonpath='{.spec.clusterIP}')
+
 ROUTE=$(oc get routes -n test-route -o=jsonpath='{.items[0].status.ingress[0].host}')
 
-curl --connect-timeout 5 http://${ROUTE}
+if [ ${ROUTE} == "" ]; then
+  echo "test failed"
+  exit 1
+fi
+#curl --connect-timeout 5 http://${ROUTE}
 
 echo "test passed"
