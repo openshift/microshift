@@ -45,34 +45,25 @@ func startControllerOnly() error {
 		return err
 	}
 	<-etcdReadyCh
-	kubeAPIReadyCh := make(chan bool, 1)
-	logrus.Infof("starting kube-apiserver")
-	controllers.KubeAPIServer(kubeAPIReadyCh)
-	<-kubeAPIReadyCh
 
-	kubeCMReadyCh := make(chan bool, 1)
-	controllers.KubeControllerManager(kubeCMReadyCh)
-	<-kubeCMReadyCh
+	logrus.Infof("starting kube-apiserver")
+	controllers.KubeAPIServer()
+
+	logrus.Infof("starting kube-controller-manager")
+	controllers.KubeControllerManager()
+
+	logrus.Infof("starting kube-scheduler")
+	controllers.KubeScheduler()
 
 	if err := controllers.PrepareOCP(); err != nil {
 		return err
 	}
 
 	logrus.Infof("starting openshift-apiserver")
-	ocpAPIReadyCh := make(chan bool, 1)
-	controllers.OCPAPIServer(ocpAPIReadyCh)
-	<-ocpAPIReadyCh
-
-	logrus.Infof("starting kube-scheduler")
-	kubeSchedulerReadyCh := make(chan bool, 1)
-	controllers.KubeScheduler(kubeSchedulerReadyCh)
-	<-kubeSchedulerReadyCh
+	controllers.OCPAPIServer()
 
 	//TODO: cloud provider
-
-	ocpCMReadyCh := make(chan bool, 1)
-	controllers.OCPControllerManager(ocpCMReadyCh)
-	<-ocpCMReadyCh
+	controllers.OCPControllerManager()
 
 	if err := controllers.StartOCPAPIComponents(); err != nil {
 		return err
