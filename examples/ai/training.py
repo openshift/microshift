@@ -46,9 +46,10 @@ def evaluate(num_rounds=10):
   state = trainer.initialize()
   for round in range(num_rounds):
     t1 = time.time()
-    state, metrics = trainer.next(state, train_data)
+    #state, metrics = trainer.next(state, train_data)
     t2 = time.time()
-    print('Round {}: loss {}, round time {}'.format(round, metrics.loss, t2 - t1))
+    #print('Round {}: loss {}, round time {}'.format(round, metrics.loss, t2 - t1))
+    print('Round {}:  round time {}'.format(round, t2 - t1))
 
 
 import grpc
@@ -57,7 +58,9 @@ import os
 ip_address = os.environ['NODE_IP'] 
 port = os.environ['NODE_PORT'] 
 
-channels = [grpc.insecure_channel(f'{ip_address}:{port}') for _ in range(1)]
+print('IP {} Port {}'.format(ip_address, port))
+
+channels = [grpc.insecure_channel(f'{ip_address}:{port}') for _ in range(10)]
 
 tff.backends.native.set_remote_execution_context(channels)
 
