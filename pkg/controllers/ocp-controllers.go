@@ -43,7 +43,7 @@ func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
 
 	return cmd
 }
-func OCPAPIServer(ready chan bool) error {
+func OCPAPIServer() error {
 	stopCh := make(chan struct{}) //genericapiserver.SetupSignalHandler(false)
 	command := newOpenshiftApiServerCommand(stopCh)
 	args := []string{
@@ -65,11 +65,10 @@ func OCPAPIServer(ready chan bool) error {
 		logrus.Fatalf("ocp apiserver exited: %v", command.Execute())
 	}()
 
-	ready <- true
 	return nil
 }
 
-func newOpenShiftControllerManagerCommand(stopCh <-chan struct{}) *cobra.Command {
+func newOpenShiftControllerManagerCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "openshift-controller-manager",
 		Short: "Command for the OpenShift Controllers",
@@ -83,9 +82,8 @@ func newOpenShiftControllerManagerCommand(stopCh <-chan struct{}) *cobra.Command
 	return cmd
 }
 
-func OCPControllerManager(ready chan bool) {
-	stopCh := make(chan struct{}) //genericapiserver.SetupSignalHandler(false)
-	command := newOpenShiftControllerManagerCommand(stopCh)
+func OCPControllerManager() {
+	command := newOpenShiftControllerManagerCommand()
 	args := []string{
 		"--config=/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml",
 		"-v=2",
@@ -96,5 +94,4 @@ func OCPControllerManager(ready chan bool) {
 	go func() {
 		logrus.Fatalf("ocp controller-manager exited: %v", command.Execute())
 	}()
-	ready <- true
 }

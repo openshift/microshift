@@ -23,7 +23,7 @@ import (
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
 )
 
-func KubeControllerManager(ready chan bool) {
+func KubeControllerManager() {
 	command := kubecm.NewControllerManagerCommand()
 	args := []string{
 		"--kubeconfig=" + constant.AdminKubeconfigPath, //KubeControllerManagerKubeconfigPath,
@@ -50,5 +50,4 @@ func KubeControllerManager(ready chan bool) {
 		logrus.Fatalf("controller-manager exited")
 	}()
 
-	ready <- true
 }

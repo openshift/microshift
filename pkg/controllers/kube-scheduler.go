@@ -22,7 +22,7 @@ import (
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
 )
 
-func KubeScheduler(ready chan bool) {
+func KubeScheduler() {
 	command := kubescheduler.NewSchedulerCommand()
 	args := []string{
 		"--config=/etc/kubernetes/ushift-resources/kube-scheduler/config/config.yaml",
@@ -48,6 +48,4 @@ func KubeScheduler(ready chan bool) {
 		command.Run(command, args)
 		logrus.Fatalf("kube-scheduler exited")
 	}()
-
-	ready <- true
 }
