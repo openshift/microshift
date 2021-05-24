@@ -1,18 +1,16 @@
-DO_LOCAL=1 # default false
-DO_STATIC=1 # default false
-BUILD_CFG=./build/Dockerfile
-BUILD_TAG=ushift-build
-SRC_ROOT=$(shell pwd)
-BIN=./_output/bin/ushift
+DO_LOCAL:=1 # default false
+DO_STATIC:=1 # default false
+BUILD_CFG:=./build/Dockerfile
+BUILD_TAG:=ushift-build
+SRC_ROOT:=$(shell pwd)
+BIN:=./_output/bin/ushift
 
-CTR_CMD=$(or $(shell which podman), $(shell which docker))
+CTR_CMD:=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 CACHE_VOL=go_cache
 
-CGO_ENABLED=1
 STATIC_OPTS=
 ifeq ($(DO_STATIC), 0)
 STATIC_OPTS=--ldflags '-extldflags "-static"'
-CGO_ENABLED=0
 endif
 
 all: build
@@ -28,7 +26,7 @@ build_local:
 
 .PHONY: build_ctr
 build_ctr: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift: $(BUILD_TAG)
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift $(BUILD_TAG) DO_STATIC=$(DO_STATIC)
 
 .PHONY: build
 ifeq ($(DO_LOCAL), 0)
@@ -41,6 +39,7 @@ endif
 vendor:
 	./hack/vendoring.sh
 
+.PHONY: clean
 clean:
 	rm -f _output/bin/ushift
 ifdef CTR_CMD
