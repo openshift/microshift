@@ -17,16 +17,17 @@ all: build
 
 .PHONY: build_local
 build_local:
-	 GOOS=linux GARCH=amd64 CGO_ENABLED=$(CGO_ENABLED) go build $(STATIC_OPTS) -mod vendor  -o _output/bin/ushift cmd/main.go
+	 GOOS=linux GOARCH=amd64 go build $(STATIC_OPTS) -mod vendor  -o _output/bin/ushift cmd/main.go
 
 .PHONY: .init
 .init:
-	$(CTR_CMD) volume create --label name=ushift-build $(CACHE_VOL)
+	# docker will ignore volume create calls if the volume name already exists, but podman will fail, so ignore errors
+	-$(CTR_CMD) volume create --label name=ushift-build $(CACHE_VOL)
 	$(CTR_CMD) build -t $(BUILD_TAG) -f $(BUILD_CFG) ./build
 
 .PHONY: build_ctr
 build_ctr: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift $(BUILD_TAG) DO_STATIC=$(DO_STATIC)
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) DO_STATIC=$(DO_STATIC)
 
 .PHONY: build
 ifeq ($(DO_LOCAL), 0)
