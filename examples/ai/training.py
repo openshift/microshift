@@ -20,8 +20,8 @@ def client_data(n):
   ds = source.create_tf_dataset_for_client(source.client_ids[n])
   return ds.repeat(10).batch(20).map(map_fn)
 
-
-train_data = [client_data(n) for n in range(10)]
+client_num = 1
+train_data = [client_data(n) for n in range(client_num)]
 input_spec = train_data[0].element_spec
 
 
@@ -46,7 +46,8 @@ def evaluate(num_rounds=10):
   state = trainer.initialize()
   for round in range(num_rounds):
     t1 = time.time()
-    #state, metrics = trainer.next(state, train_data)
+    print(t1)
+    state, metrics = trainer.next(state, train_data)
     t2 = time.time()
     #print('Round {}: loss {}, round time {}'.format(round, metrics.loss, t2 - t1))
     print('Round {}:  round time {}'.format(round, t2 - t1))
@@ -60,7 +61,7 @@ port = os.environ['NODE_PORT']
 
 print('IP {} Port {}'.format(ip_address, port))
 
-channels = [grpc.insecure_channel(f'{ip_address}:{port}') for _ in range(10)]
+channels = [grpc.insecure_channel(f'{ip_address}:{port}') for _ in range(client_num)]
 
 tff.backends.native.set_remote_execution_context(channels)
 
