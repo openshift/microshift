@@ -1,20 +1,96 @@
 #################################################################################################################
-# The deployment for the rook operator
-# Contains the common settings for most Kubernetes deployments.
+# Create the rook operator and necessary security context constraints for running
+# Rook in an OpenShift cluster.
 # For example, to create the rook-ceph cluster:
-#   kubectl create -f crds.yaml -f common.yaml -f operator.yaml
-#   kubectl create -f cluster.yaml
+#   oc create -f crds.yaml -f common.yaml -f operator-openshift.yaml
+#   oc create -f cluster.yaml
+#################################################################################################################
+# scc for the Rook and Ceph daemons
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: rook-ceph
+allowPrivilegedContainer: true
+allowHostNetwork: true
+allowHostDirVolumePlugin: true
+priority: 10
+allowedCapabilities: []
+allowHostPorts: true
+allowHostPID: true # remove this once we drop support for Nautilus
+allowHostIPC: true
+readOnlyRootFilesystem: false
+requiredDropCapabilities: []
+defaultAddCapabilities: []
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+allowedFlexVolumes:
+  - driver: "ceph.rook.io/rook"
+  - driver: "ceph.rook.io/rook-ceph"
+volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - flexVolume
+  - hostPath
+  - persistentVolumeClaim
+  - projected
+  - secret
+users:
+  # A user needs to be added for each rook service account.
+  # This assumes running in the default sample "rook-ceph" namespace.
+  # If other namespaces or service accounts are configured, they need to be updated here.
+  - system:serviceaccount:rook-ceph:rook-ceph-system # serviceaccount:namespace:operator
+  - system:serviceaccount:rook-ceph:default # serviceaccount:namespace:cluster
+  - system:serviceaccount:rook-ceph:rook-ceph-mgr # serviceaccount:namespace:cluster
+  - system:serviceaccount:rook-ceph:rook-ceph-osd # serviceaccount:namespace:cluster
+---
+# scc for the CSI driver
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: rook-ceph-csi
+allowPrivilegedContainer: true
+allowHostNetwork: true
+allowHostDirVolumePlugin: true
+priority: 10
+allowedCapabilities: ["*"]
+allowHostPorts: true
+allowHostPID: true
+allowHostIPC: true
+readOnlyRootFilesystem: false
+requiredDropCapabilities: []
+defaultAddCapabilities: []
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+fsGroup:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+allowedFlexVolumes:
+  - driver: "ceph.rook.io/rook"
+  - driver: "ceph.rook.io/rook-ceph"
+volumes: ["*"]
+users:
+  # A user needs to be added for each rook service account.
+  # This assumes running in the default sample "rook-ceph" namespace.
+  # If other namespaces or service accounts are configured, they need to be updated here.
+  - system:serviceaccount:rook-ceph:rook-csi-rbd-plugin-sa # serviceaccount:namespace:operator
+  - system:serviceaccount:rook-ceph:rook-csi-rbd-provisioner-sa # serviceaccount:namespace:operator
+  - system:serviceaccount:rook-ceph:rook-csi-cephfs-plugin-sa # serviceaccount:namespace:operator
+  - system:serviceaccount:rook-ceph:rook-csi-cephfs-provisioner-sa # serviceaccount:namespace:operator
+---
+# Rook Ceph Operator Config
+# Use this ConfigMap to override operator configurations
+# Precedence will be given to this config in case Env Var also exists for the same
 #
-# Also see other operator sample files for variations of operator.yaml:
-# - operator-openshift.yaml: Common settings for running in OpenShift
-###############################################################################################################
-
-# Rook Ceph Operator Config ConfigMap
-# Use this ConfigMap to override Rook-Ceph Operator configurations.
-# NOTE! Precedence will be given to this config if the same Env Var config also exists in the
-#       Operator Deployment.
-# To move a configuration(s) from the Operator Deployment to this ConfigMap, add the config
-# here. It is recommended to then remove it from the Deployment to eliminate any future confusion.
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -38,11 +114,12 @@ data:
   # Supported values from 0 to 5. 0 for general useful logs, 5 for trace level verbosity.
   # CSI_LOG_LEVEL: "0"
 
-  # OMAP generator will generate the omap mapping between the PV name and the RBD image.
+  # OMAP generator generates the omap mapping between the PV name and the RBD image
+  # which helps CSI to identify the rbd images for CSI operations.
   # CSI_ENABLE_OMAP_GENERATOR need to be enabled when we are using rbd mirroring feature.
-  # By default OMAP generator sidecar is deployed with CSI provisioner pod, to disable
-  # it set it to false.
-  # CSI_ENABLE_OMAP_GENERATOR: "false"
+  # By default OMAP generator is disabled and when enabled it willbe deployed as a
+  # sidecar with CSI provisioner pod, to enable set it to true.
+  # CSI_ENABLE_OMAP_GENERATOR: "true"
 
   # set to false to disable deployment of snapshotter container in CephFS provisioner pod.
   CSI_ENABLE_CEPHFS_SNAPSHOTTER: "true"
@@ -50,10 +127,9 @@ data:
   # set to false to disable deployment of snapshotter container in RBD provisioner pod.
   CSI_ENABLE_RBD_SNAPSHOTTER: "true"
 
-  # Enable cephfs kernel driver instead of ceph-fuse.
+  # Enable Ceph Kernel clients on kernel < 4.17 which support quotas for Cephfs
   # If you disable the kernel client, your application may be disrupted during upgrade.
   # See the upgrade guide: https://rook.io/docs/rook/master/ceph-upgrade.html
-  # NOTE! cephfs quota is not supported in kernel version < 4.17
   CSI_FORCE_CEPHFS_KERNEL_CLIENT: "true"
 
   # (Optional) policy for modifying a volume's ownership or permissions when the RBD PVC is being mounted.
@@ -269,7 +345,7 @@ data:
   #        memory: 256Mi
   #        cpu: 100m
 
-  # Configure CSI CSI Ceph FS grpc and liveness metrics port
+  # Configure CSI Ceph FS grpc and liveness metrics port
   # CSI_CEPHFS_GRPC_METRICS_PORT: "9091"
   # CSI_CEPHFS_LIVENESS_METRICS_PORT: "9081"
   # Configure CSI RBD grpc and liveness metrics port
@@ -301,6 +377,7 @@ data:
   #     key: node-role.kubernetes.io/etcd
   #     operator: Exists
 ---
+# The deployment for the rook operator
 # OLM: BEGIN OPERATOR DEPLOYMENT
 apiVersion: apps/v1
 kind: Deployment
@@ -331,13 +408,11 @@ spec:
             - mountPath: /etc/ceph
               name: default-config-dir
           env:
-            # If the operator should only watch for cluster CRDs in the same namespace, set this to "true".
-            # If this is not set to true, the operator will watch for cluster CRDs in all namespaces.
             - name: ROOK_CURRENT_NAMESPACE_ONLY
               value: "false"
             # To disable RBAC, uncomment the following:
             # - name: RBAC_ENABLED
-            #   value: "false"
+            #  value: "false"
             # Rook Agent toleration. Will tolerate all taints with all keys.
             # Choose between NoSchedule, PreferNoSchedule and NoExecute:
             # - name: AGENT_TOLERATION
@@ -345,15 +420,6 @@ spec:
             # (Optional) Rook Agent toleration key. Set this to the key of the taint you want to tolerate
             # - name: AGENT_TOLERATION_KEY
             #   value: "<KeyOfTheTaintToTolerate>"
-            # (Optional) Rook Agent tolerations list. Put here list of taints you want to tolerate in YAML format.
-            # - name: AGENT_TOLERATIONS
-            #   value: |
-            #     - effect: NoSchedule
-            #       key: node-role.kubernetes.io/controlplane
-            #       operator: Exists
-            #     - effect: NoExecute
-            #       key: node-role.kubernetes.io/etcd
-            #       operator: Exists
             # (Optional) Rook Agent priority class name to set on the pod(s)
             # - name: AGENT_PRIORITY_CLASS_NAME
             #   value: "<PriorityClassName>"
@@ -368,30 +434,21 @@ spec:
             # - name: AGENT_MOUNT_SECURITY_MODE
             #   value: "Any"
             # Set the path where the Rook agent can find the flex volumes
-            # - name: FLEXVOLUME_DIR_PATH
-            #   value: "<PathToFlexVolumes>"
+            - name: FLEXVOLUME_DIR_PATH
+              value: "/etc/kubernetes/kubelet-plugins/volume/exec"
             # Set the path where kernel modules can be found
             # - name: LIB_MODULES_DIR_PATH
-            #   value: "<PathToLibModules>"
+            #  value: "<PathToLibModules>"
             # Mount any extra directories into the agent container
             # - name: AGENT_MOUNTS
-            #   value: "somemount=/host/path:/container/path,someothermount=/host/path2:/container/path2"
+            #  value: "somemount=/host/path:/container/path,someothermount=/host/path2:/container/path2"
             # Rook Discover toleration. Will tolerate all taints with all keys.
             # Choose between NoSchedule, PreferNoSchedule and NoExecute:
             # - name: DISCOVER_TOLERATION
             #   value: "NoSchedule"
             # (Optional) Rook Discover toleration key. Set this to the key of the taint you want to tolerate
             # - name: DISCOVER_TOLERATION_KEY
-            #   value: "<KeyOfTheTaintToTolerate>"
-            # (Optional) Rook Discover tolerations list. Put here list of taints you want to tolerate in YAML format.
-            # - name: DISCOVER_TOLERATIONS
-            #   value: |
-            #     - effect: NoSchedule
-            #       key: node-role.kubernetes.io/controlplane
-            #       operator: Exists
-            #     - effect: NoExecute
-            #       key: node-role.kubernetes.io/etcd
-            #       operator: Exists
+            #  value: "<KeyOfTheTaintToTolerate>"
             # (Optional) Rook Discover priority class name to set on the pod(s)
             # - name: DISCOVER_PRIORITY_CLASS_NAME
             #   value: "<PriorityClassName>"
@@ -405,39 +462,37 @@ spec:
             # The logging level for the operator: INFO | DEBUG
             - name: ROOK_LOG_LEVEL
               value: "INFO"
-
             # The duration between discovering devices in the rook-discover daemonset.
             - name: ROOK_DISCOVER_DEVICES_INTERVAL
               value: "60m"
-
             # Whether to start pods as privileged that mount a host path, which includes the Ceph mon and osd pods.
             # Set this to true if SELinux is enabled (e.g. OpenShift) to workaround the anyuid issues.
             # For more details see https://github.com/rook/rook/issues/1314#issuecomment-355799641
             - name: ROOK_HOSTPATH_REQUIRES_PRIVILEGED
-              value: "false"
-
+              value: "true"
             # In some situations SELinux relabelling breaks (times out) on large filesystems, and doesn't work with cephfs ReadWriteMany volumes (last relabel wins).
             # Disable it here if you have similar issues.
             # For more details see https://github.com/rook/rook/issues/2417
             - name: ROOK_ENABLE_SELINUX_RELABELING
               value: "true"
-
             # In large volumes it will take some time to chown all the files. Disable it here if you have performance issues.
             # For more details see https://github.com/rook/rook/issues/2254
             - name: ROOK_ENABLE_FSGROUP
               value: "true"
-
             # Disable automatic orchestration when new devices are discovered
             - name: ROOK_DISABLE_DEVICE_HOTPLUG
               value: "false"
-
             # Provide customised regex as the values using comma. For eg. regex for rbd based volume, value will be like "(?i)rbd[0-9]+".
             # In case of more than one regex, use comma to separate between them.
             # Default regex will be "(?i)dm-[0-9]+,(?i)rbd[0-9]+,(?i)nbd[0-9]+"
-            # Add regex expression after putting a comma to blacklist a disk
+            # add regex expression after putting a comma to blacklist a disk
             # If value is empty, the default regex will be used.
             - name: DISCOVER_DAEMON_UDEV_BLACKLIST
               value: "(?i)dm-[0-9]+,(?i)rbd[0-9]+,(?i)nbd[0-9]+"
+
+            # Whether to start machineDisruptionBudget and machineLabel controller to watch for the osd pods and MDBs.
+            - name: ROOK_ENABLE_MACHINE_DISRUPTION_BUDGET
+              value: "false"
 
             # Time to wait until the node controller will move Rook pods to other
             # nodes after detecting an unreachable node.
@@ -472,9 +527,7 @@ spec:
           #  Uncomment it to run lib bucket provisioner in multithreaded mode
           #- name: LIB_BUCKET_PROVISIONER_THREADS
           #  value: "5"
-
-      # Uncomment it to run rook operator on the host network
-      #hostNetwork: true
+      hostNetwork: true
       volumes:
         - name: rook-config
           emptyDir: {}
