@@ -27,22 +27,7 @@ import (
 )
 
 /*
-kubelet
---config=/etc/kubernetes/kubelet.conf
---bootstrap-kubeconfig=/etc/kubernetes/kubeconfig
---kubeconfig=/var/lib/kubelet/kubeconfig
---container-runtime=remote
---container-runtime-endpoint=/var/run/crio/crio.sock
---runtime-cgroups=/system.slice/crio.service
---node-labels=node-role.kubernetes.io/master,node.openshift.io/os_id=rhcos
---node-ip=192.168.126.11
---minimum-container-ttl-duration=6m0s
---cloud-provider=
---volume-plugin-dir=/etc/kubernetes/kubelet-plugins/volume/exec
---register-with-taints=node-role.kubernetes.io/master=:NoSchedule
---pod-infra-container-image=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6eedefd9c899f7bd95978594d3a7f18fc3d9b54a53b70f58b29a3fb97bb65511
---v=2
-*/
+ */
 func StartKubelet() error {
 	ip, err := util.GetHostIP()
 	if err != nil {
@@ -63,7 +48,8 @@ func StartKubelet() error {
 		//"--register-with-taints=node-role.kubernetes.io/master=:NoSchedule",
 		//"--fail-swap-on=false",
 		//"--pod-infra-container-image=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6eedefd9c899f7bd95978594d3a7f18fc3d9b54a53b70f58b29a3fb97bb65511
-		"--v=2",
+		"--log-dir=/var/log",
+		"--v=3",
 	}
 	//command.DisableFlagParsing = false
 	if err := command.ParseFlags(args); err != nil {
@@ -80,18 +66,14 @@ func StartKubelet() error {
 }
 
 /*
-/usr/bin/openshift-sdn-node
---node-name crc-xl2km-master-0
---node-ip 192.168.126.11
---proxy-config /config/kube-proxy-config.yaml
---v 2
-*/
+ */
 func StartKubeProxy() {
 	command := kubeproxy.NewProxyCommand()
 	args := []string{
 		"--config=/etc/kubernetes/ushift-resources/kube-proxy/config/config.yaml",
 		"--master=https://127.0.0.1:6443",
-		"-v=2",
+		"--log-dir=/var/log",
+		"-v=3",
 	}
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)

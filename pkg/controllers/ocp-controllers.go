@@ -57,7 +57,9 @@ func OCPAPIServer() error {
 		"--requestheader-group-headers=X-Remote-Group",
 		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
 		"--client-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
-		"-v=2",
+		"--log-file=/var/log/ocp-apiserver.log",
+		"--logtostderr=false",
+		"-v=3",
 	}
 	command.SetArgs(args)
 	logrus.Infof("starting openshift-apiserver, args: %v", args)
@@ -86,7 +88,9 @@ func OCPControllerManager() {
 	command := newOpenShiftControllerManagerCommand()
 	args := []string{
 		"--config=/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml",
-		"-v=2",
+		"--log-file=/var/log/ocp-controller-manager.log",
+		"--logtostderr=false",
+		"-v=3",
 	}
 	startArgs := append(args, "start")
 	command.SetArgs(startArgs)

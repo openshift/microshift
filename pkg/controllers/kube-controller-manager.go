@@ -40,7 +40,9 @@ func KubeControllerManager() {
 		"--use-service-account-credentials=true",
 		"--cluster-signing-cert-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
 		"cluster-signing-key-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.key",
-		"-v=2",
+		"--log-file=/var/log/kube-controller-manager.log",
+		"--logtostderr=false",
+		"-v=3",
 	}
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
