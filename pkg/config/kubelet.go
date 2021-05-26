@@ -97,9 +97,12 @@ func KubeProxyConfig(path string) error {
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 clientConnection:
-   kubeconfig: ` + constant.AdminKubeconfigPath + `
+  kubeconfig: ` + constant.AdminKubeconfigPath + `
 hostnameOverride: 127.0.0.1
-mode:
+clusterCIDR: ` + constant.ClusterCIDR + `
+mode: "iptables"
+iptables:
+  masqueradeAll: true
 featureGates:
    AllAlpha: false`)
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))

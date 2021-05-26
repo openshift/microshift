@@ -75,7 +75,9 @@ func KubeAPIServer() error {
 		"--tls-cert-file=/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
 		"--tls-private-key-file=/etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
 		"--cors-allowed-origins=/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$",
-		"-v=2",
+		"--log-file=/var/log/kube-apiserver.log",
+		"--logtostderr=false",
+		"-v=3",
 	}
 	if err := command.ParseFlags(apiArgs); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)

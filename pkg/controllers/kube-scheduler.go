@@ -33,11 +33,13 @@ func KubeScheduler() {
 		//"--feature-gates=APIPriorityAndFairness=true,LegacyNodeRoleBehavior=false,NodeDisruptionExclusion=true,RemoveSelfLink=false,RotateKubeletServerCertificate=true,SCTPSupport=true,ServiceNodeExclusion=true,SupportPodPidsLimit=true",
 		//"--feature-gates=AllAlpha=false",
 		//"--kubeconfig=" + constant.AdminKubeconfigPath,
-		"--v=2",
 		//"--leader-elect=false",
 		"--master=https://127.0.0.1:6443",
 		//"--tls-cert-file=/etc/kubernetes/ushift-resources/kube-scheduler/secrets/tls.crt",
 		//"--tls-private-key-file=/etc/kubernetes/ushift-resources/kube-scheduler/secrets/tls.key",
+		"--log-file=/var/log/kube-scheduler.log",
+		"--logtostderr=false",
+		"-v=3",
 	}
 
 	if err := command.ParseFlags(args); err != nil {

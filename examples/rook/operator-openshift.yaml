@@ -100,9 +100,9 @@ metadata:
 data:
   # Enable the CSI driver.
   # To run the non-default version of the CSI driver, see the override-able image properties in operator.yaml
-  ROOK_CSI_ENABLE_CEPHFS: "true"
+  ROOK_CSI_ENABLE_CEPHFS: "false"
   # Enable the default version of the CSI RBD driver. To start another version of the CSI driver, see image properties below.
-  ROOK_CSI_ENABLE_RBD: "true"
+  ROOK_CSI_ENABLE_RBD: "false"
   ROOK_CSI_ENABLE_GRPC_METRICS: "false"
 
   # Set to true to enable host networking for CSI CephFS and RBD nodeplugins. This may be necessary
@@ -122,10 +122,10 @@ data:
   # CSI_ENABLE_OMAP_GENERATOR: "true"
 
   # set to false to disable deployment of snapshotter container in CephFS provisioner pod.
-  CSI_ENABLE_CEPHFS_SNAPSHOTTER: "true"
+  CSI_ENABLE_CEPHFS_SNAPSHOTTER: "false"
 
   # set to false to disable deployment of snapshotter container in RBD provisioner pod.
-  CSI_ENABLE_RBD_SNAPSHOTTER: "true"
+  CSI_ENABLE_RBD_SNAPSHOTTER: "false"
 
   # Enable Ceph Kernel clients on kernel < 4.17 which support quotas for Cephfs
   # If you disable the kernel client, your application may be disrupted during upgrade.
@@ -527,7 +527,7 @@ spec:
           #  Uncomment it to run lib bucket provisioner in multithreaded mode
           #- name: LIB_BUCKET_PROVISIONER_THREADS
           #  value: "5"
-      hostNetwork: true
+          #hostNetwork: true
       volumes:
         - name: rook-config
           emptyDir: {}
