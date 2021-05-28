@@ -1217,7 +1217,7 @@ spec:
         - name: KUBERNETES_SERVICE_HOST
           value: 127.0.0.1
         - name: OPENSHIFT_DNS_DOMAIN
-          value: ushift.testing
+          value: cluster.local
         - name: K8S_NODE_NAME
           valueFrom:
             fieldRef:

@@ -63,9 +63,9 @@ rules:
 func kubeAPIOAuthMetadataFile(path string) error {
 	data := []byte(`
   {
-    "issuer": "https://oauth-openshift.ushift.testing",
-    "authorization_endpoint": "https://oauth-openshift.ushift.testing/oauth/authorize",
-    "token_endpoint": "https://oauth-openshift.ushift.testing/oauth/token",
+    "issuer": "https://oauth-openshift.cluster.local",
+    "authorization_endpoint": "https://oauth-openshift.cluster.local/oauth/authorize",
+    "token_endpoint": "https://oauth-openshift.cluster.local/oauth/token",
     "scopes_supported": [
       "user:check-access",
       "user:full",
