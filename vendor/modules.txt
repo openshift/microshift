@@ -564,6 +564,9 @@ github.com/json-iterator/go
 # github.com/karrick/godirwalk v1.16.1
 ## explicit
 github.com/karrick/godirwalk
+# github.com/kelseyhightower/envconfig v1.4.0
+## explicit
+github.com/kelseyhightower/envconfig
 # github.com/libopenstorage/openstorage v1.0.0
 ## explicit
 github.com/libopenstorage/openstorage/api
@@ -596,6 +599,9 @@ github.com/mindprince/gonvml
 # github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible
 ## explicit
 github.com/mistifyio/go-zfs
+# github.com/mitchellh/go-homedir v1.1.0
+## explicit
+github.com/mitchellh/go-homedir
 # github.com/mitchellh/go-wordwrap v1.0.0
 ## explicit
 github.com/mitchellh/go-wordwrap
@@ -3191,9 +3197,11 @@ sigs.k8s.io/structured-merge-diff/v4/value
 sigs.k8s.io/yaml
 # github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 # github.com/docker/docker => github.com/docker/docker v17.12.0-ce-rc1.0.20200916142827-bd33bbf0497b+incompatible
+# github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
 # github.com/google/cadvisor => github.com/google/cadvisor v0.38.5
 # github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
 # github.com/onsi/ginkgo => github.com/openshift/ginkgo v4.5.0-origin.1+incompatible
+# google.golang.org/genproto => google.golang.org/genproto v0.0.0-20200224152610-e50cd9704f63
 # k8s.io/api => k8s.io/api v0.20.0
 # k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.20.0
 # k8s.io/apimachinery => k8s.io/apimachinery v0.20.0
@@ -3220,5 +3228,3 @@ sigs.k8s.io/yaml
 # k8s.io/metrics => k8s.io/metrics v0.20.0
 # k8s.io/mount-utils => k8s.io/mount-utils v0.20.0
 # k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.20.0
-# github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
-# google.golang.org/genproto => google.golang.org/genproto v0.0.0-20200224152610-e50cd9704f63

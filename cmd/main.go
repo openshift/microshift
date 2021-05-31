@@ -22,6 +22,8 @@ func main() {
 
 	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 	pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
+	pflag.CommandLine.MarkHidden("azure-container-registry-config")
+	pflag.CommandLine.MarkHidden("log-flush-frequency")
 
 	logs.InitLogs()
 	defer logs.FlushLogs()
@@ -40,15 +42,17 @@ func main() {
 func newCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ushift",
-		Short: "Micro OpenShift",
+		Short: "Microshift, a minimal OpenShift",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 			os.Exit(1)
 		},
 	}
+
 	cmd.AddCommand(cmds.InitCmd)
 	cmd.AddCommand(cmds.ControllerCmd)
 	cmd.AddCommand(cmds.NodeCmd)
 	cmd.AddCommand(cmds.UpCmd)
+	cmd.AddCommand(cmds.NewRunMicroshiftCommand())
 	return cmd
 }
