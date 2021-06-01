@@ -26,9 +26,8 @@ import (
 func KubeControllerManager() {
 	command := kubecm.NewControllerManagerCommand()
 	args := []string{
-		"--kubeconfig=" + constant.AdminKubeconfigPath, //KubeControllerManagerKubeconfigPath,
+		"--kubeconfig=" + constant.AdminKubeconfigPath,
 		"--service-account-private-key-file=/etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-key/service-account.key",
-		//"--allocate-node-cidrs=false",
 		"--allocate-node-cidrs=true",
 		"--cluster-cidr=" + constant.ClusterCIDR, //TODO param
 		"--authorization-kubeconfig=" + constant.AdminKubeconfigPath,
