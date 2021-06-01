@@ -21,8 +21,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	//genericapiserver "k8s.io/apiserver/pkg/server"
-
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 
@@ -44,7 +42,7 @@ func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
 	return cmd
 }
 func OCPAPIServer() error {
-	stopCh := make(chan struct{}) //genericapiserver.SetupSignalHandler(false)
+	stopCh := make(chan struct{})
 	command := newOpenshiftApiServerCommand(stopCh)
 	args := []string{
 		"start",
