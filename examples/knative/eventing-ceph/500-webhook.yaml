@@ -1,0 +1,93 @@
+# Copyright 2020 The Knative Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ceph-webhook
+  namespace: knative-source
+  labels:
+    ceph.eventing.knative.dev/release: devel
+spec:
+  replicas: 1
+  selector:
+    matchLabels: &labels
+      app: ceph-webhook
+      role: ceph-webhook
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      # To avoid node becoming SPOF, spread our replicas to different nodes.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: ceph-webhook
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+
+      serviceAccountName: ceph-webhook
+      containers:
+        - name: cephsource-webhook
+          terminationMessagePolicy: FallbackToLogsOnError
+          #image: ko://knative.dev/eventing-ceph/cmd/webhook
+          image: microshift.jfrog.io/eventing-ceph-docker-local/webhook-466804bcbcf5f7f651025dd984540e8d@sha256:451b0e69e18429e46a5653e400be7e1bdaeaa9b51762534b68620646a4c665ca
+          env:
+          - name: SYSTEM_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: CONFIG_LOGGING_NAME
+            value: config-logging
+          - name: METRICS_DOMAIN
+            value: knative.dev/eventing
+          - name: WEBHOOK_NAME
+            value: cephsource-webhook
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          ports:
+          - containerPort: 9090
+            name: metrics
+          readinessProbe: &probe
+            periodSeconds: 1
+            httpGet:
+              scheme: HTTPS
+              port: 8443
+              httpHeaders:
+              - name: k-kubelet-probe
+                value: "webhook"
+          livenessProbe: *probe
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    ceph.eventing.knative.dev/release: devel
+    role: ceph-webhook
+  name: ceph-webhook
+  namespace: knative-source
+spec:
+  ports:
+    - name: https-webhook
+      port: 443
+      targetPort: 8443
+  selector:
+    role: ceph-webhook

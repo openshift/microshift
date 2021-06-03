@@ -1,0 +1,80 @@
+# Copyright 2020 The Knative Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ceph-controller
+  namespace: knative-source
+  labels:
+    ceph.eventing.knative.dev/release: devel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ceph-controller
+  template:
+    metadata:
+      labels:
+        app: ceph-controller
+        ceph.eventing.knative.dev/release: devel
+    spec:
+      # To avoid node becoming SPOF, spread our replicas to different nodes.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: ceph-controller
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+
+      serviceAccountName: ceph-controller
+
+      containers:
+      - name: controller
+        terminationMessagePolicy: FallbackToLogsOnError
+        #image: ko://knative.dev/eventing-ceph/cmd/controller
+        image: microshift.jfrog.io/eventing-ceph-docker-local/controller-9240b517564bbcf7acc4966b6b9496b5@sha256:6e004b020c84403cf56d64194c2513614c7638621a21c18193678f812fd4dfcb
+
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+
+        env:
+          - name: SYSTEM_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: CONFIG_LOGGING_NAME
+            value: config-logging
+          - name: CONFIG_OBSERVABILITY_NAME
+            value: config-observability
+          - name: METRICS_DOMAIN
+            value: knative.dev/sources
+          - name: CEPH_SOURCE_RA_IMAGE
+            value: ko://knative.dev/eventing-ceph/cmd/receive_adapter
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+
+        securityContext:
+          allowPrivilegeEscalation: false
+
+        ports:
+          - name: metrics
+            containerPort: 9090
