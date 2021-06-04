@@ -1,0 +1,11 @@
+apiVersion: sources.knative.dev/v1alpha1
+kind: CephSource
+metadata:
+  name: my-ceph-source
+spec:
+  port: "8888"
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display

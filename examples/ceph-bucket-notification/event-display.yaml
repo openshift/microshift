@@ -1,0 +1,10 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: event-display
+spec:
+  template:
+    spec:
+      containers:
+      - name: display-container
+        image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display:latest

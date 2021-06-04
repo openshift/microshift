@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-ceph-source-svc
+spec:
+  selector:
+    knative-eventing-source-name: my-ceph-source
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8888
