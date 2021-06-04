@@ -1,0 +1,7 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: my-ob-claim
+spec:
+  bucketName: my-bucket
+  storageClassName: ceph-delete-bucket
