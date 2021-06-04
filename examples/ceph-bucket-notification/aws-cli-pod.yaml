@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: aws-cli-runner
+  namespace: rook-ceph
+spec:
+  containers:
+  - name: aws-cli
+    image: quay.io/ylifshit/aws-cli
