@@ -28,8 +28,8 @@ func StartKubelet(cfg *config.MicroshiftConfig) error {
 	command := kubelet.NewKubeletCommand()
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kubelet/config/config.yaml",
-		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
-		"--kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
+		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
 		"--container-runtime=remote",
 		"--container-runtime-endpoint=/var/run/crio/crio.sock",
 		"--runtime-cgroups=/system.slice/crio.service",
