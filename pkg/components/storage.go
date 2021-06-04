@@ -5,7 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func startHostpathProvisioner() error {
+func startHostpathProvisioner(kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"assets/core/0000_80_hostpath-provisioner-namespace.yaml",
@@ -29,31 +29,31 @@ func startHostpathProvisioner() error {
 			"assets/storage/0000_80_hostpath-provisioner-storageclass.yaml",
 		}
 	)
-	if err := assets.ApplyNamespaces(ns); err != nil {
+	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply ns %v: %v", ns, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoles(cr); err != nil {
+	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply clusterrole %v: %v", cr, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(crb); err != nil {
+	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyServiceAccounts(sa); err != nil {
+	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply sa %v: %v", sa, err)
 		return err
 	}
-	if err := assets.ApplySCCs(scc, nil); err != nil {
+	if err := assets.ApplySCCs(scc, nil, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply scc %v: %v", scc, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, nil); err != nil {
+	if err := assets.ApplyDaemonSets(ds, nil, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply ds %v: %v", ds, err)
 		return err
 	}
-	if err := assets.ApplyStorageClasses(sc, nil); err != nil {
+	if err := assets.ApplyStorageClasses(sc, nil, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply sc %v: %v", sc, err)
 		return err
 	}

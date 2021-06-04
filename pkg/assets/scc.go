@@ -7,7 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	sccassets "github.com/openshift/microshift/pkg/assets/scc"
-	"github.com/openshift/microshift/pkg/constant"
 
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -37,18 +36,18 @@ type sccApplier struct {
 	scc    *sccv1.SecurityContextConstraints
 }
 
-func sccClient() *sccclientv1.SecurityV1Client {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+func sccClient(kubeconfigPath string) *sccclientv1.SecurityV1Client {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}
 	return sccclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "scc-agent"))
 }
 
-func (s *sccApplier) Reader(objBytes []byte, render RenderFunc) {
+func (s *sccApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes)
+		objBytes, err = render(objBytes, params)
 		if err != nil {
 			panic(err)
 		}
@@ -68,7 +67,7 @@ func (s *sccApplier) Applier() error {
 	return nil
 }
 
-func applySCCs(sccs []string, applier readerApplier, render RenderFunc) error {
+func applySCCs(sccs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -78,7 +77,7 @@ func applySCCs(sccs []string, applier readerApplier, render RenderFunc) error {
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", scc, err)
 		}
-		applier.Reader(objBytes, render)
+		applier.Reader(objBytes, render, params)
 		if err := applier.Applier(); err != nil {
 			logrus.Warningf("failed to apply scc api %s: %v", scc, err)
 			return err
@@ -87,8 +86,8 @@ func applySCCs(sccs []string, applier readerApplier, render RenderFunc) error {
 	return nil
 }
 
-func ApplySCCs(sccs []string, render RenderFunc) error {
+func ApplySCCs(sccs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	scc := &sccApplier{}
-	scc.Client = sccClient()
-	return applySCCs(sccs, scc, render)
+	scc.Client = sccClient(kubeconfigPath)
+	return applySCCs(sccs, scc, render, params)
 }

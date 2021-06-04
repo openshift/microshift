@@ -20,12 +20,10 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
-
-	"github.com/openshift/microshift/pkg/constant"
 )
 
 // OpenShiftAPIServerConfig creates a config for openshift-apiserver to use
-func OpenShiftAPIServerConfig(path string) error {
+func OpenShiftAPIServerConfig(cfg *MicroshiftConfig) error {
 	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftAPIServerConfig
 aggregatorConfig:
@@ -43,16 +41,16 @@ aggregatorConfig:
   usernameHeaders:
   - X-Remote-User
 kubeClientConfig:
-  kubeConfig:  ` + constant.AdminKubeconfigPath + `
+  kubeConfig:  ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
 apiServerArguments:
   minimal-shutdown-duration:
   - 30s
   anonymous-auth:
   - "false"
   authorization-kubeconfig:
-  - ` + constant.AdminKubeconfigPath + `
+  - ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
   authentication-kubeconfig:
-  - ` + constant.AdminKubeconfigPath + `
+  - ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
   audit-log-format:
   - json
   audit-log-maxbackup:
@@ -65,7 +63,7 @@ apiServerArguments:
   - RBAC
   - Node
 auditConfig:
-  auditFilePath: "/var/log/openshift-apiserver/audit.log"
+  auditFilePath: "` + cfg.LogDir + `/openshift-apiserver/audit.log"
   enabled: true
   logFormat: json
   maximumFileSizeMegabytes: 100
@@ -103,34 +101,34 @@ imagePolicyConfig:
 projectConfig:
   projectRequestMessage: ''
 routingConfig:
-  subdomain: ` + constant.DomainName + `
+  subdomain: ` + cfg.Cluster.BaseDomain + `
 servingInfo:
   bindAddress: "0.0.0.0:8444"
-  certFile: /etc/kubernetes/ushift-resources/ocp-apiserver/secrets/tls.crt
-  keyFile: /etc/kubernetes/ushift-resources/ocp-apiserver/secrets/tls.key
-  ca: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
+  certFile: ` + cfg.DataDir + `/resources/ocp-apiserver/secrets/tls.crt
+  keyFile: ` + cfg.DataDir + `/resources/ocp-apiserver/secrets/tls.key
+  ca: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
 storageConfig:
   urls:
   - https://127.0.0.1:2379
-  certFile: /etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client/tls.crt
-  keyFile: /etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client/tls.key
-  ca: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
+  certFile: ` + cfg.DataDir + `/resources/kube-apiserver/secrets/etcd-client/tls.crt
+  keyFile: ` + cfg.DataDir + `/resources/kube-apiserver/secrets/etcd-client/tls.key
+  ca: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
   `)
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	return ioutil.WriteFile(path, data, 0644)
+	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/openshift-apiserver/config/config.yaml"), os.FileMode(0755))
+	return ioutil.WriteFile(cfg.DataDir+"/resources/openshift-apiserver/config/config.yaml", data, 0644)
 }
 
-func OpenShiftControllerManagerConfig(path string) error {
+func OpenShiftControllerManagerConfig(cfg *MicroshiftConfig) error {
 	configTemplate := template.Must(template.New("controller-manager-config.yaml").Parse(`
 apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftControllerManagerConfig
 kubeClientConfig:
-  kubeConfig: ` + constant.AdminKubeconfigPath + `
+  kubeConfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
 servingInfo:
   bindAddress: "0.0.0.0:8445"
-  certFile: /etc/kubernetes/ushift-resources/ocp-controller-manager/secrets/tls.crt
-  keyFile:  /etc/kubernetes/ushift-resources/ocp-controller-manager/secrets/tls.key
-  clientCA: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt`))
+  certFile: ` + cfg.DataDir + `/resources/ocp-controller-manager/secrets/tls.crt
+  keyFile:  ` + cfg.DataDir + `/resources/ocp-controller-manager/secrets/tls.key
+  clientCA: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt`))
 
 	data := struct { //TODO
 		KubeConfig, BuilderImage, DeployerName, ImageRegistryUrl string
@@ -140,8 +138,8 @@ servingInfo:
 		DeployerName:     "docker-build",
 		ImageRegistryUrl: "image-registry.openshift-image-registry.svc:5000",
 	}
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	output, err := os.Create(path)
+	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/openshift-controller-manager/config/config.yaml"), os.FileMode(0755))
+	output, err := os.Create(cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml")
 	if err != nil {
 		return err
 	}

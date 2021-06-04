@@ -5,7 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func startFlannel() error {
+func startFlannel(kubeconfigPath string) error {
 	var (
 		// psp = []string{
 		// 	"assets/rbac/0000_00_podsecuritypolicy-flannel.yaml",
@@ -27,23 +27,23 @@ func startFlannel() error {
 		}
 	)
 
-	if err := assets.ApplyClusterRoles(cr); err != nil {
+	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply clusterrole %v: %v", cr, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(crb); err != nil {
+	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyServiceAccounts(sa); err != nil {
+	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply sa %v: %v", sa, err)
 		return err
 	}
-	if err := assets.ApplyConfigMaps(cm); err != nil {
+	if err := assets.ApplyConfigMaps(cm, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply cm %v: %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, nil); err != nil {
+	if err := assets.ApplyDaemonSets(ds, nil, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply ds %v: %v", ds, err)
 		return err
 	}

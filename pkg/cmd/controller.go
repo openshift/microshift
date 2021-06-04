@@ -17,59 +17,43 @@ package cmd
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/components"
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
 )
 
-var ControllerCmd = &cobra.Command{
-	Use:   "controller",
-	Short: "openshift controller",
-	Long:  `openshift controller`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return startController(args)
-	},
-}
-
-func startController(args []string) error {
-	if err := startControllerOnly(); err != nil {
-		return err
-	}
-	select {}
-}
-
-func startControllerOnly() error {
+func startControllerOnly(cfg *config.MicroshiftConfig) error {
 	etcdReadyCh := make(chan bool, 1)
-	if err := controllers.StartEtcd(etcdReadyCh); err != nil {
+	if err := controllers.StartEtcd(cfg, etcdReadyCh); err != nil {
 		return err
 	}
 	<-etcdReadyCh
 
 	logrus.Infof("starting kube-apiserver")
-	controllers.KubeAPIServer()
+	controllers.KubeAPIServer(cfg)
 
 	logrus.Infof("starting kube-controller-manager")
-	controllers.KubeControllerManager()
+	controllers.KubeControllerManager(cfg)
 
 	logrus.Infof("starting kube-scheduler")
-	controllers.KubeScheduler()
+	controllers.KubeScheduler(cfg)
 
-	if err := controllers.PrepareOCP(); err != nil {
+	if err := controllers.PrepareOCP(cfg); err != nil {
 		return err
 	}
 
 	logrus.Infof("starting openshift-apiserver")
-	controllers.OCPAPIServer()
+	controllers.OCPAPIServer(cfg)
 
 	//TODO: cloud provider
-	controllers.OCPControllerManager()
+	controllers.OCPControllerManager(cfg)
 
-	if err := controllers.StartOCPAPIComponents(); err != nil {
+	if err := controllers.StartOCPAPIComponents(cfg); err != nil {
 		return err
 	}
 
-	if err := components.StartComponents(); err != nil {
+	if err := components.StartComponents(cfg); err != nil {
 		return err
 	}
 	return nil

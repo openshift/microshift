@@ -22,7 +22,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/microshift/pkg/assets"
-	"github.com/openshift/microshift/pkg/constant"
+	"github.com/openshift/microshift/pkg/config"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -36,8 +36,8 @@ import (
 	apiregistrationclientv1 "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/typed/apiregistration/v1"
 )
 
-func createAPIHeadlessSvc() error {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+func createAPIHeadlessSvc(cfg *config.MicroshiftConfig) error {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
 	if err != nil {
 		return err
 	}
@@ -129,8 +129,8 @@ func trimFirst(s string, sep string) string {
 	return strings.Join(parts[1:], sep)
 }
 
-func createAPIRegistration() error {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+func createAPIRegistration(cfg *config.MicroshiftConfig) error {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func createAPIRegistration() error {
 	return nil
 }
 
-func applySCCs() error {
+func applySCCs(kubeconfigPath string) error {
 	var (
 		sccs = []string{
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
@@ -189,38 +189,38 @@ func applySCCs() error {
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml",
 		}
 	)
-	if err := assets.ApplySCCs(sccs, nil); err != nil {
+	if err := assets.ApplySCCs(sccs, nil, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply sccs: %v", err)
 		return err
 	}
 	return nil
 }
 
-func PrepareOCP() error {
+func PrepareOCP(cfg *config.MicroshiftConfig) error {
 	if err := assets.ApplyNamespaces([]string{
 		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
-	}); err != nil {
+	}, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to apply openshift namespaces %v", err)
 		return err
 	}
-	if err := assets.ApplyCRDs(); err != nil {
+	if err := assets.ApplyCRDs(cfg); err != nil {
 		logrus.Warningf("failed to apply openshift CRDs %v", err)
 		return err
 	}
 	return nil
 }
 
-func StartOCPAPIComponents() error {
+func StartOCPAPIComponents(cfg *config.MicroshiftConfig) error {
 	// ocp api service registration
-	if err := createAPIHeadlessSvc(); err != nil {
+	if err := createAPIHeadlessSvc(cfg); err != nil {
 		logrus.Warningf("failed to apply headless svc %v", err)
 		return err
 	}
-	if err := createAPIRegistration(); err != nil {
+	if err := createAPIRegistration(cfg); err != nil {
 		logrus.Warningf("failed to register api %v", err)
 		return err
 	}
-	if err := applySCCs(); err != nil {
+	if err := applySCCs(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to apply sccs: %v", err)
 		return err
 	}

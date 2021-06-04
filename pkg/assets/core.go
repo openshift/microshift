@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	coreassets "github.com/openshift/microshift/pkg/assets/core"
-	"github.com/openshift/microshift/pkg/constant"
 
 	"github.com/sirupsen/logrus"
 
@@ -36,8 +35,8 @@ type nsApplier struct {
 	ns     *corev1.Namespace
 }
 
-func coreClient() *coreclientv1.CoreV1Client {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+func coreClient(kubeconfigPath string) *coreclientv1.CoreV1Client {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}
@@ -45,10 +44,10 @@ func coreClient() *coreclientv1.CoreV1Client {
 	return coreclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "core-agent"))
 }
 
-func (ns *nsApplier) Reader(objBytes []byte, render RenderFunc) {
+func (ns *nsApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes)
+		objBytes, err = render(objBytes, params)
 		if err != nil {
 			panic(err)
 		}
@@ -74,10 +73,10 @@ type svcApplier struct {
 	svc    *corev1.Service
 }
 
-func (svc *svcApplier) Reader(objBytes []byte, render RenderFunc) {
+func (svc *svcApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes)
+		objBytes, err = render(objBytes, params)
 		if err != nil {
 			panic(err)
 		}
@@ -103,10 +102,10 @@ type saApplier struct {
 	sa     *corev1.ServiceAccount
 }
 
-func (sa *saApplier) Reader(objBytes []byte, render RenderFunc) {
+func (sa *saApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes)
+		objBytes, err = render(objBytes, params)
 		if err != nil {
 			panic(err)
 		}
@@ -132,10 +131,10 @@ type cmApplier struct {
 	cm     *corev1.ConfigMap
 }
 
-func (cm *cmApplier) Reader(objBytes []byte, render RenderFunc) {
+func (cm *cmApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes)
+		objBytes, err = render(objBytes, params)
 		if err != nil {
 			panic(err)
 		}
@@ -156,7 +155,7 @@ func (cm *cmApplier) Applier() error {
 	return nil
 }
 
-func applyCore(cores []string, applier readerApplier, render RenderFunc) error {
+func applyCore(cores []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -166,7 +165,7 @@ func applyCore(cores []string, applier readerApplier, render RenderFunc) error {
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", core, err)
 		}
-		applier.Reader(objBytes, render)
+		applier.Reader(objBytes, render, params)
 		if err := applier.Applier(); err != nil {
 			logrus.Warningf("failed to apply corev1 api %s: %v", core, err)
 			return err
@@ -176,26 +175,26 @@ func applyCore(cores []string, applier readerApplier, render RenderFunc) error {
 	return nil
 }
 
-func ApplyNamespaces(cores []string) error {
+func ApplyNamespaces(cores []string, kubeconfigPath string) error {
 	ns := &nsApplier{}
-	ns.Client = coreClient()
-	return applyCore(cores, ns, nil)
+	ns.Client = coreClient(kubeconfigPath)
+	return applyCore(cores, ns, nil, nil)
 }
 
-func ApplyServices(cores []string, render RenderFunc) error {
+func ApplyServices(cores []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	svc := &svcApplier{}
-	svc.Client = coreClient()
-	return applyCore(cores, svc, render)
+	svc.Client = coreClient(kubeconfigPath)
+	return applyCore(cores, svc, render, params)
 }
 
-func ApplyServiceAccounts(cores []string) error {
+func ApplyServiceAccounts(cores []string, kubeconfigPath string) error {
 	sa := &saApplier{}
-	sa.Client = coreClient()
-	return applyCore(cores, sa, nil)
+	sa.Client = coreClient(kubeconfigPath)
+	return applyCore(cores, sa, nil, nil)
 }
 
-func ApplyConfigMaps(cores []string) error {
+func ApplyConfigMaps(cores []string, kubeconfigPath string) error {
 	cm := &cmApplier{}
-	cm.Client = coreClient()
-	return applyCore(cores, cm, nil)
+	cm.Client = coreClient(kubeconfigPath)
+	return applyCore(cores, cm, nil, nil)
 }

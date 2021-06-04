@@ -22,7 +22,7 @@ import (
 )
 
 // KubeControllerManagerConfig creates a config for kube-controller-manager in option --openshift-config
-func KubeControllerManagerConfig(path string) error {
+func KubeControllerManagerConfig(cfg *MicroshiftConfig) error {
 	configTemplate := template.Must(template.New("config").Parse(`
 apiVersion: kubecontrolplane.config.openshift.io/v1
 kind: KubeControllerManagerConfig  
@@ -36,11 +36,11 @@ extendedArguments:
   use-service-account-credentials:
   - "true"
   flex-volume-plugin-dir:
-  - "/etc/kubernetes/kubelet-plugins/volume/exec" # created by machine-config-operator, owned by storage team/hekumar@redhat.com
+  - "` + cfg.DataDir + `/kubelet-plugins/volume/exec" # created by machine-config-operator, owned by storage team/hekumar@redhat.com
   pv-recycler-pod-template-filepath-nfs: # owned by storage team/fbertina@redhat.com
-  - "/etc/kubernetes/ushift-resources/configmaps/recycler-config/recycler-pod.yaml"
+  - "` + cfg.DataDir + `/resources/configmaps/recycler-config/recycler-pod.yaml"
   pv-recycler-pod-template-filepath-hostpath: # owned by storage team/fbertina@redhat.com
-  - "/etc/kubernetes/ushift-resources/configmaps/recycler-config/recycler-pod.yaml"
+  - "` + cfg.DataDir + `/resources/configmaps/recycler-config/recycler-pod.yaml"
   leader-elect:
   - "true"
   leader-elect-retry-period:
@@ -82,8 +82,8 @@ extendedArguments:
 			EtcdKey:           ,
 		*/
 	}
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	output, err := os.Create(path)
+	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kube-controller-manager/config/config.yaml"), os.FileMode(0755))
+	output, err := os.Create(cfg.DataDir + "/resources/kube-controller-manager/config/config.yaml")
 	if err != nil {
 		return err
 	}

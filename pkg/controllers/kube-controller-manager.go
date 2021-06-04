@@ -18,33 +18,33 @@ package controllers
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/microshift/pkg/constant"
+	"github.com/openshift/microshift/pkg/config"
 
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
 )
 
-func KubeControllerManager() {
+func KubeControllerManager(cfg *config.MicroshiftConfig) {
 	command := kubecm.NewControllerManagerCommand()
 	args := []string{
-		"--kubeconfig=" + constant.AdminKubeconfigPath,
-		"--service-account-private-key-file=/etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-key/service-account.key",
+		"--kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--service-account-private-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
 		"--allocate-node-cidrs=true",
-		"--cluster-cidr=" + constant.ClusterCIDR, //TODO param
-		"--authorization-kubeconfig=" + constant.AdminKubeconfigPath,
-		"--authentication-kubeconfig=" + constant.AdminKubeconfigPath,
-		"--root-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
+		"--cluster-cidr=" + cfg.Cluster.ClusterCIDR,
+		"--authorization-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--authentication-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--root-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
 		"--bind-address=127.0.0.1",
 		"--secure-port=10257",
 		"--leader-elect=false",
 		"--use-service-account-credentials=true",
-		"--cluster-signing-cert-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
-		"cluster-signing-key-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.key",
-		"--log-file=/var/log/kube-controller-manager.log",
+		"--cluster-signing-cert-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--cluster-signing-key-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.key",
+		"--log-file=" + cfg.LogDir + "/kube-controller-manager.log",
 		"--logtostderr=false",
 		"-v=3",
 	}
 	if err := command.ParseFlags(args); err != nil {
-		logrus.Fatalf("failed to parse flags:%v", err)
+		logrus.Fatalf("failed to parse flags: %v", err)
 	}
 	go func() {
 		command.Run(command, nil)

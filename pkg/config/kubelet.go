@@ -19,29 +19,26 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
 	//"text/template"
-
-	"github.com/openshift/microshift/pkg/constant"
 )
 
-func KubeletConfig(path string) error {
+func KubeletConfig(cfg *MicroshiftConfig) error {
 	data := []byte(`
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
   x509:
-    clientCAFile: /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
+    clientCAFile: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
   anonymous:
     enabled: false
-tlsCertFile: /etc/kubernetes/ushift-resources/kubelet/secrets/kubelet-client/tls.crt
-tlsPrivateKeyFile: /etc/kubernetes/ushift-resources/kubelet/secrets/kubelet-client/tls.key
+tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.crt
+tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.key
 cgroupDriver: "systemd"
 cgroupRoot: /
 failSwapOn: false
 clusterDNS:
-  - ` + constant.ClusterDNS + `
-clusterDomain: ` + constant.DomainName + `
+  - ` + cfg.Cluster.DNS + `
+clusterDomain: ` + cfg.Cluster.BaseDomain + `
 containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50
@@ -61,11 +58,11 @@ featureGates:
   ServiceNodeExclusion: true
   SupportPodPidsLimit: true
 serverTLSBootstrap: false #TODO`)
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	return ioutil.WriteFile(path, data, 0644)
+	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kubelet/config/config.yaml"), os.FileMode(0755))
+	return ioutil.WriteFile(cfg.DataDir+"/resources/kubelet/config/config.yaml", data, 0644)
 }
 
-func OpenShiftSDNConfig(path string) error {
+func OpenShiftSDNConfig(cfg *MicroshiftConfig) error {
 	data := []byte(`
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 bindAddress: 0.0.0.0
@@ -76,7 +73,7 @@ clientConnection:
   contentType: ""
   kubeconfig: ""
   qps: 0
-clusterCIDR: - ` + constant.ClusterCIDR + `
+clusterCIDR: - ` + cfg.Cluster.ClusterCIDR + `
 configSyncPeriod: 0s
 conntrack:
   maxPerCore: null
@@ -88,23 +85,23 @@ enableProfiling: false
 featureGates:
   EndpointSlice: false
   EndpointSliceProxying: false`)
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	return ioutil.WriteFile(path, data, 0644)
+	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/openshift-sdn/config/config.yaml"), os.FileMode(0755))
+	return ioutil.WriteFile(cfg.DataDir+"/resources/openshift-sdn/config/config.yaml", data, 0644)
 }
 
-func KubeProxyConfig(path string) error {
+func KubeProxyConfig(cfg *MicroshiftConfig) error {
 	data := []byte(`
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 clientConnection:
-  kubeconfig: ` + constant.AdminKubeconfigPath + `
+  kubeconfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
 hostnameOverride: 127.0.0.1
-clusterCIDR: ` + constant.ClusterCIDR + `
+clusterCIDR: ` + cfg.Cluster.ClusterCIDR + `
 mode: "iptables"
 iptables:
   masqueradeAll: true
 featureGates:
    AllAlpha: false`)
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	return ioutil.WriteFile(path, data, 0644)
+	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kube-proxy/config/config.yaml"), os.FileMode(0755))
+	return ioutil.WriteFile(cfg.DataDir+"/resources/kube-proxy/config/config.yaml", data, 0644)
 }

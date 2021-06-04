@@ -19,19 +19,17 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"github.com/openshift/microshift/pkg/constant"
 )
 
 // KubeSchedulerConfig creates a config for kube-scheduler in option --config
-func KubeSchedulerConfig(path string) error {
+func KubeSchedulerConfig(cfg *MicroshiftConfig) error {
 	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta1
 kind: KubeSchedulerConfiguration
 clientConnection:
-  kubeconfig: ` + constant.AdminKubeconfigPath + `
+  kubeconfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
 leaderElection:
   leaderElect: false`)
 
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	return ioutil.WriteFile(path, data, 0644)
+	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kube-scheduler/config/config.yaml"), os.FileMode(0755))
+	return ioutil.WriteFile(cfg.DataDir+"/resources/kube-scheduler/config/config.yaml", data, 0644)
 }

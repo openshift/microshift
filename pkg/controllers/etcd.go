@@ -18,13 +18,12 @@ package controllers
 import (
 	"fmt"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	etcd "go.etcd.io/etcd/embed"
 
-	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/config"
 )
 
 var (
@@ -42,40 +41,32 @@ const (
 	etcdStartupTimeout = 10
 )
 
-func StartEtcd(ready chan bool) error {
-	hostname, err := os.Hostname()
-	if err != nil {
-		return fmt.Errorf("failed to get hostname: %v", err)
-	}
-	ip, err := util.GetHostIP()
-	if err != nil {
-		return fmt.Errorf("failed to get host IP: %v", err)
-	}
+func StartEtcd(c *config.MicroshiftConfig, ready chan bool) error {
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	cfg := etcd.NewConfig()
 	cfg.ClusterState = "new"
 	//cfg.ForceNewCluster = true //TODO
 	cfg.Logger = "zap"
-	cfg.Dir = "/var/lib/etcd/"
-	cfg.APUrls = setURL([]string{ip}, ":2380")
-	cfg.LPUrls = setURL([]string{ip}, ":2380")
-	cfg.ACUrls = setURL([]string{ip}, ":2379")
-	cfg.LCUrls = setURL([]string{"127.0.0.1", ip}, ":2379")
+	cfg.Dir = c.DataDir + "/etcd/"
+	cfg.APUrls = setURL([]string{c.HostIP}, ":2380")
+	cfg.LPUrls = setURL([]string{c.HostIP}, ":2380")
+	cfg.ACUrls = setURL([]string{c.HostIP}, ":2379")
+	cfg.LCUrls = setURL([]string{"127.0.0.1", c.HostIP}, ":2379")
 	cfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, ":2381")
 
-	cfg.Name = hostname
-	cfg.InitialCluster = hostname + "=" + "https://" + ip + ":2380"
+	cfg.Name = c.HostName
+	cfg.InitialCluster = c.HostName + "=" + "https://" + c.HostIP + ":2380"
 
 	cfg.CipherSuites = tlsCipherSuites
-	cfg.ClientTLSInfo.CertFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-serving/etcd-serving.crt"
-	cfg.ClientTLSInfo.KeyFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-serving/etcd-serving.key"
-	cfg.ClientTLSInfo.TrustedCAFile = "/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt"
+	cfg.ClientTLSInfo.CertFile = c.DataDir + "/certs/secrets/etcd-all-serving/etcd-serving.crt"
+	cfg.ClientTLSInfo.KeyFile = c.DataDir + "/certs/secrets/etcd-all-serving/etcd-serving.key"
+	cfg.ClientTLSInfo.TrustedCAFile = c.DataDir + "/certs/ca-bundle/ca-bundle.crt"
 	cfg.ClientTLSInfo.ClientCertAuth = false
 	cfg.ClientTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
-	cfg.PeerTLSInfo.CertFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-peer/etcd-peer.crt"
-	cfg.PeerTLSInfo.KeyFile = "/etc/kubernetes/ushift-certs/secrets/etcd-all-peer/etcd-peer.key"
-	cfg.PeerTLSInfo.TrustedCAFile = "/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt"
+	cfg.PeerTLSInfo.CertFile = c.DataDir + "/certs/secrets/etcd-all-peer/etcd-peer.crt"
+	cfg.PeerTLSInfo.KeyFile = c.DataDir + "/certs/secrets/etcd-all-peer/etcd-peer.key"
+	cfg.PeerTLSInfo.TrustedCAFile = c.DataDir + "/certs/ca-bundle/ca-bundle.crt"
 	cfg.PeerTLSInfo.ClientCertAuth = false
 	cfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 

@@ -8,9 +8,11 @@ var (
 	lock sync.Mutex
 )
 
-type RenderFunc func([]byte) ([]byte, error)
+type RenderParams map[string]string
+
+type RenderFunc func([]byte, RenderParams) ([]byte, error)
 
 type readerApplier interface {
-	Reader([]byte, RenderFunc)
+	Reader([]byte, RenderFunc, RenderParams)
 	Applier() error
 }

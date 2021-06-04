@@ -4,16 +4,17 @@ import (
 	"bytes"
 	"text/template"
 
+	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/constant"
 )
 
-func renderSCController(b []byte) ([]byte, error) {
+func renderSCController(b []byte, p assets.RenderParams) ([]byte, error) {
 	data := struct {
 		ImageSCOperator, KeyDir, CADir string
 	}{
 		ImageSCOperator: constant.ImageServiceCAOperator,
-		KeyDir:          "/etc/kubernetes/ushift-resources/service-ca/secrets/service-ca",
-		CADir:           "/etc/kubernetes/ushift-certs/ca-bundle",
+		KeyDir:          p["DataDir"] + "/resources/service-ca/secrets/service-ca",
+		CADir:           p["DataDir"] + "/certs/ca-bundle",
 	}
 	tpl := template.Must(template.New("sc").Parse(string(b)))
 	var byteBuff bytes.Buffer
@@ -24,11 +25,11 @@ func renderSCController(b []byte) ([]byte, error) {
 	return byteBuff.Bytes(), nil
 }
 
-func renderDNSService(b []byte) ([]byte, error) {
+func renderDNSService(b []byte, p assets.RenderParams) ([]byte, error) {
 	data := struct {
 		ClusterIP string
 	}{
-		ClusterIP: constant.ClusterDNS,
+		ClusterIP: p["ClusterDNS"],
 	}
 	tpl := template.Must(template.New("svc").Parse(string(b)))
 	var byteBuff bytes.Buffer

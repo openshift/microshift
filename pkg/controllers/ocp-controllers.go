@@ -24,7 +24,7 @@ import (
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 
-	"github.com/openshift/microshift/pkg/constant"
+	"github.com/openshift/microshift/pkg/config"
 )
 
 func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
@@ -41,21 +41,21 @@ func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
 
 	return cmd
 }
-func OCPAPIServer() error {
+func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 	stopCh := make(chan struct{})
 	command := newOpenshiftApiServerCommand(stopCh)
 	args := []string{
 		"start",
-		"--config=/etc/kubernetes/ushift-resources/openshift-apiserver/config/config.yaml",
-		"--authorization-kubeconfig=" + constant.AdminKubeconfigPath,
-		"--authentication-kubeconfig=" + constant.AdminKubeconfigPath,
-		"--requestheader-client-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
+		"--config=" + cfg.DataDir + "/resources/openshift-apiserver/config/config.yaml",
+		"--authorization-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--authentication-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--requestheader-client-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
 		"--requestheader-allowed-names=kube-apiserver-proxy,system:kube-apiserver-proxy,system:openshift-aggregator",
 		"--requestheader-username-headers=X-Remote-User",
 		"--requestheader-group-headers=X-Remote-Group",
 		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
-		"--client-ca-file=/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt",
-		"--log-file=/var/log/ocp-apiserver.log",
+		"--client-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--log-file=" + cfg.LogDir + "/ocp-apiserver.log",
 		"--logtostderr=false",
 		"-v=3",
 	}
@@ -82,11 +82,11 @@ func newOpenShiftControllerManagerCommand() *cobra.Command {
 	return cmd
 }
 
-func OCPControllerManager() {
+func OCPControllerManager(cfg *config.MicroshiftConfig) {
 	command := newOpenShiftControllerManagerCommand()
 	args := []string{
-		"--config=/etc/kubernetes/ushift-resources/openshift-controller-manager/config/config.yaml",
-		"--log-file=/var/log/ocp-controller-manager.log",
+		"--config=" + cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml",
+		"--log-file=" + cfg.LogDir + "/ocp-controller-manager.log",
 		"--logtostderr=false",
 		"-v=3",
 	}
