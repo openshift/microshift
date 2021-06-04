@@ -66,7 +66,7 @@ spec:
           - name: METRICS_DOMAIN
             value: knative.dev/sources
           - name: CEPH_SOURCE_RA_IMAGE
-            value: ko://knative.dev/eventing-ceph/cmd/receive_adapter
+            value: microshift.jfrog.io/eventing-ceph-docker-local/receive_adapter-b624b2be994333d9e5b2e9640a64270e:latest
           - name: POD_NAME
             valueFrom:
               fieldRef:
