@@ -49,10 +49,6 @@ func newCommand() *cobra.Command {
 		},
 	}
 
-	cmd.AddCommand(cmds.InitCmd)
-	cmd.AddCommand(cmds.ControllerCmd)
-	cmd.AddCommand(cmds.NodeCmd)
-	cmd.AddCommand(cmds.UpCmd)
 	cmd.AddCommand(cmds.NewRunMicroshiftCommand())
 	return cmd
 }

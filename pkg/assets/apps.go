@@ -7,7 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	appsassets "github.com/openshift/microshift/pkg/assets/apps"
-	"github.com/openshift/microshift/pkg/constant"
 
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -31,8 +30,8 @@ func init() {
 	}
 }
 
-func appsClient() *appsclientv1.AppsV1Client {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+func appsClient(kubeconfigPath string) *appsclientv1.AppsV1Client {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}
@@ -45,10 +44,10 @@ type dpApplier struct {
 	dp     *appsv1.Deployment
 }
 
-func (d *dpApplier) Reader(objBytes []byte, render RenderFunc) {
+func (d *dpApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes)
+		objBytes, err = render(objBytes, params)
 		if err != nil {
 			panic(err)
 		}
@@ -73,10 +72,10 @@ type dsApplier struct {
 	ds     *appsv1.DaemonSet
 }
 
-func (d *dsApplier) Reader(objBytes []byte, render RenderFunc) {
+func (d *dsApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes)
+		objBytes, err = render(objBytes, params)
 		if err != nil {
 			panic(err)
 		}
@@ -96,7 +95,7 @@ func (d *dsApplier) Applier() error {
 	return nil
 }
 
-func applyApps(apps []string, applier readerApplier, render RenderFunc) error {
+func applyApps(apps []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -106,7 +105,7 @@ func applyApps(apps []string, applier readerApplier, render RenderFunc) error {
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", app, err)
 		}
-		applier.Reader(objBytes, render)
+		applier.Reader(objBytes, render, params)
 		if err := applier.Applier(); err != nil {
 			logrus.Warningf("failed to apply apps api %s: %v", app, err)
 			return err
@@ -116,14 +115,14 @@ func applyApps(apps []string, applier readerApplier, render RenderFunc) error {
 	return nil
 }
 
-func ApplyDeployments(dps []string, render RenderFunc) error {
+func ApplyDeployments(dps []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	dp := &dpApplier{}
-	dp.Client = appsClient()
-	return applyApps(dps, dp, render)
+	dp.Client = appsClient(kubeconfigPath)
+	return applyApps(dps, dp, render, params)
 }
 
-func ApplyDaemonSets(apps []string, render RenderFunc) error {
+func ApplyDaemonSets(apps []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	ds := &dsApplier{}
-	ds.Client = appsClient()
-	return applyApps(apps, ds, render)
+	ds.Client = appsClient(kubeconfigPath)
+	return applyApps(apps, ds, render, params)
 }

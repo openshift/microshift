@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	crd_assets "github.com/openshift/microshift/pkg/assets/crd"
-	"github.com/openshift/microshift/pkg/constant"
+	"github.com/openshift/microshift/pkg/config"
 
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiext_clientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -120,11 +120,11 @@ func init() {
 		panic(err)
 	}
 }
-func ApplyCRDs() error {
+func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 	lock.Lock()
 	defer lock.Unlock()
 
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
 	if err != nil {
 		return err
 	}

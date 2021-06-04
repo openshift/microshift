@@ -7,15 +7,19 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/openshift/microshift/pkg/util"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
 )
 
 const (
-	defaultUserConfigFile   = "~/.ushift/ushift.yaml"
-	defaultUserDataDir      = "~/.ushift"
-	defaultGlobalConfigFile = "/etc/ushift/ushift.yaml"
+	defaultUserConfigFile   = "~/.ushift/config.yaml"
+	defaultUserDataDir      = "~/.ushift/data"
+	defaultUserLogDir       = "~/.ushift/log"
+	defaultGlobalConfigFile = "/etc/ushift/config.yaml"
 	defaultGlobalDataDir    = "/var/lib/ushift"
+	defaultGlobalLogDir     = "/var/log"
 )
 
 var (
@@ -23,30 +27,68 @@ var (
 	validRoles   = []string{"controlplane", "node"}
 )
 
+// config
+type ClusterConfig struct {
+	URL string `yaml:"url"`
+
+	ClusterCIDR string
+	ServiceCIDR string
+	DNS         string
+	BaseDomain  string
+}
+
+// config specific to a control plane instance
+type ControlPlaneConfig struct {
+	// Token string `yaml:"token", envconfig:"CONTROLPLANE_TOKEN"`
+}
+
+// config specific to a node instance
+type NodeConfig struct {
+	// Token string `yaml:"token", envconfig:"NODE_TOKEN"`
+}
+
 type MicroshiftConfig struct {
+	// config specific to this Microshift instance
 	ConfigFile string
 	DataDir    string `yaml:"dataDir"`
+	LogDir     string `yaml:"logDir"`
 
 	Roles []string `yaml:"roles"`
 
-	// ClusterURL    string `yaml:"url", envconfig:"CLUSTER_URL"`
-	// ClusterSecret string `yaml:"secret", envconfig:"CLUSTER_SECRET."`
+	HostName string `yaml:"hostName"`
+	HostIP   string `yaml:"hostIP"`
 
-	// ControlPlaneConfig struct {
-	// 	Port string `yaml:"port", envconfig:"SERVER_PORT"`
-	// 	Host string `yaml:"host", envconfig:"SERVER_HOST"`
-	// } `yaml:"controlplane"`
-	// NodeConfig struct {
-	// 	Username string `yaml:"user", envconfig:"DB_USERNAME"`
-	// 	Password string `yaml:"pass", envconfig:"DB_PASSWORD"`
-	// } `yaml:"node"`
+	Cluster      ClusterConfig      `yaml:"cluster"`
+	ControlPlane ControlPlaneConfig `yaml:"controlPlane"`
+	Node         NodeConfig         `yaml:"node"`
 }
 
 func NewMicroshiftConfig() *MicroshiftConfig {
+	hostName, err := os.Hostname()
+	if err != nil {
+		logrus.Fatal("failed to get hostname: %v", err)
+	}
+	hostIP, err := util.GetHostIP()
+	if err != nil {
+		logrus.Fatal("failed to get host IP: %v", err)
+	}
+
 	return &MicroshiftConfig{
 		ConfigFile: findConfigFile(),
 		DataDir:    findDataDir(),
+		LogDir:     findLogDir(),
 		Roles:      defaultRoles,
+		HostName:   hostName,
+		HostIP:     hostIP,
+		Cluster: ClusterConfig{
+			URL:         "https://127.0.0.1:6443",
+			ClusterCIDR: "10.42.0.0/16",
+			ServiceCIDR: "10.43.0.0/16",
+			DNS:         "10.43.0.10",
+			BaseDomain:  "cluster.local",
+		},
+		ControlPlane: ControlPlaneConfig{},
+		Node:         NodeConfig{},
 	}
 }
 
@@ -65,23 +107,34 @@ func findConfigFile() string {
 	}
 }
 
-// Returns the default user data dir if it exists or if neither the default
-// user nor global data dir exists yet and the user is non-root.
+// Returns the default user data dir if it exists or the user is non-root.
 // Returns the default global data dir otherwise.
 func findDataDir() string {
 	userDataDir, _ := homedir.Expand(defaultUserDataDir)
 	if _, err := os.Stat(userDataDir); errors.Is(err, os.ErrNotExist) {
-		if _, err := os.Stat(defaultGlobalDataDir); errors.Is(err, os.ErrNotExist) {
-			if os.Geteuid() == 0 {
-				return defaultGlobalDataDir
-			} else {
-				return userDataDir
-			}
+		if os.Geteuid() > 0 {
+			return userDataDir
 		} else {
 			return defaultGlobalDataDir
 		}
 	} else {
 		return userDataDir
+	}
+}
+
+// Returns the default user log dir if the default user _data_ dir exists or the user is non-root.
+// Returns the default global log dir otherwise.
+func findLogDir() string {
+	userDataDir, _ := homedir.Expand(defaultUserDataDir)
+	userLogDir, _ := homedir.Expand(defaultUserLogDir)
+	if _, err := os.Stat(userDataDir); errors.Is(err, os.ErrNotExist) {
+		if os.Geteuid() > 0 {
+			return userLogDir
+		} else {
+			return defaultGlobalLogDir
+		}
+	} else {
+		return userLogDir
 	}
 }
 

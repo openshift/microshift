@@ -92,13 +92,13 @@ func kubeAPIOAuthMetadataFile(path string) error {
 }
 
 // KubeAPIServerConfig creates a config for kube-apiserver to use in --openshift-config option
-func KubeAPIServerConfig(path, svcCIDR string) error {
+func KubeAPIServerConfig(cfg *MicroshiftConfig) error {
 	// based on https://github.com/openshift/cluster-kube-apiserver-operator/blob/master/bindata/v4.1.0/config/defaultconfig.yaml
 	configTemplate := template.Must(template.New("config").Parse(`
 apiVersion: kubecontrolplane.config.openshift.io/v1  
 kind: KubeAPIServerConfig
 serviceAccountPublicKeyFiles:
-  - /etc/kubernetes/ushift-resources/kube-apiserver/sa-public-key/serving-ca.pub
+  - ` + cfg.DataDir + `/resources/kube-apiserver/sa-public-key/serving-ca.pub
 admission:
   pluginConfig:
     network.openshift.io/ExternalIPRanger:
@@ -125,9 +125,9 @@ apiServerArguments:
     - RBAC
     - Node
   audit-log-path:
-    - /var/log/kube-apiserver/audit.log
+    - ` + cfg.LogDir + `/kube-apiserver/audit.log
   audit-policy-file:
-    - /etc/kubernetes/ushift-resources/kube-apiserver-audit-policies/default.yaml
+    - ` + cfg.DataDir + `/resources/kube-apiserver-audit-policies/default.yaml
   enable-admission-plugins:
     - CertificateApproval
     - CertificateSigning
@@ -190,11 +190,11 @@ apiServerArguments:
   insecure-port:
     - "0"
   kubelet-certificate-authority:
-    - /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
+    - ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
   kubelet-client-certificate:
-    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/kubelet-client/tls.crt
+    - ` + cfg.DataDir + `/resources/kube-apiserver/secrets/kubelet-client/tls.crt
   kubelet-client-key:
-    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/kubelet-client/tls.key
+    - ` + cfg.DataDir + `/resources/kube-apiserver/secrets/kubelet-client/tls.key
   kubelet-https:
     - "true"
   kubelet-preferred-address-types:
@@ -212,9 +212,9 @@ apiServerArguments:
   min-request-timeout:
     - "3600"
   proxy-client-cert-file:
-    - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client/tls.crt
+    - ` + cfg.DataDir + `/certs/kube-apiserver/secrets/aggregator-client/tls.crt
   proxy-client-key-file:
-    - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/aggregator-client/tls.key
+    - ` + cfg.DataDir + `/certs/kube-apiserver/secrets/aggregator-client/tls.key
   requestheader-allowed-names:
     - system:admin
     - aggregator
@@ -229,7 +229,7 @@ apiServerArguments:
     - system:openshift-aggregator
     - openshift-aggregator
   requestheader-client-ca-file:
-    - /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
+    - ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
   requestheader-extra-headers-prefix:
     - X-Remote-Extra-
   requestheader-group-headers:
@@ -248,25 +248,25 @@ apiServerArguments:
   storage-media-type:
     - application/vnd.kubernetes.protobuf
   tls-cert-file:
-    - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt
+    - ` + cfg.DataDir + `/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt
   tls-private-key-file:
-    - /etc/kubernetes/ushift-certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key
+    - ` + cfg.DataDir + `/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key
   service-account-issuer:
     - "https://kubernetes.svc"
   service-account-signing-key-file:
-    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/service-account-signing-key/service-account.key
+    - ` + cfg.DataDir + `/resources/kube-apiserver/secrets/service-account-signing-key/service-account.key
   etcd-cafile:
-    - /etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt
+    - ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
   etcd-certfile:
-    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client/tls.crt
+    - ` + cfg.DataDir + `/resources/kube-apiserver/secrets/etcd-client/tls.crt
   etcd-keyfile:
-    - /etc/kubernetes/ushift-resources/kube-apiserver/secrets/etcd-client/tls.key
+    - ` + cfg.DataDir + `/resources/kube-apiserver/secrets/etcd-client/tls.key
   etcd-prefix:
     - kubernetes.io
   etcd-servers:
     - https://127.0.0.1:2379
 auditConfig:
-  auditFilePath: "/var/log/kube-apiserver/audit.log"
+  auditFilePath: "` + cfg.LogDir + `/kube-apiserver/audit.log"
   enabled: true
   logFormat: json
   maximumFileSizeMegabytes: 100
@@ -301,9 +301,9 @@ auditConfig:
       omitStages:
       - RequestReceived    
 authConfig:
-  oauthMetadataFile: "/etc/kubernetes/ushift-resources/kube-apiserver/oauthMetadata"
+  oauthMetadataFile: "` + cfg.DataDir + `/resources/kube-apiserver/oauthMetadata"
   requestHeader:
-    clientCA: "/etc/kubernetes/ushift-certs/ca-bundle/ca-bundle.crt"
+    clientCA: "` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt"
     clientCommonNames:
     - kube-apiserver
     - system:kube-apiserver
@@ -326,19 +326,19 @@ servingInfo:
   bindNetwork: tcp4 # set by observe_network.go
 `))
 
-	if err := kubeAPIOAuthMetadataFile("/etc/kubernetes/ushift-resources/kube-apiserver/oauthMetadata"); err != nil {
+	if err := kubeAPIOAuthMetadataFile(cfg.DataDir + "/resources/kube-apiserver/oauthMetadata"); err != nil {
 		return err
 	}
-	if err := kubeAPIAuditPolicyFile("/etc/kubernetes/ushift-resources/kube-apiserver-audit-policies/default.yaml"); err != nil {
+	if err := kubeAPIAuditPolicyFile(cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"); err != nil {
 		return err
 	}
 	data := struct {
 		ServiceCIDR string
 	}{
-		ServiceCIDR: svcCIDR,
+		ServiceCIDR: cfg.Cluster.ServiceCIDR,
 	}
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
-	output, err := os.Create(path)
+	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kube-apiserver/config/config.yaml"), os.FileMode(0755))
+	output, err := os.Create(cfg.DataDir + "/resources/kube-apiserver/config/config.yaml")
 	if err != nil {
 		return err
 	}

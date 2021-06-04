@@ -16,17 +16,18 @@ limitations under the License.
 package controllers
 
 import (
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/sirupsen/logrus"
 
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
 )
 
-func KubeScheduler() {
+func KubeScheduler(cfg *config.MicroshiftConfig) {
 	command := kubescheduler.NewSchedulerCommand()
 	args := []string{
-		"--config=/etc/kubernetes/ushift-resources/kube-scheduler/config/config.yaml",
-		"--master=https://127.0.0.1:6443",
-		"--log-file=/var/log/kube-scheduler.log",
+		"--config=" + cfg.DataDir + "/resources/kube-scheduler/config/config.yaml",
+		"--master=" + cfg.Cluster.URL,
+		"--log-file=" + cfg.LogDir + "/kube-scheduler.log",
 		"--logtostderr=false",
 		"-v=3",
 	}

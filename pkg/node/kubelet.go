@@ -16,38 +16,32 @@ limitations under the License.
 package node
 
 import (
-	"fmt"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/microshift/pkg/constant"
-	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/config"
 
 	kubeproxy "k8s.io/kubernetes/cmd/kube-proxy/app"
 	kubelet "k8s.io/kubernetes/cmd/kubelet/app"
 )
 
-func StartKubelet() error {
-	ip, err := util.GetHostIP()
-	if err != nil {
-		return fmt.Errorf("failed to get host IP: %v", err)
-	}
+func StartKubelet(cfg *config.MicroshiftConfig) error {
 	command := kubelet.NewKubeletCommand()
 	args := []string{
-		"--config=/etc/kubernetes/ushift-resources/kubelet/config/config.yaml",
-		"--bootstrap-kubeconfig=" + constant.AdminKubeconfigPath,
-		"--kubeconfig=" + constant.AdminKubeconfigPath,
+		"--config=" + cfg.DataDir + "/resources/kubelet/config/config.yaml",
+		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
+		"--kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
 		"--container-runtime=remote",
 		"--container-runtime-endpoint=/var/run/crio/crio.sock",
 		"--runtime-cgroups=/system.slice/crio.service",
-		"--node-ip=" + ip,
-		"--volume-plugin-dir=/etc/kubernetes/kubelet-plugins/volume/exec",
-		"--log-dir=/var/log",
+		"--node-ip=" + cfg.HostIP,
+		"--volume-plugin-dir=" + cfg.DataDir + "/kubelet-plugins/volume/exec",
+		"--log-dir=" + cfg.LogDir,
 		"--v=3",
 	}
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
 	}
-	logrus.Infof("starting kubelet %s, args: %v", ip, args)
+	logrus.Infof("starting kubelet %s, args: %v", cfg.HostIP, args)
 
 	go func() {
 		command.Run(command, args)
@@ -57,12 +51,12 @@ func StartKubelet() error {
 	return nil
 }
 
-func StartKubeProxy() {
+func StartKubeProxy(cfg *config.MicroshiftConfig) error {
 	command := kubeproxy.NewProxyCommand()
 	args := []string{
-		"--config=/etc/kubernetes/ushift-resources/kube-proxy/config/config.yaml",
+		"--config=" + cfg.DataDir + "/resources/kube-proxy/config/config.yaml",
 		"--master=https://127.0.0.1:6443",
-		"--log-dir=/var/log",
+		"--log-dir=" + cfg.LogDir,
 		"-v=3",
 	}
 	if err := command.ParseFlags(args); err != nil {
@@ -75,4 +69,5 @@ func StartKubeProxy() {
 		logrus.Fatalf("kube-proxy exited")
 	}()
 
+	return nil
 }

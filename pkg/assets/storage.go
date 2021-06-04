@@ -7,7 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	scassets "github.com/openshift/microshift/pkg/assets/storage"
-	"github.com/openshift/microshift/pkg/constant"
 
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -31,8 +30,8 @@ func init() {
 	}
 }
 
-func scClient() *scclientv1.StorageV1Client {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+func scClient(kubeconfigPath string) *scclientv1.StorageV1Client {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}
@@ -45,10 +44,10 @@ type scApplier struct {
 	sc     *scv1.StorageClass
 }
 
-func (s *scApplier) Reader(objBytes []byte, render RenderFunc) {
+func (s *scApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes)
+		objBytes, err = render(objBytes, params)
 		if err != nil {
 			panic(err)
 		}
@@ -68,7 +67,7 @@ func (s *scApplier) Applier() error {
 	return nil
 }
 
-func applySCs(scs []string, applier readerApplier, render RenderFunc) error {
+func applySCs(scs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -78,7 +77,7 @@ func applySCs(scs []string, applier readerApplier, render RenderFunc) error {
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", sc, err)
 		}
-		applier.Reader(objBytes, render)
+		applier.Reader(objBytes, render, params)
 		if err := applier.Applier(); err != nil {
 			logrus.Warningf("failed to apply sc api %s: %v", sc, err)
 			return err
@@ -88,8 +87,8 @@ func applySCs(scs []string, applier readerApplier, render RenderFunc) error {
 	return nil
 }
 
-func ApplyStorageClasses(scs []string, render RenderFunc) error {
+func ApplyStorageClasses(scs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	sc := &scApplier{}
-	sc.Client = scClient()
-	return applySCs(scs, sc, render)
+	sc.Client = scClient(kubeconfigPath)
+	return applySCs(scs, sc, render, params)
 }

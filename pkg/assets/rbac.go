@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	rbacassets "github.com/openshift/microshift/pkg/assets/rbac"
-	"github.com/openshift/microshift/pkg/constant"
 
 	"github.com/sirupsen/logrus"
 
@@ -36,8 +35,8 @@ type clusterRoleBindingApplier struct {
 	crb    *rbacv1.ClusterRoleBinding
 }
 
-func (crb *clusterRoleBindingApplier) New() {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+func (crb *clusterRoleBindingApplier) New(kubeconfigPath string) {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}
@@ -45,7 +44,7 @@ func (crb *clusterRoleBindingApplier) New() {
 	crb.client = kubernetes.NewForConfigOrDie(rest.AddUserAgent(restConfig, "rbac-agent"))
 }
 
-func (crb *clusterRoleBindingApplier) Reader(objBytes []byte, _ RenderFunc) {
+func (crb *clusterRoleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
 	obj, err := runtime.Decode(rbacCodecs.UniversalDecoder(rbacv1.SchemeGroupVersion), objBytes)
 	if err != nil {
 		panic(err)
@@ -68,8 +67,8 @@ type clusterRoleApplier struct {
 	cr     *rbacv1.ClusterRole
 }
 
-func (cr *clusterRoleApplier) New() {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", constant.AdminKubeconfigPath)
+func (cr *clusterRoleApplier) New(kubeconfigPath string) {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +76,7 @@ func (cr *clusterRoleApplier) New() {
 	cr.client = kubernetes.NewForConfigOrDie(rest.AddUserAgent(restConfig, "rbac-agent"))
 }
 
-func (cr *clusterRoleApplier) Reader(objBytes []byte, _ RenderFunc) {
+func (cr *clusterRoleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
 	obj, err := runtime.Decode(rbacCodecs.UniversalDecoder(rbacv1.SchemeGroupVersion), objBytes)
 	if err != nil {
 		panic(err)
@@ -105,7 +104,7 @@ func applyRbac(rbacs []string, applier readerApplier) error {
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", rbac, err)
 		}
-		applier.Reader(objBytes, nil)
+		applier.Reader(objBytes, nil, nil)
 		if err := applier.Applier(); err != nil {
 			logrus.Warningf("failed to apply rbac %s: %v", rbac, err)
 			return err
@@ -115,15 +114,15 @@ func applyRbac(rbacs []string, applier readerApplier) error {
 	return nil
 }
 
-func ApplyClusterRoleBindings(rbacs []string) error {
+func ApplyClusterRoleBindings(rbacs []string, kubeconfigPath string) error {
 	crb := &clusterRoleBindingApplier{}
-	crb.New()
+	crb.New(kubeconfigPath)
 	return applyRbac(rbacs, crb)
 }
 
-func ApplyClusterRoles(rbacs []string) error {
+func ApplyClusterRoles(rbacs []string, kubeconfigPath string) error {
 	cr := &clusterRoleApplier{}
-	cr.New()
+	cr.New(kubeconfigPath)
 	return applyRbac(rbacs, cr)
 
 }

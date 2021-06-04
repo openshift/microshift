@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/node"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -46,17 +47,22 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	if _, err := os.Stat(cfg.DataDir); errors.Is(err, os.ErrNotExist) {
 		os.MkdirAll(cfg.DataDir, 0700)
-		initAll(nil)
+		initAll(cfg)
 	}
+	// if log dir is missing, create it
+	os.MkdirAll(cfg.LogDir, 0700)
 
 	if config.StringInList("controlplane", cfg.Roles) {
-		if err := startControllerOnly(); err != nil {
+		if err := startControllerOnly(cfg); err != nil {
 			return err
 		}
 	}
 
 	if config.StringInList("node", cfg.Roles) {
-		if err := startNodeOnly(); err != nil {
+		if err := node.StartKubelet(cfg); err != nil {
+			return err
+		}
+		if err := node.StartKubeProxy(cfg); err != nil {
 			return err
 		}
 	}

@@ -1,29 +1,30 @@
 package components
 
 import (
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/sirupsen/logrus"
 )
 
-func StartComponents() error {
-	if err := startServiceCAController(); err != nil {
+func StartComponents(cfg *config.MicroshiftConfig) error {
+	if err := startServiceCAController(cfg, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to start service-ca controller: %v", err)
 		return err
 	}
 
-	if err := startHostpathProvisioner(); err != nil {
+	if err := startHostpathProvisioner(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to start hostpath provisioner: %v", err)
 		return err
 	}
 
-	if err := startIngressController(); err != nil {
+	if err := startIngressController(cfg, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to start ingress router controller: %v", err)
 		return err
 	}
-	if err := startDNSController(); err != nil {
+	if err := startDNSController(cfg, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to start DNS controller: %v", err)
 		return err
 	}
-	if err := startFlannel(); err != nil {
+	if err := startFlannel(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warning("failed to start Flannel: %v", err)
 		return err
 	}

@@ -16,16 +16,6 @@ limitations under the License.
 package constant
 
 const (
-	AdminKubeconfigPath                 = "/etc/kubernetes/ushift-resources/kubeadmin/kubeconfig"
-	KubeAPIKubeconfigPath               = "/etc/kubernetes/ushift-resources/kube-apiserver/kubeconfig"
-	KubeControllerManagerKubeconfigPath = "/etc/kubernetes/ushift-resources/kube-controller-manager/kubeconfig"
-	KubeSchedulerKubeconfigPath         = "/etc/kubernetes/ushift-resources/kube-scheduler/kubeconfig"
-	KubeletKubeconfigPath               = "/etc/kubernetes/ushift-resources/kubelet/kubeconfig"
-	ClusterCIDR                         = "10.42.0.0/16"
-	ServiceCIDR                         = "10.43.0.0/16"
-	ClusterDNS                          = "10.43.0.10"
-	DomainName                          = "cluster.local"
-
 	// from https://github.com/openshift/okd/releases/tag/4.5.0-0.okd-2020-10-15-235428
 	ImageDNSOperator       = "quay.io/openshift/okd-content@sha256:04ed5d9d6fb14c0005c7074b659d6587c117da0e7e3b98f506f6cf3440c45358"
 	VersionOperator        = "4.5.0-0.okd-2020-10-15-235428"
