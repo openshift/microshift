@@ -26,19 +26,19 @@ func Kubeconfig(path, common string, svcName []string) error {
 	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
 apiVersion: v1
 kind: Config
-current-context: ushift
+current-context: microshift
 preferences: {}
 contexts:
 - context:
-    cluster: ushift
+    cluster: microshift
     namespace: default
     user: user
-  name: ushift
+  name: microshift
 clusters:
 - cluster:
     server: https://127.0.0.1:6443
     certificate-authority-data: {{.ClusterCA}}
-  name: ushift
+  name: microshift
 users:
 - name: user
   user:

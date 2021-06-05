@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi8/go-toolset
 USER root
-LABEL name=ushift-build
+LABEL name=microshift-build
 
 ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
 

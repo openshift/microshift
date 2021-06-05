@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	defaultUserConfigFile   = "~/.ushift/config.yaml"
-	defaultUserDataDir      = "~/.ushift/data"
-	defaultUserLogDir       = "~/.ushift/log"
-	defaultGlobalConfigFile = "/etc/ushift/config.yaml"
-	defaultGlobalDataDir    = "/var/lib/ushift"
+	defaultUserConfigFile   = "~/.microshift/config.yaml"
+	defaultUserDataDir      = "~/.microshift/data"
+	defaultUserLogDir       = "~/.microshift/log"
+	defaultGlobalConfigFile = "/etc/microshift/config.yaml"
+	defaultGlobalDataDir    = "/var/lib/microshift"
 	defaultGlobalLogDir     = "/var/log"
 )
 
