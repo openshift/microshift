@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/component-base/logs"
 
@@ -49,6 +50,9 @@ func newCommand() *cobra.Command {
 		},
 	}
 
+	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
+
 	cmd.AddCommand(cmds.NewRunMicroshiftCommand())
+	cmd.AddCommand(cmds.NewVersionCommand(ioStreams))
 	return cmd
 }
