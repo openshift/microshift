@@ -68,6 +68,7 @@ auditConfig:
   logFormat: json
   maximumFileSizeMegabytes: 100
   maximumRetainedFiles: 10
+  policyFile: "` + cfg.DataDir + `/resources/openshift-apiserver/config/policy.yaml"
   policyConfiguration:
     apiVersion: audit.k8s.io/v1beta1
     kind: Policy
