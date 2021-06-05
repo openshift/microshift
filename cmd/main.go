@@ -41,7 +41,7 @@ func main() {
 
 func newCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ushift",
+		Use:   "microshift",
 		Short: "Microshift, a minimal OpenShift",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
