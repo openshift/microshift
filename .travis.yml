@@ -10,9 +10,9 @@ before_script:
   - go get -u golang.org/x/lint/golint
 
 script:
-  - sh ./verify.sh
+  - sh ./hack/verify.sh
 
 deploy:
   - provider: script
     script:
-    - sh ./deploy.sh
+    - sh ./hack/deploy.sh

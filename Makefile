@@ -3,7 +3,7 @@ all: build
 
 DO_LOCAL:=1 # default false
 DO_STATIC:=1 # default false
-BUILD_CFG:=./build/Dockerfile
+BUILD_CFG:=./images/Dockerfile
 BUILD_TAG:=microshift-build
 SRC_ROOT:=$(shell pwd)
 BIN:=./_output/bin/microshift
@@ -45,9 +45,9 @@ build_local:
 
 .PHONY: .init
 .init:
-	# docker will ignore volume create calls if the volume name already exists, but podman will fail, so ignore errors
-	-$(CTR_CMD) volume create --label name=microshift-build $(CACHE_VOL)
-	$(CTR_CMD) build -t $(BUILD_TAG) -f $(BUILD_CFG) ./build
+	-# docker will ignore volume create calls if the volume name already exists, but podman will fail, so ignore errors
+	$(CTR_CMD) volume create --label name=microshift-build $(CACHE_VOL)
+	$(CTR_CMD) build -t $(BUILD_TAG) -f $(BUILD_CFG) ./images
 
 .PHONY: build_ctr
 build_ctr: .init
