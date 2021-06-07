@@ -27,9 +27,6 @@ func KubeScheduler(cfg *config.MicroshiftConfig) {
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-scheduler/config/config.yaml",
 		"--master=" + cfg.Cluster.URL,
-		"--log-file=" + cfg.LogDir + "/kube-scheduler.log",
-		"--logtostderr=false",
-		"-v=3",
 	}
 
 	if err := command.ParseFlags(args); err != nil {

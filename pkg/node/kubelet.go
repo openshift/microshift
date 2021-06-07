@@ -35,8 +35,6 @@ func StartKubelet(cfg *config.MicroshiftConfig) error {
 		"--runtime-cgroups=/system.slice/crio.service",
 		"--node-ip=" + cfg.HostIP,
 		"--volume-plugin-dir=" + cfg.DataDir + "/kubelet-plugins/volume/exec",
-		"--log-dir=" + cfg.LogDir,
-		"--v=3",
 	}
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
@@ -56,8 +54,6 @@ func StartKubeProxy(cfg *config.MicroshiftConfig) error {
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-proxy/config/config.yaml",
 		"--master=https://127.0.0.1:6443",
-		"--log-dir=" + cfg.LogDir,
-		"-v=3",
 	}
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
