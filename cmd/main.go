@@ -21,6 +21,7 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
+	pflag.CommandLine.MarkHidden("log-flush-frequency")
 
 	logs.InitLogs()
 	defer logs.FlushLogs()

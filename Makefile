@@ -16,6 +16,8 @@ ifeq ($(DO_STATIC), 0)
 STATIC_OPTS=--ldflags '-extldflags "-static"'
 endif
 
+TAGS="providerless"
+
 SOURCE_GIT_TAG ?=$(shell git describe --long --tags --abbrev=7 --match 'v[0-9]*' || echo 'v0.0.0-unknown')
 SOURCE_GIT_COMMIT ?=$(shell git rev-parse --short "HEAD^{commit}" 2>/dev/null)
 SOURCE_GIT_TREE_STATE ?=$(shell ( ( [ ! -d ".git/" ] || git diff --quiet ) && echo 'clean' ) || echo 'dirty')
@@ -41,7 +43,7 @@ GO_LD_FLAGS ?=-ldflags "$(GO_LD_EXTRAFLAGS)"
 
 .PHONY: build_local
 build_local:
-	 GOOS=linux GOARCH=amd64 go build $(STATIC_OPTS) $(GO_LD_FLAGS) -mod vendor  -o _output/bin/microshift cmd/main.go
+	 GOOS=linux GOARCH=amd64 go build $(STATIC_OPTS) $(GO_LD_FLAGS) -tags ${TAGS} -mod vendor  -o _output/bin/microshift cmd/main.go
 
 .PHONY: .init
 .init:
