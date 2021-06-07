@@ -1,7 +1,6 @@
 package main
 
 import (
-	goflag "flag"
 	"fmt"
 	"math/rand"
 	"os"
@@ -22,9 +21,6 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
-	pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
-	pflag.CommandLine.MarkHidden("azure-container-registry-config")
-	pflag.CommandLine.MarkHidden("log-flush-frequency")
 
 	logs.InitLogs()
 	defer logs.FlushLogs()
