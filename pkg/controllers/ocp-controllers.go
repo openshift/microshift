@@ -55,9 +55,6 @@ func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 		"--requestheader-group-headers=X-Remote-Group",
 		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
 		"--client-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
-		"--log-file=" + cfg.LogDir + "/ocp-apiserver.log",
-		"--logtostderr=false",
-		"-v=3",
 	}
 	command.SetArgs(args)
 	logrus.Infof("starting openshift-apiserver, args: %v", args)
@@ -86,9 +83,6 @@ func OCPControllerManager(cfg *config.MicroshiftConfig) {
 	command := newOpenShiftControllerManagerCommand()
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml",
-		"--log-file=" + cfg.LogDir + "/ocp-controller-manager.log",
-		"--logtostderr=false",
-		"-v=3",
 	}
 	startArgs := append(args, "start")
 	command.SetArgs(startArgs)
