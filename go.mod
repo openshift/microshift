@@ -162,7 +162,7 @@ require (
 	github.com/opencontainers/selinux v1.6.0 // indirect
 	github.com/openshift/api v0.0.0-20210412200117-f60a0b2883ea
 	github.com/openshift/apiserver-library-go v0.0.0-20210426120049-59b0e972bfb7 // indirect
-	github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e // indirect
+	github.com/openshift/build-machinery-go v0.0.0-20210209125900-0da259a2c359
 	github.com/openshift/client-go v0.0.0-20210331195552-cf6c2669e01f
 	github.com/openshift/library-go v0.0.0-20210331235027-66936e2fcc52 // indirect
 	github.com/openshift/openshift-apiserver v0.0.0-alpha.0.0.20210324042139-a0f41548179e
