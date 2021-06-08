@@ -94,7 +94,7 @@ func KubeProxyConfig(cfg *MicroshiftConfig) error {
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 clientConnection:
-  kubeconfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+  kubeconfig: ` + cfg.DataDir + `/resources/kube-proxy/kubeconfig
 hostnameOverride: 127.0.0.1
 clusterCIDR: ` + cfg.Cluster.ClusterCIDR + `
 mode: "iptables"
