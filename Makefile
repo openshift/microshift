@@ -1,23 +1,14 @@
-all: build
-.PHONY: all
-
 # Include the library makefile
 include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
 include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
 
 DO_LOCAL:=1 # default false
-DO_STATIC:=1 # default false
 BUILD_CFG:=./images/Dockerfile
 BUILD_TAG:=microshift-build
 SRC_ROOT:=$(shell pwd)
 
 CTR_CMD:=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 CACHE_VOL=go_cache
-
-STATIC_OPTS=
-ifeq ($(DO_STATIC), 0)
-STATIC_OPTS=--ldflags '-extldflags "-static"'
-endif
 
 TAGS="providerless"
 
@@ -44,22 +35,15 @@ GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor="1" \
                    -X github.com/openshift/microshift/pkg/version.buildDate="$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')"
 GO_LD_FLAGS ?=-ldflags "$(GO_LD_EXTRAFLAGS)"
 
-#.PHONY: build_local
-#build_local:
-#	 GOOS=linux GOARCH=amd64 go build $(STATIC_OPTS) $(GO_LD_FLAGS) -tags ${TAGS} -mod vendor  -o _output/bin/microshift cmd/main.go
-#
-#.PHONY: .init
-#.init:
-#	# docker will ignore volume create calls if the volume name already exists, but podman will fail, so ignore errors
-#	-$(CTR_CMD) volume create --label name=microshift-build $(CACHE_VOL)
-#	$(CTR_CMD) build -t $(BUILD_TAG) -f $(BUILD_CFG) ./build
-#
-#.PHONY: build_ctr
-#build_ctr: .init
-#	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) DO_STATIC=$(DO_STATIC)
-#
-#clean:
-#	$(RM) $(GO_BUILD_BINDIR)/microshift
+.PHONY: .init
+.init:
+	# docker will ignore volume create calls if the volume name already exists, but podman will fail, so ignore errors
+	-$(CTR_CMD) volume create --label name=microshift-build $(CACHE_VOL)
+	$(CTR_CMD) build -t $(BUILD_TAG) -f $(BUILD_CFG) ./images
+
+.PHONY: build-containerized
+build-containerized: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG)
 
 .PHONY: vendor
 vendor:
