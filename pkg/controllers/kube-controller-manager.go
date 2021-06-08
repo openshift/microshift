@@ -26,12 +26,12 @@ import (
 func KubeControllerManager(cfg *config.MicroshiftConfig) {
 	command := kubecm.NewControllerManagerCommand()
 	args := []string{
-		"--kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--kubeconfig=" + cfg.DataDir + "/resources/kube-controller-manager/kubeconfig",
 		"--service-account-private-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
 		"--allocate-node-cidrs=true",
 		"--cluster-cidr=" + cfg.Cluster.ClusterCIDR,
-		"--authorization-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
-		"--authentication-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--authorization-kubeconfig=" + cfg.DataDir + "/resources/kube-controller-manager/kubeconfig",
+		"--authentication-kubeconfig=" + cfg.DataDir + "/resources/kube-controller-manager/kubeconfig",
 		"--root-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
 		"--bind-address=127.0.0.1",
 		"--secure-port=10257",

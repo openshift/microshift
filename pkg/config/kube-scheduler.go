@@ -26,7 +26,7 @@ func KubeSchedulerConfig(cfg *MicroshiftConfig) error {
 	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta1
 kind: KubeSchedulerConfiguration
 clientConnection:
-  kubeconfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+  kubeconfig: ` + cfg.DataDir + `/resources/kube-scheduler/kubeconfig
 leaderElection:
   leaderElect: false`)
 
