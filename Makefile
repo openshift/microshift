@@ -10,12 +10,9 @@ DO_STATIC:=1 # default false
 BUILD_CFG:=./images/Dockerfile
 BUILD_TAG:=microshift-build
 SRC_ROOT:=$(shell pwd)
-BIN:=./_output/bin/microshift
 
 CTR_CMD:=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 CACHE_VOL=go_cache
-
-GO_BUILD_PACKAGE := ./cmd/...
 
 STATIC_OPTS=
 ifeq ($(DO_STATIC), 0)
@@ -60,6 +57,9 @@ GO_LD_FLAGS ?=-ldflags "$(GO_LD_EXTRAFLAGS)"
 #.PHONY: build_ctr
 #build_ctr: .init
 #	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) DO_STATIC=$(DO_STATIC)
+#
+#clean:
+#	$(RM) $(GO_BUILD_BINDIR)/microshift
 
 .PHONY: vendor
 vendor:
