@@ -6,6 +6,6 @@ ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
 
 WORKDIR $GOPATH/src/github.com/microshift
 
-RUN yum install gpgme-devel libassuan-devel -y
+RUN yum install gpgme-devel glibc-static libassuan-devel -y
 
 ENTRYPOINT ["make"]
