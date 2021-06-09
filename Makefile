@@ -1,3 +1,7 @@
+# Include openshift build-machinery-go libraries
+include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
+include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
+
 BUILD_CFG :=./images/Dockerfile
 BUILD_TAG :=microshift-build
 SRC_ROOT :=$(shell pwd)
@@ -18,21 +22,18 @@ GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/client-go/pkg/version.gitCommit=5feb30e1bd3620 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ') \
-                   $(GO_EXT_LD_FLAGS)
+                   $(GO_EXT_LD_FLAGS) \
+                   -s -w
 
 # These tags make sure we can statically link and avoid shared dependencies
-GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless'
-GO_BUILD_FLAGS_DARWIN :=-tags 'include_gcs include_oss containers_image_openpgp providerless'
-GO_BUILD_FLAGS_WINDOWS :=-tags 'include_gcs include_oss containers_image_openpgp providerless'
-GO_BUILD_FLAGS_LINUX_CROSS :=-tags 'include_gcs include_oss containers_image_openpgp providerless'
+GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netgo osusergo'
 
 OUTPUT_DIR :=_output
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
-microshift: GO_BUILD_PACKAGES :=./cmd/microshift
-microshift: GO_LD_FLAGS :=$(GO_LD_FLAGS)
-microshift: GO_BUILD_FLAGS :=$(GO_BUILD_FLAGS)
-microshift: build
+# targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
+
+microshift: build-containerized-microshift
 .PHONY: microshift
 
 update: update-generated-completions
@@ -43,28 +44,28 @@ generate-versioninfo:
 .PHONY: generate-versioninfo
 
 cross-build-darwin-amd64:
-	+@GOOS=darwin GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_FLAGS:="$(GO_BUILD_FLAGS_DARWIN)" GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/darwin_amd64
+	+@GOOS=darwin GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/darwin_amd64
 .PHONY: cross-build-darwin-amd64
 
 cross-build-windows-amd64: generate-versioninfo
-	+@GOOS=windows GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_FLAGS:="$(GO_BUILD_FLAGS_WINDOWS)" GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/windows_amd64
+	+@GOOS=windows GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/windows_amd64
 	$(RM) cmd/microshift/microshift.syso
 .PHONY: cross-build-windows-amd64
 
 cross-build-linux-amd64:
-	+@GOOS=linux GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_FLAGS:="$(GO_BUILD_FLAGS_LINUX_CROSS)" GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_amd64
+	+@GOOS=linux GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_amd64
 .PHONY: cross-build-linux-amd64
 
 cross-build-linux-arm64:
-	+@GOOS=linux GOARCH=arm64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_FLAGS:="$(GO_BUILD_FLAGS_LINUX_CROSS)" GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_arm64
+	+@GOOS=linux GOARCH=arm64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_arm64
 .PHONY: cross-build-linux-arm64
 
 cross-build-linux-ppc64le:
-	+@GOOS=linux GOARCH=ppc64le $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_FLAGS:="$(GO_BUILD_FLAGS_LINUX_CROSS)" GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_ppc64le
+	+@GOOS=linux GOARCH=ppc64le $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_ppc64le
 .PHONY: cross-build-linux-ppc64le
 
 cross-build-linux-s390x:
-	+@GOOS=linux GOARCH=s390x $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_FLAGS:="$(GO_BUILD_FLAGS_LINUX_CROSS)" GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_s390x
+	+@GOOS=linux GOARCH=s390x $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_s390x
 .PHONY: cross-build-linux-s390x
 
 cross-build: cross-build-darwin-amd64 cross-build-windows-amd64 cross-build-linux-amd64 cross-build-linux-arm64 cross-build-linux-ppc64le cross-build-linux-s390x
@@ -80,7 +81,7 @@ cross-build: cross-build-darwin-amd64 cross-build-windows-amd64 cross-build-linu
 
 .PHONY: build-containerized-microshift
 build-containerized-microshift: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) microshift
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG)
 
 .PHONY: build-containerized-cross-build-darwin-amd64
 build-containerized-cross-build-darwin-amd64: .init
@@ -121,7 +122,3 @@ clean-cross-build:
 .PHONY: clean-cross-build
 
 clean: clean-cross-build
-
-# Include the library makefile at the end to prevent
-include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
-include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
