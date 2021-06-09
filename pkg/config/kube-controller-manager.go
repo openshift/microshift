@@ -15,17 +15,18 @@ limitations under the License.
 */
 package config
 
+/*
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"text/template"
 )
 
 // KubeControllerManagerConfig creates a config for kube-controller-manager in option --openshift-config
 func KubeControllerManagerConfig(cfg *MicroshiftConfig) error {
-	configTemplate := template.Must(template.New("config").Parse(`
+	data := []byte(`
 apiVersion: kubecontrolplane.config.openshift.io/v1
-kind: KubeControllerManagerConfig  
+kind: KubeControllerManagerConfig
 extendedArguments:
   enable-dynamic-provisioning:
   - "true"
@@ -64,30 +65,9 @@ extendedArguments:
   - "150" # this is a historical values
   kube-api-burst:
   - "300" # this is a historical values
-  `))
-	data := struct {
-		ClientCACert, KubeConfig, ServingCert, ServingKey, ServingClientCert,
-		IngressDomain, EtcdUrl, EtcdCert, EtcdKey, EtcdCA string
-	}{
-		/*
-			ClientCACert:      ,
-			KubeConfig:        ,
-			ServingCert:       ,
-			ServingKey:        ,
-			ServingClientCert: ,
-			IngressDomain:     ,
-			EtcdUrl:           ,
-			EtcdCA:            ,
-			EtcdCert:          ,
-			EtcdKey:           ,
-		*/
-	}
-	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kube-controller-manager/config/config.yaml"), os.FileMode(0755))
-	output, err := os.Create(cfg.DataDir + "/resources/kube-controller-manager/config/config.yaml")
-	if err != nil {
-		return err
-	}
-	defer output.Close()
-
-	return configTemplate.Execute(output, &data)
+  `)
+	path := cfg.DataDir + "/resources/kube-controller-manager/config/config.yaml"
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }
+*/

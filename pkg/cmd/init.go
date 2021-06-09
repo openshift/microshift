@@ -125,12 +125,15 @@ func initServerConfig(cfg *config.MicroshiftConfig) error {
 	if err := config.KubeAPIServerConfig(cfg); err != nil {
 		return err
 	}
-	if err := config.KubeControllerManagerConfig(cfg); err != nil {
-		return err
-	}
+	/*
+		if err := config.KubeControllerManagerConfig(cfg); err != nil {
+			return err
+		}
+	*/
 	if err := config.OpenShiftAPIServerConfig(cfg); err != nil {
 		return err
 	}
+
 	if err := config.OpenShiftControllerManagerConfig(cfg); err != nil {
 		return err
 	}
