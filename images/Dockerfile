@@ -8,4 +8,4 @@ WORKDIR $GOPATH/src/github.com/microshift
 
 RUN yum install gpgme-devel libassuan-devel -y
 
-ENTRYPOINT ["make", "build", "DO_LOCAL=0"]
+ENTRYPOINT ["make"]
