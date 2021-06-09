@@ -1,12 +1,3 @@
-# Include the library makefile
-include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
-include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
-
-DO_STATIC ?=1
-GO_EXT_LD_FLAGS :=
-ifeq ($(DO_STATIC), 0)
-GO_EXT_LD_FLAGS :=-extldflags '-static'
-endif
 BUILD_CFG :=./images/Dockerfile
 BUILD_TAG :=microshift-build
 SRC_ROOT :=$(shell pwd)
@@ -14,36 +5,26 @@ SRC_ROOT :=$(shell pwd)
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 CACHE_VOL =go_cache
 
-TAGS="providerless"
-
-SOURCE_GIT_TAG :=$(shell git describe --long --tags --abbrev=7 --match 'v[0-9]*' || echo 'v0.0.0-unknown')
-SOURCE_GIT_COMMIT ?=$(shell git rev-parse --short "HEAD^{commit}" 2>/dev/null)
-SOURCE_GIT_TREE_STATE ?=$(shell ( ( [ ! -d ".git/" ] || git diff --quiet ) && echo 'clean' ) || echo 'dirty')
-GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor='1' \
-                   -X k8s.io/component-base/version.gitMinor='20' \
-                   -X k8s.io/component-base/version.gitVersion='v1.20.1' \
-                   -X k8s.io/component-base/version.gitCommit='5feb30e1bd3620' \
-                   -X k8s.io/component-base/version.gitTreeState='clean' \
-                   -X k8s.io/component-base/version.buildDate='$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')' \
-                   -X k8s.io/client-go/pkg/version.gitMajor='1' \
-                   -X k8s.io/client-go/pkg/version.gitMinor='20' \
-                   -X k8s.io/client-go/pkg/version.gitVersion='v1.20.1' \
-                   -X k8s.io/client-go/pkg/version.gitCommit='5feb30e1bd3620' \
-                   -X k8s.io/client-go/pkg/version.gitTreeState='clean' \
-                   -X k8s.io/client-go/pkg/version.buildDate='$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')' \
-                   -X github.com/openshift/microshift/pkg/version.majorFromGit='4' \
-                   -X github.com/openshift/microshift/pkg/version.minorFromGit='7' \
-                   -X github.com/openshift/microshift/pkg/version.versionFromGit='$(SOURCE_GIT_TAG)' \
-                   -X github.com/openshift/microshift/pkg/version.commitFromGit='$(SOURCE_GIT_COMMIT)' \
-                   -X github.com/openshift/microshift/pkg/version.gitTreeState='$(SOURCE_GIT_TREE_STATE)' \
-                   -X github.com/openshift/microshift/pkg/version.buildDate='$(shell date -u +\'%Y-%m-%dT%H:%M:%SZ\')'
-GO_LD_FLAGS :=-ldflags "$(GO_LD_EXTRAFLAGS) $(GO_EXT_LD_FLAGS)"
+GO_EXT_LD_FLAGS :=-extldflags '-static'
+GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor=1 \
+                   -X k8s.io/component-base/version.gitMinor=20 \
+                   -X k8s.io/component-base/version.gitVersion=v1.20.1 \
+                   -X k8s.io/component-base/version.gitCommit=5feb30e1bd3620 \
+                   -X k8s.io/component-base/version.gitTreeState=clean \
+                   -X k8s.io/component-base/version.buildDate=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ') \
+                   -X k8s.io/client-go/pkg/version.gitMajor=1 \
+                   -X k8s.io/client-go/pkg/version.gitMinor=20 \
+                   -X k8s.io/client-go/pkg/version.gitVersion=v1.20.1 \
+                   -X k8s.io/client-go/pkg/version.gitCommit=5feb30e1bd3620 \
+                   -X k8s.io/client-go/pkg/version.gitTreeState=clean \
+                   -X k8s.io/client-go/pkg/version.buildDate=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ') \
+                   $(GO_EXT_LD_FLAGS)
 
 # These tags make sure we can statically link and avoid shared dependencies
-GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi'
-GO_BUILD_FLAGS_DARWIN :=-tags 'include_gcs include_oss containers_image_openpgp'
-GO_BUILD_FLAGS_WINDOWS :=-tags 'include_gcs include_oss containers_image_openpgp'
-GO_BUILD_FLAGS_LINUX_CROSS :=-tags 'include_gcs include_oss containers_image_openpgp'
+GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless'
+GO_BUILD_FLAGS_DARWIN :=-tags 'include_gcs include_oss containers_image_openpgp providerless'
+GO_BUILD_FLAGS_WINDOWS :=-tags 'include_gcs include_oss containers_image_openpgp providerless'
+GO_BUILD_FLAGS_LINUX_CROSS :=-tags 'include_gcs include_oss containers_image_openpgp providerless'
 
 OUTPUT_DIR :=_output
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
@@ -89,6 +70,50 @@ cross-build-linux-s390x:
 cross-build: cross-build-darwin-amd64 cross-build-windows-amd64 cross-build-linux-amd64 cross-build-linux-arm64 cross-build-linux-ppc64le cross-build-linux-s390x
 .PHONY: cross-build
 
+# Containerized build targets
+
+.PHONY: .init
+.init:
+	# docker will ignore volume create calls if the volume name already exists, but podman will fail, so ignore errors
+	-$(CTR_CMD) volume create --label name=microshift-build $(CACHE_VOL)
+	$(CTR_CMD) build -t $(BUILD_TAG) -f $(BUILD_CFG) ./images
+
+.PHONY: build-containerized-microshift
+build-containerized-microshift: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) microshift
+
+.PHONY: build-containerized-cross-build-darwin-amd64
+build-containerized-cross-build-darwin-amd64: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-darwin-amd64:
+
+.PHONY: build-containerized-cross-build-windows-amd64
+build-containerized-cross-build-windows-amd64: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-windows-amd64
+
+.PHONY: build-containerized-cross-build-linux-amd64
+build-containerized-cross-build-linux-amd64: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-linux-amd64
+
+.PHONY: build-containerized-cross-build-linux-arm64
+build-containerized-cross-build-linux-arm64: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-linux-arm64
+
+.PHONY: build-containerized-cross-build-linux-ppc64le
+build-containerized-cross-build-linux-ppc64le: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-linux-ppc64le
+
+.PHONY: build-containerized-cross-build-linux-s390x
+build-containerized-cross-build-linux-s390x: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-linux-s390x
+
+.PHONY: build-containerized-cross-build
+build-containerized-cross-build: .init
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build
+
+.PHONY: vendor
+vendor:
+	./hack/vendoring.sh
+
 clean-cross-build:
 	$(RM) -r '$(CROSS_BUILD_BINDIR)'
 	$(RM) cmd/microshift/microshift.syso
@@ -97,17 +122,6 @@ clean-cross-build:
 
 clean: clean-cross-build
 
-.PHONY: .init
-.init:
-	# docker will ignore volume create calls if the volume name already exists, but podman will fail, so ignore errors
-	-$(CTR_CMD) volume create --label name=microshift-build $(CACHE_VOL)
-	$(CTR_CMD) build -t $(BUILD_TAG) -f $(BUILD_CFG) ./images
-
-.PHONY: build-containerized
-build-containerized: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) DO_STATIC=$(DO_STATIC) microshift
-
-.PHONY: vendor
-vendor:
-	./hack/vendoring.sh
-
+# Include the library makefile at the end to prevent
+include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
+include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
