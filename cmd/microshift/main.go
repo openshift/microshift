@@ -22,6 +22,7 @@ func main() {
 
 	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 	pflag.CommandLine.MarkHidden("log-flush-frequency")
+	pflag.CommandLine.MarkHidden("version")
 
 	logs.InitLogs()
 	defer logs.FlushLogs()
