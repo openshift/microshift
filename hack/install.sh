@@ -26,18 +26,27 @@ apply_selinux_policy() {
 
 install_dependencies() {
     dnf install -y \
-#    policycoreutils-python-utils \
+    policycoreutils-python-utils \
+    conntrack \
     iptables-services
 }
 
 install_crio() {
     if [ "$DISTRO" == "fedora" ]; then
-        dnf module enable cri-o:1.20 -y
+        dnf module -y enable cri-o:1.20
+        dnf install -y cri-o cri-tools
+    fi
+    if [ "$DISTRO" == "rhel" ]; then
         dnf install cri-o cri-tools -y
-    else [ "$DISTRO" == "rhel" ]
-        dnf install cri-o cri-tools -y
+    else [ "$DISTRO" == "centos" ]
+        VERSION=1.20
+        OS=CentOS_8_Stream
+        curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/devel:kubic:libcontainers:stable.repo
+        curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/$OS/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo
+        dnf install -y cri-o cri-tools
     fi
 }
+
 
 
 crio_conf() {
@@ -68,7 +77,7 @@ if [ $DISTRO = "rhel" ]; then
 fi
 install_dependencies
 install_crio
-#crio_conf
+crio_conf
 verify_crio
 get_kubectl
 
