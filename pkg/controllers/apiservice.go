@@ -104,7 +104,7 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig) error {
 		for _, sub := range k8s_endpoints.Subsets {
 			addr := sub.Addresses
 			ports := []corev1.EndpointPort{
-				corev1.EndpointPort{
+				{
 					Port: 8444, // ocp apiserver port
 				},
 			}
