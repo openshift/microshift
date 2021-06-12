@@ -62,11 +62,11 @@ type MicroshiftConfig struct {
 func NewMicroshiftConfig() *MicroshiftConfig {
 	hostName, err := os.Hostname()
 	if err != nil {
-		logrus.Fatal("failed to get hostname: %v", err)
+		logrus.Fatalf("failed to get hostname: %v", err)
 	}
 	hostIP, err := util.GetHostIP()
 	if err != nil {
-		logrus.Fatal("failed to get host IP: %v", err)
+		logrus.Fatalf("failed to get host IP: %v", err)
 	}
 
 	return &MicroshiftConfig{
