@@ -171,7 +171,7 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 		_, err = client.APIServices().Get(context.TODO(), api.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			logrus.Infof("creating api registration %s", api.Name)
-			_, err = client.APIServices().Create(context.TODO(), api, metav1.CreateOptions{})
+			_, _ = client.APIServices().Create(context.TODO(), api, metav1.CreateOptions{})
 		}
 	}
 	return nil

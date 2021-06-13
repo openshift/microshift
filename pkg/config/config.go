@@ -27,36 +27,32 @@ var (
 	validRoles   = []string{"controlplane", "node"}
 )
 
-// config
 type ClusterConfig struct {
 	URL string `yaml:"url"`
 
-	ClusterCIDR string
-	ServiceCIDR string
-	DNS         string
-	BaseDomain  string
+	ClusterCIDR string `yaml:"clusterCIDR"`
+	ServiceCIDR string `yaml:"serviceCIDR"`
+	DNS         string `yaml:"dns"`
+	Domain      string `yaml:"domain"`
 }
 
-// config specific to a control plane instance
 type ControlPlaneConfig struct {
 	// Token string `yaml:"token", envconfig:"CONTROLPLANE_TOKEN"`
 }
 
-// config specific to a node instance
 type NodeConfig struct {
 	// Token string `yaml:"token", envconfig:"NODE_TOKEN"`
 }
 
 type MicroshiftConfig struct {
-	// config specific to this Microshift instance
 	ConfigFile string
 	DataDir    string `yaml:"dataDir"`
 	LogDir     string `yaml:"logDir"`
 
 	Roles []string `yaml:"roles"`
 
-	HostName string `yaml:"hostName"`
-	HostIP   string `yaml:"hostIP"`
+	HostName string `yaml:"nodeName"`
+	HostIP   string `yaml:"nodeIP"`
 
 	Cluster      ClusterConfig      `yaml:"cluster"`
 	ControlPlane ControlPlaneConfig `yaml:"controlPlane"`
@@ -85,7 +81,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			ClusterCIDR: "10.42.0.0/16",
 			ServiceCIDR: "10.43.0.0/16",
 			DNS:         "10.43.0.10",
-			BaseDomain:  "cluster.local",
+			Domain:      "cluster.local",
 		},
 		ControlPlane: ControlPlaneConfig{},
 		Node:         NodeConfig{},
