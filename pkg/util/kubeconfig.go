@@ -22,7 +22,7 @@ import (
 )
 
 // Kubeconfig creates a kubeconfig
-func Kubeconfig(path, common string, svcName []string) error {
+func Kubeconfig(path, common string, svcName []string, clusterURL string) error {
 	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
 apiVersion: v1
 kind: Config
@@ -36,7 +36,7 @@ contexts:
   name: microshift
 clusters:
 - cluster:
-    server: https://127.0.0.1:6443
+    server: {{.ClusterURL}}
     certificate-authority-data: {{.ClusterCA}}
   name: microshift
 users:
@@ -53,10 +53,12 @@ users:
 	clientCert := Base64(certBuff)
 	clientKey := Base64(keyBuff)
 	data := struct {
+		ClusterURL string
 		ClusterCA  string
 		ClientCert string
 		ClientKey  string
 	}{
+		ClusterURL: clusterURL,
 		ClusterCA:  clusterCA,
 		ClientCert: clientCert,
 		ClientKey:  clientKey,

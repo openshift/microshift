@@ -38,7 +38,7 @@ cgroupRoot: /
 failSwapOn: false
 clusterDNS:
   - ` + cfg.Cluster.DNS + `
-clusterDomain: ` + cfg.Cluster.BaseDomain + `
+clusterDomain: ` + cfg.Cluster.Domain + `
 containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50
@@ -95,7 +95,7 @@ apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 clientConnection:
   kubeconfig: ` + cfg.DataDir + `/resources/kube-proxy/kubeconfig
-hostnameOverride: 127.0.0.1
+hostnameOverride: ` + cfg.HostName + `
 clusterCIDR: ` + cfg.Cluster.ClusterCIDR + `
 mode: "iptables"
 iptables:

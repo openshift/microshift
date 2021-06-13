@@ -157,23 +157,23 @@ func initNodeConfig(cfg *config.MicroshiftConfig) error {
 }
 
 func initKubeconfig(cfg *config.MicroshiftConfig) error {
-	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubeadmin/kubeconfig", "system:admin", []string{"system:masters"}); err != nil {
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubeadmin/kubeconfig", "system:admin", []string{"system:masters"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-apiserver/kubeconfig", "kube-apiserver", []string{"kube-apiserver", "system:kube-apiserver", "system:masters"}); err != nil {
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-apiserver/kubeconfig", "kube-apiserver", []string{"kube-apiserver", "system:kube-apiserver", "system:masters"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-controller-manager/kubeconfig", "system:kube-controller-manager", []string{"system:kube-controller-manager"}); err != nil {
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-controller-manager/kubeconfig", "system:kube-controller-manager", []string{"system:kube-controller-manager"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-scheduler/kubeconfig", "system:kube-scheduler", []string{"system:kube-scheduler"}); err != nil {
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-scheduler/kubeconfig", "system:kube-scheduler", []string{"system:kube-scheduler"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
 	// per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
-	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubelet/kubeconfig", "system:node:"+cfg.HostName, []string{"system:nodes"}); err != nil {
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubelet/kubeconfig", "system:node:"+cfg.HostName, []string{"system:nodes"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-proxy/kubeconfig", "system:kube-proxy", []string{"system:nodes"}); err != nil {
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-proxy/kubeconfig", "system:kube-proxy", []string{"system:nodes"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
 	return nil
