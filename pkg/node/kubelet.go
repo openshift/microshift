@@ -53,7 +53,6 @@ func StartKubeProxy(cfg *config.MicroshiftConfig) error {
 	command := kubeproxy.NewProxyCommand()
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-proxy/config/config.yaml",
-		"--master=https://127.0.0.1:6443",
 	}
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)

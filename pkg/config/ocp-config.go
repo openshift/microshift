@@ -102,7 +102,7 @@ imagePolicyConfig:
 projectConfig:
   projectRequestMessage: ''
 routingConfig:
-  subdomain: ` + cfg.Cluster.BaseDomain + `
+  subdomain: ` + cfg.Cluster.Domain + `
 servingInfo:
   bindAddress: "0.0.0.0:8444"
   certFile: ` + cfg.DataDir + `/resources/ocp-apiserver/secrets/tls.crt
