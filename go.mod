@@ -6,7 +6,7 @@ replace (
 	github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 	github.com/docker/docker => github.com/docker/docker v17.12.0-ce-rc1.0.20200916142827-bd33bbf0497b+incompatible
 	github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
-	github.com/google/cadvisor => github.com/google/cadvisor v0.38.5
+	github.com/google/cadvisor => github.com/google/cadvisor v0.38.7
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
 	github.com/onsi/ginkgo => github.com/openshift/ginkgo v4.5.0-origin.1+incompatible
 	google.golang.org/genproto => google.golang.org/genproto v0.0.0-20200224152610-e50cd9704f63
