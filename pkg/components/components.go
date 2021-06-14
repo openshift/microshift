@@ -25,7 +25,7 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 	if err := startFlannel(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
-		logrus.Warning("failed to start Flannel: %v", err)
+		logrus.Warningf("failed to start Flannel: %v", err)
 		return err
 	}
 	return nil
