@@ -2,9 +2,10 @@
 include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
 include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
 
-BUILD_CFG :=./images/Dockerfile
-BUILD_TAG :=microshift-build
+BUILD_CFG :=./images/build/Dockerfile
+BUILD_IMAGE :=microshift-builder
 SRC_ROOT :=$(shell pwd)
+DEST_ROOT :=/opt/app-root/src/github.com/redhat-et/microshift
 
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 CACHE_VOL =go_cache
@@ -68,48 +69,49 @@ cross-build-linux-s390x:
 	+@GOOS=linux GOARCH=s390x $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_s390x
 .PHONY: cross-build-linux-s390x
 
-cross-build: cross-build-darwin-amd64 cross-build-windows-amd64 cross-build-linux-amd64 cross-build-linux-arm64 cross-build-linux-ppc64le cross-build-linux-s390x
+# cross-build-windows-amd64 excluded.  current git tag scheme breaks version injection, should be vX.Y.Z
+cross-build: cross-build-darwin-amd64 cross-build-linux-amd64 cross-build-linux-arm64 cross-build-linux-ppc64le cross-build-linux-s390x
 .PHONY: cross-build
 
 # Containerized build targets
-
 .PHONY: .init
 .init:
 	# docker will ignore volume create calls if the volume name already exists, but podman will fail, so ignore errors
 	-$(CTR_CMD) volume create --label name=microshift-build $(CACHE_VOL)
-	$(CTR_CMD) build -t $(BUILD_TAG) -f $(BUILD_CFG) ./images
+	$(CTR_CMD) build -t $(BUILD_IMAGE) -f $(BUILD_CFG) ./images
 
 .PHONY: build-containerized-microshift
+build-containerized-microshift: WHAT=build
 build-containerized-microshift: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG)
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) build
 
 .PHONY: build-containerized-cross-build-darwin-amd64
 build-containerized-cross-build-darwin-amd64: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-darwin-amd64:
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build-darwin-amd64:
 
 .PHONY: build-containerized-cross-build-windows-amd64
 build-containerized-cross-build-windows-amd64: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-windows-amd64
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build-windows-amd64
 
 .PHONY: build-containerized-cross-build-linux-amd64
 build-containerized-cross-build-linux-amd64: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-linux-amd64
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build-linux-amd64
 
 .PHONY: build-containerized-cross-build-linux-arm64
 build-containerized-cross-build-linux-arm64: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-linux-arm64
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build-linux-arm64
 
 .PHONY: build-containerized-cross-build-linux-ppc64le
 build-containerized-cross-build-linux-ppc64le: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-linux-ppc64le
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build-linux-ppc64le
 
 .PHONY: build-containerized-cross-build-linux-s390x
 build-containerized-cross-build-linux-s390x: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build-linux-s390x
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build-linux-s390x
 
 .PHONY: build-containerized-cross-build
 build-containerized-cross-build: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/microshift:z $(BUILD_TAG) cross-build
+	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build
 
 .PHONY: vendor
 vendor:
