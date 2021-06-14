@@ -4,7 +4,7 @@ LABEL name=microshift-build
 
 ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
 
-WORKDIR $GOPATH/src/github.com/microshift
+WORKDIR $GOPATH/src/github.com/redhat-et/microshift
 
 RUN yum install gpgme-devel glibc-static libassuan-devel -y
 
