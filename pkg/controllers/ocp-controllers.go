@@ -16,10 +16,18 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
+	"fmt"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
@@ -61,6 +69,63 @@ func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 	go func() {
 		logrus.Fatalf("ocp apiserver exited: %v", command.Execute())
 	}()
+
+	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+	if err != nil {
+		return err
+	}
+
+	client, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return err
+	}
+
+	err = waitForOCPAPIServer(client, 10*time.Second)
+	if err != nil {
+		logrus.Warningf("Failed to wait for ocp apiserver: %v", err)
+		return nil
+	}
+
+	logrus.Info("ocp apiserver is ready")
+
+	return nil
+}
+
+func waitForOCPAPIServer(client kubernetes.Interface, timeout time.Duration) error {
+	var lastErr error
+
+	err := wait.PollImmediate(time.Second, timeout, func() (bool, error) {
+		for _, apiSvc := range []string{
+			"apps.openshift.io",
+			"authorization.openshift.io",
+			"build.openshift.io",
+			"image.openshift.io",
+			"project.openshift.io",
+			"quota.openshift.io",
+			"route.openshift.io",
+			"security.openshift.io",
+			"template.openshift.io",
+		} {
+			status := 0
+			url := "/apis/" + apiSvc
+			result := client.Discovery().RESTClient().Get().AbsPath(url).Do(context.TODO()).StatusCode(&status)
+			if result.Error() != nil {
+				lastErr = fmt.Errorf("failed to get apiserver %s status: %v", url, result.Error())
+				return false, nil
+			}
+			if status != http.StatusOK {
+				content, _ := result.Raw()
+				lastErr = fmt.Errorf("APIServer isn't available: %v", string(content))
+				logrus.Warningf("APIServer isn't available yet: %v. Waiting a little while.", string(content))
+				return false, nil
+			}
+		}
+		return true, nil
+	})
+
+	if err != nil {
+		return fmt.Errorf("%v: %v", err, lastErr)
+	}
 
 	return nil
 }
