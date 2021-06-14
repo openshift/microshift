@@ -112,7 +112,7 @@ require (
 	github.com/golang/mock v1.4.1 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/btree v1.0.0 // indirect
-	github.com/google/cadvisor v0.38.6 // indirect
+	github.com/google/cadvisor v0.38.7 // indirect
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/google/uuid v1.1.2 // indirect
@@ -226,7 +226,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.21.0-rc.0
 	k8s.io/apimachinery v0.21.0-rc.0
 	k8s.io/apiserver v0.21.0-rc.0 // indirect
-	k8s.io/cli-runtime v0.20.4 // indirect
+	k8s.io/cli-runtime v0.20.4
 	k8s.io/client-go v0.21.0-rc.0
 	k8s.io/cloud-provider v0.20.4 // indirect
 	k8s.io/cluster-bootstrap v0.0.0 // indirect
@@ -244,7 +244,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20201113171705-d219536bb9fd // indirect
 	k8s.io/kube-proxy v0.0.0 // indirect
 	k8s.io/kube-scheduler v0.0.0 // indirect
-	k8s.io/kubectl v0.20.4 // indirect
+	k8s.io/kubectl v0.20.4
 	k8s.io/kubelet v0.0.0 // indirect
 	k8s.io/kubernetes v1.21.0-rc.0
 	k8s.io/legacy-cloud-providers v0.0.0 // indirect
@@ -254,5 +254,5 @@ require (
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.14 // indirect
 	sigs.k8s.io/kustomize v2.0.3+incompatible // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.0.2 // indirect
-	sigs.k8s.io/yaml v1.2.0 // indirect
+	sigs.k8s.io/yaml v1.2.0
 )
