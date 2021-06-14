@@ -1,3 +1,4 @@
-microshift
+_output/*
+/microshift
 .idea/
 .vscode/
