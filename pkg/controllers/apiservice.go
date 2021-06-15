@@ -146,7 +146,7 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 		"v1.quota.openshift.io",
 		"v1.route.openshift.io",
 		"v1.security.openshift.io",
-		"v1.template.openshift.io",
+		"v1.template.openshift.io", //TODO missing templateinstances
 	} {
 		api := &apiregistrationv1.APIService{
 			TypeMeta: metav1.TypeMeta{
