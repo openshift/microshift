@@ -105,7 +105,7 @@ Description=Microshift
 
 [Service]
 WorkingDirectory=/usr/local/bin/
-ExecStart=microshift run --roles="$ROLES"
+ExecStart=/bin/sh -c 'microshift run --roles="$ROLES"'
 Restart=always
 User=root
 
