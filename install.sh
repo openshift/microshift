@@ -2,13 +2,8 @@
 set -e
 
 # Usage:
-# ENV_VAR= ./install.sh
-#
-# Environment variables:
-#
-# - MICROSHIFT_ROLES="controlplane,node"
-#   Option by default, but controlplane role can be run standalone.
-export MICROSHIFT_ROLES="controlplane,node"
+# ./install.sh
+
 VERSION=v0.2
 
 # Function to get Linux distribution
