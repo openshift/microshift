@@ -104,7 +104,7 @@ func waitForOCPAPIServer(client kubernetes.Interface, timeout time.Duration) err
 			"quota.openshift.io",
 			"route.openshift.io",
 			"security.openshift.io",
-			"template.openshift.io",
+			"template.openshift.io", //TODO missing templateinstances
 		} {
 			status := 0
 			url := "/apis/" + apiSvc
