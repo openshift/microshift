@@ -6,9 +6,9 @@ set -e
 #
 # Environment variables:
 #
-# - ROLES="controlplane,node"
+# - MICROSHIFT_ROLES="controlplane,node"
 #   Option by default, but controlplane role can be run standalone.
-ROLES="controlplane,node"
+export MICROSHIFT_ROLES="controlplane,node"
 VERSION=v0.2
 
 # Function to get Linux distribution
@@ -105,7 +105,7 @@ Description=Microshift
 
 [Service]
 WorkingDirectory=/usr/local/bin/
-ExecStart=/bin/sh -c 'microshift run --roles="$ROLES"'
+ExecStart=microshift run
 Restart=always
 User=root
 
