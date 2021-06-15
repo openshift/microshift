@@ -95,7 +95,7 @@ get_microshift() {
 
     apply_selinux_policy
 
-    cat << EOF | sudo tee -a /usr/lib/systemd/system/microshift.service
+    cat << EOF | sudo tee /usr/lib/systemd/system/microshift.service
 [Unit]
 Description=Microshift
 
