@@ -40,19 +40,22 @@ install_dependencies() {
 
 # Install CRI-O depending on the distro
 install_crio() {
-    if [ "$DISTRO" == "fedora" ]; then
+    case $DISTRO in
+      "fedora")
         sudo dnf module -y enable cri-o:1.20
         sudo dnf install -y cri-o cri-tools
-    fi
-    if [ "$DISTRO" == "rhel" ]; then
+      ;;
+      "rhel")
         sudo dnf install cri-o cri-tools -y
-    else [ "$DISTRO" == "centos" ]
+      ;;
+      "centos")
         CRIOVERSION=1.20
         OS=CentOS_8_Stream
         sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/devel:kubic:libcontainers:stable.repo
         sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION/$OS/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.repo
         sudo dnf install -y cri-o cri-tools
-    fi
+      ;;
+    esac
 }
 
 
