@@ -20,6 +20,8 @@ import (
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
+	BAD CODE LINE
+
 	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 	pflag.CommandLine.MarkHidden("log-flush-frequency")
 	pflag.CommandLine.MarkHidden("version")
