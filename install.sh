@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -e -o pipefail
 
 # Usage:
 # ./install.sh
@@ -9,6 +9,12 @@ VERSION=v0.2
 # Function to get Linux distribution
 get_distro() {
     DISTRO=$(egrep '^(ID)=' /etc/os-release| sed 's/"//g' | cut -f2 -d"=")
+    if [[ $DISTRO != @(rhel|fedora|centos) ]]
+    then
+      echo "This Linux distro is not supported by the install script"
+      exit 1
+    fi
+
 }
 
 # Function to get system architecture
@@ -120,9 +126,11 @@ EOF
 
 # Locate kubeadmin configuration to default kubeconfig location
 prepare_kubeconfig() {
-    mkdir $HOME/.kube
-    sudo cp /var/lib/microshift/resources/kubeadmin/kubeconfig $HOME/.kube/config
-    sudo chown $USER:$USER $HOME/.kube/config
+    mkdir -p $HOME/.kube
+    if [ -f $HOME/.kube/config ]; then
+        mv $HOME/.kube/config $HOME/.kube/config.orig
+    fi
+    sudo KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig:$HOME/.kube/config.orig  kubectl config view --flatten > $HOME/.kube/config
 }
 
 
