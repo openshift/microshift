@@ -40,15 +40,15 @@ rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 
 ## Developing Microshift
 ### Building
-You can locally build Microshift using one of two methods, either directly on the host by installing the build-time dependencies:
+You can locally build Microshift using one of two methods, either using a container build (recommended) on Podman or Docker:
+```
+make microshift
+```
+
+or directly on the host after installing the build-time dependencies
 ```
 sudo dnf install -y glibc-static
 make
-```
-
-or using a container build (running on Podman or Docker):
-```
-make microshift
 ```
 
 ### Running
