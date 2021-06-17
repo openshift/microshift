@@ -4,3 +4,4 @@ metadata:
   name: kubevirt-hostpath-provisioner
 provisioner: kubevirt.io/hostpath-provisioner
 reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer

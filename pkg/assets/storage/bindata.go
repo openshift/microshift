@@ -59,7 +59,8 @@ kind: StorageClass
 metadata:
   name: kubevirt-hostpath-provisioner
 provisioner: kubevirt.io/hostpath-provisioner
-reclaimPolicy: Delete`)
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer`)
 
 func assetsStorage0000_80_hostpathProvisionerStorageclassYamlBytes() ([]byte, error) {
 	return _assetsStorage0000_80_hostpathProvisionerStorageclassYaml, nil
