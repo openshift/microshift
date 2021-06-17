@@ -24,11 +24,12 @@ register_subs() {
 
 # Apply SElinux policies
 apply_selinux_policy() {
-    sudo semanage fcontext -a -t container_runtime_exec_t /usr/local/bin/microshift ||
-      sudo semanage fcontext -m -t container_runtime_exec_t /usr/local/bin/microshift
-    sudo mkdir -p /var/lib/kubelet/
-    sudo chcon -R -t container_file_t /var/lib/kubelet/
-    sudo chcon -R system_u:object_r:bin_t:s0 /usr/local/bin/microshift
+    # sudo semanage fcontext -a -t container_runtime_exec_t /usr/local/bin/microshift ||
+    #   sudo semanage fcontext -m -t container_runtime_exec_t /usr/local/bin/microshift
+    # sudo mkdir -p /var/lib/kubelet/
+    # sudo chcon -R -t container_file_t /var/lib/kubelet/
+    # sudo chcon -R system_u:object_r:bin_t:s0 /usr/local/bin/microshift
+    sudo setenforce 0
 }
 
 # Install dependencies
