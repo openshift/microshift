@@ -1,5 +1,5 @@
 # Microshift
-Microshift (aka "µShift") is OpenShift<sup>1</sup> Kubernetes in a small form factor and optimized for edge computing.
+Microshift is OpenShift<sup>1</sup> Kubernetes in a small form factor and optimized for edge computing.
 
 Edge devices deployed out in the field pose very different operational, environmental, and business challenges from those of cloud computing. These motivate different engineering trade-offs for Kubernetes at the far edge than for cloud or near-edge scenarios. Microshift's design goals cater to this:
 
@@ -16,15 +16,20 @@ We believe these properties should also make Microshift a great tool for other u
 <sup>1) more precisely [OKD](https://www.okd.io/), the Kubernetes distribution by the OpenShift community</sup>
 
 ## Using Microshift
-To give Microshift a try, simply install a recent test version (we don't provide stable releases yet) using:
+To give Microshift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
 ```
 curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh | sh -
 ```
 
 This will install Microshift's dependencies (CRI-O), install it as a systemd service and start it.
 
-For convenience, the script copies the kubeconfig to $HOME/.kube/config, too, so after installation you should be able to access your cluster directly:
+For convenience, the script will also add a new "microshift" context to your `$HOME/.kube/config`, so you'll be able to access your cluster using, e.g.:
 ```
+kubectl get all -A --context microshift
+```
+or
+```
+kubectl config use-context microshift
 kubectl get all -A
 ```
 
