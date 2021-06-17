@@ -21,8 +21,6 @@ apiVersion: v1
 metadata:
   name: kube-1-hpp-claim
   namespace: test-pv
-  annotations: 
-    kubevirt.io/provisionOnNode: "${NODE_NAME}"
 spec:
   storageClassName: "kubevirt-hostpath-provisioner"
   accessModes:
@@ -48,8 +46,6 @@ spec:
     volumeMounts:
       - name: hostpath-pvc
         mountPath: "/mnt"
-  nodeSelector:
-        kubernetes.io/hostname: "${NODE_NAME}"
   restartPolicy: "Never"
   volumes:
     - name: hostpath-pvc
