@@ -1,0 +1,11 @@
+[Unit]
+Description=Microshift
+
+[Service]
+WorkingDirectory=/usr/local/bin/
+ExecStart=/usr/local/bin/microshift run
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
