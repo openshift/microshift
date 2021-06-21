@@ -29,7 +29,7 @@ GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor=1 \
 # These tags make sure we can statically link and avoid shared dependencies
 GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netgo osusergo'
 
-OUTPUT_DIR :=_output
+OUTPUT_DIR :=$(shell pwd)/_output
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
 # targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
@@ -81,9 +81,10 @@ cross-build: cross-build-darwin-amd64 cross-build-linux-amd64 cross-build-linux-
 	$(CTR_CMD) build -t $(BUILD_IMAGE) -f $(BUILD_CFG) ./images
 
 .PHONY: build-containerized-microshift
-build-containerized-microshift: WHAT=build
-build-containerized-microshift: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) build
+build-containerized-microshift:
+	$(CTR_CMD) build -t microshift -f $(BUILD_CFG) .
+	mkdir -p $(CROSS_BUILD_BINDIR)/linux_amd64
+	$(CTR_CMD) cp $(shell $(CTR_CMD) create --rm microshift):/usr/bin/microshift $(CROSS_BUILD_BINDIR)/linux_amd64/microshift
 
 .PHONY: build-containerized-cross-build-darwin-amd64
 build-containerized-cross-build-darwin-amd64: .init
