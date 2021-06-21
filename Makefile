@@ -44,6 +44,15 @@ generate-versioninfo:
 	SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) hack/generate-versioninfo.sh
 .PHONY: generate-versioninfo
 
+cross-build-darwin-amd64:
+	+@GOOS=darwin GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/darwin_amd64
+.PHONY: cross-build-darwin-amd64
+
+cross-build-windows-amd64: generate-versioninfo
+	+@GOOS=windows GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/windows_amd64
+	$(RM) cmd/microshift/microshift.syso
+.PHONY: cross-build-windows-amd64
+
 cross-build-linux-amd64:
 	+@GOOS=linux GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_amd64
 .PHONY: cross-build-linux-amd64
@@ -74,7 +83,8 @@ cross-build: cross-build-darwin-amd64 cross-build-linux-amd64 cross-build-linux-
 .PHONY: build-containerized-microshift
 build-containerized-microshift:
 	$(CTR_CMD) build -t microshift -f $(BUILD_CFG) .
-	$(CTR_CMD) cp $(shell $(CTR_CMD) create --rm microshift):/usr/bin/microshift $(SRC_ROOT)/microshift
+	mkdir -p $(OUTPUT_DIR)/linux_amd64
+	$(CTR_CMD) cp $(shell $(CTR_CMD) create --rm microshift):/usr/bin/microshift $(OUPUT_DIR)/linux_amd64/microshift
 
 .PHONY: build-containerized-cross-build-darwin-amd64
 build-containerized-cross-build-darwin-amd64: .init
