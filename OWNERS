@@ -1,4 +1,5 @@
-rootfs
-fzdarsky
-oglok
-copejon
+approvers:
+- rootfs
+- fzdarsky
+- oglok
+- copejon
