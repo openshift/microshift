@@ -4,7 +4,7 @@ set -e -o pipefail
 # Usage:
 # ./install.sh
 
-VERSION=v0.2
+VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | cut -d '"' -f 4)
 
 # Function to get Linux distribution
 get_distro() {
