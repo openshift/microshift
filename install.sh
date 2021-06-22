@@ -131,7 +131,7 @@ prepare_kubeconfig() {
     if [ -f $HOME/.kube/config ]; then
         mv $HOME/.kube/config $HOME/.kube/config.orig
     fi
-    sudo KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig:$HOME/.kube/config.orig  kubectl config view --flatten > $HOME/.kube/config
+    sudo KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig:$HOME/.kube/config.orig  /usr/local/bin/kubectl config view --flatten > $HOME/.kube/config
 }
 
 
