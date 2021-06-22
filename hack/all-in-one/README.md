@@ -43,4 +43,5 @@ Inside the container, run the following to see the pods:
 
 ## Limitation
 
-These instructions are tested on Linux. Mac and Windows are currently not supported. Contributions are welcome.
+These instructions are tested on Linux. 
+On MacOS, running containerized Microshift as non-root is not supported on MacOS. 

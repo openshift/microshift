@@ -43,6 +43,8 @@ containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50
 kubeAPIBurst: 100
+cgroupsPerQOS: false
+enforceNodeAllocatable: []
 rotateCertificates: false  #TODO
 serializeImagePulls: false
 # staticPodPath: /etc/kubernetes/manifests
@@ -103,5 +105,24 @@ iptables:
 featureGates:
    AllAlpha: false`)
 	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kube-proxy/config/config.yaml"), os.FileMode(0755))
-	return ioutil.WriteFile(cfg.DataDir+"/resources/kube-proxy/config/config.yaml", data, 0644)
+	if err := ioutil.WriteFile(cfg.DataDir+"/resources/kube-proxy/config/config.yaml", data, 0644); err != nil {
+		return err
+	}
+	// on certain platforms (e.g. MacOS), writing to /sys/module/nf_conntrack/parameters/hashsize will fail
+	// if so, disable it using the following config
+	data = []byte(`
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+clientConnection:
+  kubeconfig: ` + cfg.DataDir + `/resources/kube-proxy/kubeconfig
+hostnameOverride: ` + cfg.HostName + `
+clusterCIDR: ` + cfg.Cluster.ClusterCIDR + `
+mode: "iptables"
+iptables:
+  masqueradeAll: true
+conntrack:
+  maxPerCore: 0
+featureGates:
+   AllAlpha: false`)
+	return ioutil.WriteFile(cfg.DataDir+"/resources/kube-proxy/config/config-conntrack.yaml", data, 0644)
 }
