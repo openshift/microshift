@@ -70,6 +70,7 @@ install_crio() {
 # CRI-O config to match Microshift networking values
 crio_conf() {
     sudo sed -i 's/10.85.0.0\/16/10.42.0.0\/24/' /etc/cni/net.d/100-crio-bridge.conf
+    sudo sed -i 's/0.3.1/0.4.0/' /etc/cni/net.d/100-crio-bridge.conf
 
      if [ "$DISTRO" == "rhel" ]; then
         sudo sed -i 's|/usr/libexec/crio/conmon|/usr/bin/conmon|' /etc/crio/crio.conf 
