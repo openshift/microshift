@@ -43,6 +43,8 @@ containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50
 kubeAPIBurst: 100
+cgroupsPerQOS: false
+enforceNodeAllocatable: []
 rotateCertificates: false  #TODO
 serializeImagePulls: false
 # staticPodPath: /etc/kubernetes/manifests
@@ -100,6 +102,8 @@ clusterCIDR: ` + cfg.Cluster.ClusterCIDR + `
 mode: "iptables"
 iptables:
   masqueradeAll: true
+conntrack:
+  maxPerCore: 0
 featureGates:
    AllAlpha: false`)
 	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kube-proxy/config/config.yaml"), os.FileMode(0755))

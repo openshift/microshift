@@ -19,7 +19,7 @@ Next, create a container volume:
 The following example binds localhost the container volume to `/var/lib`
 
 ```bash
-#  podman run -d --rm --name ushift --privileged -v /lib/modules:/lib/modules -v ushift-vol:/var/lib -p 6443:6443 ushift  
+#  podman run -d --rm --name ushift --privileged -v /lib/modules:/lib/modules -v ushift-vol:/var/lib --hostname ushift -p 6443:6443 ushift  
 ```
 
 Then you can access the cluster either on the host or inside the container
@@ -43,4 +43,5 @@ Inside the container, run the following to see the pods:
 
 ## Limitation
 
-These instructions are tested on Linux. Mac and Windows are currently not supported. Contributions are welcome.
+These instructions are tested on Linux. 
+On MacOS, running containerized Microshift as non-root is not supported on MacOS. 
