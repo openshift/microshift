@@ -23,6 +23,26 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	}
 
 	flags := cmd.Flags()
+
+	// get the log level
+        flags.StringVar(&logLevel, "log-level", "info", "Set the log level for Microshift (default: info)")
+        if logLevel == "trace" {
+                logrus.SetLevel(logrus.TraceLevel)
+        } else if logLevel == "debug" {
+                logrus.SetLevel(logrus.DebugLevel)
+        } else if logLevel == "warn" {
+                logrus.SetLevel(logrus.WarnLevel)
+        } else if logLevel == "error" {
+                logrus.SetLevel(logrus.ErrorLevel)
+        } else if logLevel == "fatal" {
+                logrus.SetLevel(logrus.FatalLevel)
+        } else if logLevel == "panic" {
+                logrus.SetLevel(logrus.PanicLevel)
+        } else {
+                // default to info
+                logrus.SetLevel(logrus.InfoLevel)
+        }
+
 	// Read the config flag directly into the struct, so it's immediately available.
 	flags.StringVar(&cfg.ConfigFile, "config", cfg.ConfigFile, "File to read configuration from.")
 	cmd.MarkFlagFilename("config", "yaml", "yml")
