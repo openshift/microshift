@@ -43,8 +43,21 @@ install_dependencies() {
     sudo dnf install -y \
     policycoreutils-python-utils \
     conntrack \
-    iptables-services
+    firewalld 
 }
+
+# Establish Iptables rules
+establish_firewall () {
+systemctl enable firewalld --now
+sudo firewall-cmd --zone=public --permanent --add-port=6443/tcp
+sudo firewall-cmd --zone=public --permanent --add-port=30000-32767/tcp
+sudo firewall-cmd --zone=public --permanent --add-port=2379-2380/tcp
+sudo firewall-cmd --zone=public --add-masquerade --permanent
+sudo firewall-cmd --zone=public --add-port=10250/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=10251/tcp --permanent
+sudo firewall-cmd --reload
+}
+
 
 # Install CRI-O depending on the distro
 install_crio() {
@@ -142,6 +155,7 @@ if [ $DISTRO = "rhel" ]; then
     register_subs
 fi
 install_dependencies
+establish_firewall
 install_crio
 crio_conf
 verify_crio
