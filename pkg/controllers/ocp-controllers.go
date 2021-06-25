@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -49,6 +50,7 @@ func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
 
 	return cmd
 }
+
 func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 	stopCh := make(chan struct{})
 	command := newOpenshiftApiServerCommand(stopCh)
@@ -63,7 +65,15 @@ func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 		"--requestheader-group-headers=X-Remote-Group",
 		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
 		"--client-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
+		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
+		"--v=" + strconv.Itoa(cfg.LogVLevel),
+		"--vmodule=" + cfg.LogVModule,
 	}
+	if cfg.LogDir != "" {
+		args = append(args, "--log-dir="+cfg.LogDir)
+	}
+
 	command.SetArgs(args)
 	logrus.Infof("starting openshift-apiserver, args: %v", args)
 	go func() {

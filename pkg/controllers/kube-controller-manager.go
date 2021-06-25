@@ -16,6 +16,9 @@ limitations under the License.
 package controllers
 
 import (
+	"path/filepath"
+	"strconv"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -39,10 +42,18 @@ func KubeControllerManager(cfg *config.MicroshiftConfig) {
 		"--use-service-account-credentials=true",
 		"--cluster-signing-cert-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
 		"--cluster-signing-key-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.key",
+		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
+		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
+		"--v=" + strconv.Itoa(cfg.LogVLevel),
+		"--vmodule=" + cfg.LogVModule,
+	}
+	if cfg.LogDir != "" {
+		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-controller-manager.log"))
 	}
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags: %v", err)
 	}
+	logrus.Infof("starting kube-controller-manager %s, args: %v", cfg.HostIP, args)
 	go func() {
 		command.Run(command, nil)
 		logrus.Fatalf("controller-manager exited")

@@ -16,6 +16,8 @@ limitations under the License.
 package controllers
 
 import (
+	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -33,10 +35,8 @@ func KubeAPIServer(cfg *config.MicroshiftConfig) error {
 	apiArgs := []string{
 		//"--openshift-config=" + cfg.DataDir + "/resources/kube-apiserver/config/config.yaml", //TOOD
 		//"--advertise-address=" + ip,
-		//"-v=3",
 		"--allow-privileged=true",
 		"--anonymous-auth=false",
-		"--audit-log-path=" + cfg.LogDir + "/kube-apiserver/audit.log",
 		"--audit-policy-file=" + cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml",
 		"--api-audiences=https://kubernetes.svc",
 		"--authorization-mode=Node,RBAC",
@@ -49,7 +49,6 @@ func KubeAPIServer(cfg *config.MicroshiftConfig) error {
 		"--etcd-certfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt",
 		"--etcd-keyfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key",
 		"--etcd-servers=https://127.0.0.1:2379",
-		"--insecure-port=0",
 		"--kubelet-certificate-authority=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
 		"--kubelet-client-certificate=" + cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt",
 		"--kubelet-client-key=" + cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key",
@@ -69,9 +68,15 @@ func KubeAPIServer(cfg *config.MicroshiftConfig) error {
 		"--tls-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
 		"--tls-private-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
 		"--cors-allowed-origins=/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$",
-		"--log-file=" + cfg.LogDir + "/kube-apiserver.log",
-		"--logtostderr=false",
-		"-v=3",
+		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
+		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
+		"--v=" + strconv.Itoa(cfg.LogVLevel),
+		"--vmodule=" + cfg.LogVModule,
+	}
+	if cfg.LogDir != "" {
+		apiArgs = append(apiArgs,
+			"--log-file="+filepath.Join(cfg.LogDir, "kube-apiserver.log"),
+			"--audit-log-path="+filepath.Join(cfg.LogDir, "kube-apiserver-audit.log"))
 	}
 	if err := command.ParseFlags(apiArgs); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
