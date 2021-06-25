@@ -36,6 +36,7 @@ apply_selinux_policy() {
     # sudo chcon -R -t container_file_t /var/lib/kubelet/
     # sudo chcon -R system_u:object_r:bin_t:s0 /usr/local/bin/microshift
     sudo setenforce 0
+    sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 }
 
 # Install dependencies
