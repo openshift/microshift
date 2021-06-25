@@ -13,7 +13,7 @@ import (
 
 func NewRunMicroshiftCommand() *cobra.Command {
 	cfg := config.NewMicroshiftConfig()
-
+	var logLevel string
 	cmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run Microshift",
