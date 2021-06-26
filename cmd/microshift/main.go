@@ -8,21 +8,18 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/component-base/logs"
 
 	cmds "github.com/openshift/microshift/pkg/cmd"
+	"github.com/openshift/microshift/pkg/config"
 )
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
-	pflag.CommandLine.MarkHidden("log-flush-frequency")
-	pflag.CommandLine.MarkHidden("version")
+	config.InitGlobalFlags()
 
 	logs.InitLogs()
 	defer logs.FlushLogs()

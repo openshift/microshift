@@ -16,11 +16,10 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/sirupsen/logrus"
-
 	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
+	"github.com/sirupsen/logrus"
 )
 
 func startControllerOnly(cfg *config.MicroshiftConfig) error {

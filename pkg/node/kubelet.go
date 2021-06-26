@@ -16,6 +16,9 @@ limitations under the License.
 package node
 
 import (
+	"path/filepath"
+	"strconv"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -35,7 +38,15 @@ func StartKubelet(cfg *config.MicroshiftConfig) error {
 		"--runtime-cgroups=/system.slice/crio.service",
 		"--node-ip=" + cfg.HostIP,
 		"--volume-plugin-dir=" + cfg.DataDir + "/kubelet-plugins/volume/exec",
+		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
+		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
+		"--v=" + strconv.Itoa(cfg.LogVLevel),
+		"--vmodule=" + cfg.LogVModule,
 	}
+	if cfg.LogDir != "" {
+		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kubelet.log"))
+	}
+
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
 	}
@@ -53,6 +64,13 @@ func StartKubeProxy(cfg *config.MicroshiftConfig) error {
 	command := kubeproxy.NewProxyCommand()
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-proxy/config/config.yaml",
+		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
+		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
+		"--v=" + strconv.Itoa(cfg.LogVLevel),
+		"--vmodule=" + cfg.LogVModule,
+	}
+	if cfg.LogDir != "" {
+		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-proxy.log"))
 	}
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)

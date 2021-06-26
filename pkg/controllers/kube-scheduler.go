@@ -16,6 +16,9 @@ limitations under the License.
 package controllers
 
 import (
+	"path/filepath"
+	"strconv"
+
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/sirupsen/logrus"
 
@@ -26,6 +29,13 @@ func KubeScheduler(cfg *config.MicroshiftConfig) {
 	command := kubescheduler.NewSchedulerCommand()
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-scheduler/config/config.yaml",
+		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
+		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
+		"--v=" + strconv.Itoa(cfg.LogVLevel),
+		"--vmodule=" + cfg.LogVModule,
+	}
+	if cfg.LogDir != "" {
+		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-scheduler.log"))
 	}
 
 	if err := command.ParseFlags(args); err != nil {

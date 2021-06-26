@@ -2,8 +2,10 @@ package config
 
 import (
 	"errors"
+	goflag "flag"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/kelseyhightower/envconfig"
 	homedir "github.com/mitchellh/go-homedir"
@@ -11,15 +13,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
+	cliflag "k8s.io/component-base/cli/flag"
 )
 
 const (
 	defaultUserConfigFile   = "~/.microshift/config.yaml"
 	defaultUserDataDir      = "~/.microshift/data"
-	defaultUserLogDir       = "~/.microshift/log"
 	defaultGlobalConfigFile = "/etc/microshift/config.yaml"
 	defaultGlobalDataDir    = "/var/lib/microshift"
-	defaultGlobalLogDir     = "/var/log"
 )
 
 var (
@@ -47,7 +48,11 @@ type NodeConfig struct {
 type MicroshiftConfig struct {
 	ConfigFile string
 	DataDir    string `yaml:"dataDir"`
-	LogDir     string `yaml:"logDir"`
+
+	LogDir          string `yaml:"logDir"`
+	LogVLevel       int    `yaml:"logVLevel"`
+	LogVModule      string `yaml:"logVModule"`
+	LogAlsotostderr bool   `yaml:"logAlsotostderr"`
 
 	Roles []string `yaml:"roles"`
 
@@ -70,12 +75,15 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 
 	return &MicroshiftConfig{
-		ConfigFile: findConfigFile(),
-		DataDir:    findDataDir(),
-		LogDir:     findLogDir(),
-		Roles:      defaultRoles,
-		HostName:   hostName,
-		HostIP:     hostIP,
+		ConfigFile:      findConfigFile(),
+		DataDir:         findDataDir(),
+		LogDir:          "",
+		LogVLevel:       0,
+		LogVModule:      "",
+		LogAlsotostderr: false,
+		Roles:           defaultRoles,
+		HostName:        hostName,
+		HostIP:          hostIP,
 		Cluster: ClusterConfig{
 			URL:         "https://127.0.0.1:6443",
 			ClusterCIDR: "10.42.0.0/16",
@@ -118,22 +126,6 @@ func findDataDir() string {
 	}
 }
 
-// Returns the default user log dir if the default user _data_ dir exists or the user is non-root.
-// Returns the default global log dir otherwise.
-func findLogDir() string {
-	userDataDir, _ := homedir.Expand(defaultUserDataDir)
-	userLogDir, _ := homedir.Expand(defaultUserLogDir)
-	if _, err := os.Stat(userDataDir); errors.Is(err, os.ErrNotExist) {
-		if os.Geteuid() > 0 {
-			return userLogDir
-		} else {
-			return defaultGlobalLogDir
-		}
-	} else {
-		return userLogDir
-	}
-}
-
 func StringInList(s string, list []string) bool {
 	for _, x := range list {
 		if x == s {
@@ -170,6 +162,18 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if dataDir, err := flags.GetString("data-dir"); err == nil && flags.Changed("data-dir") {
 		c.DataDir = dataDir
 	}
+	if logDir, err := flags.GetString("log-dir"); err == nil && flags.Changed("log-dir") {
+		c.LogDir = logDir
+	}
+	if vLevelFlag := flags.Lookup("v"); vLevelFlag != nil && flags.Changed("v") {
+		c.LogVLevel, _ = strconv.Atoi(vLevelFlag.Value.String())
+	}
+	if vModuleFlag := flags.Lookup("vmodule"); vModuleFlag != nil && flags.Changed("vmodule") {
+		c.LogVModule = vModuleFlag.Value.String()
+	}
+	if alsologtostderr, err := flags.GetBool("alsologtostderr"); err == nil && flags.Changed("alsologtostderr") {
+		c.LogAlsotostderr = alsologtostderr
+	}
 	if roles, err := flags.GetStringSlice("roles"); err == nil && flags.Changed("roles") {
 		c.Roles = roles
 	}
@@ -194,4 +198,19 @@ func (c *MicroshiftConfig) ReadAndValidate(flags *pflag.FlagSet) error {
 	}
 
 	return nil
+}
+
+func InitGlobalFlags() {
+	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
+
+	goflag.CommandLine.VisitAll(func(goflag *goflag.Flag) {
+		if StringInList(goflag.Name, []string{"v", "vmodule", "log_dir", "log_file", "alsologtostderr", "logtostderr"}) {
+			pflag.CommandLine.AddGoFlag(goflag)
+		}
+	})
+
+	pflag.CommandLine.MarkHidden("log-flush-frequency")
+	pflag.CommandLine.MarkHidden("log_file")
+	pflag.CommandLine.MarkHidden("logtostderr")
+	pflag.CommandLine.MarkHidden("version")
 }
