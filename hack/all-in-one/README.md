@@ -43,10 +43,15 @@ kubectl get pods -A -w
 ```
 #### MacOS
 ```bash
-docker cp /var/lib/microshift/resources/kubeadmin/kubeconfig ./kubeconfig
+docker cp ushift:/var/lib/microshift/resources/kubeadmin/kubeconfig ./kubeconfig
 kubectl get pods -A -w --kubeconfig ./kubeconfig
+```
+#### Windows
+```bash
+docker.exe cp ushift:/var/lib/microshift/resources/kubeadmin/kubeconfig .\kubeconfig
+kubectl.exe get pods -A -w --kubeconfig .\kubeconfig
 ```
 ## Limitation
 
-These instructions are tested on Linux. 
+These instructions are tested on Linux, Mac, and Windows. 
 On MacOS, running containerized Microshift as non-root is not supported on MacOS. 
