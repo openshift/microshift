@@ -44,15 +44,6 @@ generate-versioninfo:
 	SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) hack/generate-versioninfo.sh
 .PHONY: generate-versioninfo
 
-cross-build-darwin-amd64:
-	+@GOOS=darwin GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/darwin_amd64
-.PHONY: cross-build-darwin-amd64
-
-cross-build-windows-amd64: generate-versioninfo
-	+@GOOS=windows GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/windows_amd64
-	$(RM) cmd/microshift/microshift.syso
-.PHONY: cross-build-windows-amd64
-
 cross-build-linux-amd64:
 	+@GOOS=linux GOARCH=amd64 $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/linux_amd64
 .PHONY: cross-build-linux-amd64
@@ -70,7 +61,7 @@ cross-build-linux-s390x:
 .PHONY: cross-build-linux-s390x
 
 # cross-build-windows-amd64 excluded.  current git tag scheme breaks version injection, should be vX.Y.Z
-cross-build: cross-build-darwin-amd64 cross-build-linux-amd64 cross-build-linux-arm64 cross-build-linux-ppc64le cross-build-linux-s390x
+cross-build: cross-build-linux-amd64 cross-build-linux-arm64 cross-build-linux-ppc64le cross-build-linux-s390x
 .PHONY: cross-build
 
 # Containerized build targets
@@ -85,14 +76,6 @@ build-containerized-microshift:
 	$(CTR_CMD) build -t microshift -f $(BUILD_CFG) .
 	mkdir -p $(CROSS_BUILD_BINDIR)/linux_amd64
 	$(CTR_CMD) cp $(shell $(CTR_CMD) create --rm microshift):/usr/bin/microshift $(CROSS_BUILD_BINDIR)/linux_amd64/microshift
-
-.PHONY: build-containerized-cross-build-darwin-amd64
-build-containerized-cross-build-darwin-amd64: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build-darwin-amd64:
-
-.PHONY: build-containerized-cross-build-windows-amd64
-build-containerized-cross-build-windows-amd64: .init
-	$(CTR_CMD) run -v $(CACHE_VOL):/mnt/cache -v $(SRC_ROOT):/opt/app-root/src/github.com/redhat-et/microshift:z $(BUILD_IMAGE) cross-build-windows-amd64
 
 .PHONY: build-containerized-cross-build-linux-amd64
 build-containerized-cross-build-linux-amd64: .init
