@@ -13,14 +13,26 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-
-
 set -euo pipefail
+shopt -s expand_aliases
 
-ROOT="$(readlink -f $(dirname ${BASH_SOURCE[0]})/../)"
+########
+# INIT #
+########
+
+ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 OUT_DIR="$ROOT/_output/bin"
+DIGESTS_FILE="$ROOT/scripts/release_data/base_digests"
 RELEASE_BINARY_ARTIFACTS=("$OUT_DIR/linux_amd64/microshift" "$OUT_DIR/linux_arm64/microshift")
 ORG="copejon"
+
+# Generalize container manager cli to podman, since it mirrors docker's interface
+__ctr_mgr_alias=$({ which podman &>/dev/null && echo "podman"; } || { which docker &>/dev/null && echo "docker"; } || echo "")
+alias podman=${__ctr_mgr_alias:?"a container manager (podman || docker) is required as part of the release automation; none found"}
+
+#########
+# FUNCS #
+#########
 
 help() {
   printf 'Microshift: release.sh
@@ -94,7 +106,7 @@ git_create_release() {
 
 }
 
-git_post_artifacts(){
+git_post_artifacts() {
   local asset_dir="$1"
   curl \
     -X POST \
@@ -103,7 +115,7 @@ git_post_artifacts(){
     -d '{"tag_name}'
 }
 
-prepare_release_binaries(){
+prepare_release_binaries() {
   pushd "$ROOT/_output/"
   local asset_dir
   asset_dir=$(mktemp -d -p ./)
@@ -112,19 +124,24 @@ prepare_release_binaries(){
   for bin in "${RELEASE_BINARY_ARTIFACTS[@]}"; do
     arch="$(basename "$(dirname $bin)")"
     cp "$bin" "$asset_dir/microshift-$arch"
-    sha256sum "$asset_dir/microshift-$arch" >> "$checksum_file"
+    sha256sum "$asset_dir/microshift-$arch" >>"$checksum_file"
   done
 
   echo "$asset_dir"
 }
 
-
+build_container_images_artifacts(){
+  local ARCH=(arm64 amd64)
+  for arch in "${ARCH[@]}"; do
+    podman build -t microshift-linux-"$arch"-"$VERSION"
+  done
+}
 
 build_binary_artifacts() {
-    pushd $ROOT
-    make build-containerized-cross-build  || return 1
-    verify_binary_artifacts               || return 1
-    popd
+  pushd "$ROOT"
+  make build-containerized-cross-build || return 1
+  verify_binary_artifacts || return 1
+  popd
 }
 
 debug() {
@@ -137,7 +154,10 @@ debug() {
 ########
 # MAIN #
 ########
-[ $# -eq 0 ] && { help; exit 1; }
+[ $# -eq 0 ] && {
+  help
+  exit 1
+}
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -157,11 +177,11 @@ while [ $# -gt 0 ]; do
     }
     shift 2
     ;;
-  "-d"|"--debug")
+  "-d" | "--debug")
     DEBUG=0
     shift
     ;;
-  "-h"|"--help")
+  "-h" | "--help")
     help && exit
     ;;
   *)
@@ -169,6 +189,8 @@ while [ $# -gt 0 ]; do
     ;;
   esac
 done
+
+printf "Using container manager: %s\n" "$(podman --version)"
 
 [ -z ${TOKEN:-} ] && {
   printf "git auth token not defined"
@@ -185,8 +207,8 @@ API_DATA="$(generate_api_release_request "$VERSION" "$TARGET" "$TARGET" "THIS IS
 
 git_checkout_target "$TARGET"     || exit 1
 build_binary_artifacts            || exit 1
+build_container_images_artifacts  || exit 1
+#release_image
 git_push_tag "$VERSION" "$TARGET" || exit 1
 git_create_release "$API_DATA"    || exit 1
 git_post_artifacts                || exit 1
-#build_multiarch_image
-#release_image
