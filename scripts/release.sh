@@ -19,7 +19,6 @@ shopt -s expand_aliases
 ########
 # INIT #
 ########
-# import generate_version()
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 
 IMAGE_REPO="quay.io/copejon/microshift"
@@ -128,6 +127,7 @@ build_release_image() {
   local arch="${1:-''}"
   local image_digest="${2:-''}"
   local tag="$IMAGE_REPO:$VERSION-$arch"
+  printf "BUILDING CONTAINER IMAGE: %s\n" "$tag"
   podman build \
     -t "$tag" \
     -f "$ROOT"/images/build/Dockerfile \
@@ -142,11 +142,10 @@ extract_release_image_binary() {
   local tag="$1"
   local dest="$2"
   arch_ver=${tag#*:}
-  podman cp "$(podman run -d --entrypoint="bash" "$tag")":/usr/bin/local/microshift "$dest"/microshift-"$arch_ver"
+  podman cp "$(podman create -d --rm --entrypoint="bash" "$tag")":/usr/bin/local/microshift "$dest"/microshift-"$arch_ver"
 }
 
 stage_release_image_binaries() {
-  set -x
   source_tags="$1"
   dest="$(prep_stage_area)"
   for t in $source_tags; do
@@ -157,6 +156,7 @@ stage_release_image_binaries() {
 build_container_images_artifacts() {
   declare -a BUILT_RELEASE_IMAGE_TAGS
   while read ad; do
+    printf "BUILDING TO DIGEST %s\n" "$ad"
     local arch=${ad%=*}
     local digest=${ad##*=}
     BUILT_RELEASE_IMAGE_TAGS+=("$(build_release_image "$arch" "$digest")")
@@ -164,14 +164,20 @@ build_container_images_artifacts() {
   echo "${BUILT_RELEASE_IMAGE_TAGS[@]}"
 }
 
-release_image(){
+generate_container_manifest(){
   local source_tags="$1"
+  local ver="$2"
   local manifest_tag_options=()
   for t in $source_tags; do
-    maniftest_tag_options+=("${}")
+    maniftest_tag_options+=("--amend ${t}")
   done
 
-  podman manifest create
+  podman manifest create "$IMAGE_REPO:$ver" "${manifest_tag_options[@]}"
+}
+
+push_image_manifest(){
+  local tag="$1"
+
 }
 
 debug() {
@@ -192,17 +198,25 @@ debug() {
 while [ $# -gt 0 ]; do
   case "$1" in
   "--target")
-    TARGET="$2"
-    [[ "${TOKEN:=}" =~ ^-+ ]] && {
-      printf "flag $1 expects value"
+    TARGET="${2:-}"
+    [[ "${TOKEN:=}" =~ ^-+ ]] || [[ -z "$TARGET" ]] && {
+      printf "flag $1 requires git commit-ish (branch, tag, hash) value"
       exit 1
     }
     shift 2
     ;;
   "--token")
-    TOKEN="$2"
-    [[ "$TOKEN" =~ ^-+ ]] && {
-      printf "flag $1 expects value"
+    TOKEN="${2:-}"
+    [[ "$TOKEN" =~ ^-+ ]] || [[ -z "$TOKEN" ]] && {
+      printf "flag $1 git release API calls require robot token"
+      exit 1
+    }
+    shift 2
+    ;;
+  "--version")
+    VERSION="${2:-}"
+    [[ "$VERSION" =~ ^-+ ]] || [[ -z "$VERSION" ]] && {
+      printf "flag $1"
       exit 1
     }
     shift 2
@@ -223,16 +237,15 @@ done
 printf "Using container manager: %s\n" "$(podman --version)"
 
 [ -z ${TOKEN:-} ] && {
-  printf "git auth token not defined"
+  printf ""
   exit 1
 }
 [ -z ${TARGET:-} ] && {
-  printf "git commit-ish (branch, tag, hash) target is required"
+  printf ""
   exit 1
 }
 
 # Generate data early for debugging
-VERSION="$(generate_version)"
 API_DATA="$(generate_api_release_request "$VERSION" "$TARGET" "$TARGET" " " true)" # leave body empty for now
 
 [ ${DEBUG:=1} -eq 0 ] && {
