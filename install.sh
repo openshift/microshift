@@ -24,7 +24,7 @@ get_arch() {
 
 # If RHEL, use subscription manager to register
 register_subs() {
-    sudo subscription-manager register --auto-attach
+    sudo subscription-manager register --auto-attach ||
     sudo subscription-manager repos --enable=rhocp-4.7-for-rhel-8-x86_64-rpms
 }
 
