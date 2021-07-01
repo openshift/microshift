@@ -19,8 +19,11 @@ RUN yum install glibc-static -y
 
 COPY . .
 
+RUN make $MAKE_TARGET
+
 RUN make clean $MAKE_TARGET
 
+# Run stage
 # Containerized microshift
 # To start:
 # podman run --privileged --ipc=host --network=host  \
@@ -31,11 +34,6 @@ RUN make clean $MAKE_TARGET
 # -v /etc:/etc \
 # -v /run/containers:/run/containers \
 # -v /var/log:/var/log   microshift
-
-
-# Run stage
-
-
 FROM registry.access.redhat.com/ubi8/ubi@$DIGEST
 
 ARG ARCH=amd64
@@ -44,7 +42,6 @@ RUN microdnf install -y \
       policycoreutils-python-utils \
       iptables && \
     microdnf clean all
-
 COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/_output/bin/linux_$ARCH/microshift /usr/bin/microshift
 
 ENTRYPOINT ["/usr/bin/microshift", "run"]

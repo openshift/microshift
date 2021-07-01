@@ -19,13 +19,17 @@ shopt -s expand_aliases
 ########
 # INIT #
 ########
+# import generate_version()
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
+
+IMAGE_REPO="quay.io/copejon/microshift"
 STAGING_DIR="$ROOT/_output/staging"
 IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/base_digests")"
 
 mkdir -p "$STAGING_DIR"
 
-# Generalize container manager cli to podman, since it mirrors docker's interface
+# Check for a container manager cli (podman || docker), and alias it to "podman", since
+# they implement the same cli interface.
 __ctr_mgr_alias=$({ which podman &>/dev/null && echo "podman"; } || { which docker &>/dev/null && echo "docker"; } || echo "")
 alias podman=${__ctr_mgr_alias:?"a container manager (podman || docker) is required as part of the release automation; none found"}
 
@@ -123,7 +127,7 @@ prep_stage_area() {
 build_release_image() {
   local arch="${1:-''}"
   local image_digest="${2:-''}"
-  local tag="quay.io/microshift/microshift:$VERSION-$arch"
+  local tag="$IMAGE_REPO:$VERSION-$arch"
   podman build \
     -t "$tag" \
     -f "$ROOT"/images/build/Dockerfile \
@@ -160,8 +164,14 @@ build_container_images_artifacts() {
   echo "${BUILT_RELEASE_IMAGE_TAGS[@]}"
 }
 
-build_image_manifest() {
-  echo
+release_image(){
+  local source_tags="$1"
+  local manifest_tag_options=()
+  for t in $source_tags; do
+    maniftest_tag_options+=("${}")
+  done
+
+  podman manifest create
 }
 
 debug() {
@@ -216,6 +226,11 @@ printf "Using container manager: %s\n" "$(podman --version)"
   printf "git auth token not defined"
   exit 1
 }
+[ -z ${TARGET:-} ] && {
+  printf "git commit-ish (branch, tag, hash) target is required"
+  exit 1
+}
+
 # Generate data early for debugging
 VERSION="$(generate_version)"
 API_DATA="$(generate_api_release_request "$VERSION" "$TARGET" "$TARGET" " " true)" # leave body empty for now
@@ -225,10 +240,10 @@ API_DATA="$(generate_api_release_request "$VERSION" "$TARGET" "$TARGET" " " true
   exit 0
 }
 
-built_image_tags="$(build_container_images_artifacts)"  || exit 1
-stage_release_image_binaries "$built_image_tags"        || exit 1
 #git_checkout_target "$TARGET" || exit 1
-##release_image
+release_image_tags="$(build_container_images_artifacts)"  || exit 1
+stage_release_image_binaries "$release_image_tags"        || exit 1
+release_image "$release_image_tags"                       || exit 1
 #git_push_tag "$VERSION" "$TARGET" || exit 1
 #git_create_release "$API_DATA" || exit 1
 #git_post_artifacts || exit 1
