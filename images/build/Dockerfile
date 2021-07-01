@@ -25,13 +25,12 @@ RUN make clean build
 # -v /run/containers:/run/containers \
 # -v /var/log:/var/log   microshift
 
-FROM  registry.access.redhat.com/ubi8/ubi
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
 
-RUN yum install -y \
-    policycoreutils-python-utils \
-    iptables
-
-RUN yum clean all -y
+RUN microdnf install -y \
+      policycoreutils-python-utils \
+      iptables && \
+    microdnf clean all
 
 COPY --from=build /opt/app-root/src/github.com/redhat-et/microshift/microshift /usr/bin/microshift
 
