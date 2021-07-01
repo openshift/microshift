@@ -19,12 +19,11 @@ shopt -s expand_aliases
 ########
 # INIT #
 ########
-
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
-OUT_DIR="$ROOT/_output/bin"
-DIGESTS_FILE="$ROOT/scripts/release_data/base_digests"
-RELEASE_BINARY_ARTIFACTS=("$OUT_DIR/linux_amd64/microshift" "$OUT_DIR/linux_arm64/microshift")
-ORG="copejon"
+STAGING_DIR="$ROOT/_output/staging"
+IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/base_digests")"
+
+mkdir -p "$STAGING_DIR"
 
 # Generalize container manager cli to podman, since it mirrors docker's interface
 __ctr_mgr_alias=$({ which podman &>/dev/null && echo "podman"; } || { which docker &>/dev/null && echo "docker"; } || echo "")
@@ -115,33 +114,54 @@ git_post_artifacts() {
     -d '{"tag_name}'
 }
 
-prepare_release_binaries() {
-  pushd "$ROOT/_output/"
+prep_stage_area() {
   local asset_dir
-  asset_dir=$(mktemp -d -p ./)
-  checksum_file="$asset_dir/release.sha256"
-
-  for bin in "${RELEASE_BINARY_ARTIFACTS[@]}"; do
-    arch="$(basename "$(dirname $bin)")"
-    cp "$bin" "$asset_dir/microshift-$arch"
-    sha256sum "$asset_dir/microshift-$arch" >>"$checksum_file"
-  done
-
+  asset_dir=$(mktemp -d -p "$STAGING_DIR/")
   echo "$asset_dir"
 }
 
-build_container_images_artifacts(){
-  local ARCH=(arm64 amd64)
-  for arch in "${ARCH[@]}"; do
-    podman build -t microshift-linux-"$arch"-"$VERSION"
+# BUILT_RELEASE_IMAGE_TAGS tracks tags from built images for binary extraction later on
+declare -a BUILT_RELEASE_IMAGE_TAGS
+
+build_image() {
+  local arch="${1:-''}"
+  local image_digest="${2:-''}"
+  local tag="quay.io/microshift/microshift:$VERSION-$arch"
+  podman build \
+    -t "$tag" \
+    -f "$ROOT"/images/build/Dockerfile \
+    --build-arg ARCH="$arch" \
+    --build-arg MAKE_TARGET="cross-build-linux-$arch" \
+    --build-arg DIGEST="$image_digest" \
+    .
+  BUILT_RELEASE_IMAGE_TAGS+=("$tag")
+}
+
+
+extract_release_image_binary() {
+  local tag="$1"
+  docker cp $(docker run --rm )
+}
+
+stage_release_image_binaries() {
+  dest="$(prep_stage_area)"
+
+  for t in "${BUILT_RELEASE_IMAGE_TAGS[@]}"; do
+    extract_release_image_binary "$t"
   done
 }
 
-build_binary_artifacts() {
-  pushd "$ROOT"
-  make build-containerized-cross-build || return 1
-  verify_binary_artifacts || return 1
-  popd
+build_container_images_artifacts() {
+  set -x
+  echo "$IMAGE_ARCH_DIGESTS" | while read ad; do
+    local arch=${ad%=*}
+    local digest=${ad##*=}
+    build_image "$arch" "$digest"
+  done
+}
+
+build_image_manifest() {
+  echo
 }
 
 debug() {
@@ -198,17 +218,16 @@ printf "Using container manager: %s\n" "$(podman --version)"
 }
 # Generate data early for debugging
 VERSION="$(generate_version)"
-API_DATA="$(generate_api_release_request "$VERSION" "$TARGET" "$TARGET" "THIS IS THE BODY" true)"
+API_DATA="$(generate_api_release_request "$VERSION" "$TARGET" "$TARGET" " " true)" # leave body empty for now
 
 [ ${DEBUG:=1} -eq 0 ] && {
   debug "$VERSION" "$API_DATA"
   exit 0
 }
-
-git_checkout_target "$TARGET"     || exit 1
-build_binary_artifacts            || exit 1
-build_container_images_artifacts  || exit 1
-#release_image
-git_push_tag "$VERSION" "$TARGET" || exit 1
-git_create_release "$API_DATA"    || exit 1
-git_post_artifacts                || exit 1
+build_container_images_artifacts || exit 1
+stage_release_image_binaries || exit 1
+#git_checkout_target "$TARGET" || exit 1
+##release_image
+#git_push_tag "$VERSION" "$TARGET" || exit 1
+#git_create_release "$API_DATA" || exit 1
+#git_post_artifacts || exit 1
