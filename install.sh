@@ -49,7 +49,7 @@ install_dependencies() {
 
 # Establish Iptables rules
 establish_firewall () {
-systemctl enable firewalld --now
+sudo systemctl enable firewalld --now
 sudo firewall-cmd --zone=public --permanent --add-port=6443/tcp
 sudo firewall-cmd --zone=public --permanent --add-port=30000-32767/tcp
 sudo firewall-cmd --zone=public --permanent --add-port=2379-2380/tcp
