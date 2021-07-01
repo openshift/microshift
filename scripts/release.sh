@@ -78,7 +78,7 @@ generate_api_release_request() {
   }
 
   local release_request=$(printf '{"tag_name": "%s","target_commitish": "%s","name": "%s","body": "%s","draft": false,"prerelease": %s}' "$version" "$target" "$target" "$body" "$is_prerelease")
-  printf "$release_request"
+  echo "$release_request"
 }
 
 git_checkout_target() {
@@ -120,10 +120,7 @@ prep_stage_area() {
   echo "$asset_dir"
 }
 
-# BUILT_RELEASE_IMAGE_TAGS tracks tags from built images for binary extraction later on
-declare -a BUILT_RELEASE_IMAGE_TAGS
-
-build_image() {
+build_release_image() {
   local arch="${1:-''}"
   local image_digest="${2:-''}"
   local tag="quay.io/microshift/microshift:$VERSION-$arch"
@@ -133,31 +130,34 @@ build_image() {
     --build-arg ARCH="$arch" \
     --build-arg MAKE_TARGET="cross-build-linux-$arch" \
     --build-arg DIGEST="$image_digest" \
-    .
-  BUILT_RELEASE_IMAGE_TAGS+=("$tag")
+        . >&2
+  echo "${tag}"
 }
-
 
 extract_release_image_binary() {
   local tag="$1"
-  docker cp $(docker run --rm )
+  local dest="$2"
+  arch_ver=${tag#*:}
+  podman cp "$(podman run -d --entrypoint="bash" "$tag")":/usr/bin/local/microshift "$dest"/microshift-"$arch_ver"
 }
 
 stage_release_image_binaries() {
+  set -x
+  source_tags="$1"
   dest="$(prep_stage_area)"
-
-  for t in "${BUILT_RELEASE_IMAGE_TAGS[@]}"; do
-    extract_release_image_binary "$t"
+  for t in $source_tags; do
+    extract_release_image_binary "$t" "$dest"
   done
 }
 
 build_container_images_artifacts() {
-  set -x
-  echo "$IMAGE_ARCH_DIGESTS" | while read ad; do
+  declare -a BUILT_RELEASE_IMAGE_TAGS
+  while read ad; do
     local arch=${ad%=*}
     local digest=${ad##*=}
-    build_image "$arch" "$digest"
-  done
+    BUILT_RELEASE_IMAGE_TAGS+=("$(build_release_image "$arch" "$digest")")
+  done <<< "$IMAGE_ARCH_DIGESTS"
+  echo "${BUILT_RELEASE_IMAGE_TAGS[@]}"
 }
 
 build_image_manifest() {
@@ -224,8 +224,9 @@ API_DATA="$(generate_api_release_request "$VERSION" "$TARGET" "$TARGET" " " true
   debug "$VERSION" "$API_DATA"
   exit 0
 }
-build_container_images_artifacts || exit 1
-stage_release_image_binaries || exit 1
+
+built_image_tags="$(build_container_images_artifacts)"  || exit 1
+stage_release_image_binaries "$built_image_tags"        || exit 1
 #git_checkout_target "$TARGET" || exit 1
 ##release_image
 #git_push_tag "$VERSION" "$TARGET" || exit 1
