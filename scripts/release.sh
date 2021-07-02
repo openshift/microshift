@@ -16,12 +16,17 @@
 set -euo pipefail
 shopt -s expand_aliases
 
+#trap 'echo "# $BASH_COMMAND"' DEBUG
+set -x
+
 ########
 # INIT #
 ########
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 
-IMAGE_REPO="quay.io/copejon/microshift"
+ORG="copejon"
+
+IMAGE_REPO="quay.io/jcope/microshift"
 STAGING_DIR="$ROOT/_output/staging"
 IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/base_digests")"
 
@@ -41,7 +46,7 @@ help() {
 This script provides some simple automation for cutting new releases of Microshift.
 
 Inputs:
-    --target      (Required) The commit-ish (hash, tag, or branch) to build a release from.
+    --target      (Required) The commit-ish (hash, tag, or branch) to build a release from. Abbreviated commits are NOT permitted.
     --token       (Required) The github application auth token, use to create a github release.
     --debug, -d   Print generated script values for debugging.
     --help, -h    Print this help text.
@@ -54,34 +59,9 @@ Outputs:
 '
 }
 
-generate_version() {
-  local datetime=$(date '+%F-%H%M%S')
-  local version
-  version=$(printf "0.4.7-microshift-%s" "$datetime")
-  printf "$version"
-}
-
 generate_api_release_request() {
-  local version="$1"
-  local target="$2"
-  local body="$3"
-  local is_prerelease="${4:=true}" # (copejon) assume for now that all releases are prerelease, unless otherwise specified
-
-  [ -z "$version" ] && {
-    printf "version not set" >&2
-    return 1
-  }
-  [ -z "$target" ] && {
-    printf "target not set" >&2
-    return 1
-  }
-  [ -z "$body" ] && {
-    printf "body not set" >&2
-    return 1
-  }
-
-  local release_request=$(printf '{"tag_name": "%s","target_commitish": "%s","name": "%s","body": "%s","draft": false,"prerelease": %s}' "$version" "$target" "$target" "$body" "$is_prerelease")
-  echo "$release_request"
+  local is_prerelease="${1:=true}" # (copejon) assume for now that all releases are prerelease, unless otherwise specified
+  printf '{"tag_name": "%s","target_commitish": "%s","name": "%s","prerelease": %s}' "$VERSION" "$TARGET" "$VERSION" "$is_prerelease"
 }
 
 git_checkout_target() {
@@ -90,31 +70,49 @@ git_checkout_target() {
     printf "The working tree is dirty - commit or stash changes before cutting a release!" >&2
     return 1
   }
-  git checkout "$target" || return 1
-}
-
-git_push_tag() {
-  local version="$1"
-  local target="$2"
-  git tag -a "$version" -m "$version" "$target" || return 1
-  git push "$version" --dry-run
+  git checkout "$target"
 }
 
 git_create_release() {
   local data="$1"
-  local access_token="$2"
-  local reponse
-  response=$(curl --data "$data" https://api.github.com/repos/"$ORG"/microshift/releases?access_token=:"$access_token")
+  local response
+  response="$(
+    curl -X POST \
+      -H "Accept: application/vnd.github.v3+json" \
+      -H "Authorization: token $TOKEN" \
+      "https://api.github.com/repos/$ORG/microshift/releases" \
+      -d "${data[@]}"
+  )"
+  local raw_upload_url
+  raw_upload_url="$(echo "$response" | grep "upload_url")"
+  local upload_url
+  upload_url=$(echo "$raw_upload_url" | sed -n 's,.*\(https://uploads.github.com/repos/'$ORG'/microshift/releases/[0-9a-zA-Z]*/assets\).*,\1,p')
+  [ -z "$upload_url" ] && return 1
+  echo "$upload_url"
+}
 
+git_post() {
+  local bin_file="$1"
+  local upload_url="$2"
+  local mime_type
+  mime_type="$(file -b --mime-type "$bin_file")"
+  curl --fail-early \
+    -X POST \
+    -H "Accept: application/vnd.github.v3" \
+    -H "Authorization: token $TOKEN" \
+    -H "Content-Type: $mime_type" \
+    --data-binary @"$bin_file" \
+    "$upload_url"?name="$(basename $bin_file)"
 }
 
 git_post_artifacts() {
   local asset_dir="$1"
-  curl \
-    -X POST \
-    -H "Accept: application/vnd.github.v3+json" \
-    https://api.github.com/repos/"$ORG"/microshift/releases \
-    -d '{"tag_name}'
+  local upload_url="$2"
+  local files
+  files="$(ls "$asset_dir")"
+  for f in $files; do
+    git_post "$asset_dir/$f" "$upload_url"
+  done
 }
 
 prep_stage_area() {
@@ -123,26 +121,11 @@ prep_stage_area() {
   echo "$asset_dir"
 }
 
-build_release_image() {
-  local arch="${1:-''}"
-  local image_digest="${2:-''}"
-  local tag="$IMAGE_REPO:$VERSION-$arch"
-  printf "BUILDING CONTAINER IMAGE: %s\n" "$tag"
-  podman build \
-    -t "$tag" \
-    -f "$ROOT"/images/build/Dockerfile \
-    --build-arg ARCH="$arch" \
-    --build-arg MAKE_TARGET="cross-build-linux-$arch" \
-    --build-arg DIGEST="$image_digest" \
-        . >&2
-  echo "${tag}"
-}
-
 extract_release_image_binary() {
   local tag="$1"
   local dest="$2"
   arch_ver=${tag#*:}
-  podman cp "$(podman create -d --rm --entrypoint="bash" "$tag")":/usr/bin/local/microshift "$dest"/microshift-"$arch_ver"
+  podman cp "$(podman create "$tag")":/usr/bin/microshift "$dest"/microshift-"$arch_ver"
 }
 
 stage_release_image_binaries() {
@@ -151,33 +134,50 @@ stage_release_image_binaries() {
   for t in $source_tags; do
     extract_release_image_binary "$t" "$dest"
   done
+  echo $dest
+}
+
+build_release_image() {
+  local arch="${1:-''}"
+  local image_digest="${2:-''}"
+  local tag="$IMAGE_REPO:$VERSION-$arch"
+  podman build \
+    -t "$tag" \
+    -f "$ROOT"/images/build/Dockerfile \
+    --build-arg ARCH="$arch" \
+    --build-arg MAKE_TARGET="cross-build-linux-$arch" \
+    --build-arg DIGEST="$image_digest" \
+    --build-arg SOURCE_GIT_TAG="$VERSION" \
+    . >&2
+  echo "${tag}"
 }
 
 build_container_images_artifacts() {
   declare -a BUILT_RELEASE_IMAGE_TAGS
   while read ad; do
-    printf "BUILDING TO DIGEST %s\n" "$ad"
     local arch=${ad%=*}
     local digest=${ad##*=}
-    BUILT_RELEASE_IMAGE_TAGS+=("$(build_release_image "$arch" "$digest")")
-  done <<< "$IMAGE_ARCH_DIGESTS"
+    BUILT_RELEASE_IMAGE_TAGS+=("$(build_release_image "$arch" "@$digest")")
+  done <<<"$IMAGE_ARCH_DIGESTS"
   echo "${BUILT_RELEASE_IMAGE_TAGS[@]}"
 }
 
-generate_container_manifest(){
-  local source_tags="$1"
-  local ver="$2"
-  local manifest_tag_options=()
-  for t in $source_tags; do
-    maniftest_tag_options+=("--amend ${t}")
+push_container_image_artifacts() {
+  local image_tags="${1:?"expected image tags"}"
+  for t in $image_tags; do
+    podman push "$t"
   done
-
-  podman manifest create "$IMAGE_REPO:$ver" "${manifest_tag_options[@]}"
 }
 
-push_image_manifest(){
-  local tag="$1"
+generate_container_manifest() {
+  local source_tags="$1"
+  local manifest_tag_options=()
+  for t in $source_tags; do
+    manifest_tag_options+=("--amend ${t}")
+  done
 
+  podman manifest create "$IMAGE_REPO:$VERSION" ${manifest_tag_options[*]} >&2
+  echo "$IMAGE_REPO:$VERSION"
 }
 
 debug() {
@@ -246,17 +246,18 @@ printf "Using container manager: %s\n" "$(podman --version)"
 }
 
 # Generate data early for debugging
-API_DATA="$(generate_api_release_request "$VERSION" "$TARGET" "$TARGET" " " true)" # leave body empty for now
+API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 [ ${DEBUG:=1} -eq 0 ] && {
   debug "$VERSION" "$API_DATA"
   exit 0
 }
 
-#git_checkout_target "$TARGET" || exit 1
-release_image_tags="$(build_container_images_artifacts)"  || exit 1
-stage_release_image_binaries "$release_image_tags"        || exit 1
-release_image "$release_image_tags"                       || exit 1
-#git_push_tag "$VERSION" "$TARGET" || exit 1
-#git_create_release "$API_DATA" || exit 1
-#git_post_artifacts || exit 1
+git_checkout_target "$TARGET" || exit 1
+RELEASE_IMAGE_TAGS="$(build_container_images_artifacts)"  || exit 1
+STAGE_DIR=$(stage_release_image_binaries "$RELEASE_IMAGE_TAGS")    || exit 1
+push_container_image_artifacts "$RELEASE_IMAGE_TAGS"      || exit 1
+RELEASE_MANIFEST="$(generate_container_manifest "$RELEASE_IMAGE_TAGS" "$VERSION")"  || exit 1
+push_container_image_artifacts "$RELEASE_MANIFEST"
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")" || exit 1
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN" || exit 1

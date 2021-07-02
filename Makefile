@@ -34,8 +34,6 @@ GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor=1 \
 debug:
 	@echo FLAGS:"$(GO_LD_EXTRAFLAGS)"
 	@echo TAG:"$(SOURCE_GIT_TAG)"
-	sleep 3
-	@echo TAG:"$(SOURCE_GIT_TAG)"
 
 # These tags make sure we can statically link and avoid shared dependencies
 GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netgo osusergo'
