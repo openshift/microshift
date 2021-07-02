@@ -177,6 +177,7 @@ generate_container_manifest() {
   done
 
   podman manifest create "$IMAGE_REPO:$VERSION" ${manifest_tag_options[*]} >&2
+  podman manifest push "$IMAGE_REPO:$VERSION"
   echo "$IMAGE_REPO:$VERSION"
 }
 
@@ -258,6 +259,5 @@ RELEASE_IMAGE_TAGS="$(build_container_images_artifacts)"  || exit 1
 STAGE_DIR=$(stage_release_image_binaries "$RELEASE_IMAGE_TAGS")    || exit 1
 push_container_image_artifacts "$RELEASE_IMAGE_TAGS"      || exit 1
 RELEASE_MANIFEST="$(generate_container_manifest "$RELEASE_IMAGE_TAGS" "$VERSION")"  || exit 1
-push_container_image_artifacts "$RELEASE_MANIFEST"
 UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")" || exit 1
 git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN" || exit 1
