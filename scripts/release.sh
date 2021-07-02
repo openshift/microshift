@@ -261,3 +261,4 @@ push_container_image_artifacts "$RELEASE_IMAGE_TAGS"      || exit 1
 RELEASE_MANIFEST="$(generate_container_manifest "$RELEASE_IMAGE_TAGS" "$VERSION")"  || exit 1
 UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")" || exit 1
 git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN" || exit 1
+git switch -
