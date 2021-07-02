@@ -24,9 +24,9 @@ shopt -s expand_aliases
 ########
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 
-ORG="copejon"
+ORG="redhat-et"
 
-IMAGE_REPO="quay.io/jcope/microshift"
+IMAGE_REPO="quay.io/microshift/microshift"
 STAGING_DIR="$ROOT/_output/staging"
 IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/base_digests")"
 
