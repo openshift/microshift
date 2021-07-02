@@ -95,6 +95,7 @@ vendor:
 
 clean-cross-build:
 	$(RM) -r '$(CROSS_BUILD_BINDIR)'
+	$(RM) -rf $(OUTPUT_DIR)/staging
 	if [ -d '$(OUTPUT_DIR)' ]; then rmdir --ignore-fail-on-non-empty '$(OUTPUT_DIR)'; fi
 .PHONY: clean-cross-build
 

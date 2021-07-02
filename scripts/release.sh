@@ -17,7 +17,7 @@ set -euo pipefail
 shopt -s expand_aliases
 
 #trap 'echo "# $BASH_COMMAND"' DEBUG
-set -x
+#set -x
 
 ########
 # INIT #
