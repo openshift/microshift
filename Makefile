@@ -2,7 +2,7 @@
 include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
 include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
 
-TIMESTAMP :=$(shell date -u +'%Y-%m-%d-%H%M%Sz')
+TIMESTAMP :=$(shell date -u +'%Y-%m-%d-%H%M%S')
 RELEASE_PRE :=0.4.7-0.microshift
 SOURCE_GIT_TAG :=$(shell echo $(RELEASE_PRE)-$(TIMESTAMP))
 
