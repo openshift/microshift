@@ -24,9 +24,12 @@ shopt -s expand_aliases
 ########
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 
+#### Debugging Vars.  For testing e2e release without pushing to upstream, set to your own git/quay accounts.
 ORG="redhat-et"
+IMAGE_OWNER="microshift"
+####
 
-IMAGE_REPO="quay.io/microshift/microshift"
+IMAGE_REPO="quay.io/$IMAGE_OWNER/microshift"
 STAGING_DIR="$ROOT/_output/staging"
 IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/base_digests")"
 
@@ -87,6 +90,7 @@ git_create_release() {
   raw_upload_url="$(echo "$response" | grep "upload_url")"
   local upload_url
   upload_url=$(echo "$raw_upload_url" | sed -n 's,.*\(https://uploads.github.com/repos/'$ORG'/microshift/releases/[0-9a-zA-Z]*/assets\).*,\1,p')
+  # curl will return 0 even on 4xx http errors, so verify that the actually got an up_load url
   [ -z "$upload_url" ] && return 1
   echo "$upload_url"
 }
@@ -138,8 +142,8 @@ stage_release_image_binaries() {
 }
 
 build_release_image() {
-  local arch="${1:-''}"
-  local image_digest="${2:-''}"
+  local arch="$1"
+  local image_digest="$2"
   local tag="$IMAGE_REPO:$VERSION-$arch"
   podman build \
     -t "$tag" \
@@ -163,7 +167,7 @@ build_container_images_artifacts() {
 }
 
 push_container_image_artifacts() {
-  local image_tags="${1:?"expected image tags"}"
+  local image_tags="${1}"
   for t in $image_tags; do
     podman push "$t"
   done
