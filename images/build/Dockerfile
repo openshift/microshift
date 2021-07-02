@@ -34,7 +34,8 @@ RUN make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG
 # -v /etc:/etc \
 # -v /run/containers:/run/containers \
 # -v /var/log:/var/log   microshift
-FROM registry.access.redhat.com/ubi8/ubi-minimal$DIGEST
+
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4$DIGEST
 
 ARG ARCH=amd64
 

@@ -25,13 +25,13 @@ shopt -s expand_aliases
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 
 #### Debugging Vars.  For testing e2e release without pushing to upstream, set to your own git/quay accounts.
-ORG="redhat-et"
-IMAGE_OWNER="microshift"
+GIT_OWNER=${GIT_OWNER:="microshift"}
+QUAY_OWNER=${QUAY_OWNER:-"microshift"}
 ####
 
-IMAGE_REPO="quay.io/$IMAGE_OWNER/microshift"
+IMAGE_ORG="quay.io/$QUAY_OWNER/microshift"
 STAGING_DIR="$ROOT/_output/staging"
-IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/base_digests")"
+IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/rhel-ubi-minimal-8-4-arch-digests")"
 
 mkdir -p "$STAGING_DIR"
 
@@ -48,6 +48,9 @@ help() {
   printf 'Microshift: release.sh
 This script provides some simple automation for cutting new releases of Microshift.
 
+Use:
+    ./release.sh --token $(cat /token/path) --target $COMMIT
+    Note: do not use "=" with flag values
 Inputs:
     --target      (Required) The commit-ish (hash, tag, or branch) to build a release from. Abbreviated commits are NOT permitted.
     --token       (Required) The github application auth token, use to create a github release.
@@ -59,6 +62,15 @@ Outputs:
 - Multi-architecture container image tagged and pushed as quay.io/microshift/microshift:$VERSION
 - A sha256 checksum file, containing the checksums for all binary artifacts
 - A github release, containing the binary artifacts and checksum file.
+
+DEBUG
+To test releases against a downstream/fork repository, override GIT_OWNER to forked git org/owner and QUAY_OWNER to your
+quay.io owner or org.
+
+  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path) --target $COMMIT
+
+  Inputs:
+    -d print basic generated values and exit (API call, docker version).
 '
 }
 
@@ -83,13 +95,13 @@ git_create_release() {
     curl -X POST \
       -H "Accept: application/vnd.github.v3+json" \
       -H "Authorization: token $TOKEN" \
-      "https://api.github.com/repos/$ORG/microshift/releases" \
+      "https://api.github.com/repos/$GIT_OWNER/microshift/releases" \
       -d "${data[@]}"
   )"
   local raw_upload_url
   raw_upload_url="$(echo "$response" | grep "upload_url")"
   local upload_url
-  upload_url=$(echo "$raw_upload_url" | sed -n 's,.*\(https://uploads.github.com/repos/'$ORG'/microshift/releases/[0-9a-zA-Z]*/assets\).*,\1,p')
+  upload_url=$(echo "$raw_upload_url" | sed -n 's,.*\(https://uploads.github.com/repos/'$GIT_OWNER'/microshift/releases/[0-9a-zA-Z]*/assets\).*,\1,p')
   # curl will return 0 even on 4xx http errors, so verify that the actually got an up_load url
   [ -z "$upload_url" ] && return 1
   echo "$upload_url"
@@ -144,7 +156,7 @@ stage_release_image_binaries() {
 build_release_image() {
   local arch="$1"
   local image_digest="$2"
-  local tag="$IMAGE_REPO:$VERSION-$arch"
+  local tag="$IMAGE_ORG:$VERSION-$arch"
   podman build \
     -t "$tag" \
     -f "$ROOT"/images/build/Dockerfile \
@@ -173,16 +185,16 @@ push_container_image_artifacts() {
   done
 }
 
-generate_container_manifest() {
+push_container_manifest() {
   local source_tags="$1"
   local manifest_tag_options=()
   for t in $source_tags; do
     manifest_tag_options+=("--amend ${t}")
   done
 
-  podman manifest create "$IMAGE_REPO:$VERSION" ${manifest_tag_options[*]} >&2
-  podman manifest push "$IMAGE_REPO:$VERSION"
-  echo "$IMAGE_REPO:$VERSION"
+  podman manifest create "$IMAGE_ORG:$VERSION" ${manifest_tag_options[*]} >&2
+  podman manifest push "$IMAGE_ORG:$VERSION"
+  echo "$IMAGE_ORG:$VERSION"
 }
 
 debug() {
@@ -202,40 +214,40 @@ debug() {
 
 while [ $# -gt 0 ]; do
   case "$1" in
-  "--target")
-    TARGET="${2:-}"
-    [[ "${TOKEN:=}" =~ ^-+ ]] || [[ -z "$TARGET" ]] && {
-      printf "flag $1 requires git commit-ish (branch, tag, hash) value"
-      exit 1
-    }
-    shift 2
-    ;;
-  "--token")
-    TOKEN="${2:-}"
-    [[ "$TOKEN" =~ ^-+ ]] || [[ -z "$TOKEN" ]] && {
-      printf "flag $1 git release API calls require robot token"
-      exit 1
-    }
-    shift 2
-    ;;
-  "--version")
-    VERSION="${2:-}"
-    [[ "$VERSION" =~ ^-+ ]] || [[ -z "$VERSION" ]] && {
-      printf "flag $1"
-      exit 1
-    }
-    shift 2
-    ;;
-  "-d" | "--debug")
-    DEBUG=0
-    shift
-    ;;
-  "-h" | "--help")
-    help && exit
-    ;;
-  *)
-    echo "unknown input: $1" && help && exit 1
-    ;;
+    "--target")
+      TARGET="${2:-}"
+      [[ "${TOKEN:=}" =~ ^-+ ]] || [[ -z "$TARGET" ]] && {
+        printf "flag $1 requires git commit-ish (branch, tag, hash) value"
+        exit 1
+      }
+      shift 2
+      ;;
+    "--token")
+      TOKEN="${2:-}"
+      [[ "$TOKEN" =~ ^-+ ]] || [[ -z "$TOKEN" ]] && {
+        printf "flag $1 git release API calls require robot token"
+        exit 1
+      }
+      shift 2
+      ;;
+    "--version")
+      VERSION="${2:-}"
+      [[ "$VERSION" =~ ^-+ ]] || [[ -z "$VERSION" ]] && {
+        printf "flag $1"
+        exit 1
+      }
+      shift 2
+      ;;
+    "-d" | "--debug")
+      DEBUG=0
+      shift
+      ;;
+    "-h" | "--help")
+      help && exit
+      ;;
+    *)
+      echo "unknown input: $1" && help && exit 1
+      ;;
   esac
 done
 
@@ -258,11 +270,11 @@ API_DATA="$(generate_api_release_request "true")" # leave body empty for now
   exit 0
 }
 
-git_checkout_target "$TARGET" || exit 1
-RELEASE_IMAGE_TAGS="$(build_container_images_artifacts)"  || exit 1
-STAGE_DIR=$(stage_release_image_binaries "$RELEASE_IMAGE_TAGS")    || exit 1
-push_container_image_artifacts "$RELEASE_IMAGE_TAGS"      || exit 1
-RELEASE_MANIFEST="$(generate_container_manifest "$RELEASE_IMAGE_TAGS" "$VERSION")"  || exit 1
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")" || exit 1
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN" || exit 1
+git_checkout_target "$TARGET"                                         || { git switch -;  exit 1; }
+RELEASE_IMAGE_TAGS="$(build_container_images_artifacts)"              || { git switch -;  exit 1; }
+STAGE_DIR=$(stage_release_image_binaries "$RELEASE_IMAGE_TAGS")       || { git switch -;  exit 1; }
+push_container_image_artifacts "$RELEASE_IMAGE_TAGS"                  || { git switch -;  exit 1; }
+push_container_manifest "$RELEASE_IMAGE_TAGS" "$VERSION"              || { git switch -;  exit 1; }
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -;  exit 1; }
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -;  exit 1; }
 git switch -
