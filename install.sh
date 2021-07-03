@@ -22,10 +22,21 @@ get_arch() {
     ARCH=$(uname -m)
 }
 
-# If RHEL, use subscription manager to register
+# If RHEL, use subscription-manager to register
 register_subs() {
-    sudo subscription-manager register --auto-attach ||
-    sudo subscription-manager repos --enable=rhocp-4.7-for-rhel-8-x86_64-rpms
+    REPO="rhocp-4.7-for-rhel-8-x86_64-rpms"
+    # Check subscription status and register if not
+    STATUS=$(sudo subscription-manager status | awk '/Overall Status/ { print $3 }')
+    if [[ $STATUS != "Current" ]]
+    then
+        sudo subscription-manager register --auto-attach
+    fi
+
+    # Check if already subscribed to the proper repository
+    if ! sudo subscription-manager repos --list-enabled | grep -q ${REPO}
+    then
+        sudo subscription-manager repos --enable=${REPO}
+    fi
 }
 
 # Apply SElinux policies
