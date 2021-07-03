@@ -34,7 +34,6 @@
 # Overwrite each digest in ./scripts/release_config/rhel-ubi-minimal-8-4-arch-digests as
 # $ARCH=$DIGEST.  Include the "sha256:" prefix.
 
-
 set -euo pipefail
 shopt -s expand_aliases
 
@@ -164,16 +163,24 @@ extract_release_image_binary() {
   local tag="$1"
   local dest="$2"
   arch_ver=${tag#*:}
-  podman cp "$(podman create "$tag")":/usr/bin/microshift "$dest"/microshift-"$arch_ver"
+  local out_bin="$dest"/microshift-"$arch_ver"
+  podman cp "$(podman create "$tag")":/usr/bin/microshift "$out_bin" >&2
+  echo "$out_bin"
 }
 
 stage_release_image_binaries() {
-  source_tags="$1"
+  local source_tags="$1"
+  local dest
   dest="$(prep_stage_area)"
   for t in $source_tags; do
-    extract_release_image_binary "$t" "$dest"
+    local out_bin
+    out_bin="$(extract_release_image_binary "$t" "$dest")"
+    (
+      cd "$dest"
+      sha256sum "$(basename $out_bin)" >>"$dest"/release.sha256
+    )
   done
-  echo $dest
+  echo "$dest"
 }
 
 build_release_image() {
@@ -223,6 +230,8 @@ push_container_manifest() {
 debug() {
   local version="$1"
   local api_request="$2"
+  printf "Git Target: %s\n" "$TARGET"
+  printf "Image Artifact: %s\n" "$IMAGE_ORG:$VERSION"
   printf "generate_version: %s\n" "$version"
   printf "compose_release_request: %s\n" "$api_request"
 }
@@ -230,6 +239,7 @@ debug() {
 ########
 # MAIN #
 ########
+DEBUG=1
 [ $# -eq 0 ] && {
   help
   exit 1
@@ -276,6 +286,14 @@ done
 
 printf "Using container manager: %s\n" "$(podman --version)"
 
+# Generate data early for debugging
+API_DATA="$(generate_api_release_request "true")" # leave body empty for now
+
+[ ${DEBUG:-} -eq 0 ] && {
+  debug "$VERSION" "$API_DATA"
+  exit 0
+}
+
 [ -z ${TOKEN:-} ] && {
   printf ""
   exit 1
@@ -285,19 +303,11 @@ printf "Using container manager: %s\n" "$(podman --version)"
   exit 1
 }
 
-# Generate data early for debugging
-API_DATA="$(generate_api_release_request "true")" # leave body empty for now
-
-[ ${DEBUG:=1} -eq 0 ] && {
-  debug "$VERSION" "$API_DATA"
-  exit 0
-}
-
-git_checkout_target "$TARGET"                                         || { git switch -;  exit 1; }
-RELEASE_IMAGE_TAGS="$(build_container_images_artifacts)"              || { git switch -;  exit 1; }
-STAGE_DIR=$(stage_release_image_binaries "$RELEASE_IMAGE_TAGS")       || { git switch -;  exit 1; }
-push_container_image_artifacts "$RELEASE_IMAGE_TAGS"                  || { git switch -;  exit 1; }
-push_container_manifest "$RELEASE_IMAGE_TAGS" "$VERSION"              || { git switch -;  exit 1; }
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -;  exit 1; }
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -;  exit 1; }
+git_checkout_target "$TARGET"                                         || { git switch -; exit 1; }
+RELEASE_IMAGE_TAGS="$(build_container_images_artifacts)"              || { git switch -; exit 1; }
+STAGE_DIR=$(stage_release_image_binaries "$RELEASE_IMAGE_TAGS")       || { git switch -; exit 1; }
+push_container_image_artifacts "$RELEASE_IMAGE_TAGS"                  || { git switch -; exit 1; }
+push_container_manifest "$RELEASE_IMAGE_TAGS" "$VERSION"              || { git switch -; exit 1; }
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -; exit 1; }
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -; exit 1; }
 git switch -

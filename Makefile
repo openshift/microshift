@@ -67,21 +67,21 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 ###############################
 # containerized build targets #
 ###############################
-_do_containerized_build:
+_build_containerized:
 	$(CTR_CMD) build -t $(IMAGE_REPO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
 		-f "$(SRC_ROOT)"/images/build/Dockerfile \
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
 		--build-arg ARCH=$(ARCH) \
 		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
 		.
-.PHONY: _do_containerized_build
+.PHONY: _build_containerized
 
 build-containerized-cross-build-linux-amd64:
-	+$(MAKE) _do_containerized_build ARCH=amd64
+	+$(MAKE) _build_containerized ARCH=amd64
 .PHONY: build-containerized-cross-build-linux-amd64
 
 build-containerized-cross-build-linux-arm64:
-	+$(MAKE) _do_containerized_build ARCH=arm64
+	+$(MAKE) _build_containerized ARCH=arm64
 .PHONY: build-containerized-cross-build-linux-arm64
 
 build-containerized-cross-build:
