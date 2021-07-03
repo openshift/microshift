@@ -1,4 +1,13 @@
-FROM registry.access.redhat.com/ubi8/go-toolset as build
+# DIGEST is the registry.access.redhat.com/ubi8/ubi-minimal:8.4 architecture specific image to use for the run stage
+# When specifying, assign as "@sha256: ... ".  Unset by default
+ARG DIGEST
+
+# Build stage
+FROM registry.access.redhat.com/ubi8/go-toolset as builder
+
+ARG ARCH=amd64
+ARG MAKE_TARGET=cross-build-linux-$ARCH
+ARG SOURCE_GIT_TAG
 
 USER root
 
@@ -12,8 +21,9 @@ RUN yum install glibc-static -y
 
 COPY . .
 
-RUN make clean build
+RUN make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG
 
+# Run stage
 # Containerized microshift
 # To start:
 # podman run --privileged --ipc=host --network=host  \
@@ -25,13 +35,15 @@ RUN make clean build
 # -v /run/containers:/run/containers \
 # -v /var/log:/var/log   microshift
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4$DIGEST
+
+ARG ARCH=amd64
 
 RUN microdnf install -y \
       policycoreutils-python-utils \
       iptables && \
-    microdnf clean all
+      microdnf clean all
+COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/_output/bin/linux_$ARCH/microshift /usr/bin/microshift
 
-COPY --from=build /opt/app-root/src/github.com/redhat-et/microshift/microshift /usr/bin/microshift
-
-ENTRYPOINT ["/usr/bin/microshift", "run"]
+ENTRYPOINT ["/usr/bin/microshift"]
+CMD ["run"]
