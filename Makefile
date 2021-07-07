@@ -73,6 +73,7 @@ _build_containerized:
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
 		--build-arg ARCH=$(ARCH) \
 		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
+		--platform="linux/$(ARCH)" \
 		.
 .PHONY: _build_containerized
 

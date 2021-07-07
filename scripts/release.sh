@@ -51,7 +51,7 @@ GIT_OWNER=${GIT_OWNER:="microshift"}
 QUAY_OWNER=${QUAY_OWNER:-"microshift"}
 ####
 
-IMAGE_ORG="quay.io/$QUAY_OWNER/microshift"
+IMAGE_REF_BASE="quay.io/$QUAY_OWNER/microshift"
 STAGING_DIR="$ROOT/_output/staging"
 IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/rhel-ubi-minimal-8-4-arch-digests")"
 
@@ -203,35 +203,53 @@ build_container_images_artifacts() {
   while read ad; do
     local arch=${ad%=*}
     local digest=${ad##*=}
-    BUILT_RELEASE_IMAGE_TAGS+=("$(build_release_image "$arch" "@$digest")")
+    local release_image
+    release_image=$(build_release_image "$arch" "@$digest") || return 1
+    BUILT_RELEASE_IMAGE_TAGS+=("$release_image")
   done <<<"$IMAGE_ARCH_DIGESTS"
   echo "${BUILT_RELEASE_IMAGE_TAGS[@]}"
 }
 
 push_container_image_artifacts() {
-  local image_tags="${1}"
+  local image_tags="$1"
   for t in $image_tags; do
     podman push "$t"
   done
 }
 
-push_container_manifest() {
-  local source_tags="$1"
-  local manifest_tag_options=()
-  for t in $source_tags; do
-    manifest_tag_options+=("--amend ${t}")
+podman_create_manifest(){
+  local image_ref_list="${*}"
+  podman manifest create "$IMAGE_REF_BASE:$VERSION" >&2
+  for ref in $image_ref_list; do
+    podman manifest add "$IMAGE_REF_BASE:$VERSION" "$ref"
   done
+}
 
-  podman manifest create "$IMAGE_ORG:$VERSION" ${manifest_tag_options[*]} >&2
-  podman manifest push "$IMAGE_ORG:$VERSION"
-  echo "$IMAGE_ORG:$VERSION"
+docker_create_manifest(){
+  local image_list="${*}"
+  local amend_images_options
+  for image in "${image_list[@]}"; do
+    amend_images_options+="--amend $image"
+  done
+  podman manifest create "$IMAGE_REF_BASE:$VERSION" "${image_list[@]}" >&2
+}
+
+push_container_manifest() {
+  local source_tags="${@}"
+  local cli="$(alias podman)"
+  if [[ "${cli#*=}" =~ docker ]]; then
+    docker_create_manifest "${source_tags][@]}"
+  else
+    podman_create_manifest "${source_tags][@]}"
+  fi
+  podman manifest push "$IMAGE_REF_BASE:$VERSION"
 }
 
 debug() {
   local version="$1"
   local api_request="$2"
   printf "Git Target: %s\n" "$TARGET"
-  printf "Image Artifact: %s\n" "$IMAGE_ORG:$VERSION"
+  printf "Image Artifact: %s\n" "$IMAGE_REF_BASE:$VERSION"
   printf "generate_version: %s\n" "$version"
   printf "compose_release_request: %s\n" "$api_request"
 }
@@ -303,11 +321,11 @@ API_DATA="$(generate_api_release_request "true")" # leave body empty for now
   exit 1
 }
 
-git_checkout_target "$TARGET"                                         || { git switch -; exit 1; }
+#git_checkout_target "$TARGET"                                         || { git switch -; exit 1; }
 RELEASE_IMAGE_TAGS="$(build_container_images_artifacts)"              || { git switch -; exit 1; }
 STAGE_DIR=$(stage_release_image_binaries "$RELEASE_IMAGE_TAGS")       || { git switch -; exit 1; }
 push_container_image_artifacts "$RELEASE_IMAGE_TAGS"                  || { git switch -; exit 1; }
-push_container_manifest "$RELEASE_IMAGE_TAGS" "$VERSION"              || { git switch -; exit 1; }
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -; exit 1; }
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -; exit 1; }
+push_container_manifest "$RELEASE_IMAGE_TAGS"                         || { git switch -; exit 1; }
+#UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -; exit 1; }
+#git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -; exit 1; }
 git switch -
