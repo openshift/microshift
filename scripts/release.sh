@@ -46,17 +46,6 @@ shopt -s expand_aliases
 ########
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 
-#### Debugging Vars.  For generating a full release to a fork, set to your own git/quay owner.
-GIT_OWNER=${GIT_OWNER:="microshift"}
-QUAY_OWNER=${QUAY_OWNER:-"microshift"}
-####
-
-IMAGE_REF_BASE="quay.io/$QUAY_OWNER/microshift"
-STAGING_DIR="$ROOT/_output/staging"
-IMAGE_ARCH_DIGESTS="$(cat "$ROOT/scripts/release_config/rhel-ubi-minimal-8-4-arch-digests")"
-
-mkdir -p "$STAGING_DIR"
-
 # Check for a container manager cli (podman || docker), and alias it to "podman", since
 # they implement the same cli interface.
 __ctr_mgr_alias=$({ which podman &>/dev/null && echo "podman"; } || { which docker &>/dev/null && echo "docker"; } || echo "")
@@ -90,9 +79,6 @@ To test releases against a downstream/fork repository, override GIT_OWNER to for
 quay.io owner or org.
 
   e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path) --target $COMMIT
-
-  Inputs:
-    -d print basic generated values and exit (API call, docker version).
 '
 }
 
@@ -169,87 +155,63 @@ extract_release_image_binary() {
 }
 
 stage_release_image_binaries() {
-  local source_tags="$1"
   local dest
   dest="$(prep_stage_area)"
-  for t in $source_tags; do
+  for t in "${RELEASE_IMAGE_TAGS[@]}"; do
     local out_bin
-    out_bin="$(extract_release_image_binary "$t" "$dest")"
+    out_bin=$(extract_release_image_binary "$t" "$dest") || return 1
     (
       cd "$dest"
-      sha256sum "$(basename $out_bin)" >>"$dest"/release.sha256
-    )
+      sha256sum "$(basename "$out_bin")" >>"$dest"/release.sha256
+    ) || return 1
   done
   echo "$dest"
 }
 
-build_release_image() {
-  local arch="$1"
-  local image_digest="$2"
-  local tag="$IMAGE_ORG:$VERSION-$arch"
-  podman build \
-    -t "$tag" \
-    -f "$ROOT"/images/build/Dockerfile \
-    --build-arg ARCH="$arch" \
-    --build-arg MAKE_TARGET="cross-build-linux-$arch" \
-    --build-arg DIGEST="$image_digest" \
-    --build-arg SOURCE_GIT_TAG="$VERSION" \
-    . >&2
-  echo "${tag}"
-}
-
 build_container_images_artifacts() {
-  declare -a BUILT_RELEASE_IMAGE_TAGS
-  while read ad; do
-    local arch=${ad%=*}
-    local digest=${ad##*=}
-    local release_image
-    release_image=$(build_release_image "$arch" "@$digest") || return 1
-    BUILT_RELEASE_IMAGE_TAGS+=("$release_image")
-  done <<<"$IMAGE_ARCH_DIGESTS"
-  echo "${BUILT_RELEASE_IMAGE_TAGS[@]}"
+  (
+    cd "$ROOT"
+    make build-containerized-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO="$IMAGE_REPO"
+  ) || return 1
 }
 
 push_container_image_artifacts() {
-  local image_tags="$1"
-  for t in $image_tags; do
+  for t in "${RELEASE_IMAGE_TAGS[@]}"; do
     podman push "$t"
   done
 }
 
 podman_create_manifest(){
-  local image_ref_list="${*}"
-  podman manifest create "$IMAGE_REF_BASE:$VERSION" >&2
-  for ref in $image_ref_list; do
-    podman manifest add "$IMAGE_REF_BASE:$VERSION" "$ref"
+  podman manifest create "$IMAGE_REPO:$VERSION" >&2
+  for ref in "${RELEASE_IMAGE_TAGS[@]}"; do
+    podman manifest add "$IMAGE_REPO:$VERSION" "docker://$ref"
   done
+    podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$VERSION"
 }
 
 docker_create_manifest(){
-  local image_list="${*}"
   local amend_images_options
-  for image in "${image_list[@]}"; do
+  for image in "${RELEASE_IMAGE_TAGS[@]}"; do
     amend_images_options+="--amend $image"
   done
-  podman manifest create "$IMAGE_REF_BASE:$VERSION" "${image_list[@]}" >&2
+  podman manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
+  podman manifest push "$IMAGE_REPO:$VERSION"
 }
 
 push_container_manifest() {
-  local source_tags="${@}"
   local cli="$(alias podman)"
   if [[ "${cli#*=}" =~ docker ]]; then
-    docker_create_manifest "${source_tags][@]}"
+    docker_create_manifest
   else
-    podman_create_manifest "${source_tags][@]}"
+    podman_create_manifest
   fi
-  podman manifest push "$IMAGE_REF_BASE:$VERSION"
-}
 
+}
 debug() {
   local version="$1"
   local api_request="$2"
   printf "Git Target: %s\n" "$TARGET"
-  printf "Image Artifact: %s\n" "$IMAGE_REF_BASE:$VERSION"
+  printf "Image Artifact: %s\n" "$IMAGE_REPO:$VERSION"
   printf "generate_version: %s\n" "$version"
   printf "compose_release_request: %s\n" "$api_request"
 }
@@ -257,17 +219,11 @@ debug() {
 ########
 # MAIN #
 ########
-DEBUG=1
-[ $# -eq 0 ] && {
-  help
-  exit 1
-}
-
 while [ $# -gt 0 ]; do
   case "$1" in
     "--target")
       TARGET="${2:-}"
-      [[ "${TOKEN:=}" =~ ^-+ ]] || [[ -z "$TARGET" ]] && {
+      [[ "${TOKEN:=}" =~ ^-.* ]] || [[ -z "$TARGET" ]] && {
         printf "flag $1 requires git commit-ish (branch, tag, hash) value"
         exit 1
       }
@@ -275,7 +231,7 @@ while [ $# -gt 0 ]; do
       ;;
     "--token")
       TOKEN="${2:-}"
-      [[ "$TOKEN" =~ ^-+ ]] || [[ -z "$TOKEN" ]] && {
+      [[ "$TOKEN" =~ ^-.* ]] || [[ -z "$TOKEN" ]] && {
         printf "flag $1 git release API calls require robot token"
         exit 1
       }
@@ -283,15 +239,11 @@ while [ $# -gt 0 ]; do
       ;;
     "--version")
       VERSION="${2:-}"
-      [[ "$VERSION" =~ ^-+ ]] || [[ -z "$VERSION" ]] && {
-        printf "flag $1"
+      [[ "$VERSION" =~ ^-.* ]] || [[ -z "$VERSION" ]] && {
+        printf "flag $1 expects a version input value"
         exit 1
       }
       shift 2
-      ;;
-    "-d" | "--debug")
-      DEBUG=0
-      shift
       ;;
     "-h" | "--help")
       help && exit
@@ -307,25 +259,22 @@ printf "Using container manager: %s\n" "$(podman --version)"
 # Generate data early for debugging
 API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
-[ ${DEBUG:-} -eq 0 ] && {
-  debug "$VERSION" "$API_DATA"
-  exit 0
-}
+IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
+RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
 
-[ -z ${TOKEN:-} ] && {
-  printf ""
-  exit 1
-}
-[ -z ${TARGET:-} ] && {
-  printf ""
-  exit 1
-}
+#### Debugging Vars.  For generating a full release to a fork, set to your own git/quay owner.
+GIT_OWNER=${GIT_OWNER:="microshift"}
+QUAY_OWNER=${QUAY_OWNER:-"microshift"}
+####
 
-#git_checkout_target "$TARGET"                                         || { git switch -; exit 1; }
-RELEASE_IMAGE_TAGS="$(build_container_images_artifacts)"              || { git switch -; exit 1; }
-STAGE_DIR=$(stage_release_image_binaries "$RELEASE_IMAGE_TAGS")       || { git switch -; exit 1; }
-push_container_image_artifacts "$RELEASE_IMAGE_TAGS"                  || { git switch -; exit 1; }
-push_container_manifest "$RELEASE_IMAGE_TAGS"                         || { git switch -; exit 1; }
-#UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -; exit 1; }
-#git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -; exit 1; }
+STAGING_DIR="$ROOT/_output/staging"
+mkdir -p "$STAGING_DIR"
+
+git_checkout_target "$TARGET"                                         || { git switch -; exit 1; }
+build_container_images_artifacts                                      || { git switch -; exit 1; }
+STAGE_DIR=$(stage_release_image_binaries)                             || { git switch -; exit 1; }
+push_container_image_artifacts                                        || { git switch -; exit 1; }
+push_container_manifest                                               || { git switch -; exit 1; }
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -; exit 1; }
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -; exit 1; }
 git switch -
