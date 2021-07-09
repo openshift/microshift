@@ -155,7 +155,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		}
 
 		if genericcontrollermanager.WaitForAPIServer(versionedClient, kubeAPIStartupTimeout*time.Second) != nil {
-			logrus.Warningf("%s readiness check timed ou: %v", err)
+			logrus.Warningf("%s readiness check timed out: %v", s.Name(), err)
 			return
 		}
 
