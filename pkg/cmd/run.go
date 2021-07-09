@@ -1,14 +1,27 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
+	"github.com/coreos/go-systemd/daemon"
+	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/node"
+	"github.com/openshift/microshift/pkg/servicemanager"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+)
+
+const (
+	gracefulShutdownTimeout = 60
 )
 
 func NewRunMicroshiftCommand() *cobra.Command {
@@ -52,20 +65,112 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	// if log dir is missing, create it
 	os.MkdirAll(cfg.LogDir, 0700)
 
+	m := servicemanager.NewServiceManager()
 	if config.StringInList("controlplane", cfg.Roles) {
-		if err := startControllerOnly(cfg); err != nil {
-			return err
-		}
+		util.Must(m.AddService(controllers.NewEtcd(cfg)))
+		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
+		// util.Must(m.AddService(controllers.NewKubeScheduler()))
+		// util.Must(m.AddService(controllers.NewKubeControllerManager()))
+		// util.Must(m.AddService(controllers.NewOpenShiftPrepJob()))
+		// util.Must(m.AddService(controllers.NewOpenShiftAPIServer()))
+		// util.Must(m.AddService(controllers.NewOpenShiftControllerManager()))
+		// util.Must(m.AddService(controllers.NewOpenShiftAPIComponents()))
+		// util.Must(m.AddService(controllers.NewInfrastructureServices()))
+
+		util.Must(m.AddService(servicemanager.NewGenericService(
+			"other-controlplane",
+			[]string{"kube-apiserver"},
+			func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+				defer close(stopped)
+				defer close(ready)
+
+				startControllerOnly(cfg)
+
+				return nil
+			},
+		)))
 	}
 
 	if config.StringInList("node", cfg.Roles) {
-		if err := node.StartKubelet(cfg); err != nil {
-			return err
-		}
-		if err := node.StartKubeProxy(cfg); err != nil {
-			return err
-		}
+		util.Must(m.AddService(servicemanager.NewGenericService(
+			"other-node",
+			[]string{"kube-apiserver"},
+			func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+				defer close(stopped)
+				defer close(ready)
+
+				if err := node.StartKubelet(cfg); err != nil {
+					return err
+				}
+				if err := node.StartKubeProxy(cfg); err != nil {
+					return err
+				}
+				return nil
+			},
+		)))
 	}
 
-	select {}
+	logrus.Info("Starting Microshift")
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ready, stopped := make(chan struct{}), make(chan struct{})
+	go func() {
+		logrus.Infof("Starting %s", m.Name())
+		if err := m.Run(ctx, ready, stopped); err != nil {
+			logrus.Infof("%s stopped: %s", m.Name(), err)
+		} else {
+			logrus.Infof("%s completed", m.Name())
+		}
+	}()
+
+	sigTerm := make(chan os.Signal, 1)
+	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case <-ready:
+		logrus.Info("MicroShift is ready.")
+		daemon.SdNotify(false, daemon.SdNotifyReady)
+
+		<-sigTerm
+	case <-sigTerm:
+	}
+	logrus.Info("Interrupt received. Stopping services.")
+	cancel()
+
+	select {
+	case <-stopped:
+	case <-sigTerm:
+		logrus.Info("Another interrupt received. Force terminating services.")
+	case <-time.After(time.Duration(gracefulShutdownTimeout) * time.Second):
+		logrus.Info("Timed out waiting for services to stop.")
+	}
+	logrus.Info("MicroShift stopped.")
+	return nil
+}
+
+func startControllerOnly(cfg *config.MicroshiftConfig) error {
+	logrus.Infof("starting kube-controller-manager")
+	controllers.KubeControllerManager(cfg)
+
+	logrus.Infof("starting kube-scheduler")
+	controllers.KubeScheduler(cfg)
+
+	if err := controllers.PrepareOCP(cfg); err != nil {
+		return err
+	}
+
+	logrus.Infof("starting openshift-apiserver")
+	controllers.OCPAPIServer(cfg)
+
+	//TODO: cloud provider
+	controllers.OCPControllerManager(cfg)
+
+	if err := controllers.StartOCPAPIComponents(cfg); err != nil {
+		return err
+	}
+
+	if err := components.StartComponents(cfg); err != nil {
+		return err
+	}
+	return nil
 }

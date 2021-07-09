@@ -16,23 +16,61 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
+	"fmt"
 	"path/filepath"
 	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/config"
 
+	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/component-base/cli/globalflag"
 	genericcontrollermanager "k8s.io/controller-manager/app"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
+	"k8s.io/kubernetes/cmd/kube-apiserver/app/options"
 )
 
-func KubeAPIServer(cfg *config.MicroshiftConfig) error {
-	command := kubeapiserver.NewAPIServerCommand()
-	apiArgs := []string{
+const (
+	kubeAPIStartupTimeout = 60
+)
+
+type KubeAPIServer struct {
+	serverOptions *options.ServerRunOptions
+
+	kubeconfig string
+}
+
+func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
+	s := &KubeAPIServer{}
+	s.configure(cfg)
+	return s
+}
+
+func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
+func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd"} }
+
+func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
+	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
+	// certDir := filepath.Join(cfg.DataDir, "certs", s.Name())
+	// dataDir := filepath.Join(cfg.DataDir, s.Name())
+
+	// configure audit policy and oauth
+	// TODO: consolidate this
+	if err := config.KubeAPIServerConfig(cfg); err != nil {
+		return
+	}
+
+	// configure the kube-apiserver instance
+	// TODO: configure serverOptions directly rather than via cobra
+	s.serverOptions = options.NewServerRunOptions()
+
+	args := []string{
 		//"--openshift-config=" + cfg.DataDir + "/resources/kube-apiserver/config/config.yaml", //TOOD
 		//"--advertise-address=" + ip,
 		"--allow-privileged=true",
@@ -42,21 +80,21 @@ func KubeAPIServer(cfg *config.MicroshiftConfig) error {
 		"--authorization-mode=Node,RBAC",
 		"--bind-address=0.0.0.0",
 		"--secure-port=6443",
-		"--client-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--client-ca-file=" + caCertFile,
 		"--enable-admission-plugins=NodeRestriction",
 		"--enable-aggregator-routing=true",
-		"--etcd-cafile=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--etcd-cafile=" + caCertFile,
 		"--etcd-certfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt",
 		"--etcd-keyfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key",
 		"--etcd-servers=https://127.0.0.1:2379",
-		"--kubelet-certificate-authority=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--kubelet-certificate-authority=" + caCertFile,
 		"--kubelet-client-certificate=" + cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt",
 		"--kubelet-client-key=" + cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key",
 		"--profiling=false",
 		"--proxy-client-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.crt",
 		"--proxy-client-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.key",
 		"--requestheader-allowed-names=aggregator,system:aggregator,openshift-apiserver,system:openshift-apiserver,kube-apiserver-proxy,system:kube-apiserver-proxy,openshift-aggregator,system:openshift-aggregator",
-		"--requestheader-client-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--requestheader-client-ca-file=" + caCertFile,
 		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
 		"--requestheader-group-headers=X-Remote-Group",
 		"--requestheader-username-headers=X-Remote-User",
@@ -74,37 +112,69 @@ func KubeAPIServer(cfg *config.MicroshiftConfig) error {
 		"--vmodule=" + cfg.LogVModule,
 	}
 	if cfg.LogDir != "" {
-		apiArgs = append(apiArgs,
+		args = append(args,
 			"--log-file="+filepath.Join(cfg.LogDir, "kube-apiserver.log"),
 			"--audit-log-path="+filepath.Join(cfg.LogDir, "kube-apiserver-audit.log"))
 	}
-	if err := command.ParseFlags(apiArgs); err != nil {
-		logrus.Fatalf("failed to parse flags:%v", err)
-	}
-	logrus.Infof("starting kube-apiserver %s, args: %v", cfg.HostIP, apiArgs)
 
+	// fake the kube-apiserver cobra command to parse args into serverOptions
+	cmd := &cobra.Command{
+		Use:          "kube-apiserver",
+		Long:         `kube-apiserver`,
+		SilenceUsage: true,
+		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
+	}
+	namedFlagSets := s.serverOptions.Flags()
+	globalflag.AddGlobalFlags(namedFlagSets.FlagSet("global"), cmd.Name())
+	options.AddCustomGlobalFlags(namedFlagSets.FlagSet("generic"))
+	for _, f := range namedFlagSets.FlagSets {
+		cmd.Flags().AddFlagSet(f)
+	}
+	if err := cmd.ParseFlags(args); err != nil {
+		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
+	}
+
+	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+}
+
+func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+
+	// run readiness check
 	go func() {
-		logrus.Fatalf("kube-apiserver exited: %v", command.RunE(command, nil))
+		restConfig, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
+		if err != nil {
+			logrus.Warningf("%s readiness check: %v", s.Name(), err)
+			return
+		}
+
+		versionedClient, err := kubernetes.NewForConfig(restConfig)
+		if err != nil {
+			logrus.Warningf("%s readiness check: %v", s.Name(), err)
+			return
+		}
+
+		if genericcontrollermanager.WaitForAPIServer(versionedClient, kubeAPIStartupTimeout*time.Second) != nil {
+			logrus.Warningf("%s readiness check timed ou: %v", err)
+			return
+		}
+
+		logrus.Infof("%s is ready", s.Name())
+		close(ready)
 	}()
 
-	logrus.Info("waiting for kube-apiserver")
-
-	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+	// Work around that that the NewAPIServerCommand hardcodes the stop channel to SIGTERM signals,
+	// so we cannot use the cobra RunE command directly.
+	completedOptions, err := kubeapiserver.Complete(s.serverOptions)
 	if err != nil {
+		return fmt.Errorf("%s configuration error: %v", s.Name(), err)
+	}
+	if errs := completedOptions.Validate(); len(errs) != 0 {
+		return fmt.Errorf("%s configuration error: %v", s.Name(), utilerrors.NewAggregate(errs))
+	}
+
+	if err := kubeapiserver.Run(completedOptions, ctx.Done()); err != nil {
 		return err
 	}
-
-	versionedClient, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return err
-	}
-
-	err = genericcontrollermanager.WaitForAPIServer(versionedClient, 10*time.Second)
-	if err != nil {
-		logrus.Warningf("Failed to wait for apiserver being healthy: %v", err)
-		return nil
-	}
-	logrus.Info("kube-apiserver is ready")
-
-	return nil
+	return ctx.Err()
 }
