@@ -21,19 +21,6 @@
 # quay.io/microshift/microshift.  A github release and a tag are created and identified with the version generated
 # by the Makefile. Cross-compiled binaries are copied from the container images and published in the git release.
 
-# A note on base image digests:
-# Release images are based on registry.access.redhat.com/ubi8/ubi-minimal:8.4.  Architecture digests are pinned in
-# ./scripts/release_config/rhel-ubi-minimal-8-4-arch-digests.  ubi-minimal:8.4 receives z-stream update periodically.
-# When updating to the latest z-stream version, you can obtain the new digests by exec'ing the following for each
-# supported architecture:
-#
-# $ ARCH={one of: amd64, arm64}
-# $ podman pull --platform=linux/$ARCH ubi-minimal:8.4
-# $ podman inspect ubi-minimal:8.4 | jq -r '.[]["RepoDigests"][0] | sub(".+?(?=sha)";"")'
-#
-# Overwrite each digest in ./scripts/release_config/rhel-ubi-minimal-8-4-arch-digests as
-# $ARCH=$DIGEST.  Include the "sha256:" prefix.
-
 set -euo pipefail
 shopt -s expand_aliases
 
