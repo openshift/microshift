@@ -41,7 +41,10 @@ rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
 
 ## Developing Microshift
+> Note: when building or running **ARM64** container images, Linux host environments must have the `qemu-user-static` package installed.  E.g. on Fedora: `dnf install qemu-user-static`.
+
 ### Building
+
 You can locally build Microshift using one of two methods, either using a container build (recommended) on Podman or Docker:
 ```
 make microshift
@@ -54,6 +57,7 @@ make
 ```
 
 ### Running
+
 Use `install.sh` to set up your sytem and install run-time dependencies for Microshift, then simply:
 ```
 sudo microshift run
@@ -62,3 +66,4 @@ sudo microshift run
 Microshift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running Microshift as privileged user and `$HOME/.microshift` otherwise. Note that running Microshift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
 
 You can find the kubeadmin's kubeconfig under `$DATADIR/resources/kubeadmin/kubeconfig`.
+
