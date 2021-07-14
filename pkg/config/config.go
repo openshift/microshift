@@ -45,6 +45,11 @@ type NodeConfig struct {
 	// Token string `yaml:"token", envconfig:"NODE_TOKEN"`
 }
 
+type ComponentConfig struct {
+	Image      string            `yaml:"image"`
+	Parameters map[string]string `yaml:"parameters"`
+}
+
 type MicroshiftConfig struct {
 	ConfigFile string
 	DataDir    string `yaml:"dataDir"`
@@ -62,6 +67,8 @@ type MicroshiftConfig struct {
 	Cluster      ClusterConfig      `yaml:"cluster"`
 	ControlPlane ControlPlaneConfig `yaml:"controlPlane"`
 	Node         NodeConfig         `yaml:"node"`
+
+	Components []ComponentConfig `yaml:"components,omitempty"`
 }
 
 func NewMicroshiftConfig() *MicroshiftConfig {
@@ -93,6 +100,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		},
 		ControlPlane: ControlPlaneConfig{},
 		Node:         NodeConfig{},
+		Components:   []ComponentConfig{},
 	}
 }
 
