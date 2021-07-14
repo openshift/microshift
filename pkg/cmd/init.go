@@ -50,13 +50,13 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	}
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
-	if err := util.GenCerts("etcd-server", cfg.DataDir+"/certs/secrets/etcd-all-serving",
+	if err := util.GenCerts("etcd-server", cfg.DataDir+"/certs/etcd",
 		"etcd-serving.crt", "etcd-serving.key",
 		[]string{"localhost", cfg.HostIP, "127.0.0.1", cfg.HostName}); err != nil {
 		return err
 	}
 
-	if err := util.GenCerts("etcd-peer", cfg.DataDir+"/certs/secrets/etcd-all-peer",
+	if err := util.GenCerts("etcd-peer", cfg.DataDir+"/certs/etcd",
 		"etcd-peer.crt", "etcd-peer.key",
 		[]string{"localhost", cfg.HostIP, "127.0.0.1", cfg.HostName}); err != nil {
 		return err
@@ -122,14 +122,6 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 }
 
 func initServerConfig(cfg *config.MicroshiftConfig) error {
-	if err := config.KubeAPIServerConfig(cfg); err != nil {
-		return err
-	}
-	/*
-		if err := config.KubeControllerManagerConfig(cfg); err != nil {
-			return err
-		}
-	*/
 	if err := config.OpenShiftAPIServerConfig(cfg); err != nil {
 		return err
 	}

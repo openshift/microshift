@@ -16,14 +16,14 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"net/url"
-	"time"
-
-	"github.com/sirupsen/logrus"
-	etcd "go.etcd.io/etcd/embed"
+	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/sirupsen/logrus"
+	etcd "go.etcd.io/etcd/embed"
 )
 
 var (
@@ -38,53 +38,75 @@ var (
 )
 
 const (
-	etcdStartupTimeout = 10
+	etcdStartupTimeout = 60
 )
 
-func StartEtcd(c *config.MicroshiftConfig, ready chan bool) error {
+type EtcdService struct {
+	etcdCfg *etcd.Config
+}
+
+func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
+	s := &EtcdService{}
+	s.configure(cfg)
+	return s
+}
+
+func (s *EtcdService) Name() string           { return "etcd" }
+func (s *EtcdService) Dependencies() []string { return []string{} }
+
+func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
+	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
+	certDir := filepath.Join(cfg.DataDir, "certs", s.Name())
+	dataDir := filepath.Join(cfg.DataDir, s.Name())
+
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
-	cfg := etcd.NewConfig()
-	cfg.ClusterState = "new"
-	//cfg.ForceNewCluster = true //TODO
-	cfg.Logger = "zap"
-	cfg.Dir = c.DataDir + "/etcd/"
-	cfg.APUrls = setURL([]string{c.HostIP}, ":2380")
-	cfg.LPUrls = setURL([]string{c.HostIP}, ":2380")
-	cfg.ACUrls = setURL([]string{c.HostIP}, ":2379")
-	cfg.LCUrls = setURL([]string{"127.0.0.1", c.HostIP}, ":2379")
-	cfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, ":2381")
+	s.etcdCfg = etcd.NewConfig()
+	s.etcdCfg.ClusterState = "new"
+	//s.etcdCfg.ForceNewCluster = true //TODO
+	s.etcdCfg.Logger = "zap"
+	s.etcdCfg.Dir = dataDir
+	s.etcdCfg.APUrls = setURL([]string{cfg.HostIP}, ":2380")
+	s.etcdCfg.LPUrls = setURL([]string{cfg.HostIP}, ":2380")
+	s.etcdCfg.ACUrls = setURL([]string{cfg.HostIP}, ":2379")
+	s.etcdCfg.LCUrls = setURL([]string{"127.0.0.1", cfg.HostIP}, ":2379")
+	s.etcdCfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, ":2381")
 
-	cfg.Name = c.HostName
-	cfg.InitialCluster = c.HostName + "=" + "https://" + c.HostIP + ":2380"
+	s.etcdCfg.Name = cfg.HostName
+	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.HostName, cfg.HostIP)
 
-	cfg.CipherSuites = tlsCipherSuites
-	cfg.ClientTLSInfo.CertFile = c.DataDir + "/certs/secrets/etcd-all-serving/etcd-serving.crt"
-	cfg.ClientTLSInfo.KeyFile = c.DataDir + "/certs/secrets/etcd-all-serving/etcd-serving.key"
-	cfg.ClientTLSInfo.TrustedCAFile = c.DataDir + "/certs/ca-bundle/ca-bundle.crt"
-	cfg.ClientTLSInfo.ClientCertAuth = false
-	cfg.ClientTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
+	s.etcdCfg.CipherSuites = tlsCipherSuites
+	s.etcdCfg.ClientTLSInfo.CertFile = filepath.Join(certDir, "etcd-serving.crt")
+	s.etcdCfg.ClientTLSInfo.KeyFile = filepath.Join(certDir, "etcd-serving.key")
+	s.etcdCfg.ClientTLSInfo.TrustedCAFile = caCertFile
+	s.etcdCfg.ClientTLSInfo.ClientCertAuth = false
+	s.etcdCfg.ClientTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
-	cfg.PeerTLSInfo.CertFile = c.DataDir + "/certs/secrets/etcd-all-peer/etcd-peer.crt"
-	cfg.PeerTLSInfo.KeyFile = c.DataDir + "/certs/secrets/etcd-all-peer/etcd-peer.key"
-	cfg.PeerTLSInfo.TrustedCAFile = c.DataDir + "/certs/ca-bundle/ca-bundle.crt"
-	cfg.PeerTLSInfo.ClientCertAuth = false
-	cfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
+	s.etcdCfg.PeerTLSInfo.CertFile = filepath.Join(certDir, "etcd-peer.crt")
+	s.etcdCfg.PeerTLSInfo.KeyFile = filepath.Join(certDir, "etcd-peer.key")
+	s.etcdCfg.PeerTLSInfo.TrustedCAFile = caCertFile
+	s.etcdCfg.PeerTLSInfo.ClientCertAuth = false
+	s.etcdCfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
+}
 
-	e, err := etcd.StartEtcd(cfg)
+func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+
+	e, err := etcd.StartEtcd(s.etcdCfg)
 	if err != nil {
-		return fmt.Errorf("etcd failed to start: %v", err)
+		return fmt.Errorf("%s failed to start: %v", s.Name(), err)
 	}
+
+	// run readiness check
 	go func() {
-		select {
-		case <-e.Server.ReadyNotify():
-			logrus.Info("Server is ready!")
-			ready <- true
-		case <-time.After(etcdStartupTimeout * time.Second):
-			e.Server.Stop()
-			logrus.Fatalf("etcd failed to start in %d seconds", etcdStartupTimeout)
-		}
+		<-e.Server.ReadyNotify()
+		logrus.Infof("%s is ready", s.Name())
+		close(ready)
 	}()
-	return nil
+
+	<-ctx.Done()
+	e.Server.Stop()
+	<-e.Server.StopNotify()
+	return ctx.Err()
 }
 
 func setURL(hostnames []string, port string) []url.URL {
