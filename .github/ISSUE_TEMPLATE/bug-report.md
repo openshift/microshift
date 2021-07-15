@@ -29,6 +29,6 @@ title: '[BUG] <title>'
 - Kernel (e.g. `uname -a`):
 - Others:
 
-#### Log bundle
-<!-- A link to bootstrap log bundle or `oc adm must-gather` archive.-->
+#### Relevant Logs 
+
 
