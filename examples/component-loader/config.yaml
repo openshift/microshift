@@ -1,0 +1,3 @@
+components:
+  - name: test
+    image: docker.io/rootfs/loader:test

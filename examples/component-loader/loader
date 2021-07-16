@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "hello world"
+kubectl get pods -A
+
+exit 0

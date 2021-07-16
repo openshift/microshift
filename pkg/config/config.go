@@ -46,6 +46,7 @@ type NodeConfig struct {
 }
 
 type ComponentConfig struct {
+	Name       string            `yaml:"name"`
 	Image      string            `yaml:"image"`
 	Parameters map[string]string `yaml:"parameters"`
 }
