@@ -26,6 +26,10 @@ func AllClosed(channels []<-chan struct{}) bool {
 
 // And returns a signalling channel that will be closed when all operand
 // signalling channels have been closed.
+// Note: As both And() and close() are async, it is possible and normal
+//       for And() to return 'false' immediately after close() has been
+//       called on its operands. Therefore, always use as blocking or in
+//       a for-select-loop.
 func And(channels []<-chan struct{}) <-chan struct{} {
 	andChannel := make(chan struct{})
 
