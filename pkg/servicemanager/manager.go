@@ -29,6 +29,9 @@ func (s *ServiceManager) Name() string           { return s.name }
 func (s *ServiceManager) Dependencies() []string { return s.deps }
 
 func (m *ServiceManager) AddService(s Service) error {
+	if s == nil {
+		return fmt.Errorf("service must not be <nil>")
+	}
 	if _, exists := m.serviceMap[s.Name()]; exists {
 		return fmt.Errorf("service '%s' added more than once", s.Name())
 	}
