@@ -76,7 +76,9 @@ func TestRunToCompletion(t *testing.T) {
 	m.AddService(NewGenericService("bar", []string{"foo"}, runToCompletionFunc))
 	wg.Add(2)
 
-	ctx, _ := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	if err := m.Run(ctx, ready, stopped); err != nil {
 		t.Errorf("error running %s: %v", m.Name(), err)
