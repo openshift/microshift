@@ -29,8 +29,10 @@ var (
 )
 
 type ClusterConfig struct {
+	// URL is api endpoint accessed by local host
 	URL string `yaml:"url"`
-
+	// PublicURL is api endpoint accessed external hosts
+	PublicURL   string `yaml:"publicUrl"`
 	ClusterCIDR string `yaml:"clusterCIDR"`
 	ServiceCIDR string `yaml:"serviceCIDR"`
 	DNS         string `yaml:"dns"`
@@ -86,6 +88,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		HostIP:          hostIP,
 		Cluster: ClusterConfig{
 			URL:         "https://127.0.0.1:6443",
+			PublicURL:   "https://" + hostIP + ":6443",
 			ClusterCIDR: "10.42.0.0/16",
 			ServiceCIDR: "10.43.0.0/16",
 			DNS:         "10.43.0.10",

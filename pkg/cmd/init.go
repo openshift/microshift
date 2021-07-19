@@ -160,6 +160,12 @@ func initKubeconfig(cfg *config.MicroshiftConfig) error {
 	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubeadmin/kubeconfig", "system:admin", []string{"system:masters"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubeadmin/kubeconfig.public", "system:admin", []string{"system:masters"}, cfg.Cluster.PublicURL); err != nil {
+		return err
+	}
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubeadmin/kubeconfig", "system:admin", []string{"system:masters"}, cfg.Cluster.URL); err != nil {
+		return err
+	}
 	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-apiserver/kubeconfig", "kube-apiserver", []string{"kube-apiserver", "system:kube-apiserver", "system:masters"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
