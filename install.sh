@@ -24,14 +24,16 @@ get_arch() {
 
 # If RHEL, use subscription-manager to register
 register_subs() {
+    set +e +o pipefail
     REPO="rhocp-4.7-for-rhel-8-x86_64-rpms"
     # Check subscription status and register if not
     STATUS=$(sudo subscription-manager status | awk '/Overall Status/ { print $3 }')
     if [[ $STATUS != "Current" ]]
     then
         sudo subscription-manager register --auto-attach
+        sudo subscription-manager config --rhsm.manage_repos=1
     fi
-
+    set -e -o pipefail
     # Check if already subscribed to the proper repository
     if ! sudo subscription-manager repos --list-enabled | grep -q ${REPO}
     then
@@ -179,5 +181,3 @@ do
      sleep 2
 done
 prepare_kubeconfig
-
-
