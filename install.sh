@@ -31,6 +31,8 @@ register_subs() {
     if [[ $STATUS != "Current" ]]
     then
         sudo subscription-manager register --auto-attach
+        POOL=$(sudo subscription-manager list --available --matches '*OpenShift' | grep Pool | head -n1 | awk -F: '{print $2}' | tr -d ' ')
+	sudo subscription-manager attach --pool $POOL
         sudo subscription-manager config --rhsm.manage_repos=1
     fi
     set -e -o pipefail
