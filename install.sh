@@ -159,6 +159,18 @@ prepare_kubeconfig() {
     sudo KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig:$HOME/.kube/config.orig  /usr/local/bin/kubectl config view --flatten > $HOME/.kube/config
 }
 
+# validation checks for deployment 
+validation_check(){
+    echo $HOSTNAME | grep -P '(?=^.{1,254}$)(^(?>(?!\d+\.)[a-zA-Z0-9_\-]{1,63}\.?)+(?:[a-zA-Z]{2,})$)' && echo "Correct"
+    if [ $? != 0 ];
+    then
+        echo "The hostname $HOSTNAME is incompatible with this installation please update your hostname and try again. "
+        echo "Example: 'sudo hostnamectl set-hostname $HOSTNAME.example.com'"
+        exit 1
+    else
+        echo "$HOSTNAME is a valid machine name continuing installation"
+    fi
+}
 
 # Script execution
 get_distro
@@ -166,6 +178,7 @@ get_arch
 if [ $DISTRO = "rhel" ]; then
     register_subs
 fi
+validation_check
 install_dependencies
 establish_firewall
 install_crio
