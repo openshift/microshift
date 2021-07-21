@@ -31,16 +31,32 @@ func AllClosed(channels []<-chan struct{}) bool {
 //       called on its operands. Therefore, always use as blocking or in
 //       a for-select-loop.
 func And(channels []<-chan struct{}) <-chan struct{} {
-	andChannel := make(chan struct{})
+	// terminate recursion
+	switch len(channels) {
+	case 0:
+		andChannel := make(chan struct{})
+		close(andChannel)
+		return andChannel
+	case 1:
+		return channels[0]
+	}
 
+	andChannel := make(chan struct{})
 	go func() {
 		defer close(andChannel)
-		for {
-			if AllClosed(channels) {
-				break
-			}
+
+		// bipartition and recurse
+		m := (len(channels) + 1) / 2
+		a := And(channels[0:m])
+		b := And(channels[m:])
+
+		// wait for both partitions's signaling channels to close
+		select {
+		case <-a:
+			<-b
+		case <-b:
+			<-a
 		}
 	}()
-
 	return andChannel
 }
