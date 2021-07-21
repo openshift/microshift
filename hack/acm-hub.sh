@@ -1,12 +1,13 @@
 #! /usr/bin/env bash
 
 set -euo pipefail
-set -x
+
 CLUSTER_NAME=${1:? "\$1 should be a cluster name in the standard FQDN format"}
 
 WORK_DIR=$HOME/.acm/"$CLUSTER_NAME"
+SPOKE_DIR="$WORK_DIR"/spoke
 rm -rf "$WORK_DIR"
-mkdir -p "$WORK_DIR"
+mkdir -p "$WORK_DIR" "$SPOKE_DIR"
 
 cat <<EOF >"$WORK_DIR"/managed-cluster.yaml
 apiVersion: cluster.open-cluster-management.io/v1
@@ -48,5 +49,5 @@ oc apply -f "$WORK_DIR"/managed-cluster.yaml
 oc apply -f "$WORK_DIR"/klusterlet-addon-config.yaml
 sleep 3
 echo "Creating kluster-crd.yaml and import.yaml.  These files need to be accessible to the client script"
-oc get secret "$CLUSTER_NAME"-import -n "$CLUSTER_NAME" -o jsonpath={.data.crds\\.yaml} | base64 --decode >"$WORK_DIR"/klusterlet-crd.yaml
-oc get secret "$CLUSTER_NAME"-import -n "$CLUSTER_NAME" -o jsonpath={.data.import\\.yaml} | base64 --decode >"$WORK_DIR"/import.yaml
+oc get secret "$CLUSTER_NAME"-import -n "$CLUSTER_NAME" -o jsonpath={.data.crds\\.yaml} | base64 --decode >"$SPOKE_DIR"/klusterlet-crd.yaml
+oc get secret "$CLUSTER_NAME"-import -n "$CLUSTER_NAME" -o jsonpath={.data.import\\.yaml} | base64 --decode >"$SPOKE_DIR"/import.yaml
