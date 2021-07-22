@@ -35,16 +35,17 @@ GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/client-go/pkg/version.gitCommit=5feb30e1bd3620 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
-                   -X github.com/microshift/pkg/version.versionFromGit=$(SOURCE_GIT_TAG) \
-                   -X github.com/microshift/pkg/version.gitCommit=$(SOURCE_GIT_COMMIT) \
-                   -X github.com/microshift/pkg/version.gitTreeState=$(SOURCE_GIT_TREE_STATE) \
-                   -X github.com/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
+                   -X github.com/openshift/microshift/pkg/version.versionFromGit=$(SOURCE_GIT_TAG) \
+                   -X github.com/openshift/microshift/pkg/version.commitFromGit=$(SOURCE_GIT_COMMIT) \
+                   -X github.com/openshift/microshift/pkg/version.gitTreeState=$(SOURCE_GIT_TREE_STATE) \
+                   -X github.com/openshift/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    $(GO_EXT_LD_FLAGS) \
                    -s -w"
 
 debug:
 	@echo FLAGS:"$(GO_LD_FLAGS)"
 	@echo TAG:"$(SOURCE_GIT_TAG)"
+	@echo SOURCE_GIT_TAG:"$(SOURCE_GIT_TAG)"
 
 # These tags make sure we can statically link and avoid shared dependencies
 GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netgo osusergo'
