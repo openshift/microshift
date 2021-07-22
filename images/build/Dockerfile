@@ -1,12 +1,9 @@
-# DIGEST is the registry.access.redhat.com/ubi8/ubi-minimal:8.4 architecture specific image to use for the run stage
-# When specifying, assign as "@sha256: ... ".  Unset by default
-ARG DIGEST
-
 # Build stage
 FROM registry.access.redhat.com/ubi8/go-toolset as builder
 
 ARG ARCH=amd64
 ARG MAKE_TARGET=cross-build-linux-$ARCH
+ARG BIN_TIMESTAMP
 ARG SOURCE_GIT_TAG
 
 USER root
@@ -21,7 +18,7 @@ RUN yum install glibc-static -y
 
 COPY . .
 
-RUN make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG
+RUN make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG BIN_TIMESTAMP=$BIN_TIMESTAMP
 
 # Run stage
 # Containerized microshift

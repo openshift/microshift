@@ -5,11 +5,13 @@ include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/
 # TIMESTAMP is defined here, and only here, and propagated through out the build flow.  This ensures that every artifact
 # (binary version and image tag) all have the exact same build timestamp.  Because kubectl/oc expect
 # a timestamp composed with ':'s we must replace the chars with '-' so that it is still compliant with image tag format.
-export BIN_TIMESTAMP :=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
-export TIMESTAMP :=$(shell echo $(BIN_TIMESTAMP) | tr ':' '-')
+export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr ':' '-')
 
 RELEASE_PRE :=0.4.7-0.microshift
-export SOURCE_GIT_TAG :=$(shell echo $(RELEASE_PRE)-$(BIN_TIMESTAMP))
+# Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
+# because since it doesn't work with our version scheme.
+SOURCE_GIT_TAG :=$(shell git describe --long --tags --abbrev=7 --broke --match '$(RELEASE_PRE)*' || echo 'v0.0.0-unknown')
 
 SRC_ROOT :=$(shell pwd)
 
@@ -21,7 +23,7 @@ CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 
 GO_EXT_LD_FLAGS :=-extldflags '-static'
-GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor=1 \
+GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMinor=20 \
                    -X k8s.io/component-base/version.gitVersion=v1.20.1 \
                    -X k8s.io/component-base/version.gitCommit=5feb30e1bd3620 \
@@ -33,11 +35,15 @@ GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/client-go/pkg/version.gitCommit=5feb30e1bd3620 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
+                   -X github.com/microshift/pkg/version.versionFromGit=$(SOURCE_GIT_TAG) \
+                   -X github.com/microshift/pkg/version.gitCommit=$(SOURCE_GIT_COMMIT) \
+                   -X github.com/microshift/pkg/version.gitTreeState=$(SOURCE_GIT_TREE_STATE) \
+                   -X github.com/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    $(GO_EXT_LD_FLAGS) \
-                   -s -w
+                   -s -w"
 
 debug:
-	@echo FLAGS:"$(GO_LD_EXTRAFLAGS)"
+	@echo FLAGS:"$(GO_LD_FLAGS)"
 	@echo TAG:"$(SOURCE_GIT_TAG)"
 
 # These tags make sure we can statically link and avoid shared dependencies
@@ -75,9 +81,11 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 # containerized build targets #
 ###############################
 _build_containerized:
+	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
 	$(CTR_CMD) build -t $(IMAGE_REPO):$(RELEASE_PRE)-$(TIMESTAMP)-linux-$(ARCH) \
 		-f "$(SRC_ROOT)"/images/build/Dockerfile \
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
+		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
 		--build-arg ARCH=$(ARCH) \
 		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
 		--platform="linux/$(ARCH)" \
