@@ -5,11 +5,11 @@ include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/
 # TIMESTAMP is defined here, and only here, and propagated through out the build flow.  This ensures that every artifact
 # (binary version and image tag) all have the exact same build timestamp.  Because kubectl/oc expect
 # a timestamp composed with ':'s we must replace the chars with '-' so that it is still compliant with image tag format.
-BIN_TIMESTAMP :=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
-TIMESTAMP :=$(shell echo $(BIN_TIMESTAMP) | tr ':' '-')
+export BIN_TIMESTAMP :=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+export TIMESTAMP :=$(shell echo $(BIN_TIMESTAMP) | tr ':' '-')
 
 RELEASE_PRE :=0.4.7-0.microshift
-SOURCE_GIT_TAG :=$(shell echo $(RELEASE_PRE)-$(TIMESTAMP))
+export SOURCE_GIT_TAG :=$(shell echo $(RELEASE_PRE)-$(BIN_TIMESTAMP))
 
 SRC_ROOT :=$(shell pwd)
 
@@ -56,7 +56,9 @@ update: update-generated-completions
 
 _build_local:
 	@mkdir -p "$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)"
-	+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(MAKE) --no-print-directory build GO_BUILD_PACKAGES:=./cmd/microshift GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
+	+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(MAKE) --no-print-directory build \
+		GO_BUILD_PACKAGES:=./cmd/microshift \
+		GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
 
 cross-build-linux-amd64:
 	+$(MAKE) _build_local GOOS=linux GOARCH=amd64
@@ -73,7 +75,7 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 # containerized build targets #
 ###############################
 _build_containerized:
-	$(CTR_CMD) build -t $(IMAGE_REPO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
+	$(CTR_CMD) build -t $(IMAGE_REPO):$(RELEASE_PRE)-$(TIMESTAMP)-linux-$(ARCH) \
 		-f "$(SRC_ROOT)"/images/build/Dockerfile \
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
 		--build-arg ARCH=$(ARCH) \
