@@ -2,7 +2,12 @@
 include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
 include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
 
-TIMESTAMP :=$(shell date -u +'%Y-%m-%d-%H%M%S')
+# TIMESTAMP is defined here, and only here, and propagated through out the build flow.  This ensures that every artifact
+# (binary version and image tag) all have the exact same build timestamp.  Because kubectl/oc expect
+# a timestamp composed with ':'s we must replace the chars with '-' so that it is still compliant with image tag format.
+BIN_TIMESTAMP :=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+TIMESTAMP :=$(shell echo $(BIN_TIMESTAMP) | tr ':' '-')
+
 RELEASE_PRE :=0.4.7-0.microshift
 SOURCE_GIT_TAG :=$(shell echo $(RELEASE_PRE)-$(TIMESTAMP))
 
@@ -21,13 +26,13 @@ GO_LD_EXTRAFLAGS :=-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitVersion=v1.20.1 \
                    -X k8s.io/component-base/version.gitCommit=5feb30e1bd3620 \
                    -X k8s.io/component-base/version.gitTreeState=clean \
-                   -X k8s.io/component-base/version.buildDate=$(TIMESTAMP) \
+                   -X k8s.io/component-base/version.buildDate=$(BIN_TIMESTAMP) \
                    -X k8s.io/client-go/pkg/version.gitMajor=1 \
                    -X k8s.io/client-go/pkg/version.gitMinor=20 \
                    -X k8s.io/client-go/pkg/version.gitVersion=v1.20.1 \
                    -X k8s.io/client-go/pkg/version.gitCommit=5feb30e1bd3620 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
-                   -X k8s.io/client-go/pkg/version.buildDate=$(TIMESTAMP) \
+                   -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    $(GO_EXT_LD_FLAGS) \
                    -s -w
 
