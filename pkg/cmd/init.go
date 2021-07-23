@@ -77,10 +77,6 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 		"service-account.crt", "service-account.key"); err != nil {
 		return err
 	}
-	if err := util.GenKeys(cfg.DataDir+"/resources/kube-apiserver/secrets/service-account-signing-key",
-		"service-account.crt", "service-account.key"); err != nil {
-		return err
-	}
 	if err := util.GenCerts("system:masters", cfg.DataDir+"/certs/kube-apiserver/secrets/aggregator-client",
 		"tls.crt", "tls.key",
 		[]string{"system:admin", "system:masters"}); err != nil {
