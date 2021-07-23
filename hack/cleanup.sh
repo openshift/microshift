@@ -115,4 +115,3 @@ V ${SUDO} rm -rf $HOME/.kube
 
 V ${SUDO} mkdir -p /var/lib/kubelet
 V ${SUDO} chcon -R -t container_file_t /var/lib/kubelet/
-{"mode":"full","isActive":false}
