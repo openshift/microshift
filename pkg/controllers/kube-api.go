@@ -99,7 +99,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		"--requestheader-group-headers=X-Remote-Group",
 		"--requestheader-username-headers=X-Remote-User",
 		"--service-account-issuer=https://kubernetes.svc",
-		"--service-account-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
+		"--service-account-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.crt",
 		"--service-account-signing-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
 		"--service-cluster-ip-range=" + cfg.Cluster.ServiceCIDR,
 		"--storage-backend=etcd3",
