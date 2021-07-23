@@ -79,21 +79,6 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig) error {
 				Name:      "openshift-apiserver",
 				Namespace: "default",
 			},
-			/*
-				Subsets: []corev1.EndpointSubset{
-					corev1.EndpointSubset{
-						Addresses: []corev1.EndpointAddress{
-							corev1.EndpointAddress{
-								IP: cfg.AdvertiseIP,
-							},
-						},
-						Ports: []corev1.EndpointPort{
-							corev1.EndpointPort{
-								Port: port,
-							},
-						},
-					},
-				},*/
 		}
 
 		k8s_endpoints, err := client.Endpoints("default").Get(context.TODO(), "kubernetes", metav1.GetOptions{})
@@ -211,15 +196,6 @@ func PrepareOCP(cfg *config.MicroshiftConfig) error {
 }
 
 func StartOCPAPIComponents(cfg *config.MicroshiftConfig) error {
-	// ocp api service registration
-	if err := createAPIHeadlessSvc(cfg); err != nil {
-		logrus.Warningf("failed to apply headless svc %v", err)
-		return err
-	}
-	if err := createAPIRegistration(cfg); err != nil {
-		logrus.Warningf("failed to register api %v", err)
-		return err
-	}
 	if err := applySCCs(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to apply sccs: %v", err)
 		return err
