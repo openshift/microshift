@@ -4,14 +4,14 @@ include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/
 
 # TIMESTAMP is defined here, and only here, and propagated through out the build flow.  This ensures that every artifact
 # (binary version and image tag) all have the exact same build timestamp.  Because kubectl/oc expect
-# a timestamp composed with ':'s we must replace the chars with '-' so that it is still compliant with image tag format.
+# a timestamp composed with ':'s we must adjust the string so that it is still compliant with image tag format.
 export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
-export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr ':' '-')
+export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
 
-RELEASE_PRE :=0.4.7-0.microshift
+RELEASE_PRE :=4.7.0-0.microshift
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
-SOURCE_GIT_TAG :=$(shell git describe --long --tags --abbrev=7 --broke --match '$(RELEASE_PRE)*' || echo 'v0.0.0-unknown')
+SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --broke --match '$(RELEASE_PRE)*' || echo '4.7.0-0.microshift-unknown')
 
 SRC_ROOT :=$(shell pwd)
 
