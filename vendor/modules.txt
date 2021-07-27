@@ -224,7 +224,6 @@ github.com/containers/image/transports
 github.com/containers/image/types
 github.com/containers/image/version
 # github.com/containers/storage v0.0.0-20170801145921-47536c89fcc5
-## explicit
 github.com/containers/storage/pkg/homedir
 # github.com/coreos/go-oidc v2.1.0+incompatible
 ## explicit
@@ -649,7 +648,6 @@ github.com/opencontainers/go-digest
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.0.0-rc92
-## explicit
 github.com/opencontainers/runc/libcontainer
 github.com/opencontainers/runc/libcontainer/apparmor
 github.com/opencontainers/runc/libcontainer/cgroups

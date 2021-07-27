@@ -73,7 +73,6 @@ require (
 	github.com/containerd/ttrpc v1.0.2 // indirect
 	github.com/containernetworking/cni v0.8.0 // indirect
 	github.com/containers/image v3.0.2+incompatible // indirect
-	github.com/containers/storage v0.0.0-20170801145921-47536c89fcc5 // indirect
 	github.com/coreos/go-oidc v2.1.0+incompatible // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f
@@ -156,7 +155,6 @@ require (
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
-	github.com/opencontainers/runc v1.0.0-rc92 // indirect
 	github.com/opencontainers/runtime-spec v1.0.3-0.20200728170252-4d89ac9fbff6 // indirect
 	github.com/opencontainers/selinux v1.6.0 // indirect
 	github.com/openshift/api v0.0.0-20210412200117-f60a0b2883ea
