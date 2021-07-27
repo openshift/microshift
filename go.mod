@@ -69,19 +69,18 @@ require (
 	github.com/clusterhq/flocker-go v0.0.0-20160920122132-2b8b7259d313 // indirect
 	github.com/container-storage-interface/spec v1.2.0 // indirect
 	github.com/containerd/console v1.0.0 // indirect
-	github.com/containerd/containerd v1.4.1 // indirect
+	github.com/containerd/containerd v1.4.8 // indirect
 	github.com/containerd/ttrpc v1.0.2 // indirect
 	github.com/containernetworking/cni v0.8.0 // indirect
 	github.com/containers/image v3.0.2+incompatible // indirect
 	github.com/containers/storage v0.0.0-20170801145921-47536c89fcc5 // indirect
 	github.com/coreos/go-oidc v2.1.0+incompatible // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
-	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
+	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f
 	github.com/coreos/go-systemd/v22 v22.1.0 // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/cyphar/filepath-securejoin v0.2.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v17.12.0-ce-rc1.0.20200916142827-bd33bbf0497b+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.0.0-20190720063934-f78081d1f7fe // indirect
@@ -96,7 +95,6 @@ require (
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/fsouza/go-dockerclient v0.0.0-20171004212419-da3951ba2e9e // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
@@ -108,6 +106,7 @@ require (
 	github.com/go-ozzo/ozzo-validation v3.5.0+incompatible // indirect
 	github.com/godbus/dbus/v5 v5.0.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang-jwt/jwt v3.2.1+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/mock v1.4.1 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
@@ -139,7 +138,7 @@ require (
 	github.com/lithammer/dedent v1.1.0 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
-	github.com/miekg/dns v1.1.4 // indirect
+	github.com/miekg/dns v1.1.43 // indirect
 	github.com/mindprince/gonvml v0.0.0-20190828220739-9ebdce4bb989 // indirect
 	github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible // indirect
 	github.com/mitchellh/go-homedir v1.1.0
@@ -202,10 +201,7 @@ require (
 	go.uber.org/multierr v1.1.1-0.20180122172545-ddea229ff1df // indirect
 	go.uber.org/zap v1.11.0 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
-	golang.org/x/net v0.0.0-20210224082022-3d97a244fca7 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
-	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 // indirect
-	golang.org/x/sys v0.0.0-20210225134936-a50acf3fe073 // indirect
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
 	golang.org/x/text v0.3.4 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
