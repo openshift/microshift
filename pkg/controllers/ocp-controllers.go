@@ -80,6 +80,17 @@ func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 		logrus.Fatalf("ocp apiserver exited: %v", command.Execute())
 	}()
 
+	// ocp api service registration
+	if err := createAPIHeadlessSvc(cfg); err != nil {
+		logrus.Warningf("failed to apply headless svc %v", err)
+		return err
+	}
+	if err := createAPIRegistration(cfg); err != nil {
+		logrus.Warningf("failed to register api %v", err)
+		return err
+	}
+
+	// probe ocp api services
 	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
 	if err != nil {
 		return err
