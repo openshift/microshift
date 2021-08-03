@@ -24,14 +24,18 @@ get_arch() {
 
 # If RHEL, use subscription-manager to register
 register_subs() {
+    set +e +o pipefail
     REPO="rhocp-4.7-for-rhel-8-x86_64-rpms"
     # Check subscription status and register if not
     STATUS=$(sudo subscription-manager status | awk '/Overall Status/ { print $3 }')
     if [[ $STATUS != "Current" ]]
     then
-        sudo subscription-manager register --auto-attach
+        sudo subscription-manager register --auto-attach < /dev/tty
+        POOL=$(sudo subscription-manager list --available --matches '*OpenShift' | grep Pool | head -n1 | awk -F: '{print $2}' | tr -d ' ')
+	sudo subscription-manager attach --pool $POOL
+        sudo subscription-manager config --rhsm.manage_repos=1
     fi
-
+    set -e -o pipefail
     # Check if already subscribed to the proper repository
     if ! sudo subscription-manager repos --list-enabled | grep -q ${REPO}
     then
@@ -67,6 +71,7 @@ sudo firewall-cmd --zone=public --permanent --add-port=2379-2380/tcp
 sudo firewall-cmd --zone=public --add-masquerade --permanent
 sudo firewall-cmd --zone=public --add-port=10250/tcp --permanent
 sudo firewall-cmd --zone=public --add-port=10251/tcp --permanent
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
 sudo firewall-cmd --reload
 }
 
@@ -192,5 +197,3 @@ do
      sleep 2
 done
 prepare_kubeconfig
-
-

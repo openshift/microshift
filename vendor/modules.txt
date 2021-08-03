@@ -177,7 +177,7 @@ github.com/containerd/cgroups/stats/v1
 # github.com/containerd/console v1.0.0
 ## explicit
 github.com/containerd/console
-# github.com/containerd/containerd v1.4.1
+# github.com/containerd/containerd v1.4.8
 ## explicit
 github.com/containerd/containerd/api/services/containers/v1
 github.com/containerd/containerd/api/services/tasks/v1
@@ -224,7 +224,6 @@ github.com/containers/image/transports
 github.com/containers/image/types
 github.com/containers/image/version
 # github.com/containers/storage v0.0.0-20170801145921-47536c89fcc5
-## explicit
 github.com/containers/storage/pkg/homedir
 # github.com/coreos/go-oidc v2.1.0+incompatible
 ## explicit
@@ -249,7 +248,6 @@ github.com/cyphar/filepath-securejoin
 ## explicit
 github.com/davecgh/go-spew/spew
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
-## explicit
 github.com/dgrijalva/jwt-go
 # github.com/docker/distribution v2.7.1+incompatible => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 ## explicit
@@ -355,7 +353,6 @@ github.com/form3tech-oss/jwt-go
 ## explicit
 github.com/fsnotify/fsnotify
 # github.com/fsouza/go-dockerclient v0.0.0-20171004212419-da3951ba2e9e
-## explicit
 github.com/fsouza/go-dockerclient
 # github.com/ghodss/yaml v1.0.0
 ## explicit
@@ -393,6 +390,8 @@ github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 github.com/gogo/protobuf/types
+# github.com/golang-jwt/jwt v3.2.1+incompatible
+## explicit
 # github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
 ## explicit
 github.com/golang/groupcache/lru
@@ -590,7 +589,7 @@ github.com/mailru/easyjson/jwriter
 # github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369
 ## explicit
 github.com/matttproud/golang_protobuf_extensions/pbutil
-# github.com/miekg/dns v1.1.4
+# github.com/miekg/dns v1.1.43
 ## explicit
 github.com/miekg/dns
 # github.com/mindprince/gonvml v0.0.0-20190828220739-9ebdce4bb989
@@ -649,7 +648,6 @@ github.com/opencontainers/go-digest
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.0.0-rc92
-## explicit
 github.com/opencontainers/runc/libcontainer
 github.com/opencontainers/runc/libcontainer/apparmor
 github.com/opencontainers/runc/libcontainer/cgroups
@@ -1381,8 +1379,7 @@ golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20210224082022-3d97a244fca7
-## explicit
+# golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 golang.org/x/net/bpf
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
@@ -1408,12 +1405,10 @@ golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
-## explicit
+# golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 golang.org/x/sync/errgroup
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.0.0-20210225134936-a50acf3fe073
-## explicit
+# golang.org/x/sys v0.0.0-20210303074136-134d130e1a04
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
