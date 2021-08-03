@@ -3,8 +3,17 @@ set -e -o pipefail
 
 # Usage:
 # ./install.sh
+# set ""
 
-VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4)
+# ENV VARS
+# MICROSHIFT_CONFIG_ENV_ONLY=true will short-circuit the installation immediately after the host is configured, and before
+# the microshift release is downloaded.  This is to allow developers and CI to configure a host envirnment for testing
+# non-release microshift runtimes.
+MICROSHIFT_CONFIG_ENV_ONLY=${MICROSHIFT_CONFIG_ENV_ONLY:=false}
+
+# Only get the version number if installing a release version
+[ $MICROSHIFT_CONFIG_ENV_ONLY = false ] && \
+  VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4)
 
 # Function to get Linux distribution
 get_distro() {
@@ -190,6 +199,9 @@ install_crio
 crio_conf
 verify_crio
 get_kubectl
+
+[ $MICROSHIFT_CONFIG_ENV_ONLY = true ] && { echo "Env config complete" && exit 0 ; }
+
 get_microshift
 
 until sudo test -f /var/lib/microshift/resources/kubeadmin/kubeconfig
