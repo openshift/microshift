@@ -56,12 +56,23 @@ sudo dnf install -y glibc-static
 make
 ```
 
+### Environment Configuration
+
+Before running Microshift, the host must first be configured.  This can be handled by running  
+
+`MICROSHIFT_CONFIG_ENV_ONLY=true ./install.sh`
+
+Or remotely as 
+
+`curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh |  MICROSHIFT_CONFIG_ENV_ONLY=true sh -`
+
 ### Running
 
-Use `install.sh` to set up your sytem and install run-time dependencies for Microshift, then simply:
 ```
 sudo microshift run
 ```
+
+Developers:
 
 Microshift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running Microshift as privileged user and `$HOME/.microshift` otherwise. Note that running Microshift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
 
