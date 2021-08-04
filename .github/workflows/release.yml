@@ -1,0 +1,30 @@
+name: Release Populater
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Pull the images and tar
+        run: |
+          sh hack/disconnected.sh
+
+      - name: Automatic Releases
+        uses: marvinpinto/action-automatic-releases@latest
+        with:  
+          repo_token: "${{ secrets.TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Latest"
+          files:
+            ~/microshift-images-amd64.tgz 
