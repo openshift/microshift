@@ -119,6 +119,7 @@ clean-cross-build:
 clean: clean-cross-build
 .PHONY: clean
 
+release: SOURCE_GIT_TAG=$(RELEASE_PRE)-$(TIMESTAMP)
 release:
 	./scripts/release.sh --token $(TOKEN) --target $(TARGET) --version $(SOURCE_GIT_TAG)
 .PHONY: release
