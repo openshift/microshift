@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -56,14 +57,13 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		logrus.Fatalf("Microshift must be run privileged for role 'node'")
 	}
 
-	// if data dir is missing, create and initialize it
+	os.MkdirAll(cfg.DataDir, 0700)
+	os.MkdirAll(cfg.LogDir, 0700)
+
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
-	if _, err := os.Stat(cfg.DataDir); errors.Is(err, os.ErrNotExist) {
-		os.MkdirAll(cfg.DataDir, 0700)
+	if _, err := os.Stat(filepath.Join(cfg.DataDir, "certs")); errors.Is(err, os.ErrNotExist) {
 		initAll(cfg)
 	}
-	// if log dir is missing, create it
-	os.MkdirAll(cfg.LogDir, 0700)
 
 	m := servicemanager.NewServiceManager()
 	if config.StringInList("controlplane", cfg.Roles) {
