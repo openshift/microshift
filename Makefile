@@ -83,7 +83,7 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 ###############################
 _build_containerized:
 	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
-	$(CTR_CMD) build -t $(IMAGE_REPO):$(RELEASE_PRE)-$(TIMESTAMP)-linux-$(ARCH) \
+	$(CTR_CMD) build -t $(IMAGE_REPO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
 		-f "$(SRC_ROOT)"/images/build/Dockerfile \
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
 		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \

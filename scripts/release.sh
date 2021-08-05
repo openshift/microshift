@@ -243,16 +243,16 @@ done
 
 printf "Using container manager: %s\n" "$(podman --version)"
 
+#### Debugging Vars.  For generating a full release to a fork, set to your own git/quay owner.
+GIT_OWNER=${GIT_OWNER:="microshift"}
+QUAY_OWNER=${QUAY_OWNER:="microshift"}
+####
+
 # Generate data early for debugging
 API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
 RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
-
-#### Debugging Vars.  For generating a full release to a fork, set to your own git/quay owner.
-GIT_OWNER=${GIT_OWNER:="microshift"}
-QUAY_OWNER=${QUAY_OWNER:-"microshift"}
-####
 
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
