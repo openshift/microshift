@@ -25,8 +25,8 @@ set -euo pipefail
 shopt -s expand_aliases
 
 # debugging options
-#trap 'echo "# $BASH_COMMAND"' DEBUG
-#set -x
+trap 'echo "# $BASH_COMMAND"' DEBUG
+set -x
 
 ########
 # INIT #
