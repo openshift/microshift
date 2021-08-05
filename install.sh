@@ -115,6 +115,15 @@ crio_conf() {
      fi
 }
 
+# Populate CRI-O
+populate_crio() {
+    if [[ $ARCH = "x86_64" && ! -d /var/lib/containers/storage ]] ; then
+       curl -L https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-images-amd64.tgz -o microshift-images-amd64.tgz
+       sudo tar -xzvf microshift-images-amd64.tgz -C /var/lib/containers/
+       sudo chown -R root:root /var/lib/containers/storage
+       rm -rf microshift-images-amd64
+    fi
+
 # Start CRI-O
 verify_crio() {
     sudo systemctl enable crio
@@ -196,6 +205,7 @@ install_dependencies
 establish_firewall
 install_crio
 crio_conf
+populate_crio
 verify_crio
 get_kubectl
 

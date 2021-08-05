@@ -156,8 +156,9 @@ stage_release_image_binaries() {
 }
 
 pull_container_images() {
+  local data="$1"
   cd "$ROOT"
-  sh hack/disconnected.sh $asset_dir
+  sh hack/disconnected.sh $data
 }
 
 build_container_images_artifacts() {
