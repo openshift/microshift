@@ -1,5 +1,11 @@
 #!/bin/bash
 DESTINATION_PATH=$1
+if [[ -z $DESTINATION_PATH ]]; then
+   echo "A path must be specified before running this script. Example (sh hack/disconnected.sh /tmp/)"
+   exit 1
+fi
+
+# Set temporary location
 PODMAN_ROOT="/tmp/storage"
 rm -rf ${PODMAN_ROOT} || true
 mkdir -p ${PODMAN_ROOT}
@@ -12,7 +18,4 @@ for i in ${CONSTSANTS} ${BINDATA}; do
    podman --root ${PODMAN_ROOT} --runroot  ${PODMAN_ROOT}  pull  ${i}
 done
 
-if [[ -z $DESTINATION_PATH ]]; then
-   DESTINATION_PATH="./"
-fi
 sudo tar czf  ${DESTINATION_PATH}/microshift-images-amd64.tgz -C /tmp/ storage
