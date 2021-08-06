@@ -171,7 +171,7 @@ push_container_image_artifacts() {
 pull_container_images() {		
 ￼  cd "$ROOT"		
 ￼  sh hack/disconnected.sh
-￼}
+}
 
 podman_create_manifest(){
   podman manifest create "$IMAGE_REPO:$VERSION" >&2
