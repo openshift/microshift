@@ -168,9 +168,9 @@ push_container_image_artifacts() {
   done
 }
 
-pull_container_images() {		
-￼  cd "$ROOT"		
-￼  sh hack/disconnected.sh
+pull_container_images() {
+   cd "$ROOT"
+   sh hack/disconnected.sh
 }
 
 podman_create_manifest(){
