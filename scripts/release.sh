@@ -244,7 +244,7 @@ done
 printf "Using container manager: %s\n" "$(podman --version)"
 
 #### Debugging Vars.  For generating a full release to a fork, set to your own git/quay owner.
-GIT_OWNER=${GIT_OWNER:="microshift"}
+GIT_OWNER=${GIT_OWNER:="redhat-et"}
 QUAY_OWNER=${QUAY_OWNER:="microshift"}
 ####
 
