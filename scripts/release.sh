@@ -268,7 +268,7 @@ build_container_images_artifacts                                      || { git s
 STAGE_DIR=$(stage_release_image_binaries)                             || { git switch -; exit 1; }
 push_container_image_artifacts                                        || { git switch -; exit 1; }
 push_container_manifest                                               || { git switch -; exit 1; }
-pull_container_images                                                 || { git switch -; exit 1; }
+pull_container_images "$STAGE_DIR"                                    || { git switch -; exit 1; }
 UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -; exit 1; }
 git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -; exit 1; }
 git switch -
