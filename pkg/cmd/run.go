@@ -13,6 +13,7 @@ import (
 	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
+	"github.com/openshift/microshift/pkg/kustomize"
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/servicemanager"
 	"github.com/openshift/microshift/pkg/util"
@@ -89,6 +90,8 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 				return nil
 			},
 		)))
+
+		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	}
 
 	if config.StringInList("node", cfg.Roles) {
