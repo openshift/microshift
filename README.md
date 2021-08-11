@@ -53,9 +53,15 @@ You can locally build Microshift using one of two methods, either using a contai
 make microshift
 ```
 
-or directly on the host after installing the build-time dependencies
+or directly on the host after installing the build-time dependencies. When using RHEL ensure the system is register and run the following before installing the prerequisites.
+
 ```
-sudo dnf install -y glibc-static
+ARCH=$( /bin/arch )
+subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
+```
+
+```
+sudo dnf install -y glibc-static gcc make golang
 make
 ```
 
@@ -63,15 +69,27 @@ make
 
 Before running Microshift, the host must first be configured.  This can be handled by running  
 
-`CONFIG_ENV_ONLY=true ./install.sh`
+```
+CONFIG_ENV_ONLY=true ./install.sh
+```
 
 ### Running
 
 ```
-sudo microshift run
+sudo ./microshift run
 ```
 
 Microshift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running Microshift as privileged user and `$HOME/.microshift` otherwise. Note that running Microshift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
 
-You can find the kubeadmin's kubeconfig under `$DATADIR/resources/kubeadmin/kubeconfig`.
+### Kubeconfig
+You can find the kubeadmin's kubeconfig under `/var/lib/microshift/resources/kubeadmin/kubeconfig`. 
+
+To use the kubeconfig
+```
+mkdir ~/.kube
+sudo cp /var/lib/microshift/resources/kubeadmin/kubeconfig ~/.kube/config
+USER=`whoami`
+sudo chown $USER:$USER ~/.kube/config
+export KUBECONFIG=~/.kube/config
+```
 
