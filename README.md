@@ -57,7 +57,7 @@ or directly on the host after installing the build-time dependencies. When using
 
 ```
 ARCH=$( /bin/arch )
-subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
+sudo subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
 ```
 
 ```
@@ -74,6 +74,7 @@ CONFIG_ENV_ONLY=true ./install.sh
 ```
 
 ### Running
+From the directory in which the binary was created run the following.
 
 ```
 sudo ./microshift run
