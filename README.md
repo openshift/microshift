@@ -77,6 +77,7 @@ CONFIG_ENV_ONLY=true ./install.sh
 From the directory in which the binary was created run the following.
 
 ```
+sudo setenforce 0
 sudo ./microshift run
 ```
 
