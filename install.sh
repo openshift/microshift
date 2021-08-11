@@ -133,15 +133,15 @@ get_kubectl() {
 # Download and install microshift
 get_microshift() {
     if [ $ARCH = "x86_64" ]; then
-        curl -L https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-amd64 -o microshift
-        curl -L https://github.com/redhat-et/microshift/releases/download/$VERSION/release.sha256 -o release.sha256
+        curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-amd64
+        curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/release.sha256 -o release.sha256
     fi
 
-    SHA=$(sha256sum microshift | awk '{print $1}')
-    if [[ $SHA != $(cat release.sha256 | awk '{print $1}') ]]; then echo "SHA256 checksum failed" && exit 1; fi
+    SHA=$(sha256sum microshift-linux-amd64 | awk '{print $1}')
+    if [[ $SHA != $(grep "microshift-linux-amd64" release.sha256 | awk '{print $1}') ]]; then echo "SHA256 checksum failed" && exit 1; fi
 
-    sudo chmod +x microshift
-    sudo mv microshift /usr/local/bin/
+    sudo chmod +x microshift-linux-amd64
+    sudo mv microshift-linux-amd64 /usr/local/bin/microshift
 
     apply_selinux_policy
 
