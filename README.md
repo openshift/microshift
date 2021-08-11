@@ -53,7 +53,7 @@ You can locally build Microshift using one of two methods, either using a contai
 make microshift
 ```
 
-or directly on the host after installing the build-time dependencies. When using RHEL ensure the system is register and run the following before installing the prerequisites.
+or directly on the host after installing the build-time dependencies. When using RHEL ensure the system is registered and run the following before installing the prerequisites.
 
 ```
 ARCH=$( /bin/arch )
