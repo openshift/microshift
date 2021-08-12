@@ -16,17 +16,50 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
+	genericcontrollermanager "k8s.io/controller-manager/app"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
+	schedulerOptions "k8s.io/kubernetes/cmd/kube-scheduler/app/options"
 )
 
-func KubeScheduler(cfg *config.MicroshiftConfig) {
-	command := kubescheduler.NewSchedulerCommand()
+const (
+	kubeSchedulerStartupTimeout = 60
+)
+
+type KubeScheduler struct {
+	options    *schedulerOptions.Options
+	kubeconfig string
+}
+
+func NewKubeScheduler(cfg *config.MicroshiftConfig) *KubeScheduler {
+	s := &KubeScheduler{}
+	s.configure(cfg)
+	return s
+}
+
+func (s *KubeScheduler) Name() string           { return "kube-scheduler" }
+func (s *KubeScheduler) Dependencies() []string { return []string{"kube-apiserver"} }
+
+func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
+	if err := config.KubeSchedulerConfig(cfg); err != nil {
+		return
+	}
+
+	opts, err := schedulerOptions.NewOptions()
+	if err != nil {
+		logrus.Fatalf("initialization error command options: %v", err)
+	}
+
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-scheduler/config/config.yaml",
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
@@ -34,16 +67,66 @@ func KubeScheduler(cfg *config.MicroshiftConfig) {
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
 		"--vmodule=" + cfg.LogVModule,
 	}
+
 	if cfg.LogDir != "" {
 		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-scheduler.log"))
 	}
 
-	if err := command.ParseFlags(args); err != nil {
-		logrus.Fatalf("failed to parse flags:%v", err)
+	cmd := &cobra.Command{
+		Use:          "kube-scheduler",
+		Long:         `kube-scheduler`,
+		SilenceUsage: true,
+		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
 	}
-	logrus.Infof("start kube-scheduler, args %v", args)
+
+	namedFlagSets := opts.Flags()
+	fs := cmd.Flags()
+	for _, f := range namedFlagSets.FlagSets {
+		fs.AddFlagSet(f)
+	}
+	if err := cmd.ParseFlags(args); err != nil {
+		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
+	}
+
+	s.options = opts
+	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+
+}
+
+func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+
+	// run readiness check
 	go func() {
-		command.Run(command, args)
-		logrus.Fatalf("kube-scheduler exited")
+		restConfig, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
+		if err != nil {
+			logrus.Warningf("%s readiness check: %v", s.Name(), err)
+			return
+		}
+
+		versionedClient, err := kubernetes.NewForConfig(restConfig)
+		if err != nil {
+			logrus.Warningf("%s readiness check: %v", s.Name(), err)
+			return
+		}
+
+		if genericcontrollermanager.WaitForAPIServer(versionedClient, kubeSchedulerStartupTimeout*time.Second) != nil {
+			logrus.Warningf("%s readiness check timed out: %v", s.Name(), err)
+			return
+		}
+
+		logrus.Infof("%s is ready", s.Name())
+		close(ready)
 	}()
+
+	cc, sched, err := kubescheduler.Setup(ctx, s.options)
+	if err != nil {
+		return err
+	}
+
+	if err := kubescheduler.Run(ctx, cc, sched); err != nil {
+		return err
+	}
+
+	return ctx.Err()
 }
