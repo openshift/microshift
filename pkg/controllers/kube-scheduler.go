@@ -25,15 +25,15 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	genericcontrollermanager "k8s.io/controller-manager/app"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
 	schedulerOptions "k8s.io/kubernetes/cmd/kube-scheduler/app/options"
 )
 
 const (
-	kubeSchedulerStartupTimeout = 60
+	kubeSchedulerStartupTimeout = 30
 )
 
 type KubeScheduler struct {
@@ -110,9 +110,24 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 			return
 		}
 
-		if genericcontrollermanager.WaitForAPIServer(versionedClient, kubeSchedulerStartupTimeout*time.Second) != nil {
-			logrus.Warningf("%s readiness check timed out: %v", s.Name(), err)
-			return
+		errCh := make(chan error)
+		err = wait.Poll(100*time.Millisecond, kubeSchedulerStartupTimeout*time.Second, func() (bool, error) {
+			select {
+			case err := <-errCh:
+				return false, err
+			default:
+			}
+
+			result := versionedClient.CoreV1().RESTClient().Get().AbsPath("/healthz").Do(context.TODO())
+			status := 0
+			result.StatusCode(&status)
+			if status == 200 {
+				return true, nil
+			}
+			return false, nil
+		})
+		if err != nil {
+			logrus.Fatalf("failed to wait for /healthz to return ok: %v", err)
 		}
 
 		logrus.Infof("%s is ready", s.Name())
