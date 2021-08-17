@@ -71,7 +71,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(controllers.NewEtcd(cfg)))
 		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
 		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
-		// util.Must(m.AddService(controllers.NewKubeControllerManager()))
+		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
 		// util.Must(m.AddService(controllers.NewOpenShiftPrepJob()))
 		// util.Must(m.AddService(controllers.NewOpenShiftAPIServer()))
 		// util.Must(m.AddService(controllers.NewOpenShiftControllerManager()))
@@ -152,9 +152,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 }
 
 func startControllerOnly(cfg *config.MicroshiftConfig) error {
-	logrus.Infof("starting kube-controller-manager")
-	controllers.KubeControllerManager(cfg)
-
 	if err := controllers.PrepareOCP(cfg); err != nil {
 		return err
 	}
