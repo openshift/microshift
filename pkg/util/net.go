@@ -16,6 +16,7 @@ limitations under the License.
 package util
 
 import (
+	"crypto/tls"
 	"net/http"
 	"time"
 
@@ -41,6 +42,8 @@ func RetryHttpGet(url string) int {
 
 	status := 0
 	for _, timer := range timers {
+
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 		resp, err := http.Get(url)
 		if err == nil {
 			status = resp.StatusCode

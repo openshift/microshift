@@ -95,7 +95,7 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 
 	// run readiness check
 	go func() {
-		healthcheckStatus := util.RetryHttpGet("http://127.0.0.1:10251/healthz")
+		healthcheckStatus := util.RetryHttpGet("https://127.0.0.1:10259/healthz")
 		if healthcheckStatus != 200 {
 			logrus.Fatalf("Kube-scheduler failed to start")
 		}
