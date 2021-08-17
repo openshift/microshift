@@ -155,6 +155,11 @@ github.com/blang/semver
 # github.com/cespare/xxhash/v2 v2.1.1
 ## explicit
 github.com/cespare/xxhash/v2
+# github.com/chai2010/gettext-go v0.0.0-20160711120539-c6fed771bfd5
+github.com/chai2010/gettext-go/gettext
+github.com/chai2010/gettext-go/gettext/mo
+github.com/chai2010/gettext-go/gettext/plural
+github.com/chai2010/gettext-go/gettext/po
 # github.com/checkpoint-restore/go-criu/v4 v4.1.0
 ## explicit
 github.com/checkpoint-restore/go-criu/v4
@@ -460,8 +465,7 @@ github.com/google/cadvisor/utils/sysinfo
 github.com/google/cadvisor/version
 github.com/google/cadvisor/watcher
 github.com/google/cadvisor/zfs
-# github.com/google/go-cmp v0.5.2
-## explicit
+# github.com/google/go-cmp v0.5.4
 github.com/google/go-cmp/cmp
 github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
@@ -1143,7 +1147,7 @@ github.com/prometheus/client_model/go
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 github.com/prometheus/common/model
-# github.com/prometheus/procfs v0.2.0
+# github.com/prometheus/procfs v0.7.3
 ## explicit
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
@@ -1707,6 +1711,7 @@ k8s.io/apimachinery/pkg/util/httpstream
 k8s.io/apimachinery/pkg/util/httpstream/spdy
 k8s.io/apimachinery/pkg/util/intstr
 k8s.io/apimachinery/pkg/util/json
+k8s.io/apimachinery/pkg/util/jsonmergepatch
 k8s.io/apimachinery/pkg/util/mergepatch
 k8s.io/apimachinery/pkg/util/naming
 k8s.io/apimachinery/pkg/util/net
@@ -2275,8 +2280,17 @@ k8s.io/kube-scheduler/config/v1beta1
 k8s.io/kube-scheduler/extender/v1
 # k8s.io/kubectl v0.20.4 => k8s.io/kubectl v0.20.0
 ## explicit
+k8s.io/kubectl/pkg/cmd/apply
+k8s.io/kubectl/pkg/cmd/delete
 k8s.io/kubectl/pkg/cmd/util
+k8s.io/kubectl/pkg/cmd/util/editor
+k8s.io/kubectl/pkg/cmd/util/editor/crlf
+k8s.io/kubectl/pkg/cmd/wait
+k8s.io/kubectl/pkg/generated
+k8s.io/kubectl/pkg/rawhttp
 k8s.io/kubectl/pkg/scheme
+k8s.io/kubectl/pkg/util
+k8s.io/kubectl/pkg/util/i18n
 k8s.io/kubectl/pkg/util/interrupt
 k8s.io/kubectl/pkg/util/openapi
 k8s.io/kubectl/pkg/util/openapi/validation
