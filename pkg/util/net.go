@@ -22,6 +22,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/net"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 func GetHostIP() (string, error) {
@@ -32,27 +33,21 @@ func GetHostIP() (string, error) {
 	return ip.String(), nil
 }
 
-func RetryHttpGet(url string) int {
-	var timers = []time.Duration{
-		1 * time.Second,
-		5 * time.Second,
-		10 * time.Second,
-		20 * time.Second,
-	}
+func RetryInsecureHttpsGet(url string) int {
 
 	status := 0
-	for _, timer := range timers {
-
+	err := wait.Poll(5*time.Second, 120*time.Second, func() (bool, error) {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 		resp, err := http.Get(url)
 		if err == nil {
 			status = resp.StatusCode
-			break
+			return true, nil
 		}
+		return false, nil
+	})
 
-		logrus.Infof("Request error: %+v\n", err)
-		logrus.Infof("Retrying in %v\n", timer)
-		time.Sleep(timer)
+	if err != nil && err == wait.ErrWaitTimeout {
+		logrus.Warningf("Endpoint is not returning any status code")
 	}
 
 	return status
