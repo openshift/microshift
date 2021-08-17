@@ -16,6 +16,10 @@ limitations under the License.
 package util
 
 import (
+	"net/http"
+	"time"
+
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/net"
 )
 
@@ -25,4 +29,28 @@ func GetHostIP() (string, error) {
 		return "", err
 	}
 	return ip.String(), nil
+}
+
+func RetryHttpGet(url string) int {
+	var timers = []time.Duration{
+		1 * time.Second,
+		5 * time.Second,
+		10 * time.Second,
+		20 * time.Second,
+	}
+
+	status := 0
+	for _, timer := range timers {
+		resp, err := http.Get(url)
+		if err == nil {
+			status = resp.StatusCode
+			break
+		}
+
+		logrus.Infof("Request error: %+v\n", err)
+		logrus.Infof("Retrying in %v\n", timer)
+		time.Sleep(timer)
+	}
+
+	return status
 }
