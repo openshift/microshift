@@ -1,6 +1,6 @@
 # Microshift
 
-Microshift is OpenShift<sup>1</sup> Kubernetes in a small form factor and optimized for edge computing.
+Microshift is a research project that is exploring how OpenShift<sup>1</sup> Kubernetes can be optimized for small form factor and edge computing.
 
 Edge devices deployed out in the field pose very different operational, environmental, and business challenges from those of cloud computing. These motivate different engineering trade-offs for Kubernetes at the far edge than for cloud or near-edge scenarios. Microshift's design goals cater to this:
 
