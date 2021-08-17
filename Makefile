@@ -20,8 +20,6 @@ IMAGE_REPO :=quay.io/microshift/microshift
 OUTPUT_DIR :=_output
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
-CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
-
 GO_EXT_LD_FLAGS :=-extldflags '-static'
 GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMinor=20 \
@@ -81,7 +79,9 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 ###############################
 # containerized build targets #
 ###############################
+_build_containerized: CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 _build_containerized:
+	@if [ -z '$(CTR_CMD)' ] ; then echo '!! ERROR: containerized builds require podman||docker CLI, none found $$PATH' >&2 && exit 1; fi
 	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
 	$(CTR_CMD) build -t $(IMAGE_REPO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
 		-f "$(SRC_ROOT)"/images/build/Dockerfile \
@@ -105,6 +105,10 @@ build-containerized-cross-build:
 	+$(MAKE) build-containerized-cross-build-linux-amd64
 	+$(MAKE) build-containerized-cross-build-linux-arm64
 .PHONY: build-containerized-cross-build
+
+###############################
+# dev targets                 #
+###############################
 
 vendor:
 	./hack/vendoring.sh
