@@ -16,7 +16,13 @@ limitations under the License.
 package util
 
 import (
+	"crypto/tls"
+	"net/http"
+	"time"
+
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/net"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 func GetHostIP() (string, error) {
@@ -25,4 +31,24 @@ func GetHostIP() (string, error) {
 		return "", err
 	}
 	return ip.String(), nil
+}
+
+func RetryInsecureHttpsGet(url string) int {
+
+	status := 0
+	err := wait.Poll(5*time.Second, 120*time.Second, func() (bool, error) {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		resp, err := http.Get(url)
+		if err == nil {
+			status = resp.StatusCode
+			return true, nil
+		}
+		return false, nil
+	})
+
+	if err != nil && err == wait.ErrWaitTimeout {
+		logrus.Warningf("Endpoint is not returning any status code")
+	}
+
+	return status
 }
