@@ -148,6 +148,7 @@ get_microshift() {
     cat << EOF | sudo tee /usr/lib/systemd/system/microshift.service
 [Unit]
 Description=Microshift
+After=crio.service
 
 [Service]
 WorkingDirectory=/usr/local/bin/
