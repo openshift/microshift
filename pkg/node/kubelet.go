@@ -16,19 +16,59 @@ limitations under the License.
 package node
 
 import (
+	"context"
 	"path/filepath"
 	"strconv"
 
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	"github.com/openshift/microshift/pkg/config"
 
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	cliflag "k8s.io/component-base/cli/flag"
 	kubeproxy "k8s.io/kubernetes/cmd/kube-proxy/app"
 	kubelet "k8s.io/kubernetes/cmd/kubelet/app"
+	kubeletoptions "k8s.io/kubernetes/cmd/kubelet/app/options"
+	kubeletconfig "k8s.io/kubernetes/pkg/kubelet/apis/config"
 )
 
-func StartKubelet(cfg *config.MicroshiftConfig) error {
-	command := kubelet.NewKubeletCommand()
+const (
+	// Kubelet component name
+	componentKubelet = "kubelet"
+)
+
+type Kubelet struct {
+	kubeletflags   *kubeletoptions.KubeletFlags
+	kubeconfig     *kubeletconfig.KubeletConfiguration
+	kubeconfigfile string
+}
+
+func NewKubelet(cfg *config.MicroshiftConfig) (*Kubelet, error) {
+	s := &Kubelet{}
+	err := s.configure(cfg)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func (s *Kubelet) Name() string           { return "kubelet" }
+func (s *Kubelet) Dependencies() []string { return []string{"kube-apiserver"} }
+
+func (s *Kubelet) configure(cfg *config.MicroshiftConfig) error {
+	if err := config.KubeletConfig(cfg); err != nil {
+		return err
+	}
+
+	kubeletConfig, err := kubeletoptions.NewKubeletConfiguration()
+
+	if err != nil {
+		logrus.Fatalf("Failed to create a new kubelet configuration: %v", err)
+		return err
+	}
+
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kubelet/config/config.yaml",
 		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
@@ -47,17 +87,49 @@ func StartKubelet(cfg *config.MicroshiftConfig) error {
 		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kubelet.log"))
 	}
 
-	if err := command.ParseFlags(args); err != nil {
-		logrus.Fatalf("failed to parse flags:%v", err)
+	cmd := &cobra.Command{
+		Use:          "kubelet",
+		Long:         `kubelet`,
+		SilenceUsage: true,
+		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
 	}
-	logrus.Infof("starting kubelet %s, args: %v", cfg.NodeIP, args)
 
-	go func() {
-		command.Run(command, args)
-		logrus.Fatalf("kubelet exited")
-	}()
+	cleanFlagSet := pflag.NewFlagSet(componentKubelet, pflag.ContinueOnError)
+	cleanFlagSet.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
+	kubeletFlags := kubeletoptions.NewKubeletFlags()
+	kubeletFlags.AddFlags(cleanFlagSet)
+	kubeletoptions.AddKubeletConfigFlags(cleanFlagSet, kubeletConfig)
+	kubeletoptions.AddGlobalFlags(cleanFlagSet)
 
+	if err := cmd.ParseFlags(args); err != nil {
+		logrus.Fatalf("failed to parse flags:%v", err)
+		return err
+	}
+	s.kubeletflags = kubeletFlags
+	s.kubeconfig = kubeletConfig
+	s.kubeconfigfile = filepath.Join(cfg.DataDir, "resources", "kubelet", "kubeconfig")
+
+	logrus.Infof("Starting kubelet %s, args: %v", cfg.NodeIP, args)
 	return nil
+}
+
+func (s *Kubelet) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+
+	// construct a KubeletServer from kubeletFlags and kubeletConfig
+	kubeletServer := &kubeletoptions.KubeletServer{
+		KubeletFlags:         *s.kubeletflags,
+		KubeletConfiguration: *s.kubeconfig,
+	}
+
+	kubeletDeps, err := kubelet.UnsecuredDependencies(kubeletServer, utilfeature.DefaultFeatureGate)
+	if err != nil {
+		logrus.Fatalf("Error in fetching depenedencies %v", err)
+	}
+	if err := kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate); err != nil {
+		logrus.Error("Kubelet failed to start %v", err)
+	}
+	return ctx.Err()
 }
 
 func StartKubeProxy(cfg *config.MicroshiftConfig) error {

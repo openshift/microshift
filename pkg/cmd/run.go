@@ -102,8 +102,8 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 				defer close(stopped)
 				defer close(ready)
 
-				if err := node.StartKubelet(cfg); err != nil {
-					return err
+				if _, err := node.NewKubelet(cfg); err != nil {
+					logrus.Error("Failed to start kubelet %v", err)
 				}
 				if err := node.StartKubeProxy(cfg); err != nil {
 					return err
