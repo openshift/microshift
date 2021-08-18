@@ -119,6 +119,11 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 		return err
 	}
 
+	// TODO: OpenShift's kubecm patch, uncomment if OpenShiftContext added
+	//if err := kubecm.ShimForOpenShift(s.kubecmOptions, c); err != nil {
+	//	return err
+	//}
+
 	// Run runs the KubeControllerManagerOptions.  This should never exit.
 	if err := kubecm.Run(c.Complete(), ctx.Done()); err != nil {
 		return err
