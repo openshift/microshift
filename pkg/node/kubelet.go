@@ -32,6 +32,8 @@ import (
 	kubelet "k8s.io/kubernetes/cmd/kubelet/app"
 	kubeletoptions "k8s.io/kubernetes/cmd/kubelet/app/options"
 	kubeletconfig "k8s.io/kubernetes/pkg/kubelet/apis/config"
+
+	"github.com/openshift/microshift/pkg/util"
 )
 
 const (
@@ -40,9 +42,8 @@ const (
 )
 
 type Kubelet struct {
-	kubeletflags   *kubeletoptions.KubeletFlags
-	kubeconfig     *kubeletconfig.KubeletConfiguration
-	kubeconfigfile string
+	kubeletflags *kubeletoptions.KubeletFlags
+	kubeconfig   *kubeletconfig.KubeletConfiguration
 }
 
 func NewKubelet(cfg *config.MicroshiftConfig) (*Kubelet, error) {
@@ -107,7 +108,6 @@ func (s *Kubelet) configure(cfg *config.MicroshiftConfig) error {
 	}
 	s.kubeletflags = kubeletFlags
 	s.kubeconfig = kubeletConfig
-	s.kubeconfigfile = filepath.Join(cfg.DataDir, "resources", "kubelet", "kubeconfig")
 
 	logrus.Infof("Starting kubelet %s, args: %v", cfg.NodeIP, args)
 	return nil
@@ -115,6 +115,17 @@ func (s *Kubelet) configure(cfg *config.MicroshiftConfig) error {
 
 func (s *Kubelet) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+
+	// run readiness check
+	go func() {
+		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10248/healthz")
+		if healthcheckStatus != 200 {
+			logrus.Fatalf("Kube-controller-manager failed to starttttttt")
+		}
+
+		logrus.Infof("%s is readyyy", s.Name())
+		close(ready)
+	}()
 
 	// construct a KubeletServer from kubeletFlags and kubeletConfig
 	kubeletServer := &kubeletoptions.KubeletServer{
