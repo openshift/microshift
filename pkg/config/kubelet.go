@@ -97,7 +97,7 @@ apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 clientConnection:
   kubeconfig: ` + cfg.DataDir + `/resources/kube-proxy/kubeconfig
-hostnameOverride: ` + cfg.HostName + `
+hostnameOverride: ` + cfg.NodeName + `
 clusterCIDR: ` + cfg.Cluster.ClusterCIDR + `
 mode: "iptables"
 iptables:

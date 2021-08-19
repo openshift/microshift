@@ -65,14 +65,14 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	//s.etcdCfg.ForceNewCluster = true //TODO
 	s.etcdCfg.Logger = "zap"
 	s.etcdCfg.Dir = dataDir
-	s.etcdCfg.APUrls = setURL([]string{cfg.HostIP}, ":2380")
-	s.etcdCfg.LPUrls = setURL([]string{cfg.HostIP}, ":2380")
-	s.etcdCfg.ACUrls = setURL([]string{cfg.HostIP}, ":2379")
-	s.etcdCfg.LCUrls = setURL([]string{"127.0.0.1", cfg.HostIP}, ":2379")
+	s.etcdCfg.APUrls = setURL([]string{cfg.NodeIP}, ":2380")
+	s.etcdCfg.LPUrls = setURL([]string{cfg.NodeIP}, ":2380")
+	s.etcdCfg.ACUrls = setURL([]string{cfg.NodeIP}, ":2379")
+	s.etcdCfg.LCUrls = setURL([]string{"127.0.0.1", cfg.NodeIP}, ":2379")
 	s.etcdCfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, ":2381")
 
-	s.etcdCfg.Name = cfg.HostName
-	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.HostName, cfg.HostIP)
+	s.etcdCfg.Name = cfg.NodeName
+	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, cfg.NodeIP)
 
 	s.etcdCfg.CipherSuites = tlsCipherSuites
 	s.etcdCfg.ClientTLSInfo.CertFile = filepath.Join(certDir, "etcd-serving.crt")
