@@ -56,8 +56,8 @@ type MicroshiftConfig struct {
 
 	Roles []string `yaml:"roles"`
 
-	HostName string `yaml:"nodeName"`
-	HostIP   string `yaml:"nodeIP"`
+	NodeName string `yaml:"nodeName"`
+	NodeIP   string `yaml:"nodeIP"`
 
 	Cluster      ClusterConfig      `yaml:"cluster"`
 	ControlPlane ControlPlaneConfig `yaml:"controlPlane"`
@@ -65,11 +65,11 @@ type MicroshiftConfig struct {
 }
 
 func NewMicroshiftConfig() *MicroshiftConfig {
-	hostName, err := os.Hostname()
+	nodeName, err := os.Hostname()
 	if err != nil {
 		logrus.Fatalf("failed to get hostname: %v", err)
 	}
-	hostIP, err := util.GetHostIP()
+	nodeIP, err := util.GetHostIP()
 	if err != nil {
 		logrus.Fatalf("failed to get host IP: %v", err)
 	}
@@ -82,8 +82,8 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		LogVModule:      "",
 		LogAlsotostderr: false,
 		Roles:           defaultRoles,
-		HostName:        hostName,
-		HostIP:          hostIP,
+		NodeName:        nodeName,
+		NodeIP:          nodeIP,
 		Cluster: ClusterConfig{
 			URL:         "https://127.0.0.1:6443",
 			ClusterCIDR: "10.42.0.0/16",

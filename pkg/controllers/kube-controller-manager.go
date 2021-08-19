@@ -53,7 +53,7 @@ func KubeControllerManager(cfg *config.MicroshiftConfig) {
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags: %v", err)
 	}
-	logrus.Infof("starting kube-controller-manager %s, args: %v", cfg.HostIP, args)
+	logrus.Infof("starting kube-controller-manager %s, args: %v", cfg.NodeIP, args)
 	go func() {
 		command.Run(command, nil)
 		logrus.Fatalf("controller-manager exited")
