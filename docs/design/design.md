@@ -65,10 +65,10 @@ When deciding between different design options, we follow the following principl
   * Makes it simple to grok as workload for a a Linux admin persona, works well / easier to implement with systemd.
   * Smaller resource footprint has _not_ been a motivation, it may be a welcome side-effect.
 * MicroShift provides a small, optional set of infrastructure services to support common use cases and reuses OpenShift's container images for these:
-  * openshift-dns, openshift-ingress, service-ca, local storage provider
+  * openshift-dns, openshift-router, service-ca, local storage provider
 * MicroShift instances (processes) run directly on the host or containerized on Podman. They can take on the roles of Control Plane, Node, or both:
   * Instances with Control Plane role run etcd and the Kubernetes and OpenShift control plane services. As these services don't require a kubelet, pure Control Plane instances are not nodes in the Kubernetes sense and require fewer system privileges.
-  * Instances with Node role run a kubelet (and thus register as node) and kubeproxy and interface with CRI-O for running workloads. They may thus require higher system privileges.
+  * Instances with Node role run a kubelet (and thus register as node) and kube-proxy and interface with CRI-O for running workloads. They may thus require higher system privileges.
 * While it's possible to run a single MicroShift instance with both Control Plane and Node roles, there may be reasons to run two instances - one Control Plane and one Node - on the same host, e.g. to run the Control Plane with fewer privileges for security reasons. Implementation decisions should consider this.
 * MicroShift does not bundle any OS user space! Bundling makes maintenance and security hard, breaks compliance. Instead, user space is provided by the host OS, the container image base layer or a sidecar container.
 
@@ -113,4 +113,4 @@ When deciding between different design options, we follow the following principl
 * We ensure the tip of our development branch is deployable and while MicroShift is still early days and experimental we expect developers (and users who want the "latest") to build & deploy from source.
 * Releases are mainly provided for convenience to useres that just want to give MicroShift a quick try without friction. They are cut irregularly, e.g. to make a new feature available.
 * When rebasing onto a new OKD version, we vendor that version's packages and update the container image digests of the infrastructure services MicroShift deploys, i.e. the "release metadata" is baked into the MicroShift binary.
-* Eventually, we expect there to be a "MicroShift Release Image" that is based on / derived from the OpenShift Release Image: It references the MicroShift container image plus the subset of container images shared with and published by OpenShift. Defining a release image should allow to reuse the proven OpenShift CI and release toolinng later.
+* Eventually, we expect there to be a "MicroShift Release Image" that is based on / derived from the OpenShift Release Image: It references the MicroShift container image plus the subset of container images shared with and published by OpenShift. Defining a release image should allow to reuse the proven OpenShift CI and release tooling later.
