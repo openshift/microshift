@@ -16,31 +16,60 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
 	"path/filepath"
 	"strconv"
 
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 
+	"k8s.io/component-base/cli/globalflag"
+	"k8s.io/component-base/version/verflag"
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
+	kubecmoptions "k8s.io/kubernetes/cmd/kube-controller-manager/app/options"
 )
 
-func KubeControllerManager(cfg *config.MicroshiftConfig) {
-	command := kubecm.NewControllerManagerCommand()
+type KubeControllerManager struct {
+	kubecmOptions *kubecmoptions.KubeControllerManagerOptions
+	kubeconfig    string
+}
+
+func NewKubeControllerManager(cfg *config.MicroshiftConfig) *KubeControllerManager {
+	s := &KubeControllerManager{}
+	s.configure(cfg)
+	return s
+}
+
+func (s *KubeControllerManager) Name() string           { return "kube-controller-manager" }
+func (s *KubeControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
+
+func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
+	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
+	kubeconfig := filepath.Join(cfg.DataDir, "resources", "kube-controller-manager", "kubeconfig")
+
+	opts, err := kubecmoptions.NewKubeControllerManagerOptions()
+	if err != nil {
+		logrus.Fatalf("%s initialization error command options: %v", s.Name(), err)
+	}
+	s.kubecmOptions = opts
+	s.kubeconfig = kubeconfig
+
 	args := []string{
-		"--kubeconfig=" + cfg.DataDir + "/resources/kube-controller-manager/kubeconfig",
+		"--kubeconfig=" + kubeconfig,
 		"--service-account-private-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
 		"--allocate-node-cidrs=true",
 		"--cluster-cidr=" + cfg.Cluster.ClusterCIDR,
-		"--authorization-kubeconfig=" + cfg.DataDir + "/resources/kube-controller-manager/kubeconfig",
-		"--authentication-kubeconfig=" + cfg.DataDir + "/resources/kube-controller-manager/kubeconfig",
-		"--root-ca-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--authorization-kubeconfig=" + kubeconfig,
+		"--authentication-kubeconfig=" + kubeconfig,
+		"--root-ca-file=" + caCertFile,
 		"--bind-address=127.0.0.1",
 		"--secure-port=10257",
 		"--leader-elect=false",
 		"--use-service-account-credentials=true",
-		"--cluster-signing-cert-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
+		"--cluster-signing-cert-file=" + caCertFile,
 		"--cluster-signing-key-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.key",
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
@@ -50,13 +79,55 @@ func KubeControllerManager(cfg *config.MicroshiftConfig) {
 	if cfg.LogDir != "" {
 		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-controller-manager.log"))
 	}
-	if err := command.ParseFlags(args); err != nil {
-		logrus.Fatalf("failed to parse flags: %v", err)
+
+	// fake the kube-controller-manager cobra command to parse args into controllermanager options
+	cmd := &cobra.Command{
+		Use:          "kube-controller-manager",
+		Long:         `kube-controller-manager`,
+		SilenceUsage: true,
+		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
+	}
+
+	namedFlagSets := s.kubecmOptions.Flags(kubecm.KnownControllers(), kubecm.ControllersDisabledByDefault.List())
+	verflag.AddFlags(namedFlagSets.FlagSet("global"))
+	globalflag.AddGlobalFlags(namedFlagSets.FlagSet("global"), cmd.Name())
+	for _, f := range namedFlagSets.FlagSets {
+		cmd.Flags().AddFlagSet(f)
+	}
+	if err := cmd.ParseFlags(args); err != nil {
+		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
 	}
 	logrus.Infof("starting kube-controller-manager %s, args: %v", cfg.NodeIP, args)
+}
+
+func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+
+	// run readiness check
 	go func() {
-		command.Run(command, nil)
-		logrus.Fatalf("controller-manager exited")
+		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10257/healthz")
+		if healthcheckStatus != 200 {
+			logrus.Fatalf("Kube-controller-manager failed to start")
+		}
+
+		logrus.Infof("%s is ready", s.Name())
+		close(ready)
 	}()
 
+	c, err := s.kubecmOptions.Config(kubecm.KnownControllers(), kubecm.ControllersDisabledByDefault.List())
+	if err != nil {
+		return err
+	}
+
+	// TODO: OpenShift's kubecm patch, uncomment if OpenShiftContext added
+	//if err := kubecm.ShimForOpenShift(s.kubecmOptions, c); err != nil {
+	//	return err
+	//}
+
+	// Run runs the KubeControllerManagerOptions.  This should never exit.
+	if err := kubecm.Run(c.Complete(), ctx.Done()); err != nil {
+		return err
+	}
+
+	return ctx.Err()
 }
