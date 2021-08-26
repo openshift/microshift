@@ -20,7 +20,7 @@ IMAGE_REPO :=quay.io/microshift/microshift
 OUTPUT_DIR :=_output
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
-GO_EXT_LD_FLAGS :=-extldflags '-static'
+GO_EXT_LD_FLAGS :=-extldflags '-Wl,-Bstatic -ldl -lc -lpthread -lcrypto -static'
 GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMinor=20 \
                    -X k8s.io/component-base/version.gitVersion=v1.20.1 \
