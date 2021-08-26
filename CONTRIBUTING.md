@@ -129,7 +129,7 @@ and click on the button to connect to it in a remote window.
 You will need to install the required binaries:
 - git
 - make
-- golan
+- golang
 - glibc
 - podman
 
