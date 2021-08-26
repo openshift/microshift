@@ -93,7 +93,7 @@ spec:
       serviceAccountName: flannel
       initContainers:
       - name: install-cni
-        image: quay.io/coreos/flannel:v0.14.0
+        image: {{ .ReleaseImage.kube_flannel }}
         command:
         - cp
         args:
@@ -107,7 +107,7 @@ spec:
           mountPath: /etc/kube-flannel/
       containers:
       - name: kube-flannel
-        image: quay.io/coreos/flannel:v0.14.0
+        image: {{ .ReleaseImage.kube_flannel }}
         command:
         - /opt/bin/flanneld
         args:
@@ -185,7 +185,7 @@ spec:
       serviceAccountName: service-ca
       containers:
       - name: service-ca-controller
-        image: quay.io/openshift/okd-content@sha256:d5ab863a154efd4014b0e1d9f753705b97a3f3232bd600c0ed9bde71293c462e
+        image: {{ .ReleaseImage.service_ca_operator }}
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
         args:
@@ -261,7 +261,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
       - name: dns
-        image: quay.io/openshift/okd-content@sha256:fb7eafdcb7989575119e1807e4adc2eb29f8165dec5c148b9c3a44d48458d8a7
+        image: {{ .ReleaseImage.coredns }}
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         command: [ "coredns" ]
@@ -301,7 +301,7 @@ spec:
             cpu: 50m
             memory: 70Mi
       - name: kube-rbac-proxy
-        image: quay.io/openshift/okd-content@sha256:1aa5bb03d0485ec2db2c7871a1eeaef83e9eabf7e9f1bc2c841cf1a759817c99
+        image: {{ .ReleaseImage.kube_rbac_proxy }}
         args:
         - --logtostderr
         - --secure-listen-address=:9154
@@ -321,7 +321,7 @@ spec:
           name: metrics-tls
           readOnly: true
       - name: dns-node-resolver
-        image: quay.io/openshift/okd-content@sha256:b20d195c721cd3b6215e5716b5569cbabbe861559af7dce07b5f8f3d38e6d701
+        image: {{ .ReleaseImage.cli }}
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         securityContext:
@@ -467,7 +467,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
         - name: router
-          image: quay.io/openshift/okd-content@sha256:5908265eb0041cea9a9ec36ad7b2bc82dd45346fc9e0f1b34b0e38a0f43f9f18
+          image: {{ .ReleaseImage.haproxy_router }}
           imagePullPolicy: IfNotPresent
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
@@ -592,7 +592,7 @@ spec:
       serviceAccountName: kubevirt-hostpath-provisioner-admin
       containers:
         - name: kubevirt-hostpath-provisioner
-          image: quay.io/kubevirt/hostpath-provisioner:v0.8.0
+          image: {{ .ReleaseImage.kubevirt_hostpath_provisioner }}
           imagePullPolicy: Always
           env:
             - name: USE_NAMING_PREFIX

@@ -49,7 +49,7 @@ func startHostpathProvisioner(kubeconfigPath string) error {
 		logrus.Warningf("failed to apply scc %v: %v", scc, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ds, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply ds %v: %v", ds, err)
 		return err
 	}

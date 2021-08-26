@@ -20,7 +20,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
         - name: router
-          image: quay.io/openshift/okd-content@sha256:5908265eb0041cea9a9ec36ad7b2bc82dd45346fc9e0f1b34b0e38a0f43f9f18
+          image: {{ .ReleaseImage.haproxy_router }}
           imagePullPolicy: IfNotPresent
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
