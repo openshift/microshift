@@ -19,7 +19,7 @@ spec:
       serviceAccountName: service-ca
       containers:
       - name: service-ca-controller
-        image: quay.io/openshift/okd-content@sha256:d5ab863a154efd4014b0e1d9f753705b97a3f3232bd600c0ed9bde71293c462e
+        image: {{ .ReleaseImage.service_ca_operator }}
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
         args:

@@ -90,7 +90,7 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		logrus.Warningf("failed to apply svc %v: %v", svc, err)
 		return err
 	}
-	if err := assets.ApplyDeployments(apps, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyDeployments(apps, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply apps %v: %v", apps, err)
 		return err
 	}
@@ -146,7 +146,7 @@ func startDNSController(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 		logrus.Warningf("failed to apply cm %v: %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(apps, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(apps, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply apps %v: %v", apps, err)
 		return err
 	}
