@@ -2,3 +2,6 @@ _output/*
 /microshift
 .idea/
 .vscode/
+.vagrant/
+Vagrantfile
+sshfile
