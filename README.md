@@ -74,7 +74,8 @@ rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
 ## Deployment Strategies
 
-In production environment MicroShift can be deployed as:
+## [Known Issues](./docs/known-issues.md)
+
 
 1. Install via an RPM, utilizing a host-provided cri-o runtime and be lifecycle-managed by systemd
 2. [Install as a container via Podman, utilizing cri-o runtime and be lifecycle-managed by systemd](https://microshift.io/docs/deployment-modes/microshift-containerized/)
@@ -82,6 +83,68 @@ In production environment MicroShift can be deployed as:
 For app developer deployments:
 
 1. [Run an all-in-one microshift deployment on which devs can test their applications locally](https://microshift.io/docs/deployment-modes/microshift-aio/).  `microshift-aio` packages cri-o runtime and can be run and managed via podman and systemd
+
+## Configuration
+
+Microshift can be configured in three simple ways, in order of precedence: 
+- Commandline arguments
+- Environment variables
+- Configuration file
+
+Values are passed in to modify the `MicroshiftConfig` defined in `pkg/config/config.go`. 
+
+#### Configuration File
+
+The config file is a `yaml` which has the fieldnames of the struct written in yaml format:
+
+```yaml
+# to set MicroshiftConfig.NodeName:
+nodeName: anonymous-node-32
+
+# to set MicroshiftConfig.Cluster.DNS:
+cluster:
+  dns: '1.2.3.4'
+```
+
+#### Environment Variables
+
+Microshift reads environment variables as config settings if they are in the following format: 
+
+```bash
+# sets MicroshiftConfig.NodeName
+export MICROSHIFT_NODENAME="anonymous-node-32"
+
+# sets Microshift.LogVLevel
+export MICROSHIFT_LOGVLEVEL=3
+``` 
+*Note*: Currently, you cannot use environment variables to set values for fields in structs 
+that are nested within MicroshiftConfig; only top-level fields are allowed. 
+
+#### Commandline Arguments
+
+At the moment, only a subset of the Microshift config can be set through the commandline:
+
+| MicroshiftConfig field | CLI Argument | 
+| ---------------------- | ------------ |
+| `DataDir` | `--data-dir` |
+| `LogDir` | `--log-dir` |
+| `LogVLevel` | `--v` |
+| `LogVModule` | `--vmodule` |
+| `LogAlsotostderr` | `--alsologtostderr` |
+| `Roles` | `--roles` |
+| `ConfigFile` | `--config` |
+
+
+### Configuration Options
+
+#### Changing the API Server Port 
+
+To change the port for the API server, you must set the cluster URL in the config file:
+
+```yaml
+cluster:
+  url: 'https://127.0.0.1:1234'
+```
 
 ## [Known Issues](https://microshift.io/docs/known-issues/known-issues/)
 
@@ -116,7 +179,7 @@ make
 
 Before running MicroShift, the host must first be configured. This can be handled by running
 
-```
+```bash
 CONFIG_ENV_ONLY=true ./install.sh
 ```
 

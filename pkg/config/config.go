@@ -4,8 +4,10 @@ import (
 	"errors"
 	goflag "flag"
 	"fmt"
+	"net/url"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 	homedir "github.com/mitchellh/go-homedir"
@@ -94,6 +96,24 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		ControlPlane: ControlPlaneConfig{},
 		Node:         NodeConfig{},
 	}
+}
+
+// extract the api server port from the cluster URL
+func (c *ClusterConfig) ApiServerPort() (string, error) {
+	parsed, err := url.Parse(c.URL)
+	if err != nil {
+		return "", err
+	}
+
+	// port is unspecified so is either implictly defined as 443 or 80
+	// for https and http respectively
+	if parsed.Port() == "" {
+		if strings.HasPrefix(c.URL, "https") {
+			return "443", nil
+		}
+		return "80", nil
+	}
+	return parsed.Port(), nil
 }
 
 // Returns the default user config file if that exists, else the default global
