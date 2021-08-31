@@ -27,9 +27,8 @@ ARG ARCH=amd64
 
 RUN microdnf install -y \
     policycoreutils-python-utils \
-    iptables-services \
-    conntrack \
-    &&  microdnf clean all
+    iptables \
+    && microdnf clean all
 COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/_output/bin/linux_$ARCH/microshift /usr/bin/microshift
 
 ENTRYPOINT ["/usr/bin/microshift"]
