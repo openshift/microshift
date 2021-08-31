@@ -1,14 +1,17 @@
-FROM fedora:33
+FROM registry.access.redhat.com/ubi8/ubi-init:8.4
 
 COPY microshift /usr/local/bin/microshift
 COPY unit /usr/lib/systemd/system/microshift.service
 COPY kubelet-cgroups.conf /etc/systemd/system.conf.d/kubelet-cgroups.conf
 
-RUN dnf module -y enable cri-o:1.20 && \
-    dnf install -y cri-o \
+RUN export VERSION=1.20 && \
+    export OS=CentOS_8_Stream && \
+    curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/devel:kubic:libcontainers:stable.repo && \
+    curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/$OS/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo 
+
+RUN dnf install -y cri-o \
         cri-tools \
-        conntrack \
-        iptables-services \ 
+        iptables \ 
         iproute \
         procps-ng && \
     dnf clean all
