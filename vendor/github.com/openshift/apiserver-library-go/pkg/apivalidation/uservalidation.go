@@ -11,8 +11,8 @@ func ValidateUserName(name string, _ bool) []string {
 		return reasons
 	}
 
-	if strings.Contains(name, ":") && !strings.HasPrefix(name, "b64:") {
-		return []string{`usernames that contain ":" must begin with "b64:"`}
+	if strings.Contains(name, ":") {
+		return []string{`may not contain ":"`}
 	}
 	if name == "~" {
 		return []string{`may not equal "~"`}

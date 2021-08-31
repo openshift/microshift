@@ -1,0 +1,15 @@
+diff --git a/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/aggregator.go b/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/aggregator.go
+index d93b7329..04b8f0bb 100644
+--- a/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/aggregator.go
++++ b/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/aggregator.go
+@@ -69,7 +69,9 @@ func createAggregatorConfig(
+ 	genericConfig.RESTOptionsGetter = nil
+ 	// prevent generic API server from installing the OpenAPI handler. Aggregator server
+ 	// has its own customized OpenAPI handler.
+-	genericConfig.SkipOpenAPIInstallation = true
++	// This field is included in 0.20.9, but not in 0.20.4 (used by openshift-apiserver).
++	// Breaking the tie by reverting it.
++	//genericConfig.SkipOpenAPIInstallation = true
+ 
+ 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.StorageVersionAPI) &&
+ 		utilfeature.DefaultFeatureGate.Enabled(genericfeatures.APIServerIdentity) {

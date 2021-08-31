@@ -114,8 +114,8 @@ fi
 OKD_RELEASE=$1
 
 
-# rm -rf "${STAGING_DIR}"
-# mkdir -p "${STAGING_DIR}"
+rm -rf "${STAGING_DIR}"
+mkdir -p "${STAGING_DIR}"
 pushd "${STAGING_DIR}" >/dev/null
 
 

@@ -233,7 +233,13 @@ func (l *Lifecycle) ValidateInitialization() error {
 // accessReviewResources are resources which give a view into permissions in a namespace.  Users must be allowed to create these
 // resources because returning "not found" errors allows someone to search for the "people I'm going to fire in 2017" namespace.
 var accessReviewResources = map[schema.GroupResource]bool{
-	{Group: "authorization.k8s.io", Resource: "localsubjectaccessreviews"}: true,
+	{Group: "authorization.k8s.io", Resource: "localsubjectaccessreviews"}:                            true,
+	schema.GroupResource{Group: "authorization.openshift.io", Resource: "subjectaccessreviews"}:       true,
+	schema.GroupResource{Group: "authorization.openshift.io", Resource: "localsubjectaccessreviews"}:  true,
+	schema.GroupResource{Group: "authorization.openshift.io", Resource: "resourceaccessreviews"}:      true,
+	schema.GroupResource{Group: "authorization.openshift.io", Resource: "localresourceaccessreviews"}: true,
+	schema.GroupResource{Group: "authorization.openshift.io", Resource: "selfsubjectrulesreviews"}:    true,
+	schema.GroupResource{Group: "authorization.openshift.io", Resource: "subjectrulesreviews"}:        true,
 }
 
 func isAccessReview(a admission.Attributes) bool {

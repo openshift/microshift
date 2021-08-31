@@ -114,6 +114,7 @@ controller, and serviceaccounts controller.`,
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			verflag.PrintAndExitIfRequested()
+			cliflag.PrintFlags(cmd.Flags())
 
 			c, err := s.Config(KnownControllers(), ControllersDisabledByDefault.List())
 			if err != nil {
@@ -121,13 +122,7 @@ controller, and serviceaccounts controller.`,
 				os.Exit(1)
 			}
 
-			if err := ShimForOpenShift(s, c); err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				os.Exit(1)
-			}
-
-			stopCh := server.SetupSignalHandler(true)
-			if err := Run(c.Complete(), stopCh); err != nil {
+			if err := Run(c.Complete(), wait.NeverStop); err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)
 				os.Exit(1)
 			}
@@ -226,11 +221,7 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 				klog.Warningf("--use-service-account-credentials was specified without providing a --service-account-private-key-file")
 			}
 
-			// TODO be sure to drop this commit/`false` below in 4.7.  The cloud credential operator is updating the issuer URL in 4.6
-			//  https://github.com/openshift/cloud-credential-operator/blob/8d54516/pkg/operator/oidcdiscoveryendpoint/controller.go#L244-L271
-			//  This causes the previously issued to tokens to be invalid.  This transition should only happen in 4.6 and the name should
-			//  be stabl-ish from 4.6 to 4.7, so we can go back to this dynamic client without issues.
-			if false && shouldTurnOnDynamicClient(c.Client) {
+			if shouldTurnOnDynamicClient(c.Client) {
 				klog.V(1).Infof("using dynamic client builder")
 				//Dynamic builder will use TokenRequest feature and refresh service account token periodically
 				clientBuilder = controller.NewDynamicClientBuilder(
@@ -254,10 +245,6 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 			klog.Fatalf("error building controller context: %v", err)
 		}
 		saTokenControllerInitFunc := serviceAccountTokenControllerStarter{rootClientBuilder: rootClientBuilder}.startServiceAccountTokenController
-
-		if err := createPVRecyclerSA(c.OpenShiftContext.OpenShiftConfig, rootClientBuilder); err != nil {
-			klog.Fatalf("error creating recycler serviceaccount: %v", err)
-		}
 
 		if err := StartControllers(controllerContext, saTokenControllerInitFunc, NewControllerInitializers(controllerContext.LoopMode), unsecuredMux); err != nil {
 			klog.Fatalf("error starting controllers: %v", err)
@@ -296,13 +283,7 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 		klog.Fatalf("error creating lock: %v", err)
 	}
 
-	leCtx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	go func() {
-		<-stopCh
-		cancel()
-	}()
-	leaderelection.RunOrDie(leCtx, leaderelection.LeaderElectionConfig{
+	leaderelection.RunOrDie(context.TODO(), leaderelection.LeaderElectionConfig{
 		Lock:          rl,
 		LeaseDuration: c.ComponentConfig.Generic.LeaderElection.LeaseDuration.Duration,
 		RenewDeadline: c.ComponentConfig.Generic.LeaderElection.RenewDeadline.Duration,
@@ -310,28 +291,17 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: run,
 			OnStoppedLeading: func() {
-				select {
-				case <-stopCh:
-					// We were asked to terminate. Exit 0.
-					klog.Info("Requested to terminate. Exiting.")
-					os.Exit(0)
-				default:
-					// We lost the lock.
-					klog.Exitf("leaderelection lost")
-				}
+				klog.Fatalf("leaderelection lost")
 			},
 		},
-		WatchDog:        electionChecker,
-		Name:            "kube-controller-manager",
-		ReleaseOnCancel: true,
+		WatchDog: electionChecker,
+		Name:     "kube-controller-manager",
 	})
 	panic("unreachable")
 }
 
 // ControllerContext defines the context object for controller
 type ControllerContext struct {
-	OpenShiftContext config.OpenShiftContext
-
 	// ClientBuilder will provide a client for this controller to use
 	ClientBuilder clientbuilder.ControllerClientBuilder
 
@@ -498,12 +468,7 @@ func GetAvailableResources(clientBuilder clientbuilder.ControllerClientBuilder) 
 // the shared-informers client and token controller.
 func CreateControllerContext(s *config.CompletedConfig, rootClientBuilder, clientBuilder clientbuilder.ControllerClientBuilder, stop <-chan struct{}) (ControllerContext, error) {
 	versionedClient := rootClientBuilder.ClientOrDie("shared-informers")
-	var sharedInformers informers.SharedInformerFactory
-	if InformerFactoryOverride == nil {
-		sharedInformers = informers.NewSharedInformerFactory(versionedClient, ResyncPeriod(s)())
-	} else {
-		sharedInformers = InformerFactoryOverride
-	}
+	sharedInformers := informers.NewSharedInformerFactory(versionedClient, ResyncPeriod(s)())
 
 	metadataClient := metadata.NewForConfigOrDie(rootClientBuilder.ConfigOrDie("metadata-informers"))
 	metadataInformers := metadatainformer.NewSharedInformerFactory(metadataClient, ResyncPeriod(s)())
@@ -534,7 +499,6 @@ func CreateControllerContext(s *config.CompletedConfig, rootClientBuilder, clien
 	}
 
 	ctx := ControllerContext{
-		OpenShiftContext:                s.OpenShiftContext,
 		ClientBuilder:                   clientBuilder,
 		InformerFactory:                 sharedInformers,
 		ObjectOrMetadataInformerFactory: informerfactory.NewInformerFactory(sharedInformers, metadataInformers),
@@ -632,10 +596,10 @@ func (c serviceAccountTokenControllerStarter) startServiceAccountTokenController
 		ctx.InformerFactory.Core().V1().ServiceAccounts(),
 		ctx.InformerFactory.Core().V1().Secrets(),
 		c.rootClientBuilder.ClientOrDie("tokens-controller"),
-		applyOpenShiftServiceServingCertCA(serviceaccountcontroller.TokensControllerOptions{
+		serviceaccountcontroller.TokensControllerOptions{
 			TokenGenerator: tokenGenerator,
 			RootCA:         rootCA,
-		}),
+		},
 	)
 	if err != nil {
 		return nil, true, fmt.Errorf("error creating Tokens controller: %v", err)

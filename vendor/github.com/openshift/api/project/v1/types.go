@@ -81,7 +81,7 @@ type Project struct {
 // +genclient:skipVerbs=get,list,create,update,patch,delete,deleteCollection,watch
 // +genclient:method=Create,verb=create,result=Project
 
-// ProjectRequest is the set of options necessary to fully qualify a project request
+// ProjecRequest is the set of options necessary to fully qualify a project request
 type ProjectRequest struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`

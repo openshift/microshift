@@ -35,6 +35,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	podutil "k8s.io/kubernetes/pkg/api/v1/pod"
+	"k8s.io/kubernetes/pkg/apis/core/validation"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/apis/config"
 	"k8s.io/kubernetes/pkg/scheduler/apis/config/scheme"
 	"k8s.io/kubernetes/pkg/scheduler/core"
@@ -328,7 +329,8 @@ func (sched *Scheduler) recordSchedulingFailure(fwk framework.Framework, podInfo
 	}
 
 	pod := podInfo.Pod
-	fwk.EventRecorder().Eventf(pod, nil, v1.EventTypeWarning, "FailedScheduling", "Scheduling", err.Error())
+	msg := truncateMessage(err.Error())
+	fwk.EventRecorder().Eventf(pod, nil, v1.EventTypeWarning, "FailedScheduling", "Scheduling", msg)
 	if err := updatePod(sched.client, pod, &v1.PodCondition{
 		Type:    v1.PodScheduled,
 		Status:  v1.ConditionFalse,
@@ -339,19 +341,29 @@ func (sched *Scheduler) recordSchedulingFailure(fwk framework.Framework, podInfo
 	}
 }
 
+// truncateMessage truncates a message if it hits the NoteLengthLimit.
+func truncateMessage(message string) string {
+	max := validation.NoteLengthLimit
+	if len(message) <= max {
+		return message
+	}
+	suffix := " ..."
+	return message[:max-len(suffix)] + suffix
+}
+
 func updatePod(client clientset.Interface, pod *v1.Pod, condition *v1.PodCondition, nominatedNode string) error {
 	klog.V(3).Infof("Updating pod condition for %s/%s to (%s==%s, Reason=%s)", pod.Namespace, pod.Name, condition.Type, condition.Status, condition.Reason)
-	podCopy := pod.DeepCopy()
+	podStatusCopy := pod.Status.DeepCopy()
 	// NominatedNodeName is updated only if we are trying to set it, and the value is
 	// different from the existing one.
-	if !podutil.UpdatePodCondition(&podCopy.Status, condition) &&
+	if !podutil.UpdatePodCondition(podStatusCopy, condition) &&
 		(len(nominatedNode) == 0 || pod.Status.NominatedNodeName == nominatedNode) {
 		return nil
 	}
 	if nominatedNode != "" {
-		podCopy.Status.NominatedNodeName = nominatedNode
+		podStatusCopy.NominatedNodeName = nominatedNode
 	}
-	return util.PatchPod(client, pod, podCopy)
+	return util.PatchPodStatus(client, pod, podStatusCopy)
 }
 
 // assume signals to the cache that a pod is already in the cache, so that binding can be asynchronous.

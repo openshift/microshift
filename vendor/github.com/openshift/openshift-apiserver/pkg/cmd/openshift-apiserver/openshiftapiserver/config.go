@@ -104,6 +104,18 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	genericConfig.MaxMutatingRequestsInFlight = int(config.ServingInfo.MaxRequestsInFlight / 2)
 	genericConfig.LongRunningFunc = apiserverconfig.IsLongRunningRequest
 
+	// It is not worse than it was before. This code deserves refactoring.
+	// Instead of having a dedicated configuration file, we should pass flags directly.
+	// Until then it seems okay to have the following construct.
+	if shutdownDelaySlice := config.APIServerArguments["shutdown-delay-duration"]; len(shutdownDelaySlice) == 1 {
+		shutdownDelay, err := time.ParseDuration(shutdownDelaySlice[0])
+		if err != nil {
+			return nil, err
+		}
+
+		genericConfig.ShutdownDelayDuration = shutdownDelay
+	}
+
 	// I'm just hoping this works.  I don't think we use it.
 	//MergedResourceConfig *serverstore.ResourceConfig
 

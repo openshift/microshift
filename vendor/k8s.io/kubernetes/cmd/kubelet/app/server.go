@@ -46,7 +46,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
-	//genericapiserver "k8s.io/apiserver/pkg/server"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/healthz"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	clientset "k8s.io/client-go/kubernetes"
@@ -261,8 +261,7 @@ HTTP server: The kubelet can also listen for HTTP and respond to a simple API
 			kubeletDeps.KubeletConfigController = kubeletConfigController
 
 			// set up signal context here in order to be reused by kubelet and docker shim
-			//ctx := genericapiserver.SetupSignalContext(true)
-			ctx, _ := context.WithCancel(context.Background())
+			ctx := genericapiserver.SetupSignalContext()
 
 			// run the kubelet
 			klog.V(5).Infof("KubeletConfiguration: %#v", kubeletServer.KubeletConfiguration)
