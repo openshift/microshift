@@ -17,6 +17,7 @@ package util
 
 import (
 	"crypto/tls"
+	tcpnet "net"
 	"net/http"
 	"time"
 
@@ -50,5 +51,23 @@ func RetryInsecureHttpsGet(url string) int {
 		logrus.Warningf("Endpoint is not returning any status code")
 	}
 
+	return status
+}
+
+func RetryTCPConnection(host string, port string) int {
+	status := 0
+	err := wait.Poll(5*time.Second, 120*time.Second, func() (bool, error) {
+		timeout := 3 * time.Second
+		_, err := tcpnet.DialTimeout("tcp", tcpnet.JoinHostPort("127.0.0.1", "8445"), timeout)
+
+		if err == nil {
+			status = 200
+			return true, nil
+		}
+		return false, nil
+	})
+	if err != nil && err == wait.ErrWaitTimeout {
+		logrus.Warningf("Endpoint is not returning any status code")
+	}
 	return status
 }
