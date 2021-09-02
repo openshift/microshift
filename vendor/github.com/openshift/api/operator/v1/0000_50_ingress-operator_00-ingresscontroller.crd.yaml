@@ -667,7 +667,7 @@ spec:
                 properties:
                   nodeSelector:
                     description: "nodeSelector is the node selector applied to ingress
-                      controller deployments. \n If unset, the default is: \n   beta.kubernetes.io/os:
+                      controller deployments. \n If unset, the default is: \n   kubernetes.io/os:
                       linux   node-role.kubernetes.io/worker: '' \n If set, the specified
                       selector is used and replaces the default."
                     properties:

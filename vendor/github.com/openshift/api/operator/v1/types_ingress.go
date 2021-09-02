@@ -217,7 +217,7 @@ type NodePlacement struct {
 	//
 	// If unset, the default is:
 	//
-	//   beta.kubernetes.io/os: linux
+	//   kubernetes.io/os: linux
 	//   node-role.kubernetes.io/worker: ''
 	//
 	// If set, the specified selector is used and replaces the default.

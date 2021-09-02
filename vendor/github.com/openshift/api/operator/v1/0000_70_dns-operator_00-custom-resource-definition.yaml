@@ -63,9 +63,9 @@ spec:
                   nodeSelector:
                     description: "nodeSelector is the node selector applied to DNS
                       pods. \n If empty, the default is used, which is currently the
-                      following: \n   beta.kubernetes.io/os: linux \n This default
-                      is subject to change. \n If set, the specified selector is used
-                      and replaces the default."
+                      following: \n   kubernetes.io/os: linux \n This default is subject
+                      to change. \n If set, the specified selector is used and replaces
+                      the default."
                     type: object
                     additionalProperties:
                       type: string

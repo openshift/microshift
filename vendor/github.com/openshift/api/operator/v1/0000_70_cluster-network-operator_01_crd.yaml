@@ -494,6 +494,17 @@ spec:
                   should manage the component
                 type: string
                 pattern: ^(Managed|Unmanaged|Force|Removed)$
+              migration:
+                description: migration enables and configures the cluster network
+                  migration. Setting this to the target network type to allow changing
+                  the default network. If unset, the operation of changing cluster
+                  default network plugin will be rejected.
+                type: object
+                properties:
+                  networkType:
+                    description: networkType is the target type of network migration
+                      The supported values are OpenShiftSDN, OVNKubernetes
+                    type: string
               observedConfig:
                 description: observedConfig holds a sparse config that controller
                   has observed from the cluster state.  It exists in spec because

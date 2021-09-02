@@ -119,6 +119,10 @@ type ConsoleCustomization struct {
 	// +kubebuilder:validation:Optional
 	// +optional
 	ProjectAccess ProjectAccess `json:"projectAccess,omitempty"`
+	// quickStarts allows customization of available ConsoleQuickStart resources in console.
+	// +kubebuilder:validation:Optional
+	// +optional
+	QuickStarts QuickStarts `json:"quickStarts,omitempty"`
 }
 
 // ProjectAccess contains options for project access roles
@@ -169,6 +173,14 @@ type DeveloperConsoleCatalogCategory struct {
 	// +kubebuilder:validation:Optional
 	// +optional
 	Subcategories []DeveloperConsoleCatalogCategoryMeta `json:"subcategories,omitempty"`
+}
+
+// QuickStarts allow cluster admins to customize available ConsoleQuickStart resources.
+type QuickStarts struct {
+	// disabled is a list of ConsoleQuickStart resource names that are not shown to users.
+	// +kubebuilder:validation:Optional
+	// +optional
+	Disabled []string `json:"disabled,omitempty"`
 }
 
 // Brand is a specific supported brand within the console.

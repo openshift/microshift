@@ -205,6 +205,7 @@ var map_ConsoleCustomization = map[string]string{
 	"customLogoFile":       "customLogoFile replaces the default OpenShift logo in the masthead and about dialog. It is a reference to a ConfigMap in the openshift-config namespace. This can be created with a command like 'oc create configmap custom-logo --from-file=/path/to/file -n openshift-config'. Image size must be less than 1 MB due to constraints on the ConfigMap size. The ConfigMap key should include a file extension so that the console serves the file with the correct MIME type. Recommended logo specifications: Dimensions: Max height of 68px and max width of 200px SVG format preferred",
 	"developerCatalog":     "developerCatalog allows to configure the shown developer catalog categories.",
 	"projectAccess":        "projectAccess allows customizing the available list of ClusterRoles in the Developer perspective Project access page which can be used by a project admin to specify roles to other users and restrict access within the project. If set, the list will replace the default ClusterRole options.",
+	"quickStarts":          "quickStarts allows customization of available ConsoleQuickStart resources in console.",
 }
 
 func (ConsoleCustomization) SwaggerDoc() map[string]string {
@@ -276,6 +277,15 @@ var map_ProjectAccess = map[string]string{
 
 func (ProjectAccess) SwaggerDoc() map[string]string {
 	return map_ProjectAccess
+}
+
+var map_QuickStarts = map[string]string{
+	"":         "QuickStarts allow cluster admins to customize available ConsoleQuickStart resources.",
+	"disabled": "disabled is a list of ConsoleQuickStart resource names that are not shown to users.",
+}
+
+func (QuickStarts) SwaggerDoc() map[string]string {
+	return map_QuickStarts
 }
 
 var map_StatuspageProvider = map[string]string{
@@ -375,7 +385,7 @@ func (DNSList) SwaggerDoc() map[string]string {
 
 var map_DNSNodePlacement = map[string]string{
 	"":             "DNSNodePlacement describes the node scheduling configuration for DNS pods.",
-	"nodeSelector": "nodeSelector is the node selector applied to DNS pods.\n\nIf empty, the default is used, which is currently the following:\n\n  beta.kubernetes.io/os: linux\n\nThis default is subject to change.\n\nIf set, the specified selector is used and replaces the default.",
+	"nodeSelector": "nodeSelector is the node selector applied to DNS pods.\n\nIf empty, the default is used, which is currently the following:\n\n  kubernetes.io/os: linux\n\nThis default is subject to change.\n\nIf set, the specified selector is used and replaces the default.",
 	"tolerations":  "tolerations is a list of tolerations applied to DNS pods.\n\nThe default is an empty list.  This default is subject to change.\n\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/",
 }
 
@@ -678,7 +688,7 @@ func (LoggingDestination) SwaggerDoc() map[string]string {
 
 var map_NodePlacement = map[string]string{
 	"":             "NodePlacement describes node scheduling configuration for an ingress controller.",
-	"nodeSelector": "nodeSelector is the node selector applied to ingress controller deployments.\n\nIf unset, the default is:\n\n  beta.kubernetes.io/os: linux\n  node-role.kubernetes.io/worker: ''\n\nIf set, the specified selector is used and replaces the default.",
+	"nodeSelector": "nodeSelector is the node selector applied to ingress controller deployments.\n\nIf unset, the default is:\n\n  kubernetes.io/os: linux\n  node-role.kubernetes.io/worker: ''\n\nIf set, the specified selector is used and replaces the default.",
 	"tolerations":  "tolerations is a list of tolerations applied to ingress controller deployments.\n\nThe default is an empty list.\n\nSee https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/",
 }
 
@@ -900,6 +910,15 @@ func (NetworkList) SwaggerDoc() map[string]string {
 	return map_NetworkList
 }
 
+var map_NetworkMigration = map[string]string{
+	"":            "NetworkMigration represents the cluster network configuration.",
+	"networkType": "networkType is the target type of network migration The supported values are OpenShiftSDN, OVNKubernetes",
+}
+
+func (NetworkMigration) SwaggerDoc() map[string]string {
+	return map_NetworkMigration
+}
+
 var map_NetworkSpec = map[string]string{
 	"":                          "NetworkSpec is the top-level network configuration object.",
 	"clusterNetwork":            "clusterNetwork is the IP address pool to use for pod IPs. Some network providers, e.g. OpenShift SDN, support multiple ClusterNetworks. Others only support one. This is equivalent to the cluster-cidr.",
@@ -912,6 +931,7 @@ var map_NetworkSpec = map[string]string{
 	"disableNetworkDiagnostics": "disableNetworkDiagnostics specifies whether or not PodNetworkConnectivityCheck CRs from a test pod to every node, apiserver and LB should be disabled or not. If unset, this property defaults to 'false' and network diagnostics is enabled. Setting this to 'true' would reduce the additional load of the pods performing the checks.",
 	"kubeProxyConfig":           "kubeProxyConfig lets us configure desired proxy configuration. If not specified, sensible defaults will be chosen by OpenShift directly. Not consumed by all network providers - currently only openshift-sdn.",
 	"exportNetworkFlows":        "exportNetworkFlows enables and configures the export of network flow metadata from the pod network by using protocols NetFlow, SFlow or IPFIX. Currently only supported on OVN-Kubernetes plugin. If unset, flows will not be exported to any collector.",
+	"migration":                 "migration enables and configures the cluster network migration. Setting this to the target network type to allow changing the default network. If unset, the operation of changing cluster default network plugin will be rejected.",
 }
 
 func (NetworkSpec) SwaggerDoc() map[string]string {

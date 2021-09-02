@@ -97,6 +97,19 @@ type NetworkSpec struct {
 	// +optional
 	// +kubebuilder:validation:MinProperties=1
 	ExportNetworkFlows *ExportNetworkFlows `json:"exportNetworkFlows,omitempty"`
+
+	// migration enables and configures the cluster network migration.
+	// Setting this to the target network type to allow changing the default network.
+	// If unset, the operation of changing cluster default network plugin will be rejected.
+	// +optional
+	Migration *NetworkMigration `json:"migration,omitempty"`
+}
+
+// NetworkMigration represents the cluster network configuration.
+type NetworkMigration struct {
+	// networkType is the target type of network migration
+	// The supported values are OpenShiftSDN, OVNKubernetes
+	NetworkType NetworkType `json:"networkType"`
 }
 
 // ClusterNetworkEntry is a subnet from which to allocate PodIPs. A network of size

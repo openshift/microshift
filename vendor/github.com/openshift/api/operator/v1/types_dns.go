@@ -99,7 +99,7 @@ type DNSNodePlacement struct {
 	//
 	// If empty, the default is used, which is currently the following:
 	//
-	//   beta.kubernetes.io/os: linux
+	//   kubernetes.io/os: linux
 	//
 	// This default is subject to change.
 	//
