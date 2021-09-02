@@ -37,7 +37,7 @@ extract_section() {
     file=$1
     section=$2
 
-    cat ${file} | awk "BEGIN {output=0} /^)/ {output=0} {if (output == 1 && !match(\$0,\"// indirect\")) print \$0} /^${section}/ {output=1}"
+    cat "${file}" | awk "BEGIN {output=0} /^)/ {output=0} {if (output == 1 && !match(\$0,\"// indirect\")) print \$0} /^${section}/ {output=1}"
 }
 
 # Returns everything but the version of a require or replace line
@@ -82,27 +82,27 @@ update_versions() {
         base_version=$(get_version "${line}")
         version=${base_version}
 
-        update_line=$(cat "${update_file}" | grep "${mod}" || true)
-        if [[ ! -z "${update_line}" ]]; then
+        update_line=$(cat "${update_file}" | grep "${mod} " || true)
+        if [[ -n "${update_line}" ]]; then
             update_version=$(get_version "${update_line}")
             version=$(printf '%s\n%s\n' "${base_version}" "${update_version}" | sort --version-sort | tail -n 1)
         fi
 
         echo "${mod} ${version}" 
-    done < ${base_file}
+    done < "${base_file}"
 }
 
 # Returns the list of release image names from a release_${arch}.go file
 get_release_images() {
     file=$1
 
-    cat ${file} | awk "BEGIN {output=0} /^}/ {output=0} {if (output == 1) print substr(\$1, 2, length(\$1)-3)} /^var Image/ {output=1}"
+    cat "${file}" | awk "BEGIN {output=0} /^}/ {output=0} {if (output == 1) print substr(\$1, 2, length(\$1)-3)} /^var Image/ {output=1}"
 }
 
 
 # == MAIN ==
 if [[ $EUID -ne 0 ]]; then
-   >&2 echo "You need to run this script as root or in a `buildah unshare` environment:" 
+   >&2 echo "You need to run this script as root or in a 'buildah unshare' environment:" 
    >&2 echo "  buildah unshare $0" 
    exit 1
 fi
@@ -125,12 +125,12 @@ curl -LO "https://github.com/openshift/okd/releases/download/${OKD_RELEASE}/rele
 OKD_RELEASE_IMAGE=$(grep -oP 'Pull From: \K[\w.-/@:]+' release.txt)
 podman pull ${OKD_RELEASE_IMAGE}
 cnt=$(buildah from ${OKD_RELEASE_IMAGE})
-mnt=$(buildah mount ${cnt} | cut -d ' ' -f 2)
-cat ${mnt}/release-manifests/image-references \
+mnt=$(buildah mount "${cnt}" | cut -d ' ' -f 2)
+cat "${mnt}/release-manifests/image-references" \
     | jq -r '.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' \
     > source_commits.txt
 mkdir -p "${STAGING_DIR}/release-manifests"
-cp ${mnt}/release-manifests/*.yaml ${STAGING_DIR}/release-manifests
+cp -- "${mnt}"/release-manifests/*.yaml "${STAGING_DIR}/release-manifests"
 
 
 title "Cloning git repos..."
@@ -140,7 +140,7 @@ do
     COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
     REPO=$(echo "${line}" | cut -d ' ' -f 2)
     COMMIT=$(echo "${line}" | cut -d ' ' -f 3)
-    if [[ ${EMBEDDED_COMPONENTS} == *"${COMPONENT}"* ]] || [[ ${LOADED_COMPONENTS} == *"${COMPONENT}"* ]]; then
+    if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
         git clone ${REPO}
         pushd ${REPO##*/} >/dev/null
         git checkout ${COMMIT}
@@ -157,7 +157,7 @@ while IFS="" read -r line || [ -n "$line" ]
 do
     COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
     REPO=$(echo "${line}" | cut -d ' ' -f 2)
-    if [[ ${EMBEDDED_COMPONENTS} == *"${COMPONENT}"* ]]; then
+    if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
         extract_section ${REPO##*/}/go.mod require > require
         extract_section ${REPO##*/}/go.mod replace > replace
         update_versions latest_require require > t; mv t latest_require
@@ -165,7 +165,7 @@ do
     fi
 done < source_commits.txt
 
-cat << EOF > ${REPOROOT}/go.mod
+cat << EOF > "${REPOROOT}/go.mod"
 module github.com/openshift/microshift
 
 go 1.16
@@ -182,6 +182,12 @@ EOF
 go mod tidy
 go mod vendor
 
+title "Regenerating kube OpenAPI"
+pushd ${STAGING_DIR}/kubernetes >/dev/null
+make gen_openapi
+cp ./pkg/generated/openapi/zz_generated.openapi.go "${REPOROOT}/vendor/k8s.io/kubernetes/pkg/generated/openapi"
+popd >/dev/null
+
 
 title "Rebasing release_*.go"
 for arch in amd64; do
@@ -195,6 +201,7 @@ for arch in amd64; do
             mv t ${REPOROOT}/pkg/release/release_${arch}.go
         fi
     done
+    sed -i "/^var Base/c\var Base = \"${OKD_RELEASE}\"" ${REPOROOT}/pkg/release/release_${arch}.go
 done
 
 
@@ -206,10 +213,10 @@ for asset in ${assets}; do
     search_exclude=XXX
 
     # TODO: Rename assets and their references to obviate the need for special cases
-    case $(basename ${asset}) in
+    case $(basename "${asset}") in
     0000_60_service-ca_00_roles.yaml)
         search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-        search_name=role.yaml
+        search_name=clusterrolebinding.yaml
         ;;
     0000_60_service-ca_01_namespace.yaml)
         search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
@@ -236,12 +243,12 @@ for asset in ${assets}; do
     0000_80_openshift-router-service.yaml)
         search_path=${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router
         search_name=service-internal.yaml
-        search_exclude="${REPOROOT}/_output/staging/cluster-dns-operator/assets/router/metrics/*"
+        search_exclude="${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router/metrics/*"
         ;;
     0000_80_openshift-router-*)
         search_path=${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router
         search_name="${search_name#"0000_80_openshift-router-"}"
-        search_exclude="${REPOROOT}/_output/staging/cluster-dns-operator/assets/router/metrics/*"
+        search_exclude="${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router/metrics/*"
         ;;
     0000_11_imageregistry-configs.crd.yaml)
         search_path=${REPOROOT}/_output/staging/openshift-apiserver/vendor/github.com/openshift/api/imageregistry/v1
@@ -249,7 +256,7 @@ for asset in ${assets}; do
         ;;
     esac
 
-    updated_asset=$(find ${search_path} -name "${search_name}" -not -path "${search_exclude}" | tail -n 1)
+    updated_asset=$(find "${search_path}" -name "${search_name}" -not -path "${search_exclude}" | tail -n 1)
     if [[ ! -z "${updated_asset}" ]]; then
         echo "Updating ${asset} from ${updated_asset}"
         cp "${updated_asset}" "${asset}"
