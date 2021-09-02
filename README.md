@@ -16,6 +16,13 @@ We believe these properties should also make Microshift a great tool for other u
 
 <sup>1) more precisely [OKD](https://www.okd.io/), the Kubernetes distribution by the OpenShift community</sup>
 
+## Minimum specs
+
+In order to run Microshift, you will need at least 2 CPU cores, 2GB of RAM, 2.6GB of free storage space for the Microshift binary, and a 64-bit CPU (although 32-bit is *technically* possible, if you're up for the challenge). 
+
+For barebones development the minimum requirement is 3GB of RAM, though this can increase 
+if you are using resource-intensive devtools. 
+
 ## Using Microshift
 To give Microshift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
 
@@ -75,3 +82,7 @@ Microshift keeps all its state in its data-dir, which defaults to `/var/lib/micr
 
 You can find the kubeadmin's kubeconfig under `$DATADIR/resources/kubeadmin/kubeconfig`.
 
+
+### Contributing
+
+For more information on working with Microshift, you can find a contributor's guide in [CONTRIBUTING.md](./CONTRIBUTING.md)
