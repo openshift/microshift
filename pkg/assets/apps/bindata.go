@@ -171,16 +171,21 @@ metadata:
   name: service-ca
   labels:
     app: service-ca
+    service-ca: "true"
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: service-ca
+      service-ca: "true"
   template:
     metadata:
       name: service-ca
       labels:
         app: service-ca
+        service-ca: "true"
     spec:
       serviceAccountName: service-ca
       containers:
@@ -188,27 +193,26 @@ spec:
         image: {{ .ReleaseImage.service_ca_operator }}
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
-        args:
-        - "-v=4"
         ports:
-          - containerPort: 8443
-            protocol: TCP
+        - containerPort: 8443
+        securityContext:
+          runAsNonRoot: true
         resources:
           requests:
             memory: 120Mi
             cpu: 10m
         volumeMounts:
-          - mountPath: /var/run/secrets/signing-key
-            name: signing-key
-          - mountPath: /var/run/configmaps/signing-cabundle
-            name: signing-cabundle
+        - mountPath: /var/run/secrets/signing-key
+          name: signing-key
+        - mountPath: /var/run/configmaps/signing-cabundle
+          name: signing-cabundle
       volumes:
-        - name: signing-key
-          hostPath:
-            path: {{.KeyDir}}
-        - name: signing-cabundle
-          hostPath:
-            path: {{.CADir}}
+      - name: signing-key
+        hostPath:
+          path: {{.KeyDir}}
+      - name: signing-cabundle
+        hostPath:
+          path: {{.CADir}}
       #nodeSelector:
       #  node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"
@@ -247,15 +251,9 @@ metadata:
   labels:
     dns.operator.openshift.io/owning-dns: default
   name: dns-default
-  namespace: openshift-dns    
+  namespace: openshift-dns
 spec:
-  selector:
-    matchLabels:
-      dns.operator.openshift.io/daemonset-dns: default
   template:
-    metadata:
-      labels:
-        dns.operator.openshift.io/daemonset-dns: default
     spec:
       serviceAccountName: dns
       priorityClassName: system-node-critical
@@ -278,17 +276,16 @@ spec:
           name: dns-tcp
           protocol: TCP
         readinessProbe:
-          failureThreshold: 3
           httpGet:
-            path: /health
-            port: 8080
+            path: /ready
+            port: 8181
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
+          periodSeconds: 3
           successThreshold: 1
-          timeoutSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 3
         livenessProbe:
-          failureThreshold: 5
           httpGet:
             path: /health
             port: 8080
@@ -296,6 +293,7 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 5
           successThreshold: 1
+          failureThreshold: 5
         resources:
           requests:
             cpu: 50m
@@ -331,9 +329,12 @@ spec:
           mountPath: /etc/hosts
         env:
         - name: SERVICES
+          # Comma or space separated list of services
+          # NOTE: For now, ensure these are relative names; for each relative name,
+          # an alias with the CLUSTER_DOMAIN suffix will also be added.
           value: "image-registry.openshift-image-registry.svc"
         - name: CLUSTER_DOMAIN
-          value: cluster.local        
+          value: cluster.local
         command:
         - /bin/bash
         - -c
@@ -454,13 +455,10 @@ metadata:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
 spec:
   progressDeadlineSeconds: 600
-  selector:
-    matchLabels:
-      ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
   template:
     metadata:
-      labels:
-        ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+      annotations:
+        "unsupported.do-not-use.openshift.io/override-liveness-grace-period-seconds": "10"
     spec:
       serviceAccountName: router
       # nodeSelector is set at runtime.
@@ -491,53 +489,20 @@ spec:
             value: /etc/pki/tls/private
           - name: DEFAULT_DESTINATION_CA_PATH
             value: /var/run/configmaps/service-ca/service-ca.crt
-          - name: ROUTER_CIPHERS
-            value: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
-          - name: ROUTER_DISABLE_HTTP2
-            value: "true"
-          - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
-            value: "false"
-          #FIXME: use metrics tls
-          - name: ROUTER_METRICS_TLS_CERT_FILE
-            value: /etc/pki/tls/private/tls.crt
-          - name: ROUTER_METRICS_TLS_KEY_FILE
-            value: /etc/pki/tls/private/tls.key
-          - name: ROUTER_METRICS_TYPE
-            value: haproxy
-          - name: ROUTER_SERVICE_NAME
-            value: default
-          - name: ROUTER_SET_FORWARDED_HEADERS
-            value: append
-          - name: ROUTER_THREADS
-            value: "4"
-          - name: SSL_MIN_VERSION
-            value: TLSv1.2            
           livenessProbe:
-            failureThreshold: 3
+            initialDelaySeconds: 10
             httpGet:
               path: /healthz
               port: 1936
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
           readinessProbe:
-             failureThreshold: 3
-             httpGet:
-               path: /healthz/ready
-               port: 1936
-               scheme: HTTP
-             initialDelaySeconds: 10
-             periodSeconds: 10
-             successThreshold: 1
-             timeoutSeconds: 1
+            initialDelaySeconds: 10
+            httpGet:
+              path: /healthz/ready
+              port: 1936
           resources:
             requests:
               cpu: 100m
               memory: 256Mi
-          securityContext:
-            privileged: true              
           volumeMounts:
           - mountPath: /etc/pki/tls/private
             name: default-certificate
@@ -548,6 +513,7 @@ spec:
       volumes:
       - name: default-certificate
         secret:
+          defaultMode: 420
           secretName: router-certs-default
       - name: service-ca-bundle
         configMap:
@@ -556,6 +522,7 @@ spec:
             path: service-ca.crt
           name: service-ca-bundle
           optional: false
+        defaultMode: 420
 `)
 
 func assetsApps0000_80_openshiftRouterDeploymentYamlBytes() ([]byte, error) {

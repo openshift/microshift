@@ -200,15 +200,14 @@ func assetsRbac0000_00_podsecuritypolicyFlannelYaml() (*asset, error) {
 var _assetsRbac0000_60_serviceCa_00_rolesYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: system:openshift:operator:service-ca
+  name: system:openshift:controller:service-ca
 roleRef:
   kind: ClusterRole
-  name: cluster-admin
+  name: system:openshift:controller:service-ca
 subjects:
 - kind: ServiceAccount
   namespace: openshift-service-ca
-  name: service-ca
-`)
+  name: service-ca`)
 
 func assetsRbac0000_60_serviceCa_00_rolesYamlBytes() ([]byte, error) {
 	return _assetsRbac0000_60_serviceCa_00_rolesYaml, nil
@@ -235,7 +234,6 @@ subjects:
   namespace: openshift-dns
 roleRef:
   kind: ClusterRole
-  apiGroup: rbac.authorization.k8s.io
   name: openshift-dns
 `)
 
@@ -269,25 +267,21 @@ rules:
   verbs:
   - list
   - watch
-- apiGroups:
-  - discovery.k8s.io
-  resources:
-  - endpointslices
-  verbs:
-  - list
-  - watch
+
 - apiGroups:
   - authentication.k8s.io
   resources:
   - tokenreviews
   verbs:
   - create
+
 - apiGroups:
   - authorization.k8s.io
   resources:
   - subjectaccessreviews
   verbs:
-  - create`)
+  - create
+`)
 
 func assetsRbac0000_70_dns_01ClusterRoleYamlBytes() ([]byte, error) {
 	return _assetsRbac0000_70_dns_01ClusterRoleYaml, nil
@@ -383,8 +377,7 @@ subjects:
 roleRef:
   kind: ClusterRole
   name: openshift-ingress-router
-  apiGroup: rbac.authorization.k8s.io
-`)
+  namespace: openshift-ingress`)
 
 func assetsRbac0000_80_openshiftRouterClusterRoleBindingYamlBytes() ([]byte, error) {
 	return _assetsRbac0000_80_openshiftRouterClusterRoleBindingYaml, nil
@@ -461,8 +454,7 @@ rules:
   - endpointslices
   verbs:
   - list
-  - watch
-`)
+  - watch`)
 
 func assetsRbac0000_80_openshiftRouterClusterRoleYamlBytes() ([]byte, error) {
 	return _assetsRbac0000_80_openshiftRouterClusterRoleYaml, nil

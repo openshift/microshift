@@ -5,16 +5,21 @@ metadata:
   name: service-ca
   labels:
     app: service-ca
+    service-ca: "true"
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: service-ca
+      service-ca: "true"
   template:
     metadata:
       name: service-ca
       labels:
         app: service-ca
+        service-ca: "true"
     spec:
       serviceAccountName: service-ca
       containers:
@@ -22,27 +27,26 @@ spec:
         image: {{ .ReleaseImage.service_ca_operator }}
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
-        args:
-        - "-v=4"
         ports:
-          - containerPort: 8443
-            protocol: TCP
+        - containerPort: 8443
+        securityContext:
+          runAsNonRoot: true
         resources:
           requests:
             memory: 120Mi
             cpu: 10m
         volumeMounts:
-          - mountPath: /var/run/secrets/signing-key
-            name: signing-key
-          - mountPath: /var/run/configmaps/signing-cabundle
-            name: signing-cabundle
+        - mountPath: /var/run/secrets/signing-key
+          name: signing-key
+        - mountPath: /var/run/configmaps/signing-cabundle
+          name: signing-cabundle
       volumes:
-        - name: signing-key
-          hostPath:
-            path: {{.KeyDir}}
-        - name: signing-cabundle
-          hostPath:
-            path: {{.CADir}}
+      - name: signing-key
+        hostPath:
+          path: {{.KeyDir}}
+      - name: signing-cabundle
+        hostPath:
+          path: {{.CADir}}
       #nodeSelector:
       #  node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"

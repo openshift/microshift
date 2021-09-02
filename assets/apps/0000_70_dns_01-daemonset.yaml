@@ -4,15 +4,9 @@ metadata:
   labels:
     dns.operator.openshift.io/owning-dns: default
   name: dns-default
-  namespace: openshift-dns    
+  namespace: openshift-dns
 spec:
-  selector:
-    matchLabels:
-      dns.operator.openshift.io/daemonset-dns: default
   template:
-    metadata:
-      labels:
-        dns.operator.openshift.io/daemonset-dns: default
     spec:
       serviceAccountName: dns
       priorityClassName: system-node-critical
@@ -35,17 +29,16 @@ spec:
           name: dns-tcp
           protocol: TCP
         readinessProbe:
-          failureThreshold: 3
           httpGet:
-            path: /health
-            port: 8080
+            path: /ready
+            port: 8181
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
+          periodSeconds: 3
           successThreshold: 1
-          timeoutSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 3
         livenessProbe:
-          failureThreshold: 5
           httpGet:
             path: /health
             port: 8080
@@ -53,6 +46,7 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 5
           successThreshold: 1
+          failureThreshold: 5
         resources:
           requests:
             cpu: 50m
@@ -88,9 +82,12 @@ spec:
           mountPath: /etc/hosts
         env:
         - name: SERVICES
+          # Comma or space separated list of services
+          # NOTE: For now, ensure these are relative names; for each relative name,
+          # an alias with the CLUSTER_DOMAIN suffix will also be added.
           value: "image-registry.openshift-image-registry.svc"
         - name: CLUSTER_DOMAIN
-          value: cluster.local        
+          value: cluster.local
         command:
         - /bin/bash
         - -c

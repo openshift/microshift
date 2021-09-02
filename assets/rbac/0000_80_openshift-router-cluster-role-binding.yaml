@@ -10,4 +10,4 @@ subjects:
 roleRef:
   kind: ClusterRole
   name: openshift-ingress-router
-  apiGroup: rbac.authorization.k8s.io
+  namespace: openshift-ingress

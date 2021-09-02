@@ -1,10 +1,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: system:openshift:operator:service-ca
+  name: system:openshift:controller:service-ca
 roleRef:
   kind: ClusterRole
-  name: cluster-admin
+  name: system:openshift:controller:service-ca
 subjects:
 - kind: ServiceAccount
   namespace: openshift-service-ca

@@ -3,5 +3,3 @@ kind: ServiceAccount
 metadata:
   namespace: openshift-service-ca
   name: service-ca
-  labels:
-    app: service-ca
