@@ -77,6 +77,22 @@ vagrant ssh
 
 If you're using VSCode, you can connect to your vagrant box with a few extra steps.
 
+#### Increasing Memory Requirements
+
+Since VS Code leans more on the heavy side of development, the RAM usage on your Vagrant environment 
+can go up to 5GB, and therefore we will need to modify the `Vagrantfile` to
+increase the amount of available RAM from 3GB to 5GB (or 6GB if you want to be safe). 
+To do this, set `v.memory` to the following in your `Vagrantfile`:
+
+```rb
+        # provides 5GB of memory
+        v.memory = 5120
+        # provides 6GB of memory
+        v.memory = 6144
+```
+
+#### Setting up an SSH Profile
+
 First we need to ask Vagrant for an SSH config file. From your host machine, run:
 
 ```
