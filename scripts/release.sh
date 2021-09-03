@@ -56,8 +56,8 @@ Inputs:
     --help, -h    Print this help text.
 Outputs:
 - A version, formatted as 4.7.0-0.microshift-YYYY-MM-DD-HHMMSS, is applied as a git tag and pushed to the repo
+- Multi-architecture container manifest, tagged as quay.io/microshift/microshift:$VERSION && latest
 - Cross-compiled binaries
-- Multi-architecture container image tagged and pushed as quay.io/microshift/microshift:$VERSION
 - A sha256 checksum file, containing the checksums for all binary artifacts
 - A github release, containing the binary artifacts and checksum file.
 
