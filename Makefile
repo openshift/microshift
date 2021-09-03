@@ -20,6 +20,9 @@ IMAGE_REPO :=quay.io/microshift/microshift
 OUTPUT_DIR :=_output
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
+# restrict included verify-* targets to only process project files
+GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
+
 GO_EXT_LD_FLAGS :=-extldflags '-static'
 GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMinor=20 \
