@@ -173,6 +173,7 @@ podman_create_manifest(){
     podman manifest add "$IMAGE_REPO:$VERSION" "docker://$ref"
   done
     podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$VERSION"
+    podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
 }
 
 docker_create_manifest(){
@@ -180,8 +181,11 @@ docker_create_manifest(){
   for image in "${RELEASE_IMAGE_TAGS[@]}"; do
     amend_images_options+="--amend $image"
   done
-  podman manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
-  podman manifest push "$IMAGE_REPO:$VERSION"
+  # use docker cli directly for clarity, as this is a docker-only func
+  docker manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
+  docker tag "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
+  docker manifest push "$IMAGE_REPO:$VERSION"
+  docker manifest push "$IMAGE_REPO:latest"
 }
 
 push_container_manifest() {
