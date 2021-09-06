@@ -37,7 +37,7 @@ extract_section() {
     file=$1
     section=$2
 
-    cat "${file}" | awk "BEGIN {output=0} /^)/ {output=0} {if (output == 1 && !match(\$0,\"// indirect\")) print \$0} /^${section}/ {output=1}"
+    awk "BEGIN {output=0} /^)/ {output=0} {if (output == 1 && !match(\$0,\"// indirect\")) print \$0} /^${section}/ {output=1}" "${file}"
 }
 
 # Returns everything but the version of a require or replace line
@@ -82,7 +82,7 @@ update_versions() {
         base_version=$(get_version "${line}")
         version=${base_version}
 
-        update_line=$(cat "${update_file}" | grep "${mod} " || true)
+        update_line=$(grep "${mod} " "${update_file}" || true)
         if [[ -n "${update_line}" ]]; then
             update_version=$(get_version "${update_line}")
             version=$(printf '%s\n%s\n' "${base_version}" "${update_version}" | sort --version-sort | tail -n 1)
@@ -96,7 +96,7 @@ update_versions() {
 get_release_images() {
     file=$1
 
-    cat "${file}" | awk "BEGIN {output=0} /^}/ {output=0} {if (output == 1) print substr(\$1, 2, length(\$1)-3)} /^var Image/ {output=1}"
+    awk "BEGIN {output=0} /^}/ {output=0} {if (output == 1) print substr(\$1, 2, length(\$1)-3)} /^var Image/ {output=1}" "${file}"
 }
 
 
@@ -114,8 +114,8 @@ fi
 OKD_RELEASE=$1
 
 
-rm -rf "${STAGING_DIR}"
-mkdir -p "${STAGING_DIR}"
+# rm -rf "${STAGING_DIR}"
+# mkdir -p "${STAGING_DIR}"
 pushd "${STAGING_DIR}" >/dev/null
 
 
@@ -123,12 +123,11 @@ title "Downloading and extracting ${OKD_RELEASE} release image..."
 curl -LO "https://github.com/openshift/okd/releases/download/${OKD_RELEASE}/release.txt"
 
 OKD_RELEASE_IMAGE=$(grep -oP 'Pull From: \K[\w.-/@:]+' release.txt)
-podman pull ${OKD_RELEASE_IMAGE}
-cnt=$(buildah from ${OKD_RELEASE_IMAGE})
+podman pull "${OKD_RELEASE_IMAGE}"
+cnt=$(buildah from "${OKD_RELEASE_IMAGE}")
 mnt=$(buildah mount "${cnt}" | cut -d ' ' -f 2)
-cat "${mnt}/release-manifests/image-references" \
-    | jq -r '.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' \
-    > source_commits.txt
+jq -r '.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' \
+    "${mnt}/release-manifests/image-references" > source_commits.txt
 mkdir -p "${STAGING_DIR}/release-manifests"
 cp -- "${mnt}"/release-manifests/*.yaml "${STAGING_DIR}/release-manifests"
 
@@ -141,9 +140,9 @@ do
     REPO=$(echo "${line}" | cut -d ' ' -f 2)
     COMMIT=$(echo "${line}" | cut -d ' ' -f 3)
     if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
-        git clone ${REPO}
-        pushd ${REPO##*/} >/dev/null
-        git checkout ${COMMIT}
+        git clone "${REPO}"
+        pushd "${REPO##*/}" >/dev/null
+        git checkout "${COMMIT}"
         echo
         popd >/dev/null
     fi
@@ -151,15 +150,15 @@ done < source_commits.txt
 
 
 title "Rebasing go.mod..."
-extract_section ${REPOROOT}/go.mod require > latest_require
-extract_section ${REPOROOT}/go.mod replace > latest_replace
+extract_section "${REPOROOT}/go.mod" require > latest_require
+extract_section "${REPOROOT}/go.mod" replace > latest_replace
 while IFS="" read -r line || [ -n "$line" ]
 do
     COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
     REPO=$(echo "${line}" | cut -d ' ' -f 2)
     if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
-        extract_section ${REPO##*/}/go.mod require > require
-        extract_section ${REPO##*/}/go.mod replace > replace
+        extract_section "${REPO##*/}/go.mod" require > require
+        extract_section "${REPO##*/}/go.mod" replace > replace
         update_versions latest_require require > t; mv t latest_require
         update_versions latest_replace replace > t; mv t latest_replace
     fi
@@ -183,7 +182,7 @@ go mod tidy
 go mod vendor
 
 title "Regenerating kube OpenAPI"
-pushd ${STAGING_DIR}/kubernetes >/dev/null
+pushd "${STAGING_DIR}/kubernetes" >/dev/null
 make gen_openapi
 cp ./pkg/generated/openapi/zz_generated.openapi.go "${REPOROOT}/vendor/k8s.io/kubernetes/pkg/generated/openapi"
 popd >/dev/null
@@ -191,25 +190,25 @@ popd >/dev/null
 
 title "Rebasing release_*.go"
 for arch in amd64; do
-    images="$(get_release_images ${REPOROOT}/pkg/release/release_${arch}.go | xargs)"
+    images="$(get_release_images "${REPOROOT}/pkg/release/release_${arch}.go" | xargs)"
     w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
     for i in ${images}; do
-        digest=$(cat release.txt | awk "/ ${i//_/-} / {print \$2}")
+        digest=$(awk "/ ${i//_/-} / {print \$2}" release.txt)
         if [[ ! -z "${digest}" ]]; then
             awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
-                ${REPOROOT}/pkg/release/release_${arch}.go > t
-            mv t ${REPOROOT}/pkg/release/release_${arch}.go
+                "${REPOROOT}/pkg/release/release_${arch}.go" > t
+            mv t "${REPOROOT}/pkg/release/release_${arch}.go"
         fi
     done
-    sed -i "/^var Base/c\var Base = \"${OKD_RELEASE}\"" ${REPOROOT}/pkg/release/release_${arch}.go
+    sed -i "/^var Base/c\var Base = \"${OKD_RELEASE}\"" "${REPOROOT}/pkg/release/release_${arch}.go"
 done
 
 
 title "Rebasing manifests"
-assets=$(find ${REPOROOT}/assets -name "*.yaml")
+assets=$(find "${REPOROOT}/assets" -name \*.yaml)
 for asset in ${assets}; do
-    search_path=${REPOROOT}/_output/staging/release-manifests
-    search_name=$(basename ${asset})
+    search_path="${REPOROOT}/_output/staging/release-manifests"
+    search_name=$(basename "${asset}")
     search_exclude=XXX
 
     # TODO: Rename assets and their references to obviate the need for special cases
