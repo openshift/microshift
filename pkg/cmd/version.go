@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/openshift/microshift/pkg/release"
 	"github.com/openshift/microshift/pkg/version"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
@@ -47,6 +48,7 @@ func (o *VersionOptions) Run() error {
 	switch o.Output {
 	case "":
 		fmt.Fprintf(o.Out, "Microshift Version: %s\n", versionInfo.String())
+		fmt.Fprintf(o.Out, "Base OKD Version: %s\n", release.Base)
 	case "yaml":
 		marshalled, err := yaml.Marshal(&versionInfo)
 		if err != nil {
