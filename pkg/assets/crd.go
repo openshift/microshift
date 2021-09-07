@@ -40,30 +40,6 @@ var (
 		"assets/crd/0000_10_config-operator_01_image.crd.yaml",
 		"assets/crd/0000_03_config-operator_01_proxy.crd.yaml",
 		"assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml",
-		/*
-			"assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml",
-			"assets/crd/0000_10_config-operator_01_apiserver.crd.yaml",
-			"assets/crd/0000_10_config-operator_01_authentication.crd.yaml",
-
-			"assets/crd/0000_10_config-operator_01_console.crd.yaml",
-			"assets/crd/0000_10_config-operator_01_dns.crd.yaml",
-			"assets/crd/0000_10_config-operator_01_featuregate.crd.yaml",
-
-
-			"assets/crd/0000_10_config-operator_01_infrastructure.crd.yaml",
-			"assets/crd/0000_10_config-operator_01_ingress.crd.yaml",
-			"assets/crd/0000_10_config-operator_01_network.crd.yaml",
-			"assets/crd/0000_10_config-operator_01_oauth.crd.yaml",
-			"assets/crd/0000_10_config-operator_01_project.crd.yaml",
-			"assets/crd/0000_03_config-operator_01_operatorhub.crd.yaml",
-
-
-			"assets/crd/0000_00_cluster-version-operator_01_clusteroperator.crd.yaml",
-			"assets/crd/cluster-ingress-00-custom-resource-definition.yaml",
-			"assets/crd/0000_70_dns-operator_00-custom-resource-definition.yaml",
-			"assets/crd/0000_50_service-ca-operator_02_crd.yaml",
-			"assets/crd/0000_00_cluster-version-operator_01_clusterversion.crd.yaml",
-		*/
 	}
 )
 

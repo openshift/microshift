@@ -132,22 +132,28 @@ get_kubectl() {
 
 # Download and install microshift
 get_microshift() {
-    if [ $ARCH = "x86_64" ]; then
-        curl -L https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-amd64 -o microshift
-        curl -L https://github.com/redhat-et/microshift/releases/download/$VERSION/release.sha256 -o release.sha256
+    if [ "$ARCH" = "x86_64" ]; then
+        curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-amd64
+        curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/release.sha256
+    else
+        printf "arch %s unsupported" "$ARCH" >&2
+        exit 1
     fi
 
-    SHA=$(sha256sum microshift | awk '{print $1}')
-    if [[ $SHA != $(cat release.sha256 | awk '{print $1}') ]]; then echo "SHA256 checksum failed" && exit 1; fi
+    BIN_SHA="$(sha256sum microshift-linux-amd64 | awk '{print $1}')"
+    KNOWN_SHA="$(grep "microshift-linux-amd64" release.sha256 | awk '{print $1}')"
 
-    sudo chmod +x microshift
-    sudo mv microshift /usr/local/bin/
+    if [[ "$BIN_SHA" != "$KNOWN_SHA" ]]; then 
+        echo "SHA256 checksum failed" && exit 1
+    fi
 
-    apply_selinux_policy
+    sudo chmod +x microshift-linux-amd64
+    sudo mv microshift-linux-amd64 /usr/local/bin/microshift
 
     cat << EOF | sudo tee /usr/lib/systemd/system/microshift.service
 [Unit]
 Description=Microshift
+After=crio.service
 
 [Service]
 WorkingDirectory=/usr/local/bin/
@@ -188,19 +194,19 @@ validation_check(){
 # Script execution
 get_distro
 get_arch
-if [ $DISTRO = "rhel" ]; then
+if [ "$DISTRO" = "rhel" ]; then
     register_subs
 fi
 validation_check
 install_dependencies
 establish_firewall
+apply_selinux_policy
 install_crio
 crio_conf
 verify_crio
 get_kubectl
 
-[ $CONFIG_ENV_ONLY = true ] && { echo "Env config complete" && exit 0 ; }
-
+[ "$CONFIG_ENV_ONLY" = true ] && { echo "Env config complete" && exit 0 ; }
 get_microshift
 
 until sudo test -f /var/lib/microshift/resources/kubeadmin/kubeconfig

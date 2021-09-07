@@ -34,9 +34,9 @@ func StartKubelet(cfg *config.MicroshiftConfig) error {
 		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
 		"--kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
 		"--container-runtime=remote",
-		"--container-runtime-endpoint=/var/run/crio/crio.sock",
+		"--container-runtime-endpoint=unix:///var/run/crio/crio.sock",
 		"--runtime-cgroups=/system.slice/crio.service",
-		"--node-ip=" + cfg.HostIP,
+		"--node-ip=" + cfg.NodeIP,
 		"--volume-plugin-dir=" + cfg.DataDir + "/kubelet-plugins/volume/exec",
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
@@ -50,7 +50,7 @@ func StartKubelet(cfg *config.MicroshiftConfig) error {
 	if err := command.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
 	}
-	logrus.Infof("starting kubelet %s, args: %v", cfg.HostIP, args)
+	logrus.Infof("starting kubelet %s, args: %v", cfg.NodeIP, args)
 
 	go func() {
 		command.Run(command, args)

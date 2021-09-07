@@ -18,7 +18,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
       - name: dns
-        image: quay.io/openshift/okd-content@sha256:fb7eafdcb7989575119e1807e4adc2eb29f8165dec5c148b9c3a44d48458d8a7
+        image: {{ .ReleaseImage.coredns }}
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         command: [ "coredns" ]
@@ -58,7 +58,7 @@ spec:
             cpu: 50m
             memory: 70Mi
       - name: kube-rbac-proxy
-        image: quay.io/openshift/okd-content@sha256:1aa5bb03d0485ec2db2c7871a1eeaef83e9eabf7e9f1bc2c841cf1a759817c99
+        image: {{ .ReleaseImage.kube_rbac_proxy }}
         args:
         - --logtostderr
         - --secure-listen-address=:9154
@@ -78,7 +78,7 @@ spec:
           name: metrics-tls
           readOnly: true
       - name: dns-node-resolver
-        image: quay.io/openshift/okd-content@sha256:b20d195c721cd3b6215e5716b5569cbabbe861559af7dce07b5f8f3d38e6d701
+        image: {{ .ReleaseImage.cli }}
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         securityContext:

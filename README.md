@@ -1,6 +1,6 @@
 # Microshift
 
-Microshift is OpenShift<sup>1</sup> Kubernetes in a small form factor and optimized for edge computing.
+Microshift is a research project that is exploring how OpenShift<sup>1</sup> Kubernetes can be optimized for small form factor and edge computing.
 
 Edge devices deployed out in the field pose very different operational, environmental, and business challenges from those of cloud computing. These motivate different engineering trade-offs for Kubernetes at the far edge than for cloud or near-edge scenarios. Microshift's design goals cater to this:
 
@@ -15,6 +15,13 @@ We believe these properties should also make Microshift a great tool for other u
 **Note: Microshift is still early days and moving fast. Features are missing. Things break. But you can still help shape it, too.**
 
 <sup>1) more precisely [OKD](https://www.okd.io/), the Kubernetes distribution by the OpenShift community</sup>
+
+## Minimum specs
+
+In order to run Microshift, you will need at least 2 CPU cores, 2GB of RAM, 2.6GB of free storage space for the Microshift binary, and a 64-bit CPU (although 32-bit is *technically* possible, if you're up for the challenge). 
+
+For barebones development the minimum requirement is 3GB of RAM, though this can increase 
+if you are using resource-intensive devtools. 
 
 ## Using Microshift
 To give Microshift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
@@ -80,3 +87,7 @@ Microshift keeps all its state in its data-dir, which defaults to `/var/lib/micr
 ### Kubeconfig
 The `install.sh` script should place the kubeconfig file for you. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed `/var/lib/microshift/resources/kubeadmin/kubeconfig` during configuration.
 
+
+### Contributing
+
+For more information on working with Microshift, you can find a contributor's guide in [CONTRIBUTING.md](./CONTRIBUTING.md)

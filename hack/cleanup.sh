@@ -1,7 +1,9 @@
 #!/bin/sh
 
-pkill -9 conmon
-mount |grep overlay |awk '{print $3}' |xargs umount
-mount |grep kubelet |awk '{print $3}' |xargs umount
-pkill -9 pause
-rm /var/lib/etcd -rf
+sudo crictl rm --all --force
+sudo crictl rmi --all --prune
+
+sudo pkill -9 conmon
+sudo pkill -9 pause
+
+sudo rm -rf /var/lib/microshift
