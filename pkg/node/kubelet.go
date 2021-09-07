@@ -189,7 +189,7 @@ func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 
 const (
 	// proxy component name
-	component = "kubeproxy"
+	COMPONENT_KUBEPROXY = "kube-proxy"
 )
 
 type ProxyOptions struct {
@@ -202,7 +202,7 @@ func NewKubeProxyServer(cfg *config.MicroshiftConfig) *ProxyOptions {
 	return s
 }
 
-func (s *ProxyOptions) Name() string           { return component }
+func (s *ProxyOptions) Name() string           { return COMPONENT_KUBEPROXY }
 func (s *ProxyOptions) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
@@ -217,8 +217,8 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
 		"--vmodule=" + cfg.LogVModule,
 	}
 	cmd := &cobra.Command{
-		Use:          component,
-		Long:         component,
+		Use:          COMPONENT_KUBEPROXY,
+		Long:         COMPONENT_KUBEPROXY,
 		SilenceUsage: true,
 		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
 	}
@@ -243,14 +243,14 @@ func (s *ProxyOptions) Run(ctx context.Context, ready chan<- struct{}, stopped c
 
 	defer close(stopped)
 	// run readiness check
-	// go func() {
-	// 	healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10250/healthz")
-	// 	if healthcheckStatus != 200 {
-	// 		logrus.Fatalf("%s failed to start", s.Name())
-	// 	}
-	// 	logrus.Infof("%s is ready", s.Name())
-	// 	close(ready)
-	// }()
+	go func() {
+		healthcheckStatus := util.RetryInsecureHttpsGet("http://127.0.0.1:10256/healthz")
+		if healthcheckStatus != 200 {
+			logrus.Fatalf("%s failed to start", s.Name())
+		}
+		logrus.Infof("%s is ready", s.Name())
+		close(ready)
+	}()
 	if err := s.options.Run(); err != nil {
 		logrus.Fatalf("Failed to start kube-proxy %v", err)
 	}

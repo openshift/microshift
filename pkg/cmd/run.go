@@ -91,13 +91,11 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 			},
 		)))
 		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
-
 	}
 
 	if config.StringInList("node", cfg.Roles) {
 		util.Must(m.AddService(node.NewKubeletServer(cfg)))
 		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
-
 	}
 
 	logrus.Info("Starting Microshift")
