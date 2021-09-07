@@ -85,7 +85,7 @@ CONFIG_ENV_ONLY=true ./install.sh
 Microshift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running Microshift as privileged user and `$HOME/.microshift` otherwise. Note that running Microshift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
 
 ### Kubeconfig
-The `install.sh` script should place the kubeconfig file for you. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed `/var/lib/microshift/resources/kubeadmin/kubeconfig` during configuration.
+When starting the Microshift for the first time the Kubeconfig file is created. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
 
 
 ### Contributing
