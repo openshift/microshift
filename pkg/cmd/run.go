@@ -90,6 +90,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 				return nil
 			},
 		)))
+		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 
 	}
 
@@ -108,7 +109,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 				return nil
 			},
 		)))
-		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	}
 
 	logrus.Info("Starting Microshift")

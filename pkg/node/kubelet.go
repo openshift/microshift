@@ -17,6 +17,7 @@ package node
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"strconv"
 
@@ -34,6 +35,8 @@ import (
 
 	kubeletoptions "k8s.io/kubernetes/cmd/kubelet/app/options"
 	kubeletconfig "k8s.io/kubernetes/pkg/kubelet/apis/config"
+	"k8s.io/kubernetes/pkg/kubelet/kubeletconfig/configfiles"
+	utilfs "k8s.io/kubernetes/pkg/util/filesystem"
 )
 
 const (
@@ -64,15 +67,12 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 	}
 	// Prepare commandline args
 	args := []string{
-		"--config=" + cfg.DataDir + "/resources/kubelet/config/config.yaml",
 		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
 		"--kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
 		"--container-runtime=remote",
 		"--container-runtime-endpoint=unix:///var/run/crio/crio.sock",
 		"--runtime-cgroups=/system.slice/crio.service",
-		"--cgroup-driver=systemd",
 		"--node-ip=" + cfg.NodeIP,
-		"--volume-plugin-dir=" + cfg.DataDir + "/kubelet-plugins/volume/exec",
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
@@ -85,10 +85,10 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 	cleanFlagSet.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 
 	kubeletFlags := kubeletoptions.NewKubeletFlags()
-	kubeletConfig, err := kubeletoptions.NewKubeletConfiguration()
-	// programmer error
+	kubeletConfig, err := loadConfigFile(cfg.DataDir + "/resources/kubelet/config/config.yaml")
+
 	if err != nil {
-		logrus.Fatalf("programmer error %v", err)
+		logrus.Fatalf("Failed to load Kubelet Configuration %v", err)
 	}
 
 	cmd := &cobra.Command{
@@ -107,7 +107,6 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 	if err := cmd.ParseFlags(args); err != nil {
 		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
 	}
-
 	s.kubeconfig = kubeletConfig
 	s.kubeletflags = kubeletFlags
 
@@ -120,7 +119,7 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	defer close(stopped)
 	// run readiness check
 	go func() {
-		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10250/healthz")
+		healthcheckStatus := util.RetryInsecureHttpsGet("http://127.0.0.1:10248/healthz")
 		if healthcheckStatus != 200 {
 			logrus.Fatalf("%s failed to start", s.Name())
 		}
@@ -139,7 +138,7 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		logrus.Fatalf("Error in fetching depenedencies %v", err)
 	}
 	if err := kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate); err != nil {
-		logrus.Fatalf("Kubelet failed to start %v", err)
+		logrus.Fatalf("Kubelet failed to start  %v", err)
 	}
 	return ctx.Err()
 }
@@ -167,4 +166,22 @@ func StartKubeProxy(cfg *config.MicroshiftConfig) error {
 	}()
 
 	return nil
+}
+
+func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
+	const errFmt = "failed to load Kubelet config file %s, error %v"
+	// compute absolute path based on current working dir
+	kubeletConfigFile, err := filepath.Abs(name)
+	if err != nil {
+		return nil, fmt.Errorf(errFmt, name, err)
+	}
+	loader, err := configfiles.NewFsLoader(utilfs.DefaultFs{}, kubeletConfigFile)
+	if err != nil {
+		return nil, fmt.Errorf(errFmt, name, err)
+	}
+	kc, err := loader.Load()
+	if err != nil {
+		return nil, fmt.Errorf(errFmt, name, err)
+	}
+	return kc, err
 }
