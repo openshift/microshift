@@ -31,6 +31,7 @@ import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	cliflag "k8s.io/component-base/cli/flag"
 	kubeproxy "k8s.io/kubernetes/cmd/kube-proxy/app"
+
 	kubelet "k8s.io/kubernetes/cmd/kubelet/app"
 
 	kubeletoptions "k8s.io/kubernetes/cmd/kubelet/app/options"
@@ -143,31 +144,6 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	return ctx.Err()
 }
 
-func StartKubeProxy(cfg *config.MicroshiftConfig) error {
-	command := kubeproxy.NewProxyCommand()
-	args := []string{
-		"--config=" + cfg.DataDir + "/resources/kube-proxy/config/config.yaml",
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
-		"--v=" + strconv.Itoa(cfg.LogVLevel),
-		"--vmodule=" + cfg.LogVModule,
-	}
-	if cfg.LogDir != "" {
-		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-proxy.log"))
-	}
-	if err := command.ParseFlags(args); err != nil {
-		logrus.Fatalf("failed to parse flags:%v", err)
-	}
-	logrus.Infof("starting kube-proxy, args: %v", args)
-
-	go func() {
-		command.Run(command, args)
-		logrus.Fatalf("kube-proxy exited")
-	}()
-
-	return nil
-}
-
 func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 	const errFmt = "failed to load Kubelet config file %s, error %v"
 	// compute absolute path based on current working dir
@@ -184,4 +160,75 @@ func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
 	return kc, err
+}
+
+const (
+	// proxy component name
+	componentKubeProxy = "kube-proxy"
+)
+
+type ProxyOptions struct {
+	options *kubeproxy.Options
+}
+
+func NewKubeProxyServer(cfg *config.MicroshiftConfig) *ProxyOptions {
+	s := &ProxyOptions{}
+	s.configure(cfg)
+	return s
+}
+
+func (s *ProxyOptions) Name() string           { return componentKubeProxy }
+func (s *ProxyOptions) Dependencies() []string { return []string{"kube-apiserver"} }
+
+func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
+	if err := config.KubeProxyConfig(cfg); err != nil {
+		logrus.Infof("Failed to create a new kube-proxy configuration: %v", err)
+		return err
+	}
+	args := []string{
+		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
+		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
+		"--v=" + strconv.Itoa(cfg.LogVLevel),
+		"--vmodule=" + cfg.LogVModule,
+	}
+	cmd := &cobra.Command{
+		Use:          componentKubeProxy,
+		Long:         componentKubeProxy,
+		SilenceUsage: true,
+		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
+	}
+	if cfg.LogDir != "" {
+		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-proxy.log"))
+	}
+
+	opts := kubeproxy.NewOptions()
+	opts.ConfigFile = cfg.DataDir + "/resources/kube-proxy/config/config.yaml"
+	opts.Complete()
+	s.options = opts
+	cmd.SetArgs(args)
+
+	if err := cmd.ParseFlags(args); err != nil {
+		logrus.Fatalf("failed to parse flags:%v", err)
+	}
+	logrus.Infof("starting %s, args: %v", s.Name(), args)
+	return nil
+}
+
+func (s *ProxyOptions) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+
+	defer close(stopped)
+	// run readiness check
+	go func() {
+		healthcheckStatus := util.RetryInsecureHttpsGet("http://127.0.0.1:10256/healthz")
+		if healthcheckStatus != 200 {
+			logrus.Fatalf("%s failed to start", s.Name())
+		}
+		logrus.Infof("%s is ready", s.Name())
+		close(ready)
+	}()
+	if err := s.options.Run(); err != nil {
+		logrus.Fatalf("%s failed to start %v", s.Name(), err)
+	}
+
+	return ctx.Err()
 }

@@ -91,24 +91,11 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 			},
 		)))
 		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
-
 	}
 
 	if config.StringInList("node", cfg.Roles) {
 		util.Must(m.AddService(node.NewKubeletServer(cfg)))
-		util.Must(m.AddService(servicemanager.NewGenericService(
-			"other-node",
-			[]string{"kube-apiserver"},
-			func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-				defer close(stopped)
-				defer close(ready)
-
-				if err := node.StartKubeProxy(cfg); err != nil {
-					return err
-				}
-				return nil
-			},
-		)))
+		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
 	}
 
 	logrus.Info("Starting Microshift")
