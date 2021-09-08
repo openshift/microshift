@@ -144,31 +144,6 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	return ctx.Err()
 }
 
-func StartKubeProxy(cfg *config.MicroshiftConfig) error {
-	command := kubeproxy.NewProxyCommand()
-	args := []string{
-		"--config=" + cfg.DataDir + "/resources/kube-proxy/config/config.yaml",
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
-		"--v=" + strconv.Itoa(cfg.LogVLevel),
-		"--vmodule=" + cfg.LogVModule,
-	}
-	if cfg.LogDir != "" {
-		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-proxy.log"))
-	}
-	if err := command.ParseFlags(args); err != nil {
-		logrus.Fatalf("failed to parse flags:%v", err)
-	}
-	logrus.Infof("starting kube-proxy, args: %v", args)
-
-	go func() {
-		command.Run(command, args)
-		logrus.Fatalf("kube-proxy exited")
-	}()
-
-	return nil
-}
-
 func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 	const errFmt = "failed to load Kubelet config file %s, error %v"
 	// compute absolute path based on current working dir
@@ -189,7 +164,7 @@ func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 
 const (
 	// proxy component name
-	COMPONENT_KUBEPROXY = "kube-proxy"
+	componentKubeProxy = "kube-proxy"
 )
 
 type ProxyOptions struct {
@@ -202,7 +177,7 @@ func NewKubeProxyServer(cfg *config.MicroshiftConfig) *ProxyOptions {
 	return s
 }
 
-func (s *ProxyOptions) Name() string           { return COMPONENT_KUBEPROXY }
+func (s *ProxyOptions) Name() string           { return componentKubeProxy }
 func (s *ProxyOptions) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
@@ -217,8 +192,8 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
 		"--vmodule=" + cfg.LogVModule,
 	}
 	cmd := &cobra.Command{
-		Use:          COMPONENT_KUBEPROXY,
-		Long:         COMPONENT_KUBEPROXY,
+		Use:          componentKubeProxy,
+		Long:         componentKubeProxy,
 		SilenceUsage: true,
 		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
 	}
@@ -235,7 +210,7 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
 	if err := cmd.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
 	}
-	logrus.Infof("starting kube-proxy, args: %v", args)
+	logrus.Infof("starting %s, args: %v", s.Name(), args)
 	return nil
 }
 
@@ -252,7 +227,7 @@ func (s *ProxyOptions) Run(ctx context.Context, ready chan<- struct{}, stopped c
 		close(ready)
 	}()
 	if err := s.options.Run(); err != nil {
-		logrus.Fatalf("Failed to start kube-proxy %v", err)
+		logrus.Fatalf("%s failed to start %v", s.Name(), err)
 	}
 
 	return ctx.Err()
