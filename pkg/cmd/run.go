@@ -90,11 +90,12 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 				return nil
 			},
 		)))
-
 		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
+
 	}
 
 	if config.StringInList("node", cfg.Roles) {
+		util.Must(m.AddService(node.NewKubeletServer(cfg)))
 		util.Must(m.AddService(servicemanager.NewGenericService(
 			"other-node",
 			[]string{"kube-apiserver"},
@@ -102,9 +103,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 				defer close(stopped)
 				defer close(ready)
 
-				if err := node.StartKubelet(cfg); err != nil {
-					return err
-				}
 				if err := node.StartKubeProxy(cfg); err != nil {
 					return err
 				}

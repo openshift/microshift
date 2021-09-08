@@ -37,6 +37,7 @@ tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/
 cgroupDriver: "systemd"
 cgroupRoot: /
 failSwapOn: false
+volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
   - ` + cfg.Cluster.DNS + `
 clusterDomain: ` + cfg.Cluster.Domain + `
