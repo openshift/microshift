@@ -12,6 +12,7 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/kubectl/pkg/cmd/apply"
@@ -20,8 +21,8 @@ import (
 )
 
 const (
-	retries       = 3
 	retryInterval = 10 * time.Second
+	retryTimeout  = 1 * time.Minute
 )
 
 type Kustomizer struct {
@@ -59,13 +60,13 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 }
 
 func ApplyKustomizationWithRetries(kustomization string, kubeconfig string) error {
-	err := ApplyKustomization(kustomization, kubeconfig)
-	for retry := 1; retry <= retries && err != nil; retry++ {
-		logrus.Infof("Applying kustomization failed: %s. Retrying in %s.", err, retryInterval)
-		time.Sleep(retryInterval)
-		err = ApplyKustomization(kustomization, kubeconfig)
-	}
-	return err
+	return wait.Poll(retryInterval, retryTimeout, func() (bool, error) {
+		if err := ApplyKustomization(kustomization, kubeconfig); err != nil {
+			logrus.Infof("Applying kustomization failed: %s. Retrying in %s.", err, retryInterval)
+			return false, nil
+		}
+		return true, nil
+	})
 }
 
 func ApplyKustomization(kustomization string, kubeconfig string) error {
