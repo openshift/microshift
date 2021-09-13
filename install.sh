@@ -201,9 +201,14 @@ validation_check(){
     echo $HOSTNAME | grep -P '(?=^.{1,254}$)(^(?>(?!\d+\.)[a-zA-Z0-9_\-]{1,63}\.?)+(?:[a-zA-Z]{2,})$)' && echo "Correct"
     if [ $? != 0 ];
     then
-        echo "The hostname $HOSTNAME is incompatible with this installation please update your hostname and try again. "
+        echo "======================================================================"
+        echo "!!! WARNING !!!"
+        echo "The hostname $HOSTNAME does not follow FQDN, which might cause problems while operating the cluster."
+        echo "See: https://github.com/redhat-et/microshift/issues/176"
+        echo
+        echo "If you face a problem or want to avoid them, please update your hostname and try again."
         echo "Example: 'sudo hostnamectl set-hostname $HOSTNAME.example.com'"
-        exit 1
+        echo "======================================================================"
     else
         echo "$HOSTNAME is a valid machine name continuing installation"
     fi
