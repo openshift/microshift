@@ -1,4 +1,5 @@
-FROM registry.access.redhat.com/ubi8/ubi-init:8.4
+ARG IMAGE_NAME=registry.access.redhat.com/ubi8/ubi-init:8.4
+FROM ${IMAGE_NAME}
 
 RUN export VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4) && \
     export ARCH=$(uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/") && \
