@@ -56,8 +56,8 @@ Inputs:
     --help, -h    Print this help text.
 Outputs:
 - A version, formatted as 4.7.0-0.microshift-YYYY-MM-DD-HHMMSS, is applied as a git tag and pushed to the repo
+- Multi-architecture container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
 - Cross-compiled binaries
-- Multi-architecture container image tagged and pushed as quay.io/microshift/microshift:$VERSION
 - A sha256 checksum file, containing the checksums for all binary artifacts
 - A github release, containing the binary artifacts and checksum file.
 
@@ -173,6 +173,7 @@ podman_create_manifest(){
     podman manifest add "$IMAGE_REPO:$VERSION" "docker://$ref"
   done
     podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$VERSION"
+    podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
 }
 
 docker_create_manifest(){
@@ -180,8 +181,11 @@ docker_create_manifest(){
   for image in "${RELEASE_IMAGE_TAGS[@]}"; do
     amend_images_options+="--amend $image"
   done
-  podman manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
-  podman manifest push "$IMAGE_REPO:$VERSION"
+  # use docker cli directly for clarity, as this is a docker-only func
+  docker manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
+  docker tag "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
+  docker manifest push "$IMAGE_REPO:$VERSION"
+  docker manifest push "$IMAGE_REPO:latest"
 }
 
 push_container_manifest() {
