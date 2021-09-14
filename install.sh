@@ -52,14 +52,13 @@ register_subs() {
 }
 
 # Apply SElinux policies
-apply_selinux_policy() {
-    # sudo semanage fcontext -a -t container_runtime_exec_t /usr/local/bin/microshift ||
-    #   sudo semanage fcontext -m -t container_runtime_exec_t /usr/local/bin/microshift
-    # sudo mkdir -p /var/lib/kubelet/
-    # sudo chcon -R -t container_file_t /var/lib/kubelet/
-    # sudo chcon -R system_u:object_r:bin_t:s0 /usr/local/bin/microshift
-    sudo setenforce 0
-    sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+build_selinux_policy() {
+    ## Workaround until packaged as RPM
+    sudo dnf -y install selinux-policy-devel
+    curl -L -o /tmp/microshift.fc https://raw.githubusercontent.com/redhat-et/microshift/main/selinux/microshift.fc
+    curl -L -o /tmp/microshift.te https://raw.githubusercontent.com/redhat-et/microshift/main/selinux/microshift.te
+    make -f /usr/share/selinux/devel/Makefile -C /tmp
+    sudo dnf -y remove selinux-policy-devel
 }
 
 # Install dependencies
@@ -183,6 +182,14 @@ User=root
 WantedBy=multi-user.target
 EOF
 
+    sudo mkdir -p /var/run/flannel
+    sudo mkdir -p /var/run/kubelet
+    sudo mkdir -p /var/lib/kubelet/pods
+    sudo mkdir -p /var/run/secrets/kubernetes.io/serviceaccount
+    sudo mkdir -p /var/hpvolumes
+    sudo semodule -i /tmp/microshift.pp
+    sudo restorecon -v /usr/local/bin/microshift
+    sudo restorecon -v /var/hpvolumes
     sudo systemctl enable microshift.service --now
 
 }
@@ -223,7 +230,7 @@ fi
 validation_check
 install_dependencies
 establish_firewall
-apply_selinux_policy
+build_selinux_policy
 install_crio
 crio_conf
 verify_crio
