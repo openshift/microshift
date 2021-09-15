@@ -59,12 +59,20 @@ rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 
 You can locally build Microshift using one of two methods, either using a container build (recommended) on Podman or Docker:
 ```
+sudo yum -y install make golang
 make microshift
 ```
 
-or directly on the host after installing the build-time dependencies
+or directly on the host after installing the build-time dependencies. When using RHEL ensure the system is registered and run the following before installing the prerequisites.
+
 ```
-sudo dnf install -y glibc-static
+ARCH=$( /bin/arch )
+sudo subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
+```
+
+The following packages are required for Fedora and RHEL.
+```
+sudo yum install -y glibc-static gcc make golang
 make
 ```
 
@@ -72,17 +80,14 @@ make
 
 Before running Microshift, the host must first be configured.  This can be handled by running  
 
-`CONFIG_ENV_ONLY=true ./install.sh`
-
-### Running
-
 ```
-sudo microshift run
+CONFIG_ENV_ONLY=true ./install.sh
 ```
 
 Microshift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running Microshift as privileged user and `$HOME/.microshift` otherwise. Note that running Microshift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
 
-You can find the kubeadmin's kubeconfig under `$DATADIR/resources/kubeadmin/kubeconfig`.
+### Kubeconfig
+When starting the Microshift for the first time the Kubeconfig file is created. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
 
 
 ### Contributing
