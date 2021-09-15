@@ -6,17 +6,23 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/kubectl/pkg/cmd/apply"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
-	"k8s.io/kubectl/pkg/util/i18n"
 	"k8s.io/kubectl/pkg/util/templates"
+)
+
+const (
+	retryInterval = 10 * time.Second
+	retryTimeout  = 1 * time.Minute
 )
 
 type Kustomizer struct {
@@ -41,7 +47,11 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 	kustomization := filepath.Join(s.path, "kustomization.yaml")
 	if _, err := os.Stat(kustomization); !errors.Is(err, os.ErrNotExist) {
 		logrus.Infof("Applying kustomization at " + kustomization)
-		ApplyKustomization(s.path, s.kubeconfig)
+		if err := ApplyKustomizationWithRetries(s.path, s.kubeconfig); err != nil {
+			logrus.Warnf("Applying kustomization failed: %s. Giving up.", err)
+		} else {
+			logrus.Infof("Kustomization applied successfully.")
+		}
 	} else {
 		logrus.Infof("No kustomization found at " + kustomization)
 	}
@@ -49,13 +59,23 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 	return ctx.Err()
 }
 
-func ApplyKustomization(path string, kubeconfig string) error {
+func ApplyKustomizationWithRetries(kustomization string, kubeconfig string) error {
+	return wait.Poll(retryInterval, retryTimeout, func() (bool, error) {
+		if err := ApplyKustomization(kustomization, kubeconfig); err != nil {
+			logrus.Infof("Applying kustomization failed: %s. Retrying in %s.", err, retryInterval)
+			return false, nil
+		}
+		return true, nil
+	})
+}
+
+func ApplyKustomization(kustomization string, kubeconfig string) error {
 	cmds := &cobra.Command{
 		Use:   "kubectl",
-		Short: i18n.T("kubectl controls the Kubernetes cluster manager"),
+		Short: "kubectl",
 	}
 	flags := cmds.PersistentFlags()
-	flags.SetNormalizeFunc(cliflag.WarnWordSepNormalizeFunc) // Warn for "_" flags
+	flags.SetNormalizeFunc(cliflag.WarnWordSepNormalizeFunc)
 	flags.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 
 	kubeConfigFlags := genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag()
@@ -79,11 +99,14 @@ func ApplyKustomization(path string, kubeconfig string) error {
 
 	args := []string{
 		"--kubeconfig=" + kubeconfig,
-		"-k", path,
+		"-k", kustomization,
 	}
-
 	util.Must(applyCommand.ParseFlags(args))
-	applyCommand.Run(applyCommand, nil)
 
-	return nil
+	o := apply.NewApplyOptions(ioStreams)
+	o.DeleteFlags.FileNameFlags.Kustomize = &kustomization
+	if err := o.Complete(f, applyCommand); err != nil {
+		return err
+	}
+	return o.Run()
 }
