@@ -32,7 +32,7 @@ func NewKustomizer(cfg *config.MicroshiftConfig) *Kustomizer {
 }
 
 func (s *Kustomizer) Name() string           { return "kustomizer" }
-func (s *Kustomizer) Dependencies() []string { return []string{"kube-apiserver"} }
+func (s *Kustomizer) Dependencies() []string { return []string{"component-loader"} }
 
 func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
