@@ -25,6 +25,20 @@ In order to run Microshift, you will need at least 2 CPU cores, 2GB of RAM, 2.6G
 For barebones development the minimum requirement is 3GB of RAM, though this can increase 
 if you are using resource-intensive devtools. 
 
+### OS Requirements
+
+The all-in-one containerized Microshift can run on Windows, MacOS, and Linux. 
+
+Currently, the Microshift binary is known to be supported on the following Operating Systems:
+- Fedora 33/34
+- CentOS 8 Stream
+- RHEL 8
+- CentOS 7
+- Ubuntu 20.04
+
+It may be possible to run Microshift on other systems, however they haven't been tested so you may run into issues.
+
+
 ## Using Microshift
 To give Microshift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
 
