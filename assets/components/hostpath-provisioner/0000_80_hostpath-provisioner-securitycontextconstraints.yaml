@@ -22,3 +22,11 @@ users:
 volumes:
 - hostPath
 - secret
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowedCapabilities: []
+defaultAddCapabilities: []
+priority: 0
+readOnlyRootFilesystem: false

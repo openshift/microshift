@@ -33,7 +33,7 @@ spec:
       serviceAccountName: flannel
       initContainers:
       - name: install-cni
-        image: {{ .ReleaseImage.kube_flannel }}
+        image: kube_flannel
         command:
         - cp
         args:
@@ -47,7 +47,7 @@ spec:
           mountPath: /etc/kube-flannel/
       containers:
       - name: kube-flannel
-        image: {{ .ReleaseImage.kube_flannel }}
+        image: kube_flannel
         command:
         - /opt/bin/flanneld
         args:

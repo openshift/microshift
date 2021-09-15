@@ -646,7 +646,7 @@ func assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml", size: 33433, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1129,7 +1129,7 @@ func assetsCrd0000_03_configOperator_01_proxyCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_config-operator_01_proxy.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_config-operator_01_proxy.crd.yaml", size: 27696, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1733,7 +1733,7 @@ func assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml", size: 33579, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2432,7 +2432,7 @@ func assetsCrd0000_03_securityOpenshift_01_sccCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_security-openshift_01_scc.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_security-openshift_01_scc.crd.yaml", size: 37401, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3183,7 +3183,7 @@ func assetsCrd0000_10_configOperator_01_buildCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_build.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_build.crd.yaml", size: 43343, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3643,7 +3643,7 @@ func assetsCrd0000_10_configOperator_01_featuregateCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_featuregate.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_featuregate.crd.yaml", size: 26327, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4171,7 +4171,7 @@ func assetsCrd0000_10_configOperator_01_imageCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_image.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_image.crd.yaml", size: 30369, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4643,7 +4643,7 @@ func assetsCrd0000_10_configOperator_01_imagecontentsourcepolicyCrdYaml() (*asse
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_imagecontentsourcepolicy.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_imagecontentsourcepolicy.crd.yaml", size: 27897, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5219,7 +5219,7 @@ func assetsCrd0000_11_imageregistryConfigsCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_11_imageregistry-configs.crd.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_11_imageregistry-configs.crd.yaml", size: 25780, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

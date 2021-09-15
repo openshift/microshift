@@ -18,7 +18,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
       - name: dns
-        image: {{ .ReleaseImage.coredns }}
+        image: coredns
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         command: [ "coredns" ]
@@ -58,7 +58,7 @@ spec:
             cpu: 50m
             memory: 70Mi
       - name: kube-rbac-proxy
-        image: {{ .ReleaseImage.kube_rbac_proxy }}
+        image: kube_rbac_proxy
         args:
         - --logtostderr
         - --secure-listen-address=:9154
@@ -78,7 +78,7 @@ spec:
           name: metrics-tls
           readOnly: true
       - name: dns-node-resolver
-        image: {{ .ReleaseImage.cli }}
+        image: cli
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         securityContext:

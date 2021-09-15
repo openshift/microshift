@@ -20,7 +20,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
         - name: router
-          image: {{ .ReleaseImage.haproxy_router }}
+          image: haproxy_router
           imagePullPolicy: IfNotPresent
           terminationMessagePolicy: FallbackToLogsOnError
           ports:

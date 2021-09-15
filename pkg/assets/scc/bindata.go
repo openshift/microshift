@@ -7,7 +7,6 @@
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml
-// assets/scc/0000_80_hostpath-provisioner-securitycontextconstraints.yaml
 package assets
 
 import (
@@ -113,7 +112,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 926, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -175,7 +174,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1145, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -237,7 +236,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1176, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -297,7 +296,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostnetworkYaml() (*asset, err
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1001, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -357,7 +356,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1044, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -419,7 +418,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1169, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -480,48 +479,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsScc0000_80_hostpathProvisionerSecuritycontextconstraintsYaml = []byte(`kind: SecurityContextConstraints
-apiVersion: security.openshift.io/v1
-metadata:
-  name: hostpath-provisioner
-allowPrivilegedContainer: true
-requiredDropCapabilities:
-- KILL
-- MKNOD
-- SETUID
-- SETGID
-runAsUser:
-  type: RunAsAny
-seLinuxContext:
-  type: RunAsAny
-fsGroup:
-  type: RunAsAny
-supplementalGroups:
-  type: RunAsAny
-allowHostDirVolumePlugin: true
-users:
-- system:serviceaccount:kubevirt-hostpath-provisioner:kubevirt-hostpath-provisioner-admin
-volumes:
-- hostPath
-- secret
-`)
-
-func assetsScc0000_80_hostpathProvisionerSecuritycontextconstraintsYamlBytes() ([]byte, error) {
-	return _assetsScc0000_80_hostpathProvisionerSecuritycontextconstraintsYaml, nil
-}
-
-func assetsScc0000_80_hostpathProvisionerSecuritycontextconstraintsYaml() (*asset, error) {
-	bytes, err := assetsScc0000_80_hostpathProvisionerSecuritycontextconstraintsYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/scc/0000_80_hostpath-provisioner-securitycontextconstraints.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1091, mode: os.FileMode(420), modTime: time.Unix(1630924449, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -585,7 +543,6 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml":          assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml":       assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml":       assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml,
-	"assets/scc/0000_80_hostpath-provisioner-securitycontextconstraints.yaml": assetsScc0000_80_hostpathProvisionerSecuritycontextconstraintsYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -638,7 +595,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_20_kube-apiserver-operator_00_scc-nonroot.yaml":          {assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml, map[string]*bintree{}},
 			"0000_20_kube-apiserver-operator_00_scc-privileged.yaml":       {assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml, map[string]*bintree{}},
 			"0000_20_kube-apiserver-operator_00_scc-restricted.yaml":       {assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml, map[string]*bintree{}},
-			"0000_80_hostpath-provisioner-securitycontextconstraints.yaml": {assetsScc0000_80_hostpathProvisionerSecuritycontextconstraintsYaml, map[string]*bintree{}},
 		}},
 	}},
 }}

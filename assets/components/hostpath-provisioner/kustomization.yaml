@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - 0000_80_hostpath-provisioner-clusterrolebinding.yaml
+  - 0000_80_hostpath-provisioner-clusterrole.yaml
+  - 0000_80_hostpath-provisioner-daemonset.yaml
+  - 0000_80_hostpath-provisioner-namespace.yaml
+  - 0000_80_hostpath-provisioner-securitycontextconstraints.yaml
+  - 0000_80_hostpath-provisioner-serviceaccount.yaml
+  - 0000_80_hostpath-provisioner-storageclass.yaml

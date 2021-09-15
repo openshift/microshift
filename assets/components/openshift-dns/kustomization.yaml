@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - 0000_70_dns_00-namespace.yaml
+  - 0000_70_dns_01-cluster-role-binding.yaml
+  - 0000_70_dns_01-cluster-role.yaml
+  - 0000_70_dns_01-configmap.yaml
+  - 0000_70_dns_01-daemonset.yaml
+  - 0000_70_dns_01-service-account.yaml
+  - 0000_70_dns_01-service.yaml

@@ -19,7 +19,7 @@ spec:
       serviceAccountName: service-ca
       containers:
       - name: service-ca-controller
-        image: {{ .ReleaseImage.service_ca_operator }}
+        image: service_ca_operator
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
         args:
@@ -39,10 +39,10 @@ spec:
       volumes:
         - name: signing-key
           hostPath:
-            path: {{.KeyDir}}
+            path: /var/lib/microshift/resources/service-ca/secrets/service-ca
         - name: signing-cabundle
           hostPath:
-            path: {{.CADir}}
+            path: /var/lib/microshift/certs/ca-bundle
       #nodeSelector:
       #  node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"

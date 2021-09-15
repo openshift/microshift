@@ -90,6 +90,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 				return nil
 			},
 		)))
+		util.Must(m.AddService(components.NewComponentLoader(cfg)))
 		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	}
 
@@ -151,8 +152,8 @@ func startControllerOnly(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	if err := components.StartComponents(cfg); err != nil {
-		return err
-	}
+	// if err := components.StartComponents(cfg); err != nil {
+	// 	return err
+	// }
 	return nil
 }

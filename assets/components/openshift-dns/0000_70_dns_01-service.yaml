@@ -9,7 +9,7 @@ metadata:
   namespace: openshift-dns          
 # name, namespace,labels and annotations are set at runtime
 spec:
-  clusterIP: {{.ClusterIP}}
+  clusterIP: 10.43.0.10
   ports:
   - name: dns
     port: 53
