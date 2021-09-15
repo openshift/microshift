@@ -182,7 +182,7 @@ Now we can build Microshift:
 ```sh
 make build
 CONFIG_ENV_ONLY=true ./install.sh
-sudo microshift run 
+sudo ./microshift run 
 ```
 
 
