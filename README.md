@@ -42,8 +42,6 @@ It may be possible to run Microshift on other systems, however they haven't been
 ## Using Microshift
 To give Microshift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
 
-**WARNING: At this time the script will disable SELinux.**
-
 ```
 curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh | sh -
 ```
