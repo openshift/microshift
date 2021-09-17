@@ -20,14 +20,14 @@ Watch this [end-to-end MicroShift provisioning demo video](https://youtu.be/QOiB
 
 ## Minimum specs
 
-In order to run Microshift, you will need at least 2 CPU cores, 2GB of RAM, 2.6GB of free storage space for the Microshift binary, and a 64-bit CPU (although 32-bit is *technically* possible, if you're up for the challenge). 
+In order to run Microshift, you will need at least 2 CPU cores, 2GB of RAM, 2.6GB of free storage space for the Microshift binary, and a 64-bit CPU (although 32-bit is *technically* possible, if you're up for the challenge).
 
-For barebones development the minimum requirement is 3GB of RAM, though this can increase 
-if you are using resource-intensive devtools. 
+For barebones development the minimum requirement is 3GB of RAM, though this can increase
+if you are using resource-intensive devtools.
 
 ### OS Requirements
 
-The all-in-one containerized Microshift can run on Windows, MacOS, and Linux. 
+The all-in-one containerized Microshift can run on Windows, MacOS, and Linux.
 
 Currently, the Microshift binary is known to be supported on the following Operating Systems:
 - Fedora 33/34
@@ -63,6 +63,8 @@ Notes: When installing Microshift on a system with an older version already inst
 rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
 
+## [Known Issues](./docs/known-issues.md)
+
 ## Developing Microshift
 
 > Note: when building or running **ARM64** container images, Linux host environments must have the `qemu-user-static` package installed.  E.g. on Fedora: `dnf install qemu-user-static`.
@@ -90,7 +92,7 @@ make
 
 ### Environment Configuration
 
-Before running Microshift, the host must first be configured.  This can be handled by running  
+Before running Microshift, the host must first be configured.  This can be handled by running
 
 ```
 CONFIG_ENV_ONLY=true ./install.sh
