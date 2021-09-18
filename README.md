@@ -43,7 +43,7 @@ It may be possible to run Microshift on other systems, however they haven't been
 To give Microshift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
 
 ```
-curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh | sh -
+curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh | bash
 ```
 
 This will install Microshift's dependencies (CRI-O), install it as a systemd service and start it.
