@@ -16,8 +16,12 @@ limitations under the License.
 package cmd
 
 import (
+	"net"
+
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
+
+	ctrl "k8s.io/kubernetes/pkg/controlplane"
 )
 
 func initAll(cfg *config.MicroshiftConfig) error {
@@ -41,6 +45,16 @@ func initAll(cfg *config.MicroshiftConfig) error {
 }
 
 func initCerts(cfg *config.MicroshiftConfig) error {
+	_, svcNet, err := net.ParseCIDR(cfg.Cluster.ServiceCIDR)
+	if err != nil {
+		return err
+	}
+
+	_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
+	if err != nil {
+		return err
+	}
+
 	// store root CA for all
 	//TODO generate ca bundles for each component
 	if err := util.StoreRootCA("https://kubernetes.svc", cfg.DataDir+"/certs/ca-bundle",
@@ -70,7 +84,7 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	}
 	if err := util.GenCerts("kube-apiserver", cfg.DataDir+"/certs/kube-apiserver/secrets/service-network-serving-certkey",
 		"tls.crt", "tls.key",
-		[]string{"kube-apiserver", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost", "10.43.0.1"}); err != nil {
+		[]string{"kube-apiserver", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost", apiServerServiceIP.String()}); err != nil {
 		return err
 	}
 	if err := util.GenKeys(cfg.DataDir+"/resources/kube-apiserver/secrets/service-account-key",
@@ -111,7 +125,7 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	}
 	if err := util.GenCerts("service-ca", cfg.DataDir+"/resources/service-ca/secrets/service-ca",
 		"tls.crt", "tls.key",
-		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName, "10.43.0.1"}); err != nil {
+		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName, apiServerServiceIP.String()}); err != nil {
 		return err
 	}
 	return nil
