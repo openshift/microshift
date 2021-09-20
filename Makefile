@@ -222,3 +222,11 @@ release: SOURCE_GIT_TAG=$(RELEASE_PRE)-$(TIMESTAMP)
 release:
 	./scripts/release.sh --token $(TOKEN) --version $(SOURCE_GIT_TAG)
 .PHONY: release
+
+TEST_PACKAGES :=./pkg/...
+TEST_ARGS := -v ${TEST_PACKAGES} 
+# run all of the *_test.go files within the project using the go test module
+test:
+	@go test ${TEST_ARGS}
+.PHONY: test
+
