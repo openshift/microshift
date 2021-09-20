@@ -8,11 +8,13 @@ include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/
 export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
 
-RELEASE_PRE :=4.7.0-0.microshift
+RELEASE_BASE := 4.7.0
+RELEASE_PRE := ${RELEASE_BASE}-0.microshift
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
 SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --broke --match '$(RELEASE_PRE)*' || echo '4.7.0-0.microshift-unknown')
 
+RPM_REL := $(shell git describe --tags | sed s/${RELEASE_PRE}-//g | sed s/-/_/g )
 SRC_ROOT :=$(shell pwd)
 
 BUILD_CFG :=./images/build/Dockerfile
@@ -78,6 +80,14 @@ cross-build-linux-arm64:
 
 cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 .PHONY: cross-build
+
+devel-rpm:
+	rpmbuild -bb --build-in-place microshift.spec --define="release ${RPM_REL}" --define="version ${RELEASE_BASE}"
+.PHONY: local-rpmº
+
+devel-srpm:
+	rpmbuild -bs --build-in-place microshift.spec --define="release ${RPM_REL}" --define "version ${RELEASE_BASE}"
+.PHONY: local-srpm
 
 ###############################
 # containerized build targets #

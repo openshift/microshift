@@ -1,0 +1,12 @@
+[Unit]
+Description=Microshift
+After=crio.service
+
+[Service]
+WorkingDirectory=/usr/bin/
+ExecStart=microshift run
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
