@@ -1,0 +1,15 @@
+[Unit]
+Description=microshift all-in-one
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=/run/containers/storage
+
+[Service]
+Restart=on-failure
+TimeoutStopSec=70
+ExecStart=/bin/bash /usr/bin/microshift-aio-run
+ExecStop=/usr/bin/podman stop -t 20 microshift 
+Type=forking
+
+[Install]
+WantedBy=multi-user.target default.target
