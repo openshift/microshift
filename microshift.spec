@@ -9,6 +9,10 @@
 # modifying the Go binaries breaks the DWARF debugging
 %global __os_install_post %{_rpmconfigdir}/brp-compress
 
+# SELinux specifics
+%global selinuxtype targeted
+
+
 Name: microshift
 Version: %{version}
 Release: %{release}%{dist}
@@ -34,6 +38,8 @@ BuildRequires: make
 
 Requires: cri-o
 Requires: cri-tools
+Requires: microshift-selinux
+
 %{?systemd_requires}
 
 %description
@@ -59,6 +65,17 @@ systems, scale testing, and provisioning of lightweight Kubernetes control plane
 
 Note: Microshift is still early days and moving fast. Features are missing.
 Things break. But you can still help shape it, too.
+
+%package selinux
+Summary: SELinux policies for Microshift
+BuildRequires: selinux-policy
+BuildRequires: selinux-policy-devel
+BuildArch: noarch
+%{?selinux_requires}
+
+%description selinux
+SElinux policy modules for Microshift.
+
 
 %prep
 
@@ -90,6 +107,11 @@ GOARCH=amd64
 make _build_local GOOS=${GOOS} GOARCH=${GOARCH}
 cp ./_output/bin/${GOOS}_${GOARCH}/microshift ./_output/microshift
 
+# SELinux modules build
+
+cd selinux
+make
+
 %install
 
 install -d %{buildroot}%{_bindir}
@@ -106,9 +128,26 @@ mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
 mkdir -p -m755 %{buildroot}/var/hpvolumes
 restorecon -v %{buildroot}/var/hpvolumes
 
+install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
+install -m644 selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
+
 %post
 
 %systemd_post microshift.service
+
+%post selinux
+
+%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
+
+%postun selinux
+
+if [ $1 -eq 0 ]; then
+    %selinux_modules_uninstall -s %{selinuxtype} microshift
+fi
+
+%posttrans selinux
+
+%selinux_relabel_post -s %{selinuxtype}
 
 %preun
 
@@ -120,6 +159,11 @@ restorecon -v %{buildroot}/var/hpvolumes
 %license LICENSE
 %{_bindir}/microshift
 %{_unitdir}/microshift.service
+
+%files selinux
+
+%{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
+%ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
 %changelog
 * Mon Sep 20 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.7.0-2021_08_31_224727
