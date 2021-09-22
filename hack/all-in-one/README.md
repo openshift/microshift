@@ -8,7 +8,7 @@ Copy microshift-aio unit file to /etc/systemd and the aio-run to /usr/bin
 cp microshift-aio.service /etc/systemd/system/microshift-aio.service
 cp microshift-aio-run /usr/bin/
 ```
-Now enable and start the service. The KUBECONFIG location will be written to /etc/microshift-aio/microshift-aio.conf
+Now enable and start the service. The KUBECONFIG location will be written to /etc/microshift-aio/microshift-aio.conf.    
 If the `microshift-vol` podman volume does not exist, the systemd service will create one.
 
 ```bash
