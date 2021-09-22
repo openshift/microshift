@@ -22,12 +22,16 @@ get_distro() {
       echo "This Linux distro is not supported by the install script"
       exit 1
     fi
-
 }
 
 # Function to get system architecture
 get_arch() {
-    ARCH=$(uname -m)
+    ARCH=$(uname -m | sed "s/x86_64/amd64/" | sed "s/aarch64/arm64/")
+    if [[ $ARCH != @(amd64|arm64) ]]
+    then
+        printf "arch %s unsupported" "$ARCH" >&2
+        exit 1
+    fi
 }
 
 # If RHEL, use subscription-manager to register
@@ -158,36 +162,29 @@ EOF'
 verify_crio() {
     sudo systemctl enable crio
     sudo systemctl restart crio
-
 }
 
 # Download and install kubectl
 get_kubectl() {
-    curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+    curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/$ARCH/kubectl"
     sudo chmod +x ./kubectl
     sudo mv ./kubectl /usr/local/bin/kubectl
-
 }
 
 # Download and install microshift
 get_microshift() {
-    if [ "$ARCH" = "x86_64" ]; then
-        curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-amd64
-        curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/release.sha256
-    else
-        printf "arch %s unsupported" "$ARCH" >&2
-        exit 1
-    fi
+    curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-$ARCH
+    curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/release.sha256
 
-    BIN_SHA="$(sha256sum microshift-linux-amd64 | awk '{print $1}')"
-    KNOWN_SHA="$(grep "microshift-linux-amd64" release.sha256 | awk '{print $1}')"
+    BIN_SHA="$(sha256sum microshift-linux-$ARCH | awk '{print $1}')"
+    KNOWN_SHA="$(grep "microshift-linux-$ARCH" release.sha256 | awk '{print $1}')"
 
     if [[ "$BIN_SHA" != "$KNOWN_SHA" ]]; then 
         echo "SHA256 checksum failed" && exit 1
     fi
 
-    sudo chmod +x microshift-linux-amd64
-    sudo mv microshift-linux-amd64 /usr/local/bin/microshift
+    sudo chmod +x microshift-linux-$ARCH
+    sudo mv microshift-linux-$ARCH /usr/local/bin/microshift
 
     cat << EOF | sudo tee /usr/lib/systemd/system/microshift.service
 [Unit]
@@ -215,7 +212,6 @@ EOF
         sudo restorecon -v /var/hpvolumes
     fi
     sudo systemctl enable microshift.service --now
-
 }
 
 # Locate kubeadmin configuration to default kubeconfig location
