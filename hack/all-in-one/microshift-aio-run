@@ -4,18 +4,17 @@ set -euxo pipefail
 
 setsebool -P container_manage_cgroup true
 
-if ! /usr/bin/podman volume exists microshift-vol
+if ! /usr/bin/podman volume exists microshift-data
 then
-  /usr/bin/podman volume create microshift-vol
+  /usr/bin/podman volume create microshift-data
 fi
 
 [[ -d /etc/microshift-aio ]] || mkdir /etc/microshift-aio
 
 /usr/bin/podman run -d --rm \
-  --name microshift --privileged \
+  --name microshift-aio --privileged \
   -v /lib/modules:/lib/modules \
-  -v microshift-vol:/var/lib \
-  --hostname microshift \
+  -v microshift-data:/var/lib \
   --label "io.containers.autoupdate=registry" \
   -p 6443:6443 quay.io/microshift/microshift:4.7.0-0.microshift-2021-08-31-224727-aio
 
