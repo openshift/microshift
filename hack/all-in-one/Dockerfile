@@ -30,4 +30,9 @@ RUN export ARCH=$(uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
     systemctl enable microshift.service && \
     systemctl enable crio 
 
+RUN curl -s -L https://nvidia.github.io/nvidia-docker/rhel8.3/nvidia-docker.repo | tee /etc/yum.repos.d/nvidia-docker.repo && \
+    dnf install nvidia-container-toolkit -y
+
+ADD nvidia-config.toml /etc/nvidia-container-runtime/config.toml
+
 CMD [ "/sbin/init" ]
