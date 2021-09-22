@@ -54,14 +54,14 @@ func RetryInsecureHttpsGet(url string) int {
 	return status
 }
 
-func RetryTCPConnection(host string, port string) int {
-	status := 0
+func RetryTCPConnection(host string, port string) bool {
+	status := true
 	err := wait.Poll(5*time.Second, 120*time.Second, func() (bool, error) {
-		timeout := 3 * time.Second
-		_, err := tcpnet.DialTimeout("tcp", tcpnet.JoinHostPort("127.0.0.1", "8445"), timeout)
+		timeout := 30 * time.Second
+		_, err := tcpnet.DialTimeout("tcp", tcpnet.JoinHostPort(host, port), timeout)
 
 		if err == nil {
-			status = 200
+			status = false
 			return true, nil
 		}
 		return false, nil

@@ -68,17 +68,17 @@ kubectl get pods -A
 ### Access the cluster on the host
 #### Linux
 ```bash
-export KUBECONFIG=$(podman volume inspect ushift-vol --format "{{.Mountpoint}}")/microshift/resources/kubeadmin/kubeconfig
+export KUBECONFIG=$(podman volume inspect microshift-data --format "{{.Mountpoint}}")/microshift/resources/kubeadmin/kubeconfig
 kubectl get pods -A -w
 ```
 #### MacOS
 ```bash
-docker cp ushift:/var/lib/microshift/resources/kubeadmin/kubeconfig ./kubeconfig
+docker cp microshift-aio:/var/lib/microshift/resources/kubeadmin/kubeconfig ./kubeconfig
 kubectl get pods -A -w --kubeconfig ./kubeconfig
 ```
 #### Windows
 ```bash
-docker.exe cp ushift:/var/lib/microshift/resources/kubeadmin/kubeconfig .\kubeconfig
+docker.exe cp microshift-aio:/var/lib/microshift/resources/kubeadmin/kubeconfig .\kubeconfig
 kubectl.exe get pods -A -w --kubeconfig .\kubeconfig
 ```
 ## Limitation

@@ -225,7 +225,7 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	// run readiness check
 	go func() {
 		healthcheckStatus := util.RetryTCPConnection("127.0.0.1", "8445")
-		if healthcheckStatus != 200 {
+		if !healthcheckStatus {
 			logrus.Fatalf("%s failed to start", s.Name())
 		}
 		logrus.Infof("%s is ready", s.Name())
