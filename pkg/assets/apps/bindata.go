@@ -187,16 +187,21 @@ spec:
         app: service-ca
         service-ca: "true"
     spec:
+      securityContext: {}
+      serviceAccount: service-ca
       serviceAccountName: service-ca
       containers:
       - name: service-ca-controller
         image: {{ .ReleaseImage.service_ca_operator }}
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
+        args:
+        - -v=2
         ports:
         - containerPort: 8443
-        securityContext:
-          runAsNonRoot: true
+          protocol: TCP
+        # securityContext:
+        #   runAsNonRoot: true
         resources:
           requests:
             memory: 120Mi
@@ -455,10 +460,16 @@ metadata:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
 spec:
   progressDeadlineSeconds: 600
+  replicas: 1
+  selector:
+    matchLabels:
+      ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
   template:
     metadata:
       annotations:
         "unsupported.do-not-use.openshift.io/override-liveness-grace-period-seconds": "10"
+      labels:
+        ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
       serviceAccountName: router
       # nodeSelector is set at runtime.

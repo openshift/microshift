@@ -4,5 +4,3 @@ metadata:
   name: openshift-service-ca
   annotations:
     openshift.io/node-selector: ""
-  labels:
-    openshift.io/run-level-: "" # remove the label on upgrades

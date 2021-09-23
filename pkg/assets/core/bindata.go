@@ -173,8 +173,7 @@ metadata:
   name: openshift-service-ca
   annotations:
     openshift.io/node-selector: ""
-  labels:
-    openshift.io/run-level-: "" # remove the label on upgrades`)
+`)
 
 func assetsCore0000_60_serviceCa_01_namespaceYamlBytes() ([]byte, error) {
 	return _assetsCore0000_60_serviceCa_01_namespaceYaml, nil
