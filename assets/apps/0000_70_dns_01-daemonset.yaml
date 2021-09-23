@@ -6,7 +6,13 @@ metadata:
   name: dns-default
   namespace: openshift-dns
 spec:
+  selector:
+    matchLabels:
+      dns.operator.openshift.io/daemonset-dns: default
   template:
+    metadata:
+      labels:
+        dns.operator.openshift.io/daemonset-dns: default
     spec:
       serviceAccountName: dns
       priorityClassName: system-node-critical
