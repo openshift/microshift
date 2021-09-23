@@ -43,20 +43,30 @@ case $BUILD in
 esac
 
 build_commit() {
-  rpmbuild "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_REL}" --define="version ${RELEASE_BASE}" \
-  "${RPMBUILD_DIR}"SPECS/microshift.spec  --define "git_commit ${1}"
+  # using --defines worka for rpm building, but not for an srpm
+  cat >"${RPMBUILD_DIR}"SPECS/microshift.spec <<EOF
+%global release ${RPM_REL}
+%global version ${RELEASE_BASE}
+%global git_commit ${1}
+EOF
+  cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
+
+  rpmbuild "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 build_tag_commit() {
-  GIT_SHA=${1:-$GIT_SHA}
-  rpmbuild "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_REL}" --define="version ${RELEASE_BASE}" \
-  "${RPMBUILD_DIR}"SPECS/microshift.spec  --define "github_tag ${1}"
+    cat >"${RPMBUILD_DIR}"SPECS/microshift.spec <<EOF
+%global release ${RPM_REL}
+%global version ${RELEASE_BASE}
+%global github_tag ${1}
+EOF
+  cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
+
+  rpmbuild "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 # prepare the rpmbuild env
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-cp "${SCRIPT_DIR}/microshift.spec" "${RPMBUILD_DIR}/SPECS/"
-
 
 case $1 in
     local) create_local_tarball

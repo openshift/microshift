@@ -1,6 +1,9 @@
-%{!?github_tag: %global github_tag 4.7.0-0.microshift-2021-08-31-224727}
-%{!?version: %global version 4.7.0}
-%{!?release: %global release 2021_08_31_224727}
+# parameters that must be provided via --define , or fixed into the spec file:
+# global version 4.7.0
+# global release 2021_08_31_224727
+# global github_tag 4.7.0-0.microshift-2021-08-31-224727
+# global git_commit 81264d0ebb17fef06eff9ec7d4f2a81631c6b34a
+
 
 # golang specifics
 %global golang_version 1.15
@@ -43,6 +46,7 @@ BuildRequires: glibc-static
 BuildRequires: golang >= %{golang_version}
 BuildRequires: make
 BuildRequires: policycoreutils
+BuildRequires: systemd
 
 Requires: cri-o
 Requires: cri-tools
@@ -130,7 +134,7 @@ install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
 restorecon -v %{buildroot}%{_bindir}/microshift
 
-install -d -m755 $RPM_BUILD_ROOT/%{_unitdir}
+install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 rpm/microshift.service %{buildroot}%{_unitdir}/microshift.service
 
 mkdir -p -m755 %{buildroot}/var/run/flannel
@@ -181,6 +185,7 @@ fi
 * Thu Sep 23 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.7.0-021_08_31_224727_40_g5c23735f
 - Support commit based builds
 - workaround rpmbuild with no build in place support
+- add missing BuildRequires on systemd and policycoreutils
 
 * Mon Sep 20 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.7.0-2021_08_31_224727
 - Initial packaging
