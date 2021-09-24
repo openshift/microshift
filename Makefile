@@ -223,10 +223,20 @@ release:
 	./scripts/release.sh --token $(TOKEN) --version $(SOURCE_GIT_TAG)
 .PHONY: release
 
-TEST_PACKAGES :=./pkg/...
-TEST_ARGS := -v ${TEST_PACKAGES} 
-# run all of the *_test.go files within the project using the go test module
-test:
-	@go test ${TEST_ARGS}
-.PHONY: test
 
+# setup the test targets 
+GO_TEST_PACKAGES :=./pkg/...
+GO_TEST_FLAGS := -v
+GO_MOD_FLAGS := 
+# TEST_ARGS := -v ${TEST_PACKAGES} 
+test-unit:
+	echo "im sorry ms jackson"
+ifndef JUNITFILE
+	$(GO) test $(GO_MOD_FLAGS) $(GO_TEST_FLAGS) $(GO_TEST_PACKAGES)
+else
+ifeq (, $(shell which gotest2junit 2>/dev/null))
+	$(error gotest2junit not found! Get it by `go get -mod='' -u github.com/openshift/release/tools/gotest2junit`.)
+endif
+	set -o pipefail; $(GO) test $(GO_MOD_FLAGS) $(GO_TEST_FLAGS) -json $(GO_TEST_PACKAGES) | gotest2junit > $(JUNITFILE)
+endif
+.PHONY: test-unit
