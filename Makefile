@@ -13,7 +13,7 @@ RELEASE_PRE := ${RELEASE_BASE}-0.microshift
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
-SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --broke --match '$(RELEASE_PRE)*' || echo '4.7.0-0.microshift-unknown')
+SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' || echo '4.7.0-0.microshift-unknown')
 
 SRC_ROOT :=$(shell pwd)
 
