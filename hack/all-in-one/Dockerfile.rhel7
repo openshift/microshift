@@ -35,8 +35,8 @@ RUN curl -s -L https://nvidia.github.io/nvidia-docker/rhel8.3/nvidia-docker.repo
 ADD nvidia-config.toml /etc/nvidia-container-runtime/config.toml
 
 RUN yum remove iptables -y && \
-    yum install -y https://rpmfind.net/linux/opensuse/distribution/leap/15.1/repo/oss/x86_64/xtables-plugins-1.6.2-lp151.2.3.x86_64.rpm && \
-    yum install -y https://rpmfind.net/linux/opensuse/distribution/leap/15.1/repo/oss/x86_64/iptables-1.6.2-lp151.2.3.x86_64.rpm
+    yum install -y https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/x86_64/os/Packages/i/iptables-libs-1.6.2-2.fc28.x86_64.rpm && \
+    yum install -y https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/x86_64/os/Packages/i/iptables-1.6.2-2.fc28.x86_64.rpm    
 
 RUN sed -e '/mountopt/s/,\?metacopy=on,\?//' -i /etc/containers/storage.conf
 
