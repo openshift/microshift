@@ -54,6 +54,11 @@ GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X github.com/openshift/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    -s -w"
 
+# setup the test targets 
+GO_TEST_PACKAGES :=./pkg/...
+GO_TEST_FLAGS := -v
+GO_MOD_FLAGS := 
+
 debug:
 	@echo FLAGS:"$(GO_LD_FLAGS)"
 	@echo TAG:"$(SOURCE_GIT_TAG)"
@@ -224,18 +229,3 @@ release:
 .PHONY: release
 
 
-# setup the test targets 
-GO_TEST_PACKAGES :=./pkg/...
-GO_TEST_FLAGS := -v
-GO_MOD_FLAGS := 
-# TEST_ARGS := -v ${TEST_PACKAGES} 
-test-unit:
-ifndef JUNITFILE
-	$(GO) test $(GO_MOD_FLAGS) $(GO_TEST_FLAGS) $(GO_TEST_PACKAGES)
-else
-ifeq (, $(shell which gotest2junit 2>/dev/null))
-	$(error gotest2junit not found! Get it by `go get -mod='' -u github.com/openshift/release/tools/gotest2junit`.)
-endif
-	set -o pipefail; $(GO) test $(GO_MOD_FLAGS) $(GO_TEST_FLAGS) -json $(GO_TEST_PACKAGES) | gotest2junit > $(JUNITFILE)
-endif
-.PHONY: test-unit
