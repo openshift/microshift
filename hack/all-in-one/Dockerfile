@@ -1,4 +1,6 @@
 ARG IMAGE_NAME=registry.access.redhat.com/ubi8/ubi-init:8.4
+ARG IPTABLES=nft
+
 FROM ${IMAGE_NAME}
 
 RUN export VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4) && \
@@ -32,6 +34,12 @@ RUN export ARCH=$(uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
 
 RUN curl -s -L https://nvidia.github.io/nvidia-docker/rhel8.3/nvidia-docker.repo | tee /etc/yum.repos.d/nvidia-docker.repo && \
     dnf install nvidia-container-toolkit -y
+
+RUN if [ "$IPTABLES" != "nft" ]; then yum remove iptables -y && \
+    yum install -y https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/x86_64/os/Packages/i/iptables-libs-1.6.2-2.fc28.x86_64.rpm && \
+    yum install -y https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/x86_64/os/Packages/i/iptables-1.6.2-2.fc28.x86_64.rpm ; fi
+
+
 
 ADD nvidia-config.toml /etc/nvidia-container-runtime/config.toml
 
