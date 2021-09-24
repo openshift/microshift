@@ -20,7 +20,12 @@ Watch this [end-to-end MicroShift provisioning demo video](https://youtu.be/QOiB
 
 ## Minimum specs
 
-In order to run Microshift, you will need at least 2 CPU cores, 2GB of RAM, 2.6GB of free storage space for the Microshift binary, and a 64-bit CPU (although 32-bit is *technically* possible, if you're up for the challenge).
+
+In order to run Microshift, you will need at least:
+- 2 CPU cores
+- 2GB of RAM
+- ~124MB of free storage space for the Microshift binary
+- 64-bit CPU (although 32-bit is *technically* possible, if you're up for the challenge)
 
 For barebones development the minimum requirement is 3GB of RAM, though this can increase
 if you are using resource-intensive devtools.
