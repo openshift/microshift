@@ -7,8 +7,8 @@ RequiresMountsFor=/run/containers/storage
 [Service]
 Restart=on-failure
 TimeoutStopSec=70
-ExecStart=/bin/bash /usr/bin/microshift-aio-run
-ExecStop=/usr/bin/podman stop -t 20 microshift 
+ExecStart=/bin/bash /usr/bin/microshift-aio start
+ExecStop=/bin/bash /usr/bin/microshift-aio stop
 Type=forking
 
 [Install]
