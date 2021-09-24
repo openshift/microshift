@@ -230,7 +230,6 @@ GO_TEST_FLAGS := -v
 GO_MOD_FLAGS := 
 # TEST_ARGS := -v ${TEST_PACKAGES} 
 test-unit:
-	echo "im sorry ms jackson"
 ifndef JUNITFILE
 	$(GO) test $(GO_MOD_FLAGS) $(GO_TEST_FLAGS) $(GO_TEST_PACKAGES)
 else
