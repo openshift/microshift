@@ -1,6 +1,9 @@
-%{!?github_tag: %global github_tag 4.7.0-0.microshift-2021-08-31-224727}
-%{!?version: %global version 4.7.0}
-%{!?release: %global release 2021_08_31_224727}
+# parameters that must be provided via --define , or fixed into the spec file:
+# global version 4.7.0
+# global release 2021_08_31_224727
+# global github_tag 4.7.0-0.microshift-2021-08-31-224727
+# global git_commit 81264d0ebb17fef06eff9ec7d4f2a81631c6b34a
+
 
 # golang specifics
 %global golang_version 1.15
@@ -12,6 +15,8 @@
 # SELinux specifics
 %global selinuxtype targeted
 
+# Git related details
+%global shortcommit %(c=%{git_commit}; echo ${c:0:7})
 
 Name: microshift
 Version: %{version}
@@ -21,9 +26,14 @@ Summary: Microshift binary
 License: ASL 2.0
 URL: https://github.com/redhat-et/microshift
 
-%if ! 0%{?local_build:1}
+%if ! 0%{?local_build:1}%{?git_commit:1}
 Source0: https://github.com/redhat-et/microshift/archive/refs/tags/%{github_tag}.tar.gz
 %endif
+
+%if 0%{?git_commit:1}
+Source0: https://github.com/redhat-et/microshift/archive/%{git_commit}/microshift-%{shortcommit}.tar.gz
+%endif
+
 
 %if 0%{?go_arches:1}
 ExclusiveArch: %{go_arches}
@@ -35,6 +45,8 @@ BuildRequires: gcc
 BuildRequires: glibc-static
 BuildRequires: golang >= %{golang_version}
 BuildRequires: make
+BuildRequires: policycoreutils
+BuildRequires: systemd
 
 Requires: cri-o
 Requires: cri-tools
@@ -76,12 +88,16 @@ BuildArch: noarch
 %description selinux
 SElinux policy modules for Microshift.
 
-
 %prep
 
-# Unpack the sources, unless it's a localbuild
-%if ! 0%{?local_build:1}
+# Unpack the sources, unless it's a localbuild (tag)
+%if ! 0%{?local_build:1}%{?git_commit:1}
 %setup -n microshift-%{github_tag}
+%endif
+
+# Unpack the sources, for a commit-based tarball
+%if 0%{?git_commit:1}
+%setup -n microshift-%{git_commit}
 %endif
 
 %build
@@ -118,8 +134,8 @@ install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
 restorecon -v %{buildroot}%{_bindir}/microshift
 
-install -d -m755 $RPM_BUILD_ROOT/%{_unitdir}
-install -p -m644 systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
+install -d -m755 %{buildroot}/%{_unitdir}
+install -p -m644 rpm/microshift.service %{buildroot}%{_unitdir}/microshift.service
 
 mkdir -p -m755 %{buildroot}/var/run/flannel
 mkdir -p -m755 %{buildroot}/var/run/kubelet
@@ -166,5 +182,10 @@ fi
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
 %changelog
+* Thu Sep 23 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.7.0-021_08_31_224727_40_g5c23735f
+- Support commit based builds
+- workaround rpmbuild with no build in place support
+- add missing BuildRequires on systemd and policycoreutils
+
 * Mon Sep 20 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.7.0-2021_08_31_224727
 - Initial packaging
