@@ -1,4 +1,4 @@
----
+--- 
 dataDir: /tmp/microshift/data
 logDir: /tmp/microshift/logs
 logVLevel: 4
