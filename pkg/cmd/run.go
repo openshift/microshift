@@ -74,7 +74,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
 		// util.Must(m.AddService(controllers.NewOpenShiftPrepJob()))
 		// util.Must(m.AddService(controllers.NewOpenShiftAPIServer()))
-		// util.Must(m.AddService(controllers.NewOpenShiftControllerManager()))
+		util.Must(m.AddService(controllers.NewOpenShiftControllerManager(cfg)))
 		// util.Must(m.AddService(controllers.NewOpenShiftAPIComponents()))
 		// util.Must(m.AddService(controllers.NewInfrastructureServices()))
 
@@ -145,7 +145,7 @@ func startControllerOnly(cfg *config.MicroshiftConfig) error {
 	controllers.OCPAPIServer(cfg)
 
 	//TODO: cloud provider
-	controllers.OCPControllerManager(cfg)
+	// controllers.OCPControllerManager(cfg)
 
 	if err := controllers.StartOCPAPIComponents(cfg); err != nil {
 		return err
