@@ -25,7 +25,7 @@ REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 STAGING_DIR="$REPOROOT/_output/staging"
 
 EMBEDDED_COMPONENTS="etcd hyperkube openshift-apiserver openshift-controller-manager"
-LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator"
+LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator openshift-cluster-policy-controller service-ca-operator"
 
 
 title() {

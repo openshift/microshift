@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: openshift-kube-controller-manager
+  name: openshift-cluster-policy-controller
+  labels:
+    app: openshift-cluster-policy-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openshift-cluster-policy-controller
+  template:
+    metadata:
+      name: openshift-cluster-policy-controller
+      labels:
+        app: openshift-cluster-policy-controller
+    spec:
+      serviceAccountName: openshift-cluster-policy-controller-sa
+      containers:
+      - name: cluster-policy-controller
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        image: {{ .ReleaseImage.cluster_policy_controller }}
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        command: ["/bin/bash", "-euxo", "pipefail", "-c"]
+        args:
+          - |
+            timeout 3m /bin/bash -exuo pipefail -c 'while [ -n "$(ss -Htanop \( sport = 10357 \))" ]; do sleep 1; done'
+            exec cluster-policy-controller start --config=/var/run/config/config.yaml
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 10m
+        ports:
+          - containerPort: 10357
+        volumeMounts:
+        - mountPath: /var/run/kubeadmin
+          name: kubeconfig-dir
+        - mountPath: /var/run/secrets
+          name: signing-key
+        - mountPath: /var/run/configmaps/signing-cabundle
+          name: signing-cabundle
+        - mountPath: /var/run/config
+          name: config
+        startupProbe:
+          httpGet:
+            scheme: HTTPS
+            port: 10357
+            path: healthz
+          initialDelaySeconds: 0
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            scheme: HTTPS
+            port: 10357
+            path: healthz
+          initialDelaySeconds: 45
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            scheme: HTTPS
+            port: 10357
+            path: healthz
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      volumes:
+      - name: kubeconfig-dir
+        hostPath:
+          path: {{.KubeConfigDir}}
+      - name: signing-key
+        hostPath:
+          path: {{.KeyDir}}
+      - name: config
+        hostPath:
+          path: {{.ConfigDir}}
+      - hostPath:
+          path: {{.CADir}}
+        name: signing-cabundle

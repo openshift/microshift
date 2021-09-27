@@ -1,11 +1,62 @@
 package components
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 
 	"github.com/sirupsen/logrus"
 )
+
+func startClusterPolicyController(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+	if err := writeConfig(cfg); err != nil {
+		logrus.Fatalf("Failed to write openshift-cluster-policy-controller config: %v", err)
+	}
+
+	var (
+		clusterRole = []string{
+			"assets/rbac/0000_80_cluster-policy-controller_clusterrole.yaml",
+		}
+		clusterRoleBinding = []string{
+			"assets/rbac/0000_80_cluster-policy-controller_clusterrolebinding.yaml",
+		}
+		apps = []string{
+			"assets/apps/0000_80_cluster_policy_controller_deploy.yaml",
+		}
+		ns = []string{
+			"assets/core/0000_80_cluster-openshift-cluster-policy-controller_00_namespace.yaml",
+		}
+		sa = []string{
+			"assets/core/0000_80_cluster-openshift-cluster-policy-controller_service-account.yaml",
+			"assets/core/0000_80_namespace-security-allocation-controller_sa.yaml",
+		}
+	)
+	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply ns %v: %v", ns, err)
+		return err
+	}
+	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply clusterRolebinding %v: %v", clusterRole, err)
+		return err
+	}
+	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
+		return err
+	}
+	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply sa %v: %v", sa, err)
+		return err
+	}
+	if err := assets.ApplyDeployments(apps, renderClusterPolicyController, assets.RenderParams{"DataDir": cfg.DataDir}, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply apps %v: %v", apps, err)
+		return err
+	}
+
+	return nil
+}
 
 func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
@@ -181,4 +232,20 @@ func startDNSController(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 		return err
 	}
 	return nil
+}
+
+func writeConfig(cfg *config.MicroshiftConfig) error {
+	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
+kind: OpenShiftControllerManagerConfig
+kubeClientConfig:
+  kubeConfig: /var/run/kubeadmin/kubeconfig
+servingInfo:
+  bindAddress: "0.0.0.0:10357"
+  certFile: /var/run/secrets/tls.crt
+  keyFile:  /var/run/secrets/tls.key
+  clientCA: /var/run/configmaps/signing-cabundle/ca-bundle.crt`)
+
+	path := filepath.Join(cfg.DataDir, "resources", "openshift-cluster-policy-controller", "config", "config.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }

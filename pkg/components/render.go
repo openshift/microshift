@@ -8,6 +8,26 @@ import (
 	"github.com/openshift/microshift/pkg/release"
 )
 
+func renderClusterPolicyController(b []byte, p assets.RenderParams) ([]byte, error) {
+	data := struct {
+		ReleaseImage                            assets.RenderParams
+		KeyDir, CADir, KubeConfigDir, ConfigDir string
+	}{
+		ReleaseImage:  release.Image,
+		KeyDir:        p["DataDir"] + "/resources/openshift-cluster-policy-controller/secrets",
+		ConfigDir:     p["DataDir"] + "/resources/openshift-cluster-policy-controller/config",
+		KubeConfigDir: p["DataDir"] + "/resources/kubeadmin",
+		CADir:         p["DataDir"] + "/certs/ca-bundle",
+	}
+	tpl := template.Must(template.New("cpc").Parse(string(b)))
+	var byteBuff bytes.Buffer
+
+	if err := tpl.Execute(&byteBuff, data); err != nil {
+		return nil, err
+	}
+	return byteBuff.Bytes(), nil
+}
+
 func renderSCController(b []byte, p assets.RenderParams) ([]byte, error) {
 	data := struct {
 		ReleaseImage  assets.RenderParams
