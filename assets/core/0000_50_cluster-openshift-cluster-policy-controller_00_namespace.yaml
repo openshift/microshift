@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+  labels:
+    # set value to avoid depending on kube admission that depends on openshift apis
+    openshift.io/run-level: "0"
+    # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
+    openshift.io/cluster-monitoring: "true"
+  name: openshift-kube-controller-manager

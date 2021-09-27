@@ -20,6 +20,7 @@ var Base = "4.8.0-0.okd-2021-10-10-030117"
 
 var Image = map[string]string{
 	"cli":                           "quay.io/microshift/cli:" + Base,
+	"cluster_policy_controller":     "quay.io/microshift/cluster-policy-controller:" + Base,
 	"coredns":                       "quay.io/microshift/coredns:" + Base,
 	"haproxy_router":                "quay.io/microshift/haproxy-router:" + Base,
 	"kube_flannel":                  "quay.io/microshift/flannel:" + Base,

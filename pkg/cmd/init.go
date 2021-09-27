@@ -139,6 +139,12 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 			"openshift-oauth-apiserver.svc", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
+	if err := util.GenCerts("openshift-cluster-policy-controller", cfg.DataDir+"/resources/openshift-cluster-policy-controller/secrets",
+		"tls.crt", "tls.key",
+		[]string{"openshift-cluster-policy-controller", cfg.NodeName, cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default",
+			"kubernetes", "localhost"}); err != nil {
+		return err
+	}
 	return nil
 }
 
