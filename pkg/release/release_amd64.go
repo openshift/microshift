@@ -22,6 +22,7 @@ package release
 func init() {
 	Image = map[string]string{
 		"cli":                           "quay.io/openshift/okd-content@sha256:27f7918b5f0444e278118b2ee054f5b6fadfc4005cf91cb78106c3f5e1833edd",
+		"cluster_policy_controller":     "quay.io/openshift/okd-content@sha256:caf8254cbd4f3fc3e923682106a39f3bcfc62e9746ca909ed50b930e2d17a166",
 		"coredns":                       "quay.io/openshift/okd-content@sha256:bcdefdbcee8af1e634e68a850c52fe1e9cb31364525e30f5b20ee4eacb93c3e8",
 		"haproxy_router":                "quay.io/openshift/okd-content@sha256:01cfbbfdc11e2cbb8856f31a65c83acc7cfbd1986c1309f58c255840efcc0b64",
 		"kube_flannel":                  "quay.io/coreos/flannel:v0.14.0",

@@ -217,6 +217,7 @@ func applySCCs(kubeconfigPath string) error {
 func PrepareOCP(cfg *config.MicroshiftConfig) error {
 	if err := assets.ApplyNamespaces([]string{
 		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
+		"assets/core/0000_50_cluster-openshift-cluster-policy-controller_00_namespace.yaml",
 	}, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to apply openshift namespaces %v", err)
 		return err

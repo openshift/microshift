@@ -41,6 +41,7 @@ var (
 		"assets/crd/0000_10_config-operator_01_image.crd.yaml",
 		"assets/crd/0000_03_config-operator_01_proxy.crd.yaml",
 		"assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml",
+		"assets/crd/0000_03_securityinternal-openshift_01_rangeallocation.crd.yaml",
 	}
 )
 
