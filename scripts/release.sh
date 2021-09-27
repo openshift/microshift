@@ -47,10 +47,9 @@ help() {
 This script provides some simple automation for cutting new releases of Microshift.
 
 Use:
-    ./release.sh --token $(cat /token/path) --target $COMMIT
+    ./release.sh --token $(cat /token/path)
     Note: do not use "=" with flag values
 Inputs:
-    --target      (Required) The commit-ish (hash, tag, or branch) to build a release from. Abbreviated commits are NOT permitted.
     --token       (Required) The github application auth token, use to create a github release.
     --debug, -d   Print generated script values for debugging.
     --help, -h    Print this help text.
@@ -65,22 +64,13 @@ DEBUG
 To test releases against a downstream/fork repository, override GIT_OWNER to forked git org/owner and QUAY_OWNER to your
 quay.io owner or org.
 
-  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path) --target $COMMIT
+  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path
 '
 }
 
 generate_api_release_request() {
   local is_prerelease="${1:=true}" # (copejon) assume for now that all releases are prerelease, unless otherwise specified
-  printf '{"tag_name": "%s","target_commitish": "%s","name": "%s","prerelease": %s}' "$VERSION" "$TARGET" "$VERSION" "$is_prerelease"
-}
-
-git_checkout_target() {
-  target="$1"
-  [ -z "$(git status --porcelain)" ] || {
-    printf "The working tree is dirty - commit or stash changes before cutting a release!" >&2
-    return 1
-  }
-  git checkout "$target"
+  printf '{"tag_name": "%s","name": "%s","prerelease": %s}' "$VERSION" "$VERSION" "$is_prerelease"
 }
 
 git_create_release() {
@@ -211,14 +201,6 @@ debug() {
 ########
 while [ $# -gt 0 ]; do
   case "$1" in
-    "--target")
-      TARGET="${2:-}"
-      [[ "${TOKEN:=}" =~ ^-.* ]] || [[ -z "$TARGET" ]] && {
-        printf "flag $1 requires git commit-ish (branch, tag, hash) value"
-        exit 1
-      }
-      shift 2
-      ;;
     "--token")
       TOKEN="${2:-}"
       [[ "$TOKEN" =~ ^-.* ]] || [[ -z "$TOKEN" ]] && {
@@ -260,11 +242,9 @@ RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-lin
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
 
-git_checkout_target "$TARGET"                                         || { git switch -; exit 1; }
-build_container_images_artifacts                                      || { git switch -; exit 1; }
-STAGE_DIR=$(stage_release_image_binaries)                             || { git switch -; exit 1; }
-push_container_image_artifacts                                        || { git switch -; exit 1; }
-push_container_manifest                                               || { git switch -; exit 1; }
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -; exit 1; }
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -; exit 1; }
-git switch -
+build_container_images_artifacts                                      || exit 1
+STAGE_DIR=$(stage_release_image_binaries)                             || exit 1
+push_container_image_artifacts                                        || exit 1
+push_container_manifest                                               || exit 1
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || exit 1
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || exit 1
