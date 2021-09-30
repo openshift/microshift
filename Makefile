@@ -23,7 +23,7 @@ SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*
 
 SRC_ROOT :=$(shell pwd)
 
-BUILD_CFG :=./images/build/Dockerfile
+BUILD_CFG :=./packaging/images/build/Dockerfile
 IMAGE_REPO :=quay.io/microshift/microshift
 OUTPUT_DIR :=_output
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
@@ -123,12 +123,12 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 .PHONY: cross-build
 
 rpm:
-	BUILD=rpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./rpm/make-rpm.sh local
+	BUILD=rpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
 
 .PHONY: rpm
 
 srpm:
-	BUILD=srpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./rpm/make-rpm.sh local
+	BUILD=srpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
 .PHONY: srpm
 
 ###############################
@@ -139,7 +139,7 @@ _build_containerized:
 	@if [ -z '$(CTR_CMD)' ] ; then echo '!! ERROR: containerized builds require podman||docker CLI, none found $$PATH' >&2 && exit 1; fi
 	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
 	$(CTR_CMD) build -t $(IMAGE_REPO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
-		-f "$(SRC_ROOT)"/images/build/Dockerfile \
+		-f "$(SRC_ROOT)"/packaging/images/build/Dockerfile \
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
 		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
 		--build-arg ARCH=$(ARCH) \

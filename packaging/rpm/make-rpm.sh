@@ -20,7 +20,7 @@ create_local_tarball() {
             --exclude='.git' --exclude='.idea' --exclude='.vagrant' \
             --exclude='_output' --exclude='rpm/_rpmbuild' \
             --transform="s|^|microshift-${GIT_SHA}/|"  \
-            --exclude="${TARBALL_FILE}" "${SCRIPT_DIR}/../"
+            --exclude="${TARBALL_FILE}" "${SCRIPT_DIR}/../../"
 }
 
 download_commit_tarball() {

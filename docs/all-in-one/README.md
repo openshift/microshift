@@ -5,8 +5,8 @@
 Copy microshift-aio unit file to /etc/systemd and the aio run script to /usr/bin
 
 ```bash
-cp microshift-aio.service /etc/systemd/system/microshift-aio.service
-cp microshift-aio /usr/bin/
+cp packaging/systemd/microshift-aio.service /etc/systemd/system/microshift-aio.service
+cp packaging/systemd/microshift-aio /usr/bin/
 ```
 Now enable and start the service. The KUBECONFIG location will be written to /etc/microshift-aio/microshift-aio.conf.    
 If the `microshift-data` podman volume does not exist, the systemd service will create one.
@@ -31,8 +31,12 @@ systemctl stop microshift-aio
 A restart will use the same volume.
 
 ## Build Container Image
-First copy microshift binary to this directory, then build the container image:
+First copy microshift binary to the build directory, then build the container image:
 ```bash
+#from repository root
+make
+cp microshift packaging/images/all-in-one/
+cd packaging/images/all-in-one
 sudo podman build -t microshift-aio .
 ```
 
@@ -84,4 +88,4 @@ kubectl.exe get pods -A -w --kubeconfig .\kubeconfig
 ## Limitation
 
 These instructions are tested on Linux, Mac, and Windows. 
-On MacOS, running containerized Microshift as non-root is not supported on MacOS. 
+On MacOS, running containerized Microshift as non-root is not supported on MacOS.
