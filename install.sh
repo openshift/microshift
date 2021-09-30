@@ -34,6 +34,11 @@ get_arch() {
     fi
 }
 
+# Function to get OS version
+get_os_version() {
+    OS_VERSION=$(egrep '^(VERSION_ID)=' /etc/os-release | sed 's/"//g' | cut -f2 -d"=")
+}
+
 # If RHEL, use subscription-manager to register
 register_subs() {
     set +e +o pipefail
@@ -113,7 +118,7 @@ install_crio() {
       ;;
       "ubuntu")
         CRIOVERSION=1.20
-        OS=xUbuntu_20.04
+        OS=xUbuntu_$OS_VERSION
         echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" > devel:kubic:libcontainers:stable.list
         sudo mv devel:kubic:libcontainers:stable.list /etc/apt/sources.list.d/
         echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIOVERSION/$OS/ /" > devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.list
@@ -201,6 +206,10 @@ User=root
 WantedBy=multi-user.target
 EOF
 
+    if [ "$DISTRO" = "ubuntu" ] && [ "$OS_VERSION" = "18.04" ]; then
+        sudo sed -i 's|^ExecStart=microshift|ExecStart=/usr/local/bin/microshift|' /usr/lib/systemd/system/microshift.service
+    fi
+
     if [ "$DISTRO" != "ubuntu" ]; then
         sudo mkdir -p /var/run/flannel
         sudo mkdir -p /var/run/kubelet
@@ -244,6 +253,7 @@ validation_check(){
 # Script execution
 get_distro
 get_arch
+get_os_version
 if [ "$DISTRO" = "rhel" ]; then
     register_subs
 fi
