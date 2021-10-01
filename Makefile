@@ -25,7 +25,6 @@ CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
 
-GO_EXT_LD_FLAGS :=-extldflags '-static'
 GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMinor=20 \
                    -X k8s.io/component-base/version.gitVersion=v1.20.1 \
@@ -42,7 +41,6 @@ GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X github.com/openshift/microshift/pkg/version.commitFromGit=$(SOURCE_GIT_COMMIT) \
                    -X github.com/openshift/microshift/pkg/version.gitTreeState=$(SOURCE_GIT_TREE_STATE) \
                    -X github.com/openshift/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
-                   $(GO_EXT_LD_FLAGS) \
                    -s -w"
 
 debug:
