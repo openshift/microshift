@@ -119,13 +119,13 @@ install_crio() {
       "ubuntu")
         CRIOVERSION=1.20
         OS=xUbuntu_$OS_VERSION
-        echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" > devel:kubic:libcontainers:stable.list
-        sudo mv devel:kubic:libcontainers:stable.list /etc/apt/sources.list.d/
-        echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIOVERSION/$OS/ /" > devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.list
-        sudo mv devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.list /etc/apt/sources.list.d/
+        KEYRINGS_DIR=/usr/share/keyrings
+        echo "deb [signed-by=$KEYRINGS_DIR/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list > /dev/null
+        echo "deb [signed-by=$KEYRINGS_DIR/libcontainers-crio-archive-keyring.gpg] http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIOVERSION/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.list > /dev/null
 
-        curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION/$OS/Release.key | sudo apt-key add -
-        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | sudo apt-key add -
+        sudo mkdir -p $KEYRINGS_DIR
+        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | sudo gpg --dearmor -o $KEYRINGS_DIR/libcontainers-archive-keyring.gpg
+        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIOVERSION/$OS/Release.key | sudo gpg --dearmor -o $KEYRINGS_DIR/libcontainers-crio-archive-keyring.gpg
 
         sudo apt-get update -y
         # Vagrant Ubuntu VMs don't provide containernetworking-plugins by default
