@@ -244,18 +244,24 @@ var _assetsCore0000_70_dns_01ConfigmapYaml = []byte(`apiVersion: v1
 data:
   Corefile: |
     .:5353 {
+        bufsize 512
         errors
-        health
+        health {
+            lameduck 20s
+        }
+        ready
         kubernetes cluster.local in-addr.arpa ip6.arpa {
             pods insecure
             upstream
             fallthrough in-addr.arpa ip6.arpa
         }
-        prometheus :9153
+        prometheus 127.0.0.1:9153
         forward . /etc/resolv.conf {
             policy sequential
         }
-        cache 30
+        cache 900 {
+            denial 9984 30
+        }
         reload
     }
 kind: ConfigMap
