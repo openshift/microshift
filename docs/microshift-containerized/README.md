@@ -29,8 +29,8 @@ Before runnng microshift-containerized as a systemd service, ensure to update th
 Copy microshift-containerized unit file to `/etc/systemd` and the microshift-containerized run script to `/usr/bin`
 
 ```bash
-sudo cp microshift-containerized.service /etc/systemd/system/microshift-containerized.service
-sudo cp microshift-containerized /usr/bin/
+sudo cp packaging/systemd/microshift-containerized.service /etc/systemd/system/microshift-containerized.service
+sudo cp packaging/systemd/microshift-containerized /usr/bin/
 ```
 Now enable and start the service. The KUBECONFIG location will be written to `/etc/microshift-containerized/microshift-containerized.conf`.    
 
