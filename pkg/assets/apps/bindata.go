@@ -171,17 +171,24 @@ metadata:
   name: service-ca
   labels:
     app: service-ca
+    service-ca: "true"
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: service-ca
+      service-ca: "true"
   template:
     metadata:
       name: service-ca
       labels:
         app: service-ca
+        service-ca: "true"
     spec:
+      securityContext: {}
+      serviceAccount: service-ca
       serviceAccountName: service-ca
       containers:
       - name: service-ca-controller
@@ -189,26 +196,28 @@ spec:
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
         args:
-        - "-v=4"
+        - -v=2
         ports:
-          - containerPort: 8443
-            protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        # securityContext:
+        #   runAsNonRoot: true
         resources:
           requests:
             memory: 120Mi
             cpu: 10m
         volumeMounts:
-          - mountPath: /var/run/secrets/signing-key
-            name: signing-key
-          - mountPath: /var/run/configmaps/signing-cabundle
-            name: signing-cabundle
+        - mountPath: /var/run/secrets/signing-key
+          name: signing-key
+        - mountPath: /var/run/configmaps/signing-cabundle
+          name: signing-cabundle
       volumes:
-        - name: signing-key
-          hostPath:
-            path: {{.KeyDir}}
-        - name: signing-cabundle
-          hostPath:
-            path: {{.CADir}}
+      - name: signing-key
+        hostPath:
+          path: {{.KeyDir}}
+      - name: signing-cabundle
+        hostPath:
+          path: {{.CADir}}
       #nodeSelector:
       #  node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"
@@ -247,7 +256,7 @@ metadata:
   labels:
     dns.operator.openshift.io/owning-dns: default
   name: dns-default
-  namespace: openshift-dns    
+  namespace: openshift-dns
 spec:
   selector:
     matchLabels:
@@ -278,17 +287,16 @@ spec:
           name: dns-tcp
           protocol: TCP
         readinessProbe:
-          failureThreshold: 3
           httpGet:
-            path: /health
-            port: 8080
+            path: /ready
+            port: 8181
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
+          periodSeconds: 3
           successThreshold: 1
-          timeoutSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 3
         livenessProbe:
-          failureThreshold: 5
           httpGet:
             path: /health
             port: 8080
@@ -296,6 +304,7 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 5
           successThreshold: 1
+          failureThreshold: 5
         resources:
           requests:
             cpu: 50m
@@ -331,9 +340,12 @@ spec:
           mountPath: /etc/hosts
         env:
         - name: SERVICES
+          # Comma or space separated list of services
+          # NOTE: For now, ensure these are relative names; for each relative name,
+          # an alias with the CLUSTER_DOMAIN suffix will also be added.
           value: "image-registry.openshift-image-registry.svc"
         - name: CLUSTER_DOMAIN
-          value: cluster.local        
+          value: cluster.local
         command:
         - /bin/bash
         - -c
@@ -454,11 +466,20 @@ metadata:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
 spec:
   progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
+      annotations:
+        "unsupported.do-not-use.openshift.io/override-liveness-grace-period-seconds": "10"
       labels:
         ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
@@ -473,12 +494,15 @@ spec:
           ports:
           - name: http
             containerPort: 80
+            hostPort: 80
             protocol: TCP
           - name: https
             containerPort: 443
+            hostPort: 443
             protocol: TCP
           - name: metrics
             containerPort: 1936
+            hostPort: 1936
             protocol: TCP
           # Merged at runtime.
           env:
@@ -511,10 +535,11 @@ spec:
           - name: ROUTER_THREADS
             value: "4"
           - name: SSL_MIN_VERSION
-            value: TLSv1.2            
+            value: TLSv1.2
           livenessProbe:
             failureThreshold: 3
             httpGet:
+              host: localhost
               path: /healthz
               port: 1936
               scheme: HTTP
@@ -523,21 +548,20 @@ spec:
             successThreshold: 1
             timeoutSeconds: 1
           readinessProbe:
-             failureThreshold: 3
-             httpGet:
-               path: /healthz/ready
-               port: 1936
-               scheme: HTTP
-             initialDelaySeconds: 10
-             periodSeconds: 10
-             successThreshold: 1
-             timeoutSeconds: 1
+            failureThreshold: 3
+            httpGet:
+              host: localhost
+              path: /healthz/ready
+              port: 1936
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
           resources:
             requests:
               cpu: 100m
               memory: 256Mi
-          securityContext:
-            privileged: true              
           volumeMounts:
           - mountPath: /etc/pki/tls/private
             name: default-certificate
@@ -545,9 +569,16 @@ spec:
           - mountPath: /var/run/configmaps/service-ca
             name: service-ca-bundle
             readOnly: true
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: router
       volumes:
       - name: default-certificate
         secret:
+          defaultMode: 420
           secretName: router-certs-default
       - name: service-ca-bundle
         configMap:

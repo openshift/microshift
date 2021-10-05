@@ -15,7 +15,9 @@ groups:
 kind: SecurityContextConstraints
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: restricted denies access to all host features and requires
       pods to be run with a UID, and SELinux context that are allocated to the namespace.  This

@@ -43,7 +43,7 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 
 	containerEnv := []v1.EnvVar{
 		{Name: "BUILD", Value: string(data)},
-		{Name: "LANG", Value: "en_US.utf8"},
+		{Name: "LANG", Value: "C.utf8"},
 	}
 
 	addSourceEnvVars(build.Spec.Source, &containerEnv)

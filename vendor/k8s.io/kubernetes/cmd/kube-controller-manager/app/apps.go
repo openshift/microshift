@@ -37,10 +37,7 @@ func startDaemonSetController(ctx ControllerContext) (http.Handler, bool, error)
 	if !ctx.AvailableResources[schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "daemonsets"}] {
 		return nil, false, nil
 	}
-	dsc, err := daemon.NewNodeSelectorAwareDaemonSetsController(
-		ctx.OpenShiftContext.OpenShiftDefaultProjectNodeSelector,
-		ctx.OpenShiftContext.KubeDefaultProjectNodeSelector,
-		ctx.InformerFactory.Core().V1().Namespaces(),
+	dsc, err := daemon.NewDaemonSetsController(
 		ctx.InformerFactory.Apps().V1().DaemonSets(),
 		ctx.InformerFactory.Apps().V1().ControllerRevisions(),
 		ctx.InformerFactory.Core().V1().Pods(),

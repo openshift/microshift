@@ -170,10 +170,9 @@ func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*as
 var _assetsCore0000_60_serviceCa_01_namespaceYaml = []byte(`apiVersion: v1
 kind: Namespace
 metadata:
-  labels:
-    openshift.io/run-level: "1"
-    openshift.io/cluster-monitoring: "true"
   name: openshift-service-ca
+  annotations:
+    openshift.io/node-selector: ""
 `)
 
 func assetsCore0000_60_serviceCa_01_namespaceYamlBytes() ([]byte, error) {
@@ -196,8 +195,6 @@ kind: ServiceAccount
 metadata:
   namespace: openshift-service-ca
   name: service-ca
-  labels:
-    app: service-ca
 `)
 
 func assetsCore0000_60_serviceCa_04_saYamlBytes() ([]byte, error) {
@@ -247,18 +244,24 @@ var _assetsCore0000_70_dns_01ConfigmapYaml = []byte(`apiVersion: v1
 data:
   Corefile: |
     .:5353 {
+        bufsize 512
         errors
-        health
+        health {
+            lameduck 20s
+        }
+        ready
         kubernetes cluster.local in-addr.arpa ip6.arpa {
             pods insecure
             upstream
             fallthrough in-addr.arpa ip6.arpa
         }
-        prometheus :9153
+        prometheus 127.0.0.1:9153
         forward . /etc/resolv.conf {
             policy sequential
         }
-        cache 30
+        cache 900 {
+            denial 9984 30
+        }
         reload
     }
 kind: ConfigMap
@@ -314,10 +317,11 @@ metadata:
   labels:
       dns.operator.openshift.io/owning-dns: default
   name: dns-default
-  namespace: openshift-dns          
-# name, namespace,labels and annotations are set at runtime
+  namespace: openshift-dns
 spec:
   clusterIP: {{.ClusterIP}}
+  selector:
+    dns.operator.openshift.io/daemonset-dns: default
   ports:
   - name: dns
     port: 53
@@ -331,8 +335,10 @@ spec:
     port: 9154
     targetPort: metrics
     protocol: TCP
-  selector:
-    dns.operator.openshift.io/daemonset-dns: default    
+  # TODO: Uncomment when service topology feature gate is enabled.
+  #topologyKeys:
+  #  - "kubernetes.io/hostname"
+  #  - "*"
 `)
 
 func assetsCore0000_70_dns_01ServiceYamlBytes() ([]byte, error) {
@@ -425,7 +431,9 @@ metadata:
     # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
     openshift.io/cluster-monitoring: "true"
     name: openshift-ingress
+    # old and new forms of the label for matching with NetworkPolicy
     network.openshift.io/policy-group: ingress
+    policy-group.network.openshift.io/ingress: ""
 `)
 
 func assetsCore0000_80_openshiftRouterNamespaceYamlBytes() ([]byte, error) {
@@ -475,7 +483,7 @@ metadata:
   labels:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
   name: router-internal-default
-  namespace: openshift-ingress     
+  namespace: openshift-ingress
 spec:
   selector:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default

@@ -94,6 +94,70 @@ func (cr *clusterRoleApplier) Applier() error {
 	return nil
 }
 
+type roleBindingApplier struct {
+	client *kubernetes.Clientset
+	rb     *rbacv1.RoleBinding
+}
+
+func (rb *roleBindingApplier) New(kubeconfigPath string) {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	if err != nil {
+		panic(err)
+	}
+
+	rb.client = kubernetes.NewForConfigOrDie(rest.AddUserAgent(restConfig, "rbac-agent"))
+}
+
+func (rb *roleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
+	obj, err := runtime.Decode(rbacCodecs.UniversalDecoder(rbacv1.SchemeGroupVersion), objBytes)
+	if err != nil {
+		panic(err)
+	}
+	rb.rb = obj.(*rbacv1.RoleBinding)
+}
+
+func (rb *roleBindingApplier) Applier() error {
+	_, err := rb.client.RbacV1().RoleBindings(rb.rb.Namespace).Get(context.TODO(), rb.rb.Name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		_, err := rb.client.RbacV1().RoleBindings(rb.rb.Namespace).Create(context.TODO(), rb.rb, metav1.CreateOptions{})
+		return err
+	}
+
+	return nil
+}
+
+type roleApplier struct {
+	client *kubernetes.Clientset
+	r      *rbacv1.Role
+}
+
+func (r *roleApplier) New(kubeconfigPath string) {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	if err != nil {
+		panic(err)
+	}
+
+	r.client = kubernetes.NewForConfigOrDie(rest.AddUserAgent(restConfig, "rbac-agent"))
+}
+
+func (r *roleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
+	obj, err := runtime.Decode(rbacCodecs.UniversalDecoder(rbacv1.SchemeGroupVersion), objBytes)
+	if err != nil {
+		panic(err)
+	}
+	r.r = obj.(*rbacv1.Role)
+}
+
+func (r *roleApplier) Applier() error {
+	_, err := r.client.RbacV1().Roles(r.r.Namespace).Get(context.TODO(), r.r.Name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		_, err := r.client.RbacV1().Roles(r.r.Namespace).Create(context.TODO(), r.r, metav1.CreateOptions{})
+		return err
+	}
+
+	return nil
+}
+
 func applyRbac(rbacs []string, applier readerApplier) error {
 	lock.Lock()
 	defer lock.Unlock()
@@ -124,5 +188,15 @@ func ApplyClusterRoles(rbacs []string, kubeconfigPath string) error {
 	cr := &clusterRoleApplier{}
 	cr.New(kubeconfigPath)
 	return applyRbac(rbacs, cr)
+}
+func ApplyRoleBindings(rbacs []string, kubeconfigPath string) error {
+	rb := &roleBindingApplier{}
+	rb.New(kubeconfigPath)
+	return applyRbac(rbacs, rb)
+}
 
+func ApplyRoles(rbacs []string, kubeconfigPath string) error {
+	r := &roleApplier{}
+	r.New(kubeconfigPath)
+	return applyRbac(rbacs, r)
 }

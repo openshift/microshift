@@ -239,12 +239,6 @@ type Config struct {
 
 	// StorageVersionManager holds the storage versions of the API resources installed by this server.
 	StorageVersionManager storageversion.Manager
-
-	// hasBeenReadyCh is closed when /readyz succeeds for the first time.
-	hasBeenReadyCh chan struct{}
-
-	// A func that returns whether the server is terminating. This can be nil.
-	IsTerminating func() bool
 }
 
 // EventSink allows to create events.
@@ -357,8 +351,6 @@ func NewConfig(codecs serializer.CodecFactory) *Config {
 		LongRunningFunc:       genericfilters.BasicLongRunningRequestCheck(sets.NewString("watch"), sets.NewString()),
 		APIServerID:           id,
 		StorageVersionManager: storageversion.NewDefaultManager(),
-
-		hasBeenReadyCh: make(chan struct{}),
 	}
 }
 
@@ -655,7 +647,6 @@ func (c completedConfig) New(name string, delegationTarget DelegationTarget) (*G
 		livezChecks:      c.LivezChecks,
 		readyzChecks:     c.ReadyzChecks,
 		readinessStopCh:  make(chan struct{}),
-		hasBeenReadyCh:   c.hasBeenReadyCh,
 		livezGracePeriod: c.LivezGracePeriod,
 
 		DiscoveryGroupManager: discovery.NewRootAPIsHandler(c.DiscoveryAddresses, c.Serializer),
@@ -830,16 +821,8 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
 	handler = filterlatency.TrackStarted(handler, "authentication")
 
 	handler = genericfilters.WithCORS(handler, c.CorsAllowedOriginList, nil, nil, nil, "true")
-
-	// WithTimeoutForNonLongRunningRequests will call the rest of the request handling in a go-routine with the
-	// context with deadline. The go-routine can keep running, while the timeout logic will return a timeout to the client.
-	handler = genericfilters.WithTimeoutForNonLongRunningRequests(handler, c.LongRunningFunc)
-
-	handler = genericapifilters.WithRequestDeadline(handler, c.AuditBackend, c.AuditPolicyChecker,
-		c.LongRunningFunc, c.Serializer, c.RequestTimeout)
+	handler = genericfilters.WithTimeoutForNonLongRunningRequests(handler, c.LongRunningFunc, c.RequestTimeout)
 	handler = genericfilters.WithWaitGroup(handler, c.LongRunningFunc, c.HandlerChainWaitGroup)
-	handler = WithNonReadyRequestLogging(handler, c.hasBeenReadyCh)
-	handler = WithLateConnectionFilter(handler)
 	handler = genericapifilters.WithRequestInfo(handler, c.RequestInfoResolver)
 	if c.SecureServing != nil && !c.SecureServing.DisableHTTP2 && c.GoawayChance > 0 {
 		handler = genericfilters.WithProbabilisticGoaway(handler, c.GoawayChance)
@@ -848,7 +831,7 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
 	handler = genericapifilters.WithWarningRecorder(handler)
 	handler = genericapifilters.WithCacheControl(handler)
 	handler = genericapifilters.WithRequestReceivedTimestamp(handler)
-	handler = genericfilters.WithPanicRecovery(handler, c.RequestInfoResolver, c.IsTerminating)
+	handler = genericfilters.WithPanicRecovery(handler, c.RequestInfoResolver)
 	return handler
 }
 

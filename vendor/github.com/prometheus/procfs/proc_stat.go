@@ -100,15 +100,6 @@ type ProcStat struct {
 	VSize uint
 	// Resident set size in pages.
 	RSS int
-	// Soft limit in bytes on the rss of the process.
-	RSSLimit uint64
-	// Real-time scheduling priority, a number in the range 1 to 99 for processes
-	// scheduled under a real-time policy, or 0, for non-real-time processes.
-	RTPriority uint
-	// Scheduling policy.
-	Policy uint
-	// Aggregated block I/O delays, measured in clock ticks (centiseconds).
-	DelayAcctBlkIOTicks uint64
 
 	proc fs.FS
 }
@@ -128,8 +119,7 @@ func (p Proc) Stat() (ProcStat, error) {
 	}
 
 	var (
-		ignoreInt64  int64
-		ignoreUint64 uint64
+		ignore int
 
 		s = ProcStat{PID: p.PID, proc: p.fs}
 		l = bytes.Index(data, []byte("("))
@@ -137,7 +127,10 @@ func (p Proc) Stat() (ProcStat, error) {
 	)
 
 	if l < 0 || r < 0 {
-		return ProcStat{}, fmt.Errorf("unexpected format, couldn't extract comm %q", data)
+		return ProcStat{}, fmt.Errorf(
+			"unexpected format, couldn't extract comm: %s",
+			data,
+		)
 	}
 
 	s.Comm = string(data[l+1 : r])
@@ -161,28 +154,10 @@ func (p Proc) Stat() (ProcStat, error) {
 		&s.Priority,
 		&s.Nice,
 		&s.NumThreads,
-		&ignoreInt64,
+		&ignore,
 		&s.Starttime,
 		&s.VSize,
 		&s.RSS,
-		&s.RSSLimit,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreUint64,
-		&ignoreInt64,
-		&ignoreInt64,
-		&s.RTPriority,
-		&s.Policy,
-		&s.DelayAcctBlkIOTicks,
 	)
 	if err != nil {
 		return ProcStat{}, err

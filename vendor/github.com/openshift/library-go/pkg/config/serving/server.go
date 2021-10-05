@@ -58,10 +58,7 @@ func ToServerConfig(ctx context.Context, servingInfo configv1.HTTPServingInfo, a
 	}
 
 	if !authorizationConfig.Disabled {
-		authorizationOptions := genericapiserveroptions.NewDelegatingAuthorizationOptions().
-			WithAlwaysAllowPaths("/healthz", "/readyz", "/livez"). // this allows the kubelet to always get health and readiness without causing an access check
-			WithAlwaysAllowGroups("system:masters")                // in a kube cluster, system:masters can take any action, so there is no need to ask for an authz check
-
+		authorizationOptions := genericapiserveroptions.NewDelegatingAuthorizationOptions()
 		authorizationOptions.RemoteKubeConfigFile = kubeConfigFile
 		// the platform generally uses 30s for /metrics scraping, avoid API request for every other /metrics request to the component
 		authorizationOptions.AllowCacheTTL = 35 * time.Second

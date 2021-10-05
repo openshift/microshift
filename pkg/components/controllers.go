@@ -11,7 +11,16 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 	var (
 		//TODO: fix the rolebinding and sa
 		clusterRoleBinding = []string{
-			"assets/rbac/0000_60_service-ca_00_roles.yaml",
+			"assets/rbac/0000_60_service-ca_00_clusterrolebinding.yaml",
+		}
+		clusterRole = []string{
+			"assets/rbac/0000_60_service-ca_00_clusterrole.yaml",
+		}
+		roleBinding = []string{
+			"assets/rbac/0000_60_service-ca_00_rolebinding.yaml",
+		}
+		role = []string{
+			"assets/rbac/0000_60_service-ca_00_role.yaml",
 		}
 		apps = []string{
 			"assets/apps/0000_60_service-ca_05_deploy.yaml",
@@ -29,6 +38,18 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 	}
 	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
+		return err
+	}
+	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply clusterRole %v: %v", clusterRole, err)
+		return err
+	}
+	if err := assets.ApplyRoleBindings(roleBinding, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply rolebinding %v: %v", roleBinding, err)
+		return err
+	}
+	if err := assets.ApplyRoles(role, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply role %v: %v", role, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {

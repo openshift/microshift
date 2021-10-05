@@ -150,7 +150,7 @@ func makeMounts(pod *v1.Pod, podDir string, container *v1.Container, hostName, h
 		mountEtcHostsFile = mountEtcHostsFile && (mount.MountPath != etcHostsPath)
 		vol, ok := podVolumes[mount.Name]
 		if !ok || vol.Mounter == nil {
-			klog.Errorf("Mount cannot be satisfied for container %q, because the volume is missing or the volume mounter is nil: %+v", container.Name, mount)
+			klog.Errorf("Mount cannot be satisfied for container %q, because the volume is missing (ok=%v) or the volume mounter (vol.Mounter) is nil (vol=%+v): %+v", container.Name, ok, vol, mount)
 			return nil, cleanupAction, fmt.Errorf("cannot find volume %q to mount into container %q", mount.Name, container.Name)
 		}
 
@@ -1033,7 +1033,7 @@ func (kl *Kubelet) removeOrphanedPodStatuses(pods []*v1.Pod, mirrorPods []*v1.Po
 func (kl *Kubelet) deleteOrphanedMirrorPods() {
 	podFullNames := kl.podManager.GetOrphanedMirrorPodNames()
 	for _, podFullname := range podFullNames {
-		if !kl.podKiller.IsPodPendingTerminationByPodName(podFullname) {
+		if !kl.podKiller.IsMirrorPodPendingTerminationByPodName(podFullname) {
 			_, err := kl.podManager.DeleteMirrorPod(podFullname, nil)
 			if err != nil {
 				klog.Errorf("encountered error when deleting mirror pod %q : %v", podFullname, err)
@@ -1137,16 +1137,18 @@ func (kl *Kubelet) HandlePodCleanups() error {
 // PodKiller handles requests for killing pods
 type PodKiller interface {
 	// KillPod receives pod speficier representing the pod to kill
-	KillPod(podPair *kubecontainer.PodPair)
+	KillPod(pair *kubecontainer.PodPair)
 	// PerformPodKillingWork performs the actual pod killing work via calling CRI
 	// It returns after its Close() func is called and all outstanding pod killing requests are served
 	PerformPodKillingWork()
 	// After Close() is called, this pod killer wouldn't accept any more pod killing requests
 	Close()
-	// IsPodPendingTerminationByPodName checks whether any pod for the given full pod name is pending termination (thread safe)
-	IsPodPendingTerminationByPodName(podFullname string) bool
-	// IsPodPendingTerminationByUID checks whether the mirror pod for the given uid is pending termination (thread safe)
-	IsPodPendingTerminationByUID(uid types.UID) bool
+	// IsMirrorPodPendingTerminationByPodName checks whether the mirror pod for the given full pod name is pending termination
+	IsMirrorPodPendingTerminationByPodName(podFullname string) bool
+	// IsMirrorPodPendingTerminationByUID checks whether the mirror pod for the given uid is pending termination
+	IsMirrorPodPendingTerminationByUID(uid types.UID) bool
+	// MarkMirrorPodPendingTermination marks the mirror pod entering grace period of termination
+	MarkMirrorPodPendingTermination(pod *v1.Pod)
 }
 
 // podKillerWithChannel is an implementation of PodKiller which receives pod killing requests via channel
@@ -1154,13 +1156,10 @@ type podKillerWithChannel struct {
 	// Channel for getting pods to kill.
 	podKillingCh chan *kubecontainer.PodPair
 	// lock for synchronization between HandlePodCleanups and pod killer
-	podKillingLock *sync.RWMutex
+	podKillingLock *sync.Mutex
 	// mirrorPodTerminationMap keeps track of the progress of mirror pod termination
 	// The key is the UID of the pod and the value is the full name of the pod
 	mirrorPodTerminationMap map[string]string
-	// podTerminationMap keeps track of the progress of pod termination.
-	// The key is the UID of the pod and the value is the full name of the pod
-	podTerminationMap map[string]string
 	// killPod is the func which invokes runtime to kill the pod
 	killPod func(pod *v1.Pod, runningPod *kubecontainer.Pod, status *kubecontainer.PodStatus, gracePeriodOverride *int64) error
 }
@@ -1169,89 +1168,47 @@ type podKillerWithChannel struct {
 func NewPodKiller(kl *Kubelet) PodKiller {
 	podKiller := &podKillerWithChannel{
 		podKillingCh:            make(chan *kubecontainer.PodPair, podKillingChannelCapacity),
-		podKillingLock:          &sync.RWMutex{},
+		podKillingLock:          &sync.Mutex{},
 		mirrorPodTerminationMap: make(map[string]string),
-		podTerminationMap:       make(map[string]string),
 		killPod:                 kl.killPod,
 	}
 	return podKiller
 }
 
-// IsPodPendingTerminationByUID checks whether the pod for the given uid is pending termination
-func (pk *podKillerWithChannel) IsPodPendingTerminationByUID(uid types.UID) bool {
-	pk.podKillingLock.RLock()
-	defer pk.podKillingLock.RUnlock()
-	if _, ok := pk.podTerminationMap[string(uid)]; ok {
-		return ok
-	}
-	if _, ok := pk.mirrorPodTerminationMap[string(uid)]; ok {
-		return ok
-	}
-	return false
+// IsMirrorPodPendingTerminationByUID checks whether the pod for the given uid is pending termination
+func (pk *podKillerWithChannel) IsMirrorPodPendingTerminationByUID(uid types.UID) bool {
+	pk.podKillingLock.Lock()
+	defer pk.podKillingLock.Unlock()
+	_, ok := pk.mirrorPodTerminationMap[string(uid)]
+	return ok
 }
 
 // IsMirrorPodPendingTerminationByPodName checks whether the given pod is in grace period of termination
-func (pk *podKillerWithChannel) IsPodPendingTerminationByPodName(podFullname string) bool {
-	pk.podKillingLock.RLock()
-	defer pk.podKillingLock.RUnlock()
+func (pk *podKillerWithChannel) IsMirrorPodPendingTerminationByPodName(podFullname string) bool {
+	pk.podKillingLock.Lock()
+	defer pk.podKillingLock.Unlock()
 	for _, name := range pk.mirrorPodTerminationMap {
 		if name == podFullname {
 			return true
 		}
 	}
-	for _, name := range pk.podTerminationMap {
-		if name == podFullname {
-			return true
-		}
-	}
 	return false
 }
 
-func (pk *podKillerWithChannel) markPodTerminated(uid string) {
-	klog.V(4).Infof("marking pod termination %q", uid)
+func (pk *podKillerWithChannel) markMirrorPodTerminated(uid string) {
 	pk.podKillingLock.Lock()
-	defer pk.podKillingLock.Unlock()
+	klog.V(4).Infof("marking pod termination %q", uid)
 	delete(pk.mirrorPodTerminationMap, uid)
-	delete(pk.podTerminationMap, uid)
+	pk.podKillingLock.Unlock()
 }
 
-// KillPod sends pod killing request to the killer after marks the pod
-// unless the given pod has been marked to be killed
-func (pk *podKillerWithChannel) KillPod(podPair *kubecontainer.PodPair) {
+// MarkMirrorPodPendingTermination marks the pod entering grace period of termination
+func (pk *podKillerWithChannel) MarkMirrorPodPendingTermination(pod *v1.Pod) {
+	fullname := kubecontainer.GetPodFullName(pod)
+	klog.V(3).Infof("marking pod pending termination %q", string(pod.UID))
 	pk.podKillingLock.Lock()
-	defer pk.podKillingLock.Unlock()
-	var apiPodExists bool
-	var runningPodExists bool
-	if podPair.APIPod != nil {
-		uid := string(podPair.APIPod.UID)
-		_, apiPodExists = pk.mirrorPodTerminationMap[uid]
-		if !apiPodExists {
-			fullname := kubecontainer.GetPodFullName(podPair.APIPod)
-			klog.V(4).Infof("marking api pod pending termination %q : %q", uid, fullname)
-			pk.mirrorPodTerminationMap[uid] = fullname
-		}
-	}
-	if podPair.RunningPod != nil {
-		uid := string(podPair.RunningPod.ID)
-		_, runningPodExists = pk.podTerminationMap[uid]
-		if !runningPodExists {
-			fullname := podPair.RunningPod.Name
-			klog.V(4).Infof("marking running pod pending termination %q: %q", uid, fullname)
-			pk.podTerminationMap[uid] = fullname
-		}
-	}
-	if apiPodExists || runningPodExists {
-		if apiPodExists && runningPodExists {
-			klog.V(4).Infof("api pod %q and running pod %q is pending termination", podPair.APIPod.UID, podPair.RunningPod.ID)
-		} else if apiPodExists {
-			klog.V(4).Infof("api pod %q is pending termination", podPair.APIPod.UID)
-		} else {
-			klog.V(4).Infof("running pod %q is pending termination", podPair.RunningPod.ID)
-		}
-		return
-	}
-	// Limit to one request per pod
-	pk.podKillingCh <- podPair
+	pk.mirrorPodTerminationMap[string(pod.UID)] = fullname
+	pk.podKillingLock.Unlock()
 }
 
 // Close closes the channel through which requests are delivered
@@ -1259,21 +1216,41 @@ func (pk *podKillerWithChannel) Close() {
 	close(pk.podKillingCh)
 }
 
+// KillPod sends pod killing request to the killer
+func (pk *podKillerWithChannel) KillPod(pair *kubecontainer.PodPair) {
+	pk.podKillingCh <- pair
+}
+
 // PerformPodKillingWork launches a goroutine to kill a pod received from the channel if
 // another goroutine isn't already in action.
 func (pk *podKillerWithChannel) PerformPodKillingWork() {
+	killing := sets.NewString()
+	// guard for the killing set
+	lock := sync.Mutex{}
 	for podPair := range pk.podKillingCh {
 		runningPod := podPair.RunningPod
 		apiPod := podPair.APIPod
 
-		go func(apiPod *v1.Pod, runningPod *kubecontainer.Pod) {
-			klog.V(2).Infof("Killing unwanted pod %q", runningPod.Name)
-			err := pk.killPod(apiPod, runningPod, nil, nil)
-			if err != nil {
-				klog.Errorf("Failed killing the pod %q: %v", runningPod.Name, err)
-			}
-			pk.markPodTerminated(string(runningPod.ID))
-		}(apiPod, runningPod)
+		lock.Lock()
+		exists := killing.Has(string(runningPod.ID))
+		if !exists {
+			killing.Insert(string(runningPod.ID))
+		}
+		lock.Unlock()
+
+		if !exists {
+			go func(apiPod *v1.Pod, runningPod *kubecontainer.Pod) {
+				klog.V(2).Infof("Killing unwanted pod %q", runningPod.Name)
+				err := pk.killPod(apiPod, runningPod, nil, nil)
+				if err != nil {
+					klog.Errorf("Failed killing the pod %q: %v", runningPod.Name, err)
+				}
+				lock.Lock()
+				killing.Delete(string(runningPod.ID))
+				lock.Unlock()
+				pk.markMirrorPodTerminated(string(runningPod.ID))
+			}(apiPod, runningPod)
+		}
 	}
 }
 
@@ -1966,7 +1943,7 @@ func (kl *Kubelet) cleanupOrphanedPodCgroups(pcm cm.PodContainerManager, cgroupP
 		}
 
 		// if the pod is within termination grace period, we shouldn't cleanup the underlying cgroup
-		if kl.podKiller.IsPodPendingTerminationByUID(uid) {
+		if kl.podKiller.IsMirrorPodPendingTerminationByUID(uid) {
 			klog.V(3).Infof("pod %q is pending termination", uid)
 			continue
 		}

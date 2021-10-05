@@ -11,11 +11,10 @@ import (
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
+	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 
-	routev1 "github.com/openshift/api/route/v1"
-	library "github.com/openshift/library-go/pkg/route/routeapihelpers"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 )
 
@@ -23,19 +22,15 @@ var ValidateRouteName = apimachineryvalidation.NameIsDNSSubdomain
 
 // ValidateRoute tests if required fields in the route are set.
 func ValidateRoute(route *routeapi.Route) field.ErrorList {
-	return validateRoute(route, true)
-}
-
-// validateRoute tests if required fields in the route are set.
-func validateRoute(route *routeapi.Route, check_hostname bool) field.ErrorList {
 	//ensure meta is set properly
 	result := validation.ValidateObjectMeta(&route.ObjectMeta, true, ValidateRouteName, field.NewPath("metadata"))
 
 	specPath := field.NewPath("spec")
 
-	if check_hostname && len(route.Spec.Host) > 0 {
-		if err := validateHost(route); err != nil {
-			result = append(result, err...)
+	//host is not required but if it is set ensure it meets DNS requirements
+	if len(route.Spec.Host) > 0 {
+		if len(kvalidation.IsDNS1123Subdomain(route.Spec.Host)) != 0 {
+			result = append(result, field.Invalid(specPath.Child("host"), route.Spec.Host, "host must conform to DNS 952 subdomain conventions"))
 		}
 	}
 
@@ -93,24 +88,10 @@ func validateRoute(route *routeapi.Route, check_hostname bool) field.ErrorList {
 	return result
 }
 
-// validateHost checks that a route's host name meets DNS requirements.
-func validateHost(route *routeapi.Route) field.ErrorList {
-	result := field.ErrorList{}
-	if len(route.Spec.Host) == 0 {
-		return result
-	}
-	hostPath := field.NewPath("spec.host")
-	lenient, _ := route.Annotations[routev1.AllowNonDNSCompliantHostAnnotation]
-	result = library.ValidateHost(route.Spec.Host, lenient, hostPath)
-
-	return result
-}
-
 func ValidateRouteUpdate(route *routeapi.Route, older *routeapi.Route) field.ErrorList {
 	allErrs := validation.ValidateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
 	allErrs = append(allErrs, validation.ValidateImmutableField(route.Spec.WildcardPolicy, older.Spec.WildcardPolicy, field.NewPath("spec", "wildcardPolicy"))...)
-	hostChanged := route.Spec.Host != older.Spec.Host
-	allErrs = append(allErrs, validateRoute(route, hostChanged)...)
+	allErrs = append(allErrs, ValidateRoute(route)...)
 	return allErrs
 }
 
