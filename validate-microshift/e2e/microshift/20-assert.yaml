@@ -1,0 +1,13 @@
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 300
+---
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: router-default 
+  namespace: openshift-ingress
+status:
+  availableReplicas: 1
+  readyReplicas: 1
