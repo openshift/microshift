@@ -1,5 +1,6 @@
 _output/*
 /microshift
+bin
 .idea/
 .vscode/
 .vagrant/

@@ -1,3 +1,9 @@
+# Export shell defined to support Ubuntu
+export SHELL := $(shell which bash)
+
+PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
+KUTTL_VERSION := 0.10.0
+
 # Include openshift build-machinery-go libraries
 include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
 include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
@@ -57,6 +63,43 @@ microshift: build-containerized-cross-build-linux-amd64
 
 update: update-generated-completions
 .PHONY: update
+
+###############################
+# post install validate       #
+###############################
+
+##@ Download utilities
+
+OS := $(shell go env GOOS)
+ARCH := $(shell go env GOARCH)
+
+# download-tool will curl any file $2 and install it to $1.
+define download-tool
+@[ -f $(1) ] || { \
+set -e ;\
+echo "Downloading $(2)" ;\
+curl -sSLo "$(1)" "$(2)" ;\
+chmod a+x "$(1)" ;\
+}
+endef
+
+
+.PHONY: kuttl
+KUTTL := $(PROJECT_DIR)/bin/kuttl
+KUTTL_URL := https://github.com/kudobuilder/kuttl/releases/download/v$(KUTTL_VERSION)/kubectl-kuttl_$(KUTTL_VERSION)_linux_x86_64
+kuttl: ## Download kuttl
+	mkdir bin
+	$(call download-tool,$(KUTTL),$(KUTTL_URL))
+
+.PHONY: test-e2e
+test-e2e: kuttl
+	cd validate-microshift && $(KUTTL) test --namespace test
+
+
+##@ Download utilities
+
+OS := $(shell go env GOOS)
+ARCH := $(shell go env GOARCH)
 
 ###############################
 # host build targets          #
