@@ -9,5 +9,4 @@ metadata:
   name: dns-default
   namespace: openshift-dns
 status:
-  availableReplicas: 1
-  readyReplicas: 1
+  numberReady: 1
