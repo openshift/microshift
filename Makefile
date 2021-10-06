@@ -88,7 +88,7 @@ endef
 KUTTL := $(PROJECT_DIR)/bin/kuttl
 KUTTL_URL := https://github.com/kudobuilder/kuttl/releases/download/v$(KUTTL_VERSION)/kubectl-kuttl_$(KUTTL_VERSION)_linux_x86_64
 kuttl: ## Download kuttl
-	mkdir bin
+	mkdir -p bin
 	$(call download-tool,$(KUTTL),$(KUTTL_URL))
 
 .PHONY: test-e2e
