@@ -1,27 +1,22 @@
 policy_module(microshift, 1.0.0)
 
 gen_require(`
-    type container_runtime_t, container_var_lib_t, container_runtime_exec_t, init_t;
-    class bpf prog_run;
-')
-filetrans_pattern(container_runtime_t, container_var_lib_t, container_runtime_exec_t, dir, "data")
-
-allow container_runtime_t init_t:bpf prog_run;
-
-gen_require(`
     type container_runtime_t, var_lib_t, container_var_lib_t, container_runtime_tmpfs_t, container_t;
     class file { open read };
 ')
 filetrans_pattern(container_runtime_t, var_lib_t, container_var_lib_t, dir, "kubelet")
 
-allow container_t container_var_lib_t:file open;
-allow container_t container_runtime_tmpfs_t:file read;
+allow container_t container_runtime_tmpfs_t:file read_file_perms;
+allow container_t container_runtime_tmpfs_t:lnk_file read_file_perms;
 allow container_t container_runtime_tmpfs_t:file open;
+allow container_t container_runtime_tmpfs_t:file read;
+allow container_t container_var_lib_t:file open;
+allow container_t container_var_lib_t:file read;
 
 gen_require(`
     type container_runtime_t, container_var_lib_t, container_file_t, container_t, container_runtime_tmpfs_t;
     class file read;
 ')
 filetrans_pattern(container_runtime_t, container_var_lib_t, container_file_t, dir, "pods")
-allow container_t container_var_lib_t:file read;
-allow container_t container_var_lib_t:lnk_file read;
+
+fs_tmpfs_filetrans(container_runtime_t, container_runtime_tmpfs_t, { lnk_file})
