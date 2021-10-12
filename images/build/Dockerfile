@@ -14,8 +14,6 @@ ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
 
 WORKDIR $GOPATH/src/github.com/redhat-et/microshift
 
-RUN yum install glibc-static -y
-
 COPY . .
 
 RUN make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG BIN_TIMESTAMP=$BIN_TIMESTAMP
