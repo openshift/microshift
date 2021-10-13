@@ -1,12 +1,9 @@
-name: release
+name: nightly build
 # only execute a release when triggered manually
 on:
   workflow_dispatch:
   schedule:
     - cron: "15 23 * * *"  #11:15 PM every day
-env:
-  RELEASE_REG_USER: ${{ secrets.REGISTRY_USER }}
-  RELEASE_REG_PASS: ${{ secrets.REGISTRY_PASS }}
 
 jobs:
   build:
@@ -26,7 +23,8 @@ jobs:
       - name: generate checksum
         run: sha256sum ./microshift-amd64 ./microshift-arm64 >> ./release.sha256
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: post nightly release
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "nightly"
