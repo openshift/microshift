@@ -14,6 +14,7 @@ import (
 	kautoscalingv2beta1 "k8s.io/api/autoscaling/v2beta1"
 	kbatchv1 "k8s.io/api/batch/v1"
 	kbatchv1beta1 "k8s.io/api/batch/v1beta1"
+	kbatchv2alpha1 "k8s.io/api/batch/v2alpha1"
 	kcertificatesv1beta1 "k8s.io/api/certificates/v1beta1"
 	kcorev1 "k8s.io/api/core/v1"
 	keventsv1beta1 "k8s.io/api/events/v1beta1"
@@ -40,7 +41,6 @@ import (
 	"github.com/openshift/api/imageregistry"
 	"github.com/openshift/api/kubecontrolplane"
 	"github.com/openshift/api/network"
-	"github.com/openshift/api/networkoperator"
 	"github.com/openshift/api/oauth"
 	"github.com/openshift/api/openshiftcontrolplane"
 	"github.com/openshift/api/operator"
@@ -70,7 +70,6 @@ var (
 		imageregistry.Install,
 		kubecontrolplane.Install,
 		network.Install,
-		networkoperator.Install,
 		oauth.Install,
 		openshiftcontrolplane.Install,
 		operator.Install,
@@ -102,6 +101,7 @@ var (
 		kautoscalingv2beta1.AddToScheme,
 		kbatchv1.AddToScheme,
 		kbatchv1beta1.AddToScheme,
+		kbatchv2alpha1.AddToScheme,
 		kcertificatesv1beta1.AddToScheme,
 		kcorev1.AddToScheme,
 		keventsv1beta1.AddToScheme,

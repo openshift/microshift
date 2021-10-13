@@ -6,7 +6,7 @@ metadata:
   labels:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
   name: router-internal-default
-  namespace: openshift-ingress     
+  namespace: openshift-ingress
 spec:
   selector:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default

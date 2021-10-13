@@ -4,7 +4,7 @@ metadata:
   labels:
     dns.operator.openshift.io/owning-dns: default
   name: dns-default
-  namespace: openshift-dns    
+  namespace: openshift-dns
 spec:
   selector:
     matchLabels:
@@ -18,7 +18,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
       - name: dns
-        image: quay.io/openshift/okd-content@sha256:fb7eafdcb7989575119e1807e4adc2eb29f8165dec5c148b9c3a44d48458d8a7
+        image: {{ .ReleaseImage.coredns }}
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         command: [ "coredns" ]
@@ -35,17 +35,16 @@ spec:
           name: dns-tcp
           protocol: TCP
         readinessProbe:
-          failureThreshold: 3
           httpGet:
-            path: /health
-            port: 8080
+            path: /ready
+            port: 8181
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
+          periodSeconds: 3
           successThreshold: 1
-          timeoutSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 3
         livenessProbe:
-          failureThreshold: 5
           httpGet:
             path: /health
             port: 8080
@@ -53,12 +52,13 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 5
           successThreshold: 1
+          failureThreshold: 5
         resources:
           requests:
             cpu: 50m
             memory: 70Mi
       - name: kube-rbac-proxy
-        image: quay.io/openshift/okd-content@sha256:1aa5bb03d0485ec2db2c7871a1eeaef83e9eabf7e9f1bc2c841cf1a759817c99
+        image: {{ .ReleaseImage.kube_rbac_proxy }}
         args:
         - --logtostderr
         - --secure-listen-address=:9154
@@ -78,7 +78,7 @@ spec:
           name: metrics-tls
           readOnly: true
       - name: dns-node-resolver
-        image: quay.io/openshift/okd-content@sha256:b20d195c721cd3b6215e5716b5569cbabbe861559af7dce07b5f8f3d38e6d701
+        image: {{ .ReleaseImage.cli }}
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         securityContext:
@@ -88,9 +88,12 @@ spec:
           mountPath: /etc/hosts
         env:
         - name: SERVICES
+          # Comma or space separated list of services
+          # NOTE: For now, ensure these are relative names; for each relative name,
+          # an alias with the CLUSTER_DOMAIN suffix will also be added.
           value: "image-registry.openshift-image-registry.svc"
         - name: CLUSTER_DOMAIN
-          value: cluster.local        
+          value: cluster.local
         command:
         - /bin/bash
         - -c

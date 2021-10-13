@@ -62,7 +62,7 @@ func RunControllerServer(servingInfo configv1.HTTPServingInfo, kubeExternal clie
 
 	//handler = apifilters.WithAuthentication(handler, authn, apifilters.Unauthorized(legacyscheme.Codecs, false), nil)
 	handler = apifilters.WithAuthentication(handler, authn, apifilters.Unauthorized(serializer.WithoutConversionCodecFactory{CodecFactory: legacyscheme.Codecs}), nil)
-	handler = apiserverfilters.WithPanicRecovery(handler, requestInfoResolver, nil)
+	handler = apiserverfilters.WithPanicRecovery(handler, requestInfoResolver)
 	handler = apifilters.WithRequestInfo(handler, requestInfoResolver)
 
 	return serveControllers(servingInfo, handler, clientCAs)

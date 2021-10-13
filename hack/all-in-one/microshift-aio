@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -euxo pipefail
+
+setsebool -P container_manage_cgroup true
+
+if ! /usr/bin/podman volume exists microshift-data
+then
+  /usr/bin/podman volume create microshift-data
+fi
+
+[[ -d /etc/microshift-aio ]] || mkdir /etc/microshift-aio
+cat <<EOF > /etc/microshift-aio/microshift-aio.conf
+export KUBECONFIG=$(/usr/bin/podman volume inspect microshift-data --format "{{.Mountpoint}}")/microshift/resources/kubeadmin/kubeconfig
+EOF
+

@@ -43,7 +43,7 @@ func startFlannel(kubeconfigPath string) error {
 		logrus.Warningf("failed to apply cm %v: %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ds, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply ds %v: %v", ds, err)
 		return err
 	}

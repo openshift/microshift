@@ -18,6 +18,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -34,6 +35,7 @@ import (
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 )
 
 func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
@@ -165,15 +167,74 @@ func newOpenShiftControllerManagerCommand() *cobra.Command {
 	return cmd
 }
 
-func OCPControllerManager(cfg *config.MicroshiftConfig) {
-	command := newOpenShiftControllerManagerCommand()
-	args := []string{
-		"--config=" + cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml",
-	}
-	startArgs := append(args, "start")
-	command.SetArgs(startArgs)
+type OCPControllerManager struct {
+	ConfigFilePath string
+	Output         io.Writer
+}
 
+const (
+	// OCPControllerManager component name
+	componentOCM = "ocp-controller-manager"
+)
+
+func NewOpenShiftControllerManager(cfg *config.MicroshiftConfig) *OCPControllerManager {
+	s := &OCPControllerManager{}
+	s.configure(cfg)
+	return s
+}
+
+func (s *OCPControllerManager) Name() string           { return componentOCM }
+func (s *OCPControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
+
+func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) error {
+	var configFilePath = cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml"
+
+	if err := config.OpenShiftControllerManagerConfig(cfg); err != nil {
+		logrus.Infof("Failed to create a new ocp-controller-manager configuration: %v", err)
+		return err
+	}
+	args := []string{
+		"--config=" + configFilePath,
+	}
+
+	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
+	options.ConfigFilePath = configFilePath
+
+	cmd := &cobra.Command{
+		Use:          componentOCM,
+		Long:         componentOCM,
+		SilenceUsage: true,
+		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
+	}
+
+	flags := cmd.Flags()
+	cmd.SetArgs(args)
+	flags.StringVar(&options.ConfigFilePath, "config", options.ConfigFilePath, "Location of the master configuration file to run from.")
+	cmd.MarkFlagFilename("config", "yaml", "yml")
+	cmd.MarkFlagRequired("config")
+
+	s.ConfigFilePath = options.ConfigFilePath
+	s.Output = options.Output
+
+	return nil
+}
+
+func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+
+	// run readiness check
 	go func() {
-		logrus.Fatalf("ocp controller-manager exited: %v", command.Execute())
+		healthcheckStatus := util.RetryTCPConnection("127.0.0.1", "8445")
+		if !healthcheckStatus {
+			logrus.Fatalf("%s failed to start", s.Name())
+		}
+		logrus.Infof("%s is ready", s.Name())
+		close(ready)
 	}()
+	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
+	options.ConfigFilePath = s.ConfigFilePath
+	if err := options.StartControllerManager(); err != nil {
+		logrus.Fatalf("Failed to start ocp-controller-manager %v", err)
+	}
+	return ctx.Err()
 }

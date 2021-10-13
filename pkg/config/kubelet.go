@@ -16,6 +16,7 @@ limitations under the License.
 package config
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -36,6 +37,7 @@ tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/
 cgroupDriver: "systemd"
 cgroupRoot: /
 failSwapOn: false
+volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
   - ` + cfg.Cluster.DNS + `
 clusterDomain: ` + cfg.Cluster.Domain + `
@@ -60,6 +62,12 @@ featureGates:
   ServiceNodeExclusion: true
   SupportPodPidsLimit: true
 serverTLSBootstrap: false #TODO`)
+
+	// Load real resolv.conf in case systemd-resolved is used
+	// https://github.com/coredns/coredns/blob/master/plugin/loop/README.md#troubleshooting-loops-in-kubernetes-clusters
+	if _, err := os.Stat("/run/systemd/resolve/resolv.conf"); !errors.Is(err, os.ErrNotExist) {
+		data = append(data, "\nresolvConf: /run/systemd/resolve/resolv.conf"...)
+	}
 	os.MkdirAll(filepath.Dir(cfg.DataDir+"/resources/kubelet/config/config.yaml"), os.FileMode(0755))
 	return ioutil.WriteFile(cfg.DataDir+"/resources/kubelet/config/config.yaml", data, 0644)
 }
@@ -97,7 +105,7 @@ apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 clientConnection:
   kubeconfig: ` + cfg.DataDir + `/resources/kube-proxy/kubeconfig
-hostnameOverride: ` + cfg.HostName + `
+hostnameOverride: ` + cfg.NodeName + `
 clusterCIDR: ` + cfg.Cluster.ClusterCIDR + `
 mode: "iptables"
 iptables:

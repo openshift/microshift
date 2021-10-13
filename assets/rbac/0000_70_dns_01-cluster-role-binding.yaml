@@ -8,5 +8,4 @@ subjects:
   namespace: openshift-dns
 roleRef:
   kind: ClusterRole
-  apiGroup: rbac.authorization.k8s.io
   name: openshift-dns

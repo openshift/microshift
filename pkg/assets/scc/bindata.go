@@ -78,7 +78,9 @@ groups:
 kind: SecurityContextConstraints
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: anyuid provides all features of the restricted SCC
       but allows users to run with any UID and any GID.
@@ -134,7 +136,9 @@ groups: []
 kind: SecurityContextConstraints
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: 'hostaccess allows access to all host namespaces but
       still requires pods to be run with a UID and SELinux context that are allocated
@@ -196,7 +200,9 @@ groups: []
 kind: SecurityContextConstraints
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: |-
       hostmount-anyuid provides all the features of the
@@ -258,7 +264,9 @@ groups: []
 kind: SecurityContextConstraints
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: hostnetwork allows using host networking and host ports
       but still requires pods to be run with a UID and SELinux context that are allocated
@@ -318,7 +326,9 @@ groups: []
 kind: SecurityContextConstraints
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: nonroot provides all features of the restricted SCC
       but allows users to run with any non-root UID.  The user must specify the UID
@@ -384,7 +394,9 @@ groups:
 kind: SecurityContextConstraints
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: 'privileged allows access to all privileged and host
       features and the ability to run as any user, any group, any fsGroup, and with
@@ -441,7 +453,9 @@ groups:
 kind: SecurityContextConstraints
 metadata:
   annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: restricted denies access to all host features and requires
       pods to be run with a UID, and SELinux context that are allocated to the namespace.  This

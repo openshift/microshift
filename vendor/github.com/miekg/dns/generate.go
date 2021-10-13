@@ -20,13 +20,13 @@ import (
 // of $ after that are interpreted.
 func (zp *ZoneParser) generate(l lex) (RR, bool) {
 	token := l.token
-	step := int64(1)
+	step := 1
 	if i := strings.IndexByte(token, '/'); i >= 0 {
 		if i+1 == len(token) {
 			return zp.setParseError("bad step in $GENERATE range", l)
 		}
 
-		s, err := strconv.ParseInt(token[i+1:], 10, 64)
+		s, err := strconv.Atoi(token[i+1:])
 		if err != nil || s <= 0 {
 			return zp.setParseError("bad step in $GENERATE range", l)
 		}
@@ -40,24 +40,20 @@ func (zp *ZoneParser) generate(l lex) (RR, bool) {
 		return zp.setParseError("bad start-stop in $GENERATE range", l)
 	}
 
-	start, err := strconv.ParseInt(sx[0], 10, 64)
+	start, err := strconv.Atoi(sx[0])
 	if err != nil {
 		return zp.setParseError("bad start in $GENERATE range", l)
 	}
 
-	end, err := strconv.ParseInt(sx[1], 10, 64)
+	end, err := strconv.Atoi(sx[1])
 	if err != nil {
 		return zp.setParseError("bad stop in $GENERATE range", l)
 	}
-	if end < 0 || start < 0 || end < start || (end-start)/step > 65535 {
+	if end < 0 || start < 0 || end < start {
 		return zp.setParseError("bad range in $GENERATE range", l)
 	}
 
-	// _BLANK
-	l, ok := zp.c.Next()
-	if !ok || l.value != zBlank {
-		return zp.setParseError("garbage after $GENERATE range", l)
-	}
+	zp.c.Next() // _BLANK
 
 	// Create a complete new string, which we then parse again.
 	var s string
@@ -85,7 +81,6 @@ func (zp *ZoneParser) generate(l lex) (RR, bool) {
 	}
 	zp.sub = NewZoneParser(r, zp.origin, zp.file)
 	zp.sub.includeDepth, zp.sub.includeAllowed = zp.includeDepth, zp.includeAllowed
-	zp.sub.generateDisallowed = true
 	zp.sub.SetDefaultTTL(defaultTtl)
 	return zp.subNext()
 }
@@ -94,10 +89,10 @@ type generateReader struct {
 	s  string
 	si int
 
-	cur   int64
-	start int64
-	end   int64
-	step  int64
+	cur   int
+	start int
+	end   int
+	step  int
 
 	mod bytes.Buffer
 
@@ -173,7 +168,7 @@ func (r *generateReader) ReadByte() (byte, error) {
 			return '$', nil
 		}
 
-		var offset int64
+		var offset int
 
 		// Search for { and }
 		if r.s[si+1] == '{' {
@@ -208,7 +203,7 @@ func (r *generateReader) ReadByte() (byte, error) {
 }
 
 // Convert a $GENERATE modifier 0,0,d to something Printf can deal with.
-func modToPrintf(s string) (string, int64, string) {
+func modToPrintf(s string) (string, int, string) {
 	// Modifier is { offset [ ,width [ ,base ] ] } - provide default
 	// values for optional width and type, if necessary.
 	var offStr, widthStr, base string
@@ -229,12 +224,12 @@ func modToPrintf(s string) (string, int64, string) {
 		return "", 0, "bad base in $GENERATE"
 	}
 
-	offset, err := strconv.ParseInt(offStr, 10, 64)
+	offset, err := strconv.Atoi(offStr)
 	if err != nil {
 		return "", 0, "bad offset in $GENERATE"
 	}
 
-	width, err := strconv.ParseInt(widthStr, 10, 64)
+	width, err := strconv.Atoi(widthStr)
 	if err != nil || width < 0 || width > 255 {
 		return "", 0, "bad width in $GENERATE"
 	}

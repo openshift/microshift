@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
+	"github.com/openshift/microshift/pkg/kustomize"
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/servicemanager"
 	"github.com/openshift/microshift/pkg/util"
@@ -56,24 +58,23 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		logrus.Fatalf("Microshift must be run privileged for role 'node'")
 	}
 
-	// if data dir is missing, create and initialize it
+	os.MkdirAll(cfg.DataDir, 0700)
+	os.MkdirAll(cfg.LogDir, 0700)
+
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
-	if _, err := os.Stat(cfg.DataDir); errors.Is(err, os.ErrNotExist) {
-		os.MkdirAll(cfg.DataDir, 0700)
+	if _, err := os.Stat(filepath.Join(cfg.DataDir, "certs")); errors.Is(err, os.ErrNotExist) {
 		initAll(cfg)
 	}
-	// if log dir is missing, create it
-	os.MkdirAll(cfg.LogDir, 0700)
 
 	m := servicemanager.NewServiceManager()
 	if config.StringInList("controlplane", cfg.Roles) {
 		util.Must(m.AddService(controllers.NewEtcd(cfg)))
 		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
-		// util.Must(m.AddService(controllers.NewKubeScheduler()))
-		// util.Must(m.AddService(controllers.NewKubeControllerManager()))
+		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
+		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
 		// util.Must(m.AddService(controllers.NewOpenShiftPrepJob()))
 		// util.Must(m.AddService(controllers.NewOpenShiftAPIServer()))
-		// util.Must(m.AddService(controllers.NewOpenShiftControllerManager()))
+		util.Must(m.AddService(controllers.NewOpenShiftControllerManager(cfg)))
 		// util.Must(m.AddService(controllers.NewOpenShiftAPIComponents()))
 		// util.Must(m.AddService(controllers.NewInfrastructureServices()))
 
@@ -89,25 +90,12 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 				return nil
 			},
 		)))
+		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	}
 
 	if config.StringInList("node", cfg.Roles) {
-		util.Must(m.AddService(servicemanager.NewGenericService(
-			"other-node",
-			[]string{"kube-apiserver"},
-			func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-				defer close(stopped)
-				defer close(ready)
-
-				if err := node.StartKubelet(cfg); err != nil {
-					return err
-				}
-				if err := node.StartKubeProxy(cfg); err != nil {
-					return err
-				}
-				return nil
-			},
-		)))
+		util.Must(m.AddService(node.NewKubeletServer(cfg)))
+		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
 	}
 
 	logrus.Info("Starting Microshift")
@@ -149,12 +137,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 }
 
 func startControllerOnly(cfg *config.MicroshiftConfig) error {
-	logrus.Infof("starting kube-controller-manager")
-	controllers.KubeControllerManager(cfg)
-
-	logrus.Infof("starting kube-scheduler")
-	controllers.KubeScheduler(cfg)
-
 	if err := controllers.PrepareOCP(cfg); err != nil {
 		return err
 	}
@@ -163,7 +145,7 @@ func startControllerOnly(cfg *config.MicroshiftConfig) error {
 	controllers.OCPAPIServer(cfg)
 
 	//TODO: cloud provider
-	controllers.OCPControllerManager(cfg)
+	// controllers.OCPControllerManager(cfg)
 
 	if err := controllers.StartOCPAPIComponents(cfg); err != nil {
 		return err

@@ -16,8 +16,12 @@ limitations under the License.
 package cmd
 
 import (
+	"net"
+
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
+
+	ctrl "k8s.io/kubernetes/pkg/controlplane"
 )
 
 func initAll(cfg *config.MicroshiftConfig) error {
@@ -41,6 +45,16 @@ func initAll(cfg *config.MicroshiftConfig) error {
 }
 
 func initCerts(cfg *config.MicroshiftConfig) error {
+	_, svcNet, err := net.ParseCIDR(cfg.Cluster.ServiceCIDR)
+	if err != nil {
+		return err
+	}
+
+	_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
+	if err != nil {
+		return err
+	}
+
 	// store root CA for all
 	//TODO generate ca bundles for each component
 	if err := util.StoreRootCA("https://kubernetes.svc", cfg.DataDir+"/certs/ca-bundle",
@@ -52,25 +66,25 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	if err := util.GenCerts("etcd-server", cfg.DataDir+"/certs/etcd",
 		"etcd-serving.crt", "etcd-serving.key",
-		[]string{"localhost", cfg.HostIP, "127.0.0.1", cfg.HostName}); err != nil {
+		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
 		return err
 	}
 
 	if err := util.GenCerts("etcd-peer", cfg.DataDir+"/certs/etcd",
 		"etcd-peer.crt", "etcd-peer.key",
-		[]string{"localhost", cfg.HostIP, "127.0.0.1", cfg.HostName}); err != nil {
+		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
 		return err
 	}
 
 	// kube-apiserver
 	if err := util.GenCerts("etcd-client", cfg.DataDir+"/resources/kube-apiserver/secrets/etcd-client",
 		"tls.crt", "tls.key",
-		[]string{"localhost", cfg.HostIP, "127.0.0.1", cfg.HostName}); err != nil {
+		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
 		return err
 	}
 	if err := util.GenCerts("kube-apiserver", cfg.DataDir+"/certs/kube-apiserver/secrets/service-network-serving-certkey",
 		"tls.crt", "tls.key",
-		[]string{"kube-apiserver", cfg.HostIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost", "10.43.0.1"}); err != nil {
+		[]string{"kube-apiserver", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost", apiServerServiceIP.String()}); err != nil {
 		return err
 	}
 	if err := util.GenKeys(cfg.DataDir+"/resources/kube-apiserver/secrets/service-account-key",
@@ -94,24 +108,24 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 
 	if err := util.GenCerts("kubelet", cfg.DataDir+"/resources/kubelet/secrets/kubelet-client",
 		"tls.crt", "tls.key",
-		[]string{"localhost", cfg.HostIP, "127.0.0.1", cfg.HostName}); err != nil {
+		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
 		return err
 	}
 
 	// ocp
 	if err := util.GenCerts("openshift-apiserver", cfg.DataDir+"/resources/ocp-apiserver/secrets",
 		"tls.crt", "tls.key",
-		[]string{"openshift-apiserver", cfg.HostIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		[]string{"openshift-apiserver", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
 	if err := util.GenCerts("openshift-controller-manager", cfg.DataDir+"/resources/ocp-controller-manager/secrets",
 		"tls.crt", "tls.key",
-		[]string{"openshift-controller-manager", cfg.HostIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		[]string{"openshift-controller-manager", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
 	if err := util.GenCerts("service-ca", cfg.DataDir+"/resources/service-ca/secrets/service-ca",
 		"tls.crt", "tls.key",
-		[]string{"localhost", cfg.HostIP, "127.0.0.1", cfg.HostName, "10.43.0.1"}); err != nil {
+		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName, apiServerServiceIP.String()}); err != nil {
 		return err
 	}
 	return nil
@@ -158,7 +172,7 @@ func initKubeconfig(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 	// per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
-	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubelet/kubeconfig", "system:node:"+cfg.HostName, []string{"system:nodes"}, cfg.Cluster.URL); err != nil {
+	if err := util.Kubeconfig(cfg.DataDir+"/resources/kubelet/kubeconfig", "system:node:"+cfg.NodeName, []string{"system:nodes"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
 	if err := util.Kubeconfig(cfg.DataDir+"/resources/kube-proxy/kubeconfig", "system:kube-proxy", []string{"system:nodes"}, cfg.Cluster.URL); err != nil {

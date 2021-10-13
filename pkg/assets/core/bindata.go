@@ -1,18 +1,10 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
-// assets/core/0000_00_cluster-version-operator_00_namespace.yaml
 // assets/core/0000_00_flannel-configmap.yaml
 // assets/core/0000_00_flannel-service-account.yaml
 // assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
-// assets/core/0000_50_service-ca-operator_01_namespace.yaml
-// assets/core/0000_50_service-ca-operator_02_service.yaml
-// assets/core/0000_50_service-ca-operator_03_cm.yaml
-// assets/core/0000_50_service-ca-operator_04_sa.yaml
 // assets/core/0000_60_service-ca_01_namespace.yaml
 // assets/core/0000_60_service-ca_04_sa.yaml
-// assets/core/0000_70_dns-operator_00-namespace.yaml
-// assets/core/0000_70_dns-operator_01-service-account.yaml
-// assets/core/0000_70_dns-operator_01-service.yaml
 // assets/core/0000_70_dns_00-namespace.yaml
 // assets/core/0000_70_dns_01-configmap.yaml
 // assets/core/0000_70_dns_01-service-account.yaml
@@ -23,8 +15,6 @@
 // assets/core/0000_80_openshift-router-namespace.yaml
 // assets/core/0000_80_openshift-router-service-account.yaml
 // assets/core/0000_80_openshift-router-service.yaml
-// assets/core/0001_00_cluster-version-operator_03_service.yaml
-// assets/core/openshift-sdn-cm.yaml
 package assets
 
 import (
@@ -76,33 +66,6 @@ func (fi bindataFileInfo) IsDir() bool {
 // Sys return file is sys mode
 func (fi bindataFileInfo) Sys() interface{} {
 	return nil
-}
-
-var _assetsCore0000_00_clusterVersionOperator_00_namespaceYaml = []byte(`apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-cluster-version
-  annotations:
-    openshift.io/node-selector: ""
-  labels:
-    name: openshift-cluster-version
-    openshift.io/run-level: "1"
-    openshift.io/cluster-monitoring: "true"
-`)
-
-func assetsCore0000_00_clusterVersionOperator_00_namespaceYamlBytes() ([]byte, error) {
-	return _assetsCore0000_00_clusterVersionOperator_00_namespaceYaml, nil
-}
-
-func assetsCore0000_00_clusterVersionOperator_00_namespaceYaml() (*asset, error) {
-	bytes, err := assetsCore0000_00_clusterVersionOperator_00_namespaceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_00_cluster-version-operator_00_namespace.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
 }
 
 var _assetsCore0000_00_flannelConfigmapYaml = []byte(`kind: ConfigMap
@@ -204,125 +167,12 @@ func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*as
 	return a, nil
 }
 
-var _assetsCore0000_50_serviceCaOperator_01_namespaceYaml = []byte(`apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    openshift.io/run-level: "1"
-    openshift.io/cluster-monitoring: "true"
-  name: openshift-service-ca-operator
-  annotations:
-    openshift.io/node-selector: ""
-`)
-
-func assetsCore0000_50_serviceCaOperator_01_namespaceYamlBytes() ([]byte, error) {
-	return _assetsCore0000_50_serviceCaOperator_01_namespaceYaml, nil
-}
-
-func assetsCore0000_50_serviceCaOperator_01_namespaceYaml() (*asset, error) {
-	bytes, err := assetsCore0000_50_serviceCaOperator_01_namespaceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_50_service-ca-operator_01_namespace.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_50_serviceCaOperator_02_serviceYaml = []byte(`apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    service.beta.openshift.io/serving-cert-secret-name: serving-cert
-  labels:
-    app: service-ca-operator
-  name: metrics
-  namespace: openshift-service-ca-operator
-spec:
-  ports:
-  - name: https
-    port: 443
-    protocol: TCP
-    targetPort: 8443
-  selector:
-    app: service-ca-operator
-  sessionAffinity: None
-  type: ClusterIP
-`)
-
-func assetsCore0000_50_serviceCaOperator_02_serviceYamlBytes() ([]byte, error) {
-	return _assetsCore0000_50_serviceCaOperator_02_serviceYaml, nil
-}
-
-func assetsCore0000_50_serviceCaOperator_02_serviceYaml() (*asset, error) {
-	bytes, err := assetsCore0000_50_serviceCaOperator_02_serviceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_50_service-ca-operator_02_service.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_50_serviceCaOperator_03_cmYaml = []byte(`apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: openshift-service-ca-operator
-  name: service-ca-operator-config
-data:
-  operator-config.yaml: |
-    apiVersion: operator.openshift.io/v1alpha1
-    kind: GenericOperatorConfig
-`)
-
-func assetsCore0000_50_serviceCaOperator_03_cmYamlBytes() ([]byte, error) {
-	return _assetsCore0000_50_serviceCaOperator_03_cmYaml, nil
-}
-
-func assetsCore0000_50_serviceCaOperator_03_cmYaml() (*asset, error) {
-	bytes, err := assetsCore0000_50_serviceCaOperator_03_cmYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_50_service-ca-operator_03_cm.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_50_serviceCaOperator_04_saYaml = []byte(`apiVersion: v1
-kind: ServiceAccount
-metadata:
-  namespace: openshift-service-ca-operator
-  name: service-ca-operator
-  labels:
-    app: service-ca-operator
-`)
-
-func assetsCore0000_50_serviceCaOperator_04_saYamlBytes() ([]byte, error) {
-	return _assetsCore0000_50_serviceCaOperator_04_saYaml, nil
-}
-
-func assetsCore0000_50_serviceCaOperator_04_saYaml() (*asset, error) {
-	bytes, err := assetsCore0000_50_serviceCaOperator_04_saYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_50_service-ca-operator_04_sa.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _assetsCore0000_60_serviceCa_01_namespaceYaml = []byte(`apiVersion: v1
 kind: Namespace
 metadata:
-  labels:
-    openshift.io/run-level: "1"
-    openshift.io/cluster-monitoring: "true"
   name: openshift-service-ca
+  annotations:
+    openshift.io/node-selector: ""
 `)
 
 func assetsCore0000_60_serviceCa_01_namespaceYamlBytes() ([]byte, error) {
@@ -345,8 +195,6 @@ kind: ServiceAccount
 metadata:
   namespace: openshift-service-ca
   name: service-ca
-  labels:
-    app: service-ca
 `)
 
 func assetsCore0000_60_serviceCa_04_saYamlBytes() ([]byte, error) {
@@ -360,92 +208,6 @@ func assetsCore0000_60_serviceCa_04_saYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/core/0000_60_service-ca_04_sa.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_70_dnsOperator_00NamespaceYaml = []byte(`kind: Namespace
-apiVersion: v1
-metadata:
-  annotations:
-    openshift.io/node-selector: ""
-  name: openshift-dns-operator
-  labels:
-    # set value to avoid depending on kube admission that depends on openshift apis
-    openshift.io/run-level: "0"
-    # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
-    openshift.io/cluster-monitoring: "true"
-`)
-
-func assetsCore0000_70_dnsOperator_00NamespaceYamlBytes() ([]byte, error) {
-	return _assetsCore0000_70_dnsOperator_00NamespaceYaml, nil
-}
-
-func assetsCore0000_70_dnsOperator_00NamespaceYaml() (*asset, error) {
-	bytes, err := assetsCore0000_70_dnsOperator_00NamespaceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_70_dns-operator_00-namespace.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_70_dnsOperator_01ServiceAccountYaml = []byte(`# Account for the operator itself. It should require namespace scoped
-# permissions.
-kind: ServiceAccount
-apiVersion: v1
-metadata:
-  name: dns-operator
-  namespace: openshift-dns-operator
-`)
-
-func assetsCore0000_70_dnsOperator_01ServiceAccountYamlBytes() ([]byte, error) {
-	return _assetsCore0000_70_dnsOperator_01ServiceAccountYaml, nil
-}
-
-func assetsCore0000_70_dnsOperator_01ServiceAccountYaml() (*asset, error) {
-	bytes, err := assetsCore0000_70_dnsOperator_01ServiceAccountYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_70_dns-operator_01-service-account.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_70_dnsOperator_01ServiceYaml = []byte(`apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    service.beta.openshift.io/serving-cert-secret-name: metrics-tls
-  labels:
-    name: dns-operator
-  name: metrics
-  namespace: openshift-dns-operator
-spec:
-  ports:
-  - name: metrics
-    port: 9393
-    targetPort: metrics
-  selector:
-    name: dns-operator
-  type: ClusterIP
-`)
-
-func assetsCore0000_70_dnsOperator_01ServiceYamlBytes() ([]byte, error) {
-	return _assetsCore0000_70_dnsOperator_01ServiceYaml, nil
-}
-
-func assetsCore0000_70_dnsOperator_01ServiceYaml() (*asset, error) {
-	bytes, err := assetsCore0000_70_dnsOperator_01ServiceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_70_dns-operator_01-service.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -482,18 +244,24 @@ var _assetsCore0000_70_dns_01ConfigmapYaml = []byte(`apiVersion: v1
 data:
   Corefile: |
     .:5353 {
+        bufsize 512
         errors
-        health
+        health {
+            lameduck 20s
+        }
+        ready
         kubernetes cluster.local in-addr.arpa ip6.arpa {
             pods insecure
             upstream
             fallthrough in-addr.arpa ip6.arpa
         }
-        prometheus :9153
+        prometheus 127.0.0.1:9153
         forward . /etc/resolv.conf {
             policy sequential
         }
-        cache 30
+        cache 900 {
+            denial 9984 30
+        }
         reload
     }
 kind: ConfigMap
@@ -549,10 +317,11 @@ metadata:
   labels:
       dns.operator.openshift.io/owning-dns: default
   name: dns-default
-  namespace: openshift-dns          
-# name, namespace,labels and annotations are set at runtime
+  namespace: openshift-dns
 spec:
   clusterIP: {{.ClusterIP}}
+  selector:
+    dns.operator.openshift.io/daemonset-dns: default
   ports:
   - name: dns
     port: 53
@@ -566,8 +335,10 @@ spec:
     port: 9154
     targetPort: metrics
     protocol: TCP
-  selector:
-    dns.operator.openshift.io/daemonset-dns: default    
+  # TODO: Uncomment when service topology feature gate is enabled.
+  #topologyKeys:
+  #  - "kubernetes.io/hostname"
+  #  - "*"
 `)
 
 func assetsCore0000_70_dns_01ServiceYamlBytes() ([]byte, error) {
@@ -660,7 +431,9 @@ metadata:
     # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
     openshift.io/cluster-monitoring: "true"
     name: openshift-ingress
+    # old and new forms of the label for matching with NetworkPolicy
     network.openshift.io/policy-group: ingress
+    policy-group.network.openshift.io/ingress: ""
 `)
 
 func assetsCore0000_80_openshiftRouterNamespaceYamlBytes() ([]byte, error) {
@@ -710,7 +483,7 @@ metadata:
   labels:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
   name: router-internal-default
-  namespace: openshift-ingress     
+  namespace: openshift-ingress
 spec:
   selector:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
@@ -741,113 +514,6 @@ func assetsCore0000_80_openshiftRouterServiceYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/core/0000_80_openshift-router-service.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0001_00_clusterVersionOperator_03_serviceYaml = []byte(`apiVersion: v1
-kind: Service
-metadata:
-  name: cluster-version-operator
-  namespace: openshift-cluster-version
-  labels:
-    k8s-app: cluster-version-operator
-  annotations:
-    service.beta.openshift.io/serving-cert-secret-name: cluster-version-operator-serving-cert
-    exclude.release.openshift.io/internal-openshift-hosted: "true"
-spec:
-  type: ClusterIP
-  selector:
-    k8s-app: cluster-version-operator
-  ports:
-  - name: metrics
-    port: 9099 # chosen to be in the internal open range
-`)
-
-func assetsCore0001_00_clusterVersionOperator_03_serviceYamlBytes() ([]byte, error) {
-	return _assetsCore0001_00_clusterVersionOperator_03_serviceYaml, nil
-}
-
-func assetsCore0001_00_clusterVersionOperator_03_serviceYaml() (*asset, error) {
-	bytes, err := assetsCore0001_00_clusterVersionOperator_03_serviceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0001_00_cluster-version-operator_03_service.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCoreOpenshiftSdnCmYaml = []byte(`apiVersion: v1
-data:
-  kube-proxy-config.yaml: |-
-    apiVersion: kubeproxy.config.k8s.io/v1alpha1
-    bindAddress: 0.0.0.0
-    #bindAddressHardFail: false
-    clientConnection:
-      acceptContentTypes: ""
-      burst: 0
-      contentType: ""
-      kubeconfig: ""
-      qps: 0
-    clusterCIDR: 10.42.0.0/16
-    configSyncPeriod: 0s
-    conntrack:
-      maxPerCore: null
-      min: null
-      tcpCloseWaitTimeout: null
-      tcpEstablishedTimeout: null
-    detectLocalMode: ""
-    enableProfiling: false
-    featureGates:
-      EndpointSlice: false
-      EndpointSliceProxying: false
-    healthzBindAddress: 0.0.0.0:10256
-    hostnameOverride: ""
-    iptables:
-      masqueradeAll: false
-      masqueradeBit: 0
-      minSyncPeriod: 0s
-      syncPeriod: 0s
-    ipvs:
-      excludeCIDRs: null
-      minSyncPeriod: 0s
-      scheduler: ""
-      strictARP: false
-      syncPeriod: 0s
-      tcpFinTimeout: 0s
-      tcpTimeout: 0s
-      udpTimeout: 0s
-    kind: KubeProxyConfiguration
-    metricsBindAddress: 0.0.0.0:29101
-    mode: unidling+iptables
-    nodePortAddresses: null
-    oomScoreAdj: null
-    portRange: ""
-    showHiddenMetricsForVersion: ""
-    udpIdleTimeout: 0s
-    winkernel:
-      enableDSR: false
-      networkName: ""
-      sourceVip: ""
-kind: ConfigMap
-metadata:
-  name: sdn-config
-  namespace: openshift-sdn
-`)
-
-func assetsCoreOpenshiftSdnCmYamlBytes() ([]byte, error) {
-	return _assetsCoreOpenshiftSdnCmYaml, nil
-}
-
-func assetsCoreOpenshiftSdnCmYaml() (*asset, error) {
-	bytes, err := assetsCoreOpenshiftSdnCmYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/openshift-sdn-cm.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -904,19 +570,11 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"assets/core/0000_00_cluster-version-operator_00_namespace.yaml":             assetsCore0000_00_clusterVersionOperator_00_namespaceYaml,
 	"assets/core/0000_00_flannel-configmap.yaml":                                 assetsCore0000_00_flannelConfigmapYaml,
 	"assets/core/0000_00_flannel-service-account.yaml":                           assetsCore0000_00_flannelServiceAccountYaml,
 	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml": assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
-	"assets/core/0000_50_service-ca-operator_01_namespace.yaml":                  assetsCore0000_50_serviceCaOperator_01_namespaceYaml,
-	"assets/core/0000_50_service-ca-operator_02_service.yaml":                    assetsCore0000_50_serviceCaOperator_02_serviceYaml,
-	"assets/core/0000_50_service-ca-operator_03_cm.yaml":                         assetsCore0000_50_serviceCaOperator_03_cmYaml,
-	"assets/core/0000_50_service-ca-operator_04_sa.yaml":                         assetsCore0000_50_serviceCaOperator_04_saYaml,
 	"assets/core/0000_60_service-ca_01_namespace.yaml":                           assetsCore0000_60_serviceCa_01_namespaceYaml,
 	"assets/core/0000_60_service-ca_04_sa.yaml":                                  assetsCore0000_60_serviceCa_04_saYaml,
-	"assets/core/0000_70_dns-operator_00-namespace.yaml":                         assetsCore0000_70_dnsOperator_00NamespaceYaml,
-	"assets/core/0000_70_dns-operator_01-service-account.yaml":                   assetsCore0000_70_dnsOperator_01ServiceAccountYaml,
-	"assets/core/0000_70_dns-operator_01-service.yaml":                           assetsCore0000_70_dnsOperator_01ServiceYaml,
 	"assets/core/0000_70_dns_00-namespace.yaml":                                  assetsCore0000_70_dns_00NamespaceYaml,
 	"assets/core/0000_70_dns_01-configmap.yaml":                                  assetsCore0000_70_dns_01ConfigmapYaml,
 	"assets/core/0000_70_dns_01-service-account.yaml":                            assetsCore0000_70_dns_01ServiceAccountYaml,
@@ -927,8 +585,6 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/core/0000_80_openshift-router-namespace.yaml":                        assetsCore0000_80_openshiftRouterNamespaceYaml,
 	"assets/core/0000_80_openshift-router-service-account.yaml":                  assetsCore0000_80_openshiftRouterServiceAccountYaml,
 	"assets/core/0000_80_openshift-router-service.yaml":                          assetsCore0000_80_openshiftRouterServiceYaml,
-	"assets/core/0001_00_cluster-version-operator_03_service.yaml":               assetsCore0001_00_clusterVersionOperator_03_serviceYaml,
-	"assets/core/openshift-sdn-cm.yaml":                                          assetsCoreOpenshiftSdnCmYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -974,19 +630,11 @@ type bintree struct {
 var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"core": {nil, map[string]*bintree{
-			"0000_00_cluster-version-operator_00_namespace.yaml":             {assetsCore0000_00_clusterVersionOperator_00_namespaceYaml, map[string]*bintree{}},
 			"0000_00_flannel-configmap.yaml":                                 {assetsCore0000_00_flannelConfigmapYaml, map[string]*bintree{}},
 			"0000_00_flannel-service-account.yaml":                           {assetsCore0000_00_flannelServiceAccountYaml, map[string]*bintree{}},
 			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml": {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
-			"0000_50_service-ca-operator_01_namespace.yaml":                  {assetsCore0000_50_serviceCaOperator_01_namespaceYaml, map[string]*bintree{}},
-			"0000_50_service-ca-operator_02_service.yaml":                    {assetsCore0000_50_serviceCaOperator_02_serviceYaml, map[string]*bintree{}},
-			"0000_50_service-ca-operator_03_cm.yaml":                         {assetsCore0000_50_serviceCaOperator_03_cmYaml, map[string]*bintree{}},
-			"0000_50_service-ca-operator_04_sa.yaml":                         {assetsCore0000_50_serviceCaOperator_04_saYaml, map[string]*bintree{}},
 			"0000_60_service-ca_01_namespace.yaml":                           {assetsCore0000_60_serviceCa_01_namespaceYaml, map[string]*bintree{}},
 			"0000_60_service-ca_04_sa.yaml":                                  {assetsCore0000_60_serviceCa_04_saYaml, map[string]*bintree{}},
-			"0000_70_dns-operator_00-namespace.yaml":                         {assetsCore0000_70_dnsOperator_00NamespaceYaml, map[string]*bintree{}},
-			"0000_70_dns-operator_01-service-account.yaml":                   {assetsCore0000_70_dnsOperator_01ServiceAccountYaml, map[string]*bintree{}},
-			"0000_70_dns-operator_01-service.yaml":                           {assetsCore0000_70_dnsOperator_01ServiceYaml, map[string]*bintree{}},
 			"0000_70_dns_00-namespace.yaml":                                  {assetsCore0000_70_dns_00NamespaceYaml, map[string]*bintree{}},
 			"0000_70_dns_01-configmap.yaml":                                  {assetsCore0000_70_dns_01ConfigmapYaml, map[string]*bintree{}},
 			"0000_70_dns_01-service-account.yaml":                            {assetsCore0000_70_dns_01ServiceAccountYaml, map[string]*bintree{}},
@@ -997,8 +645,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_80_openshift-router-namespace.yaml":                        {assetsCore0000_80_openshiftRouterNamespaceYaml, map[string]*bintree{}},
 			"0000_80_openshift-router-service-account.yaml":                  {assetsCore0000_80_openshiftRouterServiceAccountYaml, map[string]*bintree{}},
 			"0000_80_openshift-router-service.yaml":                          {assetsCore0000_80_openshiftRouterServiceYaml, map[string]*bintree{}},
-			"0001_00_cluster-version-operator_03_service.yaml":               {assetsCore0001_00_clusterVersionOperator_03_serviceYaml, map[string]*bintree{}},
-			"openshift-sdn-cm.yaml":                                          {assetsCoreOpenshiftSdnCmYaml, map[string]*bintree{}},
 		}},
 	}},
 }}

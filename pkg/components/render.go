@@ -5,16 +5,17 @@ import (
 	"text/template"
 
 	"github.com/openshift/microshift/pkg/assets"
-	"github.com/openshift/microshift/pkg/constant"
+	"github.com/openshift/microshift/pkg/release"
 )
 
 func renderSCController(b []byte, p assets.RenderParams) ([]byte, error) {
 	data := struct {
-		ImageSCOperator, KeyDir, CADir string
+		ReleaseImage  assets.RenderParams
+		KeyDir, CADir string
 	}{
-		ImageSCOperator: constant.ImageServiceCAOperator,
-		KeyDir:          p["DataDir"] + "/resources/service-ca/secrets/service-ca",
-		CADir:           p["DataDir"] + "/certs/ca-bundle",
+		ReleaseImage: release.Image,
+		KeyDir:       p["DataDir"] + "/resources/service-ca/secrets/service-ca",
+		CADir:        p["DataDir"] + "/certs/ca-bundle",
 	}
 	tpl := template.Must(template.New("sc").Parse(string(b)))
 	var byteBuff bytes.Buffer
@@ -27,11 +28,28 @@ func renderSCController(b []byte, p assets.RenderParams) ([]byte, error) {
 
 func renderDNSService(b []byte, p assets.RenderParams) ([]byte, error) {
 	data := struct {
-		ClusterIP string
+		ReleaseImage assets.RenderParams
+		ClusterIP    string
 	}{
-		ClusterIP: p["ClusterDNS"],
+		ReleaseImage: release.Image,
+		ClusterIP:    p["ClusterDNS"],
 	}
 	tpl := template.Must(template.New("svc").Parse(string(b)))
+	var byteBuff bytes.Buffer
+
+	if err := tpl.Execute(&byteBuff, data); err != nil {
+		return nil, err
+	}
+	return byteBuff.Bytes(), nil
+}
+
+func renderReleaseImage(b []byte, p assets.RenderParams) ([]byte, error) {
+	data := struct {
+		ReleaseImage assets.RenderParams
+	}{
+		ReleaseImage: release.Image,
+	}
+	tpl := template.Must(template.New("dp").Parse(string(b)))
 	var byteBuff bytes.Buffer
 
 	if err := tpl.Execute(&byteBuff, data); err != nil {

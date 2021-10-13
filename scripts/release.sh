@@ -47,17 +47,16 @@ help() {
 This script provides some simple automation for cutting new releases of Microshift.
 
 Use:
-    ./release.sh --token $(cat /token/path) --target $COMMIT
+    ./release.sh --token $(cat /token/path)
     Note: do not use "=" with flag values
 Inputs:
-    --target      (Required) The commit-ish (hash, tag, or branch) to build a release from. Abbreviated commits are NOT permitted.
     --token       (Required) The github application auth token, use to create a github release.
     --debug, -d   Print generated script values for debugging.
     --help, -h    Print this help text.
 Outputs:
 - A version, formatted as 4.7.0-0.microshift-YYYY-MM-DD-HHMMSS, is applied as a git tag and pushed to the repo
+- Multi-architecture container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
 - Cross-compiled binaries
-- Multi-architecture container image tagged and pushed as quay.io/microshift/microshift:$VERSION
 - A sha256 checksum file, containing the checksums for all binary artifacts
 - A github release, containing the binary artifacts and checksum file.
 
@@ -65,22 +64,13 @@ DEBUG
 To test releases against a downstream/fork repository, override GIT_OWNER to forked git org/owner and QUAY_OWNER to your
 quay.io owner or org.
 
-  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path) --target $COMMIT
+  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path
 '
 }
 
 generate_api_release_request() {
   local is_prerelease="${1:=true}" # (copejon) assume for now that all releases are prerelease, unless otherwise specified
-  printf '{"tag_name": "%s","target_commitish": "%s","name": "%s","prerelease": %s}' "$VERSION" "$TARGET" "$VERSION" "$is_prerelease"
-}
-
-git_checkout_target() {
-  target="$1"
-  [ -z "$(git status --porcelain)" ] || {
-    printf "The working tree is dirty - commit or stash changes before cutting a release!" >&2
-    return 1
-  }
-  git checkout "$target"
+  printf '{"tag_name": "%s","name": "%s","prerelease": %s}' "$VERSION" "$VERSION" "$is_prerelease"
 }
 
 git_create_release() {
@@ -135,8 +125,7 @@ prep_stage_area() {
 extract_release_image_binary() {
   local tag="$1"
   local dest="$2"
-  arch_ver=${tag#*:}
-  local out_bin="$dest"/microshift-"$arch_ver"
+  local out_bin="$dest"/microshift-"${tag#*"$VERSION-"}"
   podman cp "$(podman create "$tag")":/usr/bin/microshift "$out_bin" >&2
   echo "$out_bin"
 }
@@ -174,6 +163,7 @@ podman_create_manifest(){
     podman manifest add "$IMAGE_REPO:$VERSION" "docker://$ref"
   done
     podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$VERSION"
+    podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
 }
 
 docker_create_manifest(){
@@ -181,8 +171,11 @@ docker_create_manifest(){
   for image in "${RELEASE_IMAGE_TAGS[@]}"; do
     amend_images_options+="--amend $image"
   done
-  podman manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
-  podman manifest push "$IMAGE_REPO:$VERSION"
+  # use docker cli directly for clarity, as this is a docker-only func
+  docker manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
+  docker tag "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
+  docker manifest push "$IMAGE_REPO:$VERSION"
+  docker manifest push "$IMAGE_REPO:latest"
 }
 
 push_container_manifest() {
@@ -208,14 +201,6 @@ debug() {
 ########
 while [ $# -gt 0 ]; do
   case "$1" in
-    "--target")
-      TARGET="${2:-}"
-      [[ "${TOKEN:=}" =~ ^-.* ]] || [[ -z "$TARGET" ]] && {
-        printf "flag $1 requires git commit-ish (branch, tag, hash) value"
-        exit 1
-      }
-      shift 2
-      ;;
     "--token")
       TOKEN="${2:-}"
       [[ "$TOKEN" =~ ^-.* ]] || [[ -z "$TOKEN" ]] && {
@@ -243,25 +228,23 @@ done
 
 printf "Using container manager: %s\n" "$(podman --version)"
 
+#### Debugging Vars.  For generating a full release to a fork, set to your own git/quay owner.
+GIT_OWNER=${GIT_OWNER:="redhat-et"}
+QUAY_OWNER=${QUAY_OWNER:="microshift"}
+####
+
 # Generate data early for debugging
 API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
 RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
 
-#### Debugging Vars.  For generating a full release to a fork, set to your own git/quay owner.
-GIT_OWNER=${GIT_OWNER:="microshift"}
-QUAY_OWNER=${QUAY_OWNER:-"microshift"}
-####
-
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
 
-git_checkout_target "$TARGET"                                         || { git switch -; exit 1; }
-build_container_images_artifacts                                      || { git switch -; exit 1; }
-STAGE_DIR=$(stage_release_image_binaries)                             || { git switch -; exit 1; }
-push_container_image_artifacts                                        || { git switch -; exit 1; }
-push_container_manifest                                               || { git switch -; exit 1; }
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || { git switch -; exit 1; }
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || { git switch -; exit 1; }
-git switch -
+build_container_images_artifacts                                      || exit 1
+STAGE_DIR=$(stage_release_image_binaries)                             || exit 1
+push_container_image_artifacts                                        || exit 1
+push_container_manifest                                               || exit 1
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || exit 1
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || exit 1

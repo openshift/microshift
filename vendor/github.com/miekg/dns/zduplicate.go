@@ -37,7 +37,7 @@ func (r1 *AFSDB) isDuplicate(_r2 RR) bool {
 	if r1.Subtype != r2.Subtype {
 		return false
 	}
-	if !isDuplicateName(r1.Hostname, r2.Hostname) {
+	if !isDulicateName(r1.Hostname, r2.Hostname) {
 		return false
 	}
 	return true
@@ -49,23 +49,6 @@ func (r1 *ANY) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	return true
-}
-
-func (r1 *APL) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*APL)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if len(r1.Prefixes) != len(r2.Prefixes) {
-		return false
-	}
-	for i := 0; i < len(r1.Prefixes); i++ {
-		if !r1.Prefixes[i].equals(&r2.Prefixes[i]) {
-			return false
-		}
-	}
 	return true
 }
 
@@ -104,48 +87,6 @@ func (r1 *CAA) isDuplicate(_r2 RR) bool {
 	return true
 }
 
-func (r1 *CDNSKEY) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*CDNSKEY)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if r1.Flags != r2.Flags {
-		return false
-	}
-	if r1.Protocol != r2.Protocol {
-		return false
-	}
-	if r1.Algorithm != r2.Algorithm {
-		return false
-	}
-	if r1.PublicKey != r2.PublicKey {
-		return false
-	}
-	return true
-}
-
-func (r1 *CDS) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*CDS)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if r1.KeyTag != r2.KeyTag {
-		return false
-	}
-	if r1.Algorithm != r2.Algorithm {
-		return false
-	}
-	if r1.DigestType != r2.DigestType {
-		return false
-	}
-	if r1.Digest != r2.Digest {
-		return false
-	}
-	return true
-}
-
 func (r1 *CERT) isDuplicate(_r2 RR) bool {
 	r2, ok := _r2.(*CERT)
 	if !ok {
@@ -173,7 +114,7 @@ func (r1 *CNAME) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Target, r2.Target) {
+	if !isDulicateName(r1.Target, r2.Target) {
 		return false
 	}
 	return true
@@ -214,34 +155,13 @@ func (r1 *DHCID) isDuplicate(_r2 RR) bool {
 	return true
 }
 
-func (r1 *DLV) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*DLV)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if r1.KeyTag != r2.KeyTag {
-		return false
-	}
-	if r1.Algorithm != r2.Algorithm {
-		return false
-	}
-	if r1.DigestType != r2.DigestType {
-		return false
-	}
-	if r1.Digest != r2.Digest {
-		return false
-	}
-	return true
-}
-
 func (r1 *DNAME) isDuplicate(_r2 RR) bool {
 	r2, ok := _r2.(*DNAME)
 	if !ok {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Target, r2.Target) {
+	if !isDulicateName(r1.Target, r2.Target) {
 		return false
 	}
 	return true
@@ -395,51 +315,9 @@ func (r1 *HIP) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	for i := 0; i < len(r1.RendezvousServers); i++ {
-		if !isDuplicateName(r1.RendezvousServers[i], r2.RendezvousServers[i]) {
+		if !isDulicateName(r1.RendezvousServers[i], r2.RendezvousServers[i]) {
 			return false
 		}
-	}
-	return true
-}
-
-func (r1 *HTTPS) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*HTTPS)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if r1.Priority != r2.Priority {
-		return false
-	}
-	if !isDuplicateName(r1.Target, r2.Target) {
-		return false
-	}
-	if len(r1.Value) != len(r2.Value) {
-		return false
-	}
-	if !areSVCBPairArraysEqual(r1.Value, r2.Value) {
-		return false
-	}
-	return true
-}
-
-func (r1 *KEY) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*KEY)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if r1.Flags != r2.Flags {
-		return false
-	}
-	if r1.Protocol != r2.Protocol {
-		return false
-	}
-	if r1.Algorithm != r2.Algorithm {
-		return false
-	}
-	if r1.PublicKey != r2.PublicKey {
-		return false
 	}
 	return true
 }
@@ -453,7 +331,7 @@ func (r1 *KX) isDuplicate(_r2 RR) bool {
 	if r1.Preference != r2.Preference {
 		return false
 	}
-	if !isDuplicateName(r1.Exchanger, r2.Exchanger) {
+	if !isDulicateName(r1.Exchanger, r2.Exchanger) {
 		return false
 	}
 	return true
@@ -528,7 +406,7 @@ func (r1 *LP) isDuplicate(_r2 RR) bool {
 	if r1.Preference != r2.Preference {
 		return false
 	}
-	if !isDuplicateName(r1.Fqdn, r2.Fqdn) {
+	if !isDulicateName(r1.Fqdn, r2.Fqdn) {
 		return false
 	}
 	return true
@@ -540,7 +418,7 @@ func (r1 *MB) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Mb, r2.Mb) {
+	if !isDulicateName(r1.Mb, r2.Mb) {
 		return false
 	}
 	return true
@@ -552,7 +430,7 @@ func (r1 *MD) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Md, r2.Md) {
+	if !isDulicateName(r1.Md, r2.Md) {
 		return false
 	}
 	return true
@@ -564,7 +442,7 @@ func (r1 *MF) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Mf, r2.Mf) {
+	if !isDulicateName(r1.Mf, r2.Mf) {
 		return false
 	}
 	return true
@@ -576,7 +454,7 @@ func (r1 *MG) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Mg, r2.Mg) {
+	if !isDulicateName(r1.Mg, r2.Mg) {
 		return false
 	}
 	return true
@@ -588,10 +466,10 @@ func (r1 *MINFO) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Rmail, r2.Rmail) {
+	if !isDulicateName(r1.Rmail, r2.Rmail) {
 		return false
 	}
-	if !isDuplicateName(r1.Email, r2.Email) {
+	if !isDulicateName(r1.Email, r2.Email) {
 		return false
 	}
 	return true
@@ -603,7 +481,7 @@ func (r1 *MR) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Mr, r2.Mr) {
+	if !isDulicateName(r1.Mr, r2.Mr) {
 		return false
 	}
 	return true
@@ -618,7 +496,7 @@ func (r1 *MX) isDuplicate(_r2 RR) bool {
 	if r1.Preference != r2.Preference {
 		return false
 	}
-	if !isDuplicateName(r1.Mx, r2.Mx) {
+	if !isDulicateName(r1.Mx, r2.Mx) {
 		return false
 	}
 	return true
@@ -645,7 +523,7 @@ func (r1 *NAPTR) isDuplicate(_r2 RR) bool {
 	if r1.Regexp != r2.Regexp {
 		return false
 	}
-	if !isDuplicateName(r1.Replacement, r2.Replacement) {
+	if !isDulicateName(r1.Replacement, r2.Replacement) {
 		return false
 	}
 	return true
@@ -701,7 +579,7 @@ func (r1 *NS) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Ns, r2.Ns) {
+	if !isDulicateName(r1.Ns, r2.Ns) {
 		return false
 	}
 	return true
@@ -713,7 +591,7 @@ func (r1 *NSAPPTR) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Ptr, r2.Ptr) {
+	if !isDulicateName(r1.Ptr, r2.Ptr) {
 		return false
 	}
 	return true
@@ -725,7 +603,7 @@ func (r1 *NSEC) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.NextDomain, r2.NextDomain) {
+	if !isDulicateName(r1.NextDomain, r2.NextDomain) {
 		return false
 	}
 	if len(r1.TypeBitMap) != len(r2.TypeBitMap) {
@@ -831,7 +709,7 @@ func (r1 *PTR) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Ptr, r2.Ptr) {
+	if !isDulicateName(r1.Ptr, r2.Ptr) {
 		return false
 	}
 	return true
@@ -846,10 +724,10 @@ func (r1 *PX) isDuplicate(_r2 RR) bool {
 	if r1.Preference != r2.Preference {
 		return false
 	}
-	if !isDuplicateName(r1.Map822, r2.Map822) {
+	if !isDulicateName(r1.Map822, r2.Map822) {
 		return false
 	}
-	if !isDuplicateName(r1.Mapx400, r2.Mapx400) {
+	if !isDulicateName(r1.Mapx400, r2.Mapx400) {
 		return false
 	}
 	return true
@@ -894,10 +772,10 @@ func (r1 *RP) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Mbox, r2.Mbox) {
+	if !isDulicateName(r1.Mbox, r2.Mbox) {
 		return false
 	}
-	if !isDuplicateName(r1.Txt, r2.Txt) {
+	if !isDulicateName(r1.Txt, r2.Txt) {
 		return false
 	}
 	return true
@@ -930,7 +808,7 @@ func (r1 *RRSIG) isDuplicate(_r2 RR) bool {
 	if r1.KeyTag != r2.KeyTag {
 		return false
 	}
-	if !isDuplicateName(r1.SignerName, r2.SignerName) {
+	if !isDulicateName(r1.SignerName, r2.SignerName) {
 		return false
 	}
 	if r1.Signature != r2.Signature {
@@ -948,43 +826,7 @@ func (r1 *RT) isDuplicate(_r2 RR) bool {
 	if r1.Preference != r2.Preference {
 		return false
 	}
-	if !isDuplicateName(r1.Host, r2.Host) {
-		return false
-	}
-	return true
-}
-
-func (r1 *SIG) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*SIG)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if r1.TypeCovered != r2.TypeCovered {
-		return false
-	}
-	if r1.Algorithm != r2.Algorithm {
-		return false
-	}
-	if r1.Labels != r2.Labels {
-		return false
-	}
-	if r1.OrigTtl != r2.OrigTtl {
-		return false
-	}
-	if r1.Expiration != r2.Expiration {
-		return false
-	}
-	if r1.Inception != r2.Inception {
-		return false
-	}
-	if r1.KeyTag != r2.KeyTag {
-		return false
-	}
-	if !isDuplicateName(r1.SignerName, r2.SignerName) {
-		return false
-	}
-	if r1.Signature != r2.Signature {
+	if !isDulicateName(r1.Host, r2.Host) {
 		return false
 	}
 	return true
@@ -1017,10 +859,10 @@ func (r1 *SOA) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Ns, r2.Ns) {
+	if !isDulicateName(r1.Ns, r2.Ns) {
 		return false
 	}
-	if !isDuplicateName(r1.Mbox, r2.Mbox) {
+	if !isDulicateName(r1.Mbox, r2.Mbox) {
 		return false
 	}
 	if r1.Serial != r2.Serial {
@@ -1073,7 +915,7 @@ func (r1 *SRV) isDuplicate(_r2 RR) bool {
 	if r1.Port != r2.Port {
 		return false
 	}
-	if !isDuplicateName(r1.Target, r2.Target) {
+	if !isDulicateName(r1.Target, r2.Target) {
 		return false
 	}
 	return true
@@ -1092,27 +934,6 @@ func (r1 *SSHFP) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	if r1.FingerPrint != r2.FingerPrint {
-		return false
-	}
-	return true
-}
-
-func (r1 *SVCB) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*SVCB)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if r1.Priority != r2.Priority {
-		return false
-	}
-	if !isDuplicateName(r1.Target, r2.Target) {
-		return false
-	}
-	if len(r1.Value) != len(r2.Value) {
-		return false
-	}
-	if !areSVCBPairArraysEqual(r1.Value, r2.Value) {
 		return false
 	}
 	return true
@@ -1145,10 +966,10 @@ func (r1 *TALINK) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.PreviousName, r2.PreviousName) {
+	if !isDulicateName(r1.PreviousName, r2.PreviousName) {
 		return false
 	}
-	if !isDuplicateName(r1.NextName, r2.NextName) {
+	if !isDulicateName(r1.NextName, r2.NextName) {
 		return false
 	}
 	return true
@@ -1160,7 +981,7 @@ func (r1 *TKEY) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Algorithm, r2.Algorithm) {
+	if !isDulicateName(r1.Algorithm, r2.Algorithm) {
 		return false
 	}
 	if r1.Inception != r2.Inception {
@@ -1217,7 +1038,7 @@ func (r1 *TSIG) isDuplicate(_r2 RR) bool {
 		return false
 	}
 	_ = r2
-	if !isDuplicateName(r1.Algorithm, r2.Algorithm) {
+	if !isDulicateName(r1.Algorithm, r2.Algorithm) {
 		return false
 	}
 	if r1.TimeSigned != r2.TimeSigned {
@@ -1313,27 +1134,6 @@ func (r1 *X25) isDuplicate(_r2 RR) bool {
 	}
 	_ = r2
 	if r1.PSDNAddress != r2.PSDNAddress {
-		return false
-	}
-	return true
-}
-
-func (r1 *ZONEMD) isDuplicate(_r2 RR) bool {
-	r2, ok := _r2.(*ZONEMD)
-	if !ok {
-		return false
-	}
-	_ = r2
-	if r1.Serial != r2.Serial {
-		return false
-	}
-	if r1.Scheme != r2.Scheme {
-		return false
-	}
-	if r1.Hash != r2.Hash {
-		return false
-	}
-	if r1.Digest != r2.Digest {
 		return false
 	}
 	return true

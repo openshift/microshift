@@ -20,8 +20,6 @@ import (
 	"context"
 	"os"
 	"os/signal"
-
-	"k8s.io/klog/v2"
 )
 
 var onlyOneSignalHandler = make(chan struct{})
@@ -32,14 +30,14 @@ var shutdownHandler chan os.Signal
 // is terminated with exit code 1.
 // Only one of SetupSignalContext and SetupSignalHandler should be called, and only can
 // be called once.
-func SetupSignalHandler(exitOnSecondSignal bool) <-chan struct{} {
-	return SetupSignalContext(exitOnSecondSignal).Done()
+func SetupSignalHandler() <-chan struct{} {
+	return SetupSignalContext().Done()
 }
 
 // SetupSignalContext is same as SetupSignalHandler, but a context.Context is returned.
 // Only one of SetupSignalContext and SetupSignalHandler should be called, and only can
 // be called once.
-func SetupSignalContext(exitOnSecondSignal bool) context.Context {
+func SetupSignalContext() context.Context {
 	close(onlyOneSignalHandler) // panics when called twice
 
 	shutdownHandler = make(chan os.Signal, 2)
@@ -49,15 +47,8 @@ func SetupSignalContext(exitOnSecondSignal bool) context.Context {
 	go func() {
 		<-shutdownHandler
 		cancel()
-		if exitOnSecondSignal {
-			<-shutdownHandler
-			os.Exit(1)
-		} else {
-			for {
-				<-shutdownHandler
-				klog.Infof("Termination signal has been received already. Ignoring signal.")
-			}
-		}
+		<-shutdownHandler
+		os.Exit(1) // second signal. Exit directly.
 	}()
 
 	return ctx

@@ -1,0 +1,6 @@
+# vim: sw=8:ts=8:et
+/var/run/secrets/kubernetes.io/serviceaccount(/.*)?				gen_context(system_u:object_r:container_runtime_tmpfs_t,s0)
+/var/lib/microshift/certs/ca-bundle(/.*)?                                       gen_context(system_u:object_r:container_file_t,s0)
+/usr/local/bin/microshift                                                  --	gen_context(system_u:object_r:container_runtime_exec_t,s0)
+/usr/bin/microshift                                                        --	gen_context(system_u:object_r:container_runtime_exec_t,s0)
+/var/hpvolumes(/.*)?            						gen_context(system_u:object_r:container_file_t,s0)

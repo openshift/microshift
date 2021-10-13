@@ -111,7 +111,14 @@ V ${SUDO} rm -rf /var/lib/microshift
 V ${SUDO} rm -rf /var/lib/rook
 V ${SUDO} rm -rf /var/lib/etcd
 V ${SUDO} rm -rf /var/lib/kubelet
-V ${SUDO} rm -rf $HOME/.kube
 
 V ${SUDO} mkdir -p /var/lib/kubelet
 V ${SUDO} chcon -R -t container_file_t /var/lib/kubelet/
+
+sudo crictl rm --all --force
+sudo crictl rmi --all --prune
+
+sudo pkill -9 conmon
+sudo pkill -9 pause
+
+sudo rm -rf /var/lib/microshift

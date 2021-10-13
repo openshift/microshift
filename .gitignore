@@ -1,4 +1,8 @@
 _output/*
 /microshift
+bin
 .idea/
 .vscode/
+.vagrant/
+Vagrantfile
+sshfile

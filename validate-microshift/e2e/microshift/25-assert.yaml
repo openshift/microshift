@@ -1,0 +1,12 @@
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 300
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dns-default
+  namespace: openshift-dns
+status:
+  numberReady: 1

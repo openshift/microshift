@@ -1,5 +1,6 @@
 [Unit]
 Description=Microshift
+After=crio.service
 
 [Service]
 WorkingDirectory=/usr/local/bin/
