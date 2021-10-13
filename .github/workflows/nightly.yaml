@@ -1,0 +1,24 @@
+name: release
+# only execute a release when triggered manually
+on:
+  workflow_dispatch:
+
+on:
+  schedule:
+    - cron: "15 23 * * *"  #11:15 PM every day
+env:
+  RELEASE_REG_USER: ${{ secrets.REGISTRY_USER }}
+  RELEASE_REG_PASS: ${{ secrets.REGISTRY_PASS }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: log into quay.io
+        uses: redhat-actions/podman-login@v1
+        with:
+          username: ${RELEASE_REG_USER}
+          password: ${RELEASE_REG_PASS}
+          registry: quay.io
+      - name: launch build
+        run: make cross-build
