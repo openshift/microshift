@@ -17,11 +17,11 @@ jobs:
 
       - name: rename binary and move
         run: |
-          mv _output/bin/linux_amd64/microshift ./microshift-amd64
-          mv _output/bin/linux_arm64/microshift ./microshift-arm64
+          mv _output/bin/linux_amd64/microshift ./microshift-linux-amd64
+          mv _output/bin/linux_arm64/microshift ./microshift-linux-arm64
 
       - name: generate checksum
-        run: sha256sum ./microshift-amd64 ./microshift-arm64 >> ./release.sha256
+        run: sha256sum ./microshift-linux-amd64 ./microshift-linux-arm64 >> ./release.sha256
 
       - name: post nightly release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -31,6 +31,6 @@ jobs:
           prerelease: true
           title: "Latest Nightly Build"
           files: |
-            microshift-amd64
-            microshift-arm64
+            microshift-linux-amd64
+            microshift-linux-arm64
             release.sha256
