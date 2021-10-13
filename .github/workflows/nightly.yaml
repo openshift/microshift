@@ -17,3 +17,22 @@ jobs:
 
       - name: launch build
         run: make cross-build
+
+      - name: rename binary and move
+        run: |
+          mv _output/bin/linux_amd64/microshift ./microshift-amd64
+          mv _output/bin/linux_arm64/microshift ./microshift-arm64
+
+      - name: generate checksum
+        run: sha256sum ./microshift-amd64 ./microshift-arm64 >> ./release.sha256
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "nightly"
+          prerelease: true
+          title: "Latest Nightly Build"
+          files: |
+            microshift-amd64
+            microshift-arm64
+            release.sha256
