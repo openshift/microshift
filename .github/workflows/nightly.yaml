@@ -2,8 +2,6 @@ name: release
 # only execute a release when triggered manually
 on:
   workflow_dispatch:
-
-on:
   schedule:
     - cron: "15 23 * * *"  #11:15 PM every day
 env:
