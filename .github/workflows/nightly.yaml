@@ -12,5 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
       - name: launch build
         run: make cross-build
