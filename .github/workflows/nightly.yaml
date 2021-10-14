@@ -1,5 +1,4 @@
 name: nightly build
-# only execute a release when triggered manually
 on:
   workflow_dispatch:
   schedule:
@@ -13,12 +12,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: launch build
-        run: make cross-build
+        run: make build-containerized-cross-build
 
-      - name: rename binary and move
+      - name: move binary
         run: |
-          mv _output/bin/linux_amd64/microshift ./microshift-linux-amd64
-          mv _output/bin/linux_arm64/microshift ./microshift-linux-arm64
+          arm=$(podman images | grep arm64 | awk '{print $3}')
+          amd=$(podman images | grep amd | awk '{print $3}')
+          podman cp $(podman create --rm $arm):/usr/bin/microshift ./microshift-linux-arm64
+          podman cp $(podman create --rm $amd):/usr/bin/microshift ./microshift-linux-arm64
 
       - name: generate checksum
         run: sha256sum ./microshift-linux-amd64 ./microshift-linux-arm64 >> ./release.sha256
