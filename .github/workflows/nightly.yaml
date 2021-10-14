@@ -1,0 +1,40 @@
+name: nightly build
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 23 * * *"  #11:15 PM every day
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Install required packages
+        run: sudo apt install build-essential qemu-user qemu-user-static  
+
+      - name: launch build
+        run: make build-containerized-cross-build
+
+      - name: move binary
+        run: |
+          arm=$(podman images | grep arm64 | awk '{print $3}')
+          amd=$(podman images | grep amd | awk '{print $3}')
+          podman cp $(podman create --rm $arm):/usr/bin/microshift ./microshift-linux-arm64
+          podman cp $(podman create --rm $amd):/usr/bin/microshift ./microshift-linux-amd64
+
+      - name: generate checksum
+        run: sha256sum ./microshift-linux-amd64 ./microshift-linux-arm64 >> ./release.sha256
+
+      - name: post nightly release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "nightly"
+          prerelease: true
+          title: "Latest Nightly Build"
+          files: |
+            microshift-linux-amd64
+            microshift-linux-arm64
+            release.sha256
