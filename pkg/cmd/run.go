@@ -76,6 +76,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		// util.Must(m.AddService(controllers.NewOpenShiftAPIServer()))
 		util.Must(m.AddService(controllers.NewOpenShiftControllerManager(cfg)))
 		// util.Must(m.AddService(controllers.NewOpenShiftAPIComponents()))
+		util.Must(m.AddService(controllers.NewOpenShiftOAuth(cfg)))
 		// util.Must(m.AddService(controllers.NewInfrastructureServices()))
 
 		util.Must(m.AddService(servicemanager.NewGenericService(

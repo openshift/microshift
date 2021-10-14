@@ -21,6 +21,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -31,6 +32,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
+	oauth_apiserver "github.com/openshift/oauth-apiserver/pkg/cmd/oauth-apiserver"
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 
@@ -230,5 +232,84 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	if err := options.StartControllerManager(); err != nil {
 		logrus.Fatalf("Failed to start ocp-controller-manager %v", err)
 	}
+	return ctx.Err()
+}
+
+// OAuth OpenShift Service
+type OpenShiftOAuth struct {
+	options *oauth_apiserver.OAuthAPIServerOptions
+}
+
+func NewOpenShiftOAuth(cfg *config.MicroshiftConfig) *OpenShiftOAuth {
+	s := &OpenShiftOAuth{}
+	s.configure(cfg)
+	return s
+}
+
+func (s *OpenShiftOAuth) Name() string           { return "oauth-apiserver" }
+func (s *OpenShiftOAuth) Dependencies() []string { return []string{"oauth-apiserver"} }
+
+func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
+	opts := oauth_apiserver.NewOAuthAPIServerOptions(os.Stdout)
+	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
+	args := []string{
+		"start",
+		"--secure-port=8443",
+		"--audit-log-format=json",
+		"--audit-log-maxsize=100",
+		"--audit-log-maxbackup=10",
+		"--audit-policy-file=/var/run/configmaps/audit/policy.yaml",
+		"--etcd-cafile=" + caCertFile,
+		"--etcd-keyfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key",
+		"--etcd-certfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt",
+		"--shutdown-delay-duration=10s",
+		"--tls-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
+		"--tls-private-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
+		"--api-audiences=https://kubernetes.default.svc",
+		"--cors-allowed-origins='//127.0.0.1(:|$)'",
+		"--cors-allowed-origins='//localhost(:|$)'",
+		"--etcd-servers=https://127.0.0.1:2379",
+		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+		"--tls-min-version=VersionTLS12",
+		"--v=2",
+	}
+	if cfg.LogDir != "" {
+		args = append(args,
+			"--log-file="+filepath.Join(cfg.LogDir, "oauth-apiserver.log"),
+			"--audit-log-path="+filepath.Join(cfg.LogDir, "oauth-apiserver-audit.log"))
+	}
+
+	cmd := &cobra.Command{
+		Use:          "oauth-apiserver",
+		Long:         `oauth-apiserver`,
+		SilenceUsage: true,
+		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
+	}
+
+	fs := cmd.Flags()
+	opts.AddFlags(fs)
+
+	if err := opts.Complete(); err != nil {
+		logrus.Fatalf("OAuth options completion error: %s", err)
+	}
+	if err := opts.Validate(args); err != nil {
+		logrus.Fatalf("OAuth options validation error: %s", err)
+	}
+
+	s.options = opts
+}
+
+func (s *OpenShiftOAuth) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+	stopCh := make(chan struct{})
+	if err := oauth_apiserver.RunOAuthAPIServer(s.options, stopCh); err != nil {
+		return err
+	}
+
 	return ctx.Err()
 }
