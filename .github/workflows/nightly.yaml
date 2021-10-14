@@ -11,6 +11,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
 
+      - name: Install required packages
+        run: sudo apt install build-essential
+
       - name: launch build
         run: make build-containerized-cross-build
 
