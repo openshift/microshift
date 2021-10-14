@@ -22,7 +22,7 @@ jobs:
           arm=$(podman images | grep arm64 | awk '{print $3}')
           amd=$(podman images | grep amd | awk '{print $3}')
           podman cp $(podman create --rm $arm):/usr/bin/microshift ./microshift-linux-arm64
-          podman cp $(podman create --rm $amd):/usr/bin/microshift ./microshift-linux-arm64
+          podman cp $(podman create --rm $amd):/usr/bin/microshift ./microshift-linux-amd64
 
       - name: generate checksum
         run: sha256sum ./microshift-linux-amd64 ./microshift-linux-arm64 >> ./release.sha256
