@@ -452,6 +452,12 @@ func (e *DockercfgController) createTokenSecret(serviceAccount *v1.ServiceAccoun
 	if kapierrors.IsAlreadyExists(err) {
 		return nil, false, nil
 	}
+	// If we cannot create this secret because the namespace it is being terminated isn't a thing we should fail and requeue a retry.
+	// Instead, we know that when a new namespace gets created, the serviceaccount will be recreated and we'll get a second shot at
+	// processing the serviceaccount.
+	if kapierrors.HasStatusCause(err, v1.NamespaceTerminatingCause) {
+		return nil, false, nil
+	}
 	if err != nil {
 		return nil, false, err
 	}
@@ -509,6 +515,12 @@ func (e *DockercfgController) createDockerPullSecret(serviceAccount *v1.ServiceA
 
 	// Save the secret
 	createdSecret, err := e.client.CoreV1().Secrets(tokenSecret.Namespace).Create(context.TODO(), dockercfgSecret, metav1.CreateOptions{})
+	// If we cannot create this secret because the namespace it is being terminated isn't a thing we should fail and requeue a retry.
+	// Instead, we know that when a new namespace gets created, the serviceaccount will be recreated and we'll get a second shot at
+	// processing the serviceaccount.
+	if kapierrors.HasStatusCause(err, v1.NamespaceTerminatingCause) {
+		return nil, false, nil
+	}
 	return createdSecret, err == nil, err
 }
 

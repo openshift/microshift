@@ -5,8 +5,6 @@
 package v1
 
 import (
-	"reflect"
-
 	v1 "github.com/openshift/api/security/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
@@ -91,7 +89,7 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -141,7 +139,7 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -191,7 +189,7 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 		corev1.SetDefaults_EphemeralContainer(a)
 		for j := range a.EphemeralContainerCommon.Ports {
 			b := &a.EphemeralContainerCommon.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -303,7 +301,7 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 			corev1.SetDefaults_Container(b)
 			for k := range b.Ports {
 				c := &b.Ports[k]
-				if reflect.ValueOf(c.Protocol).IsZero() {
+				if c.Protocol == "" {
 					c.Protocol = "TCP"
 				}
 			}
@@ -353,7 +351,7 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 			corev1.SetDefaults_Container(b)
 			for k := range b.Ports {
 				c := &b.Ports[k]
-				if reflect.ValueOf(c.Protocol).IsZero() {
+				if c.Protocol == "" {
 					c.Protocol = "TCP"
 				}
 			}
@@ -403,7 +401,7 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 			corev1.SetDefaults_EphemeralContainer(b)
 			for k := range b.EphemeralContainerCommon.Ports {
 				c := &b.EphemeralContainerCommon.Ports[k]
-				if reflect.ValueOf(c.Protocol).IsZero() {
+				if c.Protocol == "" {
 					c.Protocol = "TCP"
 				}
 			}
@@ -517,7 +515,7 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -567,7 +565,7 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -617,7 +615,7 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		corev1.SetDefaults_EphemeralContainer(a)
 		for j := range a.EphemeralContainerCommon.Ports {
 			b := &a.EphemeralContainerCommon.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -727,7 +725,7 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -777,7 +775,7 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -827,7 +825,7 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		corev1.SetDefaults_EphemeralContainer(a)
 		for j := range a.EphemeralContainerCommon.Ports {
 			b := &a.EphemeralContainerCommon.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -940,7 +938,7 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -990,7 +988,7 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -1040,7 +1038,7 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		corev1.SetDefaults_EphemeralContainer(a)
 		for j := range a.EphemeralContainerCommon.Ports {
 			b := &a.EphemeralContainerCommon.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -1150,7 +1148,7 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -1200,7 +1198,7 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		corev1.SetDefaults_Container(a)
 		for j := range a.Ports {
 			b := &a.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}
@@ -1250,7 +1248,7 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		corev1.SetDefaults_EphemeralContainer(a)
 		for j := range a.EphemeralContainerCommon.Ports {
 			b := &a.EphemeralContainerCommon.Ports[j]
-			if reflect.ValueOf(b.Protocol).IsZero() {
+			if b.Protocol == "" {
 				b.Protocol = "TCP"
 			}
 		}

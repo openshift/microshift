@@ -250,7 +250,7 @@ func validateDeploymentStrategy(strategy *appsapi.DeploymentStrategy, pod *kapi.
 		errs = append(errs, validation.ValidateAnnotations(strategy.Annotations, fldPath.Child("annotations"))...)
 	}
 
-	errs = append(errs, validation.ValidateResourceRequirements(&strategy.Resources, fldPath.Child("resources"))...)
+	errs = append(errs, validation.ValidateResourceRequirements(&strategy.Resources, fldPath.Child("resources"), kapivalidation.PodValidationOptions{})...)
 
 	if strategy.ActiveDeadlineSeconds != nil {
 		errs = append(errs, kapivalidation.ValidateNonnegativeField(*strategy.ActiveDeadlineSeconds, fldPath.Child("activeDeadlineSeconds"))...)

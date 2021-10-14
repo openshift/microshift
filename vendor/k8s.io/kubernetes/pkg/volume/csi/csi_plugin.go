@@ -62,7 +62,6 @@ const (
 
 type csiPlugin struct {
 	host                      volume.VolumeHost
-	blockEnabled              bool
 	csiDriverLister           storagelisters.CSIDriverLister
 	serviceAccountTokenGetter func(namespace, name string, tr *authenticationv1.TokenRequest) (*authenticationv1.TokenRequest, error)
 	volumeAttachmentLister    storagelisters.VolumeAttachmentLister
@@ -71,8 +70,7 @@ type csiPlugin struct {
 // ProbeVolumePlugins returns implemented plugins
 func ProbeVolumePlugins() []volume.VolumePlugin {
 	p := &csiPlugin{
-		host:         nil,
-		blockEnabled: utilfeature.DefaultFeatureGate.Enabled(features.CSIBlockVolume),
+		host: nil,
 	}
 	return []volume.VolumePlugin{p}
 }
@@ -241,8 +239,7 @@ func (p *csiPlugin) Init(host volume.VolumeHost) error {
 	// Initializing the label management channels
 	nim = nodeinfomanager.NewNodeInfoManager(host.GetNodeName(), host, migratedPlugins)
 
-	if utilfeature.DefaultFeatureGate.Enabled(features.CSINodeInfo) &&
-		utilfeature.DefaultFeatureGate.Enabled(features.CSIMigration) {
+	if utilfeature.DefaultFeatureGate.Enabled(features.CSIMigration) {
 		// This function prevents Kubelet from posting Ready status until CSINode
 		// is both installed and initialized
 		if err := initializeCSINode(host); err != nil {
@@ -664,10 +661,6 @@ func (p *csiPlugin) GetDeviceMountRefs(deviceMountPath string) ([]string, error)
 var _ volume.BlockVolumePlugin = &csiPlugin{}
 
 func (p *csiPlugin) NewBlockVolumeMapper(spec *volume.Spec, podRef *api.Pod, opts volume.VolumeOptions) (volume.BlockVolumeMapper, error) {
-	if !p.blockEnabled {
-		return nil, errors.New("CSIBlockVolume feature not enabled")
-	}
-
 	pvSource, err := getCSISourceFromSpec(spec)
 	if err != nil {
 		return nil, err
@@ -704,6 +697,13 @@ func (p *csiPlugin) NewBlockVolumeMapper(spec *volume.Spec, podRef *api.Pod, opt
 	}
 	klog.V(4).Info(log("created path successfully [%s]", dataDir))
 
+	blockPath, err := mapper.GetGlobalMapPath(spec)
+	if err != nil {
+		return nil, errors.New(log("failed to get device path: %v", err))
+	}
+
+	mapper.MetricsProvider = NewMetricsCsi(pvSource.VolumeHandle, blockPath+"/"+string(podRef.UID), csiDriverName(pvSource.Driver))
+
 	// persist volume info data for teardown
 	node := string(p.host.GetNodeName())
 	attachID := getAttachmentName(pvSource.VolumeHandle, pvSource.Driver, node)
@@ -736,10 +736,6 @@ func (p *csiPlugin) NewBlockVolumeMapper(spec *volume.Spec, podRef *api.Pod, opt
 }
 
 func (p *csiPlugin) NewBlockVolumeUnmapper(volName string, podUID types.UID) (volume.BlockVolumeUnmapper, error) {
-	if !p.blockEnabled {
-		return nil, errors.New("CSIBlockVolume feature not enabled")
-	}
-
 	klog.V(4).Infof(log("setting up block unmapper for [Spec=%v, podUID=%v]", volName, podUID))
 	unmapper := &csiBlockMapper{
 		plugin:   p,
@@ -761,10 +757,6 @@ func (p *csiPlugin) NewBlockVolumeUnmapper(volName string, podUID types.UID) (vo
 }
 
 func (p *csiPlugin) ConstructBlockVolumeSpec(podUID types.UID, specVolName, mapPath string) (*volume.Spec, error) {
-	if !p.blockEnabled {
-		return nil, errors.New("CSIBlockVolume feature not enabled")
-	}
-
 	klog.V(4).Infof("plugin.ConstructBlockVolumeSpec [podUID=%s, specVolName=%s, path=%s]", string(podUID), specVolName, mapPath)
 
 	dataDir := getVolumeDeviceDataDir(specVolName, p.host)
@@ -882,7 +874,7 @@ func containsVolumeMode(modes []storage.VolumeLifecycleMode, mode storage.Volume
 // getVolumeLifecycleMode returns the mode for the specified spec: {persistent|ephemeral}.
 // 1) If mode cannot be determined, it will default to "persistent".
 // 2) If Mode cannot be resolved to either {persistent | ephemeral}, an error is returned
-// See https://github.com/kubernetes/enhancements/blob/master/keps/sig-storage/20190122-csi-inline-volumes.md
+// See https://github.com/kubernetes/enhancements/blob/master/keps/sig-storage/596-csi-inline-volumes/README.md
 func (p *csiPlugin) getVolumeLifecycleMode(spec *volume.Spec) (storage.VolumeLifecycleMode, error) {
 	// 1) if volume.Spec.Volume.CSI != nil -> mode is ephemeral
 	// 2) if volume.Spec.PersistentVolume.Spec.CSI != nil -> persistent
@@ -968,9 +960,9 @@ func (p *csiPlugin) newAttacherDetacher() (*csiAttacher, error) {
 	}
 
 	return &csiAttacher{
-		plugin:        p,
-		k8s:           k8s,
-		waitSleepTime: 1 * time.Second,
+		plugin:       p,
+		k8s:          k8s,
+		watchTimeout: csiTimeout,
 	}, nil
 }
 

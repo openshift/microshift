@@ -479,7 +479,7 @@ func (az *Cloud) InitializeCloudFromConfig(config *Config, fromSecret bool) erro
 	az.Config = *config
 	az.Environment = *env
 	az.ResourceRequestBackoff = resourceRequestBackoff
-	az.metadata, err = NewInstanceMetadataService(imdsServer)
+	az.metadata, err = NewInstanceMetadataService(metadataURL)
 	if err != nil {
 		return err
 	}

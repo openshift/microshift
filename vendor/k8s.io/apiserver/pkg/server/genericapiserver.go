@@ -135,8 +135,14 @@ type GenericAPIServer struct {
 	// Enable swagger and/or OpenAPI if these configs are non-nil.
 	openAPIConfig *openapicommon.Config
 
+	// SkipOpenAPIInstallation indicates not to install the OpenAPI handler
+	// during PrepareRun.
+	// Set this to true when the specific API Server has its own OpenAPI handler
+	// (e.g. kube-aggregator)
+	skipOpenAPIInstallation bool
+
 	// OpenAPIVersionedService controls the /openapi/v2 endpoint, and can be used to update the served spec.
-	// It is set during PrepareRun.
+	// It is set during PrepareRun if `openAPIConfig` is non-nil unless `skipOpenAPIInstallation` is true.
 	OpenAPIVersionedService *handler.OpenAPIService
 
 	// StaticOpenAPISpec is the spec derived from the restful container endpoints.
@@ -172,6 +178,8 @@ type GenericAPIServer struct {
 	// the readiness stop channel is used to signal that the apiserver has initiated a shutdown sequence, this
 	// will cause readyz to return unhealthy.
 	readinessStopCh chan struct{}
+	// hasBeenReadyCh is closed when /readyz succeeds for the first time.
+	hasBeenReadyCh chan struct{}
 
 	// auditing. The backend is started after the server starts listening.
 	AuditBackend audit.Backend
@@ -295,7 +303,7 @@ type preparedGenericAPIServer struct {
 func (s *GenericAPIServer) PrepareRun() preparedGenericAPIServer {
 	s.delegationTarget.PrepareRun()
 
-	if s.openAPIConfig != nil {
+	if s.openAPIConfig != nil && !s.skipOpenAPIInstallation {
 		s.OpenAPIVersionedService, s.StaticOpenAPISpec = routes.OpenAPI{
 			Config: s.openAPIConfig,
 		}.Install(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
@@ -344,6 +352,23 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 
 		s.Eventf(corev1.EventTypeNormal, "TerminationMinimalShutdownDurationFinished", "The minimal shutdown duration of %v finished", s.ShutdownDelayDuration)
 	}()
+
+	lateStopCh := make(chan struct{})
+	if s.ShutdownDelayDuration > 0 {
+		go func() {
+			defer close(lateStopCh)
+
+			<-stopCh
+
+			time.Sleep(s.ShutdownDelayDuration * 8 / 10)
+		}()
+	}
+
+	s.SecureServingInfo.Listener = &terminationLoggingListener{
+		Listener:   s.SecureServingInfo.Listener,
+		lateStopCh: lateStopCh,
+	}
+	unexpectedRequestsEventf.Store(s.Eventf)
 
 	// close socket after delayed stopCh
 	stoppedCh, err := s.NonBlockingRun(delayedStopCh)
@@ -566,14 +591,15 @@ func (s *GenericAPIServer) newAPIGroupVersion(apiGroupInfo *APIGroupInfo, groupV
 		GroupVersion:     groupVersion,
 		MetaGroupVersion: apiGroupInfo.MetaGroupVersion,
 
-		ParameterCodec:  apiGroupInfo.ParameterCodec,
-		Serializer:      apiGroupInfo.NegotiatedSerializer,
-		Creater:         apiGroupInfo.Scheme,
-		Convertor:       apiGroupInfo.Scheme,
-		UnsafeConvertor: runtime.UnsafeObjectConvertor(apiGroupInfo.Scheme),
-		Defaulter:       apiGroupInfo.Scheme,
-		Typer:           apiGroupInfo.Scheme,
-		Linker:          runtime.SelfLinker(meta.NewAccessor()),
+		ParameterCodec:        apiGroupInfo.ParameterCodec,
+		Serializer:            apiGroupInfo.NegotiatedSerializer,
+		Creater:               apiGroupInfo.Scheme,
+		Convertor:             apiGroupInfo.Scheme,
+		ConvertabilityChecker: apiGroupInfo.Scheme,
+		UnsafeConvertor:       runtime.UnsafeObjectConvertor(apiGroupInfo.Scheme),
+		Defaulter:             apiGroupInfo.Scheme,
+		Typer:                 apiGroupInfo.Scheme,
+		Linker:                runtime.SelfLinker(meta.NewAccessor()),
 
 		EquivalentResourceRegistry: s.EquivalentResourceRegistry,
 
@@ -667,9 +693,6 @@ func (s *GenericAPIServer) Eventf(eventType, reason, messageFmt string, args ...
 		InvolvedObject: ref,
 		Reason:         reason,
 		Message:        fmt.Sprintf(messageFmt, args...),
-		FirstTimestamp: t,
-		LastTimestamp:  t,
-		Count:          1,
 		Type:           eventType,
 		Source:         corev1.EventSource{Component: "apiserver", Host: host},
 	}

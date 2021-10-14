@@ -28,7 +28,7 @@ dependencies:
 	go install ./vendor/github.com/mattn/goveralls
 ifdef SHOULD_LINT
 	@echo "Installing golint..."
-	go install ./vendor/golang.org/x/lint/golint
+	go install ./vendor/github.com/golang/lint/golint
 else
 	@echo "Not installing golint, since we don't expect to lint on" $(GO_VERSION)
 endif
@@ -51,7 +51,7 @@ ifdef SHOULD_LINT
 	@echo "Checking for unresolved FIXMEs..."
 	@git grep -i fixme | grep -v -e vendor -e Makefile | tee -a lint.log
 	@echo "Checking for license headers..."
-	@./checklicense.sh | tee -a lint.log
+	@./check_license.sh | tee -a lint.log
 	@[ ! -s lint.log ]
 else
 	@echo "Skipping linters on" $(GO_VERSION)

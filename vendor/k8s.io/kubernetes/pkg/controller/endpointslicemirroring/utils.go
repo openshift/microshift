@@ -22,17 +22,14 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
-	discovery "k8s.io/api/discovery/v1beta1"
-	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	discovery "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/kubernetes/pkg/apis/discovery/validation"
 	endpointutil "k8s.io/kubernetes/pkg/controller/util/endpoint"
-	"k8s.io/kubernetes/pkg/features"
 )
 
 // addrTypePortMapKey is used to uniquely identify groups of endpoint ports and
@@ -62,25 +59,6 @@ func getAddressType(address string) *discovery.AddressType {
 		addressType = discovery.AddressTypeIPv6
 	}
 	return &addressType
-}
-
-// endpointsEqualBeyondHash returns true if endpoints have equal attributes
-// but excludes equality checks that would have already been covered with
-// endpoint hashing (see hashEndpoint func for more info).
-func endpointsEqualBeyondHash(ep1, ep2 *discovery.Endpoint) bool {
-	if !apiequality.Semantic.DeepEqual(ep1.Topology, ep2.Topology) {
-		return false
-	}
-
-	if !boolPtrEqual(ep1.Conditions.Ready, ep2.Conditions.Ready) {
-		return false
-	}
-
-	if !objectRefPtrEqual(ep1.TargetRef, ep2.TargetRef) {
-		return false
-	}
-
-	return true
 }
 
 // newEndpointSlice returns an EndpointSlice generated from an Endpoints
@@ -148,12 +126,7 @@ func addressToEndpoint(address corev1.EndpointAddress, ready bool) *discovery.En
 	}
 
 	if address.NodeName != nil {
-		endpoint.Topology = map[string]string{
-			"kubernetes.io/hostname": *address.NodeName,
-		}
-		if utilfeature.DefaultFeatureGate.Enabled(features.EndpointSliceNodeName) {
-			endpoint.NodeName = address.NodeName
-		}
+		endpoint.NodeName = address.NodeName
 	}
 	if address.Hostname != "" {
 		endpoint.Hostname = &address.Hostname
@@ -176,29 +149,6 @@ func epPortsToEpsPorts(epPorts []corev1.EndpointPort) []discovery.EndpointPort {
 		})
 	}
 	return epsPorts
-}
-
-// boolPtrEqual returns true if a set of bool pointers have equivalent values.
-func boolPtrEqual(ptr1, ptr2 *bool) bool {
-	if (ptr1 == nil) != (ptr2 == nil) {
-		return false
-	}
-	if ptr1 != nil && ptr2 != nil && *ptr1 != *ptr2 {
-		return false
-	}
-	return true
-}
-
-// objectRefPtrEqual returns true if a set of object ref pointers have
-// equivalent values.
-func objectRefPtrEqual(ref1, ref2 *corev1.ObjectReference) bool {
-	if (ref1 == nil) != (ref2 == nil) {
-		return false
-	}
-	if ref1 != nil && ref2 != nil && !apiequality.Semantic.DeepEqual(*ref1, *ref2) {
-		return false
-	}
-	return true
 }
 
 // getServiceFromDeleteAction parses a Service resource from a delete

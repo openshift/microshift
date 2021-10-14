@@ -108,7 +108,7 @@ func (s *scope) RemoveContainer(containerID string) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	klog.Infof("[topologymanager] RemoveContainer - Container ID: %v", containerID)
+	klog.InfoS("RemoveContainer", "containerID", containerID)
 	// Get the podUID and containerName associated with the containerID to be removed and remove it
 	podUIDString, containerName, err := s.podMap.GetContainerRef(containerID)
 	if err != nil {

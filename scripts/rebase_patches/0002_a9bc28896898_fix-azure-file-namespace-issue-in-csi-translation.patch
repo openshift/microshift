@@ -1,0 +1,133 @@
+diff --git a/vendor/k8s.io/csi-translation-lib/plugins/aws_ebs.go b/vendor/k8s.io/csi-translation-lib/plugins/aws_ebs.go
+index db00283a68d..a5c32013f90 100644
+--- a/vendor/k8s.io/csi-translation-lib/plugins/aws_ebs.go
++++ b/vendor/k8s.io/csi-translation-lib/plugins/aws_ebs.go
+@@ -86,7 +86,7 @@ func (t *awsElasticBlockStoreCSITranslator) TranslateInTreeStorageClassToCSI(sc
+ 
+ // TranslateInTreeInlineVolumeToCSI takes a Volume with AWSElasticBlockStore set from in-tree
+ // and converts the AWSElasticBlockStore source to a CSIPersistentVolumeSource
+-func (t *awsElasticBlockStoreCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume) (*v1.PersistentVolume, error) {
++func (t *awsElasticBlockStoreCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume, podNamespace string) (*v1.PersistentVolume, error) {
+ 	if volume == nil || volume.AWSElasticBlockStore == nil {
+ 		return nil, fmt.Errorf("volume is nil or AWS EBS not defined on volume")
+ 	}
+diff --git a/vendor/k8s.io/csi-translation-lib/plugins/azure_disk.go b/vendor/k8s.io/csi-translation-lib/plugins/azure_disk.go
+index 8184881de9d..d47df35e5c4 100644
+--- a/vendor/k8s.io/csi-translation-lib/plugins/azure_disk.go
++++ b/vendor/k8s.io/csi-translation-lib/plugins/azure_disk.go
+@@ -93,7 +93,7 @@ func (t *azureDiskCSITranslator) TranslateInTreeStorageClassToCSI(sc *storage.St
+ 
+ // TranslateInTreeInlineVolumeToCSI takes a Volume with AzureDisk set from in-tree
+ // and converts the AzureDisk source to a CSIPersistentVolumeSource
+-func (t *azureDiskCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume) (*v1.PersistentVolume, error) {
++func (t *azureDiskCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume, podNamespace string) (*v1.PersistentVolume, error) {
+ 	if volume == nil || volume.AzureDisk == nil {
+ 		return nil, fmt.Errorf("volume is nil or Azure Disk not defined on volume")
+ 	}
+diff --git a/vendor/k8s.io/csi-translation-lib/plugins/azure_file.go b/vendor/k8s.io/csi-translation-lib/plugins/azure_file.go
+index 6ce3be461f7..df8251325f1 100644
+--- a/vendor/k8s.io/csi-translation-lib/plugins/azure_file.go
++++ b/vendor/k8s.io/csi-translation-lib/plugins/azure_file.go
+@@ -65,7 +65,7 @@ func (t *azureFileCSITranslator) TranslateInTreeStorageClassToCSI(sc *storage.St
+ 
+ // TranslateInTreeInlineVolumeToCSI takes a Volume with AzureFile set from in-tree
+ // and converts the AzureFile source to a CSIPersistentVolumeSource
+-func (t *azureFileCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume) (*v1.PersistentVolume, error) {
++func (t *azureFileCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume, podNamespace string) (*v1.PersistentVolume, error) {
+ 	if volume == nil || volume.AzureFile == nil {
+ 		return nil, fmt.Errorf("volume is nil or Azure File not defined on volume")
+ 	}
+@@ -77,6 +77,11 @@ func (t *azureFileCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Vol
+ 		accountName = azureSource.SecretName
+ 	}
+ 
++	secretNamespace := defaultSecretNamespace
++	if podNamespace != "" {
++		secretNamespace = podNamespace
++	}
++
+ 	var (
+ 		pv = &v1.PersistentVolume{
+ 			ObjectMeta: metav1.ObjectMeta{
+@@ -93,7 +98,7 @@ func (t *azureFileCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Vol
+ 						VolumeAttributes: map[string]string{shareNameField: azureSource.ShareName},
+ 						NodeStageSecretRef: &v1.SecretReference{
+ 							Name:      azureSource.SecretName,
+-							Namespace: defaultSecretNamespace,
++							Namespace: secretNamespace,
+ 						},
+ 					},
+ 				},
+diff --git a/vendor/k8s.io/csi-translation-lib/plugins/gce_pd.go b/vendor/k8s.io/csi-translation-lib/plugins/gce_pd.go
+index d163fe88536..5183e092bdf 100644
+--- a/vendor/k8s.io/csi-translation-lib/plugins/gce_pd.go
++++ b/vendor/k8s.io/csi-translation-lib/plugins/gce_pd.go
+@@ -162,7 +162,7 @@ func backwardCompatibleAccessModes(ams []v1.PersistentVolumeAccessMode) []v1.Per
+ 
+ // TranslateInTreeInlineVolumeToCSI takes a Volume with GCEPersistentDisk set from in-tree
+ // and converts the GCEPersistentDisk source to a CSIPersistentVolumeSource
+-func (g *gcePersistentDiskCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume) (*v1.PersistentVolume, error) {
++func (g *gcePersistentDiskCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume, podNamespace string) (*v1.PersistentVolume, error) {
+ 	if volume == nil || volume.GCEPersistentDisk == nil {
+ 		return nil, fmt.Errorf("volume is nil or GCE PD not defined on volume")
+ 	}
+diff --git a/vendor/k8s.io/csi-translation-lib/plugins/in_tree_volume.go b/vendor/k8s.io/csi-translation-lib/plugins/in_tree_volume.go
+index f1c760df786..7a0040e2661 100644
+--- a/vendor/k8s.io/csi-translation-lib/plugins/in_tree_volume.go
++++ b/vendor/k8s.io/csi-translation-lib/plugins/in_tree_volume.go
+@@ -37,7 +37,8 @@ type InTreePlugin interface {
+ 	// TranslateInTreeInlineVolumeToCSI takes a inline volume and will translate
+ 	// the in-tree inline volume source to a CSIPersistentVolumeSource
+ 	// A PV object containing the CSIPersistentVolumeSource in it's spec is returned
+-	TranslateInTreeInlineVolumeToCSI(volume *v1.Volume) (*v1.PersistentVolume, error)
++	// podNamespace is only needed for azurefile to fetch secret namespace, no need to be set for other plugins.
++	TranslateInTreeInlineVolumeToCSI(volume *v1.Volume, podNamespace string) (*v1.PersistentVolume, error)
+ 
+ 	// TranslateInTreePVToCSI takes a persistent volume and will translate
+ 	// the in-tree pv source to a CSI Source. The input persistent volume can be modified
+diff --git a/vendor/k8s.io/csi-translation-lib/plugins/openstack_cinder.go b/vendor/k8s.io/csi-translation-lib/plugins/openstack_cinder.go
+index 44f744cb218..66ce81185e9 100644
+--- a/vendor/k8s.io/csi-translation-lib/plugins/openstack_cinder.go
++++ b/vendor/k8s.io/csi-translation-lib/plugins/openstack_cinder.go
+@@ -75,7 +75,7 @@ func (t *osCinderCSITranslator) TranslateInTreeStorageClassToCSI(sc *storage.Sto
+ 
+ // TranslateInTreeInlineVolumeToCSI takes a Volume with Cinder set from in-tree
+ // and converts the Cinder source to a CSIPersistentVolumeSource
+-func (t *osCinderCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume) (*v1.PersistentVolume, error) {
++func (t *osCinderCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume, podNamespace string) (*v1.PersistentVolume, error) {
+ 	if volume == nil || volume.Cinder == nil {
+ 		return nil, fmt.Errorf("volume is nil or Cinder not defined on volume")
+ 	}
+diff --git a/vendor/k8s.io/csi-translation-lib/plugins/vsphere_volume.go b/vendor/k8s.io/csi-translation-lib/plugins/vsphere_volume.go
+index 531aff0d983..83058b374a6 100644
+--- a/vendor/k8s.io/csi-translation-lib/plugins/vsphere_volume.go
++++ b/vendor/k8s.io/csi-translation-lib/plugins/vsphere_volume.go
+@@ -111,7 +111,7 @@ func (t *vSphereCSITranslator) TranslateInTreeStorageClassToCSI(sc *storage.Stor
+ 
+ // TranslateInTreeInlineVolumeToCSI takes a Volume with VsphereVolume set from in-tree
+ // and converts the VsphereVolume source to a CSIPersistentVolumeSource
+-func (t *vSphereCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume) (*v1.PersistentVolume, error) {
++func (t *vSphereCSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume, podNamespace string) (*v1.PersistentVolume, error) {
+ 	if volume == nil || volume.VsphereVolume == nil {
+ 		return nil, fmt.Errorf("volume is nil or VsphereVolume not defined on volume")
+ 	}
+diff --git a/vendor/k8s.io/csi-translation-lib/translate.go b/vendor/k8s.io/csi-translation-lib/translate.go
+index 21f5c49d59a..c1ffbe97411 100644
+--- a/vendor/k8s.io/csi-translation-lib/translate.go
++++ b/vendor/k8s.io/csi-translation-lib/translate.go
+@@ -62,13 +62,13 @@ func (CSITranslator) TranslateInTreeStorageClassToCSI(inTreePluginName string, s
+ // TranslateInTreeInlineVolumeToCSI takes a inline volume and will translate
+ // the in-tree volume source to a CSIPersistentVolumeSource (wrapped in a PV)
+ // if the translation logic has been implemented.
+-func (CSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume) (*v1.PersistentVolume, error) {
++func (CSITranslator) TranslateInTreeInlineVolumeToCSI(volume *v1.Volume, podNamespace string) (*v1.PersistentVolume, error) {
+ 	if volume == nil {
+ 		return nil, fmt.Errorf("persistent volume was nil")
+ 	}
+ 	for _, curPlugin := range inTreePlugins {
+ 		if curPlugin.CanSupportInline(volume) {
+-			pv, err := curPlugin.TranslateInTreeInlineVolumeToCSI(volume)
++			pv, err := curPlugin.TranslateInTreeInlineVolumeToCSI(volume, podNamespace)
+ 			if err != nil {
+ 				return nil, err
+ 			}

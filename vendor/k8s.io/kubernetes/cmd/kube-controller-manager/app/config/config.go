@@ -26,6 +26,8 @@ import (
 
 // Config is the main context object for the controller manager.
 type Config struct {
+	OpenShiftContext OpenShiftContext
+
 	ComponentConfig kubectrlmgrconfig.KubeControllerManagerConfiguration
 
 	SecureServing *apiserver.SecureServingInfo
@@ -39,9 +41,6 @@ type Config struct {
 
 	// the general kube client
 	Client *clientset.Clientset
-
-	// the client only used for leader election
-	LeaderElectionClient *clientset.Clientset
 
 	// the rest config for the master
 	Kubeconfig *restclient.Config

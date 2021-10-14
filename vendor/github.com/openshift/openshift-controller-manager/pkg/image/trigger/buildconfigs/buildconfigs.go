@@ -22,6 +22,7 @@ import (
 	buildclientv1 "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
 	"github.com/openshift/library-go/pkg/build/buildutil"
 	triggerutil "github.com/openshift/library-go/pkg/image/trigger"
+	ocmbuildutil "github.com/openshift/openshift-controller-manager/pkg/build/buildutil"
 	"github.com/openshift/openshift-controller-manager/pkg/image/trigger"
 )
 
@@ -175,8 +176,12 @@ func (r *buildConfigReactor) ImageChanged(obj runtime.Object, tagRetriever trigg
 			newSource = true
 		}
 
-		// LastTriggeredImageID is an image ref, despite the name
-		if latest == p.LastTriggeredImageID {
+		// Determine whether this trigger has fired previously and is recorded in status;
+		// openshift-apiserver updates the status of image change triggers,
+		// including resolving LastTriggeredImageID and LastTriggerTime.
+		pStatus := ocmbuildutil.GetImageChangeTriggerStatusForImageChangeTrigger(p, bc)
+		if pStatus != nil && latest == pStatus.LastTriggeredImageID {
+			// LastTriggeredImageID is an image ref, despite the name
 			continue
 		}
 

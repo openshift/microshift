@@ -47,6 +47,7 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 	}
 
 	addSourceEnvVars(build.Spec.Source, &containerEnv)
+	addTrustedCAMountEnvVar(build.Spec.MountTrustedCA, &containerEnv)
 
 	if len(strategy.Env) > 0 {
 		buildutil.MergeTrustedEnvWithoutDuplicates(strategy.Env, &containerEnv, true)

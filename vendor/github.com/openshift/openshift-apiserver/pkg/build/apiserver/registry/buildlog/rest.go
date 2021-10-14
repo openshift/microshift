@@ -16,6 +16,7 @@ import (
 	genericrest "k8s.io/apiserver/pkg/registry/generic/rest"
 	"k8s.io/apiserver/pkg/registry/rest"
 	kubetypedclient "k8s.io/client-go/kubernetes/typed/core/v1"
+	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/klog/v2"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	v1 "k8s.io/kubernetes/pkg/apis/core/v1"
@@ -33,10 +34,11 @@ import (
 	buildwait "github.com/openshift/openshift-apiserver/pkg/build/apiserver/registry/wait"
 )
 
-// REST is an implementation of RESTStorage for the api server.
+// REST is an implementation of RESTStorage for the buildlog apiserver.
 type REST struct {
 	BuildClient buildtypedclient.BuildsGetter
 	PodClient   kubetypedclient.PodsGetter
+	PodLister   corev1listers.PodLister
 	Timeout     time.Duration
 
 	// for unit testing
@@ -48,10 +50,11 @@ const defaultTimeout time.Duration = 30 * time.Second
 // NewREST creates a new REST for BuildLog
 // Takes build registry and pod client to get necessary attributes to assemble
 // URL to which the request shall be redirected in order to get build logs.
-func NewREST(buildClient buildtypedclient.BuildsGetter, podClient kubetypedclient.PodsGetter) *REST {
+func NewREST(buildClient buildtypedclient.BuildsGetter, podClient kubetypedclient.PodsGetter, podLister corev1listers.PodLister) *REST {
 	r := &REST{
 		BuildClient: buildClient,
 		PodClient:   podClient,
+		PodLister:   podLister,
 		Timeout:     defaultTimeout,
 	}
 	r.getSimpleLogsFn = r.getSimpleLogs
@@ -69,21 +72,25 @@ func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runti
 	if errs := validation.ValidateBuildLogOptions(buildLogOpts); len(errs) > 0 {
 		return nil, errors.NewInvalid(build.Kind("BuildLogOptions"), "", errs)
 	}
-	build, err := r.BuildClient.Builds(apirequest.NamespaceValue(ctx)).Get(ctx, name, metav1.GetOptions{})
+
+	ns := apirequest.NamespaceValue(ctx)
+	build, err := r.BuildClient.Builds(ns).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
+
 	if buildLogOpts.Previous {
 		version := versionForBuild(build)
 		// Use the previous version
 		version--
 		previousBuildName := buildNameForConfigVersion(buildutil.ConfigNameForBuild(build), version)
-		previous, err := r.BuildClient.Builds(apirequest.NamespaceValue(ctx)).Get(ctx, previousBuildName, metav1.GetOptions{})
+		previous, err := r.BuildClient.Builds(ns).Get(ctx, previousBuildName, metav1.GetOptions{})
 		if err != nil {
 			return nil, err
 		}
 		build = previous
 	}
+
 	switch build.Status.Phase {
 	// Build has not launched, wait until it runs
 	case buildv1.BuildPhaseNew, buildv1.BuildPhasePending:
@@ -121,7 +128,7 @@ func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runti
 
 	// if we can't at least get the build pod, we're not going to get very far, so
 	// error out now.
-	buildPod, err := r.PodClient.Pods(build.Namespace).Get(ctx, buildPodName, metav1.GetOptions{})
+	buildPod, err := r.PodLister.Pods(build.Namespace).Get(buildPodName)
 	if err != nil {
 		return nil, errors.NewBadRequest(err.Error())
 	}
@@ -178,7 +185,7 @@ func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runti
 			// assume we are not going to need to iterate again until proven otherwise
 			waitForInitContainers = false
 			// Get the latest version of the pod so we can check init container statuses
-			buildPod, err = r.PodClient.Pods(build.Namespace).Get(ctx, buildPodName, metav1.GetOptions{})
+			buildPod, err = r.PodLister.Pods(build.Namespace).Get(buildPodName)
 			if err != nil {
 				s := fmt.Sprintf("error retrieving build pod %s/%s : %v", build.Namespace, buildPodName, err.Error())
 				// we're sending the error message as the log output so the user at least sees some indication of why
@@ -268,7 +275,7 @@ func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runti
 			// Wait for the main container to be running, this can take a second after the initcontainers
 			// finish so we have to poll.
 			err := wait.PollImmediate(time.Second, 10*time.Minute, func() (bool, error) {
-				buildPod, err = r.PodClient.Pods(build.Namespace).Get(ctx, buildPodName, metav1.GetOptions{})
+				buildPod, err = r.PodLister.Pods(build.Namespace).Get(buildPodName)
 				if err != nil {
 					s := fmt.Sprintf("error while getting build logs, could not retrieve build pod %s/%s : %v", build.Namespace, buildPodName, err.Error())
 					pipeStreamer.In.Write([]byte(s))
