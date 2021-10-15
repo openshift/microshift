@@ -165,10 +165,6 @@ build-containerized-cross-build:
 # dev targets                 #
 ###############################
 
-vendor:
-	./hack/vendoring.sh
-.PHONY: vendor
-
 clean-cross-build:
 	$(RM) -r '$(CROSS_BUILD_BINDIR)'
 	$(RM) -rf $(OUTPUT_DIR)/staging
