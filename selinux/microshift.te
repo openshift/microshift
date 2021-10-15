@@ -12,6 +12,7 @@ allow container_t container_runtime_tmpfs_t:file open;
 allow container_t container_runtime_tmpfs_t:file read;
 allow container_t container_var_lib_t:file open;
 allow container_t container_var_lib_t:file read;
+allow container_t container_var_lib_t:lnk_file read;
 
 gen_require(`
     type container_runtime_t, container_var_lib_t, container_file_t, container_t, container_runtime_tmpfs_t;
