@@ -13,49 +13,8 @@ V()
 }
 
 
-function check_for_running_containers(){
-  if [[ ! -z $(${SUDO} crictl ps  | grep -v CONTAINER) ]];
-  then 
-    CONTAINERS=$(${SUDO} crictl ps | awk '{if(NR>1) print $1}')
-    for CONTAINER in $CONTAINERS
-    do
-      V ${SUDO} crictl stop $CONTAINER
-      sleep ${WAIT_FOR_CONTAINER}s
-    done
-  fi 
-}
-
-function remove_all_stopped_containers(){
-  if [[ ! -z $(${SUDO} crictl ps -q -a | grep -v CONTAINER) ]];
-  then 
-    CONTAINERS=$(${SUDO} crictl ps -a | awk '{if(NR>1) print $1}')
-    for CONTAINER in $CONTAINERS
-    do
-      V ${SUDO} crictl rm $CONTAINER 
-    done
-  fi 
-}
-
-function check_for_running_pods(){
-  if [[ ! -z $(${SUDO} crictl pods | grep -v "POD ID") ]];
-  then 
-    PODS=$(${SUDO} crictl pods | awk '{if(NR>1) print $1}')
-    for POD in $PODS
-    do
-      V ${SUDO} crictl stopp $POD 
-    done
-  fi 
-}
-
-function remove_all_pods(){
-  if [[ ! -z $(${SUDO} crictl pods | grep -v "POD ID") ]];
-  then 
-    PODS=$(${SUDO} crictl pods | awk '{if(NR>1) print $1}')
-    for POD in $PODS
-    do
-      V ${SUDO} crictl rmp $POD 
-    done
-  fi 
+function cri_cleanup(){
+  until sudo crictl rmp --force --all; do sleep 1; done
 }
 
 function check_overlay_mount_points(){
@@ -83,6 +42,17 @@ function remove_all_overlay_mount_points(){
   fi 
 }
 
+function remove_opened_ports(){
+   sudo firewall-cmd --zone=public --permanent --remove-port=6443/tcp
+   sudo firewall-cmd --zone=public --permanent --remove-port=30000-32767/tcp
+   sudo firewall-cmd --zone=public --permanent --remove-port=2379-2380/tcp
+   sudo firewall-cmd --zone=public --remove-masquerade --permanent
+   sudo firewall-cmd --zone=public --remove-port=10250/tcp --permanent
+   sudo firewall-cmd --zone=public --remove-port=10251/tcp --permanent
+   sudo firewall-cmd --permanent --zone=trusted --remove-source=10.42.0.0/16
+   sudo firewall-cmd --reload
+}
+
 function remove_all_overlay_kubelet_points(){
   if [[ ! -z $(${SUDO} mount | grep kubelet ) ]];
   then 
@@ -90,20 +60,22 @@ function remove_all_overlay_kubelet_points(){
   fi 
 }
 
+function remove_microshift_kubeconfig(){
+  kubectl config delete-cluster microshift
+}
+
 V ${SUDO} systemctl stop microshift
 V ${SUDO} systemctl disable microshift
-V ${SUDO} rm -rf /etc/systemd/system/microshift
-V ${SUDO} rm -rf /usr/lib/systemd/system/microshift
+V ${SUDO} rm -f /etc/systemd/system/microshift
+V ${SUDO} rm -f /usr/lib/systemd/system/microshift
 V ${SUDO} systemctl daemon-reload
 V ${SUDO} systemctl reset-failed
 
-check_for_running_containers
-remove_all_stopped_containers
-check_for_running_pods
-remove_all_pods
-
+cri_cleanup
+remove_microshift_kubeconfig
 check_overlay_mount_points
 remove_all_overlay_kubelet_points
+remove_opened_ports
 
 V ${SUDO} pkill -9 pause
 
@@ -113,12 +85,14 @@ V ${SUDO} rm -rf /var/lib/etcd
 V ${SUDO} rm -rf /var/lib/kubelet
 
 V ${SUDO} mkdir -p /var/lib/kubelet
-V ${SUDO} chcon -R -t container_file_t /var/lib/kubelet/
 
-sudo crictl rm --all --force
-sudo crictl rmi --all --prune
+echo "Removing Selinux Policy"
+sudo semodule -r microshift
 
 sudo pkill -9 conmon
 sudo pkill -9 pause
 
 sudo rm -rf /var/lib/microshift
+V ${SUDO} systemctl stop cri-o
+V ${SUDO} systemctl disable cri-o
+V ${SUDO} rm -f /etc/systemd/system/microshift
