@@ -24,7 +24,7 @@ import (
 
 func kubeAPIAuditPolicyFile(path string) error {
 	data := []byte(`
-apiVersion: audit.k8s.io/v1beta1
+apiVersion: audit.k8s.io/v1
 kind: Policy
 metadata:
   name: Default
