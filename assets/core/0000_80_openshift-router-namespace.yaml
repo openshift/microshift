@@ -4,6 +4,7 @@ metadata:
   name: openshift-ingress
   annotations:
     openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
   labels:
     # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
     openshift.io/cluster-monitoring: "true"

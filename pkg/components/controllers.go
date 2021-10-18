@@ -134,13 +134,15 @@ func startDNSController(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 			"assets/rbac/0000_70_dns_01-cluster-role.yaml",
 		}
 		apps = []string{
-			"assets/apps/0000_70_dns_01-daemonset.yaml",
+			"assets/apps/0000_70_dns_01-dns-daemonset.yaml",
+			"assets/apps/0000_70_dns_01-node-resolver-daemonset.yaml",
 		}
 		ns = []string{
 			"assets/core/0000_70_dns_00-namespace.yaml",
 		}
 		sa = []string{
-			"assets/core/0000_70_dns_01-service-account.yaml",
+			"assets/core/0000_70_dns_01-dns-service-account.yaml",
+			"assets/core/0000_70_dns_01-node-resolver-service-account.yaml",
 		}
 		cm = []string{
 			"assets/core/0000_70_dns_01-configmap.yaml",
