@@ -3,6 +3,7 @@ ARG IMAGE_NAME=registry.access.redhat.com/ubi8/ubi-init:8.4
 FROM registry.access.redhat.com/ubi8/go-toolset as builder
 
 ARG FROM_SOURCE=false
+
 ARG ARCH
 
 ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
@@ -31,12 +32,18 @@ FROM ${IMAGE_NAME}
 
 ARG HOST=rhel8
 
+ARG ARCH
+
 ENV BUILD_PATH=packaging/images/microshift-aio
 
 COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/microshift /usr/local/bin/microshift
 COPY $BUILD_PATH/unit /usr/lib/systemd/system/microshift.service
 COPY $BUILD_PATH/kubelet-cgroups.conf /etc/systemd/system.conf.d/kubelet-cgroups.conf
 COPY $BUILD_PATH/crio-bridge.conf /etc/cni/net.d/100-crio-bridge.conf
+
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$ARCH/kubectl" && \
+    chmod +x ./kubectl && \
+    mv ./kubectl /usr/local/bin/kubectl
 
 RUN chmod 755 /usr/local/bin/microshift
 RUN export VERSION=1.20 && \
