@@ -64,7 +64,7 @@ GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi 
 microshift: build-containerized-cross-build-linux-amd64
 .PHONY: microshift
 
-microshift-aio: build-containerized-all-in-one
+microshift-aio: build-containerized-all-in-one-amd64
 .PHONY: microshift-aio
 
 update: update-generated-completions
@@ -180,10 +180,13 @@ build-containerized-cross-build:
 	+$(MAKE) build-containerized-cross-build-linux-arm64
 .PHONY: build-containerized-cross-build
 
-build-containerized-all-in-one:
+build-containerized-all-in-one-amd64:
 	+$(MAKE) _build_containerized_aio ARCH=amd64
 .PHONY: build-containerized-all-in-one
 
+build-containerized-all-in-one-arm64:
+	+$(MAKE) _build_containerized_aio ARCH=arm64
+.PHONY: build-containerized-all-in-one
 ###############################
 # dev targets                 #
 ###############################
