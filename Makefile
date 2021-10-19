@@ -23,10 +23,13 @@ SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*
 
 SRC_ROOT :=$(shell pwd)
 
-BUILD_CFG :=./images/build/Dockerfile
 IMAGE_REPO :=quay.io/microshift/microshift
+IMAGE_REPO_AIO :=quay.io/microshift/microshift-aio
 OUTPUT_DIR :=_output
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
+FROM_SOURCE :=false
+CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
+ARCH :=$(shell uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
 
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
@@ -60,6 +63,9 @@ GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi 
 # targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
 microshift: build-containerized-cross-build-linux-amd64
 .PHONY: microshift
+
+microshift-aio: build-containerized-all-in-one
+.PHONY: microshift-aio
 
 update: update-generated-completions
 .PHONY: update
@@ -123,23 +129,22 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 .PHONY: cross-build
 
 rpm:
-	BUILD=rpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./rpm/make-rpm.sh local
+	BUILD=rpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
 
 .PHONY: rpm
 
 srpm:
-	BUILD=srpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./rpm/make-rpm.sh local
+	BUILD=srpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
 .PHONY: srpm
 
 ###############################
 # containerized build targets #
 ###############################
-_build_containerized: CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 _build_containerized:
 	@if [ -z '$(CTR_CMD)' ] ; then echo '!! ERROR: containerized builds require podman||docker CLI, none found $$PATH' >&2 && exit 1; fi
 	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
 	$(CTR_CMD) build -t $(IMAGE_REPO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
-		-f "$(SRC_ROOT)"/images/build/Dockerfile \
+		-f "$(SRC_ROOT)"/packaging/images/microshift/Dockerfile \
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
 		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
 		--build-arg ARCH=$(ARCH) \
@@ -147,6 +152,20 @@ _build_containerized:
 		--platform="linux/$(ARCH)" \
 		.
 .PHONY: _build_containerized
+
+_build_containerized_aio:
+	@if [ -z '$(CTR_CMD)' ] ; then echo '!! ERROR: containerized builds require podman||docker CLI, none found $$PATH' >&2 && exit 1; fi
+	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
+	$(CTR_CMD) build -t $(IMAGE_REPO_AIO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
+		-f "$(SRC_ROOT)"/packaging/images/microshift-aio/Dockerfile \
+		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
+		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
+		--build-arg ARCH=$(ARCH) \
+		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
+		--build-arg FROM_SOURCE=$(FROM_SOURCE) \
+		--platform="linux/$(ARCH)" \
+		.
+.PHONY: _build_containerized_aio
 
 build-containerized-cross-build-linux-amd64:
 	+$(MAKE) _build_containerized ARCH=amd64
@@ -160,6 +179,10 @@ build-containerized-cross-build:
 	+$(MAKE) build-containerized-cross-build-linux-amd64
 	+$(MAKE) build-containerized-cross-build-linux-arm64
 .PHONY: build-containerized-cross-build
+
+build-containerized-all-in-one:
+	+$(MAKE) _build_containerized_aio ARCH=amd64
+.PHONY: build-containerized-all-in-one
 
 ###############################
 # dev targets                 #

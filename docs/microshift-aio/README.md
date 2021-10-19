@@ -1,11 +1,10 @@
-# Containerized Microshift With GPU Support and Kubectl 
+# Containerized Microshift 
 
 ## Run Microshift All-In-One as a Systemd Service
 
 Copy microshift-aio unit file to /etc/systemd and the aio run script to /usr/bin
 
 ```bash
-# from microshift repository root directory
 cp packaging/systemd/microshift-aio.service /etc/systemd/system/microshift-aio.service
 cp packaging/systemd/microshift-aio /usr/bin/
 ```
@@ -63,6 +62,15 @@ Execute the following command to get into the container:
 sudo podman exec -ti microshift-aio bash
 ```
 
+Inside the container, install kubectl:
+
+```bash
+export ARCH=$(uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
+curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/${ARCH}/kubectl" && \
+chmod +x ./kubectl && \
+mv ./kubectl /usr/local/bin/kubectl
+```
+
 Inside the container, run the following to see the pods:
 
 ```bash
@@ -94,16 +102,16 @@ kubectl.exe get pods -A -w --kubeconfig .\kubeconfig
 
 ## Build All-In-One Container Image
 
-### Build With Locally Built Binary and Custom Image Name
+### Build With Locally Built Binary
 
 ```bash
-FROM_SOURCE="true" TAG="quay.io/myname/myrepo:dev" ./hack/build-aio-dev.sh
+make microshift-aio FROM_SOURCE="true"
 ```
 
-### Build With Latest Released Binary Download and Custom Image Name
+### Build With Latest Released Binary Download
 
 ```bash
-TAG="quay.io/myname/myrepo:dev" ./hack/build-aio-dev.sh
+make microshfit-aio
 ```
 
 ## Limitation

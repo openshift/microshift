@@ -125,7 +125,7 @@ cp ./_output/bin/${GOOS}_${GOARCH}/microshift ./_output/microshift
 
 # SELinux modules build
 
-cd selinux
+cd packaging/selinux
 make
 
 %install
@@ -135,7 +135,7 @@ install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
 restorecon -v %{buildroot}%{_bindir}/microshift
 
 install -d -m755 %{buildroot}/%{_unitdir}
-install -p -m644 rpm/microshift.service %{buildroot}%{_unitdir}/microshift.service
+install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 
 mkdir -p -m755 %{buildroot}/var/run/flannel
 mkdir -p -m755 %{buildroot}/var/run/kubelet
@@ -145,7 +145,7 @@ mkdir -p -m755 %{buildroot}/var/hpvolumes
 restorecon -v %{buildroot}/var/hpvolumes
 
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
-install -m644 selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
+install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 
 %post
 
