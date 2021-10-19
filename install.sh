@@ -64,8 +64,8 @@ register_subs() {
 build_selinux_policy() {
     ## Workaround until packaged as RPM
     sudo dnf -y install selinux-policy-devel
-    curl -L -o /tmp/microshift.fc https://raw.githubusercontent.com/redhat-et/microshift/main/selinux/microshift.fc
-    curl -L -o /tmp/microshift.te https://raw.githubusercontent.com/redhat-et/microshift/main/selinux/microshift.te
+    curl -L -o /tmp/microshift.fc https://raw.githubusercontent.com/redhat-et/microshift/main/packaging/selinux/microshift.fc
+    curl -L -o /tmp/microshift.te https://raw.githubusercontent.com/redhat-et/microshift/main/packaging/selinux/microshift.te
     make -f /usr/share/selinux/devel/Makefile -C /tmp
     sudo dnf -y remove selinux-policy-devel
 }
