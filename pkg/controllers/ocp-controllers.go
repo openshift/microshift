@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	cliflag "k8s.io/component-base/cli/flag"
 
 	oauth_apiserver "github.com/openshift/oauth-apiserver/pkg/cmd/oauth-apiserver"
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
@@ -79,7 +80,11 @@ func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 	}()
 
 	// ocp api service registration
-	if err := createAPIHeadlessSvc(cfg); err != nil {
+	if err := createAPIHeadlessSvc(cfg, "openshift-apiserver", 8444); err != nil {
+		logrus.Warningf("failed to apply headless svc %v", err)
+		return err
+	}
+	if err := createAPIHeadlessSvc(cfg, "openshift-oauth-apiserver", 8443); err != nil {
 		logrus.Warningf("failed to apply headless svc %v", err)
 		return err
 	}
@@ -238,6 +243,7 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 // OAuth OpenShift Service
 type OpenShiftOAuth struct {
 	options *oauth_apiserver.OAuthAPIServerOptions
+	Output  io.Writer
 }
 
 func NewOpenShiftOAuth(cfg *config.MicroshiftConfig) *OpenShiftOAuth {
@@ -247,36 +253,40 @@ func NewOpenShiftOAuth(cfg *config.MicroshiftConfig) *OpenShiftOAuth {
 }
 
 func (s *OpenShiftOAuth) Name() string           { return "oauth-apiserver" }
-func (s *OpenShiftOAuth) Dependencies() []string { return []string{"oauth-apiserver"} }
+func (s *OpenShiftOAuth) Dependencies() []string { return []string{} }
 
 func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
-	opts := oauth_apiserver.NewOAuthAPIServerOptions(os.Stdout)
-	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
+	// var configFilePath = cfg.DataDir + "/resources/openshift-oauth-apiserver/config/config.yaml"
+	// if err := config.
+
+	// caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
 	args := []string{
 		"start",
 		"--secure-port=8443",
-		"--audit-log-format=json",
-		"--audit-log-maxsize=100",
-		"--audit-log-maxbackup=10",
-		"--audit-policy-file=/var/run/configmaps/audit/policy.yaml",
-		"--etcd-cafile=" + caCertFile,
+		"--kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--authorization-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--authentication-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		// "--audit-log-format=json",
+		// "--audit-log-maxsize=100",
+		// "--audit-log-maxbackup=10",
+		"--etcd-cafile=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
 		"--etcd-keyfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key",
 		"--etcd-certfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt",
-		"--shutdown-delay-duration=10s",
-		"--tls-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
-		"--tls-private-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
-		"--api-audiences=https://kubernetes.default.svc",
-		"--cors-allowed-origins='//127.0.0.1(:|$)'",
-		"--cors-allowed-origins='//localhost(:|$)'",
+		"--shutdown-delay-duration=120s",
+		"--tls-cert-file=" + cfg.DataDir + "/resources/ocp-oauth-apiserver/secrets/tls.crt",
+		"--tls-private-key-file=" + cfg.DataDir + "/resources/ocp-oauth-apiserver/secrets/tls.key",
+		// "--api-audiences=https://kubernetes.default.svc",
+		// "--cors-allowed-origins='//127.0.0.1(:|$)'",
+		// "--cors-allowed-origins='//localhost(:|$)'",
 		"--etcd-servers=https://127.0.0.1:2379",
-		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-		"--tls-min-version=VersionTLS12",
-		"--v=2",
+		// "--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+		// "--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+		// "--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+		// "--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+		// "--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+		// "--tls-cipher-suites=TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+		// "--tls-min-version=VersionTLS12",
+		"--v=4",
 	}
 	if cfg.LogDir != "" {
 		args = append(args,
@@ -284,23 +294,26 @@ func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
 			"--audit-log-path="+filepath.Join(cfg.LogDir, "oauth-apiserver-audit.log"))
 	}
 
+	opts := oauth_apiserver.NewOAuthAPIServerOptions(os.Stdout)
 	cmd := &cobra.Command{
 		Use:          "oauth-apiserver",
 		Long:         `oauth-apiserver`,
 		SilenceUsage: true,
-		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := opts.Complete(); err != nil {
+				return err
+			}
+			if err := opts.Validate(args); err != nil {
+				return err
+			}
+			cliflag.PrintFlags(cmd.Flags())
+			return nil
+		},
 	}
+	logrus.Infof("starting openshift-oauth-apiserver, args: %v", args)
 
-	fs := cmd.Flags()
-	opts.AddFlags(fs)
-
-	if err := opts.Complete(); err != nil {
-		logrus.Fatalf("OAuth options completion error: %s", err)
-	}
-	if err := opts.Validate(args); err != nil {
-		logrus.Fatalf("OAuth options validation error: %s", err)
-	}
-
+	flags := cmd.Flags()
+	opts.AddFlags(flags)
 	s.options = opts
 }
 
