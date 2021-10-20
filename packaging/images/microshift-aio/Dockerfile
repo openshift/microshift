@@ -5,6 +5,7 @@ FROM registry.access.redhat.com/ubi8/go-toolset as builder
 ARG FROM_SOURCE=false
 
 ARG ARCH
+ARG IPTABLES=nft
 
 ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
 
@@ -59,14 +60,20 @@ RUN dnf install -y cri-o \
 
 RUN sed -i 's|/usr/libexec/crio/conmon|/usr/bin/conmon|' /etc/crio/crio.conf && \
     systemctl enable microshift.service && \
-    systemctl enable crio 
+    systemctl enable crio
 
-RUN if [ "$HOST" == "rhel8" ]; then  \
-        dnf install -y iptables; \
+# rhel7 hosts, or hosts with legacy iptables need the specific iptables binaries, ubi8 comes with iptables-nft translator
+
+RUN if [ "$HOST" == "rhel7" ] || [ "$IPTABLES" != "nft" ]; then  \
+      dnf install -y libnetfilter_conntrack libnfnetlink && dnf clean all && \
+      export ARCH=$(uname -m) && \
+      rpm -v -i --force https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/$ARCH/os/Packages/i/iptables-libs-1.6.2-2.fc28.$ARCH.rpm \
+                   https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/$ARCH/os/Packages/i/iptables-1.6.2-2.fc28.$ARCH.rpm ; \
     else \
-      dnf install -y libnetfilter_conntrack libnfnetlink && \
-      rpm -v -i --force https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/x86_64/os/Packages/i/iptables-libs-1.6.2-2.fc28.x86_64.rpm \
-                   https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/x86_64/os/Packages/i/iptables-1.6.2-2.fc28.x86_64.rpm && \
+        dnf install -y iptables && dnf clean all; \
+    fi
+
+RUN if [ "$HOST" == "rhel8" ]; then \
       sed -e '/mountopt/s/,\?metacopy=on,\?//' -i /etc/containers/storage.conf; \
     fi
 
