@@ -61,7 +61,10 @@ func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 		"--config=" + cfg.DataDir + "/resources/openshift-apiserver/config/config.yaml",
 		"--authorization-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
 		"--authentication-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
+		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
+		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
+		"--vmodule=" + cfg.LogVModule,
 	}
 	if cfg.LogDir != "" {
 		args = append(args, "--log-dir="+cfg.LogDir)
