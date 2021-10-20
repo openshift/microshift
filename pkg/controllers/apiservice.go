@@ -17,12 +17,12 @@ package controllers
 
 import (
 	"context"
+	"io/ioutil"
 	"strings"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/sirupsen/logrus"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -119,6 +119,10 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 	if err != nil {
 		return err
 	}
+	caFile, err := ioutil.ReadFile(cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt")
+	if err != nil {
+		logrus.Errorf("Error loading CA bundle certificate: %v", err)
+	}
 	client := apiregistrationclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "apiregistration-agent"))
 	for _, apiSvc := range []string{
 		"v1.apps.openshift.io",
@@ -146,11 +150,11 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 					Name:      "openshift-apiserver",
 					Namespace: "default",
 				},
-				Group:                 trimFirst(apiSvc, "."),
-				GroupPriorityMinimum:  9900,
-				Version:               "v1",
-				InsecureSkipTLSVerify: true,
-				VersionPriority:       15,
+				Group:                trimFirst(apiSvc, "."),
+				GroupPriorityMinimum: 9900,
+				Version:              "v1",
+				CABundle:             caFile,
+				VersionPriority:      15,
 			},
 		}
 		_, err = client.APIServices().Get(context.TODO(), api.Name, metav1.GetOptions{})

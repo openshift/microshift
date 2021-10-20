@@ -115,7 +115,7 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	// ocp
 	if err := util.GenCerts("openshift-apiserver", cfg.DataDir+"/resources/ocp-apiserver/secrets",
 		"tls.crt", "tls.key",
-		[]string{"openshift-apiserver", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		[]string{"openshift-apiserver", cfg.NodeIP, "openshift-apiserver.default.svc", "openshift-apiserver.default", "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
 	if err := util.GenCerts("openshift-controller-manager", cfg.DataDir+"/resources/ocp-controller-manager/secrets",
