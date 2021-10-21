@@ -4,11 +4,11 @@ Microshift is a research project that is exploring how OpenShift<sup>1</sup> Kub
 
 Edge devices deployed out in the field pose very different operational, environmental, and business challenges from those of cloud computing. These motivate different engineering trade-offs for Kubernetes at the far edge than for cloud or near-edge scenarios. Microshift's design goals cater to this:
 
-* make frugal use of system resources (CPU, memory, network, storage, etc.),
-* tolerate severe networking constraints,
-* update (resp. roll back) securely, safely, speedily, and seamlessly (without disrupting workloads), and
-* build on and integrate cleanly with edge-optimized OSes like Fedora IoT and RHEL for Edge, while
-* providing a consistent development and management experience with standard OpenShift.
+- make frugal use of system resources (CPU, memory, network, storage, etc.),
+- tolerate severe networking constraints,
+- update (resp. rollback) securely, safely, speedily, and seamlessly (without disrupting workloads), and
+- build on and integrate cleanly with edge-optimized OSes like Fedora IoT and RHEL for Edge, while
+- providing a consistent development and management experience with standard OpenShift.
 
 We believe these properties should also make Microshift a great tool for other use cases such as Kubernetes applications development on resource-constrained systems, scale testing, and provisioning of lightweight Kubernetes control planes.
 
@@ -20,12 +20,12 @@ Watch this [end-to-end MicroShift provisioning demo video](https://youtu.be/QOiB
 
 ## Minimum specs
 
-
 In order to run Microshift, you will need at least:
+
 - 2 CPU cores
 - 2GB of RAM
 - ~124MB of free storage space for the Microshift binary
-- 64-bit CPU (although 32-bit is *technically* possible, if you're up for the challenge)
+- 64-bit CPU (although 32-bit is _technically_ possible, if you're up for the challenge)
 
 For barebones development the minimum requirement is 3GB of RAM, though this can increase
 if you are using resource-intensive devtools.
@@ -35,6 +35,7 @@ if you are using resource-intensive devtools.
 The all-in-one containerized Microshift can run on Windows, MacOS, and Linux.
 
 Currently, the Microshift binary is known to be supported on the following Operating Systems:
+
 - Fedora 33/34
 - CentOS 8 Stream
 - RHEL 8
@@ -43,28 +44,32 @@ Currently, the Microshift binary is known to be supported on the following Opera
 
 It may be possible to run Microshift on other systems, however they haven't been tested so you may run into issues.
 
-
 ## Using Microshift
+
 To give Microshift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
 
-```
+```sh
 curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh | bash
 ```
 
 This will install Microshift's dependencies (CRI-O), install it as a systemd service and start it.
 
 For convenience, the script will also add a new "microshift" context to your `$HOME/.kube/config`, so you'll be able to access your cluster using, e.g.:
-```
+
+```sh
 kubectl get all -A --context microshift
 ```
+
 or
-```
+
+```sh
 kubectl config use-context microshift
 kubectl get all -A
 ```
 
 Notes: When installing Microshift on a system with an older version already installed, it is safest to remove the old data directory and start fresh:
-```
+
+```sh
 rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
 
@@ -72,32 +77,34 @@ rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 
 ## Developing Microshift
 
-> Note: when building or running **ARM64** container images, Linux host environments must have the `qemu-user-static` package installed.  E.g. on Fedora: `dnf install qemu-user-static`.
+> Note: when building or running **ARM64** container images, Linux host environments must have the `qemu-user-static` package installed. E.g. on Fedora: `dnf install qemu-user-static`.
 
 ### Building
 
 You can locally build Microshift using one of two methods, either using a container build (recommended) on Podman or Docker:
-```
+
+```sh
 sudo yum -y install make golang
 make microshift
 ```
 
 or directly on the host after installing the build-time dependencies. When using RHEL ensure the system is registered and run the following before installing the prerequisites.
 
-```
+```sh
 ARCH=$( /bin/arch )
 sudo subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
 ```
 
 The following packages are required for Fedora and RHEL.
-```
+
+```sh
 sudo yum install -y glibc-static gcc make golang
 make
 ```
 
 ### Environment Configuration
 
-Before running Microshift, the host must first be configured.  This can be handled by running
+Before running Microshift, the host must first be configured. This can be handled by running
 
 ```
 CONFIG_ENV_ONLY=true ./install.sh
@@ -106,8 +113,8 @@ CONFIG_ENV_ONLY=true ./install.sh
 Microshift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running Microshift as privileged user and `$HOME/.microshift` otherwise. Note that running Microshift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
 
 ### Kubeconfig
-When starting the Microshift for the first time the Kubeconfig file is created. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
 
+When starting the Microshift for the first time the Kubeconfig file is created. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
 
 ### Contributing
 
@@ -115,6 +122,6 @@ For more information on working with Microshift, you can find a contributor's gu
 
 ### Community
 
-Join us on [Slack](https://microshift.slack.com)!
+Join us on [Slack](https://microshift.slack.com)! ([Invite to the Slack space](https://join.slack.com/t/microshift/shared_invite/zt-uxncbjbl-XOjueb1ShNP7xfByDxNaaA))
 
-Community meetings are held weekly, Wednesdays at 10:30AM - 11:00AM EST.  Be sure to join the community [calendar](https://calendar.google.com/calendar/embed?src=nj6l882mfe4d2g9nr1h7avgrcs%40group.calendar.google.com&ctz=America%2FChicago)!  Click "Google Calendar" in the lower right hand corner to subscribe.
+Community meetings are held weekly, Wednesdays at 10:30AM - 11:00AM EST. Be sure to join the community [calendar](https://calendar.google.com/calendar/embed?src=nj6l882mfe4d2g9nr1h7avgrcs%40group.calendar.google.com&ctz=America%2FChicago)! Click "Google Calendar" in the lower right-hand corner to subscribe.
