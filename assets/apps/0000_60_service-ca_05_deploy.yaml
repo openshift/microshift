@@ -30,7 +30,7 @@ spec:
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
         args:
-        - -v=2
+        - -v=4
         ports:
         - containerPort: 8443
           protocol: TCP
