@@ -15,6 +15,7 @@
 // assets/core/0000_80_openshift-router-namespace.yaml
 // assets/core/0000_80_openshift-router-service-account.yaml
 // assets/core/0000_80_openshift-router-service.yaml
+// assets/core/0000_80_openshift-router-external-service.yaml
 package assets
 
 import (
@@ -518,6 +519,45 @@ func assetsCore0000_80_openshiftRouterServiceYaml() (*asset, error) {
 	return a, nil
 }
 
+var _assetsCore0000_80_openshiftRouterExternalServiceYaml = []byte(`kind: Service
+apiVersion: v1
+metadata:
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: router-certs-default
+  labels:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  name: router-external-default
+  namespace: openshift-ingress
+spec:
+  selector:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  type: NodePort
+  ports:
+  - name: external-http
+    port: 80
+    targetPort: 80
+    nodePort: 30001
+  - name: external-https
+    port: 443
+    targetPort: 443
+    nodePort: 30002
+`)
+
+func assetsCore0000_80_openshiftRouterExternalServiceYamlBytes() ([]byte, error) {
+	return _assetsCore0000_80_openshiftRouterExternalServiceYaml, nil
+}
+
+func assetsCore0000_80_openshiftRouterExternalServiceYaml() (*asset, error) {
+	bytes, err := assetsCore0000_80_openshiftRouterExternalServiceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_80_openshift-router-service.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -585,6 +625,7 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/core/0000_80_openshift-router-namespace.yaml":                        assetsCore0000_80_openshiftRouterNamespaceYaml,
 	"assets/core/0000_80_openshift-router-service-account.yaml":                  assetsCore0000_80_openshiftRouterServiceAccountYaml,
 	"assets/core/0000_80_openshift-router-service.yaml":                          assetsCore0000_80_openshiftRouterServiceYaml,
+	"assets/core/0000_80_openshift-router-external-service.yaml":                 assetsCore0000_80_openshiftRouterExternalServiceYaml,
 }
 
 // AssetDir returns the file names below a certain

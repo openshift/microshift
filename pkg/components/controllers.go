@@ -86,6 +86,9 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		svc = []string{
 			"assets/core/0000_80_openshift-router-service.yaml",
 		}
+		extSvc = []string{
+			"assets/core/0000_80_openshift-router-external-service.yaml",
+		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply ns %v: %v", ns, err)
@@ -109,6 +112,10 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 	}
 	if err := assets.ApplyServices(svc, nil, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply svc %v: %v", svc, err)
+		return err
+	}
+	if err := assets.ApplyServices(extSvc, nil, nil, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply external ingress svc %v: %v", extSvc, err)
 		return err
 	}
 	if err := assets.ApplyDeployments(apps, renderReleaseImage, nil, kubeconfigPath); err != nil {

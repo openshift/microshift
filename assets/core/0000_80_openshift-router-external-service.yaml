@@ -1,0 +1,22 @@
+kind: Service
+apiVersion: v1
+metadata:
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: router-certs-default
+  labels:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  name: router-external-default
+  namespace: openshift-ingress
+spec:
+  selector:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  type: NodePort 
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30001
+    - name: https
+      port: 443
+      targetPort: 443
+      nodePort: 30002

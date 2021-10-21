@@ -92,6 +92,8 @@ establish_firewall () {
     sudo firewall-cmd --zone=public --permanent --add-port=30000-32767/tcp
     sudo firewall-cmd --zone=public --permanent --add-port=2379-2380/tcp
     sudo firewall-cmd --zone=public --add-masquerade --permanent
+    sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+    sudo firewall-cmd --zone=public --add-port=443/tcp --permanent
     sudo firewall-cmd --zone=public --add-port=10250/tcp --permanent
     sudo firewall-cmd --zone=public --add-port=10251/tcp --permanent
     sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
