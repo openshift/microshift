@@ -1,4 +1,8 @@
-# Containerized Microshift 
+---
+modified: "2021-10-21T16:30:17.270+02:00"
+---
+
+# Containerized Microshift
 
 ## Run Microshift All-In-One as a Systemd Service
 
@@ -9,7 +13,7 @@ cp packaging/systemd/microshift-aio.service /etc/systemd/system/microshift-aio.s
 cp packaging/systemd/microshift-aio /usr/bin/
 ```
 
-Now enable and start the service. The KUBECONFIG location will be written to /etc/microshift-aio/microshift-aio.conf.    
+Now enable and start the service. The KUBECONFIG location will be written to /etc/microshift-aio/microshift-aio.conf.  
 If the `microshift-data` podman volume does not exist, the systemd service will create one.
 
 ```bash
@@ -49,7 +53,7 @@ sudo podman volume create microshift-data
 The following example binds localhost the container volume to `/var/lib`
 
 ```bash
-sudo podman run -d --rm --name microshift-aio --privileged -v /lib/modules:/lib/modules -v microshift-data:/var/lib  -p 6443:6443 microshift-aio  
+sudo podman run -d --rm --name microshift-aio --privileged -v /lib/modules:/lib/modules -v microshift-data:/var/lib  -p 6443:6443 microshift-aio
 ```
 
 You can access the cluster either on the host or inside the container
@@ -79,12 +83,19 @@ kubectl get pods -A
 ```
 
 ### Access the Cluster From the Host
+
 #### Linux
+
+{% comment %}
+{% raw %}
 
 ```bash
 export KUBECONFIG=$(podman volume inspect microshift-data --format "{{.Mountpoint}}")/microshift/resources/kubeadmin/kubeconfig
 kubectl get pods -A -w
 ```
+
+{% endraw %}
+{% endcomment %}
 
 #### MacOS
 
@@ -116,5 +127,5 @@ make microshfit-aio
 
 ## Limitation
 
-These instructions are tested on Linux, Mac, and Windows. 
+These instructions are tested on Linux, Mac, and Windows.
 On MacOS, running containerized Microshift as non-root is not supported on MacOS.
