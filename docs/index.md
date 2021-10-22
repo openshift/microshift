@@ -68,7 +68,7 @@ Notes: When installing Microshift on a system with an older version already inst
 rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
 
-## [Known Issues](./docs/known-issues.md)
+## [Known Issues](./known-issues.md)
 
 ## Developing Microshift
 
