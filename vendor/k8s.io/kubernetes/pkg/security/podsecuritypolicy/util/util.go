@@ -29,6 +29,8 @@ const (
 	ValidatedPSPAnnotation = "kubernetes.io/psp"
 )
 
+// GetAllFSTypesExcept returns the result of GetAllFSTypesAsSet minus
+// the given exceptions.
 func GetAllFSTypesExcept(exceptions ...string) sets.String {
 	fstypes := GetAllFSTypesAsSet()
 	for _, e := range exceptions {
@@ -37,6 +39,8 @@ func GetAllFSTypesExcept(exceptions ...string) sets.String {
 	return fstypes
 }
 
+// GetAllFSTypesAsSet returns all actual volume types, regardless
+// of feature gates. The special policy.All pseudo type is not included.
 func GetAllFSTypesAsSet() sets.String {
 	fstypes := sets.NewString()
 	fstypes.Insert(
@@ -256,7 +260,8 @@ func IsOnlyServiceAccountTokenSources(v *api.ProjectedVolumeSource) bool {
 			return false
 		}
 
-		if s.ConfigMap != nil && s.ConfigMap.LocalObjectReference.Name != "kube-root-ca.crt" {
+		// Permit mounting of service ca from a local configmap
+		if s.ConfigMap != nil && !(s.ConfigMap.LocalObjectReference.Name == "kube-root-ca.crt" || s.ConfigMap.LocalObjectReference.Name == "openshift-service-ca.crt") {
 			return false
 		}
 

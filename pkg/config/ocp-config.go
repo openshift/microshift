@@ -70,7 +70,7 @@ auditConfig:
   maximumRetainedFiles: 10
   policyFile: "` + cfg.DataDir + `/resources/openshift-apiserver/config/policy.yaml"
   policyConfiguration:
-    apiVersion: audit.k8s.io/v1beta1
+    apiVersion: audit.k8s.io/v1
     kind: Policy
     omitStages:
     - RequestReceived

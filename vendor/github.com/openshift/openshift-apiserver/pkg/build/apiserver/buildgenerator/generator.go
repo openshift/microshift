@@ -13,6 +13,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
@@ -125,37 +126,59 @@ func fetchServiceAccountSecrets(ctx context.Context, secrets corev1client.Secret
 	return result, nil
 }
 
+func getTriggerNamespaceName(bc *buildv1.BuildConfig, triggerFrom buildv1.ImageStreamTagReference) k8stypes.NamespacedName {
+	if len(triggerFrom.Name) == 0 {
+		strategyRef := buildutil.GetInputReference(bc.Spec.Strategy)
+		if strategyRef == nil || strategyRef.Kind != "ImageStreamTag" {
+			return k8stypes.NamespacedName{}
+		}
+		triggerFrom.Namespace = strategyRef.Namespace
+		triggerFrom.Name = strategyRef.Name
+	}
+	triggerNs := triggerFrom.Namespace
+	if triggerNs == "" {
+		triggerNs = bc.Namespace
+	}
+	return k8stypes.NamespacedName{Namespace: triggerNs, Name: triggerFrom.Name}
+}
+
 // findImageChangeTrigger finds an image change trigger that has a from that matches the passed in ref
 // if no match is found but there is an image change trigger with a null from, that trigger is returned
-func findImageChangeTrigger(bc *buildv1.BuildConfig, ref *corev1.ObjectReference) *buildv1.ImageChangeTrigger {
+func findImageChangeTrigger(bc *buildv1.BuildConfig, ref *corev1.ObjectReference) (*buildv1.ImageChangeTrigger, *buildv1.ImageChangeTriggerStatus) {
 	if ref == nil {
-		return nil
+		return nil, nil
+	}
+	var requestTrigger *buildv1.ImageChangeTrigger
+	var responseTrigger *buildv1.ImageChangeTriggerStatus
+	refNs := ref.Namespace
+	if refNs == "" {
+		refNs = bc.Namespace
 	}
 	for _, trigger := range bc.Spec.Triggers {
 		if trigger.Type != buildv1.ImageChangeBuildTriggerType {
 			continue
 		}
 		imageChange := trigger.ImageChange
-		triggerRef := imageChange.From
-		if triggerRef == nil {
-			triggerRef = buildutil.GetInputReference(bc.Spec.Strategy)
-			if triggerRef == nil || triggerRef.Kind != "ImageStreamTag" {
-				continue
-			}
+		istRef := buildv1.ImageStreamTagReference{}
+		from := trigger.ImageChange.From
+		if from != nil {
+			istRef = buildv1.ImageStreamTagReference{Namespace: from.Namespace, Name: from.Name}
 		}
-		triggerNs := triggerRef.Namespace
-		if triggerNs == "" {
-			triggerNs = bc.Namespace
-		}
-		refNs := ref.Namespace
-		if refNs == "" {
-			refNs = bc.Namespace
-		}
-		if triggerRef.Name == ref.Name && triggerNs == refNs {
-			return imageChange
+		triggerNSN := getTriggerNamespaceName(bc, istRef)
+		if triggerNSN.Name == ref.Name && triggerNSN.Namespace == refNs {
+			requestTrigger = imageChange
+			break
 		}
 	}
-	return nil
+	for _, trigger := range bc.Status.ImageChangeTriggers {
+		triggerNSN := getTriggerNamespaceName(bc, trigger.From)
+		if triggerNSN.Name == ref.Name && triggerNSN.Namespace == refNs {
+			responseTrigger = &trigger
+			break
+		}
+
+	}
+	return requestTrigger, responseTrigger
 }
 
 func describeBuildRequest(request *buildv1.BuildRequest) string {
@@ -338,30 +361,54 @@ func (g *BuildGenerator) checkLastVersion(bc *buildv1.BuildConfig, lastVersion *
 }
 
 // updateImageTriggers sets the LastTriggeredImageID on all the ImageChangeTriggers on the BuildConfig and
-// updates the From reference of the strategy if the strategy uses an ImageStream or ImageStreamTag reference
+// updates the From reference of the strategy if the strategy uses an ImageStream or ImageStreamTag reference.
+// Also updates the LastTriggerTime for the trigger that correlates to the triggeredBy parameter.
 func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.BuildConfig, from, triggeredBy *corev1.ObjectReference) error {
 	var requestTrigger *buildv1.ImageChangeTrigger
+	var responseTrigger *buildv1.ImageChangeTriggerStatus
+	strategyImageRef := buildutil.GetInputReference(bc.Spec.Strategy)
 	if from != nil {
-		requestTrigger = findImageChangeTrigger(bc, from)
+		requestTrigger, responseTrigger = findImageChangeTrigger(bc, from)
 	}
-	if requestTrigger != nil && triggeredBy != nil && requestTrigger.LastTriggeredImageID == triggeredBy.Name {
+	if triggeredBy != nil &&
+		//TODO we still update spec until deprecated field (drepcated in 4.8) is removed (presumably 4.9)
+		((requestTrigger != nil && requestTrigger.LastTriggeredImageID == triggeredBy.Name) ||
+			(responseTrigger != nil && responseTrigger.LastTriggeredImageID == triggeredBy.Name)) {
 		klog.V(2).Infof("Aborting imageid triggered build for BuildConfig %s/%s with imageid %s because the BuildConfig already matches this imageid", bc.Namespace, bc.Name, triggeredBy.Name)
 		return fmt.Errorf("build config %s/%s has already instantiated a build for imageid %s", bc.Namespace, bc.Name, triggeredBy.Name)
 	}
 	// Update last triggered image id for all image change triggers
+	// reset the status field in case the list of ICTs change in the spec; we'll then repopulate all of them
+	bc.Status.ImageChangeTriggers = []buildv1.ImageChangeTriggerStatus{}
 	for _, trigger := range bc.Spec.Triggers {
 		if trigger.Type != buildv1.ImageChangeBuildTriggerType {
 			continue
 		}
+		ictsFrom := trigger.ImageChange.From
+		if ictsFrom == nil {
+			ictsFrom = strategyImageRef
+		}
+		imageChangeTriggerStatus := buildv1.ImageChangeTriggerStatus{
+			From: buildv1.ImageStreamTagReference{Namespace: ictsFrom.Namespace, Name: ictsFrom.Name},
+		}
 		// Use the requested image id for the trigger that caused the build, otherwise resolve to the latest
 		if triggeredBy != nil && trigger.ImageChange == requestTrigger {
+			//TODO we still update spec until deprecated field (deprecated in 4.8) is ignored (presumably 4.9)
 			trigger.ImageChange.LastTriggeredImageID = triggeredBy.Name
+			imageChangeTriggerStatus.LastTriggeredImageID = triggeredBy.Name
+			// we only update the trigger time for trigger associated with triggeredBy
+			imageChangeTriggerStatus.LastTriggerTime = metav1.Now()
+			bc.Status.ImageChangeTriggers = append(bc.Status.ImageChangeTriggers, imageChangeTriggerStatus)
 			continue
 		}
 
+		// the reason we update LastTriggeredImageID for triggers whose From field do not match triggeredBy is to
+		// minimize triggering multiple builds when several image changes arrive concurrently.  When those events
+		// come in, the check prior to the for loop should prevent additional build generation.
+
 		triggerImageRef := trigger.ImageChange.From
 		if triggerImageRef == nil {
-			triggerImageRef = buildutil.GetInputReference(bc.Spec.Strategy)
+			triggerImageRef = strategyImageRef
 		}
 		if triggerImageRef == nil {
 			klog.Warningf("Could not get ImageStream reference for default ImageChangeTrigger on BuildConfig %s/%s", bc.Namespace, bc.Name)
@@ -376,7 +423,11 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 			// Otherwise, warn that an error occurred, but continue
 			klog.Warningf("Could not resolve trigger reference for build config %s/%s: %#v", bc.Namespace, bc.Name, triggerImageRef)
 		}
+		//TODO we still update spec until deprecated field (deprecated in 4.8) is ignored (presumably 4.9)
 		trigger.ImageChange.LastTriggeredImageID = image
+		imageChangeTriggerStatus.LastTriggeredImageID = image
+		// reminder: we do not update the LastTriggeredTime here
+		bc.Status.ImageChangeTriggers = append(bc.Status.ImageChangeTriggers, imageChangeTriggerStatus)
 	}
 	return nil
 }
@@ -520,6 +571,7 @@ func (g *BuildGenerator) generateBuildFromConfig(ctx context.Context, bc *buildv
 				PostCommit:                bcCopy.Spec.PostCommit,
 				CompletionDeadlineSeconds: bcCopy.Spec.CompletionDeadlineSeconds,
 				NodeSelector:              bcCopy.Spec.NodeSelector,
+				MountTrustedCA:            bcCopy.Spec.MountTrustedCA,
 			},
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -948,10 +1000,11 @@ func getNextBuildNameFromBuild(build *buildv1.Build, buildConfig *buildv1.BuildC
 }
 
 // getStrategyImageChangeTrigger returns the ImageChangeTrigger that corresponds to the BuildConfig's strategy
-func getStrategyImageChangeTrigger(bc *buildv1.BuildConfig) *buildv1.ImageChangeTrigger {
-	for _, trigger := range bc.Spec.Triggers {
-		if trigger.Type == buildv1.ImageChangeBuildTriggerType && trigger.ImageChange.From == nil {
-			return trigger.ImageChange
+func getStrategyImageChangeTrigger(bc *buildv1.BuildConfig) *buildv1.ImageChangeTriggerStatus {
+	strategyRef := buildutil.GetInputReference(bc.Spec.Strategy)
+	for _, trigger := range bc.Status.ImageChangeTriggers {
+		if reflect.DeepEqual(strategyRef, trigger.From) {
+			return &trigger
 		}
 	}
 	return nil
@@ -959,14 +1012,13 @@ func getStrategyImageChangeTrigger(bc *buildv1.BuildConfig) *buildv1.ImageChange
 
 // getImageChangeTriggerForRef returns the ImageChangeTrigger that is triggered by a change to
 // the provided object reference, if any
-func getImageChangeTriggerForRef(bc *buildv1.BuildConfig, ref *corev1.ObjectReference) *buildv1.ImageChangeTrigger {
+func getImageChangeTriggerForRef(bc *buildv1.BuildConfig, ref *corev1.ObjectReference) *buildv1.ImageChangeTriggerStatus {
 	if ref == nil || ref.Kind != "ImageStreamTag" {
 		return nil
 	}
-	for _, trigger := range bc.Spec.Triggers {
-		if trigger.Type == buildv1.ImageChangeBuildTriggerType && trigger.ImageChange.From != nil &&
-			trigger.ImageChange.From.Name == ref.Name && trigger.ImageChange.From.Namespace == ref.Namespace {
-			return trigger.ImageChange
+	for _, trigger := range bc.Status.ImageChangeTriggers {
+		if trigger.From.Name == ref.Name && trigger.From.Namespace == ref.Namespace {
+			return &trigger
 		}
 	}
 	return nil

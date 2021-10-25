@@ -107,21 +107,19 @@ func NewControllerContext(
 	openshiftControllerContext := &ControllerContext{
 		OpenshiftControllerConfig: config,
 
+		// k8s 1.21 rebase - SAControllerClientBuilder replaced with NewDynamicClientBuilder
+		// See https://github.com/kubernetes/kubernetes/pull/99291
 		ClientBuilder: OpenshiftControllerClientBuilder{
-			ControllerClientBuilder: clientbuilder.SAControllerClientBuilder{
-				ClientConfig:         rest.AnonymousClientConfig(clientConfig),
-				CoreClient:           kubeClient.CoreV1(),
-				AuthenticationClient: kubeClient.AuthenticationV1(),
-				Namespace:            defaultOpenShiftInfraNamespace,
-			},
+			ControllerClientBuilder: clientbuilder.NewDynamicClientBuilder(
+				rest.AnonymousClientConfig(clientConfig),
+				kubeClient.CoreV1(),
+				defaultOpenShiftInfraNamespace),
 		},
 		HighRateLimitClientBuilder: OpenshiftControllerClientBuilder{
-			ControllerClientBuilder: clientbuilder.SAControllerClientBuilder{
-				ClientConfig:         rest.AnonymousClientConfig(highRateLimitClientConfig),
-				CoreClient:           kubeClient.CoreV1(),
-				AuthenticationClient: kubeClient.AuthenticationV1(),
-				Namespace:            defaultOpenShiftInfraNamespace,
-			},
+			ControllerClientBuilder: clientbuilder.NewDynamicClientBuilder(
+				rest.AnonymousClientConfig(highRateLimitClientConfig),
+				kubeClient.CoreV1(),
+				defaultOpenShiftInfraNamespace),
 		},
 		KubernetesInformers:                informers.NewSharedInformerFactory(kubeClient, defaultInformerResyncPeriod),
 		OpenshiftConfigKubernetesInformers: informers.NewSharedInformerFactoryWithOptions(kubeClient, defaultInformerResyncPeriod, informers.WithNamespace("openshift-config")),

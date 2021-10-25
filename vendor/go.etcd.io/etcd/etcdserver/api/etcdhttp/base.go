@@ -21,14 +21,13 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/coreos/pkg/capnslog"
 	"go.etcd.io/etcd/etcdserver"
 	"go.etcd.io/etcd/etcdserver/api"
 	"go.etcd.io/etcd/etcdserver/api/v2error"
 	"go.etcd.io/etcd/etcdserver/api/v2http/httptypes"
 	"go.etcd.io/etcd/pkg/logutil"
 	"go.etcd.io/etcd/version"
-
-	"github.com/coreos/pkg/capnslog"
 	"go.uber.org/zap"
 )
 
@@ -45,13 +44,16 @@ const (
 
 // HandleBasic adds handlers to a mux for serving JSON etcd client requests
 // that do not access the v2 store.
-func HandleBasic(mux *http.ServeMux, server etcdserver.ServerPeer) {
+func HandleBasic(lg *zap.Logger, mux *http.ServeMux, server etcdserver.ServerPeer) {
+	if lg == nil {
+		lg = zap.NewNop()
+	}
 	mux.HandleFunc(varsPath, serveVars)
 
 	// TODO: deprecate '/config/local/log' in v3.5
 	mux.HandleFunc(configPath+"/local/log", logHandleFunc)
 
-	HandleMetricsHealth(mux, server)
+	HandleMetricsHealth(lg, mux, server)
 	mux.HandleFunc(versionPath, versionHandler(server.Cluster(), serveVersion))
 }
 

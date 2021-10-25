@@ -11,7 +11,7 @@ import (
 	"k8s.io/klog/v2"
 
 	corev1 "k8s.io/api/core/v1"
-	networkingv1beta1 "k8s.io/api/networking/v1beta1"
+	networkingv1 "k8s.io/api/networking/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -24,11 +24,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	coreinformers "k8s.io/client-go/informers/core/v1"
-	networkingv1beta1informers "k8s.io/client-go/informers/networking/v1beta1"
+	networkingv1informers "k8s.io/client-go/informers/networking/v1"
 	kv1core "k8s.io/client-go/kubernetes/typed/core/v1"
-	kv1beta1networking "k8s.io/client-go/kubernetes/typed/networking/v1beta1"
+	kv1networking "k8s.io/client-go/kubernetes/typed/networking/v1"
 	corelisters "k8s.io/client-go/listers/core/v1"
-	networkingv1beta1listers "k8s.io/client-go/listers/networking/v1beta1"
+	networkingv1listers "k8s.io/client-go/listers/networking/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
@@ -76,12 +76,13 @@ type Controller struct {
 	eventRecorder record.EventRecorder
 
 	routeClient   routeclient.RoutesGetter
-	ingressClient kv1beta1networking.IngressesGetter
+	ingressClient kv1networking.IngressesGetter
 
-	ingressLister networkingv1beta1listers.IngressLister
-	secretLister  corelisters.SecretLister
-	routeLister   routelisters.RouteLister
-	serviceLister corelisters.ServiceLister
+	ingressLister      networkingv1listers.IngressLister
+	ingressclassLister networkingv1listers.IngressClassLister
+	secretLister       corelisters.SecretLister
+	routeLister        routelisters.RouteLister
+	serviceLister      corelisters.ServiceLister
 
 	// syncs are the items that must return true before the queue can be processed
 	syncs []cache.InformerSynced
@@ -163,7 +164,7 @@ type queueKey struct {
 }
 
 // NewController instantiates a Controller
-func NewController(eventsClient kv1core.EventsGetter, routeClient routeclient.RoutesGetter, ingressClient kv1beta1networking.IngressesGetter, ingresses networkingv1beta1informers.IngressInformer, secrets coreinformers.SecretInformer, services coreinformers.ServiceInformer, routes routeinformers.RouteInformer) *Controller {
+func NewController(eventsClient kv1core.EventsGetter, routeClient routeclient.RoutesGetter, ingressClient kv1networking.IngressesGetter, ingresses networkingv1informers.IngressInformer, ingressclasses networkingv1informers.IngressClassInformer, secrets coreinformers.SecretInformer, services coreinformers.ServiceInformer, routes routeinformers.RouteInformer) *Controller {
 	broadcaster := record.NewBroadcaster()
 	broadcaster.StartLogging(klog.Infof)
 	// TODO: remove the wrapper when every clients have moved to use the clientset.
@@ -180,10 +181,11 @@ func NewController(eventsClient kv1core.EventsGetter, routeClient routeclient.Ro
 		routeClient:   routeClient,
 		ingressClient: ingressClient,
 
-		ingressLister: ingresses.Lister(),
-		secretLister:  secrets.Lister(),
-		routeLister:   routes.Lister(),
-		serviceLister: services.Lister(),
+		ingressLister:      ingresses.Lister(),
+		ingressclassLister: ingressclasses.Lister(),
+		secretLister:       secrets.Lister(),
+		routeLister:        routes.Lister(),
+		serviceLister:      services.Lister(),
 
 		syncs: []cache.InformerSynced{
 			ingresses.Informer().HasSynced,
@@ -281,7 +283,7 @@ func (c *Controller) processRoute(obj interface{}) {
 
 func (c *Controller) processIngress(obj interface{}) {
 	switch t := obj.(type) {
-	case *networkingv1beta1.Ingress:
+	case *networkingv1.Ingress:
 		// when we see a change to an ingress, reset our expectations
 		// this also allows periodic purging of the expectation list in the event
 		// we miss one or more events.
@@ -370,6 +372,32 @@ func (c *Controller) sync(key queueKey) error {
 		return err
 	}
 
+	// If the ingress specifies an ingressclass and the ingressclass does
+	// not specify openshift.io/ingress-to-route as its controller, ignore
+	// the ingress.
+	var ingressClassName *string
+	if v, ok := ingress.Annotations["kubernetes.io/ingress.class"]; ok {
+		ingressClassName = &v
+	} else {
+		ingressClassName = ingress.Spec.IngressClassName
+	}
+	if ingressClassName != nil {
+		ingressclass, err := c.ingressclassLister.Get(*ingressClassName)
+		if kerrors.IsNotFound(err) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		// TODO Replace "openshift.io/ingress-to-route" with
+		// routev1.IngressToRouteIngressClassControllerName once
+		// openshift-controller-manager bumps openshift/api to a version
+		// that defines it.
+		if ingressclass.Spec.Controller != "openshift.io/ingress-to-route" {
+			return nil
+		}
+	}
+
 	// find all matching routes
 	routes, err := c.routeLister.Routes(key.namespace).List(labels.Everything())
 	if err != nil {
@@ -395,7 +423,15 @@ func (c *Controller) sync(key queueKey) error {
 			continue
 		}
 		for _, path := range rule.HTTP.Paths {
-			if len(path.Backend.ServiceName) == 0 {
+			if path.Backend.Service == nil {
+				// Non-Service backends are not implemented.
+				continue
+			}
+			if len(path.Backend.Service.Name) == 0 {
+				continue
+			}
+			if path.PathType != nil && *path.PathType == networkingv1.PathTypeExact {
+				// Exact path type is not implemented.
 				continue
 			}
 
@@ -442,9 +478,14 @@ func (c *Controller) sync(key queueKey) error {
 		if err != nil {
 			return err
 		}
+		ownerRefs, err := json.Marshal(&route.OwnerReferences)
+		if err != nil {
+			return err
+		}
 		data = []byte(fmt.Sprintf(`[{"op":"replace","path":"/spec","value":%s},`+
-			`{"op":"replace","path":"/metadata/annotations","value":%s}]`,
-			data, annotations))
+			`{"op":"replace","path":"/metadata/annotations","value":%s},`+
+			`{"op":"replace","path":"/metadata/ownerReferences","value":%s}]`,
+			data, annotations, ownerRefs))
 		_, err = c.routeClient.Routes(route.Namespace).Patch(context.TODO(), route.Name, types.JSONPatchType, data, metav1.PatchOptions{})
 		if err != nil {
 			errs = append(errs, err)
@@ -511,9 +552,17 @@ func (c *Controller) sync(key queueKey) error {
 	return utilerrors.NewAggregate(errs)
 }
 
+// validOwnerRefAPIVersions is a set of recognized API versions for the ingress
+// owner ref.
+var validOwnerRefAPIVersions = sets.NewString(
+	"networking.k8s.io/v1",
+	"networking.k8s.io/v1beta1",
+	"extensions.k8s.io/v1beta1",
+)
+
 func hasIngressOwnerRef(owners []metav1.OwnerReference) (string, bool) {
 	for _, ref := range owners {
-		if ref.Kind != "Ingress" || ref.APIVersion != "networking.k8s.io/v1beta1" || ref.Controller == nil || !*ref.Controller {
+		if ref.Kind != "Ingress" || !validOwnerRefAPIVersions.Has(ref.APIVersion) || ref.Controller == nil || !*ref.Controller {
 			continue
 		}
 		return ref.Name, true
@@ -522,13 +571,13 @@ func hasIngressOwnerRef(owners []metav1.OwnerReference) (string, bool) {
 }
 
 func newRouteForIngress(
-	ingress *networkingv1beta1.Ingress,
-	rule *networkingv1beta1.IngressRule,
-	path *networkingv1beta1.HTTPIngressPath,
+	ingress *networkingv1.Ingress,
+	rule *networkingv1.IngressRule,
+	path *networkingv1.HTTPIngressPath,
 	secretLister corelisters.SecretLister,
 	serviceLister corelisters.ServiceLister,
 ) *routev1.Route {
-	targetPort, err := targetPortForService(ingress.Namespace, path, serviceLister)
+	targetPort, err := targetPortForService(ingress.Namespace, path.Backend.Service, serviceLister)
 	if err != nil {
 		// no valid target port
 		return nil
@@ -552,14 +601,14 @@ func newRouteForIngress(
 			Labels:       ingress.Labels,
 			Annotations:  ingress.Annotations,
 			OwnerReferences: []metav1.OwnerReference{
-				{APIVersion: "networking.k8s.io/v1beta1", Kind: "Ingress", Controller: &t, Name: ingress.Name, UID: ingress.UID},
+				{APIVersion: "networking.k8s.io/v1", Kind: "Ingress", Controller: &t, Name: ingress.Name, UID: ingress.UID},
 			},
 		},
 		Spec: routev1.RouteSpec{
 			Host: rule.Host,
 			Path: path.Path,
 			To: routev1.RouteTargetReference{
-				Name: path.Backend.ServiceName,
+				Name: path.Backend.Service.Name,
 			},
 			Port: port,
 			TLS:  tlsConfigForIngress(ingress, rule, tlsSecret),
@@ -580,23 +629,24 @@ func preserveRouteAttributesFromExisting(r, existing *routev1.Route) {
 
 func routeMatchesIngress(
 	route *routev1.Route,
-	ingress *networkingv1beta1.Ingress,
-	rule *networkingv1beta1.IngressRule,
-	path *networkingv1beta1.HTTPIngressPath,
+	ingress *networkingv1.Ingress,
+	rule *networkingv1.IngressRule,
+	path *networkingv1.HTTPIngressPath,
 	secretLister corelisters.SecretLister,
 	serviceLister corelisters.ServiceLister,
 ) bool {
 	match := route.Spec.Host == rule.Host &&
 		route.Spec.Path == path.Path &&
-		route.Spec.To.Name == path.Backend.ServiceName &&
+		route.Spec.To.Name == path.Backend.Service.Name &&
 		route.Spec.WildcardPolicy == routev1.WildcardPolicyNone &&
 		len(route.Spec.AlternateBackends) == 0 &&
-		reflect.DeepEqual(route.Annotations, ingress.Annotations)
+		reflect.DeepEqual(route.Annotations, ingress.Annotations) &&
+		route.OwnerReferences[0].APIVersion == "networking.k8s.io/v1"
 	if !match {
 		return false
 	}
 
-	targetPort, err := targetPortForService(ingress.Namespace, path, serviceLister)
+	targetPort, err := targetPortForService(ingress.Namespace, path.Backend.Service, serviceLister)
 	if err != nil {
 		// not valid
 		return false
@@ -620,10 +670,10 @@ func routeMatchesIngress(
 }
 
 // targetPortForService returns a target port for a Route based on the given
-// Ingress path.  If the Ingress references a Service or port that cannot be
-// found, targetPortForService returns an error.  If the Ingress references a
-// port that has no name, a nil value is returned for the target port.
-// Otherwise, the port name is returned as the target port.
+// Ingress backend service.  If the Ingress references a Service or port that
+// cannot be found, targetPortForService returns an error.  If the Ingress
+// references a port that has no name, a nil value is returned for the target
+// port.  Otherwise, the port name is returned as the target port.
 //
 // Note that an Ingress specifies a port on a Service whereas a Route specifies
 // a port on an Endpoints resource.  The ports on a Service resource and the
@@ -632,14 +682,14 @@ func routeMatchesIngress(
 // in this case, the Route need have no port specification because omitting the
 // port specification causes the Route to target every port (in this case, the
 // only port) on the Endpoints resource.
-func targetPortForService(namespace string, path *networkingv1beta1.HTTPIngressPath, serviceLister corelisters.ServiceLister) (*intstr.IntOrString, error) {
-	service, err := serviceLister.Services(namespace).Get(path.Backend.ServiceName)
+func targetPortForService(namespace string, backendService *networkingv1.IngressServiceBackend, serviceLister corelisters.ServiceLister) (*intstr.IntOrString, error) {
+	service, err := serviceLister.Services(namespace).Get(backendService.Name)
 	if err != nil {
 		// service doesn't exist yet, wait
 		return nil, err
 	}
-	if path.Backend.ServicePort.Type == intstr.String {
-		expect := path.Backend.ServicePort.StrVal
+	if len(backendService.Port.Name) != 0 {
+		expect := backendService.Port.Name
 		for _, port := range service.Spec.Ports {
 			if port.Name == expect {
 				targetPort := intstr.FromString(port.Name)
@@ -647,7 +697,7 @@ func targetPortForService(namespace string, path *networkingv1beta1.HTTPIngressP
 			}
 		}
 	} else {
-		expect := path.Backend.ServicePort.IntVal
+		expect := backendService.Port.Number
 		for _, port := range service.Spec.Ports {
 			if port.Port == expect {
 				if len(port.Name) == 0 {
@@ -672,7 +722,7 @@ func splitForPathAndHost(routes []*routev1.Route, host, path string) ([]*routev1
 	return routes, nil
 }
 
-func referencesSecret(ingress *networkingv1beta1.Ingress, host string) (string, bool) {
+func referencesSecret(ingress *networkingv1.Ingress, host string) (string, bool) {
 	for _, tls := range ingress.Spec.TLS {
 		for _, tlsHost := range tls.Hosts {
 			if tlsHost == host {
@@ -686,7 +736,7 @@ func referencesSecret(ingress *networkingv1beta1.Ingress, host string) (string, 
 // createRouteWithName performs client side name generation so we can set a predictable expectation.
 // If we fail multiple times in a row we will return an error.
 // TODO: future optimization, check the local cache for the name first
-func createRouteWithName(client routeclient.RoutesGetter, ingress *networkingv1beta1.Ingress, route *routev1.Route, expect *expectations) error {
+func createRouteWithName(client routeclient.RoutesGetter, ingress *networkingv1.Ingress, route *routev1.Route, expect *expectations) error {
 	base := route.GenerateName
 	var lastErr error
 	// only retry a limited number of times
@@ -736,8 +786,8 @@ func generateRouteName(base string) string {
 }
 
 func tlsConfigForIngress(
-	ingress *networkingv1beta1.Ingress,
-	rule *networkingv1beta1.IngressRule,
+	ingress *networkingv1.Ingress,
+	rule *networkingv1.IngressRule,
 	potentiallyNilTLSSecret *corev1.Secret,
 ) *routev1.TLSConfig {
 	if !tlsEnabled(ingress, rule, potentiallyNilTLSSecret) {
@@ -758,9 +808,9 @@ func tlsConfigForIngress(
 	return tlsConfig
 }
 
-var emptyTLS = networkingv1beta1.IngressTLS{}
+var emptyTLS = networkingv1.IngressTLS{}
 
-func tlsEnabled(ingress *networkingv1beta1.Ingress, rule *networkingv1beta1.IngressRule, potentiallyNilTLSSecret *corev1.Secret) bool {
+func tlsEnabled(ingress *networkingv1.Ingress, rule *networkingv1.IngressRule, potentiallyNilTLSSecret *corev1.Secret) bool {
 	switch ingress.Annotations[terminationPolicyAnnotationKey] {
 	case string(routev1.TLSTerminationPassthrough), string(routev1.TLSTerminationReencrypt), string(routev1.TLSTerminationEdge):
 		return true
@@ -776,7 +826,7 @@ func tlsEnabled(ingress *networkingv1beta1.Ingress, rule *networkingv1beta1.Ingr
 	return false
 }
 
-func tlsSecretIfValid(ingress *networkingv1beta1.Ingress, rule *networkingv1beta1.IngressRule, secretLister corelisters.SecretLister) (_ *corev1.Secret, hasInvalidSecret bool) {
+func tlsSecretIfValid(ingress *networkingv1.Ingress, rule *networkingv1.IngressRule, secretLister corelisters.SecretLister) (_ *corev1.Secret, hasInvalidSecret bool) {
 	name, ok := referencesSecret(ingress, rule.Host)
 	if !ok {
 		return nil, false
@@ -801,7 +851,7 @@ func tlsSecretIfValid(ingress *networkingv1beta1.Ingress, rule *networkingv1beta
 
 var terminationPolicyAnnotationKey = routev1.GroupName + "/termination"
 
-func terminationPolicyForIngress(ingress *networkingv1beta1.Ingress) routev1.TLSTerminationType {
+func terminationPolicyForIngress(ingress *networkingv1.Ingress) routev1.TLSTerminationType {
 	switch {
 	case ingress.Annotations[terminationPolicyAnnotationKey] == string(routev1.TLSTerminationPassthrough):
 		return routev1.TLSTerminationPassthrough

@@ -3,6 +3,7 @@ apiVersion: v1
 metadata:
   annotations:
     openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
   name: openshift-dns
   labels:
     # set value to avoid depending on kube admission that depends on openshift apis

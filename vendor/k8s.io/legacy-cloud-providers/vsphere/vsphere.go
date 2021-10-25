@@ -411,6 +411,9 @@ func populateVsphereInstanceMap(cfg *VSphereConfig) (map[string]*VSphereInstance
 			klog.Error(msg)
 			return nil, errors.New(msg)
 		}
+		if len(cfg.VirtualCenter) > 1 {
+			klog.Warning("Multi vCenter support is deprecated. vSphere CSI Driver does not support Kubernetes nodes spread across multiple vCenter servers. Please consider moving all Kubernetes nodes to single vCenter server")
+		}
 
 		for vcServer, vcConfig := range cfg.VirtualCenter {
 			klog.V(4).Infof("Initializing vc server %s", vcServer)
@@ -933,10 +936,11 @@ func (vs *VSphere) AttachDisk(vmDiskPath string, storagePolicyName string, nodeN
 			return "", err
 		}
 
-		// try and get canonical path for disk and if we can't use provided vmDiskPath
-		canonicalPath, pathFetchErr := getcanonicalVolumePath(ctx, vm.Datacenter, vmDiskPath)
-		if canonicalPath != "" && pathFetchErr == nil {
-			vmDiskPath = canonicalPath
+		// try and get canonical path for disk and if we can't throw error
+		vmDiskPath, err = getcanonicalVolumePath(ctx, vm.Datacenter, vmDiskPath)
+		if err != nil {
+			klog.Errorf("failed to get canonical path for %s on node %s: %v", vmDiskPath, convertToString(nodeName), err)
+			return "", err
 		}
 
 		diskUUID, err = vm.AttachDisk(ctx, vmDiskPath, &vclib.VolumeOptions{SCSIControllerType: vclib.PVSCSIControllerType, StoragePolicyName: storagePolicyName})
@@ -1220,9 +1224,15 @@ func (vs *VSphere) DisksAreAttached(nodeVolumes map[k8stypes.NodeName][]string) 
 			}
 
 		}
+		klog.V(4).Infof("DisksAreAttached successfully executed. result: %+v", attached)
+		// There could be nodes in cluster which do not have any pods with vsphere volumes running on them
+		// such nodes won't be part of nodeVolumes map because attach-detach controller does not keep track
+		// such nodes. But such nodes may still have dangling volumes on them and hence we need to scan all the
+		// remaining nodes which weren't scanned by code previously.
+		vs.BuildMissingVolumeNodeMap(ctx)
 		// any volume which we could not verify will be removed from the map.
 		vs.vsphereVolumeMap.RemoveUnverified()
-		klog.V(4).Infof("DisksAreAttach successfully executed. result: %+v", attached)
+		klog.V(4).Infof("current node volume map is: %+v", vs.vsphereVolumeMap.volumeNodeMap)
 		return disksAttached, nil
 	}
 	requestTime := time.Now()

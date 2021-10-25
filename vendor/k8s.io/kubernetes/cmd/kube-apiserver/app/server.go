@@ -20,6 +20,7 @@ limitations under the License.
 package app
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
@@ -30,10 +31,16 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement"
+	"k8s.io/kubernetes/openshift-kube-apiserver/enablement"
+	"k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	corev1 "k8s.io/api/core/v1"
 	extensionsapiserver "k8s.io/apiextensions-apiserver/pkg/apiserver"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -41,6 +48,7 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	openapinamer "k8s.io/apiserver/pkg/endpoints/openapi"
+	"k8s.io/apiserver/pkg/endpoints/request"
 	genericfeatures "k8s.io/apiserver/pkg/features"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/egressselector"
@@ -69,16 +77,18 @@ import (
 
 	"k8s.io/kubernetes/cmd/kube-apiserver/app/options"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
+	"k8s.io/kubernetes/pkg/apis/core"
+	v1 "k8s.io/kubernetes/pkg/apis/core/v1"
 	"k8s.io/kubernetes/pkg/capabilities"
 	"k8s.io/kubernetes/pkg/controlplane"
 	"k8s.io/kubernetes/pkg/controlplane/reconcilers"
 	"k8s.io/kubernetes/pkg/controlplane/tunneler"
-	"k8s.io/kubernetes/pkg/features"
 	generatedopenapi "k8s.io/kubernetes/pkg/generated/openapi"
 	"k8s.io/kubernetes/pkg/kubeapiserver"
 	kubeapiserveradmission "k8s.io/kubernetes/pkg/kubeapiserver/admission"
 	kubeauthenticator "k8s.io/kubernetes/pkg/kubeapiserver/authenticator"
 	"k8s.io/kubernetes/pkg/kubeapiserver/authorizer/modes"
+	eventstorage "k8s.io/kubernetes/pkg/registry/core/event/storage"
 	rbacrest "k8s.io/kubernetes/pkg/registry/rbac/rest"
 	"k8s.io/kubernetes/pkg/serviceaccount"
 )
@@ -123,7 +133,35 @@ cluster's shared state through which all other components interact.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			verflag.PrintAndExitIfRequested()
 			fs := cmd.Flags()
-			cliflag.PrintFlags(fs)
+
+			if len(s.OpenShiftConfig) > 0 {
+				// if we are running openshift, we modify the admission chain defaults accordingly
+				admissionenablement.InstallOpenShiftAdmissionPlugins(s)
+
+				openshiftConfig, err := enablement.GetOpenshiftConfig(s.OpenShiftConfig)
+				if err != nil {
+					klog.Fatal(err)
+				}
+				enablement.ForceOpenShift(openshiftConfig)
+
+				args, err := openshiftkubeapiserver.ConfigToFlags(openshiftConfig)
+				if err != nil {
+					return err
+				}
+
+				// hopefully this resets the flags?
+				if err := cmd.ParseFlags(args); err != nil {
+					return err
+				}
+
+				// print merged flags (merged from OpenshiftConfig)
+				cliflag.PrintFlags(cmd.Flags())
+
+				enablement.ForceGlobalInitializationForOpenShift()
+			} else {
+				// print default flags
+				cliflag.PrintFlags(cmd.Flags())
+			}
 
 			err := checkNonZeroInsecurePort(fs)
 			if err != nil {
@@ -140,7 +178,7 @@ cluster's shared state through which all other components interact.`,
 				return utilerrors.NewAggregate(errs)
 			}
 
-			return Run(completedOptions, genericapiserver.SetupSignalHandler())
+			return Run(completedOptions, genericapiserver.SetupSignalHandlerIgnoringFurtherSignals())
 		},
 		Args: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
@@ -201,7 +239,7 @@ func CreateServerChain(completedOptions completedServerRunOptions, stopCh <-chan
 		return nil, err
 	}
 
-	kubeAPIServerConfig, serviceResolver, pluginInitializer, err := CreateKubeAPIServerConfig(completedOptions, nodeTunneler, proxyTransport)
+	kubeAPIServerConfig, serviceResolver, pluginInitializer, err := CreateKubeAPIServerConfig(completedOptions, nodeTunneler, proxyTransport, stopCh)
 	if err != nil {
 		return nil, err
 	}
@@ -298,13 +336,14 @@ func CreateKubeAPIServerConfig(
 	s completedServerRunOptions,
 	nodeTunneler tunneler.Tunneler,
 	proxyTransport *http.Transport,
+	stopCh <-chan struct{},
 ) (
 	*controlplane.Config,
 	aggregatorapiserver.ServiceResolver,
 	[]admission.PluginInitializer,
 	error,
 ) {
-	genericConfig, versionedInformers, serviceResolver, pluginInitializers, admissionPostStartHook, storageFactory, err := buildGenericConfig(s.ServerRunOptions, proxyTransport)
+	genericConfig, versionedInformers, serviceResolver, pluginInitializers, admissionPostStartHook, storageFactory, err := buildGenericConfig(s.ServerRunOptions, proxyTransport, stopCh)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -345,6 +384,13 @@ func CreateKubeAPIServerConfig(
 			return nil, nil, nil, err
 		}
 	}
+
+	var eventStorage *eventstorage.REST
+	eventStorage, err = eventstorage.NewREST(genericConfig.RESTOptionsGetter, uint64(s.EventTTL.Seconds()))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	genericConfig.EventSink = eventRegistrySink{eventStorage}
 
 	config := &controlplane.Config{
 		GenericConfig: genericConfig,
@@ -422,21 +468,19 @@ func CreateKubeAPIServerConfig(
 		config.ExtraConfig.ProxyTransport = c
 	}
 
-	if utilfeature.DefaultFeatureGate.Enabled(features.ServiceAccountIssuerDiscovery) {
-		// Load the public keys.
-		var pubKeys []interface{}
-		for _, f := range s.Authentication.ServiceAccounts.KeyFiles {
-			keys, err := keyutil.PublicKeysFromFile(f)
-			if err != nil {
-				return nil, nil, nil, fmt.Errorf("failed to parse key file %q: %v", f, err)
-			}
-			pubKeys = append(pubKeys, keys...)
+	// Load the public keys.
+	var pubKeys []interface{}
+	for _, f := range s.Authentication.ServiceAccounts.KeyFiles {
+		keys, err := keyutil.PublicKeysFromFile(f)
+		if err != nil {
+			return nil, nil, nil, fmt.Errorf("failed to parse key file %q: %v", f, err)
 		}
-		// Plumb the required metadata through ExtraConfig.
-		config.ExtraConfig.ServiceAccountIssuerURL = s.Authentication.ServiceAccounts.Issuer
-		config.ExtraConfig.ServiceAccountJWKSURI = s.Authentication.ServiceAccounts.JWKSURI
-		config.ExtraConfig.ServiceAccountPublicKeys = pubKeys
+		pubKeys = append(pubKeys, keys...)
 	}
+	// Plumb the required metadata through ExtraConfig.
+	config.ExtraConfig.ServiceAccountIssuerURL = s.Authentication.ServiceAccounts.Issuer
+	config.ExtraConfig.ServiceAccountJWKSURI = s.Authentication.ServiceAccounts.JWKSURI
+	config.ExtraConfig.ServiceAccountPublicKeys = pubKeys
 
 	return config, serviceResolver, pluginInitializers, nil
 }
@@ -445,6 +489,7 @@ func CreateKubeAPIServerConfig(
 func buildGenericConfig(
 	s *options.ServerRunOptions,
 	proxyTransport *http.Transport,
+	stopCh <-chan struct{},
 ) (
 	genericConfig *genericapiserver.Config,
 	versionedInformers clientgoinformers.SharedInformerFactory,
@@ -455,6 +500,14 @@ func buildGenericConfig(
 	lastErr error,
 ) {
 	genericConfig = genericapiserver.NewConfig(legacyscheme.Codecs)
+	genericConfig.IsTerminating = func() bool {
+		select {
+		case <-stopCh:
+			return true
+		default:
+			return false
+		}
+	}
 	genericConfig.MergedResourceConfig = controlplane.DefaultAPIResourceConfigSource()
 
 	if lastErr = s.GenericServerRunOptions.ApplyTo(genericConfig); lastErr != nil {
@@ -511,6 +564,8 @@ func buildGenericConfig(
 	// on a fast local network
 	genericConfig.LoopbackClientConfig.DisableCompression = true
 
+	enablement.SetLoopbackClientConfig(genericConfig.LoopbackClientConfig)
+
 	kubeClientConfig := genericConfig.LoopbackClientConfig
 	clientgoExternalClient, err := clientgoclientset.NewForConfig(kubeClientConfig)
 	if err != nil {
@@ -550,6 +605,14 @@ func buildGenericConfig(
 		return
 	}
 
+	if err := openshiftkubeapiserver.OpenShiftKubeAPIServerConfigPatch(genericConfig, versionedInformers, &pluginInitializers); err != nil {
+		lastErr = fmt.Errorf("failed to patch: %v", err)
+		return
+	}
+
+	if enablement.IsOpenShift() {
+		admissionenablement.SetAdmissionDefaults(s, versionedInformers, clientgoExternalClient)
+	}
 	err = s.Admission.ApplyTo(
 		genericConfig,
 		versionedInformers,
@@ -660,14 +723,14 @@ func Complete(s *options.ServerRunOptions) (completedServerRunOptions, error) {
 			upBound := time.Duration(1<<32) * time.Second
 			if s.Authentication.ServiceAccounts.MaxExpiration < lowBound ||
 				s.Authentication.ServiceAccounts.MaxExpiration > upBound {
-				return options, fmt.Errorf("the serviceaccount max expiration must be between 1 hour to 2^32 seconds")
+				return options, fmt.Errorf("the service-account-max-token-expiration must be between 1 hour and 2^32 seconds")
 			}
 			if s.Authentication.ServiceAccounts.ExtendExpiration {
 				if s.Authentication.ServiceAccounts.MaxExpiration < serviceaccount.WarnOnlyBoundTokenExpirationSeconds*time.Second {
-					klog.Warningf("service-account-extend-token-expiration is true, in order to correctly trigger safe transition logic, service-account-max-token-expiration must be set longer than 3607 seconds (currently %s)", s.Authentication.ServiceAccounts.MaxExpiration)
+					klog.Warningf("service-account-extend-token-expiration is true, in order to correctly trigger safe transition logic, service-account-max-token-expiration must be set longer than %d seconds (currently %s)", serviceaccount.WarnOnlyBoundTokenExpirationSeconds, s.Authentication.ServiceAccounts.MaxExpiration)
 				}
 				if s.Authentication.ServiceAccounts.MaxExpiration < serviceaccount.ExpirationExtensionSeconds*time.Second {
-					klog.Warningf("service-account-extend-token-expiration is true, enabling tokens valid up to 1 year, which is longer than service-account-max-token-expiration set to %s", s.Authentication.ServiceAccounts.MaxExpiration)
+					klog.Warningf("service-account-extend-token-expiration is true, enabling tokens valid up to %d seconds, which is longer than service-account-max-token-expiration set to %s seconds", serviceaccount.ExpirationExtensionSeconds, s.Authentication.ServiceAccounts.MaxExpiration)
 				}
 			}
 		}
@@ -772,4 +835,39 @@ func getServiceIPAndRanges(serviceClusterIPRanges string) (net.IP, net.IPNet, ne
 		secondaryServiceIPRange = *secondaryServiceClusterCIDR
 	}
 	return apiServerServiceIP, primaryServiceIPRange, secondaryServiceIPRange, nil
+}
+
+// eventRegistrySink wraps an event registry in order to be used as direct event sync, without going through the API.
+type eventRegistrySink struct {
+	*eventstorage.REST
+}
+
+var _ genericapiserver.EventSink = eventRegistrySink{}
+
+func (s eventRegistrySink) Create(v1event *corev1.Event) (*corev1.Event, error) {
+	ctx := request.WithNamespace(request.WithRequestInfo(request.NewContext(), &request.RequestInfo{APIVersion: "v1"}), v1event.Namespace)
+	// since we are bypassing the API set a hard timeout for the storage layer
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	var event core.Event
+	if err := v1.Convert_v1_Event_To_core_Event(v1event, &event, nil); err != nil {
+		return nil, err
+	}
+
+	obj, err := s.REST.Create(ctx, &event, nil, &metav1.CreateOptions{})
+	if err != nil {
+		return nil, err
+	}
+	ret, ok := obj.(*core.Event)
+	if !ok {
+		return nil, fmt.Errorf("expected corev1.Event, got %T", obj)
+	}
+
+	var v1ret corev1.Event
+	if err := v1.Convert_core_Event_To_v1_Event(ret, &v1ret, nil); err != nil {
+		return nil, err
+	}
+
+	return &v1ret, nil
 }

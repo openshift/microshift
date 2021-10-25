@@ -92,6 +92,8 @@ type ServerRunOptions struct {
 	ServiceAccountTokenMaxExpiration time.Duration
 
 	ShowHiddenMetricsForVersion string
+
+	OpenShiftConfig string
 }
 
 // NewServerRunOptions creates a new ServerRunOptions object with default parameters
@@ -152,7 +154,7 @@ func addDummyInsecureFlags(fs *pflag.FlagSet) {
 
 	for _, name := range []string{"insecure-bind-address", "address"} {
 		fs.IPVar(&bindAddr, name, bindAddr, ""+
-			"The IP address on which to serve the insecure port (set to 0.0.0.0 for all IPv4 interfaces and :: for all IPv6 interfaces).")
+			"The IP address on which to serve the insecure port (set to 0.0.0.0 or :: for listening in all interfaces and IP families).")
 		fs.MarkDeprecated(name, "This flag has no effect now and will be removed in v1.24.")
 	}
 
@@ -227,10 +229,9 @@ func (s *ServerRunOptions) Flags() (fss cliflag.NamedFlagSets) {
 		"of type NodePort, using this as the value of the port. If zero, the Kubernetes master "+
 		"service will be of type ClusterIP.")
 
-	// TODO (khenidak) change documentation as we move IPv6DualStack feature from ALPHA to BETA
 	fs.StringVar(&s.ServiceClusterIPRanges, "service-cluster-ip-range", s.ServiceClusterIPRanges, ""+
 		"A CIDR notation IP range from which to assign service cluster IPs. This must not "+
-		"overlap with any IP ranges assigned to nodes or pods.")
+		"overlap with any IP ranges assigned to nodes or pods. Max of two dual-stack CIDRs is allowed.")
 
 	fs.Var(&s.ServiceNodePortRange, "service-node-port-range", ""+
 		"A port range to reserve for services with NodePort visibility. "+
@@ -282,6 +283,10 @@ func (s *ServerRunOptions) Flags() (fss cliflag.NamedFlagSets) {
 
 	fs.StringVar(&s.ServiceAccountSigningKeyFile, "service-account-signing-key-file", s.ServiceAccountSigningKeyFile, ""+
 		"Path to the file that contains the current private key of the service account token issuer. The issuer will sign issued ID tokens with this private key.")
+
+	fs.StringVar(&s.OpenShiftConfig, "openshift-config", s.OpenShiftConfig, "config for openshift")
+	fs.MarkDeprecated("openshift-config", "to be removed")
+	fs.MarkHidden("openshift-config")
 
 	return fss
 }

@@ -63,7 +63,7 @@ func (opts ScheduledImageStreamControllerOptions) GetRateLimiter() flowcontrol.R
 // NewImageStreamController returns a new image stream import controller.
 func NewImageStreamController(client imagev1client.Interface, informer imagev1informer.ImageStreamInformer) *ImageStreamController {
 	controller := &ImageStreamController{
-		queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ImageStreamController"),
+		queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultItemBasedRateLimiter(), "ImageStreamController"),
 
 		client:       client.ImageV1(),
 		lister:       informer.Lister(),

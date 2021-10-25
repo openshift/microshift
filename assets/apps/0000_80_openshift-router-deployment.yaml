@@ -1,3 +1,5 @@
+# Deployment with default values
+# Ingress Controller specific values are applied at runtime.
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -21,6 +23,7 @@ spec:
     metadata:
       annotations:
         "unsupported.do-not-use.openshift.io/override-liveness-grace-period-seconds": "10"
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
       labels:
         ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
@@ -99,6 +102,12 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /healthz/ready
+              port: 1936
+            periodSeconds: 1
           resources:
             requests:
               cpu: 100m
@@ -128,3 +137,4 @@ spec:
             path: service-ca.crt
           name: service-ca-bundle
           optional: false
+        defaultMode: 420

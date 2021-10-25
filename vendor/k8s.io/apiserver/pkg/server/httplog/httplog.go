@@ -25,6 +25,7 @@ import (
 	"runtime"
 	"time"
 
+	"k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/klog/v2"
 )
 
@@ -53,6 +54,7 @@ type respLogger struct {
 	statusStack    string
 	addedInfo      string
 	startTime      time.Time
+	isTerminating  bool
 
 	captureErrorOutput bool
 
@@ -76,16 +78,26 @@ func DefaultStacktracePred(status int) bool {
 }
 
 // WithLogging wraps the handler with logging.
-func WithLogging(handler http.Handler, pred StacktracePred) http.Handler {
+func WithLogging(handler http.Handler, pred StacktracePred, isTerminatingFn func() bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 		if old := respLoggerFromContext(req); old != nil {
 			panic("multiple WithLogging calls!")
 		}
-		rl := newLogged(req, w).StacktraceWhen(pred)
+		isTerminating := false
+		if isTerminatingFn != nil {
+			isTerminating = isTerminatingFn()
+		}
+
+		startTime := time.Now()
+		if receivedTimestamp, ok := request.ReceivedTimestampFrom(ctx); ok {
+			startTime = receivedTimestamp
+		}
+
+		rl := newLoggedWithStartTime(req, w, startTime).StacktraceWhen(pred).IsTerminating(isTerminating)
 		req = req.WithContext(context.WithValue(ctx, respLoggerContextKey, rl))
 
-		if klog.V(3).Enabled() {
+		if klog.V(3).Enabled() || (rl.isTerminating && klog.V(1).Enabled()) {
 			defer func() { klog.InfoS("HTTP", rl.LogArgs()...) }()
 		}
 		handler.ServeHTTP(rl, req)
@@ -102,14 +114,18 @@ func respLoggerFromContext(req *http.Request) *respLogger {
 	return nil
 }
 
-// newLogged turns a normal response writer into a logged response writer.
-func newLogged(req *http.Request, w http.ResponseWriter) *respLogger {
+func newLoggedWithStartTime(req *http.Request, w http.ResponseWriter, startTime time.Time) *respLogger {
 	return &respLogger{
-		startTime:         time.Now(),
+		startTime:         startTime,
 		req:               req,
 		w:                 w,
 		logStacktracePred: DefaultStacktracePred,
 	}
+}
+
+// newLogged turns a normal response writer into a logged response writer.
+func newLogged(req *http.Request, w http.ResponseWriter) *respLogger {
+	return newLoggedWithStartTime(req, w, time.Now())
 }
 
 // LogOf returns the logger hiding in w. If there is not an existing logger
@@ -134,6 +150,12 @@ func Unlogged(req *http.Request, w http.ResponseWriter) http.ResponseWriter {
 // There's a default, so you don't need to call this unless you don't like the default.
 func (rl *respLogger) StacktraceWhen(pred StacktracePred) *respLogger {
 	rl.logStacktracePred = pred
+	return rl
+}
+
+// IsTerminating informs the logger that the server is terminating.
+func (rl *respLogger) IsTerminating(is bool) *respLogger {
+	rl.isTerminating = is
 	return rl
 }
 

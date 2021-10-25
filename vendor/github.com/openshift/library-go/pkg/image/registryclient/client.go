@@ -65,6 +65,7 @@ func NewContext(transp, insecureTransport http.RoundTripper) *Context {
 
 type transportCache struct {
 	rt        http.RoundTripper
+	host      string
 	scopes    map[string]struct{}
 	transport http.RoundTripper
 }
@@ -289,7 +290,7 @@ func (s stringScope) String() string { return string(s) }
 // cachedTransport reuses an underlying transport for the given round tripper based
 // on the set of passed scopes. It will always return a transport that has at least the
 // provided scope list.
-func (c *Context) cachedTransport(rt http.RoundTripper, scopes []auth.Scope) http.RoundTripper {
+func (c *Context) cachedTransport(rt http.RoundTripper, host string, scopes []auth.Scope) http.RoundTripper {
 	scopeNames := make(map[string]struct{})
 	for _, scope := range scopes {
 		scopeNames[scope.String()] = struct{}{}
@@ -298,7 +299,7 @@ func (c *Context) cachedTransport(rt http.RoundTripper, scopes []auth.Scope) htt
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	for _, c := range c.cachedTransports {
-		if c.rt == rt && hasAll(c.scopes, scopeNames) {
+		if c.rt == rt && c.host == host && hasAll(c.scopes, scopeNames) {
 			return c.transport
 		}
 	}
@@ -331,6 +332,7 @@ func (c *Context) cachedTransport(rt http.RoundTripper, scopes []auth.Scope) htt
 	t := transport.NewTransport(rt, modifiers...)
 	c.cachedTransports = append(c.cachedTransports, transportCache{
 		rt:        rt,
+		host:      host,
 		scopes:    scopeNames,
 		transport: t,
 	})
@@ -349,7 +351,7 @@ func (c *Context) scopes(repoName string) []auth.Scope {
 }
 
 func (c *Context) repositoryTransport(t http.RoundTripper, registry *url.URL, repoName string) http.RoundTripper {
-	return c.cachedTransport(t, c.scopes(repoName))
+	return c.cachedTransport(t, registry.Host, c.scopes(repoName))
 }
 
 var nowFn = time.Now

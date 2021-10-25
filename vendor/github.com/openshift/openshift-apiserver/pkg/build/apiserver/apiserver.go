@@ -155,7 +155,11 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	v1Storage := map[string]rest.Storage{}
 	v1Storage["builds"] = buildStorage
 	v1Storage["builds/clone"] = buildclone.NewStorage(buildGenerator)
-	v1Storage["builds/log"] = buildlogregistry.NewREST(buildClient.BuildV1(), kubeClient.CoreV1())
+	v1Storage["builds/log"] = buildlogregistry.NewREST(
+		buildClient.BuildV1(),
+		kubeClient.CoreV1(),
+		c.GenericConfig.SharedInformerFactory.Core().V1().Pods().Lister(),
+	)
 	v1Storage["builds/details"] = buildDetailsStorage
 
 	v1Storage["buildConfigs"] = buildConfigStorage

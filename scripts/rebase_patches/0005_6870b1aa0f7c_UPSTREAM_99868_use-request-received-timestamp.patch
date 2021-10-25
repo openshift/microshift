@@ -1,0 +1,111 @@
+diff --git a/vendor/k8s.io/apiserver/pkg/server/config.go b/vendor/k8s.io/apiserver/pkg/server/config.go
+index 24992562cb2..b6e346b8250 100644
+--- a/vendor/k8s.io/apiserver/pkg/server/config.go
++++ b/vendor/k8s.io/apiserver/pkg/server/config.go
+@@ -851,8 +851,9 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
+ 	handler = genericapifilters.WithWarningRecorder(handler)
+ 	handler = genericapifilters.WithCacheControl(handler)
+ 	handler = genericfilters.WithHSTS(handler, c.HSTSDirectives)
++	handler = genericfilters.WithHTTPLogging(handler, c.IsTerminating)
+ 	handler = genericapifilters.WithRequestReceivedTimestamp(handler)
+-	handler = genericfilters.WithPanicRecovery(handler, c.RequestInfoResolver, c.IsTerminating)
++	handler = genericfilters.WithPanicRecovery(handler, c.RequestInfoResolver)
+ 	return handler
+ }
+ 
+diff --git a/vendor/k8s.io/apiserver/pkg/server/filters/wrap.go b/vendor/k8s.io/apiserver/pkg/server/filters/wrap.go
+index 2e4c823aefd..946c7f0e34a 100644
+--- a/vendor/k8s.io/apiserver/pkg/server/filters/wrap.go
++++ b/vendor/k8s.io/apiserver/pkg/server/filters/wrap.go
+@@ -28,7 +28,7 @@ import (
+ )
+ 
+ // WithPanicRecovery wraps an http Handler to recover and log panics (except in the special case of http.ErrAbortHandler panics, which suppress logging).
+-func WithPanicRecovery(handler http.Handler, resolver request.RequestInfoResolver, isTerminating func() bool) http.Handler {
++func WithPanicRecovery(handler http.Handler, resolver request.RequestInfoResolver) http.Handler {
+ 	return withPanicRecovery(handler, func(w http.ResponseWriter, req *http.Request, err interface{}) {
+ 		if err == http.ErrAbortHandler {
+ 			// Honor the http.ErrAbortHandler sentinel panic value
+@@ -56,11 +56,15 @@ func WithPanicRecovery(handler http.Handler, resolver request.RequestInfoResolve
+ 		}
+ 		http.Error(w, "This request caused apiserver to panic. Look in the logs for details.", http.StatusInternalServerError)
+ 		klog.Errorf("apiserver panic'd on %v %v", req.Method, req.RequestURI)
+-	}, isTerminating)
++	})
++}
++
++// WithHTTPLogging enables logging of incoming requests.
++func WithHTTPLogging(handler http.Handler, isTerminating func() bool) http.Handler {
++	return httplog.WithLogging(handler, httplog.DefaultStacktracePred, isTerminating)
+ }
+ 
+-func withPanicRecovery(handler http.Handler, crashHandler func(http.ResponseWriter, *http.Request, interface{}), isTerminating func() bool) http.Handler {
+-	handler = httplog.WithLogging(handler, httplog.DefaultStacktracePred, isTerminating)
++func withPanicRecovery(handler http.Handler, crashHandler func(http.ResponseWriter, *http.Request, interface{})) http.Handler {
+ 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+ 		defer runtime.HandleCrash(func(err interface{}) {
+ 			crashHandler(w, req, err)
+diff --git a/vendor/k8s.io/apiserver/pkg/server/httplog/httplog.go b/vendor/k8s.io/apiserver/pkg/server/httplog/httplog.go
+index 0ab4dcb78f6..23cd475a2e3 100644
+--- a/vendor/k8s.io/apiserver/pkg/server/httplog/httplog.go
++++ b/vendor/k8s.io/apiserver/pkg/server/httplog/httplog.go
+@@ -25,6 +25,7 @@ import (
+ 	"runtime"
+ 	"time"
+ 
++	"k8s.io/apiserver/pkg/endpoints/request"
+ 	"k8s.io/klog/v2"
+ )
+ 
+@@ -87,7 +88,13 @@ func WithLogging(handler http.Handler, pred StacktracePred, isTerminatingFn func
+ 		if isTerminatingFn != nil {
+ 			isTerminating = isTerminatingFn()
+ 		}
+-		rl := newLogged(req, w).StacktraceWhen(pred).IsTerminating(isTerminating)
++
++		startTime := time.Now()
++		if receivedTimestamp, ok := request.ReceivedTimestampFrom(ctx); ok {
++			startTime = receivedTimestamp
++		}
++
++		rl := newLoggedWithStartTime(req, w, startTime).StacktraceWhen(pred).IsTerminating(isTerminating)
+ 		req = req.WithContext(context.WithValue(ctx, respLoggerContextKey, rl))
+ 
+ 		if klog.V(3).Enabled() || (rl.isTerminating && klog.V(1).Enabled()) {
+@@ -107,16 +114,20 @@ func respLoggerFromContext(req *http.Request) *respLogger {
+ 	return nil
+ }
+ 
+-// newLogged turns a normal response writer into a logged response writer.
+-func newLogged(req *http.Request, w http.ResponseWriter) *respLogger {
++func newLoggedWithStartTime(req *http.Request, w http.ResponseWriter, startTime time.Time) *respLogger {
+ 	return &respLogger{
+-		startTime:         time.Now(),
++		startTime:         startTime,
+ 		req:               req,
+ 		w:                 w,
+ 		logStacktracePred: DefaultStacktracePred,
+ 	}
+ }
+ 
++// newLogged turns a normal response writer into a logged response writer.
++func newLogged(req *http.Request, w http.ResponseWriter) *respLogger {
++	return newLoggedWithStartTime(req, w, time.Now())
++}
++
+ // LogOf returns the logger hiding in w. If there is not an existing logger
+ // then a passthroughLogger will be created which will log to stdout immediately
+ // when Addf is called.
+diff --git a/vendor/k8s.io/controller-manager/app/serve.go b/vendor/k8s.io/controller-manager/app/serve.go
+index bf5d87e069d..9e1f5bb7254 100644
+--- a/vendor/k8s.io/controller-manager/app/serve.go
++++ b/vendor/k8s.io/controller-manager/app/serve.go
+@@ -48,7 +48,7 @@ func BuildHandlerChain(apiHandler http.Handler, authorizationInfo *apiserver.Aut
+ 	}
+ 	handler = genericapifilters.WithRequestInfo(handler, requestInfoResolver)
+ 	handler = genericapifilters.WithCacheControl(handler)
+-	handler = genericfilters.WithPanicRecovery(handler, requestInfoResolver, nil)
++	handler = genericfilters.WithPanicRecovery(handler, requestInfoResolver)
+ 
+ 	return handler
+ }
