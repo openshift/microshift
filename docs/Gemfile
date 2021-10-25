@@ -39,3 +39,5 @@ gem "rouge"
 
 # Allow running 'rake', e.g. for local link checks
 gem "rake"
+
+gem "jekyll-toc"

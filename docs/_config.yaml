@@ -6,6 +6,7 @@ title: Microshift
 description: Microshift is a research project that is exploring how OpenShift Kubernetes can be optimized for small form factor and edge computing.
 type: website
 keep_files: ["CNAME"]
+repository: redhat-et/microshift
 
 # Build settings
 markdown: kramdown
@@ -29,11 +30,20 @@ plugins:
   - jekyll-remote-theme
   - jekyll-sitemap
   - premonition
+  - jekyll-toc
 
 minima:
    skin: dark
    social_links:
      github: redhat-et
-# header_pages:  - docs/commands.md
-#   - docs/config.md
-#   - docs/examples.md
+
+header_pages:
+  - index.md
+  - design/design.md
+  - microshift-aio/README.md
+  - microshift-containerized/README.md
+  - known-issues.md
+
+toc:
+  min_level: 2 # default: 1
+  max_level: 6 # default: 6
