@@ -22,7 +22,7 @@ Name: microshift
 Version: %{version}
 Release: %{release}%{dist}
 # this can be %{timestamp}.git%{short_hash} later for continous main builds
-Summary: Microshift binary
+Summary: MicroShift binary
 License: ASL 2.0
 URL: https://github.com/redhat-et/microshift
 
@@ -55,14 +55,14 @@ Requires: microshift-selinux
 %{?systemd_requires}
 
 %description
-Microshift is a research project that is exploring how OpenShift Kubernetes
+MicroShift is a research project that is exploring how OpenShift Kubernetes
 can be optimized for small form factor and edge computing.
 
 Edge devices deployed out in the field pose very different operational,
 environmental, and business challenges from those of cloud computing.
 These motivate different engineering
 trade-offs for Kubernetes at the far edge than for cloud or near-edge
-scenarios. Microshift's design goals cater to this:
+scenarios. MicroShift's design goals cater to this:
 
 make frugal use of system resources (CPU, memory, network, storage, etc.),
 tolerate severe networking constraints, update (resp. roll back) securely,
@@ -71,22 +71,22 @@ and integrate cleanly with edge-optimized OSes like Fedora IoT and RHEL for Edge
 while providing a consistent development and management experience with standard
 OpenShift.
 
-We believe these properties should also make Microshift a great tool for other
+We believe these properties should also make MicroShift a great tool for other
 use cases such as Kubernetes applications development on resource-constrained
 systems, scale testing, and provisioning of lightweight Kubernetes control planes.
 
-Note: Microshift is still early days and moving fast. Features are missing.
+Note: MicroShift is still early days and moving fast. Features are missing.
 Things break. But you can still help shape it, too.
 
 %package selinux
-Summary: SELinux policies for Microshift
+Summary: SELinux policies for MicroShift
 BuildRequires: selinux-policy
 BuildRequires: selinux-policy-devel
 BuildArch: noarch
 %{?selinux_requires}
 
 %description selinux
-SElinux policy modules for Microshift.
+SElinux policy modules for MicroShift.
 
 %prep
 

@@ -29,7 +29,7 @@ func NewVersionCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 	o := NewVersionOptions(ioStreams)
 	cmd := &cobra.Command{
 		Use:   "version",
-		Short: "Print Microshift version information",
+		Short: "Print MicroShift version information",
 		Run: func(cmd *cobra.Command, args []string) {
 			// cmdutil.CheckErr(o.Validate())
 			// cmdutil.CheckErr(o.Complete(f, cmd))
@@ -47,7 +47,7 @@ func (o *VersionOptions) Run() error {
 
 	switch o.Output {
 	case "":
-		fmt.Fprintf(o.Out, "Microshift Version: %s\n", versionInfo.String())
+		fmt.Fprintf(o.Out, "MicroShift Version: %s\n", versionInfo.String())
 		fmt.Fprintf(o.Out, "Base OKD Version: %s\n", release.Base)
 	case "yaml":
 		marshalled, err := yaml.Marshal(&versionInfo)
