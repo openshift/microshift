@@ -35,6 +35,12 @@ IPTABLES :=nft
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
 
+# setup vars for tests
+GO_TEST_PACKAGES :=./pkg/...
+GO_TEST_FLAGS := -v -coverprofile cover.out
+GO_MOD_FLAGS := -mod=vendor
+
+GO_EXT_LD_FLAGS :=-extldflags '-static'
 GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMinor=21 \
@@ -54,10 +60,6 @@ GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X github.com/openshift/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    -s -w"
 
-# setup the test targets 
-GO_TEST_PACKAGES :=./pkg/...
-GO_TEST_FLAGS := -v
-GO_MOD_FLAGS := 
 
 debug:
 	@echo FLAGS:"$(GO_LD_FLAGS)"
