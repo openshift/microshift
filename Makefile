@@ -149,6 +149,7 @@ _build_containerized:
 		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
 		--build-arg ARCH=$(ARCH) \
 		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
+		--build-arg FROM_SOURCE=$(FROM_SOURCE) \
 		--platform="linux/$(ARCH)" \
 		.
 .PHONY: _build_containerized
