@@ -1,0 +1,13 @@
+
+    <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="{% if page.author %}{{ page.author | join: ', ' }}{% else %}The {{ site.title }} website team, {{ autharray | uniq | join: ", " }}{% endif %}" >
+    {% if page.author %}<meta property="og:type" content="article" >{% endif %}
+    <meta name="twitter:card" content="summary">
+    <meta name="keywords" content="{% if page.tags %}{{ page.tags | join: ', ' }}{% else %}{% for category in site.categories %}{{ category | first | slugify }}, {% endfor %}{% endif %}" >
+    <meta property="og:type" content="{% if page.type %}{{ page.type }} | {{ site.type }}{% else %}{{ site.type }}{% endif %}">
+    <meta property="og:image" content="{% if page.image %}{{site.url}}{{ page.image }} | {{site.url}}{{ site.image }}{% else %}{{site.url}}{{ site.image }}{% endif %}">
+    <meta property="og:article:author" content="{% if page.author %}{{ page.author | join: ', ' }}{% else %}The {{ site.title }} website team{% endif %}" >
+    <meta property="og:article:published_time" content="{% if page.date %}{{ page.date }}{% else %}{{ site.time }}{% endif %}" >
+    <meta name="twitter:title" content="{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}">
+    <meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">

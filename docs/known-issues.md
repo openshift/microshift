@@ -1,8 +1,16 @@
-# On EC2 RHEL 8.4
+---
+modified: "2021-10-25T11:10:27.304+02:00"
+title: Known Issues
+tags: known issues, troubleshooting
+layout: page
+toc: true
+---
 
-## `service-ca` can't be created
+## On EC2 with RHEL 8.4
 
-If you want to run `microshift` on EC2 REHL 8.4(`cat /etc/os-release`), you might find [`ingress and service-ca will not stay online`](https://github.com/redhat-et/microshift/issues/270).
+### `service-ca` can't be created
+
+If you want to run `microshift` on EC2 RHEL 8.4(`cat /etc/os-release`), you might find [`ingress and service-ca will not stay online`](https://github.com/redhat-et/microshift/issues/270).
 
 Inside the failing pods, you might find errors as: `10.43.0.1:443: read: connection timed out`.
 
@@ -12,20 +20,20 @@ In order to work on RHEL 8.4, you may disable the networkManager and reboot to r
 
 Eg:
 
-```
+```sh
 systemctl disable nm-cloud-setup.service nm-cloud-setup.timer
 reboot
 ```
 
 You can find the details of this EC2 networkManage issue tracked at [issue](https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/740).
 
-
-## Openshift pods restarts on `CrashLoopBackOff`
+### Openshift pods restarts on `CrashLoopBackOff`
 
 A few minutes after `microshift` started, openshift pods fall into `CrashLoopBackOff`.
 
 If you check up the `journalctl |grep iptables`, you may see the following:
-```
+
+```log
 
 Sep 21 19:12:54 ip-172-31-85-30.ec2.internal microshift[1297]: I0921 19:12:54.399365    1297 server_others.go:185] Using iptables Proxier.
 Sep 21 19:13:50 ip-172-31-85-30.ec2.internal kernel: iptables[2438]: segfault at 88 ip 00007feaf5dc0e47 sp 00007fff6f2fea08 error 4 in libnftnl.so.11.3.0[7feaf5dbc000+16000]
@@ -34,17 +42,23 @@ Sep 21 20:35:57 ip-172-31-85-30.ec2.internal microshift[1297]: E0921 20:35:57.91
 ```
 
 Also, the `openshift-ingress` pod will faild on:
-```
+
+```console
 I0921 17:36:17.811391       1 router.go:262] router "msg"="router is including routes in all namespaces"
 E0921 17:36:17.914638       1 haproxy.go:418] can't scrape HAProxy: dial unix /var/lib/haproxy/run/haproxy.sock: connect: no such file or directory
 I0921 17:36:17.948417       1 router.go:579] template "msg"="router reloaded"  "output"=" - Checking http://localhost:80 ...\n - Health check ok : 0 retry attempt(s).\n"
 ```
-As a walk around, you can follow steps below:
+
+As a workaround, you can follow steps below:
+
 - delete `flannel` daemonset
 
-	`kubectl delete ds -n kube-system                     kube-flannel-ds`
+  ```sh
+  kubectl delete ds -n kube-system kube-flannel-ds
+  ```
+
 - restart all the openshift pods.
 
-This workaround won't affect the singel node `microshift` functionality since the `flannel` daemonset is used for multi-node microshift.
+This workaround won't affect the single node `microshift` functionality since the `flannel` daemonset is used for multi-node microshift.
 
 This issue is tracked at: [#296](https://github.com/redhat-et/microshift/issues/296)

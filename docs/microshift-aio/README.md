@@ -1,19 +1,21 @@
 ---
-modified: "2021-10-21T16:30:17.270+02:00"
+modified: "2021-10-25T11:09:31.544+02:00"
+title: All-In-One
+layout: page
+tags: all-in-one, aio
+toc: true
 ---
-
-# Containerized Microshift
 
 ## Run Microshift All-In-One as a Systemd Service
 
-Copy microshift-aio unit file to /etc/systemd and the aio run script to /usr/bin
+Copy `microshift-aio` unit file to `/etc/systemd` and the aio run script to `/usr/bin`
 
 ```bash
 cp packaging/systemd/microshift-aio.service /etc/systemd/system/microshift-aio.service
 cp packaging/systemd/microshift-aio /usr/bin/
 ```
 
-Now enable and start the service. The KUBECONFIG location will be written to /etc/microshift-aio/microshift-aio.conf.  
+Now enable and start the service. The `KUBECONFIG` location will be written to `/etc/microshift-aio/microshift-aio.conf`.  
 If the `microshift-data` podman volume does not exist, the systemd service will create one.
 
 ```bash
@@ -23,22 +25,22 @@ source /etc/microshift-aio/microshift-aio.conf
 
 Verify that microshift is running.
 
-```
+```sh
 kubectl get pods -A
 ```
 
-Stop microshift-aio service
+Stop `microshift-aio` service
 
 ```bash
 systemctl stop microshift-aio
 ```
 
-**NOTE** Stopping microshift-aio service _does not_ remove the podman volume `microshift-data`.
-A restart will use the same volume.
+> note ""
+> Stopping microshift-aio service _does not_ remove the podman volume `microshift-data`. A restart will use the same volume.
 
 ## Run the Image Without Systemd
 
-First, enable the following selinux rule:
+First, enable the following SElinux rule:
 
 ```bash
 setsebool -P container_manage_cgroup true
