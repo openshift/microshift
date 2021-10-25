@@ -68,7 +68,11 @@ microshift: build-containerized-cross-build-linux-amd64
 microshift-aio: build-containerized-all-in-one-amd64
 .PHONY: microshift-aio
 
-update: update-generated-completions
+update-bindata:
+	./scripts/bindata.sh
+.PHONY: update-bindata
+
+update: update-bindata
 .PHONY: update
 
 ###############################
