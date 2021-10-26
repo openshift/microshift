@@ -26,13 +26,11 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
-	oauth_apiserver "github.com/openshift/oauth-apiserver/pkg/cmd/oauth-apiserver"
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 
@@ -236,83 +234,5 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	if err := options.StartControllerManager(); err != nil {
 		logrus.Fatalf("Failed to start ocp-controller-manager %v", err)
 	}
-	return ctx.Err()
-}
-
-// OAuth OpenShift Service
-type OpenShiftOAuth struct {
-	options *oauth_apiserver.OAuthAPIServerOptions
-	Output  io.Writer
-}
-
-func NewOpenShiftOAuth(cfg *config.MicroshiftConfig) *OpenShiftOAuth {
-	s := &OpenShiftOAuth{}
-	s.configure(cfg)
-	return s
-}
-
-func (s *OpenShiftOAuth) Name() string           { return "oauth-apiserver" }
-func (s *OpenShiftOAuth) Dependencies() []string { return []string{} }
-
-func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
-	args := []string{
-		"start",
-		"--secure-port=8443",
-		"--kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
-		"--authorization-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
-		"--authentication-kubeconfig=" + cfg.DataDir + "/resources/kubeadmin/kubeconfig",
-		"--audit-log-format=json",
-		"--audit-log-maxsize=100",
-		"--audit-log-maxbackup=10",
-		"--etcd-cafile=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt",
-		"--etcd-keyfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key",
-		"--etcd-certfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt",
-		"--shutdown-delay-duration=120s",
-		"--tls-cert-file=" + cfg.DataDir + "/resources/ocp-oauth-apiserver/secrets/tls.crt",
-		"--tls-private-key-file=" + cfg.DataDir + "/resources/ocp-oauth-apiserver/secrets/tls.key",
-		"--cors-allowed-origins='//127.0.0.1(:|$)'",
-		"--cors-allowed-origins='//localhost(:|$)'",
-		"--etcd-servers=https://127.0.0.1:2379",
-		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-		"--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-		"--tls-cipher-suites=TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-		"--tls-min-version=VersionTLS12",
-	}
-
-	fs := pflag.NewFlagSet("oauth-apiserver", pflag.PanicOnError)
-	opts := oauth_apiserver.NewOAuthAPIServerOptions(os.Stdout)
-	opts.AddFlags(fs)
-	logrus.Infof("starting openshift-oauth-apiserver, args: %v", args)
-
-	ls, err := util.CreateLocalhostListenerOnPort(8443)
-	if err != nil {
-		logrus.Errorf("failed to create listener: %v", err)
-	}
-
-	opts.RecommendedOptions.SecureServing.Listener = ls
-	opts.RecommendedOptions.SecureServing.BindPort = 8443
-
-	if err := fs.Parse(args); err != nil {
-		logrus.Errorf("failed to parse flags: %v", err)
-	}
-	if err := opts.Complete(); err != nil {
-		logrus.Errorf("failed to complete options: %v", err)
-	}
-	if err := opts.Validate(args); err != nil {
-		logrus.Errorf("failed to validate options: %v", err)
-	}
-	s.options = opts
-}
-
-func (s *OpenShiftOAuth) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(stopped)
-	stopCh := make(chan struct{})
-	if err := oauth_apiserver.RunOAuthAPIServer(s.options, stopCh); err != nil {
-		return err
-	}
-
 	return ctx.Err()
 }
