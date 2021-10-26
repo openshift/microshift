@@ -6,7 +6,7 @@ tags: all-in-one, aio
 toc: true
 ---
 
-## Run Microshift All-In-One as a Systemd Service
+## Run MicroShift All-In-One as a Systemd Service
 
 Copy `microshift-aio` unit file to `/etc/systemd` and the aio run script to `/usr/bin`
 
@@ -130,4 +130,4 @@ make microshfit-aio
 ## Limitation
 
 These instructions are tested on Linux, Mac, and Windows.
-On MacOS, running containerized Microshift as non-root is not supported on MacOS.
+On MacOS, running containerized MicroShift as non-root is not supported on MacOS.

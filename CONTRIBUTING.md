@@ -1,9 +1,9 @@
-# Contributing to Microshift
+# Contributing to MicroShift
 
-If you would like to develop Microshift locally, you can follow this guide on getting
+If you would like to develop MicroShift locally, you can follow this guide on getting
 it installed and running through the provided Makefile.
 
-This guide will primarily focus on running Microshift within a VM using Vagrant.
+This guide will primarily focus on running MicroShift within a VM using Vagrant.
 
 
 ## (optional) Developing with Vagrant
@@ -18,7 +18,7 @@ system of your choice. For this example we will be looking at a [fedora 34 cloud
 image](https://app.vagrantup.com/fedora/boxes/34-cloud-base), however you can substitute any vagrant image of your choice.
 
 
-First, navigate to the Microshift directory on your host system, or another designated
+First, navigate to the MicroShift directory on your host system, or another designated
 directory where we will be storing the Vagrantfile.
 
 
@@ -138,7 +138,7 @@ and click on the button to connect to it in a remote window.
 ](https://medium.com/@lopezgand/connect-visual-studio-code-with-vagrant-in-your-local-machine-24903fb4a9de))*
 
 
-## Running Microshift Locally
+## Running MicroShift Locally
 
 ### Pre-Installation
 
@@ -175,9 +175,9 @@ git clone https://github.com/redhat-et/microshift.git
 cd microshift
 ```
 
-### Building Microshift 
+### Building MicroShift
 
-Now we can build Microshift:
+Now we can build MicroShift:
 
 ```sh
 make build

@@ -1,5 +1,5 @@
 [Unit]
-Description=Microshift
+Description=MicroShift
 After=crio.service
 
 [Service]

@@ -137,7 +137,7 @@ install_crio() {
 }
 
 
-# CRI-O config to match Microshift networking values
+# CRI-O config to match MicroShift networking values
 crio_conf() {
     sudo sh -c 'cat << EOF > /etc/cni/net.d/100-crio-bridge.conf
 {
@@ -195,7 +195,7 @@ get_microshift() {
 
     cat << EOF | sudo tee /usr/lib/systemd/system/microshift.service
 [Unit]
-Description=Microshift
+Description=MicroShift
 After=crio.service
 
 [Service]
