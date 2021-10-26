@@ -1,6 +1,6 @@
 ---
-modified: "2021-10-25T11:08:42.763+02:00"
-title: The Project
+modified: "2021-10-26T13:12:07.131+02:00"
+title: The  Project
 tags: microshift project, edge, µShift
 layout: page
 toc: true
@@ -22,6 +22,7 @@ Watch this [end-to-end MicroShift provisioning demo video](https://youtu.be/QOiB
 
 > warning ""
 > MicroShift is still early days and moving fast. Features are missing. Things break. But you can still help shape it, too.\*\*
+
 
 <sup>1) more precisely [OKD](https://www.okd.io/), the Kubernetes distribution by the OpenShift community</sup>
 

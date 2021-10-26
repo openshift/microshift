@@ -1,0 +1,54 @@
+From 36166d8f51b5a90a33a46d543118350ebe9715c4 Mon Sep 17 00:00:00 2001
+From: Miguel Angel Ajo <majopela@redhat.com>
+Date: Thu, 14 Oct 2021 16:09:50 +0200
+Subject: [PATCH] workaround riscv64
+
+Signed-off-by: Miguel Angel Ajo <majopela@redhat.com>
+---
+ vendor/github.com/prometheus/procfs/cpuinfo.go |  4 ++++
+ .../prometheus/procfs/cpuinfo_riscv64.go       | 18 ++++++++++++++++++
+ 2 files changed, 22 insertions(+)
+ create mode 100644 vendor/github.com/prometheus/procfs/cpuinfo_riscv64.go
+
+diff --git a/vendor/github.com/prometheus/procfs/cpuinfo.go b/vendor/github.com/prometheus/procfs/cpuinfo.go
+index 31d42f71..70651ed6 100644
+--- a/vendor/github.com/prometheus/procfs/cpuinfo.go
++++ b/vendor/github.com/prometheus/procfs/cpuinfo.go
+@@ -71,6 +71,10 @@ func (fs FS) CPUInfo() ([]CPUInfo, error) {
+ 	return parseCPUInfo(data)
+ }
+ 
++func parseCPUInfoRiscv64(info []byte) ([]CPUInfo, error) {
++    return nil, nil
++}
++
+ func parseCPUInfoX86(info []byte) ([]CPUInfo, error) {
+ 	scanner := bufio.NewScanner(bytes.NewReader(info))
+ 
+diff --git a/vendor/github.com/prometheus/procfs/cpuinfo_riscv64.go b/vendor/github.com/prometheus/procfs/cpuinfo_riscv64.go
+new file mode 100644
+index 00000000..cb75cc7d
+--- /dev/null
++++ b/vendor/github.com/prometheus/procfs/cpuinfo_riscv64.go
+@@ -0,0 +1,18 @@
++// Copyright 2020 The Prometheus Authors
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++// http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++// +build linux
++
++package procfs
++
++var parseCPUInfo = parseCPUInfoRiscv64
+-- 
+2.31.1
+
