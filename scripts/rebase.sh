@@ -189,19 +189,21 @@ popd >/dev/null
 
 
 title "Rebasing release_*.go"
+images="$(get_release_images "${REPOROOT}/pkg/release/release.go" | xargs)"
+
 for arch in amd64; do
-    images="$(get_release_images "${REPOROOT}/pkg/release/release_${arch}.go" | xargs)"
     w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
     for i in ${images}; do
         digest=$(awk "/ ${i//_/-} / {print \$2}" release.txt)
         if [[ ! -z "${digest}" ]]; then
-            awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
+            awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
                 "${REPOROOT}/pkg/release/release_${arch}.go" > t
             mv t "${REPOROOT}/pkg/release/release_${arch}.go"
         fi
     done
-    sed -i "/^var Base/c\var Base = \"${OKD_RELEASE}\"" "${REPOROOT}/pkg/release/release_${arch}.go"
 done
+
+sed -i "/^var Base/c\var Base = \"${OKD_RELEASE}\"" "${REPOROOT}/pkg/release/release.go"
 
 
 title "Rebasing manifests"
