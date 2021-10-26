@@ -827,6 +827,7 @@ github.com/openshift/library-go/pkg/legacyapi/legacygroupification
 github.com/openshift/library-go/pkg/monitor/health
 github.com/openshift/library-go/pkg/network
 github.com/openshift/library-go/pkg/oauth/oauthdiscovery
+github.com/openshift/library-go/pkg/oauth/oauthserviceaccountclient
 github.com/openshift/library-go/pkg/quota/clusterquotamapping
 github.com/openshift/library-go/pkg/quota/quotautil
 github.com/openshift/library-go/pkg/security/ldaputil
@@ -836,6 +837,52 @@ github.com/openshift/library-go/pkg/template/generator
 github.com/openshift/library-go/pkg/template/templateprocessing
 github.com/openshift/library-go/pkg/template/templateprocessingclient
 github.com/openshift/library-go/pkg/unidling/unidlingclient
+# github.com/openshift/oauth-apiserver v0.0.0-20210508031825-09435a5dd505
+## explicit
+github.com/openshift/oauth-apiserver/pkg/api/install
+github.com/openshift/oauth-apiserver/pkg/apiserver
+github.com/openshift/oauth-apiserver/pkg/authorization/hardcodedauthorizer
+github.com/openshift/oauth-apiserver/pkg/cmd/oauth-apiserver
+github.com/openshift/oauth-apiserver/pkg/cmd/oauth-apiserver/openapiconfig
+github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth
+github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth/install
+github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth/v1
+github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth/validation
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthaccesstoken
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthaccesstoken/etcd
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthauthorizetoken
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthauthorizetoken/etcd
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthclient
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthclient/etcd
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthclientauthorization
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthclientauthorization/etcd
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/tokenreviews
+github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/useroauthaccesstokens/delegate
+github.com/openshift/oauth-apiserver/pkg/oauth/printers/internalversion
+github.com/openshift/oauth-apiserver/pkg/openapi
+github.com/openshift/oauth-apiserver/pkg/printers
+github.com/openshift/oauth-apiserver/pkg/printerstorage
+github.com/openshift/oauth-apiserver/pkg/serverscheme
+github.com/openshift/oauth-apiserver/pkg/tokenvalidation
+github.com/openshift/oauth-apiserver/pkg/tokenvalidation/apis
+github.com/openshift/oauth-apiserver/pkg/tokenvalidation/options
+github.com/openshift/oauth-apiserver/pkg/tokenvalidation/rankedset
+github.com/openshift/oauth-apiserver/pkg/tokenvalidation/usercache
+github.com/openshift/oauth-apiserver/pkg/user/apis/user
+github.com/openshift/oauth-apiserver/pkg/user/apis/user/install
+github.com/openshift/oauth-apiserver/pkg/user/apis/user/v1
+github.com/openshift/oauth-apiserver/pkg/user/apis/user/validation
+github.com/openshift/oauth-apiserver/pkg/user/apiserver
+github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/group
+github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/group/etcd
+github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/identity
+github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/identity/etcd
+github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/user
+github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/user/etcd
+github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/useridentitymapping
+github.com/openshift/oauth-apiserver/pkg/user/printers/internalversion
+github.com/openshift/oauth-apiserver/pkg/version
 # github.com/openshift/openshift-apiserver v0.0.0-20210812003746-628b46ccb012
 ## explicit
 github.com/openshift/openshift-apiserver/pkg/api
@@ -1037,7 +1084,7 @@ github.com/peterbourgon/diskv
 # github.com/pkg/errors v0.9.1 => github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
-# github.com/pkg/profile v1.3.0 => github.com/pkg/profile v1.3.0
+# github.com/pkg/profile v1.4.0 => github.com/pkg/profile v1.3.0
 github.com/pkg/profile
 # github.com/pmezard/go-difflib v1.0.0 => github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib

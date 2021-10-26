@@ -77,7 +77,11 @@ func OCPAPIServer(cfg *config.MicroshiftConfig) error {
 	}()
 
 	// ocp api service registration
-	if err := createAPIHeadlessSvc(cfg); err != nil {
+	if err := createAPIHeadlessSvc(cfg, "openshift-apiserver", 8444); err != nil {
+		logrus.Warningf("failed to apply headless svc %v", err)
+		return err
+	}
+	if err := createAPIHeadlessSvc(cfg, "openshift-oauth-apiserver", 8443); err != nil {
 		logrus.Warningf("failed to apply headless svc %v", err)
 		return err
 	}
