@@ -1,7 +1,7 @@
 ---
-modified: "2021-10-25T11:08:42.763+02:00"
+modified: "2021-10-26T13:12:07.131+02:00"
 title: The  Project
-tags: microsihift project, edge, µShift
+tags: microshift project, edge, µShift
 layout: page
 toc: true
 ---
@@ -21,7 +21,7 @@ We believe these properties should also make Microshift a great tool for other u
 Watch this [end-to-end MicroShift provisioning demo video](https://youtu.be/QOiB8NExtA4) to get a first impression of MicroShift deployed onto a [RHEL for edge computing](https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux/edge-computing) device and managed through [Open Cluster Management](https://github.com/open-cluster-management).
 
 > warning ""
-> Microshift is still early days and moving fast. Features are missing. Things break. But you can still help shape it, too.\*\*
+> Microshift is still early days and moving fast. Features are missing. Things break. But you can still help shape it, too.
 
 <sup>1) more precisely [OKD](https://www.okd.io/), the Kubernetes distribution by the OpenShift community</sup>
 
@@ -127,7 +127,7 @@ When starting the Microshift for the first time the Kubeconfig file is created. 
 
 ### Contributing
 
-For more information on working with Microshift, you can find a contributor's guide in [CONTRIBUTING.md](./CONTRIBUTING.md)
+For more information on working with Microshift, you can find a contributor's guide in [CONTRIBUTING.md](https://github.com/redhat-et/microshift/blob/main/CONTRIBUTING.md)
 
 ### Community
 
