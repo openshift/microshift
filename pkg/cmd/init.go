@@ -139,9 +139,6 @@ func initServerConfig(cfg *config.MicroshiftConfig) error {
 	if err := config.OpenShiftControllerManagerConfig(cfg); err != nil {
 		return err
 	}
-	if err := config.KubeSchedulerConfig(cfg); err != nil {
-		return err
-	}
 	return nil
 }
 
