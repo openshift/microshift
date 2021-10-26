@@ -94,12 +94,24 @@ func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
 	if err := opts.Validate(args); err != nil {
 		logrus.Errorf("failed to validate options: %v", err)
 	}
+
 	s.options = opts
 }
 
 func (s *OpenShiftOAuth) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 	stopCh := make(chan struct{})
+
+	// run readiness check
+	go func() {
+		healthcheckStatus := util.RetryTCPConnection("127.0.0.1", "8443")
+		if !healthcheckStatus {
+			logrus.Fatalf("%s failed to start", s.Name())
+		}
+		logrus.Infof("%s is ready", s.Name())
+		close(ready)
+	}()
+
 	if err := oauth_apiserver.RunOAuthAPIServer(s.options, stopCh); err != nil {
 		return err
 	}
