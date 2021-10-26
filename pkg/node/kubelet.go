@@ -17,7 +17,10 @@ package node
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -60,11 +63,10 @@ func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserve
 
 func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 
-	//create KubeletConfiguration file at cfg.DataDir + "/resources/kubelet/config/config.yaml
-	if err := config.KubeletConfig(cfg); err != nil {
-		logrus.Infof("Failed to create a new kubelet configuration: %v", err)
-		return err
+	if err := s.writeConfig(cfg); err != nil {
+		logrus.Fatalf("Failed to write kubelet config: %v", err)
 	}
+
 	// Prepare commandline args
 	args := []string{
 		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
@@ -112,6 +114,57 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 
 	logrus.Infof("Starting kubelet %s, args: %v", cfg.NodeIP, args)
 	return nil
+}
+
+func (s *KubeletServer) writeConfig(cfg *config.MicroshiftConfig) error {
+	data := []byte(`
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+authentication:
+  x509:
+    clientCAFile: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
+  anonymous:
+    enabled: false
+tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.crt
+tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.key
+cgroupDriver: "systemd"
+cgroupRoot: /
+failSwapOn: false
+volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec
+clusterDNS:
+  - ` + cfg.Cluster.DNS + `
+clusterDomain: ` + cfg.Cluster.Domain + `
+containerLogMaxSize: 50Mi
+maxPods: 250
+kubeAPIQPS: 50
+kubeAPIBurst: 100
+cgroupsPerQOS: false
+enforceNodeAllocatable: []
+rotateCertificates: false  #TODO
+serializeImagePulls: false
+# staticPodPath: /etc/kubernetes/manifests
+systemCgroups: /system.slice
+featureGates:
+  APIPriorityAndFairness: true
+  LegacyNodeRoleBehavior: false
+  # Will be removed in future openshift/api update https://github.com/openshift/api/commit/c8c8f6d0f4a8ac4ff4ad7d1a84b27e1aa7ebf9b4
+  RemoveSelfLink: false
+  NodeDisruptionExclusion: true
+  RotateKubeletServerCertificate: false #TODO
+  SCTPSupport: true
+  ServiceNodeExclusion: true
+  SupportPodPidsLimit: true
+serverTLSBootstrap: false #TODO`)
+
+	// Load real resolv.conf in case systemd-resolved is used
+	// https://github.com/coredns/coredns/blob/master/plugin/loop/README.md#troubleshooting-loops-in-kubernetes-clusters
+	if _, err := os.Stat("/run/systemd/resolve/resolv.conf"); !errors.Is(err, os.ErrNotExist) {
+		data = append(data, "\nresolvConf: /run/systemd/resolve/resolv.conf"...)
+	}
+
+	path := filepath.Join(cfg.DataDir, "resources", "kubelet", "config", "config.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }
 
 func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {

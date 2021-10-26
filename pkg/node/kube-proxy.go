@@ -17,6 +17,8 @@ package node
 
 import (
 	"context"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -48,9 +50,8 @@ func (s *ProxyOptions) Name() string           { return componentKubeProxy }
 func (s *ProxyOptions) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
-	if err := config.KubeProxyConfig(cfg); err != nil {
-		logrus.Infof("Failed to create a new kube-proxy configuration: %v", err)
-		return err
+	if err := s.writeConfig(cfg); err != nil {
+		logrus.Fatalf("Failed to write kube-proxy config: %v", err)
 	}
 	args := []string{
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
@@ -79,6 +80,27 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
 	}
 	logrus.Infof("starting %s, args: %v", s.Name(), args)
 	return nil
+}
+
+func (s *ProxyOptions) writeConfig(cfg *config.MicroshiftConfig) error {
+	data := []byte(`
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+clientConnection:
+  kubeconfig: ` + cfg.DataDir + `/resources/kube-proxy/kubeconfig
+hostnameOverride: ` + cfg.NodeName + `
+clusterCIDR: ` + cfg.Cluster.ClusterCIDR + `
+mode: "iptables"
+iptables:
+  masqueradeAll: true
+conntrack:
+  maxPerCore: 0
+featureGates:
+   AllAlpha: false`)
+
+	path := filepath.Join(cfg.DataDir, "resources", "kube-proxy", "config", "config.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }
 
 func (s *ProxyOptions) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
