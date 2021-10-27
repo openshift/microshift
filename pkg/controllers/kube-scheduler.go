@@ -17,6 +17,8 @@ package controllers
 
 import (
 	"context"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -48,8 +50,8 @@ func (s *KubeScheduler) Name() string           { return "kube-scheduler" }
 func (s *KubeScheduler) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
-	if err := config.KubeSchedulerConfig(cfg); err != nil {
-		return
+	if err := s.writeConfig(cfg); err != nil {
+		logrus.Fatalf("failed to write kube-scheduler config: %v", err)
 	}
 
 	opts, err := schedulerOptions.NewOptions()
@@ -88,6 +90,19 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 	s.options = opts
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
 
+}
+
+func (s *KubeScheduler) writeConfig(cfg *config.MicroshiftConfig) error {
+	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta1
+kind: KubeSchedulerConfiguration
+clientConnection:
+  kubeconfig: ` + cfg.DataDir + `/resources/kube-scheduler/kubeconfig
+leaderElection:
+  leaderElect: false`)
+
+	path := filepath.Join(cfg.DataDir, "resources", "kube-scheduler", "config", "config.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }
 
 func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
