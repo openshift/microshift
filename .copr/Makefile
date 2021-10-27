@@ -13,5 +13,5 @@
 outdir ?= /tmp
 
 srpm:
-	cd .. && make srpm
-	cp ../packaging/rpm/_rpmbuild/SRPMS/*.src.rpm $(outdir)
+	make srpm # from the project top level makefile
+	cp packaging/rpm/_rpmbuild/SRPMS/*.src.rpm $(outdir)
