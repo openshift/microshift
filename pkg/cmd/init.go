@@ -19,6 +19,7 @@ import (
 	"net"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/util"
 
 	ctrl "k8s.io/kubernetes/pkg/controlplane"
@@ -134,14 +135,7 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 }
 
 func initServerConfig(cfg *config.MicroshiftConfig) error {
-	if err := config.OpenShiftAPIServerConfig(cfg); err != nil {
-		return err
-	}
-
-	if err := config.OpenShiftControllerManagerConfig(cfg); err != nil {
-		return err
-	}
-	return nil
+	return controllers.OpenShiftAPIServerConfig(cfg)
 }
 
 func initKubeconfig(cfg *config.MicroshiftConfig) error {
