@@ -166,7 +166,7 @@ replace (
 	github.com/gregjones/httpcache => github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7
 	github.com/grpc-ecosystem/go-grpc-middleware => github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
 	github.com/grpc-ecosystem/go-grpc-prometheus => github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway => github.com/grpc-ecosystem/grpc-gateway v1.9.5
+	github.com/grpc-ecosystem/grpc-gateway => github.com/grpc-ecosystem/grpc-gateway v1.11.3
 	github.com/hashicorp/consul/api => github.com/hashicorp/consul/api v1.1.0
 	github.com/hashicorp/consul/sdk => github.com/hashicorp/consul/sdk v0.1.1
 	github.com/hashicorp/errwrap => github.com/hashicorp/errwrap v1.0.0
