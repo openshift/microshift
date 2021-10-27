@@ -18,9 +18,10 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -32,10 +33,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
-	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/util"
 )
 
 func newOpenshiftApiServerCommand(stopCh <-chan struct{}) *cobra.Command {
@@ -151,88 +150,100 @@ func waitForOCPAPIServer(client kubernetes.Interface, timeout time.Duration) err
 	return nil
 }
 
-func newOpenShiftControllerManagerCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "openshift-controller-manager",
-		Short: "Command for the OpenShift Controllers",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
-			os.Exit(1)
-		},
-	}
-	start := openshift_controller_manager.NewOpenShiftControllerManagerCommand("start", os.Stdout, os.Stderr)
-	cmd.AddCommand(start)
-	return cmd
-}
+func OpenShiftAPIServerConfig(cfg *config.MicroshiftConfig) error {
+	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
+kind: OpenShiftAPIServerConfig
+aggregatorConfig:
+  allowedNames:
+  - kube-apiserver
+  - system:kube-apiserver
+  - kube-apiserver-proxy
+  - system:kube-apiserver-proxy
+  - system:openshift-aggregator
+  - system:admin
+  extraHeaderPrefixes:
+  - X-Remote-Extra-
+  groupHeaders:
+  - X-Remote-Group
+  usernameHeaders:
+  - X-Remote-User
+kubeClientConfig:
+  kubeConfig:  ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+apiServerArguments:
+  minimal-shutdown-duration:
+  - 30s
+  anonymous-auth:
+  - "false"
+  authorization-kubeconfig:
+  - ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+  authentication-kubeconfig:
+  - ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+  audit-log-format:
+  - json
+  audit-log-maxbackup:
+  - "10"
+  audit-log-maxsize:
+  - "100"
+  authorization-mode:
+  - Scope
+  - SystemMasters
+  - RBAC
+  - Node
+auditConfig:
+  auditFilePath: "` + cfg.LogDir + `/openshift-apiserver/audit.log"
+  enabled: true
+  logFormat: json
+  maximumFileSizeMegabytes: 100
+  maximumRetainedFiles: 10
+  policyFile: "` + cfg.DataDir + `/resources/openshift-apiserver/config/policy.yaml"
+  policyConfiguration:
+    apiVersion: audit.k8s.io/v1
+    kind: Policy
+    omitStages:
+    - RequestReceived
+    rules:
+    - level: None
+      resources:
+      - group: ''
+        resources:
+        - events
+    - level: None
+      resources:
+      - group: oauth.openshift.io
+        resources:
+        - oauthaccesstokens
+        - oauthauthorizetokens
+    - level: None
+      nonResourceURLs:
+      - "/api*"
+      - "/version"
+      - "/healthz"
+      userGroups:
+      - system:authenticated
+      - system:unauthenticated
+    - level: Metadata
+      omitStages:
+      - RequestReceived
+imagePolicyConfig:
+  internalRegistryHostname: image-registry.openshift-image-registry.svc:5000
+projectConfig:
+  projectRequestMessage: ''
+routingConfig:
+  subdomain: ` + cfg.Cluster.Domain + `
+servingInfo:
+  bindAddress: "0.0.0.0:8444"
+  certFile: ` + cfg.DataDir + `/resources/ocp-apiserver/secrets/tls.crt
+  keyFile: ` + cfg.DataDir + `/resources/ocp-apiserver/secrets/tls.key
+  ca: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
+storageConfig:
+  urls:
+  - https://127.0.0.1:2379
+  certFile: ` + cfg.DataDir + `/resources/kube-apiserver/secrets/etcd-client/tls.crt
+  keyFile: ` + cfg.DataDir + `/resources/kube-apiserver/secrets/etcd-client/tls.key
+  ca: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
+  `)
 
-type OCPControllerManager struct {
-	ConfigFilePath string
-	Output         io.Writer
-}
-
-const (
-	// OCPControllerManager component name
-	componentOCM = "ocp-controller-manager"
-)
-
-func NewOpenShiftControllerManager(cfg *config.MicroshiftConfig) *OCPControllerManager {
-	s := &OCPControllerManager{}
-	s.configure(cfg)
-	return s
-}
-
-func (s *OCPControllerManager) Name() string           { return componentOCM }
-func (s *OCPControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
-
-func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) error {
-	var configFilePath = cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml"
-
-	if err := config.OpenShiftControllerManagerConfig(cfg); err != nil {
-		logrus.Infof("Failed to create a new ocp-controller-manager configuration: %v", err)
-		return err
-	}
-	args := []string{
-		"--config=" + configFilePath,
-	}
-
-	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
-	options.ConfigFilePath = configFilePath
-
-	cmd := &cobra.Command{
-		Use:          componentOCM,
-		Long:         componentOCM,
-		SilenceUsage: true,
-		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
-	}
-
-	flags := cmd.Flags()
-	cmd.SetArgs(args)
-	flags.StringVar(&options.ConfigFilePath, "config", options.ConfigFilePath, "Location of the master configuration file to run from.")
-	cmd.MarkFlagFilename("config", "yaml", "yml")
-	cmd.MarkFlagRequired("config")
-
-	s.ConfigFilePath = options.ConfigFilePath
-	s.Output = options.Output
-
-	return nil
-}
-
-func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(stopped)
-
-	// run readiness check
-	go func() {
-		healthcheckStatus := util.RetryTCPConnection("127.0.0.1", "8445")
-		if !healthcheckStatus {
-			logrus.Fatalf("%s failed to start", s.Name())
-		}
-		logrus.Infof("%s is ready", s.Name())
-		close(ready)
-	}()
-	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
-	options.ConfigFilePath = s.ConfigFilePath
-	if err := options.StartControllerManager(); err != nil {
-		logrus.Fatalf("Failed to start ocp-controller-manager %v", err)
-	}
-	return ctx.Err()
+	path := filepath.Join(cfg.DataDir, "resources", "openshift-apiserver", "config", "config.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }
