@@ -1,6 +1,5 @@
 #!/bin/bash
 #set -xe 
-WAIT_FOR_CONTAINER="1"
 SUDO=''
 if (( $EUID != 0 )); then
     SUDO='sudo'
@@ -43,14 +42,14 @@ function remove_all_overlay_mount_points(){
 }
 
 function remove_opened_ports(){
-   sudo firewall-cmd --zone=public --permanent --remove-port=6443/tcp
-   sudo firewall-cmd --zone=public --permanent --remove-port=30000-32767/tcp
-   sudo firewall-cmd --zone=public --permanent --remove-port=2379-2380/tcp
-   sudo firewall-cmd --zone=public --remove-masquerade --permanent
-   sudo firewall-cmd --zone=public --remove-port=10250/tcp --permanent
-   sudo firewall-cmd --zone=public --remove-port=10251/tcp --permanent
-   sudo firewall-cmd --permanent --zone=trusted --remove-source=10.42.0.0/16
-   sudo firewall-cmd --reload
+   V ${SUDO} firewall-cmd --zone=public --permanent --remove-port=6443/tcp
+   V ${SUDO} firewall-cmd --zone=public --permanent --remove-port=30000-32767/tcp
+   V ${SUDO} firewall-cmd --zone=public --permanent --remove-port=2379-2380/tcp
+   V ${SUDO} firewall-cmd --zone=public --remove-masquerade --permanent
+   V ${SUDO} firewall-cmd --zone=public --remove-port=10250/tcp --permanent
+   V ${SUDO} firewall-cmd --zone=public --remove-port=10251/tcp --permanent
+   V ${SUDO} firewall-cmd --permanent --zone=trusted --remove-source=10.42.0.0/16
+   V ${SUDO} firewall-cmd --reload
 }
 
 function remove_all_overlay_kubelet_points(){
