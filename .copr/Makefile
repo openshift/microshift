@@ -13,5 +13,6 @@
 outdir ?= /tmp
 
 srpm:
+	dnf -y install golang-bin git
 	make srpm # from the project top level makefile
 	cp packaging/rpm/_rpmbuild/SRPMS/*.src.rpm $(outdir)
