@@ -30,6 +30,7 @@ CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 ARCH :=$(shell uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
+IPTABLES :=nft
 
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
@@ -162,13 +163,14 @@ _build_containerized:
 _build_containerized_aio:
 	@if [ -z '$(CTR_CMD)' ] ; then echo '!! ERROR: containerized builds require podman||docker CLI, none found $$PATH' >&2 && exit 1; fi
 	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
-	$(CTR_CMD) build -t $(IMAGE_REPO_AIO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
+	$(CTR_CMD) build -t $(IMAGE_REPO_AIO):$(SOURCE_GIT_TAG)-linux-$(IPTABLES)-$(ARCH) \
 		-f "$(SRC_ROOT)"/packaging/images/microshift-aio/Dockerfile \
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
 		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
 		--build-arg ARCH=$(ARCH) \
 		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
 		--build-arg FROM_SOURCE=$(FROM_SOURCE) \
+		--build-arg IPTABLES=$(IPTABLES) \
 		--platform="linux/$(ARCH)" \
 		.
 .PHONY: _build_containerized_aio
@@ -193,6 +195,11 @@ build-containerized-all-in-one-amd64:
 build-containerized-all-in-one-arm64:
 	+$(MAKE) _build_containerized_aio ARCH=arm64
 .PHONY: build-containerized-all-in-one
+
+build-containerized-all-in-one-iptables-arm64:
+	+$(MAKE) _build_containerized_aio ARCH=arm64 IPTABLES=iptables
+.PHONY: build-containerized-all-in-one-iptables-arm64
+
 ###############################
 # dev targets                 #
 ###############################
