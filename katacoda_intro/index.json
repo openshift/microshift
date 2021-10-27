@@ -1,0 +1,29 @@
+{
+  "title": "MicroShift Introduction",
+  "description": "Simple walktrough to installing MicroShift",
+  "details": {
+    "steps": [
+      {
+        "title": "Step 1",
+        "text": "step1.md"
+      }
+    ],
+    "assets": {},
+    "intro": {
+      "text": "intro.md",
+      "credits": "__Author:__ The MicroShift team at Red Hat",
+      "courseData": "background.sh",
+      "code": "foreground.sh"
+    },
+    "finish": {
+      "text": "finish.md"
+    }
+  },
+  "environment": {
+    "uilayout": "terminal",
+    "terminals": [{ "name": "host", "target": "host01" }]
+  },
+  "backend": {
+    "imageid": "ubuntu:2004"
+  }
+}

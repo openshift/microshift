@@ -1,0 +1,9 @@
+---
+- name: change hostname
+  hosts: control_node
+  become: true
+  tasks:
+
+  - name: change hostname for device
+    hostname:
+      name: "control"
