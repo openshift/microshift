@@ -18,6 +18,8 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -60,10 +62,11 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	// certDir := filepath.Join(cfg.DataDir, "certs", s.Name())
 	// dataDir := filepath.Join(cfg.DataDir, s.Name())
 
-	// configure audit policy and oauth
-	// TODO: consolidate this
-	if err := config.KubeAPIServerConfig(cfg); err != nil {
-		return
+	if err := s.configureAuditPolicy(cfg); err != nil {
+		logrus.Fatalf("Failed to configure kube-apiserver audit policy: %v", err)
+	}
+	if err := s.configureOAuth(cfg); err != nil {
+		logrus.Fatalf("Failed to configure kube-apiserver OAuth: %v", err)
 	}
 
 	// configure the kube-apiserver instance
@@ -135,6 +138,79 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	}
 
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+}
+
+func (s *KubeAPIServer) configureAuditPolicy(cfg *config.MicroshiftConfig) error {
+	data := []byte(`
+apiVersion: audit.k8s.io/v1
+kind: Policy
+metadata:
+  name: Default
+# Don't generate audit events for all requests in RequestReceived stage.
+omitStages:
+- "RequestReceived"
+rules:
+# Don't log requests for events
+- level: None
+  resources:
+  - group: ""
+    resources: ["events"]
+# Don't log oauth tokens as metadata.name is the secret
+- level: None
+  resources:
+  - group: "oauth.openshift.io"
+    resources: ["oauthaccesstokens", "oauthauthorizetokens"]
+# Don't log authenticated requests to certain non-resource URL paths.
+- level: None
+  userGroups: ["system:authenticated", "system:unauthenticated"]
+  nonResourceURLs:
+  - "/api*" # Wildcard matching.
+  - "/version"
+  - "/healthz"
+  - "/readyz"
+# A catch-all rule to log all other requests at the Metadata level.
+- level: Metadata
+  # Long-running requests like watches that fall under this rule will not
+  # generate an audit event in RequestReceived.
+  omitStages:
+  - "RequestReceived"`)
+
+	path := filepath.Join(cfg.DataDir, "resources", "kube-apiserver-audit-policies", "default.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
+}
+
+func (s *KubeAPIServer) configureOAuth(cfg *config.MicroshiftConfig) error {
+	data := []byte(`
+  {
+    "issuer": "https://oauth-openshift.cluster.local",
+    "authorization_endpoint": "https://oauth-openshift.cluster.local/oauth/authorize",
+    "token_endpoint": "https://oauth-openshift.cluster.local/oauth/token",
+    "scopes_supported": [
+      "user:check-access",
+      "user:full",
+      "user:info",
+      "user:list-projects",
+      "user:list-scoped-projects"
+    ],
+    "response_types_supported": [
+      "code",
+      "token"
+    ],
+    "grant_types_supported": [
+      "authorization_code",
+      "implicit"
+    ],
+    "code_challenge_methods_supported": [
+      "plain",
+      "S256"
+    ]
+  }
+`)
+
+	path := filepath.Join(cfg.DataDir, "resources", "kube-apiserver", "oauthMetadata")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }
 
 func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
