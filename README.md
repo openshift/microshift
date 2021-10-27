@@ -72,6 +72,16 @@ Notes: When installing MicroShift on a system with an older version already inst
 ```sh
 rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
+## Deployment Strategies
+
+In production environment MicroShift can be deployed as:
+
+1. Install via an RPM, utilizing a host-provided cri-o runtime and be lifecycle-managed by systemd
+2. [Install as a container via Podman, utilizing cri-o runtime and be lifecycle-managed by systemd](./docs/microshift-containerized/README.md)
+
+For app developer deployments:
+
+1. [Run an all-in-one microshift deployment on which devs can test their applications locally](.docs/microshift-aio/README.md).  `microshift-aio` packages cri-o runtime and can be run and managed via podman and systemd
 
 ## [Known Issues](./docs/known-issues.md)
 
