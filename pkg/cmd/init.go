@@ -33,9 +33,6 @@ func initAll(cfg *config.MicroshiftConfig) error {
 	if err := initServerConfig(cfg); err != nil {
 		return err
 	}
-	if err := initNodeConfig(cfg); err != nil {
-		return err
-	}
 	// create kubeconfig for kube-scheduler, kubelet, openshift-apiserver,controller-manager
 	if err := initKubeconfig(cfg); err != nil {
 		return err
@@ -142,19 +139,6 @@ func initServerConfig(cfg *config.MicroshiftConfig) error {
 	}
 
 	if err := config.OpenShiftControllerManagerConfig(cfg); err != nil {
-		return err
-	}
-	return nil
-}
-
-func initNodeConfig(cfg *config.MicroshiftConfig) error {
-	if err := config.KubeletConfig(cfg); err != nil {
-		return err
-	}
-	if err := config.OpenShiftSDNConfig(cfg); err != nil {
-		return err
-	}
-	if err := config.KubeProxyConfig(cfg); err != nil {
 		return err
 	}
 	return nil
