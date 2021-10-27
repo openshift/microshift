@@ -16,4 +16,3 @@ LABEL io.k8s.display-name="CoreDNS" \
       maintainer="Carlos Eduardo <carlosedp@gmail.com>"
 
 ENTRYPOINT ["/usr/bin/coredns"]
-

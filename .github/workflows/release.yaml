@@ -20,11 +20,11 @@ jobs:
           password: ${{ secrets.REGISTRY_PASS }}
 
       - name: Install required packages
-        run: sudo apt install build-essential qemu-user qemu-user-static 
-      
+        run: sudo apt install build-essential qemu-user qemu-user-static
+
       - name: Checkout source
         uses: actions/checkout@v2
-      
+
       - name: execute release.sh
         shell: bash
         run: make release TOKEN=${GITHUB_TOKEN}

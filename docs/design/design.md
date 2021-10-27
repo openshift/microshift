@@ -1,5 +1,5 @@
 ---
-modified: "2021-10-25T10:52:50.869+02:00"
+modified: "2021-10-27T12:24:27.200+02:00"
 title: Design doc.
 tags: Design documentation, goals
 layout: page
@@ -20,15 +20,15 @@ MicroShift aims at meeting all of the following design goals:
     - e.g. disconnected or rarely connected, NAT'ed or firewalled, changing IP addresses, IPv4 or v6, high latency / low bandwidth, no control over local network (DNS, DHCP, LBN, GW), connectivity via LTE dongle (i.e. no LAN)
   - MicroShift operates autonomously; it does not require external orchestration.
   - MicroShift is safe to change<sup>1</sup>; it has means to automatically recover from faulty software or configuration updates that would render it unmanageable or non-operational.
-  - MicroShift is secure<sup>1</sup> even in environments without physical accesss security.
+  - MicroShift is secure<sup>1</sup> even in environments without physical access security.
 
   <sup>1) when used in combination with an edge-optimized OS like RHEL 4 Edge or Fedora IoT</sup>
 
 - **Production-grade:**
 
   - MicroShift supports deployments with 1 or 3 control plane and 0..N worker instances.
-  - MicroShift can be deployed containerized on Podman or Docker or non-containerized via RPM and managed via systemd; it is compatible with `rpm-ostree`-based systems.
-  - MicroShift's lifecyle is decoupled from the underlying OS's lifecycle.
+  - MicroShift can be deployed containerized on `podman` or Docker or non-containerized via RPM and managed via systemd; it is compatible with `rpm-ostree`-based systems.
+  - MicroShift's lifecycle is decoupled from the underlying OS's lifecycle.
   - MicroShift can be deployed such that updates or changes to it do not disrupt running workloads.
   - MicroShift meets DISA STIG and FedRAMP security requirements; it runs as non-privileged workload and supports common CVE and auditing workflows.
   - MicroShift allows segregation between the "edge device administrator" and the "edge service development and operations" personas.
@@ -78,7 +78,7 @@ When deciding between different design options, we follow the following principl
   - Smaller resource footprint has _not_ been a motivation, it may be a welcome side-effect.
 - MicroShift provides a small, optional set of infrastructure services to support common use cases and reuses OpenShift's container images for these:
   - openshift-dns, openshift-router, service-ca, local storage provider
-- MicroShift instances (processes) run directly on the host or containerized on Podman. They can take on the roles of Control Plane, Node, or both:
+- MicroShift instances (processes) run directly on the host or containerized on `podman`. They can take on the roles of Control Plane, Node, or both:
   - Instances with Control Plane role run etcd and the Kubernetes and OpenShift control plane services. As these services don't require a kubelet, pure Control Plane instances are not nodes in the Kubernetes sense and require fewer system privileges.
   - Instances with Node role run a kubelet (and thus register as node) and kube-proxy and interface with CRI-O for running workloads. They may thus require higher system privileges.
 - While it's possible to run a single MicroShift instance with both Control Plane and Node roles, there may be reasons to run two instances - one Control Plane and one Node - on the same host, e.g. to run the Control Plane with fewer privileges for security reasons. Implementation decisions should consider this.

@@ -17,14 +17,14 @@ index 31d42f71..70651ed6 100644
 @@ -71,6 +71,10 @@ func (fs FS) CPUInfo() ([]CPUInfo, error) {
  	return parseCPUInfo(data)
  }
- 
+
 +func parseCPUInfoRiscv64(info []byte) ([]CPUInfo, error) {
 +    return nil, nil
 +}
 +
  func parseCPUInfoX86(info []byte) ([]CPUInfo, error) {
  	scanner := bufio.NewScanner(bytes.NewReader(info))
- 
+
 diff --git a/vendor/github.com/prometheus/procfs/cpuinfo_riscv64.go b/vendor/github.com/prometheus/procfs/cpuinfo_riscv64.go
 new file mode 100644
 index 00000000..cb75cc7d
@@ -49,6 +49,5 @@ index 00000000..cb75cc7d
 +package procfs
 +
 +var parseCPUInfo = parseCPUInfoRiscv64
--- 
+--
 2.31.1
-

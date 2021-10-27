@@ -333,7 +333,7 @@ spec:
           readOnly: true
       dnsPolicy: Default
       nodeSelector:
-        kubernetes.io/os: linux      
+        kubernetes.io/os: linux
       volumes:
       - name: config-volume
         configMap:

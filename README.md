@@ -1,3 +1,7 @@
+---
+modified: "2021-10-29T08:27:16.055+02:00"
+---
+
 # MicroShift
 
 MicroShift is a research project that is exploring how OpenShift<sup>1</sup> Kubernetes can be optimized for small form factor and edge computing.
@@ -27,8 +31,7 @@ In order to run MicroShift, you will need at least:
 - ~124MB of free storage space for the MicroShift binary
 - 64-bit CPU (although 32-bit is _technically_ possible, if you're up for the challenge)
 
-For barebones development the minimum requirement is 3GB of RAM, though this can increase
-if you are using resource-intensive devtools.
+For barebone development the minimum requirement is 3GB of RAM, though this can increase if you are using resource-intensive development tools.
 
 ### OS Requirements
 
@@ -46,7 +49,7 @@ It may be possible to run MicroShift on other systems, however they haven't been
 
 ## Using MicroShift
 
-To give MicroShift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
+To give MicroShift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distribution (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
 
 ```sh
 curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh | bash
@@ -54,7 +57,7 @@ curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh
 
 This will install MicroShift's dependencies (CRI-O), install it as a systemd service and start it.
 
-For convenience, the script will also add a new "microshift" context to your `$HOME/.kube/config`, so you'll be able to access your cluster using, e.g.:
+For convenience, the script will also add a new `microshift` context to your `$HOME/.kube/config`, so you'll be able to access your cluster using, e.g.:
 
 ```sh
 kubectl get all -A --context microshift
@@ -72,16 +75,17 @@ Notes: When installing MicroShift on a system with an older version already inst
 ```sh
 rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
+
 ## Deployment Strategies
 
 In production environment MicroShift can be deployed as:
 
-1. Install via an RPM, utilizing a host-provided cri-o runtime and be lifecycle-managed by systemd
-2. [Install as a container via Podman, utilizing cri-o runtime and be lifecycle-managed by systemd](./docs/microshift-containerized/README.md)
+1. Install via an RPM, utilizing a host-provided `cri-o` runtime and be lifecycle-managed by systemd
+2. [Install as a container via Podman, utilizing `cri-o` runtime and be lifecycle-managed by systemd](./docs/microshift-containerized/README.md)
 
 For app developer deployments:
 
-1. [Run an all-in-one microshift deployment on which devs can test their applications locally](.docs/microshift-aio/README.md).  `microshift-aio` packages cri-o runtime and can be run and managed via podman and systemd
+1. [Run an all-in-one MicroShift deployment on which developers can test their applications locally](.docs/microshift-aio/README.md). `microshift-aio` packages `cri-o` runtime and can be run and managed via podman and systemd
 
 ## [Known Issues](./docs/known-issues.md)
 
@@ -91,7 +95,7 @@ For app developer deployments:
 
 ### Building
 
-You can locally build MicroShift using one of two methods, either using a container build (recommended) on Podman or Docker:
+You can locally build MicroShift using one of two methods, either using a container build (recommended) on `podman` or Docker:
 
 ```sh
 sudo yum -y install make golang
@@ -120,18 +124,18 @@ Before running MicroShift, the host must first be configured. This can be handle
 CONFIG_ENV_ONLY=true ./install.sh
 ```
 
-MicroShift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running MicroShift as privileged user and `$HOME/.microshift` otherwise. Note that running MicroShift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
+MicroShift keeps all its state in its data directory, which defaults to `/var/lib/microshift` when running MicroShift as privileged user and `$HOME/.microshift` otherwise. Note that running MicroShift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
 
-### Kubeconfig
+### `Kubeconfig`
 
-When starting the MicroShift for the first time the Kubeconfig file is created. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
+When starting the MicroShift for the first time the `kubeconfig` file is created. If you need it for another user or to use externally the `kubeadmin`'s `kubeconfig` is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
 
 ### Contributing
 
-For more information on working with MicroShift, you can find a contributor's guide in [CONTRIBUTING.md](./CONTRIBUTING.md)
+For more information on working with MicroShift, you can find a contributor's guide in [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 
 ### Community
 
-Join us on [Slack](https://microshift.slack.com)! ([Invite to the Slack space](https://join.slack.com/t/microshift/shared_invite/zt-uxncbjbl-XOjueb1ShNP7xfByDxNaaA))
+Join us on [Slack](https://MicroShift.slack.com)! ([Invite to the Slack space](https://join.slack.com/t/MicroShift/shared_invite/zt-uxncbjbl-XOjueb1ShNP7xfByDxNaaA))
 
 Community meetings are held weekly, Wednesdays at 10:30AM - 11:00AM EST. Be sure to join the community [calendar](https://calendar.google.com/calendar/embed?src=nj6l882mfe4d2g9nr1h7avgrcs%40group.calendar.google.com&ctz=America%2FChicago)! Click "Google Calendar" in the lower right-hand corner to subscribe.

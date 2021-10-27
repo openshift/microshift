@@ -1,3 +1,7 @@
+---
+modified: "2021-10-27T12:18:27.143+02:00"
+---
+
 # Contributing to MicroShift
 
 If you would like to develop MicroShift locally, you can follow this guide on getting
@@ -5,23 +9,19 @@ it installed and running through the provided Makefile.
 
 This guide will primarily focus on running MicroShift within a VM using Vagrant.
 
-
 ## (optional) Developing with Vagrant
 
 To get started with development, it is recommended to use Vagrant for VM provisioning,
 however it is not necessary.
 
-You can find a guide on how to install it for your system [here](https://www.vagrantup.com/downloads). 
+You can find a guide on how to install it for your system [here](https://www.vagrantup.com/downloads).
 
 Once Vagrant is installed, you will need to create a Vagrant box for the operating
 system of your choice. For this example we will be looking at a [fedora 34 cloud
 image](https://app.vagrantup.com/fedora/boxes/34-cloud-base), however you can substitute any vagrant image of your choice.
 
-
 First, navigate to the MicroShift directory on your host system, or another designated
-directory where we will be storing the Vagrantfile.
-
-
+directory where we will be storing the `Vagrantfile`.
 
 Next, download the vagrant image. For this example we will use
 a fedora 34 cloud image:
@@ -43,8 +43,9 @@ Running this command will create a `Vagrantfile` in your working directory which
 is used to configure your vagrant box.
 
 Before we start our Vagrant box, we will need to increase the amount of RAM available
-to the system. 
-To do this, edit the Vagrantfile and configure your provider settings to include
+to the system.
+
+To do this, edit the `Vagrantfile` and configure your provider settings to include
 the following:
 
 ```rb
@@ -57,9 +58,8 @@ the following:
 ```
 
 The value of `config.vm.provider` depends on the provider you selected when you
-ran `vagrant add` earlier. For example, if you selected virtualbox then the first
+ran `vagrant add` earlier. For example, if you selected `virtualbox` then the first
 line should be: `config.vm.provider "virtualbox" do |v|`
-
 
 Now we can start the VM:
 
@@ -73,15 +73,15 @@ Once the VM is up, connect to it:
 vagrant ssh
 ```
 
-### (Extra Optional) Connecting VSCode to Vagrant 
+### (Extra Optional) Connecting VSCode to Vagrant
 
 If you're using VSCode, you can connect to your vagrant box with a few extra steps.
 
 #### Increasing Memory Requirements
 
-Since VS Code leans more on the heavy side of development, the RAM usage on your Vagrant environment 
+Since VSCode leans more on the heavy side of development, the RAM usage on your Vagrant environment
 can go up to 5GB, and therefore we will need to modify the `Vagrantfile` to
-increase the amount of available RAM from 3GB to 5GB (or 6GB if you want to be safe). 
+increase the amount of available RAM from 3GB to 5GB (or 6GB if you want to be safe).
 To do this, set `v.memory` to the following in your `Vagrantfile`:
 
 ```rb
@@ -99,10 +99,11 @@ First we need to ask Vagrant for an SSH config file. From your host machine, run
 vagrant ssh-config > ssh-config.conf
 ```
 
-*You can edit the `ssh-config.conf` file to change the hostname from `default` to
-`vagrant` to be more easily identifiable, but that's up to you. :)*
+_You can edit the `ssh-config.conf` file to change the hostname from `default` to
+`vagrant` to be more easily identifiable, but that's up to you. :)_
 
 Here's an example of my working SSH config file:
+
 ```
 Host default
   HostName 127.0.0.1
@@ -116,10 +117,7 @@ Host default
   LogLevel FATAL
 ```
 
-
 Next, you'll want to install the `Remote - SSH` extension from the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)
-
-
 
 With the extension installed, you'll click on the green bottom in the bottom-left
 corner of VSCode to open a dropdown menu for SSH options:
@@ -133,28 +131,27 @@ Next you'll want to navigate to the "Remote Explorer" tab on the left-hand side
 of VSCode, then select on the vagrant target (default if you haven't renamed it)
 and click on the button to connect to it in a remote window.
 
-
-*(Credits to Andrés Lopez for this guide: [Connect Visual Studio Code with Vagrant in your local machine
-](https://medium.com/@lopezgand/connect-visual-studio-code-with-vagrant-in-your-local-machine-24903fb4a9de))*
-
+_(Credits to Andrés Lopez for this guide: [Connect Visual Studio Code with Vagrant in your local machine
+](https://medium.com/@lopezgand/connect-visual-studio-code-with-vagrant-in-your-local-machine-24903fb4a9de))_
 
 ## Running MicroShift Locally
 
 ### Pre-Installation
 
 You will need to install the required binaries:
-- git
-- make
-- golang
-- glibc
-- podman
+
+- `git`
+- `make`
+- `golang`
+- `glibc`
+- `podman`
 
 ```sh
-# Fedora/CentOS 
+# Fedora/CentOS
 sudo dnf install \
     git \
     make \
-    golang \    
+    golang \
     glibc-static
 
 # Ubuntu
@@ -168,8 +165,8 @@ sudo apt install \
 To install podman, you can find the appropriate guide for your respective system:
 [Install Podman](https://podman.io/getting-started/installation)
 
+Next you'll want to clone the repository and `cd` into it:
 
-Next you'll want to clone the repository and cd into it: 
 ```sh
 git clone https://github.com/redhat-et/microshift.git
 cd microshift
@@ -182,7 +179,5 @@ Now we can build MicroShift:
 ```sh
 make build
 CONFIG_ENV_ONLY=true ./install.sh
-sudo ./microshift run 
+sudo ./microshift run
 ```
-
-

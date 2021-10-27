@@ -4,9 +4,9 @@ kind: TestAssert
 timeout: 300
 ---
 apiVersion: apps/v1
-kind: Deployment 
+kind: Deployment
 metadata:
-  name: service-ca 
+  name: service-ca
   namespace: openshift-service-ca
 status:
   availableReplicas: 1

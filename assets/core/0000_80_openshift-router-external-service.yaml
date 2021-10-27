@@ -10,7 +10,7 @@ metadata:
 spec:
   selector:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  type: NodePort 
+  type: NodePort
   ports:
     - name: http
       port: 80

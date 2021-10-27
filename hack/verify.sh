@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 set -x
 set -o errexit
 set -o nounset
@@ -14,12 +13,11 @@ REPO_ROOT=$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)
     GOPKG=go/pkg
     GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
 
-
     go get -u golang.org/x/lint/golint
 
     test -z $(gofmt -s -l -e $GO_FILES)
     go vet -v $(go list ./... | grep -v /vendor/)
 
-    cd ${GOPKG}; go test
+    cd ${GOPKG}
+    go test
 )
-

@@ -426,7 +426,7 @@ var _assetsCore0000_80_openshiftRouterCmYaml = []byte(`apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: openshift-ingress
-  name: service-ca-bundle 
+  name: service-ca-bundle
   annotations:
     service.beta.openshift.io/inject-cabundle: "true"
 `)

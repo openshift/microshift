@@ -23,7 +23,7 @@ jobs:
         run: sudo apt install build-essential
 
       - name: Checkout
-        uses: actions/checkout@v2    
+        uses: actions/checkout@v2
 
       - name: make
         run: make build
@@ -33,7 +33,7 @@ jobs:
         with:
           name: microshift
           path: ./microshift
-  
+
   deploy-microshift:
     name: Deploy-Microshift
     needs: Build-Microshift
@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      
+
       - name: download archive
         uses: actions/download-artifact@v2.0.10
         with:
@@ -51,7 +51,7 @@ jobs:
           path: /tmp/
 
       - name: sleep then run kubectl
-        run: chmod +x /tmp/microshift    
+        run: chmod +x /tmp/microshift
 
       - name: install script
         run: CONFIG_ENV_ONLY=true ./install.sh
@@ -64,4 +64,4 @@ jobs:
            sudo -i sh -c 'until [ -f /var/lib/microshift/resources/kubeadmin/kubeconfig ]; do sudo sleep 5; done'
            sudo cp /var/lib/microshift/resources/kubeadmin/kubeconfig /tmp/kubeconfig
            sudo chown `whoami`: /tmp/kubeconfig
-           make test-e2e 
+           make test-e2e

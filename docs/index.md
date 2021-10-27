@@ -1,7 +1,7 @@
 ---
-modified: "2021-10-26T13:12:07.131+02:00"
+modified: "2021-10-27T12:49:28.175+02:00"
 title: The  Project
-tags: microshift project, edge, µShift
+tags: MicroShift project, edge, µShift, MicroShift
 layout: page
 toc: true
 ---
@@ -21,8 +21,7 @@ We believe these properties should also make MicroShift a great tool for other u
 Watch this [end-to-end MicroShift provisioning demo video](https://youtu.be/QOiB8NExtA4) to get a first impression of MicroShift deployed onto a [RHEL for edge computing](https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux/edge-computing) device and managed through [Open Cluster Management](https://github.com/open-cluster-management).
 
 > warning ""
-> MicroShift is still early days and moving fast. Features are missing. Things break. But you can still help shape it, too.\*\*
-
+> MicroShift is still early days and moving fast. Features are missing. Things break. But you can still help shape it, too.
 
 <sup>1) more precisely [OKD](https://www.okd.io/), the Kubernetes distribution by the OpenShift community</sup>
 
@@ -35,8 +34,8 @@ In order to run MicroShift, you will need at least:
 - ~124MB of free storage space for the MicroShift binary
 - 64-bit CPU (although 32-bit is _technically_ possible, if you're up for the challenge)
 
-For barebones development the minimum requirement is 3GB of RAM, though this can increase
-if you are using resource-intensive devtools.
+For barebone development the minimum requirement is 3GB of RAM, though this can increase
+if you are using resource-intensive development tools.
 
 ### OS Requirements
 
@@ -54,7 +53,7 @@ It may be possible to run MicroShift on other systems, however they haven't been
 
 ## Using MicroShift
 
-To give MicroShift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
+To give MicroShift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distribution (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
 
 ```sh
 curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh | bash
@@ -62,7 +61,7 @@ curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh
 
 This will install MicroShift's dependencies (CRI-O), install it as a systemd service and start it.
 
-For convenience, the script will also add a new "microshift" context to your `$HOME/.kube/config`, so you'll be able to access your cluster using, e.g.:
+For convenience, the script will also add a new `microshift` context to your `$HOME/.kube/config`, so you'll be able to access your cluster using, e.g.:
 
 ```sh
 kubectl get all -A --context microshift
@@ -91,7 +90,7 @@ rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 
 ### Building
 
-You can locally build MicroShift using one of two methods, either using a container build (recommended) on Podman or Docker:
+You can locally build MicroShift using one of two methods, either using a container build (recommended) on `podman` or Docker:
 
 ```sh
 sudo yum -y install make golang
@@ -120,15 +119,15 @@ Before running MicroShift, the host must first be configured. This can be handle
 CONFIG_ENV_ONLY=true ./install.sh
 ```
 
-MicroShift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running MicroShift as privileged user and `$HOME/.microshift` otherwise. Note that running MicroShift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
+MicroShift keeps all its state in its data directory, which defaults to `/var/lib/microshift` when running MicroShift as privileged user and `$HOME/.microshift` otherwise. Note that running MicroShift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
 
-### Kubeconfig
+### `Kubeconfig`
 
-When starting the MicroShift for the first time the Kubeconfig file is created. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
+When starting the MicroShift for the first time the `kubeconfig` file is created. If you need it for another user or to use externally the `kubeadmin`'s `kubeconfig` is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
 
 ### Contributing
 
-For more information on working with MicroShift, you can find a contributor's guide in [CONTRIBUTING.md](./CONTRIBUTING.md)
+For more information on working with MicroShift, you can find a contributor's guide in [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 
 ### Community
 

@@ -27,9 +27,8 @@ STAGING_DIR="$REPOROOT/_output/staging"
 EMBEDDED_COMPONENTS="etcd hyperkube openshift-apiserver openshift-controller-manager"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator"
 
-
 title() {
-    echo -e "\E[34m\n$1\E[00m";
+    echo -e "\E[34m\n$1\E[00m"
 }
 
 # Reads go.mod file $1 and prints lines in its section $2 ("require" or "replace")
@@ -72,8 +71,7 @@ update_versions() {
     update_file=$2
 
     re="^(.+) ([a-z0-9.-]+)$"
-    while IFS="" read -r line || [ -n "$line" ]
-    do
+    while IFS="" read -r line || [ -n "$line" ]; do
         if [[ "${line}" =~ ^//.* ]]; then
             continue
         fi
@@ -88,8 +86,8 @@ update_versions() {
             version=$(printf '%s\n%s\n' "${base_version}" "${update_version}" | sort --version-sort | tail -n 1)
         fi
 
-        echo "${mod} ${version}" 
-    done < "${base_file}"
+        echo "${mod} ${version}"
+    done <"${base_file}"
 }
 
 # Returns the list of release image names from a release_${arch}.go file
@@ -99,25 +97,22 @@ get_release_images() {
     awk "BEGIN {output=0} /^}/ {output=0} {if (output == 1) print substr(\$1, 2, length(\$1)-3)} /^var Image/ {output=1}" "${file}"
 }
 
-
 # == MAIN ==
 if [[ $EUID -ne 0 ]]; then
-   >&2 echo "You need to run this script as root or in a 'buildah unshare' environment:" 
-   >&2 echo "  buildah unshare $0" 
-   exit 1
+    echo >&2 "You need to run this script as root or in a 'buildah unshare' environment:"
+    echo >&2 "  buildah unshare $0"
+    exit 1
 fi
 if [[ -z ${1+x} ]]; then
-    >&2 echo "You need to provide an OKD release name, e.g.:"
-    >&2 echo "  $0 4.7.0-0.okd-2021-08-22-163618"
+    echo >&2 "You need to provide an OKD release name, e.g.:"
+    echo >&2 "  $0 4.7.0-0.okd-2021-08-22-163618"
     exit 1
 fi
 OKD_RELEASE=$1
 
-
 rm -rf "${STAGING_DIR}"
 mkdir -p "${STAGING_DIR}"
 pushd "${STAGING_DIR}" >/dev/null
-
 
 title "Downloading and extracting ${OKD_RELEASE} release image..."
 curl -LO "https://github.com/openshift/okd/releases/download/${OKD_RELEASE}/release.txt"
@@ -127,15 +122,13 @@ podman pull "${OKD_RELEASE_IMAGE}"
 cnt=$(buildah from "${OKD_RELEASE_IMAGE}")
 mnt=$(buildah mount "${cnt}" | cut -d ' ' -f 2)
 jq -r '.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' \
-    "${mnt}/release-manifests/image-references" > source_commits.txt
+    "${mnt}/release-manifests/image-references" >source_commits.txt
 mkdir -p "${STAGING_DIR}/release-manifests"
 cp -- "${mnt}"/release-manifests/*.yaml "${STAGING_DIR}/release-manifests"
 
-
 title "Cloning git repos..."
 git config --global advice.detachedHead false
-while IFS="" read -r line || [ -n "$line" ]
-do
+while IFS="" read -r line || [ -n "$line" ]; do
     COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
     REPO=$(echo "${line}" | cut -d ' ' -f 2)
     COMMIT=$(echo "${line}" | cut -d ' ' -f 3)
@@ -146,25 +139,25 @@ do
         echo
         popd >/dev/null
     fi
-done < source_commits.txt
-
+done <source_commits.txt
 
 title "Rebasing go.mod..."
-extract_section "${REPOROOT}/go.mod" require > latest_require
-extract_section "${REPOROOT}/go.mod" replace > latest_replace
-while IFS="" read -r line || [ -n "$line" ]
-do
+extract_section "${REPOROOT}/go.mod" require >latest_require
+extract_section "${REPOROOT}/go.mod" replace >latest_replace
+while IFS="" read -r line || [ -n "$line" ]; do
     COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
     REPO=$(echo "${line}" | cut -d ' ' -f 2)
     if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
-        extract_section "${REPO##*/}/go.mod" require > require
-        extract_section "${REPO##*/}/go.mod" replace > replace
-        update_versions latest_require require > t; mv t latest_require
-        update_versions latest_replace replace > t; mv t latest_replace
+        extract_section "${REPO##*/}/go.mod" require >require
+        extract_section "${REPO##*/}/go.mod" replace >replace
+        update_versions latest_require require >t
+        mv t latest_require
+        update_versions latest_replace replace >t
+        mv t latest_replace
     fi
-done < source_commits.txt
+done <source_commits.txt
 
-cat << EOF > "${REPOROOT}/go.mod"
+cat <<EOF >"${REPOROOT}/go.mod"
 module github.com/openshift/microshift
 
 go 1.16
@@ -187,7 +180,6 @@ make gen_openapi
 cp ./pkg/generated/openapi/zz_generated.openapi.go "${REPOROOT}/vendor/k8s.io/kubernetes/pkg/generated/openapi"
 popd >/dev/null
 
-
 title "Rebasing release_*.go"
 images="$(get_release_images "${REPOROOT}/pkg/release/release.go" | xargs)"
 
@@ -197,14 +189,13 @@ for arch in amd64; do
         digest=$(awk "/ ${i//_/-} / {print \$2}" release.txt)
         if [[ ! -z "${digest}" ]]; then
             awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
-                "${REPOROOT}/pkg/release/release_${arch}.go" > t
+                "${REPOROOT}/pkg/release/release_${arch}.go" >t
             mv t "${REPOROOT}/pkg/release/release_${arch}.go"
         fi
     done
 done
 
 sed -i "/^var Base/c\var Base = \"${OKD_RELEASE}\"" "${REPOROOT}/pkg/release/release.go"
-
 
 title "Rebasing manifests"
 assets=$(find "${REPOROOT}/assets" -name \*.yaml)
@@ -262,10 +253,9 @@ for asset in ${assets}; do
         echo "Updating ${asset} from ${updated_asset}"
         cp "${updated_asset}" "${asset}"
     else
-        echo -e "\E[31mNo update source found for ${asset}\E[00m";
+        echo -e "\E[31mNo update source found for ${asset}\E[00m"
     fi
 done
-
 
 title "Done."
 popd >/dev/null

@@ -1,8 +1,12 @@
-# Containerized MicroShift With GPU Support and Kubectl 
+---
+modified: "2021-10-27T12:26:51.322+02:00"
+---
+
+# Containerized MicroShift With GPU Support and `kubectl`
 
 ## Run MicroShift All-In-One as a Systemd Service
 
-Copy microshift-aio unit file to /etc/systemd and the aio run script to /usr/bin
+Copy `microshift-aio.service` unit file to `/etc/systemd` and the AIO run script to `/usr/bin`
 
 ```bash
 # from microshift repository root directory
@@ -10,32 +14,32 @@ cp packaging/systemd/microshift-aio.service /etc/systemd/system/microshift-aio.s
 cp packaging/systemd/microshift-aio /usr/bin/
 ```
 
-Now enable and start the service. The KUBECONFIG location will be written to /etc/microshift-aio/microshift-aio.conf.    
-If the `microshift-data` podman volume does not exist, the systemd service will create one.
+Now enable and start the service. The `KUBECONFIG` location will be written to `/etc/microshift-aio/microshift-aio.conf`.
+If the `microshift-data` `podman` volume does not exist, the `systemd` service will create one.
 
 ```bash
 systemctl enable microshift-aio --now
 source /etc/microshift-aio/microshift-aio.conf
 ```
 
-Verify that microshift is running.
+Verify that MicroShift is running:
 
-```
+```sh
 kubectl get pods -A
 ```
 
-Stop microshift-aio service
+Stop `microshift-aio` service
 
 ```bash
 systemctl stop microshift-aio
 ```
 
-**NOTE** Stopping microshift-aio service _does not_ remove the podman volume `microshift-data`.
+**NOTE** Stopping `microshift-aio` service _does not_ remove the podman volume `microshift-data`.
 A restart will use the same volume.
 
 ## Run the Image Without Systemd
 
-First, enable the following selinux rule:
+First, enable the following SELinux rule:
 
 ```bash
 setsebool -P container_manage_cgroup true
@@ -50,7 +54,7 @@ sudo podman volume create microshift-data
 The following example binds localhost the container volume to `/var/lib`
 
 ```bash
-sudo podman run -d --rm --name microshift-aio --privileged -v /lib/modules:/lib/modules -v microshift-data:/var/lib  -p 6443:6443 microshift-aio  
+sudo podman run -d --rm --name microshift-aio --privileged -v /lib/modules:/lib/modules -v microshift-data:/var/lib  -p 6443:6443 microshift-aio
 ```
 
 You can access the cluster either on the host or inside the container
@@ -71,6 +75,7 @@ kubectl get pods -A
 ```
 
 ### Access the Cluster From the Host
+
 #### Linux
 
 ```bash
@@ -108,5 +113,5 @@ TAG="quay.io/myname/myrepo:dev" ./hack/build-aio-dev.sh
 
 ## Limitation
 
-These instructions are tested on Linux, Mac, and Windows. 
+These instructions are tested on Linux, Mac, and Windows.
 On MacOS, running containerized MicroShift as non-root is not supported on MacOS.

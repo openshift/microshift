@@ -43,7 +43,7 @@ alias podman=${__ctr_mgr_alias:?"a container manager (podman || docker) is requi
 #########
 
 help() {
-  printf 'Microshift: release.sh
+    printf 'Microshift: release.sh
 This script provides some simple automation for cutting new releases of Microshift.
 
 Use:
@@ -69,161 +69,161 @@ quay.io owner or org.
 }
 
 generate_api_release_request() {
-  local is_prerelease="${1:=true}" # (copejon) assume for now that all releases are prerelease, unless otherwise specified
-  printf '{"tag_name": "%s","name": "%s","prerelease": %s}' "$VERSION" "$VERSION" "$is_prerelease"
+    local is_prerelease="${1:=true}" # (copejon) assume for now that all releases are prerelease, unless otherwise specified
+    printf '{"tag_name": "%s","name": "%s","prerelease": %s}' "$VERSION" "$VERSION" "$is_prerelease"
 }
 
 git_create_release() {
-  local data="$1"
-  local response
-  response="$(
-    curl -X POST \
-      -H "Accept: application/vnd.github.v3+json" \
-      -H "Authorization: token $TOKEN" \
-      "https://api.github.com/repos/$GIT_OWNER/microshift/releases" \
-      -d "${data[@]}"
-  )"
-  local raw_upload_url
-  raw_upload_url="$(echo "$response" | grep "upload_url")"
-  local upload_url
-  upload_url=$(echo "$raw_upload_url" | sed -n 's,.*\(https://uploads.github.com/repos/'$GIT_OWNER'/microshift/releases/[0-9a-zA-Z]*/assets\).*,\1,p')
-  # curl will return 0 even on 4xx http errors, so verify that the actually got an up_load url
-  [ -z "$upload_url" ] && return 1
-  echo "$upload_url"
+    local data="$1"
+    local response
+    response="$(
+        curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token $TOKEN" \
+            "https://api.github.com/repos/$GIT_OWNER/microshift/releases" \
+            -d "${data[@]}"
+    )"
+    local raw_upload_url
+    raw_upload_url="$(echo "$response" | grep "upload_url")"
+    local upload_url
+    upload_url=$(echo "$raw_upload_url" | sed -n 's,.*\(https://uploads.github.com/repos/'$GIT_OWNER'/microshift/releases/[0-9a-zA-Z]*/assets\).*,\1,p')
+    # curl will return 0 even on 4xx http errors, so verify that the actually got an up_load url
+    [ -z "$upload_url" ] && return 1
+    echo "$upload_url"
 }
 
 git_post() {
-  local bin_file="$1"
-  local upload_url="$2"
-  local mime_type
-  mime_type="$(file -b --mime-type "$bin_file")"
-  curl --fail-early \
-    -X POST \
-    -H "Accept: application/vnd.github.v3" \
-    -H "Authorization: token $TOKEN" \
-    -H "Content-Type: $mime_type" \
-    --data-binary @"$bin_file" \
-    "$upload_url"?name="$(basename $bin_file)"
+    local bin_file="$1"
+    local upload_url="$2"
+    local mime_type
+    mime_type="$(file -b --mime-type "$bin_file")"
+    curl --fail-early \
+        -X POST \
+        -H "Accept: application/vnd.github.v3" \
+        -H "Authorization: token $TOKEN" \
+        -H "Content-Type: $mime_type" \
+        --data-binary @"$bin_file" \
+        "$upload_url"?name="$(basename $bin_file)"
 }
 
 git_post_artifacts() {
-  local asset_dir="$1"
-  local upload_url="$2"
-  local files
-  files="$(ls "$asset_dir")"
-  for f in $files; do
-    git_post "$asset_dir/$f" "$upload_url"
-  done
+    local asset_dir="$1"
+    local upload_url="$2"
+    local files
+    files="$(ls "$asset_dir")"
+    for f in $files; do
+        git_post "$asset_dir/$f" "$upload_url"
+    done
 }
 
 prep_stage_area() {
-  local asset_dir
-  asset_dir=$(mktemp -d -p "$STAGING_DIR/")
-  echo "$asset_dir"
+    local asset_dir
+    asset_dir=$(mktemp -d -p "$STAGING_DIR/")
+    echo "$asset_dir"
 }
 
 extract_release_image_binary() {
-  local tag="$1"
-  local dest="$2"
-  local out_bin="$dest"/microshift-"${tag#*"$VERSION-"}"
-  podman cp "$(podman create "$tag")":/usr/bin/microshift "$out_bin" >&2
-  echo "$out_bin"
+    local tag="$1"
+    local dest="$2"
+    local out_bin="$dest"/microshift-"${tag#*"$VERSION-"}"
+    podman cp "$(podman create "$tag")":/usr/bin/microshift "$out_bin" >&2
+    echo "$out_bin"
 }
 
 stage_release_image_binaries() {
-  local dest
-  dest="$(prep_stage_area)"
-  for t in "${RELEASE_IMAGE_TAGS[@]}"; do
-    local out_bin
-    out_bin=$(extract_release_image_binary "$t" "$dest") || return 1
-    (
-      cd "$dest"
-      sha256sum "$(basename "$out_bin")" >>"$dest"/release.sha256
-    ) || return 1
-  done
-  echo "$dest"
+    local dest
+    dest="$(prep_stage_area)"
+    for t in "${RELEASE_IMAGE_TAGS[@]}"; do
+        local out_bin
+        out_bin=$(extract_release_image_binary "$t" "$dest") || return 1
+        (
+            cd "$dest"
+            sha256sum "$(basename "$out_bin")" >>"$dest"/release.sha256
+        ) || return 1
+    done
+    echo "$dest"
 }
 
 build_container_images_artifacts() {
-  (
-    cd "$ROOT"
-    make build-containerized-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO="$IMAGE_REPO"
-  ) || return 1
+    (
+        cd "$ROOT"
+        make build-containerized-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO="$IMAGE_REPO"
+    ) || return 1
 }
 
 push_container_image_artifacts() {
-  for t in "${RELEASE_IMAGE_TAGS[@]}"; do
-    podman push "$t"
-  done
+    for t in "${RELEASE_IMAGE_TAGS[@]}"; do
+        podman push "$t"
+    done
 }
 
-podman_create_manifest(){
-  podman manifest create "$IMAGE_REPO:$VERSION" >&2
-  for ref in "${RELEASE_IMAGE_TAGS[@]}"; do
-    podman manifest add "$IMAGE_REPO:$VERSION" "docker://$ref"
-  done
+podman_create_manifest() {
+    podman manifest create "$IMAGE_REPO:$VERSION" >&2
+    for ref in "${RELEASE_IMAGE_TAGS[@]}"; do
+        podman manifest add "$IMAGE_REPO:$VERSION" "docker://$ref"
+    done
     podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$VERSION"
     podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
 }
 
-docker_create_manifest(){
-  local amend_images_options
-  for image in "${RELEASE_IMAGE_TAGS[@]}"; do
-    amend_images_options+="--amend $image"
-  done
-  # use docker cli directly for clarity, as this is a docker-only func
-  docker manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
-  docker tag "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
-  docker manifest push "$IMAGE_REPO:$VERSION"
-  docker manifest push "$IMAGE_REPO:latest"
+docker_create_manifest() {
+    local amend_images_options
+    for image in "${RELEASE_IMAGE_TAGS[@]}"; do
+        amend_images_options+="--amend $image"
+    done
+    # use docker cli directly for clarity, as this is a docker-only func
+    docker manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
+    docker tag "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
+    docker manifest push "$IMAGE_REPO:$VERSION"
+    docker manifest push "$IMAGE_REPO:latest"
 }
 
 push_container_manifest() {
-  local cli="$(alias podman)"
-  if [[ "${cli#*=}" =~ docker ]]; then
-    docker_create_manifest
-  else
-    podman_create_manifest
-  fi
+    local cli="$(alias podman)"
+    if [[ "${cli#*=}" =~ docker ]]; then
+        docker_create_manifest
+    else
+        podman_create_manifest
+    fi
 
 }
 debug() {
-  local version="$1"
-  local api_request="$2"
-  printf "Git Target: %s\n" "$TARGET"
-  printf "Image Artifact: %s\n" "$IMAGE_REPO:$VERSION"
-  printf "generate_version: %s\n" "$version"
-  printf "compose_release_request: %s\n" "$api_request"
+    local version="$1"
+    local api_request="$2"
+    printf "Git Target: %s\n" "$TARGET"
+    printf "Image Artifact: %s\n" "$IMAGE_REPO:$VERSION"
+    printf "generate_version: %s\n" "$version"
+    printf "compose_release_request: %s\n" "$api_request"
 }
 
 ########
 # MAIN #
 ########
 while [ $# -gt 0 ]; do
-  case "$1" in
+    case "$1" in
     "--token")
-      TOKEN="${2:-}"
-      [[ "$TOKEN" =~ ^-.* ]] || [[ -z "$TOKEN" ]] && {
-        printf "flag $1 git release API calls require robot token"
-        exit 1
-      }
-      shift 2
-      ;;
+        TOKEN="${2:-}"
+        [[ "$TOKEN" =~ ^-.* ]] || [[ -z "$TOKEN" ]] && {
+            printf "flag $1 git release API calls require robot token"
+            exit 1
+        }
+        shift 2
+        ;;
     "--version")
-      VERSION="${2:-}"
-      [[ "$VERSION" =~ ^-.* ]] || [[ -z "$VERSION" ]] && {
-        printf "flag $1 expects a version input value"
-        exit 1
-      }
-      shift 2
-      ;;
+        VERSION="${2:-}"
+        [[ "$VERSION" =~ ^-.* ]] || [[ -z "$VERSION" ]] && {
+            printf "flag $1 expects a version input value"
+            exit 1
+        }
+        shift 2
+        ;;
     "-h" | "--help")
-      help && exit
-      ;;
+        help && exit
+        ;;
     *)
-      echo "unknown input: $1" && help && exit 1
-      ;;
-  esac
+        echo "unknown input: $1" && help && exit 1
+        ;;
+    esac
 done
 
 printf "Using container manager: %s\n" "$(podman --version)"
@@ -237,14 +237,14 @@ QUAY_OWNER=${QUAY_OWNER:="microshift"}
 API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
-RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
+RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64")
 
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
 
-build_container_images_artifacts                                      || exit 1
-STAGE_DIR=$(stage_release_image_binaries)                             || exit 1
-push_container_image_artifacts                                        || exit 1
-push_container_manifest                                               || exit 1
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || exit 1
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || exit 1
+build_container_images_artifacts || exit 1
+STAGE_DIR=$(stage_release_image_binaries) || exit 1
+push_container_image_artifacts || exit 1
+push_container_manifest || exit 1
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")" || exit 1
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN" || exit 1

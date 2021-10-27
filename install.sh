@@ -11,24 +11,22 @@ set -e -o pipefail
 CONFIG_ENV_ONLY=${CONFIG_ENV_ONLY:=false}
 
 # Only get the version number if installing a release version
-[ $CONFIG_ENV_ONLY = false ] && \
-  VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4)
+[ $CONFIG_ENV_ONLY = false ] &&
+    VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4)
 
 # Function to get Linux distribution
 get_distro() {
-    DISTRO=$(egrep '^(ID)=' /etc/os-release| sed 's/"//g' | cut -f2 -d"=")
-    if [[ $DISTRO != @(rhel|fedora|centos|ubuntu) ]]
-    then
-      echo "This Linux distro is not supported by the install script"
-      exit 1
+    DISTRO=$(egrep '^(ID)=' /etc/os-release | sed 's/"//g' | cut -f2 -d"=")
+    if [[ $DISTRO != @(rhel|fedora|centos|ubuntu) ]]; then
+        echo "This Linux distro is not supported by the install script"
+        exit 1
     fi
 }
 
 # Function to get system architecture
 get_arch() {
     ARCH=$(uname -m | sed "s/x86_64/amd64/" | sed "s/aarch64/arm64/")
-    if [[ $ARCH != @(amd64|arm64) ]]
-    then
+    if [[ $ARCH != @(amd64|arm64) ]]; then
         printf "arch %s unsupported" "$ARCH" >&2
         exit 1
     fi
@@ -45,17 +43,15 @@ register_subs() {
     REPO="rhocp-4.7-for-rhel-8-x86_64-rpms"
     # Check subscription status and register if not
     STATUS=$(sudo subscription-manager status | awk '/Overall Status/ { print $3 }')
-    if [[ $STATUS != "Current" ]]
-    then
-        sudo subscription-manager register --auto-attach < /dev/tty
+    if [[ $STATUS != "Current" ]]; then
+        sudo subscription-manager register --auto-attach </dev/tty
         POOL=$(sudo subscription-manager list --available --matches '*OpenShift' | grep Pool | head -n1 | awk -F: '{print $2}' | tr -d ' ')
         sudo subscription-manager attach --pool $POOL
         sudo subscription-manager config --rhsm.manage_repos=1
     fi
     set -e -o pipefail
     # Check if already subscribed to the proper repository
-    if ! sudo subscription-manager repos --list-enabled | grep -q ${REPO}
-    then
+    if ! sudo subscription-manager repos --list-enabled | grep -q ${REPO}; then
         sudo subscription-manager repos --enable=${REPO}
     fi
 }
@@ -86,7 +82,7 @@ install_dependencies() {
 }
 
 # Establish Iptables rules
-establish_firewall () {
+establish_firewall() {
     sudo systemctl enable firewalld --now
     sudo firewall-cmd --zone=public --permanent --add-port=6443/tcp
     sudo firewall-cmd --zone=public --permanent --add-port=30000-32767/tcp
@@ -100,30 +96,29 @@ establish_firewall () {
     sudo firewall-cmd --reload
 }
 
-
 # Install CRI-O depending on the distro
 install_crio() {
     case $DISTRO in
-      "fedora")
+    "fedora")
         sudo dnf module -y enable cri-o:1.20
         sudo dnf install -y cri-o cri-tools
-      ;;
-      "rhel")
+        ;;
+    "rhel")
         sudo dnf install cri-o cri-tools -y
-      ;;
-      "centos")
+        ;;
+    "centos")
         CRIOVERSION=1.20
         OS=CentOS_8_Stream
         sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/devel:kubic:libcontainers:stable.repo
         sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION/$OS/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.repo
         sudo dnf install -y cri-o cri-tools
-      ;;
-      "ubuntu")
+        ;;
+    "ubuntu")
         CRIOVERSION=1.20
         OS=xUbuntu_$OS_VERSION
         KEYRINGS_DIR=/usr/share/keyrings
-        echo "deb [signed-by=$KEYRINGS_DIR/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list > /dev/null
-        echo "deb [signed-by=$KEYRINGS_DIR/libcontainers-crio-archive-keyring.gpg] http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIOVERSION/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.list > /dev/null
+        echo "deb [signed-by=$KEYRINGS_DIR/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list >/dev/null
+        echo "deb [signed-by=$KEYRINGS_DIR/libcontainers-crio-archive-keyring.gpg] http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIOVERSION/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.list >/dev/null
 
         sudo mkdir -p $KEYRINGS_DIR
         curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | sudo gpg --dearmor -o $KEYRINGS_DIR/libcontainers-archive-keyring.gpg
@@ -132,10 +127,9 @@ install_crio() {
         sudo apt-get update -y
         # Vagrant Ubuntu VMs don't provide containernetworking-plugins by default
         sudo apt-get install -y cri-o cri-o-runc cri-tools containernetworking-plugins
-      ;;
+        ;;
     esac
 }
-
 
 # CRI-O config to match MicroShift networking values
 crio_conf() {
@@ -159,10 +153,10 @@ crio_conf() {
     }
 }
 EOF'
-    
-     if [ "$DISTRO" == "rhel" ]; then
-        sudo sed -i 's|/usr/libexec/crio/conmon|/usr/bin/conmon|' /etc/crio/crio.conf 
-     fi
+
+    if [ "$DISTRO" == "rhel" ]; then
+        sudo sed -i 's|/usr/libexec/crio/conmon|/usr/bin/conmon|' /etc/crio/crio.conf
+    fi
 }
 
 # Start CRI-O
@@ -186,14 +180,14 @@ get_microshift() {
     BIN_SHA="$(sha256sum microshift-linux-$ARCH | awk '{print $1}')"
     KNOWN_SHA="$(grep "microshift-linux-$ARCH" release.sha256 | awk '{print $1}')"
 
-    if [[ "$BIN_SHA" != "$KNOWN_SHA" ]]; then 
+    if [[ "$BIN_SHA" != "$KNOWN_SHA" ]]; then
         echo "SHA256 checksum failed" && exit 1
     fi
 
     sudo chmod +x microshift-linux-$ARCH
     sudo mv microshift-linux-$ARCH /usr/local/bin/microshift
 
-    cat << EOF | sudo tee /usr/lib/systemd/system/microshift.service
+    cat <<EOF | sudo tee /usr/lib/systemd/system/microshift.service
 [Unit]
 Description=MicroShift
 After=crio.service
@@ -231,14 +225,13 @@ prepare_kubeconfig() {
     if [ -f $HOME/.kube/config ]; then
         mv $HOME/.kube/config $HOME/.kube/config.orig
     fi
-    sudo KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig:$HOME/.kube/config.orig  /usr/local/bin/kubectl config view --flatten > $HOME/.kube/config
+    sudo KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig:$HOME/.kube/config.orig /usr/local/bin/kubectl config view --flatten >$HOME/.kube/config
 }
 
-# validation checks for deployment 
-validation_check(){
+# validation checks for deployment
+validation_check() {
     echo $HOSTNAME | grep -P '(?=^.{1,254}$)(^(?>(?!\d+\.)[a-zA-Z0-9_\-]{1,63}\.?)+(?:[a-zA-Z]{2,})$)' && echo "Correct"
-    if [ $? != 0 ];
-    then
+    if [ $? != 0 ]; then
         echo "======================================================================"
         echo "!!! WARNING !!!"
         echo "The hostname $HOSTNAME does not follow FQDN, which might cause problems while operating the cluster."
@@ -270,11 +263,10 @@ crio_conf
 verify_crio
 get_kubectl
 
-[ "$CONFIG_ENV_ONLY" = true ] && { echo "Env config complete" && exit 0 ; }
+[ "$CONFIG_ENV_ONLY" = true ] && { echo "Env config complete" && exit 0; }
 get_microshift
 
-until sudo test -f /var/lib/microshift/resources/kubeadmin/kubeconfig
-do
-     sleep 2
+until sudo test -f /var/lib/microshift/resources/kubeadmin/kubeconfig; do
+    sleep 2
 done
 prepare_kubeconfig

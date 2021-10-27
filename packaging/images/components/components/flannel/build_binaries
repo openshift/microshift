@@ -4,4 +4,3 @@ mkdir -p bin
 
 cd src
 GOOS=linux GOARCH=$1 make dist/flanneld && mv dist/flanneld ../bin/flanneld-$1
-
