@@ -13,11 +13,13 @@ allow container_t container_runtime_tmpfs_t:file read;
 allow container_t container_var_lib_t:file open;
 allow container_t container_var_lib_t:file read;
 allow container_t container_var_lib_t:lnk_file read;
+allow container_t var_lib_t:file { open read };
 allow iptables_t cgroup_t:dir ioctl;
 
 require {
-	type cgroup_t, iptables_t;
-	class dir ioctl;
+    type cgroup_t, iptables_t, init_var_run_t, container_t, var_lib_t, systemd_hostnamed_t;
+    class dir { ioctl write };
+    class file { open read };
 }
 
 gen_require(`
