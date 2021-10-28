@@ -9,6 +9,10 @@ BUILD=${BUILD:-all}
 # generated from other info
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 RPM_REL=$(git describe --tags | sed s/"${RELEASE_PRE}-"//g | sed s/-/_/g )
+
+# add the git commit timestamp for nightlies, so updates will always work on devices old pkg < new pkg
+RPM_REL=$(echo "${RPM_REL}" | sed s/nightly_/nightly_$(git show -s --format=%ct)_/g)
+
 GIT_SHA=$(git rev-parse HEAD)
 # using this instead of rev-parse --short because github's is 1 char shorter than --short
 GIT_SHORTHASH="${GIT_SHA:0:7}"
