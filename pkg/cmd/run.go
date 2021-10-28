@@ -73,7 +73,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
 		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
 		// util.Must(m.AddService(controllers.NewOpenShiftPrepJob()))
-		// util.Must(m.AddService(controllers.NewOpenShiftAPIServer()))
+		util.Must(m.AddService(controllers.NewOpenShiftAPIServer(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftControllerManager(cfg)))
 		// util.Must(m.AddService(controllers.NewOpenShiftAPIComponents()))
 		util.Must(m.AddService(controllers.NewOpenShiftOAuth(cfg)))
@@ -142,12 +142,7 @@ func startControllerOnly(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	logrus.Infof("starting openshift-apiserver")
-	controllers.OCPAPIServer(cfg)
-
 	//TODO: cloud provider
-	// controllers.OCPControllerManager(cfg)
-
 	if err := controllers.StartOCPAPIComponents(cfg); err != nil {
 		return err
 	}
