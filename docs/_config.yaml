@@ -7,6 +7,7 @@ description: MicroShift is a research project that is exploring how OpenShift Ku
 type: website
 keep_files: ["CNAME"]
 repository: redhat-et/microshift
+exclude: ["vendor"]
 
 # Build settings
 markdown: kramdown
