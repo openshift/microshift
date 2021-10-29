@@ -126,6 +126,27 @@ MicroShift keeps all its state in its data-dir, which defaults to `/var/lib/micr
 
 When starting the MicroShift for the first time the Kubeconfig file is created. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
 
+### Pulling Container Image From Private Registries
+
+Microshift may not have the pull secret for the registry that you are trying to use. For example, Microshift does not have the pull secret for registry.redhat.io. In order to use this registry, there are several approaches. The first approach is to use podman login,
+```sh
+podman login registry.redhat.io
+```
+
+Once the podman login is complete, Microshift will be able to pull images from this registry. This approach works across name spaces.
+
+The second approach is to create a pull secret, then let the service account to use this pull secret. This approach works within a name space. For example, if the pull secret is stored in a json formatted file "secret.json",
+```sh
+# First create the secret in a name space
+kubectl create secret generic my_pull_secret \
+    --from-file=secret.json \
+    --type=kubernetes.io/dockerconfigjson
+# Then attach the secret to a service account in the name space
+kubectl secrets link default my_pull_secret --for=pull
+```
+
+In stead of attaching the secret to a service account, one can also specify the pull secret under the pod spec, Refer to [this Kubernetes document](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) for more details.
+
 ### Contributing
 
 For more information on working with MicroShift, you can find a contributor's guide in [CONTRIBUTING.md](./CONTRIBUTING.md)
