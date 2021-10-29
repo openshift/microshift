@@ -89,8 +89,8 @@ kubeClientConfig:
   kubeConfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
 servingInfo:
   bindAddress: "0.0.0.0:8445"
-  certFile: ` + cfg.DataDir + `/resources/ocp-controller-manager/secrets/tls.crt
-  keyFile:  ` + cfg.DataDir + `/resources/ocp-controller-manager/secrets/tls.key
+  certFile: ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.crt
+  keyFile:  ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.key
   clientCA: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt`)
 
 	path := filepath.Join(cfg.DataDir, "resources", "openshift-controller-manager", "config", "config.yaml")

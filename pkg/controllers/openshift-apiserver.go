@@ -232,8 +232,8 @@ routingConfig:
   subdomain: ` + cfg.Cluster.Domain + `
 servingInfo:
   bindAddress: "0.0.0.0:8444"
-  certFile: ` + cfg.DataDir + `/resources/ocp-apiserver/secrets/tls.crt
-  keyFile: ` + cfg.DataDir + `/resources/ocp-apiserver/secrets/tls.key
+  certFile: ` + cfg.DataDir + `/resources/openshift-apiserver/secrets/tls.crt
+  keyFile: ` + cfg.DataDir + `/resources/openshift-apiserver/secrets/tls.key
   ca: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
 storageConfig:
   urls:
