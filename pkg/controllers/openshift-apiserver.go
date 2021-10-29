@@ -86,6 +86,12 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.Output = options.Output
 	s.cfg = cfg
 
+	err := s.prepareOCPComponents(s.cfg)
+	if err != nil {
+		logrus.Warningf("Failed to start ocp-apiserver %v", err)
+	}
+	logrus.Infof("%s is ready", s.Name())
+
 	return nil
 
 }
@@ -93,15 +99,15 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
-	go func() {
-		err := s.prepareOCPComponents(s.cfg)
-		if err != nil {
-			logrus.Warningf("Failed to start ocp-apiserver %v", err)
-		}
-		logrus.Infof("%s is ready", s.Name())
+	// go func() {
+	// 	err := s.prepareOCPComponents(s.cfg)
+	// 	if err != nil {
+	// 		logrus.Warningf("Failed to start ocp-apiserver %v", err)
+	// 	}
+	// 	logrus.Infof("%s is ready", s.Name())
 
-		close(ready)
-	}()
+	// 	close(ready)
+	// }()
 	options := openshift_apiserver.OpenShiftAPIServer{Output: os.Stdout}
 	options.ConfigFile = s.ConfigFile
 	stopCh := make(chan struct{})
