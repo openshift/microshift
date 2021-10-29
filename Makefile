@@ -217,3 +217,26 @@ release: SOURCE_GIT_TAG=$(RELEASE_PRE)-$(TIMESTAMP)
 release:
 	./scripts/release.sh --token $(TOKEN) --version $(SOURCE_GIT_TAG)
 .PHONY: release
+
+###############################
+# docs targets                 #
+###############################
+
+JEKYLL_VERSION := 3.8
+vendor/bundle:
+	mkdir -p vendor/bundle
+
+docs-build: vendor/bundle
+	$(CTR_CMD) run --rm --volume="$(PROJECT_DIR):$(PROJECT_DIR)" -w $(PROJECT_DIR)/docs -e JEKYLL_ROOTLESS=true --volume="$(PROJECT_DIR)/docs/vendor/bundle:/usr/local/bundle" \
+        -it docker.io/jekyll/jekyll:$(JEKYLL_VERSION) jekyll build
+
+.PHONY: docs-build
+
+docs-serve: vendor/bundle
+	@echo ""
+	@echo -e  "\033[1;37m open http://[::1]:4000 when the server is ready \033[0m"
+	@echo ""
+	$(CTR_CMD) run --rm --volume="$(PROJECT_DIR):$(PROJECT_DIR)" -w $(PROJECT_DIR)/docs -e JEKYLL_ROOTLESS=true --volume="$(PROJECT_DIR)/docs/vendor/bundle:/usr/local/bundle" \
+		--publish [::1]:4000:4000  docker.io/jekyll/jekyll:$(JEKYLL_VERSION) jekyll serve
+
+.PHONY: docs-serve
