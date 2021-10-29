@@ -36,15 +36,15 @@ IPTABLES :=nft
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
 
 GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
-                   -X k8s.io/component-base/version.gitMajor=0 \
+                   -X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMinor=21 \
-                   -X k8s.io/component-base/version.gitVersion=v0.21.0 \
+                   -X k8s.io/component-base/version.gitVersion=v1.21.0 \
                    -X k8s.io/component-base/version.gitCommit=c3b9e07a \
                    -X k8s.io/component-base/version.gitTreeState=clean \
                    -X k8s.io/component-base/version.buildDate=$(BIN_TIMESTAMP) \
-                   -X k8s.io/client-go/pkg/version.gitMajor=0 \
+                   -X k8s.io/client-go/pkg/version.gitMajor=1 \
                    -X k8s.io/client-go/pkg/version.gitMinor=21 \
-                   -X k8s.io/client-go/pkg/version.gitVersion=v0.21.1 \
+                   -X k8s.io/client-go/pkg/version.gitVersion=v1.21.1 \
                    -X k8s.io/client-go/pkg/version.gitCommit=b09a9ce3 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
