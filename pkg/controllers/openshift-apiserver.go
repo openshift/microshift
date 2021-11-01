@@ -88,7 +88,8 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 	err := s.prepareOCPComponents(s.cfg)
 	if err != nil {
-		logrus.Warningf("Failed to start ocp-apiserver %v", err)
+		logrus.Errorf("Failed to prepare ocp-components %v", err)
+		return err
 	}
 	logrus.Infof("%s is ready", s.Name())
 
@@ -98,16 +99,24 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
-
-	// go func() {
-	// 	err := s.prepareOCPComponents(s.cfg)
-	// 	if err != nil {
-	// 		logrus.Warningf("Failed to start ocp-apiserver %v", err)
-	// 	}
-	// 	logrus.Infof("%s is ready", s.Name())
-
-	// 	close(ready)
-	// }()
+	go func() error {
+		// probe ocp api services
+		restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+		if err != nil {
+			return err
+		}
+		client, err := kubernetes.NewForConfig(restConfig)
+		if err != nil {
+			return err
+		}
+		err = waitForOCPAPIServer(client, 10*time.Second)
+		if err != nil {
+			logrus.Warningf("Failed to wait for ocp apiserver: %v", err)
+			return err
+		}
+		logrus.Info("ocp apiserver is ready")
+		return nil
+	}()
 	options := openshift_apiserver.OpenShiftAPIServer{Output: os.Stdout}
 	options.ConfigFile = s.ConfigFile
 	stopCh := make(chan struct{})
@@ -132,22 +141,6 @@ func (s *OCPAPIServer) prepareOCPComponents(cfg *config.MicroshiftConfig) error 
 		logrus.Warningf("failed to register api %v", err)
 		return err
 	}
-	// probe ocp api services
-	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
-	if err != nil {
-		return err
-	}
-	client, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return err
-	}
-
-	err = waitForOCPAPIServer(client, 10*time.Second)
-	if err != nil {
-		logrus.Warningf("Failed to wait for ocp apiserver: %v", err)
-		return nil
-	}
-	logrus.Info("ocp apiserver is ready")
 
 	return nil
 }
