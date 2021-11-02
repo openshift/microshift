@@ -36,7 +36,7 @@ Before runnng microshift as a systemd service, ensure to update the host `crio-b
 Copy microshift unit file to `/etc/systemd/system` and the microshift-containerized run script to `/usr/bin`
 
 ```bash
-sudo cp packaging/systemd/microshift /etc/systemd/system/microshift
+sudo cp packaging/systemd/microshift-containerized.service /etc/systemd/system/microshift.service
 sudo cp packaging/systemd/microshift-containerized /usr/bin/
 ```
 
