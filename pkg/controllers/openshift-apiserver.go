@@ -49,8 +49,10 @@ func NewOpenShiftAPIServer(cfg *config.MicroshiftConfig) *OCPAPIServer {
 	return s
 }
 
-func (s *OCPAPIServer) Name() string           { return "ocp-apiserver" }
-func (s *OCPAPIServer) Dependencies() []string { return []string{"kube-apiserver"} }
+func (s *OCPAPIServer) Name() string { return "ocp-apiserver" }
+func (s *OCPAPIServer) Dependencies() []string {
+	return []string{"kube-apiserver", "openshift-prepjob-manager", "oauth-apiserver"}
+}
 
 func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	var configFilePath = cfg.DataDir + "/resources/openshift-apiserver/config/config.yaml"
@@ -86,43 +88,44 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.Output = options.Output
 	s.cfg = cfg
 
-	err := s.prepareOCPComponents(s.cfg)
-	if err != nil {
-		logrus.Errorf("Failed to prepare ocp-components %v", err)
-		return err
-	}
-	logrus.Infof("%s is ready", s.Name())
-
 	return nil
 
 }
 
 func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
-	go func() error {
-		// probe ocp api services
-		restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.DataDir+"/resources/kubeadmin/kubeconfig")
-		if err != nil {
-			return err
+
+	go func() {
+		options := openshift_apiserver.OpenShiftAPIServer{Output: os.Stdout}
+		options.ConfigFile = s.ConfigFile
+		stopCh := make(chan struct{})
+		if err := options.RunAPIServer(stopCh); err != nil {
+			logrus.Fatalf("Failed to start ocp-apiserver %v", err)
 		}
-		client, err := kubernetes.NewForConfig(restConfig)
-		if err != nil {
-			return err
-		}
-		err = waitForOCPAPIServer(client, 10*time.Second)
-		if err != nil {
-			logrus.Warningf("Failed to wait for ocp apiserver: %v", err)
-			return err
-		}
-		logrus.Info("ocp apiserver is ready")
-		return nil
 	}()
-	options := openshift_apiserver.OpenShiftAPIServer{Output: os.Stdout}
-	options.ConfigFile = s.ConfigFile
-	stopCh := make(chan struct{})
-	if err := options.RunAPIServer(stopCh); err != nil {
-		logrus.Fatalf("Failed to start ocp-apiserver %v", err)
+
+	err := s.prepareOCPComponents(s.cfg)
+	if err != nil {
+		logrus.Errorf("Failed to prepare ocp-components %v", err)
+		return err
 	}
+	logrus.Infof("%s is ready", s.Name())
+	// probe ocp api services
+	restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+	if err != nil {
+		return err
+	}
+	client, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return err
+	}
+	err = waitForOCPAPIServer(client, 10*time.Second)
+	if err != nil {
+		logrus.Warningf("Failed to wait for ocp apiserver: %v", err)
+		return err
+	}
+	logrus.Info("ocp apiserver is ready")
+
 	return ctx.Err()
 }
 
