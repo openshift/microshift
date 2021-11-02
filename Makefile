@@ -224,7 +224,7 @@ release:
 
 JEKYLL_VERSION := 3.8
 vendor/bundle:
-	mkdir -p vendor/bundle
+	mkdir -p "$(PROJECT_DIR)/docs/vendor/bundle"
 
 docs-build: vendor/bundle
 	$(CTR_CMD) run --rm --volume="$(PROJECT_DIR):$(PROJECT_DIR)" -w $(PROJECT_DIR)/docs -e JEKYLL_ROOTLESS=true --volume="$(PROJECT_DIR)/docs/vendor/bundle:/usr/local/bundle" \
