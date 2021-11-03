@@ -18,7 +18,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -30,6 +29,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"k8s.io/apimachinery/pkg/util/wait"
+	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -38,9 +38,8 @@ import (
 )
 
 type OCPAPIServer struct {
-	ConfigFile string
-	Output     io.Writer
-	cfg        *config.MicroshiftConfig
+	options openshift_apiserver.OpenShiftAPIServer
+	cfg     *config.MicroshiftConfig
 }
 
 func NewOpenShiftAPIServer(cfg *config.MicroshiftConfig) *OCPAPIServer {
@@ -69,8 +68,13 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 	}
 
-	options := openshift_apiserver.OpenShiftAPIServer{Output: os.Stdout}
-	options.ConfigFile = configFilePath
+	options := openshift_apiserver.OpenShiftAPIServer{
+		Output:         os.Stdout,
+		Authentication: genericapiserveroptions.NewDelegatingAuthenticationOptions(),
+		Authorization:  genericapiserveroptions.NewDelegatingAuthorizationOptions().WithAlwaysAllowPaths("/healthz", "/healthz/").WithAlwaysAllowGroups("system:masters"),
+	}
+	options.Authentication.RemoteKubeConfigFile = cfg.DataDir + "/resources/kubeadmin/kubeconfig"
+	options.Authorization.RemoteKubeConfigFile = cfg.DataDir + "/resources/kubeadmin/kubeconfig"
 
 	cmd := &cobra.Command{
 		Use:          "ocp-apiserver",
@@ -84,9 +88,9 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	cmd.MarkFlagRequired("config")
 	cmd.ParseFlags(args)
 
-	s.ConfigFile = options.ConfigFile
-	s.Output = options.Output
 	s.cfg = cfg
+	s.options = options
+	s.options.ConfigFile = configFilePath
 
 	return nil
 
@@ -95,13 +99,24 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
-	go func() {
-		options := openshift_apiserver.OpenShiftAPIServer{Output: os.Stdout}
-		options.ConfigFile = s.ConfigFile
-		stopCh := make(chan struct{})
-		if err := options.RunAPIServer(stopCh); err != nil {
-			logrus.Fatalf("Failed to start ocp-apiserver %v", err)
+	go func() error {
+		// probe ocp api services
+		restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+		if err != nil {
+			return err
 		}
+		client, err := kubernetes.NewForConfig(restConfig)
+		if err != nil {
+			return err
+		}
+		err = waitForOCPAPIServer(client, 10*time.Second)
+		if err != nil {
+			logrus.Warningf("Failed to wait for ocp apiserver: %v", err)
+			return err
+		}
+		logrus.Info("ocp apiserver is ready")
+		return nil
+
 	}()
 
 	err := s.prepareOCPComponents(s.cfg)
@@ -109,22 +124,11 @@ func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped c
 		logrus.Errorf("Failed to prepare ocp-components %v", err)
 		return err
 	}
-	logrus.Infof("%s is ready", s.Name())
-	// probe ocp api services
-	restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.DataDir+"/resources/kubeadmin/kubeconfig")
-	if err != nil {
-		return err
+
+	stopCh := make(chan struct{})
+	if err := s.options.RunAPIServer(stopCh); err != nil {
+		logrus.Fatalf("Failed to start ocp-apiserver %v", err)
 	}
-	client, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return err
-	}
-	err = waitForOCPAPIServer(client, 10*time.Second)
-	if err != nil {
-		logrus.Warningf("Failed to wait for ocp apiserver: %v", err)
-		return err
-	}
-	logrus.Info("ocp apiserver is ready")
 
 	return ctx.Err()
 }
