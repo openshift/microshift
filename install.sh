@@ -39,6 +39,46 @@ get_os_version() {
     OS_VERSION=$(egrep '^(VERSION_ID)=' /etc/os-release | sed 's/"//g' | cut -f2 -d"=")
 }
 
+# Function to check system prerequisites
+pre-check-installation(){
+    cpu_threshold='90'
+    mem_threshold='1024'
+    disk_threshold='200'
+    numCPU_threshold='2'
+    
+    #---cpu
+    numCPU=$(nproc --all)
+    if [ $numCPU -lt $numCPU_threshold ]; then
+        echo "Error in prerequisites: Number of CPUs is less than $numCPU_threshold"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+    cpu_used=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}' | cut -f 1 -d ".")
+    if [ $cpu_used -gt $cpu_threshold ]; then
+        echo "Error in prerequisites: CPU usage warning!!!"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+
+    #---mem
+    mem_free=$(free -m | grep "Mem" | awk '{print $4+$6}')
+    if [ $mem_free -lt $mem_threshold ]
+    then
+        echo "Error in prerequisites: MEM usage warning!!!"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+
+    #---disk
+    disk_free=$(df -m | grep /$ | grep -v -E '(tmp|boot)' | awk '{print $4}')
+    if [ $disk_free -lt $disk_threshold ]
+    then
+        echo "Error in prerequisites: DISK usage warning!!!"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+}
+
 # If RHEL, use subscription-manager to register
 register_subs() {
     set +e +o pipefail
@@ -73,15 +113,25 @@ build_selinux_policy() {
 # Install dependencies
 install_dependencies() {
     if [ "$DISTRO" = "ubuntu" ]; then
+        sudo apt-get update -y
         sudo apt-get install -y \
             policycoreutils-python-utils \
             conntrack \
             firewalld
     else
-        sudo dnf install -y \
-            policycoreutils-python-utils \
-            conntrack \
-            firewalld
+        if [ "$DISTRO" = "centos" ] && [ "$VERSION" = "7" ]; then
+            sudo yum update -y 
+            sudo yum install -y \
+                policycoreutils-python-utils \
+                conntrack \
+                firewalld
+        else
+            sudo dnf update -y 
+            sudo dnf install -y \
+                policycoreutils-python-utils \
+                conntrack \
+                firewalld
+        fi
     fi
 }
 
@@ -256,6 +306,7 @@ validation_check(){
 get_distro
 get_arch
 get_os_version
+pre-check-installation
 if [ "$DISTRO" = "rhel" ]; then
     register_subs
 fi
