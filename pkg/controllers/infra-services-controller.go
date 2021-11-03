@@ -40,13 +40,8 @@ func (s *InfrastructureServicesManager) Dependencies() []string {
 }
 
 func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(stopped)
-
-	go func() error {
-		// To-DO add readiness check
-		close(ready)
-		return nil
-	}()
+	defer close(ready)
+	// TO-DO add readiness check
 	if err := components.StartComponents(s.cfg); err != nil {
 		return err
 	}

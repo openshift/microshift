@@ -35,20 +35,16 @@ func NewOpenShiftPrepJob(cfg *config.MicroshiftConfig) *OCPPrepJobManager {
 
 func (s *OCPPrepJobManager) Name() string { return "openshift-prepjob-manager" }
 func (s *OCPPrepJobManager) Dependencies() []string {
-	return []string{"kube-apiserver", "oauth-apiserver"}
+	return []string{"kube-apiserver"}
 }
 
 func (s *OCPPrepJobManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(stopped)
-
-	go func() {
-		// To-DO add readiness check
-	}()
+	defer close(ready)
+	// To-DO add readiness check
 	if err := PrepareOCP(s.cfg); err != nil {
 		logrus.Errorf("%s unable to prepare ocp componets: %v", s.Name(), err)
 	}
 	logrus.Infof("%s launched ocp componets", s.Name())
-	close(ready)
 
 	return ctx.Err()
 }

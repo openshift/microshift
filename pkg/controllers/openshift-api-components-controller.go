@@ -41,13 +41,8 @@ func (s *OpenShiftAPIComponentsControllerManager) Dependencies() []string {
 }
 
 func (s *OpenShiftAPIComponentsControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(stopped)
-
-	go func() {
-		// To-DO add readiness check
-
-		close(ready)
-	}()
+	defer close(ready)
+	// TO-DO add readiness check
 	if err := StartOCPAPIComponents(s.cfg); err != nil {
 		logrus.Errorf("%s unable to prepare ocp componets: %v", s.Name(), err)
 	}

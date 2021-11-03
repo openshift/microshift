@@ -72,9 +72,10 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
 		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftControllerManager(cfg)))
-		util.Must(m.AddService(controllers.NewOpenShiftOAuth(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftPrepJob(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftAPIServer(cfg)))
+		util.Must(m.AddService(controllers.NewOpenShiftOAuth(cfg)))
+
 		util.Must(m.AddService(controllers.NewOpenShiftAPIComponents(cfg)))
 		util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
 		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
