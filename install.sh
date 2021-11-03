@@ -41,20 +41,13 @@ get_os_version() {
 
 # Function to check system prerequisites
 pre-check-installation(){
-    cpu_threshold='90'
     mem_threshold='1024'
-    disk_threshold='200'
+    disk_threshold='2048'
     numCPU_threshold='2'
     
     numCPU=$(nproc --all)
     if [ $numCPU -lt $numCPU_threshold ]; then
         echo "Warning: Pre-Install check number of CPUs cores less than recommended number: $numCPU_threshold"
-        #uncomment this line to exit on error. By now informative only
-        #exit 1
-    fi
-    cpu_used=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}' | cut -f 1 -d ".")
-    if [ $cpu_used -gt $cpu_threshold ]; then
-        echo "Warning: Pre-Install check CPUs usage less than recommended number: $cpu_threshold"
         #uncomment this line to exit on error. By now informative only
         #exit 1
     fi
