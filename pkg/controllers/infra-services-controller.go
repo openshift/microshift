@@ -43,13 +43,13 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 	defer close(stopped)
 
 	go func() error {
-		if err := components.StartComponents(s.cfg); err != nil {
-			return err
-		}
-		logrus.Infof("%s launched ocp componets", s.Name())
+		// To-DO add readiness check
 		close(ready)
 		return nil
 	}()
-
+	if err := components.StartComponents(s.cfg); err != nil {
+		return err
+	}
+	logrus.Infof("%s launched ocp componets", s.Name())
 	return ctx.Err()
 }

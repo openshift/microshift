@@ -44,12 +44,13 @@ func (s *OpenShiftAPIComponentsControllerManager) Run(ctx context.Context, ready
 	defer close(stopped)
 
 	go func() {
-		if err := StartOCPAPIComponents(s.cfg); err != nil {
-			logrus.Errorf("%s unable to prepare ocp componets: %v", s.Name(), err)
-		}
-		logrus.Infof("%s launched ocp componets", s.Name())
+		// To-DO add readiness check
+
 		close(ready)
 	}()
-
+	if err := StartOCPAPIComponents(s.cfg); err != nil {
+		logrus.Errorf("%s unable to prepare ocp componets: %v", s.Name(), err)
+	}
+	logrus.Infof("%s launched ocp componets", s.Name())
 	return ctx.Err()
 }

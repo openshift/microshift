@@ -42,12 +42,13 @@ func (s *OCPPrepJobManager) Run(ctx context.Context, ready chan<- struct{}, stop
 	defer close(stopped)
 
 	go func() {
-		if err := PrepareOCP(s.cfg); err != nil {
-			logrus.Errorf("%s unable to prepare ocp componets: %v", s.Name(), err)
-		}
-		logrus.Infof("%s launched ocp componets", s.Name())
-		close(ready)
+		// To-DO add readiness check
 	}()
+	if err := PrepareOCP(s.cfg); err != nil {
+		logrus.Errorf("%s unable to prepare ocp componets: %v", s.Name(), err)
+	}
+	logrus.Infof("%s launched ocp componets", s.Name())
+	close(ready)
 
 	return ctx.Err()
 }

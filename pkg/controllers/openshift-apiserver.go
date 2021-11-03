@@ -115,8 +115,8 @@ func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped c
 			return err
 		}
 		logrus.Info("ocp apiserver is ready")
+		close(ready)
 		return nil
-
 	}()
 
 	err := s.prepareOCPComponents(s.cfg)
