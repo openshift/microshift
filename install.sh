@@ -46,34 +46,31 @@ pre-check-installation(){
     disk_threshold='200'
     numCPU_threshold='2'
     
-    #---cpu
     numCPU=$(nproc --all)
     if [ $numCPU -lt $numCPU_threshold ]; then
-        echo "Error in prerequisites: Number of CPUs is less than $numCPU_threshold"
+        echo "Warning: Pre-Install check number of CPUs cores less than recommended number: $numCPU_threshold"
         #uncomment this line to exit on error. By now informative only
         #exit 1
     fi
     cpu_used=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}' | cut -f 1 -d ".")
     if [ $cpu_used -gt $cpu_threshold ]; then
-        echo "Error in prerequisites: CPU usage warning!!!"
+        echo "Warning: Pre-Install check CPUs usage less than recommended number: $cpu_threshold"
         #uncomment this line to exit on error. By now informative only
         #exit 1
     fi
 
-    #---mem
     mem_free=$(free -m | grep "Mem" | awk '{print $4+$6}')
     if [ $mem_free -lt $mem_threshold ]
     then
-        echo "Error in prerequisites: MEM usage warning!!!"
+        echo "Warning: Pre-Install check MEM usage less than recommended number: $mem_threshold"
         #uncomment this line to exit on error. By now informative only
         #exit 1
     fi
 
-    #---disk
     disk_free=$(df -m | grep /$ | grep -v -E '(tmp|boot)' | awk '{print $4}')
     if [ $disk_free -lt $disk_threshold ]
     then
-        echo "Error in prerequisites: DISK usage warning!!!"
+        echo "Warning: Pre-Install check DISK usage less than recommended number: $disk_threshold"
         #uncomment this line to exit on error. By now informative only
         #exit 1
     fi
@@ -118,17 +115,10 @@ install_dependencies() {
             conntrack \
             firewalld
     else
-        if [ "$DISTRO" = "centos" ] && [ "$VERSION" = "7" ]; then
-            sudo yum install -y \
-                policycoreutils-python-utils \
-                conntrack \
-                firewalld
-        else
-            sudo dnf install -y \
-                policycoreutils-python-utils \
-                conntrack \
-                firewalld
-        fi
+        sudo dnf install -y \
+            policycoreutils-python-utils \
+            conntrack \
+            firewalld
     fi
 }
 
