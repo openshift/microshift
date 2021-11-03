@@ -113,20 +113,17 @@ build_selinux_policy() {
 # Install dependencies
 install_dependencies() {
     if [ "$DISTRO" = "ubuntu" ]; then
-        sudo apt-get update -y
         sudo apt-get install -y \
             policycoreutils-python-utils \
             conntrack \
             firewalld
     else
         if [ "$DISTRO" = "centos" ] && [ "$VERSION" = "7" ]; then
-            sudo yum update -y 
             sudo yum install -y \
                 policycoreutils-python-utils \
                 conntrack \
                 firewalld
         else
-            sudo dnf update -y 
             sudo dnf install -y \
                 policycoreutils-python-utils \
                 conntrack \
