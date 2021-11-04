@@ -167,6 +167,8 @@ make
 
 install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
+install -p -m755 hack/cleanup.sh %{buildroot}%{_bindir}/cleanup-all-microshift-data
+
 restorecon -v %{buildroot}%{_bindir}/microshift
 
 install -d -m755 %{buildroot}/%{_unitdir}
@@ -210,6 +212,7 @@ fi
 
 %license LICENSE
 %{_bindir}/microshift
+%{_bindir}/cleanup-all-microshift-data
 %{_unitdir}/microshift.service
 
 %files selinux
@@ -225,6 +228,10 @@ fi
 * Thu Nov 4 2021 Miguel angel Ajo <majopela@redhat.com> . 4.8.0-nightly-14-g973b9c78
 - Add microshift-containerized subpackage which contains the microshift-containerized systemd
   definition.
+
+* Thu Nov 4 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.8.0-nightly-13-g886705e5
+- Include the cleanup-all-microshift-data script for convenience
+
 
 * Thu Sep 23 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.7.0-021_08_31_224727_40_g5c23735f
 - Support commit based builds
