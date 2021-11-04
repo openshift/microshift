@@ -1,6 +1,7 @@
 [Unit]
 Description=MicroShift
-After=crio.service
+Wants=network-online.target crio.service
+After=network-online.target crio.service
 
 [Service]
 WorkingDirectory=/usr/bin/
