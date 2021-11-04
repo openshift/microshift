@@ -3,10 +3,10 @@
 # Thu Oct 28 14:18:51 UTC 2021
 
 [Unit]
-Description=Podman microshift
+Description=MicroShift Containerized
 Documentation=man:podman-generate-systemd(1)
-Wants=network-online.target
-After=network-online.target
+Wants=network-online.target crio.service
+After=network-online.target crio.service
 RequiresMountsFor=%t/containers
 
 [Service]
