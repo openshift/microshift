@@ -39,6 +39,36 @@ get_os_version() {
     OS_VERSION=$(egrep '^(VERSION_ID)=' /etc/os-release | sed 's/"//g' | cut -f2 -d"=")
 }
 
+# Function to check system prerequisites
+pre-check-installation(){
+    mem_threshold='1024'
+    disk_threshold='2048'
+    numCPU_threshold='2'
+    
+    numCPU=$(nproc --all)
+    if [ $numCPU -lt $numCPU_threshold ]; then
+        echo "Warning: Pre-Install check number of CPUs cores less than recommended number: $numCPU_threshold"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+
+    mem_free=$(free -m | grep "Mem" | awk '{print $4+$6}')
+    if [ $mem_free -lt $mem_threshold ]
+    then
+        echo "Warning: Pre-Install check MEM usage less than recommended number: $mem_threshold"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+
+    disk_free=$(df -m | grep /$ | grep -v -E '(tmp|boot)' | awk '{print $4}')
+    if [ $disk_free -lt $disk_threshold ]
+    then
+        echo "Warning: Pre-Install check DISK usage less than recommended number: $disk_threshold"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+}
+
 # If RHEL, use subscription-manager to register
 register_subs() {
     set +e +o pipefail
@@ -256,6 +286,7 @@ validation_check(){
 get_distro
 get_arch
 get_os_version
+pre-check-installation
 if [ "$DISTRO" = "rhel" ]; then
     register_subs
 fi
