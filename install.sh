@@ -98,6 +98,15 @@ build_selinux_policy() {
     curl -L -o /tmp/microshift.te https://raw.githubusercontent.com/redhat-et/microshift/main/packaging/selinux/microshift.te
     make -f /usr/share/selinux/devel/Makefile -C /tmp
     sudo dnf -y remove selinux-policy-devel
+    if [ "$DISTRO" != "ubuntu" ]; then
+        sudo mkdir -p /var/run/flannel
+        sudo mkdir -p /var/run/kubelet
+        sudo mkdir -p /var/lib/kubelet/pods
+        sudo mkdir -p /var/run/secrets/kubernetes.io/serviceaccount
+        sudo mkdir -p /var/hpvolumes
+        sudo semodule -i /tmp/microshift.pp
+        sudo restorecon -v /var/hpvolumes
+    fi
 }
 
 # Install dependencies
@@ -241,16 +250,8 @@ EOF
     if [ "$DISTRO" = "ubuntu" ] && [ "$OS_VERSION" = "18.04" ]; then
         sudo sed -i 's|^ExecStart=microshift|ExecStart=/usr/local/bin/microshift|' /usr/lib/systemd/system/microshift.service
     fi
-
     if [ "$DISTRO" != "ubuntu" ]; then
-        sudo mkdir -p /var/run/flannel
-        sudo mkdir -p /var/run/kubelet
-        sudo mkdir -p /var/lib/kubelet/pods
-        sudo mkdir -p /var/run/secrets/kubernetes.io/serviceaccount
-        sudo mkdir -p /var/hpvolumes
-        sudo semodule -i /tmp/microshift.pp
         sudo restorecon -v /usr/local/bin/microshift
-        sudo restorecon -v /var/hpvolumes
     fi
     sudo systemctl enable microshift.service --now
 }
@@ -293,13 +294,13 @@ fi
 validation_check
 install_dependencies
 establish_firewall
-if [ "$DISTRO" != "ubuntu" ]; then
-    build_selinux_policy
-fi
 install_crio
 crio_conf
 verify_crio
 get_kubectl
+if [ "$DISTRO" != "ubuntu" ]; then
+    build_selinux_policy
+fi
 
 [ "$CONFIG_ENV_ONLY" = true ] && { echo "Env config complete" && exit 0 ; }
 get_microshift
