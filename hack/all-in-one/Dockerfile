@@ -1,18 +1,9 @@
 # This Dockerfile should not be run directly. Instead, run ./build-aio-dev.sh
 ARG IMAGE_NAME=registry.access.redhat.com/ubi8/ubi-init:8.4
-
+FROM ${IMAGE_NAME}
 ARG ARCH
-
-FROM registry.access.redhat.com/ubi8/go-toolset as builder
-
-ARG FROM_SOURCE
-
-ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
-
-WORKDIR $GOPATH/src/github.com/redhat-et/microshift
-
-COPY . .
-
+ARG HOST=rhel8
+ARG CPU
 USER root
 
 # If from source, expect microshift binary in current directory
@@ -25,10 +16,6 @@ RUN if [ "$FROM_SOURCE" == "true" ]; then \
      fi
 
 RUN chmod 755 /usr/local/bin/microshift
-
-FROM ${IMAGE_NAME}
-
-ARG HOST=rhel8
 
 # files copied from packaging/images/microshift-aio in ./build-aio-dev.sh
 COPY unit /usr/lib/systemd/system/microshift.service
@@ -59,9 +46,9 @@ RUN curl -s -L https://nvidia.github.io/nvidia-docker/rhel8.3/nvidia-docker.repo
 RUN if [ "$HOST" == "rhel8" ]; then  \
       dnf install -y iptables; \
     else \
-      dnf install -y libnetfilter_conntrack libnfnetlink && \
-      rpm -v -i --force https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/x86_64/os/Packages/i/iptables-libs-1.6.2-2.fc28.x86_64.rpm \
-                   https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/x86_64/os/Packages/i/iptables-1.6.2-2.fc28.x86_64.rpm && \
+      yum install -y libnetfilter_conntrack libnfnetlink && \
+      rpm -v -i --force https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/${CPU}/os/Packages/i/iptables-libs-1.6.2-2.fc28.${CPU}.rpm \
+                   https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/28/Everything/${CPU}/os/Packages/i/iptables-1.6.2-2.fc28.${CPU}.rpm && \
       sed -e '/mountopt/s/,\?metacopy=on,\?//' -i /etc/containers/storage.conf; \
     fi
 
