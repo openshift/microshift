@@ -106,6 +106,7 @@ build_selinux_policy() {
         sudo mkdir -p /var/hpvolumes
         sudo semodule -i /tmp/microshift.pp
         sudo restorecon -v /var/hpvolumes
+	sudo restorecon -vR /var/lib/kubelet/pods
     fi
 }
 
