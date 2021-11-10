@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 	homedir "github.com/mitchellh/go-homedir"
@@ -105,13 +104,9 @@ func (c *ClusterConfig) ApiServerPort() (string, error) {
 		return "", err
 	}
 
-	// port is unspecified so is either implictly defined as 443 or 80
-	// for https and http respectively
+	// default empty URL to port 6443
 	if parsed.Port() == "" {
-		if strings.HasPrefix(c.URL, "https") {
-			return "443", nil
-		}
-		return "80", nil
+		return "6443", nil
 	}
 	return parsed.Port(), nil
 }
