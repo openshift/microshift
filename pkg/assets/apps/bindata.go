@@ -4,6 +4,7 @@
 // assets/apps/0000_60_service-ca_05_deploy.yaml
 // assets/apps/0000_70_dns_01-dns-daemonset.yaml
 // assets/apps/0000_70_dns_01-node-resolver-daemonset.yaml
+// assets/apps/0000_80_cluster_policy_controller_deploy.yaml
 // assets/apps/0000_80_openshift-router-deployment.yaml
 // assets/apps/000_80_hostpath-provisioner-daemonset.yaml
 package assets
@@ -517,6 +518,112 @@ func assetsApps0000_70_dns_01NodeResolverDaemonsetYaml() (*asset, error) {
 	return a, nil
 }
 
+var _assetsApps0000_80_cluster_policy_controller_deployYaml = []byte(`apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: openshift-kube-controller-manager
+  name: openshift-cluster-policy-controller
+  labels:
+    app: openshift-cluster-policy-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openshift-cluster-policy-controller
+  template:
+    metadata:
+      name: openshift-cluster-policy-controller
+      labels:
+        app: openshift-cluster-policy-controller
+    spec:
+      serviceAccountName: openshift-cluster-policy-controller-sa
+      containers:
+      - name: cluster-policy-controller
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        image: {{ .ReleaseImage.cluster_policy_controller }}
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        command: ["/bin/bash", "-euxo", "pipefail", "-c"]
+        args:
+          - |
+            timeout 3m /bin/bash -exuo pipefail -c 'while [ -n "$(ss -Htanop \( sport = 10357 \))" ]; do sleep 1; done'
+            exec cluster-policy-controller start --config=/var/run/config/config.yaml
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 10m
+        ports:
+          - containerPort: 10357
+        volumeMounts:
+        - mountPath: /var/run/kubeadmin
+          name: kubeconfig-dir
+        - mountPath: /var/run/secrets
+          name: signing-key
+        - mountPath: /var/run/configmaps/signing-cabundle
+          name: signing-cabundle
+        - mountPath: /var/run/config
+          name: config
+        startupProbe:
+          httpGet:
+            scheme: HTTPS
+            port: 10357
+            path: healthz
+          initialDelaySeconds: 0
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            scheme: HTTPS
+            port: 10357
+            path: healthz
+          initialDelaySeconds: 45
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            scheme: HTTPS
+            port: 10357
+            path: healthz
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      volumes:
+      - name: kubeconfig-dir
+        hostPath:
+          path: {{.KubeConfigDir}}
+      - name: signing-key
+        hostPath:
+          path: {{.KeyDir}}
+      - name: config
+        hostPath:
+          path: {{.ConfigDir}}
+      - hostPath:
+          path: {{.CADir}}
+        name: signing-cabundle
+`)
+
+func assetsApps0000_80_cluster_policy_controller_deployYamlBytes() ([]byte, error) {
+	return _assetsApps0000_80_cluster_policy_controller_deployYaml, nil
+}
+
+func assetsApps0000_80_cluster_policy_controller_deployYaml() (*asset, error) {
+	bytes, err := assetsApps0000_80_cluster_policy_controller_deployYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/apps/0000_80_cluster_policy_controller_deploy.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _assetsApps0000_80_openshiftRouterDeploymentYaml = []byte(`# Deployment with default values
 # Ingress Controller specific values are applied at runtime.
 kind: Deployment
@@ -782,12 +889,13 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"assets/apps/0000_00_flannel-daemonset.yaml":              assetsApps0000_00_flannelDaemonsetYaml,
-	"assets/apps/0000_60_service-ca_05_deploy.yaml":           assetsApps0000_60_serviceCa_05_deployYaml,
-	"assets/apps/0000_70_dns_01-dns-daemonset.yaml":           assetsApps0000_70_dns_01DnsDaemonsetYaml,
-	"assets/apps/0000_70_dns_01-node-resolver-daemonset.yaml": assetsApps0000_70_dns_01NodeResolverDaemonsetYaml,
-	"assets/apps/0000_80_openshift-router-deployment.yaml":    assetsApps0000_80_openshiftRouterDeploymentYaml,
-	"assets/apps/000_80_hostpath-provisioner-daemonset.yaml":  assetsApps000_80_hostpathProvisionerDaemonsetYaml,
+	"assets/apps/0000_00_flannel-daemonset.yaml":                assetsApps0000_00_flannelDaemonsetYaml,
+	"assets/apps/0000_60_service-ca_05_deploy.yaml":             assetsApps0000_60_serviceCa_05_deployYaml,
+	"assets/apps/0000_70_dns_01-dns-daemonset.yaml":             assetsApps0000_70_dns_01DnsDaemonsetYaml,
+	"assets/apps/0000_70_dns_01-node-resolver-daemonset.yaml":   assetsApps0000_70_dns_01NodeResolverDaemonsetYaml,
+	"assets/apps/0000_80_cluster_policy_controller_deploy.yaml": assetsApps0000_80_cluster_policy_controller_deployYaml,
+	"assets/apps/0000_80_openshift-router-deployment.yaml":      assetsApps0000_80_openshiftRouterDeploymentYaml,
+	"assets/apps/000_80_hostpath-provisioner-daemonset.yaml":    assetsApps000_80_hostpathProvisionerDaemonsetYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -833,12 +941,13 @@ type bintree struct {
 var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"apps": {nil, map[string]*bintree{
-			"0000_00_flannel-daemonset.yaml":              {assetsApps0000_00_flannelDaemonsetYaml, map[string]*bintree{}},
-			"0000_60_service-ca_05_deploy.yaml":           {assetsApps0000_60_serviceCa_05_deployYaml, map[string]*bintree{}},
-			"0000_70_dns_01-dns-daemonset.yaml":           {assetsApps0000_70_dns_01DnsDaemonsetYaml, map[string]*bintree{}},
-			"0000_70_dns_01-node-resolver-daemonset.yaml": {assetsApps0000_70_dns_01NodeResolverDaemonsetYaml, map[string]*bintree{}},
-			"0000_80_openshift-router-deployment.yaml":    {assetsApps0000_80_openshiftRouterDeploymentYaml, map[string]*bintree{}},
-			"000_80_hostpath-provisioner-daemonset.yaml":  {assetsApps000_80_hostpathProvisionerDaemonsetYaml, map[string]*bintree{}},
+			"0000_00_flannel-daemonset.yaml":                {assetsApps0000_00_flannelDaemonsetYaml, map[string]*bintree{}},
+			"0000_60_service-ca_05_deploy.yaml":             {assetsApps0000_60_serviceCa_05_deployYaml, map[string]*bintree{}},
+			"0000_70_dns_01-dns-daemonset.yaml":             {assetsApps0000_70_dns_01DnsDaemonsetYaml, map[string]*bintree{}},
+			"0000_70_dns_01-node-resolver-daemonset.yaml":   {assetsApps0000_70_dns_01NodeResolverDaemonsetYaml, map[string]*bintree{}},
+			"0000_80_cluster_policy_controller_deploy.yaml": {assetsApps0000_80_cluster_policy_controller_deployYaml, map[string]*bintree{}},
+			"0000_80_openshift-router-deployment.yaml":      {assetsApps0000_80_openshiftRouterDeploymentYaml, map[string]*bintree{}},
+			"000_80_hostpath-provisioner-daemonset.yaml":    {assetsApps000_80_hostpathProvisionerDaemonsetYaml, map[string]*bintree{}},
 		}},
 	}},
 }}
