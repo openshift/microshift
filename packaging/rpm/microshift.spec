@@ -117,7 +117,7 @@ Things break. But you can still help shape it, too.
 Summary: SELinux policies for MicroShift
 BuildRequires: selinux-policy
 BuildRequires: selinux-policy-devel
-BuildRequires: container-selinux
+Requires: container-selinux
 BuildArch: noarch
 %{?selinux_requires}
 
