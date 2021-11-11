@@ -2,6 +2,9 @@ package config
 
 import (
 	"os"
+	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/spf13/pflag"
@@ -9,193 +12,167 @@ import (
 
 // tests to make sure that the config file is parsed correctly
 func TestConfigFile(t *testing.T) {
-	config := NewMicroshiftConfig()
-	config.ConfigFile = "../../test/config.yaml"
-	if err := config.ReadFromConfigFile(); err != nil {
-		t.Errorf("failed to read config file: %v", err)
+
+	var ttests = []struct {
+		configFile string
+		err        error
+	}{
+		{"../../test/config.yaml", nil},
 	}
-	if config.DataDir != "/tmp/microshift/data" {
-		t.Errorf("failed to read data dir from config file: %s", config.DataDir)
-	}
-	if config.LogDir != "/tmp/microshift/logs" {
-		t.Errorf("failed to read log dir from config file: %s", config.LogDir)
-	}
-	if config.LogVLevel != 4 {
-		t.Errorf("failed to read log vlevel from config file: %d", config.LogVLevel)
-	}
-	if config.LogVModule != "microshift=4" {
-		t.Errorf("failed to read log vmodule from config file: %s", config.LogVModule)
-	}
-	if config.LogAlsotostderr != true {
-		t.Errorf("failed to read log alsotostderr from config file: %t", config.LogAlsotostderr)
-	}
-	if len(config.Roles) != 2 {
-		t.Errorf("failed to read roles from config file: %v", config.Roles)
-	}
-	if config.NodeName != "node1" {
-		t.Errorf("failed to read node name from config file: %s", config.NodeName)
-	}
-	if config.NodeIP != "1.2.3.4" {
-		t.Errorf("failed to read node ip from config file: %s", config.NodeIP)
-	}
-	if config.Cluster.URL != "https://1.2.3.4:6443" {
-		t.Errorf("failed to read cluster url from config file: %s", config.Cluster.URL)
-	}
-	if config.Cluster.ClusterCIDR != "10.20.30.40/16" {
-		t.Errorf("failed to read cluster cidr from config file: %s", config.Cluster.ClusterCIDR)
-	}
-	if config.Cluster.ServiceCIDR != "40.30.20.10/16" {
-		t.Errorf("failed to read cluster service cidr from config file: %s", config.Cluster.ServiceCIDR)
-	}
-	if config.Cluster.DNS != "cluster.dns" {
-		t.Errorf("failed to read cluster dns from config file: %s", config.Cluster.DNS)
-	}
-	if config.Cluster.Domain != "cluster.local" {
-		t.Errorf("failed to read cluster domain from config file: %s", config.Cluster.Domain)
+
+	for _, tt := range ttests {
+		config := NewMicroshiftConfig()
+		config.ConfigFile = tt.configFile
+		err := config.ReadFromConfigFile()
+		if (err != nil) != (tt.err != nil) {
+			t.Errorf("ReadFromConfigFile() error = %v, wantErr %v", err, tt.err)
+		}
 	}
 }
 
 // test that Microshift is able to properly read the config from the commandline
 func TestCommandLineConfig(t *testing.T) {
-	config := NewMicroshiftConfig()
-	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
-	flags.StringVar(&config.DataDir, "data-dir", "", "")
-	flags.StringVar(&config.LogDir, "log-dir", "", "")
-	flags.IntVar(&config.LogVLevel, "v", 0, "")
-	flags.StringVar(&config.LogVModule, "vmodule", "", "")
-	flags.BoolVar(&config.LogAlsotostderr, "alsologtostderr", false, "")
-	flags.StringSliceVar(&config.Roles, "roles", []string{}, "")
-	flags.StringVar(&config.NodeName, "node-name", "", "")
-	flags.StringVar(&config.NodeIP, "node-ip", "", "")
-	flags.StringVar(&config.Cluster.URL, "cluster-url", "", "")
-	flags.StringVar(&config.Cluster.ClusterCIDR, "cluster-cidr", "", "")
-	flags.StringVar(&config.Cluster.ServiceCIDR, "service-cidr", "", "")
-	flags.StringVar(&config.Cluster.DNS, "cluster-dns", "", "")
-	flags.StringVar(&config.Cluster.Domain, "cluster-domain", "", "")
-	flags.Parse([]string{
-		"--data-dir=/tmp/microshift/data",
-		"--log-dir=/tmp/microshift/logs",
-		"--v=4",
-		"--vmodule=microshift=4",
-		"--alsologtostderr",
-		"--roles=controlplane,node",
-		"--node-name=node1",
-		"--node-ip=1.2.3.4",
-		"--cluster-url=https://1.2.3.4:6443",
-		"--cluster-cidr=10.20.30.40/16",
-		"--service-cidr=40.30.20.10/16",
-		"--cluster-dns=10.43.0.10",
-		"--cluster-domain=cluster.local",
-	})
 
-	if err := config.ReadFromCmdLine(flags); err != nil {
-		t.Errorf("failed to read config from commandline: %v", err)
+	var ttests = []struct {
+		config *MicroshiftConfig
+		err    error
+	}{
+		{
+			config: &MicroshiftConfig{
+				DataDir:         "/tmp/microshift/data",
+				LogDir:          "/tmp/microshift/logs",
+				LogVLevel:       4,
+				LogVModule:      "microshift=4",
+				LogAlsotostderr: true,
+				Roles:           []string{"controlplane", "node"},
+				NodeName:        "node1",
+				NodeIP:          "1.2.3.4",
+				Cluster: ClusterConfig{
+					URL:         "https://1.2.3.4:6443",
+					ClusterCIDR: "10.20.30.40/16",
+					ServiceCIDR: "40.30.20.10/16",
+					DNS:         "cluster.dns",
+					Domain:      "cluster.local",
+				},
+			},
+			err: nil,
+		},
 	}
 
-	if config.DataDir != "/tmp/microshift/data" {
-		t.Errorf("failed to read data dir from commandline: %s", config.DataDir)
-	}
-	if config.LogDir != "/tmp/microshift/logs" {
-		t.Errorf("failed to read log dir from commandline: %s", config.LogDir)
-	}
-	if config.LogVLevel != 4 {
-		t.Errorf("failed to read log vlevel from commandline: %d", config.LogVLevel)
-	}
-	if config.LogVModule != "microshift=4" {
-		t.Errorf("failed to read log vmodule from commandline: %s", config.LogVModule)
-	}
-	if config.LogAlsotostderr != true {
-		t.Errorf("failed to read log alsotostderr from commandline: %v", config.LogAlsotostderr)
-	}
-	if len(config.Roles) != 2 {
-		t.Errorf("failed to read roles from commandline: %v", config.Roles)
-	}
-	if config.NodeName != "node1" {
-		t.Errorf("failed to read node name from commandline: %s", config.NodeName)
-	}
-	if config.NodeIP != "1.2.3.4" {
-		t.Errorf("failed to read node ip from commandline: %s", config.NodeIP)
-	}
-	if config.Cluster.URL != "https://1.2.3.4:6443" {
-		t.Errorf("failed to read cluster url from commandline: %s", config.Cluster.URL)
-	}
-	if config.Cluster.ClusterCIDR != "10.20.30.40/16" {
-		t.Errorf("failed to read cluster cidr from commandline: %s", config.Cluster.ClusterCIDR)
-	}
-	if config.Cluster.ServiceCIDR != "40.30.20.10/16" {
-		t.Errorf("failed to read cluster service cidr from commandline: %s", config.Cluster.ServiceCIDR)
-	}
-	if config.Cluster.DNS != "10.43.0.10" {
-		t.Errorf("failed to read cluster dns from commandline: %s", config.Cluster.DNS)
-	}
-	if config.Cluster.Domain != "cluster.local" {
-		t.Errorf("failed to read cluster domain from commandline: %s", config.Cluster.Domain)
+	for _, tt := range ttests {
+		config := NewMicroshiftConfig()
+		// bind the flags to the config
+		flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
+		flags.StringVar(&config.DataDir, "data-dir", "", "")
+		flags.StringVar(&config.LogDir, "log-dir", "", "")
+		flags.IntVar(&config.LogVLevel, "v", 0, "")
+		flags.StringVar(&config.LogVModule, "vmodule", "", "")
+		flags.BoolVar(&config.LogAlsotostderr, "alsologtostderr", false, "")
+		flags.StringSliceVar(&config.Roles, "roles", []string{}, "")
+		flags.StringVar(&config.NodeName, "node-name", "", "")
+		flags.StringVar(&config.NodeIP, "node-ip", "", "")
+		flags.StringVar(&config.Cluster.URL, "cluster-url", "", "")
+		flags.StringVar(&config.Cluster.ClusterCIDR, "cluster-cidr", "", "")
+		flags.StringVar(&config.Cluster.ServiceCIDR, "service-cidr", "", "")
+		flags.StringVar(&config.Cluster.DNS, "cluster-dns", "", "")
+		flags.StringVar(&config.Cluster.Domain, "cluster-domain", "", "")
+
+		// parse the flags
+		flags.Parse([]string{
+			"--data-dir=" + tt.config.DataDir,
+			"--log-dir=" + tt.config.LogDir,
+			"--v=" + strconv.Itoa(tt.config.LogVLevel),
+			"--vmodule=" + tt.config.LogVModule,
+			"--alsologtostderr",
+			"--roles=" + strings.Join(tt.config.Roles, ","),
+			"--node-name=" + tt.config.NodeName,
+			"--node-ip=" + tt.config.NodeIP,
+			"--cluster-url=" + tt.config.Cluster.URL,
+			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
+			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
+			"--cluster-dns=" + tt.config.Cluster.DNS,
+			"--cluster-domain=" + tt.config.Cluster.Domain,
+		})
+
+		// validate that we can read the config from the commandline
+		err := config.ReadFromCmdLine(flags)
+		if (err != nil) != (tt.err != nil) {
+			t.Errorf("failed to read config from commandline: %s", err)
+		}
+		if err == nil && !reflect.DeepEqual(config, tt.config) {
+			t.Errorf("struct read from commandline does not match target: %v", config)
+		}
 	}
 }
 
 // test to verify that Microshift is able to populate the config from the environment variables
 func TestEnvironmentVariableConfig(t *testing.T) {
-	os.Setenv("MICROSHIFT_CONFIGFILE", "/to/config/file")
-	os.Setenv("MICROSHIFT_DATADIR", "/tmp/microshift/data")
-	os.Setenv("MICROSHIFT_LOGDIR", "/tmp/microshift/logs")
-	os.Setenv("MICROSHIFT_LOGVLEVEL", "23")
-	os.Setenv("MICROSHIFT_LOGVMODULE", "microshift=23")
-	os.Setenv("MICROSHIFT_LOGALSOTOSTDERR", "true")
-	os.Setenv("MICROSHIFT_ROLES", "controlplane,node")
-	os.Setenv("MICROSHIFT_NODENAME", "node1")
-	os.Setenv("MICROSHIFT_NODEIP", "1.2.3.4")
-	os.Setenv("MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint")
-	os.Setenv("MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16")
-	os.Setenv("MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16")
-	os.Setenv("MICROSHIFT_CLUSTER_DNS", "10.43.0.10")
-	os.Setenv("MICROSHIFT_CLUSTER_DOMAIN", "cluster.local")
-
-	config := NewMicroshiftConfig()
-	if err := config.ReadFromEnv(); err != nil {
-		t.Errorf("failed to read from environment variables: %v", err)
+	// set up the table tests using the above environment variables & the MicroShift config struct
+	var ttests = []struct {
+		desiredMicroShiftConfig *MicroshiftConfig
+		err                     error
+		envList                 []struct {
+			varName string
+			value   string
+		}
+	}{
+		{
+			desiredMicroShiftConfig: &MicroshiftConfig{
+				ConfigFile:      "/to/config/file",
+				DataDir:         "/tmp/microshift/data",
+				LogDir:          "/tmp/microshift/logs",
+				LogVLevel:       23,
+				LogVModule:      "microshift=23",
+				LogAlsotostderr: true,
+				Roles:           []string{"controlplane", "node"},
+				NodeName:        "node1",
+				NodeIP:          "1.2.3.4",
+				Cluster: ClusterConfig{
+					URL:         "https://cluster.com:4343/endpoint",
+					ClusterCIDR: "10.20.30.40/16",
+					ServiceCIDR: "40.30.20.10/16",
+					DNS:         "10.43.0.10",
+					Domain:      "cluster.local",
+				},
+			},
+			err: nil,
+			envList: []struct {
+				varName string
+				value   string
+			}{
+				{"MICROSHIFT_CONFIGFILE", "/to/config/file"},
+				{"MICROSHIFT_DATADIR", "/tmp/microshift/data"},
+				{"MICROSHIFT_LOGDIR", "/tmp/microshift/logs"},
+				{"MICROSHIFT_LOGVLEVEL", "23"},
+				{"MICROSHIFT_LOGVMODULE", "microshift=23"},
+				{"MICROSHIFT_LOGALSOTOSTDERR", "true"},
+				{"MICROSHIFT_ROLES", "controlplane,node"},
+				{"MICROSHIFT_NODENAME", "node1"},
+				{"MICROSHIFT_NODEIP", "1.2.3.4"},
+				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
+				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
+				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
+				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
+				{"MICROSHIFT_CLUSTER_DOMAIN", "cluster.local"},
+			},
+		},
 	}
 
-	if config.ConfigFile != "/to/config/file" {
-		t.Errorf("expected ConfigFile to be empty, got %s", config.ConfigFile)
-	}
-	if config.DataDir != "/tmp/microshift/data" {
-		t.Errorf("expected DataDir to be /tmp/microshift/data, got %s", config.DataDir)
-	}
-	if config.LogDir != "/tmp/microshift/logs" {
-		t.Errorf("expected LogDir to be empty, got %s", config.LogDir)
-	}
-	if config.LogVLevel != 23 {
-		t.Errorf("expected LogVLevel to be 23, got %d", config.LogVLevel)
-	}
-	if config.LogVModule != "microshift=23" {
-		t.Errorf("expected LogVModule to be microshift=23, got %s", config.LogVModule)
-	}
-	if config.LogAlsotostderr != true {
-		t.Errorf("expected LogAlsotostderr to be true, got %v", config.LogAlsotostderr)
-	}
-	if len(config.Roles) != 2 {
-		t.Errorf("expected Roles to be of length 2, got %v", config.Roles)
-	}
-	if config.NodeName != "node1" {
-		t.Errorf("expected NodeName to not be node1, got %s", config.NodeName)
-	}
-	if config.NodeIP != "1.2.3.4" {
-		t.Errorf("expected NodeIP to be 1.2.3.4, got %s", config.NodeIP)
-	}
-	if config.Cluster.URL != "https://cluster.com:4343/endpoint" {
-		t.Errorf("expected Cluster.URL to be https://cluster.com:4343/endpoint, got %s", config.Cluster.URL)
-	}
-	if config.Cluster.ClusterCIDR != "10.20.30.40/16" {
-		t.Errorf("expected Cluster.ClusterCIDR to be 10.20.30.40/16, got %s", config.Cluster.ClusterCIDR)
-	}
-	if config.Cluster.ServiceCIDR != "40.30.20.10/16" {
-		t.Errorf("expected Cluster.ServiceCIDR to be 40.30.20.10/16, got %s", config.Cluster.ServiceCIDR)
-	}
-	if config.Cluster.DNS != "10.43.0.10" {
-		t.Errorf("expected Cluster.DNS to be 10.43.0.10, got %s", config.Cluster.DNS)
-	}
-	if config.Cluster.Domain != "cluster.local" {
-		t.Errorf("expected Cluster.Domain to be cluster.local, got %s", config.Cluster.Domain)
+	for _, tt := range ttests {
+		// first set the values
+		for _, env := range tt.envList {
+			os.Setenv(env.varName, env.value)
+		}
+		// then read the values
+		microShiftconfig := NewMicroshiftConfig()
+		err := microShiftconfig.ReadFromEnv()
+		if (err != nil && tt.err == nil) || (err == nil && tt.err != nil) {
+			t.Errorf("failed to read from env, expected error: %v, got: %v", tt.err, err)
+		}
+		if (err == nil && !reflect.DeepEqual(microShiftconfig, tt.desiredMicroShiftConfig)) ||
+			(err != nil && reflect.DeepEqual(microShiftconfig, tt.desiredMicroShiftConfig)) {
+			t.Errorf("structs don't match up, expected: %+v, got: %+v", tt.desiredMicroShiftConfig, microShiftconfig)
+		}
 	}
 }
 
