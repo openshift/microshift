@@ -6,7 +6,7 @@ on:
 
 env:
   RELEASE_REG_USER: ${{ secrets.REGISTRY_USER }}
-  RELEASE_REG_PASS: ${{ secrets.REGISTRY_PASS }}
+  RELEASE_REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
         with:
           registry: quay.io
           username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_PASS }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Install required packages
         run: sudo apt install build-essential qemu-user qemu-user-static 
