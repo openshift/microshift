@@ -21,7 +21,8 @@ Notice a bug? File an issue [here](https://github.com/redhat-et/microshift/issue
 
 MicroShift’s goal is to create a minimal core that can functionally operate as close to OpenShift as 
 possible while maintaining a low resource impact. We are always looking for enhancement proposals, 
-so feel free to create a pull-request and an additional document explaining your proposal. 
+so feel free to create an enhancement issue with a link to a document that explains your proposal. 
+The enhancement will be considered as long as it aligns with [MicroShift's design goals](https://github.com/redhat-et/microshift/blob/main/docs/design/design.md).
 
 ## Community
 
