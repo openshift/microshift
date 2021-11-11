@@ -27,12 +27,12 @@ function source_image {
 
 function build_component {
   local component=$1
-  SRC_REPO=$(source_repo $component)
-  SRC_COMMIT=$(source_commit $component)
-  OKD_IMG=$(source_image $component)
+  SRC_REPO=$(source_repo "$component")
+  SRC_COMMIT=$(source_commit "$component")
+  OKD_IMG=$(source_image "$component")
 
-  [ -z "$SRC_REPO" ] && SRC_REPO=$(cat components/$component/repo || :)
-  [ -z "$SRC_COMMIT" ] && SRC_COMMIT=$(cat components/$component/commit || :)
+  [ -z "$SRC_REPO" ] && SRC_REPO=$(cat components/"$component"/repo || :)
+  [ -z "$SRC_COMMIT" ] && SRC_COMMIT=$(cat components/"$component"/commit || :)
 
   echo ""
   echo -e "${GREEN}building component: $component${CLEAR}"
@@ -40,14 +40,14 @@ function build_component {
   echo "  Source Commit: $SRC_COMMIT"
   echo "  Source Image:  $OKD_IMG"
 
-  pushd components/$component >/dev/null
+  pushd components/"$component" >/dev/null
 
     if [ ! -z "${SRC_REPO}" ]; then
-      checkout_component $SRC_REPO $SRC_COMMIT
+      checkout_component "$SRC_REPO" "$SRC_COMMIT"
       build_cross_binaries
     fi
 
-    build_multiarch_image $component $OKD_IMG
+    build_multiarch_image "$component" "$OKD_IMG"
   popd
 
   if [ "${PUSH}" == "yes" ]; then
@@ -59,23 +59,23 @@ function build_component {
 function checkout_component {
   echo ""
   echo -e "${GRAY}> making sure we have the source code for $1, at commit $2${CLEAR}"
-  [ ! -d src ] && git clone $1 src
+  [ ! -d src ] && git clone "$1" src
   cd src
   git fetch -a
   git stash >/dev/null # just in case we had patches applied in last run
   git clean -f # remove any out-of-tree files (from patches)
-  echo git checkout $2 -B building-side-images
-  git checkout $2 -B building-side-images
+  echo git checkout "$2" -B building-side-images
+  git checkout "$2" -B building-side-images
   cd ..
 }
 
 function build_cross_binaries {
   for ARCH in ${ARCHITECTURES}
   do
-    if [ -f Dockerfile.$ARCH ] || [ -f Dockerfile ] && [ ! -f ImageSource.$ARCH ] && [ -x ./build_binaries ]; then
+    if [ -f Dockerfile."$ARCH" ] || [ -f Dockerfile ] && [ ! -f ImageSource."$ARCH" ] && [ -x ./build_binaries ]; then
       echo ""
       echo -e "${GRAY}> building binaries for architecture ${ARCH} ${CLEAR}"
-       ./build_binaries $ARCH
+       ./build_binaries "$ARCH"
     fi
   done
 }
@@ -158,28 +158,28 @@ function build_using_dockerfile {
    BUILD_ARGS="${BUILD_ARGS} --build-arg REGISTRY=${DEST_REGISTRY} --build-arg OKD_TAG=${OKD_BASE_TAG}"
 
 
-   buildah build-using-dockerfile --override-arch "${ARCH}" $BUILD_ARGS . || \
-      if [ ${ARCH} == arm ]; then # fedora registry uses armhfp instead for arm (arm32 with floating point)
-              buildah build-using-dockerfile --override-arch "armhfp" $BUILD_ARGS .
+   buildah build-using-dockerfile --override-arch "${ARCH}" "$BUILD_ARGS" . || \
+      if [ "${ARCH}" == arm ]; then # fedora registry uses armhfp instead for arm (arm32 with floating point)
+              buildah build-using-dockerfile --override-arch "armhfp" "$BUILD_ARGS" .
       fi
 
 }
 
 function build_using_image {
 
-  IMG_REF=$(get_image_ref $1 "${OKD_IMG}")
+  IMG_REF=$(get_image_ref "$1" "${OKD_IMG}")
   buildah pull --arch "${ARCH}" "${IMG_REF}"
   buildah tag "${IMG_REF}" "${ARCH_IMAGE}"
 }
 
 function get_image_ref {
 
-  IMG=$(cat $1)
+  IMG=$(cat "$1")
   # check if we must use the one captured from oc adm image-releases
   if [ "${IMG}" == "\$OKD_IMAGE_AMD64" ]; then
-    echo $2
+    echo "$2"
   else
-    echo ${IMG}
+    echo "${IMG}"
   fi
 }
 
@@ -199,5 +199,5 @@ fi
 
 for component in $COMPONENTS
 do
-  build_component $component
+  build_component "$component"
 done

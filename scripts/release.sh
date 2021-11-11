@@ -36,7 +36,7 @@ ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 # Check for a container manager cli (podman || docker), and alias it to "podman", since
 # they implement the same cli interface.
 __ctr_mgr_alias=$({ which podman &>/dev/null && echo "podman"; } || { which docker &>/dev/null && echo "docker"; } || echo "")
-alias podman=${__ctr_mgr_alias:?"a container manager (podman || docker) is required as part of the release automation; none found"}
+alias podman="${__ctr_mgr_alias:?"a container manager (podman || docker) is required as part of the release automation; none found"}"
 
 #########
 # FUNCS #

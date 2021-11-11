@@ -4,7 +4,7 @@
 
 # TODO use our own image for riscv64 builder
 
-podman run -it --rm -v $(pwd)/src:/src -e TAG=${VERSION} -w /src carlosedp/crossbuild-riscv64 <<EOF
+podman run -it --rm -v $(pwd)/src:/src -e TAG="${VERSION}" -w /src carlosedp/crossbuild-riscv64 <<EOF
 cd build/pause
 mkdir -p bin
 riscv64-linux-gcc -Os -Wall -Werror -static -DVERSION=v3.2 -o bin/pause-riscv64 pause.c

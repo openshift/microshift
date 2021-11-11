@@ -13,4 +13,3 @@ fi
 cat <<EOF > /etc/microshift-aio/microshift-aio.conf
 export KUBECONFIG=$(/usr/bin/podman volume inspect microshift-data --format "{{.Mountpoint}}")/microshift/resources/kubeadmin/kubeconfig
 EOF
-
