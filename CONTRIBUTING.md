@@ -1,16 +1,12 @@
 # Contributing to MicroShift
 
 Welcome to MicroShift! We are glad you are interested in this project. 
-Pull Requests are always welcome. If you’d like to jump right in with MicroShift, 
-check out the [open issues](https://github.com/redhat-et/microshift/issues). 
-No pull request is too small, we’re pretty sure you might see some typos in the code, 
-so please help us to fix anything you see!
-
+If you’d like to jump right in with MicroShift then check out the [open issues](https://github.com/redhat-et/microshift/issues), pull requests are always welcome. 
 
 ## Documentation
 
 Looking for the docs? Well, look no further; [microshift.io](https://microshift.io) has the answers. 
-If the docs aren’t fulfilling enough, you can add to them by contributing in the [documentation repo](https://github.com/redhat-et/microshift-documentation).
+If you would like to contribute to the documentation pages, check out the [documentation repo](https://github.com/redhat-et/microshift-documentation).
 
 
 ## Issues
