@@ -1,0 +1,50 @@
+# This Dockerfile should not be run directly. Instead, run ./build-aio-dev.sh
+FROM nvcr.io/nvidia/l4t-base:r32.6.1
+
+ARG ARCH=arm64
+
+ARG SOC=t194
+
+USER root
+
+# add l4t repo
+ADD https://repo.download.nvidia.com/jetson/jetson-ota-public.asc /etc/apt/trusted.gpg.d/jetson-ota-public.asc
+RUN chmod 644 /etc/apt/trusted.gpg.d/jetson-ota-public.asc && \
+    apt-get update && apt-get install -y ca-certificates && \
+    echo "deb https://repo.download.nvidia.com/jetson/common r32.6 main" > /etc/apt/sources.list.d/nvidia-container-runtime.list && \
+    echo "deb https://repo.download.nvidia.com/jetson/${SOC} r32.6 main" >> /etc/apt/sources.list.d/nvidia-container-runtime.list && \
+    apt-get update 
+
+RUN apt install -y init curl jq runc iptables conntrack nvidia-container-runtime
+
+# install microshift
+RUN export VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4) && \
+    curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-${ARCH} && \
+    mv microshift-linux-${ARCH} /usr/local/bin/microshift; chmod 755 /usr/local/bin/microshift
+
+# install and config crio
+RUN curl https://raw.githubusercontent.com/cri-o/cri-o/main/scripts/get | bash ; rm /etc/crio/crio.conf.d/* 
+
+COPY 10-nvidia-runtime.conf /etc/crio/crio.conf.d/10-nvidia-runtime.conf
+COPY 01-crio-runc.conf /etc/crio/crio.conf.d/01-crio-runc.conf
+
+# configs used by microshift and crio
+COPY unit /usr/lib/systemd/system/microshift.service
+COPY kubelet-cgroups.conf /etc/systemd/system.conf.d/kubelet-cgroups.conf
+COPY crio-bridge.conf /etc/cni/net.d/100-crio-bridge.conf
+
+# enable systemd units
+RUN systemctl enable microshift.service && \
+    systemctl enable crio 
+
+# install kubectl
+RUN curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/${ARCH}/kubectl" && \
+    chmod +x ./kubectl && \
+    mv ./kubectl /usr/local/bin/kubectl && \
+    sed -i 's|/usr/libexec/crio/conmon|/usr/bin/conmon|' /etc/crio/crio.conf && \
+    sed -e '/mountopt/s/,\?metacopy=on,\?//' -i /etc/containers/storage.conf || true
+
+RUN apt-get install -y vim 
+RUN apt-get install nvidia-container-toolkit -y
+RUN apt-get install -y nvidia-container-csv-visionworks nvidia-container-csv-tensorrt nvidia-container-csv-cudnn nvidia-container-csv-cuda
+CMD [ "/sbin/init" ]
