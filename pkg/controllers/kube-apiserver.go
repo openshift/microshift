@@ -73,6 +73,12 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	// TODO: configure serverOptions directly rather than via cobra
 	s.serverOptions = options.NewServerRunOptions()
 
+	// Get the apiserver port so we can set it as an argument
+	apiServerPort, err := cfg.Cluster.ApiServerPort()
+	if err != nil {
+		return
+	}
+
 	args := []string{
 		//"--openshift-config=" + cfg.DataDir + "/resources/kube-apiserver/config/config.yaml", //TOOD
 		//"--advertise-address=" + ip,
@@ -82,7 +88,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		"--api-audiences=https://kubernetes.svc",
 		"--authorization-mode=Node,RBAC",
 		"--bind-address=0.0.0.0",
-		"--secure-port=6443",
+		"--secure-port=" + apiServerPort,
 		"--client-ca-file=" + caCertFile,
 		"--enable-admission-plugins=NodeRestriction",
 		"--enable-aggregator-routing=true",
