@@ -74,7 +74,8 @@ rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
 ## Deployment Strategies
 
-In production environment MicroShift can be deployed as:
+## [Known Issues](./docs/known-issues.md)
+
 
 1. [Install via an RPM, utilizing a host-provided cri-o runtime and be lifecycle-managed by systemd](https://microshift.io/docs/developer-documentation/build-install-rpm/)
 2. [Install as a container via Podman, utilizing cri-o runtime and be lifecycle-managed by systemd](https://microshift.io/docs/user-documentation/deploying-microshift/containerized/)
@@ -116,7 +117,7 @@ make
 
 Before running MicroShift, the host must first be configured. This can be handled by running
 
-```
+```bash
 CONFIG_ENV_ONLY=true ./install.sh
 ```
 
