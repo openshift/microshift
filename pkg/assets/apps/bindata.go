@@ -191,7 +191,6 @@ spec:
         app: service-ca
         service-ca: "true"
     spec:
-      securityContext: {}
       serviceAccount: service-ca
       serviceAccountName: service-ca
       containers:
@@ -201,8 +200,8 @@ spec:
         command: ["service-ca-operator", "controller"]
         ports:
         - containerPort: 8443
-        # securityContext:
-        #   runAsNonRoot: true
+        securityContext:
+          runAsNonRoot: true
         resources:
           requests:
             memory: 120Mi
