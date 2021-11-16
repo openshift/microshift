@@ -7,7 +7,4 @@ cd src
 set -x
 GOOS=linux GOARCH=$1 CGO_ENABLED=0 \
 GO111MODULE=on GOFLAGS=-mod=vendor \
-go build -o ../bin/coredns-$1 .
-
-
-
+go build -o ../bin/coredns-"$1" .
