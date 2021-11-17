@@ -86,7 +86,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
 		Cluster: ClusterConfig{
-			URL:         "https://127.0.0.1:6443",
+			URL:         "https://" + nodeIP + ":6443",
 			ClusterCIDR: "10.42.0.0/16",
 			ServiceCIDR: "10.43.0.0/16",
 			DNS:         "10.43.0.10",
