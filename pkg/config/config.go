@@ -78,7 +78,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	return &MicroshiftConfig{
 		ConfigFile:      findConfigFile(),
 		DataDir:         findDataDir(),
-		LogDir:          "",
+		LogDir:          "/var/log/microshift/",
 		LogVLevel:       0,
 		LogVModule:      "",
 		LogAlsotostderr: false,
