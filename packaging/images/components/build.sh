@@ -4,7 +4,7 @@ set -e
 # input parameters via env variables
 
 DEST_REGISTRY=${DEST_REGISTRY:-"quay.io/microshift"}
-COMPONENTS=${COMPONENTS:-"base-image pause cli coredns flannel haproxy-router hostpath-provisioner kube-rbac-proxy service-ca-operator"}
+COMPONENTS=${COMPONENTS:-"base-image pause cli coredns flannel flannel-cni haproxy-router hostpath-provisioner kube-rbac-proxy service-ca-operator"}
 ARCHITECTURES=${ARCHITECTURES:-"amd64 arm64 arm ppc64le riscv64"}
 PUSH=${PUSH:-no}
 PARALLEL=${PARALLEL:-yes}
@@ -112,6 +112,7 @@ function build_multiarch_image {
   else
       for ARCH in ${ARCHITECTURES}
       do
+        ARCH_IMAGE="${MULTIARCH_MANIFEST}-${ARCH}"
         echo ""
         echo -e "${GRAY}> preparing arch image ${ARCH_IMAGE} ${CLEAR}"
         build_arch_image |& sed "s/^/[${COMPONENT}:${ARCH}] /"
@@ -158,9 +159,9 @@ function build_using_dockerfile {
    BUILD_ARGS="${BUILD_ARGS} --build-arg REGISTRY=${DEST_REGISTRY} --build-arg OKD_TAG=${OKD_BASE_TAG}"
 
 
-   buildah build-using-dockerfile --override-arch "${ARCH}" "$BUILD_ARGS" . || \
+   buildah build-using-dockerfile --override-arch "${ARCH}" $BUILD_ARGS . || \
       if [ "${ARCH}" == arm ]; then # fedora registry uses armhfp instead for arm (arm32 with floating point)
-              buildah build-using-dockerfile --override-arch "armhfp" "$BUILD_ARGS" .
+              buildah build-using-dockerfile --override-arch "armhfp" $BUILD_ARGS .
       fi
 
 }
