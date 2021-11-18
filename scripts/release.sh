@@ -144,11 +144,24 @@ stage_release_image_binaries() {
   echo "$dest"
 }
 
+build_aio_container_images_artifacts() {
+  (
+    cd "$ROOT"
+    make build-containerized-all-in-one-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO="$AIO_IMAGE_REPO"
+  ) || return 1
+}
+
 build_container_images_artifacts() {
   (
     cd "$ROOT"
     make build-containerized-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO="$IMAGE_REPO"
   ) || return 1
+}
+
+push_aio_container_image_artifacts() {
+  for t in "${AIO_RELEASE_IMAGE_TAGS[@]}"; do
+    podman push "$t"
+  done
 }
 
 push_container_image_artifacts() {
@@ -237,12 +250,15 @@ QUAY_OWNER=${QUAY_OWNER:="microshift"}
 API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
+AIO_IMAGE_REPO="quai.io/$QUAY_OWNER/microsift-aio"
 RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
+AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-arm64" )
 
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
 
 build_container_images_artifacts                                      || exit 1
+build_aio_container_images_artifacts                                  || exit 1
 STAGE_DIR=$(stage_release_image_binaries)                             || exit 1
 push_container_image_artifacts                                        || exit 1
 push_container_manifest                                               || exit 1
