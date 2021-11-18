@@ -183,7 +183,7 @@ build-containerized-cross-build:
 build-containerized-all-in-one-cross-build:
 	+$(MAKE) build-containerized-all-in-one-amd64
 	+$(MAKE) build-containerized-all-in-one-arm64
-.PHONY build-containerized-all-in-one-cross-build
+.PHONY: build-containerized-all-in-one-cross-build
 
 build-containerized-all-in-one-amd64:
 	+$(MAKE) _build_containerized_aio ARCH=amd64
