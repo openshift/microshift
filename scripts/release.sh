@@ -149,7 +149,7 @@ stage_release_image_binaries() {
 build_aio_container_images_artifacts() {
   (
     cd "$ROOT"
-    make build-containerized-all-in-one-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO="$AIO_IMAGE_REPO"
+    make build-containerized-all-in-one-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO_AIO="$AIO_IMAGE_REPO"
   ) || return 1
 }
 
@@ -258,7 +258,7 @@ QUAY_OWNER=${QUAY_OWNER:="microshift"}
 API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
-AIO_IMAGE_REPO="quai.io/$QUAY_OWNER/microsift-aio"
+AIO_IMAGE_REPO="quay.io/$QUAY_OWNER/microshift-aio"
 RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
 AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-arm64" )
 
