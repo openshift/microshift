@@ -176,7 +176,7 @@ podman_create_manifest(){
   local dest_repo="$1"
   local image_tags="$2"
   podman manifest create "$dest_repo:$VERSION" >&2
-  for ref in "${image_tags[@]}"; do
+  for ref in "${image_tags[*]}"; do
     podman manifest add "$dest_repo:$VERSION" "docker://$ref"
   done
     podman manifest push "$dest_repo:$VERSION" "$dest_repo:$VERSION"
@@ -187,7 +187,7 @@ docker_create_manifest(){
   local dest_repo="$1"
   local image_tags="$2"
   # use docker cli directly for clarity, as this is a docker-only func
-  docker manifest create "$dest_repo:$VERSION" "${image_tags[@]}" >&2
+  docker manifest create "$dest_repo:$VERSION" "${image_tags[*]}" >&2
   docker tag "$dest_repo:$VERSION" "$dest_repo:latest"
   docker manifest push "$dest_repo:$VERSION"
   docker manifest push "$dest_repo:latest"
@@ -198,13 +198,13 @@ docker_create_manifest(){
 # to be passed at creation. Podman also requires a prefixed "container-transport", which is
 # no recognized by docker, causing the command to fail.
 push_container_manifest() {
-  local images_tags="$1"
-  local dest_repo="$2"
+  local dest_repo="$1"
+  local image_tags="$2"
   local cli="$(alias podman)"
   if [[ "${cli#*=}" =~ docker ]]; then
-    docker_create_manifest
+    docker_create_manifest "$dest_repo" "$image_tags[*]"
   else
-    podman_create_manifest
+    podman_create_manifest "$dest_repo" "$image_tags[*]"
   fi
 }
 
