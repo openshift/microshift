@@ -19,7 +19,6 @@ sudo bash -c '
     systemctl disable microshift-containerized 2>/dev/null
     podman stop microshift 2>/dev/null
     podman stop microshift-aio 2>/dev/null
-    set -e
 
     echo "Removing crio pods"
     until crictl rmp --all --force 1>/dev/null; do sleep 1; done
