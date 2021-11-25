@@ -8,8 +8,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 
+	"github.com/openshift/apiserver-library-go/pkg/labelselector"
 	oapi "github.com/openshift/openshift-apiserver/pkg/api"
-	"github.com/openshift/openshift-apiserver/pkg/apiserver/labelselector"
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
 )
 

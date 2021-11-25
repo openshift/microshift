@@ -22,10 +22,8 @@ func newRemoteAuthenticator(tokenReview authenticationclient.TokenReviewInterfac
 	authenticators := []authenticator.Request{}
 
 	// TODO audiences
-	// Upstream kubernetes/apiserver introduced timeouts in https://github.com/kubernetes/kubernetes/pull/100959.
-	// This change is included in v0.20.9 (used by openshift-controller-manager) but not v0.20.4 (used by openshift-apiserver).
-	// Breaking the tie by reverting 4ff13dee21a76d7bd107426f18b0e560aa2c94ed.
-	tokenAuthenticator, err := webhooktoken.NewFromInterface(tokenReview, nil, *webhooktoken.DefaultRetryBackoff())
+	TokenAccessReviewTimeout := 10 * time.Second
+	tokenAuthenticator, err := webhooktoken.NewFromInterface(tokenReview, nil, *webhooktoken.DefaultRetryBackoff(), TokenAccessReviewTimeout)
 	if err != nil {
 		return nil, err
 	}

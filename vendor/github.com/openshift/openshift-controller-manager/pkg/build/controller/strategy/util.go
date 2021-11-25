@@ -289,6 +289,14 @@ func addOutputEnvVars(buildOutput *corev1.ObjectReference, output *[]corev1.EnvV
 	return nil
 }
 
+// addTrustedCAMountEnvVar sets the BUILD_MOUNT_ETC_PKI_CATRUST environment variable if the build
+// pod needs the CA trust bundle (`/etc/pki/ca-trust`) mounted into build processes.
+func addTrustedCAMountEnvVar(mountTrustedCA *bool, envVars *[]corev1.EnvVar) {
+	if mountTrustedCA != nil {
+		*envVars = append(*envVars, corev1.EnvVar{Name: "BUILD_MOUNT_ETC_PKI_CATRUST", Value: strconv.FormatBool(*mountTrustedCA)})
+	}
+}
+
 // setupActiveDeadline sets up the Pod activeDeadlineSeconds field
 func setupActiveDeadline(pod *corev1.Pod, build *buildv1.Build) *corev1.Pod {
 	if build.Spec.CompletionDeadlineSeconds != nil {
@@ -356,7 +364,8 @@ func copyEnvVarSlice(in []corev1.EnvVar) []corev1.EnvVar {
 }
 
 // setupContainersConfigs sets up volumes for mounting the node's configuration which governs which
-// registries it knows about, whether or not they should be accessed with TLS, and signature policies.
+// registries it knows about, whether or not they should be accessed with TLS, signature policies,
+// and default bind mounts for buildah.
 func setupContainersConfigs(build *buildv1.Build, pod *corev1.Pod) {
 	const volumeName = "build-system-configs"
 	const configDir = ConfigMapBuildSystemConfigsMountPath

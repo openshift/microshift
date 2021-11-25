@@ -17,12 +17,12 @@ package controllers
 
 import (
 	"context"
+	"io/ioutil"
 	"strings"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/sirupsen/logrus"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -36,7 +36,7 @@ import (
 	apiregistrationclientv1 "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/typed/apiregistration/v1"
 )
 
-func createAPIHeadlessSvc(cfg *config.MicroshiftConfig) error {
+func createAPIHeadlessSvc(cfg *config.MicroshiftConfig, svcName string, svcPort int) error {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig) error {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "openshift-apiserver",
+			Name:      svcName,
 			Namespace: "default",
 		},
 		Spec: corev1.ServiceSpec{
@@ -76,7 +76,7 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig) error {
 				APIVersion: "v1",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "openshift-apiserver",
+				Name:      svcName,
 				Namespace: "default",
 			},
 		}
@@ -90,7 +90,7 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig) error {
 			addr := sub.Addresses
 			ports := []corev1.EndpointPort{
 				{
-					Port: 8444, // ocp apiserver port
+					Port: int32(svcPort),
 				},
 			}
 			subsets = append(subsets,
@@ -119,6 +119,10 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 	if err != nil {
 		return err
 	}
+	caFile, err := ioutil.ReadFile(cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt")
+	if err != nil {
+		logrus.Errorf("Error loading CA bundle certificate: %v", err)
+	}
 	client := apiregistrationclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "apiregistration-agent"))
 	for _, apiSvc := range []string{
 		"v1.apps.openshift.io",
@@ -126,7 +130,6 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 		"v1.build.openshift.io",
 		"v1.image.openshift.io",
 		//"v1.oauth.openshift.io", //TODO check if they exist
-		//"v1.user.openshift.io"
 		"v1.project.openshift.io",
 		"v1.quota.openshift.io",
 		"v1.route.openshift.io",
@@ -146,17 +149,47 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 					Name:      "openshift-apiserver",
 					Namespace: "default",
 				},
-				Group:                 trimFirst(apiSvc, "."),
-				GroupPriorityMinimum:  9900,
-				Version:               "v1",
-				InsecureSkipTLSVerify: true,
-				VersionPriority:       15,
+				Group:                trimFirst(apiSvc, "."),
+				GroupPriorityMinimum: 9900,
+				Version:              "v1",
+				CABundle:             caFile,
+				VersionPriority:      15,
 			},
 		}
 		_, err = client.APIServices().Get(context.TODO(), api.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			logrus.Infof("creating api registration %s", api.Name)
 			_, _ = client.APIServices().Create(context.TODO(), api, metav1.CreateOptions{})
+		}
+	}
+
+	for _, oauthApiSvc := range []string{
+		"v1.user.openshift.io",
+	} {
+		oauthApi := &apiregistrationv1.APIService{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "APIService",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: oauthApiSvc,
+			},
+			Spec: apiregistrationv1.APIServiceSpec{
+				Service: &apiregistrationv1.ServiceReference{
+					Name:      "openshift-oauth-apiserver",
+					Namespace: "default",
+				},
+				Group:                trimFirst(oauthApiSvc, "."),
+				GroupPriorityMinimum: 9900,
+				Version:              "v1",
+				CABundle:             caFile,
+				VersionPriority:      15,
+			},
+		}
+		_, err = client.APIServices().Get(context.TODO(), oauthApi.Name, metav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			logrus.Infof("creating api registration %s", oauthApi.Name)
+			_, _ = client.APIServices().Create(context.TODO(), oauthApi, metav1.CreateOptions{})
 		}
 	}
 	return nil

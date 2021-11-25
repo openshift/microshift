@@ -69,9 +69,7 @@ func createAggregatorConfig(
 	genericConfig.RESTOptionsGetter = nil
 	// prevent generic API server from installing the OpenAPI handler. Aggregator server
 	// has its own customized OpenAPI handler.
-	// This field is included in 0.20.9, but not in 0.20.4 (used by openshift-apiserver).
-	// Breaking the tie by reverting it.
-	//genericConfig.SkipOpenAPIInstallation = true
+	genericConfig.SkipOpenAPIInstallation = true
 
 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.StorageVersionAPI) &&
 		utilfeature.DefaultFeatureGate.Enabled(genericfeatures.APIServerIdentity) {
@@ -96,8 +94,8 @@ func createAggregatorConfig(
 	// copy the etcd options so we don't mutate originals.
 	etcdOptions := *commandOptions.Etcd
 	etcdOptions.StorageConfig.Paging = utilfeature.DefaultFeatureGate.Enabled(features.APIListChunking)
-	etcdOptions.StorageConfig.Codec = aggregatorscheme.Codecs.LegacyCodec(v1beta1.SchemeGroupVersion, v1.SchemeGroupVersion)
-	etcdOptions.StorageConfig.EncodeVersioner = runtime.NewMultiGroupVersioner(v1beta1.SchemeGroupVersion, schema.GroupKind{Group: v1beta1.GroupName})
+	etcdOptions.StorageConfig.Codec = aggregatorscheme.Codecs.LegacyCodec(v1.SchemeGroupVersion, v1beta1.SchemeGroupVersion)
+	etcdOptions.StorageConfig.EncodeVersioner = runtime.NewMultiGroupVersioner(v1.SchemeGroupVersion, schema.GroupKind{Group: v1beta1.GroupName})
 	genericConfig.RESTOptionsGetter = &genericoptions.SimpleRestOptionsFactory{Options: etcdOptions}
 
 	// override MergedResourceConfig with aggregator defaults and registry
@@ -267,6 +265,7 @@ var apiVersionPriorities = map[schema.GroupVersion]priority{
 	{Group: "networking.k8s.io", Version: "v1"}:                  {group: 17200, version: 15},
 	{Group: "networking.k8s.io", Version: "v1beta1"}:             {group: 17200, version: 9},
 	{Group: "extensions", Version: "v1beta1"}:                    {group: 17150, version: 1}, // prioritize below networking.k8s.io, which contains the GA version of Ingress, the only resource remaining in extensions/v1beta1
+	{Group: "policy", Version: "v1"}:                             {group: 17100, version: 15},
 	{Group: "policy", Version: "v1beta1"}:                        {group: 17100, version: 9},
 	{Group: "rbac.authorization.k8s.io", Version: "v1"}:          {group: 17000, version: 15},
 	{Group: "rbac.authorization.k8s.io", Version: "v1beta1"}:     {group: 17000, version: 12},
@@ -286,8 +285,8 @@ var apiVersionPriorities = map[schema.GroupVersion]priority{
 	{Group: "node.k8s.io", Version: "v1"}:                        {group: 16300, version: 15},
 	{Group: "node.k8s.io", Version: "v1alpha1"}:                  {group: 16300, version: 1},
 	{Group: "node.k8s.io", Version: "v1beta1"}:                   {group: 16300, version: 9},
+	{Group: "discovery.k8s.io", Version: "v1"}:                   {group: 16200, version: 15},
 	{Group: "discovery.k8s.io", Version: "v1beta1"}:              {group: 16200, version: 12},
-	{Group: "discovery.k8s.io", Version: "v1alpha1"}:             {group: 16200, version: 9},
 	{Group: "flowcontrol.apiserver.k8s.io", Version: "v1beta1"}:  {group: 16100, version: 12},
 	{Group: "flowcontrol.apiserver.k8s.io", Version: "v1alpha1"}: {group: 16100, version: 9},
 	{Group: "internal.apiserver.k8s.io", Version: "v1alpha1"}:    {group: 16000, version: 9},

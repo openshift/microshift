@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
-	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/kustomize"
@@ -31,7 +30,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "run",
-		Short: "Run Microshift",
+		Short: "Run MicroShift",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return RunMicroshift(cfg, cmd.Flags())
 		},
@@ -43,7 +42,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	cmd.MarkFlagFilename("config", "yaml", "yml")
 	// All other flags will be read after reading both config file and env vars.
 	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
-	flags.StringSlice("roles", cfg.Roles, "Roles of this Microshift instance.")
+	flags.StringSlice("roles", cfg.Roles, "Roles of this MicroShift instance.")
 
 	return cmd
 }
@@ -55,7 +54,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	// fail early if we don't have enough privileges
 	if config.StringInList("node", cfg.Roles) && os.Geteuid() > 0 {
-		logrus.Fatalf("Microshift must be run privileged for role 'node'")
+		logrus.Fatalf("MicroShift must be run privileged for role 'node'")
 	}
 
 	os.MkdirAll(cfg.DataDir, 0700)
@@ -72,24 +71,13 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
 		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
 		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
-		// util.Must(m.AddService(controllers.NewOpenShiftPrepJob()))
-		// util.Must(m.AddService(controllers.NewOpenShiftAPIServer()))
 		util.Must(m.AddService(controllers.NewOpenShiftControllerManager(cfg)))
-		// util.Must(m.AddService(controllers.NewOpenShiftAPIComponents()))
-		// util.Must(m.AddService(controllers.NewInfrastructureServices()))
+		util.Must(m.AddService(controllers.NewOpenShiftPrepJob(cfg)))
+		util.Must(m.AddService(controllers.NewOpenShiftAPIServer(cfg)))
+		util.Must(m.AddService(controllers.NewOpenShiftOAuth(cfg)))
 
-		util.Must(m.AddService(servicemanager.NewGenericService(
-			"other-controlplane",
-			[]string{"kube-apiserver"},
-			func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-				defer close(stopped)
-				defer close(ready)
-
-				startControllerOnly(cfg)
-
-				return nil
-			},
-		)))
+		util.Must(m.AddService(controllers.NewOpenShiftAPIComponents(cfg)))
+		util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
 		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	}
 
@@ -98,7 +86,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
 	}
 
-	logrus.Info("Starting Microshift")
+	logrus.Info("Starting MicroShift")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ready, stopped := make(chan struct{}), make(chan struct{})
@@ -133,26 +121,5 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		logrus.Info("Timed out waiting for services to stop.")
 	}
 	logrus.Info("MicroShift stopped.")
-	return nil
-}
-
-func startControllerOnly(cfg *config.MicroshiftConfig) error {
-	if err := controllers.PrepareOCP(cfg); err != nil {
-		return err
-	}
-
-	logrus.Infof("starting openshift-apiserver")
-	controllers.OCPAPIServer(cfg)
-
-	//TODO: cloud provider
-	// controllers.OCPControllerManager(cfg)
-
-	if err := controllers.StartOCPAPIComponents(cfg); err != nil {
-		return err
-	}
-
-	if err := components.StartComponents(cfg); err != nil {
-		return err
-	}
 	return nil
 }

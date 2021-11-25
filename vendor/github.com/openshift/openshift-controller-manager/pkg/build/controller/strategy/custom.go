@@ -61,6 +61,7 @@ func (bs *CustomBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 	if build.Spec.Source.Git != nil {
 		addSourceEnvVars(build.Spec.Source, &containerEnv)
 	}
+	addTrustedCAMountEnvVar(build.Spec.MountTrustedCA, &containerEnv)
 
 	if build.Spec.Output.To != nil {
 		addOutputEnvVars(build.Spec.Output.To, &containerEnv)

@@ -10,7 +10,6 @@ import (
 	kappsv1beta2 "k8s.io/api/apps/v1beta2"
 	kbatchv1 "k8s.io/api/batch/v1"
 	kbatchv1beta1 "k8s.io/api/batch/v1beta1"
-	kbatchv2alpha1 "k8s.io/api/batch/v2alpha1"
 	kapiv1 "k8s.io/api/core/v1"
 	kmetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -82,8 +81,8 @@ func RunImageTriggerController(ctx *ControllerContext) (bool, error) {
 	})
 	sources = append(sources, imagetriggercontroller.TriggerSource{
 		Resource:  schema.GroupResource{Group: "batch", Resource: "cronjobs"},
-		Informer:  ctx.KubernetesInformers.Batch().V1beta1().CronJobs().Informer(),
-		Store:     ctx.KubernetesInformers.Batch().V1beta1().CronJobs().Informer().GetIndexer(),
+		Informer:  ctx.KubernetesInformers.Batch().V1().CronJobs().Informer(),
+		Store:     ctx.KubernetesInformers.Batch().V1().CronJobs().Informer().GetIndexer(),
 		TriggerFn: triggerannotations.NewAnnotationTriggerIndexer,
 		Reactor:   &triggerutil.AnnotationReactor{Updater: updater},
 	})
@@ -128,11 +127,11 @@ func (u podSpecUpdater) Update(obj runtime.Object) error {
 	case *kbatchv1.Job:
 		_, err := u.kclient.BatchV1().Jobs(t.Namespace).Update(context.TODO(), t, kmetav1.UpdateOptions{})
 		return err
+	case *kbatchv1.CronJob:
+		_, err := u.kclient.BatchV1().CronJobs(t.Namespace).Update(context.TODO(), t, kmetav1.UpdateOptions{})
+		return err
 	case *kbatchv1beta1.CronJob:
 		_, err := u.kclient.BatchV1beta1().CronJobs(t.Namespace).Update(context.TODO(), t, kmetav1.UpdateOptions{})
-		return err
-	case *kbatchv2alpha1.CronJob:
-		_, err := u.kclient.BatchV2alpha1().CronJobs(t.Namespace).Update(context.TODO(), t, kmetav1.UpdateOptions{})
 		return err
 	case *kapiv1.Pod:
 		_, err := u.kclient.CoreV1().Pods(t.Namespace).Update(context.TODO(), t, kmetav1.UpdateOptions{})
@@ -166,7 +165,7 @@ func RunImageImportController(ctx *ControllerContext) (bool, error) {
 		ctx.ClientBuilder.OpenshiftImageClientOrDie(infraImageImportControllerServiceAccountName),
 		informer,
 	)
-	go controller.Run(5, ctx.Stop)
+	go controller.Run(50, ctx.Stop)
 
 	// TODO control this using enabled and disabled controllers
 	if ctx.OpenshiftControllerConfig.ImageImport.DisableScheduledImport {

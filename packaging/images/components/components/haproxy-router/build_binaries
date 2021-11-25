@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+
+mkdir -p bin
+
+cd src
+export SOURCE_GIT_TAG=$(git describe --tags)
+
+if [ "x$1" == "xriscv64" ]; then
+  git apply ../../kube-rbac-proxy/0001-workaround-riscv64.patch
+fi
+
+set -x
+GO111MODULE=on GOOS=linux GOARCH=$1 GOFLAGS="-mod=vendor" \
+make build
+set +x
+
+cp openshift-router ../bin/openshift-router-"$1"
+
+if [ "x$1" == "xriscv64" ]; then
+  git stash
+fi

@@ -1,5 +1,6 @@
 _output/*
 /microshift
+packaging/rpm/_rpmbuild/
 bin
 .idea/
 .vscode/

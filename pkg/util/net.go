@@ -19,6 +19,7 @@ import (
 	"crypto/tls"
 	tcpnet "net"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -70,4 +71,13 @@ func RetryTCPConnection(host string, port string) bool {
 		logrus.Warningf("Endpoint is not returning any status code")
 	}
 	return status
+}
+
+func CreateLocalhostListenerOnPort(port int) (tcpnet.Listener, error) {
+	ln, err := tcpnet.Listen("tcp", "0.0.0.0:"+strconv.Itoa(port))
+	if err != nil {
+		return nil, err
+	}
+
+	return ln, nil
 }

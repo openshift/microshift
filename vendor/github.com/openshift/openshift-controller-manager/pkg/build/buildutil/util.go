@@ -7,6 +7,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation"
 	v1lister "k8s.io/client-go/listers/core/v1"
 	"k8s.io/klog/v2"
@@ -274,4 +275,33 @@ func LabelValue(name string) string {
 	}
 	klog.Warningf("In creating the value of the build label in the build pod, several attempts at manipulating %s to meet k8s label name requirements failed", name)
 	return name
+}
+
+func fromMatch(from1 k8stypes.NamespacedName, from2 k8stypes.NamespacedName) bool {
+	return from1.Namespace == from2.Namespace && from1.Name == from2.Name
+}
+
+// GetImageChangeTriggerStatusForImageChangeTrigger returns the ImageChangeTrigger entry in status that corresponds
+// to the supplied ImageChangeTrigger entry in the spec.
+func GetImageChangeTriggerStatusForImageChangeTrigger(triggerSpec *buildv1.ImageChangeTrigger, bc *buildv1.BuildConfig) *buildv1.ImageChangeTriggerStatus {
+	if bc.Status.ImageChangeTriggers == nil || len(bc.Status.ImageChangeTriggers) == 0 {
+		return nil
+	}
+	specFrom := k8stypes.NamespacedName{}
+	if triggerSpec.From != nil {
+		specFrom.Namespace = triggerSpec.From.Namespace
+		specFrom.Name = triggerSpec.From.Name
+	} else {
+		strategyFrom := buildutil.GetInputReference(bc.Spec.Strategy)
+		if strategyFrom != nil && strategyFrom.Kind == "ImageStreamTag" {
+			specFrom.Namespace = strategyFrom.Namespace
+			specFrom.Name = strategyFrom.Name
+		}
+	}
+	for _, ict := range bc.Status.ImageChangeTriggers {
+		if fromMatch(specFrom, k8stypes.NamespacedName{Namespace: ict.From.Namespace, Name: ict.From.Name}) {
+			return &ict
+		}
+	}
+	return nil
 }

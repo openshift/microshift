@@ -618,7 +618,7 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 
 // Decorate decorates stream.Status.DockerImageRepository using the logic from
 // dockerImageRepository().
-func (s Strategy) Decorate(obj runtime.Object) error {
+func (s Strategy) Decorate(obj runtime.Object) {
 	switch t := obj.(type) {
 	case *imageapi.ImageStream:
 		t.Status.DockerImageRepository = s.dockerImageRepository(context.TODO(), t, true)
@@ -633,7 +633,6 @@ func (s Strategy) Decorate(obj runtime.Object) error {
 		// This was not an object we can decorate.  This is not an error, as the
 		// caching layer can pass through here, too.
 	}
-	return nil
 }
 
 type StatusStrategy struct {

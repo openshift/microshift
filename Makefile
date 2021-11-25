@@ -14,12 +14,12 @@ include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/
 export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
 
-RELEASE_BASE := 4.7.0
+RELEASE_BASE := 4.8.0
 RELEASE_PRE := ${RELEASE_BASE}-0.microshift
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
-SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' || echo '4.7.0-0.microshift-unknown')
+SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' || echo '4.8.0-0.microshift-unknown')
 
 SRC_ROOT :=$(shell pwd)
 
@@ -30,20 +30,22 @@ CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 ARCH :=$(shell uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
+IPTABLES :=nft
 
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
 
 GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
-                   -X k8s.io/component-base/version.gitMinor=20 \
-                   -X k8s.io/component-base/version.gitVersion=v1.20.1 \
-                   -X k8s.io/component-base/version.gitCommit=5feb30e1bd3620 \
+                   -X k8s.io/component-base/version.gitMajor=1 \
+                   -X k8s.io/component-base/version.gitMinor=21 \
+                   -X k8s.io/component-base/version.gitVersion=v1.21.0 \
+                   -X k8s.io/component-base/version.gitCommit=c3b9e07a \
                    -X k8s.io/component-base/version.gitTreeState=clean \
                    -X k8s.io/component-base/version.buildDate=$(BIN_TIMESTAMP) \
                    -X k8s.io/client-go/pkg/version.gitMajor=1 \
-                   -X k8s.io/client-go/pkg/version.gitMinor=20 \
-                   -X k8s.io/client-go/pkg/version.gitVersion=v1.20.1 \
-                   -X k8s.io/client-go/pkg/version.gitCommit=5feb30e1bd3620 \
+                   -X k8s.io/client-go/pkg/version.gitMinor=21 \
+                   -X k8s.io/client-go/pkg/version.gitVersion=v1.21.1 \
+                   -X k8s.io/client-go/pkg/version.gitCommit=b09a9ce3 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    -X github.com/openshift/microshift/pkg/version.versionFromGit=$(SOURCE_GIT_TAG) \
@@ -67,7 +69,11 @@ microshift: build-containerized-cross-build-linux-amd64
 microshift-aio: build-containerized-all-in-one-amd64
 .PHONY: microshift-aio
 
-update: update-generated-completions
+update-bindata:
+	./scripts/bindata.sh
+.PHONY: update-bindata
+
+update: update-bindata
 .PHONY: update
 
 ###############################
@@ -149,6 +155,7 @@ _build_containerized:
 		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
 		--build-arg ARCH=$(ARCH) \
 		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
+		--build-arg FROM_SOURCE=$(FROM_SOURCE) \
 		--platform="linux/$(ARCH)" \
 		.
 .PHONY: _build_containerized
@@ -156,13 +163,14 @@ _build_containerized:
 _build_containerized_aio:
 	@if [ -z '$(CTR_CMD)' ] ; then echo '!! ERROR: containerized builds require podman||docker CLI, none found $$PATH' >&2 && exit 1; fi
 	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
-	$(CTR_CMD) build -t $(IMAGE_REPO_AIO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
+	$(CTR_CMD) build -t $(IMAGE_REPO_AIO):$(SOURCE_GIT_TAG)-linux-$(IPTABLES)-$(ARCH) \
 		-f "$(SRC_ROOT)"/packaging/images/microshift-aio/Dockerfile \
 		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
 		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
 		--build-arg ARCH=$(ARCH) \
 		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
 		--build-arg FROM_SOURCE=$(FROM_SOURCE) \
+		--build-arg IPTABLES=$(IPTABLES) \
 		--platform="linux/$(ARCH)" \
 		.
 .PHONY: _build_containerized_aio
@@ -192,6 +200,11 @@ build-containerized-all-in-one-amd64:
 build-containerized-all-in-one-arm64:
 	+$(MAKE) _build_containerized_aio ARCH=arm64
 .PHONY: build-containerized-all-in-one
+
+build-containerized-all-in-one-iptables-arm64:
+	+$(MAKE) _build_containerized_aio ARCH=arm64 IPTABLES=iptables
+.PHONY: build-containerized-all-in-one-iptables-arm64
+
 ###############################
 # dev targets                 #
 ###############################

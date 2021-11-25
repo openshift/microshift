@@ -93,6 +93,16 @@ type CommonSpec struct {
 	// If set to an empty map or a map with any values, default build nodeselector values
 	// are ignored.
 	NodeSelector map[string]string
+
+	// MountTrustedCA bind mounts the cluster's trusted certificate authorities, as defined in
+	// the cluster's proxy configuration, into the build. This lets processes within a build trust
+	// components signed by custom PKI certificate authorities, such as private artifact
+	// repositories and HTTPS proxies.
+	//
+	// When this field is set to true, the contents of `/etc/pki/ca-trust` within the build are
+	// managed by the build container, and any changes to this directory or its subdirectories (for
+	// example - within a Dockerfile `RUN` instruction) are not persisted in the build's output image.
+	MountTrustedCA *bool
 }
 
 const (
@@ -798,6 +808,8 @@ type DockerBuildStrategy struct {
 
 	// Args contains any build arguments that are to be passed to Docker.  See
 	// https://docs.docker.com/engine/reference/builder/#/arg for more details
+	// NOTE: Only the 'name' and 'value' fields are supported. Any settings on the 'valueFrom' field
+	// are ignored.
 	BuildArgs []kapi.EnvVar
 
 	// ForcePull describes if the builder should pull the images from registry prior to building.
@@ -1035,6 +1047,11 @@ const (
 type BuildConfigStatus struct {
 	// LastVersion is used to inform about number of last triggered build.
 	LastVersion int64
+
+	// ImageChangeTriggers captures the runtime state of any ImageChangeTrigger specified in the BuildConfigSpec,
+	// including the value reconciled by the OpenShift APIServer for the lastTriggeredImageID. There is a single entry
+	// in this array for each image change trigger in spec. Each trigger status references the ImageStreamTag that acts as the source of the trigger.
+	ImageChangeTriggers []ImageChangeTriggerStatus
 }
 
 // SecretLocalReference contains information that points to the local secret being used
@@ -1074,6 +1091,32 @@ type ImageChangeTrigger struct {
 
 	// Paused is true if this trigger is temporarily disabled. Optional.
 	Paused bool
+}
+
+// ImageStreamTagReference captures the required elements for identifying the ImageStreamTag referenced by the more
+// generic ObjectReference BuildTriggerPolicy.ImageChange.From.  It is used by ImageChangeTriggerStatus, where a
+// specific instance of ImageChangeTriggerStatus in maintained in BuildConfigStatus.ImageChangeTriggers for each entry
+// in the BuildConfigSpec.Triggers array where the BuildTriggerPolicy.ImageChange pointer is set to a non-nil value
+type ImageStreamTagReference struct {
+	// namespace is the namespace where the ImageStreamTag used for an ImageChangeTrigger is located
+	Namespace string
+
+	// name is the name of the ImageStreamTag used for an ImageChangeTrigger
+	Name string
+}
+
+// ImageChangeTriggerStatus tracks the latest resolved status of the associated ImageChangeTrigger policy specified in the BuildConfigSpec.Triggers struct.
+type ImageChangeTriggerStatus struct {
+	// lastTriggeredImageID represents the sha/id of the ImageStreamTag when a Build for this BuildConfig was started.
+	// The lastTriggeredImageID is updated each time a Build for this BuildConfig is started, even if this ImageStreamTag is not the reason the Build is started.
+	LastTriggeredImageID string
+
+	// from is the ImageStreamTag that is the source of the trigger.
+	From ImageStreamTagReference
+
+	// lastTriggerTime is the last time this particular ImageStreamTag triggered a Build to start.
+	// This field is only updated when this trigger specifically started a Build.
+	LastTriggerTime metav1.Time
 }
 
 // BuildTriggerPolicy describes a policy for a single trigger that results in a new Build.

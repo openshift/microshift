@@ -1,6 +1,6 @@
-# Containerized Microshift With GPU Support and Kubectl 
+# Containerized MicroShift With GPU Support and Kubectl 
 
-## Run Microshift All-In-One as a Systemd Service
+## Run MicroShift All-In-One as a Systemd Service
 
 Copy microshift-aio unit file to /etc/systemd and the aio run script to /usr/bin
 
@@ -109,4 +109,4 @@ TAG="quay.io/myname/myrepo:dev" ./hack/build-aio-dev.sh
 ## Limitation
 
 These instructions are tested on Linux, Mac, and Windows. 
-On MacOS, running containerized Microshift as non-root is not supported on MacOS.
+On MacOS, running containerized MicroShift as non-root is not supported on MacOS.

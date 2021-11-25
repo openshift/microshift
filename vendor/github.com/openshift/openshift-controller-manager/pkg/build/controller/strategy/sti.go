@@ -44,6 +44,7 @@ func (bs *SourceBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 	}
 
 	addSourceEnvVars(build.Spec.Source, &containerEnv)
+	addTrustedCAMountEnvVar(build.Spec.MountTrustedCA, &containerEnv)
 
 	strategy := build.Spec.Strategy.SourceStrategy
 	if len(strategy.Env) > 0 {

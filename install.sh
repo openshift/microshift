@@ -39,6 +39,36 @@ get_os_version() {
     OS_VERSION=$(egrep '^(VERSION_ID)=' /etc/os-release | sed 's/"//g' | cut -f2 -d"=")
 }
 
+# Function to check system prerequisites
+pre-check-installation(){
+    mem_threshold='1024'
+    disk_threshold='2048'
+    numCPU_threshold='2'
+    
+    numCPU=$(nproc --all)
+    if [ $numCPU -lt $numCPU_threshold ]; then
+        echo "Warning: Pre-Install check number of CPUs cores less than recommended number: $numCPU_threshold"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+
+    mem_free=$(free -m | grep "Mem" | awk '{print $4+$6}')
+    if [ $mem_free -lt $mem_threshold ]
+    then
+        echo "Warning: Pre-Install check MEM usage less than recommended number: $mem_threshold"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+
+    disk_free=$(df -m | grep /$ | grep -v -E '(tmp|boot)' | awk '{print $4}')
+    if [ $disk_free -lt $disk_threshold ]
+    then
+        echo "Warning: Pre-Install check DISK usage less than recommended number: $disk_threshold"
+        #uncomment this line to exit on error. By now informative only
+        #exit 1
+    fi
+}
+
 # If RHEL, use subscription-manager to register
 register_subs() {
     set +e +o pipefail
@@ -68,6 +98,16 @@ build_selinux_policy() {
     curl -L -o /tmp/microshift.te https://raw.githubusercontent.com/redhat-et/microshift/main/packaging/selinux/microshift.te
     make -f /usr/share/selinux/devel/Makefile -C /tmp
     sudo dnf -y remove selinux-policy-devel
+    if [ "$DISTRO" != "ubuntu" ]; then
+        sudo mkdir -p /var/run/flannel
+        sudo mkdir -p /var/run/kubelet
+        sudo mkdir -p /var/lib/kubelet/pods
+        sudo mkdir -p /var/run/secrets/kubernetes.io/serviceaccount
+        sudo mkdir -p /var/hpvolumes
+        sudo semodule -i /tmp/microshift.pp
+        sudo restorecon -v /var/hpvolumes
+	sudo restorecon -vR /var/lib/kubelet/pods
+    fi
 }
 
 # Install dependencies
@@ -92,6 +132,8 @@ establish_firewall () {
     sudo firewall-cmd --zone=public --permanent --add-port=30000-32767/tcp
     sudo firewall-cmd --zone=public --permanent --add-port=2379-2380/tcp
     sudo firewall-cmd --zone=public --add-masquerade --permanent
+    sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+    sudo firewall-cmd --zone=public --add-port=443/tcp --permanent
     sudo firewall-cmd --zone=public --add-port=10250/tcp --permanent
     sudo firewall-cmd --zone=public --add-port=10251/tcp --permanent
     sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
@@ -135,7 +177,7 @@ install_crio() {
 }
 
 
-# CRI-O config to match Microshift networking values
+# CRI-O config to match MicroShift networking values
 crio_conf() {
     sudo sh -c 'cat << EOF > /etc/cni/net.d/100-crio-bridge.conf
 {
@@ -193,7 +235,7 @@ get_microshift() {
 
     cat << EOF | sudo tee /usr/lib/systemd/system/microshift.service
 [Unit]
-Description=Microshift
+Description=MicroShift
 After=crio.service
 
 [Service]
@@ -209,16 +251,8 @@ EOF
     if [ "$DISTRO" = "ubuntu" ] && [ "$OS_VERSION" = "18.04" ]; then
         sudo sed -i 's|^ExecStart=microshift|ExecStart=/usr/local/bin/microshift|' /usr/lib/systemd/system/microshift.service
     fi
-
     if [ "$DISTRO" != "ubuntu" ]; then
-        sudo mkdir -p /var/run/flannel
-        sudo mkdir -p /var/run/kubelet
-        sudo mkdir -p /var/lib/kubelet/pods
-        sudo mkdir -p /var/run/secrets/kubernetes.io/serviceaccount
-        sudo mkdir -p /var/hpvolumes
-        sudo semodule -i /tmp/microshift.pp
         sudo restorecon -v /usr/local/bin/microshift
-        sudo restorecon -v /var/hpvolumes
     fi
     sudo systemctl enable microshift.service --now
 }
@@ -254,19 +288,20 @@ validation_check(){
 get_distro
 get_arch
 get_os_version
+pre-check-installation
 if [ "$DISTRO" = "rhel" ]; then
     register_subs
 fi
 validation_check
 install_dependencies
 establish_firewall
-if [ "$DISTRO" != "ubuntu" ]; then
-    build_selinux_policy
-fi
 install_crio
 crio_conf
 verify_crio
 get_kubectl
+if [ "$DISTRO" != "ubuntu" ]; then
+    build_selinux_policy
+fi
 
 [ "$CONFIG_ENV_ONLY" = true ] && { echo "Env config complete" && exit 0 ; }
 get_microshift

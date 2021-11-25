@@ -86,6 +86,9 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		svc = []string{
 			"assets/core/0000_80_openshift-router-service.yaml",
 		}
+		extSvc = []string{
+			"assets/core/0000_80_openshift-router-external-service.yaml",
+		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply ns %v: %v", ns, err)
@@ -111,6 +114,10 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		logrus.Warningf("failed to apply svc %v: %v", svc, err)
 		return err
 	}
+	if err := assets.ApplyServices(extSvc, nil, nil, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply external ingress svc %v: %v", extSvc, err)
+		return err
+	}
 	if err := assets.ApplyDeployments(apps, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply apps %v: %v", apps, err)
 		return err
@@ -127,13 +134,15 @@ func startDNSController(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 			"assets/rbac/0000_70_dns_01-cluster-role.yaml",
 		}
 		apps = []string{
-			"assets/apps/0000_70_dns_01-daemonset.yaml",
+			"assets/apps/0000_70_dns_01-dns-daemonset.yaml",
+			"assets/apps/0000_70_dns_01-node-resolver-daemonset.yaml",
 		}
 		ns = []string{
 			"assets/core/0000_70_dns_00-namespace.yaml",
 		}
 		sa = []string{
-			"assets/core/0000_70_dns_01-service-account.yaml",
+			"assets/core/0000_70_dns_01-dns-service-account.yaml",
+			"assets/core/0000_70_dns_01-node-resolver-service-account.yaml",
 		}
 		cm = []string{
 			"assets/core/0000_70_dns_01-configmap.yaml",

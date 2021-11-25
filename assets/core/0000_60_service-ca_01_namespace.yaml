@@ -4,3 +4,4 @@ metadata:
   name: openshift-service-ca
   annotations:
     openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"

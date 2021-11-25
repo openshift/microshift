@@ -19,6 +19,7 @@ import (
 	"net"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/util"
 
 	ctrl "k8s.io/kubernetes/pkg/controlplane"
@@ -31,9 +32,6 @@ func initAll(cfg *config.MicroshiftConfig) error {
 	}
 	// create configs
 	if err := initServerConfig(cfg); err != nil {
-		return err
-	}
-	if err := initNodeConfig(cfg); err != nil {
 		return err
 	}
 	// create kubeconfig for kube-scheduler, kubelet, openshift-apiserver,controller-manager
@@ -113,12 +111,12 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	}
 
 	// ocp
-	if err := util.GenCerts("openshift-apiserver", cfg.DataDir+"/resources/ocp-apiserver/secrets",
+	if err := util.GenCerts("openshift-apiserver", cfg.DataDir+"/resources/openshift-apiserver/secrets",
 		"tls.crt", "tls.key",
-		[]string{"openshift-apiserver", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		[]string{"openshift-apiserver", cfg.NodeIP, "openshift-apiserver.default.svc", "openshift-apiserver.default", "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
-	if err := util.GenCerts("openshift-controller-manager", cfg.DataDir+"/resources/ocp-controller-manager/secrets",
+	if err := util.GenCerts("openshift-controller-manager", cfg.DataDir+"/resources/openshift-controller-manager/secrets",
 		"tls.crt", "tls.key",
 		[]string{"openshift-controller-manager", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
@@ -128,34 +126,16 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName, apiServerServiceIP.String()}); err != nil {
 		return err
 	}
+	if err := util.GenCerts("openshift-oauth-apiserver", cfg.DataDir+"/resources/openshift-oauth-apiserver/secrets",
+		"tls.crt", "tls.key",
+		[]string{"openshift-oauth-apiserver", cfg.NodeIP, "127.0.0.1", "openshift-oauth-apiserver.default.svc", "openshift-oauth-apiserver.svc", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		return err
+	}
 	return nil
 }
 
 func initServerConfig(cfg *config.MicroshiftConfig) error {
-	if err := config.OpenShiftAPIServerConfig(cfg); err != nil {
-		return err
-	}
-
-	if err := config.OpenShiftControllerManagerConfig(cfg); err != nil {
-		return err
-	}
-	if err := config.KubeSchedulerConfig(cfg); err != nil {
-		return err
-	}
-	return nil
-}
-
-func initNodeConfig(cfg *config.MicroshiftConfig) error {
-	if err := config.KubeletConfig(cfg); err != nil {
-		return err
-	}
-	if err := config.OpenShiftSDNConfig(cfg); err != nil {
-		return err
-	}
-	if err := config.KubeProxyConfig(cfg); err != nil {
-		return err
-	}
-	return nil
+	return controllers.OpenShiftAPIServerConfig(cfg)
 }
 
 func initKubeconfig(cfg *config.MicroshiftConfig) error {

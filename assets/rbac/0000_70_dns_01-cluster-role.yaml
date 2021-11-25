@@ -15,6 +15,14 @@ rules:
   - watch
 
 - apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
+
+- apiGroups:
   - authentication.k8s.io
   resources:
   - tokenreviews

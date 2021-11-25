@@ -28,8 +28,8 @@ import (
 	corelisters "k8s.io/client-go/listers/core/v1"
 	storagelisters "k8s.io/client-go/listers/storage/v1"
 	volumehelpers "k8s.io/cloud-provider/volume/helpers"
+	storagehelpers "k8s.io/component-helpers/storage/volume"
 	"k8s.io/klog/v2"
-	v1helper "k8s.io/kubernetes/pkg/apis/core/v1/helper"
 	"k8s.io/kubernetes/pkg/scheduler/framework"
 )
 
@@ -116,9 +116,13 @@ func (pl *VolumeZone) Filter(ctx context.Context, _ *framework.CycleState, pod *
 			return s
 		}
 
+		if pvc == nil {
+			return framework.NewStatus(framework.Error, fmt.Sprintf("PersistentVolumeClaim was not found: %q", pvcName))
+		}
+
 		pvName := pvc.Spec.VolumeName
 		if pvName == "" {
-			scName := v1helper.GetPersistentVolumeClaimClass(pvc)
+			scName := storagehelpers.GetPersistentVolumeClaimClass(pvc)
 			if len(scName) == 0 {
 				return framework.NewStatus(framework.UnschedulableAndUnresolvable, "PersistentVolumeClaim had no pv name and storageClass name")
 			}
@@ -143,6 +147,10 @@ func (pl *VolumeZone) Filter(ctx context.Context, _ *framework.CycleState, pod *
 			return s
 		}
 
+		if pv == nil {
+			return framework.NewStatus(framework.Error, fmt.Sprintf("PersistentVolume was not found: %q", pvName))
+		}
+
 		for k, v := range pv.ObjectMeta.Labels {
 			if !volumeZoneLabels.Has(k) {
 				continue
@@ -150,7 +158,7 @@ func (pl *VolumeZone) Filter(ctx context.Context, _ *framework.CycleState, pod *
 			nodeV, _ := nodeConstraints[k]
 			volumeVSet, err := volumehelpers.LabelZonesToSet(v)
 			if err != nil {
-				klog.Warningf("Failed to parse label for %q: %q. Ignoring the label. err=%v. ", k, v, err)
+				klog.InfoS("Failed to parse label, ignoring the label", "label", fmt.Sprintf("%s:%s", k, v), "err", err)
 				continue
 			}
 

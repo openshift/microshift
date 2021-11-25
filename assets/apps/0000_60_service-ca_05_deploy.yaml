@@ -17,6 +17,8 @@ spec:
   template:
     metadata:
       name: service-ca
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
       labels:
         app: service-ca
         service-ca: "true"
@@ -29,11 +31,8 @@ spec:
         image: {{ .ReleaseImage.service_ca_operator }}
         imagePullPolicy: IfNotPresent
         command: ["service-ca-operator", "controller"]
-        args:
-        - -v=2
         ports:
         - containerPort: 8443
-          protocol: TCP
         # securityContext:
         #   runAsNonRoot: true
         resources:
@@ -52,8 +51,8 @@ spec:
       - name: signing-cabundle
         hostPath:
           path: {{.CADir}}
-      #nodeSelector:
-      #  node-role.kubernetes.io/master: ""
+      # nodeSelector:
+      #   node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"
       tolerations:
       - key: node-role.kubernetes.io/master

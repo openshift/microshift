@@ -21,9 +21,9 @@ import (
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 
 	buildv1 "github.com/openshift/api/build/v1"
+	"github.com/openshift/apiserver-library-go/pkg/labelselector"
 	"github.com/openshift/library-go/pkg/image/imageutil"
 	imageref "github.com/openshift/library-go/pkg/image/reference"
-	"github.com/openshift/openshift-apiserver/pkg/apiserver/labelselector"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	buildinternalhelpers "github.com/openshift/openshift-apiserver/pkg/build/apis/build/internal_helpers"
 	imageapivalidation "github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation"

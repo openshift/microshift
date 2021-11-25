@@ -3,7 +3,7 @@
 # Tue Sep 28 16:00:39 UTC 2021
 
 [Unit]
-Description=microshift all-in-one
+Description=MicroShift all-in-one
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target

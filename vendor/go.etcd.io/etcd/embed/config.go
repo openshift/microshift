@@ -66,6 +66,15 @@ const (
 	StdErrLogOutput  = "stderr"
 	StdOutLogOutput  = "stdout"
 
+	// DefaultLogRotationConfig is the default configuration used for log rotation.
+	// Log rotation is disabled by default.
+	// MaxSize    = 100 // MB
+	// MaxAge     = 0 // days (no limit)
+	// MaxBackups = 0 // no limit
+	// LocalTime  = false // use computers local time, UTC by default
+	// Compress   = false // compress the rotated log in gzip format
+	DefaultLogRotationConfig = `{"maxsize": 100, "maxage": 0, "maxbackups": 0, "localtime": false, "compress": false}`
+
 	// DefaultStrictReconfigCheck is the default value for "--strict-reconfig-check" flag.
 	// It's enabled by default.
 	DefaultStrictReconfigCheck = true
@@ -84,6 +93,7 @@ var (
 	ErrConflictBootstrapFlags = fmt.Errorf("multiple discovery or bootstrap flags are set. " +
 		"Choose one of \"initial-cluster\", \"discovery\" or \"discovery-srv\"")
 	ErrUnsetAdvertiseClientURLsFlag = fmt.Errorf("--advertise-client-urls is required when --listen-client-urls is set explicitly")
+	ErrLogRotationInvalidLogOutput  = fmt.Errorf("--log-outputs requires a single file path when --log-rotate-config-json is defined")
 
 	DefaultInitialAdvertisePeerURLs = "http://localhost:2380"
 	DefaultAdvertiseClientURLs      = "http://localhost:2379"
@@ -221,6 +231,9 @@ type Config struct {
 	// before closing a non-responsive connection. 0 to disable.
 	GRPCKeepAliveTimeout time.Duration `json:"grpc-keepalive-timeout"`
 
+	// SocketOpts are socket options passed to listener config.
+	SocketOpts transport.SocketOpts
+
 	// PreVote is true to enable Raft Pre-Vote.
 	// If enabled, Raft runs an additional election phase
 	// to check whether it would get enough votes to win
@@ -306,7 +319,10 @@ type Config struct {
 	//  - file path to append server logs to.
 	// It can be multiple when "Logger" is zap.
 	LogOutputs []string `json:"log-outputs"`
-
+	// EnableLogRotation enables log rotation of a single LogOutputs file target.
+	EnableLogRotation bool `json:"enable-log-rotation"`
+	// LogRotationConfigJSON is a passthrough allowing a log rotation JSON config to be passed directly.
+	LogRotationConfigJSON string `json:"log-rotation-config-json"`
 	// ZapLoggerBuilder is used to build the zap logger.
 	ZapLoggerBuilder func(*Config) error
 
@@ -395,6 +411,8 @@ func NewConfig() *Config {
 		GRPCKeepAliveInterval: DefaultGRPCKeepAliveInterval,
 		GRPCKeepAliveTimeout:  DefaultGRPCKeepAliveTimeout,
 
+		SocketOpts: transport.SocketOpts{},
+
 		TickMs:                     100,
 		ElectionMs:                 1000,
 		InitialElectionTickAdvance: true,
@@ -420,14 +438,16 @@ func NewConfig() *Config {
 
 		PreVote: false, // TODO: enable by default in v3.5
 
-		loggerMu:            new(sync.RWMutex),
-		logger:              nil,
-		Logger:              "capnslog",
-		DeprecatedLogOutput: []string{DefaultLogOutput},
-		LogOutputs:          []string{DefaultLogOutput},
-		Debug:               false,
-		LogLevel:            logutil.DefaultLogLevel,
-		LogPkgLevels:        "",
+		loggerMu:              new(sync.RWMutex),
+		logger:                nil,
+		Logger:                "capnslog",
+		DeprecatedLogOutput:   []string{DefaultLogOutput},
+		LogOutputs:            []string{DefaultLogOutput},
+		Debug:                 false,
+		LogLevel:              logutil.DefaultLogLevel,
+		LogPkgLevels:          "",
+		EnableLogRotation:     false,
+		LogRotationConfigJSON: DefaultLogRotationConfig,
 	}
 	cfg.InitialCluster = cfg.InitialClusterFromName(cfg.Name)
 	return cfg

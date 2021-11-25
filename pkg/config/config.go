@@ -4,6 +4,7 @@ import (
 	"errors"
 	goflag "flag"
 	"fmt"
+	"net/url"
 	"os"
 	"strconv"
 
@@ -77,7 +78,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	return &MicroshiftConfig{
 		ConfigFile:      findConfigFile(),
 		DataDir:         findDataDir(),
-		LogDir:          "",
+		LogDir:          "/var/log/microshift/",
 		LogVLevel:       0,
 		LogVModule:      "",
 		LogAlsotostderr: false,
@@ -94,6 +95,20 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		ControlPlane: ControlPlaneConfig{},
 		Node:         NodeConfig{},
 	}
+}
+
+// extract the api server port from the cluster URL
+func (c *ClusterConfig) ApiServerPort() (string, error) {
+	parsed, err := url.Parse(c.URL)
+	if err != nil {
+		return "", err
+	}
+
+	// default empty URL to port 6443
+	if parsed.Port() == "" {
+		return "6443", nil
+	}
+	return parsed.Port(), nil
 }
 
 // Returns the default user config file if that exists, else the default global

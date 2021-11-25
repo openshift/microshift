@@ -1943,6 +1943,7 @@ func (bc *BuildController) createBuildSystemConfigMapSpec(build *buildv1.Build, 
 		},
 		Data: make(map[string]string),
 	}
+
 	registryConf := bc.registryConfTOML()
 	if len(registryConf) > 0 {
 		cm.Data[buildv1.RegistryConfKey] = registryConf
