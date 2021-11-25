@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"k8s.io/klog/v2"
@@ -24,6 +25,16 @@ func CreateTokenFile(path string) {
 	defer f.Close()
 	f.Write([]byte(token))
 
+}
+
+func GetToken(path string) string {
+	f, err := os.ReadFile(path)
+	if err != nil {
+		klog.ErrorS(err, "Token file cannot be opened")
+	}
+	token := f[:strings.IndexByte(string(f), ',')]
+
+	return string(token)
 }
 
 func randString(length int) string {

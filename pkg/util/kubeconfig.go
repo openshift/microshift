@@ -73,3 +73,55 @@ users:
 
 	return kubeconfigTemplate.Execute(output, &data)
 }
+
+func BootstrapKubeconfig(token, path, common string, svcName []string, clusterURL string) error {
+	bootstrapKubeconfigTemplate := template.Must(template.New("bootstrap-kubeconfig").Parse(`
+apiVersion: v1
+kind: Config
+current-context: microshift
+preferences: {}
+contexts:
+- context:
+    cluster: microshift
+    user: kubelet-bootstrap
+  name: microshift
+clusters:
+- cluster:
+    server: {{.ClusterURL}}
+    certificate-authority-data: {{.ClusterCA}}
+  name: microshift
+users:
+- name: kubelet-bootstrap
+  user:
+    token: {{.Token}}
+`))
+	certBuff, keyBuff, err := GenCertsBuff(common, svcName)
+	if err != nil {
+		return err
+	}
+	clusterCA := Base64(CertToPem(GetRootCA()))
+	clientCert := Base64(certBuff)
+	clientKey := Base64(keyBuff)
+	data := struct {
+		ClusterURL string
+		ClusterCA  string
+		ClientCert string
+		ClientKey  string
+		Token      string
+	}{
+		ClusterURL: clusterURL,
+		ClusterCA:  clusterCA,
+		ClientCert: clientCert,
+		ClientKey:  clientKey,
+		Token:      token,
+	}
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+
+	output, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer output.Close()
+
+	return bootstrapKubeconfigTemplate.Execute(output, &data)
+}
