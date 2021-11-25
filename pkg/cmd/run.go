@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"github.com/openshift/microshift/pkg/bootstrap"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/kustomize"
@@ -68,6 +69,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	m := servicemanager.NewServiceManager()
 	if config.StringInList("controlplane", cfg.Roles) {
+		util.Must(m.AddService(bootstrap.NewTokenManager(cfg)))
 		util.Must(m.AddService(controllers.NewEtcd(cfg)))
 		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
 		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))

@@ -40,7 +40,7 @@ func (m *ServiceManager) AddService(s Service) error {
 		// i.e. they'll always remain topology sorted. Should we want to relax this
 		// constraint later, we can add topo sorting in the Run() step.
 		if _, exists := m.serviceMap[dependency]; !exists {
-			return fmt.Errorf("dependecy '%s' of service '%s' not yet defined", dependency, s.Name())
+			return fmt.Errorf("dependency '%s' of service '%s' not yet defined", dependency, s.Name())
 		}
 	}
 

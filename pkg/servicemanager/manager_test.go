@@ -33,7 +33,7 @@ func TestAddService(t *testing.T) {
 			serviceTest{service: NewGenericService("foo", nil, nil), out: errors.New("service 'foo' added more than once")},
 		},
 		{
-			serviceTest{service: NewGenericService("bar", []string{"foo"}, nil), out: errors.New("dependecy 'foo' of service 'bar' not yet defined")},
+			serviceTest{service: NewGenericService("bar", []string{"foo"}, nil), out: errors.New("dependency 'foo' of service 'bar' not yet defined")},
 			serviceTest{service: NewGenericService("foo", nil, nil), out: nil},
 		},
 	}

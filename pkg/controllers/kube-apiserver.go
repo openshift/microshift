@@ -55,7 +55,7 @@ func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
 }
 
 func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
-func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd"} }
+func (s *KubeAPIServer) Dependencies() []string { return []string{"token-manager", "etcd"} }
 
 func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
