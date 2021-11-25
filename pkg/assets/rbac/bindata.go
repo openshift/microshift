@@ -3,6 +3,9 @@
 // assets/rbac/0000_00_flannel-clusterrole.yaml
 // assets/rbac/0000_00_flannel-clusterrolebinding.yaml
 // assets/rbac/0000_00_podsecuritypolicy-flannel.yaml
+// assets/rbac/0000_10_bootstrap-crb-approver.yaml
+// assets/rbac/0000_10_bootstrap-crb-creator.yaml
+// assets/rbac/0000_10_bootstrap-crb-renewal.yaml
 // assets/rbac/0000_60_service-ca_00_clusterrole.yaml
 // assets/rbac/0000_60_service-ca_00_clusterrolebinding.yaml
 // assets/rbac/0000_60_service-ca_00_role.yaml
@@ -196,6 +199,96 @@ func assetsRbac0000_00_podsecuritypolicyFlannelYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/rbac/0000_00_podsecuritypolicy-flannel.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsRbac0000_10_bootstrapCrbApproverYaml = []byte(`# Approve all CSRs for the group "system:bootstrappers"
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: auto-approve-csrs-for-group
+subjects:
+- kind: Group
+  name: system:bootstrappers
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: system:certificates.k8s.io:certificatesigningrequests:nodeclient
+  apiGroup: rbac.authorization.k8s.io
+  `)
+
+func assetsRbac0000_10_bootstrapCrbApproverYamlBytes() ([]byte, error) {
+	return _assetsRbac0000_10_bootstrapCrbApproverYaml, nil
+}
+
+func assetsRbac0000_10_bootstrapCrbApproverYaml() (*asset, error) {
+	bytes, err := assetsRbac0000_10_bootstrapCrbApproverYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/rbac/0000_10_bootstrap-crb-approver.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsRbac0000_10_bootstrapCrbCreatorYaml = []byte(`# enable bootstrapping nodes to create CSR
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: create-csrs-for-bootstrapping
+subjects:
+- kind: Group
+  name: system:bootstrappers
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: system:node-bootstrapper
+  apiGroup: rbac.authorization.k8s.io
+  `)
+
+func assetsRbac0000_10_bootstrapCrbCreatorYamlBytes() ([]byte, error) {
+	return _assetsRbac0000_10_bootstrapCrbCreatorYaml, nil
+}
+
+func assetsRbac0000_10_bootstrapCrbCreatorYaml() (*asset, error) {
+	bytes, err := assetsRbac0000_10_bootstrapCrbCreatorYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/rbac/0000_10_bootstrap-crb-creator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsRbac0000_10_bootstrapCrbRenewalYaml = []byte(`# approve renewal CSRs for the group "system:nodes"
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: auto-approve-renewals-for-nodes
+subjects:
+- kind: Group
+  name: system:nodes
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeclient
+  apiGroup: rbac.authorization.k8s.io
+`)
+
+func assetsRbac0000_10_bootstrapCrbRenewalYamlBytes() ([]byte, error) {
+	return _assetsRbac0000_10_bootstrapCrbRenewalYaml, nil
+}
+
+func assetsRbac0000_10_bootstrapCrbRenewalYaml() (*asset, error) {
+	bytes, err := assetsRbac0000_10_bootstrapCrbRenewalYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/rbac/0000_10_bootstrap-crb-renewal.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -715,6 +808,9 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/rbac/0000_00_flannel-clusterrole.yaml":                     assetsRbac0000_00_flannelClusterroleYaml,
 	"assets/rbac/0000_00_flannel-clusterrolebinding.yaml":              assetsRbac0000_00_flannelClusterrolebindingYaml,
 	"assets/rbac/0000_00_podsecuritypolicy-flannel.yaml":               assetsRbac0000_00_podsecuritypolicyFlannelYaml,
+	"assets/rbac/0000_10_bootstrap-crb-approver.yaml":                  assetsRbac0000_10_bootstrapCrbApproverYaml,
+	"assets/rbac/0000_10_bootstrap-crb-creator.yaml":                   assetsRbac0000_10_bootstrapCrbCreatorYaml,
+	"assets/rbac/0000_10_bootstrap-crb-renewal.yaml":                   assetsRbac0000_10_bootstrapCrbRenewalYaml,
 	"assets/rbac/0000_60_service-ca_00_clusterrole.yaml":               assetsRbac0000_60_serviceCa_00_clusterroleYaml,
 	"assets/rbac/0000_60_service-ca_00_clusterrolebinding.yaml":        assetsRbac0000_60_serviceCa_00_clusterrolebindingYaml,
 	"assets/rbac/0000_60_service-ca_00_role.yaml":                      assetsRbac0000_60_serviceCa_00_roleYaml,
@@ -773,6 +869,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_00_flannel-clusterrole.yaml":                     {assetsRbac0000_00_flannelClusterroleYaml, map[string]*bintree{}},
 			"0000_00_flannel-clusterrolebinding.yaml":              {assetsRbac0000_00_flannelClusterrolebindingYaml, map[string]*bintree{}},
 			"0000_00_podsecuritypolicy-flannel.yaml":               {assetsRbac0000_00_podsecuritypolicyFlannelYaml, map[string]*bintree{}},
+			"0000_10_bootstrap-crb-approver.yaml":                  {assetsRbac0000_10_bootstrapCrbApproverYaml, map[string]*bintree{}},
+			"0000_10_bootstrap-crb-creator.yaml":                   {assetsRbac0000_10_bootstrapCrbCreatorYaml, map[string]*bintree{}},
+			"0000_10_bootstrap-crb-renewal.yaml":                   {assetsRbac0000_10_bootstrapCrbRenewalYaml, map[string]*bintree{}},
 			"0000_60_service-ca_00_clusterrole.yaml":               {assetsRbac0000_60_serviceCa_00_clusterroleYaml, map[string]*bintree{}},
 			"0000_60_service-ca_00_clusterrolebinding.yaml":        {assetsRbac0000_60_serviceCa_00_clusterrolebindingYaml, map[string]*bintree{}},
 			"0000_60_service-ca_00_role.yaml":                      {assetsRbac0000_60_serviceCa_00_roleYaml, map[string]*bintree{}},
