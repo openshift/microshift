@@ -62,6 +62,7 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 		"--service-account-private-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
 		"--allocate-node-cidrs=true",
 		"--cluster-cidr=" + cfg.Cluster.ClusterCIDR,
+		"--controllers=*,tokencleaner,bootstrapsigner",
 		"--authorization-kubeconfig=" + kubeconfig,
 		"--authentication-kubeconfig=" + kubeconfig,
 		"--root-ca-file=" + caCertFile,
