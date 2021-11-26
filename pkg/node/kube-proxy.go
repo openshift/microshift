@@ -47,7 +47,7 @@ func NewKubeProxyServer(cfg *config.MicroshiftConfig) *ProxyOptions {
 }
 
 func (s *ProxyOptions) Name() string           { return componentKubeProxy }
-func (s *ProxyOptions) Dependencies() []string { return []string{"kube-apiserver"} }
+func (s *ProxyOptions) Dependencies() []string { return []string{} }
 
 func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
 	if err := s.writeConfig(cfg); err != nil {

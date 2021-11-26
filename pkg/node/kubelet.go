@@ -59,7 +59,7 @@ func NewKubeletServer(cfg *config.MicroshiftConfig) *KubeletServer {
 }
 
 func (s *KubeletServer) Name() string           { return componentKubelet }
-func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserver"} }
+func (s *KubeletServer) Dependencies() []string { return []string{} }
 
 func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 
@@ -69,7 +69,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 
 	// Prepare commandline args
 	args := []string{
-		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
+		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/bootstrap-kubeconfig",
 		"--kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
@@ -120,21 +120,23 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 func (s *KubeletServer) writeConfig(cfg *config.MicroshiftConfig) error {
 	data := []byte(`
 kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-authentication:
+apiVersion: kubelet.config.k8s.io/v1beta1`)
+	if config.StringInList("controlplane", cfg.Roles) {
+		data = append(data, "\n"+`authentication:
   x509:
-    clientCAFile: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
+    clientCAFile: `+cfg.DataDir+`/certs/ca-bundle/ca-bundle.crt
   anonymous:
     enabled: false
-tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.crt
-tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.key
-cgroupDriver: "systemd"
+tlsCertFile: `+cfg.DataDir+`/resources/kubelet/secrets/kubelet-client/tls.crt
+tlsPrivateKeyFile: `+cfg.DataDir+`/resources/kubelet/secrets/kubelet-client/tls.key`...)
+	}
+	data = append(data, "\n"+`cgroupDriver: "systemd"
 cgroupRoot: /
 failSwapOn: false
-volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec
+volumePluginDir: `+cfg.DataDir+`/kubelet-plugins/volume/exec
 clusterDNS:
-  - ` + cfg.Cluster.DNS + `
-clusterDomain: ` + cfg.Cluster.Domain + `
+  - `+cfg.Cluster.DNS+`
+clusterDomain: `+cfg.Cluster.Domain+`
 containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50
@@ -151,11 +153,11 @@ featureGates:
   # Will be removed in future openshift/api update https://github.com/openshift/api/commit/c8c8f6d0f4a8ac4ff4ad7d1a84b27e1aa7ebf9b4
   RemoveSelfLink: false
   NodeDisruptionExclusion: true
-  RotateKubeletServerCertificate: false #TODO
+  RotateKubeletServerCertificate: true
   SCTPSupport: true
   ServiceNodeExclusion: true
   SupportPodPidsLimit: true
-serverTLSBootstrap: false #TODO`)
+serverTLSBootstrap: true`...)
 
 	// Load real resolv.conf in case systemd-resolved is used
 	// https://github.com/coredns/coredns/blob/master/plugin/loop/README.md#troubleshooting-loops-in-kubernetes-clusters
