@@ -82,7 +82,9 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	}
 	if err := util.GenCerts("kube-apiserver", cfg.DataDir+"/certs/kube-apiserver/secrets/service-network-serving-certkey",
 		"tls.crt", "tls.key",
-		[]string{"kube-apiserver", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost", apiServerServiceIP.String()}); err != nil {
+		[]string{"kube-apiserver", cfg.NodeIP, cfg.NodeName, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes",
+			"localhost",
+			apiServerServiceIP.String()}); err != nil {
 		return err
 	}
 	if err := util.GenKeys(cfg.DataDir+"/resources/kube-apiserver/secrets/service-account-key",
@@ -113,12 +115,14 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	// ocp
 	if err := util.GenCerts("openshift-apiserver", cfg.DataDir+"/resources/openshift-apiserver/secrets",
 		"tls.crt", "tls.key",
-		[]string{"openshift-apiserver", cfg.NodeIP, "openshift-apiserver.default.svc", "openshift-apiserver.default", "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		[]string{"openshift-apiserver", cfg.NodeIP, cfg.NodeName, "openshift-apiserver.default.svc", "openshift-apiserver.default",
+			"127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
 	if err := util.GenCerts("openshift-controller-manager", cfg.DataDir+"/resources/openshift-controller-manager/secrets",
 		"tls.crt", "tls.key",
-		[]string{"openshift-controller-manager", cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		[]string{"openshift-controller-manager", cfg.NodeName, cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default",
+			"kubernetes", "localhost"}); err != nil {
 		return err
 	}
 	if err := util.GenCerts("service-ca", cfg.DataDir+"/resources/service-ca/secrets/service-ca",
@@ -128,7 +132,8 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	}
 	if err := util.GenCerts("openshift-oauth-apiserver", cfg.DataDir+"/resources/openshift-oauth-apiserver/secrets",
 		"tls.crt", "tls.key",
-		[]string{"openshift-oauth-apiserver", cfg.NodeIP, "127.0.0.1", "openshift-oauth-apiserver.default.svc", "openshift-oauth-apiserver.svc", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
+		[]string{"openshift-oauth-apiserver", cfg.NodeIP, cfg.NodeName, "127.0.0.1", "openshift-oauth-apiserver.default.svc",
+			"openshift-oauth-apiserver.svc", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
 		return err
 	}
 	return nil
