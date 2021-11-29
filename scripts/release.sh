@@ -21,6 +21,8 @@
 # quay.io/microshift/microshift.  A github release and a tag are created and identified with the version generated
 # by the Makefile. Cross-compiled binaries are copied from the container images and published in the git release.
 
+set -x
+
 set -euo pipefail
 shopt -s expand_aliases
 
@@ -35,8 +37,9 @@ ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 
 # Check for a container manager cli (podman || docker), and alias it to "podman", since
 # they implement the same cli interface.
-__ctr_mgr_alias=$({ which podman &>/dev/null && echo "podman"; } || { which docker &>/dev/null && echo "docker"; } || echo "")
-alias podman="${__ctr_mgr_alias:?"a container manager (podman || docker) is required as part of the release automation; none found"}"
+
+__ctr_cli_alias=$({ which podman &>/dev/null && echo "podman"; } || { which docker &>/dev/null && echo "docker"; } || echo "")
+alias podman=${__ctr_cli_alias:?"a container manager (podman || docker) is required as part of the release automation; none found"}
 
 #########
 # FUNCS #
@@ -144,11 +147,24 @@ stage_release_image_binaries() {
   echo "$dest"
 }
 
+build_aio_container_images_artifacts() {
+  (
+    cd "$ROOT"
+    make build-containerized-all-in-one-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO_AIO="$AIO_IMAGE_REPO"
+  ) || return 1
+}
+
 build_container_images_artifacts() {
   (
     cd "$ROOT"
     make build-containerized-cross-build SOURCE_GIT_TAG="$VERSION" IMAGE_REPO="$IMAGE_REPO"
   ) || return 1
+}
+
+push_aio_container_image_artifacts() {
+  for t in "${AIO_RELEASE_IMAGE_TAGS[@]}"; do
+    podman push "$t"
+  done
 }
 
 push_container_image_artifacts() {
@@ -158,35 +174,41 @@ push_container_image_artifacts() {
 }
 
 podman_create_manifest(){
-  podman manifest create "$IMAGE_REPO:$VERSION" >&2
-  for ref in "${RELEASE_IMAGE_TAGS[@]}"; do
-    podman manifest add "$IMAGE_REPO:$VERSION" "docker://$ref"
+  local dest_repo="$1"
+  local image_tags="$2"
+  podman manifest create "$dest_repo:$VERSION" >&2
+  for ref in "${image_tags[*]}"; do
+    podman manifest add "$dest_repo:$VERSION" "docker://$ref"
   done
-    podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$VERSION"
-    podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
+    podman manifest push "$dest_repo:$VERSION" "$dest_repo:$VERSION"
+    podman manifest push "$dest_repo:$VERSION" "$dest_repo:latest"
 }
 
 docker_create_manifest(){
-  local amend_images_options
-  for image in "${RELEASE_IMAGE_TAGS[@]}"; do
-    amend_images_options+="--amend $image"
-  done
+  local dest_repo="$1"
+  local image_tags="$2"
   # use docker cli directly for clarity, as this is a docker-only func
-  docker manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
-  docker tag "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:latest"
-  docker manifest push "$IMAGE_REPO:$VERSION"
-  docker manifest push "$IMAGE_REPO:latest"
+  docker manifest create "$dest_repo:$VERSION" "${image_tags[*]}" >&2
+  docker tag "$dest_repo:$VERSION" "$dest_repo:latest"
+  docker manifest push "$dest_repo:$VERSION"
+  docker manifest push "$dest_repo:latest"
 }
 
+# It is necessarry to differentiate between podman and docker manifest create subcommands.
+# Podman exepcts the manifest to exist prior to adding images; docker allows for an image list
+# to be passed at creation. Podman also requires a prefixed "container-transport", which is
+# no recognized by docker, causing the command to fail.
 push_container_manifest() {
+  local dest_repo="$1"
+  local image_tags="$2"
   local cli="$(alias podman)"
   if [[ "${cli#*=}" =~ docker ]]; then
-    docker_create_manifest
+    docker_create_manifest "$dest_repo" "$image_tags[*]"
   else
-    podman_create_manifest
+    podman_create_manifest "$dest_repo" "$image_tags[*]"
   fi
-
 }
+
 debug() {
   local version="$1"
   local api_request="$2"
@@ -237,14 +259,24 @@ QUAY_OWNER=${QUAY_OWNER:="microshift"}
 API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
+AIO_IMAGE_REPO="quay.io/$QUAY_OWNER/microshift-aio"
 RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
+AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-arm64" )
 
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
 
-build_container_images_artifacts                                      || exit 1
-STAGE_DIR=$(stage_release_image_binaries)                             || exit 1
-push_container_image_artifacts                                        || exit 1
-push_container_manifest                                               || exit 1
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"               || exit 1
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                || exit 1
+# publish containerized microshift 
+build_container_images_artifacts                                          || exit 1
+STAGE_DIR=$(stage_release_image_binaries)                                 || exit 1
+push_container_image_artifacts                                            || exit 1
+push_container_manifest "$IMAGE_REPO" "${RELEASE_IMAGE_TAGS[@]}"          || exit 1
+
+# publish binaries 
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"                   || exit 1
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                    || exit 1
+
+# publish aio container 
+build_aio_container_images_artifacts                                      || exit 1
+push_aio_container_image_artifacts                                        || exit 1
+push_container_manifest "$AIO_IMAGE_REPO" "${AIO_RELEASE_IMAGE_TAGS[@]}"  || exit 1
