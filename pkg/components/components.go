@@ -1,6 +1,7 @@
 package components
 
 import (
+	"github.com/openshift/microshift/pkg/bootstrap"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/sirupsen/logrus"
 )
@@ -25,6 +26,10 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 	if err := startFlannel(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
+		logrus.Warningf("failed to start Flannel: %v", err)
+		return err
+	}
+	if err := bootstrap.ApplyBootstrapClusterRoleBindings(cfg, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to start Flannel: %v", err)
 		return err
 	}
