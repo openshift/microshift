@@ -143,7 +143,7 @@ establish_firewall () {
 
 # Install CRI-O depending on the distro
 install_crio() {
-    CRIOVERSION=1.22
+    CRIOVERSION=1.21
 
     case $DISTRO in
       "fedora")
