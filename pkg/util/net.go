@@ -20,8 +20,10 @@ import (
 	tcpnet "net"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/openshift/microshift/pkg/mdns/server"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -80,4 +82,13 @@ func CreateLocalhostListenerOnPort(port int) (tcpnet.Listener, error) {
 	}
 
 	return ln, nil
+}
+
+func NodeURL(nodeIP, nodeName string) string {
+	host := nodeIP
+	// TODO: decide what to do outside of mDNS and IP context (IPs can change..)
+	if strings.HasSuffix(nodeName, server.DefaultmDNSTLD) {
+		host = nodeName
+	}
+	return "https://" + host + ":6443"
 }

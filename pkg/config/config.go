@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/kelseyhightower/envconfig"
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
@@ -86,7 +86,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
 		Cluster: ClusterConfig{
-			URL:         "https://" + nodeIP + ":6443",
+			URL:         util.NodeURL(nodeIP, nodeName),
 			ClusterCIDR: "10.42.0.0/16",
 			ServiceCIDR: "10.43.0.0/16",
 			DNS:         "10.43.0.10",

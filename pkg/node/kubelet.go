@@ -24,12 +24,11 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-
-	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/util"
 
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	cliflag "k8s.io/component-base/cli/flag"
@@ -66,18 +65,28 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 	if err := s.writeConfig(cfg); err != nil {
 		logrus.Fatalf("Failed to write kubelet config: %v", err)
 	}
+	kubeconfigFile := cfg.DataDir + "/resources/kubelet/kubeconfig"
+	kubeBootstrapFile := cfg.DataDir + "/resources/kubelet/bootstrap-kubeconfig"
 
 	// Prepare commandline args
 	args := []string{
-		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/bootstrap-kubeconfig",
-		"--kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
+		"--kubeconfig=" + kubeconfigFile,
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
 		"--vmodule=" + cfg.LogVModule,
 	}
+
+	if _, err := os.Stat(kubeBootstrapFile); err == nil {
+		args = append(args, "--bootstrap-kubeconfig="+kubeBootstrapFile)
+	}
+
 	if cfg.LogDir != "" {
 		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kubelet.log"))
+	}
+
+	if len(cfg.Roles) == 1 && cfg.Roles[0] == "node" {
+		args = append(args, "--cert-dir="+cfg.DataDir+"/resources/kubelet/secrets/kubelet-client/")
 	}
 	cleanFlagSet := pflag.NewFlagSet(componentKubelet, pflag.ContinueOnError)
 	cleanFlagSet.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
@@ -118,8 +127,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 }
 
 func (s *KubeletServer) writeConfig(cfg *config.MicroshiftConfig) error {
-	data := []byte(`
-kind: KubeletConfiguration
+	data := []byte(`kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1`)
 	if config.StringInList("controlplane", cfg.Roles) {
 		data = append(data, "\n"+`authentication:
