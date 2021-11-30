@@ -398,7 +398,7 @@ func (r *Registry) Unregister(c Collector) bool {
 func (r *Registry) MustRegister(cs ...Collector) {
 	for _, c := range cs {
 		if err := r.Register(c); err != nil {
-			panic(err)
+			//panic(err)
 		}
 	}
 }
