@@ -1,0 +1,2 @@
+- op: remove
+  path: /spec/versions/name=v1/schema/openAPIV3Schema/properties/data/format

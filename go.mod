@@ -267,7 +267,7 @@ replace (
 	github.com/openshift/apiserver-library-go => github.com/openshift/apiserver-library-go v0.0.0-20210721120111-70ce3cad7d84
 	github.com/openshift/build-machinery-go => github.com/openshift/build-machinery-go v0.0.0-20210209125900-0da259a2c359
 	github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-20210422153130-25c8450d1535
-	github.com/openshift/library-go => github.com/openshift/library-go v0.0.0-20210407092538-7021fda6f427
+	github.com/openshift/library-go => github.com/openshift/library-go v0.0.0-20210720151324-cfbfc8feace0
 	github.com/pascaldekloe/goe => github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c
 	github.com/pelletier/go-toml => github.com/pelletier/go-toml v1.2.0
 	github.com/peterbourgon/diskv => github.com/peterbourgon/diskv v2.0.1+incompatible
@@ -401,7 +401,7 @@ replace (
 	k8s.io/kubelet => k8s.io/kubelet v0.21.0
 	k8s.io/kubernetes => github.com/openshift/kubernetes v0.0.0-20210918023457-a620f506e956
 	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.21.0
-	k8s.io/metrics => k8s.io/metrics v0.21.0
+	k8s.io/metrics => k8s.io/metrics v0.21.2
 	k8s.io/mount-utils => k8s.io/mount-utils v0.21.0
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.21.0
 	k8s.io/sample-cli-plugin => k8s.io/sample-cli-plugin v0.21.0
@@ -441,30 +441,32 @@ require (
 	github.com/moby/sys/mount v0.2.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-00010101000000-000000000000 // indirect
 	github.com/openshift/api v0.0.0-20210910062324-a41d3573a3ba
-	github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e
-	github.com/openshift/client-go v0.0.0-20210521082421-73d9475a9142
+	github.com/openshift/build-machinery-go v0.0.0-20210806203541-4ea9b6da3a37
+	github.com/openshift/client-go v0.0.0-20210831095141-e19a065e79f7
+	github.com/openshift/cluster-policy-controller v0.0.0-20210723200948-8fbffaf2b3c7
+	github.com/openshift/library-go v0.0.0-20210825122301-7f0bf922c345
 	github.com/openshift/oauth-apiserver v0.0.0-20210508031825-09435a5dd505
 	github.com/openshift/openshift-apiserver v0.0.0-20210812003746-628b46ccb012
 	github.com/openshift/openshift-controller-manager v0.0.0-20210609062424-2e25328c64ac
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
 	github.com/urfave/negroni v0.0.0-00010101000000-000000000000 // indirect
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200910180754-dd1b699fc489
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v0.21.1
-	k8s.io/apiextensions-apiserver v0.21.0
-	k8s.io/apimachinery v0.21.1
-	k8s.io/apiserver v0.21.1
+	k8s.io/api v0.22.1
+	k8s.io/apiextensions-apiserver v0.22.1
+	k8s.io/apimachinery v0.22.1
+	k8s.io/apiserver v0.22.1
 	k8s.io/cli-runtime v0.21.0
-	k8s.io/client-go v0.21.1
-	k8s.io/component-base v0.21.1
-	k8s.io/controller-manager v0.21.0
-	k8s.io/klog/v2 v2.8.0
-	k8s.io/kube-aggregator v0.21.0
+	k8s.io/client-go v0.22.1
+	k8s.io/component-base v0.22.1
+	k8s.io/controller-manager v0.21.2
+	k8s.io/klog/v2 v2.9.0
+	k8s.io/kube-aggregator v0.22.1
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7
 	k8s.io/kubectl v0.21.0
-	k8s.io/kubernetes v1.21.1
+	k8s.io/kubernetes v1.21.2
 	sigs.k8s.io/yaml v1.2.0
 )
