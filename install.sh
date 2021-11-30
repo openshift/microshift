@@ -143,23 +143,23 @@ establish_firewall () {
 
 # Install CRI-O depending on the distro
 install_crio() {
+    CRIOVERSION=1.21
+
     case $DISTRO in
       "fedora")
-        sudo dnf module -y enable cri-o:1.20
+        sudo dnf module -y enable cri-o:$CRIOVERSION
         sudo dnf install -y cri-o cri-tools
       ;;
       "rhel")
         sudo dnf install cri-o cri-tools -y
       ;;
       "centos")
-        CRIOVERSION=1.20
         OS=CentOS_8_Stream
         sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/devel:kubic:libcontainers:stable.repo
         sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION/$OS/devel:kubic:libcontainers:stable:cri-o:$CRIOVERSION.repo
         sudo dnf install -y cri-o cri-tools
       ;;
       "ubuntu")
-        CRIOVERSION=1.20
         OS=xUbuntu_$OS_VERSION
         KEYRINGS_DIR=/usr/share/keyrings
         echo "deb [signed-by=$KEYRINGS_DIR/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list > /dev/null
