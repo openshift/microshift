@@ -71,13 +71,8 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 	args := []string{
 		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
 		"--kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
 		"--vmodule=" + cfg.LogVModule,
-	}
-	if cfg.LogDir != "" {
-		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kubelet.log"))
 	}
 	cleanFlagSet := pflag.NewFlagSet(componentKubelet, pflag.ContinueOnError)
 	cleanFlagSet.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)

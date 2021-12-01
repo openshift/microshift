@@ -54,8 +54,6 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
 		logrus.Fatalf("Failed to write kube-proxy config: %v", err)
 	}
 	args := []string{
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
 		"--vmodule=" + cfg.LogVModule,
 	}
@@ -64,9 +62,6 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
 		Long:         componentKubeProxy,
 		SilenceUsage: true,
 		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
-	}
-	if cfg.LogDir != "" {
-		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-proxy.log"))
 	}
 
 	opts := kubeproxy.NewOptions()

@@ -62,10 +62,8 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	}
 	args := []string{
 		"--config=" + configFilePath,
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
 		"--vmodule=" + cfg.LogVModule,
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 	}
 
 	options := openshift_apiserver.OpenShiftAPIServer{
