@@ -13,6 +13,7 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/kustomize"
+	"github.com/openshift/microshift/pkg/mdns"
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/servicemanager"
 	"github.com/openshift/microshift/pkg/util"
@@ -77,6 +78,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(controllers.NewOpenShiftOAuth(cfg)))
 
 		util.Must(m.AddService(controllers.NewOpenShiftAPIComponents(cfg)))
+		util.Must(m.AddService(mdns.NewMicroShiftmDNSController(cfg)))
 		util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
 		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	}

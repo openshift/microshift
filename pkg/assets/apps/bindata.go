@@ -93,6 +93,17 @@ spec:
         effect: NoSchedule
       serviceAccountName: flannel
       initContainers:
+      - name: install-cni-bin
+        image: {{ .ReleaseImage.kube_flannel_cni }}
+        command:
+        - cp
+        args:
+        - -f
+        - /flannel
+        - /opt/cni/bin/flannel
+        volumeMounts:
+        - name: cni-plugin
+          mountPath: /opt/cni/bin
       - name: install-cni
         image: {{ .ReleaseImage.kube_flannel }}
         command:
@@ -148,7 +159,10 @@ spec:
           path: /etc/cni/net.d
       - name: flannel-cfg
         configMap:
-          name: kube-flannel-cfg`)
+          name: kube-flannel-cfg
+      - name: cni-plugin
+        hostPath:
+          path: /opt/cni/bin`)
 
 func assetsApps0000_00_flannelDaemonsetYamlBytes() ([]byte, error) {
 	return _assetsApps0000_00_flannelDaemonsetYaml, nil

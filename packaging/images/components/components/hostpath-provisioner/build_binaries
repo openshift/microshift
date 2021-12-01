@@ -11,7 +11,7 @@ fi
 set -x
 
 GOOS=linux GOARCH=$1 CGO_ENABLED=0  GOFLAGS="-mod=vendor" \
-  go build -a -ldflags '-extldflags "-static"' -o ../bin/hostpath-provisioner-$1 cmd/provisioner/hostpath-provisioner.go
+  go build -a -ldflags '-extldflags "-static"' -o ../bin/hostpath-provisioner-"$1" cmd/provisioner/hostpath-provisioner.go
 
 set +x
 

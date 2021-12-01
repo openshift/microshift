@@ -1,0 +1,7 @@
+#!/bin/sh
+
+mkdir -p bin
+
+cd src
+CGO_ENABLED=0 GOOS=linux GOARCH=$1 scripts/build_flannel.sh && mv dist/flannel-$1 ../bin/flannel-$1
+

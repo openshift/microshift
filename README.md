@@ -74,16 +74,16 @@ rm -rf /var/lib/microshift && rm -r $HOME/.microshift
 ```
 ## Deployment Strategies
 
-In production environment MicroShift can be deployed as:
-
-1. Install via an RPM, utilizing a host-provided cri-o runtime and be lifecycle-managed by systemd
-2. [Install as a container via Podman, utilizing cri-o runtime and be lifecycle-managed by systemd](https://microshift.io/docs/deployment-modes/microshift-containerized/)
+1. [Install via an RPM, utilizing a host-provided cri-o runtime and be lifecycle-managed by systemd](https://microshift.io/docs/developer-documentation/build-install-rpm/)
+2. [Install as a container via Podman, utilizing cri-o runtime and be lifecycle-managed by systemd](https://microshift.io/docs/user-documentation/deploying-microshift/containerized/)
 
 For app developer deployments:
 
-1. [Run an all-in-one microshift deployment on which devs can test their applications locally](https://microshift.io/docs/deployment-modes/microshift-aio/).  `microshift-aio` packages cri-o runtime and can be run and managed via podman and systemd
+1. [Run an all-in-one microshift deployment on which devs can test their applications locally](https://microshift.io/docs/getting-started/experimental-development/).  `microshift-aio` packages cri-o runtime and can be run and managed via podman and systemd
 
-## [Known Issues](https://microshift.io/docs/known-issues/known-issues/)
+## Known Issues
+If issues occur during deployment checkout the troubleshooting document to view fixes of [known issues](https://microshift.io/docs/user-documentation/troubleshooting/).
+
 
 ## Developing MicroShift
 
@@ -116,7 +116,7 @@ make
 
 Before running MicroShift, the host must first be configured. This can be handled by running
 
-```
+```bash
 CONFIG_ENV_ONLY=true ./install.sh
 ```
 

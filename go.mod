@@ -436,6 +436,7 @@ require (
 	github.com/heketi/tests v0.0.0-00010101000000-000000000000 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // microshift
 	github.com/lpabon/godbc v0.0.0-00010101000000-000000000000 // indirect
+	github.com/miekg/dns v1.1.35
 	github.com/mitchellh/go-homedir v1.1.0 // microshift
 	github.com/moby/sys/mount v0.2.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-00010101000000-000000000000 // indirect
@@ -460,6 +461,7 @@ require (
 	k8s.io/client-go v0.21.1
 	k8s.io/component-base v0.21.1
 	k8s.io/controller-manager v0.21.0
+	k8s.io/klog/v2 v2.8.0
 	k8s.io/kube-aggregator v0.21.0
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7
 	k8s.io/kubectl v0.21.0
