@@ -21,7 +21,7 @@
 # quay.io/microshift/microshift.  A github release and a tag are created and identified with the version generated
 # by the Makefile. Cross-compiled binaries are copied from the container images and published in the git release.
 
-set -x
+#set -x
 
 set -euo pipefail
 shopt -s expand_aliases
@@ -44,32 +44,6 @@ alias podman=${__ctr_cli_alias:?"a container manager (podman || docker) is requi
 #########
 # FUNCS #
 #########
-
-help() {
-  printf 'Microshift: release.sh
-This script provides some simple automation for cutting new releases of Microshift.
-
-Use:
-    ./release.sh --token $(cat /token/path)
-    Note: do not use "=" with flag values
-Inputs:
-    --token       (Required) The github application auth token, use to create a github release.
-    --debug, -d   Print generated script values for debugging.
-    --help, -h    Print this help text.
-Outputs:
-- A version, formatted as 4.7.0-0.microshift-YYYY-MM-DD-HHMMSS, is applied as a git tag and pushed to the repo
-- Multi-architecture container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
-- Cross-compiled binaries
-- A sha256 checksum file, containing the checksums for all binary artifacts
-- A github release, containing the binary artifacts and checksum file.
-
-DEBUG
-To test releases against a downstream/fork repository, override GIT_OWNER to forked git org/owner and QUAY_OWNER to your
-quay.io owner or org.
-
-  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path
-'
-}
 
 generate_api_release_request() {
   local is_prerelease="${1:=true}" # (copejon) assume for now that all releases are prerelease, unless otherwise specified
@@ -216,6 +190,33 @@ debug() {
   printf "Image Artifact: %s\n" "$IMAGE_REPO:$VERSION"
   printf "generate_version: %s\n" "$version"
   printf "compose_release_request: %s\n" "$api_request"
+}
+
+
+help() {
+  printf 'Microshift: release.sh
+This script provides some simple automation for cutting new releases of Microshift.
+
+Use:
+    ./release.sh --token $(cat /token/path)
+    Note: do not use "=" with flag values
+Inputs:
+    --token       (Required) The github application auth token, use to create a github release.
+    --debug, -d   Print generated script values for debugging.
+    --help, -h    Print this help text.
+Outputs:
+- A version, formatted as 4.7.0-0.microshift-YYYY-MM-DD-HHMMSS, is applied as a git tag and pushed to the repo
+- Multi-architecture container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
+- Cross-compiled binaries
+- A sha256 checksum file, containing the checksums for all binary artifacts
+- A github release, containing the binary artifacts and checksum file.
+
+DEBUG
+To test releases against a downstream/fork repository, override GIT_OWNER to forked git org/owner and QUAY_OWNER to your
+quay.io owner or org.
+
+  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path
+'
 }
 
 ########
