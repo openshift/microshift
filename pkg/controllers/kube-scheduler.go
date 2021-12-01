@@ -61,14 +61,8 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-scheduler/config/config.yaml",
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
 		"--vmodule=" + cfg.LogVModule,
-	}
-
-	if cfg.LogDir != "" {
-		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-scheduler.log"))
 	}
 
 	cmd := &cobra.Command{

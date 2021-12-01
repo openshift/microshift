@@ -115,14 +115,11 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		"--tls-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
 		"--tls-private-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
 		"--cors-allowed-origins=/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$",
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
 		"--vmodule=" + cfg.LogVModule,
 	}
 	if cfg.LogDir != "" {
 		args = append(args,
-			"--log-file="+filepath.Join(cfg.LogDir, "kube-apiserver.log"),
 			"--audit-log-path="+filepath.Join(cfg.LogDir, "kube-apiserver-audit.log"))
 	}
 
