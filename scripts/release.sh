@@ -192,18 +192,31 @@ debug() {
   printf "compose_release_request: %s\n" "$api_request"
 }
 
-
 help() {
   printf 'Microshift: release.sh
 This script provides some simple automation for cutting new releases of Microshift.
 
 Use:
-    ./release.sh --token $(cat /token/path)
+./release.sh --token $(cat /token/path) --version 4.8.0-0.microshift-$(date -u "+%%Y-%%m-%%d-%%H%%M%%S")
     Note: do not use "=" with flag values
 Inputs:
     --token       (Required) The github application auth token, use to create a github release.
+
+    --version     (Required) The version to be propagated to image tags, git tags, and binary name suffixes.
+
     --debug, -d   Print generated script values for debugging.
+
+    --nightly     Enables excluse release of the AIO architecture images and manifest.
+                  The purpose is to enable the reuse of this script for nightly/ad hoc releases.
+                  Nightly releases will NOT publish a github release, will NOT generate a git tag.
+                  Nightly releases will are not aliased with the "latest" tag, which is reserverd
+                  for stable releases.
+
+                  Nightly builds 
+
+
     --help, -h    Print this help text.
+
 Outputs:
 - A version, formatted as 4.7.0-0.microshift-YYYY-MM-DD-HHMMSS, is applied as a git tag and pushed to the repo
 - Multi-architecture container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
@@ -216,15 +229,20 @@ To test releases against a downstream/fork repository, override GIT_OWNER to for
 quay.io owner or org.
 
   e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path
+
 '
 }
 
 ########
 # MAIN #
 ########
+
+# NIGHTLY: 0=false, publish all artifacts.  
+#          1=true, publish nightly AIO and stand alone images<F5>
+NIGHTLY=0
 while [ $# -gt 0 ]; do
   case "$1" in
-    "--token")
+    --token)
       TOKEN="${2:-}"
       [[ "$TOKEN" =~ ^-.* ]] || [[ -z "$TOKEN" ]] && {
         printf "flag $1 git release API calls require robot token"
@@ -232,7 +250,7 @@ while [ $# -gt 0 ]; do
       }
       shift 2
       ;;
-    "--version")
+    --version)
       VERSION="${2:-}"
       [[ "$VERSION" =~ ^-.* ]] || [[ -z "$VERSION" ]] && {
         printf "flag $1 expects a version input value"
@@ -240,8 +258,13 @@ while [ $# -gt 0 ]; do
       }
       shift 2
       ;;
-    "-h" | "--help")
-      help && exit
+    --nightly)
+      NIGHTLY=1
+      shift 1
+      ;;
+    -h|--help)
+      help
+      exit 0
       ;;
     *)
       echo "unknown input: $1" && help && exit 1
