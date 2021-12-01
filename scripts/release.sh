@@ -27,8 +27,8 @@ set -euo pipefail
 shopt -s expand_aliases
 
 # debugging options
-#trap 'echo "# $BASH_COMMAND"' DEBUG
-#set -x
+trap 'echo "# $BASH_COMMAND"' DEBUG
+set -x
 
 ########
 # INIT #
@@ -238,7 +238,7 @@ quay.io owner or org.
 ########
 
 # NIGHTLY: 0=false, publish all artifacts.  
-#          1=true, publish nightly AIO and stand alone images<F5>
+#          1=true, publish nightly AIO and stand alone images
 NIGHTLY=0
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -284,23 +284,32 @@ API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
 AIO_IMAGE_REPO="quay.io/$QUAY_OWNER/microshift-aio"
-RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
-AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-arm64" )
+
+if [ $NIGHTLY -eq 1 ]; then
+  VERSION="$VERSION-nightly"
+fi
+
+RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64")
+AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-arm64")
 
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
-
 # publish containerized microshift 
 build_container_images_artifacts                                          || exit 1
 STAGE_DIR=$(stage_release_image_binaries)                                 || exit 1
 push_container_image_artifacts                                            || exit 1
 push_container_manifest "$IMAGE_REPO" "${RELEASE_IMAGE_TAGS[@]}"          || exit 1
 
-# publish binaries 
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"                   || exit 1
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                    || exit 1
-
 # publish aio container 
 build_aio_container_images_artifacts                                      || exit 1
 push_aio_container_image_artifacts                                        || exit 1
 push_container_manifest "$AIO_IMAGE_REPO" "${AIO_RELEASE_IMAGE_TAGS[@]}"  || exit 1
+
+if [ $NIGHTLY -eq 1 ]; then
+  printf "Nightly release complete."
+  exit 0
+fi 
+
+# publish binaries 
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"                   || exit 1
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                    || exit 1
