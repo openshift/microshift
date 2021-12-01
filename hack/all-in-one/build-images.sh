@@ -16,6 +16,7 @@ for img in "registry.access.redhat.com/ubi8/ubi-init:8.4" "docker.io/nvidia/cuda
    for host in "rhel7" "rhel8"; do
         host_tag=""
         [ "${host}" == "rhel7" ] && host_tag="-rhel7"
-        podman build --build-arg ARCH="${ARCH}" --build-arg IMAGE_NAME=${img} --build-arg HOST=${host} -t "${TAG}"-"${tag}"${host_tag} .
+        CPU=$(uname -m)
+        podman build --build-arg CPU=${CPU} ARCH="${ARCH}" --build-arg IMAGE_NAME=${img} --build-arg HOST=${host} -t "${TAG}"-"${tag}"${host_tag} .
    done
 done
