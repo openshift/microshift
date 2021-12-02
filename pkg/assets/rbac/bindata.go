@@ -202,7 +202,8 @@ func assetsRbac0000_00_podsecuritypolicyFlannelYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsRbac0000_50_clusterPolicyController_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+var _assetsRbac0000_50_clusterPolicyController_clusterroleYaml = []byte(`# https://github.com/openshift/cluster-kube-controller-manager-operator/blob/release-4.8/bindata/v4.1.0/kube-controller-manager/namespace-security-allocation-controller-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
@@ -252,7 +253,8 @@ func assetsRbac0000_50_clusterPolicyController_clusterroleYaml() (*asset, error)
 	return a, nil
 }
 
-var _assetsRbac0000_50_clusterPolicyController_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+var _assetsRbac0000_50_clusterPolicyController_clusterrolebindingYaml = []byte(`# https://github.com/openshift/cluster-kube-controller-manager-operator/blob/release-4.8/bindata/v4.1.0/kube-controller-manager/namespace-security-allocation-controller-clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: namespace-security-allocation-controller

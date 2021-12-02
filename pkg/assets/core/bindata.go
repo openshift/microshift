@@ -149,7 +149,8 @@ func assetsCore0000_00_flannelServiceAccountYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYaml = []byte(`apiVersion: v1
+var _assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYaml = []byte(`# https://github.com/openshift/cluster-kube-controller-manager-operator/blob/release-4.8/bindata/v4.1.0/kube-controller-manager/ns.yaml
+apiVersion: v1
 kind: Namespace
 metadata:
   annotations:

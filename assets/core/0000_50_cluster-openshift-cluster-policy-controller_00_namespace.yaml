@@ -1,3 +1,4 @@
+# https://github.com/openshift/cluster-kube-controller-manager-operator/blob/release-4.8/bindata/v4.1.0/kube-controller-manager/ns.yaml
 apiVersion: v1
 kind: Namespace
 metadata:

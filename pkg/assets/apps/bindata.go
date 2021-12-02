@@ -180,7 +180,9 @@ func assetsApps0000_00_flannelDaemonsetYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsApps0000_50_cluster_policy_controller_deployYaml = []byte(`apiVersion: apps/v1
+var _assetsApps0000_50_cluster_policy_controller_deployYaml = []byte(`# static pod container cluster-policy-controller
+# https://github.com/openshift/cluster-kube-controller-manager-operator/blob/release-4.8/bindata/v4.1.0/kube-controller-manager/pod.yaml
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: openshift-kube-controller-manager

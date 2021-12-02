@@ -1068,7 +1068,8 @@ func assetsCrd0000_03_securityOpenshift_01_sccCrdYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsCrd0000_03_securityinternalOpenshift_01_rangeallocationCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
+var _assetsCrd0000_03_securityinternalOpenshift_01_rangeallocationCrdYaml = []byte(`# https://github.com/openshift/api/blob/release-4.8/securityinternal/v1/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
