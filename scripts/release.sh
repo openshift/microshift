@@ -150,28 +150,40 @@ push_container_image_artifacts() {
 podman_create_manifest(){
   local dest_repo="$1"
   local image_tags="$2"
+  local alias_tag="latest"
+
+  if [ "$NIGHTLY" -eq 1 ]; then
+    alias_tag="nightly"
+  fi
+
   podman manifest create "$dest_repo:$VERSION" >&2
   for ref in "${image_tags[*]}"; do
     podman manifest add "$dest_repo:$VERSION" "docker://$ref"
   done
     podman manifest push "$dest_repo:$VERSION" "$dest_repo:$VERSION"
-    podman manifest push "$dest_repo:$VERSION" "$dest_repo:latest"
+    podman manifest push "$dest_repo:$VERSION" "$dest_repo:$alias_tag"
 }
 
 docker_create_manifest(){
   local dest_repo="$1"
   local image_tags="$2"
+  local alias_tag="latest"
+
+  if [ "$NIGHTLY" -eq 1 ]; then
+    alias_tag="nightly"
+  fi
+
   # use docker cli directly for clarity, as this is a docker-only func
   docker manifest create "$dest_repo:$VERSION" "${image_tags[*]}" >&2
-  docker tag "$dest_repo:$VERSION" "$dest_repo:latest"
+  docker tag "$dest_repo:$VERSION" "$dest_repo:$alias_tag"
   docker manifest push "$dest_repo:$VERSION"
-  docker manifest push "$dest_repo:latest"
+  docker manifest push "$dest_repo:$alias_tag"
 }
 
 # It is necessarry to differentiate between podman and docker manifest create subcommands.
 # Podman exepcts the manifest to exist prior to adding images; docker allows for an image list
 # to be passed at creation. Podman also requires a prefixed "container-transport", which is
-# no recognized by docker, causing the command to fail.
+# not recognized by docker, causing the command to fail.
 push_container_manifest() {
   local dest_repo="$1"
   local image_tags="$2"
