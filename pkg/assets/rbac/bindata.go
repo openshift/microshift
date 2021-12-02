@@ -3,6 +3,8 @@
 // assets/rbac/0000_00_flannel-clusterrole.yaml
 // assets/rbac/0000_00_flannel-clusterrolebinding.yaml
 // assets/rbac/0000_00_podsecuritypolicy-flannel.yaml
+// assets/rbac/0000_50_cluster-policy-controller_clusterrole.yaml
+// assets/rbac/0000_50_cluster-policy-controller_clusterrolebinding.yaml
 // assets/rbac/0000_60_service-ca_00_clusterrole.yaml
 // assets/rbac/0000_60_service-ca_00_clusterrolebinding.yaml
 // assets/rbac/0000_60_service-ca_00_role.yaml
@@ -196,6 +198,85 @@ func assetsRbac0000_00_podsecuritypolicyFlannelYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/rbac/0000_00_podsecuritypolicy-flannel.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsRbac0000_50_clusterPolicyController_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+  name: namespace-security-allocation-controller
+rules:
+- apiGroups:
+  - security.openshift.io
+  - security.internal.openshift.io
+  resources:
+  - rangeallocations
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - update
+  - watch
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+`)
+
+func assetsRbac0000_50_clusterPolicyController_clusterroleYamlBytes() ([]byte, error) {
+	return _assetsRbac0000_50_clusterPolicyController_clusterroleYaml, nil
+}
+
+func assetsRbac0000_50_clusterPolicyController_clusterroleYaml() (*asset, error) {
+	bytes, err := assetsRbac0000_50_clusterPolicyController_clusterroleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/rbac/0000_50_cluster-policy-controller_clusterrole.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsRbac0000_50_clusterPolicyController_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: namespace-security-allocation-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: namespace-security-allocation-controller
+subjects:
+- kind: ServiceAccount
+  name: namespace-security-allocation-controller
+  namespace: openshift-infra
+`)
+
+func assetsRbac0000_50_clusterPolicyController_clusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsRbac0000_50_clusterPolicyController_clusterrolebindingYaml, nil
+}
+
+func assetsRbac0000_50_clusterPolicyController_clusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsRbac0000_50_clusterPolicyController_clusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/rbac/0000_50_cluster-policy-controller_clusterrolebinding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -712,19 +793,21 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"assets/rbac/0000_00_flannel-clusterrole.yaml":                     assetsRbac0000_00_flannelClusterroleYaml,
-	"assets/rbac/0000_00_flannel-clusterrolebinding.yaml":              assetsRbac0000_00_flannelClusterrolebindingYaml,
-	"assets/rbac/0000_00_podsecuritypolicy-flannel.yaml":               assetsRbac0000_00_podsecuritypolicyFlannelYaml,
-	"assets/rbac/0000_60_service-ca_00_clusterrole.yaml":               assetsRbac0000_60_serviceCa_00_clusterroleYaml,
-	"assets/rbac/0000_60_service-ca_00_clusterrolebinding.yaml":        assetsRbac0000_60_serviceCa_00_clusterrolebindingYaml,
-	"assets/rbac/0000_60_service-ca_00_role.yaml":                      assetsRbac0000_60_serviceCa_00_roleYaml,
-	"assets/rbac/0000_60_service-ca_00_rolebinding.yaml":               assetsRbac0000_60_serviceCa_00_rolebindingYaml,
-	"assets/rbac/0000_70_dns_01-cluster-role-binding.yaml":             assetsRbac0000_70_dns_01ClusterRoleBindingYaml,
-	"assets/rbac/0000_70_dns_01-cluster-role.yaml":                     assetsRbac0000_70_dns_01ClusterRoleYaml,
-	"assets/rbac/0000_80_hostpath-provisioner-clusterrole.yaml":        assetsRbac0000_80_hostpathProvisionerClusterroleYaml,
-	"assets/rbac/0000_80_hostpath-provisioner-clusterrolebinding.yaml": assetsRbac0000_80_hostpathProvisionerClusterrolebindingYaml,
-	"assets/rbac/0000_80_openshift-router-cluster-role-binding.yaml":   assetsRbac0000_80_openshiftRouterClusterRoleBindingYaml,
-	"assets/rbac/0000_80_openshift-router-cluster-role.yaml":           assetsRbac0000_80_openshiftRouterClusterRoleYaml,
+	"assets/rbac/0000_00_flannel-clusterrole.yaml":                          assetsRbac0000_00_flannelClusterroleYaml,
+	"assets/rbac/0000_00_flannel-clusterrolebinding.yaml":                   assetsRbac0000_00_flannelClusterrolebindingYaml,
+	"assets/rbac/0000_00_podsecuritypolicy-flannel.yaml":                    assetsRbac0000_00_podsecuritypolicyFlannelYaml,
+	"assets/rbac/0000_50_cluster-policy-controller_clusterrole.yaml":        assetsRbac0000_50_clusterPolicyController_clusterroleYaml,
+	"assets/rbac/0000_50_cluster-policy-controller_clusterrolebinding.yaml": assetsRbac0000_50_clusterPolicyController_clusterrolebindingYaml,
+	"assets/rbac/0000_60_service-ca_00_clusterrole.yaml":                    assetsRbac0000_60_serviceCa_00_clusterroleYaml,
+	"assets/rbac/0000_60_service-ca_00_clusterrolebinding.yaml":             assetsRbac0000_60_serviceCa_00_clusterrolebindingYaml,
+	"assets/rbac/0000_60_service-ca_00_role.yaml":                           assetsRbac0000_60_serviceCa_00_roleYaml,
+	"assets/rbac/0000_60_service-ca_00_rolebinding.yaml":                    assetsRbac0000_60_serviceCa_00_rolebindingYaml,
+	"assets/rbac/0000_70_dns_01-cluster-role-binding.yaml":                  assetsRbac0000_70_dns_01ClusterRoleBindingYaml,
+	"assets/rbac/0000_70_dns_01-cluster-role.yaml":                          assetsRbac0000_70_dns_01ClusterRoleYaml,
+	"assets/rbac/0000_80_hostpath-provisioner-clusterrole.yaml":             assetsRbac0000_80_hostpathProvisionerClusterroleYaml,
+	"assets/rbac/0000_80_hostpath-provisioner-clusterrolebinding.yaml":      assetsRbac0000_80_hostpathProvisionerClusterrolebindingYaml,
+	"assets/rbac/0000_80_openshift-router-cluster-role-binding.yaml":        assetsRbac0000_80_openshiftRouterClusterRoleBindingYaml,
+	"assets/rbac/0000_80_openshift-router-cluster-role.yaml":                assetsRbac0000_80_openshiftRouterClusterRoleYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -770,19 +853,21 @@ type bintree struct {
 var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"rbac": {nil, map[string]*bintree{
-			"0000_00_flannel-clusterrole.yaml":                     {assetsRbac0000_00_flannelClusterroleYaml, map[string]*bintree{}},
-			"0000_00_flannel-clusterrolebinding.yaml":              {assetsRbac0000_00_flannelClusterrolebindingYaml, map[string]*bintree{}},
-			"0000_00_podsecuritypolicy-flannel.yaml":               {assetsRbac0000_00_podsecuritypolicyFlannelYaml, map[string]*bintree{}},
-			"0000_60_service-ca_00_clusterrole.yaml":               {assetsRbac0000_60_serviceCa_00_clusterroleYaml, map[string]*bintree{}},
-			"0000_60_service-ca_00_clusterrolebinding.yaml":        {assetsRbac0000_60_serviceCa_00_clusterrolebindingYaml, map[string]*bintree{}},
-			"0000_60_service-ca_00_role.yaml":                      {assetsRbac0000_60_serviceCa_00_roleYaml, map[string]*bintree{}},
-			"0000_60_service-ca_00_rolebinding.yaml":               {assetsRbac0000_60_serviceCa_00_rolebindingYaml, map[string]*bintree{}},
-			"0000_70_dns_01-cluster-role-binding.yaml":             {assetsRbac0000_70_dns_01ClusterRoleBindingYaml, map[string]*bintree{}},
-			"0000_70_dns_01-cluster-role.yaml":                     {assetsRbac0000_70_dns_01ClusterRoleYaml, map[string]*bintree{}},
-			"0000_80_hostpath-provisioner-clusterrole.yaml":        {assetsRbac0000_80_hostpathProvisionerClusterroleYaml, map[string]*bintree{}},
-			"0000_80_hostpath-provisioner-clusterrolebinding.yaml": {assetsRbac0000_80_hostpathProvisionerClusterrolebindingYaml, map[string]*bintree{}},
-			"0000_80_openshift-router-cluster-role-binding.yaml":   {assetsRbac0000_80_openshiftRouterClusterRoleBindingYaml, map[string]*bintree{}},
-			"0000_80_openshift-router-cluster-role.yaml":           {assetsRbac0000_80_openshiftRouterClusterRoleYaml, map[string]*bintree{}},
+			"0000_00_flannel-clusterrole.yaml":                          {assetsRbac0000_00_flannelClusterroleYaml, map[string]*bintree{}},
+			"0000_00_flannel-clusterrolebinding.yaml":                   {assetsRbac0000_00_flannelClusterrolebindingYaml, map[string]*bintree{}},
+			"0000_00_podsecuritypolicy-flannel.yaml":                    {assetsRbac0000_00_podsecuritypolicyFlannelYaml, map[string]*bintree{}},
+			"0000_50_cluster-policy-controller_clusterrole.yaml":        {assetsRbac0000_50_clusterPolicyController_clusterroleYaml, map[string]*bintree{}},
+			"0000_50_cluster-policy-controller_clusterrolebinding.yaml": {assetsRbac0000_50_clusterPolicyController_clusterrolebindingYaml, map[string]*bintree{}},
+			"0000_60_service-ca_00_clusterrole.yaml":                    {assetsRbac0000_60_serviceCa_00_clusterroleYaml, map[string]*bintree{}},
+			"0000_60_service-ca_00_clusterrolebinding.yaml":             {assetsRbac0000_60_serviceCa_00_clusterrolebindingYaml, map[string]*bintree{}},
+			"0000_60_service-ca_00_role.yaml":                           {assetsRbac0000_60_serviceCa_00_roleYaml, map[string]*bintree{}},
+			"0000_60_service-ca_00_rolebinding.yaml":                    {assetsRbac0000_60_serviceCa_00_rolebindingYaml, map[string]*bintree{}},
+			"0000_70_dns_01-cluster-role-binding.yaml":                  {assetsRbac0000_70_dns_01ClusterRoleBindingYaml, map[string]*bintree{}},
+			"0000_70_dns_01-cluster-role.yaml":                          {assetsRbac0000_70_dns_01ClusterRoleYaml, map[string]*bintree{}},
+			"0000_80_hostpath-provisioner-clusterrole.yaml":             {assetsRbac0000_80_hostpathProvisionerClusterroleYaml, map[string]*bintree{}},
+			"0000_80_hostpath-provisioner-clusterrolebinding.yaml":      {assetsRbac0000_80_hostpathProvisionerClusterrolebindingYaml, map[string]*bintree{}},
+			"0000_80_openshift-router-cluster-role-binding.yaml":        {assetsRbac0000_80_openshiftRouterClusterRoleBindingYaml, map[string]*bintree{}},
+			"0000_80_openshift-router-cluster-role.yaml":                {assetsRbac0000_80_openshiftRouterClusterRoleYaml, map[string]*bintree{}},
 		}},
 	}},
 }}

@@ -2,7 +2,10 @@
 // sources:
 // assets/core/0000_00_flannel-configmap.yaml
 // assets/core/0000_00_flannel-service-account.yaml
+// assets/core/0000_50_cluster-openshift-cluster-policy-controller_00_namespace.yaml
+// assets/core/0000_50_cluster-openshift-cluster-policy-controller_service-account.yaml
 // assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
+// assets/core/0000_50_namespace-security-allocation-controller_sa.yaml
 // assets/core/0000_60_service-ca_01_namespace.yaml
 // assets/core/0000_60_service-ca_04_configmap.yaml
 // assets/core/0000_60_service-ca_04_sa.yaml
@@ -146,6 +149,57 @@ func assetsCore0000_00_flannelServiceAccountYaml() (*asset, error) {
 	return a, nil
 }
 
+var _assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYaml = []byte(`apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+  labels:
+    # set value to avoid depending on kube admission that depends on openshift apis
+    openshift.io/run-level: "0"
+    # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
+    openshift.io/cluster-monitoring: "true"
+  name: openshift-kube-controller-manager
+`)
+
+func assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYamlBytes() ([]byte, error) {
+	return _assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYaml, nil
+}
+
+func assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYaml() (*asset, error) {
+	bytes, err := assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-cluster-policy-controller_00_namespace.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCore0000_50_clusterOpenshiftClusterPolicyController_serviceAccountYaml = []byte(`apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: openshift-kube-controller-manager
+  name: openshift-cluster-policy-controller-sa
+`)
+
+func assetsCore0000_50_clusterOpenshiftClusterPolicyController_serviceAccountYamlBytes() ([]byte, error) {
+	return _assetsCore0000_50_clusterOpenshiftClusterPolicyController_serviceAccountYaml, nil
+}
+
+func assetsCore0000_50_clusterOpenshiftClusterPolicyController_serviceAccountYaml() (*asset, error) {
+	bytes, err := assetsCore0000_50_clusterOpenshiftClusterPolicyController_serviceAccountYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-cluster-policy-controller_service-account.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml = []byte(`apiVersion: v1
 kind: Namespace
 metadata:
@@ -168,6 +222,28 @@ func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*as
 	}
 
 	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCore0000_50_namespaceSecurityAllocationController_saYaml = []byte(`apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: openshift-infra
+  name: namespace-security-allocation-controller
+`)
+
+func assetsCore0000_50_namespaceSecurityAllocationController_saYamlBytes() ([]byte, error) {
+	return _assetsCore0000_50_namespaceSecurityAllocationController_saYaml, nil
+}
+
+func assetsCore0000_50_namespaceSecurityAllocationController_saYaml() (*asset, error) {
+	bytes, err := assetsCore0000_50_namespaceSecurityAllocationController_saYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_50_namespace-security-allocation-controller_sa.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -690,25 +766,28 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"assets/core/0000_00_flannel-configmap.yaml":                                 assetsCore0000_00_flannelConfigmapYaml,
-	"assets/core/0000_00_flannel-service-account.yaml":                           assetsCore0000_00_flannelServiceAccountYaml,
-	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml": assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
-	"assets/core/0000_60_service-ca_01_namespace.yaml":                           assetsCore0000_60_serviceCa_01_namespaceYaml,
-	"assets/core/0000_60_service-ca_04_configmap.yaml":                           assetsCore0000_60_serviceCa_04_configmapYaml,
-	"assets/core/0000_60_service-ca_04_sa.yaml":                                  assetsCore0000_60_serviceCa_04_saYaml,
-	"assets/core/0000_60_service-ca_04_secret.yaml":                              assetsCore0000_60_serviceCa_04_secretYaml,
-	"assets/core/0000_70_dns_00-namespace.yaml":                                  assetsCore0000_70_dns_00NamespaceYaml,
-	"assets/core/0000_70_dns_01-configmap.yaml":                                  assetsCore0000_70_dns_01ConfigmapYaml,
-	"assets/core/0000_70_dns_01-dns-service-account.yaml":                        assetsCore0000_70_dns_01DnsServiceAccountYaml,
-	"assets/core/0000_70_dns_01-node-resolver-service-account.yaml":              assetsCore0000_70_dns_01NodeResolverServiceAccountYaml,
-	"assets/core/0000_70_dns_01-service.yaml":                                    assetsCore0000_70_dns_01ServiceYaml,
-	"assets/core/0000_80_hostpath-provisioner-namespace.yaml":                    assetsCore0000_80_hostpathProvisionerNamespaceYaml,
-	"assets/core/0000_80_hostpath-provisioner-serviceaccount.yaml":               assetsCore0000_80_hostpathProvisionerServiceaccountYaml,
-	"assets/core/0000_80_openshift-router-cm.yaml":                               assetsCore0000_80_openshiftRouterCmYaml,
-	"assets/core/0000_80_openshift-router-external-service.yaml":                 assetsCore0000_80_openshiftRouterExternalServiceYaml,
-	"assets/core/0000_80_openshift-router-namespace.yaml":                        assetsCore0000_80_openshiftRouterNamespaceYaml,
-	"assets/core/0000_80_openshift-router-service-account.yaml":                  assetsCore0000_80_openshiftRouterServiceAccountYaml,
-	"assets/core/0000_80_openshift-router-service.yaml":                          assetsCore0000_80_openshiftRouterServiceYaml,
+	"assets/core/0000_00_flannel-configmap.yaml":                                           assetsCore0000_00_flannelConfigmapYaml,
+	"assets/core/0000_00_flannel-service-account.yaml":                                     assetsCore0000_00_flannelServiceAccountYaml,
+	"assets/core/0000_50_cluster-openshift-cluster-policy-controller_00_namespace.yaml":    assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYaml,
+	"assets/core/0000_50_cluster-openshift-cluster-policy-controller_service-account.yaml": assetsCore0000_50_clusterOpenshiftClusterPolicyController_serviceAccountYaml,
+	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml":           assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
+	"assets/core/0000_50_namespace-security-allocation-controller_sa.yaml":                 assetsCore0000_50_namespaceSecurityAllocationController_saYaml,
+	"assets/core/0000_60_service-ca_01_namespace.yaml":                                     assetsCore0000_60_serviceCa_01_namespaceYaml,
+	"assets/core/0000_60_service-ca_04_configmap.yaml":                                     assetsCore0000_60_serviceCa_04_configmapYaml,
+	"assets/core/0000_60_service-ca_04_sa.yaml":                                            assetsCore0000_60_serviceCa_04_saYaml,
+	"assets/core/0000_60_service-ca_04_secret.yaml":                                        assetsCore0000_60_serviceCa_04_secretYaml,
+	"assets/core/0000_70_dns_00-namespace.yaml":                                            assetsCore0000_70_dns_00NamespaceYaml,
+	"assets/core/0000_70_dns_01-configmap.yaml":                                            assetsCore0000_70_dns_01ConfigmapYaml,
+	"assets/core/0000_70_dns_01-dns-service-account.yaml":                                  assetsCore0000_70_dns_01DnsServiceAccountYaml,
+	"assets/core/0000_70_dns_01-node-resolver-service-account.yaml":                        assetsCore0000_70_dns_01NodeResolverServiceAccountYaml,
+	"assets/core/0000_70_dns_01-service.yaml":                                              assetsCore0000_70_dns_01ServiceYaml,
+	"assets/core/0000_80_hostpath-provisioner-namespace.yaml":                              assetsCore0000_80_hostpathProvisionerNamespaceYaml,
+	"assets/core/0000_80_hostpath-provisioner-serviceaccount.yaml":                         assetsCore0000_80_hostpathProvisionerServiceaccountYaml,
+	"assets/core/0000_80_openshift-router-cm.yaml":                                         assetsCore0000_80_openshiftRouterCmYaml,
+	"assets/core/0000_80_openshift-router-external-service.yaml":                           assetsCore0000_80_openshiftRouterExternalServiceYaml,
+	"assets/core/0000_80_openshift-router-namespace.yaml":                                  assetsCore0000_80_openshiftRouterNamespaceYaml,
+	"assets/core/0000_80_openshift-router-service-account.yaml":                            assetsCore0000_80_openshiftRouterServiceAccountYaml,
+	"assets/core/0000_80_openshift-router-service.yaml":                                    assetsCore0000_80_openshiftRouterServiceYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -754,25 +833,28 @@ type bintree struct {
 var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"core": {nil, map[string]*bintree{
-			"0000_00_flannel-configmap.yaml":                                 {assetsCore0000_00_flannelConfigmapYaml, map[string]*bintree{}},
-			"0000_00_flannel-service-account.yaml":                           {assetsCore0000_00_flannelServiceAccountYaml, map[string]*bintree{}},
-			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml": {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
-			"0000_60_service-ca_01_namespace.yaml":                           {assetsCore0000_60_serviceCa_01_namespaceYaml, map[string]*bintree{}},
-			"0000_60_service-ca_04_configmap.yaml":                           {assetsCore0000_60_serviceCa_04_configmapYaml, map[string]*bintree{}},
-			"0000_60_service-ca_04_sa.yaml":                                  {assetsCore0000_60_serviceCa_04_saYaml, map[string]*bintree{}},
-			"0000_60_service-ca_04_secret.yaml":                              {assetsCore0000_60_serviceCa_04_secretYaml, map[string]*bintree{}},
-			"0000_70_dns_00-namespace.yaml":                                  {assetsCore0000_70_dns_00NamespaceYaml, map[string]*bintree{}},
-			"0000_70_dns_01-configmap.yaml":                                  {assetsCore0000_70_dns_01ConfigmapYaml, map[string]*bintree{}},
-			"0000_70_dns_01-dns-service-account.yaml":                        {assetsCore0000_70_dns_01DnsServiceAccountYaml, map[string]*bintree{}},
-			"0000_70_dns_01-node-resolver-service-account.yaml":              {assetsCore0000_70_dns_01NodeResolverServiceAccountYaml, map[string]*bintree{}},
-			"0000_70_dns_01-service.yaml":                                    {assetsCore0000_70_dns_01ServiceYaml, map[string]*bintree{}},
-			"0000_80_hostpath-provisioner-namespace.yaml":                    {assetsCore0000_80_hostpathProvisionerNamespaceYaml, map[string]*bintree{}},
-			"0000_80_hostpath-provisioner-serviceaccount.yaml":               {assetsCore0000_80_hostpathProvisionerServiceaccountYaml, map[string]*bintree{}},
-			"0000_80_openshift-router-cm.yaml":                               {assetsCore0000_80_openshiftRouterCmYaml, map[string]*bintree{}},
-			"0000_80_openshift-router-external-service.yaml":                 {assetsCore0000_80_openshiftRouterExternalServiceYaml, map[string]*bintree{}},
-			"0000_80_openshift-router-namespace.yaml":                        {assetsCore0000_80_openshiftRouterNamespaceYaml, map[string]*bintree{}},
-			"0000_80_openshift-router-service-account.yaml":                  {assetsCore0000_80_openshiftRouterServiceAccountYaml, map[string]*bintree{}},
-			"0000_80_openshift-router-service.yaml":                          {assetsCore0000_80_openshiftRouterServiceYaml, map[string]*bintree{}},
+			"0000_00_flannel-configmap.yaml":                                           {assetsCore0000_00_flannelConfigmapYaml, map[string]*bintree{}},
+			"0000_00_flannel-service-account.yaml":                                     {assetsCore0000_00_flannelServiceAccountYaml, map[string]*bintree{}},
+			"0000_50_cluster-openshift-cluster-policy-controller_00_namespace.yaml":    {assetsCore0000_50_clusterOpenshiftClusterPolicyController_00_namespaceYaml, map[string]*bintree{}},
+			"0000_50_cluster-openshift-cluster-policy-controller_service-account.yaml": {assetsCore0000_50_clusterOpenshiftClusterPolicyController_serviceAccountYaml, map[string]*bintree{}},
+			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml":           {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
+			"0000_50_namespace-security-allocation-controller_sa.yaml":                 {assetsCore0000_50_namespaceSecurityAllocationController_saYaml, map[string]*bintree{}},
+			"0000_60_service-ca_01_namespace.yaml":                                     {assetsCore0000_60_serviceCa_01_namespaceYaml, map[string]*bintree{}},
+			"0000_60_service-ca_04_configmap.yaml":                                     {assetsCore0000_60_serviceCa_04_configmapYaml, map[string]*bintree{}},
+			"0000_60_service-ca_04_sa.yaml":                                            {assetsCore0000_60_serviceCa_04_saYaml, map[string]*bintree{}},
+			"0000_60_service-ca_04_secret.yaml":                                        {assetsCore0000_60_serviceCa_04_secretYaml, map[string]*bintree{}},
+			"0000_70_dns_00-namespace.yaml":                                            {assetsCore0000_70_dns_00NamespaceYaml, map[string]*bintree{}},
+			"0000_70_dns_01-configmap.yaml":                                            {assetsCore0000_70_dns_01ConfigmapYaml, map[string]*bintree{}},
+			"0000_70_dns_01-dns-service-account.yaml":                                  {assetsCore0000_70_dns_01DnsServiceAccountYaml, map[string]*bintree{}},
+			"0000_70_dns_01-node-resolver-service-account.yaml":                        {assetsCore0000_70_dns_01NodeResolverServiceAccountYaml, map[string]*bintree{}},
+			"0000_70_dns_01-service.yaml":                                              {assetsCore0000_70_dns_01ServiceYaml, map[string]*bintree{}},
+			"0000_80_hostpath-provisioner-namespace.yaml":                              {assetsCore0000_80_hostpathProvisionerNamespaceYaml, map[string]*bintree{}},
+			"0000_80_hostpath-provisioner-serviceaccount.yaml":                         {assetsCore0000_80_hostpathProvisionerServiceaccountYaml, map[string]*bintree{}},
+			"0000_80_openshift-router-cm.yaml":                                         {assetsCore0000_80_openshiftRouterCmYaml, map[string]*bintree{}},
+			"0000_80_openshift-router-external-service.yaml":                           {assetsCore0000_80_openshiftRouterExternalServiceYaml, map[string]*bintree{}},
+			"0000_80_openshift-router-namespace.yaml":                                  {assetsCore0000_80_openshiftRouterNamespaceYaml, map[string]*bintree{}},
+			"0000_80_openshift-router-service-account.yaml":                            {assetsCore0000_80_openshiftRouterServiceAccountYaml, map[string]*bintree{}},
+			"0000_80_openshift-router-service.yaml":                                    {assetsCore0000_80_openshiftRouterServiceYaml, map[string]*bintree{}},
 		}},
 	}},
 }}
