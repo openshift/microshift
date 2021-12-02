@@ -28,5 +28,9 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		logrus.Warningf("failed to start Flannel: %v", err)
 		return err
 	}
+	if err := startClusterPolicyController(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
+		logrus.Warningf("failed to start cluster-policy-controller: %v", err)
+		return err
+	}
 	return nil
 }
