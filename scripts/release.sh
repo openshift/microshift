@@ -200,29 +200,22 @@ Use:
 ./release.sh --token $(cat /token/path) --version 4.8.0-0.microshift-$(date -u "+%%Y-%%m-%%d-%%H%%M%%S")
     Note: do not use "=" with flag values
 Inputs:
-    --token       (Required) The github application auth token, use to create a github release.
+    --token       (Full Release Only) The github application auth token, use to create a github release.
 
     --version     (Required) The version to be propagated to image tags, git tags, and binary name suffixes.
 
     --debug, -d   Print generated script values for debugging.
 
-    --nightly     Enables excluse release of the AIO architecture images and manifest.
-                  The purpose is to enable the reuse of this script for nightly/ad hoc releases.
-                  Nightly releases will NOT publish a github release, will NOT generate a git tag.
-                  Nightly releases will are not aliased with the "latest" tag, which is reserverd
-                  for stable releases.
-
-                  Nightly builds 
-
+    --nightly     Release standalone and aio container images; does NOT publish a github release.
+                  Enables the reuse of this script for nightly releases, which do NOT represent a
+                  "latest" stable release.
 
     --help, -h    Print this help text.
 
 Outputs:
-- A version, formatted as 4.7.0-0.microshift-YYYY-MM-DD-HHMMSS, is applied as a git tag and pushed to the repo
-- Multi-architecture container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
-- Cross-compiled binaries
-- A sha256 checksum file, containing the checksums for all binary artifacts
-- A github release, containing the binary artifacts and checksum file.
+- A github release, formatted as 4.Y.Z-0.microshift-YYYY-MM-DD-HHMMSS, containing cross compiled binaries and checksum
+- Multi-architecture standalone container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
+- Multi-architecture all-in-one container manifest, tagged as `quay.io/microshift/microshift-aio:$VERSION` and `:latest`
 
 DEBUG
 To test releases against a downstream/fork repository, override GIT_OWNER to forked git org/owner and QUAY_OWNER to your
@@ -237,7 +230,7 @@ quay.io owner or org.
 # MAIN #
 ########
 
-# NIGHTLY: 0=false, publish all artifacts.  
+# NIGHTLY: 0=false, publish all artifacts.
 #          1=true, publish nightly AIO and stand alone images
 NIGHTLY=0
 while [ $# -gt 0 ]; do
@@ -290,17 +283,17 @@ if [ $NIGHTLY -eq 1 ]; then
 fi
 
 RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64")
-AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-arm64")
+AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-nft-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-nft-arm64")
 
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
-# publish containerized microshift 
+# publish containerized microshift
 build_container_images_artifacts                                          || exit 1
 STAGE_DIR=$(stage_release_image_binaries)                                 || exit 1
 push_container_image_artifacts                                            || exit 1
 push_container_manifest "$IMAGE_REPO" "${RELEASE_IMAGE_TAGS[@]}"          || exit 1
 
-# publish aio container 
+# publish aio container
 build_aio_container_images_artifacts                                      || exit 1
 push_aio_container_image_artifacts                                        || exit 1
 push_container_manifest "$AIO_IMAGE_REPO" "${AIO_RELEASE_IMAGE_TAGS[@]}"  || exit 1
@@ -308,8 +301,8 @@ push_container_manifest "$AIO_IMAGE_REPO" "${AIO_RELEASE_IMAGE_TAGS[@]}"  || exi
 if [ $NIGHTLY -eq 1 ]; then
   printf "Nightly release complete."
   exit 0
-fi 
+fi
 
-# publish binaries 
+# publish binaries
 UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"                   || exit 1
 git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                    || exit 1
