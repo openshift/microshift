@@ -1,0 +1,80 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+$script = <<-'SCRIPT'
+  sudo dnf module -y enable cri-o:1.21
+  sudo dnf copr enable -y @redhat-et/microshift
+  sudo dnf install -y microshift firewalld nss-mdns avahi-tools
+  sudo systemctl enable crio --now
+  sudo sed -i 's/mdns4_minimal/mdns/g' /etc/nsswitch.conf
+  echo .local | sudo tee /etc/mdns.allow
+  echo .local. | sudo tee -a /etc/mdns.allow
+
+  sudo systemctl enable avahi-daemon --now
+  sudo cp /vagrant/microshift /usr/bin
+
+  sudo systemctl enable firewalld --now
+  sudo firewall-cmd --zone=public --permanent --add-port=30000-32767/tcp
+  sudo firewall-cmd --zone=public --add-masquerade --permanent
+  sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+  sudo firewall-cmd --zone=public --add-port=443/tcp --permanent
+  sudo firewall-cmd --zone=public --add-port=10250/tcp --permanent
+  sudo firewall-cmd --zone=public --add-port=10251/tcp --permanent
+  sudo firewall-cmd --zone=public --add-port=5353/udp --permanent
+  sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
+  sudo firewall-cmd --reload
+  sudo sh -c "cd /usr/bin; curl https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp/stable/openshift-client-linux.tar.gz | tar xvfz -"
+
+SCRIPT
+
+
+Vagrant.configure("2") do |config|
+  
+  config.vm.define "master" do |master|
+    master.vm.box = "fedora/35-cloud-base"
+    master.vm.hostname = "microshift.local"
+    master.vm.provider "libvirt" do |v|
+      v.memory = 4096
+      v.cpus = 2
+    end
+    master.vm.provision "shell", inline: $script
+
+    # open the k8s API endpoint
+    master.vm.provision "shell", inline: "sudo firewall-cmd --zone=public --add-port=6443/tcp --permanent && sudo firewall-cmd --reload"  
+
+    # start microshift here
+    master.vm.provision "shell", inline: "sudo systemctl enable microshift --now"  
+  end
+
+  config.vm.define "worker" do |worker|
+    worker.vm.box = "fedora/35-cloud-base"
+    worker.vm.hostname = "worker.local"
+    worker.vm.provider "libvirt" do |v|
+      v.memory = 4096 
+      v.cpus = 2
+    end
+    worker.vm.provision "shell", inline: $script
+  end
+
+  config.vm.define "other" do |worker|
+    worker.vm.box = "fedora/35-cloud-base"
+    worker.vm.hostname = "consumer.local"
+    worker.vm.provider "libvirt" do |v|
+      v.memory = 2048
+      v.cpus = 2
+    end
+    worker.vm.provision "shell", inline: <<-'SCRIPT'
+      sudo dnf install -y nss-mdns avahi-tools
+      sudo sed -i 's/mdns4_minimal/mdns/g' /etc/nsswitch.conf
+      echo .local | sudo tee /etc/mdns.allow
+      echo .local. | sudo tee -a /etc/mdns.allow
+      sudo systemctl enable --now avahi-daemon
+
+    SCRIPT
+
+  end
+
+
+
+end
