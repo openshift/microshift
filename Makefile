@@ -65,7 +65,8 @@ debug:
 	@echo SOURCE_GIT_TAG:"$(SOURCE_GIT_TAG)"
 
 # These tags make sure we can statically link and avoid shared dependencies
-GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netgo osusergo'
+# netcgo : use system resolver for DNS instead of the netgo implementation which does not include mDNS
+GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netcgo osusergo'
 
 # targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
 microshift: build-containerized-cross-build-linux-amd64
