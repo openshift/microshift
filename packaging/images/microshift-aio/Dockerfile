@@ -64,6 +64,8 @@ RUN sed -i 's|/usr/libexec/crio/conmon|/usr/bin/conmon|' /etc/crio/crio.conf && 
     systemctl enable microshift.service && \
     systemctl enable crio
 
+ENV KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
+
 # rhel7 hosts, or hosts with legacy iptables need the specific iptables binaries, ubi8 comes with iptables-nft translator
 
 RUN if [ "$HOST" == "rhel7" ] || [ "$IPTABLES" != "nft" ]; then  \
