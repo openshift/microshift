@@ -78,6 +78,12 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	}
 
 	m := servicemanager.NewServiceManager()
+
+	mDNSController := mdns.NewMicroShiftmDNSController(cfg)
+
+	// all nodes must make themselves available via mDNS
+	util.Must(m.AddService(mDNSController))
+
 	if config.StringInList("controlplane", cfg.Roles) {
 		util.Must(m.AddService(controllers.NewEtcd(cfg)))
 		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
@@ -87,9 +93,8 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(controllers.NewOpenShiftCRDManager(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftAPIServer(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftOAuth(cfg)))
-
 		util.Must(m.AddService(controllers.NewOpenShiftDefaultSCCManager(cfg)))
-		util.Must(m.AddService(mdns.NewMicroShiftmDNSController(cfg)))
+		util.Must(m.AddService(mDNSController.NewmDNSRouteController()))
 		util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
 		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	}

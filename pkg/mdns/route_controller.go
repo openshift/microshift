@@ -3,6 +3,7 @@ package mdns
 import (
 	"context"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/openshift/microshift/pkg/mdns/server"
@@ -22,11 +23,37 @@ import (
 
 const defaultResyncTime = time.Hour * 1
 
-func (c *MicroShiftmDNSController) restConfig() (*rest.Config, error) {
-	return clientcmd.BuildConfigFromFlags("", c.KubeConfig)
+type MicroShiftmDNSRouteController struct {
+	sync.Mutex
+	parent    *MicroShiftmDNSController
+	hostCount map[string]int
 }
 
-func (c *MicroShiftmDNSController) startRouteInformer(stopCh chan struct{}) error {
+func (s *MicroShiftmDNSRouteController) Name() string { return "microshift-mdns-route-controller" }
+func (s *MicroShiftmDNSRouteController) Dependencies() []string {
+	return []string{"openshift-api-components-manager"}
+}
+
+func (c *MicroShiftmDNSRouteController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	stopCh := make(chan struct{})
+	defer close(stopCh)
+	defer close(stopped)
+
+	go c.startRouteInformer(stopCh, ready)
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+
+	return nil
+}
+
+func (c *MicroShiftmDNSRouteController) restConfig() (*rest.Config, error) {
+	return clientcmd.BuildConfigFromFlags("", c.parent.KubeConfig)
+}
+
+func (c *MicroShiftmDNSRouteController) startRouteInformer(stopCh chan struct{}, ready chan<- struct{}) error {
 	klog.InfoS("Starting MicroShift mDNS route watcher")
 	cfg, err := c.restConfig()
 	if err != nil {
@@ -38,10 +65,10 @@ func (c *MicroShiftmDNSController) startRouteInformer(stopCh chan struct{}) erro
 		return errors.Wrap(err, "error creating dynamic informer")
 	}
 
-	return c.run(stopCh, dc)
+	return c.runInformers(stopCh, dc, ready)
 }
 
-func (c *MicroShiftmDNSController) run(stopCh chan struct{}, dc dynamic.Interface) error {
+func (c *MicroShiftmDNSRouteController) runInformers(stopCh chan struct{}, dc dynamic.Interface, ready chan<- struct{}) error {
 	informerFactory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(dc, defaultResyncTime, v1.NamespaceAll, nil)
 	routersGVR, _ := schema.ParseResourceArg("routes.v1.route.openshift.io")
 
@@ -56,13 +83,13 @@ func (c *MicroShiftmDNSController) run(stopCh chan struct{}, dc dynamic.Interfac
 
 	informer.AddEventHandler(handlers)
 	informer.Run(stopCh)
-
+	close(ready)
 	return nil
 }
 
 // TODO: The need for this indicates that the openshift-default-scc-manager is declaring itself ready before
 //       it really is. If we don't wait for the route API the informer will start throwing ugly errors.
-func (c *MicroShiftmDNSController) waitForRouterAPI(dc dynamic.Interface, routersGVR *schema.GroupVersionResource) {
+func (c *MicroShiftmDNSRouteController) waitForRouterAPI(dc dynamic.Interface, routersGVR *schema.GroupVersionResource) {
 	backoff := wait.Backoff{
 		Cap:      3 * time.Minute,
 		Duration: 10 * time.Second,
@@ -88,7 +115,7 @@ func (c *MicroShiftmDNSController) waitForRouterAPI(dc dynamic.Interface, router
 	}
 }
 
-func (c *MicroShiftmDNSController) addedRoute(obj interface{}) {
+func (c *MicroShiftmDNSRouteController) addedRoute(obj interface{}) {
 	u := obj.(*unstructured.Unstructured)
 
 	host, found, err := unstructured.NestedString(u.UnstructuredContent(), "spec", "host")
@@ -100,7 +127,7 @@ func (c *MicroShiftmDNSController) addedRoute(obj interface{}) {
 	c.exposeHost(host)
 }
 
-func (c *MicroShiftmDNSController) updatedRoute(oldObj, newObj interface{}) {
+func (c *MicroShiftmDNSRouteController) updatedRoute(oldObj, newObj interface{}) {
 	oldU := oldObj.(*unstructured.Unstructured)
 
 	oldHost, _, _ := unstructured.NestedString(oldU.UnstructuredContent(), "spec", "host")
@@ -114,7 +141,7 @@ func (c *MicroShiftmDNSController) updatedRoute(oldObj, newObj interface{}) {
 	}
 }
 
-func (c *MicroShiftmDNSController) deletedRoute(obj interface{}) {
+func (c *MicroShiftmDNSRouteController) deletedRoute(obj interface{}) {
 	u := obj.(*unstructured.Unstructured)
 	host, found, err := unstructured.NestedString(u.UnstructuredContent(), "spec", "host")
 	if !found || err != nil {
@@ -125,33 +152,33 @@ func (c *MicroShiftmDNSController) deletedRoute(obj interface{}) {
 	c.unexposeHost(host)
 }
 
-func (c *MicroShiftmDNSController) exposeHost(host string) {
+func (c *MicroShiftmDNSRouteController) exposeHost(host string) {
 	if !strings.HasSuffix(host, server.DefaultmDNSTLD) {
 		klog.V(2).InfoS("mDNS ignoring host without mDNS suffix", "host", host)
 		return
 	}
 
-	klog.InfoS("mDNS: route found for", "host", host, "ips", c.myIPs)
+	klog.InfoS("mDNS: route found for", "host", host, "ips", c.parent.myIPs)
 
 	// TODO(multi-node) look up for the exact router service Endpoints instead of assuming our own IP (ok for single-node)
 	c.incHost(host)
-	c.resolver.AddDomain(host+".", c.myIPs)
+	c.parent.resolver.AddDomain(host+".", c.parent.myIPs)
 }
 
-func (c *MicroShiftmDNSController) unexposeHost(oldHost string) {
+func (c *MicroShiftmDNSRouteController) unexposeHost(oldHost string) {
 	if c.decHost(oldHost) == 0 {
 		klog.InfoS("mDNS removing, no more router references", "host", oldHost)
-		c.resolver.DeleteDomain(oldHost + ".")
+		c.parent.resolver.DeleteDomain(oldHost + ".")
 	}
 }
 
-func (c *MicroShiftmDNSController) incHost(name string) {
+func (c *MicroShiftmDNSRouteController) incHost(name string) {
 	c.Lock()
 	defer c.Unlock()
 	c.hostCount[name]++
 }
 
-func (c *MicroShiftmDNSController) decHost(name string) int {
+func (c *MicroShiftmDNSRouteController) decHost(name string) int {
 	c.Lock()
 	defer c.Unlock()
 	if c.hostCount[name] > 0 {

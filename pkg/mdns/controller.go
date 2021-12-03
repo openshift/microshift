@@ -5,7 +5,6 @@ import (
 	"net"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/mdns/server"
@@ -13,13 +12,11 @@ import (
 )
 
 type MicroShiftmDNSController struct {
-	sync.Mutex
 	NodeName   string
 	NodeIP     string
 	KubeConfig string
 	myIPs      []string
 	resolver   *server.Resolver
-	hostCount  map[string]int
 	stopCh     chan struct{}
 }
 
@@ -28,13 +25,19 @@ func NewMicroShiftmDNSController(cfg *config.MicroshiftConfig) *MicroShiftmDNSCo
 		NodeIP:     cfg.NodeIP,
 		NodeName:   cfg.NodeName,
 		KubeConfig: filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig"),
-		hostCount:  make(map[string]int),
 	}
 }
 
 func (s *MicroShiftmDNSController) Name() string { return "microshift-mdns-controller" }
 func (s *MicroShiftmDNSController) Dependencies() []string {
-	return []string{"openshift-default-scc-manager"}
+	return []string{}
+}
+
+func (s *MicroShiftmDNSController) NewmDNSRouteController() *MicroShiftmDNSRouteController {
+	return &MicroShiftmDNSRouteController{
+		parent:    s,
+		hostCount: make(map[string]int),
+	}
 }
 
 func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
@@ -70,13 +73,11 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 		}
 
 		klog.InfoS("Host FQDN will be announced via mDNS", "fqdn", c.NodeName, "ips", ips)
-		c.resolver.AddDomain(c.NodeName, ips)
+		c.resolver.AddDomain(c.NodeName+".", ips)
 		c.myIPs = ips
 	}
 
 	close(ready)
-
-	go c.startRouteInformer(c.stopCh)
 
 	select {
 	case <-ctx.Done():

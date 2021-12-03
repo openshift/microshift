@@ -13,14 +13,14 @@ const testNodeName = "test-node.local"
 const testRouteHost = "test-route-host.cluster.local"
 const testRouteHost2 = "test-route-host2.cluster.local"
 
-func newTestController() *MicroShiftmDNSController {
-	return &MicroShiftmDNSController{
-		NodeIP:    testIP,
-		NodeName:  testNodeName,
-		resolver:  server.NewResolver(),
-		hostCount: make(map[string]int),
-		myIPs:     []string{testIP, testIPv6},
+func newTestController() *MicroShiftmDNSRouteController {
+	ctl := &MicroShiftmDNSController{
+		NodeIP:   testIP,
+		NodeName: testNodeName,
+		resolver: server.NewResolver(),
+		myIPs:    []string{testIP, testIPv6},
 	}
+	return ctl.NewmDNSRouteController()
 }
 
 func Test_addedRoute(t *testing.T) {
@@ -29,7 +29,7 @@ func Test_addedRoute(t *testing.T) {
 	unstructured.SetNestedField(route.Object, testRouteHost, "spec", "host")
 
 	ctl.addedRoute(route)
-	if !ctl.resolver.HasDomain(testRouteHost + ".") {
+	if !ctl.parent.resolver.HasDomain(testRouteHost + ".") {
 		t.Errorf("When a host is added, the mDNS resolver should expose it")
 	}
 }
@@ -42,12 +42,12 @@ func Test_deletedRoute(t *testing.T) {
 	ctl.addedRoute(route)
 	ctl.addedRoute(route)
 	ctl.deletedRoute(route)
-	if !ctl.resolver.HasDomain(testRouteHost + ".") {
+	if !ctl.parent.resolver.HasDomain(testRouteHost + ".") {
 		t.Errorf("When multiple routes share a hostname, deleting one route shouldn't stop exposing the host")
 	}
 
 	ctl.deletedRoute(route)
-	if ctl.resolver.HasDomain(testRouteHost + ".") {
+	if ctl.parent.resolver.HasDomain(testRouteHost + ".") {
 		t.Errorf("Deleting all routes exposing a hostname should stop exposing the host")
 	}
 }
@@ -63,11 +63,11 @@ func Test_updatedRoute(t *testing.T) {
 	ctl.addedRoute(routeOld)
 	ctl.updatedRoute(routeOld, routeNew)
 
-	if ctl.resolver.HasDomain(testRouteHost + ".") {
+	if ctl.parent.resolver.HasDomain(testRouteHost + ".") {
 		t.Errorf("Old domain must have updated")
 	}
 
-	if !ctl.resolver.HasDomain(testRouteHost2 + ".") {
+	if !ctl.parent.resolver.HasDomain(testRouteHost2 + ".") {
 		t.Errorf("The updated domain must resolve at this point")
 	}
 }
@@ -84,16 +84,16 @@ func Test_updatedRouteDupHost(t *testing.T) {
 	ctl.addedRoute(routeOld) // two routes with the same hostname
 	ctl.updatedRoute(routeOld, routeNew)
 
-	if !ctl.resolver.HasDomain(testRouteHost + ".") {
+	if !ctl.parent.resolver.HasDomain(testRouteHost + ".") {
 		t.Errorf("Old domain must have persisted, there is another route using it")
 	}
 
-	if !ctl.resolver.HasDomain(testRouteHost2 + ".") {
+	if !ctl.parent.resolver.HasDomain(testRouteHost2 + ".") {
 		t.Errorf("The updated domain must resolve at this point")
 	}
 
 	ctl.deletedRoute(routeOld) // deleted the second route we had with the host
-	if ctl.resolver.HasDomain(testRouteHost + ".") {
+	if ctl.parent.resolver.HasDomain(testRouteHost + ".") {
 		t.Errorf("Old domain must have be gone after deleting the 2nd route")
 	}
 }
