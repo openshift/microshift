@@ -1,0 +1,17 @@
+--- 
+dataDir: /tmp/microshift/data
+logDir: /tmp/microshift/logs
+logVLevel: 4
+logVModule: microshift=4
+logAlsotostderr: true
+roles:
+  - role1
+  - role2
+nodeName: node1
+nodeIP: '1.2.3.4'
+cluster:
+  url: https://1.2.3.4:6443
+  clusterCIDR: '10.20.30.40/16'
+  serviceCIDR: '40.30.20.10/16'
+  dns: 'cluster.dns'
+  domain: cluster.local
