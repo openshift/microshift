@@ -42,9 +42,11 @@ COPY $BUILD_PATH/unit /usr/lib/systemd/system/microshift.service
 COPY $BUILD_PATH/kubelet-cgroups.conf /etc/systemd/system.conf.d/kubelet-cgroups.conf
 COPY $BUILD_PATH/crio-bridge.conf /etc/cni/net.d/100-crio-bridge.conf
 
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$ARCH/kubectl" && \
-    chmod +x ./kubectl && \
-    mv ./kubectl /usr/local/bin/kubectl
+RUN export OCP_VERSION=4.8.9 && \
+    curl -o oc.tar.gz https://mirror2.openshift.com/pub/openshift-v4/amd64/clients/ocp/$OCP_VERSION/openshift-client-linux-$OCP_VERSION.tar.gz && \
+    tar -xzvf oc.tar.gz && \
+    rm oc.tar.gz && \
+    install -t /usr/local/bin {kubectl,oc}
 
 RUN chmod 755 /usr/local/bin/microshift
 RUN export VERSION=1.20 && \
@@ -61,6 +63,8 @@ RUN dnf install -y cri-o \
 RUN sed -i 's|/usr/libexec/crio/conmon|/usr/bin/conmon|' /etc/crio/crio.conf && \
     systemctl enable microshift.service && \
     systemctl enable crio
+
+ENV KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
 
 # rhel7 hosts, or hosts with legacy iptables need the specific iptables binaries, ubi8 comes with iptables-nft translator
 
