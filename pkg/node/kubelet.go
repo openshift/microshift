@@ -71,10 +71,6 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 	args := []string{
 		"--bootstrap-kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
 		"--kubeconfig=" + cfg.DataDir + "/resources/kubelet/kubeconfig",
-		"--container-runtime=remote",
-		"--container-runtime-endpoint=unix:///var/run/crio/crio.sock",
-		"--runtime-cgroups=/system.slice/crio.service",
-		"--node-ip=" + cfg.NodeIP,
 		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
 		"--v=" + strconv.Itoa(cfg.LogVLevel),
@@ -87,6 +83,11 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 	cleanFlagSet.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 
 	kubeletFlags := kubeletoptions.NewKubeletFlags()
+	kubeletFlags.RuntimeCgroups = "/system.slice/crio.service"
+	kubeletFlags.NodeIP = cfg.NodeIP
+	kubeletFlags.ContainerRuntime = "remote"
+	kubeletFlags.RemoteRuntimeEndpoint = "unix:///var/run/crio/crio.sock"
+
 	kubeletConfig, err := loadConfigFile(cfg.DataDir + "/resources/kubelet/config/config.yaml")
 
 	if err != nil {
