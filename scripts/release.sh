@@ -21,14 +21,14 @@
 # quay.io/microshift/microshift.  A github release and a tag are created and identified with the version generated
 # by the Makefile. Cross-compiled binaries are copied from the container images and published in the git release.
 
-set -x
+#set -x
 
 set -euo pipefail
 shopt -s expand_aliases
 
 # debugging options
-#trap 'echo "# $BASH_COMMAND"' DEBUG
-#set -x
+trap 'echo "# $BASH_COMMAND"' DEBUG
+set -x
 
 ########
 # INIT #
@@ -44,32 +44,6 @@ alias podman=${__ctr_cli_alias:?"a container manager (podman || docker) is requi
 #########
 # FUNCS #
 #########
-
-help() {
-  printf 'Microshift: release.sh
-This script provides some simple automation for cutting new releases of Microshift.
-
-Use:
-    ./release.sh --token $(cat /token/path)
-    Note: do not use "=" with flag values
-Inputs:
-    --token       (Required) The github application auth token, use to create a github release.
-    --debug, -d   Print generated script values for debugging.
-    --help, -h    Print this help text.
-Outputs:
-- A version, formatted as 4.7.0-0.microshift-YYYY-MM-DD-HHMMSS, is applied as a git tag and pushed to the repo
-- Multi-architecture container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
-- Cross-compiled binaries
-- A sha256 checksum file, containing the checksums for all binary artifacts
-- A github release, containing the binary artifacts and checksum file.
-
-DEBUG
-To test releases against a downstream/fork repository, override GIT_OWNER to forked git org/owner and QUAY_OWNER to your
-quay.io owner or org.
-
-  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path
-'
-}
 
 generate_api_release_request() {
   local is_prerelease="${1:=true}" # (copejon) assume for now that all releases are prerelease, unless otherwise specified
@@ -176,28 +150,40 @@ push_container_image_artifacts() {
 podman_create_manifest(){
   local dest_repo="$1"
   local image_tags="$2"
+  local alias_tag="latest"
+
+  if [ "$NIGHTLY" -eq 1 ]; then
+    alias_tag="nightly"
+  fi
+
   podman manifest create "$dest_repo:$VERSION" >&2
   for ref in "${image_tags[*]}"; do
     podman manifest add "$dest_repo:$VERSION" "docker://$ref"
   done
     podman manifest push "$dest_repo:$VERSION" "$dest_repo:$VERSION"
-    podman manifest push "$dest_repo:$VERSION" "$dest_repo:latest"
+    podman manifest push "$dest_repo:$VERSION" "$dest_repo:$alias_tag"
 }
 
 docker_create_manifest(){
   local dest_repo="$1"
   local image_tags="$2"
+  local alias_tag="latest"
+
+  if [ "$NIGHTLY" -eq 1 ]; then
+    alias_tag="nightly"
+  fi
+
   # use docker cli directly for clarity, as this is a docker-only func
   docker manifest create "$dest_repo:$VERSION" "${image_tags[*]}" >&2
-  docker tag "$dest_repo:$VERSION" "$dest_repo:latest"
+  docker tag "$dest_repo:$VERSION" "$dest_repo:$alias_tag"
   docker manifest push "$dest_repo:$VERSION"
-  docker manifest push "$dest_repo:latest"
+  docker manifest push "$dest_repo:$alias_tag"
 }
 
 # It is necessarry to differentiate between podman and docker manifest create subcommands.
 # Podman exepcts the manifest to exist prior to adding images; docker allows for an image list
 # to be passed at creation. Podman also requires a prefixed "container-transport", which is
-# no recognized by docker, causing the command to fail.
+# not recognized by docker, causing the command to fail.
 push_container_manifest() {
   local dest_repo="$1"
   local image_tags="$2"
@@ -218,12 +204,50 @@ debug() {
   printf "compose_release_request: %s\n" "$api_request"
 }
 
+help() {
+  printf 'Microshift: release.sh
+This script provides some simple automation for cutting new releases of Microshift.
+
+Use:
+./release.sh --token $(cat /token/path) --version 4.8.0-0.microshift-$(date -u "+%%Y-%%m-%%d-%%H%%M%%S")
+    Note: do not use "=" with flag values
+Inputs:
+    --token       (Full Release Only) The github application auth token, use to create a github release.
+
+    --version     (Required) The version to be propagated to image tags, git tags, and binary name suffixes.
+
+    --debug, -d   Print generated script values for debugging.
+
+    --nightly     Release standalone and aio container images; does NOT publish a github release.
+                  Enables the reuse of this script for nightly releases, which do NOT represent a
+                  "latest" stable release.
+
+    --help, -h    Print this help text.
+
+Outputs:
+- A github release, formatted as 4.Y.Z-0.microshift-YYYY-MM-DD-HHMMSS, containing cross compiled binaries and checksum
+- Multi-architecture standalone container manifest, tagged as `quay.io/microshift/microshift:$VERSION` and `:latest`
+- Multi-architecture all-in-one container manifest, tagged as `quay.io/microshift/microshift-aio:$VERSION` and `:latest`
+
+DEBUG
+To test releases against a downstream/fork repository, override GIT_OWNER to forked git org/owner and QUAY_OWNER to your
+quay.io owner or org.
+
+  e.g.  GIT_OWNER=my_repo QUAY_OWNER=my_quay_repo ./release.sh --token $(cat /token/path
+
+'
+}
+
 ########
 # MAIN #
 ########
+
+# NIGHTLY: 0=false, publish all artifacts.
+#          1=true, publish nightly AIO and stand alone images
+NIGHTLY=0
 while [ $# -gt 0 ]; do
   case "$1" in
-    "--token")
+    --token)
       TOKEN="${2:-}"
       [[ "$TOKEN" =~ ^-.* ]] || [[ -z "$TOKEN" ]] && {
         printf "flag $1 git release API calls require robot token"
@@ -231,7 +255,7 @@ while [ $# -gt 0 ]; do
       }
       shift 2
       ;;
-    "--version")
+    --version)
       VERSION="${2:-}"
       [[ "$VERSION" =~ ^-.* ]] || [[ -z "$VERSION" ]] && {
         printf "flag $1 expects a version input value"
@@ -239,8 +263,13 @@ while [ $# -gt 0 ]; do
       }
       shift 2
       ;;
-    "-h" | "--help")
-      help && exit
+    --nightly)
+      NIGHTLY=1
+      shift 1
+      ;;
+    -h|--help)
+      help
+      exit 0
       ;;
     *)
       echo "unknown input: $1" && help && exit 1
@@ -260,23 +289,32 @@ API_DATA="$(generate_api_release_request "true")" # leave body empty for now
 
 IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
 AIO_IMAGE_REPO="quay.io/$QUAY_OWNER/microshift-aio"
-RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64" )
-AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-arm64" )
+
+if [ $NIGHTLY -eq 1 ]; then
+  VERSION="$VERSION-nightly"
+fi
+
+RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64")
+AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-nft-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-nft-arm64")
 
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
-
-# publish containerized microshift 
+# publish containerized microshift
 build_container_images_artifacts                                          || exit 1
 STAGE_DIR=$(stage_release_image_binaries)                                 || exit 1
 push_container_image_artifacts                                            || exit 1
 push_container_manifest "$IMAGE_REPO" "${RELEASE_IMAGE_TAGS[@]}"          || exit 1
 
-# publish binaries 
-UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"                   || exit 1
-git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                    || exit 1
-
-# publish aio container 
+# publish aio container
 build_aio_container_images_artifacts                                      || exit 1
 push_aio_container_image_artifacts                                        || exit 1
 push_container_manifest "$AIO_IMAGE_REPO" "${AIO_RELEASE_IMAGE_TAGS[@]}"  || exit 1
+
+if [ $NIGHTLY -eq 1 ]; then
+  printf "Nightly release complete."
+  exit 0
+fi
+
+# publish binaries
+UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"                   || exit 1
+git_post_artifacts "$STAGE_DIR" "$UPLOAD_URL" "$TOKEN"                    || exit 1
