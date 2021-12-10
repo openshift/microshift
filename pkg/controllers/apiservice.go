@@ -195,7 +195,8 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 	return nil
 }
 
-func applySCCs(kubeconfigPath string) error {
+func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
+	kubeconfigPath := cfg.DataDir + "/resources/kubeadmin/kubeconfig"
 	var (
 		sccs = []string{
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
@@ -208,28 +209,6 @@ func applySCCs(kubeconfigPath string) error {
 		}
 	)
 	if err := assets.ApplySCCs(sccs, nil, nil, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply sccs: %v", err)
-		return err
-	}
-	return nil
-}
-
-func PrepareOCP(cfg *config.MicroshiftConfig) error {
-	if err := assets.ApplyNamespaces([]string{
-		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
-	}, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
-		logrus.Warningf("failed to apply openshift namespaces %v", err)
-		return err
-	}
-	if err := assets.ApplyCRDs(cfg); err != nil {
-		logrus.Warningf("failed to apply openshift CRDs %v", err)
-		return err
-	}
-	return nil
-}
-
-func StartOCPAPIComponents(cfg *config.MicroshiftConfig) error {
-	if err := applySCCs(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
 		logrus.Warningf("failed to apply sccs: %v", err)
 		return err
 	}

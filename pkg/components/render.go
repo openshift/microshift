@@ -8,7 +8,7 @@ import (
 	"github.com/openshift/microshift/pkg/release"
 )
 
-func renderSCController(b []byte, p assets.RenderParams) ([]byte, error) {
+func renderServiceCAController(b []byte, p assets.RenderParams) ([]byte, error) {
 	data := struct {
 		ReleaseImage           assets.RenderParams
 		CAConfigMap, TLSSecret string

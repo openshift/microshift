@@ -23,29 +23,29 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type OpenShiftAPIComponentsControllerManager struct {
+type OpenShiftDefaultSCCManager struct {
 	cfg *config.MicroshiftConfig
 }
 
-func NewOpenShiftAPIComponents(cfg *config.MicroshiftConfig) *OpenShiftAPIComponentsControllerManager {
-	s := &OpenShiftAPIComponentsControllerManager{}
+func NewOpenShiftDefaultSCCManager(cfg *config.MicroshiftConfig) *OpenShiftDefaultSCCManager {
+	s := &OpenShiftDefaultSCCManager{}
 	s.cfg = cfg
 	return s
 }
 
-func (s *OpenShiftAPIComponentsControllerManager) Name() string {
-	return "openshift-api-components-manager"
+func (s *OpenShiftDefaultSCCManager) Name() string {
+	return "openshift-default-scc-manager"
 }
-func (s *OpenShiftAPIComponentsControllerManager) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-prepjob-manager", "oauth-apiserver"}
+func (s *OpenShiftDefaultSCCManager) Dependencies() []string {
+	return []string{"kube-apiserver", "openshift-crd-manager", "oauth-apiserver"}
 }
 
-func (s *OpenShiftAPIComponentsControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(ready)
 	// TO-DO add readiness check
-	if err := StartOCPAPIComponents(s.cfg); err != nil {
-		logrus.Errorf("%s unable to prepare ocp componets: %v", s.Name(), err)
+	if err := ApplyDefaultSCCs(s.cfg); err != nil {
+		logrus.Errorf("%s unable to apply default SCCs: %v", s.Name(), err)
 	}
-	logrus.Infof("%s launched ocp componets", s.Name())
+	logrus.Infof("%s applied default SCCs", s.Name())
 	return ctx.Err()
 }

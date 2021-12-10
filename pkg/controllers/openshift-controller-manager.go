@@ -27,6 +27,7 @@ import (
 
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 
+	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 )
@@ -79,6 +80,12 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) error {
 	s.ConfigFilePath = options.ConfigFilePath
 	s.Output = options.Output
 
+	if err := assets.ApplyNamespaces([]string{
+		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
+	}, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
+		logrus.Warningf("failed to apply openshift namespaces %v", err)
+		return err
+	}
 	return nil
 }
 

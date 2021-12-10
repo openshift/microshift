@@ -18,33 +18,34 @@ package controllers
 import (
 	"context"
 
+	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 
 	"github.com/sirupsen/logrus"
 )
 
-type OCPPrepJobManager struct {
+type OpenShiftCRDManager struct {
 	cfg *config.MicroshiftConfig
 }
 
-func NewOpenShiftPrepJob(cfg *config.MicroshiftConfig) *OCPPrepJobManager {
-	s := &OCPPrepJobManager{}
+func NewOpenShiftCRDManager(cfg *config.MicroshiftConfig) *OpenShiftCRDManager {
+	s := &OpenShiftCRDManager{}
 	s.cfg = cfg
 	return s
 }
 
-func (s *OCPPrepJobManager) Name() string { return "openshift-prepjob-manager" }
-func (s *OCPPrepJobManager) Dependencies() []string {
+func (s *OpenShiftCRDManager) Name() string { return "openshift-crd-manager" }
+func (s *OpenShiftCRDManager) Dependencies() []string {
 	return []string{"kube-apiserver"}
 }
 
-func (s *OCPPrepJobManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+func (s *OpenShiftCRDManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(ready)
 	// To-DO add readiness check
-	if err := PrepareOCP(s.cfg); err != nil {
-		logrus.Errorf("%s unable to prepare ocp componets: %v", s.Name(), err)
+	if err := assets.ApplyCRDs(s.cfg); err != nil {
+		logrus.Errorf("%s unable to apply default CRDs: %v", s.Name(), err)
 	}
-	logrus.Infof("%s launched ocp componets", s.Name())
+	logrus.Infof("%s applied default CRDs", s.Name())
 
 	return ctx.Err()
 }
