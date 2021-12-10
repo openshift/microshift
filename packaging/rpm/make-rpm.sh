@@ -19,6 +19,9 @@ GIT_SHORTHASH="${GIT_SHA:0:7}"
 TARBALL_FILE="microshift-${GIT_SHORTHASH}.tar.gz"
 RPMBUILD_DIR="${SCRIPT_DIR}/_rpmbuild/"
 
+SOURCE_GIT_TAG="$(git describe --tags | sed s/nightly-/nightly-$(git show -s --format=%ct)_/g )"
+
+
 create_local_tarball() {
   tar -czf "${RPMBUILD_DIR}/SOURCES/${TARBALL_FILE}" \
             --exclude='.git' --exclude='.idea' --exclude='.vagrant' \
@@ -52,6 +55,9 @@ build_commit() {
 %global release ${RPM_REL}
 %global version ${RELEASE_BASE}
 %global git_commit ${1}
+%global embedded_git_commit ${SOURCE_GIT_COMMIT}
+%global embedded_git_tag ${SOURCE_GIT_TAG}
+%global embedded_git_tree_state ${SOURCE_GIT_TREE_STATE}
 EOF
   cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
 
@@ -63,6 +69,9 @@ build_tag_commit() {
 %global release ${RPM_REL}
 %global version ${RELEASE_BASE}
 %global github_tag ${1}
+%global embedded_git_commit ${SOURCE_GIT_COMMIT}
+%global embedded_git_tag ${SOURCE_GIT_TAG}
+%global embedded_git_tree_state ${SOURCE_GIT_TREE_STATE}
 EOF
   cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
 

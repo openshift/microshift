@@ -21,6 +21,11 @@ RELEASE_PRE := ${RELEASE_BASE}-0.microshift
 # because since it doesn't work with our version scheme.
 SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' || echo '4.8.0-0.microshift-unknown')
 
+EMBEDDED_GIT_TAG ?= ${SOURCE_GIT_TAG}
+EMBEDDED_GIT_COMMIT ?= ${SOURCE_GIT_COMMIT}
+EMBEDDED_GIT_TREE_STATE ?= ${SOURCE_GIT_TREE_STATE}
+
+
 SRC_ROOT :=$(shell pwd)
 
 IMAGE_REPO :=quay.io/microshift/microshift
@@ -48,9 +53,9 @@ GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/client-go/pkg/version.gitCommit=b09a9ce3 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
-                   -X github.com/openshift/microshift/pkg/version.versionFromGit=$(SOURCE_GIT_TAG) \
-                   -X github.com/openshift/microshift/pkg/version.commitFromGit=$(SOURCE_GIT_COMMIT) \
-                   -X github.com/openshift/microshift/pkg/version.gitTreeState=$(SOURCE_GIT_TREE_STATE) \
+                   -X github.com/openshift/microshift/pkg/version.versionFromGit=$(EMBEDDED_GIT_TAG) \
+                   -X github.com/openshift/microshift/pkg/version.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
+                   -X github.com/openshift/microshift/pkg/version.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
                    -X github.com/openshift/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    -s -w"
 
@@ -135,12 +140,17 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 .PHONY: cross-build
 
 rpm:
-	BUILD=rpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
-
+	BUILD=rpm \
+	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
+	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} RELEASE_BASE=${RELEASE_BASE}  \
+	RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
 .PHONY: rpm
 
 srpm:
-	BUILD=srpm RELEASE_BASE=${RELEASE_BASE} RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
+	BUILD=srpm \
+	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
+	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} RELEASE_BASE=${RELEASE_BASE}  \
+	RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
 .PHONY: srpm
 
 ###############################

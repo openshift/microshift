@@ -156,7 +156,13 @@ GOARCH=s390x
 GOARCH=amd64
 %endif
 
+# if we have git commit/tag/state to be embedded in the binary pass it down to the makefile
+%if 0%{?embedded_git_commit:1}
+make _build_local GOOS=${GOOS} GOARCH=${GOARCH} EMBEDDED_GIT_COMMIT=%{embedded_git_commit} EMBEDDED_GIT_TAG=%{embedded_git_tag} EMBEDDED_GIT_TREE_STATE=%{embedded_git_tree_state}
+%else
 make _build_local GOOS=${GOOS} GOARCH=${GOARCH}
+%endif
+
 cp ./_output/bin/${GOOS}_${GOARCH}/microshift ./_output/microshift
 
 # SELinux modules build
