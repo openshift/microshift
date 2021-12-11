@@ -227,11 +227,11 @@ spec:
           name: signing-cabundle
       volumes:
       - name: signing-key
-        hostPath:
-          path: {{.KeyDir}}
+        secret:
+          secretName: {{.TLSSecret}}
       - name: signing-cabundle
-        hostPath:
-          path: {{.CADir}}
+        configMap:
+          name: {{.CAConfigMap}}
       # nodeSelector:
       #   node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"

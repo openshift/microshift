@@ -1,6 +1,8 @@
 package components
 
 import (
+	"os"
+
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 
@@ -31,7 +33,32 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 		sa = []string{
 			"assets/core/0000_60_service-ca_04_sa.yaml",
 		}
+		secret     = "assets/core/0000_60_service-ca_04_secret.yaml"
+		secretName = "signing-key"
+		cm         = "assets/core/0000_60_service-ca_04_configmap.yaml"
+		cmName     = "signing-cabundle"
 	)
+	caPath := cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt"
+	tlsCrtPath := cfg.DataDir + "/resources/service-ca/secrets/service-ca/tls.crt"
+	tlsKeyPath := cfg.DataDir + "/resources/service-ca/secrets/service-ca/tls.key"
+	cmData := map[string]string{}
+	secretData := map[string][]byte{}
+	cabundle, err := os.ReadFile(caPath)
+	if err != nil {
+		return err
+	}
+	tlscrt, err := os.ReadFile(tlsCrtPath)
+	if err != nil {
+		return err
+	}
+	tlskey, err := os.ReadFile(tlsKeyPath)
+	if err != nil {
+		return err
+	}
+	cmData["ca-bundle.crt"] = string(cabundle)
+	secretData["tls.crt"] = tlscrt
+	secretData["tls.key"] = tlskey
+
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply ns %v: %v", ns, err)
 		return err
@@ -56,7 +83,15 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 		logrus.Warningf("failed to apply sa %v: %v", sa, err)
 		return err
 	}
-	if err := assets.ApplyDeployments(apps, renderSCController, assets.RenderParams{"DataDir": cfg.DataDir}, kubeconfigPath); err != nil {
+	if err := assets.ApplySecretWithData(secret, secretData, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply secret %v: %v", secret, err)
+		return err
+	}
+	if err := assets.ApplyConfigMapWithData(cm, cmData, kubeconfigPath); err != nil {
+		logrus.Warningf("failed to apply sa %v: %v", cm, err)
+		return err
+	}
+	if err := assets.ApplyDeployments(apps, renderSCController, assets.RenderParams{"ConfigMap": cmName, "Secret": secretName}, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply apps %v: %v", apps, err)
 		return err
 	}

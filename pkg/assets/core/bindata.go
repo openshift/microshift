@@ -4,7 +4,9 @@
 // assets/core/0000_00_flannel-service-account.yaml
 // assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
 // assets/core/0000_60_service-ca_01_namespace.yaml
+// assets/core/0000_60_service-ca_04_configmap.yaml
 // assets/core/0000_60_service-ca_04_sa.yaml
+// assets/core/0000_60_service-ca_04_secret.yaml
 // assets/core/0000_70_dns_00-namespace.yaml
 // assets/core/0000_70_dns_01-configmap.yaml
 // assets/core/0000_70_dns_01-dns-service-account.yaml
@@ -194,6 +196,30 @@ func assetsCore0000_60_serviceCa_01_namespaceYaml() (*asset, error) {
 	return a, nil
 }
 
+var _assetsCore0000_60_serviceCa_04_configmapYaml = []byte(`apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: openshift-service-ca
+  name: signing-cabundle
+data:
+  ca-bundle.crt:
+`)
+
+func assetsCore0000_60_serviceCa_04_configmapYamlBytes() ([]byte, error) {
+	return _assetsCore0000_60_serviceCa_04_configmapYaml, nil
+}
+
+func assetsCore0000_60_serviceCa_04_configmapYaml() (*asset, error) {
+	bytes, err := assetsCore0000_60_serviceCa_04_configmapYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_60_service-ca_04_configmap.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _assetsCore0000_60_serviceCa_04_saYaml = []byte(`apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -212,6 +238,32 @@ func assetsCore0000_60_serviceCa_04_saYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/core/0000_60_service-ca_04_sa.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCore0000_60_serviceCa_04_secretYaml = []byte(`apiVersion: v1
+kind: Secret
+metadata:
+  namespace: openshift-service-ca
+  name: signing-key
+type: kubernetes.io/tls
+data:
+  tls.crt:
+  tls.key:
+`)
+
+func assetsCore0000_60_serviceCa_04_secretYamlBytes() ([]byte, error) {
+	return _assetsCore0000_60_serviceCa_04_secretYaml, nil
+}
+
+func assetsCore0000_60_serviceCa_04_secretYaml() (*asset, error) {
+	bytes, err := assetsCore0000_60_serviceCa_04_secretYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_60_service-ca_04_secret.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -642,7 +694,9 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/core/0000_00_flannel-service-account.yaml":                           assetsCore0000_00_flannelServiceAccountYaml,
 	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml": assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
 	"assets/core/0000_60_service-ca_01_namespace.yaml":                           assetsCore0000_60_serviceCa_01_namespaceYaml,
+	"assets/core/0000_60_service-ca_04_configmap.yaml":                           assetsCore0000_60_serviceCa_04_configmapYaml,
 	"assets/core/0000_60_service-ca_04_sa.yaml":                                  assetsCore0000_60_serviceCa_04_saYaml,
+	"assets/core/0000_60_service-ca_04_secret.yaml":                              assetsCore0000_60_serviceCa_04_secretYaml,
 	"assets/core/0000_70_dns_00-namespace.yaml":                                  assetsCore0000_70_dns_00NamespaceYaml,
 	"assets/core/0000_70_dns_01-configmap.yaml":                                  assetsCore0000_70_dns_01ConfigmapYaml,
 	"assets/core/0000_70_dns_01-dns-service-account.yaml":                        assetsCore0000_70_dns_01DnsServiceAccountYaml,
@@ -704,7 +758,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_00_flannel-service-account.yaml":                           {assetsCore0000_00_flannelServiceAccountYaml, map[string]*bintree{}},
 			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml": {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
 			"0000_60_service-ca_01_namespace.yaml":                           {assetsCore0000_60_serviceCa_01_namespaceYaml, map[string]*bintree{}},
+			"0000_60_service-ca_04_configmap.yaml":                           {assetsCore0000_60_serviceCa_04_configmapYaml, map[string]*bintree{}},
 			"0000_60_service-ca_04_sa.yaml":                                  {assetsCore0000_60_serviceCa_04_saYaml, map[string]*bintree{}},
+			"0000_60_service-ca_04_secret.yaml":                              {assetsCore0000_60_serviceCa_04_secretYaml, map[string]*bintree{}},
 			"0000_70_dns_00-namespace.yaml":                                  {assetsCore0000_70_dns_00NamespaceYaml, map[string]*bintree{}},
 			"0000_70_dns_01-configmap.yaml":                                  {assetsCore0000_70_dns_01ConfigmapYaml, map[string]*bintree{}},
 			"0000_70_dns_01-dns-service-account.yaml":                        {assetsCore0000_70_dns_01DnsServiceAccountYaml, map[string]*bintree{}},
