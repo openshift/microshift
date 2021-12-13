@@ -1,7 +1,7 @@
 ---
 apiVersion: kuttl.dev/v1beta1
 kind: TestAssert
-timeout: 300
+timeout: 500
 ---
 apiVersion: apps/v1
 kind: DaemonSet
