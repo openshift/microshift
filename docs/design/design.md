@@ -114,3 +114,13 @@ When deciding between different design options, we follow the following principl
 * Releases are mainly provided for convenience to users that just want to give MicroShift a quick try without friction. They are cut irregularly, e.g. to make a new feature available.
 * When rebasing onto a new OKD version, we vendor that version's packages and update the container image digests of the infrastructure services MicroShift deploys, i.e. the "release metadata" is baked into the MicroShift binary.
 * Eventually, we expect there to be a "MicroShift Release Image" that is based on / derived from the OpenShift Release Image: It references the MicroShift container image plus the subset of container images shared with and published by OpenShift. Defining a release image should allow to reuse the proven OpenShift CI and release tooling later.
+
+### Multi-Node Configuration
+* MicroShift provides the ability to add a n-number of compute nodes and work as a single cluster. This feature allows to scale out a MicroShift deployment when more computing power is needed.
+* MicroShift makes use of the [TLS bootstraping](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/) workflow to allow new nodes to join the cluster in a secure manner.
+* MicroShift generates a new asset that is crucial for bootstrapping new nodes:
+  * `/var/lib/microshift/resources/kubelet/bootstrap-kubeconfig`
+* The `bootstrap-kubeconfig` asset must be placed in the new nodes to allow them to join the MicroShift cluster.
+* New nodes will only contain the role `node` using the existing flag `--roles`. (Currently, MicroShift only supports one control plane entity and multiple nodes.)
+* MicroShift will handle certificate rotation for security reasons on the new nodes.
+* As a summary, the Kubelet from a new node that tries to join a MicroShift cluster, will use the bootstrap kubeconfig file to get limited access to the Kube API server. The Kubelet will then create and retrieve a CSR (Certificate Signing Request). MicroShift's controller manager is configured to automatically approve this new CSR and a new set of assets will be created by Kubelet (certs, kubeconfig).
