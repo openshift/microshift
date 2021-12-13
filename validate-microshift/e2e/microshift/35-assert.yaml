@@ -1,0 +1,12 @@
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 500
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dns-default
+  namespace: node-resolver
+status:
+  numberReady: 1
