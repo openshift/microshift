@@ -1,0 +1,18 @@
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 30
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: openshift-service-ca
+  labels:
+    app: service-ca
+status:
+  containerStatuses:
+  - name: service-ca-controller
+    ready: true
+    restartCount: 0
+    started: true
+  phase: Running
