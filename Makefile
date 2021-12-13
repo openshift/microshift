@@ -2,7 +2,6 @@
 export SHELL := $(shell which bash)
 
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
-KUTTL_VERSION := 0.10.0
 
 # Include openshift build-machinery-go libraries
 include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
@@ -96,17 +95,10 @@ chmod a+x "$(1)" ;\
 endef
 
 
-.PHONY: kuttl
-KUTTL := $(PROJECT_DIR)/bin/kuttl
-KUTTL_URL := https://github.com/kudobuilder/kuttl/releases/download/v$(KUTTL_VERSION)/kubectl-kuttl_$(KUTTL_VERSION)_linux_x86_64
-kuttl: ## Download kuttl
-	mkdir -p bin
-	$(call download-tool,$(KUTTL),$(KUTTL_URL))
-
-.PHONY: test-e2e
-test-e2e: kuttl
-	cd validate-microshift && $(KUTTL) test --namespace test
-
+# Execute kuttl health checks against infra pods
+.PHONY: validate-cluster
+validate-cluster:
+	cd validate-microshift && ./kuttl-test.sh 
 
 ##@ Download utilities
 
