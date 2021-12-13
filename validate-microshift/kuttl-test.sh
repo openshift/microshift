@@ -5,7 +5,7 @@ set -x
 
 ROOT="$(readlink -f "$(dirname "${BASH_SOURCE}/../")")"
 
-KUTTL_VERSION="${1=0.10.0}"
+KUTTL_VERSION="0.10.0"
 KUTTL="$ROOT/bin/kuttl"
 
 mkdir -p "$(dirname "$KUTTL")"
