@@ -64,4 +64,4 @@ jobs:
            sudo -i sh -c 'until [ -f /var/lib/microshift/resources/kubeadmin/kubeconfig ]; do sudo sleep 5; done'
            sudo cp /var/lib/microshift/resources/kubeadmin/kubeconfig /tmp/kubeconfig
            sudo chown `whoami`: /tmp/kubeconfig
-           make test-e2e 
+           make validate-cluster 
