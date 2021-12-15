@@ -91,7 +91,7 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 		logrus.Warningf("failed to apply sa %v: %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDeployments(apps, renderSCController, assets.RenderParams{"ConfigMap": cmName, "Secret": secretName}, kubeconfigPath); err != nil {
+	if err := assets.ApplyDeployments(apps, renderServiceCAController, assets.RenderParams{"ConfigMap": cmName, "Secret": secretName}, kubeconfigPath); err != nil {
 		logrus.Warningf("failed to apply apps %v: %v", apps, err)
 		return err
 	}

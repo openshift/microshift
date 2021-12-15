@@ -50,7 +50,7 @@ func NewOpenShiftAPIServer(cfg *config.MicroshiftConfig) *OCPAPIServer {
 
 func (s *OCPAPIServer) Name() string { return "ocp-apiserver" }
 func (s *OCPAPIServer) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-prepjob-manager"}
+	return []string{"kube-apiserver", "openshift-crd-manager"}
 }
 
 func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
@@ -92,6 +92,7 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.options = options
 	s.options.ConfigFile = configFilePath
 
+	logrus.Infof("starting openshift-apiserver %s, args: %v", cfg.NodeIP, args)
 	return nil
 
 }

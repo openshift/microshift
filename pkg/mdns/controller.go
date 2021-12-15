@@ -34,7 +34,7 @@ func NewMicroShiftmDNSController(cfg *config.MicroshiftConfig) *MicroShiftmDNSCo
 
 func (s *MicroShiftmDNSController) Name() string { return "microshift-mdns-controller" }
 func (s *MicroShiftmDNSController) Dependencies() []string {
-	return []string{"openshift-api-components-manager"}
+	return []string{"openshift-default-scc-manager"}
 }
 
 func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {

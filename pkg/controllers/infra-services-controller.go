@@ -36,7 +36,7 @@ func NewInfrastructureServices(cfg *config.MicroshiftConfig) *InfrastructureServ
 
 func (s *InfrastructureServicesManager) Name() string { return "infrastructure-services-manager" }
 func (s *InfrastructureServicesManager) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-prepjob-manager", "oauth-apiserver", "openshift-controller-manager"}
+	return []string{"kube-apiserver", "openshift-crd-manager", "oauth-apiserver", "openshift-controller-manager"}
 }
 
 func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
