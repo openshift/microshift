@@ -1,3 +1,5 @@
+# copied from https://github.com/openshift/api/blob/release-4.8/security/v1/0000_03_security-openshift_01_scc.crd.yaml
+# commented where modified from original
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -14,6 +16,8 @@ spec:
     listKind: SecurityContextConstraintsList
     plural: securitycontextconstraints
     singular: securitycontextconstraints
+    shortNames: # modified from openshift/api, openshift/api registers with openshift-apiserver, and shorNames()
+    - scc       # same shortNames as OCP but with CRD instead of openshift-apiserver
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -70,12 +74,15 @@ spec:
         - allowHostPID
         - allowHostPorts
         - allowPrivilegedContainer
-        - allowedCapabilities
-        - defaultAddCapabilities
-        - priority
         - readOnlyRootFilesystem
-        - requiredDropCapabilities
         - volumes
+        # removed 'nullable: true' required fields from openshift/api definition
+        # to avoid carrying patch for openAPIV3Schema validation
+        # - volumes - while nullable, keep required, because it shouldn't be nullable
+        # - allowedCapabilities
+        # - defaultAddCapabilities
+        # - priority
+        # - requiredDropCapabilities
         properties:
           allowHostDirVolumePlugin:
             description: AllowHostDirVolumePlugin determines if the policy allow containers

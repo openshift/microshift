@@ -411,7 +411,9 @@ func assetsCrd0000_03_configOperator_01_proxyCrdYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
+var _assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml = []byte(`# copied from https://github.com/openshift/api/blob/release-4.8/quota/v1/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml
+# commented where modified from original
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
@@ -427,6 +429,8 @@ spec:
     listKind: ClusterResourceQuotaList
     plural: clusterresourcequotas
     singular: clusterresourcequota
+    shortNames:      # modified from openshift/api, oapi registers with openshift-apiserver, and shorNames()
+    - clusterquota   # same shortNames as OCP but with CRD instead of openshift-apiserver
   scope: Cluster
   versions:
   - name: v1
@@ -676,7 +680,9 @@ func assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml() (*asset, e
 	return a, nil
 }
 
-var _assetsCrd0000_03_securityOpenshift_01_sccCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
+var _assetsCrd0000_03_securityOpenshift_01_sccCrdYaml = []byte(`# copied from https://github.com/openshift/api/blob/release-4.8/security/v1/0000_03_security-openshift_01_scc.crd.yaml
+# commented where modified from original
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
@@ -692,6 +698,8 @@ spec:
     listKind: SecurityContextConstraintsList
     plural: securitycontextconstraints
     singular: securitycontextconstraints
+    shortNames: # modified from openshift/api, openshift/api registers with openshift-apiserver, and shorNames()
+    - scc       # same shortNames as OCP but with CRD instead of openshift-apiserver
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -748,12 +756,15 @@ spec:
         - allowHostPID
         - allowHostPorts
         - allowPrivilegedContainer
-        - allowedCapabilities
-        - defaultAddCapabilities
-        - priority
         - readOnlyRootFilesystem
-        - requiredDropCapabilities
         - volumes
+        # removed 'nullable: true' required fields from openshift/api definition
+        # to avoid carrying patch for openAPIV3Schema validation
+        # - volumes - while nullable, keep required, because it shouldn't be nullable
+        # - allowedCapabilities
+        # - defaultAddCapabilities
+        # - priority
+        # - requiredDropCapabilities
         properties:
           allowHostDirVolumePlugin:
             description: AllowHostDirVolumePlugin determines if the policy allow containers
