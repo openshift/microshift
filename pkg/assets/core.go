@@ -68,6 +68,35 @@ func (ns *nsApplier) Applier() error {
 	return nil
 }
 
+type secretApplier struct {
+	Client *coreclientv1.CoreV1Client
+	secret *corev1.Secret
+}
+
+func (secret *secretApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+	var err error
+	if render != nil {
+		objBytes, err = render(objBytes, params)
+		if err != nil {
+			panic(err)
+		}
+	}
+	obj, err := runtime.Decode(coreCodecs.UniversalDecoder(corev1.SchemeGroupVersion), objBytes)
+	if err != nil {
+		panic(err)
+	}
+	secret.secret = obj.(*corev1.Secret)
+}
+
+func (secret *secretApplier) Applier() error {
+	_, err := secret.Client.Secrets(secret.secret.Namespace).Get(context.TODO(), secret.secret.Name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		_, err := secret.Client.Secrets(secret.secret.Namespace).Create(context.TODO(), secret.secret, metav1.CreateOptions{})
+		return err
+	}
+	return nil
+}
+
 type svcApplier struct {
 	Client *coreclientv1.CoreV1Client
 	svc    *corev1.Service
@@ -197,4 +226,44 @@ func ApplyConfigMaps(cores []string, kubeconfigPath string) error {
 	cm := &cmApplier{}
 	cm.Client = coreClient(kubeconfigPath)
 	return applyCore(cores, cm, nil, nil)
+}
+
+func ApplyConfigMapWithData(cmPath string, data map[string]string, kubeconfigPath string) error {
+	ctx := context.TODO()
+	cm := &cmApplier{}
+	cm.Client = coreClient(kubeconfigPath)
+	if err := applyCore([]string{cmPath}, cm, nil, nil); err != nil {
+		return err
+	}
+	c, err := cm.Client.ConfigMaps(cm.cm.Namespace).Get(ctx, cm.cm.Name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		c, err = cm.Client.ConfigMaps(cm.cm.Namespace).Create(ctx, cm.cm, metav1.CreateOptions{})
+		return err
+	}
+	c.Data = data
+	_, err = cm.Client.ConfigMaps(c.Namespace).Update(ctx, c, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ApplySecretWithData(secretPath string, data map[string][]byte, kubeconfigPath string) error {
+	ctx := context.TODO()
+	secret := &secretApplier{}
+	secret.Client = coreClient(kubeconfigPath)
+	if err := applyCore([]string{secretPath}, secret, nil, nil); err != nil {
+		return err
+	}
+	s, err := secret.Client.Secrets(secret.secret.Namespace).Get(ctx, secret.secret.Name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		s, err = secret.Client.Secrets(secret.secret.Namespace).Create(ctx, secret.secret, metav1.CreateOptions{})
+		return err
+	}
+	s.Data = data
+	_, err = secret.Client.Secrets(s.Namespace).Update(ctx, s, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
 }

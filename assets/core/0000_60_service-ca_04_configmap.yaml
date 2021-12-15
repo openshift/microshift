@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: openshift-service-ca
+  name: signing-cabundle
+data:
+  ca-bundle.crt:
