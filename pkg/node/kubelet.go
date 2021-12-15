@@ -61,7 +61,7 @@ func NewKubeletServer(cfg *config.MicroshiftConfig) *KubeletServer {
 func (s *KubeletServer) Name() string           { return componentKubelet }
 func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
+func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 
 	if err := s.writeConfig(cfg); err != nil {
 		logrus.Fatalf("Failed to write kubelet config: %v", err)
@@ -112,9 +112,6 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) error {
 	}
 	s.kubeconfig = kubeletConfig
 	s.kubeletflags = kubeletFlags
-
-	logrus.Infof("Starting kubelet %s, args: %v", cfg.NodeIP, args)
-	return nil
 }
 
 func (s *KubeletServer) writeConfig(cfg *config.MicroshiftConfig) error {

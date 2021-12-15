@@ -97,7 +97,6 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 	if err := cmd.ParseFlags(args); err != nil {
 		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
 	}
-	logrus.Infof("starting kube-controller-manager %s, args: %v", cfg.NodeIP, args)
 }
 
 func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {

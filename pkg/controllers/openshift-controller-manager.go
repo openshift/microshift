@@ -52,7 +52,7 @@ func NewOpenShiftControllerManager(cfg *config.MicroshiftConfig) *OCPControllerM
 func (s *OCPControllerManager) Name() string           { return componentOCM }
 func (s *OCPControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) error {
+func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {
 		logrus.Fatalf("Failed to write openshift-controller-manager config: %v", err)
 	}
@@ -81,8 +81,6 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) error {
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
 	s.ConfigFilePath = options.ConfigFilePath
 	s.Output = options.Output
-
-	return nil
 }
 
 func (s *OCPControllerManager) writeConfig(cfg *config.MicroshiftConfig) error {
