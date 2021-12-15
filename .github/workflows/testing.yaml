@@ -1,13 +1,25 @@
 on: [push, pull_request]
-name: Testing & Coverage
+name: Testing
 jobs:
   test:
     strategy:
       matrix:
         go-version: [1.16.8, 1.17.x]
-        os: [fedora-latest, ubuntu-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
+    - name: Install Dependencies on Ubuntu
+      if: ${{ matrix.os }} == "ubuntu-latest"
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y avahi-daemon libgpgme-dev
+    # MDNS hack
+    - name: MDNS hack
+      run: | 
+        echo $'.local\n.local.' | sudo tee /etc/mdns.allow
+        sudo sed -i 's/mdns4_minimal/mdns/g' /etc/nsswitch.conf
+        # test CI concept
+        echo "${{ matrix.go-version }}"
     - name: Install Go
       uses: actions/setup-go@v2
       with:
