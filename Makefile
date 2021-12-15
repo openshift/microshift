@@ -40,7 +40,18 @@ IPTABLES :=nft
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
 
-GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
+ifeq ($(DEBUG),true)
+	# throw all the debug info in!
+	LD_FLAGS =
+	GC_FLAGS =-gcflags "all=-N -l"
+else
+	# strip everything we can
+	LD_FLAGS =-w -s
+	GC_FLAGS =
+endif
+
+
+GO_LD_FLAGS := $(GC_FLAGS) -ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMinor=21 \
                    -X k8s.io/component-base/version.gitVersion=v1.21.0 \
@@ -57,7 +68,7 @@ GO_LD_FLAGS :=-ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X github.com/openshift/microshift/pkg/version.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
                    -X github.com/openshift/microshift/pkg/version.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
                    -X github.com/openshift/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
-                   -s -w"
+                   $(LD_FLAGS)"
 
 debug:
 	@echo FLAGS:"$(GO_LD_FLAGS)"
