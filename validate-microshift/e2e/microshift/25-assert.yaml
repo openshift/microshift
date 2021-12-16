@@ -9,4 +9,4 @@ metadata:
   name: dns-default
   namespace: openshift-dns
 status:
-  numberReady: 2
+  numberReady: 1
