@@ -1,5 +1,5 @@
 on: [push, pull_request]
-name: Testing
+name: Unit Testing
 jobs:
   test:
     strategy:
