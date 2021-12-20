@@ -42,7 +42,6 @@ ExclusiveArch: x86_64 aarch64 ppc64le s390x
 %endif
 
 BuildRequires: gcc
-BuildRequires: glibc-static
 BuildRequires: golang >= %{golang_version}
 BuildRequires: make
 BuildRequires: policycoreutils
