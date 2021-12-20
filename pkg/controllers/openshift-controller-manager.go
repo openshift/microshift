@@ -33,6 +33,7 @@ import (
 )
 
 type OCPControllerManager struct {
+	kubeconfig     string
 	ConfigFilePath string
 	Output         io.Writer
 }
@@ -77,15 +78,10 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) error {
 	cmd.MarkFlagFilename("config", "yaml", "yml")
 	cmd.MarkFlagRequired("config")
 
+	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
 	s.ConfigFilePath = options.ConfigFilePath
 	s.Output = options.Output
 
-	if err := assets.ApplyNamespaces([]string{
-		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
-	}, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
-		logrus.Warningf("failed to apply openshift namespaces %v", err)
-		return err
-	}
 	return nil
 }
 
@@ -117,6 +113,13 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 		logrus.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
+
+	if err := assets.ApplyNamespaces([]string{
+		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
+	}, s.kubeconfig); err != nil {
+		logrus.Warningf("failed to apply openshift namespaces %v", err)
+	}
+
 	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
 	options.ConfigFilePath = s.ConfigFilePath
 	if err := options.StartControllerManager(); err != nil {
