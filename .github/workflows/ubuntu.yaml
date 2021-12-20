@@ -33,35 +33,3 @@ jobs:
         with:
           name: microshift
           path: ./microshift
-  
-  deploy-microshift:
-    name: Deploy-Microshift
-    needs: Build-Microshift
-    runs-on: ubuntu-20.04
-    env:
-      KUBECONFIG: /tmp/kubeconfig
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      
-      - name: download archive
-        uses: actions/download-artifact@v2.0.10
-        with:
-          name: microshift
-          path: /tmp/
-
-      - name: sleep then run kubectl
-        run: chmod +x /tmp/microshift    
-
-      - name: install script
-        run: CONFIG_ENV_ONLY=true ./install.sh
-
-      - name: start microshift
-        run: sudo /tmp/microshift run &
-
-      - name: sleep then run kuttl
-        run: |
-           sudo -i sh -c 'until [ -f /var/lib/microshift/resources/kubeadmin/kubeconfig ]; do sudo sleep 5; done'
-           sudo cp /var/lib/microshift/resources/kubeadmin/kubeconfig /tmp/kubeconfig
-           sudo chown `whoami`: /tmp/kubeconfig
-           make validate-cluster 
