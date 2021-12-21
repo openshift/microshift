@@ -36,6 +36,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"k8s.io/klog/v2"
 )
 
 var (
@@ -70,6 +71,36 @@ func GenCA(common string, svcName []string, duration time.Duration) (*rsa.Privat
 	}
 	key, ca, err := cfg.GenerateSelfSignedCertificate()
 	return key, ca, err
+}
+
+func LoadRootCA(dir, certFilename, keyFilename string) error {
+
+	key, err := ioutil.ReadFile(filepath.Join(dir, keyFilename))
+	if err != nil {
+		return errors.Wrap(err, "error reading CA key")
+	}
+
+	if rootKey, err = PemToPrivateKey(key); err != nil {
+		return errors.Wrap(err, "parsing CA key from PEM")
+	}
+
+	certPath := filepath.Join(dir, certFilename)
+	cert, err := ioutil.ReadFile(certPath)
+	if err != nil {
+		return errors.Wrap(err, "reading CA certificate")
+	}
+
+	if rootCA, err = PemToCertificate(cert); err != nil {
+		return errors.Wrap(err, "parsing CA certificate")
+	}
+
+	now := time.Now()
+
+	if now.After(rootCA.NotAfter) {
+		klog.ErrorS(nil, "CA has expired: current time %s is after %s", now.Format(time.RFC3339), rootCA.NotAfter.Format(time.RFC3339))
+	}
+
+	return nil
 }
 
 func StoreRootCA(common, dir, certFilename, keyFilename string, svcName []string) error {
@@ -186,6 +217,15 @@ func (cfg *CertCfg) GenerateSelfSignedCertificate() (*rsa.PrivateKey, *x509.Cert
 
 // GenerateSignedCertificate generate a key and cert defined by CertCfg and signed by CA.
 func (cfg *CertCfg) GenerateSignedCertificate(caKey *rsa.PrivateKey, caCert *x509.Certificate) (*rsa.PrivateKey, *x509.Certificate, error) {
+
+	if caCert == nil {
+		return nil, nil, errors.New("Unable to GenerateSignedCertificate with (nil) caCert")
+	}
+
+	if caKey == nil {
+		return nil, nil, errors.New("Unable to GenerateSignedCertificate with (nil) caKey")
+	}
+
 	// create a private key
 	key, err := PrivateKey()
 	if err != nil {
