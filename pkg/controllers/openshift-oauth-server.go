@@ -77,7 +77,6 @@ func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
 	fs := pflag.NewFlagSet("oauth-apiserver", pflag.PanicOnError)
 	opts := oauth_apiserver.NewOAuthAPIServerOptions(os.Stdout)
 	opts.AddFlags(fs)
-	logrus.Infof("starting openshift-oauth-apiserver, args: %v", args)
 
 	ls, err := util.CreateLocalhostListenerOnPort(8443)
 	if err != nil {

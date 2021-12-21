@@ -49,7 +49,7 @@ func NewKubeProxyServer(cfg *config.MicroshiftConfig) *ProxyOptions {
 func (s *ProxyOptions) Name() string           { return componentKubeProxy }
 func (s *ProxyOptions) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
+func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {
 		logrus.Fatalf("Failed to write kube-proxy config: %v", err)
 	}
@@ -78,8 +78,6 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) error {
 	if err := cmd.ParseFlags(args); err != nil {
 		logrus.Fatalf("failed to parse flags:%v", err)
 	}
-	logrus.Infof("starting %s, args: %v", s.Name(), args)
-	return nil
 }
 
 func (s *ProxyOptions) writeConfig(cfg *config.MicroshiftConfig) error {

@@ -89,7 +89,6 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 
 	s.options = opts
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
-
 }
 
 func (s *KubeScheduler) writeConfig(cfg *config.MicroshiftConfig) error {
