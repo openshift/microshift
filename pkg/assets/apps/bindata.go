@@ -328,7 +328,6 @@ spec:
       - name: kube-rbac-proxy
         image: {{ .ReleaseImage.kube_rbac_proxy }}
         args:
-        - --logtostderr
         - --secure-listen-address=:9154
         - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
         - --upstream=http://127.0.0.1:9153/
