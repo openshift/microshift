@@ -20,7 +20,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -53,10 +52,8 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {
 		logrus.Fatalf("Failed to write kube-proxy config: %v", err)
 	}
-	args := []string{
-		"--v=" + strconv.Itoa(cfg.LogVLevel),
-		"--vmodule=" + cfg.LogVModule,
-	}
+	// Keeping the args in case something must be added in the future
+	args := []string{""}
 	cmd := &cobra.Command{
 		Use:          componentKubeProxy,
 		Long:         componentKubeProxy,

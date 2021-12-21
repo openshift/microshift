@@ -39,14 +39,12 @@ func TestCommandLineConfig(t *testing.T) {
 	}{
 		{
 			config: &MicroshiftConfig{
-				DataDir:         "/tmp/microshift/data",
-				LogDir:          "/tmp/microshift/logs",
-				LogVLevel:       4,
-				LogVModule:      "microshift=4",
-				LogAlsotostderr: true,
-				Roles:           []string{"controlplane", "node"},
-				NodeName:        "node1",
-				NodeIP:          "1.2.3.4",
+				DataDir:   "/tmp/microshift/data",
+				LogDir:    "/tmp/microshift/logs",
+				LogVLevel: 4,
+				Roles:     []string{"controlplane", "node"},
+				NodeName:  "node1",
+				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:         "https://1.2.3.4:6443",
 					ClusterCIDR: "10.20.30.40/16",
@@ -66,8 +64,6 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.StringVar(&config.DataDir, "data-dir", "", "")
 		flags.StringVar(&config.LogDir, "log-dir", "", "")
 		flags.IntVar(&config.LogVLevel, "v", 0, "")
-		flags.StringVar(&config.LogVModule, "vmodule", "", "")
-		flags.BoolVar(&config.LogAlsotostderr, "alsologtostderr", false, "")
 		flags.StringSliceVar(&config.Roles, "roles", []string{}, "")
 		flags.StringVar(&config.NodeName, "node-name", "", "")
 		flags.StringVar(&config.NodeIP, "node-ip", "", "")
@@ -82,8 +78,6 @@ func TestCommandLineConfig(t *testing.T) {
 			"--data-dir=" + tt.config.DataDir,
 			"--log-dir=" + tt.config.LogDir,
 			"--v=" + strconv.Itoa(tt.config.LogVLevel),
-			"--vmodule=" + tt.config.LogVModule,
-			"--alsologtostderr",
 			"--roles=" + strings.Join(tt.config.Roles, ","),
 			"--node-name=" + tt.config.NodeName,
 			"--node-ip=" + tt.config.NodeIP,
@@ -118,15 +112,13 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 	}{
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
-				ConfigFile:      "/to/config/file",
-				DataDir:         "/tmp/microshift/data",
-				LogDir:          "/tmp/microshift/logs",
-				LogVLevel:       23,
-				LogVModule:      "microshift=23",
-				LogAlsotostderr: true,
-				Roles:           []string{"controlplane", "node"},
-				NodeName:        "node1",
-				NodeIP:          "1.2.3.4",
+				ConfigFile: "/to/config/file",
+				DataDir:    "/tmp/microshift/data",
+				LogDir:     "/tmp/microshift/logs",
+				LogVLevel:  23,
+				Roles:      []string{"controlplane", "node"},
+				NodeName:   "node1",
+				NodeIP:     "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:         "https://cluster.com:4343/endpoint",
 					ClusterCIDR: "10.20.30.40/16",
@@ -144,8 +136,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_DATADIR", "/tmp/microshift/data"},
 				{"MICROSHIFT_LOGDIR", "/tmp/microshift/logs"},
 				{"MICROSHIFT_LOGVLEVEL", "23"},
-				{"MICROSHIFT_LOGVMODULE", "microshift=23"},
-				{"MICROSHIFT_LOGALSOTOSTDERR", "true"},
 				{"MICROSHIFT_ROLES", "controlplane,node"},
 				{"MICROSHIFT_NODENAME", "node1"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
@@ -182,8 +172,6 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 	flags.String("data-dir", "", "")
 	flags.String("log-dir", "", "")
 	flags.Int("v", 0, "")
-	flags.String("vmodule", "", "")
-	flags.Bool("alsologtostderr", false, "")
 	flags.StringSlice("roles", []string{}, "")
 
 	c := NewMicroshiftConfig()

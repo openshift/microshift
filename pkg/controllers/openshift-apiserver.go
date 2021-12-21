@@ -22,7 +22,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -62,8 +61,6 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	}
 	args := []string{
 		"--config=" + configFilePath,
-		"--v=" + strconv.Itoa(cfg.LogVLevel),
-		"--vmodule=" + cfg.LogVModule,
 	}
 
 	options := openshift_apiserver.OpenShiftAPIServer{

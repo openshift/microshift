@@ -20,7 +20,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
@@ -61,8 +60,6 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-scheduler/config/config.yaml",
-		"--v=" + strconv.Itoa(cfg.LogVLevel),
-		"--vmodule=" + cfg.LogVModule,
 	}
 
 	cmd := &cobra.Command{
