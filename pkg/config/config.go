@@ -76,7 +76,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	return &MicroshiftConfig{
 		ConfigFile:  findConfigFile(),
 		DataDir:     findDataDir(),
-		AuditLogDir: "/var/log/microshift/",
+		AuditLogDir: "",
 		LogVLevel:   0,
 		Roles:       defaultRoles,
 		NodeName:    nodeName,
@@ -209,7 +209,7 @@ func InitGlobalFlags() {
 	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 
 	goflag.CommandLine.VisitAll(func(goflag *goflag.Flag) {
-		if StringInList(goflag.Name, []string{"v", "log_dir", "log_file"}) {
+		if StringInList(goflag.Name, []string{"v", "log_file"}) {
 			pflag.CommandLine.AddGoFlag(goflag)
 		}
 	})

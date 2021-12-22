@@ -44,6 +44,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	cmd.MarkFlagFilename("config", "yaml", "yml")
 	// All other flags will be read after reading both config file and env vars.
 	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
+	flags.String("audit-log-dir", cfg.AuditLogDir, "Directory for storing audit logs.")
 	flags.StringSlice("roles", cfg.Roles, "Roles of this MicroShift instance.")
 
 	return cmd
