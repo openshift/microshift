@@ -112,6 +112,9 @@ systems, scale testing, and provisioning of lightweight Kubernetes control plane
 Note: MicroShift is still early days and moving fast. Features are missing.
 Things break. But you can still help shape it, too.
 
+%define microshift_relabel_files() \
+restorecon -R /var/hpvolumes
+
 %package selinux
 Summary: SELinux policies for MicroShift
 BuildRequires: selinux-policy
@@ -198,6 +201,9 @@ install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinu
 %post selinux
 
 %selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
+if /usr/sbin/selinuxenabled ; then
+    %microshift_relabel_files
+fi;
 
 %postun selinux
 
