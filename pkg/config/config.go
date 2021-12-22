@@ -50,8 +50,8 @@ type MicroshiftConfig struct {
 	ConfigFile string
 	DataDir    string `yaml:"dataDir"`
 
-	LogDir    string `yaml:"logDir"`
-	LogVLevel int    `yaml:"logVLevel"`
+	AuditLogDir string `yaml:"auditLogDir"`
+	LogVLevel   int    `yaml:"logVLevel"`
 
 	Roles []string `yaml:"roles"`
 
@@ -74,13 +74,13 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 
 	return &MicroshiftConfig{
-		ConfigFile: findConfigFile(),
-		DataDir:    findDataDir(),
-		LogDir:     "/var/log/microshift/",
-		LogVLevel:  0,
-		Roles:      defaultRoles,
-		NodeName:   nodeName,
-		NodeIP:     nodeIP,
+		ConfigFile:  findConfigFile(),
+		DataDir:     findDataDir(),
+		AuditLogDir: "/var/log/microshift/",
+		LogVLevel:   0,
+		Roles:       defaultRoles,
+		NodeName:    nodeName,
+		NodeIP:      nodeIP,
 		Cluster: ClusterConfig{
 			URL:         "https://127.0.0.1:6443",
 			ClusterCIDR: "10.42.0.0/16",
@@ -173,8 +173,8 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if dataDir, err := flags.GetString("data-dir"); err == nil && flags.Changed("data-dir") {
 		c.DataDir = dataDir
 	}
-	if logDir, err := flags.GetString("log-dir"); err == nil && flags.Changed("log-dir") {
-		c.LogDir = logDir
+	if auditLogDir, err := flags.GetString("audit-log-dir"); err == nil && flags.Changed("audit-log-dir") {
+		c.AuditLogDir = auditLogDir
 	}
 	if vLevelFlag := flags.Lookup("v"); vLevelFlag != nil && flags.Changed("v") {
 		c.LogVLevel, _ = strconv.Atoi(vLevelFlag.Value.String())

@@ -115,9 +115,9 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		"--tls-private-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
 		"--cors-allowed-origins=/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$",
 	}
-	if cfg.LogDir != "" {
+	if cfg.AuditLogDir != "" {
 		args = append(args,
-			"--audit-log-path="+filepath.Join(cfg.LogDir, "kube-apiserver-audit.log"))
+			"--audit-log-path="+filepath.Join(cfg.AuditLogDir, "kube-apiserver-audit.log"))
 	}
 
 	// fake the kube-apiserver cobra command to parse args into serverOptions

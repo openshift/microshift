@@ -227,7 +227,7 @@ apiServerArguments:
   - RBAC
   - Node
 auditConfig:
-  auditFilePath: "` + cfg.LogDir + `/openshift-apiserver/audit.log"
+  auditFilePath: "` + cfg.AuditLogDir + `/openshift-apiserver/audit.log"
   enabled: true
   logFormat: json
   maximumFileSizeMegabytes: 100

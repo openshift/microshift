@@ -60,7 +60,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	}
 
 	os.MkdirAll(cfg.DataDir, 0700)
-	os.MkdirAll(cfg.LogDir, 0700)
+	os.MkdirAll(cfg.AuditLogDir, 0700)
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	if _, err := os.Stat(filepath.Join(cfg.DataDir, "certs")); errors.Is(err, os.ErrNotExist) {
