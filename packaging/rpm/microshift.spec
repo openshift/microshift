@@ -205,7 +205,7 @@ if [ $1 -eq 0 ]; then
     %selinux_modules_uninstall -s %{selinuxtype} microshift
 fi
 
-restorecon -v %{buildroot}/var/hpvolumes
+restorecon -v /var/hpvolumes
 
 %posttrans selinux
 
