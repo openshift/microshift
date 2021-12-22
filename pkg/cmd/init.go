@@ -21,7 +21,6 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/util"
-
 	ctrl "k8s.io/kubernetes/pkg/controlplane"
 )
 
@@ -40,6 +39,10 @@ func initAll(cfg *config.MicroshiftConfig) error {
 	}
 
 	return nil
+}
+
+func loadCA(cfg *config.MicroshiftConfig) error {
+	return util.LoadRootCA(cfg.DataDir+"/certs/ca-bundle", "ca-bundle.crt", "ca-bundle.key")
 }
 
 func initCerts(cfg *config.MicroshiftConfig) error {
