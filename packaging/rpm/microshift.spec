@@ -49,6 +49,7 @@ BuildRequires: systemd
 
 Requires: cri-o
 Requires: cri-tools
+Requires: iptables
 Requires: microshift-selinux
 
 %{?systemd_requires}
