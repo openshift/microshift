@@ -20,7 +20,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"k8s.io/klog/v2"
 )
 
 const (
@@ -65,15 +64,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	if _, err := os.Stat(filepath.Join(cfg.DataDir, "certs")); errors.Is(err, os.ErrNotExist) {
 		initAll(cfg)
-	} else {
-		err = loadCA(cfg)
-		if err != nil {
-			err := os.RemoveAll(filepath.Join(cfg.DataDir, "certs"))
-			if err != nil {
-				klog.ErrorS(err, "removing old certs directory")
-			}
-			util.Must(initAll(cfg))
-		}
 	}
 
 	m := servicemanager.NewServiceManager()
