@@ -186,7 +186,7 @@ mkdir -p -m755 %{buildroot}/var/run/kubelet
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
 mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
 mkdir -p -m755 %{buildroot}/var/hpvolumes
-
+restorecon -v %{buildroot}/var/hpvolumes
 
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
@@ -204,8 +204,6 @@ install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinu
 if [ $1 -eq 0 ]; then
     %selinux_modules_uninstall -s %{selinuxtype} microshift
 fi
-
-restorecon -v /var/hpvolumes
 
 %posttrans selinux
 
