@@ -53,6 +53,8 @@ func (s *OCPAPIServer) Dependencies() []string {
 	return []string{"kube-apiserver", "openshift-crd-manager"}
 }
 
+// Testing CI
+
 func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	var configFilePath = cfg.DataDir + "/resources/openshift-apiserver/config/config.yaml"
 

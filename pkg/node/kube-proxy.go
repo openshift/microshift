@@ -65,6 +65,7 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) {
 		SilenceUsage: true,
 		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
 	}
+	// Testing CI
 	if cfg.LogDir != "" {
 		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-proxy.log"))
 	}
