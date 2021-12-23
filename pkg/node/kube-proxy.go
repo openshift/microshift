@@ -53,7 +53,7 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) {
 		logrus.Fatalf("Failed to write kube-proxy config: %v", err)
 	}
 	// Keeping the args in case something must be added in the future
-	args := []string{""}
+	args := []string{}
 	cmd := &cobra.Command{
 		Use:          componentKubeProxy,
 		Long:         componentKubeProxy,
