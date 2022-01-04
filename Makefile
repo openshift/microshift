@@ -235,7 +235,3 @@ release: SOURCE_GIT_TAG=$(RELEASE_PRE)-$(TIMESTAMP)
 release:
 	./scripts/release.sh --token $(TOKEN) --version $(SOURCE_GIT_TAG)
 .PHONY: release
-
-release-nightly:
-	./scripts/release.sh --nightly --version $(SOURCE_GIT_TAG)
-.PHONY: release-nightly
