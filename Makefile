@@ -236,11 +236,6 @@ release:
 	./scripts/release.sh --token $(TOKEN) --version $(SOURCE_GIT_TAG)
 .PHONY: release
 
-temp-release: SOURCE_GIT_TAG=$(RELEASE_PRE)-$(TIMESTAMP)
-temp-release:
-	./hack/temp-release.sh --token $(TOKEN) --version $(SOURCE_GIT_TAG)
-.PHONY: temp-release
-
 release-nightly:
 	./scripts/release.sh --nightly --version $(SOURCE_GIT_TAG)
 .PHONY: release-nightly
