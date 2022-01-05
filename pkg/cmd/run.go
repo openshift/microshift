@@ -45,7 +45,6 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	// All other flags will be read after reading both config file and env vars.
 	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
 	flags.StringSlice("roles", cfg.Roles, "Roles of this MicroShift instance.")
-	// Testing CI
 	return cmd
 }
 
