@@ -186,7 +186,7 @@ install -p -m644 packaging/crio.conf.d/microshift.conf %{buildroot}%{_sysconfdir
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
-install -p -m644 packaging/systemd/microshift-containerized.service %{buildroot}%{_unitdir}/microshift-containerized.service
+install -p -m644 packaging/systemd/microshift-containerized.service %{buildroot}%{_unitdir}/microshift.service
 
 mkdir -p -m755 %{buildroot}/var/run/flannel
 mkdir -p -m755 %{buildroot}/var/run/kubelet
@@ -249,7 +249,7 @@ fi
 
 %files containerized
 
-%{_unitdir}/microshift-containerized.service
+%{_unitdir}/microshift.service
 
 %changelog
 * Thu Nov 4 2021 Miguel angel Ajo <majopela@redhat.com> . 4.8.0-nightly-14-g973b9c78
