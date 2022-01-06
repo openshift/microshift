@@ -27,6 +27,6 @@ jobs:
       
       - name: execute release.sh
         shell: bash
-        run: make temp-release TOKEN=${GITHUB_TOKEN}
+        run: make release TOKEN=${GITHUB_TOKEN}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
