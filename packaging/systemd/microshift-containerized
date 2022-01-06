@@ -2,7 +2,9 @@
 
 set -euxo pipefail
 
-[[ -d /etc/microshift-containerized ]] || mkdir -p /etc/microshift-containerized
-cat <<EOF > /etc/microshift-containerized/microshift-containerized.conf
-export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
-EOF
+setsebool -P container_manage_cgroup true
+
+if ! /usr/bin/podman volume exists microshift-data
+then
+  /usr/bin/podman volume create microshift-data
+fi
