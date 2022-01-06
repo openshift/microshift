@@ -61,7 +61,6 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
 	// certDir := filepath.Join(cfg.DataDir, "certs", s.Name())
 	// dataDir := filepath.Join(cfg.DataDir, s.Name())
-	// Testing CI
 	if err := s.configureAuditPolicy(cfg); err != nil {
 		logrus.Fatalf("Failed to configure kube-apiserver audit policy: %v", err)
 	}
