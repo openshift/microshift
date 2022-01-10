@@ -18,7 +18,6 @@ package controllers
 import (
 	"context"
 	"path/filepath"
-	"strconv"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -71,13 +70,6 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 		"--use-service-account-credentials=true",
 		"--cluster-signing-cert-file=" + caCertFile,
 		"--cluster-signing-key-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.key",
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
-		"--v=" + strconv.Itoa(cfg.LogVLevel),
-		"--vmodule=" + cfg.LogVModule,
-	}
-	if cfg.LogDir != "" {
-		args = append(args, "--log-file="+filepath.Join(cfg.LogDir, "kube-controller-manager.log"))
 	}
 
 	// fake the kube-controller-manager cobra command to parse args into controllermanager options

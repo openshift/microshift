@@ -50,10 +50,8 @@ type MicroshiftConfig struct {
 	ConfigFile string
 	DataDir    string `yaml:"dataDir"`
 
-	LogDir          string `yaml:"logDir"`
-	LogVLevel       int    `yaml:"logVLevel"`
-	LogVModule      string `yaml:"logVModule"`
-	LogAlsotostderr bool   `yaml:"logAlsotostderr"`
+	AuditLogDir string `yaml:"auditLogDir"`
+	LogVLevel   int    `yaml:"logVLevel"`
 
 	Roles []string `yaml:"roles"`
 
@@ -76,15 +74,13 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 
 	return &MicroshiftConfig{
-		ConfigFile:      findConfigFile(),
-		DataDir:         findDataDir(),
-		LogDir:          "/var/log/microshift/",
-		LogVLevel:       0,
-		LogVModule:      "",
-		LogAlsotostderr: false,
-		Roles:           defaultRoles,
-		NodeName:        nodeName,
-		NodeIP:          nodeIP,
+		ConfigFile:  findConfigFile(),
+		DataDir:     findDataDir(),
+		AuditLogDir: "",
+		LogVLevel:   0,
+		Roles:       defaultRoles,
+		NodeName:    nodeName,
+		NodeIP:      nodeIP,
 		Cluster: ClusterConfig{
 			URL:         "https://127.0.0.1:6443",
 			ClusterCIDR: "10.42.0.0/16",
@@ -177,17 +173,11 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if dataDir, err := flags.GetString("data-dir"); err == nil && flags.Changed("data-dir") {
 		c.DataDir = dataDir
 	}
-	if logDir, err := flags.GetString("log-dir"); err == nil && flags.Changed("log-dir") {
-		c.LogDir = logDir
+	if auditLogDir, err := flags.GetString("audit-log-dir"); err == nil && flags.Changed("audit-log-dir") {
+		c.AuditLogDir = auditLogDir
 	}
 	if vLevelFlag := flags.Lookup("v"); vLevelFlag != nil && flags.Changed("v") {
 		c.LogVLevel, _ = strconv.Atoi(vLevelFlag.Value.String())
-	}
-	if vModuleFlag := flags.Lookup("vmodule"); vModuleFlag != nil && flags.Changed("vmodule") {
-		c.LogVModule = vModuleFlag.Value.String()
-	}
-	if alsologtostderr, err := flags.GetBool("alsologtostderr"); err == nil && flags.Changed("alsologtostderr") {
-		c.LogAlsotostderr = alsologtostderr
 	}
 	if roles, err := flags.GetStringSlice("roles"); err == nil && flags.Changed("roles") {
 		c.Roles = roles
@@ -219,13 +209,12 @@ func InitGlobalFlags() {
 	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 
 	goflag.CommandLine.VisitAll(func(goflag *goflag.Flag) {
-		if StringInList(goflag.Name, []string{"v", "vmodule", "log_dir", "log_file", "alsologtostderr", "logtostderr"}) {
+		if StringInList(goflag.Name, []string{"v", "log_file"}) {
 			pflag.CommandLine.AddGoFlag(goflag)
 		}
 	})
 
 	pflag.CommandLine.MarkHidden("log-flush-frequency")
 	pflag.CommandLine.MarkHidden("log_file")
-	pflag.CommandLine.MarkHidden("logtostderr")
 	pflag.CommandLine.MarkHidden("version")
 }

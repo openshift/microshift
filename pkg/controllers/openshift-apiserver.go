@@ -22,7 +22,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -62,10 +61,6 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	}
 	args := []string{
 		"--config=" + configFilePath,
-		"--alsologtostderr=" + strconv.FormatBool(cfg.LogAlsotostderr),
-		"--v=" + strconv.Itoa(cfg.LogVLevel),
-		"--vmodule=" + cfg.LogVModule,
-		"--logtostderr=" + strconv.FormatBool(cfg.LogDir == "" || cfg.LogAlsotostderr),
 	}
 
 	options := openshift_apiserver.OpenShiftAPIServer{
@@ -230,14 +225,17 @@ apiServerArguments:
   - Scope
   - SystemMasters
   - RBAC
-  - Node
+  - Node`)
+
+	if cfg.AuditLogDir != "" {
+		data = append(data, `
 auditConfig:
-  auditFilePath: "` + cfg.LogDir + `/openshift-apiserver/audit.log"
+  auditFilePath: `+cfg.AuditLogDir+`openshift-apiserver-audit.log
   enabled: true
   logFormat: json
   maximumFileSizeMegabytes: 100
   maximumRetainedFiles: 10
-  policyFile: "` + cfg.DataDir + `/resources/openshift-apiserver/config/policy.yaml"
+  policyFile: "`+cfg.DataDir+`/resources/openshift-apiserver/config/policy.yaml"
   policyConfiguration:
     apiVersion: audit.k8s.io/v1
     kind: Policy
@@ -265,25 +263,28 @@ auditConfig:
       - system:unauthenticated
     - level: Metadata
       omitStages:
-      - RequestReceived
+      - RequestReceived`...)
+	}
+
+	data = append(data, `
 imagePolicyConfig:
   internalRegistryHostname: image-registry.openshift-image-registry.svc:5000
 projectConfig:
   projectRequestMessage: ''
 routingConfig:
-  subdomain: ` + cfg.Cluster.Domain + `
+  subdomain: `+cfg.Cluster.Domain+`
 servingInfo:
   bindAddress: "0.0.0.0:8444"
-  certFile: ` + cfg.DataDir + `/resources/openshift-apiserver/secrets/tls.crt
-  keyFile: ` + cfg.DataDir + `/resources/openshift-apiserver/secrets/tls.key
-  ca: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
+  certFile: `+cfg.DataDir+`/resources/openshift-apiserver/secrets/tls.crt
+  keyFile: `+cfg.DataDir+`/resources/openshift-apiserver/secrets/tls.key
+  ca: `+cfg.DataDir+`/certs/ca-bundle/ca-bundle.crt
 storageConfig:
   urls:
   - https://127.0.0.1:2379
-  certFile: ` + cfg.DataDir + `/resources/kube-apiserver/secrets/etcd-client/tls.crt
-  keyFile: ` + cfg.DataDir + `/resources/kube-apiserver/secrets/etcd-client/tls.key
-  ca: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
-  `)
+  certFile: `+cfg.DataDir+`/resources/kube-apiserver/secrets/etcd-client/tls.crt
+  keyFile: `+cfg.DataDir+`/resources/kube-apiserver/secrets/etcd-client/tls.key
+  ca: `+cfg.DataDir+`/certs/ca-bundle/ca-bundle.crt
+  `...)
 
 	path := filepath.Join(cfg.DataDir, "resources", "openshift-apiserver", "config", "config.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
