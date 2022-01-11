@@ -13,6 +13,7 @@ import (
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiext_clientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -69,9 +70,36 @@ func getCRD(clientset *apiext_clientset.Clientset, obj apiruntime.Object) error 
 	return nil
 }
 
-func waitForCRD(client apiextclientv1beta1.CustomResourceDefinitionsGetter, resource *apiextv1beta1.CustomResourceDefinition) error {
+func waitForV1crd(client apiextclientv1.CustomResourceDefinitionsGetter, resource *apiextv1.CustomResourceDefinition) error {
 	var lastErr error
-	if err := wait.Poll(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
+	if err := wait.PollImmediate(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
+		crd, err := client.CustomResourceDefinitions().Get(context.TODO(), resource.Name, metav1.GetOptions{})
+		if err != nil {
+			lastErr = fmt.Errorf("error getting CustomResourceDefinition %s: %v", resource.Name, err)
+			logrus.Infof("getting openshift CRD status %v", lastErr)
+			return false, nil
+		}
+
+		for _, condition := range crd.Status.Conditions {
+			if condition.Type == apiextv1.Established && condition.Status == apiextv1.ConditionTrue {
+				return true, nil
+			}
+		}
+		lastErr = fmt.Errorf("CustomResourceDefinition %s is not ready. conditions: %v", crd.Name, crd.Status.Conditions)
+		logrus.Infof("getting openshift CRD status %v", lastErr)
+		return false, nil
+	}); err != nil {
+		if err == wait.ErrWaitTimeout {
+			return fmt.Errorf("%v during syncCustomResourceDefinitions: %v", err, lastErr)
+		}
+		return err
+	}
+	return nil
+}
+
+func waitForV1beta1crd(client apiextclientv1beta1.CustomResourceDefinitionsGetter, resource *apiextv1beta1.CustomResourceDefinition) error {
+	var lastErr error
+	if err := wait.PollImmediate(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
 		crd, err := client.CustomResourceDefinitions().Get(context.TODO(), resource.Name, metav1.GetOptions{})
 		if err != nil {
 			lastErr = fmt.Errorf("error getting CustomResourceDefinition %s: %v", resource.Name, err)
@@ -95,6 +123,44 @@ func waitForCRD(client apiextclientv1beta1.CustomResourceDefinitionsGetter, reso
 	}
 	return nil
 }
+
+func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
+	lock.Lock()
+	defer lock.Unlock()
+
+	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+	if err != nil {
+		return err
+	}
+
+	clientSet := apiext_clientset.NewForConfigOrDie(restConfig)
+	for _, crd := range crds {
+		logrus.Infof("Waiting for CRD %s condition: Established", crd)
+		crdBytes, err := crd_assets.Asset(crd)
+		if err != nil {
+			return fmt.Errorf("error getting asset %s: %v", crd, err)
+		}
+		obj := readCRDOrDie(crdBytes)
+
+		gv := obj.GetObjectKind().GroupVersionKind().GroupVersion()
+		switch gv.String() {
+		case "apiextensions.k8s.io/v1":
+			v1Obj := obj.(*apiextv1.CustomResourceDefinition)
+			if err = waitForV1crd(clientSet.ApiextensionsV1(), v1Obj); err != nil {
+				return err
+			}
+		case "apiextensions.k8s.io/v1beta1":
+			v1beta1Obj := obj.(*apiextv1beta1.CustomResourceDefinition)
+			if err = waitForV1beta1crd(clientSet.ApiextensionsV1beta1(), v1beta1Obj); err != nil {
+				return err
+			}
+		default:
+			// panic("unknown type %s", t)
+		}
+	}
+	return nil
+}
+
 func readCRDOrDie(objBytes []byte) apiruntime.Object {
 	requiredObj, err := apiruntime.Decode(apiExtensionsCodecs.UniversalDecoder(apiextv1.SchemeGroupVersion, apiextv1beta1.SchemeGroupVersion), objBytes)
 	if err != nil {

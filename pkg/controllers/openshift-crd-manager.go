@@ -47,5 +47,10 @@ func (s *OpenShiftCRDManager) Run(ctx context.Context, ready chan<- struct{}, st
 	}
 	logrus.Infof("%s applied default CRDs", s.Name())
 
+	logrus.Infof("%s waiting for CRDs acceptance before proceeding", s.Name())
+	if err := assets.WaitForCrdsEstablished(s.cfg); err != nil {
+		logrus.Errorf("%s unable to confirm all CRDs are ready: %v", s.Name(), err)
+	}
+	logrus.Infof("%s all CRDs are ready", s.Name())
 	return ctx.Err()
 }
