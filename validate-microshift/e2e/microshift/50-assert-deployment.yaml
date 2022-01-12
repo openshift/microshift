@@ -1,0 +1,24 @@
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 500
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uploader
+  namespace: uploader 
+status:
+  readyReplicas: 1
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 500
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uploader
+  namespace: uploader 
+status:
+  readyReplicas: 1

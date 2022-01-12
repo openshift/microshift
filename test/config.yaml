@@ -1,9 +1,7 @@
 --- 
 dataDir: /tmp/microshift/data
-logDir: /tmp/microshift/logs
+auditLogDir: /tmp/microshift/logs
 logVLevel: 4
-logVModule: microshift=4
-logAlsotostderr: true
 roles:
   - role1
   - role2

@@ -220,6 +220,9 @@ if [ $1 -eq 0 ]; then
     %selinux_modules_uninstall -s %{selinuxtype} microshift
 fi
 
+%post containerized
+mv /usr/lib/systemd/system/microshift-containerized.service /usr/lib/systemd/system/microshift.service
+
 %posttrans selinux
 
 %selinux_relabel_post -s %{selinuxtype}

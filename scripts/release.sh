@@ -135,12 +135,6 @@ build_container_images_artifacts() {
   ) || return 1
 }
 
-push_aio_container_image_artifacts() {
-  for t in "${AIO_RELEASE_IMAGE_TAGS[@]}"; do
-    podman push "$t"
-  done
-}
-
 push_container_image_artifacts() {
   for t in "${RELEASE_IMAGE_TAGS[@]}"; do
     podman push "$t"
@@ -148,36 +142,31 @@ push_container_image_artifacts() {
 }
 
 podman_create_manifest(){
-  local dest_repo="$1"
-  local image_tags="$2"
   local alias_tag="latest"
 
   if [ "$NIGHTLY" -eq 1 ]; then
     alias_tag="nightly"
   fi
 
-  podman manifest create "$dest_repo:$VERSION" >&2
-  for ref in "${image_tags[*]}"; do
-    podman manifest add "$dest_repo:$VERSION" "docker://$ref"
+  podman manifest create "$IMAGE_REPO:$VERSION" >&2
+  for ref in "${RELEASE_IMAGE_TAGS[@]}"; do
+    podman manifest add "$IMAGE_REPO:$VERSION" "docker://$ref"
   done
-    podman manifest push "$dest_repo:$VERSION" "$dest_repo:$VERSION"
-    podman manifest push "$dest_repo:$VERSION" "$dest_repo:$alias_tag"
+    podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$VERSION"
+    podman manifest push "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$alias_tag"
 }
 
 docker_create_manifest(){
-  local dest_repo="$1"
-  local image_tags="$2"
   local alias_tag="latest"
-
   if [ "$NIGHTLY" -eq 1 ]; then
     alias_tag="nightly"
   fi
 
   # use docker cli directly for clarity, as this is a docker-only func
-  docker manifest create "$dest_repo:$VERSION" "${image_tags[*]}" >&2
-  docker tag "$dest_repo:$VERSION" "$dest_repo:$alias_tag"
-  docker manifest push "$dest_repo:$VERSION"
-  docker manifest push "$dest_repo:$alias_tag"
+  docker manifest create "$IMAGE_REPO:$VERSION" "${RELEASE_IMAGE_TAGS[@]}" >&2
+  docker tag "$IMAGE_REPO:$VERSION" "$IMAGE_REPO:$alias_tag"
+  docker manifest push "$IMAGE_REPO:$VERSION"
+  docker manifest push "$IMAGE_REPO:$alias_tag"
 }
 
 # It is necessarry to differentiate between podman and docker manifest create subcommands.
@@ -185,13 +174,11 @@ docker_create_manifest(){
 # to be passed at creation. Podman also requires a prefixed "container-transport", which is
 # not recognized by docker, causing the command to fail.
 push_container_manifest() {
-  local dest_repo="$1"
-  local image_tags="$2"
   local cli="$(alias podman)"
   if [[ "${cli#*=}" =~ docker ]]; then
-    docker_create_manifest "$dest_repo" "$image_tags[*]"
+    docker_create_manifest
   else
-    podman_create_manifest "$dest_repo" "$image_tags[*]"
+    podman_create_manifest
   fi
 }
 
@@ -294,21 +281,23 @@ if [ $NIGHTLY -eq 1 ]; then
   VERSION="$VERSION-nightly"
 fi
 
-RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64")
-AIO_RELEASE_IMAGE_TAGS=("$AIO_IMAGE_REPO:$VERSION-linux-nft-amd64" "$AIO_IMAGE_REPO:$VERSION-linux-nft-arm64")
-
 STAGING_DIR="$ROOT/_output/staging"
 mkdir -p "$STAGING_DIR"
+
 # publish containerized microshift
+IMAGE_REPO="quay.io/$QUAY_OWNER/microshift"
+RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-amd64" "$IMAGE_REPO:$VERSION-linux-arm64")
 build_container_images_artifacts                                          || exit 1
 STAGE_DIR=$(stage_release_image_binaries)                                 || exit 1
 push_container_image_artifacts                                            || exit 1
-push_container_manifest "$IMAGE_REPO" "${RELEASE_IMAGE_TAGS[@]}"          || exit 1
+push_container_manifest                                                   || exit 1
 
 # publish aio container
+IMAGE_REPO="$AIO_IMAGE_REPO"
+RELEASE_IMAGE_TAGS=("$IMAGE_REPO:$VERSION-linux-nft-amd64" "$IMAGE_REPO:$VERSION-linux-nft-arm64")
 build_aio_container_images_artifacts                                      || exit 1
-push_aio_container_image_artifacts                                        || exit 1
-push_container_manifest "$AIO_IMAGE_REPO" "${AIO_RELEASE_IMAGE_TAGS[@]}"  || exit 1
+push_container_image_artifacts                                            || exit 1
+push_container_manifest                                                   || exit 1
 
 if [ $NIGHTLY -eq 1 ]; then
   printf "Nightly release complete."
