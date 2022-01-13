@@ -13,9 +13,6 @@ import (
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiext_clientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
-	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
-
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiruntime "k8s.io/apimachinery/pkg/runtime"
@@ -45,83 +42,45 @@ var (
 	}
 )
 
-func getCRD(clientset *apiext_clientset.Clientset, obj apiruntime.Object) error {
+func isEstablished(clientset *apiext_clientset.Clientset, obj apiruntime.Object) (bool, error) {
 	gv := obj.GetObjectKind().GroupVersionKind().GroupVersion()
 	switch gv.String() {
 	case "apiextensions.k8s.io/v1":
 		v1Obj := obj.(*apiextv1.CustomResourceDefinition)
-		_, err := clientset.ApiextensionsV1().CustomResourceDefinitions().Get(context.TODO(), v1Obj.Name, metav1.GetOptions{})
+		crd, err := clientset.ApiextensionsV1().CustomResourceDefinitions().Get(context.TODO(), v1Obj.Name, metav1.GetOptions{})
 		if err != nil {
 			lastErr := fmt.Errorf("error getting CustomResourceDefinition %s: %v", v1Obj.Name, err)
 			logrus.Infof("getting openshift CRD status %v", lastErr)
-			return lastErr
+			if apierrors.IsNotFound(err) {
+				return false, nil
+			}
+			return false, lastErr
 		}
-	case "apiextensions.k8s.io/v1beta1":
-		v1beta1Obj := obj.(*apiextv1beta1.CustomResourceDefinition)
-		_, err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(context.TODO(), v1beta1Obj.Name, metav1.GetOptions{})
-		if err != nil {
-			lastErr := fmt.Errorf("error getting CustomResourceDefinition %s: %v", v1beta1Obj.Name, err)
-			logrus.Infof("getting openshift CRD status %v", lastErr)
-			return lastErr
-		}
-	default:
-		// panic("unknown type %s", t)
-	}
-	return nil
-}
-
-func waitForV1crd(client apiextclientv1.CustomResourceDefinitionsGetter, resource *apiextv1.CustomResourceDefinition) error {
-	var lastErr error
-	if err := wait.PollImmediate(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
-		crd, err := client.CustomResourceDefinitions().Get(context.TODO(), resource.Name, metav1.GetOptions{})
-		if err != nil {
-			lastErr = fmt.Errorf("error getting CustomResourceDefinition %s: %v", resource.Name, err)
-			logrus.Infof("getting openshift CRD status %v", lastErr)
-			return false, nil
-		}
-
 		for _, condition := range crd.Status.Conditions {
 			if condition.Type == apiextv1.Established && condition.Status == apiextv1.ConditionTrue {
 				return true, nil
 			}
 		}
-		lastErr = fmt.Errorf("CustomResourceDefinition %s is not ready. conditions: %v", crd.Name, crd.Status.Conditions)
-		logrus.Infof("getting openshift CRD status %v", lastErr)
-		return false, nil
-	}); err != nil {
-		if err == wait.ErrWaitTimeout {
-			return fmt.Errorf("%v during syncCustomResourceDefinitions: %v", err, lastErr)
-		}
-		return err
-	}
-	return nil
-}
-
-func waitForV1beta1crd(client apiextclientv1beta1.CustomResourceDefinitionsGetter, resource *apiextv1beta1.CustomResourceDefinition) error {
-	var lastErr error
-	if err := wait.PollImmediate(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
-		crd, err := client.CustomResourceDefinitions().Get(context.TODO(), resource.Name, metav1.GetOptions{})
+	case "apiextensions.k8s.io/v1beta1":
+		v1beta1Obj := obj.(*apiextv1beta1.CustomResourceDefinition)
+		crd, err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(context.TODO(), v1beta1Obj.Name, metav1.GetOptions{})
 		if err != nil {
-			lastErr = fmt.Errorf("error getting CustomResourceDefinition %s: %v", resource.Name, err)
+			lastErr := fmt.Errorf("error getting CustomResourceDefinition %s: %v", v1beta1Obj.Name, err)
 			logrus.Infof("getting openshift CRD status %v", lastErr)
-			return false, nil
+			if apierrors.IsNotFound(err) {
+				return false, nil
+			}
+			return false, lastErr
 		}
-
 		for _, condition := range crd.Status.Conditions {
 			if condition.Type == apiextv1beta1.Established && condition.Status == apiextv1beta1.ConditionTrue {
 				return true, nil
 			}
 		}
-		lastErr = fmt.Errorf("CustomResourceDefinition %s is not ready. conditions: %v", crd.Name, crd.Status.Conditions)
-		logrus.Infof("getting openshift CRD status %v", lastErr)
-		return false, nil
-	}); err != nil {
-		if err == wait.ErrWaitTimeout {
-			return fmt.Errorf("%v during syncCustomResourceDefinitions: %v", err, lastErr)
-		}
-		return err
+	default:
+		// panic("unknown type %s", t)
 	}
-	return nil
+	return false, nil
 }
 
 func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
@@ -135,27 +94,25 @@ func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
 
 	clientSet := apiext_clientset.NewForConfigOrDie(restConfig)
 	for _, crd := range crds {
-		logrus.Infof("Waiting for CRD %s condition: Established", crd)
-		crdBytes, err := crd_assets.Asset(crd)
+		logrus.Infof("waiting for crd %s condition.type: established", crd)
+		var crdBytes []byte
+		crdBytes, err = crd_assets.Asset(crd)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", crd, err)
 		}
 		obj := readCRDOrDie(crdBytes)
 
-		gv := obj.GetObjectKind().GroupVersionKind().GroupVersion()
-		switch gv.String() {
-		case "apiextensions.k8s.io/v1":
-			v1Obj := obj.(*apiextv1.CustomResourceDefinition)
-			if err = waitForV1crd(clientSet.ApiextensionsV1(), v1Obj); err != nil {
-				return err
+		if err = wait.PollImmediate(customResourceReadyInterval, customResourceReadyTimeout, func() (done bool, err error) {
+			done, lastErr := isEstablished(clientSet, obj)
+			if lastErr != nil {
+				return false, lastErr
 			}
-		case "apiextensions.k8s.io/v1beta1":
-			v1beta1Obj := obj.(*apiextv1beta1.CustomResourceDefinition)
-			if err = waitForV1beta1crd(clientSet.ApiextensionsV1beta1(), v1beta1Obj); err != nil {
-				return err
+			return done, nil
+		}); err != nil {
+			if err == wait.ErrWaitTimeout {
+				return fmt.Errorf("timed out waiting for all CRDs to report condition \"established\": %v", err)
 			}
-		default:
-			// panic("unknown type %s", t)
+			return err
 		}
 	}
 	return nil
@@ -222,11 +179,6 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 		if err := wait.Poll(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
 			if err := applyCRD(apiExtClientSet, c); err != nil {
 				logrus.Warningf("failed to apply openshift CRD %s: %v", crd, err)
-				return false, nil
-			}
-			logrus.Infof("waiting openshift CRD %s", crd)
-			if err := getCRD(apiExtClientSet, c); err != nil {
-				logrus.Warningf("failed to wait for openshift CRD %s: %v", crd, err)
 				return false, nil
 			}
 			logrus.Infof("applied openshift CRD %s", crd)
