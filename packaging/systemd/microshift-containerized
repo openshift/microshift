@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -euxo pipefail
-
-[[ -d /etc/microshift-containerized ]] || mkdir -p /etc/microshift-containerized
-cat <<EOF > /etc/microshift-containerized/microshift-containerized.conf
-export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
-EOF
