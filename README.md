@@ -18,120 +18,14 @@ Watch this [end-to-end MicroShift provisioning demo video](https://youtu.be/QOiB
 
 <sup>1) more precisely [OKD](https://www.okd.io/), the Kubernetes distribution by the OpenShift community</sup>
 
-## Minimum specs
-
-In order to run MicroShift, you will need at least:
-
-- 2 CPU cores
-- 2GB of RAM
-- ~124MB of free storage space for the MicroShift binary
-- 64-bit CPU (although 32-bit is _technically_ possible, if you're up for the challenge)
-
-For barebones development the minimum requirement is 3GB of RAM, though this can increase
-if you are using resource-intensive devtools.
-
-### OS Requirements
-
-The all-in-one containerized MicroShift can run on Windows, MacOS, and Linux.
-
-Currently, the MicroShift binary is known to be supported on the following Operating Systems:
-
-- Fedora 33/34
-- CentOS 8 Stream
-- RHEL 8
-- CentOS 7
-- Ubuntu 20.04
-
-It may be possible to run MicroShift on other systems, however they haven't been tested so you may run into issues.
-
 ## Using MicroShift
 
-To give MicroShift a try, simply install a recent test version (we don't provide stable releases yet) on a Fedora-derived Linux distro (we've only tested Fedora, RHEL, and CentOS Stream so far) using:
-
-```sh
-curl -sfL https://raw.githubusercontent.com/redhat-et/microshift/main/install.sh | bash
-```
-
-This will install MicroShift's dependencies (CRI-O), install it as a systemd service and start it.
-
-For convenience, the script will also add a new "microshift" context to your `$HOME/.kube/config`, so you'll be able to access your cluster using, e.g.:
-
-```sh
-kubectl get all -A --context microshift
-```
-
-or
-
-```sh
-kubectl config use-context microshift
-kubectl get all -A
-```
-
-Notes: When installing MicroShift on a system with an older version already installed, it is safest to remove the old data directory and start fresh:
-
-```sh
-rm -rf /var/lib/microshift && rm -r $HOME/.microshift
-```
-## Deployment Strategies
-
-1. [Install via an RPM, utilizing a host-provided cri-o runtime and be lifecycle-managed by systemd](https://microshift.io/docs/developer-documentation/build-install-rpm/)
-2. [Install as a container via Podman, utilizing cri-o runtime and be lifecycle-managed by systemd](https://microshift.io/docs/user-documentation/deploying-microshift/containerized/)
-
-For app developer deployments:
-
-1. [Run an all-in-one microshift deployment on which devs can test their applications locally](https://microshift.io/docs/getting-started/experimental-development/).  `microshift-aio` packages cri-o runtime and can be run and managed via podman and systemd
-
-## Known Issues
-If issues occur during deployment checkout the troubleshooting document to view fixes of [known issues](https://microshift.io/docs/user-documentation/troubleshooting/).
-
+To get started with MicroShift, please refer to the [Getting Started](https://microshift.io/docs/getting-started/) section of the MicroShift [User Documentation](https://microshift.io/docs/user-documentation/).
 
 ## Developing MicroShift
 
-> Note: when building or running **ARM64** container images, Linux host environments must have the `qemu-user-static` package installed. E.g. on Fedora: `dnf install qemu-user-static`.
+To build MicroShift from source and contribute to its development, please refer to the MicroShift [Developer Documentation](https://microshift.io/docs/developer-documentation/).
 
-### Building
+## Community
 
-You can locally build MicroShift using one of two methods, either using a container build (recommended) on Podman or Docker:
-
-```sh
-sudo yum -y install make golang
-make microshift
-```
-
-or directly on the host after installing the build-time dependencies. When using RHEL ensure the system is registered and run the following before installing the prerequisites.
-
-```sh
-ARCH=$( /bin/arch )
-sudo subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
-```
-
-The following packages are required for Fedora and RHEL.
-
-```sh
-sudo yum install -y glibc-static gcc make golang
-make
-```
-
-### Environment Configuration
-
-Before running MicroShift, the host must first be configured. This can be handled by running
-
-```bash
-CONFIG_ENV_ONLY=true ./install.sh
-```
-
-MicroShift keeps all its state in its data-dir, which defaults to `/var/lib/microshift` when running MicroShift as privileged user and `$HOME/.microshift` otherwise. Note that running MicroShift unprivileged only works without node role at the moment (i.e. using `--roles=controlplane` instead of the default of `--roles=controlplane,node`).
-
-### Kubeconfig
-
-When starting the MicroShift for the first time the Kubeconfig file is created. If you need it for another user or to use externally the kubeadmin's kubeconfig is placed at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
-
-### Contributing
-
-For more information on working with MicroShift, you can find a contributor's guide in [CONTRIBUTING.md](./CONTRIBUTING.md)
-
-### Community
-
-Join us on [Slack](https://microshift.slack.com)! ([Invite to the Slack space](https://join.slack.com/t/microshift/shared_invite/zt-uxncbjbl-XOjueb1ShNP7xfByDxNaaA))
-
-Community meetings are held weekly, Tuesdays at 10:30AM - 11:30AM EST. Be sure to join the community [calendar](https://calendar.google.com/calendar/embed?src=nj6l882mfe4d2g9nr1h7avgrcs%40group.calendar.google.com&ctz=America%2FChicago)! Click "Google Calendar" in the lower right-hand corner to subscribe.
+For information about getting in touch with the MicroShift community, please check our [community page](https://microshift.io/docs/community/).
