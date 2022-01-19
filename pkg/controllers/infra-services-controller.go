@@ -39,6 +39,7 @@ func (s *InfrastructureServicesManager) Dependencies() []string {
 	return []string{"kube-apiserver", "openshift-crd-manager", "oauth-apiserver", "openshift-controller-manager"}
 }
 
+// CI test
 func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(ready)
 	// TO-DO add readiness check
