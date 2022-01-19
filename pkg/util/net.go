@@ -30,7 +30,7 @@ import (
 func GetHostIP() (string, error) {
 	ip, err := net.ChooseHostInterface()
 	if err != nil {
-		return "", err
+		return "127.0.0.1", err
 	}
 	return ip.String(), nil
 }
