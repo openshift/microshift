@@ -19,9 +19,12 @@ import (
 	"crypto/tls"
 	tcpnet "net"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -80,4 +83,40 @@ func CreateLocalhostListenerOnPort(port int) (tcpnet.Listener, error) {
 	}
 
 	return ln, nil
+}
+
+func AddToNoProxyEnv(additionalEntries ...string) error {
+	entries := map[string]struct{}{}
+
+	// put both the NO_PROXY and no_proxy elements in a map to avoid duplicates
+	addNoProxyEnvVarEntries(entries, "NO_PROXY")
+	addNoProxyEnvVarEntries(entries, "no_proxy")
+
+	for _, entry := range additionalEntries {
+		entries[entry] = struct{}{}
+	}
+
+	noProxyEnv := strings.Join(mapKeys(entries), ",")
+
+	// unset the lower-case one, and keep only upper-case
+	os.Unsetenv("no_proxy")
+	return errors.Wrap(os.Setenv("NO_PROXY", noProxyEnv), "error updating NO_PROXY")
+}
+
+func mapKeys(entries map[string]struct{}) []string {
+	keys := make([]string, 0, len(entries))
+	for k := range entries {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func addNoProxyEnvVarEntries(entries map[string]struct{}, envVar string) {
+	noProxy := os.Getenv(envVar)
+
+	if noProxy != "" {
+		for _, entry := range strings.Split(noProxy, ",") {
+			entries[strings.Trim(entry, " ")] = struct{}{}
+		}
+	}
 }
