@@ -24,16 +24,14 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/openshift/microshift/pkg/config"
+	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	"github.com/spf13/cobra"
-
 	"k8s.io/apimachinery/pkg/util/wait"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-
-	"github.com/openshift/microshift/pkg/config"
-	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
+	"k8s.io/klog/v2"
 )
 
 type OCPAPIServer struct {
@@ -56,7 +54,7 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	var configFilePath = cfg.DataDir + "/resources/openshift-apiserver/config/config.yaml"
 
 	if err := OpenShiftAPIServerConfig(cfg); err != nil {
-		logrus.Infof("Failed to create a new ocp-apiserver configuration: %v", err)
+		klog.Infof("Failed to create a new ocp-apiserver configuration: %v", err)
 		return err
 	}
 	args := []string{
@@ -87,7 +85,7 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.options = options
 	s.options.ConfigFile = configFilePath
 
-	logrus.Infof("starting openshift-apiserver %s, args: %v", cfg.NodeIP, args)
+	klog.Infof("starting openshift-apiserver %s, args: %v", cfg.NodeIP, args)
 	return nil
 
 }
@@ -107,23 +105,23 @@ func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped c
 		}
 		err = waitForOCPAPIServer(client, 10*time.Second)
 		if err != nil {
-			logrus.Warningf("Failed to wait for ocp apiserver: %v", err)
+			klog.Warningf("Failed to wait for ocp apiserver: %v", err)
 			return err
 		}
-		logrus.Info("ocp apiserver is ready")
+		klog.Infof("ocp apiserver is ready")
 		close(ready)
 		return nil
 	}()
 
 	err := s.prepareOCPComponents(s.cfg)
 	if err != nil {
-		logrus.Errorf("Failed to prepare ocp-components %v", err)
+		klog.Errorf("Failed to prepare ocp-components %v", err)
 		return err
 	}
 
 	stopCh := make(chan struct{})
 	if err := s.options.RunAPIServer(stopCh); err != nil {
-		logrus.Fatalf("Failed to start ocp-apiserver %v", err)
+		klog.Fatalf("Failed to start ocp-apiserver %v", err)
 	}
 
 	return ctx.Err()
@@ -133,15 +131,15 @@ func (s *OCPAPIServer) prepareOCPComponents(cfg *config.MicroshiftConfig) error 
 
 	// ocp api service registration
 	if err := createAPIHeadlessSvc(cfg, "openshift-apiserver", 8444); err != nil {
-		logrus.Warningf("failed to apply headless svc %v", err)
+		klog.Warningf("failed to apply headless svc %v", err)
 		return err
 	}
 	if err := createAPIHeadlessSvc(cfg, "openshift-oauth-apiserver", 8443); err != nil {
-		logrus.Warningf("failed to apply headless svc %v", err)
+		klog.Warningf("failed to apply headless svc %v", err)
 		return err
 	}
 	if err := createAPIRegistration(cfg); err != nil {
-		logrus.Warningf("failed to register api %v", err)
+		klog.Warningf("failed to register api %v", err)
 		return err
 	}
 
@@ -173,7 +171,7 @@ func waitForOCPAPIServer(client kubernetes.Interface, timeout time.Duration) err
 			if status != http.StatusOK {
 				content, _ := result.Raw()
 				lastErr = fmt.Errorf("APIServer isn't available: %v", string(content))
-				logrus.Warningf("APIServer isn't available yet: %v. Waiting a little while.", string(content))
+				klog.Warningf("APIServer isn't available yet: %v. Waiting a little while.", string(content))
 				return false, nil
 			}
 		}

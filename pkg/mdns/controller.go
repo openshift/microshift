@@ -54,7 +54,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 			strings.HasPrefix(name, "cni") {
 			continue
 		}
-		klog.InfoS("starting mDNS server", "interface", name, "NodeIP", c.NodeIP, "Node", c.NodeName)
+		klog.Infof("starting mDNS server", "interface", name, "NodeIP", c.NodeIP, "Node", c.NodeName)
 		server.New(&ifs[n], c.resolver, c.stopCh)
 	}
 
@@ -69,7 +69,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 			}
 		}
 
-		klog.InfoS("Host FQDN will be announced via mDNS", "fqdn", c.NodeName, "ips", ips)
+		klog.Infof("Host FQDN will be announced via mDNS", "fqdn", c.NodeName, "ips", ips)
 		c.resolver.AddDomain(c.NodeName, ips)
 		c.myIPs = ips
 	}

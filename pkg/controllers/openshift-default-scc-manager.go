@@ -19,8 +19,7 @@ import (
 	"context"
 
 	"github.com/openshift/microshift/pkg/config"
-
-	"github.com/sirupsen/logrus"
+	"k8s.io/klog/v2"
 )
 
 type OpenShiftDefaultSCCManager struct {
@@ -44,8 +43,8 @@ func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struc
 	defer close(ready)
 	// TO-DO add readiness check
 	if err := ApplyDefaultSCCs(s.cfg); err != nil {
-		logrus.Errorf("%s unable to apply default SCCs: %v", s.Name(), err)
+		klog.Errorf("%s unable to apply default SCCs: %v", s.Name(), err)
 	}
-	logrus.Infof("%s applied default SCCs", s.Name())
+	klog.Infof("%s applied default SCCs", s.Name())
 	return ctx.Err()
 }

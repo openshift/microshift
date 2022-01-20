@@ -20,9 +20,10 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"k8s.io/klog/v2"
+
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/sirupsen/logrus"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -65,7 +66,7 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig, svcName string, svcPort 
 	}
 	_, err = client.Services("default").Get(context.TODO(), svc.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		logrus.Infof("creating svc %s", svc.Name)
+		klog.Infof("Creating service %s", svc.Name)
 		_, err = client.Services("default").Create(context.TODO(), svc, metav1.CreateOptions{})
 		if err != nil {
 			return err
@@ -83,7 +84,7 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig, svcName string, svcPort 
 
 		k8s_endpoints, err := client.Endpoints("default").Get(context.TODO(), "kubernetes", metav1.GetOptions{})
 		if err != nil {
-			logrus.Infof("failed to find kubernetes endpoints")
+			klog.Infof("Failed to find kubernetes endpoints")
 		}
 		subsets := endpoints.Subsets
 		for _, sub := range k8s_endpoints.Subsets {
@@ -102,7 +103,7 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig, svcName string, svcPort 
 		endpoints.Subsets = subsets
 		_, err = client.Endpoints("default").Get(context.TODO(), endpoints.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			logrus.Infof("creating endpoints %s", endpoints.Name)
+			klog.Infof("Creating endpoints %s", endpoints.Name)
 			_, err = client.Endpoints("default").Create(context.TODO(), endpoints, metav1.CreateOptions{})
 			return err
 		}
@@ -121,7 +122,7 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 	}
 	caFile, err := ioutil.ReadFile(cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt")
 	if err != nil {
-		logrus.Errorf("Error loading CA bundle certificate: %v", err)
+		klog.Errorf("Error loading CA bundle certificate %v", err)
 	}
 	client := apiregistrationclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "apiregistration-agent"))
 	for _, apiSvc := range []string{
@@ -158,7 +159,7 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 		}
 		_, err = client.APIServices().Get(context.TODO(), api.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			logrus.Infof("creating api registration %s", api.Name)
+			klog.Infof("Creating api registration %s", api.Name)
 			_, _ = client.APIServices().Create(context.TODO(), api, metav1.CreateOptions{})
 		}
 	}
@@ -188,7 +189,7 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 		}
 		_, err = client.APIServices().Get(context.TODO(), oauthApi.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			logrus.Infof("creating api registration %s", oauthApi.Name)
+			klog.Infof("creating api registration %s", oauthApi.Name)
 			_, _ = client.APIServices().Create(context.TODO(), oauthApi, metav1.CreateOptions{})
 		}
 	}
@@ -209,7 +210,7 @@ func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
 		}
 	)
 	if err := assets.ApplySCCs(sccs, nil, nil, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply sccs: %v", err)
+		klog.Warningf("Failed to apply sccs %v", err)
 		return err
 	}
 	return nil

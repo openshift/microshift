@@ -18,10 +18,10 @@ package controllers
 import (
 	"context"
 
+	klog "k8s.io/klog/v2"
+
 	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
-
-	"github.com/sirupsen/logrus"
 )
 
 type InfrastructureServicesManager struct {
@@ -45,6 +45,6 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 	if err := components.StartComponents(s.cfg); err != nil {
 		return err
 	}
-	logrus.Infof("%s launched ocp componets", s.Name())
+	klog.Infof("%s launched ocp componets", s.Name())
 	return ctx.Err()
 }
