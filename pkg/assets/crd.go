@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	klog "k8s.io/klog/v2"
 
 	crd_assets "github.com/openshift/microshift/pkg/assets/crd"
 	"github.com/openshift/microshift/pkg/config"
@@ -76,7 +76,7 @@ func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
 
 	clientSet := apiext_clientset.NewForConfigOrDie(restConfig)
 	for _, crd := range crds {
-		logrus.Infof("waiting for crd %s condition.type: established", crd)
+		klog.Infof("Waiting for crd %s condition.type: established", crd)
 		var crdBytes []byte
 		crdBytes, err = crd_assets.Asset(crd)
 		if err != nil {
@@ -88,7 +88,7 @@ func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
 			done, e := isEstablished(clientSet, obj)
 			// Intermittent errors can occur when calling the apiserver.  To be on the safe side, log them, but poll until timeout
 			if e != nil {
-				logrus.Errorf("polling for crd condition status \"established\"=\"true\": %v", e)
+				klog.Errorf("polling for crd condition status \"established\"=\"true\": %v", e)
 			}
 			return done, nil
 		}); err != nil {
@@ -151,7 +151,7 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 	apiExtClientSet := apiext_clientset.NewForConfigOrDie(rest.AddUserAgent(restConfig, "crd-agent"))
 
 	for _, crd := range crds {
-		logrus.Infof("applying openshift CRD %s", crd)
+		klog.Infof("Applying openshift CRD %s", crd)
 		crdBytes, err := crd_assets.Asset(crd)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", crd, err)
@@ -159,10 +159,10 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 		c := readCRDOrDie(crdBytes)
 		if err := wait.Poll(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
 			if err := applyCRD(apiExtClientSet, c); err != nil {
-				logrus.Warningf("failed to apply openshift CRD %s: %v", crd, err)
+				klog.Warningf("failed to apply openshift CRD %s: %v", crd, err)
 				return false, nil
 			}
-			logrus.Infof("applied openshift CRD %s", crd)
+			klog.Infof("Applied openshift CRD %s", crd)
 			return true, nil
 		}); err != nil {
 			if err == wait.ErrWaitTimeout {

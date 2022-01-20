@@ -11,7 +11,6 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/openshift/microshift/pkg/util"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
 	cliflag "k8s.io/component-base/cli/flag"
@@ -67,11 +66,11 @@ type MicroshiftConfig struct {
 func NewMicroshiftConfig() *MicroshiftConfig {
 	nodeName, err := os.Hostname()
 	if err != nil {
-		logrus.Fatalf("failed to get hostname: %v", err)
+		klog.Fatalf("Failed to get hostname %v", err)
 	}
 	nodeIP, err := util.GetHostIP()
 	if err != nil {
-		klog.Warningf("failed to get host IP: %v, using: %q", err, nodeIP)
+		klog.Fatalf("Failed to get host IP: %v", err)
 	}
 
 	return &MicroshiftConfig{

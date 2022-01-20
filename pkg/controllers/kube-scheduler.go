@@ -17,15 +17,16 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
+	klog "k8s.io/klog/v2"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
 	schedulerOptions "k8s.io/kubernetes/cmd/kube-scheduler/app/options"
 )
@@ -50,12 +51,12 @@ func (s *KubeScheduler) Dependencies() []string { return []string{"kube-apiserve
 
 func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {
-		logrus.Fatalf("failed to write kube-scheduler config: %v", err)
+		klog.Fatalf("failed to write kube-scheduler config: %v", err)
 	}
 
 	opts, err := schedulerOptions.NewOptions()
 	if err != nil {
-		logrus.Fatalf("initialization error command options: %v", err)
+		klog.Fatalf("initialization error command options: %v", err)
 	}
 
 	args := []string{
@@ -75,7 +76,7 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 		fs.AddFlagSet(f)
 	}
 	if err := cmd.ParseFlags(args); err != nil {
-		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
+		klog.Fatalf("", fmt.Errorf("%s failed to parse flags: %v", s.Name(), err))
 	}
 
 	s.options = opts
@@ -102,10 +103,10 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	go func() {
 		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10259/healthz")
 		if healthcheckStatus != 200 {
-			logrus.Fatalf("Kube-scheduler failed to start")
+			klog.Fatalf("%s healthcheck failed", s.Name(), fmt.Errorf("kube-scheduler failed to start"))
 		}
 
-		logrus.Infof("%s is ready", s.Name())
+		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
 

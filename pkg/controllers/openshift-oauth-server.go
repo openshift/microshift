@@ -17,11 +17,12 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
+	"k8s.io/klog/v2"
 
 	oauth_apiserver "github.com/openshift/oauth-apiserver/pkg/cmd/oauth-apiserver"
 
@@ -80,20 +81,20 @@ func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
 
 	ls, err := util.CreateLocalhostListenerOnPort(8443)
 	if err != nil {
-		logrus.Errorf("failed to create listener: %v", err)
+		klog.Errorf("Failed to create listener %v", err)
 	}
 
 	opts.RecommendedOptions.SecureServing.Listener = ls
 	opts.RecommendedOptions.SecureServing.BindPort = 8443
 
 	if err := fs.Parse(args); err != nil {
-		logrus.Errorf("failed to parse flags: %v", err)
+		klog.Errorf("failed to parse flags %v", err)
 	}
 	if err := opts.Complete(); err != nil {
-		logrus.Errorf("failed to complete options: %v", err)
+		klog.Errorf("failed to complete options %v", err)
 	}
 	if err := opts.Validate(args); err != nil {
-		logrus.Errorf("failed to validate options: %v", err)
+		klog.Errorf("failed to validate options %v", err)
 	}
 
 	s.options = opts
@@ -107,9 +108,9 @@ func (s *OpenShiftOAuth) Run(ctx context.Context, ready chan<- struct{}, stopped
 	go func() {
 		healthcheckStatus := util.RetryTCPConnection("127.0.0.1", "8443")
 		if !healthcheckStatus {
-			logrus.Fatalf("%s failed to start", s.Name())
+			klog.Fatalf("%s failed to start", s.Name(), fmt.Errorf("healthcheck failed"))
 		}
-		logrus.Infof("%s is ready", s.Name())
+		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
 

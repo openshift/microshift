@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/openshift/microshift/pkg/util/sigchannel"
-	"github.com/sirupsen/logrus"
+	"k8s.io/klog/v2"
 )
 
 type ServiceManager struct {
@@ -97,11 +97,11 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan struct{}, <-chan struct{}) {
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	go func() {
-		logrus.Infof("Starting %s", service.Name())
+		klog.Infof("Started service", "name", service.Name())
 		if err := service.Run(ctx, ready, stopped); err != nil {
-			logrus.Infof("%s stopped: %s", service.Name(), err)
+			klog.Infof("Stopped service", "name", service.Name(), "err", err)
 		} else {
-			logrus.Infof("%s completed", service.Name())
+			klog.Infof("Completed service", "name", service.Name())
 		}
 	}()
 	return ready, stopped

@@ -6,7 +6,7 @@ import (
 
 	rbacassets "github.com/openshift/microshift/pkg/assets/rbac"
 
-	"github.com/sirupsen/logrus"
+	"k8s.io/klog/v2"
 
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -163,14 +163,14 @@ func applyRbac(rbacs []string, applier readerApplier) error {
 	defer lock.Unlock()
 
 	for _, rbac := range rbacs {
-		logrus.Infof("applying rbac %s", rbac)
+		klog.Infof("Applying rbac %s", rbac)
 		objBytes, err := rbacassets.Asset(rbac)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", rbac, err)
 		}
 		applier.Reader(objBytes, nil, nil)
 		if err := applier.Applier(); err != nil {
-			logrus.Warningf("failed to apply rbac %s: %v", rbac, err)
+			klog.Warningf("Failed to apply rbac %s: %v", rbac, err)
 			return err
 		}
 	}

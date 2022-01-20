@@ -5,8 +5,9 @@ import (
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
-
 	"github.com/sirupsen/logrus"
+
+	"k8s.io/klog/v2"
 )
 
 func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
@@ -60,39 +61,39 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 	secretData["tls.key"] = tlskey
 
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply ns %v: %v", ns, err)
+		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
+		klog.Warningf("Failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply clusterRole %v: %v", clusterRole, err)
+		klog.Warningf("Failed to apply clusterRole %v: %v", clusterRole, err)
 		return err
 	}
 	if err := assets.ApplyRoleBindings(roleBinding, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply rolebinding %v: %v", roleBinding, err)
+		klog.Warningf("Failed to apply rolebinding %v: %v", roleBinding, err)
 		return err
 	}
 	if err := assets.ApplyRoles(role, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply role %v: %v", role, err)
+		klog.Warningf("Failed to apply role %v: %v", role, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply sa %v: %v", sa, err)
+		klog.Warningf("Failed to apply sa %v: %v", sa, err)
 		return err
 	}
 	if err := assets.ApplySecretWithData(secret, secretData, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply secret %v: %v", secret, err)
+		logrus.Warningf("Failed to apply secret %v: %v", secret, err)
 		return err
 	}
 	if err := assets.ApplyConfigMapWithData(cm, cmData, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply sa %v: %v", cm, err)
+		logrus.Warningf("Failed to apply sa %v: %v", cm, err)
 		return err
 	}
 	if err := assets.ApplyDeployments(apps, renderServiceCAController, assets.RenderParams{"ConfigMap": cmName, "Secret": secretName}, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply apps %v: %v", apps, err)
+		logrus.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}
 	return nil
@@ -126,35 +127,35 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply ns %v: %v", ns, err)
+		klog.Warningf("Failed to apply namespaces %v: %v", ns, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply clusterRolebinding %v: %v", clusterRole, err)
+		klog.Warningf("Failed to apply clusterRole %v: %v", clusterRole, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
+		klog.Warningf("Failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply sa %v: %v", sa, err)
+		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
 	if err := assets.ApplyConfigMaps(cm, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply cm %v: %v", cm, err)
+		klog.Warningf("Failed to apply configMap %v, %v", cm, err)
 		return err
 	}
 	if err := assets.ApplyServices(svc, nil, nil, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply svc %v: %v", svc, err)
+		klog.Warningf("Failed to apply service %v %v", svc, err)
 		return err
 	}
 	if err := assets.ApplyServices(extSvc, nil, nil, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply external ingress svc %v: %v", extSvc, err)
+		klog.Warningf("Failed to apply external ingress svc %v: %v", extSvc, err)
 		return err
 	}
 	if err := assets.ApplyDeployments(apps, renderReleaseImage, nil, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply apps %v: %v", apps, err)
+		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}
 	return nil
@@ -187,32 +188,32 @@ func startDNSController(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply ns %v: %v", ns, err)
+		klog.Warningf("Failed to apply", "namespace", ns, "err", err)
 		return err
 	}
 	if err := assets.ApplyServices(svc, renderDNSService, assets.RenderParams{"ClusterDNS": cfg.Cluster.DNS}, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply svc %v: %v", svc, err)
+		klog.Warningf("Failed to apply service %v %v", svc, err)
 		// service already created by coreDNS, not re-create it.
 		return nil
 	}
 	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply clusterRolebinding %v: %v", clusterRole, err)
+		klog.Warningf("Failed to apply clusterRole %v %v", clusterRole, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
+		klog.Warningf("Failed to apply clusterRoleBinding %v %v", clusterRoleBinding, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply sa %v: %v", sa, err)
+		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
 	if err := assets.ApplyConfigMaps(cm, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply cm %v: %v", cm, err)
+		klog.Warningf("Failed to apply configMap %v %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(apps, renderReleaseImage, nil, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply apps %v: %v", apps, err)
+	if err := assets.ApplyDaemonSets(apps, nil, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply apps %v %v", apps, err)
 		return err
 	}
 	return nil

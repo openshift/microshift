@@ -26,9 +26,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/klog/v2"
 )
 
 func GetHostIP() (string, error) {
@@ -53,7 +53,7 @@ func RetryInsecureHttpsGet(url string) int {
 	})
 
 	if err != nil && err == wait.ErrWaitTimeout {
-		logrus.Warningf("Endpoint is not returning any status code")
+		klog.Warningf("Endpoint is not returning any status code")
 	}
 
 	return status
@@ -72,7 +72,7 @@ func RetryTCPConnection(host string, port string) bool {
 		return false, nil
 	})
 	if err != nil && err == wait.ErrWaitTimeout {
-		logrus.Warningf("Endpoint is not returning any status code")
+		klog.Warningf("Endpoint is not returning any status code")
 	}
 	return status
 }

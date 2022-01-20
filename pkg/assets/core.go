@@ -6,7 +6,7 @@ import (
 
 	coreassets "github.com/openshift/microshift/pkg/assets/core"
 
-	"github.com/sirupsen/logrus"
+	"k8s.io/klog/v2"
 
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -189,14 +189,14 @@ func applyCore(cores []string, applier readerApplier, render RenderFunc, params 
 	defer lock.Unlock()
 
 	for _, core := range cores {
-		logrus.Infof("applying corev1 api %s", core)
+		klog.Infof("Applying corev1 api %s", core)
 		objBytes, err := coreassets.Asset(core)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", core, err)
 		}
 		applier.Reader(objBytes, render, params)
 		if err := applier.Applier(); err != nil {
-			logrus.Warningf("failed to apply corev1 api %s: %v", core, err)
+			klog.Warningf("Failed to apply corev1 api %s: %v", core, err)
 			return err
 		}
 	}
