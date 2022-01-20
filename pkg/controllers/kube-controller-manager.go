@@ -17,9 +17,9 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -29,6 +29,8 @@ import (
 	"k8s.io/component-base/version/verflag"
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
 	kubecmoptions "k8s.io/kubernetes/cmd/kube-controller-manager/app/options"
+
+	klog "k8s.io/klog/v2"
 )
 
 type KubeControllerManager struct {
@@ -51,7 +53,7 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 
 	opts, err := kubecmoptions.NewKubeControllerManagerOptions()
 	if err != nil {
-		logrus.Fatalf("%s initialization error command options: %v", s.Name(), err)
+		klog.Fatalf("%s initialization error command options: %v", s.Name(), err)
 	}
 	s.kubecmOptions = opts
 	s.kubeconfig = kubeconfig
@@ -87,7 +89,7 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 		cmd.Flags().AddFlagSet(f)
 	}
 	if err := cmd.ParseFlags(args); err != nil {
-		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
+		klog.Fatalf("%s failed to parse flags: %v", s.Name(), err)
 	}
 }
 
@@ -98,10 +100,10 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	go func() {
 		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10257/healthz")
 		if healthcheckStatus != 200 {
-			logrus.Fatalf("Kube-controller-manager failed to start")
+			klog.Fatalf("", fmt.Errorf("kube-controller-manager failed to start"))
 		}
 
-		logrus.Infof("%s is ready", s.Name())
+		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
 

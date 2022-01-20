@@ -17,16 +17,17 @@ package node
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 
+	"k8s.io/klog/v2"
 	kubeproxy "k8s.io/kubernetes/cmd/kube-proxy/app"
 )
 
@@ -50,7 +51,7 @@ func (s *ProxyOptions) Dependencies() []string { return []string{"kube-apiserver
 
 func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {
-		logrus.Fatalf("Failed to write kube-proxy config: %v", err)
+		klog.Fatalf("Failed to write kube-proxy config: %v", err)
 	}
 	// Keeping the args in case something must be added in the future
 	args := []string{}
@@ -68,7 +69,7 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) {
 	cmd.SetArgs(args)
 
 	if err := cmd.ParseFlags(args); err != nil {
-		logrus.Fatalf("failed to parse flags:%v", err)
+		klog.Fatalf("Failed to parse flags:%v", err)
 	}
 }
 
@@ -100,13 +101,13 @@ func (s *ProxyOptions) Run(ctx context.Context, ready chan<- struct{}, stopped c
 	go func() {
 		healthcheckStatus := util.RetryInsecureHttpsGet("http://127.0.0.1:10256/healthz")
 		if healthcheckStatus != 200 {
-			logrus.Fatalf("%s failed to start", s.Name())
+			klog.Fatalf("%s failed to start", s.Name(), fmt.Errorf("Healthcheck failed. "))
 		}
-		logrus.Infof("%s is ready", s.Name())
+		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
 	if err := s.options.Run(); err != nil {
-		logrus.Fatalf("%s failed to start %v", s.Name(), err)
+		klog.Fatalf("%s failed to start", s.Name(), err)
 	}
 
 	return ctx.Err()

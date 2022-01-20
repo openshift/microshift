@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sirupsen/logrus"
+	"k8s.io/klog/v2"
 
 	scassets "github.com/openshift/microshift/pkg/assets/storage"
 
@@ -72,14 +72,14 @@ func applySCs(scs []string, applier readerApplier, render RenderFunc, params Ren
 	defer lock.Unlock()
 
 	for _, sc := range scs {
-		logrus.Infof("applying sc %s", sc)
+		klog.Infof("Applying sc %s", sc)
 		objBytes, err := scassets.Asset(sc)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", sc, err)
 		}
 		applier.Reader(objBytes, render, params)
 		if err := applier.Applier(); err != nil {
-			logrus.Warningf("failed to apply sc api %s: %v", sc, err)
+			klog.Warningf("Failed to apply sc api %s: %v", sc, err)
 			return err
 		}
 	}

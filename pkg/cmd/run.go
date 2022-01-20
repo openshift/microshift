@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -16,8 +17,6 @@ import (
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/servicemanager"
 	"github.com/openshift/microshift/pkg/util"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -54,12 +53,12 @@ func NewRunMicroshiftCommand() *cobra.Command {
 func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	if err := cfg.ReadAndValidate(flags); err != nil {
-		logrus.Fatal(err)
+		klog.Fatalf("Error in reading and validating flags", err)
 	}
 
 	// fail early if we don't have enough privileges
 	if config.StringInList("node", cfg.Roles) && os.Geteuid() > 0 {
-		logrus.Fatalf("MicroShift must be run privileged for role 'node'")
+		klog.Fatalf("Microshift must be run privileged for role 'node'")
 	}
 
 	// TO-DO: When multi-node is ready, we need to add the controller host-name/mDNS hostname
@@ -87,7 +86,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		if err != nil {
 			err := os.RemoveAll(filepath.Join(cfg.DataDir, "certs"))
 			if err != nil {
-				klog.ErrorS(err, "removing old certs directory")
+				klog.Errorf("Removing old certs directory", err)
 			}
 			util.Must(initAll(cfg))
 		}
@@ -115,16 +114,17 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
 	}
 
-	logrus.Info("Starting MicroShift")
+	klog.Infof("Starting Microshift")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	go func() {
-		logrus.Infof("Starting %s", m.Name())
+		klog.Infof("Started %s", m.Name())
 		if err := m.Run(ctx, ready, stopped); err != nil {
-			logrus.Infof("%s stopped: %s", m.Name(), err)
+			klog.Infof("Stopped %s", m.Name(), err)
 		} else {
-			logrus.Infof("%s completed", m.Name())
+			klog.Infof("%s completed", m.Name())
+
 		}
 	}()
 
@@ -133,22 +133,22 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	select {
 	case <-ready:
-		logrus.Info("MicroShift is ready.")
+		klog.Infof("MicroShift is ready")
 		daemon.SdNotify(false, daemon.SdNotifyReady)
 
 		<-sigTerm
 	case <-sigTerm:
 	}
-	logrus.Info("Interrupt received. Stopping services.")
+	klog.Infof("Interrupt received. Stopping services")
 	cancel()
 
 	select {
 	case <-stopped:
 	case <-sigTerm:
-		logrus.Info("Another interrupt received. Force terminating services.")
+		klog.Infof("Another interrupt received. Force terminating services")
 	case <-time.After(time.Duration(gracefulShutdownTimeout) * time.Second):
-		logrus.Info("Timed out waiting for services to stop.")
+		klog.Infof("Timed out waiting for services to stop")
 	}
-	logrus.Info("MicroShift stopped.")
+	klog.Infof("MicroShift stopped")
 	return nil
 }

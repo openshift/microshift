@@ -23,9 +23,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"k8s.io/klog/v2"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
@@ -63,7 +63,7 @@ func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserve
 func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 
 	if err := s.writeConfig(cfg); err != nil {
-		logrus.Fatalf("Failed to write kubelet config: %v", err)
+		klog.Fatalf("Failed to write kubelet config", err)
 	}
 
 	// Prepare commandline args
@@ -83,7 +83,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	kubeletConfig, err := loadConfigFile(cfg.DataDir + "/resources/kubelet/config/config.yaml")
 
 	if err != nil {
-		logrus.Fatalf("Failed to load Kubelet Configuration %v", err)
+		klog.Fatalf("Failed to load Kubelet Configuration", err)
 	}
 
 	cmd := &cobra.Command{
@@ -100,7 +100,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	cmd.Flags().AddFlagSet(cleanFlagSet)
 
 	if err := cmd.ParseFlags(args); err != nil {
-		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
+		klog.Fatalf("%s failed to parse flags:", s.Name(), err)
 	}
 	s.kubeconfig = kubeletConfig
 	s.kubeletflags = kubeletFlags
@@ -164,9 +164,9 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	go func() {
 		healthcheckStatus := util.RetryInsecureHttpsGet("http://127.0.0.1:10248/healthz")
 		if healthcheckStatus != 200 {
-			logrus.Fatalf("%s failed to start", s.Name())
+			klog.Fatalf("", fmt.Errorf("%s failed to start", s.Name()))
 		}
-		logrus.Infof("%s is ready", s.Name())
+		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
 
@@ -178,10 +178,10 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 
 	kubeletDeps, err := kubelet.UnsecuredDependencies(kubeletServer, utilfeature.DefaultFeatureGate)
 	if err != nil {
-		logrus.Fatalf("Error in fetching depenedencies %v", err)
+		klog.Fatalf("Error in fetching depenedencies", err)
 	}
 	if err := kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate); err != nil {
-		logrus.Fatalf("Kubelet failed to start  %v", err)
+		klog.Fatalf("Kubelet failed to start", err)
 	}
 	return ctx.Err()
 }
