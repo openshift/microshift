@@ -20,6 +20,7 @@ import (
 	tcpnet "net"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -108,6 +109,9 @@ func mapKeys(entries map[string]struct{}) []string {
 	for k := range entries {
 		keys = append(keys, k)
 	}
+
+	// sort keys to avoid issues with map key ordering in go future versions on the unit-test side
+	sort.Strings(keys)
 	return keys
 }
 
