@@ -24,17 +24,14 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/openshift/microshift/pkg/config"
+	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 	"github.com/spf13/cobra"
-
 	"k8s.io/apimachinery/pkg/util/wait"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
-
-	"github.com/openshift/microshift/pkg/config"
-	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
 )
 
 type OCPAPIServer struct {
@@ -88,7 +85,7 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.options = options
 	s.options.ConfigFile = configFilePath
 
-	logrus.Infof("starting openshift-apiserver %s, args: %v", cfg.NodeIP, args)
+	klog.Infof("starting openshift-apiserver %s, args: %v", cfg.NodeIP, args)
 	return nil
 
 }
