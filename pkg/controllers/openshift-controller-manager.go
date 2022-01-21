@@ -23,7 +23,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"k8s.io/klog/v2"
 
@@ -117,7 +116,7 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	if err := assets.ApplyNamespaces([]string{
 		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
 	}, s.kubeconfig); err != nil {
-		logrus.Warningf("failed to apply openshift namespaces %v", err)
+		klog.Warningf("failed to apply openshift namespaces %v", err)
 	}
 
 	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}

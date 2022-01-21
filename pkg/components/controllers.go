@@ -5,8 +5,6 @@ import (
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/sirupsen/logrus"
-
 	"k8s.io/klog/v2"
 )
 
@@ -85,15 +83,15 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 		return err
 	}
 	if err := assets.ApplySecretWithData(secret, secretData, kubeconfigPath); err != nil {
-		logrus.Warningf("Failed to apply secret %v: %v", secret, err)
+		klog.Warningf("Failed to apply secret %v: %v", secret, err)
 		return err
 	}
 	if err := assets.ApplyConfigMapWithData(cm, cmData, kubeconfigPath); err != nil {
-		logrus.Warningf("Failed to apply sa %v: %v", cm, err)
+		klog.Warningf("Failed to apply sa %v: %v", cm, err)
 		return err
 	}
 	if err := assets.ApplyDeployments(apps, renderServiceCAController, assets.RenderParams{"ConfigMap": cmName, "Secret": secretName}, kubeconfigPath); err != nil {
-		logrus.Warningf("Failed to apply apps %v: %v", apps, err)
+		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}
 	return nil
