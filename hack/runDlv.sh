@@ -6,7 +6,6 @@ DLV=$HOME/go/bin/dlv
 
 sudo systemctl kill microshift
 sudo systemctl disable --now microshift
-sudo systemctl kill microshift
 sudo firewall-cmd --zone=public --add-port=2345/tcp --permanent
 sudo firewall-cmd --reload
 sudo $DLV --listen=:2345 --headless --api-version=2 --accept-multiclient exec /usr/bin/microshift -- run
