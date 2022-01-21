@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -17,9 +16,11 @@ import (
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/servicemanager"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
 	"k8s.io/klog/v2"
 )
 
@@ -51,6 +52,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 }
 
 func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
+
 	if err := cfg.ReadAndValidate(flags); err != nil {
 		logrus.Fatal(err)
 	}
@@ -58,6 +60,20 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	// fail early if we don't have enough privileges
 	if config.StringInList("node", cfg.Roles) && os.Geteuid() > 0 {
 		logrus.Fatalf("MicroShift must be run privileged for role 'node'")
+	}
+
+	// TO-DO: When multi-node is ready, we need to add the controller host-name/mDNS hostname
+	//        or VIP to this list on start
+	//        see https://github.com/redhat-et/microshift/pull/471
+
+	if err := util.AddToNoProxyEnv(
+		cfg.NodeIP,
+		cfg.NodeName,
+		cfg.Cluster.ClusterCIDR,
+		cfg.Cluster.ServiceCIDR,
+		".svc",
+		"."+cfg.Cluster.Domain); err != nil {
+		klog.Fatal(err)
 	}
 
 	os.MkdirAll(cfg.DataDir, 0700)
