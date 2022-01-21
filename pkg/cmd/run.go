@@ -11,6 +11,7 @@ import (
 	"github.com/coreos/go-systemd/daemon"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
+	"github.com/openshift/microshift/pkg/ipwatch"
 	"github.com/openshift/microshift/pkg/kustomize"
 	"github.com/openshift/microshift/pkg/mdns"
 	"github.com/openshift/microshift/pkg/node"
@@ -114,6 +115,8 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(node.NewKubeletServer(cfg)))
 		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
 	}
+
+	util.Must(m.AddService(ipwatch.NewIPWatchController(cfg)))
 
 	logrus.Info("Starting MicroShift")
 
