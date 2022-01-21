@@ -82,6 +82,8 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 
 	kubeletConfig, err := loadConfigFile(cfg.DataDir + "/resources/kubelet/config/config.yaml")
 
+	// THIS IS A CHANGE TO TRIGGER CI DON"T MERGE THIS
+
 	if err != nil {
 		logrus.Fatalf("Failed to load Kubelet Configuration %v", err)
 	}
