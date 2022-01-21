@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
 	cliflag "k8s.io/component-base/cli/flag"
+	"k8s.io/klog/v2"
 )
 
 const (
@@ -70,7 +71,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 	nodeIP, err := util.GetHostIP()
 	if err != nil {
-		logrus.Fatalf("failed to get host IP: %v", err)
+		klog.Warningf("failed to get host IP: %v, using: %q", err, nodeIP)
 	}
 
 	return &MicroshiftConfig{
