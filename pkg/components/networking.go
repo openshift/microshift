@@ -2,7 +2,7 @@ package components
 
 import (
 	"github.com/openshift/microshift/pkg/assets"
-	"github.com/sirupsen/logrus"
+	"k8s.io/klog/v2"
 )
 
 func startFlannel(kubeconfigPath string) error {
@@ -28,23 +28,23 @@ func startFlannel(kubeconfigPath string) error {
 	)
 
 	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply clusterrole %v: %v", cr, err)
+		klog.Warningf("Failed to apply clusterRole %v %v", cr, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply clusterrolebinding %v: %v", crb, err)
+		klog.Warningf("Failed to apply clusterRoleBinding %v %v", crb, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply sa %v: %v", sa, err)
+		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
 	if err := assets.ApplyConfigMaps(cm, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply cm %v: %v", cm, err)
+		klog.Warningf("Failed to apply configMap %v %v", cm, err)
 		return err
 	}
 	if err := assets.ApplyDaemonSets(ds, renderReleaseImage, nil, kubeconfigPath); err != nil {
-		logrus.Warningf("failed to apply ds %v: %v", ds, err)
+		klog.Warningf("Failed to apply daemonSet %v %v", ds, err)
 		return err
 	}
 	return nil

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sirupsen/logrus"
+	"k8s.io/klog/v2"
 
 	appsassets "github.com/openshift/microshift/pkg/assets/apps"
 
@@ -100,14 +100,14 @@ func applyApps(apps []string, applier readerApplier, render RenderFunc, params R
 	defer lock.Unlock()
 
 	for _, app := range apps {
-		logrus.Infof("applying apps api %s", app)
+		klog.Infof("Applying apps api %s", app)
 		objBytes, err := appsassets.Asset(app)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", app, err)
 		}
 		applier.Reader(objBytes, render, params)
 		if err := applier.Applier(); err != nil {
-			logrus.Warningf("failed to apply apps api %s: %v", app, err)
+			klog.Warningf("Failed to apply apps api %s: %v", app, err)
 			return err
 		}
 	}

@@ -17,13 +17,14 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"k8s.io/klog/v2"
 
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
 
@@ -54,7 +55,7 @@ func (s *OCPControllerManager) Dependencies() []string { return []string{"kube-a
 
 func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {
-		logrus.Fatalf("Failed to write openshift-controller-manager config: %v", err)
+		klog.Fatalf("Failed to write openshift-controller-manager config %v", err)
 	}
 
 	var configFilePath = cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml"
@@ -106,22 +107,22 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	go func() {
 		healthcheckStatus := util.RetryTCPConnection("127.0.0.1", "8445")
 		if !healthcheckStatus {
-			logrus.Fatalf("%s failed to start", s.Name())
+			klog.Fatalf(s.Name(), fmt.Errorf("healthcheck status"), "%s failed to start")
 		}
-		logrus.Infof("%s is ready", s.Name())
+		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
 
 	if err := assets.ApplyNamespaces([]string{
 		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
 	}, s.kubeconfig); err != nil {
-		logrus.Warningf("failed to apply openshift namespaces %v", err)
+		klog.Warningf("failed to apply openshift namespaces %v", err)
 	}
 
 	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
 	options.ConfigFilePath = s.ConfigFilePath
 	if err := options.StartControllerManager(); err != nil {
-		logrus.Fatalf("Failed to start openshift-controller-manager %v", err)
+		klog.Fatalf("Failed to start openshift-controller-manager %v", err)
 	}
 	return ctx.Err()
 }

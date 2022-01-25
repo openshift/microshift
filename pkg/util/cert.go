@@ -97,7 +97,7 @@ func LoadRootCA(dir, certFilename, keyFilename string) error {
 	now := time.Now()
 
 	if now.After(rootCA.NotAfter) {
-		klog.ErrorS(nil, "CA has expired: current time %s is after %s", now.Format(time.RFC3339), rootCA.NotAfter.Format(time.RFC3339))
+		klog.Errorf("CA has expired: current time %s is after %s", now.Format(time.RFC3339), rootCA.NotAfter.Format(time.RFC3339), nil)
 	}
 
 	return nil

@@ -23,7 +23,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -33,6 +32,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/component-base/cli/globalflag"
 	genericcontrollermanager "k8s.io/controller-manager/app"
+	"k8s.io/klog/v2"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
 	"k8s.io/kubernetes/cmd/kube-apiserver/app/options"
 )
@@ -62,10 +62,10 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	// dataDir := filepath.Join(cfg.DataDir, s.Name())
 
 	if err := s.configureAuditPolicy(cfg); err != nil {
-		logrus.Fatalf("Failed to configure kube-apiserver audit policy: %v", err)
+		klog.Fatalf("Failed to configure kube-apiserver audit policy %v", err)
 	}
 	if err := s.configureOAuth(cfg); err != nil {
-		logrus.Fatalf("Failed to configure kube-apiserver OAuth: %v", err)
+		klog.Fatalf("Failed to configure kube-apiserver OAuth %v", err)
 	}
 
 	// configure the kube-apiserver instance
@@ -134,7 +134,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		cmd.Flags().AddFlagSet(f)
 	}
 	if err := cmd.ParseFlags(args); err != nil {
-		logrus.Fatalf("%s failed to parse flags: %v", s.Name(), err)
+		klog.Fatalf("%s failed to parse flags", s.Name(), err)
 	}
 
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
@@ -220,22 +220,22 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	go func() {
 		restConfig, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
 		if err != nil {
-			logrus.Warningf("%s readiness check: %v", s.Name(), err)
+			klog.Warningf("%s readiness check: %v", s.Name(), err)
 			return
 		}
 
 		versionedClient, err := kubernetes.NewForConfig(restConfig)
 		if err != nil {
-			logrus.Warningf("%s readiness check: %v", s.Name(), err)
+			klog.Warningf("%s readiness check: %v", s.Name(), err)
 			return
 		}
 
 		if genericcontrollermanager.WaitForAPIServer(versionedClient, kubeAPIStartupTimeout*time.Second) != nil {
-			logrus.Warningf("%s readiness check timed out: %v", s.Name(), err)
+			klog.Warningf("%s readiness check timed out: %v", s.Name(), err)
 			return
 		}
 
-		logrus.Infof("%s is ready", s.Name())
+		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
 

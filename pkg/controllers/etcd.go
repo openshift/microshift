@@ -22,8 +22,8 @@ import (
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/sirupsen/logrus"
 	etcd "go.etcd.io/etcd/embed"
+	"k8s.io/klog/v2"
 )
 
 var (
@@ -99,7 +99,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	// run readiness check
 	go func() {
 		<-e.Server.ReadyNotify()
-		logrus.Infof("%s is ready", s.Name())
+		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
 
