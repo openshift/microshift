@@ -13,4 +13,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Broken Link Check
-        uses: technote-space/broken-link-checker-action@v2.2.10
+        uses: technote-space/broken-link-checker-action@v2.2.11
