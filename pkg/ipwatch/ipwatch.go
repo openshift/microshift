@@ -29,13 +29,17 @@ import (
 const ipCheckInterval = time.Second * 5
 
 type IPWatchController struct {
-	NodeIP string
-	stopCh chan struct{}
+	NodeIP      string
+	stopCh      chan struct{}
+	stopEtcd    *chan<- struct{}
+	etcdStopped *<-chan struct{}
 }
 
-func NewIPWatchController(cfg *config.MicroshiftConfig) *IPWatchController {
+func NewIPWatchController(cfg *config.MicroshiftConfig, stopEtcd *chan<- struct{}, etcdStopped *<-chan struct{}) *IPWatchController {
 	return &IPWatchController{
-		NodeIP: cfg.NodeIP,
+		NodeIP:      cfg.NodeIP,
+		stopEtcd:    stopEtcd,
+		etcdStopped: etcdStopped,
 	}
 }
 
@@ -56,15 +60,33 @@ func (c *IPWatchController) Run(ctx context.Context, ready chan<- struct{}, stop
 		case <-ticker.C:
 			currentIP, _ := util.GetHostIP()
 			if c.NodeIP != currentIP {
-				// using a harsh exit for now since soft kill ends in a loop of trying to contact etcd
-				// syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 				klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIP, currentIP)
-				os.Exit(1)
+				c.stopEtcdAndExit()
 				return nil
 			}
 
 		case <-ctx.Done():
 			return ctx.Err()
 		}
+	}
+}
+
+func (c *IPWatchController) stopEtcdAndExit() {
+	klog.Infof("stopEtcdAndExit c.stopCh = %+v c.etcdStopped = %+v", c.stopEtcd, c.etcdStopped)
+	if c.stopEtcd == nil || c.etcdStopped == nil {
+		os.Exit(0)
+	}
+
+	klog.Info("Stopping etcd service")
+
+	close(*c.stopEtcd)
+
+	select {
+	case <-*c.etcdStopped:
+		klog.Info("Etcd stopped gracefully")
+		os.Exit(0)
+	case <-time.Tick(30 * time.Second):
+		klog.Error("Etcd stop timed out, stoping forcedfully")
+		os.Exit(1)
 	}
 }

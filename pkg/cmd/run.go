@@ -96,7 +96,10 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	m := servicemanager.NewServiceManager()
 	if config.StringInList("controlplane", cfg.Roles) {
-		util.Must(m.AddService(controllers.NewEtcd(cfg)))
+		etcdService := controllers.NewEtcd(cfg)
+		util.Must(m.AddService(etcdService))
+		etcdStop, etcdStopped := etcdService.GetStopChannels()
+		util.Must(m.AddService(ipwatch.NewIPWatchController(cfg, &etcdStop, &etcdStopped)))
 		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
 		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
 		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
@@ -112,11 +115,12 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	}
 
 	if config.StringInList("node", cfg.Roles) {
+		if len(cfg.Roles) == 1 {
+			util.Must(m.AddService(ipwatch.NewIPWatchController(cfg, nil, nil)))
+		}
 		util.Must(m.AddService(node.NewKubeletServer(cfg)))
 		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
 	}
-
-	util.Must(m.AddService(ipwatch.NewIPWatchController(cfg)))
 
 	logrus.Info("Starting MicroShift")
 

@@ -24,6 +24,7 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/sirupsen/logrus"
 	etcd "go.etcd.io/etcd/embed"
+	"k8s.io/klog/v2"
 )
 
 var (
@@ -43,16 +44,26 @@ const (
 
 type EtcdService struct {
 	etcdCfg *etcd.Config
+	// stopCh is an additional channel to have the capacity to stop etcd first/individually
+	stopCh chan struct{}
+	// stoppedCh is a channel which will indicate that etcd has stopped gracefully after stopCh
+	stoppedCh chan struct{}
 }
 
 func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
-	s := &EtcdService{}
+	s := &EtcdService{
+		stopCh:    make(chan struct{}, 1),
+		stoppedCh: make(chan struct{}, 1),
+	}
 	s.configure(cfg)
 	return s
 }
 
 func (s *EtcdService) Name() string           { return "etcd" }
 func (s *EtcdService) Dependencies() []string { return []string{} }
+func (s *EtcdService) GetStopChannels() (chan<- struct{}, <-chan struct{}) {
+	return s.stopCh, s.stoppedCh
+}
 
 func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
@@ -90,6 +101,7 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 
 func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+	defer close(s.stoppedCh)
 
 	e, err := etcd.StartEtcd(s.etcdCfg)
 	if err != nil {
@@ -103,7 +115,12 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		close(ready)
 	}()
 
-	<-ctx.Done()
+	select {
+	case <-ctx.Done():
+	case <-s.stopCh:
+		klog.Info("etcd requested to stop by dedicated stop channel")
+	}
+
 	e.Server.Stop()
 	<-e.Server.StopNotify()
 	return ctx.Err()
