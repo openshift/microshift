@@ -106,9 +106,13 @@ func (s *ProxyOptions) Run(ctx context.Context, ready chan<- struct{}, stopped c
 		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
-	if err := s.options.Run(); err != nil {
-		klog.Fatalf("%s failed to start", s.Name(), err)
-	}
 
+	go func() {
+		if err := s.options.Run(); err != nil {
+			klog.Fatalf("%s failed to start %v", s.Name(), err)
+		}
+	}()
+
+	<-ctx.Done()
 	return ctx.Err()
 }
