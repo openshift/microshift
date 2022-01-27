@@ -44,6 +44,7 @@ func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struc
 	// TO-DO add readiness check
 	if err := ApplyDefaultSCCs(s.cfg); err != nil {
 		klog.Errorf("%s unable to apply default SCCs: %v", s.Name(), err)
+		return err
 	}
 	klog.Infof("%s applied default SCCs", s.Name())
 	return ctx.Err()
