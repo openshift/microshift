@@ -95,20 +95,34 @@ featureGates:
 }
 
 func (s *ProxyOptions) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	proxyStopErr := make(chan error, 1)
 
 	defer close(stopped)
+
 	// run readiness check
 	go func() {
 		healthcheckStatus := util.RetryInsecureHttpsGet("http://127.0.0.1:10256/healthz")
 		if healthcheckStatus != 200 {
-			klog.Fatalf("%s failed to start", s.Name(), fmt.Errorf("Healthcheck failed. "))
+			err := fmt.Errorf("%s failed to start, healthcheck failed", s.Name())
+			klog.Error(err)
+			proxyStopErr <- err
 		}
 		klog.Infof("%s is ready", s.Name())
 		close(ready)
 	}()
-	if err := s.options.Run(); err != nil {
-		klog.Fatalf("%s failed to start", s.Name(), err)
-	}
 
-	return ctx.Err()
+	go func() {
+		if err := s.options.Run(); err != nil {
+			klog.Errorf("%s failed to start %v", s.Name(), err)
+			proxyStopErr <- err
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+
+	case err := <-proxyStopErr:
+		return err
+	}
 }
