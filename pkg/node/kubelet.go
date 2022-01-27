@@ -158,8 +158,8 @@ serverTLSBootstrap: false #TODO`)
 }
 
 func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-
 	defer close(stopped)
+
 	// run readiness check
 	go func() {
 		healthcheckStatus := util.RetryInsecureHttpsGet("http://127.0.0.1:10248/healthz")
@@ -178,10 +178,13 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 
 	kubeletDeps, err := kubelet.UnsecuredDependencies(kubeletServer, utilfeature.DefaultFeatureGate)
 	if err != nil {
-		klog.Fatalf("Error in fetching depenedencies", err)
+		klog.Errorf("Error in fetching kubelet depenedencies", err)
+		return err
 	}
+
 	if err := kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate); err != nil {
-		klog.Fatalf("Kubelet failed to start", err)
+		klog.Errorf("Kubelet failed to start", err)
+		return err
 	}
 	return ctx.Err()
 }
