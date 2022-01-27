@@ -101,8 +101,10 @@ func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
 }
 
 func (s *OpenShiftOAuth) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	oauthErrorCh := make(chan error, 1)
 	defer close(stopped)
 	stopCh := make(chan struct{})
+	defer close(stopCh)
 
 	// run readiness check
 	go func() {
@@ -114,9 +116,17 @@ func (s *OpenShiftOAuth) Run(ctx context.Context, ready chan<- struct{}, stopped
 		close(ready)
 	}()
 
-	if err := oauth_apiserver.RunOAuthAPIServer(s.options, stopCh); err != nil {
+	go func() {
+		if err := oauth_apiserver.RunOAuthAPIServer(s.options, stopCh); err != nil {
+			klog.Errorf("Error starting oauth API server: %s", err)
+			oauthErrorCh <- err
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-oauthErrorCh:
 		return err
 	}
-
-	return ctx.Err()
 }
