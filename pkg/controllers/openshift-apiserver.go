@@ -92,25 +92,29 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+	errorChannel := make(chan error, 1)
 
-	go func() error {
+	go func() {
 		// probe ocp api services
 		restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.DataDir+"/resources/kubeadmin/kubeconfig")
 		if err != nil {
-			return err
+			errorChannel <- err
+			return
 		}
 		client, err := kubernetes.NewForConfig(restConfig)
 		if err != nil {
-			return err
+			errorChannel <- err
+			return
 		}
 		err = waitForOCPAPIServer(client, 10*time.Second)
 		if err != nil {
-			klog.Warningf("Failed to wait for ocp apiserver: %v", err)
-			return err
+			err := fmt.Errorf("Failed to wait for ocp apiserver: %v", err)
+			klog.Error(err)
+			errorChannel <- err
+			return
 		}
 		klog.Infof("ocp apiserver is ready")
 		close(ready)
-		return nil
 	}()
 
 	err := s.prepareOCPComponents(s.cfg)
@@ -120,11 +124,21 @@ func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped c
 	}
 
 	stopCh := make(chan struct{})
-	if err := s.options.RunAPIServer(stopCh); err != nil {
-		klog.Fatalf("Failed to start ocp-apiserver %v", err)
-	}
+	defer close(stopCh)
 
-	return ctx.Err()
+	go func() {
+		if err := s.options.RunAPIServer(stopCh); err != nil {
+			klog.Errorf("Failed to start ocp-apiserver %v", err)
+			errorChannel <- err
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-errorChannel:
+		return err
+	}
 }
 
 func (s *OCPAPIServer) prepareOCPComponents(cfg *config.MicroshiftConfig) error {
