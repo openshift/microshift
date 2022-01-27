@@ -42,13 +42,14 @@ func (s *Kustomizer) Dependencies() []string { return []string{"kube-apiserver"}
 
 func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
-	defer close(ready)
 
 	kustomization := filepath.Join(s.path, "kustomization.yaml")
 	if _, err := os.Stat(kustomization); !errors.Is(err, os.ErrNotExist) {
 		klog.Infof("Applying kustomization at %v ", kustomization)
 		if err := ApplyKustomizationWithRetries(s.path, s.kubeconfig); err != nil {
 			klog.Warningf("Applying kustomization failed: %s. Giving up.", err)
+			// Make the service manager safely shut down everything
+			return err
 		} else {
 			klog.Warningf("Kustomization applied successfully.")
 		}
@@ -56,6 +57,7 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 		klog.Infof("No kustomization found at " + kustomization)
 	}
 
+	close(ready)
 	return ctx.Err()
 }
 
