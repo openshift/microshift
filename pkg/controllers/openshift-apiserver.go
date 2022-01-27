@@ -119,11 +119,9 @@ func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped c
 		return err
 	}
 
-	stopCh := make(chan struct{})
-	if err := s.options.RunAPIServer(stopCh); err != nil {
+	if err := s.options.RunAPIServer(ctx.Done()); err != nil {
 		klog.Fatalf("Failed to start ocp-apiserver %v", err)
 	}
-
 	return ctx.Err()
 }
 
