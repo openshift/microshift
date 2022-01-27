@@ -3,7 +3,10 @@ package servicemanager
 import (
 	"context"
 	"errors"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"testing"
 	"time"
 
@@ -124,4 +127,105 @@ func TestRunCancellation(t *testing.T) {
 	}
 
 	cancel()
+}
+
+func TestRunToServiceCrash(t *testing.T) {
+	var wg sync.WaitGroup
+	defer wg.Wait()
+
+	var waitForContext = func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+		defer close(stopped)
+		close(ready)
+		<-ctx.Done()
+		wg.Done()
+		return nil
+	}
+
+	var runAndPanic = func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+		defer close(stopped)
+		close(ready)
+		<-time.After(time.Second)
+		wg.Done()
+		return errors.New("I'm crashing")
+	}
+
+	m := NewServiceManager()
+	m.AddService(NewGenericService("foo", nil, waitForContext))
+	m.AddService(NewGenericService("bar-crash", []string{"foo"}, runAndPanic))
+	wg.Add(2)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	cancelOnSigTerm(cancel, ctx)
+
+	ready, stopped := make(chan struct{}), make(chan struct{})
+	if err := m.Run(ctx, ready, stopped); err == nil {
+		t.Errorf("an error from bar-crash was expected %s: %v", m.Name(), err)
+	}
+
+	if !sigchannel.IsClosed(ready) {
+		t.Errorf("ready channel not closed after completing service manager")
+	}
+
+	if !sigchannel.IsClosed(stopped) {
+		t.Errorf("stopped channel not closed after completing service manager")
+	}
+}
+
+func cancelOnSigTerm(cancel context.CancelFunc, ctx context.Context) {
+	sigTerm := make(chan os.Signal, 1)
+	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		select {
+		case <-sigTerm:
+			cancel()
+		case <-ctx.Done():
+		}
+	}()
+}
+
+func TestRunToServicePanic(t *testing.T) {
+	var wg sync.WaitGroup
+	defer wg.Wait()
+
+	var waitForContext = func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+		defer close(stopped)
+		close(ready)
+		<-ctx.Done()
+		wg.Done()
+		return nil
+	}
+
+	var runAndCrash = func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+		defer close(stopped)
+		close(ready)
+		<-time.After(time.Second)
+		wg.Done()
+		panic("I'm in panic")
+
+	}
+
+	m := NewServiceManager()
+	m.AddService(NewGenericService("foo", nil, waitForContext))
+	m.AddService(NewGenericService("bar-panic", []string{"foo"}, runAndCrash))
+	wg.Add(2)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	cancelOnSigTerm(cancel, ctx)
+
+	ready, stopped := make(chan struct{}), make(chan struct{})
+	if err := m.Run(ctx, ready, stopped); err == nil {
+		t.Errorf("an error from bar-panic was expected %s: %v", m.Name(), err)
+	}
+
+	if !sigchannel.IsClosed(ready) {
+		t.Errorf("ready channel not closed after completing service manager")
+	}
+
+	if !sigchannel.IsClosed(stopped) {
+		t.Errorf("stopped channel not closed after completing service manager")
+	}
 }

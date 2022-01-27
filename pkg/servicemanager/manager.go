@@ -3,6 +3,7 @@ package servicemanager
 import (
 	"context"
 	"fmt"
+	"syscall"
 
 	"github.com/openshift/microshift/pkg/util/sigchannel"
 	"k8s.io/klog/v2"
@@ -97,9 +98,21 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan struct{}, <-chan struct{}) {
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				klog.Errorf("%s panicked: %s", service.Name(), r)
+				klog.Error("Stopping MicroShift")
+				syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
+				if !sigchannel.IsClosed(stopped) {
+					close(stopped)
+				}
+			}
+		}()
+
 		klog.Infof("Starting %s", service.Name())
 		if err := service.Run(ctx, ready, stopped); err != nil {
-			klog.Infof("%s stopped: %s", service.Name(), err)
+			klog.Errorf("service %s exited with error: %s, stopping MicroShift", service.Name(), err)
+			syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
 		} else {
 			klog.Infof("%s completed", service.Name())
 		}
