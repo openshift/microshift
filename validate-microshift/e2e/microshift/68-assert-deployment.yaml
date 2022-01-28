@@ -6,7 +6,7 @@ timeout: 500
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: uploader
-  namespace: uploader 
+  name: argocd-repo-server 
+  namespace: argocd
 status:
   readyReplicas: 1
