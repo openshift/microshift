@@ -14,6 +14,10 @@
 
 # SELinux specifics
 %global selinuxtype targeted
+%define selinux_policyver 3.14.3-67
+%define container_policyver 2.167.0-1
+%define container_policy_epoch 2
+
 
 # Git related details
 %global shortcommit %(c=%{git_commit}; echo ${c:0:7})
@@ -118,9 +122,9 @@ restorecon -R /var/hpvolumes
 
 %package selinux
 Summary: SELinux policies for MicroShift
-BuildRequires: selinux-policy
-BuildRequires: selinux-policy-devel
-Requires: container-selinux
+BuildRequires: selinux-policy >= %{selinux_policyver}
+BuildRequires: selinux-policy-devel >= %{selinux_policyver}
+Requires: container-selinux >= %{container_policy_epoch}:%{container_policyver}
 BuildArch: noarch
 %{?selinux_requires}
 
