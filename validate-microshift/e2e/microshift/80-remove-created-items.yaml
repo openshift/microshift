@@ -1,0 +1,6 @@
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+    - timeout: 180
+      command: ./80-remove-created-items.sh
