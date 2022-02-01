@@ -1,6 +1,5 @@
 name: release_to_copr
 
-# only execute a release when triggered manually
 on:
   push:
     tags:
