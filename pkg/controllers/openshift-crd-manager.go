@@ -39,10 +39,11 @@ func (s *OpenShiftCRDManager) Dependencies() []string {
 }
 
 func (s *OpenShiftCRDManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(ready)
-	// To-DO add readiness check
+	defer close(stopped)
+
 	if err := assets.ApplyCRDs(s.cfg); err != nil {
 		klog.Errorf("%s unable to apply default CRDs: %v", s.Name(), err)
+		return err
 	}
 	klog.Infof("%s applied default CRDs", s.Name())
 
@@ -51,5 +52,7 @@ func (s *OpenShiftCRDManager) Run(ctx context.Context, ready chan<- struct{}, st
 		klog.Errorf("%s unable to confirm all CRDs are ready: %v", s.Name(), err)
 	}
 	klog.Infof("%s all CRDs are ready", s.Name())
+	close(ready)
+
 	return ctx.Err()
 }
