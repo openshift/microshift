@@ -259,6 +259,9 @@ mv /usr/lib/systemd/system/microshift-containerized.service /usr/lib/systemd/sys
 %{_unitdir}/microshift-containerized.service
 
 %changelog
+* Wed Feb 2 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-nightly-14-g8a3819ee
+- Define specific selinux policy version to help manage selinux package
+
 * Thu Nov 4 2021 Miguel angel Ajo <majopela@redhat.com> . 4.8.0-nightly-14-g973b9c78
 - Add microshift-containerized subpackage which contains the microshift-containerized systemd
   definition.
