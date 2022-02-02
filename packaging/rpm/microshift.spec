@@ -82,44 +82,6 @@ systems, scale testing, and provisioning of lightweight Kubernetes control plane
 Note: MicroShift is still early days and moving fast. Features are missing.
 Things break. But you can still help shape it, too.
 
-%package containerized
-Summary: Containerized systemd files for MicroShift
-BuildArch: noarch
-Requires: crio
-Requires: cri-tools
-Requires: microshift-selinux
-Requires: podman
-%{?selinux_requires}
-
-%description containerized
-This is the containerized version of MicroShift.
-
-MicroShift is a research project that is exploring how OpenShift Kubernetes
-can be optimized for small form factor and edge computing.
-
-Edge devices deployed out in the field pose very different operational,
-environmental, and business challenges from those of cloud computing.
-These motivate different engineering
-trade-offs for Kubernetes at the far edge than for cloud or near-edge
-scenarios. MicroShift's design goals cater to this:
-
-make frugal use of system resources (CPU, memory, network, storage, etc.),
-tolerate severe networking constraints, update (resp. roll back) securely,
-safely, speedily, and seamlessly (without disrupting workloads), and build on
-and integrate cleanly with edge-optimized OSes like Fedora IoT and RHEL for Edge,
-while providing a consistent development and management experience with standard
-OpenShift.
-
-We believe these properties should also make MicroShift a great tool for other
-use cases such as Kubernetes applications development on resource-constrained
-systems, scale testing, and provisioning of lightweight Kubernetes control planes.
-
-Note: MicroShift is still early days and moving fast. Features are missing.
-Things break. But you can still help shape it, too.
-
-%define microshift_relabel_files() \
-restorecon -R /var/hpvolumes
-
 %package selinux
 Summary: SELinux policies for MicroShift
 BuildRequires: selinux-policy >= %{selinux_policyver}
@@ -190,7 +152,6 @@ install -p -m644 packaging/crio.conf.d/microshift.conf %{buildroot}%{_sysconfdir
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
-install -p -m644 packaging/systemd/microshift-containerized.service %{buildroot}%{_unitdir}/microshift-containerized.service
 
 mkdir -p -m755 %{buildroot}/var/run/flannel
 mkdir -p -m755 %{buildroot}/var/run/kubelet
@@ -224,9 +185,6 @@ if [ $1 -eq 0 ]; then
     %selinux_modules_uninstall -s %{selinuxtype} microshift
 fi
 
-%post containerized
-mv /usr/lib/systemd/system/microshift-containerized.service /usr/lib/systemd/system/microshift.service
-
 %posttrans selinux
 
 %selinux_relabel_post -s %{selinuxtype}
@@ -254,13 +212,15 @@ mv /usr/lib/systemd/system/microshift-containerized.service /usr/lib/systemd/sys
 %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
-%files containerized
-
-%{_unitdir}/microshift-containerized.service
-
 %changelog
-* Wed Feb 2 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-nightly-14-g8a3819ee
+* Wed Feb 2 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshift-2022_01_04_175420_25
 - Define specific selinux policy version to help manage selinux package
+
+* Wed Feb 2 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.8.0-0.microshift-2022-01-06-210147-20
+- Remove the microshift-containerized subpackage, our docs explain how to download the .service file,
+  and it has proven problematic to package this.
+- Fix the microshift.service being overwritten by microshift-containerized, even when the non-containerized
+  package only is installed.
 
 * Thu Nov 4 2021 Miguel angel Ajo <majopela@redhat.com> . 4.8.0-nightly-14-g973b9c78
 - Add microshift-containerized subpackage which contains the microshift-containerized systemd
