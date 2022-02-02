@@ -14,6 +14,10 @@
 
 # SELinux specifics
 %global selinuxtype targeted
+%define selinux_policyver 3.14.3-67
+%define container_policyver 2.167.0-1
+%define container_policy_epoch 2
+
 
 # Git related details
 %global shortcommit %(c=%{git_commit}; echo ${c:0:7})
@@ -80,9 +84,9 @@ Things break. But you can still help shape it, too.
 
 %package selinux
 Summary: SELinux policies for MicroShift
-BuildRequires: selinux-policy
-BuildRequires: selinux-policy-devel
-Requires: container-selinux
+BuildRequires: selinux-policy >= %{selinux_policyver}
+BuildRequires: selinux-policy-devel >= %{selinux_policyver}
+Requires: container-selinux >= %{container_policy_epoch}:%{container_policyver}
 BuildArch: noarch
 %{?selinux_requires}
 
@@ -209,6 +213,9 @@ fi
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
 %changelog
+* Wed Feb 2 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshift-2022_01_04_175420_25
+- Define specific selinux policy version to help manage selinux package
+
 * Wed Feb 2 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.8.0-0.microshift-2022-01-06-210147-20
 - Remove the microshift-containerized subpackage, our docs explain how to download the .service file,
   and it has proven problematic to package this.
