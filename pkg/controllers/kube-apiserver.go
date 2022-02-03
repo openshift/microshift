@@ -215,24 +215,25 @@ func (s *KubeAPIServer) configureOAuth(cfg *config.MicroshiftConfig) error {
 
 func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+	errorChannel := make(chan error, 1)
 
 	// run readiness check
 	go func() {
 		restConfig, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
 		if err != nil {
-			klog.Warningf("%s readiness check: %v", s.Name(), err)
-			return
+			klog.Errorf("%s readiness check: %v", s.Name(), err)
+			errorChannel <- err
 		}
 
 		versionedClient, err := kubernetes.NewForConfig(restConfig)
 		if err != nil {
-			klog.Warningf("%s readiness check: %v", s.Name(), err)
-			return
+			klog.Errorf("%s readiness check: %v", s.Name(), err)
+			errorChannel <- err
 		}
 
 		if genericcontrollermanager.WaitForAPIServer(versionedClient, kubeAPIStartupTimeout*time.Second) != nil {
-			klog.Warningf("%s readiness check timed out: %v", s.Name(), err)
-			return
+			klog.Errorf("%s readiness check timed out: %v", s.Name(), err)
+			errorChannel <- err
 		}
 
 		klog.Infof("%s is ready", s.Name())
@@ -249,8 +250,9 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return fmt.Errorf("%s configuration error: %v", s.Name(), utilerrors.NewAggregate(errs))
 	}
 
-	if err := kubeapiserver.Run(completedOptions, ctx.Done()); err != nil {
-		return err
-	}
-	return ctx.Err()
+	go func() {
+		errorChannel <- kubeapiserver.Run(completedOptions, ctx.Done())
+	}()
+
+	return <-errorChannel
 }
