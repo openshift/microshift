@@ -17,6 +17,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -98,12 +99,14 @@ leaderElection:
 
 func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+	errorChannel := make(chan error, 1)
 
 	// run readiness check
 	go func() {
 		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10259/healthz")
 		if healthcheckStatus != 200 {
-			klog.Fatalf("%s healthcheck failed", s.Name(), fmt.Errorf("kube-scheduler failed to start"))
+			klog.Errorf("%s healthcheck failed", s.Name(), fmt.Errorf("kube-scheduler failed to start"))
+			errorChannel <- errors.New("kube-scheduler healthcheck failed")
 		}
 
 		klog.Infof("%s is ready", s.Name())
@@ -115,9 +118,9 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return err
 	}
 
-	if err := kubescheduler.Run(ctx, cc, sched); err != nil {
-		return err
-	}
+	go func() {
+		errorChannel <- kubescheduler.Run(ctx, cc, sched)
+	}()
 
-	return ctx.Err()
+	return <-errorChannel
 }
