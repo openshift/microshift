@@ -185,7 +185,9 @@ fi
 %post selinux
 
 %selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
-%microshift_relabel_files
+if /usr/sbin/selinuxenabled ; then
+    %microshift_relabel_files
+fi
 
 %postun selinux
 
