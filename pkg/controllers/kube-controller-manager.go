@@ -17,7 +17,7 @@ package controllers
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -95,12 +95,14 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 
 func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+	errorChannel := make(chan error, 1)
 
 	// run readiness check
 	go func() {
 		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10257/healthz")
 		if healthcheckStatus != 200 {
-			klog.Fatalf("", fmt.Errorf("kube-controller-manager failed to start"))
+			klog.Errorf("kube-controller-manager failed to start")
+			errorChannel <- errors.New("kube-controller-manager failed to start")
 		}
 
 		klog.Infof("%s is ready", s.Name())
@@ -117,10 +119,9 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	//	return err
 	//}
 
-	// Run runs the KubeControllerManagerOptions.  This should never exit.
-	if err := kubecm.Run(c.Complete(), ctx.Done()); err != nil {
-		return err
-	}
+	go func() {
+		errorChannel <- kubecm.Run(c.Complete(), ctx.Done())
+	}()
 
-	return ctx.Err()
+	return <-errorChannel
 }
