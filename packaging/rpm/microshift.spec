@@ -17,6 +17,17 @@
 %define selinux_policyver 3.14.3-67
 %define container_policyver 2.167.0-1
 %define container_policy_epoch 2
+%define microshift_relabel_files() \
+   mkdir -p /var/hpvolumes; \
+   mkdir -p /var/run/flannel; \
+   mkdir -p /var/run/kubelet; \
+   mkdir -p /var/lib/kubelet/pods; \
+   mkdir -p /var/run/secrets/kubernetes.io/serviceaccount; \
+   restorecon -R /var/hpvolumes; \
+   restorecon -R /var/run/kubelet; \
+   restorecon -R /var/run/flannel; \
+   restorecon -R /var/lib/kubelet/pods; \
+   restorecon -R /var/run/secrets/kubernetes.io/serviceaccount
 
 
 # Git related details
@@ -157,7 +168,6 @@ mkdir -p -m755 %{buildroot}/var/run/flannel
 mkdir -p -m755 %{buildroot}/var/run/kubelet
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
 mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
-mkdir -p -m755 %{buildroot}/var/hpvolumes
 
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
@@ -177,7 +187,7 @@ fi
 %selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
 if /usr/sbin/selinuxenabled ; then
     %microshift_relabel_files
-fi;
+fi
 
 %postun selinux
 
@@ -208,11 +218,13 @@ fi
 /var/run/kubelet
 /var/lib/kubelet/pods
 /var/run/secrets/kubernetes.io/serviceaccount
-/var/hpvolumes
 %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
 %changelog
+* Mon Feb 7 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshiftr-2022_02_02_194009_3
+- Selinux directory creation and labeling
+
 * Wed Feb 2 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshift-2022_01_04_175420_25
 - Define specific selinux policy version to help manage selinux package
 
