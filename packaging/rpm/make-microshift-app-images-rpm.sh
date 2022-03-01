@@ -80,4 +80,4 @@ systemctl is-active --quiet crio && systemctl restart --quiet crio
 EOF
 cp ./microshift-app-images.spec $RPMBUILD_DIR/SPECS/microshift-app-images.spec
 
-QA_RPATHS=$(( 0x0001|0x0010 )) rpmbuild -bb $RPMBUILD_DIR/SPECS/microshift-app-images.spec
+rpmbuild -bb --define "_topdir ${RPMBUILD_DIR}" $RPMBUILD_DIR/SPECS/microshift-app-images.spec
