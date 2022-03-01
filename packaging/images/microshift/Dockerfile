@@ -29,7 +29,12 @@ RUN microdnf install -y \
     && microdnf clean all
 COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/_output/bin/linux_$ARCH/microshift /usr/bin/microshift
 
-ENTRYPOINT ["/usr/bin/microshift"]
+RUN mkdir -p /root/crio.conf.d
+
+COPY packaging/crio.conf.d/microshift.conf /root/crio.conf.d/microshift.conf
+COPY packaging/images/microshift/entrypoint.sh /root/entrypoint.sh
+
+ENTRYPOINT ["/root/entrypoint.sh"]
 CMD ["run"]
 
 # To start:
