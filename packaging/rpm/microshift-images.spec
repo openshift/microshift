@@ -1,5 +1,8 @@
 %global imageStore %{buildroot}/var/lib/microshift/images
 
+%define __arch_install_post QA_SKIP_RPATHS=2 /usr/lib/rpm/check-rpaths
+%define __brp_check_rpaths QA_SKIP_RPATHS=2 /usr/lib/rpm/check-rpaths
+
 Name: microshift-images
 Version: 1
 Release: 1
