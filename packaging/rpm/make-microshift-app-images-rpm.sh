@@ -36,7 +36,7 @@ Name: microshift-app-images
 Version: 1
 Release: 1
 Summary: Creates RO container storage for user applications
-License: ASL 2.0
+License: Apache License 2.0
 URL: https://github.com/redhat-et/microshift
 
 BuildRequires:  podman

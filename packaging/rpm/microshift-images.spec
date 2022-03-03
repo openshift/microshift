@@ -20,11 +20,11 @@ Version: %{version}
 Release: 2
 
 Summary: MicroShift related container images
-License: ASL 2.0
+License: Apache License 2.0
 URL: https://github.com/redhat-et/microshift
 
 BuildRequires: podman
-BuildRequires: crio
+Requires: crio
 
 
 %description
@@ -101,6 +101,8 @@ fi
 # only on uninstall (0), not on upgrades(1)
 if [ $1 -eq 0 ];
   sed -i '/"${imageStoreSed}",/d" /etc/containers/storage.conf
+  systemctl is-active --quiet crio && systemctl restart --quiet crio
+
 fi
 
 %files
