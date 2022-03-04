@@ -219,6 +219,14 @@ build-containerized-all-in-one-iptables-arm64:
 .PHONY: build-containerized-all-in-one-iptables-arm64
 
 ###############################
+# container image packaging   #
+###############################
+
+image-tars:
+	sudo ./packaging/images/components/archive.sh
+.PHONY: image-tars
+
+###############################
 # dev targets                 #
 ###############################
 
