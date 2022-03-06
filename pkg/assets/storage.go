@@ -6,8 +6,6 @@ import (
 
 	"k8s.io/klog/v2"
 
-	scassets "github.com/openshift/microshift/pkg/assets/storage"
-
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -73,7 +71,7 @@ func applySCs(scs []string, applier readerApplier, render RenderFunc, params Ren
 
 	for _, sc := range scs {
 		klog.Infof("Applying sc %s", sc)
-		objBytes, err := scassets.Asset(sc)
+		objBytes, err := Asset(sc)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", sc, err)
 		}

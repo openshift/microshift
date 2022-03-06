@@ -6,8 +6,6 @@ import (
 
 	"k8s.io/klog/v2"
 
-	appsassets "github.com/openshift/microshift/pkg/assets/apps"
-
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -101,7 +99,7 @@ func applyApps(apps []string, applier readerApplier, render RenderFunc, params R
 
 	for _, app := range apps {
 		klog.Infof("Applying apps api %s", app)
-		objBytes, err := appsassets.Asset(app)
+		objBytes, err := Asset(app)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", app, err)
 		}

@@ -6,8 +6,6 @@ import (
 
 	"k8s.io/klog/v2"
 
-	sccassets "github.com/openshift/microshift/pkg/assets/scc"
-
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -73,7 +71,7 @@ func applySCCs(sccs []string, applier readerApplier, render RenderFunc, params R
 
 	for _, scc := range sccs {
 		klog.Infof("Applying scc api %s", scc)
-		objBytes, err := sccassets.Asset(scc)
+		objBytes, err := Asset(scc)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", scc, err)
 		}

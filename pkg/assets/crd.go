@@ -7,7 +7,6 @@ import (
 
 	klog "k8s.io/klog/v2"
 
-	crd_assets "github.com/openshift/microshift/pkg/assets/crd"
 	"github.com/openshift/microshift/pkg/config"
 
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -78,7 +77,7 @@ func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
 	for _, crd := range crds {
 		klog.Infof("Waiting for crd %s condition.type: established", crd)
 		var crdBytes []byte
-		crdBytes, err = crd_assets.Asset(crd)
+		crdBytes, err = Asset(crd)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", crd, err)
 		}
@@ -152,7 +151,7 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 
 	for _, crd := range crds {
 		klog.Infof("Applying openshift CRD %s", crd)
-		crdBytes, err := crd_assets.Asset(crd)
+		crdBytes, err := Asset(crd)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", crd, err)
 		}
