@@ -118,7 +118,6 @@ authentication:
 tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.crt
 tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.key
 cgroupDriver: "systemd"
-cgroupRoot: /
 failSwapOn: false
 volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
@@ -128,12 +127,11 @@ containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50
 kubeAPIBurst: 100
-cgroupsPerQOS: false
+cgroupsPerQOS: true
 enforceNodeAllocatable: []
 rotateCertificates: false  #TODO
 serializeImagePulls: false
 # staticPodPath: /etc/kubernetes/manifests
-systemCgroups: /system.slice
 featureGates:
   APIPriorityAndFairness: true
   LegacyNodeRoleBehavior: false
