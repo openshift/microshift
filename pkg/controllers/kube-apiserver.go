@@ -118,6 +118,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	if cfg.AuditLogDir != "" {
 		args = append(args,
 			"--audit-log-path="+filepath.Join(cfg.AuditLogDir, "kube-apiserver-audit.log"))
+		args = append(args, "--audit-log-maxage=7")
 	}
 
 	// fake the kube-apiserver cobra command to parse args into serverOptions
