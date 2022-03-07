@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -23,10 +22,6 @@ func main() {
 
 	logs.InitLogs()
 	defer logs.FlushLogs()
-
-	if len(os.Getenv("GOMAXPROCS")) == 0 {
-		runtime.GOMAXPROCS(runtime.NumCPU())
-	}
 
 	command := newCommand()
 	if err := command.Execute(); err != nil {
