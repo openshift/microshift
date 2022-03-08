@@ -305,7 +305,7 @@ if [ $NIGHTLY -eq 1 ]; then
 fi
 
 # create container tar.gzs for the consumed container images for non-nightly releases
-ARCHITECTURES="amd64 arm64" OUTPUT_DIR="${STAGE_DIR}" sudo -E "${ROOT}/packaging/image/components/archive.sh" || exit 1
+ARCHITECTURES="amd64 arm64" OUTPUT_DIR="${STAGE_DIR}" sudo -E "${ROOT}/packaging/images/components/archive.sh" || exit 1
 
 # publish binaries
 UPLOAD_URL="$(git_create_release "$API_DATA" "$TOKEN")"                   || exit 1
