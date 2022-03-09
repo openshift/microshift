@@ -66,6 +66,7 @@ Requires: cri-o
 Requires: cri-tools
 Requires: iptables
 Requires: microshift-selinux
+Requires: conntrack-tools
 
 %{?systemd_requires}
 
