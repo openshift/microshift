@@ -46,7 +46,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
 	flags.String("audit-log-dir", cfg.AuditLogDir, "Directory for storing audit logs.")
 	flags.StringSlice("roles", cfg.Roles, "Roles of this MicroShift instance.")
-
+	fmt.Println("Hello, CI!")
 	return cmd
 }
 
