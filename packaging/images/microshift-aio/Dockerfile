@@ -40,7 +40,7 @@ ENV BUILD_PATH=packaging/images/microshift-aio
 COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/microshift /usr/local/bin/microshift
 COPY $BUILD_PATH/unit /usr/lib/systemd/system/microshift.service
 COPY $BUILD_PATH/kubelet-cgroups.conf /etc/systemd/system.conf.d/kubelet-cgroups.conf
-COPY $BUILD_PATH/crio-bridge.conf /etc/cni/net.d/100-crio-bridge.conf
+COPY packaging/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/microshift.conf
 
 # OCP_VERSION pushed ahead to 4.9.11 because aarch64 is now available, and it is backwards compatible
 RUN export OCP_VERSION=4.9.11 && \
