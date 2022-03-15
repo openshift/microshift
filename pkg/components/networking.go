@@ -8,22 +8,22 @@ import (
 func startFlannel(kubeconfigPath string) error {
 	var (
 		// psp = []string{
-		// 	"assets/rbac/0000_00_podsecuritypolicy-flannel.yaml",
+		// 	"assets/components/flannel/podsecuritypolicy.yaml",
 		// }
 		cr = []string{
-			"assets/rbac/0000_00_flannel-clusterrole.yaml",
+			"assets/components/flannel/clusterrole.yaml",
 		}
 		crb = []string{
-			"assets/rbac/0000_00_flannel-clusterrolebinding.yaml",
+			"assets/components/flannel/clusterrolebinding.yaml",
 		}
 		sa = []string{
-			"assets/core/0000_00_flannel-service-account.yaml",
+			"assets/components/flannel/service-account.yaml",
 		}
 		cm = []string{
-			"assets/core/0000_00_flannel-configmap.yaml",
+			"assets/components/flannel/configmap.yaml",
 		}
 		ds = []string{
-			"assets/apps/0000_00_flannel-daemonset.yaml",
+			"assets/components/flannel/daemonset.yaml",
 		}
 	)
 

@@ -8,25 +8,25 @@ import (
 func startHostpathProvisioner(kubeconfigPath string) error {
 	var (
 		ns = []string{
-			"assets/core/0000_80_hostpath-provisioner-namespace.yaml",
+			"assets/components/hostpath-provisioner/namespace.yaml",
 		}
 		sa = []string{
-			"assets/core/0000_80_hostpath-provisioner-serviceaccount.yaml",
+			"assets/components/hostpath-provisioner/service-account.yaml",
 		}
 		cr = []string{
-			"assets/rbac/0000_80_hostpath-provisioner-clusterrole.yaml",
+			"assets/components/hostpath-provisioner/clusterrole.yaml",
 		}
 		crb = []string{
-			"assets/rbac/0000_80_hostpath-provisioner-clusterrolebinding.yaml",
+			"assets/components/hostpath-provisioner/clusterrolebinding.yaml",
 		}
 		scc = []string{
-			"assets/scc/0000_80_hostpath-provisioner-securitycontextconstraints.yaml",
+			"assets/components/hostpath-provisioner/scc.yaml",
 		}
 		ds = []string{
-			"assets/apps/000_80_hostpath-provisioner-daemonset.yaml",
+			"assets/components/hostpath-provisioner/daemonset.yaml",
 		}
 		sc = []string{
-			"assets/storage/0000_80_hostpath-provisioner-storageclass.yaml",
+			"assets/components/hostpath-provisioner/storageclass.yaml",
 		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {

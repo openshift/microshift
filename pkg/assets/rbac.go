@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	rbacassets "github.com/openshift/microshift/pkg/assets/rbac"
-
 	"k8s.io/klog/v2"
 
 	"k8s.io/client-go/rest"
@@ -164,7 +162,7 @@ func applyRbac(rbacs []string, applier readerApplier) error {
 
 	for _, rbac := range rbacs {
 		klog.Infof("Applying rbac %s", rbac)
-		objBytes, err := rbacassets.Asset(rbac)
+		objBytes, err := Asset(rbac)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", rbac, err)
 		}

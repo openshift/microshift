@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	coreassets "github.com/openshift/microshift/pkg/assets/core"
-
 	"k8s.io/klog/v2"
 
 	"k8s.io/client-go/rest"
@@ -190,7 +188,7 @@ func applyCore(cores []string, applier readerApplier, render RenderFunc, params 
 
 	for _, core := range cores {
 		klog.Infof("Applying corev1 api %s", core)
-		objBytes, err := coreassets.Asset(core)
+		objBytes, err := Asset(core)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", core, err)
 		}
