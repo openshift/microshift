@@ -48,7 +48,7 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 	if _, err := os.Stat(kustomization); !errors.Is(err, os.ErrNotExist) {
 		klog.Infof("Applying kustomization at %v ", kustomization)
 		if err := ApplyKustomizationWithRetries(s.path, s.kubeconfig); err != nil {
-			klog.Warningf("Applying kustomization failed: %s. Giving up.", err)
+			klog.Fatalf("Applying kustomization failed: %s. Giving up.", err)
 		} else {
 			klog.Warningf("Kustomization applied successfully.")
 		}
