@@ -15,7 +15,7 @@ jobs:
         run: sudo dnf install -y copr-cli golang gcc make systemd policycoreutils rpm-build git which
 
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 

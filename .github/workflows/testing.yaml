@@ -25,6 +25,6 @@ jobs:
       with:
         go-version: ${{ matrix.go-version }}
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Test
       run: go test $(go list ./... | grep -v /vendor/ | grep -v /scripts)
