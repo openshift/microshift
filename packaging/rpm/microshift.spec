@@ -14,7 +14,6 @@
 
 # SELinux specifics
 %global selinuxtype targeted
-%define selinux_policyver 3.14.3-67
 %define container_policyver 2.167.0-1
 %define container_policy_epoch 2
 %define microshift_relabel_files() \
@@ -95,11 +94,8 @@ Things break. But you can still help shape it, too.
 
 %package selinux
 Summary: SELinux policies for MicroShift
-BuildRequires: selinux-policy >= %{selinux_policyver}
-BuildRequires: selinux-policy-devel >= %{selinux_policyver}
 Requires: container-selinux >= %{container_policy_epoch}:%{container_policyver}
 BuildArch: noarch
-%{?selinux_requires}
 
 %description selinux
 SElinux policy modules for MicroShift.
@@ -222,6 +218,9 @@ fi
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
 %changelog
+* Mon Mar 28 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.8.0-0.microshift-2022-03-28-130402
+- Removing SElinux policy as BuildRequire
+
 * Mon Feb 7 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshiftr-2022_02_02_194009_3
 - Selinux directory creation and labeling
 
