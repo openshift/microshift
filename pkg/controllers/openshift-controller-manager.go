@@ -17,7 +17,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -107,7 +106,7 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	go func() {
 		healthcheckStatus := util.RetryTCPConnection("127.0.0.1", "8445")
 		if !healthcheckStatus {
-			klog.Fatalf(s.Name(), fmt.Errorf("healthcheck status"), "%s failed to start")
+			klog.Fatalf("initial healthcheck on %s failed", s.Name())
 		}
 		klog.Infof("%s is ready", s.Name())
 		close(ready)
@@ -116,13 +115,18 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	if err := assets.ApplyNamespaces([]string{
 		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
 	}, s.kubeconfig); err != nil {
-		klog.Warningf("failed to apply openshift namespaces %v", err)
+		klog.Fatalf("failed to apply openshift namespaces %v", err)
 	}
 
 	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
 	options.ConfigFilePath = s.ConfigFilePath
-	if err := options.StartControllerManager(); err != nil {
-		klog.Fatalf("Failed to start openshift-controller-manager %v", err)
-	}
+
+	go func() {
+		if err := options.StartControllerManager(); err != nil {
+			klog.Fatalf("Failed to start openshift-controller-manager %v", err)
+		}
+	}()
+
+	<-ctx.Done()
 	return ctx.Err()
 }
