@@ -121,7 +121,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	go func() {
 		klog.Infof("Started %s", m.Name())
 		if err := m.Run(ctx, ready, stopped); err != nil {
-			klog.Infof("Stopped %s", m.Name(), err)
+			klog.Errorf("Stopped %s: %v", m.Name(), err)
 		} else {
 			klog.Infof("%s completed", m.Name())
 
