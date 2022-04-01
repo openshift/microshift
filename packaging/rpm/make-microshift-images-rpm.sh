@@ -4,45 +4,55 @@ set -e -o pipefail
 # generated from other info
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 BASE_VERSION="$(${SCRIPT_DIR}/../../pkg/release/get.sh base)"
-TARBALL_FILE="microshift-pkg-release-${BASE_VERSION}.tar.gz"
+
 RPMBUILD_DIR="${SCRIPT_DIR}/_rpmbuild/"
-BUILD=${BUILD:-$2}
-BUILD=${BUILD:-all}
-TARGET=${TARGET:-$3}
-TARGET=${TARGET:-x86_64}
+BUILD=${BUILD:-$1}
+BUILD=${BUILD:-rpm}
+TARGET=${TARGET:-$2}
+TARGET=${TARGET:-fedora-35-x86_64}
+RELEASE=${RELEASE:-1}
+COPR_REPO=${COPR_REPO:-@redhat-et/microshift-containers}
 
-
-case $BUILD in
-  all) RPMBUILD_OPT=-ba ;;
-  rpm) RPMBUILD_OPT=-bb ;;
-  srpm) RPMBUILD_OPT=-bs ;;
-esac
-
-ARCHITECTURES=${ARCHITECTURES:-"x86_64 arm64 arm ppc64le riscv64"}
+ARCHITECTURES=${ARCHITECTURES:-"x86_64:amd64 aarch64:arm64"}
 
 build() {
-  cat >"${RPMBUILD_DIR}"SPECS/microshift-images.spec <<EOF
-%global baseVersion ${BASE_VERSION}
-
+  cat >"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
+packages:
+  - name: microshift-images
+    version: $(echo $BASE_VERSION | tr \- _ )
+    release: $RELEASE
+    license: Apache License 2.0
+    summary: MicroShift related container images
+    description: |
+      MicroShift container images packaged for use as a read-only cri-o container storage.
+    url: https://github.com/redhat-et/microshift
+    path: /usr/lib/microshift/images/
+    arch:
 EOF
+
   for arch in $ARCHITECTURES; do
-    echo "%define images_${arch} \"$(${SCRIPT_DIR}/../../pkg/release/get.sh images $arch |  tr '\n' ' ')\"" >> "${RPMBUILD_DIR}"SPECS/microshift-images.spec
-    echo "" >> "${RPMBUILD_DIR}"SPECS/microshift-images.spec
+    IFS=":" read -r rpm_arch container_arch <<< "${arch}"
+    cat >>"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
+      - name: ${rpm_arch}
+        image_arch: ${container_arch}
+        images:
+EOF
+    ${SCRIPT_DIR}/../../pkg/release/get.sh images $container_arch | \
+      while read image; do echo "          - $image"; done >> "${RPMBUILD_DIR}"microshift-images.yaml
   done
 
-  cat "${SCRIPT_DIR}/microshift-images.spec" >> "${RPMBUILD_DIR}SPECS/microshift-images.spec"
+  ${SCRIPT_DIR}/paack.py ${BUILD} --no-cleanup  "${RPMBUILD_DIR}"microshift-images.yaml -r "${RPMBUILD_DIR}" $BUILD_OPT
 
-  sudo rpmbuild "${RPMBUILD_OPT}" --target $TARGET --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}SPECS/microshift-images.spec"
 }
 
 # prepare the rpmbuild env
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
-case $1 in
-    local)
-           build
-           ;;
-    *)
-      echo "Usage: $0 local [all|rpm|srpm]"
+case $BUILD in
+  copr) build;;
+  rpm)  BUILD_OPT=$TARGET build;;
+  srpm) build;;
+      *)
+      echo "Usage: $0 [copr|rpm|srpm]"
       exit 1
 esac
