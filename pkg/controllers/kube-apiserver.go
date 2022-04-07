@@ -110,6 +110,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		"--service-account-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.crt",
 		"--service-account-signing-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
 		"--service-cluster-ip-range=" + cfg.Cluster.ServiceCIDR,
+		"--service-node-port-range=" + cfg.Cluster.ServiceNodePortRange,
 		"--storage-backend=etcd3",
 		"--tls-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
 		"--tls-private-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",

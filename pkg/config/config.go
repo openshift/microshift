@@ -32,10 +32,11 @@ var (
 type ClusterConfig struct {
 	URL string `yaml:"url"`
 
-	ClusterCIDR string `yaml:"clusterCIDR"`
-	ServiceCIDR string `yaml:"serviceCIDR"`
-	DNS         string `yaml:"dns"`
-	Domain      string `yaml:"domain"`
+	ClusterCIDR          string `yaml:"clusterCIDR"`
+	ServiceCIDR          string `yaml:"serviceCIDR"`
+	ServiceNodePortRange string `yaml:"serviceNodePortRange"`
+	DNS                  string `yaml:"dns"`
+	Domain               string `yaml:"domain"`
 }
 
 type ControlPlaneConfig struct {
@@ -82,11 +83,12 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		NodeName:    nodeName,
 		NodeIP:      nodeIP,
 		Cluster: ClusterConfig{
-			URL:         "https://127.0.0.1:6443",
-			ClusterCIDR: "10.42.0.0/16",
-			ServiceCIDR: "10.43.0.0/16",
-			DNS:         "10.43.0.10",
-			Domain:      "cluster.local",
+			URL:                  "https://127.0.0.1:6443",
+			ClusterCIDR:          "10.42.0.0/16",
+			ServiceCIDR:          "10.43.0.0/16",
+			ServiceNodePortRange: "30000-32767",
+			DNS:                  "10.43.0.10",
+			Domain:               "cluster.local",
 		},
 		ControlPlane: ControlPlaneConfig{},
 		Node:         NodeConfig{},

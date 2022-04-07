@@ -46,11 +46,12 @@ func TestCommandLineConfig(t *testing.T) {
 				NodeName:    "node1",
 				NodeIP:      "1.2.3.4",
 				Cluster: ClusterConfig{
-					URL:         "https://1.2.3.4:6443",
-					ClusterCIDR: "10.20.30.40/16",
-					ServiceCIDR: "40.30.20.10/16",
-					DNS:         "cluster.dns",
-					Domain:      "cluster.local",
+					URL:                  "https://1.2.3.4:6443",
+					ClusterCIDR:          "10.20.30.40/16",
+					ServiceCIDR:          "40.30.20.10/16",
+					ServiceNodePortRange: "1024-32767",
+					DNS:                  "cluster.dns",
+					Domain:               "cluster.local",
 				},
 			},
 			err: nil,
@@ -70,6 +71,7 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.StringVar(&config.Cluster.URL, "cluster-url", "", "")
 		flags.StringVar(&config.Cluster.ClusterCIDR, "cluster-cidr", "", "")
 		flags.StringVar(&config.Cluster.ServiceCIDR, "service-cidr", "", "")
+		flags.StringVar(&config.Cluster.ServiceNodePortRange, "service-node-port-range", "", "")
 		flags.StringVar(&config.Cluster.DNS, "cluster-dns", "", "")
 		flags.StringVar(&config.Cluster.Domain, "cluster-domain", "", "")
 
@@ -84,6 +86,7 @@ func TestCommandLineConfig(t *testing.T) {
 			"--cluster-url=" + tt.config.Cluster.URL,
 			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
 			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
+			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
 			"--cluster-dns=" + tt.config.Cluster.DNS,
 			"--cluster-domain=" + tt.config.Cluster.Domain,
 		})
@@ -120,11 +123,12 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				NodeName:    "node1",
 				NodeIP:      "1.2.3.4",
 				Cluster: ClusterConfig{
-					URL:         "https://cluster.com:4343/endpoint",
-					ClusterCIDR: "10.20.30.40/16",
-					ServiceCIDR: "40.30.20.10/16",
-					DNS:         "10.43.0.10",
-					Domain:      "cluster.local",
+					URL:                  "https://cluster.com:4343/endpoint",
+					ClusterCIDR:          "10.20.30.40/16",
+					ServiceCIDR:          "40.30.20.10/16",
+					ServiceNodePortRange: "1024-32767",
+					DNS:                  "10.43.0.10",
+					Domain:               "cluster.local",
 				},
 			},
 			err: nil,
@@ -142,6 +146,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
+				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
 				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
 				{"MICROSHIFT_CLUSTER_DOMAIN", "cluster.local"},
 			},
