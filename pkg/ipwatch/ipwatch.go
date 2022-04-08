@@ -18,6 +18,7 @@ package ipwatch
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -55,7 +56,7 @@ func (c *IPWatchController) Run(ctx context.Context, ready chan<- struct{}, stop
 			currentIP, _ := util.GetHostIP()
 			if c.NodeIP != currentIP {
 				klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIP, currentIP)
-				<-ctx.Done()
+				os.Exit(0)
 				return nil
 			}
 
