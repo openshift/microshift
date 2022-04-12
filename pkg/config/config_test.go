@@ -53,6 +53,7 @@ func TestCommandLineConfig(t *testing.T) {
 					DNS:                  "cluster.dns",
 					Domain:               "cluster.local",
 				},
+				Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, "/tmp/microshift/data/manifests"},
 			},
 			err: nil,
 		},
@@ -130,6 +131,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					DNS:                  "10.43.0.10",
 					Domain:               "cluster.local",
 				},
+				Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, "/tmp/microshift/data/manifests"},
 			},
 			err: nil,
 			envList: []struct {
@@ -149,6 +151,45 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
 				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
 				{"MICROSHIFT_CLUSTER_DOMAIN", "cluster.local"},
+			},
+		},
+		{
+			desiredMicroShiftConfig: &MicroshiftConfig{
+				ConfigFile:  "/to/config/file",
+				DataDir:     "/tmp/microshift/data",
+				AuditLogDir: "/tmp/microshift/logs",
+				LogVLevel:   23,
+				Roles:       []string{"controlplane", "node"},
+				NodeName:    "node1",
+				NodeIP:      "1.2.3.4",
+				Cluster: ClusterConfig{
+					URL:                  "https://cluster.com:4343/endpoint",
+					ClusterCIDR:          "10.20.30.40/16",
+					ServiceCIDR:          "40.30.20.10/16",
+					ServiceNodePortRange: "1024-32767",
+					DNS:                  "10.43.0.10",
+					Domain:               "cluster.local",
+				},
+				Manifests: []string{"/my/manifests1", "/my/manifests2"},
+			},
+			err: nil,
+			envList: []struct {
+				varName string
+				value   string
+			}{
+				{"MICROSHIFT_CONFIGFILE", "/to/config/file"},
+				{"MICROSHIFT_DATADIR", "/tmp/microshift/data"},
+				{"MICROSHIFT_AUDITLOGDIR", "/tmp/microshift/logs"},
+				{"MICROSHIFT_LOGVLEVEL", "23"},
+				{"MICROSHIFT_ROLES", "controlplane,node"},
+				{"MICROSHIFT_NODENAME", "node1"},
+				{"MICROSHIFT_NODEIP", "1.2.3.4"},
+				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
+				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
+				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
+				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
+				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
+				{"MICROSHIFT_MANIFESTS", "/my/manifests1,/my/manifests2"},
 			},
 		},
 	}

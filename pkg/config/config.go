@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path/filepath"
+	"reflect"
 	"strconv"
 
 	"github.com/kelseyhightower/envconfig"
@@ -22,6 +24,10 @@ const (
 	defaultUserDataDir      = "~/.microshift/data"
 	defaultGlobalConfigFile = "/etc/microshift/config.yaml"
 	defaultGlobalDataDir    = "/var/lib/microshift"
+	// for files managed via management system in /etc, i.e. user applications
+	defaultManifestDirEtc = "/etc/microshift/manifests"
+	// for files embedded in ostree. i.e. cni/other component customizations
+	defaultManifestDirLib = "/usr/lib/microshift/manifests"
 )
 
 var (
@@ -62,6 +68,8 @@ type MicroshiftConfig struct {
 	Cluster      ClusterConfig      `yaml:"cluster"`
 	ControlPlane ControlPlaneConfig `yaml:"controlPlane"`
 	Node         NodeConfig         `yaml:"node"`
+
+	Manifests []string `yaml:"manifests"`
 }
 
 func NewMicroshiftConfig() *MicroshiftConfig {
@@ -74,9 +82,11 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		klog.Warningf("failed to get host IP: %v, using: %q", err, nodeIP)
 	}
 
+	dataDir := findDataDir()
+
 	return &MicroshiftConfig{
 		ConfigFile:  findConfigFile(),
-		DataDir:     findDataDir(),
+		DataDir:     dataDir,
 		AuditLogDir: "",
 		LogVLevel:   0,
 		Roles:       defaultRoles,
@@ -92,7 +102,9 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		},
 		ControlPlane: ControlPlaneConfig{},
 		Node:         NodeConfig{},
+		Manifests:    []string{defaultManifestDirLib, defaultManifestDirEtc, filepath.Join(dataDir, "manifests")},
 	}
+
 }
 
 // extract the api server port from the cluster URL
@@ -164,16 +176,31 @@ func (c *MicroshiftConfig) ReadFromConfigFile() error {
 		return fmt.Errorf("decoding config file %s: %v", c.ConfigFile, err)
 	}
 
+	c.updateManifestList()
+
 	return nil
 }
 
 func (c *MicroshiftConfig) ReadFromEnv() error {
-	return envconfig.Process("microshift", c)
+	if err := envconfig.Process("microshift", c); err != nil {
+		return err
+	}
+	c.updateManifestList()
+	return nil
+}
+
+func (c *MicroshiftConfig) updateManifestList() {
+	defaultCfg := NewMicroshiftConfig()
+	if c.DataDir != defaultCfg.DataDir && reflect.DeepEqual(defaultCfg.Manifests, c.Manifests) {
+		c.Manifests = []string{defaultManifestDirLib, defaultManifestDirEtc, filepath.Join(c.DataDir, "manifests")}
+	}
 }
 
 func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if dataDir, err := flags.GetString("data-dir"); err == nil && flags.Changed("data-dir") {
 		c.DataDir = dataDir
+		// if the defaults are present, rebuild based on the new data-dir
+		c.updateManifestList()
 	}
 	if auditLogDir, err := flags.GetString("audit-log-dir"); err == nil && flags.Changed("audit-log-dir") {
 		c.AuditLogDir = auditLogDir

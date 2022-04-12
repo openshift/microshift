@@ -13,3 +13,5 @@ cluster:
   serviceCIDR: '40.30.20.10/16'
   dns: 'cluster.dns'
   domain: cluster.local
+manifests:
+  - /etc/my-app/manifests
