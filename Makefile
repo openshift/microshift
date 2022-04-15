@@ -218,6 +218,18 @@ build-containerized-all-in-one-iptables-arm64:
 	+$(MAKE) _build_containerized_aio ARCH=arm64 IPTABLES=iptables
 .PHONY: build-containerized-all-in-one-iptables-arm64
 
+build-containerized-all-in-one-amd64-nightly:
+	+$(MAKE) _build_containerized_aio ARCH=amd64 SOURCE_GIT_TAG=4.8.0-0.microshift-nightly
+.PHONY: build-containerized-all-in-one
+
+build-containerized-all-in-one-arm64-nightly:
+	+$(MAKE) _build_containerized_aio ARCH=arm64 SOURCE_GIT_TAG=4.8.0-0.microshift-nightly
+.PHONY: build-containerized-all-in-one
+
+build-containerized-all-in-one-iptables-arm64-nightly:
+	+$(MAKE) _build_containerized_aio ARCH=arm64 IPTABLES=iptables SOURCE_GIT_TAG=4.8.0-0.microshift-nightly
+.PHONY: build-containerized-all-in-one-iptables-arm64
+
 ###############################
 # container image packaging   #
 ###############################

@@ -5,7 +5,7 @@ on:
     - cron: "15 23 * * *"  #11:15 PM every day
 
 jobs:
-  build:
+  build-binary:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -38,3 +38,34 @@ jobs:
             microshift-linux-amd64
             microshift-linux-arm64
             release.sha256
+  
+  build-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Install required packages
+        run: sudo apt install build-essential qemu-user qemu-user-static  
+
+      - name: launch amd build
+        run: make build-containerized-all-in-one-amd64-nightly
+
+      - name: launch arm build
+        run: make build-containerized-all-in-one-arm64-nightly
+
+      - name: launch arm iptables build
+        run: make build-containerized-all-in-one-iptables-arm64-nightly
+
+      - name: Login to Quay
+        uses: docker/login-action@v1
+        with:
+          registry: quay.io
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASS }}
+
+      - name: push assets
+        run: |
+          for i in `podman images --sort repository --format "{{.Repository}}:{{.Tag}}" quay.io/microshift/microshift-aio`; do
+            podman push $i
+          done
