@@ -237,7 +237,7 @@ class SRPMBuilderCommand(object):
                 for arch_info in package['arch']:
                     arch = arch_info['name']
                     tar_path = self._create_tarball(package, arch_info)
-                    print("scanning %s to generate files section for arch %s" %(tar_path, arch))
+                    print("scanning %s to generate files section for arch %s" % (tar_path, arch))
                     spec.scan_files(tar_path, arch)
 
                 spec.set_version(package['version'])
