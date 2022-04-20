@@ -18,12 +18,12 @@ package controllers
 import (
 	"context"
 	"io/ioutil"
+	"reflect"
 	"strings"
-
-	"k8s.io/klog/v2"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/pkg/errors"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -31,6 +31,7 @@ import (
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
 
 	"k8s.io/apimachinery/pkg/util/intstr"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
@@ -44,6 +45,64 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig, svcName string, svcPort 
 	}
 
 	client := coreclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "core-agent"))
+
+	if err = ensureService(client, svcName); err != nil {
+		return errors.Wrapf(err, "Error creating service %q", svcName)
+	}
+
+	if err != ensureIPEndpoints(client, svcName, cfg.NodeIP, svcPort) {
+		return errors.Wrapf(err, "Error creating IP endpoints for service %q, IP %q:%d", svcName, cfg.NodeIP, svcPort)
+	}
+
+	return nil
+}
+
+func ensureIPEndpoints(client *coreclientv1.CoreV1Client, svcName, svcIP string, svcPort int) error {
+	expectedEndpoints := &corev1.Endpoints{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Endpoints",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      svcName,
+			Namespace: "default",
+		},
+		Subsets: []corev1.EndpointSubset{
+			{
+				Addresses: []corev1.EndpointAddress{{IP: svcIP}},
+				Ports: []corev1.EndpointPort{
+					{
+						Port:     int32(svcPort),
+						Protocol: corev1.ProtocolTCP,
+					},
+				},
+			},
+		},
+	}
+
+	endpoints, err := client.Endpoints("default").Get(context.TODO(), expectedEndpoints.Name, metav1.GetOptions{})
+	if err == nil {
+		if !reflect.DeepEqual(endpoints.Subsets, expectedEndpoints.Subsets) {
+			klog.Infof("deleting outdated endpoints %s", endpoints.Name)
+			if err := client.Endpoints("default").Delete(context.TODO(), endpoints.Name, metav1.DeleteOptions{}); err != nil {
+				return errors.Wrapf(err, "Error deleting outdated endpoints %q", endpoints.Name)
+			}
+		} else {
+			klog.Infof("expected endpoint already exists %s", endpoints.Name)
+			return nil
+		}
+	}
+
+	klog.Infof("creating endpoints %s", endpoints.Name)
+	_, err = client.Endpoints("default").Create(context.TODO(), expectedEndpoints, metav1.CreateOptions{})
+	if err != nil {
+		klog.Errorf("error creating endpoints %q: %v", endpoints.Name, err)
+		return err
+	}
+	return nil
+}
+
+func ensureService(client *coreclientv1.CoreV1Client, svcName string) error {
 	svc := &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
@@ -64,52 +123,18 @@ func createAPIHeadlessSvc(cfg *config.MicroshiftConfig, svcName string, svcPort 
 			},
 		},
 	}
-	_, err = client.Services("default").Get(context.TODO(), svc.Name, metav1.GetOptions{})
+
+	_, err := client.Services("default").Get(context.TODO(), svc.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		klog.Infof("Creating service %s", svc.Name)
+		klog.Infof("creating service %s", svc.Name)
 		_, err = client.Services("default").Create(context.TODO(), svc, metav1.CreateOptions{})
 		if err != nil {
-			return err
-		}
-		endpoints := &corev1.Endpoints{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "Endpoints",
-				APIVersion: "v1",
-			},
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      svcName,
-				Namespace: "default",
-			},
-		}
-
-		k8s_endpoints, err := client.Endpoints("default").Get(context.TODO(), "kubernetes", metav1.GetOptions{})
-		if err != nil {
-			klog.Infof("Failed to find kubernetes endpoints")
-		}
-		subsets := endpoints.Subsets
-		for _, sub := range k8s_endpoints.Subsets {
-			addr := sub.Addresses
-			ports := []corev1.EndpointPort{
-				{
-					Port: int32(svcPort),
-				},
-			}
-			subsets = append(subsets,
-				corev1.EndpointSubset{
-					Addresses: addr,
-					Ports:     ports,
-				})
-		}
-		endpoints.Subsets = subsets
-		_, err = client.Endpoints("default").Get(context.TODO(), endpoints.Name, metav1.GetOptions{})
-		if apierrors.IsNotFound(err) {
-			klog.Infof("Creating endpoints %s", endpoints.Name)
-			_, err = client.Endpoints("default").Create(context.TODO(), endpoints, metav1.CreateOptions{})
 			return err
 		}
 	}
 	return nil
 }
+
 func trimFirst(s string, sep string) string {
 	parts := strings.Split(s, sep)
 	return strings.Join(parts[1:], sep)
@@ -159,7 +184,7 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 		}
 		_, err = client.APIServices().Get(context.TODO(), api.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			klog.Infof("Creating api registration %s", api.Name)
+			klog.Infof("creating api registration %s", api.Name)
 			_, _ = client.APIServices().Create(context.TODO(), api, metav1.CreateOptions{})
 		}
 	}
@@ -210,7 +235,7 @@ func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
 		}
 	)
 	if err := assets.ApplySCCs(sccs, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply sccs %v", err)
+		klog.Warningf("failed to apply sccs %v", err)
 		return err
 	}
 	return nil

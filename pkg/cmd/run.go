@@ -12,6 +12,7 @@ import (
 	"github.com/coreos/go-systemd/daemon"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
+	"github.com/openshift/microshift/pkg/ipwatch"
 	"github.com/openshift/microshift/pkg/kustomize"
 	"github.com/openshift/microshift/pkg/mdns"
 	"github.com/openshift/microshift/pkg/node"
@@ -95,6 +96,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	m := servicemanager.NewServiceManager()
 	if config.StringInList("controlplane", cfg.Roles) {
 		util.Must(m.AddService(controllers.NewEtcd(cfg)))
+		util.Must(m.AddService(ipwatch.NewIPWatchController(cfg)))
 		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
 		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
 		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
@@ -110,6 +112,9 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	}
 
 	if config.StringInList("node", cfg.Roles) {
+		if len(cfg.Roles) == 1 {
+			util.Must(m.AddService(ipwatch.NewIPWatchController(cfg)))
+		}
 		util.Must(m.AddService(node.NewKubeletServer(cfg)))
 		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
 	}
