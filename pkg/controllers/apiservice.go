@@ -70,24 +70,33 @@ func ensureIPEndpoints(client *coreclientv1.CoreV1Client, svcName, svcIP string,
 		Subsets: []corev1.EndpointSubset{
 			{
 				Addresses: []corev1.EndpointAddress{{IP: svcIP}},
-				Ports:     []corev1.EndpointPort{{Port: int32(svcPort)}},
+				Ports: []corev1.EndpointPort{
+					{
+						Port:     int32(svcPort),
+						Protocol: corev1.ProtocolTCP,
+					},
+				},
 			},
 		},
 	}
 
 	endpoints, err := client.Endpoints("default").Get(context.TODO(), expectedEndpoints.Name, metav1.GetOptions{})
-	if endpoints != nil {
+	if err == nil {
 		if !reflect.DeepEqual(endpoints.Subsets, expectedEndpoints.Subsets) {
 			klog.Infof("deleting outdated endpoints %s", endpoints.Name)
 			if err := client.Endpoints("default").Delete(context.TODO(), endpoints.Name, metav1.DeleteOptions{}); err != nil {
 				return errors.Wrapf(err, "Error deleting outdated endpoints %q", endpoints.Name)
 			}
+		} else {
+			klog.Infof("expected endpoint already exists %s", endpoints.Name)
+			return nil
 		}
 	}
 
-	if apierrors.IsNotFound(err) || endpoints != nil {
-		klog.Infof("creating endpoints %s", endpoints.Name)
-		_, err = client.Endpoints("default").Create(context.TODO(), expectedEndpoints, metav1.CreateOptions{})
+	klog.Infof("creating endpoints %s", endpoints.Name)
+	_, err = client.Endpoints("default").Create(context.TODO(), expectedEndpoints, metav1.CreateOptions{})
+	if err != nil {
+		klog.Errorf("error creating endpoints %q: %v", endpoints.Name, err)
 		return err
 	}
 	return nil
