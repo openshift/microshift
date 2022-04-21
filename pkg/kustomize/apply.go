@@ -26,13 +26,13 @@ const (
 )
 
 type Kustomizer struct {
-	path       string
+	paths      []string
 	kubeconfig string
 }
 
 func NewKustomizer(cfg *config.MicroshiftConfig) *Kustomizer {
 	return &Kustomizer{
-		path:       filepath.Join(cfg.DataDir, "manifests"),
+		paths:      cfg.Manifests,
 		kubeconfig: filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig"),
 	}
 }
@@ -44,10 +44,18 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 	defer close(stopped)
 	defer close(ready)
 
-	kustomization := filepath.Join(s.path, "kustomization.yaml")
+	for _, path := range s.paths {
+		s.ApplyKustomizationPath(path)
+	}
+
+	return ctx.Err()
+}
+
+func (s *Kustomizer) ApplyKustomizationPath(path string) {
+	kustomization := filepath.Join(path, "kustomization.yaml")
 	if _, err := os.Stat(kustomization); !errors.Is(err, os.ErrNotExist) {
 		klog.Infof("Applying kustomization at %v ", kustomization)
-		if err := ApplyKustomizationWithRetries(s.path, s.kubeconfig); err != nil {
+		if err := ApplyKustomizationWithRetries(path, s.kubeconfig); err != nil {
 			klog.Fatalf("Applying kustomization failed: %s. Giving up.", err)
 		} else {
 			klog.Warningf("Kustomization applied successfully.")
@@ -55,8 +63,6 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 	} else {
 		klog.Infof("No kustomization found at " + kustomization)
 	}
-
-	return ctx.Err()
 }
 
 func ApplyKustomizationWithRetries(kustomization string, kubeconfig string) error {
