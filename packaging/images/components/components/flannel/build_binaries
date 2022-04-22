@@ -1,6 +1,0 @@
-#!/bin/sh
-
-mkdir -p bin
-
-cd src || exit
-GOOS=linux GOARCH=$1 make dist/flanneld && mv dist/flanneld ../bin/flanneld-"$1"

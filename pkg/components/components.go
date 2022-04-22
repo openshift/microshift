@@ -24,9 +24,5 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		klog.Warningf("Failed to start DNS controller: %v", err)
 		return err
 	}
-	if err := startFlannel(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
-		klog.Warningf("Failed to start Flannel: %v", err)
-		return err
-	}
 	return nil
 }

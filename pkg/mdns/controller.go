@@ -49,8 +49,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	for n := range ifs {
 		name := ifs[n].Name
-		if strings.HasPrefix(name, "flannel") ||
-			strings.HasPrefix(name, "veth") ||
+		if strings.HasPrefix(name, "veth") ||
 			strings.HasPrefix(name, "cni") {
 			continue
 		}
