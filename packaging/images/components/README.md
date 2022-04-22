@@ -12,7 +12,7 @@ architectures MicroShift supports like `arm`, `arm64`, `ppc64le`, `riscv64`
 as environment variables you can use to tweak and debug the build:
 
 * `DEST_REGISTRY=quay.io/microshift`
-* `COMPONENTS="base-image pause cli coredns flannel haproxy-router hostpath-provisioner kube-rbac-proxy service-ca-operator"`
+* `COMPONENTS="base-image pause cli coredns haproxy-router hostpath-provisioner kube-rbac-proxy service-ca-operator"`
 * `ARCHITECTURES="amd64 arm64 arm ppc64le riscv64"`
 * `PUSH=no`
 * `PARALLEL=yes`
