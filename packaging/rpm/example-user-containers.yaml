@@ -3,7 +3,7 @@
 packages:
   - name: my-application-containers
     version: 1.0.0
-    release: 1
+    release: 2
     license: Apache License 2.0
     summary: Application specific containers
     description: |
@@ -20,3 +20,16 @@ packages:
         images:
           - docker.io/library/nginx:1.21.6
 
+  - name: my-application-manifests
+    version: 1.0.0
+    release: 2
+    license: Apache License 2.0
+    summary: Application specific manifests
+    description: |
+        This package provides a manifests for the deployed application containers.
+    manifestPath: /usr/lib/microshift/manifests
+    arch:
+      - name: x86_64
+        manifests: ./example-manifests
+      - name: aarch64
+        manifests: ./example-manifests

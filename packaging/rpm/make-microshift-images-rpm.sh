@@ -18,7 +18,7 @@ ARCHITECTURES=${ARCHITECTURES:-"x86_64:amd64 aarch64:arm64"}
 build() {
   cat >"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
 packages:
-  - name: microshift-images
+  - name: microshift-containers
     version: $(echo $BASE_VERSION | tr \- _ )
     release: $RELEASE
     license: Apache License 2.0
@@ -41,7 +41,7 @@ EOF
       while read image; do echo "          - $image"; done >> "${RPMBUILD_DIR}"microshift-images.yaml
   done
 
-  ${SCRIPT_DIR}/paack.py ${BUILD} --no-cleanup  "${RPMBUILD_DIR}"microshift-images.yaml -r "${RPMBUILD_DIR}" $BUILD_OPT
+  ${SCRIPT_DIR}/paack.py ${BUILD}  "${RPMBUILD_DIR}"microshift-images.yaml -r "${RPMBUILD_DIR}" $BUILD_OPT
 
 }
 
@@ -49,7 +49,7 @@ EOF
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 case $BUILD in
-  copr) build;;
+  copr) BUILD_OPT=$COPR_REPO build;;
   rpm)  BUILD_OPT=$TARGET build;;
   srpm) build;;
       *)
