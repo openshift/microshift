@@ -64,6 +64,9 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	if err := s.configureAuditPolicy(cfg); err != nil {
 		klog.Fatalf("Failed to configure kube-apiserver audit policy %v", err)
 	}
+	if err := s.configureTracingConfig(cfg); err != nil {
+		klog.Fatalf("Failed to configure kube-apiserver tracing configuration %v", err)
+	}
 	if err := s.configureOAuth(cfg); err != nil {
 		klog.Fatalf("Failed to configure kube-apiserver OAuth %v", err)
 	}
@@ -95,6 +98,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		"--etcd-certfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt",
 		"--etcd-keyfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key",
 		"--etcd-servers=https://127.0.0.1:2379",
+		"--feature-gates=APIServerTracing=true",
 		"--kubelet-certificate-authority=" + caCertFile,
 		"--kubelet-client-certificate=" + cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt",
 		"--kubelet-client-key=" + cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key",
@@ -114,6 +118,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		"--storage-backend=etcd3",
 		"--tls-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
 		"--tls-private-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
+		"--tracing-config-file=" + cfg.DataDir + "/resources/kube-apiserver/tracing-config.yaml",
 		"--cors-allowed-origins=/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$",
 	}
 	if cfg.AuditLogDir != "" {
@@ -140,6 +145,18 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	}
 
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+}
+
+func (s *KubeAPIServer) configureTracingConfig(cfg *config.MicroshiftConfig) error {
+	data := []byte(`
+apiVersion: apiserver.config.k8s.io/v1alpha1
+kind: TracingConfiguration
+# 99% sampling rate
+samplingRatePerMillion: 999999`)
+
+	path := filepath.Join(cfg.DataDir, "resources", "kube-apiserver", "tracing-config.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }
 
 func (s *KubeAPIServer) configureAuditPolicy(cfg *config.MicroshiftConfig) error {
