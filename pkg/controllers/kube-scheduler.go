@@ -90,6 +90,9 @@ leaderElection:
   leaderElect: false`)
 
 	path := filepath.Join(cfg.DataDir, "resources", "kube-scheduler", "config", "config.yaml")
+	if _, err := os.Stat(path); err == nil {
+		return nil
+	}
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	return ioutil.WriteFile(path, data, 0644)
 }
