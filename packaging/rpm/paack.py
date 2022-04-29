@@ -2,6 +2,7 @@
 import argparse
 import os
 import sys
+import subprocess
 import tarfile
 import yaml
 
@@ -79,6 +80,10 @@ rm -rf  %{buildroot}
 # fix permissions here so that cpio can work later
 find ./ -perm 000 -exec chmod 400 {} +
 
+%pre
+
+%%_PRE_%%
+
 %post
 
 %%_POST_%%
@@ -121,7 +126,10 @@ class SpecFile(object):
         self._manifest_path = None
         self._requires = ""
         self._post = ""
+        self._pre = ""
         self._postun = ""
+        self._uid = {}
+        self._gid = {}
 
     def _set(self, field, contents, required, default=''):
         if contents is None and required:
@@ -170,6 +178,9 @@ class SpecFile(object):
     def add_post(self, post):
         self._post += post + "\n"
 
+    def add_pre(self, pre):
+        self._pre += pre + "\n"
+
     def add_postun(self, postun):
         self._postun += postun + "\n"
 
@@ -185,6 +196,7 @@ class SpecFile(object):
         self._set('MANIFEST_STORE', self._image_store, False, '/usr/lib/microshift/manifests/')
         self._set('REQUIRES', self._requires, False, '')
         self._set('POST', self._post, False, '')
+        self._set('PRE', self._pre, False, '')
         self._set('POSTUN', self._postun, False, '')
         if self._url:
             self._set('URL', "Url: " + self._url, False)
@@ -205,23 +217,59 @@ class SpecFile(object):
             for tarinfo in tar:
                 yield tarinfo
 
+    def _get_symbolic_uid(self, uid):
+        if uid == 0:
+            return 'root'
+        elif uid not in self._uid:
+            username = 'paack-%d' % uid
+            self._uid[uid] = username
+            self.add_pre("getent passwd %s >/dev/null 2>&1 || useradd %s -u %d --non-unique --no-user-group -s /sbin/nologin --no-create-home" %
+                            (username, username, uid))
+        return self._uid[uid]
+
+    def _get_symbolic_gid(self, uid):
+        if uid == 0:
+            return 'root'
+        elif uid not in self._uid:
+            groupname = 'paack-%d' % uid
+            self._uid[uid] = groupname
+            self.add_pre("groupadd -f %s -g %d --non-unique" % (groupname, uid))
+        return self._uid[uid]
+
     def scan_crio_storage_tar(self, tar, arch):
         output = ""
+        caps = self._read_caps(tar + ".caps")
 
         for info in SpecFile._get_files(tar):
+            filename = info.name[2:] #remove the ./
+
             if info.type in [tarfile.LNKTYPE, tarfile.REGTYPE]:
                 # directories, hard links and regular files
-                output += "%%attr(%o,%d,%d) \"%%{imageStore}%s\"\n" % (info.mode, info.uid, info.gid, info.name)
+                cap = caps.get(filename)
+                capstr = ""
+                if cap:
+                    capstr = ' %caps(' + cap + ')'
+                output += "%%attr(%o,%s,%s)%s \"%%{imageStore}%s\"\n" % (info.mode, self._get_symbolic_uid(info.uid), self._get_symbolic_gid(info.gid), capstr, filename)
             if info.type in [tarfile.SYMTYPE]:
                 # symlinks have no mode permissions
-                output += "%%attr(-,%d,%d) \"%%{imageStore}%s\"\n" % (info.uid, info.gid, info.name)
+                output += "%%attr(-,%s,%s) \"%%{imageStore}%s\"\n" % (self._get_symbolic_uid(info.uid), self._get_symbolic_gid(info.gid), filename)
             if info.type in [tarfile.DIRTYPE]:
                 # directories, hard links and regular files
-                output += "%%dir %%attr(%o,%d,%d) \"%%{imageStore}%s\"\n" % (info.mode, info.uid, info.gid, info.name)
+                output += "%%dir %%attr(%o,%s,%s) \"%%{imageStore}%s\"\n" % (info.mode, self._get_symbolic_uid(info.uid), self._get_symbolic_gid(info.gid), filename)
 
         self._files_data += "\n\n%ifarch " + arch + "\n" + output + "%endif\n"
         self._extract_archs += "\n\n%ifarch " + arch + "\n" + IMAGE_INSTALLPREP + "tar xfj %{SOURCE"+str(self._source_i) + "}\n%endif"
         self._add_source(tar)
+
+    def _read_caps(self, filename):
+        print("reading capabilities from ", filename)
+        file_caps = {}
+        with open(filename, 'rb') as f:
+            for line in f.readlines():
+                path, caps = line.decode().rstrip('\n').split(' ')
+                file_caps[path] = caps
+        print(file_caps)
+        return file_caps
 
     def scan_manifests_tar(self, tar, arch):
         output = ""
@@ -340,6 +388,11 @@ class SRPMBuilderCommand(object):
             print("building srpm for " + spec_filename)
             system('rpmbuild -bs --define "_topdir %s" %s' % (self._rpmbuild_dir, spec_filename))
 
+    def _extract_caps(self, directory, out_file):
+        out = subprocess.check_output(['sh', '-c', 'cd %s; sudo getcap * -r' % directory])
+        with open(out_file, 'wb') as f:
+            f.write(out)
+
     def _create_images_tarball(self, package, arch_info):
         tar_dir = os.path.join(self._rpmbuild_dir, 'SOURCES')
         tar_file = '%s-%s-%s-%s.tar.bz2' % (package['name'], package['version'], package['release'], arch_info['name'])
@@ -363,6 +416,8 @@ class SRPMBuilderCommand(object):
             print("creating %s" % tar_path)
                     # root permissions needed to capture all files with various uid/gid/perms
             system("cd %s; sudo tar cfj %s . && sudo chmod a+rw %s" % (directory, tar_path, tar_path))
+            # we need to preserve file capabilities along with the tar, tar or cpio don't support this
+            self._extract_caps(directory, tar_path + ".caps")
 
         return tar_path
 
