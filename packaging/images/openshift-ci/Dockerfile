@@ -10,6 +10,13 @@ COPY . .
 
 RUN yum install gpgme-devel glibc-static libassuan-devel -y
 
+# update to go-1.18
+RUN  wget https://go.dev/dl/go1.18.1.linux-amd64.tar.gz && \
+    rm -rf /usr/bin/go && rm -rf /usr/local/go && \
+    tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz && \
+    export PATH=$PATH:/usr/local/go/bin && \
+    rm go1.18.1.linux-amd64.tar.gz
+
 # clean out binaries that may have been copied in form build context before running target
 RUN make clean cross-build-linux-amd64 cross-build-linux-arm64
 
