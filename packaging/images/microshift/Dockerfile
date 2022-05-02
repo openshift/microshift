@@ -16,7 +16,12 @@ WORKDIR $GOPATH/src/github.com/redhat-et/microshift
 
 COPY . .
 
-RUN make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG BIN_TIMESTAMP=$BIN_TIMESTAMP
+RUN wget https://go.dev/dl/go1.18.1.linux-amd64.tar.gz && \
+    rm -rf /usr/bin/go && rm -rf /usr/local/go && \
+    tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz && \
+    export PATH=$PATH:/usr/local/go/bin && \
+    rm go1.18.1.linux-amd64.tar.gz && \
+    make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG BIN_TIMESTAMP=$BIN_TIMESTAMP
 
 # RUN STAGE
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
