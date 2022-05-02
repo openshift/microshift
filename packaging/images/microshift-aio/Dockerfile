@@ -14,13 +14,17 @@ WORKDIR $GOPATH/src/github.com/redhat-et/microshift
 COPY . .
 
 USER root
-
 # only need these args and the COPY for FROM_SOURCE="true"
 ARG MAKE_TARGET
 ARG BIN_TIMESTAMP
 ARG SOURCE_GIT_TAG
 
 RUN if [ "$FROM_SOURCE" == "true" ]; then \
+      wget https://go.dev/dl/go1.18.1.linux-amd64.tar.gz && \
+      rm -rf /usr/bin/go && rm -rf /usr/local/go && \
+      tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz && \
+      export PATH=$PATH:/usr/local/go/bin && \
+      rm go1.18.1.linux-amd64.tar.gz && \
       make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG BIN_TIMESTAMP=$BIN_TIMESTAMP && \
       mv _output/bin/linux_$ARCH/microshift microshift; \
     else \
@@ -43,14 +47,14 @@ COPY $BUILD_PATH/kubelet-cgroups.conf /etc/systemd/system.conf.d/kubelet-cgroups
 COPY packaging/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/microshift.conf
 
 # OCP_VERSION pushed ahead to 4.9.11 because aarch64 is now available, and it is backwards compatible
-RUN export OCP_VERSION=4.9.11 && \
+RUN export OCP_VERSION=4.10.13 && \
     curl -o oc.tar.gz https://mirror2.openshift.com/pub/openshift-v4/$ARCH/clients/ocp/$OCP_VERSION/openshift-client-linux-$OCP_VERSION.tar.gz && \
     tar -xzvf oc.tar.gz && \
     rm oc.tar.gz && \
     install -t /usr/local/bin {kubectl,oc}
 
 RUN chmod 755 /usr/local/bin/microshift
-RUN export VERSION=1.21 && \
+RUN export VERSION=1.23 && \
     export OS=CentOS_8_Stream && \
     curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/devel:kubic:libcontainers:stable.repo && \
     curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo
