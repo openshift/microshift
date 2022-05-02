@@ -43,6 +43,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	// Read the config flag directly into the struct, so it's immediately available.
 	flags.StringVar(&cfg.ConfigFile, "config", cfg.ConfigFile, "File to read configuration from.")
 	cmd.MarkFlagFilename("config", "yaml", "yml")
+	flags.StringVar(&cfg.ControlPlane.KubeSchedulerCustomConfigPath, "kube-scheduler-config", filepath.Join(cfg.DataDir, "resources/kube-scheduler/config/config.yaml"), "Path to custom kube-scheduler configuration file.")
 	// All other flags will be read after reading both config file and env vars.
 	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
 	flags.String("audit-log-dir", cfg.AuditLogDir, "Directory for storing audit logs.")

@@ -25,8 +25,8 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
-	"github.com/spf13/cobra"
 
+	"github.com/spf13/cobra"
 	klog "k8s.io/klog/v2"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
 	schedulerOptions "k8s.io/kubernetes/cmd/kube-scheduler/app/options"
@@ -57,8 +57,10 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 
 	opts := schedulerOptions.NewOptions()
 
+	klog.Infof("kube-scheduler config: %s", cfg.ControlPlane.KubeSchedulerCustomConfigPath)
+
 	args := []string{
-		"--config=" + cfg.DataDir + "/resources/kube-scheduler/config/config.yaml",
+		"--config=" + cfg.ControlPlane.KubeSchedulerCustomConfigPath,
 	}
 
 	cmd := &cobra.Command{
@@ -90,9 +92,6 @@ leaderElection:
   leaderElect: false`)
 
 	path := filepath.Join(cfg.DataDir, "resources", "kube-scheduler", "config", "config.yaml")
-	if _, err := os.Stat(path); err == nil {
-		return nil
-	}
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
 	return ioutil.WriteFile(path, data, 0644)
 }

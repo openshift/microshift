@@ -10,9 +10,10 @@ import (
 	"reflect"
 	"strconv"
 
+	"github.com/openshift/microshift/pkg/util"
+
 	"github.com/kelseyhightower/envconfig"
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/openshift/microshift/pkg/util"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
 	cliflag "k8s.io/component-base/cli/flag"
@@ -47,6 +48,7 @@ type ClusterConfig struct {
 
 type ControlPlaneConfig struct {
 	// Token string `yaml:"token", envconfig:"CONTROLPLANE_TOKEN"`
+	KubeSchedulerCustomConfigPath string `yaml:"kubeSchedulerConfigPath"`
 }
 
 type NodeConfig struct {
