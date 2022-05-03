@@ -65,6 +65,7 @@ type respLogger struct {
 	addedInfo          strings.Builder
 	addedKeyValuePairs []interface{}
 	startTime          time.Time
+	isTerminating      bool
 
 	captureErrorOutput bool
 
@@ -96,13 +97,13 @@ func DefaultStacktracePred(status int) bool {
 }
 
 // WithLogging wraps the handler with logging.
-func WithLogging(handler http.Handler, pred StacktracePred) http.Handler {
+func WithLogging(handler http.Handler, pred StacktracePred, isTerminatingFn func() bool) http.Handler {
 	return withLogging(handler, pred, func() bool {
 		return klog.V(3).Enabled()
-	})
+	}, isTerminatingFn)
 }
 
-func withLogging(handler http.Handler, stackTracePred StacktracePred, shouldLogRequest ShouldLogRequestPred) http.Handler {
+func withLogging(handler http.Handler, stackTracePred StacktracePred, shouldLogRequest ShouldLogRequestPred, isTerminatingFn func() bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if !shouldLogRequest() {
 			handler.ServeHTTP(w, req)
@@ -113,17 +114,22 @@ func withLogging(handler http.Handler, stackTracePred StacktracePred, shouldLogR
 		if old := respLoggerFromRequest(req); old != nil {
 			panic("multiple WithLogging calls!")
 		}
-
 		startTime := time.Now()
 		if receivedTimestamp, ok := request.ReceivedTimestampFrom(ctx); ok {
 			startTime = receivedTimestamp
 		}
 
-		rl := newLoggedWithStartTime(req, w, startTime)
-		rl.StacktraceWhen(stackTracePred)
+		isTerminating := false
+		if isTerminatingFn != nil {
+			isTerminating = isTerminatingFn()
+		}
+		rl := newLoggedWithStartTime(req, w, startTime).StacktraceWhen(stackTracePred).IsTerminating(isTerminating)
 		req = req.WithContext(context.WithValue(ctx, respLoggerContextKey, rl))
 		defer rl.Log()
 
+		if klog.V(3).Enabled() || (rl.isTerminating && klog.V(1).Enabled()) {
+			defer rl.Log()
+		}
 		w = responsewriter.WrapForHTTP1Or2(rl)
 		handler.ServeHTTP(w, req)
 	})
@@ -176,10 +182,28 @@ func Unlogged(req *http.Request, w http.ResponseWriter) http.ResponseWriter {
 	return w
 }
 
+// DisableStackTraceForRequest stops putting a stacktrace into the log.
+func DisableStackTraceForRequest(req *http.Request) {
+	if req == nil {
+		return
+	}
+	rl := respLoggerFromContext(req.Context())
+	if rl == nil {
+		return
+	}
+	rl.StacktraceWhen(func(int) bool { return false })
+}
+
 // StacktraceWhen sets the stacktrace logging predicate, which decides when to log a stacktrace.
 // There's a default, so you don't need to call this unless you don't like the default.
 func (rl *respLogger) StacktraceWhen(pred StacktracePred) *respLogger {
 	rl.logStacktracePred = pred
+	return rl
+}
+
+// IsTerminating informs the logger that the server is terminating.
+func (rl *respLogger) IsTerminating(is bool) *respLogger {
+	rl.isTerminating = is
 	return rl
 }
 
