@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/config"
-	etcd "go.etcd.io/etcd/embed"
+	etcd "go.etcd.io/etcd/server/v3/embed"
 	"k8s.io/klog/v2"
 )
 
