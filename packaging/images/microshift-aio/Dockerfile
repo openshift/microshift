@@ -14,13 +14,17 @@ WORKDIR $GOPATH/src/github.com/redhat-et/microshift
 COPY . .
 
 USER root
-
 # only need these args and the COPY for FROM_SOURCE="true"
 ARG MAKE_TARGET
 ARG BIN_TIMESTAMP
 ARG SOURCE_GIT_TAG
 
 RUN if [ "$FROM_SOURCE" == "true" ]; then \
+      wget https://go.dev/dl/go1.18.1.linux-amd64.tar.gz && \
+      rm -rf /usr/bin/go && rm -rf /usr/local/go && \
+      tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz && \
+      export PATH=$PATH:/usr/local/go/bin && \
+      rm go1.18.1.linux-amd64.tar.gz && \
       make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG BIN_TIMESTAMP=$BIN_TIMESTAMP && \
       mv _output/bin/linux_$ARCH/microshift microshift; \
     else \
