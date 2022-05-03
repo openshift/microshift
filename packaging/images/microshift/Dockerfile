@@ -31,7 +31,6 @@ COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/_output/bi
 
 RUN mkdir -p /root/crio.conf.d
 
-COPY packaging/crio.conf.d/microshift.conf /root/crio.conf.d/microshift.conf
 COPY packaging/images/microshift/entrypoint.sh /root/entrypoint.sh
 
 ENTRYPOINT ["/root/entrypoint.sh"]

@@ -160,7 +160,6 @@ install -p -m755 hack/cleanup.sh %{buildroot}%{_bindir}/cleanup-all-microshift-d
 restorecon -v %{buildroot}%{_bindir}/microshift
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
-install -p -m644 packaging/crio.conf.d/microshift.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift.conf
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
@@ -179,7 +178,6 @@ install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinu
 
 # only for install, not on upgrades
 if [ $1 -eq 1 ]; then
-	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/microshift.conf
 	systemctl is-active --quiet crio && systemctl restart --quiet crio
 fi
 
@@ -211,7 +209,6 @@ fi
 %{_bindir}/microshift
 %{_bindir}/cleanup-all-microshift-data
 %{_unitdir}/microshift.service
-%{_sysconfdir}/crio/crio.conf.d/microshift.conf
 
 %files selinux
 
