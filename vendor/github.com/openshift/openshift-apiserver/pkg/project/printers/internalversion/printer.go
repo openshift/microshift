@@ -32,7 +32,7 @@ func printProject(project *projectapi.Project, options kprinters.GenerateOptions
 		Object: runtime.RawExtension{Object: project},
 	}
 
-	row.Cells = append(row.Cells, project.Name, project.Annotations[oapi.OpenShiftDisplayName], project.Status.Phase)
+	row.Cells = append(row.Cells, project.Name, project.Annotations[oapi.OpenShiftDisplayName], string(project.Status.Phase))
 
 	return []metav1.TableRow{row}, nil
 }

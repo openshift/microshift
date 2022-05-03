@@ -64,6 +64,11 @@ func (imageStrategy) Validate(ctx context.Context, obj runtime.Object) field.Err
 	return validation.ValidateImage(image)
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (imageStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // AllowCreateOnUpdate is false for images.
 func (imageStrategy) AllowCreateOnUpdate() bool {
 	return false
@@ -139,6 +144,11 @@ func (s imageStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 // ValidateUpdate is the default update validation for an end user.
 func (imageStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	return validation.ValidateImageUpdate(obj.(*imageapi.Image), old.(*imageapi.Image))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (imageStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }
 
 // removeManagedSignatureAnnotation removes deprecated annotation from image signatures. A bug in image update

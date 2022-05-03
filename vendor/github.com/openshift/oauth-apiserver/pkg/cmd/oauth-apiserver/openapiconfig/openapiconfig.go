@@ -2,12 +2,12 @@ package openapiconfig
 
 import (
 	"github.com/MakeNowJust/heredoc"
-	"github.com/go-openapi/spec"
 
 	extensionsapiserver "k8s.io/apiextensions-apiserver/pkg/apiserver"
 	apiserverendpointsopenapi "k8s.io/apiserver/pkg/endpoints/openapi"
 	aggregatorscheme "k8s.io/kube-aggregator/pkg/apiserver/scheme"
 	openapicommon "k8s.io/kube-openapi/pkg/common"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	openapigenerated "github.com/openshift/oauth-apiserver/pkg/openapi"

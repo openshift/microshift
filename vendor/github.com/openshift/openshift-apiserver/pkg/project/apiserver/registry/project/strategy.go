@@ -60,6 +60,11 @@ func (projectStrategy) Validate(ctx context.Context, obj runtime.Object) field.E
 	return validation.ValidateProject(obj.(*projectapi.Project))
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (projectStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // AllowCreateOnUpdate is false for project.
 func (projectStrategy) AllowCreateOnUpdate() bool {
 	return false
@@ -76,4 +81,9 @@ func (projectStrategy) Canonicalize(obj runtime.Object) {
 // ValidateUpdate is the default update validation for an end user.
 func (projectStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	return validation.ValidateProjectUpdate(obj.(*projectapi.Project), old.(*projectapi.Project))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (projectStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }

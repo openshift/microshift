@@ -24,6 +24,7 @@ type strategy struct {
 
 var _ rest.RESTCreateStrategy = strategy{}
 var _ rest.RESTUpdateStrategy = strategy{}
+var _ rest.RESTDeleteStrategy = strategy{}
 var _ rest.GarbageCollectionDeleteStrategy = strategy{}
 
 func NewStrategy(clientGetter oauthclient.Getter) strategy {
@@ -82,4 +83,12 @@ func (strategy) AllowCreateOnUpdate() bool {
 
 func (strategy) AllowUnconditionalUpdate() bool {
 	return false
+}
+
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
+func (strategy) WarningsOnUpdate(ctx context.Context, newObj, oldObj runtime.Object) []string {
+	return nil
 }

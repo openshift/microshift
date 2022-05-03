@@ -20,10 +20,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	goruntime "runtime"
 	"time"
 
 	cadvisorapi "github.com/google/cadvisor/info/v1"
+	crierror "k8s.io/cri-api/pkg/errors"
 	"k8s.io/klog/v2"
 
 	v1 "k8s.io/api/core/v1"
@@ -37,7 +39,7 @@ import (
 	"k8s.io/client-go/util/flowcontrol"
 	"k8s.io/component-base/logs/logreduction"
 	internalapi "k8s.io/cri-api/pkg/apis"
-	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1alpha2"
+	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/credentialprovider"
 	"k8s.io/kubernetes/pkg/credentialprovider/plugin"
@@ -48,11 +50,14 @@ import (
 	"k8s.io/kubernetes/pkg/kubelet/images"
 	"k8s.io/kubernetes/pkg/kubelet/lifecycle"
 	"k8s.io/kubernetes/pkg/kubelet/logs"
+	"k8s.io/kubernetes/pkg/kubelet/metrics"
 	proberesults "k8s.io/kubernetes/pkg/kubelet/prober/results"
 	"k8s.io/kubernetes/pkg/kubelet/runtimeclass"
+	"k8s.io/kubernetes/pkg/kubelet/sysctl"
 	"k8s.io/kubernetes/pkg/kubelet/types"
 	"k8s.io/kubernetes/pkg/kubelet/util/cache"
 	"k8s.io/kubernetes/pkg/kubelet/util/format"
+	sc "k8s.io/kubernetes/pkg/securitycontext"
 )
 
 const (
@@ -74,10 +79,12 @@ var (
 	ErrVersionNotSupported = errors.New("runtime api version is not supported")
 )
 
-// podStateProvider can determine if a pod is deleted ir terminated
+// podStateProvider can determine if none of the elements are necessary to retain (pod content)
+// or if none of the runtime elements are necessary to retain (containers)
 type podStateProvider interface {
-	IsPodDeleted(kubetypes.UID) bool
-	IsPodTerminated(kubetypes.UID) bool
+	IsPodTerminationRequested(kubetypes.UID) bool
+	ShouldPodContentBeRemoved(kubetypes.UID) bool
+	ShouldPodRuntimeBeRemoved(kubetypes.UID) bool
 }
 
 type kubeGenericRuntimeManager struct {
@@ -141,6 +148,18 @@ type kubeGenericRuntimeManager struct {
 
 	// PodState provider instance
 	podStateProvider podStateProvider
+
+	// Use RuntimeDefault as the default seccomp profile for all workloads.
+	seccompDefault bool
+
+	// MemorySwapBehavior defines how swap is used
+	memorySwapBehavior string
+
+	//Function to get node allocatable resources
+	getNodeAllocatable func() v1.ResourceList
+
+	// Memory throttling factor for MemoryQoS
+	memoryThrottlingFactor float64
 }
 
 // KubeGenericRuntime is a interface contains interfaces for container runtime and command.
@@ -152,7 +171,7 @@ type KubeGenericRuntime interface {
 
 // LegacyLogProvider gives the ability to use unsupported docker log drivers (e.g. journald)
 type LegacyLogProvider interface {
-	// Get the last few lines of the logs for a specific container.
+	// GetContainerLogTail gets the last few lines of the logs for a specific container.
 	GetContainerLogTail(uid kubetypes.UID, name, namespace string, containerID kubecontainer.ContainerID) (string, error)
 }
 
@@ -162,7 +181,7 @@ func NewKubeGenericRuntimeManager(
 	livenessManager proberesults.Manager,
 	readinessManager proberesults.Manager,
 	startupManager proberesults.Manager,
-	seccompProfileRoot string,
+	rootDirectory string,
 	machineInfo *cadvisorapi.MachineInfo,
 	podStateProvider podStateProvider,
 	osInterface kubecontainer.OSInterface,
@@ -182,25 +201,33 @@ func NewKubeGenericRuntimeManager(
 	legacyLogProvider LegacyLogProvider,
 	logManager logs.ContainerLogManager,
 	runtimeClassManager *runtimeclass.Manager,
+	seccompDefault bool,
+	memorySwapBehavior string,
+	getNodeAllocatable func() v1.ResourceList,
+	memoryThrottlingFactor float64,
 ) (KubeGenericRuntime, error) {
 	kubeRuntimeManager := &kubeGenericRuntimeManager{
-		recorder:            recorder,
-		cpuCFSQuota:         cpuCFSQuota,
-		cpuCFSQuotaPeriod:   cpuCFSQuotaPeriod,
-		seccompProfileRoot:  seccompProfileRoot,
-		livenessManager:     livenessManager,
-		readinessManager:    readinessManager,
-		startupManager:      startupManager,
-		machineInfo:         machineInfo,
-		osInterface:         osInterface,
-		runtimeHelper:       runtimeHelper,
-		runtimeService:      newInstrumentedRuntimeService(runtimeService),
-		imageService:        newInstrumentedImageManagerService(imageService),
-		internalLifecycle:   internalLifecycle,
-		legacyLogProvider:   legacyLogProvider,
-		logManager:          logManager,
-		runtimeClassManager: runtimeClassManager,
-		logReduction:        logreduction.NewLogReduction(identicalErrorDelay),
+		recorder:               recorder,
+		cpuCFSQuota:            cpuCFSQuota,
+		cpuCFSQuotaPeriod:      cpuCFSQuotaPeriod,
+		seccompProfileRoot:     filepath.Join(rootDirectory, "seccomp"),
+		livenessManager:        livenessManager,
+		readinessManager:       readinessManager,
+		startupManager:         startupManager,
+		machineInfo:            machineInfo,
+		osInterface:            osInterface,
+		runtimeHelper:          runtimeHelper,
+		runtimeService:         newInstrumentedRuntimeService(runtimeService),
+		imageService:           newInstrumentedImageManagerService(imageService),
+		internalLifecycle:      internalLifecycle,
+		legacyLogProvider:      legacyLogProvider,
+		logManager:             logManager,
+		runtimeClassManager:    runtimeClassManager,
+		logReduction:           logreduction.NewLogReduction(identicalErrorDelay),
+		seccompDefault:         seccompDefault,
+		memorySwapBehavior:     memorySwapBehavior,
+		getNodeAllocatable:     getNodeAllocatable,
+		memoryThrottlingFactor: memoryThrottlingFactor,
 	}
 
 	typedVersion, err := kubeRuntimeManager.getTypedVersion()
@@ -774,18 +801,34 @@ func (m *kubeGenericRuntimeManager) SyncPod(pod *v1.Pod, podStatus *kubecontaine
 		var err error
 
 		klog.V(4).InfoS("Creating PodSandbox for pod", "pod", klog.KObj(pod))
+		metrics.StartedPodsTotal.Inc()
 		createSandboxResult := kubecontainer.NewSyncResult(kubecontainer.CreatePodSandbox, format.Pod(pod))
 		result.AddSyncResult(createSandboxResult)
+
+		// ConvertPodSysctlsVariableToDotsSeparator converts sysctl variable
+		// in the Pod.Spec.SecurityContext.Sysctls slice into a dot as a separator.
+		// runc uses the dot as the separator to verify whether the sysctl variable
+		// is correct in a separate namespace, so when using the slash as the sysctl
+		// variable separator, runc returns an error: "sysctl is not in a separate kernel namespace"
+		// and the podSandBox cannot be successfully created. Therefore, before calling runc,
+		// we need to convert the sysctl variable, the dot is used as a separator to separate the kernel namespace.
+		// When runc supports slash as sysctl separator, this function can no longer be used.
+		sysctl.ConvertPodSysctlsVariableToDotsSeparator(pod.Spec.SecurityContext)
+
 		podSandboxID, msg, err = m.createPodSandbox(pod, podContainerChanges.Attempt)
 		if err != nil {
 			// createPodSandbox can return an error from CNI, CSI,
 			// or CRI if the Pod has been deleted while the POD is
 			// being created. If the pod has been deleted then it's
 			// not a real error.
-			if m.podStateProvider.IsPodDeleted(pod.UID) {
+			//
+			// SyncPod can still be running when we get here, which
+			// means the PodWorker has not acked the deletion.
+			if m.podStateProvider.IsPodTerminationRequested(pod.UID) {
 				klog.V(4).InfoS("Pod was deleted and sandbox failed to be created", "pod", klog.KObj(pod), "podUID", pod.UID)
 				return
 			}
+			metrics.StartedPodsErrorsTotal.Inc()
 			createSandboxResult.Fail(kubecontainer.ErrCreatePodSandbox, msg)
 			klog.ErrorS(err, "CreatePodSandbox for pod failed", "pod", klog.KObj(pod))
 			ref, referr := ref.GetReference(legacyscheme.Scheme, pod)
@@ -838,9 +881,11 @@ func (m *kubeGenericRuntimeManager) SyncPod(pod *v1.Pod, podStatus *kubecontaine
 	}
 
 	// Helper containing boilerplate common to starting all types of containers.
-	// typeName is a label used to describe this type of container in log messages,
+	// typeName is a description used to describe this type of container in log messages,
 	// currently: "container", "init container" or "ephemeral container"
-	start := func(typeName string, spec *startSpec) error {
+	// metricLabel is the label used to describe this type of container in monitoring metrics.
+	// currently: "container", "init_container" or "ephemeral_container"
+	start := func(typeName, metricLabel string, spec *startSpec) error {
 		startContainerResult := kubecontainer.NewSyncResult(kubecontainer.StartContainer, spec.container.Name)
 		result.AddSyncResult(startContainerResult)
 
@@ -851,9 +896,19 @@ func (m *kubeGenericRuntimeManager) SyncPod(pod *v1.Pod, podStatus *kubecontaine
 			return err
 		}
 
+		metrics.StartedContainersTotal.WithLabelValues(metricLabel).Inc()
+		if sc.HasWindowsHostProcessRequest(pod, spec.container) {
+			metrics.StartedHostProcessContainersTotal.WithLabelValues(metricLabel).Inc()
+		}
 		klog.V(4).InfoS("Creating container in pod", "containerType", typeName, "container", spec.container, "pod", klog.KObj(pod))
 		// NOTE (aramase) podIPs are populated for single stack and dual stack clusters. Send only podIPs.
 		if msg, err := m.startContainer(podSandboxID, podSandboxConfig, spec, pod, podStatus, pullSecrets, podIP, podIPs); err != nil {
+			// startContainer() returns well-defined error codes that have reasonable cardinality for metrics and are
+			// useful to cluster administrators to distinguish "server errors" from "user errors".
+			metrics.StartedContainersErrorsTotal.WithLabelValues(metricLabel, err.Error()).Inc()
+			if sc.HasWindowsHostProcessRequest(pod, spec.container) {
+				metrics.StartedHostProcessContainersErrorsTotal.WithLabelValues(metricLabel, err.Error()).Inc()
+			}
 			startContainerResult.Fail(err, msg)
 			// known errors that are logged in other places are logged at higher levels here to avoid
 			// repetitive log spam
@@ -875,14 +930,14 @@ func (m *kubeGenericRuntimeManager) SyncPod(pod *v1.Pod, podStatus *kubecontaine
 	// containers cannot be specified on pod creation.
 	if utilfeature.DefaultFeatureGate.Enabled(features.EphemeralContainers) {
 		for _, idx := range podContainerChanges.EphemeralContainersToStart {
-			start("ephemeral container", ephemeralContainerStartSpec(&pod.Spec.EphemeralContainers[idx]))
+			start("ephemeral container", metrics.EphemeralContainer, ephemeralContainerStartSpec(&pod.Spec.EphemeralContainers[idx]))
 		}
 	}
 
 	// Step 6: start the init container.
 	if container := podContainerChanges.NextInitContainerToStart; container != nil {
 		// Start the next init container.
-		if err := start("init container", containerStartSpec(container)); err != nil {
+		if err := start("init container", metrics.InitContainer, containerStartSpec(container)); err != nil {
 			return
 		}
 
@@ -892,7 +947,7 @@ func (m *kubeGenericRuntimeManager) SyncPod(pod *v1.Pod, podStatus *kubecontaine
 
 	// Step 7: start containers in podContainerChanges.ContainersToStart.
 	for _, idx := range podContainerChanges.ContainersToStart {
-		start("container", containerStartSpec(&pod.Spec.Containers[idx]))
+		start("container", metrics.Container, containerStartSpec(&pod.Spec.Containers[idx]))
 	}
 
 	return
@@ -953,7 +1008,7 @@ func (m *kubeGenericRuntimeManager) killPodWithSyncResult(pod *v1.Pod, runningPo
 	result.AddSyncResult(killSandboxResult)
 	// Stop all sandboxes belongs to same pod
 	for _, podSandbox := range runningPod.Sandboxes {
-		if err := m.runtimeService.StopPodSandbox(podSandbox.ID.ID); err != nil {
+		if err := m.runtimeService.StopPodSandbox(podSandbox.ID.ID); err != nil && !crierror.IsNotFound(err) {
 			killSandboxResult.Fail(kubecontainer.ErrKillPodSandbox, err.Error())
 			klog.ErrorS(nil, "Failed to stop sandbox", "podSandboxID", podSandbox.ID)
 		}
@@ -995,16 +1050,22 @@ func (m *kubeGenericRuntimeManager) GetPodStatus(uid kubetypes.UID, name, namesp
 
 	klog.V(4).InfoS("getSandboxIDByPodUID got sandbox IDs for pod", "podSandboxID", podSandboxIDs, "pod", klog.KObj(pod))
 
-	sandboxStatuses := make([]*runtimeapi.PodSandboxStatus, len(podSandboxIDs))
+	sandboxStatuses := []*runtimeapi.PodSandboxStatus{}
 	podIPs := []string{}
 	for idx, podSandboxID := range podSandboxIDs {
 		podSandboxStatus, err := m.runtimeService.PodSandboxStatus(podSandboxID)
+		// Between List (getSandboxIDByPodUID) and check (PodSandboxStatus) another thread might remove a container, and that is normal.
+		// The previous call (getSandboxIDByPodUID) never fails due to a pod sandbox not existing.
+		// Therefore, this method should not either, but instead act as if the previous call failed,
+		// which means the error should be ignored.
+		if crierror.IsNotFound(err) {
+			continue
+		}
 		if err != nil {
 			klog.ErrorS(err, "PodSandboxStatus of sandbox for pod", "podSandboxID", podSandboxID, "pod", klog.KObj(pod))
 			return nil, err
 		}
-		sandboxStatuses[idx] = podSandboxStatus
-
+		sandboxStatuses = append(sandboxStatuses, podSandboxStatus)
 		// Only get pod IP from latest sandbox
 		if idx == 0 && podSandboxStatus.State == runtimeapi.PodSandboxState_SANDBOX_READY {
 			podIPs = m.determinePodSandboxIPs(namespace, name, podSandboxStatus)

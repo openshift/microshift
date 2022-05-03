@@ -19,16 +19,19 @@ package endpointslice
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
 	discoveryv1beta1 "k8s.io/api/discovery/v1beta1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/storage/names"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
+	apivalidation "k8s.io/kubernetes/pkg/apis/core/validation"
 	"k8s.io/kubernetes/pkg/apis/discovery"
 	"k8s.io/kubernetes/pkg/apis/discovery/validation"
 	"k8s.io/kubernetes/pkg/features"
@@ -87,6 +90,11 @@ func (endpointSliceStrategy) Validate(ctx context.Context, obj runtime.Object) f
 	return err
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (endpointSliceStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // Canonicalize normalizes the object after validation.
 func (endpointSliceStrategy) Canonicalize(obj runtime.Object) {
 }
@@ -101,6 +109,11 @@ func (endpointSliceStrategy) ValidateUpdate(ctx context.Context, new, old runtim
 	newEPS := new.(*discovery.EndpointSlice)
 	oldEPS := old.(*discovery.EndpointSlice)
 	return validation.ValidateEndpointSliceUpdate(newEPS, oldEPS)
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (endpointSliceStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }
 
 // AllowUnconditionalUpdate is the default update policy for EndpointSlice objects.
@@ -176,11 +189,40 @@ func dropTopologyOnV1(ctx context.Context, oldEPS, newEPS *discovery.EndpointSli
 			return
 		}
 
+		// Only node names that exist in previous version of the EndpointSlice
+		// deprecatedTopology fields may be retained in new version of the
+		// EndpointSlice.
+		prevNodeNames := getDeprecatedTopologyNodeNames(oldEPS)
+
 		for i := range newEPS.Endpoints {
 			ep := &newEPS.Endpoints[i]
 
-			//Silently clear out DeprecatedTopology
+			newTopologyNodeName, ok := ep.DeprecatedTopology[corev1.LabelHostname]
+			if ep.NodeName == nil && ok && prevNodeNames.Has(newTopologyNodeName) && len(apivalidation.ValidateNodeName(newTopologyNodeName, false)) == 0 {
+				// Copy the label previously used to store the node name into the nodeName field,
+				// in order to make partial updates preserve previous node info
+				ep.NodeName = &newTopologyNodeName
+			}
+			// Drop writes to this field via the v1 API as documented
 			ep.DeprecatedTopology = nil
 		}
 	}
+}
+
+// getDeprecatedTopologyNodeNames returns a set of node names present in
+// deprecatedTopology fields within the provided EndpointSlice.
+func getDeprecatedTopologyNodeNames(eps *discovery.EndpointSlice) sets.String {
+	if eps == nil {
+		return nil
+	}
+	var names sets.String
+	for _, ep := range eps.Endpoints {
+		if nodeName, ok := ep.DeprecatedTopology[corev1.LabelHostname]; ok && len(nodeName) > 0 {
+			if names == nil {
+				names = sets.NewString()
+			}
+			names.Insert(nodeName)
+		}
+	}
+	return names
 }

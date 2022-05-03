@@ -37,6 +37,11 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	return validation.ValidateObjectMeta(&cfg.ObjectMeta, false, apimachineryvalidation.NameIsDNSSubdomain, field.NewPath("metadata"))
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 func (strategy) Canonicalize(obj runtime.Object) {
 }
 
@@ -57,4 +62,9 @@ func (strategy) ValidateUpdate(ctx context.Context, newObj, oldObj runtime.Objec
 	oldCfg, newCfg := oldObj.(*securityapi.RangeAllocation), newObj.(*securityapi.RangeAllocation)
 
 	return validation.ValidateObjectMetaUpdate(&newCfg.ObjectMeta, &oldCfg.ObjectMeta, field.NewPath("metadata"))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (strategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }

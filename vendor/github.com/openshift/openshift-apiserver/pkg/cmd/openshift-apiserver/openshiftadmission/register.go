@@ -12,6 +12,7 @@ import (
 	buildstrategyrestrictions "github.com/openshift/openshift-apiserver/pkg/build/apiserver/admission/strategyrestrictions"
 	imageadmission "github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/limitrange"
 	projectrequestlimit "github.com/openshift/openshift-apiserver/pkg/project/apiserver/admission/requestlimit"
+	requiredrouteannotations "github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/requiredrouteannotations"
 )
 
 // TODO register this per apiserver or at least per process
@@ -38,6 +39,7 @@ func RegisterOpenshiftAdmissionPlugins(plugins *admission.Plugins) {
 	imageadmission.Register(plugins)
 	imagepolicy.Register(plugins)
 	quotaclusterresourcequota.Register(plugins)
+	requiredrouteannotations.Register(plugins)
 }
 
 var (
@@ -54,6 +56,7 @@ var (
 		"image.openshift.io/ImageLimitRange",
 		"image.openshift.io/ImagePolicy",
 		"quota.openshift.io/ClusterResourceQuota",
+		"route.openshift.io/RequiredRouteAnnotations",
 
 		// the rest of the kube chain goes here
 		"MutatingAdmissionWebhook",

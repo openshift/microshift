@@ -3,8 +3,6 @@ package etcd
 import (
 	"context"
 	"errors"
-	"strings"
-
 	kerrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -18,6 +16,7 @@ import (
 
 	usergroup "github.com/openshift/api/user"
 	"github.com/openshift/apiserver-library-go/pkg/apivalidation"
+	"github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth/validation"
 	"github.com/openshift/oauth-apiserver/pkg/printers"
 	"github.com/openshift/oauth-apiserver/pkg/printerstorage"
 	userapi "github.com/openshift/oauth-apiserver/pkg/user/apis/user"
@@ -101,9 +100,8 @@ func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 
 	// do not bother looking up users that cannot be persisted
 	// make sure we return a status error otherwise the API server will complain
-	if reasons := apivalidation.ValidateUserName(name, false); len(reasons) != 0 {
-		err := field.Invalid(field.NewPath("metadata", "name"), name, strings.Join(reasons, ", "))
-		return nil, kerrs.NewInvalid(usergroup.Kind("User"), name, field.ErrorList{err})
+	if errorList := validation.ValidateUserNameField(name, field.NewPath("metadata", "name")); len(errorList) != 0 {
+		return nil, kerrs.NewInvalid(usergroup.Kind("User"), name, errorList)
 	}
 
 	return r.Store.Get(ctx, name, options)

@@ -61,7 +61,7 @@ func NewRCControllerRefManager(
 	controller kmetav1.Object,
 	selector klabels.Selector,
 	controllerKind kschema.GroupVersionKind,
-	canAdopt func() error,
+	canAdopt func(ctx context.Context) error,
 ) *RCControllerRefManager {
 	return &RCControllerRefManager{
 		BaseControllerRefManager: kcontroller.BaseControllerRefManager{
@@ -91,14 +91,14 @@ func (m *RCControllerRefManager) ClaimReplicationController(rc *v1.ReplicationCo
 	match := func(obj kmetav1.Object) bool {
 		return m.Selector.Matches(klabels.Set(obj.GetLabels()))
 	}
-	adopt := func(obj kmetav1.Object) error {
+	adopt := func(ctx context.Context, obj kmetav1.Object) error {
 		return m.AdoptReplicationController(obj.(*v1.ReplicationController))
 	}
-	release := func(obj kmetav1.Object) error {
+	release := func(ctx context.Context, obj kmetav1.Object) error {
 		return m.ReleaseReplicationController(obj.(*v1.ReplicationController))
 	}
-
-	return m.ClaimObject(rc, match, adopt, release)
+	ctx := context.TODO()
+	return m.ClaimObject(ctx, rc, match, adopt, release)
 }
 
 // ClaimReplicationControllers tries to take ownership of a list of ReplicationControllers.
@@ -134,7 +134,8 @@ func (m *RCControllerRefManager) ClaimReplicationControllers(rcs []*v1.Replicati
 // AdoptReplicationController sends a patch to take control of the ReplicationController. It returns the error if
 // the patching fails.
 func (m *RCControllerRefManager) AdoptReplicationController(rs *v1.ReplicationController) error {
-	if err := m.CanAdopt(); err != nil {
+	ctx := context.TODO()
+	if err := m.CanAdopt(ctx); err != nil {
 		return fmt.Errorf("can't adopt ReplicationController %s/%s (%s): %v", rs.Namespace, rs.Name, rs.UID, err)
 	}
 	// Note that ValidateOwnerReferences() will reject this patch if another

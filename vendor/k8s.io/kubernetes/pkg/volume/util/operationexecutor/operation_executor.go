@@ -21,6 +21,7 @@ limitations under the License.
 package operationexecutor
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -141,6 +142,9 @@ type OperationExecutor interface {
 	// IsOperationPending returns true if an operation for the given volumeName
 	// and one of podName or nodeName is pending, otherwise it returns false
 	IsOperationPending(volumeName v1.UniqueVolumeName, podName volumetypes.UniquePodName, nodeName types.NodeName) bool
+	// IsOperationSafeToRetry returns false if an operation for the given volumeName
+	// and one of podName or nodeName is pending or in exponential backoff, otherwise it returns true
+	IsOperationSafeToRetry(volumeName v1.UniqueVolumeName, podName volumetypes.UniquePodName, nodeName types.NodeName, operationName string) bool
 	// ExpandInUseVolume will resize volume's file system to expected size without unmounting the volume.
 	ExpandInUseVolume(volumeToMount VolumeToMount, actualStateOfWorld ActualStateOfWorldMounterUpdater) error
 	// ReconstructVolumeOperation construct a new volumeSpec and returns it created by plugin
@@ -202,6 +206,9 @@ type ActualStateOfWorldMounterUpdater interface {
 
 	// GetVolumeMountState returns mount state of the volume for the Pod
 	GetVolumeMountState(volumName v1.UniqueVolumeName, podName volumetypes.UniquePodName) VolumeMountState
+
+	// IsVolumeMountedElsewhere returns whether the supplied volume is mounted in a Pod other than the supplied one
+	IsVolumeMountedElsewhere(volumeName v1.UniqueVolumeName, podName volumetypes.UniquePodName) bool
 
 	// MarkForInUseExpansionError marks the volume to have in-use error during expansion.
 	// volume expansion must not be retried for this volume
@@ -411,6 +418,23 @@ const (
 	// VolumeNotMounted means volume has not be mounted in pod's local path
 	VolumeNotMounted VolumeMountState = "VolumeNotMounted"
 )
+
+type MountPreConditionFailed struct {
+	msg string
+}
+
+func (err *MountPreConditionFailed) Error() string {
+	return err.msg
+}
+
+func NewMountPreConditionFailedError(msg string) *MountPreConditionFailed {
+	return &MountPreConditionFailed{msg: msg}
+}
+
+func IsMountFailedPreconditionError(err error) bool {
+	var failedPreconditionError *MountPreConditionFailed
+	return errors.As(err, &failedPreconditionError)
+}
 
 // GenerateMsgDetailed returns detailed msgs for volumes to mount
 func (volume *VolumeToMount) GenerateMsgDetailed(prefixMsg, suffixMsg string) (detailedMsg string) {
@@ -659,6 +683,14 @@ func (oe *operationExecutor) IsOperationPending(
 	podName volumetypes.UniquePodName,
 	nodeName types.NodeName) bool {
 	return oe.pendingOperations.IsOperationPending(volumeName, podName, nodeName)
+}
+
+func (oe *operationExecutor) IsOperationSafeToRetry(
+	volumeName v1.UniqueVolumeName,
+	podName volumetypes.UniquePodName,
+	nodeName types.NodeName,
+	operationName string) bool {
+	return oe.pendingOperations.IsOperationSafeToRetry(volumeName, podName, nodeName, operationName)
 }
 
 func (oe *operationExecutor) AttachVolume(

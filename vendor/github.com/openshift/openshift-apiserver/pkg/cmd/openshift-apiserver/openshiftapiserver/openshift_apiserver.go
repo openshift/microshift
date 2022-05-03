@@ -420,7 +420,7 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 			return bootstrapData(bootstrappolicy.Policy()).EnsureRBACPolicy()(newContext)
 
 		})
-	s.GenericAPIServer.AddPostStartHookOrDie("authorization.openshift.io-ensureopenshift-infra", c.EnsureOpenShiftInfraNamespace)
+	s.GenericAPIServer.AddPostStartHookOrDie("authorization.openshift.io-ensurenodebootstrap-sa", c.EnsureNodeBootstrapServiceAccount)
 	s.GenericAPIServer.AddPostStartHookOrDie("project.openshift.io-projectcache", c.startProjectCache)
 	s.GenericAPIServer.AddPostStartHookOrDie("project.openshift.io-projectauthorizationcache", c.startProjectAuthorizationCache)
 	s.GenericAPIServer.AddPostStartHookOrDie("openshift.io-startinformers", func(context genericapiserver.PostStartHookContext) error {
@@ -500,8 +500,8 @@ func (c *completedConfig) startProjectAuthorizationCache(context genericapiserve
 	return nil
 }
 
-// EnsureOpenShiftInfraNamespace is called as part of global policy initialization to ensure infra namespace exists
-func (c *completedConfig) EnsureOpenShiftInfraNamespace(_ genericapiserver.PostStartHookContext) error {
+// EnsureNodeBootstrapServiceAccount is called as part of global policy initialization to ensure node bootstrap SA exists
+func (c *completedConfig) EnsureNodeBootstrapServiceAccount(_ genericapiserver.PostStartHookContext) error {
 	namespaceName := bootstrappolicy.DefaultOpenShiftInfraNamespace
 
 	var coreClient *corev1client.CoreV1Client
@@ -516,12 +516,6 @@ func (c *completedConfig) EnsureOpenShiftInfraNamespace(_ genericapiserver.PostS
 	})
 	if err != nil {
 		utilruntime.HandleError(fmt.Errorf("error getting client: %v", err))
-		return err
-	}
-
-	_, err = coreClient.Namespaces().Create(context.TODO(), &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}}, metav1.CreateOptions{})
-	if err != nil && !kapierror.IsAlreadyExists(err) {
-		utilruntime.HandleError(fmt.Errorf("error creating namespace %q: %v", namespaceName, err))
 		return err
 	}
 

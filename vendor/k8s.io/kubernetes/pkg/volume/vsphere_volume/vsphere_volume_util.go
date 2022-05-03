@@ -1,3 +1,4 @@
+//go:build !providerless
 // +build !providerless
 
 /*
@@ -36,7 +37,6 @@ import (
 )
 
 const (
-	maxRetries         = 10
 	checkSleepDuration = time.Second
 	diskByIDPath       = "/dev/disk/by-id/"
 	diskSCSIPrefix     = "wwn-0x"

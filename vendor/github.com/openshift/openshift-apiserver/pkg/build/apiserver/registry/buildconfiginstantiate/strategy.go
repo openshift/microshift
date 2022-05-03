@@ -42,6 +42,11 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	return buildvalidation.ValidateBuildRequest(obj.(*buildapi.BuildRequest))
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 type binaryStrategy struct {
 	runtime.ObjectTyper
 }
@@ -71,5 +76,10 @@ func (binaryStrategy) Canonicalize(obj runtime.Object) {
 // Validate validates a new role.
 func (binaryStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	// TODO: validate
+	return nil
+}
+
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (binaryStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
 	return nil
 }

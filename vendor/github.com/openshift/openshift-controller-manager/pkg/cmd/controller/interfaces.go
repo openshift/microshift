@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -38,9 +39,9 @@ import (
 )
 
 func NewControllerContext(
+	ctx context.Context,
 	config openshiftcontrolplanev1.OpenShiftControllerManagerConfig,
 	inClientConfig *rest.Config,
-	stopCh <-chan struct{},
 ) (*ControllerContext, error) {
 
 	const defaultInformerResyncPeriod = 10 * time.Minute
@@ -63,7 +64,7 @@ func NewControllerContext(
 	discoveryClient := cacheddiscovery.NewMemCacheClient(kubeClient.Discovery())
 	dynamicRestMapper := restmapper.NewDeferredDiscoveryRESTMapper(discoveryClient)
 	dynamicRestMapper.Reset()
-	go wait.Until(dynamicRestMapper.Reset, 30*time.Second, stopCh)
+	go wait.Until(dynamicRestMapper.Reset, 30*time.Second, ctx.Done())
 
 	appsClient, err := appsclient.NewForConfig(clientConfig)
 	if err != nil {
@@ -131,7 +132,8 @@ func NewControllerContext(
 		OperatorInformers:                  operatorinformer.NewSharedInformerFactory(operatorClient, defaultInformerResyncPeriod),
 		RouteInformers:                     routeinformer.NewSharedInformerFactory(routerClient, defaultInformerResyncPeriod),
 		TemplateInformers:                  templateinformer.NewSharedInformerFactory(templateClient, defaultInformerResyncPeriod),
-		Stop:                               stopCh,
+		Stop:                               ctx.Done(),
+		Context:                            ctx,
 		InformersStarted:                   make(chan struct{}),
 		RestMapper:                         dynamicRestMapper,
 	}
@@ -191,7 +193,8 @@ type ControllerContext struct {
 	RestMapper              meta.RESTMapper
 
 	// Stop is the stop channel
-	Stop <-chan struct{}
+	Stop    <-chan struct{}
+	Context context.Context
 
 	informersStartedLock   sync.Mutex
 	informersStartedClosed bool

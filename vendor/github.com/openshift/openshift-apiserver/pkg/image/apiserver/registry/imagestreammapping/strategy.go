@@ -64,3 +64,8 @@ func (s Strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorL
 	mapping := obj.(*imageapi.ImageStreamMapping)
 	return validation.ValidateImageStreamMapping(mapping)
 }
+
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (Strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}

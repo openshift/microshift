@@ -45,6 +45,11 @@ func (s *strategy) Validate(ctx context.Context, obj runtime.Object) field.Error
 	return validation.ValidateImageSignature(signature)
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 func (s *strategy) AllowCreateOnUpdate() bool {
 	return false
 }

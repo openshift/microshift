@@ -36,7 +36,6 @@ import (
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registries"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
@@ -44,10 +43,6 @@ import (
 
 // ImporterFunc returns an instance of the importer that should be used per invocation.
 type ImporterFunc func(r importer.RepositoryRetriever, regConf *sysregistriesv2.V2RegistriesConf) importer.Interface
-
-// ImporterDockerRegistryFunc returns an instance of a docker client that should be used per invocation of import,
-// may be nil if no legacy import capability is required.
-type ImporterDockerRegistryFunc func() dockerv1client.Client
 
 // REST implements the RESTStorage interface for ImageStreamImport
 type REST struct {
@@ -58,7 +53,6 @@ type REST struct {
 	isV1Client        imageclientv1.ImageStreamsGetter
 	transport         http.RoundTripper
 	insecureTransport http.RoundTripper
-	clientFn          ImporterDockerRegistryFunc
 	strategy          *strategy
 	sarClient         authorizationclient.SubjectAccessReviewInterface
 	icspLister        operatorv1lister.ImageContentSourcePolicyLister
@@ -68,14 +62,14 @@ type REST struct {
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
 
-// NewREST returns a REST storage implementation that handles importing images. The clientFn argument is optional
-// if v1 Docker Registry importing is not required. Insecure transport is optional, and both transports should not
-// include client certs unless you wish to allow the entire cluster to import using those certs.
+// NewREST returns a REST storage implementation that handles importing images.
+// Insecure transport is optional, and both transports should not include
+// client certs unless you wish to allow the entire cluster to import using
+// those certs.
 func NewREST(importFn ImporterFunc, streams imagestream.Registry, internalStreams rest.CreaterUpdater,
 	images rest.Creater,
 	isV1Client imageclientv1.ImageStreamsGetter,
 	transport, insecureTransport http.RoundTripper,
-	clientFn ImporterDockerRegistryFunc,
 	registryWhitelister whitelist.RegistryWhitelister,
 	sarClient authorizationclient.SubjectAccessReviewInterface,
 	icspLister operatorv1lister.ImageContentSourcePolicyLister,
@@ -89,7 +83,6 @@ func NewREST(importFn ImporterFunc, streams imagestream.Registry, internalStream
 		isV1Client:        isV1Client,
 		transport:         transport,
 		insecureTransport: insecureTransport,
-		clientFn:          clientFn,
 		strategy:          NewStrategy(registryWhitelister),
 		sarClient:         sarClient,
 		icspLister:        icspLister,
@@ -166,12 +159,6 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	namespace, ok := apirequest.NamespaceFrom(ctx)
 	if !ok {
 		return nil, kapierrors.NewBadRequest("a namespace must be specified to import images")
-	}
-
-	if r.clientFn != nil {
-		if client := r.clientFn(); client != nil {
-			ctx = apirequest.WithValue(ctx, importer.ContextKeyV1RegistryClient, client)
-		}
 	}
 
 	create := false

@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/spf13/pflag"
 	v1 "k8s.io/api/core/v1"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	apiserveroptions "k8s.io/apiserver/pkg/server/options"
@@ -44,6 +45,7 @@ import (
 	kubectrlmgrconfigscheme "k8s.io/kubernetes/pkg/controller/apis/config/scheme"
 	"k8s.io/kubernetes/pkg/controller/garbagecollector"
 	garbagecollectorconfig "k8s.io/kubernetes/pkg/controller/garbagecollector/config"
+	netutils "k8s.io/utils/net"
 
 	// add the kubernetes feature gates
 	_ "k8s.io/kubernetes/pkg/features"
@@ -71,6 +73,7 @@ type KubeControllerManagerOptions struct {
 	EndpointController               *EndpointControllerOptions
 	EndpointSliceController          *EndpointSliceControllerOptions
 	EndpointSliceMirroringController *EndpointSliceMirroringControllerOptions
+	EphemeralVolumeController        *EphemeralVolumeControllerOptions
 	GarbageCollectorController       *GarbageCollectorControllerOptions
 	HPAController                    *HPAControllerOptions
 	JobController                    *JobControllerOptions
@@ -86,13 +89,11 @@ type KubeControllerManagerOptions struct {
 	SAController                     *SAControllerOptions
 	TTLAfterFinishedController       *TTLAfterFinishedControllerOptions
 
-	SecureServing *apiserveroptions.SecureServingOptionsWithLoopback
-	// TODO: remove insecure serving mode
-	InsecureServing *apiserveroptions.DeprecatedInsecureServingOptionsWithLoopback
-	Authentication  *apiserveroptions.DelegatingAuthenticationOptions
-	Authorization   *apiserveroptions.DelegatingAuthorizationOptions
-	Metrics         *metrics.Options
-	Logs            *logs.Options
+	SecureServing  *apiserveroptions.SecureServingOptionsWithLoopback
+	Authentication *apiserveroptions.DelegatingAuthenticationOptions
+	Authorization  *apiserveroptions.DelegatingAuthorizationOptions
+	Metrics        *metrics.Options
+	Logs           *logs.Options
 
 	Master                      string
 	Kubeconfig                  string
@@ -102,7 +103,7 @@ type KubeControllerManagerOptions struct {
 
 // NewKubeControllerManagerOptions creates a new KubeControllerManagerOptions with a default config.
 func NewKubeControllerManagerOptions() (*KubeControllerManagerOptions, error) {
-	componentConfig, err := NewDefaultComponentConfig(ports.InsecureKubeControllerManagerPort)
+	componentConfig, err := NewDefaultComponentConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -139,6 +140,9 @@ func NewKubeControllerManagerOptions() (*KubeControllerManagerOptions, error) {
 		},
 		EndpointSliceMirroringController: &EndpointSliceMirroringControllerOptions{
 			&componentConfig.EndpointSliceMirroringController,
+		},
+		EphemeralVolumeController: &EphemeralVolumeControllerOptions{
+			&componentConfig.EphemeralVolumeController,
 		},
 		GarbageCollectorController: &GarbageCollectorControllerOptions{
 			&componentConfig.GarbageCollectorController,
@@ -182,12 +186,7 @@ func NewKubeControllerManagerOptions() (*KubeControllerManagerOptions, error) {
 		TTLAfterFinishedController: &TTLAfterFinishedControllerOptions{
 			&componentConfig.TTLAfterFinishedController,
 		},
-		SecureServing: apiserveroptions.NewSecureServingOptions().WithLoopback(),
-		InsecureServing: (&apiserveroptions.DeprecatedInsecureServingOptions{
-			BindAddress: net.ParseIP(componentConfig.Generic.Address),
-			BindPort:    int(componentConfig.Generic.Port),
-			BindNetwork: "tcp",
-		}).WithLoopback(),
+		SecureServing:  apiserveroptions.NewSecureServingOptions().WithLoopback(),
 		Authentication: apiserveroptions.NewDelegatingAuthenticationOptions(),
 		Authorization:  apiserveroptions.NewDelegatingAuthorizationOptions(),
 		Metrics:        metrics.NewOptions(),
@@ -215,7 +214,7 @@ func NewKubeControllerManagerOptions() (*KubeControllerManagerOptions, error) {
 }
 
 // NewDefaultComponentConfig returns kube-controller manager configuration object.
-func NewDefaultComponentConfig(insecurePort int32) (kubectrlmgrconfig.KubeControllerManagerConfiguration, error) {
+func NewDefaultComponentConfig() (kubectrlmgrconfig.KubeControllerManagerConfiguration, error) {
 	versioned := kubectrlmgrconfigv1alpha1.KubeControllerManagerConfiguration{}
 	kubectrlmgrconfigscheme.Scheme.Default(&versioned)
 
@@ -223,8 +222,21 @@ func NewDefaultComponentConfig(insecurePort int32) (kubectrlmgrconfig.KubeContro
 	if err := kubectrlmgrconfigscheme.Scheme.Convert(&versioned, &internal, nil); err != nil {
 		return internal, err
 	}
-	internal.Generic.Port = insecurePort
 	return internal, nil
+}
+
+// TODO: remove these insecure flags in v1.24
+func addDummyInsecureFlags(fs *pflag.FlagSet) {
+	var (
+		bindAddr = net.IPv4(127, 0, 0, 1)
+		bindPort = 0
+	)
+	fs.IPVar(&bindAddr, "address", bindAddr,
+		"The IP address on which to serve the insecure --port (set to 0.0.0.0 for all IPv4 interfaces and :: for all IPv6 interfaces).")
+	fs.MarkDeprecated("address", "This flag has no effect now and will be removed in v1.24.")
+
+	fs.IntVar(&bindPort, "port", bindPort, "The port on which to serve unsecured, unauthenticated access. Set to 0 to disable.")
+	fs.MarkDeprecated("port", "This flag has no effect now and will be removed in v1.24.")
 }
 
 // Flags returns flags for a specific APIServer by section name
@@ -235,7 +247,7 @@ func (s *KubeControllerManagerOptions) Flags(allControllers []string, disabledBy
 	s.ServiceController.AddFlags(fss.FlagSet("service controller"))
 
 	s.SecureServing.AddFlags(fss.FlagSet("secure serving"))
-	s.InsecureServing.AddUnqualifiedFlags(fss.FlagSet("insecure serving"))
+	addDummyInsecureFlags(fss.FlagSet("insecure serving"))
 	s.Authentication.AddFlags(fss.FlagSet("authentication"))
 	s.Authorization.AddFlags(fss.FlagSet("authorization"))
 
@@ -248,6 +260,7 @@ func (s *KubeControllerManagerOptions) Flags(allControllers []string, disabledBy
 	s.EndpointController.AddFlags(fss.FlagSet("endpoint controller"))
 	s.EndpointSliceController.AddFlags(fss.FlagSet("endpointslice controller"))
 	s.EndpointSliceMirroringController.AddFlags(fss.FlagSet("endpointslicemirroring controller"))
+	s.EphemeralVolumeController.AddFlags(fss.FlagSet("ephemeralvolume controller"))
 	s.GarbageCollectorController.AddFlags(fss.FlagSet("garbagecollector controller"))
 	s.HPAController.AddFlags(fss.FlagSet("horizontalpodautoscaling controller"))
 	s.JobController.AddFlags(fss.FlagSet("job controller"))
@@ -314,6 +327,9 @@ func (s *KubeControllerManagerOptions) ApplyTo(c *kubecontrollerconfig.Config) e
 	if err := s.EndpointSliceMirroringController.ApplyTo(&c.ComponentConfig.EndpointSliceMirroringController); err != nil {
 		return err
 	}
+	if err := s.EphemeralVolumeController.ApplyTo(&c.ComponentConfig.EphemeralVolumeController); err != nil {
+		return err
+	}
 	if err := s.GarbageCollectorController.ApplyTo(&c.ComponentConfig.GarbageCollectorController); err != nil {
 		return err
 	}
@@ -359,9 +375,6 @@ func (s *KubeControllerManagerOptions) ApplyTo(c *kubecontrollerconfig.Config) e
 	if err := s.TTLAfterFinishedController.ApplyTo(&c.ComponentConfig.TTLAfterFinishedController); err != nil {
 		return err
 	}
-	if err := s.InsecureServing.ApplyTo(&c.InsecureServing, &c.LoopbackClientConfig); err != nil {
-		return err
-	}
 	if err := s.SecureServing.ApplyTo(&c.SecureServing, &c.LoopbackClientConfig); err != nil {
 		return err
 	}
@@ -373,11 +386,6 @@ func (s *KubeControllerManagerOptions) ApplyTo(c *kubecontrollerconfig.Config) e
 			return err
 		}
 	}
-
-	// sync back to component config
-	// TODO: find more elegant way than syncing back the values.
-	c.ComponentConfig.Generic.Port = int32(s.InsecureServing.BindPort)
-	c.ComponentConfig.Generic.Address = s.InsecureServing.BindAddress.String()
 
 	c.OpenShiftContext = s.OpenShiftContext
 
@@ -399,6 +407,7 @@ func (s *KubeControllerManagerOptions) Validate(allControllers []string, disable
 	errs = append(errs, s.EndpointController.Validate()...)
 	errs = append(errs, s.EndpointSliceController.Validate()...)
 	errs = append(errs, s.EndpointSliceMirroringController.Validate()...)
+	errs = append(errs, s.EphemeralVolumeController.Validate()...)
 	errs = append(errs, s.GarbageCollectorController.Validate()...)
 	errs = append(errs, s.HPAController.Validate()...)
 	errs = append(errs, s.JobController.Validate()...)
@@ -415,11 +424,9 @@ func (s *KubeControllerManagerOptions) Validate(allControllers []string, disable
 	errs = append(errs, s.ServiceController.Validate()...)
 	errs = append(errs, s.TTLAfterFinishedController.Validate()...)
 	errs = append(errs, s.SecureServing.Validate()...)
-	errs = append(errs, s.InsecureServing.Validate()...)
 	errs = append(errs, s.Authentication.Validate()...)
 	errs = append(errs, s.Authorization.Validate()...)
 	errs = append(errs, s.Metrics.Validate()...)
-	errs = append(errs, s.Logs.Validate()...)
 
 	// TODO: validate component config, master and kubeconfig
 
@@ -432,7 +439,7 @@ func (s KubeControllerManagerOptions) Config(allControllers []string, disabledBy
 		return nil, err
 	}
 
-	if err := s.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{net.ParseIP("127.0.0.1")}); err != nil {
+	if err := s.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{netutils.ParseIPSloppy("127.0.0.1")}); err != nil {
 		return nil, fmt.Errorf("error creating self-signed certificates: %v", err)
 	}
 
@@ -449,6 +456,9 @@ func (s KubeControllerManagerOptions) Config(allControllers []string, disabledBy
 	if s.OpenShiftContext.PreferredHostRoundTripperWrapperFn != nil {
 		libgorestclient.DefaultServerName(kubeconfig)
 		kubeconfig.Wrap(s.OpenShiftContext.PreferredHostRoundTripperWrapperFn)
+	}
+	for _, customOpenShiftRoundTripper := range s.OpenShiftContext.CustomRoundTrippers {
+		kubeconfig.Wrap(customOpenShiftRoundTripper)
 	}
 
 	client, err := clientset.NewForConfig(restclient.AddUserAgent(kubeconfig, KubeControllerManagerUserAgent))
@@ -467,8 +477,6 @@ func (s KubeControllerManagerOptions) Config(allControllers []string, disabledBy
 		return nil, err
 	}
 	s.Metrics.Apply()
-
-	s.Logs.Apply()
 
 	return c, nil
 }

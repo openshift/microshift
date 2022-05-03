@@ -5,6 +5,8 @@ import (
 
 	authorizationv1client "github.com/openshift/client-go/authorization/clientset/versioned"
 	authorizationv1informer "github.com/openshift/client-go/authorization/informers/externalversions"
+	configv1client "github.com/openshift/client-go/config/clientset/versioned"
+	configv1informer "github.com/openshift/client-go/config/informers/externalversions"
 	imagev1client "github.com/openshift/client-go/image/clientset/versioned"
 	imagev1informer "github.com/openshift/client-go/image/informers/externalversions"
 	oauthv1client "github.com/openshift/client-go/oauth/clientset/versioned"
@@ -31,6 +33,7 @@ type InformerHolder struct {
 
 	// Internal OpenShift informers
 	authorizationInformers authorizationv1informer.SharedInformerFactory
+	configInformers        configv1informer.SharedInformerFactory
 	imageInformers         imagev1informer.SharedInformerFactory
 	oauthInformers         oauthv1informer.SharedInformerFactory
 	quotaInformers         quotainformer.SharedInformerFactory
@@ -43,6 +46,10 @@ type InformerHolder struct {
 // NewInformers is only exposed for the build's integration testing until it can be fixed more appropriately.
 func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeClientConfig *rest.Config, loopbackClientConfig *rest.Config) (*InformerHolder, error) {
 	authorizationClient, err := authorizationv1client.NewForConfig(nonProtobufConfig(kubeClientConfig))
+	if err != nil {
+		return nil, err
+	}
+	configClient, err := configv1client.NewForConfig(nonProtobufConfig(kubeClientConfig))
 	if err != nil {
 		return nil, err
 	}
@@ -82,6 +89,7 @@ func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeCl
 	return &InformerHolder{
 		kubernetesInformers:    kubeInformers,
 		authorizationInformers: authorizationv1informer.NewSharedInformerFactory(authorizationClient, defaultInformerResyncPeriod),
+		configInformers:        configv1informer.NewSharedInformerFactory(configClient, defaultInformerResyncPeriod),
 		imageInformers:         imagev1informer.NewSharedInformerFactory(imageClient, defaultInformerResyncPeriod),
 		oauthInformers:         oauthv1informer.NewSharedInformerFactory(oauthClient, defaultInformerResyncPeriod),
 		quotaInformers:         quotainformer.NewSharedInformerFactory(quotaClient, defaultInformerResyncPeriod),
@@ -107,6 +115,9 @@ func (i *InformerHolder) GetKubernetesInformers() kexternalinformers.SharedInfor
 func (i *InformerHolder) GetOpenshiftAuthorizationInformers() authorizationv1informer.SharedInformerFactory {
 	return i.authorizationInformers
 }
+func (i *InformerHolder) GetOpenshiftConfigInformers() configv1informer.SharedInformerFactory {
+	return i.configInformers
+}
 func (i *InformerHolder) GetOpenshiftImageInformers() imagev1informer.SharedInformerFactory {
 	return i.imageInformers
 }
@@ -130,6 +141,7 @@ func (i *InformerHolder) GetOpenshiftUserInformers() userv1informer.SharedInform
 func (i *InformerHolder) Start(stopCh <-chan struct{}) {
 	i.kubernetesInformers.Start(stopCh)
 	i.authorizationInformers.Start(stopCh)
+	i.configInformers.Start(stopCh)
 	i.imageInformers.Start(stopCh)
 	i.oauthInformers.Start(stopCh)
 	i.quotaInformers.Start(stopCh)

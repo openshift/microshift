@@ -184,6 +184,12 @@ func (r *buildConfigReactor) ImageChanged(obj runtime.Object, tagRetriever trigg
 			// LastTriggeredImageID is an image ref, despite the name
 			continue
 		}
+		// We still need to check the old spec field as well, in case the build config in question was last
+		// triggered while the cluster was at a level prior to 4.8.
+		// LastTriggeredImageID is an image ref, despite the name
+		if latest == p.LastTriggeredImageID {
+			continue
+		}
 
 		// prevent duplicate build trigger causes
 		if fired == nil {

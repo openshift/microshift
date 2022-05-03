@@ -22,6 +22,9 @@ type identityStrategy struct {
 var Strategy = identityStrategy{serverscheme.Scheme}
 
 var _ rest.GarbageCollectionDeleteStrategy = identityStrategy{}
+var _ rest.RESTCreateStrategy = identityStrategy{}
+var _ rest.RESTUpdateStrategy = identityStrategy{}
+var _ rest.RESTDeleteStrategy = identityStrategy{}
 
 func (identityStrategy) DefaultGarbageCollectionPolicy(ctx context.Context) rest.GarbageCollectionPolicy {
 	return rest.Unsupported
@@ -62,6 +65,14 @@ func (identityStrategy) AllowCreateOnUpdate() bool {
 
 func (identityStrategy) AllowUnconditionalUpdate() bool {
 	return false
+}
+
+func (identityStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
+func (identityStrategy) WarningsOnUpdate(ctx context.Context, newObj, oldObj runtime.Object) []string {
+	return nil
 }
 
 // Canonicalize normalizes the object after validation.

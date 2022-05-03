@@ -44,6 +44,11 @@ func (brokerTemplateInstanceStrategy) Validate(ctx context.Context, obj runtime.
 	return validation.ValidateBrokerTemplateInstance(obj.(*templateapi.BrokerTemplateInstance))
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (brokerTemplateInstanceStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // AllowCreateOnUpdate is false for brokertemplateinstances.
 func (brokerTemplateInstanceStrategy) AllowCreateOnUpdate() bool {
 	return false
@@ -56,4 +61,9 @@ func (brokerTemplateInstanceStrategy) AllowUnconditionalUpdate() bool {
 // ValidateUpdate is the default update validation for an end user.
 func (brokerTemplateInstanceStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	return validation.ValidateBrokerTemplateInstanceUpdate(obj.(*templateapi.BrokerTemplateInstance), old.(*templateapi.BrokerTemplateInstance))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (brokerTemplateInstanceStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }

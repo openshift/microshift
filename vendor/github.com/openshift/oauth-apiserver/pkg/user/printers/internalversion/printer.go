@@ -51,7 +51,7 @@ func printUser(user *userapi.User, options printers.GenerateOptions) ([]metav1.T
 
 	row.Cells = append(row.Cells,
 		user.Name,
-		user.UID,
+		string(user.UID),
 		user.FullName,
 		strings.Join(user.Identities, ", "),
 	)
@@ -97,7 +97,7 @@ func printIdentity(identity *userapi.Identity, options printers.GenerateOptions)
 		identity.ProviderName,
 		identity.ProviderUserName,
 		identity.User.Name,
-		identity.User.UID,
+		string(identity.User.UID),
 	)
 
 	return []metav1.TableRow{row}, nil
@@ -136,7 +136,7 @@ func printUserIdentityMapping(mapping *userapi.UserIdentityMapping, options prin
 		mapping.Name,
 		mapping.Identity.Name,
 		mapping.User.Name,
-		mapping.User.UID,
+		string(mapping.User.UID),
 	)
 
 	return []metav1.TableRow{row}, nil

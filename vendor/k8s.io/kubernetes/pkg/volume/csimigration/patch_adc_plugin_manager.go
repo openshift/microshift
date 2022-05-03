@@ -26,8 +26,16 @@ func (pm PluginManager) adcIsMigrationEnabledForPlugin(pluginName string) bool {
 	switch pluginName {
 	case csilibplugins.AWSEBSInTreePluginName:
 		return pm.featureGate.Enabled(features.ADCCSIMigrationAWS)
+	case csilibplugins.AzureDiskInTreePluginName:
+		return pm.featureGate.Enabled(features.ADCCSIMigrationAzureDisk)
+	case csilibplugins.AzureFileInTreePluginName:
+		return pm.featureGate.Enabled(features.ADCCSIMigrationAzureFile)
 	case csilibplugins.CinderInTreePluginName:
 		return pm.featureGate.Enabled(features.ADCCSIMigrationCinder)
+	case csilibplugins.GCEPDInTreePluginName:
+		return pm.featureGate.Enabled(features.ADCCSIMigrationGCEPD)
+	case csilibplugins.VSphereInTreePluginName:
+		return pm.featureGate.Enabled(features.ADCCSIMigrationVSphere)
 	default:
 		return pm.isMigrationEnabledForPlugin(pluginName)
 	}

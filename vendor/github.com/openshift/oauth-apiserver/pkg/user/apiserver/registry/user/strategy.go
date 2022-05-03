@@ -22,6 +22,9 @@ type userStrategy struct {
 var Strategy = userStrategy{serverscheme.Scheme}
 
 var _ rest.GarbageCollectionDeleteStrategy = userStrategy{}
+var _ rest.RESTCreateStrategy = userStrategy{}
+var _ rest.RESTUpdateStrategy = userStrategy{}
+var _ rest.RESTDeleteStrategy = userStrategy{}
 
 func (userStrategy) DefaultGarbageCollectionPolicy(ctx context.Context) rest.GarbageCollectionPolicy {
 	return rest.Unsupported
@@ -60,6 +63,14 @@ func (userStrategy) AllowCreateOnUpdate() bool {
 
 func (userStrategy) AllowUnconditionalUpdate() bool {
 	return false
+}
+
+func (userStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
+func (userStrategy) WarningsOnUpdate(ctx context.Context, newObj, oldObj runtime.Object) []string {
+	return nil
 }
 
 // Canonicalize normalizes the object after validation.

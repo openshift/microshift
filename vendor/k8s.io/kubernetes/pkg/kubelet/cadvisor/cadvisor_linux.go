@@ -1,3 +1,4 @@
+//go:build linux
 // +build linux
 
 /*
@@ -60,10 +61,17 @@ const defaultHousekeepingInterval = 10 * time.Second
 const allowDynamicHousekeeping = true
 
 func init() {
+	maxHouseKeeping := maxHousekeepingInterval.String()
+	if value := os.Getenv("OPENSHIFT_MAX_HOUSEKEEPING_INTERVAL_DURATION"); value != "" {
+		klog.Infof("Detected OPENSHIFT_MAX_HOUSEKEEPING_INTERVAL_DURATION: %v", value)
+		maxHouseKeeping = value
+	}
 	// Override cAdvisor flag defaults.
 	flagOverrides := map[string]string{
 		// Override the default cAdvisor housekeeping interval.
 		"housekeeping_interval": defaultHousekeepingInterval.String(),
+		// Override the default max cAdvisor housekeeping interval.
+		"max_housekeeping_interval": maxHouseKeeping,
 		// Disable event storage by default.
 		"event_storage_event_limit": "default=0",
 		"event_storage_age_limit":   "default=0",
@@ -83,15 +91,20 @@ func New(imageFsInfoProvider ImageFsInfoProvider, rootPath string, cgroupRoots [
 	sysFs := sysfs.NewRealSysFs()
 
 	includedMetrics := cadvisormetrics.MetricSet{
-		cadvisormetrics.CpuUsageMetrics:         struct{}{},
-		cadvisormetrics.MemoryUsageMetrics:      struct{}{},
-		cadvisormetrics.CpuLoadMetrics:          struct{}{},
-		cadvisormetrics.DiskIOMetrics:           struct{}{},
-		cadvisormetrics.NetworkUsageMetrics:     struct{}{},
-		cadvisormetrics.AcceleratorUsageMetrics: struct{}{},
-		cadvisormetrics.AppMetrics:              struct{}{},
-		cadvisormetrics.ProcessMetrics:          struct{}{},
+		cadvisormetrics.CpuUsageMetrics:     struct{}{},
+		cadvisormetrics.MemoryUsageMetrics:  struct{}{},
+		cadvisormetrics.CpuLoadMetrics:      struct{}{},
+		cadvisormetrics.DiskIOMetrics:       struct{}{},
+		cadvisormetrics.NetworkUsageMetrics: struct{}{},
+		cadvisormetrics.AppMetrics:          struct{}{},
+		cadvisormetrics.ProcessMetrics:      struct{}{},
 	}
+
+	// Only add the Accelerator metrics if the feature is inactive
+	if !utilfeature.DefaultFeatureGate.Enabled(kubefeatures.DisableAcceleratorUsageMetrics) {
+		includedMetrics[cadvisormetrics.AcceleratorUsageMetrics] = struct{}{}
+	}
+
 	if usingLegacyStats || utilfeature.DefaultFeatureGate.Enabled(kubefeatures.LocalStorageCapacityIsolation) {
 		includedMetrics[cadvisormetrics.DiskUsageMetrics] = struct{}{}
 	}
@@ -103,7 +116,7 @@ func New(imageFsInfoProvider ImageFsInfoProvider, rootPath string, cgroupRoots [
 	}
 
 	// Create the cAdvisor container manager.
-	m, err := manager.New(memory.New(statsCacheDuration, nil), sysFs, housekeepingConfig, includedMetrics, http.DefaultClient, cgroupRoots, "")
+	m, err := manager.New(memory.New(statsCacheDuration, nil), sysFs, housekeepingConfig, includedMetrics, http.DefaultClient, cgroupRoots, nil /* containerEnvMetadataWhiteList */, "" /* perfEventsFile */, time.Duration(0) /*resctrlInterval*/)
 	if err != nil {
 		return nil, err
 	}

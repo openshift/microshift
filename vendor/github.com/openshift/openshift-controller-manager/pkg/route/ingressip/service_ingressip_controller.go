@@ -114,7 +114,7 @@ func NewIngressIPController(services cache.SharedIndexInformer, kc kclientset.In
 	ic.changeHandler = ic.processChange
 	ic.persistenceHandler = persistService
 
-	ic.ipAllocator, _ = ipallocator.NewAllocatorCIDRRange(ipNet, func(max int, rangeSpec string) (allocator.Interface, error) {
+	ic.ipAllocator, _ = ipallocator.New(ipNet, func(max int, rangeSpec string) (allocator.Interface, error) {
 		return allocator.NewAllocationMap(max, rangeSpec), nil
 	})
 

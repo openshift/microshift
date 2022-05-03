@@ -81,6 +81,11 @@ func (s *templateInstanceStrategy) Validate(ctx context.Context, obj runtime.Obj
 	return allErrs
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (templateInstanceStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // AllowCreateOnUpdate is false for templateinstances.
 func (templateInstanceStrategy) AllowCreateOnUpdate() bool {
 	return false
@@ -159,6 +164,11 @@ func (s *templateInstanceStrategy) validateImpersonation(templateInstance *templ
 	return nil
 }
 
+// WarningsOnUpdate returns warnings for the given update.
+func (templateInstanceStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
+}
+
 type statusStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
@@ -190,6 +200,11 @@ func (statusStrategy) Canonicalize(obj runtime.Object) {
 
 func (statusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	return validation.ValidateTemplateInstanceUpdate(obj.(*templateapi.TemplateInstance), old.(*templateapi.TemplateInstance))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (statusStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }
 
 // convertUserToTemplateInstanceRequester copies analogous fields from user.Info to TemplateInstanceRequester

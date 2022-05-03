@@ -89,7 +89,7 @@ func printTemplate(t *templateapi.Template, options kprinters.GenerateOptions) (
 		params = fmt.Sprintf("%d (all set)", total)
 	}
 
-	row.Cells = append(row.Cells, t.Name, description, params, len(t.Objects))
+	row.Cells = append(row.Cells, t.Name, description, params, int64(len(t.Objects)))
 
 	return []metav1.TableRow{row}, nil
 }

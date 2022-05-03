@@ -1,11 +1,12 @@
 package controller
 
 import (
+	"strings"
+
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 
 	buildclient "github.com/openshift/client-go/build/clientset/versioned"
-
 	buildcontroller "github.com/openshift/openshift-controller-manager/pkg/build/controller/build"
 	builddefaults "github.com/openshift/openshift-controller-manager/pkg/build/controller/build/defaults"
 	buildoverrides "github.com/openshift/openshift-controller-manager/pkg/build/controller/build/overrides"
@@ -41,6 +42,7 @@ func RunBuildController(ctx *ControllerContext) (bool, error) {
 	imageStreamInformer := ctx.ImageInformers.Image().V1().ImageStreams()
 	podInformer := ctx.KubernetesInformers.Core().V1().Pods()
 	secretInformer := ctx.KubernetesInformers.Core().V1().Secrets()
+	configMapInformer := ctx.KubernetesInformers.Core().V1().ConfigMaps()
 	serviceAccountInformer := ctx.KubernetesInformers.Core().V1().ServiceAccounts()
 	controllerConfigInformer := ctx.ConfigInformers.Config().V1().Builds()
 	imageConfigInformer := ctx.ConfigInformers.Config().V1().Images()
@@ -48,6 +50,17 @@ func RunBuildController(ctx *ControllerContext) (bool, error) {
 	controllerManagerConfigMapInformer := ctx.ControllerManagerKubeInformers.Core().V1().ConfigMaps()
 	proxyCfgInformer := ctx.ConfigInformers.Config().V1().Proxies()
 	imageContentSourcePolicyInformer := ctx.OperatorInformers.Operator().V1alpha1().ImageContentSourcePolicies()
+
+	fg := ctx.OpenshiftControllerConfig.FeatureGates
+	csiVolumesEnabled := false
+	if fg != nil {
+		for _, v := range fg {
+			v = strings.TrimSpace(v)
+			if v == "BuildCSIVolumes=true" {
+				csiVolumesEnabled = true
+			}
+		}
+	}
 
 	buildControllerParams := &buildcontroller.BuildControllerParams{
 		BuildInformer:                      buildInformer,
@@ -57,6 +70,7 @@ func RunBuildController(ctx *ControllerContext) (bool, error) {
 		ImageStreamInformer:                imageStreamInformer,
 		PodInformer:                        podInformer,
 		SecretInformer:                     secretInformer,
+		ConfigMapInformer:                  configMapInformer,
 		ServiceAccountInformer:             serviceAccountInformer,
 		OpenshiftConfigConfigMapInformer:   openshiftConfigConfigMapInformer,
 		ControllerManagerConfigMapInformer: controllerManagerConfigMapInformer,
@@ -65,11 +79,13 @@ func RunBuildController(ctx *ControllerContext) (bool, error) {
 		KubeClient:                         externalKubeClient,
 		BuildClient:                        buildClient,
 		DockerBuildStrategy: &buildstrategy.DockerBuildStrategy{
-			Image: imageTemplate.ExpandOrDie("docker-builder"),
+			Image:                  imageTemplate.ExpandOrDie("docker-builder"),
+			BuildCSIVolumesEnabled: csiVolumesEnabled,
 		},
 		SourceBuildStrategy: &buildstrategy.SourceBuildStrategy{
-			Image:          imageTemplate.ExpandOrDie("docker-builder"),
-			SecurityClient: securityClient.SecurityV1(),
+			Image:                   imageTemplate.ExpandOrDie("docker-builder"),
+			SecurityClient:          securityClient.SecurityV1(),
+			BuildCSIVolumeseEnabled: csiVolumesEnabled,
 		},
 		CustomBuildStrategy:      &buildstrategy.CustomBuildStrategy{},
 		BuildDefaults:            builddefaults.BuildDefaults{Config: ctx.OpenshiftControllerConfig.Build.BuildDefaults},

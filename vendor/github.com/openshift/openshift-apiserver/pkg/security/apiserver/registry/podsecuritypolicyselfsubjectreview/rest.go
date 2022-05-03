@@ -8,10 +8,10 @@ import (
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
 	podsecuritypolicysubjectreview "github.com/openshift/openshift-apiserver/pkg/security/apiserver/registry/podsecuritypolicysubjectreview"
-	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	kutilerrors "k8s.io/apimachinery/pkg/util/errors"
 	authserviceaccount "k8s.io/apiserver/pkg/authentication/serviceaccount"
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
@@ -73,17 +73,13 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 		return nil, apierrors.NewBadRequest(fmt.Sprintf("unable to find SecurityContextConstraints: %v", err))
 	}
 
-	var namespace *corev1.Namespace
-	for _, constraint := range matchedConstraints {
-		var (
-			provider sccmatching.SecurityContextConstraintsProvider
-			err      error
-		)
-		if provider, namespace, err = sccmatching.CreateProviderFromConstraint(ns, namespace, constraint, r.client); err != nil {
-			klog.Errorf("Unable to create provider for constraint: %v", err)
-			continue
-		}
-		filled, err := podsecuritypolicysubjectreview.FillPodSecurityPolicySubjectReviewStatus(&pspssr.Status, provider, pspssr.Spec.Template.Spec, constraint)
+	providers, errs := sccmatching.CreateProvidersFromConstraints(ctx, ns, matchedConstraints, r.client)
+	if len(errs) > 0 {
+		return nil, kutilerrors.NewAggregate(errs)
+	}
+
+	for _, provider := range providers {
+		filled, err := podsecuritypolicysubjectreview.FillPodSecurityPolicySubjectReviewStatus(&pspssr.Status, provider, pspssr.Spec.Template.Spec, provider.GetSCC())
 		if err != nil {
 			klog.Errorf("unable to fill PodSecurityPolicySelfSubjectReview from constraint %v", err)
 			continue

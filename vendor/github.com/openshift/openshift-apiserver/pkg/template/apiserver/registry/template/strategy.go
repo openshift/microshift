@@ -43,6 +43,11 @@ func (templateStrategy) Validate(ctx context.Context, obj runtime.Object) field.
 	return validation.ValidateTemplate(obj.(*templateapi.Template))
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (templateStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // AllowCreateOnUpdate is false for templates.
 func (templateStrategy) AllowCreateOnUpdate() bool {
 	return false
@@ -55,4 +60,9 @@ func (templateStrategy) AllowUnconditionalUpdate() bool {
 // ValidateUpdate is the default update validation for an end user.
 func (templateStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	return validation.ValidateTemplateUpdate(obj.(*templateapi.Template), old.(*templateapi.Template))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (templateStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }

@@ -38,6 +38,11 @@ func (s strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorL
 	return buildvalidation.ValidateBuildRequest(obj.(*buildapi.BuildRequest))
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // Canonicalize normalizes the object after validation.
 func (strategy) Canonicalize(obj runtime.Object) {
 }

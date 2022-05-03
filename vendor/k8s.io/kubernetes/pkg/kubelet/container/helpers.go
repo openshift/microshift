@@ -29,8 +29,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
-	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1alpha2"
+	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1"
 	podutil "k8s.io/kubernetes/pkg/api/v1/pod"
+	sc "k8s.io/kubernetes/pkg/securitycontext"
 	hashutil "k8s.io/kubernetes/pkg/util/hash"
 	"k8s.io/kubernetes/third_party/forked/golang/expansion"
 	utilsnet "k8s.io/utils/net"
@@ -38,7 +39,7 @@ import (
 
 // HandlerRunner runs a lifecycle handler for a container.
 type HandlerRunner interface {
-	Run(containerID ContainerID, pod *v1.Pod, container *v1.Container, handler *v1.Handler) (string, error)
+	Run(containerID ContainerID, pod *v1.Pod, container *v1.Container, handler *v1.LifecycleHandler) (string, error)
 }
 
 // RuntimeHelper wraps kubelet to make container runtime
@@ -308,6 +309,34 @@ func HasPrivilegedContainer(pod *v1.Pod) bool {
 		return true
 	})
 	return hasPrivileged
+}
+
+// HasWindowsHostProcessContainer returns true if any of the containers in a pod are HostProcess containers.
+func HasWindowsHostProcessContainer(pod *v1.Pod) bool {
+	var hasHostProcess bool
+	podutil.VisitContainers(&pod.Spec, podutil.AllFeatureEnabledContainers(), func(c *v1.Container, containerType podutil.ContainerType) bool {
+		if sc.HasWindowsHostProcessRequest(pod, c) {
+			hasHostProcess = true
+			return false
+		}
+		return true
+	})
+
+	return hasHostProcess
+}
+
+// AllContainersAreWindowsHostProcess returns true if all containres in a pod are HostProcess containers.
+func AllContainersAreWindowsHostProcess(pod *v1.Pod) bool {
+	allHostProcess := true
+	podutil.VisitContainers(&pod.Spec, podutil.AllFeatureEnabledContainers(), func(c *v1.Container, containerType podutil.ContainerType) bool {
+		if !sc.HasWindowsHostProcessRequest(pod, c) {
+			allHostProcess = false
+			return false
+		}
+		return true
+	})
+
+	return allHostProcess
 }
 
 // MakePortMappings creates internal port mapping from api port mapping.
