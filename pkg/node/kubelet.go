@@ -136,14 +136,9 @@ serializeImagePulls: false
 systemCgroups: /system.slice
 featureGates:
   APIPriorityAndFairness: true
-  LegacyNodeRoleBehavior: false
   # Will be removed in future openshift/api update https://github.com/openshift/api/commit/c8c8f6d0f4a8ac4ff4ad7d1a84b27e1aa7ebf9b4
   RemoveSelfLink: false
-  NodeDisruptionExclusion: true
   RotateKubeletServerCertificate: false #TODO
-  SCTPSupport: true
-  ServiceNodeExclusion: true
-  SupportPodPidsLimit: true
 serverTLSBootstrap: false #TODO`)
 
 	// Load real resolv.conf in case systemd-resolved is used
@@ -193,7 +188,7 @@ func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 	if err != nil {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
-	loader, err := configfiles.NewFsLoader(utilfs.DefaultFs{}, kubeletConfigFile)
+	loader, err := configfiles.NewFsLoader(&utilfs.DefaultFs{}, kubeletConfigFile)
 	if err != nil {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
