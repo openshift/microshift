@@ -108,10 +108,14 @@ func ApplyKustomization(kustomization string, kubeconfig string) error {
 		"-k", kustomization,
 	}
 	util.Must(applyCommand.ParseFlags(args))
+	applyFlags := apply.NewApplyFlags(f, ioStreams)
+	applyFlags.AddFlags(cmds)
+	o, err := applyFlags.ToOptions(cmds, "kubectl", args)
+	if err != nil {
+		return err
+	}
 
-	o := apply.NewApplyOptions(ioStreams)
-	o.DeleteFlags.FileNameFlags.Kustomize = &kustomization
-	if err := o.Complete(f, applyCommand); err != nil {
+	if err := o.Validate(cmds, args); err != nil {
 		return err
 	}
 	return o.Run()
