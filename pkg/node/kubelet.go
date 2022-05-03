@@ -193,7 +193,7 @@ func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 	if err != nil {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
-	loader, err := configfiles.NewFsLoader(utilfs.DefaultFs{}, kubeletConfigFile)
+	loader, err := configfiles.NewFsLoader(&utilfs.DefaultFs{}, kubeletConfigFile)
 	if err != nil {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
