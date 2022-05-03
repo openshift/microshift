@@ -55,10 +55,7 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 		klog.Fatalf("failed to write kube-scheduler config: %v", err)
 	}
 
-	opts, err := schedulerOptions.NewOptions()
-	if err != nil {
-		klog.Fatalf("initialization error command options: %v", err)
-	}
+	opts := schedulerOptions.NewOptions()
 
 	args := []string{
 		"--config=" + cfg.DataDir + "/resources/kube-scheduler/config/config.yaml",
@@ -71,7 +68,7 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
 	}
 
-	namedFlagSets := opts.Flags()
+	namedFlagSets := opts.Flags
 	fs := cmd.Flags()
 	for _, f := range namedFlagSets.FlagSets {
 		fs.AddFlagSet(f)
@@ -85,7 +82,7 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 }
 
 func (s *KubeScheduler) writeConfig(cfg *config.MicroshiftConfig) error {
-	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta1
+	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta3
 kind: KubeSchedulerConfiguration
 clientConnection:
   kubeconfig: ` + cfg.DataDir + `/resources/kube-scheduler/kubeconfig
