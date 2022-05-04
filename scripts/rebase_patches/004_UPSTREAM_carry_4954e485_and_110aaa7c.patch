@@ -1,0 +1,44 @@
+diff --git a/vendor/k8s.io/apiserver/pkg/server/config.go b/vendor/k8s.io/apiserver/pkg/server/config.go
+index e6675346..a9b8d859 100644
+--- a/vendor/k8s.io/apiserver/pkg/server/config.go
++++ b/vendor/k8s.io/apiserver/pkg/server/config.go
+@@ -485,6 +485,11 @@ func (c *Config) AddPostStartHookOrDie(name string, hook PostStartHookFunc) {
+ 	}
+ }
+ 
++// HasBeenReadySignal exposes a server's lifecycle signal which is signaled when the readyz endpoint succeeds for the first time.
++func (c *Config) HasBeenReadySignal() <-chan struct{} {
++	return c.lifecycleSignals.HasBeenReady.Signaled()
++}
++
+ // Complete fills in any fields not set that are required to have valid data and can be derived
+ // from other fields. If you're going to `ApplyOptions`, do that first. It's mutating the receiver.
+ func (c *Config) Complete(informers informers.SharedInformerFactory) CompletedConfig {
+@@ -609,7 +614,7 @@ func eventReference() (*corev1.ObjectReference, error) {
+ 	}
+ 	if len(ns) == 0 {
+ 		pod = ""
+-		ns = "kube-system"
++		ns = "openshift-kube-apiserver"
+ 	}
+ 	if len(pod) == 0 {
+ 		return &corev1.ObjectReference{
+@@ -876,6 +881,8 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
+ 	handler = genericapifilters.WithRequestDeadline(handler, c.AuditBackend, c.AuditPolicyRuleEvaluator,
+ 		c.LongRunningFunc, c.Serializer, c.RequestTimeout)
+ 	handler = genericfilters.WithWaitGroup(handler, c.LongRunningFunc, c.HandlerChainWaitGroup)
++	handler = WithNonReadyRequestLogging(handler, c.lifecycleSignals.HasBeenReady)
++	handler = WithLateConnectionFilter(handler)
+ 	if c.SecureServing != nil && !c.SecureServing.DisableHTTP2 && c.GoawayChance > 0 {
+ 		handler = genericfilters.WithProbabilisticGoaway(handler, c.GoawayChance)
+ 	}
+@@ -886,7 +893,8 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
+ 	if c.ShutdownSendRetryAfter {
+ 		handler = genericfilters.WithRetryAfter(handler, c.lifecycleSignals.AfterShutdownDelayDuration.Signaled())
+ 	}
+-	handler = genericfilters.WithHTTPLogging(handler)
++	handler = genericfilters.WithOptInRetryAfter(handler, c.newServerFullyInitializedFunc())
++	handler = genericfilters.WithHTTPLogging(handler, c.newIsTerminatingFunc())
+ 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.APIServerTracing) {
+ 		handler = genericapifilters.WithTracing(handler, c.TracerProvider)
+ 	}
