@@ -43,6 +43,11 @@ const (
 	// GitCloneContainer is the name of the container that will clone the
 	// build source repository and also handle binary input content.
 	GitCloneContainer = "git-clone"
+
+	// buildVolumeMountPath is where user defined BuildVolumes get mounted
+	buildVolumeMountPath = "/var/run/openshift.io/volumes"
+	// buildVolumeSuffix is a suffix for BuildVolume names
+	buildVolumeSuffix = "user-build-volume"
 )
 
 const (
@@ -108,14 +113,20 @@ func setupDockerSocket(pod *corev1.Pod) {
 
 // mountConfigMapVolume is a helper method responsible for actual mounting configMap
 // volumes into a pod.
-func mountConfigMapVolume(pod *corev1.Pod, container *corev1.Container, configMapName, mountPath, volumeSuffix string) {
-	mountVolume(pod, container, configMapName, mountPath, volumeSuffix, policy.ConfigMap)
+func mountConfigMapVolume(pod *corev1.Pod, container *corev1.Container, configMapName, mountPath, volumeSuffix string, volumeSource *corev1.VolumeSource) {
+	mountVolume(pod, container, configMapName, mountPath, volumeSuffix, policy.ConfigMap, volumeSource)
 }
 
 // mountSecretVolume is a helper method responsible for actual mounting secret
 // volumes into a pod.
-func mountSecretVolume(pod *corev1.Pod, container *corev1.Container, secretName, mountPath, volumeSuffix string) {
-	mountVolume(pod, container, secretName, mountPath, volumeSuffix, policy.Secret)
+func mountSecretVolume(pod *corev1.Pod, container *corev1.Container, secretName, mountPath, volumeSuffix string, volumeSource *corev1.VolumeSource) {
+	mountVolume(pod, container, secretName, mountPath, volumeSuffix, policy.Secret, volumeSource)
+}
+
+// mountCSIVolume is a helper method responsible for actual mounting csi
+// volumes into a pod.
+func mountCSIVolume(pod *corev1.Pod, container *corev1.Container, volumeName, mountPath, volumeSuffix string, volumeSource *corev1.VolumeSource) {
+	mountVolume(pod, container, volumeName, mountPath, volumeSuffix, policy.CSI, volumeSource)
 }
 
 // mountVolume is a helper method responsible for mounting volumes into a pod.
@@ -124,7 +135,7 @@ func mountSecretVolume(pod *corev1.Pod, container *corev1.Container, secretName,
 // 1. ConfigMap
 // 2. EmptyDir
 // 3. Secret
-func mountVolume(pod *corev1.Pod, container *corev1.Container, objName, mountPath, volumeSuffix string, fsType policy.FSType) {
+func mountVolume(pod *corev1.Pod, container *corev1.Container, objName, mountPath, volumeSuffix string, fsType policy.FSType, volumeSource *corev1.VolumeSource) {
 	volumeName := naming.GetName(objName, volumeSuffix, kvalidation.DNS1123LabelMaxLength)
 
 	// coerce from RFC1123 subdomain to RFC1123 label.
@@ -139,7 +150,7 @@ func mountVolume(pod *corev1.Pod, container *corev1.Container, objName, mountPat
 	}
 	mode := int32(0600)
 	if !volumeExists {
-		volume := makeVolume(volumeName, objName, mode, fsType)
+		volume := makeVolume(volumeName, objName, mode, fsType, volumeSource)
 		pod.Spec.Volumes = append(pod.Spec.Volumes, volume)
 	}
 
@@ -151,7 +162,7 @@ func mountVolume(pod *corev1.Pod, container *corev1.Container, objName, mountPat
 	container.VolumeMounts = append(container.VolumeMounts, volumeMount)
 }
 
-func makeVolume(volumeName, refName string, mode int32, fsType policy.FSType) corev1.Volume {
+func makeVolume(volumeName, refName string, mode int32, fsType policy.FSType, volumeSource *corev1.VolumeSource) corev1.Volume {
 	// TODO: Add support for key-based paths for secrets and configMaps?
 	vol := corev1.Volume{
 		Name:         volumeName,
@@ -159,18 +170,36 @@ func makeVolume(volumeName, refName string, mode int32, fsType policy.FSType) co
 	}
 	switch fsType {
 	case policy.ConfigMap:
-		vol.VolumeSource.ConfigMap = &corev1.ConfigMapVolumeSource{
-			LocalObjectReference: corev1.LocalObjectReference{
-				Name: refName,
-			},
-			DefaultMode: &mode,
+		if volumeSource != nil && volumeSource.ConfigMap != nil {
+			vol.VolumeSource.ConfigMap = volumeSource.ConfigMap.DeepCopy()
+		} else {
+			vol.VolumeSource.ConfigMap = &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: refName,
+				},
+				DefaultMode: &mode,
+			}
 		}
 	case policy.EmptyDir:
-		vol.VolumeSource.EmptyDir = &corev1.EmptyDirVolumeSource{}
+		if volumeSource != nil && volumeSource.EmptyDir != nil {
+			vol.VolumeSource.EmptyDir = volumeSource.EmptyDir.DeepCopy()
+		} else {
+			vol.VolumeSource.EmptyDir = &corev1.EmptyDirVolumeSource{}
+		}
 	case policy.Secret:
-		vol.VolumeSource.Secret = &corev1.SecretVolumeSource{
-			SecretName:  refName,
-			DefaultMode: &mode,
+		if volumeSource != nil && volumeSource.Secret != nil {
+			vol.VolumeSource.Secret = volumeSource.Secret.DeepCopy()
+		} else {
+			vol.VolumeSource.Secret = &corev1.SecretVolumeSource{
+				SecretName:  refName,
+				DefaultMode: &mode,
+			}
+		}
+	case policy.CSI:
+		if volumeSource != nil && volumeSource.CSI != nil {
+			vol.VolumeSource.CSI = volumeSource.CSI.DeepCopy()
+		} else {
+			vol.VolumeSource.CSI = &corev1.CSIVolumeSource{}
 		}
 	default:
 		klog.V(3).Infof("File system %s is not supported for volumes. Using empty directory instead.", fsType)
@@ -184,7 +213,7 @@ func makeVolume(volumeName, refName string, mode int32, fsType policy.FSType) co
 // allowing Docker to authenticate against private registries or Docker Hub.
 func setupDockerSecrets(pod *corev1.Pod, container *corev1.Container, pushSecret, pullSecret *corev1.LocalObjectReference, imageSources []buildv1.ImageSource) {
 	if pushSecret != nil {
-		mountSecretVolume(pod, container, pushSecret.Name, DockerPushSecretMountPath, "push")
+		mountSecretVolume(pod, container, pushSecret.Name, DockerPushSecretMountPath, "push", nil)
 		container.Env = append(container.Env, []corev1.EnvVar{
 			{Name: "PUSH_DOCKERCFG_PATH", Value: DockerPushSecretMountPath},
 		}...)
@@ -192,7 +221,7 @@ func setupDockerSecrets(pod *corev1.Pod, container *corev1.Container, pushSecret
 	}
 
 	if pullSecret != nil {
-		mountSecretVolume(pod, container, pullSecret.Name, DockerPullSecretMountPath, "pull")
+		mountSecretVolume(pod, container, pullSecret.Name, DockerPullSecretMountPath, "pull", nil)
 		container.Env = append(container.Env, []corev1.EnvVar{
 			{Name: "PULL_DOCKERCFG_PATH", Value: DockerPullSecretMountPath},
 		}...)
@@ -204,7 +233,7 @@ func setupDockerSecrets(pod *corev1.Pod, container *corev1.Container, pushSecret
 			continue
 		}
 		mountPath := filepath.Join(SourceImagePullSecretMountPath, strconv.Itoa(i))
-		mountSecretVolume(pod, container, imageSource.PullSecret.Name, mountPath, fmt.Sprintf("%s%d", "source-image", i))
+		mountSecretVolume(pod, container, imageSource.PullSecret.Name, mountPath, fmt.Sprintf("%s%d", "source-image", i), nil)
 		container.Env = append(container.Env, []corev1.EnvVar{
 			{Name: fmt.Sprintf("%s%d", "PULL_SOURCE_DOCKERCFG_PATH_", i), Value: mountPath},
 		}...)
@@ -219,7 +248,7 @@ func setupSourceSecrets(pod *corev1.Pod, container *corev1.Container, sourceSecr
 		return
 	}
 
-	mountSecretVolume(pod, container, sourceSecret.Name, sourceSecretMountPath, "source")
+	mountSecretVolume(pod, container, sourceSecret.Name, sourceSecretMountPath, "source", nil)
 	klog.V(3).Infof("Installed source secrets in %s, in Pod %s/%s", sourceSecretMountPath, pod.Namespace, pod.Name)
 	container.Env = append(container.Env, []corev1.EnvVar{
 		{Name: "SOURCE_SECRET_PATH", Value: sourceSecretMountPath},
@@ -230,7 +259,7 @@ func setupSourceSecrets(pod *corev1.Pod, container *corev1.Container, sourceSecr
 // into a builder container.
 func setupInputConfigMaps(pod *corev1.Pod, container *corev1.Container, configs []buildv1.ConfigMapBuildSource) {
 	for _, c := range configs {
-		mountConfigMapVolume(pod, container, c.ConfigMap.Name, filepath.Join(ConfigMapBuildSourceBaseMountPath, c.ConfigMap.Name), "build")
+		mountConfigMapVolume(pod, container, c.ConfigMap.Name, filepath.Join(ConfigMapBuildSourceBaseMountPath, c.ConfigMap.Name), "build", nil)
 		klog.V(3).Infof("%s will be used as a build config in %s", c.ConfigMap.Name, ConfigMapBuildSourceBaseMountPath)
 	}
 }
@@ -239,7 +268,7 @@ func setupInputConfigMaps(pod *corev1.Pod, container *corev1.Container, configs 
 // into a builder container.
 func setupInputSecrets(pod *corev1.Pod, container *corev1.Container, secrets []buildv1.SecretBuildSource) {
 	for _, s := range secrets {
-		mountSecretVolume(pod, container, s.Secret.Name, filepath.Join(SecretBuildSourceBaseMountPath, s.Secret.Name), "build")
+		mountSecretVolume(pod, container, s.Secret.Name, filepath.Join(SecretBuildSourceBaseMountPath, s.Secret.Name), "build", nil)
 		klog.V(3).Infof("%s will be used as a build secret in %s", s.Secret.Name, SecretBuildSourceBaseMountPath)
 	}
 }
@@ -317,7 +346,7 @@ func setupActiveDeadline(pod *corev1.Pod, build *buildv1.Build) *corev1.Pod {
 // setupAdditionalSecrets creates secret volume mounts in the given pod for the given list of secrets
 func setupAdditionalSecrets(pod *corev1.Pod, container *corev1.Container, secrets []buildv1.SecretSpec) {
 	for _, secretSpec := range secrets {
-		mountSecretVolume(pod, container, secretSpec.SecretSource.Name, secretSpec.MountPath, "secret")
+		mountSecretVolume(pod, container, secretSpec.SecretSource.Name, secretSpec.MountPath, "secret", nil)
 		klog.V(3).Infof("Installed additional secret in %s, in Pod %s/%s", secretSpec.MountPath, pod.Namespace, pod.Name)
 	}
 }
@@ -648,4 +677,67 @@ func setupBlobCache(pod *corev1.Pod) {
 		}
 		pod.Spec.InitContainers = initContainers
 	}
+}
+
+// setupBuildVolumes sets up user defined BuildVolumes
+func setupBuildVolumes(pod *corev1.Pod, buildVolumes []buildv1.BuildVolume, csiVolumesEnabled bool) error {
+	// if there are no BuildVolumes or the pod is nil,
+	// there is no processing needed, so just return quickly
+	if len(buildVolumes) == 0 || pod == nil {
+		return nil
+	}
+
+	usedUserVolumeMounts := make(map[string]struct{})
+
+	// iterate over existing VolumeMounts and add to the map
+	if len(pod.Spec.Containers) != 0 {
+		for _, vm := range pod.Spec.Containers[0].VolumeMounts {
+			usedUserVolumeMounts[vm.MountPath] = struct{}{}
+		}
+	}
+
+	for _, buildVolume := range buildVolumes {
+		// check for user provided mountPath collisions and return an error if one is found
+		for _, bvm := range buildVolume.Mounts {
+			if _, ok := usedUserVolumeMounts[bvm.DestinationPath]; ok {
+				// fail if a collision is found
+				return fmt.Errorf("user provided BuildVolumeMount path %q collides with VolumeMount path created by the build controller", bvm.DestinationPath)
+			}
+		}
+
+		volumeSource := corev1.VolumeSource{}
+
+		// if no collisions are found go ahead and add the volume/volume mount to the pod/container
+		switch buildVolume.Source.Type {
+		case buildv1.BuildVolumeSourceTypeSecret:
+			volumeSource.Secret = buildVolume.Source.Secret
+			mountSecretVolume(pod, &pod.Spec.Containers[0], strings.ToLower(buildVolume.Source.Secret.SecretName), PathForBuildVolume(buildVolume.Source.Secret.SecretName), buildVolumeSuffix, &volumeSource)
+		case buildv1.BuildVolumeSourceTypeConfigMap:
+			volumeSource.ConfigMap = buildVolume.Source.ConfigMap
+			mountConfigMapVolume(pod, &pod.Spec.Containers[0], strings.ToLower(buildVolume.Source.ConfigMap.Name), PathForBuildVolume(buildVolume.Source.ConfigMap.Name), buildVolumeSuffix, &volumeSource)
+		case buildv1.BuildVolumeSourceTypeCSI:
+			if !csiVolumesEnabled {
+				return fmt.Errorf("csi volumes require the BuildCSIVolumes feature gate to be enabled")
+			}
+			volumeSource.CSI = buildVolume.Source.CSI
+			mountCSIVolume(pod, &pod.Spec.Containers[0], strings.ToLower(buildVolume.Name), PathForBuildVolume(buildVolume.Name), buildVolumeSuffix, &volumeSource)
+
+		default:
+			return fmt.Errorf("encountered unsupported build volume source type %q", buildVolume.Source.Type)
+		}
+	}
+
+	return nil
+}
+
+// NameForBuildVolume returns a valid pod volume name for the provided build volume name.
+func NameForBuildVolume(objName string) string {
+	// Volume names must be a valid DNS Label - see https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names
+	return naming.GetName(strings.ToLower(objName), buildVolumeSuffix, kvalidation.DNS1123LabelMaxLength)
+}
+
+// PathForBuildVolume returns the path in the builder container where the build volume is mounted.
+// This should not be confused with the destination path for the volume inside buildah's runtime environment.
+func PathForBuildVolume(objName string) string {
+	return filepath.Join(buildVolumeMountPath, NameForBuildVolume(objName))
 }

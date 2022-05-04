@@ -15,7 +15,6 @@ import (
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	imagedockerpre012 "github.com/openshift/openshift-apiserver/pkg/image/apis/image/dockerpre012"
-	dockerregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 )
 
 func schema1ToImage(manifest *schema1.SignedManifest, d godigest.Digest) (*imageapi.Image, error) {
@@ -87,21 +86,6 @@ func schema2OrOCIToImage(manifest distribution.Manifest, imageConfig []byte, d g
 		DockerImageConfig:            string(imageConfig),
 		DockerImageManifestMediaType: mediatype,
 		DockerImageMetadataVersion:   "1.0",
-	}
-
-	return image, nil
-}
-
-func schema0ToImage(dockerImage *dockerregistry.Image) (*imageapi.Image, error) {
-	var baseImage imageapi.DockerImage
-	dockerregistry.Convert_docker_Image_to_image_DockerImage(&dockerImage.Image, &baseImage)
-
-	image := &imageapi.Image{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: dockerImage.Image.ID,
-		},
-		DockerImageMetadata:        baseImage,
-		DockerImageMetadataVersion: "1.0",
 	}
 
 	return image, nil

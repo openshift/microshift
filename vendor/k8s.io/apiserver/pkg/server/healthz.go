@@ -21,8 +21,8 @@ import (
 	"net/http"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apiserver/pkg/server/healthz"
+	"k8s.io/utils/clock"
 )
 
 // AddHealthChecks adds HealthCheck(s) to health endpoints (healthz, livez, readyz) but
@@ -105,7 +105,7 @@ func (s *GenericAPIServer) installReadyz() {
 	s.readyzChecksInstalled = true
 	healthz.InstallReadyzHandlerWithHealthyFunc(s.Handler.NonGoRestfulMux, func() {
 		// note: InstallReadyzHandlerWithHealthyFunc guarantees that this is called only once
-		close(s.hasBeenReadyCh)
+		s.lifecycleSignals.HasBeenReady.Signal()
 	}, s.readyzChecks...)
 }
 

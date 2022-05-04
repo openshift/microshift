@@ -73,3 +73,8 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 func (strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	return validation.ValidateDeploymentConfigUpdate(obj.(*appsapi.DeploymentConfig), old.(*appsapi.DeploymentConfig))
 }
+
+// WarningsOnUpdate returns warnings for the given update.
+func (strategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
+}

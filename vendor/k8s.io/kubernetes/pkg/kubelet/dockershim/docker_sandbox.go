@@ -1,3 +1,4 @@
+//go:build !dockerless
 // +build !dockerless
 
 /*
@@ -40,7 +41,7 @@ import (
 )
 
 const (
-	defaultSandboxImage = "k8s.gcr.io/pause:3.4.1"
+	defaultSandboxImage = "k8s.gcr.io/pause:3.6"
 
 	// Various default sandbox resources requests/limits.
 	defaultSandboxCPUshares int64 = 2
@@ -97,7 +98,7 @@ func (ds *dockerService) RunPodSandbox(ctx context.Context, r *runtimeapi.RunPod
 	}
 
 	// NOTE: To use a custom sandbox image in a private repository, users need to configure the nodes with credentials properly.
-	// see: http://kubernetes.io/docs/user-guide/images/#configuring-nodes-to-authenticate-to-a-private-repository
+	// see: https://kubernetes.io/docs/user-guide/images/#configuring-nodes-to-authenticate-to-a-private-registry
 	// Only pull sandbox image when it's not present - v1.PullIfNotPresent.
 	if err := ensureSandboxImageExists(ds.client, image); err != nil {
 		return nil, err

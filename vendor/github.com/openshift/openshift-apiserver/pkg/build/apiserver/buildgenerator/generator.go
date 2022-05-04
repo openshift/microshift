@@ -370,13 +370,19 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 	if from != nil {
 		requestTrigger, responseTrigger = findImageChangeTrigger(bc, from)
 	}
-	if triggeredBy != nil &&
-		//TODO we still update spec until deprecated field (drepcated in 4.8) is removed (presumably 4.9)
-		((requestTrigger != nil && requestTrigger.LastTriggeredImageID == triggeredBy.Name) ||
-			(responseTrigger != nil && responseTrigger.LastTriggeredImageID == triggeredBy.Name)) {
+	if triggeredBy != nil && (responseTrigger != nil && responseTrigger.LastTriggeredImageID == triggeredBy.Name) {
 		klog.V(2).Infof("Aborting imageid triggered build for BuildConfig %s/%s with imageid %s because the BuildConfig already matches this imageid", bc.Namespace, bc.Name, triggeredBy.Name)
 		return fmt.Errorf("build config %s/%s has already instantiated a build for imageid %s", bc.Namespace, bc.Name, triggeredBy.Name)
 	}
+	// NOTE:  with this current form, if a BC was created and triggered while the cluster was prior to 4.8, as we are
+	// ignoring the spec last triggered here, that in theory would result in a one time retrigger of the build with the same image, where we store
+	// the details in the status instead of the spec.  However, with OCM ICT for BC now checking both spec and status, such
+	// a request should never come.  OCM ICT for BC should only instantiate if both spec and status last triggered do
+	// not match the latest.  The alternative, if we assumed OCM ICT for BC did not do the right thing, is have some
+	// kludgy one time copy of the spec last triggered information to status, and update the BC, but without instantiating.
+	// Of course, this takes the assumption that OCM and apiserver in a healthy, supportable cluster, are at the same version.
+	// If one of them failed to upgrade, the cluster is degraded regardless.
+
 	// Update last triggered image id for all image change triggers
 	// reset the status field in case the list of ICTs change in the spec; we'll then repopulate all of them
 	bc.Status.ImageChangeTriggers = []buildv1.ImageChangeTriggerStatus{}
@@ -393,8 +399,6 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 		}
 		// Use the requested image id for the trigger that caused the build, otherwise resolve to the latest
 		if triggeredBy != nil && trigger.ImageChange == requestTrigger {
-			//TODO we still update spec until deprecated field (deprecated in 4.8) is ignored (presumably 4.9)
-			trigger.ImageChange.LastTriggeredImageID = triggeredBy.Name
 			imageChangeTriggerStatus.LastTriggeredImageID = triggeredBy.Name
 			// we only update the trigger time for trigger associated with triggeredBy
 			imageChangeTriggerStatus.LastTriggerTime = metav1.Now()
@@ -423,8 +427,6 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 			// Otherwise, warn that an error occurred, but continue
 			klog.Warningf("Could not resolve trigger reference for build config %s/%s: %#v", bc.Namespace, bc.Name, triggerImageRef)
 		}
-		//TODO we still update spec until deprecated field (deprecated in 4.8) is ignored (presumably 4.9)
-		trigger.ImageChange.LastTriggeredImageID = image
 		imageChangeTriggerStatus.LastTriggeredImageID = image
 		// reminder: we do not update the LastTriggeredTime here
 		bc.Status.ImageChangeTriggers = append(bc.Status.ImageChangeTriggers, imageChangeTriggerStatus)

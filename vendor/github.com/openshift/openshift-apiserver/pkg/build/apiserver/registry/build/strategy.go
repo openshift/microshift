@@ -126,9 +126,19 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	return validation.ValidateBuild(obj.(*buildapi.Build))
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // ValidateUpdate is the default update validation for an end user.
 func (strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	return validation.ValidateBuildUpdate(obj.(*buildapi.Build), old.(*buildapi.Build))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (strategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }
 
 // CheckGracefulDelete allows a build to be gracefully deleted.

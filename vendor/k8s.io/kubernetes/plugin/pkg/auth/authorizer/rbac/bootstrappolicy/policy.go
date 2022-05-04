@@ -178,8 +178,8 @@ func NodeRules() []rbacv1.PolicyRule {
 	return nodePolicyRules
 }
 
-// clusterRoles returns the cluster roles to bootstrap an API server with
-func clusterRoles() []rbacv1.ClusterRole {
+// ClusterRoles returns the cluster roles to bootstrap an API server with
+func ClusterRoles() []rbacv1.ClusterRole {
 	roles := []rbacv1.ClusterRole{
 		{
 			// a "root" role which can do absolutely anything
@@ -214,15 +214,6 @@ func clusterRoles() []rbacv1.ClusterRole {
 					"/metrics",
 					"/livez", "/readyz", "/healthz",
 					"/livez/*", "/readyz/*", "/healthz/*",
-				).RuleOrDie(),
-			},
-		},
-		{
-			// a role which provides unauthenticated access.
-			ObjectMeta: metav1.ObjectMeta{Name: "system:openshift:public-info-viewer"},
-			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("get").URLs(
-					"/.well-known", "/.well-known/*",
 				).RuleOrDie(),
 			},
 		},
@@ -294,7 +285,7 @@ func clusterRoles() []rbacv1.ClusterRole {
 
 				rbacv1helpers.NewRule(Write...).Groups(legacyGroup).Resources("pods", "pods/attach", "pods/proxy", "pods/exec", "pods/portforward").RuleOrDie(),
 				rbacv1helpers.NewRule(Write...).Groups(legacyGroup).Resources("replicationcontrollers", "replicationcontrollers/scale", "serviceaccounts",
-					"services", "services/proxy", "endpoints", "persistentvolumeclaims", "configmaps", "secrets").RuleOrDie(),
+					"services", "services/proxy", "persistentvolumeclaims", "configmaps", "secrets", "events").RuleOrDie(),
 
 				rbacv1helpers.NewRule(Write...).Groups(appsGroup).Resources(
 					"statefulsets", "statefulsets/scale",
@@ -328,6 +319,8 @@ func clusterRoles() []rbacv1.ClusterRole {
 				// read access to namespaces at the namespace scope means you can read *this* namespace.  This can be used as an
 				// indicator of which namespaces you have access to.
 				rbacv1helpers.NewRule(Read...).Groups(legacyGroup).Resources("namespaces").RuleOrDie(),
+
+				rbacv1helpers.NewRule(Read...).Groups(discoveryGroup).Resources("endpointslices").RuleOrDie(),
 
 				rbacv1helpers.NewRule(Read...).Groups(appsGroup).Resources(
 					"controllerrevisions",
@@ -576,14 +569,13 @@ func clusterRoles() []rbacv1.ClusterRole {
 const systemNodeRoleName = "system:node"
 
 // ClusterRoleBindings return default rolebindings to the default roles
-func clusterRoleBindings() []rbacv1.ClusterRoleBinding {
+func ClusterRoleBindings() []rbacv1.ClusterRoleBinding {
 	rolebindings := []rbacv1.ClusterRoleBinding{
 		rbacv1helpers.NewClusterBinding("cluster-admin").Groups(user.SystemPrivilegedGroup).BindingOrDie(),
 		rbacv1helpers.NewClusterBinding("system:monitoring").Groups(user.MonitoringGroup).BindingOrDie(),
 		rbacv1helpers.NewClusterBinding("system:discovery").Groups(user.AllAuthenticated).BindingOrDie(),
 		rbacv1helpers.NewClusterBinding("system:basic-user").Groups(user.AllAuthenticated).BindingOrDie(),
 		rbacv1helpers.NewClusterBinding("system:public-info-viewer").Groups(user.AllAuthenticated, user.AllUnauthenticated).BindingOrDie(),
-		rbacv1helpers.NewClusterBinding("system:openshift:public-info-viewer").Groups(user.AllAuthenticated, user.AllUnauthenticated).BindingOrDie(),
 		rbacv1helpers.NewClusterBinding("system:node-proxier").Users(user.KubeProxy).BindingOrDie(),
 		rbacv1helpers.NewClusterBinding("system:kube-controller-manager").Users(user.KubeControllerManager).BindingOrDie(),
 		rbacv1helpers.NewClusterBinding("system:kube-dns").SAs("kube-system", "kube-dns").BindingOrDie(),

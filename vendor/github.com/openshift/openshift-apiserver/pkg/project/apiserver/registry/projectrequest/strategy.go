@@ -38,8 +38,18 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	return projectvalidation.ValidateProjectRequest(projectrequest)
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // ValidateUpdate validates a client update
 func (strategy) ValidateUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) field.ErrorList {
+	return nil
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (strategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
 	return nil
 }
 

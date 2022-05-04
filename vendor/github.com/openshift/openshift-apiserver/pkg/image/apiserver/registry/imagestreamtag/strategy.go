@@ -57,6 +57,11 @@ func (s Strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorL
 	return validation.ValidateImageStreamTagWithWhitelister(ctx, s.registryWhitelister, istag)
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (Strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 func (s Strategy) AllowCreateOnUpdate() bool {
 	return false
 }
@@ -88,6 +93,11 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 	oldIST := old.(*imageapi.ImageStreamTag)
 
 	return validation.ValidateImageStreamTagUpdateWithWhitelister(ctx, s.registryWhitelister, newIST, oldIST)
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (Strategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }
 
 // MatchImageStreamTag returns a generic matcher for a given label and field selector.

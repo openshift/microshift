@@ -1,6 +1,7 @@
 package registryclient
 
 import (
+	"context"
 	"fmt"
 	"hash"
 	"io"
@@ -12,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/net/context"
 	"golang.org/x/time/rate"
 
 	"k8s.io/klog/v2"
@@ -26,7 +26,15 @@ import (
 	"github.com/docker/distribution/registry/client/auth/challenge"
 	"github.com/docker/distribution/registry/client/transport"
 	"github.com/opencontainers/go-digest"
+
+	imagereference "github.com/openshift/library-go/pkg/image/reference"
 )
+
+// CredentialStoreFactory is any entity capable of creating a CredentialStore based on an image
+// path (such as quay.io/fedora/fedora).
+type CredentialStoreFactory interface {
+	CredentialStoreFor(image string) auth.CredentialStore
+}
 
 // RepositoryRetriever fetches a Docker distribution.Repository.
 type RepositoryRetriever interface {
@@ -71,15 +79,17 @@ type transportCache struct {
 }
 
 type Context struct {
-	Transport         http.RoundTripper
-	InsecureTransport http.RoundTripper
-	Challenges        challenge.Manager
-	Scopes            []auth.Scope
-	Actions           []string
-	Retries           int
-	Credentials       auth.CredentialStore
-	RequestModifiers  []transport.RequestModifier
-	Limiter           *rate.Limiter
+	Transport          http.RoundTripper
+	InsecureTransport  http.RoundTripper
+	Challenges         challenge.Manager
+	Scopes             []auth.Scope
+	Actions            []string
+	Retries            int
+	Credentials        auth.CredentialStore
+	CredentialsFactory CredentialStoreFactory
+	RequestModifiers   []transport.RequestModifier
+	Limiter            *rate.Limiter
+	Alternates         AlternateBlobSourceStrategy
 
 	DisableDigestVerification bool
 
@@ -93,14 +103,15 @@ func (c *Context) Copy() *Context {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	copied := &Context{
-		Transport:         c.Transport,
-		InsecureTransport: c.InsecureTransport,
-		Challenges:        c.Challenges,
-		Scopes:            c.Scopes,
-		Actions:           c.Actions,
-		Retries:           c.Retries,
-		Credentials:       c.Credentials,
-		Limiter:           c.Limiter,
+		Transport:          c.Transport,
+		InsecureTransport:  c.InsecureTransport,
+		Challenges:         c.Challenges,
+		Scopes:             c.Scopes,
+		Actions:            c.Actions,
+		Retries:            c.Retries,
+		Credentials:        c.Credentials,
+		CredentialsFactory: c.CredentialsFactory,
+		Limiter:            c.Limiter,
 
 		DisableDigestVerification: c.DisableDigestVerification,
 
@@ -135,6 +146,16 @@ func (c *Context) WithActions(actions ...string) *Context {
 
 func (c *Context) WithCredentials(credentials auth.CredentialStore) *Context {
 	c.Credentials = credentials
+	return c
+}
+
+func (c *Context) WithCredentialsFactory(factory CredentialStoreFactory) *Context {
+	c.CredentialsFactory = factory
+	return c
+}
+
+func (c *Context) WithAlternateBlobSourceStrategy(alternateStrategy AlternateBlobSourceStrategy) *Context {
+	c.Alternates = alternateStrategy
 	return c
 }
 
@@ -200,18 +221,75 @@ func (c *Context) Ping(ctx context.Context, registry *url.URL, insecure bool) (h
 	return t, &src, nil
 }
 
+// RepositoryForRef returns a distribution.Repository against the provided image reference. If insecure
+// is true, HTTP connections are allowed and HTTPS certificate verification errors will be ignored. The returned
+// Repository instance is threadsafe but the ManifestService, TagService, or BlobService are not.
+func (c *Context) RepositoryForRef(ctx context.Context, ref imagereference.DockerImageReference, insecure bool) (distribution.Repository, error) {
+	return c.connectToRegistry(ctx, repositoryLocator{ref: ref}, insecure)
+}
+
+// Repository returns a distribution.Repository against the provided registry and repository name. If insecure
+// is true, HTTP connections are allowed and HTTPS certificate verification errors will be ignored. The returned
+// Repository instance is threadsafe but the ManifestService, TagService, or BlobService are not. Note - the caller
+// is responsible for providing a valid registry url for docker.io - use RepositoryForRef() to avoid that.
 func (c *Context) Repository(ctx context.Context, registry *url.URL, repoName string, insecure bool) (distribution.Repository, error) {
 	named, err := reference.WithName(repoName)
 	if err != nil {
 		return nil, err
 	}
 
-	rt, src, err := c.Ping(ctx, registry, insecure)
+	registryName := registry.Host
+	if registryName == "registry-1.docker.io" {
+		registryName = "docker.io"
+	}
+	fullReference := fmt.Sprintf("%s/%s", registryName, repoName)
+
+	ref, err := imagereference.Parse(fullReference)
 	if err != nil {
 		return nil, err
 	}
 
-	rt = c.repositoryTransport(rt, src, repoName)
+	locator := repositoryLocator{
+		named: named,
+		ref:   ref,
+		url:   registry,
+	}
+	return &blobMirroredRepository{
+		locator:   locator,
+		insecure:  insecure,
+		strategy:  c.Alternates,
+		retriever: c,
+	}, nil
+}
+
+// connectToRegistry is private and returns a non-wrapped, non-mirrorable repository.
+func (c *Context) connectToRegistry(ctx context.Context, locator repositoryLocator, insecure bool) (RepositoryWithLocation, error) {
+	var named reference.Named = locator.named
+	var registryURL *url.URL = locator.url
+	var path string
+
+	// ensure the values needed from the locator are defaulted
+	if named == nil {
+		path = locator.ref.RepositoryName()
+		var err error
+		named, err = reference.WithName(path)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		path = reference.Path(named)
+	}
+	if registryURL == nil {
+		registryURL = locator.ref.RegistryURL()
+	}
+
+	// attempt to connect to the registry to get auth instructions
+	rt, src, err := c.Ping(ctx, registryURL, insecure)
+	if err != nil {
+		return nil, err
+	}
+
+	rt = c.repositoryTransport(rt, src, path, locator.ref)
 
 	repo, err := registryclient.NewRepository(named, src.String(), rt)
 	if err != nil {
@@ -224,7 +302,7 @@ func (c *Context) Repository(ctx context.Context, registry *url.URL, repoName st
 	if limiter == nil {
 		limiter = rate.NewLimiter(rate.Limit(5), 5)
 	}
-	return NewLimitedRetryRepository(repo, c.Retries, limiter), nil
+	return NewLimitedRetryRepository(locator.ref, repo, c.Retries, limiter), nil
 }
 
 func (c *Context) ping(registry url.URL, insecure bool, transport http.RoundTripper) (*url.URL, error) {
@@ -290,7 +368,7 @@ func (s stringScope) String() string { return string(s) }
 // cachedTransport reuses an underlying transport for the given round tripper based
 // on the set of passed scopes. It will always return a transport that has at least the
 // provided scope list.
-func (c *Context) cachedTransport(rt http.RoundTripper, host string, scopes []auth.Scope) http.RoundTripper {
+func (c *Context) cachedTransport(rt http.RoundTripper, host string, scopes []auth.Scope, ref imagereference.DockerImageReference) http.RoundTripper {
 	scopeNames := make(map[string]struct{})
 	for _, scope := range scopes {
 		scopeNames[scope.String()] = struct{}{}
@@ -315,6 +393,11 @@ func (c *Context) cachedTransport(rt http.RoundTripper, host string, scopes []au
 		scopes = append(scopes, stringScope(s))
 	}
 
+	creds := c.Credentials
+	if c.CredentialsFactory != nil {
+		creds = c.CredentialsFactory.CredentialStoreFor(ref.AsRepository().String())
+	}
+
 	modifiers := []transport.RequestModifier{
 		// TODO: slightly smarter authorizer that retries unauthenticated requests
 		// TODO: make multiple attempts if the first credential fails
@@ -322,10 +405,10 @@ func (c *Context) cachedTransport(rt http.RoundTripper, host string, scopes []au
 			c.Challenges,
 			auth.NewTokenHandlerWithOptions(auth.TokenHandlerOptions{
 				Transport:   rt,
-				Credentials: c.Credentials,
+				Credentials: creds,
 				Scopes:      scopes,
 			}),
-			auth.NewBasicHandler(c.Credentials),
+			auth.NewBasicHandler(creds),
 		),
 	}
 	modifiers = append(modifiers, c.RequestModifiers...)
@@ -350,8 +433,8 @@ func (c *Context) scopes(repoName string) []auth.Scope {
 	return scopes
 }
 
-func (c *Context) repositoryTransport(t http.RoundTripper, registry *url.URL, repoName string) http.RoundTripper {
-	return c.cachedTransport(t, registry.Host, c.scopes(repoName))
+func (c *Context) repositoryTransport(t http.RoundTripper, registry *url.URL, repoName string, ref imagereference.DockerImageReference) http.RoundTripper {
+	return c.cachedTransport(t, registry.Host, c.scopes(repoName), ref)
 }
 
 var nowFn = time.Now
@@ -359,6 +442,7 @@ var nowFn = time.Now
 type retryRepository struct {
 	distribution.Repository
 
+	ref     imagereference.DockerImageReference
 	limiter *rate.Limiter
 	retries int
 	sleepFn func(time.Duration)
@@ -366,14 +450,19 @@ type retryRepository struct {
 
 // NewLimitedRetryRepository wraps a distribution.Repository with helpers that will retry temporary failures
 // over a limited time window and duration, and also obeys a rate limit.
-func NewLimitedRetryRepository(repo distribution.Repository, retries int, limiter *rate.Limiter) distribution.Repository {
+func NewLimitedRetryRepository(ref imagereference.DockerImageReference, repo distribution.Repository, retries int, limiter *rate.Limiter) RepositoryWithLocation {
 	return &retryRepository{
 		Repository: repo,
 
+		ref:     ref,
 		limiter: limiter,
 		retries: retries,
 		sleepFn: time.Sleep,
 	}
+}
+
+func (r *retryRepository) Ref() imagereference.DockerImageReference {
+	return r.ref
 }
 
 // isTemporaryHTTPError returns true if the error indicates a temporary or partial HTTP failure

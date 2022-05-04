@@ -23,6 +23,7 @@ import (
 	userinformer "github.com/openshift/client-go/user/informers/externalversions"
 	bootstrap "github.com/openshift/library-go/pkg/authentication/bootstrapauthenticator"
 	"github.com/openshift/library-go/pkg/oauth/oauthserviceaccountclient"
+	"github.com/openshift/library-go/pkg/oauth/usercache"
 
 	accesstokenetcd "github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthaccesstoken/etcd"
 	authorizetokenetcd "github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthauthorizetoken/etcd"
@@ -32,7 +33,6 @@ import (
 	useroauthaccesstokensdelegate "github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/useroauthaccesstokens/delegate"
 	"github.com/openshift/oauth-apiserver/pkg/serverscheme"
 	"github.com/openshift/oauth-apiserver/pkg/tokenvalidation"
-	"github.com/openshift/oauth-apiserver/pkg/tokenvalidation/usercache"
 )
 
 const (

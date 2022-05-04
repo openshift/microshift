@@ -138,6 +138,11 @@ func (s routeStrategy) Validate(ctx context.Context, obj runtime.Object) field.E
 	return errs
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (routeStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 func (routeStrategy) AllowCreateOnUpdate() bool {
 	return false
 }
@@ -254,6 +259,11 @@ func (s routeStrategy) validateHostUpdate(ctx context.Context, route, older *rou
 			return errs
 		}
 	}
+	return nil
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (routeStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
 	return nil
 }
 

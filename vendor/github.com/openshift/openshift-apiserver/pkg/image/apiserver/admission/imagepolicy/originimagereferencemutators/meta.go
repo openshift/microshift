@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	kapiv1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
@@ -65,4 +66,44 @@ func (o OriginImageMutators) GetImageReferenceMutator(obj, old runtime.Object) (
 		return imagereferencemutators.NewPodSpecV1Mutator(spec, oldSpec, path, resolveAnnotationChanged), nil
 	}
 	return o.KubeImageMutators.GetImageReferenceMutator(obj, old)
+}
+
+type annotationsAccessor struct {
+	object   metav1.Object
+	template metav1.Object
+}
+
+func (a annotationsAccessor) Annotations() map[string]string {
+	return a.object.GetAnnotations()
+}
+
+func (a annotationsAccessor) TemplateAnnotations() (map[string]string, bool) {
+	if a.template == nil {
+		return nil, false
+	}
+	return a.template.GetAnnotations(), true
+}
+
+func (a annotationsAccessor) SetAnnotations(annotations map[string]string) {
+	a.object.SetAnnotations(annotations)
+}
+
+func (a annotationsAccessor) SetTemplateAnnotations(annotations map[string]string) bool {
+	if a.template == nil {
+		return false
+	}
+	a.template.SetAnnotations(annotations)
+	return true
+}
+
+// GetAnnotationAccessor returns an accessor for the provided object or false if the object
+// does not support accessing annotations.
+func (o OriginImageMutators) GetAnnotationAccessor(obj runtime.Object) (imagereferencemutators.AnnotationAccessor, bool) {
+	switch t := obj.(type) {
+	case metav1.Object:
+		templateObject, _ := getTemplateMetaObject(obj)
+		return annotationsAccessor{object: t, template: templateObject}, true
+	default:
+		return o.KubeImageMutators.GetAnnotationAccessor(obj)
+	}
 }

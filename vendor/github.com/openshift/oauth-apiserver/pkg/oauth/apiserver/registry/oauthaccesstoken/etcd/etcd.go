@@ -40,9 +40,10 @@ func NewREST(optsGetter generic.RESTOptionsGetter, clientGetter oauthclient.Gett
 			return expires, nil
 		},
 
-		CreateStrategy: strategy,
-		UpdateStrategy: strategy,
-		DeleteStrategy: strategy,
+		CreateStrategy:      strategy,
+		UpdateStrategy:      strategy,
+		DeleteStrategy:      strategy,
+		ReturnDeletedObject: true,
 	}
 
 	options := &generic.StoreOptions{

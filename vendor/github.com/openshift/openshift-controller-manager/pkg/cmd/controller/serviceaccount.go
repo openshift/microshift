@@ -37,7 +37,7 @@ func RunServiceAccountController(ctx *ControllerContext) (bool, error) {
 	if err != nil {
 		return true, nil
 	}
-	go controller.Run(3, ctx.Stop)
+	go controller.Run(ctx.Context, 3)
 
 	return true, nil
 }

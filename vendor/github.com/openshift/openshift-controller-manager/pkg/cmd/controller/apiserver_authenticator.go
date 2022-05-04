@@ -12,18 +12,21 @@ import (
 	x509request "k8s.io/apiserver/pkg/authentication/request/x509"
 	"k8s.io/apiserver/pkg/authentication/token/cache"
 	webhooktoken "k8s.io/apiserver/plugin/pkg/authenticator/token/webhook"
-	authenticationclient "k8s.io/client-go/kubernetes/typed/authentication/v1"
+	authenticationv1client "k8s.io/client-go/kubernetes/typed/authentication/v1"
 )
 
 // TODO this should really be removed in favor of the generic apiserver
 // newRemoteAuthenticator creates an authenticator that checks the provided remote endpoint for tokens, allows any linked clientCAs to be checked, and caches
 // responses as indicated.  If no authentication is possible, the user will be system:anonymous.
-func newRemoteAuthenticator(tokenReview authenticationclient.TokenReviewInterface, clientCAs *x509.CertPool, cacheTTL time.Duration) (authenticator.Request, error) {
+func newRemoteAuthenticator(tokenReview authenticationv1client.AuthenticationV1Interface, clientCAs *x509.CertPool, cacheTTL time.Duration) (authenticator.Request, error) {
 	authenticators := []authenticator.Request{}
 
 	// TODO audiences
 	TokenAccessReviewTimeout := 10 * time.Second
-	tokenAuthenticator, err := webhooktoken.NewFromInterface(tokenReview, nil, *webhooktoken.DefaultRetryBackoff(), TokenAccessReviewTimeout)
+	tokenAuthenticator, err := webhooktoken.NewFromInterface(tokenReview, nil, *webhooktoken.DefaultRetryBackoff(), TokenAccessReviewTimeout, webhooktoken.AuthenticatorMetrics{
+		RecordRequestTotal:   noopMetrics{}.RequestTotal,
+		RecordRequestLatency: noopMetrics{}.RequestLatency,
+	})
 	if err != nil {
 		return nil, err
 	}

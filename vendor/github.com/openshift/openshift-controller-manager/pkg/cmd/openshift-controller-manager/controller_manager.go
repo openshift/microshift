@@ -61,7 +61,7 @@ func RunOpenShiftControllerManager(config *openshiftcontrolplanev1.OpenShiftCont
 			klog.Fatal(err)
 		}
 
-		controllerContext, err := origincontrollers.NewControllerContext(*config, clientConfig, ctx.Done())
+		controllerContext, err := origincontrollers.NewControllerContext(ctx, *config, clientConfig)
 		if err != nil {
 			klog.Fatal(err)
 		}

@@ -46,7 +46,7 @@ func Get() version.Info {
 func init() {
 	buildInfo := metrics.NewGaugeVec(
 		&metrics.GaugeOpts{
-			Name: "openshift_build_info_oauth",
+			Name: "openshift_build_info",
 			Help: "A metric with a constant '1' value labeled by major, minor, git commit & git version from which OpenShift was built.",
 		},
 		[]string{"major", "minor", "gitCommit", "gitVersion"},
