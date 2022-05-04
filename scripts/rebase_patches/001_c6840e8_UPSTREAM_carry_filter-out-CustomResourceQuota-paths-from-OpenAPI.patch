@@ -1,0 +1,38 @@
+diff --git a/vendor/k8s.io/apiserver/pkg/server/routes/openapi.go b/vendor/k8s.io/apiserver/pkg/server/routes/openapi.go
+index a1b60e18..54242000 100644
+--- a/vendor/k8s.io/apiserver/pkg/server/routes/openapi.go
++++ b/vendor/k8s.io/apiserver/pkg/server/routes/openapi.go
+@@ -17,6 +17,8 @@ limitations under the License.
+ package routes
+ 
+ import (
++	"strings"
++
+ 	restful "github.com/emicklei/go-restful"
+ 	"k8s.io/klog/v2"
+ 
+@@ -47,10 +49,24 @@ func (oa OpenAPI) InstallV2(c *restful.Container, mux *mux.PathRecorderMux) (*ha
+ 		"/apis/authorization.openshift.io/v1/namespaces/{namespace}/rolebindingrestrictions",
+ 		"/apis/authorization.openshift.io/v1/watch/namespaces/{namespace}/rolebindingrestrictions",
+ 		"/apis/authorization.openshift.io/v1/watch/rolebindingrestrictions")
++
+ 	spec, err := builder2.BuildOpenAPISpec(c.RegisteredWebServices(), oa.Config)
+ 	if err != nil {
+ 		klog.Fatalf("Failed to build open api spec for root: %v", err)
+ 	}
++
++	// we shadow ClustResourceQuotas, RoleBindingRestrictions, and SecurityContextContstraints
++	// with a CRD. This loop removes all CRQ,RBR, SCC paths
++	// from the OpenAPI spec such that they don't conflict with the CRD
++	// apiextensions-apiserver spec during merging.
++	for pth := range spec.Paths.Paths {
++		if strings.HasPrefix(pth, "/apis/quota.openshift.io/v1/clusterresourcequotas") ||
++			strings.Contains(pth, "rolebindingrestrictions") ||
++			strings.HasPrefix(pth, "/apis/security.openshift.io/v1/securitycontextconstraints") {
++			delete(spec.Paths.Paths, pth)
++		}
++	}
++
+ 	spec.Definitions = handler.PruneDefaults(spec.Definitions)
+ 	openAPIVersionedService, err := handler.NewOpenAPIService(spec)
+ 	if err != nil {
