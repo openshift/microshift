@@ -13,12 +13,12 @@ include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/
 export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
 
-RELEASE_BASE := 4.8.0
+RELEASE_BASE := 4.10.0
 RELEASE_PRE := ${RELEASE_BASE}-0.microshift
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
-SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' || echo '4.8.0-0.microshift-unknown')
+SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' || echo '4.10.0-0.microshift-unknown')
 
 EMBEDDED_GIT_TAG ?= ${SOURCE_GIT_TAG}
 EMBEDDED_GIT_COMMIT ?= ${SOURCE_GIT_COMMIT}
@@ -52,15 +52,15 @@ endif
 
 GO_LD_FLAGS := $(GC_FLAGS) -ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMajor=1 \
-                   -X k8s.io/component-base/version.gitMinor=21 \
-                   -X k8s.io/component-base/version.gitVersion=v1.21.0 \
-                   -X k8s.io/component-base/version.gitCommit=c3b9e07a \
+                   -X k8s.io/component-base/version.gitMinor=23 \
+                   -X k8s.io/component-base/version.gitVersion=v1.23.1 \
+                   -X k8s.io/component-base/version.gitCommit=e9ccfad \
                    -X k8s.io/component-base/version.gitTreeState=clean \
                    -X k8s.io/component-base/version.buildDate=$(BIN_TIMESTAMP) \
                    -X k8s.io/client-go/pkg/version.gitMajor=1 \
-                   -X k8s.io/client-go/pkg/version.gitMinor=21 \
-                   -X k8s.io/client-go/pkg/version.gitVersion=v1.21.1 \
-                   -X k8s.io/client-go/pkg/version.gitCommit=b09a9ce3 \
+                   -X k8s.io/client-go/pkg/version.gitMinor=23 \
+                   -X k8s.io/client-go/pkg/version.gitVersion=v1.23.1 \
+                   -X k8s.io/client-go/pkg/version.gitCommit=a475c28 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    -X github.com/openshift/microshift/pkg/version.versionFromGit=$(EMBEDDED_GIT_TAG) \
