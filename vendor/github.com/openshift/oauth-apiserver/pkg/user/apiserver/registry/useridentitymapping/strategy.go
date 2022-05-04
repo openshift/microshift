@@ -7,6 +7,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apiserver/pkg/registry/rest"
 
 	userapi "github.com/openshift/oauth-apiserver/pkg/user/apis/user"
 	"github.com/openshift/oauth-apiserver/pkg/user/apis/user/validation"
@@ -20,6 +21,9 @@ type userIdentityMappingStrategy struct {
 // Strategy is the default logic that applies when creating UserIdentityMapping
 // objects via the REST API.
 var Strategy = userIdentityMappingStrategy{serverscheme.Scheme}
+
+var _ rest.RESTCreateStrategy = userIdentityMappingStrategy{}
+var _ rest.RESTUpdateStrategy = userIdentityMappingStrategy{}
 
 // NamespaceScoped is true for image repository mappings.
 func (s userIdentityMappingStrategy) NamespaceScoped() bool {
@@ -87,4 +91,12 @@ func (s userIdentityMappingStrategy) Validate(ctx context.Context, obj runtime.O
 // Validate validates an updated UserIdentityMapping.
 func (s userIdentityMappingStrategy) ValidateUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) field.ErrorList {
 	return validation.ValidateUserIdentityMappingUpdate(obj.(*userapi.UserIdentityMapping), old.(*userapi.UserIdentityMapping))
+}
+
+func (userIdentityMappingStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
+func (userIdentityMappingStrategy) WarningsOnUpdate(ctx context.Context, newObj, oldObj runtime.Object) []string {
+	return nil
 }

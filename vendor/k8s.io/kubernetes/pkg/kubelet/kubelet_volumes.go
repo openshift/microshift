@@ -73,10 +73,10 @@ func (kl *Kubelet) ListBlockVolumesForPod(podUID types.UID) (map[string]volume.B
 }
 
 // podVolumesExist checks with the volume manager and returns true any of the
-// pods for the specified volume are mounted.
+// pods for the specified volume are mounted or are uncertain.
 func (kl *Kubelet) podVolumesExist(podUID types.UID) bool {
 	if mountedVolumes :=
-		kl.volumeManager.GetMountedVolumesForPod(
+		kl.volumeManager.GetPossiblyMountedVolumesForPod(
 			volumetypes.UniquePodName(podUID)); len(mountedVolumes) > 0 {
 		return true
 	}
@@ -184,11 +184,6 @@ func (kl *Kubelet) cleanupOrphanedPodDirs(pods []*v1.Pod, runningPods []*kubecon
 
 	for _, uid := range found {
 		if allPods.Has(string(uid)) {
-			continue
-		}
-		// if the pod is within termination grace period, we shouldn't cleanup the underlying volumes
-		if kl.podKiller.IsPodPendingTerminationByUID(uid) {
-			klog.V(3).InfoS("Pod is pending termination", "podUID", uid)
 			continue
 		}
 		// If volumes have not been unmounted/detached, do not delete directory.

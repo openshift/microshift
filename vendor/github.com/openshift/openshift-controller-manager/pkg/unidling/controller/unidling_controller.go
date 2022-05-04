@@ -24,12 +24,14 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/pager"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/component-base/metrics"
 	"k8s.io/klog/v2"
 
 	"github.com/openshift/api"
 	unidlingapi "github.com/openshift/api/unidling/v1alpha1"
 	appstypedclient "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	"github.com/openshift/library-go/pkg/unidling/unidlingclient"
+	unidlingmetrics "github.com/openshift/openshift-controller-manager/pkg/unidling/metrics"
 )
 
 const MaxRetries = 5
@@ -73,6 +75,7 @@ type UnidlingController struct {
 	servicesNamespacer  corev1client.ServicesGetter
 	queue               workqueue.RateLimitingInterface
 	lastFiredCache      *lastFiredCache
+	eventsTotal         *metrics.Counter
 
 	// TODO: remove these once we get the scale-source functionality in the scale endpoints
 	dcNamespacer appstypedclient.DeploymentConfigsGetter
@@ -95,6 +98,7 @@ func NewUnidlingController(scaleNS scale.ScalesGetter, mapper meta.RESTMapper, e
 		lastFiredCache: &lastFiredCache{
 			items: make(map[types.NamespacedName]time.Time),
 		},
+		eventsTotal: unidlingmetrics.GetEventsTotalCounter(),
 
 		dcNamespacer: dcNamespacer,
 		rcNamespacer: rcNamespacer,
@@ -212,6 +216,7 @@ func (c *UnidlingController) enqueueEvent(event *corev1.Event) {
 
 	// only add things to the queue if they're newer than what we already have
 	if c.lastFiredCache.AddIfNewer(info, event.LastTimestamp.Time) {
+		c.eventsTotal.Inc()
 		c.queue.Add(info)
 	}
 }

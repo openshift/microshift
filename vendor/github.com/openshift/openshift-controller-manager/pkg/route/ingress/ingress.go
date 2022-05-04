@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -422,6 +423,12 @@ func (c *Controller) sync(key queueKey) error {
 		if len(rule.Host) == 0 {
 			continue
 		}
+		host := rule.Host
+		hostIsWildcard := false
+		if strings.HasPrefix(host, "*.") {
+			host = strings.Replace(host, "*", "wildcard", 1)
+			hostIsWildcard = true
+		}
 		for _, path := range rule.HTTP.Paths {
 			if path.Backend.Service == nil {
 				// Non-Service backends are not implemented.
@@ -436,20 +443,20 @@ func (c *Controller) sync(key queueKey) error {
 			}
 
 			var existing *routev1.Route
-			old, existing = splitForPathAndHost(old, rule.Host, path.Path)
+			old, existing = splitForPathAndHost(old, host, path.Path)
 			if existing == nil {
-				if r := newRouteForIngress(ingress, &rule, &path, c.secretLister, c.serviceLister); r != nil {
+				if r := newRouteForIngress(ingress, &rule, &path, c.secretLister, c.serviceLister, host, hostIsWildcard); r != nil {
 					creates = append(creates, r)
 				}
 				continue
 			}
 
-			if routeMatchesIngress(existing, ingress, &rule, &path, c.secretLister, c.serviceLister) {
+			if routeMatchesIngress(existing, ingress, &rule, &path, c.secretLister, c.serviceLister, host, hostIsWildcard) {
 				matches = append(matches, existing)
 				continue
 			}
 
-			if r := newRouteForIngress(ingress, &rule, &path, c.secretLister, c.serviceLister); r != nil {
+			if r := newRouteForIngress(ingress, &rule, &path, c.secretLister, c.serviceLister, host, hostIsWildcard); r != nil {
 				// merge the relevant spec pieces
 				preserveRouteAttributesFromExisting(r, existing)
 				updates = append(updates, r)
@@ -576,6 +583,8 @@ func newRouteForIngress(
 	path *networkingv1.HTTPIngressPath,
 	secretLister corelisters.SecretLister,
 	serviceLister corelisters.ServiceLister,
+	host string,
+	hostIsWildcard bool,
 ) *routev1.Route {
 	targetPort, err := targetPortForService(ingress.Namespace, path.Backend.Service, serviceLister)
 	if err != nil {
@@ -592,8 +601,11 @@ func newRouteForIngress(
 	if targetPort != nil {
 		port = &routev1.RoutePort{TargetPort: *targetPort}
 	}
-
 	t := true
+	var wildcardPolicy routev1.WildcardPolicyType
+	if hostIsWildcard {
+		wildcardPolicy = routev1.WildcardPolicySubdomain
+	}
 	return &routev1.Route{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: ingress.Name + "-",
@@ -605,13 +617,14 @@ func newRouteForIngress(
 			},
 		},
 		Spec: routev1.RouteSpec{
-			Host: rule.Host,
+			Host: host,
 			Path: path.Path,
 			To: routev1.RouteTargetReference{
 				Name: path.Backend.Service.Name,
 			},
-			Port: port,
-			TLS:  tlsConfigForIngress(ingress, rule, tlsSecret),
+			Port:           port,
+			TLS:            tlsConfigForIngress(ingress, rule, tlsSecret),
+			WildcardPolicy: wildcardPolicy,
 		},
 	}
 }
@@ -634,14 +647,22 @@ func routeMatchesIngress(
 	path *networkingv1.HTTPIngressPath,
 	secretLister corelisters.SecretLister,
 	serviceLister corelisters.ServiceLister,
+	host string,
+	hostIsWildcard bool,
 ) bool {
-	match := route.Spec.Host == rule.Host &&
+	wildcardPolicy := routev1.WildcardPolicyNone
+	if hostIsWildcard {
+		wildcardPolicy = routev1.WildcardPolicySubdomain
+	}
+	match := route.Spec.Host == host &&
 		route.Spec.Path == path.Path &&
 		route.Spec.To.Name == path.Backend.Service.Name &&
 		route.Spec.WildcardPolicy == routev1.WildcardPolicyNone &&
 		len(route.Spec.AlternateBackends) == 0 &&
+		route.Spec.WildcardPolicy == wildcardPolicy &&
 		reflect.DeepEqual(route.Annotations, ingress.Annotations) &&
 		route.OwnerReferences[0].APIVersion == "networking.k8s.io/v1"
+
 	if !match {
 		return false
 	}

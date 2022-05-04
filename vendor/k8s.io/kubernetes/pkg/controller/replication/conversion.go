@@ -37,6 +37,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	appsv1apply "k8s.io/client-go/applyconfigurations/apps/v1"
+	appsv1autoscaling "k8s.io/client-go/applyconfigurations/autoscaling/v1"
 	coreinformers "k8s.io/client-go/informers/core/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
@@ -223,7 +224,7 @@ func (c conversionClient) UpdateStatus(ctx context.Context, rs *apps.ReplicaSet,
 }
 
 func (c conversionClient) Get(ctx context.Context, name string, options metav1.GetOptions) (*apps.ReplicaSet, error) {
-	rc, err := c.ReplicationControllerInterface.Get(context.TODO(), name, options)
+	rc, err := c.ReplicationControllerInterface.Get(ctx, name, options)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +232,7 @@ func (c conversionClient) Get(ctx context.Context, name string, options metav1.G
 }
 
 func (c conversionClient) List(ctx context.Context, opts metav1.ListOptions) (*apps.ReplicaSetList, error) {
-	rcList, err := c.ReplicationControllerInterface.List(context.TODO(), opts)
+	rcList, err := c.ReplicationControllerInterface.List(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -264,6 +265,10 @@ func (c conversionClient) GetScale(ctx context.Context, name string, options met
 func (c conversionClient) UpdateScale(ctx context.Context, name string, scale *autoscalingv1.Scale, opts metav1.UpdateOptions) (result *autoscalingv1.Scale, err error) {
 	// This is not used by RSC.
 	return nil, errors.New("UpdateScale() is not implemented for conversionClient")
+}
+
+func (c conversionClient) ApplyScale(ctx context.Context, name string, scale *appsv1autoscaling.ScaleApplyConfiguration, opts metav1.ApplyOptions) (*autoscalingv1.Scale, error) {
+	return nil, errors.New("ApplyScale() is not implemented for conversionClient")
 }
 
 func convertSlice(rcList []*v1.ReplicationController) ([]*apps.ReplicaSet, error) {
@@ -332,28 +337,18 @@ type podControlAdapter struct {
 	controller.PodControlInterface
 }
 
-func (pc podControlAdapter) CreatePods(namespace string, template *v1.PodTemplateSpec, object runtime.Object) error {
-	// This is not used by RSC.
-	return errors.New("CreatePods() is not implemented for podControlAdapter")
-}
-
-func (pc podControlAdapter) CreatePodsOnNode(nodeName, namespace string, template *v1.PodTemplateSpec, object runtime.Object, controllerRef *metav1.OwnerReference) error {
-	// This is not used by RSC.
-	return errors.New("CreatePodsOnNode() is not implemented for podControlAdapter")
-}
-
-func (pc podControlAdapter) CreatePodsWithControllerRef(namespace string, template *v1.PodTemplateSpec, object runtime.Object, controllerRef *metav1.OwnerReference) error {
+func (pc podControlAdapter) CreatePods(ctx context.Context, namespace string, template *v1.PodTemplateSpec, object runtime.Object, controllerRef *metav1.OwnerReference) error {
 	rc, err := convertRStoRC(object.(*apps.ReplicaSet))
 	if err != nil {
 		return err
 	}
-	return pc.PodControlInterface.CreatePodsWithControllerRef(namespace, template, rc, controllerRef)
+	return pc.PodControlInterface.CreatePods(ctx, namespace, template, rc, controllerRef)
 }
 
-func (pc podControlAdapter) DeletePod(namespace string, podID string, object runtime.Object) error {
+func (pc podControlAdapter) DeletePod(ctx context.Context, namespace string, podID string, object runtime.Object) error {
 	rc, err := convertRStoRC(object.(*apps.ReplicaSet))
 	if err != nil {
 		return err
 	}
-	return pc.PodControlInterface.DeletePod(namespace, podID, rc)
+	return pc.PodControlInterface.DeletePod(ctx, namespace, podID, rc)
 }

@@ -104,8 +104,8 @@ func (c *DeploymentConfigController) Handle(config *appsv1.DeploymentConfig) err
 	}
 	// If any adoptions are attempted, we should first recheck for deletion with
 	// an uncached quorum read sometime after listing ReplicationControllers (see Kubernetes #42639).
-	canAdoptFunc := kcontroller.RecheckDeletionTimestamp(func() (metav1.Object, error) {
-		fresh, err := c.appsClient.DeploymentConfigs(config.Namespace).Get(context.TODO(), config.Name, metav1.GetOptions{})
+	canAdoptFunc := kcontroller.RecheckDeletionTimestamp(func(ctx context.Context) (metav1.Object, error) {
+		fresh, err := c.appsClient.DeploymentConfigs(config.Namespace).Get(ctx, config.Name, metav1.GetOptions{})
 		if err != nil {
 			return nil, err
 		}

@@ -13,6 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
+	kutilerrors "k8s.io/apimachinery/pkg/util/errors"
 	authserviceaccount "k8s.io/apiserver/pkg/authentication/serviceaccount"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -78,18 +79,16 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 			errs = append(errs, fmt.Errorf("unable to find SecurityContextConstraints for ServiceAccount %s: %v", sa.Name, err))
 			continue
 		}
-		var namespace *corev1.Namespace
-		for _, constraint := range saConstraints {
-			var (
-				provider sccmatching.SecurityContextConstraintsProvider
-				err      error
-			)
+
+		providers, errs := sccmatching.CreateProvidersFromConstraints(ctx, ns, saConstraints, r.client)
+		if len(errs) > 0 {
+			errs = append(errs, fmt.Errorf("unable to create SecurityContextConstraints provider for ServiceAccount %s: %v", sa.Name, kutilerrors.NewAggregate(errs)))
+			continue
+		}
+
+		for _, provider := range providers {
 			pspsrs := securityapi.PodSecurityPolicySubjectReviewStatus{}
-			if provider, namespace, err = sccmatching.CreateProviderFromConstraint(ns, namespace, constraint, r.client); err != nil {
-				errs = append(errs, fmt.Errorf("unable to create provider for service account %s: %v", sa.Name, err))
-				continue
-			}
-			_, err = podsecuritypolicysubjectreview.FillPodSecurityPolicySubjectReviewStatus(&pspsrs, provider, pspr.Spec.Template.Spec, constraint)
+			_, err = podsecuritypolicysubjectreview.FillPodSecurityPolicySubjectReviewStatus(&pspsrs, provider, pspr.Spec.Template.Spec, provider.GetSCC())
 			if err != nil {
 				klog.Errorf("unable to fill PodSecurityPolicyReviewStatus from constraint %v", err)
 				continue

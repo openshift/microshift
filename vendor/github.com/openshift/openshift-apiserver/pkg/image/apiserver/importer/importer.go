@@ -32,14 +32,8 @@ import (
 	"github.com/openshift/library-go/pkg/image/imageutil"
 	imageref "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 )
-
-// ContextKeyV1RegistryClient is used to support v1 container image registry import. Add a
-// dockerregistry.Client to the passed context with this key to support v1 container image
-// registry importing
-const ContextKeyV1RegistryClient = "v1-registry-client"
 
 // Interface loads images into an image stream import request.
 type Interface interface {
@@ -754,7 +748,9 @@ func (imp *ImageStreamImporter) importRepositoryFromDocker(ctx context.Context, 
 		if err != nil {
 			klog.V(5).Infof("unable to access repository %#v: %#v", repository, err)
 			if strings.HasSuffix(err.Error(), "does not support v2 API") {
-				importRepositoryFromDockerV1(ctx, repository, imp.limiter)
+				err := kapierrors.NewForbidden(image.Resource(""), "", fmt.Errorf("registry %q does not support the v2 Registry API", repository.Registry.Host))
+				err.ErrStatus.Reason = "NotV2Registry"
+				applyErrorToRepository(repository, err)
 				return
 			}
 			err = formatPingError(repository.Ref, repository.Insecure, err)
@@ -821,105 +817,6 @@ func (imp *ImageStreamImporter) importRepositoryFromDocker(ctx context.Context, 
 		}
 
 		importTag.Image, importTag.Err = imp.importManifest(ctx, manifest, dockerRef, "", ms, bs, importTag.PreferArch, importTag.PreferOS)
-	}
-}
-
-func importRepositoryFromDockerV1(ctx context.Context, repository *importRepository, limiter flowcontrol.RateLimiter) {
-	value := ctx.Value(ContextKeyV1RegistryClient)
-	if value == nil {
-		err := kapierrors.NewForbidden(image.Resource(""), "", fmt.Errorf("registry %q does not support the v2 Registry API", repository.Registry.Host))
-		err.ErrStatus.Reason = "NotV2Registry"
-		applyErrorToRepository(repository, err)
-		return
-	}
-	client, ok := value.(dockerv1client.Client)
-	if !ok {
-		err := kapierrors.NewForbidden(image.Resource(""), "", fmt.Errorf("registry %q does not support the v2 Registry API", repository.Registry.Host))
-		err.ErrStatus.Reason = "NotV2Registry"
-		return
-	}
-	conn, err := client.Connect(repository.Registry.Host, repository.Insecure)
-	if err != nil {
-		applyErrorToRepository(repository, err)
-		return
-	}
-
-	// if repository import is requested (MaximumTags), attempt to load the tags, sort them, and request the first N
-	if count := repository.MaximumTags; count > 0 || count == -1 {
-		tagMap, err := conn.ImageTags(repository.Ref.Namespace, repository.Ref.Name)
-		if err != nil {
-			repository.Err = err
-			return
-		}
-		tags := make([]string, 0, len(tagMap))
-		for tag := range tagMap {
-			tags = append(tags, tag)
-		}
-		// some images on the Hub have empty tags - treat those as "latest"
-		set := sets.NewString(tags...)
-		if set.Has("") {
-			set.Delete("")
-			set.Insert(imagev1.DefaultImageTag)
-		}
-		tags = set.List()
-		// include only the top N tags in the result, put the rest in AdditionalTags
-		imageutil.PrioritizeTags(tags)
-		for _, s := range tags {
-			if count <= 0 && repository.MaximumTags != -1 {
-				repository.AdditionalTags = append(repository.AdditionalTags, s)
-				continue
-			}
-			count--
-			repository.Tags = append(repository.Tags, importTag{
-				Name: s,
-			})
-		}
-	}
-
-	// load digests
-	imported := false
-	for i := range repository.Digests {
-		importDigest := &repository.Digests[i]
-		if importDigest.Err != nil || importDigest.Image != nil {
-			continue
-		}
-		limiter.Accept()
-		image, err := conn.ImageByID(repository.Ref.Namespace, repository.Ref.Name, importDigest.Name)
-		if err != nil {
-			importDigest.Err = err
-			continue
-		}
-		// we do not preserve manifests of legacy images
-		importDigest.Image, err = schema0ToImage(image)
-		if err != nil {
-			importDigest.Err = err
-			continue
-		}
-		imported = true
-	}
-
-	for i := range repository.Tags {
-		importTag := &repository.Tags[i]
-		if importTag.Err != nil || importTag.Image != nil {
-			continue
-		}
-		limiter.Accept()
-		image, err := conn.ImageByTag(repository.Ref.Namespace, repository.Ref.Name, importTag.Name)
-		if err != nil {
-			importTag.Err = err
-			continue
-		}
-		// we do not preserve manifests of legacy images
-		importTag.Image, err = schema0ToImage(image)
-		if err != nil {
-			importTag.Err = err
-			continue
-		}
-		imported = true
-	}
-
-	if imported {
-		v1ImageImportsCounter.WithLabelValues(repository.Ref.String()).Inc()
 	}
 }
 

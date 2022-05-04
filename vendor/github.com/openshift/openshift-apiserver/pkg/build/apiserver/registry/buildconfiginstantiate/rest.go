@@ -252,7 +252,7 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 	case latest.Status.Phase == buildv1.BuildPhaseFailed:
 		// don't cancel the build if it reached a terminal state on its own
 		cancel = false
-		errLog := fmt.Sprintf("build %s failed: %s: %s", build.Name, build.Status.Reason, build.Status.Message)
+		errLog := fmt.Sprintf("build %s failed: %s: %s", build.Name, latest.Status.Reason, latest.Status.Message)
 		klog.Warningf(errLog)
 		return nil, errors.NewBadRequest(errLog)
 	case latest.Status.Phase == buildv1.BuildPhaseCancelled:

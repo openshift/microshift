@@ -540,6 +540,9 @@ func validateDockerStrategy(strategy *buildapi.DockerBuildStrategy, fldPath *fie
 			strategy.DockerfilePath = cleaned
 		}
 	}
+	for i, volume := range strategy.Volumes {
+		allErrs = append(allErrs, validateBuildVolume(volume, fldPath.Child("volumes").Index(i))...)
+	}
 
 	allErrs = append(allErrs, ValidateStrategyEnv(strategy.Env, fldPath.Child("env"))...)
 
@@ -565,6 +568,9 @@ func validateSourceStrategy(strategy *buildapi.SourceBuildStrategy, fldPath *fie
 	allErrs = append(allErrs, validateImageReference(&strategy.From, fldPath.Child("from"))...)
 	allErrs = append(allErrs, validateSecretRef(strategy.PullSecret, fldPath.Child("pullSecret"))...)
 	allErrs = append(allErrs, ValidateStrategyEnv(strategy.Env, fldPath.Child("env"))...)
+	for i, volume := range strategy.Volumes {
+		allErrs = append(allErrs, validateBuildVolume(volume, fldPath.Child("volumes").Index(i))...)
+	}
 	return allErrs
 }
 
@@ -786,4 +792,80 @@ func CreateBuildPatch(older, newer *buildapi.Build) ([]byte, error) {
 		return nil, fmt.Errorf("error creating a strategic patch: %v", err)
 	}
 	return patch, nil
+}
+
+func validateBuildVolume(volume buildapi.BuildVolume, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	if len(volume.Name) == 0 {
+		allErrs = append(allErrs, field.Required(fldPath.Child("name"), ""))
+	} else if errs := kvalidation.IsDNS1123Label(volume.Name); len(errs) != 0 {
+		for _, e := range errs {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), volume.Name, e))
+		}
+	}
+	if len(volume.Source.Type) == 0 {
+		allErrs = append(allErrs, field.Required(fldPath.Child("source").Child("type"), "must not be blank"))
+	}
+	var foundVolumeSources []string
+
+	if volume.Source.Secret != nil {
+		if len(volume.Source.Secret.SecretName) == 0 {
+			allErrs = append(allErrs, field.Required(fldPath.Child("source").Child("secret").Child("secretName"), ""))
+		} else if reasons := validation.ValidateSecretName(volume.Source.Secret.SecretName, false); len(reasons) != 0 {
+			for _, r := range reasons {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("source").Child("secret").Child("secretName"), volume.Source.Secret, r))
+			}
+		}
+		foundVolumeSources = append(foundVolumeSources, string(buildapi.BuildVolumeSourceTypeSecret))
+	}
+	if volume.Source.ConfigMap != nil {
+		if len(volume.Source.ConfigMap.Name) == 0 {
+			allErrs = append(allErrs, field.Required(fldPath.Child("source").Child("configMap").Child("name"), ""))
+		} else if reasons := validation.ValidateConfigMapName(volume.Source.ConfigMap.Name, false); len(reasons) != 0 {
+			for _, r := range reasons {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("source").Child("configMap").Child("name"), volume.Source.ConfigMap, r))
+			}
+		}
+		foundVolumeSources = append(foundVolumeSources, string(buildapi.BuildVolumeSourceTypeConfigMap))
+	}
+
+	if volume.Source.CSI != nil {
+		if len(volume.Source.CSI.Driver) == 0 {
+			allErrs = append(allErrs, field.Required(fldPath.Child("source").Child("csi").Child("driver"), ""))
+		} else if reasons := validation.ValidateCSIDriverName(volume.Source.CSI.Driver, fldPath.Child("source").Child("csi").Child("driver")); len(reasons) != 0 {
+			allErrs = append(allErrs, reasons...)
+		}
+		foundVolumeSources = append(foundVolumeSources, string(buildapi.BuildVolumeSourceTypeCSI))
+	}
+
+	if len(foundVolumeSources) == 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("source"), volume.Source, "must specify one volume source"))
+	}
+	if len(foundVolumeSources) > 1 {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("source"), volume.Source, "only one volume source is allowed"))
+	}
+	if len(foundVolumeSources) != 0 && foundVolumeSources[0] != string(volume.Source.Type) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("source").Child("type"), volume.Source.Type, "source type and specified type must match"))
+	}
+	if len(volume.Mounts) == 0 {
+		allErrs = append(allErrs, field.Required(fldPath.Child("mounts"), "must supply at least one mount"))
+	}
+	for i, vm := range volume.Mounts {
+		if len(vm.DestinationPath) == 0 {
+			allErrs = append(allErrs, field.Required(fldPath.Child("mounts").Child("destinationPath"), "must not be blank"))
+		} else {
+			if strings.Contains(vm.DestinationPath, ":") {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("mounts").Index(i).Child("destinationPath"), vm.DestinationPath, "must not contain ':'"))
+			}
+			if !filepath.IsAbs(vm.DestinationPath) {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("mounts").Index(i).Child("destinationPath"), vm.DestinationPath, "must be an absolute path"))
+			}
+			if strings.HasPrefix(path.Clean(vm.DestinationPath), "..") {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("mounts").Index(i).Child("destinationPath"), vm.DestinationPath, "must not start with '..'"))
+			}
+		}
+	}
+
+	return allErrs
 }

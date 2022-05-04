@@ -7,6 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/duration"
 
 	oauthv1 "github.com/openshift/api/oauth/v1"
 	oauthapi "github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth"
@@ -169,7 +170,7 @@ func printOAuthAccessToken(oauthAccessToken *oauthapi.OAuthAccessToken, options 
 		oauthAccessToken.Name,
 		oauthAccessToken.UserName,
 		oauthAccessToken.ClientName,
-		created,
+		translateTimestampSince(created),
 		expires,
 		oauthAccessToken.RedirectURI,
 		strings.Join(oauthAccessToken.Scopes, ","),
@@ -189,7 +190,7 @@ func printUserOAuthAccessToken(personalAccessToken *oauthapi.UserOAuthAccessToke
 	row.Cells = append(row.Cells,
 		personalAccessToken.Name,
 		personalAccessToken.ClientName,
-		created,
+		translateTimestampSince(created),
 		expires,
 		personalAccessToken.RedirectURI,
 		strings.Join(personalAccessToken.Scopes, ","),
@@ -253,7 +254,7 @@ func printOAuthAuthorizeToken(oauthAuthorizeToken *oauthapi.OAuthAuthorizeToken,
 		oauthAuthorizeToken.Name,
 		oauthAuthorizeToken.UserName,
 		oauthAuthorizeToken.ClientName,
-		created,
+		translateTimestampSince(created),
 		expires,
 		oauthAuthorizeToken.RedirectURI,
 		strings.Join(oauthAuthorizeToken.Scopes, ","),
@@ -271,4 +272,14 @@ func printOAuthAuthorizeTokenList(oauthAuthorizeTokenList *oauthapi.OAuthAuthori
 		rows = append(rows, r...)
 	}
 	return rows, nil
+}
+
+// translateTimestampSince returns the elapsed time since timestamp in
+// human-readable approximation.
+func translateTimestampSince(timestamp metav1.Time) string {
+	if timestamp.IsZero() {
+		return "<unknown>"
+	}
+
+	return duration.HumanDuration(time.Since(timestamp.Time))
 }

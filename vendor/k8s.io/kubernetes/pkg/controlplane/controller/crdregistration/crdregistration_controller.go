@@ -33,7 +33,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	v1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
-	"k8s.io/kube-aggregator/pkg/apiserver"
 )
 
 // AutoAPIServiceRegistration is an interface which callers can re-declare locally and properly cast to for
@@ -104,7 +103,7 @@ func NewCRDRegistrationController(crdinformer crdinformers.CustomResourceDefinit
 	return c
 }
 
-func (c *crdRegistrationController) Run(threadiness int, stopCh <-chan struct{}) {
+func (c *crdRegistrationController) Run(workers int, stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
 	// make sure the work queue is shutdown which will trigger workers to end
 	defer c.queue.ShutDown()
@@ -131,8 +130,8 @@ func (c *crdRegistrationController) Run(threadiness int, stopCh <-chan struct{})
 	}
 	close(c.syncedInitialSet)
 
-	// start up your worker threads based on threadiness.  Some controllers have multiple kinds of workers
-	for i := 0; i < threadiness; i++ {
+	// start up your worker threads based on workers.  Some controllers have multiple kinds of workers
+	for i := 0; i < workers; i++ {
 		// runWorker will loop until "something bad" happens.  The .Until will then rekick the worker
 		// after one second
 		go wait.Until(c.runWorker, time.Second, stopCh)
@@ -194,14 +193,6 @@ func (c *crdRegistrationController) enqueueCRD(crd *apiextensionsv1.CustomResour
 func (c *crdRegistrationController) handleVersionUpdate(groupVersion schema.GroupVersion) error {
 	apiServiceName := groupVersion.Version + "." + groupVersion.Group
 
-	if apiserver.APIServiceAlreadyExists(groupVersion) {
-		// Removing APIService from sync means the CRD registration controller won't sync this APIService
-		// anymore. If the APIService is managed externally, this will mean the external component can
-		// update this APIService without CRD controller stomping the changes on it.
-		c.apiServiceRegistration.RemoveAPIServiceToSync(apiServiceName)
-		return nil
-	}
-
 	// check all CRDs.  There shouldn't that many, but if we have problems later we can index them
 	crds, err := c.crdLister.List(labels.Everything())
 	if err != nil {
@@ -221,8 +212,8 @@ func (c *crdRegistrationController) handleVersionUpdate(groupVersion schema.Grou
 				Spec: v1.APIServiceSpec{
 					Group:                groupVersion.Group,
 					Version:              groupVersion.Version,
-					GroupPriorityMinimum: getGroupPriorityMin(groupVersion.Group), // CRDs should have relatively low priority
-					VersionPriority:      100,                                     // CRDs will be sorted by kube-like versions like any other APIService with the same VersionPriority
+					GroupPriorityMinimum: 1000, // CRDs should have relatively low priority
+					VersionPriority:      100,  // CRDs will be sorted by kube-like versions like any other APIService with the same VersionPriority
 				},
 			})
 			return nil

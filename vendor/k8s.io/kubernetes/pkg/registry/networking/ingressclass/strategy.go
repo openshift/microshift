@@ -23,11 +23,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/storage/names"
-	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/apis/networking"
 	"k8s.io/kubernetes/pkg/apis/networking/validation"
-	"k8s.io/kubernetes/pkg/features"
 )
 
 // ingressClassStrategy implements verification logic for IngressClass
@@ -51,10 +49,6 @@ func (ingressClassStrategy) NamespaceScoped() bool {
 func (ingressClassStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	ingressClass := obj.(*networking.IngressClass)
 	ingressClass.Generation = 1
-
-	if !utilfeature.DefaultFeatureGate.Enabled(features.IngressClassNamespacedParams) {
-		dropIngressClassParametersReferenceScope(ingressClass)
-	}
 }
 
 // PrepareForUpdate clears fields that are not allowed to be set by end users on
@@ -68,16 +62,17 @@ func (ingressClassStrategy) PrepareForUpdate(ctx context.Context, obj, old runti
 	if !apiequality.Semantic.DeepEqual(oldIngressClass.Spec, newIngressClass.Spec) {
 		newIngressClass.Generation = oldIngressClass.Generation + 1
 	}
-
-	if !utilfeature.DefaultFeatureGate.Enabled(features.IngressClassNamespacedParams) && !scopeInUse(oldIngressClass) {
-		dropIngressClassParametersReferenceScope(newIngressClass)
-	}
 }
 
 // Validate validates a new IngressClass.
 func (ingressClassStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	ingressClass := obj.(*networking.IngressClass)
 	return validation.ValidateIngressClass(ingressClass)
+}
+
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (ingressClassStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
 }
 
 // Canonicalize normalizes the object after validation.
@@ -98,20 +93,13 @@ func (ingressClassStrategy) ValidateUpdate(ctx context.Context, obj, old runtime
 	return validation.ValidateIngressClassUpdate(newIngressClass, oldIngressClass)
 }
 
+// WarningsOnUpdate returns warnings for the given update.
+func (ingressClassStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
+}
+
 // AllowUnconditionalUpdate is the default update policy for IngressClass
 // objects.
 func (ingressClassStrategy) AllowUnconditionalUpdate() bool {
 	return true
-}
-
-func scopeInUse(ingressClass *networking.IngressClass) bool {
-	return ingressClass.Spec.Parameters != nil && ingressClass.Spec.Parameters.Scope != nil
-}
-
-// Drops Scope and Namespace field from IngressClass's parameters.
-func dropIngressClassParametersReferenceScope(ingressClass *networking.IngressClass) {
-	if ingressClass.Spec.Parameters != nil {
-		ingressClass.Spec.Parameters.Scope = nil
-		ingressClass.Spec.Parameters.Namespace = nil
-	}
 }

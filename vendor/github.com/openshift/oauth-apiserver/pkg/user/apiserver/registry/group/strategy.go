@@ -22,6 +22,9 @@ type groupStrategy struct {
 var Strategy = groupStrategy{serverscheme.Scheme}
 
 var _ rest.GarbageCollectionDeleteStrategy = groupStrategy{}
+var _ rest.RESTCreateStrategy = groupStrategy{}
+var _ rest.RESTUpdateStrategy = groupStrategy{}
+var _ rest.RESTDeleteStrategy = groupStrategy{}
 
 func (groupStrategy) DefaultGarbageCollectionPolicy(ctx context.Context) rest.GarbageCollectionPolicy {
 	return rest.Unsupported
@@ -53,6 +56,14 @@ func (groupStrategy) AllowCreateOnUpdate() bool {
 
 func (groupStrategy) AllowUnconditionalUpdate() bool {
 	return false
+}
+
+func (groupStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
+func (groupStrategy) WarningsOnUpdate(ctx context.Context, newObj, oldObj runtime.Object) []string {
+	return nil
 }
 
 // Canonicalize normalizes the object after validation.

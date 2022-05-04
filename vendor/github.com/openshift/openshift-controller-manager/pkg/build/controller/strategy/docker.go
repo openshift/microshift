@@ -26,7 +26,8 @@ func init() {
 
 // DockerBuildStrategy creates a Docker build using a Docker builder image.
 type DockerBuildStrategy struct {
-	Image string
+	Image                  string
+	BuildCSIVolumesEnabled bool
 }
 
 // CreateBuildPod creates the pod to be used for the Docker build
@@ -214,5 +215,8 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 	setupContainersStorage(pod, &pod.Spec.Containers[0]) // for unprivileged builds
 	// setupContainersNodeStorage(pod, &pod.Spec.Containers[0]) // for privileged builds
 	setupBlobCache(pod)
+	if err := setupBuildVolumes(pod, build.Spec.Strategy.DockerStrategy.Volumes, bs.BuildCSIVolumesEnabled); err != nil {
+		return pod, err
+	}
 	return pod, nil
 }

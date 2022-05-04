@@ -29,7 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apiserver/pkg/endpoints/metrics"
-	"k8s.io/apiserver/pkg/server/httplog"
+	"k8s.io/apiserver/pkg/endpoints/responsewriter"
 	"k8s.io/klog/v2"
 )
 
@@ -223,7 +223,6 @@ func getExcludedChecks(r *http.Request) sets.String {
 // handleRootHealth returns an http.HandlerFunc that serves the provided checks.
 func handleRootHealth(name string, firstTimeHealthy func(), checks ...HealthChecker) http.HandlerFunc {
 	var notifyOnce sync.Once
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		excluded := getExcludedChecks(r)
 		// failedVerboseLogOutput is for output to the log.  It indicates detailed failed output information for the log.
@@ -256,18 +255,17 @@ func handleRootHealth(name string, firstTimeHealthy func(), checks ...HealthChec
 		// always be verbose on failure
 		if len(failedChecks) > 0 {
 			klog.V(2).Infof("%s check failed: %s\n%v", strings.Join(failedChecks, ","), name, failedVerboseLogOutput.String())
-			http.Error(httplog.Unlogged(r, w), fmt.Sprintf("%s%s check failed", individualCheckOutput.String(), name), http.StatusInternalServerError)
+			http.Error(responsewriter.GetOriginal(w), fmt.Sprintf("%s%s check failed", individualCheckOutput.String(), name), http.StatusInternalServerError)
 			return
 		}
-
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
 
 		// signal first time this is healthy
 		if firstTimeHealthy != nil {
 			notifyOnce.Do(firstTimeHealthy)
 		}
 
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
 		if _, found := r.URL.Query()["verbose"]; !found {
 			fmt.Fprint(w, "ok")
 			return

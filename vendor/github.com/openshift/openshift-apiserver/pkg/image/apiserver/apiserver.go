@@ -10,7 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"k8s.io/klog/v2"
 
@@ -34,7 +33,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
 	imageimporter "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
 	imageetcd "github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image/etcd"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagesecret"
@@ -263,9 +261,6 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	importerFn := func(r importer.RepositoryRetriever, regConf *sysregistriesv2.V2RegistriesConf) imageimporter.Interface {
 		return imageimporter.NewImageStreamImporter(r, regConf, c.ExtraConfig.MaxImagesBulkImportedPerRepository, flowcontrol.NewTokenBucketRateLimiter(2.0, 3), &importerCache)
 	}
-	importerDockerClientFn := func() dockerv1client.Client {
-		return dockerv1client.NewClient(20*time.Second, false)
-	}
 	imageStreamImportStorage := imagestreamimport.NewREST(
 		importerFn,
 		imageStreamRegistry,
@@ -274,7 +269,6 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 		imageV1Client.ImageV1(),
 		importTransport,
 		insecureImportTransport,
-		importerDockerClientFn,
 		whitelister,
 		authorizationClient.SubjectAccessReviews(),
 		c.ExtraConfig.OperatorInformers.Operator().V1alpha1().ImageContentSourcePolicies().Lister(),

@@ -127,6 +127,11 @@ func (s Strategy) validateTagsAndLimits(ctx context.Context, oldStream, newStrea
 	return s.limitVerifier.VerifyLimits(ns, newStream)
 }
 
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (Strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 // AllowCreateOnUpdate is false for image streams.
 func (s Strategy) AllowCreateOnUpdate() bool {
 	return false
@@ -614,6 +619,11 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 	}
 	errs = append(errs, validation.ValidateImageStreamUpdateWithWhitelister(ctx, s.registryWhitelister, stream, oldStream)...)
 	return errs
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (Strategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }
 
 // Decorate decorates stream.Status.DockerImageRepository using the logic from

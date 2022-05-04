@@ -160,6 +160,7 @@ type BuildController struct {
 
 	buildStore                      buildv1lister.BuildLister
 	secretStore                     v1lister.SecretLister
+	configMapStore                  v1lister.ConfigMapLister
 	serviceAccountStore             v1lister.ServiceAccountLister
 	podStore                        v1lister.PodLister
 	imageStreamStore                imagev1lister.ImageStreamLister
@@ -189,6 +190,7 @@ type BuildController struct {
 	buildDefaults            builddefaults.BuildDefaults
 	buildOverrides           buildoverrides.BuildOverrides
 	internalRegistryHostname string
+	buildCSIVolumesEnabled   bool
 
 	recorder                record.EventRecorder
 	registryConfData        string
@@ -207,6 +209,7 @@ type BuildControllerParams struct {
 	ImageStreamInformer                imagev1informer.ImageStreamInformer
 	PodInformer                        kubeinformers.PodInformer
 	SecretInformer                     kubeinformers.SecretInformer
+	ConfigMapInformer                  kubeinformers.ConfigMapInformer
 	ServiceAccountInformer             kubeinformers.ServiceAccountInformer
 	OpenshiftConfigConfigMapInformer   kubeinformers.ConfigMapInformer
 	ControllerManagerConfigMapInformer kubeinformers.ConfigMapInformer
@@ -239,6 +242,7 @@ func NewBuildController(params *BuildControllerParams) *BuildController {
 		imageContentSourcePolicyLister:   params.ImageContentSourcePolicyInformer.Lister(),
 		imageConfigLister:                params.ImageConfigInformer.Lister(),
 		secretStore:                      params.SecretInformer.Lister(),
+		configMapStore:                   params.ConfigMapInformer.Lister(),
 		serviceAccountStore:              params.ServiceAccountInformer.Lister(),
 		podClient:                        params.KubeClient.CoreV1(),
 		configMapClient:                  params.KubeClient.CoreV1(),
@@ -1055,6 +1059,13 @@ func (bc *BuildController) resolveImageReferences(build *buildv1.Build, update *
 		// If we cannot resolve the output reference, the output image stream
 		// may not yet exist. The build should remain in the new state and show the
 		// reason that it is still in the new state.
+
+		// However, if source type is binary, it means, that user is creating it via
+		// the 'oc start-build'. in that case it makes sense to fail the build to let
+		// the user know early that resource does not exist
+		if build.Spec.Source.Type == buildv1.BuildSourceBinary {
+			update.setPhase(buildv1.BuildPhaseFailed)
+		}
 		update.setReason(buildv1.StatusReasonInvalidOutputReference)
 		update.setMessage("Output image could not be resolved.")
 		if err == errNoIntegratedRegistry {
@@ -1180,6 +1191,13 @@ func (bc *BuildController) createBuildPod(build *buildv1.Build) (*buildUpdate, e
 				build.Spec.Strategy.CustomStrategy.PullSecret = pullSecret
 			}
 		}
+	}
+
+	// check for resources that might be not existing
+	// and if they are not, return a build update
+	upd, err := bc.checkForNonExistantResources(build)
+	if upd != nil {
+		return upd, err
 	}
 
 	// look up the secrets needed to pull any source input images.
@@ -2135,9 +2153,8 @@ func (bc *BuildController) createBuildRegistriesConfigData(config *configv1.Imag
 	}
 
 	configObj := sysregistriesv2.V2RegistriesConf{}
-	// docker.io must be the only entry in the registry search list
-	// See https://github.com/openshift/builder/pull/40
-	configObj.UnqualifiedSearchRegistries = []string{"docker.io"}
+	// line up with the search list in the default registries.conf in openshift/builder, see PR #266 there
+	configObj.UnqualifiedSearchRegistries = []string{"registry.redhat.io", "registry.access.redhat.com", "quay.io", "docker.io"}
 	err := rutil.EditRegistriesConfig(&configObj, insecureRegs, blockedRegs, policies)
 	if err != nil {
 		klog.V(0).Infof("MCO library had problem building registries config: %s", err.Error())
@@ -2332,6 +2349,159 @@ func (bc *BuildController) configMapDeleted(obj interface{}) {
 		return
 	}
 	bc.controllerConfigChanged()
+}
+
+// checkForNonExistantResources checks for Config Maps, Secrets and Volumes used by the Build
+// which might not exist in the project. In case it finds non existing resources, it
+// fills in the buildUpdate object, setting the message enumerating missing resources and
+// returns it. In case of an error, it just returns an error.
+func (bc *BuildController) checkForNonExistantResources(build *buildv1.Build) (*buildUpdate, error) {
+	update := &buildUpdate{}
+
+	var missingResources string
+
+	// checking that all the config maps listed in the build exist
+	cms, err := bc.checkConfigMapsExist(build)
+	if err != nil {
+		update.setReason(buildv1.StatusReasonGenericBuildFailed)
+		update.setMessage(fmt.Sprintf("Error while checking Config Maps: %v", err))
+		return update, err
+	}
+	// checking that all the secrets listed in the build exist
+	secrets, err := bc.checkSecretsExist(build)
+	if err != nil {
+		update.setReason(buildv1.StatusReasonGenericBuildFailed)
+		update.setMessage(fmt.Sprintf("Error while checking Secrets: %v", err))
+		return update, err
+	}
+
+	// checking config maps and secrets in volume sources
+	vCms, vSecrets, err := bc.checkBuildVolumeSources(build)
+	if err != nil {
+		update.setReason(buildv1.StatusReasonGenericBuildFailed)
+		update.setMessage(fmt.Sprintf("Error while checking Volume Sources: %v", err))
+		return update, err
+	}
+
+	// add config maps and secrets missing in volume sources to the previous ones
+	cms = append(cms, vCms...)
+	secrets = append(secrets, vSecrets...)
+
+	if len(cms) > 0 {
+		missingResources = " ConfigMaps [" + strings.Join(cms, ", ") + "]"
+	}
+	if len(secrets) > 0 {
+		missingResources += " Secrets [" + strings.Join(secrets, ", ") + "]"
+	}
+
+	// compile the error report, that lists all the missing resources for the user
+	if len(missingResources) > 0 {
+		nonExistantMessage := fmt.Sprintf("These resources do not exist:%v", missingResources)
+
+		// Only fail if Build type is binary, otherwise update the build
+		// setting an error message
+		// This will show build error for the user, letting the Build to be
+		// reconciled again, later, and also Pod will not get created until this
+		// problem is fixed
+		if build.Spec.Source.Type == buildv1.BuildSourceBinary {
+			update.setPhase(buildv1.BuildPhaseFailed)
+		}
+		update.setReason(buildv1.StatusReasonGenericBuildFailed)
+		update.setMessage(nonExistantMessage)
+
+		return update, nil
+	}
+
+	return nil, nil
+}
+
+// checkConfigMapsExist checks whether all ConfigMaps specified by the Build are existing
+// if they are not, return the list of all non existing ConfigMaps
+func (bc *BuildController) checkConfigMapsExist(build *buildv1.Build) ([]string, error) {
+	nonExistantConfigMaps := make([]string, 0, 3)
+	for _, cm := range build.Spec.Source.ConfigMaps {
+		name := cm.ConfigMap.Name
+		_, err := bc.configMapStore.ConfigMaps(build.Namespace).Get(name)
+
+		if err != nil && errors.IsNotFound(err) {
+			nonExistantConfigMaps = append(nonExistantConfigMaps, name)
+			continue
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return nonExistantConfigMaps, nil
+}
+
+// checkSecretsExist checks whether all Secrets specified by the Build are existing
+// if they are not, return the list of all non existing Secrets
+func (bc *BuildController) checkSecretsExist(build *buildv1.Build) ([]string, error) {
+	nonExistantSecrets := make([]string, 0, 3)
+	for _, cm := range build.Spec.Source.Secrets {
+		name := cm.Secret.Name
+		_, err := bc.secretStore.Secrets(build.Namespace).Get(name)
+
+		if err != nil && errors.IsNotFound(err) {
+			nonExistantSecrets = append(nonExistantSecrets, name)
+			continue
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return nonExistantSecrets, nil
+}
+
+// checkBuildVolumeSources checks whether all Secrets and ConfigMaps specified by the
+// Build Volume Sources are existing
+// if they are not, return the lists of all non existing ConfigMaps and Secrets
+// or return error in case of unexpected behavior
+func (bc *BuildController) checkBuildVolumeSources(build *buildv1.Build) ([]string, []string, error) {
+	var volumes []buildv1.BuildVolume
+
+	if build.Spec.Strategy.Type == buildv1.DockerBuildStrategyType {
+		volumes = build.Spec.Strategy.DockerStrategy.Volumes
+	} else if build.Spec.Strategy.Type == buildv1.SourceBuildStrategyType {
+		volumes = build.Spec.Strategy.SourceStrategy.Volumes
+	}
+
+	nonExistantCms := make([]string, 0, 3)
+	nonExistantSecrets := make([]string, 0, 3)
+
+	for _, volume := range volumes {
+		if volume.Source.Type == buildv1.BuildVolumeSourceTypeConfigMap {
+			cmName := volume.Source.ConfigMap.Name
+			_, err := bc.configMapStore.ConfigMaps(build.Namespace).Get(cmName)
+			if err != nil && errors.IsNotFound(err) {
+				nonExistantCms = append(nonExistantCms, cmName)
+				continue
+			}
+
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+
+		if volume.Source.Type == buildv1.BuildVolumeSourceTypeSecret {
+			secretName := volume.Source.Secret.SecretName
+			_, err := bc.secretStore.Secrets(build.Namespace).Get(secretName)
+			if err != nil && errors.IsNotFound(err) {
+				nonExistantSecrets = append(nonExistantSecrets, secretName)
+				continue
+			}
+
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+	}
+
+	return nonExistantCms, nonExistantSecrets, nil
 }
 
 // isBuildPod returns true if the given pod is a build pod

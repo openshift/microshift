@@ -52,6 +52,9 @@ func (autoscalerStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.S
 		"autoscaling/v1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("status"),
 		),
+		"autoscaling/v2": fieldpath.NewSet(
+			fieldpath.MakePathOrDie("status"),
+		),
 		"autoscaling/v2beta1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("status"),
 		),
@@ -79,6 +82,11 @@ func (autoscalerStrategy) PrepareForCreate(ctx context.Context, obj runtime.Obje
 func (autoscalerStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	autoscaler := obj.(*autoscaling.HorizontalPodAutoscaler)
 	return validation.ValidateHorizontalPodAutoscaler(autoscaler)
+}
+
+// WarningsOnCreate returns warnings for the creation of the given object.
+func (autoscalerStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
 }
 
 // Canonicalize normalizes the object after validation.
@@ -123,6 +131,11 @@ func (autoscalerStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.O
 	return validation.ValidateHorizontalPodAutoscalerUpdate(obj.(*autoscaling.HorizontalPodAutoscaler), old.(*autoscaling.HorizontalPodAutoscaler))
 }
 
+// WarningsOnUpdate returns warnings for the given update.
+func (autoscalerStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
+}
+
 func (autoscalerStrategy) AllowUnconditionalUpdate() bool {
 	return true
 }
@@ -139,6 +152,9 @@ var StatusStrategy = autoscalerStatusStrategy{Strategy}
 func (autoscalerStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	fields := map[fieldpath.APIVersion]*fieldpath.Set{
 		"autoscaling/v1": fieldpath.NewSet(
+			fieldpath.MakePathOrDie("spec"),
+		),
+		"autoscaling/v2": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 		"autoscaling/v2beta1": fieldpath.NewSet(
@@ -161,4 +177,9 @@ func (autoscalerStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old r
 
 func (autoscalerStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	return validation.ValidateHorizontalPodAutoscalerStatusUpdate(obj.(*autoscaling.HorizontalPodAutoscaler), old.(*autoscaling.HorizontalPodAutoscaler))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (autoscalerStatusStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }

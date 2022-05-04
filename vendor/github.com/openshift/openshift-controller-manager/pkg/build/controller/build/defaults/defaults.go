@@ -55,14 +55,14 @@ func (b BuildDefaults) ApplyDefaults(pod *corev1.Pod) error {
 func setPodLogLevelFromBuild(pod *corev1.Pod, build *buildv1.Build) error {
 	var envs []corev1.EnvVar
 
-	// Check whether the build strategy supports --loglevel parameter.
+	// Check whether the build strategy supports -v logging parameter.
 	switch {
 	case build.Spec.Strategy.DockerStrategy != nil:
 		envs = build.Spec.Strategy.DockerStrategy.Env
 	case build.Spec.Strategy.SourceStrategy != nil:
 		envs = build.Spec.Strategy.SourceStrategy.Env
 	default:
-		// The build strategy does not support --loglevel
+		// The build strategy does not support -v logging directly.
 		return nil
 	}
 
@@ -75,9 +75,9 @@ func setPodLogLevelFromBuild(pod *corev1.Pod, build *buildv1.Build) error {
 		}
 	}
 	c := &pod.Spec.Containers[0]
-	c.Args = append(c.Args, "--loglevel="+buildLogLevel)
+	c.Args = append(c.Args, "--v="+buildLogLevel)
 	for i := range pod.Spec.InitContainers {
-		pod.Spec.InitContainers[i].Args = append(pod.Spec.InitContainers[i].Args, "--loglevel="+buildLogLevel)
+		pod.Spec.InitContainers[i].Args = append(pod.Spec.InitContainers[i].Args, "--v="+buildLogLevel)
 	}
 	return nil
 }
