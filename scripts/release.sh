@@ -196,7 +196,7 @@ help() {
 This script provides some simple automation for cutting new releases of Microshift.
 
 Use:
-./release.sh --token $(cat /token/path) --version 4.8.0-0.microshift-$(date -u "+%%Y-%%m-%%d-%%H%%M%%S")
+./release.sh --token $(cat /token/path) --version 4.10.0-0.microshift-$(date -u "+%%Y-%%m-%%d-%%H%%M%%S")
     Note: do not use "=" with flag values
 Inputs:
     --token       (Full Release Only) The github application auth token, use to create a github release.

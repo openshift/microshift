@@ -9,7 +9,7 @@ jobs:
   trigger_copr_repo_build:
     runs-on: ubuntu-latest
     container:
-      image: registry.fedoraproject.org/fedora:35
+      image: registry.fedoraproject.org/fedora:36
     steps:
       - shell: bash # git must be present before checkout
         run: sudo dnf install -y copr-cli golang gcc make systemd policycoreutils rpm-build git which
