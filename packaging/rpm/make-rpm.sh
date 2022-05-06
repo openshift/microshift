@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 # must be passed down to this script from Makefile
-RELEASE_BASE=${RELEASE_BASE:-4.7.0}
+RELEASE_BASE=${RELEASE_BASE:-4.10.0}
 RELEASE_PRE=${RELEASE_PRE:-${RELEASE_BASE}-0.microshift}
 BUILD=${BUILD:-all}
 

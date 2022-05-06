@@ -6,7 +6,7 @@
 
 
 # golang specifics
-%global golang_version 1.15
+%global golang_version 1.17
 #debuginfo not supported with Go
 %global debug_package %{nil}
 # modifying the Go binaries breaks the DWARF debugging
@@ -223,6 +223,9 @@ fi
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
 %changelog
+* Fri May 7 2022 Sally O'Malley <somalley@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357
+- Update required golang version to 1.17
+
 * Mon Feb 7 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshiftr-2022_02_02_194009_3
 - Selinux directory creation and labeling
 
