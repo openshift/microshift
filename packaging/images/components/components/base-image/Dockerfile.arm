@@ -1,4 +1,4 @@
-FROM fedora-minimal:34
+FROM fedora-minimal:36
 
 RUN microdnf -y install --nodocs --setopt=install_weak_deps=0 \
                         which tar wget hostname shadow-utils socat findutils \

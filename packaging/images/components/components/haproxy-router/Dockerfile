@@ -1,6 +1,6 @@
 # https://github.com/openshift/router/blob/master/images/router/haproxy/Dockerfile.rhel8
-FROM fedora-minimal:34
-# ubi-8 images don't have haproxy22, so we rely on fedora-minimal:34 in this case
+FROM fedora-minimal:36
+# ubi-8 images don't have haproxy22, so we rely on fedora-minimal:36 in this case
 
 ARG TARGETARCH
 RUN INSTALL_PKGS="haproxy rsyslog procps-ng util-linux" && \
