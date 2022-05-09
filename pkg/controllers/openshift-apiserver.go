@@ -45,10 +45,8 @@ func NewOpenShiftAPIServer(cfg *config.MicroshiftConfig) *OCPAPIServer {
 	return s
 }
 
-func (s *OCPAPIServer) Name() string { return "ocp-apiserver" }
-func (s *OCPAPIServer) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-crd-manager"}
-}
+func (s *OCPAPIServer) Name() string           { return "ocp-apiserver" }
+func (s *OCPAPIServer) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	var configFilePath = cfg.DataDir + "/resources/openshift-apiserver/config/config.yaml"
