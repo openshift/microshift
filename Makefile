@@ -247,3 +247,7 @@ release:
 release-nightly:
 	./scripts/release.sh --nightly --version $(SOURCE_GIT_TAG)
 .PHONY: release-nightly
+
+component-images:
+	cd packaging/images/components && ./build.sh
+.PHONY: component-images
