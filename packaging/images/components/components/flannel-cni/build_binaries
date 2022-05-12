@@ -3,5 +3,7 @@
 mkdir -p bin
 
 cd src
-CGO_ENABLED=0 GOOS=linux GOARCH=$1 scripts/build_flannel.sh && mv dist/flannel-$1 ../bin/flannel-$1
+GOPATH=${GOPATH:-$(go env GOPATH)}
+OUTPUT_DIR=${GOPATH}/src/github.com/flannel-io/cni-plugin/dist
+CGO_ENABLED=0 GOOS=linux GOARCH=$1 scripts/build_flannel.sh && mv ${OUTPUT_DIR}/flannel-$1 ../bin/flannel-$1
 

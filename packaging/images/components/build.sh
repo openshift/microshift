@@ -5,7 +5,7 @@ set -e
 
 DEST_REGISTRY=${DEST_REGISTRY:-"quay.io/microshift"}
 COMPONENTS=${COMPONENTS:-"base-image pause cli coredns flannel flannel-cni haproxy-router hostpath-provisioner kube-rbac-proxy service-ca-operator"}
-ARCHITECTURES=${ARCHITECTURES:-"amd64 arm64 arm ppc64le riscv64"}
+ARCHITECTURES=${ARCHITECTURES:-"amd64 arm64 ppc64le riscv64"}
 PUSH=${PUSH:-no}
 PARALLEL=${PARALLEL:-yes}
 
@@ -170,7 +170,8 @@ function build_using_image {
 
   IMG_REF=$(get_image_ref "$1" "${OKD_IMG}")
   buildah pull --arch "${ARCH}" "${IMG_REF}"
-  buildah tag "${IMG_REF}" "${ARCH_IMAGE}"
+  skopeo copy containers-storage:"${IMG_REF}" --format oci containers-storage:"${ARCH_IMAGE}"
+
 }
 
 function get_image_ref {
