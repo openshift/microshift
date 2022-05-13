@@ -249,64 +249,14 @@ update_manifests() {
     pushd "${STAGING_DIR}" >/dev/null
 
     title "Rebasing manifests"
-    assets=$(find "${REPOROOT}/assets" -name \*.yaml)
-    for asset in ${assets}; do
-        search_path="${REPOROOT}/_output/staging/release-manifests"
-        search_name=$(basename "${asset}")
-        search_exclude=XXX
-
-        # TODO: Rename assets and their references to obviate the need for special cases
-        case $(basename "${asset}") in
-        0000_60_service-ca_00_roles.yaml)
-            search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-            search_name=clusterrolebinding.yaml
-            ;;
-        0000_60_service-ca_01_namespace.yaml)
-            search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-            search_name=ns.yaml
-            ;;
-        0000_60_service-ca_04_sa.yaml)
-            search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-            search_name=sa.yaml
-            ;;
-        0000_60_service-ca_05_deploy.yaml)
-            search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-            search_name=deployment.yaml
-            ;;
-        0000_70_dns_00-*)
-            search_path=${REPOROOT}/_output/staging/cluster-dns-operator/assets/dns
-            search_name=${search_name#"0000_70_dns_00-"}
-            search_exclude="${REPOROOT}/_output/staging/cluster-dns-operator/assets/dns/metrics/*"
-            ;;
-        0000_70_dns_01-*)
-            search_path=${REPOROOT}/_output/staging/cluster-dns-operator/assets/dns
-            search_name=${search_name#"0000_70_dns_01-"}
-            search_exclude="${REPOROOT}/_output/staging/cluster-dns-operator/assets/dns/metrics/*"
-            ;;
-        0000_80_openshift-router-service.yaml)
-            search_path=${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router
-            search_name=service-internal.yaml
-            search_exclude="${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router/metrics/*"
-            ;;
-        0000_80_openshift-router-*)
-            search_path=${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router
-            search_name="${search_name#"0000_80_openshift-router-"}"
-            search_exclude="${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router/metrics/*"
-            ;;
-        0000_11_imageregistry-configs.crd.yaml)
-            search_path=${REPOROOT}/_output/staging/openshift-apiserver/vendor/github.com/openshift/api/imageregistry/v1
-            search_name=00-crd.yaml
-            ;;
-        esac
-
-        updated_asset=$(find "${search_path}" -name "${search_name}" -not -path "${search_exclude}" | tail -n 1)
-        if [[ ! -z "${updated_asset}" ]]; then
-            echo "Updating ${asset} from ${updated_asset}"
-            cp "${updated_asset}" "${asset}"
-        else
-            echo -e "\E[31mNo update source found for ${asset}\E[00m";
-        fi
-    done
+    rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
+    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns 2>/dev/null || true 
+    rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
+    cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver 2>/dev/null || true
+    rm -f "${REPOROOT}"/assets/components/openshift-router/*
+    cp "${STAGING_DIR}"/cluster-ingress-operator/assets/router/* "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
+    rm -f "${REPOROOT}"/assets/components/service-ca/*
+    cp "${STAGING_DIR}"/service-ca-operator/bindata/v4.0.0/controller/* "${REPOROOT}"/assets/components/service-ca 2>/dev/null || true
 
     popd >/dev/null
 }
