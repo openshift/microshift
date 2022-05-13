@@ -27,8 +27,10 @@ shopt -s extglob
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")"
 STAGING_DIR="$REPOROOT/_output/staging"
+PULL_SECRET_FILE="${HOME}/.docker/config.json"
 
-EMBEDDED_COMPONENTS="etcd hyperkube openshift-apiserver openshift-controller-manager"
+EMBEDDED_COMPONENTS="openshift-apiserver openshift-controller-manager oauth-apiserver hyperkube etcd"
+EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-openshift-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator"
 
 
@@ -92,7 +94,7 @@ update_versions() {
             version=$(printf '%s\n%s\n' "${base_version}" "${update_version}" | sort --version-sort | tail -n 1)
         fi
 
-        echo "${mod} ${version}" 
+        echo "${mod} ${version}"
     done < "${base_file}"
 }
 
@@ -109,52 +111,46 @@ get_release_images() {
 download_release() {
     local release_image=$1
 
-    if [[ $EUID -ne 0 ]]; then
-    >&2 echo "You need to run this script as root or in a 'buildah unshare' environment:" 
-    >&2 echo "  buildah unshare $0" 
-    exit 1
-    fi
-    if [[ -z ${1+x} ]]; then
-        >&2 echo "You need to provide an OKD release name, e.g.:"
-        >&2 echo "  $0 4.7.0-0.okd-2021-08-22-163618"
-        exit 1
-    fi
-    OKD_RELEASE=$1
-
-
     rm -rf "${STAGING_DIR}"
     mkdir -p "${STAGING_DIR}"
     pushd "${STAGING_DIR}" >/dev/null
 
+    authentication=""
+    if [ -f "${PULL_SECRET_FILE}" ]; then
+        authentication="-a ${PULL_SECRET_FILE}"
+    else
+        >&2 echo "Warning: no pull secret found at ${PULL_SECRET_FILE}"
+    fi
 
-    title "Downloading and extracting ${OKD_RELEASE} release image..."
-    curl -LO "https://github.com/openshift/okd/releases/download/${OKD_RELEASE}/release.txt"
+    title "# Downloading and extracting ${release_image} tools"
+    oc adm release extract ${authentication} --tools "${release_image}"
 
-    OKD_RELEASE_IMAGE=$(grep -oP 'Pull From: \K[\w.-/@:]+' release.txt)
-    podman pull "${OKD_RELEASE_IMAGE}"
-    cnt=$(buildah from "${OKD_RELEASE_IMAGE}")
-    mnt=$(buildah mount "${cnt}" | cut -d ' ' -f 2)
-    jq -r '.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' \
-        "${mnt}/release-manifests/image-references" > source_commits.txt
-    mkdir -p "${STAGING_DIR}/release-manifests"
-    cp -- "${mnt}"/release-manifests/*.yaml "${STAGING_DIR}/release-manifests"
+    title "# Extracing ${release_image} manifest content"
+    mkdir -p release-manifests
+    pushd release-manifests >/dev/null
+    content=$(oc adm release info ${authentication} --contents "${release_image}")
+    echo "${content}" | awk '/^# 0000_[A-Za-z0-9._-]*.yaml/{filename = $2;}{if (filename != "") print >filename;}'
+    popd >/dev/null
 
+    title "# Cloning ${release_image} component repos"
+    commits=$(oc adm release info ${authentication} --commits -o json "${release_image}")
+    echo "${commits}" | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
 
-    title "Cloning git repos..."
     git config --global advice.detachedHead false
     while IFS="" read -r line || [ -n "$line" ]
     do
-        COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
-        REPO=$(echo "${line}" | cut -d ' ' -f 2)
-        COMMIT=$(echo "${line}" | cut -d ' ' -f 3)
-        if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
-            git clone "${REPO}"
-            pushd "${REPO##*/}" >/dev/null
-            git checkout "${COMMIT}"
-            echo
+        component=$(echo "${line}" | cut -d ' ' -f 1)
+        repo=$(echo "${line}" | cut -d ' ' -f 2)
+        commit=$(echo "${line}" | cut -d ' ' -f 3)
+        if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]]; then
+            title "## Cloning ${repo} at commit ${commit}..."
+            git clone "${repo}"
+            pushd "${repo##*/}" >/dev/null
+            git checkout "${commit}"
             popd >/dev/null
+            echo
         fi
-    done < source_commits.txt
+    done < source-commits
 
     popd >/dev/null
 }
@@ -180,7 +176,7 @@ update_go_mod() {
             update_versions latest_require require > t; mv t latest_require
             update_versions latest_replace replace > t; mv t latest_replace
         fi
-    done < source_commits.txt
+    done < source-commits
 
     cat << EOF > "${REPOROOT}/go.mod"
 module github.com/openshift/microshift
@@ -222,6 +218,8 @@ update_images() {
     pushd "${STAGING_DIR}" >/dev/null
 
     title "Rebasing release_*.go"
+    base_release=$(grep -o -P "^[[:space:]]+Version:[[:space:]]+\K([[:alnum:].-]+)" "${STAGING_DIR}"/release.txt)
+
     images="$(get_release_images "${REPOROOT}/pkg/release/release.go" | xargs)"
 
     for arch in amd64; do
@@ -236,7 +234,7 @@ update_images() {
         done
     done
 
-    sed -i "/^var Base/c\var Base = \"$(<"${STAGING_DIR}/release")\"" "${REPOROOT}/pkg/release/release.go"
+    sed -i "/^var Base/c\var Base = \"${base_release}\"" "${REPOROOT}/pkg/release/release.go"
 
     popd >/dev/null
 }
@@ -316,7 +314,7 @@ update_manifests() {
 
 usage() {
     echo "Usage:"
-    echo "$(basename "$0") download IMAGE"
+    echo "$(basename "$0") download RELEASE_IMAGE"
     echo "$(basename "$0") go.mod"
     echo "$(basename "$0") generated-apis"
     echo "$(basename "$0") images"
