@@ -448,7 +448,7 @@ require (
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
-	go.etcd.io/etcd/server/v3 v3.5.0
+	go.etcd.io/etcd/server/v3 v3.5.3
 	gopkg.in/fsnotify.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/tomb.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/yaml.v2 v2.4.0

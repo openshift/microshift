@@ -107,11 +107,11 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 if [[ -z ${1+x} ]]; then
-    >&2 echo "You need to provide an OKD release name, e.g.:"
-    >&2 echo "  $0 4.7.0-0.okd-2021-08-22-163618"
+    >&2 echo "You need to provide an OCP release name, e.g.:"
+    >&2 echo "  $0 4.11.0-0.nightly-2022-05-05-015322"
     exit 1
 fi
-OKD_RELEASE=$1
+OCP_RELEASE=$1
 
 
 rm -rf "${STAGING_DIR}"
@@ -119,12 +119,12 @@ mkdir -p "${STAGING_DIR}"
 pushd "${STAGING_DIR}" >/dev/null
 
 
-title "Downloading and extracting ${OKD_RELEASE} release image..."
-curl -LO "https://github.com/openshift/okd/releases/download/${OKD_RELEASE}/release.txt"
+title "Downloading and extracting ${OCP_RELEASE} release image..."
+curl -LO "https://openshift-release-artifacts.apps.ci.l2s4.p1.openshiftapps.com/${OCP_RELEASE}/release.txt"
 
-OKD_RELEASE_IMAGE=$(grep -oP 'Pull From: \K[\w.-/@:]+' release.txt)
-podman pull "${OKD_RELEASE_IMAGE}"
-cnt=$(buildah from "${OKD_RELEASE_IMAGE}")
+OCP_RELEASE_IMAGE=$(grep -oP 'Pull From: \K[\w.-/@:]+' release.txt)
+podman pull --authfile /run/containers/auth.json "${OCP_RELEASE_IMAGE}"
+cnt=$(buildah from "${OCP_RELEASE_IMAGE}")
 mnt=$(buildah mount "${cnt}" | cut -d ' ' -f 2)
 jq -r '.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' \
     "${mnt}/release-manifests/image-references" > source_commits.txt
@@ -203,7 +203,7 @@ for arch in amd64; do
     done
 done
 
-sed -i "/^var Base/c\var Base = \"${OKD_RELEASE}\"" "${REPOROOT}/pkg/release/release.go"
+sed -i "/^var Base/c\var Base = \"${OCP_RELEASE}\"" "${REPOROOT}/pkg/release/release.go"
 
 
 title "Rebasing manifests"
