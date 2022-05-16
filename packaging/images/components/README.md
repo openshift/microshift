@@ -78,9 +78,10 @@ The reference to the consumed images can be found in [pkg/release](../pkg/releas
 
 # Image sources and source code
 
-The available OKD images, and otherwise the reference to the sourcecode and git-tag
-from which the OKD images are built is extracted from
-`oc adm release extract "quay.io/openshift/okd:${OKD_BASE_TAG}" --file=image-references` 
+** This is for OCP images, that are available internally to RedHat **
+The available OCP images, and otherwise the reference to the sourcecode and git-tag
+from which the OCP images are built is extracted from
+`oc adm release extract "registry.ci.openshift.org/ocp/release:{OCP_BASE_TAG)" --file=image-references`
 
 If an OKD image exists for the specific architecture, such specific image will be
 added into the multiarch manifest, otherwise we need to build the specific images.
@@ -88,9 +89,9 @@ added into the multiarch manifest, otherwise we need to build the specific image
 For architectures where `ubi8` or `ubi8-minimal` images exist such base will be used,
 in some cases we use `fedora-minimal` (when a newer version of packages is necessary)
 
-# Non OKD images
-We consume a few non-okd images, like `flannel`, `hostpath-provisioner`, `pause`,
+# Non OCP images
+We consume a few non-ocp images, like `flannel`, `hostpath-provisioner`, `pause`,
 we build those images from exiting image sources, or from source code.
 
 # generated images
-We publish the multi-arch images under quay.io/microshift/$IMAGE:$OKD_BASE_TAG
+We publish the multi-arch images under quay.io/microshift/$IMAGE:$OCP_BASE_TAG

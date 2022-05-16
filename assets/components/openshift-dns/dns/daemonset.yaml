@@ -1,18 +1,9 @@
 kind: DaemonSet
 apiVersion: apps/v1
-metadata:
-  labels:
-    dns.operator.openshift.io/owning-dns: default
-  name: dns-default
-  namespace: openshift-dns
+# name, namespace and labels are set at runtime
 spec:
-  selector:
-    matchLabels:
-      dns.operator.openshift.io/daemonset-dns: default
   template:
     metadata:
-      labels:
-        dns.operator.openshift.io/daemonset-dns: default
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
     spec:
@@ -20,7 +11,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
       - name: dns
-        image: {{ .ReleaseImage.coredns }}
+        # image is set at runtime
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         command: [ "coredns" ]
@@ -60,9 +51,9 @@ spec:
             cpu: 50m
             memory: 70Mi
       - name: kube-rbac-proxy
-        image: {{ .ReleaseImage.kube_rbac_proxy }}
-        imagePullPolicy: IfNotPresent
+        # image is set at runtime
         args:
+        - --logtostderr
         - --secure-listen-address=:9154
         - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
         - --upstream=http://127.0.0.1:9153/
@@ -80,22 +71,17 @@ spec:
           name: metrics-tls
           readOnly: true
       dnsPolicy: Default
-      nodeSelector:
-        kubernetes.io/os: linux      
+      # nodeSelector is set at runtime.
       volumes:
       - name: config-volume
         configMap:
+        # Name is set at runtime
           items:
           - key: Corefile
             path: Corefile
-          name: dns-default
       - name: metrics-tls
-        secret:
-          defaultMode: 420
-          secretName: dns-default-metrics-tls
-      tolerations:
-      # DNS needs to run everywhere. Tolerate all taints
-      - operator: Exists
+        # secretName is set at runtime
+      # tolerations is set at runtime.
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:

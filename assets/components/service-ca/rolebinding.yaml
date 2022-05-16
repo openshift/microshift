@@ -6,7 +6,6 @@ metadata:
 roleRef:
   kind: Role
   name: system:openshift:controller:service-ca
-  apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
   namespace: openshift-service-ca

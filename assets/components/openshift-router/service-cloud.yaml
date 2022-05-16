@@ -1,22 +1,25 @@
+# Load Balancer Service to place in front of the router in cloud environments.
+# Ingress Controller specific values are applied at runtime.
 kind: Service
 apiVersion: v1
 metadata:
-  annotations:
-    service.alpha.openshift.io/serving-cert-secret-name: router-certs-default
-  labels:
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  name: router-external-default
+  # Name is set at runtime.
   namespace: openshift-ingress
+  labels:
+    app: router
 spec:
+  type: LoadBalancer
   selector:
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  type: NodePort 
+    app: router
+  # This also has the effect of marking LB pool targets as unhealthy when no
+  # router pods are present on a node behind the service.
+  externalTrafficPolicy: Local
   ports:
-    - name: http
-      port: 80
-      targetPort: 80
-      nodePort: 30001
-    - name: https
-      port: 443
-      targetPort: 443
-      nodePort: 30002
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: https
