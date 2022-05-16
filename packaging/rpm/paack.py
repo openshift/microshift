@@ -18,7 +18,7 @@ fi
 IMAGE_POSTUN = """
 # only on uninstall (0), not on upgrades(1)
 if [ $1 -eq 0 ]; then
-  sed -i '\:%{imageStore}:d' /etc/containers/storage.con
+  sed -i '\:%{imageStore}:d' /etc/containers/storage.conf
   systemctl is-active --quiet crio && systemctl restart --quiet crio || true
 fi
 """
