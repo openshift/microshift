@@ -39,14 +39,14 @@ Release: %{release}%{dist}
 # this can be %{timestamp}.git%{short_hash} later for continous main builds
 Summary: MicroShift binary
 License: ASL 2.0
-URL: https://github.com/redhat-et/microshift
+URL: https://github.com/openshift/microshift
 
 %if ! 0%{?local_build:1}%{?git_commit:1}
-Source0: https://github.com/redhat-et/microshift/archive/refs/tags/%{github_tag}.tar.gz
+Source0: https://github.com/openshift/microshift/archive/refs/tags/%{github_tag}.tar.gz
 %endif
 
 %if 0%{?git_commit:1}
-Source0: https://github.com/redhat-et/microshift/archive/%{git_commit}/microshift-%{shortcommit}.tar.gz
+Source0: https://github.com/openshift/microshift/archive/%{git_commit}/microshift-%{shortcommit}.tar.gz
 %endif
 
 

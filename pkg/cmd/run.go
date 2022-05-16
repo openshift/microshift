@@ -64,7 +64,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	// TO-DO: When multi-node is ready, we need to add the controller host-name/mDNS hostname
 	//        or VIP to this list on start
-	//        see https://github.com/redhat-et/microshift/pull/471
+	//        see https://github.com/openshift/microshift/pull/471
 
 	if err := util.AddToNoProxyEnv(
 		cfg.NodeIP,

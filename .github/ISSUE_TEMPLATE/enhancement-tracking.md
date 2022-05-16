@@ -7,7 +7,7 @@ title: '[Enhancement]: <title>'
 ---
 <!-- Feature requests are unlikely to make progress as an issue.
 
-A proposal that works through the design along with the implications of the change should be submitted as a design document in https://github.com/redhat-et/microshift/tree/main/docs/design/
+A proposal that works through the design along with the implications of the change should be submitted as a design document in https://github.com/openshift/microshift/tree/main/docs/design/
 
 -->
 #### Design Document Link

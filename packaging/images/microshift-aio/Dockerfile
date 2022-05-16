@@ -9,7 +9,7 @@ ARG IPTABLES=nft
 
 ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
 
-WORKDIR $GOPATH/src/github.com/redhat-et/microshift
+WORKDIR $GOPATH/src/github.com/openshift/microshift
 
 COPY . .
 
@@ -29,7 +29,7 @@ RUN if [ "$FROM_SOURCE" == "true" ]; then \
       mv _output/bin/linux_$ARCH/microshift microshift; \
     else \
       export VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4) && \
-      curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-$ARCH && \
+      curl -LO https://github.com/openshift/microshift/releases/download/$VERSION/microshift-linux-$ARCH && \
       mv microshift-linux-$ARCH microshift; \
     fi
 
@@ -41,7 +41,7 @@ ARG ARCH
 
 ENV BUILD_PATH=packaging/images/microshift-aio
 
-COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/microshift /usr/local/bin/microshift
+COPY --from=builder /opt/app-root/src/github.com/openshift/microshift/microshift /usr/local/bin/microshift
 COPY $BUILD_PATH/unit /usr/lib/systemd/system/microshift.service
 COPY $BUILD_PATH/kubelet-cgroups.conf /etc/systemd/system.conf.d/kubelet-cgroups.conf
 COPY packaging/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/microshift.conf
