@@ -1,0 +1,33 @@
+packages:
+  - name: microshift-hello-world
+    version: 1.0.0
+    release: 3
+    license: Apache License 2.0
+    summary: Application specific containers
+    description: |
+        This package provides a read only storage for the deployed application containers.
+    url: https://github.com/redhat-et/microshift
+    path: /usr/lib/user-app/containers
+    arch:
+      - name: x86_64
+        image_arch: amd64
+        images:
+          - quay.io/microshift/hello-world:latest 
+      - name: aarch64
+        image_arch: arm64
+        images:
+          - quay.io/microshift/hello-world:latest 
+
+  - name: microshift-hello-world-manifests
+    version: 1.0.0
+    release: 3
+    license: Apache License 2.0
+    summary: Application specific manifests
+    description: |
+        This package provides a manifests for the deployed application containers.
+    manifestPath: /usr/lib/microshift/manifests
+    arch:
+      - name: x86_64
+        manifests: ./manifests
+      - name: aarch64
+        manifests: ./manifests

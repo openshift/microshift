@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microweb
+  labels:
+    app: microweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microweb
+  template:
+    metadata:
+      labels:
+        app: microweb
+    spec:
+      containers:
+      - name: microweb
+        image: quay.io/microshift/hello-world:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+         - containerPort: 8080
+
