@@ -41,6 +41,7 @@ Name: %%_NAME_%%
 # disable dynamic rpmbuild checks
 %global __os_install_post /bin/true
 %global __arch_install_post /bin/true
+%global _build_id_links none
 
 AutoReqProv: no
 
