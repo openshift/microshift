@@ -26,7 +26,7 @@ func init() {
 		"haproxy_router":                "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:608a8c9f893b3fae358028b44238f3184af2f3bd5cde844b8b2688583b8468ea",
 		"kube_flannel":                  "quay.io/coreos/flannel:v0.14.0",
 		"kube_flannel_cni":              "quay.io/microshift/flannel-cni:v0.14.0",
-		"kube_rbac_proxy":               "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3b3d0401dec6c7e1710b8e4a8c29a88a9bef1ed318bf570db1f344f5d31b3cbc",
+		"kube_rbac_proxy":               "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:08e8b4004edaeeb125ced09ab2c4cd6d690afaf3a86309c91a994dec8e3ccbf3",
 		"kubevirt_hostpath_provisioner": "quay.io/kubevirt/hostpath-provisioner:v0.8.0",
 		"pause":                         "k8s.gcr.io/pause:3.6",
 		"service_ca_operator":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:94a4cd55cb067f6d3747843b5532114806b6c81e8421e370bfe92ccafcc6bca7",
