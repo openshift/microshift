@@ -220,8 +220,8 @@ get_kubectl() {
 
 # Download and install microshift
 get_microshift() {
-    curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-$ARCH
-    curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/release.sha256
+    curl -LO https://github.com/openshift/microshift/releases/download/$VERSION/microshift-linux-$ARCH
+    curl -LO https://github.com/openshift/microshift/releases/download/$VERSION/release.sha256
 
     BIN_SHA="$(sha256sum microshift-linux-$ARCH | awk '{print $1}')"
     KNOWN_SHA="$(grep "microshift-linux-$ARCH" release.sha256 | awk '{print $1}')"
@@ -274,7 +274,7 @@ validation_check(){
         echo "======================================================================"
         echo "!!! WARNING !!!"
         echo "The hostname $HOSTNAME does not follow FQDN, which might cause problems while operating the cluster."
-        echo "See: https://github.com/redhat-et/microshift/issues/176"
+        echo "See: https://github.com/openshift/microshift/issues/176"
         echo
         echo "If you face a problem or want to avoid them, please update your hostname and try again."
         echo "Example: 'sudo hostnamectl set-hostname $HOSTNAME.example.com'"

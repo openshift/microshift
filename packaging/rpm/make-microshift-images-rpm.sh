@@ -25,7 +25,7 @@ packages:
     summary: MicroShift related container images
     description: |
       MicroShift container images packaged for use as a read-only cri-o container storage.
-    url: https://github.com/redhat-et/microshift
+    url: https://github.com/openshift/microshift
     path: /usr/lib/microshift/images/
     arch:
 EOF

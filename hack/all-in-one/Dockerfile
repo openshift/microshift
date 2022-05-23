@@ -11,7 +11,7 @@ RUN if [ "$FROM_SOURCE" == "true" ]; then \
         mv microshift /usr/local/bin/microshift; \
     else \
         export VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4) && \
-        curl -LO https://github.com/redhat-et/microshift/releases/download/$VERSION/microshift-linux-${ARCH} && \
+        curl -LO https://github.com/openshift/microshift/releases/download/$VERSION/microshift-linux-${ARCH} && \
         mv microshift-linux-${ARCH} /usr/local/bin/microshift; \
      fi
 

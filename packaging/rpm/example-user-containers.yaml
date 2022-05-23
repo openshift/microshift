@@ -8,7 +8,7 @@ packages:
     summary: Application specific containers
     description: |
         This package provides a read only storage for the deployed application containers.
-    url: https://github.com/redhat-et/microshift
+    url: https://github.com/openshift/microshift
     path: /usr/lib/user-app/containers
     arch:
       - name: x86_64

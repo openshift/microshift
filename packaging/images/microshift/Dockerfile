@@ -12,7 +12,7 @@ LABEL name=microshift-build
 
 ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
 
-WORKDIR $GOPATH/src/github.com/redhat-et/microshift
+WORKDIR $GOPATH/src/github.com/openshift/microshift
 
 COPY . .
 
@@ -32,7 +32,7 @@ RUN microdnf install -y \
     policycoreutils-python-utils \
     iptables \
     && microdnf clean all
-COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/_output/bin/linux_$ARCH/microshift /usr/bin/microshift
+COPY --from=builder /opt/app-root/src/github.com/openshift/microshift/_output/bin/linux_$ARCH/microshift /usr/bin/microshift
 
 RUN mkdir -p /root/crio.conf.d
 

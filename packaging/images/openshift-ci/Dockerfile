@@ -4,7 +4,7 @@ LABEL name=microshift-build
 
 ENV GOPATH=/opt/app-root GOCACHE=/mnt/cache GO111MODULE=on
 
-WORKDIR $GOPATH/src/github.com/redhat-et/microshift
+WORKDIR $GOPATH/src/github.com/openshift/microshift
 
 COPY . .
 
@@ -18,9 +18,9 @@ RUN ls -la
 #Linux ARM 64
 FROM  registry.ci.openshift.org/ocp/4.10
 
-COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/_output/bin/linux_arm64/microshift /usr/bin/local/microshift
+COPY --from=builder /opt/app-root/src/github.com/openshift/microshift/_output/bin/linux_arm64/microshift /usr/bin/local/microshift
 
 #Linux AMD 64
 FROM  registry.ci.openshift.org/ocp/4.10
 
-COPY --from=builder /opt/app-root/src/github.com/redhat-et/microshift/_output/bin/linux_amd64/microshift /usr/bin/local/microshift
+COPY --from=builder /opt/app-root/src/github.com/openshift/microshift/_output/bin/linux_amd64/microshift /usr/bin/local/microshift
