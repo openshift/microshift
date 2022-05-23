@@ -1,9 +1,18 @@
 approvers:
-- rootfs
-- fzdarsky
-- oglok
 - copejon
-- husky-parul
-- sallyom
+- dhellmann
+- fzdarsky
 - mangelajo
+- oglok
+- sallyom
+reviewers:
+- copejon
+- dhellmann
+- fzdarsky
+- mangelajo
+- oglok
+- sallyom
+emeritus_approvers:
 - cooktheryan
+- husky-parul
+- rootfs
