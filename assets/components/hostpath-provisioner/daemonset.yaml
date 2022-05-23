@@ -18,7 +18,7 @@ spec:
       containers:
         - name: kubevirt-hostpath-provisioner
           image: {{ .ReleaseImage.kubevirt_hostpath_provisioner }}
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: USE_NAMING_PREFIX
               value: "false" # change to true, to have the name of the pvc be part of the directory
