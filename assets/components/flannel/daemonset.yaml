@@ -34,6 +34,7 @@ spec:
       initContainers:
       - name: install-cni-bin
         image: {{ .ReleaseImage.kube_flannel_cni }}
+        imagePullPolicy: IfNotPresent
         command:
         - cp
         args:
@@ -45,6 +46,7 @@ spec:
           mountPath: /opt/cni/bin
       - name: install-cni
         image: {{ .ReleaseImage.kube_flannel }}
+        imagePullPolicy: IfNotPresent
         command:
         - cp
         args:
@@ -59,6 +61,7 @@ spec:
       containers:
       - name: kube-flannel
         image: {{ .ReleaseImage.kube_flannel }}
+        imagePullPolicy: IfNotPresent
         command:
         - /opt/bin/flanneld
         args:
