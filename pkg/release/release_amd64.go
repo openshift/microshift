@@ -17,7 +17,7 @@ limitations under the License.
 package release
 
 // For the amd64 architecture we use the existing and tested and
-// published OKD or other component upstream images
+// published OCP or other component upstream images
 
 func init() {
 	Image = map[string]string{
