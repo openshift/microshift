@@ -48,7 +48,7 @@ func (o *VersionOptions) Run() error {
 	switch o.Output {
 	case "":
 		fmt.Fprintf(o.Out, "MicroShift Version: %s\n", versionInfo.String())
-		fmt.Fprintf(o.Out, "Base OKD Version: %s\n", release.Base)
+		fmt.Fprintf(o.Out, "Base OCP Version: %s\n", release.Base)
 	case "yaml":
 		marshalled, err := yaml.Marshal(&versionInfo)
 		if err != nil {
