@@ -112,18 +112,31 @@ if [[ -z ${1+x} ]]; then
     exit 1
 fi
 OCP_RELEASE=$1
+OCP_RELEASE_TEXT=
+
+if [ "$1" = "nightly" ]
+then
+  set -x
+  curl --fail -X GET -G --location https://amd64.ocp.releases.ci.openshift.org/api/v1/releasestream/4.11.0-0.nightly/latest > /tmp/nightly
+  release=$(cat /tmp/nightly | jq '.downloadURL' | tr -d '"')
+  OCP_RELEASE_TEXT="$release/release.txt"
+fi
 
 
 rm -rf "${STAGING_DIR}"
 mkdir -p "${STAGING_DIR}"
 pushd "${STAGING_DIR}" >/dev/null
 
-
 title "Downloading and extracting ${OCP_RELEASE} release image..."
-curl -LO "https://openshift-release-artifacts.apps.ci.l2s4.p1.openshiftapps.com/${OCP_RELEASE}/release.txt"
-
+if [ -Z "$OCP_RELEASE_TEXT" ]
+then
+  curl -LO "https://openshift-release-artifacts.apps.ci.l2s4.p1.openshiftapps.com/${OCP_RELEASE}/release.txt"
+else
+  curl -LO "${OCP_RELEASE_TEXT}"
+fi
 OCP_RELEASE_IMAGE=$(grep -oP 'Pull From: \K[\w.-/@:]+' release.txt)
 podman pull --authfile /run/containers/auth.json "${OCP_RELEASE_IMAGE}"
+set +x
 cnt=$(buildah from "${OCP_RELEASE_IMAGE}")
 mnt=$(buildah mount "${cnt}" | cut -d ' ' -f 2)
 jq -r '.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' \
