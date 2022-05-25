@@ -164,6 +164,7 @@ install -p -m644 packaging/crio.conf.d/microshift.conf %{buildroot}%{_sysconfdir
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
+install -p -m644 packaging/systemd/hostpath-provisioner.service %{buildroot}%{_unitdir}/hostpath-provisioner.service
 
 mkdir -p -m755 %{buildroot}/var/run/flannel
 mkdir -p -m755 %{buildroot}/var/run/kubelet
@@ -202,6 +203,7 @@ fi
 
 %preun
 
+%systemd_preun hostpath-provisioner.service
 %systemd_preun microshift.service
 
 
@@ -221,8 +223,12 @@ fi
 /var/run/secrets/kubernetes.io/serviceaccount
 %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
+%{_unitdir}/hostpath-provisioner.service
 
 %changelog
+* Tue May 24 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_2
+- Adding hostpath-provisioner.service to set SElinux policies to the volumes directory
+
 * Fri May 7 2022 Sally O'Malley <somalley@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357
 - Update required golang version to 1.17
 
