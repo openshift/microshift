@@ -27,7 +27,7 @@ function get_images {
 
 function usage {
     echo "usage:"
-    echo "   get.sh base                  : prints the OKD base version for this MicroShift codebase"
+    echo "   get.sh base                  : prints the OCP base version for this MicroShift codebase"
     echo "   get.sh images <architecture> : prints image list used by this MicroShift codebase and architecture"
     exit 1
 }

@@ -108,9 +108,9 @@ When deciding between different design options, we follow the following principl
   * Provide escape hatch to add own CSI (which?).
 
 ### Production / Supply Chain / Release Management
-* MicroShift vendors OKD source code without modification. Where it deploys container images for additional services, it deploys OKD's published container images, not the OpenShift downstream's.
-* MicroShift's versioning scheme follows OKD's. This scheme signals the base OpenShift version (4.x) and order/age of builds, but intentionally avoids signaling patch level, backward compatibility (as SemVer, for example), or stability.
+* MicroShift vendors OCP source code without modification. Where it deploys container images for additional services, it deploys OCP's published container images, not the OpenShift downstream's.
+* MicroShift's versioning scheme follows OCP's. This scheme signals the base OpenShift version (4.x) and order/age of builds, but intentionally avoids signaling patch level, backward compatibility (as SemVer, for example), or stability.
 * We ensure the tip of our development branch is deployable and while MicroShift is still early days and experimental we expect developers (and users who want the "latest") to build & deploy from source.
 * Releases are mainly provided for convenience to users that just want to give MicroShift a quick try without friction. They are cut irregularly, e.g. to make a new feature available.
-* When rebasing onto a new OKD version, we vendor that version's packages and update the container image digests of the infrastructure services MicroShift deploys, i.e. the "release metadata" is baked into the MicroShift binary.
+* When rebasing onto a new OCP version, we vendor that version's packages and update the container image digests of the infrastructure services MicroShift deploys, i.e. the "release metadata" is baked into the MicroShift binary.
 * Eventually, we expect there to be a "MicroShift Release Image" that is based on / derived from the OpenShift Release Image: It references the MicroShift container image plus the subset of container images shared with and published by OpenShift. Defining a release image should allow to reuse the proven OpenShift CI and release tooling later.
