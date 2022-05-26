@@ -118,7 +118,6 @@ authentication:
 tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.crt
 tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.key
 cgroupDriver: "systemd"
-cgroupRoot: /
 failSwapOn: false
 volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
@@ -128,12 +127,11 @@ containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50
 kubeAPIBurst: 100
-cgroupsPerQOS: false
+cgroupsPerQOS: true
 enforceNodeAllocatable: []
 rotateCertificates: false  #TODO
 serializeImagePulls: false
 # staticPodPath: /etc/kubernetes/manifests
-systemCgroups: /system.slice
 featureGates:
   APIPriorityAndFairness: true
   # Will be removed in future openshift/api update https://github.com/openshift/api/commit/c8c8f6d0f4a8ac4ff4ad7d1a84b27e1aa7ebf9b4
