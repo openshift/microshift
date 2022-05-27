@@ -12,7 +12,7 @@ CONFIG_ENV_ONLY=${CONFIG_ENV_ONLY:=false}
 
 # Only get the version number if installing a release version
 [ $CONFIG_ENV_ONLY = false ] && \
-  VERSION=$(curl -s https://api.github.com/repos/redhat-et/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4)
+  VERSION=$(curl -s https://api.github.com/repos/openshift/microshift/releases | grep tag_name | head -n 1 | cut -d '"' -f 4)
 
 # Function to get Linux distribution
 get_distro() {
