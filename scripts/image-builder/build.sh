@@ -78,8 +78,8 @@ pushd ${ROOTDIR}/_builds &>/dev/null
 # Also enter sudo password in the beginning if necessary
 title "Checking available disk space"
 build_disk=$(sudo df -k --output=avail . | tail -1)
-if [ ${build_disk} -lt 15728640 ] ; then
-    echo "WARNING: Less then 15GB of disk space is available for the build"
+if [ ${build_disk} -lt 10485760 ] ; then
+    echo "ERROR: Less then 10GB of disk space is available for the build"
     exit 1
 fi
 
