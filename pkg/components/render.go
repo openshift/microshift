@@ -43,6 +43,27 @@ func renderDNSService(b []byte, p assets.RenderParams) ([]byte, error) {
 	return byteBuff.Bytes(), nil
 }
 
+func renderOVNKConfigMap(b []byte, p assets.RenderParams) ([]byte, error) {
+	data := struct {
+		ReleaseImage   assets.RenderParams
+		ClusterCIDR    string
+		ServiceCIDR    string
+		KubeconfigPath string
+	}{
+		ReleaseImage:   release.Image,
+		ClusterCIDR:    p["ClusterCIDR"],
+		ServiceCIDR:    p["ServiceCIDR"],
+		KubeconfigPath: p["KubeconfigPath"],
+	}
+	tpl := template.Must(template.New("cm").Parse(string(b)))
+	var byteBuff bytes.Buffer
+
+	if err := tpl.Execute(&byteBuff, data); err != nil {
+		return nil, err
+	}
+	return byteBuff.Bytes(), nil
+}
+
 func renderReleaseImage(b []byte, p assets.RenderParams) ([]byte, error) {
 	data := struct {
 		ReleaseImage assets.RenderParams
