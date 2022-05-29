@@ -1,9 +1,10 @@
-_output/*
-/microshift
-packaging/rpm/_rpmbuild/
-bin
 .idea/
-.vscode/
 .vagrant/
+.vscode/
+/microshift
 Vagrantfile
+_output/*
+bin
+packaging/rpm/_rpmbuild/
+scripts/image-builder/_builds/
 sshfile

@@ -25,7 +25,7 @@ SOURCE_GIT_TAG="$(git describe --tags | sed s/nightly-/nightly-$(git show -s --f
 create_local_tarball() {
   tar -czf "${RPMBUILD_DIR}/SOURCES/${TARBALL_FILE}" \
             --exclude='.git' --exclude='.idea' --exclude='.vagrant' \
-            --exclude='_output' --exclude='rpm/_rpmbuild' \
+            --exclude='_output' --exclude='rpm/_rpmbuild' --exclude='image-builder/_builds' \
             --transform="s|^|microshift-${GIT_SHA}/|"  \
             --exclude="${TARBALL_FILE}" "${SCRIPT_DIR}/../../"
 }
