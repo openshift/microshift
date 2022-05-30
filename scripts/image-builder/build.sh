@@ -121,6 +121,7 @@ sudo podman run --rm --privileged -ti -v "${ROOTDIR}/_builds":/data -v /dev:/dev
     exit"
 sudo chown -R $(whoami). "${ROOTDIR}/_builds"
 
-title "Done"
 ${ROOTDIR}/cleanup.sh
+
+title "Done"
 popd &>/dev/null

@@ -32,7 +32,6 @@ sudo podman rm  -f microshift-container-server 2>/dev/null || true
 title "Cancelling composer jobs"
 for uid in $(sudo composer-cli compose list | awk '{print $1}') ; do
     sudo composer-cli compose cancel $uid 2>/dev/null || true
-    [ "$FULL_CLEAN" = 1 ] && sudo composer-cli compose delete $uid || true
 done
 
 if [ "$FULL_CLEAN" = 1 ] ; then
