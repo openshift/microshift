@@ -45,14 +45,14 @@ func NewOpenShiftAPIServer(cfg *config.MicroshiftConfig) *OCPAPIServer {
 	return s
 }
 
-func (s *OCPAPIServer) Name() string           { return "ocp-apiserver" }
+func (s *OCPAPIServer) Name() string           { return "openshift-apiserver" }
 func (s *OCPAPIServer) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	var configFilePath = cfg.DataDir + "/resources/openshift-apiserver/config/config.yaml"
 
 	if err := OpenShiftAPIServerConfig(cfg); err != nil {
-		klog.Infof("Failed to create a new ocp-apiserver configuration: %v", err)
+		klog.Infof("Failed to create a new openshift-apiserver configuration: %v", err)
 		return err
 	}
 	args := []string{
@@ -68,8 +68,8 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	options.Authorization.RemoteKubeConfigFile = cfg.DataDir + "/resources/kubeadmin/kubeconfig"
 
 	cmd := &cobra.Command{
-		Use:          "ocp-apiserver",
-		Long:         "ocp-apiserver",
+		Use:          "openshift-apiserver",
+		Long:         "openshift-apiserver",
 		SilenceUsage: true,
 		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
 	}
@@ -113,12 +113,12 @@ func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped c
 
 	err := s.prepareOCPComponents(s.cfg)
 	if err != nil {
-		klog.Errorf("Failed to prepare ocp-components %v", err)
+		klog.Errorf("Failed to prepare openshift-components %v", err)
 		return err
 	}
 
 	if err := s.options.RunAPIServer(ctx.Done()); err != nil {
-		klog.Fatalf("Failed to start ocp-apiserver %v", err)
+		klog.Fatalf("Failed to start openshift-apiserver %v", err)
 	}
 	return ctx.Err()
 }

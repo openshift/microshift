@@ -35,7 +35,7 @@ func NewOpenShiftCRDManager(cfg *config.MicroshiftConfig) *OpenShiftCRDManager {
 
 func (s *OpenShiftCRDManager) Name() string { return "openshift-crd-manager" }
 func (s *OpenShiftCRDManager) Dependencies() []string {
-	return []string{"kube-apiserver", "ocp-apiserver"}
+	return []string{"kube-apiserver", "openshift-apiserver"}
 }
 
 func (s *OpenShiftCRDManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {

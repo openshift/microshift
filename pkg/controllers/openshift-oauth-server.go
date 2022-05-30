@@ -44,7 +44,7 @@ func NewOpenShiftOAuth(cfg *config.MicroshiftConfig) *OpenShiftOAuth {
 
 func (s *OpenShiftOAuth) Name() string { return "oauth-apiserver" }
 func (s *OpenShiftOAuth) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-controller-manager", "ocp-apiserver"}
+	return []string{"kube-apiserver", "openshift-controller-manager", "openshift-apiserver"}
 }
 
 func (s *OpenShiftOAuth) configure(cfg *config.MicroshiftConfig) {
