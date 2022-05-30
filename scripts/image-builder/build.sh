@@ -14,17 +14,20 @@ waitfor_image() {
     local uuid=$1
 
     local tstart=$(date +%s)
+    echo "$(date +'%Y-%m-%d %H:%M:%S') STARTED"
+
     local status=$(sudo composer-cli compose status | grep ${uuid} | awk '{print $2}')
     while [ "${status}" = "RUNNING" ]; do
         sleep 10
         status=$(sudo composer-cli compose status | grep ${uuid} | awk '{print $2}')
         echo -en "$(date +'%Y-%m-%d %H:%M:%S') ${status}\r"
     done
+
     local tend=$(date +%s)
     echo "$(date +'%Y-%m-%d %H:%M:%S') ${status} - elapsed $(( (tend - tstart) / 60 )) minutes"
     
     if [ "${status}" = "FAILED" ]; then
-        download_image ${uuid}
+        download_image ${uuid} 1
         echo "Blueprint build has failed. For more information, review the downloaded logs"
         exit 1
     fi
@@ -32,10 +35,13 @@ waitfor_image() {
 
 download_image() {
     local uuid=$1
+    local logsonly=$2
 
     sudo composer-cli compose logs ${uuid}
-    sudo composer-cli compose metadata ${uuid}
-    sudo composer-cli compose image ${uuid}
+    if [ -z "$logsonly" ] ; then
+        sudo composer-cli compose metadata ${uuid}
+        sudo composer-cli compose image ${uuid}
+    fi
     sudo chown -R $(whoami). "${ROOTDIR}/_builds"
 }
 
@@ -92,6 +98,8 @@ createrepo microshift-local >/dev/null
 # Download openshift local RPM packages
 rm -rf openshift-local 2>/dev/null || true
 reposync -n -a x86_64 --download-path openshift-local --repo=rhocp-4.10-for-rhel-8-x86_64-rpms >/dev/null
+# Remove coreos packages to avoid conflicts
+find openshift-local -name \*coreos\* -exec rm -f {} \;
 createrepo openshift-local >/dev/null
 
 title "Loading sources for OpenShift and MicroShift"

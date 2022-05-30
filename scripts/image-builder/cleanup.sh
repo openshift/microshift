@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e -o pipefail
 
-IMGNAME=microshift
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
 
 title() {
@@ -27,7 +26,8 @@ if [ "$FULL_CLEAN" = 1 ] ; then
 fi
 
 title "Cleaning up local ostree container server"
-sudo podman rm -f ${IMGNAME}-server 2>/dev/null || true
+sudo podman rm  -f microshift-container-server 2>/dev/null || true
+[ "$FULL_CLEAN" = 1 ] && sudo podman rmi -a
 
 title "Cancelling composer jobs"
 for uid in $(sudo composer-cli compose list | awk '{print $1}') ; do
@@ -45,6 +45,11 @@ fi
 title "Cleaning up composer sources"
 sudo composer-cli sources delete openshift-local  2>/dev/null || true
 sudo composer-cli sources delete microshift-local 2>/dev/null || true
+
+if [ "$FULL_CLEAN" = 1 ] ; then
+    title "Clean up user cache"
+    rm -rf ~/.cache 2>/dev/null || true
+fi
 
 title "Clean osbuild worker cache"
 sudo systemctl stop osbuild-composer.socket osbuild-composer.service osbuild-worker@1.service

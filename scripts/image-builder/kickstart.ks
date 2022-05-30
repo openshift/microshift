@@ -12,7 +12,6 @@ ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/o
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
-# TODO: Replace localhost by the actual server IP
 echo -e 'url=http://REPLACE_OSTREE_SERVER_IP/repo/' >> /etc/ostree/remotes.d/edge.conf
 
 useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 -G wheel redhat
