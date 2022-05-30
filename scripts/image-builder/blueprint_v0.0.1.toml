@@ -12,10 +12,6 @@ name = "microshift"
 version = "*"
 
 [[packages]]
-name = "conntrack-tools"
-version = "*"
-
-[[packages]]
 name = "openshift-clients"
 version = "*"
 
