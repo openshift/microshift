@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-#   Copyright 2021 The Microshift authors
+#   Copyright 2022 The MicroShift authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,22 +14,28 @@
 #   limitations under the License.
 #
 
-set -euo pipefail
+set -o errexit
+set -o nounset
+set -o pipefail
+
 shopt -s expand_aliases
+shopt -s extglob
 
 # debugging options
 #trap 'echo "# $BASH_COMMAND"' DEBUG
 #set -x
 
-REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
+REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")"
 STAGING_DIR="$REPOROOT/_output/staging"
+PULL_SECRET_FILE="${HOME}/.docker/config.json"
 
-EMBEDDED_COMPONENTS="etcd hyperkube openshift-apiserver openshift-controller-manager"
+EMBEDDED_COMPONENTS="openshift-apiserver openshift-controller-manager oauth-apiserver hyperkube etcd"
+EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-openshift-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator"
 
 
 title() {
-    echo -e "\E[34m\n$1\E[00m";
+    echo -e "\E[34m$1\E[00m";
 }
 
 # Reads go.mod file $1 and prints lines in its section $2 ("require" or "replace")
@@ -88,7 +94,7 @@ update_versions() {
             version=$(printf '%s\n%s\n' "${base_version}" "${update_version}" | sort --version-sort | tail -n 1)
         fi
 
-        echo "${mod} ${version}" 
+        echo "${mod} ${version}"
     done < "${base_file}"
 }
 
@@ -100,71 +106,79 @@ get_release_images() {
 }
 
 
-# == MAIN ==
-if [[ $EUID -ne 0 ]]; then
-   >&2 echo "You need to run this script as root or in a 'buildah unshare' environment:" 
-   >&2 echo "  buildah unshare $0" 
-   exit 1
-fi
-if [[ -z ${1+x} ]]; then
-    >&2 echo "You need to provide an OKD release name, e.g.:"
-    >&2 echo "  $0 4.7.0-0.okd-2021-08-22-163618"
-    exit 1
-fi
-OKD_RELEASE=$1
+# Downloads a release's tools and manifest content into a staging directory,
+# then checks out the required components for the rebase at the release's commit.
+download_release() {
+    local release_image=$1
 
+    rm -rf "${STAGING_DIR}"
+    mkdir -p "${STAGING_DIR}"
+    pushd "${STAGING_DIR}" >/dev/null
 
-rm -rf "${STAGING_DIR}"
-mkdir -p "${STAGING_DIR}"
-pushd "${STAGING_DIR}" >/dev/null
-
-
-title "Downloading and extracting ${OKD_RELEASE} release image..."
-curl -LO "https://github.com/openshift/okd/releases/download/${OKD_RELEASE}/release.txt"
-
-OKD_RELEASE_IMAGE=$(grep -oP 'Pull From: \K[\w.-/@:]+' release.txt)
-podman pull "${OKD_RELEASE_IMAGE}"
-cnt=$(buildah from "${OKD_RELEASE_IMAGE}")
-mnt=$(buildah mount "${cnt}" | cut -d ' ' -f 2)
-jq -r '.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' \
-    "${mnt}/release-manifests/image-references" > source_commits.txt
-mkdir -p "${STAGING_DIR}/release-manifests"
-cp -- "${mnt}"/release-manifests/*.yaml "${STAGING_DIR}/release-manifests"
-
-
-title "Cloning git repos..."
-git config --global advice.detachedHead false
-while IFS="" read -r line || [ -n "$line" ]
-do
-    COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
-    REPO=$(echo "${line}" | cut -d ' ' -f 2)
-    COMMIT=$(echo "${line}" | cut -d ' ' -f 3)
-    if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
-        git clone "${REPO}"
-        pushd "${REPO##*/}" >/dev/null
-        git checkout "${COMMIT}"
-        echo
-        popd >/dev/null
+    authentication=""
+    if [ -f "${PULL_SECRET_FILE}" ]; then
+        authentication="-a ${PULL_SECRET_FILE}"
+    else
+        >&2 echo "Warning: no pull secret found at ${PULL_SECRET_FILE}"
     fi
-done < source_commits.txt
+
+    title "# Downloading and extracting ${release_image} tools"
+    oc adm release extract ${authentication} --tools "${release_image}"
+
+    title "# Extracing ${release_image} manifest content"
+    mkdir -p release-manifests
+    pushd release-manifests >/dev/null
+    content=$(oc adm release info ${authentication} --contents "${release_image}")
+    echo "${content}" | awk '/^# 0000_[A-Za-z0-9._-]*.yaml/{filename = $2;}{if (filename != "") print >filename;}'
+    popd >/dev/null
+
+    title "# Cloning ${release_image} component repos"
+    commits=$(oc adm release info ${authentication} --commits -o json "${release_image}")
+    echo "${commits}" | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
+
+    git config --global advice.detachedHead false
+    while IFS="" read -r line || [ -n "$line" ]
+    do
+        component=$(echo "${line}" | cut -d ' ' -f 1)
+        repo=$(echo "${line}" | cut -d ' ' -f 2)
+        commit=$(echo "${line}" | cut -d ' ' -f 3)
+        if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]]; then
+            title "## Cloning ${repo} at commit ${commit}..."
+            git clone "${repo}"
+            pushd "${repo##*/}" >/dev/null
+            git checkout "${commit}"
+            popd >/dev/null
+            echo
+        fi
+    done < source-commits
+
+    popd >/dev/null
+}
 
 
-title "Rebasing go.mod..."
-extract_section "${REPOROOT}/go.mod" require > latest_require
-extract_section "${REPOROOT}/go.mod" replace > latest_replace
-while IFS="" read -r line || [ -n "$line" ]
-do
-    COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
-    REPO=$(echo "${line}" | cut -d ' ' -f 2)
-    if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
-        extract_section "${REPO##*/}/go.mod" require > require
-        extract_section "${REPO##*/}/go.mod" replace > replace
-        update_versions latest_require require > t; mv t latest_require
-        update_versions latest_replace replace > t; mv t latest_replace
+update_go_mod() {
+    if [ ! -f "${STAGING_DIR}/release.txt" ]; then
+        >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
+        exit 1
     fi
-done < source_commits.txt
+    pushd "${STAGING_DIR}" >/dev/null
 
-cat << EOF > "${REPOROOT}/go.mod"
+    title "Rebasing go.mod..."
+    extract_section "${REPOROOT}/go.mod" require > latest_require
+    extract_section "${REPOROOT}/go.mod" replace > latest_replace
+    while IFS="" read -r line || [ -n "$line" ]
+    do
+        COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
+        REPO=$(echo "${line}" | cut -d ' ' -f 2)
+        if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
+            extract_section "${REPO##*/}/go.mod" require > require
+            extract_section "${REPO##*/}/go.mod" replace > replace
+            update_versions latest_require require > t; mv t latest_require
+            update_versions latest_replace replace > t; mv t latest_replace
+        fi
+    done < source-commits
+
+    cat << EOF > "${REPOROOT}/go.mod"
 module github.com/openshift/microshift
 
 go 1.16
@@ -178,94 +192,95 @@ $(cat latest_require)
 )
 EOF
 
-go mod tidy
-go mod vendor
+    go mod tidy
+    go mod vendor
 
-title "Regenerating kube OpenAPI"
-pushd "${STAGING_DIR}/kubernetes" >/dev/null
-make gen_openapi
-cp ./pkg/generated/openapi/zz_generated.openapi.go "${REPOROOT}/vendor/k8s.io/kubernetes/pkg/generated/openapi"
-popd >/dev/null
+    popd >/dev/null
+}
 
+regenerate_openapi() {
+    pushd "${STAGING_DIR}/kubernetes" >/dev/null
 
-title "Rebasing release_*.go"
-images="$(get_release_images "${REPOROOT}/pkg/release/release.go" | xargs)"
+    title "Regenerating kube OpenAPI"
+    make gen_openapi
+    cp ./pkg/generated/openapi/zz_generated.openapi.go "${REPOROOT}/vendor/k8s.io/kubernetes/pkg/generated/openapi"
 
-for arch in amd64; do
-    w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
-    for i in ${images}; do
-        digest=$(awk "/ ${i//_/-} / {print \$2}" release.txt)
-        if [[ ! -z "${digest}" ]]; then
-            awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
-                "${REPOROOT}/pkg/release/release_${arch}.go" > t
-            mv t "${REPOROOT}/pkg/release/release_${arch}.go"
-        fi
-    done
-done
-
-sed -i "/^var Base/c\var Base = \"${OKD_RELEASE}\"" "${REPOROOT}/pkg/release/release.go"
+    popd >/dev/null
+}
 
 
-title "Rebasing manifests"
-assets=$(find "${REPOROOT}/assets" -name \*.yaml)
-for asset in ${assets}; do
-    search_path="${REPOROOT}/_output/staging/release-manifests"
-    search_name=$(basename "${asset}")
-    search_exclude=XXX
-
-    # TODO: Rename assets and their references to obviate the need for special cases
-    case $(basename "${asset}") in
-    0000_60_service-ca_00_roles.yaml)
-        search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-        search_name=clusterrolebinding.yaml
-        ;;
-    0000_60_service-ca_01_namespace.yaml)
-        search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-        search_name=ns.yaml
-        ;;
-    0000_60_service-ca_04_sa.yaml)
-        search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-        search_name=sa.yaml
-        ;;
-    0000_60_service-ca_05_deploy.yaml)
-        search_path=${REPOROOT}/_output/staging/service-ca-operator/bindata/v4.0.0/controller
-        search_name=deployment.yaml
-        ;;
-    0000_70_dns_00-*)
-        search_path=${REPOROOT}/_output/staging/cluster-dns-operator/assets/dns
-        search_name=${search_name#"0000_70_dns_00-"}
-        search_exclude="${REPOROOT}/_output/staging/cluster-dns-operator/assets/dns/metrics/*"
-        ;;
-    0000_70_dns_01-*)
-        search_path=${REPOROOT}/_output/staging/cluster-dns-operator/assets/dns
-        search_name=${search_name#"0000_70_dns_01-"}
-        search_exclude="${REPOROOT}/_output/staging/cluster-dns-operator/assets/dns/metrics/*"
-        ;;
-    0000_80_openshift-router-service.yaml)
-        search_path=${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router
-        search_name=service-internal.yaml
-        search_exclude="${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router/metrics/*"
-        ;;
-    0000_80_openshift-router-*)
-        search_path=${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router
-        search_name="${search_name#"0000_80_openshift-router-"}"
-        search_exclude="${REPOROOT}/_output/staging/cluster-ingress-operator/assets/router/metrics/*"
-        ;;
-    0000_11_imageregistry-configs.crd.yaml)
-        search_path=${REPOROOT}/_output/staging/openshift-apiserver/vendor/github.com/openshift/api/imageregistry/v1
-        search_name=00-crd.yaml
-        ;;
-    esac
-
-    updated_asset=$(find "${search_path}" -name "${search_name}" -not -path "${search_exclude}" | tail -n 1)
-    if [[ ! -z "${updated_asset}" ]]; then
-        echo "Updating ${asset} from ${updated_asset}"
-        cp "${updated_asset}" "${asset}"
-    else
-        echo -e "\E[31mNo update source found for ${asset}\E[00m";
+# Updates the image digests in pkg/release/release*.go
+update_images() {
+    if [ ! -f "${STAGING_DIR}/release.txt" ]; then
+        >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
+        exit 1
     fi
-done
+    pushd "${STAGING_DIR}" >/dev/null
+
+    title "Rebasing release_*.go"
+    base_release=$(grep -o -P "^[[:space:]]+Version:[[:space:]]+\K([[:alnum:].-]+)" "${STAGING_DIR}"/release.txt)
+
+    images="$(get_release_images "${REPOROOT}/pkg/release/release.go" | xargs)"
+
+    for arch in amd64; do
+        w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
+        for i in ${images}; do
+            digest=$(awk "/ ${i//_/-} / {print \$2}" release.txt)
+            if [[ -n "${digest}" ]]; then
+                awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
+                    "${REPOROOT}/pkg/release/release_${arch}.go" > t
+                mv t "${REPOROOT}/pkg/release/release_${arch}.go"
+            fi
+        done
+    done
+
+    sed -i "/^var Base/c\var Base = \"${base_release}\"" "${REPOROOT}/pkg/release/release.go"
+
+    popd >/dev/null
+}
 
 
-title "Done."
-popd >/dev/null
+# Updates embedded component manifests
+update_manifests() {
+    if [ ! -f "${STAGING_DIR}/release.txt" ]; then
+        >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
+        exit 1
+    fi
+    pushd "${STAGING_DIR}" >/dev/null
+
+    title "Rebasing manifests"
+    rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
+    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns 2>/dev/null || true 
+    rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
+    cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver 2>/dev/null || true
+    rm -f "${REPOROOT}"/assets/components/openshift-router/*
+    cp "${STAGING_DIR}"/cluster-ingress-operator/assets/router/* "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
+    rm -f "${REPOROOT}"/assets/components/service-ca/*
+    cp "${STAGING_DIR}"/service-ca-operator/bindata/v4.0.0/controller/* "${REPOROOT}"/assets/components/service-ca 2>/dev/null || true
+
+    popd >/dev/null
+}
+
+
+usage() {
+    echo "Usage:"
+    echo "$(basename "$0") download RELEASE_IMAGE"
+    echo "$(basename "$0") go.mod"
+    echo "$(basename "$0") generated-apis"
+    echo "$(basename "$0") images"
+    echo "$(basename "$0") manifests"
+    exit 1
+}
+
+command=${1:-help}
+case "$command" in
+    download)
+        [[ $# -ne 2 ]] && usage
+        download_release "$2"
+        ;;
+    go.mod) update_go_mod;;
+    generated-apis) regenerate_openapi;;
+    images) update_images;;
+    manifests) update_manifests;;
+    *) usage;;
+esac
