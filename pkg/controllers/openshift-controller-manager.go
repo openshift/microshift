@@ -86,6 +86,12 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 }
 
 func (s *OCPControllerManager) writeConfig(cfg *config.MicroshiftConfig) error {
+	// OCM config contains a list of controllers to enable/disable.
+	// If no list is specified, all controllers are started (default).
+	// If a non-zero length list is specified, only controllers enabled in the list are started.  Unlisted controllers
+	// are therefore disabled.  Enable controllers by appending their name to `controllers:`. Disable a controller by
+	// prepending "-" to the name, e.g. `controllers: ["-openshift.io/build"]
+	// Disabled OCM controllers are included in the list for documentary purposes.
 	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftControllerManagerConfig
 kubeClientConfig:
@@ -94,7 +100,25 @@ servingInfo:
   bindAddress: "0.0.0.0:8445"
   certFile: ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.crt
   keyFile:  ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.key
-  clientCA: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt`)
+  clientCA: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
+controllers:
+- "openshift.io/ingress-ip"
+- "openshift.io/ingress-to-route"
+- "-openshift.io/build"
+- "-openshift.io/build-config-change"
+- "-openshift.io/default-rolebindings"
+- "-openshift.io/deployer"
+- "-openshift.io/deploymentconfig"
+- "-openshift.io/image-import"
+- "-openshift.io/image-signature-import"
+- "-openshift.io/image-trigger"
+- "-openshift.io/origin-namespace"
+- "-openshift.io/serviceaccount"
+- "-openshift.io/serviceaccount-pull-secrets"
+- "-openshift.io/templateinstance"
+- "-openshift.io/templateinstancefinalizer"
+- "-openshift.io/unidling"
+`)
 
 	path := filepath.Join(cfg.DataDir, "resources", "openshift-controller-manager", "config", "config.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))

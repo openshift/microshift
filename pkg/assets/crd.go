@@ -31,13 +31,7 @@ var (
 	apiExtensionsCodecs = serializer.NewCodecFactory(apiExtensionsScheme)
 	crds                = []string{
 		"assets/crd/0000_03_security-openshift_01_scc.crd.yaml",
-		"assets/crd/0000_11_imageregistry-configs.crd.yaml",
 		"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml",
-		"assets/crd/0000_10_config-operator_01_imagecontentsourcepolicy.crd.yaml",
-		"assets/crd/0000_10_config-operator_01_build.crd.yaml",
-		"assets/crd/0000_10_config-operator_01_image.crd.yaml",
-		"assets/crd/0000_03_config-operator_01_proxy.crd.yaml",
-		"assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml",
 	}
 )
 

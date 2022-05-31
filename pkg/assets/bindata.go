@@ -41,14 +41,8 @@
 // assets/components/service-ca/signing-secret.yaml
 // assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
 // assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml
-// assets/crd/0000_03_config-operator_01_proxy.crd.yaml
-// assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml
 // assets/crd/0000_03_security-openshift_01_scc.crd.yaml
-// assets/crd/0000_10_config-operator_01_build.crd.yaml
 // assets/crd/0000_10_config-operator_01_featuregate.crd.yaml
-// assets/crd/0000_10_config-operator_01_image.crd.yaml
-// assets/crd/0000_10_config-operator_01_imagecontentsourcepolicy.crd.yaml
-// assets/crd/0000_11_imageregistry-configs.crd.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml
@@ -148,7 +142,7 @@ func assetsComponentsFlannelClusterroleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/flannel/clusterrole.yaml", size: 418, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/flannel/clusterrole.yaml", size: 418, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -176,7 +170,7 @@ func assetsComponentsFlannelClusterrolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/flannel/clusterrolebinding.yaml", size: 248, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/flannel/clusterrolebinding.yaml", size: 248, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -229,7 +223,7 @@ func assetsComponentsFlannelConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/flannel/configmap.yaml", size: 674, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/flannel/configmap.yaml", size: 674, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -352,7 +346,7 @@ func assetsComponentsFlannelDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/flannel/daemonset.yaml", size: 2657, mode: os.FileMode(436), modTime: time.Unix(1653308425, 0)}
+	info := bindataFileInfo{name: "assets/components/flannel/daemonset.yaml", size: 2657, mode: os.FileMode(420), modTime: time.Unix(1653503271, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -414,7 +408,7 @@ func assetsComponentsFlannelPodsecuritypolicyYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/flannel/podsecuritypolicy.yaml", size: 1195, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/flannel/podsecuritypolicy.yaml", size: 1195, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -435,7 +429,7 @@ func assetsComponentsFlannelServiceAccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/flannel/service-account.yaml", size: 86, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/flannel/service-account.yaml", size: 86, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -474,7 +468,7 @@ func assetsComponentsHostpathProvisionerClusterroleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/clusterrole.yaml", size: 609, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/clusterrole.yaml", size: 609, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -502,7 +496,7 @@ func assetsComponentsHostpathProvisionerClusterrolebindingYaml() (*asset, error)
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/clusterrolebinding.yaml", size: 338, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/clusterrolebinding.yaml", size: 338, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -558,7 +552,7 @@ func assetsComponentsHostpathProvisionerDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/daemonset.yaml", size: 1231, mode: os.FileMode(436), modTime: time.Unix(1653308443, 0)}
+	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/daemonset.yaml", size: 1231, mode: os.FileMode(420), modTime: time.Unix(1653503271, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -578,7 +572,7 @@ func assetsComponentsHostpathProvisionerNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/namespace.yaml", size: 78, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/namespace.yaml", size: 78, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -619,7 +613,7 @@ func assetsComponentsHostpathProvisionerSccYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/scc.yaml", size: 480, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/scc.yaml", size: 480, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -640,7 +634,7 @@ func assetsComponentsHostpathProvisionerServiceAccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/service-account.yaml", size: 132, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/service-account.yaml", size: 132, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -666,7 +660,7 @@ func assetsComponentsHostpathProvisionerStorageclassYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/storageclass.yaml", size: 276, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/storageclass.yaml", size: 276, mode: os.FileMode(420), modTime: time.Unix(1652799551, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -694,7 +688,7 @@ func assetsComponentsOpenshiftDnsDnsClusterRoleBindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role-binding.yaml", size: 223, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role-binding.yaml", size: 223, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -748,7 +742,7 @@ func assetsComponentsOpenshiftDnsDnsClusterRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role.yaml", size: 492, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role.yaml", size: 492, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -794,7 +788,7 @@ func assetsComponentsOpenshiftDnsDnsConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/configmap.yaml", size: 610, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/configmap.yaml", size: 610, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -917,7 +911,7 @@ func assetsComponentsOpenshiftDnsDnsDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/daemonset.yaml", size: 3217, mode: os.FileMode(436), modTime: time.Unix(1653308465, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/daemonset.yaml", size: 3217, mode: os.FileMode(420), modTime: time.Unix(1653503271, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -946,7 +940,7 @@ func assetsComponentsOpenshiftDnsDnsNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/namespace.yaml", size: 417, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/namespace.yaml", size: 417, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -968,7 +962,7 @@ func assetsComponentsOpenshiftDnsDnsServiceAccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service-account.yaml", size: 85, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service-account.yaml", size: 85, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1015,7 +1009,7 @@ func assetsComponentsOpenshiftDnsDnsServiceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service.yaml", size: 691, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service.yaml", size: 691, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1159,7 +1153,7 @@ func assetsComponentsOpenshiftDnsNodeResolverDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/daemonset.yaml", size: 4823, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/daemonset.yaml", size: 4823, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1181,7 +1175,7 @@ func assetsComponentsOpenshiftDnsNodeResolverServiceAccountYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/service-account.yaml", size: 95, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/service-account.yaml", size: 95, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1211,7 +1205,7 @@ func assetsComponentsOpenshiftRouterClusterRoleBindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role-binding.yaml", size: 329, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role-binding.yaml", size: 329, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1289,7 +1283,7 @@ func assetsComponentsOpenshiftRouterClusterRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role.yaml", size: 883, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role.yaml", size: 883, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1313,7 +1307,7 @@ func assetsComponentsOpenshiftRouterConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/configmap.yaml", size: 168, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/configmap.yaml", size: 168, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1470,7 +1464,7 @@ func assetsComponentsOpenshiftRouterDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4746, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4746, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1501,7 +1495,7 @@ func assetsComponentsOpenshiftRouterNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 499, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 499, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1525,7 +1519,7 @@ func assetsComponentsOpenshiftRouterServiceAccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-account.yaml", size: 213, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-account.yaml", size: 213, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1564,7 +1558,7 @@ func assetsComponentsOpenshiftRouterServiceCloudYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 567, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 567, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1609,7 +1603,7 @@ func assetsComponentsOpenshiftRouterServiceInternalYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-internal.yaml", size: 727, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-internal.yaml", size: 727, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1690,7 +1684,7 @@ func assetsComponentsServiceCaClusterroleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/clusterrole.yaml", size: 864, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/clusterrole.yaml", size: 864, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1719,7 +1713,7 @@ func assetsComponentsServiceCaClusterrolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/clusterrolebinding.yaml", size: 298, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/clusterrolebinding.yaml", size: 298, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1804,7 +1798,7 @@ func assetsComponentsServiceCaDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1866, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1866, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1828,7 +1822,7 @@ func assetsComponentsServiceCaNsYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 168, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 168, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1891,7 +1885,7 @@ func assetsComponentsServiceCaRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/role.yaml", size: 634, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/role.yaml", size: 634, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1921,7 +1915,7 @@ func assetsComponentsServiceCaRolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/rolebinding.yaml", size: 343, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/rolebinding.yaml", size: 343, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1943,7 +1937,7 @@ func assetsComponentsServiceCaSaYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/sa.yaml", size: 99, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/sa.yaml", size: 99, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1967,7 +1961,7 @@ func assetsComponentsServiceCaSigningCabundleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/signing-cabundle.yaml", size: 123, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/signing-cabundle.yaml", size: 123, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1993,7 +1987,7 @@ func assetsComponentsServiceCaSigningSecretYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/signing-secret.yaml", size: 144, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/signing-secret.yaml", size: 144, mode: os.FileMode(420), modTime: time.Unix(1648137870, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2019,7 +2013,7 @@ func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 254, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 254, mode: os.FileMode(420), modTime: time.Unix(1624916338, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2192,314 +2186,7 @@ func assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml", size: 9898, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCrd0000_03_configOperator_01_proxyCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  annotations:
-    api-approved.openshift.io: https://github.com/openshift/api/pull/470
-    include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/self-managed-high-availability: "true"
-    include.release.openshift.io/single-node-developer: "true"
-  name: proxies.config.openshift.io
-spec:
-  group: config.openshift.io
-  names:
-    kind: Proxy
-    listKind: ProxyList
-    plural: proxies
-    singular: proxy
-  scope: Cluster
-  versions:
-    - name: v1
-      schema:
-        openAPIV3Schema:
-          description: "Proxy holds cluster-wide information on how to configure default proxies for the cluster. The canonical name is ` + "`" + `cluster` + "`" + ` \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer)."
-          type: object
-          required:
-            - spec
-          properties:
-            apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-              type: string
-            kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-              type: string
-            metadata:
-              type: object
-            spec:
-              description: Spec holds user-settable values for the proxy configuration
-              type: object
-              properties:
-                httpProxy:
-                  description: httpProxy is the URL of the proxy for HTTP requests.  Empty means unset and will not result in an env var.
-                  type: string
-                httpsProxy:
-                  description: httpsProxy is the URL of the proxy for HTTPS requests.  Empty means unset and will not result in an env var.
-                  type: string
-                noProxy:
-                  description: noProxy is a comma-separated list of hostnames and/or CIDRs and/or IPs for which the proxy should not be used. Empty means unset and will not result in an env var.
-                  type: string
-                readinessEndpoints:
-                  description: readinessEndpoints is a list of endpoints used to verify readiness of the proxy.
-                  type: array
-                  items:
-                    type: string
-                trustedCA:
-                  description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle. The trustedCA field should only be consumed by a proxy validator. The validator is responsible for reading the certificate bundle from the required key \"ca-bundle.crt\", merging it with the system default trust bundle, and writing the merged trust bundle to a ConfigMap named \"trusted-ca-bundle\" in the \"openshift-config-managed\" namespace. Clients that expect to make proxy connections must use the trusted-ca-bundle for all HTTPS requests to the proxy, and may use the trusted-ca-bundle for non-proxy HTTPS requests as well. \n The namespace for the ConfigMap referenced by trustedCA is \"openshift-config\". Here is an example ConfigMap (in yaml): \n apiVersion: v1 kind: ConfigMap metadata:  name: user-ca-bundle  namespace: openshift-config  data:    ca-bundle.crt: |      -----BEGIN CERTIFICATE-----      Custom CA certificate bundle.      -----END CERTIFICATE-----"
-                  type: object
-                  required:
-                    - name
-                  properties:
-                    name:
-                      description: name is the metadata.name of the referenced config map
-                      type: string
-            status:
-              description: status holds observed values from the cluster. They may not be overridden.
-              type: object
-              properties:
-                httpProxy:
-                  description: httpProxy is the URL of the proxy for HTTP requests.
-                  type: string
-                httpsProxy:
-                  description: httpsProxy is the URL of the proxy for HTTPS requests.
-                  type: string
-                noProxy:
-                  description: noProxy is a comma-separated list of hostnames and/or CIDRs for which the proxy should not be used.
-                  type: string
-      served: true
-      storage: true
-      subresources:
-        status: {}
-`)
-
-func assetsCrd0000_03_configOperator_01_proxyCrdYamlBytes() ([]byte, error) {
-	return _assetsCrd0000_03_configOperator_01_proxyCrdYaml, nil
-}
-
-func assetsCrd0000_03_configOperator_01_proxyCrdYaml() (*asset, error) {
-	bytes, err := assetsCrd0000_03_configOperator_01_proxyCrdYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/crd/0000_03_config-operator_01_proxy.crd.yaml", size: 4790, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  annotations:
-    api-approved.openshift.io: https://github.com/openshift/api/pull/470
-    include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/self-managed-high-availability: "true"
-    include.release.openshift.io/single-node-developer: "true"
-  name: clusterresourcequotas.quota.openshift.io
-spec:
-  group: quota.openshift.io
-  names:
-    kind: ClusterResourceQuota
-    listKind: ClusterResourceQuotaList
-    plural: clusterresourcequotas
-    singular: clusterresourcequota
-  scope: Cluster
-  versions:
-    - name: v1
-      schema:
-        openAPIV3Schema:
-          description: "ClusterResourceQuota mirrors ResourceQuota at a cluster scope.  This object is easily convertible to synthetic ResourceQuota object to allow quota evaluation re-use. \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer)."
-          type: object
-          required:
-            - metadata
-            - spec
-          properties:
-            apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-              type: string
-            kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-              type: string
-            metadata:
-              type: object
-            spec:
-              description: Spec defines the desired quota
-              type: object
-              required:
-                - quota
-                - selector
-              properties:
-                quota:
-                  description: Quota defines the desired quota
-                  type: object
-                  properties:
-                    hard:
-                      description: 'hard is the set of desired hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/'
-                      type: object
-                      additionalProperties:
-                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                        anyOf:
-                          - type: integer
-                          - type: string
-                        x-kubernetes-int-or-string: true
-                    scopeSelector:
-                      description: scopeSelector is also a collection of filters like scopes that must match each object tracked by a quota but expressed using ScopeSelectorOperator in combination with possible values. For a resource to match, both scopes AND scopeSelector (if specified in spec), must be matched.
-                      type: object
-                      properties:
-                        matchExpressions:
-                          description: A list of scope selector requirements by scope of the resources.
-                          type: array
-                          items:
-                            description: A scoped-resource selector requirement is a selector that contains values, a scope name, and an operator that relates the scope name and values.
-                            type: object
-                            required:
-                              - operator
-                              - scopeName
-                            properties:
-                              operator:
-                                description: Represents a scope's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist.
-                                type: string
-                              scopeName:
-                                description: The name of the scope that the selector applies to.
-                                type: string
-                              values:
-                                description: An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
-                                type: array
-                                items:
-                                  type: string
-                    scopes:
-                      description: A collection of filters that must match each object tracked by a quota. If not specified, the quota matches all objects.
-                      type: array
-                      items:
-                        description: A ResourceQuotaScope defines a filter that must match each object tracked by a quota
-                        type: string
-                selector:
-                  description: Selector is the selector used to match projects. It should only select active projects on the scale of dozens (though it can select many more less active projects).  These projects will contend on object creation through this resource.
-                  type: object
-                  properties:
-                    annotations:
-                      description: AnnotationSelector is used to select projects by annotation.
-                      type: object
-                      additionalProperties:
-                        type: string
-                      nullable: true
-                    labels:
-                      description: LabelSelector is used to select projects by label.
-                      type: object
-                      properties:
-                        matchExpressions:
-                          description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
-                          type: array
-                          items:
-                            description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
-                            type: object
-                            required:
-                              - key
-                              - operator
-                            properties:
-                              key:
-                                description: key is the label key that the selector applies to.
-                                type: string
-                              operator:
-                                description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
-                                type: string
-                              values:
-                                description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
-                                type: array
-                                items:
-                                  type: string
-                        matchLabels:
-                          description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
-                          type: object
-                          additionalProperties:
-                            type: string
-                      nullable: true
-            status:
-              description: Status defines the actual enforced quota and its current usage
-              type: object
-              required:
-                - total
-              properties:
-                namespaces:
-                  description: Namespaces slices the usage by project.  This division allows for quick resolution of deletion reconciliation inside of a single project without requiring a recalculation across all projects.  This can be used to pull the deltas for a given project.
-                  type: array
-                  items:
-                    description: ResourceQuotaStatusByNamespace gives status for a particular project
-                    type: object
-                    required:
-                      - namespace
-                      - status
-                    properties:
-                      namespace:
-                        description: Namespace the project this status applies to
-                        type: string
-                      status:
-                        description: Status indicates how many resources have been consumed by this project
-                        type: object
-                        properties:
-                          hard:
-                            description: 'Hard is the set of enforced hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/'
-                            type: object
-                            additionalProperties:
-                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                              anyOf:
-                                - type: integer
-                                - type: string
-                              x-kubernetes-int-or-string: true
-                          used:
-                            description: Used is the current observed total usage of the resource in the namespace.
-                            type: object
-                            additionalProperties:
-                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                              anyOf:
-                                - type: integer
-                                - type: string
-                              x-kubernetes-int-or-string: true
-                  nullable: true
-                total:
-                  description: Total defines the actual enforced quota and its current usage across all projects
-                  type: object
-                  properties:
-                    hard:
-                      description: 'Hard is the set of enforced hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/'
-                      type: object
-                      additionalProperties:
-                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                        anyOf:
-                          - type: integer
-                          - type: string
-                        x-kubernetes-int-or-string: true
-                    used:
-                      description: Used is the current observed total usage of the resource in the namespace.
-                      type: object
-                      additionalProperties:
-                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                        anyOf:
-                          - type: integer
-                          - type: string
-                        x-kubernetes-int-or-string: true
-      served: true
-      storage: true
-      subresources:
-        status: {}
-`)
-
-func assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYamlBytes() ([]byte, error) {
-	return _assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml, nil
-}
-
-func assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml() (*asset, error) {
-	bytes, err := assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml", size: 11773, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml", size: 9898, mode: os.FileMode(420), modTime: time.Unix(1652799551, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2795,295 +2482,7 @@ func assetsCrd0000_03_securityOpenshift_01_sccCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_security-openshift_01_scc.crd.yaml", size: 16010, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCrd0000_10_configOperator_01_buildCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  annotations:
-    api-approved.openshift.io: https://github.com/openshift/api/pull/470
-    include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/self-managed-high-availability: "true"
-    include.release.openshift.io/single-node-developer: "true"
-  name: builds.config.openshift.io
-spec:
-  group: config.openshift.io
-  names:
-    kind: Build
-    listKind: BuildList
-    plural: builds
-    singular: build
-  preserveUnknownFields: false
-  scope: Cluster
-  versions:
-    - name: v1
-      schema:
-        openAPIV3Schema:
-          description: "Build configures the behavior of OpenShift builds for the entire cluster. This includes default settings that can be overridden in BuildConfig objects, and overrides which are applied to all builds. \n The canonical name is \"cluster\" \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer)."
-          type: object
-          required:
-            - spec
-          properties:
-            apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-              type: string
-            kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-              type: string
-            metadata:
-              type: object
-            spec:
-              description: Spec holds user-settable values for the build controller configuration
-              type: object
-              properties:
-                additionalTrustedCA:
-                  description: "AdditionalTrustedCA is a reference to a ConfigMap containing additional CAs that should be trusted for image pushes and pulls during builds. The namespace for this config map is openshift-config. \n DEPRECATED: Additional CAs for image pull and push should be set on image.config.openshift.io/cluster instead."
-                  type: object
-                  required:
-                    - name
-                  properties:
-                    name:
-                      description: name is the metadata.name of the referenced config map
-                      type: string
-                buildDefaults:
-                  description: BuildDefaults controls the default information for Builds
-                  type: object
-                  properties:
-                    defaultProxy:
-                      description: "DefaultProxy contains the default proxy settings for all build operations, including image pull/push and source download. \n Values can be overrode by setting the ` + "`" + `HTTP_PROXY` + "`" + `, ` + "`" + `HTTPS_PROXY` + "`" + `, and ` + "`" + `NO_PROXY` + "`" + ` environment variables in the build config's strategy."
-                      type: object
-                      properties:
-                        httpProxy:
-                          description: httpProxy is the URL of the proxy for HTTP requests.  Empty means unset and will not result in an env var.
-                          type: string
-                        httpsProxy:
-                          description: httpsProxy is the URL of the proxy for HTTPS requests.  Empty means unset and will not result in an env var.
-                          type: string
-                        noProxy:
-                          description: noProxy is a comma-separated list of hostnames and/or CIDRs and/or IPs for which the proxy should not be used. Empty means unset and will not result in an env var.
-                          type: string
-                        readinessEndpoints:
-                          description: readinessEndpoints is a list of endpoints used to verify readiness of the proxy.
-                          type: array
-                          items:
-                            type: string
-                        trustedCA:
-                          description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle. The trustedCA field should only be consumed by a proxy validator. The validator is responsible for reading the certificate bundle from the required key \"ca-bundle.crt\", merging it with the system default trust bundle, and writing the merged trust bundle to a ConfigMap named \"trusted-ca-bundle\" in the \"openshift-config-managed\" namespace. Clients that expect to make proxy connections must use the trusted-ca-bundle for all HTTPS requests to the proxy, and may use the trusted-ca-bundle for non-proxy HTTPS requests as well. \n The namespace for the ConfigMap referenced by trustedCA is \"openshift-config\". Here is an example ConfigMap (in yaml): \n apiVersion: v1 kind: ConfigMap metadata:  name: user-ca-bundle  namespace: openshift-config  data:    ca-bundle.crt: |      -----BEGIN CERTIFICATE-----      Custom CA certificate bundle.      -----END CERTIFICATE-----"
-                          type: object
-                          required:
-                            - name
-                          properties:
-                            name:
-                              description: name is the metadata.name of the referenced config map
-                              type: string
-                    env:
-                      description: Env is a set of default environment variables that will be applied to the build if the specified variables do not exist on the build
-                      type: array
-                      items:
-                        description: EnvVar represents an environment variable present in a Container.
-                        type: object
-                        required:
-                          - name
-                        properties:
-                          name:
-                            description: Name of the environment variable. Must be a C_IDENTIFIER.
-                            type: string
-                          value:
-                            description: 'Variable references $(VAR_NAME) are expanded using the previously defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to "".'
-                            type: string
-                          valueFrom:
-                            description: Source for the environment variable's value. Cannot be used if value is not empty.
-                            type: object
-                            properties:
-                              configMapKeyRef:
-                                description: Selects a key of a ConfigMap.
-                                type: object
-                                required:
-                                  - key
-                                properties:
-                                  key:
-                                    description: The key to select.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the ConfigMap or its key must be defined
-                                    type: boolean
-                              fieldRef:
-                                description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, ` + "`" + `metadata.labels[''<KEY>'']` + "`" + `, ` + "`" + `metadata.annotations[''<KEY>'']` + "`" + `, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
-                                type: object
-                                required:
-                                  - fieldPath
-                                properties:
-                                  apiVersion:
-                                    description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
-                                    type: string
-                                  fieldPath:
-                                    description: Path of the field to select in the specified API version.
-                                    type: string
-                              resourceFieldRef:
-                                description: 'Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.'
-                                type: object
-                                required:
-                                  - resource
-                                properties:
-                                  containerName:
-                                    description: 'Container name: required for volumes, optional for env vars'
-                                    type: string
-                                  divisor:
-                                    description: Specifies the output format of the exposed resources, defaults to "1"
-                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                                    anyOf:
-                                      - type: integer
-                                      - type: string
-                                    x-kubernetes-int-or-string: true
-                                  resource:
-                                    description: 'Required: resource to select'
-                                    type: string
-                              secretKeyRef:
-                                description: Selects a key of a secret in the pod's namespace
-                                type: object
-                                required:
-                                  - key
-                                properties:
-                                  key:
-                                    description: The key of the secret to select from.  Must be a valid secret key.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the Secret or its key must be defined
-                                    type: boolean
-                    gitProxy:
-                      description: "GitProxy contains the proxy settings for git operations only. If set, this will override any Proxy settings for all git commands, such as git clone. \n Values that are not set here will be inherited from DefaultProxy."
-                      type: object
-                      properties:
-                        httpProxy:
-                          description: httpProxy is the URL of the proxy for HTTP requests.  Empty means unset and will not result in an env var.
-                          type: string
-                        httpsProxy:
-                          description: httpsProxy is the URL of the proxy for HTTPS requests.  Empty means unset and will not result in an env var.
-                          type: string
-                        noProxy:
-                          description: noProxy is a comma-separated list of hostnames and/or CIDRs and/or IPs for which the proxy should not be used. Empty means unset and will not result in an env var.
-                          type: string
-                        readinessEndpoints:
-                          description: readinessEndpoints is a list of endpoints used to verify readiness of the proxy.
-                          type: array
-                          items:
-                            type: string
-                        trustedCA:
-                          description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle. The trustedCA field should only be consumed by a proxy validator. The validator is responsible for reading the certificate bundle from the required key \"ca-bundle.crt\", merging it with the system default trust bundle, and writing the merged trust bundle to a ConfigMap named \"trusted-ca-bundle\" in the \"openshift-config-managed\" namespace. Clients that expect to make proxy connections must use the trusted-ca-bundle for all HTTPS requests to the proxy, and may use the trusted-ca-bundle for non-proxy HTTPS requests as well. \n The namespace for the ConfigMap referenced by trustedCA is \"openshift-config\". Here is an example ConfigMap (in yaml): \n apiVersion: v1 kind: ConfigMap metadata:  name: user-ca-bundle  namespace: openshift-config  data:    ca-bundle.crt: |      -----BEGIN CERTIFICATE-----      Custom CA certificate bundle.      -----END CERTIFICATE-----"
-                          type: object
-                          required:
-                            - name
-                          properties:
-                            name:
-                              description: name is the metadata.name of the referenced config map
-                              type: string
-                    imageLabels:
-                      description: ImageLabels is a list of docker labels that are applied to the resulting image. User can override a default label by providing a label with the same name in their Build/BuildConfig.
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          name:
-                            description: Name defines the name of the label. It must have non-zero length.
-                            type: string
-                          value:
-                            description: Value defines the literal value of the label.
-                            type: string
-                    resources:
-                      description: Resources defines resource requirements to execute the build.
-                      type: object
-                      properties:
-                        limits:
-                          description: 'Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
-                          type: object
-                          additionalProperties:
-                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                            anyOf:
-                              - type: integer
-                              - type: string
-                            x-kubernetes-int-or-string: true
-                        requests:
-                          description: 'Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
-                          type: object
-                          additionalProperties:
-                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                            anyOf:
-                              - type: integer
-                              - type: string
-                            x-kubernetes-int-or-string: true
-                buildOverrides:
-                  description: BuildOverrides controls override settings for builds
-                  type: object
-                  properties:
-                    forcePull:
-                      description: ForcePull overrides, if set, the equivalent value in the builds, i.e. false disables force pull for all builds, true enables force pull for all builds, independently of what each build specifies itself
-                      type: boolean
-                    imageLabels:
-                      description: ImageLabels is a list of docker labels that are applied to the resulting image. If user provided a label in their Build/BuildConfig with the same name as one in this list, the user's label will be overwritten.
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          name:
-                            description: Name defines the name of the label. It must have non-zero length.
-                            type: string
-                          value:
-                            description: Value defines the literal value of the label.
-                            type: string
-                    nodeSelector:
-                      description: NodeSelector is a selector which must be true for the build pod to fit on a node
-                      type: object
-                      additionalProperties:
-                        type: string
-                    tolerations:
-                      description: Tolerations is a list of Tolerations that will override any existing tolerations set on a build pod.
-                      type: array
-                      items:
-                        description: The pod this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.
-                        type: object
-                        properties:
-                          effect:
-                            description: Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
-                            type: string
-                          key:
-                            description: Key is the taint key that the toleration applies to. Empty means match all taint keys. If the key is empty, operator must be Exists; this combination means to match all values and all keys.
-                            type: string
-                          operator:
-                            description: Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.
-                            type: string
-                          tolerationSeconds:
-                            description: TolerationSeconds represents the period of time the toleration (which must be of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default, it is not set, which means tolerate the taint forever (do not evict). Zero and negative values will be treated as 0 (evict immediately) by the system.
-                            type: integer
-                            format: int64
-                          value:
-                            description: Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
-                            type: string
-      served: true
-      storage: true
-      subresources:
-        status: {}
-`)
-
-func assetsCrd0000_10_configOperator_01_buildCrdYamlBytes() ([]byte, error) {
-	return _assetsCrd0000_10_configOperator_01_buildCrdYaml, nil
-}
-
-func assetsCrd0000_10_configOperator_01_buildCrdYaml() (*asset, error) {
-	bytes, err := assetsCrd0000_10_configOperator_01_buildCrdYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_build.crd.yaml", size: 20246, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_security-openshift_01_scc.crd.yaml", size: 16010, mode: os.FileMode(420), modTime: time.Unix(1652799551, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3163,1768 +2562,7 @@ func assetsCrd0000_10_configOperator_01_featuregateCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_featuregate.crd.yaml", size: 3438, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCrd0000_10_configOperator_01_imageCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  annotations:
-    api-approved.openshift.io: https://github.com/openshift/api/pull/470
-    include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/self-managed-high-availability: "true"
-    include.release.openshift.io/single-node-developer: "true"
-  name: images.config.openshift.io
-spec:
-  group: config.openshift.io
-  names:
-    kind: Image
-    listKind: ImageList
-    plural: images
-    singular: image
-  scope: Cluster
-  versions:
-    - name: v1
-      schema:
-        openAPIV3Schema:
-          description: "Image governs policies related to imagestream imports and runtime configuration for external registries. It allows cluster admins to configure which registries OpenShift is allowed to import images from, extra CA trust bundles for external registries, and policies to block or allow registry hostnames. When exposing OpenShift's image registry to the public, this also lets cluster admins specify the external hostname. \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer)."
-          type: object
-          required:
-            - spec
-          properties:
-            apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-              type: string
-            kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-              type: string
-            metadata:
-              type: object
-            spec:
-              description: spec holds user settable values for configuration
-              type: object
-              properties:
-                additionalTrustedCA:
-                  description: additionalTrustedCA is a reference to a ConfigMap containing additional CAs that should be trusted during imagestream import, pod image pull, build image pull, and imageregistry pullthrough. The namespace for this config map is openshift-config.
-                  type: object
-                  required:
-                    - name
-                  properties:
-                    name:
-                      description: name is the metadata.name of the referenced config map
-                      type: string
-                allowedRegistriesForImport:
-                  description: allowedRegistriesForImport limits the container image registries that normal users may import images from. Set this list to the registries that you trust to contain valid Docker images and that you want applications to be able to import from. Users with permission to create Images or ImageStreamMappings via the API are not affected by this policy - typically only administrators or system integrations will have those permissions.
-                  type: array
-                  items:
-                    description: RegistryLocation contains a location of the registry specified by the registry domain name. The domain name might include wildcards, like '*' or '??'.
-                    type: object
-                    properties:
-                      domainName:
-                        description: domainName specifies a domain name for the registry In case the registry use non-standard (80 or 443) port, the port should be included in the domain name as well.
-                        type: string
-                      insecure:
-                        description: insecure indicates whether the registry is secure (https) or insecure (http) By default (if not specified) the registry is assumed as secure.
-                        type: boolean
-                externalRegistryHostnames:
-                  description: externalRegistryHostnames provides the hostnames for the default external image registry. The external hostname should be set only when the image registry is exposed externally. The first value is used in 'publicDockerImageRepository' field in ImageStreams. The value must be in "hostname[:port]" format.
-                  type: array
-                  items:
-                    type: string
-                registrySources:
-                  description: registrySources contains configuration that determines how the container runtime should treat individual registries when accessing images for builds+pods. (e.g. whether or not to allow insecure access).  It does not contain configuration for the internal cluster registry.
-                  type: object
-                  properties:
-                    allowedRegistries:
-                      description: "allowedRegistries are the only registries permitted for image pull and push actions. All other registries are denied. \n Only one of BlockedRegistries or AllowedRegistries may be set."
-                      type: array
-                      items:
-                        type: string
-                    blockedRegistries:
-                      description: "blockedRegistries cannot be used for image pull and push actions. All other registries are permitted. \n Only one of BlockedRegistries or AllowedRegistries may be set."
-                      type: array
-                      items:
-                        type: string
-                    containerRuntimeSearchRegistries:
-                      description: 'containerRuntimeSearchRegistries are registries that will be searched when pulling images that do not have fully qualified domains in their pull specs. Registries will be searched in the order provided in the list. Note: this search list only works with the container runtime, i.e CRI-O. Will NOT work with builds or imagestream imports.'
-                      type: array
-                      format: hostname
-                      minItems: 1
-                      items:
-                        type: string
-                      x-kubernetes-list-type: set
-                    insecureRegistries:
-                      description: insecureRegistries are registries which do not have a valid TLS certificates or only support HTTP connections.
-                      type: array
-                      items:
-                        type: string
-            status:
-              description: status holds observed values from the cluster. They may not be overridden.
-              type: object
-              properties:
-                externalRegistryHostnames:
-                  description: externalRegistryHostnames provides the hostnames for the default external image registry. The external hostname should be set only when the image registry is exposed externally. The first value is used in 'publicDockerImageRepository' field in ImageStreams. The value must be in "hostname[:port]" format.
-                  type: array
-                  items:
-                    type: string
-                internalRegistryHostname:
-                  description: internalRegistryHostname sets the hostname for the default internal image registry. The value must be in "hostname[:port]" format. This value is set by the image registry operator which controls the internal registry hostname. For backward compatibility, users can still use OPENSHIFT_DEFAULT_REGISTRY environment variable but this setting overrides the environment variable.
-                  type: string
-      served: true
-      storage: true
-      subresources:
-        status: {}
-`)
-
-func assetsCrd0000_10_configOperator_01_imageCrdYamlBytes() ([]byte, error) {
-	return _assetsCrd0000_10_configOperator_01_imageCrdYaml, nil
-}
-
-func assetsCrd0000_10_configOperator_01_imageCrdYaml() (*asset, error) {
-	bytes, err := assetsCrd0000_10_configOperator_01_imageCrdYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_image.crd.yaml", size: 7808, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCrd0000_10_configOperator_01_imagecontentsourcepolicyCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  annotations:
-    api-approved.openshift.io: https://github.com/openshift/api/pull/470
-    include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/self-managed-high-availability: "true"
-    include.release.openshift.io/single-node-developer: "true"
-  name: imagecontentsourcepolicies.operator.openshift.io
-spec:
-  group: operator.openshift.io
-  names:
-    kind: ImageContentSourcePolicy
-    listKind: ImageContentSourcePolicyList
-    plural: imagecontentsourcepolicies
-    singular: imagecontentsourcepolicy
-  scope: Cluster
-  versions:
-    - name: v1alpha1
-      schema:
-        openAPIV3Schema:
-          description: "ImageContentSourcePolicy holds cluster-wide information about how to handle registry mirror rules. When multiple policies are defined, the outcome of the behavior is defined on each field. \n Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support."
-          type: object
-          required:
-            - spec
-          properties:
-            apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-              type: string
-            kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-              type: string
-            metadata:
-              type: object
-            spec:
-              description: spec holds user settable values for configuration
-              type: object
-              properties:
-                repositoryDigestMirrors:
-                  description: "repositoryDigestMirrors allows images referenced by image digests in pods to be pulled from alternative mirrored repository locations. The image pull specification provided to the pod will be compared to the source locations described in RepositoryDigestMirrors and the image may be pulled down from any of the mirrors in the list instead of the specified repository allowing administrators to choose a potentially faster mirror. Only image pull specifications that have an image digest will have this behavior applied to them - tags will continue to be pulled from the specified repository in the pull spec. \n Each “source” repository is treated independently; configurations for different “source” repositories don’t interact. \n When multiple policies are defined for the same “source” repository, the sets of defined mirrors will be merged together, preserving the relative order of the mirrors, if possible. For example, if policy A has mirrors ` + "`" + `a, b, c` + "`" + ` and policy B has mirrors ` + "`" + `c, d, e` + "`" + `, the mirrors will be used in the order ` + "`" + `a, b, c, d, e` + "`" + `.  If the orders of mirror entries conflict (e.g. ` + "`" + `a, b` + "`" + ` vs. ` + "`" + `b, a` + "`" + `) the configuration is not rejected but the resulting order is unspecified."
-                  type: array
-                  items:
-                    description: 'RepositoryDigestMirrors holds cluster-wide information about how to handle mirros in the registries config. Note: the mirrors only work when pulling the images that are referenced by their digests.'
-                    type: object
-                    required:
-                      - source
-                    properties:
-                      mirrors:
-                        description: mirrors is one or more repositories that may also contain the same images. The order of mirrors in this list is treated as the user's desired priority, while source is by default considered lower priority than all mirrors. Other cluster configuration, including (but not limited to) other repositoryDigestMirrors objects, may impact the exact order mirrors are contacted in, or some mirrors may be contacted in parallel, so this should be considered a preference rather than a guarantee of ordering.
-                        type: array
-                        items:
-                          type: string
-                      source:
-                        description: source is the repository that users refer to, e.g. in image pull specifications.
-                        type: string
-      served: true
-      storage: true
-      subresources:
-        status: {}
-`)
-
-func assetsCrd0000_10_configOperator_01_imagecontentsourcepolicyCrdYamlBytes() ([]byte, error) {
-	return _assetsCrd0000_10_configOperator_01_imagecontentsourcepolicyCrdYaml, nil
-}
-
-func assetsCrd0000_10_configOperator_01_imagecontentsourcepolicyCrdYaml() (*asset, error) {
-	bytes, err := assetsCrd0000_10_configOperator_01_imagecontentsourcepolicyCrdYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_imagecontentsourcepolicy.crd.yaml", size: 4754, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCrd0000_11_imageregistryConfigsCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  annotations:
-    api-approved.openshift.io: https://github.com/openshift/api/pull/519
-    include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/self-managed-high-availability: "true"
-    include.release.openshift.io/single-node-developer: "true"
-  name: configs.imageregistry.operator.openshift.io
-spec:
-  group: imageregistry.operator.openshift.io
-  names:
-    kind: Config
-    listKind: ConfigList
-    plural: configs
-    singular: config
-  scope: Cluster
-  versions:
-  - name: v1
-    schema:
-      openAPIV3Schema:
-        description: Config is the configuration object for a registry instance managed
-          by the registry operator
-        type: object
-        required:
-        - metadata
-        - spec
-        properties:
-          apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-            type: string
-          kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-            type: string
-          metadata:
-            type: object
-          spec:
-            description: ImageRegistrySpec defines the specs for the running registry.
-            type: object
-            required:
-            - managementState
-            - replicas
-            properties:
-              affinity:
-                description: affinity is a group of node affinity scheduling rules
-                  for the image registry pod(s).
-                type: object
-                properties:
-                  nodeAffinity:
-                    description: Describes node affinity scheduling rules for the
-                      pod.
-                    type: object
-                    properties:
-                      preferredDuringSchedulingIgnoredDuringExecution:
-                        description: The scheduler will prefer to schedule pods to
-                          nodes that satisfy the affinity expressions specified by
-                          this field, but it may choose a node that violates one or
-                          more of the expressions. The node that is most preferred
-                          is the one with the greatest sum of weights, i.e. for each
-                          node that meets all of the scheduling requirements (resource
-                          request, requiredDuringScheduling affinity expressions,
-                          etc.), compute a sum by iterating through the elements of
-                          this field and adding "weight" to the sum if the node matches
-                          the corresponding matchExpressions; the node(s) with the
-                          highest sum are the most preferred.
-                        type: array
-                        items:
-                          description: An empty preferred scheduling term matches
-                            all objects with implicit weight 0 (i.e. it's a no-op).
-                            A null preferred scheduling term matches no objects (i.e.
-                            is also a no-op).
-                          type: object
-                          required:
-                          - preference
-                          - weight
-                          properties:
-                            preference:
-                              description: A node selector term, associated with the
-                                corresponding weight.
-                              type: object
-                              properties:
-                                matchExpressions:
-                                  description: A list of node selector requirements
-                                    by node's labels.
-                                  type: array
-                                  items:
-                                    description: A node selector requirement is a
-                                      selector that contains values, a key, and an
-                                      operator that relates the key and values.
-                                    type: object
-                                    required:
-                                    - key
-                                    - operator
-                                    properties:
-                                      key:
-                                        description: The label key that the selector
-                                          applies to.
-                                        type: string
-                                      operator:
-                                        description: Represents a key's relationship
-                                          to a set of values. Valid operators are
-                                          In, NotIn, Exists, DoesNotExist. Gt, and
-                                          Lt.
-                                        type: string
-                                      values:
-                                        description: An array of string values. If
-                                          the operator is In or NotIn, the values
-                                          array must be non-empty. If the operator
-                                          is Exists or DoesNotExist, the values array
-                                          must be empty. If the operator is Gt or
-                                          Lt, the values array must have a single
-                                          element, which will be interpreted as an
-                                          integer. This array is replaced during a
-                                          strategic merge patch.
-                                        type: array
-                                        items:
-                                          type: string
-                                matchFields:
-                                  description: A list of node selector requirements
-                                    by node's fields.
-                                  type: array
-                                  items:
-                                    description: A node selector requirement is a
-                                      selector that contains values, a key, and an
-                                      operator that relates the key and values.
-                                    type: object
-                                    required:
-                                    - key
-                                    - operator
-                                    properties:
-                                      key:
-                                        description: The label key that the selector
-                                          applies to.
-                                        type: string
-                                      operator:
-                                        description: Represents a key's relationship
-                                          to a set of values. Valid operators are
-                                          In, NotIn, Exists, DoesNotExist. Gt, and
-                                          Lt.
-                                        type: string
-                                      values:
-                                        description: An array of string values. If
-                                          the operator is In or NotIn, the values
-                                          array must be non-empty. If the operator
-                                          is Exists or DoesNotExist, the values array
-                                          must be empty. If the operator is Gt or
-                                          Lt, the values array must have a single
-                                          element, which will be interpreted as an
-                                          integer. This array is replaced during a
-                                          strategic merge patch.
-                                        type: array
-                                        items:
-                                          type: string
-                            weight:
-                              description: Weight associated with matching the corresponding
-                                nodeSelectorTerm, in the range 1-100.
-                              type: integer
-                              format: int32
-                      requiredDuringSchedulingIgnoredDuringExecution:
-                        description: If the affinity requirements specified by this
-                          field are not met at scheduling time, the pod will not be
-                          scheduled onto the node. If the affinity requirements specified
-                          by this field cease to be met at some point during pod execution
-                          (e.g. due to an update), the system may or may not try to
-                          eventually evict the pod from its node.
-                        type: object
-                        required:
-                        - nodeSelectorTerms
-                        properties:
-                          nodeSelectorTerms:
-                            description: Required. A list of node selector terms.
-                              The terms are ORed.
-                            type: array
-                            items:
-                              description: A null or empty node selector term matches
-                                no objects. The requirements of them are ANDed. The
-                                TopologySelectorTerm type implements a subset of the
-                                NodeSelectorTerm.
-                              type: object
-                              properties:
-                                matchExpressions:
-                                  description: A list of node selector requirements
-                                    by node's labels.
-                                  type: array
-                                  items:
-                                    description: A node selector requirement is a
-                                      selector that contains values, a key, and an
-                                      operator that relates the key and values.
-                                    type: object
-                                    required:
-                                    - key
-                                    - operator
-                                    properties:
-                                      key:
-                                        description: The label key that the selector
-                                          applies to.
-                                        type: string
-                                      operator:
-                                        description: Represents a key's relationship
-                                          to a set of values. Valid operators are
-                                          In, NotIn, Exists, DoesNotExist. Gt, and
-                                          Lt.
-                                        type: string
-                                      values:
-                                        description: An array of string values. If
-                                          the operator is In or NotIn, the values
-                                          array must be non-empty. If the operator
-                                          is Exists or DoesNotExist, the values array
-                                          must be empty. If the operator is Gt or
-                                          Lt, the values array must have a single
-                                          element, which will be interpreted as an
-                                          integer. This array is replaced during a
-                                          strategic merge patch.
-                                        type: array
-                                        items:
-                                          type: string
-                                matchFields:
-                                  description: A list of node selector requirements
-                                    by node's fields.
-                                  type: array
-                                  items:
-                                    description: A node selector requirement is a
-                                      selector that contains values, a key, and an
-                                      operator that relates the key and values.
-                                    type: object
-                                    required:
-                                    - key
-                                    - operator
-                                    properties:
-                                      key:
-                                        description: The label key that the selector
-                                          applies to.
-                                        type: string
-                                      operator:
-                                        description: Represents a key's relationship
-                                          to a set of values. Valid operators are
-                                          In, NotIn, Exists, DoesNotExist. Gt, and
-                                          Lt.
-                                        type: string
-                                      values:
-                                        description: An array of string values. If
-                                          the operator is In or NotIn, the values
-                                          array must be non-empty. If the operator
-                                          is Exists or DoesNotExist, the values array
-                                          must be empty. If the operator is Gt or
-                                          Lt, the values array must have a single
-                                          element, which will be interpreted as an
-                                          integer. This array is replaced during a
-                                          strategic merge patch.
-                                        type: array
-                                        items:
-                                          type: string
-                  podAffinity:
-                    description: Describes pod affinity scheduling rules (e.g. co-locate
-                      this pod in the same node, zone, etc. as some other pod(s)).
-                    type: object
-                    properties:
-                      preferredDuringSchedulingIgnoredDuringExecution:
-                        description: The scheduler will prefer to schedule pods to
-                          nodes that satisfy the affinity expressions specified by
-                          this field, but it may choose a node that violates one or
-                          more of the expressions. The node that is most preferred
-                          is the one with the greatest sum of weights, i.e. for each
-                          node that meets all of the scheduling requirements (resource
-                          request, requiredDuringScheduling affinity expressions,
-                          etc.), compute a sum by iterating through the elements of
-                          this field and adding "weight" to the sum if the node has
-                          pods which matches the corresponding podAffinityTerm; the
-                          node(s) with the highest sum are the most preferred.
-                        type: array
-                        items:
-                          description: The weights of all of the matched WeightedPodAffinityTerm
-                            fields are added per-node to find the most preferred node(s)
-                          type: object
-                          required:
-                          - podAffinityTerm
-                          - weight
-                          properties:
-                            podAffinityTerm:
-                              description: Required. A pod affinity term, associated
-                                with the corresponding weight.
-                              type: object
-                              required:
-                              - topologyKey
-                              properties:
-                                labelSelector:
-                                  description: A label query over a set of resources,
-                                    in this case pods.
-                                  type: object
-                                  properties:
-                                    matchExpressions:
-                                      description: matchExpressions is a list of label
-                                        selector requirements. The requirements are
-                                        ANDed.
-                                      type: array
-                                      items:
-                                        description: A label selector requirement
-                                          is a selector that contains values, a key,
-                                          and an operator that relates the key and
-                                          values.
-                                        type: object
-                                        required:
-                                        - key
-                                        - operator
-                                        properties:
-                                          key:
-                                            description: key is the label key that
-                                              the selector applies to.
-                                            type: string
-                                          operator:
-                                            description: operator represents a key's
-                                              relationship to a set of values. Valid
-                                              operators are In, NotIn, Exists and
-                                              DoesNotExist.
-                                            type: string
-                                          values:
-                                            description: values is an array of string
-                                              values. If the operator is In or NotIn,
-                                              the values array must be non-empty.
-                                              If the operator is Exists or DoesNotExist,
-                                              the values array must be empty. This
-                                              array is replaced during a strategic
-                                              merge patch.
-                                            type: array
-                                            items:
-                                              type: string
-                                    matchLabels:
-                                      description: matchLabels is a map of {key,value}
-                                        pairs. A single {key,value} in the matchLabels
-                                        map is equivalent to an element of matchExpressions,
-                                        whose key field is "key", the operator is
-                                        "In", and the values array contains only "value".
-                                        The requirements are ANDed.
-                                      type: object
-                                      additionalProperties:
-                                        type: string
-                                namespaceSelector:
-                                  description: A label query over the set of namespaces
-                                    that the term applies to. The term is applied
-                                    to the union of the namespaces selected by this
-                                    field and the ones listed in the namespaces field.
-                                    null selector and null or empty namespaces list
-                                    means "this pod's namespace". An empty selector
-                                    ({}) matches all namespaces. This field is alpha-level
-                                    and is only honored when PodAffinityNamespaceSelector
-                                    feature is enabled.
-                                  type: object
-                                  properties:
-                                    matchExpressions:
-                                      description: matchExpressions is a list of label
-                                        selector requirements. The requirements are
-                                        ANDed.
-                                      type: array
-                                      items:
-                                        description: A label selector requirement
-                                          is a selector that contains values, a key,
-                                          and an operator that relates the key and
-                                          values.
-                                        type: object
-                                        required:
-                                        - key
-                                        - operator
-                                        properties:
-                                          key:
-                                            description: key is the label key that
-                                              the selector applies to.
-                                            type: string
-                                          operator:
-                                            description: operator represents a key's
-                                              relationship to a set of values. Valid
-                                              operators are In, NotIn, Exists and
-                                              DoesNotExist.
-                                            type: string
-                                          values:
-                                            description: values is an array of string
-                                              values. If the operator is In or NotIn,
-                                              the values array must be non-empty.
-                                              If the operator is Exists or DoesNotExist,
-                                              the values array must be empty. This
-                                              array is replaced during a strategic
-                                              merge patch.
-                                            type: array
-                                            items:
-                                              type: string
-                                    matchLabels:
-                                      description: matchLabels is a map of {key,value}
-                                        pairs. A single {key,value} in the matchLabels
-                                        map is equivalent to an element of matchExpressions,
-                                        whose key field is "key", the operator is
-                                        "In", and the values array contains only "value".
-                                        The requirements are ANDed.
-                                      type: object
-                                      additionalProperties:
-                                        type: string
-                                namespaces:
-                                  description: namespaces specifies a static list
-                                    of namespace names that the term applies to. The
-                                    term is applied to the union of the namespaces
-                                    listed in this field and the ones selected by
-                                    namespaceSelector. null or empty namespaces list
-                                    and null namespaceSelector means "this pod's namespace"
-                                  type: array
-                                  items:
-                                    type: string
-                                topologyKey:
-                                  description: This pod should be co-located (affinity)
-                                    or not co-located (anti-affinity) with the pods
-                                    matching the labelSelector in the specified namespaces,
-                                    where co-located is defined as running on a node
-                                    whose value of the label with key topologyKey
-                                    matches that of any node on which any of the selected
-                                    pods is running. Empty topologyKey is not allowed.
-                                  type: string
-                            weight:
-                              description: weight associated with matching the corresponding
-                                podAffinityTerm, in the range 1-100.
-                              type: integer
-                              format: int32
-                      requiredDuringSchedulingIgnoredDuringExecution:
-                        description: If the affinity requirements specified by this
-                          field are not met at scheduling time, the pod will not be
-                          scheduled onto the node. If the affinity requirements specified
-                          by this field cease to be met at some point during pod execution
-                          (e.g. due to a pod label update), the system may or may
-                          not try to eventually evict the pod from its node. When
-                          there are multiple elements, the lists of nodes corresponding
-                          to each podAffinityTerm are intersected, i.e. all terms
-                          must be satisfied.
-                        type: array
-                        items:
-                          description: Defines a set of pods (namely those matching
-                            the labelSelector relative to the given namespace(s))
-                            that this pod should be co-located (affinity) or not co-located
-                            (anti-affinity) with, where co-located is defined as running
-                            on a node whose value of the label with key <topologyKey>
-                            matches that of any node on which a pod of the set of
-                            pods is running
-                          type: object
-                          required:
-                          - topologyKey
-                          properties:
-                            labelSelector:
-                              description: A label query over a set of resources,
-                                in this case pods.
-                              type: object
-                              properties:
-                                matchExpressions:
-                                  description: matchExpressions is a list of label
-                                    selector requirements. The requirements are ANDed.
-                                  type: array
-                                  items:
-                                    description: A label selector requirement is a
-                                      selector that contains values, a key, and an
-                                      operator that relates the key and values.
-                                    type: object
-                                    required:
-                                    - key
-                                    - operator
-                                    properties:
-                                      key:
-                                        description: key is the label key that the
-                                          selector applies to.
-                                        type: string
-                                      operator:
-                                        description: operator represents a key's relationship
-                                          to a set of values. Valid operators are
-                                          In, NotIn, Exists and DoesNotExist.
-                                        type: string
-                                      values:
-                                        description: values is an array of string
-                                          values. If the operator is In or NotIn,
-                                          the values array must be non-empty. If the
-                                          operator is Exists or DoesNotExist, the
-                                          values array must be empty. This array is
-                                          replaced during a strategic merge patch.
-                                        type: array
-                                        items:
-                                          type: string
-                                matchLabels:
-                                  description: matchLabels is a map of {key,value}
-                                    pairs. A single {key,value} in the matchLabels
-                                    map is equivalent to an element of matchExpressions,
-                                    whose key field is "key", the operator is "In",
-                                    and the values array contains only "value". The
-                                    requirements are ANDed.
-                                  type: object
-                                  additionalProperties:
-                                    type: string
-                            namespaceSelector:
-                              description: A label query over the set of namespaces
-                                that the term applies to. The term is applied to the
-                                union of the namespaces selected by this field and
-                                the ones listed in the namespaces field. null selector
-                                and null or empty namespaces list means "this pod's
-                                namespace". An empty selector ({}) matches all namespaces.
-                                This field is alpha-level and is only honored when
-                                PodAffinityNamespaceSelector feature is enabled.
-                              type: object
-                              properties:
-                                matchExpressions:
-                                  description: matchExpressions is a list of label
-                                    selector requirements. The requirements are ANDed.
-                                  type: array
-                                  items:
-                                    description: A label selector requirement is a
-                                      selector that contains values, a key, and an
-                                      operator that relates the key and values.
-                                    type: object
-                                    required:
-                                    - key
-                                    - operator
-                                    properties:
-                                      key:
-                                        description: key is the label key that the
-                                          selector applies to.
-                                        type: string
-                                      operator:
-                                        description: operator represents a key's relationship
-                                          to a set of values. Valid operators are
-                                          In, NotIn, Exists and DoesNotExist.
-                                        type: string
-                                      values:
-                                        description: values is an array of string
-                                          values. If the operator is In or NotIn,
-                                          the values array must be non-empty. If the
-                                          operator is Exists or DoesNotExist, the
-                                          values array must be empty. This array is
-                                          replaced during a strategic merge patch.
-                                        type: array
-                                        items:
-                                          type: string
-                                matchLabels:
-                                  description: matchLabels is a map of {key,value}
-                                    pairs. A single {key,value} in the matchLabels
-                                    map is equivalent to an element of matchExpressions,
-                                    whose key field is "key", the operator is "In",
-                                    and the values array contains only "value". The
-                                    requirements are ANDed.
-                                  type: object
-                                  additionalProperties:
-                                    type: string
-                            namespaces:
-                              description: namespaces specifies a static list of namespace
-                                names that the term applies to. The term is applied
-                                to the union of the namespaces listed in this field
-                                and the ones selected by namespaceSelector. null or
-                                empty namespaces list and null namespaceSelector means
-                                "this pod's namespace"
-                              type: array
-                              items:
-                                type: string
-                            topologyKey:
-                              description: This pod should be co-located (affinity)
-                                or not co-located (anti-affinity) with the pods matching
-                                the labelSelector in the specified namespaces, where
-                                co-located is defined as running on a node whose value
-                                of the label with key topologyKey matches that of
-                                any node on which any of the selected pods is running.
-                                Empty topologyKey is not allowed.
-                              type: string
-                  podAntiAffinity:
-                    description: Describes pod anti-affinity scheduling rules (e.g.
-                      avoid putting this pod in the same node, zone, etc. as some
-                      other pod(s)).
-                    type: object
-                    properties:
-                      preferredDuringSchedulingIgnoredDuringExecution:
-                        description: The scheduler will prefer to schedule pods to
-                          nodes that satisfy the anti-affinity expressions specified
-                          by this field, but it may choose a node that violates one
-                          or more of the expressions. The node that is most preferred
-                          is the one with the greatest sum of weights, i.e. for each
-                          node that meets all of the scheduling requirements (resource
-                          request, requiredDuringScheduling anti-affinity expressions,
-                          etc.), compute a sum by iterating through the elements of
-                          this field and adding "weight" to the sum if the node has
-                          pods which matches the corresponding podAffinityTerm; the
-                          node(s) with the highest sum are the most preferred.
-                        type: array
-                        items:
-                          description: The weights of all of the matched WeightedPodAffinityTerm
-                            fields are added per-node to find the most preferred node(s)
-                          type: object
-                          required:
-                          - podAffinityTerm
-                          - weight
-                          properties:
-                            podAffinityTerm:
-                              description: Required. A pod affinity term, associated
-                                with the corresponding weight.
-                              type: object
-                              required:
-                              - topologyKey
-                              properties:
-                                labelSelector:
-                                  description: A label query over a set of resources,
-                                    in this case pods.
-                                  type: object
-                                  properties:
-                                    matchExpressions:
-                                      description: matchExpressions is a list of label
-                                        selector requirements. The requirements are
-                                        ANDed.
-                                      type: array
-                                      items:
-                                        description: A label selector requirement
-                                          is a selector that contains values, a key,
-                                          and an operator that relates the key and
-                                          values.
-                                        type: object
-                                        required:
-                                        - key
-                                        - operator
-                                        properties:
-                                          key:
-                                            description: key is the label key that
-                                              the selector applies to.
-                                            type: string
-                                          operator:
-                                            description: operator represents a key's
-                                              relationship to a set of values. Valid
-                                              operators are In, NotIn, Exists and
-                                              DoesNotExist.
-                                            type: string
-                                          values:
-                                            description: values is an array of string
-                                              values. If the operator is In or NotIn,
-                                              the values array must be non-empty.
-                                              If the operator is Exists or DoesNotExist,
-                                              the values array must be empty. This
-                                              array is replaced during a strategic
-                                              merge patch.
-                                            type: array
-                                            items:
-                                              type: string
-                                    matchLabels:
-                                      description: matchLabels is a map of {key,value}
-                                        pairs. A single {key,value} in the matchLabels
-                                        map is equivalent to an element of matchExpressions,
-                                        whose key field is "key", the operator is
-                                        "In", and the values array contains only "value".
-                                        The requirements are ANDed.
-                                      type: object
-                                      additionalProperties:
-                                        type: string
-                                namespaceSelector:
-                                  description: A label query over the set of namespaces
-                                    that the term applies to. The term is applied
-                                    to the union of the namespaces selected by this
-                                    field and the ones listed in the namespaces field.
-                                    null selector and null or empty namespaces list
-                                    means "this pod's namespace". An empty selector
-                                    ({}) matches all namespaces. This field is alpha-level
-                                    and is only honored when PodAffinityNamespaceSelector
-                                    feature is enabled.
-                                  type: object
-                                  properties:
-                                    matchExpressions:
-                                      description: matchExpressions is a list of label
-                                        selector requirements. The requirements are
-                                        ANDed.
-                                      type: array
-                                      items:
-                                        description: A label selector requirement
-                                          is a selector that contains values, a key,
-                                          and an operator that relates the key and
-                                          values.
-                                        type: object
-                                        required:
-                                        - key
-                                        - operator
-                                        properties:
-                                          key:
-                                            description: key is the label key that
-                                              the selector applies to.
-                                            type: string
-                                          operator:
-                                            description: operator represents a key's
-                                              relationship to a set of values. Valid
-                                              operators are In, NotIn, Exists and
-                                              DoesNotExist.
-                                            type: string
-                                          values:
-                                            description: values is an array of string
-                                              values. If the operator is In or NotIn,
-                                              the values array must be non-empty.
-                                              If the operator is Exists or DoesNotExist,
-                                              the values array must be empty. This
-                                              array is replaced during a strategic
-                                              merge patch.
-                                            type: array
-                                            items:
-                                              type: string
-                                    matchLabels:
-                                      description: matchLabels is a map of {key,value}
-                                        pairs. A single {key,value} in the matchLabels
-                                        map is equivalent to an element of matchExpressions,
-                                        whose key field is "key", the operator is
-                                        "In", and the values array contains only "value".
-                                        The requirements are ANDed.
-                                      type: object
-                                      additionalProperties:
-                                        type: string
-                                namespaces:
-                                  description: namespaces specifies a static list
-                                    of namespace names that the term applies to. The
-                                    term is applied to the union of the namespaces
-                                    listed in this field and the ones selected by
-                                    namespaceSelector. null or empty namespaces list
-                                    and null namespaceSelector means "this pod's namespace"
-                                  type: array
-                                  items:
-                                    type: string
-                                topologyKey:
-                                  description: This pod should be co-located (affinity)
-                                    or not co-located (anti-affinity) with the pods
-                                    matching the labelSelector in the specified namespaces,
-                                    where co-located is defined as running on a node
-                                    whose value of the label with key topologyKey
-                                    matches that of any node on which any of the selected
-                                    pods is running. Empty topologyKey is not allowed.
-                                  type: string
-                            weight:
-                              description: weight associated with matching the corresponding
-                                podAffinityTerm, in the range 1-100.
-                              type: integer
-                              format: int32
-                      requiredDuringSchedulingIgnoredDuringExecution:
-                        description: If the anti-affinity requirements specified by
-                          this field are not met at scheduling time, the pod will
-                          not be scheduled onto the node. If the anti-affinity requirements
-                          specified by this field cease to be met at some point during
-                          pod execution (e.g. due to a pod label update), the system
-                          may or may not try to eventually evict the pod from its
-                          node. When there are multiple elements, the lists of nodes
-                          corresponding to each podAffinityTerm are intersected, i.e.
-                          all terms must be satisfied.
-                        type: array
-                        items:
-                          description: Defines a set of pods (namely those matching
-                            the labelSelector relative to the given namespace(s))
-                            that this pod should be co-located (affinity) or not co-located
-                            (anti-affinity) with, where co-located is defined as running
-                            on a node whose value of the label with key <topologyKey>
-                            matches that of any node on which a pod of the set of
-                            pods is running
-                          type: object
-                          required:
-                          - topologyKey
-                          properties:
-                            labelSelector:
-                              description: A label query over a set of resources,
-                                in this case pods.
-                              type: object
-                              properties:
-                                matchExpressions:
-                                  description: matchExpressions is a list of label
-                                    selector requirements. The requirements are ANDed.
-                                  type: array
-                                  items:
-                                    description: A label selector requirement is a
-                                      selector that contains values, a key, and an
-                                      operator that relates the key and values.
-                                    type: object
-                                    required:
-                                    - key
-                                    - operator
-                                    properties:
-                                      key:
-                                        description: key is the label key that the
-                                          selector applies to.
-                                        type: string
-                                      operator:
-                                        description: operator represents a key's relationship
-                                          to a set of values. Valid operators are
-                                          In, NotIn, Exists and DoesNotExist.
-                                        type: string
-                                      values:
-                                        description: values is an array of string
-                                          values. If the operator is In or NotIn,
-                                          the values array must be non-empty. If the
-                                          operator is Exists or DoesNotExist, the
-                                          values array must be empty. This array is
-                                          replaced during a strategic merge patch.
-                                        type: array
-                                        items:
-                                          type: string
-                                matchLabels:
-                                  description: matchLabels is a map of {key,value}
-                                    pairs. A single {key,value} in the matchLabels
-                                    map is equivalent to an element of matchExpressions,
-                                    whose key field is "key", the operator is "In",
-                                    and the values array contains only "value". The
-                                    requirements are ANDed.
-                                  type: object
-                                  additionalProperties:
-                                    type: string
-                            namespaceSelector:
-                              description: A label query over the set of namespaces
-                                that the term applies to. The term is applied to the
-                                union of the namespaces selected by this field and
-                                the ones listed in the namespaces field. null selector
-                                and null or empty namespaces list means "this pod's
-                                namespace". An empty selector ({}) matches all namespaces.
-                                This field is alpha-level and is only honored when
-                                PodAffinityNamespaceSelector feature is enabled.
-                              type: object
-                              properties:
-                                matchExpressions:
-                                  description: matchExpressions is a list of label
-                                    selector requirements. The requirements are ANDed.
-                                  type: array
-                                  items:
-                                    description: A label selector requirement is a
-                                      selector that contains values, a key, and an
-                                      operator that relates the key and values.
-                                    type: object
-                                    required:
-                                    - key
-                                    - operator
-                                    properties:
-                                      key:
-                                        description: key is the label key that the
-                                          selector applies to.
-                                        type: string
-                                      operator:
-                                        description: operator represents a key's relationship
-                                          to a set of values. Valid operators are
-                                          In, NotIn, Exists and DoesNotExist.
-                                        type: string
-                                      values:
-                                        description: values is an array of string
-                                          values. If the operator is In or NotIn,
-                                          the values array must be non-empty. If the
-                                          operator is Exists or DoesNotExist, the
-                                          values array must be empty. This array is
-                                          replaced during a strategic merge patch.
-                                        type: array
-                                        items:
-                                          type: string
-                                matchLabels:
-                                  description: matchLabels is a map of {key,value}
-                                    pairs. A single {key,value} in the matchLabels
-                                    map is equivalent to an element of matchExpressions,
-                                    whose key field is "key", the operator is "In",
-                                    and the values array contains only "value". The
-                                    requirements are ANDed.
-                                  type: object
-                                  additionalProperties:
-                                    type: string
-                            namespaces:
-                              description: namespaces specifies a static list of namespace
-                                names that the term applies to. The term is applied
-                                to the union of the namespaces listed in this field
-                                and the ones selected by namespaceSelector. null or
-                                empty namespaces list and null namespaceSelector means
-                                "this pod's namespace"
-                              type: array
-                              items:
-                                type: string
-                            topologyKey:
-                              description: This pod should be co-located (affinity)
-                                or not co-located (anti-affinity) with the pods matching
-                                the labelSelector in the specified namespaces, where
-                                co-located is defined as running on a node whose value
-                                of the label with key topologyKey matches that of
-                                any node on which any of the selected pods is running.
-                                Empty topologyKey is not allowed.
-                              type: string
-              defaultRoute:
-                description: defaultRoute indicates whether an external facing route
-                  for the registry should be created using the default generated hostname.
-                type: boolean
-              disableRedirect:
-                description: disableRedirect controls whether to route all data through
-                  the Registry, rather than redirecting to the backend.
-                type: boolean
-              httpSecret:
-                description: httpSecret is the value needed by the registry to secure
-                  uploads, generated by default.
-                type: string
-              logLevel:
-                description: "logLevel is an intent based logging for an overall component.
-                  \ It does not give fine grained control, but it is a simple way
-                  to manage coarse grained logging choices that operators have to
-                  interpret for their operands. \n Valid values are: \"Normal\", \"Debug\",
-                  \"Trace\", \"TraceAll\". Defaults to \"Normal\"."
-                type: string
-                default: Normal
-                enum:
-                - ""
-                - Normal
-                - Debug
-                - Trace
-                - TraceAll
-              logging:
-                description: logging is deprecated, use logLevel instead.
-                type: integer
-                format: int64
-              managementState:
-                description: managementState indicates whether and how the operator
-                  should manage the component
-                type: string
-                pattern: ^(Managed|Unmanaged|Force|Removed)$
-              nodeSelector:
-                description: nodeSelector defines the node selection constraints for
-                  the registry pod.
-                type: object
-                additionalProperties:
-                  type: string
-              observedConfig:
-                description: observedConfig holds a sparse config that controller
-                  has observed from the cluster state.  It exists in spec because
-                  it is an input to the level for the operator
-                type: object
-                nullable: true
-                x-kubernetes-preserve-unknown-fields: true
-              operatorLogLevel:
-                description: "operatorLogLevel is an intent based logging for the
-                  operator itself.  It does not give fine grained control, but it
-                  is a simple way to manage coarse grained logging choices that operators
-                  have to interpret for themselves. \n Valid values are: \"Normal\",
-                  \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\"."
-                type: string
-                default: Normal
-                enum:
-                - ""
-                - Normal
-                - Debug
-                - Trace
-                - TraceAll
-              proxy:
-                description: proxy defines the proxy to be used when calling master
-                  api, upstream registries, etc.
-                type: object
-                properties:
-                  http:
-                    description: http defines the proxy to be used by the image registry
-                      when accessing HTTP endpoints.
-                    type: string
-                  https:
-                    description: https defines the proxy to be used by the image registry
-                      when accessing HTTPS endpoints.
-                    type: string
-                  noProxy:
-                    description: noProxy defines a comma-separated list of host names
-                      that shouldn't go through any proxy.
-                    type: string
-              readOnly:
-                description: readOnly indicates whether the registry instance should
-                  reject attempts to push new images or delete existing ones.
-                type: boolean
-              replicas:
-                description: replicas determines the number of registry instances
-                  to run.
-                type: integer
-                format: int32
-              requests:
-                description: requests controls how many parallel requests a given
-                  registry instance will handle before queuing additional requests.
-                type: object
-                properties:
-                  read:
-                    description: read defines limits for image registry's reads.
-                    type: object
-                    properties:
-                      maxInQueue:
-                        description: maxInQueue sets the maximum queued api requests
-                          to the registry.
-                        type: integer
-                      maxRunning:
-                        description: maxRunning sets the maximum in flight api requests
-                          to the registry.
-                        type: integer
-                      maxWaitInQueue:
-                        description: maxWaitInQueue sets the maximum time a request
-                          can wait in the queue before being rejected.
-                        type: string
-                        format: duration
-                  write:
-                    description: write defines limits for image registry's writes.
-                    type: object
-                    properties:
-                      maxInQueue:
-                        description: maxInQueue sets the maximum queued api requests
-                          to the registry.
-                        type: integer
-                      maxRunning:
-                        description: maxRunning sets the maximum in flight api requests
-                          to the registry.
-                        type: integer
-                      maxWaitInQueue:
-                        description: maxWaitInQueue sets the maximum time a request
-                          can wait in the queue before being rejected.
-                        type: string
-                        format: duration
-              resources:
-                description: resources defines the resource requests+limits for the
-                  registry pod.
-                type: object
-                properties:
-                  limits:
-                    description: 'Limits describes the maximum amount of compute resources
-                      allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
-                    type: object
-                    additionalProperties:
-                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                      anyOf:
-                      - type: integer
-                      - type: string
-                      x-kubernetes-int-or-string: true
-                  requests:
-                    description: 'Requests describes the minimum amount of compute
-                      resources required. If Requests is omitted for a container,
-                      it defaults to Limits if that is explicitly specified, otherwise
-                      to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
-                    type: object
-                    additionalProperties:
-                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                      anyOf:
-                      - type: integer
-                      - type: string
-                      x-kubernetes-int-or-string: true
-              rolloutStrategy:
-                description: rolloutStrategy defines rollout strategy for the image
-                  registry deployment.
-                type: string
-                pattern: ^(RollingUpdate|Recreate)$
-              routes:
-                description: routes defines additional external facing routes which
-                  should be created for the registry.
-                type: array
-                items:
-                  description: ImageRegistryConfigRoute holds information on external
-                    route access to image registry.
-                  type: object
-                  required:
-                  - name
-                  properties:
-                    hostname:
-                      description: hostname for the route.
-                      type: string
-                    name:
-                      description: name of the route to be created.
-                      type: string
-                    secretName:
-                      description: secretName points to secret containing the certificates
-                        to be used by the route.
-                      type: string
-              storage:
-                description: storage details for configuring registry storage, e.g.
-                  S3 bucket coordinates.
-                type: object
-                properties:
-                  azure:
-                    description: azure represents configuration that uses Azure Blob
-                      Storage.
-                    type: object
-                    properties:
-                      accountName:
-                        description: accountName defines the account to be used by
-                          the registry.
-                        type: string
-                      cloudName:
-                        description: cloudName is the name of the Azure cloud environment
-                          to be used by the registry. If empty, the operator will
-                          set it based on the infrastructure object.
-                        type: string
-                      container:
-                        description: container defines Azure's container to be used
-                          by registry.
-                        type: string
-                        maxLength: 63
-                        minLength: 3
-                        pattern: ^[0-9a-z]+(-[0-9a-z]+)*$
-                  emptyDir:
-                    description: 'emptyDir represents ephemeral storage on the pod''s
-                      host node. WARNING: this storage cannot be used with more than
-                      1 replica and is not suitable for production use. When the pod
-                      is removed from a node for any reason, the data in the emptyDir
-                      is deleted forever.'
-                    type: object
-                  gcs:
-                    description: gcs represents configuration that uses Google Cloud
-                      Storage.
-                    type: object
-                    properties:
-                      bucket:
-                        description: bucket is the bucket name in which you want to
-                          store the registry's data. Optional, will be generated if
-                          not provided.
-                        type: string
-                      keyID:
-                        description: keyID is the KMS key ID to use for encryption.
-                          Optional, buckets are encrypted by default on GCP. This
-                          allows for the use of a custom encryption key.
-                        type: string
-                      projectID:
-                        description: projectID is the Project ID of the GCP project
-                          that this bucket should be associated with.
-                        type: string
-                      region:
-                        description: region is the GCS location in which your bucket
-                          exists. Optional, will be set based on the installed GCS
-                          Region.
-                        type: string
-                  managementState:
-                    description: managementState indicates if the operator manages
-                      the underlying storage unit. If Managed the operator will remove
-                      the storage when this operator gets Removed.
-                    type: string
-                    pattern: ^(Managed|Unmanaged)$
-                  pvc:
-                    description: pvc represents configuration that uses a PersistentVolumeClaim.
-                    type: object
-                    properties:
-                      claim:
-                        description: claim defines the Persisent Volume Claim's name
-                          to be used.
-                        type: string
-                  s3:
-                    description: s3 represents configuration that uses Amazon Simple
-                      Storage Service.
-                    type: object
-                    properties:
-                      bucket:
-                        description: bucket is the bucket name in which you want to
-                          store the registry's data. Optional, will be generated if
-                          not provided.
-                        type: string
-                      cloudFront:
-                        description: cloudFront configures Amazon Cloudfront as the
-                          storage middleware in a registry.
-                        type: object
-                        required:
-                        - baseURL
-                        - keypairID
-                        - privateKey
-                        properties:
-                          baseURL:
-                            description: baseURL contains the SCHEME://HOST[/PATH]
-                              at which Cloudfront is served.
-                            type: string
-                          duration:
-                            description: duration is the duration of the Cloudfront
-                              session.
-                            type: string
-                            format: duration
-                          keypairID:
-                            description: keypairID is key pair ID provided by AWS.
-                            type: string
-                          privateKey:
-                            description: privateKey points to secret containing the
-                              private key, provided by AWS.
-                            type: object
-                            required:
-                            - key
-                            properties:
-                              key:
-                                description: The key of the secret to select from.  Must
-                                  be a valid secret key.
-                                type: string
-                              name:
-                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                  TODO: Add other useful fields. apiVersion, kind,
-                                  uid?'
-                                type: string
-                              optional:
-                                description: Specify whether the Secret or its key
-                                  must be defined
-                                type: boolean
-                      encrypt:
-                        description: encrypt specifies whether the registry stores
-                          the image in encrypted format or not. Optional, defaults
-                          to false.
-                        type: boolean
-                      keyID:
-                        description: keyID is the KMS key ID to use for encryption.
-                          Optional, Encrypt must be true, or this parameter is ignored.
-                        type: string
-                      region:
-                        description: region is the AWS region in which your bucket
-                          exists. Optional, will be set based on the installed AWS
-                          Region.
-                        type: string
-                      regionEndpoint:
-                        description: regionEndpoint is the endpoint for S3 compatible
-                          storage services. Optional, defaults based on the Region
-                          that is provided.
-                        type: string
-                      virtualHostedStyle:
-                        description: virtualHostedStyle enables using S3 virtual hosted
-                          style bucket paths with a custom RegionEndpoint Optional,
-                          defaults to false.
-                        type: boolean
-                  swift:
-                    description: swift represents configuration that uses OpenStack
-                      Object Storage.
-                    type: object
-                    properties:
-                      authURL:
-                        description: authURL defines the URL for obtaining an authentication
-                          token.
-                        type: string
-                      authVersion:
-                        description: authVersion specifies the OpenStack Auth's version.
-                        type: string
-                      container:
-                        description: container defines the name of Swift container
-                          where to store the registry's data.
-                        type: string
-                      domain:
-                        description: domain specifies Openstack's domain name for
-                          Identity v3 API.
-                        type: string
-                      domainID:
-                        description: domainID specifies Openstack's domain id for
-                          Identity v3 API.
-                        type: string
-                      regionName:
-                        description: regionName defines Openstack's region in which
-                          container exists.
-                        type: string
-                      tenant:
-                        description: tenant defines Openstack tenant name to be used
-                          by registry.
-                        type: string
-                      tenantID:
-                        description: tenant defines Openstack tenant id to be used
-                          by registry.
-                        type: string
-              tolerations:
-                description: tolerations defines the tolerations for the registry
-                  pod.
-                type: array
-                items:
-                  description: The pod this Toleration is attached to tolerates any
-                    taint that matches the triple <key,value,effect> using the matching
-                    operator <operator>.
-                  type: object
-                  properties:
-                    effect:
-                      description: Effect indicates the taint effect to match. Empty
-                        means match all taint effects. When specified, allowed values
-                        are NoSchedule, PreferNoSchedule and NoExecute.
-                      type: string
-                    key:
-                      description: Key is the taint key that the toleration applies
-                        to. Empty means match all taint keys. If the key is empty,
-                        operator must be Exists; this combination means to match all
-                        values and all keys.
-                      type: string
-                    operator:
-                      description: Operator represents a key's relationship to the
-                        value. Valid operators are Exists and Equal. Defaults to Equal.
-                        Exists is equivalent to wildcard for value, so that a pod
-                        can tolerate all taints of a particular category.
-                      type: string
-                    tolerationSeconds:
-                      description: TolerationSeconds represents the period of time
-                        the toleration (which must be of effect NoExecute, otherwise
-                        this field is ignored) tolerates the taint. By default, it
-                        is not set, which means tolerate the taint forever (do not
-                        evict). Zero and negative values will be treated as 0 (evict
-                        immediately) by the system.
-                      type: integer
-                      format: int64
-                    value:
-                      description: Value is the taint value the toleration matches
-                        to. If the operator is Exists, the value should be empty,
-                        otherwise just a regular string.
-                      type: string
-              unsupportedConfigOverrides:
-                description: 'unsupportedConfigOverrides holds a sparse config that
-                  will override any previously set options.  It only needs to be the
-                  fields to override it will end up overlaying in the following order:
-                  1. hardcoded defaults 2. observedConfig 3. unsupportedConfigOverrides'
-                type: object
-                nullable: true
-                x-kubernetes-preserve-unknown-fields: true
-          status:
-            description: ImageRegistryStatus reports image registry operational status.
-            type: object
-            required:
-            - storage
-            - storageManaged
-            properties:
-              conditions:
-                description: conditions is a list of conditions and their status
-                type: array
-                items:
-                  description: OperatorCondition is just the standard condition fields.
-                  type: object
-                  properties:
-                    lastTransitionTime:
-                      type: string
-                      format: date-time
-                    message:
-                      type: string
-                    reason:
-                      type: string
-                    status:
-                      type: string
-                    type:
-                      type: string
-              generations:
-                description: generations are used to determine when an item needs
-                  to be reconciled or has changed in a way that needs a reaction.
-                type: array
-                items:
-                  description: GenerationStatus keeps track of the generation for
-                    a given resource so that decisions about forced updates can be
-                    made.
-                  type: object
-                  properties:
-                    group:
-                      description: group is the group of the thing you're tracking
-                      type: string
-                    hash:
-                      description: hash is an optional field set for resources without
-                        generation that are content sensitive like secrets and configmaps
-                      type: string
-                    lastGeneration:
-                      description: lastGeneration is the last generation of the workload
-                        controller involved
-                      type: integer
-                      format: int64
-                    name:
-                      description: name is the name of the thing you're tracking
-                      type: string
-                    namespace:
-                      description: namespace is where the thing you're tracking is
-                      type: string
-                    resource:
-                      description: resource is the resource type of the thing you're
-                        tracking
-                      type: string
-              observedGeneration:
-                description: observedGeneration is the last generation change you've
-                  dealt with
-                type: integer
-                format: int64
-              readyReplicas:
-                description: readyReplicas indicates how many replicas are ready and
-                  at the desired state
-                type: integer
-                format: int32
-              storage:
-                description: storage indicates the current applied storage configuration
-                  of the registry.
-                type: object
-                properties:
-                  azure:
-                    description: azure represents configuration that uses Azure Blob
-                      Storage.
-                    type: object
-                    properties:
-                      accountName:
-                        description: accountName defines the account to be used by
-                          the registry.
-                        type: string
-                      cloudName:
-                        description: cloudName is the name of the Azure cloud environment
-                          to be used by the registry. If empty, the operator will
-                          set it based on the infrastructure object.
-                        type: string
-                      container:
-                        description: container defines Azure's container to be used
-                          by registry.
-                        type: string
-                        maxLength: 63
-                        minLength: 3
-                        pattern: ^[0-9a-z]+(-[0-9a-z]+)*$
-                  emptyDir:
-                    description: 'emptyDir represents ephemeral storage on the pod''s
-                      host node. WARNING: this storage cannot be used with more than
-                      1 replica and is not suitable for production use. When the pod
-                      is removed from a node for any reason, the data in the emptyDir
-                      is deleted forever.'
-                    type: object
-                  gcs:
-                    description: gcs represents configuration that uses Google Cloud
-                      Storage.
-                    type: object
-                    properties:
-                      bucket:
-                        description: bucket is the bucket name in which you want to
-                          store the registry's data. Optional, will be generated if
-                          not provided.
-                        type: string
-                      keyID:
-                        description: keyID is the KMS key ID to use for encryption.
-                          Optional, buckets are encrypted by default on GCP. This
-                          allows for the use of a custom encryption key.
-                        type: string
-                      projectID:
-                        description: projectID is the Project ID of the GCP project
-                          that this bucket should be associated with.
-                        type: string
-                      region:
-                        description: region is the GCS location in which your bucket
-                          exists. Optional, will be set based on the installed GCS
-                          Region.
-                        type: string
-                  managementState:
-                    description: managementState indicates if the operator manages
-                      the underlying storage unit. If Managed the operator will remove
-                      the storage when this operator gets Removed.
-                    type: string
-                    pattern: ^(Managed|Unmanaged)$
-                  pvc:
-                    description: pvc represents configuration that uses a PersistentVolumeClaim.
-                    type: object
-                    properties:
-                      claim:
-                        description: claim defines the Persisent Volume Claim's name
-                          to be used.
-                        type: string
-                  s3:
-                    description: s3 represents configuration that uses Amazon Simple
-                      Storage Service.
-                    type: object
-                    properties:
-                      bucket:
-                        description: bucket is the bucket name in which you want to
-                          store the registry's data. Optional, will be generated if
-                          not provided.
-                        type: string
-                      cloudFront:
-                        description: cloudFront configures Amazon Cloudfront as the
-                          storage middleware in a registry.
-                        type: object
-                        required:
-                        - baseURL
-                        - keypairID
-                        - privateKey
-                        properties:
-                          baseURL:
-                            description: baseURL contains the SCHEME://HOST[/PATH]
-                              at which Cloudfront is served.
-                            type: string
-                          duration:
-                            description: duration is the duration of the Cloudfront
-                              session.
-                            type: string
-                            format: duration
-                          keypairID:
-                            description: keypairID is key pair ID provided by AWS.
-                            type: string
-                          privateKey:
-                            description: privateKey points to secret containing the
-                              private key, provided by AWS.
-                            type: object
-                            required:
-                            - key
-                            properties:
-                              key:
-                                description: The key of the secret to select from.  Must
-                                  be a valid secret key.
-                                type: string
-                              name:
-                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                  TODO: Add other useful fields. apiVersion, kind,
-                                  uid?'
-                                type: string
-                              optional:
-                                description: Specify whether the Secret or its key
-                                  must be defined
-                                type: boolean
-                      encrypt:
-                        description: encrypt specifies whether the registry stores
-                          the image in encrypted format or not. Optional, defaults
-                          to false.
-                        type: boolean
-                      keyID:
-                        description: keyID is the KMS key ID to use for encryption.
-                          Optional, Encrypt must be true, or this parameter is ignored.
-                        type: string
-                      region:
-                        description: region is the AWS region in which your bucket
-                          exists. Optional, will be set based on the installed AWS
-                          Region.
-                        type: string
-                      regionEndpoint:
-                        description: regionEndpoint is the endpoint for S3 compatible
-                          storage services. Optional, defaults based on the Region
-                          that is provided.
-                        type: string
-                      virtualHostedStyle:
-                        description: virtualHostedStyle enables using S3 virtual hosted
-                          style bucket paths with a custom RegionEndpoint Optional,
-                          defaults to false.
-                        type: boolean
-                  swift:
-                    description: swift represents configuration that uses OpenStack
-                      Object Storage.
-                    type: object
-                    properties:
-                      authURL:
-                        description: authURL defines the URL for obtaining an authentication
-                          token.
-                        type: string
-                      authVersion:
-                        description: authVersion specifies the OpenStack Auth's version.
-                        type: string
-                      container:
-                        description: container defines the name of Swift container
-                          where to store the registry's data.
-                        type: string
-                      domain:
-                        description: domain specifies Openstack's domain name for
-                          Identity v3 API.
-                        type: string
-                      domainID:
-                        description: domainID specifies Openstack's domain id for
-                          Identity v3 API.
-                        type: string
-                      regionName:
-                        description: regionName defines Openstack's region in which
-                          container exists.
-                        type: string
-                      tenant:
-                        description: tenant defines Openstack tenant name to be used
-                          by registry.
-                        type: string
-                      tenantID:
-                        description: tenant defines Openstack tenant id to be used
-                          by registry.
-                        type: string
-              storageManaged:
-                description: storageManaged is deprecated, please refer to Storage.managementState
-                type: boolean
-              version:
-                description: version is the level this availability applies to
-                type: string
-    served: true
-    storage: true
-    subresources:
-      status: {}
-`)
-
-func assetsCrd0000_11_imageregistryConfigsCrdYamlBytes() ([]byte, error) {
-	return _assetsCrd0000_11_imageregistryConfigsCrdYaml, nil
-}
-
-func assetsCrd0000_11_imageregistryConfigsCrdYaml() (*asset, error) {
-	bytes, err := assetsCrd0000_11_imageregistryConfigsCrdYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/crd/0000_11_imageregistry-configs.crd.yaml", size: 90225, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_featuregate.crd.yaml", size: 3438, mode: os.FileMode(420), modTime: time.Unix(1652799551, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4983,7 +2621,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 1048, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 1048, mode: os.FileMode(420), modTime: time.Unix(1633965440, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5047,7 +2685,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1267, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1267, mode: os.FileMode(420), modTime: time.Unix(1633965440, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5111,7 +2749,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1298, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1298, mode: os.FileMode(420), modTime: time.Unix(1633965440, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5173,7 +2811,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostnetworkYaml() (*asset, err
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1123, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1123, mode: os.FileMode(420), modTime: time.Unix(1633965440, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5235,7 +2873,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1166, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1166, mode: os.FileMode(420), modTime: time.Unix(1633965440, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5299,7 +2937,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1291, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1291, mode: os.FileMode(420), modTime: time.Unix(1633965440, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5362,7 +3000,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1213, mode: os.FileMode(436), modTime: time.Unix(1653308373, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1213, mode: os.FileMode(420), modTime: time.Unix(1633965440, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5460,14 +3098,8 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/service-ca/signing-secret.yaml":                              assetsComponentsServiceCaSigningSecretYaml,
 	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml":    assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
 	"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml": assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml,
-	"assets/crd/0000_03_config-operator_01_proxy.crd.yaml":                          assetsCrd0000_03_configOperator_01_proxyCrdYaml,
-	"assets/crd/0000_03_quota-openshift_01_clusterresourcequota.crd.yaml":           assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml,
 	"assets/crd/0000_03_security-openshift_01_scc.crd.yaml":                         assetsCrd0000_03_securityOpenshift_01_sccCrdYaml,
-	"assets/crd/0000_10_config-operator_01_build.crd.yaml":                          assetsCrd0000_10_configOperator_01_buildCrdYaml,
 	"assets/crd/0000_10_config-operator_01_featuregate.crd.yaml":                    assetsCrd0000_10_configOperator_01_featuregateCrdYaml,
-	"assets/crd/0000_10_config-operator_01_image.crd.yaml":                          assetsCrd0000_10_configOperator_01_imageCrdYaml,
-	"assets/crd/0000_10_config-operator_01_imagecontentsourcepolicy.crd.yaml":       assetsCrd0000_10_configOperator_01_imagecontentsourcepolicyCrdYaml,
-	"assets/crd/0000_11_imageregistry-configs.crd.yaml":                             assetsCrd0000_11_imageregistryConfigsCrdYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":                 assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml":             assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml":       assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml,
@@ -5579,14 +3211,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"crd": {nil, map[string]*bintree{
 			"0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml": {assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml, map[string]*bintree{}},
-			"0000_03_config-operator_01_proxy.crd.yaml":                          {assetsCrd0000_03_configOperator_01_proxyCrdYaml, map[string]*bintree{}},
-			"0000_03_quota-openshift_01_clusterresourcequota.crd.yaml":           {assetsCrd0000_03_quotaOpenshift_01_clusterresourcequotaCrdYaml, map[string]*bintree{}},
 			"0000_03_security-openshift_01_scc.crd.yaml":                         {assetsCrd0000_03_securityOpenshift_01_sccCrdYaml, map[string]*bintree{}},
-			"0000_10_config-operator_01_build.crd.yaml":                          {assetsCrd0000_10_configOperator_01_buildCrdYaml, map[string]*bintree{}},
 			"0000_10_config-operator_01_featuregate.crd.yaml":                    {assetsCrd0000_10_configOperator_01_featuregateCrdYaml, map[string]*bintree{}},
-			"0000_10_config-operator_01_image.crd.yaml":                          {assetsCrd0000_10_configOperator_01_imageCrdYaml, map[string]*bintree{}},
-			"0000_10_config-operator_01_imagecontentsourcepolicy.crd.yaml":       {assetsCrd0000_10_configOperator_01_imagecontentsourcepolicyCrdYaml, map[string]*bintree{}},
-			"0000_11_imageregistry-configs.crd.yaml":                             {assetsCrd0000_11_imageregistryConfigsCrdYaml, map[string]*bintree{}},
 		}},
 		"scc": {nil, map[string]*bintree{
 			"0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":           {assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml, map[string]*bintree{}},
