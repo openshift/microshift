@@ -1,0 +1,47 @@
+name = "microshift-container"
+
+description = ""
+version = "0.0.1"
+modules = []
+groups = []
+
+# MicroShift and dependencies
+
+[[packages]]
+name = "microshift"
+version = "*"
+
+[[packages]]
+name = "openshift-clients"
+version = "*"
+
+# troubleshooting tools
+
+[[packages]]
+name = "iputils"
+version = "*"
+
+[[packages]]
+name = "bind-utils"
+version = "*"
+
+[[packages]]
+name = "net-tools"
+version = "*"
+
+[[packages]]
+name = "iotop"
+version = "*"
+
+# other
+
+[[packages]]
+name = "redhat-release"
+version = "*"
+
+# customizations
+
+[customizations]
+
+[customizations.services]
+enabled = ["crio", "microshift"]
