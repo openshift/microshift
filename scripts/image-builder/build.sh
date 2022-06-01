@@ -121,6 +121,9 @@ sudo podman run --rm --privileged -ti -v "${ROOTDIR}/_builds":/data -v /dev:/dev
     exit"
 sudo chown -R $(whoami). "${ROOTDIR}/_builds"
 
+# Remove intermediate artifacts to free disk space
+rm -f ${IMGNAME}-installer-0.0.0-installer.iso
+
 ${ROOTDIR}/cleanup.sh
 
 title "Done"
