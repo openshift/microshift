@@ -3,8 +3,10 @@ set -e -o pipefail
 
 IMGNAME=microshift
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
+STARTTIME=$(date +%s)
 
 trap ${ROOTDIR}/cleanup.sh INT
+trap 'echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
