@@ -3,8 +3,10 @@ set -e -o pipefail
 
 IMGNAME=microshift
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
+STARTTIME=$(date +%s)
 
 trap ${ROOTDIR}/cleanup.sh INT
+trap 'echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
@@ -120,6 +122,9 @@ sudo podman run --rm --privileged -ti -v "${ROOTDIR}/_builds":/data -v /dev:/dev
     mkksiso kickstart.ks ${IMGNAME}-installer-0.0.0-installer.iso ${IMGNAME}-installer.$(uname -i).iso; \
     exit"
 sudo chown -R $(whoami). "${ROOTDIR}/_builds"
+
+# Remove intermediate artifacts to free disk space
+rm -f ${IMGNAME}-installer-0.0.0-installer.iso
 
 ${ROOTDIR}/cleanup.sh
 
