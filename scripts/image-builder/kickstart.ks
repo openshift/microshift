@@ -15,8 +15,6 @@ ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/o
 echo -e 'url=http://REPLACE_OSTREE_SERVER_IP/repo/' >> /etc/ostree/remotes.d/edge.conf
 
 useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 -G wheel redhat
-mkdir -p -m 0700 /home/redhat/.ssh
-chown redhat. /home/redhat/.ssh
 
 echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' >> /etc/sudoers
 
