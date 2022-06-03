@@ -46,7 +46,7 @@ COPY $BUILD_PATH/unit /usr/lib/systemd/system/microshift.service
 COPY $BUILD_PATH/kubelet-cgroups.conf /etc/systemd/system.conf.d/kubelet-cgroups.conf
 COPY packaging/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/microshift.conf
 
-RUN export OCP_VERSION=4.10.15 && \
+RUN export OCP_VERSION=4.10.16 && \
     curl -o oc.tar.gz https://mirror2.openshift.com/pub/openshift-v4/$ARCH/clients/ocp/$OCP_VERSION/openshift-client-linux-$OCP_VERSION.tar.gz && \
     tar -xzvf oc.tar.gz && \
     rm oc.tar.gz && \
