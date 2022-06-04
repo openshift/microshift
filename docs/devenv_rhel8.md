@@ -33,10 +33,10 @@ Log into the virtual machine using SSH with the `microshift` user credentials.
 
 Run the following commands to upgrade the system, install basic dependencies, enable remote Cockpit console and configure SUDO.
 ```bash
+sudo echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
 sudo dnf update -y
 sudo dnf install -y git cockpit make golang
 sudo systemctl enable --now cockpit.socket
-echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee -a /etc/sudoers
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
 
@@ -101,7 +101,7 @@ sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
 
 Verify that the MicroShift is running.
 ```bash
-oc status
+oc get cs
 oc get pods -A
 ```
 ### Stopping MicroShift
@@ -111,7 +111,7 @@ sudo kill microshift && sleep 3
 tail -3 /tmp/microshift.log 
 ```
 
-Note tha this command only stops the MicroShift executable. To perform full cleanup including CRI-O images, run the following script.
+Note that this command only stops the MicroShift executable. To perform full cleanup including CRI-O images, run the following script.
 ```bash
 ./hack/cleanup.sh
 ```
@@ -207,7 +207,7 @@ sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
 
 Finally, check if the MicroShift is up and running by executing `oc` commands.
 ```bash
-oc status
+oc get cs
 oc get pods -A
 ```
 
