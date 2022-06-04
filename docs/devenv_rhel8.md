@@ -31,7 +31,7 @@ Click on Begin Installation and wait until the OS installation is complete.
 ### Configuring VM
 Log into the virtual machine using SSH with the `microshift` user credentials.
 
-Run the following commands to upgrade the system, install basic dependencies, enable remote Cockpit console and configure SUDO.
+Run the following commands to configure SUDO, upgrade the system, install basic dependencies and enable remote Cockpit console.
 ```bash
 sudo echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
 sudo dnf update -y
