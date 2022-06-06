@@ -29,7 +29,7 @@ function build_component {
   local component=$1
   SRC_REPO=$(source_repo "$component")
   SRC_COMMIT=$(source_commit "$component")
-  OKD_IMG=$(source_image "$component")
+  RELEASE_IMG=$(source_image "$component")
 
   [ -z "$SRC_REPO" ] && SRC_REPO=$(cat components/"$component"/repo || :)
   [ -z "$SRC_COMMIT" ] && SRC_COMMIT=$(cat components/"$component"/commit || :)
@@ -38,7 +38,7 @@ function build_component {
   echo -e "${GREEN}building component: $component${CLEAR}"
   echo "  Source Repo:   $SRC_REPO"
   echo "  Source Commit: $SRC_COMMIT"
-  echo "  Source Image:  $OKD_IMG"
+  echo "  Source Image:  $RELEASE_IMG"
 
   pushd components/"$component" >/dev/null
 
@@ -47,7 +47,7 @@ function build_component {
       build_cross_binaries
     fi
 
-    build_multiarch_image "$component" "$OKD_IMG"
+    build_multiarch_image "$component" "$RELEASE_IMG"
   popd
 
   if [ "${PUSH}" == "yes" ]; then
@@ -82,8 +82,8 @@ function build_cross_binaries {
 
 function build_multiarch_image {
   COMPONENT=$1
-  OKD_IMG=$2
-  MULTIARCH_MANIFEST="${DEST_REGISTRY}/${COMPONENT}:${OKD_BASE_TAG}"
+  RELEASE_IMG=$2
+  MULTIARCH_MANIFEST="${DEST_REGISTRY}/${COMPONENT}:${RELEASE_BASE_TAG}"
 
   echo ""
   echo -e "${GRAY}> preparing multiarch manifest ${MULTIARCH_MANIFEST} ${CLEAR}"
@@ -156,7 +156,7 @@ function build_using_dockerfile {
 
    BUILD_ARGS="-f $1 -t ${ARCH_IMAGE}"
    BUILD_ARGS="${BUILD_ARGS} --build-arg VERSION=${VERSION} --build-arg TARGETARCH=${ARCH}"
-   BUILD_ARGS="${BUILD_ARGS} --build-arg REGISTRY=${DEST_REGISTRY} --build-arg OKD_TAG=${OKD_BASE_TAG}"
+   BUILD_ARGS="${BUILD_ARGS} --build-arg REGISTRY=${DEST_REGISTRY} --build-arg RELEASE_TAG=${RELEASE_BASE_TAG}"
 
 
    buildah build-using-dockerfile --override-arch "${ARCH}" $BUILD_ARGS . || \
@@ -168,7 +168,7 @@ function build_using_dockerfile {
 
 function build_using_image {
 
-  IMG_REF=$(get_image_ref "$1" "${OKD_IMG}")
+  IMG_REF=$(get_image_ref "$1" "${RELEASE_IMG}")
   buildah pull --arch "${ARCH}" "${IMG_REF}"
   buildah tag "${IMG_REF}" "${ARCH_IMAGE}"
 }
@@ -177,7 +177,7 @@ function get_image_ref {
 
   IMG=$(cat "$1")
   # check if we must use the one captured from oc adm image-releases
-  if [ "${IMG}" == "\$OKD_IMAGE_AMD64" ]; then
+  if [ "${IMG}" == "\$RELEASE_IMAGE_AMD64" ]; then
     echo "$2"
   else
     echo "${IMG}"
@@ -190,12 +190,12 @@ if [ ! -f /proc/sys/fs/binfmt_misc/qemu-sparc ]; then
     sudo podman run --rm --privileged multiarch/qemu-user-static --reset -p yes
 fi
 
-OKD_BASE_TAG=$(cat ../../../pkg/release/release.go | grep "var Base =" | cut -d= -f2 | tr -d '" ')
-echo OKD Base: "${OKD_BASE_TAG}"
-IMG_REFS=".image-references.${OKD_BASE_TAG}"
+RELEASE_BASE_TAG=$(cat ../../../pkg/release/release.go | grep "var Base =" | cut -d= -f2 | tr -d '" ')
+echo RELEASE Base: "${RELEASE_BASE_TAG}"
+IMG_REFS=".image-references.${RELEASE_BASE_TAG}"
 
 if [ ! -f "${IMG_REFS}" ]; then
-  oc adm release extract "quay.io/openshift/okd:${OKD_BASE_TAG}" --file=image-references > ".image-references.${OKD_BASE_TAG}"
+  oc adm release extract "registry.ci.openshift.org/ocp/release:${RELEASE_BASE_TAG}" --file=image-references > ".image-references.${RELEASE_BASE_TAG}"
 fi
 
 for component in $COMPONENTS

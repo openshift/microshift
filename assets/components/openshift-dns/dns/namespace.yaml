@@ -10,3 +10,8 @@ metadata:
     openshift.io/run-level: "0"
     # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
     openshift.io/cluster-monitoring: "true"
+    # allow node-resolver daemonset to pass baseline pod security admission.
+    # It uses host networking, host path volumes, and is a privileged.
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged

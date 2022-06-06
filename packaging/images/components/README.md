@@ -2,8 +2,8 @@
 
 MicroShift optionally deploys multiple container images at runtime to provide
 infrastructure services like DNS and ingress. While most of those
-images are available from OKD and it does consume the original unmodified
-OKD image, this is only true for `amd64` because OKD still lacks support for other
+images are available from OCP and it does consume the original unmodified
+OCP image, this is only true for `amd64` because OCP still lacks support for other
 architectures MicroShift supports like `arm`, `arm64`, `ppc64le`, `riscv64` 
 
 # Usage
@@ -22,7 +22,7 @@ You can use an alternate DEST_REGISTRY for testing, pick individual components o
 For example:
 `COMPONENTS="base-image" ./build.sh`
 
-The base-image is used for composing some of the images on top, as OKD does. This serves two purposes:
+The base-image is used for composing some of the images on top, as OCP does. This serves two purposes:
     * Faster multiarch building, since the initial layers are very expensive to construct (done via
       qemu-static)
     * Thinner storage, as the base-image layer is downloaded just once.
@@ -50,8 +50,8 @@ The `components` directory inside `side-images` contains all necessary informati
 build each image. 
 
 Each component source code is extracted into the `src` directory, the references
-are extracted from the specific OKD release, and for components not
-being part of OKD the `repo` and `commit` files should exist (except for the base image)
+are extracted from the specific OCP release, and for components not
+being part of OCP the `repo` and `commit` files should exist (except for the base image)
 (see flannel for an example).
 
 In addition, each component can have:
@@ -78,19 +78,20 @@ The reference to the consumed images can be found in [pkg/release](../pkg/releas
 
 # Image sources and source code
 
-The available OKD images, and otherwise the reference to the sourcecode and git-tag
-from which the OKD images are built is extracted from
-`oc adm release extract "quay.io/openshift/okd:${OKD_BASE_TAG}" --file=image-references` 
+** This is for OCP images, that are available internally to RedHat **
+The available OCP images, and otherwise the reference to the sourcecode and git-tag
+from which the OCP images are built is extracted from
+`oc adm release extract "registry.ci.openshift.org/ocp/release:{OCP_BASE_TAG)" --file=image-references`
 
-If an OKD image exists for the specific architecture, such specific image will be
+If an OCP image exists for the specific architecture, such specific image will be
 added into the multiarch manifest, otherwise we need to build the specific images.
 
 For architectures where `ubi8` or `ubi8-minimal` images exist such base will be used,
 in some cases we use `fedora-minimal` (when a newer version of packages is necessary)
 
-# Non OKD images
-We consume a few non-okd images, like `flannel`, `hostpath-provisioner`, `pause`,
+# Non OCP images
+We consume a few non-ocp images, like `flannel`, `hostpath-provisioner`, `pause`,
 we build those images from exiting image sources, or from source code.
 
 # generated images
-We publish the multi-arch images under quay.io/microshift/$IMAGE:$OKD_BASE_TAG
+We publish the multi-arch images under quay.io/microshift/$IMAGE:$OCP_BASE_TAG

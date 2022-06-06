@@ -134,8 +134,8 @@ serializeImagePulls: false
 # staticPodPath: /etc/kubernetes/manifests
 featureGates:
   APIPriorityAndFairness: true
-  # Will be removed in future openshift/api update https://github.com/openshift/api/commit/c8c8f6d0f4a8ac4ff4ad7d1a84b27e1aa7ebf9b4
-  RemoveSelfLink: false
+  PodSecurity: true
+  DownwardAPIHugePages: true
   RotateKubeletServerCertificate: false #TODO
 serverTLSBootstrap: false #TODO`)
 
