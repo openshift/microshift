@@ -1,1 +1,7 @@
-Documentation has been moved to the GitHub repository at <https://github.com/openshift/microshift-documentation> and published on <https://microshift.io>.
+MicroShift productization and development environment documentation is managed in this repository.
+
+> Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
+
+### List of Topics
+- [MicroShift Design](design.md)
+- [MicroShift Development Environment on RHEL 8.x](devenv_rhel8.md)
