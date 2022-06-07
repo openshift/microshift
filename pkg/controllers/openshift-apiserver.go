@@ -128,7 +128,6 @@ func waitForOCPAPIServer(client kubernetes.Interface, timeout time.Duration) err
 	err := wait.PollImmediate(time.Second, timeout, func() (bool, error) {
 		for _, apiSvc := range []string{
 			"authorization.openshift.io",
-			"project.openshift.io",
 			"route.openshift.io",
 			"security.openshift.io",
 		} {
