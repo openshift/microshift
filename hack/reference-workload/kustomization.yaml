@@ -1,0 +1,8 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - amq-broker.yaml
+  - app-logic.yaml
+  - app-web-interface.yaml
+  - untrusted-app-plugin.yaml
