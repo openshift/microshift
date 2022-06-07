@@ -16,14 +16,15 @@ ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/o
 echo -e 'url=http://REPLACE_OSTREE_SERVER_NAME/repo/' >> /etc/ostree/remotes.d/edge.conf
 
 # The pull secret is mandatory for MicroShift built on top of OpenShift, but not OKD
-mkdir -p -m 0700 /var/lib/microshift/resources/cri-o
-cat > /var/lib/microshift/resources/cri-o/openshift-pull-secret << EOF
+cat > /etc/crio/openshift-pull-secret << EOF
 REPLACE_OCP_PULL_SECRET_CONTENTS
 EOF
+chmod 600 /etc/crio/openshift-pull-secret
 
 # Configure CRI-O to use the pull secret if specified
-if ! grep -q REPLACE_OCP_PULL_SECRET /var/lib/microshift/resources/cri-o/pull-secret ; then
-    echo -e '[crio.image]\nglobal_auth_file="/var/lib/microshift/resources/cri-o/openshift-pull-secret"\n' > \
+if ! grep -q REPLACE_OCP_PULL_SECRET /etc/crio/openshift-pull-secret ; then
+    [ ! -e /etc/crio/crio.conf.d ] && mkdir -p /etc/crio/crio.conf.d
+    echo -e '[crio.image]\nglobal_auth_file="/etc/crio/openshift-pull-secret"\n' > \
         /etc/crio/crio.conf.d/openshift-pull-secret.conf
 fi
 

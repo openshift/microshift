@@ -26,8 +26,12 @@ if [ "$FULL_CLEAN" = 1 ] ; then
 fi
 
 title "Cleaning up local ostree container server"
-sudo podman rm  -f microshift-container-server 2>/dev/null || true
-[ "$FULL_CLEAN" = 1 ] && sudo podman rmi -a
+sudo podman rm -f microshift-container-server 2>/dev/null || true
+if [ "$FULL_CLEAN" = 1 ] ; then 
+    sudo kill microshift 2>/dev/null || true
+    sleep 5
+    sudo podman rmi -af
+fi
 
 title "Cancelling composer jobs"
 for uid in $(sudo composer-cli compose list | awk '{print $1}') ; do
