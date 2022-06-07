@@ -3,10 +3,20 @@ set -e -o pipefail
 
 IMGNAME=microshift
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
+OSTREE_SERVER_NAME=127.0.0.1:8080
+OCP_PULL_SECRET_FILE=
 STARTTIME=$(date +%s)
 
 trap ${ROOTDIR}/cleanup.sh INT
-trap 'echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
+
+usage() {
+    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip]"
+    echo "   -pull_secret_file   Path to a file containing the OpenShift pull secret"
+    echo "   -ostree_server_name Name or IP address of the OS tree server (default: ${OSTREE_SERVER_IP})"
+    echo ""
+    echo "Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret."
+    exit 1
+}
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
@@ -57,7 +67,7 @@ build_image() {
 
     title "Loading ${blueprint} blueprint v${version}"
     sudo composer-cli blueprints delete ${blueprint} 2>/dev/null || true
-    sudo composer-cli blueprints push "${ROOTDIR}/${blueprint_file}"
+    sudo composer-cli blueprints push "${ROOTDIR}/config/${blueprint_file}"
     sudo composer-cli blueprints depsolve ${blueprint} 1>/dev/null
 
     if [ -n "$parent_version" ]; then
@@ -79,6 +89,33 @@ build_image() {
     download_image ${buildid}
     rename ${buildid} ${blueprint}-${version} ${buildid}*.{tar,iso} 2>/dev/null || true
 }
+
+# Parse the command line
+while [ $# -gt 0 ] ; do
+    case $1 in
+    -ostree_server_name)
+        shift
+        OSTREE_SERVER_NAME="$1"
+        [ -z "${OSTREE_SERVER_NAME}" ] && usage
+        shift
+        ;;
+    -pull_secret_file)
+        shift
+        OCP_PULL_SECRET_FILE="$1"
+        [ -z "${OCP_PULL_SECRET_FILE}" ] && usage
+        shift
+        ;;
+    *)
+        usage
+        ;;    
+    esac
+done
+if [ -z "${OSTREE_SERVER_NAME}" ] || [ -z "${OCP_PULL_SECRET_FILE}" ] ; then
+    usage
+fi
+
+# Set the elapsed time trap only if command line parsing was successful
+trap 'echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
 
 mkdir -p ${ROOTDIR}/_builds
 pushd ${ROOTDIR}/_builds &>/dev/null
@@ -106,7 +143,7 @@ createrepo openshift-local >/dev/null
 
 title "Loading sources for OpenShift and MicroShift"
 for f in openshift-local microshift-local ; do
-    cat ../${f}.toml | sed "s;REPLACE_IMAGE_BUILDER_DIR;${ROOTDIR};g" > ${f}.toml
+    cat ../config/${f}.toml.template | sed "s;REPLACE_IMAGE_BUILDER_DIR;${ROOTDIR};g" > ${f}.toml
     sudo composer-cli sources delete $f 2>/dev/null || true
     sudo composer-cli sources add ${ROOTDIR}/_builds/${f}.toml
 done
@@ -115,12 +152,18 @@ build_image blueprint_v0.0.1.toml "${IMGNAME}-container" 0.0.1 edge-container
 build_image installer.toml        "${IMGNAME}-installer" 0.0.0 edge-installer "${IMGNAME}-container" 0.0.1
 
 title "Embedding kickstart in the installer image"
-# TODO: Replace with the real server
-cat "../kickstart.ks" | sed "s;REPLACE_OSTREE_SERVER_IP;localhost:8080;g" > kickstart.ks
-sudo podman run --rm --privileged -ti -v "${ROOTDIR}/_builds":/data -v /dev:/dev fedora /bin/bash -c \
-    "dnf -y install lorax; cd /data; \
-    mkksiso kickstart.ks ${IMGNAME}-installer-0.0.0-installer.iso ${IMGNAME}-installer.$(uname -i).iso; \
-    exit"
+# Create a kickstart file from a template
+cat "../config/kickstart.ks.template" \
+    | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
+    | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE);g" \
+    > kickstart.ks
+
+# Run the ISO creation procedure
+sudo podman run --rm --privileged -ti -v "${ROOTDIR}/_builds":/data -v /dev:/dev registry.access.redhat.com/ubi8 \
+    /bin/bash -c \
+        "dnf -y install lorax; cd /data; \
+        mkksiso kickstart.ks ${IMGNAME}-installer-0.0.0-installer.iso ${IMGNAME}-installer.$(uname -i).iso; \
+        exit"
 sudo chown -R $(whoami). "${ROOTDIR}/_builds"
 
 # Remove intermediate artifacts to free disk space
