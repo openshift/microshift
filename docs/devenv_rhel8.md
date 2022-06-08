@@ -1,5 +1,6 @@
 ## Create Development Virtual Machine
 Start by downloading the RHEL 8.6 or above ISO image from the https://developers.redhat.com/products/rhel/download location. 
+> RHEL 9.x operating system is not currently supported.
 
 ### Creating VM
 Create a RHEL 8.x virtual machine with 2 cores, 4096MB of RAM and 40GB of storage. Move the ISO image to `/var/lib/libvirt/images` directory and run the following command to create a virtual machine.
@@ -93,10 +94,7 @@ Run the following commands to configure CRI-O for using the pull secret when fet
 ```bash
 sudo chmod 600 /etc/crio/openshift-pull-secret
 sudo mkdir -p /etc/crio/crio.conf.d/
-sudo cat > /etc/crio/crio.conf.d/openshift-pull-secret.conf << EOF
-[crio.image]
-global_auth_file="/etc/crio/openshift-pull-secret"
-EOF
+sudo cp ~microshift/microshift/packaging/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/
 sudo systemctl restart crio
 ```
 
