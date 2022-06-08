@@ -26,7 +26,6 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	openshift_apiserver "github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver"
-	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/util/wait"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/client-go/kubernetes"
@@ -55,9 +54,6 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 		klog.Infof("Failed to create a new openshift-apiserver configuration: %v", err)
 		return err
 	}
-	args := []string{
-		"--config=" + configFilePath,
-	}
 
 	options := openshift_apiserver.OpenShiftAPIServer{
 		Output:         os.Stdout,
@@ -67,23 +63,11 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	options.Authentication.RemoteKubeConfigFile = cfg.DataDir + "/resources/kubeadmin/kubeconfig"
 	options.Authorization.RemoteKubeConfigFile = cfg.DataDir + "/resources/kubeadmin/kubeconfig"
 
-	cmd := &cobra.Command{
-		Use:          "openshift-apiserver",
-		Long:         "openshift-apiserver",
-		SilenceUsage: true,
-		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
-	}
-
-	cmd.SetArgs(args)
-	cmd.MarkFlagFilename("config", "yaml", "yml")
-	cmd.MarkFlagRequired("config")
-	cmd.ParseFlags(args)
-
 	s.cfg = cfg
 	s.options = options
 	s.options.ConfigFile = configFilePath
 
-	klog.Infof("starting openshift-apiserver %s, args: %v", cfg.NodeIP, args)
+	klog.Infof("starting openshift-apiserver %s")
 	return nil
 
 }
