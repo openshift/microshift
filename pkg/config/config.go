@@ -108,17 +108,24 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 }
 
 // extract the api server port from the cluster URL
-func (c *ClusterConfig) ApiServerPort() (string, error) {
+func (c *ClusterConfig) ApiServerPort() (int, error) {
+	var port string
+
 	parsed, err := url.Parse(c.URL)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	// default empty URL to port 6443
-	if parsed.Port() == "" {
-		return "6443", nil
+	port = parsed.Port()
+	if port == "" {
+		port = "6443"
 	}
-	return parsed.Port(), nil
+	portNum, err := strconv.Atoi(port)
+	if err != nil {
+		return 0, err
+	}
+	return portNum, nil
 }
 
 // Returns the default user config file if that exists, else the default global
