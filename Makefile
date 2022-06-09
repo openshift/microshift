@@ -235,13 +235,11 @@ clean-cross-build:
 	$(RM) -r '$(CROSS_BUILD_BINDIR)'
 	$(RM) -rf $(OUTPUT_DIR)/staging
 	if [ -d '$(OUTPUT_DIR)' ]; then rmdir --ignore-fail-on-non-empty '$(OUTPUT_DIR)'; fi
+	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)' ; fi
 .PHONY: clean-cross-build
 
 clean: clean-cross-build
 .PHONY: clean
-
-cleanrpm:
-	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)' ; fi
 
 release: SOURCE_GIT_TAG=$(RELEASE_PRE)-$(TIMESTAMP)
 release:
