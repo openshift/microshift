@@ -1,0 +1,78 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-logic
+  labels:
+    app: app-logic
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-core
+  namespace: app-logic
+  labels:
+    app: app-core
+    # the core app connects to the amqp / mqtt queues
+    # and contains the core app logic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-core
+  template:
+    metadata:
+      labels:
+        app: app-core
+    spec:
+      containers:
+      - name: app-core
+        image: quay.io/submariner/nettest:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sleep"]
+        args: ["3600"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-api
+  namespace: app-logic
+  labels:
+    app: app-api
+    # the app API provides an api to talk to the core app via database
+    # (database tbd) and AMQP queues
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-api
+  template:
+    metadata:
+      labels:
+        app: app-api
+    spec:
+      containers:
+      - name: app-api
+        image: quay.io/submariner/nettest:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sleep"]
+        args: ["3600"]
+        ports:
+         - containerPort: 8080 # API
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: app-api
+  name: app-api
+  namespace: app-logic
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app:  app-api
+  sessionAffinity: None
+  type: ClusterIP
