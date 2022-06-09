@@ -130,10 +130,6 @@ func (s *OCPAPIServer) prepareOCPComponents(cfg *config.MicroshiftConfig) error 
 		klog.Warningf("failed to apply headless svc %v", err)
 		return err
 	}
-	if err := createAPIHeadlessSvc(cfg, "openshift-oauth-apiserver", 8443); err != nil {
-		klog.Warningf("failed to apply headless svc %v", err)
-		return err
-	}
 	if err := createAPIRegistration(cfg); err != nil {
 		klog.Warningf("failed to register api %v", err)
 		return err
@@ -236,12 +232,6 @@ auditConfig:
       - group: ''
         resources:
         - events
-    - level: None
-      resources:
-      - group: oauth.openshift.io
-        resources:
-        - oauthaccesstokens
-        - oauthauthorizetokens
     - level: None
       nonResourceURLs:
       - "/api*"

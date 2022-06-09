@@ -36,7 +36,7 @@ func (s *OpenShiftDefaultSCCManager) Name() string {
 	return "openshift-default-scc-manager"
 }
 func (s *OpenShiftDefaultSCCManager) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-crd-manager", "oauth-apiserver"}
+	return []string{"kube-apiserver", "openshift-crd-manager"}
 }
 
 func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
