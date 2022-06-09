@@ -95,7 +95,8 @@ Run the following commands to configure CRI-O for using the pull secret when fet
 sudo chmod 600 /etc/crio/openshift-pull-secret
 sudo mkdir -p /etc/crio/crio.conf.d/
 sudo cp ~microshift/microshift/packaging/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/
-sudo systemctl restart crio
+sudo systemctl restart crio && sleep 3
+echo 1 | ~microshift/microshift/hack/cleanup.sh
 ```
 
 ### Running MicroShift
