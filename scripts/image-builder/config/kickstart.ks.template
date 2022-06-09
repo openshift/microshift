@@ -12,7 +12,15 @@ ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/o
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
-echo -e 'url=http://REPLACE_OSTREE_SERVER_IP/repo/' >> /etc/ostree/remotes.d/edge.conf
+# Replace the ostree server name
+echo -e 'url=http://REPLACE_OSTREE_SERVER_NAME/repo/' >> /etc/ostree/remotes.d/edge.conf
+
+# The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
+# The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
+cat > /etc/crio/openshift-pull-secret << EOF
+REPLACE_OCP_PULL_SECRET_CONTENTS
+EOF
+chmod 600 /etc/crio/openshift-pull-secret
 
 useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 -G wheel redhat
 

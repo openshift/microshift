@@ -1,5 +1,6 @@
 ## Create Development Virtual Machine
 Start by downloading the RHEL 8.6 or above ISO image from the https://developers.redhat.com/products/rhel/download location. 
+> RHEL 9.x operating system is not currently supported.
 
 ### Creating VM
 Create a RHEL 8.x virtual machine with 2 cores, 4096MB of RAM and 40GB of storage. Move the ISO image to `/var/lib/libvirt/images` directory and run the following command to create a virtual machine.
@@ -86,6 +87,18 @@ sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms
 sudo dnf install -y cri-o cri-tools
 sudo systemctl enable crio --now
 ```
+
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and copy it into the `/etc/crio/openshift-pull-secret` file. 
+
+Run the following commands to configure CRI-O for using the pull secret when fetching container images.
+```bash
+sudo chmod 600 /etc/crio/openshift-pull-secret
+sudo mkdir -p /etc/crio/crio.conf.d/
+sudo cp ~microshift/microshift/packaging/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/
+sudo systemctl restart crio && sleep 3
+echo 1 | ~microshift/microshift/hack/cleanup.sh
+```
+
 ### Running MicroShift
 Run the MicroShift in the background using the following command.
 ```bash
@@ -126,6 +139,8 @@ The scripts for building the installer are located in the `scripts/image-builder
 ### Prerequisites
 Execute the `configure.sh` script to install the tools necessary for building the installer image.
 
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~microshift/pull-secret.txt` file. 
+
 Make sure there is more than 20GB of free disk space necessary for the build artifacts. Run the following command to free the space if necessary.
 ```bash
 ./scripts/image-builder/cleanup.sh -full
@@ -150,9 +165,19 @@ Note that the command deletes various user and system data, including:
 - Project-specific Image Builder sources are deleted
 - The `/var/cache/osbuild-worker` directory contents are deleted to clean Image Builder cache files
 
-Continue by running the build script and wait until it is finished. It may take over 30 minutes to complete a full build cycle.
+Run the build script without arguments to see its usage.
 ```bash
 ./scripts/image-builder/build.sh
+Usage: build.sh <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip]
+   -pull_secret_file   Path to a file containing the OpenShift pull secret
+   -ostree_server_name Name or IP address of the OS tree server (default: )
+
+Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret.
+```
+
+Continue by running the build script with the pull secret file argument and wait until build process is finished. It may take over 30 minutes to complete a full build cycle.
+```bash
+./scripts/image-builder/build.sh -pull_secret_file ~/pull-secret.txt
 ```
 The script performs the following tasks:
 - Check for minimum 10GB of available disk space

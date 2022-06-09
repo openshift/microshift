@@ -30,6 +30,7 @@ SRC_ROOT :=$(shell pwd)
 IMAGE_REPO :=quay.io/microshift/microshift
 IMAGE_REPO_AIO :=quay.io/microshift/microshift-aio
 OUTPUT_DIR :=_output
+RPM_BUILD_DIR :=packaging/rpm/_rpmbuild
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
@@ -234,6 +235,7 @@ clean-cross-build:
 	$(RM) -r '$(CROSS_BUILD_BINDIR)'
 	$(RM) -rf $(OUTPUT_DIR)/staging
 	if [ -d '$(OUTPUT_DIR)' ]; then rmdir --ignore-fail-on-non-empty '$(OUTPUT_DIR)'; fi
+	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)' ; fi
 .PHONY: clean-cross-build
 
 clean: clean-cross-build
