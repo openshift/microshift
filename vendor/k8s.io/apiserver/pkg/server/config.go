@@ -485,11 +485,6 @@ func (c *Config) AddPostStartHookOrDie(name string, hook PostStartHookFunc) {
 	}
 }
 
-// HasBeenReadySignal exposes a server's lifecycle signal which is signaled when the readyz endpoint succeeds for the first time.
-func (c *Config) HasBeenReadySignal() <-chan struct{} {
-	return c.lifecycleSignals.HasBeenReady.Signaled()
-}
-
 // Complete fills in any fields not set that are required to have valid data and can be derived
 // from other fields. If you're going to `ApplyOptions`, do that first. It's mutating the receiver.
 func (c *Config) Complete(informers informers.SharedInformerFactory) CompletedConfig {
@@ -614,7 +609,7 @@ func eventReference() (*corev1.ObjectReference, error) {
 	}
 	if len(ns) == 0 {
 		pod = ""
-		ns = "openshift-kube-apiserver"
+		ns = "kube-system"
 	}
 	if len(pod) == 0 {
 		return &corev1.ObjectReference{
@@ -881,8 +876,6 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
 	handler = genericapifilters.WithRequestDeadline(handler, c.AuditBackend, c.AuditPolicyRuleEvaluator,
 		c.LongRunningFunc, c.Serializer, c.RequestTimeout)
 	handler = genericfilters.WithWaitGroup(handler, c.LongRunningFunc, c.HandlerChainWaitGroup)
-	handler = WithNonReadyRequestLogging(handler, c.lifecycleSignals.HasBeenReady)
-	handler = WithLateConnectionFilter(handler)
 	if c.SecureServing != nil && !c.SecureServing.DisableHTTP2 && c.GoawayChance > 0 {
 		handler = genericfilters.WithProbabilisticGoaway(handler, c.GoawayChance)
 	}
@@ -893,8 +886,7 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
 	if c.ShutdownSendRetryAfter {
 		handler = genericfilters.WithRetryAfter(handler, c.lifecycleSignals.AfterShutdownDelayDuration.Signaled())
 	}
-	handler = genericfilters.WithOptInRetryAfter(handler, c.newServerFullyInitializedFunc())
-	handler = genericfilters.WithHTTPLogging(handler, c.newIsTerminatingFunc())
+	handler = genericfilters.WithHTTPLogging(handler)
 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.APIServerTracing) {
 		handler = genericapifilters.WithTracing(handler, c.TracerProvider)
 	}

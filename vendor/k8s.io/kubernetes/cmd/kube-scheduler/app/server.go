@@ -125,10 +125,6 @@ func runCommand(cmd *cobra.Command, opts *options.Options, registryOptions ...Op
 		cancel()
 	}()
 
-	if err := setUpPreferredHostForOpenShift(opts); err != nil {
-		return err
-	}
-
 	cc, sched, err := Setup(ctx, opts, registryOptions...)
 	if err != nil {
 		return err
@@ -141,11 +137,6 @@ func runCommand(cmd *cobra.Command, opts *options.Options, registryOptions ...Op
 func Run(ctx context.Context, cc *schedulerserverconfig.CompletedConfig, sched *scheduler.Scheduler) error {
 	// To help debugging, immediately log version
 	klog.InfoS("Starting Kubernetes Scheduler", "version", version.Get())
-
-	// start the localhost health monitor early so that it can be used by the LE client
-	if cc.OpenShiftContext.PreferredHostHealthMonitor != nil {
-		go cc.OpenShiftContext.PreferredHostHealthMonitor.Run(ctx)
-	}
 
 	// Configz registration.
 	if cz, err := configz.New("componentconfig"); err == nil {
@@ -244,7 +235,7 @@ func buildHandlerChain(handler http.Handler, authn authenticator.Request, authz 
 	handler = genericapifilters.WithAuthentication(handler, authn, failedHandler, nil)
 	handler = genericapifilters.WithRequestInfo(handler, requestInfoResolver)
 	handler = genericapifilters.WithCacheControl(handler)
-	handler = genericfilters.WithHTTPLogging(handler, nil)
+	handler = genericfilters.WithHTTPLogging(handler)
 	handler = genericfilters.WithPanicRecovery(handler, requestInfoResolver)
 
 	return handler
