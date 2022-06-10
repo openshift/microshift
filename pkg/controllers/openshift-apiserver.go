@@ -67,7 +67,7 @@ func (s *OCPAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.options = options
 	s.options.ConfigFile = configFilePath
 
-	klog.Infof("starting openshift-apiserver %s")
+	klog.Infof("starting openshift-apiserver")
 	return nil
 
 }
