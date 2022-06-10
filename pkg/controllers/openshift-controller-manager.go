@@ -22,7 +22,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
 	"k8s.io/klog/v2"
 
 	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
@@ -60,29 +59,9 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 	}
 
 	var configFilePath = cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml"
-	args := []string{
-		"--config=" + configFilePath,
-	}
-
-	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
-	options.ConfigFilePath = configFilePath
-
-	cmd := &cobra.Command{
-		Use:          componentOCM,
-		Long:         componentOCM,
-		SilenceUsage: true,
-		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
-	}
-
-	flags := cmd.Flags()
-	cmd.SetArgs(args)
-	flags.StringVar(&options.ConfigFilePath, "config", options.ConfigFilePath, "Location of the master configuration file to run from.")
-	cmd.MarkFlagFilename("config", "yaml", "yml")
-	cmd.MarkFlagRequired("config")
-
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
-	s.ConfigFilePath = options.ConfigFilePath
-	s.Output = options.Output
+	s.ConfigFilePath = configFilePath
+	s.Output = os.Stdout
 }
 
 func (s *OCPControllerManager) writeConfig(cfg *config.MicroshiftConfig) error {
