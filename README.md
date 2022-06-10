@@ -24,4 +24,6 @@ The following productization and development topics are documented in the curren
 
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
 
+To get started with MicroShift, please refer to the [Getting Started](https://microshift.io/docs/getting-started/) section of the MicroShift [User Documentation](https://microshift.io/docs/user-documentation/).
+
 For information about getting in touch with the MicroShift community, check our [community page](https://microshift.io/docs/community/). 
