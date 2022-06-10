@@ -18,7 +18,7 @@ MicroShift aims at meeting all of the following design goals:
 
 * **Production-grade:**
   * MicroShift supports deployments with 1 or 3 control plane and 0..N worker instances.
-  * MicroShift can be deployed containerized on Podman or Docker or non-containerized via RPM and managed via systemd; it is compatible with `rpm-ostree`-based systems.
+  * MicroShift can be deployed via RPM and managed via systemd. It is compatible with `rpm-ostree`-based systems.
   * MicroShift's lifecyle is decoupled from the underlying OS's lifecycle.
   * MicroShift can be deployed such that updates or changes to it do not disrupt running workloads.
   * MicroShift meets DISA STIG and FedRAMP security requirements; it runs as non-privileged workload and supports common CVE and auditing workflows.
