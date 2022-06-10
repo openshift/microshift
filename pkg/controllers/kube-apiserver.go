@@ -19,18 +19,17 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/spf13/cobra"
-
 	"github.com/openshift/microshift/pkg/config"
 
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
+	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/component-base/cli/globalflag"
 	genericcontrollermanager "k8s.io/controller-manager/app"
 	"k8s.io/klog/v2"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
@@ -68,76 +67,80 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 		klog.Fatalf("Failed to configure kube-apiserver OAuth %v", err)
 	}
 
-	// configure the kube-apiserver instance
-	// TODO: configure serverOptions directly rather than via cobra
-	s.serverOptions = options.NewServerRunOptions()
-
 	// Get the apiserver port so we can set it as an argument
 	apiServerPort, err := cfg.Cluster.ApiServerPort()
+	if err != nil {
+		// FIXME: This function needs to deal with errors
+		return
+	}
+
+	// configure the kube-apiserver instance
+	s.serverOptions = options.NewServerRunOptions()
+
+	s.serverOptions.AllowPrivileged = true
+	s.serverOptions.EnableAggregatorRouting = true
+	s.serverOptions.Features.EnableProfiling = false
+	s.serverOptions.ServiceAccountSigningKeyFile = cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"
+	s.serverOptions.ServiceClusterIPRanges = cfg.Cluster.ServiceCIDR
+	s.serverOptions.ServiceNodePortRange = utilnet.PortRange{}
+	// let the type deal with parsing the config file content
+	err = s.serverOptions.ServiceNodePortRange.Set(cfg.Cluster.ServiceNodePortRange)
 	if err != nil {
 		return
 	}
 
-	args := []string{
-		//"--openshift-config=" + cfg.DataDir + "/resources/kube-apiserver/config/config.yaml", //TOOD
-		//"--advertise-address=" + ip,
-		"--allow-privileged=true",
-		"--anonymous-auth=false",
-		"--audit-policy-file=" + cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml",
-		"--api-audiences=https://kubernetes.svc",
-		"--authorization-mode=Node,RBAC",
-		"--bind-address=0.0.0.0",
-		"--secure-port=" + apiServerPort,
-		"--client-ca-file=" + caCertFile,
-		"--enable-admission-plugins=NodeRestriction",
-		"--enable-aggregator-routing=true",
-		"--etcd-cafile=" + caCertFile,
-		"--etcd-certfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt",
-		"--etcd-keyfile=" + cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key",
-		"--etcd-servers=https://127.0.0.1:2379",
-		"--kubelet-certificate-authority=" + caCertFile,
-		"--kubelet-client-certificate=" + cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt",
-		"--kubelet-client-key=" + cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key",
-		"--profiling=false",
-		"--proxy-client-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.crt",
-		"--proxy-client-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.key",
-		"--requestheader-allowed-names=aggregator,system:aggregator,openshift-apiserver,system:openshift-apiserver,kube-apiserver-proxy,system:kube-apiserver-proxy,openshift-aggregator,system:openshift-aggregator",
-		"--requestheader-client-ca-file=" + caCertFile,
-		"--requestheader-extra-headers-prefix=X-Remote-Extra-",
-		"--requestheader-group-headers=X-Remote-Group",
-		"--requestheader-username-headers=X-Remote-User",
-		"--service-account-issuer=https://kubernetes.svc",
-		"--service-account-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.crt",
-		"--service-account-signing-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
-		"--service-cluster-ip-range=" + cfg.Cluster.ServiceCIDR,
-		"--service-node-port-range=" + cfg.Cluster.ServiceNodePortRange,
-		"--storage-backend=etcd3",
-		"--tls-cert-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt",
-		"--tls-private-key-file=" + cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key",
-		"--cors-allowed-origins=/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$",
+	s.serverOptions.ProxyClientCertFile = cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.crt"
+	s.serverOptions.ProxyClientKeyFile = cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.key"
+
+	s.serverOptions.Admission.GenericAdmission.EnablePlugins = []string{"NodeRestriction"}
+
+	s.serverOptions.Audit.PolicyFile = cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"
+
+	s.serverOptions.Authentication.APIAudiences = []string{"https://kubernetes.svc"}
+	s.serverOptions.Authentication.Anonymous.Allow = false
+	s.serverOptions.Authentication.ClientCert.ClientCA = caCertFile
+
+	s.serverOptions.Authentication.RequestHeader.AllowedNames = []string{
+		"aggregator",
+		"system:aggregator",
+		"openshift-apiserver",
+		"system:openshift-apiserver",
+		"kube-apiserver-proxy",
+		"system:kube-apiserver-proxy",
+		"openshift-aggregator",
+		"system:openshift-aggregator",
 	}
-	if cfg.AuditLogDir != "" {
-		args = append(args,
-			"--audit-log-path="+filepath.Join(cfg.AuditLogDir, "kube-apiserver-audit.log"))
-		args = append(args, "--audit-log-maxage=7")
+	s.serverOptions.Authentication.RequestHeader.ClientCAFile = caCertFile
+	s.serverOptions.Authentication.RequestHeader.ExtraHeaderPrefixes = []string{"X-Remote-Extra-"}
+	s.serverOptions.Authentication.RequestHeader.GroupHeaders = []string{"X-Remote-Group"}
+	s.serverOptions.Authentication.RequestHeader.UsernameHeaders = []string{"X-Remote-User"}
+
+	s.serverOptions.Authentication.ServiceAccounts.Issuers = []string{"https://kubernetes.svc"}
+	s.serverOptions.Authentication.ServiceAccounts.KeyFiles = []string{
+		cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.crt",
 	}
 
-	// fake the kube-apiserver cobra command to parse args into serverOptions
-	cmd := &cobra.Command{
-		Use:          "kube-apiserver",
-		Long:         `kube-apiserver`,
-		SilenceUsage: true,
-		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
+	s.serverOptions.Authorization.Modes = []string{"Node", "RBAC"}
+
+	s.serverOptions.Etcd.StorageConfig.Transport.ServerList = []string{"https://127.0.0.1:2379"}
+	s.serverOptions.Etcd.StorageConfig.Transport.CertFile = cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt"
+	s.serverOptions.Etcd.StorageConfig.Transport.TrustedCAFile = caCertFile
+	s.serverOptions.Etcd.StorageConfig.Transport.KeyFile = cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key"
+	s.serverOptions.Etcd.StorageConfig.Transport.ServerList = []string{"https://127.0.0.1:2379"}
+	s.serverOptions.Etcd.StorageConfig.Type = "etcd3"
+
+	s.serverOptions.GenericServerRunOptions.CorsAllowedOriginList = []string{
+		"/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$",
 	}
-	namedFlagSets := s.serverOptions.Flags()
-	globalflag.AddGlobalFlags(namedFlagSets.FlagSet("global"), cmd.Name())
-	options.AddCustomGlobalFlags(namedFlagSets.FlagSet("generic"))
-	for _, f := range namedFlagSets.FlagSets {
-		cmd.Flags().AddFlagSet(f)
-	}
-	if err := cmd.ParseFlags(args); err != nil {
-		klog.Fatalf("%s failed to parse flags", s.Name(), err)
-	}
+
+	s.serverOptions.KubeletConfig.CertFile = cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt"
+	s.serverOptions.KubeletConfig.CAFile = caCertFile
+	s.serverOptions.KubeletConfig.KeyFile = cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key"
+
+	s.serverOptions.SecureServing.BindAddress = net.IP{0, 0, 0, 0}
+	s.serverOptions.SecureServing.BindPort = apiServerPort
+	s.serverOptions.SecureServing.ServerCert.CertKey.CertFile = cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt"
+	s.serverOptions.SecureServing.ServerCert.CertKey.KeyFile = cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key"
 
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
 }
