@@ -16,7 +16,7 @@ We believe these properties should also make MicroShift a great tool for other u
 
 To build MicroShift from source and contribute to its development, refer to the MicroShift [Developer Documentation](./docs/devenv_rhel8.md).
 
-The following MicroShift productization and development documentation is included in the current repository:
+The following productization and development topics are documented in the current repository:
 - [MicroShift Design](./docs/design.md)
 - [MicroShift Development Environment on RHEL 8.x](./docs/devenv_rhel8.md)
 
@@ -24,4 +24,4 @@ The following MicroShift productization and development documentation is include
 
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
 
-For information about getting in touch with the MicroShift community, please check our [community page](https://microshift.io/docs/community/). 
+For information about getting in touch with the MicroShift community, check our [community page](https://microshift.io/docs/community/). 
