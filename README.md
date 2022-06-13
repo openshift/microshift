@@ -19,6 +19,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 The following productization and development topics are documented in the current repository:
 - [MicroShift Design](./docs/design.md)
 - [MicroShift Development Environment on RHEL 8.x](./docs/devenv_rhel8.md)
+- [OpenShift CI for MicroShift](./docs/openshift_ci.md)
 
 ## Community
 
