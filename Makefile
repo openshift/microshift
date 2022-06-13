@@ -13,8 +13,8 @@ include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/
 export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
 
-RELEASE_BASE := 4.10.0
-RELEASE_PRE := ${RELEASE_BASE}-0.microshift
+RELEASE_BASE := 4.11.0
+RELEASE_PRE := ${RELEASE_BASE}-0
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
@@ -53,15 +53,15 @@ endif
 
 GO_LD_FLAGS := $(GC_FLAGS) -ldflags "-X k8s.io/component-base/version.gitMajor=1 \
                    -X k8s.io/component-base/version.gitMajor=1 \
-                   -X k8s.io/component-base/version.gitMinor=23 \
-                   -X k8s.io/component-base/version.gitVersion=v1.23.1 \
-                   -X k8s.io/component-base/version.gitCommit=e9ccfad \
+                   -X k8s.io/component-base/version.gitMinor=24 \
+                   -X k8s.io/component-base/version.gitVersion=v1.24.0 \
+                   -X k8s.io/component-base/version.gitCommit=bb9c2f1 \
                    -X k8s.io/component-base/version.gitTreeState=clean \
                    -X k8s.io/component-base/version.buildDate=$(BIN_TIMESTAMP) \
                    -X k8s.io/client-go/pkg/version.gitMajor=1 \
-                   -X k8s.io/client-go/pkg/version.gitMinor=23 \
-                   -X k8s.io/client-go/pkg/version.gitVersion=v1.23.1 \
-                   -X k8s.io/client-go/pkg/version.gitCommit=a475c28 \
+                   -X k8s.io/client-go/pkg/version.gitMinor=24 \
+                   -X k8s.io/client-go/pkg/version.gitVersion=v1.24.0 \
+                   -X k8s.io/client-go/pkg/version.gitCommit=bb9c2f1 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    -X github.com/openshift/microshift/pkg/version.versionFromGit=$(EMBEDDED_GIT_TAG) \
