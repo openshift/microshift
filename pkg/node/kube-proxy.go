@@ -22,8 +22,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
-
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 
@@ -53,24 +51,11 @@ func (s *ProxyOptions) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {
 		klog.Fatalf("Failed to write kube-proxy config: %v", err)
 	}
-	// Keeping the args in case something must be added in the future
-	args := []string{}
-	cmd := &cobra.Command{
-		Use:          componentKubeProxy,
-		Long:         componentKubeProxy,
-		SilenceUsage: true,
-		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
-	}
 
 	opts := kubeproxy.NewOptions()
 	opts.ConfigFile = cfg.DataDir + "/resources/kube-proxy/config/config.yaml"
 	opts.Complete()
 	s.options = opts
-	cmd.SetArgs(args)
-
-	if err := cmd.ParseFlags(args); err != nil {
-		klog.Fatalf("Failed to parse flags:%v", err)
-	}
 }
 
 func (s *ProxyOptions) writeConfig(cfg *config.MicroshiftConfig) error {
