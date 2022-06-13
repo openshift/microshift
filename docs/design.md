@@ -18,7 +18,7 @@ MicroShift aims at meeting all of the following design goals:
 
 * **Production-grade:**
   * MicroShift supports deployments with 1 node acting as control plane and worker. Orchestration of multi-node control plane configurations introduces unwanted complexity into deployment and upgrade processes. A single-node control plane becomes a single point of failure when worker nodes are attached, which eliminates the high availability benefits of running workloads on kubernetes. For application availability, we recommend running two single-node instances that deploy a common application in active/active or active/passive mode and then using existing tools to support failover between those states when either host is unable to provide availability.
-  * MicroShift can be deployed containerized on Podman or Docker or non-containerized via RPM and managed via systemd; it is compatible with `rpm-ostree`-based systems.
+  * MicroShift can be deployed via RPM and managed via systemd. It is compatible with `rpm-ostree`-based systems.
   * MicroShift's lifecyle is decoupled from the underlying OS's lifecycle.
   * MicroShift can be deployed such that updates or changes to it do not disrupt running workloads.
   * MicroShift meets DISA STIG and FedRAMP security requirements; it runs as non-privileged workload and supports common CVE and auditing workflows.
