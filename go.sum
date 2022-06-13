@@ -451,8 +451,6 @@ github.com/openshift/kubernetes-metrics v0.0.0-20211216181011-1d26bcb74117 h1:3Y
 github.com/openshift/kubernetes-metrics v0.0.0-20211216181011-1d26bcb74117/go.mod h1:qXvsM1KANrc+ZZeFwj6Phvf0NLiC+d3RwcsLcdGc+xs=
 github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88 h1:qGy3+6O8JcrMtHFRVaOWyeMI0e5MryAKyMIRc7AArzw=
 github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88/go.mod h1:6AmNM4N4nHftckybV/U7bQW+5AvK5TW81ndSI6KEidw=
-github.com/openshift/oauth-apiserver v0.0.0-20220203215117-e85441345214 h1:qNRgdmp64OheGuZcnmgKtlhWQlRGw8oqbiJgpzEtqLw=
-github.com/openshift/oauth-apiserver v0.0.0-20220203215117-e85441345214/go.mod h1:25sGAb+DvswK1R6LzdMVVFp8rRMtNUQIPN5hR7cQ5B8=
 github.com/openshift/openshift-apiserver v0.0.0-alpha.0.0.20220214215439-6b16f7fa1a95 h1:ISKvidB+JZFEY9clOk2AR/CAZnNTjnDLiMJXG+oR7pw=
 github.com/openshift/openshift-apiserver v0.0.0-alpha.0.0.20220214215439-6b16f7fa1a95/go.mod h1:R0Fl50pF9kRj5hF61wotQOoyXbC5ZDr8F22AKM6GbJU=
 github.com/openshift/openshift-controller-manager v0.0.0-alpha.0.0.20220106174623-2c2d50dbda3a h1:G4lOqG0PMPpU/Fm0qXwa1Om64//kd31/ikHrb2hk5JU=
@@ -701,7 +699,6 @@ k8s.io/kube-aggregator v0.23.1 h1:w05VLh3ji05gYQglMKKrwafgqjgIxZoBusxdSWS9d/4=
 k8s.io/kube-aggregator v0.23.1/go.mod h1:1SPZXYD/je2gKxxLBkYyG3yFxSCUWI5QTyjqP2ZxRDI=
 k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 h1:E3J9oCLlaobFUqsjG9DfKbP2BmgwBL2p7pn0A3dG9W4=
 k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65/go.mod h1:sX9MT8g7NVZM5lVL/j8QyCCJe8YSMW30QvGZWaCIDIk=
-k8s.io/kubernetes v1.22.2/go.mod h1:Snea7fgIObGgHmLbUJ3OgjGEr5bjj16iEdp5oHS6eS8=
 k8s.io/kubernetes v1.23.0/go.mod h1:sgD3+Qzb8FHlRKlZnNCN+np3zZuHEAb/0PKLJkYyCUI=
 k8s.io/kubernetes v1.23.1 h1:iJfubd03CDap4m69Ue+u2I6quNUYiYlC8+TakEHATjc=
 k8s.io/kubernetes v1.23.1/go.mod h1:baMGbPpwwP0kT/+eAPtdqoWNRoXyyTJ2Zf+fw/Y8t04=
@@ -712,7 +709,6 @@ k8s.io/pod-security-admission v0.23.1/go.mod h1:WDb/vFWf7jKSGe2e07LTEjDZ0MHMDhUI
 k8s.io/sample-apiserver v0.23.1/go.mod h1:5ZQrkouVpN6GeNMZEJFkIpFwaxgDPJin/cIBXyDboC4=
 k8s.io/system-validators v1.6.0/go.mod h1:bPldcLgkIUK22ALflnsXk8pvkTEndYdNuaHH6gRrl0Q=
 k8s.io/utils v0.0.0-20210802155522-efc7438f0176/go.mod h1:jPW/WVKK9YHAvNhRxK0md/EJ228hCsBRufyofKtW8HA=
-k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a/go.mod h1:jPW/WVKK9YHAvNhRxK0md/EJ228hCsBRufyofKtW8HA=
 k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b/go.mod h1:jPW/WVKK9YHAvNhRxK0md/EJ228hCsBRufyofKtW8HA=
 k8s.io/utils v0.0.0-20211116205334-6203023598ed/go.mod h1:jPW/WVKK9YHAvNhRxK0md/EJ228hCsBRufyofKtW8HA=
 k8s.io/utils v0.0.0-20211208161948-7d6a63dca704 h1:ZKMMxTvduyf5WUtREOqg5LiXaN1KO/+0oOQPRFrClpo=

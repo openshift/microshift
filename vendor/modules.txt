@@ -800,7 +800,6 @@ github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout
 github.com/openshift/library-go/pkg/apiserver/apiserverconfig
 github.com/openshift/library-go/pkg/apps/appsserialization
 github.com/openshift/library-go/pkg/apps/appsutil
-github.com/openshift/library-go/pkg/authentication/bootstrapauthenticator
 github.com/openshift/library-go/pkg/authorization/authorizationutil
 github.com/openshift/library-go/pkg/authorization/scopemetadata
 github.com/openshift/library-go/pkg/build/buildutil
@@ -821,8 +820,6 @@ github.com/openshift/library-go/pkg/image/registryclient
 github.com/openshift/library-go/pkg/image/trigger
 github.com/openshift/library-go/pkg/legacyapi/legacygroupification
 github.com/openshift/library-go/pkg/network
-github.com/openshift/library-go/pkg/oauth/oauthserviceaccountclient
-github.com/openshift/library-go/pkg/oauth/usercache
 github.com/openshift/library-go/pkg/quota/clusterquotamapping
 github.com/openshift/library-go/pkg/quota/quotautil
 github.com/openshift/library-go/pkg/security/uid
@@ -831,51 +828,6 @@ github.com/openshift/library-go/pkg/template/generator
 github.com/openshift/library-go/pkg/template/templateprocessing
 github.com/openshift/library-go/pkg/template/templateprocessingclient
 github.com/openshift/library-go/pkg/unidling/unidlingclient
-# github.com/openshift/oauth-apiserver v0.0.0-20220203215117-e85441345214
-## explicit
-github.com/openshift/oauth-apiserver/pkg/api/install
-github.com/openshift/oauth-apiserver/pkg/apiserver
-github.com/openshift/oauth-apiserver/pkg/authorization/hardcodedauthorizer
-github.com/openshift/oauth-apiserver/pkg/cmd/oauth-apiserver
-github.com/openshift/oauth-apiserver/pkg/cmd/oauth-apiserver/openapiconfig
-github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth
-github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth/install
-github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth/v1
-github.com/openshift/oauth-apiserver/pkg/oauth/apis/oauth/validation
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthaccesstoken
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthaccesstoken/etcd
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthauthorizetoken
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthauthorizetoken/etcd
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthclient
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthclient/etcd
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthclientauthorization
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/oauthclientauthorization/etcd
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/tokenreviews
-github.com/openshift/oauth-apiserver/pkg/oauth/apiserver/registry/useroauthaccesstokens/delegate
-github.com/openshift/oauth-apiserver/pkg/oauth/printers/internalversion
-github.com/openshift/oauth-apiserver/pkg/openapi
-github.com/openshift/oauth-apiserver/pkg/printers
-github.com/openshift/oauth-apiserver/pkg/printerstorage
-github.com/openshift/oauth-apiserver/pkg/serverscheme
-github.com/openshift/oauth-apiserver/pkg/tokenvalidation
-github.com/openshift/oauth-apiserver/pkg/tokenvalidation/apis
-github.com/openshift/oauth-apiserver/pkg/tokenvalidation/options
-github.com/openshift/oauth-apiserver/pkg/tokenvalidation/rankedset
-github.com/openshift/oauth-apiserver/pkg/user/apis/user
-github.com/openshift/oauth-apiserver/pkg/user/apis/user/install
-github.com/openshift/oauth-apiserver/pkg/user/apis/user/v1
-github.com/openshift/oauth-apiserver/pkg/user/apis/user/validation
-github.com/openshift/oauth-apiserver/pkg/user/apiserver
-github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/group
-github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/group/etcd
-github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/identity
-github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/identity/etcd
-github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/user
-github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/user/etcd
-github.com/openshift/oauth-apiserver/pkg/user/apiserver/registry/useridentitymapping
-github.com/openshift/oauth-apiserver/pkg/user/printers/internalversion
-github.com/openshift/oauth-apiserver/pkg/version
 # github.com/openshift/openshift-apiserver v0.0.0-alpha.0.0.20220214215439-6b16f7fa1a95
 ## explicit
 github.com/openshift/openshift-apiserver/pkg/admission
@@ -1080,6 +1032,7 @@ github.com/peterbourgon/diskv
 ## explicit
 github.com/pkg/errors
 # github.com/pkg/profile v1.4.0 => github.com/pkg/profile v1.3.0
+## explicit
 github.com/pkg/profile
 # github.com/pmezard/go-difflib v1.0.0 => github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
@@ -1757,7 +1710,6 @@ k8s.io/apimachinery/pkg/runtime/serializer/versioning
 k8s.io/apimachinery/pkg/selection
 k8s.io/apimachinery/pkg/types
 k8s.io/apimachinery/pkg/util/cache
-k8s.io/apimachinery/pkg/util/clock
 k8s.io/apimachinery/pkg/util/diff
 k8s.io/apimachinery/pkg/util/duration
 k8s.io/apimachinery/pkg/util/errors

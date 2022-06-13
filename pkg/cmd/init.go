@@ -133,12 +133,6 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName, apiServerServiceIP.String()}); err != nil {
 		return err
 	}
-	if err := util.GenCerts("openshift-oauth-apiserver", cfg.DataDir+"/resources/openshift-oauth-apiserver/secrets",
-		"tls.crt", "tls.key",
-		[]string{"openshift-oauth-apiserver", cfg.NodeIP, cfg.NodeName, "127.0.0.1", "openshift-oauth-apiserver.default.svc",
-			"openshift-oauth-apiserver.svc", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
-		return err
-	}
 	return nil
 }
 

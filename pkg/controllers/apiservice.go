@@ -152,7 +152,6 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 	client := apiregistrationclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "apiregistration-agent"))
 	for _, apiSvc := range []string{
 		"v1.authorization.openshift.io",
-		//"v1.oauth.openshift.io", //TODO check if they exist
 		"v1.project.openshift.io",
 		"v1.route.openshift.io",
 		"v1.security.openshift.io",
@@ -181,36 +180,6 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 		if apierrors.IsNotFound(err) {
 			klog.Infof("creating api registration %s", api.Name)
 			_, _ = client.APIServices().Create(context.TODO(), api, metav1.CreateOptions{})
-		}
-	}
-
-	for _, oauthApiSvc := range []string{
-		"v1.user.openshift.io",
-	} {
-		oauthApi := &apiregistrationv1.APIService{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "APIService",
-				APIVersion: "v1",
-			},
-			ObjectMeta: metav1.ObjectMeta{
-				Name: oauthApiSvc,
-			},
-			Spec: apiregistrationv1.APIServiceSpec{
-				Service: &apiregistrationv1.ServiceReference{
-					Name:      "openshift-oauth-apiserver",
-					Namespace: "default",
-				},
-				Group:                trimFirst(oauthApiSvc, "."),
-				GroupPriorityMinimum: 9900,
-				Version:              "v1",
-				CABundle:             caFile,
-				VersionPriority:      15,
-			},
-		}
-		_, err = client.APIServices().Get(context.TODO(), oauthApi.Name, metav1.GetOptions{})
-		if apierrors.IsNotFound(err) {
-			klog.Infof("creating api registration %s", oauthApi.Name)
-			_, _ = client.APIServices().Create(context.TODO(), oauthApi, metav1.CreateOptions{})
 		}
 	}
 	return nil
