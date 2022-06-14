@@ -5,5 +5,3 @@ metadata:
   annotations:
     openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
-  labels:
-    openshift.io/run-level-: "" # remove the label on upgrades

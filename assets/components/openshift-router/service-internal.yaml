@@ -2,8 +2,16 @@
 # Ingress Controller specific annotations are applied at runtime.
 kind: Service
 apiVersion: v1
-# name, namespace and annotations are set at runtime.
+metadata:
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: router-certs-default
+  labels:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  name: router-internal-default
+  namespace: openshift-ingress
 spec:
+  selector:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
   type: ClusterIP
   ports:
   - name: http
