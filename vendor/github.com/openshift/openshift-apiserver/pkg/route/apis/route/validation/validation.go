@@ -72,6 +72,21 @@ func validateRoute(route *routeapi.Route, checkHostname bool) field.ErrorList {
 		}
 	}
 
+	if len(route.Spec.Subdomain) > 0 {
+		// Subdomain is not lenient because it was never used outside of
+		// routes.
+		//
+		// TODO: Use ValidateSubdomain from library-go.
+		if len(route.Spec.Subdomain) > kvalidation.DNS1123SubdomainMaxLength {
+			result = append(result, field.Invalid(field.NewPath("spec.subdomain"), route.Spec.Subdomain, kvalidation.MaxLenError(kvalidation.DNS1123SubdomainMaxLength)))
+		}
+		for _, label := range strings.Split(route.Spec.Subdomain, ".") {
+			if errs := kvalidation.IsDNS1123Label(label); len(errs) > 0 {
+				result = append(result, field.Invalid(field.NewPath("spec.subdomain"), label, strings.Join(errs, ", ")))
+			}
+		}
+	}
+
 	if err := validateWildcardPolicy(route.Spec.Host, route.Spec.WildcardPolicy, specPath.Child("wildcardPolicy")); err != nil {
 		result = append(result, err)
 	}

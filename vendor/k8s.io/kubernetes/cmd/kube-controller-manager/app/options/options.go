@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/spf13/pflag"
 	v1 "k8s.io/api/core/v1"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	apiserveroptions "k8s.io/apiserver/pkg/server/options"
@@ -49,6 +48,8 @@ import (
 
 	// add the kubernetes feature gates
 	_ "k8s.io/kubernetes/pkg/features"
+
+	libgorestclient "github.com/openshift/library-go/pkg/config/client"
 )
 
 const (
@@ -96,6 +97,7 @@ type KubeControllerManagerOptions struct {
 	Master                      string
 	Kubeconfig                  string
 	ShowHiddenMetricsForVersion string
+	OpenShiftContext            kubecontrollerconfig.OpenShiftContext
 }
 
 // NewKubeControllerManagerOptions creates a new KubeControllerManagerOptions with a default config.
@@ -222,20 +224,6 @@ func NewDefaultComponentConfig() (kubectrlmgrconfig.KubeControllerManagerConfigu
 	return internal, nil
 }
 
-// TODO: remove these insecure flags in v1.24
-func addDummyInsecureFlags(fs *pflag.FlagSet) {
-	var (
-		bindAddr = net.IPv4(127, 0, 0, 1)
-		bindPort = 0
-	)
-	fs.IPVar(&bindAddr, "address", bindAddr,
-		"The IP address on which to serve the insecure --port (set to 0.0.0.0 for all IPv4 interfaces and :: for all IPv6 interfaces).")
-	fs.MarkDeprecated("address", "This flag has no effect now and will be removed in v1.24.")
-
-	fs.IntVar(&bindPort, "port", bindPort, "The port on which to serve unsecured, unauthenticated access. Set to 0 to disable.")
-	fs.MarkDeprecated("port", "This flag has no effect now and will be removed in v1.24.")
-}
-
 // Flags returns flags for a specific APIServer by section name
 func (s *KubeControllerManagerOptions) Flags(allControllers []string, disabledByDefaultControllers []string) cliflag.NamedFlagSets {
 	fss := cliflag.NamedFlagSets{}
@@ -244,7 +232,6 @@ func (s *KubeControllerManagerOptions) Flags(allControllers []string, disabledBy
 	s.ServiceController.AddFlags(fss.FlagSet("service controller"))
 
 	s.SecureServing.AddFlags(fss.FlagSet("secure serving"))
-	addDummyInsecureFlags(fss.FlagSet("insecure serving"))
 	s.Authentication.AddFlags(fss.FlagSet("authentication"))
 	s.Authorization.AddFlags(fss.FlagSet("authorization"))
 
@@ -278,6 +265,12 @@ func (s *KubeControllerManagerOptions) Flags(allControllers []string, disabledBy
 	fs := fss.FlagSet("misc")
 	fs.StringVar(&s.Master, "master", s.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig).")
 	fs.StringVar(&s.Kubeconfig, "kubeconfig", s.Kubeconfig, "Path to kubeconfig file with authorization and master location information.")
+	var dummy string
+	fs.MarkDeprecated("insecure-experimental-approve-all-kubelet-csrs-for-group", "This flag does nothing.")
+	fs.StringVar(&dummy, "insecure-experimental-approve-all-kubelet-csrs-for-group", "", "This flag does nothing.")
+	fs.StringVar(&s.OpenShiftContext.OpenShiftConfig, "openshift-config", s.OpenShiftContext.OpenShiftConfig, "indicates that this process should be compatible with openshift start master")
+	fs.MarkHidden("openshift-config")
+	fs.BoolVar(&s.OpenShiftContext.UnsupportedKubeAPIOverPreferredHost, "unsupported-kube-api-over-localhost", false, "when set makes KCM prefer talking to localhost kube-apiserver (when available) instead of LB")
 	utilfeature.DefaultMutableFeatureGate.AddFlag(fss.FlagSet("generic"))
 
 	return fss
@@ -377,6 +370,9 @@ func (s *KubeControllerManagerOptions) ApplyTo(c *kubecontrollerconfig.Config) e
 			return err
 		}
 	}
+
+	c.OpenShiftContext = s.OpenShiftContext
+
 	return nil
 }
 
@@ -440,6 +436,14 @@ func (s KubeControllerManagerOptions) Config(allControllers []string, disabledBy
 	kubeconfig.ContentConfig.ContentType = s.Generic.ClientConnection.ContentType
 	kubeconfig.QPS = s.Generic.ClientConnection.QPS
 	kubeconfig.Burst = int(s.Generic.ClientConnection.Burst)
+
+	if s.OpenShiftContext.PreferredHostRoundTripperWrapperFn != nil {
+		libgorestclient.DefaultServerName(kubeconfig)
+		kubeconfig.Wrap(s.OpenShiftContext.PreferredHostRoundTripperWrapperFn)
+	}
+	for _, customOpenShiftRoundTripper := range s.OpenShiftContext.CustomRoundTrippers {
+		kubeconfig.Wrap(customOpenShiftRoundTripper)
+	}
 
 	client, err := clientset.NewForConfig(restclient.AddUserAgent(kubeconfig, KubeControllerManagerUserAgent))
 	if err != nil {

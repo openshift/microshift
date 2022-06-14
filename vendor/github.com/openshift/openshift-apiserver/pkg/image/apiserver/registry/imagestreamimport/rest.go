@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/containers/image/pkg/sysregistriesv2"
+	"github.com/containers/image/v5/pkg/sysregistriesv2"
 
 	authorizationapi "k8s.io/api/authorization/v1"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -37,8 +37,8 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registries"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
+	"github.com/openshift/runtime-utils/pkg/registries"
 )
 
 // ImporterFunc returns an instance of the importer that should be used per invocation.

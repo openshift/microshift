@@ -212,32 +212,32 @@ func (l *ImageLayers) SetResourceVersion(version string) { l.ResourceVersion = v
 
 // These methods are unused stubs to satisfy meta.Object.
 
-func (l *ImageLayers) SetNamespace(namespace string)                {}
-func (l *ImageLayers) SetName(name string)                          {}
-func (l *ImageLayers) GetGenerateName() string                      { return "" }
-func (l *ImageLayers) SetGenerateName(name string)                  {}
-func (l *ImageLayers) GetUID() types.UID                            { return "" }
-func (l *ImageLayers) SetUID(uid types.UID)                         {}
-func (l *ImageLayers) GetGeneration() int64                         { return 0 }
-func (l *ImageLayers) SetGeneration(generation int64)               {}
-func (l *ImageLayers) GetSelfLink() string                          { return "" }
-func (l *ImageLayers) SetSelfLink(selfLink string)                  {}
-func (l *ImageLayers) GetCreationTimestamp() metav1.Time            { return metav1.Time{} }
-func (l *ImageLayers) SetCreationTimestamp(timestamp metav1.Time)   {}
-func (l *ImageLayers) GetDeletionTimestamp() *metav1.Time           { return nil }
-func (l *ImageLayers) SetDeletionTimestamp(timestamp *metav1.Time)  {}
-func (l *ImageLayers) GetDeletionGracePeriodSeconds() *int64        { return nil }
-func (l *ImageLayers) SetDeletionGracePeriodSeconds(*int64)         {}
-func (l *ImageLayers) GetLabels() map[string]string                 { return nil }
-func (l *ImageLayers) SetLabels(labels map[string]string)           {}
-func (l *ImageLayers) GetAnnotations() map[string]string            { return nil }
-func (l *ImageLayers) SetAnnotations(annotations map[string]string) {}
-func (l *ImageLayers) GetFinalizers() []string                      { return nil }
-func (l *ImageLayers) SetFinalizers(finalizers []string)            {}
-func (l *ImageLayers) GetOwnerReferences() []metav1.OwnerReference  { return nil }
-func (l *ImageLayers) SetOwnerReferences([]metav1.OwnerReference)   {}
-func (l *ImageLayers) GetClusterName() string                       { return "" }
-func (l *ImageLayers) SetClusterName(clusterName string)            {}
+func (l *ImageLayers) SetNamespace(namespace string)                   {}
+func (l *ImageLayers) SetName(name string)                             {}
+func (l *ImageLayers) GetGenerateName() string                         { return "" }
+func (l *ImageLayers) SetGenerateName(name string)                     {}
+func (l *ImageLayers) GetUID() types.UID                               { return "" }
+func (l *ImageLayers) SetUID(uid types.UID)                            {}
+func (l *ImageLayers) GetGeneration() int64                            { return 0 }
+func (l *ImageLayers) SetGeneration(generation int64)                  {}
+func (l *ImageLayers) GetSelfLink() string                             { return "" }
+func (l *ImageLayers) SetSelfLink(selfLink string)                     {}
+func (l *ImageLayers) GetCreationTimestamp() metav1.Time               { return metav1.Time{} }
+func (l *ImageLayers) SetCreationTimestamp(timestamp metav1.Time)      {}
+func (l *ImageLayers) GetDeletionTimestamp() *metav1.Time              { return nil }
+func (l *ImageLayers) SetDeletionTimestamp(timestamp *metav1.Time)     {}
+func (l *ImageLayers) GetDeletionGracePeriodSeconds() *int64           { return nil }
+func (l *ImageLayers) SetDeletionGracePeriodSeconds(*int64)            {}
+func (l *ImageLayers) GetLabels() map[string]string                    { return nil }
+func (l *ImageLayers) SetLabels(labels map[string]string)              {}
+func (l *ImageLayers) GetAnnotations() map[string]string               { return nil }
+func (l *ImageLayers) SetAnnotations(annotations map[string]string)    {}
+func (l *ImageLayers) GetFinalizers() []string                         { return nil }
+func (l *ImageLayers) SetFinalizers(finalizers []string)               {}
+func (l *ImageLayers) GetOwnerReferences() []metav1.OwnerReference     { return nil }
+func (l *ImageLayers) SetOwnerReferences([]metav1.OwnerReference)      {}
+func (l *ImageLayers) GetZZZ_DeprecatedClusterName() string            { return "" }
+func (l *ImageLayers) SetZZZ_DeprecatedClusterName(clusterName string) {}
 func (l *ImageLayers) GetManagedFields() []metav1.ManagedFieldsEntry {
 	return []metav1.ManagedFieldsEntry{}
 }

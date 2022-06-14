@@ -169,6 +169,8 @@ func (l syncedClusterRoleBindingLister) LastSyncResourceVersion() string {
 
 // AuthorizationCache maintains a cache on the set of namespaces a user or group can access.
 type AuthorizationCache struct {
+	lock sync.RWMutex
+
 	// allKnownNamespaces we track all the known namespaces, so we can detect deletes.
 	// TODO remove this in favor of a list/watch mechanism for projects
 	allKnownNamespaces        sets.String
@@ -408,6 +410,11 @@ func (ac *AuthorizationCache) synchronize() {
 	groupSubjectRecordStore := ac.groupSubjectRecordStore
 	reviewRecordStore := ac.reviewRecordStore
 
+	// from here on we must be the only writer to the cache
+	// Note: even the invalidateCache() func has side-effects on ac
+	ac.lock.Lock()
+	defer ac.lock.Unlock()
+
 	// if there was a global change that forced complete invalidation, we rebuild our cache and do a fast swap at end
 	invalidateCache := ac.invalidateCache()
 	if invalidateCache {
@@ -476,6 +483,9 @@ func (ac *AuthorizationCache) syncRequest(request *reviewRequest, userSubjectRec
 
 // List returns the set of namespace names the user has access to view
 func (ac *AuthorizationCache) List(userInfo user.Info, selector labels.Selector) (*corev1.NamespaceList, error) {
+	ac.lock.RLock()
+	defer ac.lock.RUnlock()
+
 	keys := sets.String{}
 	user := userInfo.GetName()
 	groups := userInfo.GetGroups()
@@ -520,6 +530,9 @@ func (ac *AuthorizationCache) List(userInfo user.Info, selector labels.Selector)
 }
 
 func (ac *AuthorizationCache) ReadyForAccess() bool {
+	ac.lock.RLock()
+	defer ac.lock.RUnlock()
+
 	return len(ac.lastState) > 0
 }
 

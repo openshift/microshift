@@ -65,6 +65,7 @@ type respLogger struct {
 	addedInfo          strings.Builder
 	addedKeyValuePairs []interface{}
 	startTime          time.Time
+	isTerminating      bool
 
 	captureErrorOutput bool
 
@@ -95,14 +96,16 @@ func DefaultStacktracePred(status int) bool {
 	return (status < http.StatusOK || status >= http.StatusInternalServerError) && status != http.StatusSwitchingProtocols
 }
 
+const withLoggingLevel = 3
+
 // WithLogging wraps the handler with logging.
-func WithLogging(handler http.Handler, pred StacktracePred) http.Handler {
+func WithLogging(handler http.Handler, pred StacktracePred, isTerminatingFn func() bool) http.Handler {
 	return withLogging(handler, pred, func() bool {
-		return klog.V(3).Enabled()
-	})
+		return klog.V(withLoggingLevel).Enabled()
+	}, isTerminatingFn)
 }
 
-func withLogging(handler http.Handler, stackTracePred StacktracePred, shouldLogRequest ShouldLogRequestPred) http.Handler {
+func withLogging(handler http.Handler, stackTracePred StacktracePred, shouldLogRequest ShouldLogRequestPred, isTerminatingFn func() bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if !shouldLogRequest() {
 			handler.ServeHTTP(w, req)
@@ -119,11 +122,17 @@ func withLogging(handler http.Handler, stackTracePred StacktracePred, shouldLogR
 			startTime = receivedTimestamp
 		}
 
-		rl := newLoggedWithStartTime(req, w, startTime)
-		rl.StacktraceWhen(stackTracePred)
-		req = req.WithContext(context.WithValue(ctx, respLoggerContextKey, rl))
+		isTerminating := false
+		if isTerminatingFn != nil {
+			isTerminating = isTerminatingFn()
+		}
+		rl := newLoggedWithStartTime(req, w, startTime).StacktraceWhen(stackTracePred).IsTerminating(isTerminating)
+				req = req.WithContext(context.WithValue(ctx, respLoggerContextKey, rl))
 		defer rl.Log()
 
+		if klog.V(3).Enabled() || (rl.isTerminating && klog.V(1).Enabled()) {
+			defer rl.Log()
+		}
 		w = responsewriter.WrapForHTTP1Or2(rl)
 		handler.ServeHTTP(w, req)
 	})
@@ -183,6 +192,12 @@ func (rl *respLogger) StacktraceWhen(pred StacktracePred) *respLogger {
 	return rl
 }
 
+// IsTerminating informs the logger that the server is terminating.
+func (rl *respLogger) IsTerminating(is bool) *respLogger {
+	rl.isTerminating = is
+	return rl
+}
+
 // StatusIsNot returns a StacktracePred which will cause stacktraces to be logged
 // for any status *not* in the given list.
 func StatusIsNot(statuses ...int) StacktracePred {
@@ -223,6 +238,14 @@ func (rl *respLogger) AddKeyValue(key string, value interface{}) {
 func AddKeyValue(ctx context.Context, key string, value interface{}) {
 	if rl := respLoggerFromContext(ctx); rl != nil {
 		rl.AddKeyValue(key, value)
+	}
+}
+
+// SetStacktracePredicate sets a custom stacktrace predicate for the
+// logger associated with the given request context.
+func SetStacktracePredicate(ctx context.Context, pred StacktracePred) {
+	if rl := respLoggerFromContext(ctx); rl != nil {
+		rl.StacktraceWhen(pred)
 	}
 }
 
@@ -272,7 +295,7 @@ func (rl *respLogger) Log() {
 		}
 	}
 
-	klog.InfoSDepth(1, "HTTP", keysAndValues...)
+	klog.V(withLoggingLevel).InfoSDepth(1, "HTTP", keysAndValues...)
 }
 
 // Header implements http.ResponseWriter.

@@ -120,7 +120,13 @@ type DaemonSetsController struct {
 	nodeLister corelisters.NodeLister
 	// nodeStoreSynced returns true if the node store has been synced at least once.
 	// Added as a member to the struct to allow injection for testing.
-	nodeStoreSynced cache.InformerSynced
+	nodeStoreSynced                    cache.InformerSynced
+	namespaceLister                    corelisters.NamespaceLister
+	namespaceStoreSynced               cache.InformerSynced
+	openshiftDefaultNodeSelectorString string
+	openshiftDefaultNodeSelector       labels.Selector
+	kubeDefaultNodeSelectorString      string
+	kubeDefaultNodeSelector            labels.Selector
 
 	// DaemonSet keys that need to be synced.
 	queue workqueue.RateLimitingInterface
@@ -286,6 +292,11 @@ func (dsc *DaemonSetsController) Run(ctx context.Context, workers int) {
 
 	if !cache.WaitForNamedCacheSync("daemon sets", ctx.Done(), dsc.podStoreSynced, dsc.nodeStoreSynced, dsc.historyStoreSynced, dsc.dsStoreSynced) {
 		return
+	}
+	if dsc.namespaceStoreSynced != nil {
+		if !cache.WaitForNamedCacheSync("daemon sets", ctx.Done(), dsc.namespaceStoreSynced) {
+			return
+		}
 	}
 
 	for i := 0; i < workers; i++ {
@@ -1254,7 +1265,7 @@ func (dsc *DaemonSetsController) syncDaemonSet(ctx context.Context, key string) 
 	return dsc.updateDaemonSetStatus(ctx, ds, nodeList, hash, true)
 }
 
-// nodeShouldRunDaemonPod checks a set of preconditions against a (node,daemonset) and returns a
+// NodeShouldRunDaemonPod checks a set of preconditions against a (node,daemonset) and returns a
 // summary. Returned booleans are:
 // * shouldRun:
 //     Returns true when a daemonset should run on the node if a daemonset pod is not already
@@ -1262,7 +1273,7 @@ func (dsc *DaemonSetsController) syncDaemonSet(ctx context.Context, key string) 
 // * shouldContinueRunning:
 //     Returns true when a daemonset should continue running on a node if a daemonset pod is already
 //     running on that node.
-func (dsc *DaemonSetsController) nodeShouldRunDaemonPod(node *v1.Node, ds *apps.DaemonSet) (bool, bool) {
+func NodeShouldRunDaemonPod(node *v1.Node, ds *apps.DaemonSet) (bool, bool) {
 	pod := NewPod(ds, node.Name)
 
 	// If the daemon set specifies a node name, check that it matches with node.Name.
@@ -1271,7 +1282,7 @@ func (dsc *DaemonSetsController) nodeShouldRunDaemonPod(node *v1.Node, ds *apps.
 	}
 
 	taints := node.Spec.Taints
-	fitsNodeName, fitsNodeAffinity, fitsTaints := Predicates(pod, node, taints)
+	fitsNodeName, fitsNodeAffinity, fitsTaints := predicates(pod, node, taints)
 	if !fitsNodeName || !fitsNodeAffinity {
 		return false, false
 	}
@@ -1287,8 +1298,8 @@ func (dsc *DaemonSetsController) nodeShouldRunDaemonPod(node *v1.Node, ds *apps.
 	return true, true
 }
 
-// Predicates checks if a DaemonSet's pod can run on a node.
-func Predicates(pod *v1.Pod, node *v1.Node, taints []v1.Taint) (fitsNodeName, fitsNodeAffinity, fitsTaints bool) {
+// predicates checks if a DaemonSet's pod can run on a node.
+func predicates(pod *v1.Pod, node *v1.Node, taints []v1.Taint) (fitsNodeName, fitsNodeAffinity, fitsTaints bool) {
 	fitsNodeName = len(pod.Spec.NodeName) == 0 || pod.Spec.NodeName == node.Name
 	// Ignore parsing errors for backwards compatibility.
 	fitsNodeAffinity, _ = nodeaffinity.GetRequiredNodeAffinity(pod).Match(node)

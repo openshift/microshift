@@ -25,7 +25,6 @@ type RouteSpec struct {
 	// Host is an alias/DNS that points to the service. Optional
 	// Must follow DNS952 subdomain conventions.
 	Host string
-
 	// Subdomain is a DNS subdomain that is requested within the ingress controller's
 	// domain (as a subdomain). If host is set this field is ignored. An ingress
 	// controller may choose to ignore this suggested name, in which case the controller
