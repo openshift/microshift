@@ -79,8 +79,7 @@ debug:
 GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netgo osusergo'
 
 # targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
-microshift: build-containerized-cross-build-linux-amd64
-.PHONY: microshift
+microshift: build
 
 microshift-aio: build-containerized-all-in-one-amd64
 .PHONY: microshift-aio
@@ -253,3 +252,12 @@ release-nightly:
 component-images:
 	cd packaging/images/components && ./build.sh
 .PHONY: component-images
+
+licensecheck: microshift bin/lichen
+	bin/lichen -c .lichen.yaml microshift
+
+bin:
+	mkdir -p $@
+
+bin/lichen: bin vendor/modules.txt
+	GOBIN=$(realpath ./bin) go install github.com/uw-labs/lichen@latest
