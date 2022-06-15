@@ -201,7 +201,7 @@ func NewController(eventsClient kv1core.EventsGetter, routeClient routeclient.Ro
 		FilterFunc: func(obj interface{}) bool {
 			switch t := obj.(type) {
 			case *corev1.Secret:
-				return t.Type == corev1.SecretTypeTLS
+				return t.Type == corev1.SecretTypeTLS || t.Type == corev1.SecretTypeOpaque
 			}
 			return true
 		},
@@ -592,8 +592,8 @@ func newRouteForIngress(
 		return nil
 	}
 
-	tlsSecret, hasInvalidTLSSecret := tlsSecretIfValid(ingress, rule, secretLister)
-	if hasInvalidTLSSecret {
+	tlsConfig, hasInvalidSecret := tlsConfigForIngress(ingress, rule, secretLister)
+	if hasInvalidSecret {
 		return nil
 	}
 
@@ -623,7 +623,7 @@ func newRouteForIngress(
 				Name: path.Backend.Service.Name,
 			},
 			Port:           port,
-			TLS:            tlsConfigForIngress(ingress, rule, tlsSecret),
+			TLS:            tlsConfig,
 			WildcardPolicy: wildcardPolicy,
 		},
 	}
@@ -635,8 +635,12 @@ func preserveRouteAttributesFromExisting(r, existing *routev1.Route) {
 	r.Spec.To.Weight = existing.Spec.To.Weight
 	if r.Spec.TLS != nil && existing.Spec.TLS != nil {
 		r.Spec.TLS.CACertificate = existing.Spec.TLS.CACertificate
-		r.Spec.TLS.DestinationCACertificate = existing.Spec.TLS.DestinationCACertificate
 		r.Spec.TLS.InsecureEdgeTerminationPolicy = existing.Spec.TLS.InsecureEdgeTerminationPolicy
+		if r.Spec.TLS.Termination == routev1.TLSTerminationReencrypt {
+			if _, ok := r.Annotations[destinationCACertificateAnnotationKey]; !ok {
+				r.Spec.TLS.DestinationCACertificate = existing.Spec.TLS.DestinationCACertificate
+			}
+		}
 	}
 }
 
@@ -679,13 +683,16 @@ func routeMatchesIngress(
 		return false
 	}
 
-	tlsSecret, hasInvalidTLSSecret := tlsSecretIfValid(ingress, rule, secretLister)
-	if hasInvalidTLSSecret {
+	tlsConfig, hasInvalidSecret := tlsConfigForIngress(ingress, rule, secretLister)
+	if hasInvalidSecret {
 		return false
 	}
-	tlsConfig := tlsConfigForIngress(ingress, rule, tlsSecret)
+
 	if route.Spec.TLS != nil && tlsConfig != nil {
 		tlsConfig.InsecureEdgeTerminationPolicy = route.Spec.TLS.InsecureEdgeTerminationPolicy
+		if _, ok := ingress.Annotations[destinationCACertificateAnnotationKey]; !ok {
+			tlsConfig.DestinationCACertificate = route.Spec.TLS.DestinationCACertificate
+		}
 	}
 	return reflect.DeepEqual(tlsConfig, route.Spec.TLS)
 }
@@ -809,10 +816,16 @@ func generateRouteName(base string) string {
 func tlsConfigForIngress(
 	ingress *networkingv1.Ingress,
 	rule *networkingv1.IngressRule,
-	potentiallyNilTLSSecret *corev1.Secret,
-) *routev1.TLSConfig {
+	secretLister corelisters.SecretLister,
+) (*routev1.TLSConfig, bool) {
+
+	potentiallyNilTLSSecret, hasInvalidTLSSecret := tlsSecretIfValid(ingress, rule, secretLister)
+	if hasInvalidTLSSecret {
+		return nil, true
+	}
+
 	if !tlsEnabled(ingress, rule, potentiallyNilTLSSecret) {
-		return nil
+		return nil, false
 	}
 	// Edge: May have cert
 	// Re-Encrypt: May have cert
@@ -826,7 +839,13 @@ func tlsConfigForIngress(
 		tlsConfig.Certificate = string(potentiallyNilTLSSecret.Data[corev1.TLSCertKey])
 		tlsConfig.Key = string(potentiallyNilTLSSecret.Data[corev1.TLSPrivateKeyKey])
 	}
-	return tlsConfig
+
+	destinationCACertificate := destinationCACertificateForIngress(ingress, secretLister)
+	if terminationPolicy == routev1.TLSTerminationReencrypt && destinationCACertificate != nil {
+		tlsConfig.DestinationCACertificate = *destinationCACertificate
+	}
+
+	return tlsConfig, false
 }
 
 var emptyTLS = networkingv1.IngressTLS{}
@@ -881,4 +900,24 @@ func terminationPolicyForIngress(ingress *networkingv1.Ingress) routev1.TLSTermi
 	default:
 		return routev1.TLSTerminationEdge
 	}
+}
+
+var destinationCACertificateAnnotationKey = routev1.GroupName + "/destination-ca-certificate-secret"
+
+func destinationCACertificateForIngress(ingress *networkingv1.Ingress, secretLister corelisters.SecretLister) *string {
+	name := ingress.Annotations[destinationCACertificateAnnotationKey]
+	secret, err := secretLister.Secrets(ingress.Namespace).Get(name)
+	if err != nil {
+		return nil
+	}
+	switch secret.Type {
+	case corev1.SecretTypeTLS, corev1.SecretTypeOpaque:
+	default:
+		return nil
+	}
+	if v, ok := secret.Data[corev1.TLSCertKey]; ok {
+		value := string(v)
+		return &value
+	}
+	return nil
 }

@@ -48,7 +48,7 @@ func BuildHandlerChain(apiHandler http.Handler, authorizationInfo *apiserver.Aut
 	}
 	handler = genericapifilters.WithRequestInfo(handler, requestInfoResolver)
 	handler = genericapifilters.WithCacheControl(handler)
-	handler = genericfilters.WithHTTPLogging(handler)
+	handler = genericfilters.WithHTTPLogging(handler, nil)
 	handler = genericfilters.WithPanicRecovery(handler, requestInfoResolver)
 
 	return handler
@@ -66,7 +66,6 @@ func NewBaseHandler(c *componentbaseconfig.DebuggingConfiguration, healthzHandle
 		routes.DebugFlags{}.Install(mux, "v", routes.StringFlagPutHandler(logs.GlogSetter))
 	}
 	configz.InstallHandler(mux)
-	//nolint:staticcheck // SA1019 See the Metrics Stability Migration KEP
 	mux.Handle("/metrics", legacyregistry.Handler())
 
 	return mux

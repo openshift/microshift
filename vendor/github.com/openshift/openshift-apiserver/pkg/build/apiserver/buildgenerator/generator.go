@@ -17,6 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/klog/v2"
@@ -533,8 +534,12 @@ func (e *generatorFatalError) Error() string {
 
 // createBuild is responsible for validating build object and saving it and returning newly created object
 func (g *BuildGenerator) createBuild(ctx context.Context, build *buildv1.Build, opts metav1.CreateOptions) (*buildv1.Build, error) {
-	if !rest.ValidNamespace(ctx, &build.ObjectMeta) {
-		return nil, errors.NewConflict(buildv1.Resource("build"), build.Namespace, fmt.Errorf("Build.Namespace does not match the provided context"))
+	requestNamespace, ok := genericapirequest.NamespaceFrom(ctx)
+	if !ok {
+		return nil, errors.NewInternalError(fmt.Errorf("no namespace information found in request context"))
+	}
+	if err := rest.EnsureObjectNamespaceMatchesRequestNamespace(requestNamespace, &build.ObjectMeta); err != nil {
+		return nil, err
 	}
 	rest.FillObjectMetaSystemFields(&build.ObjectMeta)
 	err := g.Client.CreateBuild(ctx, build, opts)

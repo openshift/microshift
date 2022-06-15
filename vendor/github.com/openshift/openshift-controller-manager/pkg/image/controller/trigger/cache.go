@@ -10,6 +10,7 @@ import (
 	"github.com/openshift/library-go/pkg/image/imageutil"
 	triggerutil "github.com/openshift/library-go/pkg/image/trigger"
 	"github.com/openshift/openshift-controller-manager/pkg/image/trigger"
+	"k8s.io/apimachinery/pkg/api/meta"
 )
 
 // NewTriggerCache constructs a cacher that expects objects of type *trigger.CacheEntry
@@ -53,7 +54,7 @@ func ProcessEvents(c cache.ThreadSafeStore, indexer trigger.Indexer, queue workq
 		AddFunc: func(obj interface{}) {
 			key, entry, _, err := indexer.Index(obj, nil)
 			if err != nil {
-				utilruntime.HandleError(fmt.Errorf("unable to extract cache data from %T: %v", obj, err))
+				utilruntime.HandleError(extractErrorForObj(obj, err))
 				return
 			}
 			if entry != nil {
@@ -64,7 +65,7 @@ func ProcessEvents(c cache.ThreadSafeStore, indexer trigger.Indexer, queue workq
 		UpdateFunc: func(oldObj, newObj interface{}) {
 			key, entry, change, err := indexer.Index(newObj, oldObj)
 			if err != nil {
-				utilruntime.HandleError(fmt.Errorf("unable to extract cache data from %T: %v", newObj, err))
+				utilruntime.HandleError(extractErrorForObj(newObj, err))
 				return
 			}
 			switch {
@@ -81,7 +82,7 @@ func ProcessEvents(c cache.ThreadSafeStore, indexer trigger.Indexer, queue workq
 		DeleteFunc: func(obj interface{}) {
 			key, entry, _, err := indexer.Index(nil, obj)
 			if err != nil {
-				utilruntime.HandleError(fmt.Errorf("unable to extract cache data from %T: %v", obj, err))
+				utilruntime.HandleError(extractErrorForObj(obj, err))
 				return
 			}
 			if entry != nil {
@@ -89,4 +90,12 @@ func ProcessEvents(c cache.ThreadSafeStore, indexer trigger.Indexer, queue workq
 			}
 		},
 	}
+}
+
+func extractErrorForObj(obj interface{}, err error) error {
+	accessor, err := meta.Accessor(obj)
+	if err != nil {
+		return fmt.Errorf("unable to extract cache data from %T: %v", obj, err)
+	}
+	return fmt.Errorf("unable to extract cache data from %T %s/%s: %v", obj, accessor.GetNamespace(), accessor.GetName(), err)
 }

@@ -46,6 +46,8 @@ import (
 	kubeschedulerconfig "k8s.io/kubernetes/pkg/scheduler/apis/config"
 	"k8s.io/kubernetes/pkg/scheduler/apis/config/validation"
 	netutils "k8s.io/utils/net"
+
+	libgorestclient "github.com/openshift/library-go/pkg/config/client"
 )
 
 // Options has all the params needed to run a Scheduler
@@ -71,6 +73,9 @@ type Options struct {
 
 	// Flags hold the parsed CLI flags.
 	Flags *cliflag.NamedFlagSets
+
+	// OpenShiftContext is additional context that we need to launch the kube-scheduler for openshift.
+	OpenShiftContext schedulerappconfig.OpenShiftContext
 }
 
 // NewOptions returns default scheduler app options.
@@ -79,7 +84,9 @@ func NewOptions() *Options {
 		SecureServing:  apiserveroptions.NewSecureServingOptions().WithLoopback(),
 		Authentication: apiserveroptions.NewDelegatingAuthenticationOptions(),
 		Authorization:  apiserveroptions.NewDelegatingAuthorizationOptions(),
-		Deprecated:     &DeprecatedOptions{},
+		Deprecated: &DeprecatedOptions{
+			PodMaxInUnschedulablePodsDuration: 5 * time.Minute,
+		},
 		LeaderElection: &componentbaseconfig.LeaderElectionConfiguration{
 			LeaderElect:       true,
 			LeaseDuration:     metav1.Duration{Duration: 15 * time.Second},
@@ -184,6 +191,7 @@ func (o *Options) initFlags() {
 	fs.StringVar(&o.ConfigFile, "config", o.ConfigFile, "The path to the configuration file.")
 	fs.StringVar(&o.WriteConfigTo, "write-config-to", o.WriteConfigTo, "If set, write the configuration values to this file and exit.")
 	fs.StringVar(&o.Master, "master", o.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
+	fs.BoolVar(&o.OpenShiftContext.UnsupportedKubeAPIOverPreferredHost, "unsupported-kube-api-over-localhost", false, "when set makes KS prefer talking to localhost kube-apiserver (when available) instead of an LB")
 
 	o.SecureServing.AddFlags(nfs.FlagSet("secure serving"))
 	o.Authentication.AddFlags(nfs.FlagSet("authentication"))
@@ -231,6 +239,12 @@ func (o *Options) ApplyTo(c *schedulerappconfig.Config) error {
 		}
 	}
 	o.Metrics.Apply()
+
+	// Apply value independently instead of using ApplyDeprecated() because it can't be configured via ComponentConfig.
+	if o.Deprecated != nil {
+		c.PodMaxInUnschedulablePodsDuration = o.Deprecated.PodMaxInUnschedulablePodsDuration
+	}
+
 	return nil
 }
 
@@ -244,7 +258,6 @@ func (o *Options) Validate() []error {
 	errs = append(errs, o.SecureServing.Validate()...)
 	errs = append(errs, o.Authentication.Validate()...)
 	errs = append(errs, o.Authorization.Validate()...)
-	errs = append(errs, o.Deprecated.Validate()...)
 	errs = append(errs, o.Metrics.Validate()...)
 
 	return errs
@@ -262,11 +275,17 @@ func (o *Options) Config() (*schedulerappconfig.Config, error) {
 	if err := o.ApplyTo(c); err != nil {
 		return nil, err
 	}
+	c.OpenShiftContext = o.OpenShiftContext
 
 	// Prepare kube config.
 	kubeConfig, err := createKubeConfig(c.ComponentConfig.ClientConnection, o.Master)
 	if err != nil {
 		return nil, err
+	}
+
+	if c.OpenShiftContext.PreferredHostRoundTripperWrapperFn != nil {
+		libgorestclient.DefaultServerName(kubeConfig)
+		kubeConfig.Wrap(c.OpenShiftContext.PreferredHostRoundTripperWrapperFn)
 	}
 
 	// Prepare kube clients.

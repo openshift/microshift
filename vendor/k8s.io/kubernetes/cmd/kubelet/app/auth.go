@@ -17,6 +17,7 @@ limitations under the License.
 package app
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -60,6 +61,7 @@ func BuildAuth(nodeName types.NodeName, client clientset.Interface, config kubel
 	if err != nil {
 		return nil, nil, err
 	}
+	authorizer = wrapAuthorizerWithMetricsScraper(authorizer)
 
 	return server.NewKubeletAuth(authenticator, attributes, authorizer), runAuthenticatorCAReload, nil
 }
@@ -95,8 +97,18 @@ func BuildAuthn(client authenticationclient.AuthenticationV1Interface, authn kub
 	}
 
 	return authenticator, func(stopCh <-chan struct{}) {
+		// generate a context from stopCh. This is to avoid modifying files which are relying on this method
+		// TODO: See if we can pass ctx to the current method
+		ctx, cancel := context.WithCancel(context.Background())
+		go func() {
+			select {
+			case <-stopCh:
+				cancel() // stopCh closed, so cancel our context
+			case <-ctx.Done():
+			}
+		}()
 		if dynamicCAContentFromFile != nil {
-			go dynamicCAContentFromFile.Run(1, stopCh)
+			go dynamicCAContentFromFile.Run(ctx, 1)
 		}
 	}, err
 }

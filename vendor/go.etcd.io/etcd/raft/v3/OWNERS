@@ -1,19 +1,5 @@
 approvers:
-- heyitsanthony
-- philips
-- fanminshi
-- gyuho
-- mitake
-- jpbetz
-- xiang90
-- bdarnell
+  - hexfusion
+  - smarterclayton 
 reviewers:
-- heyitsanthony
-- philips
-- fanminshi
-- gyuho
-- mitake
-- jpbetz
-- xiang90
-- bdarnell
-- tschottdorf
+  - hexfusion

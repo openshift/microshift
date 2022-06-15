@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/httpstream"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/proxy"
@@ -32,9 +33,7 @@ import (
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
 	endpointmetrics "k8s.io/apiserver/pkg/endpoints/metrics"
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
-	genericfeatures "k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/server/egressselector"
-	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	utilflowcontrol "k8s.io/apiserver/pkg/util/flowcontrol"
 	"k8s.io/apiserver/pkg/util/x509metrics"
 	restclient "k8s.io/client-go/rest"
@@ -124,6 +123,14 @@ func (r *proxyHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// some groupResources should always be delegated
+	if requestInfo, ok := genericapirequest.RequestInfoFrom(req.Context()); ok {
+		if alwaysLocalDelegateGroupResource[schema.GroupResource{Group: requestInfo.APIGroup, Resource: requestInfo.Resource}] {
+			r.localDelegate.ServeHTTP(w, req)
+			return
+		}
+	}
+
 	if !handlingInfo.serviceAvailable {
 		proxyError(w, req, "service unavailable", http.StatusServiceUnavailable)
 		return
@@ -174,8 +181,6 @@ func (r *proxyHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	handler := proxy.NewUpgradeAwareHandler(location, proxyRoundTripper, true, upgrade, &responder{w: w})
-	handler.InterceptRedirects = utilfeature.DefaultFeatureGate.Enabled(genericfeatures.StreamingProxyRedirects)
-	handler.RequireSameHostRedirects = utilfeature.DefaultFeatureGate.Enabled(genericfeatures.ValidateProxyRedirects)
 	utilflowcontrol.RequestDelegated(req.Context())
 	handler.ServeHTTP(w, newReq)
 }
@@ -245,7 +250,10 @@ func (r *proxyHandler) updateAPIService(apiService *apiregistrationv1api.APIServ
 			CAData:     apiService.Spec.CABundle,
 		},
 	}
-	clientConfig.Wrap(x509metrics.NewMissingSANRoundTripperWrapperConstructor(x509MissingSANCounter))
+	clientConfig.Wrap(x509metrics.NewDeprecatedCertificateRoundTripperWrapperConstructor(
+		x509MissingSANCounter,
+		x509InsecureSHA1Counter,
+	))
 
 	newInfo := proxyHandlingInfo{
 		name:             apiService.Name,

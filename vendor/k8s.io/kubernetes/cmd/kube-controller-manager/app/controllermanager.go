@@ -23,14 +23,12 @@ package app
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -38,6 +36,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/apimachinery/pkg/util/wait"
 	genericfeatures "k8s.io/apiserver/pkg/features"
+	"k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/healthz"
 	"k8s.io/apiserver/pkg/server/mux"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -72,7 +71,13 @@ import (
 	kubectrlmgrconfig "k8s.io/kubernetes/pkg/controller/apis/config"
 	serviceaccountcontroller "k8s.io/kubernetes/pkg/controller/serviceaccount"
 	"k8s.io/kubernetes/pkg/serviceaccount"
+
+	libgorestclient "github.com/openshift/library-go/pkg/config/client"
 )
+
+func init() {
+	utilruntime.Must(logs.AddFeatureGates(utilfeature.DefaultMutableFeatureGate))
+}
 
 const (
 	// ControllerStartJitter is the Jitter used when starting controller managers
@@ -91,18 +96,6 @@ const (
 	ExternalLoops
 )
 
-// TODO: delete this check after insecure flags removed in v1.24
-func checkNonZeroInsecurePort(fs *pflag.FlagSet) error {
-	val, err := fs.GetInt("port")
-	if err != nil {
-		return err
-	}
-	if val != 0 {
-		return fmt.Errorf("invalid port value %d: only zero is allowed", val)
-	}
-	return nil
-}
-
 // NewControllerManagerCommand creates a *cobra.Command object with default parameters
 func NewControllerManagerCommand() *cobra.Command {
 	s, err := options.NewKubeControllerManagerOptions()
@@ -120,26 +113,24 @@ state of the cluster through the apiserver and makes changes attempting to move 
 current state towards the desired state. Examples of controllers that ship with
 Kubernetes today are the replication controller, endpoints controller, namespace
 controller, and serviceaccounts controller.`,
-		PersistentPreRunE: func(*cobra.Command, []string) error {
+		PersistentPreRun: func(*cobra.Command, []string) {
 			// silence client-go warnings.
 			// kube-controller-manager generically watches APIs (including deprecated ones),
 			// and CI ensures it works properly against matching kube-apiserver versions.
 			restclient.SetDefaultWarningHandler(restclient.NoWarnings{})
-			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			verflag.PrintAndExitIfRequested()
 
 			// Activate logging as soon as possible, after that
 			// show flags with the final logging configuration.
-			if err := s.Logs.ValidateAndApply(); err != nil {
+			if err := s.Logs.ValidateAndApply(utilfeature.DefaultFeatureGate); err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)
 				os.Exit(1)
 			}
 			cliflag.PrintFlags(cmd.Flags())
 
-			err := checkNonZeroInsecurePort(cmd.Flags())
-			if err != nil {
+			if err := SetUpCustomRoundTrippersForOpenShift(s); err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)
 				os.Exit(1)
 			}
@@ -150,7 +141,13 @@ controller, and serviceaccounts controller.`,
 				os.Exit(1)
 			}
 
-			if err := Run(c.Complete(), wait.NeverStop); err != nil {
+			if err := ShimForOpenShift(s, c); err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err)
+				os.Exit(1)
+			}
+
+			stopCh := server.SetupSignalHandler()
+			if err := Run(c.Complete(), stopCh); err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)
 				os.Exit(1)
 			}
@@ -195,10 +192,23 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 	// To help debugging, immediately log version
 	klog.Infof("Version: %+v", version.Get())
 
+	klog.InfoS("Golang settings", "GOGC", os.Getenv("GOGC"), "GOMAXPROCS", os.Getenv("GOMAXPROCS"), "GOTRACEBACK", os.Getenv("GOTRACEBACK"))
+
 	if cfgz, err := configz.New(ConfigzName); err == nil {
 		cfgz.Set(c.ComponentConfig)
 	} else {
 		klog.Errorf("unable to register configz: %v", err)
+	}
+
+	// start the localhost health monitor early so that it can be used by the LE client
+	if c.OpenShiftContext.PreferredHostHealthMonitor != nil {
+		hmCtx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go func() {
+			<-stopCh
+			cancel()
+		}()
+		go c.OpenShiftContext.PreferredHostHealthMonitor.Run(hmCtx)
 	}
 
 	// Setup any healthz checks we will want to use.
@@ -216,8 +226,8 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 	if c.SecureServing != nil {
 		unsecuredMux = genericcontrollermanager.NewBaseHandler(&c.ComponentConfig.Generic.Debugging, healthzHandler)
 		handler := genericcontrollermanager.BuildHandlerChain(unsecuredMux, &c.Authorization, &c.Authentication)
-		// TODO: handle stoppedCh returned by c.SecureServing.Serve
-		if _, err := c.SecureServing.Serve(handler, 0, stopCh); err != nil {
+		// TODO: handle stoppedCh and listenerStoppedCh returned by c.SecureServing.Serve
+		if _, _, err := c.SecureServing.Serve(handler, 0, stopCh); err != nil {
 			return err
 		}
 	}
@@ -295,9 +305,18 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 				run(ctx, startSATokenController, initializersFunc)
 			},
 			OnStoppedLeading: func() {
-				klog.Fatalf("leaderelection lost")
+				select {
+				case <-stopCh:
+					// We were asked to terminate. Exit 0.
+					klog.Info("Requested to terminate. Exiting.")
+					os.Exit(0)
+				default:
+					// We lost the lock.
+					klog.ErrorS(nil, "leaderelection lost")
+					klog.FlushAndExit(klog.ExitFlushTimeout, 1)
+				}
 			},
-		})
+		}, stopCh)
 
 	// If Leader Migration is enabled, proceed to attempt the migration lock.
 	if leaderMigrator != nil {
@@ -318,9 +337,18 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 					run(ctx, nil, createInitializersFunc(leaderMigrator.FilterFunc, leadermigration.ControllerMigrated))
 				},
 				OnStoppedLeading: func() {
-					klog.Fatalf("migration leaderelection lost")
+					select {
+					case <-stopCh:
+						// We were asked to terminate. Exit 0.
+						klog.Info("Requested to terminate. Exiting.")
+						os.Exit(0)
+					default:
+						// We lost the lock.
+						klog.ErrorS(nil, "migration leaderelection lost")
+						klog.FlushAndExit(klog.ExitFlushTimeout, 1)
+					}
 				},
-			})
+			}, stopCh)
 	}
 
 	select {}
@@ -328,6 +356,8 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 
 // ControllerContext defines the context object for controller
 type ControllerContext struct {
+	OpenShiftContext config.OpenShiftContext
+
 	// ClientBuilder will provide a client for this controller to use
 	ClientBuilder clientbuilder.ControllerClientBuilder
 
@@ -458,6 +488,7 @@ func NewControllerInitializers(loopMode ControllerLoopMode) map[string]InitFunc 
 	controllers["pv-protection"] = startPVProtectionController
 	controllers["ttl-after-finished"] = startTTLAfterFinishedController
 	controllers["root-ca-cert-publisher"] = startRootCACertPublisher
+	controllers["service-ca-cert-publisher"] = startServiceCACertPublisher
 	controllers["ephemeral-volume"] = startEphemeralVolumeController
 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.APIServerIdentity) &&
 		utilfeature.DefaultFeatureGate.Enabled(genericfeatures.StorageVersionAPI) {
@@ -501,7 +532,12 @@ func GetAvailableResources(clientBuilder clientbuilder.ControllerClientBuilder) 
 // the shared-informers client and token controller.
 func CreateControllerContext(s *config.CompletedConfig, rootClientBuilder, clientBuilder clientbuilder.ControllerClientBuilder, stop <-chan struct{}) (ControllerContext, error) {
 	versionedClient := rootClientBuilder.ClientOrDie("shared-informers")
-	sharedInformers := informers.NewSharedInformerFactory(versionedClient, ResyncPeriod(s)())
+	var sharedInformers informers.SharedInformerFactory
+	if InformerFactoryOverride == nil {
+		sharedInformers = informers.NewSharedInformerFactory(versionedClient, ResyncPeriod(s)())
+	} else {
+		sharedInformers = InformerFactoryOverride
+	}
 
 	metadataClient := metadata.NewForConfigOrDie(rootClientBuilder.ConfigOrDie("metadata-informers"))
 	metadataInformers := metadatainformer.NewSharedInformerFactory(metadataClient, ResyncPeriod(s)())
@@ -532,6 +568,7 @@ func CreateControllerContext(s *config.CompletedConfig, rootClientBuilder, clien
 	}
 
 	ctx := ControllerContext{
+		OpenShiftContext:                s.OpenShiftContext,
 		ClientBuilder:                   clientBuilder,
 		InformerFactory:                 sharedInformers,
 		ObjectOrMetadataInformerFactory: informerfactory.NewInformerFactory(sharedInformers, metadataInformers),
@@ -649,10 +686,10 @@ func (c serviceAccountTokenControllerStarter) startServiceAccountTokenController
 		controllerContext.InformerFactory.Core().V1().ServiceAccounts(),
 		controllerContext.InformerFactory.Core().V1().Secrets(),
 		c.rootClientBuilder.ClientOrDie("tokens-controller"),
-		serviceaccountcontroller.TokensControllerOptions{
+		applyOpenShiftServiceServingCertCA(serviceaccountcontroller.TokensControllerOptions{
 			TokenGenerator: tokenGenerator,
 			RootCA:         rootCA,
-		},
+		}),
 	)
 	if err != nil {
 		return nil, true, fmt.Errorf("error creating Tokens controller: %v", err)
@@ -666,7 +703,7 @@ func (c serviceAccountTokenControllerStarter) startServiceAccountTokenController
 }
 
 func readCA(file string) ([]byte, error) {
-	rootCA, err := ioutil.ReadFile(file)
+	rootCA, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
@@ -690,7 +727,7 @@ func createClientBuilders(c *config.CompletedConfig) (clientBuilder clientbuilde
 		}
 
 		clientBuilder = clientbuilder.NewDynamicClientBuilder(
-			restclient.AnonymousClientConfig(c.Kubeconfig),
+			libgorestclient.AnonymousClientConfigWithWrapTransport(c.Kubeconfig),
 			c.Client.CoreV1(),
 			metav1.NamespaceSystem)
 	} else {
@@ -701,7 +738,7 @@ func createClientBuilders(c *config.CompletedConfig) (clientBuilder clientbuilde
 
 // leaderElectAndRun runs the leader election, and runs the callbacks once the leader lease is acquired.
 // TODO: extract this function into staging/controller-manager
-func leaderElectAndRun(c *config.CompletedConfig, lockIdentity string, electionChecker *leaderelection.HealthzAdaptor, resourceLock string, leaseName string, callbacks leaderelection.LeaderCallbacks) {
+func leaderElectAndRun(c *config.CompletedConfig, lockIdentity string, electionChecker *leaderelection.HealthzAdaptor, resourceLock string, leaseName string, callbacks leaderelection.LeaderCallbacks, stopCh <-chan struct{}) {
 	rl, err := resourcelock.NewFromKubeconfig(resourceLock,
 		c.ComponentConfig.Generic.LeaderElection.ResourceNamespace,
 		leaseName,
@@ -715,7 +752,13 @@ func leaderElectAndRun(c *config.CompletedConfig, lockIdentity string, electionC
 		klog.Fatalf("error creating lock: %v", err)
 	}
 
-	leaderelection.RunOrDie(context.TODO(), leaderelection.LeaderElectionConfig{
+	leCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() {
+		<-stopCh
+		cancel()
+	}()
+	leaderelection.RunOrDie(leCtx, leaderelection.LeaderElectionConfig{
 		Lock:          rl,
 		LeaseDuration: c.ComponentConfig.Generic.LeaderElection.LeaseDuration.Duration,
 		RenewDeadline: c.ComponentConfig.Generic.LeaderElection.RenewDeadline.Duration,

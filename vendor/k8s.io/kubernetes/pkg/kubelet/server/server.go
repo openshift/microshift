@@ -353,7 +353,6 @@ func (s *Server) InstallDefaultHandlers() {
 	s.addMetricsBucketMatcher("metrics/cadvisor")
 	s.addMetricsBucketMatcher("metrics/probes")
 	s.addMetricsBucketMatcher("metrics/resource")
-	//nolint:staticcheck // SA1019 https://github.com/kubernetes/enhancements/issues/1206
 	s.restfulCont.Handle(metricsPath, legacyregistry.Handler())
 
 	// cAdvisor metrics are exposed under the secured handler as well
@@ -368,6 +367,7 @@ func (s *Server) InstallDefaultHandlers() {
 		cadvisormetrics.NetworkUsageMetrics: struct{}{},
 		cadvisormetrics.AppMetrics:          struct{}{},
 		cadvisormetrics.ProcessMetrics:      struct{}{},
+		cadvisormetrics.OOMMetrics:          struct{}{},
 	}
 
 	// Only add the Accelerator metrics if the feature is inactive
@@ -919,7 +919,7 @@ var statusesNoTracePred = httplog.StatusIsNot(
 
 // ServeHTTP responds to HTTP requests on the Kubelet.
 func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	handler := httplog.WithLogging(s.restfulCont, statusesNoTracePred)
+	handler := httplog.WithLogging(s.restfulCont, statusesNoTracePred, nil)
 
 	// monitor http requests
 	var serverType string

@@ -28,7 +28,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metatable "k8s.io/apimachinery/pkg/api/meta/table"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	runtime "k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/client-go/util/jsonpath"
 )
@@ -37,7 +39,7 @@ var swaggerMetadataDescriptions = metav1.ObjectMeta{}.SwaggerDoc()
 
 // New creates a new table convertor for the provided CRD column definition. If the printer definition cannot be parsed,
 // error will be returned along with a default table convertor.
-func New(crdColumns []apiextensionsv1.CustomResourceColumnDefinition) (rest.TableConvertor, error) {
+func New(crdColumns []apiextensionsv1.CustomResourceColumnDefinition, gvk schema.GroupVersionKind) (rest.TableConvertor, error) {
 	headers := []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: swaggerMetadataDescriptions["name"]},
 	}
@@ -67,7 +69,12 @@ func New(crdColumns []apiextensionsv1.CustomResourceColumnDefinition) (rest.Tabl
 		})
 	}
 
-	return c, nil
+	return withClusterOperatorColumns(c, gvk), nil
+}
+
+type column interface {
+	FindResults(data interface{}) ([][]reflect.Value, error)
+	PrintResults(wr io.Writer, results []reflect.Value) error
 }
 
 type columnPrinter interface {
@@ -90,13 +97,11 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	if m, err := meta.ListAccessor(obj); err == nil {
 		table.ResourceVersion = m.GetResourceVersion()
-		table.SelfLink = m.GetSelfLink()
 		table.Continue = m.GetContinue()
 		table.RemainingItemCount = m.GetRemainingItemCount()
 	} else {
 		if m, err := meta.CommonAccessor(obj); err == nil {
 			table.ResourceVersion = m.GetResourceVersion()
-			table.SelfLink = m.GetSelfLink()
 		}
 	}
 
@@ -106,8 +111,16 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		cells := make([]interface{}, 1, 1+len(c.additionalColumns))
 		cells[0] = name
 		customHeaders := c.headers[1:]
+		us, ok := obj.(runtime.Unstructured)
+		if !ok {
+			m, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+			if err != nil {
+				return nil, err
+			}
+			us = &unstructured.Unstructured{Object: m}
+		}
 		for i, column := range c.additionalColumns {
-			results, err := column.FindResults(obj.(runtime.Unstructured).UnstructuredContent())
+			results, err := column.FindResults(us.UnstructuredContent())
 			if err != nil || len(results) == 0 || len(results[0]) == 0 {
 				cells = append(cells, nil)
 				continue
