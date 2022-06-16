@@ -12,6 +12,20 @@ Edge devices deployed out in the field pose very different operational, environm
 
 We believe these properties should also make MicroShift a great tool for other use cases such as Kubernetes applications development on resource-constrained systems, scale testing, and provisioning of lightweight Kubernetes control planes.
 
+## System Requirements
+To run MicroShift, you need a machine with at least:
+
+- x86_64/AMD64 or ARM64 CPU architecture
+- Red Hat Enterprise Linux 8 (8.6 or later) operating system
+- 2 CPU cores
+- 2GB of RAM
+- 1GB of free storage space for MicroShift
+
+## Deploying MicroShift on Edge Devices
+For production deployments, MicroShift can be run on bare metal hardware or hypervisors supported and certified for the Red Hat Enterprise Linux 8 operating system.
+- [Edge systems certified for Red Hat Enterprise Linux](https://catalog.redhat.com/hardware/search?c_catalog_channel=Edge%20System&p=1)
+- [Hypervisors certified for Red Hat Enterprise Linux](https://access.redhat.com/solutions/certified-hypervisors)
+
 ## Developing MicroShift
 
 To build MicroShift from source and contribute to its development, refer to the MicroShift [Developer Documentation](./docs/devenv_rhel8.md).
