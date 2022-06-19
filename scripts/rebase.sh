@@ -129,7 +129,7 @@ download_release() {
     mkdir -p release-manifests
     pushd release-manifests >/dev/null
     content=$(oc adm release info ${authentication} --contents "${release_image}")
-    echo "${content}" | awk '/^# 0000_[A-Za-z0-9._-]*.yaml/{filename = $2;}{if (filename != "") print >filename;}'
+    echo "${content}" | awk '{ if ($0 ~ /^# [A-Za-z0-9._-]+.yaml$/ || $0 ~ /^# image-references$/ || $0 ~ /^# release-metadata$/) filename = $2; else print >filename;}'
     popd >/dev/null
 
     title "# Cloning ${release_image} component repos"
