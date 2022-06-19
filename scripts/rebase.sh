@@ -38,65 +38,6 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
-# Reads go.mod file $1 and prints lines in its section $2 ("require" or "replace")
-extract_section() {
-    file=$1
-    section=$2
-
-    awk "BEGIN {output=0} /^)/ {output=0} {if (output == 1 && !match(\$0,\"// indirect\")) print \$0} /^${section}/ {output=1}" "${file}"
-}
-
-# Returns everything but the version of a require or replace line
-get_mod() {
-    line=$1
-
-    re="^(.+) ([a-z0-9.+-]+)$"
-    if [[ "$line" =~ $re ]]; then
-        echo "${BASH_REMATCH[1]}"
-    else
-        echo ""
-    fi
-}
-
-# Returns the version of a require or replace line
-get_version() {
-    line=$1
-
-    re="^(.+) ([a-z0-9.+-]+)$"
-    if [[ "$line" =~ $re ]]; then
-        echo "${BASH_REMATCH[2]}"
-    else
-        echo ""
-    fi
-}
-
-# For every line in $base_file (require or replace), checks wether a corresponding module in
-# $update_file exists and is of newer version. If so, prints a module line with the newer version,
-# else prints the line in the $base_file.
-update_versions() {
-    base_file=$1
-    update_file=$2
-
-    re="^(.+) ([a-z0-9.-]+)$"
-    while IFS="" read -r line || [ -n "$line" ]
-    do
-        if [[ "${line}" =~ ^//.* ]]; then
-            continue
-        fi
-
-        mod="$(get_mod "${line}")"
-        base_version=$(get_version "${line}")
-        version=${base_version}
-
-        update_line=$(grep "${mod} " "${update_file}" || true)
-        if [[ -n "${update_line}" ]]; then
-            update_version=$(get_version "${update_line}")
-            version=$(printf '%s\n%s\n' "${base_version}" "${update_version}" | sort --version-sort | tail -n 1)
-        fi
-
-        echo "${mod} ${version}"
-    done < "${base_file}"
-}
 
 # Returns the list of release image names from a release_${arch}.go file
 get_release_images() {
