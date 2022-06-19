@@ -155,45 +155,119 @@ download_release() {
     popd >/dev/null
 }
 
+get_pseudoversion() {
+    local modulepath=$1
+    local component=$2
 
-update_go_mod() {
-    if [ ! -f "${STAGING_DIR}/release.txt" ]; then
-        >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
+    version=$(echo "${modulepath}" | grep -o "v[0-9]$")
+    if [ -z "${version}" ]; then
+        version="v0.0.0"
+    else
+        version="${version}.0.0"
+    fi
+    timestamp_commit=$( cd "${STAGING_DIR}/${component}" && TZ=UTC git --no-pager show --quiet --abbrev=12 --date='format-local:%Y%m%d%H%M%S' --format="%cd-%h" )
+    echo "${version}-${timestamp_commit}"
+}
+
+#
+get_modulepath_version_for_release() {
+    local component=$1
+
+    repo=$( cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url )
+    modulepath="${repo#https://}"
+    echo "${modulepath}@$(get_pseudoversion ${modulepath} ${component})"
+}
+
+# Returns the line (including trailing comment) in the #{gomod_file} containing the ReplaceDirective for ${module_path}
+get_replace_directive() {
+    local gomod_file=$1
+    local module_path=$2
+
+    # TODO: Handle special case of keyword "replace" being included in the line
+    go mod edit -print "${gomod_file}" | grep "^[[:space:]]${module_path}[[:space:]][[:alnum:][:space:].-]*=>"
+}
+
+lookup_modulepath_version_from_component() {
+    local modulepath=$1
+    local component=$2
+
+    # special-case etcd
+    if [[ "${modulepath}" =~ ^go.etcd.io/etcd/ ]]; then
+        modulepath=$(echo "${modulepath}" | sed 's|^go.etcd.io/etcd|github.com/openshift/etcd|')
+        pseudoversion=$(get_pseudoversion ${modulepath} etcd)
+        echo "${modulepath}@${pseudoversion}"
+        return
+    fi
+
+    replace_directive=$(get_replace_directive "${STAGING_DIR}/${component}/go.mod" "${modulepath}")
+    replace_directive=$(strip_comment "${replace_directive}")
+    replacement=$(echo "${replace_directive}" | sed -E "s|.*=>[[:space:]]*(.*)[[:space:]]*|\1|")
+    if [[ "${replacement}" =~ ^./staging ]]; then
+        replacement=$(echo "${replacement}" | sed 's|^./staging/|github.com/openshift/kubernetes/staging/|')
+        replacement="${replacement} $(get_pseudoversion ${modulepath} kubernetes)"
+    fi
+    echo "${replacement}" | sed 's| |@|'
+}
+
+# Returns ${line} without comment
+strip_comment() {
+    local line=$1
+
+    echo "${line%%//*}"
+}
+
+# Returns the comment in ${line} if one exists or an empty string if not
+get_comment() {
+    local line=$1
+
+    comment=${line##*//}
+    if [ "${comment}" != "${line}" ]; then
+        echo ${comment}
+    else
+        echo ""
+    fi
+}
+
+valid_component_or_exit() {
+    local component=$1
+    if [[ ! " etcd kubernetes openshift-apiserver openshift-controller-manager " =~ " ${component} " ]]; then
+        echo "error: release reference must be one of [etcd kubernetes openshift-apiserver openshift-controller-manager], have ${component}"
         exit 1
     fi
+}
+
+update_go_mod() {
     pushd "${STAGING_DIR}" >/dev/null
 
-    title "Rebasing go.mod..."
-    extract_section "${REPOROOT}/go.mod" require > latest_require
-    extract_section "${REPOROOT}/go.mod" replace > latest_replace
-    while IFS="" read -r line || [ -n "$line" ]
-    do
-        COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
-        REPO=$(echo "${line}" | cut -d ' ' -f 2)
-        if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
-            extract_section "${REPO##*/}/go.mod" require > require
-            extract_section "${REPO##*/}/go.mod" replace > replace
-            update_versions latest_require require > t; mv t latest_require
-            update_versions latest_replace replace > t; mv t latest_replace
-        fi
-    done < source-commits
+    title "# Updating go.mod"
 
-    cat << EOF > "${REPOROOT}/go.mod"
-module github.com/openshift/microshift
-
-go 1.16
-
-replace (
-$(cat latest_replace)
-)
-
-require (
-$(cat latest_require)
-)
-EOF
-
-    go mod tidy
-    go mod vendor
+    replaced_modulepaths=$(go mod edit -json | jq -r '.Replace // []' | jq -r '.[].Old.Path' | xargs)
+    for modulepath in ${replaced_modulepaths}; do
+        current_replace_directive=$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")
+        comment=$(get_comment "${current_replace_directive}")
+        command=${comment%% *}
+        arguments=${comment#${command} }
+        case "${command}" in
+        from)
+            component=${arguments%% *}
+            valid_component_or_exit "${component}"
+            new_modulepath_version=$(lookup_modulepath_version_from_component "${modulepath}" "${component}")
+            go mod edit -replace ${modulepath}=${new_modulepath_version}
+            ;;
+        release)
+            component=${arguments%% *}
+            valid_component_or_exit "${component}"
+            new_modulepath_version=$(get_modulepath_version_for_release "${component}")
+            go mod edit -replace ${modulepath}=${new_modulepath_version}
+            ;;
+        override)
+            echo "skipping modulepath ${modulepath}: override [${arguments}]"
+            ;;
+        *)
+            echo "skipping modulepath ${modulepath}: no or unknown command [${comment}]"
+            ;;
+        esac
+    done
 
     popd >/dev/null
 }
