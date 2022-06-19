@@ -323,6 +323,12 @@ update_manifests() {
     pushd "${STAGING_DIR}" >/dev/null
 
     title "Rebasing manifests"
+    for crd in ${REPOROOT}/assets/crd/*.yaml; do
+        cp "${STAGING_DIR}"/release-manifests/$(basename ${crd}) "${REPOROOT}"/assets/crd || true
+    done
+    rm -f "${REPOROOT}"/assets/scc/*.yaml
+    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/scc || true
+
     rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
     cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns 2>/dev/null || true 
     rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
