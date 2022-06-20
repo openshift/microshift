@@ -16,10 +16,12 @@ We believe these properties should also make MicroShift a great tool for other u
 To run MicroShift, you need a machine with at least:
 
 - x86_64/AMD64 or ARM64 CPU architecture
-- Red Hat Enterprise Linux 8 (8.6 or later) operating system
+- Red Hat Enterprise Linux 8 with Extended Update Support (8.6 or later)
 - 2 CPU cores
 - 2GB of RAM
 - 1GB of free storage space for MicroShift
+
+> The system requirements also include the resources for the operating system unless explicitly mentioned otherwise,
 
 ## Deploying MicroShift on Edge Devices
 For production deployments, MicroShift can be run on bare metal hardware or hypervisors supported and certified for the Red Hat Enterprise Linux 8 operating system.
