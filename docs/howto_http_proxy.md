@@ -78,7 +78,7 @@ sudo systemctl restart rpm-ostreed.service
 ```
 ### Verify MicroShift
 > Instructions in the section should be followed twice: with and without `tinyproxy` server running on the hypervisor host.
-> `CRI-O` should only succeed pulling POD images when the `tinyproxy` is running.
+> `CRI-O` should only succeed pulling container images when the `tinyproxy` is running.
 
 Log into the virtual machine to verify that MicroShift can run normally when `CRI-O` is configured to use HTTP(S) proxy.
 
