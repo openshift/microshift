@@ -21,7 +21,7 @@ To run MicroShift, you need a machine with at least:
 - 2GB of RAM
 - 1GB of free storage space for MicroShift
 
-> The system requirements also include the resources for the operating system unless explicitly mentioned otherwise,
+> The system requirements also include resources for the operating system unless explicitly mentioned otherwise.
 
 ## Deploying MicroShift on Edge Devices
 For production deployments, MicroShift can be run on bare metal hardware or hypervisors supported and certified for the Red Hat Enterprise Linux 8 operating system.
