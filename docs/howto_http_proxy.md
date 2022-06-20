@@ -40,17 +40,20 @@ Use the instructions in the [Install MicroShift for Edge](./devenv_rhel8.md#inst
 ### Hypervisor Settings
 Log into the hypervisor host and set up an `tinyproxy` server to be used as a forward proxy.
 ```
-podman build -t tinyproxy -f https://raw.githubusercontent.com/openshift/microshift/http_proxy/docs/podman/Containerfile.tinyproxy
+podman build -t tinyproxy -f https://raw.githubusercontent.com/openshift/microshift/main/docs/podman/Containerfile.tinyproxy
 podman run --rm -d --name tinyproxy -p 8443:8888 tinyproxy 
 ```
 
 ### Virtual Machine Settings
-Log into the virtual machine and run the following commands to configure `CRI-O` and `rpm-ostree` to use a proxy.
-> The hypervisor host IP address should be used to denote a proxy server and its port in the `PROXY_IP` variable set below.
+Log into the virtual machine to configure `CRI-O` and `rpm-ostree` for using a proxy.
 
+> The hypervisor host IP address should be used to denote a proxy server and its port in the `PROXY_IP` variable set below.
 ```
 PROXY_IP=192.168.50.103:8443
+```
+Proceed by running the following commands.
 
+```
 sudo mkdir -p /etc/systemd/system/crio.service.d/
 sudo mkdir -p /etc/systemd/system/rpm-ostreed.service.d/
 
@@ -72,4 +75,21 @@ Restart the services for the settings to take effect.
 sudo systemctl daemon-reload
 sudo systemctl restart crio
 sudo systemctl restart rpm-ostreed.service
+```
+### Verify MicroShift
+> Instructions in the section should be followed twice: with and without `tinyproxy` server running on the hypervisor host.
+> `CRI-O` should only succeed pulling POD images when the `tinyproxy` is running.
+
+Log into the virtual machine to verify that MicroShift can run normally when `CRI-O` is configured to use HTTP(S) proxy.
+
+Run the following commands to clean up the existing `CRI-O` images and restart MicroShift.
+```
+echo 1 | /usr/bin/cleanup-all-microshift-data
+sudo systemctl enable microshift --now
+```
+Configure the MicroShift access and check if the PODs are up and running.
+```
+mkdir ~/.kube
+sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
+oc get pods -A
 ```
