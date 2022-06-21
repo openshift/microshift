@@ -27,7 +27,7 @@ func init() {
 		"kube_flannel":                  "quay.io/coreos/flannel:v0.14.0",
 		"kube_flannel_cni":              "quay.io/microshift/flannel-cni:v0.14.0",
 		"kube_rbac_proxy":               "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2d8319a33aa781918a3173e2061635d8534cc5e4a39171775830ff7e2ce646ac",
-		"kubevirt_hostpath_provisioner": "quay.io/kubevirt/hostpath-provisioner:v0.8.0",
+		"kubevirt_hostpath_provisioner": "quay.io/microshift/hostpath-provisioner:4.10.0-0.okd-2022-04-23-131357",
 		"pause":                         "k8s.gcr.io/pause:3.6",
 		"service_ca_operator":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:97a7d56ac6d6a38f7977b0759bb1b97fe3895e6020364e60a8a2926f3fd0084e",
 	}
