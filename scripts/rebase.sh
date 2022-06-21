@@ -96,21 +96,24 @@ download_release() {
     popd >/dev/null
 }
 
+# Returns the pseudo-version of the checked-out commit of ${component}
 get_pseudoversion() {
     local modulepath=$1
     local component=$2
 
-    version=$(echo "${modulepath}" | grep -o "v[0-9]$")
-    if [ -z "${version}" ]; then
+    # If the modulepath has a major version suffic X, we need to use
+    # the version prefix "vX.0.0" instead of "v0.0.0"
+    major_version_suffix=$(echo "${modulepath}" | grep -o "v[0-9]$")
+    if [ -z "${major_version_suffix}" ]; then
         version="v0.0.0"
     else
-        version="${version}.0.0"
+        version="${major_version_suffix}.0.0"
     fi
     timestamp_commit=$( cd "${STAGING_DIR}/${component}" && TZ=UTC git --no-pager show --quiet --abbrev=12 --date='format-local:%Y%m%d%H%M%S' --format="%cd-%h" )
     echo "${version}-${timestamp_commit}"
 }
 
-#
+# Returns the modulepath and version for the checkout of ${component}
 get_modulepath_version_for_release() {
     local component=$1
 
@@ -128,11 +131,14 @@ get_replace_directive() {
     go mod edit -print "${gomod_file}" | grep "^[[:space:]]${module_path}[[:space:]][[:alnum:][:space:].-]*=>"
 }
 
+# Returns the new modulepath and version for an old ${modulepath} as specified
+# in the go.mod file of ${component}, taking care of necessary substitutions
+# of local modulepaths.
 lookup_modulepath_version_from_component() {
     local modulepath=$1
     local component=$2
 
-    # special-case etcd
+    # Special-case etcd to use OpenShift's repo
     if [[ "${modulepath}" =~ ^go.etcd.io/etcd/ ]]; then
         modulepath=$(echo "${modulepath}" | sed 's|^go.etcd.io/etcd|github.com/openshift/etcd|')
         pseudoversion=$(get_pseudoversion ${modulepath} etcd)
@@ -150,7 +156,7 @@ lookup_modulepath_version_from_component() {
     echo "${replacement}" | sed 's| |@|'
 }
 
-# Returns ${line} without comment
+# Returns ${line} stripping the trailing comment
 strip_comment() {
     local line=$1
 
@@ -169,6 +175,7 @@ get_comment() {
     fi
 }
 
+# Validate that ${component} is in the allowed list for the lookup, else exit
 valid_component_or_exit() {
     local component=$1
     if [[ ! " etcd kubernetes openshift-apiserver openshift-controller-manager " =~ " ${component} " ]]; then
@@ -177,6 +184,15 @@ valid_component_or_exit() {
     fi
 }
 
+# Updates MicroShift's go.mod file by updating each replace directive's
+# new modulepath-version with that of one of the embedded components.
+# The go.mod file needs to specify which component to take this data from
+# and this is driven from keywords added as comments after each line of
+# replace directives:
+#   // from ${component}     selects the replacement from the go.mod of ${component}
+#   // release ${component}  uses the commit of ${component} as specified in the release image
+#   // override [${reason}]  keep existing replacement
+# Note directives without keyword comment are skipped with a warning.
 update_go_mod() {
     pushd "${STAGING_DIR}" >/dev/null
 
@@ -213,6 +229,7 @@ update_go_mod() {
     popd >/dev/null
 }
 
+# Regenerates OpenAPIs after patching the vendor directory
 regenerate_openapi() {
     pushd "${STAGING_DIR}/kubernetes" >/dev/null
 
@@ -255,7 +272,8 @@ update_images() {
 }
 
 
-# Updates embedded component manifests
+# Updates embedded component manifests by gathering these from various places
+# in the staged repos and copying them into the asset directory.
 update_manifests() {
     if [ ! -f "${STAGING_DIR}/release.txt" ]; then
         >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
