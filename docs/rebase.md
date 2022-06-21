@@ -3,7 +3,7 @@
 
 MicroShift repackages a minimal core of OpenShift: A given MicroShift release is built from the same content as the corresponding OpenShift release, adding a small amount of "glue logic".
 
-Therefore, on a high level a rebase of MicroShift onto a newer OpenShift release starts from an given OpenShift release image and involves the following steps:
+Therefore, on a high level a rebase of MicroShift onto a newer OpenShift release starts from a given OpenShift release image and involves the following steps:
 
 * vendoring the source code of the embedded OpenShift components at the same commit as used in OpenShift,
 * embedding (as bindata) the resource manifests of the hosted OpenShift components, and 
@@ -13,8 +13,8 @@ This process is supported by the `rebase.sh` script, which generates the necessa
 
 The following describes the current rebase process in more detail.
 
-# Process
-## Prerequisites
+## Process
+### Prerequisites
 
 On the machine used for the rebase,
 
@@ -22,7 +22,7 @@ On the machine used for the rebase,
 * add a pull secret into `~/.docker/config.json`, and
 * git clone your personal fork of microshift and `cd` into it.
 
-## Downloading the target OpenShift release
+### Downloading the target OpenShift release
 
 Run the following to download the OpenShift release to rebase to, specifying the target release image, e.g.:
 
@@ -32,7 +32,7 @@ Run the following to download the OpenShift release to rebase to, specifying the
 
 This will create a directory `_output/staging`, download the specified release image's metadata (`release.txt`) and manifests, git-clone (only) the repos of the embedded components and the operators of the loaded components, and check out the commit used by that OpenShift release.
 
-## Rebasing the go.mod file and vendoring
+### Rebasing the go.mod file and vendoring
 
 In MicroShift's `go.mod` file, we only explicitly add the `require` directives needed by MicroShift itself (marked with the comment `// microshift`) whereas we let `go mod tidy` figure out the direct and indirect requirements for the embedded components. For the rebase, the focus is therefore on the `replace` directives.
 
@@ -69,7 +69,7 @@ git commit -m "update vendoring"
 
 These patches are produced by identifying the missing patches [TODO: describe process] and transforming those patches to apply against `/vendor` instead of o/k's staging dir [TODO: describe process]. This process requires some manual work but should be necessary rarely (likely after OpenShift rebases onto a upstream version).
 
-## Rebasing `Makefile`, `Dockerfiles`, and `.spec` file
+### Rebasing `Makefile`, `Dockerfiles`, and `.spec` file
 When updating to a new minor version of OpenShift, update the `RELEASE_BASE` and `GO_LD_FLAGS in the [`Makefile`](https://github.com/openshift/microshift/blob/main/Makefile) to match the new version and also check whether the Dockerfiles need a new base image (e.g. [this](https://github.com/openshift/microshift/blob/main/packaging/images/openshift-ci/Dockerfile)) and the RPM `.spec` file needs updates (e.g. [this](https://github.com/openshift/microshift/blob/main/packaging/rpm/microshift.spec))
 
 Commit the changes:
@@ -79,8 +79,8 @@ git add vendor
 git commit -m "update Makefile and Dockerfiles"
 ```
 
-## Rebasing the embedded components
-### Component images
+### Rebasing the embedded components
+#### Component images
 To update the component image references of the MicroShift release, run:
 
 ```
@@ -89,7 +89,7 @@ git add pkg/release
 git commit -m "update component images"
 ```
 
-### Component manifests
+#### Component manifests
 The next step is still poorly automated by `rebase.sh` and definitely requires manual review. It basically just gathers the various resource manifests used by the OpenShift control plane and the hosted components. In particular the latter are a few cases just the _templates_ of the manifests used by the hosted component's Operator, i.e. we need to substitute those for example with the variables MicroShift renders into the template or the name, namespace, or labels that the Operator would add in OpenShift.
 
 Gather the manifests / manifest templates into the respective asset directory:
@@ -119,5 +119,9 @@ git add assets pkg/assets
 git commit -m "update manifests"
 ```
 
-### Component configs
+#### Component configs
 The last step isn't automated at all yet, which is to compare whether the config parameters of embedded component changed, for example the kubelet configuration in `writeConfig(...)` of `pkg/node/kubelet.go` with OpenShift MCO's template (which the `rebase.sh` script downloads into `_output/staging/machine-config-operator/templates/master/01-master-kubelet/_base/files/kubelet.yaml`).
+
+## Rebasing a Community OKD Release
+
+The rebase script can also be used to build a community version of MicroShift that does not require access to internal image registries. To build the community version, rebase against an [OKD image found here](https://origin-release.ci.openshift.org/#4-stable) by following the same rebase script, and downloading the OKD release image [like so](#downloading-the-target-openshift-release) instead of an OpenShift release. This build is not supported or maintained and there is no guarantee that OKD releases will continue to mirror OpenShift releases.
