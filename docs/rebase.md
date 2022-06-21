@@ -70,7 +70,7 @@ git commit -m "update vendoring"
 These patches are produced by identifying the missing patches [TODO: describe process] and transforming those patches to apply against `/vendor` instead of o/k's staging dir [TODO: describe process]. This process requires some manual work but should be necessary rarely (likely after OpenShift rebases onto a upstream version).
 
 ## Rebasing `Makefile`, `Dockerfiles`, and `.spec` file
-When updating to a new minor version of OpenShift, update the `Makefile` [here](https://github.com/openshift/microshift/blob/main/Makefile#L16) and [here](https://github.com/openshift/microshift/blob/main/Makefile#L55-L66) and also check whether the Dockerfiles need a new base image (e.g. [this](https://github.com/openshift/microshift/blob/main/packaging/images/openshift-ci/Dockerfile)) and the RPM `.spec` file needs updates (e.g. [this](https://github.com/openshift/microshift/blob/main/packaging/rpm/microshift.spec))
+When updating to a new minor version of OpenShift, update the `RELEASE_BASE` and `GO_LD_FLAGS in the [`Makefile`](https://github.com/openshift/microshift/blob/main/Makefile) to match the new version and also check whether the Dockerfiles need a new base image (e.g. [this](https://github.com/openshift/microshift/blob/main/packaging/images/openshift-ci/Dockerfile)) and the RPM `.spec` file needs updates (e.g. [this](https://github.com/openshift/microshift/blob/main/packaging/rpm/microshift.spec))
 
 Commit the changes:
 
@@ -88,8 +88,6 @@ To update the component image references of the MicroShift release, run:
 git add pkg/release
 git commit -m "update component images"
 ```
-
-Note that as long as we don't use 100% OpenShift-built images, you may need to bump the `pause` and network and storage provider images manually.
 
 ### Component manifests
 The next step is still poorly automated by `rebase.sh` and definitely requires manual review. It basically just gathers the various resource manifests used by the OpenShift control plane and the hosted components. In particular the latter are a few cases just the _templates_ of the manifests used by the hosted component's Operator, i.e. we need to substitute those for example with the variables MicroShift renders into the template or the name, namespace, or labels that the Operator would add in OpenShift.
@@ -122,4 +120,4 @@ git commit -m "update manifests"
 ```
 
 ### Component configs
-The last step isn't automated at all yet, which is to compare whether the config parameters of embedded component changed.
+The last step isn't automated at all yet, which is to compare whether the config parameters of embedded component changed, for example the kubelet configuration in `writeConfig(...)` of `pkg/node/kubelet.go` with OpenShift MCO's template (which the `rebase.sh` script downloads into `_output/staging/machine-config-operator/templates/master/01-master-kubelet/_base/files/kubelet.yaml`).
