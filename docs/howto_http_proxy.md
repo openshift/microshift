@@ -1,5 +1,6 @@
 # Deploying MicroShift Behind HTTP(S) Proxy
 When deploying MicroShift behind a proxy, it is necessary to configure the host OS to use this proxy for the components initiating HTTP(S) requests.
+> All the user-specific workloads or PODs with egress traffic (e.g. HTTP(S) access to cloud services) should be explicitly configured to use the proxy. There is no built-in transparent proxying of egress traffic in MicroShift.
 
 ## CRI-O Container Engine
 To use an HTTP(S) proxy in `CRI-O`, you need to set the `HTTP_PROXY` and `HTTPS_PROXY` environment variables.
