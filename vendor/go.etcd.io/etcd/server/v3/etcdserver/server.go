@@ -410,7 +410,7 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 		if err = cfg.VerifyJoinExisting(); err != nil {
 			return nil, err
 		}
-		cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, cfg.InitialPeerURLsMap)
+		cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, cfg.InitialPeerURLsMap, membership.WithMaxLearners(cfg.ExperimentalMaxLearners))
 		if err != nil {
 			return nil, err
 		}
@@ -424,7 +424,10 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 		if !isCompatibleWithCluster(cfg.Logger, cl, cl.MemberByName(cfg.Name).ID, prt) {
 			return nil, fmt.Errorf("incompatible with current running cluster")
 		}
-
+		scaleUpLearners := false
+		if err := membership.ValidateMaxLearnerConfig(cfg.ExperimentalMaxLearners, existingCluster.Members(), scaleUpLearners); err != nil {
+			return nil, err
+		}
 		remotes = existingCluster.Members()
 		cl.SetID(types.ID(0), existingCluster.ID())
 		cl.SetStore(st)
@@ -436,7 +439,7 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 		if err = cfg.VerifyBootstrap(); err != nil {
 			return nil, err
 		}
-		cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, cfg.InitialPeerURLsMap)
+		cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, cfg.InitialPeerURLsMap, membership.WithMaxLearners(cfg.ExperimentalMaxLearners))
 		if err != nil {
 			return nil, err
 		}
@@ -458,7 +461,7 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 			if config.CheckDuplicateURL(urlsmap) {
 				return nil, fmt.Errorf("discovery cluster %s has duplicate url", urlsmap)
 			}
-			if cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, urlsmap); err != nil {
+			if cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, urlsmap, membership.WithMaxLearners(cfg.ExperimentalMaxLearners)); err != nil {
 				return nil, err
 			}
 		}
@@ -514,6 +517,9 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 			if be, err = recoverSnapshotBackend(cfg, be, *snapshot, beExist, beHooks); err != nil {
 				cfg.Logger.Panic("failed to recover v3 backend from snapshot", zap.Error(err))
 			}
+			// A snapshot db may have already been recovered, and the old db should have
+			// already been closed in this case, so we should set the backend again.
+			ci.SetBackend(be)
 			s1, s2 := be.Size(), be.SizeInUse()
 			cfg.Logger.Info(
 				"recovered v3 backend from snapshot",
@@ -535,6 +541,12 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 		cl.SetStore(st)
 		cl.SetBackend(be)
 		cl.Recover(api.UpdateCapability)
+
+		scaleUpLearners := false
+		if err := membership.ValidateMaxLearnerConfig(cfg.ExperimentalMaxLearners, cl.Members(), scaleUpLearners); err != nil {
+			return nil, err
+		}
+
 		if cl.Version() != nil && !cl.Version().LessThan(semver.Version{Major: 3}) && !beExist {
 			os.RemoveAll(bepath)
 			return nil, fmt.Errorf("database file (%v) of the backend is missing", bepath)
@@ -592,9 +604,10 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 
 	// always recover lessor before kv. When we recover the mvcc.KV it will reattach keys to its leases.
 	// If we recover mvcc.KV first, it will attach the keys to the wrong lessor before it recovers.
-	srv.lessor = lease.NewLessor(srv.Logger(), srv.be, lease.LessorConfig{
+	srv.lessor = lease.NewLessor(srv.Logger(), srv.be, srv.cluster, lease.LessorConfig{
 		MinLeaseTTL:                int64(math.Ceil(minTTL.Seconds())),
 		CheckpointInterval:         cfg.LeaseCheckpointInterval,
+		CheckpointPersist:          cfg.LeaseCheckpointPersist,
 		ExpiredLeasesRetryInterval: srv.Cfg.ReqTimeout(),
 	})
 
@@ -656,6 +669,10 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 			srv.raftRequestOnce(ctx, pb.InternalRaftRequest{LeaseCheckpoint: cp})
 		})
 	}
+
+	// Set the hook after EtcdServer finishes the initialization to avoid
+	// the hook being called during the initialization process.
+	srv.be.SetTxPostLockInsideApplyHook(srv.getTxPostLockInsideApplyHook())
 
 	// TODO: move transport initialization near the definition of remote
 	tr := &rafthttp.Transport{
@@ -1239,6 +1256,13 @@ func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
 		lg.Panic("failed to open snapshot backend", zap.Error(err))
 	}
 
+	// We need to set the backend to consistIndex before recovering the lessor,
+	// because lessor.Recover will commit the boltDB transaction, accordingly it
+	// will get the old consistent_index persisted into the db in OnPreCommitUnsafe.
+	// Eventually the new consistent_index value coming from snapshot is overwritten
+	// by the old value.
+	s.consistIndex.SetBackend(newbe)
+
 	// always recover lessor before kv. When we recover the mvcc.KV it will reattach keys to its leases.
 	// If we recover mvcc.KV first, it will attach the keys to the wrong lessor before it recovers.
 	if s.lessor != nil {
@@ -1255,7 +1279,7 @@ func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
 		lg.Panic("failed to restore mvcc store", zap.Error(err))
 	}
 
-	s.consistIndex.SetBackend(newbe)
+	newbe.SetTxPostLockInsideApplyHook(s.getTxPostLockInsideApplyHook())
 	lg.Info("restored mvcc store", zap.Uint64("consistent-index", s.consistIndex.ConsistentIndex()))
 
 	// Closing old backend might block until all the txns
@@ -2124,7 +2148,7 @@ func (s *EtcdServer) apply(
 
 			// set the consistent index of current executing entry
 			if e.Index > s.consistIndex.ConsistentIndex() {
-				s.consistIndex.SetConsistentIndex(e.Index, e.Term)
+				s.consistIndex.SetConsistentApplyingIndex(e.Index, e.Term)
 				shouldApplyV3 = membership.ApplyBoth
 			}
 
@@ -2151,10 +2175,18 @@ func (s *EtcdServer) apply(
 // applyEntryNormal apples an EntryNormal type raftpb request to the EtcdServer
 func (s *EtcdServer) applyEntryNormal(e *raftpb.Entry) {
 	shouldApplyV3 := membership.ApplyV2storeOnly
+	applyV3Performed := false
+	defer func() {
+		// The txPostLock callback will not get called in this case,
+		// so we should set the consistent index directly.
+		if s.consistIndex != nil && !applyV3Performed && membership.ApplyBoth == shouldApplyV3 {
+			s.consistIndex.SetConsistentIndex(e.Index, e.Term)
+		}
+	}()
 	index := s.consistIndex.ConsistentIndex()
 	if e.Index > index {
 		// set the consistent index of current executing entry
-		s.consistIndex.SetConsistentIndex(e.Index, e.Term)
+		s.consistIndex.SetConsistentApplyingIndex(e.Index, e.Term)
 		shouldApplyV3 = membership.ApplyBoth
 	}
 	s.lg.Debug("apply entry normal",
@@ -2203,6 +2235,7 @@ func (s *EtcdServer) applyEntryNormal(e *raftpb.Entry) {
 		if !needResult && raftReq.Txn != nil {
 			removeNeedlessRangeReqs(raftReq.Txn)
 		}
+		applyV3Performed = true
 		ar = s.applyV3.Apply(&raftReq, shouldApplyV3)
 	}
 
@@ -2254,6 +2287,13 @@ func (s *EtcdServer) applyConfChange(cc raftpb.ConfChange, confState *raftpb.Con
 	if err := s.cluster.ValidateConfigurationChange(cc); err != nil {
 		cc.NodeID = raft.None
 		s.r.ApplyConfChange(cc)
+
+		// The txPostLock callback will not get called in this case,
+		// so we should set the consistent index directly.
+		if s.consistIndex != nil && membership.ApplyBoth == shouldApplyV3 {
+			applyingIndex, applyingTerm := s.consistIndex.ConsistentApplyingIndex()
+			s.consistIndex.SetConsistentIndex(applyingIndex, applyingTerm)
+		}
 		return false, err
 	}
 
@@ -2677,6 +2717,15 @@ func (s *EtcdServer) IsMemberExist(id types.ID) bool {
 // raftStatus returns the raft status of this etcd node.
 func (s *EtcdServer) raftStatus() raft.Status {
 	return s.r.Node.Status()
+}
+
+func (s *EtcdServer) getTxPostLockInsideApplyHook() func() {
+	return func() {
+		applyingIdx, applyingTerm := s.consistIndex.ConsistentApplyingIndex()
+		if applyingIdx > s.consistIndex.UnsafeConsistentIndex() {
+			s.consistIndex.SetConsistentIndex(applyingIdx, applyingTerm)
+		}
+	}
 }
 
 func maybeDefragBackend(cfg config.ServerConfig, be backend.Backend) error {

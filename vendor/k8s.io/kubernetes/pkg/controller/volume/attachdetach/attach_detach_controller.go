@@ -185,7 +185,7 @@ func NewAttachDetachController(
 
 	csiTranslator := csitrans.New()
 	adc.intreeToCSITranslator = csiTranslator
-	adc.csiMigratedPluginManager = csimigration.NewPluginManager(csiTranslator, utilfeature.DefaultFeatureGate)
+	adc.csiMigratedPluginManager = csimigration.NewADCPluginManager(csiTranslator, utilfeature.DefaultFeatureGate)
 
 	adc.desiredStateOfWorldPopulator = populator.NewDesiredStateOfWorldPopulator(
 		timerConfig.DesiredStateOfWorldPopulatorLoopSleepPeriod,
@@ -856,6 +856,10 @@ func (adc *attachDetachController) GetHostIP() (net.IP, error) {
 
 func (adc *attachDetachController) GetNodeAllocatable() (v1.ResourceList, error) {
 	return v1.ResourceList{}, nil
+}
+
+func (adc *attachDetachController) GetAttachedVolumesFromNodeStatus() (map[v1.UniqueVolumeName]string, error) {
+	return map[v1.UniqueVolumeName]string{}, nil
 }
 
 func (adc *attachDetachController) GetSecretFunc() func(namespace, name string) (*v1.Secret, error) {

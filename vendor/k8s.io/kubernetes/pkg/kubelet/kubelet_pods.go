@@ -918,6 +918,12 @@ func countRunningContainerStatus(status v1.PodStatus) int {
 	return runningContainers
 }
 
+// PodCouldHaveRunningContainers returns true if the pod with the given UID could still have running
+// containers. This returns false if the pod has not yet been started or the pod is unknown.
+func (kl *Kubelet) PodCouldHaveRunningContainers(pod *v1.Pod) bool {
+	return kl.podWorkers.CouldHaveRunningContainers(pod.UID)
+}
+
 // PodResourcesAreReclaimed returns true if all required node-level resources that a pod was consuming have
 // been reclaimed by the kubelet.  Reclaiming resources is a prerequisite to deleting a pod from the API server.
 func (kl *Kubelet) PodResourcesAreReclaimed(pod *v1.Pod, status v1.PodStatus) bool {
@@ -1433,7 +1439,7 @@ func getPhase(spec *v1.PodSpec, info []v1.ContainerStatus) v1.PodPhase {
 }
 
 // generateAPIPodStatus creates the final API pod status for a pod, given the
-// internal pod status.
+// internal pod status. This method should only be called from within sync*Pod methods.
 func (kl *Kubelet) generateAPIPodStatus(pod *v1.Pod, podStatus *kubecontainer.PodStatus) v1.PodStatus {
 	klog.V(3).InfoS("Generating pod status", "pod", klog.KObj(pod))
 
@@ -1520,10 +1526,16 @@ func (kl *Kubelet) generateAPIPodStatus(pod *v1.Pod, podStatus *kubecontainer.Po
 			klog.V(4).InfoS("Cannot get host IPs", "err", err)
 		} else {
 			s.HostIP = hostIPs[0].String()
-			if kubecontainer.IsHostNetworkPod(pod) && s.PodIP == "" {
-				s.PodIP = hostIPs[0].String()
-				s.PodIPs = []v1.PodIP{{IP: s.PodIP}}
-				if len(hostIPs) == 2 {
+			// HostNetwork Pods inherit the node IPs as PodIPs. They are immutable once set,
+			// other than that if the node becomes dual-stack, we add the secondary IP.
+			if kubecontainer.IsHostNetworkPod(pod) {
+				// Primary IP is not set
+				if s.PodIP == "" {
+					s.PodIP = hostIPs[0].String()
+					s.PodIPs = []v1.PodIP{{IP: s.PodIP}}
+				}
+				// Secondary IP is not set #105320
+				if len(hostIPs) == 2 && len(s.PodIPs) == 1 {
 					s.PodIPs = append(s.PodIPs, v1.PodIP{IP: hostIPs[1].String()})
 				}
 			}

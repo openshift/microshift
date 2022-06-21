@@ -21,14 +21,14 @@ package release
 
 func init() {
 	Image = map[string]string{
-		"cli":                           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4dcacb7ae5c5a5c0cb2fbc8e132b14a72ee937b3dd7d201c7a66ded05e5d6790",
-		"coredns":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6e963275041b08eafa47fa119287e1d4428b5af642c3befc6f0c90900d3516a4",
-		"haproxy_router":                "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:608a8c9f893b3fae358028b44238f3184af2f3bd5cde844b8b2688583b8468ea",
+		"cli":                           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ba44dead03ea74107f90d58525106fb52d27a120b73c6cc8e2be31d37043ca1c",
+		"coredns":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2b423e88cdd37f307aff51cbb0f53fc45deff9618f5b4f12bfb78bea7aff51a2",
+		"haproxy_router":                "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5f9ee3afa744e790dbb61d08f44e30370c9a5ff041054bf99dc1afe58792cd7b",
 		"kube_flannel":                  "quay.io/coreos/flannel:v0.14.0",
 		"kube_flannel_cni":              "quay.io/microshift/flannel-cni:v0.14.0",
-		"kube_rbac_proxy":               "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:08e8b4004edaeeb125ced09ab2c4cd6d690afaf3a86309c91a994dec8e3ccbf3",
+		"kube_rbac_proxy":               "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3df935837634adb5df8080ac7263c7fb4c4f9d8fd45b36e32ca4fb802bdeaecc",
 		"kubevirt_hostpath_provisioner": "quay.io/kubevirt/hostpath-provisioner:v0.8.0",
 		"pause":                         "k8s.gcr.io/pause:3.6",
-		"service_ca_operator":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:94a4cd55cb067f6d3747843b5532114806b6c81e8421e370bfe92ccafcc6bca7",
+		"service_ca_operator":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8b0e194c1cb6babeb2d8326091deb2bba63c430938abe056eb89398c78733eb6",
 	}
 }

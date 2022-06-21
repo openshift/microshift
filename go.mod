@@ -312,13 +312,13 @@ replace (
 	github.com/xlab/treeprint => github.com/xlab/treeprint v0.0.0-20181112141820-a009c3971eca
 	github.com/yuin/goldmark => github.com/yuin/goldmark v1.4.0
 	go.etcd.io/bbolt => go.etcd.io/bbolt v1.3.6
-	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.5.0
-	go.etcd.io/etcd/client/pkg/v3 => go.etcd.io/etcd/client/pkg/v3 v3.5.0
-	go.etcd.io/etcd/client/v2 => go.etcd.io/etcd/client/v2 v2.305.0
-	go.etcd.io/etcd/client/v3 => go.etcd.io/etcd/client/v3 v3.5.0
-	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.5.0
-	go.etcd.io/etcd/raft/v3 => go.etcd.io/etcd/raft/v3 v3.5.0
-	go.etcd.io/etcd/server/v3 => go.etcd.io/etcd/server/v3 v3.5.0
+	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20220513172030-7afa17cd7209
+	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20220513172030-7afa17cd7209
+	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20220513172030-7afa17cd7209
+	go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20220513172030-7afa17cd7209
+	go.etcd.io/etcd/raft/v3 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20220513172030-7afa17cd7209
+	go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.1-0.20220513172030-7afa17cd7209
+	go.etcd.io/etcd/v3 => github.com/openshift/etcd/v3 v3.5.1-0.20220513172030-7afa17cd7209
 	go.opencensus.io => go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib => go.opentelemetry.io/contrib v0.20.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc => go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.20.0
@@ -380,32 +380,33 @@ replace (
 	gotest.tools/v3 => gotest.tools/v3 v3.0.3
 	honnef.co/go/tools => honnef.co/go/tools v0.0.1-2020.1.4
 	k8s.io/api => k8s.io/api v0.23.1
-	k8s.io/apiextensions-apiserver => github.com/openshift/kubernetes-apiextensions-apiserver v0.0.0-20211216180713-2dbf9c41c448 // points to openshift-apiserver-4.10-kubernetes-1.23.1
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.23.1 // updated by openshift-apiserver
 	k8s.io/apimachinery => k8s.io/apimachinery v0.23.1
 	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20211221144435-1fd9911b75fd // points to openshift-apiserver-4.10-kubernetes-1.23.1
-	k8s.io/cli-runtime => github.com/openshift/kubernetes-cli-runtime v0.0.0-20211216181305-bfb970bd4672 // points to openshift-apiserver-4.10-kubernetes-1.23.1
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.23.1
 	k8s.io/client-go => k8s.io/client-go v0.23.1
-	k8s.io/cloud-provider => github.com/openshift/kubernetes-cloud-provider v0.0.0-20211216182854-aaa6817995f6 // points to openshift-apiserver-4.10-kubernetes-1.23.1
-	k8s.io/cluster-bootstrap => github.com/openshift/kubernetes-cluster-bootstrap v0.0.0-20211216183359-c21007877174 // points to openshift-apiserver-4.10-kubernetes-1.23.1
+	k8s.io/cloud-provider => k8s.io/cloud-provider v0.23.1
+	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.23.1
 	k8s.io/code-generator => k8s.io/code-generator v0.23.1
-	k8s.io/component-base => k8s.io/component-base v0.23.1
+	k8s.io/component-base => k8s.io/component-base v0.23.1 // updated by openshift-apiserver
 	k8s.io/component-helpers => k8s.io/component-helpers v0.23.1
 	k8s.io/controller-manager => k8s.io/controller-manager v0.23.1
-	k8s.io/cri-api => github.com/openshift/kubernetes-cri-api v0.0.0-20211213230656-dda75a127e22 // points to openshift-apiserver-4.10-kubernetes-1.23.1
-	k8s.io/csi-translation-lib => github.com/openshift/kubernetes-csi-translation-lib v0.0.0-20211216183629-01ef78978368 // points to openshift-apiserver-4.10-kubernetes-1.23.1
+	k8s.io/cri-api => k8s.io/cri-api v0.23.1
+	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.23.1
 	k8s.io/gengo => k8s.io/gengo v0.0.0-20210813121822-485abfe95c7c
 	k8s.io/heapster => k8s.io/heapster v1.2.0-beta.1
 	k8s.io/klog => k8s.io/klog v1.0.0
 	k8s.io/klog/v2 => k8s.io/klog/v2 v2.30.0
-	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.23.1
-	k8s.io/kube-controller-manager => github.com/openshift/kubernetes-kube-controller-manager v0.0.0-20211216183133-c6e1672b1061 // points to openshift-apiserver-4.10-kubernetes-1.23.1
+	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.23.1 // updated by openshift-apiserver
+	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.23.1
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65
-	k8s.io/kube-proxy => github.com/openshift/kubernetes-kube-proxy v0.0.0-20211216181818-8e728c7ec385 // points to openshift-apiserver-4.10-kubernetes-1.23.1
-	k8s.io/kube-scheduler => github.com/openshift/kubernetes-kube-scheduler v0.0.0-20211216182333-4cc21587537d // points to openshift-apiserver-4.10-kubernetes-1.23.1
-	k8s.io/kubectl => github.com/openshift/kubernetes-kubectl v0.0.0-20211216184953-2edfc0ad54ac // points to openshift-apiserver-4.10-kubernetes-1.23.1
-	k8s.io/kubelet => github.com/openshift/kubernetes-kubelet v0.0.0-20211216182054-2ea4599c85e2 // points to openshift-apiserver-4.10-kubernetes-1.23.1
-	k8s.io/legacy-cloud-providers => github.com/openshift/kubernetes-legacy-cloud-providers v0.0.0-20211216184245-a3dec7369c09 // points to openshift-apiserver-4.10-kubernetes-1.23.1
-	k8s.io/metrics => github.com/openshift/kubernetes-metrics v0.0.0-20211216181011-1d26bcb74117 // points to openshift-apiserver-4.10-kubernetes-1.23.1
+	k8s.io/kube-proxy => k8s.io/kube-proxy v0.23.1
+	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.23.1
+	k8s.io/kubectl => k8s.io/kubectl v0.23.1
+	k8s.io/kubelet => k8s.io/kubelet v0.23.1
+	k8s.io/kubernetes => github.com/openshift/kubernetes v1.24.0-alpha.0.0.20220510163048-3afdacbd0183
+	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.23.1
+	k8s.io/metrics => k8s.io/metrics v0.23.1
 	k8s.io/mount-utils => k8s.io/mount-utils v0.23.1
 	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.23.1
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.23.1
@@ -432,25 +433,27 @@ replace (
 )
 
 require (
-	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f
+	github.com/auth0/go-jwt-middleware v0.0.0-00010101000000-000000000000 // indirect
+	github.com/boltdb/bolt v0.0.0-00010101000000-000000000000 // indirect
+	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
-	github.com/hpcloud/tail v0.0.0-00010101000000-000000000000 // indirect
+	github.com/go-ozzo/ozzo-validation v0.0.0-00010101000000-000000000000 // indirect
+	github.com/heketi/tests v0.0.0-00010101000000-000000000000 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // microshift
+	github.com/lpabon/godbc v0.0.0-00010101000000-000000000000 // indirect
 	github.com/miekg/dns v1.1.35
 	github.com/mitchellh/go-homedir v1.1.0 // microshift
-	github.com/openshift/api v0.0.0-20220124143425-d74727069f6f
-	github.com/openshift/build-machinery-go v0.0.0-20211213093930-7e33a7eb4ce3
+	github.com/mohae/deepcopy v0.0.0-00010101000000-000000000000 // indirect
+	github.com/openshift/api v0.0.0-20220414050251-a83e6f8f1d50
+	github.com/openshift/build-machinery-go v0.0.0-20220121085309-f94edc2d6874
 	github.com/openshift/client-go v0.0.0-20211209144617-7385dd6338e3
 	github.com/openshift/openshift-apiserver v0.0.0-alpha.0.0.20220214215439-6b16f7fa1a95
 	github.com/openshift/openshift-controller-manager v0.0.0-alpha.0.0.20220106174623-2c2d50dbda3a
 	github.com/pkg/errors v0.9.1
-	github.com/pkg/profile v1.4.0 // indirect
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
 	go.etcd.io/etcd/server/v3 v3.5.3
-	gopkg.in/fsnotify.v1 v1.0.0-00010101000000-000000000000 // indirect
-	gopkg.in/tomb.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.23.1
 	k8s.io/apiextensions-apiserver v0.23.1
