@@ -45,6 +45,13 @@ podman build -t tinyproxy https://raw.githubusercontent.com/openshift/microshift
 podman run --rm -d --name tinyproxy -p 8443:8888 tinyproxy 
 ```
 
+If the firewall is enabled, use the following commands to allow TCP traffic on port `8443` from the virtual machine network.
+```
+sudo firewall-cmd --zone=libvirt --add-port=8443/tcp --permanent
+sudo firewall-cmd --reload
+```
+> A different firewall configuration may need to be applied if `libvirt` is not used as the virtualization platform.
+
 ### Virtual Machine Settings
 Log into the virtual machine to configure `CRI-O` and `rpm-ostree` for using a proxy.
 
