@@ -231,13 +231,9 @@ func (jm *ControllerV2) resolveControllerRef(namespace string, controllerRef *me
 }
 
 func (jm *ControllerV2) getJobsToBeReconciled(cronJob *batchv1.CronJob) ([]*batchv1.Job, error) {
-	var jobSelector labels.Selector
-	if len(cronJob.Spec.JobTemplate.Labels) == 0 {
-		jobSelector = labels.Everything()
-	} else {
-		jobSelector = labels.Set(cronJob.Spec.JobTemplate.Labels).AsSelector()
-	}
-	jobList, err := jm.jobLister.Jobs(cronJob.Namespace).List(jobSelector)
+	// list all jobs: there may be jobs with labels that don't match the template anymore,
+	// but that still have a ControllerRef to the given cronjob
+	jobList, err := jm.jobLister.Jobs(cronJob.Namespace).List(labels.Everything())
 	if err != nil {
 		return nil, err
 	}
@@ -613,13 +609,14 @@ func (jm *ControllerV2) syncCronJob(
 	}
 	cj.Status.Active = append(cj.Status.Active, *jobRef)
 	cj.Status.LastScheduleTime = &metav1.Time{Time: *scheduledTime}
-	if _, err := jm.cronJobControl.UpdateStatus(ctx, cj); err != nil {
+	updatedCJ, err = jm.cronJobControl.UpdateStatus(ctx, cj)
+	if err != nil {
 		klog.InfoS("Unable to update status", "cronjob", klog.KRef(cj.GetNamespace(), cj.GetName()), "resourceVersion", cj.ResourceVersion, "err", err)
 		return cj, nil, fmt.Errorf("unable to update status for %s (rv = %s): %v", klog.KRef(cj.GetNamespace(), cj.GetName()), cj.ResourceVersion, err)
 	}
 
 	t := nextScheduledTimeDuration(sched, now)
-	return cj, t, nil
+	return updatedCJ, t, nil
 }
 
 func getJobName(cj *batchv1.CronJob, scheduledTime time.Time) string {

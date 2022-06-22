@@ -216,6 +216,7 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 		ExperimentalEnableDistributedTracing:     cfg.ExperimentalEnableDistributedTracing,
 		UnsafeNoFsync:                            cfg.UnsafeNoFsync,
 		EnableLeaseCheckpoint:                    cfg.ExperimentalEnableLeaseCheckpoint,
+		LeaseCheckpointPersist:                   cfg.ExperimentalEnableLeaseCheckpointPersist,
 		CompactionBatchLimit:                     cfg.ExperimentalCompactionBatchLimit,
 		WatchProgressNotifyInterval:              cfg.ExperimentalWatchProgressNotifyInterval,
 		DowngradeCheckTime:                       cfg.ExperimentalDowngradeCheckTime,
@@ -223,7 +224,8 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 		ExperimentalMemoryMlock:                  cfg.ExperimentalMemoryMlock,
 		ExperimentalTxnModeWriteWithSharedBuffer: cfg.ExperimentalTxnModeWriteWithSharedBuffer,
 		ExperimentalBootstrapDefragThresholdMegabytes: cfg.ExperimentalBootstrapDefragThresholdMegabytes,
-		V2Deprecation: cfg.V2DeprecationEffective(),
+		ExperimentalMaxLearners:                       cfg.ExperimentalMaxLearners,
+		V2Deprecation:                                 cfg.V2DeprecationEffective(),
 	}
 
 	if srvcfg.ExperimentalEnableDistributedTracing {
@@ -345,6 +347,7 @@ func print(lg *zap.Logger, ec Config, sc config.ServerConfig, memberInitialized 
 		zap.String("discovery-url", sc.DiscoveryURL),
 		zap.String("discovery-proxy", sc.DiscoveryProxy),
 		zap.String("downgrade-check-interval", sc.DowngradeCheckTime.String()),
+		zap.Int("max-learners", sc.ExperimentalMaxLearners),
 	)
 }
 
@@ -539,7 +542,7 @@ func (e *Etcd) servePeers() (err error) {
 
 	for _, p := range e.Peers {
 		u := p.Listener.Addr().String()
-		gs := v3rpc.Server(e.Server, peerTLScfg)
+		gs := v3rpc.Server(e.Server, peerTLScfg, nil)
 		m := cmux.New(p.Listener)
 		go gs.Serve(m.Match(cmux.HTTP2()))
 		srv := &http.Server{

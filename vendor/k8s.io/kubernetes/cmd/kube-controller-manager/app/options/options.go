@@ -49,6 +49,8 @@ import (
 
 	// add the kubernetes feature gates
 	_ "k8s.io/kubernetes/pkg/features"
+
+	libgorestclient "github.com/openshift/library-go/pkg/config/client"
 )
 
 const (
@@ -96,6 +98,7 @@ type KubeControllerManagerOptions struct {
 	Master                      string
 	Kubeconfig                  string
 	ShowHiddenMetricsForVersion string
+	OpenShiftContext            kubecontrollerconfig.OpenShiftContext
 }
 
 // NewKubeControllerManagerOptions creates a new KubeControllerManagerOptions with a default config.
@@ -278,6 +281,12 @@ func (s *KubeControllerManagerOptions) Flags(allControllers []string, disabledBy
 	fs := fss.FlagSet("misc")
 	fs.StringVar(&s.Master, "master", s.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig).")
 	fs.StringVar(&s.Kubeconfig, "kubeconfig", s.Kubeconfig, "Path to kubeconfig file with authorization and master location information.")
+	var dummy string
+	fs.MarkDeprecated("insecure-experimental-approve-all-kubelet-csrs-for-group", "This flag does nothing.")
+	fs.StringVar(&dummy, "insecure-experimental-approve-all-kubelet-csrs-for-group", "", "This flag does nothing.")
+	fs.StringVar(&s.OpenShiftContext.OpenShiftConfig, "openshift-config", s.OpenShiftContext.OpenShiftConfig, "indicates that this process should be compatible with openshift start master")
+	fs.MarkHidden("openshift-config")
+	fs.BoolVar(&s.OpenShiftContext.UnsupportedKubeAPIOverPreferredHost, "unsupported-kube-api-over-localhost", false, "when set makes KCM prefer talking to localhost kube-apiserver (when available) instead of LB")
 	utilfeature.DefaultMutableFeatureGate.AddFlag(fss.FlagSet("generic"))
 
 	return fss
@@ -377,6 +386,9 @@ func (s *KubeControllerManagerOptions) ApplyTo(c *kubecontrollerconfig.Config) e
 			return err
 		}
 	}
+
+	c.OpenShiftContext = s.OpenShiftContext
+
 	return nil
 }
 
@@ -440,6 +452,14 @@ func (s KubeControllerManagerOptions) Config(allControllers []string, disabledBy
 	kubeconfig.ContentConfig.ContentType = s.Generic.ClientConnection.ContentType
 	kubeconfig.QPS = s.Generic.ClientConnection.QPS
 	kubeconfig.Burst = int(s.Generic.ClientConnection.Burst)
+
+	if s.OpenShiftContext.PreferredHostRoundTripperWrapperFn != nil {
+		libgorestclient.DefaultServerName(kubeconfig)
+		kubeconfig.Wrap(s.OpenShiftContext.PreferredHostRoundTripperWrapperFn)
+	}
+	for _, customOpenShiftRoundTripper := range s.OpenShiftContext.CustomRoundTrippers {
+		kubeconfig.Wrap(customOpenShiftRoundTripper)
+	}
 
 	client, err := clientset.NewForConfig(restclient.AddUserAgent(kubeconfig, KubeControllerManagerUserAgent))
 	if err != nil {
