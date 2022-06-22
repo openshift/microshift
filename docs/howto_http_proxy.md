@@ -41,7 +41,7 @@ Use the instructions in the [Install MicroShift for Edge](./devenv_rhel8.md#inst
 ### Hypervisor Settings
 Log into the hypervisor host and set up an `tinyproxy` server to be used as a forward proxy.
 ```
-podman build -t tinyproxy -f https://raw.githubusercontent.com/openshift/microshift/main/docs/podman/Containerfile.tinyproxy
+podman build -t tinyproxy https://raw.githubusercontent.com/openshift/microshift/main/docs/podman/Containerfile.tinyproxy
 podman run --rm -d --name tinyproxy -p 8443:8888 tinyproxy 
 ```
 
