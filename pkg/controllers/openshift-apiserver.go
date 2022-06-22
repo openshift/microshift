@@ -129,7 +129,6 @@ func waitForOCPAPIServer(client kubernetes.Interface, timeout time.Duration) err
 		for _, apiSvc := range []string{
 			"authorization.openshift.io",
 			"route.openshift.io",
-			"security.openshift.io",
 		} {
 			status := 0
 			url := "/apis/" + apiSvc

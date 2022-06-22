@@ -153,7 +153,6 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 	for _, apiSvc := range []string{
 		"v1.authorization.openshift.io",
 		"v1.route.openshift.io",
-		"v1.security.openshift.io",
 	} {
 		api := &apiregistrationv1.APIService{
 			TypeMeta: metav1.TypeMeta{
