@@ -1,7 +1,7 @@
 # Deploying a TCP Load Balancer for User Workloads
 MicroShift does not currently offer an implementation of network load balancers ([Services of type LoadBalancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer)). If load balancer facilities are required by user workloads, it is possible to deploy 3rd party load balancer services. 
 
-This document demonstates how to deploy the [MetalLB](https://metallb.universe.tf) service, which is a load balancer implementation for bare metal clusters, using standard routing protocols.
+This document demonstates how to deploy the [MetalLB](https://metallb.universe.tf) service, which is a load balancer implementation for bare metal clusters.
 
 ## Create MicroShift Server
 Use the instructions in the [Install MicroShift for Edge](./devenv_rhel8.md#install-microshift-for-edge) section to configure a virtual machine running MicroShift. 
@@ -15,14 +15,14 @@ oc get pods -A
 ```
 
 ## Install Load Balancer
-Log into the virtual machine and run the following commands to create `MetalLB` namespace and deployment.
+Log into the virtual machine and run the following commands to create the `MetalLB` namespace and deployment.
 
 ```
 oc apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml
 oc apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml
 ```
 
-Once the components are available, create a `ConfigMap` required to define the address pool for the load balancer to use.
+Once the components are available, create a `ConfigMap` to define the default address pool for the load balancer to use.
 
 ```bash
 oc create -f - <<EOF
@@ -54,7 +54,8 @@ Run the following command to deploy **3 replicas** of a test `nginx` application
 ```bash
 oc apply -n $NAMESPACE -f https://raw.githubusercontent.com/openshift/microshift/main/docs/config/nginx-IP-header.spec
 ```
-The application is configured to return `X-Server-IP` header containing the container IP address.
+
+The application is configured to return the `X-Server-IP` header with the container IP address.
 
 Verify that all the **3 replicas** of the application started successfully.
 
@@ -63,7 +64,7 @@ oc get pods -n $NAMESPACE
 ```
 
 ## Create Load Balancer Service
-Log into the virtual machine and run the following commands to create the `LoadBalancer` service for `nginx` application using the `MetalLB` address pool.
+Log into the virtual machine and run the following command to create the `LoadBalancer` service for `nginx` application using the default `MetalLB` address pool.
 
 ```bash
 oc create -n $NAMESPACE -f - <<EOF
@@ -92,7 +93,7 @@ nginx   LoadBalancer   10.43.183.104   192.168.1.241   80:32434/TCP   2m
 ```
 
 ## Test Load Balancer
-Log into the virtual machine and run the following commands to verify that the load balancer routes requests to all the running application instances.
+Log into the virtual machine and run the following commands to verify that the load balancer distributes requests among all the running application instances.
 
 > Set the `EXTERNAL_IP` environment variable to the external IP of the `LoadBalancer` service.
 
@@ -101,9 +102,9 @@ EXTERNAL_IP=192.168.1.241
 seq 5 | xargs -Iz curl -s -I http://$EXTERNAL_IP | grep X-Server-IP
 ```
 
-The above command attempts to perform five connections to the `nginx` application using the `LoadBalancer` external IP address and print the value of the `X-Server-IP` header. 
+The above command attempts to perform five connections to the `nginx` application using the external IP address of the `LoadBalancer` service. Only the value of the `X-Server-IP` header is filtered from the application response.
 
-The output of this command should return different IP addresses, demonstrating that the load balancer service works by distributing the traffic among the instances of the application.
+The output of this command should contain different IP addresses, demonstrating that the load balancer service works by distributing the traffic among the instances of the application.
 
 ```
 X-Server-IP: 10.42.0.41
