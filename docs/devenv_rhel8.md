@@ -264,10 +264,8 @@ Rebuild the MicroShift executable as described in the [Build MicroShift](#build-
 ```bash
 scp ~/microshift/microshift redhat@microshift-edge:
 ssh redhat@microshift-edge ' \
-    sudo systemctl stop microshift && \
-    sleep 3 && \
-    sudo cp ~redhat/microshift /usr/bin/microshift && \
     echo 1 | /usr/bin/cleanup-all-microshift-data && \
+    sudo cp ~redhat/microshift /usr/bin/microshift && \
     sudo systemctl enable microshift --now && \
     echo Done '
 ```
