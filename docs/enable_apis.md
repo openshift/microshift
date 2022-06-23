@@ -5,6 +5,12 @@ MicroShift supports the following sets of OpenShift API resources.
 |-----------------------|-------|
 | route.openshift.io/v1 | Route |
 
+
+| GroupVersion             | Kind                       |
+|--------------------------|----------------------------|
+| security.openshift.io/v1 | SecurityContextConstraints |
+
+
 | GroupVersion                  | Kind                      |
 |-------------------------------|---------------------------|
 | authorization.openshift.io/v1 | ClusterRoleBinding        |
@@ -18,11 +24,3 @@ MicroShift supports the following sets of OpenShift API resources.
 |                               | SelfSubjectRulesReview    |
 |                               | SubjectAccessReview       |
 |                               | SubjectRulesReview        |
-
-| GroupVersion             | Kind                               |
-|--------------------------|------------------------------------|
-| security.openshift.io/v1 | PodSecurityPolicyReview            |
-|                          | PodSecurityPolicySelfSubjectReview |
-|                          | PodSecurityPolicySubjectReview     |
-|                          | RangeAllocation                    |
-|                          | SecurityContextConstraints         |
