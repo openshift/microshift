@@ -52,15 +52,15 @@ build each image.
 Each component source code is extracted into the `src` directory, the references
 are extracted from the specific OCP release, and for components not
 being part of OCP the `repo` and `commit` files should exist (except for the base image)
-(see flannel for an example).
+(see hostpathprovisioner for an example).
 
 In addition, each component can have:
 * `ImageSource.$ARCH` or `Dockerfile.$ARCH` specific for an architecture.
 * `ImageSource` or `Dockerfile` general building strategy.
 
 An `ImageSource` file means that if no other specific method exist for an architecture
-the image should be retrieved from an specific ImageSource, for example in `flannel` we use
-`quay.io/coreos/flannel:v0.14.0` as ImageSource for most architectures, since they publish
+the image should be retrieved from an specific ImageSource, for example in `hostpathprovisioner` we use
+`quay.io/kubevirt/hostpath-provisioner:v0.10.0` as ImageSource for most architectures, since they publish
 a multi-architecture manifest.
 
 A `Dockerfile` file means that if no other specific method exist for an architecture,
@@ -90,7 +90,7 @@ For architectures where `ubi8` or `ubi8-minimal` images exist such base will be 
 in some cases we use `fedora-minimal` (when a newer version of packages is necessary)
 
 # Non OCP images
-We consume a few non-ocp images, like `flannel`, `hostpath-provisioner`, `pause`,
+We consume a few non-ocp images, like `hostpath-provisioner`, `pause`,
 we build those images from exiting image sources, or from source code.
 
 # generated images

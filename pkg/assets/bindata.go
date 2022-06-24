@@ -1,6 +1,5 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
-// assets/components/flannel/daemonset.yaml
 // assets/components/hostpath-provisioner/clusterrole.yaml
 // assets/components/hostpath-provisioner/clusterrolebinding.yaml
 // assets/components/hostpath-provisioner/daemonset.yaml
@@ -96,129 +95,6 @@ func (fi bindataFileInfo) IsDir() bool {
 // Sys return file is sys mode
 func (fi bindataFileInfo) Sys() interface{} {
 	return nil
-}
-
-var _assetsComponentsFlannelDaemonsetYaml = []byte(`apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: kube-flannel-ds
-  namespace: kube-system
-  labels:
-    tier: node
-    app: flannel
-spec:
-  selector:
-    matchLabels:
-      app: flannel
-  template:
-    metadata:
-      labels:
-        tier: node
-        app: flannel
-    spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/os
-                operator: In
-                values:
-                - linux
-      hostNetwork: true
-      priorityClassName: system-node-critical
-      tolerations:
-      - operator: Exists
-        effect: NoSchedule
-      serviceAccountName: flannel
-      initContainers:
-      - name: install-cni-bin
-        image: {{ .ReleaseImage.kube_flannel_cni }}
-        imagePullPolicy: IfNotPresent
-        command:
-        - cp
-        args:
-        - -f
-        - /flannel
-        - /opt/cni/bin/flannel
-        volumeMounts:
-        - name: cni-plugin
-          mountPath: /opt/cni/bin
-      - name: install-cni
-        image: {{ .ReleaseImage.kube_flannel }}
-        imagePullPolicy: IfNotPresent
-        command:
-        - cp
-        args:
-        - -f
-        - /etc/kube-flannel/cni-conf.json
-        - /etc/cni/net.d/10-flannel.conflist
-        volumeMounts:
-        - name: cni
-          mountPath: /etc/cni/net.d
-        - name: flannel-cfg
-          mountPath: /etc/kube-flannel/
-      containers:
-      - name: kube-flannel
-        image: {{ .ReleaseImage.kube_flannel }}
-        imagePullPolicy: IfNotPresent
-        command:
-        - /opt/bin/flanneld
-        args:
-        - --ip-masq
-        - --kube-subnet-mgr
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "50Mi"
-          limits:
-            cpu: "100m"
-            memory: "50Mi"
-        securityContext:
-          privileged: false
-          capabilities:
-            add: ["NET_ADMIN", "NET_RAW"]
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        volumeMounts:
-        - name: run
-          mountPath: /run/flannel
-        - name: flannel-cfg
-          mountPath: /etc/kube-flannel/
-      volumes:
-      - name: run
-        hostPath:
-          path: /run/flannel
-      - name: cni
-        hostPath:
-          path: /etc/cni/net.d
-      - name: flannel-cfg
-        configMap:
-          name: kube-flannel-cfg
-      - name: cni-plugin
-        hostPath:
-          path: /opt/cni/bin`)
-
-func assetsComponentsFlannelDaemonsetYamlBytes() ([]byte, error) {
-	return _assetsComponentsFlannelDaemonsetYaml, nil
-}
-
-func assetsComponentsFlannelDaemonsetYaml() (*asset, error) {
-	bytes, err := assetsComponentsFlannelDaemonsetYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/components/flannel/daemonset.yaml", size: 2657, mode: os.FileMode(436), modTime: time.Unix(1655736360, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
 }
 
 var _assetsComponentsHostpathProvisionerClusterroleYaml = []byte(`kind: ClusterRole
@@ -2846,7 +2722,6 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"assets/components/flannel/daemonset.yaml":                                      assetsComponentsFlannelDaemonsetYaml,
 	"assets/components/hostpath-provisioner/clusterrole.yaml":                       assetsComponentsHostpathProvisionerClusterroleYaml,
 	"assets/components/hostpath-provisioner/clusterrolebinding.yaml":                assetsComponentsHostpathProvisionerClusterrolebindingYaml,
 	"assets/components/hostpath-provisioner/daemonset.yaml":                         assetsComponentsHostpathProvisionerDaemonsetYaml,
@@ -2936,9 +2811,6 @@ type bintree struct {
 var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"components": {nil, map[string]*bintree{
-			"flannel": {nil, map[string]*bintree{
-				"daemonset.yaml": {assetsComponentsFlannelDaemonsetYaml, map[string]*bintree{}},
-			}},
 			"hostpath-provisioner": {nil, map[string]*bintree{
 				"clusterrole.yaml":        {assetsComponentsHostpathProvisionerClusterroleYaml, map[string]*bintree{}},
 				"clusterrolebinding.yaml": {assetsComponentsHostpathProvisionerClusterrolebindingYaml, map[string]*bintree{}},
