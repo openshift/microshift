@@ -407,7 +407,11 @@ class SRPMBuilderCommand(object):
             for image in arch_info['images']:
                 arch_name = arch_info.get('image_arch', arch_info['name'])
                 print("pulling %s for arch %s, to %s" % (image, arch_name, directory))
-                result = system('sudo podman pull --arch %s --root "%s" %s' % (arch_name, directory, image))
+                auth_file = os.getenv('REGISTRY_AUTH_FILE')
+                if auth_file!='':
+                    result = system('sudo podman pull --authfile %s --arch %s --root "%s" %s' % (auth_file, arch_name, directory, image))
+                else:
+                    result = system('sudo podman pull               --arch %s --root "%s" %s' % (           arch_name, directory, image))
                 if result!=0:
                     print("error pulling image")
                     sys.exit(result)

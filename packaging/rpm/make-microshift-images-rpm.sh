@@ -4,16 +4,7 @@ set -e -o pipefail
 # generated from other info
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 BASE_VERSION="$(${SCRIPT_DIR}/../../pkg/release/get.sh base)"
-
 RPMBUILD_DIR="${SCRIPT_DIR}/_rpmbuild/"
-BUILD=${BUILD:-$1}
-BUILD=${BUILD:-rpm}
-TARGET=${TARGET:-$2}
-TARGET=${TARGET:-fedora-36-x86_64}
-RELEASE=${RELEASE:-1}
-COPR_REPO=${COPR_REPO:-@redhat-et/microshift-containers}
-
-ARCHITECTURES=${ARCHITECTURES:-"x86_64:amd64 aarch64:arm64"}
 
 build() {
   cat >"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
@@ -30,29 +21,75 @@ packages:
     arch:
 EOF
 
-  for arch in $ARCHITECTURES; do
-    IFS=":" read -r rpm_arch container_arch <<< "${arch}"
-    cat >>"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
-      - name: ${rpm_arch}
-        image_arch: ${container_arch}
-        images:
+  IFS=":" read -r rpm_arch container_arch <<< "${ARCHITECTURE}"
+  cat >>"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
+    - name: ${rpm_arch}
+      image_arch: ${container_arch}
+      images:
 EOF
-    ${SCRIPT_DIR}/../../pkg/release/get.sh images $container_arch | \
-      while read image; do echo "          - $image"; done >> "${RPMBUILD_DIR}"microshift-images.yaml
-  done
+  ${SCRIPT_DIR}/../../pkg/release/get.sh images $container_arch | \
+    while read image; do echo "          - $image"; done >> "${RPMBUILD_DIR}"microshift-images.yaml
 
-  ${SCRIPT_DIR}/paack.py ${BUILD}  "${RPMBUILD_DIR}"microshift-images.yaml -r "${RPMBUILD_DIR}" $BUILD_OPT
-
+  ${SCRIPT_DIR}/paack.py ${BUILD} "${RPMBUILD_DIR}"microshift-images.yaml -r "${RPMBUILD_DIR}" $BUILD_OPT
 }
+
+function usage() {
+  echo "Usage:"
+  echo "   $(basename $0) rpm  <pull_secret> <architecture> <rpm_mock_target>"
+  echo "   $(basename $0) srpm <pull_secret> <architecture>"
+  echo "   $(basename $0) copr <pull_secret> <architecture> <copr_repo>"
+  echo ""
+  echo "pull_secret:     Path to a file containing the OpenShift pull secret"
+  echo "rpm_mock_target: Target for building RPMs inside a chroot (e.g. 'rhel-8-x86_64')"
+  echo "architecture:    The RPM architecture"
+  echo "copr_repo:       Target Fedora Copr repository name (e.g. '@redhat-et/microshift-containers')"
+  echo ""
+  echo "Notes:"
+  echo " - The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret"
+  echo " - Use 'x86_64:amd64' or 'aarch64:arm64' as the architecture value"
+  echo " - See /etc/mock/*.cfg for possible RPM mock target values"
+  exit 1
+}
+
+# parse command line
+if [ $# -ne 3 ] && [ $# -ne 4 ] ; then 
+  usage
+fi
+
+BUILD=$1
+PULL_SECRET=$2
+case $BUILD in
+rpm)
+  ARCHITECTURE=$3
+  TARGET=$4
+  ;;
+srpm)
+  ARCHITECTURE=$3
+  ;;
+copr)
+  ARCHITECTURE=$3
+  COPR_REPO=$4
+  ;;
+*)
+  usage
+esac
 
 # prepare the rpmbuild env
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
+# pass pull secret as an environment variable
+export REGISTRY_AUTH_FILE=$PULL_SECRET
+export RELEASE=${RELEASE:-1}
+
+# run the build
 case $BUILD in
-  copr) BUILD_OPT=$COPR_REPO build;;
-  rpm)  BUILD_OPT=$TARGET build;;
-  srpm) build;;
-      *)
-      echo "Usage: $0 [copr|rpm|srpm]"
-      exit 1
+rpm)
+  BUILD_OPT=$TARGET build
+  ;;
+srpm) 
+  build
+  ;;
+copr) 
+  BUILD_OPT=$COPR_REPO build
+  ;;
 esac

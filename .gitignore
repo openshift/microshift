@@ -6,5 +6,6 @@ Vagrantfile
 _output/*
 bin
 packaging/rpm/_rpmbuild/
+packaging/rpm/paack-result/
 scripts/image-builder/_builds/
 sshfile
