@@ -5,6 +5,7 @@ set -e -o pipefail
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 BASE_VERSION="$(${SCRIPT_DIR}/../../pkg/release/get.sh base)"
 RPMBUILD_DIR="${SCRIPT_DIR}/_rpmbuild/"
+RELEASE=${RELEASE:-1}
 
 build() {
   cat >"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
@@ -79,7 +80,6 @@ mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 # pass pull secret as an environment variable
 export REGISTRY_AUTH_FILE=$PULL_SECRET
-export RELEASE=${RELEASE:-1}
 
 # run the build
 case $BUILD in
