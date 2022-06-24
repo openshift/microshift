@@ -25,20 +25,24 @@ To run MicroShift, you need a machine with at least:
 
 ## Deploying MicroShift on Edge Devices
 For production deployments, MicroShift can be run on bare metal hardware or hypervisors supported and certified for the Red Hat Enterprise Linux 8 operating system.
+
 - [Edge systems certified for Red Hat Enterprise Linux](https://catalog.redhat.com/hardware/search?c_catalog_channel=Edge%20System&p=1)
 - [Hypervisors certified for Red Hat Enterprise Linux](https://access.redhat.com/solutions/certified-hypervisors)
 
-## Developing MicroShift
+## User Documentation
+To install, configure and run MicroShift, refer to the following documentation:
 
-To build MicroShift from source and contribute to its development, refer to the MicroShift [Developer Documentation](./docs/devenv_rhel8.md).
+- [MicroShift Behind Proxy](./docs/howto_http_proxy.md)
+- [Load Balancer for User Workloads](./docs/howto_load_balancer.md)
 
-The following productization and development topics are documented in the current repository:
+## Developer Documentation
+To build MicroShift from source and contribute to its development, refer to the following documentation:
+
 - [MicroShift Design](./docs/design.md)
 - [MicroShift Development Environment on RHEL 8.x](./docs/devenv_rhel8.md)
 - [OpenShift CI for MicroShift](./docs/openshift_ci.md)
 
 ## Community
-
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
 
 To get started with MicroShift, please refer to the [Getting Started](https://microshift.io/docs/getting-started/) section of the MicroShift [User Documentation](https://microshift.io/docs/user-documentation/).
