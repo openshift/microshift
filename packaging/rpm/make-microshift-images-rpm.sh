@@ -63,13 +63,16 @@ BUILD=$1
 PULL_SECRET=$2
 case $BUILD in
 rpm)
+  [ $# -ne 4 ] && usage
   ARCHITECTURES=$3
   TARGET=$4
   ;;
 srpm)
+  [ $# -ne 3 ] && usage
   ARCHITECTURES=$3
   ;;
 copr)
+  [ $# -ne 4 ] && usage
   ARCHITECTURES=$3
   COPR_REPO=$4
   ;;
