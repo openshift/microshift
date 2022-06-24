@@ -89,6 +89,9 @@ find ./ -perm 000 -exec chmod 400 {} +
 
 %%_POST_%%
 
+# rpm-ostree seems to be unhappy about this, but crio storage (read-only) works without it
+# mknod -m 600 "%{imageStore}/overlay/backingFsBlockDev" b 253 0
+
 %postun
 
 %%_POSTUN_%%
@@ -259,7 +262,7 @@ class SpecFile(object):
                 output += "%%dir %%attr(%o,%s,%s) \"%%{imageStore}%s\"\n" % (info.mode, self._get_symbolic_uid(info.uid), self._get_symbolic_gid(info.gid), filename)
 
         self._files_data += "\n\n%ifarch " + arch + "\n" + output + "%endif\n"
-        self._extract_archs += "\n\n%ifarch " + arch + "\n" + IMAGE_INSTALLPREP + "tar xfj %{SOURCE"+str(self._source_i) + "}\n%endif"
+        self._extract_archs += "\n\n%ifarch " + arch + "\n" + IMAGE_INSTALLPREP + "tar xfj %{SOURCE"+str(self._source_i) + "} --exclude=./overlay/backingFsBlockDev\n%endif"
         self._add_source(tar)
 
     def _read_caps(self, filename):
