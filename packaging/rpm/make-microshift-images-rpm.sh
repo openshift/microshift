@@ -22,32 +22,34 @@ packages:
     arch:
 EOF
 
-  IFS=":" read -r rpm_arch container_arch <<< "${ARCHITECTURE}"
-  cat >>"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
-    - name: ${rpm_arch}
-      image_arch: ${container_arch}
-      images:
+  for arch in $ARCHITECTURES; do
+    IFS=":" read -r rpm_arch container_arch <<< "${arch}"
+    cat >>"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
+      - name: ${rpm_arch}
+        image_arch: ${container_arch}
+        images:
 EOF
-  ${SCRIPT_DIR}/../../pkg/release/get.sh images $container_arch | \
-    while read image; do echo "          - $image"; done >> "${RPMBUILD_DIR}"microshift-images.yaml
+    ${SCRIPT_DIR}/../../pkg/release/get.sh images $container_arch | \
+      while read image; do echo "          - $image"; done >> "${RPMBUILD_DIR}"microshift-images.yaml
+  done
 
   ${SCRIPT_DIR}/paack.py ${BUILD} "${RPMBUILD_DIR}"microshift-images.yaml -r "${RPMBUILD_DIR}" $BUILD_OPT
 }
 
 function usage() {
   echo "Usage:"
-  echo "   $(basename $0) rpm  <pull_secret> <architecture> <rpm_mock_target>"
-  echo "   $(basename $0) srpm <pull_secret> <architecture>"
-  echo "   $(basename $0) copr <pull_secret> <architecture> <copr_repo>"
+  echo "   $(basename $0) rpm  <pull_secret> <architectures> <rpm_mock_target>"
+  echo "   $(basename $0) srpm <pull_secret> <architectures>"
+  echo "   $(basename $0) copr <pull_secret> <architectures> <copr_repo>"
   echo ""
   echo "pull_secret:     Path to a file containing the OpenShift pull secret"
   echo "rpm_mock_target: Target for building RPMs inside a chroot (e.g. 'rhel-8-x86_64')"
-  echo "architecture:    The RPM architecture"
+  echo "architectures:   One or more RPM architectures"
   echo "copr_repo:       Target Fedora Copr repository name (e.g. '@redhat-et/microshift-containers')"
   echo ""
   echo "Notes:"
   echo " - The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret"
-  echo " - Use 'x86_64:amd64' or 'aarch64:arm64' as the architecture value"
+  echo " - Use 'x86_64:amd64' or 'aarch64:arm64' as an architecture value"
   echo " - See /etc/mock/*.cfg for possible RPM mock target values"
   exit 1
 }
@@ -61,14 +63,14 @@ BUILD=$1
 PULL_SECRET=$2
 case $BUILD in
 rpm)
-  ARCHITECTURE=$3
+  ARCHITECTURES=$3
   TARGET=$4
   ;;
 srpm)
-  ARCHITECTURE=$3
+  ARCHITECTURES=$3
   ;;
 copr)
-  ARCHITECTURE=$3
+  ARCHITECTURES=$3
   COPR_REPO=$4
   ;;
 *)
