@@ -151,7 +151,6 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 	}
 	client := apiregistrationclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "apiregistration-agent"))
 	for _, apiSvc := range []string{
-		"v1.authorization.openshift.io",
 		"v1.route.openshift.io",
 	} {
 		api := &apiregistrationv1.APIService{
