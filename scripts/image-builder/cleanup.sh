@@ -51,9 +51,8 @@ sudo composer-cli sources delete microshift-local 2>/dev/null || true
 
 if [ "$FULL_CLEAN" = 1 ] ; then
     title "Clean up user cache"
-    rm -rf ~/.cache        2>/dev/null || true
-    sudo rm -rf /tmp/*     2>/dev/null || true
-    sudo rm -rf /var/tmp/* 2>/dev/null || true
+    rm -rf ~/.cache 2>/dev/null || true
+    sudo rm -rf /tmp/containers/* 2>/dev/null || true
 fi
 
 title "Clean osbuild worker cache"

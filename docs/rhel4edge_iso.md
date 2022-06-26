@@ -24,7 +24,7 @@ Note that the command deletes various user and system data, including:
 - MicroShift `ostree` server container and all the unused container images
 - All the Image Builder jobs are canceled and deleted
 - Project-specific Image Builder sources are deleted
-- The user `~/.cache`, `/tmp` and `/var/tmp` directory contents are deleted to clean various cache files
+- The user `~/.cache` and `/tmp/containers` directory contents are deleted to clean various cache files
 - The `/var/cache/osbuild-worker` directory contents are deleted to clean Image Builder cache files
 
 ### Building Installer
