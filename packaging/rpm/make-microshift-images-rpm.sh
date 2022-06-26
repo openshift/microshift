@@ -43,8 +43,8 @@ function usage() {
   echo "   $(basename $0) copr <pull_secret> <architectures> <copr_repo>"
   echo ""
   echo "pull_secret:     Path to a file containing the OpenShift pull secret"
-  echo "rpm_mock_target: Target for building RPMs inside a chroot (e.g. 'rhel-8-x86_64')"
   echo "architectures:   One or more RPM architectures"
+  echo "rpm_mock_target: Target for building RPMs inside a chroot (e.g. 'rhel-8-x86_64')"
   echo "copr_repo:       Target Fedora Copr repository name (e.g. '@redhat-et/microshift-containers')"
   echo ""
   echo "Notes:"
@@ -55,10 +55,6 @@ function usage() {
 }
 
 # parse command line
-if [ $# -ne 3 ] && [ $# -ne 4 ] ; then 
-  usage
-fi
-
 BUILD=$1
 PULL_SECRET=$2
 case $BUILD in

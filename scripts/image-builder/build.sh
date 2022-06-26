@@ -10,9 +10,10 @@ STARTTIME=$(date +%s)
 trap ${ROOTDIR}/cleanup.sh INT
 
 usage() {
-    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip]"
+    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-offline_containers /path/to/file1.rpm,...,/path/to/fileN.rpm]"
     echo "   -pull_secret_file   Path to a file containing the OpenShift pull secret"
     echo "   -ostree_server_name Name or IP address of the OS tree server (default: ${OSTREE_SERVER_IP})"
+    echo "   -offline_containers Path to one or more RPM packages with offline CRI-O container images"
     echo ""
     echo "Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret."
     exit 1
@@ -67,7 +68,7 @@ build_image() {
 
     title "Loading ${blueprint} blueprint v${version}"
     sudo composer-cli blueprints delete ${blueprint} 2>/dev/null || true
-    sudo composer-cli blueprints push "${ROOTDIR}/config/${blueprint_file}"
+    sudo composer-cli blueprints push "${ROOTDIR}/_builds/${blueprint_file}"
     sudo composer-cli blueprints depsolve ${blueprint} 1>/dev/null
 
     if [ -n "$parent_version" ]; then
@@ -103,6 +104,12 @@ while [ $# -gt 0 ] ; do
         shift
         OCP_PULL_SECRET_FILE="$1"
         [ -z "${OCP_PULL_SECRET_FILE}" ] && usage
+        shift
+        ;;
+    -offline_containers)
+        shift
+        OFFLINE_CONTAINER_RPMS="$1"
+        [ -z "${OFFLINE_CONTAINER_RPMS}" ] && usage
         shift
         ;;
     *)
@@ -141,12 +148,38 @@ reposync -n -a x86_64 --download-path openshift-local --repo=rhocp-4.10-for-rhel
 find openshift-local -name \*coreos\* -exec rm -f {} \;
 createrepo openshift-local >/dev/null
 
+# Copy offline container RPM packages
+rm -rf container-local 2>/dev/null || true
+if [ ! -z ${OFFLINE_CONTAINER_RPMS} ] ; then
+    title "Building MicroShift Offline Container repository"
+    mkdir container-local
+    for rpm in ${OFFLINE_CONTAINER_RPMS//,/ } ; do
+        cp $rpm container-local
+    done
+    createrepo container-local >/dev/null
+fi
+
 title "Loading sources for OpenShift and MicroShift"
-for f in openshift-local microshift-local ; do
+for f in openshift-local microshift-local container-local ; do
+    [ ! -d $f ] && continue
     cat ../config/${f}.toml.template | sed "s;REPLACE_IMAGE_BUILDER_DIR;${ROOTDIR};g" > ${f}.toml
     sudo composer-cli sources delete $f 2>/dev/null || true
     sudo composer-cli sources add ${ROOTDIR}/_builds/${f}.toml
 done
+
+title "Preparing blueprints"
+cp -f ../config/{blueprint_v0.0.1.toml,installer.toml} .
+if [ ! -z ${OFFLINE_CONTAINER_RPMS} ] ; then
+    for rpm in ${OFFLINE_CONTAINER_RPMS//,/ } ; do
+        rpm_name=$(basename $rpm | sed 's/.rpm//g')
+        cat >> blueprint_v0.0.1.toml <<EOF
+
+[[packages]]
+name = "${rpm_name}"
+version = "*"
+EOF
+    done
+fi
 
 build_image blueprint_v0.0.1.toml "${IMGNAME}-container" 0.0.1 edge-container
 build_image installer.toml        "${IMGNAME}-installer" 0.0.0 edge-installer "${IMGNAME}-container" 0.0.1
