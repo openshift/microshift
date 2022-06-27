@@ -4,16 +4,8 @@ set -e -o pipefail
 # generated from other info
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 BASE_VERSION="$(${SCRIPT_DIR}/../../pkg/release/get.sh base)"
-
 RPMBUILD_DIR="${SCRIPT_DIR}/_rpmbuild/"
-BUILD=${BUILD:-$1}
-BUILD=${BUILD:-rpm}
-TARGET=${TARGET:-$2}
-TARGET=${TARGET:-fedora-36-x86_64}
 RELEASE=${RELEASE:-1}
-COPR_REPO=${COPR_REPO:-@redhat-et/microshift-containers}
-
-ARCHITECTURES=${ARCHITECTURES:-"x86_64:amd64 aarch64:arm64"}
 
 build() {
   cat >"${RPMBUILD_DIR}"microshift-images.yaml <<EOF
@@ -41,18 +33,64 @@ EOF
       while read image; do echo "          - $image"; done >> "${RPMBUILD_DIR}"microshift-images.yaml
   done
 
-  ${SCRIPT_DIR}/paack.py ${BUILD}  "${RPMBUILD_DIR}"microshift-images.yaml -r "${RPMBUILD_DIR}" $BUILD_OPT
-
+  ${SCRIPT_DIR}/paack.py ${BUILD} "${RPMBUILD_DIR}"microshift-images.yaml -r "${RPMBUILD_DIR}" $BUILD_OPT
 }
+
+function usage() {
+  echo "Usage:"
+  echo "   $(basename $0) rpm  <pull_secret> <architectures> <rpm_mock_target>"
+  echo "   $(basename $0) srpm <pull_secret> <architectures>"
+  echo "   $(basename $0) copr <pull_secret> <architectures> <copr_repo>"
+  echo ""
+  echo "pull_secret:     Path to a file containing the OpenShift pull secret"
+  echo "architectures:   One or more RPM architectures"
+  echo "rpm_mock_target: Target for building RPMs inside a chroot (e.g. 'rhel-8-x86_64')"
+  echo "copr_repo:       Target Fedora Copr repository name (e.g. '@redhat-et/microshift-containers')"
+  echo ""
+  echo "Notes:"
+  echo " - The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret"
+  echo " - Use 'x86_64:amd64' or 'aarch64:arm64' as an architecture value"
+  echo " - See /etc/mock/*.cfg for possible RPM mock target values"
+  exit 1
+}
+
+# parse command line
+BUILD=$1
+PULL_SECRET=$2
+case $BUILD in
+rpm)
+  [ $# -ne 4 ] && usage
+  ARCHITECTURES=$3
+  TARGET=$4
+  ;;
+srpm)
+  [ $# -ne 3 ] && usage
+  ARCHITECTURES=$3
+  ;;
+copr)
+  [ $# -ne 4 ] && usage
+  ARCHITECTURES=$3
+  COPR_REPO=$4
+  ;;
+*)
+  usage
+esac
 
 # prepare the rpmbuild env
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
+# pass pull secret as an environment variable
+export REGISTRY_AUTH_FILE=$PULL_SECRET
+
+# run the build
 case $BUILD in
-  copr) BUILD_OPT=$COPR_REPO build;;
-  rpm)  BUILD_OPT=$TARGET build;;
-  srpm) build;;
-      *)
-      echo "Usage: $0 [copr|rpm|srpm]"
-      exit 1
+rpm)
+  BUILD_OPT=$TARGET build
+  ;;
+srpm)
+  build
+  ;;
+copr)
+  BUILD_OPT=$COPR_REPO build
+  ;;
 esac
