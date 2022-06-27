@@ -3,7 +3,7 @@ To install MicroShift in a production environment, it is necessary to create a R
 
 ## Build RHEL for Edge Installer ISO
 Log into the development virtual machine with the `microshift` user credentials.
-> Use insructions in [MicroShift Development Environment on RHEL 8.x](./devenv_rhel8.md) document for creating and configuring the machine.
+> The development machine configuration guidelines can be found in the [MicroShift Development Environment on RHEL 8.x](./devenv_rhel8.md) document.
 
 Follow the instructions in the [RPM Packages](./devenv_rhel8.md#rpm-packages) section to create MicroShift RPM packages.
 
@@ -65,6 +65,57 @@ The script performs the following tasks:
 - Perform partial cleanup procedure to reclaim cached disk space
 
 The artifact of the build is the `scripts/image-builder/_builds/microshift-installer.${ARCH}.iso` bootable RHEL for Edge OS image.
+
+### Offline Containers
+The `scripts/image-builder/build.sh` script supports a special mode for including container images into the generated ISO. This allows `CRI-O` not to pull those images when MicroShift service is first started, saving network bandwidth and avoiding external network connections.
+
+The remainder of this section demonstrates how to generate container image RPMs for MicroShift and include them in the installation ISO.
+>If user workloads depend on additional container images, the respective RPMs need to be created separately.
+
+Install and configure the `mock` utility prerequisites using the following commands.
+```bash
+sudo dnf install -y mock
+sudo usermod -a -G mock $(whoami)
+```
+
+Run the `packaging/rpm/make-microshift-images-rpm.sh` script without arguments to see its usage.
+```bash
+$ ./packaging/rpm/make-microshift-images-rpm.sh
+Usage:
+   make-microshift-images-rpm.sh rpm  <pull_secret> <architectures> <rpm_mock_target>
+   make-microshift-images-rpm.sh srpm <pull_secret> <architectures>
+   make-microshift-images-rpm.sh copr <pull_secret> <architectures> <copr_repo>
+
+pull_secret:     Path to a file containing the OpenShift pull secret
+architectures:   One or more RPM architectures
+rpm_mock_target: Target for building RPMs inside a chroot (e.g. 'rhel-8-x86_64')
+copr_repo:       Target Fedora Copr repository name (e.g. '@redhat-et/microshift-containers')
+
+Notes:
+ - The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret
+ - Use 'x86_64:amd64' or 'aarch64:arm64' as an architecture value
+ - See /etc/mock/*.cfg for possible RPM mock target values
+```
+
+Run the script in the `rpm` mode to pull the required images and generate the RPMs including container images required by MicroShift.
+```bash
+./packaging/rpm/make-microshift-images-rpm.sh rpm ~/pull-secret.txt x86_64:amd64 rhel-8-x86_64
+```
+
+If the procedure is successful, the RPM artifacts can be found in the `paack-result` directory.
+```bash
+$ ls -1 ~/microshift/packaging/rpm/paack-result/*.rpm
+/home/microshift/microshift/packaging/rpm/paack-result/microshift-containers-4.10.18-1.src.rpm
+/home/microshift/microshift/packaging/rpm/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
+```
+
+Finally, run the build script with the `-offline_containers` argument to include the specified container image RPMs into the generated ISO.
+```bash
+./scripts/image-builder/build.sh -pull_secret_file ~/pull-secret.txt -offline_containers ~/microshift/packaging/rpm/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
+```
+> If user-specific container images need to be included into the ISO, multiple comma-separated RPM files can be specified as the `-offline_containers` argument value.
+
+When executed in this mode, the `scripts/image-builder/build.sh` script performs an extra step to set up local container RPM repository with one or more specified RPM files as a source. These RPMs are then appended to the blueprint so that they are installed when the operating system boots for the first time.
 
 ## Install MicroShift for Edge
 Log into the host machine using your user credentials. The remainder of this section describes how to install a virtual machine running RHEL for Edge OS containing MicroShift binaries.
