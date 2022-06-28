@@ -88,7 +88,7 @@ When deciding between different design options, we follow the following principl
 
 ### Configuration
 * MicroShift uses a strictly declarative style of configuration.
-* MicroShift uses as few configuration options as possible. Where it provides configuration options, they are intuitive and have sensible defauls respectively are auto-configured.
+* MicroShift uses as few configuration options as possible. Where it provides configuration options, they are intuitive and have sensible defaults respectively are auto-configured.
 * MicroShift is preferably configured through config files, but allows overriding of parameters via environment variables (for use in containers, systemd) and command line flags (for ad-hoc use).
 * MicroShift can use both user-local and system-wide configuration.
 
