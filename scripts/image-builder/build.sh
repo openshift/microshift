@@ -10,10 +10,10 @@ STARTTIME=$(date +%s)
 trap ${ROOTDIR}/cleanup.sh INT
 
 usage() {
-    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-offline_containers /path/to/file1.rpm,...,/path/to/fileN.rpm]"
+    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]"
     echo "   -pull_secret_file   Path to a file containing the OpenShift pull secret"
     echo "   -ostree_server_name Name or IP address of the OS tree server (default: ${OSTREE_SERVER_IP})"
-    echo "   -offline_containers Path to one or more RPM packages with offline CRI-O container images"
+    echo "   -custom_rpms        Path to one or more comma-separated RPM packages to be included in the image"
     echo ""
     echo "Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret."
     exit 1
@@ -106,10 +106,10 @@ while [ $# -gt 0 ] ; do
         [ -z "${OCP_PULL_SECRET_FILE}" ] && usage
         shift
         ;;
-    -offline_containers)
+    -custom_rpms)
         shift
-        OFFLINE_CONTAINER_RPMS="$1"
-        [ -z "${OFFLINE_CONTAINER_RPMS}" ] && usage
+        CUSTOM_RPM_FILES="$1"
+        [ -z "${CUSTOM_RPM_FILES}" ] && usage
         shift
         ;;
     *)
@@ -148,19 +148,19 @@ reposync -n -a x86_64 --download-path openshift-local --repo=rhocp-4.10-for-rhel
 find openshift-local -name \*coreos\* -exec rm -f {} \;
 createrepo openshift-local >/dev/null
 
-# Copy offline container RPM packages
-rm -rf container-local 2>/dev/null || true
-if [ ! -z ${OFFLINE_CONTAINER_RPMS} ] ; then
-    title "Building MicroShift Offline Container repository"
-    mkdir container-local
-    for rpm in ${OFFLINE_CONTAINER_RPMS//,/ } ; do
-        cp $rpm container-local
+# Copy user-specific RPM packages
+rm -rf custom-rpms 2>/dev/null || true
+if [ ! -z ${CUSTOM_RPM_FILES} ] ; then
+    title "Building User-Specified RPM repository"
+    mkdir custom-rpms
+    for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
+        cp $rpm custom-rpms
     done
-    createrepo container-local >/dev/null
+    createrepo custom-rpms >/dev/null
 fi
 
 title "Loading sources for OpenShift and MicroShift"
-for f in openshift-local microshift-local container-local ; do
+for f in openshift-local microshift-local custom-rpms ; do
     [ ! -d $f ] && continue
     cat ../config/${f}.toml.template | sed "s;REPLACE_IMAGE_BUILDER_DIR;${ROOTDIR};g" > ${f}.toml
     sudo composer-cli sources delete $f 2>/dev/null || true
@@ -169,8 +169,8 @@ done
 
 title "Preparing blueprints"
 cp -f ../config/{blueprint_v0.0.1.toml,installer.toml} .
-if [ ! -z ${OFFLINE_CONTAINER_RPMS} ] ; then
-    for rpm in ${OFFLINE_CONTAINER_RPMS//,/ } ; do
+if [ ! -z ${CUSTOM_RPM_FILES} ] ; then
+    for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
         rpm_name=$(basename $rpm | sed 's/.rpm//g')
         cat >> blueprint_v0.0.1.toml <<EOF
 
