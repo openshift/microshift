@@ -281,6 +281,11 @@ update_manifests() {
     fi
     pushd "${STAGING_DIR}" >/dev/null
 
+    title "Extracting timestamp"
+    local bindata_timestamp
+    bindata_timestamp=$(grep "^Created:" release.txt | cut -f2- -d:)
+    date --date="${bindata_timestamp}" '+%s' > "${REPOROOT}/assets/bindata_timestamp.txt"
+
     title "Rebasing manifests"
     for crd in ${REPOROOT}/assets/crd/*.yaml; do
         cp "${STAGING_DIR}"/release-manifests/$(basename ${crd}) "${REPOROOT}"/assets/crd || true
