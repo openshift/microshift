@@ -44,6 +44,7 @@ When deciding between different design options, we follow the following principl
 
 * **Minimal core**: We keep MicroShift to a minimal set of functionality, but provide mechanisms for extension.
   * Discriminator: If a functionality can be added post-cluster-up with reasonable effort, then it should not be part of the MicroShift core/binary.
+  * See [enabled apis](./enable_apis.md) for the subset of OpenShift APIs enabled in MicroShift.
 * **Minimal configuration**: We minimize the number of configuration parameters exposed to users. Where parameters cannot be avoided, we provide robust defaults or try to auto-configure them.
   * Discriminator: If a parameter can be infered from another parameter, auto-detected, or only covers rare use cases, then likely it should not be exposed to users.
 * **Robustness to failure modes**: We expect and gracefully handle failure modes stemming from field-deployment and that MicroShift is just an app on somebody else's OS it cannot control.
