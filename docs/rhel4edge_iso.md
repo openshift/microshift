@@ -181,7 +181,8 @@ sudo virsh net-start     isolated
 sudo virsh net-autostart isolated
 ```
 
-When running `virt-install` command for bootstrapping a new virtual machine, specify the `--network network=isolated,model=virtio` command line argument to have the virtual machine use the `isolated` network configuration. 
+Follow the instruction in the [Install MicroShift for Edge](#install-microshift-for-edge) section to install a new virtual machine using the `isolated` network configuration.
+> When running the `virt-install` command, specify the `--network network=isolated,model=virtio` option to select the `isolated` network configuration.
 
 After the virtual machine is created, log into the system and verify that the Internet is not accessible.
 ```bash
@@ -204,7 +205,7 @@ quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              ef1c6b04ebe
 quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              a538d5965f4fc       458MB
 ```
 
-Finally, check if the MicroShift is up and running by executing `oc` commands.
+Finally, check if MicroShift is up and running by executing `oc` commands.
 ```bash
 oc get cs
 oc get pods -A
