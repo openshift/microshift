@@ -84,7 +84,7 @@ When deciding between different design options, we follow the following principl
 
 ### CLI
 * The `microshift` binary runs the Control Plane / Node process, it is not a tool to manage or be clients to those processes (like `oc` or `kubeadmin`). This is reflected in the sub-commands and paraemters offered by it, e.g. using the `run` verb (which implies run-to-cancel/run-to-completion) instead of `start`/`stop` verb-pairs (which imply asynch commands that return immediately).
-* For consistency and to play nicely with systemd, we avoid command line parameters that would need to be different between invokations (e.g. first-run vs subsequent runs) or instantiations (e.g. 1st Control Plane instances vs. 2nd or 3rd Control Plane instance).
+* For consistency and to play nicely with systemd, we avoid command line parameters that would need to be different between invocations (e.g. first-run vs subsequent runs).
 
 ### Configuration
 * MicroShift uses a strictly declarative style of configuration.
