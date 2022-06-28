@@ -143,13 +143,13 @@ Note that it may be more convenient to access the machine using SSH. Run the fol
 sudo virsh domifaddr microshift-edge
 ```
 
-Log into the system using `redhat:redhat` credentials and run the following commands to configure the MicroShift access.
+Log into the system using `redhat:redhat` credentials and run the following commands to configure MicroShift access.
 ```bash
 mkdir ~/.kube
 sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
 ```
 
-Finally, check if the MicroShift is up and running by executing `oc` commands.
+Finally, check if MicroShift is up and running by executing `oc` commands.
 ```bash
 oc get cs
 oc get pods -A

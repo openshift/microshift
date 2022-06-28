@@ -132,11 +132,11 @@ Note that this command only stops the MicroShift executable. To perform full cle
 ```
 
 ## Quick Development and Edge Testing Cycle
-In the development environment, it is practical to build and run MicroShift executable as described in the [Build MicroShift](#build-microshift) and [Run MicroShift Executable](#run-microshift-executable) sections above. However, it is also necessary to have a convenient technique to occasionally test the system in a RHEL for Edge environment.
+During the development cycle, it is practical to build and run MicroShift executable as demonstrated in the [Build MicroShift](#build-microshift) and [Run MicroShift Executable](#run-microshift-executable) sections above. However, it is also necessary to have a convenient technique for testing the system in a setup resembling the production environment. Such an environment can be created in a virtual machine as described in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document. 
 
-The MicroShift Installer ISO build procedure takes over 30 minutes to complete. Once a RHEL for Edge virtual machine is created, it is running a version of MicroShift with the latest changes. 
+Once a RHEL for Edge virtual machine is created, it is running a version of MicroShift with the latest changes. When MicroShift code is updated and the executable file is rebuilt with the new changes, the updates need to be installed on RHEL for Edge OS.
 
-The remainder of this section describes a simple procedure for replacing the MicroShift executable file on an existing RHEL for Edge OS installation.
+Since it takes a long time to create a new RHEL for Edge installer ISO and deploy it on a virtual machine, the remainder of this section describes a simple technique for replacing the MicroShift executable file on an existing RHEL for Edge OS installation.
 
 ### Configuring ostree
 Log into the RHEL for Edge machine using `redhat:redhat` credentials. Run the following command for configuring the ostree to allow transient overlays on top of the /usr directory.
@@ -155,7 +155,7 @@ ssh-keygen
 ssh-copy-id redhat@microshift-edge
 ```
 
-Rebuild the MicroShift executable as described in the [Build MicroShift](#build-microshift) section and run the following commands to copy, cleanup and restart the new service on the RHEL for Edge system.
+Rebuild the MicroShift executable as described in the [Build MicroShift](#build-microshift) section and run the following commands to copy, cleanup, replace and restart the new service on the RHEL for Edge system.
 ```bash
 scp ~/microshift/microshift redhat@microshift-edge:
 ssh redhat@microshift-edge ' \
