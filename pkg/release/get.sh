@@ -8,7 +8,7 @@ function get_base {
 
 function add_bases {
     base=$(get_base)
-    sed "s/:$/:${base}/g" # some lines have "xxxxx:" + Base  like flannel
+    sed "s/:$/:${base}/g" # some lines have "xxxxx:" + Base  like pause
 }
 
 function get_image_list {

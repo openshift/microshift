@@ -99,7 +99,6 @@ build_selinux_policy() {
     make -f /usr/share/selinux/devel/Makefile -C /tmp
     sudo dnf -y remove selinux-policy-devel
     if [ "$DISTRO" != "ubuntu" ]; then
-        sudo mkdir -p /var/run/flannel
         sudo mkdir -p /var/run/kubelet
         sudo mkdir -p /var/lib/kubelet/pods
         sudo mkdir -p /var/run/secrets/kubernetes.io/serviceaccount
