@@ -154,3 +154,58 @@ Finally, check if the MicroShift is up and running by executing `oc` commands.
 oc get cs
 oc get pods -A
 ```
+
+### Offline Mode
+It may sometimes be necessary to install a virtual machine that does not have access to the Internet. For instance, such a configuration can be used for testing the [Offline Containers](#offline-containers) or any other setup that needs to work without the Internet access.
+
+Create a new isolated `libvirt` network configuration by running the following commands.
+```bash
+NETCONFIG_FILE=/tmp/isolated-network.xml
+cat > $NETCONFIG_FILE <<EOF
+<network>
+  <name>isolated</name>
+  <dns>
+    <host ip='192.168.100.1'>
+      <hostname>gateway</hostname>
+    </host>
+  </dns>
+  <ip address='192.168.100.1' netmask='255.255.255.0' localPtr='yes'>
+    <dhcp>
+      <range start='192.168.100.10' end='192.168.100.20'/>
+    </dhcp>
+  </ip>
+</network>
+EOF
+sudo virsh net-define    $NETCONFIG_FILE
+sudo virsh net-start     isolated
+sudo virsh net-autostart isolated
+```
+
+When running `virt-install` command for bootstrapping a new virtual machine, specify the `--network network=isolated,model=virtio` command line argument to have the virtual machine use the `isolated` network configuration. 
+
+After the virtual machine is created, log into the system and verify that the Internet is not accessible.
+```bash
+$ curl -I redhat.com
+curl: (6) Could not resolve host: redhat.com
+```
+
+Make sure that `CRI-O` has access to all the container images required by MicroShift.
+```bash
+$ sudo crictl images
+IMAGE                                            TAG                 IMAGE ID            SIZE
+k8s.gcr.io/pause                                 3.6                 6270bb605e12e       690kB
+quay.io/coreos/flannel                           v0.14.0             8522d622299ca       68.9MB
+quay.io/kubevirt/hostpath-provisioner            v0.8.0              7cbc61ff04c89       180MB
+quay.io/microshift/flannel-cni                   v0.14.0             4324dc7a1ffa5       8.12MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              334363f37666a       401MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              eb9d5c9681cd5       376MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              60f52af9fc4ba       413MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              ef1c6b04ebe2a       415MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              a538d5965f4fc       458MB
+```
+
+Finally, check if the MicroShift is up and running by executing `oc` commands.
+```bash
+oc get cs
+oc get pods -A
+```
