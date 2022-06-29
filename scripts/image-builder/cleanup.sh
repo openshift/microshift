@@ -27,9 +27,13 @@ fi
 
 title "Cleaning up local ostree container server"
 sudo podman rm -f microshift-container-server 2>/dev/null || true
-if [ "$FULL_CLEAN" = 1 ] ; then 
-    sudo kill microshift 2>/dev/null || true
-    sleep 5
+if [ "$FULL_CLEAN" = 1 ] ; then
+    SRV_PID=$(pidof microshift) || true
+    if [ ! -z ${SRV_PID} ] ; then
+        sudo kill ${SRV_PID} 2>/dev/null || true
+        # Waiting for the server to exit
+        while sudo kill -0 ${SRV_PID} 2>/dev/null; do sleep 5 ; done
+    fi
     sudo podman rmi -af
 fi
 
@@ -57,6 +61,6 @@ fi
 
 title "Clean osbuild worker cache"
 sudo systemctl stop osbuild-composer.socket osbuild-composer.service osbuild-worker@1.service
-sleep 3
+sleep 5
 sudo rm -rf /var/cache/osbuild-worker/*
 sudo systemctl start osbuild-composer.socket
