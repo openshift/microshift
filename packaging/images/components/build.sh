@@ -4,7 +4,7 @@ set -e
 # input parameters via env variables
 
 DEST_REGISTRY=${DEST_REGISTRY:-"quay.io/microshift"}
-COMPONENTS=${COMPONENTS:-"base-image pause cli coredns flannel flannel-cni haproxy-router hostpath-provisioner kube-rbac-proxy service-ca-operator"}
+COMPONENTS=${COMPONENTS:-"base-image pause cli coredns haproxy-router hostpath-provisioner kube-rbac-proxy service-ca-operator"}
 ARCHITECTURES=${ARCHITECTURES:-"amd64 arm64 arm ppc64le riscv64"}
 PUSH=${PUSH:-no}
 PARALLEL=${PARALLEL:-yes}

@@ -38,65 +38,6 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
-# Reads go.mod file $1 and prints lines in its section $2 ("require" or "replace")
-extract_section() {
-    file=$1
-    section=$2
-
-    awk "BEGIN {output=0} /^)/ {output=0} {if (output == 1 && !match(\$0,\"// indirect\")) print \$0} /^${section}/ {output=1}" "${file}"
-}
-
-# Returns everything but the version of a require or replace line
-get_mod() {
-    line=$1
-
-    re="^(.+) ([a-z0-9.+-]+)$"
-    if [[ "$line" =~ $re ]]; then
-        echo "${BASH_REMATCH[1]}"
-    else
-        echo ""
-    fi
-}
-
-# Returns the version of a require or replace line
-get_version() {
-    line=$1
-
-    re="^(.+) ([a-z0-9.+-]+)$"
-    if [[ "$line" =~ $re ]]; then
-        echo "${BASH_REMATCH[2]}"
-    else
-        echo ""
-    fi
-}
-
-# For every line in $base_file (require or replace), checks wether a corresponding module in
-# $update_file exists and is of newer version. If so, prints a module line with the newer version,
-# else prints the line in the $base_file.
-update_versions() {
-    base_file=$1
-    update_file=$2
-
-    re="^(.+) ([a-z0-9.-]+)$"
-    while IFS="" read -r line || [ -n "$line" ]
-    do
-        if [[ "${line}" =~ ^//.* ]]; then
-            continue
-        fi
-
-        mod="$(get_mod "${line}")"
-        base_version=$(get_version "${line}")
-        version=${base_version}
-
-        update_line=$(grep "${mod} " "${update_file}" || true)
-        if [[ -n "${update_line}" ]]; then
-            update_version=$(get_version "${update_line}")
-            version=$(printf '%s\n%s\n' "${base_version}" "${update_version}" | sort --version-sort | tail -n 1)
-        fi
-
-        echo "${mod} ${version}"
-    done < "${base_file}"
-}
 
 # Returns the list of release image names from a release_${arch}.go file
 get_release_images() {
@@ -129,7 +70,7 @@ download_release() {
     mkdir -p release-manifests
     pushd release-manifests >/dev/null
     content=$(oc adm release info ${authentication} --contents "${release_image}")
-    echo "${content}" | awk '/^# 0000_[A-Za-z0-9._-]*.yaml/{filename = $2;}{if (filename != "") print >filename;}'
+    echo "${content}" | awk '{ if ($0 ~ /^# [A-Za-z0-9._-]+.yaml$/ || $0 ~ /^# image-references$/ || $0 ~ /^# release-metadata$/) filename = $2; else print >filename;}'
     popd >/dev/null
 
     title "# Cloning ${release_image} component repos"
@@ -155,49 +96,140 @@ download_release() {
     popd >/dev/null
 }
 
+# Returns the pseudo-version of the checked-out commit of ${component}
+get_pseudoversion() {
+    local modulepath=$1
+    local component=$2
 
-update_go_mod() {
-    if [ ! -f "${STAGING_DIR}/release.txt" ]; then
-        >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
+    # If the modulepath has a major version suffic X, we need to use
+    # the version prefix "vX.0.0" instead of "v0.0.0"
+    major_version_suffix=$(echo "${modulepath}" | grep -o "v[0-9]$")
+    if [ -z "${major_version_suffix}" ]; then
+        version="v0.0.0"
+    else
+        version="${major_version_suffix}.0.0"
+    fi
+    timestamp_commit=$( cd "${STAGING_DIR}/${component}" && TZ=UTC git --no-pager show --quiet --abbrev=12 --date='format-local:%Y%m%d%H%M%S' --format="%cd-%h" )
+    echo "${version}-${timestamp_commit}"
+}
+
+# Returns the modulepath and version for the checkout of ${component}
+get_modulepath_version_for_release() {
+    local component=$1
+
+    repo=$( cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url )
+    modulepath="${repo#https://}"
+    echo "${modulepath}@$(get_pseudoversion ${modulepath} ${component})"
+}
+
+# Returns the line (including trailing comment) in the #{gomod_file} containing the ReplaceDirective for ${module_path}
+get_replace_directive() {
+    local gomod_file=$1
+    local module_path=$2
+
+    # TODO: Handle special case of keyword "replace" being included in the line
+    go mod edit -print "${gomod_file}" | grep "^[[:space:]]${module_path}[[:space:]][[:alnum:][:space:].-]*=>"
+}
+
+# Returns the new modulepath and version for an old ${modulepath} as specified
+# in the go.mod file of ${component}, taking care of necessary substitutions
+# of local modulepaths.
+lookup_modulepath_version_from_component() {
+    local modulepath=$1
+    local component=$2
+
+    # Special-case etcd to use OpenShift's repo
+    if [[ "${modulepath}" =~ ^go.etcd.io/etcd/ ]]; then
+        modulepath=$(echo "${modulepath}" | sed 's|^go.etcd.io/etcd|github.com/openshift/etcd|')
+        pseudoversion=$(get_pseudoversion ${modulepath} etcd)
+        echo "${modulepath}@${pseudoversion}"
+        return
+    fi
+
+    replace_directive=$(get_replace_directive "${STAGING_DIR}/${component}/go.mod" "${modulepath}")
+    replace_directive=$(strip_comment "${replace_directive}")
+    replacement=$(echo "${replace_directive}" | sed -E "s|.*=>[[:space:]]*(.*)[[:space:]]*|\1|")
+    if [[ "${replacement}" =~ ^./staging ]]; then
+        replacement=$(echo "${replacement}" | sed 's|^./staging/|github.com/openshift/kubernetes/staging/|')
+        replacement="${replacement} $(get_pseudoversion ${modulepath} kubernetes)"
+    fi
+    echo "${replacement}" | sed 's| |@|'
+}
+
+# Returns ${line} stripping the trailing comment
+strip_comment() {
+    local line=$1
+
+    echo "${line%%//*}"
+}
+
+# Returns the comment in ${line} if one exists or an empty string if not
+get_comment() {
+    local line=$1
+
+    comment=${line##*//}
+    if [ "${comment}" != "${line}" ]; then
+        echo ${comment}
+    else
+        echo ""
+    fi
+}
+
+# Validate that ${component} is in the allowed list for the lookup, else exit
+valid_component_or_exit() {
+    local component=$1
+    if [[ ! " etcd kubernetes openshift-apiserver openshift-controller-manager " =~ " ${component} " ]]; then
+        echo "error: release reference must be one of [etcd kubernetes openshift-apiserver openshift-controller-manager], have ${component}"
         exit 1
     fi
+}
+
+# Updates MicroShift's go.mod file by updating each replace directive's
+# new modulepath-version with that of one of the embedded components.
+# The go.mod file needs to specify which component to take this data from
+# and this is driven from keywords added as comments after each line of
+# replace directives:
+#   // from ${component}     selects the replacement from the go.mod of ${component}
+#   // release ${component}  uses the commit of ${component} as specified in the release image
+#   // override [${reason}]  keep existing replacement
+# Note directives without keyword comment are skipped with a warning.
+update_go_mod() {
     pushd "${STAGING_DIR}" >/dev/null
 
-    title "Rebasing go.mod..."
-    extract_section "${REPOROOT}/go.mod" require > latest_require
-    extract_section "${REPOROOT}/go.mod" replace > latest_replace
-    while IFS="" read -r line || [ -n "$line" ]
-    do
-        COMPONENT=$(echo "${line}" | cut -d ' ' -f 1)
-        REPO=$(echo "${line}" | cut -d ' ' -f 2)
-        if [[ "${EMBEDDED_COMPONENTS}" == *"${COMPONENT}"* ]]; then
-            extract_section "${REPO##*/}/go.mod" require > require
-            extract_section "${REPO##*/}/go.mod" replace > replace
-            update_versions latest_require require > t; mv t latest_require
-            update_versions latest_replace replace > t; mv t latest_replace
-        fi
-    done < source-commits
+    title "# Updating go.mod"
 
-    cat << EOF > "${REPOROOT}/go.mod"
-module github.com/openshift/microshift
-
-go 1.16
-
-replace (
-$(cat latest_replace)
-)
-
-require (
-$(cat latest_require)
-)
-EOF
-
-    go mod tidy
-    go mod vendor
+    replaced_modulepaths=$(go mod edit -json | jq -r '.Replace // []' | jq -r '.[].Old.Path' | xargs)
+    for modulepath in ${replaced_modulepaths}; do
+        current_replace_directive=$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")
+        comment=$(get_comment "${current_replace_directive}")
+        command=${comment%% *}
+        arguments=${comment#${command} }
+        case "${command}" in
+        from)
+            component=${arguments%% *}
+            valid_component_or_exit "${component}"
+            new_modulepath_version=$(lookup_modulepath_version_from_component "${modulepath}" "${component}")
+            go mod edit -replace ${modulepath}=${new_modulepath_version}
+            ;;
+        release)
+            component=${arguments%% *}
+            valid_component_or_exit "${component}"
+            new_modulepath_version=$(get_modulepath_version_for_release "${component}")
+            go mod edit -replace ${modulepath}=${new_modulepath_version}
+            ;;
+        override)
+            echo "skipping modulepath ${modulepath}: override [${arguments}]"
+            ;;
+        *)
+            echo "skipping modulepath ${modulepath}: no or unknown command [${comment}]"
+            ;;
+        esac
+    done
 
     popd >/dev/null
 }
 
+# Regenerates OpenAPIs after patching the vendor directory
 regenerate_openapi() {
     pushd "${STAGING_DIR}/kubernetes" >/dev/null
 
@@ -240,7 +272,8 @@ update_images() {
 }
 
 
-# Updates embedded component manifests
+# Updates embedded component manifests by gathering these from various places
+# in the staged repos and copying them into the asset directory.
 update_manifests() {
     if [ ! -f "${STAGING_DIR}/release.txt" ]; then
         >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
@@ -249,6 +282,12 @@ update_manifests() {
     pushd "${STAGING_DIR}" >/dev/null
 
     title "Rebasing manifests"
+    for crd in ${REPOROOT}/assets/crd/*.yaml; do
+        cp "${STAGING_DIR}"/release-manifests/$(basename ${crd}) "${REPOROOT}"/assets/crd || true
+    done
+    rm -f "${REPOROOT}"/assets/scc/*.yaml
+    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/scc || true
+
     rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
     cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns 2>/dev/null || true 
     rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
