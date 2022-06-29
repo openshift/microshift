@@ -185,10 +185,10 @@ build_image blueprint_v0.0.1.toml "${IMGNAME}-container" 0.0.1 edge-container
 build_image installer.toml        "${IMGNAME}-installer" 0.0.0 edge-installer "${IMGNAME}-container" 0.0.1
 
 title "Embedding kickstart in the installer image"
-# Create a kickstart file from a template
+# Create a kickstart file from a template, compacting pull secret contents if necessary
 cat "../config/kickstart.ks.template" \
     | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
-    | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE);g" \
+    | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE | jq -c);g" \
     > kickstart.ks
 
 # Run the ISO creation procedure
