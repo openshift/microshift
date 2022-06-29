@@ -1,7 +1,0 @@
-FROM docker.io/debian:sid-slim
-
-ARG TARGETARCH
-
-LABEL maintainer="Carlos Eduardo <carlosedp@gmail.com>"
-
-COPY bin/flannel-$TARGETARCH /flannel

@@ -19,13 +19,11 @@
 %define container_policy_epoch 2
 %define microshift_relabel_files() \
    mkdir -p /var/hpvolumes; \
-   mkdir -p /var/run/flannel; \
    mkdir -p /var/run/kubelet; \
    mkdir -p /var/lib/kubelet/pods; \
    mkdir -p /var/run/secrets/kubernetes.io/serviceaccount; \
    restorecon -R /var/hpvolumes; \
    restorecon -R /var/run/kubelet; \
-   restorecon -R /var/run/flannel; \
    restorecon -R /var/lib/kubelet/pods; \
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount
 
@@ -166,7 +164,6 @@ install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 install -p -m644 packaging/systemd/hostpath-provisioner.service %{buildroot}%{_unitdir}/hostpath-provisioner.service
 
-mkdir -p -m755 %{buildroot}/var/run/flannel
 mkdir -p -m755 %{buildroot}/var/run/kubelet
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
 mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
@@ -217,7 +214,6 @@ fi
 
 %files selinux
 
-/var/run/flannel
 /var/run/kubelet
 /var/lib/kubelet/pods
 /var/run/secrets/kubernetes.io/serviceaccount
