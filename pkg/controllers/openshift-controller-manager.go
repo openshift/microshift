@@ -50,7 +50,7 @@ func NewOpenShiftControllerManager(cfg *config.MicroshiftConfig) *OCPControllerM
 
 func (s *OCPControllerManager) Name() string { return componentOCM }
 func (s *OCPControllerManager) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-apiserver"}
+	return []string{"kube-apiserver"}
 }
 
 func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {

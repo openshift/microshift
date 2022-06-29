@@ -103,8 +103,6 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	s.serverOptions.Authentication.RequestHeader.AllowedNames = []string{
 		"aggregator",
 		"system:aggregator",
-		"openshift-apiserver",
-		"system:openshift-apiserver",
 		"kube-apiserver-proxy",
 		"system:kube-apiserver-proxy",
 		"openshift-aggregator",
