@@ -46,10 +46,10 @@ MicroShift aims at meeting all of the following design goals:
 When deciding between different design options, we follow the following principles:
 
 * **Minimal core**: We keep MicroShift to a minimal set of functionality, but provide mechanisms for extension.
-  * Discriminator 1: If a functionality implements changes to the OS or its configuration, it should probably be done as pre-requisite for running MicroShift binary.
-  * Discriminator 2: If a functionality is essential to MicroShift's atomic start/stop/update behavior (i.e. MicroShift running/stopped means the OpenShift control plane is running/stopped) it must be part of the binary, otherwise it should be hosted on the cluster.
+  * Discriminator 1: If the functionality implements changes to the OS or its configuration, it should probably be done as pre-requisite for running MicroShift binary.
+  * Discriminator 2: If the functionality is essential to MicroShift's atomic start/stop/update behavior (i.e. MicroShift running/stopped means the OpenShift control plane is running/stopped) it must be part of the binary, otherwise it should be hosted on the cluster.
   * Discriminator 3: If can be installed "post-cluster-up" and isn't used by 90% of MicroShift users, it should probably not be pre-integrated with MicroShift at all.
-* **Least-privileged**: We minimize privileges needed by MicroShift and its workloads; unlike with OpenShift, even kubeadmin should not be able to compromise the host system.
+* **Least-privileged**: We minimize privileges needed by MicroShift and its workloads.
 * **Offline-first**: We prefer mechanisms that seamlessly work with poor or no network connectivity.
 * **Minimal configuration**: We minimize the number of configuration parameters exposed to users. Where parameters cannot be avoided, we provide robust defaults or try to auto-configure them.
   * Discriminator: If a parameter can be infered from another parameter, auto-detected, or only covers rare use cases, then likely it should not be exposed to users.
@@ -106,7 +106,6 @@ When deciding between different design options, we follow the following principl
 ### Networking
 * Host networking is configured by device management. MicroShift has to work with what it's been given by the host OS.
 * No Multus.
-* Provide escape hatch to add own CNI.
 * Open issues / questions:
   * Lightweight CNI?
   * API Load Balancing?
@@ -115,7 +114,6 @@ When deciding between different design options, we follow the following principl
 
 ### Storage
 * MicroShift defaults to local ephemeral storage (enough for basic use cases).
-* Provide escape hatch to add own CSI (which?).
 
 ### Production / Supply Chain / Release Management
 * MicroShift vendors OCP source code without modification. Where it deploys container images for additional services, it deploys OCP's published container images.
