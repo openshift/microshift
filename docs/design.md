@@ -35,16 +35,22 @@ MicroShift aims at meeting all of the following design goals:
   * MicroShift makes frugal use of system resources. It runs on <1GB RAM and <1 CPU core (Intel Atom- or ARM Cortex-class). It consumes <500MB on the wire (per install/update) and <1GB at rest (excl. etcd state).
 
 * **Consistency with OpenShift:**
-  * MicroShift runs all workloads that OpenShift runs, except those which depend on OpenShift's cluster operators.
-  * MicroShift clusters can be managed like OpenShift clusters through [Open Cluster Management](https://github.com/open-cluster-management), except where functions depend on OpenShift's cluster operators.
+  * MicroShift is binary compatible with OpenShift and Kubernetes conforming.
+  * MicroShift runs all OpenShift workloads without modification, except for if these rely on OpenShift APIs that are
+    * provided by OpenShift's Operators for cluster infrastructure or lifecycle management (not applicable in MicroShift and thus removed) or
+    * not relevant to a pure non-interactive, runtime-only cluster (as opposed to a build-cluster with multiple interactive users).
+  * MicroShift workloads can be managed like OpenShift workloads through [Red Hat Advanced Cluster Management for Kubernetes](https://www.redhat.com/en/technologies/management/advanced-cluster-management), except where functions depend on unsupported OpenShift APIs (see above).
 
 
 ## Design Principles
 When deciding between different design options, we follow the following principles:
 
 * **Minimal core**: We keep MicroShift to a minimal set of functionality, but provide mechanisms for extension.
-  * Discriminator: If a functionality can be added post-cluster-up with reasonable effort, then it should not be part of the MicroShift core/binary.
-  * See [enabled apis](./enable_apis.md) for the subset of OpenShift APIs enabled in MicroShift.
+  * Discriminator 1: If the functionality implements changes to the OS or its configuration, it should probably be done as pre-requisite for running MicroShift binary.
+  * Discriminator 2: If the functionality is essential to MicroShift's atomic start/stop/update behavior (i.e. MicroShift running/stopped means the OpenShift control plane is running/stopped) it must be part of the binary, otherwise it should be hosted on the cluster.
+  * Discriminator 3: If can be installed "post-cluster-up" and isn't used by 90% of MicroShift users, it should probably not be pre-integrated with MicroShift at all.
+* **Least-privileged**: We minimize privileges needed by MicroShift and its workloads.
+* **Offline-first**: We prefer mechanisms that seamlessly work with poor or no network connectivity.
 * **Minimal configuration**: We minimize the number of configuration parameters exposed to users. Where parameters cannot be avoided, we provide robust defaults or try to auto-configure them.
   * Discriminator: If a parameter can be infered from another parameter, auto-detected, or only covers rare use cases, then likely it should not be exposed to users.
 * **Robustness to failure modes**: We expect and gracefully handle failure modes stemming from field-deployment and that MicroShift is just an app on somebody else's OS it cannot control.
@@ -59,12 +65,12 @@ When deciding between different design options, we follow the following principl
 
 ## Design Decisions
 ### Overall Architecture
-* MicroShift is an application deployed onto a running OS, preferably as container on `podman`, managed through `systemd`. As such, it cannot assume any responsiblity or control over the device or OS it runs on, including OS software or configuration updates or typical device management tasks such as configuring host CA certs or host telemetry. 
+* MicroShift is an application deployed onto a running OS. As such, it cannot assume any responsiblity or control over the device or OS it runs on, including OS software or configuration updates or typical device management tasks such as configuring host CA certs or host telemetry.
 * MicroShift runs as a single binary embedding as goroutines only those services strictly necessary to bring up a *minimal Kubernetes/OpenShift control and data plane*. Motivation:
   * Maximizes reproducibility; cluster will come up fully or not at all.
   * Does not require external orchestration, for example through operators, and allows for very fast start-up/update times.
   * Makes it simple to grok as workload for a a Linux admin persona, works well / easier to implement with systemd.
-  * Smaller resource footprint has _not_ been a motivation, it may be a welcome side-effect.
+  * Reduces resource footprint by downloading and running "less stuff".
 * MicroShift provides a small, optional set of infrastructure services to support common use cases and reuses OpenShift's container images for these:
   * openshift-dns, openshift-router, service-ca, local storage provider
 * MicroShift instances (processes) run directly on the host or containerized on Podman. They can take on the roles of Control Plane, Node, or both:
@@ -73,13 +79,16 @@ When deciding between different design options, we follow the following principl
 * While it's possible to run a single MicroShift instance with both Control Plane and Node roles, there may be reasons to run two instances - one Control Plane and one Node - on the same host, e.g. to run the Control Plane with fewer privileges for security reasons. Implementation decisions should consider this.
 * MicroShift does not bundle any OS user space! Bundling makes maintenance and security hard, breaks compliance. Instead, user space is provided by the host OS, the container image base layer or a sidecar container.
 
+### Supported APIs
+* See [enabled apis](./enable_apis.md) for the subset of OpenShift APIs enabled in MicroShift.
+
 ### CLI
 * The `microshift` binary runs the Control Plane / Node process, it is not a tool to manage or be clients to those processes (like `oc` or `kubeadmin`). This is reflected in the sub-commands and paraemters offered by it, e.g. using the `run` verb (which implies run-to-cancel/run-to-completion) instead of `start`/`stop` verb-pairs (which imply asynch commands that return immediately).
-* For consistency and to play nicely with systemd, we avoid command line parameters that would need to be different between invokations (e.g. first-run vs subsequent runs) or instantiations (e.g. 1st Control Plane instances vs. 2nd or 3rd Control Plane instance).
+* For consistency and to play nicely with systemd, we avoid command line parameters that would need to be different between invocations (e.g. first-run vs subsequent runs).
 
 ### Configuration
 * MicroShift uses a strictly declarative style of configuration.
-* MicroShift uses as few configuration options as possible. Where it provides configuration options, they are intuitive and have sensible defauls respectively are auto-configured.
+* MicroShift uses as few configuration options as possible. Where it provides configuration options, they are intuitive and have sensible defaults respectively are auto-configured.
 * MicroShift is preferably configured through config files, but allows overriding of parameters via environment variables (for use in containers, systemd) and command line flags (for ad-hoc use).
 * MicroShift can use both user-local and system-wide configuration.
 
@@ -105,13 +114,8 @@ When deciding between different design options, we follow the following principl
 
 ### Storage
 * MicroShift defaults to local ephemeral storage (enough for basic use cases).
-* Open issues / questions:
-  * Provide escape hatch to add own CSI (which?).
 
 ### Production / Supply Chain / Release Management
-* MicroShift vendors OCP source code without modification. Where it deploys container images for additional services, it deploys OCP's published container images, not the OpenShift downstream's.
-* MicroShift's versioning scheme follows OCP's. This scheme signals the base OpenShift version (4.x) and order/age of builds, but intentionally avoids signaling patch level, backward compatibility (as SemVer, for example), or stability.
-* We ensure the tip of our development branch is deployable and while MicroShift is still early days and experimental we expect developers (and users who want the "latest") to build & deploy from source.
-* Releases are mainly provided for convenience to users that just want to give MicroShift a quick try without friction. They are cut irregularly, e.g. to make a new feature available.
-* When rebasing onto a new OCP version, we vendor that version's packages and update the container image digests of the infrastructure services MicroShift deploys, i.e. the "release metadata" is baked into the MicroShift binary.
-* Eventually, we expect there to be a "MicroShift Release Image" that is based on / derived from the OpenShift Release Image: It references the MicroShift container image plus the subset of container images shared with and published by OpenShift. Defining a release image should allow to reuse the proven OpenShift CI and release tooling later.
+* MicroShift vendors OCP source code without modification. Where it deploys container images for additional services, it deploys OCP's published container images.
+* MicroShift's versioning scheme follows OCP's.
+* We ensure the tip of our development branch is deployable.
