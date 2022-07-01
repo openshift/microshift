@@ -39,14 +39,6 @@ title() {
 }
 
 
-# Returns the list of release image names from a release_${arch}.go file
-get_release_images() {
-    file=$1
-
-    awk "BEGIN {output=0} /^}/ {output=0} {if (output == 1) print substr(\$1, 2, length(\$1)-3)} /^var Image/ {output=1}" "${file}"
-}
-
-
 # Downloads a release's tools and manifest content into a staging directory,
 # then checks out the required components for the rebase at the release's commit.
 download_release() {
@@ -96,30 +88,24 @@ download_release() {
     popd >/dev/null
 }
 
-# Returns the pseudo-version of the checked-out commit of ${component}
-get_pseudoversion() {
+
+# Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
+# and version as per the staged checkout of ${component}.
+update_modulepath_version_from_release() {
     local modulepath=$1
     local component=$2
 
-    # If the modulepath has a major version suffic X, we need to use
-    # the version prefix "vX.0.0" instead of "v0.0.0"
-    major_version_suffix=$(echo "${modulepath}" | grep -o "v[0-9]$")
-    if [ -z "${major_version_suffix}" ]; then
-        version="v0.0.0"
-    else
-        version="${major_version_suffix}.0.0"
+    path=""
+    if [ "${component}" = "etcd" ]; then
+        path="${modulepath#go.etcd.io/etcd}"
     fi
-    timestamp_commit=$( cd "${STAGING_DIR}/${component}" && TZ=UTC git --no-pager show --quiet --abbrev=12 --date='format-local:%Y%m%d%H%M%S' --format="%cd-%h" )
-    echo "${version}-${timestamp_commit}"
-}
-
-# Returns the modulepath and version for the checkout of ${component}
-get_modulepath_version_for_release() {
-    local component=$1
-
     repo=$( cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url )
-    modulepath="${repo#https://}"
-    echo "${modulepath}@$(get_pseudoversion ${modulepath} ${component})"
+    commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
+    new_modulepath="${repo#https://}${path}"
+
+    echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
+    go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
+    go mod tidy
 }
 
 # Returns the line (including trailing comment) in the #{gomod_file} containing the ReplaceDirective for ${module_path}
@@ -131,18 +117,16 @@ get_replace_directive() {
     go mod edit -print "${gomod_file}" | grep "^[[:space:]]${module_path}[[:space:]][[:alnum:][:space:].-]*=>"
 }
 
-# Returns the new modulepath and version for an old ${modulepath} as specified
-# in the go.mod file of ${component}, taking care of necessary substitutions
-# of local modulepaths.
-lookup_modulepath_version_from_component() {
+# Updates a ReplaceDirective for an old ${modulepath} with the new modulepath
+# and version as specified in the go.mod file of ${component}, taking care of
+# necessary substitutions of local modulepaths.
+update_modulepath_version_from_component() {
     local modulepath=$1
     local component=$2
 
     # Special-case etcd to use OpenShift's repo
     if [[ "${modulepath}" =~ ^go.etcd.io/etcd/ ]]; then
-        modulepath=$(echo "${modulepath}" | sed 's|^go.etcd.io/etcd|github.com/openshift/etcd|')
-        pseudoversion=$(get_pseudoversion ${modulepath} etcd)
-        echo "${modulepath}@${pseudoversion}"
+        update_modulepath_version_from_release "${modulepath}" "${component}"
         return
     fi
 
@@ -150,10 +134,15 @@ lookup_modulepath_version_from_component() {
     replace_directive=$(strip_comment "${replace_directive}")
     replacement=$(echo "${replace_directive}" | sed -E "s|.*=>[[:space:]]*(.*)[[:space:]]*|\1|")
     if [[ "${replacement}" =~ ^./staging ]]; then
-        replacement=$(echo "${replacement}" | sed 's|^./staging/|github.com/openshift/kubernetes/staging/|')
-        replacement="${replacement} $(get_pseudoversion ${modulepath} kubernetes)"
+        new_modulepath=$(echo "${replacement}" | sed 's|^./staging/|github.com/openshift/kubernetes/staging/|')
+        commit=$( cd "${STAGING_DIR}/kubernetes" && git rev-parse HEAD )
+        echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
+        go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
+        go mod tidy
+    else
+        echo "go mod edit -replace ${modulepath}=${replacement/ /@}"
+        go mod edit -replace "${modulepath}=${replacement/ /@}"
     fi
-    echo "${replacement}" | sed 's| |@|'
 }
 
 # Returns ${line} stripping the trailing comment
@@ -184,11 +173,11 @@ valid_component_or_exit() {
     fi
 }
 
-# Updates MicroShift's go.mod file by updating each replace directive's
+# Updates MicroShift's go.mod file by updating each ReplaceDirective's
 # new modulepath-version with that of one of the embedded components.
 # The go.mod file needs to specify which component to take this data from
 # and this is driven from keywords added as comments after each line of
-# replace directives:
+# ReplaceDirectives:
 #   // from ${component}     selects the replacement from the go.mod of ${component}
 #   // release ${component}  uses the commit of ${component} as specified in the release image
 #   // override [${reason}]  keep existing replacement
@@ -208,14 +197,12 @@ update_go_mod() {
         from)
             component=${arguments%% *}
             valid_component_or_exit "${component}"
-            new_modulepath_version=$(lookup_modulepath_version_from_component "${modulepath}" "${component}")
-            go mod edit -replace ${modulepath}=${new_modulepath_version}
+            update_modulepath_version_from_component "${modulepath}" "${component}"
             ;;
         release)
             component=${arguments%% *}
             valid_component_or_exit "${component}"
-            new_modulepath_version=$(get_modulepath_version_for_release "${component}")
-            go mod edit -replace ${modulepath}=${new_modulepath_version}
+            update_modulepath_version_from_release "${modulepath}" "${component}"
             ;;
         override)
             echo "skipping modulepath ${modulepath}: override [${arguments}]"
@@ -229,6 +216,7 @@ update_go_mod() {
     popd >/dev/null
 }
 
+
 # Regenerates OpenAPIs after patching the vendor directory
 regenerate_openapi() {
     pushd "${STAGING_DIR}/kubernetes" >/dev/null
@@ -240,6 +228,13 @@ regenerate_openapi() {
     popd >/dev/null
 }
 
+
+# Returns the list of release image names from a release_${arch}.go file
+get_release_images() {
+    file=$1
+
+    awk "BEGIN {output=0} /^}/ {output=0} {if (output == 1) print substr(\$1, 2, length(\$1)-3)} /^var Image/ {output=1}" "${file}"
+}
 
 # Updates the image digests in pkg/release/release*.go
 update_images() {
