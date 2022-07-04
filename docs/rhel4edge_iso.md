@@ -1,5 +1,5 @@
 # Install MicroShift on RHEL for Edge
-To install MicroShift in a production environment, it is necessary to create a RHEL for Edge ISO installer with all the necessary components preloaded on the image.
+To test MicroShift in a setup similar to the production environment, it is necessary to create a RHEL for Edge ISO installer with all the necessary components preloaded on the image.
 
 ## Build RHEL for Edge Installer ISO
 Log into the development virtual machine with the `microshift` user credentials.

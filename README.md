@@ -32,7 +32,6 @@ For production deployments, MicroShift can be run on bare metal hardware or hype
 ## User Documentation
 To install, configure and run MicroShift, refer to the following documentation:
 
-- [Install MicroShift on RHEL for Edge](./docs/rhel4edge_iso.md)
 - [MicroShift Behind Proxy](./docs/howto_http_proxy.md)
 - [Load Balancer for User Workloads](./docs/howto_load_balancer.md)
 
@@ -41,6 +40,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 
 - [MicroShift Design](./docs/design.md)
 - [MicroShift Development Environment on RHEL 8.x](./docs/devenv_rhel8.md)
+- [Install MicroShift on RHEL for Edge](./docs/rhel4edge_iso.md)
 - [OpenShift CI for MicroShift](./docs/openshift_ci.md)
 
 ## Community
