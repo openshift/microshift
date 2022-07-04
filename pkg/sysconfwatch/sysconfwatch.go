@@ -28,7 +28,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-const ipCheckInterval = time.Second * 5
+const sysConfigCheckInterval = time.Second * 5
 
 type SysConfWatchController struct {
 	NodeIP  string
@@ -66,7 +66,7 @@ func (s *SysConfWatchController) Dependencies() []string {
 
 func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
-	ticker := time.NewTicker(ipCheckInterval)
+	ticker := time.NewTicker(sysConfigCheckInterval)
 	defer ticker.Stop()
 
 	klog.Infof("starting sysconfwatch-controller with IP address %q", c.NodeIP)
