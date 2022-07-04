@@ -10,9 +10,10 @@ STARTTIME=$(date +%s)
 trap ${ROOTDIR}/cleanup.sh INT
 
 usage() {
-    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip]"
+    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]"
     echo "   -pull_secret_file   Path to a file containing the OpenShift pull secret"
     echo "   -ostree_server_name Name or IP address of the OS tree server (default: ${OSTREE_SERVER_IP})"
+    echo "   -custom_rpms        Path to one or more comma-separated RPM packages to be included in the image"
     echo ""
     echo "Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret."
     exit 1
@@ -67,7 +68,7 @@ build_image() {
 
     title "Loading ${blueprint} blueprint v${version}"
     sudo composer-cli blueprints delete ${blueprint} 2>/dev/null || true
-    sudo composer-cli blueprints push "${ROOTDIR}/config/${blueprint_file}"
+    sudo composer-cli blueprints push "${ROOTDIR}/_builds/${blueprint_file}"
     sudo composer-cli blueprints depsolve ${blueprint} 1>/dev/null
 
     if [ -n "$parent_version" ]; then
@@ -103,6 +104,12 @@ while [ $# -gt 0 ] ; do
         shift
         OCP_PULL_SECRET_FILE="$1"
         [ -z "${OCP_PULL_SECRET_FILE}" ] && usage
+        shift
+        ;;
+    -custom_rpms)
+        shift
+        CUSTOM_RPM_FILES="$1"
+        [ -z "${CUSTOM_RPM_FILES}" ] && usage
         shift
         ;;
     *)
@@ -141,21 +148,47 @@ reposync -n -a x86_64 --download-path openshift-local --repo=rhocp-4.10-for-rhel
 find openshift-local -name \*coreos\* -exec rm -f {} \;
 createrepo openshift-local >/dev/null
 
+# Copy user-specific RPM packages
+rm -rf custom-rpms 2>/dev/null || true
+if [ ! -z ${CUSTOM_RPM_FILES} ] ; then
+    title "Building User-Specified RPM repository"
+    mkdir custom-rpms
+    for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
+        cp $rpm custom-rpms
+    done
+    createrepo custom-rpms >/dev/null
+fi
+
 title "Loading sources for OpenShift and MicroShift"
-for f in openshift-local microshift-local ; do
+for f in openshift-local microshift-local custom-rpms ; do
+    [ ! -d $f ] && continue
     cat ../config/${f}.toml.template | sed "s;REPLACE_IMAGE_BUILDER_DIR;${ROOTDIR};g" > ${f}.toml
     sudo composer-cli sources delete $f 2>/dev/null || true
     sudo composer-cli sources add ${ROOTDIR}/_builds/${f}.toml
 done
 
+title "Preparing blueprints"
+cp -f ../config/{blueprint_v0.0.1.toml,installer.toml} .
+if [ ! -z ${CUSTOM_RPM_FILES} ] ; then
+    for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
+        rpm_name=$(basename $rpm | sed 's/.rpm//g')
+        cat >> blueprint_v0.0.1.toml <<EOF
+
+[[packages]]
+name = "${rpm_name}"
+version = "*"
+EOF
+    done
+fi
+
 build_image blueprint_v0.0.1.toml "${IMGNAME}-container" 0.0.1 edge-container
 build_image installer.toml        "${IMGNAME}-installer" 0.0.0 edge-installer "${IMGNAME}-container" 0.0.1
 
 title "Embedding kickstart in the installer image"
-# Create a kickstart file from a template
+# Create a kickstart file from a template, compacting pull secret contents if necessary
 cat "../config/kickstart.ks.template" \
     | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
-    | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE);g" \
+    | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE | jq -c);g" \
     > kickstart.ks
 
 # Run the ISO creation procedure

@@ -40,6 +40,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 
 - [MicroShift Design](./docs/design.md)
 - [MicroShift Development Environment on RHEL 8.x](./docs/devenv_rhel8.md)
+- [Install MicroShift on RHEL for Edge](./docs/rhel4edge_iso.md)
 - [OpenShift CI for MicroShift](./docs/openshift_ci.md)
 
 ## Community
