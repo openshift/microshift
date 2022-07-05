@@ -4,7 +4,7 @@ MicroShift does not currently offer an implementation of network load balancers 
 This document demonstates how to deploy the [MetalLB](https://metallb.universe.tf) service, which is a load balancer implementation for bare metal clusters.
 
 ## Create MicroShift Server
-Use the instructions in the [Install MicroShift for Edge](./devenv_rhel8.md#install-microshift-for-edge) section to configure a virtual machine running MicroShift. 
+Use the instructions in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document to configure a virtual machine running MicroShift. 
 
 Log into the virtual machine and run the following commands to configure the MicroShift access and check if the PODs are up and running.
 
