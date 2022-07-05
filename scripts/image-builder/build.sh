@@ -112,6 +112,7 @@ while [ $# -gt 0 ] ; do
         shift
         OCP_PULL_SECRET_FILE="$1"
         [ -z "${OCP_PULL_SECRET_FILE}" ] && usage "Pull secret file not specified"
+        [ ! -s "${OCP_PULL_SECRET_FILE}" ] && usage "Empty or missing pull secret file"
         shift
         ;;
     -custom_rpms)
