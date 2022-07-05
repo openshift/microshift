@@ -38,7 +38,7 @@ waitfor_image() {
 
     local tend=$(date +%s)
     echo "$(date +'%Y-%m-%d %H:%M:%S') ${status} - elapsed $(( (tend - tstart) / 60 )) minutes"
-    
+
     if [ "${status}" = "FAILED" ]; then
         download_image ${uuid} 1
         echo "Blueprint build has failed. For more information, review the downloaded logs"
@@ -114,7 +114,7 @@ while [ $# -gt 0 ] ; do
         ;;
     *)
         usage
-        ;;    
+        ;;
     esac
 done
 if [ -z "${OSTREE_SERVER_NAME}" ] || [ -z "${OCP_PULL_SECRET_FILE}" ] ; then
