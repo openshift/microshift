@@ -10,6 +10,14 @@ STARTTIME=$(date +%s)
 trap ${ROOTDIR}/cleanup.sh INT
 
 usage() {
+    local error_message="$1"
+
+    if [ -n "$error_message" ];
+    then
+        echo "ERROR: $error_message"
+        echo
+    fi
+
     echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]"
     echo "   -pull_secret_file   Path to a file containing the OpenShift pull secret"
     echo "   -ostree_server_name Name or IP address of the OS tree server (default: ${OSTREE_SERVER_IP})"
@@ -97,13 +105,13 @@ while [ $# -gt 0 ] ; do
     -ostree_server_name)
         shift
         OSTREE_SERVER_NAME="$1"
-        [ -z "${OSTREE_SERVER_NAME}" ] && usage
+        [ -z "${OSTREE_SERVER_NAME}" ] && usage "ostree server name not specified"
         shift
         ;;
     -pull_secret_file)
         shift
         OCP_PULL_SECRET_FILE="$1"
-        [ -z "${OCP_PULL_SECRET_FILE}" ] && usage
+        [ -z "${OCP_PULL_SECRET_FILE}" ] && usage "Pull secret file not specified"
         shift
         ;;
     -custom_rpms)
