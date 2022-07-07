@@ -29,6 +29,7 @@ import (
 )
 
 const sysConfigCheckInterval = time.Second * 5
+const sysConfigAllowedTimeDrift = time.Second * 10
 
 type SysConfWatchController struct {
 	NodeIP  string
@@ -64,6 +65,22 @@ func (s *SysConfWatchController) Dependencies() []string {
 	return []string{}
 }
 
+func sysMonTimeDiff() int64 {
+	var stm unix.Timespec
+	var mtm unix.Timespec
+
+	// System-wide clock that measures real (i.e. wall-clock) time
+	// This clock is affected by discontinuous jumps in the system time (e.g. if the system administrator manually changes the clock)
+	// and by the incremental adjustments performed by adjtime and NTP
+	unix.ClockGettime(unix.CLOCK_REALTIME, &stm)
+	// Clock that cannot be set and represents monotonic time since some unspecified starting point
+	// It provides access to a raw hardware-based time that is not subject to NTP adjustments
+	// or the incremental adjustments performed by adjtime
+	unix.ClockGettime(unix.CLOCK_MONOTONIC_RAW, &mtm)
+
+	return stm.Sec - mtm.Sec
+}
+
 func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 	ticker := time.NewTicker(sysConfigCheckInterval)
@@ -72,6 +89,8 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 	klog.Infof("starting sysconfwatch-controller with IP address %q", c.NodeIP)
 
 	var buf []byte = make([]byte, 8)
+	// Take a snapshot of the system and monototic clock difference as a base reference
+	var smtDiffBase int64 = sysMonTimeDiff()
 	for {
 		select {
 		case <-ticker.C:
@@ -83,14 +102,25 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 				return nil
 			}
 
-			// Check the clock change
-			// Initiate an asynchronous read operation on the timer object
+			// Check the clock change by initiating an asynchronous read operation on the timer object
 			// When the clock is reset, the read operation returns with the ECANCELED error code
 			_, err := unix.Read(c.timerFd, buf)
 			if err == unix.ECANCELED {
-				klog.Warningf("realtime clock change detected, restarting MicroShift")
-				os.Exit(0)
-				return nil
+				// Take a snapshot of the current system and monototic clock differences
+				var smtDiffCurr int64 = sysMonTimeDiff()
+
+				// Compare the current and base references
+				// Verify that the time drift is in the allowed range
+				var smtDiffDrift = smtDiffCurr - smtDiffBase
+				if math.Abs(float64(smtDiffDrift)) < sysConfigAllowedTimeDrift.Seconds() {
+					// Allow time adjustments when the drift is the predefined range
+					// This comes to prevent restarts when small time adjustments are performed by NTP
+					klog.Warningf("realtime clock change detected, time drifted %v seconds within the allowed range", smtDiffDrift)
+				} else {
+					klog.Warningf("realtime clock change detected, time drifted %v seconds, restarting MicroShift", smtDiffDrift)
+					os.Exit(0)
+					return nil
+				}
 			}
 
 		case <-ctx.Done():
