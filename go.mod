@@ -18,6 +18,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
 	go.etcd.io/etcd/server/v3 v3.5.3
+	golang.org/x/sys v0.0.0-20210831042530-f4d43177bf5e
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.23.1
 	k8s.io/apiextensions-apiserver v0.23.1
@@ -34,8 +35,6 @@ require (
 	k8s.io/kubernetes v1.23.1
 	sigs.k8s.io/yaml v1.2.0
 )
-
-require golang.org/x/sys v0.0.0-20210831042530-f4d43177bf5e
 
 require (
 	cloud.google.com/go v0.81.0 // indirect
