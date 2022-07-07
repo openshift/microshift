@@ -74,7 +74,13 @@ Jul 05 09:54:51 localhost.localdomain microshift[5345]: I0705 09:54:51.306117   
 To restore the proper IP address setting, reboot the virtual machine so that the address is reset back to normal by the DHCP service.
 
 ## System-wide Clock Changes
-Log into the virtual machine and run the following commands to simulate a discontinuous system-wide clock change using the `timedatectl` command.
+Log into the virtual machine to simulate discontinuous system-wide clock changes using the `timedatectl` command.
+
+> MicroShift restarts when the time is adjusted by more than 10 seconds in the past or the future. 
+> Smaller time drifts are allowed to avoid unnecessary restarts on regular time adjustments performed by the NTP service.
+
+### Clock Update with Restart
+Reset the clock with a drift of more than 10 seconds to cause the MicroShift service restart.
 
 ```bash
 sudo timedatectl set-ntp false
@@ -82,14 +88,29 @@ sudo timedatectl set-time 00:00:00
 ```
 
 Run the `journalctl` command to verify that the service was restarted. The logs should contain restart and startup messages.
+
 ```
-Jul 05 00:00:03 localhost.localdomain microshift[5803]: W0705 00:00:03.834933    5803 sysconfwatch.go:91] realtime clock change detected, restarting MicroShift
+Jul 05 00:00:03 localhost.localdomain microshift[5803]: W0705 00:00:03.834933    5803 sysconfwatch.go:91] realtime clock change detected, time drifted -48955 seconds, restarting MicroShift
 Jul 05 00:00:04 localhost.localdomain microshift[6088]: I0705 00:00:04.306117    6088 run.go:120] Starting Microshift
 ```
 
-To restore the normal clock setting, re-enable the NTP using the `timedatectl` command.
+### Clock Update without Restart
+Reset the clock with a drift of less than 10 seconds to cause the MicroShift service to log a warning message, but continue execution.
+
+```bash
+sudo timedatectl set-ntp false
+sudo timedatectl set-time $(date +%H:%M:%S)
+```
+
+Run the `journalctl` command to verify that the service was not restarted. The logs should contain a warning message.
+
+```
+W0707 00:17:07.309549  157061 sysconfwatch.go:118] realtime clock change detected, time drifted 0 seconds within the allowed range
+```
+### Restore Clock Setting
+To restore the normal clock setting, re-enable the NTP using the following command.
 ```bash
 sudo timedatectl set-ntp true
 ```
 
-> Verify that MicroShift was restarted again after the system-wide time got corrected by the NTP.
+> MicroShift may be restarted again after the system-wide time got corrected by the NTP.

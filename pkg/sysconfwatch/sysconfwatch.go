@@ -90,7 +90,7 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 
 	var buf []byte = make([]byte, 8)
 	// Take a snapshot of the system and monototic clock difference as a base reference
-	var smtDiffBase int64 = sysMonTimeDiff()
+	var smtDiffBase = sysMonTimeDiff()
 	for {
 		select {
 		case <-ticker.C:
@@ -107,7 +107,7 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 			_, err := unix.Read(c.timerFd, buf)
 			if err == unix.ECANCELED {
 				// Take a snapshot of the current system and monototic clock differences
-				var smtDiffCurr int64 = sysMonTimeDiff()
+				var smtDiffCurr = sysMonTimeDiff()
 
 				// Compare the current and base references
 				// Verify that the time drift is in the allowed range
@@ -116,6 +116,8 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 					// Allow time adjustments when the drift is the predefined range
 					// This comes to prevent restarts when small time adjustments are performed by NTP
 					klog.Warningf("realtime clock change detected, time drifted %v seconds within the allowed range", smtDiffDrift)
+					// Update the base reference to allow cumulative time adjustments to remain in the allowed range
+					smtDiffBase = smtDiffCurr
 				} else {
 					klog.Warningf("realtime clock change detected, time drifted %v seconds, restarting MicroShift", smtDiffDrift)
 					os.Exit(0)
