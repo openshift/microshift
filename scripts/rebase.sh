@@ -27,7 +27,7 @@ shopt -s extglob
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")"
 STAGING_DIR="$REPOROOT/_output/staging"
-PULL_SECRET_FILE="${HOME}/.docker/config.json"
+PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
 EMBEDDED_COMPONENTS="openshift-apiserver openshift-controller-manager oauth-apiserver hyperkube etcd"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-openshift-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
