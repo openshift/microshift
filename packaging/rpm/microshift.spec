@@ -48,11 +48,7 @@ Source0: https://github.com/openshift/microshift/archive/%{git_commit}/microshif
 %endif
 
 
-%if 0%{?go_arches:1}
-ExclusiveArch: %{go_arches}
-%else
-ExclusiveArch: x86_64 aarch64 ppc64le s390x
-%endif
+ExclusiveArch: x86_64 aarch64
 
 BuildRequires: gcc
 BuildRequires: golang >= %{golang_version}
@@ -119,16 +115,8 @@ SElinux policy modules for MicroShift.
 
 GOOS=linux
 
-%ifarch ppc64le
-GOARCH=ppc64le
-%endif
-
 %ifarch %{arm} aarch64
 GOARCH=arm64
-%endif
-
-%ifarch s390x
-GOARCH=s390x
 %endif
 
 %ifarch x86_64

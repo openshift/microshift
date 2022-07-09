@@ -27,7 +27,7 @@ shopt -s extglob
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")"
 STAGING_DIR="$REPOROOT/_output/staging"
-PULL_SECRET_FILE="${HOME}/.docker/config.json"
+PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
 EMBEDDED_COMPONENTS="openshift-apiserver openshift-controller-manager oauth-apiserver hyperkube etcd"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-openshift-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
@@ -57,6 +57,8 @@ download_release() {
 
     title "# Downloading and extracting ${release_image} tools"
     oc adm release extract ${authentication} --tools "${release_image}"
+    echo "Content of release.txt:"
+    cat release.txt
 
     title "# Extracing ${release_image} manifest content"
     mkdir -p release-manifests
@@ -296,18 +298,68 @@ update_manifests() {
 }
 
 
+# Runs each rebase step in sequence, commiting the step's output to git
+rebase_to() {
+    local release_image=$1
+
+    title "# Rebasing to ${release_image}"
+    download_release "${release_image}"
+
+    rebase_branch=rebase-${release_image#*:}
+    git branch -D "${rebase_branch}" >/dev/null || true
+    git checkout -b "${rebase_branch}"
+
+    update_go_mod
+    go mod tidy
+    if [[ -n "$(git status -s go.mod go.sum)" ]]; then
+        title "## Committing changes to go.mod"
+        git add go.mod go.sum
+        git commit -m "update go.mod"
+
+        title "## Updating vendor directory"
+        go mod vendor
+        title "## Patching vendor directory"
+        git apply scripts/rebase_patches/*
+        regenerate_openapi
+        if [[ -n "$(git status -s vendor)" ]]; then
+            title "## Commiting changes to vendor directory"
+            git add vendor
+            git commit -m "update vendoring"
+        fi
+    else
+        echo "No changes in go.mod."
+    fi
+
+    update_images
+    if [[ -n "$(git status -s pkg/release)" ]]; then
+        title "## Committing changes to pkg/release"
+        git add pkg/release
+        git commit -m "update component images"
+    else
+        echo "No changes in component images."
+    fi
+
+    # TODO: update_manifests
+}
+
+
 usage() {
     echo "Usage:"
-    echo "$(basename "$0") download RELEASE_IMAGE"
-    echo "$(basename "$0") go.mod"
-    echo "$(basename "$0") generated-apis"
-    echo "$(basename "$0") images"
-    echo "$(basename "$0") manifests"
+    echo "$(basename "$0") to RELEASE_IMAGE          Performs all the steps to rebase to RELEASE_IMAGE"
+    echo "$(basename "$0") download RELEASE_IMAGE    Downloads the content of RELEASE_IMAGE to disk in preparation for rebasing"
+    echo "$(basename "$0") go.mod                    Updates the go.mod file to the downloaded release"
+    echo "$(basename "$0") generated-apis            Regenerates OpenAPIs"
+    echo "$(basename "$0") images                    Rebases the component images to the downloaded release"
+    echo "$(basename "$0") manifests                 Rebases the component manifests to the downloaded release"
     exit 1
 }
 
 command=${1:-help}
 case "$command" in
+    to)
+        [[ $# -ne 2 ]] && usage
+        rebase_to "$2"
+        ;;
     download)
         [[ $# -ne 2 ]] && usage
         download_release "$2"
