@@ -31,11 +31,13 @@ IMAGE_REPO :=quay.io/microshift/microshift
 IMAGE_REPO_AIO :=quay.io/microshift/microshift-aio
 OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=packaging/rpm/_rpmbuild
+ISO_DIR :=scripts/image-builder/_builds
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 ARCH :=$(shell uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
 IPTABLES :=nft
+PULLSECRET :=~/.pull-secret.json
 
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
@@ -156,6 +158,17 @@ srpm:
 	RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
 .PHONY: srpm
 
+image-build-configure:
+	./scripts/image-builder/configure.sh
+.PHONY: image-build-configure
+
+image-build-iso: rpm 
+	./scripts/image-builder/build.sh -pull_secret_file $(PULLSECRET)
+.PHONY: image-build-iso
+
+iso: image-build-configure image-build-iso
+.PHONY: iso
+
 ###############################
 # containerized build targets #
 ###############################
@@ -235,6 +248,7 @@ clean-cross-build:
 	$(RM) -rf $(OUTPUT_DIR)/staging
 	if [ -d '$(OUTPUT_DIR)' ]; then rmdir --ignore-fail-on-non-empty '$(OUTPUT_DIR)'; fi
 	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)' ; fi
+	if [ -d '$(ISO_DIR)' ]; then $(RM) -rf '$(ISO_DIR)' ; fi
 .PHONY: clean-cross-build
 
 clean: clean-cross-build

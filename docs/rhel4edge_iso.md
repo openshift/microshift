@@ -12,7 +12,7 @@ The scripts for building the installer are located in the `scripts/image-builder
 ### Prerequisites
 Execute the `scripts/image-builder/configure.sh` script to install the tools necessary for building the installer image.
 
-Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~microshift/pull-secret.txt` file. 
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~microshift/.pull-secret.json` file. 
 
 Make sure there is more than 20GB of free disk space necessary for the build artifacts. Run the following command to free the space if necessary.
 ```bash
@@ -51,7 +51,7 @@ Note: The OpenShift pull secret can be downloaded from https://console.redhat.co
 
 Continue by running the build script with the pull secret file argument and wait until build process is finished. It may take over 30 minutes to complete a full build cycle.
 ```bash
-./scripts/image-builder/build.sh -pull_secret_file ~/pull-secret.txt
+./scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json
 ```
 The script performs the following tasks:
 - Check for minimum 10GB of available disk space
@@ -93,7 +93,7 @@ Notes:
 
 Run the script in the `rpm` mode to pull the images required by MicroShift and generate the RPMs including those image data.
 ```bash
-./packaging/rpm/make-microshift-images-rpm.sh rpm ~/pull-secret.txt x86_64:amd64 rhel-8-x86_64
+./packaging/rpm/make-microshift-images-rpm.sh rpm ~/.pull-secret.json x86_64:amd64 rhel-8-x86_64
 ```
 
 If the procedure runs successfully, the RPM artifacts can be found in the `packaging/rpm/paack-result` directory.
@@ -105,7 +105,7 @@ $ ls -1 ~/microshift/packaging/rpm/paack-result/*.rpm
 
 Finally, run the build script with the `-custom_rpms` argument to include the specified container image RPMs into the generated ISO.
 ```bash
-./scripts/image-builder/build.sh -pull_secret_file ~/pull-secret.txt -custom_rpms ~/microshift/packaging/rpm/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
+./scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -custom_rpms ~/microshift/packaging/rpm/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
 ```
 > If user-specific container images need to be included into the ISO, multiple comma-separated RPM files can be specified as the `-custom_rpms` argument value.
 
