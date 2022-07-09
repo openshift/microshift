@@ -3,7 +3,7 @@ keyboard us
 timezone UTC
 zerombr
 clearpart --all --initlabel
-autopart --type=plain --fstype=xfs --nohome
+autopart --type=lvm --fstype=xfs --nohome --noswap
 reboot
 text
 network --bootproto=dhcp --device=link --activate --onboot=on
