@@ -65,7 +65,7 @@ func (s *SysConfWatchController) Dependencies() []string {
 	return []string{}
 }
 
-func sysMonTimeDiff() int64 {
+func getSysMonTimes() (int64, int64) {
 	var stm unix.Timespec
 	var mtm unix.Timespec
 
@@ -78,7 +78,7 @@ func sysMonTimeDiff() int64 {
 	// or the incremental adjustments performed by adjtime
 	unix.ClockGettime(unix.CLOCK_MONOTONIC_RAW, &mtm)
 
-	return stm.Sec - mtm.Sec
+	return stm.Sec, mtm.Sec
 }
 
 func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
@@ -89,8 +89,8 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 	klog.Infof("starting sysconfwatch-controller with IP address %q", c.NodeIP)
 
 	var buf []byte = make([]byte, 8)
-	// Take a snapshot of the system and monototic clock difference as a base reference
-	var smtDiffBase = sysMonTimeDiff()
+	// Take a snapshot of the system and monototic clocks as a base reference
+	stimeRef, mtimeRef := getSysMonTimes()
 	for {
 		select {
 		case <-ticker.C:
@@ -106,18 +106,21 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 			// When the clock is reset, the read operation returns with the ECANCELED error code
 			_, err := unix.Read(c.timerFd, buf)
 			if err == unix.ECANCELED {
-				// Take a snapshot of the current system and monototic clock differences
-				var smtDiffCurr = sysMonTimeDiff()
+				// Take a snapshot of the current system and monototic clocks
+				stimeCur, mtimeCur := getSysMonTimes()
 
-				// Compare the current and base references
+				// Compare the elapsed time for the current and base references
 				// Verify that the time drift is in the allowed range
-				var smtDiffDrift = smtDiffCurr - smtDiffBase
+				var stimeDiff = stimeCur - stimeRef
+				var mtimeDiff = mtimeCur - mtimeRef
+				var smtDiffDrift = stimeDiff - mtimeDiff
 				if math.Abs(float64(smtDiffDrift)) < sysConfigAllowedTimeDrift.Seconds() {
 					// Allow time adjustments when the drift is the predefined range
 					// This comes to prevent restarts when small time adjustments are performed by NTP
 					klog.Warningf("realtime clock change detected, time drifted %v seconds within the allowed range", smtDiffDrift)
-					// Update the base reference to allow cumulative time adjustments to remain in the allowed range
-					smtDiffBase = smtDiffCurr
+					// Update the base references to allow cumulative time adjustments to remain in the allowed range
+					stimeRef = stimeCur
+					mtimeRef = mtimeCur
 				} else {
 					klog.Warningf("realtime clock change detected, time drifted %v seconds, restarting MicroShift", smtDiffDrift)
 					os.Exit(0)
