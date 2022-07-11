@@ -41,9 +41,10 @@ Note that the command deletes various user and system data, including:
 Run the build script without arguments to see its usage.
 ```bash
 ./scripts/image-builder/build.sh
-Usage: build.sh <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]
+Usage: build.sh <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-lvm_sysroot_size num_in_MB] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]
    -pull_secret_file   Path to a file containing the OpenShift pull secret
-   -ostree_server_name Name or IP address of the OS tree server (default: )
+   -ostree_server_name Name or IP address and optionally port of the ostree server (default: 127.0.0.1:8080)
+   -lvm_sysroot_size   Size of the system root LVM partition. The remaining disk space will be allocated for data (default: 5120)
    -custom_rpms        Path to one or more comma-separated RPM packages to be included in the image
 
 Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret.
@@ -65,6 +66,31 @@ The script performs the following tasks:
 - Perform partial cleanup procedure to reclaim cached disk space
 
 The artifact of the build is the `scripts/image-builder/_builds/microshift-installer.${ARCH}.iso` bootable RHEL for Edge OS image.
+
+### Disk Partitioning
+The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such parititioning is required for the data volume used by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
+
+By default, the following partition layout is created and formatted with the `XFS` file system:
+* Boot partition is allocated on a 1GB volume
+* The rest of the disk is managed by the `LVM`
+  * System root partition is allocated on a 5GB volume (minimal recommended size for a root partition)
+  * Data partition is allocated on the remaining disk space and mounted at `/var/mnt/data` directory
+
+> The swap partition is not created as it is not required by MicroShift.
+
+The `scripts/image-builder/build.sh` script provides for the optional `-lvm_sysroot_size` command line parameter allowing to increase the system root partition size from the default 5GB.
+> The system root partition size should be specified in megabytes.
+
+As an example, a 20GB disk is partitioned in the following manner by default.
+```
+$ lsblk /dev/sda
+NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+sda             8:0    0  20G  0 disk 
+├─sda1          8:1    0   1G  0 part /boot
+└─sda2          8:2    0  19G  0 part 
+  ├─rhel-root 253:0    0   5G  0 lvm  /sysroot
+  └─rhel-data 253:1    0  14G  0 lvm  /var/mnt/data
+```
 
 ### Offline Containers
 The `scripts/image-builder/build.sh` script supports a special mode for including user-specific RPM files into the generated ISO. The remainder of this section demonstrates how to generate container image RPMs for MicroShift and include them in the installation ISO.
