@@ -18,7 +18,7 @@ The following describes the current rebase process in more detail.
 
 On the machine used for the rebase,
 
-* install `git`, `golang` (>= 1.17), `oc`, and `jq`,
+* install `git`, `golang` (>= 1.17), `oc`, `yq`, and `jq`,
 * add a pull secret into `~/.pull-secret.json`, and
 * git clone your personal fork of microshift and `cd` into it.
 
