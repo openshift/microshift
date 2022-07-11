@@ -68,13 +68,13 @@ The script performs the following tasks:
 The artifact of the build is the `scripts/image-builder/_builds/microshift-installer.${ARCH}.iso` bootable RHEL for Edge OS image.
 
 ### Disk Partitioning
-The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such parititioning is required for the data volume used by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
+The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such parititioning is required for the data volume to be utilized by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
 
 By default, the following partition layout is created and formatted with the `XFS` file system:
 * Boot partition is allocated on a 1GB volume
-* The rest of the disk is managed by the `LVM`
+* The rest of the disk is managed by the `LVM` in a single volume group named `rhel`
   * System root partition is allocated on a 5GB volume (minimal recommended size for a root partition)
-  * Data partition is allocated on the remaining disk space and mounted at `/var/mnt/data` directory
+  * The remainder of the volume group will be used by the CSI driver for storing data (no need to format and mount it)
 
 > The swap partition is not created as it is not required by MicroShift.
 
@@ -88,9 +88,13 @@ NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
 sda             8:0    0  20G  0 disk 
 ├─sda1          8:1    0   1G  0 part /boot
 └─sda2          8:2    0  19G  0 part 
-  ├─rhel-root 253:0    0   5G  0 lvm  /sysroot
-  └─rhel-data 253:1    0  14G  0 lvm  /var/mnt/data
+  └─rhel-root 253:0    0   5G  0 lvm  /sysroot
+
+$ sudo vgdisplay -s
+  "rhel" <19.00 GiB [5.00 GiB  used / <14.00 GiB free]
 ```
+
+> Unallocated disk space of 14GB size remains in the `rhel` volume group to be used by the CSI driver.
 
 ### Offline Containers
 The `scripts/image-builder/build.sh` script supports a special mode for including user-specific RPM files into the generated ISO. The remainder of this section demonstrates how to generate container image RPMs for MicroShift and include them in the installation ISO.

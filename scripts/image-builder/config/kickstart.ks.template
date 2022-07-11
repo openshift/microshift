@@ -8,6 +8,8 @@ reboot
 network --bootproto=dhcp --device=link --activate --onboot=on
 
 # Partition disk with a 1GB boot XFS partition and an LVM volume containing a 5GB+ system root
+# The remainder of the volume will be used by the CSI driver for storing data
+#
 # For example, a 20GB disk would be partitioned in the following way:
 #
 # NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
@@ -29,25 +31,6 @@ logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
 ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/ostree/repo --ref=rhel/8/x86_64/edge
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
-
-# Note: this step can only be performed in the post-install stage because 
-# the Image Builder does not support custom mountpoints for ostree image types
-#
-# Create an LVM data volume using all the remaining LVM space
-# Format and mount the data disk at /var/mnt/data directory
-# For example, a 20GB disk would be partitioned in the following way:
-#
-# NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-# sda             8:0    0  20G  0 disk
-# ├─sda1          8:1    0   1G  0 part /boot
-# └─sda2          8:2    0  19G  0 part
-#   ├─rhel-root 253:0    0   5G  0 lvm  /sysroot
-#   └─rhel-data 253:1    0  14G  0 lvm  /var/mnt/data
-#
-lvcreate --name data -l 100%FREE rhel
-mkfs.xfs -f /dev/rhel/data
-mkdir -p /mnt/data
-echo -e "/dev/mapper/rhel-data\t/var/mnt/data\t\txfs\tdefaults\t0 0" >> /etc/fstab
 
 # Replace the ostree server name
 echo -e 'url=http://REPLACE_OSTREE_SERVER_NAME/repo/' >> /etc/ostree/remotes.d/edge.conf
