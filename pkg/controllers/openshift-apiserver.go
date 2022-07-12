@@ -196,7 +196,7 @@ apiServerArguments:
 	if cfg.AuditLogDir != "" {
 		data = append(data, `
 auditConfig:
-  auditFilePath: `+cfg.AuditLogDir+`openshift-apiserver-audit.log
+  auditFilePath: "`+cfg.AuditLogDir+`/openshift-apiserver-audit.log"
   enabled: true
   logFormat: json
   maximumFileSizeMegabytes: 100
@@ -247,6 +247,6 @@ storageConfig:
   `...)
 
 	path := filepath.Join(cfg.DataDir, "resources", "openshift-apiserver", "config", "config.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return ioutil.WriteFile(path, data, 0644)
 }
