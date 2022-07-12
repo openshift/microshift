@@ -158,9 +158,13 @@ rm -rf microshift-local 2>/dev/null || true
 cp -TR "${ROOTDIR}/../../packaging/rpm/_rpmbuild/RPMS" microshift-local
 createrepo microshift-local >/dev/null
 
-# Download openshift local RPM packages
+# Download openshift local RPM packages (noarch for python and selinux packages)
 rm -rf openshift-local 2>/dev/null || true
 reposync -n -a x86_64 --download-path openshift-local --repo=rhocp-4.10-for-rhel-8-x86_64-rpms >/dev/null
+reposync -n -a noarch --download-path openshift-local --repo=rhocp-4.10-for-rhel-8-x86_64-rpms >/dev/null
+reposync -n -a x86_64 --download-path openshift-local --repo=fast-datapath-for-rhel-8-x86_64-rpms >/dev/null
+reposync -n -a noarch --download-path openshift-local --repo=fast-datapath-for-rhel-8-x86_64-rpms >/dev/null
+
 # Remove coreos packages to avoid conflicts
 find openshift-local -name \*coreos\* -exec rm -f {} \;
 createrepo openshift-local >/dev/null

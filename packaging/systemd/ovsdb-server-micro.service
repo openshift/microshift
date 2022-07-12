@@ -1,0 +1,32 @@
+[Unit]
+Description=Open vSwitch Database Unit (MicroShift)
+After=syslog.target network-pre.target
+Before=network.target network.service
+Wants=ovs-delete-transient-ports.service
+PartOf=openvswitch-micro.service
+
+[Service]
+Type=forking
+CPUAffinity=0
+PIDFile=/var/run/openvswitch/ovsdb-server.pid
+Restart=on-failure
+EnvironmentFile=/etc/openvswitch/default.conf
+EnvironmentFile=-/etc/sysconfig/openvswitch
+EnvironmentFile=-/run/openvswitch.useropts
+
+# Environment is reloaded for each Exec*, make sure to
+# remove openvswitch.useropts first to reload a fresh
+# OVS_USER_ID from default.conf or sysconfig.
+ExecStartPre=/usr/bin/rm -f /run/openvswitch.useropts
+
+ExecStartPre=-/usr/bin/chown ${OVS_USER_ID} /var/run/openvswitch /var/log/openvswitch
+ExecStartPre=/bin/sh -c '/usr/bin/echo "OVS_USER_ID=${OVS_USER_ID}" > /run/openvswitch.useropts'
+ExecStartPre=/bin/sh -c 'if [ "$${OVS_USER_ID/:*/}" != "root" ]; then /usr/bin/echo "OVS_USER_OPT=--ovs-user=${OVS_USER_ID}" >> /run/openvswitch.useropts; fi'
+ExecStart=/usr/share/openvswitch/scripts/ovs-ctl \
+          --no-ovs-vswitchd --no-monitor --system-id=random \
+          ${OVS_USER_OPT} \
+          start $OPTIONS
+ExecStop=/usr/share/openvswitch/scripts/ovs-ctl --no-ovs-vswitchd stop
+ExecReload=/usr/share/openvswitch/scripts/ovs-ctl --no-ovs-vswitchd \
+           ${OVS_USER_OPT} \
+           --no-monitor restart $OPTIONS
