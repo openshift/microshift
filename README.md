@@ -34,12 +34,13 @@ To install, configure and run MicroShift, refer to the following documentation:
 
 - [MicroShift Behind Proxy](./docs/howto_http_proxy.md)
 - [Load Balancer for User Workloads](./docs/howto_load_balancer.md)
+- [MicroShift Mitigation of System Configuration Changes](./docs/howto_sysconf_watch.md)
 
 ## Developer Documentation
 To build MicroShift from source and contribute to its development, refer to the following documentation:
 
 - [MicroShift Design](./docs/design.md)
-- [MicroShift Development Environment on RHEL 8.x](./docs/devenv_rhel8.md)
+- [MicroShift Development Environment on RHEL 8](./docs/devenv_rhel8.md)
 - [Install MicroShift on RHEL for Edge](./docs/rhel4edge_iso.md)
 - [OpenShift CI for MicroShift](./docs/openshift_ci.md)
 
