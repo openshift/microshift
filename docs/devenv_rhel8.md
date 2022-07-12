@@ -47,7 +47,7 @@ You should now be able to access the VM Cockpit console using `https://<vm_ip>:9
 Log into the development virtual machine with the `microshift` user credentials.
 Clone the repository to be used for building various artifacts.
 ```bash
-git clone https://github.com/redhat-et/microshift.git
+git clone https://github.com/openshift/microshift.git
 cd microshift
 ```
 
