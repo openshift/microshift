@@ -1,13 +1,33 @@
 lang en_US.UTF-8
 keyboard us
 timezone UTC
-zerombr
-clearpart --all --initlabel
-autopart --type=plain --fstype=xfs --nohome
-reboot
 text
+reboot
+
+# Configure network to use DHCP and activate on boot
 network --bootproto=dhcp --device=link --activate --onboot=on
 
+# Partition disk with a 1GB boot XFS partition and an LVM volume containing a 5GB+ system root
+# The remainder of the volume will be used by the CSI driver for storing data
+#
+# For example, a 20GB disk would be partitioned in the following way:
+#
+# NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+# sda             8:0    0  20G  0 disk 
+# ├─sda1          8:1    0   1G  0 part /boot
+# └─sda2          8:2    0  19G  0 part 
+#  └─rhel-root  253:0    0   5G  0 lvm  /sysroot
+#
+zerombr
+clearpart --all --initlabel
+part /boot --fstype=xfs --asprimary --size=1024
+# Uncomment this line to add a SWAP partition of the recommended size
+#part swap --fstype=swap --recommended
+part pv.01 --grow
+volgroup rhel pv.01
+logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
+
+# Configure ostree
 ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/ostree/repo --ref=rhel/8/x86_64/edge
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
@@ -22,10 +42,11 @@ REPLACE_OCP_PULL_SECRET_CONTENTS
 EOF
 chmod 600 /etc/crio/openshift-pull-secret
 
+# Create a default redhat user, allowing it to run sudo commands without password
 useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 -G wheel redhat
-
 echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' >> /etc/sudoers
 
+# Configure the firewall
 firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
 
 %end
