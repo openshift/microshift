@@ -53,6 +53,8 @@ func NewRunMicroshiftCommand() *cobra.Command {
 
 func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
+	time.Sleep(time.Second * 3600)
+
 	if err := cfg.ReadAndValidate(flags); err != nil {
 		klog.Fatalf("Error in reading and validating flags", err)
 	}
