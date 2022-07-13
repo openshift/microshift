@@ -5,7 +5,9 @@ After=network-online.target crio.service
 
 [Service]
 WorkingDirectory=/usr/bin/
+ExecStartPre=/bin/bash -c 'mv /var/log/microshift.log /var/log/$$(date +%%T)-microshift.log'
 ExecStart=microshift run
+StandardOutput=file:/var/log/microshift.log
 Restart=always
 User=root
 
