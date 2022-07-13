@@ -181,7 +181,7 @@ rules:
   - "RequestReceived"`)
 
 	path := filepath.Join(cfg.DataDir, "resources", "kube-apiserver-audit-policies", "default.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return ioutil.WriteFile(path, data, 0644)
 }
 
@@ -214,7 +214,7 @@ func (s *KubeAPIServer) configureOAuth(cfg *config.MicroshiftConfig) error {
 `)
 
 	path := filepath.Join(cfg.DataDir, "resources", "kube-apiserver", "oauthMetadata")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return ioutil.WriteFile(path, data, 0644)
 }
 

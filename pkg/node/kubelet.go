@@ -121,7 +121,7 @@ serverTLSBootstrap: false #TODO`)
 	}
 
 	path := filepath.Join(cfg.DataDir, "resources", "kubelet", "config", "config.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return ioutil.WriteFile(path, data, 0644)
 }
 
