@@ -45,9 +45,12 @@ Usage: build.sh <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip
    -pull_secret_file   Path to a file containing the OpenShift pull secret
    -ostree_server_name Name or IP address and optionally port of the ostree server (default: 127.0.0.1:8080)
    -lvm_sysroot_size   Size of the system root LVM partition. The remaining disk space will be allocated for data (default: 5120)
+   -authorized_keys_file
+                       Path to an ssh authorized_keys file, to use with the redhat user account.
    -custom_rpms        Path to one or more comma-separated RPM packages to be included in the image
 
 Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret.
+Note: To allow ssh access into the default redhat account using authorized keys, add the -authorized_keys_file option and provide a path to an authorized_keys file.
 ```
 
 Continue by running the build script with the pull secret file argument and wait until build process is finished. It may take over 30 minutes to complete a full build cycle.

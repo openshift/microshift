@@ -6,6 +6,8 @@ ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
 OSTREE_SERVER_NAME=127.0.0.1:8080
 LVM_SYSROOT_SIZE=5120
 OCP_PULL_SECRET_FILE=
+AUTHORIZED_KEYS_FILE=
+AUTHORIZED_KEYS=
 STARTTIME=$(date +%s)
 
 trap ${ROOTDIR}/cleanup.sh INT
@@ -18,10 +20,12 @@ usage() {
         echo
     fi
 
-    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-lvm_sysroot_size num_in_MB] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]"
+    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-lvm_sysroot_size num_in_MB] [-authorized_keys_file path_to_file] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]"
     echo "   -pull_secret_file   Path to a file containing the OpenShift pull secret"
     echo "   -ostree_server_name Name or IP address and optionally port of the ostree server (default: ${OSTREE_SERVER_NAME})"
     echo "   -lvm_sysroot_size   Size of the system root LVM partition. The remaining disk space will be allocated for data (default: ${LVM_SYSROOT_SIZE})"
+    echo "   -authorized_keys_file"
+    echo "                       Path to an ssh authorized_keys file, to use with the redhat user account."
     echo "   -custom_rpms        Path to one or more comma-separated RPM packages to be included in the image"
     echo ""
     echo "Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret."
@@ -123,6 +127,12 @@ while [ $# -gt 0 ] ; do
         [ ! -s "${OCP_PULL_SECRET_FILE}" ] && usage "Empty or missing pull secret file"
         shift
         ;;
+    -authorized_keys_file)
+        shift
+        AUTHORIZED_KEYS_FILE="$1"
+        [ -z "${AUTHORIZED_KEYS_FILE}" ] && usage
+        shift
+        ;;
     -custom_rpms)
         shift
         CUSTOM_RPM_FILES="$1"
@@ -136,6 +146,18 @@ while [ $# -gt 0 ] ; do
 done
 if [ -z "${OSTREE_SERVER_NAME}" ] || [ -z "${OCP_PULL_SECRET_FILE}" ] ; then
     usage
+fi
+if [ ! -e ${OCP_PULL_SECRET_FILE} ] ; then
+    echo "ERROR: pull_secret_file file does not exist: ${OCP_PULL_SECRET_FILE}"
+    exit 1
+fi
+if [ -n "${AUTHORIZED_KEYS_FILE}" ]; then
+    if [ ! -e ${AUTHORIZED_KEYS_FILE} ]; then
+        echo "ERROR: authorized_keys_file does not exist: ${AUTHORIZED_KEYS_FILE}"
+        exit 1
+    else
+        AUTHORIZED_KEYS=$(cat ${AUTHORIZED_KEYS_FILE})
+    fi
 fi
 
 # Set the elapsed time trap only if command line parsing was successful
@@ -207,6 +229,7 @@ cat "../config/kickstart.ks.template" \
     | sed "s;REPLACE_LVM_SYSROOT_SIZE;${LVM_SYSROOT_SIZE};g" \
     | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
     | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE | jq -c);g" \
+    | sed "s;REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS;${AUTHORIZED_KEYS};g" \
     > kickstart.ks
 
 # Run the ISO creation procedure
