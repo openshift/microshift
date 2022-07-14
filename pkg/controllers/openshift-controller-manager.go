@@ -48,10 +48,8 @@ func NewOpenShiftControllerManager(cfg *config.MicroshiftConfig) *OCPControllerM
 	return s
 }
 
-func (s *OCPControllerManager) Name() string { return componentOCM }
-func (s *OCPControllerManager) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-apiserver"}
-}
+func (s *OCPControllerManager) Name() string           { return componentOCM }
+func (s *OCPControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {

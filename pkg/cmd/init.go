@@ -19,7 +19,6 @@ import (
 	"net"
 
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/util"
 	ctrl "k8s.io/kubernetes/pkg/controlplane"
 )
@@ -29,11 +28,7 @@ func initAll(cfg *config.MicroshiftConfig) error {
 	if err := initCerts(cfg); err != nil {
 		return err
 	}
-	// create configs
-	if err := initServerConfig(cfg); err != nil {
-		return err
-	}
-	// create kubeconfig for kube-scheduler, kubelet, openshift-apiserver,controller-manager
+	// create kubeconfig for kube-scheduler, kubelet, controller-manager
 	if err := initKubeconfig(cfg); err != nil {
 		return err
 	}
@@ -116,12 +111,6 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 	}
 
 	// ocp
-	if err := util.GenCerts("openshift-apiserver", cfg.DataDir+"/resources/openshift-apiserver/secrets",
-		"tls.crt", "tls.key",
-		[]string{"openshift-apiserver", cfg.NodeIP, cfg.NodeName, "openshift-apiserver.default.svc", "openshift-apiserver.default",
-			"127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes", "localhost"}); err != nil {
-		return err
-	}
 	if err := util.GenCerts("openshift-controller-manager", cfg.DataDir+"/resources/openshift-controller-manager/secrets",
 		"tls.crt", "tls.key",
 		[]string{"openshift-controller-manager", cfg.NodeName, cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default",
@@ -134,10 +123,6 @@ func initCerts(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 	return nil
-}
-
-func initServerConfig(cfg *config.MicroshiftConfig) error {
-	return controllers.OpenShiftAPIServerConfig(cfg)
 }
 
 func initKubeconfig(cfg *config.MicroshiftConfig) error {

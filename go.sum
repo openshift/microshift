@@ -81,7 +81,6 @@ github.com/Microsoft/hcsshim v0.8.22/go.mod h1:91uVCVzvX2QD16sMCenoxxXo6L1wJnLMX
 github.com/NYTimes/gziphandler v0.0.0-20170623195520-56545f4a5d46/go.mod h1:3wb06e3pkSAbeQ52E9H9iFoQsEEwGN64994WTCIhntQ=
 github.com/NYTimes/gziphandler v1.1.1 h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cqUQ3I=
 github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
-github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5/go.mod h1:lmUJ/7eu/Q8D7ML55dXQrVaamCz2vxCfdQBasLZfHKk=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/PuerkitoBio/purell v1.1.1 h1:WEQqlqaGbrPkxLJWfBwQmfEAE1Z7ONdDLqrN38tNFfI=
 github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
@@ -274,8 +273,6 @@ github.com/go-logfmt/logfmt v0.5.0/go.mod h1:wCYkCAKZfumFQihp8CzCvQ3paCTfi41vtzG
 github.com/go-logr/logr v1.2.0 h1:QK40JKJyMdUDz+h+xvCsru/bJhvG0UxvePV0ufL/AcE=
 github.com/go-logr/logr v1.2.0/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-logr/zapr v1.2.0/go.mod h1:Qa4Bsj2Vb+FAVeAKsLD8RLQ+YRJB8YDmOAKxaBQf7Ro=
-github.com/go-openapi/errors v0.19.2 h1:a2kIyV3w+OS3S97zxUndRVD46+FhGOUBDFY7nmu4CsY=
-github.com/go-openapi/errors v0.19.2/go.mod h1:qX0BLWsyaKfvhluLejVpVNwNRdXZhEbTA4kxxpKBC94=
 github.com/go-openapi/jsonpointer v0.19.2/go.mod h1:3akKfEdA7DF1sugOqz1dVQHBcuDBPKZGEoHC/NkiQRg=
 github.com/go-openapi/jsonpointer v0.19.3/go.mod h1:Pl9vOtqEWErmShwVjC8pYs9cog34VGT37dQOVbmoatg=
 github.com/go-openapi/jsonpointer v0.19.5 h1:gZr+CIYByUqjcgeLXnQu2gHYQC9o73G2XUeOFYEICuY=
@@ -450,7 +447,6 @@ github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnr
 github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHmT4TnhNGBo=
 github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1:6v2b51hI/fHJwM22ozAgKL4VKDeJcHhJFhtBdhmNjmU=
 github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/XSXhF0NWZEnDohbsk=
-github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible/go.mod h1:JVvhzYOiGBnFSYRyV00iY8q7/0PThjIYav1p9h5dmKs=
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
@@ -600,8 +596,6 @@ github.com/openshift/kubernetes-apiserver v0.0.0-20211221144435-1fd9911b75fd h1:
 github.com/openshift/kubernetes-apiserver v0.0.0-20211221144435-1fd9911b75fd/go.mod h1:Bqt0gWbeM2NefS8CjWswwd2VNAKN6lUKR85Ft4gippY=
 github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88 h1:qGy3+6O8JcrMtHFRVaOWyeMI0e5MryAKyMIRc7AArzw=
 github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88/go.mod h1:6AmNM4N4nHftckybV/U7bQW+5AvK5TW81ndSI6KEidw=
-github.com/openshift/openshift-apiserver v0.0.0-alpha.0.0.20220214215439-6b16f7fa1a95 h1:ISKvidB+JZFEY9clOk2AR/CAZnNTjnDLiMJXG+oR7pw=
-github.com/openshift/openshift-apiserver v0.0.0-alpha.0.0.20220214215439-6b16f7fa1a95/go.mod h1:R0Fl50pF9kRj5hF61wotQOoyXbC5ZDr8F22AKM6GbJU=
 github.com/openshift/openshift-controller-manager v0.0.0-alpha.0.0.20220106174623-2c2d50dbda3a h1:G4lOqG0PMPpU/Fm0qXwa1Om64//kd31/ikHrb2hk5JU=
 github.com/openshift/openshift-controller-manager v0.0.0-alpha.0.0.20220106174623-2c2d50dbda3a/go.mod h1:3a34dC+e6A77TQ30fFRdifWDGjcEp1cLY+lj3sc8Y0Y=
 github.com/openshift/runtime-utils v0.0.0-20200415173359-c45d4ff3f912 h1:zPJYcr+2g68K+pEqw7crr0vLSVsYb3B82LS3y7/kxpc=
