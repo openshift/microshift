@@ -150,9 +150,7 @@ func createAPIRegistration(cfg *config.MicroshiftConfig) error {
 		klog.Errorf("Error loading CA bundle certificate %v", err)
 	}
 	client := apiregistrationclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "apiregistration-agent"))
-	for _, apiSvc := range []string{
-		"v1.route.openshift.io",
-	} {
+	for _, apiSvc := range []string{} {
 		api := &apiregistrationv1.APIService{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "APIService",

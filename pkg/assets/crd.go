@@ -32,6 +32,7 @@ var (
 	crds                = []string{
 		"assets/crd/0000_03_security-openshift_01_scc.crd.yaml",
 		"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml",
+		"assets/crd/0000_04_routes-crd.yaml",
 	}
 )
 

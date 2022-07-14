@@ -126,9 +126,7 @@ func waitForOCPAPIServer(client kubernetes.Interface, timeout time.Duration) err
 	var lastErr error
 
 	err := wait.PollImmediate(time.Second, timeout, func() (bool, error) {
-		for _, apiSvc := range []string{
-			"route.openshift.io",
-		} {
+		for _, apiSvc := range []string{} {
 			status := 0
 			url := "/apis/" + apiSvc
 			result := client.Discovery().RESTClient().Get().AbsPath(url).Do(context.TODO()).StatusCode(&status)
