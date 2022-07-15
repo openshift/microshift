@@ -20,6 +20,7 @@ func startLVMProvisioner(kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 		}
 		crb = []string{
 			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
@@ -27,9 +28,6 @@ func startLVMProvisioner(kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-		}
-		scc = []string{
-			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 		}
 		ds = []string{
@@ -58,8 +56,8 @@ func startLVMProvisioner(kubeconfigPath string) error {
 		klog.Warningf("Failed to apply sa %v: %v", sa, err)
 		return err
 	}
-	if err := assets.ApplySCCs(scc, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply scc %v: %v", scc, err)
+	if err := assets.ApplyDeployments(deploy, renderReleaseImage, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
 	if err := assets.ApplyDaemonSets(ds, renderReleaseImage, nil, kubeconfigPath); err != nil {

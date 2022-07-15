@@ -27,6 +27,8 @@ func init() {
 		"kube_rbac_proxy":     "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3df935837634adb5df8080ac7263c7fb4c4f9d8fd45b36e32ca4fb802bdeaecc",
 		"pause":               "k8s.gcr.io/pause:3.6",
 		"service_ca_operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8b0e194c1cb6babeb2d8326091deb2bba63c430938abe056eb89398c78733eb6",
+		"odf_lvm":             "registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64",
+		"csi_provisioner":     "registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:42563eb25efb2b6f277944b627bea420fa58fe950b46a1bd1487122b8a387e75",
 		"ovn_kubernetes":                "quay.io/microshift/ovn-kubernetes-singlenode:4.10.18",
 	}
 }

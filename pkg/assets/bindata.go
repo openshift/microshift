@@ -144,14 +144,8 @@ func assetsBindata_timestampTxt() (*asset, error) {
 var _assetsComponentsOdfLvmTopolvmController_deploymentYaml = []byte(`apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    deployment.kubernetes.io/revision: "1"
-  creationTimestamp: "2022-07-15T18:04:40Z"
-  generation: 1
   name: topolvm-controller
   namespace: openshift-storage
-  resourceVersion: "19781"
-  uid: 5d1c0497-58ce-4157-9f89-8333f7a1d0c0
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -248,17 +242,17 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
-      - args:
-        - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
-        imagePullPolicy: IfNotPresent
-        name: csi-resizer
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /run/topolvm
-          name: socket-dir
+#      - args:
+#        - --csi-address=/run/topolvm/csi-topolvm.sock
+#        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
+#        imagePullPolicy: IfNotPresent
+#        name: csi-resizer
+#        resources: {}
+#        terminationMessagePath: /dev/termination-log
+#        terminationMessagePolicy: File
+#        volumeMounts:
+#        - mountPath: /run/topolvm
+#          name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
@@ -271,21 +265,21 @@ spec:
         - mountPath: /run/topolvm
           name: socket-dir
       dnsPolicy: ClusterFirst
-      initContainers:
-      - command:
-        - /usr/bin/bash
-        - -c
-        - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
-          -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
-        imagePullPolicy: IfNotPresent
-        name: self-signed-cert-generator
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /certs
-          name: certs
+#      initContainers:
+#      - command:
+#        - /usr/bin/bash
+#        - -c
+#        - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
+#          -keyout /certs/tls.key -out /certs/tls.crt -days 3650
+#        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+#        imagePullPolicy: IfNotPresent
+#        name: self-signed-cert-generator
+#        resources: {}
+#        terminationMessagePath: /dev/termination-log
+#        terminationMessagePolicy: File
+#        volumeMounts:
+#        - mountPath: /certs
+#          name: certs
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -297,25 +291,6 @@ spec:
         name: socket-dir
       - emptyDir: {}
         name: certs
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2022-07-15T18:05:03Z"
-    lastUpdateTime: "2022-07-15T18:05:03Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2022-07-15T18:04:40Z"
-    lastUpdateTime: "2022-07-15T18:05:03Z"
-    message: ReplicaSet "topolvm-controller-7fb6fc5f75" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
 `)
 
 func assetsComponentsOdfLvmTopolvmController_deploymentYamlBytes() ([]byte, error) {
@@ -328,7 +303,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 5572, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4819, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -897,21 +872,15 @@ func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleb
 var _assetsComponentsOdfLvmTopolvmNode_daemonsetYaml = []byte(`apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  annotations:
-    deprecated.daemonset.template.generation: "1"
-  creationTimestamp: "2022-07-15T18:04:40Z"
-  generation: 1
   labels:
     app: topolvm-node
   name: topolvm-node
   namespace: openshift-storage
-  resourceVersion: "20047"
-  uid: 0ad84674-e56e-4c4f-a17d-e639f609fcf0
 spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: topolvm-node
+      app: topolvm-nodef
   template:
     metadata:
       creationTimestamp: null
@@ -922,7 +891,7 @@ spec:
       containers:
       - command:
         - /lvmd
-        - --config=/etc/topolvm/lvmd.yaml
+        - --config=/etc/microshift/lvmd.yaml
         - --container=true
         image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
@@ -1097,7 +1066,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 6042, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5850, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

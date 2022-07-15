@@ -99,17 +99,17 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
-      - args:
-        - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
-        imagePullPolicy: IfNotPresent
-        name: csi-resizer
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /run/topolvm
-          name: socket-dir
+#      - args:
+#        - --csi-address=/run/topolvm/csi-topolvm.sock
+#        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
+#        imagePullPolicy: IfNotPresent
+#        name: csi-resizer
+#        resources: {}
+#        terminationMessagePath: /dev/termination-log
+#        terminationMessagePolicy: File
+#        volumeMounts:
+#        - mountPath: /run/topolvm
+#          name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
@@ -122,21 +122,21 @@ spec:
         - mountPath: /run/topolvm
           name: socket-dir
       dnsPolicy: ClusterFirst
-      initContainers:
-      - command:
-        - /usr/bin/bash
-        - -c
-        - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
-          -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
-        imagePullPolicy: IfNotPresent
-        name: self-signed-cert-generator
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /certs
-          name: certs
+#      initContainers:
+#      - command:
+#        - /usr/bin/bash
+#        - -c
+#        - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
+#          -keyout /certs/tls.key -out /certs/tls.crt -days 3650
+#        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+#        imagePullPolicy: IfNotPresent
+#        name: self-signed-cert-generator
+#        resources: {}
+#        terminationMessagePath: /dev/termination-log
+#        terminationMessagePolicy: File
+#        volumeMounts:
+#        - mountPath: /certs
+#          name: certs
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -148,22 +148,3 @@ spec:
         name: socket-dir
       - emptyDir: {}
         name: certs
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2022-07-15T18:05:03Z"
-    lastUpdateTime: "2022-07-15T18:05:03Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2022-07-15T18:04:40Z"
-    lastUpdateTime: "2022-07-15T18:05:03Z"
-    message: ReplicaSet "topolvm-controller-7fb6fc5f75" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
