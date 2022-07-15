@@ -69,6 +69,7 @@ The artifacts of the build are located in the `packaging` directory.
 ```bash
 $ find packaging -name \*.rpm
 packaging/rpm/_rpmbuild/RPMS/x86_64/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
+packaging/rpm/_rpmbuild/RPMS/x86_64/microshift-4.10.0-networking-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
 packaging/rpm/_rpmbuild/RPMS/noarch/microshift-selinux-4.10.0-nightly_1654189204_34_gc871db21.el8.noarch.rpm
 packaging/rpm/_rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.src.rpm
 ```
@@ -85,8 +86,8 @@ rm -f openshift-client-linux.tar.gz
 ### Runtime Prerequisites
 Run the following commands to install CRI-O.
 ```bash
-sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms
-sudo dnf install -y cri-o cri-tools
+sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms fast-datapath-for-rhel-8-$(uname -i)-rpms
+sudo dnf install -y cri-o cri-tools openvswitch2.16 NetworkManager-ovs
 sudo systemctl enable crio --now
 ```
 

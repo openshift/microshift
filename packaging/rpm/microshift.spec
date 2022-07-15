@@ -103,6 +103,8 @@ SElinux policy modules for MicroShift.
 %package networking
 Summary: Networking elements for MicroShift
 Requires: openvswitch2.16
+Requires: NetworkManager
+Requires: NetworkManager-ovs
 
 %description networking
 This package contains the networking elements necessary to MicroShift's default CNI.
@@ -201,7 +203,7 @@ fi
 
 %post networking
 # setup ovs / ovsdb optimization to avoid full pre-allocation of memory
-sed -i -n -e '/^OVS_USER_OPT=/!p' -e '$aOVS_USER_OPT="--no-mlockall"' /etc/sysconfig/openvswitch
+sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openvswitch
 %systemd_post openvswitch-micro.service
 %systemd_post ovs-vswitchd-micro.service
 %systemd_post ovsdb-server-micro.service
