@@ -1,6 +1,7 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // assets/bindata_timestamp.txt
+// assets/components/odf-lvm/topolvm-controller_deployment.yaml
 // assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
 // assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml
@@ -12,12 +13,13 @@
 // assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
 // assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml
 // assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml
-// assets/components/odf-lvm/topolvm-namespace.yaml
 // assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+// assets/components/odf-lvm/topolvm-node_daemonset.yaml
 // assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
 // assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml
+// assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml
 // assets/components/openshift-dns/dns/cluster-role-binding.yaml
 // assets/components/openshift-dns/dns/cluster-role.yaml
 // assets/components/openshift-dns/dns/configmap.yaml
@@ -135,6 +137,198 @@ func assetsBindata_timestampTxt() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmController_deploymentYaml = []byte(`apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2022-07-15T18:04:40Z"
+  generation: 1
+  name: topolvm-controller
+  namespace: openshift-storage
+  resourceVersion: "19781"
+  uid: 5d1c0497-58ce-4157-9f89-8333f7a1d0c0
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: topolvm-controller
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/name: topolvm-controller
+      name: topolvm-controller
+      namespace: openshift-storage
+    spec:
+      containers:
+      - command:
+        - /topolvm-controller
+        - --cert-dir=/certs
+        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: healthz
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: topolvm-controller
+        ports:
+        - containerPort: 9808
+          name: healthz
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /metrics
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 250m
+            memory: 250Mi
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
+        - mountPath: /certs
+          name: certs
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        - --enable-capacity
+        - --capacity-ownerref-level=2
+        - --capacity-poll-interval=30s
+        - --feature-gates=Topology=true
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        image: registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:42563eb25efb2b6f277944b627bea420fa58fe950b46a1bd1487122b8a387e75
+        imagePullPolicy: IfNotPresent
+        name: csi-provisioner
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
+        imagePullPolicy: IfNotPresent
+        name: csi-resizer
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        imagePullPolicy: IfNotPresent
+        name: liveness-probe
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - /usr/bin/bash
+        - -c
+        - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
+          -keyout /certs/tls.key -out /certs/tls.crt -days 3650
+        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        imagePullPolicy: IfNotPresent
+        name: self-signed-cert-generator
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /certs
+          name: certs
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: topolvm-controller
+      serviceAccountName: topolvm-controller
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: socket-dir
+      - emptyDir: {}
+        name: certs
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2022-07-15T18:05:03Z"
+    lastUpdateTime: "2022-07-15T18:05:03Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2022-07-15T18:04:40Z"
+    lastUpdateTime: "2022-07-15T18:05:03Z"
+    message: ReplicaSet "topolvm-controller-7fb6fc5f75" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+`)
+
+func assetsComponentsOdfLvmTopolvmController_deploymentYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_deploymentYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_deploymentYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 5572, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -639,32 +833,6 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindi
 	return a, nil
 }
 
-var _assetsComponentsOdfLvmTopolvmNamespaceYaml = []byte(`apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-storage
-  annotations:
-    openshift.io/node-selector: ""
-    workload.openshift.io/allowed: "management"
-  labels:
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"`)
-
-func assetsComponentsOdfLvmTopolvmNamespaceYamlBytes() ([]byte, error) {
-	return _assetsComponentsOdfLvmTopolvmNamespaceYaml, nil
-}
-
-func assetsComponentsOdfLvmTopolvmNamespaceYaml() (*asset, error) {
-	bytes, err := assetsComponentsOdfLvmTopolvmNamespaceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-namespace.yaml", size: 293, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -722,6 +890,214 @@ func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleb
 	}
 
 	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 306, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmNode_daemonsetYaml = []byte(`apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: "1"
+  creationTimestamp: "2022-07-15T18:04:40Z"
+  generation: 1
+  labels:
+    app: topolvm-node
+  name: topolvm-node
+  namespace: openshift-storage
+  resourceVersion: "20047"
+  uid: 0ad84674-e56e-4c4f-a17d-e639f609fcf0
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: topolvm-node
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: topolvm-node
+      name: lvmcluster-sample
+    spec:
+      containers:
+      - command:
+        - /lvmd
+        - --config=/etc/topolvm/lvmd.yaml
+        - --container=true
+        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        imagePullPolicy: IfNotPresent
+        name: lvmd
+        resources:
+          limits:
+            cpu: 250m
+            memory: 250Mi
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/lvmd
+          name: lvmd-socket-dir
+        - mountPath: /etc/topolvm
+          name: lvmd-config-dir
+      - command:
+        - /topolvm-node
+        - --lvmd-socket=/run/lvmd/lvmd.sock
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: healthz
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: topolvm-node
+        ports:
+        - containerPort: 9808
+          name: healthz
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 250m
+            memory: 250Mi
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+        - mountPath: /run/lvmd
+          name: lvmd-socket-dir
+        - mountPath: /var/lib/kubelet/pods
+          mountPropagation: Bidirectional
+          name: pod-volumes-dir
+        - mountPath: /var/lib/kubelet/plugins/kubernetes.io/csi
+          mountPropagation: Bidirectional
+          name: csi-plugin-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.cybozu.com/node/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:376f21cfa8308dc1b61a3e8401b7023d903eda768912699f39403de742ab88b1
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - rm -rf /registration/topolvm.cybozu.com /registration/topolvm.cybozu.com-reg.sock
+        name: csi-registrar
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+        - mountPath: /registration
+          name: registration-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        imagePullPolicy: IfNotPresent
+        name: liveness-probe
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+      dnsPolicy: ClusterFirst
+      hostPID: true
+      initContainers:
+      - command:
+        - /usr/bin/bash
+        - -c
+        - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
+          sleep 5; done
+        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        imagePullPolicy: IfNotPresent
+        name: file-checker
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/topolvm
+          name: lvmd-config-dir
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: topolvm-node
+      serviceAccountName: topolvm-node
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /var/lib/kubelet/plugins_registry/
+          type: Directory
+        name: registration-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins/topolvm.cybozu.com/node
+          type: DirectoryOrCreate
+        name: node-plugin-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins/kubernetes.io/csi
+          type: DirectoryOrCreate
+        name: csi-plugin-dir
+      - hostPath:
+          path: /var/lib/kubelet/pods/
+          type: DirectoryOrCreate
+        name: pod-volumes-dir
+      - hostPath:
+          path: /etc/topolvm
+          type: Directory
+        name: lvmd-config-dir
+      - emptyDir:
+          medium: Memory
+        name: lvmd-socket-dir
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+status:
+  currentNumberScheduled: 1
+  desiredNumberScheduled: 1
+  numberAvailable: 1
+  numberMisscheduled: 0
+  numberReady: 1
+  observedGeneration: 1
+  updatedNumberScheduled: 1
+`)
+
+func assetsComponentsOdfLvmTopolvmNode_daemonsetYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmNode_daemonsetYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmNode_daemonsetYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 6042, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -828,6 +1204,32 @@ func assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml", size: 93, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml = []byte(`apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-storage
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+  labels:
+    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
+    topolvm.cybozu.com/webhook: "ignore"`)
+
+func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml", size: 293, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4936,7 +5338,8 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"assets/bindata_timestamp.txt": assetsBindata_timestampTxt,
+	"assets/bindata_timestamp.txt":                                                                           assetsBindata_timestampTxt,
+	"assets/components/odf-lvm/topolvm-controller_deployment.yaml":                                           assetsComponentsOdfLvmTopolvmController_deploymentYaml,
 	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":      assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
 	"assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml":                                    assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml,
@@ -4948,12 +5351,13 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":     assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
 	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml":                   assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml,
 	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml":            assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml,
-	"assets/components/odf-lvm/topolvm-namespace.yaml":                                                       assetsComponentsOdfLvmTopolvmNamespaceYaml,
 	"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":               assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":        assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
+	"assets/components/odf-lvm/topolvm-node_daemonset.yaml":                                                  assetsComponentsOdfLvmTopolvmNode_daemonsetYaml,
 	"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml":                   assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
 	"assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml":                                          assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml,
+	"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml":                                     assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml,
 	"assets/components/openshift-dns/dns/cluster-role-binding.yaml":                                          assetsComponentsOpenshiftDnsDnsClusterRoleBindingYaml,
 	"assets/components/openshift-dns/dns/cluster-role.yaml":                                                  assetsComponentsOpenshiftDnsDnsClusterRoleYaml,
 	"assets/components/openshift-dns/dns/configmap.yaml":                                                     assetsComponentsOpenshiftDnsDnsConfigmapYaml,
@@ -5050,6 +5454,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"bindata_timestamp.txt": {assetsBindata_timestampTxt, map[string]*bintree{}},
 		"components": {nil, map[string]*bintree{
 			"odf-lvm": {nil, map[string]*bintree{
+				"topolvm-controller_deployment.yaml":                                           {assetsComponentsOdfLvmTopolvmController_deploymentYaml, map[string]*bintree{}},
 				"topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
 				"topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":      {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
 				"topolvm-controller_v1_serviceaccount.yaml":                                    {assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml, map[string]*bintree{}},
@@ -5061,12 +5466,13 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":     {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
 				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml":                   {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml, map[string]*bintree{}},
 				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml":            {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml, map[string]*bintree{}},
-				"topolvm-namespace.yaml": {assetsComponentsOdfLvmTopolvmNamespaceYaml, map[string]*bintree{}},
-				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":        {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
-				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml": {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
-				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml":            {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
-				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":     {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
-				"topolvm-node_v1_serviceaccount.yaml":                                   {assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml, map[string]*bintree{}},
+				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":               {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
+				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":        {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-node_daemonset.yaml":                                                  {assetsComponentsOdfLvmTopolvmNode_daemonsetYaml, map[string]*bintree{}},
+				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml":                   {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
+				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-node_v1_serviceaccount.yaml":                                          {assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml, map[string]*bintree{}},
+				"topolvm-openshift-storage_namespace.yaml":                                     {assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml, map[string]*bintree{}},
 			}},
 			"openshift-dns": {nil, map[string]*bintree{
 				"dns": {nil, map[string]*bintree{

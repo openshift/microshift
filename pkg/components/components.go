@@ -13,7 +13,7 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	if err := startHostpathProvisioner(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
+	if err := startLVMProvisioner(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
 		klog.Warningf("Failed to start hostpath provisioner: %v", err)
 		return err
 	}

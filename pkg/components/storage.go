@@ -5,28 +5,41 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func startHostpathProvisioner(kubeconfigPath string) error {
+func startLVMProvisioner(kubeconfigPath string) error {
 	var (
 		ns = []string{
-			"assets/components/hostpath-provisioner/namespace.yaml",
+			"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml",
 		}
 		sa = []string{
-			"assets/components/hostpath-provisioner/service-account.yaml",
+			"assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml",
+			"assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml",
 		}
 		cr = []string{
-			"assets/components/hostpath-provisioner/clusterrole.yaml",
+			"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 		}
 		crb = []string{
-			"assets/components/hostpath-provisioner/clusterrolebinding.yaml",
+			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 		}
 		scc = []string{
-			"assets/components/hostpath-provisioner/scc.yaml",
+			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 		}
 		ds = []string{
-			"assets/components/hostpath-provisioner/daemonset.yaml",
+			"assets/components/odf-lvm/topolvm-node_daemonset.yaml",
+		}
+		deploy = []string{
+			"assets/components/odf-lvm/topolvm-controller_deployment.yaml",
 		}
 		sc = []string{
-			"assets/components/hostpath-provisioner/storageclass.yaml",
+			"",
 		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
