@@ -41,13 +41,25 @@ Note that the command deletes various user and system data, including:
 Run the build script without arguments to see its usage.
 ```bash
 ./scripts/image-builder/build.sh
-Usage: build.sh <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-lvm_sysroot_size num_in_MB] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]
-   -pull_secret_file   Path to a file containing the OpenShift pull secret
-   -ostree_server_name Name or IP address and optionally port of the ostree server (default: 127.0.0.1:8080)
-   -lvm_sysroot_size   Size of the system root LVM partition. The remaining disk space will be allocated for data (default: 5120)
-   -custom_rpms        Path to one or more comma-separated RPM packages to be included in the image
+Usage: build.sh <-pull_secret_file path_to_file> [OPTION]...
 
-Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret.
+  -pull_secret_file path_to_file
+          Path to a file containing the OpenShift pull secret, which
+          can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret
+
+Optional arguments:
+  -microshift_rpms path_or_URL
+          Path or URL to the MicroShift RPM packages to be included
+          in the image (default: packaging/rpm/_rpmbuild/RPMS)
+  -custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm
+          Path to one or more comma-separated RPM packages to be
+          included in the image (default: none)
+  -ostree_server_name name_or_ip
+          Name or IP address and optionally port of the ostree
+          server (default: 127.0.0.1:8080)
+  -lvm_sysroot_size num_in_MB
+          Size of the system root LVM partition. The remaining
+          disk space will be allocated for data (default: 5120)
 ```
 
 Continue by running the build script with the pull secret file argument and wait until build process is finished. It may take over 30 minutes to complete a full build cycle.
@@ -56,8 +68,8 @@ Continue by running the build script with the pull secret file argument and wait
 ```
 The script performs the following tasks:
 - Check for minimum 10GB of available disk space
-- Set up local MicroShift RPM repository using `packaging/rpm/_rpmbuild` directory contents as a source
-- Set up local OpenShift RPM repository using public `rhocp-${OCP_VERSION}-for-rhel-8-${ARCH}-rpms` repository necessary for CRI-O and OpenShift client package installation
+- Set up a local MicroShift RPM repository using a local RPM build or a remote URL (if specified in the command line) as a source
+- Set up a local OpenShift RPM repository using public OpenShift repositories necessary for CRI-O and OpenShift client package installation
 - Configure Image Builder to use the local MicroShift and OpenShift RPM repositories for image builds
 - Run Image Builder to create an edge container image containing all the MicroShift binaries and dependencies
 - Start a local `ostree` server with the above image
