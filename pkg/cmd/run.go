@@ -52,6 +52,8 @@ func NewRunMicroshiftCommand() *cobra.Command {
 }
 
 func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
+	// THIS IS A TEST DO-NOT-MERGE testing CI
+	klog.Info("This is a test")
 
 	if err := cfg.ReadAndValidate(flags); err != nil {
 		klog.Fatalf("Error in reading and validating flags", err)
