@@ -77,7 +77,7 @@ func (s *OCPAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped c
 
 	go func() error {
 		// probe ocp api services
-		restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+		restConfig, err := clientcmd.BuildConfigFromFlags("", filepath.Join(s.cfg.DataDir, "/resources/kubeadmin/kubeconfig"))
 		if err != nil {
 			return err
 		}
@@ -196,12 +196,12 @@ apiServerArguments:
 	if cfg.AuditLogDir != "" {
 		data = append(data, `
 auditConfig:
-  auditFilePath: "`+cfg.AuditLogDir+`/openshift-apiserver-audit.log"
+  auditFilePath: "`+filepath.Join(cfg.AuditLogDir, "/openshift-apiserver-audit.log")+`
   enabled: true
   logFormat: json
   maximumFileSizeMegabytes: 100
   maximumRetainedFiles: 10
-  policyFile: "`+cfg.DataDir+`/resources/openshift-apiserver/config/policy.yaml"
+  policyFile: "`+filepath.Join(cfg.DataDir, "/resources/openshift-apiserver/config/policy.yaml")+`"
   policyConfiguration:
     apiVersion: audit.k8s.io/v1
     kind: Policy
@@ -235,15 +235,15 @@ routingConfig:
   subdomain: `+cfg.Cluster.Domain+`
 servingInfo:
   bindAddress: "0.0.0.0:8444"
-  certFile: `+cfg.DataDir+`/resources/openshift-apiserver/secrets/tls.crt
-  keyFile: `+cfg.DataDir+`/resources/openshift-apiserver/secrets/tls.key
-  ca: `+cfg.DataDir+`/certs/ca-bundle/ca-bundle.crt
+  certFile: `+filepath.Join(cfg.DataDir, "/resources/openshift-apiserver/secrets/tls.crt")+`
+  keyFile: `+filepath.Join(cfg.DataDir, "/resources/openshift-apiserver/secrets/tls.key")+`
+  ca: `+filepath.Join(cfg.DataDir, "/certs/ca-bundle/ca-bundle.crt")+`
 storageConfig:
   urls:
   - https://127.0.0.1:2379
-  certFile: `+cfg.DataDir+`/resources/kube-apiserver/secrets/etcd-client/tls.crt
-  keyFile: `+cfg.DataDir+`/resources/kube-apiserver/secrets/etcd-client/tls.key
-  ca: `+cfg.DataDir+`/certs/ca-bundle/ca-bundle.crt
+  certFile: `+filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/etcd-client/tls.crt")+`
+  keyFile: `+filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/etcd-client/tls.key")+`
+  ca: `+filepath.Join(cfg.DataDir, "/certs/ca-bundle/ca-bundle.crt")+`
   `...)
 
 	path := filepath.Join(cfg.DataDir, "resources", "openshift-apiserver", "config", "config.yaml")
