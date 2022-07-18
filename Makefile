@@ -23,6 +23,8 @@ SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*
 EMBEDDED_GIT_TAG ?= ${SOURCE_GIT_TAG}
 EMBEDDED_GIT_COMMIT ?= ${SOURCE_GIT_COMMIT}
 EMBEDDED_GIT_TREE_STATE ?= ${SOURCE_GIT_TREE_STATE}
+MAJOR := $(shell echo $(SOURCE_GIT_TAG) | cut -f1 -d.)
+MINOR := $(shell echo $(SOURCE_GIT_TAG) | cut -f2 -d.)
 
 
 SRC_ROOT :=$(shell pwd)
@@ -66,6 +68,8 @@ GO_LD_FLAGS := $(GC_FLAGS) -ldflags "-X k8s.io/component-base/version.gitMajor=1
                    -X k8s.io/client-go/pkg/version.gitCommit=a475c28 \
                    -X k8s.io/client-go/pkg/version.gitTreeState=clean \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
+                   -X github.com/openshift/microshift/pkg/version.majorFromGit=$(MAJOR) \
+                   -X github.com/openshift/microshift/pkg/version.minorFromGit=$(MINOR) \
                    -X github.com/openshift/microshift/pkg/version.versionFromGit=$(EMBEDDED_GIT_TAG) \
                    -X github.com/openshift/microshift/pkg/version.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
                    -X github.com/openshift/microshift/pkg/version.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
