@@ -1,10 +1,11 @@
 [Unit]
 Description=Open vSwitch (MicroShift)
 Before=network.target network.service
-After=network-pre.target ovsdb-server-micro.service ovs-vswitchd-micro.service
+After=network-pre.target microshift-ovsdb-server.service microshift-ovs-vswitchd.service
 PartOf=network.target
-Requires=ovsdb-server-micro.service
-Requires=ovs-vswitchd-micro.service
+Requires=microshift-ovsdb-server.service
+Requires=microshift-ovs-vswitchd.service
+Conflicts=openvswitch.service
 
 [Service]
 Type=oneshot

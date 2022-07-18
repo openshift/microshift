@@ -3,7 +3,8 @@ Description=Open vSwitch Database Unit (MicroShift)
 After=syslog.target network-pre.target
 Before=network.target network.service
 Wants=ovs-delete-transient-ports.service
-PartOf=openvswitch-micro.service
+PartOf=microshift-openvswitch.service
+Conflicts=ovsdb-server.service
 
 [Service]
 Type=forking

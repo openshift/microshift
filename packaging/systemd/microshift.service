@@ -1,7 +1,7 @@
 [Unit]
 Description=MicroShift
-Wants=network-online.target crio.service openvswitch-micro.service
-After=network-online.target crio.service openvswitch-micro.service
+Wants=network-online.target crio.service microshift-openvswitch.service
+After=network-online.target crio.service microshift-openvswitch.service
 
 [Service]
 WorkingDirectory=/usr/bin/

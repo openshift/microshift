@@ -1,11 +1,12 @@
 [Unit]
 Description=Open vSwitch Forwarding Unit (MicroShift)
-After=ovsdb-server-micro.service network-pre.target systemd-udev-settle.service
+After=microshift-ovsdb-server.service network-pre.target systemd-udev-settle.service
 Before=network.target network.service
-Requires=ovsdb-server-micro.service
-ReloadPropagatedFrom=ovsdb-server-micro.service
+Requires=microshift-ovsdb-server.service
+ReloadPropagatedFrom=microshift-ovsdb-server.service
 AssertPathIsReadWrite=/var/run/openvswitch/db.sock
-PartOf=openvswitch-micro.service
+PartOf=microshift-openvswitch.service
+Conflicts=ovs-vswitchd.service
 
 [Service]
 Type=forking
