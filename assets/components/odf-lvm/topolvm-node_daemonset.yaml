@@ -9,7 +9,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: topolvm-nodef
+      app: topolvm-node
   template:
     metadata:
       creationTimestamp: null
@@ -164,7 +164,7 @@ spec:
           type: DirectoryOrCreate
         name: pod-volumes-dir
       - hostPath:
-          path: /etc/topolvm
+          path: /etc/microshift
           type: Directory
         name: lvmd-config-dir
       - emptyDir:
@@ -175,11 +175,3 @@ spec:
       maxSurge: 0
       maxUnavailable: 1
     type: RollingUpdate
-status:
-  currentNumberScheduled: 1
-  desiredNumberScheduled: 1
-  numberAvailable: 1
-  numberMisscheduled: 0
-  numberReady: 1
-  observedGeneration: 1
-  updatedNumberScheduled: 1
