@@ -28,6 +28,9 @@ import (
 
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
+	"k8s.io/apimachinery/pkg/util/runtime"
+	serveropts "k8s.io/apiserver/pkg/server/options"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	genericcontrollermanager "k8s.io/controller-manager/app"
@@ -56,12 +59,16 @@ func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
 func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd"} }
 
 func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
+	runtime.Must(utilfeature.DefaultMutableFeatureGate.Set("APIServerTracing=true"))
 	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
 	// certDir := filepath.Join(cfg.DataDir, "certs", s.Name())
 	// dataDir := filepath.Join(cfg.DataDir, s.Name())
 
 	if err := s.configureAuditPolicy(cfg); err != nil {
 		klog.Fatalf("Failed to configure kube-apiserver audit policy %v", err)
+	}
+	if err := s.configureTracingConfig(cfg); err != nil {
+		klog.Fatalf("Failed to configure kube-apiserver tracing configuration %v", err)
 	}
 	if err := s.configureOAuth(cfg); err != nil {
 		klog.Fatalf("Failed to configure kube-apiserver OAuth %v", err)
@@ -80,6 +87,8 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	s.serverOptions.AllowPrivileged = true
 	s.serverOptions.EnableAggregatorRouting = true
 	s.serverOptions.Features.EnableProfiling = false
+	s.serverOptions.Traces = serveropts.NewTracingOptions()
+	s.serverOptions.Traces.ConfigFile = cfg.DataDir + "/resources/kube-apiserver/tracing-config.yaml"
 	s.serverOptions.ServiceAccountSigningKeyFile = cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"
 	s.serverOptions.ServiceClusterIPRanges = cfg.Cluster.ServiceCIDR
 	s.serverOptions.ServiceNodePortRange = utilnet.PortRange{}
@@ -141,6 +150,18 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	s.serverOptions.SecureServing.ServerCert.CertKey.KeyFile = cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key"
 
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+}
+
+func (s *KubeAPIServer) configureTracingConfig(cfg *config.MicroshiftConfig) error {
+	data := []byte(`
+apiVersion: apiserver.config.k8s.io/v1alpha1
+kind: TracingConfiguration
+# 99% sampling rate
+samplingRatePerMillion: 999999`)
+
+	path := filepath.Join(cfg.DataDir, "resources", "kube-apiserver", "tracing-config.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	return ioutil.WriteFile(path, data, 0644)
 }
 
 func (s *KubeAPIServer) configureAuditPolicy(cfg *config.MicroshiftConfig) error {

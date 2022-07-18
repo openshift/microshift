@@ -86,6 +86,10 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	s.etcdCfg.PeerTLSInfo.TrustedCAFile = caCertFile
 	s.etcdCfg.PeerTLSInfo.ClientCertAuth = false
 	s.etcdCfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
+	s.etcdCfg.ExperimentalEnableDistributedTracing = true
+	s.etcdCfg.ExperimentalDistributedTracingAddress = "0.0.0.0:4317"
+	s.etcdCfg.ExperimentalDistributedTracingServiceName = "etcd"
+	s.etcdCfg.ExperimentalDistributedTracingServiceInstanceID = "microshift"
 }
 
 func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
