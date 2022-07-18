@@ -37,36 +37,43 @@ func startLVMProvisioner(kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-controller_deployment.yaml",
 		}
 		sc = []string{
-			"",
+			"assets/components/odf-lvm/topolvm_default-storage-class.yaml",
 		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
-		return err
+		panic(err)
+		//return err
 	}
 	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterrole %v: %v", cr, err)
-		return err
+		panic(err)
+		//return err
 	}
 	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
-		return err
+		panic(err)
+		//return err
 	}
 	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply sa %v: %v", sa, err)
-		return err
+		panic(err)
+		//return err
 	}
 	if err := assets.ApplyDeployments(deploy, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
-		return err
+		panic(err)
+		//return err
 	}
 	if err := assets.ApplyDaemonSets(ds, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
-		return err
+		panic(err)
+		//return err
 	}
 	if err := assets.ApplyStorageClasses(sc, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
-		return err
+		panic(err)
+		//return err
 	}
 	return nil
 }

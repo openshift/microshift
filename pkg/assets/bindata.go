@@ -4,6 +4,8 @@
 // assets/components/odf-lvm/topolvm-controller_deployment.yaml
 // assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+// assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
+// assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml
 // assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml
 // assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
@@ -20,6 +22,7 @@
 // assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
 // assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml
 // assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml
+// assets/components/odf-lvm/topolvm_default-storage-class.yaml
 // assets/components/openshift-dns/dns/cluster-role-binding.yaml
 // assets/components/openshift-dns/dns/cluster-role.yaml
 // assets/components/openshift-dns/dns/configmap.yaml
@@ -160,7 +163,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app.kubernetes.io/name: topolvm-controller
       name: topolvm-controller
@@ -242,17 +244,17 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
-#      - args:
-#        - --csi-address=/run/topolvm/csi-topolvm.sock
-#        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
-#        imagePullPolicy: IfNotPresent
-#        name: csi-resizer
-#        resources: {}
-#        terminationMessagePath: /dev/termination-log
-#        terminationMessagePolicy: File
-#        volumeMounts:
-#        - mountPath: /run/topolvm
-#          name: socket-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
+        imagePullPolicy: IfNotPresent
+        name: csi-resizer
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
@@ -265,21 +267,21 @@ spec:
         - mountPath: /run/topolvm
           name: socket-dir
       dnsPolicy: ClusterFirst
-#      initContainers:
-#      - command:
-#        - /usr/bin/bash
-#        - -c
-#        - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
-#          -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-#        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
-#        imagePullPolicy: IfNotPresent
-#        name: self-signed-cert-generator
-#        resources: {}
-#        terminationMessagePath: /dev/termination-log
-#        terminationMessagePolicy: File
-#        volumeMounts:
-#        - mountPath: /certs
-#          name: certs
+      initContainers:
+      - command:
+        - /usr/bin/bash
+        - -c
+        - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
+          -keyout /certs/tls.key -out /certs/tls.crt -days 3650
+        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        imagePullPolicy: IfNotPresent
+        name: self-signed-cert-generator
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /certs
+          name: certs
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -303,7 +305,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4819, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4763, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -311,7 +313,6 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 var _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: topolvm-controller
 rules:
 - apiGroups:
@@ -377,7 +378,7 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 724, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 698, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -385,7 +386,6 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterro
 var _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  creationTimestamp: null
   name: topolvm-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -394,7 +394,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: topolvm-controller
-  namespace: lvm-operator-system
+  namespace: openshift-storage
 `)
 
 func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
@@ -407,7 +407,69 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 316, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 288, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: topolvm-controller
+  namespace: openshift-storage
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configMaps
+    verbs:
+      - get
+      - watch
+      - list
+      - delete
+      - update
+      - create`)
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml", size: 281, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: topolvm-controller
+  namespace: openshift-storage
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: topolvm-controller
+subjects:
+  - kind: ServiceAccount
+    name: topolvm-controller
+    namespace: openshift-storage`)
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 310, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -415,9 +477,8 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterro
 var _assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml = []byte(`apiVersion: v1
 kind: ServiceAccount
 metadata:
-  creationTimestamp: null
   name: topolvm-controller
-`)
+  namespace: openshift-storage`)
 
 func assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYamlBytes() ([]byte, error) {
 	return _assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml, nil
@@ -429,7 +490,7 @@ func assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml() (*asset, er
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml", size: 99, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml", size: 103, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -437,7 +498,6 @@ func assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml() (*asset, er
 var _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-provisioner
 rules:
 - apiGroups:
@@ -527,7 +587,7 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clust
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 1041, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 1015, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -535,7 +595,6 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clust
 var _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-provisioner
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -544,7 +603,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: topolvm-controller
-  namespace: lvm-operator-system
+  namespace: openshift-storage
 `)
 
 func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
@@ -557,7 +616,7 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clust
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 326, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 298, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -565,8 +624,8 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clust
 var _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-provisioner
+  namespace: openshift-storage
 rules:
 - apiGroups:
   - coordination.k8s.io
@@ -615,7 +674,7 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleY
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml", size: 533, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml", size: 538, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -623,8 +682,8 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleY
 var _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-provisioner
+  namespace: openshift-storage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -632,7 +691,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: topolvm-controller
-  namespace: lvm-operator-system
+  namespace: openshift-storage
 `)
 
 func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes() ([]byte, error) {
@@ -645,7 +704,7 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleb
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 312, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 315, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -653,7 +712,6 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleb
 var _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-resizer
 rules:
 - apiGroups:
@@ -709,7 +767,7 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 595, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 569, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -717,7 +775,6 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterro
 var _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-resizer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -726,7 +783,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: topolvm-controller
-  namespace: lvm-operator-system
+  namespace: openshift-storage
 `)
 
 func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
@@ -739,7 +796,7 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 318, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 290, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -747,8 +804,8 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterro
 var _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-resizer
+  namespace: openshift-storage
 rules:
 - apiGroups:
   - coordination.k8s.io
@@ -773,7 +830,7 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml(
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml", size: 253, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml", size: 258, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -781,8 +838,8 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml(
 var _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-resizer
+  namespace: openshift-storage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -790,7 +847,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: topolvm-controller
-  namespace: lvm-operator-system
+  namespace: openshift-storage
 `)
 
 func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes() ([]byte, error) {
@@ -803,7 +860,7 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindi
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 304, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 307, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -811,7 +868,6 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindi
 var _assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: topolvm-node-scc
 rules:
 - apiGroups:
@@ -834,7 +890,7 @@ func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleY
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 261, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 235, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -842,7 +898,6 @@ func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleY
 var _assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  creationTimestamp: null
   name: topolvm-node-scc
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -851,7 +906,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: topolvm-node
-  namespace: lvm-operator-system
+  namespace: openshift-storage
 `)
 
 func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
@@ -864,7 +919,7 @@ func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleb
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 306, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 278, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -880,10 +935,9 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: topolvm-nodef
+      app: topolvm-node
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: topolvm-node
       name: lvmcluster-sample
@@ -891,7 +945,7 @@ spec:
       containers:
       - command:
         - /lvmd
-        - --config=/etc/microshift/lvmd.yaml
+        - --config=/etc/topolvm/lvmd.yaml
         - --container=true
         image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
@@ -1035,25 +1089,18 @@ spec:
           type: DirectoryOrCreate
         name: pod-volumes-dir
       - hostPath:
-          path: /etc/topolvm
+          path: /etc/microshift/
           type: Directory
         name: lvmd-config-dir
-      - emptyDir:
-          medium: Memory
+      - hostPath:
+          path: /run/topolvm/
+          type: Directory
         name: lvmd-socket-dir
   updateStrategy:
     rollingUpdate:
       maxSurge: 0
       maxUnavailable: 1
     type: RollingUpdate
-status:
-  currentNumberScheduled: 1
-  desiredNumberScheduled: 1
-  numberAvailable: 1
-  numberMisscheduled: 0
-  numberReady: 1
-  observedGeneration: 1
-  updatedNumberScheduled: 1
 `)
 
 func assetsComponentsOdfLvmTopolvmNode_daemonsetYamlBytes() ([]byte, error) {
@@ -1066,7 +1113,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5850, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5673, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1074,7 +1121,6 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 var _assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: topolvm-node
 rules:
 - apiGroups:
@@ -1120,7 +1166,7 @@ func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 492, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 466, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1128,7 +1174,6 @@ func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml
 var _assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  creationTimestamp: null
   name: topolvm-node
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1137,7 +1182,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: topolvm-node
-  namespace: lvm-operator-system
+  namespace: openshift-storage
 `)
 
 func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
@@ -1150,7 +1195,7 @@ func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebind
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 298, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 270, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1158,8 +1203,9 @@ func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebind
 var _assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml = []byte(`apiVersion: v1
 kind: ServiceAccount
 metadata:
-  creationTimestamp: null
   name: topolvm-node
+  namespace: openshift-storage
+
 `)
 
 func assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYamlBytes() ([]byte, error) {
@@ -1172,7 +1218,7 @@ func assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml", size: 93, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml", size: 99, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1199,6 +1245,36 @@ func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml() (*asset, erro
 	}
 
 	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml", size: 293, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml = []byte(`apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  labels:
+  name: topolvm-provisioner
+parameters:
+  csi.storage.k8s.io/fstype: xfs
+provisioner: topolvm.cybozu.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+`)
+
+func assetsComponentsOdfLvmTopolvm_defaultStorageClassYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvm_defaultStorageClassYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm_default-storage-class.yaml", size: 334, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4717,9 +4793,6 @@ func assetsCrd0000_10_configOperator_01_featuregateCrdYaml() (*asset, error) {
 var _assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.7.0
-  creationTimestamp: null
   name: logicalvolumes.topolvm.cybozu.com
 spec:
   group: topolvm.cybozu.com
@@ -4812,7 +4885,7 @@ func assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml", size: 3187, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml", size: 3096, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5311,6 +5384,8 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/odf-lvm/topolvm-controller_deployment.yaml":                                           assetsComponentsOdfLvmTopolvmController_deploymentYaml,
 	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":      assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
+	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml":                    assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml,
+	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml":             assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml,
 	"assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml":                                    assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml,
 	"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml":        assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml": assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
@@ -5327,6 +5402,7 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
 	"assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml":                                          assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml,
 	"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml":                                     assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml,
+	"assets/components/odf-lvm/topolvm_default-storage-class.yaml":                                           assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml,
 	"assets/components/openshift-dns/dns/cluster-role-binding.yaml":                                          assetsComponentsOpenshiftDnsDnsClusterRoleBindingYaml,
 	"assets/components/openshift-dns/dns/cluster-role.yaml":                                                  assetsComponentsOpenshiftDnsDnsClusterRoleYaml,
 	"assets/components/openshift-dns/dns/configmap.yaml":                                                     assetsComponentsOpenshiftDnsDnsConfigmapYaml,
@@ -5426,6 +5502,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"topolvm-controller_deployment.yaml":                                           {assetsComponentsOdfLvmTopolvmController_deploymentYaml, map[string]*bintree{}},
 				"topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
 				"topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":      {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml":                    {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml, map[string]*bintree{}},
+				"topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml":             {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml, map[string]*bintree{}},
 				"topolvm-controller_v1_serviceaccount.yaml":                                    {assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml, map[string]*bintree{}},
 				"topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml":        {assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
 				"topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml": {assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
@@ -5442,6 +5520,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
 				"topolvm-node_v1_serviceaccount.yaml":                                          {assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml, map[string]*bintree{}},
 				"topolvm-openshift-storage_namespace.yaml":                                     {assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml, map[string]*bintree{}},
+				"topolvm_default-storage-class.yaml":                                           {assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml, map[string]*bintree{}},
 			}},
 			"openshift-dns": {nil, map[string]*bintree{
 				"dns": {nil, map[string]*bintree{

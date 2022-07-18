@@ -12,7 +12,6 @@ spec:
       app: topolvm-node
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: topolvm-node
       name: lvmcluster-sample
@@ -20,7 +19,7 @@ spec:
       containers:
       - command:
         - /lvmd
-        - --config=/etc/microshift/lvmd.yaml
+        - --config=/etc/topolvm/lvmd.yaml
         - --container=true
         image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
@@ -164,11 +163,12 @@ spec:
           type: DirectoryOrCreate
         name: pod-volumes-dir
       - hostPath:
-          path: /etc/microshift
+          path: /etc/microshift/
           type: Directory
         name: lvmd-config-dir
-      - emptyDir:
-          medium: Memory
+      - hostPath:
+          path: /run/topolvm/
+          type: Directory
         name: lvmd-socket-dir
   updateStrategy:
     rollingUpdate:

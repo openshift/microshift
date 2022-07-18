@@ -1,8 +1,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  creationTimestamp: null
   name: topolvm-csi-provisioner
+  namespace: openshift-storage
 rules:
 - apiGroups:
   - coordination.k8s.io
