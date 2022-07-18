@@ -63,7 +63,7 @@ users:
 		ClientCert: clientCert,
 		ClientKey:  clientKey,
 	}
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0755))
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 
 	output, err := os.Create(path)
 	if err != nil {
