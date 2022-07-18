@@ -60,6 +60,7 @@ Requires: cri-o
 Requires: cri-tools
 Requires: iptables
 Requires: microshift-selinux
+Requires: microshift-networking
 Requires: conntrack-tools
 
 %{?systemd_requires}
@@ -98,6 +99,15 @@ BuildArch: noarch
 
 %description selinux
 SElinux policy modules for MicroShift.
+
+%package networking
+Summary: Networking elements for MicroShift
+Requires: openvswitch2.16
+Requires: NetworkManager
+Requires: NetworkManager-ovs
+
+%description networking
+This package contains the networking elements necessary to MicroShift's default CNI.
 
 %prep
 
@@ -152,6 +162,11 @@ install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 install -p -m644 packaging/systemd/hostpath-provisioner.service %{buildroot}%{_unitdir}/hostpath-provisioner.service
 
+# this is temporary until we can get something equivalent from openvswitch (only adds the CPUAffinity=0)
+install -p -m644 packaging/systemd/microshift-openvswitch.service %{buildroot}%{_unitdir}/microshift-openvswitch.service
+install -p -m644 packaging/systemd/microshift-ovs-vswitchd.service %{buildroot}%{_unitdir}/microshift-ovs-vswitchd.service
+install -p -m644 packaging/systemd/microshift-ovsdb-server.service %{buildroot}%{_unitdir}/microshift-ovsdb-server.service
+
 mkdir -p -m755 %{buildroot}/var/run/kubelet
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
 mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
@@ -186,6 +201,18 @@ fi
 
 %selinux_relabel_post -s %{selinuxtype}
 
+%post networking
+# setup ovs / ovsdb optimization to avoid full pre-allocation of memory
+sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openvswitch
+%systemd_post microshift-openvswitch.service
+%systemd_post microshift-ovs-vswitchd.service
+%systemd_post microshift-ovsdb-server.service
+
+%preun networking
+%systemd_preun microshift-openvswitch.service
+%systemd_preun microshift-ovs-vswitchd.service
+%systemd_preun microshift-ovsdb-server.service
+
 %preun
 
 %systemd_preun hostpath-provisioner.service
@@ -209,7 +236,18 @@ fi
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 %{_unitdir}/hostpath-provisioner.service
 
+%files networking
+
+%{_unitdir}/microshift-openvswitch.service
+%{_unitdir}/microshift-ovs-vswitchd.service
+%{_unitdir}/microshift-ovsdb-server.service
+
 %changelog
+* Tue Jul 12 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_3
+- Adding the networking subpackage to support ovn-networking
+- Adding virtual openvswitch systemd files with CPUAffinity=0
+- Setting OVS_USER_OPT to --no-mlockall in /etc/sysconfig/openvswitch
+
 * Tue May 24 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_2
 - Adding hostpath-provisioner.service to set SElinux policies to the volumes directory
 
