@@ -40,6 +40,11 @@ CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/nu
 ARCH :=$(shell uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
 IPTABLES :=nft
 PULLSECRET :=~/.pull-secret.json
+AUTHORIZED_KEYS :=$(PROJECT_DIR)/authorized_keys
+IMAGE_BUILDER_ARGS := -pull_secret_file $(PULLSECRET)
+ifneq ("$(wildcard $(AUTHORIZED_KEYS))","")
+	IMAGE_BUILDER_ARGS := $(IMAGE_BUILDER_ARGS) -authorized_keys_file $(AUTHORIZED_KEYS)
+endif
 
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
@@ -172,7 +177,7 @@ image-build-configure:
 .PHONY: image-build-configure
 
 image-build-iso: rpm 
-	./scripts/image-builder/build.sh -pull_secret_file $(PULLSECRET)
+	./scripts/image-builder/build.sh $(IMAGE_BUILDER_ARGS)
 .PHONY: image-build-iso
 
 iso: image-build-configure image-build-iso
