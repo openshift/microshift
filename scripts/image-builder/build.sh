@@ -6,6 +6,7 @@ ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
 OSTREE_SERVER_NAME=127.0.0.1:8080
 LVM_SYSROOT_SIZE=5120
 OCP_PULL_SECRET_FILE=
+MICROSHIFT_RPM_SOURCE=${ROOTDIR}/../../packaging/rpm/_rpmbuild/RPMS
 AUTHORIZED_KEYS_FILE=
 AUTHORIZED_KEYS=
 STARTTIME=$(date +%s)
@@ -20,15 +21,28 @@ usage() {
         echo
     fi
 
-    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [-ostree_server_name name_or_ip] [-lvm_sysroot_size num_in_MB] [-authorized_keys_file path_to_file] [-custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm]"
-    echo "   -pull_secret_file   Path to a file containing the OpenShift pull secret"
-    echo "   -ostree_server_name Name or IP address and optionally port of the ostree server (default: ${OSTREE_SERVER_NAME})"
-    echo "   -lvm_sysroot_size   Size of the system root LVM partition. The remaining disk space will be allocated for data (default: ${LVM_SYSROOT_SIZE})"
-    echo "   -authorized_keys_file"
-    echo "                       Path to an ssh authorized_keys file, to use with the redhat user account."
-    echo "   -custom_rpms        Path to one or more comma-separated RPM packages to be included in the image"
+    echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [OPTION]..."
     echo ""
-    echo "Note: The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret."
+    echo "  -pull_secret_file path_to_file"
+    echo "          Path to a file containing the OpenShift pull secret, which"
+    echo "          can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret"
+    echo ""
+    echo "Optional arguments:"
+    echo "  -microshift_rpms path_or_URL"
+    echo "          Path or URL to the MicroShift RPM packages to be included"
+    echo "          in the image (default: packaging/rpm/_rpmbuild/RPMS)"
+    echo "  -custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm"
+    echo "          Path to one or more comma-separated RPM packages to be"
+    echo "          included in the image (default: none)"
+    echo "  -ostree_server_name name_or_ip"
+    echo "          Name or IP address and optionally port of the ostree"
+    echo "          server (default: ${OSTREE_SERVER_NAME})"
+    echo "  -lvm_sysroot_size num_in_MB"
+    echo "          Size of the system root LVM partition. The remaining"
+    echo "          disk space will be allocated for data (default: ${LVM_SYSROOT_SIZE})"
+    echo "  -authorized_keys_file"
+    echo "          Path to an SSH authorized_keys file to allow SSH access"
+    echo "          into the default 'redhat' account"
     exit 1
 }
 
@@ -107,6 +121,31 @@ build_image() {
 # Parse the command line
 while [ $# -gt 0 ] ; do
     case $1 in
+    -pull_secret_file)
+        shift
+        OCP_PULL_SECRET_FILE="$1"
+        [ -z "${OCP_PULL_SECRET_FILE}" ] && usage "Pull secret file not specified"
+        [ ! -s "${OCP_PULL_SECRET_FILE}" ] && usage "Empty or missing pull secret file"
+        shift
+        ;;
+    -microshift_rpms)
+        shift
+        MICROSHIFT_RPM_SOURCE="$1"
+        [ -z "${MICROSHIFT_RPM_SOURCE}" ] && usage "MicroShift RPM path or URL not specified"
+        # Verify that the specified path or URL can be accessed
+        if [[ "${MICROSHIFT_RPM_SOURCE}" == http* ]] ; then
+            curl -I -so /dev/null "${MICROSHIFT_RPM_SOURCE}" || usage "MicroShift RPM URL '${MICROSHIFT_RPM_SOURCE}' is not accessible"
+        else
+            [ ! -d "${MICROSHIFT_RPM_SOURCE}" ] && usage "MicroShift RPM path '${MICROSHIFT_RPM_SOURCE}' does not exist"
+        fi
+        shift
+        ;;
+    -custom_rpms)
+        shift
+        CUSTOM_RPM_FILES="$1"
+        [ -z "${CUSTOM_RPM_FILES}" ] && usage "Custom RPM packages not specified"
+        shift
+        ;;
     -ostree_server_name)
         shift
         OSTREE_SERVER_NAME="$1"
@@ -120,23 +159,10 @@ while [ $# -gt 0 ] ; do
         [ ${LVM_SYSROOT_SIZE} -lt 5120 ] && usage "System root LVM partition size cannot be smaller than 5120MB"
         shift
         ;;
-    -pull_secret_file)
-        shift
-        OCP_PULL_SECRET_FILE="$1"
-        [ -z "${OCP_PULL_SECRET_FILE}" ] && usage "Pull secret file not specified"
-        [ ! -s "${OCP_PULL_SECRET_FILE}" ] && usage "Empty or missing pull secret file"
-        shift
-        ;;
     -authorized_keys_file)
         shift
         AUTHORIZED_KEYS_FILE="$1"
-        [ -z "${AUTHORIZED_KEYS_FILE}" ] && usage
-        shift
-        ;;
-    -custom_rpms)
-        shift
-        CUSTOM_RPM_FILES="$1"
-        [ -z "${CUSTOM_RPM_FILES}" ] && usage
+        [ -z "${AUTHORIZED_KEYS_FILE}" ] && usage "Authorized keys file not specified"
         shift
         ;;
     *)
@@ -175,9 +201,18 @@ if [ ${build_disk} -lt 10485760 ] ; then
 fi
 
 title "Downloading local OpenShift and MicroShift repositories"
-# Copy microshift local RPM packages
+# Copy MicroShift RPM packages
 rm -rf microshift-local 2>/dev/null || true
-cp -TR "${ROOTDIR}/../../packaging/rpm/_rpmbuild/RPMS" microshift-local
+if [[ "${MICROSHIFT_RPM_SOURCE}" == http* ]] ; then
+    wget -q -nd -r -L -P microshift-local -A rpm "${MICROSHIFT_RPM_SOURCE}"
+else
+    cp -TR "${MICROSHIFT_RPM_SOURCE}" microshift-local
+fi
+# Exit if no RPM packages were found
+if [ $(find microshift-local -name '*.rpm' | wc -l) -eq 0 ] ; then
+    echo "No RPM packages were found at '${MICROSHIFT_RPM_SOURCE}'. Exiting..."
+    exit 1
+fi
 createrepo microshift-local >/dev/null
 
 # Download openshift local RPM packages (noarch for python and selinux packages)
@@ -188,6 +223,11 @@ reposync -n -a x86_64 -a noarch --download-path openshift-local \
 
 # Remove coreos packages to avoid conflicts
 find openshift-local -name \*coreos\* -exec rm -f {} \;
+# Exit if no RPM packages were found
+if [ $(find openshift-local -name '*.rpm' | wc -l) -eq 0 ] ; then
+    echo "No RPM packages were found at the 'rhocp-4.10-for-rhel-8-x86_64-rpms' repository. Exiting..."
+    exit 1
+fi
 createrepo openshift-local >/dev/null
 
 # Copy user-specific RPM packages
