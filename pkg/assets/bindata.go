@@ -151,12 +151,6 @@ apiVersion: storage.k8s.io/v1
 kind: CSIDriver
 metadata:
   name: topolvm.cybozu.com
-  labels:
-    helm.sh/chart: topolvm-4.0.3
-    app.kubernetes.io/name: topolvm
-    app.kubernetes.io/instance: topolvm
-    app.kubernetes.io/version: "0.10.6"
-    app.kubernetes.io/managed-by: Helm
 spec:
   attachRequired: false
   podInfoOnMount: true
@@ -175,7 +169,7 @@ func assetsComponentsOdfLvmCsiDriverYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/csi-driver.yaml", size: 445, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/csi-driver.yaml", size: 247, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

@@ -5,7 +5,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func startLVMProvisioner(kubeconfigPath string) error {
+func startCSIPLugin(kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml",
@@ -14,7 +14,7 @@ func startLVMProvisioner(kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml",
 			"assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml",
 		}
-		roles = []string{
+		role = []string{
 			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml",
 			"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml",
 			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml",
@@ -40,6 +40,12 @@ func startLVMProvisioner(kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 		}
+		cd = []string{
+			"assets/components/odf-lvm/csi-driver.yaml",
+		}
+		cm = []string{
+			"assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml",
+		}
 		ds = []string{
 			"assets/components/odf-lvm/topolvm-node_daemonset.yaml",
 		}
@@ -55,12 +61,11 @@ func startLVMProvisioner(kubeconfigPath string) error {
 		panic(err)
 		//return err
 	}
-	if err := assets.Apply(sc, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
+	if err := assets.ApplyCSIDrivers(cd, nil, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply csiDriver %v: %v", sc, err)
 		panic(err)
 		//return err
 	}
-
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		panic(err)
@@ -71,7 +76,7 @@ func startLVMProvisioner(kubeconfigPath string) error {
 		panic(err)
 		//return err
 	}
-	if err := assets.ApplyRoles(roles, kubeconfigPath); err != nil {
+	if err := assets.ApplyRoles(role, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply role %v: %v", cr, err)
 		panic(err)
 		//return err
@@ -88,6 +93,11 @@ func startLVMProvisioner(kubeconfigPath string) error {
 	}
 	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
+		panic(err)
+		//return err
+	}
+	if err := assets.ApplyConfigMaps(cm, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		panic(err)
 		//return err
 	}
