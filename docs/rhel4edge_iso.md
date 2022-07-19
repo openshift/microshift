@@ -60,6 +60,9 @@ Optional arguments:
   -lvm_sysroot_size num_in_MB
           Size of the system root LVM partition. The remaining
           disk space will be allocated for data (default: 5120)
+  -authorized_keys_file
+          Path to an SSH authorized_keys file to allow SSH access
+          into the default 'redhat' account
 ```
 
 Continue by running the build script with the pull secret file argument and wait until build process is finished. It may take over 30 minutes to complete a full build cycle.

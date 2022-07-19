@@ -12,6 +12,11 @@ if [ -f "${timestamp_file}" ]; then
     fi
 fi
 
+# Ensure GOPATH is set before we try to use it.
+if [ -z "$GOPATH" ]; then
+    export GOPATH=$(go env GOPATH)
+fi
+
 OUTPUT="pkg/assets/bindata.go"
 "${GOPATH}"/bin/go-bindata \
            $TIMESTAMP_ARGS \

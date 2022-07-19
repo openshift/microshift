@@ -1,0 +1,10 @@
+# Values are filled in at runtime by the VersionController
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microshift-version
+  namespace: kube-public
+data:
+  major: ""
+  minor: ""
+  version: ""

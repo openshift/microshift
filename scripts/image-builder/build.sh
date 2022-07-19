@@ -7,7 +7,8 @@ OSTREE_SERVER_NAME=127.0.0.1:8080
 LVM_SYSROOT_SIZE=5120
 OCP_PULL_SECRET_FILE=
 MICROSHIFT_RPM_SOURCE=${ROOTDIR}/../../packaging/rpm/_rpmbuild/RPMS
-
+AUTHORIZED_KEYS_FILE=
+AUTHORIZED_KEYS=
 STARTTIME=$(date +%s)
 
 trap ${ROOTDIR}/cleanup.sh INT
@@ -39,6 +40,9 @@ usage() {
     echo "  -lvm_sysroot_size num_in_MB"
     echo "          Size of the system root LVM partition. The remaining"
     echo "          disk space will be allocated for data (default: ${LVM_SYSROOT_SIZE})"
+    echo "  -authorized_keys_file"
+    echo "          Path to an SSH authorized_keys file to allow SSH access"
+    echo "          into the default 'redhat' account"
     exit 1
 }
 
@@ -155,6 +159,12 @@ while [ $# -gt 0 ] ; do
         [ ${LVM_SYSROOT_SIZE} -lt 5120 ] && usage "System root LVM partition size cannot be smaller than 5120MB"
         shift
         ;;
+    -authorized_keys_file)
+        shift
+        AUTHORIZED_KEYS_FILE="$1"
+        [ -z "${AUTHORIZED_KEYS_FILE}" ] && usage "Authorized keys file not specified"
+        shift
+        ;;
     *)
         usage
         ;;
@@ -162,6 +172,18 @@ while [ $# -gt 0 ] ; do
 done
 if [ -z "${OSTREE_SERVER_NAME}" ] || [ -z "${OCP_PULL_SECRET_FILE}" ] ; then
     usage
+fi
+if [ ! -e ${OCP_PULL_SECRET_FILE} ] ; then
+    echo "ERROR: pull_secret_file file does not exist: ${OCP_PULL_SECRET_FILE}"
+    exit 1
+fi
+if [ -n "${AUTHORIZED_KEYS_FILE}" ]; then
+    if [ ! -e ${AUTHORIZED_KEYS_FILE} ]; then
+        echo "ERROR: authorized_keys_file does not exist: ${AUTHORIZED_KEYS_FILE}"
+        exit 1
+    else
+        AUTHORIZED_KEYS=$(cat ${AUTHORIZED_KEYS_FILE})
+    fi
 fi
 
 # Set the elapsed time trap only if command line parsing was successful
@@ -250,6 +272,7 @@ cat "../config/kickstart.ks.template" \
     | sed "s;REPLACE_LVM_SYSROOT_SIZE;${LVM_SYSROOT_SIZE};g" \
     | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
     | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE | jq -c);g" \
+    | sed "s;REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS;${AUTHORIZED_KEYS};g" \
     > kickstart.ks
 
 # Run the ISO creation procedure
