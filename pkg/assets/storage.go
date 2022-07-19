@@ -90,3 +90,47 @@ func ApplyStorageClasses(scs []string, render RenderFunc, params RenderParams, k
 	sc.Client = scClient(kubeconfigPath)
 	return applySCs(scs, sc, render, params)
 }
+
+func cdClient(kubeconfigPath string) *scclientv1 {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	if err != nil {
+		panic(err)
+	}
+
+	return scclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "sc-agent"))
+}
+
+type cdApplier struct {
+	Client *scclientv1.StorageV1Client
+	cd     *scv1.CSIDriver
+}
+
+func (c cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+	var err error
+	if render != nil {
+		objBytes, err = render(objBytes, params)
+		if err != nil {
+			panic(err)
+		}
+	}
+	obj, err := runtime.Decode(scCodecs.UniversalDecoder(scv1.SchemeGroupVersion), objBytes)
+	if err != nil {
+		panic(err)
+	}
+	c.cd = obj.(*scv1.CSIDriver)
+}
+
+func (c cdApplier) Applier() error {
+	_, err := c.Client.CSIDrivers().Get(context.TODO(), c.sc.Name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		_, err := c.Client.CSIDrivers().Create(context.TODO(), c.sc, metav1.CreateOptions{})
+		return err
+	}
+	return nil
+}
+
+func ApplyCSIDrivers(drivers []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+	sc := &scApplier{}
+	sc.Client = scClient(kubeconfigPath)
+	return applySCs(drivers, sc, render, params)
+}

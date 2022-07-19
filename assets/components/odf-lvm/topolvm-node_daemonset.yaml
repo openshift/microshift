@@ -6,7 +6,6 @@ metadata:
   name: topolvm-node
   namespace: openshift-storage
 spec:
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: topolvm-node
@@ -162,13 +161,14 @@ spec:
           path: /var/lib/kubelet/pods/
           type: DirectoryOrCreate
         name: pod-volumes-dir
-      - hostPath:
-          path: /etc/microshift/
-          type: Directory
-        name: lvmd-config-dir
-      - hostPath:
-          path: /run/topolvm/
-          type: Directory
+      - name: lvmd-config-dir
+        configMap:
+          name: lvmd
+          items:
+            - key: lvmd.yaml
+              path: lvmd.yaml
+      - emptyDir:
+          medium: Memory
         name: lvmd-socket-dir
   updateStrategy:
     rollingUpdate:

@@ -1,6 +1,7 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // assets/bindata_timestamp.txt
+// assets/components/odf-lvm/csi-driver.yaml
 // assets/components/odf-lvm/topolvm-controller_deployment.yaml
 // assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
@@ -15,6 +16,7 @@
 // assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
 // assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml
 // assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml
+// assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml
 // assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
 // assets/components/odf-lvm/topolvm-node_daemonset.yaml
@@ -140,6 +142,40 @@ func assetsBindata_timestampTxt() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmCsiDriverYaml = []byte(`# Source: topolvm/templates/controller/csidriver.yaml
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
+metadata:
+  name: topolvm.cybozu.com
+  labels:
+    helm.sh/chart: topolvm-4.0.3
+    app.kubernetes.io/name: topolvm
+    app.kubernetes.io/instance: topolvm
+    app.kubernetes.io/version: "0.10.6"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  attachRequired: false
+  podInfoOnMount: true
+  volumeLifecycleModes:
+    - Persistent
+    - Ephemeral
+`)
+
+func assetsComponentsOdfLvmCsiDriverYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmCsiDriverYaml, nil
+}
+
+func assetsComponentsOdfLvmCsiDriverYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmCsiDriverYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/csi-driver.yaml", size: 445, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -285,7 +321,6 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
-      serviceAccount: topolvm-controller
       serviceAccountName: topolvm-controller
       terminationGracePeriodSeconds: 30
       volumes:
@@ -305,7 +340,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4763, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4722, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -421,7 +456,7 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - configMaps
+      - configmaps
     verbs:
       - get
       - watch
@@ -865,6 +900,37 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindi
 	return a, nil
 }
 
+var _assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml = []byte(`# Source: topolvm/templates/lvmd/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lvmd
+  namespace: openshift-storage
+data:
+  lvmd.yaml: |
+    socket-name: /run/lvmd/lvmd.sock
+    device-classes: 
+      - default: true
+        name: ssd
+        spare-gb: 2
+        volume-group: rhel
+`)
+
+func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1YamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1YamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml", size: 299, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -932,7 +998,6 @@ metadata:
   name: topolvm-node
   namespace: openshift-storage
 spec:
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: topolvm-node
@@ -1088,13 +1153,14 @@ spec:
           path: /var/lib/kubelet/pods/
           type: DirectoryOrCreate
         name: pod-volumes-dir
-      - hostPath:
-          path: /etc/microshift/
-          type: Directory
-        name: lvmd-config-dir
-      - hostPath:
-          path: /run/topolvm/
-          type: Directory
+      - name: lvmd-config-dir
+        configMap:
+          name: lvmd
+          items:
+            - key: lvmd.yaml
+              path: lvmd.yaml
+      - emptyDir:
+          medium: Memory
         name: lvmd-socket-dir
   updateStrategy:
     rollingUpdate:
@@ -1113,7 +1179,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5673, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5654, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5381,6 +5447,7 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
 	"assets/bindata_timestamp.txt":                                                                           assetsBindata_timestampTxt,
+	"assets/components/odf-lvm/csi-driver.yaml":                                                              assetsComponentsOdfLvmCsiDriverYaml,
 	"assets/components/odf-lvm/topolvm-controller_deployment.yaml":                                           assetsComponentsOdfLvmTopolvmController_deploymentYaml,
 	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":      assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
@@ -5395,6 +5462,7 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":     assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
 	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml":                   assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml,
 	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml":            assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml,
+	"assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml":                                        assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml,
 	"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":               assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":        assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
 	"assets/components/odf-lvm/topolvm-node_daemonset.yaml":                                                  assetsComponentsOdfLvmTopolvmNode_daemonsetYaml,
@@ -5499,7 +5567,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"bindata_timestamp.txt": {assetsBindata_timestampTxt, map[string]*bintree{}},
 		"components": {nil, map[string]*bintree{
 			"odf-lvm": {nil, map[string]*bintree{
-				"topolvm-controller_deployment.yaml":                                           {assetsComponentsOdfLvmTopolvmController_deploymentYaml, map[string]*bintree{}},
+				"csi-driver.yaml":                    {assetsComponentsOdfLvmCsiDriverYaml, map[string]*bintree{}},
+				"topolvm-controller_deployment.yaml": {assetsComponentsOdfLvmTopolvmController_deploymentYaml, map[string]*bintree{}},
 				"topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
 				"topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":      {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
 				"topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml":                    {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml, map[string]*bintree{}},
@@ -5513,6 +5582,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":     {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
 				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml":                   {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml, map[string]*bintree{}},
 				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml":            {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml, map[string]*bintree{}},
+				"topolvm-lvmd-config_configmap_v1.yaml":                                        {assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml, map[string]*bintree{}},
 				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":               {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
 				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":        {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
 				"topolvm-node_daemonset.yaml":                                                  {assetsComponentsOdfLvmTopolvmNode_daemonsetYaml, map[string]*bintree{}},

@@ -1,0 +1,14 @@
+# Source: topolvm/templates/lvmd/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lvmd
+  namespace: openshift-storage
+data:
+  lvmd.yaml: |
+    socket-name: /run/lvmd/lvmd.sock
+    device-classes: 
+      - default: true
+        name: ssd
+        spare-gb: 2
+        volume-group: rhel
