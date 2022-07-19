@@ -18,6 +18,7 @@ package controllers
 import (
 	"context"
 	"io/ioutil"
+	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -39,7 +40,7 @@ import (
 )
 
 func createAPIHeadlessSvc(cfg *config.MicroshiftConfig, svcName string, svcPort int) error {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+	restConfig, err := clientcmd.BuildConfigFromFlags("", filepath.Join(cfg.DataDir, "/resources/kubeadmin/kubeconfig"))
 	if err != nil {
 		return err
 	}
@@ -141,7 +142,7 @@ func trimFirst(s string, sep string) string {
 }
 
 func createAPIRegistration(cfg *config.MicroshiftConfig) error {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+	restConfig, err := clientcmd.BuildConfigFromFlags("", filepath.Join(cfg.DataDir, "/resources/kubeadmin/kubeconfig"))
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package assets
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	klog "k8s.io/klog/v2"
@@ -62,7 +63,7 @@ func isEstablished(cs *apiext_clientset.Clientset, obj apiruntime.Object) (bool,
 }
 
 func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+	restConfig, err := clientcmd.BuildConfigFromFlags("", filepath.Join(cfg.DataDir, "/resources/kubeadmin/kubeconfig"))
 	if err != nil {
 		return err
 	}
@@ -136,7 +137,7 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 	lock.Lock()
 	defer lock.Unlock()
 
-	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.DataDir+"/resources/kubeadmin/kubeconfig")
+	restConfig, err := clientcmd.BuildConfigFromFlags("", filepath.Join(cfg.DataDir, "/resources/kubeadmin/kubeconfig"))
 	if err != nil {
 		return err
 	}

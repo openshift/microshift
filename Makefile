@@ -89,6 +89,10 @@ debug:
 # These tags make sure we can statically link and avoid shared dependencies
 GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netgo osusergo'
 
+# Set variables for test-unit target
+GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
+GO_TEST_PACKAGES=./cmd/... ./pkg/...
+
 # targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
 microshift: build
 
