@@ -38,7 +38,7 @@ Run the following commands to configure SUDO, upgrade the system, install basic 
 ```bash
 sudo echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
 sudo dnf update -y
-sudo dnf install -y git cockpit make golang
+sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build
 sudo systemctl enable --now cockpit.socket
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
