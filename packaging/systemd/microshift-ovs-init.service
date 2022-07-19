@@ -1,0 +1,11 @@
+[Unit]
+Description=Configures Open vSwitch for OVN (MicroShift)
+After=microshift-openvswitch.service NetworkManager.service
+Before=microshift.service
+Requires=microshift-openvswitch.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/bin/configure-ovs.sh OVNKubernetes
+ExecStart=/bin/bash /usr/bin/configure-ovs-microshift.sh
+TimeoutSec=30
