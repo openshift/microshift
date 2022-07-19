@@ -59,7 +59,7 @@ Optional arguments:
           server (default: 127.0.0.1:8080)
   -lvm_sysroot_size num_in_MB
           Size of the system root LVM partition. The remaining
-          disk space will be allocated for data (default: 5120)
+          disk space will be allocated for data (default: 8192)
   -authorized_keys_file
           Path to an SSH authorized_keys file to allow SSH access
           into the default 'redhat' account
@@ -80,7 +80,7 @@ The script performs the following tasks:
 - Rebuild the installer image with the `kickstart.ks` file for performing various OS setup when the host is first booted
 - Perform partial cleanup procedure to reclaim cached disk space
 
-The artifact of the build is the `scripts/image-builder/_builds/microshift-installer.${ARCH}.iso` bootable RHEL for Edge OS image.
+The artifact of the build is the `scripts/image-builder/_builds/microshift-installer-${VERSION}.${ARCH}.iso` bootable RHEL for Edge OS image.
 
 ### Disk Partitioning
 The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such parititioning is required for the data volume to be utilized by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
@@ -88,12 +88,12 @@ The `kickstart.ks` file is configured to partition the main disk using `Logical 
 By default, the following partition layout is created and formatted with the `XFS` file system:
 * Boot partition is allocated on a 1GB volume
 * The rest of the disk is managed by the `LVM` in a single volume group named `rhel`
-  * System root partition is allocated on a 5GB volume (minimal recommended size for a root partition)
+  * System root partition is allocated on a 8GB volume (minimal recommended size for a root partition)
   * The remainder of the volume group will be used by the CSI driver for storing data (no need to format and mount it)
 
 > The swap partition is not created as it is not required by MicroShift.
 
-The `scripts/image-builder/build.sh` script provides for the optional `-lvm_sysroot_size` command line parameter allowing to increase the system root partition size from the default 5GB.
+The `scripts/image-builder/build.sh` script provides for the optional `-lvm_sysroot_size` command line parameter allowing to increase the system root partition size from the default 8GB.
 > The system root partition size should be specified in megabytes.
 
 As an example, a 20GB disk is partitioned in the following manner by default.
@@ -103,10 +103,10 @@ NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
 sda             8:0    0  20G  0 disk 
 ├─sda1          8:1    0   1G  0 part /boot
 └─sda2          8:2    0  19G  0 part 
-  └─rhel-root 253:0    0   5G  0 lvm  /sysroot
+  └─rhel-root 253:0    0   8G  0 lvm  /sysroot
 
 $ sudo vgdisplay -s
-  "rhel" <19.00 GiB [5.00 GiB  used / <14.00 GiB free]
+  "rhel" <19.00 GiB [8.00 GiB  used / <11.00 GiB free]
 ```
 
 > Unallocated disk space of 14GB size remains in the `rhel` volume group to be used by the CSI driver.
@@ -161,12 +161,13 @@ Log into the host machine using your user credentials. The remainder of this sec
 
 Start by copying the installer image from the development virtual machine to the host file system.
 ```bash
-sudo scp microshift@microshift-dev:/home/microshift/microshift/scripts/image-builder/_builds/microshift-installer.*.iso /var/lib/libvirt/images/
+sudo scp microshift@microshift-dev:/home/microshift/microshift/scripts/image-builder/_builds/microshift-installer-*.$(uname -i).iso /var/lib/libvirt/images/
 ```
 
 Run the following commands to create a virtual machine using the installer image.
 ```bash
 VMNAME="microshift-edge"
+VERSION=4.10.18
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
 virt-install \
@@ -177,7 +178,7 @@ virt-install \
     --network network=default,model=virtio \
     --os-type generic \
     --events on_reboot=restart \
-    --cdrom ./microshift-installer.$(uname -i).iso \
+    --cdrom ./microshift-installer-${VERSION}.$(uname -i).iso \
 "
 ```
 

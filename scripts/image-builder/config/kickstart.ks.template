@@ -7,7 +7,7 @@ reboot
 # Configure network to use DHCP and activate on boot
 network --bootproto=dhcp --device=link --activate --onboot=on
 
-# Partition disk with a 1GB boot XFS partition and an LVM volume containing a 5GB+ system root
+# Partition disk with a 1GB boot XFS partition and an LVM volume containing a 8GB+ system root
 # The remainder of the volume will be used by the CSI driver for storing data
 #
 # For example, a 20GB disk would be partitioned in the following way:
@@ -16,7 +16,7 @@ network --bootproto=dhcp --device=link --activate --onboot=on
 # sda             8:0    0  20G  0 disk 
 # ├─sda1          8:1    0   1G  0 part /boot
 # └─sda2          8:2    0  19G  0 part 
-#  └─rhel-root  253:0    0   5G  0 lvm  /sysroot
+#  └─rhel-root  253:0    0   8G  0 lvm  /sysroot
 #
 zerombr
 clearpart --all --initlabel
@@ -28,7 +28,7 @@ volgroup rhel pv.01
 logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
 
 # Configure ostree
-ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/ostree/repo --ref=rhel/8/x86_64/edge
+ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/ostree/repo --ref=rhel/8/REPLACE_BUILD_ARCH/edge
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
@@ -47,13 +47,14 @@ useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl
 echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' >> /etc/sudoers
 
 # Add authorized ssh keys
-mkdir /home/redhat/.ssh
-chmod 700 /home/redhat/.ssh
+mkdir -m 700 /home/redhat/.ssh
 cat > /home/redhat/.ssh/authorized_keys << EOF
 REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS
 EOF
 chmod 600 /home/redhat/.ssh/authorized_keys
-chown -R redhat:redhat /home/redhat/.ssh
+
+# Make sure redhat user directory contents ownership is correct
+chown -R redhat:redhat /home/redhat/
 
 # Configure the firewall
 firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
