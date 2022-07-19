@@ -1,10 +1,13 @@
 #!/bin/bash
 set -e -o pipefail
 
-IMGNAME=microshift
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
+IMGNAME=microshift
+IMAGE_VERSION=$(${ROOTDIR}/../../pkg/release/get.sh base)
+BUILD_ARCH=$(uname -i)
 OSTREE_SERVER_NAME=127.0.0.1:8080
-LVM_SYSROOT_SIZE=5120
+LVM_SYSROOT_SIZE_MIN=8192
+LVM_SYSROOT_SIZE=${LVM_SYSROOT_SIZE_MIN}
 OCP_PULL_SECRET_FILE=
 MICROSHIFT_RPM_SOURCE=${ROOTDIR}/../../packaging/rpm/_rpmbuild/RPMS
 AUTHORIZED_KEYS_FILE=
@@ -107,10 +110,10 @@ build_image() {
         sudo podman run -d --name=${parent_blueprint}-server -p 8080:8080 localhost/${parent_blueprint}:${parent_version}
 
         title "Building ${image_type} for ${blueprint} v${version}, parent ${parent_blueprint} v${parent_version}"
-        buildid=$(sudo composer-cli compose start-ostree --ref rhel/8/$(uname -i)/edge --url http://localhost:8080/repo/ ${blueprint} ${image_type} | awk '{print $2}')
+        buildid=$(sudo composer-cli compose start-ostree --ref rhel/8/${BUILD_ARCH}/edge --url http://localhost:8080/repo/ ${blueprint} ${image_type} | awk '{print $2}')
     else
         title "Building ${image_type} for ${blueprint} v${version}"
-        buildid=$(sudo composer-cli compose start-ostree --ref rhel/8/$(uname -i)/edge ${blueprint} ${image_type} | awk '{print $2}')
+        buildid=$(sudo composer-cli compose start-ostree --ref rhel/8/${BUILD_ARCH}/edge ${blueprint} ${image_type} | awk '{print $2}')
     fi
 
     waitfor_image ${buildid}
@@ -155,8 +158,8 @@ while [ $# -gt 0 ] ; do
     -lvm_sysroot_size)
         shift
         LVM_SYSROOT_SIZE="$1"
-        [ -z "${LVM_SYSROOT_SIZE}"   ]   && usage "System root LVM partition size not specified"
-        [ ${LVM_SYSROOT_SIZE} -lt 5120 ] && usage "System root LVM partition size cannot be smaller than 5120MB"
+        [ -z "${LVM_SYSROOT_SIZE}" ] && usage "System root LVM partition size not specified"
+        [ ${LVM_SYSROOT_SIZE} -lt ${LVM_SYSROOT_SIZE_MIN} ] && usage "System root LVM partition size cannot be smaller than ${LVM_SYSROOT_SIZE_MIN}MB"
         shift
         ;;
     -authorized_keys_file)
@@ -217,15 +220,15 @@ createrepo microshift-local >/dev/null
 
 # Download openshift local RPM packages (noarch for python and selinux packages)
 rm -rf openshift-local 2>/dev/null || true
-reposync -n -a x86_64 -a noarch --download-path openshift-local \
-            --repo=rhocp-4.10-for-rhel-8-x86_64-rpms \
-            --repo=fast-datapath-for-rhel-8-x86_64-rpms >/dev/null
+reposync -n -a ${BUILD_ARCH} -a noarch --download-path openshift-local \
+            --repo=rhocp-4.10-for-rhel-8-${BUILD_ARCH}-rpms \
+            --repo=fast-datapath-for-rhel-8-${BUILD_ARCH}-rpms >/dev/null
 
 # Remove coreos packages to avoid conflicts
 find openshift-local -name \*coreos\* -exec rm -f {} \;
 # Exit if no RPM packages were found
 if [ $(find openshift-local -name '*.rpm' | wc -l) -eq 0 ] ; then
-    echo "No RPM packages were found at the 'rhocp-4.10-for-rhel-8-x86_64-rpms' repository. Exiting..."
+    echo "No RPM packages were found at the 'rhocp-4.10-for-rhel-8-${BUILD_ARCH}-rpms' repository. Exiting..."
     exit 1
 fi
 createrepo openshift-local >/dev/null
@@ -273,13 +276,14 @@ cat "../config/kickstart.ks.template" \
     | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
     | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE | jq -c);g" \
     | sed "s;REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS;${AUTHORIZED_KEYS};g" \
+    | sed "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
     > kickstart.ks
 
 # Run the ISO creation procedure
 sudo podman run --rm --privileged -ti -v "${ROOTDIR}/_builds":/data -v /dev:/dev registry.access.redhat.com/ubi8 \
     /bin/bash -c \
         "dnf -y install lorax; cd /data; \
-        mkksiso kickstart.ks ${IMGNAME}-installer-0.0.0-installer.iso ${IMGNAME}-installer.$(uname -i).iso; \
+        mkksiso kickstart.ks ${IMGNAME}-installer-0.0.0-installer.iso ${IMGNAME}-installer-${IMAGE_VERSION}.${BUILD_ARCH}.iso; \
         exit"
 sudo chown -R $(whoami). "${ROOTDIR}/_builds"
 
