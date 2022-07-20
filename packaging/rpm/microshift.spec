@@ -167,6 +167,11 @@ install -p -m644 packaging/systemd/microshift-openvswitch.service %{buildroot}%{
 install -p -m644 packaging/systemd/microshift-ovs-vswitchd.service %{buildroot}%{_unitdir}/microshift-ovs-vswitchd.service
 install -p -m644 packaging/systemd/microshift-ovsdb-server.service %{buildroot}%{_unitdir}/microshift-ovsdb-server.service
 
+# this script and systemd service configures openvswitch to properly operate with OVN
+install -p -m644 packaging/systemd/microshift-ovs-init.service %{buildroot}%{_unitdir}/microshift-ovs-init.service
+install -p -m755 packaging/systemd/configure-ovs.sh %{buildroot}%{_bindir}/configure-ovs.sh
+install -p -m755 packaging/systemd/configure-ovs-microshift.sh %{buildroot}%{_bindir}/configure-ovs-microshift.sh
+
 mkdir -p -m755 %{buildroot}/var/run/kubelet
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
 mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
@@ -207,11 +212,13 @@ sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openv
 %systemd_post microshift-openvswitch.service
 %systemd_post microshift-ovs-vswitchd.service
 %systemd_post microshift-ovsdb-server.service
+%systemd_post microshift-ovs-init.service
 
 %preun networking
 %systemd_preun microshift-openvswitch.service
 %systemd_preun microshift-ovs-vswitchd.service
 %systemd_preun microshift-ovsdb-server.service
+%systemd_preun microshift-ovs-init.service
 
 %preun
 
@@ -242,7 +249,16 @@ sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openv
 %{_unitdir}/microshift-ovs-vswitchd.service
 %{_unitdir}/microshift-ovsdb-server.service
 
+# OpensvSwitch oneshot configuration script which handles ovn-k8s gateway mode setup
+%{_unitdir}/microshift-ovs-init.service
+%{_bindir}/configure-ovs.sh
+%{_bindir}/configure-ovs-microshift.sh
+
 %changelog
+* Tue Jul 19 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_4
+- Adding the microshift-ovs-init systemd service and script which initializes br-ex and connects
+  the main interface through it.
+
 * Tue Jul 12 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_3
 - Adding the networking subpackage to support ovn-networking
 - Adding virtual openvswitch systemd files with CPUAffinity=0
