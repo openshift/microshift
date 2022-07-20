@@ -96,7 +96,7 @@ type cdApplier struct {
 	cd     *scv1.CSIDriver
 }
 
-func (c cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (c *cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -111,7 +111,7 @@ func (c cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderParam
 	c.cd = obj.(*scv1.CSIDriver)
 }
 
-func (c cdApplier) Applier() error {
+func (c *cdApplier) Applier() error {
 	_, err := c.Client.CSIDrivers().Get(context.TODO(), c.cd.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		_, err := c.Client.CSIDrivers().Create(context.TODO(), c.cd, metav1.CreateOptions{})
