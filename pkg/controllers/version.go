@@ -37,7 +37,7 @@ func NewVersionManager(cfg *config.MicroshiftConfig) *VersionManager {
 
 func (s *VersionManager) Name() string { return "version-manager" }
 func (s *VersionManager) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-apiserver"}
+	return []string{"kube-apiserver"}
 }
 
 func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
