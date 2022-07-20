@@ -172,6 +172,14 @@ aggregatorConfig:
   - X-Remote-User
 kubeClientConfig:
   kubeConfig:  ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+admission:
+  disabledPlugins:
+  - "project.openshift.io/ProjectRequestLimit"
+  - "build.openshift.io/BuildConfigSecretInjector"
+  - "build.openshift.io/BuildByStrategy"
+  - "image.openshift.io/ImageLimitRange"
+  - "image.openshift.io/ImagePolicy"
+  - "quota.openshift.io/ClusterResourceQuota"
 apiServerArguments:
   minimal-shutdown-duration:
   - 30s
