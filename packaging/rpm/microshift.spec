@@ -251,7 +251,7 @@ sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openv
 * Tue May 24 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_2
 - Adding hostpath-provisioner.service to set SElinux policies to the volumes directory
 
-* Fri May 7 2022 Sally O'Malley <somalley@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357
+* Fri May 6 2022 Sally O'Malley <somalley@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357
 - Update required golang version to 1.17
 
 * Mon Feb 7 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshiftr-2022_02_02_194009_3
