@@ -26,10 +26,5 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		klog.Warningf("Failed to start DNS controller: %v", err)
 		return err
 	}
-
-	if err := startOVNKubernetes(cfg, cfg.DataDir+"/resources/kubeadmin/kubeconfig"); err != nil {
-		klog.Warningf("Failed to start OVNKubernetes: %v", err)
-		return err
-	}
 	return nil
 }
