@@ -157,6 +157,7 @@ restorecon -v %{buildroot}%{_bindir}/microshift
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 install -p -m644 packaging/crio.conf.d/microshift.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift.conf
+install -p -m644 packaging/crio.conf.d/microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
@@ -233,6 +234,7 @@ sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openv
 %{_bindir}/cleanup-all-microshift-data
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
+%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
 
 %files selinux
 
@@ -255,6 +257,9 @@ sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openv
 %{_bindir}/configure-ovs-microshift.sh
 
 %changelog
+* Thu Jul 21 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_5
+- Adding microshift-ovn.conf with CRI-O network and workload partitioning
+
 * Tue Jul 19 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_4
 - Adding the microshift-ovs-init systemd service and script which initializes br-ex and connects
   the main interface through it.
