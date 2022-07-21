@@ -220,10 +220,10 @@ func ApplyServiceAccounts(cores []string, kubeconfigPath string) error {
 	return applyCore(cores, sa, nil, nil)
 }
 
-func ApplyConfigMaps(cores []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplyConfigMaps(cores []string, kubeconfigPath string) error {
 	cm := &cmApplier{}
 	cm.Client = coreClient(kubeconfigPath)
-	return applyCore(cores, cm, render, params)
+	return applyCore(cores, cm, nil, nil)
 }
 
 func ApplyConfigMapWithData(cmPath string, data map[string]string, kubeconfigPath string) error {

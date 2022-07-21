@@ -28,6 +28,5 @@ func init() {
 		"kubevirt_hostpath_provisioner": "quay.io/kubevirt/hostpath-provisioner:v0.8.0",
 		"pause":                         "k8s.gcr.io/pause:3.6",
 		"service_ca_operator":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8b0e194c1cb6babeb2d8326091deb2bba63c430938abe056eb89398c78733eb6",
-		"ovn_kubernetes":                "quay.io/microshift/ovn-kubernetes-singlenode:4.10.18",
 	}
 }
