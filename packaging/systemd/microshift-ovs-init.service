@@ -1,8 +1,8 @@
 [Unit]
 Description=Configures Open vSwitch for OVN (MicroShift)
-After=microshift-openvswitch.service NetworkManager.service
+After=openvswitch.service NetworkManager.service
 Before=microshift.service
-Requires=microshift-openvswitch.service
+Requires=openvswitch.service NetworkManager.service
 
 [Service]
 Type=oneshot
