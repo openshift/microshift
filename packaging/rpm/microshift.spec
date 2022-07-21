@@ -163,10 +163,11 @@ install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 install -p -m644 packaging/systemd/hostpath-provisioner.service %{buildroot}%{_unitdir}/hostpath-provisioner.service
 
-# this is temporary until we can get something equivalent from openvswitch (only adds the CPUAffinity=0)
-install -p -m644 packaging/systemd/microshift-openvswitch.service %{buildroot}%{_unitdir}/microshift-openvswitch.service
-install -p -m644 packaging/systemd/microshift-ovs-vswitchd.service %{buildroot}%{_unitdir}/microshift-ovs-vswitchd.service
-install -p -m644 packaging/systemd/microshift-ovsdb-server.service %{buildroot}%{_unitdir}/microshift-ovsdb-server.service
+# Memory tweaks to the OpenvSwitch services
+mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d
+mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovsdb-server.service.d
+install -p -m644 packaging/systemd/microshift-ovs-vswitchd.conf %{buildroot}%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
+install -p -m644 packaging/systemd/microshift-ovsdb-server.conf %{buildroot}%{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
 
 # this script and systemd service configures openvswitch to properly operate with OVN
 install -p -m644 packaging/systemd/microshift-ovs-init.service %{buildroot}%{_unitdir}/microshift-ovs-init.service
@@ -210,15 +211,9 @@ fi
 %post networking
 # setup ovs / ovsdb optimization to avoid full pre-allocation of memory
 sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openvswitch
-%systemd_post microshift-openvswitch.service
-%systemd_post microshift-ovs-vswitchd.service
-%systemd_post microshift-ovsdb-server.service
 %systemd_post microshift-ovs-init.service
 
 %preun networking
-%systemd_preun microshift-openvswitch.service
-%systemd_preun microshift-ovs-vswitchd.service
-%systemd_preun microshift-ovsdb-server.service
 %systemd_preun microshift-ovs-init.service
 
 %preun
@@ -247,9 +242,8 @@ sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openv
 
 %files networking
 
-%{_unitdir}/microshift-openvswitch.service
-%{_unitdir}/microshift-ovs-vswitchd.service
-%{_unitdir}/microshift-ovsdb-server.service
+%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
+%{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
 
 # OpensvSwitch oneshot configuration script which handles ovn-k8s gateway mode setup
 %{_unitdir}/microshift-ovs-init.service
