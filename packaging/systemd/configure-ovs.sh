@@ -3,6 +3,9 @@
 # source: https://github.com/openshift/machine-config-operator/blob/master/templates/common/_base/files/configure-ovs-network.yaml
 
 set -eux
+
+nmcli conn show br-ex >/dev/null && echo "br-ex already configured" && exit 0
+
 # This file is not needed anymore in 4.7+, but when rolling back to 4.6
 # the ovs pod needs it to know ovs is running on the host.
 touch /var/run/ovs-config-executed
