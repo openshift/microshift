@@ -34,6 +34,7 @@ To install, configure and run MicroShift, refer to the following documentation:
 
 - [MicroShift Behind Proxy](./docs/howto_http_proxy.md)
 - [Load Balancer for User Workloads](./docs/howto_load_balancer.md)
+- [AMQ Broker on MicroShift](./docs/howto_amq_broker.md)
 - [MicroShift Mitigation of System Configuration Changes](./docs/howto_sysconf_watch.md)
 
 ## Developer Documentation
