@@ -105,6 +105,7 @@ Summary: Networking elements for MicroShift
 Requires: openvswitch2.16
 Requires: NetworkManager
 Requires: NetworkManager-ovs
+Requires: jq
 
 %description networking
 This package contains the networking elements necessary to MicroShift's default CNI.
