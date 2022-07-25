@@ -413,22 +413,11 @@ spec:
             set +o allexport
           fi
 
-          echo "I$(date "+%m%d %H:%M:%S.%N") - copy ovn-k8s-cni-overlay"
-          cp -f /usr/libexec/cni/ovn-k8s-cni-overlay /cni-bin-dir/
-
-          echo "I$(date "+%m%d %H:%M:%S.%N") - disable conntrack on geneve port"
-          iptables -t raw -A PREROUTING -p udp --dport 6081 -j NOTRACK
-          iptables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
-          ip6tables -t raw -A PREROUTING -p udp --dport 6081 -j NOTRACK
-          ip6tables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
-          echo "I$(date "+%m%d %H:%M:%S.%N") - starting ovnkube-node"
-
           gateway_mode_flags="--gateway-mode shared --gateway-interface br-ex"
 
-          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE} --init-node ${K8S_NODE}"
+          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE}"
           exec /usr/bin/ovnkube \
             --init-master "${K8S_NODE}" \
-            --init-node "${K8S_NODE}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
             ${gateway_mode_flags} \
@@ -438,15 +427,6 @@ spec:
             --enable-multicast \
             --disable-snat-multiple-gws \
             --acl-logging-rate-limit "20"
-        lifecycle:
-          preStop:
-            exec:
-              command: ["rm","-f","/etc/cni/net.d/10-ovn-kubernetes.conf"]
-        readinessProbe:
-          exec:
-            command: ["test", "-f", "/etc/cni/net.d/10-ovn-kubernetes.conf"]
-          initialDelaySeconds: 5
-          periodSeconds: 5
         volumeMounts:
         # for checking ovs-configuration service
         - mountPath: /etc/systemd/system
@@ -462,23 +442,12 @@ spec:
           name: kubeconfig
         - mountPath: /env
           name: env-overrides
-        - mountPath: /etc/cni/net.d
-          name: host-cni-netd
-        - mountPath: /cni-bin-dir
-          name: host-cni-bin
         - mountPath: /run/ovn-kubernetes/
           name: host-run-ovn-kubernetes
         - mountPath: /dev/log
           name: log-socket
         - mountPath: /var/log/ovn
           name: node-log
-        - mountPath: /host
-          name: host-slash
-          readOnly: true
-        - mountPath: /run/netns
-          name: host-run-netns
-          readOnly: true
-          mountPropagation: HostToContainer
         - mountPath: /etc/openvswitch
           name: etc-openvswitch-node
         - mountPath: /etc/ovn/
@@ -514,13 +483,6 @@ spec:
         hostPath:
           path: /var/run/ovn
 
-      # used for iptables wrapper scripts
-      - name: host-slash
-        hostPath:
-          path: /
-      - name: host-run-netns
-        hostPath:
-          path: /run/netns
       - name: etc-openvswitch-node
         hostPath:
           path: /etc/openvswitch
@@ -535,12 +497,6 @@ spec:
       - name: host-run-ovn-kubernetes
         hostPath:
           path: /run/ovn-kubernetes
-      - name: host-cni-netd
-        hostPath:
-          path: "/etc/cni/net.d"
-      - name: host-cni-bin
-        hostPath:
-          path: "/opt/cni/bin"
 
       - name: kubeconfig
         hostPath:
