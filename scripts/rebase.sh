@@ -29,8 +29,8 @@ REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")"
 STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
-EMBEDDED_COMPONENTS="openshift-apiserver openshift-controller-manager oauth-apiserver hyperkube etcd"
-EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-openshift-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
+EMBEDDED_COMPONENTS="openshift-controller-manager oauth-apiserver hyperkube etcd"
+EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator"
 
 
@@ -169,8 +169,8 @@ get_comment() {
 # Validate that ${component} is in the allowed list for the lookup, else exit
 valid_component_or_exit() {
     local component=$1
-    if [[ ! " etcd kubernetes openshift-apiserver openshift-controller-manager " =~ " ${component} " ]]; then
-        echo "error: release reference must be one of [etcd kubernetes openshift-apiserver openshift-controller-manager], have ${component}"
+    if [[ ! " etcd kubernetes openshift-controller-manager " =~ " ${component} " ]]; then
+        echo "error: release reference must be one of [etcd kubernetes openshift-controller-manager], have ${component}"
         exit 1
     fi
 }

@@ -18,6 +18,7 @@ package controllers
 import (
 	"context"
 
+	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"k8s.io/klog/v2"
 )
@@ -48,4 +49,24 @@ func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struc
 	}
 	klog.Infof("%s applied default SCCs", s.Name())
 	return ctx.Err()
+}
+
+func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
+	kubeconfigPath := cfg.DataDir + "/resources/kubeadmin/kubeconfig"
+	var (
+		sccs = []string{
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml",
+		}
+	)
+	if err := assets.ApplySCCs(sccs, nil, nil, kubeconfigPath); err != nil {
+		klog.Warningf("failed to apply sccs %v", err)
+		return err
+	}
+	return nil
 }
