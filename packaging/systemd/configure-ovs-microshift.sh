@@ -15,3 +15,8 @@ fi
 if [[ "${OVS_REVALIDATOR_THREADS}" != "auto" ]]; then
     ovs-vsctl set open . other_config:n-revalidator-threads=${OVS_REVALIDATOR_THREADS}
 fi
+
+firewall-cmd --add-port=443/tcp
+firewall-cmd --add-port=6443/tcp
+firewall-cmd --add-masquerade
+firewall-cmd --list-all
