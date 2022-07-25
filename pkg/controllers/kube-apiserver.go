@@ -242,7 +242,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 			}
 
 			var status int
-			if err := restClient.Get().AbsPath("/healthz").Do(ctx).StatusCode(&status).Error(); err != nil {
+			if err := restClient.Get().AbsPath("/readyz").Do(ctx).StatusCode(&status).Error(); err != nil {
 				klog.Infof("%q not yet ready: %v", s.Name(), err)
 				return false, nil
 			}
