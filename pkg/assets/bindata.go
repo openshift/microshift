@@ -2015,22 +2015,11 @@ spec:
             set +o allexport
           fi
 
-          echo "I$(date "+%m%d %H:%M:%S.%N") - copy ovn-k8s-cni-overlay"
-          cp -f /usr/libexec/cni/ovn-k8s-cni-overlay /cni-bin-dir/
-
-          echo "I$(date "+%m%d %H:%M:%S.%N") - disable conntrack on geneve port"
-          iptables -t raw -A PREROUTING -p udp --dport 6081 -j NOTRACK
-          iptables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
-          ip6tables -t raw -A PREROUTING -p udp --dport 6081 -j NOTRACK
-          ip6tables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
-          echo "I$(date "+%m%d %H:%M:%S.%N") - starting ovnkube-node"
-
           gateway_mode_flags="--gateway-mode shared --gateway-interface br-ex"
 
-          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE} --init-node ${K8S_NODE}"
+          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE}"
           exec /usr/bin/ovnkube \
             --init-master "${K8S_NODE}" \
-            --init-node "${K8S_NODE}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
             ${gateway_mode_flags} \
@@ -2040,15 +2029,6 @@ spec:
             --enable-multicast \
             --disable-snat-multiple-gws \
             --acl-logging-rate-limit "20"
-        lifecycle:
-          preStop:
-            exec:
-              command: ["rm","-f","/etc/cni/net.d/10-ovn-kubernetes.conf"]
-        readinessProbe:
-          exec:
-            command: ["test", "-f", "/etc/cni/net.d/10-ovn-kubernetes.conf"]
-          initialDelaySeconds: 5
-          periodSeconds: 5
         volumeMounts:
         # for checking ovs-configuration service
         - mountPath: /etc/systemd/system
@@ -2064,23 +2044,12 @@ spec:
           name: kubeconfig
         - mountPath: /env
           name: env-overrides
-        - mountPath: /etc/cni/net.d
-          name: host-cni-netd
-        - mountPath: /cni-bin-dir
-          name: host-cni-bin
         - mountPath: /run/ovn-kubernetes/
           name: host-run-ovn-kubernetes
         - mountPath: /dev/log
           name: log-socket
         - mountPath: /var/log/ovn
           name: node-log
-        - mountPath: /host
-          name: host-slash
-          readOnly: true
-        - mountPath: /run/netns
-          name: host-run-netns
-          readOnly: true
-          mountPropagation: HostToContainer
         - mountPath: /etc/openvswitch
           name: etc-openvswitch-node
         - mountPath: /etc/ovn/
@@ -2116,13 +2085,6 @@ spec:
         hostPath:
           path: /var/run/ovn
 
-      # used for iptables wrapper scripts
-      - name: host-slash
-        hostPath:
-          path: /
-      - name: host-run-netns
-        hostPath:
-          path: /run/netns
       - name: etc-openvswitch-node
         hostPath:
           path: /etc/openvswitch
@@ -2137,12 +2099,6 @@ spec:
       - name: host-run-ovn-kubernetes
         hostPath:
           path: /run/ovn-kubernetes
-      - name: host-cni-netd
-        hostPath:
-          path: "/etc/cni/net.d"
-      - name: host-cni-bin
-        hostPath:
-          path: "/opt/cni/bin"
 
       - name: kubeconfig
         hostPath:
@@ -2175,7 +2131,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 20008, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 18393, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2330,9 +2286,126 @@ spec:
           requests:
             cpu: 10m
             memory: 10Mi
+      # ovnkube-node: does node-level bookkeeping and configuration
+      - name: ovnkube-node
+        image: {{ .ReleaseImage.ovn_kubernetes }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xe
+          if [[ -f "/env/${K8S_NODE}" ]]; then
+            set -o allexport
+            source "/env/${K8S_NODE}"
+            set +o allexport
+          fi
+
+          cp -f /usr/libexec/cni/ovn-k8s-cni-overlay /cni-bin-dir/
+
+          echo "I$(date "+%m%d %H:%M:%S.%N") - disable conntrack on geneve port"
+          iptables -t raw -A PREROUTING -p udp --dport 6081 -j NOTRACK
+          iptables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
+          ip6tables -t raw -A PREROUTING -p udp --dport 6081 -j NOTRACK
+          ip6tables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
+          echo "I$(date "+%m%d %H:%M:%S.%N") - starting ovnkube-node"
+
+          gateway_mode_flags="--gateway-mode shared --gateway-interface br-ex"
+
+          exec /usr/bin/ovnkube --init-node "${K8S_NODE}" \
+            --nb-address "" \
+            --sb-address "" \
+            --config-file=/run/ovnkube-config/ovnkube.conf \
+            --loglevel "${OVN_KUBE_LOG_LEVEL}" \
+            --inactivity-probe="${OVN_CONTROLLER_INACTIVITY_PROBE}" \
+            ${gateway_mode_flags} \
+            --disable-snat-multiple-gws
+        env:
+        # for kubectl
+        - name: KUBERNETES_SERVICE_PORT
+          value: "6443"
+        - name: OVN_CONTROLLER_INACTIVITY_PROBE
+          value: "180000"
+        - name: OVN_KUBE_LOG_LEVEL
+          value: "4"
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        ports:
+        - name: metrics-port
+          containerPort: 29103
+        securityContext:
+          privileged: true
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        # for checking ovs-configuration service
+        - mountPath: /etc/systemd/system
+          name: systemd-units
+          readOnly: true
+        # for the iptables wrapper
+        - mountPath: /host
+          name: host-slash
+          readOnly: true
+          mountPropagation: HostToContainer
+        # for the CNI server socket
+        - mountPath: /run/ovn-kubernetes/
+          name: host-run-ovn-kubernetes
+        # accessing bind-mounted net namespaces
+        - mountPath: /run/netns
+          name: host-run-netns
+          readOnly: true
+          mountPropagation: HostToContainer
+        # for installing the CNI configuration file
+        - mountPath: /etc/cni/net.d
+          name: host-cni-netd
+        - mountPath: /cni-bin-dir
+          name: host-cni-bin
+        # Where we store IP allocations
+        - mountPath: /var/lib/cni/networks/ovn-k8s-cni-overlay
+          name: host-var-lib-cni-networks-ovn-kubernetes
+        - mountPath: /run/openvswitch
+          name: run-openvswitch
+        - mountPath: /run/ovn/
+          name: run-ovn
+        - mountPath: /etc/openvswitch
+          name: etc-openvswitch
+        - mountPath: /etc/ovn/
+          name: etc-openvswitch
+        - mountPath: /var/lib/openvswitch
+          name: var-lib-openvswitch
+        - mountPath: /run/ovnkube-config/
+          name: ovnkube-config
+        - mountPath: /var/lib/microshift/resources/kubeadmin/
+          name: kubeconfig
+        - mountPath: /env
+          name: env-overrides
+        resources:
+          requests:
+            cpu: 10m
+            memory: 60Mi
+        lifecycle:
+          preStop:
+            exec:
+              command: ["rm","-f","/etc/cni/net.d/10-ovn-kubernetes.conf"]
+        readinessProbe:
+          exec:
+            command: ["test", "-f", "/etc/cni/net.d/10-ovn-kubernetes.conf"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
       nodeSelector:
         kubernetes.io/os: "linux"
       volumes:
+      # for checking ovs-configuration service
+      - name: systemd-units
+        hostPath:
+          path: /etc/systemd/system
+      # used for iptables wrapper scripts
+      - name: host-slash
+        hostPath:
+          path: /
+      - name: host-run-netns
+        hostPath:
+          path: /run/netns
       - name: var-lib-openvswitch
         hostPath:
           path: /var/lib/openvswitch/data
@@ -2352,6 +2425,26 @@ spec:
       - name: log-socket
         hostPath:
           path: /dev/log
+      # For CNI server
+      - name: host-run-ovn-kubernetes
+        hostPath:
+          path: /run/ovn-kubernetes
+      - name: host-cni-netd
+        hostPath:
+          path: "/etc/cni/net.d"
+      - name: host-cni-bin
+        hostPath:
+          path: "/opt/cni/bin"
+
+      - name: host-var-lib-cni-networks-ovn-kubernetes
+        hostPath:
+          path: /var/lib/cni/networks/ovn-k8s-cni-overlay
+      - name: kubeconfig
+        hostPath:
+          path: /var/lib/microshift/resources/kubeadmin
+      - name: ovnkube-config
+        configMap:
+          name: ovnkube-config
       - name: env-overrides
         configMap:
           name: env-overrides
@@ -2370,7 +2463,7 @@ func assetsComponentsOvnNodeDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3736, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 8388, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
