@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-resolver
+  namespace: openshift-dns
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      dns.operator.openshift.io/daemonset-node-resolver: ""
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        dns.operator.openshift.io/daemonset-node-resolver: ""
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+${NODE_RESOLVER_SCRIPT}
+        env:
+        - name: SERVICES
+          # Comma or space separated list of services
+          # NOTE: For now, ensure these are relative names; for each relative name,
+          # an alias with the CLUSTER_DOMAIN suffix will also be added.
+          value: "image-registry.openshift-image-registry.svc"
+        - name: NAMESERVER
+          value: 172.30.0.10
+        - name: CLUSTER_DOMAIN
+          value: cluster.local
+        image: {{ .ReleaseImage.cli }}
+        imagePullPolicy: IfNotPresent
+        name: dns-node-resolver
+        resources:
+          requests:
+            cpu: 5m
+            memory: 21Mi
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /etc/hosts
+          name: hosts-file
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-node-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: node-resolver
+      serviceAccountName: node-resolver
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - operator: Exists
+      volumes:
+      - hostPath:
+          path: /etc/hosts
+          type: File
+        name: hosts-file
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 33%
+    type: RollingUpdate

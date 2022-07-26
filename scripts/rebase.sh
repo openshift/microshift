@@ -284,20 +284,123 @@ update_manifests() {
     date --date="${bindata_timestamp}" '+%s' > "${REPOROOT}/assets/bindata_timestamp.txt"
 
     title "Rebasing manifests"
-    for crd in ${REPOROOT}/assets/crd/*.yaml; do
-        cp "${STAGING_DIR}"/release-manifests/$(basename ${crd}) "${REPOROOT}"/assets/crd || true
+
+    #-- OpenShift control plane ---------------------------
+    # 1) Adopt resource manifests
+    #    Selectively copy in only those CRD manifests that MicroShift is already using
+    for crd in "${REPOROOT}"/assets/crd/*.yaml; do
+        cp "${STAGING_DIR}/release-manifests/$(basename "${crd}")" "${REPOROOT}"/assets/crd || true
     done
+    #    Replace all SCC manifests.
     rm -f "${REPOROOT}"/assets/scc/*.yaml
     cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/scc || true
+    # 2) Render operand manifest templates like the operator would
+    #    n/a
+    # 3) Make MicroShift-specific changes
+    #    Add the missing scc shortName
+    yq -i '.spec.names.shortNames = ["scc"]' "${REPOROOT}"/assets/crd/0000_03_security-openshift_01_scc.crd.yaml
+    # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
+    #    n/a
 
+    #-- openshift-dns -------------------------------------
+    # 1) Adopt resource manifests
+    #    Replace all openshift-dns operand manifests
     rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
     cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns 2>/dev/null || true 
     rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
     cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver 2>/dev/null || true
+    #    Restore the openshift-dns ConfigMap. It's content is the Corefile that the operator generates
+    #    in https://github.com/openshift/cluster-dns-operator/blob/master/pkg/operator/controller/controller_dns_configmap.go
+    git restore "${REPOROOT}"/assets/components/openshift-dns/dns/configmap.yaml
+    #    Restore the template for the node-resolver DaemonSet. It matches what's programmatically created by the operator
+    #    in https://github.com/openshift/cluster-dns-operator/blob/master/pkg/operator/controller/controller_dns_node_resolver_daemonset.go
+    git restore "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl
+    # 2) Render operand manifest templates like the operator would
+    #    Render the DNS DaemonSet
+    yq -i '.metadata += {"name": "dns-default", "namespace": "openshift-dns"}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.selector = {"matchLabels": {"dns.operator.openshift.io/daemonset-dns": "default"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.metadata += {"labels": {"dns.operator.openshift.io/daemonset-dns": "default"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.containers[0].image = "REPLACE_COREDNS_IMAGE"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.containers[1].image = "REPLACE_RBAC_PROXY_IMAGE"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.nodeSelector = {"kubernetes.io/os": "linux"}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.volumes[0].configMap.name = "dns-default"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.volumes[1] += {"secret": {"defaultMode": 420, "secretName": "dns-default-metrics-tls"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.tolerations = [{"operator": "Exists"}]' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    #    Render the node-resolver script into the DaemonSet template
+    export NODE_RESOLVER_SCRIPT="$(sed 's|^|          |' "${REPOROOT}"/assets/components/openshift-dns/node-resolver/update-node-resolver.sh)"
+    envsubst < "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl > "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml
+    #    Render the DNS service
+    yq -i '.metadata += {"annotations": {"service.beta.openshift.io/serving-cert-secret-name": "dns-default-metrics-tls"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+    yq -i '.metadata += {"name": "dns-default", "namespace": "openshift-dns"}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+    yq -i '.spec.clusterIP = "REPLACE_CLUSTER_IP"' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+    yq -i '.spec.selector = {"dns.operator.openshift.io/daemonset-dns": "default"}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+    sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+    sed -i '/#.*automatically managed/d' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+    # 3) Make MicroShift-specific changes
+    #    Fix missing imagePullPolicy
+    yq -i '.spec.template.spec.containers[1].imagePullPolicy = "IfNotPresent"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    #    Temporary workaround for MicroShift's missing config parameter when rendering this DaemonSet
+    sed -i 's|OPENSHIFT_MARKER=|NAMESERVER=${DNS_DEFAULT_SERVICE_HOST}\n          OPENSHIFT_MARKER=|' "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml
+    # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
+    sed -i 's|REPLACE_COREDNS_IMAGE|{{ .ReleaseImage.coredns }}|' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    sed -i 's|REPLACE_RBAC_PROXY_IMAGE|{{ .ReleaseImage.kube_rbac_proxy }}|' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    sed -i 's|REPLACE_CLUSTER_IP|{{.ClusterIP}}|' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+
+
+    #-- openshift-router ----------------------------------
+    # 1) Adopt resource manifests
+    #    Replace all openshift-router operand manifests
     rm -f "${REPOROOT}"/assets/components/openshift-router/*
     cp "${STAGING_DIR}"/cluster-ingress-operator/assets/router/* "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
+    #    Restore the openshift-router's service-ca ConfigMap
+    git restore "${REPOROOT}"/assets/components/openshift-router/configmap.yaml
+    # 2) Render operand manifest templates like the operator would
+    yq -i '.metadata += {"name": "router-default", "namespace": "openshift-ingress"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.metadata += {"labels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.selector = {"matchLabels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.metadata += {"labels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.volumes[0].secret.secretName = "router-certs-default"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.metadata += {"annotations": {"service.alpha.openshift.io/serving-cert-secret-name": "router-certs-default"}}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
+    yq -i '.metadata += {"labels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
+    yq -i '.metadata += {"name": "router-internal-default", "namespace": "openshift-ingress"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
+    yq -i '.spec.selector = {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
+    sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
+    yq -i '.metadata += {"annotations": {"service.alpha.openshift.io/serving-cert-secret-name": "router-certs-default"}}' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    yq -i '.metadata += {"name": "router-external-default"}' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    # sed -i 's|# Name is set at runtime.|name: router-external-default|' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    #    Set replica count to 1, as we're single-node.
+    yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    #    Add hostPorts for routes and metrics
+    yq -i '.spec.template.spec.containers[0].ports[0].hostPort = 80' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].ports[1].hostPort = 443' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].ports[2].hostPort = 1936' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    #    Change LoadBalancer to NodePort as long as we do not add a default LB. Add the necessary nodePorts
+    yq -i '.spec.type = "NodePort"' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    yq -i '.spec.ports[0].nodePort = 30001' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    yq -i '.spec.ports[1].nodePort = 30002' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
+    sed -i 's|REPLACE_ROUTER_IMAGE|{{ .ReleaseImage.haproxy_router }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+
+
+    #-- service-ca ----------------------------------------
+    # 1) Adopt resource manifests
+    #    Replace all service-ca operand manifests
     rm -f "${REPOROOT}"/assets/components/service-ca/*
     cp "${STAGING_DIR}"/service-ca-operator/bindata/v4.0.0/controller/* "${REPOROOT}"/assets/components/service-ca 2>/dev/null || true
+    # 2) Render operand manifest templates like the operator would
+    yq -i '.spec.template.spec.volumes[0].secret.secretName = "REPLACE_TLS_SECRET"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+    yq -i '.spec.template.spec.volumes[1].configMap.name = "REPLACE_CA_CONFIG_MAP"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+    yq -i 'del(.metadata.labels)' "${REPOROOT}"/assets/components/service-ca/ns.yaml
+    # 3) Make MicroShift-specific changes
+    #    Set replica count to 1, as we're single-node.
+    yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+    # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
+    sed -i 's|\${IMAGE}|{{ .ReleaseImage.service_ca_operator }}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+    sed -i 's|REPLACE_TLS_SECRET|{{.TLSSecret}}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+    sed -i 's|REPLACE_CA_CONFIG_MAP|{{.CAConfigMap}}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
 
     popd >/dev/null
 }
@@ -344,7 +447,16 @@ rebase_to() {
         echo "No changes in component images."
     fi
 
-    # TODO: update_manifests
+    update_manifests
+    if [[ -n "$(git status -s assets)" ]]; then
+        title "## Updating bindata"
+        "${REPOROOT}"/scripts/bindata.sh
+        title "## Committing changes to assets and pkg/assets"
+        git add assets pkg/assets
+        git commit -m "update manifests"
+    else
+        echo "No changes to assets."
+    fi
 }
 
 
