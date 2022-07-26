@@ -26,11 +26,13 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
-	"k8s.io/client-go/kubernetes"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	genericcontrollermanager "k8s.io/controller-manager/app"
 	"k8s.io/klog/v2"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
 	"k8s.io/kubernetes/cmd/kube-apiserver/app/options"
@@ -219,27 +221,43 @@ func (s *KubeAPIServer) configureOAuth(cfg *config.MicroshiftConfig) error {
 func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 	errorChannel := make(chan error, 1)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	// run readiness check
 	go func() {
-		restConfig, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
+		err := wait.PollImmediateWithContext(ctx, time.Second, kubeAPIStartupTimeout*time.Second, func(ctx context.Context) (bool, error) {
+			restConfig, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
+			if err != nil {
+				return false, err
+			}
+			if err := rest.SetKubernetesDefaults(restConfig); err != nil {
+				return false, err
+			}
+			restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
+
+			restClient, err := rest.UnversionedRESTClientFor(restConfig)
+			if err != nil {
+				return false, err
+			}
+
+			var status int
+			if err := restClient.Get().AbsPath("/healthz").Do(ctx).StatusCode(&status).Error(); err != nil {
+				klog.Infof("%q not yet ready: %v", s.Name(), err)
+				return false, nil
+			}
+			if status < 200 || status >= 400 {
+				klog.Infof("%q not yet ready: received http status %d", s.Name(), status)
+				return false, nil
+			}
+			return true, nil
+		})
 		if err != nil {
-			klog.Errorf("%s readiness check: %v", s.Name(), err)
-			errorChannel <- err
+			errorChannel <- fmt.Errorf("readiness check failed: %w", err)
+			cancel()
+			return
 		}
-
-		versionedClient, err := kubernetes.NewForConfig(restConfig)
-		if err != nil {
-			klog.Errorf("%s readiness check: %v", s.Name(), err)
-			errorChannel <- err
-		}
-
-		if genericcontrollermanager.WaitForAPIServer(versionedClient, kubeAPIStartupTimeout*time.Second) != nil {
-			klog.Errorf("%s readiness check timed out: %v", s.Name(), err)
-			errorChannel <- err
-		}
-
-		klog.Infof("%s is ready", s.Name())
+		klog.Infof("%q is ready", s.Name())
 		close(ready)
 	}()
 
