@@ -213,6 +213,7 @@ fi
 # setup ovs / ovsdb optimization to avoid full pre-allocation of memory
 sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openvswitch
 %systemd_post microshift-ovs-init.service
+systemctl is-active --quiet NetworkManager && systemctl restart --quiet NetworkManager || true
 
 %preun networking
 %systemd_preun microshift-ovs-init.service
