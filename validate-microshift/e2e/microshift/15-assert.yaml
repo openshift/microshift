@@ -1,7 +1,7 @@
 ---
 apiVersion: kuttl.dev/v1beta1
 kind: TestAssert
-timeout: 500
+timeout: 7200
 ---
 apiVersion: apps/v1
 kind: Deployment 
