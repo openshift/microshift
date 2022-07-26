@@ -4,6 +4,9 @@
 
 set -eux
 
+# restart nm after installing NetworkManager-ovs
+systemctl restart NetworkManager
+
 nmcli conn show br-ex >/dev/null && echo "br-ex already configured" && exit 0
 
 # This file is not needed anymore in 4.7+, but when rolling back to 4.6
