@@ -231,7 +231,6 @@ systemctl is-active --quiet NetworkManager && systemctl restart --quiet NetworkM
 %{_bindir}/cleanup-all-microshift-data
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
-%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
 
 %files selinux
 
@@ -243,6 +242,8 @@ systemctl is-active --quiet NetworkManager && systemctl restart --quiet NetworkM
 %{_unitdir}/hostpath-provisioner.service
 
 %files networking
+
+%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
 
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
