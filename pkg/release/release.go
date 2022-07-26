@@ -26,4 +26,5 @@ var Image = map[string]string{
 	"kubevirt_hostpath_provisioner": "quay.io/microshift/hostpath-provisioner:" + Base,
 	"pause":                         "quay.io/microshift/pause:" + Base,
 	"service_ca_operator":           "quay.io/microshift/service-ca-operator:" + Base,
+	"ovn_kubernetes":                "quay.io/microshift/ovn-kubernetes-singlenode:" + Base,
 }
