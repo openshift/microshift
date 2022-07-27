@@ -114,7 +114,6 @@ func withLogging(handler http.Handler, stackTracePred StacktracePred, shouldLogR
 		if old := respLoggerFromRequest(req); old != nil {
 			panic("multiple WithLogging calls!")
 		}
-
 		startTime := time.Now()
 		if receivedTimestamp, ok := request.ReceivedTimestampFrom(ctx); ok {
 			startTime = receivedTimestamp
@@ -181,6 +180,18 @@ func Unlogged(req *http.Request, w http.ResponseWriter) http.ResponseWriter {
 		return rl.w
 	}
 	return w
+}
+
+// DisableStackTraceForRequest stops putting a stacktrace into the log.
+func DisableStackTraceForRequest(req *http.Request) {
+	if req == nil {
+		return
+	}
+	rl := respLoggerFromContext(req.Context())
+	if rl == nil {
+		return
+	}
+	rl.StacktraceWhen(func(int) bool { return false })
 }
 
 // StacktraceWhen sets the stacktrace logging predicate, which decides when to log a stacktrace.
