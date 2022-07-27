@@ -431,9 +431,14 @@ rebase_to() {
 
         title "## Updating vendor directory"
         go mod vendor
-        title "## Patching vendor directory"
-        git apply scripts/rebase_patches/*
+
+        if [ "$(ls -A scripts/rebase_patches)" ]; then
+            title "## Patching vendor directory"
+            git apply scripts/rebase_patches/*.patch || true
+        fi
+
         regenerate_openapi
+
         if [[ -n "$(git status -s vendor)" ]]; then
             title "## Commiting changes to vendor directory"
             git add vendor
