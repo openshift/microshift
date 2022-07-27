@@ -42,7 +42,8 @@ title() {
 # Downloads a release's tools and manifest content into a staging directory,
 # then checks out the required components for the rebase at the release's commit.
 download_release() {
-    local release_image=$1
+    local release_image_amd64=$1
+    local release_image_arm64=$2
 
     rm -rf "${STAGING_DIR}"
     mkdir -p "${STAGING_DIR}"
@@ -55,20 +56,20 @@ download_release() {
         >&2 echo "Warning: no pull secret found at ${PULL_SECRET_FILE}"
     fi
 
-    title "# Downloading and extracting ${release_image} tools"
-    oc adm release extract ${authentication} --tools "${release_image}"
-    echo "Content of release.txt:"
-    cat release.txt
+    title "# Fetching release info for ${release_image_amd64} (amd64)"
+    oc adm release info ${authentication} "${release_image_amd64}" -o json > release_amd64.json
+    title "# Fetching release info for ${release_image_arm64} (arm64)"
+    oc adm release info ${authentication} "${release_image_arm64}" -o json > release_arm64.json
 
-    title "# Extracing ${release_image} manifest content"
+    title "# Extracing ${release_image_amd64} manifest content"
     mkdir -p release-manifests
     pushd release-manifests >/dev/null
-    content=$(oc adm release info ${authentication} --contents "${release_image}")
+    content=$(oc adm release info ${authentication} --contents "${release_image_amd64}")
     echo "${content}" | awk '{ if ($0 ~ /^# [A-Za-z0-9._-]+.yaml$/ || $0 ~ /^# image-references$/ || $0 ~ /^# release-metadata$/) filename = $2; else print >filename;}'
     popd >/dev/null
 
-    title "# Cloning ${release_image} component repos"
-    commits=$(oc adm release info ${authentication} --commits -o json "${release_image}")
+    title "# Cloning ${release_image_amd64} component repos"
+    commits=$(oc adm release info ${authentication} --commits -o json "${release_image_amd64}")
     echo "${commits}" | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
 
     git config --global advice.detachedHead false
@@ -240,21 +241,25 @@ get_release_images() {
 
 # Updates the image digests in pkg/release/release*.go
 update_images() {
-    if [ ! -f "${STAGING_DIR}/release.txt" ]; then
+    if [ ! -f "${STAGING_DIR}/release_amd64.json" ]; then
         >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
         exit 1
     fi
     pushd "${STAGING_DIR}" >/dev/null
 
     title "Rebasing release_*.go"
-    base_release=$(grep -o -P "^[[:space:]]+Version:[[:space:]]+\K([[:alnum:].-]+)" "${STAGING_DIR}"/release.txt)
 
+    # Update the base release
+    base_release=$(jq -r ".metadata.version" "${STAGING_DIR}/release_amd64.json")
+    sed -i "/^var Base/c\var Base = \"${base_release}\"" "${REPOROOT}/pkg/release/release.go"
+
+    # Update the image digests for all architectures
     images="$(get_release_images "${REPOROOT}/pkg/release/release.go" | xargs)"
-
-    for arch in amd64; do
+    for arch in amd64 arm64; do
+        # Compute the max length of image names incl. enclosing quotes
         w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
         for i in ${images}; do
-            digest=$(awk "/ ${i//_/-} / {print \$2}" release.txt)
+            digest=$(jq -r ".references.spec.tags[] | select(.name == \"${i}\") | .from.name" release_${arch}.json)
             if [[ -n "${digest}" ]]; then
                 awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
                     "${REPOROOT}/pkg/release/release_${arch}.go" > t
@@ -263,8 +268,6 @@ update_images() {
         done
     done
 
-    sed -i "/^var Base/c\var Base = \"${base_release}\"" "${REPOROOT}/pkg/release/release.go"
-
     popd >/dev/null
 }
 
@@ -272,7 +275,7 @@ update_images() {
 # Updates embedded component manifests by gathering these from various places
 # in the staged repos and copying them into the asset directory.
 update_manifests() {
-    if [ ! -f "${STAGING_DIR}/release.txt" ]; then
+    if [ ! -f "${STAGING_DIR}/release_amd64.json" ]; then
         >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
         exit 1
     fi
@@ -280,7 +283,7 @@ update_manifests() {
 
     title "Extracting timestamp"
     local bindata_timestamp
-    bindata_timestamp=$(grep "^Created:" release.txt | cut -f2- -d:)
+    bindata_timestamp=$(jq -r ".config.created" "${STAGING_DIR}/release_amd64.json")
     date --date="${bindata_timestamp}" '+%s' > "${REPOROOT}/assets/bindata_timestamp.txt"
 
     title "Rebasing manifests"
@@ -408,12 +411,13 @@ update_manifests() {
 
 # Runs each rebase step in sequence, commiting the step's output to git
 rebase_to() {
-    local release_image=$1
+    local release_image_amd64=$1
+    local release_image_arm64=$2
 
-    title "# Rebasing to ${release_image}"
-    download_release "${release_image}"
+    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
+    download_release "${release_image_amd64}" "${release_image_arm64}"
 
-    rebase_branch=rebase-${release_image#*:}
+    rebase_branch=rebase-${release_image_amd64#*:}
     git branch -D "${rebase_branch}" >/dev/null || true
     git checkout -b "${rebase_branch}"
 
@@ -462,24 +466,24 @@ rebase_to() {
 
 usage() {
     echo "Usage:"
-    echo "$(basename "$0") to RELEASE_IMAGE          Performs all the steps to rebase to RELEASE_IMAGE"
-    echo "$(basename "$0") download RELEASE_IMAGE    Downloads the content of RELEASE_IMAGE to disk in preparation for rebasing"
-    echo "$(basename "$0") go.mod                    Updates the go.mod file to the downloaded release"
-    echo "$(basename "$0") generated-apis            Regenerates OpenAPIs"
-    echo "$(basename "$0") images                    Rebases the component images to the downloaded release"
-    echo "$(basename "$0") manifests                 Rebases the component manifests to the downloaded release"
+    echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM         Performs all the steps to rebase to a release image. Specify both amd64 and arm64."
+    echo "$(basename "$0") download RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM   Downloads the content of a release image to disk in preparation for rebasing. Specify both amd64 and arm64."
+    echo "$(basename "$0") go.mod                                           Updates the go.mod file to the downloaded release"
+    echo "$(basename "$0") generated-apis                                   Regenerates OpenAPIs"
+    echo "$(basename "$0") images                                           Rebases the component images to the downloaded release"
+    echo "$(basename "$0") manifests                                        Rebases the component manifests to the downloaded release"
     exit 1
 }
 
 command=${1:-help}
 case "$command" in
     to)
-        [[ $# -ne 2 ]] && usage
-        rebase_to "$2"
+        [[ $# -ne 3 ]] && usage
+        rebase_to "$2" "$3"
         ;;
     download)
-        [[ $# -ne 2 ]] && usage
-        download_release "$2"
+        [[ $# -ne 3 ]] && usage
+        download_release "$2" "$3"
         ;;
     go.mod) update_go_mod;;
     generated-apis) regenerate_openapi;;
