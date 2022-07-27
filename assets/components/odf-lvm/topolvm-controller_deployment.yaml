@@ -53,9 +53,6 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         resources:
-          limits:
-            cpu: 250m
-            memory: 250Mi
           requests:
             cpu: 250m
             memory: 250Mi
@@ -87,9 +84,6 @@ spec:
         imagePullPolicy: IfNotPresent
         name: csi-provisioner
         resources:
-          limits:
-            cpu: 100m
-            memory: 100Mi
           requests:
             cpu: 100m
             memory: 100Mi

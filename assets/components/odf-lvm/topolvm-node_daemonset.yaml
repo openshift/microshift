@@ -24,9 +24,6 @@ spec:
         imagePullPolicy: IfNotPresent
         name: lvmd
         resources:
-          limits:
-            cpu: 250m
-            memory: 250Mi
           requests:
             cpu: 250m
             memory: 250Mi
@@ -67,9 +64,6 @@ spec:
           name: healthz
           protocol: TCP
         resources:
-          limits:
-            cpu: 250m
-            memory: 250Mi
           requests:
             cpu: 250m
             memory: 250Mi

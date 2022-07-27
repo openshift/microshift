@@ -58,58 +58,47 @@ func startCSIPLugin(kubeconfigPath string) error {
 	)
 	if err := assets.ApplyStorageClasses(sc, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyCSIDrivers(cd, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply csiDriver %v: %v", sc, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply sa %v: %v", sa, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyRoles(role, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply role %v: %v", cr, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyRoleBindings(rb, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply rolebinding %v: %v", cr, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterrole %v: %v", cr, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyConfigMaps(cm, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyDeployments(deploy, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
-		panic(err)
-		//return err
+		return err
 	}
 	if err := assets.ApplyDaemonSets(ds, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
-		panic(err)
-		//return err
+		return err
 	}
 	return nil
 }
