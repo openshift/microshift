@@ -18,5 +18,5 @@ metadata:
   name: topolvm-node 
   namespace: openshift-storage
 status:
-  availableReplicas: 1
-  readyReplicas: 1
+  numberAvailable: 1
+  numberReady: 1
