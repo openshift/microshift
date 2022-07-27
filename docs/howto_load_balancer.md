@@ -52,7 +52,7 @@ oc create ns $NAMESPACE
 Run the following command to deploy **3 replicas** of a test `nginx` application in the specified namespace.
 
 ```bash
-oc apply -n $NAMESPACE -f https://raw.githubusercontent.com/openshift/microshift/main/docs/config/nginx-IP-header.spec
+oc apply -n $NAMESPACE -f https://raw.githubusercontent.com/openshift/microshift/main/docs/config/nginx-IP-header.yaml
 ```
 
 The application is configured to return the `X-Server-IP` header with the container IP address.
