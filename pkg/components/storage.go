@@ -88,7 +88,7 @@ func startCSIPLugin(kubeconfigPath string) error {
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyConfigMaps(cm, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(cm, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
