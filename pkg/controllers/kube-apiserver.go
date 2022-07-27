@@ -16,33 +16,60 @@ limitations under the License.
 package controllers
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
-
-	"github.com/openshift/microshift/pkg/config"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
-	utilerrors "k8s.io/apimachinery/pkg/util/errors"
-	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
 	"k8s.io/kubernetes/cmd/kube-apiserver/app/options"
+
+	configv1 "github.com/openshift/api/config/v1"
+	kubecontrolplanev1 "github.com/openshift/api/kubecontrolplane/v1"
+	"github.com/openshift/library-go/pkg/crypto"
+	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
+	"github.com/openshift/microshift/pkg/assets"
+	"github.com/openshift/microshift/pkg/config"
 )
 
 const (
 	kubeAPIStartupTimeout = 60
 )
 
+var baseKubeAPIServerConfigs = [][]byte{
+	// todo: a nice way to generate the baseline kas config for microshift
+	assets.MustAsset("assets/components/kube-apiserver/defaultconfig.yaml"),
+	assets.MustAsset("assets/components/kube-apiserver/config-overrides.yaml"),
+}
+
+var fixedTLSProfile *configv1.TLSProfileSpec
+
+func init() {
+	var ok bool
+	fixedTLSProfile, ok = configv1.TLSProfiles[configv1.TLSProfileIntermediateType]
+	if !ok {
+		panic("lookup of intermediate tls profile failed")
+	}
+}
+
 type KubeAPIServer struct {
+	kasConfigBytes []byte
+	verbosity      int
+	configureErr   error // todo: report configuration errors immediately
+
 	serverOptions *options.ServerRunOptions
 
 	kubeconfig string
@@ -50,96 +77,132 @@ type KubeAPIServer struct {
 
 func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
 	s := &KubeAPIServer{}
-	s.configure(cfg)
+	if err := s.configure(cfg); err != nil {
+		s.configureErr = err
+	}
 	return s
 }
 
 func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
 func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd"} }
 
-func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
+func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
+	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kube-apiserver", "kubeconfig")
+	s.verbosity = cfg.LogVLevel
+
 	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
-	// certDir := filepath.Join(cfg.DataDir, "certs", s.Name())
-	// dataDir := filepath.Join(cfg.DataDir, s.Name())
 
 	if err := s.configureAuditPolicy(cfg); err != nil {
-		klog.Fatalf("Failed to configure kube-apiserver audit policy %v", err)
+		return fmt.Errorf("Failed to configure kube-apiserver audit policy: %w", err)
 	}
 
 	// Get the apiserver port so we can set it as an argument
 	apiServerPort, err := cfg.Cluster.ApiServerPort()
 	if err != nil {
-		// FIXME: This function needs to deal with errors
-		return
+		return err
 	}
 
-	// configure the kube-apiserver instance
-	s.serverOptions = options.NewServerRunOptions()
+	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
+		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
+			"audit-log-path":    {cfg.AuditLogDir},
+			"audit-policy-file": {cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
+			"client-ca-file":    {caCertFile},
+			"etcd-cafile":       {caCertFile},
+			"etcd-certfile":     {cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt"},
+			"etcd-keyfile":      {cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key"},
+			"etcd-servers": {
+				"https://127.0.0.1:2379",
+			},
+			"kubelet-certificate-authority": {caCertFile},
+			"kubelet-client-certificate":    {cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt"},
+			"kubelet-client-key":            {cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key"},
 
-	s.serverOptions.AllowPrivileged = true
-	s.serverOptions.EnableAggregatorRouting = true
-	s.serverOptions.Features.EnableProfiling = false
-	s.serverOptions.ServiceAccountSigningKeyFile = cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"
-	s.serverOptions.ServiceClusterIPRanges = cfg.Cluster.ServiceCIDR
-	s.serverOptions.ServiceNodePortRange = utilnet.PortRange{}
-	// let the type deal with parsing the config file content
-	err = s.serverOptions.ServiceNodePortRange.Set(cfg.Cluster.ServiceNodePortRange)
+			"proxy-client-cert-file":           {cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.crt"},
+			"proxy-client-key-file":            {cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.key"},
+			"requestheader-client-ca-file":     {caCertFile},
+			"service-account-signing-key-file": {cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
+			"tls-cert-file":                    {cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt"},
+			"tls-private-key-file":             {cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key"},
+			"disable-admission-plugins": {
+				"authorization.openshift.io/RestrictSubjectBindings",
+				"authorization.openshift.io/ValidateRoleBindingRestriction",
+				"autoscaling.openshift.io/ManagementCPUsOverride",
+				"config.openshift.io/DenyDeleteClusterConfiguration",
+				"config.openshift.io/ValidateAPIServer",
+				"config.openshift.io/ValidateAuthentication",
+				"config.openshift.io/ValidateConsole",
+				"config.openshift.io/ValidateFeatureGate",
+				"config.openshift.io/ValidateImage",
+				"config.openshift.io/ValidateOAuth",
+				"config.openshift.io/ValidateProject",
+				"config.openshift.io/ValidateScheduler",
+				"image.openshift.io/ImagePolicy",
+				"quota.openshift.io/ClusterResourceQuota",
+				"quota.openshift.io/ValidateClusterResourceQuota",
+			},
+			"enable-admission-plugins": {},
+		},
+		GenericAPIServerConfig: configv1.GenericAPIServerConfig{
+			// from cluster-kube-apiserver-operator
+			CORSAllowedOrigins: []string{
+				`//127\.0\.0\.1(:|$)`,
+				`//localhost(:|$)`,
+			},
+			ServingInfo: configv1.HTTPServingInfo{
+				ServingInfo: configv1.ServingInfo{
+					BindAddress:   net.JoinHostPort("0.0.0.0", strconv.Itoa(apiServerPort)),
+					MinTLSVersion: string(fixedTLSProfile.MinTLSVersion),
+					CipherSuites:  crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
+				},
+			},
+			KubeClientConfig: configv1.KubeClientConfig{
+				KubeConfig: s.kubeconfig,
+			},
+		},
+		ServiceAccountPublicKeyFiles: []string{
+			cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.crt",
+		},
+		ServicesSubnet:        cfg.Cluster.ServiceCIDR,
+		ServicesNodePortRange: cfg.Cluster.ServiceNodePortRange,
+	}
+
+	overridesBytes, err := json.Marshal(overrides)
 	if err != nil {
-		return
+		return err
 	}
 
-	s.serverOptions.ProxyClientCertFile = cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.crt"
-	s.serverOptions.ProxyClientKeyFile = cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.key"
+	s.kasConfigBytes, err = resourcemerge.MergePrunedProcessConfig(
+		&kubecontrolplanev1.KubeAPIServerConfig{},
+		map[string]resourcemerge.MergeFunc{
+			".apiServerArguments.enable-admission-plugins": func(dst interface{}, src interface{}, currentPath string) (interface{}, error) {
+				var result []interface{}
 
-	s.serverOptions.Admission.GenericAdmission.EnablePlugins = []string{"NodeRestriction"}
+				for _, existing := range dst.([]interface{}) {
+					drop := false
+					for _, disabled := range overrides.APIServerArguments["disable-admission-plugins"] {
+						if existing == disabled {
+							drop = true
+						}
+					}
+					if !drop {
+						result = append(result, existing)
+					}
+				}
 
-	s.serverOptions.Audit.PolicyFile = cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"
+				for _, adding := range src.([]interface{}) {
+					result = append(result, adding)
+				}
 
-	s.serverOptions.Authentication.APIAudiences = []string{"https://kubernetes.svc"}
-	s.serverOptions.Authentication.Anonymous.Allow = false
-	s.serverOptions.Authentication.ClientCert.ClientCA = caCertFile
-
-	s.serverOptions.Authentication.RequestHeader.AllowedNames = []string{
-		"aggregator",
-		"system:aggregator",
-		"kube-apiserver-proxy",
-		"system:kube-apiserver-proxy",
-		"openshift-aggregator",
-		"system:openshift-aggregator",
-	}
-	s.serverOptions.Authentication.RequestHeader.ClientCAFile = caCertFile
-	s.serverOptions.Authentication.RequestHeader.ExtraHeaderPrefixes = []string{"X-Remote-Extra-"}
-	s.serverOptions.Authentication.RequestHeader.GroupHeaders = []string{"X-Remote-Group"}
-	s.serverOptions.Authentication.RequestHeader.UsernameHeaders = []string{"X-Remote-User"}
-
-	s.serverOptions.Authentication.ServiceAccounts.Issuers = []string{"https://kubernetes.svc"}
-	s.serverOptions.Authentication.ServiceAccounts.KeyFiles = []string{
-		cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.crt",
-	}
-
-	s.serverOptions.Authorization.Modes = []string{"Node", "RBAC"}
-
-	s.serverOptions.Etcd.StorageConfig.Transport.ServerList = []string{"https://127.0.0.1:2379"}
-	s.serverOptions.Etcd.StorageConfig.Transport.CertFile = cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt"
-	s.serverOptions.Etcd.StorageConfig.Transport.TrustedCAFile = caCertFile
-	s.serverOptions.Etcd.StorageConfig.Transport.KeyFile = cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key"
-	s.serverOptions.Etcd.StorageConfig.Transport.ServerList = []string{"https://127.0.0.1:2379"}
-	s.serverOptions.Etcd.StorageConfig.Type = "etcd3"
-
-	s.serverOptions.GenericServerRunOptions.CorsAllowedOriginList = []string{
-		"/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$",
+				return result, nil
+			},
+		},
+		append(baseKubeAPIServerConfigs, overridesBytes)...,
+	)
+	if err != nil {
+		return err
 	}
 
-	s.serverOptions.KubeletConfig.CertFile = cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt"
-	s.serverOptions.KubeletConfig.CAFile = caCertFile
-	s.serverOptions.KubeletConfig.KeyFile = cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key"
-
-	s.serverOptions.SecureServing.BindAddress = net.IP{0, 0, 0, 0}
-	s.serverOptions.SecureServing.BindPort = apiServerPort
-	s.serverOptions.SecureServing.ServerCert.CertKey.CertFile = cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt"
-	s.serverOptions.SecureServing.ServerCert.CertKey.KeyFile = cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key"
-
-	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+	return nil
 }
 
 func (s *KubeAPIServer) configureAuditPolicy(cfg *config.MicroshiftConfig) error {
@@ -183,6 +246,10 @@ rules:
 }
 
 func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	if s.configureErr != nil {
+		return fmt.Errorf("configuration failed: %w", s.configureErr)
+	}
+
 	defer close(stopped)
 	errorChannel := make(chan error, 1)
 	ctx, cancel := context.WithCancel(ctx)
@@ -225,19 +292,36 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		close(ready)
 	}()
 
-	// Work around that that the NewAPIServerCommand hardcodes the stop channel to SIGTERM signals,
-	// so we cannot use the cobra RunE command directly.
-	completedOptions, err := kubeapiserver.Complete(s.serverOptions)
+	fd, err := os.CreateTemp("", "kube-apiserver-config-*.yaml")
 	if err != nil {
-		return fmt.Errorf("%s configuration error: %v", s.Name(), err)
+		return err
 	}
-	if errs := completedOptions.Validate(); len(errs) != 0 {
-		return fmt.Errorf("%s configuration error: %v", s.Name(), utilerrors.NewAggregate(errs))
-	}
-
-	go func() {
-		errorChannel <- kubeapiserver.Run(completedOptions, ctx.Done())
+	defer func() {
+		err := os.Remove(fd.Name())
+		if err != nil {
+			klog.Warningf("failed to delete temporary kube-apiserver config file: %v", err)
+		}
 	}()
 
+	err = func() error {
+		defer fd.Close()
+		_, err = io.Copy(fd, bytes.NewBuffer(s.kasConfigBytes))
+		return err
+	}()
+	if err != nil {
+		return err
+	}
+
+	// Carrying a patch for NewAPIServerCommand to use cmd.Context().Done() as the stop channel
+	// instead of the channel returned by SetupSignalHandler, which expects to be called at most
+	// once in a process.
+	cmd := kubeapiserver.NewAPIServerCommand()
+	cmd.SetArgs([]string{
+		"--openshift-config", fd.Name(),
+		"-v", strconv.Itoa(s.verbosity),
+	})
+	go func() {
+		errorChannel <- cmd.ExecuteContext(ctx)
+	}()
 	return <-errorChannel
 }
