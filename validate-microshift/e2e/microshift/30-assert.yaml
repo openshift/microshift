@@ -9,7 +9,8 @@ metadata:
   name: topolvm-controller
   namespace: openshift-storage
 status:
-  numberReady: 1
+  availableReplicas: 1
+  readyReplicas: 1
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -17,4 +18,5 @@ metadata:
   name: topolvm-node 
   namespace: openshift-storage
 status:
-  numberReady: 1
+  availableReplicas: 1
+  readyReplicas: 1
