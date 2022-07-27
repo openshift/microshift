@@ -111,6 +111,18 @@ update_modulepath_version_from_release() {
     go mod tidy
 }
 
+# Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
+# in the staging directory of openshift/kubernetes at the released version.
+update_modulepath_to_kubernetes_staging() {
+    local modulepath=$1
+
+    new_modulepath="github.com/openshift/kubernetes/staging/src/${modulepath}"
+    commit=$( cd "${STAGING_DIR}/kubernetes" && git rev-parse HEAD )
+    echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
+    go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
+    go mod tidy
+}
+
 # Returns the line (including trailing comment) in the #{gomod_file} containing the ReplaceDirective for ${module_path}
 get_replace_directive() {
     local gomod_file=$1
@@ -183,6 +195,7 @@ valid_component_or_exit() {
 # and this is driven from keywords added as comments after each line of
 # ReplaceDirectives:
 #   // from ${component}     selects the replacement from the go.mod of ${component}
+#   // staging kubernetes    selects the replacement from the staging dir of openshift/kubernetes
 #   // release ${component}  uses the commit of ${component} as specified in the release image
 #   // override [${reason}]  keep existing replacement
 # Note directives without keyword comment are skipped with a warning.
@@ -202,6 +215,9 @@ update_go_mod() {
             component=${arguments%% *}
             valid_component_or_exit "${component}"
             update_modulepath_version_from_component "${modulepath}" "${component}"
+            ;;
+        staging)
+            update_modulepath_to_kubernetes_staging "${modulepath}"
             ;;
         release)
             component=${arguments%% *}
