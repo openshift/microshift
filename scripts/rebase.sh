@@ -31,7 +31,7 @@ PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
 EMBEDDED_COMPONENTS="openshift-controller-manager oauth-apiserver hyperkube etcd"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
-LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator"
+LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator"
 
 
 title() {
@@ -401,6 +401,12 @@ update_manifests() {
     sed -i 's|\${IMAGE}|{{ .ReleaseImage.service_ca_operator }}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
     sed -i 's|REPLACE_TLS_SECRET|{{.TLSSecret}}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
     sed -i 's|REPLACE_CA_CONFIG_MAP|{{.CAConfigMap}}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+
+    #-- ovn-kubernetes -----------------------------------
+    # 1) Adopt resource manifests
+    #    Replace all ovn-kubernetes manifests
+    rm -rf "${REPOROOT}"/assets/components/ovn/*
+    cp -r "${STAGING_DIR}"/cluster-network-operator/bindata/network/ovn-kubernetes/microshift/* "${REPOROOT}"/assets/components/ovn 2>/dev/null || true
 
     popd >/dev/null
 }
