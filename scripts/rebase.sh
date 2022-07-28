@@ -61,7 +61,7 @@ download_release() {
     title "# Fetching release info for ${release_image_arm64} (arm64)"
     oc adm release info ${authentication} "${release_image_arm64}" -o json > release_arm64.json
 
-    title "# Extracing ${release_image_amd64} manifest content"
+    title "# Extracting ${release_image_amd64} manifest content"
     mkdir -p release-manifests
     pushd release-manifests >/dev/null
     content=$(oc adm release info ${authentication} --contents "${release_image_amd64}")
@@ -241,7 +241,7 @@ get_release_images() {
 
 # Updates the image digests in pkg/release/release*.go
 update_images() {
-    if [ ! -f "${STAGING_DIR}/release_amd64.json" ]; then
+    if [ ! -f "${STAGING_DIR}/release_amd64.json" ] || [ ! -f "${STAGING_DIR}/release_arm64.json" ]; then
         >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
         exit 1
     fi
