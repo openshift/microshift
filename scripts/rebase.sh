@@ -170,7 +170,7 @@ get_comment() {
 # Validate that ${component} is in the allowed list for the lookup, else exit
 valid_component_or_exit() {
     local component=$1
-    if [[ ! " etcd kubernetes openshift-controller-manager " =~ " ${component} " ]]; then
+    if [[ ! " etcd kubernetes openshift-apiserver openshift-controller-manager " =~ " ${component} " ]]; then
         echo "error: release reference must be one of [etcd kubernetes openshift-apiserver openshift-controller-manager], have ${component}"
         exit 1
     fi
