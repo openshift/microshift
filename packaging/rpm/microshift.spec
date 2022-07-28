@@ -160,6 +160,9 @@ install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 install -p -m644 packaging/crio.conf.d/microshift.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift.conf
 install -p -m644 packaging/crio.conf.d/microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
 
+install -d -m755  %{buildroot}%{_sysconfdir}/NetworkManager/conf.d
+install -p -m644  packaging/network-manager-conf/microshift-nm.conf %{buildroot}%{_sysconfdir}/NetworkManager/conf.d/microshift-nm.conf
+
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 install -p -m644 packaging/systemd/hostpath-provisioner.service %{buildroot}%{_unitdir}/hostpath-provisioner.service
@@ -245,6 +248,8 @@ systemctl is-active --quiet NetworkManager && systemctl restart --quiet NetworkM
 
 %{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
 
+%{_sysconfdir}/NetworkManager/conf.d/microshift-nm.conf
+
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
 
@@ -254,6 +259,9 @@ systemctl is-active --quiet NetworkManager && systemctl restart --quiet NetworkM
 %{_bindir}/configure-ovs-microshift.sh
 
 %changelog
+* Thu Jul 28 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_6
+- Add NetworkManager configuration file
+
 * Thu Jul 21 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_5
 - Adding microshift-ovn.conf with CRI-O network and workload partitioning
 
