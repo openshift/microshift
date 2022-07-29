@@ -5309,9 +5309,10 @@ var _assetsVersionMicroshiftVersionYaml = []byte(`# Values are filled in at runt
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: microshift-version
-  namespace: kube-public
+  name: version
+  namespace: openshift
 data:
+  product: "MicroShift"
   major: ""
   minor: ""
   version: ""
@@ -5327,7 +5328,7 @@ func assetsVersionMicroshiftVersionYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/version/microshift-version.yaml", size: 196, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/version/microshift-version.yaml", size: 207, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

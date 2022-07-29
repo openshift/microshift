@@ -49,6 +49,7 @@ func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 
 	versionInfo := version.Get()
 	var data = map[string]string{
+		"product": "MicroShift",
 		"major":   versionInfo.Major,
 		"minor":   versionInfo.Minor,
 		"version": versionInfo.String(),
