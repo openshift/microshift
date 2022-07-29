@@ -575,6 +575,8 @@ github.com/openshift/build-machinery-go v0.0.0-20210806203541-4ea9b6da3a37 h1:40
 github.com/openshift/build-machinery-go v0.0.0-20210806203541-4ea9b6da3a37/go.mod h1:b1BuldmJlbA/xYtdZvKi+7j5YGB44qJUJDZ9zwiNCfE=
 github.com/openshift/client-go v0.0.0-20211209144617-7385dd6338e3 h1:SG1aqwleU6bGD0X4mhkTNupjVnByMYYuW4XbnCPavQU=
 github.com/openshift/client-go v0.0.0-20211209144617-7385dd6338e3/go.mod h1:cwhyki5lqBmrT0m8Im+9I7PGFaraOzcYPtEz93RcsGY=
+github.com/openshift/cluster-policy-controller v0.0.0-20220103093815-8e5b36511861 h1:ECyvUrQnY9dSltRcLaqtMqGRlXKmDPCQojELmR0QdM8=
+github.com/openshift/cluster-policy-controller v0.0.0-20220103093815-8e5b36511861/go.mod h1:4JNw7p8Aw8go60zGNqgKDGZzsp+MaQboo9TqsvBygqY=
 github.com/openshift/etcd/api/v3 v3.5.1-0.20220513172030-7afa17cd7209 h1:HxkQqSspk4ier6E7Q+bsLBygeV+jR97yqTLNDZss7Tk=
 github.com/openshift/etcd/api/v3 v3.5.1-0.20220513172030-7afa17cd7209/go.mod h1:5GB2vv4A4AOn3yk7MftYGHkUfGtDHnEraIjym4dYz5A=
 github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20220513172030-7afa17cd7209 h1:LmauudAwZvl+AyNA1laVZoF1RXtFJF4OfIb5yQdQYDo=

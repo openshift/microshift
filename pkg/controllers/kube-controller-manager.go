@@ -22,6 +22,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 
@@ -36,6 +37,7 @@ import (
 type KubeControllerManager struct {
 	kubecmOptions *kubecmoptions.KubeControllerManagerOptions
 	kubeconfig    string
+	kubeadmConfig string
 }
 
 func NewKubeControllerManager(cfg *config.MicroshiftConfig) *KubeControllerManager {
@@ -50,6 +52,7 @@ func (s *KubeControllerManager) Dependencies() []string { return []string{"kube-
 func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
 	kubeconfig := filepath.Join(cfg.DataDir, "resources", "kube-controller-manager", "kubeconfig")
+	kubeadmConfig := filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
 
 	opts, err := kubecmoptions.NewKubeControllerManagerOptions()
 	if err != nil {
@@ -57,6 +60,7 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 	}
 	s.kubecmOptions = opts
 	s.kubeconfig = kubeconfig
+	s.kubeadmConfig = kubeadmConfig
 
 	args := []string{
 		"--kubeconfig=" + kubeconfig,
@@ -118,6 +122,13 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	//if err := kubecm.ShimForOpenShift(s.kubecmOptions, c); err != nil {
 	//	return err
 	//}
+
+	if err := assets.ApplyNamespaces([]string{
+		"assets/core/namespace-openshift-kube-controller-manager.yaml",
+		"assets/core/namespace-openshift-infra.yaml",
+	}, s.kubeadmConfig); err != nil {
+		klog.Fatalf("failed to apply openshift namespaces %v", err)
+	}
 
 	go func() {
 		errorChannel <- kubecm.Run(c.Complete(), ctx.Done())

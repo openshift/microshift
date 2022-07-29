@@ -1,0 +1,14 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+  name: openshift-infra
+  labels:
+    # set value to avoid depending on kube admission that depends on openshift apis
+    openshift.io/run-level: "0"
+    # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
+    openshift.io/cluster-monitoring: "true"
+    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
+    topolvm.cybozu.com/webhook: "ignore"
