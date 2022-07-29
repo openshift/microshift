@@ -1,0 +1,171 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: topolvm-node
+  name: topolvm-node
+  namespace: openshift-storage
+spec:
+  selector:
+    matchLabels:
+      app: topolvm-node
+  template:
+    metadata:
+      labels:
+        app: topolvm-node
+      name: lvmcluster-sample
+    spec:
+      containers:
+      - command:
+        - /lvmd
+        - --config=/etc/topolvm/lvmd.yaml
+        - --container=true
+        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        imagePullPolicy: IfNotPresent
+        name: lvmd
+        resources:
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/lvmd
+          name: lvmd-socket-dir
+        - mountPath: /etc/topolvm
+          name: lvmd-config-dir
+      - command:
+        - /topolvm-node
+        - --lvmd-socket=/run/lvmd/lvmd.sock
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: healthz
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: topolvm-node
+        ports:
+        - containerPort: 9808
+          name: healthz
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+        - mountPath: /run/lvmd
+          name: lvmd-socket-dir
+        - mountPath: /var/lib/kubelet/pods
+          mountPropagation: Bidirectional
+          name: pod-volumes-dir
+        - mountPath: /var/lib/kubelet/plugins/kubernetes.io/csi
+          mountPropagation: Bidirectional
+          name: csi-plugin-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.cybozu.com/node/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:376f21cfa8308dc1b61a3e8401b7023d903eda768912699f39403de742ab88b1
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - rm -rf /registration/topolvm.cybozu.com /registration/topolvm.cybozu.com-reg.sock
+        name: csi-registrar
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+        - mountPath: /registration
+          name: registration-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        imagePullPolicy: IfNotPresent
+        name: liveness-probe
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+      dnsPolicy: ClusterFirst
+      hostPID: true
+      initContainers:
+      - command:
+        - /usr/bin/bash
+        - -c
+        - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
+          sleep 5; done
+        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        imagePullPolicy: IfNotPresent
+        name: file-checker
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/topolvm
+          name: lvmd-config-dir
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: topolvm-node
+      serviceAccountName: topolvm-node
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /var/lib/kubelet/plugins_registry/
+          type: Directory
+        name: registration-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins/topolvm.cybozu.com/node
+          type: DirectoryOrCreate
+        name: node-plugin-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins/kubernetes.io/csi
+          type: DirectoryOrCreate
+        name: csi-plugin-dir
+      - hostPath:
+          path: /var/lib/kubelet/pods/
+          type: DirectoryOrCreate
+        name: pod-volumes-dir
+      - name: lvmd-config-dir
+        configMap:
+          name: lvmd
+          items:
+            - key: lvmd.yaml
+              path: lvmd.yaml
+      - emptyDir:
+          medium: Memory
+        name: lvmd-socket-dir
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate

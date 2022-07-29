@@ -4,9 +4,19 @@ kind: TestAssert
 timeout: 500
 ---
 apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: topolvm-controller
+  namespace: openshift-storage
+status:
+  availableReplicas: 1
+  readyReplicas: 1
+---
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: kubevirt-hostpath-provisioner
-  namespace: kubevirt-hostpath-provisioner
+  name: topolvm-node 
+  namespace: openshift-storage
 status:
+  numberAvailable: 1
   numberReady: 1

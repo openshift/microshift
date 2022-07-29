@@ -13,8 +13,8 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	if err := startHostpathProvisioner(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
-		klog.Warningf("Failed to start hostpath provisioner: %v", err)
+	if err := startCSIPLugin(cfg.DataDir + "/resources/kubeadmin/kubeconfig"); err != nil {
+		klog.Warningf("Failed to start csi plugin: %v", err)
 		return err
 	}
 

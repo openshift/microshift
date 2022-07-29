@@ -1,13 +1,30 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // assets/bindata_timestamp.txt
-// assets/components/hostpath-provisioner/clusterrole.yaml
-// assets/components/hostpath-provisioner/clusterrolebinding.yaml
-// assets/components/hostpath-provisioner/daemonset.yaml
-// assets/components/hostpath-provisioner/namespace.yaml
-// assets/components/hostpath-provisioner/scc.yaml
-// assets/components/hostpath-provisioner/service-account.yaml
-// assets/components/hostpath-provisioner/storageclass.yaml
+// assets/components/odf-lvm/csi-driver.yaml
+// assets/components/odf-lvm/topolvm-controller_deployment.yaml
+// assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
+// assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+// assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
+// assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml
+// assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml
+// assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml
+// assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+// assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml
+// assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml
+// assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml
+// assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+// assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml
+// assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml
+// assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml
+// assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
+// assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+// assets/components/odf-lvm/topolvm-node_daemonset.yaml
+// assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
+// assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+// assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml
+// assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml
+// assets/components/odf-lvm/topolvm_default-storage-class.yaml
 // assets/components/openshift-dns/dns/cluster-role-binding.yaml
 // assets/components/openshift-dns/dns/cluster-role.yaml
 // assets/components/openshift-dns/dns/configmap.yaml
@@ -16,7 +33,9 @@
 // assets/components/openshift-dns/dns/service-account.yaml
 // assets/components/openshift-dns/dns/service.yaml
 // assets/components/openshift-dns/node-resolver/daemonset.yaml
+// assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl
 // assets/components/openshift-dns/node-resolver/service-account.yaml
+// assets/components/openshift-dns/node-resolver/update-node-resolver.sh
 // assets/components/openshift-router/cluster-role-binding.yaml
 // assets/components/openshift-router/cluster-role.yaml
 // assets/components/openshift-router/configmap.yaml
@@ -49,6 +68,7 @@
 // assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml
 // assets/crd/0000_03_security-openshift_01_scc.crd.yaml
 // assets/crd/0000_10_config-operator_01_featuregate.crd.yaml
+// assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml
@@ -123,238 +143,1188 @@ func assetsBindata_timestampTxt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsComponentsHostpathProvisionerClusterroleYaml = []byte(`kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
+var _assetsComponentsOdfLvmCsiDriverYaml = []byte(`# Source: topolvm/templates/controller/csidriver.yaml
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
 metadata:
-  name: kubevirt-hostpath-provisioner
-rules:
-  - apiGroups: [""]
-    resources: ["nodes"]
-    verbs: ["get"]
-  - apiGroups: [""]
-    resources: ["persistentvolumes"]
-    verbs: ["get", "list", "watch", "create", "delete"]
-  - apiGroups: [""]
-    resources: ["persistentvolumeclaims"]
-    verbs: ["get", "list", "watch", "update"]
-
-  - apiGroups: ["storage.k8s.io"]
-    resources: ["storageclasses"]
-    verbs: ["get", "list", "watch"]
-
-  - apiGroups: [""]
-    resources: ["events"]
-    verbs: ["list", "watch", "create", "update", "patch"]
+  name: topolvm.cybozu.com
+spec:
+  attachRequired: false
+  podInfoOnMount: true
+  volumeLifecycleModes:
+    - Persistent
+    - Ephemeral
 `)
 
-func assetsComponentsHostpathProvisionerClusterroleYamlBytes() ([]byte, error) {
-	return _assetsComponentsHostpathProvisionerClusterroleYaml, nil
+func assetsComponentsOdfLvmCsiDriverYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmCsiDriverYaml, nil
 }
 
-func assetsComponentsHostpathProvisionerClusterroleYaml() (*asset, error) {
-	bytes, err := assetsComponentsHostpathProvisionerClusterroleYamlBytes()
+func assetsComponentsOdfLvmCsiDriverYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmCsiDriverYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/clusterrole.yaml", size: 609, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/csi-driver.yaml", size: 247, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsComponentsHostpathProvisionerClusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+var _assetsComponentsOdfLvmTopolvmController_deploymentYaml = []byte(`apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: kubevirt-hostpath-provisioner
-subjects:
-- kind: ServiceAccount
-  name: kubevirt-hostpath-provisioner-admin
-  namespace: kubevirt-hostpath-provisioner
-roleRef:
-  kind: ClusterRole
-  name: kubevirt-hostpath-provisioner
-  apiGroup: rbac.authorization.k8s.io`)
-
-func assetsComponentsHostpathProvisionerClusterrolebindingYamlBytes() ([]byte, error) {
-	return _assetsComponentsHostpathProvisionerClusterrolebindingYaml, nil
-}
-
-func assetsComponentsHostpathProvisionerClusterrolebindingYaml() (*asset, error) {
-	bytes, err := assetsComponentsHostpathProvisionerClusterrolebindingYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/clusterrolebinding.yaml", size: 338, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsComponentsHostpathProvisionerDaemonsetYaml = []byte(`apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: kubevirt-hostpath-provisioner
-  labels:
-    k8s-app: kubevirt-hostpath-provisioner
-  namespace: kubevirt-hostpath-provisioner
+  name: topolvm-controller
+  namespace: openshift-storage
 spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: kubevirt-hostpath-provisioner
+      app.kubernetes.io/name: topolvm-controller
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        k8s-app: kubevirt-hostpath-provisioner
+        app.kubernetes.io/name: topolvm-controller
+      name: topolvm-controller
+      namespace: openshift-storage
     spec:
-      serviceAccountName: kubevirt-hostpath-provisioner-admin
       containers:
-        - name: kubevirt-hostpath-provisioner
-          image: {{ .ReleaseImage.kubevirt_hostpath_provisioner }}
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: USE_NAMING_PREFIX
-              value: "false" # change to true, to have the name of the pvc be part of the directory
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: PV_DIR
-              value: /var/hpvolumes
-          volumeMounts:
-            - name: pv-volume # root dir where your bind mounts will be on the node
-              mountPath: /var/hpvolumes
-              #nodeSelector:
-              #- name: xxxxxx
+      - command:
+        - /topolvm-controller
+        - --cert-dir=/certs
+        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: healthz
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: topolvm-controller
+        ports:
+        - containerPort: 9808
+          name: healthz
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /metrics
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
+        - mountPath: /certs
+          name: certs
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        - --enable-capacity
+        - --capacity-ownerref-level=2
+        - --capacity-poll-interval=30s
+        - --feature-gates=Topology=true
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        image: registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:42563eb25efb2b6f277944b627bea420fa58fe950b46a1bd1487122b8a387e75
+        imagePullPolicy: IfNotPresent
+        name: csi-provisioner
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
+        imagePullPolicy: IfNotPresent
+        name: csi-resizer
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        imagePullPolicy: IfNotPresent
+        name: liveness-probe
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - /usr/bin/bash
+        - -c
+        - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
+          -keyout /certs/tls.key -out /certs/tls.crt -days 3650
+        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        imagePullPolicy: IfNotPresent
+        name: self-signed-cert-generator
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /certs
+          name: certs
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccountName: topolvm-controller
+      terminationGracePeriodSeconds: 30
       volumes:
-        - name: pv-volume
-          hostPath:
-            path: /var/hpvolumes
+      - emptyDir: {}
+        name: socket-dir
+      - emptyDir: {}
+        name: certs
 `)
 
-func assetsComponentsHostpathProvisionerDaemonsetYamlBytes() ([]byte, error) {
-	return _assetsComponentsHostpathProvisionerDaemonsetYaml, nil
+func assetsComponentsOdfLvmTopolvmController_deploymentYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_deploymentYaml, nil
 }
 
-func assetsComponentsHostpathProvisionerDaemonsetYaml() (*asset, error) {
-	bytes, err := assetsComponentsHostpathProvisionerDaemonsetYamlBytes()
+func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_deploymentYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/daemonset.yaml", size: 1231, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4590, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsComponentsHostpathProvisionerNamespaceYaml = []byte(`apiVersion: v1
-kind: Namespace
+var _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
-  name: kubevirt-hostpath-provisioner`)
-
-func assetsComponentsHostpathProvisionerNamespaceYamlBytes() ([]byte, error) {
-	return _assetsComponentsHostpathProvisionerNamespaceYaml, nil
-}
-
-func assetsComponentsHostpathProvisionerNamespaceYaml() (*asset, error) {
-	bytes, err := assetsComponentsHostpathProvisionerNamespaceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/namespace.yaml", size: 78, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsComponentsHostpathProvisionerSccYaml = []byte(`kind: SecurityContextConstraints
-apiVersion: security.openshift.io/v1
-metadata:
-  name: hostpath-provisioner
-allowPrivilegedContainer: true
-requiredDropCapabilities:
-- KILL
-- MKNOD
-- SETUID
-- SETGID
-runAsUser:
-  type: RunAsAny
-seLinuxContext:
-  type: RunAsAny
-fsGroup:
-  type: RunAsAny
-supplementalGroups:
-  type: RunAsAny
-allowHostDirVolumePlugin: true
-users:
-- system:serviceaccount:kubevirt-hostpath-provisioner:kubevirt-hostpath-provisioner-admin
-volumes:
-- hostPath
-- secret
+  name: topolvm-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - delete
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  - csidrivers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - topolvm.cybozu.com
+  resources:
+  - logicalvolumes
+  - logicalvolumes/status
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
 `)
 
-func assetsComponentsHostpathProvisionerSccYamlBytes() ([]byte, error) {
-	return _assetsComponentsHostpathProvisionerSccYaml, nil
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml, nil
 }
 
-func assetsComponentsHostpathProvisionerSccYaml() (*asset, error) {
-	bytes, err := assetsComponentsHostpathProvisionerSccYamlBytes()
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/scc.yaml", size: 480, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 698, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsComponentsHostpathProvisionerServiceAccountYaml = []byte(`apiVersion: v1
+var _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: topolvm-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: topolvm-controller
+subjects:
+- kind: ServiceAccount
+  name: topolvm-controller
+  namespace: openshift-storage
+`)
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 288, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: topolvm-controller
+  namespace: openshift-storage
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - watch
+      - list
+      - delete
+      - update
+      - create`)
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml", size: 281, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: topolvm-controller
+  namespace: openshift-storage
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: topolvm-controller
+subjects:
+  - kind: ServiceAccount
+    name: topolvm-controller
+    namespace: openshift-storage`)
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 310, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml = []byte(`apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kubevirt-hostpath-provisioner-admin
-  namespace: kubevirt-hostpath-provisioner`)
+  name: topolvm-controller
+  namespace: openshift-storage`)
 
-func assetsComponentsHostpathProvisionerServiceAccountYamlBytes() ([]byte, error) {
-	return _assetsComponentsHostpathProvisionerServiceAccountYaml, nil
+func assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml, nil
 }
 
-func assetsComponentsHostpathProvisionerServiceAccountYaml() (*asset, error) {
-	bytes, err := assetsComponentsHostpathProvisionerServiceAccountYamlBytes()
+func assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/service-account.yaml", size: 132, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml", size: 103, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsComponentsHostpathProvisionerStorageclassYaml = []byte(`apiVersion: storage.k8s.io/v1
-kind: StorageClass
+var _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
-  name: kubevirt-hostpath-provisioner
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-provisioner: kubevirt.io/hostpath-provisioner
-reclaimPolicy: Delete
-volumeBindingMode: WaitForFirstConsumer
+  name: topolvm-csi-provisioner
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - list
+  - watch
+  - create
+  - update
+  - patch
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshots
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshotcontents
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csinodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - volumeattachments
+  verbs:
+  - get
+  - list
+  - watch
 `)
 
-func assetsComponentsHostpathProvisionerStorageclassYamlBytes() ([]byte, error) {
-	return _assetsComponentsHostpathProvisionerStorageclassYaml, nil
+func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYaml, nil
 }
 
-func assetsComponentsHostpathProvisionerStorageclassYaml() (*asset, error) {
-	bytes, err := assetsComponentsHostpathProvisionerStorageclassYamlBytes()
+func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/hostpath-provisioner/storageclass.yaml", size: 276, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 1015, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: topolvm-csi-provisioner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: topolvm-csi-provisioner
+subjects:
+- kind: ServiceAccount
+  name: topolvm-controller
+  namespace: openshift-storage
+`)
+
+func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 298, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: topolvm-csi-provisioner
+  namespace: openshift-storage
+rules:
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - watch
+  - list
+  - delete
+  - update
+  - create
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csistoragecapacities
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - get
+`)
+
+func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml", size: 538, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: topolvm-csi-provisioner
+  namespace: openshift-storage
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: topolvm-csi-provisioner
+subjects:
+- kind: ServiceAccount
+  name: topolvm-controller
+  namespace: openshift-storage
+`)
+
+func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 315, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: topolvm-csi-resizer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims/status
+  verbs:
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - list
+  - watch
+  - create
+  - update
+  - patch
+`)
+
+func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterroleYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterroleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 569, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: topolvm-csi-resizer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: topolvm-csi-resizer
+subjects:
+- kind: ServiceAccount
+  name: topolvm-controller
+  namespace: openshift-storage
+`)
+
+func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 290, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: topolvm-csi-resizer
+  namespace: openshift-storage
+rules:
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - watch
+  - list
+  - delete
+  - update
+  - create
+`)
+
+func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml", size: 258, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: topolvm-csi-resizer
+  namespace: openshift-storage
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: topolvm-csi-resizer
+subjects:
+- kind: ServiceAccount
+  name: topolvm-controller
+  namespace: openshift-storage
+`)
+
+func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 307, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml = []byte(`# Source: topolvm/templates/lvmd/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lvmd
+  namespace: openshift-storage
+data:
+  lvmd.yaml: |
+    socket-name: /run/lvmd/lvmd.sock
+    device-classes: 
+      - default: true
+        name: ssd
+        spare-gb: 2
+        volume-group: rhel
+`)
+
+func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1YamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1YamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml", size: 299, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: topolvm-node-scc
+rules:
+- apiGroups:
+  - security.openshift.io
+  resourceNames:
+  - topolvm-node
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use
+`)
+
+func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 235, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: topolvm-node-scc
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: topolvm-node-scc
+subjects:
+- kind: ServiceAccount
+  name: topolvm-node
+  namespace: openshift-storage
+`)
+
+func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 278, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmNode_daemonsetYaml = []byte(`apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: topolvm-node
+  name: topolvm-node
+  namespace: openshift-storage
+spec:
+  selector:
+    matchLabels:
+      app: topolvm-node
+  template:
+    metadata:
+      labels:
+        app: topolvm-node
+      name: lvmcluster-sample
+    spec:
+      containers:
+      - command:
+        - /lvmd
+        - --config=/etc/topolvm/lvmd.yaml
+        - --container=true
+        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        imagePullPolicy: IfNotPresent
+        name: lvmd
+        resources:
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/lvmd
+          name: lvmd-socket-dir
+        - mountPath: /etc/topolvm
+          name: lvmd-config-dir
+      - command:
+        - /topolvm-node
+        - --lvmd-socket=/run/lvmd/lvmd.sock
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: healthz
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: topolvm-node
+        ports:
+        - containerPort: 9808
+          name: healthz
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+        - mountPath: /run/lvmd
+          name: lvmd-socket-dir
+        - mountPath: /var/lib/kubelet/pods
+          mountPropagation: Bidirectional
+          name: pod-volumes-dir
+        - mountPath: /var/lib/kubelet/plugins/kubernetes.io/csi
+          mountPropagation: Bidirectional
+          name: csi-plugin-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.cybozu.com/node/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:376f21cfa8308dc1b61a3e8401b7023d903eda768912699f39403de742ab88b1
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - rm -rf /registration/topolvm.cybozu.com /registration/topolvm.cybozu.com-reg.sock
+        name: csi-registrar
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+        - mountPath: /registration
+          name: registration-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        imagePullPolicy: IfNotPresent
+        name: liveness-probe
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: node-plugin-dir
+      dnsPolicy: ClusterFirst
+      hostPID: true
+      initContainers:
+      - command:
+        - /usr/bin/bash
+        - -c
+        - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
+          sleep 5; done
+        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        imagePullPolicy: IfNotPresent
+        name: file-checker
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/topolvm
+          name: lvmd-config-dir
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: topolvm-node
+      serviceAccountName: topolvm-node
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /var/lib/kubelet/plugins_registry/
+          type: Directory
+        name: registration-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins/topolvm.cybozu.com/node
+          type: DirectoryOrCreate
+        name: node-plugin-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins/kubernetes.io/csi
+          type: DirectoryOrCreate
+        name: csi-plugin-dir
+      - hostPath:
+          path: /var/lib/kubelet/pods/
+          type: DirectoryOrCreate
+        name: pod-volumes-dir
+      - name: lvmd-config-dir
+        configMap:
+          name: lvmd
+          items:
+            - key: lvmd.yaml
+              path: lvmd.yaml
+      - emptyDir:
+          medium: Memory
+        name: lvmd-socket-dir
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+`)
+
+func assetsComponentsOdfLvmTopolvmNode_daemonsetYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmNode_daemonsetYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmNode_daemonsetYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5522, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: topolvm-node
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+- apiGroups:
+  - topolvm.cybozu.com
+  resources:
+  - logicalvolumes
+  - logicalvolumes/status
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csidrivers
+  verbs:
+  - get
+  - list
+  - watch
+`)
+
+func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 466, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: topolvm-node
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: topolvm-node
+subjects:
+- kind: ServiceAccount
+  name: topolvm-node
+  namespace: openshift-storage
+`)
+
+func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 270, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml = []byte(`apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: topolvm-node
+  namespace: openshift-storage
+
+`)
+
+func assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml", size: 99, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml = []byte(`apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-storage
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+  labels:
+    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
+    topolvm.cybozu.com/webhook: "ignore"`)
+
+func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml", size: 293, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml = []byte(`apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  labels:
+  name: topolvm-provisioner
+parameters:
+  csi.storage.k8s.io/fstype: xfs
+provisioner: topolvm.cybozu.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+`)
+
+func assetsComponentsOdfLvmTopolvm_defaultStorageClassYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvm_defaultStorageClassYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm_default-storage-class.yaml", size: 334, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -382,7 +1352,7 @@ func assetsComponentsOpenshiftDnsDnsClusterRoleBindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role-binding.yaml", size: 223, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role-binding.yaml", size: 223, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -436,7 +1406,7 @@ func assetsComponentsOpenshiftDnsDnsClusterRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role.yaml", size: 492, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role.yaml", size: 492, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -482,7 +1452,7 @@ func assetsComponentsOpenshiftDnsDnsConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/configmap.yaml", size: 610, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/configmap.yaml", size: 610, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -605,7 +1575,7 @@ func assetsComponentsOpenshiftDnsDnsDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/daemonset.yaml", size: 3217, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/daemonset.yaml", size: 3217, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -622,6 +1592,8 @@ metadata:
     openshift.io/run-level: "0"
     # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
     openshift.io/cluster-monitoring: "true"
+    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
+    topolvm.cybozu.com/webhook: "ignore"
 `)
 
 func assetsComponentsOpenshiftDnsDnsNamespaceYamlBytes() ([]byte, error) {
@@ -634,7 +1606,7 @@ func assetsComponentsOpenshiftDnsDnsNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/namespace.yaml", size: 417, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/namespace.yaml", size: 536, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -656,7 +1628,7 @@ func assetsComponentsOpenshiftDnsDnsServiceAccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service-account.yaml", size: 85, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service-account.yaml", size: 85, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -703,7 +1675,7 @@ func assetsComponentsOpenshiftDnsDnsServiceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service.yaml", size: 691, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service.yaml", size: 691, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -847,7 +1819,94 @@ func assetsComponentsOpenshiftDnsNodeResolverDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/daemonset.yaml", size: 4823, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/daemonset.yaml", size: 4823, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOpenshiftDnsNodeResolverDaemonsetYamlTmpl = []byte(`apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-resolver
+  namespace: openshift-dns
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      dns.operator.openshift.io/daemonset-node-resolver: ""
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        dns.operator.openshift.io/daemonset-node-resolver: ""
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+${NODE_RESOLVER_SCRIPT}
+        env:
+        - name: SERVICES
+          # Comma or space separated list of services
+          # NOTE: For now, ensure these are relative names; for each relative name,
+          # an alias with the CLUSTER_DOMAIN suffix will also be added.
+          value: "image-registry.openshift-image-registry.svc"
+        - name: NAMESERVER
+          value: 172.30.0.10
+        - name: CLUSTER_DOMAIN
+          value: cluster.local
+        image: {{ .ReleaseImage.cli }}
+        imagePullPolicy: IfNotPresent
+        name: dns-node-resolver
+        resources:
+          requests:
+            cpu: 5m
+            memory: 21Mi
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /etc/hosts
+          name: hosts-file
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-node-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: node-resolver
+      serviceAccountName: node-resolver
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - operator: Exists
+      volumes:
+      - hostPath:
+          path: /etc/hosts
+          type: File
+        name: hosts-file
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 33%
+    type: RollingUpdate
+`)
+
+func assetsComponentsOpenshiftDnsNodeResolverDaemonsetYamlTmplBytes() ([]byte, error) {
+	return _assetsComponentsOpenshiftDnsNodeResolverDaemonsetYamlTmpl, nil
+}
+
+func assetsComponentsOpenshiftDnsNodeResolverDaemonsetYamlTmpl() (*asset, error) {
+	bytes, err := assetsComponentsOpenshiftDnsNodeResolverDaemonsetYamlTmplBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl", size: 2023, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -869,7 +1928,81 @@ func assetsComponentsOpenshiftDnsNodeResolverServiceAccountYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/service-account.yaml", size: 95, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/service-account.yaml", size: 95, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOpenshiftDnsNodeResolverUpdateNodeResolverSh = []byte(`#!/bin/bash
+set -uo pipefail
+
+trap 'jobs -p | xargs kill || true; wait; exit 0' TERM
+
+OPENSHIFT_MARKER="openshift-generated-node-resolver"
+HOSTS_FILE="/etc/hosts"
+TEMP_FILE="/etc/hosts.tmp"
+
+IFS=', ' read -r -a services <<< "${SERVICES}"
+
+# Make a temporary file with the old hosts file's attributes.
+cp -f --attributes-only "${HOSTS_FILE}" "${TEMP_FILE}"
+
+while true; do
+  declare -A svc_ips
+  for svc in "${services[@]}"; do
+    # Fetch service IP from cluster dns if present. We make several tries
+    # to do it: IPv4, IPv6, IPv4 over TCP and IPv6 over TCP. The two last ones
+    # are for deployments with Kuryr on older OpenStack (OSP13) - those do not
+    # support UDP loadbalancers and require reaching DNS through TCP.
+    cmds=('dig -t A @"${NAMESERVER}" +short "${svc}.${CLUSTER_DOMAIN}"|grep -v "^;"'
+          'dig -t AAAA @"${NAMESERVER}" +short "${svc}.${CLUSTER_DOMAIN}"|grep -v "^;"'
+          'dig -t A +tcp +retry=0 @"${NAMESERVER}" +short "${svc}.${CLUSTER_DOMAIN}"|grep -v "^;"'
+          'dig -t AAAA +tcp +retry=0 @"${NAMESERVER}" +short "${svc}.${CLUSTER_DOMAIN}"|grep -v "^;"')
+    for i in ${!cmds[*]}
+    do
+      ips=($(eval "${cmds[i]}"))
+      if [[ "$?" -eq 0 && "${#ips[@]}" -ne 0 ]]; then
+        svc_ips["${svc}"]="${ips[@]}"
+        break
+      fi
+    done
+  done
+
+  # Update /etc/hosts only if we get valid service IPs
+  # We will not update /etc/hosts when there is coredns service outage or api unavailability
+  # Stale entries could exist in /etc/hosts if the service is deleted
+  if [[ -n "${svc_ips[*]-}" ]]; then
+    # Build a new hosts file from /etc/hosts with our custom entries filtered out
+    grep -v "# ${OPENSHIFT_MARKER}" "${HOSTS_FILE}" > "${TEMP_FILE}"
+
+    # Append resolver entries for services
+    for svc in "${!svc_ips[@]}"; do
+      for ip in ${svc_ips[${svc}]}; do
+        echo "${ip} ${svc} ${svc}.${CLUSTER_DOMAIN} # ${OPENSHIFT_MARKER}" >> "${TEMP_FILE}"
+      done
+    done
+
+    # TODO: Update /etc/hosts atomically to avoid any inconsistent behavior
+    # Replace /etc/hosts with our modified version if needed
+    cmp "${TEMP_FILE}" "${HOSTS_FILE}" || cp -f "${TEMP_FILE}" "${HOSTS_FILE}"
+    # TEMP_FILE is not removed to avoid file create/delete and attributes copy churn
+  fi
+  sleep 60 & wait
+  unset svc_ips
+done
+`)
+
+func assetsComponentsOpenshiftDnsNodeResolverUpdateNodeResolverShBytes() ([]byte, error) {
+	return _assetsComponentsOpenshiftDnsNodeResolverUpdateNodeResolverSh, nil
+}
+
+func assetsComponentsOpenshiftDnsNodeResolverUpdateNodeResolverSh() (*asset, error) {
+	bytes, err := assetsComponentsOpenshiftDnsNodeResolverUpdateNodeResolverShBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/update-node-resolver.sh", size: 2285, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -899,7 +2032,7 @@ func assetsComponentsOpenshiftRouterClusterRoleBindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role-binding.yaml", size: 329, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role-binding.yaml", size: 329, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -977,7 +2110,7 @@ func assetsComponentsOpenshiftRouterClusterRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role.yaml", size: 883, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role.yaml", size: 883, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1001,7 +2134,7 @@ func assetsComponentsOpenshiftRouterConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/configmap.yaml", size: 168, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/configmap.yaml", size: 168, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1158,7 +2291,7 @@ func assetsComponentsOpenshiftRouterDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4746, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4746, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1177,7 +2310,8 @@ metadata:
     # old and new forms of the label for matching with NetworkPolicy
     network.openshift.io/policy-group: ingress
     policy-group.network.openshift.io/ingress: ""
-`)
+    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
+    topolvm.cybozu.com/webhook: "ignore"`)
 
 func assetsComponentsOpenshiftRouterNamespaceYamlBytes() ([]byte, error) {
 	return _assetsComponentsOpenshiftRouterNamespaceYaml, nil
@@ -1189,7 +2323,7 @@ func assetsComponentsOpenshiftRouterNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 499, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 617, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1213,7 +2347,7 @@ func assetsComponentsOpenshiftRouterServiceAccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-account.yaml", size: 213, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-account.yaml", size: 213, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1252,7 +2386,7 @@ func assetsComponentsOpenshiftRouterServiceCloudYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 567, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 567, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1297,7 +2431,7 @@ func assetsComponentsOpenshiftRouterServiceInternalYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-internal.yaml", size: 727, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-internal.yaml", size: 727, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1499,7 +2633,7 @@ func assetsComponentsOvnClusterroleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/clusterrole.yaml", size: 2771, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/clusterrole.yaml", size: 2771, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1543,7 +2677,7 @@ func assetsComponentsOvnClusterrolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/clusterrolebinding.yaml", size: 663, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/clusterrolebinding.yaml", size: 663, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1596,7 +2730,7 @@ func assetsComponentsOvnConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/configmap.yaml", size: 844, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/configmap.yaml", size: 844, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2176,7 +3310,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 20008, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 20008, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2199,7 +3333,7 @@ func assetsComponentsOvnMasterServiceaccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/serviceaccount.yaml", size: 122, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/serviceaccount.yaml", size: 122, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2231,7 +3365,7 @@ func assetsComponentsOvnNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/namespace.yaml", size: 542, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/namespace.yaml", size: 542, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2371,7 +3505,7 @@ func assetsComponentsOvnNodeDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3736, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3736, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2394,7 +3528,7 @@ func assetsComponentsOvnNodeServiceaccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/node/serviceaccount.yaml", size: 116, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/node/serviceaccount.yaml", size: 116, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2448,7 +3582,7 @@ func assetsComponentsOvnRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/role.yaml", size: 615, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/role.yaml", size: 615, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2494,7 +3628,7 @@ func assetsComponentsOvnRolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/rolebinding.yaml", size: 699, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/rolebinding.yaml", size: 699, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2575,7 +3709,7 @@ func assetsComponentsServiceCaClusterroleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/clusterrole.yaml", size: 864, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/clusterrole.yaml", size: 864, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2604,7 +3738,7 @@ func assetsComponentsServiceCaClusterrolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/clusterrolebinding.yaml", size: 298, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/clusterrolebinding.yaml", size: 298, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2689,7 +3823,7 @@ func assetsComponentsServiceCaDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1866, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1866, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2701,6 +3835,9 @@ metadata:
   annotations:
     openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
+  labels:
+    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
+    topolvm.cybozu.com/webhook: "ignore"
 `)
 
 func assetsComponentsServiceCaNsYamlBytes() ([]byte, error) {
@@ -2713,7 +3850,7 @@ func assetsComponentsServiceCaNsYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 168, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 297, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2776,7 +3913,7 @@ func assetsComponentsServiceCaRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/role.yaml", size: 634, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/role.yaml", size: 634, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2806,7 +3943,7 @@ func assetsComponentsServiceCaRolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/rolebinding.yaml", size: 343, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/rolebinding.yaml", size: 343, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2828,7 +3965,7 @@ func assetsComponentsServiceCaSaYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/sa.yaml", size: 99, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/sa.yaml", size: 99, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2852,7 +3989,7 @@ func assetsComponentsServiceCaSigningCabundleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/signing-cabundle.yaml", size: 123, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/signing-cabundle.yaml", size: 123, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2878,7 +4015,7 @@ func assetsComponentsServiceCaSigningSecretYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/signing-secret.yaml", size: 144, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/signing-secret.yaml", size: 144, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2891,6 +4028,8 @@ metadata:
     openshift.io/node-selector: ""
   labels:
     openshift.io/cluster-monitoring: "true"
+    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
+    topolvm.cybozu.com/webhook: "ignore"
   name: openshift-controller-manager
 `)
 
@@ -2904,7 +4043,7 @@ func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 254, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 373, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3306,7 +4445,7 @@ func assetsCrd0000_01_routeCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_01_route.crd.yaml", size: 19360, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_01_route.crd.yaml", size: 19360, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3479,7 +4618,7 @@ func assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml", size: 9898, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml", size: 9898, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3777,7 +4916,7 @@ func assetsCrd0000_03_securityOpenshift_01_sccCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_security-openshift_01_scc.crd.yaml", size: 16038, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_security-openshift_01_scc.crd.yaml", size: 16038, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3857,7 +4996,107 @@ func assetsCrd0000_10_configOperator_01_featuregateCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_featuregate.crd.yaml", size: 3438, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_featuregate.crd.yaml", size: 3438, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: logicalvolumes.topolvm.cybozu.com
+spec:
+  group: topolvm.cybozu.com
+  names:
+    kind: LogicalVolume
+    listKind: LogicalVolumeList
+    plural: logicalvolumes
+    singular: logicalvolume
+  scope: Cluster
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: LogicalVolume is the Schema for the logicalvolumes API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: LogicalVolumeSpec defines the desired state of LogicalVolume
+            properties:
+              deviceClass:
+                type: string
+              name:
+                type: string
+              nodeName:
+                type: string
+              size:
+                anyOf:
+                - type: integer
+                - type: string
+                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                x-kubernetes-int-or-string: true
+            required:
+            - name
+            - nodeName
+            - size
+            type: object
+          status:
+            description: LogicalVolumeStatus defines the observed state of LogicalVolume
+            properties:
+              code:
+                description: A Code is an unsigned 32-bit error code as defined in
+                  the gRPC spec.
+                format: int32
+                type: integer
+              currentSize:
+                anyOf:
+                - type: integer
+                - type: string
+                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                x-kubernetes-int-or-string: true
+              message:
+                type: string
+              volumeID:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+`)
+
+func assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYamlBytes() ([]byte, error) {
+	return _assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml, nil
+}
+
+func assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml() (*asset, error) {
+	bytes, err := assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml", size: 3096, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3916,7 +5155,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 1048, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 1048, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3980,7 +5219,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1267, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1267, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4044,7 +5283,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1298, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1298, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4106,7 +5345,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostnetworkYaml() (*asset, err
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1123, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1123, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4168,7 +5407,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1166, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1166, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4232,7 +5471,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1291, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1291, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4295,7 +5534,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1213, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1213, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4322,7 +5561,7 @@ func assetsVersionMicroshiftVersionYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/version/microshift-version.yaml", size: 196, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/version/microshift-version.yaml", size: 196, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4379,63 +5618,83 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"assets/bindata_timestamp.txt":                                                  assetsBindata_timestampTxt,
-	"assets/components/hostpath-provisioner/clusterrole.yaml":                       assetsComponentsHostpathProvisionerClusterroleYaml,
-	"assets/components/hostpath-provisioner/clusterrolebinding.yaml":                assetsComponentsHostpathProvisionerClusterrolebindingYaml,
-	"assets/components/hostpath-provisioner/daemonset.yaml":                         assetsComponentsHostpathProvisionerDaemonsetYaml,
-	"assets/components/hostpath-provisioner/namespace.yaml":                         assetsComponentsHostpathProvisionerNamespaceYaml,
-	"assets/components/hostpath-provisioner/scc.yaml":                               assetsComponentsHostpathProvisionerSccYaml,
-	"assets/components/hostpath-provisioner/service-account.yaml":                   assetsComponentsHostpathProvisionerServiceAccountYaml,
-	"assets/components/hostpath-provisioner/storageclass.yaml":                      assetsComponentsHostpathProvisionerStorageclassYaml,
-	"assets/components/openshift-dns/dns/cluster-role-binding.yaml":                 assetsComponentsOpenshiftDnsDnsClusterRoleBindingYaml,
-	"assets/components/openshift-dns/dns/cluster-role.yaml":                         assetsComponentsOpenshiftDnsDnsClusterRoleYaml,
-	"assets/components/openshift-dns/dns/configmap.yaml":                            assetsComponentsOpenshiftDnsDnsConfigmapYaml,
-	"assets/components/openshift-dns/dns/daemonset.yaml":                            assetsComponentsOpenshiftDnsDnsDaemonsetYaml,
-	"assets/components/openshift-dns/dns/namespace.yaml":                            assetsComponentsOpenshiftDnsDnsNamespaceYaml,
-	"assets/components/openshift-dns/dns/service-account.yaml":                      assetsComponentsOpenshiftDnsDnsServiceAccountYaml,
-	"assets/components/openshift-dns/dns/service.yaml":                              assetsComponentsOpenshiftDnsDnsServiceYaml,
-	"assets/components/openshift-dns/node-resolver/daemonset.yaml":                  assetsComponentsOpenshiftDnsNodeResolverDaemonsetYaml,
-	"assets/components/openshift-dns/node-resolver/service-account.yaml":            assetsComponentsOpenshiftDnsNodeResolverServiceAccountYaml,
-	"assets/components/openshift-router/cluster-role-binding.yaml":                  assetsComponentsOpenshiftRouterClusterRoleBindingYaml,
-	"assets/components/openshift-router/cluster-role.yaml":                          assetsComponentsOpenshiftRouterClusterRoleYaml,
-	"assets/components/openshift-router/configmap.yaml":                             assetsComponentsOpenshiftRouterConfigmapYaml,
-	"assets/components/openshift-router/deployment.yaml":                            assetsComponentsOpenshiftRouterDeploymentYaml,
-	"assets/components/openshift-router/namespace.yaml":                             assetsComponentsOpenshiftRouterNamespaceYaml,
-	"assets/components/openshift-router/service-account.yaml":                       assetsComponentsOpenshiftRouterServiceAccountYaml,
-	"assets/components/openshift-router/service-cloud.yaml":                         assetsComponentsOpenshiftRouterServiceCloudYaml,
-	"assets/components/openshift-router/service-internal.yaml":                      assetsComponentsOpenshiftRouterServiceInternalYaml,
-	"assets/components/ovn/clusterrole.yaml":                                        assetsComponentsOvnClusterroleYaml,
-	"assets/components/ovn/clusterrolebinding.yaml":                                 assetsComponentsOvnClusterrolebindingYaml,
-	"assets/components/ovn/configmap.yaml":                                          assetsComponentsOvnConfigmapYaml,
-	"assets/components/ovn/master/daemonset.yaml":                                   assetsComponentsOvnMasterDaemonsetYaml,
-	"assets/components/ovn/master/serviceaccount.yaml":                              assetsComponentsOvnMasterServiceaccountYaml,
-	"assets/components/ovn/namespace.yaml":                                          assetsComponentsOvnNamespaceYaml,
-	"assets/components/ovn/node/daemonset.yaml":                                     assetsComponentsOvnNodeDaemonsetYaml,
-	"assets/components/ovn/node/serviceaccount.yaml":                                assetsComponentsOvnNodeServiceaccountYaml,
-	"assets/components/ovn/role.yaml":                                               assetsComponentsOvnRoleYaml,
-	"assets/components/ovn/rolebinding.yaml":                                        assetsComponentsOvnRolebindingYaml,
-	"assets/components/service-ca/clusterrole.yaml":                                 assetsComponentsServiceCaClusterroleYaml,
-	"assets/components/service-ca/clusterrolebinding.yaml":                          assetsComponentsServiceCaClusterrolebindingYaml,
-	"assets/components/service-ca/deployment.yaml":                                  assetsComponentsServiceCaDeploymentYaml,
-	"assets/components/service-ca/ns.yaml":                                          assetsComponentsServiceCaNsYaml,
-	"assets/components/service-ca/role.yaml":                                        assetsComponentsServiceCaRoleYaml,
-	"assets/components/service-ca/rolebinding.yaml":                                 assetsComponentsServiceCaRolebindingYaml,
-	"assets/components/service-ca/sa.yaml":                                          assetsComponentsServiceCaSaYaml,
-	"assets/components/service-ca/signing-cabundle.yaml":                            assetsComponentsServiceCaSigningCabundleYaml,
-	"assets/components/service-ca/signing-secret.yaml":                              assetsComponentsServiceCaSigningSecretYaml,
-	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml":    assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
-	"assets/crd/0000_01_route.crd.yaml":                                             assetsCrd0000_01_routeCrdYaml,
-	"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml": assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml,
-	"assets/crd/0000_03_security-openshift_01_scc.crd.yaml":                         assetsCrd0000_03_securityOpenshift_01_sccCrdYaml,
-	"assets/crd/0000_10_config-operator_01_featuregate.crd.yaml":                    assetsCrd0000_10_configOperator_01_featuregateCrdYaml,
-	"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":                 assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml,
-	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml":             assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml,
-	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml":       assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml,
-	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml":            assetsScc0000_20_kubeApiserverOperator_00_sccHostnetworkYaml,
-	"assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml":                assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml,
-	"assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml":             assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml,
-	"assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml":             assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml,
-	"assets/version/microshift-version.yaml":                                        assetsVersionMicroshiftVersionYaml,
+	"assets/bindata_timestamp.txt":                                                                           assetsBindata_timestampTxt,
+	"assets/components/odf-lvm/csi-driver.yaml":                                                              assetsComponentsOdfLvmCsiDriverYaml,
+	"assets/components/odf-lvm/topolvm-controller_deployment.yaml":                                           assetsComponentsOdfLvmTopolvmController_deploymentYaml,
+	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml,
+	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":      assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
+	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml":                    assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml,
+	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml":             assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml,
+	"assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml":                                    assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml,
+	"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml":        assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYaml,
+	"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml": assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
+	"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml":               assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleYaml,
+	"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml":        assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYaml,
+	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml":            assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterroleYaml,
+	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":     assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
+	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml":                   assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml,
+	"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml":            assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml,
+	"assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml":                                        assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml,
+	"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":               assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml,
+	"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":        assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
+	"assets/components/odf-lvm/topolvm-node_daemonset.yaml":                                                  assetsComponentsOdfLvmTopolvmNode_daemonsetYaml,
+	"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml":                   assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml,
+	"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
+	"assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml":                                          assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml,
+	"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml":                                     assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml,
+	"assets/components/odf-lvm/topolvm_default-storage-class.yaml":                                           assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml,
+	"assets/components/openshift-dns/dns/cluster-role-binding.yaml":                                          assetsComponentsOpenshiftDnsDnsClusterRoleBindingYaml,
+	"assets/components/openshift-dns/dns/cluster-role.yaml":                                                  assetsComponentsOpenshiftDnsDnsClusterRoleYaml,
+	"assets/components/openshift-dns/dns/configmap.yaml":                                                     assetsComponentsOpenshiftDnsDnsConfigmapYaml,
+	"assets/components/openshift-dns/dns/daemonset.yaml":                                                     assetsComponentsOpenshiftDnsDnsDaemonsetYaml,
+	"assets/components/openshift-dns/dns/namespace.yaml":                                                     assetsComponentsOpenshiftDnsDnsNamespaceYaml,
+	"assets/components/openshift-dns/dns/service-account.yaml":                                               assetsComponentsOpenshiftDnsDnsServiceAccountYaml,
+	"assets/components/openshift-dns/dns/service.yaml":                                                       assetsComponentsOpenshiftDnsDnsServiceYaml,
+	"assets/components/openshift-dns/node-resolver/daemonset.yaml":                                           assetsComponentsOpenshiftDnsNodeResolverDaemonsetYaml,
+	"assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl":                                      assetsComponentsOpenshiftDnsNodeResolverDaemonsetYamlTmpl,
+	"assets/components/openshift-dns/node-resolver/service-account.yaml":                                     assetsComponentsOpenshiftDnsNodeResolverServiceAccountYaml,
+	"assets/components/openshift-dns/node-resolver/update-node-resolver.sh":                                  assetsComponentsOpenshiftDnsNodeResolverUpdateNodeResolverSh,
+	"assets/components/openshift-router/cluster-role-binding.yaml":                                           assetsComponentsOpenshiftRouterClusterRoleBindingYaml,
+	"assets/components/openshift-router/cluster-role.yaml":                                                   assetsComponentsOpenshiftRouterClusterRoleYaml,
+	"assets/components/openshift-router/configmap.yaml":                                                      assetsComponentsOpenshiftRouterConfigmapYaml,
+	"assets/components/openshift-router/deployment.yaml":                                                     assetsComponentsOpenshiftRouterDeploymentYaml,
+	"assets/components/openshift-router/namespace.yaml":                                                      assetsComponentsOpenshiftRouterNamespaceYaml,
+	"assets/components/openshift-router/service-account.yaml":                                                assetsComponentsOpenshiftRouterServiceAccountYaml,
+	"assets/components/openshift-router/service-cloud.yaml":                                                  assetsComponentsOpenshiftRouterServiceCloudYaml,
+	"assets/components/openshift-router/service-internal.yaml":                                               assetsComponentsOpenshiftRouterServiceInternalYaml,
+	"assets/components/ovn/clusterrole.yaml":                                                                 assetsComponentsOvnClusterroleYaml,
+	"assets/components/ovn/clusterrolebinding.yaml":                                                          assetsComponentsOvnClusterrolebindingYaml,
+	"assets/components/ovn/configmap.yaml":                                                                   assetsComponentsOvnConfigmapYaml,
+	"assets/components/ovn/master/daemonset.yaml":                                                            assetsComponentsOvnMasterDaemonsetYaml,
+	"assets/components/ovn/master/serviceaccount.yaml":                                                       assetsComponentsOvnMasterServiceaccountYaml,
+	"assets/components/ovn/namespace.yaml":                                                                   assetsComponentsOvnNamespaceYaml,
+	"assets/components/ovn/node/daemonset.yaml":                                                              assetsComponentsOvnNodeDaemonsetYaml,
+	"assets/components/ovn/node/serviceaccount.yaml":                                                         assetsComponentsOvnNodeServiceaccountYaml,
+	"assets/components/ovn/role.yaml":                                                                        assetsComponentsOvnRoleYaml,
+	"assets/components/ovn/rolebinding.yaml":                                                                 assetsComponentsOvnRolebindingYaml,
+	"assets/components/service-ca/clusterrole.yaml":                                                          assetsComponentsServiceCaClusterroleYaml,
+	"assets/components/service-ca/clusterrolebinding.yaml":                                                   assetsComponentsServiceCaClusterrolebindingYaml,
+	"assets/components/service-ca/deployment.yaml":                                                           assetsComponentsServiceCaDeploymentYaml,
+	"assets/components/service-ca/ns.yaml":                                                                   assetsComponentsServiceCaNsYaml,
+	"assets/components/service-ca/role.yaml":                                                                 assetsComponentsServiceCaRoleYaml,
+	"assets/components/service-ca/rolebinding.yaml":                                                          assetsComponentsServiceCaRolebindingYaml,
+	"assets/components/service-ca/sa.yaml":                                                                   assetsComponentsServiceCaSaYaml,
+	"assets/components/service-ca/signing-cabundle.yaml":                                                     assetsComponentsServiceCaSigningCabundleYaml,
+	"assets/components/service-ca/signing-secret.yaml":                                                       assetsComponentsServiceCaSigningSecretYaml,
+	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml":                             assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
+	"assets/crd/0000_01_route.crd.yaml":                                                                      assetsCrd0000_01_routeCrdYaml,
+	"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml":                          assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml,
+	"assets/crd/0000_03_security-openshift_01_scc.crd.yaml":                                                  assetsCrd0000_03_securityOpenshift_01_sccCrdYaml,
+	"assets/crd/0000_10_config-operator_01_featuregate.crd.yaml":                                             assetsCrd0000_10_configOperator_01_featuregateCrdYaml,
+	"assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml":                                              assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml,
+	"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":                                          assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml,
+	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml":                                      assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml,
+	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml":                                assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml,
+	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml":                                     assetsScc0000_20_kubeApiserverOperator_00_sccHostnetworkYaml,
+	"assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml":                                         assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml,
+	"assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml":                                      assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml,
+	"assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml":                                      assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml,
+	"assets/version/microshift-version.yaml":                                                                 assetsVersionMicroshiftVersionYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -4482,14 +5741,31 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"bindata_timestamp.txt": {assetsBindata_timestampTxt, map[string]*bintree{}},
 		"components": {nil, map[string]*bintree{
-			"hostpath-provisioner": {nil, map[string]*bintree{
-				"clusterrole.yaml":        {assetsComponentsHostpathProvisionerClusterroleYaml, map[string]*bintree{}},
-				"clusterrolebinding.yaml": {assetsComponentsHostpathProvisionerClusterrolebindingYaml, map[string]*bintree{}},
-				"daemonset.yaml":          {assetsComponentsHostpathProvisionerDaemonsetYaml, map[string]*bintree{}},
-				"namespace.yaml":          {assetsComponentsHostpathProvisionerNamespaceYaml, map[string]*bintree{}},
-				"scc.yaml":                {assetsComponentsHostpathProvisionerSccYaml, map[string]*bintree{}},
-				"service-account.yaml":    {assetsComponentsHostpathProvisionerServiceAccountYaml, map[string]*bintree{}},
-				"storageclass.yaml":       {assetsComponentsHostpathProvisionerStorageclassYaml, map[string]*bintree{}},
+			"odf-lvm": {nil, map[string]*bintree{
+				"csi-driver.yaml":                    {assetsComponentsOdfLvmCsiDriverYaml, map[string]*bintree{}},
+				"topolvm-controller_deployment.yaml": {assetsComponentsOdfLvmTopolvmController_deploymentYaml, map[string]*bintree{}},
+				"topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
+				"topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":      {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml":                    {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml, map[string]*bintree{}},
+				"topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml":             {assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindingYaml, map[string]*bintree{}},
+				"topolvm-controller_v1_serviceaccount.yaml":                                    {assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml, map[string]*bintree{}},
+				"topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml":        {assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
+				"topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml": {assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml":               {assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleYaml, map[string]*bintree{}},
+				"topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml":        {assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_rolebindingYaml, map[string]*bintree{}},
+				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml":            {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
+				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":     {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml":                   {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml, map[string]*bintree{}},
+				"topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml":            {assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindingYaml, map[string]*bintree{}},
+				"topolvm-lvmd-config_configmap_v1.yaml":                                        {assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml, map[string]*bintree{}},
+				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":               {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
+				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":        {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-node_daemonset.yaml":                                                  {assetsComponentsOdfLvmTopolvmNode_daemonsetYaml, map[string]*bintree{}},
+				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml":                   {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
+				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-node_v1_serviceaccount.yaml":                                          {assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml, map[string]*bintree{}},
+				"topolvm-openshift-storage_namespace.yaml":                                     {assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml, map[string]*bintree{}},
+				"topolvm_default-storage-class.yaml":                                           {assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml, map[string]*bintree{}},
 			}},
 			"openshift-dns": {nil, map[string]*bintree{
 				"dns": {nil, map[string]*bintree{
@@ -4502,8 +5778,10 @@ var _bintree = &bintree{nil, map[string]*bintree{
 					"service.yaml":              {assetsComponentsOpenshiftDnsDnsServiceYaml, map[string]*bintree{}},
 				}},
 				"node-resolver": {nil, map[string]*bintree{
-					"daemonset.yaml":       {assetsComponentsOpenshiftDnsNodeResolverDaemonsetYaml, map[string]*bintree{}},
-					"service-account.yaml": {assetsComponentsOpenshiftDnsNodeResolverServiceAccountYaml, map[string]*bintree{}},
+					"daemonset.yaml":          {assetsComponentsOpenshiftDnsNodeResolverDaemonsetYaml, map[string]*bintree{}},
+					"daemonset.yaml.tmpl":     {assetsComponentsOpenshiftDnsNodeResolverDaemonsetYamlTmpl, map[string]*bintree{}},
+					"service-account.yaml":    {assetsComponentsOpenshiftDnsNodeResolverServiceAccountYaml, map[string]*bintree{}},
+					"update-node-resolver.sh": {assetsComponentsOpenshiftDnsNodeResolverUpdateNodeResolverSh, map[string]*bintree{}},
 				}},
 			}},
 			"openshift-router": {nil, map[string]*bintree{
@@ -4552,6 +5830,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml": {assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml, map[string]*bintree{}},
 			"0000_03_security-openshift_01_scc.crd.yaml":                         {assetsCrd0000_03_securityOpenshift_01_sccCrdYaml, map[string]*bintree{}},
 			"0000_10_config-operator_01_featuregate.crd.yaml":                    {assetsCrd0000_10_configOperator_01_featuregateCrdYaml, map[string]*bintree{}},
+			"0000_20_topolvm.cybozu.com_logicalvolumes.yaml":                     {assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml, map[string]*bintree{}},
 		}},
 		"scc": {nil, map[string]*bintree{
 			"0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":           {assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml, map[string]*bintree{}},

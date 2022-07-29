@@ -90,3 +90,57 @@ func ApplyStorageClasses(scs []string, render RenderFunc, params RenderParams, k
 	sc.Client = scClient(kubeconfigPath)
 	return applySCs(scs, sc, render, params)
 }
+
+type cdApplier struct {
+	Client *scclientv1.StorageV1Client
+	cd     *scv1.CSIDriver
+}
+
+func (c *cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+	var err error
+	if render != nil {
+		objBytes, err = render(objBytes, params)
+		if err != nil {
+			panic(err)
+		}
+	}
+	obj, err := runtime.Decode(scCodecs.UniversalDecoder(scv1.SchemeGroupVersion), objBytes)
+	if err != nil {
+		panic(err)
+	}
+	c.cd = obj.(*scv1.CSIDriver)
+}
+
+func (c *cdApplier) Applier() error {
+	_, err := c.Client.CSIDrivers().Get(context.TODO(), c.cd.Name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		_, err := c.Client.CSIDrivers().Create(context.TODO(), c.cd, metav1.CreateOptions{})
+		return err
+	}
+	return nil
+}
+
+func ApplyCSIDrivers(drivers []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+	applier := &cdApplier{}
+	applier.Client = scClient(kubeconfigPath)
+	return applyCDs(drivers, applier, render, params)
+}
+
+func applyCDs(cds []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+	lock.Lock()
+	defer lock.Unlock()
+
+	for _, cd := range cds {
+		klog.Infof("Applying csiDriver %s", cd)
+		objBytes, err := Asset(cd)
+		if err != nil {
+			return fmt.Errorf("error getting asset %s: %v", cd, err)
+		}
+		applier.Reader(objBytes, render, params)
+		if err := applier.Applier(); err != nil {
+			klog.Warningf("Failed to apply CSIDriver api %s: %v", cd, err)
+			return err
+		}
+	}
+	return nil
+}
