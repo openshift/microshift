@@ -11,6 +11,7 @@ require (
 	github.com/openshift/api v0.0.0-20220414050251-a83e6f8f1d50
 	github.com/openshift/build-machinery-go v0.0.0-20220121085309-f94edc2d6874
 	github.com/openshift/client-go v0.0.0-20211209144617-7385dd6338e3
+	github.com/openshift/cluster-policy-controller v0.0.0-20220103093815-8e5b36511861
 	github.com/openshift/openshift-controller-manager v0.0.0-alpha.0.0.20220106174623-2c2d50dbda3a
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
@@ -34,6 +35,8 @@ require (
 	k8s.io/kubernetes v1.23.1
 	sigs.k8s.io/yaml v1.2.0
 )
+
+require github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88
 
 require (
 	cloud.google.com/go v0.81.0 // indirect
@@ -168,7 +171,6 @@ require (
 	github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417 // indirect
 	github.com/opencontainers/selinux v1.8.2 // indirect
 	github.com/openshift/apiserver-library-go v0.0.0-20211209162547-8c11dbc46b6e // indirect
-	github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88 // indirect
 	github.com/openshift/runtime-utils v0.0.0-20200415173359-c45d4ff3f912 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/profile v1.3.0 // indirect
@@ -179,6 +181,7 @@ require (
 	github.com/prometheus/common v0.28.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/quobyte/api v0.1.8 // indirect
+	github.com/robfig/cron v1.2.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rubiojr/go-vhd v0.0.0-20200706105327-02e210299021 // indirect
 	github.com/russross/blackfriday v1.5.2 // indirect
