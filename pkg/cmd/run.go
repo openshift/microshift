@@ -137,7 +137,13 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	select {
 	case <-ready:
 		klog.Infof("MicroShift is ready")
-		daemon.SdNotify(false, daemon.SdNotifyReady)
+		if supported, err := daemon.SdNotify(false, daemon.SdNotifyReady); err != nil {
+			klog.Warningf("error sending sd_notify readiness message: %v", err)
+		} else if supported {
+			klog.Info("sent sd_notify readiness message")
+		} else {
+			klog.Info("service does not support sd_notify readiness messages")
+		}
 
 		<-sigTerm
 	case <-sigTerm:
