@@ -553,11 +553,4 @@ spec:
           name: env-overrides
           optional: true
       tolerations:
-      - key: "node-role.kubernetes.io/master"
-        operator: "Exists"
-      - key: "node.kubernetes.io/not-ready"
-        operator: "Exists"
-      - key: "node.kubernetes.io/unreachable"
-        operator: "Exists"
-      - key: "node.kubernetes.io/network-unavailable"
-        operator: "Exists"
+      - operator: "Exists"
