@@ -18,10 +18,12 @@ if [ -z "$GOPATH" ]; then
 fi
 
 OUTPUT="pkg/assets/bindata.go"
+IGNORE_REGEXES=".+.tmpl$|.+.sh$"
 "${GOPATH}"/bin/go-bindata \
            $TIMESTAMP_ARGS \
            -nocompress \
            -prefix "pkg/assets" \
            -pkg assets \
+           -ignore "$IGNORE_REGEXES" \
            -o ${OUTPUT} "./assets/..."
 gofmt -s -w "${OUTPUT}"
