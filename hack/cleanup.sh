@@ -39,10 +39,11 @@ sudo bash -c '
     echo "Removing /var/lib/microshift"
     crio wipe -f
     systemctl restart crio
+    echo "Reverting microshift-ovs-init.service configuration"
+    /usr/bin/configure-ovs.sh OpenShiftSDN
     rm -rf /var/lib/microshift
     rm -rf /var/lib/ovn
     rm -rf /var/run/ovn
-    rm -rf /var/run/openvswitch
 
     echo "Cleanup succeeded"
 '
