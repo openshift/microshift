@@ -92,6 +92,34 @@ download_release() {
 }
 
 
+# Greps a Golang pseudoversion from input.
+grep_pseudoversion() {
+    local line=$1
+
+    echo "${line}" | grep -Po "v[0-9]+\.(0\.0-|\d+\.\d+-([^+]*\.)?0\.)\d{14}-[A-Za-z0-9]+(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?"
+}
+
+# Updates a replace directive using an embedded component's commit.
+# Caches component pseudoversions for faster processing.
+declare -A pseudoversions
+replace_using_component_commit() {
+    local modulepath=$1
+    local new_modulepath=$2
+    local component=$3
+
+    if [ "${pseudoversions[${component}]+foo}" ]; then
+        echo "go mod edit -replace ${modulepath}=${new_modulepath}@${pseudoversions[${component}]}"
+        go mod edit -replace "${modulepath}=${new_modulepath}@${pseudoversions[${component}]}"
+    else
+        commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
+        echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
+        go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
+        go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
+        pseudoversion=$(grep_pseudoversion "$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")")
+        pseudoversions["${component}"]="${pseudoversion}"
+    fi
+}
+
 # Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
 # and version as per the staged checkout of ${component}.
 update_modulepath_version_from_release() {
@@ -103,12 +131,8 @@ update_modulepath_version_from_release() {
         path="${modulepath#go.etcd.io/etcd}"
     fi
     repo=$( cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url )
-    commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
     new_modulepath="${repo#https://}${path}"
-
-    echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
-    go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
-    go mod tidy
+    replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}"
 }
 
 # Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
@@ -117,10 +141,7 @@ update_modulepath_to_kubernetes_staging() {
     local modulepath=$1
 
     new_modulepath="github.com/openshift/kubernetes/staging/src/${modulepath}"
-    commit=$( cd "${STAGING_DIR}/kubernetes" && git rev-parse HEAD )
-    echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
-    go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
-    go mod tidy
+    replace_using_component_commit "${modulepath}" "${new_modulepath}" "kubernetes"
 }
 
 # Returns the line (including trailing comment) in the #{gomod_file} containing the ReplaceDirective for ${module_path}
@@ -150,10 +171,7 @@ update_modulepath_version_from_component() {
     replacement=$(echo "${replace_directive}" | sed -E "s|.*=>[[:space:]]*(.*)[[:space:]]*|\1|")
     if [[ "${replacement}" =~ ^./staging ]]; then
         new_modulepath=$(echo "${replacement}" | sed 's|^./staging/|github.com/openshift/kubernetes/staging/|')
-        commit=$( cd "${STAGING_DIR}/kubernetes" && git rev-parse HEAD )
-        echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
-        go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
-        go mod tidy
+        replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}"
     else
         echo "go mod edit -replace ${modulepath}=${replacement/ /@}"
         go mod edit -replace "${modulepath}=${replacement/ /@}"
