@@ -15,11 +15,14 @@
 #
 
 set -o errexit
+set -o errtrace
 set -o nounset
 set -o pipefail
 
 shopt -s expand_aliases
 shopt -s extglob
+
+trap 'echo "Script exited with error."' ERR
 
 # debugging options
 #trap 'echo "# $BASH_COMMAND"' DEBUG
@@ -207,6 +210,14 @@ valid_component_or_exit() {
     fi
 }
 
+# Return all o/k staging repos (borrowed from k/k's hack/lib/util.sh)
+list_staging_repos() {
+  (
+    cd "${STAGING_DIR}/kubernetes/staging/src/k8s.io" && \
+    find . -mindepth 1 -maxdepth 1 -type d | cut -c 3- | sort
+  )
+}
+
 # Updates MicroShift's go.mod file by updating each ReplaceDirective's
 # new modulepath-version with that of one of the embedded components.
 # The go.mod file needs to specify which component to take this data from
@@ -222,6 +233,7 @@ update_go_mod() {
 
     title "# Updating go.mod"
 
+    # Update existing replace directives
     replaced_modulepaths=$(go mod edit -json | jq -r '.Replace // []' | jq -r '.[].Old.Path' | xargs)
     for modulepath in ${replaced_modulepaths}; do
         current_replace_directive=$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")
@@ -249,6 +261,16 @@ update_go_mod() {
             echo "skipping modulepath ${modulepath}: no or unknown command [${comment}]"
             ;;
         esac
+    done
+
+    # Check if there exists a module in o/k staging for which we have a RequireDirective, but no
+    # ReplaceDirective, and if so, add a new ReplaceDirective
+    require_filter='(.Version != null) and (.Version != "v0.0.0") and (.Version != "v0.0.0-00010101000000-000000000000")'
+    required_modulepaths=$(go mod edit -json | jq -r ".Require // [] | sort | .[] | select(${require_filter}) | .Path")
+    for repo in $(list_staging_repos); do
+        if [[ " ${required_modulepaths} " =~ " k8s.io/${repo} " ]] && [[ ! " ${replaced_modulepaths} " =~ " k8s.io/${repo} " ]]; then
+            replace_using_component_commit "k8s.io/${repo}" "github.com/openshift/kubernetes/staging/src/k8s.io/${repo}" "kubernetes" || true
+        fi
     done
 
     popd >/dev/null
