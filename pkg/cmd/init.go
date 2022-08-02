@@ -148,9 +148,5 @@ func initKubeconfig(cfg *config.MicroshiftConfig) error {
 		"system:node:"+cfg.NodeName, []string{"system:nodes"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(filepath.Join(cfg.DataDir, "/resources/kube-proxy/kubeconfig"),
-		"system:kube-proxy", []string{"system:nodes"}, cfg.Cluster.URL); err != nil {
-		return err
-	}
 	return nil
 }

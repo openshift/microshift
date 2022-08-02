@@ -114,7 +114,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 			util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
 		}
 		util.Must(m.AddService(node.NewKubeletServer(cfg)))
-		util.Must(m.AddService(node.NewKubeProxyServer(cfg)))
 	}
 
 	klog.Infof("Starting Microshift")

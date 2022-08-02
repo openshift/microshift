@@ -68,8 +68,6 @@ github.com/Microsoft/go-winio/vhd
 ## explicit; go 1.13
 github.com/Microsoft/hcsshim
 github.com/Microsoft/hcsshim/computestorage
-github.com/Microsoft/hcsshim/hcn
-github.com/Microsoft/hcsshim/internal/cni
 github.com/Microsoft/hcsshim/internal/cow
 github.com/Microsoft/hcsshim/internal/hcs
 github.com/Microsoft/hcsshim/internal/hcs/schema1
@@ -82,8 +80,6 @@ github.com/Microsoft/hcsshim/internal/logfields
 github.com/Microsoft/hcsshim/internal/longpath
 github.com/Microsoft/hcsshim/internal/mergemaps
 github.com/Microsoft/hcsshim/internal/oc
-github.com/Microsoft/hcsshim/internal/regstate
-github.com/Microsoft/hcsshim/internal/runhcs
 github.com/Microsoft/hcsshim/internal/safefile
 github.com/Microsoft/hcsshim/internal/timeout
 github.com/Microsoft/hcsshim/internal/vmcompute
@@ -637,7 +633,6 @@ github.com/mitchellh/go-wordwrap
 github.com/mitchellh/mapstructure
 # github.com/moby/ipvs v1.0.1
 ## explicit; go 1.13
-github.com/moby/ipvs
 # github.com/moby/spdystream v0.2.0
 ## explicit; go 1.13
 github.com/moby/spdystream
@@ -2403,9 +2398,6 @@ k8s.io/kube-openapi/pkg/validation/spec
 k8s.io/kube-openapi/pkg/validation/strfmt
 k8s.io/kube-openapi/pkg/validation/strfmt/bson
 k8s.io/kube-openapi/pkg/validation/validate
-# k8s.io/kube-proxy v0.0.0 => github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy v0.0.0-20220510163048-3afdacbd0183
-## explicit; go 1.16
-k8s.io/kube-proxy/config/v1alpha1
 # k8s.io/kube-scheduler v0.0.0 => github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20220510163048-3afdacbd0183
 ## explicit; go 1.16
 k8s.io/kube-scheduler/config/v1beta2
@@ -2451,7 +2443,6 @@ k8s.io/kubernetes/cmd/kube-apiserver/app/options
 k8s.io/kubernetes/cmd/kube-controller-manager/app
 k8s.io/kubernetes/cmd/kube-controller-manager/app/config
 k8s.io/kubernetes/cmd/kube-controller-manager/app/options
-k8s.io/kubernetes/cmd/kube-proxy/app
 k8s.io/kubernetes/cmd/kube-scheduler/app
 k8s.io/kubernetes/cmd/kube-scheduler/app/config
 k8s.io/kubernetes/cmd/kube-scheduler/app/options
@@ -2914,22 +2905,13 @@ k8s.io/kubernetes/pkg/probe/grpc
 k8s.io/kubernetes/pkg/probe/http
 k8s.io/kubernetes/pkg/probe/tcp
 k8s.io/kubernetes/pkg/proxy
-k8s.io/kubernetes/pkg/proxy/apis
-k8s.io/kubernetes/pkg/proxy/apis/config
-k8s.io/kubernetes/pkg/proxy/apis/config/scheme
-k8s.io/kubernetes/pkg/proxy/apis/config/v1alpha1
-k8s.io/kubernetes/pkg/proxy/apis/config/validation
 k8s.io/kubernetes/pkg/proxy/config
 k8s.io/kubernetes/pkg/proxy/healthcheck
 k8s.io/kubernetes/pkg/proxy/iptables
-k8s.io/kubernetes/pkg/proxy/ipvs
 k8s.io/kubernetes/pkg/proxy/metaproxier
 k8s.io/kubernetes/pkg/proxy/metrics
-k8s.io/kubernetes/pkg/proxy/userspace
 k8s.io/kubernetes/pkg/proxy/util
 k8s.io/kubernetes/pkg/proxy/util/iptables
-k8s.io/kubernetes/pkg/proxy/winkernel
-k8s.io/kubernetes/pkg/proxy/winuserspace
 k8s.io/kubernetes/pkg/quota/v1/evaluator/core
 k8s.io/kubernetes/pkg/quota/v1/install
 k8s.io/kubernetes/pkg/registry/admissionregistration/mutatingwebhookconfiguration
@@ -3133,12 +3115,9 @@ k8s.io/kubernetes/pkg/util/flock
 k8s.io/kubernetes/pkg/util/goroutinemap
 k8s.io/kubernetes/pkg/util/goroutinemap/exponentialbackoff
 k8s.io/kubernetes/pkg/util/hash
-k8s.io/kubernetes/pkg/util/ipset
 k8s.io/kubernetes/pkg/util/iptables
-k8s.io/kubernetes/pkg/util/ipvs
 k8s.io/kubernetes/pkg/util/labels
 k8s.io/kubernetes/pkg/util/maps
-k8s.io/kubernetes/pkg/util/netsh
 k8s.io/kubernetes/pkg/util/node
 k8s.io/kubernetes/pkg/util/oom
 k8s.io/kubernetes/pkg/util/parsers
@@ -3337,7 +3316,6 @@ k8s.io/utils/nsenter
 k8s.io/utils/path
 k8s.io/utils/pointer
 k8s.io/utils/strings
-k8s.io/utils/strings/slices
 k8s.io/utils/trace
 # sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.30
 ## explicit; go 1.17
@@ -3498,7 +3476,6 @@ sigs.k8s.io/yaml
 # k8s.io/kube-aggregator => github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20220510163048-3afdacbd0183
 # k8s.io/kube-controller-manager => github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager v0.0.0-20220510163048-3afdacbd0183
 # k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65
-# k8s.io/kube-proxy => github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy v0.0.0-20220510163048-3afdacbd0183
 # k8s.io/kube-scheduler => github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20220510163048-3afdacbd0183
 # k8s.io/kubectl => github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20220510163048-3afdacbd0183
 # k8s.io/kubelet => github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20220510163048-3afdacbd0183

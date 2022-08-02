@@ -75,7 +75,7 @@ When deciding between different design options, we follow the following principl
   * openshift-dns, openshift-router, service-ca, local storage provider
 * MicroShift instances (processes) run directly on the host or containerized on Podman. They can take on the roles of Control Plane, Node, or both:
   * Instances with Control Plane role run etcd and the Kubernetes and OpenShift control plane services. As these services don't require a kubelet, pure Control Plane instances are not nodes in the Kubernetes sense and require fewer system privileges.
-  * Instances with Node role run a kubelet (and thus register as node) and kube-proxy and interface with CRI-O for running workloads. They may thus require higher system privileges.
+  * Instances with Node role run a kubelet (and thus register as node) and interface with CRI-O for running workloads. They may thus require higher system privileges.
 * While it's possible to run a single MicroShift instance with both Control Plane and Node roles, there may be reasons to run two instances - one Control Plane and one Node - on the same host, e.g. to run the Control Plane with fewer privileges for security reasons. Implementation decisions should consider this.
 * MicroShift does not bundle any OS user space! Bundling makes maintenance and security hard, breaks compliance. Instead, user space is provided by the host OS, the container image base layer or a sidecar container.
 
