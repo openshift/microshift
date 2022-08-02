@@ -1000,7 +1000,7 @@ spec:
         - /lvmd
         - --config=/etc/topolvm/lvmd.yaml
         - --container=true
-        image: {{ .Images.odf_topolvm_rhel8 }}  #registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .ReleaseImage.odf_topolvm_rhel8 }}  #registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
         name: lvmd
         resources:
@@ -1026,7 +1026,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: {{ .Images.odf_topolvm_rhel8 }}  # registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .ReleaseImage.odf_topolvm_rhel8 }}  # registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -1066,7 +1066,7 @@ spec:
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.cybozu.com/node/csi-topolvm.sock
-        image: {{ .Images.ose_csi_node_registrar }}  # registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:376f21cfa8308dc1b61a3e8401b7023d903eda768912699f39403de742ab88b1
+        image: {{ .ReleaseImage.ose_csi_node_registrar }}  # registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:376f21cfa8308dc1b61a3e8401b7023d903eda768912699f39403de742ab88b1
         imagePullPolicy: IfNotPresent
         lifecycle:
           preStop:
@@ -1086,7 +1086,7 @@ spec:
           name: registration-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .Images.ose_csi_livenessprobe }} # registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        image: {{ .ReleaseImage.ose_csi_livenessprobe }} # registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
         imagePullPolicy: IfNotPresent
         name: liveness-probe
         resources: {}
@@ -1103,7 +1103,7 @@ spec:
         - -c
         - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
           sleep 5; done
-        image: {{ .Images.odf_lvm_operator }} # registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        image: {{ .ReleaseImage.odf_lvm_operator }} # registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
         imagePullPolicy: IfNotPresent
         name: file-checker
         resources: {}
@@ -1161,7 +1161,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5702, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5732, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
