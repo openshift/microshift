@@ -14,22 +14,20 @@ package controllers
 
 import (
 	"context"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	clusterpolicycontroller "github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller"
 	clusterpolicyversion "github.com/openshift/cluster-policy-controller/pkg/version"
 	"github.com/openshift/library-go/pkg/controller/controllercmd"
 	"github.com/openshift/microshift/pkg/config"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/klog/v2"
+	"k8s.io/component-base/cli"
 )
 
 type ClusterPolicyController struct {
 	config     *controllercmd.ControllerCommandConfig
+	flags      *controllercmd.ControllerFlags
 	kubeconfig string
 }
 
@@ -45,35 +43,53 @@ func (s *ClusterPolicyController) Dependencies() []string { return []string{"kub
 func (s *ClusterPolicyController) configure(cfg *config.MicroshiftConfig) {
 
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+	s.writeConfig(cfg)
+
 	// Use NewControllerCommandConfig to create a controller configuration struct
 	// with default values.
 	s.config = controllercmd.NewControllerCommandConfig(s.Name(), clusterpolicyversion.Get(), clusterpolicycontroller.RunClusterPolicyController)
+
+	flags := controllercmd.NewControllerFlags()
+	flags.ConfigFile = filepath.Join(cfg.DataDir, "resources", "cluster-policy-controller", "config", "config.yaml")
+	flags.KubeConfigFile = s.kubeconfig
+	flags.Validate()
+	s.flags = flags
+
 }
 
 func (s *ClusterPolicyController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
-	// run readiness check
-	restConfig, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
-	if err != nil {
-		return err
-	}
-	if err := rest.SetKubernetesDefaults(restConfig); err != nil {
-		return err
-	}
-	restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
-
-	kubeClient, err := kubernetes.NewForConfig(restConfig)
-
-	if err := clusterpolicycontroller.WaitForHealthyAPIServer(kubeClient.Discovery().RESTClient()); err != nil {
-		klog.Fatal(err)
-		return err
-	}
+	cmd := s.config.NewCommandWithContext(ctx)
+	s.flags.AddFlags(cmd)
+	cmd.Use = s.Name()
+	cmd.Short = "Start the cluster-policy-controller"
 
 	go func() {
-		s.config.StartController(ctx)
+		cli.Run(cmd)
 	}()
 
 	<-ctx.Done()
 	return ctx.Err()
+}
+
+func (s *ClusterPolicyController) writeConfig(cfg *config.MicroshiftConfig) error {
+	// OCM config contains a list of controllers to enable/disable.
+	// If no list is specified, all controllers are started (default).
+	// If a non-zero length list is specified, only controllers enabled in the list are started.  Unlisted controllers
+	// are therefore disabled.  Enable controllers by appending their name to `controllers:`. Disable a controller by
+	// prepending "-" to the name, e.g. `controllers: ["-openshift.io/build"]
+	// Disabled OCM controllers are included in the list for documentary purposes.
+	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
+kind: OpenShiftControllerManagerConfig
+kubeClientConfig:
+  kubeConfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+controllers:
+- "-openshift.io/resourcequota"
+- "-openshift.io/cluster-quota-reconciliation"
+`)
+
+	path := filepath.Join(cfg.DataDir, "resources", "cluster-policy-controller", "config", "config.yaml")
+	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
+	return ioutil.WriteFile(path, data, 0644)
 }

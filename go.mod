@@ -12,6 +12,7 @@ require (
 	github.com/openshift/build-machinery-go v0.0.0-20220121085309-f94edc2d6874
 	github.com/openshift/client-go v0.0.0-20211209144617-7385dd6338e3
 	github.com/openshift/cluster-policy-controller v0.0.0-20220103093815-8e5b36511861
+	github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88
 	github.com/openshift/openshift-controller-manager v0.0.0-alpha.0.0.20220106174623-2c2d50dbda3a
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
@@ -26,7 +27,7 @@ require (
 	k8s.io/apiserver v0.23.1
 	k8s.io/cli-runtime v0.23.1
 	k8s.io/client-go v0.23.1
-	k8s.io/component-base v0.23.1
+	k8s.io/component-base v0.24.3
 	k8s.io/controller-manager v0.23.1 // indirect
 	k8s.io/klog/v2 v2.40.1
 	k8s.io/kube-aggregator v0.23.1 // indirect
@@ -35,8 +36,6 @@ require (
 	k8s.io/kubernetes v1.23.1
 	sigs.k8s.io/yaml v1.2.0
 )
-
-require github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88
 
 require (
 	cloud.google.com/go v0.81.0 // indirect

@@ -2292,8 +2292,9 @@ k8s.io/cluster-bootstrap/token/jws
 k8s.io/cluster-bootstrap/token/util
 k8s.io/cluster-bootstrap/util/secrets
 k8s.io/cluster-bootstrap/util/tokens
-# k8s.io/component-base v0.23.1 => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20220510163048-3afdacbd0183
+# k8s.io/component-base v0.24.3 => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20220510163048-3afdacbd0183
 ## explicit; go 1.16
+k8s.io/component-base/cli
 k8s.io/component-base/cli/flag
 k8s.io/component-base/cli/globalflag
 k8s.io/component-base/codec
