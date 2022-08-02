@@ -25,12 +25,14 @@ virt-install \
 In the OS installation wizard, set the following options:
 - Root password and `microshift` administrator user
 - Select Installation Destination
-  - Under _Storage Configuration_ sub-section, select "Custom" radial button.
-  - Select "Done", this will open a window to configure partitions.
-  - Under "New Red hat Enterprise Linux 8.x Installation," click "Click here to create them automatically"
-  - Select the root partition (`/`).  On the right side of the menu, set "Desired Capacity" to 30.
-  - Click "Done" button.
-  - At the "Summary of Changes" window, select "Accept Changes"
+    - Under "Storage Configuration" sub-section, select "Custom" radial button.
+    - Select "Done", this will open a window to configure partitions.
+    - Under "New Red hat Enterprise Linux 8.x Installation," click "Click here to create them automatically"
+    - Select the root partition (`/`). On the right side of the menu, set "Desired Capacity" to 30. This will preserve
+      10Gb of allocatable storage for dynamically provisioned logical volumes. Adjust capacity as desired. MicroShift's
+      default CSI provisioner requires at least 1Gb of unallocated storage in the volume group.
+    - Click "Done" button.
+    - At the "Summary of Changes" window, select "Accept Changes"
 - Connect network card and set the hostname (i.e. `microshift-dev.localdomain`)
 - Register the system with Red Hat using your credentials (toggle off Red Hat Insights connection)
 - In the Software Selection, select Minimal Install base environment and toggle on Headless Management to enable Cockpit
