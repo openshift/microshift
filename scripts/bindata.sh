@@ -17,11 +17,6 @@ if [ -z "$GOPATH" ]; then
     export GOPATH=$(go env GOPATH)
 fi
 
-# Ensure the assets have the expected permissions before we package
-# them, in case the user's umask changes them from the desired
-# settings.
-find ./assets -name '*.yaml' | xargs chmod 0644
-
 OUTPUT="pkg/assets/bindata.go"
 IGNORE_REGEXES=".+.tmpl$|.+.sh$"
 "${GOPATH}"/bin/go-bindata \
@@ -29,6 +24,7 @@ IGNORE_REGEXES=".+.tmpl$|.+.sh$"
            -nocompress \
            -prefix "pkg/assets" \
            -pkg assets \
+           -mode '0644' \
            -ignore "$IGNORE_REGEXES" \
            -o ${OUTPUT} "./assets/..."
 gofmt -s -w "${OUTPUT}"
