@@ -1,6 +1,8 @@
 package components
 
 import (
+	"path/filepath"
+
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"k8s.io/klog/v2"
@@ -64,12 +66,13 @@ func startOVNKubernetes(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 		"ClusterCIDR":    cfg.Cluster.ClusterCIDR,
 		"ServiceCIDR":    cfg.Cluster.ServiceCIDR,
 		"KubeconfigPath": kubeconfigPath,
+		"KubeconfigDir":  filepath.Join(cfg.DataDir, "/resources/kubeadmin"),
 	}
-	if err := assets.ApplyConfigMaps(cm, renderOVNKConfigMap, params, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(cm, renderOVNKManifests, params, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(apps, renderReleaseImage, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(apps, renderOVNKManifests, params, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
 		return err
 	}

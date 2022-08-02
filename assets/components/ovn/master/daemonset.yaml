@@ -458,7 +458,7 @@ spec:
           name: run-ovn
         - mountPath: /run/ovnkube-config/
           name: ovnkube-config
-        - mountPath: /var/lib/microshift/resources/kubeadmin
+        - mountPath: {{.KubeconfigDir}}
           name: kubeconfig
         - mountPath: /env
           name: env-overrides
@@ -544,7 +544,7 @@ spec:
 
       - name: kubeconfig
         hostPath:
-          path: /var/lib/microshift/resources/kubeadmin
+          path: {{.KubeconfigDir}}
       - name: ovnkube-config
         configMap:
           name: ovnkube-config

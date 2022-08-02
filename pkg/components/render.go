@@ -43,17 +43,19 @@ func renderDNSService(b []byte, p assets.RenderParams) ([]byte, error) {
 	return byteBuff.Bytes(), nil
 }
 
-func renderOVNKConfigMap(b []byte, p assets.RenderParams) ([]byte, error) {
+func renderOVNKManifests(b []byte, p assets.RenderParams) ([]byte, error) {
 	data := struct {
 		ReleaseImage   assets.RenderParams
 		ClusterCIDR    string
 		ServiceCIDR    string
 		KubeconfigPath string
+		KubeconfigDir  string
 	}{
 		ReleaseImage:   release.Image,
 		ClusterCIDR:    p["ClusterCIDR"],
 		ServiceCIDR:    p["ServiceCIDR"],
 		KubeconfigPath: p["KubeconfigPath"],
+		KubeconfigDir:  p["KubeconfigDir"],
 	}
 	tpl := template.Must(template.New("cm").Parse(string(b)))
 	var byteBuff bytes.Buffer
