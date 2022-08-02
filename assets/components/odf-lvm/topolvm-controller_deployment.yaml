@@ -26,7 +26,7 @@ spec:
       - command:
         - /topolvm-controller
         - --cert-dir=/certs
-        image: {{ .ReleaseImage.odf_topolvm_rhel8 }} # registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .ReleaseImage.odf_topolvm_rhel8 }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -80,7 +80,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        image: {{ .ReleaseImage.ose_csi_ext_provisioner }} # registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:42563eb25efb2b6f277944b627bea420fa58fe950b46a1bd1487122b8a387e75
+        image: {{ .ReleaseImage.ose_csi_ext_provisioner }}
         imagePullPolicy: IfNotPresent
         name: csi-provisioner
         resources:
@@ -94,7 +94,7 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.ose_csi_ext_resizer }} # registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
+        image: {{ .ReleaseImage.ose_csi_ext_resizer }}
         imagePullPolicy: IfNotPresent
         name: csi-resizer
         resources: {}
@@ -105,7 +105,7 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.ose_csi_livenessprobe }} # registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        image: {{ .ReleaseImage.ose_csi_livenessprobe }}
         imagePullPolicy: IfNotPresent
         name: liveness-probe
         resources: {}
@@ -121,7 +121,7 @@ spec:
         - -c
         - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
           -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-        image: {{ .ReleaseImage.odf_lvm_operator }} # registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        image: {{ .ReleaseImage.odf_lvm_operator }}
         imagePullPolicy: IfNotPresent
         name: self-signed-cert-generator
         resources: {}
