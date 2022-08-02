@@ -86,7 +86,7 @@ rm -f openshift-client-linux.tar.gz
 ### Runtime Prerequisites
 Run the following commands to install CRI-O.
 ```bash
-sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms fast-datapath-for-rhel-8-$(uname -i)-rpms
+sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
 sudo dnf install -y cri-o cri-tools openvswitch2.16 NetworkManager-ovs
 sudo systemctl enable crio --now
 ```
