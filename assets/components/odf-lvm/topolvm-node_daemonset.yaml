@@ -20,7 +20,7 @@ spec:
         - /lvmd
         - --config=/etc/topolvm/lvmd.yaml
         - --container=true
-        image: {{ .Images.odf_lvm_topolvm }}  #registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .Images.odf_topolvm_rhel8 }}  #registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
         name: lvmd
         resources:
@@ -46,7 +46,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: {{ .Images.odf_lvm_topolvm }}  # registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .Images.odf_topolvm_rhel8 }}  # registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3

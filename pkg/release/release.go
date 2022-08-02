@@ -26,7 +26,7 @@ var Image = map[string]string{
 	"pause":                   "quay.io/microshift/pause:" + Base,
 	"service_ca_operator":     "quay.io/microshift/service-ca-operator:" + Base,
 	"ovn_kubernetes":          "quay.io/microshift/ovn-kubernetes-singlenode:" + Base,
-	"odf_lvm_topolvm":         "registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64",
+	"odf_topolvm_rhel8":       "registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64",
 	"odf_lvm_operator":        "registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb",
 	"ose_csi_ext_provisioner": "registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:42563eb25efb2b6f277944b627bea420fa58fe950b46a1bd1487122b8a387e75",
 	"ose_csi_ext_resizer":     "registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21",
