@@ -109,7 +109,7 @@ update: update-bindata
 .PHONY: verify-bindata
 verify: verify-bindata
 verify-bindata: update-bindata
-	git diff --exit-code pkg/assets/bindata.go || echo "Found changes in pkg/assets/bindata.go, run 'make update-bindata' and commit the changes"
+	./scripts/verify_bindata.sh
 
 ###############################
 # post install validate       #

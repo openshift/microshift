@@ -141,7 +141,7 @@ func assetsBindata_timestampTxt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
