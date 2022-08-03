@@ -119,6 +119,7 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 
 	if err := assets.ApplyNamespaces([]string{
 		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
+		"assets/core/namespace-openshift-kube-controller-manager.yaml",
 	}, s.kubeconfig); err != nil {
 		klog.Fatalf("failed to apply openshift namespaces %v", err)
 	}

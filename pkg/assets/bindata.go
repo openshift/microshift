@@ -61,18 +61,16 @@
 // assets/components/service-ca/sa.yaml
 // assets/components/service-ca/signing-cabundle.yaml
 // assets/components/service-ca/signing-secret.yaml
-// assets/core/0000_10_csr_approver_clusterrole.yaml
-// assets/core/0000_11_csr_approver_clusterrolebinding.yaml
-// assets/core/0000_20_namespace-security-allocation-controller-clusterrole.yaml
-// assets/core/0000_21_namespace-security-allocation-controller-clusterrolebinding.yaml
-// assets/core/0000_30_podsecurity-admission-label-syncer-controller-clusterrole.yaml
-// assets/core/0000_31_podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml
 // assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
+// assets/core/csr_approver_clusterrole.yaml
+// assets/core/csr_approver_clusterrolebinding.yaml
+// assets/core/namespace-openshift-kube-controller-manager.yaml
+// assets/core/namespace-security-allocation-controller-clusterrole.yaml
+// assets/core/namespace-security-allocation-controller-clusterrolebinding.yaml
 // assets/crd/0000_01_route.crd.yaml
 // assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml
 // assets/crd/0000_03_security-openshift_01_scc.crd.yaml
 // assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
-// assets/crd/0000_10_config-operator_01_featuregate.crd.yaml
 // assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
@@ -135,7 +133,7 @@ func (fi bindataFileInfo) Sys() interface{} {
 	return nil
 }
 
-var _assetsBindata_timestampTxt = []byte(`1654679854
+var _assetsBindata_timestampTxt = []byte(`1658914160
 `)
 
 func assetsBindata_timestampTxtBytes() ([]byte, error) {
@@ -148,7 +146,7 @@ func assetsBindata_timestampTxt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -176,7 +174,7 @@ func assetsComponentsOdfLvmCsiDriverYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/csi-driver.yaml", size: 247, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/csi-driver.yaml", size: 247, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -335,7 +333,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4590, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4590, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -408,7 +406,7 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 698, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 698, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -437,7 +435,7 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 288, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 288, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -470,7 +468,7 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_roleYaml(
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml", size: 281, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml", size: 281, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -499,7 +497,7 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_rolebindi
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 310, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 310, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -520,7 +518,7 @@ func assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml() (*asset, er
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml", size: 103, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml", size: 103, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -617,7 +615,7 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clust
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 1015, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 1015, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -646,7 +644,7 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_clust
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 298, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 298, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -704,7 +702,7 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleY
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml", size: 538, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml", size: 538, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -734,7 +732,7 @@ func assetsComponentsOdfLvmTopolvmCsiProvisioner_rbacAuthorizationK8sIo_v1_roleb
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 315, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 315, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -797,7 +795,7 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 569, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 569, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -826,7 +824,7 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 290, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 290, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -860,7 +858,7 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_roleYaml(
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml", size: 258, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml", size: 258, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -890,7 +888,7 @@ func assetsComponentsOdfLvmTopolvmCsiResizer_rbacAuthorizationK8sIo_v1_rolebindi
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 307, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml", size: 307, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -921,7 +919,7 @@ func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml", size: 299, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml", size: 299, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -951,7 +949,7 @@ func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleY
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 235, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 235, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -980,7 +978,7 @@ func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleb
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 278, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 278, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1168,7 +1166,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5522, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5522, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1221,7 +1219,7 @@ func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 466, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 466, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1250,7 +1248,7 @@ func assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebind
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 270, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml", size: 270, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1273,7 +1271,7 @@ func assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml", size: 99, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml", size: 99, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1299,7 +1297,7 @@ func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml", size: 293, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml", size: 293, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1329,7 +1327,7 @@ func assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm_default-storage-class.yaml", size: 334, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm_default-storage-class.yaml", size: 334, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1357,7 +1355,7 @@ func assetsComponentsOpenshiftDnsDnsClusterRoleBindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role-binding.yaml", size: 223, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role-binding.yaml", size: 223, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1411,7 +1409,7 @@ func assetsComponentsOpenshiftDnsDnsClusterRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role.yaml", size: 492, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/cluster-role.yaml", size: 492, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1457,7 +1455,7 @@ func assetsComponentsOpenshiftDnsDnsConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/configmap.yaml", size: 610, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/configmap.yaml", size: 610, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1580,7 +1578,7 @@ func assetsComponentsOpenshiftDnsDnsDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/daemonset.yaml", size: 3217, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/daemonset.yaml", size: 3217, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1611,7 +1609,7 @@ func assetsComponentsOpenshiftDnsDnsNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/namespace.yaml", size: 536, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/namespace.yaml", size: 536, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1633,7 +1631,7 @@ func assetsComponentsOpenshiftDnsDnsServiceAccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service-account.yaml", size: 85, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service-account.yaml", size: 85, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1680,7 +1678,7 @@ func assetsComponentsOpenshiftDnsDnsServiceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service.yaml", size: 691, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/service.yaml", size: 691, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1824,7 +1822,7 @@ func assetsComponentsOpenshiftDnsNodeResolverDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/daemonset.yaml", size: 4823, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/daemonset.yaml", size: 4823, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1846,7 +1844,7 @@ func assetsComponentsOpenshiftDnsNodeResolverServiceAccountYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/service-account.yaml", size: 95, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/node-resolver/service-account.yaml", size: 95, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1876,7 +1874,7 @@ func assetsComponentsOpenshiftRouterClusterRoleBindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role-binding.yaml", size: 329, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role-binding.yaml", size: 329, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1954,7 +1952,7 @@ func assetsComponentsOpenshiftRouterClusterRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role.yaml", size: 883, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/cluster-role.yaml", size: 883, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1978,7 +1976,7 @@ func assetsComponentsOpenshiftRouterConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/configmap.yaml", size: 168, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/configmap.yaml", size: 168, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2135,7 +2133,7 @@ func assetsComponentsOpenshiftRouterDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4746, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4746, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2167,7 +2165,7 @@ func assetsComponentsOpenshiftRouterNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 617, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 617, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2191,7 +2189,7 @@ func assetsComponentsOpenshiftRouterServiceAccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-account.yaml", size: 213, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-account.yaml", size: 213, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2230,7 +2228,7 @@ func assetsComponentsOpenshiftRouterServiceCloudYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 567, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 567, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2275,7 +2273,7 @@ func assetsComponentsOpenshiftRouterServiceInternalYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-internal.yaml", size: 727, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-internal.yaml", size: 727, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2477,7 +2475,7 @@ func assetsComponentsOvnClusterroleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/clusterrole.yaml", size: 2771, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/clusterrole.yaml", size: 2771, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2521,7 +2519,7 @@ func assetsComponentsOvnClusterrolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/clusterrolebinding.yaml", size: 663, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/clusterrolebinding.yaml", size: 663, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2574,7 +2572,7 @@ func assetsComponentsOvnConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/configmap.yaml", size: 844, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/configmap.yaml", size: 844, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3083,11 +3081,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15752, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
-=======
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 20008, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
->>>>>>> dbec7236 (Add RBAC for cluster policy controllers)
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15752, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3110,7 +3104,7 @@ func assetsComponentsOvnMasterServiceaccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/serviceaccount.yaml", size: 122, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/serviceaccount.yaml", size: 122, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3142,7 +3136,7 @@ func assetsComponentsOvnNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/namespace.yaml", size: 542, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/namespace.yaml", size: 542, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3282,7 +3276,7 @@ func assetsComponentsOvnNodeDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3736, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3736, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3305,7 +3299,7 @@ func assetsComponentsOvnNodeServiceaccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/node/serviceaccount.yaml", size: 116, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/node/serviceaccount.yaml", size: 116, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3359,7 +3353,7 @@ func assetsComponentsOvnRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/role.yaml", size: 615, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/role.yaml", size: 615, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3405,7 +3399,7 @@ func assetsComponentsOvnRolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/rolebinding.yaml", size: 699, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/rolebinding.yaml", size: 699, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3486,7 +3480,7 @@ func assetsComponentsServiceCaClusterroleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/clusterrole.yaml", size: 864, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/clusterrole.yaml", size: 864, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3515,7 +3509,7 @@ func assetsComponentsServiceCaClusterrolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/clusterrolebinding.yaml", size: 298, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/clusterrolebinding.yaml", size: 298, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3600,7 +3594,7 @@ func assetsComponentsServiceCaDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1866, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1866, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3627,7 +3621,7 @@ func assetsComponentsServiceCaNsYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 297, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 297, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3690,7 +3684,7 @@ func assetsComponentsServiceCaRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/role.yaml", size: 634, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/role.yaml", size: 634, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3720,7 +3714,7 @@ func assetsComponentsServiceCaRolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/rolebinding.yaml", size: 343, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/rolebinding.yaml", size: 343, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3742,7 +3736,7 @@ func assetsComponentsServiceCaSaYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/sa.yaml", size: 99, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/sa.yaml", size: 99, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3766,7 +3760,7 @@ func assetsComponentsServiceCaSigningCabundleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/signing-cabundle.yaml", size: 123, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/signing-cabundle.yaml", size: 123, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3792,12 +3786,40 @@ func assetsComponentsServiceCaSigningSecretYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/signing-secret.yaml", size: 144, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/signing-secret.yaml", size: 144, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsCore0000_10_csr_approver_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+var _assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml = []byte(`apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    include.release.openshift.io/self-managed-high-availability: "true"
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"
+    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
+    topolvm.cybozu.com/webhook: "ignore"
+  name: openshift-controller-manager
+`)
+
+func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYamlBytes() ([]byte, error) {
+	return _assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, nil
+}
+
+func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*asset, error) {
+	bytes, err := assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 373, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCoreCsr_approver_clusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
@@ -3836,22 +3858,22 @@ rules:
       - update
 `)
 
-func assetsCore0000_10_csr_approver_clusterroleYamlBytes() ([]byte, error) {
-	return _assetsCore0000_10_csr_approver_clusterroleYaml, nil
+func assetsCoreCsr_approver_clusterroleYamlBytes() ([]byte, error) {
+	return _assetsCoreCsr_approver_clusterroleYaml, nil
 }
 
-func assetsCore0000_10_csr_approver_clusterroleYaml() (*asset, error) {
-	bytes, err := assetsCore0000_10_csr_approver_clusterroleYamlBytes()
+func assetsCoreCsr_approver_clusterroleYaml() (*asset, error) {
+	bytes, err := assetsCoreCsr_approver_clusterroleYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/0000_10_csr_approver_clusterrole.yaml", size: 737, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/core/csr_approver_clusterrole.yaml", size: 737, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsCore0000_11_csr_approver_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+var _assetsCoreCsr_approver_clusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
@@ -3866,22 +3888,52 @@ subjects:
     name: cluster-csr-approver-controller
     namespace: openshift-infra`)
 
-func assetsCore0000_11_csr_approver_clusterrolebindingYamlBytes() ([]byte, error) {
-	return _assetsCore0000_11_csr_approver_clusterrolebindingYaml, nil
+func assetsCoreCsr_approver_clusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsCoreCsr_approver_clusterrolebindingYaml, nil
 }
 
-func assetsCore0000_11_csr_approver_clusterrolebindingYaml() (*asset, error) {
-	bytes, err := assetsCore0000_11_csr_approver_clusterrolebindingYamlBytes()
+func assetsCoreCsr_approver_clusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsCoreCsr_approver_clusterrolebindingYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/0000_11_csr_approver_clusterrolebinding.yaml", size: 457, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/core/csr_approver_clusterrolebinding.yaml", size: 457, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsCore0000_20_namespaceSecurityAllocationControllerClusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+var _assetsCoreNamespaceOpenshiftKubeControllerManagerYaml = []byte(`apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+  name: openshift-kube-controller-manager
+  labels:
+    openshift.io/run-level: "0"
+    openshift.io/cluster-monitoring: "true"
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+`)
+
+func assetsCoreNamespaceOpenshiftKubeControllerManagerYamlBytes() ([]byte, error) {
+	return _assetsCoreNamespaceOpenshiftKubeControllerManagerYaml, nil
+}
+
+func assetsCoreNamespaceOpenshiftKubeControllerManagerYaml() (*asset, error) {
+	bytes, err := assetsCoreNamespaceOpenshiftKubeControllerManagerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/namespace-openshift-kube-controller-manager.yaml", size: 415, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
@@ -3918,22 +3970,22 @@ rules:
   - update
 `)
 
-func assetsCore0000_20_namespaceSecurityAllocationControllerClusterroleYamlBytes() ([]byte, error) {
-	return _assetsCore0000_20_namespaceSecurityAllocationControllerClusterroleYaml, nil
+func assetsCoreNamespaceSecurityAllocationControllerClusterroleYamlBytes() ([]byte, error) {
+	return _assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml, nil
 }
 
-func assetsCore0000_20_namespaceSecurityAllocationControllerClusterroleYaml() (*asset, error) {
-	bytes, err := assetsCore0000_20_namespaceSecurityAllocationControllerClusterroleYamlBytes()
+func assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml() (*asset, error) {
+	bytes, err := assetsCoreNamespaceSecurityAllocationControllerClusterroleYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/0000_20_namespace-security-allocation-controller-clusterrole.yaml", size: 587, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/core/namespace-security-allocation-controller-clusterrole.yaml", size: 587, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _assetsCore0000_21_namespaceSecurityAllocationControllerClusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+var _assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
@@ -3949,147 +4001,17 @@ subjects:
   name: namespace-security-allocation-controller
   namespace: openshift-infra`)
 
-func assetsCore0000_21_namespaceSecurityAllocationControllerClusterrolebindingYamlBytes() ([]byte, error) {
-	return _assetsCore0000_21_namespaceSecurityAllocationControllerClusterrolebindingYaml, nil
+func assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml, nil
 }
 
-func assetsCore0000_21_namespaceSecurityAllocationControllerClusterrolebindingYaml() (*asset, error) {
-	bytes, err := assetsCore0000_21_namespaceSecurityAllocationControllerClusterrolebindingYamlBytes()
+func assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/0000_21_namespace-security-allocation-controller-clusterrolebinding.yaml", size: 504, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_30_podsecurityAdmissionLabelSyncerControllerClusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: null
-  name: system:openshift:controller:podsecurity-admission-label-syncer-controller
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - update
-  - watch
-  - patch
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - serviceaccounts
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - security.openshift.io
-  resources:
-  - securitycontextconstraings
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - clusterroles
-  - clusterrolebindings
-  - roles
-  - rolebindings
-  verbs:
-  - get
-  - list
-  - watch
-`)
-
-func assetsCore0000_30_podsecurityAdmissionLabelSyncerControllerClusterroleYamlBytes() ([]byte, error) {
-	return _assetsCore0000_30_podsecurityAdmissionLabelSyncerControllerClusterroleYaml, nil
-}
-
-func assetsCore0000_30_podsecurityAdmissionLabelSyncerControllerClusterroleYaml() (*asset, error) {
-	bytes, err := assetsCore0000_30_podsecurityAdmissionLabelSyncerControllerClusterroleYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_30_podsecurity-admission-label-syncer-controller-clusterrole.yaml", size: 813, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_31_podsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: null
-  name: system:openshift:controller:podsecurity-admission-label-syncer-controller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:openshift:controller:podsecurity-admission-label-syncer-controller
-subjects:
-- kind: ServiceAccount
-  name: podsecurity-admission-label-syncer-controller
-  namespace: openshift-infra
-`)
-
-func assetsCore0000_31_podsecurityAdmissionLabelSyncerControllerClusterrolebindingYamlBytes() ([]byte, error) {
-	return _assetsCore0000_31_podsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml, nil
-}
-
-func assetsCore0000_31_podsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml() (*asset, error) {
-	bytes, err := assetsCore0000_31_podsecurityAdmissionLabelSyncerControllerClusterrolebindingYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_31_podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml", size: 520, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml = []byte(`apiVersion: v1
-kind: Namespace
-metadata:
-  annotations:
-    include.release.openshift.io/self-managed-high-availability: "true"
-    openshift.io/node-selector: ""
-  labels:
-    openshift.io/cluster-monitoring: "true"
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"
-  name: openshift-controller-manager
-`)
-
-func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYamlBytes() ([]byte, error) {
-	return _assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, nil
-}
-
-func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*asset, error) {
-	bytes, err := assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 373, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/core/namespace-security-allocation-controller-clusterrolebinding.yaml", size: 504, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4491,7 +4413,7 @@ func assetsCrd0000_01_routeCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_01_route.crd.yaml", size: 19360, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_01_route.crd.yaml", size: 19360, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4664,7 +4586,7 @@ func assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml", size: 9898, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml", size: 9898, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4962,7 +4884,7 @@ func assetsCrd0000_03_securityOpenshift_01_sccCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_security-openshift_01_scc.crd.yaml", size: 16038, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_security-openshift_01_scc.crd.yaml", size: 16038, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5030,87 +4952,7 @@ func assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml", size: 2388, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _assetsCrd0000_10_configOperator_01_featuregateCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  annotations:
-    api-approved.openshift.io: https://github.com/openshift/api/pull/470
-    include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/self-managed-high-availability: "true"
-    include.release.openshift.io/single-node-developer: "true"
-  name: featuregates.config.openshift.io
-spec:
-  group: config.openshift.io
-  names:
-    kind: FeatureGate
-    listKind: FeatureGateList
-    plural: featuregates
-    singular: featuregate
-  scope: Cluster
-  versions:
-    - name: v1
-      schema:
-        openAPIV3Schema:
-          description: "Feature holds cluster-wide information about feature gates.  The canonical name is ` + "`" + `cluster` + "`" + ` \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer)."
-          type: object
-          required:
-            - spec
-          properties:
-            apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-              type: string
-            kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-              type: string
-            metadata:
-              type: object
-            spec:
-              description: spec holds user settable values for configuration
-              type: object
-              properties:
-                customNoUpgrade:
-                  description: customNoUpgrade allows the enabling or disabling of any feature. Turning this feature set on IS NOT SUPPORTED, CANNOT BE UNDONE, and PREVENTS UPGRADES. Because of its nature, this setting cannot be validated.  If you have any typos or accidentally apply invalid combinations your cluster may fail in an unrecoverable way.  featureSet must equal "CustomNoUpgrade" must be set to use this field.
-                  type: object
-                  properties:
-                    disabled:
-                      description: disabled is a list of all feature gates that you want to force off
-                      type: array
-                      items:
-                        type: string
-                    enabled:
-                      description: enabled is a list of all feature gates that you want to force on
-                      type: array
-                      items:
-                        type: string
-                  nullable: true
-                featureSet:
-                  description: featureSet changes the list of features in the cluster.  The default is empty.  Be very careful adjusting this setting. Turning on or off features may cause irreversible changes in your cluster which cannot be undone.
-                  type: string
-            status:
-              description: status holds observed values from the cluster. They may not be overridden.
-              type: object
-      served: true
-      storage: true
-      subresources:
-        status: {}
-`)
-
-func assetsCrd0000_10_configOperator_01_featuregateCrdYamlBytes() ([]byte, error) {
-	return _assetsCrd0000_10_configOperator_01_featuregateCrdYaml, nil
-}
-
-func assetsCrd0000_10_configOperator_01_featuregateCrdYaml() (*asset, error) {
-	bytes, err := assetsCrd0000_10_configOperator_01_featuregateCrdYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/crd/0000_10_config-operator_01_featuregate.crd.yaml", size: 3438, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml", size: 2388, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5210,7 +5052,7 @@ func assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml", size: 3096, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml", size: 3096, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5269,7 +5111,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 1048, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 1048, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5333,7 +5175,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1267, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1267, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5397,7 +5239,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1298, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1298, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5459,7 +5301,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostnetworkYaml() (*asset, err
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1123, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1123, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5521,7 +5363,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1166, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1166, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5585,7 +5427,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1291, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1291, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5648,7 +5490,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1213, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1213, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5675,7 +5517,7 @@ func assetsVersionMicroshiftVersionYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/version/microshift-version.yaml", size: 196, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/version/microshift-version.yaml", size: 196, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5793,18 +5635,16 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/service-ca/sa.yaml":                                                                   assetsComponentsServiceCaSaYaml,
 	"assets/components/service-ca/signing-cabundle.yaml":                                                     assetsComponentsServiceCaSigningCabundleYaml,
 	"assets/components/service-ca/signing-secret.yaml":                                                       assetsComponentsServiceCaSigningSecretYaml,
-	"assets/core/0000_10_csr_approver_clusterrole.yaml":                                                      assetsCore0000_10_csr_approver_clusterroleYaml,
-	"assets/core/0000_11_csr_approver_clusterrolebinding.yaml":                                               assetsCore0000_11_csr_approver_clusterrolebindingYaml,
-	"assets/core/0000_20_namespace-security-allocation-controller-clusterrole.yaml":                          assetsCore0000_20_namespaceSecurityAllocationControllerClusterroleYaml,
-	"assets/core/0000_21_namespace-security-allocation-controller-clusterrolebinding.yaml":                   assetsCore0000_21_namespaceSecurityAllocationControllerClusterrolebindingYaml,
-	"assets/core/0000_30_podsecurity-admission-label-syncer-controller-clusterrole.yaml":                     assetsCore0000_30_podsecurityAdmissionLabelSyncerControllerClusterroleYaml,
-	"assets/core/0000_31_podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml":              assetsCore0000_31_podsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml,
 	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml":                             assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
+	"assets/core/csr_approver_clusterrole.yaml":                                                              assetsCoreCsr_approver_clusterroleYaml,
+	"assets/core/csr_approver_clusterrolebinding.yaml":                                                       assetsCoreCsr_approver_clusterrolebindingYaml,
+	"assets/core/namespace-openshift-kube-controller-manager.yaml":                                           assetsCoreNamespaceOpenshiftKubeControllerManagerYaml,
+	"assets/core/namespace-security-allocation-controller-clusterrole.yaml":                                  assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml,
+	"assets/core/namespace-security-allocation-controller-clusterrolebinding.yaml":                           assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml,
 	"assets/crd/0000_01_route.crd.yaml":                                                                      assetsCrd0000_01_routeCrdYaml,
 	"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml":                          assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml,
 	"assets/crd/0000_03_security-openshift_01_scc.crd.yaml":                                                  assetsCrd0000_03_securityOpenshift_01_sccCrdYaml,
 	"assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml":                              assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml,
-	"assets/crd/0000_10_config-operator_01_featuregate.crd.yaml":                                             assetsCrd0000_10_configOperator_01_featuregateCrdYaml,
 	"assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml":                                              assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":                                          assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml":                                      assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml,
@@ -5940,20 +5780,18 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			}},
 		}},
 		"core": {nil, map[string]*bintree{
-			"0000_10_csr_approver_clusterrole.yaml":                                         {assetsCore0000_10_csr_approver_clusterroleYaml, map[string]*bintree{}},
-			"0000_11_csr_approver_clusterrolebinding.yaml":                                  {assetsCore0000_11_csr_approver_clusterrolebindingYaml, map[string]*bintree{}},
-			"0000_20_namespace-security-allocation-controller-clusterrole.yaml":             {assetsCore0000_20_namespaceSecurityAllocationControllerClusterroleYaml, map[string]*bintree{}},
-			"0000_21_namespace-security-allocation-controller-clusterrolebinding.yaml":      {assetsCore0000_21_namespaceSecurityAllocationControllerClusterrolebindingYaml, map[string]*bintree{}},
-			"0000_30_podsecurity-admission-label-syncer-controller-clusterrole.yaml":        {assetsCore0000_30_podsecurityAdmissionLabelSyncerControllerClusterroleYaml, map[string]*bintree{}},
-			"0000_31_podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml": {assetsCore0000_31_podsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml, map[string]*bintree{}},
-			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml":                {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
+			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml":   {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
+			"csr_approver_clusterrole.yaml":                                    {assetsCoreCsr_approver_clusterroleYaml, map[string]*bintree{}},
+			"csr_approver_clusterrolebinding.yaml":                             {assetsCoreCsr_approver_clusterrolebindingYaml, map[string]*bintree{}},
+			"namespace-openshift-kube-controller-manager.yaml":                 {assetsCoreNamespaceOpenshiftKubeControllerManagerYaml, map[string]*bintree{}},
+			"namespace-security-allocation-controller-clusterrole.yaml":        {assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml, map[string]*bintree{}},
+			"namespace-security-allocation-controller-clusterrolebinding.yaml": {assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml, map[string]*bintree{}},
 		}},
 		"crd": {nil, map[string]*bintree{
 			"0000_01_route.crd.yaml": {assetsCrd0000_01_routeCrdYaml, map[string]*bintree{}},
 			"0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml": {assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml, map[string]*bintree{}},
 			"0000_03_security-openshift_01_scc.crd.yaml":                         {assetsCrd0000_03_securityOpenshift_01_sccCrdYaml, map[string]*bintree{}},
 			"0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml":     {assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml, map[string]*bintree{}},
-			"0000_10_config-operator_01_featuregate.crd.yaml":                    {assetsCrd0000_10_configOperator_01_featuregateCrdYaml, map[string]*bintree{}},
 			"0000_20_topolvm.cybozu.com_logicalvolumes.yaml":                     {assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml, map[string]*bintree{}},
 		}},
 		"scc": {nil, map[string]*bintree{
