@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:openshift:controller:cluster-csr-approver-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:controller:cluster-csr-approver-controller
+subjects:
+  - kind: ServiceAccount
+    name: cluster-csr-approver-controller
+    namespace: openshift-infra

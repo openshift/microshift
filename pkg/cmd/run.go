@@ -102,6 +102,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftCRDManager(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftControllerManager(cfg)))
+		util.Must(m.AddService(controllers.NewClusterPolicyController(cfg)))
 		util.Must(m.AddService(controllers.NewOpenShiftDefaultSCCManager(cfg)))
 		util.Must(m.AddService(mdns.NewMicroShiftmDNSController(cfg)))
 		util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
