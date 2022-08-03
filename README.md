@@ -46,6 +46,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [Install MicroShift on RHEL for Edge](./docs/rhel4edge_iso.md)
 - [OpenShift CI for MicroShift](./docs/openshift_ci.md)
 - [RPM Packages for Development and Testing](./docs/rpm_packages.md)
+- [MicroShift Storage Plugin Overview](./docs/default_csi_plugin.md)
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
