@@ -1,8 +1,9 @@
-# MicroShift Default CSI Plugin
+# MicroShift Storage Plugin Overview
 
-MicroShift enables dynamic storage provisioning out of the box with the ODF-LVM CSI plugin. This plugin is downstream
-Red Hat distribution of TopoLVM. This feature is not currently configurable but will be in the near future. For more
-information on ODF-LVM, visit the repo's [README](https://github.com/red-hat-storage/topolvm).
+MicroShift enables dynamic storage provisioning out of the box with the ODF-LVM CSI plugin. This plugin is a downstream
+Red Hat fork of TopoLVM. This provisioner will create a new LVM logical volume in the `rhel` volume group for each
+PersistenVolumeClaim(PVC), and make these volumes available to pods. For more information on ODF-LVM, visit the repo's
+[README](https://github.com/red-hat-storage/topolvm).
 
 ## Design
 
@@ -11,20 +12,18 @@ of ODF-LVM architecture, see the [design doc](https://github.com/red-hat-storage
 
 ## Deployment
 
-ODF-LVM is deployed onto the cluster in the `openshift-storage` namespace, after MicroShift boots. In order to reduce
-MicroShift's storage footprint and cluster overhead,
-[StorageCapacity tracking](https://kubernetes.io/docs/concepts/storage/storage-capacity/) is used in lieu of the
-plugin's extended-scheduler.
+ODF-LVM is deployed onto the cluster in the `openshift-storage` namespace, after MicroShift
+boots. [StorageCapacity tracking](https://kubernetes.io/docs/concepts/storage/storage-capacity/) is used to ensure that
+Pods with an ODF-LVM PVC are not scheduled if the requested storage is greater than the volume group's remaining free
+storage.
 
 ## System Requirements
 
 ### Volume Group Name
 
-LVMD, a component of ODF-LVM, requires that volume groups specified in
-the [device-class configuration](../assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml) exist at the
-runtime. If the volume group doesn't exist, the LVMD container will fail to start and enter a CrashLoopBackoff state.
-The initial integration of ODF-LVM assumes volume-group named `rhel` exists. Unallocated space must exist on the volume
-group if the plugin is to dynamically provision logical volumes on it.
+The default integration of ODF-LVM assumes a volume-group named `rhel`. ODF-LVM's node-controller expects that volume
+group to exist prior to launching the service. If the volume group does not exist, the node-controller will fail to
+start and enter a CrashLoopBackoff state.
 
 ### Volume Size Increments
 
@@ -40,7 +39,7 @@ group's capacity is less than 1Gb, the PersistentVolumeClaim will register a `Pr
 
 ## Usage
 
-ODF-LVM's [StorageClass](../assets/components/odf-lvm/topolvm_default-storage-class.yaml) is deployed by with a default
+ODF-LVM's [StorageClass](../assets/components/odf-lvm/topolvm_default-storage-class.yaml) is deployed with a default
 StorageClass. Any PersistentVolumeClaim without a `.spec.storageClassName` defined will automatically have a
 PersistentVolume provisioned from the default StorageClass.
 
@@ -57,7 +56,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 1G
 ---
 apiVersion: v1
 kind: Pod
