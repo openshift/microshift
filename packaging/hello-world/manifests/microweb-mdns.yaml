@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: microweb
+  name: microweb
+spec:
+  host: hello-world.local
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: microweb
+    weight: 100
+  wildcardPolicy: None
+
