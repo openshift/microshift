@@ -65,6 +65,7 @@
 // assets/crd/0000_01_route.crd.yaml
 // assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml
 // assets/crd/0000_03_security-openshift_01_scc.crd.yaml
+// assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
 // assets/crd/0000_10_config-operator_01_featuregate.crd.yaml
 // assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
@@ -4687,6 +4688,74 @@ func assetsCrd0000_03_securityOpenshift_01_sccCrdYaml() (*asset, error) {
 	return a, nil
 }
 
+var _assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml = []byte(`# 0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.openshift.io: https://github.com/openshift/api/pull/751
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+  name: rangeallocations.security.internal.openshift.io
+spec:
+  group: security.internal.openshift.io
+  names:
+    kind: RangeAllocation
+    listKind: RangeAllocationList
+    plural: rangeallocations
+    singular: rangeallocation
+  scope: Cluster
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: "RangeAllocation is used so we can easily expose a RangeAllocation
+          typed for security group This is an internal API, not intended for external
+          consumption. \n Compatibility level 1: Stable within a major release for
+          a minimum of 12 months or 3 minor releases (whichever is longer)."
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          data:
+            description: data is a byte array representing the serialized state of
+              a range allocation.  It is a bitmap with each bit set to one to represent
+              a range is taken.
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          range:
+            description: range is a string representing a unique label for a range
+              of uids, "1000000000-2000000000/10000".
+            type: string
+        type: object
+    served: true
+    storage: true
+`)
+
+func assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYamlBytes() ([]byte, error) {
+	return _assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml, nil
+}
+
+func assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml() (*asset, error) {
+	bytes, err := assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml", size: 2388, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _assetsCrd0000_10_configOperator_01_featuregateCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -4921,7 +4990,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 1048, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml", size: 1048, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4985,7 +5054,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1267, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml", size: 1267, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5049,7 +5118,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1298, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml", size: 1298, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5111,7 +5180,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccHostnetworkYaml() (*asset, err
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1123, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml", size: 1123, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5173,7 +5242,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccNonrootYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1166, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml", size: 1166, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5237,7 +5306,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccPrivilegedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1291, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml", size: 1291, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5300,7 +5369,7 @@ func assetsScc0000_20_kubeApiserverOperator_00_sccRestrictedYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1213, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml", size: 1213, mode: os.FileMode(436), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5449,6 +5518,7 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/crd/0000_01_route.crd.yaml":                                                                      assetsCrd0000_01_routeCrdYaml,
 	"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml":                          assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml,
 	"assets/crd/0000_03_security-openshift_01_scc.crd.yaml":                                                  assetsCrd0000_03_securityOpenshift_01_sccCrdYaml,
+	"assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml":                              assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml,
 	"assets/crd/0000_10_config-operator_01_featuregate.crd.yaml":                                             assetsCrd0000_10_configOperator_01_featuregateCrdYaml,
 	"assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml":                                              assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":                                          assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml,
@@ -5591,6 +5661,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_01_route.crd.yaml": {assetsCrd0000_01_routeCrdYaml, map[string]*bintree{}},
 			"0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml": {assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml, map[string]*bintree{}},
 			"0000_03_security-openshift_01_scc.crd.yaml":                         {assetsCrd0000_03_securityOpenshift_01_sccCrdYaml, map[string]*bintree{}},
+			"0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml":     {assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml, map[string]*bintree{}},
 			"0000_10_config-operator_01_featuregate.crd.yaml":                    {assetsCrd0000_10_configOperator_01_featuregateCrdYaml, map[string]*bintree{}},
 			"0000_20_topolvm.cybozu.com_logicalvolumes.yaml":                     {assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml, map[string]*bintree{}},
 		}},

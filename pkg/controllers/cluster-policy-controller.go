@@ -14,82 +14,84 @@ package controllers
 
 import (
 	"context"
-	"io/ioutil"
-	"os"
+	"fmt"
 	"path/filepath"
 
+	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	clusterpolicycontroller "github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller"
-	clusterpolicyversion "github.com/openshift/cluster-policy-controller/pkg/version"
 	"github.com/openshift/library-go/pkg/controller/controllercmd"
 	"github.com/openshift/microshift/pkg/config"
-	"k8s.io/component-base/cli"
+	corev1 "k8s.io/api/core/v1"
+	unstructuredv1 "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
 )
 
 type ClusterPolicyController struct {
-	config     *controllercmd.ControllerCommandConfig
-	flags      *controllercmd.ControllerFlags
+	run        func(context.Context) error
 	kubeconfig string
+
+	configErr error
 }
 
 func NewClusterPolicyController(cfg *config.MicroshiftConfig) *ClusterPolicyController {
 	s := &ClusterPolicyController{}
-	s.configure(cfg)
+	s.configErr = s.configure(cfg)
 	return s
 }
 
 func (s *ClusterPolicyController) Name() string           { return "cluster-policy-controller" }
 func (s *ClusterPolicyController) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *ClusterPolicyController) configure(cfg *config.MicroshiftConfig) {
-
+func (s *ClusterPolicyController) configure(cfg *config.MicroshiftConfig) error {
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
-	s.writeConfig(cfg)
 
-	// Use NewControllerCommandConfig to create a controller configuration struct
-	// with default values.
-	s.config = controllercmd.NewControllerCommandConfig(s.Name(), clusterpolicyversion.Get(), clusterpolicycontroller.RunClusterPolicyController)
+	scheme := runtime.NewScheme()
+	openshiftcontrolplanev1.AddToScheme(scheme)
+	codec := serializer.NewCodecFactory(scheme).LegacyCodec(openshiftcontrolplanev1.GroupVersion)
 
-	flags := controllercmd.NewControllerFlags()
-	flags.ConfigFile = filepath.Join(cfg.DataDir, "resources", "cluster-policy-controller", "config", "config.yaml")
-	flags.KubeConfigFile = s.kubeconfig
-	flags.Validate()
-	s.flags = flags
+	encodedConfig, err := runtime.Encode(codec,
+		&openshiftcontrolplanev1.OpenShiftControllerManagerConfig{
+			Controllers: []string{
+				"*",
+				"-openshift.io/resourcequota",
+				"-openshift.io/cluster-quota-reconciliation",
+			},
+		})
+	if err != nil {
+		return err
+	}
+	ctrlConfig := &unstructuredv1.Unstructured{}
+	if err := runtime.DecodeInto(codec, encodedConfig, ctrlConfig); err != nil {
+		return err
+	}
 
+	const namespace = "openshift-kube-controller-manager"
+	builder := controllercmd.NewController(s.Name(), clusterpolicycontroller.RunClusterPolicyController).
+		WithKubeConfigFile(s.kubeconfig, nil).
+		WithComponentNamespace(namespace).
+		// Without an explicit owner reference, the builder will try using POD_NAME or the
+		// first pod in the target namespace (and fail because we have no pod).
+		WithComponentOwnerReference(&corev1.ObjectReference{
+			APIVersion: corev1.SchemeGroupVersion.String(),
+			Kind:       "Namespace",
+			Name:       namespace,
+			Namespace:  namespace,
+		})
+
+	s.run = func(ctx context.Context) error {
+		return builder.Run(ctx, ctrlConfig)
+	}
+
+	return nil
 }
 
 func (s *ClusterPolicyController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+	if s.configErr != nil {
+		return fmt.Errorf("configuration failed: %w", s.configErr)
+	}
 
-	cmd := s.config.NewCommandWithContext(ctx)
-	s.flags.AddFlags(cmd)
-	cmd.Use = s.Name()
-	cmd.Short = "Start the cluster-policy-controller"
-
-	go func() {
-		cli.Run(cmd)
-	}()
-
-	<-ctx.Done()
-	return ctx.Err()
-}
-
-func (s *ClusterPolicyController) writeConfig(cfg *config.MicroshiftConfig) error {
-	// OCM config contains a list of controllers to enable/disable.
-	// If no list is specified, all controllers are started (default).
-	// If a non-zero length list is specified, only controllers enabled in the list are started.  Unlisted controllers
-	// are therefore disabled.  Enable controllers by appending their name to `controllers:`. Disable a controller by
-	// prepending "-" to the name, e.g. `controllers: ["-openshift.io/build"]
-	// Disabled OCM controllers are included in the list for documentary purposes.
-	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
-kind: OpenShiftControllerManagerConfig
-kubeClientConfig:
-  kubeConfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
-controllers:
-- "-openshift.io/resourcequota"
-- "-openshift.io/cluster-quota-reconciliation"
-`)
-
-	path := filepath.Join(cfg.DataDir, "resources", "cluster-policy-controller", "config", "config.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
-	return ioutil.WriteFile(path, data, 0644)
+	close(ready) // todo
+	return s.run(ctx)
 }
