@@ -20,6 +20,7 @@ import (
 
 	klog "k8s.io/klog/v2"
 
+	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
 )
@@ -41,10 +42,40 @@ func (s *InfrastructureServicesManager) Dependencies() []string {
 
 func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(ready)
+
+	if err := ApplyDefaultRBACs(s.cfg); err != nil {
+		klog.Errorf("%s unable to apply default RBACs: %v", s.Name(), err)
+		return err
+	}
 	// TO-DO add readiness check
 	if err := components.StartComponents(s.cfg); err != nil {
 		return err
 	}
 	klog.Infof("%s launched ocp componets", s.Name())
 	return ctx.Err()
+}
+
+func ApplyDefaultRBACs(cfg *config.MicroshiftConfig) error {
+	kubeconfigPath := cfg.DataDir + "/resources/kubeadmin/kubeconfig"
+	var (
+		cr = []string{
+			"assets/core/0000_10_csr_approver_clusterrole.yaml",
+			"assets/core/0000_20_namespace-security-allocation-controller-clusterrole.yaml",
+			"assets/core/0000_30_podsecurity-admission-label-syncer-controller-clusterrole.yaml",
+		}
+		crb = []string{
+			"assets/core/0000_11_csr_approver_clusterrolebinding.yaml",
+			"assets/core/0000_21_namespace-security-allocation-controller-clusterrolebinding.yaml",
+			"assets/core/0000_31_podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml",
+		}
+	)
+	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
+		klog.Warningf("failed to apply cluster roles %v", err)
+		return err
+	}
+	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
+		klog.Warningf("failed to apply cluster roles %v", err)
+		return err
+	}
+	return nil
 }
