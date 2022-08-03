@@ -2573,8 +2573,6 @@ func assetsComponentsOvnConfigmapYaml() (*asset, error) {
 }
 
 var _assetsComponentsOvnMasterDaemonsetYaml = []byte(`---
-# The ovnkube control-plane components
-
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
@@ -2700,12 +2698,9 @@ spec:
           db="nb"
           ovn_db_file="/etc/ovn/ovn${db}_db.db"
 
-          OVN_ARGS="--db-nb-cluster-local-port=9643 \
-            --db-nb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
-            --no-monitor"
+          OVN_ARGS="--db-nb-cluster-local-port=9643 --no-monitor"
 
           echo "$(date -Iseconds) - starting nbdb"
-          initial_raft_create=true
           initialize="false"
 
           if [[ ! -e ${ovn_db_file} ]]; then
@@ -2713,16 +2708,8 @@ spec:
           fi
 
           if [[ "${initialize}" == "true" ]]; then
-              # either we need to initialize a new cluster or wait for master to create it
-                # set DB election timer at DB creation time if OVN supports it
-                election_timer=
-                if test -n "$(/usr/share/ovn/scripts/ovn-ctl --help 2>&1 | grep "\--db-nb-election-timer")"; then
-                  election_timer="--db-nb-election-timer=$((10*1000))"
-                fi
-
                 exec /usr/share/ovn/scripts/ovn-ctl ${OVN_ARGS} \
                 --ovn-nb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
-                ${election_timer} \
                 run_nb_ovsdb &
 
                 wait $!
@@ -2743,23 +2730,7 @@ spec:
               - |
                 set -x
                 rm -f /var/run/ovn/ovnnb_db.pid
-                  echo "$(date -Iseconds) - nbdb - postStart - waiting for master to be selected"
 
-                  # Upgrade the db if required.
-                  DB_SCHEMA="/usr/share/ovn/ovn-nb.ovsschema"
-                  DB_SERVER="unix:/var/run/ovn/ovnnb_db.sock"
-                  schema_name=$(ovsdb-tool schema-name $DB_SCHEMA)
-                  db_version=$(ovsdb-client -t 10 get-schema-version "$DB_SERVER" "$schema_name")
-                  target_version=$(ovsdb-tool schema-version "$DB_SCHEMA")
-
-                  if ovsdb-tool compare-versions "$db_version" == "$target_version"; then
-                    :
-                  elif ovsdb-tool compare-versions "$db_version" ">" "$target_version"; then
-                      echo "Database $schema_name has newer schema version ($db_version) than our local schema ($target_version), possibly an upgrade is partially complete?"
-                  else
-                      echo "Upgrading database $schema_name from schema version $db_version to $target_version"
-                      ovsdb-client -t 30 convert "$DB_SERVER" "$DB_SCHEMA"
-                  fi
                 #configure northd_probe_interval
                 northd_probe_interval=${OVN_NORTHD_PROBE_INTERVAL:-10000}
                 echo "Setting northd probe interval to ${northd_probe_interval} ms"
@@ -2809,13 +2780,7 @@ spec:
             - -c
             - |
               set -xeo pipefail
-              leader_status=$(/usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=3 cluster/status OVN_Northbound  2>/dev/null | { grep "Leader: unknown" || true; })
-              if [[ ! -z "${leader_status}" ]]; then
-                echo "NB DB Raft leader is unknown to the cluster node."
-                exit 1
-              else
-                /usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
-              fi
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
 
         env:
         - name: OVN_LOG_LEVEL
@@ -2869,12 +2834,9 @@ spec:
           db="sb"
           ovn_db_file="/etc/ovn/ovn${db}_db.db"
 
-          OVN_ARGS="--db-sb-cluster-local-port=9644 \
-            --db-sb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
-            --no-monitor"
+          OVN_ARGS="--db-sb-cluster-local-port=9644 --no-monitor"
 
           echo "$(date -Iseconds) - starting sbdb "
-          initial_raft_create=true
           initialize="false"
 
           if [[ ! -e ${ovn_db_file} ]]; then
@@ -2882,16 +2844,8 @@ spec:
           fi
 
           if [[ "${initialize}" == "true" ]]; then
-              # either we need to initialize a new cluster or wait for master to create it
-                # set DB election timer at DB creation time if OVN supports it
-                election_timer=
-                if test -n "$(/usr/share/ovn/scripts/ovn-ctl --help 2>&1 | grep "\--db-sb-election-timer")"; then
-                  election_timer="--db-sb-election-timer=$((16*1000))"
-                fi
-
                 exec /usr/share/ovn/scripts/ovn-ctl ${OVN_ARGS} \
                 --ovn-sb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
-                ${election_timer} \
                 run_sb_ovsdb &
 
                 wait $!
@@ -2911,23 +2865,7 @@ spec:
               - |
                 set -x
                 rm -f /var/run/ovn/ovnsb_db.pid
-                  echo "$(date -Iseconds) - sdb - postStart - waiting for master to be selected"
 
-                #  # Upgrade the db if required.
-                #  DB_SCHEMA="/usr/share/ovn/ovn-sb.ovsschema"
-                #  DB_SERVER="unix:/var/run/ovn/ovnsb_db.sock"
-                #  schema_name=$(ovsdb-tool schema-name $DB_SCHEMA)
-                #  db_version=$(ovsdb-client -t 10 get-schema-version "$DB_SERVER" "$schema_name")
-                #  target_version=$(ovsdb-tool schema-version "$DB_SCHEMA")
-
-                #  if ovsdb-tool compare-versions "$db_version" == "$target_version"; then
-                #    :
-                #  elif ovsdb-tool compare-versions "$db_version" ">" "$target_version"; then
-                #      echo "Database $schema_name has newer schema version ($db_version) than our local schema ($target_version), possibly an upgrade is partially complete?"
-                #  else
-                #      echo "Upgrading database $schema_name from schema version $db_version to $target_version"
-                #      ovsdb-client -t 30 convert "$DB_SERVER" "$DB_SCHEMA"
-                #  fi
           preStop:
             exec:
               command:
@@ -2946,13 +2884,7 @@ spec:
             - -c
             - |
               set -xeo pipefail
-              leader_status=$(/usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=3 cluster/status OVN_Southbound  2>/dev/null | { grep "Leader: unknown" || true; })
-              if [[ ! -z "${leader_status}" ]]; then
-                echo "SB DB Raft leader is unknown to the cluster node."
-                exit 1
-              else
-                /usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
-              fi
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
         env:
         - name: OVN_LOG_LEVEL
           value: info
@@ -3068,9 +3000,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        ports:
-        - name: metrics-port
-          containerPort: 29102
         securityContext:
           privileged: true
         terminationMessagePolicy: FallbackToLogsOnError
@@ -3147,7 +3076,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 19966, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15752, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
