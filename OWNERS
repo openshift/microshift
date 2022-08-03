@@ -6,6 +6,7 @@ approvers:
 - mangelajo
 - oglok
 - sallyom
+- zshi-redhat
 reviewers:
 - copejon
 - dhellmann
@@ -14,6 +15,7 @@ reviewers:
 - mangelajo
 - oglok
 - sallyom
+- zshi-redhat
 emeritus_approvers:
 - cooktheryan
 - husky-parul
