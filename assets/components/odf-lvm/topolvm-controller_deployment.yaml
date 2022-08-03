@@ -26,7 +26,7 @@ spec:
       - command:
         - /topolvm-controller
         - --cert-dir=/certs
-        image: {{ .ReleaseImage.odf_topolvm_rhel8 }}
+        image: {{ .ReleaseImage.odf_topolvm }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3

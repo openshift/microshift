@@ -202,7 +202,7 @@ spec:
       - command:
         - /topolvm-controller
         - --cert-dir=/certs
-        image: {{ .ReleaseImage.odf_topolvm_rhel8 }}
+        image: {{ .ReleaseImage.odf_topolvm }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -328,7 +328,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4176, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4170, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1000,7 +1000,7 @@ spec:
         - /lvmd
         - --config=/etc/topolvm/lvmd.yaml
         - --container=true
-        image: {{ .ReleaseImage.odf_topolvm_rhel8 }}  #registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .ReleaseImage.odf_topolvm }}  #registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
         name: lvmd
         resources:
@@ -1026,7 +1026,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: {{ .ReleaseImage.odf_topolvm_rhel8 }}
+        image: {{ .ReleaseImage.odf_topolvm }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -1161,7 +1161,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5233, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5221, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

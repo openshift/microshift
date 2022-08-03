@@ -26,7 +26,7 @@ var Image = map[string]string{
 	"pause":                   "quay.io/microshift/pause:" + Base,
 	"service_ca_operator":     "quay.io/microshift/service-ca-operator:" + Base,
 	"ovn_kubernetes":          "quay.io/microshift/ovn-kubernetes-singlenode:" + Base,
-	"odf_topolvm_rhel8":       "quay.io/microshift/odf-topolvm-rhel8" + Base,
+	"odf_topolvm":             "quay.io/microshift/odf-topolvm-rhel8" + Base,
 	"odf_lvm_operator":        "quay.io/microshift/odf-lvm-rhel8-operator" + Base,
 	"ose_csi_ext_provisioner": "quay.io/microshift/ose-csi-external-provisioner" + Base,
 	"ose_csi_ext_resizer":     "quay.io/microshift/ose-csi-external-resizer" + Base,
