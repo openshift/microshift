@@ -36,6 +36,7 @@ To install, configure and run MicroShift, refer to the following documentation:
 - [Load Balancer for User Workloads](./docs/howto_load_balancer.md)
 - [AMQ Broker on MicroShift](./docs/howto_amq_broker.md)
 - [MicroShift Mitigation of System Configuration Changes](./docs/howto_sysconf_watch.md)
+- [Firewall Configuration](./docs/howto_firewall.md)
 
 ## Developer Documentation
 To build MicroShift from source and contribute to its development, refer to the following documentation:

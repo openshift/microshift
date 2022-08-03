@@ -5,7 +5,10 @@ Start by downloading the RHEL 8.6 or above ISO image from the https://developers
 > RHEL 9.x operating system is not currently supported.
 
 ### Creating VM
-Create a RHEL 8 virtual machine with 2 cores, 4096MB of RAM and 40GB of storage. Move the ISO image to `/var/lib/libvirt/images` directory and run the following command to create a virtual machine.
+Create a RHEL 8 virtual machine with 2 cores, 4096MB of RAM and 50GB of storage. 
+> Visual Studio Code may consume around 2GB of RAM. For running the IDE on the development virtual machine, it is recommended to allocate at least 6144MB of RAM in total.
+
+Move the ISO image to `/var/lib/libvirt/images` directory and run the following command to create a virtual machine.
 ```bash
 VMNAME="microshift-dev"
 sudo -b bash -c " \
@@ -14,7 +17,7 @@ virt-install \
     --name ${VMNAME} \
     --vcpus 2 \
     --memory 4096 \
-    --disk path=./${VMNAME}.qcow2,size=40 \
+    --disk path=./${VMNAME}.qcow2,size=50 \
     --network network=default,model=virtio \
     --os-type generic \
     --events on_reboot=restart \
@@ -24,7 +27,17 @@ virt-install \
 
 In the OS installation wizard, set the following options:
 - Root password and `microshift` administrator user
-- In the Installation Destination, select automatic partitioning on the disk without encryption
+- Select "Installation Destination"
+    - Under "Storage Configuration" sub-section, select "Custom" radial button
+    - Select "Done" to open a window for configuring partitions
+    - Under "New Red Hat Enterprise Linux 8.x Installation", click "Click here to create them automatically"
+    - Select the root partition (`/`)
+        - On the right side of the menu, set "Desired Capacity" to `40 GiB`
+        - Click "Update Settings" button
+        > This will preserve the rest of the allocatable storage for dynamically provisioned logical volumes. The MicroShift default CSI provisioner requires at least 1GB of unallocated storage in the volume group. Adjust the capacity as desired.
+    - Click "Done" button.
+    - At the "Summary of Changes" window, select "Accept Changes"
+
 - Connect network card and set the hostname (i.e. `microshift-dev.localdomain`)
 - Register the system with Red Hat using your credentials (toggle off Red Hat Insights connection)
 - In the Software Selection, select Minimal Install base environment and toggle on Headless Management to enable Cockpit
@@ -67,7 +80,7 @@ make srpm
 
 The artifacts of the build are located in the `packaging` directory.
 ```bash
-$ find packaging -name \*.rpm
+$ find ~/microshift/packaging -name \*.rpm
 packaging/rpm/_rpmbuild/RPMS/x86_64/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
 packaging/rpm/_rpmbuild/RPMS/x86_64/microshift-4.10.0-networking-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
 packaging/rpm/_rpmbuild/RPMS/noarch/microshift-selinux-4.10.0-nightly_1654189204_34_gc871db21.el8.noarch.rpm
@@ -76,6 +89,7 @@ packaging/rpm/_rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.
 
 ## Run MicroShift Executable
 Log into the development virtual machine with the `microshift` user credentials.
+
 ### Installing Clients
 Run the following commands to install `oc` and `kubectl` utilities.
 ```bash
@@ -83,11 +97,12 @@ curl -O https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp/st
 sudo tar -xf openshift-client-linux.tar.gz -C /usr/local/bin oc kubectl
 rm -f openshift-client-linux.tar.gz
 ```
+
 ### Runtime Prerequisites
 Run the following commands to install CRI-O.
 ```bash
-sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms fast-datapath-for-rhel-8-$(uname -i)-rpms
-sudo dnf install -y cri-o cri-tools openvswitch2.16 NetworkManager-ovs
+sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms
+sudo dnf install -y cri-o cri-tools
 sudo systemctl enable crio --now
 ```
 
@@ -96,41 +111,73 @@ Download the OpenShift pull secret from the https://console.redhat.com/openshift
 Run the following commands to configure CRI-O for using the pull secret when fetching container images.
 ```bash
 sudo chmod 600 /etc/crio/openshift-pull-secret
-sudo mkdir -p /etc/crio/crio.conf.d/
-sudo cp ~microshift/microshift/packaging/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/
-sudo systemctl restart crio && sleep 3
-echo 1 | ~microshift/microshift/hack/cleanup.sh
 ```
 
-### Running MicroShift
-Run the MicroShift in the background using the following command.
-```bash
-nohup sudo ./microshift run >> /tmp/microshift.log &
+### Configuring MicroShift
+MicroShift requires system configuration updates before it can be run. These updates include `CRI-O`, networking and file system customizations.
+
+It is necessary to install the MicroShift RPM packages to automatically apply all the necessary customizations.
 ```
-Examine the `/tmp/microshift.log` log file to ensure successful startup.
+sudo subscription-manager repos --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+sudo dnf install -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
+```
+
+The MicroShift service is not enabled or started by default. Start the service once to trigger the initialization sequence of all the dependencies.
+```bash
+sudo systemctl start microshift
+```
+
+Wait until all the pods are up and running.
+```bash
+watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A
+```
+
+Finalize the procedure by stopping the MicroShift service and cleaning up its images and configuration data.
+```
+echo 1 | ~/microshift/hack/cleanup.sh
+```
+
+It should now be possible to run a standalone MicroShift executable file as presented in the next section.
+
+### Running MicroShift
+Run the MicroShift executable file in the background using the following command.
+```bash
+nohup sudo ~/microshift/microshift run >> /tmp/microshift.log &
+```
+Examine the `/tmp/microshift.log` log file to ensure a successful startup.
+
+> An alternative way of running MicroShift is to update `/usr/bin/microshift` file and restart the service. The logs would then be accessible by running the `journalctl -xu microshift` command.
+> ```bash
+> sudo cp -f ~/microshift/microshift /usr/bin/microshift
+> sudo systemctl start microshift
+> ```
 
 Copy `kubeconfig` to the default location that can be accessed without the administrator privilege.
 ```bash
-mkdir ~/.kube
+mkdir -p ~/.kube/
 sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
 ```
 
 Verify that the MicroShift is running.
 ```bash
 oc get cs
-oc get pods -A
+watch oc get pods -A
 ```
+
 ### Stopping MicroShift
-Run the following command to stop the MicroShift and make sure it is shut down by examining its log file.
+Run the following command to stop the MicroShift process and make sure it is shut down by examining its log file.
 ```bash
 sudo kill microshift && sleep 3
 tail -3 /tmp/microshift.log 
 ```
+> If MicroShift is running as a service, it is necessary to execute the `sudo systemctl stop microshift` command to shut it down and review the output of the `journalctl -xu microshift` command to verify the service termination.
 
-Note that this command only stops the MicroShift executable. To perform full cleanup including CRI-O images, run the following script.
+This command only stops the MicroShift process. To perform the full cleanup including `CRI-O`, MicroShift and OVN caches, run the following script.
 ```bash
-./hack/cleanup.sh
+echo 1 | ~/microshift/hack/cleanup.sh
 ```
+> The full cleanup does not remove OVS configuration applied by the MicroShift service initialization sequence.
+> Run the `sudo /usr/bin/configure-ovs.sh OpenShiftSDN` command to revert to the original network settings.
 
 ## Quick Development and Edge Testing Cycle
 During the development cycle, it is practical to build and run MicroShift executable as demonstrated in the [Build MicroShift](#build-microshift) and [Run MicroShift Executable](#run-microshift-executable) sections above. However, it is also necessary to have a convenient technique for testing the system in a setup resembling the production environment. Such an environment can be created in a virtual machine as described in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document. 
