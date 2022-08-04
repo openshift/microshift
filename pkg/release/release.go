@@ -19,11 +19,17 @@ package release
 var Base = "4.10.18"
 
 var Image = map[string]string{
-	"cli":                 "quay.io/microshift/cli:" + Base,
-	"coredns":             "quay.io/microshift/coredns:" + Base,
-	"haproxy_router":      "quay.io/microshift/haproxy-router:" + Base,
-	"kube_rbac_proxy":     "quay.io/microshift/kube-rbac-proxy:" + Base,
-	"pause":               "quay.io/microshift/pause:" + Base,
-	"service_ca_operator": "quay.io/microshift/service-ca-operator:" + Base,
-	"ovn_kubernetes":      "quay.io/microshift/ovn-kubernetes-singlenode:" + Base,
+	"cli":                     "quay.io/microshift/cli:" + Base,
+	"coredns":                 "quay.io/microshift/coredns:" + Base,
+	"haproxy_router":          "quay.io/microshift/haproxy-router:" + Base,
+	"kube_rbac_proxy":         "quay.io/microshift/kube-rbac-proxy:" + Base,
+	"pause":                   "quay.io/microshift/pause:" + Base,
+	"service_ca_operator":     "quay.io/microshift/service-ca-operator:" + Base,
+	"ovn_kubernetes":          "quay.io/microshift/ovn-kubernetes-singlenode:" + Base,
+	"odf_topolvm":             "quay.io/microshift/odf-topolvm-rhel8" + Base,
+	"odf_lvm_operator":        "quay.io/microshift/odf-lvm-rhel8-operator" + Base,
+	"ose_csi_ext_provisioner": "quay.io/microshift/ose-csi-external-provisioner" + Base,
+	"ose_csi_ext_resizer":     "quay.io/microshift/ose-csi-external-resizer" + Base,
+	"ose_csi_node_registrar":  "quay.io/microshift/ose-csi-node-driver-registrar" + Base,
+	"ose_csi_livenessprobe":   "quay.io/microshift/ose-csi-livenessprobe" + Base,
 }

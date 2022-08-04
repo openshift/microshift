@@ -24,6 +24,7 @@
 // assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
 // assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml
 // assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml
+// assets/components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml
 // assets/components/odf-lvm/topolvm_default-storage-class.yaml
 // assets/components/openshift-dns/dns/cluster-role-binding.yaml
 // assets/components/openshift-dns/dns/cluster-role.yaml
@@ -66,7 +67,6 @@
 // assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml
 // assets/crd/0000_03_security-openshift_01_scc.crd.yaml
 // assets/crd/0000_10_config-operator_01_featuregate.crd.yaml
-// assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml
@@ -202,7 +202,7 @@ spec:
       - command:
         - /topolvm-controller
         - --cert-dir=/certs
-        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .ReleaseImage.odf_topolvm }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -256,7 +256,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        image: registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:42563eb25efb2b6f277944b627bea420fa58fe950b46a1bd1487122b8a387e75
+        image: {{ .ReleaseImage.ose_csi_ext_provisioner }}
         imagePullPolicy: IfNotPresent
         name: csi-provisioner
         resources:
@@ -270,7 +270,7 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:75017593988025df444c8b3849b6ba867c3a7f6fc83212aeff2dfc3de4fabd21
+        image: {{ .ReleaseImage.ose_csi_ext_resizer }}
         imagePullPolicy: IfNotPresent
         name: csi-resizer
         resources: {}
@@ -281,7 +281,7 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        image: {{ .ReleaseImage.ose_csi_livenessprobe }}
         imagePullPolicy: IfNotPresent
         name: liveness-probe
         resources: {}
@@ -297,7 +297,7 @@ spec:
         - -c
         - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
           -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        image: {{ .ReleaseImage.odf_lvm_operator }}
         imagePullPolicy: IfNotPresent
         name: self-signed-cert-generator
         resources: {}
@@ -328,7 +328,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4590, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4170, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1000,7 +1000,7 @@ spec:
         - /lvmd
         - --config=/etc/topolvm/lvmd.yaml
         - --container=true
-        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .ReleaseImage.odf_topolvm }}  #registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
         imagePullPolicy: IfNotPresent
         name: lvmd
         resources:
@@ -1026,7 +1026,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .ReleaseImage.odf_topolvm }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -1066,7 +1066,7 @@ spec:
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.cybozu.com/node/csi-topolvm.sock
-        image: registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:376f21cfa8308dc1b61a3e8401b7023d903eda768912699f39403de742ab88b1
+        image: {{ .ReleaseImage.ose_csi_node_registrar }}
         imagePullPolicy: IfNotPresent
         lifecycle:
           preStop:
@@ -1086,7 +1086,7 @@ spec:
           name: registration-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:058fd6f949218cd3a76d8974ff1ea27fd45cba4662d14e3561285c779f0f0de5
+        image: {{ .ReleaseImage.ose_csi_livenessprobe }}
         imagePullPolicy: IfNotPresent
         name: liveness-probe
         resources: {}
@@ -1103,7 +1103,7 @@ spec:
         - -c
         - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
           sleep 5; done
-        image: registry.redhat.io/odf4/odf-lvm-rhel8-operator@sha256:4f486e6f92a4810ceebeb053bb2848728da36ba1285123407e308ef9ef6dbfbb
+        image: {{ .ReleaseImage.odf_lvm_operator }}
         imagePullPolicy: IfNotPresent
         name: file-checker
         resources: {}
@@ -1161,7 +1161,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5522, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5221, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1293,6 +1293,106 @@ func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml() (*asset, erro
 	}
 
 	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml", size: 293, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: logicalvolumes.topolvm.cybozu.com
+spec:
+  group: topolvm.cybozu.com
+  names:
+    kind: LogicalVolume
+    listKind: LogicalVolumeList
+    plural: logicalvolumes
+    singular: logicalvolume
+  scope: Cluster
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: LogicalVolume is the Schema for the logicalvolumes API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: LogicalVolumeSpec defines the desired state of LogicalVolume
+            properties:
+              deviceClass:
+                type: string
+              name:
+                type: string
+              nodeName:
+                type: string
+              size:
+                anyOf:
+                - type: integer
+                - type: string
+                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                x-kubernetes-int-or-string: true
+            required:
+            - name
+            - nodeName
+            - size
+            type: object
+          status:
+            description: LogicalVolumeStatus defines the observed state of LogicalVolume
+            properties:
+              code:
+                description: A Code is an unsigned 32-bit error code as defined in
+                  the gRPC spec.
+                format: int32
+                type: integer
+              currentSize:
+                anyOf:
+                - type: integer
+                - type: string
+                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                x-kubernetes-int-or-string: true
+              message:
+                type: string
+              volumeID:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+`)
+
+func assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml", size: 3096, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4767,106 +4867,6 @@ func assetsCrd0000_10_configOperator_01_featuregateCrdYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  name: logicalvolumes.topolvm.cybozu.com
-spec:
-  group: topolvm.cybozu.com
-  names:
-    kind: LogicalVolume
-    listKind: LogicalVolumeList
-    plural: logicalvolumes
-    singular: logicalvolume
-  scope: Cluster
-  versions:
-  - name: v1
-    schema:
-      openAPIV3Schema:
-        description: LogicalVolume is the Schema for the logicalvolumes API
-        properties:
-          apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-            type: string
-          kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-            type: string
-          metadata:
-            type: object
-          spec:
-            description: LogicalVolumeSpec defines the desired state of LogicalVolume
-            properties:
-              deviceClass:
-                type: string
-              name:
-                type: string
-              nodeName:
-                type: string
-              size:
-                anyOf:
-                - type: integer
-                - type: string
-                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                x-kubernetes-int-or-string: true
-            required:
-            - name
-            - nodeName
-            - size
-            type: object
-          status:
-            description: LogicalVolumeStatus defines the observed state of LogicalVolume
-            properties:
-              code:
-                description: A Code is an unsigned 32-bit error code as defined in
-                  the gRPC spec.
-                format: int32
-                type: integer
-              currentSize:
-                anyOf:
-                - type: integer
-                - type: string
-                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                x-kubernetes-int-or-string: true
-              message:
-                type: string
-              volumeID:
-                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
-                  of cluster Important: Run "make" to regenerate code after modifying
-                  this file'
-                type: string
-            type: object
-        type: object
-    served: true
-    storage: true
-    subresources:
-      status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
-`)
-
-func assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYamlBytes() ([]byte, error) {
-	return _assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml, nil
-}
-
-func assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml() (*asset, error) {
-	bytes, err := assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml", size: 3096, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml = []byte(`allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
@@ -5408,6 +5408,7 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
 	"assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml":                                          assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml,
 	"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml":                                     assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml,
+	"assets/components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml":                                       assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYaml,
 	"assets/components/odf-lvm/topolvm_default-storage-class.yaml":                                           assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml,
 	"assets/components/openshift-dns/dns/cluster-role-binding.yaml":                                          assetsComponentsOpenshiftDnsDnsClusterRoleBindingYaml,
 	"assets/components/openshift-dns/dns/cluster-role.yaml":                                                  assetsComponentsOpenshiftDnsDnsClusterRoleYaml,
@@ -5450,7 +5451,6 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml":                          assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml,
 	"assets/crd/0000_03_security-openshift_01_scc.crd.yaml":                                                  assetsCrd0000_03_securityOpenshift_01_sccCrdYaml,
 	"assets/crd/0000_10_config-operator_01_featuregate.crd.yaml":                                             assetsCrd0000_10_configOperator_01_featuregateCrdYaml,
-	"assets/crd/0000_20_topolvm.cybozu.com_logicalvolumes.yaml":                                              assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":                                          assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml":                                      assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml":                                assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml,
@@ -5529,6 +5529,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
 				"topolvm-node_v1_serviceaccount.yaml":                                          {assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml, map[string]*bintree{}},
 				"topolvm-openshift-storage_namespace.yaml":                                     {assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml, map[string]*bintree{}},
+				"topolvm.cybozu.com_logicalvolumes.yaml":                                       {assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYaml, map[string]*bintree{}},
 				"topolvm_default-storage-class.yaml":                                           {assetsComponentsOdfLvmTopolvm_defaultStorageClassYaml, map[string]*bintree{}},
 			}},
 			"openshift-dns": {nil, map[string]*bintree{
@@ -5592,7 +5593,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml": {assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml, map[string]*bintree{}},
 			"0000_03_security-openshift_01_scc.crd.yaml":                         {assetsCrd0000_03_securityOpenshift_01_sccCrdYaml, map[string]*bintree{}},
 			"0000_10_config-operator_01_featuregate.crd.yaml":                    {assetsCrd0000_10_configOperator_01_featuregateCrdYaml, map[string]*bintree{}},
-			"0000_20_topolvm.cybozu.com_logicalvolumes.yaml":                     {assetsCrd0000_20_topolvmCybozuCom_logicalvolumesYaml, map[string]*bintree{}},
 		}},
 		"scc": {nil, map[string]*bintree{
 			"0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":           {assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml, map[string]*bintree{}},
