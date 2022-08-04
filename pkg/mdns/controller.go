@@ -69,7 +69,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 		}
 
 		klog.Infof("Host FQDN will be announced via mDNS", "fqdn", c.NodeName, "ips", ips)
-		c.resolver.AddDomain(c.NodeName, ips)
+		c.resolver.AddDomain(c.NodeName+".", ips)
 		c.myIPs = ips
 	}
 
