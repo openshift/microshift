@@ -291,9 +291,9 @@ update_manifests() {
     #-- OpenShift control plane ---------------------------
     # 1) Adopt resource manifests
     #    Selectively copy in only those CRD manifests that MicroShift is already using
-    for crd in "${REPOROOT}"/assets/crd/*.yaml; do
-        cp "${STAGING_DIR}/release-manifests/$(basename "${crd}")" "${REPOROOT}"/assets/crd || true
-    done
+    cp "${STAGING_DIR}/release-manifests/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml" "${REPOROOT}"/assets/crd
+    cp "${STAGING_DIR}/release-manifests/0000_03_security-openshift_01_scc.crd.yaml" "${REPOROOT}"/assets/crd
+    # TODO: add route CRD (https://github.com/openshift/api/blob/master/route/v1/route.crd.yaml) when we rebase to a release that contains it
     #    Replace all SCC manifests.
     rm -f "${REPOROOT}"/assets/scc/*.yaml
     cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/scc || true
