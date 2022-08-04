@@ -349,11 +349,20 @@ update_images() {
         # Compute the max length of image names incl. enclosing quotes
         w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
         for i in ${images}; do
-            digest=$(jq -r ".references.spec.tags[] | select(.name == \"${i}\") | .from.name" release_${arch}.json)
+            # Ignore the release's ovn-kubernetes image as (long as) we're deploying a MicroShift-specific image.
+            if [[ "${i//_/-}" == "ovn-kubernetes" ]]; then
+                echo "Skipping ${i//_/-} (${arch}): Keeping MicroShift-specific version."
+                continue
+            fi
+
+            digest=$(jq -r ".references.spec.tags[] | select(.name == \"${i//_/-}\") | .from.name" release_${arch}.json)
             if [[ -n "${digest}" ]]; then
+                echo "Updating image ${i//_/-} (${arch}) to ${digest}."
                 awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
                     "${REPOROOT}/pkg/release/release_${arch}.go" > t
                 mv t "${REPOROOT}/pkg/release/release_${arch}.go"
+            else
+                echo "Skipping ${i//_/-} (${arch}): Not part of release image."
             fi
         done
     done
