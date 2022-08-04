@@ -218,6 +218,9 @@ sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openv
 %systemd_post microshift-ovs-init.service
 systemctl is-active --quiet NetworkManager && systemctl restart --quiet NetworkManager || true
 systemctl enable --now --quiet openvswitch || true
+# configure the firewall rules for pods to intercommunicate
+systemctl is-active --quiet firewalld || firewall-offline-cmd -q --zone=trusted --add-source=10.42.0.0/16
+systemctl is-active --quiet firewalld && firewall-cmd         -q --zone=trusted --add-source=10.42.0.0/16
 
 %preun networking
 %systemd_preun microshift-ovs-init.service

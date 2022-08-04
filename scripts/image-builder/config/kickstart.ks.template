@@ -56,7 +56,4 @@ chmod 600 /home/redhat/.ssh/authorized_keys
 # Make sure redhat user directory contents ownership is correct
 chown -R redhat:redhat /home/redhat/
 
-# Configure the firewall
-firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
-
 %end
