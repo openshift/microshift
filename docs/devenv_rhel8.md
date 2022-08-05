@@ -116,6 +116,8 @@ sudo chmod 600 /etc/crio/openshift-pull-secret
 ### Configuring MicroShift
 MicroShift requires system configuration updates before it can be run. These updates include `CRI-O`, networking and file system customizations.
 
+> If a firewall is enabled, follow the instructions in the [Firewall Configuration](./howto_firewall.md) document to apply the mandatory settings.
+
 It is necessary to install the MicroShift RPM packages to automatically apply all the necessary customizations.
 ```
 sudo subscription-manager repos --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
