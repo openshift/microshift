@@ -3,6 +3,8 @@ package cmd
 import (
 	"context"
 	"errors"
+	"net/http"
+	"net/http/pprof"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -47,6 +49,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
 	flags.String("audit-log-dir", cfg.AuditLogDir, "Directory for storing audit logs.")
 	flags.StringSlice("roles", cfg.Roles, "Roles of this MicroShift instance.")
+	flags.Bool("debug.pprof", false, "Enable golang pprof debugging")
 
 	return cmd
 }
@@ -129,6 +132,34 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 		}
 	}()
+
+	if cfg.Debug.Pprof {
+		mux := http.NewServeMux()
+		mux.HandleFunc("/debug/pprof/", pprof.Index)
+		mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+		mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+		mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+		mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+
+		go func() {
+			var server *http.Server
+			server = &http.Server{
+				Addr:    "127.0.0.1:29500",
+				Handler: mux,
+			}
+			err := server.ListenAndServe()
+			if err != nil && err != http.ErrServerClosed {
+				klog.Errorf("starting pprof http server failed: %v", err)
+			}
+			<-stopped
+			klog.Info("stopping pprof http server: %s", server.Addr)
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err = server.Shutdown(shutdownCtx); err != nil {
+				klog.Errorf("error stopping pprof http server: %v", err)
+			}
+		}()
+	}
 
 	sigTerm := make(chan os.Signal, 1)
 	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)

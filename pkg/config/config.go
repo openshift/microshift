@@ -53,6 +53,10 @@ type NodeConfig struct {
 	// Token string `yaml:"token", envconfig:"NODE_TOKEN"`
 }
 
+type DebugConfig struct {
+	Pprof bool
+}
+
 type MicroshiftConfig struct {
 	ConfigFile string
 	DataDir    string `yaml:"dataDir"`
@@ -69,7 +73,8 @@ type MicroshiftConfig struct {
 	ControlPlane ControlPlaneConfig `yaml:"controlPlane"`
 	Node         NodeConfig         `yaml:"node"`
 
-	Manifests []string `yaml:"manifests"`
+	Manifests []string    `yaml:"manifests"`
+	Debug     DebugConfig `yaml:"debug"`
 }
 
 func NewMicroshiftConfig() *MicroshiftConfig {
@@ -217,6 +222,9 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	}
 	if roles, err := flags.GetStringSlice("roles"); err == nil && flags.Changed("roles") {
 		c.Roles = roles
+	}
+	if pprofFlag, err := flags.GetBool("debug.pprof"); err == nil && flags.Changed("debug.pprof") {
+		c.Debug.Pprof = pprofFlag
 	}
 	return nil
 }
