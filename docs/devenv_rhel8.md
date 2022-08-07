@@ -214,3 +214,30 @@ ssh redhat@microshift-edge ' \
     sudo systemctl enable microshift --now && \
     echo Done '
 ```
+
+## Profile MicroShift
+Golang [pprof](https://pkg.go.dev/net/http/pprof) is a useful tool for serving runtime profiling data via an HTTP server in the format expected by the `pprof` visualization tool.
+> Runtime profiling is disabled by default and it should not be enabled in the production environment.
+
+Run MicroShift with `--debug.pprof=true` command line argument to serve runtime profiling data on port `29500`.
+
+```
+nohup sudo ~/microshift/microshift run --debug.pprof=true >> /tmp/microshift.log &
+```
+
+> It may be necessary to configure your firewall for accessing the `pprof` HTTP server remotely.
+>```
+>sudo firewall-cmd --permanent --add-port=29500/tcp
+>sudo firewall-cmd --reload
+>```
+
+Runtime profiling data can now be accessed from the command line as described in the [pprof](https://pkg.go.dev/net/http/pprof) documentation. As an example, the following command can be used to look at the heap profile.
+
+```
+PPROF_ADDR=microshift-dev:29500
+go tool pprof http://${PPROF_ADDR}/debug/pprof/heap
+```
+
+To view all the available profiles, open the `http://microshift-dev:29500/debug/pprof` URL in your browser.
+
+![All pprof profiles](./images/devenv_pprof.png)
