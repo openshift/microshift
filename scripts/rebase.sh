@@ -15,11 +15,14 @@
 #
 
 set -o errexit
+set -o errtrace
 set -o nounset
 set -o pipefail
 
 shopt -s expand_aliases
 shopt -s extglob
+
+trap 'echo "Script exited with error."' ERR
 
 # debugging options
 #trap 'echo "# $BASH_COMMAND"' DEBUG
@@ -92,6 +95,34 @@ download_release() {
 }
 
 
+# Greps a Golang pseudoversion from input.
+grep_pseudoversion() {
+    local line=$1
+
+    echo "${line}" | grep -Po "v[0-9]+\.(0\.0-|\d+\.\d+-([^+]*\.)?0\.)\d{14}-[A-Za-z0-9]+(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?"
+}
+
+# Updates a replace directive using an embedded component's commit.
+# Caches component pseudoversions for faster processing.
+declare -A pseudoversions
+replace_using_component_commit() {
+    local modulepath=$1
+    local new_modulepath=$2
+    local component=$3
+
+    if [[ ${pseudoversions[${component}]+foo} ]]; then
+        echo "go mod edit -replace ${modulepath}=${new_modulepath}@${pseudoversions[${component}]}"
+        go mod edit -replace "${modulepath}=${new_modulepath}@${pseudoversions[${component}]}"
+    else
+        commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
+        echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
+        go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
+        go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
+        pseudoversion=$(grep_pseudoversion "$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")")
+        pseudoversions["${component}"]="${pseudoversion}"
+    fi
+}
+
 # Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
 # and version as per the staged checkout of ${component}.
 update_modulepath_version_from_release() {
@@ -103,12 +134,17 @@ update_modulepath_version_from_release() {
         path="${modulepath#go.etcd.io/etcd}"
     fi
     repo=$( cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url )
-    commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
     new_modulepath="${repo#https://}${path}"
+    replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}"
+}
 
-    echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
-    go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
-    go mod tidy
+# Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
+# in the staging directory of openshift/kubernetes at the released version.
+update_modulepath_to_kubernetes_staging() {
+    local modulepath=$1
+
+    new_modulepath="github.com/openshift/kubernetes/staging/src/${modulepath}"
+    replace_using_component_commit "${modulepath}" "${new_modulepath}" "kubernetes"
 }
 
 # Returns the line (including trailing comment) in the #{gomod_file} containing the ReplaceDirective for ${module_path}
@@ -116,8 +152,8 @@ get_replace_directive() {
     local gomod_file=$1
     local module_path=$2
 
-    # TODO: Handle special case of keyword "replace" being included in the line
-    go mod edit -print "${gomod_file}" | grep "^[[:space:]]${module_path}[[:space:]][[:alnum:][:space:].-]*=>"
+    replace=$(go mod edit -print "${gomod_file}" | grep "[[:space:]]${module_path}[[:space:]][[:alnum:][:space:].-]*=>")
+    echo -e "${replace/replace /}"
 }
 
 # Updates a ReplaceDirective for an old ${modulepath} with the new modulepath
@@ -138,21 +174,39 @@ update_modulepath_version_from_component() {
     replacement=$(echo "${replace_directive}" | sed -E "s|.*=>[[:space:]]*(.*)[[:space:]]*|\1|")
     if [[ "${replacement}" =~ ^./staging ]]; then
         new_modulepath=$(echo "${replacement}" | sed 's|^./staging/|github.com/openshift/kubernetes/staging/|')
-        commit=$( cd "${STAGING_DIR}/kubernetes" && git rev-parse HEAD )
-        echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
-        go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
-        go mod tidy
+        replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}"
     else
         echo "go mod edit -replace ${modulepath}=${replacement/ /@}"
         go mod edit -replace "${modulepath}=${replacement/ /@}"
     fi
 }
 
+# Trim trailing whitespace
+rtrim() {
+    local line=$1
+
+    echo "${line}" | sed 's|[[:space:]]*$||'
+}
+
+# Trim leading whitespace
+ltrim() {
+    local line=$1
+
+    echo "${line}" | sed 's|^[[:space:]]*||'
+}
+
+# Trim leading and trailing whitespace
+trim() {
+    local line=$1
+
+    ltrim "$(rtrim "${line}")"
+}
+
 # Returns ${line} stripping the trailing comment
 strip_comment() {
     local line=$1
 
-    echo "${line%%//*}"
+    rtrim "${line%%//*}"
 }
 
 # Returns the comment in ${line} if one exists or an empty string if not
@@ -161,19 +215,38 @@ get_comment() {
 
     comment=${line##*//}
     if [ "${comment}" != "${line}" ]; then
-        echo ${comment}
+        trim "${comment}"
     else
         echo ""
     fi
 }
 
+# Replaces comment(s) at the end of the ReplaceDirective for $modulepath with $newcomment
+update_comment() {
+    local modulepath=$1
+    local newcomment=$2
+
+    oldline=$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")
+    newline="$(strip_comment "${oldline}") // ${newcomment}"
+    sed -i "s|${oldline}|${newline}|" "${REPOROOT}/go.mod"
+}
+
 # Validate that ${component} is in the allowed list for the lookup, else exit
 valid_component_or_exit() {
     local component=$1
-    if [[ ! " etcd kubernetes openshift-apiserver openshift-controller-manager " =~ " ${component} " ]]; then
-        echo "error: release reference must be one of [etcd kubernetes openshift-apiserver openshift-controller-manager], have ${component}"
+
+    if [[ ! " ${EMBEDDED_COMPONENTS/hyperkube/kubernetes} " =~ " ${component} " ]]; then
+        echo "error: component must be one of [${EMBEDDED_COMPONENTS/hyperkube/kubernetes}], have ${component}"
         exit 1
     fi
+}
+
+# Return all o/k staging repos (borrowed from k/k's hack/lib/util.sh)
+list_staging_repos() {
+  (
+    cd "${STAGING_DIR}/kubernetes/staging/src/k8s.io" && \
+    find . -mindepth 1 -maxdepth 1 -type d | cut -c 3- | sort
+  )
 }
 
 # Updates MicroShift's go.mod file by updating each ReplaceDirective's
@@ -182,6 +255,7 @@ valid_component_or_exit() {
 # and this is driven from keywords added as comments after each line of
 # ReplaceDirectives:
 #   // from ${component}     selects the replacement from the go.mod of ${component}
+#   // staging kubernetes    selects the replacement from the staging dir of openshift/kubernetes
 #   // release ${component}  uses the commit of ${component} as specified in the release image
 #   // override [${reason}]  keep existing replacement
 # Note directives without keyword comment are skipped with a warning.
@@ -190,6 +264,17 @@ update_go_mod() {
 
     title "# Updating go.mod"
 
+    # For all repos in o/k staging, ensure a RequireDirective of v0.0.0
+    # and a ReplaceDirective to an absolute modulepath to o/k staging.
+    for repo in $(list_staging_repos); do
+        go mod edit -require "k8s.io/${repo}@v0.0.0"
+        update_modulepath_to_kubernetes_staging "k8s.io/${repo}"
+        if [ -z "$(get_comment "$(get_replace_directive "${REPOROOT}/go.mod" "k8s.io/${repo}")")" ]; then
+            update_comment "k8s.io/${repo}" "staging kubernetes"
+        fi
+    done
+
+    # Update existing replace directives
     replaced_modulepaths=$(go mod edit -json | jq -r '.Replace // []' | jq -r '.[].Old.Path' | xargs)
     for modulepath in ${replaced_modulepaths}; do
         current_replace_directive=$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")
@@ -201,6 +286,9 @@ update_go_mod() {
             component=${arguments%% *}
             valid_component_or_exit "${component}"
             update_modulepath_version_from_component "${modulepath}" "${component}"
+            ;;
+        staging)
+            update_modulepath_to_kubernetes_staging "${modulepath}"
             ;;
         release)
             component=${arguments%% *}
@@ -215,6 +303,8 @@ update_go_mod() {
             ;;
         esac
     done
+
+    go mod tidy
 
     popd >/dev/null
 }
@@ -259,11 +349,20 @@ update_images() {
         # Compute the max length of image names incl. enclosing quotes
         w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
         for i in ${images}; do
-            digest=$(jq -r ".references.spec.tags[] | select(.name == \"${i}\") | .from.name" release_${arch}.json)
+            # Ignore the release's ovn-kubernetes image as (long as) we're deploying a MicroShift-specific image.
+            if [[ "${i//_/-}" == "ovn-kubernetes" ]]; then
+                echo "Skipping ${i//_/-} (${arch}): Keeping MicroShift-specific version."
+                continue
+            fi
+
+            digest=$(jq -r ".references.spec.tags[] | select(.name == \"${i//_/-}\") | .from.name" release_${arch}.json)
             if [[ -n "${digest}" ]]; then
+                echo "Updating image ${i//_/-} (${arch}) to ${digest}."
                 awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
                     "${REPOROOT}/pkg/release/release_${arch}.go" > t
                 mv t "${REPOROOT}/pkg/release/release_${arch}.go"
+            else
+                echo "Skipping ${i//_/-} (${arch}): Not part of release image."
             fi
         done
     done
@@ -430,9 +529,14 @@ rebase_to() {
 
         title "## Updating vendor directory"
         go mod vendor
-        title "## Patching vendor directory"
-        git apply scripts/rebase_patches/*
+
+        if [ "$(ls -A scripts/rebase_patches)" ]; then
+            title "## Patching vendor directory"
+            git apply scripts/rebase_patches/*.patch || true
+        fi
+
         regenerate_openapi
+
         if [[ -n "$(git status -s vendor)" ]]; then
             title "## Commiting changes to vendor directory"
             git add vendor
