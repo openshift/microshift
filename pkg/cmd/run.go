@@ -144,7 +144,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		go func() {
 			var server *http.Server
 			server = &http.Server{
-				Addr:    "127.0.0.1:29500",
+				Addr:    cfg.NodeIP + ":29500",
 				Handler: mux,
 			}
 			err := server.ListenAndServe()
