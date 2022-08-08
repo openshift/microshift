@@ -3156,14 +3156,7 @@ spec:
           name: env-overrides
           optional: true
       tolerations:
-      - key: "node-role.kubernetes.io/master"
-        operator: "Exists"
-      - key: "node.kubernetes.io/not-ready"
-        operator: "Exists"
-      - key: "node.kubernetes.io/unreachable"
-        operator: "Exists"
-      - key: "node.kubernetes.io/network-unavailable"
-        operator: "Exists"
+      - operator: "Exists"
 `)
 
 func assetsComponentsOvnMasterDaemonsetYamlBytes() ([]byte, error) {
@@ -3176,7 +3169,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15752, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15481, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
