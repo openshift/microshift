@@ -59,6 +59,6 @@ chown -R redhat:redhat /home/redhat/
 # Configure the firewall
 firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
 firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
-systemctl is-enabled --quiet firewalld.service && firewall-cmd --reload
+systemctl is-active --quiet firewalld.service && firewall-cmd --reload
 
 %end
