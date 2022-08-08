@@ -94,6 +94,11 @@ GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
 GO_TEST_PACKAGES=./cmd/... ./pkg/...
 
 # targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
+# Disable CGO when building microshift binary
+all: export CGO_ENABLED=0
+
+build: export CGO_ENABLED=0
+
 microshift: build
 
 microshift-aio: build-containerized-all-in-one-amd64
