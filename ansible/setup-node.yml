@@ -1,0 +1,38 @@
+---
+# Setup Microshfit nodes
+#
+# Example Usage:
+#
+# ansible-playbook -i inventory/inventory setup-node.yml
+#
+
+- name: Set up localhost
+  hosts: localhost
+  vars:
+    ansible_become: no
+    ansible_connection: local
+  vars_files:
+  - vars/all.yml
+  roles:
+  - setup-localhost
+
+- name: Set up logging node
+  hosts: logging
+  roles:
+  - install-logging
+
+- name: Install microshift node
+  hosts: microshift
+  vars_files:
+  - vars/all.yml
+  roles:
+    - epel-repo-install
+    - role: pbench_repo_install
+      when: install_pbench | bool
+    - role: pbench_agent_install
+      when: install_pbench | bool
+    - role: pbench_agent_config
+      when: install_pbench | bool
+    - install-microshift
+    - microshift-start
+

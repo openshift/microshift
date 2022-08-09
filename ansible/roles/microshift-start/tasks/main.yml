@@ -1,0 +1,96 @@
+---
+# install-microshift tasks
+
+- name: reboot machine
+  reboot:
+    reboot_timeout: 600
+
+- name: Pause for 60 seconds for steady state post reboot
+  ansible.builtin.pause:
+    seconds: 60
+
+- name: pbench recording start
+  block:
+  - name: source pbench-agent & register-tool-set
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
+  
+  - name: start pbench-user-benchmark recording
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift2 -- sleep {{ pbench_record_duration }}
+    async: "{{ pbench_record_duration|int * 2 }}"
+    poll: 0
+    register: pbench_user_benchmark_result
+  
+  - name: Pause for 60 seconds to gather steady state for pbench tool recording
+    ansible.builtin.pause:
+      seconds: 60
+  when: install_pbench | bool
+  environment:
+    PBENCH_TOOL_DATA_SINK: localhost:8081
+
+- name: force update of current timestamp
+  ansible.builtin.setup:
+    filter:
+      - 'ansible_date_time'
+
+- name: set start_time
+  ansible.builtin.set_fact:
+    start_time: "{{ ansible_date_time.iso8601[:19] }}"
+
+- name: start microshift service
+  ansible.builtin.systemd:
+    name: microshift
+    state: started
+    enabled: no
+
+- name: restart cadvisor to pick up new containers
+  ansible.builtin.systemd:
+    name: cadvisor
+    state: restarted
+
+- name: wait for kubeconfig to exist on microshift node
+  ansible.builtin.stat:
+    path: "{{ remote_kubeconfig_path }}"
+  register: remote_kubeconfig
+  until: remote_kubeconfig.stat.exists
+  retries: 30
+  delay: 1
+
+- name: wait for pods running
+  ansible.builtin.shell: kubectl get po -A --no-headers | grep Running | wc -l
+  retries: 60
+  delay: 1
+  register: result
+  until: result.stdout == "6"
+
+- name: force update of current timestamp
+  ansible.builtin.setup:
+    filter:
+      - 'ansible_date_time'
+
+- name: get runtime
+  ansible.builtin.set_fact:
+    runtime: "{{ ((ansible_date_time.iso8601[:19] | to_datetime('%Y-%m-%dT%H:%M:%S')) - (start_time | to_datetime('%Y-%m-%dT%H:%M:%S'))).seconds }}"
+
+- name: Add boot info to local file
+  lineinfile:
+    path: boot.txt
+    line: "Second boot: {{ runtime }}"
+    create: yes
+  delegate_to: localhost
+
+- name: finish pbench capture
+  block:
+  - name: check on pbench-user-benchmark status
+    ansible.builtin.async_status:
+      jid: "{{ pbench_user_benchmark_result.ansible_job_id }}"
+    register: job_result
+    until: job_result.finished
+    retries: 80
+    delay: 15
+  
+  - name: source pbench-agent & move results
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-move-results
+  when: install_pbench | bool
+  environment:
+    PBENCH_USER: sejug
+

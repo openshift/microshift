@@ -1,0 +1,18 @@
+---
+# install-localhost tasks
+#
+- name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
+  connection: local
+  wait_for:
+    port: 22
+    host: "{{ item }}"
+    search_regex: OpenSSH
+    delay: 10
+  with_items:
+    - "{{ host_ips }}"
+
+- name: write the new ec2 instance host key to known hosts
+  connection: local
+  shell: "ssh-keyscan -H {{ item }} >> ~/.ssh/known_hosts"
+  with_items:
+    - "{{ host_ips }}"

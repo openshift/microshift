@@ -1,0 +1,30 @@
+---
+# epel_repo_install tasks
+
+- name: RHEL tasks
+  block:
+    - name: install EPEL repo
+      ansible.builtin.dnf:
+        name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
+        disable_gpg_check: true
+        state: present
+  when: ansible_distribution == "RedHat"
+
+- name: CentOS tasks
+  block:
+    - name: enable powertools repo (CentOS 8)
+      ansible.builtin.command: dnf config-manager --set-enabled powertools
+      when: ansible_distribution_version == "8"
+
+    # There's no CRI-O for RHEL/CentOS 9
+    - name: enable powertools repo (CentOS 9)
+      ansible.builtin.command: dnf config-manager --set-enabled crb
+      when: ansible_distribution_version == "9"
+
+    - name: install EPEL repo
+      ansible.builtin.dnf:
+        name:
+        - epel-release
+        - epel-next-release
+        state: present
+  when: ansible_distribution == "CentOS"

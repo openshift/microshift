@@ -1,0 +1,49 @@
+---
+# install-logging tasks
+
+- name: CentOS tasks
+  block:
+    - name: enable powertools repo (CentOS 8)
+      ansible.builtin.command: dnf config-manager --set-enabled powertools
+      when: ansible_distribution_version == "8"
+
+    # There's no CRI-O for RHEL/CentOS 9
+    - name: enable powertools repo (CentOS 9)
+      ansible.builtin.command: dnf config-manager --set-enabled crb
+      when: ansible_distribution_version == "9"
+
+    - name: install EPEL repo
+      ansible.builtin.dnf:
+        name:
+        - epel-release
+        - epel-next-release
+        state: present
+        update_cache: true
+  when: ansible_distribution == "CentOS"
+
+- name: upgrade all packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+  notify: reboot machine
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: install prometheus
+  ansible.builtin.dnf:
+    name:
+      - golang-github-prometheus
+    state: present
+
+- name: copy prometheus config
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    backup: true
+
+- name: start and enable prometheus service
+  ansible.builtin.systemd:
+    name: prometheus
+    state: restarted
+    enabled: yes

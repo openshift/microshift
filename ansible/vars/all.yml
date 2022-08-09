@@ -1,0 +1,4 @@
+install_pbench: false
+pbench_record_duration: 360
+local_kubeconfig_path: ~/.kube/config.microshift
+pbench_configuration_environment: ec2

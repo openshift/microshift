@@ -1,0 +1,6 @@
+---
+# install-localhost defaults
+
+host_ips:
+  - "{{ hostvars['microshift'].ansible_host }}"
+  - "{{ hostvars['logging'].ansible_host }}"

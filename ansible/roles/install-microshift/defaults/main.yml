@@ -1,0 +1,43 @@
+---
+# install-microshift default vars
+
+enable_repos:
+  - rhel-9-for-x86_64-baseos-rpms
+  - rhel-9-for-x86_64-appstream-rpms
+  - codeready-builder-for-rhel-9-x86_64-rpms
+
+install_packages:
+  - bash-completion
+  - firewalld
+  - python3-firewall
+  - perf
+
+cadvisor_url: https://github.com/google/cadvisor/releases/download/v0.39.2/cadvisor
+cadvisor_checksum: sha256:65109ea14132bce91bb2a92dc70248c705ba26fb2a7d55e295bf4192940a396c
+
+firewall_services:
+  - http
+  - https
+  - mdns
+
+firewall_ports:
+  - 6443/tcp
+  - 8080/tcp
+  - 9100/tcp
+  - 9537/tcp
+  - 17001/tcp
+
+systemd_services:
+  - cadvisor
+  - firewalld
+  - prometheus-node-exporter
+
+remote_kubeconfig_path: /var/lib/microshift/resources/kubeadmin/kubeconfig
+
+du_dirs:
+  - /
+  - /var/
+  - /var/lib/
+  - /var/lib/containers/storage/
+  - /usr/
+  - /usr/bin/*

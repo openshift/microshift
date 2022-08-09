@@ -1,0 +1,237 @@
+---
+# install-microshift tasks
+
+- name: RHEL tasks
+  block:
+    - name: register host with subscription-manager (RHEL)
+      community.general.redhat_subscription:
+        state: present
+        username: "{{ sm_user }}"
+        password: "{{ sm_pass }}"
+        pool_ids: "{{ pool_id }}"
+    
+    - name: enable repo management from subscription-manager
+      ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
+    
+    - name: enable built-in repos
+      ansible.builtin.command: subscription-manager repos --enable={{ item }}
+      with_items: "{{ enable_repos }}"
+  when: ansible_distribution == "RedHat"
+
+- name: CentOS tasks
+  block:
+    - name: install firewalld & packages
+      ansible.builtin.dnf:
+        name: "{{ install_packages}}"
+        state: present
+        update_cache: true
+
+    - name: install node-exporter
+      ansible.builtin.dnf:
+        name:
+        - golang-github-prometheus-node-exporter
+        state: present
+
+    - name: download cadvisor
+      ansible.builtin.get_url:
+        url: "{{ cadvisor_url }}"
+        dest: /usr/bin/cadvisor
+        checksum: "{{ cadvisor_checksum }}"
+        mode: '0755'
+
+    - name: install systemd unit for cadvisor
+      ansible.builtin.template:
+        src: cadvisor.service.j2
+        dest: /usr/lib/systemd/system/cadvisor.service
+        backup: true
+
+    - name: start and enable systemd services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        daemon_reload: yes
+        state: started
+        enabled: yes
+      with_items: "{{ systemd_services }}"
+  when: ansible_distribution == "CentOS"
+
+- name: install kubernetes repo
+  ansible.builtin.template:
+    src: kubernetes.repo.j2
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: install kubectl
+  ansible.builtin.dnf:
+    name:
+    - kubectl
+    state: present
+
+- name: create .kube home dir
+  ansible.builtin.file:
+    path: /root/.kube/
+    state: directory
+
+- name: create symbolic link for kubeconfig
+  ansible.builtin.file:
+    src: "{{ remote_kubeconfig_path }}"
+    path: "/root/.kube/config"
+    state: link
+    force: yes
+
+- name: permit traffic in trusted zone from CIDR
+  ansible.posix.firewalld:
+    source: 10.42.0.0/16
+    state: enabled
+    immediate: yes
+    permanent: yes
+    zone: trusted
+
+- name: permit traffic in public zone for services
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+    zone: public
+  with_items: "{{ firewall_services }}"
+
+- name: permit traffic in public zone for ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+    zone: public
+  with_items: "{{ firewall_ports }}"
+
+- name: upgrade all packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+  notify: reboot machine
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: record initial disk space
+  vars:
+    filename: disk0.txt
+  include_tasks: disk.yml
+  loop: "{{ du_dirs }}"
+
+- name: enable microshift copr repo
+  community.general.copr:
+    name: '@redhat-et/microshift'
+    state: enabled
+
+- name: enable cri-o module
+  ansible.builtin.command: dnf module enable -y cri-o
+
+- name: install microshift package
+  ansible.builtin.dnf:
+    name:
+    - microshift
+    state: present
+    update_cache: true
+
+- name: pbench recording start
+  block:
+  - name: source pbench-agent & register-tool-set
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
+  
+  - name: start pbench-user-benchmark recording
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift -- sleep {{ pbench_record_duration }}
+    async: "{{ pbench_record_duration|int * 2 }}"
+    poll: 0
+    register: pbench_user_benchmark_result
+  
+  - name: Pause for 60 seconds to gather steady state for pbench tool recording
+    ansible.builtin.pause:
+      seconds: 60
+  when: install_pbench | bool
+  environment:
+    PBENCH_TOOL_DATA_SINK: localhost:8081
+
+- name: record post-install disk utilization
+  vars:
+    filename: disk1.txt
+  include_tasks: disk.yml
+  loop: "{{ du_dirs }}"
+
+- name: force update of current timestamp
+  ansible.builtin.setup:
+    filter:
+      - 'ansible_date_time'
+
+- name: set start_time
+  ansible.builtin.set_fact:
+    start_time: "{{ ansible_date_time.iso8601[:19] }}"
+
+- name: start microshift service
+  ansible.builtin.systemd:
+    name: microshift
+    state: started
+    enabled: no
+
+- name: restart cadvisor to pick up new containers
+  ansible.builtin.systemd:
+    name: cadvisor
+    state: restarted
+
+- name: wait for kubeconfig to exist on microshift node
+  ansible.builtin.stat:
+    path: "{{ remote_kubeconfig_path }}"
+  register: remote_kubeconfig
+  until: remote_kubeconfig.stat.exists
+  retries: 30
+  delay: 10
+
+- name: wait for pods running
+  ansible.builtin.shell: kubectl get po -A --no-headers | grep Running | wc -l
+  retries: 60
+  delay: 5
+  register: result
+  until: result.stdout == "6"
+
+- name: force update of current timestamp
+  ansible.builtin.setup:
+    filter:
+      - 'ansible_date_time'
+
+- name: get runtime
+  ansible.builtin.set_fact:
+    runtime: "{{ ((ansible_date_time.iso8601[:19] | to_datetime('%Y-%m-%dT%H:%M:%S')) - (start_time | to_datetime('%Y-%m-%dT%H:%M:%S'))).seconds }}"
+
+- name: Add boot info to local file
+  lineinfile:
+    path: boot.txt
+    line: "First boot: {{ runtime }}"
+    create: yes
+  delegate_to: localhost
+
+#- name: copy kubeconfig to localhost
+#  ansible.builtin.fetch:
+#    src: "{{ remote_kubeconfig_path }}"
+#    dest: "{{ local_kubeconfig_path }}"
+#    flat: yes
+
+- name: finish pbench capture
+  block:
+  - name: check on pbench-user-benchmark status
+    ansible.builtin.async_status:
+      jid: "{{ pbench_user_benchmark_result.ansible_job_id }}"
+    register: job_result
+    until: job_result.finished
+    retries: 80
+    delay: 15
+  
+  - name: source pbench-agent & move results
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-move-results
+  when: install_pbench | bool
+  environment:
+    PBENCH_USER: sejug
+
+- name: record fully running disk utilization
+  vars:
+    filename: disk2.txt
+  include_tasks: disk.yml
+  loop: "{{ du_dirs }}"
