@@ -65,9 +65,6 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	if err := s.configureAuditPolicy(cfg); err != nil {
 		klog.Fatalf("Failed to configure kube-apiserver audit policy %v", err)
 	}
-	if err := s.configureOAuth(cfg); err != nil {
-		klog.Fatalf("Failed to configure kube-apiserver OAuth %v", err)
-	}
 
 	// Get the apiserver port so we can set it as an argument
 	apiServerPort, err := cfg.Cluster.ApiServerPort()
@@ -181,39 +178,6 @@ rules:
   - "RequestReceived"`)
 
 	path := filepath.Join(cfg.DataDir, "resources", "kube-apiserver-audit-policies", "default.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
-	return ioutil.WriteFile(path, data, 0644)
-}
-
-func (s *KubeAPIServer) configureOAuth(cfg *config.MicroshiftConfig) error {
-	data := []byte(`
-  {
-    "issuer": "https://oauth-openshift.cluster.local",
-    "authorization_endpoint": "https://oauth-openshift.cluster.local/oauth/authorize",
-    "token_endpoint": "https://oauth-openshift.cluster.local/oauth/token",
-    "scopes_supported": [
-      "user:check-access",
-      "user:full",
-      "user:info",
-      "user:list-projects",
-      "user:list-scoped-projects"
-    ],
-    "response_types_supported": [
-      "code",
-      "token"
-    ],
-    "grant_types_supported": [
-      "authorization_code",
-      "implicit"
-    ],
-    "code_challenge_methods_supported": [
-      "plain",
-      "S256"
-    ]
-  }
-`)
-
-	path := filepath.Join(cfg.DataDir, "resources", "kube-apiserver", "oauthMetadata")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return ioutil.WriteFile(path, data, 0644)
 }
