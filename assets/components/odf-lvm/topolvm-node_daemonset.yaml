@@ -123,7 +123,7 @@ spec:
         - -c
         - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
           sleep 5; done
-        image: {{ .ReleaseImage.odf_lvm_operator }}
+        image: {{ .ReleaseImage.openssl }}
         imagePullPolicy: IfNotPresent
         name: file-checker
         resources: {}
