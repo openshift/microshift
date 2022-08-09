@@ -65,7 +65,7 @@ To update the vendoring run:
 ```shell
 go mod vendor
 git apply scripts/rebase_patches/*
-script/rebase.sh generated-apis
+./scripts/rebase.sh generated-apis
 git add vendor
 git commit -m "update vendoring"
 ```
