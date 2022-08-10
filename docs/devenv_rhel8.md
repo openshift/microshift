@@ -179,7 +179,7 @@ This command only stops the MicroShift process. To perform the full cleanup incl
 echo 1 | ~/microshift/hack/cleanup.sh
 ```
 > The full cleanup does not remove OVS configuration applied by the MicroShift service initialization sequence.
-> Run the `sudo /usr/bin/configure-ovs.sh OpenShiftSDN` command to revert to the original network settings.
+> Run the `sudo /usr/bin/configure-ovs.sh` command to revert to the original network settings.
 
 ## Quick Development and Edge Testing Cycle
 During the development cycle, it is practical to build and run MicroShift executable as demonstrated in the [Build MicroShift](#build-microshift) and [Run MicroShift Executable](#run-microshift-executable) sections above. However, it is also necessary to have a convenient technique for testing the system in a setup resembling the production environment. Such an environment can be created in a virtual machine as described in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document. 
