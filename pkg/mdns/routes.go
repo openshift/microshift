@@ -82,9 +82,9 @@ func (c *MicroShiftmDNSController) waitForRouterAPI(dc dynamic.Interface, router
 	if err != nil {
 		// This is a soft error, the watcher down the line will keep waiting, but will emit
 		// less nice errors
-		klog.Errorf("waiting for the route.openshift.io/v1 API to come up", err)
+		klog.Errorf("mDNS: Failed waiting for the route.openshift.io/v1 API to come up: %s", err)
 	} else {
-		klog.Infof("mDNS: route API ready, watching routers")
+		klog.Infof("mDNS: Route API ready, watching routers")
 	}
 }
 
@@ -93,7 +93,7 @@ func (c *MicroShiftmDNSController) addedRoute(obj interface{}) {
 
 	host, found, err := unstructured.NestedString(u.UnstructuredContent(), "spec", "host")
 	if !found || err != nil {
-		klog.Errorf("mDNS spec.host not found", err)
+		klog.Errorf("mDNS: spec.host not found: %s", err)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (c *MicroShiftmDNSController) updatedRoute(oldObj, newObj interface{}) {
 	newHost, _, _ := unstructured.NestedString(newU.UnstructuredContent(), "spec", "host")
 
 	if oldHost != newHost {
-		klog.Infof("Updating route host", "oldHost", oldHost, "newHost", newHost)
+		klog.Infof("mDNS: Updating route host from %q to %q", oldHost, newHost)
 		c.unexposeHost(oldHost)
 		c.exposeHost(newHost)
 	}
@@ -118,7 +118,7 @@ func (c *MicroShiftmDNSController) deletedRoute(obj interface{}) {
 	u := obj.(*unstructured.Unstructured)
 	host, found, err := unstructured.NestedString(u.UnstructuredContent(), "spec", "host")
 	if !found || err != nil {
-		klog.Errorf("mDNS spec.host not found", err)
+		klog.Errorf("mDNS: spec.host not found: %s", err)
 		return
 	}
 
@@ -127,11 +127,11 @@ func (c *MicroShiftmDNSController) deletedRoute(obj interface{}) {
 
 func (c *MicroShiftmDNSController) exposeHost(host string) {
 	if !strings.HasSuffix(host, server.DefaultmDNSTLD) {
-		klog.V(2).InfoS("mDNS ignoring host without mDNS suffix", "host", host)
+		klog.V(2).Infof("mDNS: Ignoring host %q without mDNS suffix", host)
 		return
 	}
 
-	klog.Infof("mDNS: route found for", "host", host, "ips", c.myIPs)
+	klog.Infof("mDNS: Route found for host %q on IPs %q", host, c.myIPs)
 
 	// TODO(multi-node) look up for the exact router service Endpoints instead of assuming our own IP (ok for single-node)
 	c.incHost(host)
@@ -140,7 +140,7 @@ func (c *MicroShiftmDNSController) exposeHost(host string) {
 
 func (c *MicroShiftmDNSController) unexposeHost(oldHost string) {
 	if c.decHost(oldHost) == 0 {
-		klog.Infof("mDNS removing, no more router references", "host", oldHost)
+		klog.Infof("mDNS: Removing host %q, no more router references", oldHost)
 		c.resolver.DeleteDomain(oldHost + ".")
 	}
 }
