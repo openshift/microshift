@@ -66,7 +66,10 @@ func New(iface *net.Interface, responder Responder, stopCh chan struct{}) (*Serv
 }
 
 func (s *Server) listenerLoop(c *net.UDPConn) {
-	buf := make([]byte, 65536)
+	// most queries will be smaller than 512bytes, and FQDNs are limited to 253 characters
+	// but multiple queries can be grouped into a single UDP request. We use 2048 which is
+	// slightly above the standard mtu of 1500 bytes
+	buf := make([]byte, 2048)
 	for {
 		length, addr, err := c.ReadFromUDP(buf)
 		if length == 0 {
