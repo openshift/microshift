@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -47,10 +48,21 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	ifs, _ := net.Interfaces()
 
+	excludedInterfacesRegexp := regexp.MustCompile(
+		"^[A-Fa-f0-9]{15}|" + // OVN pod interfaces
+			"ovn.*|" + // OVN ovn-k8s-mp0 and similar interfaces
+			"br-int|" + // OVN integration bridge
+			"veth.*|cni.*|" + // Interfaces used in bridge-cni or flannel
+			"ovs-system$") // Internal OVS interface
+
+	// NOTE: this will listen on both br-ex and the physical interface attached to it
+	//       i.e. eth0 . We don't believe it's worth going into the complexities (and coupling)
+	//       of talking to OpenvSwitch to discover the physical interface(s) on br-ex. And
+	//       we have also verified that no duplicate mDNS answers will happen because of this,
+	//       if those were to happend it would be harmless.
 	for n := range ifs {
 		name := ifs[n].Name
-		if strings.HasPrefix(name, "veth") ||
-			strings.HasPrefix(name, "cni") {
+		if excludedInterfacesRegexp.MatchString(name) {
 			continue
 		}
 		klog.Infof("starting mDNS server", "interface", name, "NodeIP", c.NodeIP, "Node", c.NodeName)
