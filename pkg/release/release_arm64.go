@@ -29,6 +29,5 @@ func init() {
 		"service_ca_operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:97a7d56ac6d6a38f7977b0759bb1b97fe3895e6020364e60a8a2926f3fd0084e",
 		"openssl":             "registry.access.redhat.com/ubi8/openssl@sha256:3f781a07e59d164eba065dba7d8e7661ab2494b21199c379b65b0ff514a1b8d0",
 		"ovn_kubernetes":      "quay.io/microshift/ovn-kubernetes-singlenode@sha256:012e743363b5f15f442c238099d35a0c70343fd1d4dc15b0a57a7340a338ffdb",
-		"ubi":                 "registry.access.redhat.com/ubi8/ubi@sha256:48ba6276b423eafd63c7c54949cbc98b47165e5660329b7bae9632f6c592b258",
 	}
 }
