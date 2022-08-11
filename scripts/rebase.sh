@@ -532,7 +532,7 @@ rebase_to() {
 
         if [ "$(ls -A scripts/rebase_patches)" ]; then
             title "## Patching vendor directory"
-            git apply scripts/rebase_patches/*.patch || true
+            git am scripts/rebase_patches/*.patch || true
         fi
 
         regenerate_openapi
