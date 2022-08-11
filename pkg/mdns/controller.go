@@ -65,7 +65,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 		if excludedInterfacesRegexp.MatchString(name) {
 			continue
 		}
-		klog.Infof("starting mDNS server", "interface", name, "NodeIP", c.NodeIP, "Node", c.NodeName)
+		klog.Infof("mDNS: Starting server on interface %q, NodeIP %q, NodeName %q", name, c.NodeIP, c.NodeName)
 		server.New(&ifs[n], c.resolver, c.stopCh)
 	}
 
@@ -83,7 +83,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	if strings.HasSuffix(c.NodeName, server.DefaultmDNSTLD) {
 
-		klog.Infof("Host FQDN will be announced via mDNS", "fqdn", c.NodeName, "ips", ips)
+		klog.Infof("mDNS: Host FQDN %q will be announced via mDNS on IPs %q", c.NodeName, ips)
 		c.resolver.AddDomain(c.NodeName+".", ips)
 	}
 
