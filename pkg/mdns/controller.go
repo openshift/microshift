@@ -69,20 +69,22 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 		server.New(&ifs[n], c.resolver, c.stopCh)
 	}
 
-	if strings.HasSuffix(c.NodeName, server.DefaultmDNSTLD) {
-		ips := []string{c.NodeIP}
+	ips := []string{c.NodeIP}
 
-		// Discover additional IPs for the interface (IPv6 LLA ...)
-		for n := range ifs {
-			addrs, _ := ifs[n].Addrs()
-			if ipInAddrs(c.NodeIP, addrs) {
-				ips = addrsToStrings(addrs)
-			}
+	// Discover additional IPs for the interface (IPv6 LLA ...)
+	for n := range ifs {
+		addrs, _ := ifs[n].Addrs()
+		if ipInAddrs(c.NodeIP, addrs) {
+			ips = addrsToStrings(addrs)
 		}
+	}
+
+	c.myIPs = ips
+
+	if strings.HasSuffix(c.NodeName, server.DefaultmDNSTLD) {
 
 		klog.Infof("Host FQDN will be announced via mDNS", "fqdn", c.NodeName, "ips", ips)
 		c.resolver.AddDomain(c.NodeName+".", ips)
-		c.myIPs = ips
 	}
 
 	close(ready)
