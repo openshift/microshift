@@ -243,20 +243,24 @@ func (p *csiPlugin) Init(host volume.VolumeHost) error {
 	}
 
 	// Initializing the label management channels
-	nim = nodeinfomanager.NewNodeInfoManager(host.GetNodeName(), host, migratedPlugins)
+	localNim := nodeinfomanager.NewNodeInfoManager(host.GetNodeName(), host, migratedPlugins)
 
 	if utilfeature.DefaultFeatureGate.Enabled(features.CSIMigration) {
 		// This function prevents Kubelet from posting Ready status until CSINode
 		// is both installed and initialized
-		if err := initializeCSINode(host); err != nil {
-			return errors.New(log("failed to initialize CSINode: %v", err))
+		if err := initializeCSINode(host, localNim); err != nil {
+			return errors.New(log("failed to initialize CSINodeInfo: %v", err))
 		}
+	}
+
+	if _, ok := host.(volume.KubeletVolumeHost); ok {
+		nim = localNim
 	}
 
 	return nil
 }
 
-func initializeCSINode(host volume.VolumeHost) error {
+func initializeCSINode(host volume.VolumeHost, nim nodeinfomanager.Interface) error {
 	kvh, ok := host.(volume.KubeletVolumeHost)
 	if !ok {
 		klog.V(4).Info("Cast from VolumeHost to KubeletVolumeHost failed. Skipping CSINode initialization, not running on kubelet")
