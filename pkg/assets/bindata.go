@@ -303,7 +303,7 @@ spec:
         - -c
         - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
           -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-        image: {{ .ReleaseImage.odf_lvm_operator }}
+        image: {{ .ReleaseImage.openssl }}
         imagePullPolicy: IfNotPresent
         name: self-signed-cert-generator
         resources: {}
@@ -334,7 +334,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4170, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4161, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1109,7 +1109,7 @@ spec:
         - -c
         - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
           sleep 5; done
-        image: {{ .ReleaseImage.odf_lvm_operator }}
+        image: {{ .ReleaseImage.openssl }}
         imagePullPolicy: IfNotPresent
         name: file-checker
         resources: {}
@@ -1167,7 +1167,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5221, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5212, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
