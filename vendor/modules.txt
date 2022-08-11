@@ -766,6 +766,7 @@ github.com/openshift/api/samples
 github.com/openshift/api/samples/v1
 github.com/openshift/api/security
 github.com/openshift/api/security/v1
+github.com/openshift/api/securityinternal/v1
 github.com/openshift/api/servicecertsigner
 github.com/openshift/api/servicecertsigner/v1alpha1
 github.com/openshift/api/sharedresource
@@ -900,6 +901,9 @@ github.com/openshift/client-go/security/informers/externalversions/internalinter
 github.com/openshift/client-go/security/informers/externalversions/security
 github.com/openshift/client-go/security/informers/externalversions/security/v1
 github.com/openshift/client-go/security/listers/security/v1
+github.com/openshift/client-go/securityinternal/clientset/versioned
+github.com/openshift/client-go/securityinternal/clientset/versioned/scheme
+github.com/openshift/client-go/securityinternal/clientset/versioned/typed/securityinternal/v1
 github.com/openshift/client-go/template/clientset/versioned
 github.com/openshift/client-go/template/clientset/versioned/scheme
 github.com/openshift/client-go/template/clientset/versioned/typed/template/v1
@@ -916,6 +920,17 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
+# github.com/openshift/cluster-policy-controller v0.0.0-20220103093815-8e5b36511861
+## explicit; go 1.17
+github.com/openshift/cluster-policy-controller/pkg/client/genericinformers
+github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller
+github.com/openshift/cluster-policy-controller/pkg/cmd/controller
+github.com/openshift/cluster-policy-controller/pkg/quota/clusterquotareconciliation
+github.com/openshift/cluster-policy-controller/pkg/quota/quotaimageexternal
+github.com/openshift/cluster-policy-controller/pkg/security/controller
+github.com/openshift/cluster-policy-controller/pkg/security/mcs
+github.com/openshift/cluster-policy-controller/pkg/security/uidallocator
+github.com/openshift/cluster-policy-controller/pkg/version
 # github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88 => github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88
 ## explicit; go 1.17
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
@@ -932,10 +947,15 @@ github.com/openshift/library-go/pkg/build/envresolve
 github.com/openshift/library-go/pkg/build/naming
 github.com/openshift/library-go/pkg/client/openshiftrestmapper
 github.com/openshift/library-go/pkg/config/client
+github.com/openshift/library-go/pkg/config/clusterstatus
 github.com/openshift/library-go/pkg/config/configdefaults
 github.com/openshift/library-go/pkg/config/helpers
 github.com/openshift/library-go/pkg/config/leaderelection
+github.com/openshift/library-go/pkg/config/serving
 github.com/openshift/library-go/pkg/config/validation
+github.com/openshift/library-go/pkg/controller/controllercmd
+github.com/openshift/library-go/pkg/controller/factory
+github.com/openshift/library-go/pkg/controller/fileobserver
 github.com/openshift/library-go/pkg/crypto
 github.com/openshift/library-go/pkg/image/imageutil
 github.com/openshift/library-go/pkg/image/internal/digest
@@ -946,6 +966,10 @@ github.com/openshift/library-go/pkg/image/trigger
 github.com/openshift/library-go/pkg/monitor/health
 github.com/openshift/library-go/pkg/network
 github.com/openshift/library-go/pkg/oauth/oauthdiscovery
+github.com/openshift/library-go/pkg/operator/csr
+github.com/openshift/library-go/pkg/operator/events
+github.com/openshift/library-go/pkg/operator/management
+github.com/openshift/library-go/pkg/operator/v1helpers
 github.com/openshift/library-go/pkg/quota/clusterquotamapping
 github.com/openshift/library-go/pkg/quota/quotautil
 github.com/openshift/library-go/pkg/security/ldaputil
@@ -1032,6 +1056,9 @@ github.com/prometheus/procfs/internal/util
 # github.com/quobyte/api v0.1.8
 ## explicit
 github.com/quobyte/api
+# github.com/robfig/cron v1.2.0
+## explicit
+github.com/robfig/cron
 # github.com/robfig/cron/v3 v3.0.1
 ## explicit; go 1.12
 github.com/robfig/cron/v3
@@ -2263,7 +2290,7 @@ k8s.io/cluster-bootstrap/token/jws
 k8s.io/cluster-bootstrap/token/util
 k8s.io/cluster-bootstrap/util/secrets
 k8s.io/cluster-bootstrap/util/tokens
-# k8s.io/component-base v0.23.1 => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20220510163048-3afdacbd0183
+# k8s.io/component-base v0.24.3 => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20220510163048-3afdacbd0183
 ## explicit; go 1.16
 k8s.io/component-base/cli/flag
 k8s.io/component-base/cli/globalflag
@@ -2281,7 +2308,10 @@ k8s.io/component-base/logs/registry
 k8s.io/component-base/logs/sanitization
 k8s.io/component-base/metrics
 k8s.io/component-base/metrics/legacyregistry
+k8s.io/component-base/metrics/prometheus/clientgo
+k8s.io/component-base/metrics/prometheus/clientgo/leaderelection
 k8s.io/component-base/metrics/prometheus/ratelimiter
+k8s.io/component-base/metrics/prometheus/restclient
 k8s.io/component-base/metrics/prometheus/workqueue
 k8s.io/component-base/metrics/testutil
 k8s.io/component-base/term
