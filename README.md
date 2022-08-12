@@ -37,6 +37,7 @@ To install, configure and run MicroShift, refer to the following documentation:
 - [AMQ Broker on MicroShift](./docs/howto_amq_broker.md)
 - [MicroShift Mitigation of System Configuration Changes](./docs/howto_sysconf_watch.md)
 - [Firewall Configuration](./docs/howto_firewall.md)
+- [Debugging Tips](./docs/debugging_tips.md)
 
 ## Developer Documentation
 To build MicroShift from source and contribute to its development, refer to the following documentation:
