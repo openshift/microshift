@@ -1,8 +1,8 @@
 # ansible-microshift
 
 The purpose of this ansible automation is to help gain insight into the footprint and start times of MicroShift.
-At this stage we are capturing the first start as well as the second start (with cached images), as well as disk
-usage data from a number of points in time as well as performance tool data with pbench for each of the two starts.
+At this stage we are capturing the first start, the second start (with cached images), disk usage data from a
+number of points in time as well as performance tool data with pbench for each of the two starts.
 
 ## Prereqs
 
