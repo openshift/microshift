@@ -9,7 +9,10 @@ usage data from a number of points in time as well as performance tool data with
 We are using [pbench](https://github.com/distributed-system-analysis/pbench) to capture a wide array of performance tool data.
 Pbench has Ansible playbooks available in Ansible Galaxy to install the pbench-agent on the MicroShift host.
 
-- Ansible
+- Ansible:
+  - On Fedora: `dnf install ansible`
+
+- Pbench agent installation role from ansible-galaxy:
   - `ansible-galaxy collection install pbench.agent`
 
 Note: ensure your ansible galaxy user directory is exported:
