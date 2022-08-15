@@ -4,17 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"k8s.io/klog/v2"
-
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
+
+	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 )
 
 var (
@@ -58,12 +56,8 @@ func (ns *nsApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 }
 
 func (ns *nsApplier) Applier() error {
-	_, err := ns.Client.Namespaces().Get(context.TODO(), ns.ns.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := ns.Client.Namespaces().Create(context.TODO(), ns.ns, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplyNamespace(context.TODO(), ns.Client, assetsEventRecorder, ns.ns)
+	return err
 }
 
 type secretApplier struct {
@@ -87,12 +81,8 @@ func (secret *secretApplier) Reader(objBytes []byte, render RenderFunc, params R
 }
 
 func (secret *secretApplier) Applier() error {
-	_, err := secret.Client.Secrets(secret.secret.Namespace).Get(context.TODO(), secret.secret.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := secret.Client.Secrets(secret.secret.Namespace).Create(context.TODO(), secret.secret, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplySecret(context.TODO(), secret.Client, assetsEventRecorder, secret.secret)
+	return err
 }
 
 type svcApplier struct {
@@ -116,12 +106,8 @@ func (svc *svcApplier) Reader(objBytes []byte, render RenderFunc, params RenderP
 }
 
 func (svc *svcApplier) Applier() error {
-	_, err := svc.Client.Services(svc.svc.Namespace).Get(context.TODO(), svc.svc.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := svc.Client.Services(svc.svc.Namespace).Create(context.TODO(), svc.svc, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplyService(context.TODO(), svc.Client, assetsEventRecorder, svc.svc)
+	return err
 }
 
 type saApplier struct {
@@ -145,12 +131,8 @@ func (sa *saApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 }
 
 func (sa *saApplier) Applier() error {
-	_, err := sa.Client.ServiceAccounts(sa.sa.Namespace).Get(context.TODO(), sa.sa.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := sa.Client.ServiceAccounts(sa.sa.Namespace).Create(context.TODO(), sa.sa, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplyServiceAccount(context.TODO(), sa.Client, assetsEventRecorder, sa.sa)
+	return err
 }
 
 type cmApplier struct {
@@ -174,12 +156,8 @@ func (cm *cmApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 }
 
 func (cm *cmApplier) Applier() error {
-	_, err := cm.Client.ConfigMaps(cm.cm.Namespace).Get(context.TODO(), cm.cm.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := cm.Client.ConfigMaps(cm.cm.Namespace).Create(context.TODO(), cm.cm, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplyConfigMap(context.TODO(), cm.Client, assetsEventRecorder, cm.cm)
+	return err
 }
 
 func applyCore(cores []string, applier readerApplier, render RenderFunc, params RenderParams) error {
@@ -227,41 +205,26 @@ func ApplyConfigMaps(cores []string, render RenderFunc, params RenderParams, kub
 }
 
 func ApplyConfigMapWithData(cmPath string, data map[string]string, kubeconfigPath string) error {
-	ctx := context.TODO()
 	cm := &cmApplier{}
 	cm.Client = coreClient(kubeconfigPath)
-	if err := applyCore([]string{cmPath}, cm, nil, nil); err != nil {
-		return err
-	}
-	c, err := cm.Client.ConfigMaps(cm.cm.Namespace).Get(ctx, cm.cm.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		c, err = cm.Client.ConfigMaps(cm.cm.Namespace).Create(ctx, cm.cm, metav1.CreateOptions{})
-		return err
-	}
-	c.Data = data
-	_, err = cm.Client.ConfigMaps(c.Namespace).Update(ctx, c, metav1.UpdateOptions{})
+	cmBytes, err := Asset(cmPath)
 	if err != nil {
 		return err
 	}
-	return nil
+	cm.Reader(cmBytes, nil, nil)
+	_, _, err = resourceapply.ApplyConfigMap(context.TODO(), cm.Client, assetsEventRecorder, cm.cm)
+	return err
 }
 
 func ApplySecretWithData(secretPath string, data map[string][]byte, kubeconfigPath string) error {
-	ctx := context.TODO()
 	secret := &secretApplier{}
 	secret.Client = coreClient(kubeconfigPath)
-	if err := applyCore([]string{secretPath}, secret, nil, nil); err != nil {
-		return err
-	}
-	s, err := secret.Client.Secrets(secret.secret.Namespace).Get(ctx, secret.secret.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		s, err = secret.Client.Secrets(secret.secret.Namespace).Create(ctx, secret.secret, metav1.CreateOptions{})
-		return err
-	}
-	s.Data = data
-	_, err = secret.Client.Secrets(s.Namespace).Update(ctx, s, metav1.UpdateOptions{})
+	secretBytes, err := Asset(secretPath)
 	if err != nil {
 		return err
 	}
-	return nil
+	secret.Reader(secretBytes, nil, nil)
+	secret.secret.Data = data
+	_, _, err = resourceapply.ApplySecret(context.TODO(), secret.Client, assetsEventRecorder, secret.secret)
+	return err
 }

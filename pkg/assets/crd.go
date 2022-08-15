@@ -6,20 +6,18 @@ import (
 	"path/filepath"
 	"time"
 
-	klog "k8s.io/klog/v2"
-
-	"github.com/openshift/microshift/pkg/config"
-
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	apiext_clientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	klog "k8s.io/klog/v2"
+
+	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
+	"github.com/openshift/microshift/pkg/config"
 )
 
 const (
@@ -39,21 +37,19 @@ var (
 	}
 )
 
-func isEstablished(cs *apiext_clientset.Clientset, obj apiruntime.Object) (bool, error) {
+func init() {
+	if err := apiextv1.AddToScheme(apiExtensionsScheme); err != nil {
+		panic(err)
+	}
+}
+
+func isEstablished(cs *apiextclientv1.ApiextensionsV1Client, obj apiruntime.Object) (bool, error) {
 	var err error
 	switch crd := obj.(type) {
 	case *apiextv1.CustomResourceDefinition:
-		if crd, err = cs.ApiextensionsV1().CustomResourceDefinitions().Get(context.TODO(), crd.Name, metav1.GetOptions{}); err == nil {
+		if crd, err = cs.CustomResourceDefinitions().Get(context.TODO(), crd.Name, metav1.GetOptions{}); err == nil {
 			for _, condition := range crd.Status.Conditions {
 				if condition.Type == apiextv1.Established && condition.Status == apiextv1.ConditionTrue {
-					return true, nil
-				}
-			}
-		}
-	case *apiextv1beta1.CustomResourceDefinition:
-		if crd, err = cs.ApiextensionsV1beta1().CustomResourceDefinitions().Get(context.TODO(), crd.Name, metav1.GetOptions{}); err == nil {
-			for _, condition := range crd.Status.Conditions {
-				if condition.Type == apiextv1beta1.Established && condition.Status == apiextv1beta1.ConditionTrue {
 					return true, nil
 				}
 			}
@@ -71,7 +67,7 @@ func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	clientSet := apiext_clientset.NewForConfigOrDie(restConfig)
+	clientSet := apiextclientv1.NewForConfigOrDie(restConfig)
 	for _, crd := range crds {
 		klog.Infof("Waiting for crd %s condition.type: established", crd)
 		var crdBytes []byte
@@ -96,44 +92,18 @@ func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
 	return nil
 }
 
-func readCRDOrDie(objBytes []byte) apiruntime.Object {
-	requiredObj, err := apiruntime.Decode(apiExtensionsCodecs.UniversalDecoder(apiextv1.SchemeGroupVersion, apiextv1beta1.SchemeGroupVersion), objBytes)
+func readCRDOrDie(objBytes []byte) *apiextv1.CustomResourceDefinition {
+	var crd apiextv1.CustomResourceDefinition
+	err := apiruntime.DecodeInto(apiExtensionsCodecs.UniversalDecoder(apiextv1.SchemeGroupVersion), objBytes, &crd)
 	if err != nil {
 		panic(err)
 	}
-	return requiredObj
+	return &crd
 }
 
-func applyCRD(clientset *apiext_clientset.Clientset, obj apiruntime.Object) error {
-	gv := obj.GetObjectKind().GroupVersionKind().GroupVersion()
-	switch gv.String() {
-	case "apiextensions.k8s.io/v1":
-		v1Obj := obj.(*apiextv1.CustomResourceDefinition)
-		_, err := clientset.ApiextensionsV1().CustomResourceDefinitions().Get(context.TODO(), v1Obj.Name, metav1.GetOptions{})
-		if apierrors.IsNotFound(err) {
-			_, err := clientset.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), v1Obj, metav1.CreateOptions{})
-			return err
-		}
-	case "apiextensions.k8s.io/v1beta1":
-		v1beta1Obj := obj.(*apiextv1beta1.CustomResourceDefinition)
-		_, err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(context.TODO(), v1beta1Obj.Name, metav1.GetOptions{})
-		if apierrors.IsNotFound(err) {
-			_, err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Create(context.TODO(), v1beta1Obj, metav1.CreateOptions{})
-			return err
-		}
-	default:
-		// panic("unknown type %s", t)
-	}
-	return nil
-}
-
-func init() {
-	if err := apiextv1.AddToScheme(apiExtensionsScheme); err != nil {
-		panic(err)
-	}
-	if err := apiextv1beta1.AddToScheme(apiExtensionsScheme); err != nil {
-		panic(err)
-	}
+func applyCRD(client *apiextclientv1.ApiextensionsV1Client, crd *apiextv1.CustomResourceDefinition) error {
+	_, _, err := resourceapply.ApplyCustomResourceDefinitionV1(context.TODO(), client, assetsEventRecorder, crd)
+	return err
 }
 
 func ApplyCRDs(cfg *config.MicroshiftConfig) error {
@@ -145,7 +115,7 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	apiExtClientSet := apiext_clientset.NewForConfigOrDie(rest.AddUserAgent(restConfig, "crd-agent"))
+	client := apiextclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "crd-agent"))
 
 	for _, crd := range crds {
 		klog.Infof("Applying openshift CRD %s", crd)
@@ -155,7 +125,7 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 		}
 		c := readCRDOrDie(crdBytes)
 		if err := wait.Poll(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
-			if err := applyCRD(apiExtClientSet, c); err != nil {
+			if err := applyCRD(client, c); err != nil {
 				klog.Warningf("failed to apply openshift CRD %s: %v", crd, err)
 				return false, nil
 			}

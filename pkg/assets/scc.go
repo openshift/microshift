@@ -4,18 +4,17 @@ import (
 	"context"
 	"fmt"
 
-	"k8s.io/klog/v2"
-
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
 
 	sccv1 "github.com/openshift/api/security/v1"
 	sccclientv1 "github.com/openshift/client-go/security/clientset/versioned/typed/security/v1"
+	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
 )
 
 var (
@@ -56,13 +55,26 @@ func (s *sccApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	}
 	s.scc = obj.(*sccv1.SecurityContextConstraints)
 }
+
 func (s *sccApplier) Applier() error {
-	_, err := s.Client.SecurityContextConstraints().Get(context.TODO(), s.scc.Name, metav1.GetOptions{})
+	// adapted from cvo
+	existing, err := s.Client.SecurityContextConstraints().Get(context.TODO(), s.scc.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		_, err := s.Client.SecurityContextConstraints().Create(context.TODO(), s.scc, metav1.CreateOptions{})
 		return err
 	}
-	return nil
+	if err != nil {
+		return err
+	}
+
+	var modified bool
+	resourcemerge.EnsureObjectMeta(&modified, &existing.ObjectMeta, s.scc.ObjectMeta)
+	if !modified {
+		return nil
+	}
+
+	_, err = s.Client.SecurityContextConstraints().Update(context.TODO(), existing, metav1.UpdateOptions{})
+	return err
 }
 
 func applySCCs(sccs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
