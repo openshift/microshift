@@ -7,7 +7,7 @@
       ansible.builtin.command: dnf config-manager --set-enabled powertools
       when: ansible_distribution_version == "8"
 
-    # There's no CRI-O for RHEL/CentOS 9
+    # There's no CRI-O for CentOS 9
     - name: enable powertools repo (CentOS 9)
       ansible.builtin.command: dnf config-manager --set-enabled crb
       when: ansible_distribution_version == "9"
