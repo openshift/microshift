@@ -28,15 +28,21 @@ scrape_configs:
   - job_name: node
     static_configs:
       - targets:
-        - {{ hostvars['microshift'].private_ip }}:9100
+{% for host in groups['microshift'] %}
+	- {{ hostvars[host].private_ip }}:9100
+{% endfor %}
 
   - job_name: cadvisor
     static_configs:
       - targets:
-        - {{ hostvars['microshift'].private_ip }}:8080
+{% for host in groups['microshift'] %}
+	- {{ hostvars[host].private_ip }}:8080
+{% endfor %}
 
   - job_name: crio
     static_configs:
       - targets:
-        - {{ hostvars['microshift'].private_ip }}:9537
+{% for host in groups['microshift'] %}
+	- {{ hostvars[host].private_ip }}:9537
+{% endfor %}
 
