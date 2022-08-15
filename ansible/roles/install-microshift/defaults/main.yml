@@ -21,11 +21,20 @@ firewall_services:
   - mdns
 
 firewall_ports:
+  - 80/tcp
+  - 443/tcp
+  - 5353/udp
   - 6443/tcp
   - 8080/tcp
   - 9100/tcp
   - 9537/tcp
   - 17001/tcp
+  - 30000-32767/tcp
+  - 30000-32767/udp
+
+firewall_trusted_cidr:
+  - 10.42.0.0/16
+  - 169.254.169.1/32
 
 systemd_services:
   - cadvisor
