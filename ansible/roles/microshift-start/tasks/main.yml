@@ -56,11 +56,11 @@
   delay: 1
 
 - name: wait for pods running
-  ansible.builtin.shell: kubectl get po -A --no-headers | grep -v Running | wc -l
+  ansible.builtin.shell: kubectl get po -A --no-headers | grep Running | wc -l
   retries: 60
   delay: 1
   register: result
-  until: result.stdout == "0"
+  until: result.stdout == "6"
 
 - name: force update of current timestamp
   ansible.builtin.setup:
