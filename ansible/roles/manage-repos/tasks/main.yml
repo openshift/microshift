@@ -1,8 +1,27 @@
 ---
-# epel_repo_install tasks
+# manage-repos tasks
 
 - name: RHEL tasks
   block:
+    - name: register host with subscription manager
+      community.general.redhat_subscription:
+        state: present
+        username: "{{ rhel_username }}"
+        password: "{{ rhel_password }}"
+        pool_ids: "{{ rhel_pool_id }}"
+
+    - name: enable repo management from subscription-manager
+      ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
+
+    - name: disable all repos
+      community.general.rhsm_repository:
+        name: '*'
+        state: disabled
+
+    - name: enable required repos for microshift
+      community.general.rhsm_repository:
+        name: "{{ rhel_repos }}"
+
     - name: install EPEL repo
       ansible.builtin.dnf:
         name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
@@ -28,3 +47,4 @@
         - epel-next-release
         state: present
   when: ansible_distribution == "CentOS"
+

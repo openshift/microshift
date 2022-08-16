@@ -26,7 +26,7 @@
   vars_files:
   - vars/all.yml
   roles:
-    - epel-repo-install
+    - manage-repos
     - role: pbench_repo_install
       when: install_pbench | bool
     - role: pbench_agent_install

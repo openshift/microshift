@@ -1,69 +1,50 @@
 ---
 # install-microshift tasks
 
-- name: RHEL tasks
-  block:
-    - name: register host with subscription-manager (RHEL)
-      community.general.redhat_subscription:
-        state: present
-        username: "{{ sm_user }}"
-        password: "{{ sm_pass }}"
-        pool_ids: "{{ pool_id }}"
-    
-    - name: enable repo management from subscription-manager
-      ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
-    
-    - name: enable built-in repos
-      ansible.builtin.command: subscription-manager repos --enable={{ item }}
-      with_items: "{{ enable_repos }}"
-  when: ansible_distribution == "RedHat"
+- name: install firewalld & packages
+  ansible.builtin.dnf:
+    name: "{{ install_packages }}"
+    state: present
+    update_cache: true
 
-- name: CentOS tasks
-  block:
-    - name: install firewalld & packages
-      ansible.builtin.dnf:
-        name: "{{ install_packages}}"
-        state: present
-        update_cache: true
+- name: create root bin directory
+  ansible.builtin.file:
+    path: "{{ root_bin_dir }}"
+    state: directory
+    mode: '0755'
 
-    - name: install node-exporter
-      ansible.builtin.dnf:
-        name:
-        - golang-github-prometheus-node-exporter
-        state: present
+- name: download and extract oc client
+  ansible.builtin.unarchive:
+    src: "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/{{ oc_archive_name }}"
+    dest: "{{ root_bin_dir }}"
+    remote_src: yes
 
-    - name: download cadvisor
-      ansible.builtin.get_url:
-        url: "{{ cadvisor_url }}"
-        dest: /usr/bin/cadvisor
-        checksum: "{{ cadvisor_checksum }}"
-        mode: '0755'
-
-    - name: install systemd unit for cadvisor
-      ansible.builtin.template:
-        src: cadvisor.service.j2
-        dest: /usr/lib/systemd/system/cadvisor.service
-        backup: true
-
-    - name: start and enable systemd services
-      ansible.builtin.systemd:
-        name: "{{ item }}"
-        daemon_reload: yes
-        state: started
-        enabled: yes
-      with_items: "{{ systemd_services }}"
-  when: ansible_distribution == "CentOS"
-
-- name: install kubernetes repo
-  ansible.builtin.template:
-    src: kubernetes.repo.j2
-    dest: /etc/yum.repos.d/kubernetes.repo
-
-- name: install kubectl
+- name: install node-exporter
   ansible.builtin.dnf:
     name:
-    - kubectl
+    - golang-github-prometheus-node-exporter
     state: present
+
+- name: download cadvisor
+  ansible.builtin.get_url:
+    url: "{{ cadvisor_url }}"
+    dest: /usr/bin/cadvisor
+    checksum: "{{ cadvisor_checksum }}"
+    mode: '0755'
+
+- name: install systemd unit for cadvisor
+  ansible.builtin.template:
+    src: cadvisor.service.j2
+    dest: /usr/lib/systemd/system/cadvisor.service
+    backup: true
+
+- name: start and enable systemd services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    daemon_reload: yes
+    state: started
+    enabled: yes
+  with_items: "{{ systemd_services }}"
 
 - name: create .kube home dir
   ansible.builtin.file:
@@ -119,20 +100,74 @@
   include_tasks: disk.yml
   loop: "{{ du_dirs }}"
 
-- name: enable microshift copr repo
-  community.general.copr:
-    name: '@redhat-et/microshift'
-    state: enabled
+- name: build & install microshift RPMs on RHEL
+  block:
+    - name: install cri-o
+      ansible.builtin.dnf:
+        name:
+          - cri-o
+          - cri-tools
+        state: present
 
-- name: enable cri-o module
-  ansible.builtin.command: dnf module enable -y cri-o
+    - name: start & enable crio service
+      ansible.builtin.systemd:
+        name: crio
+        state: started
+        enabled: yes
 
-- name: install microshift package
-  ansible.builtin.dnf:
-    name:
-    - microshift
-    state: present
-    update_cache: true
+    - name: clone microshift git repo
+      ansible.builtin.git:
+        repo: 'https://github.com/openshift/microshift.git'
+        dest: "{{ microshift_dir }}"
+
+    - name: make microshift RPMs
+      ansible.builtin.command: make rpm
+      args:
+        chdir: "{{ microshift_dir }}"
+
+    - name: find built RPMs
+      ansible.builtin.find:
+        paths: "{{ microshift_dir }}"
+        patterns: '*.rpm'
+        recurse: yes
+      register: microshift_find
+
+    - name: make list of built RPM paths
+      ansible.builtin.set_fact:
+        microshift_rpms: "{{ microshift_rpms }} + [ '{{ item.path }}' ]"
+      with_items: "{{ microshift_find.files }}"
+
+    - name: install microshift RPMs
+      ansible.builtin.dnf:
+        name: "{{ microshift_rpms }}"
+        state: present
+        disable_gpg_check: yes
+  when: ansible_distribution == "RedHat"
+
+- name: install microshift RPMs on CentOS
+  block:
+    - name: enable microshift copr repo
+      community.general.copr:
+        name: '@redhat-et/microshift'
+        state: enabled
+
+    - name: enable cri-o module
+      ansible.builtin.command: dnf module enable -y cri-o
+
+    - name: install microshift package
+      ansible.builtin.dnf:
+        name: microshift
+        state: present
+        update_cache: true
+  when: ansible_distribution == "CentOS"
+
+- name: copy pull-secret to node
+  ansible.builtin.copy:
+    src: pull-secret.txt
+    dest: /etc/crio/openshift-pull-secret
+    owner: root
+    group: root
+    mode: '0600'
 
 - name: pbench recording start
   block:

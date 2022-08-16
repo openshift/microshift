@@ -1,0 +1,6 @@
+---
+# manage-repos default vars
+
+rhel_repos:
+  - fast-datapath-for-rhel-8-x86_64-rpms
+  - rhocp-4.10-for-rhel-8-x86_64-rpms
