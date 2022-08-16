@@ -16,7 +16,7 @@ Download the OpenShift pull secret from the https://console.redhat.com/openshift
 
 Make sure there is more than 20GB of free disk space necessary for the build artifacts. Run the following command to free the space if necessary.
 ```bash
-./scripts/image-builder/cleanup.sh -full
+~/microshift/scripts/image-builder/cleanup.sh -full
 ```
 
 Note that the command deletes various user and system data, including:
@@ -30,7 +30,7 @@ Note that the command deletes various user and system data, including:
 ### Building Installer
 It is recommended to execute the partial cleanup procedure (without `-full` argument) before each build to reclaim cached disk space from previous builds. 
 ```bash
-./scripts/image-builder/cleanup.sh
+~/microshift/scripts/image-builder/cleanup.sh
 ```
 Note that the command deletes various user and system data, including:
 - MicroShift `ostree` server container
@@ -40,7 +40,7 @@ Note that the command deletes various user and system data, including:
 
 Run the build script without arguments to see its usage.
 ```bash
-./scripts/image-builder/build.sh
+~/microshift/scripts/image-builder/build.sh
 Usage: build.sh <-pull_secret_file path_to_file> [OPTION]...
 
   -pull_secret_file path_to_file
@@ -67,7 +67,7 @@ Optional arguments:
 
 Continue by running the build script with the pull secret file argument and wait until build process is finished. It may take over 30 minutes to complete a full build cycle.
 ```bash
-./scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json
+~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json
 ```
 The script performs the following tasks:
 - Check for minimum 10GB of available disk space
@@ -119,7 +119,7 @@ When the container images required by MicroShift are preinstalled, `CRI-O` does 
 
 Start by running the `packaging/rpm/make-microshift-images-rpm.sh` script without arguments to see its usage.
 ```bash
-$ ./packaging/rpm/make-microshift-images-rpm.sh
+$ ~/microshift/packaging/rpm/make-microshift-images-rpm.sh
 Usage:
    make-microshift-images-rpm.sh rpm  <pull_secret> <architectures> <rpm_mock_target>
    make-microshift-images-rpm.sh srpm <pull_secret> <architectures>
@@ -138,19 +138,20 @@ Notes:
 
 Run the script in the `rpm` mode to pull the images required by MicroShift and generate the RPMs including those image data.
 ```bash
-./packaging/rpm/make-microshift-images-rpm.sh rpm ~/.pull-secret.json x86_64:amd64 rhel-8-x86_64
+~/microshift/packaging/rpm/make-microshift-images-rpm.sh rpm ~/.pull-secret.json x86_64:amd64 rhel-8-x86_64
 ```
 
-If the procedure runs successfully, the RPM artifacts can be found in the `packaging/rpm/paack-result` directory.
+If the procedure runs successfully, the RPM artifacts can be found in the `paack-result` directory.
 ```bash
-$ ls -1 ~/microshift/packaging/rpm/paack-result/*.rpm
-/home/microshift/microshift/packaging/rpm/paack-result/microshift-containers-4.10.18-1.src.rpm
-/home/microshift/microshift/packaging/rpm/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
+$ find ~/microshift/paack-result -name microshift-containers-\*.rpm
+/home/microshift/microshift/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
+/home/microshift/microshift/paack-result/microshift-containers-4.10.18-1.src.rpm
 ```
 
 Finally, run the build script with the `-custom_rpms` argument to include the specified container image RPMs into the generated ISO.
 ```bash
-./scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -custom_rpms ~/microshift/packaging/rpm/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
+CONTAINERS_RPM=$(find ~/microshift/paack-result -name microshift-containers-\*.$(uname -i).rpm)
+~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -custom_rpms $CONTAINERS_RPM
 ```
 > If user-specific container images need to be included into the ISO, multiple comma-separated RPM files can be specified as the `-custom_rpms` argument value.
 
