@@ -28,8 +28,11 @@ func (s *SecureServingOptions) ApplyReadyOnlyTo(config **server.SecureServingInf
 	if s.Listener != nil {
 		return fmt.Errorf("cannot ApplyReadyOnlyTo with a listener set")
 	}
-	realBindAddress := s.BindAddress
-	realBindPort := s.BindPort
+	if s.ReadyOnlyBindPort == 0{
+		return nil
+	}
+	realBindAddress := s.ReadyOnlyBindAddress
+	realBindPort := s.ReadyOnlyBindPort
 	defer func() {
 		s.BindAddress = realBindAddress
 		s.BindPort = realBindPort
