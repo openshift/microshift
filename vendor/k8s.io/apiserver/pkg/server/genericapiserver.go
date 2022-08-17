@@ -116,6 +116,9 @@ type GenericAPIServer struct {
 	// SecureServingInfo holds configuration of the TLS server.
 	SecureServingInfo *SecureServingInfo
 
+	// ReadyOnlySecureServingInfo is like SecureServingInfo, for the readyOnly handler
+	ReadyOnlySecureServingInfo *SecureServingInfo
+
 	// ExternalAddress is the address (hostname or IP and port) that should be used in
 	// external (public internet) URLs for this GenericAPIServer.
 	ExternalAddress string
@@ -357,11 +360,6 @@ func (s *GenericAPIServer) PrepareRun() preparedGenericAPIServer {
 		s.OpenAPIVersionedService, s.StaticOpenAPISpec = routes.OpenAPI{
 			Config: s.openAPIConfig,
 		}.InstallV2(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
-		if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
-			s.OpenAPIV3VersionedService = routes.OpenAPI{
-				Config: s.openAPIConfig,
-			}.InstallV3(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
-		}
 	}
 
 	s.installHealthz()
@@ -516,7 +514,7 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 // NonBlockingRun spawns the secure http server. An error is
 // returned if the secure port cannot be listened on.
 // The returned channel is closed when the (asynchronous) termination is finished.
-func (s preparedGenericAPIServer) NonBlockingRun(stopCh <-chan struct{}, shutdownTimeout time.Duration) (<-chan struct{}, <-chan struct{}, error) {
+func (s preparedGenericAPIServer) nonBlockingRun(stopCh <-chan struct{}, shutdownTimeout time.Duration) (<-chan struct{}, <-chan struct{}, error) {
 	// Use an stop channel to allow graceful shutdown without dropping audit events
 	// after http server shutdown.
 	auditStopCh := make(chan struct{})

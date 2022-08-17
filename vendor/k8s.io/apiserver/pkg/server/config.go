@@ -98,6 +98,9 @@ type Config struct {
 	// SecureServing is required to serve https
 	SecureServing *SecureServingInfo
 
+	// ReadyOnlySecureServing is like SecureServing, but until the server has been ready at least once this returns a 503
+	ReadyOnlySecureServing *SecureServingInfo
+
 	// Authentication is the configuration for authentication
 	Authentication AuthenticationInfo
 
@@ -372,6 +375,9 @@ func NewConfig(codecs serializer.CodecFactory) *Config {
 		// A request body might be encoded in json, and is converted to
 		// proto when persisted in etcd, so we allow 2x as the largest request
 		// body size to be accepted and decoded in a write request.
+		// If this constant is changed, maxRequestSizeBytes in apiextensions-apiserver/third_party/forked/celopenapi/model/schemas.go
+		// should be changed to reflect the new value, if the two haven't
+		// been wired together already somehow.
 		MaxRequestBodyBytes: int64(3 * 1024 * 1024),
 
 		// Default to treating watch as a long-running operation
@@ -411,6 +417,7 @@ func DefaultOpenAPIConfig(getDefinitions openapicommon.GetOpenAPIDefinitions, de
 		GetDefinitions:        getDefinitions,
 	}
 }
+
 
 func (c *AuthenticationInfo) ApplyClientCert(clientCA dynamiccertificates.CAContentProvider, servingInfo *SecureServingInfo) error {
 	if servingInfo == nil {
@@ -485,6 +492,7 @@ func (c *Config) AddPostStartHookOrDie(name string, hook PostStartHookFunc) {
 	}
 }
 
+
 // HasBeenReadySignal exposes a server's lifecycle signal which is signaled when the readyz endpoint succeeds for the first time.
 func (c *Config) HasBeenReadySignal() <-chan struct{} {
 	return c.lifecycleSignals.HasBeenReady.Signaled()
@@ -545,6 +553,7 @@ func (c *Config) Complete(informers informers.SharedInformerFactory) CompletedCo
 			}
 		}
 	}
+
 	if c.DiscoveryAddresses == nil {
 		c.DiscoveryAddresses = discovery.DefaultAddresses{DefaultAddress: c.ExternalAddress}
 	}
@@ -667,11 +676,12 @@ func (c completedConfig) New(name string, delegationTarget DelegationTarget) (*G
 
 		listedPathProvider: apiServerHandler,
 
-		minRequestTimeout:     time.Duration(c.MinRequestTimeout) * time.Second,
-		ShutdownTimeout:       c.RequestTimeout,
-		ShutdownDelayDuration: c.ShutdownDelayDuration,
-		SecureServingInfo:     c.SecureServing,
-		ExternalAddress:       c.ExternalAddress,
+		minRequestTimeout:          time.Duration(c.MinRequestTimeout) * time.Second,
+		ShutdownTimeout:            c.RequestTimeout,
+		ShutdownDelayDuration:      c.ShutdownDelayDuration,
+		SecureServingInfo:          c.SecureServing,
+		ReadyOnlySecureServingInfo: c.ReadyOnlySecureServing,
+		ExternalAddress:            c.ExternalAddress,
 
 		openAPIConfig:           c.OpenAPIConfig,
 		skipOpenAPIInstallation: c.SkipOpenAPIInstallation,
@@ -842,7 +852,7 @@ func BuildHandlerChainWithStorageVersionPrecondition(apiHandler http.Handler, c 
 }
 
 func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
-	handler := genericapifilters.WithWebhookDuration(apiHandler)
+   	handler := genericapifilters.WithWebhookDuration(apiHandler)
 	handler = filterlatency.TrackCompleted(handler)
 	handler = genericapifilters.WithAuthorization(handler, c.Authorization.Authorizer, c.Serializer)
 	handler = filterlatency.TrackStarted(handler, "authorization")

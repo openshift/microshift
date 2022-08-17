@@ -21,8 +21,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"sync"
-	goatomic "sync/atomic"
+	"time"
 
 	"go.uber.org/atomic"
 
@@ -43,15 +42,6 @@ type terminationLoggingListener struct {
 	net.Listener
 	lateStopCh <-chan struct{}
 }
-
-type eventfFunc func(eventType, reason, messageFmt string, args ...interface{})
-
-var (
-	lateConnectionRemoteAddrsLock sync.RWMutex
-	lateConnectionRemoteAddrs     = map[string]bool{}
-
-	unexpectedRequestsEventf goatomic.Value
-)
 
 func (l *terminationLoggingListener) Accept() (net.Conn, error) {
 	c, err := l.Listener.Accept()
@@ -155,4 +145,43 @@ func isLocal(req *http.Request) bool {
 
 func isKubeApiserverLoopBack(req *http.Request) bool {
 	return strings.HasPrefix(req.UserAgent(), "kube-apiserver/")
+}
+
+// NonBlockingRun spawns the secure http server. An error is
+// returned if the secure port cannot be listened on.
+// The returned channel is closed when the (asynchronous) termination is finished.
+func (s preparedGenericAPIServer) NonBlockingRun(stopCh <-chan struct{}, shutdownTimeout time.Duration) (<-chan struct{}, <-chan struct{}, error) {
+	normalStoppedCh, normalListenerStoppedCh, err := s.nonBlockingRun(stopCh, shutdownTimeout)
+	if err != nil {
+		return nil, nil, err
+	}
+	if s.ReadyOnlySecureServingInfo == nil || s.Handler == nil {
+		return normalStoppedCh, normalListenerStoppedCh, nil
+	}
+
+	// prepend a handler that returns 503 until we have been ready at least once.
+	readyOnlyHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		select {
+		case <-s.lifecycleSignals.HasBeenReady.Signaled():
+			s.Handler.ServeHTTP(w, req)
+			return
+		default:
+			w.WriteHeader(http.StatusServiceUnavailable)
+			w.Write([]byte("kube-apiserver has not been ready yet"))
+			return
+		}
+	})
+
+	internalStopCh := make(chan struct{})
+	// we ignore the channels that indicate clean shutdown from the readyOnly server.
+	// This likely makes the shutdown unclean, so we should ONLY use this for microshift.
+	_, _, err = s.ReadyOnlySecureServingInfo.ServeWithListenerStopped(readyOnlyHandler, shutdownTimeout, internalStopCh)
+	if err != nil {
+		close(internalStopCh)
+		// This is still going to leak the nonBlockingRun call from above.
+		// Hopefully this exits the process and we try again after reporting a good error message.
+		return nil, nil, err
+	}
+
+	return normalStoppedCh, normalListenerStoppedCh, nil
 }

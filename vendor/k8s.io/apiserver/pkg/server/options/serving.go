@@ -38,6 +38,10 @@ import (
 )
 
 type SecureServingOptions struct {
+	ReadyOnlyBindAddress net.IP
+	// ReadyOnlyBindPort is like BindPort, but wires to a handler that returns a 503 until the server is ready ONCE.
+	ReadyOnlyBindPort int
+
 	BindAddress net.IP
 	// BindPort is ignored when Listener is set, will serve https even with 0.
 	BindPort int
