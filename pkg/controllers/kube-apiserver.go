@@ -135,7 +135,9 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) {
 	s.serverOptions.KubeletConfig.KeyFile = cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key"
 
 	s.serverOptions.SecureServing.BindAddress = net.IP{0, 0, 0, 0}
-	s.serverOptions.SecureServing.BindPort = apiServerPort
+	s.serverOptions.SecureServing.BindPort = apiServerPort-1
+	s.serverOptions.SecureServing.ReadyOnlyBindAddress = net.IP{0, 0, 0, 0}
+	s.serverOptions.SecureServing.ReadyOnlyBindPort = apiServerPort
 	s.serverOptions.SecureServing.ServerCert.CertKey.CertFile = cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt"
 	s.serverOptions.SecureServing.ServerCert.CertKey.KeyFile = cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key"
 
