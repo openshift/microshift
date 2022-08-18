@@ -33,13 +33,13 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /run/lvmd
+        - mountPath: {{ Dir .SocketName  }}
           name: lvmd-socket-dir
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
       - command:
         - /topolvm-node
-        - --lvmd-socket=/run/lvmd/lvmd.sock
+        - --lvmd-socket={{ .SocketName }}
         env:
         - name: NODE_NAME
           valueFrom:
@@ -75,7 +75,7 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: node-plugin-dir
-        - mountPath: /run/lvmd
+        - mountPath: {{ Dir .SocketName  }}
           name: lvmd-socket-dir
         - mountPath: /var/lib/kubelet/pods
           mountPropagation: Bidirectional

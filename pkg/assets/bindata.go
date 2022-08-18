@@ -1154,13 +1154,7 @@ metadata:
   name: lvmd
   namespace: openshift-storage
 data:
-  lvmd.yaml: |
-    socket-name: /run/lvmd/lvmd.sock
-    device-classes: 
-      - default: true
-        name: ssd
-        spare-gb: 2
-        volume-group: rhel
+  lvmd.yaml: {{ .lvmd }}
 `)
 
 func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1YamlBytes() ([]byte, error) {
@@ -1321,13 +1315,13 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /run/lvmd
+        - mountPath: {{ Dir .SocketName  }}
           name: lvmd-socket-dir
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
       - command:
         - /topolvm-node
-        - --lvmd-socket=/run/lvmd/lvmd.sock
+        - --lvmd-socket={{ .SocketName }}
         env:
         - name: NODE_NAME
           valueFrom:
@@ -1363,7 +1357,7 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: node-plugin-dir
-        - mountPath: /run/lvmd
+        - mountPath: {{ Dir .SocketName  }}
           name: lvmd-socket-dir
         - mountPath: /var/lib/kubelet/pods
           mountPropagation: Bidirectional
@@ -1470,7 +1464,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5258, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5282, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6569,11 +6563,13 @@ var _bindata = map[string]func() (*asset, error){
 // directory embedded in the file by go-bindata.
 // For example if you run go-bindata on data/... and data contains the
 // following hierarchy:
-//     data/
-//       foo.txt
-//       img/
-//         a.png
-//         b.png
+//
+//	data/
+//	  foo.txt
+//	  img/
+//	    a.png
+//	    b.png
+//
 // then AssetDir("data") would return []string{"foo.txt", "img"}
 // AssetDir("data/img") would return []string{"a.png", "b.png"}
 // AssetDir("foo.txt") and AssetDir("notexist") would return an error

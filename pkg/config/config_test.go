@@ -241,6 +241,7 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 	flags.StringSlice("roles", []string{}, "")
 
 	c := NewMicroshiftConfig()
+
 	if err := c.ReadAndValidate(flags); err != nil {
 		t.Errorf("failed to read and validate config: %v", err)
 	}

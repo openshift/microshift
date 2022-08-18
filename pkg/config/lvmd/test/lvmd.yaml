@@ -1,0 +1,10 @@
+socket-name: '/run/lvmd/lvmd.socket'
+device-classes:
+- name: "gold"
+  default: true
+  volume-group: "vg_1"
+  spare-gb: 5
+- name: "silver"
+  default: false
+  volume-group: "vg_2"
+  spare-gb: 5

@@ -1,12 +1,16 @@
 package components
 
 import (
+	"fmt"
+
+	"github.com/openshift/microshift/pkg/config/lvmd"
+	"k8s.io/klog/v2"
+
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
-	"k8s.io/klog/v2"
 )
 
-func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml",
@@ -58,6 +62,16 @@ func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-node-securitycontextconstraint.yaml",
 		}
 	)
+
+	l, err := lvmd.NewLvmdConfigFromFileOrDefault(cfg.LvmdConfigFile)
+	if err != nil {
+		return fmt.Errorf("getting lvmd config")
+	}
+	lvmdRenderParams, err := renderLvmdParams(l)
+	if err != nil {
+		return fmt.Errorf("rendering lvmd params: %v", err)
+	}
+
 	if err := assets.ApplyStorageClasses(sc, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
 		return err
@@ -90,7 +104,7 @@ func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyConfigMaps(cm, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(cm, renderTemplate, lvmdRenderParams, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
@@ -98,7 +112,7 @@ func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ds, renderTemplate, renderParamsFromConfig(cfg, assets.RenderParams{"SocketName": l.SocketName}), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
 		return err
 	}

@@ -36,6 +36,8 @@ func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags.StringVar(&cfg.ConfigFile, "config", cfg.ConfigFile, "The file to read configuration from.")
 	cmd.MarkFlagFilename("config", "yaml", "yml")
 	// All other flags will be read after reading both config file and env vars.
+	flags.StringVar(&cfg.LvmdConfigFile, "lvmd", cfg.LvmdConfigFile, "The path of the LVMD configuration specified by the user. Overrides default.")
+	cmd.MarkFlagFilename("lvmd", "yaml", "yml")
 	flags.String("data-dir", cfg.DataDir, "The directory for storing runtime data.")
 	flags.String("audit-log-dir", cfg.AuditLogDir, "The directory for storing audit logs.")
 	flags.StringSlice("roles", cfg.Roles, "The roles of this MicroShift instance.")

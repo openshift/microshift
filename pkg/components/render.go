@@ -2,14 +2,20 @@ package components
 
 import (
 	"bytes"
+	"fmt"
+	"path/filepath"
 	"text/template"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/config/lvmd"
 	"github.com/openshift/microshift/pkg/release"
+	"sigs.k8s.io/yaml"
 )
 
-var templateFuncs = map[string]interface{}{}
+var templateFuncs = map[string]interface{}{
+	"Dir": filepath.Dir,
+}
 
 func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderParams) assets.RenderParams {
 	params := map[string]interface{}{
@@ -39,3 +45,14 @@ func renderTemplate(tb []byte, data assets.RenderParams) ([]byte, error) {
 	}
 	return buf.Bytes(), nil
 }
+
+func renderLvmdParams(l *lvmd.Lvmd) (assets.RenderParams, error) {
+	r := make(assets.RenderParams)
+	b, err := yaml.Marshal(l)
+	if err != nil {
+		return nil, err
+	}
+	r["lvmd"] = fmt.Sprintf(`%q`, b)
+	return r, nil
+}
+

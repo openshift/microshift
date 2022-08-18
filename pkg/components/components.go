@@ -13,7 +13,7 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	if err := startCSIPLugin(cfg, kubeAdminConfig); err != nil {
+	if err := startCSIPlugin(cfg, cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
 		klog.Warningf("Failed to start csi plugin: %v", err)
 		return err
 	}
