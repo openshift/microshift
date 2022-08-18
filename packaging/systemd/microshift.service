@@ -9,6 +9,11 @@ ExecStart=microshift run
 Restart=always
 User=root
 Type=notify
+Delegate=yes
+CPUAccounting=yes
+BlockIOAccounting=yes
+MemoryAccounting=yes
+LimitNOFILE=1048576
 
 [Install]
 WantedBy=multi-user.target
