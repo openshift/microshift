@@ -41,8 +41,10 @@ import (
 	kubecontrolplanev1 "github.com/openshift/api/kubecontrolplane/v1"
 	"github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
+
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/cryptomaterial"
 )
 
 const (
@@ -90,7 +92,9 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kube-apiserver", "kubeconfig")
 	s.verbosity = cfg.LogVLevel
 
-	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
+	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	caCertFile := filepath.Join(certsDir, "ca-bundle", "ca-bundle.crt")
+	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
 
 	if err := s.configureAuditPolicy(cfg); err != nil {
 		return fmt.Errorf("Failed to configure kube-apiserver audit policy: %w", err)
@@ -106,7 +110,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
 			"audit-log-path":    {cfg.AuditLogDir},
 			"audit-policy-file": {cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
-			"client-ca-file":    {caCertFile},
+			"client-ca-file":    {clientCABundlePath},
 			"etcd-cafile":       {caCertFile},
 			"etcd-certfile":     {cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt"},
 			"etcd-keyfile":      {cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key"},
@@ -119,7 +123,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 			"proxy-client-cert-file":           {cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.crt"},
 			"proxy-client-key-file":            {cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.key"},
-			"requestheader-client-ca-file":     {caCertFile},
+			"requestheader-client-ca-file":     {clientCABundlePath},
 			"service-account-signing-key-file": {cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
 			"tls-cert-file":                    {cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt"},
 			"tls-private-key-file":             {cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key"},

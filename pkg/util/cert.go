@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -103,12 +103,12 @@ func LoadRootCA(dir, certFilename, keyFilename string) error {
 	return nil
 }
 
-func StoreRootCA(common, dir, certFilename, keyFilename string, svcName []string) error {
+func StoreRootCA(common, dir, certFilename, keyFilename string, svcName []string) ([]byte, []byte, error) {
 	if rootCA == nil || rootKey == nil {
 		var err error
 		rootKey, rootCA, err = GenCA(common, svcName, defaultDuration)
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
 	}
 	certBuff := CertToPem(rootCA)
@@ -118,7 +118,7 @@ func StoreRootCA(common, dir, certFilename, keyFilename string, svcName []string
 	keyPath := filepath.Join(dir, keyFilename)
 	ioutil.WriteFile(certPath, certBuff, 0644)
 	ioutil.WriteFile(keyPath, keyBuff, 0644)
-	return nil
+	return certBuff, keyBuff, nil
 }
 
 // GenCertsBuff create cert and key buff
