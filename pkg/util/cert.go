@@ -56,10 +56,6 @@ const (
 	ValidityTenYears = 10 * ValidityOneYear
 )
 
-func GetRootCA() *x509.Certificate {
-	return rootCA
-}
-
 func GenCA(common string, svcName []string, duration time.Duration) (*rsa.PrivateKey, *x509.Certificate, error) {
 	_, dns := IPAddressesDNSNames(svcName)
 	cfg := &CertCfg{

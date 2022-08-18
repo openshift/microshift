@@ -31,6 +31,8 @@ import (
 )
 
 type tlsConfigs struct {
+	clusterTrustBundle []byte
+
 	kubeControllerManager *crypto.TLSCertificateConfig
 	kubeScheduler         *crypto.TLSCertificateConfig
 }
@@ -69,7 +71,7 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
 	// store root CA for all
 	//TODO generate ca bundles for each component
-	cert, _, err := util.StoreRootCA("https://kubernetes.svc", filepath.Join(certsDir, "/ca-bundle"),
+	certConfigs.clusterTrustBundle, _, err = util.StoreRootCA("https://kubernetes.svc", filepath.Join(certsDir, "/ca-bundle"),
 		"ca-bundle.crt", "ca-bundle.key",
 		[]string{"https://kubernetes.svc"})
 
@@ -78,7 +80,7 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 	}
 
 	// FIXME: don't add the whole root CA to client CA bundle, get rid of a general trust by splitting the root CA
-	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, cert); err != nil {
+	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, certConfigs.clusterTrustBundle); err != nil {
 		return nil, fmt.Errorf("failed to add the root CA to the total client CA bundle: %w", err)
 	}
 
@@ -183,11 +185,15 @@ func initKubeconfig(
 	cfg *config.MicroshiftConfig,
 	certConfigs *tlsConfigs,
 ) error {
+	clusterTrustBundlePEM := certConfigs.clusterTrustBundle
+
 	if err := util.Kubeconfig(filepath.Join(cfg.DataDir, "/resources/kubeadmin/kubeconfig"),
+		clusterTrustBundlePEM,
 		"system:admin", []string{"system:masters"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
 	if err := util.Kubeconfig(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/kubeconfig"),
+		clusterTrustBundlePEM,
 		"kube-apiserver", []string{"kube-apiserver", "system:kube-apiserver", "system:masters"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
@@ -199,6 +205,7 @@ func initKubeconfig(
 	if err := util.KubeConfigWithClientCerts(
 		filepath.Join(cfg.DataDir, "resources", "kube-controller-manager", "kubeconfig"),
 		cfg.Cluster.URL,
+		clusterTrustBundlePEM,
 		kcmCertPEM,
 		kcmKeyPEM,
 	); err != nil {
@@ -212,6 +219,7 @@ func initKubeconfig(
 	if err := util.KubeConfigWithClientCerts(
 		filepath.Join(cfg.DataDir, "resources", "kube-scheduler", "kubeconfig"),
 		cfg.Cluster.URL,
+		clusterTrustBundlePEM,
 		schedulerCertPEM, schedulerKeyPEM,
 	); err != nil {
 		return err
@@ -219,6 +227,7 @@ func initKubeconfig(
 
 	// per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
 	if err := util.Kubeconfig(filepath.Join(cfg.DataDir, "/resources/kubelet/kubeconfig"),
+		clusterTrustBundlePEM,
 		"system:node:"+cfg.NodeName, []string{"system:nodes"}, cfg.Cluster.URL); err != nil {
 		return err
 	}

@@ -22,16 +22,16 @@ import (
 )
 
 // Kubeconfig creates a kubeconfig
-func Kubeconfig(path string, common string, svcName []string, clusterURL string) error {
+func Kubeconfig(path string, clusterTrustBundle []byte, common string, svcName []string, clusterURL string) error {
 	cert, key, err := GenCertsBuff(common, svcName)
 	if err != nil {
 		return err
 	}
 
-	return KubeConfigWithClientCerts(path, clusterURL, cert, key)
+	return KubeConfigWithClientCerts(path, clusterURL, clusterTrustBundle, cert, key)
 }
 
-func KubeConfigWithClientCerts(path string, clusterURL string, clientCertPEM []byte, clientKeyPEM []byte) error {
+func KubeConfigWithClientCerts(path string, clusterURL string, clusterTrustBundle []byte, clientCertPEM []byte, clientKeyPEM []byte) error {
 	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
 apiVersion: v1
 kind: Config
@@ -55,9 +55,6 @@ users:
     client-key-data: {{.ClientKey}}
 `))
 
-	clusterCA := Base64(CertToPem(GetRootCA()))
-	clientCert := Base64(clientCertPEM)
-	clientKey := Base64(clientKeyPEM)
 	data := struct {
 		ClusterURL string
 		ClusterCA  string
@@ -65,9 +62,9 @@ users:
 		ClientKey  string
 	}{
 		ClusterURL: clusterURL,
-		ClusterCA:  clusterCA,
-		ClientCert: clientCert,
-		ClientKey:  clientKey,
+		ClusterCA:  Base64(clusterTrustBundle),
+		ClientCert: Base64(clientCertPEM),
+		ClientKey:  Base64(clientKeyPEM),
 	}
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 
