@@ -4,17 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"k8s.io/klog/v2"
-
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-
 	rbacv1 "k8s.io/api/rbac/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
+
+	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 )
 
 var (
@@ -51,13 +49,8 @@ func (crb *clusterRoleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ Re
 }
 
 func (crb *clusterRoleBindingApplier) Applier() error {
-	_, err := crb.client.RbacV1().ClusterRoleBindings().Get(context.TODO(), crb.crb.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := crb.client.RbacV1().ClusterRoleBindings().Create(context.TODO(), crb.crb, metav1.CreateOptions{})
-		return err
-	}
-
-	return nil
+	_, _, err := resourceapply.ApplyClusterRoleBinding(context.TODO(), crb.client.RbacV1(), assetsEventRecorder, crb.crb)
+	return err
 }
 
 type clusterRoleApplier struct {
@@ -83,13 +76,8 @@ func (cr *clusterRoleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderPara
 }
 
 func (cr *clusterRoleApplier) Applier() error {
-	_, err := cr.client.RbacV1().ClusterRoles().Get(context.TODO(), cr.cr.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := cr.client.RbacV1().ClusterRoles().Create(context.TODO(), cr.cr, metav1.CreateOptions{})
-		return err
-	}
-
-	return nil
+	_, _, err := resourceapply.ApplyClusterRole(context.TODO(), cr.client.RbacV1(), assetsEventRecorder, cr.cr)
+	return err
 }
 
 type roleBindingApplier struct {
@@ -115,13 +103,8 @@ func (rb *roleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderPara
 }
 
 func (rb *roleBindingApplier) Applier() error {
-	_, err := rb.client.RbacV1().RoleBindings(rb.rb.Namespace).Get(context.TODO(), rb.rb.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := rb.client.RbacV1().RoleBindings(rb.rb.Namespace).Create(context.TODO(), rb.rb, metav1.CreateOptions{})
-		return err
-	}
-
-	return nil
+	_, _, err := resourceapply.ApplyRoleBinding(context.TODO(), rb.client.RbacV1(), assetsEventRecorder, rb.rb)
+	return err
 }
 
 type roleApplier struct {
@@ -147,13 +130,8 @@ func (r *roleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
 }
 
 func (r *roleApplier) Applier() error {
-	_, err := r.client.RbacV1().Roles(r.r.Namespace).Get(context.TODO(), r.r.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := r.client.RbacV1().Roles(r.r.Namespace).Create(context.TODO(), r.r, metav1.CreateOptions{})
-		return err
-	}
-
-	return nil
+	_, _, err := resourceapply.ApplyRole(context.TODO(), r.client.RbacV1(), assetsEventRecorder, r.r)
+	return err
 }
 
 func applyRbac(rbacs []string, applier readerApplier) error {
