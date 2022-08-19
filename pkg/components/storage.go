@@ -30,7 +30,6 @@ func startCSIPLugin(kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 		}
 		crb = []string{
 			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
@@ -38,7 +37,6 @@ func startCSIPLugin(kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 		}
 		cd = []string{
 			"assets/components/odf-lvm/csi-driver.yaml",
@@ -54,6 +52,9 @@ func startCSIPLugin(kubeconfigPath string) error {
 		}
 		sc = []string{
 			"assets/components/odf-lvm/topolvm_default-storage-class.yaml",
+		}
+		scc = []string{
+			"assets/components/odf-lvm/topolvm-node-securitycontextconstraint.yaml",
 		}
 	)
 	if err := assets.ApplyStorageClasses(sc, nil, nil, kubeconfigPath); err != nil {
@@ -98,6 +99,10 @@ func startCSIPLugin(kubeconfigPath string) error {
 	}
 	if err := assets.ApplyDaemonSets(ds, renderReleaseImage, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
+		return err
+	}
+	if err := assets.ApplySCCs(scc, nil, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply sccs %v: %v", scc, err)
 		return err
 	}
 	return nil
