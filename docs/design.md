@@ -108,7 +108,6 @@ When deciding between different design options, we follow the following principl
 * MicroShift uses the Red Hat OpenShift Networking CNI driver, based on OVN-Kubernetes.
 * No Multus.
 * Single-node, so no API load balancer.
-* No service load balancer, by default.
 * Open issues / questions:
   * Ingress?
 
