@@ -4,8 +4,7 @@ metadata:
   name: system:openshift:controller:service-ca
 roleRef:
   kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
+  name: system:openshift:controller:service-ca
 subjects:
 - kind: ServiceAccount
   namespace: openshift-service-ca

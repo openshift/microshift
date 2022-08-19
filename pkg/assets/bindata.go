@@ -3870,8 +3870,7 @@ metadata:
   name: system:openshift:controller:service-ca
 roleRef:
   kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
+  name: system:openshift:controller:service-ca
 subjects:
 - kind: ServiceAccount
   namespace: openshift-service-ca
@@ -3888,7 +3887,7 @@ func assetsComponentsServiceCaClusterrolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/clusterrolebinding.yaml", size: 298, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/clusterrolebinding.yaml", size: 285, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3918,7 +3917,6 @@ spec:
         app: service-ca
         service-ca: "true"
     spec:
-      securityContext: {}
       serviceAccount: service-ca
       serviceAccountName: service-ca
       containers:
@@ -3928,8 +3926,8 @@ spec:
         command: ["service-ca-operator", "controller"]
         ports:
         - containerPort: 8443
-        # securityContext:
-        #   runAsNonRoot: true
+        securityContext:
+          runAsNonRoot: true
         resources:
           requests:
             memory: 120Mi
@@ -3973,7 +3971,7 @@ func assetsComponentsServiceCaDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1866, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1836, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
