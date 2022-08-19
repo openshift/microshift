@@ -1,0 +1,50 @@
+---
+# manage-repos tasks
+
+- name: RHEL tasks
+  block:
+    - name: register host with subscription manager
+      community.general.redhat_subscription:
+        state: present
+        username: "{{ rhel_username }}"
+        password: "{{ rhel_password }}"
+        pool_ids: "{{ rhel_pool_id }}"
+
+    - name: enable repo management from subscription-manager
+      ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
+
+    - name: disable all repos
+      community.general.rhsm_repository:
+        name: '*'
+        state: disabled
+
+    - name: enable required repos for microshift
+      community.general.rhsm_repository:
+        name: "{{ rhel_repos }}"
+
+    - name: install EPEL repo
+      ansible.builtin.dnf:
+        name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
+        disable_gpg_check: true
+        state: present
+  when: ansible_distribution == "RedHat"
+
+- name: CentOS tasks
+  block:
+    - name: enable powertools repo (CentOS 8)
+      ansible.builtin.command: dnf config-manager --set-enabled powertools
+      when: ansible_distribution_version == "8"
+
+    # There's no CRI-O for CentOS 9
+    - name: enable powertools repo (CentOS 9)
+      ansible.builtin.command: dnf config-manager --set-enabled crb
+      when: ansible_distribution_version == "9"
+
+    - name: install EPEL repo
+      ansible.builtin.dnf:
+        name:
+        - epel-release
+        - epel-next-release
+        state: present
+  when: ansible_distribution == "CentOS"
+

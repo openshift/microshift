@@ -4,17 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"k8s.io/klog/v2"
-
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-
 	appsv1 "k8s.io/api/apps/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	appsclientv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
+
+	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 )
 
 var (
@@ -56,13 +54,10 @@ func (d *dpApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	}
 	d.dp = obj.(*appsv1.Deployment)
 }
+
 func (d *dpApplier) Applier() error {
-	_, err := d.Client.Deployments(d.dp.Namespace).Get(context.TODO(), d.dp.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := d.Client.Deployments(d.dp.Namespace).Create(context.TODO(), d.dp, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplyDeployment(context.TODO(), d.Client, assetsEventRecorder, d.dp, 0)
+	return err
 }
 
 type dsApplier struct {
@@ -85,12 +80,8 @@ func (d *dsApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	d.ds = obj.(*appsv1.DaemonSet)
 }
 func (d *dsApplier) Applier() error {
-	_, err := d.Client.DaemonSets(d.ds.Namespace).Get(context.TODO(), d.ds.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := d.Client.DaemonSets(d.ds.Namespace).Create(context.TODO(), d.ds, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplyDaemonSet(context.TODO(), d.Client, assetsEventRecorder, d.ds, 0)
+	return err
 }
 
 func applyApps(apps []string, applier readerApplier, render RenderFunc, params RenderParams) error {

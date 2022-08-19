@@ -1,0 +1,21 @@
+- name: disk space block
+  block:
+    - name: find disk usage
+      ansible.builtin.shell:
+        cmd: du -BM -t 1M --max-depth=1 {{ item }} | sort -rh
+      register: disk_usage
+    
+    - name: print disk_usage var
+      ansible.builtin.debug:
+        var: disk_usage.stdout_lines
+    
+    - name: Add disk info to local file
+      lineinfile:
+        path: "{{ filename }}"
+        line: "{{ item }}"
+        create: yes
+      delegate_to: localhost
+      with_items:
+        - "{{ item }}:"
+        - "{{ disk_usage.stdout_lines }}"
+

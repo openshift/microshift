@@ -4,17 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"k8s.io/klog/v2"
-
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-
 	scv1 "k8s.io/api/storage/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	scclientv1 "k8s.io/client-go/kubernetes/typed/storage/v1"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
+
+	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 )
 
 var (
@@ -57,12 +55,8 @@ func (s *scApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	s.sc = obj.(*scv1.StorageClass)
 }
 func (s *scApplier) Applier() error {
-	_, err := s.Client.StorageClasses().Get(context.TODO(), s.sc.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := s.Client.StorageClasses().Create(context.TODO(), s.sc, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplyStorageClass(context.TODO(), s.Client, assetsEventRecorder, s.sc)
+	return err
 }
 
 func applySCs(scs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
@@ -112,12 +106,8 @@ func (c *cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 }
 
 func (c *cdApplier) Applier() error {
-	_, err := c.Client.CSIDrivers().Get(context.TODO(), c.cd.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err := c.Client.CSIDrivers().Create(context.TODO(), c.cd, metav1.CreateOptions{})
-		return err
-	}
-	return nil
+	_, _, err := resourceapply.ApplyCSIDriver(context.TODO(), c.Client, assetsEventRecorder, c.cd)
+	return err
 }
 
 func ApplyCSIDrivers(drivers []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {

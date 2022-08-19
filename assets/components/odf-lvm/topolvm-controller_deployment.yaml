@@ -121,7 +121,7 @@ spec:
         - -c
         - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
           -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-        image: {{ .ReleaseImage.odf_lvm_operator }}
+        image: {{ .ReleaseImage.openssl }}
         imagePullPolicy: IfNotPresent
         name: self-signed-cert-generator
         resources: {}

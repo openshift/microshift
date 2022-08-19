@@ -1,6 +1,8 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // assets/bindata_timestamp.txt
+// assets/components/kube-apiserver/config-overrides.yaml
+// assets/components/kube-apiserver/defaultconfig.yaml
 // assets/components/odf-lvm/csi-driver.yaml
 // assets/components/odf-lvm/topolvm-controller_deployment.yaml
 // assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
@@ -19,6 +21,7 @@
 // assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml
 // assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+// assets/components/odf-lvm/topolvm-node-securitycontextconstraint.yaml
 // assets/components/odf-lvm/topolvm-node_daemonset.yaml
 // assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
 // assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
@@ -148,6 +151,239 @@ func assetsBindata_timestampTxt() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsKubeApiserverConfigOverridesYaml = []byte(`apiVersion: kubecontrolplane.config.openshift.io/v1
+kind: KubeAPIServerConfig
+apiServerArguments:
+  # The following arguments are required to enable bound sa
+  # tokens. This is only supported post-bootstrap so these
+  # values must not appear in defaultconfig.yaml.
+  service-account-issuer:
+    - https://kubernetes.default.svc
+  api-audiences:
+    - https://kubernetes.default.svc
+  service-account-signing-key-file:
+    - /etc/kubernetes/static-pod-certs/secrets/bound-service-account-signing-key/service-account.key
+serviceAccountPublicKeyFiles:
+  # this being a directory means we cannot directly use the upstream flags.
+  # TODO make a configobserver that writes the individual values that we need.
+  - /etc/kubernetes/static-pod-resources/configmaps/sa-token-signing-certs
+  # The following path contains the public keys needed to verify bound sa
+  # tokens. This is only supported post-bootstrap.
+  - /etc/kubernetes/static-pod-resources/configmaps/bound-sa-token-signing-certs
+
+`)
+
+func assetsComponentsKubeApiserverConfigOverridesYamlBytes() ([]byte, error) {
+	return _assetsComponentsKubeApiserverConfigOverridesYaml, nil
+}
+
+func assetsComponentsKubeApiserverConfigOverridesYaml() (*asset, error) {
+	bytes, err := assetsComponentsKubeApiserverConfigOverridesYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/kube-apiserver/config-overrides.yaml", size: 988, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsKubeApiserverDefaultconfigYaml = []byte(`apiVersion: kubecontrolplane.config.openshift.io/v1
+kind: KubeAPIServerConfig
+admission:
+  pluginConfig:
+    network.openshift.io/ExternalIPRanger:
+      configuration:
+        allowIngressIP: true
+        apiVersion: network.openshift.io/v1
+        externalIPNetworkCIDRs: null
+        kind: ExternalIPRangerAdmissionConfig
+      location: ""
+    PodSecurity:
+      configuration:
+        kind: PodSecurityConfiguration
+        apiVersion: pod-security.admission.config.k8s.io/v1alpha1
+        defaults:
+          enforce: "privileged"
+          enforce-version: "latest"
+          audit: "baseline"
+          audit-version: "latest"
+          warn: "baseline"
+          warn-version: "latest"
+apiServerArguments:
+  allow-privileged:
+    - "true"
+  anonymous-auth:
+    - "true"
+  authorization-mode:
+    - Scope
+    - SystemMasters
+    - RBAC
+    - Node
+  audit-log-format:
+    - json
+  audit-log-maxbackup:
+    - "10"
+  audit-log-maxsize:
+    - "100"
+  audit-log-path:
+    - /var/log/kube-apiserver/audit.log
+  audit-policy-file:
+    - /etc/kubernetes/static-pod-resources/configmaps/kube-apiserver-audit-policies/policy.yaml
+  client-ca-file:
+    - /etc/kubernetes/static-pod-certs/configmaps/client-ca/ca-bundle.crt
+  disable-admission-plugins:
+    - PodSecurity
+  enable-admission-plugins:
+    - CertificateApproval
+    - CertificateSigning
+    - CertificateSubjectRestriction
+    - DefaultIngressClass
+    - DefaultStorageClass
+    - DefaultTolerationSeconds
+    - LimitRanger
+    - MutatingAdmissionWebhook
+    - NamespaceLifecycle
+    - NodeRestriction
+    - OwnerReferencesPermissionEnforcement
+    - PersistentVolumeClaimResize
+    - PersistentVolumeLabel
+    - PodNodeSelector
+    - PodTolerationRestriction
+    - Priority
+    - ResourceQuota
+    - RuntimeClass
+    - ServiceAccount
+    - StorageObjectInUseProtection
+    - TaintNodesByCondition
+    - ValidatingAdmissionWebhook
+    - authorization.openshift.io/RestrictSubjectBindings
+    - authorization.openshift.io/ValidateRoleBindingRestriction
+    - config.openshift.io/DenyDeleteClusterConfiguration
+    - config.openshift.io/ValidateAPIServer
+    - config.openshift.io/ValidateAuthentication
+    - config.openshift.io/ValidateConsole
+    - config.openshift.io/ValidateFeatureGate
+    - config.openshift.io/ValidateImage
+    - config.openshift.io/ValidateOAuth
+    - config.openshift.io/ValidateProject
+    - config.openshift.io/ValidateScheduler
+    - image.openshift.io/ImagePolicy
+    - network.openshift.io/ExternalIPRanger
+    - network.openshift.io/RestrictedEndpointsAdmission
+    - quota.openshift.io/ClusterResourceQuota
+    - quota.openshift.io/ValidateClusterResourceQuota
+    - route.openshift.io/IngressAdmission
+    - scheduling.openshift.io/OriginPodNodeEnvironment
+    - security.openshift.io/DefaultSecurityContextConstraints
+    - security.openshift.io/SCCExecRestrictions
+    - security.openshift.io/SecurityContextConstraint
+    - security.openshift.io/ValidateSecurityContextConstraints
+  # switch to direct pod IP routing for aggregated apiservers to avoid service IPs as on source of instability
+  enable-aggregator-routing:
+    - "true"
+  enable-logs-handler:
+    - "false"
+  enable-swagger-ui:
+    - "true"
+  endpoint-reconciler-type:
+    - "lease"
+  etcd-cafile:
+    - /etc/kubernetes/static-pod-resources/configmaps/etcd-serving-ca/ca-bundle.crt
+  etcd-certfile:
+    - /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.crt
+  etcd-keyfile:
+    - /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.key
+  etcd-prefix:
+    - kubernetes.io
+  event-ttl:
+    - 3h
+  goaway-chance:
+    - "0"
+  http2-max-streams-per-connection:
+    - "2000"  # recommended is 1000, but we need to mitigate https://github.com/kubernetes/kubernetes/issues/74412
+  insecure-port:
+    - "0"
+  kubelet-certificate-authority:
+    - /etc/kubernetes/static-pod-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
+  kubelet-client-certificate:
+    - /etc/kubernetes/static-pod-certs/secrets/kubelet-client/tls.crt
+  kubelet-client-key:
+    - /etc/kubernetes/static-pod-certs/secrets/kubelet-client/tls.key
+  kubelet-preferred-address-types:
+    - InternalIP # all of our kubelets have internal IPs and we *only* support communicating with them via that internal IP so that NO_PROXY always works and is lightweight
+  kubelet-read-only-port:
+    - "0"
+  kubernetes-service-node-port:
+    - "0"
+  # value should logically scale with max-requests-inflight
+  max-mutating-requests-inflight:
+    - "1000"
+  # value needed to be bumped for scale tests.  The kube-apiserver did ok here
+  max-requests-inflight:
+    - "3000"
+  min-request-timeout:
+    - "3600"
+  proxy-client-cert-file:
+    - /etc/kubernetes/static-pod-certs/secrets/aggregator-client/tls.crt
+  proxy-client-key-file:
+    - /etc/kubernetes/static-pod-certs/secrets/aggregator-client/tls.key
+  requestheader-allowed-names:
+    - kube-apiserver-proxy
+    - system:kube-apiserver-proxy
+    - system:openshift-aggregator
+  requestheader-client-ca-file:
+    - /etc/kubernetes/static-pod-certs/configmaps/aggregator-client-ca/ca-bundle.crt
+  requestheader-extra-headers-prefix:
+    - X-Remote-Extra-
+  requestheader-group-headers:
+    - X-Remote-Group
+  requestheader-username-headers:
+    - X-Remote-User
+  # need to enable alpha APIs for the priority and fairness feature
+  service-account-lookup:
+    - "true"
+  service-node-port-range:
+    - 30000-32767
+  shutdown-delay-duration:
+    - 70s # give SDN some time to converge: 30s for iptable lock contention, 25s for the second try and some seconds for AWS to update ELBs
+  shutdown-send-retry-after:
+  - "true"
+  storage-backend:
+    - etcd3
+  storage-media-type:
+    - application/vnd.kubernetes.protobuf
+  tls-cert-file:
+    - /etc/kubernetes/static-pod-certs/secrets/service-network-serving-certkey/tls.crt
+  tls-private-key-file:
+    - /etc/kubernetes/static-pod-certs/secrets/service-network-serving-certkey/tls.key
+authConfig:
+  oauthMetadataFile: ""
+consolePublicURL: ""
+projectConfig:
+  defaultNodeSelector: ""
+servicesSubnet: 10.3.0.0/16 # ServiceCIDR # set by observe_network.go
+servingInfo:
+  bindAddress: 0.0.0.0:6443 # set by observe_network.go
+  bindNetwork: tcp4 # set by observe_network.go
+  namedCertificates: null # set by observe_apiserver.go
+`)
+
+func assetsComponentsKubeApiserverDefaultconfigYamlBytes() ([]byte, error) {
+	return _assetsComponentsKubeApiserverDefaultconfigYaml, nil
+}
+
+func assetsComponentsKubeApiserverDefaultconfigYaml() (*asset, error) {
+	bytes, err := assetsComponentsKubeApiserverDefaultconfigYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/kube-apiserver/defaultconfig.yaml", size: 6252, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -303,7 +539,7 @@ spec:
         - -c
         - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
           -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-        image: {{ .ReleaseImage.odf_lvm_operator }}
+        image: {{ .ReleaseImage.openssl }}
         imagePullPolicy: IfNotPresent
         name: self-signed-cert-generator
         resources: {}
@@ -334,7 +570,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4170, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4161, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -984,6 +1220,55 @@ func assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleb
 	return a, nil
 }
 
+var _assetsComponentsOdfLvmTopolvmNodeSecuritycontextconstraintYaml = []byte(`allowHostDirVolumePlugin: true
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: true
+allowHostPorts: false
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: true
+allowedCapabilities:
+apiVersion: security.openshift.io/v1
+defaultAddCapabilities:
+fsGroup:
+  type: RunAsAny
+groups: []
+kind: SecurityContextConstraints
+metadata:
+  name: topolvm-node
+priority:
+readOnlyRootFilesystem: false
+requiredDropCapabilities: []
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+users:
+- system:serviceaccount:openshift-storage:topolvm-node
+volumes:
+- configMap
+- emptyDir
+- hostPath
+- secret
+`)
+
+func assetsComponentsOdfLvmTopolvmNodeSecuritycontextconstraintYamlBytes() ([]byte, error) {
+	return _assetsComponentsOdfLvmTopolvmNodeSecuritycontextconstraintYaml, nil
+}
+
+func assetsComponentsOdfLvmTopolvmNodeSecuritycontextconstraintYaml() (*asset, error) {
+	bytes, err := assetsComponentsOdfLvmTopolvmNodeSecuritycontextconstraintYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node-securitycontextconstraint.yaml", size: 642, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _assetsComponentsOdfLvmTopolvmNode_daemonsetYaml = []byte(`apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -1109,7 +1394,7 @@ spec:
         - -c
         - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
           sleep 5; done
-        image: {{ .ReleaseImage.odf_lvm_operator }}
+        image: {{ .ReleaseImage.openssl }}
         imagePullPolicy: IfNotPresent
         name: file-checker
         resources: {}
@@ -1167,7 +1452,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5221, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5212, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5599,6 +5884,8 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
 	"assets/bindata_timestamp.txt":                                                                           assetsBindata_timestampTxt,
+	"assets/components/kube-apiserver/config-overrides.yaml":                                                 assetsComponentsKubeApiserverConfigOverridesYaml,
+	"assets/components/kube-apiserver/defaultconfig.yaml":                                                    assetsComponentsKubeApiserverDefaultconfigYaml,
 	"assets/components/odf-lvm/csi-driver.yaml":                                                              assetsComponentsOdfLvmCsiDriverYaml,
 	"assets/components/odf-lvm/topolvm-controller_deployment.yaml":                                           assetsComponentsOdfLvmTopolvmController_deploymentYaml,
 	"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml":             assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYaml,
@@ -5617,6 +5904,7 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml":                                        assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml,
 	"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":               assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":        assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
+	"assets/components/odf-lvm/topolvm-node-securitycontextconstraint.yaml":                                  assetsComponentsOdfLvmTopolvmNodeSecuritycontextconstraintYaml,
 	"assets/components/odf-lvm/topolvm-node_daemonset.yaml":                                                  assetsComponentsOdfLvmTopolvmNode_daemonsetYaml,
 	"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml":                   assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml,
 	"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml,
@@ -5725,6 +6013,10 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"bindata_timestamp.txt": {assetsBindata_timestampTxt, map[string]*bintree{}},
 		"components": {nil, map[string]*bintree{
+			"kube-apiserver": {nil, map[string]*bintree{
+				"config-overrides.yaml": {assetsComponentsKubeApiserverConfigOverridesYaml, map[string]*bintree{}},
+				"defaultconfig.yaml":    {assetsComponentsKubeApiserverDefaultconfigYaml, map[string]*bintree{}},
+			}},
 			"odf-lvm": {nil, map[string]*bintree{
 				"csi-driver.yaml":                    {assetsComponentsOdfLvmCsiDriverYaml, map[string]*bintree{}},
 				"topolvm-controller_deployment.yaml": {assetsComponentsOdfLvmTopolvmController_deploymentYaml, map[string]*bintree{}},
@@ -5744,6 +6036,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"topolvm-lvmd-config_configmap_v1.yaml":                                        {assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml, map[string]*bintree{}},
 				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml":               {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
 				"topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":        {assetsComponentsOdfLvmTopolvmNodeScc_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},
+				"topolvm-node-securitycontextconstraint.yaml":                                  {assetsComponentsOdfLvmTopolvmNodeSecuritycontextconstraintYaml, map[string]*bintree{}},
 				"topolvm-node_daemonset.yaml":                                                  {assetsComponentsOdfLvmTopolvmNode_daemonsetYaml, map[string]*bintree{}},
 				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml":                   {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterroleYaml, map[string]*bintree{}},
 				"topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml":            {assetsComponentsOdfLvmTopolvmNode_rbacAuthorizationK8sIo_v1_clusterrolebindingYaml, map[string]*bintree{}},

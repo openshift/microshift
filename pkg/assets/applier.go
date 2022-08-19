@@ -2,11 +2,15 @@ package assets
 
 import (
 	"sync"
+
+	"github.com/openshift/library-go/pkg/operator/events"
 )
 
 var (
 	lock sync.Mutex
 )
+
+var assetsEventRecorder events.Recorder = events.NewLoggingEventRecorder("microshift-assets")
 
 type RenderParams map[string]string
 
