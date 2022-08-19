@@ -1,5 +1,8 @@
 policy_module(microshift, 1.0.0)
 
+type microshift_t;
+domain_type(microshift_t);
+
 gen_require(`
     type container_runtime_t, var_lib_t, container_var_lib_t, container_runtime_tmpfs_t, container_t;
     class file { open read };
