@@ -4,6 +4,18 @@ kind: Namespace
 metadata:
   name: amq-broker
 --- 
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: amq-broker-pvc
+  namespace: amq-broker
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -25,18 +37,30 @@ spec:
       - name: amq-broker
         image: registry.redhat.io/amq7/amq-broker:7.8
         imagePullPolicy: IfNotPresent
+        persistenceEnabled: true
+        storage:
+          size: 1Gi
         env:
         - name: AMQ_USER
           value: admin
         - name: AMQ_PASSWORD
           value: admin
         - name: AMQ_PROTOCOL
-          value: amqp,mqtt 
+          value: amqp,mqtt
+        - name: AMQ_DATA_DIR
+          value: /data
         ports:
          - containerPort: 61616 # general
          - containerPort: 8161  # web
          - containerPort: 5672  # amqp
          - containerPort: 1883  # mqtt
+        volumeMounts:
+          - name: amq-broker-datavol
+            mountPath: /data
+      volumes:
+        - name: amq-broker-datavol
+          persistentVolumeClaim:
+            claimName: amq-broker-pvc
 ---
 apiVersion: v1
 kind: Service
