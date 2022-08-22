@@ -40,6 +40,8 @@ sudo bash -c "
     echo Removing MicroShift and OVN configuration
     rm -rf /var/lib/{microshift,ovnk}
     rm -rf /var/run/ovn
+    rm -f /etc/cni/net.d/10-ovn-kubernetes.conf
+    rm -f /opt/cni/bin/ovn-k8s-cni-overlay
 
     echo Cleanup succeeded
 "
