@@ -17,6 +17,7 @@ package util
 
 import (
 	"crypto/tls"
+	"fmt"
 	tcpnet "net"
 	"net/http"
 	"os"
@@ -31,12 +32,45 @@ import (
 	"k8s.io/klog/v2"
 )
 
+const (
+	// Used to get gateway IP when default route doesn't exist
+	OVNGatewayInterface = "br-ex"
+)
+
 func GetHostIP() (string, error) {
 	ip, err := net.ChooseHostInterface()
-	if err != nil {
-		return "127.0.0.1", err
+	if err == nil {
+		return ip.String(), nil
 	}
-	return ip.String(), nil
+	klog.V(2).Infof("failed to find default route IP address: %v", err)
+
+	gatewayIP, err := getOVNGatewayIP()
+	if err != nil {
+		return "", err
+	}
+	klog.V(2).Infof("ovn gateway IP address: %s", gatewayIP)
+
+	return gatewayIP, nil
+}
+
+func getOVNGatewayIP() (string, error) {
+	iface, err := tcpnet.InterfaceByName(OVNGatewayInterface)
+	if err != nil {
+		return "", err
+	}
+	addrs, err := iface.Addrs()
+	if err != nil {
+		return "", err
+	}
+	for _, addr := range addrs {
+		ip := addr.(*tcpnet.IPNet).IP
+		if ip.To4() != nil {
+			return ip.To4().String(), nil
+		} else {
+			return ip.String(), nil
+		}
+	}
+	return "", fmt.Errorf("failed to get ovn gateway IP address")
 }
 
 func RetryInsecureHttpsGet(url string) int {

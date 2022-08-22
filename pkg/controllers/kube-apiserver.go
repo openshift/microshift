@@ -104,6 +104,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
+			"advertise-address": {cfg.NodeIP},
 			"audit-log-path":    {cfg.AuditLogDir},
 			"audit-policy-file": {cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
 			"client-ca-file":    {caCertFile},

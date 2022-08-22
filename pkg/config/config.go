@@ -84,7 +84,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 	nodeIP, err := util.GetHostIP()
 	if err != nil {
-		klog.Warningf("failed to get host IP: %v, using: %q", err, nodeIP)
+		klog.Fatalf("failed to get host IP: %v", err)
 	}
 
 	dataDir := findDataDir()
