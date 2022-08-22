@@ -105,11 +105,10 @@ When deciding between different design options, we follow the following principl
 
 ### Networking
 * Host networking is configured by device management. MicroShift has to work with what it's been given by the host OS.
+* MicroShift uses the Red Hat OpenShift Networking CNI driver, based on OVN-Kubernetes.
 * No Multus.
+* Single-node, so no API load balancer.
 * Open issues / questions:
-  * Lightweight CNI?
-  * API Load Balancing?
-  * Service Load Balancing?
   * Ingress?
 
 ### Storage
