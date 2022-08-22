@@ -94,11 +94,21 @@ Open a browser at the `http://VM_IP:AMQ_WEB_PORT` URL, click on the `Management 
 > - Replace `VM_IP` with the current IP address of the MicroShift virtual machine (i.e. 192.168.122.32)
 > - Replace `AMPQ_WEB_PORT` with the current `NodePort` of the `amq-web` service (i.e. 31715)
 
-Navigate to `broker > addresses > microshift-queue` in the tree and select the `Queues` tab. Review the `Message Count` column in the table, noting that there are still fifty messages remaining to be consumed in the queue.
+Navigate to `broker > addresses > microshift-queue` in the tree and select the `Queues` tab. Review the `Message Count` column in the table, noting that there are fifty messages remaining to be consumed in the queue.
 
 ![AMQ Broker Queue](./images/howto_amq_broker_queue.png)
 
 > See [Producing and consuming test messages](https://access.redhat.com/documentation/en-us/red_hat_amq/2020.q4/html/getting_started_with_amq_broker/creating-standalone-getting-started#producing-consuming-test-messages-getting-started) for more information.
+
+### Data Persistency
+The AMQ Broker deployment is configured to mount a 1GB volume at the `/data` directory and set the `AMQ_DATA_DIR` environment variable to point to that location. All the messages sent to the AMQ Broker are persisted on the volume until their expiry or retrieval.
+
+Run the following command to delete the running AMQ Broker pod instance.
+```bash
+oc delete pods -n amq-broker -l app=amq-broker
+```
+
+Wait until a new AMQ Broker pod is started and check the message queue in the `Management Console` as described in the [Web Interface](#web-interface) section. Note that there are still fifty messages remaining to be consumed in the queue.
 
 ## Cleanup
 Log into the virtual machine and run the following command to delete the AMQ Broker deployment.
