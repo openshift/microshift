@@ -91,6 +91,9 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 	var buf []byte = make([]byte, 8)
 	// Take a snapshot of the system and monototic clocks as a base reference
 	stimeRef, mtimeRef := getSysMonTimes()
+
+	klog.Infof("sysconfwatch-controller is ready")
+	close(ready)
 	for {
 		select {
 		case <-ticker.C:

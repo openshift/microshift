@@ -120,6 +120,10 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		util.Must(m.AddService(node.NewKubeletServer(cfg)))
 	}
 
+	// Storing and clearing the env, so other components don't send the READY=1 until MicroShift is fully ready
+	notifySocket := os.Getenv("NOTIFY_SOCKET")
+	os.Unsetenv("NOTIFY_SOCKET")
+
 	klog.Infof("Starting Microshift")
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -168,6 +172,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	select {
 	case <-ready:
 		klog.Infof("MicroShift is ready")
+		os.Setenv("NOTIFY_SOCKET", notifySocket)
 		if supported, err := daemon.SdNotify(false, daemon.SdNotifyReady); err != nil {
 			klog.Warningf("error sending sd_notify readiness message: %v", err)
 		} else if supported {
