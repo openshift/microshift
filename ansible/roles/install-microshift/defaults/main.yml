@@ -37,8 +37,8 @@ firewall_trusted_cidr:
   - 10.42.0.0/16
   - 169.254.169.1/32
 
-root_bin_dir: /root/bin
-microshift_dir: /root/microshift
+root_bin_dir: /usr/bin
+microshift_dir: "{{ ansible_env.HOME }}/microshift"
 microshift_rpms: []
 
 systemd_services:

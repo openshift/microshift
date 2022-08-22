@@ -7,17 +7,17 @@
     state: present
     update_cache: true
 
-- name: create root bin directory
-  ansible.builtin.file:
-    path: "{{ root_bin_dir }}"
-    state: directory
-    mode: '0755'
+- name: check if we have oc installed
+  command: which oc
+  register: oc_present
+  ignore_errors: true
 
 - name: download and extract oc client
   ansible.builtin.unarchive:
     src: "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/{{ oc_archive_name }}"
     dest: "{{ root_bin_dir }}"
     remote_src: yes
+  when: oc_present.rc != 0
 
 - name: install node-exporter
   ansible.builtin.dnf:
@@ -221,12 +221,7 @@
   retries: 30
   delay: 10
 
-- name: wait for pods running
-  ansible.builtin.shell: kubectl get po -A --no-headers | grep Running | wc -l
-  retries: 60
-  delay: 5
-  register: result
-  until: result.stdout == "6"
+- include_tasks: roles/common/tasks/readinesscheck.yml
 
 - name: force update of current timestamp
   ansible.builtin.setup:

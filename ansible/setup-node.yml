@@ -14,12 +14,12 @@
   vars_files:
   - vars/all.yml
   roles:
-  - setup-localhost
+    - setup-localhost
 
 - name: Set up logging node
   hosts: logging
   roles:
-  - install-logging
+    - install-logging
 
 - name: Install microshift node
   hosts: microshift

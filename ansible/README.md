@@ -28,6 +28,10 @@ There are a few variables that may need user configuration and they are found in
 | -------------- | ----------- | ------- |
 | `install_pbench` | Install pbench performance capture tooling (boolean) | `false` |
 | `pbench_record_duration` | Duration of time for pbench recording (seconds) | `360` |
+| `rhel_username` | Red Hat subscription account username (string) | `null` | 
+| `rhel_password` | Red Hat subscription account password (string) | `null` | 
+| `rhel_pool_id` | Red Hat subscription pool id (string) | `null` | 
+
 
 ## Running
 
