@@ -489,6 +489,27 @@ get_default_interface() {
     if [[ -n "${iface}" ]]; then
       break
     fi
+
+    # TODO: sync with openshift configure-ovs.sh when it supports non default route
+    # pick the first ipv4 route in the case that default route doesn't exist
+    if [ "${extra_bridge}" != "" ]; then
+      iface=$(ip route show | grep -v "br-ex1" | grep -v "${extra_bridge}" | awk '{ if ($2 == "dev") { print $3; exit } }')
+    else
+      iface=$(ip route show | grep -v "br-ex1" | awk '{ if ($2 == "dev") { print $3; exit } }')
+    fi
+    if [[ -n "${iface}" ]]; then
+      break
+    fi
+    # pick the first ipv6 route in the case that default route doesn't exist
+    if [ "${extra_bridge}" != "" ]; then
+      iface=$(ip -6 route show | grep -v "br-ex1" | grep -v "${extra_bridge}" | awk '{ if ($2 == "dev") { print $3; exit } }')
+    else
+      iface=$(ip -6 route show | grep -v "br-ex1" | awk '{ if ($2 == "dev") { print $3; exit } }')
+    fi
+    if [[ -n "${iface}" ]]; then
+      break
+    fi
+
     counter=$((counter+1))
     sleep 5
   done
@@ -512,6 +533,21 @@ get_default_interface() {
           iface="${iface_default_hint}"
           break
         fi
+
+        # TODO: sync with openshift configure-ovs.sh when it supports non default route
+        # check ipv4
+        # use iface hint when default route doesn't exist
+        if [ "$(ip route show dev "${iface_default_hint}")" != "" ]; then
+          iface="${iface_default_hint}"
+          break
+        fi
+        # check ipv6
+        # use iface hint when default route doesn't exist
+        if [ "$(ip -6 route show dev "${iface_default_hint}")" != "" ]; then
+          iface="${iface_default_hint}"
+          break
+        fi
+
         counter=$((counter+1))
         sleep 5
       done
