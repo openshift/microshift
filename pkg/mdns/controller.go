@@ -91,13 +91,9 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	go c.startRouteInformer(c.stopCh)
 
-	select {
-	case <-ctx.Done():
+	<-ctx.Done()
 
-		return ctx.Err()
-	}
-
-	return nil
+	return ctx.Err()
 }
 
 func ipInAddrs(ip string, addrs []net.Addr) bool {
