@@ -4282,20 +4282,13 @@ func assetsCoreCsr_approver_clusterrolebindingYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsCoreNamespaceOpenshiftInfraYaml = []byte(`kind: Namespace
-apiVersion: v1
+var _assetsCoreNamespaceOpenshiftInfraYaml = []byte(`apiVersion: v1
+kind: Namespace
 metadata:
   annotations:
-    openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
   name: openshift-infra
-  labels:
-    # set value to avoid depending on kube admission that depends on openshift apis
-    openshift.io/run-level: "0"
-    # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
-    openshift.io/cluster-monitoring: "true"
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"`)
+`)
 
 func assetsCoreNamespaceOpenshiftInfraYamlBytes() ([]byte, error) {
 	return _assetsCoreNamespaceOpenshiftInfraYaml, nil
@@ -4307,7 +4300,7 @@ func assetsCoreNamespaceOpenshiftInfraYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/namespace-openshift-infra.yaml", size: 537, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/core/namespace-openshift-infra.yaml", size: 128, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
