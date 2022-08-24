@@ -26,8 +26,8 @@ import (
 	"github.com/openshift/library-go/pkg/crypto"
 
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/cryptomaterial"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
 type tlsConfigs struct {

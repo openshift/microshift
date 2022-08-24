@@ -44,7 +44,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/cryptomaterial"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
 const (
