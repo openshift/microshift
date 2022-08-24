@@ -40,3 +40,8 @@ func KubeControllerManagerClientCertDir(certsDir string) string {
 func TotalClientCABundlePath(certsDir string) string {
 	return filepath.Join(certsDir, "ca-bundle", "client-ca.crt")
 }
+
+// UltimateTrustBundlePath returns the path to the cert bundle with the root certificate
+func UltimateTrustBundlePath(certsDir string) string {
+	return filepath.Join(certsDir, "ca-bundle", "ca-bundle.crt")
+}

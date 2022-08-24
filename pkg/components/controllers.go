@@ -5,6 +5,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	"k8s.io/klog/v2"
 )
 
@@ -37,7 +38,8 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 		cm         = "assets/components/service-ca/signing-cabundle.yaml"
 		cmName     = "signing-cabundle"
 	)
-	caPath := cfg.DataDir + "/certs/ca-bundle/ca-bundle.crt"
+
+	caPath := cryptomaterial.UltimateTrustBundlePath(cryptomaterial.CertsDirectory(cfg.DataDir))
 	tlsCrtPath := cfg.DataDir + "/resources/service-ca/secrets/service-ca/tls.crt"
 	tlsKeyPath := cfg.DataDir + "/resources/service-ca/secrets/service-ca/tls.key"
 	cmData := map[string]string{}

@@ -93,7 +93,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.verbosity = cfg.LogVLevel
 
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
-	caCertFile := filepath.Join(certsDir, "ca-bundle", "ca-bundle.crt")
+	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
 
 	if err := s.configureAuditPolicy(cfg); err != nil {
