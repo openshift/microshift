@@ -3,6 +3,17 @@
 
 - name: RHEL tasks
   block:
+    - name: check if we have subscription-manager installed
+      ansible.builtin.command: which subscription-manager
+      register: sm_present
+      ignore_errors: true
+
+    - name: install subscription-manager
+      ansible.builtin.dnf:
+        name:
+        - subscription-manager
+      when: sm_present.rc != 0
+
     - name: register host with subscription manager
       community.general.redhat_subscription:
         state: present

@@ -1,0 +1,10 @@
+---
+# Wait for pods to be running
+
+- name: wait for pods running
+  ansible.builtin.shell: oc get po -A --no-headers | grep Running | wc -l
+  retries: 60
+  delay: 5
+  register: result
+  until: result.stdout == "8"
+
