@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 
 	"k8s.io/component-base/cli/globalflag"
 	"k8s.io/component-base/version/verflag"
@@ -50,7 +51,8 @@ func (s *KubeControllerManager) Name() string           { return "kube-controlle
 func (s *KubeControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
-	caCertFile := filepath.Join(cfg.DataDir, "certs", "ca-bundle", "ca-bundle.crt")
+	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	kubeconfig := filepath.Join(cfg.DataDir, "resources", "kube-controller-manager", "kubeconfig")
 	kubeadmConfig := filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
 
@@ -75,7 +77,7 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 		"--leader-elect=false",
 		"--use-service-account-credentials=true",
 		"--cluster-signing-cert-file=" + caCertFile,
-		"--cluster-signing-key-file=" + cfg.DataDir + "/certs/ca-bundle/ca-bundle.key",
+		"--cluster-signing-key-file=" + certsDir + "/ca-bundle/ca-bundle.key",
 	}
 
 	// fake the kube-controller-manager cobra command to parse args into controllermanager options

@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
 type OCPControllerManager struct {
@@ -79,7 +80,7 @@ servingInfo:
   bindAddress: "0.0.0.0:8445"
   certFile: ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.crt
   keyFile:  ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.key
-  clientCA: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
+  clientCA: ` + cryptomaterial.UltimateTrustBundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
 controllers:
 - "openshift.io/ingress-ip"
 - "openshift.io/ingress-to-route"

@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 
@@ -96,7 +97,7 @@ kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
   x509:
-    clientCAFile: ` + cfg.DataDir + `/certs/ca-bundle/ca-bundle.crt
+    clientCAFile: ` + cryptomaterial.UltimateTrustBundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
   anonymous:
     enabled: false
 tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.crt
