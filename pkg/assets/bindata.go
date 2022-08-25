@@ -3060,7 +3060,7 @@ spec:
             memory: 10Mi
         terminationMessagePolicy: FallbackToLogsOnError
 
-      # nbdb: the northbound, or logical network object DB. In raft mode
+      # nbdb: the northbound, or logical network object DB. In standalone mode
       - name: nbdb
         image: {{ .ReleaseImage.ovn_kubernetes }}
         command:
@@ -3164,7 +3164,8 @@ spec:
                 echo "$(date -Iseconds) - nbdb stopped"
                 rm -f /var/run/ovn/ovnnb_db.pid
         readinessProbe:
-          timeoutSeconds: 5
+          timeoutSeconds: 10
+          periodSeconds: 600
           exec:
             command:
             - /bin/bash
@@ -3172,6 +3173,7 @@ spec:
             - |
               set -xeo pipefail
               /usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=5 ovsdb-server/compact 2>/dev/null
 
         env:
         - name: OVN_LOG_LEVEL
@@ -3195,7 +3197,7 @@ spec:
             memory: 10Mi
         terminationMessagePolicy: FallbackToLogsOnError
 
-      # sbdb: The southbound, or flow DB. In raft mode
+      # sbdb: The southbound, or flow DB. In standalone mode
       - name: sbdb
         image: {{ .ReleaseImage.ovn_kubernetes }}
         command:
@@ -3268,7 +3270,8 @@ spec:
                 echo "$(date -Iseconds) - sbdb stopped"
                 rm -f /var/run/ovn/ovnsb_db.pid
         readinessProbe:
-          timeoutSeconds: 5
+          timeoutSeconds: 10
+          periodSeconds: 600
           exec:
             command:
             - /bin/bash
@@ -3276,6 +3279,8 @@ spec:
             - |
               set -xeo pipefail
               /usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=5 ovsdb-server/compact 2>/dev/null
+
         env:
         - name: OVN_LOG_LEVEL
           value: info
@@ -3460,7 +3465,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15481, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15770, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
