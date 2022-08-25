@@ -29,6 +29,7 @@ sudo systemctl enable firewalld --now
 # Mandatory settings
 sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 
 sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+sudo firewall-cmd --reload
 # Optional settings
 sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
 sudo firewall-cmd --permanent --zone=public --add-port=443/tcp

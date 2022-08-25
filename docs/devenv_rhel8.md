@@ -1,4 +1,6 @@
 # MicroShift Development Environment on RHEL 8
+The development environment bootstrap and configuration procedures are automated as described in the [Automating Development Environment Setup](./devenv_rhel8_auto.md) document.
+It is recommended to review the current document and use the automation instructions to create and configure the environment.
 
 ## Create Development Virtual Machine
 Start by downloading the RHEL 8.6 or above ISO image from the https://developers.redhat.com/products/rhel/download location. 
@@ -10,6 +12,8 @@ Create a RHEL 8 virtual machine with 2 cores, 4096MB of RAM and 50GB of storage.
 
 Move the ISO image to `/var/lib/libvirt/images` directory and run the following command to create a virtual machine.
 ```bash
+sudo dnf install -y libvirt virt-manager virt-viewer libvirt-client qemu-kvm qemu-img
+
 VMNAME="microshift-dev"
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
@@ -49,9 +53,9 @@ Log into the virtual machine using SSH with the `microshift` user credentials.
 
 Run the following commands to configure SUDO, upgrade the system, install basic dependencies and enable remote Cockpit console.
 ```bash
-sudo echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
+echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf update -y
-sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build
+sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
@@ -60,8 +64,8 @@ You should now be able to access the VM Cockpit console using `https://<vm_ip>:9
 Log into the development virtual machine with the `microshift` user credentials.
 Clone the repository to be used for building various artifacts.
 ```bash
-git clone https://github.com/openshift/microshift.git
-cd microshift
+git clone https://github.com/openshift/microshift.git ~/microshift
+cd ~/microshift
 ```
 
 ### Executable
@@ -93,9 +97,10 @@ Log into the development virtual machine with the `microshift` user credentials.
 ### Installing Clients
 Run the following commands to install `oc` and `kubectl` utilities.
 ```bash
-curl -O https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp/stable/openshift-client-linux.tar.gz
-sudo tar -xf openshift-client-linux.tar.gz -C /usr/local/bin oc kubectl
-rm -f openshift-client-linux.tar.gz
+OC_ARCHIVE=/tmp/openshift-client-linux.tar.gz
+curl -o ${OC_ARCHIVE} -O https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp/stable/openshift-client-linux.tar.gz
+sudo tar -xf ${OC_ARCHIVE} -C /usr/local/bin oc kubectl
+rm -f ${OC_ARCHIVE}
 ```
 
 ### Runtime Prerequisites
