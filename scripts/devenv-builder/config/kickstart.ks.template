@@ -1,0 +1,45 @@
+lang en_US.UTF-8
+keyboard us
+timezone UTC
+text
+reboot
+
+# Configure network to use DHCP and activate on boot
+network --bootproto=dhcp --device=link --activate --onboot=on --hostname=REPLACE_HOST_NAME.local --noipv6
+
+# Partition disk with a 1GB boot XFS partition and an LVM volume containing system root
+# The remainder of the volume will be used by the CSI driver for storing data
+#
+# For example, a 50GB disk with 45GB system root would be partitioned in the following way:
+#
+# NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+# sda             8:0    0  50G  0 disk 
+# ├─sda1          8:1    0   1G  0 part /boot
+# └─sda2          8:2    0  49G  0 part 
+#  └─rhel-root  253:0    0  45G  0 lvm  /sysroot
+#
+zerombr
+clearpart --all --initlabel
+part /boot --fstype=xfs --asprimary --size=1024
+# Uncomment this line to add a SWAP partition of the recommended size
+#part swap --fstype=swap --recommended
+part pv.01 --grow
+volgroup rhel pv.01
+logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
+
+# Configure users
+rootpw --lock
+user   --plaintext --name=microshift --password=microshift
+
+# Minimal package setup
+cdrom
+%packages
+@^minimal-environment
+%end
+
+%post --log=/var/log/anaconda/post-install.log --erroronfail
+
+# Allow the default user to run sudo commands without password
+echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
+
+%end
