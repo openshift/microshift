@@ -5,6 +5,4 @@ metadata:
   annotations:
     openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
-  labels:
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"
+
