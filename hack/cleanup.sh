@@ -17,16 +17,8 @@ sudo bash -c "
     systemctl disable microshift 2>/dev/null
     pkill -9 microshift
 
-    echo Removing non-OVN crio pods
-    NOVN_PODS=\$(crictl pods | tail -n +2 | grep -vE openshift-ovn-kubernetes | awk '{print \$1}')
-    [ ! -z \"\${NOVN_PODS}\" ] && crictl stopp \${NOVN_PODS}
-    [ ! -z \"\${NOVN_PODS}\" ] && crictl rmp   \${NOVN_PODS}
-
-    echo Removing all crio pods
-    until crictl rmp --all --force 1>/dev/null; do sleep 1; done
-
     echo Removing crio container and image storage
-    crio wipe -f &>/dev/null
+    crio wipe -f &>/dev/null || true
     systemctl restart crio
 
     echo Killing conmon, pause and OVN processes
