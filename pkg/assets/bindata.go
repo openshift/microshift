@@ -1569,9 +1569,7 @@ metadata:
   annotations:
     openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
-  labels:
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"`)
+`)
 
 func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYamlBytes() ([]byte, error) {
 	return _assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml, nil
@@ -1583,7 +1581,7 @@ func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml", size: 293, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml", size: 165, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1981,8 +1979,7 @@ metadata:
     openshift.io/run-level: "0"
     # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
     openshift.io/cluster-monitoring: "true"
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"
+    
 `)
 
 func assetsComponentsOpenshiftDnsDnsNamespaceYamlBytes() ([]byte, error) {
@@ -1995,7 +1992,7 @@ func assetsComponentsOpenshiftDnsDnsNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/namespace.yaml", size: 536, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-dns/dns/namespace.yaml", size: 422, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2538,8 +2535,7 @@ metadata:
     # old and new forms of the label for matching with NetworkPolicy
     network.openshift.io/policy-group: ingress
     policy-group.network.openshift.io/ingress: ""
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"`)
+    `)
 
 func assetsComponentsOpenshiftRouterNamespaceYamlBytes() ([]byte, error) {
 	return _assetsComponentsOpenshiftRouterNamespaceYaml, nil
@@ -2551,7 +2547,7 @@ func assetsComponentsOpenshiftRouterNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 617, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 503, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3988,9 +3984,7 @@ metadata:
   annotations:
     openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
-  labels:
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"
+
 `)
 
 func assetsComponentsServiceCaNsYamlBytes() ([]byte, error) {
@@ -4003,7 +3997,7 @@ func assetsComponentsServiceCaNsYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 297, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 169, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4181,8 +4175,6 @@ metadata:
     openshift.io/node-selector: ""
   labels:
     openshift.io/cluster-monitoring: "true"
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"
   name: openshift-controller-manager
 `)
 
@@ -4196,7 +4188,7 @@ func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 373, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 254, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4297,8 +4289,7 @@ metadata:
     openshift.io/run-level: "0"
     # allow openshift-monitoring to look for ServiceMonitor objects in this namespace
     openshift.io/cluster-monitoring: "true"
-    # ODF-LVM should not attempt to manage openshift or kube infra namespaces
-    topolvm.cybozu.com/webhook: "ignore"`)
+`)
 
 func assetsCoreNamespaceOpenshiftInfraYamlBytes() ([]byte, error) {
 	return _assetsCoreNamespaceOpenshiftInfraYaml, nil
@@ -4310,7 +4301,7 @@ func assetsCoreNamespaceOpenshiftInfraYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/namespace-openshift-infra.yaml", size: 537, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/core/namespace-openshift-infra.yaml", size: 419, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
