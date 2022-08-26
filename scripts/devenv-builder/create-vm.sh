@@ -52,7 +52,6 @@ virt-install \
     --memory ${RAMSIZE} \
     --disk path=./${VMNAME}.qcow2,size=${DISKSIZE} \
     --network network=default,model=virtio \
-    --os-type generic \
     --events on_reboot=restart \
     --location ${RHELISO} \
     --initrd-inject=${KICKSTART_FILE} \
