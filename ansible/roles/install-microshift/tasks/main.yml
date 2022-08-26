@@ -7,6 +7,11 @@
     state: present
     update_cache: true
 
+- name: create a volume group on top of secondary disk for topolvm
+  community.general.lvg:
+    vg: rhel
+    pvs: "{{ lvm_disk }}"
+
 - name: check if we have oc installed
   command: which oc
   register: oc_present
@@ -117,7 +122,7 @@
 
     - name: clone microshift git repo
       ansible.builtin.git:
-        repo: 'https://github.com/openshift/microshift.git'
+        repo: "{{ microshift_repo }}"
         dest: "{{ microshift_dir }}"
 
     - name: make microshift RPMs
@@ -161,6 +166,40 @@
         update_cache: true
   when: ansible_distribution == "CentOS"
 
+- name: build & install etcd
+  block:
+    - name: clone etcd git repo
+      ansible.builtin.git:
+        repo: "{{ etcd_repo }}"
+        dest: "{{ etcd_dir }}"
+
+    - name: make etcd binary
+      ansible.builtin.command: make
+      args:
+        chdir: "{{ etcd_dir }}"
+
+    - name: install etcd binary
+      ansible.builtin.copy:
+        src: "{{ etcd_dir }}/bin/etcd"
+        dest: "/usr/bin/etcd"
+        remote_src: yes
+        mode: '0755'
+
+    - name: copy etcd systemd unit to node
+      ansible.builtin.copy:
+        src: etcd.service
+        dest: /usr/lib/systemd/system/etcd.service
+        owner: root
+        group: root
+        mode: '0664'
+
+    - name: start etcd service
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        state: started
+        name: etcd
+  when: build_etcd_binary | bool
+
 - name: copy pull-secret to node
   ansible.builtin.copy:
     src: pull-secret.txt
@@ -174,6 +213,9 @@
   - name: source pbench-agent & register-tool-set
     ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
   
+  - name: set new pidstat interval
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool --name=pidstat -- --interval={{ sample_interval }}
+
   - name: start pbench-user-benchmark recording
     ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift -- sleep {{ pbench_record_duration }}
     async: "{{ pbench_record_duration|int * 2 }}"
