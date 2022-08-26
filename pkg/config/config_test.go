@@ -30,7 +30,7 @@ func TestConfigFile(t *testing.T) {
 	}
 }
 
-// test that Microshift is able to properly read the config from the commandline
+// test that MicroShift is able to properly read the config from the commandline
 func TestCommandLineConfig(t *testing.T) {
 
 	var ttests = []struct {
@@ -103,7 +103,7 @@ func TestCommandLineConfig(t *testing.T) {
 	}
 }
 
-// test to verify that Microshift is able to populate the config from the environment variables
+// test to verify that MicroShift is able to populate the config from the environment variables
 func TestEnvironmentVariableConfig(t *testing.T) {
 	// set up the table tests using the above environment variables & the MicroShift config struct
 	var ttests = []struct {

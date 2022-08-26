@@ -18,7 +18,7 @@ oc get pods -A
 MicroShift startups and restarts can be detected by examining the service output.
 
 ```bash
-sudo journalctl -xu microshift | egrep 'Starting Microshift|restarting MicroShift'
+sudo journalctl -xu microshift | egrep 'Starting MicroShift|restarting MicroShift'
 ```
 
 ## IP Address Changes
@@ -68,7 +68,7 @@ sudo ip addr del $IPCUR dev $IFACE
 Run the `journalctl` command to verify that the service was restarted. The logs should contain restart and startup messages.
 ```
 Jul 05 09:54:51 localhost.localdomain microshift[1146]: W0705 09:54:51.834933    5803 sysconfwatch.go:81] IP address has changed from "192.168.122.21" to "192.168.122.22", restarting MicroShift
-Jul 05 09:54:51 localhost.localdomain microshift[5345]: I0705 09:54:51.306117    6088 run.go:120] Starting Microshift
+Jul 05 09:54:51 localhost.localdomain microshift[5345]: I0705 09:54:51.306117    6088 run.go:120] Starting MicroShift
 ```
 
 To restore the proper IP address setting, reboot the virtual machine so that the address is reset back to normal by the DHCP service.
@@ -91,7 +91,7 @@ Run the `journalctl` command to verify that the service was restarted. The logs 
 
 ```
 Jul 05 00:00:03 localhost.localdomain microshift[5803]: W0705 00:00:03.834933    5803 sysconfwatch.go:91] realtime clock change detected, time drifted -48955 seconds, restarting MicroShift
-Jul 05 00:00:04 localhost.localdomain microshift[6088]: I0705 00:00:04.306117    6088 run.go:120] Starting Microshift
+Jul 05 00:00:04 localhost.localdomain microshift[6088]: I0705 00:00:04.306117    6088 run.go:120] Starting MicroShift
 ```
 
 ### Clock Update without Restart

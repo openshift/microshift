@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-#   Copyright 2021 The Microshift authors
+#   Copyright 2021 The MicroShift authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 # release.sh
-# This helper script generates and publishes Microshift releases for a given git ref. This is done by checking out the
+# This helper script generates and publishes MicroShift releases for a given git ref. This is done by checking out the
 # git ref and cross-compiling to architecture specific image digests. Images are composed from the multistage container
 # file stored in ./images/build/Dockerfile, with the release images being layered on top of
 # registry.access.redhat.com/ubi8/ubi-minimal:8.4. Images are wrapped with a container manifest and pushed to
@@ -192,8 +192,8 @@ debug() {
 }
 
 help() {
-  printf 'Microshift: release.sh
-This script provides some simple automation for cutting new releases of Microshift.
+  printf 'MicroShift: release.sh
+This script provides some simple automation for cutting new releases of MicroShift.
 
 Use:
 ./release.sh --token $(cat /token/path) --version 4.10.0-0.microshift-$(date -u "+%%Y-%%m-%%d-%%H%%M%%S")
