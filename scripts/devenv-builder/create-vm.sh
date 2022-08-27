@@ -31,17 +31,33 @@ DATAVOLSIZE=$7
 [[ ! "${DISKSIZE}" =~ ^[0-9]+$ ]]    && usage "Invalid disk size: '${DISKSIZE}'"
 [[ ! "${DATAVOLSIZE}" =~ ^[0-9]+$ ]] && usage "Invalid data volume size: '${DATAVOLSIZE}'"
 
+# It would be ideal to let the system choose the recommended amount of
+# swap automatically but then we could not compute the SYSROOTSIZE
+# below so we have to apply the logic ourselves based on
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/getting-started-with-swap_managing-storage-devices
+if [ $RAMSIZE -le 2 ]; then
+    SWAP=$(( $RAMSIZE * 2 ))
+elif [ $RAMSIZE -le 8 ]; then
+    SWAP=$RAMSIZE
+else
+    SWAP=4
+fi
+
 # RAM size is expected in MB
 RAMSIZE=$(( ${RAMSIZE} * 1024 ))
 # Calculate system root partition size (1GB is allocated to the boot partition)
-SYSROOTSIZE=$(( ${DISKSIZE} - 1 - ${DATAVOLSIZE} ))
+SYSROOTSIZE=$(( ${DISKSIZE} - 1 - ${DATAVOLSIZE} - ${SWAP} ))
 # System root size is expected in MB
 SYSROOTSIZE=$(( ${SYSROOTSIZE} * 1024 ))
+# Swap above is GB
+SWAPSIZE=$(( ${SWAP} * 1024 ))
 
 KICKSTART_FILE=/tmp/devenv-kickstart.ks
 cat ${ROOTDIR}/config/kickstart.ks.template | \
-    sed "s;REPLACE_HOST_NAME;${VMNAME};" | \
-    sed "s;REPLACE_LVM_SYSROOT_SIZE;${SYSROOTSIZE};" > ${KICKSTART_FILE}
+    sed -e "s;REPLACE_HOST_NAME;${VMNAME};" \
+        -e "s;REPLACE_LVM_SYSROOT_SIZE;${SYSROOTSIZE};" \
+        -e "s;REPLACE_SWAP_SIZE;${SWAPSIZE};" \
+        > ${KICKSTART_FILE}
 
 sudo dnf install -y libvirt virt-manager virt-viewer libvirt-client qemu-kvm qemu-img
 sudo -b bash -c " \

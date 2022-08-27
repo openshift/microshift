@@ -21,8 +21,7 @@ network --bootproto=dhcp --device=link --activate --onboot=on --hostname=REPLACE
 zerombr
 clearpart --all --initlabel
 part /boot --fstype=xfs --asprimary --size=1024
-# Uncomment this line to add a SWAP partition of the recommended size
-#part swap --fstype=swap --recommended
+part swap --fstype=swap --size=REPLACE_SWAP_SIZE
 part pv.01 --grow
 volgroup rhel pv.01
 logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
