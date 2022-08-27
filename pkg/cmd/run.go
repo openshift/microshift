@@ -62,7 +62,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	// fail early if we don't have enough privileges
 	if config.StringInList("node", cfg.Roles) && os.Geteuid() > 0 {
-		klog.Fatalf("Microshift must be run privileged for role 'node'")
+		klog.Fatalf("MicroShift must be run privileged for role 'node'")
 	}
 
 	// TO-DO: When multi-node is ready, we need to add the controller host-name/mDNS hostname
@@ -124,7 +124,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	notifySocket := os.Getenv("NOTIFY_SOCKET")
 	os.Unsetenv("NOTIFY_SOCKET")
 
-	klog.Infof("Starting Microshift")
+	klog.Infof("Starting MicroShift")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ready, stopped := make(chan struct{}), make(chan struct{})

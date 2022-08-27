@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug encountered while operating Microshift 
+about: Report a bug encountered while operating MicroShift
 labels: bug
 title: '[BUG] <title>'
 
@@ -23,7 +23,7 @@ title: '[BUG] <title>'
 
 
 #### Environment:
-- Microshift version (use `microshift version`):
+- MicroShift version (use `microshift version`):
 - Hardware configuration:
 - OS (e.g: `cat /etc/os-release`):
 - Kernel (e.g. `uname -a`):
