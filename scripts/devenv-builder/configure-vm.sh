@@ -41,10 +41,6 @@ if [ ! -e ~/microshift ] ; then
 fi
 cd ~/microshift
 
-# Build MicroShift > Executable
-# https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#executable
-make
-
 # Build MicroShift > RPM Packages
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#rpm-packages
 make rpm 
