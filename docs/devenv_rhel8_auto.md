@@ -10,15 +10,19 @@ It is recommended to review the above mentioned documentation sections before pr
 Log into the hypervisor host and run the `create-vm.sh` script without arguments to see its usage.
 ```bash
 $ ./scripts/devenv-builder/create-vm.sh 
-Usage: create-vm.sh <vm_name> <vm_disk_dir> <rhel_dvd_iso_file> <ncpus> <memory_in_GB> <disk_in_GB> <data_vol_size_in_GB>
+Usage: create-vm.sh <vm_name> <vm_disk_dir> <rhel_dvd_iso_file> <ncpus> <memory_in_GB> <disk_in_GB> <swap_in_GB> <data_vol_size_in_GB>
+INFO: Specify 0 swap size to disable swap partition
 
 ERROR: Invalid number of arguments
 ```
 > It is mandatory to use the RHEL 8 DVD (not boot) image for installing the virtual machine.
 
-As an example, run the following command to create a virtual machine named `microshift-dev` with 4 CPUs, 6GB of RAM, 50GB of total disk space and 2GB disk allocated to the data volume.
+As an example, run the following command to create a virtual machine named `microshift-dev` with 4 CPUs, 6GB of RAM, 50GB of total disk space, 6GB of swap and 2GB disk allocated to the data volume.
+> The recommended swap partition size depends on the amount of RAM.
+> See the [Recommended system swap size](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/getting-started-with-swap_managing-storage-devices#recommended-system-swap-space_getting-started-with-swap) document for more information.
+
 ```bash
-./scripts/devenv-builder/create-vm.sh microshift-dev /var/lib/libvirt/images /var/lib/libvirt/images/rhel-8.6-x86_64-dvd.iso 4 6 50 2 
+./scripts/devenv-builder/create-vm.sh microshift-dev /var/lib/libvirt/images /var/lib/libvirt/images/rhel-8.6-x86_64-dvd.iso 4 6 50 6 2
 ```
 
 Watch the output in the `Virt Viewer` popup, waiting for a successful completion of the installation procedure.
