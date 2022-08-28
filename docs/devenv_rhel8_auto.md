@@ -9,11 +9,13 @@ It is recommended to review the above mentioned documentation sections before pr
 ## Create Virtual Machine
 Log into the hypervisor host and run the `create-vm.sh` script without arguments to see its usage.
 ```bash
-$ ./scripts/devenv-builder/create-vm.sh 
-Usage: create-vm.sh <vm_name> <vm_disk_dir> <rhel_dvd_iso_file> <ncpus> <memory_in_GB> <disk_in_GB> <swap_in_GB> <data_vol_size_in_GB>
+$ ./scripts/devenv-builder/create-vm.sh
+Usage: create-vm.sh [<VMNAME> <VMDISKDIR> <RHELISO> <NCPUS> <RAMSIZE> <DISKSIZE> <SWAPSIZE> <DATAVOLSIZE>]
 INFO: Specify 0 swap size to disable swap partition
+INFO: Positional arguments also can be specified using environment variables
+INFO: All sizes in GB
 
-ERROR: Invalid number of arguments
+ERROR: Invalid VM name: ''
 ```
 > It is mandatory to use the RHEL 8 DVD (not boot) image for installing the virtual machine.
 
@@ -23,6 +25,20 @@ As an example, run the following command to create a virtual machine named `micr
 
 ```bash
 ./scripts/devenv-builder/create-vm.sh microshift-dev /var/lib/libvirt/images /var/lib/libvirt/images/rhel-8.6-x86_64-dvd.iso 4 6 50 6 2
+```
+
+or
+
+```bash
+export VMNAME=microshift-dev
+export VMDISKDIR=/var/lib/libvirt/images
+export RHELISO=/var/lib/libvirt/images/rhel-8.6-x86_64-dvd.iso
+export NCPUS=4
+export RAMSIZE=6
+export DISKSIZE=50
+export SWAPSIZE=6
+export DATAVOLSIZE=2
+./scripts/devenv-builder/create-vm.sh
 ```
 
 Watch the output in the `Virt Viewer` popup, waiting for a successful completion of the installation procedure.

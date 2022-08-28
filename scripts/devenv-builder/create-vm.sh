@@ -7,24 +7,22 @@ set -eo pipefail
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/devenv-builder
 
 function usage() {
-    echo "Usage: $(basename $0) <vm_name> <vm_disk_dir> <rhel_dvd_iso_file> <ncpus> <memory_in_GB> <disk_in_GB> <swap_in_GB> <data_vol_size_in_GB>"
+    echo "Usage: $(basename $0) [<VMNAME> <VMDISKDIR> <RHELISO> <NCPUS> <RAMSIZE> <DISKSIZE> <SWAPSIZE> <DATAVOLSIZE>]"
     echo "INFO: Specify 0 swap size to disable swap partition"
+    echo "INFO: Positional arguments also can be specified using environment variables"
+    echo "INFO: All sizes in GB"
     [ ! -z "$1" ] && echo -e "\nERROR: $1"
     exit 1
 }
 
-if [ $# -ne 8 ] ; then
-    usage "Invalid number of arguments"
-fi
-
-VMNAME=$1
-VMDISKDIR=$2
-RHELISO=$3
-NCPUS=$4
-RAMSIZE=$5
-DISKSIZE=$6
-SWAPSIZE=$7
-DATAVOLSIZE=$8
+VMNAME=${1:-$VMNAME}
+VMDISKDIR=${2:-$VMDISKDIR}
+RHELISO=${3:-$RHELISO}
+NCPUS=${4:-$NCPUS}
+RAMSIZE=${5:-$RAMSIZE}
+DISKSIZE=${6:-$DISKSIZE}
+SWAPSIZE=${7:-$SWAPSIZE}
+DATAVOLSIZE=${8:-$DATAVOLSIZE}
 [ -z "${VMNAME}" ]      && usage "Invalid VM name: '${VMNAME}'"
 [ ! -e "${VMDISKDIR}" ] && usage "VM disk directory '${VMDISKDIR}' is not accessible"
 [ ! -e "${RHELISO}" ]   && usage "RHEL ISO file '${RHELISO}' is not accessible"
