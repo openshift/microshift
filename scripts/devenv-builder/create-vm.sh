@@ -7,12 +7,13 @@ set -eo pipefail
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/devenv-builder
 
 function usage() {
-    echo "Usage: $(basename $0) <vm_name> <vm_disk_dir> <rhel_dvd_iso_file> <ncpus> <memory_in_GB> <disk_in_GB> <data_vol_size_in_GB>" 
+    echo "Usage: $(basename $0) <vm_name> <vm_disk_dir> <rhel_dvd_iso_file> <ncpus> <memory_in_GB> <disk_in_GB> <swap_in_GB> <data_vol_size_in_GB>"
+    echo "INFO: Specify 0 swap size to disable swap partition"
     [ ! -z "$1" ] && echo -e "\nERROR: $1"
     exit 1
 }
 
-if [ $# -ne 7 ] ; then
+if [ $# -ne 8 ] ; then
     usage "Invalid number of arguments"
 fi
 
@@ -22,26 +23,36 @@ RHELISO=$3
 NCPUS=$4
 RAMSIZE=$5
 DISKSIZE=$6
-DATAVOLSIZE=$7
-[ -z "${VMNAME}" ]                   && usage "Invalid VM name: '${VMNAME}'"
-[ ! -e "${VMDISKDIR}" ]              && usage "VM disk directory '${VMDISKDIR}' is not accessible"
-[ ! -e "${RHELISO}" ]                && usage "RHEL ISO file '${RHELISO}' is not accessible"
-[[ ! "${NCPUS}" =~ ^[0-9]+$ ]]       && usage "Invalid number of CPUs: '${NCPUS}'"
-[[ ! "${RAMSIZE}" =~ ^[0-9]+$ ]]     && usage "Invalid RAM size: '${RAMSIZE}'"
-[[ ! "${DISKSIZE}" =~ ^[0-9]+$ ]]    && usage "Invalid disk size: '${DISKSIZE}'"
-[[ ! "${DATAVOLSIZE}" =~ ^[0-9]+$ ]] && usage "Invalid data volume size: '${DATAVOLSIZE}'"
+SWAPSIZE=$7
+DATAVOLSIZE=$8
+[ -z "${VMNAME}" ]      && usage "Invalid VM name: '${VMNAME}'"
+[ ! -e "${VMDISKDIR}" ] && usage "VM disk directory '${VMDISKDIR}' is not accessible"
+[ ! -e "${RHELISO}" ]   && usage "RHEL ISO file '${RHELISO}' is not accessible"
+
+[[ ! "${NCPUS}" =~ ^[0-9]+$ ]]       || [[ "${NCPUS}" -le 0 ]]       && usage "Invalid number of CPUs: '${NCPUS}'"
+[[ ! "${RAMSIZE}" =~ ^[0-9]+$ ]]     || [[ "${RAMSIZE}" -le 0 ]]     && usage "Invalid RAM size: '${RAMSIZE}'"
+[[ ! "${DISKSIZE}" =~ ^[0-9]+$ ]]    || [[ "${DISKSIZE}" -le 0 ]]    && usage "Invalid disk size: '${DISKSIZE}'"
+[[ ! "${SWAPSIZE}" =~ ^[0-9]+$ ]]    || [[ "${SWAPSIZE}" -lt 0 ]]    && usage "Invalid swap size: '${SWAPSIZE}'"
+[[ ! "${DATAVOLSIZE}" =~ ^[0-9]+$ ]] || [[ "${DATAVOLSIZE}" -le 0 ]] && usage "Invalid data volume size: '${DATAVOLSIZE}'"
 
 # RAM size is expected in MB
 RAMSIZE=$(( ${RAMSIZE} * 1024 ))
 # Calculate system root partition size (1GB is allocated to the boot partition)
-SYSROOTSIZE=$(( ${DISKSIZE} - 1 - ${DATAVOLSIZE} ))
+SYSROOTSIZE=$(( ${DISKSIZE} - 1 - ${SWAPSIZE} - ${DATAVOLSIZE} ))
 # System root size is expected in MB
 SYSROOTSIZE=$(( ${SYSROOTSIZE} * 1024 ))
+# Swap size is expected in MB
+SWAPSIZE=$(( ${SWAPSIZE} * 1024 ))
 
 KICKSTART_FILE=/tmp/devenv-kickstart.ks
 cat ${ROOTDIR}/config/kickstart.ks.template | \
     sed "s;REPLACE_HOST_NAME;${VMNAME};" | \
+    sed "s;REPLACE_SWAP_SIZE;${SWAPSIZE};" | \
     sed "s;REPLACE_LVM_SYSROOT_SIZE;${SYSROOTSIZE};" > ${KICKSTART_FILE}
+# Disable swap if its size is 0
+if [ "${SWAPSIZE}" -eq 0 ] ; then
+    sed -i "s;^part swap;#part swap;" ${KICKSTART_FILE}
+fi
 
 sudo dnf install -y libvirt virt-manager virt-viewer libvirt-client qemu-kvm qemu-img
 sudo -b bash -c " \
