@@ -33,8 +33,8 @@ import (
 type tlsConfigs struct {
 	clusterTrustBundle []byte
 
-	kubeControllerManager *crypto.TLSCertificateConfig
-	kubeScheduler         *crypto.TLSCertificateConfig
+	kubeControllerManagerClient *crypto.TLSCertificateConfig
+	kubeSchedulerClient         *crypto.TLSCertificateConfig
 }
 
 func initAll(cfg *config.MicroshiftConfig) error {
@@ -83,6 +83,9 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, certConfigs.clusterTrustBundle); err != nil {
 		return nil, fmt.Errorf("failed to add the root CA to the total client CA bundle: %w", err)
 	}
+	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, certConfigs.clusterTrustBundle); err != nil {
+		return nil, fmt.Errorf("failed to add the root CA to the kubelet client CA bundle: %w", err)
+	}
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	if err := util.GenCerts("etcd-server", filepath.Join(certsDir, "/etcd"),
@@ -98,7 +101,7 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 	}
 
 	// kube-control-plane-signer
-	controlPlaneSignerCA, err := generateClientCA(
+	controlPlaneSignerCA, controlPlaneSignerCAPEM, err := generateClientCA(
 		certsDir,
 		cryptomaterial.KubeControlPlaneSignerCertDir(certsDir),
 		"kube-control-plane-signer")
@@ -106,8 +109,12 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 		return nil, err
 	}
 
+	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, controlPlaneSignerCAPEM); err != nil {
+		return nil, fmt.Errorf("failed to add %s to kubelet client CA bundle: %w", "kube-control-plane-signer", err)
+	}
+
 	kcmClientDir := cryptomaterial.KubeControllerManagerClientCertDir(certsDir)
-	certConfigs.kubeControllerManager, _, err = controlPlaneSignerCA.EnsureClientCertificate(
+	certConfigs.kubeControllerManagerClient, _, err = controlPlaneSignerCA.EnsureClientCertificate(
 		cryptomaterial.ClientCertPath(kcmClientDir),
 		cryptomaterial.ClientKeyPath(kcmClientDir),
 		&user.DefaultInfo{Name: "system:kube-controller-manager"},
@@ -118,7 +125,7 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 	}
 
 	schedulerClientDir := cryptomaterial.KubeSchedulerClientCertDir(certsDir)
-	certConfigs.kubeScheduler, _, err = controlPlaneSignerCA.EnsureClientCertificate(
+	certConfigs.kubeSchedulerClient, _, err = controlPlaneSignerCA.EnsureClientCertificate(
 		cryptomaterial.ClientCertPath(schedulerClientDir),
 		cryptomaterial.ClientKeyPath(schedulerClientDir),
 		&user.DefaultInfo{Name: "system:kube-scheduler"},
@@ -150,11 +157,31 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 		[]string{"system:admin", "system:masters"}); err != nil {
 		return nil, err
 	}
-	if err := util.GenCerts("system:masters", filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/kubelet-client"),
-		"tls.crt", "tls.key",
-		[]string{"kube-apiserver", "system:kube-apiserver", "system:masters"}); err != nil {
+
+	// kube-apiserver-to-kubelet-signer
+	kubeAPIServerToKubeletSignerCA, kubeAPIServerToKubeletSignerCAPEM, err := generateClientCA(
+		certsDir,
+		cryptomaterial.KubeAPIServerToKubeletSignerCertDir(certsDir),
+		"kube-apiserver-to-kubelet-signer")
+	if err != nil {
 		return nil, err
 	}
+
+	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, kubeAPIServerToKubeletSignerCAPEM); err != nil {
+		return nil, fmt.Errorf("failed to add %s to kubelet client CA bundle: %w", "kube-apiserver-to-kubelet-signer", err)
+	}
+
+	kubeAPIServerToKubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
+	_, _, err = kubeAPIServerToKubeletSignerCA.EnsureClientCertificate(
+		cryptomaterial.ClientCertPath(kubeAPIServerToKubeletClientDir),
+		cryptomaterial.ClientKeyPath(kubeAPIServerToKubeletClientDir),
+		&user.DefaultInfo{Name: "system:kube-apiserver", Groups: []string{"kube-master"}},
+		cryptomaterial.ClientCertValidityDays,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate kube-apiserver-to-kubelet client certificate: %w", err)
+	}
+
 	if err := util.GenKeys(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/sa-public-key"),
 		"serving-ca.pub", "serving-ca.key"); err != nil {
 		return nil, err
@@ -193,7 +220,7 @@ func initKubeconfig(
 		return err
 	}
 
-	kcmCertPEM, kcmKeyPEM, err := certConfigs.kubeControllerManager.GetPEMBytes()
+	kcmCertPEM, kcmKeyPEM, err := certConfigs.kubeControllerManagerClient.GetPEMBytes()
 	if err != nil {
 		return err
 	}
@@ -207,7 +234,7 @@ func initKubeconfig(
 		return err
 	}
 
-	schedulerCertPEM, schedulerKeyPEM, err := certConfigs.kubeScheduler.GetPEMBytes()
+	schedulerCertPEM, schedulerKeyPEM, err := certConfigs.kubeSchedulerClient.GetPEMBytes()
 	if err != nil {
 		return err
 	}
@@ -229,7 +256,7 @@ func initKubeconfig(
 	return nil
 }
 
-func generateClientCA(certsDir, signerDir, signerName string) (*crypto.CA, error) {
+func generateClientCA(certsDir, signerDir, signerName string) (*crypto.CA, []byte, error) {
 	signerCA, _, err := crypto.EnsureCA(
 		cryptomaterial.CACertPath(signerDir),
 		cryptomaterial.CAKeyPath(signerDir),
@@ -238,17 +265,17 @@ func generateClientCA(certsDir, signerDir, signerName string) (*crypto.CA, error
 		cryptomaterial.ClientCAValidityDays,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate %s CA certificate: %w", signerName, err)
+		return nil, nil, fmt.Errorf("failed to generate %s CA certificate: %w", signerName, err)
 	}
 
 	signerCAPEM, _, err := signerCA.Config.GetPEMBytes()
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve %s CA PEM: %w", signerName, err)
+		return nil, nil, fmt.Errorf("failed to retrieve %s CA PEM: %w", signerName, err)
 	}
 
 	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, signerCAPEM); err != nil {
-		return nil, fmt.Errorf("failed to add %s to trusted client CA bundle: %w", signerName, err)
+		return nil, nil, fmt.Errorf("failed to add %s to trusted client CA bundle: %w", signerName, err)
 	}
 
-	return signerCA, nil
+	return signerCA, signerCAPEM, nil
 }

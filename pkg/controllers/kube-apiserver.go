@@ -89,6 +89,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.verbosity = cfg.LogVLevel
 
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	kubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
 	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
 	kasSecretsDir := filepath.Join(certsDir, "kube-apiserver", "secrets")
@@ -120,8 +121,8 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 				"https://127.0.0.1:2379",
 			},
 			"kubelet-certificate-authority": {caCertFile},
-			"kubelet-client-certificate":    {cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt"},
-			"kubelet-client-key":            {cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key"},
+			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
+			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
 
 			"proxy-client-cert-file":           {filepath.Join(kasSecretsDir, "aggregator-client", "tls.crt")},
 			"proxy-client-key-file":            {filepath.Join(kasSecretsDir, "aggregator-client", "tls.key")},

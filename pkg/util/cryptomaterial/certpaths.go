@@ -1,6 +1,8 @@
 package cryptomaterial
 
-import "path/filepath"
+import (
+	"path/filepath"
+)
 
 const (
 	CACertFileName     = "ca.crt"
@@ -36,6 +38,14 @@ func KubeControllerManagerClientCertDir(certsDir string) string {
 	return filepath.Join(KubeControlPlaneSignerCertDir(certsDir), "kube-controller-manager")
 }
 
+func KubeAPIServerToKubeletSignerCertDir(certsDir string) string {
+	return filepath.Join(certsDir, "kube-apiserver-to-kubelet-client-signer")
+}
+
+func KubeAPIServerToKubeletClientCertDir(certsDir string) string {
+	return filepath.Join(KubeAPIServerToKubeletSignerCertDir(certsDir), "kube-apiserver-to-kubelet-client")
+}
+
 // TotalClientCABundlePath returns the path to the cert bundle with all client certificate signers
 func TotalClientCABundlePath(certsDir string) string {
 	return filepath.Join(certsDir, "ca-bundle", "client-ca.crt")
@@ -44,4 +54,9 @@ func TotalClientCABundlePath(certsDir string) string {
 // UltimateTrustBundlePath returns the path to the cert bundle with the root certificate
 func UltimateTrustBundlePath(certsDir string) string {
 	return filepath.Join(certsDir, "ca-bundle", "ca-bundle.crt")
+}
+
+// KubeletClientCAPath returns the path to the cert bundle with all client certificate signers that kubelet should respect
+func KubeletClientCAPath(certsDir string) string {
+	return filepath.Join(certsDir, "ca-bundle", "kubelet-ca.crt")
 }

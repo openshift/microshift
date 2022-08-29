@@ -97,7 +97,7 @@ kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
   x509:
-    clientCAFile: ` + cryptomaterial.UltimateTrustBundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
+    clientCAFile: ` + cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
   anonymous:
     enabled: false
 tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.crt
