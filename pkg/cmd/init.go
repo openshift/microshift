@@ -35,6 +35,8 @@ type tlsConfigs struct {
 
 	kubeControllerManagerClient *crypto.TLSCertificateConfig
 	kubeSchedulerClient         *crypto.TLSCertificateConfig
+
+	adminKubeconfigClient *crypto.TLSCertificateConfig
 }
 
 func initAll(cfg *config.MicroshiftConfig) error {
@@ -182,6 +184,30 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 		return nil, fmt.Errorf("failed to generate kube-apiserver-to-kubelet client certificate: %w", err)
 	}
 
+	// admin-kubeconfig-signer
+	adminKubeconfigSigner, adminKubeconfigSignerPEM, err := generateClientCA(
+		certsDir,
+		cryptomaterial.AdminKubeconfigSignerDir(certsDir),
+		"admin-kubeconfig-signer",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, adminKubeconfigSignerPEM); err != nil {
+		return nil, fmt.Errorf("failed to add %s to kubelet client CA bundle: %w", "admin-kubeconfig-signer", err)
+	}
+	adminKubeconfigClientDir := cryptomaterial.AdminKubeconfigClientCertDir(certsDir)
+	certConfigs.adminKubeconfigClient, _, err = adminKubeconfigSigner.EnsureClientCertificate(
+		cryptomaterial.ClientCertPath(adminKubeconfigClientDir),
+		cryptomaterial.ClientKeyPath(adminKubeconfigClientDir),
+		&user.DefaultInfo{Name: "system:admin", Groups: []string{"system:masters"}},
+		cryptomaterial.AdminKubeconfigClientCertValidityDays,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate 'system:admin' client certificate: %w", err)
+	}
+
 	if err := util.GenKeys(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/sa-public-key"),
 		"serving-ca.pub", "serving-ca.key"); err != nil {
 		return nil, err
@@ -214,9 +240,17 @@ func initKubeconfig(
 ) error {
 	clusterTrustBundlePEM := certConfigs.clusterTrustBundle
 
-	if err := util.Kubeconfig(filepath.Join(cfg.DataDir, "/resources/kubeadmin/kubeconfig"),
+	adminKubeconfigCertPEM, adminKubeconfigKeyPEM, err := certConfigs.adminKubeconfigClient.GetPEMBytes()
+	if err != nil {
+		return err
+	}
+	if err := util.KubeConfigWithClientCerts(
+		filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig"),
+		cfg.Cluster.URL,
 		clusterTrustBundlePEM,
-		"system:admin", []string{"system:masters"}, cfg.Cluster.URL); err != nil {
+		adminKubeconfigCertPEM,
+		adminKubeconfigKeyPEM,
+	); err != nil {
 		return err
 	}
 
