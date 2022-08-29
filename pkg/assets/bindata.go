@@ -42,6 +42,8 @@
 // assets/components/openshift-router/cluster-role.yaml
 // assets/components/openshift-router/configmap.yaml
 // assets/components/openshift-router/deployment.yaml
+// assets/components/openshift-router/ingress-to-route-controller-clusterrole.yaml
+// assets/components/openshift-router/ingress-to-route-controller-clusterrolebinding.yaml
 // assets/components/openshift-router/namespace.yaml
 // assets/components/openshift-router/service-account.yaml
 // assets/components/openshift-router/service-cloud.yaml
@@ -2517,6 +2519,106 @@ func assetsComponentsOpenshiftRouterDeploymentYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4746, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOpenshiftRouterIngressToRouteControllerClusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:openshift:openshift-controller-manager:ingress-to-route-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingress
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  verbs:
+  - update
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes/custom-host
+  verbs:
+  - create
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+`)
+
+func assetsComponentsOpenshiftRouterIngressToRouteControllerClusterroleYamlBytes() ([]byte, error) {
+	return _assetsComponentsOpenshiftRouterIngressToRouteControllerClusterroleYaml, nil
+}
+
+func assetsComponentsOpenshiftRouterIngressToRouteControllerClusterroleYaml() (*asset, error) {
+	bytes, err := assetsComponentsOpenshiftRouterIngressToRouteControllerClusterroleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/openshift-router/ingress-to-route-controller-clusterrole.yaml", size: 764, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsOpenshiftRouterIngressToRouteControllerClusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:openshift:openshift-controller-manager:ingress-to-route-controller
+roleRef:
+  kind: ClusterRole
+  name: system:openshift:openshift-controller-manager:ingress-to-route-controller
+subjects:
+- kind: ServiceAccount
+  namespace: openshift-infra
+  name: ingress-to-route-controller
+`)
+
+func assetsComponentsOpenshiftRouterIngressToRouteControllerClusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsOpenshiftRouterIngressToRouteControllerClusterrolebindingYaml, nil
+}
+
+func assetsComponentsOpenshiftRouterIngressToRouteControllerClusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsOpenshiftRouterIngressToRouteControllerClusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/openshift-router/ingress-to-route-controller-clusterrolebinding.yaml", size: 367, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5919,6 +6021,8 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/openshift-router/cluster-role.yaml":                                                   assetsComponentsOpenshiftRouterClusterRoleYaml,
 	"assets/components/openshift-router/configmap.yaml":                                                      assetsComponentsOpenshiftRouterConfigmapYaml,
 	"assets/components/openshift-router/deployment.yaml":                                                     assetsComponentsOpenshiftRouterDeploymentYaml,
+	"assets/components/openshift-router/ingress-to-route-controller-clusterrole.yaml":                        assetsComponentsOpenshiftRouterIngressToRouteControllerClusterroleYaml,
+	"assets/components/openshift-router/ingress-to-route-controller-clusterrolebinding.yaml":                 assetsComponentsOpenshiftRouterIngressToRouteControllerClusterrolebindingYaml,
 	"assets/components/openshift-router/namespace.yaml":                                                      assetsComponentsOpenshiftRouterNamespaceYaml,
 	"assets/components/openshift-router/service-account.yaml":                                                assetsComponentsOpenshiftRouterServiceAccountYaml,
 	"assets/components/openshift-router/service-cloud.yaml":                                                  assetsComponentsOpenshiftRouterServiceCloudYaml,
@@ -6055,14 +6159,16 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				}},
 			}},
 			"openshift-router": {nil, map[string]*bintree{
-				"cluster-role-binding.yaml": {assetsComponentsOpenshiftRouterClusterRoleBindingYaml, map[string]*bintree{}},
-				"cluster-role.yaml":         {assetsComponentsOpenshiftRouterClusterRoleYaml, map[string]*bintree{}},
-				"configmap.yaml":            {assetsComponentsOpenshiftRouterConfigmapYaml, map[string]*bintree{}},
-				"deployment.yaml":           {assetsComponentsOpenshiftRouterDeploymentYaml, map[string]*bintree{}},
-				"namespace.yaml":            {assetsComponentsOpenshiftRouterNamespaceYaml, map[string]*bintree{}},
-				"service-account.yaml":      {assetsComponentsOpenshiftRouterServiceAccountYaml, map[string]*bintree{}},
-				"service-cloud.yaml":        {assetsComponentsOpenshiftRouterServiceCloudYaml, map[string]*bintree{}},
-				"service-internal.yaml":     {assetsComponentsOpenshiftRouterServiceInternalYaml, map[string]*bintree{}},
+				"cluster-role-binding.yaml":                           {assetsComponentsOpenshiftRouterClusterRoleBindingYaml, map[string]*bintree{}},
+				"cluster-role.yaml":                                   {assetsComponentsOpenshiftRouterClusterRoleYaml, map[string]*bintree{}},
+				"configmap.yaml":                                      {assetsComponentsOpenshiftRouterConfigmapYaml, map[string]*bintree{}},
+				"deployment.yaml":                                     {assetsComponentsOpenshiftRouterDeploymentYaml, map[string]*bintree{}},
+				"ingress-to-route-controller-clusterrole.yaml":        {assetsComponentsOpenshiftRouterIngressToRouteControllerClusterroleYaml, map[string]*bintree{}},
+				"ingress-to-route-controller-clusterrolebinding.yaml": {assetsComponentsOpenshiftRouterIngressToRouteControllerClusterrolebindingYaml, map[string]*bintree{}},
+				"namespace.yaml":                                      {assetsComponentsOpenshiftRouterNamespaceYaml, map[string]*bintree{}},
+				"service-account.yaml":                                {assetsComponentsOpenshiftRouterServiceAccountYaml, map[string]*bintree{}},
+				"service-cloud.yaml":                                  {assetsComponentsOpenshiftRouterServiceCloudYaml, map[string]*bintree{}},
+				"service-internal.yaml":                               {assetsComponentsOpenshiftRouterServiceInternalYaml, map[string]*bintree{}},
 			}},
 			"ovn": {nil, map[string]*bintree{
 				"clusterrole.yaml":        {assetsComponentsOvnClusterroleYaml, map[string]*bintree{}},

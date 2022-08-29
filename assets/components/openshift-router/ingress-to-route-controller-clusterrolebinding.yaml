@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:openshift:openshift-controller-manager:ingress-to-route-controller
+roleRef:
+  kind: ClusterRole
+  name: system:openshift:openshift-controller-manager:ingress-to-route-controller
+subjects:
+- kind: ServiceAccount
+  namespace: openshift-infra
+  name: ingress-to-route-controller
