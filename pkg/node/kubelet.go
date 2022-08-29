@@ -100,8 +100,8 @@ authentication:
     clientCAFile: ` + cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
   anonymous:
     enabled: false
-tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.crt
-tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-client/tls.key
+tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-server/tls.crt
+tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-server/tls.key
 cgroupDriver: "systemd"
 failSwapOn: false
 volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec
