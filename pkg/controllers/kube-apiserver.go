@@ -193,9 +193,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 					}
 				}
 
-				for _, adding := range src.([]interface{}) {
-					result = append(result, adding)
-				}
+				result = append(result, src.([]interface{})...)
 
 				return result, nil
 			},
