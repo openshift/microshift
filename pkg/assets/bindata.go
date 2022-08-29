@@ -2695,11 +2695,9 @@ spec:
     - name: http
       port: 80
       targetPort: 80
-      nodePort: 30001
     - name: https
       port: 443
       targetPort: 443
-      nodePort: 30002
 `)
 
 func assetsComponentsOpenshiftRouterServiceCloudYamlBytes() ([]byte, error) {
@@ -2712,7 +2710,7 @@ func assetsComponentsOpenshiftRouterServiceCloudYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 567, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 523, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

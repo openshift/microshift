@@ -127,6 +127,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"proxy-client-key-file":            {filepath.Join(kasSecretsDir, "aggregator-client", "tls.key")},
 			"requestheader-client-ca-file":     {clientCABundlePath},
 			"service-account-signing-key-file": {cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
+			"service-node-port-range":          {cfg.Cluster.ServiceNodePortRange},
 			"tls-cert-file":                    {filepath.Join(servingCertsDir, "tls.crt")},
 			"tls-private-key-file":             {filepath.Join(servingCertsDir, "tls.key")},
 			"disable-admission-plugins": {

@@ -485,8 +485,6 @@ update_manifests() {
     yq -i '.spec.template.spec.containers[0].ports[2].hostPort = 1936' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Change LoadBalancer to NodePort as long as we do not add a default LB. Add the necessary nodePorts
     yq -i '.spec.type = "NodePort"' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-    yq -i '.spec.ports[0].nodePort = 30001' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-    yq -i '.spec.ports[1].nodePort = 30002' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
     # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
     sed -i 's|REPLACE_ROUTER_IMAGE|{{ .ReleaseImage.haproxy_router }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
 
