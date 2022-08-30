@@ -5,17 +5,12 @@ labels: feature
 title: '[Enhancement]: <title>'
 
 ---
-<!-- Feature requests are unlikely to make progress as an issue.
-
-A proposal that works through the design along with the implications of the change should be submitted as a design document in https://github.com/openshift/microshift/tree/main/docs/design/
-
+<!-- Feature requests are unlikely to make progress as fast as other issues.
 -->
-#### Design Document Link
+#### Design document link
 
-PR: #<PR Number>
+PR: #<PR number>
 
-#### What would you like to be added:
+#### What would you like to be added?
 
-#### Why is this needed:
-
-
+#### Why is this needed?
