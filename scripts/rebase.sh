@@ -455,6 +455,9 @@ update_manifests() {
     #    Replace all openshift-router operand manifests
     rm -f "${REPOROOT}"/assets/components/openshift-router/*
     cp "${STAGING_DIR}"/cluster-ingress-operator/assets/router/* "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
+    # Copy embedded manifests applied by the COCMO rather than CVO
+    cp "${STAGING_DIR}"/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrole.yaml "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
+    cp "${STAGING_DIR}"/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrolebinding.yaml "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
     #    Restore the openshift-router's service-ca ConfigMap
     git restore "${REPOROOT}"/assets/components/openshift-router/configmap.yaml
     # 2) Render operand manifest templates like the operator would
