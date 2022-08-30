@@ -63,6 +63,7 @@ du_dirs:
   - /usr/
   - /usr/bin/*
 
+vg_name: rhel
 lvm_disk: /dev/xvdb
 
 sample_interval: 5

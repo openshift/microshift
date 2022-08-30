@@ -7,13 +7,19 @@
     state: present
     update_cache: true
 
+- name: check if rhel vg exists
+  ansible.builtin.command: vgdisplay -s {{ vg_name }}
+  register: rhel_vg_present
+  ignore_errors: true
+
 - name: create a volume group on top of secondary disk for topolvm
   community.general.lvg:
-    vg: rhel
+    vg: "{{ vg_name }}"
     pvs: "{{ lvm_disk }}"
+  when: rhel_vg_present.rc != 0
 
 - name: check if we have oc installed
-  command: which oc
+  ansible.builtin.command: which oc
   register: oc_present
   ignore_errors: true
 
@@ -281,6 +287,13 @@
     create: yes
   delegate_to: localhost
 
+- name: stress etcd with configmap loading
+  ansible.builtin.shell: |
+    for i in {5255..5355}; do
+      oc new-project project-$i
+      oc create configmap project-$i --from-file=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+    done
+
 #- name: copy kubeconfig to localhost
 #  ansible.builtin.fetch:
 #    src: "{{ remote_kubeconfig_path }}"
@@ -294,7 +307,7 @@
       jid: "{{ pbench_user_benchmark_result.ansible_job_id }}"
     register: job_result
     until: job_result.finished
-    retries: 80
+    retries: 240
     delay: 15
   
   - name: source pbench-agent & move results
