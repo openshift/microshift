@@ -94,40 +94,28 @@ packaging/rpm/_rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.
 ## Run MicroShift Executable
 Log into the development virtual machine with the `microshift` user credentials.
 
-### Installing Clients
-Run the following commands to install `oc` and `kubectl` utilities.
-```bash
-OC_ARCHIVE=/tmp/openshift-client-linux.tar.gz
-curl -o ${OC_ARCHIVE} -O https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp/stable/openshift-client-linux.tar.gz
-sudo tar -xf ${OC_ARCHIVE} -C /usr/local/bin oc kubectl
-rm -f ${OC_ARCHIVE}
-```
-
 ### Runtime Prerequisites
-Run the following commands to install CRI-O.
+Enable the MicroShift repos and install the MicroShift RPMs, which pulls in required package dependencies and provides required configuration files and systemd units:
 ```bash
-sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms
-sudo dnf install -y cri-o cri-tools
-sudo systemctl enable crio --now
+sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+sudo dnf localinstall -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
 ```
 
-Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and copy it into the `/etc/crio/openshift-pull-secret` file. 
-
-Run the following commands to configure CRI-O for using the pull secret when fetching container images.
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page. Copy it to `/etc/crio/openshift-pull-secret` and update its file permissions so CRI-O can use it when fetching container images:
 ```bash
 sudo chmod 600 /etc/crio/openshift-pull-secret
+```
+
+### Installing Clients
+Run the following commands to install `oc` and `kubectl` utilities:
+```bash
+dnf install -y openshift-clients
 ```
 
 ### Configuring MicroShift
 MicroShift requires system configuration updates before it can be run. These updates include `CRI-O`, networking and file system customizations.
 
 > If a firewall is enabled, follow the instructions in the [Firewall Configuration](./howto_firewall.md) document to apply the mandatory settings.
-
-It is necessary to install the MicroShift RPM packages to automatically apply all the necessary customizations.
-```
-sudo subscription-manager repos --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
-sudo dnf install -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
-```
 
 The MicroShift service is not enabled or started by default. Start the service once to trigger the initialization sequence of all the dependencies.
 ```bash
