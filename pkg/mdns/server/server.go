@@ -97,9 +97,7 @@ func (s *Server) handlemDNSPacket(conn *net.UDPConn, packet []byte, from net.Add
 
 	// Handle all the questions and construct the answers
 	for _, q := range query.Question {
-		for _, a := range s.responder.Answer(q) {
-			answers = append(answers, a)
-		}
+		answers = append(answers, s.responder.Answer(q)...)
 		unicast = unicast || q.Qclass&(1<<15) != 0
 	}
 
