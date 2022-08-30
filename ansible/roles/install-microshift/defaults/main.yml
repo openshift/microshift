@@ -6,6 +6,7 @@ install_packages:
   - firewalld
   - git
   - golang
+  - lvm2
   - make
   - python3-firewall
   - perf
@@ -24,6 +25,7 @@ firewall_services:
 firewall_ports:
   - 80/tcp
   - 443/tcp
+  - 2379/tcp
   - 5353/udp
   - 6443/tcp
   - 8080/tcp
@@ -38,7 +40,12 @@ firewall_trusted_cidr:
   - 169.254.169.1/32
 
 root_bin_dir: /usr/bin
+
+etcd_dir: "{{ ansible_env.HOME }}/etcd"
+etcd_repo: https://github.com/openshift/etcd.git
+
 microshift_dir: "{{ ansible_env.HOME }}/microshift"
+microshift_repo: https://github.com/openshift/microshift.git
 microshift_rpms: []
 
 systemd_services:
@@ -55,3 +62,8 @@ du_dirs:
   - /var/lib/containers/storage/
   - /usr/
   - /usr/bin/*
+
+vg_name: rhel
+lvm_disk: /dev/xvdb
+
+sample_interval: 5

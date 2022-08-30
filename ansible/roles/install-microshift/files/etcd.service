@@ -1,0 +1,24 @@
+[Unit]
+Description=etcd key-value store
+Documentation=https://github.com/etcd-io/etcd
+After=network-online.target local-fs.target remote-fs.target time-sync.target
+Wants=network-online.target local-fs.target remote-fs.target time-sync.target
+
+[Service]
+User=root
+Type=notify
+Environment=ETCD_DATA_DIR=/var/lib/microshift
+Environment=ETCD_NAME=%m
+ExecStart=/usr/bin/etcd \
+	--cert-file=${ETCD_DATA_DIR}/resources/kube-apiserver/secrets/etcd-client/tls.crt \
+	--key-file=${ETCD_DATA_DIR}/resources/kube-apiserver/secrets/etcd-client/tls.key \
+	--trusted-ca-file=${ETCD_DATA_DIR}/certs/ca-bundle/ca-bundle.crt \
+	--advertise-client-urls=https://localhost:2379 \
+	--listen-client-urls=https://localhost:2379,unixs://localhost:0 \
+	--client-cert-auth=true
+Restart=always
+RestartSec=10s
+LimitNOFILE=40000
+
+[Install]
+WantedBy=multi-user.target
