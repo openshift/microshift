@@ -56,7 +56,7 @@ sudo chmod 600                /etc/crio/openshift-pull-secret
 
 # Run MicroShift Executable > Installing Clients
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#installing-clients
-dnf install -y openshift-clients
+sudo dnf install -y openshift-clients
 
 # Run MicroShift Executable > Configuring MicroShift > Firewalld
 # https://github.com/openshift/microshift/blob/main/docs/howto_firewall.md#firewalld
