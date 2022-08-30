@@ -8,6 +8,8 @@ approvers:
 - oglok
 - sallyom
 - zshi-redhat
+- pmtk
+- pacevedom
 reviewers:
 - benluddy
 - copejon
@@ -18,6 +20,8 @@ reviewers:
 - oglok
 - sallyom
 - zshi-redhat
+- pmtk
+- pacevedom
 emeritus_approvers:
 - cooktheryan
 - husky-parul
