@@ -46,21 +46,17 @@ cd ~/microshift
 make rpm 
 make srpm
 
-# Run MicroShift Executable > Installing Clients
-# https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#installing-clients
-OC_ARCHIVE=/tmp/openshift-client-linux.tar.gz
-curl -o ${OC_ARCHIVE} -O https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp/stable/openshift-client-linux.tar.gz
-sudo tar -xf ${OC_ARCHIVE} -C /usr/local/bin oc kubectl
-rm -f ${OC_ARCHIVE}
-
 # Run MicroShift Executable > Runtime Prerequisites
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#runtime-prerequisites
-sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms
-sudo dnf install -y cri-o cri-tools
-sudo systemctl enable crio --now
+sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+sudo dnf localinstall -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
 
 sudo cp -f ${OCP_PULL_SECRET} /etc/crio/openshift-pull-secret
 sudo chmod 600                /etc/crio/openshift-pull-secret
+
+# Run MicroShift Executable > Installing Clients
+# https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#installing-clients
+dnf install -y openshift-clients
 
 # Run MicroShift Executable > Configuring MicroShift > Firewalld
 # https://github.com/openshift/microshift/blob/main/docs/howto_firewall.md#firewalld
@@ -72,9 +68,6 @@ sudo firewall-cmd --reload
 
 # Run MicroShift Executable > Configuring MicroShift
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#configuring-microshift
-sudo subscription-manager repos --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
-sudo dnf install -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
-
 sudo systemctl enable microshift --now
 
 echo ""
