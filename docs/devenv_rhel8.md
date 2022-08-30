@@ -95,9 +95,11 @@ packaging/rpm/_rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.
 Log into the development virtual machine with the `microshift` user credentials.
 
 ### Runtime Prerequisites
-Enable the MicroShift repos and install the MicroShift RPMs, which pulls in required package dependencies and provides required configuration files and systemd units:
+Enable the needed repositories and install the MicroShift RPM packages. This procedure pulls in the required package dependencies, also installing the necessary configuration files and `systemd` units.
 ```bash
-sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+sudo subscription-manager repos \
+    --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms \
+    --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
 sudo dnf localinstall -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
 ```
 
@@ -107,9 +109,9 @@ sudo chmod 600 /etc/crio/openshift-pull-secret
 ```
 
 ### Installing Clients
-Run the following commands to install `oc` and `kubectl` utilities:
+Run the following commands to install `oc` and `kubectl` utilities.
 ```bash
-dnf install -y openshift-clients
+sudo dnf install -y openshift-clients
 ```
 
 ### Configuring MicroShift
