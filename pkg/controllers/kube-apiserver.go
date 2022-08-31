@@ -35,7 +35,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 	kubeapiserver "k8s.io/kubernetes/cmd/kube-apiserver/app"
-	"k8s.io/kubernetes/cmd/kube-apiserver/app/options"
 
 	configv1 "github.com/openshift/api/config/v1"
 	kubecontrolplanev1 "github.com/openshift/api/kubecontrolplane/v1"
@@ -72,9 +71,8 @@ type KubeAPIServer struct {
 	verbosity      int
 	configureErr   error // todo: report configuration errors immediately
 
-	serverOptions *options.ServerRunOptions
-
-	kubeconfig string
+	masterURL       string
+	servingCertPath string
 }
 
 func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
@@ -89,12 +87,13 @@ func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
 func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd"} }
 
 func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
-	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kube-apiserver", "kubeconfig")
 	s.verbosity = cfg.LogVLevel
 
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
 	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
+	kasSecretsDir := filepath.Join(certsDir, "kube-apiserver", "secrets")
+	servingCertsDir := filepath.Join(kasSecretsDir, "service-network-serving-certkey")
 
 	if err := s.configureAuditPolicy(cfg); err != nil {
 		return fmt.Errorf("Failed to configure kube-apiserver audit policy: %w", err)
@@ -105,6 +104,9 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	if err != nil {
 		return err
 	}
+
+	s.masterURL = cfg.Cluster.URL
+	s.servingCertPath = filepath.Join(servingCertsDir, "tls.crt")
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
@@ -121,12 +123,12 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"kubelet-client-certificate":    {cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.crt"},
 			"kubelet-client-key":            {cfg.DataDir + "/resources/kube-apiserver/secrets/kubelet-client/tls.key"},
 
-			"proxy-client-cert-file":           {cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.crt"},
-			"proxy-client-key-file":            {cfg.DataDir + "/certs/kube-apiserver/secrets/aggregator-client/tls.key"},
+			"proxy-client-cert-file":           {filepath.Join(kasSecretsDir, "aggregator-client", "tls.crt")},
+			"proxy-client-key-file":            {filepath.Join(kasSecretsDir, "aggregator-client", "tls.key")},
 			"requestheader-client-ca-file":     {clientCABundlePath},
 			"service-account-signing-key-file": {cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
-			"tls-cert-file":                    {cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.crt"},
-			"tls-private-key-file":             {cfg.DataDir + "/certs/kube-apiserver/secrets/service-network-serving-certkey/tls.key"},
+			"tls-cert-file":                    {filepath.Join(servingCertsDir, "tls.crt")},
+			"tls-private-key-file":             {filepath.Join(servingCertsDir, "tls.key")},
 			"disable-admission-plugins": {
 				"authorization.openshift.io/RestrictSubjectBindings",
 				"authorization.openshift.io/ValidateRoleBindingRestriction",
@@ -158,9 +160,6 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 					MinTLSVersion: string(fixedTLSProfile.MinTLSVersion),
 					CipherSuites:  crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
 				},
-			},
-			KubeClientConfig: configv1.KubeClientConfig{
-				KubeConfig: s.kubeconfig,
 			},
 		},
 		ServiceAccountPublicKeyFiles: []string{
@@ -262,7 +261,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	// run readiness check
 	go func() {
 		err := wait.PollImmediateWithContext(ctx, time.Second, kubeAPIStartupTimeout*time.Second, func(ctx context.Context) (bool, error) {
-			restConfig, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
+			restConfig, err := clientcmd.BuildConfigFromFlags(s.masterURL, "")
 			if err != nil {
 				return false, err
 			}
@@ -270,6 +269,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 				return false, err
 			}
 			restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
+			restConfig.CAFile = s.servingCertPath
 
 			restClient, err := rest.UnversionedRESTClientFor(restConfig)
 			if err != nil {
