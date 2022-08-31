@@ -1,0 +1,63 @@
+From 362ddacd8704c1e124d4831b2a301aeec0d34641 Mon Sep 17 00:00:00 2001
+From: Ben Luddy <bluddy@redhat.com>
+Date: Wed, 31 Aug 2022 17:36:35 -0400
+Subject: [PATCH] Hack to tag klog headers with embedded component names.
+
+---
+ vendor/k8s.io/klog/v2/goroutine_labels.go | 30 ++++++++++++++++++++++++++++++
+ vendor/k8s.io/klog/v2/klog.go             |  2 ++
+ 2 files changed, 32 insertions(+)
+ create mode 100644 goroutine_labels.go
+
+diff --git a/vendor/k8s.io/klog/v2/goroutine_labels.go b/vendor/k8s.io/klog/v2/goroutine_labels.go
+new file mode 100644
+index 0000000..b9a7356
+--- /dev/null
++++ b/vendor/k8s.io/klog/v2/goroutine_labels.go
+@@ -0,0 +1,30 @@
++package klog
++
++import (
++	"context"
++	"runtime/pprof"
++	"unsafe"
++)
++
++//go:linkname runtime_getProfLabel runtime/pprof.runtime_getProfLabel
++func runtime_getProfLabel() unsafe.Pointer
++
++func getMicroshiftLoggerComponent() string {
++	labels := (*map[string]string)(runtime_getProfLabel())
++	if labels == nil {
++		return "???"
++	}
++
++	c, ok := (*labels)["microshift_logger_component"]
++	if !ok {
++		return "???"
++	}
++
++	return c
++}
++
++func WithMicroshitLoggerComponent(c string, f func()) {
++	pprof.Do(context.Background(), pprof.Labels("microshift_logger_component", c), func(context.Context) {
++		f()
++	})
++}
+diff --git a/vendor/k8s.io/klog/v2/klog.go b/vendor/k8s.io/klog/v2/klog.go
+index 45efbb0..57a52c6 100644
+--- a/vendor/k8s.io/klog/v2/klog.go
++++ b/vendor/k8s.io/klog/v2/klog.go
+@@ -648,6 +648,8 @@ func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
+ 	buf.nDigits(7, 22, pid, ' ') // TODO: should be TID
+ 	buf.tmp[29] = ' '
+ 	buf.Write(buf.tmp[:30])
++	buf.WriteString(getMicroshiftLoggerComponent())
++	buf.WriteByte(' ')
+ 	buf.WriteString(file)
+ 	buf.tmp[0] = ':'
+ 	n := buf.someDigits(1, line)
+-- 
+2.37.2
+

@@ -98,26 +98,28 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 
 func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan struct{}, <-chan struct{}) {
 	ready, stopped := make(chan struct{}), make(chan struct{})
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				klog.Errorf("%s panicked: %s", service.Name(), r)
-				klog.Error("Stopping MicroShift")
-				syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
-				if !sigchannel.IsClosed(stopped) {
-					close(stopped)
+	klog.WithMicroshitLoggerComponent(service.Name(), func() {
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					klog.Errorf("%s panicked: %s", service.Name(), r)
+					klog.Error("Stopping MicroShift")
+					syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
+					if !sigchannel.IsClosed(stopped) {
+						close(stopped)
+					}
 				}
+			}()
+
+			klog.Infof("Starting %s", service.Name())
+			if err := service.Run(ctx, ready, stopped); err != nil && !errors.Is(err, context.Canceled) {
+				klog.Errorf("service %s exited with error: %s, stopping MicroShift", service.Name(), err)
+				syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
+			} else {
+				klog.Infof("%s completed", service.Name())
 			}
 		}()
-
-		klog.Infof("Starting %s", service.Name())
-		if err := service.Run(ctx, ready, stopped); err != nil && !errors.Is(err, context.Canceled) {
-			klog.Errorf("service %s exited with error: %s, stopping MicroShift", service.Name(), err)
-			syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
-		} else {
-			klog.Infof("%s completed", service.Name())
-		}
-	}()
+	})
 	return ready, stopped
 }
 
