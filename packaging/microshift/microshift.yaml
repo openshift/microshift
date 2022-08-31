@@ -1,0 +1,40 @@
+# Directory for storing audit logs
+#AuditLogDir: ""
+
+# Cluster settings
+Cluster:
+
+  # IP range for use by the cluster
+  #ClusterCIDR: 10.42.0.0/16
+
+  # DNS server IP
+  #DNS: 10.43.0.10
+
+  # mDNS Domain used by the cluster
+  #Domain: cluster.local
+
+  # IP range for services in the cluster
+  #ServiceCIDR: 10.43.0.0/16
+
+  # Node ports allowed for services
+  #ServiceNodePortRange: 30000-32767
+
+  # URL of the API server for the cluster
+  #URL: https://127.0.0.1:6443
+
+# Location for data created by MicroShift
+#DataDir: /var/lib/microshift
+
+# Log verbosity (0-5)
+#LogVLevel: 0
+
+# Locations to scan for manifests to load on startup
+#Manifests:
+#- /usr/lib/microshift/manifests
+#- /etc/microshift/manifests
+
+# The IP of the node (defaults to IP of default route)
+#NodeIP: ""
+
+# The name of the node (defaults to hostname)
+#NodeName: ""
