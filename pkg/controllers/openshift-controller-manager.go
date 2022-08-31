@@ -76,6 +76,8 @@ func (s *OCPControllerManager) writeConfig(cfg *config.MicroshiftConfig) error {
 kind: OpenShiftControllerManagerConfig
 kubeClientConfig:
   kubeConfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+  connectionOverrides:
+    contentType: "application/json"
 servingInfo:
   bindAddress: "0.0.0.0:8445"
   certFile: ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.crt
