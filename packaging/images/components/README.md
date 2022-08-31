@@ -12,7 +12,7 @@ architectures MicroShift supports like `arm`, `arm64`, `ppc64le`, `riscv64`
 as environment variables you can use to tweak and debug the build:
 
 * `DEST_REGISTRY=quay.io/microshift`
-* `COMPONENTS="base-image pause cli coredns haproxy-router hostpath-provisioner kube-rbac-proxy service-ca-operator"`
+* `COMPONENTS="base-image pause cli coredns haproxy-router kube-rbac-proxy service-ca-operator"`
 * `ARCHITECTURES="amd64 arm64 arm ppc64le riscv64"`
 * `PUSH=no`
 * `PARALLEL=yes`
@@ -52,16 +52,15 @@ build each image.
 Each component source code is extracted into the `src` directory, the references
 are extracted from the specific OCP release, and for components not
 being part of OCP the `repo` and `commit` files should exist (except for the base image)
-(see hostpathprovisioner for an example).
+(see `components/pause/` for an example).
 
 In addition, each component can have:
 * `ImageSource.$ARCH` or `Dockerfile.$ARCH` specific for an architecture.
 * `ImageSource` or `Dockerfile` general building strategy.
 
 An `ImageSource` file means that if no other specific method exist for an architecture
-the image should be retrieved from an specific ImageSource, for example in `hostpathprovisioner` we use
-`quay.io/kubevirt/hostpath-provisioner:v0.10.0` as ImageSource for most architectures, since they publish
-a multi-architecture manifest.
+the image should be retrieved from a specific ImageSource. If a multi-architecture manifest is published,
+same image reference can be used for multiple architectures.
 
 A `Dockerfile` file means that if no other specific method exist for an architecture,
 the image will be built according to the instructions of the Dockerfile.
@@ -90,7 +89,7 @@ For architectures where `ubi8` or `ubi8-minimal` images exist such base will be 
 in some cases we use `fedora-minimal` (when a newer version of packages is necessary)
 
 # Non OCP images
-We consume a few non-ocp images, like `hostpath-provisioner`, `pause`,
+We consume a few non-ocp images, like `pause`,
 we build those images from exiting image sources, or from source code.
 
 # generated images
