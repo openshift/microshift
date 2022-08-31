@@ -18,26 +18,30 @@ oc get pods -A
 Log into the virtual machine and run the following commands to create the `MetalLB` namespace and deployment.
 
 ```
-oc apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml
-oc apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml
+oc apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.4/config/manifests/metallb-native.yaml
 ```
 
-Once the components are available, create a `ConfigMap` to define the default address pool for the load balancer to use.
+Verify that the `MetalLB` pods are up and running in the `metallb-system` namespace.
+
+```bash
+oc get pods -n metallb-system
+NAME                          READY   STATUS    RESTARTS   AGE
+controller-64cc46b9f9-2csb7   1/1     Running   0          107s
+speaker-fqmq4                 1/1     Running   0          107s
+```
+
+Once all the pods are available, create an `IPAddressPool` resource to define the default address pool for the load balancer to use.
 
 ```bash
 oc create -f - <<EOF
-apiVersion: v1
-kind: ConfigMap
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
 metadata:
+  name: default
   namespace: metallb-system
-  name: config
-data:
-  config: |
-    address-pools:
-    - name: default
-      protocol: layer2
-      addresses:
-      - 192.168.1.240-192.168.1.250    
+spec:
+  addresses:
+  - 192.168.1.240-192.168.1.250
 EOF
 ```
 
