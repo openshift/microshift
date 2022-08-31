@@ -192,7 +192,7 @@ install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinu
 # only for install, not on upgrades
 if [ $1 -eq 1 ]; then
 	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/microshift.conf
-	systemctl is-active --quiet crio && systemctl restart --quiet crio
+	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
 fi
 
 %post selinux
