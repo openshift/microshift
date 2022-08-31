@@ -23,7 +23,7 @@ const (
 	defaultUserConfigFile   = "~/.microshift/config.yaml"
 	defaultUserDataDir      = "~/.microshift/data"
 	defaultGlobalConfigFile = "/etc/microshift/config.yaml"
-	defaultGlobalDataDir    = "/var/lib/microshift"
+	DefaultGlobalDataDir    = "/var/lib/microshift"
 	// for files managed via management system in /etc, i.e. user applications
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
@@ -156,7 +156,7 @@ func findDataDir() string {
 		if os.Geteuid() > 0 {
 			return userDataDir
 		} else {
-			return defaultGlobalDataDir
+			return DefaultGlobalDataDir
 		}
 	} else {
 		return userDataDir
