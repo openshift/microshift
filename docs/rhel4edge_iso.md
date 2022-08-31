@@ -243,7 +243,6 @@ $ sudo crictl images
 IMAGE                                            TAG                 IMAGE ID            SIZE
 k8s.gcr.io/pause                                 3.6                 6270bb605e12e       690kB
 quay.io/coreos/flannel                           v0.14.0             8522d622299ca       68.9MB
-quay.io/kubevirt/hostpath-provisioner            v0.8.0              7cbc61ff04c89       180MB
 quay.io/microshift/flannel-cni                   v0.14.0             4324dc7a1ffa5       8.12MB
 quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              334363f37666a       401MB
 quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              eb9d5c9681cd5       376MB

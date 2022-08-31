@@ -1,9 +1,0 @@
-[Unit]
-Description=Set SELinux chcon for hostpath-provisioner
-
-[Service]
-ExecStart=/usr/bin/chcon -Rt container_file_t /var/hpvolumes
-Type=oneshot
-
-[Install]
-WantedBy=multi-user.target

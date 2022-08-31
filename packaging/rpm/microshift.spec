@@ -165,7 +165,6 @@ install -p -m644  packaging/network-manager-conf/microshift-nm.conf %{buildroot}
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
-install -p -m644 packaging/systemd/hostpath-provisioner.service %{buildroot}%{_unitdir}/hostpath-provisioner.service
 
 # Memory tweaks to the OpenvSwitch services
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d
@@ -224,7 +223,6 @@ systemctl enable --now --quiet openvswitch || true
 
 %preun
 
-%systemd_preun hostpath-provisioner.service
 %systemd_preun microshift.service
 
 
@@ -243,7 +241,6 @@ systemctl enable --now --quiet openvswitch || true
 /var/run/secrets/kubernetes.io/serviceaccount
 %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
-%{_unitdir}/hostpath-provisioner.service
 
 %files networking
 
@@ -260,6 +257,9 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/configure-ovs-microshift.sh
 
 %changelog
+* Wed Aug 31 2022 Patryk Matuszak <pmatusza@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_6
+- Removed hostpath-provisioner
+
 * Thu Jul 28 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_6
 - Add NetworkManager configuration file
 
