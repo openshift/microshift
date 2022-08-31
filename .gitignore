@@ -6,7 +6,7 @@
 Vagrantfile
 _output/*
 bin
-packaging/rpm/_rpmbuild/
+packaging/rpm/_rpmbuild
 packaging/selinux/*.pp*
 packaging/selinux/microshift_selinux.8
 packaging/selinux/tmp/
