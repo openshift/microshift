@@ -1,0 +1,35 @@
+# The cold replica-rpm containers can be built using paack:
+#  ./paack.py rpm example-user-containers.yaml fedora-35-aarch64
+packages:
+  - name: my-application-containers
+    version: 1.0.0
+    release: 2
+    license: Apache License 2.0
+    summary: Application specific containers
+    description: |
+        This package provides a read only storage for the deployed application containers.
+    url: https://github.com/openshift/microshift
+    path: /usr/lib/user-app/containers
+    arch:
+      - name: x86_64
+        image_arch: amd64
+        images:
+          - docker.io/library/nginx:1.21.6
+      - name: aarch64
+        image_arch: arm64
+        images:
+          - docker.io/library/nginx:1.21.6
+
+  - name: my-application-manifests
+    version: 1.0.0
+    release: 2
+    license: Apache License 2.0
+    summary: Application specific manifests
+    description: |
+        This package provides a manifests for the deployed application containers.
+    manifestPath: /usr/lib/microshift/manifests
+    arch:
+      - name: x86_64
+        manifests: ./example-manifests
+      - name: aarch64
+        manifests: ./example-manifests
