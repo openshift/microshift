@@ -164,7 +164,7 @@ install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift
-install -p -m644 packaging/microshift/microshift.yaml %{buildroot}%{_sysconfdir}/microshift/microshift.yaml
+install -p -m644 packaging/microshift/config.yaml %{buildroot}%{_sysconfdir}/microshift/config.yaml
 
 # Memory tweaks to the OpenvSwitch services
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d
@@ -233,7 +233,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/cleanup-all-microshift-data
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
-%{_sysconfdir}/microshift/microshift.yaml
+%{_sysconfdir}/microshift/config.yaml
 
 %files selinux
 
