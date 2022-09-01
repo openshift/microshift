@@ -1,0 +1,3 @@
+# Static analysis of OpenShift tests to get API usage
+
+See comments in main.go
