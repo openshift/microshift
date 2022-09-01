@@ -492,22 +492,27 @@ get_default_interface() {
 
     # TODO: sync with openshift configure-ovs.sh when it supports non default route
     # pick the first ipv4 route in the case that default route doesn't exist
-    if [ "${extra_bridge}" != "" ]; then
-      iface=$(ip route show | grep -v "br-ex1" | grep -v "${extra_bridge}" | awk '{ if ($2 == "dev") { print $3; exit } }')
-    else
-      iface=$(ip route show | grep -v "br-ex1" | awk '{ if ($2 == "dev") { print $3; exit } }')
-    fi
-    if [[ -n "${iface}" ]]; then
-      break
-    fi
-    # pick the first ipv6 route in the case that default route doesn't exist
-    if [ "${extra_bridge}" != "" ]; then
-      iface=$(ip -6 route show | grep -v "br-ex1" | grep -v "${extra_bridge}" | awk '{ if ($2 == "dev") { print $3; exit } }')
-    else
-      iface=$(ip -6 route show | grep -v "br-ex1" | awk '{ if ($2 == "dev") { print $3; exit } }')
-    fi
-    if [[ -n "${iface}" ]]; then
-      break
+    #
+    # Interface may not get default route immediately after boot: https://issues.redhat.com/browse/USHIFT-340
+    # Give it 8*5=40 seconds to detect default route interface, otherwise try to get non-default route interface
+    if [ ${counter} -gt 8 ]; then
+      if [ "${extra_bridge}" != "" ]; then
+        iface=$(ip route show | grep -v "br-ex1" | grep -v "${extra_bridge}" | awk '{ if ($2 == "dev") { print $3; exit } }')
+      else
+        iface=$(ip route show | grep -v "br-ex1" | awk '{ if ($2 == "dev") { print $3; exit } }')
+      fi
+      if [[ -n "${iface}" ]]; then
+        break
+      fi
+      # pick the first ipv6 route in the case that default route doesn't exist
+      if [ "${extra_bridge}" != "" ]; then
+        iface=$(ip -6 route show | grep -v "br-ex1" | grep -v "${extra_bridge}" | awk '{ if ($2 == "dev") { print $3; exit } }')
+      else
+        iface=$(ip -6 route show | grep -v "br-ex1" | awk '{ if ($2 == "dev") { print $3; exit } }')
+      fi
+      if [[ -n "${iface}" ]]; then
+        break
+      fi
     fi
 
     counter=$((counter+1))
