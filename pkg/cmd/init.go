@@ -192,11 +192,6 @@ func initKubeconfig(
 		"system:admin", []string{"system:masters"}, cfg.Cluster.URL); err != nil {
 		return err
 	}
-	if err := util.Kubeconfig(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/kubeconfig"),
-		clusterTrustBundlePEM,
-		"kube-apiserver", []string{"kube-apiserver", "system:kube-apiserver", "system:masters"}, cfg.Cluster.URL); err != nil {
-		return err
-	}
 
 	kcmCertPEM, kcmKeyPEM, err := certConfigs.kubeControllerManager.GetPEMBytes()
 	if err != nil {
