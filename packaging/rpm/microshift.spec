@@ -66,7 +66,7 @@ Requires: conntrack-tools
 %{?systemd_requires}
 
 %description
-MicroShift is a research project that is exploring how OpenShift Kubernetes
+MicroShift is a project that is exploring how OpenShift Kubernetes
 can be optimized for small form factor and edge computing.
 
 Edge devices deployed out in the field pose very different operational,
@@ -85,9 +85,6 @@ OpenShift.
 We believe these properties should also make MicroShift a great tool for other
 use cases such as Kubernetes applications development on resource-constrained
 systems, scale testing, and provisioning of lightweight Kubernetes control planes.
-
-Note: MicroShift is still early days and moving fast. Features are missing.
-Things break. But you can still help shape it, too.
 
 %package selinux
 Summary: SELinux policies for MicroShift
