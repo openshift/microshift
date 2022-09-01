@@ -648,6 +648,8 @@ func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
 	buf.nDigits(7, 22, pid, ' ') // TODO: should be TID
 	buf.tmp[29] = ' '
 	buf.Write(buf.tmp[:30])
+	buf.WriteString(getMicroshiftLoggerComponent())
+	buf.WriteByte(' ')
 	buf.WriteString(file)
 	buf.tmp[0] = ':'
 	n := buf.someDigits(1, line)

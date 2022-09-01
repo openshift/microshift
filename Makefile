@@ -298,3 +298,10 @@ bin:
 
 bin/lichen: bin vendor/modules.txt
 	GOBIN=$(realpath ./bin) go install github.com/uw-labs/lichen@latest
+
+vendor:
+	go mod vendor
+	for p in $(wildcard scripts/rebase_patches/*.patch); do \
+		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply; \
+	done
+.PHONY: vendor
