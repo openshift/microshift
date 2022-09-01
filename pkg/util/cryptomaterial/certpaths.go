@@ -27,6 +27,9 @@ func CASerialsPath(dir string) string { return filepath.Join(dir, CASerialsFileN
 func ClientCertPath(dir string) string { return filepath.Join(dir, ClientCertFileName) }
 func ClientKeyPath(dir string) string  { return filepath.Join(dir, ClientKeyFileName) }
 
+func ServingCertPath(dir string) string { return filepath.Join(dir, ServerCertFileName) }
+func ServingKeyPath(dir string) string  { return filepath.Join(dir, ServerKeyFileName) }
+
 func KubeControlPlaneSignerCertDir(certsDir string) string {
 	return filepath.Join(certsDir, "kube-control-plane-signer")
 }

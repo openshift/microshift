@@ -19,37 +19,23 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
-	"time"
 
 	"k8s.io/apiserver/pkg/authentication/user"
 	ctrl "k8s.io/kubernetes/pkg/controlplane"
-
-	"github.com/openshift/library-go/pkg/crypto"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
-type tlsConfigs struct {
-	clusterTrustBundle []byte
-
-	kubeControllerManagerClient *crypto.TLSCertificateConfig
-	kubeSchedulerClient         *crypto.TLSCertificateConfig
-
-	adminKubeconfigClient *crypto.TLSCertificateConfig
-
-	kubeletClient *crypto.TLSCertificateConfig
-}
-
 func initAll(cfg *config.MicroshiftConfig) error {
 	// create CA and keys
-	certConfig, err := initCerts(cfg)
+	clusterTrustBundlePEM, certChains, err := initCerts(cfg)
 	if err != nil {
 		return err
 	}
 	// create kubeconfig for kube-scheduler, kubelet,controller-manager
-	if err := initKubeconfig(cfg, certConfig); err != nil {
+	if err := initKubeconfig(cfg, clusterTrustBundlePEM, certChains); err != nil {
 		return err
 	}
 
@@ -60,212 +46,178 @@ func loadCA(cfg *config.MicroshiftConfig) error {
 	return util.LoadRootCA(filepath.Join(cfg.DataDir, "/certs/ca-bundle"), "ca-bundle.crt", "ca-bundle.key")
 }
 
-func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
+func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.CertificateChains, error) {
 	_, svcNet, err := net.ParseCIDR(cfg.Cluster.ServiceCIDR)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-
-	certConfigs := &tlsConfigs{}
 
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
 	// store root CA for all
 	//TODO generate ca bundles for each component
-	certConfigs.clusterTrustBundle, _, err = util.StoreRootCA("https://kubernetes.svc", filepath.Join(certsDir, "/ca-bundle"),
+	clusterTrustBundlePEM, _, err := util.StoreRootCA("https://kubernetes.svc", filepath.Join(certsDir, "/ca-bundle"),
 		"ca-bundle.crt", "ca-bundle.key",
 		[]string{"https://kubernetes.svc"})
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// FIXME: don't add the whole root CA to client CA bundle, get rid of a general trust by splitting the root CA
-	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, certConfigs.clusterTrustBundle); err != nil {
-		return nil, fmt.Errorf("failed to add the root CA to the total client CA bundle: %w", err)
+	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, clusterTrustBundlePEM); err != nil {
+		return nil, nil, fmt.Errorf("failed to add the root CA to the total client CA bundle: %w", err)
 	}
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	if err := util.GenCerts("etcd-server", filepath.Join(certsDir, "/etcd"),
 		"etcd-serving.crt", "etcd-serving.key",
 		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := util.GenCerts("etcd-peer", filepath.Join(certsDir, "/etcd"),
 		"etcd-peer.crt", "etcd-peer.key",
 		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	// kube-control-plane-signer
-	controlPlaneSignerCA, controlPlaneSignerCAPEM, err := generateClientCA(
-		certsDir,
-		cryptomaterial.KubeControlPlaneSignerCertDir(certsDir),
-		"kube-control-plane-signer")
+	certChains, err := cryptomaterial.NewCertificateChains(
+		// kube-control-plane-signer
+		cryptomaterial.NewCertificateSigner(
+			"kube-control-plane-signer",
+			cryptomaterial.KubeControlPlaneSignerCertDir(certsDir),
+			cryptomaterial.ClientCAValidityDays,
+		).WithClientCertificates(
+			&cryptomaterial.ClientCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "kube-controller-manager",
+					ValidityDays: cryptomaterial.ClientCertValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "system:kube-controller-manager"},
+			},
+			&cryptomaterial.ClientCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "kube-scheduler",
+					ValidityDays: cryptomaterial.ClientCertValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "system:kube-scheduler"},
+			}),
+
+		// kube-apiserver-to-kubelet-signer
+		cryptomaterial.NewCertificateSigner(
+			"kube-apiserver-to-kubelet-signer",
+			cryptomaterial.KubeAPIServerToKubeletSignerCertDir(certsDir),
+			cryptomaterial.ClientCAValidityDays,
+		).WithClientCertificates(
+			&cryptomaterial.ClientCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "kube-apiserver-to-kubelet-client",
+					ValidityDays: cryptomaterial.ClientCertValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "system:kube-apiserver", Groups: []string{"kube-master"}},
+			}),
+
+		// admin-kubeconfig-signer
+		cryptomaterial.NewCertificateSigner(
+			"admin-kubeconfig-signer",
+			cryptomaterial.AdminKubeconfigSignerDir(certsDir),
+			cryptomaterial.ClientCAValidityDays,
+		).WithClientCertificates(
+			&cryptomaterial.ClientCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "admin-kubeconfig-client",
+					ValidityDays: cryptomaterial.AdminKubeconfigClientCertValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "system:admin", Groups: []string{"system:masters"}},
+			}),
+
+		// kubelet + CSR signing chain
+		cryptomaterial.NewCertificateSigner(
+			"kubelet-signer",
+			cryptomaterial.KubeletCSRSignerSignerCertDir(certsDir),
+			cryptomaterial.ClientCAValidityDays,
+		).WithClientCertificates(
+			&cryptomaterial.ClientCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "kubelet-client",
+					ValidityDays: cryptomaterial.ClientCertValidityDays,
+				},
+				// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
+				UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
+			},
+		).WithSubCAs(
+			cryptomaterial.NewCertificateSigner("kube-csr-signer", cryptomaterial.CSRSignerCertDir(certsDir), cryptomaterial.ClientCAValidityDays),
+		),
+	).WithCABundle(
+		cryptomaterial.TotalClientCABundlePath(certsDir),
+		"kube-control-plane-signer",
+		"kube-apiserver-to-kubelet-signer",
+		"admin-kubeconfig-signer",
+		"kubelet-signer",
+		// kube-csr-signer is being added below
+	).WithCABundle(
+		cryptomaterial.KubeletClientCAPath(certsDir),
+		"kube-control-plane-signer",
+		"kube-apiserver-to-kubelet-signer",
+		"admin-kubeconfig-signer",
+		"kubelet-signer",
+		// kube-csr-signer is being added below
+	).Complete()
+
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, controlPlaneSignerCAPEM); err != nil {
-		return nil, fmt.Errorf("failed to add %s to kubelet client CA bundle: %w", "kube-control-plane-signer", err)
-	}
-
-	kcmClientDir := cryptomaterial.KubeControllerManagerClientCertDir(certsDir)
-	certConfigs.kubeControllerManagerClient, _, err = controlPlaneSignerCA.EnsureClientCertificate(
-		cryptomaterial.ClientCertPath(kcmClientDir),
-		cryptomaterial.ClientKeyPath(kcmClientDir),
-		&user.DefaultInfo{Name: "system:kube-controller-manager"},
-		cryptomaterial.ClientCertValidityDays,
-	)
+	csrSignerCAPEM, err := certChains.GetSigner("kubelet-signer", "kube-csr-signer").GetSignerCertPEM()
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate kube-controller-manager client certificate: %w", err)
+		return nil, nil, err
 	}
 
-	schedulerClientDir := cryptomaterial.KubeSchedulerClientCertDir(certsDir)
-	certConfigs.kubeSchedulerClient, _, err = controlPlaneSignerCA.EnsureClientCertificate(
-		cryptomaterial.ClientCertPath(schedulerClientDir),
-		cryptomaterial.ClientKeyPath(schedulerClientDir),
-		&user.DefaultInfo{Name: "system:kube-scheduler"},
-		cryptomaterial.ClientCertValidityDays,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate kube-scheduler client certificate: %w", err)
+	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, csrSignerCAPEM); err != nil {
+		return nil, nil, err
+	}
+
+	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, csrSignerCAPEM); err != nil {
+		return nil, nil, err
 	}
 
 	// kube-apiserver
 	if err := util.GenCerts("etcd-client", filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/etcd-client"),
 		"tls.crt", "tls.key",
 		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := util.GenCerts("kube-apiserver", filepath.Join(cfg.DataDir, "/certs/kube-apiserver/secrets/service-network-serving-certkey"),
 		"tls.crt", "tls.key",
 		[]string{"kube-apiserver", cfg.NodeIP, cfg.NodeName, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes",
 			"localhost",
 			apiServerServiceIP.String()}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := util.GenKeys(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/service-account-key"),
 		"service-account.crt", "service-account.key"); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := util.GenCerts("system:masters", filepath.Join(cfg.DataDir, "/certs/kube-apiserver/secrets/aggregator-client"),
 		"tls.crt", "tls.key",
 		[]string{"system:admin", "system:masters"}); err != nil {
-		return nil, err
-	}
-
-	// kube-apiserver-to-kubelet-signer
-	kubeAPIServerToKubeletSignerCA, kubeAPIServerToKubeletSignerCAPEM, err := generateClientCA(
-		certsDir,
-		cryptomaterial.KubeAPIServerToKubeletSignerCertDir(certsDir),
-		"kube-apiserver-to-kubelet-signer")
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, kubeAPIServerToKubeletSignerCAPEM); err != nil {
-		return nil, fmt.Errorf("failed to add %s to kubelet client CA bundle: %w", "kube-apiserver-to-kubelet-signer", err)
-	}
-
-	kubeAPIServerToKubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
-	_, _, err = kubeAPIServerToKubeletSignerCA.EnsureClientCertificate(
-		cryptomaterial.ClientCertPath(kubeAPIServerToKubeletClientDir),
-		cryptomaterial.ClientKeyPath(kubeAPIServerToKubeletClientDir),
-		&user.DefaultInfo{Name: "system:kube-apiserver", Groups: []string{"kube-master"}},
-		cryptomaterial.ClientCertValidityDays,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate kube-apiserver-to-kubelet client certificate: %w", err)
-	}
-
-	// admin-kubeconfig-signer
-	adminKubeconfigSigner, adminKubeconfigSignerPEM, err := generateClientCA(
-		certsDir,
-		cryptomaterial.AdminKubeconfigSignerDir(certsDir),
-		"admin-kubeconfig-signer",
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, adminKubeconfigSignerPEM); err != nil {
-		return nil, fmt.Errorf("failed to add %s to kubelet client CA bundle: %w", "admin-kubeconfig-signer", err)
-	}
-	adminKubeconfigClientDir := cryptomaterial.AdminKubeconfigClientCertDir(certsDir)
-	certConfigs.adminKubeconfigClient, _, err = adminKubeconfigSigner.EnsureClientCertificate(
-		cryptomaterial.ClientCertPath(adminKubeconfigClientDir),
-		cryptomaterial.ClientKeyPath(adminKubeconfigClientDir),
-		&user.DefaultInfo{Name: "system:admin", Groups: []string{"system:masters"}},
-		cryptomaterial.AdminKubeconfigClientCertValidityDays,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate 'system:admin' client certificate: %w", err)
-	}
-
-	// kubelet + CSR signing chain
-	kubeletCSRSignerSigner, kubeletCSRSignerSignerPEM, err := generateClientCA(
-		certsDir,
-		cryptomaterial.KubeletCSRSignerSignerCertDir(certsDir),
-		"kubelet-signer",
-	)
-	if err != nil {
-		return nil, err
-	}
-	if err := cryptomaterial.AddToKubeletClientCABundle(certsDir, kubeletCSRSignerSignerPEM); err != nil {
-		return nil, fmt.Errorf("failed to add %s to kubelet client CA bundle: %w", "kubelet-signer", err)
-	}
-
-	csrSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
-	csrSigner, err := crypto.MakeCAConfigForDuration(
-		"kube-csr-signer",
-		cryptomaterial.ClientCAValidityDays*time.Hour*24,
-		kubeletCSRSignerSigner,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate the kube-csr-signer certificate: %w", err)
-	}
-
-	if err := csrSigner.WriteCertConfigFile(
-		cryptomaterial.CACertPath(csrSignerDir),
-		cryptomaterial.CAKeyPath(csrSignerDir),
-	); err != nil {
-		return nil, fmt.Errorf("failed to write the kube-csr-signer cert/key pair files: %w", err)
-	}
-	csrSignerCertPEM, _, err := csrSigner.GetPEMBytes()
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve csr-signer CA cert PEM: %w", err)
-	}
-	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, csrSignerCertPEM); err != nil {
-		return nil, fmt.Errorf("failed to add the csr-signer to the trusted client CA bundle: %w", err)
-	}
-
-	kubeletClientDir := cryptomaterial.KubeletClientCertDir(certsDir)
-	certConfigs.kubeletClient, _, err = kubeletCSRSignerSigner.EnsureClientCertificate(
-		cryptomaterial.ClientCertPath(kubeletClientDir),
-		cryptomaterial.ClientKeyPath(kubeletClientDir),
-		// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
-		&user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
-		cryptomaterial.ClientCertValidityDays,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate kubelet client certificate: %w", err)
+		return nil, nil, err
 	}
 
 	if err := util.GenCerts("kubelet", filepath.Join(cfg.DataDir, "/resources/kubelet/secrets/kubelet-server"),
 		"tls.crt", "tls.key",
 		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := util.GenKeys(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/sa-public-key"),
 		"serving-ca.pub", "serving-ca.key"); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// ocp
@@ -273,23 +225,23 @@ func initCerts(cfg *config.MicroshiftConfig) (*tlsConfigs, error) {
 		"tls.crt", "tls.key",
 		[]string{"openshift-controller-manager", cfg.NodeName, cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default",
 			"kubernetes", "localhost"}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := util.GenCerts("service-ca", filepath.Join(cfg.DataDir, "/resources/service-ca/secrets/service-ca"),
 		"tls.crt", "tls.key",
 		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName, apiServerServiceIP.String()}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return certConfigs, nil
+	return clusterTrustBundlePEM, certChains, nil
 }
 
 func initKubeconfig(
 	cfg *config.MicroshiftConfig,
-	certConfigs *tlsConfigs,
+	clusterTrustBundlePEM []byte,
+	certChains *cryptomaterial.CertificateChains,
 ) error {
-	clusterTrustBundlePEM := certConfigs.clusterTrustBundle
 
-	adminKubeconfigCertPEM, adminKubeconfigKeyPEM, err := certConfigs.adminKubeconfigClient.GetPEMBytes()
+	adminKubeconfigCertPEM, adminKubeconfigKeyPEM, err := certChains.GetCertKey("admin-kubeconfig-signer", "admin-kubeconfig-client")
 	if err != nil {
 		return err
 	}
@@ -303,7 +255,7 @@ func initKubeconfig(
 		return err
 	}
 
-	kcmCertPEM, kcmKeyPEM, err := certConfigs.kubeControllerManagerClient.GetPEMBytes()
+	kcmCertPEM, kcmKeyPEM, err := certChains.GetCertKey("kube-control-plane-signer", "kube-controller-manager")
 	if err != nil {
 		return err
 	}
@@ -317,7 +269,7 @@ func initKubeconfig(
 		return err
 	}
 
-	schedulerCertPEM, schedulerKeyPEM, err := certConfigs.kubeSchedulerClient.GetPEMBytes()
+	schedulerCertPEM, schedulerKeyPEM, err := certChains.GetCertKey("kube-control-plane-signer", "kube-scheduler")
 	if err != nil {
 		return err
 	}
@@ -330,7 +282,7 @@ func initKubeconfig(
 		return err
 	}
 
-	kubeletCertPEM, kubeletKeyPEM, err := certConfigs.kubeletClient.GetPEMBytes()
+	kubeletCertPEM, kubeletKeyPEM, err := certChains.GetCertKey("kubelet-signer", "kubelet-client")
 	if err != nil {
 		return err
 	}
@@ -343,28 +295,4 @@ func initKubeconfig(
 		return err
 	}
 	return nil
-}
-
-func generateClientCA(certsDir, signerDir, signerName string) (*crypto.CA, []byte, error) {
-	signerCA, _, err := crypto.EnsureCA(
-		cryptomaterial.CACertPath(signerDir),
-		cryptomaterial.CAKeyPath(signerDir),
-		cryptomaterial.CASerialsPath(signerDir),
-		signerName,
-		cryptomaterial.ClientCAValidityDays,
-	)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to generate %s CA certificate: %w", signerName, err)
-	}
-
-	signerCAPEM, _, err := signerCA.Config.GetPEMBytes()
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to retrieve %s CA PEM: %w", signerName, err)
-	}
-
-	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, signerCAPEM); err != nil {
-		return nil, nil, fmt.Errorf("failed to add %s to trusted client CA bundle: %w", signerName, err)
-	}
-
-	return signerCA, signerCAPEM, nil
 }
