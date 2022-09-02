@@ -215,10 +215,6 @@ spec:
           value: info
         - name: OVN_NORTHD_PROBE_INTERVAL
           value: "5000"
-        - name: K8S_NODE_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
         volumeMounts:
         - mountPath: /run/openvswitch/
           name: run-openvswitch
@@ -319,10 +315,6 @@ spec:
         env:
         - name: OVN_LOG_LEVEL
           value: info
-        - name: K8S_NODE_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
         volumeMounts:
         - mountPath: /run/openvswitch/
           name: run-openvswitch
@@ -349,6 +341,9 @@ spec:
             source "/env/_master"
             set +o allexport
           fi
+
+          # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
+          echo "$(date -Iseconds) - starting ovnkube-master, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - copy ovn-k8s-cni-overlay"
           cp -f /usr/libexec/cni/ovn-k8s-cni-overlay /cni-bin-dir/
@@ -431,6 +426,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         securityContext:
           privileged: true
         terminationMessagePolicy: FallbackToLogsOnError
