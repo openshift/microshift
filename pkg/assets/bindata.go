@@ -78,6 +78,8 @@
 // assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml
 // assets/crd/0000_03_security-openshift_01_scc.crd.yaml
 // assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
+// assets/crd/authorizationv1-local-apiservice.yaml
+// assets/crd/securityv1-local-apiservice.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
 // assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml
@@ -5456,6 +5458,58 @@ func assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml() (*as
 	return a, nil
 }
 
+var _assetsCrdAuthorizationv1LocalApiserviceYaml = []byte(`apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1.authorization.openshift.io
+spec:
+  group: authorization.openshift.io
+  groupPriorityMinimum: 1000
+  version: v1
+  versionPriority: 100
+`)
+
+func assetsCrdAuthorizationv1LocalApiserviceYamlBytes() ([]byte, error) {
+	return _assetsCrdAuthorizationv1LocalApiserviceYaml, nil
+}
+
+func assetsCrdAuthorizationv1LocalApiserviceYaml() (*asset, error) {
+	bytes, err := assetsCrdAuthorizationv1LocalApiserviceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/crd/authorizationv1-local-apiservice.yaml", size: 211, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCrdSecurityv1LocalApiserviceYaml = []byte(`apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1.security.openshift.io
+spec:
+  group: security.openshift.io
+  groupPriorityMinimum: 1000
+  version: v1
+  versionPriority: 100
+`)
+
+func assetsCrdSecurityv1LocalApiserviceYamlBytes() ([]byte, error) {
+	return _assetsCrdSecurityv1LocalApiserviceYaml, nil
+}
+
+func assetsCrdSecurityv1LocalApiserviceYaml() (*asset, error) {
+	bytes, err := assetsCrdSecurityv1LocalApiserviceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/crd/securityv1-local-apiservice.yaml", size: 201, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml = []byte(`allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
@@ -6051,6 +6105,8 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml":                          assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml,
 	"assets/crd/0000_03_security-openshift_01_scc.crd.yaml":                                                  assetsCrd0000_03_securityOpenshift_01_sccCrdYaml,
 	"assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml":                              assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml,
+	"assets/crd/authorizationv1-local-apiservice.yaml":                                                       assetsCrdAuthorizationv1LocalApiserviceYaml,
+	"assets/crd/securityv1-local-apiservice.yaml":                                                            assetsCrdSecurityv1LocalApiserviceYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":                                          assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml":                                      assetsScc0000_20_kubeApiserverOperator_00_sccHostaccessYaml,
 	"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml":                                assetsScc0000_20_kubeApiserverOperator_00_sccHostmountAnyuidYaml,
@@ -6206,6 +6262,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml": {assetsCrd0000_03_authorizationOpenshift_01_rolebindingrestrictionCrdYaml, map[string]*bintree{}},
 			"0000_03_security-openshift_01_scc.crd.yaml":                         {assetsCrd0000_03_securityOpenshift_01_sccCrdYaml, map[string]*bintree{}},
 			"0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml":     {assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml, map[string]*bintree{}},
+			"authorizationv1-local-apiservice.yaml":                              {assetsCrdAuthorizationv1LocalApiserviceYaml, map[string]*bintree{}},
+			"securityv1-local-apiservice.yaml":                                   {assetsCrdSecurityv1LocalApiserviceYaml, map[string]*bintree{}},
 		}},
 		"scc": {nil, map[string]*bintree{
 			"0000_20_kube-apiserver-operator_00_scc-anyuid.yaml":           {assetsScc0000_20_kubeApiserverOperator_00_sccAnyuidYaml, map[string]*bintree{}},
