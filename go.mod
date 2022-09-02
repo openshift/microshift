@@ -286,6 +286,7 @@ replace (
 	github.com/openshift/apiserver-library-go => github.com/openshift/apiserver-library-go v0.0.0-20211209162547-8c11dbc46b6e // from kubernetes
 	github.com/openshift/build-machinery-go => github.com/openshift/build-machinery-go v0.0.0-20210806203541-4ea9b6da3a37 // from kubernetes
 	github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-20211209144617-7385dd6338e3 // from kubernetes
+	github.com/openshift/cluster-policy-controller => github.com/openshift/cluster-policy-controller v0.0.0-20220103093815-8e5b36511861 // release cluster-policy-controller
 	github.com/openshift/library-go => github.com/openshift/library-go v0.0.0-20220331194700-379bd5d96d88 // from kubernetes
 	github.com/pkg/errors => github.com/pkg/errors v0.9.1 // from kubernetes
 	github.com/pquerna/cachecontrol => github.com/pquerna/cachecontrol v0.0.0-20171018203845-0dec1b30a021 // from kubernetes
@@ -317,7 +318,7 @@ replace (
 	k8s.io/client-go => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20220510163048-3afdacbd0183 // staging kubernetes
 	k8s.io/cloud-provider => github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider v0.0.0-20220510163048-3afdacbd0183 // from kubernetes
 	k8s.io/cluster-bootstrap => github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap v0.0.0-20220510163048-3afdacbd0183 // from kubernetes
-	k8s.io/code-generator => github.com/openshift/kubernetes/staging/src/k8s.io/code-generator v0.0.0-20220510163048-3afdacbd0183 // from kubernetes
+	k8s.io/code-generator => github.com/openshift/kubernetes/staging/src/k8s.io/code-generator v0.0.0-20220510163048-3afdacbd0183 // staging kubernetes
 	k8s.io/component-base => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20220510163048-3afdacbd0183 // staging kubernetes
 	k8s.io/component-helpers => github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers v0.0.0-20220510163048-3afdacbd0183 // from kubernetes
 	k8s.io/controller-manager => github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20220510163048-3afdacbd0183 // from kubernetes
