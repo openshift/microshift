@@ -280,11 +280,7 @@ cat "../config/kickstart.ks.template" \
     > kickstart.ks
 
 # Run the ISO creation procedure
-sudo podman run --rm --privileged -ti -v "${ROOTDIR}/_builds":/data -v /dev:/dev registry.access.redhat.com/ubi8 \
-    /bin/bash -c \
-        "dnf -y install lorax; cd /data; \
-        mkksiso kickstart.ks ${IMGNAME}-installer-0.0.0-installer.iso ${IMGNAME}-installer-${IMAGE_VERSION}.${BUILD_ARCH}.iso; \
-        exit"
+sudo mkksiso kickstart.ks ${IMGNAME}-installer-0.0.0-installer.iso ${IMGNAME}-installer-${IMAGE_VERSION}.${BUILD_ARCH}.iso
 sudo chown -R $(whoami). "${ROOTDIR}/_builds"
 
 # Remove intermediate artifacts to free disk space
