@@ -2365,26 +2365,10 @@ func assetsComponentsOpenshiftRouterConfigmapYaml() (*asset, error) {
 }
 
 var _assetsComponentsOpenshiftRouterDeploymentYaml = []byte(`# Deployment with default values
-# Ingress Controller specific values are applied at runtime.
 kind: Deployment
 apiVersion: apps/v1
-metadata:
-  name: router-default
-  namespace: openshift-ingress
-  labels:
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
 spec:
   progressDeadlineSeconds: 600
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  strategy:
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 25%
-    type: RollingUpdate
   template:
     metadata:
       annotations:
@@ -2394,80 +2378,66 @@ spec:
         ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
       serviceAccountName: router
-      # nodeSelector is set at runtime.
       priorityClassName: system-cluster-critical
       containers:
         - name: router
-          image: {{ .ReleaseImage.haproxy_router }}
           imagePullPolicy: IfNotPresent
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
-          - name: http
-            containerPort: 80
-            hostPort: 80
-            protocol: TCP
-          - name: https
-            containerPort: 443
-            hostPort: 443
-            protocol: TCP
-          - name: metrics
-            containerPort: 1936
-            hostPort: 1936
-            protocol: TCP
-          # Merged at runtime.
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP
+            - name: metrics
+              containerPort: 1936
+              protocol: TCP
           env:
-          # stats username and password are generated at runtime
-          - name: STATS_PORT
-            value: "1936"
-          - name: ROUTER_SERVICE_NAMESPACE
-            value: openshift-ingress
-          - name: DEFAULT_CERTIFICATE_DIR
-            value: /etc/pki/tls/private
-          - name: DEFAULT_DESTINATION_CA_PATH
-            value: /var/run/configmaps/service-ca/service-ca.crt
-          - name: ROUTER_CIPHERS
-            value: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
-          - name: ROUTER_DISABLE_HTTP2
-            value: "true"
-          - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
-            value: "false"
-          #FIXME: use metrics tls
-          - name: ROUTER_METRICS_TLS_CERT_FILE
-            value: /etc/pki/tls/private/tls.crt
-          - name: ROUTER_METRICS_TLS_KEY_FILE
-            value: /etc/pki/tls/private/tls.key
-          - name: ROUTER_METRICS_TYPE
-            value: haproxy
-          - name: ROUTER_SERVICE_NAME
-            value: default
-          - name: ROUTER_SET_FORWARDED_HEADERS
-            value: append
-          - name: ROUTER_THREADS
-            value: "4"
-          - name: SSL_MIN_VERSION
-            value: TLSv1.2
+            - name: STATS_PORT
+              value: "1936"
+            - name: ROUTER_SERVICE_NAMESPACE
+              value: openshift-ingress
+            - name: DEFAULT_CERTIFICATE_DIR
+              value: /etc/pki/tls/private
+            - name: DEFAULT_DESTINATION_CA_PATH
+              value: /var/run/configmaps/service-ca/service-ca.crt
+            - name: RELOAD_INTERVAL
+              value: 5s
+            - name: ROUTER_ALLOW_WILDCARD_ROUTES
+              value: "false"
+            - name: ROUTER_CANONICAL_HOSTNAME
+              value: router-default.apps.{{ .ClusterDomain }}
+            - name: ROUTER_CIPHERS
+              value: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+            - name: ROUTER_CIPHERSUITES
+              value: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+            - name: ROUTER_DISABLE_HTTP2
+              value: "true"
+            - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
+              value: "false"
+            - name: ROUTER_LOAD_BALANCE_ALGORITHM
+              value: leastconn
+            - name: ROUTER_METRICS_TYPE
+              value: haproxy
+            - name: ROUTER_SERVICE_NAME
+              value: default
+            - name: ROUTER_SET_FORWARDED_HEADERS
+              value: append
+            - name: ROUTER_TCP_BALANCE_SCHEME
+              value: source
+            - name: ROUTER_THREADS
+              value: "4"
+            - name: SSL_MIN_VERSION
+              value: TLSv1.2
           livenessProbe:
-            failureThreshold: 3
             httpGet:
-              host: localhost
               path: /healthz
               port: 1936
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
           readinessProbe:
-            failureThreshold: 3
             httpGet:
-              host: localhost
               path: /healthz/ready
               port: 1936
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
           startupProbe:
             failureThreshold: 120
             httpGet:
@@ -2479,31 +2449,45 @@ spec:
               cpu: 100m
               memory: 256Mi
           volumeMounts:
-          - mountPath: /etc/pki/tls/private
-            name: default-certificate
-            readOnly: true
-          - mountPath: /var/run/configmaps/service-ca
-            name: service-ca-bundle
-            readOnly: true
-      dnsPolicy: ClusterFirstWithHostNet
-      hostNetwork: true
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: router
+            - mountPath: /etc/pki/tls/private
+              name: default-certificate
+              readOnly: true
+            - mountPath: /var/run/configmaps/service-ca
+              name: service-ca-bundle
+              readOnly: true
+          image: {{ .ReleaseImage.haproxy_router }}
       volumes:
-      - name: default-certificate
-        secret:
+        - name: default-certificate
+          secret:
+            defaultMode: 420
+            secretName: router-certs-default
+        - name: service-ca-bundle
+          configMap:
+            items:
+              - key: service-ca.crt
+                path: service-ca.crt
+            name: service-ca-bundle
+            optional: false
           defaultMode: 420
-          secretName: router-certs-default
-      - name: service-ca-bundle
-        configMap:
-          items:
-          - key: service-ca.crt
-            path: service-ca.crt
-          name: service-ca-bundle
-          optional: false
-        defaultMode: 420
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 3600
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+        node-role.kubernetes.io/worker: ""
+      serviceAccount: router
+      securityContext: {}
+      schedulerName: default-scheduler
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  replicas: 1
+metadata:
+  name: router-default
+  namespace: openshift-ingress
+  labels:
+    ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
 `)
 
 func assetsComponentsOpenshiftRouterDeploymentYamlBytes() ([]byte, error) {
@@ -2516,7 +2500,7 @@ func assetsComponentsOpenshiftRouterDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4746, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4376, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2635,7 +2619,7 @@ metadata:
     # old and new forms of the label for matching with NetworkPolicy
     network.openshift.io/policy-group: ingress
     policy-group.network.openshift.io/ingress: ""
-    `)
+`)
 
 func assetsComponentsOpenshiftRouterNamespaceYamlBytes() ([]byte, error) {
 	return _assetsComponentsOpenshiftRouterNamespaceYaml, nil
@@ -2647,7 +2631,7 @@ func assetsComponentsOpenshiftRouterNamespaceYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 503, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/namespace.yaml", size: 499, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2676,26 +2660,35 @@ func assetsComponentsOpenshiftRouterServiceAccountYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsComponentsOpenshiftRouterServiceCloudYaml = []byte(`kind: Service
+var _assetsComponentsOpenshiftRouterServiceCloudYaml = []byte(`# Load Balancer Service to place in front of the router in cloud environments.
+# Ingress Controller specific values are applied at runtime.
+kind: Service
 apiVersion: v1
 metadata:
-  annotations:
-    service.alpha.openshift.io/serving-cert-secret-name: router-certs-default
-  labels:
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  name: router-external-default
   namespace: openshift-ingress
+  labels:
+    app: router
+    ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
+    router: router-default
+  annotations:
+    traffic-policy.network.alpha.openshift.io/local-with-fallback: ""
+  name: router-default
 spec:
+  type: NodePort
   selector:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  type: NodePort 
+  # This also has the effect of marking LB pool targets as unhealthy when no
+  # router pods are present on a node behind the service.
+  externalTrafficPolicy: Local
   ports:
     - name: http
+      protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: http
     - name: https
+      protocol: TCP
       port: 443
-      targetPort: 443
+      targetPort: https
 `)
 
 func assetsComponentsOpenshiftRouterServiceCloudYamlBytes() ([]byte, error) {
@@ -2708,7 +2701,7 @@ func assetsComponentsOpenshiftRouterServiceCloudYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 523, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-cloud.yaml", size: 894, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2717,30 +2710,30 @@ var _assetsComponentsOpenshiftRouterServiceInternalYaml = []byte(`# Cluster Serv
 # Ingress Controller specific annotations are applied at runtime.
 kind: Service
 apiVersion: v1
-metadata:
-  annotations:
-    service.alpha.openshift.io/serving-cert-secret-name: router-certs-default
-  labels:
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  name: router-internal-default
-  namespace: openshift-ingress
 spec:
-  selector:
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
   type: ClusterIP
   ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
-  - name: https
-    port: 443
-    protocol: TCP
-    targetPort: https
-  - name: metrics
-    port: 1936
-    protocol: TCP
-    targetPort: 1936
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+    - name: metrics
+      port: 1936
+      protocol: TCP
+      targetPort: 1936
+  selector:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+metadata:
+  labels:
+    ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
+  name: router-internal-default
+  namespace: openshift-ingress
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: router-certs-default
 `)
 
 func assetsComponentsOpenshiftRouterServiceInternalYamlBytes() ([]byte, error) {
@@ -2753,7 +2746,7 @@ func assetsComponentsOpenshiftRouterServiceInternalYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/service-internal.yaml", size: 727, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/service-internal.yaml", size: 747, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
