@@ -3103,7 +3103,7 @@ spec:
       containers:
       # ovn-northd: convert network objects in nbdb to flows in sbdb
       - name: northd
-        image: {{ .ReleaseImage.ovn_kubernetes }}
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
         command:
         - /bin/bash
         - -c
@@ -3156,7 +3156,7 @@ spec:
 
       # nbdb: the northbound, or logical network object DB. In standalone mode
       - name: nbdb
-        image: {{ .ReleaseImage.ovn_kubernetes }}
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
         command:
         - /bin/bash
         - -c
@@ -3289,7 +3289,7 @@ spec:
 
       # sbdb: The southbound, or flow DB. In standalone mode
       - name: sbdb
-        image: {{ .ReleaseImage.ovn_kubernetes }}
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
         command:
         - /bin/bash
         - -c
@@ -3389,7 +3389,7 @@ spec:
 
       # ovnkube master: convert kubernetes objects in to nbdb logical network components
       - name: ovnkube-master
-        image: {{ .ReleaseImage.ovn_kubernetes }}
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
         command:
         - /bin/bash
         - -c
@@ -3558,7 +3558,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15843, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15887, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3660,7 +3660,7 @@ spec:
       containers:
       # ovn-controller: programs the vswitch with flows from the sbdb
       - name: ovn-controller
-        image: {{ .ReleaseImage.ovn_kubernetes }}
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
         command:
         - /bin/bash
         - -c
@@ -3759,7 +3759,7 @@ func assetsComponentsOvnNodeDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3968, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3979, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
