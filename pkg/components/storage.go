@@ -2,10 +2,11 @@ package components
 
 import (
 	"github.com/openshift/microshift/pkg/assets"
+	"github.com/openshift/microshift/pkg/config"
 	"k8s.io/klog/v2"
 )
 
-func startCSIPLugin(kubeconfigPath string) error {
+func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml",
@@ -93,11 +94,11 @@ func startCSIPLugin(kubeconfigPath string) error {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyDeployments(deploy, renderReleaseImage, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyDeployments(deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, renderReleaseImage, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ds, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
 		return err
 	}
