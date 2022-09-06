@@ -88,8 +88,8 @@ func ServiceCADir(certsDir string) string {
 	return filepath.Join(certsDir, "service-ca")
 }
 
-func OpenshiftControllerManagerServingCertDir(certsDir string) string {
-	return filepath.Join(ServiceCADir(certsDir), "openshift-controller-manager-serving")
+func RouteControllerManagerServingCertDir(certsDir string) string {
+	return filepath.Join(ServiceCADir(certsDir), "route-controller-manager-serving")
 }
 
 func AggregatorSignerDir(certsDir string) string {

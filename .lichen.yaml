@@ -21,7 +21,7 @@ exceptions:
   # to the type of license, it comes from RedHat, so we assume it's safe to import.
   unresolvableLicense:
   - path: "github.com/openshift/openshift-apiserver"
-  - path: "github.com/openshift/openshift-controller-manager"
+  - path: "github.com/openshift/route-controller-manager"
   # The CNFC maintains a list of project license exceptions which are safe or Apache-2
   # compliant, those exceptions are maintained here:
   # https://github.com/cncf/foundation/tree/main/license-exceptions

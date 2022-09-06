@@ -17,14 +17,15 @@ package controllers
 
 import (
 	"context"
-	"io"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 
 	"k8s.io/klog/v2"
 
-	openshift_controller_manager "github.com/openshift/openshift-controller-manager/pkg/cmd/openshift-controller-manager"
+	configv1 "github.com/openshift/api/config/v1"
+	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
+	"github.com/openshift/library-go/pkg/config/configdefaults"
+	"github.com/openshift/library-go/pkg/config/helpers"
+	"github.com/openshift/library-go/pkg/config/leaderelection"
+	route_controller_manager "github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
@@ -32,85 +33,67 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
-type OCPControllerManager struct {
-	kubeconfig     string
-	ConfigFilePath string
-	Output         io.Writer
+type OCPRouteControllerManager struct {
+	kubeconfig string
+	config     *openshiftcontrolplanev1.OpenShiftControllerManagerConfig
 }
 
 const (
-	// OCPControllerManager component name
-	componentOCM = "openshift-controller-manager"
+	// OCPRouteControllerManager component name
+	componentRCM = "route-controller-manager"
 )
 
-func NewOpenShiftControllerManager(cfg *config.MicroshiftConfig) *OCPControllerManager {
-	s := &OCPControllerManager{}
+func NewRouteControllerManager(cfg *config.MicroshiftConfig) *OCPRouteControllerManager {
+	s := &OCPRouteControllerManager{}
 	s.configure(cfg)
 	return s
 }
 
-func (s *OCPControllerManager) Name() string { return componentOCM }
-func (s *OCPControllerManager) Dependencies() []string {
+func (s *OCPRouteControllerManager) Name() string { return componentRCM }
+func (s *OCPRouteControllerManager) Dependencies() []string {
 	return []string{"kube-apiserver", "openshift-crd-manager"}
 }
 
-func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
+func (s *OCPRouteControllerManager) configure(cfg *config.MicroshiftConfig) {
 	s.kubeconfig = cfg.KubeConfigPath(config.KubeAdmin)
+	s.config = s.writeConfig(cfg)
+}
 
-	if err := s.writeConfig(cfg); err != nil {
-		klog.Fatalf("Failed to write openshift-controller-manager config %v", err)
+func (s *OCPRouteControllerManager) writeConfig(cfg *config.MicroshiftConfig) *openshiftcontrolplanev1.OpenShiftControllerManagerConfig {
+	servingCertDir := cryptomaterial.RouteControllerManagerServingCertDir(cryptomaterial.CertsDirectory(cfg.DataDir))
+
+	c := &openshiftcontrolplanev1.OpenShiftControllerManagerConfig{
+		KubeClientConfig: configv1.KubeClientConfig{
+			KubeConfig: s.kubeconfig,
+			ConnectionOverrides: configv1.ClientConnectionOverrides{
+				ContentType: "application/json",
+			},
+		},
+		ServingInfo: &configv1.HTTPServingInfo{
+			ServingInfo: configv1.ServingInfo{
+				BindAddress: "0.0.0.0:8445",
+				BindNetwork: "tcp4",
+				CertInfo: configv1.CertInfo{
+					CertFile: cryptomaterial.ServingCertPath(servingCertDir),
+					KeyFile:  cryptomaterial.ServingKeyPath(servingCertDir),
+				},
+				ClientCA: cryptomaterial.TotalClientCABundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)),
+			},
+		},
+		Controllers: []string{
+			"openshift.io/ingress-ip",
+			"openshift.io/ingress-to-route",
+		},
 	}
 
-	var configFilePath = cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml"
-	s.ConfigFilePath = configFilePath
-	s.Output = os.Stdout
+	// https://github.com/openshift/route-controller-manager/blob/main/pkg/cmd/route-controller-manager/openshiftcontrolplane_default.go
+	configdefaults.SetRecommendedHTTPServingInfoDefaults(c.ServingInfo)
+	configdefaults.SetRecommendedKubeClientConfigDefaults(&c.KubeClientConfig)
+	c.LeaderElection = leaderelection.LeaderElectionDefaulting(c.LeaderElection, "kube-system", "openshift-route-controllers")
+	return c
 }
 
-func (s *OCPControllerManager) writeConfig(cfg *config.MicroshiftConfig) error {
-	servingCertDir := cryptomaterial.OpenshiftControllerManagerServingCertDir(cryptomaterial.CertsDirectory(cfg.DataDir))
-
-	// OCM config contains a list of controllers to enable/disable.
-	// If no list is specified, all controllers are started (default).
-	// If a non-zero length list is specified, only controllers enabled in the list are started.  Unlisted controllers
-	// are therefore disabled.  Enable controllers by appending their name to `controllers:`. Disable a controller by
-	// prepending "-" to the name, e.g. `controllers: ["-openshift.io/build"]
-	// Disabled OCM controllers are included in the list for documentary purposes.
-	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
-kind: OpenShiftControllerManagerConfig
-kubeClientConfig:
-  kubeConfig: ` + s.kubeconfig + `
-  connectionOverrides:
-    contentType: "application/json"
-servingInfo:
-  bindAddress: "0.0.0.0:8445"
-  certFile: ` + cryptomaterial.ServingCertPath(servingCertDir) + `
-  keyFile:  ` + cryptomaterial.ServingKeyPath(servingCertDir) + `
-  clientCA: ` + cryptomaterial.TotalClientCABundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
-controllers:
-- "openshift.io/ingress-ip"
-- "openshift.io/ingress-to-route"
-- "-openshift.io/build"
-- "-openshift.io/build-config-change"
-- "-openshift.io/default-rolebindings"
-- "-openshift.io/deployer"
-- "-openshift.io/deploymentconfig"
-- "-openshift.io/image-import"
-- "-openshift.io/image-signature-import"
-- "-openshift.io/image-trigger"
-- "-openshift.io/origin-namespace"
-- "-openshift.io/serviceaccount"
-- "-openshift.io/serviceaccount-pull-secrets"
-- "-openshift.io/templateinstance"
-- "-openshift.io/templateinstancefinalizer"
-- "-openshift.io/unidling"
-`)
-
-	path := filepath.Join(cfg.DataDir, "resources", "openshift-controller-manager", "config", "config.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
-	return ioutil.WriteFile(path, data, 0644)
-}
-
-func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
 	// run readiness check
@@ -124,13 +107,18 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	}()
 
 	if err := assets.ApplyNamespaces([]string{
-		"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml",
+		"assets/core/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml",
 	}, s.kubeconfig); err != nil {
 		klog.Fatalf("failed to apply openshift namespaces %v", err)
 	}
+	clientConfig, err := helpers.GetKubeClientConfig(s.config.KubeClientConfig)
+	if err != nil {
+		return err
+	}
 
-	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
-	options.ConfigFilePath = s.ConfigFilePath
-
-	return options.StartControllerManager(ctx.Done())
+	if err := route_controller_manager.RunRouteControllerManager(s.config, clientConfig); err != nil {
+		return err
+	}
+	<-ctx.Done()
+	return nil
 }
