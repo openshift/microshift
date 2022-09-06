@@ -91,6 +91,17 @@ When deciding between different design options, we follow the following principl
 * MicroShift uses as few configuration options as possible. Where it provides configuration options, they are intuitive and have sensible defaults respectively are auto-configured.
 * MicroShift is preferably configured through config files, but allows overriding of parameters via environment variables (for use in containers, systemd) and command line flags (for ad-hoc use).
 * MicroShift can use both user-local and system-wide configuration.
+* Components built into the `microshift` binary are configured by modifying `config.yaml` and restarting the service, instead of through Kubernetes APIs as in standalone OpenShift. This ensures that:
+  * MicroShift can act as an "application running on RHEL", which avoids requiring Kubernetes expertise to deploy it.
+  * Configuration changes can be packaged as part of an ostree update with the OS.
+  * The configurable options can be limited and abstracted for the MicroShift use case.
+  * The complexity of applying configuration changes is minimized by not attempting to reconfigure a running component on the fly.
+* Components bundled with MicroShift but not built into the `microshift` binary (CSI and CNI drivers, for example) may be configured with configuration files native to the bundled application (`lvmd` or OVN-K). This approach means
+    * We can separate the OS-level configuration ("bottom half") of these components from the cluster-level configuration ("top half").
+    * The components may be treated as optional or replaceable for deployments with different needs.
+    * We avoid importing the configuration API of those bundled components into MicroShift.
+* MicroShift does not have knowledge of configuring add-on components such as operators, alternative CSI implementations, etc.
+* Applications running on MicroShift are configured with Kubernetes resources, which can be loaded automatically from manifests or managed through the API.
 
 ### Security
 * MicroShift instances should run with least privileges. In particular Control Plane-only instances should run completely non-privileged.
