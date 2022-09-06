@@ -3948,6 +3948,14 @@ rules:
   - list
   - watch
   - update
+- apiGroups:
+  - config.openshift.io
+  resources:
+  - infrastructures
+  verbs:
+  - get
+  - list
+  - watch
 `)
 
 func assetsComponentsServiceCaClusterroleYamlBytes() ([]byte, error) {
@@ -3960,7 +3968,7 @@ func assetsComponentsServiceCaClusterroleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/clusterrole.yaml", size: 864, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/clusterrole.yaml", size: 970, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4002,7 +4010,6 @@ metadata:
     app: service-ca
     service-ca: "true"
 spec:
-  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -4018,48 +4025,48 @@ spec:
         app: service-ca
         service-ca: "true"
     spec:
-      serviceAccount: service-ca
       serviceAccountName: service-ca
       containers:
-      - name: service-ca-controller
-        image: {{ .ReleaseImage.service_ca_operator }}
-        imagePullPolicy: IfNotPresent
-        command: ["service-ca-operator", "controller"]
-        ports:
-        - containerPort: 8443
-        securityContext:
-          runAsNonRoot: true
-        resources:
-          requests:
-            memory: 120Mi
-            cpu: 10m
-        volumeMounts:
-        - mountPath: /var/run/secrets/signing-key
-          name: signing-key
-        - mountPath: /var/run/configmaps/signing-cabundle
-          name: signing-cabundle
+        - name: service-ca-controller
+          image: {{ .ReleaseImage.service_ca_operator }}
+          imagePullPolicy: IfNotPresent
+          command: ["service-ca-operator", "controller"]
+          ports:
+            - containerPort: 8443
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            requests:
+              memory: 120Mi
+              cpu: 10m
+          volumeMounts:
+            - mountPath: /var/run/secrets/signing-key
+              name: signing-key
+            - mountPath: /var/run/configmaps/signing-cabundle
+              name: signing-cabundle
       volumes:
-      - name: signing-key
-        secret:
-          secretName: {{.TLSSecret}}
-      - name: signing-cabundle
-        configMap:
-          name: {{.CAConfigMap}}
-      # nodeSelector:
-      #   node-role.kubernetes.io/master: ""
+        - name: signing-key
+          secret:
+            secretName: {{.TLSSecret}}
+        - name: signing-cabundle
+          configMap:
+            name: {{.CAConfigMap}}
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"
       tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: "NoSchedule"
-      - key: "node.kubernetes.io/unreachable"
-        operator: "Exists"
-        effect: "NoExecute"
-        tolerationSeconds: 120
-      - key: "node.kubernetes.io/not-ready"
-        operator: "Exists"
-        effect: "NoExecute"
-        tolerationSeconds: 120
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: "NoSchedule"
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 120
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 120
+  replicas: 1
 `)
 
 func assetsComponentsServiceCaDeploymentYamlBytes() ([]byte, error) {
@@ -4072,7 +4079,7 @@ func assetsComponentsServiceCaDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1836, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/deployment.yaml", size: 1877, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4084,7 +4091,6 @@ metadata:
   annotations:
     openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
-
 `)
 
 func assetsComponentsServiceCaNsYamlBytes() ([]byte, error) {
@@ -4097,7 +4103,7 @@ func assetsComponentsServiceCaNsYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 169, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/ns.yaml", size: 168, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4148,7 +4154,8 @@ rules:
   verbs:
   - get
   - list
-  - watch`)
+  - watch
+`)
 
 func assetsComponentsServiceCaRoleYamlBytes() ([]byte, error) {
 	return _assetsComponentsServiceCaRoleYaml, nil
@@ -4160,7 +4167,7 @@ func assetsComponentsServiceCaRoleYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/role.yaml", size: 634, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/role.yaml", size: 635, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4173,7 +4180,6 @@ metadata:
 roleRef:
   kind: Role
   name: system:openshift:controller:service-ca
-  apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
   namespace: openshift-service-ca
@@ -4190,7 +4196,7 @@ func assetsComponentsServiceCaRolebindingYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/service-ca/rolebinding.yaml", size: 343, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/service-ca/rolebinding.yaml", size: 305, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
