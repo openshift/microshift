@@ -30,6 +30,18 @@ const (
 	gracefulShutdownTimeout = 60
 )
 
+func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
+	flags := cmd.Flags()
+	// Read the config flag directly into the struct, so it's immediately available.
+	flags.StringVar(&cfg.ConfigFile, "config", cfg.ConfigFile, "File to read configuration from.")
+	cmd.MarkFlagFilename("config", "yaml", "yml")
+	// All other flags will be read after reading both config file and env vars.
+	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
+	flags.String("audit-log-dir", cfg.AuditLogDir, "Directory for storing audit logs.")
+	flags.StringSlice("roles", cfg.Roles, "Roles of this MicroShift instance.")
+	flags.Bool("debug.pprof", false, "Enable golang pprof debugging")
+}
+
 func NewRunMicroshiftCommand() *cobra.Command {
 	cfg := config.NewMicroshiftConfig()
 
@@ -41,15 +53,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 		},
 	}
 
-	flags := cmd.Flags()
-	// Read the config flag directly into the struct, so it's immediately available.
-	flags.StringVar(&cfg.ConfigFile, "config", cfg.ConfigFile, "File to read configuration from.")
-	cmd.MarkFlagFilename("config", "yaml", "yml")
-	// All other flags will be read after reading both config file and env vars.
-	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
-	flags.String("audit-log-dir", cfg.AuditLogDir, "Directory for storing audit logs.")
-	flags.StringSlice("roles", cfg.Roles, "Roles of this MicroShift instance.")
-	flags.Bool("debug.pprof", false, "Enable golang pprof debugging")
+	addRunFlags(cmd, cfg)
 
 	return cmd
 }
