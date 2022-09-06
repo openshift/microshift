@@ -3276,10 +3276,6 @@ spec:
           value: info
         - name: OVN_NORTHD_PROBE_INTERVAL
           value: "5000"
-        - name: K8S_NODE_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
         volumeMounts:
         - mountPath: /run/openvswitch/
           name: run-openvswitch
@@ -3380,10 +3376,6 @@ spec:
         env:
         - name: OVN_LOG_LEVEL
           value: info
-        - name: K8S_NODE_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
         volumeMounts:
         - mountPath: /run/openvswitch/
           name: run-openvswitch
@@ -3410,6 +3402,9 @@ spec:
             source "/env/_master"
             set +o allexport
           fi
+
+          # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
+          echo "$(date -Iseconds) - starting ovnkube-master, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - copy ovn-k8s-cni-overlay"
           cp -f /usr/libexec/cni/ovn-k8s-cni-overlay /cni-bin-dir/
@@ -3492,6 +3487,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         securityContext:
           privileged: true
         terminationMessagePolicy: FallbackToLogsOnError
@@ -3561,7 +3560,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15770, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15843, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3675,7 +3674,9 @@ spec:
             set +o allexport
           fi
 
-          echo "$(date -Iseconds) - starting ovn-controller"
+          # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
+          echo "$(date -Iseconds) - starting ovn-controller, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
+
           exec ovn-controller unix:/var/run/openvswitch/db.sock -vfile:off \
             --no-chdir --pidfile=/var/run/ovn/ovn-controller.pid \
             --syslog-method="null" \
@@ -3694,6 +3695,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         volumeMounts:
         - mountPath: /run/openvswitch
           name: run-openvswitch
@@ -3756,7 +3761,7 @@ func assetsComponentsOvnNodeDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3736, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/node/daemonset.yaml", size: 3968, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
