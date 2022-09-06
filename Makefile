@@ -32,8 +32,8 @@ SRC_ROOT :=$(shell pwd)
 IMAGE_REPO :=quay.io/microshift/microshift
 IMAGE_REPO_AIO :=quay.io/microshift/microshift-aio
 OUTPUT_DIR :=_output
-RPM_BUILD_DIR :=packaging/rpm/_rpmbuild
-ISO_DIR :=scripts/image-builder/_builds
+RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
+ISO_DIR :=$(OUTPUT_DIR)/image-builder
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
@@ -48,6 +48,9 @@ endif
 
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
+
+# Build to a place we can ignore
+GO_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
 ifeq ($(DEBUG),true)
 	# throw all the debug info in!
