@@ -1,20 +1,11 @@
 [microshift]
-microshift.example.com ansible_host= private_ip= # microshift node
+microshift.example.com ansible_host= # microshift node
 
 [microshift:vars]
-ansible_user=centos
-ansible_become=yes
-pbench_key_url=
-pbench_config_url=
+ansible_user=microshift
 
 [logging]
-logging.example.com ansible_host= private_ip= # logging node
 
 [logging:vars]
 ansible_user=centos
 ansible_become=yes
-
-[all:vars]
-sm_user=
-sm_pass=
-pool_id=

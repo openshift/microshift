@@ -3,41 +3,44 @@
 
 - name: RHEL tasks
   block:
-    - name: check if we have subscription-manager installed
-      ansible.builtin.command: which subscription-manager
-      register: sm_present
-      ignore_errors: true
+  - name: subscription-manager tasks
+    block:
+      - name: check if we have subscription-manager installed
+        ansible.builtin.command: which subscription-manager
+        register: sm_present
+        ignore_errors: true
 
-    - name: install subscription-manager
-      ansible.builtin.dnf:
-        name:
-        - subscription-manager
-      when: sm_present.rc != 0
+      - name: install subscription-manager
+        ansible.builtin.dnf:
+          name:
+          - subscription-manager
+        when: sm_present.rc != 0
 
-    - name: register host with subscription manager
-      community.general.redhat_subscription:
-        state: present
-        username: "{{ rhel_username }}"
-        password: "{{ rhel_password }}"
-        pool_ids: "{{ rhel_pool_id }}"
+      - name: register host with subscription manager
+        community.general.redhat_subscription:
+          state: present
+          username: "{{ rhel_username }}"
+          password: "{{ rhel_password }}"
+          pool_ids: "{{ rhel_pool_id }}"
 
-    - name: enable repo management from subscription-manager
-      ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
+      - name: enable repo management from subscription-manager
+        ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
 
-    - name: disable all repos
-      community.general.rhsm_repository:
-        name: '*'
-        state: disabled
+      - name: disable all repos
+        community.general.rhsm_repository:
+          name: '*'
+          state: disabled
+    when: manage_subscription
 
-    - name: enable required repos for microshift
-      community.general.rhsm_repository:
-        name: "{{ rhel_repos }}"
+  - name: enable required repos for microshift
+    community.general.rhsm_repository:
+      name: "{{ rhel_repos }}"
 
-    - name: install EPEL repo
-      ansible.builtin.dnf:
-        name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
-        disable_gpg_check: true
-        state: present
+  - name: install EPEL repo
+    ansible.builtin.dnf:
+      name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
+      disable_gpg_check: true
+      state: present
   when: ansible_distribution == "RedHat"
 
 - name: CentOS tasks
@@ -59,3 +62,16 @@
         state: present
   when: ansible_distribution == "CentOS"
 
+- name: gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: pbench-agent is installed
+  ansible.builtin.set_fact:
+    pbench_installed: true
+  when: "'pbench-agent' in ansible_facts.packages"
+
+- name: pbench-agent is not installed
+  ansible.builtin.set_fact:
+    pbench_installed: false
+  when: "'pbench-agent' not in ansible_facts.packages"

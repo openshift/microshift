@@ -1,110 +1,6 @@
 ---
 # install-microshift tasks
 
-- name: install firewalld & packages
-  ansible.builtin.dnf:
-    name: "{{ install_packages }}"
-    state: present
-    update_cache: true
-
-- name: check if rhel vg exists
-  ansible.builtin.command: vgdisplay -s {{ vg_name }}
-  register: rhel_vg_present
-  ignore_errors: true
-
-- name: create a volume group on top of secondary disk for topolvm
-  community.general.lvg:
-    vg: "{{ vg_name }}"
-    pvs: "{{ lvm_disk }}"
-  when: rhel_vg_present.rc != 0
-
-- name: check if we have oc installed
-  ansible.builtin.command: which oc
-  register: oc_present
-  ignore_errors: true
-
-- name: download and extract oc client
-  ansible.builtin.unarchive:
-    src: "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/{{ oc_archive_name }}"
-    dest: "{{ root_bin_dir }}"
-    remote_src: yes
-  when: oc_present.rc != 0
-
-- name: install node-exporter
-  ansible.builtin.dnf:
-    name:
-    - golang-github-prometheus-node-exporter
-    state: present
-
-- name: download cadvisor
-  ansible.builtin.get_url:
-    url: "{{ cadvisor_url }}"
-    dest: /usr/bin/cadvisor
-    checksum: "{{ cadvisor_checksum }}"
-    mode: '0755'
-
-- name: install systemd unit for cadvisor
-  ansible.builtin.template:
-    src: cadvisor.service.j2
-    dest: /usr/lib/systemd/system/cadvisor.service
-    backup: true
-
-- name: start and enable systemd services
-  ansible.builtin.systemd:
-    name: "{{ item }}"
-    daemon_reload: yes
-    state: started
-    enabled: yes
-  with_items: "{{ systemd_services }}"
-
-- name: create .kube home dir
-  ansible.builtin.file:
-    path: /root/.kube/
-    state: directory
-
-- name: create symbolic link for kubeconfig
-  ansible.builtin.file:
-    src: "{{ remote_kubeconfig_path }}"
-    path: "/root/.kube/config"
-    state: link
-    force: yes
-
-- name: permit traffic in trusted zone from CIDR
-  ansible.posix.firewalld:
-    source: "{{ item }}"
-    state: enabled
-    immediate: yes
-    permanent: yes
-    zone: trusted
-  with_items: "{{ firewall_trusted_cidr }}"
-
-- name: permit traffic in public zone for services
-  ansible.posix.firewalld:
-    service: "{{ item }}"
-    state: enabled
-    immediate: yes
-    permanent: yes
-    zone: public
-  with_items: "{{ firewall_services }}"
-
-- name: permit traffic in public zone for ports
-  ansible.posix.firewalld:
-    port: "{{ item }}"
-    state: enabled
-    immediate: yes
-    permanent: yes
-    zone: public
-  with_items: "{{ firewall_ports }}"
-
-- name: upgrade all packages
-  ansible.builtin.dnf:
-    name: "*"
-    state: latest
-  notify: reboot machine
-
-- name: flush handlers
-  ansible.builtin.meta: flush_handlers
-
 - name: record initial disk space
   vars:
     filename: disk0.txt
@@ -114,6 +10,7 @@
 - name: build & install microshift RPMs on RHEL
   block:
     - name: install cri-o
+      become: yes
       ansible.builtin.dnf:
         name:
           - cri-o
@@ -121,17 +18,29 @@
         state: present
 
     - name: start & enable crio service
+      become: yes
       ansible.builtin.systemd:
         name: crio
         state: started
         enabled: yes
 
+    - name: check if microshift dir exists
+      ansible.builtin.stat:
+        path: "{{ microshift_dir }}"
+      register: ms_dir
+
     - name: clone microshift git repo
       ansible.builtin.git:
         repo: "{{ microshift_repo }}"
         dest: "{{ microshift_dir }}"
+      when: not ms_dir.stat.exists
 
-    - name: make microshift RPMs
+    - name: make clean
+      ansible.builtin.command: make clean
+      args:
+        chdir: "{{ microshift_dir }}"
+
+    - name: make rpm
       ansible.builtin.command: make rpm
       args:
         chdir: "{{ microshift_dir }}"
@@ -145,10 +54,11 @@
 
     - name: make list of built RPM paths
       ansible.builtin.set_fact:
-        microshift_rpms: "{{ microshift_rpms }} + [ '{{ item.path }}' ]"
+        microshift_rpms: "{{ microshift_rpms + [ item.path ] }}"
       with_items: "{{ microshift_find.files }}"
 
     - name: install microshift RPMs
+      become: yes
       ansible.builtin.dnf:
         name: "{{ microshift_rpms }}"
         state: present
@@ -156,6 +66,7 @@
   when: ansible_distribution == "RedHat"
 
 - name: install microshift RPMs on CentOS
+  become: yes
   block:
     - name: enable microshift copr repo
       community.general.copr:
@@ -185,6 +96,7 @@
         chdir: "{{ etcd_dir }}"
 
     - name: install etcd binary
+      become: yes
       ansible.builtin.copy:
         src: "{{ etcd_dir }}/bin/etcd"
         dest: "/usr/bin/etcd"
@@ -192,6 +104,7 @@
         mode: '0755'
 
     - name: copy etcd systemd unit to node
+      become: yes
       ansible.builtin.copy:
         src: etcd.service
         dest: /usr/lib/systemd/system/etcd.service
@@ -200,21 +113,35 @@
         mode: '0664'
 
     - name: start etcd service
+      become: yes
       ansible.builtin.systemd:
         daemon_reload: yes
         state: started
         name: etcd
   when: build_etcd_binary | bool
 
+- name: check if pull-secret is present
+  ansible.builtin.stat:
+    path: /etc/crio/openshift-pull-secret
+  register: pull_secret
+
 - name: copy pull-secret to node
+  become: yes
   ansible.builtin.copy:
     src: pull-secret.txt
     dest: /etc/crio/openshift-pull-secret
     owner: root
     group: root
     mode: '0600'
+  when: not pull_secret.stat.exists
+
+- name: create .kube home dir
+  ansible.builtin.file:
+    path: ~/.kube/
+    state: directory
 
 - name: pbench recording start
+  become: yes
   block:
   - name: source pbench-agent & register-tool-set
     ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
@@ -251,23 +178,42 @@
     start_time: "{{ ansible_date_time.iso8601[:19] }}"
 
 - name: start microshift service
+  become: yes
   ansible.builtin.systemd:
     name: microshift
     state: started
     enabled: no
 
+- name: check for cadvisor
+  ansible.builtin.command: which cadvisor
+  register: cadvisor_check
+  ignore_errors: true
+
 - name: restart cadvisor to pick up new containers
+  become: yes
   ansible.builtin.systemd:
     name: cadvisor
     state: restarted
+  when: cadvisor_check.rc == 0
 
 - name: wait for kubeconfig to exist on microshift node
+  become: yes
   ansible.builtin.stat:
     path: "{{ remote_kubeconfig_path }}"
   register: remote_kubeconfig
   until: remote_kubeconfig.stat.exists
   retries: 30
   delay: 10
+
+- name: create copy of kubeconfig
+  become: yes
+  ansible.builtin.copy:
+    src: "{{ remote_kubeconfig_path }}"
+    dest: "/home/{{ ansible_user }}/.kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    remote_src: yes
+    force: yes
 
 - include_tasks: roles/common/tasks/readinesscheck.yml
 
@@ -287,20 +233,8 @@
     create: yes
   delegate_to: localhost
 
-- name: stress etcd with configmap loading
-  ansible.builtin.shell: |
-    for i in {5255..5355}; do
-      oc new-project project-$i
-      oc create configmap project-$i --from-file=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
-    done
-
-#- name: copy kubeconfig to localhost
-#  ansible.builtin.fetch:
-#    src: "{{ remote_kubeconfig_path }}"
-#    dest: "{{ local_kubeconfig_path }}"
-#    flat: yes
-
 - name: finish pbench capture
+  become: yes
   block:
   - name: check on pbench-user-benchmark status
     ansible.builtin.async_status:
@@ -321,3 +255,7 @@
     filename: disk2.txt
   include_tasks: disk.yml
   loop: "{{ du_dirs }}"
+
+- name: cleanup microshift data
+  ansible.builtin.shell: echo 1 | /usr/bin/cleanup-all-microshift-data
+  when: cleanup_microshift | default('true') | bool
