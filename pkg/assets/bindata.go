@@ -4279,12 +4279,12 @@ func assetsComponentsServiceCaSigningSecretYaml() (*asset, error) {
 var _assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml = []byte(`apiVersion: v1
 kind: Namespace
 metadata:
+  name: openshift-controller-manager
   annotations:
-    include.release.openshift.io/self-managed-high-availability: "true"
     openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
   labels:
     openshift.io/cluster-monitoring: "true"
-  name: openshift-controller-manager
 `)
 
 func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYamlBytes() ([]byte, error) {
@@ -4297,7 +4297,7 @@ func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 254, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 230, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5402,8 +5402,7 @@ func assetsCrd0000_03_securityOpenshift_01_sccCrdYaml() (*asset, error) {
 	return a, nil
 }
 
-var _assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml = []byte(`# 0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
-apiVersion: apiextensions.k8s.io/v1
+var _assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
@@ -5465,7 +5464,7 @@ func assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml", size: 2388, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
+	info := bindataFileInfo{name: "assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml", size: 2323, mode: os.FileMode(420), modTime: time.Unix(1654679854, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
