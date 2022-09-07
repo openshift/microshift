@@ -50,7 +50,7 @@ Usage: build.sh <-pull_secret_file path_to_file> [OPTION]...
 Optional arguments:
   -microshift_rpms path_or_URL
           Path or URL to the MicroShift RPM packages to be included
-          in the image (default: packaging/rpm/_rpmbuild/RPMS)
+          in the image (default: _output/rpmbuild/RPMS)
   -custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm
           Path to one or more comma-separated RPM packages to be
           included in the image (default: none)

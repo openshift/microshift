@@ -35,7 +35,7 @@ usage() {
     echo "Optional arguments:"
     echo "  -microshift_rpms path_or_URL"
     echo "          Path or URL to the MicroShift RPM packages to be included"
-    echo "          in the image (default: packaging/rpm/_rpmbuild/RPMS)"
+    echo "          in the image (default: _output/rpmbuild/RPMS)"
     echo "  -custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm"
     echo "          Path to one or more comma-separated RPM packages to be"
     echo "          included in the image (default: none)"

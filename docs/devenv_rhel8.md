@@ -82,13 +82,13 @@ make rpm
 make srpm
 ```
 
-The artifacts of the build are located in the `packaging` directory.
+The artifacts of the build are located in the `_output/rpmbuild` directory.
 ```bash
-$ find ~/microshift/packaging -name \*.rpm
-packaging/rpm/_rpmbuild/RPMS/x86_64/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
-packaging/rpm/_rpmbuild/RPMS/x86_64/microshift-4.10.0-networking-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
-packaging/rpm/_rpmbuild/RPMS/noarch/microshift-selinux-4.10.0-nightly_1654189204_34_gc871db21.el8.noarch.rpm
-packaging/rpm/_rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.src.rpm
+$ find ~/microshift/_output/rpmbuild -name \*.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-4.10.0-networking-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
+_output/rpmbuild/RPMS/noarch/microshift-selinux-4.10.0-nightly_1654189204_34_gc871db21.el8.noarch.rpm
+_output/rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.src.rpm
 ```
 
 ## Run MicroShift Executable
@@ -100,7 +100,7 @@ Enable the needed repositories and install the MicroShift RPM packages. This pro
 sudo subscription-manager repos \
     --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms \
     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
-sudo dnf localinstall -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
+sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 ```
 
 Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page. Copy it to `/etc/crio/openshift-pull-secret` and update its file permissions so CRI-O can use it when fetching container images:
