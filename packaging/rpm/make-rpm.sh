@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -e -o pipefail
-set -x
 
 # must be passed down to this script from Makefile
 RELEASE_BASE=${RELEASE_BASE:-4.10.0}
@@ -24,7 +23,7 @@ SOURCE_GIT_TAG="$(git describe --tags | sed s/nightly-/nightly-$(git show -s --f
 
 
 create_local_tarball() {
-  tar -czvf "${RPMBUILD_DIR}/SOURCES/${TARBALL_FILE}" \
+  tar -czf "${RPMBUILD_DIR}/SOURCES/${TARBALL_FILE}" \
             --exclude='.git' --exclude='.idea' --exclude='.vagrant' \
             --exclude='_output' \
             --transform="s|^|microshift-${GIT_SHA}/|"  \
