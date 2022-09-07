@@ -103,7 +103,7 @@ sudo subscription-manager repos \
 sudo dnf localinstall -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
 ```
 
-Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page. Copy it to `/etc/crio/openshift-pull-secret` and update its file permissions so CRI-O can use it when fetching container images:
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page. Copy it to `/etc/crio/openshift-pull-secret` and update its file permissions so `CRI-O` can use it when fetching container images.
 ```bash
 sudo chmod 600 /etc/crio/openshift-pull-secret
 ```
@@ -121,8 +121,11 @@ MicroShift requires system configuration updates before it can be run. These upd
 
 The MicroShift service is not enabled or started by default. Start the service once to trigger the initialization sequence of all the dependencies.
 ```bash
+sudo systemctl enable crio
 sudo systemctl start microshift
 ```
+
+> The `CRI-O` service is started automatically by `systemd` as one of MicroShift dependencies. Enabling the `CRI-O` service is necessary to allow running MicroShift as a standalone executable.
 
 Wait until all the pods are up and running.
 ```bash

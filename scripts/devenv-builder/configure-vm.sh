@@ -68,7 +68,8 @@ sudo firewall-cmd --reload
 
 # Run MicroShift Executable > Configuring MicroShift
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#configuring-microshift
-sudo systemctl enable microshift --now
+sudo systemctl enable crio
+sudo systemctl start microshift
 
 echo ""
 echo "The configuration phase completed. Run the following commands to:"
