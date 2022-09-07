@@ -96,3 +96,6 @@ case $1 in
       echo "Usage: $0 local|commit <commit-id>|tag <tag-name>"
       exit 1
 esac
+
+# TODO: Remove this workaround again as soon as CI got updated to the new RPM location
+ln -sF ../../_output/rpmbuild packaging/rpm/_rpmbuild
