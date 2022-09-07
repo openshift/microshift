@@ -20,6 +20,7 @@ func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderPar
 		"ServiceCIDR":   cfg.Cluster.ServiceCIDR,
 		"ClusterDNS":    cfg.Cluster.DNS,
 		"ClusterDomain": cfg.Cluster.Domain,
+		"MTU":           cfg.Cluster.MTU,
 	}
 	for k, v := range extra {
 		params[k] = v

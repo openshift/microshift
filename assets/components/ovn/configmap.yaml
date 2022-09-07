@@ -8,7 +8,7 @@ metadata:
 data:
   ovnkube.conf:   |-
     [default]
-    mtu="1400"
+    mtu="{{.MTU}}"
     cluster-subnets={{.ClusterCIDR}}
     encap-port="6081"
     enable-lflow-cache=false

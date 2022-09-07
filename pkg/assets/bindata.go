@@ -3018,7 +3018,7 @@ metadata:
 data:
   ovnkube.conf:   |-
     [default]
-    mtu="1400"
+    mtu="{{.MTU}}"
     cluster-subnets={{.ClusterCIDR}}
     encap-port="6081"
     enable-lflow-cache=false
@@ -3056,7 +3056,7 @@ func assetsComponentsOvnConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/configmap.yaml", size: 844, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/configmap.yaml", size: 848, mode: os.FileMode(420), modTime: time.Unix(1658914160, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

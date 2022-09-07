@@ -43,6 +43,7 @@ type ClusterConfig struct {
 	ServiceNodePortRange string `yaml:"serviceNodePortRange"`
 	DNS                  string `yaml:"dns"`
 	Domain               string `yaml:"domain"`
+	MTU                  string `yaml:"mtu"`
 }
 
 type ControlPlaneConfig struct {
@@ -104,6 +105,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			ServiceNodePortRange: "30000-32767",
 			DNS:                  "10.43.0.10",
 			Domain:               "cluster.local",
+			MTU:                  "1400",
 		},
 		ControlPlane: ControlPlaneConfig{},
 		Node:         NodeConfig{},
