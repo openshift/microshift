@@ -9,6 +9,7 @@ import (
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	apiruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -18,6 +19,9 @@ import (
 
 	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 	"github.com/openshift/microshift/pkg/config"
+
+	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
+	apiregistrationv1client "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/typed/apiregistration/v1"
 )
 
 const (
@@ -34,6 +38,12 @@ var (
 		"assets/crd/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml",
 		"assets/crd/0000_01_route.crd.yaml",
 		"assets/components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml",
+	}
+	// for apis that belong to a group served by openshift-apiserver but are themselves served
+	// as a CR, the crd registration controller will not automatically create local apiservices
+	localAPIServices = []string{
+		"assets/crd/authorizationv1-local-apiservice.yaml",
+		"assets/crd/securityv1-local-apiservice.yaml",
 	}
 )
 
@@ -114,8 +124,33 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 	if err != nil {
 		return err
 	}
+	rest.AddUserAgent(restConfig, "crd-agent")
 
-	client := apiextclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "crd-agent"))
+	apiRegistrationClient, err := apiregistrationv1client.NewForConfig(restConfig)
+	if err != nil {
+		return err
+	}
+
+	apiRegistrationScheme := runtime.NewScheme()
+	apiRegistrationCodecs := serializer.NewCodecFactory(apiRegistrationScheme)
+
+	for _, apiServiceManifest := range localAPIServices {
+		apiServiceBytes, err := Asset(apiServiceManifest)
+		if err != nil {
+			return err
+		}
+		var apiService apiregistrationv1.APIService
+		err = runtime.DecodeInto(apiRegistrationCodecs.UniversalDecoder(apiregistrationv1.SchemeGroupVersion), apiServiceBytes, &apiService)
+		if err != nil {
+			return err
+		}
+		_, _, err = resourceapply.ApplyAPIService(context.TODO(), apiRegistrationClient, assetsEventRecorder, &apiService)
+		if err != nil {
+			return err
+		}
+	}
+
+	client := apiextclientv1.NewForConfigOrDie(restConfig)
 
 	for _, crd := range crds {
 		klog.Infof("Applying openshift CRD %s", crd)

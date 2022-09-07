@@ -1,0 +1,9 @@
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1.security.openshift.io
+spec:
+  group: security.openshift.io
+  groupPriorityMinimum: 1000
+  version: v1
+  versionPriority: 100
