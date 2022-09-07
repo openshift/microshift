@@ -12,7 +12,7 @@ The scripts for building the installer are located in the `scripts/image-builder
 ### Prerequisites
 Execute the `scripts/image-builder/configure.sh` script to install the tools necessary for building the installer image.
 
-Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~microshift/.pull-secret.json` file. 
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~microshift/.pull-secret.json` file.
 
 Make sure there is more than 20GB of free disk space necessary for the build artifacts. Run the following command to free the space if necessary.
 ```bash
@@ -20,7 +20,7 @@ Make sure there is more than 20GB of free disk space necessary for the build art
 ```
 
 Note that the command deletes various user and system data, including:
-- The `scripts/image-builder/_builds` directory containing image build artifacts
+- The `_output/image-builder/` directory containing image build artifacts
 - MicroShift `ostree` server container and all the unused container images
 - All the Image Builder jobs are canceled and deleted
 - Project-specific Image Builder sources are deleted
@@ -28,7 +28,7 @@ Note that the command deletes various user and system data, including:
 - The `/var/cache/osbuild-worker` directory contents are deleted to clean Image Builder cache files
 
 ### Building Installer
-It is recommended to execute the partial cleanup procedure (without `-full` argument) before each build to reclaim cached disk space from previous builds. 
+It is recommended to execute the partial cleanup procedure (without `-full` argument) before each build to reclaim cached disk space from previous builds.
 ```bash
 ~/microshift/scripts/image-builder/cleanup.sh
 ```
@@ -50,7 +50,7 @@ Usage: build.sh <-pull_secret_file path_to_file> [OPTION]...
 Optional arguments:
   -microshift_rpms path_or_URL
           Path or URL to the MicroShift RPM packages to be included
-          in the image (default: packaging/rpm/_rpmbuild/RPMS)
+          in the image (default: _output/rpmbuild/RPMS)
   -custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm
           Path to one or more comma-separated RPM packages to be
           included in the image (default: none)
@@ -100,9 +100,9 @@ As an example, a 20GB disk is partitioned in the following manner by default.
 ```
 $ lsblk /dev/sda
 NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-sda             8:0    0  20G  0 disk 
+sda             8:0    0  20G  0 disk
 ├─sda1          8:1    0   1G  0 part /boot
-└─sda2          8:2    0  19G  0 part 
+└─sda2          8:2    0  19G  0 part
   └─rhel-root 253:0    0   8G  0 lvm  /sysroot
 
 $ sudo vgdisplay -s
@@ -183,7 +183,7 @@ virt-install \
 "
 ```
 
-Watch the OS console to see the progress of the installation, waiting until the machine is rebooted and the login prompt appears. 
+Watch the OS console to see the progress of the installation, waiting until the machine is rebooted and the login prompt appears.
 
 Note that it may be more convenient to access the machine using SSH. Run the following command to get its IP address and use it to remotely connect to the system.
 ```bash

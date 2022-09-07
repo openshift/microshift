@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e -o pipefail
 
-ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
+ROOTDIR=$(git rev-parse --show-toplevel)
+BUILDDIR=${ROOTDIR}/_output/image-builder/
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
@@ -22,7 +23,7 @@ fi
 
 if [ "$FULL_CLEAN" = 1 ] ; then
     title "Cleaning the build directory"
-    rm -rf ${ROOTDIR}/_builds
+    rm -rf ${BUILDDIR}
 fi
 
 title "Cleaning up local ostree container server"

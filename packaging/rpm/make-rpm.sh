@@ -17,7 +17,7 @@ GIT_SHA=$(git rev-parse HEAD)
 # using this instead of rev-parse --short because github's is 1 char shorter than --short
 GIT_SHORTHASH="${GIT_SHA:0:7}"
 TARBALL_FILE="microshift-${GIT_SHORTHASH}.tar.gz"
-RPMBUILD_DIR="${SCRIPT_DIR}/_rpmbuild/"
+RPMBUILD_DIR="$(git rev-parse --show-toplevel)/_output/rpmbuild/"
 
 SOURCE_GIT_TAG="$(git describe --tags | sed s/nightly-/nightly-$(git show -s --format=%ct)_/g )"
 
@@ -25,7 +25,7 @@ SOURCE_GIT_TAG="$(git describe --tags | sed s/nightly-/nightly-$(git show -s --f
 create_local_tarball() {
   tar -czf "${RPMBUILD_DIR}/SOURCES/${TARBALL_FILE}" \
             --exclude='.git' --exclude='.idea' --exclude='.vagrant' \
-            --exclude='_output' --exclude='rpm/_rpmbuild' --exclude='image-builder/_builds' \
+            --exclude='_output' \
             --transform="s|^|microshift-${GIT_SHA}/|"  \
             --exclude="${TARBALL_FILE}" "${SCRIPT_DIR}/../../"
 }
@@ -96,3 +96,6 @@ case $1 in
       echo "Usage: $0 local|commit <commit-id>|tag <tag-name>"
       exit 1
 esac
+
+# TODO: Remove this workaround again as soon as CI got updated to the new RPM location
+ln -sF ../../_output/rpmbuild packaging/rpm/_rpmbuild

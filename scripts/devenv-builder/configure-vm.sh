@@ -49,7 +49,7 @@ make srpm
 # Run MicroShift Executable > Runtime Prerequisites
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#runtime-prerequisites
 sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
-sudo dnf localinstall -y ~/microshift/packaging/rpm/_rpmbuild/RPMS/*/*.rpm
+sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 
 sudo cp -f ${OCP_PULL_SECRET} /etc/crio/openshift-pull-secret
 sudo chmod 600                /etc/crio/openshift-pull-secret

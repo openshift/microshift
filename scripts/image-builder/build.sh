@@ -1,20 +1,22 @@
 #!/bin/bash
 set -e -o pipefail
 
-ROOTDIR=$(git rev-parse --show-toplevel)/scripts/image-builder
+ROOTDIR=$(git rev-parse --show-toplevel)
+SCRIPTDIR=${ROOTDIR}/scripts/image-builder
 IMGNAME=microshift
-IMAGE_VERSION=$(${ROOTDIR}/../../pkg/release/get.sh base)
+IMAGE_VERSION=$(${ROOTDIR}/pkg/release/get.sh base)
 BUILD_ARCH=$(uname -i)
 OSTREE_SERVER_NAME=127.0.0.1:8080
 LVM_SYSROOT_SIZE_MIN=8192
 LVM_SYSROOT_SIZE=${LVM_SYSROOT_SIZE_MIN}
 OCP_PULL_SECRET_FILE=
-MICROSHIFT_RPM_SOURCE=${ROOTDIR}/../../packaging/rpm/_rpmbuild/RPMS
+MICROSHIFT_RPM_SOURCE=${ROOTDIR}/_output/rpmbuild/
 AUTHORIZED_KEYS_FILE=
 AUTHORIZED_KEYS=
 STARTTIME=$(date +%s)
+BUILDDIR=${ROOTDIR}/_output/image-builder/
 
-trap ${ROOTDIR}/cleanup.sh INT
+trap ${SCRIPTDIR}/cleanup.sh INT
 
 usage() {
     local error_message="$1"
@@ -33,7 +35,7 @@ usage() {
     echo "Optional arguments:"
     echo "  -microshift_rpms path_or_URL"
     echo "          Path or URL to the MicroShift RPM packages to be included"
-    echo "          in the image (default: packaging/rpm/_rpmbuild/RPMS)"
+    echo "          in the image (default: _output/rpmbuild/RPMS)"
     echo "  -custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm"
     echo "          Path to one or more comma-separated RPM packages to be"
     echo "          included in the image (default: none)"
@@ -85,7 +87,7 @@ download_image() {
         sudo composer-cli compose metadata ${uuid}
         sudo composer-cli compose image ${uuid}
     fi
-    sudo chown -R $(whoami). "${ROOTDIR}/_builds"
+    sudo chown -R $(whoami). "${BUILDDIR}"
 }
 
 build_image() {
@@ -98,7 +100,7 @@ build_image() {
 
     title "Loading ${blueprint} blueprint v${version}"
     sudo composer-cli blueprints delete ${blueprint} 2>/dev/null || true
-    sudo composer-cli blueprints push "${ROOTDIR}/_builds/${blueprint_file}"
+    sudo composer-cli blueprints push "${BUILDDIR}/${blueprint_file}"
     sudo composer-cli blueprints depsolve ${blueprint} 1>/dev/null
 
     if [ -n "$parent_version" ]; then
@@ -192,8 +194,8 @@ fi
 # Set the elapsed time trap only if command line parsing was successful
 trap 'echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
 
-mkdir -p ${ROOTDIR}/_builds
-pushd ${ROOTDIR}/_builds &>/dev/null
+mkdir -p ${BUILDDIR}
+pushd ${BUILDDIR} &>/dev/null
 
 # Also enter sudo password in the beginning if necessary
 title "Checking available disk space"
@@ -247,13 +249,13 @@ fi
 title "Loading sources for OpenShift and MicroShift"
 for f in openshift-local microshift-local custom-rpms ; do
     [ ! -d $f ] && continue
-    cat ../config/${f}.toml.template | sed "s;REPLACE_IMAGE_BUILDER_DIR;${ROOTDIR};g" > ${f}.toml
+    cat ${SCRIPTDIR}/config/${f}.toml.template | sed "s;REPLACE_IMAGE_BUILDER_DIR;${SCRIPTDIR};g" > ${f}.toml
     sudo composer-cli sources delete $f 2>/dev/null || true
-    sudo composer-cli sources add ${ROOTDIR}/_builds/${f}.toml
+    sudo composer-cli sources add ${BUILDDIR}/${f}.toml
 done
 
 title "Preparing blueprints"
-cp -f ../config/{blueprint_v0.0.1.toml,installer.toml} .
+cp -f ${SCRIPTDIR}/config/{blueprint_v0.0.1.toml,installer.toml} .
 if [ ! -z ${CUSTOM_RPM_FILES} ] ; then
     for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
         rpm_name=$(basename $rpm | sed 's/.rpm//g')
@@ -271,7 +273,7 @@ build_image installer.toml        "${IMGNAME}-installer" 0.0.0 edge-installer "$
 
 title "Embedding kickstart in the installer image"
 # Create a kickstart file from a template, compacting pull secret contents if necessary
-cat "../config/kickstart.ks.template" \
+cat "${SCRIPTDIR}/config/kickstart.ks.template" \
     | sed "s;REPLACE_LVM_SYSROOT_SIZE;${LVM_SYSROOT_SIZE};g" \
     | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
     | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE | jq -c);g" \
@@ -281,12 +283,12 @@ cat "../config/kickstart.ks.template" \
 
 # Run the ISO creation procedure
 sudo mkksiso kickstart.ks ${IMGNAME}-installer-0.0.0-installer.iso ${IMGNAME}-installer-${IMAGE_VERSION}.${BUILD_ARCH}.iso
-sudo chown -R $(whoami). "${ROOTDIR}/_builds"
+sudo chown -R $(whoami). "${BUILDDIR}"
 
 # Remove intermediate artifacts to free disk space
 rm -f ${IMGNAME}-installer-0.0.0-installer.iso
 
-${ROOTDIR}/cleanup.sh
+${SCRIPTDIR}/cleanup.sh
 
 title "Done"
 popd &>/dev/null

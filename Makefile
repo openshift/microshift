@@ -32,8 +32,8 @@ SRC_ROOT :=$(shell pwd)
 IMAGE_REPO :=quay.io/microshift/microshift
 IMAGE_REPO_AIO :=quay.io/microshift/microshift-aio
 OUTPUT_DIR :=_output
-RPM_BUILD_DIR :=packaging/rpm/_rpmbuild
-ISO_DIR :=scripts/image-builder/_builds
+RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
+ISO_DIR :=$(OUTPUT_DIR)/image-builder
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
@@ -48,6 +48,9 @@ endif
 
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
+
+# Build to a place we can ignore
+GO_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
 ifeq ($(DEBUG),true)
 	# throw all the debug info in!
@@ -267,11 +270,11 @@ tar-ocp-containers:
 ###############################
 
 clean-cross-build:
-	$(RM) -r '$(CROSS_BUILD_BINDIR)'
-	$(RM) -rf $(OUTPUT_DIR)/staging
+	if [ -d '$(CROSS_BUILD_BINDIR)' ]; then $(RM) -rf '$(CROSS_BUILD_BINDIR)'; fi
+	if [ -d '$(OUTPUT_DIR)/staging' ]; then $(RM) -rf '$(OUTPUT_DIR)/staging'; fi
+	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)'; fi
+	if [ -d '$(ISO_DIR)' ]; then $(RM) -rf '$(ISO_DIR)'; fi
 	if [ -d '$(OUTPUT_DIR)' ]; then rmdir --ignore-fail-on-non-empty '$(OUTPUT_DIR)'; fi
-	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)' ; fi
-	if [ -d '$(ISO_DIR)' ]; then $(RM) -rf '$(ISO_DIR)' ; fi
 .PHONY: clean-cross-build
 
 clean: clean-cross-build
