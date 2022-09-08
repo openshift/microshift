@@ -509,8 +509,12 @@ update_manifests() {
     #-- ovn-kubernetes -----------------------------------
     # 1) Adopt resource manifests
     #    Replace all ovn-kubernetes manifests
-    rm -rf "${REPOROOT}"/assets/components/ovn/*
-    cp -r "${STAGING_DIR}"/cluster-network-operator/bindata/network/ovn-kubernetes/microshift/* "${REPOROOT}"/assets/components/ovn || true
+    #
+    # NOTE: As long as MicroShift is still based on OpenShift releases that do not yet contain the MicroShift-specific
+    #       manifests we're manually updating them as needed for now.
+    # TODO: Remove this comments and uncomment the lines below once we've rebased to 4.12.
+    #rm -rf "${REPOROOT}"/assets/components/ovn/*
+    #cp -r "${STAGING_DIR}"/cluster-network-operator/bindata/network/ovn-kubernetes/microshift/* "${REPOROOT}"/assets/components/ovn || true
 
     popd >/dev/null
 }
