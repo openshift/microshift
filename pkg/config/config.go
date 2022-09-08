@@ -36,22 +36,22 @@ var (
 )
 
 type ClusterConfig struct {
-	URL string `yaml:"url"`
+	URL string `json:"url"`
 
-	ClusterCIDR          string `yaml:"clusterCIDR"`
-	ServiceCIDR          string `yaml:"serviceCIDR"`
-	ServiceNodePortRange string `yaml:"serviceNodePortRange"`
-	DNS                  string `yaml:"dns"`
-	Domain               string `yaml:"domain"`
-	MTU                  string `yaml:"mtu"`
+	ClusterCIDR          string `json:"clusterCIDR"`
+	ServiceCIDR          string `json:"serviceCIDR"`
+	ServiceNodePortRange string `json:"serviceNodePortRange"`
+	DNS                  string `json:"dns"`
+	Domain               string `json:"domain"`
+	MTU                  string `json:"mtu"`
 }
 
 type ControlPlaneConfig struct {
-	// Token string `yaml:"token", envconfig:"CONTROLPLANE_TOKEN"`
+	// Token string `json:"token", envconfig:"CONTROLPLANE_TOKEN"`
 }
 
 type NodeConfig struct {
-	// Token string `yaml:"token", envconfig:"NODE_TOKEN"`
+	// Token string `json:"token", envconfig:"NODE_TOKEN"`
 }
 
 type DebugConfig struct {
@@ -59,23 +59,23 @@ type DebugConfig struct {
 }
 
 type MicroshiftConfig struct {
-	ConfigFile string
-	DataDir    string `yaml:"dataDir"`
+	ConfigFile string `json:"configFile"`
+	DataDir    string `json:"dataDir"`
 
-	AuditLogDir string `yaml:"auditLogDir"`
-	LogVLevel   int    `yaml:"logVLevel"`
+	AuditLogDir string `json:"auditLogDir"`
+	LogVLevel   int    `json:"logVLevel"`
 
-	Roles []string `yaml:"roles"`
+	Roles []string `json:"roles"`
 
-	NodeName string `yaml:"nodeName"`
-	NodeIP   string `yaml:"nodeIP"`
+	NodeName string `json:"nodeName"`
+	NodeIP   string `json:"nodeIP"`
 
-	Cluster      ClusterConfig      `yaml:"cluster"`
-	ControlPlane ControlPlaneConfig `yaml:"controlPlane"`
-	Node         NodeConfig         `yaml:"node"`
+	Cluster      ClusterConfig      `json:"cluster"`
+	ControlPlane ControlPlaneConfig `json:"controlPlane"`
+	Node         NodeConfig         `json:"node"`
 
-	Manifests []string    `yaml:"manifests"`
-	Debug     DebugConfig `yaml:"debug"`
+	Manifests []string    `json:"manifests"`
+	Debug     DebugConfig `json:"debug"`
 }
 
 func NewMicroshiftConfig() *MicroshiftConfig {
