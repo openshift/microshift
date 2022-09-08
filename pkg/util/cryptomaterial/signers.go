@@ -81,7 +81,7 @@ func (cs *certificateChains) Complete() (*CertificateChains, error) {
 }
 
 func (cs *CertificateChains) GetSignerNames() []string {
-	return stringMapKeysOrdered(cs.signers)
+	return certificateSignersMapKeysOrdered(cs.signers)
 }
 
 func (cs *CertificateChains) GetSigner(signerPath ...string) *CertificateSigner {
@@ -309,7 +309,7 @@ func (s *CertificateSigner) SignServingCertificate(signInfo *ServingCertificateS
 }
 
 func (s *CertificateSigner) GetCertNames() []string {
-	return stringMapKeysOrdered(s.signedCertificates)
+	return signedCertificateInfoMapKeysOrdered(s.signedCertificates)
 }
 
 func (s *CertificateSigner) GetCertKey(subjectName string) ([]byte, []byte, error) {
@@ -322,14 +322,25 @@ func (s *CertificateSigner) GetCertKey(subjectName string) ([]byte, []byte, erro
 }
 
 func (s *CertificateSigner) GetSubCANames() []string {
-	return stringMapKeysOrdered(s.subCAs)
+	return certificateSignersMapKeysOrdered(s.subCAs)
 }
 
 func (s *CertificateSigner) GetSubCA(signerName string) *CertificateSigner {
 	return s.subCAs[signerName]
 }
 
-func stringMapKeysOrdered[T CertificateSigner | signedCertificateInfo](stringMap map[string]*T) []string {
+// TODO: merge the two below functions with generics once we've got go 1.18
+func certificateSignersMapKeysOrdered(stringMap map[string]*CertificateSigner) []string {
+	keys := make(sort.StringSlice, 0, len(stringMap))
+	for k := range stringMap {
+		keys = append(keys, k)
+	}
+
+	keys.Sort()
+	return keys
+}
+
+func signedCertificateInfoMapKeysOrdered(stringMap map[string]*signedCertificateInfo) []string {
 	keys := make(sort.StringSlice, 0, len(stringMap))
 	for k := range stringMap {
 		keys = append(keys, k)
