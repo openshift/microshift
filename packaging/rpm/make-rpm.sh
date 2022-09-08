@@ -7,8 +7,8 @@ RELEASE_PRE=${RELEASE_PRE:-${RELEASE_BASE}-0.microshift}
 BUILD=${BUILD:-all}
 
 # generated from other info
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-RPM_REL=$(git describe --tags | sed s/"${RELEASE_PRE}-"//g | sed s/-/_/g )
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+RPM_REL=$(git describe --tags | sed s/"${RELEASE_PRE}-"//g | sed s/-/_/g)
 
 # add the git commit timestamp for nightlies, so updates will always work on devices old pkg < new pkg
 RPM_REL=$(echo "${RPM_REL}" | sed s/nightly_/nightly_$(git show -s --format=%ct)_/g)
@@ -21,8 +21,12 @@ RPMBUILD_DIR="$(git rev-parse --show-toplevel)/_output/rpmbuild/"
 
 SOURCE_GIT_TAG="$(git describe --tags | sed s/nightly-/nightly-$(git show -s --format=%ct)_/g )"
 
+title() {
+    echo -e "\E[34m\n# $1\E[00m";
+}
 
 create_local_tarball() {
+  title "Creating local tarball"
   tar -czf "${RPMBUILD_DIR}/SOURCES/${TARBALL_FILE}" \
             --exclude='.git' --exclude='.idea' --exclude='.vagrant' \
             --exclude='_output' \
@@ -31,6 +35,7 @@ create_local_tarball() {
 }
 
 download_commit_tarball() {
+  title "Downloading commit tarball"
   GIT_SHA=${1:-$GIT_SHA}
   spectool -g --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_REL}" --define="version ${RELEASE_BASE}" \
           --define "git_commit ${GIT_SHA}" \
@@ -38,6 +43,7 @@ download_commit_tarball() {
 }
 
 download_tag_tarball() {
+  title "Downloading tag tarball"
   spectool -g --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_REL}" --define="version ${RELEASE_BASE}" \
           --define "github_tag ${1}" \
           -R "${SCRIPT_DIR}/microshift.spec"
@@ -61,7 +67,8 @@ build_commit() {
 EOF
   cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
 
-  rpmbuild "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
+  title "Building RPM packages"
+  rpmbuild --quiet "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 build_tag_commit() {
@@ -75,27 +82,28 @@ build_tag_commit() {
 EOF
   cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
 
-  rpmbuild "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
+  title "Building RPM packages"
+  rpmbuild --quiet "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 # prepare the rpmbuild env
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 case $1 in
-    local) create_local_tarball
-           build_commit "${GIT_SHA}"
-           ;;
-    commit) download_commit_tarball "$2"
-            build_commit "$2"
-            ;;
-    tag) download_tag_tarball "$2"
-         build_tag_commit "$2"
-         ;;
+    local)
+      create_local_tarball
+      build_commit "${GIT_SHA}"
+      ;;
+    commit)
+      download_commit_tarball "$2"
+      build_commit "$2"
+      ;;
+    tag)
+      download_tag_tarball "$2"
+      build_tag_commit "$2"
+      ;;
 
     *)
       echo "Usage: $0 local|commit <commit-id>|tag <tag-name>"
       exit 1
 esac
-
-# TODO: Remove this workaround again as soon as CI got updated to the new RPM location
-ln -sF ../../_output/rpmbuild packaging/rpm/_rpmbuild
