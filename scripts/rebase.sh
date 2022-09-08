@@ -409,9 +409,9 @@ update_manifests() {
     # 1) Adopt resource manifests
     #    Replace all openshift-dns operand manifests
     rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
-    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns 2>/dev/null || true 
+    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns || true 
     rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
-    cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver 2>/dev/null || true
+    cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver || true
     #    Restore the openshift-dns ConfigMap. It's content is the Corefile that the operator generates
     #    in https://github.com/openshift/cluster-dns-operator/blob/master/pkg/operator/controller/controller_dns_configmap.go
     git restore "${REPOROOT}"/assets/components/openshift-dns/dns/configmap.yaml
@@ -457,8 +457,8 @@ update_manifests() {
     rm -f "${REPOROOT}"/assets/components/openshift-router/*
     cp "${STAGING_DIR}"/cluster-ingress-operator/assets/router/* "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
     # Copy embedded manifests applied by the COCMO rather than CVO
-    cp "${STAGING_DIR}"/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrole.yaml "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
-    cp "${STAGING_DIR}"/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrolebinding.yaml "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
+    cp "${STAGING_DIR}"/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrole.yaml "${REPOROOT}"/assets/components/openshift-router || true
+    cp "${STAGING_DIR}"/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrolebinding.yaml "${REPOROOT}"/assets/components/openshift-router || true
     #    Restore the openshift-router's service-ca ConfigMap
     git restore "${REPOROOT}"/assets/components/openshift-router/configmap.yaml
     # 2) Render operand manifest templates like the operator would
@@ -493,7 +493,7 @@ update_manifests() {
     # 1) Adopt resource manifests
     #    Replace all service-ca operand manifests
     rm -f "${REPOROOT}"/assets/components/service-ca/*
-    cp "${STAGING_DIR}"/service-ca-operator/bindata/v4.0.0/controller/* "${REPOROOT}"/assets/components/service-ca 2>/dev/null || true
+    cp "${STAGING_DIR}"/service-ca-operator/bindata/v4.0.0/controller/* "${REPOROOT}"/assets/components/service-ca || true
     # 2) Render operand manifest templates like the operator would
     yq -i '.spec.template.spec.volumes[0].secret.secretName = "REPLACE_TLS_SECRET"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
     yq -i '.spec.template.spec.volumes[1].configMap.name = "REPLACE_CA_CONFIG_MAP"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
@@ -510,7 +510,7 @@ update_manifests() {
     # 1) Adopt resource manifests
     #    Replace all ovn-kubernetes manifests
     rm -rf "${REPOROOT}"/assets/components/ovn/*
-    cp -r "${STAGING_DIR}"/cluster-network-operator/bindata/network/ovn-kubernetes/microshift/* "${REPOROOT}"/assets/components/ovn 2>/dev/null || true
+    cp -r "${STAGING_DIR}"/cluster-network-operator/bindata/network/ovn-kubernetes/microshift/* "${REPOROOT}"/assets/components/ovn || true
 
     popd >/dev/null
 }
@@ -525,7 +525,7 @@ rebase_to() {
     download_release "${release_image_amd64}" "${release_image_arm64}"
 
     rebase_branch=rebase-${release_image_amd64#*:}
-    git branch -D "${rebase_branch}" >/dev/null || true
+    git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
     update_go_mod
