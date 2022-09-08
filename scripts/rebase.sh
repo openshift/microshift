@@ -403,6 +403,10 @@ update_manifests() {
     cp "${STAGING_DIR}/release-manifests/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_security-openshift_01_scc.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml" "${REPOROOT}"/assets/crd
+    # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
+    # - assets/crd/authorizationv1-local-apiservice.yaml (local API service for authorization API group, needed if OpenShift API server is not present)
+    # - assets/crd/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
+
     #    Replace all SCC manifests
     rm -f "${REPOROOT}"/assets/scc/*.yaml
     cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/scc || true
