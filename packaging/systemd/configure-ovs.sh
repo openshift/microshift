@@ -282,6 +282,22 @@ EOF
       if [ -n "$ipv6_addr_gen_mode" ]; then
         extra_if_brex_args+="ipv6.addr-gen-mode ${ipv6_addr_gen_mode} "
       fi
+      ipv4_ignore_auto_dns=$(nmcli --get-values ipv4.ignore-auto-dns conn show ${old_conn})
+      if [ -n "$ipv4_ignore_auto_dns" ]; then
+        extra_if_brex_args+="ipv4.ignore-auto-dns ${ipv4_ignore_auto_dns} "
+      fi
+      ipv6_ignore_auto_dns=$(nmcli --get-values ipv6.ignore-auto-dns conn show ${old_conn})
+      if [ -n "$ipv6_ignore_auto_dns" ]; then
+        extra_if_brex_args+="ipv6.ignore-auto-dns ${ipv6_ignore_auto_dns} "
+      fi
+      ipv4_dns=$(nmcli --get-values ipv4.dns conn show ${old_conn})
+      if [ -n "$ipv4_dns" ]; then
+        extra_if_brex_args+="ipv4.dns ${ipv4_dns} "
+      fi
+      ipv6_dns=$(nmcli --get-values ipv6.dns conn show ${old_conn})
+      if [ -n "$ipv6_dns" ]; then
+        extra_if_brex_args+="ipv6.dns ${ipv6_dns} "
+      fi
       add_nm_conn type ovs-interface slave-type ovs-port conn.interface "$bridge_name" master "$ovs_port_conn" con-name \
         "$ovs_interface" 802-3-ethernet.mtu ${iface_mtu} 802-3-ethernet.cloned-mac-address ${iface_mac} \
         ipv4.route-metric "${bridge_metric}" ipv6.route-metric "${bridge_metric}" ${extra_if_brex_args}
