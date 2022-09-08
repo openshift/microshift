@@ -14,9 +14,9 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/spf13/pflag"
-	"gopkg.in/yaml.v2"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
+	"sigs.k8s.io/yaml"
 )
 
 const (
@@ -185,8 +185,12 @@ func (c *MicroshiftConfig) ReadFromConfigFile() error {
 	}
 	defer f.Close()
 
-	decoder := yaml.NewDecoder(f)
-	if err := decoder.Decode(c); err != nil {
+	contents := []byte{}
+	if _, err = f.Read(contents); err != nil {
+		return fmt.Errorf("reading config file %s: %v", c.ConfigFile, err)
+	}
+
+	if err := yaml.Unmarshal(contents, c); err != nil {
 		return fmt.Errorf("decoding config file %s: %v", c.ConfigFile, err)
 	}
 
