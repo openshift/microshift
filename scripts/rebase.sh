@@ -431,7 +431,7 @@ update_manifests() {
     yq -i '.spec.template.spec.tolerations = [{"operator": "Exists"}]' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     #    Render the node-resolver script into the DaemonSet template
-    export NODE_RESOLVER_SCRIPT="$(sed 's|^|          |' "${REPOROOT}"/assets/components/openshift-dns/node-resolver/update-node-resolver.sh)"
+    export NODE_RESOLVER_SCRIPT="$(sed 's|^.|          &|' "${REPOROOT}"/assets/components/openshift-dns/node-resolver/update-node-resolver.sh)"
     envsubst < "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl > "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml
     #    Render the DNS service
     yq -i '.metadata += {"annotations": {"service.beta.openshift.io/serving-cert-secret-name": "dns-default-metrics-tls"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml

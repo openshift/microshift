@@ -1,30 +1,24 @@
 kind: Service
 apiVersion: v1
-metadata:
-  annotations:
-    service.beta.openshift.io/serving-cert-secret-name: dns-default-metrics-tls
-  labels:
-      dns.operator.openshift.io/owning-dns: default
-  name: dns-default
-  namespace: openshift-dns
 spec:
+  ports:
+    - name: dns
+      port: 53
+      targetPort: dns
+      protocol: UDP
+    - name: dns-tcp
+      port: 53
+      targetPort: dns-tcp
+      protocol: TCP
+    - name: metrics
+      port: 9154
+      targetPort: metrics
+      protocol: TCP
   clusterIP: {{.ClusterIP}}
   selector:
     dns.operator.openshift.io/daemonset-dns: default
-  ports:
-  - name: dns
-    port: 53
-    targetPort: dns
-    protocol: UDP
-  - name: dns-tcp
-    port: 53
-    targetPort: dns-tcp
-    protocol: TCP
-  - name: metrics
-    port: 9154
-    targetPort: metrics
-    protocol: TCP
-  # TODO: Uncomment when service topology feature gate is enabled.
-  #topologyKeys:
-  #  - "kubernetes.io/hostname"
-  #  - "*"
+metadata:
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: dns-default-metrics-tls
+  name: dns-default
+  namespace: openshift-dns
