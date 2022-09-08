@@ -62,17 +62,15 @@ func startOVNKubernetes(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 		klog.Warningf("Failed to apply clusterRoleBinding %v %v", crb, err)
 		return err
 	}
-	params := assets.RenderParams{
-		"ClusterCIDR":    cfg.Cluster.ClusterCIDR,
-		"ServiceCIDR":    cfg.Cluster.ServiceCIDR,
+	extraParams := assets.RenderParams{
 		"KubeconfigPath": kubeconfigPath,
 		"KubeconfigDir":  filepath.Join(cfg.DataDir, "/resources/kubeadmin"),
 	}
-	if err := assets.ApplyConfigMaps(cm, renderOVNKManifests, params, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(apps, renderOVNKManifests, params, kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
 		return err
 	}
