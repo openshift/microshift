@@ -55,7 +55,7 @@ type NodeConfig struct {
 }
 
 type DebugConfig struct {
-	Pprof bool
+	Pprof bool `json:"pprof"`
 }
 
 type MicroshiftConfig struct {
