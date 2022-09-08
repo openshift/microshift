@@ -52,6 +52,7 @@ func TestCommandLineConfig(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "cluster.dns",
 					Domain:               "cluster.local",
+					MTU:                  "1200",
 				},
 				Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, "/tmp/microshift/data/manifests"},
 			},
@@ -75,6 +76,7 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.StringVar(&config.Cluster.ServiceNodePortRange, "service-node-port-range", "", "")
 		flags.StringVar(&config.Cluster.DNS, "cluster-dns", "", "")
 		flags.StringVar(&config.Cluster.Domain, "cluster-domain", "", "")
+		flags.StringVar(&config.Cluster.MTU, "mtu", "1200", "")
 
 		// parse the flags
 		flags.Parse([]string{
@@ -90,6 +92,7 @@ func TestCommandLineConfig(t *testing.T) {
 			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
 			"--cluster-dns=" + tt.config.Cluster.DNS,
 			"--cluster-domain=" + tt.config.Cluster.Domain,
+			"--cluster-mtu=" + tt.config.Cluster.MTU,
 		})
 
 		// validate that we can read the config from the commandline
@@ -130,6 +133,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "10.43.0.10",
 					Domain:               "cluster.local",
+					MTU:                  "1400",
 				},
 				Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, "/tmp/microshift/data/manifests"},
 			},
@@ -169,6 +173,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "10.43.0.10",
 					Domain:               "cluster.local",
+					MTU:                  "1300",
 				},
 				Manifests: []string{"/my/manifests1", "/my/manifests2"},
 			},
@@ -190,6 +195,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
 				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
 				{"MICROSHIFT_MANIFESTS", "/my/manifests1,/my/manifests2"},
+				{"MICROSHIFT_CLUSTER_MTU", "1300"},
 			},
 		},
 	}
