@@ -32,6 +32,7 @@ func TestConfigFile(t *testing.T) {
 
 // test that MicroShift is able to properly read the config from the commandline
 func TestCommandLineConfig(t *testing.T) {
+	defaultConfig := NewMicroshiftConfig()
 
 	var ttests = []struct {
 		config *MicroshiftConfig
@@ -39,22 +40,26 @@ func TestCommandLineConfig(t *testing.T) {
 	}{
 		{
 			config: &MicroshiftConfig{
+				ConfigFile:  "/path/to/config.yaml",
 				DataDir:     "/tmp/microshift/data",
 				AuditLogDir: "/tmp/microshift/logs",
 				LogVLevel:   4,
 				Roles:       []string{"controlplane", "node"},
-				NodeName:    "node1",
-				NodeIP:      "1.2.3.4",
+				NodeName:    defaultConfig.NodeName,
+				NodeIP:      defaultConfig.NodeIP,
 				Cluster: ClusterConfig{
-					URL:                  "https://1.2.3.4:6443",
-					ClusterCIDR:          "10.20.30.40/16",
-					ServiceCIDR:          "40.30.20.10/16",
-					ServiceNodePortRange: "1024-32767",
-					DNS:                  "cluster.dns",
-					Domain:               "cluster.local",
-					MTU:                  "1200",
+					URL:                  defaultConfig.Cluster.URL,
+					ClusterCIDR:          defaultConfig.Cluster.ClusterCIDR,
+					ServiceCIDR:          defaultConfig.Cluster.ServiceCIDR,
+					ServiceNodePortRange: defaultConfig.Cluster.ServiceNodePortRange,
+					DNS:                  defaultConfig.Cluster.DNS,
+					Domain:               defaultConfig.Cluster.Domain,
+					MTU:                  defaultConfig.Cluster.MTU,
 				},
 				Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, "/tmp/microshift/data/manifests"},
+				Debug: DebugConfig{
+					Pprof: true,
+				},
 			},
 			err: nil,
 		},
@@ -62,46 +67,38 @@ func TestCommandLineConfig(t *testing.T) {
 
 	for _, tt := range ttests {
 		config := NewMicroshiftConfig()
-		// bind the flags to the config
+
 		flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		flags.StringVar(&config.DataDir, "data-dir", "", "")
-		flags.StringVar(&config.AuditLogDir, "audit-log-dir", "", "")
-		flags.IntVar(&config.LogVLevel, "v", 0, "")
-		flags.StringSliceVar(&config.Roles, "roles", []string{}, "")
-		flags.StringVar(&config.NodeName, "node-name", "", "")
-		flags.StringVar(&config.NodeIP, "node-ip", "", "")
-		flags.StringVar(&config.Cluster.URL, "cluster-url", "", "")
-		flags.StringVar(&config.Cluster.ClusterCIDR, "cluster-cidr", "", "")
-		flags.StringVar(&config.Cluster.ServiceCIDR, "service-cidr", "", "")
-		flags.StringVar(&config.Cluster.ServiceNodePortRange, "service-node-port-range", "", "")
-		flags.StringVar(&config.Cluster.DNS, "cluster-dns", "", "")
-		flags.StringVar(&config.Cluster.Domain, "cluster-domain", "", "")
-		flags.StringVar(&config.Cluster.MTU, "mtu", "1200", "")
+		// bind the config file flag to the struct
+		flags.StringVar(&config.ConfigFile, "config", config.ConfigFile, "File to read configuration from.")
+		// all other flags unbound (looked up by name) and defaulted
+		flags.String("data-dir", config.DataDir, "")
+		flags.String("audit-log-dir", config.AuditLogDir, "")
+		flags.Int("v", config.LogVLevel, "")
+		flags.StringSlice("roles", config.Roles, "")
+		flags.Bool("debug.pprof", false, "")
 
 		// parse the flags
-		flags.Parse([]string{
+		var err error
+		err = flags.Parse([]string{
+			"--config=" + tt.config.ConfigFile,
 			"--data-dir=" + tt.config.DataDir,
 			"--audit-log-dir=" + tt.config.AuditLogDir,
 			"--v=" + strconv.Itoa(tt.config.LogVLevel),
 			"--roles=" + strings.Join(tt.config.Roles, ","),
-			"--node-name=" + tt.config.NodeName,
-			"--node-ip=" + tt.config.NodeIP,
-			"--cluster-url=" + tt.config.Cluster.URL,
-			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
-			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
-			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
-			"--cluster-dns=" + tt.config.Cluster.DNS,
-			"--cluster-domain=" + tt.config.Cluster.Domain,
-			"--cluster-mtu=" + tt.config.Cluster.MTU,
+			"--debug.pprof=" + strconv.FormatBool(tt.config.Debug.Pprof),
 		})
+		if err != nil {
+			t.Errorf("failed to parse command line flags: %s", err)
+		}
 
 		// validate that we can read the config from the commandline
-		err := config.ReadFromCmdLine(flags)
+		err = config.ReadFromCmdLine(flags)
 		if (err != nil) != (tt.err != nil) {
 			t.Errorf("failed to read config from commandline: %s", err)
 		}
 		if err == nil && !reflect.DeepEqual(config, tt.config) {
-			t.Errorf("struct read from commandline does not match target: %v", config)
+			t.Errorf("struct read from commandline does not match: expected %+v, got %+v", tt.config, config)
 		}
 	}
 }
