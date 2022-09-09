@@ -33,12 +33,21 @@ const (
 func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags := cmd.Flags()
 	// Read the config flag directly into the struct, so it's immediately available.
-	flags.StringVar(&cfg.ConfigFile, "config", cfg.ConfigFile, "File to read configuration from.")
+	flags.StringVar(&cfg.ConfigFile, "config", cfg.ConfigFile, "The file to read configuration from.")
 	cmd.MarkFlagFilename("config", "yaml", "yml")
 	// All other flags will be read after reading both config file and env vars.
-	flags.String("data-dir", cfg.DataDir, "Directory for storing runtime data.")
-	flags.String("audit-log-dir", cfg.AuditLogDir, "Directory for storing audit logs.")
-	flags.StringSlice("roles", cfg.Roles, "Roles of this MicroShift instance.")
+	flags.String("data-dir", cfg.DataDir, "The directory for storing runtime data.")
+	flags.String("audit-log-dir", cfg.AuditLogDir, "The directory for storing audit logs.")
+	flags.StringSlice("roles", cfg.Roles, "The roles of this MicroShift instance.")
+	flags.String("node-name", cfg.NodeName, "The hostname of the node.")
+	flags.String("node-ip", cfg.NodeIP, "The IP address of the node.")
+	flags.String("url", cfg.Cluster.URL, "The URL of the API server.")
+	flags.String("cluster-cidr", cfg.Cluster.ClusterCIDR, "The IP range in CIDR notation for pods in the cluster.")
+	flags.String("service-cidr", cfg.Cluster.ServiceCIDR, "The IP range in CIDR notation for services in the cluster.")
+	flags.String("service-node-port-range", cfg.Cluster.ServiceNodePortRange, "The port range to reserve for services with NodePort visibility. This must not overlap with the ephemeral port range on nodes.")
+	flags.String("cluster-dns", cfg.Cluster.DNS, "Comma-separated list of DNS server IP address. This value is used for containers DNS server in case of Pods with \"dnsPolicy=ClusterFirst\".")
+	flags.String("cluster-domain", cfg.Cluster.Domain, "Domain for this cluster.")
+	flags.String("cluster-mtu", cfg.Cluster.MTU, "Network MTU for pods in the cluster.")
 	flags.Bool("debug.pprof", false, "Enable golang pprof debugging")
 }
 

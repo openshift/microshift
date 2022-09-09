@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 	homedir "github.com/mitchellh/go-homedir"
@@ -31,8 +32,7 @@ const (
 )
 
 var (
-	defaultRoles = validRoles
-	validRoles   = []string{"controlplane", "node"}
+	validRoles = []string{"controlplane", "node"}
 )
 
 type ClusterConfig struct {
@@ -90,6 +90,8 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 
 	dataDir := findDataDir()
 
+	defaultRoles := make([]string, len(validRoles))
+	copy(defaultRoles, validRoles)
 	return &MicroshiftConfig{
 		ConfigFile:  findConfigFile(),
 		DataDir:     dataDir,
@@ -211,23 +213,51 @@ func (c *MicroshiftConfig) updateManifestList() {
 }
 
 func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
-	if dataDir, err := flags.GetString("data-dir"); err == nil && flags.Changed("data-dir") {
-		c.DataDir = dataDir
+	if s, err := flags.GetString("data-dir"); err == nil && flags.Changed("data-dir") {
+		c.DataDir = s
 		// if the defaults are present, rebuild based on the new data-dir
 		c.updateManifestList()
 	}
-	if auditLogDir, err := flags.GetString("audit-log-dir"); err == nil && flags.Changed("audit-log-dir") {
-		c.AuditLogDir = auditLogDir
+	if s, err := flags.GetString("audit-log-dir"); err == nil && flags.Changed("audit-log-dir") {
+		c.AuditLogDir = s
 	}
-	if vLevelFlag := flags.Lookup("v"); vLevelFlag != nil && flags.Changed("v") {
-		c.LogVLevel, _ = strconv.Atoi(vLevelFlag.Value.String())
+	if f := flags.Lookup("v"); f != nil && flags.Changed("v") {
+		c.LogVLevel, _ = strconv.Atoi(f.Value.String())
 	}
-	if roles, err := flags.GetStringSlice("roles"); err == nil && flags.Changed("roles") {
-		c.Roles = roles
+	if ss, err := flags.GetStringSlice("roles"); err == nil && flags.Changed("roles") {
+		c.Roles = ss
 	}
-	if pprofFlag, err := flags.GetBool("debug.pprof"); err == nil && flags.Changed("debug.pprof") {
-		c.Debug.Pprof = pprofFlag
+	if s, err := flags.GetString("node-name"); err == nil && flags.Changed("node-name") {
+		c.NodeName = s
 	}
+	if s, err := flags.GetString("node-ip"); err == nil && flags.Changed("node-ip") {
+		c.NodeIP = s
+	}
+	if s, err := flags.GetString("url"); err == nil && flags.Changed("url") {
+		c.Cluster.URL = s
+	}
+	if s, err := flags.GetString("cluster-cidr"); err == nil && flags.Changed("cluster-cidr") {
+		c.Cluster.ClusterCIDR = s
+	}
+	if s, err := flags.GetString("service-cidr"); err == nil && flags.Changed("service-cidr") {
+		c.Cluster.ServiceCIDR = s
+	}
+	if s, err := flags.GetString("service-node-port-range"); err == nil && flags.Changed("service-node-port-range") {
+		c.Cluster.ServiceNodePortRange = s
+	}
+	if s, err := flags.GetString("cluster-dns"); err == nil && flags.Changed("cluster-dns") {
+		c.Cluster.DNS = s
+	}
+	if s, err := flags.GetString("cluster-domain"); err == nil && flags.Changed("cluster-domain") {
+		c.Cluster.Domain = s
+	}
+	if s, err := flags.GetString("cluster-mtu"); err == nil && flags.Changed("cluster-mtu") {
+		c.Cluster.MTU = s
+	}
+	if b, err := flags.GetBool("debug.pprof"); err == nil && flags.Changed("debug.pprof") {
+		c.Debug.Pprof = b
+	}
+
 	return nil
 }
 
@@ -241,10 +271,9 @@ func (c *MicroshiftConfig) ReadAndValidate(flags *pflag.FlagSet) error {
 	if err := c.ReadFromCmdLine(flags); err != nil {
 		return err
 	}
-
 	for _, role := range c.Roles {
 		if !StringInList(role, validRoles) {
-			return fmt.Errorf("config error: '%s' is not a valid role, must be in ['controlplane','node']", role)
+			return fmt.Errorf("config error: '%s' is not a valid role, must be in {%s}", role, strings.Join(validRoles, ", "))
 		}
 	}
 
