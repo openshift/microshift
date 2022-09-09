@@ -32,7 +32,6 @@ func TestConfigFile(t *testing.T) {
 
 // test that MicroShift is able to properly read the config from the commandline
 func TestCommandLineConfig(t *testing.T) {
-	defaultConfig := NewMicroshiftConfig()
 
 	var ttests = []struct {
 		config *MicroshiftConfig
@@ -45,16 +44,16 @@ func TestCommandLineConfig(t *testing.T) {
 				AuditLogDir: "/tmp/microshift/logs",
 				LogVLevel:   4,
 				Roles:       []string{"controlplane", "node"},
-				NodeName:    defaultConfig.NodeName,
-				NodeIP:      defaultConfig.NodeIP,
+				NodeName:    "node1",
+				NodeIP:      "1.2.3.4",
 				Cluster: ClusterConfig{
-					URL:                  defaultConfig.Cluster.URL,
-					ClusterCIDR:          defaultConfig.Cluster.ClusterCIDR,
-					ServiceCIDR:          defaultConfig.Cluster.ServiceCIDR,
-					ServiceNodePortRange: defaultConfig.Cluster.ServiceNodePortRange,
-					DNS:                  defaultConfig.Cluster.DNS,
-					Domain:               defaultConfig.Cluster.Domain,
-					MTU:                  defaultConfig.Cluster.MTU,
+					URL:                  "https://1.2.3.4:6443",
+					ClusterCIDR:          "10.20.30.40/16",
+					ServiceCIDR:          "40.30.20.10/16",
+					ServiceNodePortRange: "1024-32767",
+					DNS:                  "cluster.dns",
+					Domain:               "cluster.local",
+					MTU:                  "1200",
 				},
 				Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, "/tmp/microshift/data/manifests"},
 				Debug: DebugConfig{
@@ -76,6 +75,15 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.String("audit-log-dir", config.AuditLogDir, "")
 		flags.Int("v", config.LogVLevel, "")
 		flags.StringSlice("roles", config.Roles, "")
+		flags.String("node-name", config.NodeName, "")
+		flags.String("node-ip", config.NodeIP, "")
+		flags.String("url", config.Cluster.URL, "")
+		flags.String("cluster-cidr", config.Cluster.ClusterCIDR, "")
+		flags.String("service-cidr", config.Cluster.ServiceCIDR, "")
+		flags.String("service-node-port-range", config.Cluster.ServiceNodePortRange, "")
+		flags.String("cluster-dns", config.Cluster.DNS, "")
+		flags.String("cluster-domain", config.Cluster.Domain, "")
+		flags.String("cluster-mtu", config.Cluster.MTU, "")
 		flags.Bool("debug.pprof", false, "")
 
 		// parse the flags
@@ -86,6 +94,15 @@ func TestCommandLineConfig(t *testing.T) {
 			"--audit-log-dir=" + tt.config.AuditLogDir,
 			"--v=" + strconv.Itoa(tt.config.LogVLevel),
 			"--roles=" + strings.Join(tt.config.Roles, ","),
+			"--node-name=" + tt.config.NodeName,
+			"--node-ip=" + tt.config.NodeIP,
+			"--url=" + tt.config.Cluster.URL,
+			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
+			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
+			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
+			"--cluster-dns=" + tt.config.Cluster.DNS,
+			"--cluster-domain=" + tt.config.Cluster.Domain,
+			"--cluster-mtu=" + tt.config.Cluster.MTU,
 			"--debug.pprof=" + strconv.FormatBool(tt.config.Debug.Pprof),
 		})
 		if err != nil {

@@ -13,5 +13,7 @@ cluster:
   serviceCIDR: '40.30.20.10/16'
   dns: 'cluster.dns'
   domain: cluster.local
+  serviceNodePortRange: 30000-32767
+  mtu: "1400"
 manifests:
   - /etc/my-app/manifests
