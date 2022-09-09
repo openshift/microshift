@@ -179,14 +179,8 @@ func (c *MicroshiftConfig) ReadFromConfigFile() error {
 		return nil
 	}
 
-	f, err := os.Open(c.ConfigFile)
+	contents, err := os.ReadFile(c.ConfigFile)
 	if err != nil {
-		return fmt.Errorf("opening config file %s: %v", c.ConfigFile, err)
-	}
-	defer f.Close()
-
-	contents := []byte{}
-	if _, err = f.Read(contents); err != nil {
 		return fmt.Errorf("reading config file %s: %v", c.ConfigFile, err)
 	}
 
