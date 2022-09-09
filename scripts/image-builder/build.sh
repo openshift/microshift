@@ -249,7 +249,7 @@ fi
 title "Loading sources for OpenShift and MicroShift"
 for f in openshift-local microshift-local custom-rpms ; do
     [ ! -d $f ] && continue
-    cat ${SCRIPTDIR}/config/${f}.toml.template | sed "s;REPLACE_IMAGE_BUILDER_DIR;${SCRIPTDIR};g" > ${f}.toml
+    cat ${SCRIPTDIR}/config/${f}.toml.template | sed "s;REPLACE_IMAGE_BUILDER_DIR;${BUILDDIR};g" > ${f}.toml
     sudo composer-cli sources delete $f 2>/dev/null || true
     sudo composer-cli sources add ${BUILDDIR}/${f}.toml
 done
