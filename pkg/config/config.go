@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 	homedir "github.com/mitchellh/go-homedir"
@@ -31,8 +32,7 @@ const (
 )
 
 var (
-	defaultRoles = validRoles
-	validRoles   = []string{"controlplane", "node"}
+	validRoles = []string{"controlplane", "node"}
 )
 
 type ClusterConfig struct {
@@ -90,6 +90,8 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 
 	dataDir := findDataDir()
 
+	defaultRoles := make([]string, len(validRoles))
+	copy(defaultRoles, validRoles)
 	return &MicroshiftConfig{
 		ConfigFile:  findConfigFile(),
 		DataDir:     dataDir,
@@ -241,10 +243,9 @@ func (c *MicroshiftConfig) ReadAndValidate(flags *pflag.FlagSet) error {
 	if err := c.ReadFromCmdLine(flags); err != nil {
 		return err
 	}
-
 	for _, role := range c.Roles {
 		if !StringInList(role, validRoles) {
-			return fmt.Errorf("config error: '%s' is not a valid role, must be in ['controlplane','node']", role)
+			return fmt.Errorf("config error: '%s' is not a valid role, must be in {%s}", role, strings.Join(validRoles, ", "))
 		}
 	}
 
