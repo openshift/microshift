@@ -383,12 +383,25 @@ update_manifests() {
 
     #-- OpenShift control plane ---------------------------
     # 1) Adopt resource manifests
+    #    Selectively copy in only those core manifests that MicroShift is already using
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ns.yaml" "${REPOROOT}"/assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrole.yaml" "${REPOROOT}"/assets/core
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrolebinding.yaml" "${REPOROOT}"/assets/core
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-openshift-infra.yaml" "${REPOROOT}"/assets/core
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/ns.yaml" "${REPOROOT}"/assets/core/namespace-openshift-kube-controller-manager.yaml
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrole.yaml" "${REPOROOT}"/assets/core
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/core
     #    Selectively copy in only those CRD manifests that MicroShift is already using
+    # TODO: add route CRD (https://github.com/openshift/api/blob/master/route/v1/route.crd.yaml) once we rebase to a release that contains it
+    #cp "${STAGING_DIR}/release-manifests/0000_01_route.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_security-openshift_01_scc.crd.yaml" "${REPOROOT}"/assets/crd
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-openshift-infra.yaml" "${REPOROOT}"/assets/core
-    # TODO: add route CRD (https://github.com/openshift/api/blob/master/route/v1/route.crd.yaml) when we rebase to a release that contains it
-    #    Replace all SCC manifests.
+    cp "${STAGING_DIR}/release-manifests/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml" "${REPOROOT}"/assets/crd
+    # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
+    # - assets/crd/authorizationv1-local-apiservice.yaml (local API service for authorization API group, needed if OpenShift API server is not present)
+    # - assets/crd/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
+
+    #    Replace all SCC manifests
     rm -f "${REPOROOT}"/assets/scc/*.yaml
     cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/scc || true
     # 2) Render operand manifest templates like the operator would
