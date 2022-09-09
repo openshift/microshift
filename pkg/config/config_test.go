@@ -238,12 +238,3 @@ func TestGlobalInitFlags(t *testing.T) {
 	// pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 	pflag.Parse()
 }
-
-// tests that the default config file is being read
-func TestDefaultConfigFile(t *testing.T) {
-	os.Setenv("MICROSHIFT_CONFIG_FILE", "")
-	config := NewMicroshiftConfig()
-	if config.ConfigFile != "" {
-		t.Errorf("expected config file to be empty, got %s", config.ConfigFile)
-	}
-}
