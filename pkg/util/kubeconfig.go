@@ -16,63 +16,40 @@ limitations under the License.
 package util
 
 import (
-	"os"
-	"path/filepath"
-	"text/template"
+	clientcmd "k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
-// Kubeconfig creates a kubeconfig
-func Kubeconfig(path string, clusterTrustBundle []byte, common string, svcName []string, clusterURL string) error {
-	cert, key, err := GenCertsBuff(common, svcName)
-	if err != nil {
-		return err
+// KubeConfigWithClientCerts creates a kubeconfig authenticating with client cert/key
+// at a location provided by `path`
+func KubeConfigWithClientCerts(
+	path string,
+	clusterURL string,
+	clusterTrustBundle []byte,
+	clientCertPEM []byte,
+	clientKeyPEM []byte,
+) error {
+	const microshiftName = "microshift"
+
+	cluster := clientcmdapi.NewCluster()
+	cluster.Server = clusterURL
+	cluster.CertificateAuthorityData = clusterTrustBundle
+
+	msContext := clientcmdapi.NewContext()
+	msContext.Cluster = microshiftName
+	msContext.Namespace = "default"
+	msContext.AuthInfo = "user"
+
+	msUser := clientcmdapi.NewAuthInfo()
+	msUser.ClientCertificateData = clientCertPEM
+	msUser.ClientKeyData = clientKeyPEM
+
+	kubeConfig := clientcmdapi.Config{
+		CurrentContext: microshiftName,
+		Clusters:       map[string]*clientcmdapi.Cluster{microshiftName: cluster},
+		Contexts:       map[string]*clientcmdapi.Context{microshiftName: msContext},
+		AuthInfos:      map[string]*clientcmdapi.AuthInfo{"user": msUser},
 	}
 
-	return KubeConfigWithClientCerts(path, clusterURL, clusterTrustBundle, cert, key)
-}
-
-func KubeConfigWithClientCerts(path string, clusterURL string, clusterTrustBundle []byte, clientCertPEM []byte, clientKeyPEM []byte) error {
-	kubeconfigTemplate := template.Must(template.New("kubeconfig").Parse(`
-apiVersion: v1
-kind: Config
-current-context: microshift
-preferences: {}
-contexts:
-- context:
-    cluster: microshift
-    namespace: default
-    user: user
-  name: microshift
-clusters:
-- cluster:
-    server: {{.ClusterURL}}
-    certificate-authority-data: {{.ClusterCA}}
-  name: microshift
-users:
-- name: user
-  user:
-    client-certificate-data: {{.ClientCert}}
-    client-key-data: {{.ClientKey}}
-`))
-
-	data := struct {
-		ClusterURL string
-		ClusterCA  string
-		ClientCert string
-		ClientKey  string
-	}{
-		ClusterURL: clusterURL,
-		ClusterCA:  Base64(clusterTrustBundle),
-		ClientCert: Base64(clientCertPEM),
-		ClientKey:  Base64(clientKeyPEM),
-	}
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
-
-	output, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer output.Close()
-
-	return kubeconfigTemplate.Execute(output, &data)
+	return clientcmd.WriteToFile(kubeConfig, path)
 }
