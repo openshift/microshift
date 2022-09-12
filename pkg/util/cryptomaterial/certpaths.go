@@ -16,6 +16,8 @@ const (
 	ClientCAValidityDays                  = 60
 	ClientCertValidityDays                = 30
 	AdminKubeconfigClientCertValidityDays = 365 * 10
+
+	ServiceCAValidityDays = 790
 )
 
 func CertsDirectory(dataPath string) string { return filepath.Join(dataPath, "certs") }
@@ -70,6 +72,10 @@ func CSRSignerCertDir(certsDir string) string {
 
 func KubeletClientCertDir(certsDir string) string {
 	return filepath.Join(KubeletCSRSignerSignerCertDir(certsDir), "kubelet-client")
+}
+
+func ServiceCADir(certsDir string) string {
+	return filepath.Join(certsDir, "service-ca")
 }
 
 // TotalClientCABundlePath returns the path to the cert bundle with all client certificate signers

@@ -39,26 +39,24 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 		cmName     = "signing-cabundle"
 	)
 
-	caPath := cryptomaterial.UltimateTrustBundlePath(cryptomaterial.CertsDirectory(cfg.DataDir))
-	tlsCrtPath := cfg.DataDir + "/resources/service-ca/secrets/service-ca/tls.crt"
-	tlsKeyPath := cfg.DataDir + "/resources/service-ca/secrets/service-ca/tls.key"
+	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(cfg.DataDir))
+	caCertPath := cryptomaterial.CACertPath(serviceCADir)
+	caKeyPath := cryptomaterial.CAKeyPath(serviceCADir)
+
 	cmData := map[string]string{}
 	secretData := map[string][]byte{}
-	cabundle, err := os.ReadFile(caPath)
+
+	caCertPEM, err := os.ReadFile(caCertPath)
 	if err != nil {
 		return err
 	}
-	tlscrt, err := os.ReadFile(tlsCrtPath)
+	caKeyPEM, err := os.ReadFile(caKeyPath)
 	if err != nil {
 		return err
 	}
-	tlskey, err := os.ReadFile(tlsKeyPath)
-	if err != nil {
-		return err
-	}
-	cmData["ca-bundle.crt"] = string(cabundle)
-	secretData["tls.crt"] = tlscrt
-	secretData["tls.key"] = tlskey
+	cmData["ca-bundle.crt"] = string(caCertPEM)
+	secretData["tls.crt"] = caCertPEM
+	secretData["tls.key"] = caKeyPEM
 
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
