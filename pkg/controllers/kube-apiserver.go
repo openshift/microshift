@@ -90,7 +90,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
 	kubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
-	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
+	ultimateTrustCACertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
 	kasSecretsDir := filepath.Join(certsDir, "kube-apiserver", "secrets")
 	servingCertsDir := filepath.Join(kasSecretsDir, "service-network-serving-certkey")
@@ -114,19 +114,19 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"audit-log-path":    {cfg.AuditLogDir},
 			"audit-policy-file": {cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
 			"client-ca-file":    {clientCABundlePath},
-			"etcd-cafile":       {caCertFile},
+			"etcd-cafile":       {ultimateTrustCACertFile},
 			"etcd-certfile":     {cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt"},
 			"etcd-keyfile":      {cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key"},
 			"etcd-servers": {
 				"https://127.0.0.1:2379",
 			},
-			"kubelet-certificate-authority": {caCertFile},
+			"kubelet-certificate-authority": {ultimateTrustCACertFile},
 			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
 
 			"proxy-client-cert-file":           {filepath.Join(kasSecretsDir, "aggregator-client", "tls.crt")},
 			"proxy-client-key-file":            {filepath.Join(kasSecretsDir, "aggregator-client", "tls.key")},
-			"requestheader-client-ca-file":     {clientCABundlePath},
+			"requestheader-client-ca-file":     {ultimateTrustCACertFile},
 			"service-account-signing-key-file": {cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
 			"service-node-port-range":          {cfg.Cluster.ServiceNodePortRange},
 			"tls-cert-file":                    {filepath.Join(servingCertsDir, "tls.crt")},

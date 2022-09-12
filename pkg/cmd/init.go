@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"net"
 	"path/filepath"
 
@@ -66,11 +65,6 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 
 	if err != nil {
 		return nil, nil, err
-	}
-
-	// FIXME: don't add the whole root CA to client CA bundle, get rid of a general trust by splitting the root CA
-	if err := cryptomaterial.AddToTotalClientCABundle(certsDir, clusterTrustBundlePEM); err != nil {
-		return nil, nil, fmt.Errorf("failed to add the root CA to the total client CA bundle: %w", err)
 	}
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
