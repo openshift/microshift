@@ -27,6 +27,7 @@ import (
 	"encoding/asn1"
 	"encoding/base64"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 	"math"
 	"math/big"
@@ -138,12 +139,10 @@ func GenCertsBuff(common string, svcName []string) ([]byte, []byte, error) {
 	return certBuff, keyBuff, nil
 }
 
-// GenCerts creates certs and keys
-// GenCerts("/var/lib/openshift/service-ca/key", "tls.crt", "tls.key", "example.com")
+// GenCerts creates certs and keys signed by the root CA
 func GenCerts(common, dir, certFilename, keyFilename string, svcName []string) error {
-	var err error
 	if rootCA == nil || rootKey == nil {
-		return err
+		return fmt.Errorf("the root CA cert/key pair was not yet generated")
 	}
 	os.MkdirAll(dir, 0700)
 	certBuff, keyBuff, err := GenCertsBuff(common, svcName)
