@@ -210,9 +210,9 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		"service-account.crt", "service-account.key"); err != nil {
 		return nil, nil, err
 	}
-	if err := util.GenCerts("system:masters", filepath.Join(cfg.DataDir, "/certs/kube-apiserver/secrets/aggregator-client"),
+	if err := util.GenCerts("system:openshift-aggregator", filepath.Join(cfg.DataDir, "/certs/kube-apiserver/secrets/aggregator-client"),
 		"tls.crt", "tls.key",
-		[]string{"system:admin", "system:masters"}); err != nil {
+		[]string{"remove-this"}); err != nil {
 		return nil, nil, err
 	}
 
