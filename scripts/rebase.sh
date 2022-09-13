@@ -573,6 +573,7 @@ rebase_to() {
     download_release "${release_image_amd64}" "${release_image_arm64}"
 
     rebase_branch=rebase-${release_image_amd64#*:}
+    rebase_branch=${rebase_branch%-x86_64}
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
