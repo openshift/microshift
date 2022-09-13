@@ -1,0 +1,30 @@
+---
+# configure-firewall tasks
+
+- name: permit traffic in trusted zone from CIDR
+  ansible.posix.firewalld:
+    source: "{{ item }}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+    zone: trusted
+  with_items: "{{ firewall_trusted_cidr }}"
+
+- name: permit traffic in public zone for services
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+    zone: public
+  with_items: "{{ firewall_services }}"
+
+- name: permit traffic in public zone for ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+    zone: public
+  with_items: "{{ firewall_ports }}"
+

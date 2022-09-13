@@ -33,6 +33,7 @@
       when: install_pbench | bool
     - role: pbench_agent_config
       when: install_pbench | bool
+    - setup-microshift-host
     - install-microshift
     - microshift-start
 

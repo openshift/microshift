@@ -1,6 +1,7 @@
 - name: disk space block
   block:
     - name: find disk usage
+      become: yes
       ansible.builtin.shell:
         cmd: du -BM -t 1M --max-depth=1 {{ item }} | sort -rh
       register: disk_usage

@@ -1,8 +1,15 @@
-build_etcd_binary: false
-install_pbench: false
-pbench_record_duration: 360
-local_kubeconfig_path: ~/.kube/config.microshift
-pbench_configuration_environment: ec2
+manage_subscription: false
 rhel_username:
 rhel_password:
 rhel_pool_id:
+
+prometheus_logging: false
+
+install_pbench: true
+pbench_configuration_environment: ec2
+pbench_key_url:
+pbench_config_url:
+pbench_record_duration: 360
+
+setup_microshift_host: false
+build_etcd_binary: false

@@ -1,57 +1,12 @@
 ---
 # install-microshift default vars
 
-install_packages:
-  - bash-completion
-  - firewalld
-  - git
-  - golang
-  - lvm2
-  - make
-  - python3-firewall
-  - perf
-  - rpm-build
-  - selinux-policy-devel 
-
-oc_archive_name: openshift-client-linux.tar.gz
-cadvisor_url: https://github.com/google/cadvisor/releases/download/v0.39.2/cadvisor
-cadvisor_checksum: sha256:65109ea14132bce91bb2a92dc70248c705ba26fb2a7d55e295bf4192940a396c
-
-firewall_services:
-  - http
-  - https
-  - mdns
-
-firewall_ports:
-  - 80/tcp
-  - 443/tcp
-  - 2379/tcp
-  - 5353/udp
-  - 6443/tcp
-  - 8080/tcp
-  - 9100/tcp
-  - 9537/tcp
-  - 17001/tcp
-  - 30000-32767/tcp
-  - 30000-32767/udp
-
-firewall_trusted_cidr:
-  - 10.42.0.0/16
-  - 169.254.169.1/32
-
-root_bin_dir: /usr/bin
-
 etcd_dir: "{{ ansible_env.HOME }}/etcd"
 etcd_repo: https://github.com/openshift/etcd.git
 
 microshift_dir: "{{ ansible_env.HOME }}/microshift"
 microshift_repo: https://github.com/openshift/microshift.git
 microshift_rpms: []
-
-systemd_services:
-  - cadvisor
-  - firewalld
-  - prometheus-node-exporter
 
 remote_kubeconfig_path: /var/lib/microshift/resources/kubeadmin/kubeconfig
 
@@ -62,8 +17,5 @@ du_dirs:
   - /var/lib/containers/storage/
   - /usr/
   - /usr/bin/*
-
-vg_name: rhel
-lvm_disk: /dev/xvdb
 
 sample_interval: 5

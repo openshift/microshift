@@ -2,6 +2,8 @@
 # manage-repos default vars
 
 rhel_repos:
+  - rhel-8-for-x86_64-baseos-rpms
+  - rhel-8-for-x86_64-appstream-rpms
   - codeready-builder-for-rhel-8-x86_64-rpms
   - fast-datapath-for-rhel-8-x86_64-rpms
   - rhocp-4.10-for-rhel-8-x86_64-rpms

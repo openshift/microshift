@@ -1,0 +1,64 @@
+---
+# setup-microshift-host tasks
+
+- name: install firewalld & packages
+  ansible.builtin.dnf:
+    name: "{{ install_packages }}"
+    state: present
+    update_cache: true
+
+- name: start and enable firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: check if rhel vg exists
+  ansible.builtin.command: vgdisplay -s {{ vg_name }}
+  register: rhel_vg_present
+  ignore_errors: true
+
+- name: create a volume group on top of secondary disk for topolvm
+  community.general.lvg:
+    vg: "{{ vg_name }}"
+    pvs: "{{ lvm_disk }}"
+  when: rhel_vg_present.rc != 0
+
+- name: setup prometheus exporters
+  block:
+  - name: install node-exporter
+    ansible.builtin.dnf:
+      name:
+      - golang-github-prometheus-node-exporter
+      state: present
+
+  - name: download cadvisor
+    ansible.builtin.get_url:
+      url: "{{ cadvisor_url }}"
+      dest: /usr/bin/cadvisor
+      checksum: "{{ cadvisor_checksum }}"
+      mode: '0755'
+
+  - name: install systemd unit for cadvisor
+    ansible.builtin.template:
+      src: cadvisor.service.j2
+      dest: /usr/lib/systemd/system/cadvisor.service
+      backup: true
+
+  - name: start and enable prometheus services
+    ansible.builtin.systemd:
+      name: "{{ item }}"
+      daemon_reload: yes
+      state: started
+      enabled: yes
+    with_items: "{{ promtheus_services }}"
+  when: prometheus_logging
+
+- name: upgrade all packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+  notify: reboot machine
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
