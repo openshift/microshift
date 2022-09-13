@@ -585,15 +585,7 @@ rebase_to() {
         git commit -m "update go.mod"
 
         title "## Updating vendor directory"
-        go mod vendor
-
-        if [ "$(ls -A scripts/rebase_patches)" ]; then
-            title "## Patching vendor directory"
-            git am scripts/rebase_patches/*.patch || true
-        fi
-
-        regenerate_openapi
-
+        make vendor
         if [[ -n "$(git status -s vendor)" ]]; then
             title "## Commiting changes to vendor directory"
             git add vendor
