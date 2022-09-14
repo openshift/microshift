@@ -132,6 +132,7 @@ spec:
         volumeMounts:
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
+      priorityClassName: system-node-critical
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}

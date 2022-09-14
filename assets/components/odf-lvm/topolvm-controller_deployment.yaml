@@ -130,6 +130,7 @@ spec:
         volumeMounts:
         - mountPath: /certs
           name: certs
+      priorityClassName: system-cluster-critical
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
