@@ -17,7 +17,6 @@ package controllers
 
 import (
 	"context"
-	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
@@ -54,7 +53,7 @@ func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 		"version": versionInfo.String(),
 	}
 
-	kubeConfigPath := filepath.Join(s.cfg.DataDir, "/resources/kubeadmin/kubeconfig")
+	kubeConfigPath := s.cfg.KubeConfigPath(config.KubeAdmin)
 	if err := assets.ApplyConfigMapWithData(cm, data, kubeConfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v, %v", cm, err)
 		return err

@@ -18,7 +18,6 @@ package controllers
 import (
 	"context"
 	"errors"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -53,8 +52,8 @@ func (s *KubeControllerManager) Dependencies() []string { return []string{"kube-
 func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
 	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
-	kubeconfig := filepath.Join(cfg.DataDir, "resources", "kube-controller-manager", "kubeconfig")
-	kubeadmConfig := filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+	kubeconfig := cfg.KubeConfigPath(config.KubeControllerManager)
+	kubeadmConfig := cfg.KubeConfigPath(config.KubeAdmin)
 
 	opts, err := kubecmoptions.NewKubeControllerManagerOptions()
 	if err != nil {

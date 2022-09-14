@@ -3,7 +3,6 @@ package assets
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"time"
 
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -72,7 +71,7 @@ func isEstablished(cs *apiextclientv1.ApiextensionsV1Client, obj apiruntime.Obje
 }
 
 func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
-	restConfig, err := clientcmd.BuildConfigFromFlags("", filepath.Join(cfg.DataDir, "/resources/kubeadmin/kubeconfig"))
+	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.KubeConfigPath(config.KubeAdmin))
 	if err != nil {
 		return err
 	}
@@ -120,7 +119,7 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 	lock.Lock()
 	defer lock.Unlock()
 
-	restConfig, err := clientcmd.BuildConfigFromFlags("", filepath.Join(cfg.DataDir, "/resources/kubeadmin/kubeconfig"))
+	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.KubeConfigPath(config.KubeAdmin))
 	if err != nil {
 		return err
 	}

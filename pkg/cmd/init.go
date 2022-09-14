@@ -246,7 +246,7 @@ func initKubeconfig(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig"),
+		cfg.KubeConfigPath(config.KubeAdmin),
 		cfg.Cluster.URL,
 		clusterTrustBundlePEM,
 		adminKubeconfigCertPEM,
@@ -260,7 +260,7 @@ func initKubeconfig(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		filepath.Join(cfg.DataDir, "resources", "kube-controller-manager", "kubeconfig"),
+		cfg.KubeConfigPath(config.KubeControllerManager),
 		cfg.Cluster.URL,
 		clusterTrustBundlePEM,
 		kcmCertPEM,
@@ -274,7 +274,7 @@ func initKubeconfig(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		filepath.Join(cfg.DataDir, "resources", "kube-scheduler", "kubeconfig"),
+		cfg.KubeConfigPath(config.KubeScheduler),
 		cfg.Cluster.URL,
 		clusterTrustBundlePEM,
 		schedulerCertPEM, schedulerKeyPEM,
@@ -287,7 +287,7 @@ func initKubeconfig(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		filepath.Join(cfg.DataDir, "resources", "kubelet", "kubeconfig"),
+		cfg.KubeConfigPath(config.Kubelet),
 		cfg.Cluster.URL,
 		clusterTrustBundlePEM,
 		kubeletCertPEM, kubeletKeyPEM,

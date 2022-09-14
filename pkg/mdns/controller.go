@@ -3,7 +3,6 @@ package mdns
 import (
 	"context"
 	"net"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -28,7 +27,7 @@ func NewMicroShiftmDNSController(cfg *config.MicroshiftConfig) *MicroShiftmDNSCo
 	return &MicroShiftmDNSController{
 		NodeIP:     cfg.NodeIP,
 		NodeName:   cfg.NodeName,
-		KubeConfig: filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig"),
+		KubeConfig: cfg.KubeConfigPath(config.KubeAdmin),
 		hostCount:  make(map[string]int),
 	}
 }

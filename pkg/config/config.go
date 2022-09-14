@@ -78,6 +78,21 @@ type MicroshiftConfig struct {
 	Debug     DebugConfig `json:"debug"`
 }
 
+// KubeConfigID identifies the different kubeconfigs managed in the DataDir
+type KubeConfigID string
+
+const (
+	KubeAdmin             KubeConfigID = "kubeadmin"
+	KubeControllerManager KubeConfigID = "kube-controller-manager"
+	KubeScheduler         KubeConfigID = "kube-scheduler"
+	Kubelet               KubeConfigID = "kubelet"
+)
+
+// KubeConfigPath returns the path to the specified kubeconfig file.
+func (cfg *MicroshiftConfig) KubeConfigPath(id KubeConfigID) string {
+	return filepath.Join(cfg.DataDir, "resources", string(id), "kubeconfig")
+}
+
 func NewMicroshiftConfig() *MicroshiftConfig {
 	nodeName, err := os.Hostname()
 	if err != nil {

@@ -65,8 +65,8 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	}
 
 	kubeletFlags := kubeletoptions.NewKubeletFlags()
-	kubeletFlags.BootstrapKubeconfig = cfg.DataDir + "/resources/kubelet/kubeconfig"
-	kubeletFlags.KubeConfig = cfg.DataDir + "/resources/kubelet/kubeconfig"
+	kubeletFlags.BootstrapKubeconfig = cfg.KubeConfigPath(config.Kubelet)
+	kubeletFlags.KubeConfig = cfg.KubeConfigPath(config.Kubelet)
 	kubeletFlags.RuntimeCgroups = "/system.slice/crio.service"
 	kubeletFlags.NodeIP = cfg.NodeIP
 	kubeletFlags.ContainerRuntime = "remote"

@@ -52,7 +52,7 @@ func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struc
 }
 
 func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
-	kubeconfigPath := cfg.DataDir + "/resources/kubeadmin/kubeconfig"
+	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
 	var (
 		sccs = []string{
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",

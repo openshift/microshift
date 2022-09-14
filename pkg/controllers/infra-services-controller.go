@@ -17,7 +17,6 @@ package controllers
 
 import (
 	"context"
-	"path/filepath"
 
 	klog "k8s.io/klog/v2"
 
@@ -57,7 +56,7 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 }
 
 func applyDefaultRBACs(cfg *config.MicroshiftConfig) error {
-	kubeconfigPath := filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
 	var (
 		cr = []string{
 			"assets/core/csr_approver_clusterrole.yaml",

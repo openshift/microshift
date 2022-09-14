@@ -15,7 +15,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	clusterpolicycontroller "github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller"
@@ -44,7 +43,7 @@ func (s *ClusterPolicyController) Name() string           { return "cluster-poli
 func (s *ClusterPolicyController) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *ClusterPolicyController) configure(cfg *config.MicroshiftConfig) error {
-	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kube-controller-manager", "kubeconfig")
+	s.kubeconfig = cfg.KubeConfigPath(config.KubeControllerManager)
 
 	scheme := runtime.NewScheme()
 	openshiftcontrolplanev1.AddToScheme(scheme)
