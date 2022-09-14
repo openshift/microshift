@@ -46,14 +46,6 @@ type ClusterConfig struct {
 	MTU                  string `json:"mtu"`
 }
 
-type ControlPlaneConfig struct {
-	// Token string `json:"token", envconfig:"CONTROLPLANE_TOKEN"`
-}
-
-type NodeConfig struct {
-	// Token string `json:"token", envconfig:"NODE_TOKEN"`
-}
-
 type DebugConfig struct {
 	Pprof bool `json:"pprof"`
 }
@@ -70,9 +62,7 @@ type MicroshiftConfig struct {
 	NodeName string `json:"nodeName"`
 	NodeIP   string `json:"nodeIP"`
 
-	Cluster      ClusterConfig      `json:"cluster"`
-	ControlPlane ControlPlaneConfig `json:"controlPlane"`
-	Node         NodeConfig         `json:"node"`
+	Cluster ClusterConfig `json:"cluster"`
 
 	Manifests []string    `json:"manifests"`
 	Debug     DebugConfig `json:"debug"`
@@ -109,9 +99,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			Domain:               "cluster.local",
 			MTU:                  "1400",
 		},
-		ControlPlane: ControlPlaneConfig{},
-		Node:         NodeConfig{},
-		Manifests:    []string{defaultManifestDirLib, defaultManifestDirEtc, filepath.Join(dataDir, "manifests")},
+		Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, filepath.Join(dataDir, "manifests")},
 	}
 
 }
