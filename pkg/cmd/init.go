@@ -151,6 +151,19 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		).WithSubCAs(
 			cryptomaterial.NewCertificateSigner("kube-csr-signer", cryptomaterial.CSRSignerCertDir(certsDir), cryptomaterial.ClientCAValidityDays),
 		),
+		cryptomaterial.NewCertificateSigner(
+			"aggregator-signer",
+			cryptomaterial.AggregatorSignerDir(certsDir),
+			cryptomaterial.ClientCAValidityDays,
+		).WithClientCertificates(
+			&cryptomaterial.ClientCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "aggregator-client",
+					ValidityDays: cryptomaterial.ClientCertValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "system:openshift-aggregator"},
+			},
+		),
 
 		//------------------------------
 		// SERVING CERTIFICATE SIGNERS
@@ -208,11 +221,6 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 	}
 	if err := util.GenKeys(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/service-account-key"),
 		"service-account.crt", "service-account.key"); err != nil {
-		return nil, nil, err
-	}
-	if err := util.GenCerts("system:openshift-aggregator", filepath.Join(cfg.DataDir, "/certs/kube-apiserver/secrets/aggregator-client"),
-		"tls.crt", "tls.key",
-		[]string{"remove-this"}); err != nil {
 		return nil, nil, err
 	}
 
