@@ -73,7 +73,7 @@ Run `make` command in the top-level directory. If necessary, add `DEBUG=true` ar
 ```bash
 make
 ```
-The artifact of the build is the `microshift` executable file located in the top level directory of the source tree.
+The artifact of the build is the `microshift` executable file located in the `_output/bin` directory.
 
 ### RPM Packages
 Run make command with the `rpm` or `srpm` argument in the top-level directory. 
@@ -84,11 +84,11 @@ make srpm
 
 The artifacts of the build are located in the `_output/rpmbuild` directory.
 ```bash
-$ find ~/microshift/_output/rpmbuild -name \*.rpm
-_output/rpmbuild/RPMS/x86_64/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
-_output/rpmbuild/RPMS/x86_64/microshift-4.10.0-networking-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
-_output/rpmbuild/RPMS/noarch/microshift-selinux-4.10.0-nightly_1654189204_34_gc871db21.el8.noarch.rpm
-_output/rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.src.rpm
+$ cd ~/microshift/ && find . -name \*.rpm
+./_output/rpmbuild/RPMS/x86_64/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
+./_output/rpmbuild/RPMS/x86_64/microshift-4.10.0-networking-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
+./_output/rpmbuild/RPMS/noarch/microshift-selinux-4.10.0-nightly_1654189204_34_gc871db21.el8.noarch.rpm
+./_output/rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.src.rpm
 ```
 
 ## Run MicroShift Executable
@@ -142,14 +142,14 @@ It should now be possible to run a standalone MicroShift executable file as pres
 ### Running MicroShift
 Run the MicroShift executable file in the background using the following command.
 ```bash
-nohup sudo ~/microshift/microshift run >> /tmp/microshift.log &
+nohup sudo ~/microshift/_output/bin/microshift run >> /tmp/microshift.log &
 ```
 Examine the `/tmp/microshift.log` log file to ensure a successful startup.
 
 > An alternative way of running MicroShift is to update `/usr/bin/microshift` file and restart the service. The logs would then be accessible by running the `journalctl -xu microshift` command.
 > ```bash
-> sudo cp -f ~/microshift/microshift /usr/bin/microshift
-> sudo systemctl start microshift
+> sudo cp -f ~/microshift/_output_/bin/microshift /usr/bin/microshift
+> sudo systemctl restart microshift
 > ```
 
 Copy `kubeconfig` to the default location that can be accessed without the administrator privilege.
@@ -205,7 +205,7 @@ ssh-copy-id redhat@microshift-edge
 
 Rebuild the MicroShift executable as described in the [Build MicroShift](#build-microshift) section and run the following commands to copy, cleanup, replace and restart the new service on the RHEL for Edge system.
 ```bash
-scp ~/microshift/microshift redhat@microshift-edge:
+scp ~/microshift/_output/bin/microshift redhat@microshift-edge:
 ssh redhat@microshift-edge ' \
     echo 1 | /usr/bin/cleanup-all-microshift-data && \
     sudo cp ~redhat/microshift /usr/bin/microshift && \
