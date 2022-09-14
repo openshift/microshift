@@ -1,5 +1,7 @@
 # Enabled OpenShift APIs
-MicroShift supports the following sets of OpenShift API resources. 
+
+In addition to the standard Kubernetes APIs, MicroShift supports the
+following OpenShift API resources.
 
 | GroupVersion          | Kind  |
 |-----------------------|-------|
@@ -13,14 +15,4 @@ MicroShift supports the following sets of OpenShift API resources.
 
 | GroupVersion                  | Kind                      |
 |-------------------------------|---------------------------|
-| authorization.openshift.io/v1 | ClusterRoleBinding        |
-|                               | ClusterRole               |
-|                               | LocalResourceAccessReview |
-|                               | LocalSubjectAccessReview  |
-|                               | ResourceAccessReview      |
-|                               | RoleBindingRestriction    |
-|                               | RoleBinding               |
-|                               | Role                      |
-|                               | SelfSubjectRulesReview    |
-|                               | SubjectAccessReview       |
-|                               | SubjectRulesReview        |
+| authorization.openshift.io/v1 | RoleBindingRestriction    |
