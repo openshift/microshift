@@ -87,6 +87,10 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 	}
 
 	certChains, err := cryptomaterial.NewCertificateChains(
+		// ------------------------------
+		// CLIENT CERTIFICATE SIGNERS
+		// ------------------------------
+
 		// kube-control-plane-signer
 		cryptomaterial.NewCertificateSigner(
 			"kube-control-plane-signer",
@@ -152,6 +156,15 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 			},
 		).WithSubCAs(
 			cryptomaterial.NewCertificateSigner("kube-csr-signer", cryptomaterial.CSRSignerCertDir(certsDir), cryptomaterial.ClientCAValidityDays),
+		),
+
+		//------------------------------
+		// SERVING CERTIFICATE SIGNERS
+		//------------------------------
+		cryptomaterial.NewCertificateSigner(
+			"service-ca",
+			cryptomaterial.ServiceCADir(certsDir),
+			cryptomaterial.ServiceCAValidityDays,
 		),
 	).WithCABundle(
 		cryptomaterial.TotalClientCABundlePath(certsDir),
@@ -227,11 +240,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 			"kubernetes", "localhost"}); err != nil {
 		return nil, nil, err
 	}
-	if err := util.GenCerts("service-ca", filepath.Join(cfg.DataDir, "/resources/service-ca/secrets/service-ca"),
-		"tls.crt", "tls.key",
-		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName, apiServerServiceIP.String()}); err != nil {
-		return nil, nil, err
-	}
+
 	return clusterTrustBundlePEM, certChains, nil
 }
 
