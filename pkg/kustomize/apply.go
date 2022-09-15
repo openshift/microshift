@@ -33,7 +33,7 @@ type Kustomizer struct {
 func NewKustomizer(cfg *config.MicroshiftConfig) *Kustomizer {
 	return &Kustomizer{
 		paths:      cfg.Manifests,
-		kubeconfig: filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig"),
+		kubeconfig: cfg.KubeConfigPath(config.KubeAdmin),
 	}
 }
 

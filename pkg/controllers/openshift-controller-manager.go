@@ -60,7 +60,7 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 	}
 
 	var configFilePath = cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml"
-	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+	s.kubeconfig = cfg.KubeConfigPath(config.KubeAdmin)
 	s.ConfigFilePath = configFilePath
 	s.Output = os.Stdout
 }
@@ -75,7 +75,7 @@ func (s *OCPControllerManager) writeConfig(cfg *config.MicroshiftConfig) error {
 	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftControllerManagerConfig
 kubeClientConfig:
-  kubeConfig: ` + cfg.DataDir + `/resources/kubeadmin/kubeconfig
+  kubeConfig: ` + cfg.KubeConfigPath(config.KubeAdmin) + `
   connectionOverrides:
     contentType: "application/json"
 servingInfo:

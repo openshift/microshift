@@ -56,14 +56,14 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 
 	s.options = schedulerOptions.NewOptions()
 	s.options.ConfigFile = cfg.DataDir + "/resources/kube-scheduler/config/config.yaml"
-	s.kubeconfig = filepath.Join(cfg.DataDir, "resources", "kubeadmin", "kubeconfig")
+	s.kubeconfig = cfg.KubeConfigPath(config.KubeAdmin)
 }
 
 func (s *KubeScheduler) writeConfig(cfg *config.MicroshiftConfig) error {
 	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta3
 kind: KubeSchedulerConfiguration
 clientConnection:
-  kubeconfig: ` + cfg.DataDir + `/resources/kube-scheduler/kubeconfig
+  kubeconfig: ` + cfg.KubeConfigPath(config.KubeScheduler) + `
 leaderElection:
   leaderElect: false`)
 
