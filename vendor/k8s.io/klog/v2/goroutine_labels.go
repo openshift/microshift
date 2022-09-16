@@ -23,7 +23,7 @@ func getMicroshiftLoggerComponent() string {
 	return c
 }
 
-func WithMicroshitLoggerComponent(c string, f func()) {
+func WithMicroshiftLoggerComponent(c string, f func()) {
 	pprof.Do(context.Background(), pprof.Labels("microshift_logger_component", c), func(context.Context) {
 		f()
 	})

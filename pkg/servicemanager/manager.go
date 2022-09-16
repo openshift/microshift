@@ -98,7 +98,7 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 
 func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan struct{}, <-chan struct{}) {
 	ready, stopped := make(chan struct{}), make(chan struct{})
-	klog.WithMicroshitLoggerComponent(service.Name(), func() {
+	klog.WithMicroshiftLoggerComponent(service.Name(), func() {
 		go func() {
 			defer func() {
 				if r := recover(); r != nil {
