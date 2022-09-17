@@ -58,9 +58,12 @@ func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml",
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork-v2.yaml",
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot-v2.yaml",
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml",
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml",
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml",
 		}
 	)
