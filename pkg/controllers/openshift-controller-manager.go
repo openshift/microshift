@@ -55,12 +55,13 @@ func (s *OCPControllerManager) Dependencies() []string {
 }
 
 func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
+	s.kubeconfig = cfg.KubeConfigPath(config.KubeAdmin)
+
 	if err := s.writeConfig(cfg); err != nil {
 		klog.Fatalf("Failed to write openshift-controller-manager config %v", err)
 	}
 
 	var configFilePath = cfg.DataDir + "/resources/openshift-controller-manager/config/config.yaml"
-	s.kubeconfig = cfg.KubeConfigPath(config.KubeAdmin)
 	s.ConfigFilePath = configFilePath
 	s.Output = os.Stdout
 }
@@ -75,14 +76,14 @@ func (s *OCPControllerManager) writeConfig(cfg *config.MicroshiftConfig) error {
 	data := []byte(`apiVersion: openshiftcontrolplane.config.openshift.io/v1
 kind: OpenShiftControllerManagerConfig
 kubeClientConfig:
-  kubeConfig: ` + cfg.KubeConfigPath(config.KubeAdmin) + `
+  kubeConfig: ` + s.kubeconfig + `
   connectionOverrides:
     contentType: "application/json"
 servingInfo:
   bindAddress: "0.0.0.0:8445"
   certFile: ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.crt
   keyFile:  ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.key
-  clientCA: ` + cryptomaterial.UltimateTrustBundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
+  clientCA: ` + cryptomaterial.TotalClientCABundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
 controllers:
 - "openshift.io/ingress-ip"
 - "openshift.io/ingress-to-route"

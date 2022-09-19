@@ -252,6 +252,16 @@ func (s *CertificateSigner) SignSubCA(signerInfo *certificateSigner) error {
 		return fmt.Errorf("failed to generate sub-CA %q: %w", signerInfo.signerName, err)
 	}
 
+	// lib-go automatically adds all the certs to the chain but KCM would not start
+	// if there were more than 1 certs in the file
+	subCAConfig.Certs = subCAConfig.Certs[:1]
+	if err := subCAConfig.WriteCertConfigFile(
+		CACertPath(signerInfo.signerDir),
+		CAKeyPath(signerInfo.signerDir),
+	); err != nil {
+		return fmt.Errorf("failed to write the %q cert/key pair files: %w", signerInfo.signerName, err)
+	}
+
 	signerInfo.signerConfig = &crypto.CA{
 		Config:          subCAConfig,
 		SerialGenerator: &crypto.RandomSerialGenerator{},
