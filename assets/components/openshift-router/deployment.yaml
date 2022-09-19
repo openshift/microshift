@@ -16,6 +16,9 @@ spec:
       containers:
         - name: router
           imagePullPolicy: IfNotPresent
+          securityContext:
+            # See https://bugzilla.redhat.com/2007246
+            allowPrivilegeEscalation: true
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - name: http
