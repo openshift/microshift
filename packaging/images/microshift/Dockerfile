@@ -24,7 +24,7 @@ RUN wget https://go.dev/dl/go1.18.1.linux-amd64.tar.gz && \
     make clean $MAKE_TARGET SOURCE_GIT_TAG=$SOURCE_GIT_TAG BIN_TIMESTAMP=$BIN_TIMESTAMP
 
 # RUN STAGE
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.6
 
 ARG ARCH=amd64
 

@@ -1,4 +1,4 @@
-ARG IMAGE_NAME=registry.access.redhat.com/ubi8/ubi-init:8.4
+ARG IMAGE_NAME=registry.access.redhat.com/ubi8/ubi-init:8.6
 
 FROM registry.access.redhat.com/ubi8/go-toolset as builder
 
