@@ -16,24 +16,52 @@
   roles:
     - setup-localhost
 
-- name: Set up logging node
+- name: entitle host and manage repos
+  hosts: microshift
+  become: yes
+  vars_files:
+    - vars/all.yml
+  roles:
+    - manage-repos
+
+- name: install pbench
+  hosts: microshift
+  become: yes
+  gather_facts: no
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: pbench_repo_install
+      when: (install_pbench | bool) and (not pbench_installed | bool)
+    - role: pbench_agent_install
+      when: (install_pbench | bool) and (not pbench_installed | bool)
+    - role: pbench_agent_config
+      when: (install_pbench | bool) and (not pbench_installed | bool)
+
+
+- name: set up logging node
   hosts: logging
+  become: yes
   roles:
     - install-logging
 
-- name: Install microshift node
+- name: install packages, configure services & firewall
+  hosts: microshift
+  become: yes
+  gather_facts: no
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: setup-microshift-host
+      when: (setup_microshift_host | bool)
+    - role: configure-firewall
+      when: (setup_microshift_host | bool)
+
+- name: capture microshift metrics
   hosts: microshift
   vars_files:
-  - vars/all.yml
+    - vars/all.yml
   roles:
-    - manage-repos
-    - role: pbench_repo_install
-      when: install_pbench | bool
-    - role: pbench_agent_install
-      when: install_pbench | bool
-    - role: pbench_agent_config
-      when: install_pbench | bool
-    - setup-microshift-host
     - install-microshift
     - microshift-start
 

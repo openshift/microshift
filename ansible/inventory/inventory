@@ -1,11 +1,8 @@
 [microshift]
-microshift.example.com ansible_host= # microshift node
+microshift-dev ansible_host= private_ip=
 
 [microshift:vars]
 ansible_user=microshift
 
 [logging]
-
-[logging:vars]
-ansible_user=centos
-ansible_become=yes
+localhost ansible_connection=local
