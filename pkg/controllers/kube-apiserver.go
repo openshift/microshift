@@ -92,6 +92,8 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	kubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
 	ultimateTrustCACertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
+	aggregatorCAPath := cryptomaterial.CACertPath(cryptomaterial.AggregatorSignerDir(certsDir))
+	aggregatorClientCertDir := cryptomaterial.AggregatorClientCertDir(certsDir)
 	kasSecretsDir := filepath.Join(certsDir, "kube-apiserver", "secrets")
 	servingCertsDir := filepath.Join(kasSecretsDir, "service-network-serving-certkey")
 
@@ -124,9 +126,9 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
 
-			"proxy-client-cert-file":           {filepath.Join(kasSecretsDir, "aggregator-client", "tls.crt")},
-			"proxy-client-key-file":            {filepath.Join(kasSecretsDir, "aggregator-client", "tls.key")},
-			"requestheader-client-ca-file":     {ultimateTrustCACertFile},
+			"proxy-client-cert-file":           {cryptomaterial.ClientCertPath(aggregatorClientCertDir)},
+			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},
+			"requestheader-client-ca-file":     {aggregatorCAPath},
 			"service-account-signing-key-file": {cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
 			"service-node-port-range":          {cfg.Cluster.ServiceNodePortRange},
 			"tls-cert-file":                    {filepath.Join(servingCertsDir, "tls.crt")},

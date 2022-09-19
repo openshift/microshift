@@ -78,6 +78,14 @@ func ServiceCADir(certsDir string) string {
 	return filepath.Join(certsDir, "service-ca")
 }
 
+func AggregatorSignerDir(certsDir string) string {
+	return filepath.Join(certsDir, "aggregator-signer")
+}
+
+func AggregatorClientCertDir(certsDir string) string {
+	return filepath.Join(AggregatorSignerDir(certsDir), "aggregator-client")
+}
+
 // TotalClientCABundlePath returns the path to the cert bundle with all client certificate signers
 func TotalClientCABundlePath(certsDir string) string {
 	return filepath.Join(certsDir, "ca-bundle", "client-ca.crt")
