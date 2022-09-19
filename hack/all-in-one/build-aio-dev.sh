@@ -13,7 +13,7 @@ trap cleanup EXIT
 TAG="${TAG:-quay.io/microshift/microshift-aio:dev}"
 HOST="${HOST:-rhel8}"
 FROM_SOURCE="${FROM_SOURCE:-false}"
-IMAGE_NAME="${IMAGE_NAME:-registry.access.redhat.com/ubi8/ubi-init:8.4}"
+IMAGE_NAME="${IMAGE_NAME:-registry.access.redhat.com/ubi8/ubi-init:8.6}"
 cp ../../packaging/images/microshift-aio/unit ../../packaging/images/microshift-aio/crio-bridge.conf ../../packaging/images/microshift-aio/kubelet-cgroups.conf .
 
 ARCH=$(uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")

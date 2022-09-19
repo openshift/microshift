@@ -1,5 +1,5 @@
 # This Dockerfile should not be run directly. Instead, run ./build-aio-dev.sh
-ARG IMAGE_NAME=registry.access.redhat.com/ubi8/ubi-init:8.4
+ARG IMAGE_NAME=registry.access.redhat.com/ubi8/ubi-init:8.6
 FROM ${IMAGE_NAME}
 ARG ARCH
 ARG HOST=rhel8
