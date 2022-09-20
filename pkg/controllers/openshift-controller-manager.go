@@ -67,6 +67,8 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 }
 
 func (s *OCPControllerManager) writeConfig(cfg *config.MicroshiftConfig) error {
+	servingCertDir := cryptomaterial.OpenshiftControllerManagerServingCertDir(cryptomaterial.CertsDirectory(cfg.DataDir))
+
 	// OCM config contains a list of controllers to enable/disable.
 	// If no list is specified, all controllers are started (default).
 	// If a non-zero length list is specified, only controllers enabled in the list are started.  Unlisted controllers
@@ -81,8 +83,8 @@ kubeClientConfig:
     contentType: "application/json"
 servingInfo:
   bindAddress: "0.0.0.0:8445"
-  certFile: ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.crt
-  keyFile:  ` + cfg.DataDir + `/resources/openshift-controller-manager/secrets/tls.key
+  certFile: ` + cryptomaterial.ServingCertPath(servingCertDir) + `
+  keyFile:  ` + cryptomaterial.ServingKeyPath(servingCertDir) + `
   clientCA: ` + cryptomaterial.TotalClientCABundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
 controllers:
 - "openshift.io/ingress-ip"
