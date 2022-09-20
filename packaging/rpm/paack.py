@@ -503,6 +503,6 @@ elif args.command == "rpm":
     _report_generated_files(files)
     print("")
     print(GREEN + "Building via mock for the target platform: %s" % args.target + CLEAR)
-    system("mock --resultdir ./paack-result -r %s %s" % (args.target, ' '.join(files)))
+    system("mock --resultdir ./_output/paack-result -r %s %s" % (args.target, ' '.join(files)))
 
-    print(GREEN + "your output files can be found in ./paack-result" + CLEAR)
+    print(GREEN + "your output files can be found in ./_output/paack-result" + CLEAR)

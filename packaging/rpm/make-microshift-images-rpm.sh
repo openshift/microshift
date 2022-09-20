@@ -4,7 +4,7 @@ set -e -o pipefail
 # generated from other info
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 BASE_VERSION="$(${SCRIPT_DIR}/../../pkg/release/get.sh base)"
-RPMBUILD_DIR="${SCRIPT_DIR}/_rpmbuild/"
+RPMBUILD_DIR="${SCRIPT_DIR}/../../_output/image-rpmbuild/"
 RELEASE=${RELEASE:-1}
 
 build() {

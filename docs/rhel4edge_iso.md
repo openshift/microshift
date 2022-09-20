@@ -109,7 +109,7 @@ $ sudo vgdisplay -s
   "rhel" <19.00 GiB [8.00 GiB  used / <11.00 GiB free]
 ```
 
-> Unallocated disk space of 14GB size remains in the `rhel` volume group to be used by the CSI driver.
+> Unallocated disk space of 11GB size remains in the `rhel` volume group to be used by the CSI driver.
 
 ### Offline Containers
 The `scripts/image-builder/build.sh` script supports a special mode for including user-specific RPM files into the generated ISO. The remainder of this section demonstrates how to generate container image RPMs for MicroShift and include them in the installation ISO.
@@ -143,14 +143,14 @@ Run the script in the `rpm` mode to pull the images required by MicroShift and g
 
 If the procedure runs successfully, the RPM artifacts can be found in the `paack-result` directory.
 ```bash
-$ find ~/microshift/paack-result -name microshift-containers-\*.rpm
-/home/microshift/microshift/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
-/home/microshift/microshift/paack-result/microshift-containers-4.10.18-1.src.rpm
+$ find ~/microshift/_output/paack-result -name microshift-containers-\*.rpm
+/home/microshift/microshift/_output/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
+/home/microshift/microshift/_output/paack-result/microshift-containers-4.10.18-1.src.rpm
 ```
 
 Finally, run the build script with the `-custom_rpms` argument to include the specified container image RPMs into the generated ISO.
 ```bash
-CONTAINERS_RPM=$(find ~/microshift/paack-result -name microshift-containers-\*.$(uname -i).rpm)
+CONTAINERS_RPM=$(find ~/microshift/_output/paack-result -name microshift-containers-\*.$(uname -i).rpm)
 ~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -custom_rpms $CONTAINERS_RPM
 ```
 > If user-specific container images need to be included into the ISO, multiple comma-separated RPM files can be specified as the `-custom_rpms` argument value.
@@ -162,7 +162,7 @@ Log into the host machine using your user credentials. The remainder of this sec
 
 Start by copying the installer image from the development virtual machine to the host file system.
 ```bash
-sudo scp microshift@microshift-dev:/home/microshift/microshift/scripts/image-builder/_builds/microshift-installer-*.$(uname -i).iso /var/lib/libvirt/images/
+sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-builder/microshift-installer-*.$(uname -i).iso /var/lib/libvirt/images/
 ```
 
 Run the following commands to create a virtual machine using the installer image.
