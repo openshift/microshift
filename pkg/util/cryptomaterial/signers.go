@@ -2,12 +2,14 @@ package cryptomaterial
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"time"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apiserver/pkg/authentication/user"
+	"k8s.io/klog/v2"
 
 	"github.com/openshift/library-go/pkg/crypto"
 )
@@ -243,30 +245,33 @@ func (s *CertificateSigner) GetSignerCertPEM() ([]byte, error) {
 }
 
 func (s *CertificateSigner) SignSubCA(signerInfo *certificateSigner) error {
-	subCAConfig, err := crypto.MakeCAConfigForDuration(
-		signerInfo.signerName,
-		time.Duration(signerInfo.signerValidityDays)*time.Hour*24,
+	subCA, _, err := libraryGoEnsureSubCA(
 		s.signerConfig,
+		CABundlePath(signerInfo.signerDir),
+		CAKeyPath(signerInfo.signerDir),
+		CASerialsPath(signerInfo.signerDir),
+		signerInfo.signerName,
+		signerInfo.signerValidityDays,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to generate sub-CA %q: %w", signerInfo.signerName, err)
 	}
 
-	// lib-go automatically adds all the certs to the chain but KCM would not start
-	// if there were more than 1 certs in the file
-	subCAConfig.Certs = subCAConfig.Certs[:1]
-	if err := subCAConfig.WriteCertConfigFile(
-		CACertPath(signerInfo.signerDir),
-		CAKeyPath(signerInfo.signerDir),
-	); err != nil {
-		return fmt.Errorf("failed to write the %q cert/key pair files: %w", signerInfo.signerName, err)
+	// the library code above writes the whole cert chain in files but some of
+	// the kube code requires a single cert per signer cert file
+	subCACertPath := CACertPath(signerInfo.signerDir)
+	if _, err := os.Stat(subCACertPath); err == nil || os.IsNotExist(err) {
+		certPEM, err := crypto.EncodeCertificates(subCA.Config.Certs[0])
+		if err != nil {
+			return fmt.Errorf("failed to encode sub-CA %q certs to pem: %w", signerInfo.signerName, err)
+		}
+
+		if err := os.WriteFile(subCACertPath, certPEM, os.FileMode(0644)); err != nil {
+			return fmt.Errorf("failed to write certificate for sub-CA %q: %w", signerInfo.signerName, err)
+		}
 	}
 
-	signerInfo.signerConfig = &crypto.CA{
-		Config:          subCAConfig,
-		SerialGenerator: &crypto.RandomSerialGenerator{},
-	}
-
+	signerInfo.signerConfig = subCA
 	subCertSigner, err := signerInfo.Complete()
 	if err != nil {
 		return err
@@ -358,4 +363,49 @@ func signedCertificateInfoMapKeysOrdered(stringMap map[string]*signedCertificate
 
 	keys.Sort()
 	return keys
+}
+
+// libraryGoEnsureSubCA comes from lib-go 4.12, use (ca *CA) EnsureSubCA from there once we get the updated lib-go
+func libraryGoEnsureSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expireDays int) (*crypto.CA, bool, error) {
+	if subCA, err := crypto.GetCA(certFile, keyFile, serialFile); err == nil {
+		return subCA, false, err
+	}
+	subCA, err := libraryGoMakeAndWriteSubCA(ca, certFile, keyFile, serialFile, name, expireDays)
+	return subCA, true, err
+}
+
+// lilibraryGoMakeAndWriteSubCA comes from lib-go 4.12, use (ca *CA) MakeAndWriteSubCA from there once we get the updated lib-go
+func libraryGoMakeAndWriteSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expireDays int) (*crypto.CA, error) {
+	klog.V(4).Infof("Generating sub-CA certificate in %s, key in %s, serial in %s", certFile, keyFile, serialFile)
+
+	subCAConfig, err := crypto.MakeCAConfigForDuration(name, time.Duration(expireDays)*time.Hour*24, ca)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := subCAConfig.WriteCertConfigFile(certFile, keyFile); err != nil {
+		return nil, err
+	}
+
+	var serialGenerator crypto.SerialGenerator
+	if len(serialFile) > 0 {
+		// create / overwrite the serial file with a zero padded hex value (ending in a newline to have a valid file)
+		if err := os.WriteFile(serialFile, []byte("00\n"), 0644); err != nil {
+			return nil, err
+		}
+
+		serialGenerator, err = crypto.NewSerialFileGenerator(serialFile)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		serialGenerator = &crypto.RandomSerialGenerator{}
+	}
+
+	subCA := &crypto.CA{
+		Config:          subCAConfig,
+		SerialGenerator: serialGenerator,
+	}
+
+	return subCA, nil
 }
