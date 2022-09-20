@@ -26,11 +26,8 @@ EMBEDDED_GIT_TREE_STATE ?= ${SOURCE_GIT_TREE_STATE}
 MAJOR := $(shell echo $(SOURCE_GIT_TAG) | cut -f1 -d.)
 MINOR := $(shell echo $(SOURCE_GIT_TAG) | cut -f2 -d.)
 
-
 SRC_ROOT :=$(shell pwd)
 
-IMAGE_REPO :=quay.io/microshift/microshift
-IMAGE_REPO_AIO :=quay.io/microshift/microshift-aio
 OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
 ISO_DIR :=$(OUTPUT_DIR)/image-builder
@@ -104,9 +101,6 @@ build: export CGO_ENABLED=0
 
 microshift: build
 
-microshift-aio: build-containerized-all-in-one-amd64
-.PHONY: microshift-aio
-
 update-bindata:
 	./scripts/bindata.sh
 .PHONY: update-bindata
@@ -137,7 +131,6 @@ curl -sSLo "$(1)" "$(2)" ;\
 chmod a+x "$(1)" ;\
 }
 endef
-
 
 # Execute kuttl health checks against infra pods
 .PHONY: validate-cluster
@@ -196,76 +189,6 @@ iso: image-build-configure image-build-iso
 .PHONY: iso
 
 ###############################
-# containerized build targets #
-###############################
-_build_containerized:
-	@if [ -z '$(CTR_CMD)' ] ; then echo '!! ERROR: containerized builds require podman||docker CLI, none found $$PATH' >&2 && exit 1; fi
-	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
-	$(CTR_CMD) build -t $(IMAGE_REPO):$(SOURCE_GIT_TAG)-linux-$(ARCH) \
-		-f "$(SRC_ROOT)"/packaging/images/microshift/Dockerfile \
-		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
-		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
-		--build-arg ARCH=$(ARCH) \
-		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
-		--build-arg FROM_SOURCE=$(FROM_SOURCE) \
-		--platform="linux/$(ARCH)" \
-		.
-.PHONY: _build_containerized
-
-_build_containerized_aio:
-	@if [ -z '$(CTR_CMD)' ] ; then echo '!! ERROR: containerized builds require podman||docker CLI, none found $$PATH' >&2 && exit 1; fi
-	echo BIN_TIMESTAMP==$(BIN_TIMESTAMP)
-	$(CTR_CMD) build -t $(IMAGE_REPO_AIO):$(SOURCE_GIT_TAG)-linux-$(IPTABLES)-$(ARCH) \
-		-f "$(SRC_ROOT)"/packaging/images/microshift-aio/Dockerfile \
-		--build-arg SOURCE_GIT_TAG=$(SOURCE_GIT_TAG) \
-		--build-arg BIN_TIMESTAMP=$(BIN_TIMESTAMP) \
-		--build-arg ARCH=$(ARCH) \
-		--build-arg MAKE_TARGET="cross-build-linux-$(ARCH)" \
-		--build-arg FROM_SOURCE=$(FROM_SOURCE) \
-		--build-arg IPTABLES=$(IPTABLES) \
-		--platform="linux/$(ARCH)" \
-		.
-.PHONY: _build_containerized_aio
-
-build-containerized-cross-build-linux-amd64:
-	+$(MAKE) _build_containerized ARCH=amd64
-.PHONY: build-containerized-cross-build-linux-amd64
-
-build-containerized-cross-build-linux-arm64:
-	+$(MAKE) _build_containerized ARCH=arm64
-.PHONY: build-containerized-cross-build-linux-arm64
-
-build-containerized-cross-build:
-	+$(MAKE) build-containerized-cross-build-linux-amd64
-	+$(MAKE) build-containerized-cross-build-linux-arm64
-.PHONY: build-containerized-cross-build
-
-build-containerized-all-in-one-cross-build:
-	+$(MAKE) build-containerized-all-in-one-amd64
-	+$(MAKE) build-containerized-all-in-one-arm64
-.PHONY: build-containerized-all-in-one-cross-build
-
-build-containerized-all-in-one-amd64:
-	+$(MAKE) _build_containerized_aio ARCH=amd64
-.PHONY: build-containerized-all-in-one
-
-build-containerized-all-in-one-arm64:
-	+$(MAKE) _build_containerized_aio ARCH=arm64
-.PHONY: build-containerized-all-in-one
-
-build-containerized-all-in-one-iptables-arm64:
-	+$(MAKE) _build_containerized_aio ARCH=arm64 IPTABLES=iptables
-.PHONY: build-containerized-all-in-one-iptables-arm64
-
-###############################
-# container image packaging   #
-###############################
-
-tar-ocp-containers:
-	sudo ./packaging/images/components/archive.sh
-.PHONY: image-tars
-
-###############################
 # dev targets                 #
 ###############################
 
@@ -279,19 +202,6 @@ clean-cross-build:
 
 clean: clean-cross-build
 .PHONY: clean
-
-release: SOURCE_GIT_TAG=$(RELEASE_PRE)-$(TIMESTAMP)
-release:
-	./scripts/release.sh --token $(TOKEN) --version $(SOURCE_GIT_TAG)
-.PHONY: release
-
-release-nightly:
-	./scripts/release.sh --nightly --version $(SOURCE_GIT_TAG)
-.PHONY: release-nightly
-
-component-images:
-	cd packaging/images/components && ./build.sh
-.PHONY: component-images
 
 licensecheck: microshift bin/lichen
 	bin/lichen -c .lichen.yaml microshift
