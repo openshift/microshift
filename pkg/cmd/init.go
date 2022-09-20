@@ -230,11 +230,6 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		return nil, nil, err
 	}
 
-	if err := util.GenKeys(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/sa-public-key"),
-		"serving-ca.pub", "serving-ca.key"); err != nil {
-		return nil, nil, err
-	}
-
 	// ocp
 	if err := util.GenCerts("openshift-controller-manager", filepath.Join(cfg.DataDir, "/resources/openshift-controller-manager/secrets"),
 		"tls.crt", "tls.key",
