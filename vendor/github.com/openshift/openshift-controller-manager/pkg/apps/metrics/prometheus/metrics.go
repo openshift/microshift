@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/blang/semver"
+	semver "github.com/blang/semver/v4"
 	appsv1 "github.com/openshift/api/apps/v1"
 	appsv1listers "github.com/openshift/client-go/apps/listers/apps/v1"
 	"github.com/prometheus/client_golang/prometheus"

@@ -65,7 +65,8 @@ func RunOpenShiftControllerManager(config *openshiftcontrolplanev1.OpenShiftCont
 		if err != nil {
 			klog.Fatal(err)
 		}
-		if err := startControllers(controllerContext); err != nil {
+		// We can make clientConfig part of controllerContext later
+		if err := startControllers(controllerContext, clientConfig); err != nil {
 			klog.Fatal(err)
 		}
 		controllerContext.StartInformers(ctx.Done())
@@ -80,7 +81,7 @@ func RunOpenShiftControllerManager(config *openshiftcontrolplanev1.OpenShiftCont
 		return err
 	}
 	rl, err := resourcelock.New(
-		"configmaps",
+		resourcelock.ConfigMapsLeasesResourceLock,
 		"openshift-controller-manager",
 		"openshift-master-controllers", // this matches what ansible used to set
 		kubeClient.CoreV1(),
@@ -106,7 +107,6 @@ func RunOpenShiftControllerManager(config *openshiftcontrolplanev1.OpenShiftCont
 				},
 			},
 		})
-
 	return nil
 }
 
@@ -135,13 +135,12 @@ func WaitForHealthyAPIServer(client rest.Interface) error {
 
 // startControllers launches the controllers
 // allocation controller is passed in because it wants direct etcd access.  Naughty.
-func startControllers(controllerContext *origincontrollers.ControllerContext) error {
+func startControllers(controllerContext *origincontrollers.ControllerContext, clientConfig *rest.Config) error {
 	for controllerName, initFn := range origincontrollers.ControllerInitializers {
 		if !controllerContext.IsControllerEnabled(controllerName) {
 			klog.Warningf("%q is disabled", controllerName)
 			continue
 		}
-
 		klog.V(1).Infof("Starting %q", controllerName)
 		started, err := initFn(controllerContext)
 		if err != nil {
@@ -154,8 +153,12 @@ func startControllers(controllerContext *origincontrollers.ControllerContext) er
 		}
 		klog.Infof("Started %q", controllerName)
 	}
-
 	klog.Infof("Started Origin Controllers")
+	_, err := origincontrollers.RunRouteControllerManager(controllerContext, clientConfig)
+	if err != nil {
+		klog.Fatalf("Error starting route controller manager (%v)", err)
+	}
+	klog.Infof("Started Route Controllers")
 
 	return nil
 }

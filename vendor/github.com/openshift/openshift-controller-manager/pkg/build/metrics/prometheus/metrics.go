@@ -3,7 +3,7 @@ package prometheus
 import (
 	"sync"
 
-	"github.com/blang/semver"
+	semver "github.com/blang/semver/v4"
 	"github.com/prometheus/client_golang/prometheus"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

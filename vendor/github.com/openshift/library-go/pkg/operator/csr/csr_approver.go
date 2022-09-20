@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"time"
 
 	certapiv1 "k8s.io/api/certificates/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -73,6 +74,7 @@ func NewCSRApproverController(
 
 	f := factory.New().
 		WithSync(c.sync).
+		ResyncEvery(time.Minute).
 		WithFilteredEventsInformersQueueKeyFunc(factory.ObjectNameToKey, csrFilterConverted, csrInformers.Informer())
 
 	if operatorClient != nil {

@@ -34,7 +34,7 @@ type OpenShiftControllerManager struct {
 var longDescription = templates.LongDesc(`
 	Start the OpenShift controllers`)
 
-func NewOpenShiftControllerManagerCommand(name string, out, errout io.Writer) *cobra.Command {
+func NewOpenShiftControllerManagerCommand(name string, out, errout io.Writer, stopCh <-chan struct{}) *cobra.Command {
 	options := &OpenShiftControllerManager{Output: out}
 
 	cmd := &cobra.Command{
@@ -46,7 +46,7 @@ func NewOpenShiftControllerManagerCommand(name string, out, errout io.Writer) *c
 
 			serviceability.StartProfiler()
 
-			if err := options.StartControllerManager(); err != nil {
+			if err := options.StartControllerManager(stopCh); err != nil {
 				if kerrors.IsInvalid(err) {
 					if details := err.(*kerrors.StatusError).ErrStatus.Details; details != nil {
 						fmt.Fprintf(errout, "Invalid %s %s\n", details.Kind, details.Name)
@@ -56,7 +56,7 @@ func NewOpenShiftControllerManagerCommand(name string, out, errout io.Writer) *c
 						os.Exit(255)
 					}
 				}
-				klog.Fatal(err)
+				klog.Fatal(fmt.Sprintf("fatal error occurred: %v", err))
 			}
 		},
 	}
@@ -79,13 +79,17 @@ func (o *OpenShiftControllerManager) Validate() error {
 }
 
 // StartControllerManager calls RunControllerManager and then waits forever
-func (o *OpenShiftControllerManager) StartControllerManager() error {
+func (o *OpenShiftControllerManager) StartControllerManager(stopCh <-chan struct{}) error {
 	if err := o.RunControllerManager(); err != nil {
 		return err
 	}
 
 	go daemon.SdNotify(false, "READY=1")
-	select {}
+	select {
+	case <-stopCh:
+		klog.Infof("Controller Manager received stop signal. exiting.")
+		return nil
+	}
 }
 
 // RunControllerManager takes the options and starts the controllers

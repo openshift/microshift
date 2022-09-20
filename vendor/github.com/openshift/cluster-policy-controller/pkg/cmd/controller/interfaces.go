@@ -7,15 +7,11 @@ import (
 
 	"k8s.io/klog/v2"
 
-	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/util/wait"
-	cacheddiscovery "k8s.io/client-go/discovery/cached"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/restmapper"
 	"k8s.io/controller-manager/app"
 	"k8s.io/controller-manager/pkg/clientbuilder"
 
@@ -34,7 +30,9 @@ import (
 	quotainformer "github.com/openshift/client-go/quota/informers/externalversions"
 	routeclient "github.com/openshift/client-go/route/clientset/versioned"
 	routeinformer "github.com/openshift/client-go/route/informers/externalversions"
-	securityclient "github.com/openshift/client-go/securityinternal/clientset/versioned"
+	securityclient "github.com/openshift/client-go/security/clientset/versioned"
+	securityinformer "github.com/openshift/client-go/security/informers/externalversions"
+	securityinternalclient "github.com/openshift/client-go/securityinternal/clientset/versioned"
 	templateclient "github.com/openshift/client-go/template/clientset/versioned"
 	templateinformer "github.com/openshift/client-go/template/informers/externalversions"
 	"github.com/openshift/library-go/pkg/controller/controllercmd"
@@ -65,11 +63,6 @@ func NewControllerContext(
 	if clientConfig.Burst > 0 {
 		clientConfig.Burst = clientConfig.Burst/10 + 1
 	}
-
-	discoveryClient := cacheddiscovery.NewMemCacheClient(kubeClient.Discovery())
-	dynamicRestMapper := restmapper.NewDeferredDiscoveryRESTMapper(discoveryClient)
-	dynamicRestMapper.Reset()
-	go wait.Until(dynamicRestMapper.Reset, 30*time.Second, ctx.Done())
 
 	appsClient, err := appsclient.NewForConfig(clientConfig)
 	if err != nil {
@@ -103,6 +96,10 @@ func NewControllerContext(
 	if err != nil {
 		return nil, err
 	}
+	securityClient, err := securityclient.NewForConfig(clientConfig)
+	if err != nil {
+		return nil, err
+	}
 
 	openshiftControllerContext := &EnhancedControllerContext{
 		ControllerContext:         controllerContext,
@@ -111,19 +108,17 @@ func NewControllerContext(
 		ClientBuilder: OpenshiftControllerClientBuilder{
 			ControllerClientBuilder: clientbuilder.NewDynamicClientBuilder(rest.AnonymousClientConfig(clientConfig), kubeClient.CoreV1(), defaultOpenShiftInfraNamespace),
 		},
-		KubernetesInformers:                informers.NewSharedInformerFactory(kubeClient, defaultInformerResyncPeriod),
-		OpenshiftConfigKubernetesInformers: informers.NewSharedInformerFactoryWithOptions(kubeClient, defaultInformerResyncPeriod, informers.WithNamespace("openshift-config")),
-		ControllerManagerKubeInformers:     informers.NewSharedInformerFactoryWithOptions(kubeClient, defaultInformerResyncPeriod, informers.WithNamespace("openshift-controller-manager")),
-		AppsInformers:                      appsinformer.NewSharedInformerFactory(appsClient, defaultInformerResyncPeriod),
-		BuildInformers:                     buildinformer.NewSharedInformerFactory(buildClient, defaultInformerResyncPeriod),
-		ConfigInformers:                    configinformer.NewSharedInformerFactory(configClient, defaultInformerResyncPeriod),
-		ImageInformers:                     imageinformer.NewSharedInformerFactory(imageClient, defaultInformerResyncPeriod),
-		OperatorInformers:                  operatorinformer.NewSharedInformerFactory(operatorClient, defaultInformerResyncPeriod),
-		QuotaInformers:                     quotainformer.NewSharedInformerFactory(quotaClient, defaultInformerResyncPeriod),
-		RouteInformers:                     routeinformer.NewSharedInformerFactory(routerClient, defaultInformerResyncPeriod),
-		TemplateInformers:                  templateinformer.NewSharedInformerFactory(templateClient, defaultInformerResyncPeriod),
-		InformersStarted:                   make(chan struct{}),
-		RestMapper:                         dynamicRestMapper,
+		KubernetesInformers: informers.NewSharedInformerFactory(kubeClient, defaultInformerResyncPeriod),
+		AppsInformers:       appsinformer.NewSharedInformerFactory(appsClient, defaultInformerResyncPeriod),
+		BuildInformers:      buildinformer.NewSharedInformerFactory(buildClient, defaultInformerResyncPeriod),
+		ConfigInformers:     configinformer.NewSharedInformerFactory(configClient, defaultInformerResyncPeriod),
+		ImageInformers:      imageinformer.NewSharedInformerFactory(imageClient, defaultInformerResyncPeriod),
+		OperatorInformers:   operatorinformer.NewSharedInformerFactory(operatorClient, defaultInformerResyncPeriod),
+		QuotaInformers:      quotainformer.NewSharedInformerFactory(quotaClient, defaultInformerResyncPeriod),
+		RouteInformers:      routeinformer.NewSharedInformerFactory(routerClient, defaultInformerResyncPeriod),
+		SecurityInformers:   securityinformer.NewSharedInformerFactory(securityClient, defaultInformerResyncPeriod),
+		TemplateInformers:   templateinformer.NewSharedInformerFactory(templateClient, defaultInformerResyncPeriod),
+		InformersStarted:    make(chan struct{}),
 	}
 	openshiftControllerContext.GenericResourceInformer = openshiftControllerContext.ToGenericInformer()
 
@@ -165,9 +160,7 @@ type EnhancedControllerContext struct {
 	// ClientBuilder will provide a client for this controller to use
 	ClientBuilder ControllerClientBuilder
 
-	KubernetesInformers                informers.SharedInformerFactory
-	OpenshiftConfigKubernetesInformers informers.SharedInformerFactory
-	ControllerManagerKubeInformers     informers.SharedInformerFactory
+	KubernetesInformers informers.SharedInformerFactory
 
 	TemplateInformers templateinformer.SharedInformerFactory
 	QuotaInformers    quotainformer.SharedInformerFactory
@@ -178,9 +171,9 @@ type EnhancedControllerContext struct {
 	ConfigInformers   configinformer.SharedInformerFactory
 	ImageInformers    imageinformer.SharedInformerFactory
 	OperatorInformers operatorinformer.SharedInformerFactory
+	SecurityInformers securityinformer.SharedInformerFactory
 
 	GenericResourceInformer genericinformers.GenericResourceInformer
-	RestMapper              meta.RESTMapper
 
 	informersStartedLock   sync.Mutex
 	informersStartedClosed bool
@@ -191,13 +184,12 @@ type EnhancedControllerContext struct {
 
 func (c *EnhancedControllerContext) StartInformers(stopCh <-chan struct{}) {
 	c.KubernetesInformers.Start(stopCh)
-	c.OpenshiftConfigKubernetesInformers.Start(stopCh)
-	c.ControllerManagerKubeInformers.Start(stopCh)
 
 	c.AppsInformers.Start(stopCh)
 	c.BuildInformers.Start(stopCh)
 	c.ConfigInformers.Start(stopCh)
 	c.ImageInformers.Start(stopCh)
+	c.SecurityInformers.Start(stopCh)
 
 	c.TemplateInformers.Start(stopCh)
 	c.QuotaInformers.Start(stopCh)
@@ -228,8 +220,8 @@ type ControllerClientBuilder interface {
 	OpenshiftConfigClient(name string) (configclient.Interface, error)
 	OpenshiftConfigClientOrDie(name string) configclient.Interface
 
-	OpenshiftSecurityClient(name string) (securityclient.Interface, error)
-	OpenshiftSecurityClientOrDie(name string) securityclient.Interface
+	OpenshiftSecurityClient(name string) (securityinternalclient.Interface, error)
+	OpenshiftSecurityClientOrDie(name string) securityinternalclient.Interface
 
 	// OpenShift clients based on generated internal clientsets
 	OpenshiftTemplateClient(name string) (templateclient.Interface, error)
@@ -399,15 +391,15 @@ func (b OpenshiftControllerClientBuilder) OpenshiftQuotaClientOrDie(name string)
 	return client
 }
 
-func (b OpenshiftControllerClientBuilder) OpenshiftSecurityClient(name string) (securityclient.Interface, error) {
+func (b OpenshiftControllerClientBuilder) OpenshiftSecurityClient(name string) (securityinternalclient.Interface, error) {
 	clientConfig, err := b.Config(name)
 	if err != nil {
 		return nil, err
 	}
-	return securityclient.NewForConfig(nonProtobufConfig(clientConfig))
+	return securityinternalclient.NewForConfig(nonProtobufConfig(clientConfig))
 }
 
-func (b OpenshiftControllerClientBuilder) OpenshiftSecurityClientOrDie(name string) securityclient.Interface {
+func (b OpenshiftControllerClientBuilder) OpenshiftSecurityClientOrDie(name string) securityinternalclient.Interface {
 	client, err := b.OpenshiftSecurityClient(name)
 	if err != nil {
 		klog.Fatal(err)

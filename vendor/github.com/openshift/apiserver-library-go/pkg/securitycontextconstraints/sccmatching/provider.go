@@ -3,13 +3,6 @@ package sccmatching
 import (
 	"fmt"
 
-	securityv1 "github.com/openshift/api/security/v1"
-	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/capabilities"
-	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/group"
-	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/seccomp"
-	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/selinux"
-	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/user"
-	sccutil "github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -17,6 +10,14 @@ import (
 	"k8s.io/kubernetes/pkg/security/podsecuritypolicy/sysctl"
 	"k8s.io/kubernetes/pkg/securitycontext"
 	"k8s.io/kubernetes/pkg/util/maps"
+
+	securityv1 "github.com/openshift/api/security/v1"
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/capabilities"
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/group"
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/seccomp"
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/selinux"
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/user"
+	sccutil "github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util"
 )
 
 // used to pass in the field being validated for reusable group strategies so they
@@ -126,22 +127,17 @@ func (s *simpleProvider) CreatePodSecurityContext(pod *api.Pod) (*api.PodSecurit
 		sc.SetSELinuxOptions(seLinux)
 	}
 
-	// we only generate a seccomp annotation for the entire pod.  Validation
-	// will catch any container annotations that are invalid and containers
-	// will inherit the pod annotation.
-	_, hasPodProfile := pod.Annotations[api.SeccompPodAnnotationKey]
-	if !hasPodProfile {
-		profile, err := s.seccompStrategy.Generate(pod)
-		if err != nil {
-			return nil, nil, err
+	// This is only generated on the pod level.  Containers inherit the pod's profile.  If the
+	// container has a specific profile set then it will be caught in the validation step.
+	seccompProfile, err := s.seccompStrategy.Generate(pod.Annotations, pod)
+	if err != nil {
+		return nil, nil, err
+	}
+	if seccompProfile != "" {
+		if annotationsCopy == nil {
+			annotationsCopy = map[string]string{}
 		}
-
-		if profile != "" {
-			if annotationsCopy == nil {
-				annotationsCopy = map[string]string{}
-			}
-			annotationsCopy[api.SeccompPodAnnotationKey] = profile
-		}
+		annotationsCopy[api.SeccompPodAnnotationKey] = seccompProfile
 	}
 
 	return sc.PodSecurityContext(), annotationsCopy, nil
@@ -174,9 +170,24 @@ func (s *simpleProvider) CreateContainerSecurityContext(pod *api.Pod, container 
 	// if we're using the non-root strategy set the marker that this container should not be
 	// run as root which will signal to the kubelet to do a final check either on the runAsUser
 	// or, if runAsUser is not set, the image
-	if sc.RunAsNonRoot() == nil && sc.RunAsUser() == nil && s.scc.RunAsUser.Type == securityv1.RunAsUserStrategyMustRunAsNonRoot {
-		nonRoot := true
-		sc.SetRunAsNonRoot(&nonRoot)
+	// Alternatively, also set the RunAsNonRoot to true in case the UID value is non-nil and non-zero
+	// to more easily satisfy the requirements of upstream PodSecurity admission "restricted" profile
+	// which currently requires all containers to have runAsNonRoot set to true, or to have this set
+	// in the whole pod's security context
+	if sc.RunAsNonRoot() == nil {
+		nonRoot := false
+		switch runAsUser := sc.RunAsUser(); {
+		case runAsUser == nil:
+			if s.scc.RunAsUser.Type == securityv1.RunAsUserStrategyMustRunAsNonRoot {
+				nonRoot = true
+			}
+		case *runAsUser > 0:
+			nonRoot = true
+		}
+
+		if nonRoot {
+			sc.SetRunAsNonRoot(&nonRoot)
+		}
 	}
 
 	caps, err := s.capabilitiesStrategy.Generate(pod, container)
@@ -461,7 +472,7 @@ func createCapabilitiesStrategy(defaultAddCaps, requiredDropCaps, allowedCaps []
 
 // createSeccompStrategy creates a new seccomp strategy
 func createSeccompStrategy(allowedProfiles []string) (seccomp.SeccompStrategy, error) {
-	return seccomp.NewWithSeccompProfile(allowedProfiles)
+	return seccomp.NewSeccompStrategy(allowedProfiles), nil
 }
 
 // createSysctlsStrategy creates a new sysctls strategy
