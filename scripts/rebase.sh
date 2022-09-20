@@ -102,6 +102,17 @@ grep_pseudoversion() {
     echo "${line}" | grep -Po "v[0-9]+\.(0\.0-|\d+\.\d+-([^+]*\.)?0\.)\d{14}-[A-Za-z0-9]+(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?"
 }
 
+# Updates a require directive using an embedded component's commit.
+require_using_component_commit() {
+    local modulepath=$1
+    local component=$2
+
+    commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
+    echo "go mod edit -require ${modulepath}@${commit}"
+    go mod edit -require "${modulepath}@${commit}"
+    go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
+}
+
 # Updates a replace directive using an embedded component's commit.
 # Caches component pseudoversions for faster processing.
 declare -A pseudoversions
@@ -263,6 +274,10 @@ update_go_mod() {
     pushd "${STAGING_DIR}" >/dev/null
 
     title "# Updating go.mod"
+
+    # Require updated versions of OCM and CPC
+    require_using_component_commit github.com/openshift/cluster-policy-controller cluster-policy-controller
+    require_using_component_commit github.com/openshift/openshift-controller-manager openshift-controller-manager
 
     # For all repos in o/k staging, ensure a RequireDirective of v0.0.0
     # and a ReplaceDirective to an absolute modulepath to o/k staging.
