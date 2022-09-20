@@ -355,7 +355,7 @@ spec:
           ip6tables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
           echo "I$(date "+%m%d %H:%M:%S.%N") - starting ovnkube-node"
 
-          gateway_mode_flags="--gateway-mode shared --gateway-interface br-ex"
+          gateway_mode_flags="--gateway-mode local --gateway-interface br-ex"
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE} --init-node ${K8S_NODE}"
           exec /usr/bin/ovnkube \

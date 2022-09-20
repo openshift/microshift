@@ -3068,7 +3068,7 @@ data:
     enable-egress-qos=false
 
     [gateway]
-    mode=shared
+    mode=local
     nodeport=true
 
     [masterha]
@@ -3087,7 +3087,7 @@ func assetsComponentsOvnConfigmapYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/configmap.yaml", size: 848, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/configmap.yaml", size: 847, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3449,7 +3449,7 @@ spec:
           ip6tables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
           echo "I$(date "+%m%d %H:%M:%S.%N") - starting ovnkube-node"
 
-          gateway_mode_flags="--gateway-mode shared --gateway-interface br-ex"
+          gateway_mode_flags="--gateway-mode local --gateway-interface br-ex"
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE} --init-node ${K8S_NODE}"
           exec /usr/bin/ovnkube \
@@ -3593,7 +3593,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15887, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15886, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
