@@ -754,7 +754,8 @@ var _assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml = []byte(`api
 kind: ServiceAccount
 metadata:
   name: topolvm-controller
-  namespace: openshift-storage`)
+  namespace: openshift-storage
+`)
 
 func assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYamlBytes() ([]byte, error) {
 	return _assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml, nil
@@ -766,7 +767,7 @@ func assetsComponentsOdfLvmTopolvmController_v1_serviceaccountYaml() (*asset, er
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml", size: 103, mode: os.FileMode(420), modTime: time.Unix(1663251006, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml", size: 104, mode: os.FileMode(420), modTime: time.Unix(1663251006, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1556,7 +1557,6 @@ kind: ServiceAccount
 metadata:
   name: topolvm-node
   namespace: openshift-storage
-
 `)
 
 func assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYamlBytes() ([]byte, error) {
@@ -1569,7 +1569,7 @@ func assetsComponentsOdfLvmTopolvmNode_v1_serviceaccountYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml", size: 99, mode: os.FileMode(420), modTime: time.Unix(1663251006, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml", size: 98, mode: os.FileMode(420), modTime: time.Unix(1663251006, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1601,6 +1601,8 @@ func assetsComponentsOdfLvmTopolvmOpenshiftStorage_namespaceYaml() (*asset, erro
 var _assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.7.0
   name: logicalvolumes.topolvm.cybozu.com
 spec:
   group: topolvm.cybozu.com
@@ -1631,6 +1633,12 @@ spec:
           spec:
             description: LogicalVolumeSpec defines the desired state of LogicalVolume
             properties:
+              accessType:
+                description: '''accessType'' specifies how the user intends to consume
+                  the snapshot logical volume. Set to "ro" when creating a snapshot
+                  and to "rw" when restoring a snapshot or creating a clone. This
+                  field is populated only when LogicalVolume has a source.'
+                type: string
               deviceClass:
                 type: string
               name:
@@ -1643,6 +1651,11 @@ spec:
                 - type: string
                 pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                 x-kubernetes-int-or-string: true
+              source:
+                description: '''source'' specifies the logicalvolume name of the source;
+                  if present. This field is populated only when LogicalVolume has
+                  a source.'
+                type: string
             required:
             - name
             - nodeName
@@ -1693,7 +1706,7 @@ func assetsComponentsOdfLvmTopolvmCybozuCom_logicalvolumesYaml() (*asset, error)
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml", size: 3096, mode: os.FileMode(420), modTime: time.Unix(1663251006, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml", size: 3796, mode: os.FileMode(420), modTime: time.Unix(1663251006, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
