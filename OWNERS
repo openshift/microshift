@@ -10,6 +10,7 @@ approvers:
 - zshi-redhat
 - pmtk
 - pacevedom
+- stlaz
 reviewers:
 - benluddy
 - copejon
@@ -22,6 +23,7 @@ reviewers:
 - zshi-redhat
 - pmtk
 - pacevedom
+- stlaz
 emeritus_approvers:
 - cooktheryan
 - husky-parul
