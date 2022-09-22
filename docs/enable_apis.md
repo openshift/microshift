@@ -12,7 +12,3 @@ following OpenShift API resources.
 |--------------------------|----------------------------|
 | security.openshift.io/v1 | SecurityContextConstraints |
 
-
-| GroupVersion                  | Kind                      |
-|-------------------------------|---------------------------|
-| authorization.openshift.io/v1 | RoleBindingRestriction    |
