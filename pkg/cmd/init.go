@@ -89,7 +89,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		cryptomaterial.NewCertificateSigner(
 			"kube-control-plane-signer",
 			cryptomaterial.KubeControlPlaneSignerCertDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.KubeControlPlaneSignerCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -110,7 +110,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		cryptomaterial.NewCertificateSigner(
 			"kube-apiserver-to-kubelet-signer",
 			cryptomaterial.KubeAPIServerToKubeletSignerCertDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.KubeAPIServerToKubeletCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -124,7 +124,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		cryptomaterial.NewCertificateSigner(
 			"admin-kubeconfig-signer",
 			cryptomaterial.AdminKubeconfigSignerDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.AdminKubeconfigCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -138,7 +138,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		cryptomaterial.NewCertificateSigner(
 			"kubelet-signer",
 			cryptomaterial.KubeletCSRSignerSignerCertDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.KubeControllerManagerCSRSignerSignerCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -149,12 +149,12 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 				UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
 			},
 		).WithSubCAs(
-			cryptomaterial.NewCertificateSigner("kube-csr-signer", cryptomaterial.CSRSignerCertDir(certsDir), cryptomaterial.ClientCAValidityDays),
+			cryptomaterial.NewCertificateSigner("kube-csr-signer", cryptomaterial.CSRSignerCertDir(certsDir), cryptomaterial.KubeControllerManagerCSRSignerCAValidityDays),
 		),
 		cryptomaterial.NewCertificateSigner(
 			"aggregator-signer",
 			cryptomaterial.AggregatorSignerDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.AggregatorFrontProxySignerCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{

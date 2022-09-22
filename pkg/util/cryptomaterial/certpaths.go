@@ -14,11 +14,18 @@ const (
 	ClientCertFileName = "client.crt"
 	ClientKeyFileName  = "client.key"
 
-	ClientCAValidityDays                  = 60
-	ClientCertValidityDays                = 30
-	AdminKubeconfigClientCertValidityDays = 365 * 10
+	AdminKubeconfigCAValidityDays                      = 365 * 10
+	AdminKubeconfigClientCertValidityDays              = 365 * 10
+	AggregatorFrontProxySignerCAValidityDays           = 30
+	KubeAPIServerToKubeletCAValidityDays               = 365
+	KubeControlPlaneSignerCAValidityDays               = 365
+	KubeControllerManagerCSRSignerSignerCAValidityDays = 60
+	KubeControllerManagerCSRSignerCAValidityDays       = 30
 
-	ServiceCAValidityDays = 790
+	ClientCertValidityDays = 30
+
+	ServiceCAValidityDays            = 790
+	ServiceCAServingCertValidityDays = 730
 )
 
 func CertsDirectory(dataPath string) string { return filepath.Join(dataPath, "certs") }
