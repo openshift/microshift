@@ -411,7 +411,6 @@ update_manifests() {
     #    Selectively copy in only those CRD manifests that MicroShift is already using
     # TODO: add route CRD (https://github.com/openshift/api/blob/master/route/v1/route.crd.yaml) once we rebase to a release that contains it
     #cp "${STAGING_DIR}/release-manifests/0000_01_route.crd.yaml" "${REPOROOT}"/assets/crd
-    cp "${STAGING_DIR}/release-manifests/0000_03_authorization-openshift_01_rolebindingrestriction.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_security-openshift_01_scc.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml" "${REPOROOT}"/assets/crd
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
