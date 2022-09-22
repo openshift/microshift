@@ -46,15 +46,39 @@ func (s *EtcdService) Name() string           { return "etcd" }
 func (s *EtcdService) Dependencies() []string { return []string{} }
 
 func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+
+	// Check to see if we should run as a systemd run or directly as a binary.
+	runningAsSvc := os.Getenv("INVOCATION_ID") != ""
+
+	// Get the path to the etcd binary based on the MicroShift binary location.
 	microshiftExecPath, err := os.Executable()
 	if err != nil {
 		return fmt.Errorf("%v failed to get exec path: %v", s.Name(), err)
 	}
 	etcdPath := filepath.Join(filepath.Dir(microshiftExecPath), "microshift-etcd")
+	// Not running the etcd binary directly, the proper etcd arguments are handled
+	//		in etcd/cmd/microshift-etcd/run.go.
 	args := []string{"run"}
 
+	// If we're launching MicroShift as a service, we need to do the same
+	//		with etcd, so wrap it in a transient systemd-unit that's tied
+	//		to the MicroShift service lifetime.
+	var exe string
+	if runningAsSvc {
+		args = append([]string{
+			"--uid=root",
+			"--scope",
+			"--property", "BindsTo=microshift.service",
+			"--unit", "microshift-etcd",
+			etcdPath,
+		}, args...)
+		exe = "systemd-run"
+	} else {
+		exe = etcdPath
+	}
 	// Not using context as canceling ctx sends SIGKILL to process
-	cmd := exec.Command(etcdPath, args...)
+	cmd := exec.Command(exe, args...)
 
 	wd, err := os.Getwd()
 	if err != nil {
@@ -63,7 +87,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	cmd.Dir = wd
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	if err := cmd.Start(); err != nil {
+	if err = cmd.Start(); err != nil {
 		return fmt.Errorf("%s failed to start: %v", s.Name(), err)
 	}
 
@@ -87,6 +111,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	klog.Info("etcd is ready!")
 	close(ready)
 
+	// Wait for MicroShift to be done
 	<-ctx.Done()
 	return ctx.Err()
 }

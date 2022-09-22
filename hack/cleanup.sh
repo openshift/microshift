@@ -18,6 +18,9 @@ sudo bash -c "
     systemctl disable microshift 2>/dev/null
     pkill -9 microshift
 
+    systemctl stop --now microshift-etcd 2>/dev/null
+    systemctl reset-failed microshift-etcd 2>/dev/null
+
     echo Removing crio container and image storage
     crio wipe -f &>/dev/null || true
     systemctl restart crio
