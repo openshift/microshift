@@ -82,14 +82,10 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	s.etcdCfg.ClientTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdServingCertDir)
 	s.etcdCfg.ClientTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdServingCertDir)
 	s.etcdCfg.ClientTLSInfo.TrustedCAFile = etcdSignerCertPath
-	s.etcdCfg.ClientTLSInfo.ClientCertAuth = false
-	s.etcdCfg.ClientTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
 	s.etcdCfg.PeerTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdPeerCertDir)
 	s.etcdCfg.PeerTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdPeerCertDir)
 	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
-	s.etcdCfg.PeerTLSInfo.ClientCertAuth = false
-	s.etcdCfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 }
 
 func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
