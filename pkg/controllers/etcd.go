@@ -58,8 +58,9 @@ func (s *EtcdService) Dependencies() []string { return []string{} }
 func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
 
-	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
-	etcdCertDir := filepath.Join(certsDir, s.Name())
+	etcdServingCertDir := cryptomaterial.EtcdServingCertDir(certsDir)
+	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
+	etcdSignerCertPath := cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))
 	dataDir := filepath.Join(cfg.DataDir, s.Name())
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
@@ -78,15 +79,15 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, cfg.NodeIP)
 
 	s.etcdCfg.CipherSuites = tlsCipherSuites
-	s.etcdCfg.ClientTLSInfo.CertFile = filepath.Join(etcdCertDir, "etcd-serving.crt")
-	s.etcdCfg.ClientTLSInfo.KeyFile = filepath.Join(etcdCertDir, "etcd-serving.key")
-	s.etcdCfg.ClientTLSInfo.TrustedCAFile = caCertFile
+	s.etcdCfg.ClientTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdServingCertDir)
+	s.etcdCfg.ClientTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdServingCertDir)
+	s.etcdCfg.ClientTLSInfo.TrustedCAFile = etcdSignerCertPath
 	s.etcdCfg.ClientTLSInfo.ClientCertAuth = false
 	s.etcdCfg.ClientTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 
-	s.etcdCfg.PeerTLSInfo.CertFile = filepath.Join(etcdCertDir, "etcd-peer.crt")
-	s.etcdCfg.PeerTLSInfo.KeyFile = filepath.Join(etcdCertDir, "etcd-peer.key")
-	s.etcdCfg.PeerTLSInfo.TrustedCAFile = caCertFile
+	s.etcdCfg.PeerTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdPeerCertDir)
+	s.etcdCfg.PeerTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdPeerCertDir)
+	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
 	s.etcdCfg.PeerTLSInfo.ClientCertAuth = false
 	s.etcdCfg.PeerTLSInfo.InsecureSkipVerify = true //TODO after fix GenCert to generate client cert
 }

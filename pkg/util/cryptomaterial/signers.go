@@ -1,6 +1,8 @@
 package cryptomaterial
 
 import (
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -131,6 +133,7 @@ type certificateSigner struct {
 	subCAs                   []*certificateSigner
 	clientCertificatesToSign []*ClientCertificateSigningRequestInfo
 	serverCertificatesToSign []*ServingCertificateSigningRequestInfo
+	peerCertificatesToSign   []*PeerCertificateSigningRequestInfo
 }
 
 type CertificateSigner struct {
@@ -151,6 +154,13 @@ type ClientCertificateSigningRequestInfo struct {
 type ServingCertificateSigningRequestInfo struct {
 	CertificateSigningRequestInfo
 
+	Hostnames []string
+}
+
+type PeerCertificateSigningRequestInfo struct {
+	CertificateSigningRequestInfo
+
+	UserInfo  user.Info
 	Hostnames []string
 }
 
@@ -180,6 +190,11 @@ func (s *certificateSigner) WithClientCertificates(signInfos ...*ClientCertifica
 
 func (s *certificateSigner) WithServingCertificates(signInfos ...*ServingCertificateSigningRequestInfo) *certificateSigner {
 	s.serverCertificatesToSign = append(s.serverCertificatesToSign, signInfos...)
+	return s
+}
+
+func (s *certificateSigner) WithPeerCertificiates(signInfos ...*PeerCertificateSigningRequestInfo) *certificateSigner {
+	s.peerCertificatesToSign = append(s.peerCertificatesToSign, signInfos...)
 	return s
 }
 
@@ -232,6 +247,13 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 	for _, si := range s.serverCertificatesToSign {
 		si := si
 		if err := signerCompleted.SignServingCertificate(si); err != nil {
+			return nil, err
+		}
+	}
+
+	for _, si := range s.peerCertificatesToSign {
+		si := si
+		if err := signerCompleted.SignPeerCertificate(si); err != nil {
 			return nil, err
 		}
 	}
@@ -323,6 +345,47 @@ func (s *CertificateSigner) SignServingCertificate(signInfo *ServingCertificateS
 	return nil
 }
 
+func (s *CertificateSigner) SignPeerCertificate(signInfo *PeerCertificateSigningRequestInfo) error {
+	certDir := filepath.Join(s.signerDir, signInfo.Name)
+
+	hostnameSet := sets.NewString(signInfo.Hostnames...)
+	if _, err := crypto.GetServerCert(
+		PeerCertPath(certDir),
+		PeerKeyPath(certDir),
+		hostnameSet,
+	); err == nil {
+		return nil
+	}
+
+	tlsConfig, err := s.signerConfig.MakeServerCertForDuration(
+		hostnameSet,
+		time.Duration(signInfo.ValidityDays)*24*time.Hour,
+		func(certTemplate *x509.Certificate) error {
+			certTemplate.Subject = userToSubject(signInfo.UserInfo)
+			certTemplate.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth}
+
+			return nil
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to generate peer certificate for %q: %w", signInfo.Name, err)
+	}
+
+	if err := tlsConfig.WriteCertConfigFile(
+		PeerCertPath(certDir),
+		PeerKeyPath(certDir),
+	); err != nil {
+		return fmt.Errorf("failed to write peer certificate for %q: %w", signInfo.Name, err)
+	}
+
+	s.signedCertificates[signInfo.Name] = &signedCertificateInfo{
+		certDir:   certDir,
+		tlsConfig: tlsConfig,
+	}
+
+	return nil
+}
+
 func (s *CertificateSigner) GetCertNames() []string {
 	return signedCertificateInfoMapKeysOrdered(s.signedCertificates)
 }
@@ -408,4 +471,47 @@ func libraryGoMakeAndWriteSubCA(ca *crypto.CA, certFile, keyFile, serialFile, na
 	}
 
 	return subCA, nil
+}
+
+type sortedForDER []string
+
+func (s sortedForDER) Len() int {
+	return len(s)
+}
+func (s sortedForDER) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s sortedForDER) Less(i, j int) bool {
+	l1 := len(s[i])
+	l2 := len(s[j])
+	if l1 == l2 {
+		return s[i] < s[j]
+	}
+	return l1 < l2
+}
+
+func userToSubject(u user.Info) pkix.Name {
+	// Ok we are going to order groups in a peculiar way here to workaround a
+	// 2 bugs, 1 in golang (https://github.com/golang/go/issues/24254) which
+	// incorrectly encodes Multivalued RDNs and another in GNUTLS clients
+	// which are too picky (https://gitlab.com/gnutls/gnutls/issues/403)
+	// and try to "correct" this issue when reading client certs.
+	//
+	// This workaround should be killed once Golang's pkix module is fixed to
+	// generate a correct DER encoding.
+	//
+	// The workaround relies on the fact that the first octect that differs
+	// between the encoding of two group RDNs will end up being the encoded
+	// length which is directly related to the group name's length. So we'll
+	// sort such that shortest names come first.
+	ugroups := u.GetGroups()
+	groups := make([]string, len(ugroups))
+	copy(groups, ugroups)
+	sort.Sort(sortedForDER(groups))
+
+	return pkix.Name{
+		CommonName:   u.GetName(),
+		SerialNumber: u.GetUID(),
+		Organization: groups,
+	}
 }

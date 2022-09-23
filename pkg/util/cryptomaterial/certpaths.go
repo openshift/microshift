@@ -13,6 +13,8 @@ const (
 	ServerKeyFileName  = "server.key"
 	ClientCertFileName = "client.crt"
 	ClientKeyFileName  = "client.key"
+	PeerCertFileName   = "peer.crt"
+	PeerKeyFileName    = "peer.key"
 
 	AdminKubeconfigCAValidityDays                      = 365 * 10
 	AdminKubeconfigClientCertValidityDays              = 365 * 10
@@ -21,6 +23,7 @@ const (
 	KubeControlPlaneSignerCAValidityDays               = 365
 	KubeControllerManagerCSRSignerSignerCAValidityDays = 60
 	KubeControllerManagerCSRSignerCAValidityDays       = 30
+	EtcdSignerCAValidityDays                           = 365 * 10
 
 	ClientCertValidityDays  = 30
 	ServingCertValidityDays = 30
@@ -42,6 +45,9 @@ func ClientKeyPath(dir string) string  { return filepath.Join(dir, ClientKeyFile
 
 func ServingCertPath(dir string) string { return filepath.Join(dir, ServerCertFileName) }
 func ServingKeyPath(dir string) string  { return filepath.Join(dir, ServerKeyFileName) }
+
+func PeerCertPath(dir string) string { return filepath.Join(dir, PeerCertFileName) }
+func PeerKeyPath(dir string) string  { return filepath.Join(dir, PeerKeyFileName) }
 
 func KubeControlPlaneSignerCertDir(certsDir string) string {
 	return filepath.Join(certsDir, "kube-control-plane-signer")
@@ -103,6 +109,22 @@ func AggregatorSignerDir(certsDir string) string {
 
 func AggregatorClientCertDir(certsDir string) string {
 	return filepath.Join(AggregatorSignerDir(certsDir), "aggregator-client")
+}
+
+func EtcdSignerDir(certsDir string) string {
+	return filepath.Join(certsDir, "etcd-signer")
+}
+
+func EtcdPeerCertDir(certsDir string) string {
+	return filepath.Join(EtcdSignerDir(certsDir), "etcd-peer")
+}
+
+func EtcdAPIServerClientCertDir(certsDir string) string {
+	return filepath.Join(EtcdSignerDir(certsDir), "apiserver-etcd-client")
+}
+
+func EtcdServingCertDir(certsDir string) string {
+	return filepath.Join(EtcdSignerDir(certsDir), "etcd-serving")
 }
 
 // TotalClientCABundlePath returns the path to the cert bundle with all client certificate signers
