@@ -88,7 +88,7 @@ func (bs *CustomBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 		serviceAccount = buildutil.BuilderServiceAccountName
 	}
 
-	privileged := true
+	securityContext := securityContextForBuild(strategy.Env)
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      buildutil.GetBuildPodName(build),
@@ -99,13 +99,10 @@ func (bs *CustomBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 			ServiceAccountName: serviceAccount,
 			Containers: []corev1.Container{
 				{
-					Name:  CustomBuild,
-					Image: strategy.From.Name,
-					Env:   containerEnv,
-					// TODO: run unprivileged https://github.com/openshift/origin/issues/662
-					SecurityContext: &corev1.SecurityContext{
-						Privileged: &privileged,
-					},
+					Name:                     CustomBuild,
+					Image:                    strategy.From.Name,
+					Env:                      containerEnv,
+					SecurityContext:          securityContext,
 					TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,
 				},
 			},
@@ -138,6 +135,10 @@ func (bs *CustomBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 	setupAdditionalSecrets(pod, &pod.Spec.Containers[0], build.Spec.Strategy.CustomStrategy.Secrets)
 	setupContainersConfigs(build, pod)
 	setupBuildCAs(build, pod, additionalCAs, internalRegistryHost)
-	setupContainersStorage(pod, &pod.Spec.Containers[0]) // for unprivileged builds
+	setupContainersStorage(pod, &pod.Spec.Containers[0])
+	if securityContext == nil || securityContext.Privileged == nil || !*securityContext.Privileged {
+		setupBuilderAutonsUser(build, strategy.Env, pod)
+		setupBuilderDeviceFUSE(pod)
+	}
 	return pod, nil
 }

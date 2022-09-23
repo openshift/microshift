@@ -1321,7 +1321,7 @@ func (bc *BuildController) createBuildPod(build *buildv1.Build) (*buildUpdate, e
 			return update, fmt.Errorf("could not find registry config for build: %v", err)
 		}
 		if !hasRegistryConf {
-			// Create the registry config ConfigMap to mount the regsitry config to the existing build pod
+			// Create the registry config ConfigMap to mount the registry config to the existing build pod
 			update, err = bc.createBuildSystemConfConfigMap(build, existingPod, update)
 			if err != nil {
 				return update, err

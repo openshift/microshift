@@ -65,8 +65,7 @@ func RunOpenShiftControllerManager(config *openshiftcontrolplanev1.OpenShiftCont
 		if err != nil {
 			klog.Fatal(err)
 		}
-		// We can make clientConfig part of controllerContext later
-		if err := startControllers(controllerContext, clientConfig); err != nil {
+		if err := startControllers(controllerContext); err != nil {
 			klog.Fatal(err)
 		}
 		controllerContext.StartInformers(ctx.Done())
@@ -135,7 +134,7 @@ func WaitForHealthyAPIServer(client rest.Interface) error {
 
 // startControllers launches the controllers
 // allocation controller is passed in because it wants direct etcd access.  Naughty.
-func startControllers(controllerContext *origincontrollers.ControllerContext, clientConfig *rest.Config) error {
+func startControllers(controllerContext *origincontrollers.ControllerContext) error {
 	for controllerName, initFn := range origincontrollers.ControllerInitializers {
 		if !controllerContext.IsControllerEnabled(controllerName) {
 			klog.Warningf("%q is disabled", controllerName)
@@ -154,11 +153,6 @@ func startControllers(controllerContext *origincontrollers.ControllerContext, cl
 		klog.Infof("Started %q", controllerName)
 	}
 	klog.Infof("Started Origin Controllers")
-	_, err := origincontrollers.RunRouteControllerManager(controllerContext, clientConfig)
-	if err != nil {
-		klog.Fatalf("Error starting route controller manager (%v)", err)
-	}
-	klog.Infof("Started Route Controllers")
 
 	return nil
 }

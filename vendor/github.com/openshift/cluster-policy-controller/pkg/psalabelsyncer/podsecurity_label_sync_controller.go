@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/openshift/cluster-policy-controller/pkg/psalabelsyncer/nsexemptions"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,81 +34,6 @@ const (
 	controllerName        = "pod-security-admission-label-synchronization-controller"
 	labelSyncControlLabel = "security.openshift.io/scc.podSecurityLabelSync"
 	currentPSaVersion     = "v1.24"
-)
-
-// systemNSSyncExemptions is the list of namespaces deployed by an OpenShift install
-// payload, as retrieved by listing the namespaces after a successful installation
-// IMPORTANT: The Namespace openshift-operators must be an exception to this rule
-// since it is used by OCP/OLM users to install their Operator bundle solutions.
-var systemNSSyncExemptions = sets.NewString(
-	// kube-specific system namespaces
-	"default",
-	"kube-node-lease",
-	"kube-public",
-	"kube-system",
-
-	// openshift payload namespaces
-	"openshift",
-	"openshift-apiserver",
-	"openshift-apiserver-operator",
-	"openshift-authentication",
-	"openshift-authentication-operator",
-	"openshift-cloud-controller-manager",
-	"openshift-cloud-controller-manager-operator",
-	"openshift-cloud-credential-operator",
-	"openshift-cloud-network-config-controller",
-	"openshift-cluster-csi-drivers",
-	"openshift-cluster-machine-approver",
-	"openshift-cluster-node-tuning-operator",
-	"openshift-cluster-samples-operator",
-	"openshift-cluster-storage-operator",
-	"openshift-cluster-version",
-	"openshift-config",
-	"openshift-config-managed",
-	"openshift-config-operator",
-	"openshift-console",
-	"openshift-console-operator",
-	"openshift-console-user-settings",
-	"openshift-controller-manager",
-	"openshift-controller-manager-operator",
-	"openshift-dns",
-	"openshift-dns-operator",
-	"openshift-etcd",
-	"openshift-etcd-operator",
-	"openshift-host-network",
-	"openshift-image-registry",
-	"openshift-infra",
-	"openshift-ingress",
-	"openshift-ingress-canary",
-	"openshift-ingress-operator",
-	"openshift-insights",
-	"openshift-kni-infra",
-	"openshift-kube-apiserver",
-	"openshift-kube-apiserver-operator",
-	"openshift-kube-controller-manager",
-	"openshift-kube-controller-manager-operator",
-	"openshift-kube-scheduler",
-	"openshift-kube-scheduler-operator",
-	"openshift-kube-storage-version-migrator",
-	"openshift-kube-storage-version-migrator-operator",
-	"openshift-machine-api",
-	"openshift-machine-config-operator",
-	"openshift-marketplace",
-	"openshift-monitoring",
-	"openshift-multus",
-	"openshift-network-diagnostics",
-	"openshift-network-operator",
-	"openshift-node",
-	"openshift-nutanix-infra",
-	"openshift-oauth-apiserver",
-	"openshift-openstack-infra",
-	"openshift-operator-lifecycle-manager",
-	"openshift-ovirt-infra",
-	"openshift-sdn",
-	"openshift-service-ca",
-	"openshift-service-ca-operator",
-	"openshift-user-workload-monitoring",
-	"openshift-vsphere-infra",
 )
 
 // PodSecurityAdmissionLabelSynchronizationController watches over namespaces labelled with
@@ -284,19 +210,29 @@ func (c *PodSecurityAdmissionLabelSynchronizationController) syncNamespace(ctx c
 	nsCopy := ns.DeepCopy()
 
 	var changed bool
+	if nsCopy.Labels[psapi.EnforceLevelLabel] != string(psaLevel) || nsCopy.Labels[psapi.EnforceVersionLabel] != currentPSaVersion {
+		changed = true
+		if nsCopy.Labels == nil {
+			nsCopy.Labels = map[string]string{}
+		}
+
+		nsCopy.Labels[psapi.EnforceLevelLabel] = string(psaLevel)
+		nsCopy.Labels[psapi.EnforceVersionLabel] = currentPSaVersion
+	}
+
+	// cleanup audit and warn labels from version 4.11
+	// TODO: This can be removed in 4.13 and allow users set these as they wish
 	for typeLabel, versionLabel := range map[string]string{
 		psapi.WarnLevelLabel:  psapi.WarnVersionLabel,
 		psapi.AuditLevelLabel: psapi.AuditVersionLabel,
 	} {
-		if ns.Labels[typeLabel] != string(psaLevel) || ns.Labels[versionLabel] != currentPSaVersion {
+		if _, ok := nsCopy.Labels[typeLabel]; ok {
+			delete(nsCopy.Labels, typeLabel)
 			changed = true
-			if nsCopy.Labels == nil {
-				nsCopy.Labels = map[string]string{}
-			}
-
-			nsCopy.Labels[typeLabel] = string(psaLevel)
-			nsCopy.Labels[versionLabel] = currentPSaVersion
-
+		}
+		if _, ok := nsCopy.Labels[versionLabel]; ok {
+			delete(nsCopy.Labels, versionLabel)
+			changed = true
 		}
 	}
 
@@ -390,7 +326,9 @@ func (c *PodSecurityAdmissionLabelSynchronizationController) isNSControlled(nsNa
 
 func isNSControlled(ns *corev1.Namespace) bool {
 	nsName := ns.Name
-	if systemNSSyncExemptions.Has(nsName) {
+
+	// never sync exempted namespaces
+	if nsexemptions.IsNamespacePSALabelSyncExemptedInVendoredOCPVersion(nsName) {
 		return false
 	}
 
@@ -402,11 +340,7 @@ func isNSControlled(ns *corev1.Namespace) bool {
 		return ns.Labels[labelSyncControlLabel] == "true"
 	}
 
-	if ns.Labels[labelSyncControlLabel] != "false" {
-		return true
-	}
-
-	return false
+	return ns.Labels[labelSyncControlLabel] != "false"
 }
 
 // controlledNamespacesLabelSelector returns label selector to be used with the

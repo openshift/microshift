@@ -8,7 +8,6 @@ import (
 	"k8s.io/klog/v2"
 
 	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	cacheddiscovery "k8s.io/client-go/discovery/cached"
@@ -35,7 +34,6 @@ import (
 	securityclient "github.com/openshift/client-go/security/clientset/versioned"
 	templateclient "github.com/openshift/client-go/template/clientset/versioned"
 	templateinformer "github.com/openshift/client-go/template/informers/externalversions"
-	"github.com/openshift/openshift-controller-manager/pkg/client/genericinformers"
 )
 
 func NewControllerContext(
@@ -137,34 +135,8 @@ func NewControllerContext(
 		InformersStarted:                   make(chan struct{}),
 		RestMapper:                         dynamicRestMapper,
 	}
-	openshiftControllerContext.GenericResourceInformer = openshiftControllerContext.ToGenericInformer()
 
 	return openshiftControllerContext, nil
-}
-
-func (c *ControllerContext) ToGenericInformer() genericinformers.GenericResourceInformer {
-	return genericinformers.NewGenericInformers(
-		c.StartInformers,
-		c.KubernetesInformers,
-		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
-			return c.AppsInformers.ForResource(resource)
-		}),
-		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
-			return c.BuildInformers.ForResource(resource)
-		}),
-		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
-			return c.ConfigInformers.ForResource(resource)
-		}),
-		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
-			return c.ImageInformers.ForResource(resource)
-		}),
-		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
-			return c.RouteInformers.ForResource(resource)
-		}),
-		genericinformers.GenericInternalResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
-			return c.TemplateInformers.ForResource(resource)
-		}),
-	)
 }
 
 type ControllerContext struct {
@@ -189,8 +161,7 @@ type ControllerContext struct {
 	ImageInformers    imageinformer.SharedInformerFactory
 	OperatorInformers operatorinformer.SharedInformerFactory
 
-	GenericResourceInformer genericinformers.GenericResourceInformer
-	RestMapper              meta.RESTMapper
+	RestMapper meta.RESTMapper
 
 	// Stop is the stop channel
 	Stop    <-chan struct{}
