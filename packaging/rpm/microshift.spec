@@ -99,7 +99,7 @@ SElinux policy modules for MicroShift.
 
 %package networking
 Summary: Networking elements for MicroShift
-Requires: openvswitch2.16
+Requires: openvswitch2.17
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
