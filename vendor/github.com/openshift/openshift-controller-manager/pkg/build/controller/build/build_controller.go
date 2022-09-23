@@ -35,7 +35,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/containers/image/pkg/sysregistriesv2"
+	sysregistriesv2 "github.com/containers/image/v5/pkg/sysregistriesv2"
 	rutil "github.com/openshift/runtime-utils/pkg/registries"
 
 	buildv1 "github.com/openshift/api/build/v1"
@@ -1231,7 +1231,7 @@ func (bc *BuildController) createBuildPod(build *buildv1.Build) (*buildUpdate, e
 				"Unable to resolve build environment variable reference.", err.Error()))
 		default:
 			update.setReason(buildv1.StatusReasonCannotCreateBuildPodSpec)
-			update.setMessage("Failed to create pod spec.")
+			update.setMessage(fmt.Sprintf("Failed to create pod spec: %s", err.Error()))
 
 		}
 		// If an error occurred when creating the pod spec, it likely means
@@ -1258,7 +1258,7 @@ func (bc *BuildController) createBuildPod(build *buildv1.Build) (*buildUpdate, e
 		// Log an event if the pod is not created (most likely due to quota denial).
 		bc.recorder.Eventf(build, corev1.EventTypeWarning, "FailedCreate", "Error creating build pod: %v", err)
 		update.setReason(buildv1.StatusReasonCannotCreateBuildPod)
-		update.setMessage("Failed creating build pod.")
+		update.setMessage(fmt.Sprintf("Failed creating build pod: %s", err.Error()))
 		return update, fmt.Errorf("failed to create build pod: %v", err)
 
 	} else if err != nil {

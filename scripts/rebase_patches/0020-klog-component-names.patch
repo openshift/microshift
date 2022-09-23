@@ -1,21 +1,36 @@
-From 362ddacd8704c1e124d4831b2a301aeec0d34641 Mon Sep 17 00:00:00 2001
-From: Ben Luddy <bluddy@redhat.com>
-Date: Wed, 31 Aug 2022 17:36:35 -0400
-Subject: [PATCH] Hack to tag klog headers with embedded component names.
-
----
- vendor/k8s.io/klog/v2/goroutine_labels.go | 30 ++++++++++++++++++++++++++++++
- vendor/k8s.io/klog/v2/klog.go             |  2 ++
- 2 files changed, 32 insertions(+)
- create mode 100644 goroutine_labels.go
-
 diff --git a/vendor/k8s.io/klog/v2/goroutine_labels.go b/vendor/k8s.io/klog/v2/goroutine_labels.go
 new file mode 100644
-index 0000000..b9a7356
+index 00000000..50f2235b
 --- /dev/null
 +++ b/vendor/k8s.io/klog/v2/goroutine_labels.go
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,7 @@
 +package klog
++
++import "k8s.io/klog/v2/internal/buffer"
++
++func WithMicroshiftLoggerComponent(c string, f func()) {
++	buffer.WithMicroshiftLoggerComponent(c, f)
++}
+diff --git a/vendor/k8s.io/klog/v2/internal/buffer/buffer.go b/vendor/k8s.io/klog/v2/internal/buffer/buffer.go
+index ac88682a..a29eb626 100644
+--- a/vendor/k8s.io/klog/v2/internal/buffer/buffer.go
++++ b/vendor/k8s.io/klog/v2/internal/buffer/buffer.go
+@@ -149,6 +149,8 @@ func (buf *Buffer) FormatHeader(s severity.Severity, file string, line int, now
+ 	buf.Tmp[21] = ' '
+ 	buf.nDigits(7, 22, Pid, ' ') // TODO: should be TID
+ 	buf.Tmp[29] = ' '
++	buf.WriteString(getMicroshiftLoggerComponent())
++	buf.WriteByte(' ')
+ 	buf.Write(buf.Tmp[:30])
+ 	buf.WriteString(file)
+ 	buf.Tmp[0] = ':'
+diff --git a/vendor/k8s.io/klog/v2/internal/buffer/goroutine_labels.go b/vendor/k8s.io/klog/v2/internal/buffer/goroutine_labels.go
+new file mode 100644
+index 00000000..6e93bdbd
+--- /dev/null
++++ b/vendor/k8s.io/klog/v2/internal/buffer/goroutine_labels.go
+@@ -0,0 +1,30 @@
++package buffer
 +
 +import (
 +	"context"
@@ -45,19 +60,3 @@ index 0000000..b9a7356
 +		f()
 +	})
 +}
-diff --git a/vendor/k8s.io/klog/v2/klog.go b/vendor/k8s.io/klog/v2/klog.go
-index 45efbb0..57a52c6 100644
---- a/vendor/k8s.io/klog/v2/klog.go
-+++ b/vendor/k8s.io/klog/v2/klog.go
-@@ -648,6 +648,8 @@ func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
- 	buf.nDigits(7, 22, pid, ' ') // TODO: should be TID
- 	buf.tmp[29] = ' '
- 	buf.Write(buf.tmp[:30])
-+	buf.WriteString(getMicroshiftLoggerComponent())
-+	buf.WriteByte(' ')
- 	buf.WriteString(file)
- 	buf.tmp[0] = ':'
- 	n := buf.someDigits(1, line)
--- 
-2.37.2
-
