@@ -17,6 +17,7 @@ App requires following permissions:
 import os
 import sys
 import subprocess
+from git import Repo # GitPython
 from github import GithubIntegration, Github # pygithub
 from pathlib import Path
 
@@ -45,34 +46,18 @@ if app_installation == None:
 
 installation_access_token = integration.get_access_token(app_installation.id).token
 
+remote_url = f"https://x-access-token:{installation_access_token}@github.com/{org}/{repo}"
+r = Repo('.')
 try:
-    current_branch = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True).stdout.strip()
-except subprocess.CalledProcessError as e:
-    sys.exit(f"Failed to obtain current branch:\n\n{e.stderr}")
+    remote = r.remote(REMOTE_NAME)
+    remote.set_url(remote_url)
+except ValueError:
+    r.create_remote(REMOTE_NAME, remote_url)
 
-try:
-    res = subprocess.run(["git", "remote"], capture_output=True, text=True)
-except subprocess.CalledProcessError as e:
-    sys.exit(f"Failed to obtain list of remotes:\n\n{e.stderr}")
-
-git_remote_cmd = "add"
-if REMOTE_NAME in res.stdout:
-    print(f"Warning: remote {REMOTE_NAME} already present, will change url")
-    git_remote_cmd = "set-url"
-
-try:
-    subprocess.run(["git", "remote", git_remote_cmd, REMOTE_NAME, f"https://x-access-token:{installation_access_token}@github.com/{org}/{repo}"],
-        check=True, capture_output=True)
-except subprocess.CalledProcessError as e:
-    sys.exit(f"Failed to {git_remote_cmd} remote:\n\n{e.stderr}")
-
-try:
-    subprocess.run(["git", "push", REMOTE_NAME, current_branch], check=True, capture_output=True, text=True)
-except subprocess.CalledProcessError as e:
-    sys.exit(f"Failed to push branch:\n\n{e.stderr}")
+remote = r.remote(REMOTE_NAME)
+remote.push()
 
 gh = Github(installation_access_token)
 repo = gh.get_repo(f"{org}/{repo}")
-pr = repo.create_pull(title=current_branch, body='', base='main', head=current_branch, maintainer_can_modify=True)
+pr = repo.create_pull(title=r.active_branch.name, body='', base='main', head=r.active_branch.name, maintainer_can_modify=True)
 print(f"Created pull request: {pr.html_url}")
-
