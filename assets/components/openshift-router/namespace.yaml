@@ -12,3 +12,9 @@ metadata:
     # old and new forms of the label for matching with NetworkPolicy
     network.openshift.io/policy-group: ingress
     policy-group.network.openshift.io/ingress: ""
+    # Router deployment needs to allow privilege escalation, as well as host
+    # network and host ports for the "HostNetwork" endpoint publishing strategy,
+    # which is the default for on-premise platforms.
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged

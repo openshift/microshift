@@ -3,7 +3,7 @@ package prometheus
 import (
 	"sync"
 
-	"github.com/blang/semver"
+	semver "github.com/blang/semver/v4"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"k8s.io/component-base/metrics/legacyregistry"

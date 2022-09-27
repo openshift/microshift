@@ -1,5 +1,5 @@
 diff --git a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
-index fb66eece..046e20bc 100644
+index a72b3387..046e20bc 100644
 --- a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 +++ b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 @@ -8,7 +8,6 @@ import (
@@ -33,8 +33,8 @@ index fb66eece..046e20bc 100644
 -		return nil
 -	})
 -	genericConfig.BuildHandlerChainFunc, err = BuildHandlerChain(
--		enablement.OpenshiftConfig().ConsolePublicURL,
 -		enablement.OpenshiftConfig().AuthConfig.OAuthMetadataFile,
+-		kubeInformers.Core().V1().ConfigMaps(),
 -		deprecatedAPIRequestController,
 -	)
 -	if err != nil {

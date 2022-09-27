@@ -130,12 +130,5 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 	options := openshift_controller_manager.OpenShiftControllerManager{Output: os.Stdout}
 	options.ConfigFilePath = s.ConfigFilePath
 
-	go func() {
-		if err := options.StartControllerManager(); err != nil {
-			klog.Fatalf("Failed to start openshift-controller-manager %v", err)
-		}
-	}()
-
-	<-ctx.Done()
-	return ctx.Err()
+	return options.StartControllerManager(ctx.Done())
 }

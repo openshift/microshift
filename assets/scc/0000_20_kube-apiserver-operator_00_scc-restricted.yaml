@@ -10,8 +10,7 @@ apiVersion: security.openshift.io/v1
 defaultAddCapabilities:
 fsGroup:
   type: MustRunAs
-groups:
-- system:authenticated
+groups: []
 kind: SecurityContextConstraints
 metadata:
   annotations:
@@ -20,8 +19,7 @@ metadata:
     include.release.openshift.io/single-node-developer: "true"
     release.openshift.io/create-only: "true"
     kubernetes.io/description: restricted denies access to all host features and requires
-      pods to be run with a UID, and SELinux context that are allocated to the namespace.  This
-      is the most restrictive SCC and it is used by default for authenticated users.
+      pods to be run with a UID, and SELinux context that are allocated to the namespace.
   name: restricted
 priority:
 readOnlyRootFilesystem: false

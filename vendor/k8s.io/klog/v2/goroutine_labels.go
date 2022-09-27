@@ -1,30 +1,7 @@
 package klog
 
-import (
-	"context"
-	"runtime/pprof"
-	"unsafe"
-)
-
-//go:linkname runtime_getProfLabel runtime/pprof.runtime_getProfLabel
-func runtime_getProfLabel() unsafe.Pointer
-
-func getMicroshiftLoggerComponent() string {
-	labels := (*map[string]string)(runtime_getProfLabel())
-	if labels == nil {
-		return "???"
-	}
-
-	c, ok := (*labels)["microshift_logger_component"]
-	if !ok {
-		return "???"
-	}
-
-	return c
-}
+import "k8s.io/klog/v2/internal/buffer"
 
 func WithMicroshiftLoggerComponent(c string, f func()) {
-	pprof.Do(context.Background(), pprof.Labels("microshift_logger_component", c), func(context.Context) {
-		f()
-	})
+	buffer.WithMicroshiftLoggerComponent(c, f)
 }

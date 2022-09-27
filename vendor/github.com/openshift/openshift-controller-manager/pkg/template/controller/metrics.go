@@ -3,7 +3,7 @@ package controller
 import (
 	"time"
 
-	"github.com/blang/semver"
+	semver "github.com/blang/semver/v4"
 	"github.com/prometheus/client_golang/prometheus"
 
 	corev1 "k8s.io/api/core/v1"
