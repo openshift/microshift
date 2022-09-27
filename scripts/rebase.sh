@@ -83,8 +83,10 @@ download_release() {
         commit=$(echo "${line}" | cut -d ' ' -f 3)
         if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]]; then
             title "## Cloning ${repo} at commit ${commit}..."
-            git clone "${repo}"
+            git init "${repo##*/}"
             pushd "${repo##*/}" >/dev/null
+            git remote add origin "${repo}"
+            git fetch origin --depth=1 "${commit}"
             git checkout "${commit}"
             popd >/dev/null
             echo
