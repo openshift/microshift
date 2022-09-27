@@ -55,7 +55,7 @@ except ValueError:
     r.create_remote(REMOTE_NAME, remote_url)
 
 remote = r.remote(REMOTE_NAME)
-remote.push()
+remote.push(r.active_branch.name)
 
 gh = Github(installation_access_token)
 repo = gh.get_repo(f"{org}/{repo}")

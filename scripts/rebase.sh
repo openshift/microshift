@@ -580,13 +580,6 @@ update_manifests() {
     popd >/dev/null
 }
 
-git_commit() {
-    if [[ -z ${GIT_AUTHOR+x} ]]; then
-        git commit -m "$1"
-    else
-        git commit -m "$1" --author "${GIT_AUTHOR}"
-    fi
-}
 
 # Runs each rebase step in sequence, commiting the step's output to git
 rebase_to() {
@@ -606,14 +599,14 @@ rebase_to() {
     if [[ -n "$(git status -s go.mod go.sum)" ]]; then
         title "## Committing changes to go.mod"
         git add go.mod go.sum
-        git_commit "update go.mod"
+        git commit -m "update go.mod"
 
         title "## Updating vendor directory"
         make vendor
         if [[ -n "$(git status -s vendor)" ]]; then
             title "## Commiting changes to vendor directory"
             git add vendor
-            git_commit "update vendoring"
+            git commit -m "update vendoring"
         fi
     else
         echo "No changes in go.mod."
@@ -623,7 +616,7 @@ rebase_to() {
     if [[ -n "$(git status -s pkg/release)" ]]; then
         title "## Committing changes to pkg/release"
         git add pkg/release
-        git_commit "update component images"
+        git commit -m "update component images"
     else
         echo "No changes in component images."
     fi
@@ -634,7 +627,7 @@ rebase_to() {
         "${REPOROOT}"/scripts/bindata.sh
         title "## Committing changes to assets and pkg/assets"
         git add assets pkg/assets
-        git_commit "update manifests"
+        git commit -m "update manifests"
     else
         echo "No changes to assets."
     fi
