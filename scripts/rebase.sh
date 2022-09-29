@@ -380,6 +380,8 @@ update_images() {
     done
 
     popd >/dev/null
+
+    go fmt "${REPOROOT}"/pkg/release
 }
 
 
