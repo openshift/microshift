@@ -15,19 +15,11 @@
   roles:
     - manage-repos
 
-- name: install pbench
-  hosts: microshift
+- name: set up logging node
+  hosts: logging
   become: yes
-  gather_facts: no
-  vars_files:
-    - vars/all.yml
   roles:
-    - role: pbench_repo_install
-      when: (install_pbench | bool) and (not pbench_installed | bool)
-    - role: pbench_agent_install
-      when: (install_pbench | bool) and (not pbench_installed | bool)
-    - role: pbench_agent_config
-      when: (install_pbench | bool) and (not pbench_installed | bool)
+    - install-logging
 
 - name: install packages, configure services & firewall
   hosts: microshift
