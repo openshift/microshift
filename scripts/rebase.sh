@@ -76,6 +76,7 @@ download_release() {
     echo "${commits}" | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
 
     git config --global advice.detachedHead false
+    git config --global init.defaultBranch main
     while IFS="" read -r line || [ -n "$line" ]
     do
         component=$(echo "${line}" | cut -d ' ' -f 1)
