@@ -170,7 +170,26 @@ Deprovisions the GCP test infrastructure.
 This is well [documented](https://docs.ci.openshift.org/docs/how-tos/adding-a-new-secret-to-ci/). Secrets are stored in [Vault](https://vault.ci.openshift.org/ui/vault/auth?with=oidc%2F). Leave `Role` as `default` and click `Sign in with OIDC Provider`. This will ask you to sign in with your Red Hat SSO login. Once a secret is present in Vault, step refs can specify these secrets under the `credentials` field (see [here](https://docs.ci.openshift.org/docs/architecture/step-registry/#injecting-custom-credentials)).
 
 
-At present MicroShift steps only inject RHSM subscription credentials, required for installing system and test dependencies on the GCP test instances.
+At present MicroShift steps inject following credentials:
+- RHSM subscription (required for installing system and test dependencies on the GCP test instances)
+- CI Pull Secret (required to pull images in nightly rebase job)
+- GitHub App's ID and private key (required to push branches and create Pull Requests with nightly rebase)
+
+### Obtaining GitHub App's ID and private key for PR creation script
+GitHub App can be understood as a credentials with specific permissions authorized against a repository. GitHub App can be created using form at [github.com/settings/apps/new](https://github.com/settings/apps/new).
+
+[Pull request creation script](../scripts/create_pr.py) requires following read and write permissions:
+- Contents (to push branches directly to the repository)
+- Pull requests (to create Pull Requests)
+
+After creating the App, private key must be generated and together with App's ID supplied to the Vault.
+Step configuration contains a `credentials` stanza which needs to be configured to supply the credentials from the Vault to the step at runtime.
+Credentials are provided to `create_pr.py` with following environmental variables:
+- `APP_ID` - ID of the App
+- `KEY` - path to the private key
+- `REPO` - repository to work against (push branch and create PR)
+- `ORG` - repository's organization
+
 
 ## [CI Config Contributions](https://docs.ci.openshift.org/docs/how-tos/contributing-openshift-release/)
 Patching processes are well documented. Consider the following as a `tl;dr`.
