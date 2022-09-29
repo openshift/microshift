@@ -76,6 +76,7 @@ download_release() {
     echo "${commits}" | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
 
     git config --global advice.detachedHead false
+    git config --global init.defaultBranch main
     while IFS="" read -r line || [ -n "$line" ]
     do
         component=$(echo "${line}" | cut -d ' ' -f 1)
@@ -83,8 +84,10 @@ download_release() {
         commit=$(echo "${line}" | cut -d ' ' -f 3)
         if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]]; then
             title "## Cloning ${repo} at commit ${commit}..."
-            git clone "${repo}"
+            git init "${repo##*/}"
             pushd "${repo##*/}" >/dev/null
+            git remote add origin "${repo}"
+            git fetch origin --depth=1 "${commit}"
             git checkout "${commit}"
             popd >/dev/null
             echo
