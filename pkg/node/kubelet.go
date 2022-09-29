@@ -92,6 +92,9 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 }
 
 func (s *KubeletServer) writeConfig(cfg *config.MicroshiftConfig) error {
+	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	servingCertDir := cryptomaterial.KubeletServingCertDir(certsDir)
+
 	data := []byte(`
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -100,8 +103,8 @@ authentication:
     clientCAFile: ` + cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
   anonymous:
     enabled: false
-tlsCertFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-server/tls.crt
-tlsPrivateKeyFile: ` + cfg.DataDir + `/resources/kubelet/secrets/kubelet-server/tls.key
+tlsCertFile: ` + cryptomaterial.ServingCertPath(servingCertDir) + `
+tlsPrivateKeyFile: ` + cryptomaterial.ServingKeyPath(servingCertDir) + `
 cgroupDriver: "systemd"
 failSwapOn: false
 volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec

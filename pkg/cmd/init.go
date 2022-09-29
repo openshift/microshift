@@ -153,6 +153,14 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 					// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
 					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
 				},
+			).WithServingCertificates(
+				&cryptomaterial.ServingCertificateSigningRequestInfo{
+					CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+						Name:         "kubelet-server",
+						ValidityDays: cryptomaterial.ServingCertValidityDays,
+					},
+					Hostnames: []string{cfg.NodeName, cfg.NodeIP},
+				},
 			),
 		),
 		cryptomaterial.NewCertificateSigner(
@@ -236,12 +244,6 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 	}
 	if err := util.GenKeys(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/service-account-key"),
 		"service-account.crt", "service-account.key"); err != nil {
-		return nil, nil, err
-	}
-
-	if err := util.GenCerts("kubelet", filepath.Join(cfg.DataDir, "/resources/kubelet/secrets/kubelet-server"),
-		"tls.crt", "tls.key",
-		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
 		return nil, nil, err
 	}
 
