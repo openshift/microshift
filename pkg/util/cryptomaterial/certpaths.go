@@ -7,17 +7,25 @@ import (
 const (
 	CACertFileName     = "ca.crt"
 	CAKeyFileName      = "ca.key"
+	CABundleFileName   = "ca-bundle.crt"
 	CASerialsFileName  = "serial.txt"
 	ServerCertFileName = "server.crt"
 	ServerKeyFileName  = "server.key"
 	ClientCertFileName = "client.crt"
 	ClientKeyFileName  = "client.key"
 
-	ClientCAValidityDays                  = 60
-	ClientCertValidityDays                = 30
-	AdminKubeconfigClientCertValidityDays = 365 * 10
+	AdminKubeconfigCAValidityDays                      = 365 * 10
+	AdminKubeconfigClientCertValidityDays              = 365 * 10
+	AggregatorFrontProxySignerCAValidityDays           = 30
+	KubeAPIServerToKubeletCAValidityDays               = 365
+	KubeControlPlaneSignerCAValidityDays               = 365
+	KubeControllerManagerCSRSignerSignerCAValidityDays = 60
+	KubeControllerManagerCSRSignerCAValidityDays       = 30
 
-	ServiceCAValidityDays = 790
+	ClientCertValidityDays = 30
+
+	ServiceCAValidityDays            = 790
+	ServiceCAServingCertValidityDays = 730
 )
 
 func CertsDirectory(dataPath string) string { return filepath.Join(dataPath, "certs") }
@@ -25,6 +33,8 @@ func CertsDirectory(dataPath string) string { return filepath.Join(dataPath, "ce
 func CACertPath(dir string) string    { return filepath.Join(dir, CACertFileName) }
 func CAKeyPath(dir string) string     { return filepath.Join(dir, CAKeyFileName) }
 func CASerialsPath(dir string) string { return filepath.Join(dir, CASerialsFileName) }
+
+func CABundlePath(dir string) string { return filepath.Join(dir, CABundleFileName) }
 
 func ClientCertPath(dir string) string { return filepath.Join(dir, ClientCertFileName) }
 func ClientKeyPath(dir string) string  { return filepath.Join(dir, ClientKeyFileName) }
@@ -76,6 +86,10 @@ func KubeletClientCertDir(certsDir string) string {
 
 func ServiceCADir(certsDir string) string {
 	return filepath.Join(certsDir, "service-ca")
+}
+
+func OpenshiftControllerManagerServingCertDir(certsDir string) string {
+	return filepath.Join(ServiceCADir(certsDir), "openshift-controller-manager-serving")
 }
 
 func AggregatorSignerDir(certsDir string) string {

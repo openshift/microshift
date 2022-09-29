@@ -89,7 +89,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		cryptomaterial.NewCertificateSigner(
 			"kube-control-plane-signer",
 			cryptomaterial.KubeControlPlaneSignerCertDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.KubeControlPlaneSignerCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -110,7 +110,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		cryptomaterial.NewCertificateSigner(
 			"kube-apiserver-to-kubelet-signer",
 			cryptomaterial.KubeAPIServerToKubeletSignerCertDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.KubeAPIServerToKubeletCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -124,7 +124,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		cryptomaterial.NewCertificateSigner(
 			"admin-kubeconfig-signer",
 			cryptomaterial.AdminKubeconfigSignerDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.AdminKubeconfigCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -138,7 +138,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		cryptomaterial.NewCertificateSigner(
 			"kubelet-signer",
 			cryptomaterial.KubeletCSRSignerSignerCertDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.KubeControllerManagerCSRSignerSignerCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -149,12 +149,12 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 				UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
 			},
 		).WithSubCAs(
-			cryptomaterial.NewCertificateSigner("kube-csr-signer", cryptomaterial.CSRSignerCertDir(certsDir), cryptomaterial.ClientCAValidityDays),
+			cryptomaterial.NewCertificateSigner("kube-csr-signer", cryptomaterial.CSRSignerCertDir(certsDir), cryptomaterial.KubeControllerManagerCSRSignerCAValidityDays),
 		),
 		cryptomaterial.NewCertificateSigner(
 			"aggregator-signer",
 			cryptomaterial.AggregatorSignerDir(certsDir),
-			cryptomaterial.ClientCAValidityDays,
+			cryptomaterial.AggregatorFrontProxySignerCAValidityDays,
 		).WithClientCertificates(
 			&cryptomaterial.ClientCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -172,6 +172,17 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 			"service-ca",
 			cryptomaterial.ServiceCADir(certsDir),
 			cryptomaterial.ServiceCAValidityDays,
+		).WithServingCertificates(
+			&cryptomaterial.ServingCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "openshift-controller-manager-serving",
+					ValidityDays: cryptomaterial.ServiceCAServingCertValidityDays,
+				},
+				Hostnames: []string{
+					"controller-manager.openshift-controller-manager.svc",
+					"controller-manager.openshift-controller-manager.svc.cluster.local",
+				},
+			},
 		),
 	).WithCABundle(
 		cryptomaterial.TotalClientCABundlePath(certsDir),
@@ -227,14 +238,6 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 	if err := util.GenCerts("kubelet", filepath.Join(cfg.DataDir, "/resources/kubelet/secrets/kubelet-server"),
 		"tls.crt", "tls.key",
 		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
-		return nil, nil, err
-	}
-
-	// ocp
-	if err := util.GenCerts("openshift-controller-manager", filepath.Join(cfg.DataDir, "/resources/openshift-controller-manager/secrets"),
-		"tls.crt", "tls.key",
-		[]string{"openshift-controller-manager", cfg.NodeName, cfg.NodeIP, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default",
-			"kubernetes", "localhost"}); err != nil {
 		return nil, nil, err
 	}
 
