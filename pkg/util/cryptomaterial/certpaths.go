@@ -81,7 +81,7 @@ func CSRSignerCertDir(certsDir string) string {
 }
 
 func KubeletClientCertDir(certsDir string) string {
-	return filepath.Join(KubeletCSRSignerSignerCertDir(certsDir), "kubelet-client")
+	return filepath.Join(CSRSignerCertDir(certsDir), "kubelet-client")
 }
 
 func ServiceCADir(certsDir string) string {

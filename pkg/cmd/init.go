@@ -139,17 +139,21 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 			"kubelet-signer",
 			cryptomaterial.KubeletCSRSignerSignerCertDir(certsDir),
 			cryptomaterial.KubeControllerManagerCSRSignerSignerCAValidityDays,
-		).WithClientCertificates(
-			&cryptomaterial.ClientCertificateSigningRequestInfo{
-				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
-					Name:         "kubelet-client",
-					ValidityDays: cryptomaterial.ClientCertValidityDays,
-				},
-				// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
-				UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
-			},
 		).WithSubCAs(
-			cryptomaterial.NewCertificateSigner("kube-csr-signer", cryptomaterial.CSRSignerCertDir(certsDir), cryptomaterial.KubeControllerManagerCSRSignerCAValidityDays),
+			cryptomaterial.NewCertificateSigner(
+				"kube-csr-signer",
+				cryptomaterial.CSRSignerCertDir(certsDir),
+				cryptomaterial.KubeControllerManagerCSRSignerCAValidityDays,
+			).WithClientCertificates(
+				&cryptomaterial.ClientCertificateSigningRequestInfo{
+					CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+						Name:         "kubelet-client",
+						ValidityDays: cryptomaterial.ClientCertValidityDays,
+					},
+					// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
+					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
+				},
+			),
 		),
 		cryptomaterial.NewCertificateSigner(
 			"aggregator-signer",
@@ -291,7 +295,7 @@ func initKubeconfig(
 		return err
 	}
 
-	kubeletCertPEM, kubeletKeyPEM, err := certChains.GetCertKey("kubelet-signer", "kubelet-client")
+	kubeletCertPEM, kubeletKeyPEM, err := certChains.GetCertKey("kubelet-signer", "kube-csr-signer", "kubelet-client")
 	if err != nil {
 		return err
 	}
