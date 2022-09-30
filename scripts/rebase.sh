@@ -367,6 +367,11 @@ update_images() {
         # Compute the max length of image names incl. enclosing quotes
         w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
         for i in ${images}; do
+            # TODO: Remove pinning of the ovn-kubernetes-microshift image below once
+            # nightlies contain https://github.com/ovn-org/ovn-kubernetes/pull/3184 lands
+            if [[ "$i" == "ovn_kubernetes_microshift" ]]; then
+                continue
+            fi
             digest=$(jq -r ".references.spec.tags[] | select(.name == \"${i//_/-}\") | .from.name" release_${arch}.json)
             if [[ -n "${digest}" ]]; then
                 echo "Updating image ${i//_/-} (${arch}) to ${digest}."
