@@ -420,8 +420,10 @@ update_manifests() {
     # - assets/crd/authorizationv1-local-apiservice.yaml (local API service for authorization API group, needed if OpenShift API server is not present)
     # - assets/crd/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
 
-    #    Replace all SCC manifests
+    #    Replace all SCC manifests and their CRs/CRBs
     rm -f "${REPOROOT}"/assets/scc/*.yaml
+    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_cr-*.yaml "${REPOROOT}"/assets/scc || true
+    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_crb-*.yaml "${REPOROOT}"/assets/scc || true
     cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/scc || true
     # 2) Render operand manifest templates like the operator would
     #    n/a
@@ -563,6 +565,8 @@ update_manifests() {
     rm -f "${REPOROOT}"/assets/components/service-ca/*
     cp "${STAGING_DIR}"/service-ca-operator/bindata/v4.0.0/controller/* "${REPOROOT}"/assets/components/service-ca || true
     # 2) Render operand manifest templates like the operator would
+    # TODO: Remov the following annotations once CPC correctly creates them automatically
+    yq -i '.spec.template.spec.containers[0].args = ["-v=2"]' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
     yq -i '.spec.template.spec.volumes[0].secret.secretName = "REPLACE_TLS_SECRET"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
     yq -i '.spec.template.spec.volumes[1].configMap.name = "REPLACE_CA_CONFIG_MAP"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
     yq -i 'del(.metadata.labels)' "${REPOROOT}"/assets/components/service-ca/ns.yaml
