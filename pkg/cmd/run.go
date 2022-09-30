@@ -97,7 +97,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	if _, err := os.Stat(filepath.Join(cfg.DataDir, "certs")); errors.Is(err, os.ErrNotExist) {
-		initAll(cfg)
+		util.Must(initAll(cfg))
 	} else {
 		err = loadCA(cfg)
 		if err != nil {
