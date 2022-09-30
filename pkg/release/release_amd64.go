@@ -21,12 +21,12 @@ package release
 
 func init() {
 	Image = map[string]string{
-		"cli":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:26153cfac611418881dad62d9bb2ea46b5c93ba586a68e752335b657dd79032a",
-		"coredns":                   "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cdb8a4c24c404c0c03b0ed2a8221f5a71cf735c1969ff38a3cc3631a754fe7ad",
-		"haproxy_router":            "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b008d8526ffdf997d62309ec12e7b6ba673f76235a5ffe7236db57f407dc24ba",
-		"kube_rbac_proxy":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:174b4f8995157d0f1b5533c9d179c1eb681415a0bd092b4c1b14c2ed1f28083c",
+		"cli":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1f8dc620a817f49452dc746ae41eaec8dece729c9928a0792a3f4000b28f70d6",
+		"coredns":                   "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:440dcd0d8857e19a4c911ed195dbe6d15dfada352d37f3e5bfb9179b67914812",
+		"haproxy_router":            "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0b6677f0f566f3877b97a9e37415bb11b81ce20461a77fdc27bb1641751fb357",
+		"kube_rbac_proxy":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9185a8d8bab28f84db59c75053dbc25cee79c8342990aaf32509a4b6389e9cc2",
 		"pause":                     "k8s.gcr.io/pause:3.6",
-		"service_ca_operator":       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0fde163f17d82d39b75b5ec6a5f2b36652e02b29d6d339c52017de135e4be47a",
+		"service_ca_operator":       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3c9a9d4387f6dc6009c6e17feae637b3cce7dec3e0e2904a58233a29d20414c0",
 		"openssl":                   "registry.access.redhat.com/ubi8/openssl@sha256:8b41865d30b7947de68a9c1747616bce4efab4f60f68f8b7016cd84d7708af6b",
 		"ovn_kubernetes_microshift": "quay.io/microshift/ovn-kubernetes-singlenode@sha256:e97d6035754fad1660b522b8afa4dea2502d5189c8490832e762ae2afb4cf142",
 		"odf_topolvm":               "registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64",
