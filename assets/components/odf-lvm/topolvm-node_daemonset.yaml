@@ -11,6 +11,8 @@ spec:
       app: topolvm-node
   template:
     metadata:
+      annotations:
+        odf-lvm.microshift.io/lvmd_config_sha256sum: "{{ Sha256sum .Config }}"
       labels:
         app: topolvm-node
       name: lvmcluster-sample

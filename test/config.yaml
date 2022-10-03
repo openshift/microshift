@@ -1,7 +1,6 @@
 --- 
 dataDir: /tmp/microshift/data
 auditLogDir: /tmp/microshift/logs
-lvmdConfigFile:
 logVLevel: 4
 roles:
   - role1

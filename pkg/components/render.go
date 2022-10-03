@@ -2,19 +2,22 @@ package components
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"fmt"
 	"path/filepath"
 	"text/template"
+
+	"sigs.k8s.io/yaml"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/config/lvmd"
 	"github.com/openshift/microshift/pkg/release"
-	"sigs.k8s.io/yaml"
 )
 
 var templateFuncs = map[string]interface{}{
-	"Dir": filepath.Dir,
+	"Dir":       filepath.Dir,
+	"Sha256sum": func(b []byte) string { return fmt.Sprintf("%x", sha256.Sum256(b)) },
 }
 
 func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderParams) assets.RenderParams {
@@ -53,6 +56,6 @@ func renderLvmdParams(l *lvmd.Lvmd) (assets.RenderParams, error) {
 		return nil, err
 	}
 	r["lvmd"] = fmt.Sprintf(`%q`, b)
+	r["SocketName"] = l.SocketName
 	return r, nil
 }
-

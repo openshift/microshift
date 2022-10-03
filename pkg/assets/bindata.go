@@ -1167,7 +1167,7 @@ func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml", size: 299, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml", size: 164, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1293,6 +1293,8 @@ spec:
       app: topolvm-node
   template:
     metadata:
+      annotations:
+        odf-lvm.microshift.io/lvmd_config_sha256sum: "{{ Sha256sum .Config }}"
       labels:
         app: topolvm-node
       name: lvmcluster-sample
@@ -1464,7 +1466,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5282, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5380, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

@@ -2,12 +2,13 @@ package components
 
 import (
 	"fmt"
+	"path/filepath"
 
-	"github.com/openshift/microshift/pkg/config/lvmd"
 	"k8s.io/klog/v2"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/config/lvmd"
 )
 
 func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
@@ -63,11 +64,13 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		}
 	)
 
-	l, err := lvmd.NewLvmdConfigFromFileOrDefault(cfg.LvmdConfigFile)
+	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
+	// csi plugin.
+	lvmdCfg, err := lvmd.NewLvmdConfigFromFileOrDefault(filepath.Join(filepath.Dir(cfg.ConfigFile), "lvmd.yaml"))
 	if err != nil {
-		return fmt.Errorf("getting lvmd config")
+		return err
 	}
-	lvmdRenderParams, err := renderLvmdParams(l)
+	lvmdRenderParams, err := renderLvmdParams(lvmdCfg)
 	if err != nil {
 		return fmt.Errorf("rendering lvmd params: %v", err)
 	}
@@ -112,7 +115,7 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, renderTemplate, renderParamsFromConfig(cfg, assets.RenderParams{"SocketName": l.SocketName}), kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ds, renderTemplate, renderParamsFromConfig(cfg, lvmdRenderParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
 		return err
 	}

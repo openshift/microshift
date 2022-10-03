@@ -1,10 +1,12 @@
 package lvmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/ghodss/yaml"
+	"k8s.io/klog/v2"
 )
 
 const (
@@ -20,32 +22,23 @@ type Lvmd struct {
 }
 
 func (l *Lvmd) withDefaults() *Lvmd {
-	if l.SocketName == "" {
-		l.SocketName = defaultSockName
-	}
-	if len(l.DeviceClasses) == 0 {
-		l.DeviceClasses = []*DeviceClass{
-			{
-				Name:        "default",
-				VolumeGroup: defaultRHEL4EdgeVolumeGroup,
-				Default:     true,
-				SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
-			},
-		}
+	l.SocketName = defaultSockName
+	l.DeviceClasses = []*DeviceClass{
+		{
+			Name:        "default",
+			VolumeGroup: defaultRHEL4EdgeVolumeGroup,
+			Default:     true,
+			SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
+		},
 	}
 	return l
-}
-
-type Config struct {
-	Path       string
-	LvmdConfig *Lvmd
 }
 
 func newLvmdConfigFromFile(p string) (*Lvmd, error) {
 	l := new(Lvmd)
 	buf, err := os.ReadFile(p)
 	if err != nil {
-		return nil, fmt.Errorf("reading config file: %v", err)
+		return nil, err
 	}
 
 	err = yaml.Unmarshal(buf, &l)
@@ -58,10 +51,24 @@ func newLvmdConfigFromFile(p string) (*Lvmd, error) {
 	return l, nil
 }
 
+// NewLvmdConfigFromFileOrDefault takes a path to a lvmd config file.  If the file exists and is readable, returns the
+// unmarshalled config *Lvmd and no error.  If the file does not exist, is inaccessible, or fails to unmarshall,
+// a nil ptr and the error are returned.
+// The defaulting behavior exists for cases where a microshift config file was found, but the user has not specified
+// a lvmd file.
 func NewLvmdConfigFromFileOrDefault(path string) (*Lvmd, error) {
-	if path == "" {
-		l := new(Lvmd)
-		return l.withDefaults(), nil
+	if _, err := os.Stat(path); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			klog.Info("lvmd file not found, assuming default values")
+			return new(Lvmd).withDefaults(), nil
+		}
+		return nil, fmt.Errorf("failed to get lvmd config file: %v", err)
 	}
-	return newLvmdConfigFromFile(path)
+
+	l, err := newLvmdConfigFromFile(path)
+	if err == nil {
+		klog.Info("got lvmd config from file %q", path)
+		return l, nil
+	}
+	return nil, fmt.Errorf("getting lvmd config: %v", err)
 }

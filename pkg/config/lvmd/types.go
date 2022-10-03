@@ -1,5 +1,6 @@
 // DeviceClass type definition and validation is taken from:
 // https://github.com/red-hat-storage/topolvm/blob/release-4.10/lvmd/device_class_manager.go
+
 package lvmd
 
 import "regexp"

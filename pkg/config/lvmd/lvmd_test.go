@@ -6,68 +6,6 @@ import (
 	"testing"
 )
 
-const (
-	microShiftTestCfg = `./test/config.yaml`
-	lvmdTestConfig    = `./test/lvmd.yaml`
-)
-
-const (
-	testConfig     = "./test/config.yaml"
-	testLvmdConfig = "./test/lvmd.yaml"
-)
-
-var spareGb10 = uint(10)
-var stripes = uint(2)
-
-func TestLvmd_withDefaults(t *testing.T) {
-	type fields struct {
-		DeviceClasses []*DeviceClass
-		SocketName    string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   *Lvmd
-	}{
-		{
-			name: "sets defaults",
-			fields: fields{
-				SocketName: defaultSockName,
-				DeviceClasses: []*DeviceClass{
-					{
-						Name:        "default",
-						Default:     true,
-						VolumeGroup: defaultRHEL4EdgeVolumeGroup,
-						SpareGB:     func() *uint64 { u := uint64(defaultSpareGB); return &u }(),
-					},
-				},
-			},
-			want: &Lvmd{
-				SocketName: defaultSockName,
-				DeviceClasses: []*DeviceClass{
-					{
-						Name:        "default",
-						Default:     true,
-						VolumeGroup: defaultRHEL4EdgeVolumeGroup,
-						SpareGB:     func() *uint64 { u := uint64(defaultSpareGB); return &u }(),
-					},
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			l := &Lvmd{
-				DeviceClasses: tt.fields.DeviceClasses,
-				SocketName:    tt.fields.SocketName,
-			}
-			if got := l.withDefaults(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("withDefaults() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_newLvmdConfigFromFile(t *testing.T) {
 
 	iToP := func(i int) *uint64 {
@@ -115,14 +53,6 @@ func Test_newLvmdConfigFromFile(t *testing.T) {
 				},
 			},
 			wantErr: false,
-		},
-		{
-			name: "config value mismatch",
-			args: args{
-				"./test/valueMismatch.yaml",
-			},
-			want:    nil,
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

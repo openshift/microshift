@@ -13,11 +13,12 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mitchellh/go-homedir"
-	"github.com/openshift/microshift/pkg/util"
 	"github.com/spf13/pflag"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
+
+	"github.com/openshift/microshift/pkg/util"
 )
 
 const (
@@ -51,9 +52,8 @@ type DebugConfig struct {
 }
 
 type MicroshiftConfig struct {
-	ConfigFile     string `json:"configFile"`
-	LvmdConfigFile string `json:"lvmdConfigFile"`
-	DataDir        string `json:"dataDir"`
+	ConfigFile string `json:"configFile"`
+	DataDir    string `json:"dataDir"`
 
 	AuditLogDir string `json:"auditLogDir"`
 	LogVLevel   int    `json:"logVLevel"`
@@ -100,14 +100,13 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	defaultRoles := make([]string, len(validRoles))
 	copy(defaultRoles, validRoles)
 	return &MicroshiftConfig{
-		ConfigFile:     findConfigFile(),
-		LvmdConfigFile: findLVMDConfig(),
-		DataDir:        dataDir,
-		AuditLogDir:    "",
-		LogVLevel:      0,
-		Roles:          defaultRoles,
-		NodeName:       nodeName,
-		NodeIP:         nodeIP,
+		ConfigFile:  findConfigFile(),
+		DataDir:     dataDir,
+		AuditLogDir: "",
+		LogVLevel:   0,
+		Roles:       defaultRoles,
+		NodeName:    nodeName,
+		NodeIP:      nodeIP,
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
@@ -154,21 +153,6 @@ func findConfigFile() string {
 		}
 	} else {
 		return userConfigFile
-	}
-}
-
-// Return the default user lvmd config if it exists, else return the default global config file, else an empty string.
-func findLVMDConfig() string {
-	const base = "lvmd.yaml"
-	userLvmdConfigFile, _ := homedir.Expand(filepath.Join(filepath.Dir(defaultUserConfigFile), base))
-	if _, err := os.Stat(userLvmdConfigFile); errors.Is(err, os.ErrNotExist) {
-		if _, err := os.Stat(filepath.Join(filepath.Dir(defaultGlobalConfigFile), base)); errors.Is(err, os.ErrNotExist) {
-			return ""
-		} else {
-			return filepath.Join(filepath.Dir(defaultGlobalConfigFile), base)
-		}
-	} else {
-		return userLvmdConfigFile
 	}
 }
 

@@ -2,6 +2,7 @@ package components
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"fmt"
 	"path/filepath"
 	"reflect"
@@ -43,7 +44,8 @@ func Test_renderLvmdParams(t *testing.T) {
 			},
 			wantErr: false,
 			want: assets.RenderParams{
-				"lvmd": `"device-classes:\n- default: true\n  lvcreate-options: null\n  name: test\n  spare-gb: 5\n  stripe: null\n  stripe-size: \"\"\n  thin-pool: null\n  type: \"\"\n  volume-group: vg\nsocket-name: /run/lvmd/lvmd.socket\n"`,
+				"SocketName": "/run/lvmd/lvmd.socket",
+				"lvmd":       `"device-classes:\n- default: true\n  lvcreate-options: null\n  name: test\n  spare-gb: 5\n  stripe: null\n  stripe-size: \"\"\n  thin-pool: null\n  type: \"\"\n  volume-group: vg\nsocket-name: /run/lvmd/lvmd.socket\n"`,
 			},
 		},
 	}
@@ -115,8 +117,15 @@ data:
 func Test_renderTopolvmDaemonsetTemplate(t *testing.T) {
 	tb := assets.MustAsset("assets/components/odf-lvm/topolvm-node_daemonset.yaml")
 
+	fm := template.FuncMap{
+		"Dir": filepath.Dir,
+		"Sha256sum": func(b []byte) string {
+			return fmt.Sprintf("%x", sha256.Sum256(b))
+		},
+	}
 	tpl := template.New("")
-	tpl.Funcs(template.FuncMap{"Dir": filepath.Dir})
+	tpl.Funcs(fm)
+
 	template.Must(tpl.Parse(string(tb)))
 
 	wantBytes := func(tpl *template.Template, data map[string]interface{}) []byte {
