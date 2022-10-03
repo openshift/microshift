@@ -28,7 +28,7 @@ trap 'echo "Script exited with error."' ERR
 #trap 'echo "# $BASH_COMMAND"' DEBUG
 #set -x
 
-REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")"
+REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
