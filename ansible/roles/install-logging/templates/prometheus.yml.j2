@@ -43,7 +43,7 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['microshift'] %}
-        - {{ hostvars[host].private_ip }}:8080
+        - {{ hostvars[host].private_ip }}:8081
 {% endfor %}
 
   - job_name: crio
