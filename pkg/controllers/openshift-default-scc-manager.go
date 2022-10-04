@@ -54,6 +54,21 @@ func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struc
 func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
 	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
 	var (
+		clusterRole = []string{
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-anyuid.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-hostaccess.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-hostmount-anyuid.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork-v2.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-nonroot-v2.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml",
+			"assets/scc/0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml",
+		}
+		clusterRoleBinding = []string{
+			"assets/scc/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml",
+		}
 		sccs = []string{
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
 			"assets/scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml",
@@ -71,5 +86,14 @@ func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
 		klog.Warningf("failed to apply sccs %v", err)
 		return err
 	}
+	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply clusterRole %v: %v", clusterRole, err)
+		return err
+	}
+	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
+		return err
+	}
+
 	return nil
 }

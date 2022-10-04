@@ -38,8 +38,8 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 		return nil, fmt.Errorf("failed to encode the build: %v", err)
 	}
 
-	privileged := true
 	strategy := build.Spec.Strategy.DockerStrategy
+	securityContext := securityContextForBuild(strategy.Env)
 	hostPathFile := v1.HostPathFile
 
 	containerEnv := []v1.EnvVar{
@@ -69,14 +69,11 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 			ServiceAccountName: serviceAccount,
 			Containers: []v1.Container{
 				{
-					Name:  DockerBuild,
-					Image: bs.Image,
-					Args:  []string{"openshift-docker-build"},
-					Env:   copyEnvVarSlice(containerEnv),
-					// TODO: run unprivileged https://github.com/openshift/origin/issues/662
-					SecurityContext: &v1.SecurityContext{
-						Privileged: &privileged,
-					},
+					Name:                     DockerBuild,
+					Image:                    bs.Image,
+					Args:                     []string{"openshift-docker-build"},
+					Env:                      copyEnvVarSlice(containerEnv),
+					SecurityContext:          securityContext,
 					TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 					VolumeMounts: []v1.VolumeMount{
 						{
@@ -133,6 +130,7 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 			Image:                    bs.Image,
 			Args:                     []string{"openshift-git-clone"},
 			Env:                      copyEnvVarSlice(containerEnv),
+			SecurityContext:          securityContext,
 			TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 			VolumeMounts: []v1.VolumeMount{
 				{
@@ -152,14 +150,11 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 	}
 	if len(build.Spec.Source.Images) > 0 {
 		extractImageContentContainer := v1.Container{
-			Name:  ExtractImageContentContainer,
-			Image: bs.Image,
-			Args:  []string{"openshift-extract-image-content"},
-			Env:   copyEnvVarSlice(containerEnv),
-			// TODO: run unprivileged https://github.com/openshift/origin/issues/662
-			SecurityContext: &v1.SecurityContext{
-				Privileged: &privileged,
-			},
+			Name:                     ExtractImageContentContainer,
+			Image:                    bs.Image,
+			Args:                     []string{"openshift-extract-image-content"},
+			Env:                      copyEnvVarSlice(containerEnv),
+			SecurityContext:          securityContext,
 			TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 			VolumeMounts: []v1.VolumeMount{
 				{
@@ -188,6 +183,7 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 			Image:                    bs.Image,
 			Args:                     []string{"openshift-manage-dockerfile"},
 			Env:                      copyEnvVarSlice(containerEnv),
+			SecurityContext:          securityContext,
 			TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 			VolumeMounts: []v1.VolumeMount{
 				{
@@ -212,8 +208,11 @@ func (bs *DockerBuildStrategy) CreateBuildPod(build *buildv1.Build, additionalCA
 	setupInputConfigMaps(pod, &pod.Spec.Containers[0], build.Spec.Source.ConfigMaps)
 	setupContainersConfigs(build, pod)
 	setupBuildCAs(build, pod, additionalCAs, internalRegistryHost)
-	setupContainersStorage(pod, &pod.Spec.Containers[0]) // for unprivileged builds
-	// setupContainersNodeStorage(pod, &pod.Spec.Containers[0]) // for privileged builds
+	setupContainersStorage(pod, &pod.Spec.Containers[0])
+	if securityContext == nil || securityContext.Privileged == nil || !*securityContext.Privileged {
+		setupBuilderAutonsUser(build, strategy.Env, pod)
+		setupBuilderDeviceFUSE(pod)
+	}
 	setupBlobCache(pod)
 	if err := setupBuildVolumes(pod, build.Spec.Strategy.DockerStrategy.Volumes, bs.BuildCSIVolumesEnabled); err != nil {
 		return pod, err

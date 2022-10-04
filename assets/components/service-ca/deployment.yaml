@@ -41,6 +41,8 @@ spec:
               name: signing-key
             - mountPath: /var/run/configmaps/signing-cabundle
               name: signing-cabundle
+          args:
+            - -v=2
       volumes:
         - name: signing-key
           secret:

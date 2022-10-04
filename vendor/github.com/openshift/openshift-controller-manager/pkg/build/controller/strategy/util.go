@@ -148,7 +148,10 @@ func mountVolume(pod *corev1.Pod, container *corev1.Container, objName, mountPat
 			break
 		}
 	}
-	mode := int32(0600)
+	mode := int32(0o600)
+	if container.SecurityContext == nil || container.SecurityContext.Privileged == nil || !*container.SecurityContext.Privileged {
+		mode = int32(0o644) // make sure unprivileged builders can read them
+	}
 	if !volumeExists {
 		volume := makeVolume(volumeName, objName, mode, fsType, volumeSource)
 		pod.Spec.Volumes = append(pod.Spec.Volumes, volume)
@@ -465,17 +468,19 @@ func updateConfigsForContainer(c corev1.Container, volumeName string, configDir 
 	return c
 }
 
-// setupContainersStorage creates a volume that we'll use for holding images and working
+// setupContainersStorage creates volumes that we'll use for holding images and working
 // root filesystems for building images.
 func setupContainersStorage(pod *corev1.Pod, container *corev1.Container) {
-	exists := false
+	rootExists, runExists := false, false
 	for _, v := range pod.Spec.Volumes {
 		if v.Name == "container-storage-root" {
-			exists = true
-			break
+			rootExists = true
+		}
+		if v.Name == "container-storage-run" {
+			runExists = true
 		}
 	}
-	if !exists {
+	if !rootExists {
 		pod.Spec.Volumes = append(pod.Spec.Volumes,
 			corev1.Volume{
 				Name: "container-storage-root",
@@ -485,46 +490,26 @@ func setupContainersStorage(pod *corev1.Pod, container *corev1.Container) {
 			},
 		)
 	}
-	container.VolumeMounts = append(container.VolumeMounts,
-		corev1.VolumeMount{
-			Name:      "container-storage-root",
-			MountPath: "/var/lib/containers/storage",
-		},
-	)
-	container.Env = append(container.Env, corev1.EnvVar{Name: "BUILD_STORAGE_DRIVER", Value: "overlay"})
-}
-
-// setupContainersNodeStorage borrows the appropriate storage directories from the node so
-// that we can share layers that we're using with the node
-func setupContainersNodeStorage(pod *corev1.Pod, container *corev1.Container) {
-	exists := false
-	for _, v := range pod.Spec.Volumes {
-		if v.Name == "node-storage-root" {
-			exists = true
-			break
-		}
-	}
-	if !exists {
+	if !runExists {
 		pod.Spec.Volumes = append(pod.Spec.Volumes,
-			// TODO: run unprivileged https://github.com/openshift/origin/issues/662
 			corev1.Volume{
-				Name: "node-storage-root",
+				Name: "container-storage-run",
 				VolumeSource: corev1.VolumeSource{
-					HostPath: &corev1.HostPathVolumeSource{
-						Path: "/var/lib/containers/storage",
-					},
+					EmptyDir: &corev1.EmptyDirVolumeSource{},
 				},
 			},
 		)
 	}
 	container.VolumeMounts = append(container.VolumeMounts,
-		// TODO: run unprivileged https://github.com/openshift/origin/issues/662
 		corev1.VolumeMount{
-			Name:      "node-storage-root",
-			MountPath: "/var/lib/containers/storage",
+			Name:      "container-storage-root",
+			MountPath: "/var/lib/containers",
+		},
+		corev1.VolumeMount{
+			Name:      "container-storage-run",
+			MountPath: "/var/run/containers",
 		},
 	)
-	container.Env = append(container.Env, corev1.EnvVar{Name: "BUILD_STORAGE_DRIVER", Value: "overlay"})
 }
 
 func addVolumeMountToContainers(conts []corev1.Container, mount corev1.VolumeMount) []corev1.Container {
@@ -534,6 +519,60 @@ func addVolumeMountToContainers(conts []corev1.Container, mount corev1.VolumeMou
 		containers[i] = c
 	}
 	return containers
+}
+
+// securityContextForBuild returns a security context that limits the requested
+// privileges because the build spec wanted an unprivileged build, or that sets
+// the pod to be privileged otherwise.
+func securityContextForBuild(vars []corev1.EnvVar) *corev1.SecurityContext {
+	privileged := true
+	for _, env := range vars {
+		if env.Name == "BUILD_PRIVILEGED" {
+			if b, err := strconv.ParseBool(env.Value); err == nil {
+				privileged = b
+			} else if i, err := strconv.Atoi(env.Value); err == nil {
+				privileged = i != 0
+			}
+		}
+	}
+	securityContext := &corev1.SecurityContext{
+		Privileged: &privileged,
+		SeccompProfile: &corev1.SeccompProfile{
+			Type: corev1.SeccompProfileTypeUnconfined, // default profile might ban unshare()
+		},
+	}
+	if privileged {
+		uid, gid := int64(0), int64(0)
+		securityContext.RunAsUser = &uid
+		securityContext.RunAsGroup = &gid
+	} else {
+		securityContext.Capabilities = &corev1.Capabilities{
+			Add: []corev1.Capability{
+				"CAP_SETFCAP",
+			},
+			Drop: []corev1.Capability{
+				"CAP_KILL",
+				"CAP_MKNOD",
+			},
+		}
+	}
+	return securityContext
+}
+
+// Add annotations that should tell CRI-O to provide /dev/fuse in the pod's
+// containers' device control group and in the /dev that the runtime will set
+// up for them.
+// Reference: https://github.com/openshift/machine-config-operator/pull/2805
+func setupBuilderDeviceFUSE(pod *corev1.Pod) {
+	metav1.SetMetaDataAnnotation(&pod.ObjectMeta, "io.openshift.builder", "")
+	metav1.SetMetaDataAnnotation(&pod.ObjectMeta, "io.kubernetes.cri-o.Devices", "/dev/fuse:rwm")
+}
+
+// Request that the builder be run in a user namespace, mapped from host ID
+// ranges chosen by the node.
+func setupBuilderAutonsUser(build *buildv1.Build, vars []corev1.EnvVar, pod *corev1.Pod) {
+	metav1.SetMetaDataAnnotation(&pod.ObjectMeta, "io.openshift.builder", "")
+	metav1.SetMetaDataAnnotation(&pod.ObjectMeta, "io.kubernetes.cri-o.userns-mode", "auto:size=65536")
 }
 
 // setupBuildCAs mounts certificate authorities for the build from a predetermined ConfigMap.
@@ -721,7 +760,6 @@ func setupBuildVolumes(pod *corev1.Pod, buildVolumes []buildv1.BuildVolume, csiV
 			}
 			volumeSource.CSI = buildVolume.Source.CSI
 			mountCSIVolume(pod, &pod.Spec.Containers[0], strings.ToLower(buildVolume.Name), PathForBuildVolume(buildVolume.Name), buildVolumeSuffix, &volumeSource)
-
 		default:
 			return fmt.Errorf("encountered unsupported build volume source type %q", buildVolume.Source.Type)
 		}
