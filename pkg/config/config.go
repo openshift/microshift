@@ -114,7 +114,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			Domain:               "cluster.local",
 			MTU:                  "1400",
 		},
-		Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, filepath.Join(dataDir, "manifests")},
+		Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc},
 	}
 
 }

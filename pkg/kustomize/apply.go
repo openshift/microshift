@@ -3,13 +3,11 @@ package kustomize
 import (
 	"context"
 	"errors"
-	"flag"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/util"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -56,9 +54,9 @@ func (s *Kustomizer) ApplyKustomizationPath(path string) {
 	if _, err := os.Stat(kustomization); !errors.Is(err, os.ErrNotExist) {
 		klog.Infof("Applying kustomization at %v ", kustomization)
 		if err := ApplyKustomizationWithRetries(path, s.kubeconfig); err != nil {
-			klog.Fatalf("Applying kustomization failed: %s. Giving up.", err)
+			klog.Fatalf("Applying kustomization at %v failed: %s. Giving up.", kustomization, err)
 		} else {
-			klog.Warningf("Kustomization applied successfully.")
+			klog.Infof("Kustomization at %v applied successfully.", kustomization)
 		}
 	} else {
 		klog.Infof("No kustomization found at " + kustomization)
@@ -80,42 +78,39 @@ func ApplyKustomization(kustomization string, kubeconfig string) error {
 		Use:   "kubectl",
 		Short: "kubectl",
 	}
-	flags := cmds.PersistentFlags()
-	flags.SetNormalizeFunc(cliflag.WarnWordSepNormalizeFunc)
-	flags.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
+	persistFlags := cmds.PersistentFlags()
+	persistFlags.SetNormalizeFunc(cliflag.WarnWordSepNormalizeFunc)
+	persistFlags.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
 
 	kubeConfigFlags := genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag()
-	kubeConfigFlags.AddFlags(flags)
+	kubeConfigFlags.KubeConfig = &kubeconfig
+	kubeConfigFlags.AddFlags(persistFlags)
+
 	matchVersionKubeConfigFlags := cmdutil.NewMatchVersionFlags(kubeConfigFlags)
-	matchVersionKubeConfigFlags.AddFlags(cmds.PersistentFlags())
-	cmds.PersistentFlags().AddGoFlagSet(flag.CommandLine)
+	matchVersionKubeConfigFlags.AddFlags(persistFlags)
 
 	f := cmdutil.NewFactory(matchVersionKubeConfigFlags)
 	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
-	applyCommand := apply.NewCmdApply("kubectl", f, ioStreams)
 	groups := templates.CommandGroups{
 		{
 			Message: "Advanced Commands:",
 			Commands: []*cobra.Command{
-				applyCommand,
+				apply.NewCmdApply("kubectl", f, ioStreams),
 			},
 		},
 	}
 	groups.Add(cmds)
 
-	args := []string{
-		"--kubeconfig=" + kubeconfig,
-		"-k", kustomization,
-	}
-	util.Must(applyCommand.ParseFlags(args))
 	applyFlags := apply.NewApplyFlags(f, ioStreams)
+	applyFlags.DeleteFlags.FileNameFlags.Kustomize = &kustomization
 	applyFlags.AddFlags(cmds)
-	o, err := applyFlags.ToOptions(cmds, "kubectl", args)
+
+	o, err := applyFlags.ToOptions(cmds, "kubectl", nil)
 	if err != nil {
 		return err
 	}
 
-	if err := o.Validate(cmds, args); err != nil {
+	if err := o.Validate(cmds, nil); err != nil {
 		return err
 	}
 	return o.Run()
