@@ -13,6 +13,7 @@ import (
 
 	cmds "github.com/openshift/microshift/pkg/cmd"
 	"github.com/openshift/microshift/pkg/config"
+	"go.etcd.io/etcd/server/v3/etcdmain"
 )
 
 func main() {
@@ -43,7 +44,23 @@ func newCommand() *cobra.Command {
 	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
 
 	cmd.AddCommand(cmds.NewRunMicroshiftCommand())
+	cmd.AddCommand(temporaryEtcdShim())
 	cmd.AddCommand(cmds.NewVersionCommand(ioStreams))
 	cmd.AddCommand(cmds.NewShowConfigCommand(ioStreams))
+
+	return cmd
+}
+
+func temporaryEtcdShim() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:                "etcd",
+		Short:              "Run not-quite-etcd",
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			etcdmain.Main(os.Args[1:])
+			return nil
+		},
+	}
+
 	return cmd
 }
