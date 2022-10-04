@@ -1161,6 +1161,11 @@ go.etcd.io/etcd/client/v3/concurrency
 go.etcd.io/etcd/client/v3/credentials
 go.etcd.io/etcd/client/v3/internal/endpoint
 go.etcd.io/etcd/client/v3/internal/resolver
+go.etcd.io/etcd/client/v3/leasing
+go.etcd.io/etcd/client/v3/namespace
+go.etcd.io/etcd/client/v3/naming/endpoints
+go.etcd.io/etcd/client/v3/naming/endpoints/internal
+go.etcd.io/etcd/client/v3/ordering
 # go.etcd.io/etcd/pkg/v3 v3.5.3 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7
 ## explicit; go 1.16
 go.etcd.io/etcd/pkg/v3/adt
@@ -1173,6 +1178,7 @@ go.etcd.io/etcd/pkg/v3/httputil
 go.etcd.io/etcd/pkg/v3/idutil
 go.etcd.io/etcd/pkg/v3/ioutil
 go.etcd.io/etcd/pkg/v3/netutil
+go.etcd.io/etcd/pkg/v3/osutil
 go.etcd.io/etcd/pkg/v3/pbutil
 go.etcd.io/etcd/pkg/v3/runtime
 go.etcd.io/etcd/pkg/v3/schedule
@@ -1191,6 +1197,7 @@ go.etcd.io/etcd/server/v3/auth
 go.etcd.io/etcd/server/v3/config
 go.etcd.io/etcd/server/v3/datadir
 go.etcd.io/etcd/server/v3/embed
+go.etcd.io/etcd/server/v3/etcdmain
 go.etcd.io/etcd/server/v3/etcdserver
 go.etcd.io/etcd/server/v3/etcdserver/api
 go.etcd.io/etcd/server/v3/etcdserver/api/etcdhttp
@@ -1223,7 +1230,11 @@ go.etcd.io/etcd/server/v3/lease/leasepb
 go.etcd.io/etcd/server/v3/mvcc
 go.etcd.io/etcd/server/v3/mvcc/backend
 go.etcd.io/etcd/server/v3/mvcc/buckets
+go.etcd.io/etcd/server/v3/proxy/grpcproxy
 go.etcd.io/etcd/server/v3/proxy/grpcproxy/adapter
+go.etcd.io/etcd/server/v3/proxy/grpcproxy/cache
+go.etcd.io/etcd/server/v3/proxy/httpproxy
+go.etcd.io/etcd/server/v3/proxy/tcpproxy
 go.etcd.io/etcd/server/v3/verify
 go.etcd.io/etcd/server/v3/wal
 go.etcd.io/etcd/server/v3/wal/walpb
