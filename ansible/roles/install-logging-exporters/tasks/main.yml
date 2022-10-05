@@ -1,0 +1,34 @@
+- name: setup prometheus exporters
+  block:
+  - name: install node-exporter
+    ansible.builtin.dnf:
+      name:
+      - golang-github-prometheus-node-exporter
+      state: present
+
+  - name: install process-exporter
+    ansible.builtin.dnf:
+      name: "{{ process_exporter_url }}"
+      disable_gpg_check: true
+      state: present
+
+  - name: download cadvisor
+    ansible.builtin.get_url:
+      url: "{{ cadvisor_url }}"
+      dest: /usr/bin/cadvisor
+      checksum: "{{ cadvisor_checksum }}"
+      mode: '0755'
+
+  - name: install systemd unit for cadvisor
+    ansible.builtin.template:
+      src: cadvisor.service.j2
+      dest: /usr/lib/systemd/system/cadvisor.service
+      backup: true
+
+  - name: start and enable prometheus services
+    ansible.builtin.systemd:
+      name: "{{ item }}"
+      daemon_reload: yes
+      state: started
+      enabled: yes
+    with_items: "{{ prometheus_services }}"

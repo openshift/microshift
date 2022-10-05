@@ -87,5 +87,4 @@
     ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-move-results
   when: install_pbench | bool
   environment:
-    PBENCH_USER: sejug
-
+    PBENCH_USER: microshift

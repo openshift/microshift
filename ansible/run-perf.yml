@@ -6,7 +6,6 @@
 # ansible-playbook -i inventory/inventory run-perf.yml
 #
 
-
 - name: entitle host and manage repos
   hosts: microshift
   become: yes
@@ -32,6 +31,8 @@
       when: (setup_microshift_host | bool)
     - role: configure-firewall
       when: (setup_microshift_host | bool)
+    - role: install-logging-exporters
+      when: (prometheus_logging | bool)
 
 - name: capture microshift metrics
   hosts: microshift
@@ -39,5 +40,3 @@
     - vars/all.yml
   roles:
     - install-microshift
-    #- microshift-start
-
