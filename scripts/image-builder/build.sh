@@ -13,8 +13,9 @@ OCP_PULL_SECRET_FILE=
 MICROSHIFT_RPM_SOURCE=${ROOTDIR}/_output/rpmbuild/
 AUTHORIZED_KEYS_FILE=
 AUTHORIZED_KEYS=
+PROMETHEUS=false
 STARTTIME=$(date +%s)
-BUILDDIR=${ROOTDIR}/_output/image-builder/
+BUILDDIR=${ROOTDIR}/_output/image-builder
 
 trap ${SCRIPTDIR}/cleanup.sh INT
 
@@ -170,6 +171,10 @@ while [ $# -gt 0 ] ; do
         [ -z "${AUTHORIZED_KEYS_FILE}" ] && usage "Authorized keys file not specified"
         shift
         ;;
+    -prometheus)
+        PROMETHEUS=true
+        shift
+        ;;
     *)
         usage
         ;;
@@ -235,6 +240,19 @@ if [ $(find openshift-local -name '*.rpm' | wc -l) -eq 0 ] ; then
 fi
 createrepo openshift-local >/dev/null
 
+# Install prometheus process exporter
+if ${PROMETHEUS} ; then
+  owner=ncabatoff
+  repo=process-exporter
+  version=$(curl -s https://api.github.com/repos/${owner}/${repo}/releases/latest | jq -r '.name')
+  url=https://github.com/${owner}/${repo}/releases/download/${version}/
+  file=${repo}_${version#v}_linux_amd64.rpm
+
+  title "Downloading prometheus exporter(s)"
+  wget -q ${url}${file}
+  CUSTOM_RPM_FILES+="$(pwd)/${file},"
+fi
+
 # Copy user-specific RPM packages
 rm -rf custom-rpms 2>/dev/null || true
 if [ ! -z ${CUSTOM_RPM_FILES} ] ; then
@@ -257,13 +275,21 @@ done
 title "Preparing blueprints"
 cp -f ${SCRIPTDIR}/config/{blueprint_v0.0.1.toml,installer.toml} .
 if [ ! -z ${CUSTOM_RPM_FILES} ] ; then
+  if ${PROMETHEUS} ; then
+    cat >> blueprint_v0.0.1.toml <<EOF
+
+[customizations.firewall]
+ports = ["9256:tcp"]
+EOF
+  fi
     for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
-        rpm_name=$(basename $rpm | sed 's/.rpm//g')
+        rpm_name=$(rpm -qp $rpm --queryformat "%{NAME}")
+        rpm_version=$(rpm -qp $rpm --queryformat "%{VERSION}")
         cat >> blueprint_v0.0.1.toml <<EOF
 
 [[packages]]
 name = "${rpm_name}"
-version = "*"
+version = "${rpm_version}"
 EOF
     done
 fi
