@@ -85,20 +85,36 @@ make srpm
 The artifacts of the build are located in the `_output/rpmbuild` directory.
 ```bash
 $ cd ~/microshift/ && find . -name \*.rpm
-./_output/rpmbuild/RPMS/x86_64/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
-./_output/rpmbuild/RPMS/x86_64/microshift-4.10.0-networking-nightly_1654189204_34_gc871db21.el8.x86_64.rpm
-./_output/rpmbuild/RPMS/noarch/microshift-selinux-4.10.0-nightly_1654189204_34_gc871db21.el8.noarch.rpm
-./_output/rpmbuild/SRPMS/microshift-4.10.0-nightly_1654189204_34_gc871db21.el8.src.rpm
+./_output/rpmbuild/RPMS/x86_64/microshift-4.12.0-nightly_20220908132255_152_g4267d5d1.el8.x86_64.rpm
+./_output/rpmbuild/RPMS/x86_64/microshift-networking-4.12.0-nightly_20220908132255_152_g4267d5d1.el8.x86_64.rpm
+./_output/rpmbuild/RPMS/noarch/microshift-selinux-4.12.0-nightly_20220908132255_152_g4267d5d1.el8.noarch.rpm
+./_output/rpmbuild/SRPMS/microshift-4.12.0-nightly_20220908132255_152_g4267d5d1.el8.src.rpm
 ```
 
 ## Run MicroShift Executable
 Log into the development virtual machine with the `microshift` user credentials.
 
 ### Runtime Prerequisites
+When working a MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding PRM repo `rhocp-4.$Y-for-rhel-8-$ARCH-rpms` won't be available yet. In that case, use the `Y-1` version.
+
+> If you have VPN access to the Red Hat build systems, you can add the corresponding puddle repo.
+>
+> ```bash
+> sudo tee /etc/yum.repos.d/internal-rhocp-4.12-for-rhel-8-rpms.repo >/dev/null <<EOF
+> [internal-rhocp-4.12-for-rhel-8-rpms]
+> name=Puddle of the rhocp-4.12 RPMs for RHEL8
+> baseurl=http://download.lab.bos.redhat.com/rcm-guest/puddles/RHAOS/plashets/4.12-el8/building/\$basearch/os/
+> enabled=1
+> gpgcheck=0
+> skip_if_unavailable=1
+> EOF
+> ```
+
 Enable the needed repositories and install the MicroShift RPM packages. This procedure pulls in the required package dependencies, also installing the necessary configuration files and `systemd` units.
+
 ```bash
 sudo subscription-manager repos \
-    --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms \
+    --enable rhocp-4.11-for-rhel-8-$(uname -i)-rpms \
     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
 sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 ```
