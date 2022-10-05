@@ -2,9 +2,11 @@ manage_subscription: false
 rhel_username:
 rhel_password:
 rhel_pool_id:
+manage_repos: false
 
-prometheus_logging: true
 setup_microshift_host: false
+prometheus_logging: true
+install_microshift: false
 build_etcd_binary: false
 
 install_pbench: false

@@ -27,8 +27,10 @@ There are a few variables that may need user configuration and they are found in
 | `rhel_username` | Red Hat subscription account username (string) | `null` | 
 | `rhel_password` | Red Hat subscription account password (string) | `null` | 
 | `rhel_pool_id` | Red Hat subscription pool id (string) | `null` | 
-| `prometheus_logging` | Set up logging and exporters on the nodes | `false` |
+| `manage_repos` | Enable necessary repos to build MicroShift and install necessary components | `false` |
 | `setup_microshift_host` | Complete initial setup of MicroShift host (subscription, packages, firewall, etc) | `false` |
+| `prometheus_logging` | Set up logging and exporters on the nodes | `true` |
+| `install_microshift` | Build and install MicroShift from git | `false` |
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
 
 ## Running
