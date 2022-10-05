@@ -106,8 +106,6 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
-	errorChannel := make(chan error, 1)
-
 	// run readiness check
 	go func() {
 		healthcheckStatus := util.RetryTCPConnection("127.0.0.1", "8445")
@@ -129,16 +127,10 @@ func (s *OCPControllerManager) Run(ctx context.Context, ready chan<- struct{}, s
 		return err
 	}
 
-	go func(ctx context.Context) error {
+	if err := openshift_controller_manager.RunOpenShiftControllerManager(&s.config, clientConfig); err != nil {
+		return err
+	}
 
-		errorChannel <- openshift_controller_manager.RunOpenShiftControllerManager(&s.config, clientConfig)
-
-		select {
-		case <-ctx.Done():
-			klog.Infof("OpenShift Controller Manager received stop signal. exiting.")
-			return nil
-		}
-	}(ctx)
-
-	return <-errorChannel
+	<-ctx.Done()
+	return nil
 }
