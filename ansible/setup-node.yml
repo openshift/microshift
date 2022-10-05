@@ -35,9 +35,10 @@
       when: (install_pbench | bool) and (not pbench_installed | bool)
     - role: pbench_agent_install
       when: (install_pbench | bool) and (not pbench_installed | bool)
+    - role: install-logging-exporters
+      when: (prometheus_logging | bool)
     - role: pbench_agent_config
       when: (install_pbench | bool) and (not pbench_installed | bool)
-
 
 - name: set up logging node
   hosts: logging

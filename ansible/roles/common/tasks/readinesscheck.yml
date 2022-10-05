@@ -3,6 +3,7 @@
 
 - name: wait for pods running
   ansible.builtin.shell: oc get pods -A -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' | grep -c False
+  ignore_errors: yes
   retries: 60
   delay: 5
   register: result

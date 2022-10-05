@@ -65,24 +65,6 @@
         disable_gpg_check: yes
   when: ansible_distribution == "RedHat"
 
-- name: install microshift RPMs on CentOS
-  become: yes
-  block:
-    - name: enable microshift copr repo
-      community.general.copr:
-        name: '@redhat-et/microshift'
-        state: enabled
-
-    - name: enable cri-o module
-      ansible.builtin.command: dnf module enable -y cri-o
-
-    - name: install microshift package
-      ansible.builtin.dnf:
-        name: microshift
-        state: present
-        update_cache: true
-  when: ansible_distribution == "CentOS"
-
 - name: build & install etcd
   block:
     - name: clone etcd git repo

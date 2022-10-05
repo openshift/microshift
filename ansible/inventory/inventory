@@ -1,5 +1,5 @@
 [microshift]
-microshift-dev ansible_host= private_ip=
+microshift-dev ansible_host=microshift-dev private_ip=
 
 [microshift:vars]
 ansible_user=microshift
