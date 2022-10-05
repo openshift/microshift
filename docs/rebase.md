@@ -24,12 +24,20 @@ On the machine used for the rebase,
 * add a pull secret into `~/.pull-secret.json`, and
 * git clone your personal fork of microshift and `cd` into it.
 
+### Fully automatic rebaseing
+
+The following command attempts a fully automatic rebase to a given target upstream release. It is what is run nighly from CI and should work for most cases within a z-stream. It creates a new branch namded after the target release, then runs the indidivual steps described in the following sections, including creating the respective commmits.
+
+```shell
+./scripts/auto-rebase/rebase.sh to quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64
+```
+
 ### Downloading the target OpenShift release
 
 Run the following to download the OpenShift release to rebase to, specifying the target release images for _both_ Intel and Arm architectures, e.g.:
 
 ```shell
-./scripts/rebase.sh download quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64
+./scripts/auto-rebase/rebase.sh download quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64
 ```
 
 This will create a directory `_output/staging`, download the specified release images' metadata (`release_{amd64,arm64}.json`) and manifests, git-clone (only) the repos of the embedded components and the operators of the loaded components, and check out the commit used by that OpenShift release.
@@ -52,20 +60,18 @@ The `rebase.sh` script automates updating the modulepaths (e.g. rewriting local 
 Run the following to rebase the `go.mod`:
 
 ```shell
-./scripts/rebase.sh go.mod
+./scripts/auto-rebase/rebase.sh go.mod
 go mod tidy
 git add go.mod go.sum
 git commit -m "update go.mod"
 ```
 
-As we're vendoring from multiple OpenShift components, there may be a situation in which we need to pick a module version for one component that is not completely aligned with another component's version (like we've had when still vendoring `openshift-apiserver`). In this case, it may be necessary to resolve the conflict through patches to the vendored modules. These patches would then be stored in `scripts/rebase_patches`.
+As we're vendoring from multiple OpenShift components, there may be a situation in which we need to pick a module version for one component that is not completely aligned with another component's version (like we've had when still vendoring `openshift-apiserver`). In this case, it may be necessary to resolve the conflict through patches to the vendored modules. These patches would then be stored in `scripts/auto-rebase/rebase_patches`.
 
 To update the vendoring run:
 
 ```shell
-go mod vendor
-git apply scripts/rebase_patches/*
-./scripts/rebase.sh generated-apis
+make vendor
 git add vendor
 git commit -m "update vendoring"
 ```
@@ -77,7 +83,7 @@ When updating to a new minor version of OpenShift, update the `RELEASE_BASE` and
 Commit the changes:
 
 ```shell
-git add vendor
+git add Makefile packaging
 git commit -m "update Makefile and Dockerfiles"
 ```
 
@@ -88,7 +94,7 @@ git commit -m "update Makefile and Dockerfiles"
 To update the component image references of the MicroShift release, run:
 
 ```shell
-./scripts/rebase.sh images
+./scripts/auto-rebase/rebase.sh images
 git add pkg/release
 git commit -m "update component images"
 ```
@@ -98,7 +104,7 @@ git commit -m "update component images"
 The next step is to update the embedded component manifests in the asset directory:
 
 ```shell
-./scripts/rebase.sh manifests
+./scripts/auto-rebase/rebase.sh manifests
 ```
 
 For each component, this performs the following high-level steps:
