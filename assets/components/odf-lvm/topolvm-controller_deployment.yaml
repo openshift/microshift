@@ -114,6 +114,19 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        - --leader-election
+        - --leader-election-namespace=openshift-storage
+        image: {{ .ReleaseImage.ose_csi_ext_snapshotter }}
+        imagePullPolicy: IfNotPresent
+        name: csi-snapshotter
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
       dnsPolicy: ClusterFirst
       initContainers:
       - command:

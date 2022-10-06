@@ -13,8 +13,13 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	if err := startCSIPLugin(cfg, kubeAdminConfig); err != nil {
+	if err := startCSIPlugin(cfg, kubeAdminConfig); err != nil {
 		klog.Warningf("Failed to start csi plugin: %v", err)
+		return err
+	}
+
+	if err := startCSISnapshot(cfg, kubeAdminConfig); err != nil {
+		klog.Warningf("Failed to start CSI snapshot controller: %v", err)
 		return err
 	}
 
@@ -31,5 +36,6 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		klog.Warningf("Failed to start OVNKubernetes: %v", err)
 		return err
 	}
+
 	return nil
 }

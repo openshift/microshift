@@ -1,6 +1,18 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // assets/bindata_timestamp.txt
+// assets/components/csi-snapshot/clusterrole.yaml
+// assets/components/csi-snapshot/clusterrolebinding.yaml
+// assets/components/csi-snapshot/controller-deployment.yaml
+// assets/components/csi-snapshot/role.yaml
+// assets/components/csi-snapshot/rolebinding.yaml
+// assets/components/csi-snapshot/service-account.yaml
+// assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshotclasses.crd.yaml
+// assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshotcontents.crd.yaml
+// assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshots.crd.yaml
+// assets/components/csi-snapshot/validating-webhook-config.yaml
+// assets/components/csi-snapshot/webhook-deployment.yaml
+// assets/components/csi-snapshot/webhook-service.yaml
 // assets/components/kube-apiserver/config-overrides.yaml
 // assets/components/kube-apiserver/defaultconfig.yaml
 // assets/components/odf-lvm/csi-driver.yaml
@@ -168,6 +180,1329 @@ func assetsBindata_timestampTxt() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/bindata_timestamp.txt", size: 11, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotClusterroleYaml = []byte(`kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openshift-csi-snapshot-controller-runner
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["list", "watch", "create", "update", "patch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshotclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshotcontents"]
+    verbs: ["create", "get", "list", "watch", "update", "delete", "patch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshots"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshots/status"]
+    verbs: ["update", "patch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshotcontents/status"]
+    verbs: ["update", "patch"]
+`)
+
+func assetsComponentsCsiSnapshotClusterroleYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotClusterroleYaml, nil
+}
+
+func assetsComponentsCsiSnapshotClusterroleYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotClusterroleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/clusterrole.yaml", size: 1395, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotClusterrolebindingYaml = []byte(`kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openshift-csi-snapshot-controller-role
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+subjects:
+  - kind: ServiceAccount
+    name: csi-snapshot-controller
+    namespace: openshift-storage
+roleRef:
+  kind: ClusterRole
+  name: openshift-csi-snapshot-controller-runner
+  apiGroup: rbac.authorization.k8s.io
+`)
+
+func assetsComponentsCsiSnapshotClusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotClusterrolebindingYaml, nil
+}
+
+func assetsComponentsCsiSnapshotClusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotClusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/clusterrolebinding.yaml", size: 550, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotControllerDeploymentYaml = []byte(`kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: csi-snapshot-controller
+  namespace: openshift-storage
+spec:
+  serviceName: "csi-snapshot-controller"
+  selector:
+    matchLabels:
+      app: csi-snapshot-controller
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: csi-snapshot-controller
+    spec:
+      serviceAccount: csi-snapshot-controller
+      containers:
+        - name: snapshot-controller
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          image: {{ .ReleaseImage.csi_snapshot_controller }}
+            #quay.io/openshift/origin-csi-snapshot-controller:4.12.0
+          args:
+            - "--v=1"
+            - "--leader-election=true"
+            # Leader election values are from
+            # https://github.com/openshift/library-go/blob/master/pkg/config/leaderelection/leaderelection.go
+            - "--leader-election-lease-duration=137s"
+            - "--leader-election-renew-deadline=107s"
+            - "--leader-election-retry-period=26s"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              # TODO: measure on a real cluster
+              cpu: 10m
+              memory: 50Mi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: csi-snapshot-controller
+                topologyKey: kubernetes.io/hostname
+      priorityClassName: "system-cluster-critical"
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: "NoSchedule"
+`)
+
+func assetsComponentsCsiSnapshotControllerDeploymentYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotControllerDeploymentYaml, nil
+}
+
+func assetsComponentsCsiSnapshotControllerDeploymentYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotControllerDeploymentYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/controller-deployment.yaml", size: 2270, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotRoleYaml = []byte(`kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: openshift-storage
+  name: csi-snapshot-controller-leaderelection
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+rules:
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "watch", "list", "delete", "update", "create"]
+`)
+
+func assetsComponentsCsiSnapshotRoleYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotRoleYaml, nil
+}
+
+func assetsComponentsCsiSnapshotRoleYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotRoleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/role.yaml", size: 481, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotRolebindingYaml = []byte(`kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: csi-snapshot-controller-leaderelection
+  namespace: openshift-storage
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+subjects:
+  - kind: ServiceAccount
+    name: csi-snapshot-controller
+    namespace: openshift-storage
+roleRef:
+  kind: Role
+  name: csi-snapshot-controller-leaderelection
+  apiGroup: rbac.authorization.k8s.io
+`)
+
+func assetsComponentsCsiSnapshotRolebindingYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotRolebindingYaml, nil
+}
+
+func assetsComponentsCsiSnapshotRolebindingYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotRolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/rolebinding.yaml", size: 565, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotServiceAccountYaml = []byte(`apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: csi-snapshot-controller
+  namespace: openshift-storage
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+`)
+
+func assetsComponentsCsiSnapshotServiceAccountYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotServiceAccountYaml, nil
+}
+
+func assetsComponentsCsiSnapshotServiceAccountYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotServiceAccountYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/service-account.yaml", size: 318, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotclassesCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.8.0
+    api-approved.kubernetes.io: "https://github.com/kubernetes-csi/external-snapshotter/pull/665"
+  creationTimestamp: null
+  name: volumesnapshotclasses.snapshot.storage.k8s.io
+spec:
+  group: snapshot.storage.k8s.io
+  names:
+    kind: VolumeSnapshotClass
+    listKind: VolumeSnapshotClassList
+    plural: volumesnapshotclasses
+    shortNames:
+    - vsclass
+    - vsclasses
+    singular: volumesnapshotclass
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .driver
+      name: Driver
+      type: string
+    - description: Determines whether a VolumeSnapshotContent created through the
+        VolumeSnapshotClass should be deleted when its bound VolumeSnapshot is deleted.
+      jsonPath: .deletionPolicy
+      name: DeletionPolicy
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: VolumeSnapshotClass specifies parameters that a underlying storage
+          system uses when creating a volume snapshot. A specific VolumeSnapshotClass
+          is used by specifying its name in a VolumeSnapshot object. VolumeSnapshotClasses
+          are non-namespaced
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          deletionPolicy:
+            description: deletionPolicy determines whether a VolumeSnapshotContent
+              created through the VolumeSnapshotClass should be deleted when its bound
+              VolumeSnapshot is deleted. Supported values are "Retain" and "Delete".
+              "Retain" means that the VolumeSnapshotContent and its physical snapshot
+              on underlying storage system are kept. "Delete" means that the VolumeSnapshotContent
+              and its physical snapshot on underlying storage system are deleted.
+              Required.
+            enum:
+            - Delete
+            - Retain
+            type: string
+          driver:
+            description: driver is the name of the storage driver that handles this
+              VolumeSnapshotClass. Required.
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          parameters:
+            additionalProperties:
+              type: string
+            description: parameters is a key-value map with storage driver specific
+              parameters for creating snapshots. These values are opaque to Kubernetes.
+            type: object
+        required:
+        - deletionPolicy
+        - driver
+        type: object
+    served: true
+    storage: true
+    subresources: {}
+  - additionalPrinterColumns:
+    - jsonPath: .driver
+      name: Driver
+      type: string
+    - description: Determines whether a VolumeSnapshotContent created through the VolumeSnapshotClass should be deleted when its bound VolumeSnapshot is deleted.
+      jsonPath: .deletionPolicy
+      name: DeletionPolicy
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1beta1
+    # This indicates the v1beta1 version of the custom resource is deprecated.
+    # API requests to this version receive a warning in the server response.
+    deprecated: true
+    # This overrides the default warning returned to clients making v1beta1 API requests.
+    deprecationWarning: "snapshot.storage.k8s.io/v1beta1 VolumeSnapshotClass is deprecated; use snapshot.storage.k8s.io/v1 VolumeSnapshotClass"
+    schema:
+      openAPIV3Schema:
+        description: VolumeSnapshotClass specifies parameters that a underlying storage system uses when creating a volume snapshot. A specific VolumeSnapshotClass is used by specifying its name in a VolumeSnapshot object. VolumeSnapshotClasses are non-namespaced
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          deletionPolicy:
+            description: deletionPolicy determines whether a VolumeSnapshotContent created through the VolumeSnapshotClass should be deleted when its bound VolumeSnapshot is deleted. Supported values are "Retain" and "Delete". "Retain" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are kept. "Delete" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are deleted. Required.
+            enum:
+            - Delete
+            - Retain
+            type: string
+          driver:
+            description: driver is the name of the storage driver that handles this VolumeSnapshotClass. Required.
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          parameters:
+            additionalProperties:
+              type: string
+            description: parameters is a key-value map with storage driver specific parameters for creating snapshots. These values are opaque to Kubernetes.
+            type: object
+        required:
+        - deletionPolicy
+        - driver
+        type: object
+    served: false
+    storage: false
+    subresources: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+`)
+
+func assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotclassesCrdYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotclassesCrdYaml, nil
+}
+
+func assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotclassesCrdYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotclassesCrdYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshotclasses.crd.yaml", size: 6490, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotcontentsCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.8.0
+    api-approved.kubernetes.io: "https://github.com/kubernetes-csi/external-snapshotter/pull/665"
+  creationTimestamp: null
+  name: volumesnapshotcontents.snapshot.storage.k8s.io
+spec:
+  group: snapshot.storage.k8s.io
+  names:
+    kind: VolumeSnapshotContent
+    listKind: VolumeSnapshotContentList
+    plural: volumesnapshotcontents
+    shortNames:
+    - vsc
+    - vscs
+    singular: volumesnapshotcontent
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - description: Indicates if the snapshot is ready to be used to restore a volume.
+      jsonPath: .status.readyToUse
+      name: ReadyToUse
+      type: boolean
+    - description: Represents the complete size of the snapshot in bytes
+      jsonPath: .status.restoreSize
+      name: RestoreSize
+      type: integer
+    - description: Determines whether this VolumeSnapshotContent and its physical
+        snapshot on the underlying storage system should be deleted when its bound
+        VolumeSnapshot is deleted.
+      jsonPath: .spec.deletionPolicy
+      name: DeletionPolicy
+      type: string
+    - description: Name of the CSI driver used to create the physical snapshot on
+        the underlying storage system.
+      jsonPath: .spec.driver
+      name: Driver
+      type: string
+    - description: Name of the VolumeSnapshotClass to which this snapshot belongs.
+      jsonPath: .spec.volumeSnapshotClassName
+      name: VolumeSnapshotClass
+      type: string
+    - description: Name of the VolumeSnapshot object to which this VolumeSnapshotContent
+        object is bound.
+      jsonPath: .spec.volumeSnapshotRef.name
+      name: VolumeSnapshot
+      type: string
+    - description: Namespace of the VolumeSnapshot object to which this VolumeSnapshotContent object is bound.
+      jsonPath: .spec.volumeSnapshotRef.namespace
+      name: VolumeSnapshotNamespace
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: VolumeSnapshotContent represents the actual "on-disk" snapshot
+          object in the underlying storage system
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          spec:
+            description: spec defines properties of a VolumeSnapshotContent created
+              by the underlying storage system. Required.
+            properties:
+              deletionPolicy:
+                description: deletionPolicy determines whether this VolumeSnapshotContent
+                  and its physical snapshot on the underlying storage system should
+                  be deleted when its bound VolumeSnapshot is deleted. Supported values
+                  are "Retain" and "Delete". "Retain" means that the VolumeSnapshotContent
+                  and its physical snapshot on underlying storage system are kept.
+                  "Delete" means that the VolumeSnapshotContent and its physical snapshot
+                  on underlying storage system are deleted. For dynamically provisioned
+                  snapshots, this field will automatically be filled in by the CSI
+                  snapshotter sidecar with the "DeletionPolicy" field defined in the
+                  corresponding VolumeSnapshotClass. For pre-existing snapshots, users
+                  MUST specify this field when creating the VolumeSnapshotContent
+                  object. Required.
+                enum:
+                - Delete
+                - Retain
+                type: string
+              driver:
+                description: driver is the name of the CSI driver used to create the
+                  physical snapshot on the underlying storage system. This MUST be
+                  the same as the name returned by the CSI GetPluginName() call for
+                  that driver. Required.
+                type: string
+              source:
+                description: source specifies whether the snapshot is (or should be)
+                  dynamically provisioned or already exists, and just requires a Kubernetes
+                  object representation. This field is immutable after creation. Required.
+                properties:
+                  snapshotHandle:
+                    description: snapshotHandle specifies the CSI "snapshot_id" of
+                      a pre-existing snapshot on the underlying storage system for
+                      which a Kubernetes object representation was (or should be)
+                      created. This field is immutable.
+                    type: string
+                  volumeHandle:
+                    description: volumeHandle specifies the CSI "volume_id" of the
+                      volume from which a snapshot should be dynamically taken from.
+                      This field is immutable.
+                    type: string
+                type: object
+                oneOf:
+                - required: ["snapshotHandle"]
+                - required: ["volumeHandle"]
+              sourceVolumeMode:
+                description: SourceVolumeMode is the mode of the volume whose snapshot
+                  is taken. Can be either “Filesystem” or “Block”. If not specified,
+                  it indicates the source volume's mode is unknown. This field is
+                  immutable. This field is an alpha field.
+                type: string
+              volumeSnapshotClassName:
+                description: name of the VolumeSnapshotClass from which this snapshot
+                  was (or will be) created. Note that after provisioning, the VolumeSnapshotClass
+                  may be deleted or recreated with different set of values, and as
+                  such, should not be referenced post-snapshot creation.
+                type: string
+              volumeSnapshotRef:
+                description: volumeSnapshotRef specifies the VolumeSnapshot object
+                  to which this VolumeSnapshotContent object is bound. VolumeSnapshot.Spec.VolumeSnapshotContentName
+                  field must reference to this VolumeSnapshotContent's name for the
+                  bidirectional binding to be valid. For a pre-existing VolumeSnapshotContent
+                  object, name and namespace of the VolumeSnapshot object MUST be
+                  provided for binding to happen. This field is immutable after creation.
+                  Required.
+                properties:
+                  apiVersion:
+                    description: API version of the referent.
+                    type: string
+                  fieldPath:
+                    description: 'If referring to a piece of an object instead of
+                      an entire object, this string should contain a valid JSON/Go
+                      field access statement, such as desiredState.manifest.containers[2].
+                      For example, if the object reference is to a container within
+                      a pod, this would take on a value like: "spec.containers{name}"
+                      (where "name" refers to the name of the container that triggered
+                      the event) or if no container name is specified "spec.containers[2]"
+                      (container with index 2 in this pod). This syntax is chosen
+                      only to have some well-defined way of referencing a part of
+                      an object. TODO: this design is not final and this field is
+                      subject to change in the future.'
+                    type: string
+                  kind:
+                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    type: string
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                    type: string
+                  namespace:
+                    description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                    type: string
+                  resourceVersion:
+                    description: 'Specific resourceVersion to which this reference
+                      is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                    type: string
+                  uid:
+                    description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                    type: string
+                type: object
+            required:
+            - deletionPolicy
+            - driver
+            - source
+            - volumeSnapshotRef
+            type: object
+          status:
+            description: status represents the current information of a snapshot.
+            properties:
+              creationTime:
+                description: creationTime is the timestamp when the point-in-time
+                  snapshot is taken by the underlying storage system. In dynamic snapshot
+                  creation case, this field will be filled in by the CSI snapshotter
+                  sidecar with the "creation_time" value returned from CSI "CreateSnapshot"
+                  gRPC call. For a pre-existing snapshot, this field will be filled
+                  with the "creation_time" value returned from the CSI "ListSnapshots"
+                  gRPC call if the driver supports it. If not specified, it indicates
+                  the creation time is unknown. The format of this field is a Unix
+                  nanoseconds time encoded as an int64. On Unix, the command ` + "`" + `date
+                  +%s%N` + "`" + ` returns the current time in nanoseconds since 1970-01-01
+                  00:00:00 UTC.
+                format: int64
+                type: integer
+              error:
+                description: error is the last observed error during snapshot creation,
+                  if any. Upon success after retry, this error field will be cleared.
+                properties:
+                  message:
+                    description: 'message is a string detailing the encountered error
+                      during snapshot creation if specified. NOTE: message may be
+                      logged, and it should not contain sensitive information.'
+                    type: string
+                  time:
+                    description: time is the timestamp when the error was encountered.
+                    format: date-time
+                    type: string
+                type: object
+              readyToUse:
+                description: readyToUse indicates if a snapshot is ready to be used
+                  to restore a volume. In dynamic snapshot creation case, this field
+                  will be filled in by the CSI snapshotter sidecar with the "ready_to_use"
+                  value returned from CSI "CreateSnapshot" gRPC call. For a pre-existing
+                  snapshot, this field will be filled with the "ready_to_use" value
+                  returned from the CSI "ListSnapshots" gRPC call if the driver supports
+                  it, otherwise, this field will be set to "True". If not specified,
+                  it means the readiness of a snapshot is unknown.
+                type: boolean
+              restoreSize:
+                description: restoreSize represents the complete size of the snapshot
+                  in bytes. In dynamic snapshot creation case, this field will be
+                  filled in by the CSI snapshotter sidecar with the "size_bytes" value
+                  returned from CSI "CreateSnapshot" gRPC call. For a pre-existing
+                  snapshot, this field will be filled with the "size_bytes" value
+                  returned from the CSI "ListSnapshots" gRPC call if the driver supports
+                  it. When restoring a volume from this snapshot, the size of the
+                  volume MUST NOT be smaller than the restoreSize if it is specified,
+                  otherwise the restoration will fail. If not specified, it indicates
+                  that the size is unknown.
+                format: int64
+                minimum: 0
+                type: integer
+              snapshotHandle:
+                description: snapshotHandle is the CSI "snapshot_id" of a snapshot
+                  on the underlying storage system. If not specified, it indicates
+                  that dynamic snapshot creation has either failed or it is still
+                  in progress.
+                type: string
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+  - additionalPrinterColumns:
+    - description: Indicates if the snapshot is ready to be used to restore a volume.
+      jsonPath: .status.readyToUse
+      name: ReadyToUse
+      type: boolean
+    - description: Represents the complete size of the snapshot in bytes
+      jsonPath: .status.restoreSize
+      name: RestoreSize
+      type: integer
+    - description: Determines whether this VolumeSnapshotContent and its physical snapshot on the underlying storage system should be deleted when its bound VolumeSnapshot is deleted.
+      jsonPath: .spec.deletionPolicy
+      name: DeletionPolicy
+      type: string
+    - description: Name of the CSI driver used to create the physical snapshot on the underlying storage system.
+      jsonPath: .spec.driver
+      name: Driver
+      type: string
+    - description: Name of the VolumeSnapshotClass to which this snapshot belongs.
+      jsonPath: .spec.volumeSnapshotClassName
+      name: VolumeSnapshotClass
+      type: string
+    - description: Name of the VolumeSnapshot object to which this VolumeSnapshotContent object is bound.
+      jsonPath: .spec.volumeSnapshotRef.name
+      name: VolumeSnapshot
+      type: string
+    - description: Namespace of the VolumeSnapshot object to which this VolumeSnapshotContent object is bound.
+      jsonPath: .spec.volumeSnapshotRef.namespace
+      name: VolumeSnapshotNamespace
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1beta1
+    # This indicates the v1beta1 version of the custom resource is deprecated.
+    # API requests to this version receive a warning in the server response.
+    deprecated: true
+    # This overrides the default warning returned to clients making v1beta1 API requests.
+    deprecationWarning: "snapshot.storage.k8s.io/v1beta1 VolumeSnapshotContent is deprecated; use snapshot.storage.k8s.io/v1 VolumeSnapshotContent"
+    schema:
+      openAPIV3Schema:
+        description: VolumeSnapshotContent represents the actual "on-disk" snapshot object in the underlying storage system
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          spec:
+            description: spec defines properties of a VolumeSnapshotContent created by the underlying storage system. Required.
+            properties:
+              deletionPolicy:
+                description: deletionPolicy determines whether this VolumeSnapshotContent and its physical snapshot on the underlying storage system should be deleted when its bound VolumeSnapshot is deleted. Supported values are "Retain" and "Delete". "Retain" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are kept. "Delete" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are deleted. For dynamically provisioned snapshots, this field will automatically be filled in by the CSI snapshotter sidecar with the "DeletionPolicy" field defined in the corresponding VolumeSnapshotClass. For pre-existing snapshots, users MUST specify this field when creating the  VolumeSnapshotContent object. Required.
+                enum:
+                - Delete
+                - Retain
+                type: string
+              driver:
+                description: driver is the name of the CSI driver used to create the physical snapshot on the underlying storage system. This MUST be the same as the name returned by the CSI GetPluginName() call for that driver. Required.
+                type: string
+              source:
+                description: source specifies whether the snapshot is (or should be) dynamically provisioned or already exists, and just requires a Kubernetes object representation. This field is immutable after creation. Required.
+                properties:
+                  snapshotHandle:
+                    description: snapshotHandle specifies the CSI "snapshot_id" of a pre-existing snapshot on the underlying storage system for which a Kubernetes object representation was (or should be) created. This field is immutable.
+                    type: string
+                  volumeHandle:
+                    description: volumeHandle specifies the CSI "volume_id" of the volume from which a snapshot should be dynamically taken from. This field is immutable.
+                    type: string
+                type: object
+              volumeSnapshotClassName:
+                description: name of the VolumeSnapshotClass from which this snapshot was (or will be) created. Note that after provisioning, the VolumeSnapshotClass may be deleted or recreated with different set of values, and as such, should not be referenced post-snapshot creation.
+                type: string
+              volumeSnapshotRef:
+                description: volumeSnapshotRef specifies the VolumeSnapshot object to which this VolumeSnapshotContent object is bound. VolumeSnapshot.Spec.VolumeSnapshotContentName field must reference to this VolumeSnapshotContent's name for the bidirectional binding to be valid. For a pre-existing VolumeSnapshotContent object, name and namespace of the VolumeSnapshot object MUST be provided for binding to happen. This field is immutable after creation. Required.
+                properties:
+                  apiVersion:
+                    description: API version of the referent.
+                    type: string
+                  fieldPath:
+                    description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                    type: string
+                  kind:
+                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    type: string
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                    type: string
+                  namespace:
+                    description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                    type: string
+                  resourceVersion:
+                    description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                    type: string
+                  uid:
+                    description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                    type: string
+                type: object
+            required:
+            - deletionPolicy
+            - driver
+            - source
+            - volumeSnapshotRef
+            type: object
+          status:
+            description: status represents the current information of a snapshot.
+            properties:
+              creationTime:
+                description: creationTime is the timestamp when the point-in-time snapshot is taken by the underlying storage system. In dynamic snapshot creation case, this field will be filled in by the CSI snapshotter sidecar with the "creation_time" value returned from CSI "CreateSnapshot" gRPC call. For a pre-existing snapshot, this field will be filled with the "creation_time" value returned from the CSI "ListSnapshots" gRPC call if the driver supports it. If not specified, it indicates the creation time is unknown. The format of this field is a Unix nanoseconds time encoded as an int64. On Unix, the command ` + "`" + `date +%s%N` + "`" + ` returns the current time in nanoseconds since 1970-01-01 00:00:00 UTC.
+                format: int64
+                type: integer
+              error:
+                description: error is the last observed error during snapshot creation, if any. Upon success after retry, this error field will be cleared.
+                properties:
+                  message:
+                    description: 'message is a string detailing the encountered error during snapshot creation if specified. NOTE: message may be logged, and it should not contain sensitive information.'
+                    type: string
+                  time:
+                    description: time is the timestamp when the error was encountered.
+                    format: date-time
+                    type: string
+                type: object
+              readyToUse:
+                description: readyToUse indicates if a snapshot is ready to be used to restore a volume. In dynamic snapshot creation case, this field will be filled in by the CSI snapshotter sidecar with the "ready_to_use" value returned from CSI "CreateSnapshot" gRPC call. For a pre-existing snapshot, this field will be filled with the "ready_to_use" value returned from the CSI "ListSnapshots" gRPC call if the driver supports it, otherwise, this field will be set to "True". If not specified, it means the readiness of a snapshot is unknown.
+                type: boolean
+              restoreSize:
+                description: restoreSize represents the complete size of the snapshot in bytes. In dynamic snapshot creation case, this field will be filled in by the CSI snapshotter sidecar with the "size_bytes" value returned from CSI "CreateSnapshot" gRPC call. For a pre-existing snapshot, this field will be filled with the "size_bytes" value returned from the CSI "ListSnapshots" gRPC call if the driver supports it. When restoring a volume from this snapshot, the size of the volume MUST NOT be smaller than the restoreSize if it is specified, otherwise the restoration will fail. If not specified, it indicates that the size is unknown.
+                format: int64
+                minimum: 0
+                type: integer
+              snapshotHandle:
+                description: snapshotHandle is the CSI "snapshot_id" of a snapshot on the underlying storage system. If not specified, it indicates that dynamic snapshot creation has either failed or it is still in progress.
+                type: string
+            type: object
+        required:
+        - spec
+        type: object
+    served: false
+    storage: false
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+`)
+
+func assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotcontentsCrdYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotcontentsCrdYaml, nil
+}
+
+func assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotcontentsCrdYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotcontentsCrdYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshotcontents.crd.yaml", size: 25245, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotsCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.8.0
+    api-approved.kubernetes.io: "https://github.com/kubernetes-csi/external-snapshotter/pull/665"
+  creationTimestamp: null
+  name: volumesnapshots.snapshot.storage.k8s.io
+spec:
+  group: snapshot.storage.k8s.io
+  names:
+    kind: VolumeSnapshot
+    listKind: VolumeSnapshotList
+    plural: volumesnapshots
+    shortNames:
+    - vs
+    singular: volumesnapshot
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Indicates if the snapshot is ready to be used to restore a volume.
+      jsonPath: .status.readyToUse
+      name: ReadyToUse
+      type: boolean
+    - description: If a new snapshot needs to be created, this contains the name of
+        the source PVC from which this snapshot was (or will be) created.
+      jsonPath: .spec.source.persistentVolumeClaimName
+      name: SourcePVC
+      type: string
+    - description: If a snapshot already exists, this contains the name of the existing
+        VolumeSnapshotContent object representing the existing snapshot.
+      jsonPath: .spec.source.volumeSnapshotContentName
+      name: SourceSnapshotContent
+      type: string
+    - description: Represents the minimum size of volume required to rehydrate from
+        this snapshot.
+      jsonPath: .status.restoreSize
+      name: RestoreSize
+      type: string
+    - description: The name of the VolumeSnapshotClass requested by the VolumeSnapshot.
+      jsonPath: .spec.volumeSnapshotClassName
+      name: SnapshotClass
+      type: string
+    - description: Name of the VolumeSnapshotContent object to which the VolumeSnapshot
+        object intends to bind to. Please note that verification of binding actually
+        requires checking both VolumeSnapshot and VolumeSnapshotContent to ensure
+        both are pointing at each other. Binding MUST be verified prior to usage of
+        this object.
+      jsonPath: .status.boundVolumeSnapshotContentName
+      name: SnapshotContent
+      type: string
+    - description: Timestamp when the point-in-time snapshot was taken by the underlying
+        storage system.
+      jsonPath: .status.creationTime
+      name: CreationTime
+      type: date
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: VolumeSnapshot is a user's request for either creating a point-in-time
+          snapshot of a persistent volume, or binding to a pre-existing snapshot.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          spec:
+            description: 'spec defines the desired characteristics of a snapshot requested
+              by a user. More info: https://kubernetes.io/docs/concepts/storage/volume-snapshots#volumesnapshots
+              Required.'
+            properties:
+              source:
+                description: source specifies where a snapshot will be created from.
+                  This field is immutable after creation. Required.
+                properties:
+                  persistentVolumeClaimName:
+                    description: persistentVolumeClaimName specifies the name of the
+                      PersistentVolumeClaim object representing the volume from which
+                      a snapshot should be created. This PVC is assumed to be in the
+                      same namespace as the VolumeSnapshot object. This field should
+                      be set if the snapshot does not exists, and needs to be created.
+                      This field is immutable.
+                    type: string
+                  volumeSnapshotContentName:
+                    description: volumeSnapshotContentName specifies the name of a
+                      pre-existing VolumeSnapshotContent object representing an existing
+                      volume snapshot. This field should be set if the snapshot already
+                      exists and only needs a representation in Kubernetes. This field
+                      is immutable.
+                    type: string
+                type: object
+                oneOf:
+                - required: ["persistentVolumeClaimName"]
+                - required: ["volumeSnapshotContentName"]
+              volumeSnapshotClassName:
+                description: 'VolumeSnapshotClassName is the name of the VolumeSnapshotClass
+                  requested by the VolumeSnapshot. VolumeSnapshotClassName may be
+                  left nil to indicate that the default SnapshotClass should be used.
+                  A given cluster may have multiple default Volume SnapshotClasses:
+                  one default per CSI Driver. If a VolumeSnapshot does not specify
+                  a SnapshotClass, VolumeSnapshotSource will be checked to figure
+                  out what the associated CSI Driver is, and the default VolumeSnapshotClass
+                  associated with that CSI Driver will be used. If more than one VolumeSnapshotClass
+                  exist for a given CSI Driver and more than one have been marked
+                  as default, CreateSnapshot will fail and generate an event. Empty
+                  string is not allowed for this field.'
+                type: string
+            required:
+            - source
+            type: object
+          status:
+            description: status represents the current information of a snapshot.
+              Consumers must verify binding between VolumeSnapshot and VolumeSnapshotContent
+              objects is successful (by validating that both VolumeSnapshot and VolumeSnapshotContent
+              point at each other) before using this object.
+            properties:
+              boundVolumeSnapshotContentName:
+                description: 'boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent
+                  object to which this VolumeSnapshot object intends to bind to. If
+                  not specified, it indicates that the VolumeSnapshot object has not
+                  been successfully bound to a VolumeSnapshotContent object yet. NOTE:
+                  To avoid possible security issues, consumers must verify binding
+                  between VolumeSnapshot and VolumeSnapshotContent objects is successful
+                  (by validating that both VolumeSnapshot and VolumeSnapshotContent
+                  point at each other) before using this object.'
+                type: string
+              creationTime:
+                description: creationTime is the timestamp when the point-in-time
+                  snapshot is taken by the underlying storage system. In dynamic snapshot
+                  creation case, this field will be filled in by the snapshot controller
+                  with the "creation_time" value returned from CSI "CreateSnapshot"
+                  gRPC call. For a pre-existing snapshot, this field will be filled
+                  with the "creation_time" value returned from the CSI "ListSnapshots"
+                  gRPC call if the driver supports it. If not specified, it may indicate
+                  that the creation time of the snapshot is unknown.
+                format: date-time
+                type: string
+              error:
+                description: error is the last observed error during snapshot creation,
+                  if any. This field could be helpful to upper level controllers(i.e.,
+                  application controller) to decide whether they should continue on
+                  waiting for the snapshot to be created based on the type of error
+                  reported. The snapshot controller will keep retrying when an error
+                  occurs during the snapshot creation. Upon success, this error field
+                  will be cleared.
+                properties:
+                  message:
+                    description: 'message is a string detailing the encountered error
+                      during snapshot creation if specified. NOTE: message may be
+                      logged, and it should not contain sensitive information.'
+                    type: string
+                  time:
+                    description: time is the timestamp when the error was encountered.
+                    format: date-time
+                    type: string
+                type: object
+              readyToUse:
+                description: readyToUse indicates if the snapshot is ready to be used
+                  to restore a volume. In dynamic snapshot creation case, this field
+                  will be filled in by the snapshot controller with the "ready_to_use"
+                  value returned from CSI "CreateSnapshot" gRPC call. For a pre-existing
+                  snapshot, this field will be filled with the "ready_to_use" value
+                  returned from the CSI "ListSnapshots" gRPC call if the driver supports
+                  it, otherwise, this field will be set to "True". If not specified,
+                  it means the readiness of a snapshot is unknown.
+                type: boolean
+              restoreSize:
+                type: string
+                description: restoreSize represents the minimum size of volume required
+                  to create a volume from this snapshot. In dynamic snapshot creation
+                  case, this field will be filled in by the snapshot controller with
+                  the "size_bytes" value returned from CSI "CreateSnapshot" gRPC call.
+                  For a pre-existing snapshot, this field will be filled with the
+                  "size_bytes" value returned from the CSI "ListSnapshots" gRPC call
+                  if the driver supports it. When restoring a volume from this snapshot,
+                  the size of the volume MUST NOT be smaller than the restoreSize
+                  if it is specified, otherwise the restoration will fail. If not
+                  specified, it indicates that the size is unknown.
+                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                x-kubernetes-int-or-string: true
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+  - additionalPrinterColumns:
+    - description: Indicates if the snapshot is ready to be used to restore a volume.
+      jsonPath: .status.readyToUse
+      name: ReadyToUse
+      type: boolean
+    - description: If a new snapshot needs to be created, this contains the name of the source PVC from which this snapshot was (or will be) created.
+      jsonPath: .spec.source.persistentVolumeClaimName
+      name: SourcePVC
+      type: string
+    - description: If a snapshot already exists, this contains the name of the existing VolumeSnapshotContent object representing the existing snapshot.
+      jsonPath: .spec.source.volumeSnapshotContentName
+      name: SourceSnapshotContent
+      type: string
+    - description: Represents the minimum size of volume required to rehydrate from this snapshot.
+      jsonPath: .status.restoreSize
+      name: RestoreSize
+      type: string
+    - description: The name of the VolumeSnapshotClass requested by the VolumeSnapshot.
+      jsonPath: .spec.volumeSnapshotClassName
+      name: SnapshotClass
+      type: string
+    - description: Name of the VolumeSnapshotContent object to which the VolumeSnapshot object intends to bind to. Please note that verification of binding actually requires checking both VolumeSnapshot and VolumeSnapshotContent to ensure both are pointing at each other. Binding MUST be verified prior to usage of this object.
+      jsonPath: .status.boundVolumeSnapshotContentName
+      name: SnapshotContent
+      type: string
+    - description: Timestamp when the point-in-time snapshot was taken by the underlying storage system.
+      jsonPath: .status.creationTime
+      name: CreationTime
+      type: date
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1beta1
+    # This indicates the v1beta1 version of the custom resource is deprecated.
+    # API requests to this version receive a warning in the server response.
+    deprecated: true
+    # This overrides the default warning returned to clients making v1beta1 API requests.
+    deprecationWarning: "snapshot.storage.k8s.io/v1beta1 VolumeSnapshot is deprecated; use snapshot.storage.k8s.io/v1 VolumeSnapshot"
+    schema:
+      openAPIV3Schema:
+        description: VolumeSnapshot is a user's request for either creating a point-in-time snapshot of a persistent volume, or binding to a pre-existing snapshot.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          spec:
+            description: 'spec defines the desired characteristics of a snapshot requested by a user. More info: https://kubernetes.io/docs/concepts/storage/volume-snapshots#volumesnapshots Required.'
+            properties:
+              source:
+                description: source specifies where a snapshot will be created from. This field is immutable after creation. Required.
+                properties:
+                  persistentVolumeClaimName:
+                    description: persistentVolumeClaimName specifies the name of the PersistentVolumeClaim object representing the volume from which a snapshot should be created. This PVC is assumed to be in the same namespace as the VolumeSnapshot object. This field should be set if the snapshot does not exists, and needs to be created. This field is immutable.
+                    type: string
+                  volumeSnapshotContentName:
+                    description: volumeSnapshotContentName specifies the name of a pre-existing VolumeSnapshotContent object representing an existing volume snapshot. This field should be set if the snapshot already exists and only needs a representation in Kubernetes. This field is immutable.
+                    type: string
+                type: object
+              volumeSnapshotClassName:
+                description: 'VolumeSnapshotClassName is the name of the VolumeSnapshotClass requested by the VolumeSnapshot. VolumeSnapshotClassName may be left nil to indicate that the default SnapshotClass should be used. A given cluster may have multiple default Volume SnapshotClasses: one default per CSI Driver. If a VolumeSnapshot does not specify a SnapshotClass, VolumeSnapshotSource will be checked to figure out what the associated CSI Driver is, and the default VolumeSnapshotClass associated with that CSI Driver will be used. If more than one VolumeSnapshotClass exist for a given CSI Driver and more than one have been marked as default, CreateSnapshot will fail and generate an event. Empty string is not allowed for this field.'
+                type: string
+            required:
+            - source
+            type: object
+          status:
+            description: status represents the current information of a snapshot. Consumers must verify binding between VolumeSnapshot and VolumeSnapshotContent objects is successful (by validating that both VolumeSnapshot and VolumeSnapshotContent point at each other) before using this object.
+            properties:
+              boundVolumeSnapshotContentName:
+                description: 'boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent object to which this VolumeSnapshot object intends to bind to. If not specified, it indicates that the VolumeSnapshot object has not been successfully bound to a VolumeSnapshotContent object yet. NOTE: To avoid possible security issues, consumers must verify binding between VolumeSnapshot and VolumeSnapshotContent objects is successful (by validating that both VolumeSnapshot and VolumeSnapshotContent point at each other) before using this object.'
+                type: string
+              creationTime:
+                description: creationTime is the timestamp when the point-in-time snapshot is taken by the underlying storage system. In dynamic snapshot creation case, this field will be filled in by the snapshot controller with the "creation_time" value returned from CSI "CreateSnapshot" gRPC call. For a pre-existing snapshot, this field will be filled with the "creation_time" value returned from the CSI "ListSnapshots" gRPC call if the driver supports it. If not specified, it may indicate that the creation time of the snapshot is unknown.
+                format: date-time
+                type: string
+              error:
+                description: error is the last observed error during snapshot creation, if any. This field could be helpful to upper level controllers(i.e., application controller) to decide whether they should continue on waiting for the snapshot to be created based on the type of error reported. The snapshot controller will keep retrying when an error occurs during the snapshot creation. Upon success, this error field will be cleared.
+                properties:
+                  message:
+                    description: 'message is a string detailing the encountered error during snapshot creation if specified. NOTE: message may be logged, and it should not contain sensitive information.'
+                    type: string
+                  time:
+                    description: time is the timestamp when the error was encountered.
+                    format: date-time
+                    type: string
+                type: object
+              readyToUse:
+                description: readyToUse indicates if the snapshot is ready to be used to restore a volume. In dynamic snapshot creation case, this field will be filled in by the snapshot controller with the "ready_to_use" value returned from CSI "CreateSnapshot" gRPC call. For a pre-existing snapshot, this field will be filled with the "ready_to_use" value returned from the CSI "ListSnapshots" gRPC call if the driver supports it, otherwise, this field will be set to "True". If not specified, it means the readiness of a snapshot is unknown.
+                type: boolean
+              restoreSize:
+                type: string
+                description: restoreSize represents the minimum size of volume required to create a volume from this snapshot. In dynamic snapshot creation case, this field will be filled in by the snapshot controller with the "size_bytes" value returned from CSI "CreateSnapshot" gRPC call. For a pre-existing snapshot, this field will be filled with the "size_bytes" value returned from the CSI "ListSnapshots" gRPC call if the driver supports it. When restoring a volume from this snapshot, the size of the volume MUST NOT be smaller than the restoreSize if it is specified, otherwise the restoration will fail. If not specified, it indicates that the size is unknown.
+                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                x-kubernetes-int-or-string: true
+            type: object
+        required:
+        - spec
+        type: object
+    served: false
+    storage: false
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+`)
+
+func assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotsCrdYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotsCrdYaml, nil
+}
+
+func assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotsCrdYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotsCrdYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshots.crd.yaml", size: 20652, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotValidatingWebhookConfigYaml = []byte(`apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: snapshot.storage.k8s.io
+  labels:
+    app: csi-snapshot-webhook
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+webhooks:
+  - name: volumesnapshotclasses.snapshot.storage.k8s.io
+    clientConfig:
+      service:
+        name: csi-snapshot-webhook
+        namespace: openshift-storage
+        path: /volumesnapshot
+    rules:
+      - operations: [ "CREATE", "UPDATE" ]
+        apiGroups: ["snapshot.storage.k8s.io"]
+        apiVersions: ["v1beta1", "v1"]
+        resources: ["volumesnapshots", "volumesnapshotcontents", "volumesnapshotclasses"]
+    admissionReviewVersions:
+      - v1
+      - v1beta1
+    sideEffects: None
+    failurePolicy: Ignore
+`)
+
+func assetsComponentsCsiSnapshotValidatingWebhookConfigYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotValidatingWebhookConfigYaml, nil
+}
+
+func assetsComponentsCsiSnapshotValidatingWebhookConfigYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotValidatingWebhookConfigYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/validating-webhook-config.yaml", size: 902, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotWebhookDeploymentYaml = []byte(`kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: csi-snapshot-webhook
+  namespace: openshift-storage
+spec:
+  serviceName: "csi-snapshot-webhook"
+  selector:
+    matchLabels:
+      app: csi-snapshot-webhook
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: csi-snapshot-webhook
+    spec:
+      serviceAccount: csi-snapshot-controller # TODO: create dedicated service account
+      containers:
+      - name: webhook
+        image: {{ .ReleaseImage.csi_snapshot_validation_webhook }}
+        #image: quay.io/openshift/origin-csi-snapshot-validation-webhook:4.12.0
+        args:
+          - --tls-cert-file=/etc/snapshot-validation-webhook/certs/tls.crt
+          - --tls-private-key-file=/etc/snapshot-validation-webhook/certs/tls.key
+          - "--v=1"
+          - --port=8443
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+          - name: certs
+            mountPath: /etc/snapshot-validation-webhook/certs
+            readOnly: true
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: csi-snapshot-webhook
+                topologyKey: kubernetes.io/hostname
+      priorityClassName: "system-cluster-critical"
+      restartPolicy: Always
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      volumes:
+      - name: certs
+        secret:
+          secretName: csi-snapshot-webhook-secret
+      tolerations:
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: "NoSchedule"
+`)
+
+func assetsComponentsCsiSnapshotWebhookDeploymentYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotWebhookDeploymentYaml, nil
+}
+
+func assetsComponentsCsiSnapshotWebhookDeploymentYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotWebhookDeploymentYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/webhook-deployment.yaml", size: 2363, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsComponentsCsiSnapshotWebhookServiceYaml = []byte(`apiVersion: v1
+kind: Service
+metadata:
+  name: csi-snapshot-webhook
+  namespace: openshift-storage
+  labels:
+    app: csi-snapshot-webhook
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: csi-snapshot-webhook-secret
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    targetPort: 8443
+  selector:
+    app: csi-snapshot-webhook
+`)
+
+func assetsComponentsCsiSnapshotWebhookServiceYamlBytes() ([]byte, error) {
+	return _assetsComponentsCsiSnapshotWebhookServiceYaml, nil
+}
+
+func assetsComponentsCsiSnapshotWebhookServiceYaml() (*asset, error) {
+	bytes, err := assetsComponentsCsiSnapshotWebhookServiceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/components/csi-snapshot/webhook-service.yaml", size: 542, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -548,6 +1883,19 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
+      - args:
+        - --csi-address=/run/topolvm/csi-topolvm.sock
+        - --leader-election
+        - --leader-election-namespace=openshift-storage
+        image: {{ .ReleaseImage.ose_csi_ext_snapshotter }}
+        imagePullPolicy: IfNotPresent
+        name: csi-snapshotter
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /run/topolvm
+          name: socket-dir
       dnsPolicy: ClusterFirst
       initContainers:
       - command:
@@ -587,7 +1935,7 @@ func assetsComponentsOdfLvmTopolvmController_deploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4210, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_deployment.yaml", size: 4686, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -648,6 +1996,31 @@ rules:
   - update
   - patch
   - delete
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshotclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshotcontents
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshotcontents/status
+  verbs:
+  - update
+  - patch
 `)
 
 func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterroleYamlBytes() ([]byte, error) {
@@ -660,7 +2033,7 @@ func assetsComponentsOdfLvmTopolvmController_rbacAuthorizationK8sIo_v1_clusterro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 698, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml", size: 1070, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6491,6 +7864,18 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
 	"assets/bindata_timestamp.txt":                                                                           assetsBindata_timestampTxt,
+	"assets/components/csi-snapshot/clusterrole.yaml":                                                        assetsComponentsCsiSnapshotClusterroleYaml,
+	"assets/components/csi-snapshot/clusterrolebinding.yaml":                                                 assetsComponentsCsiSnapshotClusterrolebindingYaml,
+	"assets/components/csi-snapshot/controller-deployment.yaml":                                              assetsComponentsCsiSnapshotControllerDeploymentYaml,
+	"assets/components/csi-snapshot/role.yaml":                                                               assetsComponentsCsiSnapshotRoleYaml,
+	"assets/components/csi-snapshot/rolebinding.yaml":                                                        assetsComponentsCsiSnapshotRolebindingYaml,
+	"assets/components/csi-snapshot/service-account.yaml":                                                    assetsComponentsCsiSnapshotServiceAccountYaml,
+	"assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshotclasses.crd.yaml":                  assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotclassesCrdYaml,
+	"assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshotcontents.crd.yaml":                 assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotcontentsCrdYaml,
+	"assets/components/csi-snapshot/snapshot.storage.k8s.io_volumesnapshots.crd.yaml":                        assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotsCrdYaml,
+	"assets/components/csi-snapshot/validating-webhook-config.yaml":                                          assetsComponentsCsiSnapshotValidatingWebhookConfigYaml,
+	"assets/components/csi-snapshot/webhook-deployment.yaml":                                                 assetsComponentsCsiSnapshotWebhookDeploymentYaml,
+	"assets/components/csi-snapshot/webhook-service.yaml":                                                    assetsComponentsCsiSnapshotWebhookServiceYaml,
 	"assets/components/kube-apiserver/config-overrides.yaml":                                                 assetsComponentsKubeApiserverConfigOverridesYaml,
 	"assets/components/kube-apiserver/defaultconfig.yaml":                                                    assetsComponentsKubeApiserverDefaultconfigYaml,
 	"assets/components/odf-lvm/csi-driver.yaml":                                                              assetsComponentsOdfLvmCsiDriverYaml,
@@ -6597,11 +7982,13 @@ var _bindata = map[string]func() (*asset, error){
 // directory embedded in the file by go-bindata.
 // For example if you run go-bindata on data/... and data contains the
 // following hierarchy:
-//     data/
-//       foo.txt
-//       img/
-//         a.png
-//         b.png
+//
+//	data/
+//	  foo.txt
+//	  img/
+//	    a.png
+//	    b.png
+//
 // then AssetDir("data") would return []string{"foo.txt", "img"}
 // AssetDir("data/img") would return []string{"a.png", "b.png"}
 // AssetDir("foo.txt") and AssetDir("notexist") would return an error
@@ -6637,6 +8024,20 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"assets": {nil, map[string]*bintree{
 		"bindata_timestamp.txt": {assetsBindata_timestampTxt, map[string]*bintree{}},
 		"components": {nil, map[string]*bintree{
+			"csi-snapshot": {nil, map[string]*bintree{
+				"clusterrole.yaml":           {assetsComponentsCsiSnapshotClusterroleYaml, map[string]*bintree{}},
+				"clusterrolebinding.yaml":    {assetsComponentsCsiSnapshotClusterrolebindingYaml, map[string]*bintree{}},
+				"controller-deployment.yaml": {assetsComponentsCsiSnapshotControllerDeploymentYaml, map[string]*bintree{}},
+				"role.yaml":                  {assetsComponentsCsiSnapshotRoleYaml, map[string]*bintree{}},
+				"rolebinding.yaml":           {assetsComponentsCsiSnapshotRolebindingYaml, map[string]*bintree{}},
+				"service-account.yaml":       {assetsComponentsCsiSnapshotServiceAccountYaml, map[string]*bintree{}},
+				"snapshot.storage.k8s.io_volumesnapshotclasses.crd.yaml":  {assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotclassesCrdYaml, map[string]*bintree{}},
+				"snapshot.storage.k8s.io_volumesnapshotcontents.crd.yaml": {assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotcontentsCrdYaml, map[string]*bintree{}},
+				"snapshot.storage.k8s.io_volumesnapshots.crd.yaml":        {assetsComponentsCsiSnapshotSnapshotStorageK8sIo_volumesnapshotsCrdYaml, map[string]*bintree{}},
+				"validating-webhook-config.yaml":                          {assetsComponentsCsiSnapshotValidatingWebhookConfigYaml, map[string]*bintree{}},
+				"webhook-deployment.yaml":                                 {assetsComponentsCsiSnapshotWebhookDeploymentYaml, map[string]*bintree{}},
+				"webhook-service.yaml":                                    {assetsComponentsCsiSnapshotWebhookServiceYaml, map[string]*bintree{}},
+			}},
 			"kube-apiserver": {nil, map[string]*bintree{
 				"config-overrides.yaml": {assetsComponentsKubeApiserverConfigOverridesYaml, map[string]*bintree{}},
 				"defaultconfig.yaml":    {assetsComponentsKubeApiserverDefaultconfigYaml, map[string]*bintree{}},

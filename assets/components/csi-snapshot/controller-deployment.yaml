@@ -1,0 +1,70 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: csi-snapshot-controller
+  namespace: openshift-storage
+spec:
+  serviceName: "csi-snapshot-controller"
+  selector:
+    matchLabels:
+      app: csi-snapshot-controller
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: csi-snapshot-controller
+    spec:
+      serviceAccount: csi-snapshot-controller
+      containers:
+        - name: snapshot-controller
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          image: {{ .ReleaseImage.csi_snapshot_controller }}
+            #quay.io/openshift/origin-csi-snapshot-controller:4.12.0
+          args:
+            - "--v=1"
+            - "--leader-election=true"
+            # Leader election values are from
+            # https://github.com/openshift/library-go/blob/master/pkg/config/leaderelection/leaderelection.go
+            - "--leader-election-lease-duration=137s"
+            - "--leader-election-renew-deadline=107s"
+            - "--leader-election-retry-period=26s"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              # TODO: measure on a real cluster
+              cpu: 10m
+              memory: 50Mi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: csi-snapshot-controller
+                topologyKey: kubernetes.io/hostname
+      priorityClassName: "system-cluster-critical"
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: "NoSchedule"
