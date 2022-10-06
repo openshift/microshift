@@ -75,7 +75,7 @@ The list of manifest locations can be customized via configuration using the abo
 
 ## Manifest Example
 
-The example demonstrates automatic deployment of an `nginx` container using `kustomize` manifests in the `/etc/microshift/manifests` directory.
+The example demonstrates automatic deployment of a `busybox` container using `kustomize` manifests in the `/etc/microshift/manifests` directory.
 
 Run the following command to create the manifest files.
 
@@ -83,43 +83,49 @@ Run the following command to create the manifest files.
 MANIFEST_DIR=/etc/microshift/manifests
 sudo mkdir -p ${MANIFEST_DIR}
 
-sudo tee ${MANIFEST_DIR}/nginx.yaml <<EOF
+sudo tee ${MANIFEST_DIR}/busybox.yaml &>/dev/null <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: busybox
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: busybox-deployment
 spec:
   selector:
     matchLabels:
-      app: nginx
-  replicas: 2
+      app: busybox
   template:
     metadata:
       labels:
-        app: nginx
+        app: busybox
     spec:
       containers:
-      - name: nginx
-        image: NGINX_IMAGE
-        ports:
-        - containerPort: 8080
+      - name: busybox
+        image: BUSYBOX_IMAGE
+        command:
+          - sleep
+          - "3600"
 EOF
 
-sudo tee ${MANIFEST_DIR}/kustomization.yaml <<EOF
+sudo tee ${MANIFEST_DIR}/kustomization.yaml &>/dev/null <<EOF
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+namespace: busybox
 resources:
-  - nginx.yaml
+  - busybox.yaml
 images:
-  - name: NGINX_IMAGE
-    newName: nginx:1.21
+  - name: BUSYBOX_IMAGE
+    newName: k8s.gcr.io/busybox
 EOF
 ```
 
-Restart the MicroShift service to apply the manifests and verify that the `nginx` container was created.
+Restart the MicroShift service to apply the manifests and verify that the `busybox` pod is running.
 
 ```bash
 sudo systemctl restart microshift
-oc get pods -l app=nginx
+oc get pods -n busybox
 ```
