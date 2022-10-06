@@ -125,3 +125,76 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	}
 	return nil
 }
+
+func startCSISnapshot(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+	var (
+		sa = []string{
+			"assets/components/csi-snapshot/service-account.yaml",
+		}
+		role = []string{
+			"assets/components/csi-snapshot/role.yaml",
+		}
+		rb = []string{
+			"assets/components/csi-snapshot/rolebinding.yaml",
+		}
+		cr = []string{
+			"assets/components/csi-snapshot/clusterrole.yaml",
+		}
+		crb = []string{
+			"assets/components/csi-snapshot/clusterrolebinding.yaml",
+		}
+		deploy = []string{
+			"assets/components/csi-snapshot/controller-deployment.yaml",
+			"assets/components/csi-snapshot/webhook-deployment.yaml",
+		}
+		svc = []string{
+			"assets/components/csi-snapshot/webhook-service.yaml",
+		}
+		vwc = []string {
+			"assets/components/csi-snapshot/validating-webhook-config.yaml",
+		}
+		// scc = []string{
+		// 	"assets/components/csi-snapshot/topolvm-node-securitycontextconstraint.yaml",
+		// }
+	)
+
+	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply sa %v: %v", sa, err)
+		return err
+	}
+	if err := assets.ApplyRoles(role, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply role %v: %v", cr, err)
+		return err
+	}
+	if err := assets.ApplyRoleBindings(rb, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply rolebinding %v: %v", cr, err)
+		return err
+	}
+	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply clusterrole %v: %v", cr, err)
+		return err
+	}
+	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
+		return err
+	}
+	if err := assets.ApplyDeployments(deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
+		return err
+	}
+
+	if err := assets.ApplyServices(svc, nil, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply services %v: %v", svc, err)
+		return err
+	}
+
+	if err := assets.ApplyValidatingWebhookConfiguration(vwc, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply ValidatingWebhookConfiguration %v: %v", vwc, err)
+		return err
+	}
+	// if err := assets.ApplySCCs(scc, nil, nil, kubeconfigPath); err != nil {
+	// 	klog.Warningf("Failed to apply sccs %v: %v", scc, err)
+	// 	return err
+	// }
+	return nil
+}
