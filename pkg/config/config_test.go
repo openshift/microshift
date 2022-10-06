@@ -169,6 +169,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
 				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
 				{"MICROSHIFT_CLUSTER_DOMAIN", "cluster.local"},
+				{"MICROSHIFT_CLUSTER_MTU", "1400"},
 			},
 		},
 		{
