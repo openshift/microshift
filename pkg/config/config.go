@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	goflag "flag"
 	"fmt"
 	"net/url"
 	"os"
@@ -15,7 +14,9 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/spf13/pflag"
-	cliflag "k8s.io/component-base/cli/flag"
+
+	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/component-base/logs"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 )
@@ -281,16 +282,18 @@ func (c *MicroshiftConfig) ReadAndValidate(flags *pflag.FlagSet) error {
 	return nil
 }
 
-func InitGlobalFlags() {
-	pflag.CommandLine.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
+func HideUnsupportedFlags(flags *pflag.FlagSet) {
+	// hide logging flags that we do not use/support
+	loggingFlags := pflag.NewFlagSet("logging-flags", pflag.ContinueOnError)
+	logs.AddFlags(loggingFlags)
 
-	goflag.CommandLine.VisitAll(func(goflag *goflag.Flag) {
-		if StringInList(goflag.Name, []string{"v", "log_file"}) {
-			pflag.CommandLine.AddGoFlag(goflag)
+	supportedLoggingFlags := sets.NewString("v")
+
+	loggingFlags.VisitAll(func(pf *pflag.Flag) {
+		if !supportedLoggingFlags.Has(pf.Name) {
+			flags.MarkHidden(pf.Name)
 		}
 	})
 
-	pflag.CommandLine.MarkHidden("log-flush-frequency")
-	pflag.CommandLine.MarkHidden("log_file")
-	pflag.CommandLine.MarkHidden("version")
+	flags.MarkHidden("version")
 }

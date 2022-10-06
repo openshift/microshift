@@ -247,8 +247,26 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 }
 
 // tests that the global flags have been initialized
-func TestGlobalInitFlags(t *testing.T) {
-	InitGlobalFlags()
-	// pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
-	pflag.Parse()
+func TestHideUnsupportedFlags(t *testing.T) {
+	flags := pflag.NewFlagSet("test-flags", pflag.ContinueOnError)
+
+	flags.String("url", "", "version usage")
+	flags.String("v", "10", "v usage")
+	flags.String("log_dir", "/tmp", "log_dir usage")
+	flags.String("version", "", "version usage")
+
+	HideUnsupportedFlags(flags)
+
+	if flags.Lookup("url").Hidden {
+		t.Errorf("v should not be hidden")
+	}
+	if flags.Lookup("v").Hidden {
+		t.Errorf("v should not be hidden")
+	}
+	if !flags.Lookup("version").Hidden {
+		t.Errorf("version should be hidden")
+	}
+	if !flags.Lookup("log_dir").Hidden {
+		t.Errorf("log_dir should be hidden")
+	}
 }
