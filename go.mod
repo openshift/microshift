@@ -272,7 +272,6 @@ replace (
 	github.com/MakeNowJust/heredoc => github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd // from kubernetes
 	github.com/auth0/go-jwt-middleware => github.com/auth0/go-jwt-middleware v1.0.1 // from kubernetes
 	github.com/boltdb/bolt => github.com/boltdb/bolt v1.3.1 // from kubernetes
-	github.com/go-bindata/go-bindata => github.com/go-bindata/go-bindata v3.1.2+incompatible // from kubernetes
 	github.com/go-logr/logr => github.com/go-logr/logr v1.2.0 // from kubernetes
 	github.com/go-ozzo/ozzo-validation => github.com/go-ozzo/ozzo-validation v3.5.0+incompatible // from kubernetes
 	github.com/google/go-cmp => github.com/google/go-cmp v0.5.5 // from kubernetes
@@ -284,6 +283,7 @@ replace (
 	github.com/moby/sys/mountinfo => github.com/moby/sys/mountinfo v0.6.0 // from kubernetes
 	github.com/mohae/deepcopy => github.com/mohae/deepcopy v0.0.0-20170603005431-491d3605edfb // from kubernetes
 	github.com/onsi/ginkgo => github.com/openshift/ginkgo v4.7.0-origin.0+incompatible // from kubernetes
+	github.com/onsi/ginkgo/v2 => github.com/soltysh/ginkgo/v2 v2.1.5-0.20220909190140-b488ab12695a // from kubernetes
 	github.com/opencontainers/image-spec => github.com/opencontainers/image-spec v1.0.2 // from kubernetes
 	github.com/openshift/api => github.com/openshift/api v0.0.0-20220525145417-ee5b62754c68 // from kubernetes
 	github.com/openshift/apiserver-library-go => github.com/openshift/apiserver-library-go v0.0.0-20220718193426-aa2bfcc66a43 // from kubernetes
