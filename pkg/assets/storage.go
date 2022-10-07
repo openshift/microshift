@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	embedded "github.com/openshift/microshift/assets"
+
 	scv1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -65,7 +67,7 @@ func applySCs(scs []string, applier readerApplier, render RenderFunc, params Ren
 
 	for _, sc := range scs {
 		klog.Infof("Applying sc %s", sc)
-		objBytes, err := Asset(sc)
+		objBytes, err := embedded.Asset(sc)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", sc, err)
 		}
@@ -122,7 +124,7 @@ func applyCDs(cds []string, applier readerApplier, render RenderFunc, params Ren
 
 	for _, cd := range cds {
 		klog.Infof("Applying csiDriver %s", cd)
-		objBytes, err := Asset(cd)
+		objBytes, err := embedded.Asset(cd)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", cd, err)
 		}

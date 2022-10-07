@@ -14,53 +14,53 @@ import (
 func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
 		ns = []string{
-			"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml",
+			"components/odf-lvm/topolvm-openshift-storage_namespace.yaml",
 		}
 		sa = []string{
-			"assets/components/odf-lvm/topolvm-node_v1_serviceaccount.yaml",
-			"assets/components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml",
+			"components/odf-lvm/topolvm-node_v1_serviceaccount.yaml",
+			"components/odf-lvm/topolvm-controller_v1_serviceaccount.yaml",
 		}
 		role = []string{
-			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml",
-			"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml",
-			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml",
+			"components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml",
+			"components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml",
+			"components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml",
 		}
 		rb = []string{
-			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml",
-			"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml",
-			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml",
+			"components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml",
+			"components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml",
+			"components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml",
 		}
 		cr = []string{
-			"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 		}
 		crb = []string{
-			"assets/components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"assets/components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"assets/components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"assets/components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"assets/components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"components/odf-lvm/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"components/odf-lvm/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"components/odf-lvm/topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"components/odf-lvm/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"components/odf-lvm/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 		}
 		cd = []string{
-			"assets/components/odf-lvm/csi-driver.yaml",
+			"components/odf-lvm/csi-driver.yaml",
 		}
 		cm = []string{
-			"assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml",
+			"components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml",
 		}
 		ds = []string{
-			"assets/components/odf-lvm/topolvm-node_daemonset.yaml",
+			"components/odf-lvm/topolvm-node_daemonset.yaml",
 		}
 		deploy = []string{
-			"assets/components/odf-lvm/topolvm-controller_deployment.yaml",
+			"components/odf-lvm/topolvm-controller_deployment.yaml",
 		}
 		sc = []string{
-			"assets/components/odf-lvm/topolvm_default-storage-class.yaml",
+			"components/odf-lvm/topolvm_default-storage-class.yaml",
 		}
 		scc = []string{
-			"assets/components/odf-lvm/topolvm-node-securitycontextconstraint.yaml",
+			"components/odf-lvm/topolvm-node-securitycontextconstraint.yaml",
 		}
 	)
 

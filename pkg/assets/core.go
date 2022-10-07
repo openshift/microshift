@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	embedded "github.com/openshift/microshift/assets"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -166,7 +168,7 @@ func applyCore(cores []string, applier readerApplier, render RenderFunc, params 
 
 	for _, core := range cores {
 		klog.Infof("Applying corev1 api %s", core)
-		objBytes, err := Asset(core)
+		objBytes, err := embedded.Asset(core)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", core, err)
 		}
@@ -207,7 +209,7 @@ func ApplyConfigMaps(cores []string, render RenderFunc, params RenderParams, kub
 func ApplyConfigMapWithData(cmPath string, data map[string]string, kubeconfigPath string) error {
 	cm := &cmApplier{}
 	cm.Client = coreClient(kubeconfigPath)
-	cmBytes, err := Asset(cmPath)
+	cmBytes, err := embedded.Asset(cmPath)
 	if err != nil {
 		return err
 	}
@@ -219,7 +221,7 @@ func ApplyConfigMapWithData(cmPath string, data map[string]string, kubeconfigPat
 func ApplySecretWithData(secretPath string, data map[string][]byte, kubeconfigPath string) error {
 	secret := &secretApplier{}
 	secret.Client = coreClient(kubeconfigPath)
-	secretBytes, err := Asset(secretPath)
+	secretBytes, err := embedded.Asset(secretPath)
 	if err != nil {
 		return err
 	}

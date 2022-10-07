@@ -267,10 +267,6 @@ github.com/fvbommel/sortorder
 # github.com/ghodss/yaml v1.0.0
 ## explicit
 github.com/ghodss/yaml
-# github.com/go-bindata/go-bindata v3.1.2+incompatible
-## explicit
-github.com/go-bindata/go-bindata
-github.com/go-bindata/go-bindata/go-bindata
 # github.com/go-errors/errors v1.0.1
 ## explicit
 github.com/go-errors/errors

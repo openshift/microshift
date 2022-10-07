@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	embedded "github.com/openshift/microshift/assets"
+
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -90,7 +92,7 @@ func applyApps(apps []string, applier readerApplier, render RenderFunc, params R
 
 	for _, app := range apps {
 		klog.Infof("Applying apps api %s", app)
-		objBytes, err := Asset(app)
+		objBytes, err := embedded.Asset(app)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", app, err)
 		}

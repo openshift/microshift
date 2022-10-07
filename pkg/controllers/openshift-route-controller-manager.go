@@ -107,7 +107,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 	}()
 
 	if err := assets.ApplyNamespaces([]string{
-		"assets/core/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml",
+		"core/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml",
 	}, s.kubeconfig); err != nil {
 		klog.Fatalf("failed to apply openshift namespaces %v", err)
 	}

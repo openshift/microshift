@@ -11,30 +11,30 @@ import (
 func startOVNKubernetes(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
 		ns = []string{
-			"assets/components/ovn/namespace.yaml",
+			"components/ovn/namespace.yaml",
 		}
 		sa = []string{
-			"assets/components/ovn/node/serviceaccount.yaml",
-			"assets/components/ovn/master/serviceaccount.yaml",
+			"components/ovn/node/serviceaccount.yaml",
+			"components/ovn/master/serviceaccount.yaml",
 		}
 		r = []string{
-			"assets/components/ovn/role.yaml",
+			"components/ovn/role.yaml",
 		}
 		rb = []string{
-			"assets/components/ovn/rolebinding.yaml",
+			"components/ovn/rolebinding.yaml",
 		}
 		cr = []string{
-			"assets/components/ovn/clusterrole.yaml",
+			"components/ovn/clusterrole.yaml",
 		}
 		crb = []string{
-			"assets/components/ovn/clusterrolebinding.yaml",
+			"components/ovn/clusterrolebinding.yaml",
 		}
 		cm = []string{
-			"assets/components/ovn/configmap.yaml",
+			"components/ovn/configmap.yaml",
 		}
 		apps = []string{
-			"assets/components/ovn/master/daemonset.yaml",
-			"assets/components/ovn/node/daemonset.yaml",
+			"components/ovn/master/daemonset.yaml",
+			"components/ovn/node/daemonset.yaml",
 		}
 	)
 
