@@ -1,8 +1,13 @@
 # Configuration
 
-MicroShift components are configured by modifying `config.yaml` instead of using Kubernetes APIs. MicroShift binary looks for both user-local `~/.microshift/config.yaml` and system-wide `/etc/microshift/config.yaml` configuration files in order, user-local file takes precedence if exists.
+MicroShift can be configured in the following ways, in order of precedence:
+* Command line arguments
+* Environment variables
+* Configuration file
 
-The following fields are supported in `config.yaml`.
+The MicroShift configuration file may be located at `~/.microshift/config.yaml` (user-specific) and `/etc/microshift/config.yaml` (system-wide), while the former takes precedence if it exists. Use the `--config` command line argument or `MICROSHIFT_CONFIGFILE` environment variable to specify a custom location of the configuration file.
+
+The format of the `config.yaml` configuration file is as follows.
 
 ```yaml
 cluster:
@@ -21,21 +26,23 @@ logVLevel: ""
 manifests: []
 ```
 
-| Field Name          | Description |
-|---------------------|-------------|
-| clusterCIDR         | A block of IP addresses from which Pod IP addresses are allocated
-| serviceCIDR         | A block of virtual IP addresses for Kubernetes services
-| serviceNodePortRange| The port range allowed for Kubernetes services of type NodePort
-| dns                 | The Kubernetes service IP address where pods query for name resolution
-| domain              | Base DNS domain used to construct fully qualified pod and service domain names
-| url                 | URL of the API server for the cluster.
-| mtu                 | The maximum transmission unit for the Geneve (Generic Network Virtualization Encapulation) overlay network
-| nodeIP              | The IP address of the node, defaults to IP of the default route
-| nodeName            | The name of the node, defaults to hostname
-| auditLogDir         | Location for storing audit logs
-| dataDir             | Location for data created by MicroShift
-| logVLevel           | Log verbosity (0-5)
-| manifests           | Locations to scan for manifests to be loaded on startup
+The configuration settings alongside with the supported command line arguments and environment variables are presented below.
+
+| Field Name          | CLI Argument              | Environment Variable                    | Description |
+|---------------------|---------------------------|-----------------------------------------|-------------|
+| clusterCIDR         | --cluster-cidr            | MICROSHIFT_CLUSTER_CLUSTERCIDR          | A block of IP addresses from which Pod IP addresses are allocated
+| serviceCIDR         | --service-cidr            | MICROSHIFT_CLUSTER_SERVICECIDR          | A block of virtual IP addresses for Kubernetes services
+| serviceNodePortRange| --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort
+| dns                 | --cluster-dns             | MICROSHIFT_CLUSTER_DNS                  | The Kubernetes service IP address where pods query for name resolution
+| domain              | --cluster-domain          | MICROSHIFT_CLUSTER_DOMAIN               | Base DNS domain used to construct fully qualified pod and service domain names
+| url                 | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
+| mtu                 | --cluster-mtu             | MICROSHIFT_CLUSTER_MTU                  | The maximum transmission unit for the Generic Network Virtualization Encapsulation overlay network
+| nodeIP              | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
+| nodeName            | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
+| auditLogDir         | --audit-log-dir           | MICROSHIFT_AUDITLOGDIR                  | Location for storing audit logs
+| dataDir             | --data-dir                | MICROSHIFT_DATADIR                      | Location for data created by MicroShift
+| logVLevel           | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (0-5)
+| manifests           | n/a                       | n/a                                     | Locations to scan for manifests to be loaded on startup
 
 ## Default Settings
 
@@ -56,8 +63,8 @@ auditLogDir: ""
 dataDir: /var/lib/microshift
 logVLevel: 0
 manifests:
-- /usr/lib/microshift/manifests
-- /etc/microshift/manifests
+  - /usr/lib/microshift/manifests
+  - /etc/microshift/manifests
 ```
 
 # Auto-applying Manifests
