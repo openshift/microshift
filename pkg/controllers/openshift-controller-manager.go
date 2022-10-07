@@ -17,10 +17,8 @@ package controllers
 
 import (
 	"context"
-	"time"
 
 	configv1 "github.com/openshift/api/config/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/openshift/library-go/pkg/config/helpers"
 	"k8s.io/klog/v2"
@@ -32,6 +30,9 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+
+	"github.com/openshift/library-go/pkg/config/configdefaults"
+	"github.com/openshift/library-go/pkg/config/leaderelection"
 )
 
 type OCPControllerManager struct {
@@ -80,12 +81,6 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 			"-openshift.io/templateinstancefinalizer",
 			"-openshift.io/unidling",
 		},
-		LeaderElection: configv1.LeaderElection{
-			Disable:       true,
-			LeaseDuration: metav1.Duration{Duration: 270 * time.Second},
-			RenewDeadline: metav1.Duration{Duration: 240 * time.Second},
-			RetryPeriod:   metav1.Duration{Duration: 60 * time.Second},
-		},
 		ServingInfo: &configv1.HTTPServingInfo{
 			ServingInfo: configv1.ServingInfo{
 				BindAddress: "0.0.0.0:8445",
@@ -99,6 +94,9 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 		},
 	}
 
+	configdefaults.SetRecommendedHTTPServingInfoDefaults(ocmconfig.ServingInfo)
+	configdefaults.SetRecommendedKubeClientConfigDefaults(&ocmconfig.KubeClientConfig)
+	ocmconfig.LeaderElection = leaderelection.LeaderElectionDefaulting(ocmconfig.LeaderElection, "kube-system", "openshift-route-controllers")
 	s.config = ocmconfig
 
 }
