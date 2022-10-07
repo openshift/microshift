@@ -5,10 +5,4 @@ metadata:
   name: lvmd
   namespace: openshift-storage
 data:
-  lvmd.yaml: |
-    socket-name: /run/lvmd/lvmd.sock
-    device-classes: 
-      - default: true
-        name: ssd
-        spare-gb: 2
-        volume-group: rhel
+  lvmd.yaml: {{ .lvmd }}

@@ -1154,13 +1154,7 @@ metadata:
   name: lvmd
   namespace: openshift-storage
 data:
-  lvmd.yaml: |
-    socket-name: /run/lvmd/lvmd.sock
-    device-classes: 
-      - default: true
-        name: ssd
-        spare-gb: 2
-        volume-group: rhel
+  lvmd.yaml: {{ .lvmd }}
 `)
 
 func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1YamlBytes() ([]byte, error) {
@@ -1173,7 +1167,7 @@ func assetsComponentsOdfLvmTopolvmLvmdConfig_configmap_v1Yaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml", size: 299, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml", size: 164, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1299,6 +1293,8 @@ spec:
       app: topolvm-node
   template:
     metadata:
+      annotations:
+        odf-lvm.microshift.io/lvmd_config_sha256sum: "{{ Sha256sum .Config }}"
       labels:
         app: topolvm-node
       name: lvmcluster-sample
@@ -1321,13 +1317,13 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /run/lvmd
+        - mountPath: {{ Dir .SocketName  }}
           name: lvmd-socket-dir
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
       - command:
         - /topolvm-node
-        - --lvmd-socket=/run/lvmd/lvmd.sock
+        - --lvmd-socket={{ .SocketName }}
         env:
         - name: NODE_NAME
           valueFrom:
@@ -1363,7 +1359,7 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: node-plugin-dir
-        - mountPath: /run/lvmd
+        - mountPath: {{ Dir .SocketName  }}
           name: lvmd-socket-dir
         - mountPath: /var/lib/kubelet/pods
           mountPropagation: Bidirectional
@@ -1470,7 +1466,7 @@ func assetsComponentsOdfLvmTopolvmNode_daemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5258, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/odf-lvm/topolvm-node_daemonset.yaml", size: 5380, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

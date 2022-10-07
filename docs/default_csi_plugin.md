@@ -1,5 +1,7 @@
 # MicroShift Storage Plugin Overview
 
+> **IMPORTANT!** The default ODF-LVM configuration is intended to match the developer environment described in [MicroShift Development Environment on RHEL 8](./devenv_rhel8.md). See section **[Configuring ODF-LVM](#Configuring ODF-LVM)** for guidance on configuring ODF-LVM for your environment.
+
 MicroShift enables dynamic storage provisioning out of the box with the ODF-LVM CSI plugin. This plugin is a downstream
 Red Hat fork of TopoLVM. This provisioner will create a new LVM logical volume in the `rhel` volume group for each
 PersistenVolumeClaim(PVC), and make these volumes available to pods. For more information on ODF-LVM, visit the repo's
@@ -16,6 +18,25 @@ ODF-LVM is deployed onto the cluster in the `openshift-storage` namespace, after
 boots. [StorageCapacity tracking](https://kubernetes.io/docs/concepts/storage/storage-capacity/) is used to ensure that
 Pods with an ODF-LVM PVC are not scheduled if the requested storage is greater than the volume group's remaining free
 storage.
+
+### Configuring ODF-LVM
+
+MicroShift supports pass-through of users' ODF-LVM configuration and allows users to specify custom volume-groups, thin volume provisioning parameters, reserved unallocated volume-group space, among others.  This file can be specified anytime.  If MicroShift is already running, simply restart it to pick up the latest config.
+
+This configuration is specific to the LVMD runtime and informs how it interacts with the host. LVMD is a subcomponent of ODF-LVM, and in the case of MicroShift, deployed automatically as a DaemonSet.
+
+#### Specification
+
+Full documentation of the config spec can be found at [github.com/red-hat-storage/topolvm/blob/v4.11.0/docs/lvmd.md](https://github.com/red-hat-storage/topolvm/blob/v4.11.0/docs/lvmd.md).
+
+#### Path
+
+The user provided lvmd config should be written to the same directory as the MicroShift config.  If a MicroShift config
+doesn't exist, MicroShift will assume default lvmd values. These paths will be checked for the config, depending on the user MicroShift
+is run as.
+
+1. User config dir: `~/.microshift/lvmd.yaml`
+2. Global config dir: `/etc/microshift/lvmd.yaml`
 
 ## System Requirements
 

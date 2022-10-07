@@ -12,12 +12,13 @@ import (
 	"strings"
 
 	"github.com/kelseyhightower/envconfig"
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/openshift/microshift/pkg/util"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/pflag"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
+
+	"github.com/openshift/microshift/pkg/util"
 )
 
 const (
@@ -64,8 +65,9 @@ type MicroshiftConfig struct {
 
 	Cluster ClusterConfig `json:"cluster"`
 
-	Manifests []string    `json:"manifests"`
-	Debug     DebugConfig `json:"debug"`
+	Manifests []string `json:"manifests"`
+
+	Debug DebugConfig `json:"debug"`
 }
 
 // KubeConfigID identifies the different kubeconfigs managed in the DataDir
@@ -116,7 +118,6 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		},
 		Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc},
 	}
-
 }
 
 // extract the api server port from the cluster URL
@@ -141,7 +142,7 @@ func (c *ClusterConfig) ApiServerPort() (int, error) {
 }
 
 // Returns the default user config file if that exists, else the default global
-// global config file, else the empty string.
+// config file, else the empty string.
 func findConfigFile() string {
 	userConfigFile, _ := homedir.Expand(defaultUserConfigFile)
 	if _, err := os.Stat(userConfigFile); errors.Is(err, os.ErrNotExist) {

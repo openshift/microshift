@@ -1,12 +1,17 @@
 package components
 
 import (
+	"fmt"
+	"path/filepath"
+
+	"k8s.io/klog/v2"
+
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
-	"k8s.io/klog/v2"
+	"github.com/openshift/microshift/pkg/config/lvmd"
 )
 
-func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"assets/components/odf-lvm/topolvm-openshift-storage_namespace.yaml",
@@ -58,6 +63,18 @@ func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 			"assets/components/odf-lvm/topolvm-node-securitycontextconstraint.yaml",
 		}
 	)
+
+	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
+	// csi plugin.
+	lvmdCfg, err := lvmd.NewLvmdConfigFromFileOrDefault(filepath.Join(filepath.Dir(cfg.ConfigFile), "lvmd.yaml"))
+	if err != nil {
+		return err
+	}
+	lvmdRenderParams, err := renderLvmdParams(lvmdCfg)
+	if err != nil {
+		return fmt.Errorf("rendering lvmd params: %v", err)
+	}
+
 	if err := assets.ApplyStorageClasses(sc, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
 		return err
@@ -90,7 +107,7 @@ func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyConfigMaps(cm, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(cm, renderTemplate, lvmdRenderParams, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
@@ -98,7 +115,7 @@ func startCSIPLugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ds, renderTemplate, renderParamsFromConfig(cfg, lvmdRenderParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
 		return err
 	}
