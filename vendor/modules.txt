@@ -332,7 +332,7 @@ github.com/fvbommel/sortorder
 # github.com/ghodss/yaml v1.0.0
 ## explicit
 github.com/ghodss/yaml
-# github.com/go-bindata/go-bindata v3.1.2+incompatible => github.com/go-bindata/go-bindata v3.1.2+incompatible
+# github.com/go-bindata/go-bindata v3.1.2+incompatible
 ## explicit
 github.com/go-bindata/go-bindata
 github.com/go-bindata/go-bindata/go-bindata
@@ -3436,7 +3436,6 @@ sigs.k8s.io/yaml
 # github.com/MakeNowJust/heredoc => github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd
 # github.com/auth0/go-jwt-middleware => github.com/auth0/go-jwt-middleware v1.0.1
 # github.com/boltdb/bolt => github.com/boltdb/bolt v1.3.1
-# github.com/go-bindata/go-bindata => github.com/go-bindata/go-bindata v3.1.2+incompatible
 # github.com/go-logr/logr => github.com/go-logr/logr v1.2.0
 # github.com/go-ozzo/ozzo-validation => github.com/go-ozzo/ozzo-validation v3.5.0+incompatible
 # github.com/google/go-cmp => github.com/google/go-cmp v0.5.5
@@ -3448,6 +3447,7 @@ sigs.k8s.io/yaml
 # github.com/moby/sys/mountinfo => github.com/moby/sys/mountinfo v0.6.0
 # github.com/mohae/deepcopy => github.com/mohae/deepcopy v0.0.0-20170603005431-491d3605edfb
 # github.com/onsi/ginkgo => github.com/openshift/ginkgo v4.7.0-origin.0+incompatible
+# github.com/onsi/ginkgo/v2 => github.com/soltysh/ginkgo/v2 v2.1.5-0.20220909190140-b488ab12695a
 # github.com/opencontainers/image-spec => github.com/opencontainers/image-spec v1.0.2
 # github.com/openshift/api => github.com/openshift/api v0.0.0-20220525145417-ee5b62754c68
 # github.com/openshift/apiserver-library-go => github.com/openshift/apiserver-library-go v0.0.0-20220718193426-aa2bfcc66a43
