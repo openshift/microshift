@@ -150,7 +150,8 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 				"quota.openshift.io/ClusterResourceQuota",
 				"quota.openshift.io/ValidateClusterResourceQuota",
 			},
-			"enable-admission-plugins": {},
+			"enable-admission-plugins":              {},
+			"send-retry-after-while-not-ready-once": {"true"},
 		},
 		GenericAPIServerConfig: configv1.GenericAPIServerConfig{
 			// from cluster-kube-apiserver-operator
