@@ -37,37 +37,37 @@ var (
 )
 
 type ClusterConfig struct {
-	URL string `json:"url"`
+	// URL string `json:"url"`
 
-	ClusterCIDR          string `json:"clusterCIDR"`
-	ServiceCIDR          string `json:"serviceCIDR"`
-	ServiceNodePortRange string `json:"serviceNodePortRange"`
-	DNS                  string `json:"dns"`
-	Domain               string `json:"domain"`
-	MTU                  string `json:"mtu"`
+	// ClusterCIDR          string `json:"clusterCIDR"`
+	// ServiceCIDR          string `json:"serviceCIDR"`
+	// ServiceNodePortRange string `json:"serviceNodePortRange"`
+	// DNS string `json:"dns"`
+	// Domain               string `json:"domain"`
+	// MTU string `json:"mtu"`
 }
 
 type DebugConfig struct {
-	Pprof bool `json:"pprof"`
+	// Pprof bool `json:"pprof"`
 }
 
 type MicroshiftConfig struct {
-	ConfigFile string `json:"configFile"`
-	DataDir    string `json:"dataDir"`
-
-	AuditLogDir string `json:"auditLogDir"`
-	LogVLevel   int    `json:"logVLevel"`
-
-	Roles []string `json:"roles"`
-
-	NodeName string `json:"nodeName"`
-	NodeIP   string `json:"nodeIP"`
-
-	Cluster ClusterConfig `json:"cluster"`
-
-	Manifests []string `json:"manifests"`
-
-	Debug DebugConfig `json:"debug"`
+	// ConfigFile string `json:"configFile"`
+	// DataDir    string `json:"dataDir"`
+	//
+	// AuditLogDir string `json:"auditLogDir"`
+	// LogVLevel   int    `json:"logVLevel"`
+	//
+	// Roles []string `json:"roles"`
+	//
+	// NodeName string `json:"nodeName"`
+	// NodeIP   string `json:"nodeIP"`
+	//
+	// Cluster ClusterConfig `json:"cluster"`
+	//
+	// Manifests []string `json:"manifests"`
+	//
+	// Debug DebugConfig `json:"debug"`
 }
 
 // KubeConfigID identifies the different kubeconfigs managed in the DataDir
