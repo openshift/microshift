@@ -168,7 +168,7 @@ sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-bui
 Run the following commands to create a virtual machine using the installer image.
 ```bash
 VMNAME="microshift-edge"
-VERSION=4.12.0
+VERSION=$(~/microshift/pkg/release/get.sh base)
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
 virt-install \
