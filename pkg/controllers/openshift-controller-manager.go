@@ -63,6 +63,9 @@ func (s *OCPControllerManager) configure(cfg *config.MicroshiftConfig) {
 	ocmconfig := openshiftcontrolplanev1.OpenShiftControllerManagerConfig{
 		KubeClientConfig: configv1.KubeClientConfig{
 			KubeConfig: s.kubeconfig,
+			ConnectionOverrides: configv1.ClientConnectionOverrides{
+				ContentType: "application/json",
+			},
 		},
 		Controllers: []string{
 			"*",
