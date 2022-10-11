@@ -26,6 +26,8 @@ type Interface interface {
 	Etcds() EtcdInformer
 	// IngressControllers returns a IngressControllerInformer.
 	IngressControllers() IngressControllerInformer
+	// InsightsOperators returns a InsightsOperatorInformer.
+	InsightsOperators() InsightsOperatorInformer
 	// KubeAPIServers returns a KubeAPIServerInformer.
 	KubeAPIServers() KubeAPIServerInformer
 	// KubeControllerManagers returns a KubeControllerManagerInformer.
@@ -104,6 +106,11 @@ func (v *version) Etcds() EtcdInformer {
 // IngressControllers returns a IngressControllerInformer.
 func (v *version) IngressControllers() IngressControllerInformer {
 	return &ingressControllerInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// InsightsOperators returns a InsightsOperatorInformer.
+func (v *version) InsightsOperators() InsightsOperatorInformer {
+	return &insightsOperatorInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // KubeAPIServers returns a KubeAPIServerInformer.
