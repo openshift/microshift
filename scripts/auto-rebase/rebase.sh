@@ -418,6 +418,8 @@ update_manifests() {
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/ns.yaml" "${REPOROOT}"/assets/core/namespace-openshift-kube-controller-manager.yaml
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrole.yaml" "${REPOROOT}"/assets/core
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/core
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrole.yaml" "${REPOROOT}"/assets/core
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/core
     #    Selectively copy in only those CRD manifests that MicroShift is already using
     # TODO: add route CRD (https://github.com/openshift/api/blob/master/route/v1/route.crd.yaml) once we rebase to a release that contains it
     #cp "${STAGING_DIR}/release-manifests/0000_01_route.crd.yaml" "${REPOROOT}"/assets/crd
