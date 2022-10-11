@@ -61,14 +61,12 @@ func applyDefaultRBACs(cfg *config.MicroshiftConfig) error {
 		cr = []string{
 			"assets/core/csr_approver_clusterrole.yaml",
 			"assets/core/namespace-security-allocation-controller-clusterrole.yaml",
-			// TODO: add podsecurity-admission in 4.12 rebase
-			//"assets/core/0000_30_podsecurity-admission-label-syncer-controller-clusterrole.yaml",
+			"assets/core/podsecurity-admission-label-syncer-controller-clusterrole.yaml",
 		}
 		crb = []string{
 			"assets/core/csr_approver_clusterrolebinding.yaml",
 			"assets/core/namespace-security-allocation-controller-clusterrolebinding.yaml",
-			// TODO: add podsecurity-admission in 4.12 rebase
-			//"assets/core/0000_31_podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml",
+			"assets/core/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml",
 		}
 	)
 	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
