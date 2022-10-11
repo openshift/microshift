@@ -74,6 +74,8 @@
 // assets/core/namespace-openshift-kube-controller-manager.yaml
 // assets/core/namespace-security-allocation-controller-clusterrole.yaml
 // assets/core/namespace-security-allocation-controller-clusterrolebinding.yaml
+// assets/core/podsecurity-admission-label-syncer-controller-clusterrole.yaml
+// assets/core/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml
 // assets/crd/0000_01_route.crd.yaml
 // assets/crd/0000_03_security-openshift_01_scc.crd.yaml
 // assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
@@ -4577,6 +4579,108 @@ func assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml() (*a
 	return a, nil
 }
 
+var _assetsCorePodsecurityAdmissionLabelSyncerControllerClusterroleYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  creationTimestamp: null
+  name: system:openshift:controller:podsecurity-admission-label-syncer-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - update
+  - watch
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - security.openshift.io
+  resources:
+  - securitycontextconstraings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs:
+  - get
+  - list
+  - watch
+`)
+
+func assetsCorePodsecurityAdmissionLabelSyncerControllerClusterroleYamlBytes() ([]byte, error) {
+	return _assetsCorePodsecurityAdmissionLabelSyncerControllerClusterroleYaml, nil
+}
+
+func assetsCorePodsecurityAdmissionLabelSyncerControllerClusterroleYaml() (*asset, error) {
+	bytes, err := assetsCorePodsecurityAdmissionLabelSyncerControllerClusterroleYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/podsecurity-admission-label-syncer-controller-clusterrole.yaml", size: 813, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCorePodsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml = []byte(`apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  creationTimestamp: null
+  name: system:openshift:controller:podsecurity-admission-label-syncer-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:controller:podsecurity-admission-label-syncer-controller
+subjects:
+- kind: ServiceAccount
+  name: podsecurity-admission-label-syncer-controller
+  namespace: openshift-infra
+`)
+
+func assetsCorePodsecurityAdmissionLabelSyncerControllerClusterrolebindingYamlBytes() ([]byte, error) {
+	return _assetsCorePodsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml, nil
+}
+
+func assetsCorePodsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml() (*asset, error) {
+	bytes, err := assetsCorePodsecurityAdmissionLabelSyncerControllerClusterrolebindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml", size: 520, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _assetsCrd0000_01_routeCrdYaml = []byte(`apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -6542,6 +6646,8 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/core/namespace-openshift-kube-controller-manager.yaml":                                           assetsCoreNamespaceOpenshiftKubeControllerManagerYaml,
 	"assets/core/namespace-security-allocation-controller-clusterrole.yaml":                                  assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml,
 	"assets/core/namespace-security-allocation-controller-clusterrolebinding.yaml":                           assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml,
+	"assets/core/podsecurity-admission-label-syncer-controller-clusterrole.yaml":                             assetsCorePodsecurityAdmissionLabelSyncerControllerClusterroleYaml,
+	"assets/core/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml":                      assetsCorePodsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml,
 	"assets/crd/0000_01_route.crd.yaml":                                                                      assetsCrd0000_01_routeCrdYaml,
 	"assets/crd/0000_03_security-openshift_01_scc.crd.yaml":                                                  assetsCrd0000_03_securityOpenshift_01_sccCrdYaml,
 	"assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml":                              assetsCrd0000_03_securityinternalOpenshift_02_rangeallocationCrdYaml,
@@ -6702,6 +6808,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			}},
 		}},
 		"core": {nil, map[string]*bintree{
+<<<<<<< HEAD
 			"0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml": {assetsCore0000_50_clusterOpenshiftRouteControllerManager_00_namespaceYaml, map[string]*bintree{}},
 			"csr_approver_clusterrole.yaml":                                        {assetsCoreCsr_approver_clusterroleYaml, map[string]*bintree{}},
 			"csr_approver_clusterrolebinding.yaml":                                 {assetsCoreCsr_approver_clusterrolebindingYaml, map[string]*bintree{}},
@@ -6709,6 +6816,17 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"namespace-openshift-kube-controller-manager.yaml":                     {assetsCoreNamespaceOpenshiftKubeControllerManagerYaml, map[string]*bintree{}},
 			"namespace-security-allocation-controller-clusterrole.yaml":            {assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml, map[string]*bintree{}},
 			"namespace-security-allocation-controller-clusterrolebinding.yaml":     {assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml, map[string]*bintree{}},
+=======
+			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml":        {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
+			"csr_approver_clusterrole.yaml":                                         {assetsCoreCsr_approver_clusterroleYaml, map[string]*bintree{}},
+			"csr_approver_clusterrolebinding.yaml":                                  {assetsCoreCsr_approver_clusterrolebindingYaml, map[string]*bintree{}},
+			"namespace-openshift-infra.yaml":                                        {assetsCoreNamespaceOpenshiftInfraYaml, map[string]*bintree{}},
+			"namespace-openshift-kube-controller-manager.yaml":                      {assetsCoreNamespaceOpenshiftKubeControllerManagerYaml, map[string]*bintree{}},
+			"namespace-security-allocation-controller-clusterrole.yaml":             {assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml, map[string]*bintree{}},
+			"namespace-security-allocation-controller-clusterrolebinding.yaml":      {assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml, map[string]*bintree{}},
+			"podsecurity-admission-label-syncer-controller-clusterrole.yaml":        {assetsCorePodsecurityAdmissionLabelSyncerControllerClusterroleYaml, map[string]*bintree{}},
+			"podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml": {assetsCorePodsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml, map[string]*bintree{}},
+>>>>>>> 9582615e (Update PSA bindata)
 		}},
 		"crd": {nil, map[string]*bintree{
 			"0000_01_route.crd.yaml":                                         {assetsCrd0000_01_routeCrdYaml, map[string]*bintree{}},
