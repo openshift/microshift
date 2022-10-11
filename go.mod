@@ -3,7 +3,7 @@ module github.com/openshift/microshift
 go 1.17
 
 require (
-	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
+	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // route-controller-manager
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/kelseyhightower/envconfig v1.4.0 // microshift
 	github.com/miekg/dns v1.1.35 // microshift
@@ -13,7 +13,7 @@ require (
 	github.com/openshift/client-go v0.0.0-20220603133046-984ee5ebedcf
 	github.com/openshift/cluster-policy-controller v0.0.0-20220906142815-6dba7561af11
 	github.com/openshift/library-go v0.0.0-20220615161831-8b2df431789c
-	github.com/openshift/openshift-controller-manager v0.0.0-alpha.0.0.20220922121630-8c1124123b2a
+	github.com/openshift/route-controller-manager v0.0.0-20220912160359-ec88681fe101
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
@@ -50,7 +50,6 @@ require (
 	github.com/Azure/go-autorest/autorest/validation v0.1.0 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
-	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/GoogleCloudPlatform/k8s-cloud-provider v1.16.1-0.20210702024009-ea6160c1d0e3 // indirect
 	github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
@@ -75,20 +74,13 @@ require (
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/containerd/containerd v1.5.0-beta.1 // indirect
 	github.com/containerd/ttrpc v1.0.2 // indirect
-	github.com/containers/image v3.0.2+incompatible // indirect
-	github.com/containers/storage v1.28.1 // indirect
 	github.com/coreos/go-oidc v2.1.0+incompatible // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/docker v20.10.12+incompatible // indirect
-	github.com/docker/docker-credential-helpers v0.6.3 // indirect
-	github.com/docker/go-connections v0.4.0 // indirect
-	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
-	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emicklei/go-restful v2.9.5+incompatible // indirect
 	github.com/euank/go-kmsg-parser v2.0.0+incompatible // indirect
@@ -121,7 +113,6 @@ require (
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/gophercloud/gophercloud v0.1.0 // indirect
-	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
@@ -152,15 +143,12 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170603005431-491d3605edfb // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/mrunalp/fileutils v0.5.0 // indirect
-	github.com/mtrmac/gpgme v0.1.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/opencontainers/runc v1.1.1 // indirect
 	github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417 // indirect
 	github.com/opencontainers/selinux v1.10.0 // indirect
-	github.com/openshift/runtime-utils v0.0.0-20220513161558-c736ec4e99ce // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/profile v1.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -257,7 +245,6 @@ require (
 	github.com/auth0/go-jwt-middleware v0.0.0-00010101000000-000000000000 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/boltdb/bolt v0.0.0-00010101000000-000000000000 // indirect
-	github.com/containers/image/v5 v5.11.0 // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/heketi/tests v0.0.0-00010101000000-000000000000 // indirect
 	github.com/lpabon/godbc v0.0.0-00010101000000-000000000000 // indirect

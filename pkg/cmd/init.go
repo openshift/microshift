@@ -175,12 +175,12 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		).WithServingCertificates(
 			&cryptomaterial.ServingCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
-					Name:         "openshift-controller-manager-serving",
+					Name:         "route-controller-manager-serving",
 					ValidityDays: cryptomaterial.ServiceCAServingCertValidityDays,
 				},
 				Hostnames: []string{
-					"controller-manager.openshift-controller-manager.svc",
-					"controller-manager.openshift-controller-manager.svc.cluster.local",
+					"route-controller-manager.openshift-route-controller-manager.svc",
+					"route-controller-manager.openshift-route-controller-manager.svc.cluster.local",
 				},
 			},
 		),

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-route-controller-manager
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+  labels:
+    openshift.io/cluster-monitoring: "true"
+    openshift.io/run-level: "" # specify no run-level turns it off on install and upgrades

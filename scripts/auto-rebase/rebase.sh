@@ -32,7 +32,7 @@ REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
-EMBEDDED_COMPONENTS="openshift-controller-manager cluster-policy-controller hyperkube etcd"
+EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator"
 
@@ -278,9 +278,9 @@ update_go_mod() {
 
     title "# Updating go.mod"
 
-    # Require updated versions of OCM and CPC
+    # Require updated versions of RCM and CPC
     require_using_component_commit github.com/openshift/cluster-policy-controller cluster-policy-controller
-    require_using_component_commit github.com/openshift/openshift-controller-manager openshift-controller-manager
+    require_using_component_commit github.com/openshift/route-controller-manager route-controller-manager
 
     # For all repos in o/k staging, ensure a RequireDirective of v0.0.0
     # and a ReplaceDirective to an absolute modulepath to o/k staging.
