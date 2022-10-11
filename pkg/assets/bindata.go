@@ -6808,16 +6808,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			}},
 		}},
 		"core": {nil, map[string]*bintree{
-<<<<<<< HEAD
-			"0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml": {assetsCore0000_50_clusterOpenshiftRouteControllerManager_00_namespaceYaml, map[string]*bintree{}},
-			"csr_approver_clusterrole.yaml":                                        {assetsCoreCsr_approver_clusterroleYaml, map[string]*bintree{}},
-			"csr_approver_clusterrolebinding.yaml":                                 {assetsCoreCsr_approver_clusterrolebindingYaml, map[string]*bintree{}},
-			"namespace-openshift-infra.yaml":                                       {assetsCoreNamespaceOpenshiftInfraYaml, map[string]*bintree{}},
-			"namespace-openshift-kube-controller-manager.yaml":                     {assetsCoreNamespaceOpenshiftKubeControllerManagerYaml, map[string]*bintree{}},
-			"namespace-security-allocation-controller-clusterrole.yaml":            {assetsCoreNamespaceSecurityAllocationControllerClusterroleYaml, map[string]*bintree{}},
-			"namespace-security-allocation-controller-clusterrolebinding.yaml":     {assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml, map[string]*bintree{}},
-=======
-			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml":        {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
+			"0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml":  {assetsCore0000_50_clusterOpenshiftRouteControllerManager_00_namespaceYaml, map[string]*bintree{}},
 			"csr_approver_clusterrole.yaml":                                         {assetsCoreCsr_approver_clusterroleYaml, map[string]*bintree{}},
 			"csr_approver_clusterrolebinding.yaml":                                  {assetsCoreCsr_approver_clusterrolebindingYaml, map[string]*bintree{}},
 			"namespace-openshift-infra.yaml":                                        {assetsCoreNamespaceOpenshiftInfraYaml, map[string]*bintree{}},
@@ -6826,7 +6817,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"namespace-security-allocation-controller-clusterrolebinding.yaml":      {assetsCoreNamespaceSecurityAllocationControllerClusterrolebindingYaml, map[string]*bintree{}},
 			"podsecurity-admission-label-syncer-controller-clusterrole.yaml":        {assetsCorePodsecurityAdmissionLabelSyncerControllerClusterroleYaml, map[string]*bintree{}},
 			"podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml": {assetsCorePodsecurityAdmissionLabelSyncerControllerClusterrolebindingYaml, map[string]*bintree{}},
->>>>>>> 9582615e (Update PSA bindata)
 		}},
 		"crd": {nil, map[string]*bintree{
 			"0000_01_route.crd.yaml":                                         {assetsCrd0000_01_routeCrdYaml, map[string]*bintree{}},
