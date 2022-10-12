@@ -144,8 +144,8 @@ Run the script in the `rpm` mode to pull the images required by MicroShift and g
 If the procedure runs successfully, the RPM artifacts can be found in the `paack-result` directory.
 ```bash
 $ find ~/microshift/_output/paack-result -name microshift-containers-\*.rpm
-/home/microshift/microshift/_output/paack-result/microshift-containers-4.10.18-1.x86_64.rpm
-/home/microshift/microshift/_output/paack-result/microshift-containers-4.10.18-1.src.rpm
+/home/microshift/microshift/_output/paack-result/microshift-containers-4.12.0-1.x86_64.rpm
+/home/microshift/microshift/_output/paack-result/microshift-containers-4.12.0-1.src.rpm
 ```
 
 Finally, run the build script with the `-custom_rpms` argument to include the specified container image RPMs into the generated ISO.
@@ -168,7 +168,7 @@ sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-bui
 Run the following commands to create a virtual machine using the installer image.
 ```bash
 VMNAME="microshift-edge"
-VERSION=4.10.18
+VERSION=$(~/microshift/pkg/release/get.sh base)
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
 virt-install \
@@ -240,15 +240,20 @@ curl: (6) Could not resolve host: redhat.com
 Make sure that `CRI-O` has access to all the container images required by MicroShift.
 ```bash
 $ sudo crictl images
-IMAGE                                            TAG                 IMAGE ID            SIZE
-k8s.gcr.io/pause                                 3.6                 6270bb605e12e       690kB
-quay.io/coreos/flannel                           v0.14.0             8522d622299ca       68.9MB
-quay.io/microshift/flannel-cni                   v0.14.0             4324dc7a1ffa5       8.12MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              334363f37666a       401MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              eb9d5c9681cd5       376MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              60f52af9fc4ba       413MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              ef1c6b04ebe2a       415MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev   <none>              a538d5965f4fc       458MB
+IMAGE                                                         TAG                 IMAGE ID            SIZE
+quay.io/microshift/ovn-kubernetes-singlenode                  <none>              3931a3a4e593a       696MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              abfe4b141323c       400MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              e838beef2dc33       352MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              46485ef27b75a       354MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              c9ab25a51ced3       331MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              075ed082f7130       343MB
+registry.access.redhat.com/ubi8/openssl                       <none>              6f0b85db494c0       40.7MB
+registry.k8s.io/pause                                         3.6                 6270bb605e12e       690kB
+registry.redhat.io/odf4/odf-topolvm-rhel8                     <none>              7772af7c5ac84       222MB
+registry.redhat.io/openshift4/ose-csi-external-provisioner    <none>              f4f57fec63a30       389MB
+registry.redhat.io/openshift4/ose-csi-external-resizer        <none>              ffee6b6e833e3       387MB
+registry.redhat.io/openshift4/ose-csi-livenessprobe           <none>              f67b4438d40d3       349MB
+registry.redhat.io/openshift4/ose-csi-node-driver-registrar   <none>              161662e2189a0       350MB
 ```
 
 Finally, check if MicroShift is up and running by executing `oc` commands.

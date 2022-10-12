@@ -5,17 +5,36 @@
 #
 set -eo pipefail
 
+ENABLE_DEV_REPO="false"
+
 function usage() {
-    echo "Usage: $(basename $0) <openshift-pull-secret-file>"
+    echo "Usage: $(basename $0) [--enable-dev-repo] <openshift-pull-secret-file>"
+    echo ""
+    echo "Optional arguments:"
+    echo "  --enable-dev-repo"
+    echo "          Enable the developer repos with pre-release RPMs (Red Hat VPN required)"
+    [ ! -z "$1" ] && echo -e "\nERROR: $1"
     exit 1
 }
 
-if [ $# -ne 1 ] ; then
-    usage
+if [ $# -lt 1 ]; then
+    usage "Missing argument."
 fi
+# Parse the command line
+while [ $# -gt 1 ] ; do
+    case $1 in
+    --enable-dev-repo)
+        ENABLE_DEV_REPO="true"
+        shift
+        ;;
+    *)
+        usage "Invalid argument '$1'."
+        ;;
+    esac
+done
 
 OCP_PULL_SECRET=$(realpath $1)
-[ ! -e "${OCP_PULL_SECRET}" ] && usage
+[ ! -f "${OCP_PULL_SECRET}" ] && usage "OpenShift pull secret ${OCP_PULL_SECRET} does not exist or is not a regular file."
 
 if [ "$(whoami)" != "microshift" ] ; then
     echo "This script should be run from 'microshift' user account"
@@ -48,7 +67,23 @@ make srpm
 
 # Run MicroShift Executable > Runtime Prerequisites
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#runtime-prerequisites
-sudo subscription-manager repos --enable rhocp-4.10-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+if [[ "${ENABLE_DEV_REPO}" == "true" ]]; then
+    if curl --output /dev/null --silent --head --fail "http://download.lab.bos.redhat.com"; then
+        echo -e "\E[32mSuccessfully reached http://download.lab.bos.redhat.com, configuring prerelease repo.\E[00m"
+        sudo tee /etc/yum.repos.d/internal-rhocp-4.12-for-rhel-8-rpms.repo >/dev/null <<EOF
+[internal-rhocp-4.12-for-rhel-8-rpms]
+name=Puddle of the rhocp-4.12 RPMs for RHEL8
+baseurl=http://download.lab.bos.redhat.com/rcm-guest/puddles/RHAOS/plashets/4.12-el8/building/\$basearch/os/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=1
+EOF
+    else
+        echo -e "\E[31mERROR: '--enable-dev-repo' specified, but could not reach http://download.lab.bos.redhat.com (not on VPN?), aborting.\E[00m"
+        exit 1
+    fi
+fi
+sudo subscription-manager repos --enable rhocp-4.11-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
 sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 
 sudo cp -f ${OCP_PULL_SECRET} /etc/crio/openshift-pull-secret
