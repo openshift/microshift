@@ -12,7 +12,8 @@
   vars_files:
     - vars/all.yml
   roles:
-    - manage-repos
+    - role: manage-repos
+      when: (manage_repos | bool)
 
 - name: set up logging node
   hosts: logging
@@ -34,9 +35,17 @@
     - role: install-logging-exporters
       when: (prometheus_logging | bool)
 
+- name: install microshift
+  hosts: microshift
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: install-microshift
+      when: (install_microshift | bool)
+
 - name: capture microshift metrics
   hosts: microshift
   vars_files:
     - vars/all.yml
   roles:
-    - install-microshift
+    - microshift-start

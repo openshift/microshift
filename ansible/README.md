@@ -27,8 +27,10 @@ There are a few variables that may need user configuration and they are found in
 | `rhel_username` | Red Hat subscription account username (string) | `null` | 
 | `rhel_password` | Red Hat subscription account password (string) | `null` | 
 | `rhel_pool_id` | Red Hat subscription pool id (string) | `null` | 
-| `prometheus_logging` | Set up logging and exporters on the nodes | `false` |
+| `manage_repos` | Enable necessary repos to build MicroShift and install necessary components | `false` |
 | `setup_microshift_host` | Complete initial setup of MicroShift host (subscription, packages, firewall, etc) | `false` |
+| `prometheus_logging` | Set up logging and exporters on the nodes | `true` |
+| `install_microshift` | Build and install MicroShift from git | `false` |
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
 
 ## Running
@@ -73,9 +75,11 @@ manage_subscription: true
 rhel_username: <subscription manager username>
 rhel_password: <subscription manager password>
 rhel_pool_id: <subscription manager pool-id>
+manage_repos: true
 
-prometheus_logging: true
 setup_microshift_host: true
+prometheus_logging: true
+install_microshift: true
 build_etcd_binary: false
 ```
 
@@ -92,9 +96,32 @@ manage_subscription: false
 rhel_username:
 rhel_password:
 rhel_pool_id:
+manage_repos: true
 
-prometheus_logging: true
 setup_microshift_host: false
+prometheus_logging: true
+install_microshift: true
+build_etcd_binary: false
+```
+
+#### RHEL4Edge Host Example Variables
+
+If the user has deployed a RHEL4Edge image built with MicroShift, the scripts can be run with a few more variables disabled as the host is fully configured out of the box.
+> Such host can be created using the instructions from the [Install MicroShift on RHEL for Edge](../docs/rhel4edge_iso.md) document.
+
+The `manage_subscription`, `manage_repos`, `setup_microshift_host` and `install_microshift` variables have been set to `false`.
+
+**Sample vars/all.yml File**
+```
+manage_subscription: false
+rhel_username:
+rhel_password:
+rhel_pool_id:
+manage_repos: true
+
+setup_microshift_host: false
+prometheus_logging: true
+install_microshift: false
 build_etcd_binary: false
 ```
 

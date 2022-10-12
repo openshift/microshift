@@ -1,21 +1,48 @@
 ---
-# install-microshift tasks
+# microshift-start tasks
+
+- name: cleanup microshift data
+  ansible.builtin.shell: echo 1 | /usr/bin/cleanup-all-microshift-data
+  when: cleanup_microshift | default('true') | bool
+
+- name: disable microshift service
+  become: yes
+  ansible.builtin.systemd:
+    name: microshift
+    state: stopped
+    enabled: no
+
+- name: create .kube home dir
+  ansible.builtin.file:
+    path: ~/.kube/
+    state: directory
 
 - name: reboot machine
-  reboot:
+  become: yes
+  ansible.builtin.reboot:
     reboot_timeout: 600
+
+- name: record post-install disk utilization
+  vars:
+    filename: disk1.txt
+  include_tasks: roles/common/tasks/disk.yml
+  loop: "{{ du_dirs }}"
 
 - name: Pause for 60 seconds for steady state post reboot
   ansible.builtin.pause:
     seconds: 60
 
 - name: pbench recording start
+  become: yes
   block:
   - name: source pbench-agent & register-tool-set
     ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
   
+  - name: set new pidstat interval
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool --name=pidstat -- --interval={{ sample_interval }}
+
   - name: start pbench-user-benchmark recording
-    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift2 -- sleep {{ pbench_record_duration }}
+    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift -- sleep {{ pbench_record_duration }}
     async: "{{ pbench_record_duration|int * 2 }}"
     poll: 0
     register: pbench_user_benchmark_result
@@ -27,6 +54,11 @@
   environment:
     PBENCH_TOOL_DATA_SINK: localhost:8081
 
+- name: check for cadvisor
+  ansible.builtin.command: which cadvisor
+  register: cadvisor_check
+  ignore_errors: true
+
 - name: force update of current timestamp
   ansible.builtin.setup:
     filter:
@@ -37,6 +69,7 @@
     start_time: "{{ ansible_date_time.iso8601[:19] }}"
 
 - name: start microshift service
+  become: yes
   ansible.builtin.systemd:
     name: microshift
     state: started
@@ -46,16 +79,40 @@
   ansible.builtin.systemd:
     name: cadvisor
     state: restarted
+  when: cadvisor_check.rc == 0
 
 - name: wait for kubeconfig to exist on microshift node
+  become: yes
   ansible.builtin.stat:
     path: "{{ remote_kubeconfig_path }}"
   register: remote_kubeconfig
   until: remote_kubeconfig.stat.exists
-  retries: 30
-  delay: 1
+  retries: 300
+  delay: 3
 
-- include_tasks: roles/common/tasks/readinesscheck.yml
+- name: create copy of kubeconfig
+  become: yes
+  ansible.builtin.copy:
+    src: "{{ remote_kubeconfig_path }}"
+    dest: "/home/{{ ansible_user }}/.kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    remote_src: yes
+    force: yes
+
+- name: wait for any pods
+  ansible.builtin.shell: oc get pods -A --no-headers | wc -l
+  register: pods
+  until: (pods.stdout | int ) >= 1
+  retries: 10
+
+- name: wait for pods running
+  ansible.builtin.shell: oc get pods -A -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' | grep -c False
+  retries: 120
+  delay: 5
+  register: result
+  until: result.stdout == "0"
+  failed_when: result.stderr != ''
 
 - name: force update of current timestamp
   ansible.builtin.setup:
@@ -69,22 +126,29 @@
 - name: Add boot info to local file
   lineinfile:
     path: boot.txt
-    line: "Second boot: {{ runtime }}"
+    line: "First boot: {{ runtime }}"
     create: yes
   delegate_to: localhost
 
 - name: finish pbench capture
+  become: yes
   block:
   - name: check on pbench-user-benchmark status
     ansible.builtin.async_status:
       jid: "{{ pbench_user_benchmark_result.ansible_job_id }}"
     register: job_result
     until: job_result.finished
-    retries: 80
+    retries: 240
     delay: 15
-  
+
   - name: source pbench-agent & move results
     ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-move-results
   when: install_pbench | bool
   environment:
     PBENCH_USER: microshift
+
+- name: record fully running disk utilization
+  vars:
+    filename: disk2.txt
+  include_tasks: roles/common/tasks/disk.yml
+  loop: "{{ du_dirs }}"

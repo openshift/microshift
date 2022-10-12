@@ -3,10 +3,11 @@
 
 - name: rpm tasks
   block:
-    - name: install prometheus
+    - name: install prometheus & grafana
       ansible.builtin.dnf:
-        name: golang-github-prometheus
+        name: "{{ logging_packages }}"
         state: present
+        update_cache: true
   when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat") or (ansible_distribution == "Fedora")
 
 - name: copy prometheus config
@@ -15,8 +16,8 @@
     dest: /etc/prometheus/prometheus.yml
     backup: true
 
-- name: start and enable prometheus service
+- name: start and enable prometheus & grafana service(s)
   ansible.builtin.systemd:
-    name: prometheus
+    name: "{{ logging_services }}"
     state: restarted
     enabled: yes
