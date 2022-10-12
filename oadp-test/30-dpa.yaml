@@ -1,0 +1,37 @@
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: topolvm-csi-test
+  namespace: openshift-adp
+spec:
+  backupImages: false
+  configuration:
+    velero:
+      defaultPlugins:
+        - aws
+        - csi
+    restic:
+      enable: false
+    featureFlags:
+      - EnableCSI
+  backupLocations:
+    - name: default
+      velero:
+        provider: aws
+        default: true
+        config:
+          s3ForcePathStyle: "true"
+          s3Url: http://192.168.122.148:9000
+          region: minio
+          profile: "default"
+        objectStorage:
+          bucket: oadp
+          prefix: velero
+        credential:
+          name: cloud-credentials
+          key: cloud
+  snapshotLocations:
+    - name: default
+      velero:
+        provider: csi
+

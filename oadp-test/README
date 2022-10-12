@@ -1,0 +1,19 @@
+1. Create a thin pool named `mythinpool`
+2. Create file `/etc/microshift/lvmd.yaml`:
+   ```
+   socket-name: /run/lvmd/lvmd.sock
+   device-classes:
+   - name: ssd-thin
+     default: true
+     volume-group: rhel
+     type: thin
+     thin-pool:
+       name: mythinpool
+       overprovision-ratio: 10.0
+   ```
+3. Build MicroShift: `$ make`
+4. Run Microshift: `sudo _output/bin/microshift run` and wait until all pods are ready
+5. Run `minio` on microshift's host, tweak `3sUrl` in `30-dpa.yaml`, create bucket `oadp`
+6. Run `cd oadp-test && ./0000.sh`
+7. After pod is running run: `oc create -f ./60-backup.yaml`
+8. Check backup for completion: `oc get -n openshift-adp backup test -o yaml` - phase should be `Completed` and minio's bucket should have dir `velero` with `test` dir inside
