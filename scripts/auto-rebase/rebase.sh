@@ -554,13 +554,9 @@ update_manifests() {
     yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Use router-certs-default instead of the router-metrics-certs-default that the CIO sets
     yq -i '.metadata += {"annotations": {"service.alpha.openshift.io/serving-cert-secret-name": "router-certs-default"}}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
-    #    Use host networking
-    # yq -i '.spec.template.spec.dnsPolicy = "ClusterFirstWithHostNet"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    # yq -i '.spec.template.spec.hostNetwork = "true"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    #    Add hostPorts for routes and metrics
-    # yq -i '.spec.template.spec.containers[0].ports[0].hostPort = 80' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    # yq -i '.spec.template.spec.containers[0].ports[1].hostPort = 443' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    # yq -i '.spec.template.spec.containers[0].ports[2].hostPort = 1936' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    #    Add hostPorts for routes and metrics (needed as long as there is no load balancer)
+    yq -i '.spec.template.spec.containers[0].ports[0].hostPort = 80' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].ports[1].hostPort = 443' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Change LoadBalancer to NodePort as long as we do not add a default LB.
     yq -i '.spec.type = "NodePort"' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
     # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)

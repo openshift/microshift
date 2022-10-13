@@ -67,6 +67,7 @@
 // assets/components/service-ca/sa.yaml
 // assets/components/service-ca/signing-cabundle.yaml
 // assets/components/service-ca/signing-secret.yaml
+// assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
 // assets/core/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml
 // assets/core/csr_approver_clusterrole.yaml
 // assets/core/csr_approver_clusterrolebinding.yaml
@@ -2482,9 +2483,11 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+              hostPort: 80
             - name: https
               containerPort: 443
               protocol: TCP
+              hostPort: 443
             - name: metrics
               containerPort: 1936
               protocol: TCP
@@ -2532,7 +2535,7 @@ func assetsComponentsOpenshiftRouterDeploymentYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4500, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/openshift-router/deployment.yaml", size: 4555, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4319,6 +4322,33 @@ func assetsComponentsServiceCaSigningSecretYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "assets/components/service-ca/signing-secret.yaml", size: 144, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml = []byte(`apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-controller-manager
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+  labels:
+    openshift.io/cluster-monitoring: "true"
+    openshift.io/run-level: "" # specify no run-level turns it off on install and upgrades
+`)
+
+func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYamlBytes() ([]byte, error) {
+	return _assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, nil
+}
+
+func assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml() (*asset, error) {
+	bytes, err := assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml", size: 321, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6634,6 +6664,7 @@ var _bindata = map[string]func() (*asset, error){
 	"assets/components/service-ca/sa.yaml":                                                                   assetsComponentsServiceCaSaYaml,
 	"assets/components/service-ca/signing-cabundle.yaml":                                                     assetsComponentsServiceCaSigningCabundleYaml,
 	"assets/components/service-ca/signing-secret.yaml":                                                       assetsComponentsServiceCaSigningSecretYaml,
+	"assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml":                             assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml,
 	"assets/core/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml":                       assetsCore0000_50_clusterOpenshiftRouteControllerManager_00_namespaceYaml,
 	"assets/core/csr_approver_clusterrole.yaml":                                                              assetsCoreCsr_approver_clusterroleYaml,
 	"assets/core/csr_approver_clusterrolebinding.yaml":                                                       assetsCoreCsr_approver_clusterrolebindingYaml,
@@ -6803,6 +6834,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			}},
 		}},
 		"core": {nil, map[string]*bintree{
+			"0000_50_cluster-openshift-controller-manager_00_namespace.yaml":        {assetsCore0000_50_clusterOpenshiftControllerManager_00_namespaceYaml, map[string]*bintree{}},
 			"0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml":  {assetsCore0000_50_clusterOpenshiftRouteControllerManager_00_namespaceYaml, map[string]*bintree{}},
 			"csr_approver_clusterrole.yaml":                                         {assetsCoreCsr_approver_clusterroleYaml, map[string]*bintree{}},
 			"csr_approver_clusterrolebinding.yaml":                                  {assetsCoreCsr_approver_clusterrolebindingYaml, map[string]*bintree{}},
