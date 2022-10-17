@@ -95,7 +95,7 @@ $ cd ~/microshift/ && find . -name \*.rpm
 Log into the development virtual machine with the `microshift` user credentials.
 
 ### Runtime Prerequisites
-When working a MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding PRM repo `rhocp-4.$Y-for-rhel-8-$ARCH-rpms` won't be available yet. In that case, use the `Y-1` version.
+When working a MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repo `rhocp-4.$Y-for-rhel-8-$ARCH-rpms` won't be available yet. In that case, use the `Y-1` version.
 
 > If you have VPN access to the Red Hat build systems, you can add the corresponding puddle repo.
 >
