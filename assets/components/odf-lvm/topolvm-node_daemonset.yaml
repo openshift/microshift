@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       annotations:
-        odf-lvm.microshift.io/lvmd_config_sha256sum: "{{ Sha256sum .Config }}"
+        odf-lvm.microshift.io/lvmd_config_sha256sum: "{{ Sha256sum .lvmd }}"
       labels:
         app: topolvm-node
       name: lvmcluster-sample

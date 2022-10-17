@@ -17,7 +17,7 @@ import (
 
 var templateFuncs = map[string]interface{}{
 	"Dir":       filepath.Dir,
-	"Sha256sum": func(b []byte) string { return fmt.Sprintf("%x", sha256.Sum256(b)) },
+	"Sha256sum": func(s string) string { return fmt.Sprintf("%x", sha256.Sum256([]byte(s))) },
 }
 
 func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderParams) assets.RenderParams {
@@ -38,7 +38,7 @@ func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderPar
 }
 
 func renderTemplate(tb []byte, data assets.RenderParams) ([]byte, error) {
-	tmpl, err := template.New("").Funcs(templateFuncs).Parse(string(tb))
+	tmpl, err := template.New("").Option("missingkey=error").Funcs(templateFuncs).Parse(string(tb))
 	if err != nil {
 		return nil, err
 	}

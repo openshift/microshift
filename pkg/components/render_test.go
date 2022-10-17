@@ -119,8 +119,8 @@ func Test_renderTopolvmDaemonsetTemplate(t *testing.T) {
 
 	fm := template.FuncMap{
 		"Dir": filepath.Dir,
-		"Sha256sum": func(b []byte) string {
-			return fmt.Sprintf("%x", sha256.Sum256(b))
+		"Sha256sum": func(s string) string {
+			return fmt.Sprintf("%x", sha256.Sum256([]byte(s)))
 		},
 	}
 	tpl := template.New("")
@@ -151,11 +151,12 @@ func Test_renderTopolvmDaemonsetTemplate(t *testing.T) {
 			name: "renders lvmd-socket-name path",
 			args: args{
 				tb:   tb,
-				data: renderParamsFromConfig(config.NewMicroshiftConfig(), assets.RenderParams{"SocketName": "/run/lvmd/lvmd.socket"}),
+				data: renderParamsFromConfig(config.NewMicroshiftConfig(), assets.RenderParams{"SocketName": "/run/lvmd/lvmd.socket", "lvmd": "foobar"}),
 			},
 			want: wantBytes(tpl, map[string]interface{}{
 				"ReleaseImage": release.Image,
 				"SocketName":   "/run/lvmd/lvmd.socket",
+				"lvmd":         "foobar",
 			}),
 			wantErr: false,
 		},
