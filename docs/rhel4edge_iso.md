@@ -80,7 +80,7 @@ The script performs the following tasks:
 - Rebuild the installer image with the `kickstart.ks` file for performing various OS setup when the host is first booted
 - Perform partial cleanup procedure to reclaim cached disk space
 
-The artifact of the build is the `scripts/image-builder/_builds/microshift-installer-${VERSION}.${ARCH}.iso` bootable RHEL for Edge OS image.
+The artifact of the build is the `_output/image-builder/microshift-installer-${VERSION}.${ARCH}.iso` bootable RHEL for Edge OS image.
 
 ### Disk Partitioning
 The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such parititioning is required for the data volume to be utilized by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
