@@ -26,7 +26,7 @@ func init() {
 		"haproxy_router":            "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:349e73813f432203920ae9ed04fc33a4026507e26ecc23ff2ab609d5b95b4206",
 		"kube_rbac_proxy":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c19226019fe605b5ab10496fb0b7cb4712cb694a7ee1e26642d63d515ca6b7cc",
 		"openssl":                   "registry.access.redhat.com/ubi8/openssl@sha256:3f781a07e59d164eba065dba7d8e7661ab2494b21199c379b65b0ff514a1b8d0",
-		"ovn_kubernetes_microshift": "quay.io/microshift/ovn-kubernetes-singlenode@sha256:012e743363b5f15f442c238099d35a0c70343fd1d4dc15b0a57a7340a338ffdb",
+		"ovn_kubernetes_microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8634637031e8b7eea5cb2d5f3bb76c0f40d6328871839eae8f215c3e524d9ab7",
 		"pod":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9f9b6f1aa2770195c726ef4186306813b3c3c038cc488ff05aa5873297de94d0",
 		"service_ca_operator":       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2fe468f25881e7b5ae8118c7d54b41a7fbb132a186f0156bbe46df0fd6a2f1f8",
 	}
