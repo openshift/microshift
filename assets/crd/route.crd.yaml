@@ -69,10 +69,6 @@ spec:
               - properties:
                   path:
                     maxLength: 0
-              - properties:
-                  tls:
-                    enum:
-                    - null
               - not:
                   properties:
                     tls:
