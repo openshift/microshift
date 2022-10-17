@@ -21,13 +21,13 @@ package release
 
 func init() {
 	Image = map[string]string{
-		"cli":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:fe65a036a65af078f6f61017ae96e141dbb203f3602ecaca7f63ec8f58a1f6c6",
-		"coredns":                   "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b5b3d024b2586bd0bf7b1315b2866f36a9b8b0acd23f0a9c6459371234dc8429",
-		"haproxy_router":            "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:349e73813f432203920ae9ed04fc33a4026507e26ecc23ff2ab609d5b95b4206",
-		"kube_rbac_proxy":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c19226019fe605b5ab10496fb0b7cb4712cb694a7ee1e26642d63d515ca6b7cc",
+		"cli":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3d13d0552be6ea8f593ccce46ea4566a058429ca112f844703a315f51c9020b8",
+		"coredns":                   "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f7e9edbcaffe940b0f5989a29a80245b4015342f6f4aae42b24caf909e1f2c6f",
+		"haproxy_router":            "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0ed84cfd46b75d0961c7ea98dcf78482758601997d1375d1a56fde8c3a43aefa",
+		"kube_rbac_proxy":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:72f9e579dc1395bb5754550847fac926ab5a87051949c52a3ea8c709dc23fd7d",
 		"openssl":                   "registry.access.redhat.com/ubi8/openssl@sha256:3f781a07e59d164eba065dba7d8e7661ab2494b21199c379b65b0ff514a1b8d0",
 		"ovn_kubernetes_microshift": "quay.io/microshift/ovn-kubernetes-singlenode@sha256:012e743363b5f15f442c238099d35a0c70343fd1d4dc15b0a57a7340a338ffdb",
 		"pause":                     "k8s.gcr.io/pause:3.6",
-		"service_ca_operator":       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2fe468f25881e7b5ae8118c7d54b41a7fbb132a186f0156bbe46df0fd6a2f1f8",
+		"service_ca_operator":       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:989a43840f16af130f846df494e61e484d42ed679d311db79a6b698d2399b92e",
 	}
 }
