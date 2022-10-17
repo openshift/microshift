@@ -416,7 +416,7 @@ update_manifests() {
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrole.yaml" "${REPOROOT}"/assets/core
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/core
     #    Selectively copy in only those CRD manifests that MicroShift is already using
-    cp "${STAGING_DIR}/kubernetes/vendor/github.com/openshift/api/route/v1/route.crd.yaml" "${REPOROOT}"/assets/crd
+    cp "${STAGING_DIR}/cluster-ingress-operator/vendor/github.com/openshift/api/route/v1/route.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_security-openshift_01_scc.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml" "${REPOROOT}"/assets/crd
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.

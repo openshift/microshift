@@ -5142,6 +5142,10 @@ spec:
               - properties:
                   path:
                     maxLength: 0
+              - properties:
+                  tls:
+                    enum:
+                    - null
               - not:
                   properties:
                     tls:
@@ -5471,7 +5475,7 @@ func assetsCrdRouteCrdYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/crd/route.crd.yaml", size: 18418, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/crd/route.crd.yaml", size: 18522, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
