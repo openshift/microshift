@@ -167,7 +167,7 @@ func NewRange(prefix string, n, k uint) (*Range, error) {
 // user, type, and role of the range, the number of labels to use, and the
 // maximum category to use.  The input string is expected to be in the format:
 //
-//   <prefix>/<numLabels>[,<maxCategory>]
+//	<prefix>/<numLabels>[,<maxCategory>]
 //
 // If the maximum category is not specified, it is defaulted to the maximum
 // number of SELinux categories (1024).

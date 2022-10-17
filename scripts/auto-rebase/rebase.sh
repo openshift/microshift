@@ -26,6 +26,7 @@ trap 'echo "Script exited with error."' ERR
 
 # debugging options
 #trap 'echo "# $BASH_COMMAND"' DEBUG
+#export PS4='+ ${LINENO}: '
 #set -x
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
@@ -145,6 +146,7 @@ update_modulepath_version_from_release() {
 
     path=""
     if [ "${component}" = "etcd" ]; then
+        return # skip updating etcd due to conflicting dependencies
         path="${modulepath#go.etcd.io/etcd}"
     fi
     repo=$( cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url )
@@ -179,6 +181,7 @@ update_modulepath_version_from_component() {
 
     # Special-case etcd to use OpenShift's repo
     if [[ "${modulepath}" =~ ^go.etcd.io/etcd/ ]]; then
+        return # skip updating etcd due to conflicting dependencies
         update_modulepath_version_from_release "${modulepath}" "${component}"
         return
     fi

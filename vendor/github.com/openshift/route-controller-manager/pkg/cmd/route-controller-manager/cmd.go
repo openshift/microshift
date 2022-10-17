@@ -8,7 +8,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/coreos/go-systemd/daemon"
 	"github.com/spf13/cobra"
 
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -84,7 +83,6 @@ func (o *RouteControllerManager) StartControllerManager(stopCh <-chan struct{}) 
 		return err
 	}
 
-	go daemon.SdNotify(false, "READY=1")
 	select {
 	case <-stopCh:
 		klog.Infof("Route Controller Manager received stop signal. exiting.")

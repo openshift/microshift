@@ -49,14 +49,14 @@ import (
 //
 // Invariants:
 //
-// 1. For every ingress path rule with a non-empty backend statement, a route should
-//    exist that points to that backend.
-// 2. For every TLS hostname that has a corresponding path rule and points to a secret
-//    that exists, a route should exist with a valid TLS config from that secret.
-// 3. For every service referenced by the ingress path rule, the route should have
-//    a target port based on the service.
-// 4. A route owned by an ingress that is not described by any of the three invariants
-//    above should be deleted.
+//  1. For every ingress path rule with a non-empty backend statement, a route should
+//     exist that points to that backend.
+//  2. For every TLS hostname that has a corresponding path rule and points to a secret
+//     that exists, a route should exist with a valid TLS config from that secret.
+//  3. For every service referenced by the ingress path rule, the route should have
+//     a target port based on the service.
+//  4. A route owned by an ingress that is not described by any of the three invariants
+//     above should be deleted.
 //
 // The controller also relies on the use of expectations to remind itself whether there
 // are route creations it has not yet observed, which prevents the controller from
@@ -72,7 +72,6 @@ import (
 // * the empty backend
 // * paths with empty backends
 // * creating a dynamic route spec.host
-//
 type Controller struct {
 	eventRecorder record.EventRecorder
 
