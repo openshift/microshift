@@ -36,6 +36,7 @@ var (
 		"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
 		"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
 	}
+	microshiftDataDir = config.GetDataDir()
 )
 
 const (
@@ -56,12 +57,12 @@ func (s *EtcdService) Name() string           { return "etcd" }
 func (s *EtcdService) Dependencies() []string { return []string{} }
 
 func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
-	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 
 	etcdServingCertDir := cryptomaterial.EtcdServingCertDir(certsDir)
 	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
 	etcdSignerCertPath := cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))
-	dataDir := filepath.Join(cfg.DataDir, s.Name())
+	dataDir := filepath.Join(microshiftDataDir, s.Name())
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	s.etcdCfg = etcd.NewConfig()

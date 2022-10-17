@@ -50,7 +50,7 @@ func (s *KubeControllerManager) Name() string           { return "kube-controlle
 func (s *KubeControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
-	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	csrSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
 	kubeconfig := cfg.KubeConfigPath(config.KubeControllerManager)
@@ -66,7 +66,7 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 
 	args := []string{
 		"--kubeconfig=" + kubeconfig,
-		"--service-account-private-key-file=" + cfg.DataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
+		"--service-account-private-key-file=" + microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
 		"--allocate-node-cidrs=true",
 		"--cluster-cidr=" + cfg.Cluster.ClusterCIDR,
 		"--authorization-kubeconfig=" + kubeconfig,

@@ -5,7 +5,7 @@ MicroShift can be configured in the following ways, in order of precedence:
 * Environment variables
 * Configuration file
 
-The MicroShift configuration file may be located at `~/.microshift/config.yaml` (user-specific) and `/etc/microshift/config.yaml` (system-wide), while the former takes precedence if it exists. Use the `--config` command line argument or `MICROSHIFT_CONFIGFILE` environment variable to specify a custom location of the configuration file.
+The MicroShift configuration file must be located at `~/.microshift/config.yaml` (user-specific) and `/etc/microshift/config.yaml` (system-wide), while the former takes precedence if it exists.
 
 The format of the `config.yaml` configuration file is as follows.
 
@@ -20,9 +20,7 @@ cluster:
   mtu: ""
 nodeIP: ""
 nodeName: ""
-dataDir: ""
 logVLevel: ""
-manifests: []
 ```
 
 The configuration settings alongside with the supported command line arguments and environment variables are presented below.
@@ -38,9 +36,7 @@ The configuration settings alongside with the supported command line arguments a
 | mtu                 | --cluster-mtu             | MICROSHIFT_CLUSTER_MTU                  | The maximum transmission unit for the Generic Network Virtualization Encapsulation overlay network
 | nodeIP              | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
 | nodeName            | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
-| dataDir             | --data-dir                | MICROSHIFT_DATADIR                      | Location for data created by MicroShift
 | logVLevel           | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (0-5)
-| manifests           | n/a                       | n/a                                     | Locations to scan for manifests to be loaded on startup
 
 ## Default Settings
 
@@ -57,11 +53,7 @@ cluster:
   mtu: "1400"
 nodeIP: ""
 nodeName: ""
-dataDir: /var/lib/microshift
 logVLevel: 0
-manifests:
-  - /usr/lib/microshift/manifests
-  - /etc/microshift/manifests
 ```
 
 # Auto-applying Manifests
@@ -74,8 +66,6 @@ The reason for providing multiple directories is to allow a flexible method to m
 |-------------------------------|--------|
 | /etc/microshift/manifests     | Read-write location for configuration management systems or development
 | /usr/lib/microshift/manifests | Read-only location for embedding configuration manifests on ostree based systems
-
-The list of manifest locations can be customized via configuration using the above-mentioned `manifests` section of the `config.yaml` file or via the `MICROSHIFT_MANIFESTS` environment variable as comma separated directories.
 
 ## Manifest Example
 

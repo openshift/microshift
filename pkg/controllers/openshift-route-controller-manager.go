@@ -60,7 +60,7 @@ func (s *OCPRouteControllerManager) configure(cfg *config.MicroshiftConfig) {
 }
 
 func (s *OCPRouteControllerManager) writeConfig(cfg *config.MicroshiftConfig) *openshiftcontrolplanev1.OpenShiftControllerManagerConfig {
-	servingCertDir := cryptomaterial.RouteControllerManagerServingCertDir(cryptomaterial.CertsDirectory(cfg.DataDir))
+	servingCertDir := cryptomaterial.RouteControllerManagerServingCertDir(cryptomaterial.CertsDirectory(microshiftDataDir))
 
 	c := &openshiftcontrolplanev1.OpenShiftControllerManagerConfig{
 		KubeClientConfig: configv1.KubeClientConfig{
@@ -77,7 +77,7 @@ func (s *OCPRouteControllerManager) writeConfig(cfg *config.MicroshiftConfig) *o
 					CertFile: cryptomaterial.ServingCertPath(servingCertDir),
 					KeyFile:  cryptomaterial.ServingKeyPath(servingCertDir),
 				},
-				ClientCA: cryptomaterial.TotalClientCABundlePath(cryptomaterial.CertsDirectory(cfg.DataDir)),
+				ClientCA: cryptomaterial.TotalClientCABundlePath(cryptomaterial.CertsDirectory(microshiftDataDir)),
 			},
 		},
 		Controllers: []string{

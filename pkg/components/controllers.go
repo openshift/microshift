@@ -39,7 +39,7 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 		cmName     = "signing-cabundle"
 	)
 
-	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(cfg.DataDir))
+	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(microshiftDataDir))
 	caCertPath := cryptomaterial.CACertPath(serviceCADir)
 	caKeyPath := cryptomaterial.CAKeyPath(serviceCADir)
 

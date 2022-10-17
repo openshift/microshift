@@ -64,7 +64,7 @@ func startOVNKubernetes(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 	}
 	extraParams := assets.RenderParams{
 		"KubeconfigPath": kubeconfigPath,
-		"KubeconfigDir":  filepath.Join(cfg.DataDir, "/resources/kubeadmin"),
+		"KubeconfigDir":  filepath.Join(microshiftDataDir, "/resources/kubeadmin"),
 	}
 	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)

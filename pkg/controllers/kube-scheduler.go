@@ -55,7 +55,7 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 	}
 
 	s.options = schedulerOptions.NewOptions()
-	s.options.ConfigFile = cfg.DataDir + "/resources/kube-scheduler/config/config.yaml"
+	s.options.ConfigFile = microshiftDataDir + "/resources/kube-scheduler/config/config.yaml"
 	s.kubeconfig = cfg.KubeConfigPath(config.KubeAdmin)
 }
 
@@ -67,7 +67,7 @@ clientConnection:
 leaderElection:
   leaderElect: false`)
 
-	path := filepath.Join(cfg.DataDir, "resources", "kube-scheduler", "config", "config.yaml")
+	path := filepath.Join(microshiftDataDir, "resources", "kube-scheduler", "config", "config.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return ioutil.WriteFile(path, data, 0644)
 }
