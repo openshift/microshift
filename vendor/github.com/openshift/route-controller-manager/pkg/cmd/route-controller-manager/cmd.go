@@ -1,6 +1,7 @@
 package openshift_controller_manager
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -33,7 +34,7 @@ type RouteControllerManager struct {
 var longDescription = templates.LongDesc(`
 	Start the additional Ingress and Route controllers`)
 
-func NewRouteControllerManagerCommand(name string, out, errout io.Writer, stopCh <-chan struct{}) *cobra.Command {
+func NewRouteControllerManagerCommand(name string, out, errout io.Writer, ctx context.Context) *cobra.Command {
 	options := &RouteControllerManager{Output: out}
 
 	cmd := &cobra.Command{
@@ -45,7 +46,7 @@ func NewRouteControllerManagerCommand(name string, out, errout io.Writer, stopCh
 
 			serviceability.StartProfiler()
 
-			if err := options.StartControllerManager(stopCh); err != nil {
+			if err := options.StartControllerManager(ctx); err != nil {
 				if kerrors.IsInvalid(err) {
 					if details := err.(*kerrors.StatusError).ErrStatus.Details; details != nil {
 						fmt.Fprintf(errout, "Invalid %s %s\n", details.Kind, details.Name)
@@ -77,21 +78,8 @@ func (o *RouteControllerManager) Validate() error {
 	return nil
 }
 
-// StartControllerManager calls RunControllerManager and then waits forever
-func (o *RouteControllerManager) StartControllerManager(stopCh <-chan struct{}) error {
-	if err := o.RunControllerManager(); err != nil {
-		return err
-	}
-
-	select {
-	case <-stopCh:
-		klog.Infof("Route Controller Manager received stop signal. exiting.")
-		return nil
-	}
-}
-
-// RunControllerManager takes the options and starts the controllers
-func (o *RouteControllerManager) RunControllerManager() error {
+// StartControllerManager takes the options, starts the controllers and then blocks forever
+func (o *RouteControllerManager) StartControllerManager(ctx context.Context) error {
 	// try to decode into our new types first.  right now there is no validation, no file path resolution.  this unsticks the operator to start.
 	// TODO add those things
 	configContent, err := ioutil.ReadFile(o.ConfigFilePath)
@@ -128,5 +116,5 @@ func (o *RouteControllerManager) RunControllerManager() error {
 	if err != nil {
 		return err
 	}
-	return RunRouteControllerManager(config, clientConfig)
+	return RunRouteControllerManager(config, clientConfig, ctx)
 }

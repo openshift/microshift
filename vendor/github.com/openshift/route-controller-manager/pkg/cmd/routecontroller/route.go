@@ -19,7 +19,7 @@ import (
 	routecontrollers "github.com/openshift/route-controller-manager/pkg/cmd/controller/route"
 )
 
-func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig, kubeClient kubernetes.Interface, clientConfig *rest.Config) (bool, error) {
+func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig, kubeClient kubernetes.Interface, clientConfig *rest.Config, ctx context.Context) error {
 	routeControllerManager := func(cntx context.Context) {
 		// Start Route Controllers
 		// TODO: This can be split further
@@ -38,7 +38,7 @@ func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControll
 	eventRecorder := eventBroadcaster.NewRecorder(legacyscheme.Scheme, v1.EventSource{Component: "route-controller-manager"})
 	id, err := os.Hostname()
 	if err != nil {
-		return false, err
+		return err
 	}
 	// Create a new lease for the route controller manager
 	rl, err := resourcelock.New(
@@ -52,9 +52,9 @@ func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControll
 			EventRecorder: eventRecorder,
 		})
 	if err != nil {
-		return false, err
+		return err
 	}
-	go leaderelection.RunOrDie(context.Background(),
+	leaderelection.RunOrDie(ctx,
 		leaderelection.LeaderElectionConfig{
 			Lock:            rl,
 			ReleaseOnCancel: true,
@@ -64,11 +64,12 @@ func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControll
 			Callbacks: leaderelection.LeaderCallbacks{
 				OnStartedLeading: routeControllerManager,
 				OnStoppedLeading: func() {
-					klog.Fatalf("leaderelection lost")
+					defer os.Exit(0)
+					klog.Warningf("Route Controller Manager received stop signal: leaderelection lost")
 				},
 			},
 		})
-	return true, nil
+	return nil
 }
 
 func startControllers(controllerContext *routecontrollers.ControllerContext) error {
