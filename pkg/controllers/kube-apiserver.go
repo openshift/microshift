@@ -70,8 +70,8 @@ type KubeAPIServer struct {
 	verbosity      int
 	configureErr   error // todo: report configuration errors immediately
 
-	masterURL       string
-	servingCertPath string
+	masterURL     string
+	servingCAPath string
 }
 
 func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
@@ -95,11 +95,12 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	aggregatorCAPath := cryptomaterial.CACertPath(cryptomaterial.AggregatorSignerDir(certsDir))
 	aggregatorClientCertDir := cryptomaterial.AggregatorClientCertDir(certsDir)
 	etcdClientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
-	kasSecretsDir := filepath.Join(certsDir, "kube-apiserver", "secrets")
-	servingCertsDir := filepath.Join(kasSecretsDir, "service-network-serving-certkey")
+	serviceNetworkServingCertDir := cryptomaterial.KubeAPIServerServiceNetworkServingCertDir(certsDir)
+	servingCert := cryptomaterial.ServingCertPath(serviceNetworkServingCertDir)
+	servingKey := cryptomaterial.ServingKeyPath(serviceNetworkServingCertDir)
 
 	if err := s.configureAuditPolicy(cfg); err != nil {
-		return fmt.Errorf("Failed to configure kube-apiserver audit policy: %w", err)
+		return fmt.Errorf("failed to configure kube-apiserver audit policy: %w", err)
 	}
 
 	// Get the apiserver port so we can set it as an argument
@@ -109,7 +110,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	}
 
 	s.masterURL = cfg.Cluster.URL
-	s.servingCertPath = filepath.Join(servingCertsDir, "tls.crt")
+	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
@@ -131,8 +132,8 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"requestheader-client-ca-file":     {aggregatorCAPath},
 			"service-account-signing-key-file": {microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
 			"service-node-port-range":          {cfg.Cluster.ServiceNodePortRange},
-			"tls-cert-file":                    {filepath.Join(servingCertsDir, "tls.crt")},
-			"tls-private-key-file":             {filepath.Join(servingCertsDir, "tls.key")},
+			"tls-cert-file":                    {servingCert},
+			"tls-private-key-file":             {servingKey},
 			"disable-admission-plugins": {
 				"authorization.openshift.io/RestrictSubjectBindings",
 				"authorization.openshift.io/ValidateRoleBindingRestriction",
@@ -164,6 +165,26 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 					BindAddress:   net.JoinHostPort("0.0.0.0", strconv.Itoa(apiServerPort)),
 					MinTLSVersion: string(fixedTLSProfile.MinTLSVersion),
 					CipherSuites:  crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
+					NamedCertificates: []configv1.NamedCertificate{
+						{
+							CertInfo: configv1.CertInfo{
+								CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
+								KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
+							},
+						},
+						{
+							CertInfo: configv1.CertInfo{
+								CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
+								KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
+							},
+						},
+						{
+							CertInfo: configv1.CertInfo{
+								CertFile: servingCert,
+								KeyFile:  servingKey,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -272,7 +293,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 				return false, err
 			}
 			restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
-			restConfig.CAFile = s.servingCertPath
+			restConfig.CAFile = s.servingCAPath
 
 			restClient, err := rest.UnversionedRESTClientFor(restConfig)
 			if err != nil {

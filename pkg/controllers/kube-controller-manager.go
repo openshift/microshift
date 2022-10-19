@@ -51,7 +51,6 @@ func (s *KubeControllerManager) Dependencies() []string { return []string{"kube-
 
 func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
-	caCertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	csrSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
 	kubeconfig := cfg.KubeConfigPath(config.KubeControllerManager)
 	kubeadmConfig := cfg.KubeConfigPath(config.KubeAdmin)
@@ -71,7 +70,7 @@ func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
 		"--cluster-cidr=" + cfg.Cluster.ClusterCIDR,
 		"--authorization-kubeconfig=" + kubeconfig,
 		"--authentication-kubeconfig=" + kubeconfig,
-		"--root-ca-file=" + caCertFile, // TODO: this should be service-account-token-ca.crt
+		"--root-ca-file=" + cryptomaterial.ServiceAccountTokenCABundlePath(certsDir),
 		"--bind-address=127.0.0.1",
 		"--secure-port=10257",
 		"--leader-elect=false",

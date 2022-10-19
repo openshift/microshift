@@ -186,6 +186,65 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 			},
 		),
 
+		// this signer replaces the loadbalancer signers of OCP, we don't need those
+		// in Microshift
+		cryptomaterial.NewCertificateSigner(
+			"kube-apiserver-external-signer",
+			cryptomaterial.KubeAPIServerExternalSigner(certsDir),
+			cryptomaterial.KubeAPIServerServingSignerCAValidityDays,
+		).WithServingCertificates(
+			&cryptomaterial.ServingCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "kube-external-serving",
+					ValidityDays: cryptomaterial.KubeAPIServerServingCertValidityDays,
+				},
+				Hostnames: []string{
+					cfg.NodeName,
+				},
+			},
+		),
+
+		cryptomaterial.NewCertificateSigner(
+			"kube-apiserver-localhost-signer",
+			cryptomaterial.KubeAPIServerLocalhostSigner(certsDir),
+			cryptomaterial.KubeAPIServerServingSignerCAValidityDays,
+		).WithServingCertificates(
+			&cryptomaterial.ServingCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "kube-apiserver-localhost-serving",
+					ValidityDays: cryptomaterial.KubeAPIServerServingCertValidityDays,
+				},
+				Hostnames: []string{
+					"127.0.0.1",
+					"localhost",
+				},
+			},
+		),
+
+		cryptomaterial.NewCertificateSigner(
+			"kube-apiserver-service-network-signer",
+			cryptomaterial.KubeAPIServerServiceNetworkSigner(certsDir),
+			cryptomaterial.KubeAPIServerServingSignerCAValidityDays,
+		).WithServingCertificates(
+			&cryptomaterial.ServingCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "kube-apiserver-service-network-serving",
+					ValidityDays: cryptomaterial.KubeAPIServerServingCertValidityDays,
+				},
+				Hostnames: []string{
+					"kubernetes",
+					"kubernetes.default",
+					"kubernetes.default.svc",
+					"kubernetes.default.svc.cluster.local",
+					"openshift",
+					"openshift.default",
+					"openshift.default.svc",
+					"openshift.default.svc.cluster.local",
+					apiServerServiceIP.String(),
+				},
+			},
+		),
+
 		//------------------------------
 		// 	ETCD CERTIFICATE SIGNER
 		//------------------------------
@@ -233,6 +292,11 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		"admin-kubeconfig-signer",
 		"kubelet-signer",
 		// kube-csr-signer is being added below
+	).WithCABundle(
+		cryptomaterial.ServiceAccountTokenCABundlePath(certsDir),
+		"kube-apiserver-external-signer",
+		"kube-apiserver-localhost-signer",
+		"kube-apiserver-service-network-signer",
 	).Complete()
 
 	if err != nil {
@@ -252,14 +316,6 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		return nil, nil, err
 	}
 
-	// kube-apiserver
-	if err := util.GenCerts("kube-apiserver", filepath.Join(microshiftDataDir, "/certs/kube-apiserver/secrets/service-network-serving-certkey"),
-		"tls.crt", "tls.key",
-		[]string{"kube-apiserver", cfg.NodeIP, cfg.NodeName, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes",
-			"localhost",
-			apiServerServiceIP.String()}); err != nil {
-		return nil, nil, err
-	}
 	if err := util.GenKeys(filepath.Join(microshiftDataDir, "/resources/kube-apiserver/secrets/service-account-key"),
 		"service-account.crt", "service-account.key"); err != nil {
 		return nil, nil, err

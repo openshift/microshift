@@ -30,6 +30,9 @@ const (
 
 	ServiceCAValidityDays            = 790
 	ServiceCAServingCertValidityDays = 730
+
+	KubeAPIServerServingSignerCAValidityDays = 365 * 10
+	KubeAPIServerServingCertValidityDays     = 365
 )
 
 func CertsDirectory(dataPath string) string { return filepath.Join(dataPath, "certs") }
@@ -127,6 +130,30 @@ func EtcdServingCertDir(certsDir string) string {
 	return filepath.Join(EtcdSignerDir(certsDir), "etcd-serving")
 }
 
+func KubeAPIServerExternalSigner(certsDir string) string {
+	return filepath.Join(certsDir, "kube-apiserver-external-signer")
+}
+
+func KubeAPIServerExternalServingCertDir(certsDir string) string {
+	return filepath.Join(KubeAPIServerExternalSigner(certsDir), "kube-external-serving")
+}
+
+func KubeAPIServerLocalhostSigner(certsDir string) string {
+	return filepath.Join(certsDir, "kube-apiserver-localhost-signer")
+}
+
+func KubeAPIServerLocalhostServingCertDir(certsDir string) string {
+	return filepath.Join(KubeAPIServerLocalhostSigner(certsDir), "kube-apiserver-localhost-serving")
+}
+
+func KubeAPIServerServiceNetworkSigner(certsDir string) string {
+	return filepath.Join(certsDir, "kube-apiserver-service-network-signer")
+}
+
+func KubeAPIServerServiceNetworkServingCertDir(certsDir string) string {
+	return filepath.Join(KubeAPIServerServiceNetworkSigner(certsDir), "kube-apiserver-service-network-serving")
+}
+
 // TotalClientCABundlePath returns the path to the cert bundle with all client certificate signers
 func TotalClientCABundlePath(certsDir string) string {
 	return filepath.Join(certsDir, "ca-bundle", "client-ca.crt")
@@ -140,4 +167,8 @@ func UltimateTrustBundlePath(certsDir string) string {
 // KubeletClientCAPath returns the path to the cert bundle with all client certificate signers that kubelet should respect
 func KubeletClientCAPath(certsDir string) string {
 	return filepath.Join(certsDir, "ca-bundle", "kubelet-ca.crt")
+}
+
+func ServiceAccountTokenCABundlePath(certsDir string) string {
+	return filepath.Join(certsDir, "ca-bundle", "service-account-token-ca.crt")
 }
