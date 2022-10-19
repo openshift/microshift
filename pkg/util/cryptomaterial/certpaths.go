@@ -33,6 +33,9 @@ const (
 
 	KubeAPIServerServingSignerCAValidityDays = 365 * 10
 	KubeAPIServerServingCertValidityDays     = 365
+
+	IngressSignerCAValidityDays    = 365 * 2
+	IngressServingCertValidityDays = 365
 )
 
 func CertsDirectory(dataPath string) string { return filepath.Join(dataPath, "certs") }
@@ -104,6 +107,10 @@ func ServiceCADir(certsDir string) string {
 
 func RouteControllerManagerServingCertDir(certsDir string) string {
 	return filepath.Join(ServiceCADir(certsDir), "route-controller-manager-serving")
+}
+
+func IngressCADir(certsDir string) string {
+	return filepath.Join(certsDir, "ingress-ca")
 }
 
 func AggregatorSignerDir(certsDir string) string {

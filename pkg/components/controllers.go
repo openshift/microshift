@@ -129,6 +129,7 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		extSvc = []string{
 			"components/openshift-router/service-cloud.yaml",
 		}
+		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply namespaces %v: %v", ns, err)
@@ -158,6 +159,18 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		klog.Warningf("Failed to apply external ingress svc %v: %v", extSvc, err)
 		return err
 	}
+	if err := assets.ApplySecretWithData(
+		servingKeypairSecret,
+		map[string][]byte{
+			"tls.crt": cfg.Ingress.ServingCertificate,
+			"tls.key": cfg.Ingress.ServingKey,
+		},
+		kubeconfigPath,
+	); err != nil {
+		klog.Warningf("failed to apply secret %q: %v", servingKeypairSecret, err)
+		return err
+	}
+
 	if err := assets.ApplyDeployments(apps, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err

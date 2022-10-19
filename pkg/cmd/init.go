@@ -186,6 +186,22 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 			},
 		),
 
+		cryptomaterial.NewCertificateSigner(
+			"ingress-ca",
+			cryptomaterial.IngressCADir(certsDir),
+			cryptomaterial.IngressSignerCAValidityDays,
+		).WithServingCertificates(
+			&cryptomaterial.ServingCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "router-default-serving",
+					ValidityDays: cryptomaterial.IngressServingCertValidityDays,
+				},
+				Hostnames: []string{
+					"router-default.apps." + cfg.Cluster.Domain,
+				},
+			},
+		),
+
 		// this signer replaces the loadbalancer signers of OCP, we don't need those
 		// in Microshift
 		cryptomaterial.NewCertificateSigner(
@@ -318,6 +334,11 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 
 	if err := util.GenKeys(filepath.Join(microshiftDataDir, "/resources/kube-apiserver/secrets/service-account-key"),
 		"service-account.crt", "service-account.key"); err != nil {
+		return nil, nil, err
+	}
+
+	cfg.Ingress.ServingCertificate, cfg.Ingress.ServingKey, err = certChains.GetCertKey("ingress-ca", "router-default-serving")
+	if err != nil {
 		return nil, nil, err
 	}
 
