@@ -4,6 +4,9 @@ data:
     .:5353 {
         bufsize 512
         errors
+        log . {
+            class error
+        }
         health {
             lameduck 20s
         }
@@ -20,6 +23,9 @@ data:
             denial 9984 30
         }
         reload
+    }
+    hostname.bind:5353 {
+        chaos
     }
 kind: ConfigMap
 metadata:
