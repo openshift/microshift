@@ -3,7 +3,7 @@ module github.com/openshift/microshift
 go 1.17
 
 require (
-	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // route-controller-manager
+	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // microshift
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/kelseyhightower/envconfig v1.4.0 // microshift
 	github.com/miekg/dns v1.1.35 // microshift
@@ -13,7 +13,7 @@ require (
 	github.com/openshift/client-go v0.0.0-20220915152853-9dfefb19db2e
 	github.com/openshift/cluster-policy-controller v0.0.0-20221011220439-6b430883a6e6
 	github.com/openshift/library-go v0.0.0-20221004125358-0d713c6520e2
-	github.com/openshift/route-controller-manager v0.0.0-20221011113449-47f161a94d2d
+	github.com/openshift/route-controller-manager v0.0.0-20221019143731-c232643fbc47
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
