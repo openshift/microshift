@@ -55,8 +55,15 @@ Run the following commands to configure SUDO, upgrade the system, install basic 
 ```bash
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf update -y
-sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
+sudo dnf install -y git cockpit make gcc selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
+export GO_VER=1.18.7; curl -L -o go${GO_VER}.linux-amd64.tar.gz https://go.dev/dl/go${GO_VER}.linux-amd64.tar.gz &&
+    sudo rm -rf /usr/local/go${GO_VER} && \
+    sudo mkdir -p /usr/local/go${GO_VER} && \
+    sudo tar -C /usr/local/go${GO_VER} -xzf go${GO_VER}.linux-amd64.tar.gz --strip-components 1 && \
+    sudo rm -rfv /usr/local/bin/{go,gofmt}
+    sudo ln --symbolic /usr/local/go1.18.7/bin/go /usr/local/go1.18.7/bin/gofmt /usr/local/bin/ && \
+    rm -rfv go${GO_VER}.linux-amd64.tar.gz
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
 

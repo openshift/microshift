@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # This script automates the VM creation steps described in the "MicroShift Development Environment on RHEL 8" document.
-# See https://github.com/ggiguash/microshift/blob/main/docs/devenv_rhel8.md#creating-vm
+# See https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#creating-vm
 #
 set -eo pipefail
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/devenv-builder
