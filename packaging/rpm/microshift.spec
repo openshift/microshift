@@ -51,7 +51,7 @@ Source0: https://github.com/openshift/microshift/archive/%{git_commit}/microshif
 ExclusiveArch: x86_64 aarch64
 
 BuildRequires: gcc
-BuildRequires: golang >= %{golang_version}
+# BuildRequires: golang >= %{golang_version} Temporarily disabled until go1.18 is available in RHEL8 repositories
 BuildRequires: make
 BuildRequires: policycoreutils
 BuildRequires: systemd

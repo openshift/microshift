@@ -1,6 +1,6 @@
 module github.com/openshift/microshift
 
-go 1.17
+go 1.18
 
 require (
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // route-controller-manager
