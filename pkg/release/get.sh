@@ -24,7 +24,8 @@ function get_images {
         arm|aarch64|arm64) get_image_list "${SCRIPT_DIR}/release_arm64.go" ;;
         all)
             for f in ${SCRIPT_DIR}/release*.go; do
-                get_image_list $f
+                shortf=$(echo $f | sed -e 's|.*pkg/|pkg/|')
+                get_image_list $f | sed -e "s|^|$shortf |g"
             done;;
         *) get_image_list "${SCRIPT_DIR}/release.go"              ;;
     esac

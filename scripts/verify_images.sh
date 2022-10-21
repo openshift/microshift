@@ -16,7 +16,7 @@ function debug() {
 }
 
 approved=true
-for image in $(./pkg/release/get.sh images all); do
+./pkg/release/get.sh images all | while read source_file image; do
     case $image in
         quay.io/microshift/*)
             debug "$image OK";;
@@ -29,7 +29,7 @@ for image in $(./pkg/release/get.sh images all); do
         registry.redhat.io/odf4/*)
             debug "$image OK";;
         *)
-            echo "$image is not from an approved location" 1>&2
+            echo "$image used in $source_file is not from an approved location" 1>&2
             approved=false;;
     esac
 done
