@@ -120,32 +120,26 @@ spec:
           trap quit TERM INT
 
           bracketify() { case "$1" in *:*) echo "[$1]" ;; *) echo "$1" ;; esac }
+          compact() {
+            while true; do
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovn${1}_db.ctl --timeout=5 ovsdb-server/compact 2>/dev/null || true
+              sleep 600
+            done
+          }
           # initialize variables
           db="nb"
           ovn_db_file="/etc/ovn/ovn${db}_db.db"
-
           OVN_ARGS="--db-nb-cluster-local-port=9643 --no-monitor"
 
           echo "$(date -Iseconds) - starting nbdb"
-          initialize="false"
+          exec /usr/share/ovn/scripts/ovn-ctl \
+            ${OVN_ARGS} \
+            --ovn-nb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
+            run_nb_ovsdb &
 
-          if [[ ! -e ${ovn_db_file} ]]; then
-            initialize="true"
-          fi
-
-          if [[ "${initialize}" == "true" ]]; then
-                exec /usr/share/ovn/scripts/ovn-ctl ${OVN_ARGS} \
-                --ovn-nb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
-                run_nb_ovsdb &
-
-                wait $!
-          else
-            exec /usr/share/ovn/scripts/ovn-ctl ${OVN_ARGS} \
-              --ovn-nb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
-              run_nb_ovsdb &
-
-              wait $!
-          fi
+          db_pid=$!
+          compact $db &
+          wait $db_pid
 
         lifecycle:
           postStart:
@@ -233,7 +227,7 @@ spec:
         - /bin/bash
         - -c
         - |
-          set -xm
+          set -xem
           if [[ -f /env/_master ]]; then
             set -o allexport
             source /env/_master
@@ -251,6 +245,12 @@ spec:
           trap quit TERM INT
 
           bracketify() { case "$1" in *:*) echo "[$1]" ;; *) echo "$1" ;; esac }
+          compact() {
+            while true; do
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovn${1}_db.ctl --timeout=5 ovsdb-server/compact 2>/dev/null || true
+              sleep 600
+            done
+          }
 
           # initialize variables
           db="sb"
@@ -259,25 +259,13 @@ spec:
           OVN_ARGS="--db-sb-cluster-local-port=9644 --no-monitor"
 
           echo "$(date -Iseconds) - starting sbdb "
-          initialize="false"
-
-          if [[ ! -e ${ovn_db_file} ]]; then
-            initialize="true"
-          fi
-
-          if [[ "${initialize}" == "true" ]]; then
-                exec /usr/share/ovn/scripts/ovn-ctl ${OVN_ARGS} \
-                --ovn-sb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
-                run_sb_ovsdb &
-
-                wait $!
-          else
-            exec /usr/share/ovn/scripts/ovn-ctl ${OVN_ARGS} \
+          exec /usr/share/ovn/scripts/ovn-ctl \
+            ${OVN_ARGS} \
             --ovn-sb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
             run_sb_ovsdb &
-
-            wait $!
-          fi
+          db_pid=$!
+          compact $db &
+          wait $db_pid
         lifecycle:
           postStart:
             exec:
