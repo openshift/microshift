@@ -56,8 +56,8 @@ export GO_VER=1.18.7; curl -L -o go${GO_VER}.linux-amd64.tar.gz https://go.dev/d
     sudo rm -rf /usr/local/go${GO_VER} && \
     sudo mkdir -p /usr/local/go${GO_VER} && \
     sudo tar -C /usr/local/go${GO_VER} -xzf go${GO_VER}.linux-amd64.tar.gz --strip-components 1 && \
-    sudo rm -rfv /usr/local/bin/{go,gofmt}
-    sudo ln --symbolic /usr/local/go1.18.7/bin/go /usr/local/go1.18.7/bin/gofmt /usr/local/bin/ && \
+    sudo rm -rfv /usr/local/bin/{go,gofmt} && \
+    sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/ && \
     rm -rfv go${GO_VER}.linux-amd64.tar.gz
 
 # Build MicroShift
