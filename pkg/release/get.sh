@@ -22,6 +22,10 @@ function get_images {
     case $arch in
         x86_64|amd64) get_image_list "${SCRIPT_DIR}/release_amd64.go" ;;
         arm|aarch64|arm64) get_image_list "${SCRIPT_DIR}/release_arm64.go" ;;
+        all)
+            for f in ${SCRIPT_DIR}/release*.go; do
+                get_image_list $f
+            done;;
         *) get_image_list "${SCRIPT_DIR}/release.go"              ;;
     esac
 }
@@ -38,5 +42,3 @@ case $1 in
     images) get_images $2 ;;
     *) usage
 esac
-
-
