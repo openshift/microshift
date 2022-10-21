@@ -14,6 +14,7 @@ MICROSHIFT_RPM_SOURCE=${ROOTDIR}/_output/rpmbuild/
 AUTHORIZED_KEYS_FILE=
 AUTHORIZED_KEYS=
 PROMETHEUS=false
+EMBED_CONTAINERS=false
 STARTTIME=$(date +%s)
 BUILDDIR=${ROOTDIR}/_output/image-builder
 
@@ -30,8 +31,8 @@ usage() {
     echo "Usage: $(basename $0) <-pull_secret_file path_to_file> [OPTION]..."
     echo ""
     echo "  -pull_secret_file path_to_file"
-    echo "          Path to a file containing the OpenShift pull secret, which"
-    echo "          can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret"
+    echo "          Path to a file containing the OpenShift pull secret, which can be"
+    echo "          obtained from https://console.redhat.com/openshift/downloads#tool-pull-secret"
     echo ""
     echo "Optional arguments:"
     echo "  -microshift_rpms path_or_URL"
@@ -40,15 +41,21 @@ usage() {
     echo "  -custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm"
     echo "          Path to one or more comma-separated RPM packages to be"
     echo "          included in the image (default: none)"
+    echo "  -embed_containers"
+    echo "          Embed the MicroShift container dependencies in the image using the"
+    echo "          'pkg/release/get.sh images \$(uname -i)' command to get their list"
     echo "  -ostree_server_name name_or_ip"
     echo "          Name or IP address and optionally port of the ostree"
     echo "          server (default: ${OSTREE_SERVER_NAME})"
     echo "  -lvm_sysroot_size num_in_MB"
     echo "          Size of the system root LVM partition. The remaining"
     echo "          disk space will be allocated for data (default: ${LVM_SYSROOT_SIZE})"
-    echo "  -authorized_keys_file"
+    echo "  -authorized_keys_file path_to_file"
     echo "          Path to an SSH authorized_keys file to allow SSH access"
     echo "          into the default 'redhat' account"
+    echo "  -prometheus"
+    echo "          Add Prometheus process exporter to the image. See"
+    echo "          https://github.com/ncabatoff/process-exporter for more information"
     exit 1
 }
 
@@ -63,7 +70,7 @@ waitfor_image() {
     echo "$(date +'%Y-%m-%d %H:%M:%S') STARTED"
 
     local status=$(sudo composer-cli compose status | grep ${uuid} | awk '{print $2}')
-    while [ "${status}" = "RUNNING" ]; do
+    while [ "${status}" = "RUNNING" -o "${status}" = "WAITING" ]; do
         sleep 10
         status=$(sudo composer-cli compose status | grep ${uuid} | awk '{print $2}')
         echo -en "$(date +'%Y-%m-%d %H:%M:%S') ${status}\r"
@@ -152,6 +159,11 @@ while [ $# -gt 0 ] ; do
         [ -z "${CUSTOM_RPM_FILES}" ] && usage "Custom RPM packages not specified"
         shift
         ;;
+
+    -embed_containers)
+        EMBED_CONTAINERS=true
+        shift
+        ;;
     -ostree_server_name)
         shift
         OSTREE_SERVER_NAME="$1"
@@ -180,6 +192,7 @@ while [ $# -gt 0 ] ; do
         ;;
     esac
 done
+
 if [ -z "${OSTREE_SERVER_NAME}" ] || [ -z "${OCP_PULL_SECRET_FILE}" ] ; then
     usage
 fi
@@ -216,6 +229,7 @@ rm -rf microshift-local 2>/dev/null || true
 if [[ "${MICROSHIFT_RPM_SOURCE}" == http* ]] ; then
     wget -q -nd -r -L -P microshift-local -A rpm "${MICROSHIFT_RPM_SOURCE}"
 else
+    [ ! -d "${MICROSHIFT_RPM_SOURCE}" ] && echo "MicroShift RPM path '${MICROSHIFT_RPM_SOURCE}' does not exist" && exit 1
     cp -TR "${MICROSHIFT_RPM_SOURCE}" microshift-local
 fi
 # Exit if no RPM packages were found
@@ -248,7 +262,7 @@ if ${PROMETHEUS} ; then
   url=https://github.com/${owner}/${repo}/releases/download/${version}/
   file=${repo}_${version#v}_linux_amd64.rpm
 
-  title "Downloading prometheus exporter(s)"
+  title "Downloading Prometheus exporter(s)"
   wget -q ${url}${file}
   CUSTOM_RPM_FILES+="$(pwd)/${file},"
 fi
@@ -275,13 +289,6 @@ done
 title "Preparing blueprints"
 cp -f ${SCRIPTDIR}/config/{blueprint_v0.0.1.toml,installer.toml} .
 if [ ! -z ${CUSTOM_RPM_FILES} ] ; then
-  if ${PROMETHEUS} ; then
-    cat >> blueprint_v0.0.1.toml <<EOF
-
-[customizations.firewall]
-ports = ["9256:tcp"]
-EOF
-  fi
     for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
         rpm_name=$(rpm -qp $rpm --queryformat "%{NAME}")
         rpm_version=$(rpm -qp $rpm --queryformat "%{VERSION}")
@@ -292,6 +299,34 @@ name = "${rpm_name}"
 version = "${rpm_version}"
 EOF
     done
+fi
+
+# Add container images
+if ${EMBED_CONTAINERS} ; then
+    # TODO: This should be removed when RHEL 8.x stream gets an up-to-date package
+    # Include up-to-date ostree packages in the image builder to support whiteouts    
+    repo_name=ostree-copr
+    cp -f ${SCRIPTDIR}/config/${repo_name}.toml .
+    sudo composer-cli sources delete ${repo_name} 2>/dev/null || true
+    sudo composer-cli sources add ${BUILDDIR}/${repo_name}.toml
+
+    # Add the list of all the container images
+    for img in $(${ROOTDIR}/pkg/release/get.sh images $(uname -i)) ; do
+        cat >> blueprint_v0.0.1.toml <<EOF
+
+[[containers]]
+source = "${img}"
+EOF
+    done
+fi
+
+# Add the firewall customization required by Prometheus
+if ${PROMETHEUS} ; then
+    cat >> blueprint_v0.0.1.toml <<EOF
+
+[customizations.firewall]
+ports = ["9256:tcp"]
+EOF
 fi
 
 build_image blueprint_v0.0.1.toml "${IMGNAME}-container" 0.0.1 edge-container

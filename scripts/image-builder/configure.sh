@@ -1,7 +1,7 @@
 #!/bin/bash
 set -exo pipefail
 
-sudo dnf install -y git osbuild-composer composer-cli \
+sudo dnf install -y git osbuild-composer composer-cli ostree rpm-ostree \
     cockpit-composer bash-completion podman genisoimage \
     createrepo syslinux yum-utils selinux-policy-devel jq wget lorax rpm-build
 sudo systemctl enable osbuild-composer.socket --now

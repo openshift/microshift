@@ -44,8 +44,8 @@ Run the build script without arguments to see its usage.
 Usage: build.sh <-pull_secret_file path_to_file> [OPTION]...
 
   -pull_secret_file path_to_file
-          Path to a file containing the OpenShift pull secret, which
-          can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret
+          Path to a file containing the OpenShift pull secret, which can be
+          obtained from https://console.redhat.com/openshift/downloads#tool-pull-secret
 
 Optional arguments:
   -microshift_rpms path_or_URL
@@ -54,15 +54,21 @@ Optional arguments:
   -custom_rpms /path/to/file1.rpm,...,/path/to/fileN.rpm
           Path to one or more comma-separated RPM packages to be
           included in the image (default: none)
+  -embed_containers
+          Embed the MicroShift container dependencies in the image using the
+          'pkg/release/get.sh images $(uname -i)' command to get their list
   -ostree_server_name name_or_ip
           Name or IP address and optionally port of the ostree
           server (default: 127.0.0.1:8080)
   -lvm_sysroot_size num_in_MB
           Size of the system root LVM partition. The remaining
           disk space will be allocated for data (default: 8192)
-  -authorized_keys_file
+  -authorized_keys_file path_to_file
           Path to an SSH authorized_keys file to allow SSH access
           into the default 'redhat' account
+  -prometheus
+          Add Prometheus process exporter to the image. See
+          https://github.com/ncabatoff/process-exporter for more information
 ```
 
 Continue by running the build script with the pull secret file argument and wait until build process is finished. It may take over 30 minutes to complete a full build cycle.
@@ -112,50 +118,41 @@ $ sudo vgdisplay -s
 > Unallocated disk space of 11GB size remains in the `rhel` volume group to be used by the CSI driver.
 
 ### Offline Containers
-The `scripts/image-builder/build.sh` script supports a special mode for including user-specific RPM files into the generated ISO. The remainder of this section demonstrates how to generate container image RPMs for MicroShift and include them in the installation ISO.
+The `scripts/image-builder/build.sh` script supports a special mode for including the MicroShift container image dependencies into the generated ISO. When the container images required by MicroShift are preinstalled, `CRI-O` does not attempt to pull them when MicroShift service is first started, saving network bandwidth and avoiding external network connections.
 
-When the container images required by MicroShift are preinstalled, `CRI-O` does not attempt to pull them when MicroShift service is first started, saving network bandwidth and avoiding external network connections.
->If user workloads depend on additional container images, the respective RPMs need to be created by the user separately.
-
-Start by running the `packaging/rpm/make-microshift-images-rpm.sh` script without arguments to see its usage.
+Image Builder needs to be configured to use the pull secret for downloading container images during the build procedure. 
+Run the following commands to reuse the `CRI-O` pull secret file.
 ```bash
-$ ~/microshift/packaging/rpm/make-microshift-images-rpm.sh
-Usage:
-   make-microshift-images-rpm.sh rpm  <pull_secret> <architectures> <rpm_mock_target>
-   make-microshift-images-rpm.sh srpm <pull_secret> <architectures>
-   make-microshift-images-rpm.sh copr <pull_secret> <architectures> <copr_repo>
-
-pull_secret:     Path to a file containing the OpenShift pull secret
-architectures:   One or more RPM architectures
-rpm_mock_target: Target for building RPMs inside a chroot (e.g. 'rhel-8-x86_64')
-copr_repo:       Target Fedora Copr repository name (e.g. '@redhat-et/microshift-containers')
-
-Notes:
- - The OpenShift pull secret can be downloaded from https://console.redhat.com/openshift/downloads#tool-pull-secret
- - Use 'x86_64:amd64' or 'aarch64:arm64' as an architecture value
- - See /etc/mock/*.cfg for possible RPM mock target values
+sudo mkdir -p /etc/osbuild-worker
+sudo ln -s /etc/crio/openshift-pull-secret /etc/osbuild-worker/pull-secret.json
+sudo tee /etc/osbuild-worker/osbuild-worker.toml &>/dev/null <<EOF
+[containers]
+auth_file_path = "/etc/osbuild-worker/pull-secret.json"
+EOF
 ```
 
-Run the script in the `rpm` mode to pull the images required by MicroShift and generate the RPMs including those image data.
+> **NOTE** <br>
+> Embedding container images in the generated ISO requires the functionality from the latest version of the `osbuild-composer` and `rpm-ostree` packages.
+> This functionality will be available in the future releases of the RHEL 8 operating system.
+
+To install the necessary functionality, run the following command to upgrade your system with the up-to-date software from the `copr` repository.
 ```bash
-~/microshift/packaging/rpm/make-microshift-images-rpm.sh rpm ~/.pull-secret.json x86_64:amd64 rhel-8-x86_64
+~/microshift/hack/osbuild2copr.sh copr
 ```
 
-If the procedure runs successfully, the RPM artifacts can be found in the `paack-result` directory.
+> If necessary, rerun the `hack/osbuild2copr.sh` script with the `appstream` argument to revert to the standard `osbuild-composer` and `rpm-ostree` packages.
+
+Proceed by running the build script with the `-embed_containers` argument to include the dependent container images into the generated ISO.
 ```bash
-$ find ~/microshift/_output/paack-result -name microshift-containers-\*.rpm
-/home/microshift/microshift/_output/paack-result/microshift-containers-4.12.0-1.x86_64.rpm
-/home/microshift/microshift/_output/paack-result/microshift-containers-4.12.0-1.src.rpm
+~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -embed_containers
 ```
 
-Finally, run the build script with the `-custom_rpms` argument to include the specified container image RPMs into the generated ISO.
-```bash
-CONTAINERS_RPM=$(find ~/microshift/_output/paack-result -name microshift-containers-\*.$(uname -i).rpm)
-~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -custom_rpms $CONTAINERS_RPM
-```
-> If user-specific container images need to be included into the ISO, multiple comma-separated RPM files can be specified as the `-custom_rpms` argument value.
+> If user workloads depend on additional container images, they need to be included by the user separately.
 
-When executed in this mode, the `scripts/image-builder/build.sh` script performs an extra step to set up a custom RPM repository with one or more specified RPM files as a source. These RPMs are then appended to the blueprint so that they are installed when the operating system boots for the first time.
+When executed in this mode, the `scripts/image-builder/build.sh` script performs an extra step to append the list of the MicroShift container images to the blueprint so that they are installed when the operating system boots for the first time. The list of these images can be obtained by the following command.
+```bash
+~/microshift/pkg/release/get.sh images $(uname -i)
+```
 
 ## Install MicroShift for Edge
 Log into the host machine using your user credentials. The remainder of this section describes how to install a virtual machine running RHEL for Edge OS containing MicroShift binaries.
@@ -256,8 +253,7 @@ registry.redhat.io/openshift4/ose-csi-livenessprobe           <none>            
 registry.redhat.io/openshift4/ose-csi-node-driver-registrar   <none>              161662e2189a0       350MB
 ```
 
-Finally, check if MicroShift is up and running by executing `oc` commands.
+Finally, wait until all the MicroShift pods are up and running.
 ```bash
-oc get cs
-oc get pods -A
+watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A
 ```
