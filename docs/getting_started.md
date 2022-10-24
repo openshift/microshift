@@ -11,6 +11,10 @@ The remainder of this document describes how to install a virtual machine runnin
 Log into the hypervisor machine using your user credentials.
 
 Run the following command to install the necessary components for the [libvirt](https://libvirt.org/) virtualization platform and its [QEMU KVM](https://libvirt.org/drvqemu.html) hypervisor driver.
+> **Note for Other Virtualization Platform Users** <br>
+> Implement the virtual machine creation guidelines from [Bootstrap MicroShift](#bootstrap-microshift) using your virtualization platform and apply one of the following configuration steps:
+> * When creating a virtual machine, pass the `inst.ks=...` boot option pointing to the [microshift-starter.ks](https://raw.githubusercontent.com/openshift/microshift/main/docs/config/microshift-starter.ks) kickstart file
+> * After creating a virtual machine, manually execute the configuration steps from the [microshift-starter.ks](https://raw.githubusercontent.com/openshift/microshift/main/docs/config/microshift-starter.ks) kickstart file
 
 ```bash
 sudo dnf install -y libvirt virt-manager virt-viewer libvirt-client qemu-kvm qemu-img
@@ -18,6 +22,8 @@ sudo dnf install -y libvirt virt-manager virt-viewer libvirt-client qemu-kvm qem
 
 Download the [Red Hat Enterprise Linux 8.6 DVD ISO](https://developers.redhat.com/content-gateway/file/rhel-8.6-x86_64-dvd.iso) image for the x86_64 architecture from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site and copy the file to the `/var/lib/libvirt/images` directory.
 > Other architectures, versions or flavors of operating systems are not supported. For this setup, only use the RHEL 8.6 DVD image for x86_64 architecture.
+
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~/.pull-secret.json` file.
 
 ## Bootstrap MicroShift
 
@@ -56,7 +62,21 @@ Is it most convenient to access the MicroShift virtual machine using SSH. Run th
 sudo virsh domifaddr microshift-starter
 ```
 
-Log into the MicroShift virtual machine using `redhat:redhat` credentials and run the following commands to configure MicroShift access.
+First, copy your pull secret file to the MicroShift virtual machine using `redhat:redhat` credentials.
+
+```bash
+USHIFT_IP=192.168.122.2
+scp ~/.pull-secret.json redhat@${USHIFT_IP}:
+```
+
+Log into the MicroShift virtual machine using `redhat:redhat` credentials. Run the following commands to configure `CRI-O` for using the pull secret and start the MicroShift service.
+
+```bash
+sudo cp ~redhat/.pull-secret.json /etc/crio/openshift-pull-secret
+sudo systemctl enable --now microshift.service
+```
+
+Proceed by configuring MicroShift access for the `redhat` user account.
 
 ```bash
 mkdir ~/.kube

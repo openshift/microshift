@@ -58,12 +58,11 @@ rm -f selinux-policy*.rpm
 dnf copr enable -y @redhat-et/microshift-testing
 dnf install -y microshift
 
-# Enable MicroShift service to be started after reboot
-systemctl enable microshift.service
+# MicroShift service should be enabled later after setting up CRI-O with the pull secret
 
 # Configure firewalld
-sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 
-sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
+firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
 
 # Install the oc and kubectl utilities
 curl -LO -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
