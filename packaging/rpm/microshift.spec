@@ -154,7 +154,15 @@ install -p -m755 hack/cleanup.sh %{buildroot}%{_bindir}/cleanup-all-microshift-d
 restorecon -v %{buildroot}%{_bindir}/microshift
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
-install -p -m644 packaging/crio.conf.d/microshift.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift.conf
+
+%ifarch %{arm} aarch64
+install -p -m644 packaging/crio.conf.d/microshift_arm64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift.conf
+%endif
+
+%ifarch x86_64
+install -p -m644 packaging/crio.conf.d/microshift_amd64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift.conf
+%endif
+
 install -p -m644 packaging/crio.conf.d/microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
 
 install -d -m755  %{buildroot}%{_sysconfdir}/NetworkManager/conf.d
