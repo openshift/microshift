@@ -32,6 +32,7 @@ For production deployments, MicroShift can be run on bare metal hardware or hype
 ## User Documentation
 To install, configure and run MicroShift, refer to the following documentation:
 
+- [Getting Started with MicroShift](./docs/getting_started.md)
 - [MicroShift Configuration](./docs/howto_config.md)
 - [MicroShift Behind Proxy](./docs/howto_http_proxy.md)
 - [Load Balancer for User Workloads](./docs/howto_load_balancer.md)
