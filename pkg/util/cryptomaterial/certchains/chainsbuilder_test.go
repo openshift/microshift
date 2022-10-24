@@ -33,14 +33,14 @@ func Test_certificateChains_Complete(t *testing.T) {
 			testChains: NewCertificateChains(
 				NewCertificateSigner("test-signer1", filepath.Join(tmpDir, "test-signer1"), 1).
 					WithClientCertificates(&ClientCertificateSigningRequestInfo{
-						CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+						CSRMeta: CSRMeta{
 							Name:         "test-client1",
 							ValidityDays: 1,
 						},
 						UserInfo: &user.DefaultInfo{Name: "test-user", Groups: []string{"test-group1", "test-group2"}},
 					},
 						&ClientCertificateSigningRequestInfo{
-							CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+							CSRMeta: CSRMeta{
 								Name:         "test-client2",
 								ValidityDays: 1,
 							},
@@ -49,7 +49,7 @@ func Test_certificateChains_Complete(t *testing.T) {
 					),
 				NewCertificateSigner("test-signer2", filepath.Join(tmpDir, "test-signer2"), 1).
 					WithServingCertificates(&ServingCertificateSigningRequestInfo{
-						CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+						CSRMeta: CSRMeta{
 							Name:         "test-server1",
 							ValidityDays: 1,
 						},

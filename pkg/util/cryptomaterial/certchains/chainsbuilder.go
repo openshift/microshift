@@ -2,13 +2,11 @@ package certchains
 
 import (
 	"fmt"
-
-	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
 type CertificateChainsBuilder interface {
 	WithSigners(signers ...CertificateSignerBuilder) CertificateChainsBuilder
-	WithCABundle(bundlePath string, signerNames ...string) CertificateChainsBuilder
+	WithCABundle(bundlePath string, signerNames ...[]string) CertificateChainsBuilder
 	Complete() (*CertificateChains, error)
 }
 
@@ -17,14 +15,14 @@ type certificateChains struct {
 
 	// fileBundles maps fileName -> signers, where fileName is the filename of a CA bundle
 	// where PEM certificates should be stored
-	fileBundles map[string][]string
+	fileBundles map[string][][]string
 }
 
 func NewCertificateChains(signers ...CertificateSignerBuilder) CertificateChainsBuilder {
 	return &certificateChains{
 		signers: signers,
 
-		fileBundles: make(map[string][]string),
+		fileBundles: make(map[string][][]string),
 	}
 }
 
@@ -33,7 +31,7 @@ func (cs *certificateChains) WithSigners(signers ...CertificateSignerBuilder) Ce
 	return cs
 }
 
-func (cs *certificateChains) WithCABundle(bundlePath string, signerNames ...string) CertificateChainsBuilder {
+func (cs *certificateChains) WithCABundle(bundlePath string, signerNames ...[]string) CertificateChainsBuilder {
 	cs.fileBundles[bundlePath] = signerNames
 	return cs
 }
@@ -56,20 +54,16 @@ func (cs *certificateChains) Complete() (*CertificateChains, error) {
 		completeChains.signers[completedSigner.signerName] = completedSigner
 	}
 
-	bundlePreWrite := make(map[string][]byte, len(cs.fileBundles))
-	for bundlePath, signers := range cs.fileBundles {
+	for bundle, signers := range cs.fileBundles {
 		for _, s := range signers {
-			signerCACertPEM, err := completeChains.GetSigner(s).GetSignerCertPEM()
-			if err != nil {
-				return nil, fmt.Errorf("failed to retrieve cert PEM for signer %q: %w", s, err)
+			signerObj := completeChains.GetSigner(s...)
+			if signerObj == nil {
+				return nil, NewSignerNotFound(signerObj.signerName)
 			}
-			bundlePreWrite[bundlePath] = append(bundlePreWrite[bundlePath], append(signerCACertPEM, byte('\n'))...)
-		}
-	}
 
-	for bundlePath, pemChain := range bundlePreWrite {
-		if err := cryptomaterial.AppendCertsToFile(bundlePath, pemChain); err != nil {
-			return nil, err
+			if err := signerObj.AddToBundles(bundle); err != nil {
+				return nil, fmt.Errorf("failed adding the signer %q to CA bundle %q: %v", signerObj.signerName, bundle, err)
+			}
 		}
 	}
 

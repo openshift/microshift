@@ -48,6 +48,14 @@ func (cs *CertificateChains) GetCertKey(certPath ...string) ([]byte, []byte, err
 	return signer.GetCertKey(certPath[len(certPath)-1])
 }
 
+func (cs *CertificateChains) Regenerate(certPath ...string) error {
+	if signer := cs.GetSigner(certPath[0]); signer != nil {
+		return signer.Regenerate(certPath[1:]...)
+	}
+
+	return fmt.Errorf("no such signer: %s", certPath[0])
+}
+
 type CertWalkFunc func(certPath []string, c x509.Certificate) error
 
 // WalkChains traverses through the trust chain starting at `rootPath` and applies

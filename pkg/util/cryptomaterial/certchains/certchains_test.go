@@ -16,21 +16,21 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 	ret, err := NewCertificateChains(
 		NewCertificateSigner("test-signer1", filepath.Join(tmpDir, "test-signer1"), 30).
 			WithClientCertificates(&ClientCertificateSigningRequestInfo{
-				CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+				CSRMeta: CSRMeta{
 					Name:         "test-client1",
 					ValidityDays: 15,
 				},
 				UserInfo: &user.DefaultInfo{Name: "test-user", Groups: []string{"test-group1", "test-group2"}},
 			},
 				&ClientCertificateSigningRequestInfo{
-					CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+					CSRMeta: CSRMeta{
 						Name:         "test-client2",
 						ValidityDays: 15,
 					},
 					UserInfo: &user.DefaultInfo{Name: "test-user2"},
 				},
 			).WithServingCertificates(&ServingCertificateSigningRequestInfo{
-			CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+			CSRMeta: CSRMeta{
 				Name:         "test-signer1-server1",
 				ValidityDays: 15,
 			},
@@ -38,7 +38,7 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 		}).WithSubCAs(
 			NewCertificateSigner("test-signer1-subca", filepath.Join(tmpDir, "test-signer1", "intemediateDir", "subca"), 30).
 				WithServingCertificates(&ServingCertificateSigningRequestInfo{
-					CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+					CSRMeta: CSRMeta{
 						Name:         "test-signer1-subca-server1",
 						ValidityDays: 15,
 					},
@@ -46,7 +46,7 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 				}).WithSubCAs(
 				NewCertificateSigner("test-signer1-subca-too", filepath.Join(tmpDir, "test-signer1", "intemediateDir", "subca", "subca-too"), 30).
 					WithClientCertificates(&ClientCertificateSigningRequestInfo{
-						CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+						CSRMeta: CSRMeta{
 							Name:         "subca-too-test-client1",
 							ValidityDays: 15,
 						},
@@ -54,7 +54,7 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 					}).WithSubCAs(
 					NewCertificateSigner("test-signer1-subca-too-too", filepath.Join(tmpDir, "test-signer1", "intemediateDir", "subca", "subca-too", "subca-too-too"), 30).
 						WithClientCertificates(&ClientCertificateSigningRequestInfo{
-							CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+							CSRMeta: CSRMeta{
 								Name:         "subca-too-too-test-client2",
 								ValidityDays: 10,
 							},
@@ -66,7 +66,7 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 		),
 		NewCertificateSigner("test-signer2", filepath.Join(tmpDir, "test-signer2"), 30).
 			WithServingCertificates(&ServingCertificateSigningRequestInfo{
-				CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+				CSRMeta: CSRMeta{
 					Name:         "test-signer2-server1",
 					ValidityDays: 15,
 				},
@@ -74,7 +74,7 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 			}),
 		NewCertificateSigner("test-signer3", filepath.Join(tmpDir, "test-signer3"), 20).
 			WithServingCertificates(&ServingCertificateSigningRequestInfo{
-				CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+				CSRMeta: CSRMeta{
 					Name:         "test-signer3-server1",
 					ValidityDays: 15,
 				},
@@ -82,7 +82,7 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 			}).
 			WithSubCAs(NewCertificateSigner("test-signer3-subca1", filepath.Join(tmpDir, "test-signer3-subca1"), 30).
 				WithClientCertificates(&ClientCertificateSigningRequestInfo{
-					CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+					CSRMeta: CSRMeta{
 						Name:         "test-client1",
 						ValidityDays: 15,
 					},
@@ -90,7 +90,7 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 				}),
 			).
 			WithPeerCertificiates(&PeerCertificateSigningRequestInfo{
-				CertificateSigningRequestInfo: CertificateSigningRequestInfo{
+				CSRMeta: CSRMeta{
 					Name:         "test-peer1",
 					ValidityDays: 15,
 				},

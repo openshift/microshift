@@ -6,14 +6,6 @@ import (
 	"path/filepath"
 )
 
-func AddToTotalClientCABundle(certsDir string, cacerts ...[]byte) error {
-	return AppendCertsToFile(TotalClientCABundlePath(certsDir), cacerts...)
-}
-
-func AddToKubeletClientCABundle(certsDir string, cacerts ...[]byte) error {
-	return AppendCertsToFile(KubeletClientCAPath(certsDir), cacerts...)
-}
-
 func AppendCertsToFile(bundlePath string, certs ...[]byte) error {
 	// ensure parent dir
 	if err := os.MkdirAll(filepath.Dir(bundlePath), os.FileMode(0755)); err != nil {
