@@ -7,14 +7,14 @@ import (
 )
 
 func AddToTotalClientCABundle(certsDir string, cacerts ...[]byte) error {
-	return appendCertsToFile(TotalClientCABundlePath(certsDir), cacerts...)
+	return AppendCertsToFile(TotalClientCABundlePath(certsDir), cacerts...)
 }
 
 func AddToKubeletClientCABundle(certsDir string, cacerts ...[]byte) error {
-	return appendCertsToFile(KubeletClientCAPath(certsDir), cacerts...)
+	return AppendCertsToFile(KubeletClientCAPath(certsDir), cacerts...)
 }
 
-func appendCertsToFile(bundlePath string, certs ...[]byte) error {
+func AppendCertsToFile(bundlePath string, certs ...[]byte) error {
 	// ensure parent dir
 	if err := os.MkdirAll(filepath.Dir(bundlePath), os.FileMode(0755)); err != nil {
 		return err

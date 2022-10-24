@@ -1,4 +1,4 @@
-package cryptomaterial
+package certchains
 
 import (
 	"crypto/x509"
@@ -14,135 +14,22 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/openshift/library-go/pkg/crypto"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
-type certificateChains struct {
-	signers []*certificateSigner
-
-	// fileBundles maps fileName -> signers, where fileName is the filename of a CA bundle
-	// where PEM certificates should be stored
-	fileBundles map[string][]string
-}
-
-type CertificateChains struct {
-	signers map[string]*CertificateSigner
-}
-
-func NewCertificateChains(signers ...*certificateSigner) *certificateChains {
-	return &certificateChains{
-		signers: signers,
-
-		fileBundles: make(map[string][]string),
-	}
-}
-
-func (cs *certificateChains) WithSigners(signers ...*certificateSigner) *certificateChains {
-	cs.signers = append(cs.signers, signers...)
-	return cs
-}
-
-func (cs *certificateChains) WithCABundle(bundlePath string, signerNames ...string) *certificateChains {
-	cs.fileBundles[bundlePath] = signerNames
-	return cs
-}
-
-func (cs *certificateChains) Complete() (*CertificateChains, error) {
-	completeChains := &CertificateChains{
-		signers: make(map[string]*CertificateSigner),
-	}
-
-	for _, s := range cs.signers {
-		s := s
-		if _, ok := completeChains.signers[s.signerName]; ok {
-			return nil, fmt.Errorf("signer name clash: %s", s.signerName)
-		}
-
-		completedSigner, err := s.Complete()
-		if err != nil {
-			return nil, fmt.Errorf("failed to complete signer %q: %w", s.signerName, err)
-		}
-		completeChains.signers[completedSigner.signerName] = completedSigner
-	}
-
-	bundlePreWrite := make(map[string][]byte, len(cs.fileBundles))
-	for bundlePath, signers := range cs.fileBundles {
-		for _, s := range signers {
-			signerCACertPEM, err := completeChains.GetSigner(s).GetSignerCertPEM()
-			if err != nil {
-				return nil, fmt.Errorf("failed to retrieve cert PEM for signer %q: %w", s, err)
-			}
-			bundlePreWrite[bundlePath] = append(bundlePreWrite[bundlePath], append(signerCACertPEM, byte('\n'))...)
-		}
-	}
-
-	for bundlePath, pemChain := range bundlePreWrite {
-		if err := appendCertsToFile(bundlePath, pemChain); err != nil {
-			return nil, err
-		}
-	}
-
-	return completeChains, nil
-}
-
-func (cs *CertificateChains) GetSignerNames() []string {
-	return certificateSignersMapKeysOrdered(cs.signers)
-}
-
-func (cs *CertificateChains) GetSigner(signerPath ...string) *CertificateSigner {
-	if len(signerPath) == 0 {
-		return nil
-	}
-
-	currentSigner := cs.signers[signerPath[0]]
-	for _, fragment := range signerPath[1:] {
-		if currentSigner != nil {
-			currentSigner = currentSigner.GetSubCA(fragment)
-		} else {
-			return nil
-		}
-	}
-
-	return currentSigner
-}
-
-func (cs *CertificateChains) GetCertKey(certPath ...string) ([]byte, []byte, error) {
-	if len(certPath) == 0 {
-		return nil, nil, fmt.Errorf("empty certificate path")
-	}
-	if len(certPath) == 1 {
-		return nil, nil, fmt.Errorf("the CertificateChains struct only stores signers, the path must be at least 1 level deep")
-	}
-
-	signerPath := certPath[:len(certPath)-1]
-	signer := cs.GetSigner(signerPath...)
-	if signer == nil {
-		return nil, nil, fmt.Errorf("no such signer in the path: %v", signerPath)
-	}
-
-	return signer.GetCertKey(certPath[len(certPath)-1])
-}
-
-type certificateSigner struct {
+type CertificateSigner struct {
 	signerName         string
+	signerConfig       *crypto.CA
 	signerDir          string
 	signerValidityDays int
 
-	// signerConfig should only be used in case this is a sub-ca signer
-	// It should be populated during CertificateSigner.SignSubCA()
-	signerConfig             *crypto.CA
-	subCAs                   []*certificateSigner
-	clientCertificatesToSign []*ClientCertificateSigningRequestInfo
-	serverCertificatesToSign []*ServingCertificateSigningRequestInfo
-	peerCertificatesToSign   []*PeerCertificateSigningRequestInfo
-}
-
-type CertificateSigner struct {
-	signerName   string
-	signerConfig *crypto.CA
-	signerDir    string
-
 	subCAs             map[string]*CertificateSigner
 	signedCertificates map[string]*signedCertificateInfo
+}
+
+type signedCertificateInfo struct {
+	certDir   string
+	tlsConfig *crypto.TLSCertificateConfig
 }
 
 type ClientCertificateSigningRequestInfo struct {
@@ -169,132 +56,51 @@ type CertificateSigningRequestInfo struct {
 	ValidityDays int
 }
 
-type signedCertificateInfo struct {
-	certDir   string
-	tlsConfig *crypto.TLSCertificateConfig
-}
-
-// NewCertificateSigner returns a builder object for a certificate chain for the given signer
-func NewCertificateSigner(signerName, signerDir string, validityDays int) *certificateSigner {
-	return &certificateSigner{
-		signerName:         signerName,
-		signerDir:          signerDir,
-		signerValidityDays: validityDays,
-	}
-}
-
-func (s *certificateSigner) WithClientCertificates(signInfos ...*ClientCertificateSigningRequestInfo) *certificateSigner {
-	s.clientCertificatesToSign = append(s.clientCertificatesToSign, signInfos...)
-	return s
-}
-
-func (s *certificateSigner) WithServingCertificates(signInfos ...*ServingCertificateSigningRequestInfo) *certificateSigner {
-	s.serverCertificatesToSign = append(s.serverCertificatesToSign, signInfos...)
-	return s
-}
-
-func (s *certificateSigner) WithPeerCertificiates(signInfos ...*PeerCertificateSigningRequestInfo) *certificateSigner {
-	s.peerCertificatesToSign = append(s.peerCertificatesToSign, signInfos...)
-	return s
-}
-
-func (s *certificateSigner) WithSubCAs(subCAsInfo ...*certificateSigner) *certificateSigner {
-	s.subCAs = append(s.subCAs, subCAsInfo...)
-	return s
-}
-
-func (s *certificateSigner) Complete() (*CertificateSigner, error) {
-	// in case this is a sub-ca, it's already going to have the signer-config populated
-	signerConfig := s.signerConfig
-	if signerConfig == nil {
-		var err error
-		signerConfig, _, err = crypto.EnsureCA(
-			CACertPath(s.signerDir),
-			CAKeyPath(s.signerDir),
-			CASerialsPath(s.signerDir),
-			s.signerName,
-			s.signerValidityDays,
-		)
-
-		if err != nil {
-			return nil, fmt.Errorf("failed to generate %s CA certificate: %w", s.signerName, err)
-		}
-	}
-
-	signerCompleted := &CertificateSigner{
-		signerName:   s.signerName,
-		signerConfig: signerConfig,
-		signerDir:    s.signerDir,
-
-		subCAs:             make(map[string]*CertificateSigner),
-		signedCertificates: make(map[string]*signedCertificateInfo),
-	}
-
-	for _, subCA := range s.subCAs {
-		subCA := subCA
-		if err := signerCompleted.SignSubCA(subCA); err != nil {
-			return nil, err
-		}
-	}
-
-	for _, si := range s.clientCertificatesToSign {
-		si := si
-		if err := signerCompleted.SignClientCertificate(si); err != nil {
-			return nil, err
-		}
-	}
-
-	for _, si := range s.serverCertificatesToSign {
-		si := si
-		if err := signerCompleted.SignServingCertificate(si); err != nil {
-			return nil, err
-		}
-	}
-
-	for _, si := range s.peerCertificatesToSign {
-		si := si
-		if err := signerCompleted.SignPeerCertificate(si); err != nil {
-			return nil, err
-		}
-	}
-
-	return signerCompleted, nil
-}
-
 func (s *CertificateSigner) GetSignerCertPEM() ([]byte, error) {
 	certPem, _, err := s.signerConfig.Config.GetPEMBytes()
 	return certPem, err
 }
 
-func (s *CertificateSigner) SignSubCA(signerInfo *certificateSigner) error {
+func (s *CertificateSigner) SignSubCA(subSignerInfo CertificateSignerBuilder) error {
+	subSignerName := subSignerInfo.Name()
+	subSignerDir := subSignerInfo.Directory()
+
 	subCA, _, err := libraryGoEnsureSubCA(
 		s.signerConfig,
-		CABundlePath(signerInfo.signerDir),
-		CAKeyPath(signerInfo.signerDir),
-		CASerialsPath(signerInfo.signerDir),
-		signerInfo.signerName,
-		signerInfo.signerValidityDays,
+		cryptomaterial.CABundlePath(subSignerDir),
+		cryptomaterial.CAKeyPath(subSignerDir),
+		cryptomaterial.CASerialsPath(subSignerDir),
+		subSignerName,
+		subSignerInfo.ValidityDays(),
 	)
 	if err != nil {
-		return fmt.Errorf("failed to generate sub-CA %q: %w", signerInfo.signerName, err)
+		return fmt.Errorf("failed to generate sub-CA %q: %w", subSignerName, err)
 	}
 
 	// the library code above writes the whole cert chain in files but some of
 	// the kube code requires a single cert per signer cert file
-	subCACertPath := CACertPath(signerInfo.signerDir)
+	subCACertPath := cryptomaterial.CACertPath(subSignerDir)
 	if _, err := os.Stat(subCACertPath); err == nil || os.IsNotExist(err) {
 		certPEM, err := crypto.EncodeCertificates(subCA.Config.Certs[0])
 		if err != nil {
-			return fmt.Errorf("failed to encode sub-CA %q certs to pem: %w", signerInfo.signerName, err)
+			return fmt.Errorf("failed to encode sub-CA %q certs to pem: %w", subSignerName, err)
 		}
 
 		if err := os.WriteFile(subCACertPath, certPEM, os.FileMode(0644)); err != nil {
-			return fmt.Errorf("failed to write certificate for sub-CA %q: %w", signerInfo.signerName, err)
+			return fmt.Errorf("failed to write certificate for sub-CA %q: %w", subSignerName, err)
 		}
 	}
 
-	signerInfo.signerConfig = subCA
-	subCertSigner, err := signerInfo.Complete()
+	// create the internal representation of a signer to inject the subCA CA config
+	subSignerInfoInternal := &certificateSigner{
+		signerName:         subSignerName,
+		signerDir:          subSignerDir,
+		signerValidityDays: subSignerInfo.ValidityDays(),
+
+		signerConfig: subCA,
+	}
+
+	subCertSigner, err := subSignerInfoInternal.Complete()
 	if err != nil {
 		return err
 	}
@@ -307,8 +113,8 @@ func (s *CertificateSigner) SignClientCertificate(signInfo *ClientCertificateSig
 	certDir := filepath.Join(s.signerDir, signInfo.Name)
 
 	tlsConfig, _, err := s.signerConfig.EnsureClientCertificate(
-		ClientCertPath(certDir),
-		ClientKeyPath(certDir),
+		cryptomaterial.ClientCertPath(certDir),
+		cryptomaterial.ClientKeyPath(certDir),
 		signInfo.UserInfo,
 		signInfo.ValidityDays,
 	)
@@ -328,8 +134,8 @@ func (s *CertificateSigner) SignServingCertificate(signInfo *ServingCertificateS
 	certDir := filepath.Join(s.signerDir, signInfo.Name)
 
 	tlsConfig, _, err := s.signerConfig.EnsureServerCert(
-		ServingCertPath(certDir),
-		ServingKeyPath(certDir),
+		cryptomaterial.ServingCertPath(certDir),
+		cryptomaterial.ServingKeyPath(certDir),
 		sets.NewString(signInfo.Hostnames...),
 		signInfo.ValidityDays,
 	)
@@ -350,8 +156,8 @@ func (s *CertificateSigner) SignPeerCertificate(signInfo *PeerCertificateSigning
 
 	hostnameSet := sets.NewString(signInfo.Hostnames...)
 	if _, err := crypto.GetServerCert(
-		PeerCertPath(certDir),
-		PeerKeyPath(certDir),
+		cryptomaterial.PeerCertPath(certDir),
+		cryptomaterial.PeerKeyPath(certDir),
 		hostnameSet,
 	); err == nil {
 		return nil
@@ -372,8 +178,8 @@ func (s *CertificateSigner) SignPeerCertificate(signInfo *PeerCertificateSigning
 	}
 
 	if err := tlsConfig.WriteCertConfigFile(
-		PeerCertPath(certDir),
-		PeerKeyPath(certDir),
+		cryptomaterial.PeerCertPath(certDir),
+		cryptomaterial.PeerKeyPath(certDir),
 	); err != nil {
 		return fmt.Errorf("failed to write peer certificate for %q: %w", signInfo.Name, err)
 	}
