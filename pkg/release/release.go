@@ -30,6 +30,6 @@ var Image = map[string]string{
 	"ose_csi_node_registrar":    "quay.io/microshift/ose-csi-node-driver-registrar" + Base,
 	"ose_csi_livenessprobe":     "quay.io/microshift/ose-csi-livenessprobe" + Base,
 	"ovn_kubernetes_microshift": "quay.io/microshift/ovn-kubernetes-microshift:" + Base,
-	"pause":                     "quay.io/microshift/pause:" + Base,
+	"pod":                       "quay.io/microshift/pause:" + Base,
 	"service_ca_operator":       "quay.io/microshift/service-ca-operator:" + Base,
 }
