@@ -89,6 +89,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.verbosity = cfg.LogVLevel
 
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	kubeCSRSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
 	kubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
 	ultimateTrustCACertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
@@ -122,7 +123,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"etcd-servers": {
 				"https://127.0.0.1:2379",
 			},
-			"kubelet-certificate-authority": {ultimateTrustCACertFile},
+			"kubelet-certificate-authority": {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
 			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
 

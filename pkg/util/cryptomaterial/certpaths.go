@@ -22,7 +22,8 @@ const (
 	KubeControllerManagerCSRSignerSignerCAValidityDays = 60
 	KubeControllerManagerCSRSignerCAValidityDays       = 30
 
-	ClientCertValidityDays = 30
+	ClientCertValidityDays  = 30
+	ServingCertValidityDays = 30
 
 	ServiceCAValidityDays            = 790
 	ServiceCAServingCertValidityDays = 730
@@ -81,7 +82,11 @@ func CSRSignerCertDir(certsDir string) string {
 }
 
 func KubeletClientCertDir(certsDir string) string {
-	return filepath.Join(KubeletCSRSignerSignerCertDir(certsDir), "kubelet-client")
+	return filepath.Join(CSRSignerCertDir(certsDir), "kubelet-client")
+}
+
+func KubeletServingCertDir(certsDir string) string {
+	return filepath.Join(CSRSignerCertDir(certsDir), "kubelet-server")
 }
 
 func ServiceCADir(certsDir string) string {
