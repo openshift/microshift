@@ -196,6 +196,10 @@ convert_to_bridge() {
         clone_mac=0
       fi
     fi
+  elif [ $(nmcli --get-values connection.type conn show ${old_conn}) == "tun" ]; then
+    iface_type=tun
+    tun_mode=$(nmcli --get-values tun.mode -e no connection show ${old_conn})
+    extra_phys_args+=( tun.mode "${tun_mode}" )
   else
     iface_type=802-3-ethernet
   fi
