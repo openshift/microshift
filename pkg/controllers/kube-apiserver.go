@@ -113,7 +113,6 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
 			"advertise-address": {cfg.NodeIP},
-			"audit-log-path":    {cfg.AuditLogDir},
 			"audit-policy-file": {cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
 			"client-ca-file":    {clientCABundlePath},
 			"etcd-cafile":       {ultimateTrustCACertFile},
@@ -318,6 +317,9 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	if err != nil {
 		return err
 	}
+
+	// audit logs go here
+	os.MkdirAll("/var/log/kube-apiserver", 0700)
 
 	// Carrying a patch for NewAPIServerCommand to use cmd.Context().Done() as the stop channel
 	// instead of the channel returned by SetupSignalHandler, which expects to be called at most
