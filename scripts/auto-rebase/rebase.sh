@@ -399,11 +399,6 @@ update_manifests() {
     fi
     pushd "${STAGING_DIR}" >/dev/null
 
-    title "Extracting timestamp"
-    local bindata_timestamp
-    bindata_timestamp=$(jq -r ".config.created" "${STAGING_DIR}/release_amd64.json")
-    date --date="${bindata_timestamp}" '+%s' > "${REPOROOT}/assets/bindata_timestamp.txt"
-
     title "Rebasing manifests"
 
     #-- OpenShift control plane ---------------------------
@@ -639,8 +634,6 @@ rebase_to() {
 
     update_manifests
     if [[ -n "$(git status -s assets)" ]]; then
-        title "## Updating bindata"
-        "${REPOROOT}"/scripts/bindata.sh
         title "## Committing changes to assets and pkg/assets"
         git add assets pkg/assets
         git commit -m "update manifests"

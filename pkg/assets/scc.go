@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	embedded "github.com/openshift/microshift/assets"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -83,7 +85,7 @@ func applySCCs(sccs []string, applier readerApplier, render RenderFunc, params R
 
 	for _, scc := range sccs {
 		klog.Infof("Applying scc api %s", scc)
-		objBytes, err := Asset(scc)
+		objBytes, err := embedded.Asset(scc)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", scc, err)
 		}

@@ -13,29 +13,29 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 	var (
 		//TODO: fix the rolebinding and sa
 		clusterRoleBinding = []string{
-			"assets/components/service-ca/clusterrolebinding.yaml",
+			"components/service-ca/clusterrolebinding.yaml",
 		}
 		clusterRole = []string{
-			"assets/components/service-ca/clusterrole.yaml",
+			"components/service-ca/clusterrole.yaml",
 		}
 		roleBinding = []string{
-			"assets/components/service-ca/rolebinding.yaml",
+			"components/service-ca/rolebinding.yaml",
 		}
 		role = []string{
-			"assets/components/service-ca/role.yaml",
+			"components/service-ca/role.yaml",
 		}
 		apps = []string{
-			"assets/components/service-ca/deployment.yaml",
+			"components/service-ca/deployment.yaml",
 		}
 		ns = []string{
-			"assets/components/service-ca/ns.yaml",
+			"components/service-ca/ns.yaml",
 		}
 		sa = []string{
-			"assets/components/service-ca/sa.yaml",
+			"components/service-ca/sa.yaml",
 		}
-		secret     = "assets/components/service-ca/signing-secret.yaml"
+		secret     = "components/service-ca/signing-secret.yaml"
 		secretName = "signing-key"
-		cm         = "assets/components/service-ca/signing-cabundle.yaml"
+		cm         = "components/service-ca/signing-cabundle.yaml"
 		cmName     = "signing-cabundle"
 	)
 
@@ -104,30 +104,30 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
 		clusterRoleBinding = []string{
-			"assets/components/openshift-router/cluster-role-binding.yaml",
-			"assets/components/openshift-router/ingress-to-route-controller-clusterrolebinding.yaml",
+			"components/openshift-router/cluster-role-binding.yaml",
+			"components/openshift-router/ingress-to-route-controller-clusterrolebinding.yaml",
 		}
 		clusterRole = []string{
-			"assets/components/openshift-router/cluster-role.yaml",
-			"assets/components/openshift-router/ingress-to-route-controller-clusterrole.yaml",
+			"components/openshift-router/cluster-role.yaml",
+			"components/openshift-router/ingress-to-route-controller-clusterrole.yaml",
 		}
 		apps = []string{
-			"assets/components/openshift-router/deployment.yaml",
+			"components/openshift-router/deployment.yaml",
 		}
 		ns = []string{
-			"assets/components/openshift-router/namespace.yaml",
+			"components/openshift-router/namespace.yaml",
 		}
 		sa = []string{
-			"assets/components/openshift-router/service-account.yaml",
+			"components/openshift-router/service-account.yaml",
 		}
 		cm = []string{
-			"assets/components/openshift-router/configmap.yaml",
+			"components/openshift-router/configmap.yaml",
 		}
 		svc = []string{
-			"assets/components/openshift-router/service-internal.yaml",
+			"components/openshift-router/service-internal.yaml",
 		}
 		extSvc = []string{
-			"assets/components/openshift-router/service-cloud.yaml",
+			"components/openshift-router/service-cloud.yaml",
 		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
@@ -168,27 +168,27 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 func startDNSController(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
 		clusterRoleBinding = []string{
-			"assets/components/openshift-dns/dns/cluster-role-binding.yaml",
+			"components/openshift-dns/dns/cluster-role-binding.yaml",
 		}
 		clusterRole = []string{
-			"assets/components/openshift-dns/dns/cluster-role.yaml",
+			"components/openshift-dns/dns/cluster-role.yaml",
 		}
 		apps = []string{
-			"assets/components/openshift-dns/dns/daemonset.yaml",
-			"assets/components/openshift-dns/node-resolver/daemonset.yaml",
+			"components/openshift-dns/dns/daemonset.yaml",
+			"components/openshift-dns/node-resolver/daemonset.yaml",
 		}
 		ns = []string{
-			"assets/components/openshift-dns/dns/namespace.yaml",
+			"components/openshift-dns/dns/namespace.yaml",
 		}
 		sa = []string{
-			"assets/components/openshift-dns/dns/service-account.yaml",
-			"assets/components/openshift-dns/node-resolver/service-account.yaml",
+			"components/openshift-dns/dns/service-account.yaml",
+			"components/openshift-dns/node-resolver/service-account.yaml",
 		}
 		cm = []string{
-			"assets/components/openshift-dns/dns/configmap.yaml",
+			"components/openshift-dns/dns/configmap.yaml",
 		}
 		svc = []string{
-			"assets/components/openshift-dns/dns/service.yaml",
+			"components/openshift-dns/dns/service.yaml",
 		}
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {

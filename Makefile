@@ -101,18 +101,6 @@ build: export CGO_ENABLED=0
 
 microshift: build
 
-update-bindata:
-	./scripts/bindata.sh
-.PHONY: update-bindata
-
-update: update-bindata
-.PHONY: update
-
-.PHONY: verify-bindata
-verify: verify-bindata
-verify-bindata: update-bindata
-	./scripts/verify_bindata.sh
-
 ###############################
 # post install validate       #
 ###############################

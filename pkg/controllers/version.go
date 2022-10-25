@@ -41,7 +41,7 @@ func (s *VersionManager) Dependencies() []string {
 
 func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 
-	var cm = "assets/version/microshift-version.yaml"
+	var cm = "version/microshift-version.yaml"
 
 	defer close(stopped)
 	defer close(ready)

@@ -40,7 +40,7 @@ import (
 	"github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
 
-	"github.com/openshift/microshift/pkg/assets"
+	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
@@ -51,8 +51,8 @@ const (
 
 var baseKubeAPIServerConfigs = [][]byte{
 	// todo: a nice way to generate the baseline kas config for microshift
-	assets.MustAsset("assets/components/kube-apiserver/defaultconfig.yaml"),
-	assets.MustAsset("assets/components/kube-apiserver/config-overrides.yaml"),
+	embedded.MustAsset("components/kube-apiserver/defaultconfig.yaml"),
+	embedded.MustAsset("components/kube-apiserver/config-overrides.yaml"),
 }
 
 var fixedTLSProfile *configv1.TLSProfileSpec

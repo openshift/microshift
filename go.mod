@@ -3,8 +3,7 @@ module github.com/openshift/microshift
 go 1.18
 
 require (
-	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // route-controller-manager
-	github.com/go-bindata/go-bindata v3.1.2+incompatible
+	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
 	github.com/kelseyhightower/envconfig v1.4.0 // microshift
 	github.com/miekg/dns v1.1.35 // microshift
 	github.com/mitchellh/go-homedir v1.1.0 // microshift

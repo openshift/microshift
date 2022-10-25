@@ -2,6 +2,5 @@
 package tools
 
 import (
-	_ "github.com/go-bindata/go-bindata/go-bindata"
 	_ "k8s.io/kube-openapi/cmd/openapi-gen"
 )

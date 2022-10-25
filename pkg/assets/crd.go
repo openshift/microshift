@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	embedded "github.com/openshift/microshift/assets"
+
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,15 +34,15 @@ var (
 	apiExtensionsScheme = apiruntime.NewScheme()
 	apiExtensionsCodecs = serializer.NewCodecFactory(apiExtensionsScheme)
 	crds                = []string{
-		"assets/crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml",
-		"assets/crd/0000_03_security-openshift_01_scc.crd.yaml",
-		"assets/crd/0000_01_route.crd.yaml",
-		"assets/components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml",
+		"crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml",
+		"crd/0000_03_security-openshift_01_scc.crd.yaml",
+		"crd/0000_01_route.crd.yaml",
+		"components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml",
 	}
 	// for apis that belong to a group served by openshift-apiserver but are themselves served
 	// as a CR, the crd registration controller will not automatically create local apiservices
 	localAPIServices = []string{
-		"assets/crd/securityv1-local-apiservice.yaml",
+		"crd/securityv1-local-apiservice.yaml",
 	}
 )
 
@@ -78,7 +80,7 @@ func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
 	for _, crd := range crds {
 		klog.Infof("Waiting for crd %s condition.type: established", crd)
 		var crdBytes []byte
-		crdBytes, err = Asset(crd)
+		crdBytes, err = embedded.Asset(crd)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", crd, err)
 		}
@@ -132,7 +134,7 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 	apiRegistrationCodecs := serializer.NewCodecFactory(apiRegistrationScheme)
 
 	for _, apiServiceManifest := range localAPIServices {
-		apiServiceBytes, err := Asset(apiServiceManifest)
+		apiServiceBytes, err := embedded.Asset(apiServiceManifest)
 		if err != nil {
 			return err
 		}
@@ -151,7 +153,7 @@ func ApplyCRDs(cfg *config.MicroshiftConfig) error {
 
 	for _, crd := range crds {
 		klog.Infof("Applying openshift CRD %s", crd)
-		crdBytes, err := Asset(crd)
+		crdBytes, err := embedded.Asset(crd)
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", crd, err)
 		}
