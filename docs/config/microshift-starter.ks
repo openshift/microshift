@@ -64,9 +64,9 @@ dnf install -y microshift
 firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
 firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
 
-# Install the oc and kubectl utilities
-curl -LO -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
-tar zxf openshift-client-linux.tar.gz -C /usr/local/bin/
-rm -f openshift-client-linux.tar.gz
+# Install the oc and kubectl utilities (need a 4.12 dev-preview version to have the new functionality support)
+curl -LO -s https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp-dev-preview/4.12.0-ec.4/openshift-client-linux-4.12.0-ec.4.tar.gz
+tar zxf openshift-client-linux-4.12.0-ec.4.tar.gz -C /usr/local/bin/
+rm -f openshift-client-linux-4.12.0-ec.4.tar.gz
 
 %end
