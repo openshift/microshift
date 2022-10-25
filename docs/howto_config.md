@@ -126,7 +126,7 @@ resources:
   - busybox.yaml
 images:
   - name: BUSYBOX_IMAGE
-    newName: k8s.gcr.io/busybox
+    newName: registry.k8s.io/busybox
 EOF
 ```
 
