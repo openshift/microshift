@@ -378,6 +378,11 @@ update_images() {
                 awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
                     "${REPOROOT}/pkg/release/release_${arch}.go" > t
                 mv t "${REPOROOT}/pkg/release/release_${arch}.go"
+                if [[ "$i" == "pod" ]]; then
+                    echo "Updating image pod (${arch}) in packaging/crio.conf.d/microshift_${arch}.conf"
+                    sed -i "s|pause_image =.*|pause_image = \"${digest}\"|g" \
+                        "${REPOROOT}/packaging/crio.conf.d/microshift_${arch}.conf"
+                fi
             else
                 echo "Skipping ${i//_/-} (${arch}): Not part of release image."
             fi
