@@ -3447,12 +3447,13 @@ spec:
 
           gateway_mode_flags="--gateway-mode local --gateway-interface br-ex"
 
+          sysctl net.ipv4.ip_forward=1
+
           gw_interface_flag=
           # if br-ex1 is configured on the node, we want to use it for external gateway traffic
           if [ -d /sys/class/net/br-ex1 ]; then
             gw_interface_flag="--exgw-interface=br-ex1"
             # the functionality depends on ip_forwarding being enabled
-            sysctl net.ipv4.ip_forward=1
           fi
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE} --init-node ${K8S_NODE}"
@@ -3598,7 +3599,7 @@ func assetsComponentsOvnMasterDaemonsetYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15987, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
+	info := bindataFileInfo{name: "assets/components/ovn/master/daemonset.yaml", size: 15986, mode: os.FileMode(420), modTime: time.Unix(1664090284, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
