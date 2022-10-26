@@ -1,6 +1,7 @@
 package openshift_controller_manager
 
 import (
+	"context"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
@@ -13,7 +14,7 @@ import (
 	"github.com/openshift/route-controller-manager/pkg/version"
 )
 
-func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig, clientConfig *rest.Config) error {
+func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig, clientConfig *rest.Config, ctx context.Context) error {
 	serviceability.InitLogrusFromKlog()
 	kubeClient, err := kubernetes.NewForConfig(clientConfig)
 	if err != nil {
@@ -28,9 +29,5 @@ func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControll
 			return err
 		}
 	}
-	_, err = origincontrollers.RunRouteControllerManager(config, kubeClient, clientConfig)
-	if err != nil {
-		return err
-	}
-	return nil
+	return origincontrollers.RunRouteControllerManager(config, kubeClient, clientConfig, ctx)
 }
