@@ -10,28 +10,25 @@ the node info manager.  It is then possible that the kubelet gets
 the credentials of the kube-controller-manager and that will cause
 CSI to fail.
 ---
- vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go b/vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go
-index 0ae6d084f0e..f63bfb337e6 100644
+index 976292de..5c4c5477 100644
 --- a/vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go
 +++ b/vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go
-@@ -243,20 +243,24 @@ func (p *csiPlugin) Init(host volume.VolumeHost) error {
+@@ -243,18 +243,22 @@ func (p *csiPlugin) Init(host volume.VolumeHost) error {
  	}
  
  	// Initializing the label management channels
 -	nim = nodeinfomanager.NewNodeInfoManager(host.GetNodeName(), host, migratedPlugins)
 +	localNim := nodeinfomanager.NewNodeInfoManager(host.GetNodeName(), host, migratedPlugins)
  
- 	if utilfeature.DefaultFeatureGate.Enabled(features.CSIMigration) {
- 		// This function prevents Kubelet from posting Ready status until CSINode
- 		// is both installed and initialized
--		if err := initializeCSINode(host); err != nil {
--			return errors.New(log("failed to initialize CSINode: %v", err))
-+		if err := initializeCSINode(host, localNim); err != nil {
-+			return errors.New(log("failed to initialize CSINodeInfo: %v", err))
- 		}
+ 	// This function prevents Kubelet from posting Ready status until CSINode
+ 	// is both installed and initialized
+-	if err := initializeCSINode(host); err != nil {
++	if err := initializeCSINode(host, localNim); err != nil {
+ 		return errors.New(log("failed to initialize CSINode: %v", err))
  	}
  
 +	if _, ok := host.(volume.KubeletVolumeHost); ok {
@@ -46,6 +43,3 @@ index 0ae6d084f0e..f63bfb337e6 100644
  	kvh, ok := host.(volume.KubeletVolumeHost)
  	if !ok {
  		klog.V(4).Info("Cast from VolumeHost to KubeletVolumeHost failed. Skipping CSINode initialization, not running on kubelet")
--- 
-2.36.1
-
