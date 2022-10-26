@@ -9,10 +9,7 @@ if [ "$1" = "-v" ]; then
 fi
 
 function debug() {
-    if ! $verbose; then
-        return
-    fi
-    echo "$*"
+    $verbose && echo "$*"
 }
 
 approved=true
