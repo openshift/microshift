@@ -12,8 +12,10 @@ function debug() {
     $verbose && echo "$*"
 }
 
+ROOTDIR=$(git rev-parse --show-toplevel)
+
 approved=true
-./pkg/release/get.sh images all | while read source_file image; do
+${ROOTDIR}/pkg/release/get.sh images all | while read source_file image; do
     case $image in
         quay.io/microshift/*)
             debug "$image OK";;
