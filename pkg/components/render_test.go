@@ -9,6 +9,7 @@ import (
 	"testing"
 	"text/template"
 
+	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/config/lvmd"
@@ -93,7 +94,7 @@ data:
 		{
 			name: "should render topolvm configMap",
 			args: args{
-				tb:   assets.MustAsset("assets/components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml"),
+				tb:   embedded.MustAsset("components/odf-lvm/topolvm-lvmd-config_configmap_v1.yaml"),
 				data: func() assets.RenderParams { p, _ := renderLvmdParams(defL); return p }(),
 			},
 			want:    cmWrap([]byte("device-classes:\n- default: true\n  lvcreate-options: null\n  name: default\n  spare-gb: 10\n  stripe: null\n  stripe-size: \"\"\n  thin-pool: null\n  type: \"\"\n  volume-group: rhel\nsocket-name: /run/lvmd/lvmd.socket\n")),
@@ -115,7 +116,7 @@ data:
 }
 
 func Test_renderTopolvmDaemonsetTemplate(t *testing.T) {
-	tb := assets.MustAsset("assets/components/odf-lvm/topolvm-node_daemonset.yaml")
+	tb := embedded.MustAsset("components/odf-lvm/topolvm-node_daemonset.yaml")
 
 	fm := template.FuncMap{
 		"Dir": filepath.Dir,
