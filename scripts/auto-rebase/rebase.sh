@@ -539,19 +539,12 @@ update_manifests() {
     yq -i '.metadata += {"name": "router-internal-default", "namespace": "openshift-ingress"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
     yq -i '.spec.selector = {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
     sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
-    yq -i '.metadata += {"annotations": {"traffic-policy.network.alpha.openshift.io/local-with-fallback": ""}}' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-    yq -i '.metadata.labels += {"ingresscontroller.operator.openshift.io/owning-ingresscontroller": "default", "router": "router-default"}' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-    yq -i '.metadata += {"name": "router-default"}' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-    yq -i '.spec.selector = {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-    sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
     # 3) Make MicroShift-specific changes
     #    Set replica count to 1, as we're single-node.
     yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Add hostPorts for routes and metrics (needed as long as there is no load balancer)
     yq -i '.spec.template.spec.containers[0].ports[0].hostPort = 80' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].ports[1].hostPort = 443' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    #    Change LoadBalancer to NodePort as long as we do not add a default LB.
-    yq -i '.spec.type = "NodePort"' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
     # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
     sed -i 's|REPLACE_CLUSTER_DOMAIN|{{ .ClusterDomain }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     sed -i 's|REPLACE_ROUTER_IMAGE|{{ .ReleaseImage.haproxy_router }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
