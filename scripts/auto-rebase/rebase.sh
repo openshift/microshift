@@ -627,6 +627,7 @@ rebase_to() {
     if [[ -n "$(git status -s pkg/release)" ]]; then
         title "## Committing changes to pkg/release"
         git add pkg/release
+        git add packaging/crio.conf.d
         git commit -m "update component images"
     else
         echo "No changes in component images."
