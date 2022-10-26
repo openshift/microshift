@@ -91,10 +91,10 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
 	kubeCSRSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
 	kubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
-	ultimateTrustCACertFile := cryptomaterial.UltimateTrustBundlePath(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
 	aggregatorCAPath := cryptomaterial.CACertPath(cryptomaterial.AggregatorSignerDir(certsDir))
 	aggregatorClientCertDir := cryptomaterial.AggregatorClientCertDir(certsDir)
+	etcdClientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
 	kasSecretsDir := filepath.Join(certsDir, "kube-apiserver", "secrets")
 	servingCertsDir := filepath.Join(kasSecretsDir, "service-network-serving-certkey")
 
@@ -117,9 +117,9 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"audit-log-path":    {cfg.AuditLogDir},
 			"audit-policy-file": {cfg.DataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
 			"client-ca-file":    {clientCABundlePath},
-			"etcd-cafile":       {ultimateTrustCACertFile},
-			"etcd-certfile":     {cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.crt"},
-			"etcd-keyfile":      {cfg.DataDir + "/resources/kube-apiserver/secrets/etcd-client/tls.key"},
+			"etcd-cafile":       {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
+			"etcd-certfile":     {cryptomaterial.ClientCertPath(etcdClientCertDir)},
+			"etcd-keyfile":      {cryptomaterial.ClientKeyPath(etcdClientCertDir)},
 			"etcd-servers": {
 				"https://127.0.0.1:2379",
 			},

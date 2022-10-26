@@ -67,19 +67,6 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		return nil, nil, err
 	}
 
-	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
-	if err := util.GenCerts("etcd-server", filepath.Join(certsDir, "/etcd"),
-		"etcd-serving.crt", "etcd-serving.key",
-		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
-		return nil, nil, err
-	}
-
-	if err := util.GenCerts("etcd-peer", filepath.Join(certsDir, "/etcd"),
-		"etcd-peer.crt", "etcd-peer.key",
-		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
-		return nil, nil, err
-	}
-
 	certChains, err := cryptomaterial.NewCertificateChains(
 		// ------------------------------
 		// CLIENT CERTIFICATE SIGNERS
@@ -196,6 +183,40 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 				},
 			},
 		),
+
+		//------------------------------
+		// 	ETCD CERTIFICATE SIGNER
+		//------------------------------
+		cryptomaterial.NewCertificateSigner(
+			"etcd-signer",
+			cryptomaterial.EtcdSignerDir(certsDir),
+			cryptomaterial.EtcdSignerCAValidityDays,
+		).WithClientCertificates(
+			&cryptomaterial.ClientCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "apiserver-etcd-client",
+					ValidityDays: 10 * 365,
+				},
+				UserInfo: &user.DefaultInfo{Name: "etcd", Groups: []string{"etcd"}},
+			},
+		).WithPeerCertificiates(
+			&cryptomaterial.PeerCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "etcd-peer",
+					ValidityDays: 3 * 365,
+				},
+				UserInfo:  &user.DefaultInfo{Name: "system:etcd-peer:etcd-client", Groups: []string{"system:etcd-peers"}},
+				Hostnames: []string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName},
+			},
+			&cryptomaterial.PeerCertificateSigningRequestInfo{
+				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
+					Name:         "etcd-serving",
+					ValidityDays: 3 * 365,
+				},
+				UserInfo:  &user.DefaultInfo{Name: "system:etcd-server:etcd-client", Groups: []string{"system:etcd-servers"}},
+				Hostnames: []string{"localhost", "127.0.0.1", cfg.NodeIP, cfg.NodeName},
+			},
+		),
 	).WithCABundle(
 		cryptomaterial.TotalClientCABundlePath(certsDir),
 		"kube-control-plane-signer",
@@ -230,11 +251,6 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 	}
 
 	// kube-apiserver
-	if err := util.GenCerts("etcd-client", filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/etcd-client"),
-		"tls.crt", "tls.key",
-		[]string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName}); err != nil {
-		return nil, nil, err
-	}
 	if err := util.GenCerts("kube-apiserver", filepath.Join(cfg.DataDir, "/certs/kube-apiserver/secrets/service-network-serving-certkey"),
 		"tls.crt", "tls.key",
 		[]string{"kube-apiserver", cfg.NodeIP, cfg.NodeName, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes",
