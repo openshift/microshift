@@ -20,7 +20,6 @@ cluster:
   mtu: ""
 nodeIP: ""
 nodeName: ""
-auditLogDir: ""
 dataDir: ""
 logVLevel: ""
 manifests: []
@@ -39,7 +38,6 @@ The configuration settings alongside with the supported command line arguments a
 | mtu                 | --cluster-mtu             | MICROSHIFT_CLUSTER_MTU                  | The maximum transmission unit for the Generic Network Virtualization Encapsulation overlay network
 | nodeIP              | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
 | nodeName            | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
-| auditLogDir         | --audit-log-dir           | MICROSHIFT_AUDITLOGDIR                  | Location for storing audit logs
 | dataDir             | --data-dir                | MICROSHIFT_DATADIR                      | Location for data created by MicroShift
 | logVLevel           | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (0-5)
 | manifests           | n/a                       | n/a                                     | Locations to scan for manifests to be loaded on startup
@@ -59,7 +57,6 @@ cluster:
   mtu: "1400"
 nodeIP: ""
 nodeName: ""
-auditLogDir: ""
 dataDir: /var/lib/microshift
 logVLevel: 0
 manifests:
