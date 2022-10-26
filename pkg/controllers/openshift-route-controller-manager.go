@@ -116,7 +116,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		return err
 	}
 
-	if err := route_controller_manager.RunRouteControllerManager(s.config, clientConfig); err != nil {
+	if err := route_controller_manager.RunRouteControllerManager(s.config, clientConfig, ctx); err != nil {
 		return err
 	}
 	<-ctx.Done()
