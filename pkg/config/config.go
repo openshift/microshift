@@ -56,8 +56,7 @@ type MicroshiftConfig struct {
 	ConfigFile string `json:"configFile"`
 	DataDir    string `json:"dataDir"`
 
-	AuditLogDir string `json:"auditLogDir"`
-	LogVLevel   int    `json:"logVLevel"`
+	LogVLevel int `json:"logVLevel"`
 
 	Roles []string `json:"roles"`
 
@@ -101,13 +100,12 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	defaultRoles := make([]string, len(validRoles))
 	copy(defaultRoles, validRoles)
 	return &MicroshiftConfig{
-		ConfigFile:  findConfigFile(),
-		DataDir:     dataDir,
-		AuditLogDir: "",
-		LogVLevel:   0,
-		Roles:       defaultRoles,
-		NodeName:    nodeName,
-		NodeIP:      nodeIP,
+		ConfigFile: findConfigFile(),
+		DataDir:    dataDir,
+		LogVLevel:  0,
+		Roles:      defaultRoles,
+		NodeName:   nodeName,
+		NodeIP:     nodeIP,
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
@@ -220,9 +218,6 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 		c.DataDir = s
 		// if the defaults are present, rebuild based on the new data-dir
 		c.updateManifestList()
-	}
-	if s, err := flags.GetString("audit-log-dir"); err == nil && flags.Changed("audit-log-dir") {
-		c.AuditLogDir = s
 	}
 	if f := flags.Lookup("v"); f != nil && flags.Changed("v") {
 		c.LogVLevel, _ = strconv.Atoi(f.Value.String())

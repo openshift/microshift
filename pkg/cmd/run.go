@@ -37,7 +37,6 @@ func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	cmd.MarkFlagFilename("config", "yaml", "yml")
 	// All other flags will be read after reading both config file and env vars.
 	flags.String("data-dir", cfg.DataDir, "The directory for storing runtime data.")
-	flags.String("audit-log-dir", cfg.AuditLogDir, "The directory for storing audit logs.")
 	flags.StringSlice("roles", cfg.Roles, "The roles of this MicroShift instance.")
 	flags.String("node-name", cfg.NodeName, "The hostname of the node.")
 	flags.String("node-ip", cfg.NodeIP, "The IP address of the node.")
@@ -93,7 +92,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	}
 
 	os.MkdirAll(cfg.DataDir, 0700)
-	os.MkdirAll(cfg.AuditLogDir, 0700)
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	if _, err := os.Stat(filepath.Join(cfg.DataDir, "certs")); errors.Is(err, os.ErrNotExist) {
