@@ -21,6 +21,10 @@ echo "Removing the existing 'osbuild' packages..."
 LIST2REMOVE=$(rpm -qa | egrep 'osbuild|cockpit-composer|rpm-ostree' || true)
 [ ! -z "${LIST2REMOVE}" ] && sudo rpm -e ${LIST2REMOVE}
 
+# Clean-up the old osbuild jobs and state to avoid incompatibilities between versions
+sudo rm -rf /var/lib/osbuild-composer || true
+sudo rm -rf /var/cache/{osbuild-composer,osbuild-worker} || true
+
 echo "Configuring the 'copr' repositories..."
 sudo dnf copr -y $REPO_MODE @osbuild/osbuild
 sudo dnf copr -y $REPO_MODE @osbuild/osbuild-composer
