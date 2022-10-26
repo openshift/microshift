@@ -1,6 +1,3 @@
-# Directory for storing audit logs
-#auditLogDir: ""
-
 # Cluster settings
 cluster:
 
