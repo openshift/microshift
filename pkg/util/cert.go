@@ -20,12 +20,13 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/pkg/errors"
+	"k8s.io/client-go/util/keyutil"
 )
 
 const (
@@ -42,45 +43,31 @@ const (
 
 // GenKeys generates and save rsa keys
 func GenKeys(dir, pubFilename, keyFilename string) error {
-	key, err := PrivateKey()
-	if err != nil {
-		return err
-	}
-	pub := &key.PublicKey
-	pubBuff, err := PublicKeyToPem(pub)
-	if err != nil {
-		return err
-	}
-	keyBuff := PrivateKeyToPem(key)
-	os.MkdirAll(dir, 0700)
-	pubPath := filepath.Join(dir, pubFilename)
-	keyPath := filepath.Join(dir, keyFilename)
-	ioutil.WriteFile(pubPath, pubBuff, 0644)
-	ioutil.WriteFile(keyPath, keyBuff, 0644)
-	return err
-
-}
-
-// PrivateKey generates an RSA Private key and returns the value
-func PrivateKey() (*rsa.PrivateKey, error) {
 	rsaKey, err := rsa.GenerateKey(rand.Reader, keySize)
 	if err != nil {
-		return nil, errors.Wrap(err, "error generating RSA private key")
+		return errors.Wrap(err, "error generating RSA private key")
 	}
 
-	return rsaKey, nil
-}
+	keyPEM, err := keyutil.MarshalPrivateKeyToPEM(rsaKey)
+	if err != nil {
+		return fmt.Errorf("failed to encode private key to PEM: %v", err)
+	}
 
-// PrivateKeyToPem converts an rsa.PrivateKey object to pem string
-func PrivateKeyToPem(key *rsa.PrivateKey) []byte {
-	keyInBytes := x509.MarshalPKCS1PrivateKey(key)
-	keyinPem := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: keyInBytes,
-		},
-	)
-	return keyinPem
+	pubPEM, err := PublicKeyToPem(&rsaKey.PublicKey)
+	if err != nil {
+		return err
+	}
+
+	keyPath := filepath.Join(dir, keyFilename)
+	pubPath := filepath.Join(dir, pubFilename)
+
+	if err := keyutil.WriteKey(keyPath, keyPEM); err != nil {
+		return fmt.Errorf("failed to write the private key to %s: %v", keyPath, err)
+	}
+
+	ioutil.WriteFile(pubPath, pubPEM, 0644)
+
+	return nil
 }
 
 // PublicKeyToPem converts an rsa.PublicKey object to pem string
