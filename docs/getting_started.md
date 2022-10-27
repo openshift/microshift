@@ -2,7 +2,7 @@
 
 > **Disclaimer**<br>
 > This page describes an opinionated setup to facilitate a quick bootstrap of MicroShift in a virtual environment for **experimentation-only** purpose.
-> See [Install MicroShift on RHEL for Edge](./docs/rhel4edge_iso.md) for more information on setting up a production-grade system with MicroShift.
+> See [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) for more information on setting up a production-grade system with MicroShift.
 
 The remainder of this document describes how to install a virtual machine running RHEL 8.6 operating system and an **experimental version** of MicroShift from the [@redhat-et/microshift-testing](https://copr.fedorainfracloud.org/coprs/g/redhat-et/microshift-testing) `copr` repository.
 
