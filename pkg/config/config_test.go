@@ -10,6 +10,10 @@ import (
 	"github.com/spf13/pflag"
 )
 
+const (
+	testConfigFile = "../../test/config.yaml"
+)
+
 // tests to make sure that the config file is parsed correctly
 func TestConfigFile(t *testing.T) {
 
@@ -17,13 +21,12 @@ func TestConfigFile(t *testing.T) {
 		configFile string
 		err        error
 	}{
-		{"../../test/config.yaml", nil},
+		{testConfigFile, nil},
 	}
 
 	for _, tt := range ttests {
 		config := NewMicroshiftConfig()
-		config.ConfigFile = tt.configFile
-		err := config.ReadFromConfigFile()
+		err := config.ReadFromConfigFile(tt.configFile)
 		if (err != nil) != (tt.err != nil) {
 			t.Errorf("ReadFromConfigFile() error = %v, wantErr %v", err, tt.err)
 		}
@@ -39,12 +42,10 @@ func TestCommandLineConfig(t *testing.T) {
 	}{
 		{
 			config: &MicroshiftConfig{
-				ConfigFile: "/path/to/config.yaml",
-				DataDir:    "/tmp/microshift/data",
-				LogVLevel:  4,
-				Roles:      []string{"controlplane", "node"},
-				NodeName:   "node1",
-				NodeIP:     "1.2.3.4",
+				LogVLevel: 4,
+				Roles:     []string{"controlplane", "node"},
+				NodeName:  "node1",
+				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://1.2.3.4:6443",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -54,7 +55,6 @@ func TestCommandLineConfig(t *testing.T) {
 					Domain:               "cluster.local",
 					MTU:                  "1200",
 				},
-				Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, "/tmp/microshift/data/manifests"},
 				Debug: DebugConfig{
 					Pprof: true,
 				},
@@ -67,10 +67,7 @@ func TestCommandLineConfig(t *testing.T) {
 		config := NewMicroshiftConfig()
 
 		flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		// bind the config file flag to the struct
-		flags.StringVar(&config.ConfigFile, "config", config.ConfigFile, "File to read configuration from.")
 		// all other flags unbound (looked up by name) and defaulted
-		flags.String("data-dir", config.DataDir, "")
 		flags.Int("v", config.LogVLevel, "")
 		flags.StringSlice("roles", config.Roles, "")
 		flags.String("node-name", config.NodeName, "")
@@ -87,8 +84,6 @@ func TestCommandLineConfig(t *testing.T) {
 		// parse the flags
 		var err error
 		err = flags.Parse([]string{
-			"--config=" + tt.config.ConfigFile,
-			"--data-dir=" + tt.config.DataDir,
 			"--v=" + strconv.Itoa(tt.config.LogVLevel),
 			"--roles=" + strings.Join(tt.config.Roles, ","),
 			"--node-name=" + tt.config.NodeName,
@@ -130,12 +125,10 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 	}{
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
-				ConfigFile: "/to/config/file",
-				DataDir:    "/tmp/microshift/data",
-				LogVLevel:  23,
-				Roles:      []string{"controlplane", "node"},
-				NodeName:   "node1",
-				NodeIP:     "1.2.3.4",
+				LogVLevel: 23,
+				Roles:     []string{"controlplane", "node"},
+				NodeName:  "node1",
+				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -145,15 +138,12 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					Domain:               "cluster.local",
 					MTU:                  "1400",
 				},
-				Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc, "/tmp/microshift/data/manifests"},
 			},
 			err: nil,
 			envList: []struct {
 				varName string
 				value   string
 			}{
-				{"MICROSHIFT_CONFIGFILE", "/to/config/file"},
-				{"MICROSHIFT_DATADIR", "/tmp/microshift/data"},
 				{"MICROSHIFT_LOGVLEVEL", "23"},
 				{"MICROSHIFT_ROLES", "controlplane,node"},
 				{"MICROSHIFT_NODENAME", "node1"},
@@ -169,12 +159,10 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 		},
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
-				ConfigFile: "/to/config/file",
-				DataDir:    "/tmp/microshift/data",
-				LogVLevel:  23,
-				Roles:      []string{"controlplane", "node"},
-				NodeName:   "node1",
-				NodeIP:     "1.2.3.4",
+				LogVLevel: 23,
+				Roles:     []string{"controlplane", "node"},
+				NodeName:  "node1",
+				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -184,15 +172,12 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					Domain:               "cluster.local",
 					MTU:                  "1300",
 				},
-				Manifests: []string{"/my/manifests1", "/my/manifests2"},
 			},
 			err: nil,
 			envList: []struct {
 				varName string
 				value   string
 			}{
-				{"MICROSHIFT_CONFIGFILE", "/to/config/file"},
-				{"MICROSHIFT_DATADIR", "/tmp/microshift/data"},
 				{"MICROSHIFT_LOGVLEVEL", "23"},
 				{"MICROSHIFT_ROLES", "controlplane,node"},
 				{"MICROSHIFT_NODENAME", "node1"},
@@ -202,7 +187,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
 				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
-				{"MICROSHIFT_MANIFESTS", "/my/manifests1,/my/manifests2"},
 				{"MICROSHIFT_CLUSTER_MTU", "1300"},
 			},
 		},
@@ -229,13 +213,12 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 // test the MicroshiftConfig.ReadAndValidate function to verify that it configures MicroshiftConfig with a valid flagset
 func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
-	flags.String("data-dir", "", "")
 	flags.Int("v", 0, "")
 	flags.StringSlice("roles", []string{}, "")
 
 	c := NewMicroshiftConfig()
 
-	if err := c.ReadAndValidate(flags); err != nil {
+	if err := c.ReadAndValidate(testConfigFile, flags); err != nil {
 		t.Errorf("failed to read and validate config: %v", err)
 	}
 }

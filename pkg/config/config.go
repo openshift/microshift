@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -26,7 +25,7 @@ const (
 	defaultUserConfigFile   = "~/.microshift/config.yaml"
 	defaultUserDataDir      = "~/.microshift/data"
 	defaultGlobalConfigFile = "/etc/microshift/config.yaml"
-	DefaultGlobalDataDir    = "/var/lib/microshift"
+	defaultGlobalDataDir    = "/var/lib/microshift"
 	// for files managed via management system in /etc, i.e. user applications
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
@@ -34,7 +33,10 @@ const (
 )
 
 var (
-	validRoles = []string{"controlplane", "node"}
+	validRoles   = []string{"controlplane", "node"}
+	configFile   = findConfigFile()
+	dataDir      = findDataDir()
+	manifestsDir = findManifestsDir()
 )
 
 type ClusterConfig struct {
@@ -53,9 +55,6 @@ type DebugConfig struct {
 }
 
 type MicroshiftConfig struct {
-	ConfigFile string `json:"configFile"`
-	DataDir    string `json:"dataDir"`
-
 	LogVLevel int `json:"logVLevel"`
 
 	Roles []string `json:"roles"`
@@ -64,10 +63,19 @@ type MicroshiftConfig struct {
 	NodeIP   string `json:"nodeIP"`
 
 	Cluster ClusterConfig `json:"cluster"`
+	Debug   DebugConfig   `json:"debug"`
+}
 
-	Manifests []string `json:"manifests"`
+func GetConfigFile() string {
+	return configFile
+}
 
-	Debug DebugConfig `json:"debug"`
+func GetDataDir() string {
+	return dataDir
+}
+
+func GetManifestsDir() []string {
+	return manifestsDir
 }
 
 // KubeConfigID identifies the different kubeconfigs managed in the DataDir
@@ -82,7 +90,7 @@ const (
 
 // KubeConfigPath returns the path to the specified kubeconfig file.
 func (cfg *MicroshiftConfig) KubeConfigPath(id KubeConfigID) string {
-	return filepath.Join(cfg.DataDir, "resources", string(id), "kubeconfig")
+	return filepath.Join(dataDir, "resources", string(id), "kubeconfig")
 }
 
 func NewMicroshiftConfig() *MicroshiftConfig {
@@ -95,17 +103,13 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		klog.Fatalf("failed to get host IP: %v", err)
 	}
 
-	dataDir := findDataDir()
-
 	defaultRoles := make([]string, len(validRoles))
 	copy(defaultRoles, validRoles)
 	return &MicroshiftConfig{
-		ConfigFile: findConfigFile(),
-		DataDir:    dataDir,
-		LogVLevel:  0,
-		Roles:      defaultRoles,
-		NodeName:   nodeName,
-		NodeIP:     nodeIP,
+		LogVLevel: 0,
+		Roles:     defaultRoles,
+		NodeName:  nodeName,
+		NodeIP:    nodeIP,
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
@@ -115,7 +119,6 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			Domain:               "cluster.local",
 			MTU:                  "1400",
 		},
-		Manifests: []string{defaultManifestDirLib, defaultManifestDirEtc},
 	}
 }
 
@@ -163,11 +166,17 @@ func findDataDir() string {
 		if os.Geteuid() > 0 {
 			return userDataDir
 		} else {
-			return DefaultGlobalDataDir
+			return defaultGlobalDataDir
 		}
 	} else {
 		return userDataDir
 	}
+}
+
+// Returns the default manifests directories
+func findManifestsDir() []string {
+	var manifestsDir = []string{defaultManifestDirLib, defaultManifestDirEtc}
+	return manifestsDir
 }
 
 func StringInList(s string, list []string) bool {
@@ -179,21 +188,17 @@ func StringInList(s string, list []string) bool {
 	return false
 }
 
-func (c *MicroshiftConfig) ReadFromConfigFile() error {
-	if len(c.ConfigFile) == 0 {
-		return nil
-	}
-
-	contents, err := os.ReadFile(c.ConfigFile)
+// Note: add a configFile parameter here because of unit test requiring custom
+// local directory
+func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
+	contents, err := os.ReadFile(configFile)
 	if err != nil {
-		return fmt.Errorf("reading config file %s: %v", c.ConfigFile, err)
+		return fmt.Errorf("reading config file %s: %v", configFile, err)
 	}
 
 	if err := yaml.Unmarshal(contents, c); err != nil {
-		return fmt.Errorf("decoding config file %s: %v", c.ConfigFile, err)
+		return fmt.Errorf("decoding config file %s: %v", configFile, err)
 	}
-
-	c.updateManifestList()
 
 	return nil
 }
@@ -202,23 +207,10 @@ func (c *MicroshiftConfig) ReadFromEnv() error {
 	if err := envconfig.Process("microshift", c); err != nil {
 		return err
 	}
-	c.updateManifestList()
 	return nil
 }
 
-func (c *MicroshiftConfig) updateManifestList() {
-	defaultCfg := NewMicroshiftConfig()
-	if c.DataDir != defaultCfg.DataDir && reflect.DeepEqual(defaultCfg.Manifests, c.Manifests) {
-		c.Manifests = []string{defaultManifestDirLib, defaultManifestDirEtc, filepath.Join(c.DataDir, "manifests")}
-	}
-}
-
 func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
-	if s, err := flags.GetString("data-dir"); err == nil && flags.Changed("data-dir") {
-		c.DataDir = s
-		// if the defaults are present, rebuild based on the new data-dir
-		c.updateManifestList()
-	}
 	if f := flags.Lookup("v"); f != nil && flags.Changed("v") {
 		c.LogVLevel, _ = strconv.Atoi(f.Value.String())
 	}
@@ -259,8 +251,13 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	return nil
 }
 
-func (c *MicroshiftConfig) ReadAndValidate(flags *pflag.FlagSet) error {
-	if err := c.ReadFromConfigFile(); err != nil {
+// Note: add a configFile parameter here because of unit test requiring custom
+// local directory
+func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagSet) error {
+	if configFile == "" {
+		configFile = findConfigFile()
+	}
+	if err := c.ReadFromConfigFile(configFile); err != nil {
 		return err
 	}
 	if err := c.ReadFromEnv(); err != nil {

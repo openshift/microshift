@@ -32,11 +32,7 @@ const (
 
 func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags := cmd.Flags()
-	// Read the config flag directly into the struct, so it's immediately available.
-	flags.StringVar(&cfg.ConfigFile, "config", cfg.ConfigFile, "The file to read configuration from.")
-	cmd.MarkFlagFilename("config", "yaml", "yml")
 	// All other flags will be read after reading both config file and env vars.
-	flags.String("data-dir", cfg.DataDir, "The directory for storing runtime data.")
 	flags.StringSlice("roles", cfg.Roles, "The roles of this MicroShift instance.")
 	flags.String("node-name", cfg.NodeName, "The hostname of the node.")
 	flags.String("node-ip", cfg.NodeIP, "The IP address of the node.")
@@ -67,8 +63,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 }
 
 func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
-
-	if err := cfg.ReadAndValidate(flags); err != nil {
+	if err := cfg.ReadAndValidate("", flags); err != nil {
 		klog.Fatalf("Error in reading and validating flags", err)
 	}
 
@@ -91,15 +86,15 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		klog.Fatal(err)
 	}
 
-	os.MkdirAll(cfg.DataDir, 0700)
+	os.MkdirAll(microshiftDataDir, 0700)
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
-	if _, err := os.Stat(filepath.Join(cfg.DataDir, "certs")); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(filepath.Join(microshiftDataDir, "certs")); errors.Is(err, os.ErrNotExist) {
 		util.Must(initAll(cfg))
 	} else {
 		err = loadCA(cfg)
 		if err != nil {
-			err := os.RemoveAll(filepath.Join(cfg.DataDir, "certs"))
+			err := os.RemoveAll(filepath.Join(microshiftDataDir, "certs"))
 			if err != nil {
 				klog.Errorf("Removing old certs directory", err)
 			}

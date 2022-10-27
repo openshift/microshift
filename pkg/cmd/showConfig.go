@@ -30,14 +30,11 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 
 			switch opts.Mode {
 			case "default":
-				// Override a few settings to always use the global locations
-				cfg.DataDir = config.DefaultGlobalDataDir
-				cfg.Manifests = cfg.Manifests[:len(cfg.Manifests)-1]
 				cfg.NodeIP = ""
 				cfg.NodeName = ""
 			case "effective":
 				// Load the current configuration
-				if err := cfg.ReadAndValidate(cmd.Flags()); err != nil {
+				if err := cfg.ReadAndValidate("", cmd.Flags()); err != nil {
 					cmdutil.CheckErr(err)
 				}
 			default:

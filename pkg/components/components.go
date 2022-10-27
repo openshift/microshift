@@ -5,6 +5,8 @@ import (
 	"k8s.io/klog/v2"
 )
 
+var microshiftDataDir = config.GetDataDir()
+
 func StartComponents(cfg *config.MicroshiftConfig) error {
 	kubeAdminConfig := cfg.KubeConfigPath(config.KubeAdmin)
 

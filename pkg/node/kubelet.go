@@ -44,6 +44,8 @@ const (
 	componentKubelet = "kubelet"
 )
 
+var microshiftDataDir = config.GetDataDir()
+
 type KubeletServer struct {
 	kubeletflags *kubeletoptions.KubeletFlags
 	kubeconfig   *kubeletconfig.KubeletConfiguration
@@ -81,7 +83,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 		}
 	}
 
-	kubeletConfig, err := loadConfigFile(cfg.DataDir + "/resources/kubelet/config/config.yaml")
+	kubeletConfig, err := loadConfigFile(microshiftDataDir + "/resources/kubelet/config/config.yaml")
 
 	if err != nil {
 		klog.Fatalf("Failed to load Kubelet Configuration", err)
@@ -92,7 +94,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 }
 
 func (s *KubeletServer) writeConfig(cfg *config.MicroshiftConfig) error {
-	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 	servingCertDir := cryptomaterial.KubeletServingCertDir(certsDir)
 
 	data := []byte(`
@@ -100,14 +102,14 @@ kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
   x509:
-    clientCAFile: ` + cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(cfg.DataDir)) + `
+    clientCAFile: ` + cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(microshiftDataDir)) + `
   anonymous:
     enabled: false
 tlsCertFile: ` + cryptomaterial.ServingCertPath(servingCertDir) + `
 tlsPrivateKeyFile: ` + cryptomaterial.ServingKeyPath(servingCertDir) + `
 cgroupDriver: "systemd"
 failSwapOn: false
-volumePluginDir: ` + cfg.DataDir + `/kubelet-plugins/volume/exec
+volumePluginDir: ` + microshiftDataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
   - ` + cfg.Cluster.DNS + `
 clusterDomain: ` + cfg.Cluster.Domain + `
@@ -133,7 +135,7 @@ serverTLSBootstrap: false #TODO`)
 		data = append(data, "\nresolvConf: /run/systemd/resolve/resolv.conf"...)
 	}
 
-	path := filepath.Join(cfg.DataDir, "resources", "kubelet", "config", "config.yaml")
+	path := filepath.Join(microshiftDataDir, "resources", "kubelet", "config", "config.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return ioutil.WriteFile(path, data, 0644)
 }

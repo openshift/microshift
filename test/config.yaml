@@ -1,5 +1,4 @@
---- 
-dataDir: /tmp/microshift/data
+---
 logVLevel: 4
 roles:
   - role1
@@ -14,5 +13,3 @@ cluster:
   domain: cluster.local
   serviceNodePortRange: 30000-32767
   mtu: "1400"
-manifests:
-  - /etc/my-app/manifests

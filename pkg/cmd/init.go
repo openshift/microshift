@@ -27,6 +27,8 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
+var microshiftDataDir = config.GetDataDir()
+
 func initAll(cfg *config.MicroshiftConfig) error {
 	// create CA and keys
 	clusterTrustBundlePEM, certChains, err := initCerts(cfg)
@@ -42,7 +44,7 @@ func initAll(cfg *config.MicroshiftConfig) error {
 }
 
 func loadCA(cfg *config.MicroshiftConfig) error {
-	return util.LoadRootCA(filepath.Join(cfg.DataDir, "/certs/ca-bundle"), "ca-bundle.crt", "ca-bundle.key")
+	return util.LoadRootCA(filepath.Join(microshiftDataDir, "/certs/ca-bundle"), "ca-bundle.crt", "ca-bundle.key")
 }
 
 func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.CertificateChains, error) {
@@ -56,7 +58,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 		return nil, nil, err
 	}
 
-	certsDir := cryptomaterial.CertsDirectory(cfg.DataDir)
+	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 	// store root CA for all
 	//TODO generate ca bundles for each component
 	clusterTrustBundlePEM, _, err := util.StoreRootCA("https://kubernetes.svc", filepath.Join(certsDir, "/ca-bundle"),
@@ -251,14 +253,14 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 	}
 
 	// kube-apiserver
-	if err := util.GenCerts("kube-apiserver", filepath.Join(cfg.DataDir, "/certs/kube-apiserver/secrets/service-network-serving-certkey"),
+	if err := util.GenCerts("kube-apiserver", filepath.Join(microshiftDataDir, "/certs/kube-apiserver/secrets/service-network-serving-certkey"),
 		"tls.crt", "tls.key",
 		[]string{"kube-apiserver", cfg.NodeIP, cfg.NodeName, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes",
 			"localhost",
 			apiServerServiceIP.String()}); err != nil {
 		return nil, nil, err
 	}
-	if err := util.GenKeys(filepath.Join(cfg.DataDir, "/resources/kube-apiserver/secrets/service-account-key"),
+	if err := util.GenKeys(filepath.Join(microshiftDataDir, "/resources/kube-apiserver/secrets/service-account-key"),
 		"service-account.crt", "service-account.key"); err != nil {
 		return nil, nil, err
 	}
