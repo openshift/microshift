@@ -98,6 +98,9 @@ github.com/PuerkitoBio/urlesc
 # github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220418222510-f25a4f6275ed
 ## explicit; go 1.16
 github.com/antlr/antlr4/runtime/Go/antlr
+# github.com/apparentlymart/go-cidr v1.1.0
+## explicit
+github.com/apparentlymart/go-cidr/cidr
 # github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
 ## explicit
 github.com/armon/circbuf

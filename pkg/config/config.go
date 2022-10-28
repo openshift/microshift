@@ -3,11 +3,13 @@ package config
 import (
 	"errors"
 	"fmt"
+	"net"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
 
+	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/pflag"
@@ -43,7 +45,7 @@ type ClusterConfig struct {
 	ClusterCIDR          string `json:"clusterCIDR"`
 	ServiceCIDR          string `json:"serviceCIDR"`
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
-	DNS                  string `json:"dns"`
+	DNS                  string `json:"-"`
 	Domain               string `json:"domain"`
 }
 
@@ -109,7 +111,6 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			ClusterCIDR:          "10.42.0.0/16",
 			ServiceCIDR:          "10.43.0.0/16",
 			ServiceNodePortRange: "30000-32767",
-			DNS:                  "10.43.0.10",
 			Domain:               "cluster.local",
 		},
 	}
@@ -223,9 +224,6 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if s, err := flags.GetString("service-node-port-range"); err == nil && flags.Changed("service-node-port-range") {
 		c.Cluster.ServiceNodePortRange = s
 	}
-	if s, err := flags.GetString("cluster-dns"); err == nil && flags.Changed("cluster-dns") {
-		c.Cluster.DNS = s
-	}
 	if s, err := flags.GetString("cluster-domain"); err == nil && flags.Changed("cluster-domain") {
 		c.Cluster.Domain = s
 	}
@@ -248,7 +246,28 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 		return err
 	}
 
+	// validate serviceCIDR
+	clusterDNS, err := getClusterDNS(c.Cluster.ServiceCIDR)
+	if err != nil {
+		klog.Fatalf("failed to get DNS IP: %v", err)
+	}
+	c.Cluster.DNS = clusterDNS
+
 	return nil
+}
+
+// getClusterDNS returns cluster DNS IP that is 10th IP of the ServiceNetwork
+func getClusterDNS(serviceCIDR string) (string, error) {
+	_, service, err := net.ParseCIDR(serviceCIDR)
+	if err != nil {
+		return "", fmt.Errorf("invalid service cidr %v: %v", serviceCIDR, err)
+	}
+	dnsClusterIP, err := cidr.Host(service, 10)
+	if err != nil {
+		return "", fmt.Errorf("service cidr must have at least 10 distinct host addresses %v: %v", serviceCIDR, err)
+	}
+
+	return dnsClusterIP.String(), nil
 }
 
 func HideUnsupportedFlags(flags *pflag.FlagSet) {
