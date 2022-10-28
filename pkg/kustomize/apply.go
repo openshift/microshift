@@ -112,7 +112,7 @@ func ApplyKustomization(kustomization string, kubeconfig string) error {
 		return err
 	}
 
-	if err := o.Validate(cmds, nil); err != nil {
+	if err := o.Validate(); err != nil {
 		return err
 	}
 	return o.Run()
