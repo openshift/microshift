@@ -66,7 +66,7 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 
 	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
 	// csi plugin.
-	lvmdCfg, err := lvmd.NewLvmdConfigFromFileOrDefault(filepath.Join(filepath.Dir(microshiftDataDir), "lvmd.yaml"))
+	lvmdCfg, err := lvmd.NewLvmdConfigFromFileOrDefault(filepath.Join(filepath.Dir(config.GetConfigFile()), "lvmd.yaml"))
 	if err != nil {
 		return err
 	}
