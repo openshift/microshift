@@ -36,7 +36,7 @@ var (
 	crds                = []string{
 		"crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml",
 		"crd/0000_03_security-openshift_01_scc.crd.yaml",
-		"crd/0000_01_route.crd.yaml",
+		"crd/route.crd.yaml",
 		"components/odf-lvm/topolvm.cybozu.com_logicalvolumes.yaml",
 	}
 	// for apis that belong to a group served by openshift-apiserver but are themselves served
