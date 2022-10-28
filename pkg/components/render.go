@@ -24,7 +24,7 @@ func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderPar
 	params := map[string]interface{}{
 		"ReleaseImage":  release.Image,
 		"NodeName":      cfg.NodeName,
-		"NodeIP":        cfg.NodeIP,
+		"NodeIP":        nodeIP,
 		"ClusterCIDR":   cfg.Cluster.ClusterCIDR,
 		"ServiceCIDR":   cfg.Cluster.ServiceCIDR,
 		"ClusterDNS":    cfg.Cluster.DNS,

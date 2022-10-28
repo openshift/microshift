@@ -37,6 +37,7 @@ var (
 	configFile   = findConfigFile()
 	dataDir      = findDataDir()
 	manifestsDir = findManifestsDir()
+	nodeIP       = findNodeIP()
 )
 
 type ClusterConfig struct {
@@ -60,7 +61,6 @@ type MicroshiftConfig struct {
 	Roles []string `json:"roles"`
 
 	NodeName string `json:"nodeName"`
-	NodeIP   string `json:"nodeIP"`
 
 	Cluster ClusterConfig `json:"cluster"`
 	Debug   DebugConfig   `json:"debug"`
@@ -76,6 +76,18 @@ func GetDataDir() string {
 
 func GetManifestsDir() []string {
 	return manifestsDir
+}
+
+func GetNodeIP() string {
+	return nodeIP
+}
+
+func findNodeIP() string {
+	hostIP, err := util.GetHostIP()
+	if err != nil {
+		klog.Fatalf("failed to get host IP: %v", err)
+	}
+	return hostIP
 }
 
 // KubeConfigID identifies the different kubeconfigs managed in the DataDir
@@ -98,10 +110,6 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	if err != nil {
 		klog.Fatalf("Failed to get hostname %v", err)
 	}
-	nodeIP, err := util.GetHostIP()
-	if err != nil {
-		klog.Fatalf("failed to get host IP: %v", err)
-	}
 
 	defaultRoles := make([]string, len(validRoles))
 	copy(defaultRoles, validRoles)
@@ -109,7 +117,6 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		LogVLevel: 0,
 		Roles:     defaultRoles,
 		NodeName:  nodeName,
-		NodeIP:    nodeIP,
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
@@ -219,9 +226,6 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	}
 	if s, err := flags.GetString("node-name"); err == nil && flags.Changed("node-name") {
 		c.NodeName = s
-	}
-	if s, err := flags.GetString("node-ip"); err == nil && flags.Changed("node-ip") {
-		c.NodeIP = s
 	}
 	if s, err := flags.GetString("url"); err == nil && flags.Changed("url") {
 		c.Cluster.URL = s

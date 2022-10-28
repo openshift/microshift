@@ -22,19 +22,8 @@ cluster:
   # MTU for CNI
   #mtu: "1400"
 
-# Location for data created by MicroShift
-#dataDir: /var/lib/microshift
-
 # Log verbosity (0-5)
 #logVLevel: 0
-
-# Locations to scan for manifests to load on startup
-#manifests:
-#- /usr/lib/microshift/manifests
-#- /etc/microshift/manifests
-
-# The IP of the node (defaults to IP of default route)
-#nodeIP: ""
 
 # The name of the node (defaults to hostname)
 #nodeName: ""

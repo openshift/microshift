@@ -25,7 +25,7 @@ type MicroShiftmDNSController struct {
 
 func NewMicroShiftmDNSController(cfg *config.MicroshiftConfig) *MicroShiftmDNSController {
 	return &MicroShiftmDNSController{
-		NodeIP:     cfg.NodeIP,
+		NodeIP:     config.GetNodeIP(),
 		NodeName:   cfg.NodeName,
 		KubeConfig: cfg.KubeConfigPath(config.KubeAdmin),
 		hostCount:  make(map[string]int),

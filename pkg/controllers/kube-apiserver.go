@@ -113,7 +113,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
-			"advertise-address": {cfg.NodeIP},
+			"advertise-address": {nodeIP},
 			"audit-policy-file": {microshiftDataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
 			"client-ca-file":    {clientCABundlePath},
 			"etcd-cafile":       {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},

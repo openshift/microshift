@@ -37,6 +37,7 @@ var (
 		"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
 	}
 	microshiftDataDir = config.GetDataDir()
+	nodeIP            = config.GetNodeIP()
 )
 
 const (
@@ -70,14 +71,14 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	//s.etcdCfg.ForceNewCluster = true //TODO
 	s.etcdCfg.Logger = "zap"
 	s.etcdCfg.Dir = dataDir
-	s.etcdCfg.APUrls = setURL([]string{cfg.NodeIP}, ":2380")
-	s.etcdCfg.LPUrls = setURL([]string{cfg.NodeIP}, ":2380")
-	s.etcdCfg.ACUrls = setURL([]string{cfg.NodeIP}, ":2379")
-	s.etcdCfg.LCUrls = setURL([]string{"127.0.0.1", cfg.NodeIP}, ":2379")
+	s.etcdCfg.APUrls = setURL([]string{nodeIP}, ":2380")
+	s.etcdCfg.LPUrls = setURL([]string{nodeIP}, ":2380")
+	s.etcdCfg.ACUrls = setURL([]string{nodeIP}, ":2379")
+	s.etcdCfg.LCUrls = setURL([]string{"127.0.0.1", nodeIP}, ":2379")
 	s.etcdCfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, ":2381")
 
 	s.etcdCfg.Name = cfg.NodeName
-	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, cfg.NodeIP)
+	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, nodeIP)
 
 	s.etcdCfg.CipherSuites = tlsCipherSuites
 	s.etcdCfg.ClientTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdServingCertDir)

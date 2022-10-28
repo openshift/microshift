@@ -27,7 +27,10 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
-var microshiftDataDir = config.GetDataDir()
+var (
+	microshiftDataDir = config.GetDataDir()
+	nodeIP            = config.GetNodeIP()
+)
 
 func initAll(cfg *config.MicroshiftConfig) error {
 	// create CA and keys
@@ -148,7 +151,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 						Name:         "kubelet-server",
 						ValidityDays: cryptomaterial.ServingCertValidityDays,
 					},
-					Hostnames: []string{cfg.NodeName, cfg.NodeIP},
+					Hostnames: []string{cfg.NodeName, nodeIP},
 				},
 			),
 		),
@@ -208,7 +211,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 					ValidityDays: 3 * 365,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-peer:etcd-client", Groups: []string{"system:etcd-peers"}},
-				Hostnames: []string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName},
+				Hostnames: []string{"localhost", nodeIP, "127.0.0.1", cfg.NodeName},
 			},
 			&cryptomaterial.PeerCertificateSigningRequestInfo{
 				CertificateSigningRequestInfo: cryptomaterial.CertificateSigningRequestInfo{
@@ -216,7 +219,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 					ValidityDays: 3 * 365,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-server:etcd-client", Groups: []string{"system:etcd-servers"}},
-				Hostnames: []string{"localhost", "127.0.0.1", cfg.NodeIP, cfg.NodeName},
+				Hostnames: []string{"localhost", "127.0.0.1", nodeIP, cfg.NodeName},
 			},
 		),
 	).WithCABundle(
@@ -255,7 +258,7 @@ func initCerts(cfg *config.MicroshiftConfig) ([]byte, *cryptomaterial.Certificat
 	// kube-apiserver
 	if err := util.GenCerts("kube-apiserver", filepath.Join(microshiftDataDir, "/certs/kube-apiserver/secrets/service-network-serving-certkey"),
 		"tls.crt", "tls.key",
-		[]string{"kube-apiserver", cfg.NodeIP, cfg.NodeName, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes",
+		[]string{"kube-apiserver", nodeIP, cfg.NodeName, "127.0.0.1", "kubernetes.default.svc", "kubernetes.default", "kubernetes",
 			"localhost",
 			apiServerServiceIP.String()}); err != nil {
 		return nil, nil, err

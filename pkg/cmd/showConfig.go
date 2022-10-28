@@ -30,7 +30,6 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 
 			switch opts.Mode {
 			case "default":
-				cfg.NodeIP = ""
 				cfg.NodeName = ""
 			case "effective":
 				// Load the current configuration

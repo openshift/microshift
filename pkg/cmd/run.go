@@ -35,7 +35,6 @@ func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	// All other flags will be read after reading both config file and env vars.
 	flags.StringSlice("roles", cfg.Roles, "The roles of this MicroShift instance.")
 	flags.String("node-name", cfg.NodeName, "The hostname of the node.")
-	flags.String("node-ip", cfg.NodeIP, "The IP address of the node.")
 	flags.String("url", cfg.Cluster.URL, "The URL of the API server.")
 	flags.String("cluster-cidr", cfg.Cluster.ClusterCIDR, "The IP range in CIDR notation for pods in the cluster.")
 	flags.String("service-cidr", cfg.Cluster.ServiceCIDR, "The IP range in CIDR notation for services in the cluster.")
@@ -77,7 +76,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	//        see https://github.com/openshift/microshift/pull/471
 
 	if err := util.AddToNoProxyEnv(
-		cfg.NodeIP,
 		cfg.NodeName,
 		cfg.Cluster.ClusterCIDR,
 		cfg.Cluster.ServiceCIDR,
@@ -155,7 +153,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		go func() {
 			var server *http.Server
 			server = &http.Server{
-				Addr:    cfg.NodeIP + ":29500",
+				Addr:    nodeIP + ":29500",
 				Handler: mux,
 			}
 			err := server.ListenAndServe()

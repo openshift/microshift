@@ -18,7 +18,6 @@ cluster:
   domain: ""
   url: ""
   mtu: ""
-nodeIP: ""
 nodeName: ""
 logVLevel: ""
 ```
@@ -34,7 +33,6 @@ The configuration settings alongside with the supported command line arguments a
 | domain              | --cluster-domain          | MICROSHIFT_CLUSTER_DOMAIN               | Base DNS domain used to construct fully qualified pod and service domain names
 | url                 | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
 | mtu                 | --cluster-mtu             | MICROSHIFT_CLUSTER_MTU                  | The maximum transmission unit for the Generic Network Virtualization Encapsulation overlay network
-| nodeIP              | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
 | nodeName            | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
 | logVLevel           | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (0-5)
 
@@ -51,7 +49,6 @@ cluster:
   domain: cluster.local
   url: https://127.0.0.1:6443
   mtu: "1400"
-nodeIP: ""
 nodeName: ""
 logVLevel: 0
 ```
