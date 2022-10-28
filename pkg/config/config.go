@@ -50,10 +50,6 @@ type ClusterConfig struct {
 	MTU                  string `json:"mtu"`
 }
 
-type DebugConfig struct {
-	Pprof bool `json:"pprof"`
-}
-
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
@@ -63,7 +59,6 @@ type MicroshiftConfig struct {
 	NodeIP   string `json:"nodeIP"`
 
 	Cluster ClusterConfig `json:"cluster"`
-	Debug   DebugConfig   `json:"debug"`
 }
 
 func GetConfigFile() string {
@@ -243,9 +238,6 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	}
 	if s, err := flags.GetString("cluster-mtu"); err == nil && flags.Changed("cluster-mtu") {
 		c.Cluster.MTU = s
-	}
-	if b, err := flags.GetBool("debug.pprof"); err == nil && flags.Changed("debug.pprof") {
-		c.Debug.Pprof = b
 	}
 
 	return nil

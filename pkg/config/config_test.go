@@ -55,9 +55,6 @@ func TestCommandLineConfig(t *testing.T) {
 					Domain:               "cluster.local",
 					MTU:                  "1200",
 				},
-				Debug: DebugConfig{
-					Pprof: true,
-				},
 			},
 			err: nil,
 		},
@@ -79,7 +76,6 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.String("cluster-dns", config.Cluster.DNS, "")
 		flags.String("cluster-domain", config.Cluster.Domain, "")
 		flags.String("cluster-mtu", config.Cluster.MTU, "")
-		flags.Bool("debug.pprof", false, "")
 
 		// parse the flags
 		var err error
@@ -95,7 +91,6 @@ func TestCommandLineConfig(t *testing.T) {
 			"--cluster-dns=" + tt.config.Cluster.DNS,
 			"--cluster-domain=" + tt.config.Cluster.Domain,
 			"--cluster-mtu=" + tt.config.Cluster.MTU,
-			"--debug.pprof=" + strconv.FormatBool(tt.config.Debug.Pprof),
 		})
 		if err != nil {
 			t.Errorf("failed to parse command line flags: %s", err)
