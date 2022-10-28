@@ -73,15 +73,9 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	kubeletFlags.NodeIP = cfg.NodeIP
 	kubeletFlags.ContainerRuntime = "remote"
 	kubeletFlags.RemoteRuntimeEndpoint = "unix:///var/run/crio/crio.sock"
-	for _, role := range cfg.Roles {
-		if role == "controlplane" {
-			kubeletFlags.NodeLabels["node-role.kubernetes.io/control-plane"] = ""
-			kubeletFlags.NodeLabels["node-role.kubernetes.io/master"] = ""
-		}
-		if role == "node" {
-			kubeletFlags.NodeLabels["node-role.kubernetes.io/worker"] = ""
-		}
-	}
+	kubeletFlags.NodeLabels["node-role.kubernetes.io/control-plane"] = ""
+	kubeletFlags.NodeLabels["node-role.kubernetes.io/master"] = ""
+	kubeletFlags.NodeLabels["node-role.kubernetes.io/worker"] = ""
 
 	kubeletConfig, err := loadConfigFile(microshiftDataDir + "/resources/kubelet/config/config.yaml")
 
