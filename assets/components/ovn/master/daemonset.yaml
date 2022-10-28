@@ -121,6 +121,7 @@ spec:
 
           bracketify() { case "$1" in *:*) echo "[$1]" ;; *) echo "$1" ;; esac }
           compact() {
+            sleep 15
             while true; do
               /usr/bin/ovn-appctl -t /var/run/ovn/ovn${1}_db.ctl --timeout=5 ovsdb-server/compact 2>/dev/null || true
               sleep 600
@@ -246,6 +247,7 @@ spec:
 
           bracketify() { case "$1" in *:*) echo "[$1]" ;; *) echo "$1" ;; esac }
           compact() {
+            sleep 15
             while true; do
               /usr/bin/ovn-appctl -t /var/run/ovn/ovn${1}_db.ctl --timeout=5 ovsdb-server/compact 2>/dev/null || true
               sleep 600
