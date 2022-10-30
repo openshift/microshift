@@ -265,55 +265,89 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/configure-ovs.sh
 %{_bindir}/configure-ovs-microshift.sh
 
+# Use Git command to generate the log and replace the VERSION string
+# LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" microshift.spec
 %changelog
-* Wed Aug 31 2022 Patryk Matuszak <pmatusza@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_6
+* Mon Oct 24 2022 Zenghui Shi <zshi@redhat.com> 4.12.0
+- Add arch specific crio conf
+
+* Fri Sep 30 2022 Frank A. Zdarsky <fzdarsky@redhat.com> 4.12.0
+- Update openswitch version to 2.17
+
+* Wed Aug 31 2022 Doug Hellmann <dhellmann@redhat.com> 4.10.0
+- Remove experimental comments from RPM description
+- Add example config file to rpm
+
+* Wed Aug 31 2022 Gregory Giguashvili <ggiguash@redhat.com> 4.10.0
+- Fix RPM post install script not to return error when crio is not running
+- Co-authored-by: Dan Clark <danielmclark@gmail.com>
+
+* Wed Aug 31 2022 Patryk Matuszak <pmatusza@redhat.com> 4.10.0
 - Removed hostpath-provisioner
 
-* Thu Jul 28 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_6
+* Tue Aug 02 2022 Zenghui Shi <zshi@redhat.com> 4.10.0
+- Fix openvswitch issues when MicroShift service is disabled
+
+* Thu Jul 28 2022 Ricardo Noriega <rnoriega@redhat.com> 4.10.0
 - Add NetworkManager configuration file
 
-* Thu Jul 21 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_5
+* Tue Jul 26 2022 Miguel Angel Ajo Pelayo <majopela@redhat.com> 4.10.0
+- Move crio.conf.d/microshift-ovn.conf to microshift-networking
+
+* Tue Jul 26 2022 Zenghui Shi <zshi@redhat.com> 4.10.0
+- Restart NetworkManager before OVS configuration
+
+* Fri Jul 22 2022 Miguel Angel Ajo Pelayo <majopela@redhat.com> 4.10.0
+- Add the jq dependency
+
+* Thu Jul 21 2022 Miguel Angel Ajo Pelayo <majopela@redhat.com> 4.10.0
+- Remove ovs duplicated services to set CPUAffinity with systemd .d dirs
+
+* Thu Jul 21 2022 Ricardo Noriega <rnoriega@redhat.com> 4.10.0
 - Adding microshift-ovn.conf with CRI-O network and workload partitioning
 
-* Tue Jul 19 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_4
+* Wed Jul 20 2022 Miguel Angel Ajo Pelayo <majopela@redhat.com> 4.10.0
+- Add microshift-ovs-init script as oneshot during boot
+
+* Tue Jul 19 2022 Miguel Angel Ajo <majopela@redhat.com> 4.10.0
 - Adding the microshift-ovs-init systemd service and script which initializes br-ex and connects
   the main interface through it.
 
-* Tue Jul 12 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_3
+* Tue Jul 12 2022 Miguel Angel Ajo <majopela@redhat.com> 4.10.0
 - Adding the networking subpackage to support ovn-networking
 - Adding virtual openvswitch systemd files with CPUAffinity=0
 - Setting OVS_USER_OPT to --no-mlockall in /etc/sysconfig/openvswitch
 
-* Tue May 24 2022 Ricardo Noriega <rnoriega@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357_2
+* Tue May 24 2022 Ricardo Noriega <rnoriega@redhat.com> 4.10.0
 - Adding hostpath-provisioner.service to set SElinux policies to the volumes directory
 
-* Fri May 6 2022 Sally O'Malley <somalley@redhat.com> . 4.10.0-0.microshift-2022-04-23-131357
+* Fri May 6 2022 Sally O'Malley <somalley@redhat.com> 4.10.0
 - Update required golang version to 1.17
 
-* Mon Feb 7 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshiftr-2022_02_02_194009_3
+* Mon Feb 7 2022 Ryan Cook <rcook@redhat.com> 4.8.0
 - Selinux directory creation and labeling
 
-* Wed Feb 2 2022 Ryan Cook <rcook@redhat.com> . 4.8.0-0.microshift-2022_01_04_175420_25
+* Wed Feb 2 2022 Ryan Cook <rcook@redhat.com> 4.8.0
 - Define specific selinux policy version to help manage selinux package
 
-* Wed Feb 2 2022 Miguel Angel Ajo <majopela@redhat.com> . 4.8.0-0.microshift-2022-01-06-210147-20
+* Wed Feb 2 2022 Miguel Angel Ajo <majopela@redhat.com> 4.8.0
 - Remove the microshift-containerized subpackage, our docs explain how to download the .service file,
   and it has proven problematic to package this.
 - Fix the microshift.service being overwritten by microshift-containerized, even when the non-containerized
   package only is installed.
 
-* Thu Nov 4 2021 Miguel angel Ajo <majopela@redhat.com> . 4.8.0-nightly-14-g973b9c78
+* Thu Nov 4 2021 Miguel angel Ajo <majopela@redhat.com> 4.8.0
 - Add microshift-containerized subpackage which contains the microshift-containerized systemd
   definition.
 
-* Thu Nov 4 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.8.0-nightly-13-g886705e5
+* Thu Nov 4 2021 Miguel Angel Ajo <majopela@redhat.com> 4.8.0
 - Include the cleanup-all-microshift-data script for convenience
 
 
-* Thu Sep 23 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.7.0-021_08_31_224727_40_g5c23735f
+* Thu Sep 23 2021 Miguel Angel Ajo <majopela@redhat.com> 4.7.0
 - Support commit based builds
 - workaround rpmbuild with no build in place support
 - add missing BuildRequires on systemd and policycoreutils
 
-* Mon Sep 20 2021 Miguel Angel Ajo <majopela@redhat.com> . 4.7.0-2021_08_31_224727
+* Mon Sep 20 2021 Miguel Angel Ajo <majopela@redhat.com> 4.7.0
 - Initial packaging
