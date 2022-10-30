@@ -91,11 +91,11 @@ make srpm
 
 The artifacts of the build are located in the `_output/rpmbuild` directory.
 ```bash
-$ cd ~/microshift/ && find . -name \*.rpm
-./_output/rpmbuild/RPMS/x86_64/microshift-4.12.0-nightly_20220908132255_152_g4267d5d1.el8.x86_64.rpm
-./_output/rpmbuild/RPMS/x86_64/microshift-networking-4.12.0-nightly_20220908132255_152_g4267d5d1.el8.x86_64.rpm
-./_output/rpmbuild/RPMS/noarch/microshift-selinux-4.12.0-nightly_20220908132255_152_g4267d5d1.el8.noarch.rpm
-./_output/rpmbuild/SRPMS/microshift-4.12.0-nightly_20220908132255_152_g4267d5d1.el8.src.rpm
+$ cd ~/microshift/ && find _output -name \*.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-4.12.0-2022_10_30_114426_untagged.el8.x86_64.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-networking-4.12.0-2022_10_30_114426_untagged.el8.x86_64.rpm
+_output/rpmbuild/RPMS/noarch/microshift-selinux-4.12.0-2022_10_30_114426_untagged.el8.noarch.rpm
+_output/rpmbuild/SRPMS/microshift-4.12.0-2022_10_30_114426_untagged.el8.src.rpm
 ```
 
 ## Run MicroShift Executable

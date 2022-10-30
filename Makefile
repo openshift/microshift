@@ -18,7 +18,7 @@ RELEASE_PRE := ${RELEASE_BASE}-0.microshift
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
-SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' || echo '4.12.0-0.microshift-unknown')
+SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' || echo '${RELEASE_PRE}-${TIMESTAMP}-untagged')
 
 EMBEDDED_GIT_TAG ?= ${SOURCE_GIT_TAG}
 EMBEDDED_GIT_COMMIT ?= ${SOURCE_GIT_COMMIT}
@@ -152,17 +152,21 @@ cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 .PHONY: cross-build
 
 rpm:
-	BUILD=rpm \
+	RELEASE_BASE=${RELEASE_BASE} \
+	RELEASE_PRE=${RELEASE_PRE} \
+	SOURCE_GIT_TAG=${SOURCE_GIT_TAG} \
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
-	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} RELEASE_BASE=${RELEASE_BASE}  \
-	RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
+	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
+	./packaging/rpm/make-rpm.sh rpm local
 .PHONY: rpm
 
 srpm:
-	BUILD=srpm \
+	RELEASE_BASE=${RELEASE_BASE} \
+	RELEASE_PRE=${RELEASE_PRE} \
+	SOURCE_GIT_TAG=${SOURCE_GIT_TAG} \
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
-	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} RELEASE_BASE=${RELEASE_BASE}  \
-	RELEASE_PRE=${RELEASE_PRE} ./packaging/rpm/make-rpm.sh local
+	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
+	./packaging/rpm/make-rpm.sh srpm local
 .PHONY: srpm
 
 image-build-configure:
