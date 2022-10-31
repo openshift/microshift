@@ -8,8 +8,6 @@ microshift_dir: "{{ ansible_env.HOME }}/microshift"
 microshift_repo: https://github.com/openshift/microshift.git
 microshift_rpms: []
 
-remote_kubeconfig_path: /var/lib/microshift/resources/kubeadmin/kubeconfig
-
 du_dirs:
   - /
   - /var/
@@ -17,5 +15,3 @@ du_dirs:
   - /var/lib/containers/storage/
   - /usr/
   - /usr/bin/*
-
-sample_interval: 5
