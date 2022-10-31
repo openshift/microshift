@@ -59,7 +59,7 @@ func newLvmdConfigFromFile(p string) (*Lvmd, error) {
 func NewLvmdConfigFromFileOrDefault(path string) (*Lvmd, error) {
 	if _, err := os.Stat(path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			klog.Info("lvmd file not found, assuming default values")
+			klog.Infof("lvmd file not found, assuming default values")
 			return new(Lvmd).withDefaults(), nil
 		}
 		return nil, fmt.Errorf("failed to get lvmd config file: %v", err)
@@ -67,7 +67,7 @@ func NewLvmdConfigFromFileOrDefault(path string) (*Lvmd, error) {
 
 	l, err := newLvmdConfigFromFile(path)
 	if err == nil {
-		klog.Info("got lvmd config from file %q", path)
+		klog.Infof("got lvmd config from file %q", path)
 		return l, nil
 	}
 	return nil, fmt.Errorf("getting lvmd config: %v", err)
