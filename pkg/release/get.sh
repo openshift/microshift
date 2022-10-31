@@ -21,6 +21,7 @@ function get_images {
     arch=$1
     case $arch in
         x86_64|amd64) get_image_list "${SCRIPT_DIR}/release_amd64.go" ;;
+        aarch64|arm64) get_image_list "${SCRIPT_DIR}/release_arm64.go" ;;
         *) get_image_list "${SCRIPT_DIR}/release.go"              ;;
     esac
 }

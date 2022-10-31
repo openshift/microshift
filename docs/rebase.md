@@ -116,14 +116,6 @@ For each component, this performs the following high-level steps:
 
 Each step consistes of zero or more transformations. These transformations should remain relatively stable, but at least when rebasing to a new minor version of OpenShift, the output produced by the components Operator and that of the rebase script should be compared to make the necessary updates.
 
-Embed the assets into the binary and commit the result:
-
-```shell
-./scripts/bindata.sh
-git add assets pkg/assets
-git commit -m "update manifests"
-```
-
 #### Component configs
 
 The last step isn't automated at all yet, which is to compare whether the config parameters of embedded component changed, for example the kubelet configuration in `writeConfig(...)` of `pkg/node/kubelet.go` with OpenShift MCO's template (which the `rebase.sh` script downloads into `_output/staging/machine-config-operator/templates/master/01-master-kubelet/_base/files/kubelet.yaml`).

@@ -2,24 +2,29 @@
 set -e -o pipefail
 
 # must be passed down to this script from Makefile
-RELEASE_BASE=${RELEASE_BASE:-4.12.0}
-RELEASE_PRE=${RELEASE_PRE:-${RELEASE_BASE}-0.microshift}
-BUILD=${BUILD:-all}
+ENV_VARS="RELEASE_BASE RELEASE_PRE SOURCE_GIT_TAG SOURCE_GIT_COMMIT SOURCE_GIT_TREE_STATE"
+for env in $ENV_VARS ; do
+  if [[ -z "${!env}" ]] ; then
+    echo "Error: Mandatory environment variable '${env}' is missing"
+    echo ""
+    echo "Run 'make rpm' or 'make srpm' instead of this script"
+    exit 1
+  fi
+done
 
 # generated from other info
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-RPM_REL=$(git describe --tags | sed s/"${RELEASE_PRE}-"//g | sed s/-/_/g)
 
+RPM_REL=$(echo ${SOURCE_GIT_TAG} | sed s/"${RELEASE_PRE}-"//g | sed s/-/_/g)
 # add the git commit timestamp for nightlies, so updates will always work on devices old pkg < new pkg
 RPM_REL=$(echo "${RPM_REL}" | sed s/nightly_/nightly_$(git show -s --format=%ct)_/g)
 
 GIT_SHA=$(git rev-parse HEAD)
 # using this instead of rev-parse --short because github's is 1 char shorter than --short
-GIT_SHORTHASH="${GIT_SHA:0:7}"
-TARBALL_FILE="microshift-${GIT_SHORTHASH}.tar.gz"
-RPMBUILD_DIR="$(git rev-parse --show-toplevel)/_output/rpmbuild/"
+GITHUB_SHA="${GIT_SHA:0:7}"
 
-SOURCE_GIT_TAG="$(git describe --tags | sed s/nightly-/nightly-$(git show -s --format=%ct)_/g )"
+TARBALL_FILE="microshift-${GITHUB_SHA}.tar.gz"
+RPMBUILD_DIR="$(git rev-parse --show-toplevel)/_output/rpmbuild/"
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
@@ -48,12 +53,6 @@ download_tag_tarball() {
           --define "github_tag ${1}" \
           -R "${SCRIPT_DIR}/microshift.spec"
 }
-
-case $BUILD in
-  all) RPMBUILD_OPT=-ba ;;
-  rpm) RPMBUILD_OPT=-bb ;;
-  srpm) RPMBUILD_OPT=-bs ;;
-esac
 
 build_commit() {
   # using --defines worka for rpm building, but not for an srpm
@@ -86,6 +85,21 @@ EOF
   rpmbuild --quiet "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
+usage() {
+  echo "Usage: $(basename $0) <all | rpm | srpm> < local | commit <commit-id> | tag <tag-name> >"
+  exit 1
+}
+
+[ $# -lt 2 ] && usage
+
+case $1 in
+  all)  RPMBUILD_OPT=-ba ;;
+  rpm)  RPMBUILD_OPT=-bb ;;
+  srpm) RPMBUILD_OPT=-bs ;;
+  *)    usage
+esac
+shift
+
 # prepare the rpmbuild env
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
@@ -102,8 +116,6 @@ case $1 in
       download_tag_tarball "$2"
       build_tag_commit "$2"
       ;;
-
     *)
-      echo "Usage: $0 local|commit <commit-id>|tag <tag-name>"
-      exit 1
+      usage
 esac

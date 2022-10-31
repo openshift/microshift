@@ -65,14 +65,21 @@ if r.active_branch.commit == r.branches["main"].commit:
     print(f"There's no new commit on branch {r.active_branch} compared to 'main'.\nLast commit: {r.active_branch.commit.hexsha[:8]} - \n\n{r.active_branch.commit.summary}'")
     sys.exit(0)
 
-origin = r.remote("origin")
-origin.fetch()
+remote_url = f"https://x-access-token:{installation_access_token}@github.com/{org}/{repo}"
+try:
+    remote = r.remote(BOT_REMOTE_NAME)
+    remote.set_url(remote_url)
+except ValueError:
+    r.create_remote(BOT_REMOTE_NAME, remote_url)
+
+remote = r.remote(BOT_REMOTE_NAME)
+remote.fetch()
 
 # Check if branch with the same name exists in remote
-matching_origin_branches = [ ref for ref in origin.refs if "origin/" + r.active_branch.name == ref.name ]
-if len(matching_origin_branches) == 1:
+matching_remote_branches = [ ref for ref in remote.refs if BOT_REMOTE_NAME + "/" + r.active_branch.name == ref.name ]
+if len(matching_remote_branches) == 1:
     # Compare local and remote rebase branches by looking at their start on main branch (commit from which they branched off)
-    merge_base_prev_rebase = r.merge_base("main", matching_origin_branches[0].name)
+    merge_base_prev_rebase = r.merge_base("main", matching_remote_branches[0].name)
     merge_base_cur_rebase = r.merge_base("main", r.active_branch.name)
     if merge_base_prev_rebase[0] == merge_base_cur_rebase[0]:
         print(f"Branch {r.active_branch} already exists on remote and it's up to date.\n\
@@ -83,16 +90,6 @@ Branch-off commit: {commit_str(merge_base_cur_rebase[0])}\n")
         print(f"Branch {r.active_branch} already exists on remote but it's out of date.\n\
 Old branch-off commit: {commit_str(merge_base_prev_rebase[0])}\n\
 New branch-off commit: {commit_str(merge_base_cur_rebase[0])}\n")
-
-
-remote_url = f"https://x-access-token:{installation_access_token}@github.com/{org}/{repo}"
-try:
-    remote = r.remote(BOT_REMOTE_NAME)
-    remote.set_url(remote_url)
-except ValueError:
-    r.create_remote(BOT_REMOTE_NAME, remote_url)
-
-remote = r.remote(BOT_REMOTE_NAME)
 
 push_result = remote.push(r.active_branch.name, force=True)
 if len(push_result) != 1:
