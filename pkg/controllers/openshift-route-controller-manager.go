@@ -81,8 +81,8 @@ func (s *OCPRouteControllerManager) writeConfig(cfg *config.MicroshiftConfig) *o
 			},
 		},
 		Controllers: []string{
-			"openshift.io/ingress-ip",
 			"openshift.io/ingress-to-route",
+			"-openshift.io/ingress-ip",
 		},
 	}
 
