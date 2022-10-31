@@ -13,34 +13,7 @@ install_packages:
   - perf
   - rpm-build
   - selinux-policy-devel 
+  - vnstat
 
 vg_name: rhel
 lvm_disk: /dev/xvdb
-
-oc_archive_name: openshift-client-linux.tar.gz
-
-remote_kubeconfig_path: /var/lib/microshift/resources/kubeadmin/kubeconfig
-
-firewall_services:
-  - http
-  - https
-  - mdns
-
-firewall_ports:
-  - 80/tcp
-  - 443/tcp
-  - 2379/tcp
-  - 5353/udp
-  - 6443/tcp
-  - 8080/tcp
-  - 9100/tcp
-  - 9537/tcp
-  - 17001/tcp
-  - 30000-32767/tcp
-  - 30000-32767/udp
-
-firewall_trusted_cidr:
-  - 10.42.0.0/16
-  - 169.254.169.1/32
-
-root_bin_dir: /usr/bin

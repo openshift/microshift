@@ -18,6 +18,7 @@
 
 - name: start and enable prometheus & grafana service(s)
   ansible.builtin.systemd:
-    name: "{{ logging_services }}"
+    name: "{{ item }}"
     state: restarted
     enabled: yes
+  loop: "{{ logging_services }}"
