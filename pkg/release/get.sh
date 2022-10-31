@@ -21,7 +21,12 @@ function get_images {
     arch=$1
     case $arch in
         x86_64|amd64) get_image_list "${SCRIPT_DIR}/release_amd64.go" ;;
-        aarch64|arm64) get_image_list "${SCRIPT_DIR}/release_arm64.go" ;;
+        arm|aarch64|arm64) get_image_list "${SCRIPT_DIR}/release_arm64.go" ;;
+        all)
+            for f in ${SCRIPT_DIR}/release*.go; do
+                shortf=$(echo $f | sed -e 's|.*pkg/|pkg/|')
+                get_image_list $f | sed -e "s|^|$shortf |g"
+            done;;
         *) get_image_list "${SCRIPT_DIR}/release.go"              ;;
     esac
 }
@@ -38,5 +43,3 @@ case $1 in
     images) get_images $2 ;;
     *) usage
 esac
-
-

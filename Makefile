@@ -101,6 +101,11 @@ build: export CGO_ENABLED=0
 
 microshift: build
 
+.PHONY: verify-images
+verify: verify-images
+verify-images:
+	./scripts/verify_images.sh
+
 ###############################
 # post install validate       #
 ###############################
