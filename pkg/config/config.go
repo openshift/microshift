@@ -50,6 +50,11 @@ type ClusterConfig struct {
 	MTU                  string `json:"mtu"`
 }
 
+type IngressConfig struct {
+	ServingCertificate []byte
+	ServingKey         []byte
+}
+
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
@@ -59,6 +64,8 @@ type MicroshiftConfig struct {
 	NodeIP   string `json:"nodeIP"`
 
 	Cluster ClusterConfig `json:"cluster"`
+
+	Ingress IngressConfig `json:"ingress"`
 }
 
 func GetConfigFile() string {
