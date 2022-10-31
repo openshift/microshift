@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mitchellh/go-homedir"
@@ -33,7 +32,6 @@ const (
 )
 
 var (
-	validRoles   = []string{"controlplane", "node"}
 	configFile   = findConfigFile()
 	dataDir      = findDataDir()
 	manifestsDir = findManifestsDir()
@@ -57,8 +55,6 @@ type IngressConfig struct {
 
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
-
-	Roles []string `json:"roles"`
 
 	NodeName string `json:"nodeName"`
 	NodeIP   string `json:"nodeIP"`
@@ -105,11 +101,8 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		klog.Fatalf("failed to get host IP: %v", err)
 	}
 
-	defaultRoles := make([]string, len(validRoles))
-	copy(defaultRoles, validRoles)
 	return &MicroshiftConfig{
 		LogVLevel: 0,
-		Roles:     defaultRoles,
 		NodeName:  nodeName,
 		NodeIP:    nodeIP,
 		Cluster: ClusterConfig{
@@ -216,9 +209,6 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if f := flags.Lookup("v"); f != nil && flags.Changed("v") {
 		c.LogVLevel, _ = strconv.Atoi(f.Value.String())
 	}
-	if ss, err := flags.GetStringSlice("roles"); err == nil && flags.Changed("roles") {
-		c.Roles = ss
-	}
 	if s, err := flags.GetString("node-name"); err == nil && flags.Changed("node-name") {
 		c.NodeName = s
 	}
@@ -264,11 +254,6 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 	}
 	if err := c.ReadFromCmdLine(flags); err != nil {
 		return err
-	}
-	for _, role := range c.Roles {
-		if !StringInList(role, validRoles) {
-			return fmt.Errorf("config error: '%s' is not a valid role, must be in {%s}", role, strings.Join(validRoles, ", "))
-		}
 	}
 
 	return nil

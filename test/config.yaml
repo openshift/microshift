@@ -1,8 +1,5 @@
 ---
 logVLevel: 4
-roles:
-  - role1
-  - role2
 nodeName: node1
 nodeIP: '1.2.3.4'
 cluster:

@@ -4,7 +4,6 @@ import (
 	"os"
 	"reflect"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/spf13/pflag"
@@ -43,7 +42,6 @@ func TestCommandLineConfig(t *testing.T) {
 		{
 			config: &MicroshiftConfig{
 				LogVLevel: 4,
-				Roles:     []string{"controlplane", "node"},
 				NodeName:  "node1",
 				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
@@ -66,7 +64,6 @@ func TestCommandLineConfig(t *testing.T) {
 		flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 		// all other flags unbound (looked up by name) and defaulted
 		flags.Int("v", config.LogVLevel, "")
-		flags.StringSlice("roles", config.Roles, "")
 		flags.String("node-name", config.NodeName, "")
 		flags.String("node-ip", config.NodeIP, "")
 		flags.String("url", config.Cluster.URL, "")
@@ -81,7 +78,6 @@ func TestCommandLineConfig(t *testing.T) {
 		var err error
 		err = flags.Parse([]string{
 			"--v=" + strconv.Itoa(tt.config.LogVLevel),
-			"--roles=" + strings.Join(tt.config.Roles, ","),
 			"--node-name=" + tt.config.NodeName,
 			"--node-ip=" + tt.config.NodeIP,
 			"--url=" + tt.config.Cluster.URL,
@@ -121,7 +117,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
 				LogVLevel: 23,
-				Roles:     []string{"controlplane", "node"},
 				NodeName:  "node1",
 				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
@@ -140,7 +135,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				value   string
 			}{
 				{"MICROSHIFT_LOGVLEVEL", "23"},
-				{"MICROSHIFT_ROLES", "controlplane,node"},
 				{"MICROSHIFT_NODENAME", "node1"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
@@ -155,7 +149,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
 				LogVLevel: 23,
-				Roles:     []string{"controlplane", "node"},
 				NodeName:  "node1",
 				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
@@ -174,7 +167,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				value   string
 			}{
 				{"MICROSHIFT_LOGVLEVEL", "23"},
-				{"MICROSHIFT_ROLES", "controlplane,node"},
 				{"MICROSHIFT_NODENAME", "node1"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
@@ -209,7 +201,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.Int("v", 0, "")
-	flags.StringSlice("roles", []string{}, "")
 
 	c := NewMicroshiftConfig()
 

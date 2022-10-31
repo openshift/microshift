@@ -29,7 +29,6 @@ const (
 func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags := cmd.Flags()
 	// All other flags will be read after reading both config file and env vars.
-	flags.StringSlice("roles", cfg.Roles, "The roles of this MicroShift instance.")
 	flags.String("node-name", cfg.NodeName, "The hostname of the node.")
 	flags.String("node-ip", cfg.NodeIP, "The IP address of the node.")
 	flags.String("url", cfg.Cluster.URL, "The URL of the API server.")
@@ -63,8 +62,8 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	}
 
 	// fail early if we don't have enough privileges
-	if config.StringInList("node", cfg.Roles) && os.Geteuid() > 0 {
-		klog.Fatalf("MicroShift must be run privileged for role 'node'")
+	if os.Geteuid() > 0 {
+		klog.Fatalf("MicroShift must be run privileged")
 	}
 
 	// TO-DO: When multi-node is ready, we need to add the controller host-name/mDNS hostname
@@ -89,28 +88,20 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	}
 
 	m := servicemanager.NewServiceManager()
-	if config.StringInList("controlplane", cfg.Roles) {
-		util.Must(m.AddService(controllers.NewEtcd(cfg)))
-		util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
-		util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
-		util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
-		util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
-		util.Must(m.AddService(controllers.NewOpenShiftCRDManager(cfg)))
-		util.Must(m.AddService(controllers.NewRouteControllerManager(cfg)))
-		util.Must(m.AddService(controllers.NewClusterPolicyController(cfg)))
-		util.Must(m.AddService(controllers.NewOpenShiftDefaultSCCManager(cfg)))
-		util.Must(m.AddService(mdns.NewMicroShiftmDNSController(cfg)))
-		util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
-		util.Must(m.AddService((controllers.NewVersionManager((cfg)))))
-		util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
-	}
-
-	if config.StringInList("node", cfg.Roles) {
-		if len(cfg.Roles) == 1 {
-			util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
-		}
-		util.Must(m.AddService(node.NewKubeletServer(cfg)))
-	}
+	util.Must(m.AddService(controllers.NewEtcd(cfg)))
+	util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
+	util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
+	util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
+	util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
+	util.Must(m.AddService(controllers.NewOpenShiftCRDManager(cfg)))
+	util.Must(m.AddService(controllers.NewRouteControllerManager(cfg)))
+	util.Must(m.AddService(controllers.NewClusterPolicyController(cfg)))
+	util.Must(m.AddService(controllers.NewOpenShiftDefaultSCCManager(cfg)))
+	util.Must(m.AddService(mdns.NewMicroShiftmDNSController(cfg)))
+	util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
+	util.Must(m.AddService((controllers.NewVersionManager((cfg)))))
+	util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
+	util.Must(m.AddService(node.NewKubeletServer(cfg)))
 
 	// Storing and clearing the env, so other components don't send the READY=1 until MicroShift is fully ready
 	notifySocket := os.Getenv("NOTIFY_SOCKET")
