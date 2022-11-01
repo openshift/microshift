@@ -29,5 +29,12 @@ func init() {
 		"ovn_kubernetes_microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4678d1ccf812ef8bcbfd54cf59d5d01be05d1b08683c346e06c3e29d3f924824",
 		"pod":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9f9b6f1aa2770195c726ef4186306813b3c3c038cc488ff05aa5873297de94d0",
 		"service_ca_operator":       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:989a43840f16af130f846df494e61e484d42ed679d311db79a6b698d2399b92e",
+
+		// TODO: find the real images here, otherwise the run fails on infrastructure-service-controller
+		"odf_topolvm":             "quay.io/microshift/odf-topolvm-rhel8" + Base,
+		"ose_csi_ext_provisioner": "quay.io/microshift/ose-csi-external-provisioner" + Base,
+		"ose_csi_ext_resizer":     "quay.io/microshift/ose-csi-external-resizer" + Base,
+		"ose_csi_node_registrar":  "quay.io/microshift/ose-csi-node-driver-registrar" + Base,
+		"ose_csi_livenessprobe":   "quay.io/microshift/ose-csi-livenessprobe" + Base,
 	}
 }
