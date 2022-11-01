@@ -61,7 +61,7 @@ type MicroshiftConfig struct {
 
 	Cluster ClusterConfig `json:"cluster"`
 
-	Ingress IngressConfig `json:"ingress"`
+	Ingress IngressConfig `json:"-"`
 }
 
 func GetConfigFile() string {
