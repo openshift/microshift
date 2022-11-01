@@ -50,6 +50,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [OpenShift CI for MicroShift](./docs/openshift_ci.md)
 - [RPM Packages for Development and Testing](./docs/rpm_packages.md)
 - [MicroShift Storage Plugin Overview](./docs/default_csi_plugin.md)
+- [MicroShift Network Plugin Overview](./docs/default_cni_plugin.md)
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
