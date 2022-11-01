@@ -10,6 +10,7 @@ import (
 
 	cmds "github.com/openshift/microshift/pkg/cmd"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/inspect"
 )
 
 func main() {
@@ -38,5 +39,6 @@ func newCommand() *cobra.Command {
 	cmd.AddCommand(cmds.NewRunMicroshiftCommand())
 	cmd.AddCommand(cmds.NewVersionCommand(ioStreams))
 	cmd.AddCommand(cmds.NewShowConfigCommand(ioStreams))
+	cmd.AddCommand(inspect.NewCmdInspect(ioStreams))
 	return cmd
 }
