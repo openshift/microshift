@@ -188,11 +188,11 @@ func StringInList(s string, list []string) bool {
 func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	contents, err := os.ReadFile(configFile)
 	if err != nil {
-		return fmt.Errorf("reading config file %s: %v", configFile, err)
+		return fmt.Errorf("reading config file %q: %v", configFile, err)
 	}
 
 	if err := yaml.Unmarshal(contents, c); err != nil {
-		return fmt.Errorf("decoding config file %s: %v", configFile, err)
+		return fmt.Errorf("decoding config file %q: %v", configFile, err)
 	}
 
 	return nil
@@ -245,6 +245,9 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagSet) error {
 	if configFile == "" {
 		configFile = findConfigFile()
+	}
+	if len(configFile) == 0 {
+		return fmt.Errorf("unable to find config file in %q or %q", defaultGlobalConfigFile, defaultUserConfigFile)
 	}
 	if err := c.ReadFromConfigFile(configFile); err != nil {
 		return err
