@@ -20,19 +20,17 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"k8s.io/klog/v2"
 	"os"
 	"path/filepath"
-
-	"k8s.io/klog/v2"
+	"runtime"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
-
 	kubelet "k8s.io/kubernetes/cmd/kubelet/app"
-
 	kubeletoptions "k8s.io/kubernetes/cmd/kubelet/app/options"
 	kubeletconfig "k8s.io/kubernetes/pkg/kubelet/apis/config"
 	"k8s.io/kubernetes/pkg/kubelet/kubeletconfig/configfiles"
@@ -135,7 +133,10 @@ serverTLSBootstrap: false #TODO`)
 }
 
 func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-
+	if runtime.GOOS == "darwin" {
+		klog.Warningf("Kubelet is NOT supported on OSX, continuing to run in headless mode")
+		return nil
+	}
 	defer close(stopped)
 	// run readiness check
 	go func() {
@@ -158,7 +159,7 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		klog.Fatalf("Error in fetching depenedencies", err)
 	}
 	if err := kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate); err != nil {
-		klog.Fatalf("Kubelet failed to start", err)
+		klog.Fatalf("Kubelet failed to start: %v", err)
 	}
 	return ctx.Err()
 }
