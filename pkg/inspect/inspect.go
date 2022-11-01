@@ -3,6 +3,7 @@ package inspect
 import (
 	"context"
 	"fmt"
+	"github.com/openshift/microshift/pkg/config"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -87,6 +88,11 @@ type InspectOptions struct {
 	eventFile string
 }
 
+var (
+	microshiftConfig    = config.NewMicroshiftConfig()
+	microshiftResources = []string{"namespaces"}
+)
+
 func NewInspectOptions(streams genericclioptions.IOStreams) *InspectOptions {
 	return &InspectOptions{
 		printFlags:  genericclioptions.NewPrintFlags("gathered").WithDefaultOutput("yaml").WithTypeSetter(scheme.Scheme),
@@ -121,10 +127,20 @@ func NewCmdInspect(streams genericclioptions.IOStreams) *cobra.Command {
 }
 
 func (o *InspectOptions) Complete(cmd *cobra.Command, args []string) error {
+	if len(args) == 0 {
+		args = append(args, microshiftResources...)
+	}
+
 	o.args = args
 
 	if len(o.eventFile) > 0 {
 		return nil
+	}
+
+	// default kubeconfig to microshift kubeadmin kubeconfig
+	if o.configFlags.KubeConfig == nil || len(*o.configFlags.KubeConfig) == 0 {
+		kubeconfigFile := microshiftConfig.KubeConfigPath("kubeadmin")
+		o.configFlags.KubeConfig = &kubeconfigFile
 	}
 
 	var err error
