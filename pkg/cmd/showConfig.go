@@ -34,7 +34,7 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 				cfg.NodeName = ""
 			case "effective":
 				// Load the current configuration
-				if err := cfg.ReadAndValidate("", cmd.Flags()); err != nil {
+				if err := cfg.ReadAndValidate(config.GetConfigFile(), cmd.Flags()); err != nil {
 					cmdutil.CheckErr(err)
 				}
 			default:

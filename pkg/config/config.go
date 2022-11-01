@@ -183,8 +183,6 @@ func StringInList(s string, list []string) bool {
 	return false
 }
 
-// Note: add a configFile parameter here because of unit test requiring custom
-// local directory
 func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	contents, err := os.ReadFile(configFile)
 	if err != nil {
@@ -243,11 +241,10 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 // Note: add a configFile parameter here because of unit test requiring custom
 // local directory
 func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagSet) error {
-	if configFile == "" {
-		configFile = findConfigFile()
-	}
-	if err := c.ReadFromConfigFile(configFile); err != nil {
-		return err
+	if configFile != "" {
+		if err := c.ReadFromConfigFile(configFile); err != nil {
+			return err
+		}
 	}
 	if err := c.ReadFromEnv(); err != nil {
 		return err
