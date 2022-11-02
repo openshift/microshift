@@ -57,8 +57,8 @@ func NewRunMicroshiftCommand() *cobra.Command {
 }
 
 func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
-	if err := cfg.ReadAndValidate("", flags); err != nil {
-		klog.Fatalf("Error in reading and validating flags", err)
+	if err := cfg.ReadAndValidate(config.GetConfigFile(), flags); err != nil {
+		klog.Fatalf("Error in reading and validating flags: %v", err)
 	}
 
 	// fail early if we don't have enough privileges
