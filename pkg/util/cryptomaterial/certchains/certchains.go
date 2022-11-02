@@ -4,6 +4,10 @@ import (
 	"crypto/x509"
 	"fmt"
 	"time"
+
+	"k8s.io/klog/v2"
+
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
 type CertificateChains struct {
@@ -103,15 +107,19 @@ func (cs *CertificateChains) WalkChains(rootPath []string, fn CertWalkFunc) erro
 }
 
 func WhenToRotateAtEarliest(cs *CertificateChains) ([]string, time.Time, error) {
-	const rotateAtLifetime = 0.7
 	var (
 		certPath     []string
 		rotationDate time.Time
 	)
 
 	err := cs.WalkChains(nil, func(currentPath []string, c x509.Certificate) error {
-		totalTime := c.NotAfter.Sub(c.NotBefore).Seconds()
-		rotateAt := c.NotBefore.Add(time.Duration(totalTime*rotateAtLifetime) * time.Second)
+		const month = 30 * time.Hour * 24
+
+		rotateAt := c.NotAfter.Add(-4 * month)
+		if !cryptomaterial.IsCertShortLived(&c) {
+			rotateAt = c.NotAfter.Add(-12 * month)
+		}
+		klog.Errorf("%v rotate at: %s", currentPath, rotateAt.String())
 
 		if rotationDate.IsZero() {
 			rotationDate = rotateAt
