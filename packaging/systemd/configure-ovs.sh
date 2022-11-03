@@ -626,6 +626,15 @@ fi
 # print initial state
 print_state
 if [ "$1" == "OVNKubernetes" ]; then
+  # Skip configuring NICs onto OVS bridge "br-ex" when disableOVSInit is true
+  MICROSHIFT_OVN_CONFIG_FILE_PATH="/etc/microshift/ovn.yaml"
+  if [ -f "$MICROSHIFT_OVN_CONFIG_FILE_PATH" ]; then
+    disableOVSInit=$(cat "$MICROSHIFT_OVN_CONFIG_FILE_PATH" | awk "/disableOVSInit:/ && ! /#.*disableOVSInit:/ {print \$2}")
+    if [ "$disableOVSInit" == "true" ]; then
+      echo "disableOVSInit is true, skipped configure-ovs.sh "
+      exit 0
+    fi
+  fi
   # Configures NICs onto OVS bridge "br-ex"
   # Configuration is either auto-detected or provided through a config file written already in Network Manager
   # key files under /etc/NetworkManager/system-connections/

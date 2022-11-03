@@ -19,9 +19,6 @@ cluster:
   # URL of the API server for the cluster
   #url: https://127.0.0.1:6443
 
-  # MTU for CNI
-  #mtu: "1400"
-
 # Log verbosity (0-5)
 #logVLevel: 0
 

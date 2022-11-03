@@ -1,14 +1,17 @@
 package components
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/config/ovn"
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
-func startOVNKubernetes(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"components/ovn/namespace.yaml",
@@ -38,6 +41,17 @@ func startOVNKubernetes(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 		}
 	)
 
+	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Join(filepath.Dir(config.GetConfigFile()), ovn.ConfigFileName))
+	if err != nil {
+		return err
+	}
+
+	if ovnConfig.DisableOVSInit {
+		if err := ovnConfig.ValidateOVSBridge(util.OVNGatewayInterface); err != nil {
+			return fmt.Errorf("failed to find ovn-kubernetes gateway bridge %s: %v", util.OVNGatewayInterface, err)
+		}
+	}
+
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		return err
@@ -63,6 +77,7 @@ func startOVNKubernetes(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 		return err
 	}
 	extraParams := assets.RenderParams{
+		"OVNConfig":      ovnConfig,
 		"KubeconfigPath": kubeconfigPath,
 		"KubeconfigDir":  filepath.Join(microshiftDataDir, "/resources/kubeadmin"),
 	}

@@ -29,8 +29,8 @@ func StartComponents(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	if err := startOVNKubernetes(cfg, kubeAdminConfig); err != nil {
-		klog.Warningf("Failed to start OVNKubernetes: %v", err)
+	if err := startCNIPlugin(cfg, kubeAdminConfig); err != nil {
+		klog.Warningf("Failed to start CNI plugin: %v", err)
 		return err
 	}
 	return nil

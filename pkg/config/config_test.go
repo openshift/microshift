@@ -51,7 +51,6 @@ func TestCommandLineConfig(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "cluster.dns",
 					Domain:               "cluster.local",
-					MTU:                  "1200",
 				},
 			},
 			err: nil,
@@ -72,7 +71,6 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.String("service-node-port-range", config.Cluster.ServiceNodePortRange, "")
 		flags.String("cluster-dns", config.Cluster.DNS, "")
 		flags.String("cluster-domain", config.Cluster.Domain, "")
-		flags.String("cluster-mtu", config.Cluster.MTU, "")
 
 		// parse the flags
 		var err error
@@ -86,7 +84,6 @@ func TestCommandLineConfig(t *testing.T) {
 			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
 			"--cluster-dns=" + tt.config.Cluster.DNS,
 			"--cluster-domain=" + tt.config.Cluster.Domain,
-			"--cluster-mtu=" + tt.config.Cluster.MTU,
 		})
 		if err != nil {
 			t.Errorf("failed to parse command line flags: %s", err)
@@ -126,7 +123,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "10.43.0.10",
 					Domain:               "cluster.local",
-					MTU:                  "1400",
 				},
 			},
 			err: nil,
@@ -143,7 +139,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
 				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
 				{"MICROSHIFT_CLUSTER_DOMAIN", "cluster.local"},
-				{"MICROSHIFT_CLUSTER_MTU", "1400"},
 			},
 		},
 		{
@@ -158,7 +153,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "10.43.0.10",
 					Domain:               "cluster.local",
-					MTU:                  "1300",
 				},
 			},
 			err: nil,
@@ -174,7 +168,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
 				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
-				{"MICROSHIFT_CLUSTER_MTU", "1300"},
 			},
 		},
 	}

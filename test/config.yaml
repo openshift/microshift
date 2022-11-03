@@ -9,4 +9,3 @@ cluster:
   dns: 'cluster.dns'
   domain: cluster.local
   serviceNodePortRange: 30000-32767
-  mtu: "1400"

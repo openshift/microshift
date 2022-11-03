@@ -37,7 +37,6 @@ func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags.String("service-node-port-range", cfg.Cluster.ServiceNodePortRange, "The port range to reserve for services with NodePort visibility. This must not overlap with the ephemeral port range on nodes.")
 	flags.String("cluster-dns", cfg.Cluster.DNS, "Comma-separated list of DNS server IP address. This value is used for containers DNS server in case of Pods with \"dnsPolicy=ClusterFirst\".")
 	flags.String("cluster-domain", cfg.Cluster.Domain, "Domain for this cluster.")
-	flags.String("cluster-mtu", cfg.Cluster.MTU, "Network MTU for pods in the cluster.")
 }
 
 func NewRunMicroshiftCommand() *cobra.Command {

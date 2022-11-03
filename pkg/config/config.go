@@ -45,7 +45,6 @@ type ClusterConfig struct {
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
 	DNS                  string `json:"dns"`
 	Domain               string `json:"domain"`
-	MTU                  string `json:"mtu"`
 }
 
 type IngressConfig struct {
@@ -112,7 +111,6 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			ServiceNodePortRange: "30000-32767",
 			DNS:                  "10.43.0.10",
 			Domain:               "cluster.local",
-			MTU:                  "1400",
 		},
 	}
 }
@@ -230,9 +228,6 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	}
 	if s, err := flags.GetString("cluster-domain"); err == nil && flags.Changed("cluster-domain") {
 		c.Cluster.Domain = s
-	}
-	if s, err := flags.GetString("cluster-mtu"); err == nil && flags.Changed("cluster-mtu") {
-		c.Cluster.MTU = s
 	}
 
 	return nil
