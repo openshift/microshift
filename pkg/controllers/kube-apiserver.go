@@ -109,7 +109,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 		return err
 	}
 
-	s.masterURL = cfg.Cluster.URL
+	s.masterURL = fmt.Sprintf("https://localhost:%d", apiServerPort)
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{

@@ -56,7 +56,7 @@ type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
 	NodeName string `json:"nodeName"`
-	NodeIP   string `json:"nodeIP"`
+	NodeIP   string `json:"-"`
 
 	Cluster ClusterConfig `json:"cluster"`
 
@@ -99,13 +99,15 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	if err != nil {
 		klog.Fatalf("failed to get host IP: %v", err)
 	}
-
+	// Use the node IP to set default URL
+	// If user wants to configure node IP manually, they can set it in URL via config
+	// file, env var and cli
+	url := "https://" + nodeIP + ":6443"
 	return &MicroshiftConfig{
 		LogVLevel: 0,
 		NodeName:  nodeName,
-		NodeIP:    nodeIP,
 		Cluster: ClusterConfig{
-			URL:                  "https://127.0.0.1:6443",
+			URL:                  url,
 			ClusterCIDR:          "10.42.0.0/16",
 			ServiceCIDR:          "10.43.0.0/16",
 			ServiceNodePortRange: "30000-32767",
@@ -134,6 +136,16 @@ func (c *ClusterConfig) ApiServerPort() (int, error) {
 		return 0, err
 	}
 	return portNum, nil
+}
+
+// extract the api server port from the cluster URL
+func (c *ClusterConfig) ApiServerHostName() (string, error) {
+	parsed, err := url.Parse(c.URL)
+	if err != nil {
+		return "", err
+	}
+
+	return parsed.Hostname(), nil
 }
 
 // Returns the default user config file if that exists, else the default global
@@ -207,9 +219,6 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	}
 	if s, err := flags.GetString("node-name"); err == nil && flags.Changed("node-name") {
 		c.NodeName = s
-	}
-	if s, err := flags.GetString("node-ip"); err == nil && flags.Changed("node-ip") {
-		c.NodeIP = s
 	}
 	if s, err := flags.GetString("url"); err == nil && flags.Changed("url") {
 		c.Cluster.URL = s

@@ -43,7 +43,6 @@ func TestCommandLineConfig(t *testing.T) {
 			config: &MicroshiftConfig{
 				LogVLevel: 4,
 				NodeName:  "node1",
-				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://1.2.3.4:6443",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -64,7 +63,6 @@ func TestCommandLineConfig(t *testing.T) {
 		// all other flags unbound (looked up by name) and defaulted
 		flags.Int("v", config.LogVLevel, "")
 		flags.String("node-name", config.NodeName, "")
-		flags.String("node-ip", config.NodeIP, "")
 		flags.String("url", config.Cluster.URL, "")
 		flags.String("cluster-cidr", config.Cluster.ClusterCIDR, "")
 		flags.String("service-cidr", config.Cluster.ServiceCIDR, "")
@@ -77,7 +75,6 @@ func TestCommandLineConfig(t *testing.T) {
 		err = flags.Parse([]string{
 			"--v=" + strconv.Itoa(tt.config.LogVLevel),
 			"--node-name=" + tt.config.NodeName,
-			"--node-ip=" + tt.config.NodeIP,
 			"--url=" + tt.config.Cluster.URL,
 			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
 			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
@@ -115,7 +112,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 			desiredMicroShiftConfig: &MicroshiftConfig{
 				LogVLevel: 23,
 				NodeName:  "node1",
-				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -132,7 +128,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 			}{
 				{"MICROSHIFT_LOGVLEVEL", "23"},
 				{"MICROSHIFT_NODENAME", "node1"},
-				{"MICROSHIFT_NODEIP", "1.2.3.4"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
@@ -145,7 +140,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 			desiredMicroShiftConfig: &MicroshiftConfig{
 				LogVLevel: 23,
 				NodeName:  "node1",
-				NodeIP:    "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -162,7 +156,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 			}{
 				{"MICROSHIFT_LOGVLEVEL", "23"},
 				{"MICROSHIFT_NODENAME", "node1"},
-				{"MICROSHIFT_NODEIP", "1.2.3.4"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},

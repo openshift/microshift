@@ -30,7 +30,6 @@ func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags := cmd.Flags()
 	// All other flags will be read after reading both config file and env vars.
 	flags.String("node-name", cfg.NodeName, "The hostname of the node.")
-	flags.String("node-ip", cfg.NodeIP, "The IP address of the node.")
 	flags.String("url", cfg.Cluster.URL, "The URL of the API server.")
 	flags.String("cluster-cidr", cfg.Cluster.ClusterCIDR, "The IP range in CIDR notation for pods in the cluster.")
 	flags.String("service-cidr", cfg.Cluster.ServiceCIDR, "The IP range in CIDR notation for services in the cluster.")
@@ -64,6 +63,12 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
+
+	nodeIP, err := cfg.Cluster.ApiServerHostName()
+	if err != nil {
+		klog.Fatalf("failed to get node IP: %v", err)
+	}
+	cfg.NodeIP = nodeIP
 
 	// TO-DO: When multi-node is ready, we need to add the controller host-name/mDNS hostname
 	//        or VIP to this list on start

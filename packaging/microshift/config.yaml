@@ -22,8 +22,5 @@ cluster:
 # Log verbosity (0-5)
 #logVLevel: 0
 
-# The IP of the node (defaults to IP of default route)
-#nodeIP: ""
-
 # The name of the node (defaults to hostname)
 #nodeName: ""
