@@ -44,7 +44,7 @@ spec:
             - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
               value: "false"
             - name: ROUTER_LOAD_BALANCE_ALGORITHM
-              value: leastconn
+              value: random
             - name: ROUTER_METRICS_TYPE
               value: haproxy
             - name: ROUTER_SERVICE_NAME
@@ -55,6 +55,8 @@ spec:
               value: source
             - name: ROUTER_THREADS
               value: "4"
+            - name: ROUTER_USE_PROXY_PROTOCOL
+              value: "true"
             - name: SSL_MIN_VERSION
               value: TLSv1.2
           livenessProbe:
