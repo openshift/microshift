@@ -8,8 +8,6 @@ The remainder of this document describes how to install a virtual machine runnin
 
 ## Prerequisites
 
-Log into the hypervisor machine using your user credentials.
-
 Run the following command to install the necessary components for the [libvirt](https://libvirt.org/) virtualization platform and its [QEMU KVM](https://libvirt.org/drvqemu.html) hypervisor driver.
 > **Note for Other Virtualization Platform Users** <br>
 > Implement the virtual machine creation guidelines from [Bootstrap MicroShift](#bootstrap-microshift) using your virtualization platform and apply one of the following configuration steps:
@@ -26,8 +24,6 @@ Download the [Red Hat Enterprise Linux 8.6 DVD ISO](https://developers.redhat.co
 Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~/.pull-secret.json` file.
 
 ## Bootstrap MicroShift
-
-Log into the hypervisor machine using your user credentials.
 
 Run the following commands to initiate the creation process of the `microshift-starter` virtual machine with 2 CPU cores, 2GB RAM and 20GB storage.
 
@@ -51,25 +47,39 @@ virt-install \
 ```
 
 Watch the OS console of the virtual machine to see the progress of the installation, waiting until the machine is rebooted and the login prompt appears.
+The OS console is also accessible from the `virt-manager GUI` as a result of running `sudo virt-manager`. 
 
 ## Access MicroShift
 
-Log into the hypervisor machine using your user credentials.
+From the OS console of the virtual machine, it is possible to log into the machine using your user credentials, `redhat:redhat`.
 
-Is it most convenient to access the MicroShift virtual machine using SSH. Run the following command to get the machine IP address and use it to remotely connect to the system.
+However, it is most convenient to access the MicroShift virtual machine using SSH.
+First, get the machine IP address with the following command.
 
 ```bash
 sudo virsh domifaddr microshift-starter
+#example output
+ Name       MAC address          Protocol     Address
+-------------------------------------------------------------------------------
+ vnet2      52:54:00:6d:08:f7    ipv4         192.168.122.2/24
 ```
 
-First, copy your pull secret file to the MicroShift virtual machine using `redhat:redhat` credentials.
+Copy your pull secret file to the MicroShift virtual machine using `redhat:redhat` credentials.
 
 ```bash
 USHIFT_IP=192.168.122.2
 scp ~/.pull-secret.json redhat@${USHIFT_IP}:
 ```
 
-Log into the MicroShift virtual machine using `redhat:redhat` credentials. Run the following commands to configure `CRI-O` for using the pull secret and start the MicroShift service.
+Log into the MicroShift virtual machine.
+
+```bash
+ssh redhat@192.168.122.2 # when prompted, password is `redhat`
+```
+
+The remaining commands are to be executed from within the virtual machine as the `redhat` user.
+
+Configure `CRI-O` to use the pull secret and start the MicroShift service.
 
 ```bash
 sudo cp ~redhat/.pull-secret.json /etc/crio/openshift-pull-secret
