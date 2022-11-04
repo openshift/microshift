@@ -3,6 +3,13 @@ Description=MicroShift
 Wants=network-online.target crio.service openvswitch.service microshift-ovs-init.service
 After=network-online.target crio.service openvswitch.service microshift-ovs-init.service
 
+# Control shutdown order by declaring this service to start Before the kubepods.slice
+# transient systemd unit; this makes system shutdown delay MicroShift shutdown until
+# all the pod containers are down. This is important because some services need to talk
+# to the MicroShift API during shutdown (i.e. releasing leader election locks or cleaning
+# up other resources) MicroShift restart or manual stop will not stop the kubepods.
+Before=kubepods.slice
+
 [Service]
 WorkingDirectory=/usr/bin/
 ExecStart=microshift run
