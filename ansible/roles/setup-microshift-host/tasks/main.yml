@@ -7,6 +7,10 @@
     state: present
     update_cache: true
 
+# Install go1.18
+# This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
+# /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
+# To be removed when go1.18 is available in repositories
 - name: install golang
   ansible.builtin.shell: |
     export GO_VER=1.18.7

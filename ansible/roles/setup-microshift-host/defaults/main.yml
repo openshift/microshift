@@ -5,7 +5,7 @@ install_packages:
   - bash-completion
   - firewalld
   - git
-  - gcc
+  - golang
   - lvm2
   - make
   - openshift-clients
