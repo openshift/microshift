@@ -19,6 +19,13 @@ boots. [StorageCapacity tracking](https://kubernetes.io/docs/concepts/storage/st
 Pods with an LVMS PVC are not scheduled if the requested storage is greater than the volume group's remaining free
 storage.
 
+> **IMPORTANT!** StorageCapacity tracking poses a race condition in which the node's storage capacity is not up-to-date
+> before reconciling a PVC.  This can lead to a situtation where total provisioned LVs exceed the capacity of the node, 
+> calculated as VolumeGroupTotalCapacity - SpareGigabyte.  When this happens, the over-scheduled LVs will be reclaimed
+> and the scheduler will attempt to find another node _without updating the PV or PVCs._  It is important to ensure
+> workloads are right-sized to their target device.  See [Topolvm Limitations](https://github.com/topolvm/topolvm/blob/main/docs/limitations.md#capacity-aware-scheduling-may-go-wrong)
+> and [Kubernetes 1.24 documentation](https://kubernetes.io/blog/2022/05/06/storage-capacity-ga/) for more info.
+
 ### Configuring LVMS
 
 MicroShift supports pass-through of users' LVMS configuration and allows users to specify custom volume-groups, thin volume provisioning parameters, reserved unallocated volume-group space, among others.  This file can be specified anytime.  If MicroShift is already running, simply restart it to pick up the latest config.
