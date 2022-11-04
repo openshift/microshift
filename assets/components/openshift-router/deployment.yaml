@@ -119,6 +119,7 @@ spec:
       serviceAccount: router
       securityContext: {}
       schedulerName: default-scheduler
+      hostNetwork: true
   minReadySeconds: 30
   selector:
     matchLabels:
