@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	go.etcd.io/etcd/server/v3 v3.5.4
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.25.2
 	k8s.io/apiextensions-apiserver v0.25.0
 	k8s.io/apimachinery v0.25.2
@@ -215,7 +215,7 @@ require (
 	k8s.io/cloud-provider v0.0.0 // indirect
 	k8s.io/cluster-bootstrap v0.0.0 // indirect
 	k8s.io/component-helpers v0.25.2 // indirect
-	k8s.io/cri-api v0.20.1 // indirect
+	k8s.io/cri-api v0.0.0 // indirect
 	k8s.io/csi-translation-lib v0.0.0 // indirect
 	k8s.io/gengo v0.0.0-20211129171323-c02415ce4185 // indirect
 	k8s.io/kube-controller-manager v0.0.0 // indirect
