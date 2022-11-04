@@ -204,7 +204,7 @@ func initCerts(cfg *config.MicroshiftConfig) (*cryptomaterial.CertificateChains,
 					ValidityDays: cryptomaterial.KubeAPIServerServingCertValidityDays,
 				},
 				Hostnames: []string{
-					cfg.NodeName,
+					cfg.NodeName, cfg.NodeIP,
 				},
 			},
 		),
