@@ -92,6 +92,7 @@ The artifact of the build is the `_output/image-builder/microshift-installer-${V
 The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such parititioning is required for the data volume to be utilized by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
 
 By default, the following partition layout is created and formatted with the `XFS` file system:
+* EFI partition with EFI file system (200MB)
 * Boot partition is allocated on a 1GB volume
 * The rest of the disk is managed by the `LVM` in a single volume group named `rhel`
   * System root partition is allocated on a 8GB volume (minimal recommended size for a root partition)
@@ -105,17 +106,18 @@ The `scripts/image-builder/build.sh` script provides for the optional `-lvm_sysr
 As an example, a 20GB disk is partitioned in the following manner by default.
 ```
 $ lsblk /dev/sda
-NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-sda             8:0    0  20G  0 disk
-├─sda1          8:1    0   1G  0 part /boot
-└─sda2          8:2    0  19G  0 part
-  └─rhel-root 253:0    0   8G  0 lvm  /sysroot
+NAME          MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda             8:0    0   20G  0 disk
+├─sda1          8:1    0  200M  0 part /boot/efi
+├─sda2          8:2    0    1G  0 part /boot
+└─sda3          8:3    0 18.8G  0 part
+  └─rhel-root 253:0    0    8G  0 lvm  /sysroot
 
 $ sudo vgdisplay -s
-  "rhel" <19.00 GiB [8.00 GiB  used / <11.00 GiB free]
+  "rhel" <18.80 GiB [8.00 GiB  used / <10.80 GiB free]
 ```
 
-> Unallocated disk space of 11GB size remains in the `rhel` volume group to be used by the CSI driver.
+> Unallocated disk space of 10.80GB size remains in the `rhel` volume group to be used by the CSI driver.
 
 ### Offline Containers
 The `scripts/image-builder/build.sh` script supports a special mode for including the MicroShift container image dependencies into the generated ISO. When the container images required by MicroShift are preinstalled, `CRI-O` does not attempt to pull them when MicroShift service is first started, saving network bandwidth and avoiding external network connections.
