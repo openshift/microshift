@@ -33,6 +33,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	routev1 "github.com/openshift/api/route/v1"
@@ -95,6 +96,11 @@ type Controller struct {
 	// expectationDelay controls how long the controller waits to observe its
 	// own creates. Exposed only for testing.
 	expectationDelay time.Duration
+
+	// Prometheus metrics
+	metricsCreated    bool
+	metricsCreateOnce sync.Once
+	metricsCreateLock sync.RWMutex
 }
 
 // expectations track an upcoming change to a named resource related
@@ -250,6 +256,11 @@ func NewController(eventsClient kv1core.EventsGetter, routeClient routeclient.Ro
 		},
 	})
 
+	if !c.MetricsCreated() {
+		legacyregistry.MustRegister(c)
+	}
+	klog.Info("ingress-to-route metrics registered with prometheus")
+
 	return c
 }
 
@@ -372,30 +383,12 @@ func (c *Controller) sync(key queueKey) error {
 		return err
 	}
 
-	// If the ingress specifies an ingressclass and the ingressclass does
-	// not specify openshift.io/ingress-to-route as its controller, ignore
-	// the ingress.
-	var ingressClassName *string
-	if v, ok := ingress.Annotations["kubernetes.io/ingress.class"]; ok {
-		ingressClassName = &v
-	} else {
-		ingressClassName = ingress.Spec.IngressClassName
+	managed, err := c.ingressManaged(ingress)
+	if err != nil {
+		return err
 	}
-	if ingressClassName != nil {
-		ingressclass, err := c.ingressclassLister.Get(*ingressClassName)
-		if kerrors.IsNotFound(err) {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		// TODO Replace "openshift.io/ingress-to-route" with
-		// routev1.IngressToRouteIngressClassControllerName once
-		// openshift-controller-manager bumps openshift/api to a version
-		// that defines it.
-		if ingressclass.Spec.Controller != "openshift.io/ingress-to-route" {
-			return nil
-		}
+	if !managed {
+		return nil
 	}
 
 	// find all matching routes
@@ -574,6 +567,32 @@ func hasIngressOwnerRef(owners []metav1.OwnerReference) (string, bool) {
 		return ref.Name, true
 	}
 	return "", false
+}
+
+func (c *Controller) ingressManaged(ingress *networkingv1.Ingress) (bool, error) {
+	// If the ingress specifies an ingressclass and the ingressclass does
+	// not specify openshift.io/ingress-to-route as its controller, ignore
+	// the ingress.
+	var ingressClassName *string
+	if v, ok := ingress.Annotations["kubernetes.io/ingress.class"]; ok {
+		ingressClassName = &v
+	} else {
+		ingressClassName = ingress.Spec.IngressClassName
+	}
+	if ingressClassName != nil {
+		ingressclass, err := c.ingressclassLister.Get(*ingressClassName)
+		if kerrors.IsNotFound(err) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		if ingressclass.Spec.Controller != routev1.IngressToRouteIngressClassControllerName {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }
 
 func newRouteForIngress(
