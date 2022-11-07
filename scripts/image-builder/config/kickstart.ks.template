@@ -20,6 +20,7 @@ network --bootproto=dhcp --device=link --activate --onboot=on
 #
 zerombr
 clearpart --all --initlabel
+part /boot/efi --fstype=efi --grow --maxsize=200 --size=20
 part /boot --fstype=xfs --asprimary --size=1024
 # Uncomment this line to add a SWAP partition of the recommended size
 #part swap --fstype=swap --recommended
