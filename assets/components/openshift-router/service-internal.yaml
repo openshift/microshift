@@ -24,5 +24,3 @@ metadata:
     ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
   name: router-internal-default
   namespace: openshift-ingress
-  annotations:
-    service.alpha.openshift.io/serving-cert-secret-name: router-metrics-certs-default
