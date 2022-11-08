@@ -83,7 +83,7 @@ EOF
         exit 1
     fi
 fi
-sudo subscription-manager repos --enable rhocp-4.11-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+sudo subscription-manager repos --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
 sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 
 sudo cp -f ${OCP_PULL_SECRET} /etc/crio/openshift-pull-secret
