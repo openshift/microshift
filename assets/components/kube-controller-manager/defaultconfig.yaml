@@ -1,0 +1,40 @@
+apiVersion: kubecontrolplane.config.openshift.io/v1
+kind: KubeControllerManagerConfig
+extendedArguments:
+  enable-dynamic-provisioning:
+  - "true"
+  allocate-node-cidrs:
+  - "false"
+  configure-cloud-routes:
+  - "false"
+  use-service-account-credentials:
+  - "true"
+  leader-elect:
+  - "true"
+  leader-elect-retry-period:
+  - 3s
+  leader-elect-resource-lock:
+  - configmapsleases
+  controllers:
+  - '*'
+  - -ttl
+  - -bootstrapsigner
+  - -tokencleaner
+  cluster-signing-duration:
+  - 720h
+  secure-port:
+  - "10257"
+  cert-dir:
+  - /var/run/kubernetes
+  root-ca-file:
+  - /etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/ca-bundle.crt
+  service-account-private-key-file:
+  - /etc/kubernetes/static-pod-resources/secrets/service-account-private-key/service-account.key
+  cluster-signing-cert-file:
+  - /etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.crt
+  cluster-signing-key-file:
+  - /etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.key
+  kube-api-qps:
+  - "150"
+  kube-api-burst:
+  - "300"
