@@ -52,17 +52,6 @@ echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microsh
 sudo dnf update -y
 sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
-# Install go1.18
-# This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
-# /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
-# To be removed when go1.18 is available in repositories
-export GO_VER=1.18.7; curl -L -o go${GO_VER}.linux-amd64.tar.gz https://go.dev/dl/go${GO_VER}.linux-amd64.tar.gz &&
-    sudo rm -rf /usr/local/go${GO_VER} && \
-    sudo mkdir -p /usr/local/go${GO_VER} && \
-    sudo tar -C /usr/local/go${GO_VER} -xzf go${GO_VER}.linux-amd64.tar.gz --strip-components 1 && \
-    sudo rm -rfv /usr/local/bin/{go,gofmt} && \
-    sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/ && \
-    rm -rfv go${GO_VER}.linux-amd64.tar.gz
 
 # Build MicroShift
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#build-microshift
