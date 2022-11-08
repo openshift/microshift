@@ -20,6 +20,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strconv"
 	"sync"
@@ -785,6 +786,12 @@ func (ca *CA) EnsureClientCertificate(certFile, keyFile string, u user.Info, exp
 	if err != nil {
 		certConfig, err = ca.MakeClientCertificate(certFile, keyFile, u, expireDays)
 		return certConfig, true, err // true indicates we wrote the files.
+	}
+	// Validate the existing certificate subject has changed, if it has we need to regenerate the certificate
+	expectedSubject := userToSubject(u)
+	if len(certConfig.Certs) != 1 || !reflect.DeepEqual(certConfig.Certs[0].Subject, expectedSubject) {
+		certConfig, err = ca.MakeClientCertificate(certFile, keyFile, u, expireDays)
+		return certConfig, true, err
 	}
 
 	return certConfig, false, nil
