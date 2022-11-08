@@ -1,6 +1,10 @@
 ---
 # install-logging default vars
 
+grafana_username: admin
+grafana_password: admin
+grafana_port: 3000
+
 logging_packages:
  - golang-github-prometheus
  - grafana
