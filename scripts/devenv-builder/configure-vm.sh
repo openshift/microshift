@@ -55,7 +55,7 @@ sudo systemctl enable --now cockpit.socket
 
 # Build MicroShift
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#build-microshift
-if [ ! -e ~/microshift ] ; then 
+if [ ! -e ~/microshift ] ; then
     git clone https://github.com/openshift/microshift.git ~/microshift
 fi
 cd ~/microshift
@@ -97,7 +97,7 @@ sudo dnf install -y openshift-clients
 # https://github.com/openshift/microshift/blob/main/docs/howto_firewall.md#firewalld
 sudo dnf install -y firewalld
 sudo systemctl enable firewalld --now
-sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
 sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
 sudo firewall-cmd --reload
 
