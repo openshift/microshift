@@ -435,6 +435,7 @@ activate_nm_connections() {
     nmcli c mod "$conn" connection.autoconnect yes
   done
 }
+
 # Accepts parameters $iface_default_hint_file, $iface
 # Writes content of $iface into $iface_default_hint_file
 write_iface_default_hint() {
@@ -442,6 +443,15 @@ write_iface_default_hint() {
   local iface="$2"
   echo "${iface}" >| "${iface_default_hint_file}"
 }
+
+# Accepts parameters $extra_bridge_file, $iface
+# Writes content of $iface into $extra_bridge_file
+write_iface_external_hint() {
+  local iface_default_hint_file="$1"
+  local iface="$2"
+  echo "${iface}" >| "${extra_bridge_file}"
+}
+
 # Accepts parameters $iface_default_hint_file
 # Returns the stored interface default hint if the hint is non-empty,
 # not br-ex, not br-ex1 and if the interface can be found in /sys/class/net
@@ -626,13 +636,41 @@ fi
 # print initial state
 print_state
 if [ "$1" == "OVNKubernetes" ]; then
-  # Skip configuring NICs onto OVS bridge "br-ex" when disableOVSInit is true
+
+  ovnk_config_dir='/etc/ovnk'
+  ovnk_var_dir='/var/lib/ovnk'
+  extra_bridge_file="${ovnk_config_dir}/extra_bridge"
+  iface_default_hint_file="${ovnk_var_dir}/iface_default_hint"
+  # make sure to create ovnk_config_dir if it does not exist, yet
+  mkdir -p "${ovnk_config_dir}"
+  # make sure to create ovnk_var_dir if it does not exist, yet
+  mkdir -p "${ovnk_var_dir}"
+
+  # Parse MicroShift OVNKubernetes CNI config file
   MICROSHIFT_OVN_CONFIG_FILE_PATH="/etc/microshift/ovn.yaml"
+  function get_cni_config {
+    ovnkey=$1
+    echo "$(cat "$MICROSHIFT_OVN_CONFIG_FILE_PATH" | awk "/$ovnkey:/ && ! /#.*$ovnkey:/ {print \$2}")"
+  }
   if [ -f "$MICROSHIFT_OVN_CONFIG_FILE_PATH" ]; then
-    disableOVSInit=$(cat "$MICROSHIFT_OVN_CONFIG_FILE_PATH" | awk "/disableOVSInit:/ && ! /#.*disableOVSInit:/ {print \$2}")
+    # Skip configuring NICs onto OVS bridge "br-ex" or "br-ex1" when disableOVSInit is true
+    disableOVSInit=$(get_cni_config "disableOVSInit")
     if [ "$disableOVSInit" == "true" ]; then
       echo "disableOVSInit is true, skipped configure-ovs.sh "
       exit 0
+    fi
+    # Store user provided gateway interfaces
+    gatewayInterface=$(get_cni_config "gatewayInterface")
+    if [ "$gatewayInterface" != "" ]; then
+      write_iface_default_hint "${iface_default_hint_file}" "${gatewayInterface}"
+    else
+      rm -f "${iface_default_hint_file}"
+    fi
+    externalGatewayInterface=$(get_cni_config "externalGatewayInterface")
+    if [ "$externalGatewayInterface" != "" ]; then
+      write_iface_external_hint "${extra_bridge_file}" "${externalGatewayInterface}"
+    else
+      rm -f "${extra_bridge_file}"
     fi
   fi
   # Configures NICs onto OVS bridge "br-ex"
@@ -653,14 +691,6 @@ if [ "$1" == "OVNKubernetes" ]; then
       fi
     fi
   }
-  ovnk_config_dir='/etc/ovnk'
-  ovnk_var_dir='/var/lib/ovnk'
-  extra_bridge_file="${ovnk_config_dir}/extra_bridge"
-  iface_default_hint_file="${ovnk_var_dir}/iface_default_hint"
-  # make sure to create ovnk_config_dir if it does not exist, yet
-  mkdir -p "${ovnk_config_dir}"
-  # make sure to create ovnk_var_dir if it does not exist, yet
-  mkdir -p "${ovnk_var_dir}"
   # For upgrade scenarios, make sure that we stabilize what we already configured
   # before. If we do not have a valid interface hint, find the physical interface
   # that's attached to ovs-if-phys0.

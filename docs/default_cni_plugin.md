@@ -63,17 +63,22 @@ MicroShift will assume default ovn-kubernetes config values if ovn-kubernetes co
 
 The following configs are supported in ovn-kubernetes config file:
 
-|Field          |Required |Type    |Default |Description                                                       |Example|
-|:--------------|:--------|:-------|:-------|:-----------------------------------------------------------------|:------|
-|disableOVSInit |N        |bool    |false   |Skip configuring OVS bridge "br-ex" in microshift-ovs-init.service|true   |
-|mtu            |N        |uint32  |1400    |MTU value to be used for the Pods                                 |1300   |
+|Field                    |Required |Type    |Default |Description                                                       |Example|
+|:------------------------|:--------|:-------|:-------|:-----------------------------------------------------------------|:------|
+|disableOVSInit           |N        |bool    |false   |Skip configuring OVS bridge "br-ex" in microshift-ovs-init.service|true   |
+|gatewayInterface         |N        |string  |""      |Interface to be added in OVS gateway bridge "br-ex"               |eth0   |
+|externalGatewayInterface |N        |string  |""      |Interface to be added in external OVS gateway bridge "br-ex1"     |eth1   |
+|mtu                      |N        |uint32  |1400    |MTU value to be used for the Pods                                 |1300   |
 
 > When `disableOVSInit` is true, OVS bridge "br-ex" needs to be configured manually. This OVS bridge is required by ovn-kubernetes CNI. See section [OVS bridge](#ovs-bridge) for guidance on configuring the OVS gateway bridge manually.
 
 Below is an example of `ovn.yaml`:
 
 ```yaml
-disableOVSInit: true
+ovsInit:
+  disableOVSInit: true
+  gatewayInterface: eth0
+  externalGatewayInterface: eth1
 mtu: 1300
 ```
 
@@ -201,15 +206,15 @@ A wide range of networking features are available with ovn-kubernetes, including
 ### Cluster network on specified host interface
 
 microshift-ovs-init.service is able to use user specified host interface for cluster network.
-This is done by specifying the desired host interface name in a hint file `/var/lib/ovnk/iface_default_hint`.
+This is done by specifying the `gatewayInterface` in the CNI config file `/etc/microshift/ovn.yaml`.
 The specified interface will be added in OVS bridge `br-ex` which acts as gateway bridge for ovn-kubernetes CNI network.
 
 
 ### Secondary gateway interface
 
 microshift-ovs-init.service is able to setup one additional host interface for cluster ingress/egress traffic.
-This is done by adding the additional host interface name in another hint file `/etc/ovnk/extra_bridge`.
-The additional interface will be added in a second OVS bridge `br-ex1`. Cluster pod traffic destinated to additional host subnet will be routed through `br-ex1`.
+This is done by specifying the `externalGatewayInterface` in the CNI config file `/etc/microshift/ovn.yaml`.
+The external gateway interface will be added in a second OVS bridge `br-ex1`. Cluster pod traffic destinated to additional host subnet will be routed through `br-ex1`.
 
 ## Troubleshooting
 
