@@ -47,6 +47,13 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 		klog.Errorf("%s unable to apply default RBACs: %v", s.Name(), err)
 		return err
 	}
+
+	priorityClasses := []string{"core/priority-class-openshift-user-critical.yaml"}
+	if err := assets.ApplyPriorityClasses(priorityClasses, s.cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
+		klog.Errorf("%s unable to apply PriorityClasses: %v", s.Name(), err)
+		return err
+	}
+
 	// TO-DO add readiness check
 	if err := components.StartComponents(s.cfg); err != nil {
 		return err
