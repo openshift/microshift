@@ -22,3 +22,34 @@
     state: restarted
     enabled: yes
   loop: "{{ logging_services }}"
+
+- name: get content of microshift grafana dashboard
+  ansible.builtin.set_fact:
+    microshift_dashboard: "{{ lookup('ansible.builtin.file', 'microshift_perf.json') }}"
+
+- name: create prometheus datasource in grafana
+  ansible.builtin.uri:
+    url: http://{{ ansible_default_ipv4.address }}:{{ grafana_port }}/api/datasources
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    status_code: [200, 409]
+    force_basic_auth: yes
+    method: POST
+    body_format: json
+    headers:
+      Accept: application/json
+      Content-Type: application/json
+    body: "{{ lookup('ansible.builtin.file', 'prometheus_datasource.json') }}"
+
+- name: create microshift perf dashboard in grafana
+  ansible.builtin.uri:
+    url: http://{{ ansible_default_ipv4.address }}:{{ grafana_port }}/api/dashboards/db
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    force_basic_auth: yes
+    method: POST
+    body_format: json
+    headers:
+      Accept: application/json
+      Content-Type: application/json
+    body: "{{ lookup('ansible.builtin.template', 'grafana_dashboard.json.j2') }}"
