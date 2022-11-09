@@ -545,6 +545,8 @@ update_manifests() {
     # 3) Make MicroShift-specific changes
     #    Set replica count to 1, as we're single-node.
     yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    #    Set deployment strategy type to Recreate.
+    yq -i '.spec.strategy.type = Recreate' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Add hostPorts for routes and metrics (needed as long as there is no load balancer)
     yq -i '.spec.template.spec.containers[0].ports[0].hostPort = 80' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].ports[1].hostPort = 443' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml

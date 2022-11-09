@@ -124,6 +124,8 @@ spec:
     matchLabels:
       ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
   replicas: 1
+  strategy:
+    type: Recreate
 metadata:
   name: router-default
   namespace: openshift-ingress
