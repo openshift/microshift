@@ -2,9 +2,83 @@
 ## CI Operations Overview
 Openshift CI will conditionally run end-to-end (e2e) testing whenever a PR is opened or updated. Depending on the changes introduced, only unit and validation checks may be run. This is determined per test job according to patterns for the `run_if_changed` key defined for each test (see [here](https://gitHub.com/openshift/release/blob/9c9a3e99c5985eec57464ea137e8db2534df5f1f/ci-operator/config/redhat-et/microshift/redhat-et-microshift-main.yaml#L114)). As a rule of thumb, changes that affect the MicroShift compile-time or runtime (i.e. changes to source code, build scripts, or container image definitions) will trigger e2e test runs.
 
-CI jobs are represented by a GitHub status check on PRs and will report a pending/pass/fail state per job. Jobs are loosely broken up by their maintaining OKD/K8S SIG, which is embedded in the status check’s name. Failed jobs will toggle their respective git status as failed and block the PR from merging. Blocks may still be overridden by maintainers.
+CI jobs are represented by a GitHub status check on PRs and will report a pending/pass/fail state per job. Jobs are currently loosely broken up by their maintaining OKD/K8S SIG, which is embedded in the status check’s name. Failed jobs will toggle their respective git status as failed and block the PR from merging. Blocks may still be overridden by maintainers. Full list of tests can be found [here](https://github.com/openshift/release/blob/master/ci-operator/config/openshift/microshift/openshift-microshift-main.yaml#L92-L141).
 
 E2e jobs are executed in parallel, each against its own isolated MicroShift cluster. That is, there are as many MicroShift clusters deployed as there are SIG status checks. Expect a complete PR test run to take approximately 45 minutes.
+
+## Running tests manually
+Prior to opening a PR it is useful and efficient to be able to run tests locally relying on your own resources. In order to do it you need a running instance of MicroShift and a valid version of [openshift-tests](https://github.com/openshift/origin).
+> `openshift-tests` follows the same branching strategy than the rest of the product, so be sure to check base version in `pkg/release/release.go`.
+
+`openshift-tests` requires a kubeconfig and `oc` binary as well. MicroShift generates a kubeconfig located in `/var/lib/microshift/resources/kubeadmin/kubeconfig`, but we will see how to use it depending on local vs remote access to MicroShift instances.
+
+Once we have the kubeconfig working, we can launch the tests. In order to run `openshift-tests` for `MicroShift` we need to provide KUBECONFIG and one specific option:
+```
+KUBECONFIG=~/.kube/microshift ./openshift-tests --provider none -v 2 <test suite name> -o <output file name> --junit-dir <junit dir path>
+```
+> `--provider none` avoids having automatic discovery for the cloud provider, which needs non-existing APIs in `MicroShift`.
+
+All `openshift-tests` functionality is available like in a regular OCP cluster. Check [docs](https://github.com/openshift/origin/blob/master/test/extended/README.md) for more information.
+
+### Using local MicroShift
+If you execute `openshift-tests` in the same host where `MicroShift` is running there is an already available kubeconfig to do so. This file is located at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
+
+All that is required is to set kubeconfig to this file and launch the tests.
+
+### Using remote MicroShift
+If we have a look at the default kubeconfig we see it tries to connect to localhost, assuming `MicroShift` is running in the same host:
+```
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: ...
+    server: https://127.0.0.1:6443
+  name: microshift
+```
+If we look at the certificate for API server to check what the valid names are we see the following:
+```
+Subject: O = 10.43.0.1 + O = 127.0.0.1 + O = localhost + O = kubernetes + O = kube-apiserver + O = 192.168.122.108 + O = kubernetes.default + O = localhost.localdomain + O = kubernetes.default.svc, CN = kube-apiserver
+...
+X509v3 Subject Alternative Name: 
+  DNS:kube-apiserver, DNS:localhost.localdomain, DNS:kubernetes.default.svc, DNS:kubernetes.default, DNS:kubernetes, DNS:localhost, DNS:192.168.122.108, DNS:127.0.0.1, DNS:10.43.0.1, IP Address:192.168.122.108, IP Address:127.0.0.1, IP Address:10.43.0.1
+```
+
+Resolving the hostname DNS entry to a valid IP, or using the raw IPs will work. We can not use any of the `kube-.*` DNS names as those are internal to `MicroShift`, the same happens with `localhost`. For the IP entries, it also happens to `127.0.0.1` and `10.43.0.1`, they are local to `MicroShift` host.
+
+We need to use the external IP (`192.168.122.108` in this example) or the hostname (`localhost.localdomain`). To do this we change the `server` value in kubeconfig and that should be good to go. You can also use `/etc/hosts` to shortcut DNS lookup if you want to use the names.
+
+IP addresses are not guaranteed to be stable in `MicroShift`, but everytime it starts it regenerates kubeconfig so it should be ok during a test run. Remember to open port 6443 if there is a firewall.
+```
+$ cat ~/.kube/microshift | yq '.clusters[].cluster.server'
+https://192.168.122.108:6443
+$ KUBECONFIG=~/.kube/microshift oc get pod -A
+NAMESPACE                  NAME                                  READY   STATUS    RESTARTS   AGE
+openshift-dns              dns-default-dcwx7                     2/2     Running   0          8h
+openshift-dns              node-resolver-j2gqf                   1/1     Running   0          8h
+openshift-ingress          router-default-6b6bb965d9-v8qzq       1/1     Running   0          8h
+openshift-ovn-kubernetes   ovnkube-master-vrcfz                  4/4     Running   0          8h
+openshift-ovn-kubernetes   ovnkube-node-kmrcw                    1/1     Running   0          8h
+openshift-service-ca       service-ca-5f9bc879d8-qpc2p           1/1     Running   0          8h
+openshift-storage          topolvm-controller-5cbd9d9684-kz5m7   4/4     Running   0          8h
+openshift-storage          topolvm-node-q6rr9                    4/4     Running   0          8h
+```
+
+If you dont want to change kubeconfig you can also use ssh to connect to `MicroShift` host forwarding port 6443 to tunnel all traffic.
+```
+$ ssh -L 6443:localhost:6443 redhat@192.168.122.108 -fN
+$ cat ~/.kube/microshift | yq '.clusters[].cluster.server'
+https://127.0.0.1:6443
+$ KUBECONFIG=~/.kube/microshift oc get pod -A
+NAMESPACE                  NAME                                  READY   STATUS    RESTARTS   AGE
+openshift-dns              dns-default-dcwx7                     2/2     Running   0          8h
+openshift-dns              node-resolver-j2gqf                   1/1     Running   0          8h
+openshift-ingress          router-default-6b6bb965d9-v8qzq       1/1     Running   0          8h
+openshift-ovn-kubernetes   ovnkube-master-vrcfz                  4/4     Running   0          8h
+openshift-ovn-kubernetes   ovnkube-node-kmrcw                    1/1     Running   0          8h
+openshift-service-ca       service-ca-5f9bc879d8-qpc2p           1/1     Running   0          8h
+openshift-storage          topolvm-controller-5cbd9d9684-kz5m7   4/4     Running   0          8h
+openshift-storage          topolvm-node-q6rr9                    4/4     Running   0          8h
+```
 
 ## Debugging
 > Test runtime objects (namespace, pods, build images) are garbage collected after 1 hour from test completion. The build log remains, but does not provide a holistic view of the job’s life.
