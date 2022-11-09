@@ -3,7 +3,7 @@ The development environment bootstrap and configuration procedures are automated
 It is recommended to review the current document and use the automation instructions to create and configure the environment.
 
 ## Create Development Virtual Machine
-Start by downloading the RHEL 8.6 or above ISO image from the https://developers.redhat.com/products/rhel/download location. 
+Start by downloading the RHEL 8.7 or above ISO image from the https://developers.redhat.com/products/rhel/download location.
 > RHEL 9.x operating system is not currently supported.
 
 ### Creating VM
@@ -25,7 +25,7 @@ virt-install \
     --network network=default,model=virtio \
     --os-type generic \
     --events on_reboot=restart \
-    --cdrom ./rhel-8.6-$(uname -i)-boot.iso \
+    --cdrom ./rhel-8.7-$(uname -i)-boot.iso \
 "
 ```
 
@@ -54,16 +54,10 @@ Log into the virtual machine using SSH with the `microshift` user credentials.
 Run the following commands to configure SUDO, upgrade the system, install basic dependencies and enable remote Cockpit console.
 ```bash
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
+sudo dnf clean all -y
 sudo dnf update -y
 sudo dnf install -y git cockpit make gcc selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
-export GO_VER=1.18.7; curl -L -o go${GO_VER}.linux-amd64.tar.gz https://go.dev/dl/go${GO_VER}.linux-amd64.tar.gz &&
-    sudo rm -rf /usr/local/go${GO_VER} && \
-    sudo mkdir -p /usr/local/go${GO_VER} && \
-    sudo tar -C /usr/local/go${GO_VER} -xzf go${GO_VER}.linux-amd64.tar.gz --strip-components 1 && \
-    sudo rm -rfv /usr/local/bin/{go,gofmt}
-    sudo ln --symbolic /usr/local/go1.18.7/bin/go /usr/local/go1.18.7/bin/gofmt /usr/local/bin/ && \
-    rm -rfv go${GO_VER}.linux-amd64.tar.gz
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
 
@@ -107,10 +101,10 @@ When working a MicroShift based on a pre-release _minor_ version `Y` of OpenShif
 > If you have VPN access to the Red Hat build systems, you can add the corresponding puddle repo.
 >
 > ```bash
-> sudo tee /etc/yum.repos.d/internal-rhocp-4.12-for-rhel-8-rpms.repo >/dev/null <<EOF
-> [internal-rhocp-4.12-for-rhel-8-rpms]
-> name=Puddle of the rhocp-4.12 RPMs for RHEL8
-> baseurl=http://download.lab.bos.redhat.com/rcm-guest/puddles/RHAOS/plashets/4.12-el8/building/\$basearch/os/
+> sudo tee /etc/yum.repos.d/internal-rhocp-4.13-for-rhel-8-rpms.repo >/dev/null <<EOF
+> [internal-rhocp-4.13-for-rhel-8-rpms]
+> name=Puddle of the rhocp-4.13 RPMs for RHEL8
+> baseurl=http://download.lab.bos.redhat.com/rcm-guest/puddles/RHAOS/plashets/4.13-el8/building/\$basearch/os/
 > enabled=1
 > gpgcheck=0
 > skip_if_unavailable=1
@@ -120,9 +114,19 @@ When working a MicroShift based on a pre-release _minor_ version `Y` of OpenShif
 Enable the needed repositories and install the MicroShift RPM packages. This procedure pulls in the required package dependencies, also installing the necessary configuration files and `systemd` units.
 
 ```bash
+# Temporary workaround before the rhocp-4.12-for-rhel-8-$(uname -i)-rpms repo can be used
+sudo tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <<EOF
+[rhocp-4.12-el8-beta-$(uname -i)-rpms]
+name=Beta rhocp-4.12 RPMs for RHEL8
+baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/4.12-el8-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=1
+EOF
+
 sudo subscription-manager repos \
-    --enable rhocp-4.11-for-rhel-8-$(uname -i)-rpms \
     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+#    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
 sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 ```
 
