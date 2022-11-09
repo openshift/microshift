@@ -4,7 +4,7 @@
 > This page describes an opinionated setup to facilitate a quick bootstrap of MicroShift in a virtual environment for **experimentation-only** purpose.
 > See [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) for more information on setting up a production-grade system with MicroShift.
 
-The remainder of this document describes how to install a virtual machine running RHEL 8.6 operating system and an **experimental version** of MicroShift from the [@redhat-et/microshift-testing](https://copr.fedorainfracloud.org/coprs/g/redhat-et/microshift-testing) `copr` repository.
+The remainder of this document describes how to install a virtual machine running RHEL 8.7 operating system and an **experimental version** of MicroShift from the [@redhat-et/microshift-testing](https://copr.fedorainfracloud.org/coprs/g/redhat-et/microshift-testing) `copr` repository.
 
 ## Prerequisites
 
@@ -18,8 +18,8 @@ Run the following command to install the necessary components for the [libvirt](
 sudo dnf install -y libvirt virt-manager virt-viewer libvirt-client qemu-kvm qemu-img
 ```
 
-Download the [Red Hat Enterprise Linux 8.6 DVD ISO](https://developers.redhat.com/content-gateway/file/rhel-8.6-x86_64-dvd.iso) image for the x86_64 architecture from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site and copy the file to the `/var/lib/libvirt/images` directory.
-> Other architectures, versions or flavors of operating systems are not supported. For this setup, only use the RHEL 8.6 DVD image for x86_64 architecture.
+Download the Red Hat Enterprise Linux 8.7 DVD ISO image for the x86_64 architecture from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site and copy the file to the `/var/lib/libvirt/images` directory.
+> Other architectures, versions or flavors of operating systems are not supported. For this setup, only use the RHEL 8.7 DVD image for x86_64 architecture.
 
 Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~/.pull-secret.json` file.
 
@@ -29,7 +29,7 @@ Run the following commands to initiate the creation process of the `microshift-s
 
 ```bash
 VMNAME=microshift-starter
-DVDISO=/var/lib/libvirt/images/rhel-8.6-x86_64-dvd.iso
+DVDISO=/var/lib/libvirt/images/rhel-8.7-x86_64-dvd.iso
 KICKSTART=https://raw.githubusercontent.com/openshift/microshift/main/docs/config/microshift-starter.ks
 
 sudo -b bash -c " \

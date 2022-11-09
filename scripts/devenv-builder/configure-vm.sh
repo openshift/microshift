@@ -49,24 +49,14 @@ fi
 # Create Development Virtual Machine > Configuring VM
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#configuring-vm
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
+sudo dnf clean all -y
 sudo dnf update -y
 sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
-# Install go1.18
-# This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
-# /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
-# To be removed when go1.18 is available in repositories
-export GO_VER=1.18.7; curl -L -o go${GO_VER}.linux-amd64.tar.gz https://go.dev/dl/go${GO_VER}.linux-amd64.tar.gz &&
-    sudo rm -rf /usr/local/go${GO_VER} && \
-    sudo mkdir -p /usr/local/go${GO_VER} && \
-    sudo tar -C /usr/local/go${GO_VER} -xzf go${GO_VER}.linux-amd64.tar.gz --strip-components 1 && \
-    sudo rm -rfv /usr/local/bin/{go,gofmt} && \
-    sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/ && \
-    rm -rfv go${GO_VER}.linux-amd64.tar.gz
 
 # Build MicroShift
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#build-microshift
-if [ ! -e ~/microshift ] ; then 
+if [ ! -e ~/microshift ] ; then
     git clone https://github.com/openshift/microshift.git ~/microshift
 fi
 cd ~/microshift
@@ -81,10 +71,10 @@ make srpm
 if [[ "${ENABLE_DEV_REPO}" == "true" ]]; then
     if curl --output /dev/null --silent --head --fail "http://download.lab.bos.redhat.com"; then
         echo -e "\E[32mSuccessfully reached http://download.lab.bos.redhat.com, configuring prerelease repo.\E[00m"
-        sudo tee /etc/yum.repos.d/internal-rhocp-4.12-for-rhel-8-rpms.repo >/dev/null <<EOF
-[internal-rhocp-4.12-for-rhel-8-rpms]
-name=Puddle of the rhocp-4.12 RPMs for RHEL8
-baseurl=http://download.lab.bos.redhat.com/rcm-guest/puddles/RHAOS/plashets/4.12-el8/building/\$basearch/os/
+        sudo tee /etc/yum.repos.d/internal-rhocp-4.13-for-rhel-8-rpms.repo >/dev/null <<EOF
+[internal-rhocp-4.13-for-rhel-8-rpms]
+name=Puddle of the rhocp-4.13 RPMs for RHEL8
+baseurl=http://download.lab.bos.redhat.com/rcm-guest/puddles/RHAOS/plashets/4.13-el8/building/\$basearch/os/
 enabled=1
 gpgcheck=0
 skip_if_unavailable=1
@@ -94,7 +84,19 @@ EOF
         exit 1
     fi
 fi
-sudo subscription-manager repos --enable rhocp-4.11-for-rhel-8-$(uname -i)-rpms --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+
+sudo tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <<EOF
+[rhocp-4.12-el8-beta-$(uname -i)-rpms]
+name=Beta rhocp-4.12 RPMs for RHEL8
+baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/4.12-el8-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=1
+EOF
+
+sudo subscription-manager repos \
+    --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+#    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
 sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 
 sudo cp -f ${OCP_PULL_SECRET} /etc/crio/openshift-pull-secret
@@ -108,7 +110,7 @@ sudo dnf install -y openshift-clients
 # https://github.com/openshift/microshift/blob/main/docs/howto_firewall.md#firewalld
 sudo dnf install -y firewalld
 sudo systemctl enable firewalld --now
-sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
 sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
 sudo firewall-cmd --reload
 
