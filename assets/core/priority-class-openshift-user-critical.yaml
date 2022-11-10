@@ -1,0 +1,7 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: openshift-user-critical
+preemptionPolicy: PreemptLowerPriority
+value: 1000000000
+description: "This priority class should be used for user facing OpenShift workload pods only."
