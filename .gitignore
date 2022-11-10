@@ -5,3 +5,4 @@ Vagrantfile
 _output/*
 _output
 sshfile
+ansible/*.txt

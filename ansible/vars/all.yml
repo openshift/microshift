@@ -5,8 +5,8 @@ rhel_pool_id:
 manage_repos: false
 
 setup_microshift_host: false
-prometheus_logging: true
-install_microshift: false
+prometheus_logging: "{{ prometheus_logging_arg | default('true')  }}"
+install_microshift: "{{ install_microshift_arg | default('false') }}"
 build_etcd_binary: false
 
 install_pbench: false
