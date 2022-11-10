@@ -23,7 +23,7 @@ $KUTTL test --namespace test || {
       kubectl get pods -A -o yaml || true
       kubectl get events -A || true
 
-      for ns in $(kubectl get namespace); do
+      for ns in $(kubectl get namespace -o name); do
             for pod in $(kubectl get pods -n $ns -o name); do
                   kubectl describe -n $ns $pod || true
                   for container in $(kubectl get -n $ns $pod -o jsonpath='{.spec.containers[*].name}'); do
