@@ -1,8 +1,8 @@
 [microshift]
-microshift-dev ansible_host=microshift-dev private_ip=
+microshift-dev ansible_host="{{ ansible_host_var | default('microshift-dev') }}" private_ip="{{ private_ip_var | default('') }}"
 
 [microshift:vars]
-ansible_user=microshift
+ansible_user="{{ ansible_user_var | default('microshift') }}"
 
 [logging]
 localhost ansible_connection=local
