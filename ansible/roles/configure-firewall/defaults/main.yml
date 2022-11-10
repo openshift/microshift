@@ -10,10 +10,12 @@ firewall_ports:
   - 80/tcp
   - 443/tcp
   - 2379/tcp
+  - 3000/tcp
   - 5353/udp
   - 6443/tcp
   - 8080/tcp
   - 8082/tcp
+  - 9091/tcp
   - 9100/tcp
   - 9256/tcp
   - 9537/tcp
