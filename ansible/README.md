@@ -138,4 +138,4 @@ The following text files be created on the local system running the playbook:
 - The `boot.txt` will have the time that it took the microshift service to start and for all the pods to enter the `Running` state
 - The `disk0.txt, disk1.txt, disk2.txt` files will have a snapshot of the disk usage at different stages of installation and execution.
 
-If Prometheus was enabled, the performance metrics will be uploaded to the Ansible server, where the user can view all the captured performance data using the `http://<ansible-server-ip>:9090` URL.
+If Prometheus was enabled, the performance metrics will be uploaded to the Ansible server, where the user can view all the captured performance data using the `http://<ansible-server-ip>:9091` URL.

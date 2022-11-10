@@ -8,6 +8,18 @@
         name: "{{ logging_packages }}"
         state: present
         update_cache: true
+
+    - name: check that the prometheus cli vars file exists
+      ansible.builtin.stat:
+        path: "{{ prometheus_vars_file }}"
+      register: prometheus_vars
+    
+    - name: set prometheus args to change listen port
+      ansible.builtin.replace:
+        path: "{{ prometheus_vars_file }}"
+        regexp: "ARGS=''"
+        replace: "ARGS='--web.listen-address=0.0.0.0:{{ prometheus_port }}'"
+      when: prometheus_vars.stat.exists
   when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat") or (ansible_distribution == "Fedora")
 
 - name: copy prometheus config
@@ -39,7 +51,7 @@
     headers:
       Accept: application/json
       Content-Type: application/json
-    body: "{{ lookup('ansible.builtin.file', 'prometheus_datasource.json') }}"
+    body: "{{ lookup('ansible.builtin.template', 'prometheus_datasource.json.j2') }}"
 
 - name: create microshift perf dashboard in grafana
   ansible.builtin.uri:
