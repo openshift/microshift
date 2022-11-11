@@ -35,7 +35,6 @@ func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags.String("cluster-cidr", cfg.Cluster.ClusterCIDR, "The IP range in CIDR notation for pods in the cluster.")
 	flags.String("service-cidr", cfg.Cluster.ServiceCIDR, "The IP range in CIDR notation for services in the cluster.")
 	flags.String("service-node-port-range", cfg.Cluster.ServiceNodePortRange, "The port range to reserve for services with NodePort visibility. This must not overlap with the ephemeral port range on nodes.")
-	flags.String("cluster-dns", cfg.Cluster.DNS, "Comma-separated list of DNS server IP address. This value is used for containers DNS server in case of Pods with \"dnsPolicy=ClusterFirst\".")
 	flags.String("cluster-domain", cfg.Cluster.Domain, "Domain for this cluster.")
 }
 

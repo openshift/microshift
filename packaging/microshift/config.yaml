@@ -4,9 +4,6 @@ cluster:
   # IP range for use by the cluster
   #clusterCIDR: 10.42.0.0/16
 
-  # DNS server IP is the k8s service IP address which pods query for name resolution
-  #dns: 10.43.0.10
-
   # Base DNS domain used to construct fully qualified pod and service domain names
   #domain: cluster.local
 

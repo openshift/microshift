@@ -49,7 +49,6 @@ func TestCommandLineConfig(t *testing.T) {
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
-					DNS:                  "cluster.dns",
 					Domain:               "cluster.local",
 				},
 			},
@@ -69,7 +68,6 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.String("cluster-cidr", config.Cluster.ClusterCIDR, "")
 		flags.String("service-cidr", config.Cluster.ServiceCIDR, "")
 		flags.String("service-node-port-range", config.Cluster.ServiceNodePortRange, "")
-		flags.String("cluster-dns", config.Cluster.DNS, "")
 		flags.String("cluster-domain", config.Cluster.Domain, "")
 
 		// parse the flags
@@ -82,7 +80,6 @@ func TestCommandLineConfig(t *testing.T) {
 			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
 			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
 			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
-			"--cluster-dns=" + tt.config.Cluster.DNS,
 			"--cluster-domain=" + tt.config.Cluster.Domain,
 		})
 		if err != nil {
@@ -121,7 +118,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
-					DNS:                  "10.43.0.10",
 					Domain:               "cluster.local",
 				},
 			},
@@ -137,7 +133,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
-				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
 				{"MICROSHIFT_CLUSTER_DOMAIN", "cluster.local"},
 			},
 		},
@@ -151,7 +146,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
-					DNS:                  "10.43.0.10",
 					Domain:               "cluster.local",
 				},
 			},
@@ -167,7 +161,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
-				{"MICROSHIFT_CLUSTER_DNS", "10.43.0.10"},
 			},
 		},
 	}
