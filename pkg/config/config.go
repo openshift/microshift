@@ -81,10 +81,12 @@ func GetManifestsDir() []string {
 type KubeConfigID string
 
 const (
-	KubeAdmin             KubeConfigID = "kubeadmin"
-	KubeControllerManager KubeConfigID = "kube-controller-manager"
-	KubeScheduler         KubeConfigID = "kube-scheduler"
-	Kubelet               KubeConfigID = "kubelet"
+	KubeAdmin               KubeConfigID = "kubeadmin"
+	KubeControllerManager   KubeConfigID = "kube-controller-manager"
+	KubeScheduler           KubeConfigID = "kube-scheduler"
+	Kubelet                 KubeConfigID = "kubelet"
+	ClusterPolicyController KubeConfigID = "cluster-policy-controller"
+	RouteControllerManager  KubeConfigID = "route-controller-manager"
 )
 
 // KubeConfigPath returns the path to the specified kubeconfig file.

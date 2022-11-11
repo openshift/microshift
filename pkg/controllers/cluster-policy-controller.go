@@ -43,7 +43,7 @@ func (s *ClusterPolicyController) Name() string           { return "cluster-poli
 func (s *ClusterPolicyController) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *ClusterPolicyController) configure(cfg *config.MicroshiftConfig) error {
-	s.kubeconfig = cfg.KubeConfigPath(config.KubeControllerManager)
+	s.kubeconfig = cfg.KubeConfigPath(config.ClusterPolicyController)
 
 	scheme := runtime.NewScheme()
 	openshiftcontrolplanev1.AddToScheme(scheme)
