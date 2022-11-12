@@ -10,48 +10,53 @@ The MicroShift configuration file must be located at `~/.microshift/config.yaml`
 The format of the `config.yaml` configuration file is as follows.
 
 ```yaml
-cluster:
-  clusterCIDR: ""
-  serviceCIDR: ""
-  serviceNodePortRange: ""
-  domain: ""
-  url: ""
-nodeIP: ""
-nodeName: ""
 subjectAltNames:
   - ""
-logVLevel: ""
+nodeName: ""
+nodeIP: ""
+url: ""
+clusterDomain: ""
+network:
+  clusterNetwork:
+    - cidr: ""
+  serviceNetwork:
+    - ""
+  serviceNodePortRange: ""
+debugging:
+  logLevel: ""
 ```
 
 The configuration settings alongside with the supported command line arguments and environment variables are presented below.
 
-| Field Name          | CLI Argument              | Environment Variable                    | Description |
-|---------------------|---------------------------|-----------------------------------------|-------------|
-| clusterCIDR         | --cluster-cidr            | MICROSHIFT_CLUSTER_CLUSTERCIDR          | A block of IP addresses from which Pod IP addresses are allocated
-| serviceCIDR         | --service-cidr            | MICROSHIFT_CLUSTER_SERVICECIDR          | A block of virtual IP addresses for Kubernetes services
-| serviceNodePortRange| --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort (WARNING: see the dedicated section)
-| domain              | --cluster-domain          | MICROSHIFT_CLUSTER_DOMAIN               | Base DNS domain used to construct fully qualified pod and service domain names
-| url                 | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
-| nodeIP              | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
-| nodeName            | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
+| Field Name            | CLI Argument              | Environment Variable                    | Description |
+|-----------------------|---------------------------|-----------------------------------------|-------------|
+| cidr (clusterNetwork) | --cluster-cidr            | MICROSHIFT_CLUSTER_CLUSTERCIDR          | A block of IP addresses from which Pod IP addresses are allocated
+| serviceNetwork        | --service-cidr            | MICROSHIFT_CLUSTER_SERVICECIDR          | A block of virtual IP addresses for Kubernetes services
+| serviceNodePortRange  | --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort
+| clusterDomain         | --cluster-domain          | MICROSHIFT_CLUSTER_DOMAIN               | Base DNS domain used to construct fully qualified pod and service domain names
+| url                   | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
+| nodeIP                | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
+| nodeName              | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
+| logLevel              | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (Normal, Debug, Trace, TraceAll)
 | subjectAltNames     | --subject-alt-names       | MICROSHIFT_SUBJECTALTNAMES              | Subject Alternative Names for apiserver certificates
-| logVLevel           | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (0-5)
 
 ## Default Settings
 
 In case `config.yaml` is not provided, the following default settings will be used.
 
 ```yaml
-cluster:
-  clusterCIDR: 10.42.0.0/16
-  serviceCIDR: 10.43.0.0/16
-  serviceNodePortRange: 30000-32767
-  domain: cluster.local
-  url: https://127.0.0.1:6443
-nodeIP: ""
 nodeName: ""
-subjectAltNames: nil
-logVLevel: 0
+nodeIP: ""
+url: https://127.0.0.1:6443
+clusterDomain: cluster.local
+network:
+  clusterNetwork:
+    - cidr: 10.42.0.0/16
+  serviceNetwork:
+    - 10.43.0.0/16
+  serviceNodePortRange: 30000-32767
+debugging:
+  logLevel: "Normal"
 ```
 
 ## Service NodePort range
