@@ -96,25 +96,12 @@ _output/rpmbuild/SRPMS/microshift-4.12.0-2022_10_30_114426_untagged.el8.src.rpm
 Log into the development virtual machine with the `microshift` user credentials.
 
 ### Runtime Prerequisites
-When working a MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repo `rhocp-4.$Y-for-rhel-8-$ARCH-rpms` won't be available yet. In that case, use the `Y-1` version.
-
-> If you have VPN access to the Red Hat build systems, you can add the corresponding puddle repo.
->
-> ```bash
-> sudo tee /etc/yum.repos.d/internal-rhocp-4.13-for-rhel-8-rpms.repo >/dev/null <<EOF
-> [internal-rhocp-4.13-for-rhel-8-rpms]
-> name=Puddle of the rhocp-4.13 RPMs for RHEL8
-> baseurl=http://download.lab.bos.redhat.com/rcm-guest/puddles/RHAOS/plashets/4.13-el8/building/\$basearch/os/
-> enabled=1
-> gpgcheck=0
-> skip_if_unavailable=1
-> EOF
-> ```
+When working with MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repository `rhocp-4.$Y-for-rhel-8-$ARCH-rpms` may not be available yet. In that case, use the `Y-1` released version or a `Y-beta` version from the public `https://mirror.openshift.com/pub/openshift-v4/$ARCH/dependencies/rpms/` OpenShift mirror repository.
 
 Enable the needed repositories and install the MicroShift RPM packages. This procedure pulls in the required package dependencies, also installing the necessary configuration files and `systemd` units.
 
 ```bash
-# Temporary workaround before the rhocp-4.12-for-rhel-8-$(uname -i)-rpms repo can be used
+# Temporary workaround until the rhocp-4.12-for-rhel-8-$(uname -i)-rpms repo can be used
 sudo tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <<EOF
 [rhocp-4.12-el8-beta-$(uname -i)-rpms]
 name=Beta rhocp-4.12 RPMs for RHEL8

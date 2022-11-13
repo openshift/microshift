@@ -5,33 +5,15 @@
 #
 set -eo pipefail
 
-ENABLE_DEV_REPO="false"
-
 function usage() {
-    echo "Usage: $(basename $0) [--enable-dev-repo] <openshift-pull-secret-file>"
-    echo ""
-    echo "Optional arguments:"
-    echo "  --enable-dev-repo"
-    echo "          Enable the developer repos with pre-release RPMs (Red Hat VPN required)"
+    echo "Usage: $(basename $0) <openshift-pull-secret-file>"
     [ ! -z "$1" ] && echo -e "\nERROR: $1"
     exit 1
 }
 
-if [ $# -lt 1 ]; then
-    usage "Missing argument."
+if [ $# -ne 1 ]; then
+    usage "Wrong number of arguments"
 fi
-# Parse the command line
-while [ $# -gt 1 ] ; do
-    case $1 in
-    --enable-dev-repo)
-        ENABLE_DEV_REPO="true"
-        shift
-        ;;
-    *)
-        usage "Invalid argument '$1'."
-        ;;
-    esac
-done
 
 OCP_PULL_SECRET=$(realpath $1)
 [ ! -f "${OCP_PULL_SECRET}" ] && usage "OpenShift pull secret ${OCP_PULL_SECRET} does not exist or is not a regular file."
@@ -68,23 +50,6 @@ make srpm
 
 # Run MicroShift Executable > Runtime Prerequisites
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#runtime-prerequisites
-if [[ "${ENABLE_DEV_REPO}" == "true" ]]; then
-    if curl --output /dev/null --silent --head --fail "http://download.lab.bos.redhat.com"; then
-        echo -e "\E[32mSuccessfully reached http://download.lab.bos.redhat.com, configuring prerelease repo.\E[00m"
-        sudo tee /etc/yum.repos.d/internal-rhocp-4.13-for-rhel-8-rpms.repo >/dev/null <<EOF
-[internal-rhocp-4.13-for-rhel-8-rpms]
-name=Puddle of the rhocp-4.13 RPMs for RHEL8
-baseurl=http://download.lab.bos.redhat.com/rcm-guest/puddles/RHAOS/plashets/4.13-el8/building/\$basearch/os/
-enabled=1
-gpgcheck=0
-skip_if_unavailable=1
-EOF
-    else
-        echo -e "\E[31mERROR: '--enable-dev-repo' specified, but could not reach http://download.lab.bos.redhat.com (not on VPN?), aborting.\E[00m"
-        exit 1
-    fi
-fi
-
 sudo tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <<EOF
 [rhocp-4.12-el8-beta-$(uname -i)-rpms]
 name=Beta rhocp-4.12 RPMs for RHEL8
