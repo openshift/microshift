@@ -114,3 +114,28 @@ sudo timedatectl set-ntp true
 ```
 
 > MicroShift may be restarted again after the system-wide time got corrected by the NTP.
+
+### Certificate Lifetime and Rotation
+
+Microshift certificates are separated into two basic groups:
+
+- long lived certificates with certificate validity of **10 years**
+- short lived certificates with certificate validity of **1 year**
+
+Most of the leaf certificates are short lived.
+
+An example of a long-lived certificate is the client certificate for `system:admin`
+user authentication, or the certificate of the signer of the kube-apiserver
+external serving certificate.
+
+The below (non-proportional!) graph shows when certificates are rotated.
+
+![Cert Rotation](./images/certrotation.png)
+
+- a certificate in the **green zone** does not get rotated
+- a certificate in the **yellow zone** is rotated on Microshift start (or restart)
+- Microshift will get restarted should a certificate get to the **red zone**, the
+  certificate will be rotated for a new one.
+
+If the rotated certificate is a CA, all of the certificates it signed get rotated
+as well.

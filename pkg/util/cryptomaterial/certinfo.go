@@ -1,7 +1,9 @@
 package cryptomaterial
 
 import (
+	"crypto/x509"
 	"path/filepath"
+	"time"
 )
 
 const (
@@ -16,27 +18,16 @@ const (
 	PeerCertFileName   = "peer.crt"
 	PeerKeyFileName    = "peer.key"
 
-	AdminKubeconfigCAValidityDays                      = 365 * 10
-	AdminKubeconfigClientCertValidityDays              = 365 * 10
-	AggregatorFrontProxySignerCAValidityDays           = 30
-	KubeAPIServerToKubeletCAValidityDays               = 365
-	KubeControlPlaneSignerCAValidityDays               = 365
-	KubeControllerManagerCSRSignerSignerCAValidityDays = 60
-	KubeControllerManagerCSRSignerCAValidityDays       = 30
-	EtcdSignerCAValidityDays                           = 365 * 10
-
-	ClientCertValidityDays  = 30
-	ServingCertValidityDays = 30
-
-	ServiceCAValidityDays            = 790
-	ServiceCAServingCertValidityDays = 730
-
-	KubeAPIServerServingSignerCAValidityDays = 365 * 10
-	KubeAPIServerServingCertValidityDays     = 365
-
-	IngressSignerCAValidityDays    = 365 * 2
-	IngressServingCertValidityDays = 365
+	LongLivedCertificateValidityDays  = 365 * 10
+	ShortLivedCertificateValidityDays = 365
 )
+
+func IsCertShortLived(c *x509.Certificate) bool {
+	totalTime := c.NotAfter.Sub(c.NotBefore)
+
+	// certs under 5 years are considered short-lived
+	return totalTime < 5*365*time.Hour*24
+}
 
 func CertsDirectory(dataPath string) string { return filepath.Join(dataPath, "certs") }
 
