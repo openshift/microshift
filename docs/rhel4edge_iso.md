@@ -134,15 +134,15 @@ EOF
 ```
 
 > **NOTE** <br>
-> Embedding container images in the generated ISO requires the functionality from the latest version of the `osbuild-composer` and `rpm-ostree` packages.
+> Embedding container images in the generated ISO requires the functionality from the latest version of the `rpm-ostree` package.
 > This functionality will be available in the future releases of the RHEL 8 operating system.
 
-To install the necessary functionality, run the following command to upgrade your system with the up-to-date software from the `copr` repository.
+To install the necessary functionality, run the following command to upgrade your system with the up-to-date `rpm-ostree` software from the `copr` repository.
 ```bash
 ~/microshift/hack/osbuild2copr.sh copr
 ```
 
-> If necessary, rerun the `hack/osbuild2copr.sh` script with the `appstream` argument to revert to the standard `osbuild-composer` and `rpm-ostree` packages.
+> If necessary, rerun the `hack/osbuild2copr.sh` script with the `appstream` argument to revert to the standard `rpm-ostree` package.
 
 Proceed by running the build script with the `-embed_containers` argument to include the dependent container images into the generated ISO.
 ```bash
@@ -240,19 +240,19 @@ Make sure that `CRI-O` has access to all the container images required by MicroS
 ```bash
 $ sudo crictl images
 IMAGE                                                         TAG                 IMAGE ID            SIZE
-quay.io/microshift/ovn-kubernetes-singlenode                  <none>              3931a3a4e593a       696MB
 quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              abfe4b141323c       400MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              e838beef2dc33       352MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev                latest              e838beef2dc33       352MB
 quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              46485ef27b75a       354MB
 quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              c9ab25a51ced3       331MB
 quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              075ed082f7130       343MB
-registry.access.redhat.com/ubi8/openssl                       <none>              6f0b85db494c0       40.7MB
-registry.k8s.io/pause                                         3.6                 6270bb605e12e       690kB
-registry.redhat.io/odf4/odf-topolvm-rhel8                     <none>              7772af7c5ac84       222MB
-registry.redhat.io/openshift4/ose-csi-external-provisioner    <none>              f4f57fec63a30       389MB
-registry.redhat.io/openshift4/ose-csi-external-resizer        <none>              ffee6b6e833e3       387MB
-registry.redhat.io/openshift4/ose-csi-livenessprobe           <none>              f67b4438d40d3       349MB
-registry.redhat.io/openshift4/ose-csi-node-driver-registrar   <none>              161662e2189a0       350MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              d9ab25a51c123       415MB
+quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              075eabc2f7a0a       466MB
+registry.access.redhat.com/ubi8/openssl                       latest              6f0b85db494c0       40.7MB
+registry.redhat.io/odf4/odf-topolvm-rhel8                     latest              7772af7c5ac84       222MB
+registry.redhat.io/openshift4/ose-csi-external-provisioner    latest              f4f57fec63a30       389MB
+registry.redhat.io/openshift4/ose-csi-external-resizer        latest              ffee6b6e833e3       387MB
+registry.redhat.io/openshift4/ose-csi-livenessprobe           latest              f67b4438d40d3       349MB
+registry.redhat.io/openshift4/ose-csi-node-driver-registrar   latest              161662e2189a0       350MB
 ```
 
 Finally, wait until all the MicroShift pods are up and running.
