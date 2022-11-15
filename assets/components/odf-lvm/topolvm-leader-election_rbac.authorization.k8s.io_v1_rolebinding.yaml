@@ -1,13 +1,14 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   creationTimestamp: null
-  name: topolvm-node
+  name: topolvm-leader-election
+  namespace: openshift-storage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: topolvm-node
+  kind: Role
+  name: topolvm-leader-election
 subjects:
 - kind: ServiceAccount
-  name: topolvm-node
+  name: topolvm-controller
   namespace: openshift-storage

@@ -25,7 +25,7 @@ func init() {
 		"coredns":                   "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6aea46caf069e9ac9cd7a77c0354a2a56095586bb464baff6bfdceb8dbbb82e6",
 		"haproxy_router":            "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:07374f455423ab69655f6ea6dce683e4c2ab3617864f5ad477ddfb5d231351bb",
 		"kube_rbac_proxy":           "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8bbd4f243c8d3160a0788bef966ec0ca019ad8d3172ca7d0efe08f04116d88f8",
-		"odf_topolvm":               "registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:362c41177d086fc7c8d4fa4ac3bbedb18b1902e950feead9219ea59d1ad0e7ad",
+		"odf_topolvm":               "quay.io/rh-storage-partners/microshift-topolvm@sha256:616fe64c9f2d1315cec655d482e7b26596594e879e07017e0e610d37c72bacd0",
 		"openssl":                   "registry.access.redhat.com/ubi8/openssl@sha256:8b41865d30b7947de68a9c1747616bce4efab4f60f68f8b7016cd84d7708af6b",
 		"ose_csi_ext_provisioner":   "registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:4b7d8035055a867b14265495bd2787db608b9ff39ed4e6f65ff24488a2e488d2",
 		"ose_csi_ext_resizer":       "registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:ca34c46c4a4c1a4462b8aa89d1dbb5427114da098517954895ff797146392898",

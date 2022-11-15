@@ -87,7 +87,7 @@ spec:
           name: csi-plugin-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.cybozu.com/node/csi-topolvm.sock
+        - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.io/node/csi-topolvm.sock
         image: {{ .ReleaseImage.ose_csi_node_registrar }}
         imagePullPolicy: IfNotPresent
         lifecycle:
@@ -96,7 +96,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - rm -rf /registration/topolvm.cybozu.com /registration/topolvm.cybozu.com-reg.sock
+              - rm -rf /registration/topolvm.io /registration/topolvm.io-reg.sock
         name: csi-registrar
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -147,7 +147,7 @@ spec:
           type: Directory
         name: registration-dir
       - hostPath:
-          path: /var/lib/kubelet/plugins/topolvm.cybozu.com/node
+          path: /var/lib/kubelet/plugins/topolvm.io/node
           type: DirectoryOrCreate
         name: node-plugin-dir
       - hostPath:

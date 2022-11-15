@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/compose: metrics
+    app.kubernetes.io/part-of: odf-lvm-provisioner
+  name: topolvm-node-metrics
+  namespace: openshift-storage
+spec:
+  ports:
+  - name: topolvm-metrics
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/name: topolvm-node
+status:
+  loadBalancer: {}
