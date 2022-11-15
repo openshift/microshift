@@ -1,1 +1,0 @@
-../../packaging/images/microshift/Dockerfile
