@@ -185,11 +185,11 @@ func StringInList(s string, list []string) bool {
 func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	contents, err := os.ReadFile(configFile)
 	if err != nil {
-		return fmt.Errorf("reading config file %s: %v", configFile, err)
+		return fmt.Errorf("reading config file %q: %v", configFile, err)
 	}
 
 	if err := yaml.Unmarshal(contents, c); err != nil {
-		return fmt.Errorf("decoding config file %s: %v", configFile, err)
+		return fmt.Errorf("decoding config file %q: %v", configFile, err)
 	}
 
 	return nil

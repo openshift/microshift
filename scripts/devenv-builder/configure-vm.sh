@@ -59,6 +59,7 @@ gpgcheck=0
 skip_if_unavailable=1
 EOF
 
+sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos \
     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
 #    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
