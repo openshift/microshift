@@ -24,7 +24,7 @@ On the machine used for the rebase,
 * add a pull secret into `~/.pull-secret.json`, and
 * git clone your personal fork of microshift and `cd` into it.
 
-### Fully automatic rebaseing
+### Fully automatic rebasing
 
 The following command attempts a fully automatic rebase to a given target upstream release. It is what is run nighly from CI and should work for most cases within a z-stream. It creates a new branch namded after the target release, then runs the indidivual steps described in the following sections, including creating the respective commmits.
 

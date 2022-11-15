@@ -3,17 +3,20 @@ The development environment bootstrap and configuration procedures are automated
 It is recommended to review the current document and use the automation instructions to create and configure the environment.
 
 ## Create Development Virtual Machine
-Start by downloading the RHEL 8.7 or above ISO image from the https://developers.redhat.com/products/rhel/download location.
+Start by downloading the RHEL 8.7 ISO boot image for `x86_64` or `aarch64` architecture from the https://developers.redhat.com/products/rhel/download location.
 > RHEL 9.x operating system is not currently supported.
 
 ### Creating VM
-Create a RHEL 8 virtual machine with 2 cores, 4096MB of RAM and 50GB of storage. 
+Create a RHEL virtual machine with 2 cores, 4096MB of RAM and 50GB of storage. 
 > Visual Studio Code may consume around 2GB of RAM. For running the IDE on the development virtual machine, it is recommended to allocate at least 6144MB of RAM in total.
+
+Install the `libvirt` packages and reboot your system to start the virtualization environment.
+```
+sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img
+```
 
 Move the ISO image to `/var/lib/libvirt/images` directory and run the following command to create a virtual machine.
 ```bash
-sudo dnf install -y libvirt virt-manager virt-viewer libvirt-client qemu-kvm qemu-img
-
 VMNAME="microshift-dev"
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
@@ -111,6 +114,7 @@ gpgcheck=0
 skip_if_unavailable=1
 EOF
 
+sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos \
     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
 #    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \

@@ -24,7 +24,7 @@ As an example, run the following command to create a virtual machine named `micr
 > See the [Recommended system swap size](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/getting-started-with-swap_managing-storage-devices#recommended-system-swap-space_getting-started-with-swap) document for more information.
 
 ```bash
-./scripts/devenv-builder/create-vm.sh microshift-dev /var/lib/libvirt/images /var/lib/libvirt/images/rhel-8.7-x86_64-dvd.iso 4 6 50 6 2
+./scripts/devenv-builder/create-vm.sh microshift-dev /var/lib/libvirt/images /var/lib/libvirt/images/rhel-8.7-$(uname -i)-dvd.iso 4 6 50 6 2
 ```
 
 or
@@ -32,7 +32,7 @@ or
 ```bash
 export VMNAME=microshift-dev
 export VMDISKDIR=/var/lib/libvirt/images
-export RHELISO=/var/lib/libvirt/images/rhel-8.7-x86_64-dvd.iso
+export RHELISO=/var/lib/libvirt/images/rhel-8.7-$(uname -i)-dvd.iso
 export NCPUS=4
 export RAMSIZE=6
 export DISKSIZE=50

@@ -109,15 +109,15 @@ $ lsblk /dev/sda
 NAME          MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 sda             8:0    0   20G  0 disk
 ├─sda1          8:1    0  200M  0 part /boot/efi
-├─sda2          8:2    0    1G  0 part /boot
-└─sda3          8:3    0 18.8G  0 part
+├─sda2          8:2    0  800M  0 part /boot
+└─sda3          8:3    0   19G  0 part
   └─rhel-root 253:0    0    8G  0 lvm  /sysroot
 
 $ sudo vgdisplay -s
-  "rhel" <18.80 GiB [8.00 GiB  used / <10.80 GiB free]
+  "rhel" <18.80 GiB [8.00 GiB  used / <11 GiB free]
 ```
 
-> Unallocated disk space of 10.80GB size remains in the `rhel` volume group to be used by the CSI driver.
+> Unallocated disk space of 11GB size remains in the `rhel` volume group to be used by the CSI driver.
 
 ### Offline Containers
 The `scripts/image-builder/build.sh` script supports a special mode for including the MicroShift container image dependencies into the generated ISO. When the container images required by MicroShift are preinstalled, `CRI-O` does not attempt to pull them when MicroShift service is first started, saving network bandwidth and avoiding external network connections.
