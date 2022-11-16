@@ -60,18 +60,19 @@ else
 endif
 
 
-GO_LD_FLAGS := $(GC_FLAGS) -ldflags "-X k8s.io/component-base/version.gitMajor=1 \
-                   -X k8s.io/component-base/version.gitMajor=1 \
-                   -X k8s.io/component-base/version.gitMinor=24 \
-                   -X k8s.io/component-base/version.gitVersion=v1.24.0 \
-                   -X k8s.io/component-base/version.gitCommit=07c9eb7 \
-                   -X k8s.io/component-base/version.gitTreeState=clean \
+include Makefile.kube_git.var
+GO_LD_FLAGS := $(GC_FLAGS) -ldflags " \
+                   -X k8s.io/component-base/version.gitMajor=$(KUBE_GIT_MAJOR) \
+                   -X k8s.io/component-base/version.gitMinor=$(KUBE_GIT_MINOR) \
+                   -X k8s.io/component-base/version.gitVersion=$(KUBE_GIT_VERSION) \
+                   -X k8s.io/component-base/version.gitCommit=$(KUBE_GIT_COMMIT) \
+                   -X k8s.io/component-base/version.gitTreeState=$(KUBE_GIT_TREE_STATE) \
                    -X k8s.io/component-base/version.buildDate=$(BIN_TIMESTAMP) \
-                   -X k8s.io/client-go/pkg/version.gitMajor=1 \
-                   -X k8s.io/client-go/pkg/version.gitMinor=24 \
-                   -X k8s.io/client-go/pkg/version.gitVersion=v1.24.0 \
-                   -X k8s.io/client-go/pkg/version.gitCommit=07c9eb7 \
-                   -X k8s.io/client-go/pkg/version.gitTreeState=clean \
+                   -X k8s.io/client-go/pkg/version.gitMajor=$(KUBE_GIT_MAJOR) \
+                   -X k8s.io/client-go/pkg/version.gitMinor=$(KUBE_GIT_MINOR) \
+                   -X k8s.io/client-go/pkg/version.gitVersion=$(KUBE_GIT_VERSION) \
+                   -X k8s.io/client-go/pkg/version.gitCommit=$(KUBE_GIT_COMMIT) \
+                   -X k8s.io/client-go/pkg/version.gitTreeState=$(KUBE_GIT_TREE_STATE) \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    -X github.com/openshift/microshift/pkg/version.majorFromGit=$(MAJOR) \
                    -X github.com/openshift/microshift/pkg/version.minorFromGit=$(MINOR) \
