@@ -2,7 +2,7 @@
 apiVersion: storage.k8s.io/v1
 kind: CSIDriver
 metadata:
-  name: topolvm.cybozu.com
+  name: topolvm.io
 spec:
   attachRequired: false
   podInfoOnMount: true

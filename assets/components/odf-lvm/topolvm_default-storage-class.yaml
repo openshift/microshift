@@ -7,7 +7,7 @@ metadata:
   name: topolvm-provisioner
 parameters:
   csi.storage.k8s.io/fstype: xfs
-provisioner: topolvm.cybozu.com
+provisioner: topolvm.io
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true

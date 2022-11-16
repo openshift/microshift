@@ -1,6 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
+  creationTimestamp: null
   name: topolvm-csi-provisioner
   namespace: openshift-storage
 roleRef:
