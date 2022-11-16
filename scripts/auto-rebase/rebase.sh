@@ -87,7 +87,7 @@ download_release() {
             git init "${repo##*/}"
             pushd "${repo##*/}" >/dev/null
             git remote add origin "${repo}"
-            git fetch origin --depth=1 "${commit}"
+            git fetch origin --filter=tree:0 --tags "${commit}"
             git checkout "${commit}"
             popd >/dev/null
             echo
@@ -586,6 +586,31 @@ update_manifests() {
 }
 
 
+# Updates buildfiles like the Makefile
+update_buildfiles() {
+    KUBE_ROOT="${STAGING_DIR}/kubernetes"
+    if [ ! -d "${KUBE_ROOT}" ]; then
+        >&2 echo "No kubernetes repo found at ${KUBE_ROOT}, you need to download a release first."
+        exit 1
+    fi
+
+    pushd "${KUBE_ROOT}" >/dev/null
+
+    title "Rebasing Makefile"
+    source hack/lib/version.sh
+    kube::version::get_version_vars
+    cat <<EOF > "${REPOROOT}/Makefile.kube_git.var"
+KUBE_GIT_MAJOR=${KUBE_GIT_MAJOR-}
+KUBE_GIT_MINOR=${KUBE_GIT_MINOR%%+*}
+KUBE_GIT_VERSION=${KUBE_GIT_VERSION%%-*}
+KUBE_GIT_COMMIT=${KUBE_GIT_COMMIT-}
+KUBE_GIT_TREE_STATE=${KUBE_GIT_TREE_STATE-}
+EOF
+
+    popd >/dev/null
+}
+
+
 # Runs each rebase step in sequence, commiting the step's output to git
 rebase_to() {
     local release_image_amd64=$1
@@ -635,6 +660,15 @@ rebase_to() {
     else
         echo "No changes to assets."
     fi
+
+    update_buildfiles
+    if [[ -n "$(git status -s Makefile packaging/rpm/microshift.spec)" ]]; then
+        title "## Committing changes to buildfiles"
+        git add Makefile packaging/rpm/microshift.spec
+        git commit -m "update buildfiles"
+    else
+        echo "No changes to buildfiles."
+    fi
 }
 
 
@@ -642,6 +676,7 @@ usage() {
     echo "Usage:"
     echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM         Performs all the steps to rebase to a release image. Specify both amd64 and arm64."
     echo "$(basename "$0") download RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM   Downloads the content of a release image to disk in preparation for rebasing. Specify both amd64 and arm64."
+    echo "$(basename "$0") buildfiles                                       Updates build files (Makefile, Dockerfile, .spec)"
     echo "$(basename "$0") go.mod                                           Updates the go.mod file to the downloaded release"
     echo "$(basename "$0") generated-apis                                   Regenerates OpenAPIs"
     echo "$(basename "$0") images                                           Rebases the component images to the downloaded release"
@@ -659,6 +694,7 @@ case "$command" in
         [[ $# -ne 3 ]] && usage
         download_release "$2" "$3"
         ;;
+    buildfiles) update_buildfiles;;
     go.mod) update_go_mod;;
     generated-apis) regenerate_openapi;;
     images) update_images;;
