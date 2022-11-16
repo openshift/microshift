@@ -27,7 +27,6 @@ data:
     enable-egress-qos=false
 
     [gateway]
-    mode=local
     nodeport=true
 
     [masterha]

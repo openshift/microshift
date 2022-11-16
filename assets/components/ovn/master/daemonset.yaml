@@ -340,7 +340,8 @@ spec:
           ip6tables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
           echo "I$(date "+%m%d %H:%M:%S.%N") - starting ovnkube-node"
 
-          gateway_mode_flags="--gateway-mode local --gateway-interface br-ex"
+          # gateway_mode_flags="--gateway-mode local --gateway-interface br-ex"
+          gateway_mode_flags="--gateway-mode \"\""
 
           sysctl net.ipv4.ip_forward=1
 
@@ -357,13 +358,11 @@ spec:
             --init-node "${K8S_NODE}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
-            ${gateway_mode_flags} \
             ${gw_interface_flag} \
             --inactivity-probe="180000" \
             --nb-address "" \
             --sb-address "" \
             --enable-multicast \
-            --disable-snat-multiple-gws \
             --acl-logging-rate-limit "20"
         lifecycle:
           preStop:

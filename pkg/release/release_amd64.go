@@ -31,7 +31,7 @@ func init() {
 		"ose_csi_ext_resizer":       "registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:ca34c46c4a4c1a4462b8aa89d1dbb5427114da098517954895ff797146392898",
 		"ose_csi_node_registrar":    "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:3babcf219371017d92f8bc3301de6c63681fcfaa8c344ec7891c8e84f31420eb",
 		"ose_csi_livenessprobe":     "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:e4b0f6c89a12d26babdc2feae7d13d3f281ac4d38c24614c13c230b4a29ec56e",
-		"ovn_kubernetes_microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b032c385990214c21040e08058e532b22fe01401b84d6afa34df2c90c319cbca",
+		"ovn_kubernetes_microshift": "quay.io/zshi/ovn-daemonset:disable-gateway",
 		"pod":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dd96c7e645b7cfaba393b8f486692ee76e44c307ebd4d12bb29145488cb31448",
 		"service_ca_operator":       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:122d11ef830b5de73abfa91c15f3d96fe448d057ce05421e21df7008bb5b8f0b",
 	}

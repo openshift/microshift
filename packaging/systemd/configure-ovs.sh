@@ -626,6 +626,7 @@ fi
 # print initial state
 print_state
 if [ "$1" == "OVNKubernetes" ]; then
+  exit 0
   # Skip configuring NICs onto OVS bridge "br-ex" when disableOVSInit is true
   MICROSHIFT_OVN_CONFIG_FILE_PATH="/etc/microshift/ovn.yaml"
   if [ -f "$MICROSHIFT_OVN_CONFIG_FILE_PATH" ]; then
