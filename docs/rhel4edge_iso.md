@@ -173,7 +173,7 @@ cd /var/lib/libvirt/images/ && \
 virt-install \
     --name ${VMNAME} \
     --vcpus 2 \
-    --memory 3096 \
+    --memory 3072 \
     --disk path=./${VMNAME}.qcow2,size=20 \
     --network network=default,model=virtio \
     --os-type generic \

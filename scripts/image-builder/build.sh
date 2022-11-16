@@ -196,8 +196,8 @@ done
 if [ -z "${OSTREE_SERVER_NAME}" ] || [ -z "${OCP_PULL_SECRET_FILE}" ] ; then
     usage
 fi
-if [ ! -e ${OCP_PULL_SECRET_FILE} ] ; then
-    echo "ERROR: pull_secret_file file does not exist: ${OCP_PULL_SECRET_FILE}"
+if [ ! -r ${OCP_PULL_SECRET_FILE} ] ; then
+    echo "ERROR: pull_secret_file file does not exist or not readable: ${OCP_PULL_SECRET_FILE}"
     exit 1
 fi
 if [ -n "${AUTHORIZED_KEYS_FILE}" ]; then
@@ -307,7 +307,7 @@ if ${EMBED_CONTAINERS} ; then
     # TODO: This should be removed when RHEL 8.x stream gets an up-to-date package
     # Include up-to-date ostree packages in the image builder to support whiteouts    
     repo_name=ostree-copr
-    cp -f ${SCRIPTDIR}/config/${repo_name}.toml .
+    cat ${SCRIPTDIR}/config/${repo_name}.toml | sed "s;REPLACE_ARCH_VALUE;${BUILD_ARCH};g" > ${repo_name}.toml
     sudo composer-cli sources delete ${repo_name} 2>/dev/null || true
     sudo composer-cli sources add ${BUILDDIR}/${repo_name}.toml
 
