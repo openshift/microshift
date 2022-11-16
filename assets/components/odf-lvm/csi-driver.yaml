@@ -4,6 +4,7 @@ kind: CSIDriver
 metadata:
   name: topolvm.io
 spec:
+  storageCapacity: true
   attachRequired: false
   podInfoOnMount: true
   volumeLifecycleModes:
