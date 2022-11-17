@@ -17,88 +17,99 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"sort"
 
-	"github.com/spf13/cobra"
-
+	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 
-	"k8s.io/component-base/cli/globalflag"
-	"k8s.io/component-base/version/verflag"
+	kubecontrolplanev1 "github.com/openshift/api/kubecontrolplane/v1"
+	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
-	kubecmoptions "k8s.io/kubernetes/cmd/kube-controller-manager/app/options"
 
+	"github.com/ghodss/yaml"
 	klog "k8s.io/klog/v2"
 )
 
+const (
+	kcmDefaultConfigAsset = "components/kube-controller-manager/defaultconfig.yaml"
+)
+
 type KubeControllerManager struct {
-	kubecmOptions *kubecmoptions.KubeControllerManagerOptions
-	kubeconfig    string
-	kubeadmConfig string
+	args    []string
+	applyFn func() error
+
+	// TODO: report configuration errors immediately
+	configureErr error
 }
 
 func NewKubeControllerManager(cfg *config.MicroshiftConfig) *KubeControllerManager {
 	s := &KubeControllerManager{}
-	s.configure(cfg)
+	// TODO: manage and invoke the configure bits independently outside of this.
+	s.args, s.applyFn, s.configureErr = configure(cfg)
 	return s
 }
 
 func (s *KubeControllerManager) Name() string           { return "kube-controller-manager" }
 func (s *KubeControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *KubeControllerManager) configure(cfg *config.MicroshiftConfig) {
+func kcmRootCAFile() string {
+	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
+	return cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
+}
+
+func kcmClusterSigningCertKeyAndFile() (string, string) {
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 	csrSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
-	kubeconfig := cfg.KubeConfigPath(config.KubeControllerManager)
-	kubeadmConfig := cfg.KubeConfigPath(config.KubeAdmin)
+	return cryptomaterial.CAKeyPath(csrSignerDir), cryptomaterial.CACertPath(csrSignerDir)
+}
 
-	opts, err := kubecmoptions.NewKubeControllerManagerOptions()
-	if err != nil {
-		klog.Fatalf("%s initialization error command options: %v", s.Name(), err)
-	}
-	s.kubecmOptions = opts
-	s.kubeconfig = kubeconfig
-	s.kubeadmConfig = kubeadmConfig
+func kcmServiceAccountPrivateKeyFile() string {
+	return microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"
+}
 
-	args := []string{
-		"--kubeconfig=" + kubeconfig,
-		"--service-account-private-key-file=" + microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key",
-		"--allocate-node-cidrs=true",
-		"--cluster-cidr=" + cfg.Cluster.ClusterCIDR,
-		"--authorization-kubeconfig=" + kubeconfig,
-		"--authentication-kubeconfig=" + kubeconfig,
-		"--root-ca-file=" + cryptomaterial.ServiceAccountTokenCABundlePath(certsDir),
-		"--bind-address=127.0.0.1",
-		"--secure-port=10257",
-		"--leader-elect=false",
-		"--use-service-account-credentials=true",
-		"--cluster-signing-cert-file=" + cryptomaterial.CACertPath(csrSignerDir),
-		"--cluster-signing-key-file=" + cryptomaterial.CAKeyPath(csrSignerDir),
-	}
+func configure(cfg *config.MicroshiftConfig) (args []string, applyFn func() error, err error) {
+	kubeConfig := cfg.KubeConfigPath(config.KubeControllerManager)
+	clusterSigningKey, clusterSigningCert := kcmClusterSigningCertKeyAndFile()
 
-	// fake the kube-controller-manager cobra command to parse args into controllermanager options
-	cmd := &cobra.Command{
-		Use:          "kube-controller-manager",
-		Long:         `kube-controller-manager`,
-		SilenceUsage: true,
-		RunE:         func(cmd *cobra.Command, args []string) error { return nil },
+	overrides := &kubecontrolplanev1.KubeControllerManagerConfig{
+		ExtendedArguments: map[string]kubecontrolplanev1.Arguments{
+			"kubeconfig":                       {kubeConfig},
+			"authentication-kubeconfig":        {kubeConfig},
+			"authorization-kubeconfig":         {kubeConfig},
+			"service-account-private-key-file": {kcmServiceAccountPrivateKeyFile()},
+			"allocate-node-cidrs":              {"true"},
+			"cluster-cidr":                     {cfg.Cluster.ClusterCIDR},
+			"root-ca-file":                     {kcmRootCAFile()},
+			"bind-address":                     {"127.0.0.1"},
+			"secure-port":                      {"10257"},
+			"leader-elect":                     {"false"},
+			"use-service-account-credentials":  {"true"},
+			"cluster-signing-cert-file":        {clusterSigningCert},
+			"cluster-signing-key-file":         {clusterSigningKey},
+		},
 	}
 
-	namedFlagSets := s.kubecmOptions.Flags(kubecm.KnownControllers(), kubecm.ControllersDisabledByDefault.List())
-	verflag.AddFlags(namedFlagSets.FlagSet("global"))
-	globalflag.AddGlobalFlags(namedFlagSets.FlagSet("global"), cmd.Name())
-	for _, f := range namedFlagSets.FlagSets {
-		cmd.Flags().AddFlagSet(f)
+	args, err = mergeAndConvertToArgs(overrides)
+	applyFn = func() error {
+		return assets.ApplyNamespaces([]string{
+			"core/namespace-openshift-kube-controller-manager.yaml",
+			"core/namespace-openshift-infra.yaml",
+		}, cfg.KubeConfigPath(config.KubeAdmin))
 	}
-	if err := cmd.ParseFlags(args); err != nil {
-		klog.Fatalf("%s failed to parse flags: %v", s.Name(), err)
-	}
+	return args, applyFn, err
 }
 
 func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	if s.configureErr != nil {
+		return fmt.Errorf("configuration failed: %w", s.configureErr)
+	}
+
 	defer close(stopped)
 	errorChannel := make(chan error, 1)
 
@@ -114,26 +125,57 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 		close(ready)
 	}()
 
-	c, err := s.kubecmOptions.Config(kubecm.KnownControllers(), kubecm.ControllersDisabledByDefault.List())
-	if err != nil {
-		return err
-	}
-
-	// TODO: OpenShift's kubecm patch, uncomment if OpenShiftContext added
-	//if err := kubecm.ShimForOpenShift(s.kubecmOptions, c); err != nil {
-	//	return err
-	//}
-
-	if err := assets.ApplyNamespaces([]string{
-		"core/namespace-openshift-kube-controller-manager.yaml",
-		"core/namespace-openshift-infra.yaml",
-	}, s.kubeadmConfig); err != nil {
-		klog.Fatalf("failed to apply openshift namespaces %v", err)
-	}
-
+	// Carrying a patch for NewControllerManagerCommand to use cmd.Context().Done()
+	// as the stop channel instead of the channel returned by SetupSignalHandler,
+	// which expects to be called at most once in a process.
+	cmd := kubecm.NewControllerManagerCommand()
+	cmd.SetArgs(s.args)
 	go func() {
-		errorChannel <- kubecm.Run(c.Complete(), ctx.Done())
+		errorChannel <- cmd.ExecuteContext(ctx)
 	}()
 
+	if err := s.applyFn(); err != nil {
+		klog.Fatalf("failed to apply openshift namespaces %v", err)
+	}
 	return <-errorChannel
+}
+
+func mergeAndConvertToArgs(overrides *kubecontrolplanev1.KubeControllerManagerConfig) ([]string, error) {
+	defaultConfigBytes, err := embedded.Asset(kcmDefaultConfigAsset)
+	if err != nil {
+		return nil, fmt.Errorf("invalid asset: %q, error: %w", kcmDefaultConfigAsset, err)
+	}
+	overridesBytes, err := json.Marshal(overrides)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal KubeControllerManagerConfig, error: %w", err)
+	}
+	mergedBytes, err := resourcemerge.MergePrunedProcessConfig(
+		&kubecontrolplanev1.KubeControllerManagerConfig{}, nil, defaultConfigBytes, overridesBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to merge kube-controller-manager configuration: error: %w", err)
+	}
+
+	var kubeControllerManagerConfig map[string]interface{}
+	if err := yaml.Unmarshal(mergedBytes, &kubeControllerManagerConfig); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal the kube-controller-manager config: %v", err)
+	}
+	return GetKubeControllerManagerArgs(kubeControllerManagerConfig), nil
+}
+
+// This is a straight copy from KCM operator repo
+func GetKubeControllerManagerArgs(config map[string]interface{}) []string {
+	extendedArguments, ok := config["extendedArguments"]
+	if !ok || extendedArguments == nil {
+		return nil
+	}
+	args := []string{}
+	for key, value := range extendedArguments.(map[string]interface{}) {
+		for _, arrayValue := range value.([]interface{}) {
+			args = append(args, fmt.Sprintf("--%s=%s", key, arrayValue.(string)))
+		}
+	}
+	// make sure to sort the arguments, otherwise we might get mismatch
+	// when comparing revisions leading to new ones being created, unnecessarily
+	sort.Strings(args)
+	return args
 }

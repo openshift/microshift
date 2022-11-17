@@ -1,0 +1,22 @@
+diff --git a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
+index 28caa49e..9045347f 100644
+--- a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
++++ b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
+@@ -35,7 +35,6 @@ import (
+ 	"k8s.io/apimachinery/pkg/util/uuid"
+ 	"k8s.io/apimachinery/pkg/util/wait"
+ 	genericfeatures "k8s.io/apiserver/pkg/features"
+-	"k8s.io/apiserver/pkg/server"
+ 	"k8s.io/apiserver/pkg/server/healthz"
+ 	"k8s.io/apiserver/pkg/server/mux"
+ 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+@@ -147,8 +146,7 @@ controller, and serviceaccounts controller.`,
+ 				return err
+ 			}
+ 
+-			stopCh := server.SetupSignalHandler()
+-			return Run(c.Complete(), stopCh)
++			return Run(c.Complete(), cmd.Context().Done())
+ 		},
+ 		Args: func(cmd *cobra.Command, args []string) error {
+ 			for _, arg := range args {
