@@ -15,7 +15,7 @@ Run the following command to install the necessary components for the [libvirt](
 > * After creating a virtual machine, manually execute the configuration steps from the [microshift-starter.ks](https://raw.githubusercontent.com/openshift/microshift/main/docs/config/microshift-starter.ks) kickstart file
 
 ```bash
-sudo dnf install -y libvirt virt-manager virt-viewer libvirt-client qemu-kvm qemu-img
+sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img
 ```
 
 Download the Red Hat Enterprise Linux 8.7 DVD ISO image for the x86_64 architecture from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site and copy the file to the `/var/lib/libvirt/images` directory.
@@ -58,7 +58,6 @@ First, get the machine IP address with the following command.
 
 ```bash
 sudo virsh domifaddr microshift-starter
-#example output
  Name       MAC address          Protocol     Address
 -------------------------------------------------------------------------------
  vnet2      52:54:00:6d:08:f7    ipv4         192.168.122.2/24
