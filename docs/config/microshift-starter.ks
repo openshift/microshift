@@ -11,7 +11,8 @@ network --bootproto=dhcp --device=link --activate --onboot=on --hostname=microsh
 # The remainder of the volume will be used by the CSI driver for storing data
 zerombr
 clearpart --all --initlabel
-part /boot --fstype=xfs --asprimary --size=1024
+part /boot/efi --fstype=efi --size=200
+part /boot --fstype=xfs --asprimary --size=800
 part pv.01 --grow
 volgroup rhel pv.01
 logvol / --vgname=rhel --fstype=xfs --size=8192 --name=root
@@ -46,27 +47,24 @@ selinux-policy-devel
 # Allow the default user to run sudo commands without password
 echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/redhat
 
-# Update selinux-policy packages from CentOS 8 Stream
-CENTOS8BASE=http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages
-curl -LO -s $CENTOS8BASE/selinux-policy-3.14.3-96.el8.noarch.rpm
-curl -LO -s $CENTOS8BASE/selinux-policy-devel-3.14.3-96.el8.noarch.rpm
-curl -LO -s $CENTOS8BASE/selinux-policy-targeted-3.14.3-96.el8.noarch.rpm
-dnf localinstall -y selinux-policy*.rpm
-rm -f selinux-policy*.rpm
+tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <<EOF
+[rhocp-4.12-el8-beta-$(uname -i)-rpms]
+name=Beta rhocp-4.12 RPMs for RHEL8
+baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/4.12-el8-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
 
 # Install MicroShift testing package
 dnf copr enable -y @redhat-et/microshift-testing
 dnf install -y microshift
+dnf install -y openshift-clients
 
 # MicroShift service should be enabled later after setting up CRI-O with the pull secret
 
 # Configure firewalld
 firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
 firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
-
-# Install the oc and kubectl utilities (need a 4.12 dev-preview version to have the new functionality support)
-curl -LO -s https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp-dev-preview/4.12.0-ec.4/openshift-client-linux-4.12.0-ec.4.tar.gz
-tar zxf openshift-client-linux-4.12.0-ec.4.tar.gz -C /usr/local/bin/
-rm -f openshift-client-linux-4.12.0-ec.4.tar.gz
 
 %end
