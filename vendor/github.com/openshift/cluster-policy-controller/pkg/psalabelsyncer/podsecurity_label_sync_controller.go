@@ -210,29 +210,19 @@ func (c *PodSecurityAdmissionLabelSynchronizationController) syncNamespace(ctx c
 	nsCopy := ns.DeepCopy()
 
 	var changed bool
-	if nsCopy.Labels[psapi.EnforceLevelLabel] != string(psaLevel) || nsCopy.Labels[psapi.EnforceVersionLabel] != currentPSaVersion {
-		changed = true
-		if nsCopy.Labels == nil {
-			nsCopy.Labels = map[string]string{}
-		}
-
-		nsCopy.Labels[psapi.EnforceLevelLabel] = string(psaLevel)
-		nsCopy.Labels[psapi.EnforceVersionLabel] = currentPSaVersion
-	}
-
-	// cleanup audit and warn labels from version 4.11
-	// TODO: This can be removed in 4.13 and allow users set these as they wish
 	for typeLabel, versionLabel := range map[string]string{
 		psapi.WarnLevelLabel:  psapi.WarnVersionLabel,
 		psapi.AuditLevelLabel: psapi.AuditVersionLabel,
 	} {
-		if _, ok := nsCopy.Labels[typeLabel]; ok {
-			delete(nsCopy.Labels, typeLabel)
+		if ns.Labels[typeLabel] != string(psaLevel) || ns.Labels[versionLabel] != currentPSaVersion {
 			changed = true
-		}
-		if _, ok := nsCopy.Labels[versionLabel]; ok {
-			delete(nsCopy.Labels, versionLabel)
-			changed = true
+			if nsCopy.Labels == nil {
+				nsCopy.Labels = map[string]string{}
+			}
+
+			nsCopy.Labels[typeLabel] = string(psaLevel)
+			nsCopy.Labels[versionLabel] = currentPSaVersion
+
 		}
 	}
 
