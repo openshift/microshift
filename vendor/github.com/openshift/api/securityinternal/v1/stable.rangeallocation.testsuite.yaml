@@ -1,0 +1,13 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[Stable] RangeAllocation"
+crd: 0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
+tests:
+  onCreate:
+  - name: Should be able to create a minimal RangeAllocation
+    initial: |
+      apiVersion: security.internal.openshift.io/v1
+      kind: RangeAllocation
+      # No fields are required for a RangeAllocation
+    expected: |
+      apiVersion: security.internal.openshift.io/v1
+      kind: RangeAllocation
