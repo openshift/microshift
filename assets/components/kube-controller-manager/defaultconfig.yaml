@@ -2,39 +2,39 @@ apiVersion: kubecontrolplane.config.openshift.io/v1
 kind: KubeControllerManagerConfig
 extendedArguments:
   enable-dynamic-provisioning:
-  - "true"
+    - "true"
   allocate-node-cidrs:
-  - "false"
+    - "false"
   configure-cloud-routes:
-  - "false"
+    - "false"
   use-service-account-credentials:
-  - "true"
+    - "true"
   leader-elect:
-  - "true"
+    - "true"
   leader-elect-retry-period:
-  - 3s
+    - "3s"
   leader-elect-resource-lock:
-  - configmapsleases
+    - "configmapsleases"
   controllers:
-  - '*'
-  - -ttl
-  - -bootstrapsigner
-  - -tokencleaner
+    - "*"
+    - "-ttl" # TODO: this is excluded in kube-core, but not in #21092
+    - "-bootstrapsigner"
+    - "-tokencleaner"
   cluster-signing-duration:
-  - 720h
+    - "720h"
   secure-port:
-  - "10257"
+    - "10257"
   cert-dir:
-  - /var/run/kubernetes
+    - "/var/run/kubernetes"
   root-ca-file:
-  - /etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/ca-bundle.crt
+    - "/etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/ca-bundle.crt"
   service-account-private-key-file:
-  - /etc/kubernetes/static-pod-resources/secrets/service-account-private-key/service-account.key
+    - "/etc/kubernetes/static-pod-resources/secrets/service-account-private-key/service-account.key"
   cluster-signing-cert-file:
-  - /etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.crt
+    - "/etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.crt"
   cluster-signing-key-file:
-  - /etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.key
+    - "/etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.key"
   kube-api-qps:
-  - "150"
+    - "150" # this is a historical values
   kube-api-burst:
-  - "300"
+    - "300" # this is a historical values
