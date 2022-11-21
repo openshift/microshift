@@ -406,8 +406,8 @@ update_manifests() {
     #    Selectively copy in only those core manifests that MicroShift is already using
     cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ns.yaml" "${REPOROOT}"/assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
     cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/config-overrides.yaml" "${REPOROOT}"/assets/components/kube-apiserver
-    cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/components/kube-controller-manager
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/components/kube-apiserver
+    cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/components/kube-apiserver
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/components/kube-controller-manager
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrole.yaml" "${REPOROOT}"/assets/core
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrolebinding.yaml" "${REPOROOT}"/assets/core
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-openshift-infra.yaml" "${REPOROOT}"/assets/core
@@ -424,10 +424,9 @@ update_manifests() {
     # - assets/crd/authorizationv1-local-apiservice.yaml (local API service for authorization API group, needed if OpenShift API server is not present)
     # - assets/crd/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
 
-    # note: yq changes the format of the yaml file, although semantically it's a match.
-    yq d -i "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml extendedArguments.pv-recycler-pod-template-filepath-hostpath
-    yq d -i "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml extendedArguments.pv-recycler-pod-template-filepath-nfs
-    yq d -i "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml extendedArguments.flex-volume-plugin-dir
+    yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
+    yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
+    yq -i 'del(.extendedArguments.flex-volume-plugin-dir)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
 
     #    Replace all SCC manifests and their CRs/CRBs
     rm -f "${REPOROOT}"/assets/scc/*.yaml
@@ -668,9 +667,9 @@ rebase_to() {
     fi
 
     update_buildfiles
-    if [[ -n "$(git status -s Makefile packaging/rpm/microshift.spec)" ]]; then
+    if [[ -n "$(git status -s Makefile* packaging/rpm/microshift.spec)" ]]; then
         title "## Committing changes to buildfiles"
-        git add Makefile packaging/rpm/microshift.spec
+        git add Makefile* packaging/rpm/microshift.spec
         git commit -m "update buildfiles"
     else
         echo "No changes to buildfiles."
