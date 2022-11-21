@@ -54,8 +54,8 @@ spec:
           timeoutSeconds: 1
         resources:
           requests:
-            cpu: 250m
-            memory: 250Mi
+            cpu: 2m
+            memory: 31Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -85,8 +85,8 @@ spec:
         name: csi-provisioner
         resources:
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 2m
+            memory: 35Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -97,7 +97,10 @@ spec:
         image: {{ .ReleaseImage.ose_csi_ext_resizer }}
         imagePullPolicy: IfNotPresent
         name: csi-resizer
-        resources: {}
+        resources:
+          requests:
+            cpu: 1m
+            memory: 23Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -108,7 +111,10 @@ spec:
         image: {{ .ReleaseImage.ose_csi_livenessprobe }}
         imagePullPolicy: IfNotPresent
         name: liveness-probe
-        resources: {}
+        resources:
+          requests:
+            cpu: 1m
+            memory: 9Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
