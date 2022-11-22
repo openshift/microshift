@@ -7,10 +7,11 @@ MicroShift repackages a minimal core of OpenShift: A given MicroShift release is
 Therefore, on a high level a rebase of MicroShift onto a newer OpenShift release starts from a given OpenShift release image and involves the following steps:
 
 * vendoring the source code of the embedded OpenShift components at the same commit as used in OpenShift,
-* embedding (as bindata) the resource manifests of the hosted OpenShift components, and 
-* updating the image references (digests) of the hosted OpenShift components.
+* embedding the resource manifests of the hosted OpenShift components,
+* updating the image references (digests) of the hosted OpenShift components, and
+* updating build files (Makefile, Containerfile, ...).
 
-This process is supported by the `rebase.sh` script, which generates the necessary changes, but currently still requires human review and post-processing. The goal is to eventually automate generation, testing, and merging PRs at least for nightlies and z-stream updates.
+This process is supported by the `scripts/auto-rebase/rebase.sh` script, which automates generating the changes for updating MicroShift to the given target OpenShift release.
 
 The following describes the current rebase process in more detail.
 
@@ -18,15 +19,29 @@ The following describes the current rebase process in more detail.
 
 ### Prerequisites
 
-On the machine used for the rebase,
+Rebasing requires the following tools to be installed, which is already the case when running in a [MicroShift development environment](./devenv_rhel8.md):
 
-* install `git`, `golang` (>= 1.17), `oc`, `yq`, and `jq`,
-* add a pull secret into `~/.pull-secret.json`, and
-* git clone your personal fork of microshift and `cd` into it.
+* `git` >= 2.3
+* `golang` >= 1.18
+* `oc` (latest)
+* `jq` >= 1.6
+* `yq` >= 4.26
+
+> There are multiple tools called `yq`, please make sure you install the one from [mikefarah](https://github.com/mikefarah/yq). See the [CI config](https://github.com/openshift/release/blob/master/ci-operator/config/openshift/microshift/openshift-microshift-main__periodics.yaml) (in the `dockerfile_literal` of `yq-cli` image) for the authoritative version and how to install it.
+
+When rebasing onto an OpenShift version whose release image requires a pull secret, place that secret in `~/.pull-secret.json`.
+
+> For rebasing onto nightlies and other versions on CI, see the [OpenShift CI docs](https://docs.ci.openshift.org/docs/how-tos/use-registries-in-build-farm/#how-do-i-log-in-to-pull-images-that-require-authentication) for how to obtain a pull secret for the CI registry. The gist is: Get a CLI login token from the [app.ci web console](https://console-openshift-console.apps.ci.l2s4.p1.openshiftapps.com/), use it to log in from the CLI (`oc login https://app.ci.openshift.org --token=<token>`), and download the registry pull-secret using `oc registry login --to=app.ci_registry.json`.
+>
+> For rebasing onto released OpenShift versions, use the regular [OpenShift pull secret](https://cloud.redhat.com/openshift/install).
+>
+> You can combine both pull secrets using `jq -c -s '.[0] * .[1]' app.ci_registry.json openshift-pull-secret.json > ~/.pull-secret.json`.
+
+Finally. git clone your personal fork of microshift and `cd` into it.
 
 ### Fully automatic rebasing
 
-The following command attempts a fully automatic rebase to a given target upstream release. It is what is run nighly from CI and should work for most cases within a z-stream. It creates a new branch namded after the target release, then runs the indidivual steps described in the following sections, including creating the respective commmits.
+The following command attempts a fully automatic rebase to a given target upstream release. It is what is run nighly from CI and should work for most cases within a z-stream. It creates a new branch named after the target release, then runs the individual steps described in the following sections, including creating the respective commits.
 
 ```shell
 ./scripts/auto-rebase/rebase.sh to quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64
@@ -76,22 +91,9 @@ git add vendor
 git commit -m "update vendoring"
 ```
 
-### Rebasing `Makefile`, `Dockerfiles`, and `.spec` file
+### Rebasing the hosted component images
 
-When updating to a new minor version of OpenShift, update the `RELEASE_BASE` and `GO_LD_FLAGS in the [`Makefile`](https://github.com/openshift/microshift/blob/main/Makefile) to match the new version and also check whether the Dockerfiles need a new base image (e.g. [this](https://github.com/openshift/microshift/blob/main/packaging/images/openshift-ci/Dockerfile)) and the RPM `.spec` file needs updates (e.g. [this](https://github.com/openshift/microshift/blob/main/packaging/rpm/microshift.spec))
-
-Commit the changes:
-
-```shell
-git add Makefile packaging
-git commit -m "update Makefile and Dockerfiles"
-```
-
-### Rebasing the embedded components
-
-#### Component images
-
-To update the component image references of the MicroShift release, run:
+To update the image references for the hosted components of the MicroShift release (incl. the pause image for CRI-O), run:
 
 ```shell
 ./scripts/auto-rebase/rebase.sh images
@@ -99,9 +101,9 @@ git add pkg/release
 git commit -m "update component images"
 ```
 
-#### Component manifests
+#### Rebasing the hosted component manifests
 
-The next step is to update the embedded component manifests in the asset directory:
+The next step is to update the manifests of embedded and hosted components in the asset directory:
 
 ```shell
 ./scripts/auto-rebase/rebase.sh manifests
@@ -116,9 +118,33 @@ For each component, this performs the following high-level steps:
 
 Each step consistes of zero or more transformations. These transformations should remain relatively stable, but at least when rebasing to a new minor version of OpenShift, the output produced by the components Operator and that of the rebase script should be compared to make the necessary updates.
 
-#### Component configs
+#### Rebasing the embedded component configs
 
-The last step isn't automated at all yet, which is to compare whether the config parameters of embedded component changed, for example the kubelet configuration in `writeConfig(...)` of `pkg/node/kubelet.go` with OpenShift MCO's template (which the `rebase.sh` script downloads into `_output/staging/machine-config-operator/templates/master/01-master-kubelet/_base/files/kubelet.yaml`).
+The step isn't automated at all yet, which is to compare whether the config parameters of embedded components changed, for example the kubelet configuration in `writeConfig(...)` of `pkg/node/kubelet.go` with OpenShift MCO's template (which the `rebase.sh` script downloads into `_output/staging/machine-config-operator/templates/master/01-master-kubelet/_base/files/kubelet.yaml`).
+
+### Rebasing the build files
+
+The final step is to update build files like the `Makefiles`, `Dockerfiles`, `.spec` etc.
+
+```shell
+./scripts/auto-rebase/rebase.sh buildfiles
+```
+
+At the moment, this only updates the `GO_LD_FLAGS` in the `Makefile.kube_git.var`. When updating to a new minor version of OpenShift, you may also need to update other locations, for example:
+
+* in the [`Makefile`](https://github.com/openshift/microshift/blob/main/Makefile)
+  * the `RELEASE_BASE` variable
+* in the `Dockerfile`s (e.g. [openshift-ci image](https://github.com/openshift/microshift/blob/main/packaging/images/openshift-ci/Dockerfile))
+  * the version of the base images
+* in the [microshift.spec](https://github.com/openshift/microshift/blob/main/packaging/rpm/microshift.spec))
+  * the Golang version
+
+Commit the changes:
+
+```shell
+git add Makefile* packaging
+git commit -m "update buildfiles"
+```
 
 ## Rebasing a Community OKD Release
 
