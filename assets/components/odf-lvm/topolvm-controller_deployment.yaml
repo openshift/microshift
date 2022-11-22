@@ -80,7 +80,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        image: {{ .ReleaseImage.ose_csi_ext_provisioner }}
+        image: {{ .ReleaseImage.csi_external_provisioner }}
         imagePullPolicy: IfNotPresent
         name: csi-provisioner
         resources:
@@ -94,7 +94,7 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.ose_csi_ext_resizer }}
+        image: {{ .ReleaseImage.csi_external_resizer }}
         imagePullPolicy: IfNotPresent
         name: csi-resizer
         resources: {}
@@ -105,7 +105,7 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.ose_csi_livenessprobe }}
+        image: {{ .ReleaseImage.csi_livenessprobe }}
         imagePullPolicy: IfNotPresent
         name: liveness-probe
         resources: {}
