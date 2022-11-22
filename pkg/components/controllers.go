@@ -105,11 +105,9 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 	var (
 		clusterRoleBinding = []string{
 			"components/openshift-router/cluster-role-binding.yaml",
-			"components/openshift-router/ingress-to-route-controller-clusterrolebinding.yaml",
 		}
 		clusterRole = []string{
 			"components/openshift-router/cluster-role.yaml",
-			"components/openshift-router/ingress-to-route-controller-clusterrole.yaml",
 		}
 		apps = []string{
 			"components/openshift-router/deployment.yaml",

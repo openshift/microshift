@@ -114,6 +114,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		klog.Fatalf("failed to apply openshift namespaces %v", err)
 	}
 	if err := assets.ApplyClusterRoles([]string{
+		"core/ingress-to-route-controller-clusterrole.yaml",
 		"core/route-controller-informer-clusterrole.yaml",
 		"core/route-controller-tokenreview-clusterrole.yaml",
 	}, s.kubeadmconfig); err != nil {
@@ -121,6 +122,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 	}
 
 	if err := assets.ApplyClusterRoleBindings([]string{
+		"core/ingress-to-route-controller-clusterrolebinding.yaml",
 		"core/route-controller-informer-clusterrolebinding.yaml",
 		"core/route-controller-tokenreview-clusterrolebinding.yaml",
 	}, s.kubeadmconfig); err != nil {
