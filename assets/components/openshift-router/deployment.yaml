@@ -21,8 +21,6 @@ spec:
             allowPrivilegeEscalation: true
           terminationMessagePolicy: FallbackToLogsOnError
           env:
-            - name: ROUTER_SERVICE_NAMESPACE
-              value: openshift-ingress
             - name: DEFAULT_CERTIFICATE_DIR
               value: /etc/pki/tls/private
             - name: DEFAULT_DESTINATION_CA_PATH
@@ -43,18 +41,24 @@ spec:
               value: "true"
             - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
               value: "false"
+            - name: ROUTER_DOMAIN
+              value: apps.{{ .ClusterDomain }}
             - name: ROUTER_LOAD_BALANCE_ALGORITHM
               value: random
             - name: ROUTER_METRICS_TYPE
               value: haproxy
             - name: ROUTER_SERVICE_NAME
               value: default
+            - name: ROUTER_SERVICE_NAMESPACE
+              value: openshift-ingress
             - name: ROUTER_SET_FORWARDED_HEADERS
               value: append
             - name: ROUTER_TCP_BALANCE_SCHEME
               value: source
             - name: ROUTER_THREADS
               value: "4"
+            - name: GRACEFUL_SHUTDOWN_DELAY
+              value: "1"
             - name: ROUTER_USE_PROXY_PROTOCOL
               value: "false"
             - name: SSL_MIN_VERSION
