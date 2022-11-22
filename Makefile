@@ -102,6 +102,19 @@ build: export CGO_ENABLED=0
 
 microshift: build
 
+.PHONY: etcd
+export GO_BUILD_FLAGS 
+export GO_LD_FLAGS = $(GC_FLAGS) -ldflags "\
+                   -X main.majorFromGit=$(MAJOR) \
+                   -X main.minorFromGit=$(MINOR) \
+                   -X main.versionFromGit=$(EMBEDDED_GIT_TAG) \
+                   -X main.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
+                   -X main.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
+                   -X main.buildDate=$(BIN_TIMESTAMP) \
+					$(LD_FLAGS)"
+etcd:
+	$(MAKE) -C etcd
+
 .PHONY: verify-images
 verify: verify-images
 verify-images:
