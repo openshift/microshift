@@ -16,7 +16,7 @@ limitations under the License.
 
 package release
 
-var Base = "4.12.0-0.nightly-2022-11-21-151126"
+var Base = "4.12.0-0.nightly-2022-11-22-012345"
 
 var Image = map[string]string{
 	"cli":                       "quay.io/microshift/cli:" + Base,
@@ -25,10 +25,10 @@ var Image = map[string]string{
 	"kube_rbac_proxy":           "quay.io/microshift/kube-rbac-proxy:" + Base,
 	"odf_topolvm":               "quay.io/microshift/odf-topolvm-rhel8" + Base,
 	"openssl":                   "quay.io/microshift/openssl" + Base,
-	"ose_csi_ext_provisioner":   "quay.io/microshift/ose-csi-external-provisioner" + Base,
-	"ose_csi_ext_resizer":       "quay.io/microshift/ose-csi-external-resizer" + Base,
-	"ose_csi_node_registrar":    "quay.io/microshift/ose-csi-node-driver-registrar" + Base,
-	"ose_csi_livenessprobe":     "quay.io/microshift/ose-csi-livenessprobe" + Base,
+	"csi_external_provisioner":  "quay.io/microshift/csi-external-provisioner" + Base,
+	"csi_external_resizer":      "quay.io/microshift/csi-external-resizer" + Base,
+	"csi_node_driver_registrar": "quay.io/microshift/csi-node-driver-registrar" + Base,
+	"csi_livenessprobe":         "quay.io/microshift/csi-livenessprobe" + Base,
 	"ovn_kubernetes_microshift": "quay.io/microshift/ovn-kubernetes-microshift:" + Base,
 	"pod":                       "quay.io/microshift/pause:" + Base,
 	"service_ca_operator":       "quay.io/microshift/service-ca-operator:" + Base,
