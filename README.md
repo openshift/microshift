@@ -47,6 +47,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [MicroShift Design](./docs/design.md)
 - [Enabled OpenShift APIs](./docs/enabled_apis.md)
 - [MicroShift Development Environment on RHEL 8](./docs/devenv_rhel8.md)
+- [MicroShift Development Environment in Cloud](./docs/devenv_cloud.md)
 - [Install MicroShift on RHEL for Edge](./docs/rhel4edge_iso.md)
 - [OpenShift CI for MicroShift](./docs/openshift_ci.md)
 - [RPM Packages for Development and Testing](./docs/rpm_packages.md)

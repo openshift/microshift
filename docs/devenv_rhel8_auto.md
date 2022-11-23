@@ -24,7 +24,10 @@ As an example, run the following command to create a virtual machine named `micr
 > See the [Recommended system swap size](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/getting-started-with-swap_managing-storage-devices#recommended-system-swap-space_getting-started-with-swap) document for more information.
 
 ```bash
-./scripts/devenv-builder/create-vm.sh microshift-dev /var/lib/libvirt/images /var/lib/libvirt/images/rhel-8.7-$(uname -i)-dvd.iso 4 6 50 6 2
+./scripts/devenv-builder/create-vm.sh microshift-dev \
+    /var/lib/libvirt/images \
+    /var/lib/libvirt/images/rhel-8.7-$(uname -i)-dvd.iso \
+    4 6 50 6 2
 ```
 
 or
@@ -69,7 +72,7 @@ The configuration phase completed. Run the following commands to:
  - Wait until all MicroShift pods are running
  - Clean up MicroShift service configuration
 
-watch sudo /usr/local/bin/oc --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A
+watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A
 echo 1 | /usr/bin/cleanup-all-microshift-data
 
 Done
