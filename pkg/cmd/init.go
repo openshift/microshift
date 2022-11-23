@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"k8s.io/apiserver/pkg/authentication/serviceaccount"
 	"k8s.io/apiserver/pkg/authentication/user"
 	ctrl "k8s.io/kubernetes/pkg/controlplane"
 
@@ -107,7 +108,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					Name:         "route-controller-manager",
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
-				UserInfo: &user.DefaultInfo{Name: "system:serviceaccount:openshift-route-controller-manager:route-controller-manager-sa"},
+				UserInfo: serviceaccount.UserInfo("openshift-route-controller-manager", "route-controller-manager-sa", ""),
 			}),
 
 		// kube-apiserver-to-kubelet-signer
