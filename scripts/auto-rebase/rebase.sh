@@ -554,6 +554,7 @@ update_manifests() {
     yq -i '.spec.template.spec.containers[0].ports[1].hostPort = 443' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Not use proxy protocol due to lack of load balancer support
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_USE_PROXY_PROTOCOL", "value": "false"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "GRACEFUL_SHUTDOWN_DELAY", "value": "1s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DOMAIN", "value": "apps.{{ .ClusterDomain }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
     sed -i 's|REPLACE_CLUSTER_DOMAIN|{{ .ClusterDomain }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
