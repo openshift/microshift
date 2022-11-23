@@ -45,6 +45,7 @@ cd ~/microshift
 
 # Build MicroShift > RPM Packages
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#rpm-packages
+make clean
 make rpm
 make srpm
 
@@ -90,7 +91,7 @@ echo "The configuration phase completed. Run the following commands to:"
 echo " - Wait until all MicroShift pods are running"
 echo " - Clean up MicroShift service configuration"
 echo ""
-echo "watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A"
+echo "watch sudo \$(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A"
 echo "echo 1 | /usr/bin/cleanup-all-microshift-data"
 echo ""
 echo "Done"
