@@ -58,7 +58,7 @@ spec:
             - name: ROUTER_THREADS
               value: "4"
             - name: GRACEFUL_SHUTDOWN_DELAY
-              value: "1"
+              value: 1s
             - name: ROUTER_USE_PROXY_PROTOCOL
               value: "false"
             - name: SSL_MIN_VERSION
