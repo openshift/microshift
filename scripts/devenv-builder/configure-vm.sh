@@ -47,6 +47,17 @@ sudo dnf update -y
 sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
 
+YQ_URL=https://github.com/mikefarah/yq/releases/download/v4.26.1/yq_linux_$(go env GOARCH)
+YQ_HASH_amd64=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582
+YQ_HASH_arm64=8966f9698a9bc321eae6745ffc5129b5e1b509017d3f710ee0eccec4f5568766
+yq_hash="YQ_HASH_$(go env GOARCH)"
+echo -n "${!yq_hash} -" > /tmp/sum.txt
+if ! (curl -Ls "${YQ_URL}" | tee /tmp/yq | sha256sum -c /tmp/sum.txt &>/dev/null); then
+    echo "ERROR: Expected file at ${YQ_URL} to have checksum ${!yq_hash} but instead got $(sha256sum </tmp/yq | cut -d' ' -f1)"
+    exit 1
+fi
+chmod +x /tmp/yq && sudo cp /tmp/yq /usr/bin/yq
+
 if $BUILD_AND_INSTALL ; then
     # Build MicroShift
     # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#build-microshift
