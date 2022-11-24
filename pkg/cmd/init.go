@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"k8s.io/apiserver/pkg/authentication/serviceaccount"
 	"k8s.io/apiserver/pkg/authentication/user"
 	ctrl "k8s.io/kubernetes/pkg/controlplane"
 
@@ -94,6 +95,20 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:kube-scheduler"},
+			},
+			&certchains.ClientCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:         "cluster-policy-controller",
+					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "system:kube-controller-manager"},
+			},
+			&certchains.ClientCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:         "route-controller-manager",
+					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
+				},
+				UserInfo: serviceaccount.UserInfo("openshift-route-controller-manager", "route-controller-manager-sa", ""),
 			}),
 
 		// kube-apiserver-to-kubelet-signer
@@ -392,6 +407,31 @@ func initKubeconfigs(
 		cfg.Cluster.URL,
 		inClusterTrustBundlePEM,
 		kubeletCertPEM, kubeletKeyPEM,
+	); err != nil {
+		return err
+	}
+	clusterPolicyControllerCertPEM, clusterPolicyControllerKeyPEM, err := certChains.GetCertKey("kube-control-plane-signer", "cluster-policy-controller")
+	if err != nil {
+		return err
+	}
+	if err := util.KubeConfigWithClientCerts(
+		cfg.KubeConfigPath(config.ClusterPolicyController),
+		cfg.Cluster.URL,
+		inClusterTrustBundlePEM,
+		clusterPolicyControllerCertPEM, clusterPolicyControllerKeyPEM,
+	); err != nil {
+		return err
+	}
+
+	routeControllerManagerCertPEM, routeControllerManagerKeyPEM, err := certChains.GetCertKey("kube-control-plane-signer", "route-controller-manager")
+	if err != nil {
+		return err
+	}
+	if err := util.KubeConfigWithClientCerts(
+		cfg.KubeConfigPath(config.RouteControllerManager),
+		cfg.Cluster.URL,
+		inClusterTrustBundlePEM,
+		routeControllerManagerCertPEM, routeControllerManagerKeyPEM,
 	); err != nil {
 		return err
 	}

@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: system:openshift:leader-locking-openshift-route-controller-manager
+  namespace: openshift-route-controller-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: system:openshift:leader-locking-openshift-route-controller-manager
+subjects:
+- kind: ServiceAccount
+  namespace: openshift-route-controller-manager
+  name: route-controller-manager-sa
