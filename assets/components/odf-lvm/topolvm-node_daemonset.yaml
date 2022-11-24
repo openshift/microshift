@@ -27,8 +27,8 @@ spec:
         name: lvmd
         resources:
           requests:
-            cpu: 250m
-            memory: 250Mi
+            cpu: 1m
+            memory: 22Mi
         securityContext:
           privileged: true
           runAsUser: 0
@@ -67,8 +67,8 @@ spec:
           protocol: TCP
         resources:
           requests:
-            cpu: 250m
-            memory: 250Mi
+            cpu: 1m
+            memory: 16Mi
         securityContext:
           privileged: true
           runAsUser: 0
@@ -88,7 +88,7 @@ spec:
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.io/node/csi-topolvm.sock
-        image: {{ .ReleaseImage.ose_csi_node_registrar }}
+        image: {{ .ReleaseImage.csi_node_driver_registrar }}
         imagePullPolicy: IfNotPresent
         lifecycle:
           preStop:
@@ -98,7 +98,10 @@ spec:
               - -c
               - rm -rf /registration/topolvm.io /registration/topolvm.io-reg.sock
         name: csi-registrar
-        resources: {}
+        resources:
+          requests:
+            cpu: 1m
+            memory: 2Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -108,10 +111,13 @@ spec:
           name: registration-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.ose_csi_livenessprobe }}
+        image: {{ .ReleaseImage.csi_livenessprobe }}
         imagePullPolicy: IfNotPresent
         name: liveness-probe
-        resources: {}
+        resources:
+          requests:
+            cpu: 1m
+            memory: 7Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:

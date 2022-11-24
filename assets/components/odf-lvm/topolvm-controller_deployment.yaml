@@ -54,8 +54,8 @@ spec:
           timeoutSeconds: 1
         resources:
           requests:
-            cpu: 250m
-            memory: 250Mi
+            cpu: 2m
+            memory: 31Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -80,13 +80,13 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        image: {{ .ReleaseImage.ose_csi_ext_provisioner }}
+        image: {{ .ReleaseImage.csi_external_provisioner }}
         imagePullPolicy: IfNotPresent
         name: csi-provisioner
         resources:
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 2m
+            memory: 35Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -94,10 +94,13 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.ose_csi_ext_resizer }}
+        image: {{ .ReleaseImage.csi_external_resizer }}
         imagePullPolicy: IfNotPresent
         name: csi-resizer
-        resources: {}
+        resources:
+          requests:
+            cpu: 1m
+            memory: 23Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -105,10 +108,13 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.ose_csi_livenessprobe }}
+        image: {{ .ReleaseImage.csi_livenessprobe }}
         imagePullPolicy: IfNotPresent
         name: liveness-probe
-        resources: {}
+        resources:
+          requests:
+            cpu: 1m
+            memory: 9Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:

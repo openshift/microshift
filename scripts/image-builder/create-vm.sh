@@ -35,6 +35,6 @@ virt-install \
     --network network=${NETNAME},model=virtio \
     --os-type generic \
     --events on_reboot=restart \
-    --location ${CDROM} \
+    --cdrom ${CDROM} \
     --noautoconsole \
 "

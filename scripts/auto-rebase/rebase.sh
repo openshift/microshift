@@ -417,7 +417,7 @@ update_manifests() {
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrole.yaml" "${REPOROOT}"/assets/core
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/core
     #    Selectively copy in only those CRD manifests that MicroShift is already using
-    cp "${STAGING_DIR}/cluster-ingress-operator/vendor/github.com/openshift/api/route/v1/route.crd.yaml" "${REPOROOT}"/assets/crd
+    cp "${REPOROOT}"/vendor/github.com/openshift/api/route/v1/route.crd.yaml "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_security-openshift_01_scc.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml" "${REPOROOT}"/assets/crd
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
@@ -524,7 +524,6 @@ update_manifests() {
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_SET_FORWARDED_HEADERS", "value": "append"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_TCP_BALANCE_SCHEME", "value": "source"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_THREADS", "value": "4"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_USE_PROXY_PROTOCOL", "value": "true"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "SSL_MIN_VERSION", "value": "TLSv1.2"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     # TODO: Generate and volume mount the router-stats-default secret
     # yq -i '.spec.template.spec.containers[0].env += {"name": "STATS_PASSWORD_FILE", "value": "/var/lib/haproxy/conf/metrics-auth/statsPassword"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
@@ -550,9 +549,15 @@ update_manifests() {
     # 3) Make MicroShift-specific changes
     #    Set replica count to 1, as we're single-node.
     yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    #    Set deployment strategy type to Recreate.
+    yq -i '.spec.strategy.type = Recreate' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Add hostPorts for routes and metrics (needed as long as there is no load balancer)
     yq -i '.spec.template.spec.containers[0].ports[0].hostPort = 80' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].ports[1].hostPort = 443' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    #    Not use proxy protocol due to lack of load balancer support
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_USE_PROXY_PROTOCOL", "value": "false"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "GRACEFUL_SHUTDOWN_DELAY", "value": "1s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DOMAIN", "value": "apps.{{ .ClusterDomain }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
     sed -i 's|REPLACE_CLUSTER_DOMAIN|{{ .ClusterDomain }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     sed -i 's|REPLACE_ROUTER_IMAGE|{{ .ReleaseImage.haproxy_router }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml

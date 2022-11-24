@@ -9,10 +9,10 @@ number of points in time as well as performance data for each of the two starts.
 We are using [Prometheus](https://prometheus.io/), [process-exporter](https://github.com/ncabatoff/process-exporter) and [cAdvisor](https://github.com/google/cadvisor) to capture a wide array of performance tool data.
 
 It is necessary to have two hosts configured for running the benchmarks:
-* Ansible server used to start the automation scripts
+* Ansible control node used to start the automation scripts
 * MicroShift server used to execute the performance tests
 
-Run the following command on the Ansible server to install the Ansible package.
+Run the following command on the Ansible control node to install the Ansible package.
 ```
 sudo dnf install -y ansible
 ```
@@ -72,11 +72,11 @@ time ansible-playbook -v \
 
 ## Output
 
-The following text files will be created on the Ansible server running the playbook:
+The following text files will be created on the Ansible control node running the playbook:
 - The `boot.txt` will have the time that it took the microshift service to start and for all the pods to enter the `Running` state
 - The `disk0.txt, disk1.txt, disk2.txt` files will have a snapshot of the disk usage at different stages of installation and execution.
 
-If Prometheus was enabled, the performance metrics will be uploaded to the Ansible server, where users can view all the captured performance data using the `http://<ansible-server-ip>:9091` URL. These metrics can be conveniently visualized in the Grafana dashboards accessible at the `http://<ansible-server-ip>:3000` site.
+If Prometheus was enabled, the performance metrics will be uploaded to the Ansible control node, where users can view all the captured performance data using the `http://<ansible-server-ip>:9091` URL. These metrics can be conveniently visualized in the Grafana dashboards accessible at the `http://<ansible-server-ip>:3000` site.
 > Use `admin:admin` credentials to log into the Grafana server.
 
 ## Configuration Overview

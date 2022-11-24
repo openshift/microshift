@@ -82,6 +82,7 @@ The artifact of the build is the `microshift` executable file located in the `_o
 ### RPM Packages
 Run make command with the `rpm` or `srpm` argument in the top-level directory. 
 ```bash
+make clean
 make rpm
 make srpm
 ```

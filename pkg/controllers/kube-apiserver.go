@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"time"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -39,10 +40,10 @@ import (
 	kubecontrolplanev1 "github.com/openshift/api/kubecontrolplane/v1"
 	"github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
-
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	hostassignmentv1 "k8s.io/kubernetes/openshift-kube-apiserver/admission/route/apis/hostassignment/v1"
 )
 
 const (
@@ -155,6 +156,21 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"send-retry-after-while-not-ready-once": {"true"},
 		},
 		GenericAPIServerConfig: configv1.GenericAPIServerConfig{
+			AdmissionConfig: configv1.AdmissionConfig{
+				PluginConfig: map[string]configv1.AdmissionPluginConfig{
+					"route.openshift.io/RouteHostAssignment": {
+						Configuration: runtime.RawExtension{
+							Object: &hostassignmentv1.HostAssignmentAdmissionConfig{
+								TypeMeta: metav1.TypeMeta{
+									APIVersion: "route.openshift.io/v1",
+									Kind:       "HostAssignmentAdmissionConfig",
+								},
+								Domain: cfg.Cluster.Domain,
+							},
+						},
+					},
+				},
+			},
 			// from cluster-kube-apiserver-operator
 			CORSAllowedOrigins: []string{
 				`//127\.0\.0\.1(:|$)`,

@@ -57,6 +57,7 @@ if $BUILD_AND_INSTALL ; then
 
     # Build MicroShift > RPM Packages
     # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#rpm-packages
+    make clean
     make rpm
     make srpm
 fi
@@ -106,7 +107,7 @@ if $BUILD_AND_INSTALL ; then
     echo " - Wait until all MicroShift pods are running"
     echo " - Clean up MicroShift service configuration"
     echo ""
-    echo "watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A"
+    echo "watch sudo \$(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A"
     echo "echo 1 | /usr/bin/cleanup-all-microshift-data"
 fi
 
