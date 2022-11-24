@@ -15,13 +15,22 @@ const (
 )
 
 type OVNKubernetesConfig struct {
-	// disable microshift-ovs-init.service.
-	// OVS bridge "br-ex" needs to be configured manually when disableOVSInit is true.
-	DisableOVSInit bool `json:"disableOVSInit,omitempty"`
+	// Configuration for microshift-ovs-init.service
+	OVSInit OVSInit `json:"ovsInit,omitempty"`
 	// MTU to use for the geneve tunnel interface.
 	// This must be 100 bytes smaller than the uplink mtu.
 	// Default is 1400.
 	MTU uint32 `json:"mtu,omitempty"`
+}
+
+type OVSInit struct {
+	// disable microshift-ovs-init.service.
+	// OVS bridge "br-ex" needs to be configured manually when disableOVSInit is true.
+	DisableOVSInit bool `json:"disableOVSInit,omitempty"`
+	// Uplink interface for OVS bridge "br-ex"
+	GatewayInterface string `json:"gatewayInterface,omitempty"`
+	// Uplink interface for OVS bridge "br-ex1"
+	ExternalGatewayInterface string `json:"externalGatewayInterface,omitempty"`
 }
 
 func (o *OVNKubernetesConfig) ValidateOVSBridge(bridge string) error {
@@ -33,7 +42,7 @@ func (o *OVNKubernetesConfig) ValidateOVSBridge(bridge string) error {
 }
 
 func (o *OVNKubernetesConfig) withDefaults() *OVNKubernetesConfig {
-	o.DisableOVSInit = false
+	o.OVSInit.DisableOVSInit = false
 	o.MTU = 1400
 	return o
 }

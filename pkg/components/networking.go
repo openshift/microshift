@@ -46,7 +46,7 @@ func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		return err
 	}
 
-	if ovnConfig.DisableOVSInit {
+	if ovnConfig.OVSInit.DisableOVSInit {
 		if err := ovnConfig.ValidateOVSBridge(util.OVNGatewayInterface); err != nil {
 			return fmt.Errorf("failed to find ovn-kubernetes gateway bridge %s: %v", util.OVNGatewayInterface, err)
 		}
