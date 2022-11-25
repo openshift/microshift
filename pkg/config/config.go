@@ -1,13 +1,16 @@
 package config
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/kelseyhightower/envconfig"
@@ -17,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/component-base/logs"
 	"k8s.io/klog/v2"
+	ctrl "k8s.io/kubernetes/pkg/controlplane"
 	"sigs.k8s.io/yaml"
 
 	"github.com/openshift/microshift/pkg/util"
@@ -57,8 +61,9 @@ type IngressConfig struct {
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
-	NodeName string `json:"nodeName"`
-	NodeIP   string `json:"nodeIP"`
+	SubjectAltNames []string `json:"subjectAltNames"`
+	NodeName        string   `json:"nodeName"`
+	NodeIP          string   `json:"nodeIP"`
 
 	Cluster ClusterConfig `json:"cluster"`
 
@@ -92,6 +97,26 @@ func (cfg *MicroshiftConfig) KubeConfigPath(id KubeConfigID) string {
 	return filepath.Join(dataDir, "resources", string(id), "kubeconfig")
 }
 
+func (cfg *MicroshiftConfig) KubeConfigAdminPath(id string) string {
+	return filepath.Join(dataDir, "resources", string(KubeAdmin), id, "kubeconfig")
+}
+
+func getAllHostnames() ([]string, error) {
+	cmd := exec.Command("/bin/hostname", "-A")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return nil, fmt.Errorf("Error when executing 'hostname -A': %v", err)
+	}
+	outString := out.String()
+	outString = strings.Trim(outString[:len(outString)-1], " ")
+	// Remove duplicates to avoid having them in the certificates.
+	names := strings.Split(outString, " ")
+	set := sets.NewString(names...)
+	return set.List(), nil
+}
+
 func NewMicroshiftConfig() *MicroshiftConfig {
 	nodeName, err := os.Hostname()
 	if err != nil {
@@ -101,11 +126,16 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	if err != nil {
 		klog.Fatalf("failed to get host IP: %v", err)
 	}
+	subjectAltNames, err := getAllHostnames()
+	if err != nil {
+		klog.Fatalf("failed to get all hostnames: %v", err)
+	}
 
 	return &MicroshiftConfig{
-		LogVLevel: 0,
-		NodeName:  nodeName,
-		NodeIP:    nodeIP,
+		LogVLevel:       0,
+		SubjectAltNames: subjectAltNames,
+		NodeName:        nodeName,
+		NodeIP:          nodeIP,
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
@@ -206,6 +236,9 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if f := flags.Lookup("v"); f != nil && flags.Changed("v") {
 		c.LogVLevel, _ = strconv.Atoi(f.Value.String())
 	}
+	if s, err := flags.GetStringSlice("subject-alt-names"); err == nil && flags.Changed("subject-alt-names") {
+		c.SubjectAltNames = s
+	}
 	if s, err := flags.GetString("node-name"); err == nil && flags.Changed("node-name") {
 		c.NodeName = s
 	}
@@ -253,6 +286,53 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 	}
 	c.Cluster.DNS = clusterDNS
 
+	if len(c.SubjectAltNames) > 0 {
+		// Any entry in SubjectAltNames will be included in the external access certificates.
+		// Any of the hostnames and IPs (except the node IP) listed below conflicts with
+		// other certificates, such as the service network and localhost access.
+		// The node IP is a bit special. Apiserver k8s service, which holds a service IP
+		// gets resolved to the node IP. If we include the node IP in the SAN then we have
+		// an ambiguity, the same IP matches two different certificates and there are errors
+		// when trying to reach apiserver from within the cluster using the service IP.
+		// Apiserver will decide which certificate to return to client hello based on SNI
+		// (which client-go does not use) or raw IP mappings. As soon as there is a match for
+		// the node IP it returns that certificate, which is the external access one. This
+		// breaks all pods trying to reach apiserver, as hostnames dont match and the certificate
+		// is invalid.
+		if stringSliceContains(c.SubjectAltNames, "localhost", "127.0.0.1", c.NodeIP) {
+			klog.Fatal("subjectAltNames must not contain localhost, 127.0.0.1 or node IP")
+		}
+
+		// unchecked error because this was done when getting cluster DNS
+		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
+		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
+		if err != nil {
+			klog.Fatalf("error getting apiserver IP: %v", err)
+		}
+		if stringSliceContains(
+			c.SubjectAltNames,
+			"kubernetes",
+			"kubernetes.default",
+			"kubernetes.default.svc",
+			"kubernetes.default.svc.cluster.local",
+			"openshift",
+			"openshift.default",
+			"openshift.default.svc",
+			"openshift.default.svc.cluster.local",
+			apiServerServiceIP.String(),
+		) {
+			klog.Fatal("subjectAltNames must not contain apiserver kubernetes service names or IPs")
+		}
+	}
+
+	u, err := url.Parse(c.Cluster.URL)
+	if err != nil {
+		klog.Fatalf("failed to parse cluster URL: %v", err)
+	}
+	if !stringSliceContains(c.SubjectAltNames, u.Host) || u.Host != c.NodeName {
+		klog.Fatal("Cluster URL is using a host not included in subjectAltNames or nodeName")
+	}
+
 	return nil
 }
 
@@ -268,6 +348,17 @@ func getClusterDNS(serviceCIDR string) (string, error) {
 	}
 
 	return dnsClusterIP.String(), nil
+}
+
+func stringSliceContains(list []string, elements ...string) bool {
+	for _, value := range list {
+		for _, element := range elements {
+			if value == element {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func HideUnsupportedFlags(flags *pflag.FlagSet) {
