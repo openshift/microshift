@@ -62,6 +62,7 @@ Requires: iptables
 Requires: microshift-selinux
 Requires: microshift-networking
 Requires: conntrack-tools
+Requires: sos
 
 %{?systemd_requires}
 
@@ -268,6 +269,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" microshift.spec
 %changelog
+* Fri Nov 25 2022 Gregory Giguashvili <ggiguash@redhat.com> 4.12.0
+- Install sos utility with MicroShift and document its usage
+
 * Mon Oct 24 2022 Zenghui Shi <zshi@redhat.com> 4.12.0
 - Add arch specific crio conf
 
