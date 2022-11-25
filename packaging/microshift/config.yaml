@@ -27,3 +27,4 @@ cluster:
 
 # The Subject Alternative Names for the external certificates in API server (defaults to hostname -A)
 #subjectAltNames: ""
+

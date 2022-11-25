@@ -19,6 +19,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"net"
+	"net/url"
 	"os"
 	"path/filepath"
 	"time"
@@ -215,9 +216,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					Name:         "kube-external-serving",
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
-				Hostnames: []string{
-					cfg.NodeName,
-				},
+				Hostnames: append(cfg.SubjectAltNames, cfg.NodeName),
 			},
 		),
 
@@ -346,6 +345,33 @@ func initKubeconfigs(
 	if err != nil {
 		return err
 	}
+
+	u, err := url.Parse(cfg.Cluster.URL)
+	if err != nil {
+		return fmt.Errorf("failed to parse cluster URL: %v", err)
+	}
+	apiServerPort, err := cfg.Cluster.ApiServerPort()
+	if err != nil {
+		return fmt.Errorf("failed to get apiserver port: %v", err)
+	}
+
+	// If using localhost this is part of the default URL and it needs external access.
+	// Generate all other kubeconfigs, one per name.
+	if u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" {
+		for _, name := range append(cfg.SubjectAltNames, cfg.NodeName, "localhost") {
+			u.Host = fmt.Sprintf("%s:%d", name, apiServerPort)
+			if err := util.KubeConfigWithClientCerts(
+				cfg.KubeConfigAdminPath(name),
+				u.String(),
+				inClusterTrustBundlePEM,
+				adminKubeconfigCertPEM,
+				adminKubeconfigKeyPEM,
+			); err != nil {
+				return err
+			}
+		}
+	}
+
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeAdmin),
 		cfg.Cluster.URL,
