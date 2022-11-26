@@ -9,4 +9,3 @@ subjects:
 - kind: ServiceAccount
   namespace: openshift-route-controller-manager
   name: route-controller-manager-sa
-
