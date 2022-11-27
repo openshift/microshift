@@ -282,7 +282,7 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 	// validate serviceCIDR
 	clusterDNS, err := getClusterDNS(c.Cluster.ServiceCIDR)
 	if err != nil {
-		klog.Fatalf("failed to get DNS IP: %v", err)
+		return fmt.Errorf("failed to get DNS IP: %v", err)
 	}
 	c.Cluster.DNS = clusterDNS
 
@@ -299,15 +299,28 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 		// the node IP it returns that certificate, which is the external access one. This
 		// breaks all pods trying to reach apiserver, as hostnames dont match and the certificate
 		// is invalid.
-		if stringSliceContains(c.SubjectAltNames, "localhost", "127.0.0.1", c.NodeIP) {
-			klog.Fatal("subjectAltNames must not contain localhost, 127.0.0.1 or node IP")
+		u, err := url.Parse(c.Cluster.URL)
+		if err != nil {
+			return fmt.Errorf("failed to parse cluster URL: %v", err)
+		}
+		if u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" {
+			if stringSliceContains(c.SubjectAltNames, "localhost", "127.0.0.1") {
+				return fmt.Errorf("subjectAltNames must not contain localhost, 127.0.0.1")
+			}
+		} else {
+			if stringSliceContains(c.SubjectAltNames, c.NodeIP) {
+				return fmt.Errorf("subjectAltNames must not contain node IP")
+			}
+			if !stringSliceContains(c.SubjectAltNames, u.Host) || u.Host != c.NodeName {
+				return fmt.Errorf("Cluster URL host %v is not included in subjectAltNames or nodeName", u.String())
+			}
 		}
 
 		// unchecked error because this was done when getting cluster DNS
 		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
 		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
 		if err != nil {
-			klog.Fatalf("error getting apiserver IP: %v", err)
+			return fmt.Errorf("error getting apiserver IP: %v", err)
 		}
 		if stringSliceContains(
 			c.SubjectAltNames,
@@ -321,16 +334,8 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 			"openshift.default.svc.cluster.local",
 			apiServerServiceIP.String(),
 		) {
-			klog.Fatal("subjectAltNames must not contain apiserver kubernetes service names or IPs")
+			return fmt.Errorf("subjectAltNames must not contain apiserver kubernetes service names or IPs")
 		}
-	}
-
-	u, err := url.Parse(c.Cluster.URL)
-	if err != nil {
-		klog.Fatalf("failed to parse cluster URL: %v", err)
-	}
-	if !stringSliceContains(c.SubjectAltNames, u.Host) || u.Host != c.NodeName {
-		klog.Fatal("Cluster URL is using a host not included in subjectAltNames or nodeName")
 	}
 
 	return nil

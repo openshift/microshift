@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	testConfigFile = "../../test/config.yaml"
+	testConfigFile                   = "../../test/config.yaml"
+	testConfigFileBadSubjectAltNames = "../../test/config_bad_subjectaltnames.yaml"
 )
 
 // tests to make sure that the config file is parsed correctly
@@ -22,6 +23,7 @@ func TestConfigFile(t *testing.T) {
 		err        error
 	}{
 		{testConfigFile, nil},
+		{testConfigFileBadSubjectAltNames, nil},
 	}
 
 	for _, tt := range ttests {
@@ -177,6 +179,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 		// first set the values
 		for _, env := range tt.envList {
 			os.Setenv(env.varName, env.value)
+			defer os.Unsetenv(env.varName)
 		}
 		// then read the values
 		microShiftconfig := NewMicroshiftConfig()
@@ -196,10 +199,28 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.Int("v", 0, "")
 
-	c := NewMicroshiftConfig()
-
-	if err := c.ReadAndValidate(testConfigFile, flags); err != nil {
-		t.Errorf("failed to read and validate config: %v", err)
+	var ttests = []struct {
+		configFile string
+		expectErr  bool
+	}{
+		{
+			configFile: testConfigFile,
+			expectErr:  false,
+		},
+		{
+			configFile: testConfigFileBadSubjectAltNames,
+			expectErr:  true,
+		},
+	}
+	for _, tt := range ttests {
+		microShiftConfig := NewMicroshiftConfig()
+		err := microShiftConfig.ReadAndValidate(tt.configFile, flags)
+		if tt.expectErr && err == nil {
+			t.Error("Expecting error and received nothing")
+		}
+		if !tt.expectErr && err != nil {
+			t.Errorf("Not expecting error and received: %v", err)
+		}
 	}
 }
 
