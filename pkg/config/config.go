@@ -148,6 +148,53 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 }
 
+// Determine if the config file specified a NodeName (by default it's assigned the hostname)
+func (c *MicroshiftConfig) isDefaultNodeName() bool {
+	hostname, err := os.Hostname()
+	if err != nil {
+		klog.Fatalf("Failed to get hostname %v", err)
+	}
+	return c.NodeName == hostname
+}
+
+// Read or set the NodeName that will be used for this MicroShift instance
+func (c *MicroshiftConfig) establishNodeName() (string, error) {
+	filePath := filepath.Join(GetDataDir(), ".nodename")
+	contents, err := os.ReadFile(filePath)
+	if os.IsNotExist(err) {
+		// ensure that dataDir exists
+		os.MkdirAll(GetDataDir(), 0700)
+		if err := os.WriteFile(filePath, []byte(c.NodeName), 0444); err != nil {
+			return "", fmt.Errorf("failed to write nodename file %q: %v", filePath, err)
+		}
+		return c.NodeName, nil
+	} else if err != nil {
+		return "", err
+	}
+	return string(contents), nil
+}
+
+// Validate the NodeName to be used for this MicroShift instances
+func (c *MicroshiftConfig) validateNodeName(isDefaultNodeName bool) error {
+	establishedNodeName, err := c.establishNodeName()
+	if err != nil {
+		return fmt.Errorf("failed to establish NodeName: %v", err)
+	}
+
+	if establishedNodeName != c.NodeName {
+		if !isDefaultNodeName {
+			return fmt.Errorf("configured NodeName %q does not match previous NodeName %q , NodeName cannot be changed for a device once established",
+				c.NodeName, establishedNodeName)
+		} else {
+			c.NodeName = establishedNodeName
+			klog.Warningf("NodeName has changed due to a host name change, using previously established NodeName %q."+
+				"Please consider using a static NodeName in configuration", c.NodeName)
+		}
+	}
+
+	return nil
+}
+
 // extract the api server port from the cluster URL
 func (c *ClusterConfig) ApiServerPort() (int, error) {
 	var port string
@@ -338,6 +385,12 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 		) {
 			return fmt.Errorf("subjectAltNames must not contain apiserver kubernetes service names or IPs")
 		}
+	}
+	// Validate NodeName in config file, node-name should not be changed for an already
+	// initialized MicroShift instance. This can lead to Pods being re-scheduled, storage
+	// being orphaned or lost, and other side effects.
+	if err := c.validateNodeName(c.isDefaultNodeName()); err != nil {
+		klog.Fatalf("Error in validating node name: %v", err)
 	}
 
 	return nil

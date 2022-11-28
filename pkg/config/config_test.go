@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -13,7 +14,20 @@ import (
 const (
 	testConfigFile                   = "../../test/config.yaml"
 	testConfigFileBadSubjectAltNames = "../../test/config_bad_subjectaltnames.yaml"
+	IS_DEFAULT_NODENAME              = true
+	IS_NOT_DEFAULT_NODENAME          = false
 )
+
+func setupSuiteDataDir(t *testing.T) func() {
+	tmpdir, err := os.MkdirTemp("", "microshift")
+	if err != nil {
+		t.Errorf("failed to create temp dir: %v", err)
+	}
+	dataDir = tmpdir
+	return func() {
+		os.RemoveAll(tmpdir)
+	}
+}
 
 // tests to make sure that the config file is parsed correctly
 func TestConfigFile(t *testing.T) {
@@ -196,6 +210,9 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 
 // test the MicroshiftConfig.ReadAndValidate function to verify that it configures MicroshiftConfig with a valid flagset
 func TestMicroshiftConfigReadAndValidate(t *testing.T) {
+	cleanup := setupSuiteDataDir(t)
+	defer cleanup()
+
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.Int("v", 0, "")
 
@@ -221,6 +238,74 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 		if !tt.expectErr && err != nil {
 			t.Errorf("Not expecting error and received: %v", err)
 		}
+	}
+}
+
+func TestMicroshiftConfigIsDefaultNodeName(t *testing.T) {
+	c := NewMicroshiftConfig()
+	if !c.isDefaultNodeName() {
+		t.Errorf("expected default IsDefaultNodeName to be true")
+	}
+
+	c.NodeName += "-suffix"
+	if c.isDefaultNodeName() {
+		t.Errorf("expected default IsDefaultNodeName to be false")
+	}
+}
+
+func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
+	cleanup := setupSuiteDataDir(t)
+	defer cleanup()
+
+	c := NewMicroshiftConfig()
+	c.NodeName = "node1"
+
+	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err != nil {
+		t.Errorf("failed to validate node name on first call: %v", err)
+	}
+
+	nodeNameFile := filepath.Join(dataDir, ".nodename")
+	if data, err := os.ReadFile(nodeNameFile); err != nil {
+		t.Errorf("failed to read node name from file %q: %v", nodeNameFile, err)
+	} else if string(data) != c.NodeName {
+		t.Errorf("node name file doesn't match the node name in the saved file: %v", err)
+	}
+
+	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err != nil {
+		t.Errorf("failed to validate node name on second call without changes: %v", err)
+	}
+
+	c.NodeName = "node2"
+	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err == nil {
+		t.Errorf("validation should have failed for nodename change: %v", err)
+	}
+}
+
+func TestMicroshiftConfigNodeNameValidationFromDefault(t *testing.T) {
+	cleanup := setupSuiteDataDir(t)
+	defer cleanup()
+
+	c := NewMicroshiftConfig()
+
+	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
+		t.Errorf("failed to validate node name on first call: %v", err)
+	}
+
+	hostName, _ := os.Hostname()
+	nodeNameFile := filepath.Join(dataDir, ".nodename")
+	if data, err := os.ReadFile(nodeNameFile); err != nil {
+		t.Errorf("failed to read node name from file %q: %v", nodeNameFile, err)
+	} else if string(data) != hostName {
+		t.Errorf("node name file doesn't match the node name in the saved file: %v", err)
+	}
+
+	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
+		t.Errorf("failed to validate node name on second call without changes: %v", err)
+	}
+
+	c.NodeName = "node2"
+	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
+		t.Errorf("validation should have failed in this case, it must be a warning in logs: %v", err)
 	}
 }
 
