@@ -18,6 +18,8 @@ cluster:
   url: ""
 nodeIP: ""
 nodeName: ""
+subjectAltNames:
+  - ""
 logVLevel: ""
 ```
 
@@ -32,6 +34,7 @@ The configuration settings alongside with the supported command line arguments a
 | url                 | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
 | nodeIP              | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
 | nodeName            | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
+| subjectAltNames     | --subject-alt-names       | MICROSHIFT_SUBJECTALTNAMES              | Subject Alternative Names for apiserver certificates
 | logVLevel           | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (0-5)
 
 ## Default Settings
@@ -47,6 +50,7 @@ cluster:
   url: https://127.0.0.1:6443
 nodeIP: ""
 nodeName: ""
+subjectAltNames: nil
 logVLevel: 0
 ```
 
