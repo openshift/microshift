@@ -63,6 +63,8 @@ spec:
               value: 1s
             - name: ROUTER_DOMAIN
               value: apps.{{ .BaseDomain }}
+            - name: ROUTER_CREATION_TIMESTAMP
+              value: {{ .CreationTimestamp }}
           livenessProbe:
             httpGet:
               path: /healthz

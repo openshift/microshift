@@ -162,7 +162,10 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		return err
 	}
 
-	if err := assets.ApplyDeployments(apps, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+	extraParams := assets.RenderParams{
+		"CreationTimestamp": cfg.CreationTimestamp,
+	}
+	if err := assets.ApplyDeployments(apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}
