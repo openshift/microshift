@@ -130,7 +130,6 @@ Host network `sysctl net.ipv4.ip_forward` is automatically enabled by ovn-kubern
 #### Host Ports
 
 Ingress routes are exposed on host port `80` and `443` automatically by `route-default` deployment in `openshift-ingress` namespace.
-Data profiling with pprof is exposed on host port `29500` when starting MicroShift with `--debug.pprof`, disabled by default.
 
 ## Network Topology
 
