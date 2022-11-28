@@ -1,6 +1,10 @@
 # MicroShift Mitigation of System Configuration Changes
 
-MicroShift depends on the device IP address and system-wide clock settings to remain consistent during its runtime. However, these settings may occasionally change on edge devices (i.e. DHCP or NTP updates). When such changes occur, some MicroShift components may stop functioning properly. To mitigate this situation, MicroShift monitors the mentioned system configuration settings and restarts if a setting change is detected.
+MicroShift depends on the following system settings to remain consistent during its runtime:
+- Device IP address
+- System-wide clock settings
+- Iptable configurations.
+However, these settings may occasionally change on edge devices (i.e. DHCP or NTP updates). When such changes occur, some MicroShift components may stop functioning properly. To mitigate this situation, MicroShift monitors the mentioned system configuration settings and restarts if a setting change is detected.
 
 This document describes how to simulate system configuration changes in a virtual environment and verify that MicroShift service reacts by restarting when necessary.
 
@@ -139,3 +143,19 @@ The below (non-proportional!) graph shows when certificates are rotated.
 
 If the rotated certificate is a CA, all of the certificates it signed get rotated
 as well.
+
+## Firewall Changes
+
+Reload the firewall rules with the following command to trigger the MicroShift service restart.
+
+```bash
+sudo firewall-cmd --reload
+```
+
+Firewall reload action flushes the existing iptable configurations which results in failed network traffic. <br>
+Run the `journalctl` command to verify that the service was restarted. The logs should contain restart and startup messages.
+
+```
+Dec 11 08:23:30 localhost.localdomain microshift[168331]: sysconfwatch-controller W1211 08:23:30.914772  168331 sysconfwatch_linux.go:112] iptables flush is detected, restarting MicroShift
+Dec 11 08:23:31 localhost.localdomain systemd[1]: Starting MicroShift...
+```

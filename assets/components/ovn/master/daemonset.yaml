@@ -328,7 +328,7 @@ spec:
           fi
 
           # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
-          echo "$(date -Iseconds) - starting ovnkube-master, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
+          echo "$(date -Iseconds) - starting ovnkube-master at {{ .CreationTimestamp }}, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - copy ovn-k8s-cni-overlay"
           cp -f /usr/libexec/cni/ovn-k8s-cni-overlay /cni-bin-dir/

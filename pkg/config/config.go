@@ -66,6 +66,8 @@ type MicroshiftConfig struct {
 	NodeIP          string        `json:"nodeIP"`
 	BaseDomain      string        `json:"baseDomain"`
 	Cluster         ClusterConfig `json:"cluster"`
+	// Used to trigger a force rollout on network components upon MicroShift restart
+	CreationTimestamp string `json:"creationTimestamp"`
 
 	Ingress IngressConfig `json:"-"`
 }
