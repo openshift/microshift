@@ -4,10 +4,11 @@ MicroShift does not require a firewall for normal operation. However, it is reco
 It is mandatory to allow MicroShift pods the access to the internal CoreDNS and API servers.
 > Users may choose to change the pod IP range to be different from the default `10.42.0.0/16` setting. This must be reflected in the firewall configuration.
 
-|IP Range      |Description|
-|:-------------|:----------|
-|10.42.0.0/16  |Host network pod access to CoreDNS and MicroShift API |
-|169.254.169.1 |Host network pod access to MicroShift API Server      |
+|IP Range      |Firewall rule required| Description|
+|:-------------|:---------------------|:-----------|
+|10.42.0.0/16  |Yes                   |Pod network access to other pods |
+|10.43.0.0/16  |No                    |ClusterIP service network, used by pods to access services (like CoreDNS and MicroShift API) |
+|169.254.169.1 |Yes                   |Special IP to access services backed by host endpoints, like MicroShift API Server |
 
 The following ports are optional and they should be considered for MicroShift if a firewall is enabled.
 
@@ -17,11 +18,13 @@ The following ports are optional and they should be considered for MicroShift if
 |443        |TCP        |HTTPS port used to serve applications through the OpenShift router |
 |5353       |UDP        |mDNS service to respond for OpenShift route mDNS hosts |
 |30000-32767|TCP/UDP    |Port range reserved for NodePort type of services, can be used to expose applications on the LAN |
-|6443       |TCP        |HTTPS API port for the MicroShift API |
+|6443       |TCP        |HTTPS port for the MicroShift API |
 
 ## Firewalld
 The following commands can be used for enabling `firewalld` and opening all the above mentioned source IP addresses and ports.
 > Use the appropriate pod IP range if it is different from the default `10.42.0.0/16` setting.
+
+> Use the appropriate optional settings when requiring external access to services running on MicroShift (e.g. port 6443 for api server, ports 80 and 443 for applications exposed through the router, etc.).
 
 ```bash
 sudo dnf install -y firewalld
