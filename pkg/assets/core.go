@@ -214,6 +214,7 @@ func ApplyConfigMapWithData(cmPath string, data map[string]string, kubeconfigPat
 		return err
 	}
 	cm.Reader(cmBytes, nil, nil)
+	cm.cm.Data = data
 	_, _, err = resourceapply.ApplyConfigMap(context.TODO(), cm.Client, assetsEventRecorder, cm.cm)
 	return err
 }
