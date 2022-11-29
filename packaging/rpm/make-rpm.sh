@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 # must be passed down to this script from Makefile
-ENV_VARS="RELEASE_BASE RELEASE_PRE SOURCE_GIT_TAG SOURCE_GIT_COMMIT SOURCE_GIT_TREE_STATE"
+ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_COMMIT SOURCE_GIT_TREE_STATE"
 for env in $ENV_VARS ; do
   if [[ -z "${!env}" ]] ; then
     echo "Error: Mandatory environment variable '${env}' is missing"
@@ -15,9 +15,7 @@ done
 # generated from other info
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
-RPM_REL=$(echo ${SOURCE_GIT_TAG} | sed s/"${RELEASE_PRE}-"//g | sed s/-/_/g)
-# add the git commit timestamp for nightlies, so updates will always work on devices old pkg < new pkg
-RPM_REL=$(echo "${RPM_REL}" | sed s/nightly_/nightly_$(git show -s --format=%ct)_/g)
+MICROSHIFT_VERSION=$(echo ${MICROSHIFT_VERSION} | sed s/-/_/g)
 
 GIT_SHA=$(git rev-parse HEAD)
 # using this instead of rev-parse --short because github's is 1 char shorter than --short
@@ -42,23 +40,23 @@ create_local_tarball() {
 download_commit_tarball() {
   title "Downloading commit tarball"
   GIT_SHA=${1:-$GIT_SHA}
-  spectool -g --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_REL}" --define="version ${RELEASE_BASE}" \
+  spectool -g --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_RELEASE}" --define="version ${MICROSHIFT_VERSION}" \
           --define "git_commit ${GIT_SHA}" \
           -R "${SCRIPT_DIR}/microshift.spec"
 }
 
 download_tag_tarball() {
   title "Downloading tag tarball"
-  spectool -g --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_REL}" --define="version ${RELEASE_BASE}" \
+  spectool -g --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_RELEASE}" --define="version ${MICROSHIFT_VERSION}" \
           --define "github_tag ${1}" \
           -R "${SCRIPT_DIR}/microshift.spec"
 }
 
 build_commit() {
-  # using --defines worka for rpm building, but not for an srpm
+  # using --defines works for rpm building, but not for an srpm
   cat >"${RPMBUILD_DIR}"SPECS/microshift.spec <<EOF
-%global release ${RPM_REL}
-%global version ${RELEASE_BASE}
+%global release ${RPM_RELEASE}
+%global version ${MICROSHIFT_VERSION}
 %global git_commit ${1}
 %global embedded_git_commit ${SOURCE_GIT_COMMIT}
 %global embedded_git_tag ${SOURCE_GIT_TAG}
@@ -72,8 +70,8 @@ EOF
 
 build_tag_commit() {
     cat >"${RPMBUILD_DIR}"SPECS/microshift.spec <<EOF
-%global release ${RPM_REL}
-%global version ${RELEASE_BASE}
+%global release ${RPM_RELEASE}
+%global version ${MICROSHIFT_VERSION}
 %global github_tag ${1}
 %global embedded_git_commit ${SOURCE_GIT_COMMIT}
 %global embedded_git_tag ${SOURCE_GIT_TAG}

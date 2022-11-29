@@ -12,14 +12,14 @@ include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/
 # a timestamp composed with ':'s we must adjust the string so that it is still compliant with image tag format.
 export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
+SOURCE_GIT_COMMIT_TIMESTAMP ?= $(shell TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H%M%S' --format="%cd")
 
-RELEASE_BASE := 4.12.0
-RELEASE_PRE := ${RELEASE_BASE}-0.microshift
+OCP_VERSION := $(shell awk -F'["-]' '/var Base/ {print $$2}'  ${PROJECT_DIR}/pkg/release/release.go)
+MICROSHIFT_VERSION := $(subst -clean,,$(shell echo '${OCP_VERSION}-${SOURCE_GIT_COMMIT_TIMESTAMP}-${SOURCE_GIT_COMMIT}-${SOURCE_GIT_TREE_STATE}'))
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
-SOURCE_GIT_TAG :=$(shell git describe --tags --abbrev=7 --match '$(RELEASE_PRE)*' 2>/dev/null || echo '${RELEASE_PRE}-${TIMESTAMP}-untagged')
-
+SOURCE_GIT_TAG := ${MICROSHIFT_VERSION}
 EMBEDDED_GIT_TAG ?= ${SOURCE_GIT_TAG}
 EMBEDDED_GIT_COMMIT ?= ${SOURCE_GIT_COMMIT}
 EMBEDDED_GIT_TREE_STATE ?= ${SOURCE_GIT_TREE_STATE}
@@ -157,9 +157,10 @@ cross-build-linux-arm64:
 cross-build: cross-build-linux-amd64 cross-build-linux-arm64
 .PHONY: cross-build
 
+RPM_RELEASE := 1
 rpm:
-	RELEASE_BASE=${RELEASE_BASE} \
-	RELEASE_PRE=${RELEASE_PRE} \
+	MICROSHIFT_VERSION=${MICROSHIFT_VERSION} \
+	RPM_RELEASE="${RPM_RELEASE}" \
 	SOURCE_GIT_TAG=${SOURCE_GIT_TAG} \
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
@@ -167,8 +168,8 @@ rpm:
 .PHONY: rpm
 
 srpm:
-	RELEASE_BASE=${RELEASE_BASE} \
-	RELEASE_PRE=${RELEASE_PRE} \
+	MICROSHIFT_VERSION=${MICROSHIFT_VERSION} \
+	RPM_RELEASE="${RPM_RELEASE}" \
 	SOURCE_GIT_TAG=${SOURCE_GIT_TAG} \
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \

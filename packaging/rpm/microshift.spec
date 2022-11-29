@@ -6,7 +6,7 @@
 
 
 # golang specifics
-%global golang_version 1.17
+%global golang_version 1.18
 #debuginfo not supported with Go
 %global debug_package %{nil}
 # modifying the Go binaries breaks the DWARF debugging
