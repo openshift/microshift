@@ -27,7 +27,7 @@ The configuration settings alongside with the supported command line arguments a
 |---------------------|---------------------------|-----------------------------------------|-------------|
 | clusterCIDR         | --cluster-cidr            | MICROSHIFT_CLUSTER_CLUSTERCIDR          | A block of IP addresses from which Pod IP addresses are allocated
 | serviceCIDR         | --service-cidr            | MICROSHIFT_CLUSTER_SERVICECIDR          | A block of virtual IP addresses for Kubernetes services
-| serviceNodePortRange| --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort
+| serviceNodePortRange| --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort (WARNING: see the dedicated section)
 | domain              | --cluster-domain          | MICROSHIFT_CLUSTER_DOMAIN               | Base DNS domain used to construct fully qualified pod and service domain names
 | url                 | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
 | nodeIP              | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
@@ -49,6 +49,40 @@ nodeIP: ""
 nodeName: ""
 logVLevel: 0
 ```
+
+## Service NodePort range
+
+The `serviceNodePortRange` setting allows the extension of the port range available
+to NodePort Services. This option is useful when specific standard ports under the
+`30000-32767` need to be exposed. i.e., your device needs to expose the `1883/tcp`
+MQTT port on the network because some client devices cannot use a different port.
+
+If you use this option, you must be careful; NodePorts can overlap with system ports,
+causing malfunction of the system or MicroShift. Take the following considerations
+into account:
+
+* Do not create any NodePort service without an explicit `nodePort` selection, in this
+  case the port is assigned randomly by the kube-apiserver.
+* Do not create any NodePort service for any system service port, MicroShift port,
+  or other services you expose on your device HostNetwork.
+
+List of ports that you must avoid:
+
+| Port          | Description                                                     |
+|---------------|-----------------------------------------------------------------|
+| 22/tcp        | SSH port
+| 80/tcp        | OpenShift Router HTTP endpoint
+| 443/tcp       | OpenShift Router HTTPS endpoint
+| 1936/tcp      | Metrics service for the openshift-router, not exposed today
+| 2379/tcp      | etcd port
+| 2380/tcp      | etcd port
+| 6443          | kubernetes API
+| 8445/tcp      | openshift-route-controller-manager
+| 9537/tcp      | cri-o metrics
+| 10250/tcp     | kubelet
+| 10248/tcp     | kubelet healthz port
+| 10259/tcp     | kube scheduler
+|---------------|-----------------------------------------------------------------|
 
 # Auto-applying Manifests
 
