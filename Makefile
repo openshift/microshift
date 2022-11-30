@@ -15,7 +15,7 @@ export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -
 SOURCE_GIT_COMMIT_TIMESTAMP ?= $(shell TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H%M%S' --format="%cd")
 
 OCP_VERSION := $(shell awk -F'["-]' '/var Base/ {print $$2}'  ${PROJECT_DIR}/pkg/release/release.go)
-MICROSHIFT_VERSION := $(subst -clean,,$(shell echo '${OCP_VERSION}-${SOURCE_GIT_COMMIT_TIMESTAMP}-${SOURCE_GIT_COMMIT}-${SOURCE_GIT_TREE_STATE}'))
+MICROSHIFT_VERSION ?= $(subst -clean,,$(shell echo '${OCP_VERSION}-${SOURCE_GIT_COMMIT_TIMESTAMP}-${SOURCE_GIT_COMMIT}-${SOURCE_GIT_TREE_STATE}'))
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
 # because since it doesn't work with our version scheme.
