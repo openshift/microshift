@@ -173,7 +173,7 @@ install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift
-install -p -m644 packaging/microshift/config.yaml %{buildroot}%{_sysconfdir}/microshift/config.yaml
+install -p -m644 packaging/microshift/config.yaml %{buildroot}%{_sysconfdir}/microshift/config.yaml.default
 
 # Memory tweaks to the OpenvSwitch services
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d
@@ -242,7 +242,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/cleanup-all-microshift-data
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
-%{_sysconfdir}/microshift/config.yaml
+%config(noreplace) %{_sysconfdir}/microshift/config.yaml.default
 
 %files selinux
 
@@ -269,6 +269,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" microshift.spec
 %changelog
+* Wed Nov 30 2022 Gregory Giguashvili <ggiguash@redhat.com> 4.12.0
+- Change the config.yaml file name to allow its overwrite by users
+
 * Fri Nov 25 2022 Gregory Giguashvili <ggiguash@redhat.com> 4.12.0
 - Install sos utility with MicroShift and document its usage
 
