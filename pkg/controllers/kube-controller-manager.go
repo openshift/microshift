@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strconv"
 
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/assets"
@@ -92,6 +93,7 @@ func configure(cfg *config.MicroshiftConfig) (args []string, applyFn func() erro
 			"use-service-account-credentials":  {"true"},
 			"cluster-signing-cert-file":        {clusterSigningCert},
 			"cluster-signing-key-file":         {clusterSigningKey},
+			"v":                                {strconv.Itoa(cfg.LogVLevel)},
 		},
 	}
 
@@ -171,7 +173,11 @@ func GetKubeControllerManagerArgs(config map[string]interface{}) []string {
 	args := []string{}
 	for key, value := range extendedArguments.(map[string]interface{}) {
 		for _, arrayValue := range value.([]interface{}) {
-			args = append(args, fmt.Sprintf("--%s=%s", key, arrayValue.(string)))
+			if len(key) == 1 {
+				args = append(args, fmt.Sprintf("-%s=%s", key, arrayValue.(string)))
+			} else {
+				args = append(args, fmt.Sprintf("--%s=%s", key, arrayValue.(string)))
+			}
 		}
 	}
 	// make sure to sort the arguments, otherwise we might get mismatch
