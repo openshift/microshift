@@ -21,52 +21,41 @@ KUBECONFIG=~/.kube/microshift ./openshift-tests --provider none -v 2 <test suite
 All `openshift-tests` functionality is available like in a regular OCP cluster. Check [docs](https://github.com/openshift/origin/blob/master/test/extended/README.md) for more information.
 
 ### Using local MicroShift
-If you execute `openshift-tests` in the same host where `MicroShift` is running there is an already available kubeconfig to do so. This file is located at `/var/lib/microshift/resources/kubeadmin/kubeconfig`.
+If you execute `openshift-tests` in the same host where `MicroShift` is running there is an already available kubeconfig to do so. This file is located at `/var/lib/microshift/resources/kubeadmin/localhost/kubeconfig`.
 
 All that is required is to set kubeconfig to this file and launch the tests.
 
 ### Using remote MicroShift
-If we have a look at the default kubeconfig we see it tries to connect to localhost, assuming `MicroShift` is running in the same host:
+MicroShift generates a set of kubeconfig files in default configuration:
 ```
-apiVersion: v1
-clusters:
-- cluster:
-    certificate-authority-data: ...
-    server: https://127.0.0.1:6443
-  name: microshift
+# tree /var/lib/microshift/resources/kubeadmin/
+/var/lib/microshift/resources/kubeadmin/
+├── kubeconfig
+├── localhost
+│   └── kubeconfig
+├── microshift-dev
+│   └── kubeconfig
+└── microshift-dev.localdomain
+    └── kubeconfig
+
+3 directories, 4 files
 ```
-If we look at the certificate for API server to check what the valid names are we see the following:
+Using default configuration there is a kubeconfig for each of the subject alternative names, localhost, and the one at the root directory which is using the cluster URL. If cluster URL is not using localhost then all these files are not generated.
+
+Having a DNS (or simply changing `/etc/hosts`) we have to select which of the kubeconfig files we need to use according to it. In this case we may copy the `microshift-dev` kubeconfig to our local environment and we will be able to use `oc`:
 ```
-Subject: O = 10.43.0.1 + O = 127.0.0.1 + O = localhost + O = kubernetes + O = kube-apiserver + O = 192.168.122.108 + O = kubernetes.default + O = localhost.localdomain + O = kubernetes.default.svc, CN = kube-apiserver
-...
-X509v3 Subject Alternative Name: 
-  DNS:kube-apiserver, DNS:localhost.localdomain, DNS:kubernetes.default.svc, DNS:kubernetes.default, DNS:kubernetes, DNS:localhost, DNS:192.168.122.108, DNS:127.0.0.1, DNS:10.43.0.1, IP Address:192.168.122.108, IP Address:127.0.0.1, IP Address:10.43.0.1
+$ yq -r '.clusters[].cluster.server' ~/.kube/microshift 
+https://microshift-dev:6443
+
+$ KUBECONFIG=~/.kube/microshift oc get node
+NAME                         STATUS   ROLES                         AGE   VERSION
+microshift-dev.localdomain   Ready    control-plane,master,worker   8h    v1.25.0
 ```
 
-Resolving the hostname DNS entry to a valid IP, or using the raw IPs will work. We can not use any of the `kube-.*` DNS names as those are internal to `MicroShift`, the same happens with `localhost`. For the IP entries, it also happens to `127.0.0.1` and `10.43.0.1`, they are local to `MicroShift` host.
-
-We need to use the external IP (`192.168.122.108` in this example) or the hostname (`localhost.localdomain`). To do this we change the `server` value in kubeconfig and that should be good to go. You can also use `/etc/hosts` to shortcut DNS lookup if you want to use the names.
-
-IP addresses are not guaranteed to be stable in `MicroShift`, but everytime it starts it regenerates kubeconfig so it should be ok during a test run. Remember to open port 6443 if there is a firewall.
-```
-$ cat ~/.kube/microshift | yq '.clusters[].cluster.server'
-https://192.168.122.108:6443
-$ KUBECONFIG=~/.kube/microshift oc get pod -A
-NAMESPACE                  NAME                                  READY   STATUS    RESTARTS   AGE
-openshift-dns              dns-default-dcwx7                     2/2     Running   0          8h
-openshift-dns              node-resolver-j2gqf                   1/1     Running   0          8h
-openshift-ingress          router-default-6b6bb965d9-v8qzq       1/1     Running   0          8h
-openshift-ovn-kubernetes   ovnkube-master-vrcfz                  4/4     Running   0          8h
-openshift-ovn-kubernetes   ovnkube-node-kmrcw                    1/1     Running   0          8h
-openshift-service-ca       service-ca-5f9bc879d8-qpc2p           1/1     Running   0          8h
-openshift-storage          topolvm-controller-5cbd9d9684-kz5m7   4/4     Running   0          8h
-openshift-storage          topolvm-node-q6rr9                    4/4     Running   0          8h
-```
-
-If you dont want to change kubeconfig you can also use ssh to connect to `MicroShift` host forwarding port 6443 to tunnel all traffic.
+If you still want to use localhost kubeconfig you can also use ssh to connect to `MicroShift` host forwarding port 6443 to tunnel all traffic.
 ```
 $ ssh -L 6443:localhost:6443 redhat@192.168.122.108 -fN
-$ cat ~/.kube/microshift | yq '.clusters[].cluster.server'
+$ yq '.clusters[].cluster.server' ~/.kube/microshift
 https://127.0.0.1:6443
 $ KUBECONFIG=~/.kube/microshift oc get pod -A
 NAMESPACE                  NAME                                  READY   STATUS    RESTARTS   AGE

@@ -4,13 +4,15 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/spf13/pflag"
 )
 
 const (
-	testConfigFile = "../../test/config.yaml"
+	testConfigFile                   = "../../test/config.yaml"
+	testConfigFileBadSubjectAltNames = "../../test/config_bad_subjectaltnames.yaml"
 )
 
 // tests to make sure that the config file is parsed correctly
@@ -21,6 +23,7 @@ func TestConfigFile(t *testing.T) {
 		err        error
 	}{
 		{testConfigFile, nil},
+		{testConfigFileBadSubjectAltNames, nil},
 	}
 
 	for _, tt := range ttests {
@@ -41,9 +44,10 @@ func TestCommandLineConfig(t *testing.T) {
 	}{
 		{
 			config: &MicroshiftConfig{
-				LogVLevel: 4,
-				NodeName:  "node1",
-				NodeIP:    "1.2.3.4",
+				LogVLevel:       4,
+				SubjectAltNames: []string{"node1"},
+				NodeName:        "node1",
+				NodeIP:          "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://1.2.3.4:6443",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -62,6 +66,7 @@ func TestCommandLineConfig(t *testing.T) {
 		flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 		// all other flags unbound (looked up by name) and defaulted
 		flags.Int("v", config.LogVLevel, "")
+		flags.StringSlice("subject-alt-names", config.SubjectAltNames, "")
 		flags.String("node-name", config.NodeName, "")
 		flags.String("node-ip", config.NodeIP, "")
 		flags.String("url", config.Cluster.URL, "")
@@ -74,6 +79,7 @@ func TestCommandLineConfig(t *testing.T) {
 		var err error
 		err = flags.Parse([]string{
 			"--v=" + strconv.Itoa(tt.config.LogVLevel),
+			"--subject-alt-names=" + strings.Join(tt.config.SubjectAltNames, ","),
 			"--node-name=" + tt.config.NodeName,
 			"--node-ip=" + tt.config.NodeIP,
 			"--url=" + tt.config.Cluster.URL,
@@ -110,9 +116,10 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 	}{
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
-				LogVLevel: 23,
-				NodeName:  "node1",
-				NodeIP:    "1.2.3.4",
+				LogVLevel:       23,
+				SubjectAltNames: []string{"node1", "node2"},
+				NodeName:        "node1",
+				NodeIP:          "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -128,6 +135,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 			}{
 				{"MICROSHIFT_LOGVLEVEL", "23"},
 				{"MICROSHIFT_NODENAME", "node1"},
+				{"MICROSHIFT_SUBJECTALTNAMES", "node1,node2"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
@@ -138,9 +146,10 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 		},
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
-				LogVLevel: 23,
-				NodeName:  "node1",
-				NodeIP:    "1.2.3.4",
+				LogVLevel:       23,
+				SubjectAltNames: []string{"node1"},
+				NodeName:        "node1",
+				NodeIP:          "1.2.3.4",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -156,6 +165,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 			}{
 				{"MICROSHIFT_LOGVLEVEL", "23"},
 				{"MICROSHIFT_NODENAME", "node1"},
+				{"MICROSHIFT_SUBJECTALTNAMES", "node1"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
@@ -169,6 +179,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 		// first set the values
 		for _, env := range tt.envList {
 			os.Setenv(env.varName, env.value)
+			defer os.Unsetenv(env.varName)
 		}
 		// then read the values
 		microShiftconfig := NewMicroshiftConfig()
@@ -188,10 +199,28 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.Int("v", 0, "")
 
-	c := NewMicroshiftConfig()
-
-	if err := c.ReadAndValidate(testConfigFile, flags); err != nil {
-		t.Errorf("failed to read and validate config: %v", err)
+	var ttests = []struct {
+		configFile string
+		expectErr  bool
+	}{
+		{
+			configFile: testConfigFile,
+			expectErr:  false,
+		},
+		{
+			configFile: testConfigFileBadSubjectAltNames,
+			expectErr:  true,
+		},
+	}
+	for _, tt := range ttests {
+		microShiftConfig := NewMicroshiftConfig()
+		err := microShiftConfig.ReadAndValidate(tt.configFile, flags)
+		if tt.expectErr && err == nil {
+			t.Error("Expecting error and received nothing")
+		}
+		if !tt.expectErr && err != nil {
+			t.Errorf("Not expecting error and received: %v", err)
+		}
 	}
 }
 
@@ -207,7 +236,7 @@ func TestHideUnsupportedFlags(t *testing.T) {
 	HideUnsupportedFlags(flags)
 
 	if flags.Lookup("url").Hidden {
-		t.Errorf("v should not be hidden")
+		t.Errorf("url should not be hidden")
 	}
 	if flags.Lookup("v").Hidden {
 		t.Errorf("v should not be hidden")
