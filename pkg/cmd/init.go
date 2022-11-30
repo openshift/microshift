@@ -355,20 +355,17 @@ func initKubeconfigs(
 		return fmt.Errorf("failed to get apiserver port: %v", err)
 	}
 
-	// If using localhost this is part of the default URL and it needs external access.
-	// Generate all other kubeconfigs, one per name.
-	if u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" {
-		for _, name := range append(cfg.SubjectAltNames, cfg.NodeName, "localhost") {
-			u.Host = fmt.Sprintf("%s:%d", name, apiServerPort)
-			if err := util.KubeConfigWithClientCerts(
-				cfg.KubeConfigAdminPath(name),
-				u.String(),
-				inClusterTrustBundlePEM,
-				adminKubeconfigCertPEM,
-				adminKubeconfigKeyPEM,
-			); err != nil {
-				return err
-			}
+	// Generate one kubeconfigs per name
+	for _, name := range append(cfg.SubjectAltNames, cfg.NodeName, "localhost") {
+		u.Host = fmt.Sprintf("%s:%d", name, apiServerPort)
+		if err := util.KubeConfigWithClientCerts(
+			cfg.KubeConfigAdminPath(name),
+			u.String(),
+			inClusterTrustBundlePEM,
+			adminKubeconfigCertPEM,
+			adminKubeconfigKeyPEM,
+		); err != nil {
+			return err
 		}
 	}
 
