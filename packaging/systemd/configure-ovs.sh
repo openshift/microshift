@@ -538,7 +538,7 @@ get_default_interface() {
       if [ "${extra_bridge}" != "" ]; then
         iface=$(ip -6 route show | grep -v "br-ex1" | grep -v "${extra_bridge}" | awk '{ if ($2 == "dev") { print $3; exit } }')
       else
-        iface=$(ip -6 route show | grep -v "br-ex1" | awk '{ if ($2 == "dev") { print $3; exit } }')
+        iface=$(ip -6 route show | grep -v "br-ex1" | grep -w -v "lo" | awk '{ if ($2 == "dev") { print $3; exit } }')
       fi
       if [[ -n "${iface}" ]]; then
         break
