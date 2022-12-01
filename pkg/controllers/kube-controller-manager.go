@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	kcmDefaultConfigAsset = "components/kube-controller-manager/defaultconfig.yaml"
+	kcmDefaultConfigAsset = "controllers/kube-controller-manager/defaultconfig.yaml"
 )
 
 type KubeControllerManager struct {
@@ -100,7 +100,7 @@ func configure(cfg *config.MicroshiftConfig) (args []string, applyFn func() erro
 	args, err = mergeAndConvertToArgs(overrides)
 	applyFn = func() error {
 		return assets.ApplyNamespaces([]string{
-			"core/namespace-openshift-kube-controller-manager.yaml",
+			"controllers/kube-controller-manager/namespace-openshift-kube-controller-manager.yaml",
 			"core/namespace-openshift-infra.yaml",
 		}, cfg.KubeConfigPath(config.KubeAdmin))
 	}

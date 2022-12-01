@@ -55,31 +55,31 @@ func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
 	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
 	var (
 		clusterRole = []string{
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-anyuid.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-hostaccess.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-hostmount-anyuid.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork-v2.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-nonroot-v2.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-anyuid.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-hostaccess.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-hostmount-anyuid.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-nonroot-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml",
 		}
 		clusterRoleBinding = []string{
-			"scc/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml",
 		}
 		sccs = []string{
-			"scc/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork-v2.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-nonroot-v2.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-privileged.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml",
-			"scc/0000_20_kube-apiserver-operator_00_scc-restricted.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-hostnetwork-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-nonroot-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-privileged.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted.yaml",
 		}
 	)
 	if err := assets.ApplySCCs(sccs, nil, nil, kubeconfigPath); err != nil {
