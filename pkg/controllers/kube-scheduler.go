@@ -56,7 +56,9 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 
 	s.options = schedulerOptions.NewOptions()
 	s.options.ConfigFile = microshiftDataDir + "/resources/kube-scheduler/config/config.yaml"
-	s.kubeconfig = cfg.KubeConfigPath(config.KubeAdmin)
+	s.options.Authentication.RemoteKubeConfigFile = cfg.KubeConfigPath(config.KubeScheduler)
+	s.options.Authorization.RemoteKubeConfigFile = cfg.KubeConfigPath(config.KubeScheduler)
+	s.kubeconfig = cfg.KubeConfigPath(config.KubeScheduler)
 }
 
 func (s *KubeScheduler) writeConfig(cfg *config.MicroshiftConfig) error {
