@@ -57,15 +57,15 @@ func Test_newLvmdConfigFromFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newLvmdConfigFromFile(tt.args.p)
+			got, err := NewLvmdConfigFromFile(tt.args.p)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("newLvmdConfigFromFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewLvmdConfigFromFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != nil && !reflect.DeepEqual(*got, *tt.want) {
 				g, _ := json.Marshal(got)
 				w, _ := json.Marshal(tt.want)
-				t.Errorf("newLvmdConfigFromFile() = %s, want %s", string(g), string(w))
+				t.Errorf("NewLvmdConfigFromFile() = %s, want %s", string(g), string(w))
 			}
 		})
 	}

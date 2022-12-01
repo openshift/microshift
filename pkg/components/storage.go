@@ -1,7 +1,9 @@
 package components
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"k8s.io/klog/v2"
@@ -10,6 +12,23 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/config/lvmd"
 )
+
+// getCSIPluginConfig searches for a user-defined lvmd configuration file in predefined locations are returns the first
+// found, else a default-value lvmd config. Returns an error if the file exists and cannot be read, or exists and cannot
+// be deserialized (indicating a malformed config).  User's home directory is checked first.  If not found, global
+// MicroShift config directory is checked.
+func getCSIPluginConfig() (*lvmd.Lvmd, error) {
+	userCfg := filepath.Dir(config.DefaultUserConfigFile)
+	globalCfg := filepath.Dir(config.DefaultGlobalConfigFile)
+
+	if _, err := os.Stat(userCfg); errors.Is(err, os.ErrNotExist) {
+		return lvmd.NewLvmdConfigFromFile(filepath.Join(lvmd.LvmdConfigFileName))
+	}
+	if _, err := os.Stat(globalCfg); errors.Is(err, os.ErrNotExist) {
+		return lvmd.NewLvmdConfigFromFile(filepath.Join(globalCfg, lvmd.LvmdConfigFileName))
+	}
+	return (&lvmd.Lvmd{}).WithDefaults(), nil
+}
 
 func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	var (
@@ -66,7 +85,7 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 
 	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
 	// csi plugin.
-	lvmdCfg, err := lvmd.NewLvmdConfigFromFileOrDefault(filepath.Join(filepath.Dir(config.GetConfigFile()), "lvmd.yaml"))
+	lvmdCfg, err := getCSIPluginConfig()
 	if err != nil {
 		return err
 	}
