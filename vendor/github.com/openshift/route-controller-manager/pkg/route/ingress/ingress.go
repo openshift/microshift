@@ -638,6 +638,7 @@ func newRouteForIngress(
 			Host: host,
 			Path: path.Path,
 			To: routev1.RouteTargetReference{
+				Kind: "Service",
 				Name: path.Backend.Service.Name,
 			},
 			Port:           port,
