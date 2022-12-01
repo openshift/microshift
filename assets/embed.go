@@ -2,7 +2,7 @@ package embedded
 
 import "embed"
 
-//go:embed apiservice components core crd rbac scc version
+//go:embed components controllers core crd version
 var content embed.FS
 
 func Asset(name string) ([]byte, error) {

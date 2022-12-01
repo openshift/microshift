@@ -52,8 +52,8 @@ const (
 
 var baseKubeAPIServerConfigs = [][]byte{
 	// todo: a nice way to generate the baseline kas config for microshift
-	embedded.MustAsset("components/kube-apiserver/defaultconfig.yaml"),
-	embedded.MustAsset("components/kube-apiserver/config-overrides.yaml"),
+	embedded.MustAsset("controllers/kube-apiserver/defaultconfig.yaml"),
+	embedded.MustAsset("controllers/kube-apiserver/config-overrides.yaml"),
 }
 
 var fixedTLSProfile *configv1.TLSProfileSpec

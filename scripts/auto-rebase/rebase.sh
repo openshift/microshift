@@ -405,49 +405,49 @@ update_manifests() {
     # 1) Adopt resource manifests
     #    Selectively copy in only those core manifests that MicroShift is already using
     cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ns.yaml" "${REPOROOT}"/assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-ns.yaml" "${REPOROOT}"/assets/core/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-ns.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml
 
     # Copy embedded RBAC manifests that belong to the Route Controller Manager
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrole.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-informer-clusterrole.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-informer-clusterrolebinding.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-leader-role.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-leader-rolebinding.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-sa.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-separate-sa-role.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-separate-sa-rolebinding.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-tokenreview-clusterrole.yaml" "${REPOROOT}"/assets/rbac/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-tokenreview-clusterrolebinding.yaml" "${REPOROOT}"/assets/rbac/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrole.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-informer-clusterrole.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-informer-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-leader-role.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-leader-rolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-sa.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-separate-sa-role.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-separate-sa-rolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-tokenreview-clusterrole.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
+    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-tokenreview-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
 
     # Copy various manifests needed by core components
-    cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/config-overrides.yaml" "${REPOROOT}"/assets/components/kube-apiserver
-    cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/components/kube-apiserver
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/components/kube-controller-manager
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrole.yaml" "${REPOROOT}"/assets/rbac
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrolebinding.yaml" "${REPOROOT}"/assets/rbac
+    cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/config-overrides.yaml" "${REPOROOT}"/assets/controllers/kube-apiserver
+    cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/controllers/kube-apiserver
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/controllers/kube-controller-manager
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrole.yaml" "${REPOROOT}"/assets/controllers/kube-controller-manager
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/kube-controller-manager
     cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-openshift-infra.yaml" "${REPOROOT}"/assets/core
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/ns.yaml" "${REPOROOT}"/assets/core/namespace-openshift-kube-controller-manager.yaml
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrole.yaml" "${REPOROOT}"/assets/rbac
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/rbac
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrole.yaml" "${REPOROOT}"/assets/rbac
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/rbac
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/ns.yaml" "${REPOROOT}"/assets/controllers/kube-controller-manager/namespace-openshift-kube-controller-manager.yaml
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrole.yaml" "${REPOROOT}"/assets/controllers/cluster-policy-controller
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/cluster-policy-controller
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrole.yaml" "${REPOROOT}"/assets/controllers/cluster-policy-controller
+    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/cluster-policy-controller
     #    Selectively copy in only those CRD manifests that MicroShift is already using
     cp "${REPOROOT}"/vendor/github.com/openshift/api/route/v1/route.crd.yaml "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_security-openshift_01_scc.crd.yaml" "${REPOROOT}"/assets/crd
     cp "${STAGING_DIR}/release-manifests/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml" "${REPOROOT}"/assets/crd
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
-    # - assets/apiservice/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
+    # - assets/core/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
 
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.flex-volume-plugin-dir)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
 
     #    Replace all SCC manifests and their CRs/CRBs
-    rm -f "${REPOROOT}"/assets/scc/*.yaml
-    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_cr-*.yaml "${REPOROOT}"/assets/scc || true
-    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_crb-*.yaml "${REPOROOT}"/assets/scc || true
-    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/scc || true
+    rm -f "${REPOROOT}"/assets/controllers/openshift-default-scc-manager/*.yaml
+    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_cr-*.yaml "${REPOROOT}"/assets/controllers/openshift-default-scc-manager || true
+    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_crb-*.yaml "${REPOROOT}"/assets/controllers/openshift-default-scc-manager || true
+    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/controllers/openshift-default-scc-manager || true
     # 2) Render operand manifest templates like the operator would
     #    n/a
     # 3) Make MicroShift-specific changes

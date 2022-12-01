@@ -42,7 +42,7 @@ var (
 	// for apis that belong to a group served by openshift-apiserver but are themselves served
 	// as a CR, the crd registration controller will not automatically create local apiservices
 	localAPIServices = []string{
-		"apiservice/securityv1-local-apiservice.yaml",
+		"core/securityv1-local-apiservice.yaml",
 	}
 )
 
