@@ -588,8 +588,8 @@ github.com/openshift/library-go v0.0.0-20221116163016-046e935fe86f h1:d+T/1HC70y
 github.com/openshift/library-go v0.0.0-20221116163016-046e935fe86f/go.mod h1:KPBAXGaq7pPmA+1wUVtKr5Axg3R68IomWDkzaOxIhxM=
 github.com/openshift/onsi-ginkgo/v2 v2.0.0-20221005160638-5fa9cd70cd8c h1:bRjMBrKdts7PdEHiF7Z9Q+LZR8NFVfF0HsDQJJzWLco=
 github.com/openshift/onsi-ginkgo/v2 v2.0.0-20221005160638-5fa9cd70cd8c/go.mod h1:MEH45j8TBi6u9BMogfbp0stKC5cdGjumZj5Y7AG4VIk=
-github.com/openshift/route-controller-manager v0.0.0-20221025135013-a4731c8cb3f9 h1:LKxfRK0Z87CaHAosrKTETToFds9kC5Z2XiRO8hAxjA0=
-github.com/openshift/route-controller-manager v0.0.0-20221025135013-a4731c8cb3f9/go.mod h1:mRsosX3u/Y1pdYZIvfbAhvUURyKOE4JeBb6mRDp0r4s=
+github.com/openshift/route-controller-manager v0.0.0-20221130011049-9e74d175e81e h1:YVelr8PNPjQ+vPNu5PtQPDMQnbyab4cTipPpZZ42Hzw=
+github.com/openshift/route-controller-manager v0.0.0-20221130011049-9e74d175e81e/go.mod h1:mRsosX3u/Y1pdYZIvfbAhvUURyKOE4JeBb6mRDp0r4s=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/peterbourgon/diskv v2.0.1+incompatible h1:UBdAOUP5p4RWqPBg048CAvpKN+vxiaj6gdUUzhl4XmI=
 github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR/tNboyR3/BZd58JJSHlUSCU=
