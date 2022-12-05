@@ -37,4 +37,5 @@ virt-install \
     --events on_reboot=restart \
     --cdrom ${CDROM} \
     --noautoconsole \
+    --wait \
 "

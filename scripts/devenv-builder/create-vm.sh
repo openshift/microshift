@@ -72,4 +72,5 @@ virt-install \
     --location ${RHELISO} \
     --initrd-inject=${KICKSTART_FILE} \
     --extra-args \"inst.ks=file:/$(basename ${KICKSTART_FILE})\" \
+    --wait \
 "
