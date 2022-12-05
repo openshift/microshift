@@ -439,9 +439,9 @@ update_manifests() {
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
     # - assets/core/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
 
-    yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
-    yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
-    yq -i 'del(.extendedArguments.flex-volume-plugin-dir)' "${REPOROOT}"/assets/components/kube-controller-manager/defaultconfig.yaml
+    yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
+    yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
+    yq -i 'del(.extendedArguments.flex-volume-plugin-dir)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
 
     #    Replace all SCC manifests and their CRs/CRBs
     rm -f "${REPOROOT}"/assets/controllers/openshift-default-scc-manager/*.yaml
