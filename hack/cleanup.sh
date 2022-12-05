@@ -14,6 +14,7 @@ sudo bash -c "
     echo Stopping MicroShift
     set +e
     systemctl stop --now microshift 2>/dev/null
+    systemctl stop --now kubepods.slice 2>/dev/null
     systemctl disable microshift 2>/dev/null
     pkill -9 microshift
 
