@@ -27,9 +27,9 @@ import (
 )
 
 const (
-	defaultUserConfigFile   = "~/.microshift/config.yaml"
+	DefaultUserConfigFile   = "~/.microshift/config.yaml"
 	defaultUserDataDir      = "~/.microshift/data"
-	defaultGlobalConfigFile = "/etc/microshift/config.yaml"
+	DefaultGlobalConfigFile = "/etc/microshift/config.yaml"
 	defaultGlobalDataDir    = "/var/lib/microshift"
 	// for files managed via management system in /etc, i.e. user applications
 	defaultManifestDirEtc = "/etc/microshift/manifests"
@@ -219,12 +219,12 @@ func (c *ClusterConfig) ApiServerPort() (int, error) {
 // Returns the default user config file if that exists, else the default global
 // config file, else the empty string.
 func findConfigFile() string {
-	userConfigFile, _ := homedir.Expand(defaultUserConfigFile)
+	userConfigFile, _ := homedir.Expand(DefaultUserConfigFile)
 	if _, err := os.Stat(userConfigFile); errors.Is(err, os.ErrNotExist) {
-		if _, err := os.Stat(defaultGlobalConfigFile); errors.Is(err, os.ErrNotExist) {
+		if _, err := os.Stat(DefaultGlobalConfigFile); errors.Is(err, os.ErrNotExist) {
 			return ""
 		} else {
-			return defaultGlobalConfigFile
+			return DefaultGlobalConfigFile
 		}
 	} else {
 		return userConfigFile

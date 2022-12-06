@@ -66,7 +66,7 @@ func Test_renderLvmdParams(t *testing.T) {
 
 func Test_renderLvmdConfig(t *testing.T) {
 
-	defL, _ := lvmd.NewLvmdConfigFromFileOrDefault("")
+	defL := (&lvmd.Lvmd{}).WithDefaults()
 
 	cmWrap := func(d []byte) []byte {
 		base :=
