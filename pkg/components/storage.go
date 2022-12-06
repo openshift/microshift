@@ -18,8 +18,8 @@ import (
 // and the error.
 func getCSIPluginConfig() (*lvmd.Lvmd, error) {
 	lvmdConfig := filepath.Join(filepath.Dir(config.DefaultGlobalConfigFile), lvmd.LvmdConfigFileName)
-	if _, err := os.Stat(lvmdConfig); errors.Is(err, os.ErrNotExist) {
-		return lvmd.NewLvmdConfigFromFile(filepath.Join(lvmdConfig, lvmd.LvmdConfigFileName))
+	if _, err := os.Stat(lvmdConfig); !errors.Is(err, os.ErrNotExist) {
+		return lvmd.NewLvmdConfigFromFile(lvmdConfig)
 	}
 	return (&lvmd.Lvmd{}).WithDefaults(), nil
 }
