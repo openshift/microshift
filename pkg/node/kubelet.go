@@ -16,12 +16,14 @@ limitations under the License.
 package node
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"k8s.io/klog/v2"
 
@@ -65,6 +67,10 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	if err := s.writeConfig(cfg); err != nil {
 		klog.Fatalf("Failed to write kubelet config", err)
 	}
+	osID, err := loadOSID()
+	if err != nil {
+		klog.Fatalf("Failed to read OS ID", err)
+	}
 
 	kubeletFlags := kubeletoptions.NewKubeletFlags()
 	kubeletFlags.BootstrapKubeconfig = cfg.KubeConfigPath(config.Kubelet)
@@ -76,6 +82,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/control-plane"] = ""
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/master"] = ""
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/worker"] = ""
+	kubeletFlags.NodeLabels["node.openshift.io/os_id"] = osID
 
 	kubeletConfig, err := loadConfigFile(microshiftDataDir + "/resources/kubelet/config/config.yaml")
 
@@ -179,4 +186,25 @@ func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
 	return kc, err
+}
+
+func loadOSID() (string, error) {
+	readFile, err := os.Open("/etc/os-release")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return "unknown", nil
+		}
+		return "", err
+	}
+	defer readFile.Close()
+	fileScanner := bufio.NewScanner(readFile)
+	fileScanner.Split(bufio.ScanLines)
+	for fileScanner.Scan() {
+		line := fileScanner.Text()
+		if strings.HasPrefix(line, "ID=") {
+			// remove prefix and quotes
+			return line[4 : len(line)-1], nil
+		}
+	}
+	return "", fmt.Errorf("OS ID not found")
 }
