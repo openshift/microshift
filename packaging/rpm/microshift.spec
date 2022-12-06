@@ -1,9 +1,12 @@
 # parameters that must be provided via --define , or fixed into the spec file:
 # global version 4.7.0
 # global release 2021_08_31_224727
-# global github_tag 4.7.0-0.microshift-2021-08-31-224727
-# global git_commit 81264d0ebb17fef06eff9ec7d4f2a81631c6b34a
+# global commit 81264d0ebb17fef06eff9ec7d4f2a81631c6b34a
 
+%{!?commit:
+# DO NOT MODIFY: the value on the line below is sed-like replaced by openshift/doozer
+%global commit 0000000000000000000000000000000000000000
+}
 
 # golang specifics
 %global golang_version 1.18
@@ -29,24 +32,15 @@
 
 
 # Git related details
-%global shortcommit %(c=%{git_commit}; echo ${c:0:7})
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name: microshift
 Version: %{version}
 Release: %{release}%{dist}
-# this can be %{timestamp}.git%{short_hash} later for continous main builds
 Summary: MicroShift binary
 License: ASL 2.0
 URL: https://github.com/openshift/microshift
-
-%if ! 0%{?local_build:1}%{?git_commit:1}
-Source0: https://github.com/openshift/microshift/archive/refs/tags/%{github_tag}.tar.gz
-%endif
-
-%if 0%{?git_commit:1}
-Source0: https://github.com/openshift/microshift/archive/%{git_commit}/microshift-%{shortcommit}.tar.gz
-%endif
-
+Source0: https://github.com/openshift/microshift/archive/%{commit}/microshift-%{shortcommit}.tar.gz
 
 ExclusiveArch: x86_64 aarch64
 
@@ -110,15 +104,7 @@ This package contains the networking elements necessary to MicroShift's default 
 
 %prep
 
-# Unpack the sources, unless it's a localbuild (tag)
-%if ! 0%{?local_build:1}%{?git_commit:1}
-%setup -n microshift-%{github_tag}
-%endif
-
-# Unpack the sources, for a commit-based tarball
-%if 0%{?git_commit:1}
-%setup -n microshift-%{git_commit}
-%endif
+%setup -n microshift-%{commit}
 
 %build
 
@@ -133,10 +119,10 @@ GOARCH=amd64
 %endif
 
 # if we have git commit/tag/state to be embedded in the binary pass it down to the makefile
-%if 0%{?embedded_git_commit:1}
-make _build_local GOOS=${GOOS} GOARCH=${GOARCH} EMBEDDED_GIT_COMMIT=%{embedded_git_commit} EMBEDDED_GIT_TAG=%{embedded_git_tag} EMBEDDED_GIT_TREE_STATE=%{embedded_git_tree_state} MICROSHIFT_VERSION=%{version}
+%if %{defined embedded_git_commit}
+make _build_local GOOS=${GOOS} GOARCH=${GOARCH} EMBEDDED_GIT_COMMIT=%{commit} EMBEDDED_GIT_TAG=%{embedded_git_tag} EMBEDDED_GIT_TREE_STATE=%{embedded_git_tree_state} MICROSHIFT_VERSION=%{version}
 %else
-make _build_local GOOS=${GOOS} GOARCH=${GOARCH} MICROSHIFT_VERSION=%{version}
+make _build_local GOOS=${GOOS} GOARCH=${GOARCH} MICROSHIFT_VERSION=%{version} EMBEDDED_GIT_COMMIT=%{commit}
 %endif
 
 cp ./_output/bin/${GOOS}_${GOARCH}/microshift ./_output/microshift
@@ -269,8 +255,17 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" microshift.spec
 %changelog
+* Tue Dec 06 2022 Patryk Matuszak <pmatusza@redhat.com> 4.12.0
+- Add %{commit} and embed it into binary
+
+* Wed Nov 30 2022 Patryk Matuszak <pmatusza@redhat.com> 4.12.0
+- Pass %{version} to Makefile
+
 * Wed Nov 30 2022 Gregory Giguashvili <ggiguash@redhat.com> 4.12.0
 - Change the config.yaml file name to allow its overwrite by users
+
+* Mon Nov 28 2022 Patryk Matuszak <pmatusza@redhat.com> 4.12.0
+- Use commit time & sha for RPM and exec
 
 * Fri Nov 25 2022 Gregory Giguashvili <ggiguash@redhat.com> 4.12.0
 - Install sos utility with MicroShift and document its usage

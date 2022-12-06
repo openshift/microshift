@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 # must be passed down to this script from Makefile
-ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_COMMIT SOURCE_GIT_TREE_STATE"
+ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_TREE_STATE"
 for env in $ENV_VARS ; do
   if [[ -z "${!env}" ]] ; then
     echo "Error: Mandatory environment variable '${env}' is missing"
@@ -45,35 +45,12 @@ download_commit_tarball() {
           -R "${SCRIPT_DIR}/microshift.spec"
 }
 
-download_tag_tarball() {
-  title "Downloading tag tarball"
-  spectool -g --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_RELEASE}" --define="version ${MICROSHIFT_VERSION}" \
-          --define "github_tag ${1}" \
-          -R "${SCRIPT_DIR}/microshift.spec"
-}
-
 build_commit() {
   # using --defines works for rpm building, but not for an srpm
   cat >"${RPMBUILD_DIR}"SPECS/microshift.spec <<EOF
 %global release ${RPM_RELEASE}
 %global version ${MICROSHIFT_VERSION}
-%global git_commit ${1}
-%global embedded_git_commit ${SOURCE_GIT_COMMIT}
-%global embedded_git_tag ${SOURCE_GIT_TAG}
-%global embedded_git_tree_state ${SOURCE_GIT_TREE_STATE}
-EOF
-  cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
-
-  title "Building RPM packages"
-  rpmbuild --quiet "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
-}
-
-build_tag_commit() {
-    cat >"${RPMBUILD_DIR}"SPECS/microshift.spec <<EOF
-%global release ${RPM_RELEASE}
-%global version ${MICROSHIFT_VERSION}
-%global github_tag ${1}
-%global embedded_git_commit ${SOURCE_GIT_COMMIT}
+%global commit ${1}
 %global embedded_git_tag ${SOURCE_GIT_TAG}
 %global embedded_git_tree_state ${SOURCE_GIT_TREE_STATE}
 EOF
@@ -84,7 +61,7 @@ EOF
 }
 
 usage() {
-  echo "Usage: $(basename $0) <all | rpm | srpm> < local | commit <commit-id> | tag <tag-name> >"
+  echo "Usage: $(basename $0) <all | rpm | srpm> < local | commit <commit-id> >"
   exit 1
 }
 
@@ -109,10 +86,6 @@ case $1 in
     commit)
       download_commit_tarball "$2"
       build_commit "$2"
-      ;;
-    tag)
-      download_tag_tarball "$2"
-      build_tag_commit "$2"
       ;;
     *)
       usage
