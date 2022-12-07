@@ -75,8 +75,8 @@ type Config struct {
 	NodeName        string    `json:"nodeName"`
 	NodeIP          string    `json:"nodeIP"`
 	URL             string    `json:"url"`
-	ClusterDomain   string    `json:"clusterDomain"`
 	Network         Network   `json:"network"`
+	DNS             DNS       `json:"dns"`
 	Debugging       Debugging `json:"debugging"`
 	SubjectAltNames []string  `json:"subjectAltNames"`
 }
@@ -104,6 +104,17 @@ type Network struct {
 type ClusterNetworkEntry struct {
 	// The complete block for pod IPs.
 	CIDR string `json:"cidr,omitempty"`
+}
+
+type DNS struct {
+	// baseDomain is the base domain of the cluster. All managed DNS records will
+	// be sub-domains of this base.
+	//
+	// For example, given the base domain `openshift.example.com`, an API server
+	// DNS record may be created for `cluster-api.openshift.example.com`.
+	//
+	// Once set, this field cannot be changed.
+	BaseDomain string `json:"baseDomain"`
 }
 
 type Debugging struct {
@@ -333,8 +344,8 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	if config.Network.ServiceNodePortRange != "" {
 		c.Cluster.ServiceNodePortRange = config.Network.ServiceNodePortRange
 	}
-	if config.ClusterDomain != "" {
-		c.Cluster.Domain = config.ClusterDomain
+	if config.DNS.BaseDomain != "" {
+		c.Cluster.Domain = config.DNS.BaseDomain
 	}
 	if len(config.SubjectAltNames) > 0 {
 		c.SubjectAltNames = config.SubjectAltNames
