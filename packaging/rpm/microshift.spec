@@ -37,7 +37,7 @@
 Name: microshift
 Version: %{version}
 Release: %{release}%{dist}
-Summary: MicroShift binary
+Summary: MicroShift service
 License: ASL 2.0
 URL: https://github.com/openshift/microshift
 Source0: https://github.com/openshift/microshift/archive/%{commit}/microshift-%{shortcommit}.tar.gz
@@ -61,25 +61,7 @@ Requires: sos
 %{?systemd_requires}
 
 %description
-MicroShift is a project that is exploring how OpenShift Kubernetes
-can be optimized for small form factor and edge computing.
-
-Edge devices deployed out in the field pose very different operational,
-environmental, and business challenges from those of cloud computing.
-These motivate different engineering
-trade-offs for Kubernetes at the far edge than for cloud or near-edge
-scenarios. MicroShift's design goals cater to this:
-
-make frugal use of system resources (CPU, memory, network, storage, etc.),
-tolerate severe networking constraints, update (resp. roll back) securely,
-safely, speedily, and seamlessly (without disrupting workloads), and build on
-and integrate cleanly with edge-optimized OSes like Fedora IoT and RHEL for Edge,
-while providing a consistent development and management experience with standard
-OpenShift.
-
-We believe these properties should also make MicroShift a great tool for other
-use cases such as Kubernetes applications development on resource-constrained
-systems, scale testing, and provisioning of lightweight Kubernetes control planes.
+The MicroShift package provides an OpenShift Kubernetes distribution optimized for small form factor and edge computing.
 
 %package selinux
 Summary: SELinux policies for MicroShift
@@ -90,17 +72,17 @@ BuildArch: noarch
 %{?selinux_requires}
 
 %description selinux
-SElinux policy modules for MicroShift.
+The MicroShift SELinux package provides the SELinux policy modules required by MicroShift.
 
 %package networking
-Summary: Networking elements for MicroShift
+Summary: Networking components for MicroShift
 Requires: openvswitch2.17
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
 
 %description networking
-This package contains the networking elements necessary to MicroShift's default CNI.
+The MicroShift Networking package provides the networking components necessary for the MicroShift default CNI driver.
 
 %prep
 
@@ -253,8 +235,11 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/configure-ovs-microshift.sh
 
 # Use Git command to generate the log and replace the VERSION string
-# LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" microshift.spec
+# LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Dec 07 2022 Gregory Giguashvili <ggiguash@redhat.com> 4.12.0
+- Update the summaries and descriptions of MicroShift RPM packages
+
 * Tue Dec 06 2022 Patryk Matuszak <pmatusza@redhat.com> 4.12.0
 - Add commit macro and embed it into binary
 

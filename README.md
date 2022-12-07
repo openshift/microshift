@@ -1,16 +1,23 @@
 # MicroShift
 
-MicroShift is a project that is exploring how OpenShift Kubernetes can be optimized for small form factor and edge computing.
+MicroShift is a project that optimizes OpenShift Kubernetes for small
+form factor and edge computing.
 
-Edge devices deployed out in the field pose very different operational, environmental, and business challenges from those of cloud computing. These motivate different engineering trade-offs for Kubernetes at the far edge than for cloud or near-edge scenarios. MicroShift's design goals cater to this:
+Edge devices deployed out in the field pose very different operational,
+environmental, and business challenges from those of cloud computing.
+These motivate different engineering trade-offs for Kubernetes at the
+far edge than for cloud or near-edge scenarios.
 
-- make frugal use of system resources (CPU, memory, network, storage, etc.),
-- tolerate severe networking constraints,
-- update (resp. rollback) securely, safely, speedily, and seamlessly (without disrupting workloads), and
-- build on and integrate cleanly with edge-optimized OSes like Fedora IoT and RHEL for Edge, while
-- providing a consistent development and management experience with standard OpenShift.
+MicroShift design goals cater to this:
+- make frugal use of system resources (CPU, memory, network, storage, etc.)
+- tolerate severe networking constraints
+- update securely, safely, speedily, and seamlessly (without disrupting workloads)
+- build on and integrate cleanly with edge-optimized operating systems like RHEL for Edge
+- provide a consistent development and management experience with standard OpenShift
 
-We believe these properties should also make MicroShift a great tool for other use cases such as Kubernetes applications development on resource-constrained systems, scale testing, and provisioning of lightweight Kubernetes control planes.
+These properties should also make MicroShift a great tool for other use cases
+such as Kubernetes applications development on resource-constrained systems,
+scale testing, and provisioning of lightweight Kubernetes control planes.
 
 ## System Requirements
 To run MicroShift, you need a machine with at least:
