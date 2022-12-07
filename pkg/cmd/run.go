@@ -36,7 +36,7 @@ func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags.String("cluster-cidr", cfg.Cluster.ClusterCIDR, "The IP range in CIDR notation for pods in the cluster.")
 	flags.String("service-cidr", cfg.Cluster.ServiceCIDR, "The IP range in CIDR notation for services in the cluster.")
 	flags.String("service-node-port-range", cfg.Cluster.ServiceNodePortRange, "The port range to reserve for services with NodePort visibility. This must not overlap with the ephemeral port range on nodes.")
-	flags.String("cluster-domain", cfg.Cluster.Domain, "Domain for this cluster.")
+	flags.String("base-domain", cfg.BaseDomain, "Base domain for this cluster.")
 }
 
 func NewRunMicroshiftCommand() *cobra.Command {
@@ -75,7 +75,8 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 		cfg.Cluster.ClusterCIDR,
 		cfg.Cluster.ServiceCIDR,
 		".svc",
-		"."+cfg.Cluster.Domain); err != nil {
+		".cluster.local",
+		"."+cfg.BaseDomain); err != nil {
 		klog.Fatal(err)
 	}
 

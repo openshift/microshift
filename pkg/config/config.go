@@ -50,7 +50,6 @@ type ClusterConfig struct {
 	ServiceCIDR          string `json:"serviceCIDR"`
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
 	DNS                  string `json:"-"`
-	Domain               string `json:"domain"`
 }
 
 type IngressConfig struct {
@@ -61,21 +60,22 @@ type IngressConfig struct {
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
-	SubjectAltNames []string `json:"subjectAltNames"`
-	NodeName        string   `json:"nodeName"`
-	NodeIP          string   `json:"nodeIP"`
-
-	Cluster ClusterConfig `json:"cluster"`
+	SubjectAltNames []string      `json:"subjectAltNames"`
+	NodeName        string        `json:"nodeName"`
+	NodeIP          string        `json:"nodeIP"`
+	BaseDomain      string        `json:"baseDomain"`
+	Cluster         ClusterConfig `json:"cluster"`
 
 	Ingress IngressConfig `json:"-"`
 }
 
-// Top level config
+// Top level config file
 type Config struct {
 	NodeName        string    `json:"nodeName"`
 	NodeIP          string    `json:"nodeIP"`
 	URL             string    `json:"url"`
 	Network         Network   `json:"network"`
+	ClusterName     string    `json:"clusterName"`
 	DNS             DNS       `json:"dns"`
 	Debugging       Debugging `json:"debugging"`
 	SubjectAltNames []string  `json:"subjectAltNames"`
@@ -191,12 +191,12 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		SubjectAltNames: subjectAltNames,
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
+		BaseDomain:      "openshift.example.com",
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
 			ServiceCIDR:          "10.43.0.0/16",
 			ServiceNodePortRange: "30000-32767",
-			Domain:               "cluster.local",
 		},
 	}
 }
@@ -345,7 +345,7 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 		c.Cluster.ServiceNodePortRange = config.Network.ServiceNodePortRange
 	}
 	if config.DNS.BaseDomain != "" {
-		c.Cluster.Domain = config.DNS.BaseDomain
+		c.BaseDomain = config.DNS.BaseDomain
 	}
 	if len(config.SubjectAltNames) > 0 {
 		c.SubjectAltNames = config.SubjectAltNames
@@ -386,8 +386,8 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if s, err := flags.GetString("service-node-port-range"); err == nil && flags.Changed("service-node-port-range") {
 		c.Cluster.ServiceNodePortRange = s
 	}
-	if s, err := flags.GetString("cluster-domain"); err == nil && flags.Changed("cluster-domain") {
-		c.Cluster.Domain = s
+	if s, err := flags.GetString("base-domain"); err == nil && flags.Changed("base-domain") {
+		c.BaseDomain = s
 	}
 
 	return nil

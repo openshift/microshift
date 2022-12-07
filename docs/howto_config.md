@@ -34,7 +34,7 @@ The configuration settings alongside with the supported command line arguments a
 | cidr (clusterNetwork) | --cluster-cidr            | MICROSHIFT_CLUSTER_CLUSTERCIDR          | A block of IP addresses from which Pod IP addresses are allocated
 | serviceNetwork        | --service-cidr            | MICROSHIFT_CLUSTER_SERVICECIDR          | A block of virtual IP addresses for Kubernetes services
 | serviceNodePortRange  | --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort
-| baseDomain            | --cluster-domain          | MICROSHIFT_CLUSTER_DOMAIN               | Base DNS domain used to construct fully qualified pod and service domain names
+| baseDomain            | --base-domain             | MICROSHIFT_BASEDOMAIN                   | Base DNS domain used to construct fully qualified pod and service domain names
 | url                   | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
 | nodeIP                | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
 | nodeName              | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname

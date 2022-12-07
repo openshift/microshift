@@ -22,13 +22,13 @@ var templateFuncs = map[string]interface{}{
 
 func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderParams) assets.RenderParams {
 	params := map[string]interface{}{
-		"ReleaseImage":  release.Image,
-		"NodeName":      cfg.NodeName,
-		"NodeIP":        cfg.NodeIP,
-		"ClusterCIDR":   cfg.Cluster.ClusterCIDR,
-		"ServiceCIDR":   cfg.Cluster.ServiceCIDR,
-		"ClusterDNS":    cfg.Cluster.DNS,
-		"ClusterDomain": cfg.Cluster.Domain,
+		"ReleaseImage": release.Image,
+		"NodeName":     cfg.NodeName,
+		"NodeIP":       cfg.NodeIP,
+		"ClusterCIDR":  cfg.Cluster.ClusterCIDR,
+		"ServiceCIDR":  cfg.Cluster.ServiceCIDR,
+		"ClusterDNS":   cfg.Cluster.DNS,
+		"BaseDomain":   cfg.BaseDomain,
 	}
 	for k, v := range extra {
 		params[k] = v
