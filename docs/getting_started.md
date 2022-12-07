@@ -43,6 +43,7 @@ virt-install \
     --events on_reboot=restart \
     --location ${DVDISO} \
     --extra-args \"inst.ks=${KICKSTART}\" \
+    --wait \
 "
 ```
 
