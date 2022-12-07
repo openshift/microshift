@@ -256,7 +256,7 @@ systemctl enable --now --quiet openvswitch || true
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" microshift.spec
 %changelog
 * Tue Dec 06 2022 Patryk Matuszak <pmatusza@redhat.com> 4.12.0
-- Add %{commit} and embed it into binary
+- Add commit macro and embed it into binary
 
 * Wed Nov 30 2022 Patryk Matuszak <pmatusza@redhat.com> 4.12.0
 - Pass %{version} to Makefile
