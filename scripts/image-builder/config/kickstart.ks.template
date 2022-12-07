@@ -7,7 +7,7 @@ reboot
 # Configure network to use DHCP and activate on boot
 network --bootproto=dhcp --device=link --activate --onboot=on
 
-# Partition disk with a 1GB boot XFS partition and an LVM volume containing a 8GB+ system root
+# Partition disk with a 1GB boot XFS partition and an LVM volume containing a 10GB+ system root
 # The remainder of the volume will be used by the CSI driver for storing data
 #
 # For example, a 20GB disk would be partitioned in the following way:
@@ -17,7 +17,7 @@ network --bootproto=dhcp --device=link --activate --onboot=on
 # ├─sda1          8:1    0 200M  0 part /boot/efi
 # ├─sda1          8:1    0 800M  0 part /boot
 # └─sda2          8:2    0  19G  0 part 
-#  └─rhel-root  253:0    0   8G  0 lvm  /sysroot
+#  └─rhel-root  253:0    0  10G  0 lvm  /sysroot
 #
 zerombr
 clearpart --all --initlabel

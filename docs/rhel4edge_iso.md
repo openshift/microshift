@@ -62,7 +62,7 @@ Optional arguments:
           server (default: 127.0.0.1:8080)
   -lvm_sysroot_size num_in_MB
           Size of the system root LVM partition. The remaining
-          disk space will be allocated for data (default: 8192)
+          disk space will be allocated for data (default: 10240)
   -authorized_keys_file path_to_file
           Path to an SSH authorized_keys file to allow SSH access
           into the default 'redhat' account
@@ -95,12 +95,12 @@ By default, the following partition layout is created and formatted with the `XF
 * EFI partition with EFI file system (200MB)
 * Boot partition is allocated on a 1GB volume
 * The rest of the disk is managed by the `LVM` in a single volume group named `rhel`
-  * System root partition is allocated on a 8GB volume (minimal recommended size for a root partition)
+  * System root partition is allocated on a 10GB volume (minimal recommended size for a root partition)
   * The remainder of the volume group will be used by the CSI driver for storing data (no need to format and mount it)
 
 > The swap partition is not created as it is not required by MicroShift.
 
-The `scripts/image-builder/build.sh` script provides for the optional `-lvm_sysroot_size` command line parameter allowing to increase the system root partition size from the default 8GB.
+The `scripts/image-builder/build.sh` script provides for the optional `-lvm_sysroot_size` command line parameter allowing to increase the system root partition size from the default 10GB.
 > The system root partition size should be specified in megabytes.
 
 As an example, a 20GB disk is partitioned in the following manner by default.
@@ -111,13 +111,13 @@ sda             8:0    0   20G  0 disk
 ├─sda1          8:1    0  200M  0 part /boot/efi
 ├─sda2          8:2    0  800M  0 part /boot
 └─sda3          8:3    0   19G  0 part
-  └─rhel-root 253:0    0    8G  0 lvm  /sysroot
+  └─rhel-root 253:0    0   10G  0 lvm  /sysroot
 
 $ sudo vgdisplay -s
-  "rhel" <18.80 GiB [8.00 GiB  used / <11 GiB free]
+  "rhel" <19.02 GiB [10.00 GiB  used / <9.02 GiB free]
 ```
 
-> Unallocated disk space of 11GB size remains in the `rhel` volume group to be used by the CSI driver.
+> Unallocated disk space of 9GB size remains in the `rhel` volume group to be used by the CSI driver.
 
 ### Offline Containers
 The `scripts/image-builder/build.sh` script supports a special mode for including the MicroShift container image dependencies into the generated ISO. When the container images required by MicroShift are preinstalled, `CRI-O` does not attempt to pull them when MicroShift service is first started, saving network bandwidth and avoiding external network connections.

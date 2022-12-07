@@ -20,15 +20,18 @@ such as Kubernetes applications development on resource-constrained systems,
 scale testing, and provisioning of lightweight Kubernetes control planes.
 
 ## System Requirements
-To run MicroShift, you need a machine with at least:
+To run MicroShift, the minimum system requirements are:
 
-- x86_64/AMD64 or ARM64 CPU architecture
+- x86_64 or aarch64 CPU architecture
 - Red Hat Enterprise Linux 8 with Extended Update Support (8.6 or later)
 - 2 CPU cores
 - 2GB of RAM
-- 1GB of free storage space for MicroShift
+- 2GB of free system root storage for MicroShift and its container images
 
 > The system requirements also include resources for the operating system unless explicitly mentioned otherwise.
+
+Depending on user workload requirements, it may be necessary to add more resources i.e. CPU and RAM for better
+performance, disk space in a root partition for container images, an LVM group for container storage, etc.
 
 ## Deploying MicroShift on Edge Devices
 For production deployments, MicroShift can be run on bare metal hardware or hypervisors supported and certified for the Red Hat Enterprise Linux 8 operating system.

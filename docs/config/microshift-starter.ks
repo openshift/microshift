@@ -7,7 +7,7 @@ reboot
 # Configure network to use DHCP and activate on boot
 network --bootproto=dhcp --device=link --activate --onboot=on --hostname=microshift-starter.local --noipv6
 
-# Partition disk with a 1GB boot XFS partition and a 8GB LVM volume containing system root
+# Partition disk with a 1GB boot XFS partition and a 10GB LVM volume containing system root
 # The remainder of the volume will be used by the CSI driver for storing data
 zerombr
 clearpart --all --initlabel
@@ -15,7 +15,7 @@ part /boot/efi --fstype=efi --size=200
 part /boot --fstype=xfs --asprimary --size=800
 part pv.01 --grow
 volgroup rhel pv.01
-logvol / --vgname=rhel --fstype=xfs --size=8192 --name=root
+logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
 
 # Configure users
 rootpw --lock
