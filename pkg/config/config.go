@@ -70,6 +70,48 @@ type MicroshiftConfig struct {
 	Ingress IngressConfig `json:"-"`
 }
 
+// Top level config
+type Config struct {
+	NodeName        string    `json:"nodeName"`
+	NodeIP          string    `json:"nodeIP"`
+	URL             string    `json:"url"`
+	ClusterDomain   string    `json:"clusterDomain"`
+	Network         Network   `json:"network"`
+	Debugging       Debugging `json:"debugging"`
+	SubjectAltNames []string  `json:"subjectAltNames"`
+}
+
+type Network struct {
+	// IP address pool to use for pod IPs.
+	// This field is immutable after installation.
+	ClusterNetwork []ClusterNetworkEntry `json:"clusterNetwork,omitempty"`
+
+	// IP address pool for services.
+	// Currently, we only support a single entry here.
+	// This field is immutable after installation.
+	ServiceNetwork []string `json:"serviceNetwork,omitempty"`
+
+	// The port range allowed for Services of type NodePort.
+	// If not specified, the default of 30000-32767 will be used.
+	// Such Services without a NodePort specified will have one
+	// automatically allocated from this range.
+	// This parameter can be updated after the cluster is
+	// installed.
+	// +kubebuilder:validation:Pattern=`^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])-([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$`
+	ServiceNodePortRange string `json:"serviceNodePortRange,omitempty"`
+}
+
+type ClusterNetworkEntry struct {
+	// The complete block for pod IPs.
+	CIDR string `json:"cidr,omitempty"`
+}
+
+type Debugging struct {
+	// Valid values are: "Normal", "Debug", "Trace", "TraceAll".
+	// Defaults to "Normal".
+	LogLevel string `json:"logLevel"`
+}
+
 func GetConfigFile() string {
 	return configFile
 }
@@ -266,9 +308,36 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	if err != nil {
 		return fmt.Errorf("reading config file %q: %v", configFile, err)
 	}
+	var config Config
+	if err := yaml.Unmarshal(contents, &config); err != nil {
+		return fmt.Errorf("decoding config file %s: %v", configFile, err)
+	}
 
-	if err := yaml.Unmarshal(contents, c); err != nil {
-		return fmt.Errorf("decoding config file %q: %v", configFile, err)
+	// Wire new Config type to existing MicroshiftConfig
+	c.LogVLevel = config.GetVerbosity()
+	if config.NodeName != "" {
+		c.NodeName = config.NodeName
+	}
+	if config.NodeIP != "" {
+		c.NodeIP = config.NodeIP
+	}
+	if config.URL != "" {
+		c.Cluster.URL = config.URL
+	}
+	if len(config.Network.ClusterNetwork) != 0 {
+		c.Cluster.ClusterCIDR = config.Network.ClusterNetwork[0].CIDR
+	}
+	if len(config.Network.ServiceNetwork) != 0 {
+		c.Cluster.ServiceCIDR = config.Network.ServiceNetwork[0]
+	}
+	if config.Network.ServiceNodePortRange != "" {
+		c.Cluster.ServiceNodePortRange = config.Network.ServiceNodePortRange
+	}
+	if config.ClusterDomain != "" {
+		c.Cluster.Domain = config.ClusterDomain
+	}
+	if len(config.SubjectAltNames) > 0 {
+		c.SubjectAltNames = config.SubjectAltNames
 	}
 
 	return nil
@@ -435,4 +504,22 @@ func HideUnsupportedFlags(flags *pflag.FlagSet) {
 	})
 
 	flags.MarkHidden("version")
+}
+
+// GetVerbosity returns the numerical value for LogLevel which is an enum
+func (c *Config) GetVerbosity() int {
+	var verbosity int
+	switch c.Debugging.LogLevel {
+	case "Normal":
+		verbosity = 2
+	case "Debug":
+		verbosity = 4
+	case "Trace":
+		verbosity = 6
+	case "TraceAll":
+		verbosity = 8
+	default:
+		verbosity = 2
+	}
+	return verbosity
 }
