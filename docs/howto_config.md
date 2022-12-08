@@ -56,7 +56,7 @@ network:
     - 10.43.0.0/16
   serviceNodePortRange: 30000-32767
 dns:
-  baseDomain: cluster.local
+  baseDomain: microshift.example.com
 debugging:
   logLevel: "Normal"
 ```

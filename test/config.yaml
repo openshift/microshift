@@ -11,6 +11,6 @@ network:
     - '40.30.20.10/16'
   serviceNodePortRange: 30000-32767
 dns:
-  baseDomain: 'openshift.example.com'
+  baseDomain: 'microshift.example.com'
 debugging:
   logLevel: 'Debug'

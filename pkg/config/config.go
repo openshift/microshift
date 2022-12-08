@@ -44,8 +44,7 @@ var (
 )
 
 type ClusterConfig struct {
-	URL string `json:"url"`
-
+	URL                  string `json:"url"`
 	ClusterCIDR          string `json:"clusterCIDR"`
 	ServiceCIDR          string `json:"serviceCIDR"`
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
@@ -75,7 +74,6 @@ type Config struct {
 	NodeIP          string    `json:"nodeIP"`
 	URL             string    `json:"url"`
 	Network         Network   `json:"network"`
-	ClusterName     string    `json:"clusterName"`
 	DNS             DNS       `json:"dns"`
 	Debugging       Debugging `json:"debugging"`
 	SubjectAltNames []string  `json:"subjectAltNames"`
@@ -110,8 +108,8 @@ type DNS struct {
 	// baseDomain is the base domain of the cluster. All managed DNS records will
 	// be sub-domains of this base.
 	//
-	// For example, given the base domain `openshift.example.com`, an API server
-	// DNS record may be created for `cluster-api.openshift.example.com`.
+	// For example, given the base domain `microshift.example.com`, an API server
+	// DNS record may be created for `cluster-api.microshift.example.com`.
 	//
 	// Once set, this field cannot be changed.
 	BaseDomain string `json:"baseDomain"`
@@ -191,7 +189,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		SubjectAltNames: subjectAltNames,
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
-		BaseDomain:      "openshift.example.com",
+		BaseDomain:      "microshift.example.com",
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
