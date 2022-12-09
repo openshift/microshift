@@ -113,7 +113,7 @@ failSwapOn: false
 volumePluginDir: ` + microshiftDataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
   - ` + cfg.Cluster.DNS + `
-clusterDomain: ` + cfg.Cluster.Domain + `
+clusterDomain: cluster.local
 containerLogMaxSize: 50Mi
 maxPods: 250
 kubeAPIQPS: 50

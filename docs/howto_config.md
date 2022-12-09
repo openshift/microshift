@@ -15,13 +15,14 @@ subjectAltNames:
 nodeName: ""
 nodeIP: ""
 url: ""
-clusterDomain: ""
 network:
   clusterNetwork:
     - cidr: ""
   serviceNetwork:
     - ""
   serviceNodePortRange: ""
+dns:
+  baseDomain: ""
 debugging:
   logLevel: ""
 ```
@@ -33,7 +34,7 @@ The configuration settings alongside with the supported command line arguments a
 | cidr (clusterNetwork) | --cluster-cidr            | MICROSHIFT_CLUSTER_CLUSTERCIDR          | A block of IP addresses from which Pod IP addresses are allocated
 | serviceNetwork        | --service-cidr            | MICROSHIFT_CLUSTER_SERVICECIDR          | A block of virtual IP addresses for Kubernetes services
 | serviceNodePortRange  | --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort
-| clusterDomain         | --cluster-domain          | MICROSHIFT_CLUSTER_DOMAIN               | Base DNS domain used to construct fully qualified pod and service domain names
+| baseDomain            | --base-domain             | MICROSHIFT_BASEDOMAIN                   | Base DNS domain used to construct fully qualified router and API domain names.
 | url                   | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
 | nodeIP                | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
 | nodeName              | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
@@ -48,13 +49,14 @@ In case `config.yaml` is not provided, the following default settings will be us
 nodeName: ""
 nodeIP: ""
 url: https://127.0.0.1:6443
-clusterDomain: cluster.local
 network:
   clusterNetwork:
     - cidr: 10.42.0.0/16
   serviceNetwork:
     - 10.43.0.0/16
   serviceNodePortRange: 30000-32767
+dns:
+  baseDomain: example.com
 debugging:
   logLevel: "Normal"
 ```

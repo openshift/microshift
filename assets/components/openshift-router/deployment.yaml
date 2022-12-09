@@ -34,7 +34,7 @@ spec:
             - name: ROUTER_ALLOW_WILDCARD_ROUTES
               value: "false"
             - name: ROUTER_CANONICAL_HOSTNAME
-              value: router-default.apps.{{ .ClusterDomain }}
+              value: router-default.apps.{{ .ClusterName }}.{{ .BaseDomain }}
             - name: ROUTER_CIPHERS
               value: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
             - name: ROUTER_CIPHERSUITES
@@ -62,7 +62,7 @@ spec:
             - name: GRACEFUL_SHUTDOWN_DELAY
               value: 1s
             - name: ROUTER_DOMAIN
-              value: apps.{{ .ClusterDomain }}
+              value: apps.{{ .ClusterName }}.{{ .BaseDomain }}
           livenessProbe:
             httpGet:
               path: /healthz

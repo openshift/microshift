@@ -4,12 +4,13 @@ subjectAltNames:
 nodeName: node1
 nodeIP: '1.2.3.4'
 url: https://127.0.0.1:6443
-clusterDomain: 'cluster.local'
 network:
   clusterNetwork:
     - cidr: '10.20.30.40/16'
   serviceNetwork:
     - '40.30.20.10/16'
   serviceNodePortRange: 30000-32767
+dns:
+  baseDomain: 'example.com'
 debugging:
   logLevel: 'Debug'

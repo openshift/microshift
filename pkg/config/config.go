@@ -35,6 +35,7 @@ const (
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
 	defaultManifestDirLib = "/usr/lib/microshift/manifests"
+	DefaultClusterName    = "microshift"
 )
 
 var (
@@ -44,13 +45,11 @@ var (
 )
 
 type ClusterConfig struct {
-	URL string `json:"url"`
-
+	URL                  string `json:"url"`
 	ClusterCIDR          string `json:"clusterCIDR"`
 	ServiceCIDR          string `json:"serviceCIDR"`
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
 	DNS                  string `json:"-"`
-	Domain               string `json:"domain"`
 }
 
 type IngressConfig struct {
@@ -61,22 +60,22 @@ type IngressConfig struct {
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
-	SubjectAltNames []string `json:"subjectAltNames"`
-	NodeName        string   `json:"nodeName"`
-	NodeIP          string   `json:"nodeIP"`
-
-	Cluster ClusterConfig `json:"cluster"`
+	SubjectAltNames []string      `json:"subjectAltNames"`
+	NodeName        string        `json:"nodeName"`
+	NodeIP          string        `json:"nodeIP"`
+	BaseDomain      string        `json:"baseDomain"`
+	Cluster         ClusterConfig `json:"cluster"`
 
 	Ingress IngressConfig `json:"-"`
 }
 
-// Top level config
+// Top level config file
 type Config struct {
 	NodeName        string    `json:"nodeName"`
 	NodeIP          string    `json:"nodeIP"`
 	URL             string    `json:"url"`
-	ClusterDomain   string    `json:"clusterDomain"`
 	Network         Network   `json:"network"`
+	DNS             DNS       `json:"dns"`
 	Debugging       Debugging `json:"debugging"`
 	SubjectAltNames []string  `json:"subjectAltNames"`
 }
@@ -104,6 +103,19 @@ type Network struct {
 type ClusterNetworkEntry struct {
 	// The complete block for pod IPs.
 	CIDR string `json:"cidr,omitempty"`
+}
+
+type DNS struct {
+	// baseDomain is the base domain of the cluster. All managed DNS records will
+	// be sub-domains of this base.
+	//
+	// For example, given the base domain `example.com`, router exposed
+	// domains will be formed as `*.apps.microshift.example.com` by default,
+	// and API service will have a DNS entry for `api.microshift.example.com`,
+	// as well as "api-int.microshift.example.com" for internal k8s API access.
+	//
+	// Once set, this field cannot be changed.
+	BaseDomain string `json:"baseDomain"`
 }
 
 type Debugging struct {
@@ -180,12 +192,12 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		SubjectAltNames: subjectAltNames,
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
+		BaseDomain:      "example.com",
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
 			ServiceCIDR:          "10.43.0.0/16",
 			ServiceNodePortRange: "30000-32767",
-			Domain:               "cluster.local",
 		},
 	}
 }
@@ -333,8 +345,8 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	if config.Network.ServiceNodePortRange != "" {
 		c.Cluster.ServiceNodePortRange = config.Network.ServiceNodePortRange
 	}
-	if config.ClusterDomain != "" {
-		c.Cluster.Domain = config.ClusterDomain
+	if config.DNS.BaseDomain != "" {
+		c.BaseDomain = config.DNS.BaseDomain
 	}
 	if len(config.SubjectAltNames) > 0 {
 		c.SubjectAltNames = config.SubjectAltNames
@@ -375,8 +387,8 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if s, err := flags.GetString("service-node-port-range"); err == nil && flags.Changed("service-node-port-range") {
 		c.Cluster.ServiceNodePortRange = s
 	}
-	if s, err := flags.GetString("cluster-domain"); err == nil && flags.Changed("cluster-domain") {
-		c.Cluster.Domain = s
+	if s, err := flags.GetString("base-domain"); err == nil && flags.Changed("base-domain") {
+		c.BaseDomain = s
 	}
 
 	return nil

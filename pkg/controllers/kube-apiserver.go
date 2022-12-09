@@ -165,7 +165,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 									APIVersion: "route.openshift.io/v1",
 									Kind:       "HostAssignmentAdmissionConfig",
 								},
-								Domain: cfg.Cluster.Domain,
+								Domain: config.DefaultClusterName + "." + cfg.BaseDomain,
 							},
 						},
 					},

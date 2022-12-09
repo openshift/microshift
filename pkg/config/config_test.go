@@ -62,12 +62,12 @@ func TestCommandLineConfig(t *testing.T) {
 				SubjectAltNames: []string{"node1"},
 				NodeName:        "node1",
 				NodeIP:          "1.2.3.4",
+				BaseDomain:      "example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://1.2.3.4:6443",
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
-					Domain:               "cluster.local",
 				},
 			},
 			err: nil,
@@ -87,7 +87,7 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.String("cluster-cidr", config.Cluster.ClusterCIDR, "")
 		flags.String("service-cidr", config.Cluster.ServiceCIDR, "")
 		flags.String("service-node-port-range", config.Cluster.ServiceNodePortRange, "")
-		flags.String("cluster-domain", config.Cluster.Domain, "")
+		flags.String("base-domain", config.BaseDomain, "")
 
 		// parse the flags
 		var err error
@@ -100,7 +100,7 @@ func TestCommandLineConfig(t *testing.T) {
 			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
 			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
 			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
-			"--cluster-domain=" + tt.config.Cluster.Domain,
+			"--base-domain=" + tt.config.BaseDomain,
 		})
 		if err != nil {
 			t.Errorf("failed to parse command line flags: %s", err)
@@ -134,12 +134,12 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				SubjectAltNames: []string{"node1", "node2"},
 				NodeName:        "node1",
 				NodeIP:          "1.2.3.4",
+				BaseDomain:      "example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
-					Domain:               "cluster.local",
 				},
 			},
 			err: nil,
@@ -151,11 +151,11 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_NODENAME", "node1"},
 				{"MICROSHIFT_SUBJECTALTNAMES", "node1,node2"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
+				{"MICROSHIFT_BASEDOMAIN", "example.com"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
 				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
-				{"MICROSHIFT_CLUSTER_DOMAIN", "cluster.local"},
 			},
 		},
 		{
@@ -164,12 +164,12 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				SubjectAltNames: []string{"node1"},
 				NodeName:        "node1",
 				NodeIP:          "1.2.3.4",
+				BaseDomain:      "another.example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
-					Domain:               "cluster.local",
 				},
 			},
 			err: nil,
@@ -181,6 +181,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_NODENAME", "node1"},
 				{"MICROSHIFT_SUBJECTALTNAMES", "node1"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
+				{"MICROSHIFT_BASEDOMAIN", "another.example.com"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},

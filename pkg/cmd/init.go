@@ -214,7 +214,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
 				Hostnames: []string{
-					"router-default.apps." + cfg.Cluster.Domain,
+					"*.apps.microshift." + cfg.BaseDomain, // wildcard for any additional auto-generated domains
 				},
 			},
 		),
@@ -231,7 +231,14 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					Name:         "kube-external-serving",
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
-				Hostnames: append(cfg.SubjectAltNames, cfg.NodeName),
+				Hostnames: append(
+					cfg.SubjectAltNames,
+					cfg.NodeName,
+					"api."+config.DefaultClusterName+"."+cfg.BaseDomain,
+					// TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
+					// but we don't have a ClusterName parameter yet, using microshift
+					// for now
+				),
 			},
 		),
 
@@ -271,6 +278,8 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					"openshift.default",
 					"openshift.default.svc",
 					"openshift.default.svc.cluster.local",
+					"api." + config.DefaultClusterName + "." + cfg.BaseDomain,     // TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
+					"api-int." + config.DefaultClusterName + "." + cfg.BaseDomain, // TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
 					apiServerServiceIP.String(),
 				},
 			},
