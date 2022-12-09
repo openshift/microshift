@@ -35,6 +35,7 @@ const (
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
 	defaultManifestDirLib = "/usr/lib/microshift/manifests"
+	DefaultClusterName    = "microshift"
 )
 
 var (
@@ -108,8 +109,10 @@ type DNS struct {
 	// baseDomain is the base domain of the cluster. All managed DNS records will
 	// be sub-domains of this base.
 	//
-	// For example, given the base domain `microshift.example.com`, an API server
-	// DNS record may be created for `cluster-api.microshift.example.com`.
+	// For example, given the base domain `example.com`, router exposed
+	// domains will be formed as `*.apps.microshift.example.com` by default,
+	// and API service will have a DNS entry for `api.microshift.example.com`,
+	// as well as "api-int.microshift.example.com" for internal k8s API access.
 	//
 	// Once set, this field cannot be changed.
 	BaseDomain string `json:"baseDomain"`
@@ -189,7 +192,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		SubjectAltNames: subjectAltNames,
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
-		BaseDomain:      "microshift.example.com",
+		BaseDomain:      "example.com",
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",

@@ -62,7 +62,7 @@ func TestCommandLineConfig(t *testing.T) {
 				SubjectAltNames: []string{"node1"},
 				NodeName:        "node1",
 				NodeIP:          "1.2.3.4",
-				BaseDomain:      "microshift.example.com",
+				BaseDomain:      "example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://1.2.3.4:6443",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -134,7 +134,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				SubjectAltNames: []string{"node1", "node2"},
 				NodeName:        "node1",
 				NodeIP:          "1.2.3.4",
-				BaseDomain:      "microshift.example.com",
+				BaseDomain:      "example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -151,7 +151,7 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_NODENAME", "node1"},
 				{"MICROSHIFT_SUBJECTALTNAMES", "node1,node2"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
-				{"MICROSHIFT_BASEDOMAIN", "microshift.example.com"},
+				{"MICROSHIFT_BASEDOMAIN", "example.com"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
 				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
