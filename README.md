@@ -50,6 +50,7 @@ To install, configure and run MicroShift, refer to the following documentation:
 - [MicroShift Mitigation of System Configuration Changes](./docs/howto_sysconf_watch.md)
 - [Firewall Configuration](./docs/howto_firewall.md)
 - [Debugging Tips](./docs/debugging_tips.md)
+- [Known Limitations](./docs/known_limitations.md)
 
 ## Developer Documentation
 To build MicroShift from source and contribute to its development, refer to the following documentation:
