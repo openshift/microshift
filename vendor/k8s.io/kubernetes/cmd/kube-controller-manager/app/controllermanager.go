@@ -587,6 +587,7 @@ func CreateControllerContext(s *config.CompletedConfig, rootClientBuilder, clien
 		ResyncPeriod:                    ResyncPeriod(s),
 		ControllerManagerMetrics:        controllersmetrics.NewControllerManagerMetrics("kube-controller-manager"),
 	}
+	controllersmetrics.Register()
 	return ctx, nil
 }
 
