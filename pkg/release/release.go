@@ -16,7 +16,7 @@ limitations under the License.
 
 package release
 
-var Base = "4.12.0-0.nightly-2022-12-07-182824"
+var Base = "4.12.0-0.nightly-2022-12-08-234300"
 
 var Image = map[string]string{
 	"cli":                       "quay.io/microshift/cli:" + Base,

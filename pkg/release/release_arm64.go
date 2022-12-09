@@ -31,8 +31,8 @@ func init() {
 		"csi_external_resizer":      "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b9524eb63c3408c2889ec926f2ebdf9d4ab4689c3ad50594eb8d80a9bdd0dbc9",
 		"csi_node_driver_registrar": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:66d99027850fac4ed6f6f9cef8f6247c08881f75648492b76a9e7f50ff9dc115",
 		"csi_livenessprobe":         "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ea75863f09d2a45ef549e08b6c75fe2058ca142ecc53d793408d5a80982c90d7",
-		"ovn_kubernetes_microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5a1d281f545e66780586235bc335adbb1a241c69ee8ed956935e220ee4a65bd6",
-		"pod":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e7bb4ac0d2f6236772b8f5eb7fc67b1651c03ddc8dc1119d413ec75327d80735",
+		"ovn_kubernetes_microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:eef1d51fa5ed70c81dc46cb60ed88331e496aeddd64a79e1bd67d0534753d6dd",
+		"pod":                       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:fc1bb41085a8bb979c1d5242c8925174a1265483a0295943fe3f7c90a3939b2d",
 		"service_ca_operator":       "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2b601e2889b25a6175c9d65c834c310262696094a9bcb5f49d6c4e2682392727",
 	}
 }
