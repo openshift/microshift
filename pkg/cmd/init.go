@@ -234,7 +234,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 				Hostnames: append(
 					cfg.SubjectAltNames,
 					cfg.NodeName,
-					"api.microshift."+cfg.BaseDomain,
+					"api."+config.DefaultClusterName+"."+cfg.BaseDomain,
 					// TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
 					// but we don't have a ClusterName parameter yet, using microshift
 					// for now
@@ -278,8 +278,8 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					"openshift.default",
 					"openshift.default.svc",
 					"openshift.default.svc.cluster.local",
-					"api.microshift." + cfg.BaseDomain,     // TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
-					"api-int.microshift." + cfg.BaseDomain, // TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
+					"api." + config.DefaultClusterName + "." + cfg.BaseDomain,     // TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
+					"api-int." + config.DefaultClusterName + "." + cfg.BaseDomain, // TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
 					apiServerServiceIP.String(),
 				},
 			},
