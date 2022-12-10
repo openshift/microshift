@@ -80,7 +80,7 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 
 	// run readiness check
 	go func() {
-		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10259/healthz")
+		healthcheckStatus := util.RetryInsecureHttpsGet("https://localhost:10259/healthz")
 		if healthcheckStatus != 200 {
 			klog.Errorf("%s healthcheck failed", s.Name(), fmt.Errorf("kube-scheduler failed to start"))
 			errorChannel <- errors.New("kube-scheduler healthcheck failed")

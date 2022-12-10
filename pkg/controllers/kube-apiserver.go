@@ -128,11 +128,12 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"etcd-certfile":     {cryptomaterial.ClientCertPath(etcdClientCertDir)},
 			"etcd-keyfile":      {cryptomaterial.ClientKeyPath(etcdClientCertDir)},
 			"etcd-servers": {
-				"https://127.0.0.1:2379",
+				"https://localhost:2379",
 			},
-			"kubelet-certificate-authority": {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
-			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
-			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
+			"kubelet-certificate-authority":   {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
+			"kubelet-client-certificate":      {cryptomaterial.ClientCertPath(kubeletClientDir)},
+			"kubelet-client-key":              {cryptomaterial.ClientKeyPath(kubeletClientDir)},
+			"kubelet-preferred-address-types": {"Hostname"},
 
 			"proxy-client-cert-file":           {cryptomaterial.ClientCertPath(aggregatorClientCertDir)},
 			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},

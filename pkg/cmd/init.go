@@ -180,7 +180,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 						Name:         "kubelet-server",
 						ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 					},
-					Hostnames: []string{cfg.NodeName, cfg.NodeIP},
+					Hostnames: []string{cfg.NodeName},
 				},
 			),
 		),
@@ -261,7 +261,6 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
 				Hostnames: []string{
-					"127.0.0.1",
 					"localhost",
 				},
 			},
@@ -315,7 +314,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-peer:etcd-client", Groups: []string{"system:etcd-peers"}},
-				Hostnames: []string{"localhost", cfg.NodeIP, "127.0.0.1", cfg.NodeName},
+				Hostnames: []string{"localhost", cfg.NodeName},
 			},
 			&certchains.PeerCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -323,7 +322,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-server:etcd-client", Groups: []string{"system:etcd-servers"}},
-				Hostnames: []string{"localhost", "127.0.0.1", cfg.NodeIP, cfg.NodeName},
+				Hostnames: []string{"localhost", cfg.NodeName},
 			},
 		),
 	).WithCABundle(
