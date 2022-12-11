@@ -64,7 +64,7 @@ func TestCommandLineConfig(t *testing.T) {
 				NodeIP:          "1.2.3.4",
 				BaseDomain:      "example.com",
 				Cluster: ClusterConfig{
-					URL:                  "https://1.2.3.4:6443",
+					URL:                  "https://127.0.0.1:6443",
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
@@ -83,7 +83,6 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.StringSlice("subject-alt-names", config.SubjectAltNames, "")
 		flags.String("hostname-override", config.NodeName, "")
 		flags.String("node-ip", config.NodeIP, "")
-		flags.String("url", config.Cluster.URL, "")
 		flags.String("cluster-cidr", config.Cluster.ClusterCIDR, "")
 		flags.String("service-cidr", config.Cluster.ServiceCIDR, "")
 		flags.String("service-node-port-range", config.Cluster.ServiceNodePortRange, "")
@@ -96,7 +95,6 @@ func TestCommandLineConfig(t *testing.T) {
 			"--subject-alt-names=" + strings.Join(tt.config.SubjectAltNames, ","),
 			"--hostname-override=" + tt.config.NodeName,
 			"--node-ip=" + tt.config.NodeIP,
-			"--url=" + tt.config.Cluster.URL,
 			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
 			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
 			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,

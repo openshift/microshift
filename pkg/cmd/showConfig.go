@@ -48,7 +48,6 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 				klog.Fatal("logVLevel out of range [0..%d] %d", len(logLevels)-1, cfg.LogVLevel)
 			}
 			userCfg := config.Config{
-				URL: cfg.Cluster.URL,
 				Network: config.Network{
 					ClusterNetwork: []config.ClusterNetworkEntry{
 						{CIDR: cfg.Cluster.ClusterCIDR},

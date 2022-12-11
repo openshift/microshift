@@ -45,7 +45,7 @@ var (
 )
 
 type ClusterConfig struct {
-	URL                  string `json:"url"`
+	URL                  string `json:"-"`
 	ClusterCIDR          string `json:"clusterCIDR"`
 	ServiceCIDR          string `json:"serviceCIDR"`
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
@@ -71,7 +71,6 @@ type MicroshiftConfig struct {
 
 // Top level config file
 type Config struct {
-	URL       string    `json:"url"`
 	DNS       DNS       `json:"dns"`
 	Network   Network   `json:"network"`
 	Node      Node      `json:"node"`
@@ -346,9 +345,6 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	if config.Node.NodeIP != "" {
 		c.NodeIP = config.Node.NodeIP
 	}
-	if config.URL != "" {
-		c.Cluster.URL = config.URL
-	}
 	if len(config.Network.ClusterNetwork) != 0 {
 		c.Cluster.ClusterCIDR = config.Network.ClusterNetwork[0].CIDR
 	}
@@ -387,9 +383,6 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	}
 	if s, err := flags.GetString("node-ip"); err == nil && flags.Changed("node-ip") {
 		c.NodeIP = s
-	}
-	if s, err := flags.GetString("url"); err == nil && flags.Changed("url") {
-		c.Cluster.URL = s
 	}
 	if s, err := flags.GetString("cluster-cidr"); err == nil && flags.Changed("cluster-cidr") {
 		c.Cluster.ClusterCIDR = s

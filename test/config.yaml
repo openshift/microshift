@@ -1,5 +1,4 @@
 ---
-url: https://127.0.0.1:6443
 network:
   clusterNetwork:
     - cidr: '10.20.30.40/16'
