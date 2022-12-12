@@ -40,6 +40,7 @@ In the OS installation wizard, set the following options:
     - Under "New Red Hat Enterprise Linux 8.x Installation", click "Click here to create them automatically"
     - Select the root partition (`/`)
         - On the right side of the menu, set "Desired Capacity" to `40 GiB`
+        - On the right side of the menu, verify the volume group is `rhel`.
         - Click "Update Settings" button
         > This will preserve the rest of the allocatable storage for dynamically provisioned logical volumes. The MicroShift default CSI provisioner requires at least 1GB of unallocated storage in the volume group. Adjust the capacity as desired.
     - Click "Done" button.
