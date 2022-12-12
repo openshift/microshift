@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/klog/v2"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"sigs.k8s.io/yaml"
 
@@ -41,7 +42,31 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 				cmdutil.CheckErr(fmt.Errorf("Unknown mode %q", opts.Mode))
 			}
 
-			marshalled, err := yaml.Marshal(cfg)
+			// map back from internal representation to user config
+			logLevels := []string{"", "", "Normal", "", "Debug", "", "Trace", "", "TraceAll"}
+			if cfg.LogVLevel < 0 || cfg.LogVLevel >= len(logLevels) {
+				klog.Fatal("logVLevel out of range [0..%d] %d", len(logLevels)-1, cfg.LogVLevel)
+			}
+			userCfg := config.Config{
+				NodeName: cfg.NodeName,
+				NodeIP:   cfg.NodeIP,
+				URL:      cfg.Cluster.URL,
+				Network: config.Network{
+					ClusterNetwork: []config.ClusterNetworkEntry{
+						{CIDR: cfg.Cluster.ClusterCIDR},
+					},
+					ServiceNetwork:       []string{cfg.Cluster.ServiceCIDR},
+					ServiceNodePortRange: cfg.Cluster.ServiceNodePortRange,
+				},
+				DNS: config.DNS{
+					BaseDomain: cfg.BaseDomain,
+				},
+				Debugging: config.Debugging{
+					LogLevel: logLevels[cfg.LogVLevel],
+				},
+				SubjectAltNames: cfg.SubjectAltNames,
+			}
+			marshalled, err := yaml.Marshal(userCfg)
 			cmdutil.CheckErr(err)
 
 			fmt.Fprintf(ioStreams.Out, "%s\n", string(marshalled))
