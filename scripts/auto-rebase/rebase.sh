@@ -691,6 +691,9 @@ rebase_to() {
     else
         echo "No changes to buildfiles."
     fi
+
+    title "# Removing staging directory"
+    rm -rf "$REPOROOT/_output"
 }
 
 
