@@ -48,7 +48,8 @@ def create_or_get_pr_url(ghrepo):
     elif prs.totalCount > 1:
         print(f"Found several existing PRs for '{r.active_branch.name}': {[(x.state, x.html_url) for x in prs]}")
     else:
-        pr = ghrepo.create_pull(title=r.active_branch.name, body='', base='main', head=r.active_branch.name, maintainer_can_modify=True)
+        body = f"{r.active_branch.name}\n\n/label tide/merge-method-squash"
+        pr = ghrepo.create_pull(title=r.active_branch.name, body=body, base='main', head=r.active_branch.name, maintainer_can_modify=True)
         print(f"Created pull request: {pr.html_url}")
 
 
