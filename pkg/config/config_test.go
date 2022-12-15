@@ -81,7 +81,7 @@ func TestCommandLineConfig(t *testing.T) {
 		// all other flags unbound (looked up by name) and defaulted
 		flags.Int("v", config.LogVLevel, "")
 		flags.StringSlice("subject-alt-names", config.SubjectAltNames, "")
-		flags.String("node-name", config.NodeName, "")
+		flags.String("hostname-override", config.NodeName, "")
 		flags.String("node-ip", config.NodeIP, "")
 		flags.String("url", config.Cluster.URL, "")
 		flags.String("cluster-cidr", config.Cluster.ClusterCIDR, "")
@@ -94,7 +94,7 @@ func TestCommandLineConfig(t *testing.T) {
 		err = flags.Parse([]string{
 			"--v=" + strconv.Itoa(tt.config.LogVLevel),
 			"--subject-alt-names=" + strings.Join(tt.config.SubjectAltNames, ","),
-			"--node-name=" + tt.config.NodeName,
+			"--hostname-override=" + tt.config.NodeName,
 			"--node-ip=" + tt.config.NodeIP,
 			"--url=" + tt.config.Cluster.URL,
 			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,

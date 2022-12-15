@@ -1,14 +1,20 @@
 ---
-logVLevel: 4
-subjectAltNames:
-  - localhost
-  - '10.43.0.1'
-  - '1.2.3.4'
-nodeName: node1
-nodeIP: '1.2.3.4'
-cluster:
-  url: https://1.2.3.4:6443
-  clusterCIDR: '10.20.30.40/16'
-  serviceCIDR: '40.30.20.10/16'
-  domain: cluster.local
+url: https://127.0.0.1:6443
+network:
+  clusterNetwork:
+    - cidr: '10.20.30.40/16'
+  serviceNetwork:
+    - '40.30.20.10/16'
   serviceNodePortRange: 30000-32767
+dns:
+  baseDomain: 'microshift.example.com'
+node:
+  hostnameOverride: node1
+  nodeIP: '1.2.3.4'
+apiServer:
+  subjectAltNames:
+    - localhost
+    - '10.43.0.1'
+    - '1.2.3.4'
+debugging:
+  logLevel: 'Debug'

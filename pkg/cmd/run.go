@@ -30,13 +30,13 @@ const (
 func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
 	flags := cmd.Flags()
 	// All other flags will be read after reading both config file and env vars.
-	flags.String("node-name", cfg.NodeName, "The hostname of the node.")
+	flags.String("hostname-override", cfg.NodeName, "The name to use to identify this node instead of the hostname.")
 	flags.String("node-ip", cfg.NodeIP, "The IP address of the node.")
 	flags.String("url", cfg.Cluster.URL, "The URL of the API server.")
 	flags.String("cluster-cidr", cfg.Cluster.ClusterCIDR, "The IP range in CIDR notation for pods in the cluster.")
 	flags.String("service-cidr", cfg.Cluster.ServiceCIDR, "The IP range in CIDR notation for services in the cluster.")
 	flags.String("service-node-port-range", cfg.Cluster.ServiceNodePortRange, "The port range to reserve for services with NodePort visibility. This must not overlap with the ephemeral port range on nodes.")
-	flags.String("base-domain", cfg.BaseDomain, "Base domain for this cluster.")
+	flags.String("base-domain", cfg.BaseDomain, "The base domain for this cluster.")
 }
 
 func NewRunMicroshiftCommand() *cobra.Command {

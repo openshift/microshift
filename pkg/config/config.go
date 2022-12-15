@@ -71,13 +71,12 @@ type MicroshiftConfig struct {
 
 // Top level config file
 type Config struct {
-	NodeName        string    `json:"nodeName"`
-	NodeIP          string    `json:"nodeIP"`
-	URL             string    `json:"url"`
-	Network         Network   `json:"network"`
-	DNS             DNS       `json:"dns"`
-	Debugging       Debugging `json:"debugging"`
-	SubjectAltNames []string  `json:"subjectAltNames"`
+	URL       string    `json:"url"`
+	DNS       DNS       `json:"dns"`
+	Network   Network   `json:"network"`
+	Node      Node      `json:"node"`
+	ApiServer ApiServer `json:"apiServer"`
+	Debugging Debugging `json:"debugging"`
 }
 
 type Network struct {
@@ -116,6 +115,20 @@ type DNS struct {
 	//
 	// Once set, this field cannot be changed.
 	BaseDomain string `json:"baseDomain"`
+}
+
+type ApiServer struct {
+	// SubjectAltNames added to API server certs
+	SubjectAltNames []string `json:"subjectAltNames"`
+}
+
+type Node struct {
+	// If non-empty, will use this string to identify the node instead of the hostname
+	HostnameOverride string `json:"hostnameOverride"`
+
+	// IP address of the node, passed to the kubelet.
+	// If not specified, kubelet will use the node's default IP address.
+	NodeIP string `json:"nodeIP"`
 }
 
 type Debugging struct {
@@ -188,7 +201,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 
 	return &MicroshiftConfig{
-		LogVLevel:       0,
+		LogVLevel:       2,
 		SubjectAltNames: subjectAltNames,
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
@@ -327,11 +340,11 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 
 	// Wire new Config type to existing MicroshiftConfig
 	c.LogVLevel = config.GetVerbosity()
-	if config.NodeName != "" {
-		c.NodeName = config.NodeName
+	if config.Node.HostnameOverride != "" {
+		c.NodeName = config.Node.HostnameOverride
 	}
-	if config.NodeIP != "" {
-		c.NodeIP = config.NodeIP
+	if config.Node.NodeIP != "" {
+		c.NodeIP = config.Node.NodeIP
 	}
 	if config.URL != "" {
 		c.Cluster.URL = config.URL
@@ -348,8 +361,8 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	if config.DNS.BaseDomain != "" {
 		c.BaseDomain = config.DNS.BaseDomain
 	}
-	if len(config.SubjectAltNames) > 0 {
-		c.SubjectAltNames = config.SubjectAltNames
+	if len(config.ApiServer.SubjectAltNames) > 0 {
+		c.SubjectAltNames = config.ApiServer.SubjectAltNames
 	}
 
 	return nil
@@ -369,7 +382,7 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if s, err := flags.GetStringSlice("subject-alt-names"); err == nil && flags.Changed("subject-alt-names") {
 		c.SubjectAltNames = s
 	}
-	if s, err := flags.GetString("node-name"); err == nil && flags.Changed("node-name") {
+	if s, err := flags.GetString("hostname-override"); err == nil && flags.Changed("hostname-override") {
 		c.NodeName = s
 	}
 	if s, err := flags.GetString("node-ip"); err == nil && flags.Changed("node-ip") {

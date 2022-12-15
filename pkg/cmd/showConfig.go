@@ -48,9 +48,7 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 				klog.Fatal("logVLevel out of range [0..%d] %d", len(logLevels)-1, cfg.LogVLevel)
 			}
 			userCfg := config.Config{
-				NodeName: cfg.NodeName,
-				NodeIP:   cfg.NodeIP,
-				URL:      cfg.Cluster.URL,
+				URL: cfg.Cluster.URL,
 				Network: config.Network{
 					ClusterNetwork: []config.ClusterNetworkEntry{
 						{CIDR: cfg.Cluster.ClusterCIDR},
@@ -61,10 +59,16 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 				DNS: config.DNS{
 					BaseDomain: cfg.BaseDomain,
 				},
+				Node: config.Node{
+					HostnameOverride: cfg.NodeName,
+					NodeIP:           cfg.NodeIP,
+				},
+				ApiServer: config.ApiServer{
+					SubjectAltNames: cfg.SubjectAltNames,
+				},
 				Debugging: config.Debugging{
 					LogLevel: logLevels[cfg.LogVLevel],
 				},
-				SubjectAltNames: cfg.SubjectAltNames,
 			}
 			marshalled, err := yaml.Marshal(userCfg)
 			cmdutil.CheckErr(err)

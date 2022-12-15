@@ -1,8 +1,4 @@
 ---
-subjectAltNames:
-  - '1.2.3.40'
-nodeName: node1
-nodeIP: '1.2.3.4'
 url: https://127.0.0.1:6443
 network:
   clusterNetwork:
@@ -11,6 +7,12 @@ network:
     - '40.30.20.10/16'
   serviceNodePortRange: 30000-32767
 dns:
-  baseDomain: 'example.com'
+  baseDomain: 'microshift.example.com'
+node:
+  hostnameOverride: node1
+  nodeIP: '1.2.3.4'
+apiServer:
+  subjectAltNames:
+    - '1.2.3.40'
 debugging:
   logLevel: 'Debug'
