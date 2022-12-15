@@ -35,7 +35,6 @@ const (
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
 	defaultManifestDirLib = "/usr/lib/microshift/manifests"
-	DefaultClusterName    = "microshift"
 )
 
 var (
@@ -108,9 +107,9 @@ type DNS struct {
 	// be sub-domains of this base.
 	//
 	// For example, given the base domain `example.com`, router exposed
-	// domains will be formed as `*.apps.microshift.example.com` by default,
-	// and API service will have a DNS entry for `api.microshift.example.com`,
-	// as well as "api-int.microshift.example.com" for internal k8s API access.
+	// domains will be formed as `*.apps.example.com` by default,
+	// and API service will have a DNS entry for `api.example.com`,
+	// as well as "api-int.example.com" for internal k8s API access.
 	//
 	// Once set, this field cannot be changed.
 	BaseDomain string `json:"baseDomain"`

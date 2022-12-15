@@ -214,7 +214,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
 				Hostnames: []string{
-					"*.apps.microshift." + cfg.BaseDomain, // wildcard for any additional auto-generated domains
+					"*.apps." + cfg.BaseDomain, // wildcard for any additional auto-generated domains
 				},
 			},
 		),
@@ -234,10 +234,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 				Hostnames: append(
 					cfg.SubjectAltNames,
 					cfg.NodeName,
-					"api."+config.DefaultClusterName+"."+cfg.BaseDomain,
-					// TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
-					// but we don't have a ClusterName parameter yet, using microshift
-					// for now
+					"api."+cfg.BaseDomain,
 				),
 			},
 		),
@@ -278,8 +275,8 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					"openshift.default",
 					"openshift.default.svc",
 					"openshift.default.svc.cluster.local",
-					"api." + config.DefaultClusterName + "." + cfg.BaseDomain,     // TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
-					"api-int." + config.DefaultClusterName + "." + cfg.BaseDomain, // TODO: OpenShift actually uses  api.$ClusterName.$BaseDomain
+					"api." + cfg.BaseDomain,
+					"api-int." + cfg.BaseDomain,
 					apiServerServiceIP.String(),
 				},
 			},
