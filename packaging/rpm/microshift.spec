@@ -61,7 +61,18 @@ Requires: sos
 %{?systemd_requires}
 
 %description
-The MicroShift package provides an OpenShift Kubernetes distribution optimized for small form factor and edge computing.
+The microshift package provides an OpenShift Kubernetes distribution optimized for small form factor and edge computing.
+
+
+%package release-info
+Summary: Release information for MicroShift
+BuildArch: noarch
+
+%description release-info
+The microshift-release package provides release information files for this
+release. These files contain the list of container image references used by
+MicroShift and can be used to embed those images into osbuilder blueprints.
+
 
 %package selinux
 Summary: SELinux policies for MicroShift
@@ -72,7 +83,8 @@ BuildArch: noarch
 %{?selinux_requires}
 
 %description selinux
-The MicroShift SELinux package provides the SELinux policy modules required by MicroShift.
+The microshift-selinux package provides the SELinux policy modules required by MicroShift.
+
 
 %package networking
 Summary: Networking components for MicroShift
@@ -82,7 +94,8 @@ Requires: NetworkManager-ovs
 Requires: jq
 
 %description networking
-The MicroShift Networking package provides the networking components necessary for the MicroShift default CNI driver.
+The microshift-networking package provides the networking components necessary for the MicroShift default CNI driver.
+
 
 %prep
 
@@ -142,6 +155,10 @@ install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/mi
 
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift
 install -p -m644 packaging/microshift/config.yaml %{buildroot}%{_sysconfdir}/microshift/config.yaml.default
+
+# release-info files
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/release/release*.json %{buildroot}%{_datadir}/microshift/release
 
 # Memory tweaks to the OpenvSwitch services
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d
@@ -212,6 +229,9 @@ systemctl enable --now --quiet openvswitch || true
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
 %config(noreplace) %{_sysconfdir}/microshift/config.yaml.default
 
+%files release-info
+%{_datadir}/microshift/release/release*.json
+
 %files selinux
 
 /var/run/kubelet
@@ -237,6 +257,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Dec 14 2022 Frank A. Zdarsky <fzdarsky@redhat.com> 4.12.0
+- Add microshift-release-info subpackage
+
 * Wed Dec 07 2022 Gregory Giguashvili <ggiguash@redhat.com> 4.12.0
 - Update the summaries and descriptions of MicroShift RPM packages
 
