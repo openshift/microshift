@@ -137,6 +137,28 @@ replace_using_component_commit() {
     fi
 }
 
+# Updates a script to record the last rebase that was run to make it
+# easier to reproduce issues and to test changes to the rebase script
+# against the same set of images.
+update_last_rebase() {
+    local release_image_amd64=$1
+    local release_image_arm64=$2
+
+    title "## updating last_rebase.sh"
+
+    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase.sh"
+
+    cat - >"${last_rebase_script}" <<EOF
+#!/bin/bash -x
+./scripts/auto-rebase/rebase.sh to "${release_image_amd64}" "${release_image_arm64}"
+EOF
+    chmod +x "${last_rebase_script}"
+
+    (cd "${REPOROOT}" && \
+         git add scripts/auto-rebase/last_rebase.sh && \
+         git commit -m "update last_rebase.sh")
+}
+
 # Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
 # and version as per the staged checkout of ${component}.
 update_modulepath_version_from_release() {
@@ -645,6 +667,8 @@ rebase_to() {
     rebase_branch=${rebase_branch%-x86_64}
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
+
+    update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
 
     update_go_mod
     go mod tidy
