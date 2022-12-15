@@ -67,7 +67,7 @@ func TestConfigure(t *testing.T) {
 		"--secure-port=10257",
 		fmt.Sprintf("--service-account-private-key-file=%s", kcmServiceAccountPrivateKeyFile()),
 		"--use-service-account-credentials=true",
-		"-v=0",
+		"-v=2",
 	}
 
 	argsGot := kcm.args

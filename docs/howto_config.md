@@ -10,19 +10,20 @@ The MicroShift configuration file must be located at `~/.microshift/config.yaml`
 The format of the `config.yaml` configuration file is as follows.
 
 ```yaml
-subjectAltNames:
-  - ""
-nodeName: ""
-nodeIP: ""
-url: ""
+dns:
+  baseDomain: ""
 network:
   clusterNetwork:
     - cidr: ""
   serviceNetwork:
     - ""
   serviceNodePortRange: ""
-dns:
-  baseDomain: ""
+node:
+  hostnameOverride: ""
+  nodeIP: ""
+apiServer:
+  subjectAltNames:
+    - ""
 debugging:
   logLevel: ""
 ```
@@ -34,10 +35,9 @@ The configuration settings alongside with the supported command line arguments a
 | cidr (clusterNetwork) | --cluster-cidr            | MICROSHIFT_CLUSTER_CLUSTERCIDR          | A block of IP addresses from which Pod IP addresses are allocated
 | serviceNetwork        | --service-cidr            | MICROSHIFT_CLUSTER_SERVICECIDR          | A block of virtual IP addresses for Kubernetes services
 | serviceNodePortRange  | --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort
-| baseDomain            | --base-domain             | MICROSHIFT_BASEDOMAIN                   | Base DNS domain used to construct fully qualified router and API domain names.
-| url                   | --url                     | MICROSHIFT_CLUSTER_URL                  | URL of the API server for the cluster.
+| baseDomain            | --base-domain             | MICROSHIFT_BASEDOMAIN                   | Base domain of the cluster. All managed DNS records will be sub-domains of this base.
 | nodeIP                | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
-| nodeName              | --node-name               | MICROSHIFT_NODENAME                     | The name of the node, defaults to hostname
+| hostnameOverride      | --hostname-override       | MICROSHIFT_HOSTNAMEOVERRIDE             | The name of the node, defaults to hostname
 | logLevel              | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (Normal, Debug, Trace, TraceAll)
 | subjectAltNames     | --subject-alt-names       | MICROSHIFT_SUBJECTALTNAMES              | Subject Alternative Names for apiserver certificates
 
@@ -46,17 +46,19 @@ The configuration settings alongside with the supported command line arguments a
 In case `config.yaml` is not provided, the following default settings will be used.
 
 ```yaml
-nodeName: ""
-nodeIP: ""
-url: https://127.0.0.1:6443
+dns:
+  baseDomain: microshift.example.com
 network:
   clusterNetwork:
     - cidr: 10.42.0.0/16
   serviceNetwork:
     - 10.43.0.0/16
   serviceNodePortRange: 30000-32767
-dns:
-  baseDomain: example.com
+node:
+  hostnameOverride: ""
+  nodeIP: ''
+apiServer:
+  subjectAltNames: []
 debugging:
   logLevel: "Normal"
 ```

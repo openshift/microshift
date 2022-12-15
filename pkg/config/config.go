@@ -35,7 +35,6 @@ const (
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
 	defaultManifestDirLib = "/usr/lib/microshift/manifests"
-	DefaultClusterName    = "microshift"
 )
 
 var (
@@ -45,7 +44,7 @@ var (
 )
 
 type ClusterConfig struct {
-	URL                  string `json:"url"`
+	URL                  string `json:"-"`
 	ClusterCIDR          string `json:"clusterCIDR"`
 	ServiceCIDR          string `json:"serviceCIDR"`
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
@@ -71,13 +70,11 @@ type MicroshiftConfig struct {
 
 // Top level config file
 type Config struct {
-	NodeName        string    `json:"nodeName"`
-	NodeIP          string    `json:"nodeIP"`
-	URL             string    `json:"url"`
-	Network         Network   `json:"network"`
-	DNS             DNS       `json:"dns"`
-	Debugging       Debugging `json:"debugging"`
-	SubjectAltNames []string  `json:"subjectAltNames"`
+	DNS       DNS       `json:"dns"`
+	Network   Network   `json:"network"`
+	Node      Node      `json:"node"`
+	ApiServer ApiServer `json:"apiServer"`
+	Debugging Debugging `json:"debugging"`
 }
 
 type Network struct {
@@ -110,12 +107,26 @@ type DNS struct {
 	// be sub-domains of this base.
 	//
 	// For example, given the base domain `example.com`, router exposed
-	// domains will be formed as `*.apps.microshift.example.com` by default,
-	// and API service will have a DNS entry for `api.microshift.example.com`,
-	// as well as "api-int.microshift.example.com" for internal k8s API access.
+	// domains will be formed as `*.apps.example.com` by default,
+	// and API service will have a DNS entry for `api.example.com`,
+	// as well as "api-int.example.com" for internal k8s API access.
 	//
 	// Once set, this field cannot be changed.
 	BaseDomain string `json:"baseDomain"`
+}
+
+type ApiServer struct {
+	// SubjectAltNames added to API server certs
+	SubjectAltNames []string `json:"subjectAltNames"`
+}
+
+type Node struct {
+	// If non-empty, will use this string to identify the node instead of the hostname
+	HostnameOverride string `json:"hostnameOverride"`
+
+	// IP address of the node, passed to the kubelet.
+	// If not specified, kubelet will use the node's default IP address.
+	NodeIP string `json:"nodeIP"`
 }
 
 type Debugging struct {
@@ -188,7 +199,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 
 	return &MicroshiftConfig{
-		LogVLevel:       0,
+		LogVLevel:       2,
 		SubjectAltNames: subjectAltNames,
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
@@ -327,14 +338,11 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 
 	// Wire new Config type to existing MicroshiftConfig
 	c.LogVLevel = config.GetVerbosity()
-	if config.NodeName != "" {
-		c.NodeName = config.NodeName
+	if config.Node.HostnameOverride != "" {
+		c.NodeName = config.Node.HostnameOverride
 	}
-	if config.NodeIP != "" {
-		c.NodeIP = config.NodeIP
-	}
-	if config.URL != "" {
-		c.Cluster.URL = config.URL
+	if config.Node.NodeIP != "" {
+		c.NodeIP = config.Node.NodeIP
 	}
 	if len(config.Network.ClusterNetwork) != 0 {
 		c.Cluster.ClusterCIDR = config.Network.ClusterNetwork[0].CIDR
@@ -348,8 +356,8 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	if config.DNS.BaseDomain != "" {
 		c.BaseDomain = config.DNS.BaseDomain
 	}
-	if len(config.SubjectAltNames) > 0 {
-		c.SubjectAltNames = config.SubjectAltNames
+	if len(config.ApiServer.SubjectAltNames) > 0 {
+		c.SubjectAltNames = config.ApiServer.SubjectAltNames
 	}
 
 	return nil
@@ -369,14 +377,11 @@ func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
 	if s, err := flags.GetStringSlice("subject-alt-names"); err == nil && flags.Changed("subject-alt-names") {
 		c.SubjectAltNames = s
 	}
-	if s, err := flags.GetString("node-name"); err == nil && flags.Changed("node-name") {
+	if s, err := flags.GetString("hostname-override"); err == nil && flags.Changed("hostname-override") {
 		c.NodeName = s
 	}
 	if s, err := flags.GetString("node-ip"); err == nil && flags.Changed("node-ip") {
 		c.NodeIP = s
-	}
-	if s, err := flags.GetString("url"); err == nil && flags.Changed("url") {
-		c.Cluster.URL = s
 	}
 	if s, err := flags.GetString("cluster-cidr"); err == nil && flags.Changed("cluster-cidr") {
 		c.Cluster.ClusterCIDR = s
