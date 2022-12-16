@@ -343,8 +343,11 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 		return nil, err
 	}
 
-	if err := util.GenKeys(filepath.Join(microshiftDataDir, "/resources/kube-apiserver/secrets/service-account-key"),
-		"service-account.crt", "service-account.key"); err != nil {
+	saKeyDir := filepath.Join(microshiftDataDir, "/resources/kube-apiserver/secrets/service-account-key")
+	if err := util.EnsureKeyPair(
+		filepath.Join(saKeyDir, "service-account.pub"),
+		filepath.Join(saKeyDir, "service-account.key"),
+	); err != nil {
 		return nil, err
 	}
 
