@@ -2,6 +2,7 @@ package certchains
 
 import (
 	"fmt"
+	"os"
 )
 
 type CertificateChainsBuilder interface {
@@ -39,6 +40,22 @@ func (cs *certificateChains) WithCABundle(bundlePath string, signerNames ...[]st
 func (cs *certificateChains) Complete() (*CertificateChains, error) {
 	completeChains := &CertificateChains{
 		signers: make(map[string]*CertificateSigner),
+	}
+
+	// Library-go crypto package warns via stderr prints about CA
+	// and cert validity time when they exceed 5 and 2 years
+	// respectively. This is not configurable and the introduction
+	// of such a possibility involves changing the API in a massively
+	// used library accross OpenShift. Temporarily disable stderr as
+	// a shortcut to clean logs.
+	newstderr, err := os.Open("/dev/null")
+	if err == nil {
+		originalStderr := os.Stderr
+		os.Stderr = newstderr
+		defer newstderr.Close()
+		defer func() {
+			os.Stderr = originalStderr
+		}()
 	}
 
 	for _, signer := range cs.signers {
