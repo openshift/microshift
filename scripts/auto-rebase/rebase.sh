@@ -36,6 +36,7 @@ EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkub
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator"
 
+declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
 title() {
     echo -e "\E[34m$1\E[00m";
@@ -377,33 +378,38 @@ update_images() {
     fi
     pushd "${STAGING_DIR}" >/dev/null
 
-    title "Rebasing release_*.go"
+    title "Rebasing release_*.json"
+    for goarch in amd64 arm64; do
+        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
 
-    # Update the base release
-    base_release=$(jq -r ".metadata.version" "${STAGING_DIR}/release_amd64.json")
-    sed -i "/^var Base/c\var Base = \"${base_release}\"" "${REPOROOT}/pkg/release/release.go"
+        # Update the base release
+        base_release=$(jq -r ".metadata.version" "${STAGING_DIR}/release_${goarch}.json")
+        jq --arg base "${base_release}" '
+            .release.base = $base
+            ' "${REPOROOT}/assets/release/release-${arch}.json" > "${REPOROOT}/assets/release/release-${arch}.json.tmp"
+        mv "${REPOROOT}/assets/release/release-${arch}.json.tmp" "${REPOROOT}/assets/release/release-${arch}.json"
 
-    # Update the image digests for all architectures
-    images="$(get_release_images "${REPOROOT}/pkg/release/release.go" | xargs)"
-    for arch in amd64 arm64; do
-        # Compute the max length of image names incl. enclosing quotes
-        w=$(awk "BEGIN {n=split(\"${images}\", images, \" \"); max=0; for (i=1;i<=n;i++) {if (length(images[i]) > max) {max=length(images[i])}}; print max+2; exit}")
-        for i in ${images}; do
-            digest=$(jq -r ".references.spec.tags[] | select(.name == \"${i//_/-}\") | .from.name" release_${arch}.json)
-            if [[ -n "${digest}" ]]; then
-                echo "Updating image ${i//_/-} (${arch}) to ${digest}."
-                awk "!/\"${i}\"/ {print \$0} /\"${i}\"/ {printf(\"\\t\\t%-${w}s  %s\n\", \"\\\"${i}\\\":\", \"\\\"${digest}\\\",\")}" \
-                    "${REPOROOT}/pkg/release/release_${arch}.go" > t
-                mv t "${REPOROOT}/pkg/release/release_${arch}.go"
-                if [[ "$i" == "pod" ]]; then
-                    echo "Updating image pod (${arch}) in packaging/crio.conf.d/microshift_${arch}.conf"
-                    sed -i "s|pause_image =.*|pause_image = \"${digest}\"|g" \
-                        "${REPOROOT}/packaging/crio.conf.d/microshift_${arch}.conf"
-                fi
-            else
-                echo "Skipping ${i//_/-} (${arch}): Not part of release image."
-            fi
-        done
+        # Get list of MicroShift's container images
+        images=$(jq -r '.images | keys[]' "${REPOROOT}/assets/release/release-${arch}.json" | xargs)
+
+        # Extract the pullspecs for these images from OCP's release info
+        jq --arg images "$images" '
+            reduce .references.spec.tags[] as $img ({}; . + {($img.name): $img.from.name})
+            | with_entries(select(.key == ($images | split(" ")[])))
+            ' "release_${goarch}.json" > "update_${goarch}.json"
+
+        # Update MicroShift's release info with these pullspecs
+        jq --slurpfile updates "update_${goarch}.json" '
+            .images += $updates[0]
+            ' "${REPOROOT}/assets/release/release-${arch}.json" > "${REPOROOT}/assets/release/release-${arch}.json.tmp"
+        mv "${REPOROOT}/assets/release/release-${arch}.json.tmp" "${REPOROOT}/assets/release/release-${arch}.json"
+
+        # Update crio's pause image
+        pause_image_digest=$(jq -r '
+            .references.spec.tags[] | select(.name == "pod") | .from.name
+            ' "release_${goarch}.json")
+        sed -i "s|pause_image =.*|pause_image = \"${pause_image_digest}\"|g" \
+            "${REPOROOT}/packaging/crio.conf.d/microshift_${goarch}.conf"
     done
 
     popd >/dev/null

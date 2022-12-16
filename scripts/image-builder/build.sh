@@ -4,7 +4,7 @@ set -e -o pipefail
 ROOTDIR=$(git rev-parse --show-toplevel)
 SCRIPTDIR=${ROOTDIR}/scripts/image-builder
 IMGNAME=microshift
-IMAGE_VERSION=$(${ROOTDIR}/pkg/release/get.sh base)
+IMAGE_VERSION=$(jq -r '.release.base' assets/release/release-$(uname -i).json)
 BUILD_ARCH=$(uname -i)
 OSTREE_SERVER_NAME=127.0.0.1:8080
 LVM_SYSROOT_SIZE_MIN=10240
@@ -42,8 +42,7 @@ usage() {
     echo "          Path to one or more comma-separated RPM packages to be"
     echo "          included in the image (default: none)"
     echo "  -embed_containers"
-    echo "          Embed the MicroShift container dependencies in the image using the"
-    echo "          'pkg/release/get.sh images \$(uname -i)' command to get their list"
+    echo "          Embed the MicroShift container dependencies in the image"
     echo "  -ostree_server_name name_or_ip"
     echo "          Name or IP address and optionally port of the ostree"
     echo "          server (default: ${OSTREE_SERVER_NAME})"
@@ -312,13 +311,9 @@ if ${EMBED_CONTAINERS} ; then
     sudo composer-cli sources add ${BUILDDIR}/${repo_name}.toml
 
     # Add the list of all the container images
-    for img in $(${ROOTDIR}/pkg/release/get.sh images $(uname -i)) ; do
-        cat >> blueprint_v0.0.1.toml <<EOF
-
-[[containers]]
-source = "${img}"
-EOF
-    done
+    jq -r '.images | .[] | ("[[containers]]\nsource = \"" + . + "\"\n")' \
+        "${ROOTDIR}/assets/release/release-$(uname -i).json" \
+        >> blueprint_v0.0.1.toml
 fi
 
 # Add the firewall customization required by Prometheus

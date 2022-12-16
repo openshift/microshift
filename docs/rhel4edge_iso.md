@@ -55,8 +55,7 @@ Optional arguments:
           Path to one or more comma-separated RPM packages to be
           included in the image (default: none)
   -embed_containers
-          Embed the MicroShift container dependencies in the image using the
-          'pkg/release/get.sh images $(uname -i)' command to get their list
+          Embed the MicroShift container dependencies in the image
   -ostree_server_name name_or_ip
           Name or IP address and optionally port of the ostree
           server (default: 127.0.0.1:8080)
@@ -153,7 +152,7 @@ Proceed by running the build script with the `-embed_containers` argument to inc
 
 When executed in this mode, the `scripts/image-builder/build.sh` script performs an extra step to append the list of the MicroShift container images to the blueprint so that they are installed when the operating system boots for the first time. The list of these images can be obtained by the following command.
 ```bash
-~/microshift/pkg/release/get.sh images $(uname -i)
+jq -r '.images | .[]' ~/microshift/assets/release/release-$(uname -i).json
 ```
 
 ## Install MicroShift for Edge
@@ -167,7 +166,7 @@ sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-bui
 Run the following commands to create a virtual machine using the installer image.
 ```bash
 VMNAME="microshift-edge"
-VERSION=$(~/microshift/pkg/release/get.sh base)
+VERSION=$(grep "^var Base =" ~/microshift/pkg/release/release.go | cut -d\" -f 2)
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
 virt-install \

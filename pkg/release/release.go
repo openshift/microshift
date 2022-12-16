@@ -16,20 +16,44 @@ limitations under the License.
 
 package release
 
-var Base = "4.12.0-0.nightly-2022-12-15-175145"
+import (
+	"encoding/json"
+	"fmt"
+	"runtime"
+	"strings"
 
-var Image = map[string]string{
-	"cli":                       "quay.io/microshift/cli:" + Base,
-	"coredns":                   "quay.io/microshift/coredns:" + Base,
-	"haproxy_router":            "quay.io/microshift/haproxy-router:" + Base,
-	"kube_rbac_proxy":           "quay.io/microshift/kube-rbac-proxy:" + Base,
-	"odf_topolvm":               "quay.io/microshift/odf-topolvm-rhel8" + Base,
-	"openssl":                   "quay.io/microshift/openssl" + Base,
-	"csi_external_provisioner":  "quay.io/microshift/csi-external-provisioner" + Base,
-	"csi_external_resizer":      "quay.io/microshift/csi-external-resizer" + Base,
-	"csi_node_driver_registrar": "quay.io/microshift/csi-node-driver-registrar" + Base,
-	"csi_livenessprobe":         "quay.io/microshift/csi-livenessprobe" + Base,
-	"ovn_kubernetes_microshift": "quay.io/microshift/ovn-kubernetes-microshift:" + Base,
-	"pod":                       "quay.io/microshift/pause:" + Base,
-	"service_ca_operator":       "quay.io/microshift/service-ca-operator:" + Base,
+	embedded "github.com/openshift/microshift/assets"
+)
+
+var Base = "undefined"
+
+var Image = map[string]string{}
+
+func init() {
+	arch_replacer := strings.NewReplacer("amd64", "x86_64", "arm64", "aarch64")
+	arch := arch_replacer.Replace(runtime.GOARCH)
+
+	release_file := "release/release-" + arch + ".json"
+	data, err := embedded.Asset(release_file)
+	if err != nil {
+		// If there is no release file for this architecture, work with the generic specs
+		return
+	}
+
+	var release map[string]any
+	if err := json.Unmarshal(data, &release); err != nil {
+		panic(fmt.Errorf("unmarshaling %s: %v", release_file, err))
+	}
+
+	// Copy in the OCP base version
+	metadata := release["release"].(map[string]any)
+	Base = metadata["base"].(string)
+
+	// Copy in the pullspecs, translating the keys as used by the OCP release image
+	// (with '-'s) into keys we can use in go templates (need to use '_'s instead).
+	images := release["images"].(map[string]any)
+	for name, pullspec := range images {
+		name := strings.Replace(name, "-", "_", -1)
+		Image[name] = pullspec.(string)
+	}
 }

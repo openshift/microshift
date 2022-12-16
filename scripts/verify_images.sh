@@ -15,7 +15,7 @@ function debug() {
 ROOTDIR=$(git rev-parse --show-toplevel)
 
 approved=true
-${ROOTDIR}/pkg/release/get.sh images all | while read source_file image; do
+jq -r '.images | .[] | (input_filename) + " " + (.)' assets/release/release-*.json | while read source_file image; do
     case $image in
         quay.io/microshift/*)
             debug "$image OK";;
