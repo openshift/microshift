@@ -7,7 +7,7 @@
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cbe32c3940f369eb9093d2b6669a22ce4fd3b1c0781c2afd74f1b0b1e6bd3a9d",
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e19d3bcfc797cd879db6043ef59c1d9e9c8c199181f5f2b6cca5e4c7cfed0a5d",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:329566d40a19ff6914c4d584c7526c2093917a1437eb32c9f299f1c62350d035",
-    "odf-topolvm": "quay.io/rh-storage-partners/microshift-topolvm@sha256:616fe64c9f2d1315cec655d482e7b26596594e879e07017e0e610d37c72bacd0",
+    "lvms-topolvm": "quay.io/rh-storage-partners/microshift-topolvm@sha256:10bffded5317da9de6c45ba74f0bb10e0a08ddb2bfef23b11ac61287a37f10a1",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
     "csi-external-provisioner": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f8a246885c509a113cbd7ce43f78ea764752fad2f1bf2b61849abcaa77baacff",
     "csi-external-resizer": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b9524eb63c3408c2889ec926f2ebdf9d4ab4689c3ad50594eb8d80a9bdd0dbc9",

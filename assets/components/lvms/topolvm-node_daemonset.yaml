@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       annotations:
-        odf-lvm.microshift.io/lvmd_config_sha256sum: "{{ Sha256sum .lvmd }}"
+        lvms.microshift.io/lvmd_config_sha256sum: "{{ Sha256sum .lvmd }}"
       labels:
         app: topolvm-node
       name: lvmcluster-sample
@@ -22,7 +22,7 @@ spec:
         - /lvmd
         - --config=/etc/topolvm/lvmd.yaml
         - --container=true
-        image: {{ .ReleaseImage.odf_topolvm }}  #registry.redhat.io/odf4/odf-topolvm-rhel8@sha256:bd9fb330fc35f88fae65f1598b802923c8a9716eeec8432bdf05d16bd4eced64
+        image: {{ .ReleaseImage.lvms_topolvm }}
         imagePullPolicy: IfNotPresent
         name: lvmd
         resources:
@@ -48,7 +48,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: {{ .ReleaseImage.odf_topolvm }}
+        image: {{ .ReleaseImage.lvms_topolvm }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
