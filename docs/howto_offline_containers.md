@@ -1,4 +1,4 @@
-# Embedding MicroShift's container iamges for offline deployments
+# Embedding MicroShift Container Images for Offline Deployments
 
 Image Builder supports building `rpm-ostree` system images with embedded container images. Embedded container images are immediately available to container engines like `podman` and `cri-o` after booting the system, without having to pull images over the network from a container registry. This means container workloads can start up without delay and without requiring network connectivity.
 
@@ -9,7 +9,7 @@ To embed a container image, add it to the Image Builder blueprint as follows:
 source = "<your_image_pullspec_with_tag_or_digest>"
 ```
 
-To embed MicroShift's container images, you need to know the exact list of container image references used by the MicroShift version you're deploying. You can obtain this list by installing the `microshift-release-info` RPM package of the same version, for example:
+To embed MicroShift container images, you need to know the exact list of container image references used by the MicroShift version you are deploying. You can obtain this list by installing the `microshift-release-info` RPM package of the same version, for example:
 
 ```
 $ sudo dnf install -y microshift-release-info-4.12.0-1
