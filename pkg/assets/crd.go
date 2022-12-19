@@ -37,7 +37,7 @@ var (
 		"crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml",
 		"crd/0000_03_security-openshift_01_scc.crd.yaml",
 		"crd/route.crd.yaml",
-		"components/odf-lvm/topolvm.io_logicalvolumes.yaml",
+		"components/lvms/topolvm.io_logicalvolumes.yaml",
 	}
 	// for apis that belong to a group served by openshift-apiserver but are themselves served
 	// as a CR, the crd registration controller will not automatically create local apiservices

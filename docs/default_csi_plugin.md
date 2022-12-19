@@ -1,29 +1,29 @@
 # MicroShift Storage Plugin Overview
 
-> **IMPORTANT!** The default ODF-LVM configuration is intended to match the developer environment described in [MicroShift Development Environment on RHEL 8](./devenv_rhel8.md). See section **[Configuring ODF-LVM](#Configuring-ODF-LVM)** for guidance on configuring ODF-LVM for your environment.
+> **IMPORTANT!** The default LVMS configuration is intended to match the developer environment described in [MicroShift Development Environment on RHEL 8](./devenv_rhel8.md). See section **[Configuring LVMS](#Configuring-LVMS)** for guidance on configuring LVMS for your environment.
 
-MicroShift enables dynamic storage provisioning out of the box with the ODF-LVM CSI plugin. This plugin is a downstream
+MicroShift enables dynamic storage provisioning out of the box with the LVMS CSI plugin. This plugin is a downstream
 Red Hat fork of TopoLVM. This provisioner will create a new LVM logical volume in the `rhel` volume group for each
-PersistenVolumeClaim(PVC), and make these volumes available to pods. For more information on ODF-LVM, visit the repo's
+PersistenVolumeClaim(PVC), and make these volumes available to pods. For more information on LVMS, visit the repo's
 [README](https://github.com/red-hat-storage/topolvm).
 
 ## Design
 
-ODF-LVM manifests can be found in [microshift/assets/components/odf-lvm](../assets/components/odf-lvm). For an overview
-of ODF-LVM architecture, see the [design doc](https://github.com/red-hat-storage/topolvm/blob/main/docs/design.md).
+LVMS manifests can be found in [microshift/assets/components/lvms](../assets/components/lvms). For an overview
+of LVMS architecture, see the [design doc](https://github.com/red-hat-storage/topolvm/blob/main/docs/design.md).
 
 ## Deployment
 
-ODF-LVM is deployed onto the cluster in the `openshift-storage` namespace, after MicroShift
+LVMS is deployed onto the cluster in the `openshift-storage` namespace, after MicroShift
 boots. [StorageCapacity tracking](https://kubernetes.io/docs/concepts/storage/storage-capacity/) is used to ensure that
-Pods with an ODF-LVM PVC are not scheduled if the requested storage is greater than the volume group's remaining free
+Pods with an LVMS PVC are not scheduled if the requested storage is greater than the volume group's remaining free
 storage.
 
-### Configuring ODF-LVM
+### Configuring LVMS
 
-MicroShift supports pass-through of users' ODF-LVM configuration and allows users to specify custom volume-groups, thin volume provisioning parameters, reserved unallocated volume-group space, among others.  This file can be specified anytime.  If MicroShift is already running, simply restart it to pick up the latest config.
+MicroShift supports pass-through of users' LVMS configuration and allows users to specify custom volume-groups, thin volume provisioning parameters, reserved unallocated volume-group space, among others.  This file can be specified anytime.  If MicroShift is already running, simply restart it to pick up the latest config.
 
-This configuration is specific to the LVMD runtime and informs how it interacts with the host. LVMD is a subcomponent of ODF-LVM, and in the case of MicroShift, deployed automatically as a DaemonSet.
+This configuration is specific to the LVMD runtime and informs how it interacts with the host. LVMD is a subcomponent of LVMS, and in the case of MicroShift, deployed automatically as a DaemonSet.
 
 #### Specification
 
@@ -42,13 +42,13 @@ is run as.
 
 ### Volume Group Name
 
-The default integration of ODF-LVM assumes a volume-group named `rhel`. ODF-LVM's node-controller expects that volume
+The default integration of LVMS assumes a volume-group named `rhel`. LVMS's node-controller expects that volume
 group to exist prior to launching the service. If the volume group does not exist, the node-controller will fail to
 start and enter a CrashLoopBackoff state.
 
 ### Volume Size Increments
 
-ODF-LVM provisions storage in increments of 1Gb. Storage requests are rounded up to the near gigabyte. When a volume
+LVMS provisions storage in increments of 1Gb. Storage requests are rounded up to the near gigabyte. When a volume
 group's capacity is less than 1Gb, the PersistentVolumeClaim will register a `ProvisioningFailed` event:
 
 ```shell
@@ -60,7 +60,7 @@ group's capacity is less than 1Gb, the PersistentVolumeClaim will register a `Pr
 
 ## Usage
 
-ODF-LVM's [StorageClass](../assets/components/odf-lvm/topolvm_default-storage-class.yaml) is deployed with a default
+LVMS's [StorageClass](../assets/components/lvms/topolvm_default-storage-class.yaml) is deployed with a default
 StorageClass. Any PersistentVolumeClaim without a `.spec.storageClassName` defined will automatically have a
 PersistentVolume provisioned from the default StorageClass.
 

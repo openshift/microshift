@@ -119,7 +119,7 @@ When deciding between different design options, we follow the following principl
   * Ingress?
 
 ### Storage
-* MicroShift uses ODF-LVM for local storage volume allocation.
+* MicroShift uses LVMS for local storage volume allocation.
 
 ### Production / Supply Chain / Release Management
 * MicroShift vendors OCP source code without modification. Where it deploys container images for additional services, it deploys OCP's published container images.
