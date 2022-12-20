@@ -22,7 +22,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
 	"time"
 
 	"github.com/pkg/errors"
@@ -41,8 +40,16 @@ const (
 	ValidityTenYears = 10 * ValidityOneYear
 )
 
+func EnsureKeyPair(pubKeyPath, privKeyPath string) error {
+	if _, err := getKeyPair(pubKeyPath, privKeyPath); err == nil {
+		return nil
+	}
+
+	return GenKeys(pubKeyPath, privKeyPath)
+}
+
 // GenKeys generates and save rsa keys
-func GenKeys(dir, pubFilename, keyFilename string) error {
+func GenKeys(pubPath, keyPath string) error {
 	rsaKey, err := rsa.GenerateKey(rand.Reader, keySize)
 	if err != nil {
 		return errors.Wrap(err, "error generating RSA private key")
@@ -57,9 +64,6 @@ func GenKeys(dir, pubFilename, keyFilename string) error {
 	if err != nil {
 		return err
 	}
-
-	keyPath := filepath.Join(dir, keyFilename)
-	pubPath := filepath.Join(dir, pubFilename)
 
 	if err := keyutil.WriteKey(keyPath, keyPEM); err != nil {
 		return fmt.Errorf("failed to write the private key to %s: %v", keyPath, err)
@@ -83,4 +87,30 @@ func PublicKeyToPem(key *rsa.PublicKey) ([]byte, error) {
 		},
 	)
 	return keyinPem, nil
+}
+
+func getKeyPair(pubKeyPath, privKeyPath string) (*rsa.PrivateKey, error) {
+	pubKeys, err := keyutil.PublicKeysFromFile(pubKeyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read public key: %w", err)
+	}
+	if len(pubKeys) > 1 {
+		return nil, fmt.Errorf("too many pub keys in file %s", pubKeyPath)
+	}
+
+	privKey, err := keyutil.PrivateKeyFromFile(privKeyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read private key: %w", err)
+	}
+
+	rsaPrivKey, ok := privKey.(*rsa.PrivateKey)
+	if !ok {
+		return nil, fmt.Errorf("only RSA private keys are currently supported")
+	}
+
+	if !rsaPrivKey.PublicKey.Equal(pubKeys[0].(*rsa.PublicKey)) {
+		return nil, fmt.Errorf("public and private keys don't match")
+	}
+
+	return rsaPrivKey, nil
 }

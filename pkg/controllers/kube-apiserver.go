@@ -205,7 +205,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			},
 		},
 		ServiceAccountPublicKeyFiles: []string{
-			microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.crt",
+			microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.pub",
 		},
 		ServicesSubnet:        cfg.Cluster.ServiceCIDR,
 		ServicesNodePortRange: cfg.Cluster.ServiceNodePortRange,
