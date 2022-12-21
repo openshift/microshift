@@ -2,6 +2,7 @@ package components
 
 import (
 	"os"
+	"time"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
@@ -163,7 +164,7 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 	}
 
 	extraParams := assets.RenderParams{
-		"CreationTimestamp": cfg.CreationTimestamp,
+		"CreationTimestamp": time.Now().Format("2006-01-02 15:04:05"),
 	}
 	if err := assets.ApplyDeployments(apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)

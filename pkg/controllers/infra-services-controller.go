@@ -23,15 +23,25 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
+	"k8s.io/kubernetes/pkg/util/iptables"
+	"k8s.io/utils/exec"
 )
 
 type InfrastructureServicesManager struct {
-	cfg *config.MicroshiftConfig
+	cfg        *config.MicroshiftConfig
+	iptClients []iptables.Interface
 }
 
 func NewInfrastructureServices(cfg *config.MicroshiftConfig) *InfrastructureServicesManager {
 	s := &InfrastructureServicesManager{}
 	s.cfg = cfg
+
+	// Initialize iptables util
+	exec := exec.New()
+	s.iptClients = []iptables.Interface{
+		iptables.New(exec, iptables.ProtocolIPv4),
+		iptables.New(exec, iptables.ProtocolIPv6),
+	}
 	return s
 }
 
@@ -55,7 +65,7 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 	}
 
 	// TO-DO add readiness check
-	if err := components.StartComponents(s.cfg); err != nil {
+	if err := components.StartComponents(s.cfg, s.iptClients); err != nil {
 		return err
 	}
 	klog.Infof("%s launched ocp componets", s.Name())

@@ -81,8 +81,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 
 	os.MkdirAll(microshiftDataDir, 0700)
 
-	cfg.CreationTimestamp = time.Now().Format("2006-01-02 15:04:05")
-
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	certChains, err := initCerts(cfg)
 	if err != nil {

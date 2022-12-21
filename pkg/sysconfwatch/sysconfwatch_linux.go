@@ -25,19 +25,15 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"golang.org/x/sys/unix"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
-	utiliptables "k8s.io/kubernetes/pkg/util/iptables"
-	utilexec "k8s.io/utils/exec"
 )
 
 const sysConfigCheckInterval = time.Second * 5
 const sysConfigAllowedTimeDrift = time.Second * 10
 
 type SysConfWatchController struct {
-	NodeIP     string
-	timerFd    int
-	iptClients []utiliptables.Interface
+	NodeIP  string
+	timerFd int
 }
 
 func NewSysConfWatchController(cfg *config.MicroshiftConfig) *SysConfWatchController {
@@ -58,17 +54,9 @@ func NewSysConfWatchController(cfg *config.MicroshiftConfig) *SysConfWatchContro
 		klog.Fatalf("failed to start a realtime clock timer %v", err)
 	}
 
-	// Initialize network iptables util
-	exec := utilexec.New()
-	iptClients := []utiliptables.Interface{
-		utiliptables.New(exec, utiliptables.ProtocolIPv4),
-		utiliptables.New(exec, utiliptables.ProtocolIPv6),
-	}
-
 	return &SysConfWatchController{
-		NodeIP:     cfg.NodeIP,
-		timerFd:    fd,
-		iptClients: iptClients,
+		NodeIP:  cfg.NodeIP,
+		timerFd: fd,
 	}
 }
 
@@ -103,17 +91,6 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 	var buf []byte = make([]byte, 8)
 	// Take a snapshot of the system and monototic clocks as a base reference
 	stimeRef, mtimeRef := getSysMonTimes()
-
-	for i := range c.iptClients {
-		iptClient := c.iptClients[i]
-		go iptClient.Monitor(
-			utiliptables.Chain("MICROSHIFT-SYSCONF-CANARY"),
-			[]utiliptables.Table{utiliptables.TableMangle, utiliptables.TableNAT, utiliptables.TableFilter},
-			func() { klog.Warningf("iptables flush is detected, restarting MicroShift"); os.Exit(0) },
-			sysConfigCheckInterval,
-			wait.NeverStop,
-		)
-	}
 
 	klog.Infof("sysconfwatch-controller is ready")
 	close(ready)

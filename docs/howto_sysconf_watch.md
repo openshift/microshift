@@ -3,8 +3,8 @@
 MicroShift depends on the following system settings to remain consistent during its runtime:
 - Device IP address
 - System-wide clock settings
-- Iptable configurations.
-However, these settings may occasionally change on edge devices (i.e. DHCP or NTP updates). When such changes occur, some MicroShift components may stop functioning properly. To mitigate this situation, MicroShift monitors the mentioned system configuration settings and restarts if a setting change is detected.
+- Iptable configurations
+However, these settings may occasionally change on edge devices (i.e. DHCP or NTP updates). When such changes occur, some MicroShift components may stop functioning properly. To mitigate this situation, MicroShift monitors the mentioned system configuration settings, restarts or reloads components if a setting change is detected.
 
 This document describes how to simulate system configuration changes in a virtual environment and verify that MicroShift service reacts by restarting when necessary.
 
@@ -146,16 +146,18 @@ as well.
 
 ## Firewall Changes
 
-Reload the firewall rules with the following command to trigger the MicroShift service restart.
+Reload the firewall rules with the following command to trigger the reloading of MicroShift components.
 
 ```bash
 sudo firewall-cmd --reload
 ```
 
-Firewall reload action flushes the existing iptable configurations which results in failed network traffic. <br>
-Run the `journalctl` command to verify that the service was restarted. The logs should contain restart and startup messages.
+Firewall reload action flushes the iptable configurations which results in failed network traffic. <br>
+Run the `journalctl -xu microshift` command to verify that the components are reloaded. The logs should contain reload messages.
 
 ```
-Dec 11 08:23:30 localhost.localdomain microshift[168331]: sysconfwatch-controller W1211 08:23:30.914772  168331 sysconfwatch_linux.go:112] iptables flush is detected, restarting MicroShift
-Dec 11 08:23:31 localhost.localdomain systemd[1]: Starting MicroShift...
+Dec 21 08:57:01 localhost.localdomain microshift[2005232]: infrastructure-services-manager I1221 08:57:01.567046 2005232 iptables.go:590] iptables canary mangle/MICROSHIFT-CANARY deleted
+Dec 21 08:57:01 localhost.localdomain microshift[2005232]: infrastructure-services-manager W1221 08:57:01.582233 2005232 components.go:25] Iptables flush is detected, reloading affected components
+Dec 21 08:57:01 localhost.localdomain microshift[2005232]: infrastructure-services-manager I1221 08:57:01.582276 2005232 components.go:64] Reload ingress controller
+Dec 21 08:57:01 localhost.localdomain microshift[2005232]: infrastructure-services-manager I1221 08:57:01.644365 2005232 components.go:69] Reload CNI plugin
 ```
