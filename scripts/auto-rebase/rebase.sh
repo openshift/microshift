@@ -149,6 +149,7 @@ update_last_rebase() {
 
     local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase.sh"
 
+    rm -f "${last_rebase_script}"
     cat - >"${last_rebase_script}" <<EOF
 #!/bin/bash -x
 ./scripts/auto-rebase/rebase.sh to "${release_image_amd64}" "${release_image_arm64}"
