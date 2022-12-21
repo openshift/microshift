@@ -14,20 +14,15 @@ require (
 	github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
 	github.com/spf13/cobra v1.4.0
 	go.etcd.io/etcd/server/v3 v3.5.4
+	k8s.io/apimachinery v0.25.2
 	k8s.io/cli-runtime v0.25.2
 	k8s.io/component-base v0.25.2
 	k8s.io/klog/v2 v2.80.1
-	k8s.io/apimachinery v0.25.2
 	k8s.io/kubectl v0.25.2
 	sigs.k8s.io/yaml v1.2.0
 )
 
 require (
-	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.25.2 // indirect
-	k8s.io/kube-openapi v0.0.0-20220803164354-a70c9af30aea // indirect
-	sigs.k8s.io/kustomize/api v0.12.1 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.13.9 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
@@ -126,9 +121,14 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+	k8s.io/api v0.25.2 // indirect
 	k8s.io/client-go v0.25.2 // indirect
+	k8s.io/kube-openapi v0.0.0-20220803164354-a70c9af30aea // indirect
 	k8s.io/utils v0.0.0-20220922133306-665eaaec4324 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
+	sigs.k8s.io/kustomize/api v0.12.1 // indirect
+	sigs.k8s.io/kustomize/kyaml v0.13.9 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 )
 
@@ -141,12 +141,12 @@ replace (
 	github.com/imdario/mergo => github.com/imdario/mergo v0.3.6 // from kubernetes
 	github.com/onsi/ginkgo => github.com/onsi/ginkgo v1.11.0 // from kubernetes
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.0.0-20221005160638-5fa9cd70cd8c // from kubernetes
-	github.com/openshift/build-machinery-go => github.com/openshift/build-machinery-go v0.0.0-20220720161851-9b4f0386f6b0 // from kubernetes
+	github.com/openshift/build-machinery-go => github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d // from kubernetes
 	github.com/pkg/errors => github.com/pkg/errors v0.9.1 // from kubernetes
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.12.1 // from kubernetes
 	github.com/spf13/cobra => github.com/spf13/cobra v1.4.0 // from kubernetes
 	github.com/spf13/pflag => github.com/spf13/pflag v1.0.5 // from kubernetes
-	github.com/stretchr/testify => github.com/stretchr/testify v1.7.0 // from kubernetes
+	github.com/stretchr/testify => github.com/stretchr/testify v1.8.0 // from kubernetes
 	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7 // override pinning etcd due to conflicting opentelemetry version
 	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7 // override pinning etcd due to conflicting opentelemetry version
 	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7 // override pinning etcd due to conflicting opentelemetry version
@@ -157,14 +157,14 @@ replace (
 	golang.org/x/exp => golang.org/x/exp v0.0.0-20210220032938-85be41e4509f // from kubernetes
 	golang.org/x/net => golang.org/x/net v0.0.0-20220722155237-a158d28d115b // from kubernetes
 	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0 // from kubernetes
-	k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20221111225109-cd98eda801e0 // staging kubernetes
-	k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20221111225109-cd98eda801e0 // staging kubernetes
-	k8s.io/cli-runtime => github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime v0.0.0-20221111225109-cd98eda801e0 // from kubernetes
-	k8s.io/client-go => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20221111225109-cd98eda801e0 // staging kubernetes
-	k8s.io/component-base => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20221111225109-cd98eda801e0 // staging kubernetes
+	k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20221214201842-77bec7ab3573 // staging kubernetes
+	k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20221214201842-77bec7ab3573 // staging kubernetes
+	k8s.io/cli-runtime => github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime v0.0.0-20221214201842-77bec7ab3573 // from kubernetes
+	k8s.io/client-go => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20221214201842-77bec7ab3573 // staging kubernetes
+	k8s.io/component-base => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20221214201842-77bec7ab3573 // staging kubernetes
 	k8s.io/klog/v2 => k8s.io/klog/v2 v2.70.1 // from kubernetes
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1 // from kubernetes
-	k8s.io/kubectl => github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20221111225109-cd98eda801e0 // from kubernetes
+	k8s.io/kubectl => github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20221214201842-77bec7ab3573 // from kubernetes
 	sigs.k8s.io/json => sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // from kubernetes
 	sigs.k8s.io/yaml => sigs.k8s.io/yaml v1.2.0 // from kubernetes
 )
