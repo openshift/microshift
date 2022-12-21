@@ -293,6 +293,7 @@ type EtcdServer struct {
 	firstCommitInTermC  chan struct{}
 
 	*AccessController
+	corruptionChecker CorruptionChecker
 }
 
 type backendHooks struct {
@@ -348,13 +349,13 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 		)
 	}
 
-	if terr := fileutil.TouchDirAll(cfg.DataDir); terr != nil {
+	if terr := fileutil.TouchDirAll(cfg.Logger, cfg.DataDir); terr != nil {
 		return nil, fmt.Errorf("cannot access data directory: %v", terr)
 	}
 
 	haveWAL := wal.Exist(cfg.WALDir())
 
-	if err = fileutil.TouchDirAll(cfg.SnapDir()); err != nil {
+	if err = fileutil.TouchDirAll(cfg.Logger, cfg.SnapDir()); err != nil {
 		cfg.Logger.Fatal(
 			"failed to create snapshot directory",
 			zap.String("path", cfg.SnapDir()),
@@ -556,7 +557,7 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 		return nil, fmt.Errorf("unsupported bootstrap config")
 	}
 
-	if terr := fileutil.TouchDirAll(cfg.MemberDir()); terr != nil {
+	if terr := fileutil.TouchDirAll(cfg.Logger, cfg.MemberDir()); terr != nil {
 		return nil, fmt.Errorf("cannot access member directory: %v", terr)
 	}
 
@@ -638,6 +639,7 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 			)
 		}
 	}
+	srv.corruptionChecker = newCorruptionChecker(cfg.Logger, srv, srv.kv.HashStorage())
 
 	srv.authStore = auth.NewAuthStore(srv.Logger(), srv.be, tp, int(cfg.BcryptCost))
 
@@ -812,6 +814,7 @@ func (s *EtcdServer) Start() {
 	s.GoAttach(s.monitorVersions)
 	s.GoAttach(s.linearizableReadLoop)
 	s.GoAttach(s.monitorKVHash)
+	s.GoAttach(s.monitorCompactHash)
 	s.GoAttach(s.monitorDowngrade)
 }
 
@@ -1128,33 +1131,7 @@ func (s *EtcdServer) run() {
 			f := func(context.Context) { s.applyAll(&ep, &ap) }
 			sched.Schedule(f)
 		case leases := <-expiredLeaseC:
-			s.GoAttach(func() {
-				// Increases throughput of expired leases deletion process through parallelization
-				c := make(chan struct{}, maxPendingRevokes)
-				for _, lease := range leases {
-					select {
-					case c <- struct{}{}:
-					case <-s.stopping:
-						return
-					}
-					lid := lease.ID
-					s.GoAttach(func() {
-						ctx := s.authStore.WithRoot(s.ctx)
-						_, lerr := s.LeaseRevoke(ctx, &pb.LeaseRevokeRequest{ID: int64(lid)})
-						if lerr == nil {
-							leaseExpired.Inc()
-						} else {
-							lg.Warn(
-								"failed to revoke lease",
-								zap.String("lease-id", fmt.Sprintf("%016x", lid)),
-								zap.Error(lerr),
-							)
-						}
-
-						<-c
-					})
-				}
-			})
+			s.revokeExpiredLeases(leases)
 		case err := <-s.errorc:
 			lg.Warn("server error", zap.Error(err))
 			lg.Warn("data-dir used by this member must be removed")
@@ -1167,6 +1144,41 @@ func (s *EtcdServer) run() {
 			return
 		}
 	}
+}
+
+func (s *EtcdServer) revokeExpiredLeases(leases []*lease.Lease) {
+	s.GoAttach(func() {
+		lg := s.Logger()
+		// Increases throughput of expired leases deletion process through parallelization
+		c := make(chan struct{}, maxPendingRevokes)
+		for _, curLease := range leases {
+			select {
+			case c <- struct{}{}:
+			case <-s.stopping:
+				return
+			}
+
+			f := func(lid int64) {
+				s.GoAttach(func() {
+					ctx := s.authStore.WithRoot(s.ctx)
+					_, lerr := s.LeaseRevoke(ctx, &pb.LeaseRevokeRequest{ID: lid})
+					if lerr == nil {
+						leaseExpired.Inc()
+					} else {
+						lg.Warn(
+							"failed to revoke lease",
+							zap.String("lease-id", fmt.Sprintf("%016x", lid)),
+							zap.Error(lerr),
+						)
+					}
+
+					<-c
+				})
+			}
+
+			f(int64(curLease.ID))
+		}
+	})
 }
 
 // Cleanup removes allocated objects by EtcdServer.NewServer in
@@ -2175,19 +2187,20 @@ func (s *EtcdServer) apply(
 // applyEntryNormal apples an EntryNormal type raftpb request to the EtcdServer
 func (s *EtcdServer) applyEntryNormal(e *raftpb.Entry) {
 	shouldApplyV3 := membership.ApplyV2storeOnly
-	applyV3Performed := false
-	defer func() {
-		// The txPostLock callback will not get called in this case,
-		// so we should set the consistent index directly.
-		if s.consistIndex != nil && !applyV3Performed && membership.ApplyBoth == shouldApplyV3 {
-			s.consistIndex.SetConsistentIndex(e.Index, e.Term)
-		}
-	}()
+	var ar *applyResult
 	index := s.consistIndex.ConsistentIndex()
 	if e.Index > index {
 		// set the consistent index of current executing entry
 		s.consistIndex.SetConsistentApplyingIndex(e.Index, e.Term)
 		shouldApplyV3 = membership.ApplyBoth
+		defer func() {
+			// The txPostLockInsideApplyHook will not get called in some cases,
+			// in which we should move the consistent index forward directly.
+			newIndex := s.consistIndex.ConsistentIndex()
+			if newIndex < e.Index {
+				s.consistIndex.SetConsistentIndex(e.Index, e.Term)
+			}
+		}()
 	}
 	s.lg.Debug("apply entry normal",
 		zap.Uint64("consistent-index", index),
@@ -2229,13 +2242,11 @@ func (s *EtcdServer) applyEntryNormal(e *raftpb.Entry) {
 		id = raftReq.Header.ID
 	}
 
-	var ar *applyResult
 	needResult := s.w.IsRegistered(id)
 	if needResult || !noSideEffect(&raftReq) {
 		if !needResult && raftReq.Txn != nil {
 			removeNeedlessRangeReqs(raftReq.Txn)
 		}
-		applyV3Performed = true
 		ar = s.applyV3.Apply(&raftReq, shouldApplyV3)
 	}
 
@@ -2509,6 +2520,51 @@ func (s *EtcdServer) monitorVersions() {
 	}
 }
 
+func (s *EtcdServer) monitorKVHash() {
+	t := s.Cfg.CorruptCheckTime
+	if t == 0 {
+		return
+	}
+
+	lg := s.Logger()
+	lg.Info(
+		"enabled corruption checking",
+		zap.String("local-member-id", s.ID().String()),
+		zap.Duration("interval", t),
+	)
+	for {
+		select {
+		case <-s.stopping:
+			return
+		case <-time.After(t):
+		}
+		if !s.isLeader() {
+			continue
+		}
+		if err := s.corruptionChecker.PeriodicCheck(); err != nil {
+			lg.Warn("failed to check hash KV", zap.Error(err))
+		}
+	}
+}
+
+func (s *EtcdServer) monitorCompactHash() {
+	if !s.Cfg.CompactHashCheckEnabled {
+		return
+	}
+	t := s.Cfg.CompactHashCheckTime
+	for {
+		select {
+		case <-time.After(t):
+		case <-s.stopping:
+			return
+		}
+		if !s.isLeader() {
+			continue
+		}
+		s.corruptionChecker.CompactHashCheck()
+	}
+}
+
 func (s *EtcdServer) updateClusterVersionV2(ver string) {
 	lg := s.Logger()
 
@@ -2745,4 +2801,8 @@ func maybeDefragBackend(cfg config.ServerConfig, be backend.Backend) error {
 		return nil
 	}
 	return be.Defrag()
+}
+
+func (s *EtcdServer) CorruptionChecker() CorruptionChecker {
+	return s.corruptionChecker
 }

@@ -7,3 +7,7 @@ GO_BUILD_BINDIR := $(OUTPUT_DIR)/bin
 all: export CGO_ENABLED=0
 
 build: export CGO_ENABLED=0
+
+vendor:
+	go mod vendor
+.PHONY: vendor
