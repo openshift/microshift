@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
@@ -80,7 +81,7 @@ func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		"OVNConfig":         ovnConfig,
 		"KubeconfigPath":    kubeconfigPath,
 		"KubeconfigDir":     filepath.Join(microshiftDataDir, "/resources/kubeadmin"),
-		"CreationTimestamp": cfg.CreationTimestamp,
+		"CreationTimestamp": time.Now().Format("2006-01-02 15:04:05"),
 	}
 	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
