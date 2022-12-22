@@ -66,6 +66,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [MicroShift Storage Plugin Overview](./docs/default_csi_plugin.md)
 - [MicroShift Network Plugin Overview](./docs/default_cni_plugin.md)
 - [MicroShift Host Networking Overview](./docs/network/host_networking.md)
+- [MicroShift Traffic flows Overview](./docs/network/ovn_kubernetes_traffic_flows.md)
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
