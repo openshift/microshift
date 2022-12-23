@@ -42,6 +42,7 @@ volumes:
 - configMap
 - downwardAPI
 - emptyDir
+- ephemeral
 - persistentVolumeClaim
 - projected
 - secret
