@@ -308,6 +308,18 @@ func TestMicroshiftConfigNodeNameValidationFromDefault(t *testing.T) {
 	}
 }
 
+func TestMicroshiftConfigNodeNameValidationBadName(t *testing.T) {
+	cleanup := setupSuiteDataDir(t)
+	defer cleanup()
+
+	c := NewMicroshiftConfig()
+	c.NodeName = "1.2.3.4"
+
+	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err == nil {
+		t.Errorf("failed to validate node name.")
+	}
+}
+
 // tests that the global flags have been initialized
 func TestHideUnsupportedFlags(t *testing.T) {
 	flags := pflag.NewFlagSet("test-flags", pflag.ContinueOnError)
