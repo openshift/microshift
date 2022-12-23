@@ -241,6 +241,10 @@ func (c *MicroshiftConfig) establishNodeName() (string, error) {
 
 // Validate the NodeName to be used for this MicroShift instances
 func (c *MicroshiftConfig) validateNodeName(isDefaultNodeName bool) error {
+	if addr := net.ParseIP(c.NodeName); addr != nil {
+		return fmt.Errorf("NodeName can not be an IP address: %q", c.NodeName)
+	}
+
 	establishedNodeName, err := c.establishNodeName()
 	if err != nil {
 		return fmt.Errorf("failed to establish NodeName: %v", err)
