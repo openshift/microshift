@@ -76,7 +76,7 @@ When deciding between different design options, we follow the following principl
 * MicroShift does not bundle any OS user space! Bundling makes maintenance and security hard, breaks compliance. Instead, user space is provided by the host OS, the container image base layer or a sidecar container.
 
 ### Supported APIs
-* See [enabled apis](./enable_apis.md) for the subset of OpenShift APIs enabled in MicroShift.
+* See [enabled apis](./enabled_apis.md) for the subset of OpenShift APIs enabled in MicroShift.
 
 ### CLI
 * The `microshift` binary runs the Control Plane / Node process, it is not a tool to manage or be clients to those processes (like `oc` or `kubeadmin`). This is reflected in the sub-commands and paraemters offered by it, e.g. using the `run` verb (which implies run-to-cancel/run-to-completion) instead of `start`/`stop` verb-pairs (which imply asynch commands that return immediately).
