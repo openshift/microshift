@@ -145,7 +145,7 @@ update_last_rebase() {
     local release_image_amd64=$1
     local release_image_arm64=$2
 
-    title "## updating last_rebase.sh"
+    title "## Updating last_rebase.sh"
 
     local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase.sh"
 
@@ -157,8 +157,10 @@ EOF
     chmod +x "${last_rebase_script}"
 
     (cd "${REPOROOT}" && \
+         test -n "$(git status -s scripts/auto-rebase/last_rebase.sh)" && \
+         title "## Committing changes to last_rebase.sh" && \
          git add scripts/auto-rebase/last_rebase.sh && \
-         git commit -m "update last_rebase.sh")
+         git commit -m "update last_rebase.sh" || true)
 }
 
 # Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
