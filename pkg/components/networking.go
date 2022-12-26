@@ -17,7 +17,6 @@ func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 			"components/ovn/namespace.yaml",
 		}
 		sa = []string{
-			"components/ovn/node/serviceaccount.yaml",
 			"components/ovn/master/serviceaccount.yaml",
 		}
 		r = []string{
@@ -37,7 +36,6 @@ func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		}
 		apps = []string{
 			"components/ovn/master/daemonset.yaml",
-			"components/ovn/node/daemonset.yaml",
 		}
 	)
 
@@ -79,7 +77,7 @@ func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	extraParams := assets.RenderParams{
 		"OVNConfig":      ovnConfig,
 		"KubeconfigPath": kubeconfigPath,
-		"KubeconfigDir":  filepath.Join(microshiftDataDir, "/resources/kubeadmin"),
+		"KubeconfigDir":  filepath.Dir(kubeconfigPath),
 	}
 	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
