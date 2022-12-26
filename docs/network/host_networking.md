@@ -9,7 +9,7 @@ The following host ports are allocated for microshift components by default:
 |80      |openshift-ingress  |router-default-xxx |http                                   |
 |443     |openshift-ingress  |router-default-xxx |https                                  |
 
-Host ports exposure are implemented via iptable rules, see section [iptable -> kubelet](#kubelet) for details on how iptable rules are configured.<br>
+Host ports exposure are implemented via iptable rules, see section [iptable -> cri-o](#cri-o) for details on how iptable rules are configured.<br>
 
 **NOTE:** These host ports shall be reserved for MicroShift.
 
@@ -278,9 +278,9 @@ svc-etp-local   10.42.0.17:8080   116s
 
 **NOTE:** The `-j RETURN` rule in OVN-KUBE-SNAT-MGMTPORT prevents client packet from being SNATed by the next rule in the same chain. This is to preserve client IP address for externalTrafficPolicy=Local service.
 
-### kubelet
+### cri-o
 
-The following iptable chain is added by kubelet to expose pod traffic to local host port.
+The following iptable chain is added by cri-o to expose pod traffic to local host port.
 
 |chain                  |description                                  |table      | comment                                  |applicable|
 |:----------------------|:--------------------------------------------|:----------|:-----------------------------------------|:---------|
