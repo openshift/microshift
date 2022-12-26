@@ -406,8 +406,6 @@ spec:
           name: run-ovn
         - mountPath: /run/ovnkube-config/
           name: ovnkube-config
-        - mountPath: {{.KubeconfigDir}}
-          name: kubeconfig
         - mountPath: /etc/cni/net.d
           name: host-cni-netd
         - mountPath: /cni-bin-dir
@@ -492,9 +490,6 @@ spec:
         hostPath:
           path: "/opt/cni/bin"
 
-      - name: kubeconfig
-        hostPath:
-          path: {{.KubeconfigDir}}
       - name: ovnkube-config
         configMap:
           name: ovnkube-config
