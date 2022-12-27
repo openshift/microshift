@@ -74,9 +74,9 @@ spec:
         - mountPath: /run/ovn/
           name: run-ovn
         - mountPath: /etc/openvswitch
-          name: etc-openvswitch-node
+          name: etc-ovn
         - mountPath: /etc/ovn/
-          name: etc-openvswitch-node
+          name: etc-ovn
         - mountPath: /var/lib/openvswitch
           name: var-lib-openvswitch
         - mountPath: /var/log/ovn
@@ -129,6 +129,10 @@ spec:
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /etc/openvswitch/
+          name: etc-ovn
+        - mountPath: /var/lib/openvswitch/
+          name: data-ovn
         resources:
           requests:
             cpu: 10m
@@ -248,6 +252,12 @@ spec:
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /etc/ovn/
+          name: etc-ovn
+        - mountPath: /etc/openvswitch/
+          name: etc-ovn
+        - mountPath: /var/lib/openvswitch/
+          name: data-ovn
         resources:
           requests:
             cpu: 10m
@@ -333,6 +343,12 @@ spec:
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /etc/ovn/
+          name: etc-ovn
+        - mountPath: /etc/openvswitch/
+          name: etc-ovn
+        - mountPath: /var/lib/openvswitch/
+          name: data-ovn
         resources:
           requests:
             cpu: 10m
@@ -400,10 +416,18 @@ spec:
         - mountPath: /etc/systemd/system
           name: systemd-units
           readOnly: true
+
         - mountPath: /run/openvswitch/
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /etc/openvswitch
+          name: etc-ovn
+        - mountPath: /etc/ovn
+          name: etc-ovn
+        - mountPath: /var/lib/openvswitch
+          name: data-ovn
+
         - mountPath: /run/ovnkube-config/
           name: ovnkube-config
         - mountPath: /etc/cni/net.d
@@ -423,10 +447,6 @@ spec:
           name: host-run-netns
           readOnly: true
           mountPropagation: HostToContainer
-        - mountPath: /etc/openvswitch
-          name: etc-openvswitch-node
-        - mountPath: /etc/ovn/
-          name: etc-openvswitch-node
         resources:
           requests:
             cpu: 10m
@@ -461,6 +481,12 @@ spec:
       - name: var-lib-openvswitch
         hostPath:
           path: /var/lib/openvswitch/data
+      - name: etc-ovn
+        hostPath:
+          path: /var/lib/ovn/etc
+      - name: data-ovn
+        hostPath:
+          path: /var/lib/ovn/data
 
       # used for iptables wrapper scripts
       - name: host-slash
@@ -469,9 +495,6 @@ spec:
       - name: host-run-netns
         hostPath:
           path: /run/netns
-      - name: etc-openvswitch-node
-        hostPath:
-          path: /etc/openvswitch
       # Used for placement of ACL audit logs
       - name: node-log
         hostPath:
