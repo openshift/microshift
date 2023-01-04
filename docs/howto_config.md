@@ -5,7 +5,7 @@ MicroShift can be configured in the following ways, in order of precedence:
 * Environment variables
 * Configuration file
 
-The MicroShift configuration file must be located at `~/.microshift/config.yaml` (user-specific) and `/etc/microshift/config.yaml` (system-wide), while the former takes precedence if it exists.
+The MicroShift configuration file must be located at `~/.microshift/config.yaml` (user-specific) and `/etc/microshift/config.yaml` (system-wide), while the former takes precedence if it exists. A sample `/etc/microshift/config.yaml.default` configuration file is installed by the MicroShift RPM and it can be used as a template when customizing MicroShift.
 
 The format of the `config.yaml` configuration file is as follows.
 
