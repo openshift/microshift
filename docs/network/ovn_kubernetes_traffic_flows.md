@@ -69,7 +69,7 @@ Step 1, IP and route inside `pod-1`:
 (host)$ oc -n default exec -it pod-1 -- bash
 
 (pod-1)$ ifconfig eth0
-eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1400
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 10.42.0.12  netmask 255.255.255.0  broadcast 10.42.0.255
         inet6 fe80::858:aff:fe2a:c  prefixlen 64  scopeid 0x20<link>
         ether 0a:58:0a:2a:00:0c  txqueuelen 0  (Ethernet)
@@ -124,7 +124,7 @@ Step 3, ovn management port ovn-k8s-mp0 on the host:
 
 ```text
 (host)$ ifconfig ovn-k8s-mp0
-ovn-k8s-mp0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1400
+ovn-k8s-mp0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 10.42.0.2  netmask 255.255.255.0  broadcast 10.42.0.255
         inet6 fe80::743a:81ff:fe5a:5d7  prefixlen 64  scopeid 0x20<link>
         ether 76:3a:81:5a:05:d7  txqueuelen 1000  (Ethernet)
@@ -493,7 +493,7 @@ Step 2, route in host network:
 
 ```text
 (host)$ ip route
-10.43.0.0/16 via 169.254.169.4 dev br-ex mtu 1400
+10.43.0.0/16 via 169.254.169.4 dev br-ex mtu 1500
 ```
 
 **NOTE:** The rest traffic flow for external to nodePortService is the same as [Host to ClusterServer](#host-to-clusterservice) or [Host to HostService](#host-to-hostservice)

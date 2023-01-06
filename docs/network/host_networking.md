@@ -108,10 +108,10 @@ Special routes are associated to `br-ex` interface to facilitate traffic destina
 
 ```text
 (host)$ ip route show 10.43.0.0/16
-10.43.0.0/16 via 169.254.169.4 dev br-ex mtu 1400
+10.43.0.0/16 via 169.254.169.4 dev br-ex mtu 1500
 
 (host)$ ip route show 169.254.169.1
-169.254.169.1 dev br-ex src 192.168.122.14 mtu 1400
+169.254.169.1 dev br-ex src 192.168.122.14 mtu 1500
 
 (host)$ ip route show 169.254.169.3
 169.254.169.3 via 10.42.0.1 dev ovn-k8s-mp0
