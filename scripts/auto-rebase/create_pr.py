@@ -15,6 +15,7 @@ App requires following permissions:
 """
 
 import os
+import re
 import sys
 from git import Repo, PushInfo # GitPython
 from github import GithubIntegration, Github, GithubException # pygithub
@@ -24,8 +25,10 @@ APP_ID_ENV = "APP_ID"
 KEY_ENV = "KEY"
 ORG_ENV = "ORG"
 REPO_ENV = "REPO"
+JOB_NAME_ENV = "JOB_NAME"
 
 BOT_REMOTE_NAME = "bot-creds"
+JOB_NAME_REGEXP = "periodic-ci-openshift-microshift-(.+)-periodics-rebase-on-nightlies"
 
 def try_get_env(var_name):
     val = os.getenv(var_name)
@@ -33,23 +36,27 @@ def try_get_env(var_name):
         sys.exit(f"Env var {var_name} is empty")
     return val
 
+def get_expected_base_branch():
+    return re.search(JOB_NAME_REGEXP, try_get_env(JOB_NAME_ENV)).group(1)
+
 app_id = try_get_env(APP_ID_ENV)
 key_path = try_get_env(KEY_ENV)
 org = try_get_env(ORG_ENV)
 repo = try_get_env(REPO_ENV)
+expected_base = get_expected_base_branch()
 
 def commit_str(commit):
     return f"{commit.hexsha[:8]} - {commit.summary}"
 
 def create_or_get_pr_url(ghrepo):
-    prs = ghrepo.get_pulls(base='main', head=f"{org}:{r.active_branch.name}", state="all")
+    prs = ghrepo.get_pulls(base=expected_base, head=f"{org}:{r.active_branch.name}", state="all")
     if prs.totalCount == 1:
         print(f"{prs[0].state.capitalize()} pull request exists already: {prs[0].html_url}")
     elif prs.totalCount > 1:
         print(f"Found several existing PRs for '{r.active_branch.name}': {[(x.state, x.html_url) for x in prs]}")
     else:
         body = f"{r.active_branch.name}\n\n/label tide/merge-method-squash"
-        pr = ghrepo.create_pull(title=r.active_branch.name, body=body, base='main', head=r.active_branch.name, maintainer_can_modify=True)
+        pr = ghrepo.create_pull(title=r.active_branch.name, body=body, base=expected_base, head=r.active_branch.name, maintainer_can_modify=True)
         print(f"Created pull request: {pr.html_url}")
 
 
@@ -62,8 +69,8 @@ gh = Github(installation_access_token)
 ghrepo = gh.get_repo(f"{org}/{repo}")
 
 r = Repo('.')
-if r.active_branch.commit == r.branches["main"].commit:
-    print(f"There's no new commit on branch {r.active_branch} compared to 'main'.\nLast commit: {r.active_branch.commit.hexsha[:8]} - \n\n{r.active_branch.commit.summary}'")
+if r.active_branch.commit == r.branches[expected_base].commit:
+    print(f"There's no new commit on branch {r.active_branch} compared to '{expected_base}'.\nLast commit: {r.active_branch.commit.hexsha[:8]} - \n\n{r.active_branch.commit.summary}'")
     sys.exit(0)
 
 remote_url = f"https://x-access-token:{installation_access_token}@github.com/{org}/{repo}"
@@ -79,9 +86,9 @@ remote.fetch()
 # Check if branch with the same name exists in remote
 matching_remote_branches = [ ref for ref in remote.refs if BOT_REMOTE_NAME + "/" + r.active_branch.name == ref.name ]
 if len(matching_remote_branches) == 1:
-    # Compare local and remote rebase branches by looking at their start on main branch (commit from which they branched off)
-    merge_base_prev_rebase = r.merge_base("main", matching_remote_branches[0].name)
-    merge_base_cur_rebase = r.merge_base("main", r.active_branch.name)
+    # Compare local and remote rebase branches by looking at their start on {expected_base} branch (commit from which they branched off)
+    merge_base_prev_rebase = r.merge_base(expected_base, matching_remote_branches[0].name)
+    merge_base_cur_rebase = r.merge_base(expected_base, r.active_branch.name)
     if merge_base_prev_rebase[0] == merge_base_cur_rebase[0]:
         print(f"Branch {r.active_branch} already exists on remote and it's up to date.\n\
 Branch-off commit: {commit_str(merge_base_cur_rebase[0])}\n")
