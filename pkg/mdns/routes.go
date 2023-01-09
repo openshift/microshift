@@ -61,7 +61,7 @@ func (c *MicroShiftmDNSController) run(stopCh chan struct{}, dc dynamic.Interfac
 }
 
 // TODO: The need for this indicates that the openshift-default-scc-manager is declaring itself ready before
-//       it really is. If we don't wait for the route API the informer will start throwing ugly errors.
+// it really is. If we don't wait for the route API the informer will start throwing ugly errors.
 func (c *MicroShiftmDNSController) waitForRouterAPI(dc dynamic.Interface, routersGVR *schema.GroupVersionResource) {
 	backoff := wait.Backoff{
 		Cap:      3 * time.Minute,
