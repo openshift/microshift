@@ -113,8 +113,8 @@ sudo tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <
 name=Beta rhocp-4.12 RPMs for RHEL8
 baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/4.12-el8-beta/
 enabled=1
-gpgcheck=0
-skip_if_unavailable=1
+gpgcheck=1
+skip_if_unavailable=0
 EOF
 
 sudo subscription-manager config --rhsm.manage_repos=1
