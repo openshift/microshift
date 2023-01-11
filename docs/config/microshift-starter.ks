@@ -47,12 +47,17 @@ selinux-policy-devel
 # Allow the default user to run sudo commands without password
 echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/redhat
 
+# Import Red Hat public keys to allow RPM GPG check (not necessary if a system is registered)
+if ! subscription-manager status >& /dev/null ; then
+   rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-*
+fi
+
 tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <<EOF
 [rhocp-4.12-el8-beta-$(uname -i)-rpms]
 name=Beta rhocp-4.12 RPMs for RHEL8
 baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/4.12-el8-beta/
 enabled=1
-gpgcheck=0
+gpgcheck=1
 skip_if_unavailable=0
 EOF
 
