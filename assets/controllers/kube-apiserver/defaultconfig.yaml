@@ -14,12 +14,8 @@ admission:
         kind: PodSecurityConfiguration
         apiVersion: pod-security.admission.config.k8s.io/v1beta1
         defaults:
-          enforce: "privileged"
+          enforce: "restricted"
           enforce-version: "latest"
-          audit: "restricted"
-          audit-version: "latest"
-          warn: "restricted"
-          warn-version: "latest"
         exemptions:
           usernames:
           # The build controller creates pods that are likely to be privileged
@@ -96,6 +92,7 @@ apiServerArguments:
     - security.openshift.io/SCCExecRestrictions
     - security.openshift.io/SecurityContextConstraint
     - security.openshift.io/ValidateSecurityContextConstraints
+    - storage.openshift.io/CSIInlineVolumeSecurity
   # switch to direct pod IP routing for aggregated apiservers to avoid service IPs as on source of instability
   enable-aggregator-routing:
     - "true"
