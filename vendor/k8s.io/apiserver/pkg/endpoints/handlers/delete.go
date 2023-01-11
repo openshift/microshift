@@ -231,7 +231,7 @@ func DeleteCollection(r rest.CollectionDeleter, checkBody bool, scope *RequestSc
 				return
 			}
 			if len(body) > 0 {
-				s, err := negotiation.NegotiateInputSerializer(req, false, metainternalversionscheme.Codecs)
+				s, err := negotiation.NegotiateInputSerializer(req, false, scope.Serializer)
 				if err != nil {
 					scope.err(err, w, req)
 					return

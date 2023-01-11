@@ -3,6 +3,8 @@ apiVersion: storage.k8s.io/v1
 kind: CSIDriver
 metadata:
   name: topolvm.io
+  labels:
+    security.openshift.io/csi-ephemeral-volume-profile: restricted
 spec:
   storageCapacity: true
   attachRequired: false
