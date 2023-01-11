@@ -60,6 +60,7 @@ func TestConfigure(t *testing.T) {
 		"--kube-api-burst=300",
 		"--kube-api-qps=150",
 		fmt.Sprintf("--kubeconfig=%s", cfg.KubeConfigPath(config.KubeControllerManager)),
+		"--leader-elect-renew-deadline=12s",
 		"--leader-elect-resource-lock=configmapsleases",
 		"--leader-elect-retry-period=3s",
 		"--leader-elect=false",
