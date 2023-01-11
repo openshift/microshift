@@ -8,6 +8,7 @@ import (
 	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/imagereferencemutators"
 	"github.com/openshift/apiserver-library-go/pkg/admission/quota/clusterresourcequota"
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccadmission"
+	apiclientv1 "github.com/openshift/client-go/apiserver/clientset/versioned/typed/apiserver/v1"
 	configclient "github.com/openshift/client-go/config/clientset/versioned"
 	configv1informer "github.com/openshift/client-go/config/informers/externalversions"
 	quotaclient "github.com/openshift/client-go/quota/clientset/versioned"
@@ -32,6 +33,7 @@ import (
 	"k8s.io/kubernetes/openshift-kube-apiserver/admission/autoscaling/managementcpusoverride"
 	"k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/nodeenv"
 	"k8s.io/kubernetes/openshift-kube-apiserver/enablement"
+	"k8s.io/kubernetes/openshift-kube-apiserver/filters/deprecatedapirequest"
 	"k8s.io/kubernetes/pkg/quota/v1/install"
 
 	// magnet to get authorizer package in hack/update-vendor.sh
@@ -76,7 +78,33 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
 		admissionrestconfig.NewInitializer(*rest.CopyConfig(genericConfig.LoopbackClientConfig)),
 		managementcpusoverride.NewInitializer(openshiftInformers.getOpenshiftInfraInformers().Config().V1().Infrastructures()),
 	)
+
+	// This is needed in order to have the correct initializers for the SCC admission plugin which is used to mutate
+	// PodSpecs for PodSpec-y workload objects in the pod security admission plugin.
+	enablement.SCCAdmissionPlugin.SetAuthorizer(genericConfig.Authorization.Authorizer)
+	enablement.SCCAdmissionPlugin.SetSecurityInformers(openshiftInformers.getOpenshiftSecurityInformers().Security().V1().SecurityContextConstraints())
+	enablement.SCCAdmissionPlugin.SetExternalKubeInformerFactory(kubeInformers)
 	// END ADMISSION
+
+	// HANDLER CHAIN (with oauth server and web console)
+	deprecatedAPIClient, err := apiclientv1.NewForConfig(makeJSONRESTConfig(genericConfig.LoopbackClientConfig))
+	if err != nil {
+		return err
+	}
+	deprecatedAPIRequestController := deprecatedapirequest.NewController(deprecatedAPIClient.APIRequestCounts(), nodeFor())
+	genericConfig.AddPostStartHook("openshift.io-deprecated-api-requests-filter", func(context genericapiserver.PostStartHookContext) error {
+		go deprecatedAPIRequestController.Start(context.StopCh)
+		return nil
+	})
+	genericConfig.BuildHandlerChainFunc, err = BuildHandlerChain(
+		enablement.OpenshiftConfig().AuthConfig.OAuthMetadataFile,
+		kubeInformers.Core().V1().ConfigMaps(),
+		deprecatedAPIRequestController,
+	)
+	if err != nil {
+		return err
+	}
+	// END HANDLER CHAIN
 
 	openshiftAPIServiceReachabilityCheck := newOpenshiftAPIServiceReachabilityCheck()
 	oauthAPIServiceReachabilityCheck := newOAuthPIServiceReachabilityCheck()

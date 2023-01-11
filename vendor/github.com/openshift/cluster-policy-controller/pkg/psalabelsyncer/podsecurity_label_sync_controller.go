@@ -41,6 +41,8 @@ const (
 // admission namespace label to match the user account privileges in terms of being able
 // to use SCCs
 type PodSecurityAdmissionLabelSynchronizationController struct {
+	shouldEnforce bool
+
 	namespaceClient corev1client.NamespaceInterface
 
 	namespaceLister      corev1listers.NamespaceLister
@@ -53,7 +55,46 @@ type PodSecurityAdmissionLabelSynchronizationController struct {
 	saToSCCsCache SAToSCCCache
 }
 
-func NewPodSecurityAdmissionLabelSynchronizationController(
+func NewEnforcingPodSecurityAdmissionLabelSynchronizationController(
+	namespaceClient corev1client.NamespaceInterface,
+	namespaceInformer corev1informers.NamespaceInformer,
+	rbacInformers rbacv1informers.Interface,
+	serviceAccountInformer corev1informers.ServiceAccountInformer,
+	sccInformer securityv1informers.SecurityContextConstraintsInformer,
+	eventRecorder events.Recorder,
+) (factory.Controller, error) {
+	return newPodSecurityAdmissionLabelSynchronizationController(
+		true,
+		namespaceClient,
+		namespaceInformer,
+		rbacInformers,
+		serviceAccountInformer,
+		sccInformer,
+		eventRecorder,
+	)
+}
+
+func NewAdvisingPodSecurityAdmissionLabelSynchronizationController(
+	namespaceClient corev1client.NamespaceInterface,
+	namespaceInformer corev1informers.NamespaceInformer,
+	rbacInformers rbacv1informers.Interface,
+	serviceAccountInformer corev1informers.ServiceAccountInformer,
+	sccInformer securityv1informers.SecurityContextConstraintsInformer,
+	eventRecorder events.Recorder,
+) (factory.Controller, error) {
+	return newPodSecurityAdmissionLabelSynchronizationController(
+		false,
+		namespaceClient,
+		namespaceInformer,
+		rbacInformers,
+		serviceAccountInformer,
+		sccInformer,
+		eventRecorder,
+	)
+}
+
+func newPodSecurityAdmissionLabelSynchronizationController(
+	shouldEnforce bool,
 	namespaceClient corev1client.NamespaceInterface,
 	namespaceInformer corev1informers.NamespaceInformer,
 	rbacInformers rbacv1informers.Interface,
@@ -82,6 +123,8 @@ func NewPodSecurityAdmissionLabelSynchronizationController(
 
 	syncCtx := factory.NewSyncContext(controllerName, eventRecorder.WithComponentSuffix(controllerName))
 	c := &PodSecurityAdmissionLabelSynchronizationController{
+		shouldEnforce: shouldEnforce,
+
 		namespaceClient: namespaceClient,
 
 		namespaceLister:      namespaceInformer.Lister(),
@@ -210,19 +253,48 @@ func (c *PodSecurityAdmissionLabelSynchronizationController) syncNamespace(ctx c
 	nsCopy := ns.DeepCopy()
 
 	var changed bool
-	for typeLabel, versionLabel := range map[string]string{
-		psapi.WarnLevelLabel:  psapi.WarnVersionLabel,
-		psapi.AuditLevelLabel: psapi.AuditVersionLabel,
-	} {
-		if ns.Labels[typeLabel] != string(psaLevel) || ns.Labels[versionLabel] != currentPSaVersion {
+
+	if c.shouldEnforce {
+		if nsCopy.Labels[psapi.EnforceLevelLabel] != string(psaLevel) || nsCopy.Labels[psapi.EnforceVersionLabel] != currentPSaVersion {
 			changed = true
 			if nsCopy.Labels == nil {
 				nsCopy.Labels = map[string]string{}
 			}
 
-			nsCopy.Labels[typeLabel] = string(psaLevel)
-			nsCopy.Labels[versionLabel] = currentPSaVersion
+			nsCopy.Labels[psapi.EnforceLevelLabel] = string(psaLevel)
+			nsCopy.Labels[psapi.EnforceVersionLabel] = currentPSaVersion
+		}
 
+		// cleanup audit and warn labels from version 4.11
+		// TODO: This can be removed in 4.13 and allow users set these as they wish
+		for typeLabel, versionLabel := range map[string]string{
+			psapi.WarnLevelLabel:  psapi.WarnVersionLabel,
+			psapi.AuditLevelLabel: psapi.AuditVersionLabel,
+		} {
+			if _, ok := nsCopy.Labels[typeLabel]; ok {
+				delete(nsCopy.Labels, typeLabel)
+				changed = true
+			}
+			if _, ok := nsCopy.Labels[versionLabel]; ok {
+				delete(nsCopy.Labels, versionLabel)
+				changed = true
+			}
+		}
+	} else {
+		for typeLabel, versionLabel := range map[string]string{
+			psapi.WarnLevelLabel:  psapi.WarnVersionLabel,
+			psapi.AuditLevelLabel: psapi.AuditVersionLabel,
+		} {
+			if ns.Labels[typeLabel] != string(psaLevel) || ns.Labels[versionLabel] != currentPSaVersion {
+				changed = true
+				if nsCopy.Labels == nil {
+					nsCopy.Labels = map[string]string{}
+				}
+
+				nsCopy.Labels[typeLabel] = string(psaLevel)
+				nsCopy.Labels[versionLabel] = currentPSaVersion
+
+			}
 		}
 	}
 
