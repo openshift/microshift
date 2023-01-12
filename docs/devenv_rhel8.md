@@ -60,7 +60,7 @@ Run the following commands to configure SUDO, upgrade the system, install basic 
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf clean all -y
 sudo dnf update -y
-sudo dnf install -y git cockpit make gcc selinux-policy-devel rpm-build bash-completion
+sudo dnf install -y git cockpit make gcc selinux-policy-devel rpm-build bash-completion go-toolset
 sudo systemctl enable --now cockpit.socket
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
@@ -83,7 +83,6 @@ The artifact of the build is the `microshift` executable file located in the `_o
 ### RPM Packages
 Run make command with the `rpm` or `srpm` argument in the top-level directory. 
 ```bash
-make clean
 make rpm
 make srpm
 ```
@@ -245,3 +244,35 @@ go tool pprof heap.pprof
 ```
 
 To view all the available profiles, run `oc get --raw /debug/pprof`.
+
+## Troubleshooting
+### No valid repository ID for fast-datapath
+If you encounter following error message while enabling fast-datapath repo:
+
+```
+# sudo subscription-manager repos \
+>     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+Error: 'fast-datapath-for-rhel-8-x86_64-rpms' does not match a valid repository ID. Use "subscription-manager repos --list" to see valid repositories.
+```
+Please make sure that your system is registered and attached to the `Red Hat Openshift Container Platform` subscription. Once the repo is enabled, you must see atleast following repo enabled.
+
+```
+# sudo subscription-manager repos --list-enabled
++----------------------------------------------------------+
+    Available Repositories in /etc/yum.repos.d/redhat.repo
++----------------------------------------------------------+
+Repo ID:   rhel-8-for-x86_64-appstream-rpms
+Repo Name: Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/rhel8/$releasever/x86_64/appstream/os
+Enabled:   1
+
+Repo ID:   fast-datapath-for-rhel-8-x86_64-rpms
+Repo Name: Fast Datapath for RHEL 8 x86_64 (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/layered/rhel8/x86_64/fast-datapath/os
+Enabled:   1
+
+Repo ID:   rhel-8-for-x86_64-baseos-rpms
+Repo Name: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/rhel8/$releasever/x86_64/baseos/os
+Enabled:   1
+```
