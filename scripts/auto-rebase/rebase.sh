@@ -77,6 +77,9 @@ download_release() {
     commits=$(oc adm release info ${authentication} --commits -o json "${release_image_amd64}")
     echo "${commits}" | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
 
+    local new_commits_file="new-commits.txt"
+    touch "${new_commits_file}"
+
     git config --global advice.detachedHead false
     git config --global init.defaultBranch main
     while IFS="" read -r line || [ -n "$line" ]
@@ -92,6 +95,7 @@ download_release() {
             git fetch origin --filter=tree:0 --tags "${commit}"
             git checkout "${commit}"
             popd >/dev/null
+            echo "${repo} ${commit}" >> "${new_commits_file}"
             echo
         fi
     done < source-commits
@@ -665,6 +669,62 @@ EOF
 }
 
 
+# Builds a list of the changes for each repository touched in this rebase
+update_changelog() {
+    local new_commits_file="${STAGING_DIR}/new-commits.txt"
+    local old_commits_file="${REPOROOT}/scripts/auto-rebase/commits.txt"
+    local changelog="${REPOROOT}/scripts/auto-rebase/changelog.txt"
+
+    local repo
+    local new_commit
+
+    rm -f "$changelog"
+    touch "$changelog"
+
+    while read repo new_commit
+    do
+        # Look for repo URL anchored at start of the line with a space
+        # after it because some repos may have names that are
+        # substrings of other repos.
+        local old_commit=$(grep "^${repo} " "${old_commits_file}" | cut -f2 -d' ' | head -n 1)
+
+        if [[ -z "${old_commit}" ]]
+        then
+            echo "# ${repo##*/} is a new dependency" >> "${changelog}"
+            echo >> "${changelog}"
+            continue
+        fi
+
+        if [[ "${old_commit}" == "${new_commit}" ]]; then
+            # emit a message, but not to the changelog, to avoid cluttering it
+            echo "${repo##*/} no change"
+            echo
+            continue
+        fi
+
+        pushd "${STAGING_DIR}/${repo##*/}" >/dev/null
+        echo "# ${repo##*/} ${old_commit} to ${new_commit}" >> "${changelog}"
+        (git log \
+             --no-merges \
+             --pretty="format:%H %cI %s" \
+             --no-decorate \
+             "${old_commit}..${new_commit}" \
+             || echo "There was an error determining the changes") >> "${changelog}"
+        echo >> "${changelog}"
+        popd >/dev/null
+    done < "${new_commits_file}"
+
+    cp "${new_commits_file}" "${old_commits_file}"
+
+    (cd "${REPOROOT}" && \
+         test -n "$(git status -s scripts/auto-rebase/changelog.txt scripts/auto-rebase/commits.txt)" && \
+         title "## Committing changes to changelog" && \
+         git add scripts/auto-rebase/commits.txt scripts/auto-rebase/changelog.txt && \
+         git commit -m "update changelog" || true)
+
+}
+
+
 # Runs each rebase step in sequence, commiting the step's output to git
 rebase_to() {
     local release_image_amd64=$1
@@ -693,6 +753,8 @@ rebase_to() {
     git checkout -b "${rebase_branch}"
 
     update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
+
+    update_changelog
 
     update_go_mod
     go mod tidy
@@ -767,6 +829,7 @@ case "$command" in
         [[ $# -ne 3 ]] && usage
         download_release "$2" "$3"
         ;;
+    changelog) update_changelog;;
     buildfiles) update_buildfiles;;
     go.mod) update_go_mod;;
     generated-apis) regenerate_openapi;;
