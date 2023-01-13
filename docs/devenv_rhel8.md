@@ -246,15 +246,13 @@ go tool pprof heap.pprof
 To view all the available profiles, run `oc get --raw /debug/pprof`.
 
 ## Troubleshooting
-### No valid repository ID for fast-datapath
-If you encounter following error message while enabling fast-datapath repo:
+### No Valid Repository ID for OpenShift RPM Channels
+If you encounter following error message while enabling fast-datapath repo (You can encounter similar error for other OpenShift related repos as well)
 
 ```
-# sudo subscription-manager repos \
->     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
 Error: 'fast-datapath-for-rhel-8-x86_64-rpms' does not match a valid repository ID. Use "subscription-manager repos --list" to see valid repositories.
 ```
-Please make sure that your system is registered and attached to the `Red Hat Openshift Container Platform` subscription. Once the repo is enabled, you must see atleast following repo enabled.
+Make sure that your system is registered and attached to the `Red Hat Openshift Container Platform` pr equivalent subscription. Once the repo is enabled, you must see at least the following repos enabled.
 
 ```
 # sudo subscription-manager repos --list-enabled
