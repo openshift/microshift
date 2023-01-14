@@ -31,6 +31,7 @@ trap 'echo "Script exited with error."' ERR
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
+RELEASE_TAG_RX="(.+)-([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6})"
 
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
@@ -672,8 +673,22 @@ rebase_to() {
     title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
     download_release "${release_image_amd64}" "${release_image_arm64}"
 
-    rebase_branch=rebase-${release_image_amd64#*:}
-    rebase_branch=${rebase_branch%-x86_64}
+    if [[ "${release_image_amd64#*:}" =~ ${RELEASE_TAG_RX} ]]; then
+        ver_stream=${BASH_REMATCH[1]}
+        amd64_date=${BASH_REMATCH[2]}
+    else
+        echo "Failed to match regex against amd64 image tag"
+        exit 1
+    fi
+
+    if [[ "${release_image_arm64#*:}" =~ ${RELEASE_TAG_RX} ]]; then
+        arm64_date="${BASH_REMATCH[2]}"
+    else
+        echo "Failed to match regex against arm64 image tag"
+        exit 1
+    fi
+
+    rebase_branch="rebase-${ver_stream}+amd64-${amd64_date}+arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
@@ -698,7 +713,7 @@ rebase_to() {
     fi
 
     update_images
-    if [[ -n "$(git status -s pkg/release)" ]]; then
+    if [[ -n "$(git status -s pkg/release packaging/crio.conf.d)" ]]; then
         title "## Committing changes to pkg/release"
         git add pkg/release
         git add packaging/crio.conf.d
