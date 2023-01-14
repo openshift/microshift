@@ -93,8 +93,8 @@ download_release() {
     popd >/dev/null
 
     title "# Cloning ${release_image_amd64} component repos"
-    commits=$(oc adm release info ${authentication} --commits -o json "${release_image_amd64}")
-    echo "${commits}" | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
+    cat release_amd64.json \
+       | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
 
     local new_commits_file="new-commits.txt"
     touch "${new_commits_file}"
