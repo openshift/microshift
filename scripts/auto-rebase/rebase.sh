@@ -43,6 +43,18 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+# Clone a repo at a commit
+clone_repo() {
+    local repo="$1"
+    local commit="$2"
+
+    git init "${repo##*/}"
+    pushd "${repo##*/}" >/dev/null
+    git remote add origin "${repo}"
+    git fetch origin --filter=tree:0 --tags "${commit}"
+    git checkout "${commit}"
+    popd >/dev/null
+}
 
 # Downloads a release's tools and manifest content into a staging directory,
 # then checks out the required components for the rebase at the release's commit.
@@ -88,13 +100,7 @@ download_release() {
         repo=$(echo "${line}" | cut -d ' ' -f 2)
         commit=$(echo "${line}" | cut -d ' ' -f 3)
         if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]]; then
-            title "## Cloning ${repo} at commit ${commit}..."
-            git init "${repo##*/}"
-            pushd "${repo##*/}" >/dev/null
-            git remote add origin "${repo}"
-            git fetch origin --filter=tree:0 --tags "${commit}"
-            git checkout "${commit}"
-            popd >/dev/null
+            clone_repo "${repo}" "${commit}"
             echo "${repo} ${commit}" >> "${new_commits_file}"
             echo
         fi
