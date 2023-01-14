@@ -48,8 +48,15 @@ clone_repo() {
     local repo="$1"
     local commit="$2"
 
-    git init "${repo##*/}"
-    pushd "${repo##*/}" >/dev/null
+    local repodir="${repo##*/}"
+
+    if [[ -d "${repodir}" ]]
+    then
+        return
+    fi
+
+    git init "${repodir}"
+    pushd "${repodir}" >/dev/null
     git remote add origin "${repo}"
     git fetch origin --filter=tree:0 --tags "${commit}"
     git checkout "${commit}"
