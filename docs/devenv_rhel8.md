@@ -60,7 +60,7 @@ Run the following commands to configure SUDO, upgrade the system, install basic 
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf clean all -y
 sudo dnf update -y
-sudo dnf install -y git cockpit make gcc selinux-policy-devel rpm-build bash-completion go-toolset
+sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
@@ -76,6 +76,7 @@ cd ~/microshift
 ### Executable
 Run `make` command in the top-level directory. If necessary, add `DEBUG=true` argument to the `make` command for building a binary with debug symbols.
 ```bash
+make clean
 make
 ```
 The artifact of the build is the `microshift` executable file located in the `_output/bin` directory.
