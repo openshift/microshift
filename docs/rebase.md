@@ -57,6 +57,14 @@ Run the following to download the OpenShift release to rebase to, specifying the
 
 This will create a directory `_output/staging`, download the specified release images' metadata (`release_{amd64,arm64}.json`) and manifests, git-clone (only) the repos of the embedded components and the operators of the loaded components, and check out the commit used by that OpenShift release.
 
+### Updating the changelog
+
+The rebase process tracks the git commits used for the embedded code and images to build a changelog of the updates in each rebase. Having the changelog in the pull request makes it easier for reviewers to understand what changes are being pulled in as part of the rebase.
+
+```shell
+./scripts/auto-rebase/rebase.sh changelog
+```
+
 ### Rebasing the go.mod file and vendoring
 
 In MicroShift's `go.mod` file, we only explicitly add the `require` directives needed by MicroShift itself (marked with the comment `// microshift`) whereas we let `go mod tidy` figure out the direct and indirect requirements for the embedded components. For the rebase, the focus is therefore on the `replace` directives.
