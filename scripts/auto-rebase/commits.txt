@@ -20,7 +20,7 @@ https://github.com/openshift/csi-livenessprobe image-amd64 057d3a76b7850b4763815
 https://github.com/openshift/csi-node-driver-registrar image-amd64 dd94599a87360adb32dd2be0d3f34b8d5e8439ae
 https://github.com/openshift/router image-amd64 c4b9f3f17bff6a076dffec8978b0907caf21022f
 https://github.com/openshift/kube-rbac-proxy image-amd64 513fd32175af4bb03f2e8a31030477e63380b5bc
-https://github.com/openshift/ovn-kubernetes image-amd64 dbdf0372b2f2be0c3413731eeae3084d924878b6
+https://github.com/openshift/ovn-kubernetes image-amd64 949a086595c75e635d0157242f518f3881151eeb
 https://github.com/openshift/kubernetes image-amd64 099791b17ea18e63fae371efd629d5d8131ca2c7
 https://github.com/openshift/service-ca-operator image-amd64 1b89fdce3fcccecdc5fdb705fe674cd4bfc58a2a
 https://github.com/openshift/oc image-arm64 619c8d74223a1b21fb182e11c35592716aed2896
