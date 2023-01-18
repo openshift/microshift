@@ -14,8 +14,12 @@ admission:
         kind: PodSecurityConfiguration
         apiVersion: pod-security.admission.config.k8s.io/v1beta1
         defaults:
-          enforce: "restricted"
-          enforce-version: "latest"
+          enforce: "invalid-to-force-substitution"
+          enforce-version: "invalid-to-force-substitution"
+          audit: "invalid-to-force-substitution"
+          audit-version: "invalid-to-force-substitution"
+          warn: "invalid-to-force-substitution"
+          warn-version: "invalid-to-force-substitution"
         exemptions:
           usernames:
           # The build controller creates pods that are likely to be privileged
