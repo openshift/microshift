@@ -22,10 +22,10 @@ release_arm64="$(oc get configmap/release-release-images-arm64-latest -o yaml \
 pullspec_release_amd64="registry.ci.openshift.org/ocp/release:${release_amd64}"
 pullspec_release_arm64="registry.ci.openshift.org/ocp-arm64/release-arm64:${release_arm64}"
 
-./scripts/auto-rebase/rebase.sh to "${pullspec_release_amd64}" "${pullspec_release_arm64}"
-
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
 ORG=openshift \
 REPO=microshift \
-./scripts/auto-rebase/create_pr.py
+AMD64_RELEASE=${pullspec_release_amd64} \
+ARM64_RELEASE=${pullspec_release_arm64} \
+./scripts/auto-rebase/rebase.py

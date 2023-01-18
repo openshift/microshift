@@ -827,7 +827,7 @@ rebase_to() {
         exit 1
     fi
 
-    rebase_branch="rebase-${ver_stream}+amd64-${amd64_date}+arm64-${arm64_date}"
+    rebase_branch="rebase-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
