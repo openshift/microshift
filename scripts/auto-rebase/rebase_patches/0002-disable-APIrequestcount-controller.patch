@@ -1,5 +1,5 @@
 diff --git a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
-index a72b3387..046e20bc 100644
+index fc1ce848..d402786d 100644
 --- a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 +++ b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 @@ -8,7 +8,6 @@ import (
@@ -18,8 +18,8 @@ index a72b3387..046e20bc 100644
  	"k8s.io/kubernetes/pkg/quota/v1/install"
  
  	// magnet to get authorizer package in hack/update-vendor.sh
-@@ -80,26 +78,6 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
- 	)
+@@ -86,26 +84,6 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
+ 	enablement.SCCAdmissionPlugin.SetExternalKubeInformerFactory(kubeInformers)
  	// END ADMISSION
  
 -	// HANDLER CHAIN (with oauth server and web console)
