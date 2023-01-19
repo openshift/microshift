@@ -22,6 +22,7 @@ BlockIOAccounting=yes
 MemoryAccounting=yes
 LimitNOFILE=1048576
 TimeoutStartSec=2m
+CPUAffinity=0
 
 [Install]
 WantedBy=multi-user.target

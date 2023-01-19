@@ -122,6 +122,8 @@ cgroupsPerQOS: true
 enforceNodeAllocatable: []
 rotateCertificates: false  #TODO
 serializeImagePulls: false
+reservedSystemCPUs: "0"
+cpuManagerPolicy: static
 # staticPodPath: /etc/kubernetes/manifests
 featureGates:
   APIPriorityAndFairness: true

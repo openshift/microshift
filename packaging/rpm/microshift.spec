@@ -96,6 +96,11 @@ Requires: jq
 %description networking
 The microshift-networking package provides the networking components necessary for the MicroShift default CNI driver.
 
+%package workload-pinning
+Summary: Workload pinning configuration for MicroShift
+
+%description workload-pinning
+The microshift-workload-pinning package provides the configuration files to turn keep the MicroShift control plane processes on a single core.
 
 %prep
 
@@ -146,6 +151,11 @@ install -p -m644 packaging/crio.conf.d/microshift_amd64.conf %{buildroot}%{_sysc
 %endif
 
 install -p -m644 packaging/crio.conf.d/microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
+
+# workload-pinning files
+mkdir -p -m755 %{buildroot}%{_sysconfdir}/kubernetes 
+install -p -m644 packaging/crio.conf.d/microshift-workloads.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift-workloads.conf
+install -p -m644 packaging/kubernetes/openshift-workload-pinning %{buildroot}%{_sysconfdir}/kubernetes/openshift-workload-pinning
 
 install -d -m755  %{buildroot}%{_sysconfdir}/NetworkManager/conf.d
 install -p -m644  packaging/network-manager-conf/microshift-nm.conf %{buildroot}%{_sysconfdir}/NetworkManager/conf.d/microshift-nm.conf
@@ -253,6 +263,11 @@ systemctl enable --now --quiet openvswitch || true
 %{_unitdir}/microshift-ovs-init.service
 %{_bindir}/configure-ovs.sh
 %{_bindir}/configure-ovs-microshift.sh
+
+%files workload-pinning
+
+%{_sysconfdir}/crio/crio.conf.d/microshift-workloads.conf
+%{_sysconfdir}/kubernetes/openshift-workload-pinning
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec

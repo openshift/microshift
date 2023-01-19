@@ -1,0 +1,5 @@
+{
+    "management": {
+        "cpuset": "0"
+    }
+}
