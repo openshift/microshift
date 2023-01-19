@@ -1,9 +1,9 @@
 {
   "release": {
-    "base": "4.13.0-0.nightly-arm64-2023-01-15-225335"
+    "base": "4.13.0-0.nightly-arm64-2023-01-17-171314"
   },
   "images": {
-    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0dbbe1de2f74af0e11646e3fa64c76ad8be903214208cd50dffeae3917a83e85",
+    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3364500288d431a85381bcf9b22cdc9ce65ca94458d4aced783cf8e566cace72",
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4af574e5ff2866d99c98b579ef3fdef0511c6a80343cf09da80ba7bf460ab30e",
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1938ba2ac9c96cb068cb60a2a9f164e0e1c4036158264b1c5ddfaa0a0776b46a",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cab0eb109ce74dd8e2d6b2c94f20bc66578ddb7cf883889711d4df49d99d8aae",
@@ -13,8 +13,8 @@
     "csi-external-resizer": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3a2b124e259555a6a603291cbc20dc4af5b658cbc968a8b32339240da7a92c54",
     "csi-node-driver-registrar": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1b2c57b0bb705d427ab448f5f21c0a49f1c564debba2495804908d55fffe2c67",
     "csi-livenessprobe": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6451a940b9c21e58364aa1445c18ae94438facfb45b4141301d8c8dbaa34eeda",
-    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:94f1030c585e7157725064e58f162eb7e17742ecbeb949a841cccab8fa6f795b",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2962383567ed9f2b78b394562c4f8c03ec511906da7f855e98d2ac418d6d6258",
+    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1ff2d7bd9798678af009f38e3a1cf0d3019958c25c733d238a5dc59011a2a50b",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:467984e3d3f19740278e95b3928ba2239571ca134896944dc160039451f262c2",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2ddea0c30e6facf46d52015482a7f0914a8ec0182cff3f0d5ec4a4f6035114e8"
   }
 }
