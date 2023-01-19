@@ -6,7 +6,6 @@ spec:
   template:
     metadata:
       annotations:
-        "unsupported.do-not-use.openshift.io/override-liveness-grace-period-seconds": "10"
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
       labels:
         ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
@@ -67,6 +66,7 @@ spec:
             httpGet:
               path: /healthz
               port: 1936
+            terminationGracePeriodSeconds: 10
           readinessProbe:
             httpGet:
               path: /healthz/ready
