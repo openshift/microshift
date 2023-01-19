@@ -1,26 +1,636 @@
-# ovn-kubernetes image-amd64 dbdf0372b2f2be0c3413731eeae3084d924878b6 to 949a086595c75e635d0157242f518f3881151eeb
-e74520379c7176ce99a24ed6cd93d8dd52983b7f 2023-01-10T11:33:10+01:00 Use the test wait group in all hybrid tests
-1f9e78e79f3b16bc5f8b8aff8fa9eb0ea03f1bee 2023-01-10T10:16:14+01:00 Add e2e test for LBs using metalLB
-a44abfbd04c05347237b5a35ea1e1b665f8f7f40 2023-01-10T10:16:13+01:00 Add docs for allocateNodePorts=false case
-f23a2a33da0088f145eeb3f5185eb2b261d9cabc 2023-01-10T10:16:13+01:00 Support AllocateLoadBalancerNodePortsFalse
-6d7dc8b5dc1132962dc635a2349bcbb4630d1932 2023-01-10T10:16:13+01:00 Fix pointer issues in gateway code
-bf0b421cb3729ddb465e34288832ea5ec95d0cec 2023-01-10T10:16:13+01:00 CloudPrivateIPConfig reconcile: don't throw err on missing annotation
-5b48ca0af8a0116aadd36cdb9d910dbae64bcf97 2023-01-10T10:16:13+01:00 kind: Add --deploy option to just install ovn-k
-b030fdbde7022b596644d80008dc01f6071ced67 2023-01-10T10:16:13+01:00 ignore tunnel header for single node mtu check
-28422f1673868d679d94620699afbead2070c2ed 2023-01-10T10:16:13+01:00 Add single-node gateway config option
-741c4e95d753f91e1a64469c1c1f5854bea053a6 2023-01-10T10:16:13+01:00 Update egress node assignability on every egress node update
-6b54337ba3275ebc677cc5bac5e13cce390191d0 2023-01-10T10:16:12+01:00 ovnkube-trace: run ovn-sbctl and ovn-trace with --no-leader-only
-c8d8ce06cdc5ab68569a9def56ad6ec91ba84cc5 2023-01-10T10:16:12+01:00 ovn/test: remove redundant NodeHostAddress from testcase 'tNode' struct
-6eb8ac4ed86aa30fa70fe87e2fd103f343eeb500 2023-01-10T10:16:12+01:00 ovn/test: misc spacing fixes for master tests
-722aab780deedec3eb2ce499f2e0fa9509a8172d 2023-01-10T10:16:12+01:00 ovn/test: consolidate Controller startup code in master tests
-c6e056cac3d42453345684a2cc5897bab7ca5e4e 2023-01-10T10:16:12+01:00 ovn/test: remove redundant expectedDatabaseState usage in testcases
-7dd94677bcf11e4c68f35391533d805eaf398c0b 2023-01-10T10:16:12+01:00 ovn/test: consolidate more code in master tests
-310115687a264ffe65367159d8cfac6660547bfd 2023-01-10T10:16:12+01:00 ovn/test: remove redundant config.HostNetworkNamespace="" in testcases
-78b0e1d47459a26bc10d463d5bff963f1be3900b 2023-01-10T10:16:09+01:00 ovn/test: remove unused LrpMac variable from test node object
-07cc45c3ab886da60fdf2d434a8c6ee2521e66a8 2023-01-10T10:14:25+01:00 ovn/test: rename some variables in master tests
-473242db584770e42ef7dfc00fc9c5aa07fbb878 2023-01-10T10:14:25+01:00 ovn/test: rename some variables in master tests
-53a3b381d23bda63f46889f18a91c5c2cd91d638 2023-01-10T10:14:24+01:00 ovn: partial revert of 0754fe61ed "Prepare node subnet annotation for multi-network support"
-e1cb4f0af669d020fa4b78e3a01256773761b75e 2023-01-10T10:14:24+01:00 Correct the deletion of noHostSubnet nodes
-b90394a56e409afc228e658f21dbda7130298c94 2023-01-10T10:14:24+01:00 Bump OVN to 22.12
-1a36993b92b2a9024bc048023218759de0221fb2 2023-01-10T10:14:24+01:00 Process delete handlers in reverse order of priority
-042ba6834f37824b752d812fcbb50e97951b915e 2023-01-10T10:14:24+01:00 Remove extra log format verb for add logical port latency
+# cluster-dns-operator embedded-component 1c136fe38b8cd5c0de99577d23157f884728d20b to 3251205366f52819330ada30c6407716559bae26
+84967ad9dafecc3b4f0857d088d3f0c03630b412 2022-12-07T02:34:50+00:00 Updating ose-cluster-dns-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-cluster-dns-operator.yml
+# cluster-ingress-operator embedded-component 560b2d32264db2c4919be3b94c202711a08f2ab0 to b81ee72a00486ad6994c5f50320bb536d0c93ca6
+cb8d9bb51c3409352535b6df96bed5b6058b32d7 2023-01-11T13:13:51-05:00 OCPBUGS-4759: Do not manage DNS for an ingresscontroller with a domain that does not match the baseDomain of the cluster DNS config for GCP
+cacbafd3493a9057869ed3438a40a8e0c9e818cc 2022-12-15T16:53:11-05:00 Replace liveness-grace-period-seconds annotation
+67b0e9216208406f9ff73f5616f4272d18cb3b50 2022-12-07T19:46:52-05:00 checkPodsScheduledForDeployment: Add nil check
+dbb5ac8ffe5d79ac24d9b6211fa153a7b3d0d9db 2022-12-06T19:17:00-05:00 Absorb PodsScheduled condition into MinAvailable
+4a793daafe68ff2dc237617b0931fdacb985816c 2022-11-10T16:20:20-05:00 Bump openshift/api for matchExpressions doc fix
+# cluster-kube-apiserver-operator embedded-component 7458ef3c0088e3d0f23cacb0305a1ee3f265fd8f to 0fa1e9be5e16b1fc8f7df206ec5bffc105ff814f
+18ee864c4e9acd633bad0f4c0a14bc100156ff71 2023-01-12T17:13:48-05:00 Remove duplicate `find` word in error msg for degraded webhook
+13f24dc9c35dd7f4d6dee50b0465814ad5058dc9 2023-01-11T17:53:58-05:00 enable pod security admission for techpreview
+c28433289d7647ce35d58f9ea600f6a05974d951 2023-01-11T17:53:58-05:00 update openshift/api for new featuregates
+811d5fe68c3a15599542770e180eae42387e7b5a 2023-01-10T14:57:30-05:00 Revert "turn PodSecurity admission to enforce restricted globally"
+# cluster-kube-controller-manager-operator embedded-component 152572d0606b4de816d06ea08b293e866467c94f to 5607bf985494c0ecd786827e12324fa1d20a553d
+7fde0ca3c681f5c4e3723e5278b5777f0d88ee47 2023-01-12T17:45:09+00:00 Fixup vendor after library-go update
+fc57b9b6bb905367dd82e751b262e2932e9f1b24 2023-01-12T11:45:43-05:00 update openshift/api to get new featuregates
+dac73d95c22e5723c33c71d7bead6232d715f4ab 2023-01-12T11:45:43-05:00 add featuregates for clusterpolicycontroller
+41383640bdccafdb6a7944cd90c786d92fbb6845 2023-01-09T11:10:10+00:00 Update library-go dependency to move vSphere to out of tree
+# cluster-kube-scheduler-operator embedded-component b64f1a6fef9bb8d86fac2763c58d981bafe0602c to d1ccee33ec0e2a6d503421b5fe9496d59ef7ff2c
+6f3c4d0f301eb64a051dc709fe311550b68f0869 2022-08-08T14:55:23-04:00 Add client certificate and key to service monitor
+# cluster-network-operator embedded-component 830daae9472c1e3f525c0af66bc7ea4054de9989 to a7187082c4caed84f554edb218ca7d00c3a57370
+e014a171e5ddc85f833c691ec03e9f73f17d2783 2023-01-12T22:27:11+01:00 Update github.com/Masterminds/sprig to v3
+5c225953a5be97c54d49ab6c13e39cc00842a6c0 2023-01-10T17:03:25+01:00 OVN-Kubernetes: Stop sorting master node addresses
+# cluster-openshift-controller-manager-operator embedded-component 57fde686504d1a404fe5c3aa0e4f9f8e8347c982 to 9091d03d6c61cb205e72bc32657a36c5cac759ed
+bb96c874950ef83fc30c0835c3f298327af18f9f 2023-01-03T14:02:19+01:00 remove unnecessary RBAC for leader-locking-ingress-to-route-controller
+# cluster-policy-controller embedded-component 69d1995d8f0346247e24544ea201af498225978a to 3f8efde27bb6a50e5d50f0798877d4d2e1154dcb
+6aa74eac7046e5e668edcbfb23f14358326e777f 2023-01-11T13:41:22+01:00 clusterquotareconciliation: do not sync quota monitor cache with no monitors registered
+# etcd embedded-component 494951078ddcfe896cdda4c4f3c70d37ec1c6c53 to 18785067b82295f2eb40edb6e4afda4d7b3f9cfe
+15f68c38366d6699f8bdbcda50c4dfebaa3bcb69 2023-01-11T11:17:55+01:00 UPSTREAM:<carry>: etcdserver: process the scenaro of the last WAL record being partially synced to disk
+# kubernetes embedded-component 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# machine-config-operator embedded-component 31c812547f612be2b5112c530af6adf4b654c37c to a7c4961a8000708251384cbcf58f9eff08ca3b74
+57164c708a6248c468d6c8ad4c38895fa2e079ee 2023-01-12T12:10:06+01:00 Add mkowalsk as a bare metal reviewer and approver
+31cbc9edf3693678f08d3aca841454d39708a0c8 2023-01-11T17:27:44-05:00 remove sprig / goutils / associated deps
+eff8d1562ee2b773f986e07431032153dcd4f296 2023-01-11T17:27:35-05:00 adds smoke test for rendered assets
+1998d569e977b9d503cde9ba9b804f300942e107 2023-01-11T17:08:55-05:00 use common template rendering funcs
+# cluster-dns-operator embedded-component 1c136fe38b8cd5c0de99577d23157f884728d20b to 3251205366f52819330ada30c6407716559bae26
+84967ad9dafecc3b4f0857d088d3f0c03630b412 2022-12-07T02:34:50+00:00 Updating ose-cluster-dns-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-cluster-dns-operator.yml
+# cluster-ingress-operator embedded-component 560b2d32264db2c4919be3b94c202711a08f2ab0 to b81ee72a00486ad6994c5f50320bb536d0c93ca6
+cb8d9bb51c3409352535b6df96bed5b6058b32d7 2023-01-11T13:13:51-05:00 OCPBUGS-4759: Do not manage DNS for an ingresscontroller with a domain that does not match the baseDomain of the cluster DNS config for GCP
+cacbafd3493a9057869ed3438a40a8e0c9e818cc 2022-12-15T16:53:11-05:00 Replace liveness-grace-period-seconds annotation
+67b0e9216208406f9ff73f5616f4272d18cb3b50 2022-12-07T19:46:52-05:00 checkPodsScheduledForDeployment: Add nil check
+dbb5ac8ffe5d79ac24d9b6211fa153a7b3d0d9db 2022-12-06T19:17:00-05:00 Absorb PodsScheduled condition into MinAvailable
+4a793daafe68ff2dc237617b0931fdacb985816c 2022-11-10T16:20:20-05:00 Bump openshift/api for matchExpressions doc fix
+# cluster-kube-apiserver-operator embedded-component 7458ef3c0088e3d0f23cacb0305a1ee3f265fd8f to 0fa1e9be5e16b1fc8f7df206ec5bffc105ff814f
+18ee864c4e9acd633bad0f4c0a14bc100156ff71 2023-01-12T17:13:48-05:00 Remove duplicate `find` word in error msg for degraded webhook
+13f24dc9c35dd7f4d6dee50b0465814ad5058dc9 2023-01-11T17:53:58-05:00 enable pod security admission for techpreview
+c28433289d7647ce35d58f9ea600f6a05974d951 2023-01-11T17:53:58-05:00 update openshift/api for new featuregates
+811d5fe68c3a15599542770e180eae42387e7b5a 2023-01-10T14:57:30-05:00 Revert "turn PodSecurity admission to enforce restricted globally"
+# cluster-kube-controller-manager-operator embedded-component 152572d0606b4de816d06ea08b293e866467c94f to 5607bf985494c0ecd786827e12324fa1d20a553d
+7fde0ca3c681f5c4e3723e5278b5777f0d88ee47 2023-01-12T17:45:09+00:00 Fixup vendor after library-go update
+fc57b9b6bb905367dd82e751b262e2932e9f1b24 2023-01-12T11:45:43-05:00 update openshift/api to get new featuregates
+dac73d95c22e5723c33c71d7bead6232d715f4ab 2023-01-12T11:45:43-05:00 add featuregates for clusterpolicycontroller
+41383640bdccafdb6a7944cd90c786d92fbb6845 2023-01-09T11:10:10+00:00 Update library-go dependency to move vSphere to out of tree
+# cluster-kube-scheduler-operator embedded-component b64f1a6fef9bb8d86fac2763c58d981bafe0602c to d1ccee33ec0e2a6d503421b5fe9496d59ef7ff2c
+6f3c4d0f301eb64a051dc709fe311550b68f0869 2022-08-08T14:55:23-04:00 Add client certificate and key to service monitor
+# cluster-network-operator embedded-component 830daae9472c1e3f525c0af66bc7ea4054de9989 to a7187082c4caed84f554edb218ca7d00c3a57370
+e014a171e5ddc85f833c691ec03e9f73f17d2783 2023-01-12T22:27:11+01:00 Update github.com/Masterminds/sprig to v3
+5c225953a5be97c54d49ab6c13e39cc00842a6c0 2023-01-10T17:03:25+01:00 OVN-Kubernetes: Stop sorting master node addresses
+# cluster-openshift-controller-manager-operator embedded-component 57fde686504d1a404fe5c3aa0e4f9f8e8347c982 to 9091d03d6c61cb205e72bc32657a36c5cac759ed
+bb96c874950ef83fc30c0835c3f298327af18f9f 2023-01-03T14:02:19+01:00 remove unnecessary RBAC for leader-locking-ingress-to-route-controller
+# cluster-policy-controller embedded-component 69d1995d8f0346247e24544ea201af498225978a to 3f8efde27bb6a50e5d50f0798877d4d2e1154dcb
+6aa74eac7046e5e668edcbfb23f14358326e777f 2023-01-11T13:41:22+01:00 clusterquotareconciliation: do not sync quota monitor cache with no monitors registered
+# etcd embedded-component 494951078ddcfe896cdda4c4f3c70d37ec1c6c53 to 18785067b82295f2eb40edb6e4afda4d7b3f9cfe
+15f68c38366d6699f8bdbcda50c4dfebaa3bcb69 2023-01-11T11:17:55+01:00 UPSTREAM:<carry>: etcdserver: process the scenaro of the last WAL record being partially synced to disk
+# kubernetes embedded-component 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# machine-config-operator embedded-component 31c812547f612be2b5112c530af6adf4b654c37c to a7c4961a8000708251384cbcf58f9eff08ca3b74
+57164c708a6248c468d6c8ad4c38895fa2e079ee 2023-01-12T12:10:06+01:00 Add mkowalsk as a bare metal reviewer and approver
+31cbc9edf3693678f08d3aca841454d39708a0c8 2023-01-11T17:27:44-05:00 remove sprig / goutils / associated deps
+eff8d1562ee2b773f986e07431032153dcd4f296 2023-01-11T17:27:35-05:00 adds smoke test for rendered assets
+1998d569e977b9d503cde9ba9b804f300942e107 2023-01-11T17:08:55-05:00 use common template rendering funcs
+# oc image-amd64 619c8d74223a1b21fb182e11c35592716aed2896 to a0c13fc4b7112da787fb93d7ecb2f10f8a0cbb0c
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# cluster-dns-operator embedded-component 1c136fe38b8cd5c0de99577d23157f884728d20b to 3251205366f52819330ada30c6407716559bae26
+84967ad9dafecc3b4f0857d088d3f0c03630b412 2022-12-07T02:34:50+00:00 Updating ose-cluster-dns-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-cluster-dns-operator.yml
+# cluster-ingress-operator embedded-component 560b2d32264db2c4919be3b94c202711a08f2ab0 to b81ee72a00486ad6994c5f50320bb536d0c93ca6
+cb8d9bb51c3409352535b6df96bed5b6058b32d7 2023-01-11T13:13:51-05:00 OCPBUGS-4759: Do not manage DNS for an ingresscontroller with a domain that does not match the baseDomain of the cluster DNS config for GCP
+cacbafd3493a9057869ed3438a40a8e0c9e818cc 2022-12-15T16:53:11-05:00 Replace liveness-grace-period-seconds annotation
+67b0e9216208406f9ff73f5616f4272d18cb3b50 2022-12-07T19:46:52-05:00 checkPodsScheduledForDeployment: Add nil check
+dbb5ac8ffe5d79ac24d9b6211fa153a7b3d0d9db 2022-12-06T19:17:00-05:00 Absorb PodsScheduled condition into MinAvailable
+4a793daafe68ff2dc237617b0931fdacb985816c 2022-11-10T16:20:20-05:00 Bump openshift/api for matchExpressions doc fix
+# cluster-kube-apiserver-operator embedded-component 7458ef3c0088e3d0f23cacb0305a1ee3f265fd8f to 0fa1e9be5e16b1fc8f7df206ec5bffc105ff814f
+18ee864c4e9acd633bad0f4c0a14bc100156ff71 2023-01-12T17:13:48-05:00 Remove duplicate `find` word in error msg for degraded webhook
+13f24dc9c35dd7f4d6dee50b0465814ad5058dc9 2023-01-11T17:53:58-05:00 enable pod security admission for techpreview
+c28433289d7647ce35d58f9ea600f6a05974d951 2023-01-11T17:53:58-05:00 update openshift/api for new featuregates
+811d5fe68c3a15599542770e180eae42387e7b5a 2023-01-10T14:57:30-05:00 Revert "turn PodSecurity admission to enforce restricted globally"
+# cluster-kube-controller-manager-operator embedded-component 152572d0606b4de816d06ea08b293e866467c94f to 5607bf985494c0ecd786827e12324fa1d20a553d
+7fde0ca3c681f5c4e3723e5278b5777f0d88ee47 2023-01-12T17:45:09+00:00 Fixup vendor after library-go update
+fc57b9b6bb905367dd82e751b262e2932e9f1b24 2023-01-12T11:45:43-05:00 update openshift/api to get new featuregates
+dac73d95c22e5723c33c71d7bead6232d715f4ab 2023-01-12T11:45:43-05:00 add featuregates for clusterpolicycontroller
+41383640bdccafdb6a7944cd90c786d92fbb6845 2023-01-09T11:10:10+00:00 Update library-go dependency to move vSphere to out of tree
+# cluster-kube-scheduler-operator embedded-component b64f1a6fef9bb8d86fac2763c58d981bafe0602c to d1ccee33ec0e2a6d503421b5fe9496d59ef7ff2c
+6f3c4d0f301eb64a051dc709fe311550b68f0869 2022-08-08T14:55:23-04:00 Add client certificate and key to service monitor
+# cluster-network-operator embedded-component 830daae9472c1e3f525c0af66bc7ea4054de9989 to a7187082c4caed84f554edb218ca7d00c3a57370
+e014a171e5ddc85f833c691ec03e9f73f17d2783 2023-01-12T22:27:11+01:00 Update github.com/Masterminds/sprig to v3
+5c225953a5be97c54d49ab6c13e39cc00842a6c0 2023-01-10T17:03:25+01:00 OVN-Kubernetes: Stop sorting master node addresses
+# cluster-openshift-controller-manager-operator embedded-component 57fde686504d1a404fe5c3aa0e4f9f8e8347c982 to 9091d03d6c61cb205e72bc32657a36c5cac759ed
+bb96c874950ef83fc30c0835c3f298327af18f9f 2023-01-03T14:02:19+01:00 remove unnecessary RBAC for leader-locking-ingress-to-route-controller
+# cluster-policy-controller embedded-component 69d1995d8f0346247e24544ea201af498225978a to 3f8efde27bb6a50e5d50f0798877d4d2e1154dcb
+6aa74eac7046e5e668edcbfb23f14358326e777f 2023-01-11T13:41:22+01:00 clusterquotareconciliation: do not sync quota monitor cache with no monitors registered
+# etcd embedded-component 494951078ddcfe896cdda4c4f3c70d37ec1c6c53 to 18785067b82295f2eb40edb6e4afda4d7b3f9cfe
+15f68c38366d6699f8bdbcda50c4dfebaa3bcb69 2023-01-11T11:17:55+01:00 UPSTREAM:<carry>: etcdserver: process the scenaro of the last WAL record being partially synced to disk
+# kubernetes embedded-component 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# machine-config-operator embedded-component 31c812547f612be2b5112c530af6adf4b654c37c to a7c4961a8000708251384cbcf58f9eff08ca3b74
+57164c708a6248c468d6c8ad4c38895fa2e079ee 2023-01-12T12:10:06+01:00 Add mkowalsk as a bare metal reviewer and approver
+31cbc9edf3693678f08d3aca841454d39708a0c8 2023-01-11T17:27:44-05:00 remove sprig / goutils / associated deps
+eff8d1562ee2b773f986e07431032153dcd4f296 2023-01-11T17:27:35-05:00 adds smoke test for rendered assets
+1998d569e977b9d503cde9ba9b804f300942e107 2023-01-11T17:08:55-05:00 use common template rendering funcs
+# oc image-amd64 619c8d74223a1b21fb182e11c35592716aed2896 to a0c13fc4b7112da787fb93d7ecb2f10f8a0cbb0c
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# cluster-dns-operator embedded-component 1c136fe38b8cd5c0de99577d23157f884728d20b to 3251205366f52819330ada30c6407716559bae26
+84967ad9dafecc3b4f0857d088d3f0c03630b412 2022-12-07T02:34:50+00:00 Updating ose-cluster-dns-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-cluster-dns-operator.yml
+# cluster-ingress-operator embedded-component 560b2d32264db2c4919be3b94c202711a08f2ab0 to b81ee72a00486ad6994c5f50320bb536d0c93ca6
+cb8d9bb51c3409352535b6df96bed5b6058b32d7 2023-01-11T13:13:51-05:00 OCPBUGS-4759: Do not manage DNS for an ingresscontroller with a domain that does not match the baseDomain of the cluster DNS config for GCP
+cacbafd3493a9057869ed3438a40a8e0c9e818cc 2022-12-15T16:53:11-05:00 Replace liveness-grace-period-seconds annotation
+67b0e9216208406f9ff73f5616f4272d18cb3b50 2022-12-07T19:46:52-05:00 checkPodsScheduledForDeployment: Add nil check
+dbb5ac8ffe5d79ac24d9b6211fa153a7b3d0d9db 2022-12-06T19:17:00-05:00 Absorb PodsScheduled condition into MinAvailable
+4a793daafe68ff2dc237617b0931fdacb985816c 2022-11-10T16:20:20-05:00 Bump openshift/api for matchExpressions doc fix
+# cluster-kube-apiserver-operator embedded-component 7458ef3c0088e3d0f23cacb0305a1ee3f265fd8f to 0fa1e9be5e16b1fc8f7df206ec5bffc105ff814f
+18ee864c4e9acd633bad0f4c0a14bc100156ff71 2023-01-12T17:13:48-05:00 Remove duplicate `find` word in error msg for degraded webhook
+13f24dc9c35dd7f4d6dee50b0465814ad5058dc9 2023-01-11T17:53:58-05:00 enable pod security admission for techpreview
+c28433289d7647ce35d58f9ea600f6a05974d951 2023-01-11T17:53:58-05:00 update openshift/api for new featuregates
+811d5fe68c3a15599542770e180eae42387e7b5a 2023-01-10T14:57:30-05:00 Revert "turn PodSecurity admission to enforce restricted globally"
+# cluster-kube-controller-manager-operator embedded-component 152572d0606b4de816d06ea08b293e866467c94f to 5607bf985494c0ecd786827e12324fa1d20a553d
+7fde0ca3c681f5c4e3723e5278b5777f0d88ee47 2023-01-12T17:45:09+00:00 Fixup vendor after library-go update
+fc57b9b6bb905367dd82e751b262e2932e9f1b24 2023-01-12T11:45:43-05:00 update openshift/api to get new featuregates
+dac73d95c22e5723c33c71d7bead6232d715f4ab 2023-01-12T11:45:43-05:00 add featuregates for clusterpolicycontroller
+41383640bdccafdb6a7944cd90c786d92fbb6845 2023-01-09T11:10:10+00:00 Update library-go dependency to move vSphere to out of tree
+# cluster-kube-scheduler-operator embedded-component b64f1a6fef9bb8d86fac2763c58d981bafe0602c to d1ccee33ec0e2a6d503421b5fe9496d59ef7ff2c
+6f3c4d0f301eb64a051dc709fe311550b68f0869 2022-08-08T14:55:23-04:00 Add client certificate and key to service monitor
+# cluster-network-operator embedded-component 830daae9472c1e3f525c0af66bc7ea4054de9989 to a7187082c4caed84f554edb218ca7d00c3a57370
+e014a171e5ddc85f833c691ec03e9f73f17d2783 2023-01-12T22:27:11+01:00 Update github.com/Masterminds/sprig to v3
+5c225953a5be97c54d49ab6c13e39cc00842a6c0 2023-01-10T17:03:25+01:00 OVN-Kubernetes: Stop sorting master node addresses
+# cluster-openshift-controller-manager-operator embedded-component 57fde686504d1a404fe5c3aa0e4f9f8e8347c982 to 9091d03d6c61cb205e72bc32657a36c5cac759ed
+bb96c874950ef83fc30c0835c3f298327af18f9f 2023-01-03T14:02:19+01:00 remove unnecessary RBAC for leader-locking-ingress-to-route-controller
+# cluster-policy-controller embedded-component 69d1995d8f0346247e24544ea201af498225978a to 3f8efde27bb6a50e5d50f0798877d4d2e1154dcb
+6aa74eac7046e5e668edcbfb23f14358326e777f 2023-01-11T13:41:22+01:00 clusterquotareconciliation: do not sync quota monitor cache with no monitors registered
+# etcd embedded-component 494951078ddcfe896cdda4c4f3c70d37ec1c6c53 to 18785067b82295f2eb40edb6e4afda4d7b3f9cfe
+15f68c38366d6699f8bdbcda50c4dfebaa3bcb69 2023-01-11T11:17:55+01:00 UPSTREAM:<carry>: etcdserver: process the scenaro of the last WAL record being partially synced to disk
+# kubernetes embedded-component 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# machine-config-operator embedded-component 31c812547f612be2b5112c530af6adf4b654c37c to a7c4961a8000708251384cbcf58f9eff08ca3b74
+57164c708a6248c468d6c8ad4c38895fa2e079ee 2023-01-12T12:10:06+01:00 Add mkowalsk as a bare metal reviewer and approver
+31cbc9edf3693678f08d3aca841454d39708a0c8 2023-01-11T17:27:44-05:00 remove sprig / goutils / associated deps
+eff8d1562ee2b773f986e07431032153dcd4f296 2023-01-11T17:27:35-05:00 adds smoke test for rendered assets
+1998d569e977b9d503cde9ba9b804f300942e107 2023-01-11T17:08:55-05:00 use common template rendering funcs
+# oc image-amd64 619c8d74223a1b21fb182e11c35592716aed2896 to a0c13fc4b7112da787fb93d7ecb2f10f8a0cbb0c
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# ovn-kubernetes image-amd64 949a086595c75e635d0157242f518f3881151eeb to ffb8cee00c97b0e1c521edb111209da3d83372b2
+5400d94460db87b2933ab81b01aed24a050d4ddb 2023-01-13T20:28:43+01:00 CARRY: Use the test wait group in all hybrid tests
+c76929fe8d9f59aa4456a97703b802ef1a5c5bf3 2023-01-13T15:22:24+01:00 Revert "Bug 2075548: [DownstreamMerge] 09 Jan 2023"
+238b4ed99d408ce03e557f7df1ffe77f799d9df8 2023-01-12T10:28:11-08:00 update yaml template to enable multiple network support
+88e61e97e11d80714c9f690f94cf68fb12db729b 2023-01-12T10:28:11-08:00 enable OVN CNI to configure secondary network interfaces for a Pod
+78d5f499da49df4e778a8afdd89496c6d9eff7e0 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: add level driven controller
+ae09791fc87770258ed1cb4a7edf6e41cb85c426 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: watch NAD provisioning
+495f235e7ce4d7db24f0edc6215e8c8b7a7a5a16 2023-01-11T15:29:43-08:00 config: add enable-multi-network option
+35f04b8d358756905dea5091b6b7df60dea7efa3 2023-01-11T15:29:43-08:00 support secondary network of layer3 topology
+5a88f6b79565d72b12d8442538003e1f94718ce9 2023-01-11T19:31:03+01:00 An attempt to fix cleanup failure in case when the original ovn-k pod used to run host commands was deleted between setup and cleanup.
+de29a860dc4db129f4408516d4616b2d5d221413 2023-01-11T19:30:59+01:00 EgressFirewall: smart clusterSubnet exclusion. Don't apply "&& dst != clusterSubnet" to every acl, since that will generate inefficient conjunctive flows in ovs. Every egress firewall ACL has "dst = <CIDR selector or dns name address set>", for CIDR selector only add clusterSubnet exclusion if CIDR selector has intersection with clusterSubnet. For dns address sets (since they are only used by egress firewall), don't add ips from clusterSubnet to dns address set, since we know these ips should be excluded.
+bd29f417b43c257897f27badc64af38df78b99bd 2023-01-11T19:30:55+01:00 Unify egress firewall implementation for both gateway modes, move all acls to the ClusterPortGroup. Unify unit tests for both gateway modes. Make sure egress firewall allows inbound connections.
+e5d3e3f3f992bca605a6c194b9209656fe063a40 2023-01-11T14:30:20+01:00 Drop in-cluster traffic towards svcCIDR at wrong port
+48f9204e675af0796d90f1c14cfe24b833834867 2023-01-11T13:17:15+01:00 Bump OVN to 22.12
+9da055f26906d2dcf40af2584df9196878116503 2023-01-10T15:36:44+02:00 ovnkube-node: Existing management port check
+f105108f2cbc6f026b214d99ba198eaf2c5d3b3f 2023-01-09T11:55:41+00:00 addMasqueradeRoute: fallback to gateway interface IPs
+22766b43be44eb9fcccfb5e0083041e10253bfe1 2023-01-07T20:29:55+01:00 Add e2e test for LBs using metalLB
+e380332fbfa79424f8faa8660e7e8f50c17ca4c6 2023-01-07T19:24:41+01:00 Add docs for allocateNodePorts=false case
+0111e1faec20d16505a110449966273b430b7ad1 2023-01-07T19:24:41+01:00 Support AllocateLoadBalancerNodePortsFalse
+40199eed08d999e760deba3d09a1125a09c8624b 2023-01-07T19:24:41+01:00 Fix pointer issues in gateway code
+18f2a097b6ce89eeea2bbdcbbe048bde3c95be9f 2023-01-05T11:29:59+01:00 kind: Add --deploy option to just install ovn-k
+6da279560b1c30a74d5fe1553f5b3c4a6ff175dc 2023-01-03T14:57:30-06:00 ovn/test: remove redundant NodeHostAddress from testcase 'tNode' struct
+5ea7e42977664dd9abe4a068352d62e402c3af01 2023-01-03T14:57:30-06:00 ovn/test: misc spacing fixes for master tests
+0b72a52bc95c3146c4a05433bb51ca1ae3b57b98 2023-01-03T14:57:30-06:00 ovn/test: consolidate Controller startup code in master tests
+40fe0222f01349d28bbd4a800c481f2d5fae3671 2023-01-03T14:57:30-06:00 ovn/test: remove redundant expectedDatabaseState usage in testcases
+1692238563b837d4bb32a437b087dc525918d08d 2023-01-03T14:57:30-06:00 ovn/test: consolidate more code in master tests
+623f414eda9b25f214acb274f020d51aea8bc4b0 2023-01-03T14:57:30-06:00 ovn/test: remove redundant config.HostNetworkNamespace="" in testcases
+5741fc313b62de7ba1a4987fba134668e993b103 2023-01-03T14:57:30-06:00 ovn/test: remove unused LrpMac variable from test node object
+4f6a7417b08ec184ec8b04f099807afc5da0d4f3 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+fd142de1aa066dbb1a9a789c1d69b7d990fc1586 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+7fae2fc4ddc68dec005f6c394cf18c1caddf1ec0 2023-01-03T14:57:30-06:00 ovn: partial revert of 0754fe61ed "Prepare node subnet annotation for multi-network support"
+fb62ce7f197e38b82586adca8b5fb27422851dbc 2023-01-03T14:11:31-05:00 Correct the deletion of noHostSubnet nodes
+539b5e723a4eb2b05bd4a610f487df1bea7a58bc 2022-12-22T14:49:08+01:00 ovnkube-trace: run ovn-sbctl and ovn-trace with --no-leader-only
+0bb7c19be33ce4ed5966e8444404f6739b3e6fa8 2022-12-21T18:33:57+01:00 Update egress node assignability on every egress node update
+683971e073eafc71db1ebcaccb3070cecaa1bbb0 2022-12-21T18:26:41+01:00 Bump OVN to 22.12
+cf09fb47d57fb1082c8313682f0adacb7112ff90 2022-12-15T18:49:30+00:00 Process delete handlers in reverse order of priority
+c248f1e32cf9f84625b2cb9a037ffa28ab2232ae 2022-12-15T13:10:30+00:00 Remove extra log format verb for add logical port latency
+156cc72c4fbaa7b986c06026bc6dd57679bf3f78 2022-12-06T17:20:46+01:00 CloudPrivateIPConfig reconcile: don't throw err on missing annotation
+84e28ea5d414586fc12cecab223bff0f9861e11d 2022-11-24T16:04:11+08:00 ignore tunnel header for single node mtu check
+9fca16bb1317262239f9276e24cd033bb21e5e7a 2022-11-24T16:04:06+08:00 Add single-node gateway config option
+# kubernetes image-amd64 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# oc image-arm64 619c8d74223a1b21fb182e11c35592716aed2896 to 983567b394f8d1efcc9c938b01af30d173c8fc5d
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+3e3cbf85f787630d459beac2fe96e4ba0904b287 2023-01-10T14:15:15+03:00 Remove must-gather pod after it completes when explicit namespace is used
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# cluster-dns-operator embedded-component 1c136fe38b8cd5c0de99577d23157f884728d20b to 3251205366f52819330ada30c6407716559bae26
+84967ad9dafecc3b4f0857d088d3f0c03630b412 2022-12-07T02:34:50+00:00 Updating ose-cluster-dns-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-cluster-dns-operator.yml
+# cluster-ingress-operator embedded-component 560b2d32264db2c4919be3b94c202711a08f2ab0 to b81ee72a00486ad6994c5f50320bb536d0c93ca6
+cb8d9bb51c3409352535b6df96bed5b6058b32d7 2023-01-11T13:13:51-05:00 OCPBUGS-4759: Do not manage DNS for an ingresscontroller with a domain that does not match the baseDomain of the cluster DNS config for GCP
+cacbafd3493a9057869ed3438a40a8e0c9e818cc 2022-12-15T16:53:11-05:00 Replace liveness-grace-period-seconds annotation
+67b0e9216208406f9ff73f5616f4272d18cb3b50 2022-12-07T19:46:52-05:00 checkPodsScheduledForDeployment: Add nil check
+dbb5ac8ffe5d79ac24d9b6211fa153a7b3d0d9db 2022-12-06T19:17:00-05:00 Absorb PodsScheduled condition into MinAvailable
+4a793daafe68ff2dc237617b0931fdacb985816c 2022-11-10T16:20:20-05:00 Bump openshift/api for matchExpressions doc fix
+# cluster-kube-apiserver-operator embedded-component 7458ef3c0088e3d0f23cacb0305a1ee3f265fd8f to 0fa1e9be5e16b1fc8f7df206ec5bffc105ff814f
+18ee864c4e9acd633bad0f4c0a14bc100156ff71 2023-01-12T17:13:48-05:00 Remove duplicate `find` word in error msg for degraded webhook
+13f24dc9c35dd7f4d6dee50b0465814ad5058dc9 2023-01-11T17:53:58-05:00 enable pod security admission for techpreview
+c28433289d7647ce35d58f9ea600f6a05974d951 2023-01-11T17:53:58-05:00 update openshift/api for new featuregates
+811d5fe68c3a15599542770e180eae42387e7b5a 2023-01-10T14:57:30-05:00 Revert "turn PodSecurity admission to enforce restricted globally"
+# cluster-kube-controller-manager-operator embedded-component 152572d0606b4de816d06ea08b293e866467c94f to 5607bf985494c0ecd786827e12324fa1d20a553d
+7fde0ca3c681f5c4e3723e5278b5777f0d88ee47 2023-01-12T17:45:09+00:00 Fixup vendor after library-go update
+fc57b9b6bb905367dd82e751b262e2932e9f1b24 2023-01-12T11:45:43-05:00 update openshift/api to get new featuregates
+dac73d95c22e5723c33c71d7bead6232d715f4ab 2023-01-12T11:45:43-05:00 add featuregates for clusterpolicycontroller
+41383640bdccafdb6a7944cd90c786d92fbb6845 2023-01-09T11:10:10+00:00 Update library-go dependency to move vSphere to out of tree
+# cluster-kube-scheduler-operator embedded-component b64f1a6fef9bb8d86fac2763c58d981bafe0602c to d1ccee33ec0e2a6d503421b5fe9496d59ef7ff2c
+6f3c4d0f301eb64a051dc709fe311550b68f0869 2022-08-08T14:55:23-04:00 Add client certificate and key to service monitor
+# cluster-network-operator embedded-component 830daae9472c1e3f525c0af66bc7ea4054de9989 to a7187082c4caed84f554edb218ca7d00c3a57370
+e014a171e5ddc85f833c691ec03e9f73f17d2783 2023-01-12T22:27:11+01:00 Update github.com/Masterminds/sprig to v3
+5c225953a5be97c54d49ab6c13e39cc00842a6c0 2023-01-10T17:03:25+01:00 OVN-Kubernetes: Stop sorting master node addresses
+# cluster-openshift-controller-manager-operator embedded-component 57fde686504d1a404fe5c3aa0e4f9f8e8347c982 to 9091d03d6c61cb205e72bc32657a36c5cac759ed
+bb96c874950ef83fc30c0835c3f298327af18f9f 2023-01-03T14:02:19+01:00 remove unnecessary RBAC for leader-locking-ingress-to-route-controller
+# cluster-policy-controller embedded-component 69d1995d8f0346247e24544ea201af498225978a to 3f8efde27bb6a50e5d50f0798877d4d2e1154dcb
+6aa74eac7046e5e668edcbfb23f14358326e777f 2023-01-11T13:41:22+01:00 clusterquotareconciliation: do not sync quota monitor cache with no monitors registered
+# etcd embedded-component 494951078ddcfe896cdda4c4f3c70d37ec1c6c53 to 18785067b82295f2eb40edb6e4afda4d7b3f9cfe
+15f68c38366d6699f8bdbcda50c4dfebaa3bcb69 2023-01-11T11:17:55+01:00 UPSTREAM:<carry>: etcdserver: process the scenaro of the last WAL record being partially synced to disk
+# kubernetes embedded-component 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# machine-config-operator embedded-component 31c812547f612be2b5112c530af6adf4b654c37c to a7c4961a8000708251384cbcf58f9eff08ca3b74
+57164c708a6248c468d6c8ad4c38895fa2e079ee 2023-01-12T12:10:06+01:00 Add mkowalsk as a bare metal reviewer and approver
+31cbc9edf3693678f08d3aca841454d39708a0c8 2023-01-11T17:27:44-05:00 remove sprig / goutils / associated deps
+eff8d1562ee2b773f986e07431032153dcd4f296 2023-01-11T17:27:35-05:00 adds smoke test for rendered assets
+1998d569e977b9d503cde9ba9b804f300942e107 2023-01-11T17:08:55-05:00 use common template rendering funcs
+# oc image-amd64 619c8d74223a1b21fb182e11c35592716aed2896 to a0c13fc4b7112da787fb93d7ecb2f10f8a0cbb0c
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# ovn-kubernetes image-amd64 949a086595c75e635d0157242f518f3881151eeb to ffb8cee00c97b0e1c521edb111209da3d83372b2
+5400d94460db87b2933ab81b01aed24a050d4ddb 2023-01-13T20:28:43+01:00 CARRY: Use the test wait group in all hybrid tests
+c76929fe8d9f59aa4456a97703b802ef1a5c5bf3 2023-01-13T15:22:24+01:00 Revert "Bug 2075548: [DownstreamMerge] 09 Jan 2023"
+238b4ed99d408ce03e557f7df1ffe77f799d9df8 2023-01-12T10:28:11-08:00 update yaml template to enable multiple network support
+88e61e97e11d80714c9f690f94cf68fb12db729b 2023-01-12T10:28:11-08:00 enable OVN CNI to configure secondary network interfaces for a Pod
+78d5f499da49df4e778a8afdd89496c6d9eff7e0 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: add level driven controller
+ae09791fc87770258ed1cb4a7edf6e41cb85c426 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: watch NAD provisioning
+495f235e7ce4d7db24f0edc6215e8c8b7a7a5a16 2023-01-11T15:29:43-08:00 config: add enable-multi-network option
+35f04b8d358756905dea5091b6b7df60dea7efa3 2023-01-11T15:29:43-08:00 support secondary network of layer3 topology
+5a88f6b79565d72b12d8442538003e1f94718ce9 2023-01-11T19:31:03+01:00 An attempt to fix cleanup failure in case when the original ovn-k pod used to run host commands was deleted between setup and cleanup.
+de29a860dc4db129f4408516d4616b2d5d221413 2023-01-11T19:30:59+01:00 EgressFirewall: smart clusterSubnet exclusion. Don't apply "&& dst != clusterSubnet" to every acl, since that will generate inefficient conjunctive flows in ovs. Every egress firewall ACL has "dst = <CIDR selector or dns name address set>", for CIDR selector only add clusterSubnet exclusion if CIDR selector has intersection with clusterSubnet. For dns address sets (since they are only used by egress firewall), don't add ips from clusterSubnet to dns address set, since we know these ips should be excluded.
+bd29f417b43c257897f27badc64af38df78b99bd 2023-01-11T19:30:55+01:00 Unify egress firewall implementation for both gateway modes, move all acls to the ClusterPortGroup. Unify unit tests for both gateway modes. Make sure egress firewall allows inbound connections.
+e5d3e3f3f992bca605a6c194b9209656fe063a40 2023-01-11T14:30:20+01:00 Drop in-cluster traffic towards svcCIDR at wrong port
+48f9204e675af0796d90f1c14cfe24b833834867 2023-01-11T13:17:15+01:00 Bump OVN to 22.12
+9da055f26906d2dcf40af2584df9196878116503 2023-01-10T15:36:44+02:00 ovnkube-node: Existing management port check
+f105108f2cbc6f026b214d99ba198eaf2c5d3b3f 2023-01-09T11:55:41+00:00 addMasqueradeRoute: fallback to gateway interface IPs
+22766b43be44eb9fcccfb5e0083041e10253bfe1 2023-01-07T20:29:55+01:00 Add e2e test for LBs using metalLB
+e380332fbfa79424f8faa8660e7e8f50c17ca4c6 2023-01-07T19:24:41+01:00 Add docs for allocateNodePorts=false case
+0111e1faec20d16505a110449966273b430b7ad1 2023-01-07T19:24:41+01:00 Support AllocateLoadBalancerNodePortsFalse
+40199eed08d999e760deba3d09a1125a09c8624b 2023-01-07T19:24:41+01:00 Fix pointer issues in gateway code
+18f2a097b6ce89eeea2bbdcbbe048bde3c95be9f 2023-01-05T11:29:59+01:00 kind: Add --deploy option to just install ovn-k
+6da279560b1c30a74d5fe1553f5b3c4a6ff175dc 2023-01-03T14:57:30-06:00 ovn/test: remove redundant NodeHostAddress from testcase 'tNode' struct
+5ea7e42977664dd9abe4a068352d62e402c3af01 2023-01-03T14:57:30-06:00 ovn/test: misc spacing fixes for master tests
+0b72a52bc95c3146c4a05433bb51ca1ae3b57b98 2023-01-03T14:57:30-06:00 ovn/test: consolidate Controller startup code in master tests
+40fe0222f01349d28bbd4a800c481f2d5fae3671 2023-01-03T14:57:30-06:00 ovn/test: remove redundant expectedDatabaseState usage in testcases
+1692238563b837d4bb32a437b087dc525918d08d 2023-01-03T14:57:30-06:00 ovn/test: consolidate more code in master tests
+623f414eda9b25f214acb274f020d51aea8bc4b0 2023-01-03T14:57:30-06:00 ovn/test: remove redundant config.HostNetworkNamespace="" in testcases
+5741fc313b62de7ba1a4987fba134668e993b103 2023-01-03T14:57:30-06:00 ovn/test: remove unused LrpMac variable from test node object
+4f6a7417b08ec184ec8b04f099807afc5da0d4f3 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+fd142de1aa066dbb1a9a789c1d69b7d990fc1586 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+7fae2fc4ddc68dec005f6c394cf18c1caddf1ec0 2023-01-03T14:57:30-06:00 ovn: partial revert of 0754fe61ed "Prepare node subnet annotation for multi-network support"
+fb62ce7f197e38b82586adca8b5fb27422851dbc 2023-01-03T14:11:31-05:00 Correct the deletion of noHostSubnet nodes
+539b5e723a4eb2b05bd4a610f487df1bea7a58bc 2022-12-22T14:49:08+01:00 ovnkube-trace: run ovn-sbctl and ovn-trace with --no-leader-only
+0bb7c19be33ce4ed5966e8444404f6739b3e6fa8 2022-12-21T18:33:57+01:00 Update egress node assignability on every egress node update
+683971e073eafc71db1ebcaccb3070cecaa1bbb0 2022-12-21T18:26:41+01:00 Bump OVN to 22.12
+cf09fb47d57fb1082c8313682f0adacb7112ff90 2022-12-15T18:49:30+00:00 Process delete handlers in reverse order of priority
+c248f1e32cf9f84625b2cb9a037ffa28ab2232ae 2022-12-15T13:10:30+00:00 Remove extra log format verb for add logical port latency
+156cc72c4fbaa7b986c06026bc6dd57679bf3f78 2022-12-06T17:20:46+01:00 CloudPrivateIPConfig reconcile: don't throw err on missing annotation
+84e28ea5d414586fc12cecab223bff0f9861e11d 2022-11-24T16:04:11+08:00 ignore tunnel header for single node mtu check
+9fca16bb1317262239f9276e24cd033bb21e5e7a 2022-11-24T16:04:06+08:00 Add single-node gateway config option
+# kubernetes image-amd64 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# oc image-arm64 619c8d74223a1b21fb182e11c35592716aed2896 to 983567b394f8d1efcc9c938b01af30d173c8fc5d
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+3e3cbf85f787630d459beac2fe96e4ba0904b287 2023-01-10T14:15:15+03:00 Remove must-gather pod after it completes when explicit namespace is used
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# cluster-dns-operator embedded-component 1c136fe38b8cd5c0de99577d23157f884728d20b to 3251205366f52819330ada30c6407716559bae26
+84967ad9dafecc3b4f0857d088d3f0c03630b412 2022-12-07T02:34:50+00:00 Updating ose-cluster-dns-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-cluster-dns-operator.yml
+# cluster-ingress-operator embedded-component 560b2d32264db2c4919be3b94c202711a08f2ab0 to b81ee72a00486ad6994c5f50320bb536d0c93ca6
+cb8d9bb51c3409352535b6df96bed5b6058b32d7 2023-01-11T13:13:51-05:00 OCPBUGS-4759: Do not manage DNS for an ingresscontroller with a domain that does not match the baseDomain of the cluster DNS config for GCP
+cacbafd3493a9057869ed3438a40a8e0c9e818cc 2022-12-15T16:53:11-05:00 Replace liveness-grace-period-seconds annotation
+67b0e9216208406f9ff73f5616f4272d18cb3b50 2022-12-07T19:46:52-05:00 checkPodsScheduledForDeployment: Add nil check
+dbb5ac8ffe5d79ac24d9b6211fa153a7b3d0d9db 2022-12-06T19:17:00-05:00 Absorb PodsScheduled condition into MinAvailable
+4a793daafe68ff2dc237617b0931fdacb985816c 2022-11-10T16:20:20-05:00 Bump openshift/api for matchExpressions doc fix
+# cluster-kube-apiserver-operator embedded-component 7458ef3c0088e3d0f23cacb0305a1ee3f265fd8f to 0fa1e9be5e16b1fc8f7df206ec5bffc105ff814f
+18ee864c4e9acd633bad0f4c0a14bc100156ff71 2023-01-12T17:13:48-05:00 Remove duplicate `find` word in error msg for degraded webhook
+13f24dc9c35dd7f4d6dee50b0465814ad5058dc9 2023-01-11T17:53:58-05:00 enable pod security admission for techpreview
+c28433289d7647ce35d58f9ea600f6a05974d951 2023-01-11T17:53:58-05:00 update openshift/api for new featuregates
+811d5fe68c3a15599542770e180eae42387e7b5a 2023-01-10T14:57:30-05:00 Revert "turn PodSecurity admission to enforce restricted globally"
+# cluster-kube-controller-manager-operator embedded-component 152572d0606b4de816d06ea08b293e866467c94f to 5607bf985494c0ecd786827e12324fa1d20a553d
+7fde0ca3c681f5c4e3723e5278b5777f0d88ee47 2023-01-12T17:45:09+00:00 Fixup vendor after library-go update
+fc57b9b6bb905367dd82e751b262e2932e9f1b24 2023-01-12T11:45:43-05:00 update openshift/api to get new featuregates
+dac73d95c22e5723c33c71d7bead6232d715f4ab 2023-01-12T11:45:43-05:00 add featuregates for clusterpolicycontroller
+41383640bdccafdb6a7944cd90c786d92fbb6845 2023-01-09T11:10:10+00:00 Update library-go dependency to move vSphere to out of tree
+# cluster-kube-scheduler-operator embedded-component b64f1a6fef9bb8d86fac2763c58d981bafe0602c to d1ccee33ec0e2a6d503421b5fe9496d59ef7ff2c
+6f3c4d0f301eb64a051dc709fe311550b68f0869 2022-08-08T14:55:23-04:00 Add client certificate and key to service monitor
+# cluster-network-operator embedded-component 830daae9472c1e3f525c0af66bc7ea4054de9989 to a7187082c4caed84f554edb218ca7d00c3a57370
+e014a171e5ddc85f833c691ec03e9f73f17d2783 2023-01-12T22:27:11+01:00 Update github.com/Masterminds/sprig to v3
+5c225953a5be97c54d49ab6c13e39cc00842a6c0 2023-01-10T17:03:25+01:00 OVN-Kubernetes: Stop sorting master node addresses
+# cluster-openshift-controller-manager-operator embedded-component 57fde686504d1a404fe5c3aa0e4f9f8e8347c982 to 9091d03d6c61cb205e72bc32657a36c5cac759ed
+bb96c874950ef83fc30c0835c3f298327af18f9f 2023-01-03T14:02:19+01:00 remove unnecessary RBAC for leader-locking-ingress-to-route-controller
+# cluster-policy-controller embedded-component 69d1995d8f0346247e24544ea201af498225978a to 3f8efde27bb6a50e5d50f0798877d4d2e1154dcb
+6aa74eac7046e5e668edcbfb23f14358326e777f 2023-01-11T13:41:22+01:00 clusterquotareconciliation: do not sync quota monitor cache with no monitors registered
+# etcd embedded-component 494951078ddcfe896cdda4c4f3c70d37ec1c6c53 to 18785067b82295f2eb40edb6e4afda4d7b3f9cfe
+15f68c38366d6699f8bdbcda50c4dfebaa3bcb69 2023-01-11T11:17:55+01:00 UPSTREAM:<carry>: etcdserver: process the scenaro of the last WAL record being partially synced to disk
+# kubernetes embedded-component 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# machine-config-operator embedded-component 31c812547f612be2b5112c530af6adf4b654c37c to a7c4961a8000708251384cbcf58f9eff08ca3b74
+57164c708a6248c468d6c8ad4c38895fa2e079ee 2023-01-12T12:10:06+01:00 Add mkowalsk as a bare metal reviewer and approver
+31cbc9edf3693678f08d3aca841454d39708a0c8 2023-01-11T17:27:44-05:00 remove sprig / goutils / associated deps
+eff8d1562ee2b773f986e07431032153dcd4f296 2023-01-11T17:27:35-05:00 adds smoke test for rendered assets
+1998d569e977b9d503cde9ba9b804f300942e107 2023-01-11T17:08:55-05:00 use common template rendering funcs
+# oc image-amd64 619c8d74223a1b21fb182e11c35592716aed2896 to a0c13fc4b7112da787fb93d7ecb2f10f8a0cbb0c
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# ovn-kubernetes image-amd64 949a086595c75e635d0157242f518f3881151eeb to ffb8cee00c97b0e1c521edb111209da3d83372b2
+5400d94460db87b2933ab81b01aed24a050d4ddb 2023-01-13T20:28:43+01:00 CARRY: Use the test wait group in all hybrid tests
+c76929fe8d9f59aa4456a97703b802ef1a5c5bf3 2023-01-13T15:22:24+01:00 Revert "Bug 2075548: [DownstreamMerge] 09 Jan 2023"
+238b4ed99d408ce03e557f7df1ffe77f799d9df8 2023-01-12T10:28:11-08:00 update yaml template to enable multiple network support
+88e61e97e11d80714c9f690f94cf68fb12db729b 2023-01-12T10:28:11-08:00 enable OVN CNI to configure secondary network interfaces for a Pod
+78d5f499da49df4e778a8afdd89496c6d9eff7e0 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: add level driven controller
+ae09791fc87770258ed1cb4a7edf6e41cb85c426 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: watch NAD provisioning
+495f235e7ce4d7db24f0edc6215e8c8b7a7a5a16 2023-01-11T15:29:43-08:00 config: add enable-multi-network option
+35f04b8d358756905dea5091b6b7df60dea7efa3 2023-01-11T15:29:43-08:00 support secondary network of layer3 topology
+5a88f6b79565d72b12d8442538003e1f94718ce9 2023-01-11T19:31:03+01:00 An attempt to fix cleanup failure in case when the original ovn-k pod used to run host commands was deleted between setup and cleanup.
+de29a860dc4db129f4408516d4616b2d5d221413 2023-01-11T19:30:59+01:00 EgressFirewall: smart clusterSubnet exclusion. Don't apply "&& dst != clusterSubnet" to every acl, since that will generate inefficient conjunctive flows in ovs. Every egress firewall ACL has "dst = <CIDR selector or dns name address set>", for CIDR selector only add clusterSubnet exclusion if CIDR selector has intersection with clusterSubnet. For dns address sets (since they are only used by egress firewall), don't add ips from clusterSubnet to dns address set, since we know these ips should be excluded.
+bd29f417b43c257897f27badc64af38df78b99bd 2023-01-11T19:30:55+01:00 Unify egress firewall implementation for both gateway modes, move all acls to the ClusterPortGroup. Unify unit tests for both gateway modes. Make sure egress firewall allows inbound connections.
+e5d3e3f3f992bca605a6c194b9209656fe063a40 2023-01-11T14:30:20+01:00 Drop in-cluster traffic towards svcCIDR at wrong port
+48f9204e675af0796d90f1c14cfe24b833834867 2023-01-11T13:17:15+01:00 Bump OVN to 22.12
+9da055f26906d2dcf40af2584df9196878116503 2023-01-10T15:36:44+02:00 ovnkube-node: Existing management port check
+f105108f2cbc6f026b214d99ba198eaf2c5d3b3f 2023-01-09T11:55:41+00:00 addMasqueradeRoute: fallback to gateway interface IPs
+22766b43be44eb9fcccfb5e0083041e10253bfe1 2023-01-07T20:29:55+01:00 Add e2e test for LBs using metalLB
+e380332fbfa79424f8faa8660e7e8f50c17ca4c6 2023-01-07T19:24:41+01:00 Add docs for allocateNodePorts=false case
+0111e1faec20d16505a110449966273b430b7ad1 2023-01-07T19:24:41+01:00 Support AllocateLoadBalancerNodePortsFalse
+40199eed08d999e760deba3d09a1125a09c8624b 2023-01-07T19:24:41+01:00 Fix pointer issues in gateway code
+18f2a097b6ce89eeea2bbdcbbe048bde3c95be9f 2023-01-05T11:29:59+01:00 kind: Add --deploy option to just install ovn-k
+6da279560b1c30a74d5fe1553f5b3c4a6ff175dc 2023-01-03T14:57:30-06:00 ovn/test: remove redundant NodeHostAddress from testcase 'tNode' struct
+5ea7e42977664dd9abe4a068352d62e402c3af01 2023-01-03T14:57:30-06:00 ovn/test: misc spacing fixes for master tests
+0b72a52bc95c3146c4a05433bb51ca1ae3b57b98 2023-01-03T14:57:30-06:00 ovn/test: consolidate Controller startup code in master tests
+40fe0222f01349d28bbd4a800c481f2d5fae3671 2023-01-03T14:57:30-06:00 ovn/test: remove redundant expectedDatabaseState usage in testcases
+1692238563b837d4bb32a437b087dc525918d08d 2023-01-03T14:57:30-06:00 ovn/test: consolidate more code in master tests
+623f414eda9b25f214acb274f020d51aea8bc4b0 2023-01-03T14:57:30-06:00 ovn/test: remove redundant config.HostNetworkNamespace="" in testcases
+5741fc313b62de7ba1a4987fba134668e993b103 2023-01-03T14:57:30-06:00 ovn/test: remove unused LrpMac variable from test node object
+4f6a7417b08ec184ec8b04f099807afc5da0d4f3 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+fd142de1aa066dbb1a9a789c1d69b7d990fc1586 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+7fae2fc4ddc68dec005f6c394cf18c1caddf1ec0 2023-01-03T14:57:30-06:00 ovn: partial revert of 0754fe61ed "Prepare node subnet annotation for multi-network support"
+fb62ce7f197e38b82586adca8b5fb27422851dbc 2023-01-03T14:11:31-05:00 Correct the deletion of noHostSubnet nodes
+539b5e723a4eb2b05bd4a610f487df1bea7a58bc 2022-12-22T14:49:08+01:00 ovnkube-trace: run ovn-sbctl and ovn-trace with --no-leader-only
+0bb7c19be33ce4ed5966e8444404f6739b3e6fa8 2022-12-21T18:33:57+01:00 Update egress node assignability on every egress node update
+683971e073eafc71db1ebcaccb3070cecaa1bbb0 2022-12-21T18:26:41+01:00 Bump OVN to 22.12
+cf09fb47d57fb1082c8313682f0adacb7112ff90 2022-12-15T18:49:30+00:00 Process delete handlers in reverse order of priority
+c248f1e32cf9f84625b2cb9a037ffa28ab2232ae 2022-12-15T13:10:30+00:00 Remove extra log format verb for add logical port latency
+156cc72c4fbaa7b986c06026bc6dd57679bf3f78 2022-12-06T17:20:46+01:00 CloudPrivateIPConfig reconcile: don't throw err on missing annotation
+84e28ea5d414586fc12cecab223bff0f9861e11d 2022-11-24T16:04:11+08:00 ignore tunnel header for single node mtu check
+9fca16bb1317262239f9276e24cd033bb21e5e7a 2022-11-24T16:04:06+08:00 Add single-node gateway config option
+# kubernetes image-amd64 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# oc image-arm64 619c8d74223a1b21fb182e11c35592716aed2896 to 983567b394f8d1efcc9c938b01af30d173c8fc5d
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+3e3cbf85f787630d459beac2fe96e4ba0904b287 2023-01-10T14:15:15+03:00 Remove must-gather pod after it completes when explicit namespace is used
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# ovn-kubernetes image-arm64 9169cd970e74f8e01082c9935bcb1ef991885358 to ffb8cee00c97b0e1c521edb111209da3d83372b2
+5400d94460db87b2933ab81b01aed24a050d4ddb 2023-01-13T20:28:43+01:00 CARRY: Use the test wait group in all hybrid tests
+c76929fe8d9f59aa4456a97703b802ef1a5c5bf3 2023-01-13T15:22:24+01:00 Revert "Bug 2075548: [DownstreamMerge] 09 Jan 2023"
+238b4ed99d408ce03e557f7df1ffe77f799d9df8 2023-01-12T10:28:11-08:00 update yaml template to enable multiple network support
+88e61e97e11d80714c9f690f94cf68fb12db729b 2023-01-12T10:28:11-08:00 enable OVN CNI to configure secondary network interfaces for a Pod
+78d5f499da49df4e778a8afdd89496c6d9eff7e0 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: add level driven controller
+ae09791fc87770258ed1cb4a7edf6e41cb85c426 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: watch NAD provisioning
+495f235e7ce4d7db24f0edc6215e8c8b7a7a5a16 2023-01-11T15:29:43-08:00 config: add enable-multi-network option
+35f04b8d358756905dea5091b6b7df60dea7efa3 2023-01-11T15:29:43-08:00 support secondary network of layer3 topology
+5a88f6b79565d72b12d8442538003e1f94718ce9 2023-01-11T19:31:03+01:00 An attempt to fix cleanup failure in case when the original ovn-k pod used to run host commands was deleted between setup and cleanup.
+de29a860dc4db129f4408516d4616b2d5d221413 2023-01-11T19:30:59+01:00 EgressFirewall: smart clusterSubnet exclusion. Don't apply "&& dst != clusterSubnet" to every acl, since that will generate inefficient conjunctive flows in ovs. Every egress firewall ACL has "dst = <CIDR selector or dns name address set>", for CIDR selector only add clusterSubnet exclusion if CIDR selector has intersection with clusterSubnet. For dns address sets (since they are only used by egress firewall), don't add ips from clusterSubnet to dns address set, since we know these ips should be excluded.
+bd29f417b43c257897f27badc64af38df78b99bd 2023-01-11T19:30:55+01:00 Unify egress firewall implementation for both gateway modes, move all acls to the ClusterPortGroup. Unify unit tests for both gateway modes. Make sure egress firewall allows inbound connections.
+e5d3e3f3f992bca605a6c194b9209656fe063a40 2023-01-11T14:30:20+01:00 Drop in-cluster traffic towards svcCIDR at wrong port
+9da055f26906d2dcf40af2584df9196878116503 2023-01-10T15:36:44+02:00 ovnkube-node: Existing management port check
+f105108f2cbc6f026b214d99ba198eaf2c5d3b3f 2023-01-09T11:55:41+00:00 addMasqueradeRoute: fallback to gateway interface IPs
+22766b43be44eb9fcccfb5e0083041e10253bfe1 2023-01-07T20:29:55+01:00 Add e2e test for LBs using metalLB
+e380332fbfa79424f8faa8660e7e8f50c17ca4c6 2023-01-07T19:24:41+01:00 Add docs for allocateNodePorts=false case
+0111e1faec20d16505a110449966273b430b7ad1 2023-01-07T19:24:41+01:00 Support AllocateLoadBalancerNodePortsFalse
+40199eed08d999e760deba3d09a1125a09c8624b 2023-01-07T19:24:41+01:00 Fix pointer issues in gateway code
+18f2a097b6ce89eeea2bbdcbbe048bde3c95be9f 2023-01-05T11:29:59+01:00 kind: Add --deploy option to just install ovn-k
+6da279560b1c30a74d5fe1553f5b3c4a6ff175dc 2023-01-03T14:57:30-06:00 ovn/test: remove redundant NodeHostAddress from testcase 'tNode' struct
+5ea7e42977664dd9abe4a068352d62e402c3af01 2023-01-03T14:57:30-06:00 ovn/test: misc spacing fixes for master tests
+0b72a52bc95c3146c4a05433bb51ca1ae3b57b98 2023-01-03T14:57:30-06:00 ovn/test: consolidate Controller startup code in master tests
+40fe0222f01349d28bbd4a800c481f2d5fae3671 2023-01-03T14:57:30-06:00 ovn/test: remove redundant expectedDatabaseState usage in testcases
+1692238563b837d4bb32a437b087dc525918d08d 2023-01-03T14:57:30-06:00 ovn/test: consolidate more code in master tests
+623f414eda9b25f214acb274f020d51aea8bc4b0 2023-01-03T14:57:30-06:00 ovn/test: remove redundant config.HostNetworkNamespace="" in testcases
+5741fc313b62de7ba1a4987fba134668e993b103 2023-01-03T14:57:30-06:00 ovn/test: remove unused LrpMac variable from test node object
+4f6a7417b08ec184ec8b04f099807afc5da0d4f3 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+fd142de1aa066dbb1a9a789c1d69b7d990fc1586 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+7fae2fc4ddc68dec005f6c394cf18c1caddf1ec0 2023-01-03T14:57:30-06:00 ovn: partial revert of 0754fe61ed "Prepare node subnet annotation for multi-network support"
+fb62ce7f197e38b82586adca8b5fb27422851dbc 2023-01-03T14:11:31-05:00 Correct the deletion of noHostSubnet nodes
+539b5e723a4eb2b05bd4a610f487df1bea7a58bc 2022-12-22T14:49:08+01:00 ovnkube-trace: run ovn-sbctl and ovn-trace with --no-leader-only
+0bb7c19be33ce4ed5966e8444404f6739b3e6fa8 2022-12-21T18:33:57+01:00 Update egress node assignability on every egress node update
+683971e073eafc71db1ebcaccb3070cecaa1bbb0 2022-12-21T18:26:41+01:00 Bump OVN to 22.12
+cf09fb47d57fb1082c8313682f0adacb7112ff90 2022-12-15T18:49:30+00:00 Process delete handlers in reverse order of priority
+c248f1e32cf9f84625b2cb9a037ffa28ab2232ae 2022-12-15T13:10:30+00:00 Remove extra log format verb for add logical port latency
+156cc72c4fbaa7b986c06026bc6dd57679bf3f78 2022-12-06T17:20:46+01:00 CloudPrivateIPConfig reconcile: don't throw err on missing annotation
+84e28ea5d414586fc12cecab223bff0f9861e11d 2022-11-24T16:04:11+08:00 ignore tunnel header for single node mtu check
+9fca16bb1317262239f9276e24cd033bb21e5e7a 2022-11-24T16:04:06+08:00 Add single-node gateway config option
+# kubernetes image-arm64 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# cluster-dns-operator embedded-component 1c136fe38b8cd5c0de99577d23157f884728d20b to 3251205366f52819330ada30c6407716559bae26
+84967ad9dafecc3b4f0857d088d3f0c03630b412 2022-12-07T02:34:50+00:00 Updating ose-cluster-dns-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-cluster-dns-operator.yml
+# cluster-ingress-operator embedded-component 560b2d32264db2c4919be3b94c202711a08f2ab0 to b81ee72a00486ad6994c5f50320bb536d0c93ca6
+cb8d9bb51c3409352535b6df96bed5b6058b32d7 2023-01-11T13:13:51-05:00 OCPBUGS-4759: Do not manage DNS for an ingresscontroller with a domain that does not match the baseDomain of the cluster DNS config for GCP
+cacbafd3493a9057869ed3438a40a8e0c9e818cc 2022-12-15T16:53:11-05:00 Replace liveness-grace-period-seconds annotation
+67b0e9216208406f9ff73f5616f4272d18cb3b50 2022-12-07T19:46:52-05:00 checkPodsScheduledForDeployment: Add nil check
+dbb5ac8ffe5d79ac24d9b6211fa153a7b3d0d9db 2022-12-06T19:17:00-05:00 Absorb PodsScheduled condition into MinAvailable
+4a793daafe68ff2dc237617b0931fdacb985816c 2022-11-10T16:20:20-05:00 Bump openshift/api for matchExpressions doc fix
+# cluster-kube-apiserver-operator embedded-component 7458ef3c0088e3d0f23cacb0305a1ee3f265fd8f to 0fa1e9be5e16b1fc8f7df206ec5bffc105ff814f
+18ee864c4e9acd633bad0f4c0a14bc100156ff71 2023-01-12T17:13:48-05:00 Remove duplicate `find` word in error msg for degraded webhook
+13f24dc9c35dd7f4d6dee50b0465814ad5058dc9 2023-01-11T17:53:58-05:00 enable pod security admission for techpreview
+c28433289d7647ce35d58f9ea600f6a05974d951 2023-01-11T17:53:58-05:00 update openshift/api for new featuregates
+811d5fe68c3a15599542770e180eae42387e7b5a 2023-01-10T14:57:30-05:00 Revert "turn PodSecurity admission to enforce restricted globally"
+# cluster-kube-controller-manager-operator embedded-component 152572d0606b4de816d06ea08b293e866467c94f to 5607bf985494c0ecd786827e12324fa1d20a553d
+7fde0ca3c681f5c4e3723e5278b5777f0d88ee47 2023-01-12T17:45:09+00:00 Fixup vendor after library-go update
+fc57b9b6bb905367dd82e751b262e2932e9f1b24 2023-01-12T11:45:43-05:00 update openshift/api to get new featuregates
+dac73d95c22e5723c33c71d7bead6232d715f4ab 2023-01-12T11:45:43-05:00 add featuregates for clusterpolicycontroller
+41383640bdccafdb6a7944cd90c786d92fbb6845 2023-01-09T11:10:10+00:00 Update library-go dependency to move vSphere to out of tree
+# cluster-kube-scheduler-operator embedded-component b64f1a6fef9bb8d86fac2763c58d981bafe0602c to d1ccee33ec0e2a6d503421b5fe9496d59ef7ff2c
+6f3c4d0f301eb64a051dc709fe311550b68f0869 2022-08-08T14:55:23-04:00 Add client certificate and key to service monitor
+# cluster-network-operator embedded-component 830daae9472c1e3f525c0af66bc7ea4054de9989 to a7187082c4caed84f554edb218ca7d00c3a57370
+e014a171e5ddc85f833c691ec03e9f73f17d2783 2023-01-12T22:27:11+01:00 Update github.com/Masterminds/sprig to v3
+5c225953a5be97c54d49ab6c13e39cc00842a6c0 2023-01-10T17:03:25+01:00 OVN-Kubernetes: Stop sorting master node addresses
+# cluster-openshift-controller-manager-operator embedded-component 57fde686504d1a404fe5c3aa0e4f9f8e8347c982 to 9091d03d6c61cb205e72bc32657a36c5cac759ed
+bb96c874950ef83fc30c0835c3f298327af18f9f 2023-01-03T14:02:19+01:00 remove unnecessary RBAC for leader-locking-ingress-to-route-controller
+# cluster-policy-controller embedded-component 69d1995d8f0346247e24544ea201af498225978a to 3f8efde27bb6a50e5d50f0798877d4d2e1154dcb
+6aa74eac7046e5e668edcbfb23f14358326e777f 2023-01-11T13:41:22+01:00 clusterquotareconciliation: do not sync quota monitor cache with no monitors registered
+# etcd embedded-component 494951078ddcfe896cdda4c4f3c70d37ec1c6c53 to 18785067b82295f2eb40edb6e4afda4d7b3f9cfe
+15f68c38366d6699f8bdbcda50c4dfebaa3bcb69 2023-01-11T11:17:55+01:00 UPSTREAM:<carry>: etcdserver: process the scenaro of the last WAL record being partially synced to disk
+# kubernetes embedded-component 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# machine-config-operator embedded-component 31c812547f612be2b5112c530af6adf4b654c37c to a7c4961a8000708251384cbcf58f9eff08ca3b74
+57164c708a6248c468d6c8ad4c38895fa2e079ee 2023-01-12T12:10:06+01:00 Add mkowalsk as a bare metal reviewer and approver
+31cbc9edf3693678f08d3aca841454d39708a0c8 2023-01-11T17:27:44-05:00 remove sprig / goutils / associated deps
+eff8d1562ee2b773f986e07431032153dcd4f296 2023-01-11T17:27:35-05:00 adds smoke test for rendered assets
+1998d569e977b9d503cde9ba9b804f300942e107 2023-01-11T17:08:55-05:00 use common template rendering funcs
+# oc image-amd64 619c8d74223a1b21fb182e11c35592716aed2896 to a0c13fc4b7112da787fb93d7ecb2f10f8a0cbb0c
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# ovn-kubernetes image-amd64 949a086595c75e635d0157242f518f3881151eeb to ffb8cee00c97b0e1c521edb111209da3d83372b2
+5400d94460db87b2933ab81b01aed24a050d4ddb 2023-01-13T20:28:43+01:00 CARRY: Use the test wait group in all hybrid tests
+c76929fe8d9f59aa4456a97703b802ef1a5c5bf3 2023-01-13T15:22:24+01:00 Revert "Bug 2075548: [DownstreamMerge] 09 Jan 2023"
+238b4ed99d408ce03e557f7df1ffe77f799d9df8 2023-01-12T10:28:11-08:00 update yaml template to enable multiple network support
+88e61e97e11d80714c9f690f94cf68fb12db729b 2023-01-12T10:28:11-08:00 enable OVN CNI to configure secondary network interfaces for a Pod
+78d5f499da49df4e778a8afdd89496c6d9eff7e0 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: add level driven controller
+ae09791fc87770258ed1cb4a7edf6e41cb85c426 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: watch NAD provisioning
+495f235e7ce4d7db24f0edc6215e8c8b7a7a5a16 2023-01-11T15:29:43-08:00 config: add enable-multi-network option
+35f04b8d358756905dea5091b6b7df60dea7efa3 2023-01-11T15:29:43-08:00 support secondary network of layer3 topology
+5a88f6b79565d72b12d8442538003e1f94718ce9 2023-01-11T19:31:03+01:00 An attempt to fix cleanup failure in case when the original ovn-k pod used to run host commands was deleted between setup and cleanup.
+de29a860dc4db129f4408516d4616b2d5d221413 2023-01-11T19:30:59+01:00 EgressFirewall: smart clusterSubnet exclusion. Don't apply "&& dst != clusterSubnet" to every acl, since that will generate inefficient conjunctive flows in ovs. Every egress firewall ACL has "dst = <CIDR selector or dns name address set>", for CIDR selector only add clusterSubnet exclusion if CIDR selector has intersection with clusterSubnet. For dns address sets (since they are only used by egress firewall), don't add ips from clusterSubnet to dns address set, since we know these ips should be excluded.
+bd29f417b43c257897f27badc64af38df78b99bd 2023-01-11T19:30:55+01:00 Unify egress firewall implementation for both gateway modes, move all acls to the ClusterPortGroup. Unify unit tests for both gateway modes. Make sure egress firewall allows inbound connections.
+e5d3e3f3f992bca605a6c194b9209656fe063a40 2023-01-11T14:30:20+01:00 Drop in-cluster traffic towards svcCIDR at wrong port
+48f9204e675af0796d90f1c14cfe24b833834867 2023-01-11T13:17:15+01:00 Bump OVN to 22.12
+9da055f26906d2dcf40af2584df9196878116503 2023-01-10T15:36:44+02:00 ovnkube-node: Existing management port check
+f105108f2cbc6f026b214d99ba198eaf2c5d3b3f 2023-01-09T11:55:41+00:00 addMasqueradeRoute: fallback to gateway interface IPs
+22766b43be44eb9fcccfb5e0083041e10253bfe1 2023-01-07T20:29:55+01:00 Add e2e test for LBs using metalLB
+e380332fbfa79424f8faa8660e7e8f50c17ca4c6 2023-01-07T19:24:41+01:00 Add docs for allocateNodePorts=false case
+0111e1faec20d16505a110449966273b430b7ad1 2023-01-07T19:24:41+01:00 Support AllocateLoadBalancerNodePortsFalse
+40199eed08d999e760deba3d09a1125a09c8624b 2023-01-07T19:24:41+01:00 Fix pointer issues in gateway code
+18f2a097b6ce89eeea2bbdcbbe048bde3c95be9f 2023-01-05T11:29:59+01:00 kind: Add --deploy option to just install ovn-k
+6da279560b1c30a74d5fe1553f5b3c4a6ff175dc 2023-01-03T14:57:30-06:00 ovn/test: remove redundant NodeHostAddress from testcase 'tNode' struct
+5ea7e42977664dd9abe4a068352d62e402c3af01 2023-01-03T14:57:30-06:00 ovn/test: misc spacing fixes for master tests
+0b72a52bc95c3146c4a05433bb51ca1ae3b57b98 2023-01-03T14:57:30-06:00 ovn/test: consolidate Controller startup code in master tests
+40fe0222f01349d28bbd4a800c481f2d5fae3671 2023-01-03T14:57:30-06:00 ovn/test: remove redundant expectedDatabaseState usage in testcases
+1692238563b837d4bb32a437b087dc525918d08d 2023-01-03T14:57:30-06:00 ovn/test: consolidate more code in master tests
+623f414eda9b25f214acb274f020d51aea8bc4b0 2023-01-03T14:57:30-06:00 ovn/test: remove redundant config.HostNetworkNamespace="" in testcases
+5741fc313b62de7ba1a4987fba134668e993b103 2023-01-03T14:57:30-06:00 ovn/test: remove unused LrpMac variable from test node object
+4f6a7417b08ec184ec8b04f099807afc5da0d4f3 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+fd142de1aa066dbb1a9a789c1d69b7d990fc1586 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+7fae2fc4ddc68dec005f6c394cf18c1caddf1ec0 2023-01-03T14:57:30-06:00 ovn: partial revert of 0754fe61ed "Prepare node subnet annotation for multi-network support"
+fb62ce7f197e38b82586adca8b5fb27422851dbc 2023-01-03T14:11:31-05:00 Correct the deletion of noHostSubnet nodes
+539b5e723a4eb2b05bd4a610f487df1bea7a58bc 2022-12-22T14:49:08+01:00 ovnkube-trace: run ovn-sbctl and ovn-trace with --no-leader-only
+0bb7c19be33ce4ed5966e8444404f6739b3e6fa8 2022-12-21T18:33:57+01:00 Update egress node assignability on every egress node update
+683971e073eafc71db1ebcaccb3070cecaa1bbb0 2022-12-21T18:26:41+01:00 Bump OVN to 22.12
+cf09fb47d57fb1082c8313682f0adacb7112ff90 2022-12-15T18:49:30+00:00 Process delete handlers in reverse order of priority
+c248f1e32cf9f84625b2cb9a037ffa28ab2232ae 2022-12-15T13:10:30+00:00 Remove extra log format verb for add logical port latency
+156cc72c4fbaa7b986c06026bc6dd57679bf3f78 2022-12-06T17:20:46+01:00 CloudPrivateIPConfig reconcile: don't throw err on missing annotation
+84e28ea5d414586fc12cecab223bff0f9861e11d 2022-11-24T16:04:11+08:00 ignore tunnel header for single node mtu check
+9fca16bb1317262239f9276e24cd033bb21e5e7a 2022-11-24T16:04:06+08:00 Add single-node gateway config option
+# kubernetes image-amd64 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
+# oc image-arm64 619c8d74223a1b21fb182e11c35592716aed2896 to 983567b394f8d1efcc9c938b01af30d173c8fc5d
+cef72b3d9e224b302d303ec4718c417e0b4dcb46 2023-01-13T10:52:09+01:00 reordered options struct
+7917c921f72f2f16fd26666d7f0e31995d8b02e6 2023-01-13T10:50:55+01:00 added explanation for --import-mode to command examples
+796e875c7cc82eb67b3ea4d6302a327338a88e6e 2023-01-12T12:48:11-07:00 Tweak tests and validation for ImportMode
+e3140b09a26a63996788d0c3fbf17be6224f8861 2023-01-11T15:01:55-05:00 Fix issue parsing Jira issues with dashes
+242b42f8b8426cba6068252069e8b0291ead1bea 2023-01-11T15:00:56-05:00 Enable json ouput for changelog
+ff1ebe80a504db50385428e00dc13c2feb337d6a 2023-01-10T13:22:45-07:00 Add additional test for validation failure with ImportMode
+f372c323adfdac963c09af0dda2745401c3b1c96 2023-01-10T14:33:50+01:00 Test oc tag with and without --import-mode option
+a51b92b13fc53770a2f21c5d3d0063fabc53859f 2023-01-10T14:26:50+01:00 Validate --import-mode option
+3e3cbf85f787630d459beac2fe96e4ba0904b287 2023-01-10T14:15:15+03:00 Remove must-gather pod after it completes when explicit namespace is used
+734b3a10712a47f4a467a9789b61a7e8a065f15f 2023-01-10T09:33:45+01:00 IR-261: Add --import-mode to 'tag'
+b8ab997983e9c0b6e3f89a342f5e8280d9f77d95 2023-01-05T11:56:43-07:00 Validate --import-mode option
+d752cc94d06c084c9cb5a132174fe91fc7d1a62b 2023-01-05T11:11:00-07:00 Add tests for --import-mode option
+dd64b98e5439d38a5835e298f4da754c786eed91 2023-01-05T11:11:00-07:00 Add --import-mode option to import-image
+# ovn-kubernetes image-arm64 9169cd970e74f8e01082c9935bcb1ef991885358 to ffb8cee00c97b0e1c521edb111209da3d83372b2
+5400d94460db87b2933ab81b01aed24a050d4ddb 2023-01-13T20:28:43+01:00 CARRY: Use the test wait group in all hybrid tests
+c76929fe8d9f59aa4456a97703b802ef1a5c5bf3 2023-01-13T15:22:24+01:00 Revert "Bug 2075548: [DownstreamMerge] 09 Jan 2023"
+238b4ed99d408ce03e557f7df1ffe77f799d9df8 2023-01-12T10:28:11-08:00 update yaml template to enable multiple network support
+88e61e97e11d80714c9f690f94cf68fb12db729b 2023-01-12T10:28:11-08:00 enable OVN CNI to configure secondary network interfaces for a Pod
+78d5f499da49df4e778a8afdd89496c6d9eff7e0 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: add level driven controller
+ae09791fc87770258ed1cb4a7edf6e41cb85c426 2023-01-11T15:29:43-08:00 multi-homing, net-attach-def handlers: watch NAD provisioning
+495f235e7ce4d7db24f0edc6215e8c8b7a7a5a16 2023-01-11T15:29:43-08:00 config: add enable-multi-network option
+35f04b8d358756905dea5091b6b7df60dea7efa3 2023-01-11T15:29:43-08:00 support secondary network of layer3 topology
+5a88f6b79565d72b12d8442538003e1f94718ce9 2023-01-11T19:31:03+01:00 An attempt to fix cleanup failure in case when the original ovn-k pod used to run host commands was deleted between setup and cleanup.
+de29a860dc4db129f4408516d4616b2d5d221413 2023-01-11T19:30:59+01:00 EgressFirewall: smart clusterSubnet exclusion. Don't apply "&& dst != clusterSubnet" to every acl, since that will generate inefficient conjunctive flows in ovs. Every egress firewall ACL has "dst = <CIDR selector or dns name address set>", for CIDR selector only add clusterSubnet exclusion if CIDR selector has intersection with clusterSubnet. For dns address sets (since they are only used by egress firewall), don't add ips from clusterSubnet to dns address set, since we know these ips should be excluded.
+bd29f417b43c257897f27badc64af38df78b99bd 2023-01-11T19:30:55+01:00 Unify egress firewall implementation for both gateway modes, move all acls to the ClusterPortGroup. Unify unit tests for both gateway modes. Make sure egress firewall allows inbound connections.
+e5d3e3f3f992bca605a6c194b9209656fe063a40 2023-01-11T14:30:20+01:00 Drop in-cluster traffic towards svcCIDR at wrong port
+9da055f26906d2dcf40af2584df9196878116503 2023-01-10T15:36:44+02:00 ovnkube-node: Existing management port check
+f105108f2cbc6f026b214d99ba198eaf2c5d3b3f 2023-01-09T11:55:41+00:00 addMasqueradeRoute: fallback to gateway interface IPs
+22766b43be44eb9fcccfb5e0083041e10253bfe1 2023-01-07T20:29:55+01:00 Add e2e test for LBs using metalLB
+e380332fbfa79424f8faa8660e7e8f50c17ca4c6 2023-01-07T19:24:41+01:00 Add docs for allocateNodePorts=false case
+0111e1faec20d16505a110449966273b430b7ad1 2023-01-07T19:24:41+01:00 Support AllocateLoadBalancerNodePortsFalse
+40199eed08d999e760deba3d09a1125a09c8624b 2023-01-07T19:24:41+01:00 Fix pointer issues in gateway code
+18f2a097b6ce89eeea2bbdcbbe048bde3c95be9f 2023-01-05T11:29:59+01:00 kind: Add --deploy option to just install ovn-k
+6da279560b1c30a74d5fe1553f5b3c4a6ff175dc 2023-01-03T14:57:30-06:00 ovn/test: remove redundant NodeHostAddress from testcase 'tNode' struct
+5ea7e42977664dd9abe4a068352d62e402c3af01 2023-01-03T14:57:30-06:00 ovn/test: misc spacing fixes for master tests
+0b72a52bc95c3146c4a05433bb51ca1ae3b57b98 2023-01-03T14:57:30-06:00 ovn/test: consolidate Controller startup code in master tests
+40fe0222f01349d28bbd4a800c481f2d5fae3671 2023-01-03T14:57:30-06:00 ovn/test: remove redundant expectedDatabaseState usage in testcases
+1692238563b837d4bb32a437b087dc525918d08d 2023-01-03T14:57:30-06:00 ovn/test: consolidate more code in master tests
+623f414eda9b25f214acb274f020d51aea8bc4b0 2023-01-03T14:57:30-06:00 ovn/test: remove redundant config.HostNetworkNamespace="" in testcases
+5741fc313b62de7ba1a4987fba134668e993b103 2023-01-03T14:57:30-06:00 ovn/test: remove unused LrpMac variable from test node object
+4f6a7417b08ec184ec8b04f099807afc5da0d4f3 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+fd142de1aa066dbb1a9a789c1d69b7d990fc1586 2023-01-03T14:57:30-06:00 ovn/test: rename some variables in master tests
+7fae2fc4ddc68dec005f6c394cf18c1caddf1ec0 2023-01-03T14:57:30-06:00 ovn: partial revert of 0754fe61ed "Prepare node subnet annotation for multi-network support"
+fb62ce7f197e38b82586adca8b5fb27422851dbc 2023-01-03T14:11:31-05:00 Correct the deletion of noHostSubnet nodes
+539b5e723a4eb2b05bd4a610f487df1bea7a58bc 2022-12-22T14:49:08+01:00 ovnkube-trace: run ovn-sbctl and ovn-trace with --no-leader-only
+0bb7c19be33ce4ed5966e8444404f6739b3e6fa8 2022-12-21T18:33:57+01:00 Update egress node assignability on every egress node update
+683971e073eafc71db1ebcaccb3070cecaa1bbb0 2022-12-21T18:26:41+01:00 Bump OVN to 22.12
+cf09fb47d57fb1082c8313682f0adacb7112ff90 2022-12-15T18:49:30+00:00 Process delete handlers in reverse order of priority
+c248f1e32cf9f84625b2cb9a037ffa28ab2232ae 2022-12-15T13:10:30+00:00 Remove extra log format verb for add logical port latency
+156cc72c4fbaa7b986c06026bc6dd57679bf3f78 2022-12-06T17:20:46+01:00 CloudPrivateIPConfig reconcile: don't throw err on missing annotation
+84e28ea5d414586fc12cecab223bff0f9861e11d 2022-11-24T16:04:11+08:00 ignore tunnel header for single node mtu check
+9fca16bb1317262239f9276e24cd033bb21e5e7a 2022-11-24T16:04:06+08:00 Add single-node gateway config option
+# kubernetes image-arm64 099791b17ea18e63fae371efd629d5d8131ca2c7 to 7dab57f2302ec0f94b648ccb48b0fa67c2befbb3
+b4e019f9bb91fb6733c6fdb342a78021d8d01f3e 2023-01-16T11:43:15+01:00 UPSTREAM: <carry>: pod-security: don't fail on SCC admission error
