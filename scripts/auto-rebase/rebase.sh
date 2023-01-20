@@ -538,6 +538,7 @@ update_manifests() {
     cp "${STAGING_DIR}/release-manifests/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml" "${REPOROOT}"/assets/crd
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
     # - assets/core/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
+    # - assets/core/priority-class-openshift-user-critical.yaml (defines PriorityClass required by oc debug)
 
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
