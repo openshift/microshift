@@ -177,6 +177,22 @@ func (c *ClusterQuotaReconcilationController) Sync(discoveryFunc resourcequota.N
 			}
 		}
 
+		// Empty list of resources is a sign of incorrectness in the cluster.
+		// Either the kube-apiserver incorrectly returns an empty list with no error.
+		// Or, the client-code responsible for processing response from the discovery
+		// is incorrectly interpretting the server error.
+		//
+		// If the list of resources is zero, all current monitors are cleared and removed.
+		// Followed by invoking c.quotaMonitor.IsSynced which is always false when there's
+		// no monitor running. In which case cache.WaitForCacheSync never returns
+		// and loops indefinitely. Never resyncing the resources. Thus, none of the resources
+		// mentioned on any ClusterResourceQuota's status are recomputed since there's no
+		// resource monitor to provide current resource usage.
+		if len(newResources) == 0 {
+			klog.V(2).Infof("no resources discovered, skipping resource quota sync")
+			return
+		}
+
 		// Decide whether discovery has reported a change.
 		if reflect.DeepEqual(oldResources, newResources) {
 			klog.V(4).Infof("no resource updates from discovery, skipping resource quota sync")
