@@ -258,6 +258,25 @@ def get_expected_branch_name(amd, arm):
     return f"rebase-{match_amd['version_stream']}_amd64-{match_amd['date']}_arm64-{match_arm['date']}"
 
 
+def cleanup_branches(gh_repo):
+    logging.info("Cleaning up branches for closed PRs")
+    rebase_branches = [b for b in gh_repo.get_branches() if b.name.startswith("rebase-")]
+    deleted_branches = []
+    for branch in rebase_branches:
+        prs = gh_repo.get_pulls(head=f"{gh_repo.owner.login}:{branch.name}", state="all")
+        all_prs_are_closed = all([pr.state == "closed" for pr in prs])
+        logging.info(f"'{branch.name}' is referenced in following PRs: " + ", ".join([f"#{pr.number} ({pr.state})" for pr in prs]))
+        if all_prs_are_closed:
+            ref = gh_repo.get_git_ref(f"heads/{branch.name}")
+            deleted_branches.append(branch.name)
+            if REMOTE_DRY_RUN:
+                logging.info(f"[DRY RUN] Delete '{ref.ref}'")
+            else:
+                ref.delete()
+                logging.info(f"Deleted '{ref.ref}'")
+    _extra_msgs.append(f"Deleted following branches: " + ", ".join(deleted_branches))
+
+
 def main():
     app_id = try_get_env(APP_ID_ENV)
     key_path = try_get_env(KEY_ENV)
@@ -308,13 +327,17 @@ def main():
     pr_title = create_pr_title(rebase_branch_name, rebase_result.success)
     desc = generate_pr_description(rebase_branch_name, get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
 
+    comment = ""
     pr = try_get_pr(gh_repo, org, base_branch, rebase_branch_name)
     if pr == None:
         pr = create_pr(gh_repo, base_branch, rebase_branch_name, pr_title, desc)
-        post_comment(pr)
     else:
         update_pr(pr, pr_title, desc)
-        post_comment(pr, f"Rebase job updated the branch\n{desc}")
+        comment = f"Rebase job updated the branch\n{desc}"
+
+    if base_branch == "main":
+        cleanup_branches(gh_repo)
+    post_comment(pr, comment)
 
     sys.exit(0 if rebase_result.success else 1)
 
