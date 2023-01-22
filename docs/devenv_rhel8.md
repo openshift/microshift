@@ -107,20 +107,10 @@ When working with MicroShift based on a pre-release _minor_ version `Y` of OpenS
 Enable the needed repositories and install the MicroShift RPM packages. This procedure pulls in the required package dependencies, also installing the necessary configuration files and `systemd` units.
 
 ```bash
-# Temporary workaround until the rhocp-4.12-for-rhel-8-$(uname -i)-rpms repo can be used
-sudo tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <<EOF
-[rhocp-4.12-el8-beta-$(uname -i)-rpms]
-name=Beta rhocp-4.12 RPMs for RHEL8
-baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/4.12-el8-beta/
-enabled=1
-gpgcheck=1
-skip_if_unavailable=0
-EOF
-
 sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos \
+    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
-#    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
 sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 ```
 

@@ -75,19 +75,10 @@ fi
 
 # Run MicroShift Executable > Runtime Prerequisites
 # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#runtime-prerequisites
-sudo tee /etc/yum.repos.d/rhocp-4.12-el8-beta-$(uname -i)-rpms.repo >/dev/null <<EOF
-[rhocp-4.12-el8-beta-$(uname -i)-rpms]
-name=Beta rhocp-4.12 RPMs for RHEL8
-baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/4.12-el8-beta/
-enabled=1
-gpgcheck=1
-skip_if_unavailable=0
-EOF
-
 sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos \
+    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
     --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
-#    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
 if $BUILD_AND_INSTALL ; then
     sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 
