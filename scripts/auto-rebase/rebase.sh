@@ -43,6 +43,72 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+# Clone a repo at a commit
+clone_repo() {
+    local repo="$1"
+    local commit="$2"
+    local destdir="$3"
+
+    local repodir="${destdir}/${repo##*/}"
+
+    if [[ -d "${repodir}" ]]
+    then
+        return
+    fi
+
+    git init "${repodir}"
+    pushd "${repodir}" >/dev/null
+    git remote add origin "${repo}"
+    git fetch origin --filter=tree:0 --tags "${commit}"
+    git checkout "${commit}"
+    popd >/dev/null
+}
+
+# Determine the image info for one architecture
+download_image_state() {
+    local release_image="$1"
+    local release_image_arch="$2"
+
+    local release_info_file="release_${release_image_arch}.json"
+    local commits_file="image-repos-commits-${release_image_arch}"
+    local new_commits_file="new-commits.txt"
+
+    # Determine the repos and commits for the repos that build the images
+    cat "${release_info_file}" \
+        | jq -j '.references.spec.tags[] | if .annotations["io.openshift.build.source-location"] != "" then .name," ",.annotations["io.openshift.build.source-location"]," ",.annotations["io.openshift.build.commit.id"] else "" end,"\n"' \
+             | sort -u \
+             | grep -v '^$' \
+                    > "${commits_file}"
+
+    # Get list of MicroShift's container images. The names are not
+    # arch-specific, so we just use the x86_64 list.
+    local images=$(jq -r '.images | keys[]' "${REPOROOT}/assets/release/release-x86_64.json" | xargs)
+
+    # Clone the repos. We clone a copy of each repo for each arch in
+    # case they're on different branches or would otherwise not have
+    # the history for both images if we only cloned one.
+    #
+    # TODO: This is probably more wasteful than just cloning the
+    # entire git repo.
+    mkdir -p "${release_image_arch}"
+    local image=""
+    for image in $images
+    do
+        if ! grep -q "^${image} " "${commits_file}"
+        then
+            # some of the images we use do not come from the release payload
+            echo "${image} not from release payload, skipping"
+            echo
+            continue
+        fi
+        local line=$(grep "^${image} " "${commits_file}")
+        local repo=$(echo "$line" | cut -f2 -d' ')
+        local commit=$(echo "$line" | cut -f3 -d' ')
+        clone_repo "${repo}" "${commit}" "${release_image_arch}"
+        echo "${repo} image-${release_image_arch} ${commit}" >> "${new_commits_file}"
+        echo
+    done
+}
 
 # Downloads a release's tools and manifest content into a staging directory,
 # then checks out the required components for the rebase at the release's commit.
@@ -74,8 +140,11 @@ download_release() {
     popd >/dev/null
 
     title "# Cloning ${release_image_amd64} component repos"
-    commits=$(oc adm release info ${authentication} --commits -o json "${release_image_amd64}")
-    echo "${commits}" | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
+    cat release_amd64.json \
+       | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
+
+    local new_commits_file="new-commits.txt"
+    touch "${new_commits_file}"
 
     git config --global advice.detachedHead false
     git config --global init.defaultBranch main
@@ -85,16 +154,15 @@ download_release() {
         repo=$(echo "${line}" | cut -d ' ' -f 2)
         commit=$(echo "${line}" | cut -d ' ' -f 3)
         if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]]; then
-            title "## Cloning ${repo} at commit ${commit}..."
-            git init "${repo##*/}"
-            pushd "${repo##*/}" >/dev/null
-            git remote add origin "${repo}"
-            git fetch origin --filter=tree:0 --tags "${commit}"
-            git checkout "${commit}"
-            popd >/dev/null
+            clone_repo "${repo}" "${commit}" "."
+            echo "${repo} embedded-component ${commit}" >> "${new_commits_file}"
             echo
         fi
     done < source-commits
+
+    title "# Cloning ${release_image_amd64} image repos"
+    download_image_state "${release_image_amd64}" "amd64"
+    download_image_state "${release_image_arm64}" "arm64"
 
     popd >/dev/null
 }
@@ -665,6 +733,77 @@ EOF
 }
 
 
+# Builds a list of the changes for each repository touched in this rebase
+update_changelog() {
+    local new_commits_file="${STAGING_DIR}/new-commits.txt"
+    local old_commits_file="${REPOROOT}/scripts/auto-rebase/commits.txt"
+    local changelog="${REPOROOT}/scripts/auto-rebase/changelog.txt"
+
+    local repo # the URL to the repository
+    local new_commit # the SHA of the commit to which we're updating
+    local purpose # the purpose of the repo
+
+    rm -f "$changelog"
+    touch "$changelog"
+
+    while read repo purpose new_commit
+    do
+        # Look for repo URL anchored at start of the line with a space
+        # after it because some repos may have names that are
+        # substrings of other repos.
+        local old_commit=$(grep "^${repo} ${purpose} " "${old_commits_file}" | cut -f3 -d' ' | head -n 1)
+
+        if [[ -z "${old_commit}" ]]
+        then
+            echo "# ${repo##*/} is a new ${purpose} dependency" >> "${changelog}"
+            echo >> "${changelog}"
+            continue
+        fi
+
+        if [[ "${old_commit}" == "${new_commit}" ]]; then
+            # emit a message, but not to the changelog, to avoid cluttering it
+            echo "${repo##*/} ${purpose} no change"
+            echo
+            continue
+        fi
+
+        local repodir
+        case "${purpose}" in
+            embedded-component)
+                repodir="${STAGING_DIR}/${repo##*/}"
+                ;;
+            image-*)
+                local image_arch=$(echo $purpose | cut -f2 -d-)
+                repodir="${STAGING_DIR}/${image_arch}/${repo##*/}"
+                ;;
+            *)
+                echo "Unknown commit purpose \"${purpose}\" for ${repo}" >> "${changelog}"
+                continue
+                ;;
+        esac
+        pushd "${repodir}" >/dev/null
+        echo "# ${repo##*/} ${purpose} ${old_commit} to ${new_commit}" >> "${changelog}"
+        (git log \
+             --no-merges \
+             --pretty="format:%H %cI %s" \
+             --no-decorate \
+             "${old_commit}..${new_commit}" \
+             || echo "There was an error determining the changes") >> "${changelog}"
+        echo >> "${changelog}"
+        popd >/dev/null
+    done < "${new_commits_file}"
+
+    cp "${new_commits_file}" "${old_commits_file}"
+
+    (cd "${REPOROOT}" && \
+         test -n "$(git status -s scripts/auto-rebase/changelog.txt scripts/auto-rebase/commits.txt)" && \
+         title "## Committing changes to changelog" && \
+         git add scripts/auto-rebase/commits.txt scripts/auto-rebase/changelog.txt && \
+         git commit -m "update changelog" || true)
+
+}
+
+
 # Runs each rebase step in sequence, commiting the step's output to git
 rebase_to() {
     local release_image_amd64=$1
@@ -693,6 +832,8 @@ rebase_to() {
     git checkout -b "${rebase_branch}"
 
     update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
+
+    update_changelog
 
     update_go_mod
     go mod tidy
@@ -767,6 +908,7 @@ case "$command" in
         [[ $# -ne 3 ]] && usage
         download_release "$2" "$3"
         ;;
+    changelog) update_changelog;;
     buildfiles) update_buildfiles;;
     go.mod) update_go_mod;;
     generated-apis) regenerate_openapi;;
