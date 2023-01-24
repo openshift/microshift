@@ -52,7 +52,7 @@ GO_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 ifeq ($(DEBUG),true)
 	# throw all the debug info in!
 	LD_FLAGS =
-	GC_FLAGS =-gcflags "all=-N -l"
+	GC_FLAGS =-gcflags 'all=-N -l'
 else
 	# strip everything we can
 	LD_FLAGS =-w -s
