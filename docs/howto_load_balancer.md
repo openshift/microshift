@@ -18,7 +18,9 @@ oc get pods -A
 Log into the virtual machine and run the following commands to create the `MetalLB` namespace and deployment.
 
 ```
-oc apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.4/config/manifests/metallb-native.yaml
+oc apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
+oc adm policy add-scc-to-user privileged -z controller -n metallb-system
+oc adm policy add-scc-to-user privileged -z speaker -n metallb-system
 ```
 
 Verify that the `MetalLB` pods are up and running in the `metallb-system` namespace.
