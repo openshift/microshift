@@ -1,10 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/url"
+	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
@@ -17,32 +19,27 @@ import (
 func NewRunEtcdCommand() *cobra.Command {
 	cfg := config.NewMicroshiftConfig()
 	cmd := &cobra.Command{
-		Use:   "run",
-		Short: "TODO",
+		Use: "run",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if err := cfg.ReadAndValidate(config.GetConfigFile(), cmd.Flags()); err != nil {
 				klog.Fatalf("Error in reading and validating flags", err)
 			}
 
 			e := NewEtcd(cfg)
-			ready := make(chan struct{})
-			stopped := make(chan struct{})
-			return e.Run(cmd.Context(), ready, stopped)
+			return e.Run()
 		},
 	}
 	return cmd
 }
 
-var (
-	tlsCipherSuites = []string{
-		"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-		"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-		"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-		"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-		"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
-		"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
-	}
-)
+var tlsCipherSuites = []string{
+	"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+	"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+	"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+	"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+	"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
+	"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
+}
 
 type EtcdService struct {
 	etcdCfg *etcd.Config
@@ -54,16 +51,16 @@ func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
 	return s
 }
 
-func (s *EtcdService) Name() string           { return "etcd" }
-func (s *EtcdService) Dependencies() []string { return []string{} }
+func (s *EtcdService) Name() string { return "etcd" }
 
 func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
-	certsDir := cryptomaterial.CertsDirectory(config.GetDataDir())
+	microshiftDataDir := config.GetDataDir()
+	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 
 	etcdServingCertDir := cryptomaterial.EtcdServingCertDir(certsDir)
 	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
 	etcdSignerCertPath := cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))
-	dataDir := filepath.Join(config.GetDataDir(), s.Name())
+	dataDir := filepath.Join(microshiftDataDir, s.Name())
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	s.etcdCfg = etcd.NewConfig()
@@ -90,25 +87,21 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
 }
 
-func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(stopped)
-
+func (s *EtcdService) Run() error {
 	e, err := etcd.StartEtcd(s.etcdCfg)
 	if err != nil {
-		return fmt.Errorf("%s failed to start: %v", s.Name(), err)
+		return fmt.Errorf("microshift-etcd failed to start: %v", err)
 	}
+	<-e.Server.ReadyNotify()
 
-	// run readiness check
-	go func() {
-		<-e.Server.ReadyNotify()
-		klog.Infof("%s is ready", s.Name())
-		close(ready)
-	}()
+	sigTerm := make(chan os.Signal, 1)
+	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
+	sig := <-sigTerm
+	klog.Infof("microshift-etcd received signal %v - stopping", sig)
 
-	<-ctx.Done()
 	e.Server.Stop()
 	<-e.Server.StopNotify()
-	return ctx.Err()
+	return nil
 }
 
 func setURL(hostnames []string, port string) []url.URL {
