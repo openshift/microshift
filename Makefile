@@ -158,6 +158,9 @@ _build_local:
 	+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(MAKE) --no-print-directory build \
 		GO_BUILD_PACKAGES:=./cmd/microshift \
 		GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
+	+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(MAKE) -C etcd --no-print-directory build \
+		GO_BUILD_PACKAGES:=./cmd/microshift-etcd \
+		GO_BUILD_BINDIR:=../$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
 
 cross-build-linux-amd64:
 	+$(MAKE) _build_local GOOS=linux GOARCH=amd64
