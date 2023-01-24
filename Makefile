@@ -94,26 +94,26 @@ GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi 
 GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
 GO_TEST_PACKAGES=./cmd/... ./pkg/...
 
-# targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
-# Disable CGO when building microshift binary
-all: export CGO_ENABLED=0
+all: microshift etcd
 
+# target "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
+# Disable CGO when building microshift binary
 build: export CGO_ENABLED=0
 
 microshift: build
 
 .PHONY: etcd
 export GO_BUILD_FLAGS 
-export GO_LD_FLAGS = $(GC_FLAGS) -ldflags "\
+etcd:
+	GO_LD_FLAGS="$(GC_FLAGS) -ldflags \"\
                    -X main.majorFromGit=$(MAJOR) \
                    -X main.minorFromGit=$(MINOR) \
                    -X main.versionFromGit=$(EMBEDDED_GIT_TAG) \
                    -X main.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
                    -X main.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
                    -X main.buildDate=$(BIN_TIMESTAMP) \
-					$(LD_FLAGS)"
-etcd:
-	$(MAKE) -C etcd
+					$(LD_FLAGS)\"" \
+		$(MAKE) -C etcd
 
 .PHONY: verify-images
 verify: verify-images
