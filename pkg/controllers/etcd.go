@@ -18,106 +18,119 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"net/url"
+	"os"
+	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
-	etcd "go.etcd.io/etcd/server/v3/embed"
-	"k8s.io/klog/v2"
+	klog "k8s.io/klog/v2"
+
+	"go.etcd.io/etcd/client/pkg/v3/transport"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 var (
-	tlsCipherSuites = []string{
-		"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-		"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-		"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-		"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-		"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
-		"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
-	}
-	microshiftDataDir = config.GetDataDir()
+	HealthCheckRetries = 10
+	HealthCheckWait    = time.Duration(3 * time.Second)
 )
 
-const (
-	etcdStartupTimeout = 60
-)
-
-type EtcdService struct {
-	etcdCfg *etcd.Config
-}
+type EtcdService struct{}
 
 func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
-	s := &EtcdService{}
-	s.configure(cfg)
-	return s
+	return &EtcdService{}
 }
 
 func (s *EtcdService) Name() string           { return "etcd" }
 func (s *EtcdService) Dependencies() []string { return []string{} }
 
-func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
-	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
-
-	etcdServingCertDir := cryptomaterial.EtcdServingCertDir(certsDir)
-	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
-	etcdSignerCertPath := cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))
-	dataDir := filepath.Join(microshiftDataDir, s.Name())
-
-	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
-	s.etcdCfg = etcd.NewConfig()
-	s.etcdCfg.ClusterState = "new"
-	//s.etcdCfg.ForceNewCluster = true //TODO
-	s.etcdCfg.Logger = "zap"
-	s.etcdCfg.Dir = dataDir
-	s.etcdCfg.APUrls = setURL([]string{cfg.NodeIP}, ":2380")
-	s.etcdCfg.LPUrls = setURL([]string{cfg.NodeIP}, ":2380")
-	s.etcdCfg.ACUrls = setURL([]string{cfg.NodeIP}, ":2379")
-	s.etcdCfg.LCUrls = setURL([]string{"127.0.0.1", cfg.NodeIP}, ":2379")
-	s.etcdCfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, ":2381")
-
-	s.etcdCfg.Name = cfg.NodeName
-	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, cfg.NodeIP)
-
-	s.etcdCfg.CipherSuites = tlsCipherSuites
-	s.etcdCfg.ClientTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdServingCertDir)
-	s.etcdCfg.ClientTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdServingCertDir)
-	s.etcdCfg.ClientTLSInfo.TrustedCAFile = etcdSignerCertPath
-
-	s.etcdCfg.PeerTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdPeerCertDir)
-	s.etcdCfg.PeerTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdPeerCertDir)
-	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
-}
-
 func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(stopped)
-
-	e, err := etcd.StartEtcd(s.etcdCfg)
+	microshiftExecPath, err := os.Executable()
 	if err != nil {
+		return fmt.Errorf("%v failed to get exec path: %v", s.Name(), err)
+	}
+	etcdPath := filepath.Join(filepath.Dir(microshiftExecPath), "microshift-etcd")
+	args := []string{"run"}
+
+	// Not using context as canceling ctx sends SIGKILL to process
+	cmd := exec.Command(etcdPath, args...)
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("%s failed to get workdir: %v", s.Name(), err)
+	}
+	cmd.Dir = wd
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("%s failed to start: %v", s.Name(), err)
 	}
 
-	// run readiness check
-	go func() {
-		<-e.Server.ReadyNotify()
-		klog.Infof("%s is ready", s.Name())
-		close(ready)
+	// Make sure microshift-etcd is terminated whether it failed to properly start or MicroShift stops
+	defer func() {
+		if err := cmd.Process.Signal(os.Interrupt); err != nil {
+			klog.Warningf("%v failed interrupting the process: %+v", s.Name(), err)
+			if err := cmd.Process.Kill(); err != nil {
+				klog.Warningf("%v failed killing the process: %+v", s.Name(), err)
+			}
+		}
+		if err := cmd.Wait(); err != nil {
+			klog.Warningf("%v failed waiting on process to finish: %+v", s.Name(), err)
+		}
+		klog.Infof("%v process quit: %v", s.Name(), cmd.ProcessState.String())
 	}()
 
+	if err := checkIfEtcdIsReady(ctx); err != nil {
+		return err
+	}
+	klog.Info("etcd is ready!")
+	close(ready)
+
 	<-ctx.Done()
-	e.Server.Stop()
-	<-e.Server.StopNotify()
 	return ctx.Err()
 }
 
-func setURL(hostnames []string, port string) []url.URL {
-	urls := make([]url.URL, len(hostnames))
-	for i, name := range hostnames {
-		u, err := url.Parse("https://" + name + port)
-		if err != nil {
-			return []url.URL{}
-		}
-		urls[i] = *u
+func checkIfEtcdIsReady(ctx context.Context) error {
+	client, err := getEtcdClient(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to obtain etcd client: %v", err)
 	}
-	return urls
+	defer client.Close()
+
+	for i := 0; i < HealthCheckRetries; i++ {
+		time.Sleep(HealthCheckWait)
+		if _, err = client.Get(ctx, "health"); err == nil {
+			return nil
+		} else {
+			klog.Infof("etcd not ready yet: %v", err)
+		}
+	}
+	return fmt.Errorf("etcd still not healthy after checking %d times", HealthCheckRetries)
+}
+
+func getEtcdClient(ctx context.Context) (*clientv3.Client, error) {
+	certsDir := cryptomaterial.CertsDirectory(config.GetDataDir())
+	etcdAPIServerClientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
+
+	tlsInfo := transport.TLSInfo{
+		CertFile:      cryptomaterial.ClientCertPath(etcdAPIServerClientCertDir),
+		KeyFile:       cryptomaterial.ClientKeyPath(etcdAPIServerClientCertDir),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+	}
+	tlsConfig, err := tlsInfo.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"https://127.0.0.1:2379"},
+		DialTimeout: 5 * time.Second,
+		TLS:         tlsConfig,
+		Context:     ctx,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cli, nil
 }
