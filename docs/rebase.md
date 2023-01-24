@@ -39,12 +39,16 @@ When rebasing onto an OpenShift version whose release image requires a pull secr
 
 Finally. git clone your personal fork of microshift and `cd` into it.
 
+### A Note on Rebasing MicroShift's CSI Plugin
+
+The Logical Volume Manager Service is not integrated with the ocp release image and must be passed explicitly to the rebase script as its 4th argument (including the sub-command). Images can be found at [Red Hat Container Catalog](https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79?tag=v4.12.0-4&architecture=amd64&push_date=1673885582000&container-tabs=gti).
+
 ### Fully automatic rebasing
 
 The following command attempts a fully automatic rebase to a given target upstream release. It is what is run nighly from CI and should work for most cases within a z-stream. It creates a new branch named after the target release, then runs the individual steps described in the following sections, including creating the respective commits.
 
 ```shell
-./scripts/auto-rebase/rebase.sh to quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64
+./scripts/auto-rebase/rebase.sh to quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64 registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]
 ```
 
 ### Downloading the target OpenShift release
@@ -52,7 +56,7 @@ The following command attempts a fully automatic rebase to a given target upstre
 Run the following to download the OpenShift release to rebase to, specifying the target release images for _both_ Intel and Arm architectures, e.g.:
 
 ```shell
-./scripts/auto-rebase/rebase.sh download quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64
+./scripts/auto-rebase/rebase.sh download quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64 registry.redhat.io/lvms4/lvms-operator-bundle:v4.12
 ```
 
 This will create a directory `_output/staging`, download the specified release images' metadata (`release_{amd64,arm64}.json`) and manifests, git-clone (only) the repos of the embedded components and the operators of the loaded components, and check out the commit used by that OpenShift release.
