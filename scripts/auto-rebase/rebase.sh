@@ -604,6 +604,7 @@ update_manifests() {
     sed -i 's|REPLACE_COREDNS_IMAGE|{{ .ReleaseImage.coredns }}|' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     sed -i 's|REPLACE_RBAC_PROXY_IMAGE|{{ .ReleaseImage.kube_rbac_proxy }}|' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     sed -i 's|REPLACE_CLUSTER_IP|{{.ClusterIP}}|' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+    sed -i 's|forward.*|{{with .UpstreamResolver}}{{.}}{{else}}/etc/resolv.conf{{end}} {|' "${REPOROOT}"/assets/components/openshift-dns/dns/configmap.yaml
 
 
     #-- openshift-router ----------------------------------
