@@ -22,7 +22,7 @@ spec:
         - /lvmd
         - --config=/etc/topolvm/lvmd.yaml
         - --container=true
-        image: {{ .ReleaseImage.topolvm-csi }}
+        image: {{ .ReleaseImage.topolvm_csi }}
         imagePullPolicy: IfNotPresent
         name: lvmd
         resources:
@@ -48,7 +48,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: {{ .ReleaseImage.topolvm-csi }}
+        image: {{ .ReleaseImage.topolvm_csi }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -88,7 +88,7 @@ spec:
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.io/node/csi-topolvm.sock
-        image: {{ .ReleaseImage.topolvm-csi-registrar }}
+        image: {{ .ReleaseImage.topolvm_csi_registrar }}
         imagePullPolicy: IfNotPresent
         lifecycle:
           preStop:
@@ -111,7 +111,7 @@ spec:
           name: registration-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.topolvm-csi-livenessprobe }}
+        image: {{ .ReleaseImage.topolvm_csi_livenessprobe }}
         imagePullPolicy: IfNotPresent
         name: liveness-probe
         resources:
