@@ -48,11 +48,12 @@ EOF
 ```
 
 ## Install User Workload
-Log into the virtual machine and create the namespace to be used for deploying the test application.
+Log into the virtual machine and create the namespace to be used for deploying the test application.  Be aware that this test application will run as root user, which is not a security best practice.
 
 ```bash
 NAMESPACE=nginx-lb-test
 oc create ns $NAMESPACE
+oc adm policy add-scc-to-user privileged -z default -n $NAMESPACE
 ```
 
 Run the following command to deploy **3 replicas** of a test `nginx` application in the specified namespace.

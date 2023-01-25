@@ -30,6 +30,8 @@ spec:
         - name: nginx-configs
           subPath: headers.conf
           mountPath: /etc/nginx/conf.d/headers.conf
+      securityContext:
+        runAsUser: 0
       volumes:
         - name: nginx-configs
           configMap:
