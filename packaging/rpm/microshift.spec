@@ -132,7 +132,7 @@ make
 
 install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
-install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift-etcd
+install -p -m755 ./_output/microshift-etcd %{buildroot}%{_bindir}/microshift-etcd
 install -p -m755 hack/cleanup.sh %{buildroot}%{_bindir}/cleanup-all-microshift-data
 
 restorecon -v %{buildroot}%{_bindir}/microshift
