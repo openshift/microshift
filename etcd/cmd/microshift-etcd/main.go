@@ -14,8 +14,7 @@ func main() {
 	defer logs.FlushLogs()
 
 	cmd := &cobra.Command{
-		Use:   "microshift-etcd",
-		Short: "MicroShift, a minimal OpenShift",
+		Use: "microshift-etcd",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 			os.Exit(1)
