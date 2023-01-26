@@ -820,15 +820,16 @@ rebase_to() {
         ver_stream=${BASH_REMATCH[1]}
         amd64_date=${BASH_REMATCH[2]}
     else
-        echo "Failed to match regex against amd64 image tag"
-        exit 1
+        echo "Failed to match regex against amd64 image tag, using release file"
+        ver_stream="$(cat ${STAGING_DIR}/release_amd64.json | jq -r '.config.config.Labels["io.openshift.release"]')"
+        amd64_date="$(cat ${STAGING_DIR}/release_amd64.json | jq -r .config.created | cut -f1 -dT)"
     fi
 
     if [[ "${release_image_arm64#*:}" =~ ${RELEASE_TAG_RX} ]]; then
         arm64_date="${BASH_REMATCH[2]}"
     else
-        echo "Failed to match regex against arm64 image tag"
-        exit 1
+        echo "Failed to match regex against arm64 image tag, using release file"
+        arm64_date="$(cat ${STAGING_DIR}/release_arm64.json | jq -r .config.created | cut -f1 -dT)"
     fi
 
     rebase_branch="rebase-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
