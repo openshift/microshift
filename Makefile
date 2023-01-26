@@ -52,7 +52,7 @@ GO_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 ifeq ($(DEBUG),true)
 	# throw all the debug info in!
 	LD_FLAGS =
-	GC_FLAGS =-gcflags "all=-N -l"
+	GC_FLAGS =-gcflags 'all=-N -l'
 else
 	# strip everything we can
 	LD_FLAGS =-w -s
@@ -94,13 +94,26 @@ GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi 
 GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
 GO_TEST_PACKAGES=./cmd/... ./pkg/...
 
-# targets "all:" and "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
-# Disable CGO when building microshift binary
-all: export CGO_ENABLED=0
+all: microshift etcd
 
+# target "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
+# Disable CGO when building microshift binary
 build: export CGO_ENABLED=0
 
 microshift: build
+
+.PHONY: etcd
+export GO_BUILD_FLAGS 
+etcd:
+	GO_LD_FLAGS="$(GC_FLAGS) -ldflags \"\
+                   -X main.majorFromGit=$(MAJOR) \
+                   -X main.minorFromGit=$(MINOR) \
+                   -X main.versionFromGit=$(EMBEDDED_GIT_TAG) \
+                   -X main.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
+                   -X main.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
+                   -X main.buildDate=$(BIN_TIMESTAMP) \
+					$(LD_FLAGS)\"" \
+		$(MAKE) -C etcd
 
 .PHONY: verify-images
 verify: verify-images
@@ -145,6 +158,9 @@ _build_local:
 	+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(MAKE) --no-print-directory build \
 		GO_BUILD_PACKAGES:=./cmd/microshift \
 		GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
+	+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(MAKE) -C etcd --no-print-directory build \
+		GO_BUILD_PACKAGES:=./cmd/microshift-etcd \
+		GO_BUILD_BINDIR:=../$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
 
 cross-build-linux-amd64:
 	+$(MAKE) _build_local GOOS=linux GOARCH=amd64

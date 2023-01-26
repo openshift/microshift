@@ -50,11 +50,15 @@ const (
 	kubeAPIStartupTimeout = 60
 )
 
-var baseKubeAPIServerConfigs = [][]byte{
-	// todo: a nice way to generate the baseline kas config for microshift
-	embedded.MustAsset("controllers/kube-apiserver/defaultconfig.yaml"),
-	embedded.MustAsset("controllers/kube-apiserver/config-overrides.yaml"),
-}
+var (
+	baseKubeAPIServerConfigs = [][]byte{
+		// todo: a nice way to generate the baseline kas config for microshift
+		embedded.MustAsset("controllers/kube-apiserver/defaultconfig.yaml"),
+		embedded.MustAsset("controllers/kube-apiserver/config-overrides.yaml"),
+	}
+
+	microshiftDataDir = config.GetDataDir()
+)
 
 var fixedTLSProfile *configv1.TLSProfileSpec
 

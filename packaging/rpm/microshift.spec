@@ -121,6 +121,7 @@ make _build_local GOOS=${GOOS} GOARCH=${GOARCH} MICROSHIFT_VERSION=%{version} EM
 %endif
 
 cp ./_output/bin/${GOOS}_${GOARCH}/microshift ./_output/microshift
+cp ./_output/bin/${GOOS}_${GOARCH}/microshift-etcd ./_output/microshift-etcd
 
 # SELinux modules build
 
@@ -131,9 +132,11 @@ make
 
 install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
+install -p -m755 ./_output/microshift-etcd %{buildroot}%{_bindir}/microshift-etcd
 install -p -m755 hack/cleanup.sh %{buildroot}%{_bindir}/cleanup-all-microshift-data
 
 restorecon -v %{buildroot}%{_bindir}/microshift
+restorecon -v %{buildroot}%{_bindir}/microshift-etcd
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
@@ -224,6 +227,7 @@ systemctl enable --now --quiet openvswitch || true
 
 %license LICENSE
 %{_bindir}/microshift
+%{_bindir}/microshift-etcd
 %{_bindir}/cleanup-all-microshift-data
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
@@ -257,6 +261,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Jan 24 2023 Patryk Matuszak <pmatusza@redhat.com> 4.13.0
+- Include microshift-etcd in package
+
 * Wed Dec 14 2022 Frank A. Zdarsky <fzdarsky@redhat.com> 4.12.0
 - Add microshift-release-info subpackage
 
