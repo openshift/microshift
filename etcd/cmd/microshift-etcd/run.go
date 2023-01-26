@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"os"
 	"os/signal"
@@ -68,14 +69,16 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	//s.etcdCfg.ForceNewCluster = true //TODO
 	s.etcdCfg.Logger = "zap"
 	s.etcdCfg.Dir = dataDir
-	s.etcdCfg.APUrls = setURL([]string{cfg.NodeIP}, ":2380")
-	s.etcdCfg.LPUrls = setURL([]string{cfg.NodeIP}, ":2380")
-	s.etcdCfg.ACUrls = setURL([]string{cfg.NodeIP}, ":2379")
-	s.etcdCfg.LCUrls = setURL([]string{"127.0.0.1", cfg.NodeIP}, ":2379")
-	s.etcdCfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, ":2381")
+	url2380 := setURL([]string{"127.0.0.1"}, "2380")
+	url2379 := setURL([]string{"127.0.0.1"}, "2379")
+	s.etcdCfg.APUrls = url2380
+	s.etcdCfg.LPUrls = url2380
+	s.etcdCfg.ACUrls = url2379
+	s.etcdCfg.LCUrls = url2379
+	s.etcdCfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, "2381")
 
 	s.etcdCfg.Name = cfg.NodeName
-	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, cfg.NodeIP)
+	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, "127.0.0.1")
 
 	s.etcdCfg.CipherSuites = tlsCipherSuites
 	s.etcdCfg.ClientTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdServingCertDir)
@@ -107,8 +110,9 @@ func (s *EtcdService) Run() error {
 func setURL(hostnames []string, port string) []url.URL {
 	urls := make([]url.URL, len(hostnames))
 	for i, name := range hostnames {
-		u, err := url.Parse("https://" + name + port)
+		u, err := url.Parse("https://" + net.JoinHostPort(name, port))
 		if err != nil {
+			klog.Errorf("failed to parse url: %v", err)
 			return []url.URL{}
 		}
 		urls[i] = *u
