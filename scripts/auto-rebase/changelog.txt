@@ -1,9 +1,30 @@
-# oc image-arm64 983567b394f8d1efcc9c938b01af30d173c8fc5d to 21018ec19bff0ffe0cbf5e64604dff4c9e5fadb2
+# cluster-ingress-operator embedded-component b81ee72a00486ad6994c5f50320bb536d0c93ca6 to 2c30c066a97980348ac12c537596b1e637a43269
+9c6e368c63565d29a45c10f056f7761a53748108 2023-01-09T19:01:22-05:00 service-internal.yaml: Target metrics port by name
+44a60f530416bbf93e47a8c7d711177f7008c86d 2022-12-09T19:52:26-05:00 ensureInternalIngressControllerService: Updates
+92d71a053f88ca82d1c359e910ec6192e3967b62 2022-12-09T19:52:23-05:00 ensureInternalIngressControllerService: Reformat
+# cluster-kube-apiserver-operator embedded-component 0fa1e9be5e16b1fc8f7df206ec5bffc105ff814f to d83b6392a9e28b1dd4488b7b525778c5b41dee1b
+e758c90f821588ad5cd28d2a4f0a37d3d43c60a6 2023-01-17T08:14:30-05:00 increase audit log size to contain an entire upgrade+e2e run
+# cluster-network-operator embedded-component a7187082c4caed84f554edb218ca7d00c3a57370 to 50fa8db54569004cfe0bbe32fe78652684769b0f
+569ef041837b3f80853158697069c152f9f7211e 2023-01-16T09:25:28-06:00 ovn-kubernetes: ignore NB/SB readiness checks and dbchecker when not RAFT member
+# machine-config-operator embedded-component a7c4961a8000708251384cbcf58f9eff08ca3b74 to 0e69cd5dd6e2d24e223e086e63bc81a89cfe4d92
+7971961241a034e819ed1bd09cf3870303c900e3 2023-01-19T17:30:25-05:00 bump runtime-utils
+9907dc5611d3f41b9bacb2dfe40fe4fc6466335f 2023-01-19T17:30:09-05:00 Add support for ImageDigestMirrorSet,ImageDigestMirrorSet CRDs.
+912a0e87d72128f2411e7731ec304b356c0ed69d 2023-01-19T12:49:15-05:00 controller: add unit test for outdated MCs
+86bd1cc32beab6c8c5a6b2c6f8a852f9cc48ce95 2023-01-19T12:33:12-05:00 Updated all alerts with the MCO namespace label
+c9141260034715475d52951316d61a2fc692cecf 2023-01-18T19:51:08-06:00 Avoid 'too restrictive' scc by being more explicit
+0aea68f9374dd8a0091b087aa741e644f164fa96 2023-01-18T20:38:56-05:00 controller: don't render new MC until base MCs update
+5f52c442ca08d8908f1af3e45093da4d873dcde2 2023-01-17T15:31:21-05:00 only run this testcase once
+a8fd4780f5d8b8944056f34e88e5de4cc6192594 2023-01-17T12:30:30-05:00 increase e2e-test timeouts
+a436ac4871bacb79e418ae03c7666d5f2ff0b1c3 2023-01-17T13:00:51+01:00 OCPBUGS-5872: Wrap podman commands in a while loop
+07fb60cfa1a9e42f1309af2d80b544264d5681f8 2023-01-16T22:41:41+02:00 OCPBUGS-5379: There are not enough logs in case "oc extract" is stuck in mco first boot
+a2337dbc4271b8f0068c05cfe7a802ae39f22af9 2023-01-16T14:15:11-05:00 ensure that failing tests fail the job
+# oc image-amd64 a0c13fc4b7112da787fb93d7ecb2f10f8a0cbb0c to 21018ec19bff0ffe0cbf5e64604dff4c9e5fadb2
 87caf44408d2a1fb72f388674cca9ed8338388b6 2023-01-19T11:23:45-05:00 Removing unwanted character from changelog output
 ed3ad1ed39ff8603c1fc4b731734b78e29fe1a58 2023-01-17T14:07:56-05:00 Commit dc5504ff0383bde3c5fa86d4cbc4c3d6c878f703 adds the ability to run must-gather in a namespace skipping rolebinding operations. With WRKLDS-629 or PR #1313 in 4.13 we no long consider this exparamental, so this log/error is incorrect
-# router image-arm64 c4b9f3f17bff6a076dffec8978b0907caf21022f to 3b8c25547cbef64812d5cb5d0029bb82ce71765c
+3e3cbf85f787630d459beac2fe96e4ba0904b287 2023-01-10T14:15:15+03:00 Remove must-gather pod after it completes when explicit namespace is used
+# router image-amd64 c4b9f3f17bff6a076dffec8978b0907caf21022f to 3b8c25547cbef64812d5cb5d0029bb82ce71765c
 4c0a6edfafb20b0e9c812df5e0524d152a0345f0 2023-01-17T09:19:04-05:00 OCPBUGS-5073: Count endpoints per port for weights and enabling active health checks
-# kube-rbac-proxy image-arm64 513fd32175af4bb03f2e8a31030477e63380b5bc to 0aa2830ed7359fd8cd0e2f7db0ed96a733c5990e
+# kube-rbac-proxy image-amd64 513fd32175af4bb03f2e8a31030477e63380b5bc to 0aa2830ed7359fd8cd0e2f7db0ed96a733c5990e
 013f9b3cd627818333d05f535869ec382ff799a4 2022-12-16T18:58:31+01:00 vendor: bump
 477ca26bc3eb856cc197517b610d1040a1cf73b5 2022-12-15T15:27:26+01:00 CHANGELOG.md: update wrt to future outlook
 f728d71a25e9d9200954033e49d120c9c2feb605 2022-12-15T14:11:26+01:00 *: cut v0.14.0 release
@@ -42,3 +63,7 @@ c89a631248278253067c00e18d38f18f235e84d5 2022-08-11T21:52:13+02:00 bump: golang.
 aaa32b7a64660b65036de84861bfe647adda054a 2022-08-11T16:50:40+02:00 main.go: better lingo
 7b1831ed24512b4c67f0dc78c97b2bdf23d6f59c 2022-08-08T12:30:25+02:00 main.go: add warn logs when insecure opts in use
 e969036f2d10fa9350d94c17470365917284cc83 2022-08-04T15:01:13+02:00 bump emicklei/go-restful due to CVE-2022-1996
+# oc image-arm64 21018ec19bff0ffe0cbf5e64604dff4c9e5fadb2 to 4db7704f862ff893b54f6723e7353c9a6df05a0e
+ea0f83cb29ffa580bc88d5aa9c5265a55078d721 2023-01-19T13:27:56+03:00 Update kubernetes version to 1.25.2
+5c1b94a758c9cd89726c6840c89e15d80ea5de54 2023-01-19T13:13:09+03:00 Add verify-kube-version step
+3cb7b01542516a9c9f7f7caab024b9cebb17029e 2023-01-19T09:54:30+03:00 Fix kube version from 1.24.1 to 1.25.2
