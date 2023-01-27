@@ -7,7 +7,7 @@ import subprocess
 from collections import namedtuple
 
 from git import Repo, PushInfo  # GitPython
-from github import GithubIntegration, Github  # pygithub
+from github import GithubIntegration, Github, GithubException  # pygithub
 from pathlib import Path
 
 APP_ID_ENV = "APP_ID"
@@ -268,12 +268,18 @@ def cleanup_branches(gh_repo):
         logging.info(f"'{branch.name}' is referenced in following PRs: " + ", ".join([f"#{pr.number} ({pr.state})" for pr in prs]))
         if all_prs_are_closed:
             ref = gh_repo.get_git_ref(f"heads/{branch.name}")
-            deleted_branches.append(branch.name)
             if REMOTE_DRY_RUN:
                 logging.info(f"[DRY RUN] Delete '{ref.ref}'")
+                deleted_branches.append(branch.name)
             else:
-                ref.delete()
-                logging.info(f"Deleted '{ref.ref}'")
+                try:
+                    ref.delete()
+                    logging.info(f"Deleted '{ref.ref}'")
+                    deleted_branches.append(branch.name)
+                except GithubException as e:
+                    logging.warning(f"Failed to delete '{ref.ref}' because: {e}")
+                    _extra_msgs.append(f"Failed to delete '{ref.ref}' because: {e}")
+
     _extra_msgs.append(f"Deleted following branches: " + ", ".join(deleted_branches))
 
 
