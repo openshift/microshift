@@ -43,11 +43,13 @@ import (
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	"github.com/vishvananda/netlink"
 	hostassignmentv1 "k8s.io/kubernetes/openshift-kube-apiserver/admission/route/apis/hostassignment/v1"
 )
 
 const (
 	kubeAPIStartupTimeout = 60
+	loopbackInterface     = "lo"
 )
 
 var baseKubeAPIServerConfigs = [][]byte{
@@ -71,8 +73,9 @@ type KubeAPIServer struct {
 	verbosity      int
 	configureErr   error // todo: report configuration errors immediately
 
-	masterURL     string
-	servingCAPath string
+	masterURL        string
+	servingCAPath    string
+	advertiseAddress string
 }
 
 func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
@@ -112,10 +115,11 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 	s.masterURL = cfg.Cluster.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
+	s.advertiseAddress = cfg.AdvertiseKASAddress
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
-			"advertise-address": {cfg.NodeIP},
+			"advertise-address": {s.advertiseAddress},
 			"audit-policy-file": {microshiftDataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
 			"client-ca-file":    {clientCABundlePath},
 			"etcd-cafile":       {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
@@ -293,10 +297,23 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return fmt.Errorf("configuration failed: %w", s.configureErr)
 	}
 
+	if err := s.addServiceIPLoopback(); err != nil {
+		return err
+	}
+
 	defer close(stopped)
 	errorChannel := make(chan error, 1)
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
+	go func() {
+		select {
+		case <-ctx.Done():
+			if err := s.removeServiceIPLoopback(); err != nil {
+				klog.Warningf("failed to remove IP from interface: %v", err)
+			}
+		}
+	}()
 
 	// run readiness check
 	go func() {
@@ -371,4 +388,46 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		errorChannel <- cmd.ExecuteContext(ctx)
 	}()
 	return <-errorChannel
+}
+
+func (s *KubeAPIServer) addServiceIPLoopback() error {
+	link, err := netlink.LinkByName(loopbackInterface)
+	if err != nil {
+		return err
+	}
+	address, err := netlink.ParseAddr(fmt.Sprintf("%s/32", s.advertiseAddress))
+	if err != nil {
+		return err
+	}
+	existing, err := netlink.AddrList(link, netlink.FAMILY_ALL)
+	if err != nil {
+		return err
+	}
+	for _, existingAddress := range existing {
+		if address.Equal(existingAddress) {
+			return nil
+		}
+	}
+	return netlink.AddrAdd(link, address)
+}
+
+func (s *KubeAPIServer) removeServiceIPLoopback() error {
+	link, err := netlink.LinkByName(loopbackInterface)
+	if err != nil {
+		return err
+	}
+	address, err := netlink.ParseAddr(fmt.Sprintf("%s/32", s.advertiseAddress))
+	if err != nil {
+		return err
+	}
+	existing, err := netlink.AddrList(link, netlink.FAMILY_ALL)
+	if err != nil {
+		return err
+	}
+	for _, existingAddress := range existing {
+		if address.Equal(existingAddress) {
+			return netlink.AddrDel(link, address)
+		}
+	}
+	return nil
 }
