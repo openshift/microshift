@@ -58,12 +58,11 @@ func TestCommandLineConfig(t *testing.T) {
 	}{
 		{
 			config: &MicroshiftConfig{
-				LogVLevel:           4,
-				SubjectAltNames:     []string{"node1"},
-				NodeName:            "node1",
-				NodeIP:              "1.2.3.4",
-				KASAdvertiseAddress: "6.7.8.9",
-				BaseDomain:          "example.com",
+				LogVLevel:       4,
+				SubjectAltNames: []string{"node1"},
+				NodeName:        "node1",
+				NodeIP:          "1.2.3.4",
+				BaseDomain:      "example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://127.0.0.1:6443",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -88,7 +87,6 @@ func TestCommandLineConfig(t *testing.T) {
 		flags.String("service-cidr", config.Cluster.ServiceCIDR, "")
 		flags.String("service-node-port-range", config.Cluster.ServiceNodePortRange, "")
 		flags.String("base-domain", config.BaseDomain, "")
-		flags.String("kas-advertise-address", config.BaseDomain, "")
 
 		// parse the flags
 		var err error
@@ -101,7 +99,6 @@ func TestCommandLineConfig(t *testing.T) {
 			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
 			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
 			"--base-domain=" + tt.config.BaseDomain,
-			"--kas-advertise-address=" + tt.config.KASAdvertiseAddress,
 		})
 		if err != nil {
 			t.Errorf("failed to parse command line flags: %s", err)
@@ -131,12 +128,11 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 	}{
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
-				LogVLevel:           23,
-				SubjectAltNames:     []string{"node1", "node2"},
-				NodeName:            "node1",
-				NodeIP:              "1.2.3.4",
-				KASAdvertiseAddress: "6.7.8.9",
-				BaseDomain:          "example.com",
+				LogVLevel:       23,
+				SubjectAltNames: []string{"node1", "node2"},
+				NodeName:        "node1",
+				NodeIP:          "1.2.3.4",
+				BaseDomain:      "example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -153,7 +149,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_NODENAME", "node1"},
 				{"MICROSHIFT_SUBJECTALTNAMES", "node1,node2"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
-				{"MICROSHIFT_KASADVERTISEADDRESS", "6.7.8.9"},
 				{"MICROSHIFT_BASEDOMAIN", "example.com"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
@@ -163,12 +158,11 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 		},
 		{
 			desiredMicroShiftConfig: &MicroshiftConfig{
-				LogVLevel:           23,
-				SubjectAltNames:     []string{"node1"},
-				NodeName:            "node1",
-				NodeIP:              "1.2.3.4",
-				KASAdvertiseAddress: "6.7.8.9",
-				BaseDomain:          "another.example.com",
+				LogVLevel:       23,
+				SubjectAltNames: []string{"node1"},
+				NodeName:        "node1",
+				NodeIP:          "1.2.3.4",
+				BaseDomain:      "another.example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://cluster.com:4343/endpoint",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -185,7 +179,6 @@ func TestEnvironmentVariableConfig(t *testing.T) {
 				{"MICROSHIFT_NODENAME", "node1"},
 				{"MICROSHIFT_SUBJECTALTNAMES", "node1"},
 				{"MICROSHIFT_NODEIP", "1.2.3.4"},
-				{"MICROSHIFT_KASADVERTISEADDRESS", "6.7.8.9"},
 				{"MICROSHIFT_BASEDOMAIN", "another.example.com"},
 				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
 				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
