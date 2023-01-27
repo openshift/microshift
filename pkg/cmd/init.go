@@ -235,6 +235,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					cfg.SubjectAltNames,
 					cfg.NodeName,
 					"api."+cfg.BaseDomain,
+					cfg.NodeIP,
 				),
 			},
 		),

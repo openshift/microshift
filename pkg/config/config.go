@@ -59,11 +59,12 @@ type IngressConfig struct {
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
-	SubjectAltNames []string      `json:"subjectAltNames"`
-	NodeName        string        `json:"nodeName"`
-	NodeIP          string        `json:"nodeIP"`
-	BaseDomain      string        `json:"baseDomain"`
-	Cluster         ClusterConfig `json:"cluster"`
+	SubjectAltNames     []string      `json:"subjectAltNames"`
+	NodeName            string        `json:"nodeName"`
+	NodeIP              string        `json:"nodeIP"`
+	AdvertiseKASAddress string        `json:"advertiseKASAddress"`
+	BaseDomain          string        `json:"baseDomain"`
+	Cluster             ClusterConfig `json:"cluster"`
 
 	Ingress IngressConfig `json:"-"`
 }
@@ -199,11 +200,12 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 
 	return &MicroshiftConfig{
-		LogVLevel:       2,
-		SubjectAltNames: subjectAltNames,
-		NodeName:        nodeName,
-		NodeIP:          nodeIP,
-		BaseDomain:      "example.com",
+		LogVLevel:           2,
+		SubjectAltNames:     subjectAltNames,
+		NodeName:            nodeName,
+		NodeIP:              nodeIP,
+		AdvertiseKASAddress: "10.43.0.1",
+		BaseDomain:          "example.com",
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
