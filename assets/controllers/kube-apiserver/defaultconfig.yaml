@@ -44,7 +44,8 @@ apiServerArguments:
   audit-log-maxbackup:
     - "10"
   audit-log-maxsize:
-    - "100"
+    # size chosen to be large enough to hold all the audit for an upgrade + e2e parallel test.
+    - "200"
   audit-log-path:
     - /var/log/kube-apiserver/audit.log
   audit-policy-file:
