@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 import logging
 import subprocess
 from collections import namedtuple
@@ -81,6 +82,32 @@ def make_sure_rebase_script_created_new_commits_or_exit(git_repo, base_branch):
                      "MicroShift is already rebased on top of given release.\n"
                      f"Last commit: {commit_str(git_repo.active_branch.commit)}")
         sys.exit(0)
+
+
+def rebase_script_made_changes_considered_functional(git_repo, base_branch):
+    logging.info(f"Deciding if PR should be created by diffing against {base_branch} branch")
+    diffs = git_repo.active_branch.commit.diff(base_branch)
+    logging.info(f"Following files changed: {[ d.a_path for d in diffs ]}")
+
+    for d in diffs:
+        if 'scripts/auto-rebase/' in d.a_path:
+            logging.info(f" - {d.a_path} - ignoring")
+            continue
+
+        if "assets/release/release-" in d.a_path:
+            old_images = set(json.loads(d.a_blob.data_stream.read())['images'].items())
+            new_images = set(json.loads(d.b_blob.data_stream.read())['images'].items())
+            diff = old_images ^ new_images
+            if not diff:
+                logging.info(f" - {d.a_path} - images did not change - ignoring")
+                continue
+            logging.info(f" - {d.a_path} - images changed")
+            return True
+
+        logging.info(f" - File {d.a_path} is considered functional")
+        return True
+
+    return False
 
 
 def get_remote_with_token(git_repo, token, org, repo):
@@ -280,6 +307,11 @@ def main():
     if rebase_result.success:
         # TODO How can we inform team that rebase job ran successfully just there was nothing new?
         make_sure_rebase_script_created_new_commits_or_exit(git_repo, base_branch)
+        if rebase_script_made_changes_considered_functional(git_repo, base_branch):
+            logging.info("Detected functional changes made by rebase script - proceeding with creating PR")
+        else:
+            logging.info("Rebase did not produce any change considered to be functional - quiting")
+            sys.exit(0)
     else:
         logging.warning("Rebase script failed - everything will be committed")
         with open('rebase_sh.log', 'w') as writer:
