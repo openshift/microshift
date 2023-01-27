@@ -115,7 +115,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 	s.masterURL = cfg.Cluster.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
-	s.advertiseAddress = cfg.AdvertiseKASAddress
+	s.advertiseAddress = cfg.KASAdvertiseAddress
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{

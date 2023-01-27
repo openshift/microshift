@@ -59,10 +59,15 @@ type IngressConfig struct {
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
-	SubjectAltNames     []string      `json:"subjectAltNames"`
-	NodeName            string        `json:"nodeName"`
-	NodeIP              string        `json:"nodeIP"`
-	AdvertiseKASAddress string        `json:"advertiseKASAddress"`
+	SubjectAltNames []string `json:"subjectAltNames"`
+	NodeName        string   `json:"nodeName"`
+	NodeIP          string   `json:"nodeIP"`
+	// Kube apiserver advertise address to work around the certificates issue
+	// when requiring external access using the node IP. This will turn into
+	// the IP configured in the endpoint slice for kubernetes service. Must be
+	// a reachable IP from pods. Defaults to service network CIDR first
+	// address.
+	KASAdvertiseAddress string        `json:"kasAdvertiseAddress"`
 	BaseDomain          string        `json:"baseDomain"`
 	Cluster             ClusterConfig `json:"cluster"`
 
@@ -119,6 +124,9 @@ type DNS struct {
 type ApiServer struct {
 	// SubjectAltNames added to API server certs
 	SubjectAltNames []string `json:"subjectAltNames"`
+	// AdvertiseAddress for endpoint slices in kubernetes service. Developer
+	// only parameter, wont show in show-config commands or docs.
+	AdvertiseAddress string `json:"advertiseAddress,omitempty"`
 }
 
 type Node struct {
@@ -204,7 +212,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		SubjectAltNames:     subjectAltNames,
 		NodeName:            nodeName,
 		NodeIP:              nodeIP,
-		AdvertiseKASAddress: "10.43.0.1",
+		KASAdvertiseAddress: "10.43.0.1",
 		BaseDomain:          "example.com",
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
@@ -364,6 +372,9 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	}
 	if len(config.ApiServer.SubjectAltNames) > 0 {
 		c.SubjectAltNames = config.ApiServer.SubjectAltNames
+	}
+	if len(config.ApiServer.AdvertiseAddress) > 0 {
+		c.KASAdvertiseAddress = config.ApiServer.AdvertiseAddress
 	}
 
 	return nil
