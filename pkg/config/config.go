@@ -208,12 +208,11 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 
 	return &MicroshiftConfig{
-		LogVLevel:           2,
-		SubjectAltNames:     subjectAltNames,
-		NodeName:            nodeName,
-		NodeIP:              nodeIP,
-		KASAdvertiseAddress: "10.43.0.1",
-		BaseDomain:          "example.com",
+		LogVLevel:       2,
+		SubjectAltNames: subjectAltNames,
+		NodeName:        nodeName,
+		NodeIP:          nodeIP,
+		BaseDomain:      "example.com",
 		Cluster: ClusterConfig{
 			URL:                  "https://127.0.0.1:6443",
 			ClusterCIDR:          "10.42.0.0/16",
@@ -438,6 +437,18 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 	}
 	c.Cluster.DNS = clusterDNS
 
+	// If KAS advertise address is not configured then grab it from the service
+	// CIDR automatically.
+	if len(c.KASAdvertiseAddress) == 0 {
+		// unchecked error because this was done when getting cluster DNS
+		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
+		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
+		if err != nil {
+			return fmt.Errorf("error getting apiserver IP: %v", err)
+		}
+		c.KASAdvertiseAddress = apiServerServiceIP.String()
+	}
+
 	if len(c.SubjectAltNames) > 0 {
 		// Any entry in SubjectAltNames will be included in the external access certificates.
 		// Any of the hostnames and IPs (except the node IP) listed below conflicts with
@@ -468,12 +479,6 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 			}
 		}
 
-		// unchecked error because this was done when getting cluster DNS
-		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
-		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
-		if err != nil {
-			return fmt.Errorf("error getting apiserver IP: %v", err)
-		}
 		if stringSliceContains(
 			c.SubjectAltNames,
 			"kubernetes",
@@ -484,7 +489,7 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 			"openshift.default",
 			"openshift.default.svc",
 			"openshift.default.svc.cluster.local",
-			apiServerServiceIP.String(),
+			c.KASAdvertiseAddress,
 		) {
 			return fmt.Errorf("subjectAltNames must not contain apiserver kubernetes service names or IPs")
 		}
