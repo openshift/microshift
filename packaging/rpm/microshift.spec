@@ -174,6 +174,17 @@ install -p -m644 packaging/systemd/microshift-ovs-init.service %{buildroot}%{_un
 install -p -m755 packaging/systemd/configure-ovs.sh %{buildroot}%{_bindir}/configure-ovs.sh
 install -p -m755 packaging/systemd/configure-ovs-microshift.sh %{buildroot}%{_bindir}/configure-ovs-microshift.sh
 
+# Avoid firewalld manipulation and flushing of iptable rules,
+# this is a workaround for https://issues.redhat.com/browse/NP-641
+# It will trigger some warnings on the selinux audit log when restarting firewalld.
+# In the future firewalld should stop flushing iptables unless we use any firewalld rule with direct
+# iptables rules, once that's available in RHEL we can remove this workaround
+# see https://github.com/firewalld/firewalld/issues/863#issuecomment-1407059938
+
+mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d
+install -p -m644 packaging/systemd/firewalld-no-iptables.conf %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
+
+
 mkdir -p -m755 %{buildroot}/var/run/kubelet
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
 mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
@@ -252,6 +263,7 @@ systemctl enable --now --quiet openvswitch || true
 
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
+%{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
 
 # OpensvSwitch oneshot configuration script which handles ovn-k8s gateway mode setup
 %{_unitdir}/microshift-ovs-init.service
@@ -261,6 +273,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Fri Jan 27 2023 Miguel Angel Ajo Pelayo <majopela@rehat.com> 4.12.0
+- Add firewalld systemd service override configuration to avoid access to iptables
+
 * Tue Jan 24 2023 Patryk Matuszak <pmatusza@redhat.com> 4.13.0
 - Include microshift-etcd in package
 
