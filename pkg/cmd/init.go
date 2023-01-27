@@ -70,6 +70,21 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 		return nil, err
 	}
 
+	externalCertNames := []string{
+		cfg.NodeName,
+		"api." + cfg.BaseDomain,
+	}
+	externalCertNames = append(externalCertNames, cfg.SubjectAltNames...)
+	// When Kube apiserver advertise address matches the node IP we can not add
+	// it to the certificates or else the internal pod access to apiserver is
+	// broken. Because of client-go not using SNI and the way apiserver handles
+	// which certificate to serve which destination IP, internal pods start
+	// getting the external certificate, which is signed by a different CA and
+	// does not match the hostname.
+	if cfg.KASAdvertiseAddress != cfg.NodeIP {
+		externalCertNames = append(externalCertNames, cfg.NodeIP)
+	}
+
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 
 	certChains, err := certchains.NewCertificateChains(
@@ -231,12 +246,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					Name:         "kube-external-serving",
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
-				Hostnames: append(
-					cfg.SubjectAltNames,
-					cfg.NodeName,
-					"api."+cfg.BaseDomain,
-					cfg.NodeIP,
-				),
+				Hostnames: externalCertNames,
 			},
 		),
 

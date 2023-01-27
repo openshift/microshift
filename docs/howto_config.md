@@ -39,7 +39,7 @@ The configuration settings alongside with the supported command line arguments a
 | nodeIP                | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
 | hostnameOverride      | --hostname-override       | MICROSHIFT_HOSTNAMEOVERRIDE             | The name of the node, defaults to hostname
 | logLevel              | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (Normal, Debug, Trace, TraceAll)
-| subjectAltNames     | --subject-alt-names       | MICROSHIFT_SUBJECTALTNAMES              | Subject Alternative Names for apiserver certificates
+| subjectAltNames       | --subject-alt-names       | MICROSHIFT_SUBJECTALTNAMES              | Subject Alternative Names for apiserver certificates
 
 ## Default Settings
 
