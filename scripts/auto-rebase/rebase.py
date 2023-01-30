@@ -233,8 +233,9 @@ def post_comment(pr, comment=""):
         comment += "Extra messages:\n - " + "\n - ".join(_extra_msgs)
 
     if comment.strip() != "":
+        logging.info(f"Comment to post: {comment}")
         if REMOTE_DRY_RUN:
-            logging.info(f"[DRY RUN] Post a comment on PR: {comment}")
+            logging.info(f"[DRY RUN] Posted a comment")
             return
         issue = pr.as_issue()
         issue.create_comment(comment)
