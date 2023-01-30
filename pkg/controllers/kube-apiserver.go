@@ -76,6 +76,7 @@ type KubeAPIServer struct {
 	masterURL        string
 	servingCAPath    string
 	advertiseAddress string
+	skipLoInterface  bool
 }
 
 func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
@@ -116,6 +117,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.masterURL = cfg.Cluster.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 	s.advertiseAddress = cfg.KASAdvertiseAddress
+	s.skipLoInterface = cfg.SkipKASInterface
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
@@ -297,23 +299,24 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return fmt.Errorf("configuration failed: %w", s.configureErr)
 	}
 
-	if err := s.addServiceIPLoopback(); err != nil {
-		return err
-	}
-
 	defer close(stopped)
 	errorChannel := make(chan error, 1)
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	go func() {
-		select {
-		case <-ctx.Done():
-			if err := s.removeServiceIPLoopback(); err != nil {
-				klog.Warningf("failed to remove IP from interface: %v", err)
-			}
+	if !s.skipLoInterface {
+		if err := s.addServiceIPLoopback(); err != nil {
+			return err
 		}
-	}()
+		go func() {
+			select {
+			case <-ctx.Done():
+				if err := s.removeServiceIPLoopback(); err != nil {
+					klog.Warningf("failed to remove IP from interface: %v", err)
+				}
+			}
+		}()
+	}
 
 	// run readiness check
 	go func() {
