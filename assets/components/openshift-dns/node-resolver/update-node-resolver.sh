@@ -10,7 +10,10 @@ TEMP_FILE="/etc/hosts.tmp"
 IFS=', ' read -r -a services <<< "${SERVICES}"
 
 # Make a temporary file with the old hosts file's attributes.
-cp -f --attributes-only "${HOSTS_FILE}" "${TEMP_FILE}"
+if ! cp -f --attributes-only "${HOSTS_FILE}" "${TEMP_FILE}"; then
+  echo "Failed to preserve hosts file. Exiting."
+  exit 1
+fi
 
 while true; do
   declare -A svc_ips
@@ -38,7 +41,11 @@ while true; do
   # Stale entries could exist in /etc/hosts if the service is deleted
   if [[ -n "${svc_ips[*]-}" ]]; then
     # Build a new hosts file from /etc/hosts with our custom entries filtered out
-    grep -v "# ${OPENSHIFT_MARKER}" "${HOSTS_FILE}" > "${TEMP_FILE}"
+    if ! sed --silent "/# ${OPENSHIFT_MARKER}/d; w ${TEMP_FILE}" "${HOSTS_FILE}"; then
+      # Only continue rebuilding the hosts entries if its original content is preserved
+      sleep 60 & wait
+      continue
+    fi
 
     # Append resolver entries for services
     for svc in "${!svc_ips[@]}"; do
