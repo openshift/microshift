@@ -399,6 +399,7 @@ def main():
         cleanup_branches(gh_repo)
     post_comment(pr, comment)
 
+    git_remote.remove(git_repo, BOT_REMOTE_NAME)
     sys.exit(0 if rebase_result.success else 1)
 
 
