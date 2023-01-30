@@ -316,7 +316,8 @@ def cleanup_branches(gh_repo):
                     logging.warning(f"Failed to delete '{ref.ref}' because: {e}")
                     _extra_msgs.append(f"Failed to delete '{ref.ref}' because: {e}")
 
-    _extra_msgs.append(f"Deleted following branches: " + ", ".join(deleted_branches))
+    if len(deleted_branches) != 0:
+        _extra_msgs.append(f"Deleted following branches: " + ", ".join(deleted_branches))
 
 
 def get_token(org, repo):
