@@ -6,13 +6,15 @@ import json
 import logging
 import subprocess
 from collections import namedtuple
+from timeit import default_timer as timer
 
 from git import Repo, PushInfo  # GitPython
 from github import GithubIntegration, Github, GithubException  # pygithub
 from pathlib import Path
 
-APP_ID_ENV = "APP_ID"
-KEY_ENV = "KEY"
+APP_ID_ENV = "APP_ID"  # GitHub App's ID
+KEY_ENV = "KEY"  # Path to GitHub App's key
+PAT_ENV = "TOKEN"  # Personal Access Token
 ORG_ENV = "ORG"
 REPO_ENV = "REPO"
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
@@ -20,6 +22,7 @@ ARM64_RELEASE_ENV = "ARM64_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
 BUILD_ID_ENV = "BUILD_ID"
 DRY_RUN_ENV = "DRY_RUN"
+BASE_BRANCH_ENV = "BASE_BRANCH"
 
 BOT_REMOTE_NAME = "bot-creds"
 REMOTE_ORIGIN = "origin"
@@ -54,12 +57,14 @@ def run_rebase_sh(release_amd64, release_arm64):
     script_dir = os.path.abspath(os.path.dirname(__file__))
     args = [f"{script_dir}/rebase.sh", "to", release_amd64, release_arm64]
     logging.info(f"Running: '{' '.join(args)}'")
+    start = timer()
     result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     logging.info(f"Return code: {result.returncode}. Output:\n" +
                  "==================================================\n" +
                  f"{result.stdout}" +
                  "==================================================\n")
-    logging.info(f"Script returned code: {result.returncode}")
+    end = timer() - start
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
     return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
 
 
@@ -203,8 +208,11 @@ def create_pr(gh_repo, base_branch, branch_name, title, desc):
 
     pr = gh_repo.create_pull(title=title, body=desc, base=base_branch, head=branch_name, maintainer_can_modify=True)
     logging.info(f"Created pull request: {pr.html_url}")
-    pr.create_review_request(reviewers=REVIEWERS)
-    logging.info(f"Requested review from {REVIEWERS}")
+    try:
+        pr.create_review_request(reviewers=REVIEWERS)
+        logging.info(f"Requested review from {REVIEWERS}")
+    except GithubException as e:
+        logging.info(f"Failed to request review from {REVIEWERS} because: {e}")
     return pr
 
 
@@ -225,8 +233,9 @@ def post_comment(pr, comment=""):
         comment += "Extra messages:\n - " + "\n - ".join(_extra_msgs)
 
     if comment.strip() != "":
+        logging.info(f"Comment to post: {comment}")
         if REMOTE_DRY_RUN:
-            logging.info(f"[DRY RUN] Post a comment on PR: {comment}")
+            logging.info(f"[DRY RUN] Posted a comment")
             return
         issue = pr.as_issue()
         issue.create_comment(comment)
@@ -287,7 +296,7 @@ def get_expected_branch_name(amd, arm):
 
 def cleanup_branches(gh_repo):
     logging.info("Cleaning up branches for closed PRs")
-    rebase_branches = [b for b in gh_repo.get_branches() if b.name.startswith("rebase-")]
+    rebase_branches = [b for b in gh_repo.get_branches() if b.name.startswith("rebase-4")]
     deleted_branches = []
     for branch in rebase_branches:
         prs = gh_repo.get_pulls(head=f"{gh_repo.owner.login}:{branch.name}", state="all")
@@ -307,26 +316,44 @@ def cleanup_branches(gh_repo):
                     logging.warning(f"Failed to delete '{ref.ref}' because: {e}")
                     _extra_msgs.append(f"Failed to delete '{ref.ref}' because: {e}")
 
-    _extra_msgs.append(f"Deleted following branches: " + ", ".join(deleted_branches))
+    if len(deleted_branches) != 0:
+        _extra_msgs.append(f"Deleted following branches: " + ", ".join(deleted_branches))
+
+
+def get_token(org, repo):
+    """
+    Returns a token to be used with GitHub API.
+    It's either Personal Access Token if TOKEN env is set,
+    or Installation Access Token which is intended to be used with GitHub Apps.
+    """
+    personal_access_token = try_get_env(PAT_ENV, die=False)
+    if personal_access_token != "":
+        logging.info("Using Personal Access Token to access GitHub API")
+        return personal_access_token
+
+    app_id = try_get_env(APP_ID_ENV)
+    key_path = try_get_env(KEY_ENV)
+    return get_installation_access_token(app_id, key_path, org, repo)
 
 
 def main():
-    app_id = try_get_env(APP_ID_ENV)
-    key_path = try_get_env(KEY_ENV)
     org = try_get_env(ORG_ENV)
     repo = try_get_env(REPO_ENV)
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
+    base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
     REMOTE_DRY_RUN = False if try_get_env(DRY_RUN_ENV, die=False) == "" else True
     if REMOTE_DRY_RUN:
         logging.info("Dry run mode")
 
-    token = get_installation_access_token(app_id, key_path, org, repo)
+    token = get_token(org, repo)
     gh_repo = Github(token).get_repo(f"{org}/{repo}")
     git_repo = Repo('.')
-    base_branch = git_repo.active_branch.name
+    base_branch = (git_repo.active_branch.name
+        if base_branch_override == ""
+        else base_branch_override)
 
     rebase_result = run_rebase_sh(release_amd, release_arm)
     if rebase_result.success:
@@ -377,6 +404,7 @@ def main():
         cleanup_branches(gh_repo)
     post_comment(pr, comment)
 
+    git_remote.remove(git_repo, BOT_REMOTE_NAME)
     sys.exit(0 if rebase_result.success else 1)
 
 
