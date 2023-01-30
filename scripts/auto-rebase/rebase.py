@@ -208,8 +208,11 @@ def create_pr(gh_repo, base_branch, branch_name, title, desc):
 
     pr = gh_repo.create_pull(title=title, body=desc, base=base_branch, head=branch_name, maintainer_can_modify=True)
     logging.info(f"Created pull request: {pr.html_url}")
-    pr.create_review_request(reviewers=REVIEWERS)
-    logging.info(f"Requested review from {REVIEWERS}")
+    try:
+        pr.create_review_request(reviewers=REVIEWERS)
+        logging.info(f"Requested review from {REVIEWERS}")
+    except GithubException as e:
+        logging.info(f"Failed to request review from {REVIEWERS} because: {e}")
     return pr
 
 
