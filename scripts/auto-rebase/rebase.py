@@ -12,8 +12,9 @@ from git import Repo, PushInfo  # GitPython
 from github import GithubIntegration, Github, GithubException  # pygithub
 from pathlib import Path
 
-APP_ID_ENV = "APP_ID"
-KEY_ENV = "KEY"
+APP_ID_ENV = "APP_ID"  # GitHub App's ID
+KEY_ENV = "KEY"  # Path to GitHub App's key
+PAT_ENV = "TOKEN"  # Personal Access Token
 ORG_ENV = "ORG"
 REPO_ENV = "REPO"
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
@@ -313,9 +314,23 @@ def cleanup_branches(gh_repo):
     _extra_msgs.append(f"Deleted following branches: " + ", ".join(deleted_branches))
 
 
-def main():
+def get_token(org, repo):
+    """
+    Returns a token to be used with GitHub API.
+    It's either Personal Access Token if TOKEN env is set,
+    or Installation Access Token which is intended to be used with GitHub Apps.
+    """
+    personal_access_token = try_get_env(PAT_ENV, die=False)
+    if personal_access_token != "":
+        logging.info("Using Personal Access Token to access GitHub API")
+        return personal_access_token
+
     app_id = try_get_env(APP_ID_ENV)
     key_path = try_get_env(KEY_ENV)
+    return get_installation_access_token(app_id, key_path, org, repo)
+
+
+def main():
     org = try_get_env(ORG_ENV)
     repo = try_get_env(REPO_ENV)
     release_amd = try_get_env(AMD64_RELEASE_ENV)
@@ -326,7 +341,7 @@ def main():
     if REMOTE_DRY_RUN:
         logging.info("Dry run mode")
 
-    token = get_installation_access_token(app_id, key_path, org, repo)
+    token = get_token(org, repo)
     gh_repo = Github(token).get_repo(f"{org}/{repo}")
     git_repo = Repo('.')
     base_branch = git_repo.active_branch.name
