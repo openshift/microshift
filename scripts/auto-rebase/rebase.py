@@ -6,6 +6,7 @@ import json
 import logging
 import subprocess
 from collections import namedtuple
+from timeit import default_timer as timer
 
 from git import Repo, PushInfo  # GitPython
 from github import GithubIntegration, Github, GithubException  # pygithub
@@ -54,12 +55,14 @@ def run_rebase_sh(release_amd64, release_arm64):
     script_dir = os.path.abspath(os.path.dirname(__file__))
     args = [f"{script_dir}/rebase.sh", "to", release_amd64, release_arm64]
     logging.info(f"Running: '{' '.join(args)}'")
+    start = timer()
     result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     logging.info(f"Return code: {result.returncode}. Output:\n" +
                  "==================================================\n" +
                  f"{result.stdout}" +
                  "==================================================\n")
-    logging.info(f"Script returned code: {result.returncode}")
+    end = timer() - start
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
     return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
 
 
