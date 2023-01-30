@@ -67,9 +67,12 @@ type MicroshiftConfig struct {
 	// the IP configured in the endpoint slice for kubernetes service. Must be
 	// a reachable IP from pods. Defaults to service network CIDR first
 	// address.
-	KASAdvertiseAddress string        `json:"kasAdvertiseAddress"`
-	BaseDomain          string        `json:"baseDomain"`
-	Cluster             ClusterConfig `json:"cluster"`
+	KASAdvertiseAddress string `json:"kasAdvertiseAddress"`
+	// Determines if kube-apiserver controller should configure the
+	// KASAdvertiseAddress in the loopback interface. Automatically computed.
+	SkipKASInterface bool          `json:"-"`
+	BaseDomain       string        `json:"baseDomain"`
+	Cluster          ClusterConfig `json:"cluster"`
 
 	Ingress IngressConfig `json:"-"`
 }
@@ -447,6 +450,9 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 			return fmt.Errorf("error getting apiserver IP: %v", err)
 		}
 		c.KASAdvertiseAddress = apiServerServiceIP.String()
+		c.SkipKASInterface = false
+	} else {
+		c.SkipKASInterface = true
 	}
 
 	if len(c.SubjectAltNames) > 0 {
