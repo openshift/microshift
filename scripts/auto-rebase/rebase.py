@@ -22,6 +22,7 @@ ARM64_RELEASE_ENV = "ARM64_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
 BUILD_ID_ENV = "BUILD_ID"
 DRY_RUN_ENV = "DRY_RUN"
+BASE_BRANCH_ENV = "BASE_BRANCH"
 
 BOT_REMOTE_NAME = "bot-creds"
 REMOTE_ORIGIN = "origin"
@@ -335,6 +336,7 @@ def main():
     repo = try_get_env(REPO_ENV)
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
+    base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
     REMOTE_DRY_RUN = False if try_get_env(DRY_RUN_ENV, die=False) == "" else True
@@ -344,7 +346,9 @@ def main():
     token = get_token(org, repo)
     gh_repo = Github(token).get_repo(f"{org}/{repo}")
     git_repo = Repo('.')
-    base_branch = git_repo.active_branch.name
+    base_branch = (git_repo.active_branch.name
+        if base_branch_override == ""
+        else base_branch_override)
 
     rebase_result = run_rebase_sh(release_amd, release_arm)
     if rebase_result.success:
