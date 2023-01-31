@@ -161,3 +161,151 @@ git commit -m "update buildfiles"
 ## Rebasing a Community OKD Release
 
 The rebase script can also be used to build a community version of MicroShift that does not require access to internal image registries. To build the community version, rebase against an [OKD image found here](https://origin-release.ci.openshift.org/#4-stable) by following the same rebase script, and downloading the OKD release image [like so](#downloading-the-target-openshift-release) instead of an OpenShift release. This build is not supported or maintained and there is no guarantee that OKD releases will continue to mirror OpenShift releases.
+
+## Rebase Prow Job
+
+MicroShift's Go dependencies, manifests, and images are kept in sync with OpenShift by a [rebase](https://steps.ci.openshift.org/workflow/openshift-microshift-rebase) Prow Job that runs on weekdays at night (5 AM UTC) which executes a rebase procedure and creates a Pull Request if needed.
+Rebase Prow Job is set up in release repository but scripts are kept in the Microshift repository in `scripts/auto-rebase/` directory.
+This allows us to keep all logic in one place for easier testing and development, and to minimize problems due to synchronizing PR merges across different repositories (first make changes to Prow Job configuration to expose additional files, resources, etc., then make changes to the scripts to utilize them).
+
+Following scripts are revelant for the rebase job (explained in detail below):
+- `rebase_job_entrypoint.sh`
+- `rebase.py`
+- `rebase.sh`
+
+### Credentials
+
+Rebase job requires following credentials:
+- **Pull Secret** used to pull OpenShift release images.
+  - It belongs to `system-serviceaccount-microshift-image-puller` which is configured [here](https://github.com/openshift/release/blob/master/clusters/app.ci/registry-access/microshift/admin_manifest.yaml).
+- **GitHub App ID and private key** used to interact with `openshift/microshift` repository and GitHub API.
+  - They're obtained from GH App's Settings page - private key must be generated and stored in a safe location.
+    - For more information about GitHub Apps see [GitHub Docs: About apps](https://docs.github.com/en/developers/apps/getting-started-with-apps/about-apps)
+  - App ID and key are used to obtain an Installation Access Token (similar to Personal Access Token) which can be used to interact with remote git repository and GitHub API.
+    - Installation Access Token is only valid for one hour, so it needs to be generated on each job run.
+    - See [GitHub documentation about authentication as an installation](https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-an-installation) for more information.
+
+
+Credentials are stored in [CI's Vault](https://vault.ci.openshift.org/) and made available to the job's `openshift-microshift-rebase` step by [this configuration](https://github.com/openshift/release/blob/d50f86ece447e22011acf0bdddc7ff4af7124953/ci-operator/step-registry/openshift/microshift/rebase/openshift-microshift-rebase-ref.yaml#L16-L22).
+See [OpenShift CI Docs: Adding a New Secret to CI](https://docs.ci.openshift.org/docs/how-tos/adding-a-new-secret-to-ci/) for more details.
+
+### Getting latest release tags
+
+Rebase Prow Job is configured to leverage CI's ability to provide the job with latest nightly tag inside a ConfigMap that scripts later access.
+[Here](https://github.com/openshift/release/blob/d50f86ece447e22011acf0bdddc7ff4af7124953/ci-operator/config/openshift/microshift/openshift-microshift-main__periodics.yaml#L95-L106) is a configuration to populate the ConfigMaps.
+[rebase_job_entrypoint.sh](https://github.com/openshift/microshift/blob/3255867882b6b7da6c411449c52ae50c610a9dc7/scripts/auto-rebase/rebase_job_entrypoint.sh#L15-L20) accesses these ConfigMaps to obtain tags and create URIs which `rebase.sh` uses to download release images.
+
+### rebase_job_entrypoint.sh
+
+Entrypoint of the Rebase Prow Job.
+It expects to be executed in the job's container as it looks for files and objects defined in the job's configuration in (`openshift/release` repository):
+pull secret file, latest release ConfigMaps existing in CI's cluster, GH App ID and key files.
+Can serve as an example of what arguments `rebase.py` expects.
+
+### rebase.sh
+
+Primary consumer of release image references.
+Script responsible for updating MicroShift's manifests, image references, and go.mod references based on contents of release images.
+It's executed by `rebase.py` to capture output and exit code.
+
+It also creates a git branch which name consists of prefix `rebase-`, version and stream (e.g. `4.13.0-0.nightly`), and creation datetimes of AMD and ARM nightly releases (e.g. `_amd64-2023-01-31-072358_arm64-2023-01-31-233557`).
+
+### rebase.py
+
+Python script responsible for interacting with remote `openshift/microshift` repository and communicating with GitHub API.
+Uses GH App's ID and key to generate IAT (Installation Access Token) which is like Personal Access Token except its lifetime is 1 hour.
+
+It also executes `rebase.sh` to capture its output and exit code.
+In case of error, it will save `rebase.sh` output to a file, commit it together with any modified files, push changes, and create a PR to inform about the failure in visible way.
+
+`rebase.py` interacts with remote git repository:
+- Creates new, temporary `git remote`: `https://x-access-token:{token}@github.com/openshift/microshift`.
+- Fetches remote references (branches) to check if rebase branch already exists, compare it with local, and decide if it needs update.
+- (Force) pushes local branch to `openshift/microshift`
+
+`rebase.py` interacts with GitHub API:
+- Lists existing PRs to find one matching local branch name, so it'll force push changes and comment under PR that it was refreshed (can happen if no new nightlies were produced, but another PR was merged on microshift repository, so what happens is job is rebasing the rebase PR on newer main branch)
+- Creates a PR if needed.
+- Posts a PR comment which extra information that is important, but shouldn't be part of PR's description.
+- Cleans up branches of closed PRs (branches of merges PRs are automatically deleted, otherwise we need to clean the up).
+
+
+### Testing changes to rebase automation
+
+To reduce a need of Pull Request synchronization between repositories, keep logic together, and allow for easier testing and developing, all scripts related to rebasing are residing in `scripts/auto-rebase/` directory in this repository.
+
+[Job's logic is to only execute](https://github.com/openshift/release/blob/1976df80259f0357c0842700a70a64433988892a/ci-operator/step-registry/openshift/microshift/rebase/openshift-microshift-rebase-commands.sh)
+`scripts/auto-rebase/rebase_job_entrypoint.sh` which gathers necessary arguments and passes them to `rebase.py` and is implemented in a way expecting to be executed in the job's container but can be a guidance on what arguments provide to `rebase.py` locally.
+
+
+#### Getting release image build references
+
+Rebase procedure expects references to AMD64 and ARM64 OpenShift release images, and LVM Storage (LVMS) Operator bundle image.
+OpenShift release images can be obtained from Release Status pages: (AMD64)[https://amd64.ocp.releases.ci.openshift.org/] and (ARM64)[https://arm64.ocp.releases.ci.openshift.org/] - navigate to section with nightly image builds for version that is currently worked on and pick latest approved for both architectures.
+LVMS Operator bundle image can be obtained from (Red Hat's catalog)[https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79] - tag can be just appended to following URI: `registry.access.redhat.com/lvms4/lvms-operator-bundle:`.
+These references are passed to `rebase.py` using `AMD64_RELEASE`, `ARM64_RELEASE`, and `LVMS_RELEASE` environment variables, for example:
+```
+AMD64_RELEASE=registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-01-27-165107 \
+ARM64_RELEASE=registry.ci.openshift.org/ocp-arm64/release-arm64:4.13.0-0.nightly-arm64-2023-01-30-010253 \
+LVMS_RELEASE=registry.access.redhat.com/lvms4/lvms-operator-bundle:v4.12 \
+./scripts/auto-rebase/rebase.py
+```
+
+#### Testing locally
+
+For testing `rebase.py` locally, following env vars can be useful:
+- `TOKEN` expects a GitHub Personal Access Token which can be generated [here](https://github.com/settings/tokens).
+   Use it instead of `APP_ID` and `KEY`.
+- `DRY_RUN` instructs script to not make any changes on the repo (i.e. git push, create PR, post comment, etc.) - instead actions are logged and script continues.
+- `BASE_BRANCH` forces script to diff results against different branch than what was checked out when script started running
+   (useful when testing changes exist on local branch that is not `main` - otherwise, script would want to create a PR with base being branch does not exists on remote).
+
+```shell
+TOKEN=ghp_... \
+ORG=openshift \
+DRY_RUN=y \
+REPO=microshift \
+AMD64_RELEASE=registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-01-27-165107 \
+ARM64_RELEASE=registry.ci.openshift.org/ocp-arm64/release-arm64:4.13.0-0.nightly-arm64-2023-01-30-010253 \
+LVMS_RELEASE=registry.access.redhat.com/lvms4/lvms-operator-bundle:v4.12 \
+./scripts/auto-rebase/rebase.py
+```
+
+Script also can be ran against a private fork in non-dry run which is helpful to verify that the communication with remote repository is as expected and so is created PR.
+In such case `ORG` env var needs to be set to GitHub username:
+
+```shell
+TOKEN=ghp_... \
+ORG=USER_NAME \
+REPO=microshift \
+AMD64_RELEASE=registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-01-27-165107 \
+ARM64_RELEASE=registry.ci.openshift.org/ocp-arm64/release-arm64:4.13.0-0.nightly-arm64-2023-01-30-010253 \
+LVMS_RELEASE=registry.access.redhat.com/lvms4/lvms-operator-bundle:v4.12 \
+./scripts/auto-rebase/rebase.py
+```
+
+#### Testing in CI
+
+> Note: Rehearsing Rebase Prow Job without dry run can result in creation of rebase PR in openshift/microshift.
+
+To test changes in context of "production" (CI Prow Job) environment it's recommended to:
+- Create a dummy PR in `release` repo for rehearsing the rebase job that checks out changes under test
+  - Example of `ci-operator/step-registry/openshift/microshift/rebase/openshift-microshift-rebase-commands.sh` from [PR](https://github.com/openshift/release/pull/35875/files)
+    ```shell
+    #!/bin/bash
+
+    git remote add pmtk https://github.com/pmtk/microshift.git
+    git fetch pmtk
+    git switch --track pmtk/csi-rebase-script
+
+    # export DRY_RUN=y
+
+    ./scripts/auto-rebase/rebase_job_entrypoint.sh
+
+    git diff csi-rebase-script
+    ```
+  - `export DRY_RUN=y` can also be provided here (instead of adding it in `rebase_job_entrypoint.sh`)
+
+- Making changes to `rebase_job_entrypoint.sh` so `openshift/microshift` repository is untouched:
+  - Enabling dry run by setting `DRY_RUN`
+  - Setting `ORG` to GitHub username and installing [microshift-rebase-script](https://github.com/apps/microshift-rebase-script) to your fork of microshift repository (that way job will be able to push a branch and create a PR on the fork)
