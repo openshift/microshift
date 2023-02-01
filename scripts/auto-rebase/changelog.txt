@@ -1,14 +1,27 @@
-# cluster-policy-controller embedded-component c7a633416a8ee702fa653649488a13f578f3f857 to 105cc773b37f00be2351c9a4e6df24af94d547c1
-9ac71ec0259617a72da6e9e689e36442a219fccd 2023-01-12T15:23:45+00:00 clusterquotareconciliation: do not sync quota monitor cache with no monitors registered
-# etcd embedded-component 89a451c499e06b3e9f8072c7cd70b86d78f597bf to 978cfefd2f21c4ec1ac84ed95130cbff510fbe1b
-3e579cbdc1d646db1b2e6609d2569dbcaa261775 2023-01-11T21:51:19+00:00 UPSTREAM:<carry>: etcdserver: process the scenaro of the last WAL record being partially synced to disk
-# kubernetes embedded-component 77bec7ab3573494f228fbaa4967c76e3d2df0fb3 to a34b9e9499e6c3a94e2326652bd8236a5378c0b2
-1e79da7a3048b8e9edcbca2577d4da8df68a894a 2023-01-09T09:50:22+00:00 UPSTREAM: <carry>: update e2e test annotations
-f577242b4b99ff494de02849aa5b78c2a583b463 2023-01-09T09:50:22+00:00 UPSTREAM: 112993: remove in-tree volume limits test now that CSIMigration is GA
-# machine-config-operator embedded-component 2b3eba74dd9e4371f35ab41dbda02642f60707ec to 60fb64fa861f1231f779226aa5dcd5c4ef604dcb
-28dcf47c890dc590833557269cd5560c130c583d 2023-01-11T12:53:01+00:00 Mount /run/nodeip-configuration into keepalived containers
-# ovn-kubernetes image-amd64 56eba9e2ffe7a7c15ca377513c93bff3d99c457c to 4bbd924efa35c8c9c5c1f4b5257aadfa2f7850a4
-caba9beceee0f6354ac94be6633cda221c50ed9b 2023-01-10T09:31:21-06:00 egressip: fix test data race accessing podAssignment cache
-# kubernetes image-amd64 77bec7ab3573494f228fbaa4967c76e3d2df0fb3 to a34b9e9499e6c3a94e2326652bd8236a5378c0b2
-1e79da7a3048b8e9edcbca2577d4da8df68a894a 2023-01-09T09:50:22+00:00 UPSTREAM: <carry>: update e2e test annotations
-f577242b4b99ff494de02849aa5b78c2a583b463 2023-01-09T09:50:22+00:00 UPSTREAM: 112993: remove in-tree volume limits test now that CSIMigration is GA
+# cluster-network-operator embedded-component 9eafe2304273ee8447ca155f12e676096c0e5507 to 23536c020d3bddea96c955ecf5e379dded8a8327
+d1bfacb9e6df95f822705e95bb421f6cb3198972 2022-12-14T15:33:34+00:00 Update ovnkube-node.yaml
+9030948a7f969f49d85c04d87eacb0cf1465e52c 2022-12-14T15:33:34+00:00 Update ovnkube-node.yaml
+f82df484d0c1811d946c2294487b772bda891801 2022-12-14T15:33:34+00:00 Update sdn.yaml
+9f979698a4606edb2a78f771d0823e74e59a00c2 2022-11-09T15:31:02-05:00 CNI binary copy should account for the possibility of symlinks
+# machine-config-operator embedded-component 60fb64fa861f1231f779226aa5dcd5c4ef604dcb to e3dc9430ac753ac0440f55910370da22c65637f1
+d75603391f3cd84f3c76b86a1329ee7d1719749c 2023-01-20T19:45:40+00:00 controller: add unit test for outdated MCs
+519ea0adaec637c499f890b1dbb318e76efdb984 2023-01-20T19:45:40+00:00 controller: don't render new MC until base MCs update
+8459724f372d037eaca6425b2814f8c58d6716c2 2023-01-18T11:36:43-05:00 remove sprig / goutils / associated deps
+833f26670a53254a42530e18d0c0240500e92031 2023-01-18T11:35:29-05:00 adds smoke test for rendered assets
+fc72e2ecf6fb80a8015a16367580aea33adf26ef 2023-01-18T11:34:59-05:00 use common template rendering funcs
+# oc image-amd64 854f807d8a84dde710c062a5281bca5bc07cb562 to b05f7d40f9a2dac30771be620e9e9148d26ffd07
+19e02cc319ef3918ce3118be2d1b322347fe5b83 2023-01-24T14:13:04+00:00 Update kubernetes version to 1.25.2
+8a3bf8458ebc5f1acf313cccbf4bd5d8ea849daf 2023-01-24T14:13:04+00:00 Add verify-kube-version step
+4778958ab63e40e1d63724374f7d6e7146b775c0 2023-01-24T14:13:04+00:00 Fix kube version from 1.24.1 to 1.25.2
+# ovn-kubernetes image-amd64 4bbd924efa35c8c9c5c1f4b5257aadfa2f7850a4 to 84904bf654afd1288eed1573ccb448654a0f81a4
+fe381839af1023d093c33668a204b5375ecbdbbf 2023-01-24T10:41:08+01:00 Dockerfile: bump OVN to 22.09.0-54
+e8a480df9d089787397ef1ed644e6fa62b043c55 2023-01-17T15:21:24+01:00 EgressFirewall: smart clusterSubnet exclusion. Don't apply "&& dst != clusterSubnet" to every acl, since that will generate inefficient conjunctive flows in ovs. Every egress firewall ACL has "dst = <CIDR selector or dns name address set>", for CIDR selector only add clusterSubnet exclusion if CIDR selector has intersection with clusterSubnet. For dns address sets (since they are only used by egress firewall), don't add ips from clusterSubnet to dns address set, since we know these ips should be excluded.
+0e3b1bbab3b2278d02c3d987e23d060ef4ba42ad 2023-01-17T15:20:33+01:00 Unify egress firewall implementation for both gateway modes, move all acls to the ClusterPortGroup. Unify unit tests for both gateway modes. Make sure egress firewall allows inbound connections.
+# oc image-arm64 854f807d8a84dde710c062a5281bca5bc07cb562 to b05f7d40f9a2dac30771be620e9e9148d26ffd07
+19e02cc319ef3918ce3118be2d1b322347fe5b83 2023-01-24T14:13:04+00:00 Update kubernetes version to 1.25.2
+8a3bf8458ebc5f1acf313cccbf4bd5d8ea849daf 2023-01-24T14:13:04+00:00 Add verify-kube-version step
+4778958ab63e40e1d63724374f7d6e7146b775c0 2023-01-24T14:13:04+00:00 Fix kube version from 1.24.1 to 1.25.2
+# ovn-kubernetes image-arm64 4bbd924efa35c8c9c5c1f4b5257aadfa2f7850a4 to 84904bf654afd1288eed1573ccb448654a0f81a4
+fe381839af1023d093c33668a204b5375ecbdbbf 2023-01-24T10:41:08+01:00 Dockerfile: bump OVN to 22.09.0-54
+e8a480df9d089787397ef1ed644e6fa62b043c55 2023-01-17T15:21:24+01:00 EgressFirewall: smart clusterSubnet exclusion. Don't apply "&& dst != clusterSubnet" to every acl, since that will generate inefficient conjunctive flows in ovs. Every egress firewall ACL has "dst = <CIDR selector or dns name address set>", for CIDR selector only add clusterSubnet exclusion if CIDR selector has intersection with clusterSubnet. For dns address sets (since they are only used by egress firewall), don't add ips from clusterSubnet to dns address set, since we know these ips should be excluded.
+0e3b1bbab3b2278d02c3d987e23d060ef4ba42ad 2023-01-17T15:20:33+01:00 Unify egress firewall implementation for both gateway modes, move all acls to the ClusterPortGroup. Unify unit tests for both gateway modes. Make sure egress firewall allows inbound connections.
