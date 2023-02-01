@@ -43,13 +43,11 @@ import (
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
-	"github.com/vishvananda/netlink"
 	hostassignmentv1 "k8s.io/kubernetes/openshift-kube-apiserver/admission/route/apis/hostassignment/v1"
 )
 
 const (
 	kubeAPIStartupTimeout = 60
-	loopbackInterface     = "lo"
 )
 
 var baseKubeAPIServerConfigs = [][]byte{
@@ -76,7 +74,6 @@ type KubeAPIServer struct {
 	masterURL        string
 	servingCAPath    string
 	advertiseAddress string
-	skipLoInterface  bool
 }
 
 func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
@@ -88,7 +85,7 @@ func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
 }
 
 func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
-func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd"} }
+func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd", "network-configuration"} }
 
 func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.verbosity = cfg.LogVLevel
@@ -117,7 +114,6 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.masterURL = cfg.Cluster.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 	s.advertiseAddress = cfg.KASAdvertiseAddress
-	s.skipLoInterface = cfg.SkipKASInterface
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
@@ -304,20 +300,6 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if !s.skipLoInterface {
-		if err := s.addServiceIPLoopback(); err != nil {
-			return err
-		}
-		go func() {
-			select {
-			case <-ctx.Done():
-				if err := s.removeServiceIPLoopback(); err != nil {
-					klog.Warningf("failed to remove IP from interface: %v", err)
-				}
-			}
-		}()
-	}
-
 	// run readiness check
 	go func() {
 		err := wait.PollImmediateWithContext(ctx, time.Second, kubeAPIStartupTimeout*time.Second, func(ctx context.Context) (bool, error) {
@@ -391,46 +373,4 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		errorChannel <- cmd.ExecuteContext(ctx)
 	}()
 	return <-errorChannel
-}
-
-func (s *KubeAPIServer) addServiceIPLoopback() error {
-	link, err := netlink.LinkByName(loopbackInterface)
-	if err != nil {
-		return err
-	}
-	address, err := netlink.ParseAddr(fmt.Sprintf("%s/32", s.advertiseAddress))
-	if err != nil {
-		return err
-	}
-	existing, err := netlink.AddrList(link, netlink.FAMILY_ALL)
-	if err != nil {
-		return err
-	}
-	for _, existingAddress := range existing {
-		if address.Equal(existingAddress) {
-			return nil
-		}
-	}
-	return netlink.AddrAdd(link, address)
-}
-
-func (s *KubeAPIServer) removeServiceIPLoopback() error {
-	link, err := netlink.LinkByName(loopbackInterface)
-	if err != nil {
-		return err
-	}
-	address, err := netlink.ParseAddr(fmt.Sprintf("%s/32", s.advertiseAddress))
-	if err != nil {
-		return err
-	}
-	existing, err := netlink.AddrList(link, netlink.FAMILY_ALL)
-	if err != nil {
-		return err
-	}
-	for _, existingAddress := range existing {
-		if address.Equal(existingAddress) {
-			return netlink.AddrDel(link, address)
-		}
-	}
-	return nil
 }
