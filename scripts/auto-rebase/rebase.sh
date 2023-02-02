@@ -24,9 +24,9 @@ shopt -s extglob
 
 trap 'echo "Script exited with error."' ERR
 
-# debugging options
-#trap 'echo "# $BASH_COMMAND"' DEBUG
-#set -x
+#debugging options
+#trap 'echo "#L$LINENO: $BASH_COMMAND" >&2' DEBUG
+#set -xo functrace
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="$REPOROOT/_output/staging"
@@ -36,13 +36,154 @@ RELEASE_TAG_RX="(.+)-([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6})"
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator"
-
+declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
 title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+# LVMS is not integrated into the ocp release image, so the work flow does not fit with core component rebase.  LVMS'
+# operator bundle is the authoritative source for manifest and image digests.
+download_lvms_operator_bundle_manifest(){
+    bundle_manifest="$1"
+
+    title 'downloading LVMS operator bundles'
+    local LVMS_STAGING="${STAGING_DIR}/lvms"
+
+    for arch in ${ARCHS[@]}; do
+        mkdir -p "$LVMS_STAGING/$arch"
+        pushd "$LVMS_STAGING/$arch" || return 1
+        title "extracting lvms operator bundle for \"$arch\" architecture"
+        oc image extract \
+            --registry-config "$PULL_SECRET_FILE" \
+            --path /manifests/:. "$bundle_manifest" \
+            --filter-by-os "$arch" \
+            ||  {
+                    popd
+                    return 1
+                }
+        popd || return 1
+    done
+}
+
+parse_images() {
+    local src="$1"
+    local dest="$2"
+    yq '.spec.relatedImages[]? | [.name, .image] | @csv' $src > "$dest"
+}
+
+write_lvms_images_for_arch(){
+    local arch="$1"
+    arch_dir="${STAGING_DIR}/lvms/${arch}"
+    [ -d "$arch_dir" ] || {
+        echo "dir $arch_dir not found"
+        return 1
+    }
+
+    declare -a include_images=(
+        "topolvm-csi"
+        "topolvm-csi-provisioner"
+        "topolvm-csi-resizer"
+        "topolvm-csi-registrar"
+        "topolvm-csi-livenessprobe"
+    )
+
+    local csv_manifest="${arch_dir}/lvms-operator.clusterserviceversion.yaml"
+    local image_file="${arch_dir}/images"
+
+    parse_images "$csv_manifest" "$image_file"
+
+    if [ $(wc -l "$image_file" | cut -d' ' -f1) -eq 0 ]; then
+        >$2 echo "error: image file ($image_file) has fewer images than expected (${#include_images})"
+        exit 1
+    fi
+    while read -ers LINE; do
+        name=${LINE%,*}
+        img=${LINE#*,}
+        for included in "${include_images[@]}"; do
+            if [[ "$name" == "$included" ]]; then
+                name="$(echo "$name" | tr '-' '_')"
+                yq -iP -o=json e '.images["'"$name"'"] = "'"$img"'"' "${REPOROOT}/assets/release/release-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
+                break;
+            fi
+        done
+    done < "$image_file"
+}
+
+update_lvms_images(){
+    local workdir="$STAGING_DIR/lvms"
+    [ -d "$workdir" ] || {
+        >&2 echo 'lvms staging dir not found, aborting image update'
+        return 1
+    }
+    pushd "$workdir"
+    for arch in ${ARCHS[@]}; do
+        write_lvms_images_for_arch "$arch"
+    done
+    popd
+}
+
+set_openshift_storage_ns(){
+        local manifest="$1"
+        local tmp="$(oc create --dry-run=client --namespace=openshift-storage -o yaml -f "${manifest}")"
+        # assume that if the returned string is nil, it's because the resource is not namespaced.  Failures
+        # like file-not-found will still result in the script exiting with a non-zero code.
+        if [ -z "$(echo "$tmp" | tr -d '[:space:]' )" ]; then
+            return 0
+        fi
+        echo "$tmp" > "$manifest"
+}
+
+update_lvms_manifests() {
+    local src="${STAGING_DIR}/lvms/amd64"
+    local dest="${REPOROOT}/assets/components/lvms"
+    local manifests=(
+          "topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
+          "topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml"
+          "topolvm-controller_v1_serviceaccount.yaml"
+          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml"
+          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
+          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml"
+          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml"
+          "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml"
+          "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
+          "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml"
+          "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml"
+          "topolvm-metrics_rbac.authorization.k8s.io_v1_role.yaml"
+          "topolvm-metrics_rbac.authorization.k8s.io_v1_rolebinding.yaml"
+          "topolvm-node-metrics_v1_service.yaml"
+          "topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml"
+          "topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
+          "topolvm-node_v1_serviceaccount.yaml"
+          "topolvm.io_logicalvolumes.yaml"
+    )
+    for m in "${manifests[@]}"; do
+        cp -v "${src}/${m}" "${dest}/" || return 1
+        set_openshift_storage_ns "${dest}/${m}"
+    done
+}
+
+update_release_go() {
+    local src=$1
+    local arch=$2
+
+    case "$arch" in
+        amd64|x86_64)   release_file="${REPOROOT}/pkg/assets/release-x86_64.json"   ;;
+        arm64|aarch64)  release_file="${REPOROOT}/pkg/assets/release-aarch64.json"  ;;
+    esac
+
+    local staged_release
+    staged_release="$(mktemp -d)/$(basename "$release_file")"
+    cp "$release_file" "${staged_release}" || return 1
+    # shellcheck disable=SC2155
+    local images
+    images="$(parse_images "$src")" || return 1
+    while IFS=' ' read -r line; do
+        yq '.images['""']'
+    done <"$images"
+    cp -f "$staged_release" "$release_file" || return 1
+}
 # Clone a repo at a commit
 clone_repo() {
     local repo="$1"
@@ -710,7 +851,6 @@ update_manifests() {
     popd >/dev/null
 }
 
-
 # Updates buildfiles like the Makefile
 update_buildfiles() {
     KUBE_ROOT="${STAGING_DIR}/kubernetes"
@@ -811,9 +951,11 @@ update_changelog() {
 rebase_to() {
     local release_image_amd64=$1
     local release_image_arm64=$2
+    local lvms_operator_bundle_manifest=$3
 
     title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
     download_release "${release_image_amd64}" "${release_image_arm64}"
+    download_lvms_operator_bundle_manifest "$lvms_operator_bundle_manifest"
 
     if [[ "${release_image_amd64#*:}" =~ ${RELEASE_TAG_RX} ]]; then
         ver_stream=${BASH_REMATCH[1]}
@@ -858,6 +1000,7 @@ rebase_to() {
     fi
 
     update_images
+    update_lvms_images
     if [[ -n "$(git status -s pkg/release packaging/crio.conf.d)" ]]; then
         title "## Committing changes to pkg/release"
         git add pkg/release
@@ -868,6 +1011,7 @@ rebase_to() {
     fi
 
     update_manifests
+    update_lvms_manifests
     if [[ -n "$(git status -s assets)" ]]; then
         title "## Committing changes to assets and pkg/assets"
         git add assets pkg/assets
@@ -892,31 +1036,38 @@ rebase_to() {
 
 usage() {
     echo "Usage:"
-    echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM         Performs all the steps to rebase to a release image. Specify both amd64 and arm64."
-    echo "$(basename "$0") download RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM   Downloads the content of a release image to disk in preparation for rebasing. Specify both amd64 and arm64."
-    echo "$(basename "$0") buildfiles                                       Updates build files (Makefile, Dockerfile, .spec)"
-    echo "$(basename "$0") go.mod                                           Updates the go.mod file to the downloaded release"
-    echo "$(basename "$0") generated-apis                                   Regenerates OpenAPIs"
-    echo "$(basename "$0") images                                           Rebases the component images to the downloaded release"
-    echo "$(basename "$0") manifests                                        Rebases the component manifests to the downloaded release"
+    echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM LVMS_RELEASE_MULTI_ARCH        Performs all the steps to rebase to a release image. Specify both amd64 and arm64 ocp releases, and multi-arch lvms operator bundle image."
+    echo "$(basename "$0") download RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM LVMS_RELEASE_MULTI_ARCH  Downloads the content of a release image to disk in preparation for rebasing. Specify both amd64 and arm64 and multi-arch lvms operator bundle image."
+    echo "$(basename "$0") buildfiles                                                              Updates build files (Makefile, Dockerfile, .spec)"
+    echo "$(basename "$0") go.mod                                                                  Updates the go.mod file to the downloaded release"
+    echo "$(basename "$0") generated-apis                                                          Regenerates OpenAPIs"
+    echo "$(basename "$0") images                                                                  Rebases the component images to the downloaded release"
+    echo "$(basename "$0") manifests                                                               Rebases the component manifests to the downloaded release"
     exit 1
 }
 
 command=${1:-help}
 case "$command" in
     to)
-        [[ $# -ne 3 ]] && usage
-        rebase_to "$2" "$3"
+        [[ $# -ne 4 ]] && usage
+        rebase_to "$2" "$3" "${4:-}"
         ;;
     download)
-        [[ $# -ne 3 ]] && usage
+        [[ $# -ne 4 ]] && usage
         download_release "$2" "$3"
+        download_lvms_operator_bundle_manifest "${4:-}"
         ;;
     changelog) update_changelog;;
     buildfiles) update_buildfiles;;
     go.mod) update_go_mod;;
     generated-apis) regenerate_openapi;;
-    images) update_images;;
-    manifests) update_manifests;;
+    images)
+        update_images
+        update_lvms_images
+        ;;
+    manifests)
+        update_manifests
+        update_lvms_manifests
+        ;;
     *) usage;;
 esac

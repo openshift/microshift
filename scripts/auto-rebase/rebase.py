@@ -19,6 +19,7 @@ ORG_ENV = "ORG"
 REPO_ENV = "REPO"
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
 ARM64_RELEASE_ENV = "ARM64_RELEASE"
+LVMS_RELEASE_ENV = "LVMS_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
 BUILD_ID_ENV = "BUILD_ID"
 DRY_RUN_ENV = "DRY_RUN"
@@ -53,9 +54,9 @@ def try_get_env(var_name, die=True):
     return val
 
 
-def run_rebase_sh(release_amd64, release_arm64):
+def run_rebase_sh(release_amd64, release_arm64, release_lvms):
     script_dir = os.path.abspath(os.path.dirname(__file__))
-    args = [f"{script_dir}/rebase.sh", "to", release_amd64, release_arm64]
+    args = [f"{script_dir}/rebase.sh", "to", release_amd64, release_arm64, release_lvms]
     logging.info(f"Running: '{' '.join(args)}'")
     start = timer()
     result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
@@ -341,6 +342,7 @@ def main():
     repo = try_get_env(REPO_ENV)
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
+    release_lvms = try_get_env(LVMS_RELEASE_ENV)
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
@@ -355,7 +357,7 @@ def main():
         if base_branch_override == ""
         else base_branch_override)
 
-    rebase_result = run_rebase_sh(release_amd, release_arm)
+    rebase_result = run_rebase_sh(release_amd, release_arm, release_lvms)
     if rebase_result.success:
         # TODO How can we inform team that rebase job ran successfully just there was nothing new?
         make_sure_rebase_script_created_new_commits_or_exit(git_repo, base_branch)
@@ -369,7 +371,7 @@ def main():
         with open('rebase_sh.log', 'w') as writer:
             writer.write(rebase_result.output)
         if git_repo.active_branch.name == base_branch:
-            # rebase.sh didn't reached the step that would create a branch
+            # rebase.sh didn't reach the step that would create a branch
             # so script needs to create it
             branch = git_repo.create_head(get_expected_branch_name(release_amd, release_arm))
             branch.checkout()

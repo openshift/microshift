@@ -14,6 +14,6 @@ spec:
     protocol: TCP
     targetPort: 8080
   selector:
-    app.kubernetes.io/name: topolvm-node
+    app.kubernetes.io/component: topolvm-node
 status:
   loadBalancer: {}
