@@ -1,0 +1,184 @@
+# TODO - Add APIResource && APIGroup to Metadata APIs
+version: 2
+outputDir: microshift_rest_api
+apiMap:
+- name: Autoscale APIs
+  resources:
+  - kind: HorizontalPodAutoscaler
+    group: autoscaling
+    version: v2
+  - kind: Scale
+    group: autoscaling
+    version: v1
+- name: Extension APIs
+  resources:
+  - kind: APIService
+    group: apiregistration.k8s.io
+    version: v1
+  - kind: CustomResourceDefinition
+    group: apiextensions.k8s.io
+    version: v1
+  - kind: MutatingWebhookConfiguration
+    group: admissionregistration.k8s.io
+    version: v1
+  - kind: ValidatingWebhookConfiguration
+    group: admissionregistration.k8s.io
+    version: v1
+- name: Metadata APIs
+  resources:
+  - kind: Binding
+    version: v1
+  - kind: ComponentStatus
+    version: v1
+  - kind: ConfigMap
+    version: v1
+  - kind: ControllerRevision
+    group: apps
+    version: v1
+  - kind: Event
+    group: events.k8s.io
+    version: v1
+  - kind: Event
+    version: v1
+  - kind: Lease
+    group: coordination.k8s.io
+    version: v1
+  - kind: Namespace
+    version: v1
+- name: Network APIs
+  resources:
+  - kind: Endpoints
+    version: v1
+  - kind: EndpointSlice
+    group: discovery.k8s.io
+    version: v1
+  - kind: Ingress
+    group: networking.k8s.io
+    version: v1
+  - kind: IngressClass
+    group: networking.k8s.io
+    version: v1
+  - kind: NetworkPolicy
+    group: networking.k8s.io
+    version: v1
+  - kind: Route
+    group: route.openshift.io
+    version: v1
+  - kind: Service
+    version: v1
+- name: Node APIs
+  resources:
+  - kind: Node
+    version: v1
+  - kind: RuntimeClass
+    group: node.k8s.io
+    version: v1
+- name: Policy APIs
+  resources:
+  - kind: Eviction
+    group: policy
+    version: v1
+  - kind: PodDisruptionBudget
+    group: policy
+    version: v1
+- name: RBAC APIs
+  resources:
+  - kind: ClusterRoleBinding
+    group: rbac.authorization.k8s.io
+    version: v1
+  - kind: ClusterRole
+    group: rbac.authorization.k8s.io
+    version: v1
+  - kind: RoleBinding
+    group: rbac.authorization.k8s.io
+    version: v1
+  - kind: Role
+    group: rbac.authorization.k8s.io
+    version: v1
+- name: Schedule and quota APIs
+  resources:
+  - kind: FlowSchema
+    group: flowcontrol.apiserver.k8s.io
+    version: v1beta1
+  - kind: LimitRange
+    version: v1
+  - kind: PriorityClass
+    group: scheduling.k8s.io
+    version: v1
+  - kind: PriorityLevelConfiguration
+    group: flowcontrol.apiserver.k8s.io
+    version: v1beta1
+  - kind: ResourceQuota
+    version: v1
+- name: Security APIs
+  resources:
+  - kind: CertificateSigningRequest
+    group: certificates.k8s.io
+    version: v1
+  - kind: Secret
+    version: v1
+  - kind: SecurityContextConstraints
+    group: security.openshift.io
+    version: v1
+  - kind: ServiceAccount
+    version: v1
+- name: Storage APIs
+  resources:
+  - kind: CSIDriver
+    group: storage.k8s.io
+    version: v1
+  - kind: CSINode
+    group: storage.k8s.io
+    version: v1
+  - kind: CSIStorageCapacity
+    group: storage.k8s.io
+    version: v1
+  - kind: PersistentVolumeClaim
+    version: v1
+  - kind: StorageClass
+    group: storage.k8s.io
+    version: v1
+  - kind: VolumeAttachment
+    group: storage.k8s.io
+    version: v1
+  - kind: LogicalVolume
+    group: topolvm.io
+    version: v1
+- name: Template APIs
+  resources:
+  - kind: PodTemplate
+    version: v1
+- name: Workloads APIs
+  resources:
+  - kind: CronJob
+    group: batch
+    version: v1
+  - kind: DaemonSet
+    group: apps
+    version: v1
+  - kind: Deployment
+    group: apps
+    version: v1
+  - kind: Job
+    group: batch
+    version: v1
+  - kind: Pod
+    version: v1
+  - kind: ReplicationController
+    version: v1
+  - kind: PersistentVolume
+    version: v1
+  - kind: ReplicaSet
+    group: apps
+    version: v1
+  - kind: StatefulSet
+    group: apps
+    version: v1
+
+# TBD
+#  - kind: NodeMetrics
+#    group: metrics.k8s.io
+#    version: v1beta1
+#  - kind: PodMetrics
+#    group: metrics.k8s.io
+#    version: v1beta1

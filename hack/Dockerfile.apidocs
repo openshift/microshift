@@ -1,0 +1,13 @@
+# Build a container including openshift-apidocs-gen
+# https://github.com/jboxman-rh/openshift-apidocs-gen
+FROM fedora
+
+RUN dnf -y module enable nodejs:14 && dnf -y install nodejs
+RUN dnf -y install git
+# The package name referenced in the readme is wrong, see
+# https://github.com/jboxman/openshift-apidocs-gen/issues/44
+#RUN npm install -g openshift-apidocs-gen
+# Install from source to get the latest version of the code.
+RUN npm install -g https://github.com/jboxman-rh/openshift-apidocs-gen
+
+WORKDIR /workdir
