@@ -1,0 +1,223 @@
+assets:
+  - dir: components/openshift-dns/dns/
+    src: cluster-dns-operator/assets/dns/
+    files:
+      - file: cluster-role-binding.yaml
+      - file: cluster-role.yaml
+      - file: configmap.yaml
+        git_restore: True
+      - file: daemonset.yaml
+      - file: namespace.yaml
+      - file: service-account.yaml
+      - file: service.yaml
+
+  - dir: components/openshift-dns/node-resolver
+    src: cluster-dns-operator/assets/node-resolver/
+    files:
+      - file: daemonset.yaml
+        ignore: "it's created by processing daemonset.yaml.tmpl"
+      - file: daemonset.yaml.tmpl
+        git_restore: True
+      - file: service-account.yaml
+      - file: update-node-resolver.sh
+
+  - dir: components/openshift-router/
+    src: cluster-ingress-operator/assets/router/
+    files:
+      - file: cluster-role-binding.yaml
+      - file: cluster-role.yaml
+      - file: configmap.yaml
+        git_restore: True
+      - file: deployment.yaml
+      - file: namespace.yaml
+      - file: service-account.yaml
+      - file: service-internal.yaml
+      - file: serving-certificate.yaml
+        git_restore: True
+
+  - dir: components/lvms/
+    src: lvms/amd64/
+    no_clean: True
+    files:
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml
+      - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml
+      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: topolvm-metrics_rbac.authorization.k8s.io_v1_role.yaml
+      - file: topolvm-metrics_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-node_v1_serviceaccount.yaml
+      - file: topolvm.io_logicalvolumes.yaml
+
+      - file: csi-driver.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-controller_deployment.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-controller_v1_serviceaccount.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-csi-snapshotter_rbac.authorization.k8s.io_v1_clusterrole.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-csi-snapshotter_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-leader-election_rbac.authorization.k8s.io_v1_role.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-leader-election_rbac.authorization.k8s.io_v1_rolebinding.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-lvmd-config_configmap_v1.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-node-metrics_v1_service.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-node-securitycontextconstraint.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-node_daemonset.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm-openshift-storage_namespace.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+      - file: topolvm_default-storage-class.yaml
+        ignore: "it's not yet available in LVMS Operator Bundle"
+
+
+
+  - dir: components/ovn/
+    ignore: "it's not covered by rebase script yet"
+    files:
+      - file: clusterrole.yaml
+      - file: clusterrolebinding.yaml
+      - file: configmap.yaml
+      - file: namespace.yaml
+      - file: role.yaml
+      - file: rolebinding.yaml
+    dirs:
+      - dir: master/
+        files:
+          - file: daemonset.yaml
+          - file: serviceaccount.yaml
+
+  - dir: components/service-ca/
+    src: service-ca-operator/bindata/v4.0.0/controller/
+    files:
+      - file: clusterrole.yaml
+      - file: clusterrolebinding.yaml
+      - file: deployment.yaml
+      - file: ns.yaml
+      - file: role.yaml
+      - file: rolebinding.yaml
+      - file: sa.yaml
+      - file: signing-cabundle.yaml
+      - file: signing-secret.yaml
+
+  - dir: controllers/cluster-policy-controller/
+    src: cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/
+    files:
+      - file: namespace-security-allocation-controller-clusterrole.yaml
+      - file: namespace-security-allocation-controller-clusterrolebinding.yaml
+      - file: podsecurity-admission-label-syncer-controller-clusterrole.yaml
+      - file: podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml
+
+  - dir: controllers/kube-apiserver/
+    src: cluster-kube-apiserver-operator/bindata/assets/config/
+    files:
+      - file: config-overrides.yaml
+      - file: defaultconfig.yaml
+
+  - dir: controllers/kube-controller-manager/
+    src: cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/
+    files:
+      - file: defaultconfig.yaml
+        src: ../config/
+      - file: csr_approver_clusterrole.yaml
+      - file: csr_approver_clusterrolebinding.yaml
+      - file: namespace-openshift-kube-controller-manager.yaml
+        src: ns.yaml
+
+  - dir: controllers/openshift-default-scc-manager/
+    src: release-manifests/
+    files:
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-anyuid.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-hostaccess.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-hostmount-anyuid.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-nonroot-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml
+      - file: 0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-hostnetwork-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-nonroot-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-nonroot.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-privileged.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-restricted.yaml
+
+  - dir: controllers/route-controller-manager/
+    src: cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/
+    files:
+      - file: 0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml
+        src: route-controller-ns.yaml
+      - file: ingress-to-route-controller-clusterrole.yaml
+      - file: ingress-to-route-controller-clusterrolebinding.yaml
+      - file: route-controller-informer-clusterrole.yaml
+      - file: route-controller-informer-clusterrolebinding.yaml
+      - file: route-controller-leader-role.yaml
+      - file: route-controller-leader-rolebinding.yaml
+      - file: route-controller-sa.yaml
+      - file: route-controller-separate-sa-role.yaml
+      - file: route-controller-separate-sa-rolebinding.yaml
+      - file: route-controller-tokenreview-clusterrole.yaml
+      - file: route-controller-tokenreview-clusterrolebinding.yaml
+
+  - dir: core/
+    no_clean: True
+    files:
+      - file: 0000_50_cluster-openshift-controller-manager_00_namespace.yaml
+        src: /cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ns.yaml
+      - file: namespace-openshift-infra.yaml
+        src: /cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/
+      - file: priority-class-openshift-user-critical.yaml
+        ignore: "it's a priority class needed for oc debug node command - not available in any repo that rebase is using"
+      - file: securityv1-local-apiservice.yaml
+        ignore: "it's a local API service for security API group, needed if OpenShift API server is not present"
+
+  - dir: crd/
+    src: release-manifests/
+    files:
+      - file: 0000_03_security-openshift_01_scc.crd.yaml
+      - file: 0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
+      - file: route.crd.yaml
+        src:  /kubernetes/vendor/github.com/openshift/api/route/v1/
+
+  - dir: release/
+    ignore: "it contains files generated during rebase procedure"
+    files:
+      - release-aarch64.json
+      - release-x86_64.json
+
+  - dir: version/
+    no_clean: True
+    files:
+      - file: microshift-version.yaml
+        ignore: "it's a template for ConfigMap processed during runtime"
+
+  - file: embed.go
+    ignore: "it's a MicroShift specific Go file that embeds into a binary"
