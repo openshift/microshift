@@ -38,17 +38,18 @@ const (
 )
 
 func GetHostIP() (string, error) {
+	// Prefer OVN-K gateway IP if it is the CNI
+	gatewayIP, err := getOVNGatewayIP()
+	if err != nil && !strings.Contains(err.Error(), "no such network interface") {
+		return "", err
+	}
+	klog.V(2).Infof("ovn gateway IP address: %s", gatewayIP)
+
 	ip, err := net.ChooseHostInterface()
 	if err == nil {
 		return ip.String(), nil
 	}
 	klog.V(2).Infof("failed to find default route IP address: %v", err)
-
-	gatewayIP, err := getOVNGatewayIP()
-	if err != nil {
-		return "", err
-	}
-	klog.V(2).Infof("ovn gateway IP address: %s", gatewayIP)
 
 	return gatewayIP, nil
 }
