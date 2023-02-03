@@ -46,13 +46,6 @@ import (
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/soheilhy/cmux"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/exporters/otlp"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpgrpc"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
-	tracesdk "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/semconv"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -199,6 +192,7 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 		BackendBatchInterval:                     cfg.BackendBatchInterval,
 		MaxTxnOps:                                cfg.MaxTxnOps,
 		MaxRequestBytes:                          cfg.MaxRequestBytes,
+		MaxConcurrentStreams:                     cfg.MaxConcurrentStreams,
 		SocketOpts:                               cfg.SocketOpts,
 		StrictReconfigCheck:                      cfg.StrictReconfigCheck,
 		ClientCertAuthEnabled:                    cfg.ClientTLSInfo.ClientCertAuth,
@@ -209,6 +203,8 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 		HostWhitelist:                            cfg.HostWhitelist,
 		InitialCorruptCheck:                      cfg.ExperimentalInitialCorruptCheck,
 		CorruptCheckTime:                         cfg.ExperimentalCorruptCheckTime,
+		CompactHashCheckEnabled:                  cfg.ExperimentalCompactHashCheckEnabled,
+		CompactHashCheckTime:                     cfg.ExperimentalCompactHashCheckTime,
 		PreVote:                                  cfg.PreVote,
 		Logger:                                   cfg.logger,
 		ForceNewCluster:                          cfg.ForceNewCluster,
@@ -230,7 +226,7 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 
 	if srvcfg.ExperimentalEnableDistributedTracing {
 		tctx := context.Background()
-		tracingExporter, opts, err := e.setupTracing(tctx)
+		tracingExporter, opts, err := setupTracingExporter(tctx, cfg)
 		if err != nil {
 			return e, err
 		}
@@ -239,6 +235,8 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 		}
 		e.tracingExporterShutdown = func() { tracingExporter.Shutdown(tctx) }
 		srvcfg.ExperimentalTracerOptions = opts
+
+		e.cfg.logger.Info("distributed tracing setup enabled")
 	}
 
 	print(e.cfg.logger, *cfg, srvcfg, memberInitialized)
@@ -252,8 +250,8 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 
 	// newly started member ("memberInitialized==false")
 	// does not need corruption check
-	if memberInitialized {
-		if err = e.Server.CheckInitialHashKV(); err != nil {
+	if memberInitialized && srvcfg.InitialCorruptCheck {
+		if err = e.Server.CorruptionChecker().InitialCheck(); err != nil {
 			// set "EtcdServer" to nil, so that it does not block on "EtcdServer.Close()"
 			// (nothing to close since rafthttp transports have not been started)
 
@@ -326,6 +324,8 @@ func print(lg *zap.Logger, ec Config, sc config.ServerConfig, memberInitialized 
 		zap.String("election-timeout", fmt.Sprintf("%v", time.Duration(sc.ElectionTicks*int(sc.TickMs))*time.Millisecond)),
 		zap.Bool("initial-election-tick-advance", sc.InitialElectionTickAdvance),
 		zap.Uint64("snapshot-count", sc.SnapshotCount),
+		zap.Uint("max-wals", sc.MaxWALFiles),
+		zap.Uint("max-snapshots", sc.MaxSnapFiles),
 		zap.Uint64("snapshot-catchup-entries", sc.SnapshotCatchUpEntries),
 		zap.Strings("initial-advertise-peer-urls", ec.getAPURLs()),
 		zap.Strings("listen-peer-urls", ec.getLPURLs()),
@@ -337,10 +337,15 @@ func print(lg *zap.Logger, ec Config, sc config.ServerConfig, memberInitialized 
 		zap.String("initial-cluster", sc.InitialPeerURLsMap.String()),
 		zap.String("initial-cluster-state", ec.ClusterState),
 		zap.String("initial-cluster-token", sc.InitialClusterToken),
-		zap.Int64("quota-size-bytes", quota),
+		zap.Int64("quota-backend-bytes", quota),
+		zap.Uint("max-request-bytes", sc.MaxRequestBytes),
+		zap.Uint32("max-concurrent-streams", sc.MaxConcurrentStreams),
+
 		zap.Bool("pre-vote", sc.PreVote),
 		zap.Bool("initial-corrupt-check", sc.InitialCorruptCheck),
 		zap.String("corrupt-check-time-interval", sc.CorruptCheckTime.String()),
+		zap.Bool("compact-check-time-enabled", sc.CompactHashCheckEnabled),
+		zap.Duration("compact-check-time-interval", sc.CompactHashCheckTime),
 		zap.String("auto-compaction-mode", sc.AutoCompactionMode),
 		zap.Duration("auto-compaction-retention", sc.AutoCompactionRetention),
 		zap.String("auto-compaction-interval", sc.AutoCompactionRetention.String()),
@@ -653,12 +658,6 @@ func configureClientListeners(cfg *Config) (sctxs map[string]*serveCtx, err erro
 			sctx.l = transport.LimitListener(sctx.l, int(fdLimit-reservedInternalFDNum))
 		}
 
-		if network == "tcp" {
-			if sctx.l, err = transport.NewKeepAliveListener(sctx.l, network, nil); err != nil {
-				return nil, err
-			}
-		}
-
 		defer func(u url.URL) {
 			if err == nil {
 				return
@@ -810,53 +809,4 @@ func parseCompactionRetention(mode, retention string) (ret time.Duration, err er
 		}
 	}
 	return ret, nil
-}
-
-func (e *Etcd) setupTracing(ctx context.Context) (exporter tracesdk.SpanExporter, options []otelgrpc.Option, err error) {
-	exporter, err = otlp.NewExporter(ctx,
-		otlpgrpc.NewDriver(
-			otlpgrpc.WithEndpoint(e.cfg.ExperimentalDistributedTracingAddress),
-			otlpgrpc.WithInsecure(),
-		))
-	if err != nil {
-		return nil, nil, err
-	}
-	res := resource.NewWithAttributes(
-		semconv.ServiceNameKey.String(e.cfg.ExperimentalDistributedTracingServiceName),
-	)
-	// As Tracing service Instance ID must be unique, it should
-	// never use the empty default string value, so we only set it
-	// if it's a non empty string.
-	if e.cfg.ExperimentalDistributedTracingServiceInstanceID != "" {
-		resWithIDKey := resource.NewWithAttributes(
-			(semconv.ServiceInstanceIDKey.String(e.cfg.ExperimentalDistributedTracingServiceInstanceID)),
-		)
-		// Merge resources to combine into a new
-		// resource in case of duplicates.
-		res = resource.Merge(res, resWithIDKey)
-	}
-
-	options = append(options,
-		otelgrpc.WithPropagators(
-			propagation.NewCompositeTextMapPropagator(
-				propagation.TraceContext{},
-				propagation.Baggage{},
-			),
-		),
-		otelgrpc.WithTracerProvider(
-			tracesdk.NewTracerProvider(
-				tracesdk.WithBatcher(exporter),
-				tracesdk.WithResource(res),
-			),
-		),
-	)
-
-	e.cfg.logger.Info(
-		"distributed tracing enabled",
-		zap.String("distributed-tracing-address", e.cfg.ExperimentalDistributedTracingAddress),
-		zap.String("distributed-tracing-service-name", e.cfg.ExperimentalDistributedTracingServiceName),
-		zap.String("distributed-tracing-service-instance-id", e.cfg.ExperimentalDistributedTracingServiceInstanceID),
-	)
-
-	return exporter, options, err
 }

@@ -686,8 +686,8 @@ update_manifests() {
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
     # - assets/core/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
 
-    yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults; 
-        .enforce = "restricted" | .audit = "restricted" | .warn = "restricted" | 
+    yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults;
+        .enforce = "restricted" | .audit = "restricted" | .warn = "restricted" |
         .enforce-version = "latest" | .audit-version = "latest" | .warn-version = "latest")' "${REPOROOT}"/assets/controllers/kube-apiserver/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
@@ -710,7 +710,7 @@ update_manifests() {
     # 1) Adopt resource manifests
     #    Replace all openshift-dns operand manifests
     rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
-    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns || true 
+    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns || true
     rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
     cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver || true
     #    Restore the openshift-dns ConfigMap. It's content is the Corefile that the operator generates
