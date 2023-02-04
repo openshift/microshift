@@ -8,7 +8,7 @@ import "regexp"
 type DeviceType string
 
 const (
-	defaultSpareGB = 10
+	defaultSpareGB = 0
 	TypeThin       = DeviceType("thin")
 	TypeThick      = DeviceType("thick")
 )
