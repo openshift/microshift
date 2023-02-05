@@ -41,7 +41,7 @@ func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		}
 	)
 
-	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Join(filepath.Dir(config.GetConfigFile()), ovn.ConfigFileName))
+	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Join(filepath.Dir(config.DefaultGlobalConfigFile), ovn.ConfigFileName))
 	if err != nil {
 		return err
 	}
