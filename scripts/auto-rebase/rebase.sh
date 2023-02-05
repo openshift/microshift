@@ -354,6 +354,7 @@ replace_using_component_commit() {
 update_last_rebase() {
     local release_image_amd64=$1
     local release_image_arm64=$2
+    local lvms_operator_bundle_manifest=$3
 
     title "## Updating last_rebase.sh"
 
@@ -362,7 +363,7 @@ update_last_rebase() {
     rm -f "${last_rebase_script}"
     cat - >"${last_rebase_script}" <<EOF
 #!/bin/bash -x
-./scripts/auto-rebase/rebase.sh to "${release_image_amd64}" "${release_image_arm64}"
+./scripts/auto-rebase/rebase.sh to "${release_image_amd64}" "${release_image_arm64}" "${lvms_operator_bundle_manifest}"
 EOF
     chmod +x "${last_rebase_script}"
 
@@ -977,7 +978,7 @@ rebase_to() {
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
-    update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
+    update_last_rebase "${release_image_amd64}" "${release_image_arm64}" "${lvms_operator_bundle_manifest}"
 
     update_changelog
 
