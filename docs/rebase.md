@@ -301,26 +301,28 @@ LVMS_RELEASE=registry.access.redhat.com/lvms4/lvms-operator-bundle:v4.12 \
 
 #### Testing in CI
 
-> Note: Rehearsing Rebase Prow Job without dry run can result in creation of rebase PR in openshift/microshift.
+> Note: Rehearsing Rebase Prow Job without dry run can result in force pushing rebase branch, creation of rebase PR, and deleting stale rebase branches in openshift/microshift.
 
-To test changes in context of "production" (CI Prow Job) environment it's recommended to:
-- Create a dummy PR in `release` repo for rehearsing the rebase job that checks out changes under test
-  - Example of `ci-operator/step-registry/openshift/microshift/rebase/openshift-microshift-rebase-commands.sh` from [PR](https://github.com/openshift/release/pull/35875/files)
-    ```shell
-    #!/bin/bash
+To test changes in context of "production" (CI Prow Job) environment it's recommended to first set and export one of two environment variables either in `openshift-microshift-rebase-commands.sh` or `rebase_job_entrypoint.sh`:
+  - `ORG=GITHUB_USERNAME` to make the Job target specific fork of `microshift` like [pmtk/microshift](https://github.com/pmtk/microshift)
+     > This requires [installing](https://github.com/apps/microshift-rebase-script/installations/new) the [microshift-rebase-script](https://github.com/apps/microshift-rebase-script) for the fork (this will allow the job to push branches and create PRs)
+  - `DRY_RUN=y` to not push branches or create PRs on `$ORG/microshift` - job will just log what it would do and continue the execution
 
-    git remote add pmtk https://github.com/pmtk/microshift.git
-    git fetch pmtk
-    git switch --track pmtk/csi-rebase-script
+Then, create a dummy PR in [https://github.com/openshift/release](openshift/release) repository for rehearsing the rebase job that switches from `openshift/microshift` `main` branch to `org/microshift` for testing.
 
-    # export DRY_RUN=y
+Example of `ci-operator/step-registry/openshift/microshift/rebase/openshift-microshift-rebase-commands.sh` (tweaked [PR](https://github.com/openshift/release/pull/35875/files):
+```bash
+#!/bin/bash
 
-    ./scripts/auto-rebase/rebase_job_entrypoint.sh
+# These will be picked up in rebase_job_entrypoint.sh as well
+export ORG=pmtk
+# export DRY_RUN=y
 
-    git diff csi-rebase-script
-    ```
-  - `export DRY_RUN=y` can also be provided here (instead of adding it in `rebase_job_entrypoint.sh`)
+git remote add TEST https://github.com/${ORG}/microshift.git
+git fetch TEST
+git switch --track TEST/csi-rebase-script
 
-- Making changes to `rebase_job_entrypoint.sh` so `openshift/microshift` repository is untouched:
-  - Enabling dry run by setting `DRY_RUN`
-  - Setting `ORG` to GitHub username and installing [microshift-rebase-script](https://github.com/apps/microshift-rebase-script) to your fork of microshift repository (that way job will be able to push a branch and create a PR on the fork)
+./scripts/auto-rebase/rebase_job_entrypoint.sh
+
+git diff csi-rebase-script
+```
