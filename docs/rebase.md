@@ -19,7 +19,7 @@ The following describes the current rebase process in more detail.
 
 ### Prerequisites
 
-Rebasing requires the following tools to be installed, which is already the case when running in a [MicroShift development environment](./devenv_rhel8.md):
+Rebasing requires the following tools to be installed, which is already the case when running in a [MicroShift development environment](./devenv_setup.md):
 
 * `git` >= 2.3
 * `golang` >= 1.18

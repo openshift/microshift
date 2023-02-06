@@ -1,10 +1,11 @@
-# MicroShift Development Environment on RHEL 8
-The development environment bootstrap and configuration procedures are automated as described in the [Automating Development Environment Setup](./devenv_rhel8_auto.md) document.
+# MicroShift Development Environment
+The development environment bootstrap and configuration procedures are automated as described in the [Automating Development Environment Setup](./devenv_setup_auto.md) document.
 It is recommended to review the current document and use the automation instructions to create and configure the environment.
 
 ## Create Development Virtual Machine
-Start by downloading the RHEL 8.7 ISO boot image for `x86_64` or `aarch64` architecture from the https://developers.redhat.com/products/rhel/download location.
-> RHEL 9.x operating system is not currently supported.
+Start by downloading one of the supported boot images for the `x86_64` or `aarch64` architecture:
+* RHEL 8.7 or RHEL 9.1 from https://developers.redhat.com/products/rhel/download
+* CentOS 9 Stream from https://www.centos.org/download
 
 ### Creating VM
 Create a RHEL virtual machine with 2 cores, 4096MB of RAM and 50GB of storage. 
@@ -15,9 +16,11 @@ Install the `libvirt` packages and reboot your system to start the virtualizatio
 sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img
 ```
 
-Move the ISO image to `/var/lib/libvirt/images` directory and run the following command to create a virtual machine.
+Move the ISO image to `/var/lib/libvirt/images` directory and run the following commands to create a virtual machine.
 ```bash
 VMNAME="microshift-dev"
+ISONAME=rhel-8.7-$(uname -i)-boot.iso
+
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
 virt-install \
@@ -28,7 +31,7 @@ virt-install \
     --network network=default,model=virtio \
     --os-type generic \
     --events on_reboot=restart \
-    --cdrom ./rhel-8.7-$(uname -i)-boot.iso \
+    --cdrom ./${ISONAME} \
 "
 ```
 
@@ -91,26 +94,51 @@ make srpm
 The artifacts of the build are located in the `_output/rpmbuild` directory.
 ```bash
 $ cd ~/microshift/ && find _output -name \*.rpm
-_output/rpmbuild/RPMS/x86_64/microshift-4.12.0_20221215165847_758c8b61-1.el8.x86_64.rpm
-_output/rpmbuild/RPMS/x86_64/microshift-networking-4.12.0_20221215165847_758c8b61-1.el8.x86_64.rpm
-_output/rpmbuild/RPMS/noarch/microshift-release-info-4.12.0_20221215165847_758c8b61-1.el8.noarch.rpm
-_output/rpmbuild/RPMS/noarch/microshift-selinux-4.12.0_20221215165847_758c8b61-1.el8.noarch.rpm
-_output/rpmbuild/SRPMS/microshift-4.12.0_20221215165847_758c8b61-1.el8.src.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-4.13.0_20221215165847_758c8b61-1.el8.x86_64.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-networking-4.13.0_20221215165847_758c8b61-1.el8.x86_64.rpm
+_output/rpmbuild/RPMS/noarch/microshift-release-info-4.13.0_20221215165847_758c8b61-1.el8.noarch.rpm
+_output/rpmbuild/RPMS/noarch/microshift-selinux-4.13.0_20221215165847_758c8b61-1.el8.noarch.rpm
+_output/rpmbuild/SRPMS/microshift-4.13.0_20221215165847_758c8b61-1.el8.src.rpm
 ```
 
 ## Run MicroShift Executable
 Log into the development virtual machine with the `microshift` user credentials.
 
 ### Runtime Prerequisites
+Enable the repositories required for installing MicroShift dependencies.
+
+<details><summary>RHEL</summary>
+
 When working with MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repository `rhocp-4.$Y-for-rhel-8-$ARCH-rpms` may not be available yet. In that case, use the `Y-1` released version or a `Y-beta` version from the public `https://mirror.openshift.com/pub/openshift-v4/$ARCH/dependencies/rpms/` OpenShift mirror repository.
 
-Enable the needed repositories and install the MicroShift RPM packages. This procedure pulls in the required package dependencies, also installing the necessary configuration files and `systemd` units.
-
 ```bash
+OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
+    
 sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos \
-    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
-    --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
+    --enable rhocp-4.12-for-rhel-${OSVERSION}-$(uname -i)-rpms \
+    --enable fast-datapath-for-rhel-${OSVERSION}-$(uname -i)-rpms
+```
+</details>
+<details><summary>CentOS</summary>
+
+```bash
+sudo dnf install -y centos-release-nfv-common
+sudo dnf copr enable -y @OKD/okd centos-stream-9-$(uname -i)
+sudo tee /etc/yum.repos.d/openvswitch2-$(uname -i)-rpms.repo >/dev/null <<EOF
+[sig-nfv]
+name=CentOS Stream 9 - SIG NFV
+baseurl=http://mirror.stream.centos.org/SIGs/9-stream/nfv/\$basearch/openvswitch-2/
+gpgcheck=1
+enabled=1
+skip_if_unavailable=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-NFV
+EOF
+```
+</details>
+
+Proceed by installing the MicroShift RPM packages. This procedure pulls in the required package dependencies, also installing the necessary configuration files and `systemd` units.
+```bash
 sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 ```
 
@@ -121,9 +149,24 @@ sudo chmod 600 /etc/crio/openshift-pull-secret
 
 ### Installing Clients
 Run the following commands to install `oc` and `kubectl` utilities.
+
+<details><summary>RHEL</summary>
+
 ```bash
 sudo dnf install -y openshift-clients
 ```
+</details>
+<details><summary>CentOS</summary>
+
+```bash
+OCC_REM=https://mirror.openshift.com/pub/openshift-v4/$(uname -i)/clients/ocp-dev-preview/latest-4.13/openshift-client-linux.tar.gz
+OCC_LOC=/tmp/openshift-client-linux.tar.gz
+
+curl -s ${OCC_REM} --output ${OCC_LOC}
+sudo tar zxf ${OCC_LOC} -C /usr/bin
+rm -f ${OCC_LOC}
+```
+</details>
 
 ### Configuring MicroShift
 MicroShift requires system configuration updates before it can be run. These updates include `CRI-O`, networking and file system customizations.
@@ -238,15 +281,17 @@ To view all the available profiles, run `oc get --raw /debug/pprof`.
 
 ## Troubleshooting
 ### No Valid Repository ID for OpenShift RPM Channels
-If you encounter following error message while enabling fast-datapath repo (You can encounter similar error for other OpenShift related repos as well)
+The following error message may be encountered when enabling the OpenShift RPM repositories.
 
 ```
-Error: 'fast-datapath-for-rhel-8-x86_64-rpms' does not match a valid repository ID. Use "subscription-manager repos --list" to see valid repositories.
+Error: 'fast-datapath-for-rhel-8-x86_64-rpms' does not match a valid repository ID.
+Use "subscription-manager repos --list" to see valid repositories.
 ```
-Make sure that your system is registered and attached to the `Red Hat Openshift Container Platform` pr equivalent subscription. Once the repo is enabled, you must see at least the following repos enabled.
+
+To mitigate this problem, make sure that your system is registered and attached to the `Red Hat Openshift Container Platform` or equivalent subscription. Once the proper subscription is configured, run the `subscription-manager` command to verify the enabled repositories.
 
 ```
-# sudo subscription-manager repos --list-enabled
+$ sudo subscription-manager repos --list-enabled
 +----------------------------------------------------------+
     Available Repositories in /etc/yum.repos.d/redhat.repo
 +----------------------------------------------------------+

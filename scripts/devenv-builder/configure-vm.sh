@@ -1,11 +1,12 @@
 #!/bin/bash
 #
-# This script automates the VM configuration steps described in the "MicroShift Development Environment on RHEL 8" document.
-# See https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md
+# This script automates the VM configuration steps described in the "MicroShift Development Environment" document.
+# See https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md
 #
 set -eo pipefail
 
 BUILD_AND_INSTALL=true
+RHEL_SUBSCRIPTION=false
 
 function usage() {
     echo "Usage: $(basename $0) [--no-build] <openshift-pull-secret-file>"
@@ -14,6 +15,11 @@ function usage() {
     [ ! -z "$1" ] && echo -e "\nERROR: $1"
     exit 1
 }
+
+# Only RHEL requires a subscription
+if grep -q 'Red Hat Enterprise Linux' /etc/redhat-release ; then
+    RHEL_SUBSCRIPTION=true
+fi
 
 if [ $# -ne 1 ] && [ $# -ne 2 ]; then
     usage "Wrong number of arguments"
@@ -35,16 +41,18 @@ if [ "$(whoami)" != "microshift" ] ; then
 fi
 
 # Check the subscription status and register if necessary
-if ! sudo subscription-manager status >& /dev/null ; then
-   sudo subscription-manager register
+if [ $RHEL_SUBSCRIPTION = true ] ; then
+    if ! sudo subscription-manager status >& /dev/null ; then
+        sudo subscription-manager register
+    fi
 fi
 
 # Create Development Virtual Machine > Configuring VM
-# https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#configuring-vm
+# https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#configuring-vm
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf clean all -y
 sudo dnf update -y
-sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
+sudo dnf install -y git cockpit make golang jq selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
 
 YQ_URL=https://github.com/mikefarah/yq/releases/download/v4.26.1/yq_linux_$(go env GOARCH)
@@ -58,28 +66,45 @@ if ! (curl -Ls "${YQ_URL}" | tee /tmp/yq | sha256sum -c /tmp/sum.txt &>/dev/null
 fi
 chmod +x /tmp/yq && sudo cp /tmp/yq /usr/bin/yq
 
-if $BUILD_AND_INSTALL ; then
+if [ $BUILD_AND_INSTALL = true ] ; then
     # Build MicroShift
-    # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#build-microshift
+    # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#build-microshift
     if [ ! -e ~/microshift ] ; then
         git clone https://github.com/openshift/microshift.git ~/microshift
     fi
     cd ~/microshift
 
     # Build MicroShift > RPM Packages
-    # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#rpm-packages
+    # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#rpm-packages
     make clean
     make rpm
     make srpm
 fi
 
 # Run MicroShift Executable > Runtime Prerequisites
-# https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#runtime-prerequisites
-sudo subscription-manager config --rhsm.manage_repos=1
-sudo subscription-manager repos \
-    --enable rhocp-4.12-for-rhel-8-$(uname -i)-rpms \
-    --enable fast-datapath-for-rhel-8-$(uname -i)-rpms
-if $BUILD_AND_INSTALL ; then
+# https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#runtime-prerequisites
+if [ $RHEL_SUBSCRIPTION = true ] ; then
+    OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
+    
+    sudo subscription-manager config --rhsm.manage_repos=1
+    sudo subscription-manager repos \
+        --enable rhocp-4.12-for-rhel-${OSVERSION}-$(uname -i)-rpms \
+        --enable fast-datapath-for-rhel-${OSVERSION}-$(uname -i)-rpms
+else
+    sudo dnf install -y centos-release-nfv-common
+    sudo dnf copr enable -y @OKD/okd centos-stream-9-$(uname -i)
+    sudo tee /etc/yum.repos.d/openvswitch2-$(uname -i)-rpms.repo >/dev/null <<EOF
+[sig-nfv]
+name=CentOS Stream 9 - SIG NFV
+baseurl=http://mirror.stream.centos.org/SIGs/9-stream/nfv/\$basearch/openvswitch-2/
+gpgcheck=1
+enabled=1
+skip_if_unavailable=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-NFV
+EOF
+fi
+
+if [ $BUILD_AND_INSTALL = true ] ; then
     sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 
     sudo cp -f ${OCP_PULL_SECRET} /etc/crio/openshift-pull-secret
@@ -87,10 +112,19 @@ if $BUILD_AND_INSTALL ; then
 fi
 
 # Run MicroShift Executable > Installing Clients
-# https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#installing-clients
-sudo dnf install -y openshift-clients
+# https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#installing-clients
+if [ $RHEL_SUBSCRIPTION = true ] ; then
+    sudo dnf install -y openshift-clients
+else
+    OCC_REM=https://mirror.openshift.com/pub/openshift-v4/$(uname -i)/clients/ocp-dev-preview/latest-4.13/openshift-client-linux.tar.gz
+    OCC_LOC=/tmp/openshift-client-linux.tar.gz
 
-if $BUILD_AND_INSTALL ; then
+    curl -s ${OCC_REM} --output ${OCC_LOC}
+    sudo tar zxf ${OCC_LOC} -C /usr/bin
+    rm -f ${OCC_LOC}
+fi
+
+if [ $BUILD_AND_INSTALL = true ] ; then
     # Run MicroShift Executable > Configuring MicroShift > Firewalld
     # https://github.com/openshift/microshift/blob/main/docs/howto_firewall.md#firewalld
     sudo dnf install -y firewalld
@@ -100,7 +134,7 @@ if $BUILD_AND_INSTALL ; then
     sudo firewall-cmd --reload
 
     # Run MicroShift Executable > Configuring MicroShift
-    # https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#configuring-microshift
+    # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#configuring-microshift
     sudo systemctl enable crio
     sudo systemctl start microshift
 

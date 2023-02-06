@@ -1,6 +1,6 @@
 # MicroShift CNI Plugin Overview
 
-> **IMPORTANT!** The default CNI configuration is intended to match the developer environment described in [MicroShift Development Environment on RHEL 8](./devenv_rhel8.md).
+> **IMPORTANT!** The default CNI configuration is intended to match the developer environment described in [MicroShift Development Environment](./devenv_setup.md).
 
 MicroShift uses Red Hat OpenShift Networking CNI driver, based on [ovn-kubernetes](https://github.com/ovn-org/ovn-kubernetes.git).
 

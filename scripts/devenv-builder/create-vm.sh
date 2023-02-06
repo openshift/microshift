@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# This script automates the VM creation steps described in the "MicroShift Development Environment on RHEL 8" document.
-# See https://github.com/openshift/microshift/blob/main/docs/devenv_rhel8.md#creating-vm
+# This script automates the VM creation steps described in the "MicroShift Development Environment" document.
+# See https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#creating-vm
 #
 set -eo pipefail
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/devenv-builder
 
 function usage() {
-    echo "Usage: $(basename $0) [<VMNAME> <VMDISKDIR> <RHELISO> <NCPUS> <RAMSIZE> <DISKSIZE> <SWAPSIZE> <DATAVOLSIZE>]"
+    echo "Usage: $(basename $0) [<VMNAME> <VMDISKDIR> <ISOFILE> <NCPUS> <RAMSIZE> <DISKSIZE> <SWAPSIZE> <DATAVOLSIZE>]"
     echo "INFO: Specify 0 swap size to disable swap partition"
     echo "INFO: Positional arguments also can be specified using environment variables"
     echo "INFO: All sizes in GB"
@@ -17,7 +17,7 @@ function usage() {
 
 VMNAME=${1:-$VMNAME}
 VMDISKDIR=${2:-$VMDISKDIR}
-RHELISO=${3:-$RHELISO}
+ISOFILE=${3:-$ISOFILE}
 NCPUS=${4:-$NCPUS}
 RAMSIZE=${5:-$RAMSIZE}
 DISKSIZE=${6:-$DISKSIZE}
@@ -25,7 +25,7 @@ SWAPSIZE=${7:-$SWAPSIZE}
 DATAVOLSIZE=${8:-$DATAVOLSIZE}
 [ -z "${VMNAME}" ]      && usage "Invalid VM name: '${VMNAME}'"
 [ ! -e "${VMDISKDIR}" ] && usage "VM disk directory '${VMDISKDIR}' is not accessible"
-[ ! -e "${RHELISO}" ]   && usage "RHEL ISO file '${RHELISO}' is not accessible"
+[ ! -e "${ISOFILE}" ]   && usage "Installation ISO file '${ISOFILE}' is not accessible"
 
 [[ ! "${NCPUS}" =~ ^[0-9]+$ ]]       || [[ "${NCPUS}" -le 0 ]]       && usage "Invalid number of CPUs: '${NCPUS}'"
 [[ ! "${RAMSIZE}" =~ ^[0-9]+$ ]]     || [[ "${RAMSIZE}" -le 0 ]]     && usage "Invalid RAM size: '${RAMSIZE}'"
@@ -69,7 +69,7 @@ virt-install \
     --disk path=./${VMNAME}.qcow2,size=${DISKSIZE} \
     --network network=default,model=virtio \
     --events on_reboot=restart \
-    --location ${RHELISO} \
+    --location ${ISOFILE} \
     --initrd-inject=${KICKSTART_FILE} \
     --extra-args \"inst.ks=file:/$(basename ${KICKSTART_FILE})\" \
     --wait \

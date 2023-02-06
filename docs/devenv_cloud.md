@@ -3,7 +3,7 @@
 ## Introduction
 
 The MicroShift development environment should be set up on a **local workstation** as a collection of virtual machines.
-* The [development virtual machine](./devenv_rhel8.md#create-development-virtual-machine) used for compiling and running the MicroShift binaries and building [RHEL for Edge Installer ISO](./rhel4edge_iso.md#build-rhel-for-edge-installer-iso) images
+* The [development virtual machine](./devenv_setup.md#create-development-virtual-machine) used for compiling and running the MicroShift binaries and building [RHEL for Edge Installer ISO](./rhel4edge_iso.md#build-rhel-for-edge-installer-iso) images
 * The [RHEL for Edge virtual machine](./rhel4edge_iso.md#install-microshift-for-edge) used for running MicroShift in a clean, production-like environment
 * The [Ansible control node virtual machine](../ansible/README.md) used for running performance benchmark automation scripts
 
@@ -99,7 +99,7 @@ sudo pvcreate      ${DEVICE}
 sudo vgcreate rhel ${DEVICE}
 ```
 
-Finish by running the `scripts/devenv-builder/configure-vm.sh` script to perform the initial configuration as described in the [Configure Virtual Machine](./devenv_rhel8_auto.md#configure-virtual-machine) document.
+Finish by running the `scripts/devenv-builder/configure-vm.sh` script to perform the initial configuration as described in the [Configure Virtual Machine](./devenv_setup_auto.md#configure-virtual-machine) document.
 > Reboot your host in the end of the configuration procedure to make sure it is running the latest operating system components.
 
 ## Nested Virtualization
@@ -127,7 +127,7 @@ NETNAME=default
 
 Log into the development virtual machine running in the cloud using the `microshift` user account.
 
-Follow the instructions in the [Create Virtual Machine](./devenv_rhel8_auto.md#create-virtual-machine) section to create a new virtual machine using **nested** virtualization.
+Follow the instructions in the [Create Virtual Machine](./devenv_setup_auto.md#create-virtual-machine) section to create a new virtual machine using **nested** virtualization.
 
 ```bash
 ./scripts/devenv-builder/create-vm.sh microshift-bench \
