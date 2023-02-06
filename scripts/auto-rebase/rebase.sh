@@ -200,7 +200,7 @@ clone_repo() {
     git init "${repodir}"
     pushd "${repodir}" >/dev/null
     git remote add origin "${repo}"
-    git fetch origin --filter=tree:0 --tags "${commit}"
+    git fetch origin --quiet  --filter=tree:0 --tags "${commit}"
     git checkout "${commit}"
     popd >/dev/null
 }
