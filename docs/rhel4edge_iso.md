@@ -3,9 +3,9 @@ To test MicroShift in a setup similar to the production environment, it is neces
 
 ## Build RHEL for Edge Installer ISO
 Log into the development virtual machine with the `microshift` user credentials.
-> The development machine configuration guidelines can be found in the [MicroShift Development Environment on RHEL 8.x](./devenv_rhel8.md) document.
+> The development machine configuration guidelines can be found in the [MicroShift Development Environment.x](./devenv_setup.md) document.
 
-Follow the instructions in the [RPM Packages](./devenv_rhel8.md#rpm-packages) section to create MicroShift RPM packages.
+Follow the instructions in the [RPM Packages](./devenv_setup.md#rpm-packages) section to create MicroShift RPM packages.
 
 The scripts for building the installer are located in the `scripts/image-builder` subdirectory.
 

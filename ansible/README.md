@@ -156,7 +156,7 @@ build_etcd_binary: false
 #### Development Host Example Variables
 
 If the user has an existing host used as the MicroShift development environment, the scripts can be run without the initial configuration steps.
-> Such host can be created using the instructions from the [MicroShift Development Environment on RHEL 8](../docs/devenv_rhel8.md) document.
+> Such host can be created using the instructions from the [MicroShift Development Environment](../docs/devenv_setup.md) document.
 
 The `manage_subscription`, `manage_repos` and `setup_microshift_host` variables have been set to `false`.
 
