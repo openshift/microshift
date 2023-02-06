@@ -195,6 +195,21 @@ Rebase Prow Job is configured to leverage CI's ability to provide the job with l
 [Here](https://github.com/openshift/release/blob/d50f86ece447e22011acf0bdddc7ff4af7124953/ci-operator/config/openshift/microshift/openshift-microshift-main__periodics.yaml#L95-L106) is a configuration to populate the ConfigMaps.
 [rebase_job_entrypoint.sh](https://github.com/openshift/microshift/blob/3255867882b6b7da6c411449c52ae50c610a9dc7/scripts/auto-rebase/rebase_job_entrypoint.sh#L15-L20) accesses these ConfigMaps to obtain tags and create URIs which `rebase.sh` uses to download release images.
 
+### Setting up the App as trusted
+
+Installing an App for specific repository does not make it part of the organisation which means that PRs created by the App are not tested automatically requiring team members to apply `ok-to-test` label.
+
+To make the App trusted and have presubmit jobs executed without any intervention it needs to be added to Prow's Plugin Config for the repository.
+This configuration is performed in `openshift/release` repository in file `core-services/prow/02_config/ORG/REPOSITORY/_pluginconfig.yaml`
+([openshift/microshift example](https://github.com/openshift/release/blob/70057044c4088c19fb89fa051a8d51e21a49e4e3/core-services/prow/02_config/openshift/microshift/_pluginconfig.yaml#L54-L58)):
+```yaml
+triggers:
+- repos:
+  - openshift/microshift
+  trusted_apps:
+  - microshift-rebase-script
+```
+
 ### rebase_job_entrypoint.sh
 
 Entrypoint of the Rebase Prow Job.
