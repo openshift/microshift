@@ -1,0 +1,466 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-02-03-145213 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.13.0-0.nightly-arm64-2023-02-06-181757[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-02-03-145213 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.13.0-0.nightly-arm64-2023-02-06-181757 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-02-03-145213 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-02-03-145213 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 637a694 Merge pull request #352 from bverschueren/avoid-original-hosts-loss
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at e5461ad Merge pull request #876 from gcs278/CVE-2022-41717
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at 66deb60 Merge pull request #1415 from openshift-bot/art-consistency-openshift-4.13-ose-cluster-kube-apiserver-operator
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 7f293da Merge pull request #693 from ingvagabund/guard-controller-set-explicit-readiness-probe-endpoint
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at 05ac3ae Merge pull request #459 from ingvagabund/guard-pod-set-readiness-probe-endpoint-explicitly
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at 7977b51 Merge pull request #1676 from wizhaoredhat/allow_node_mgmt_port_netdev_flags
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at 2aa9db3 Merge pull request #274 from openshift-bot/art-consistency-openshift-4.13-ose-cluster-openshift-controller-manager-operator
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at 3f8efde Merge pull request #94 from ingvagabund/crq-controller-do-not-sync-cache-over-no-monitors
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at 13c18c44 Merge pull request #181 from openshift-bot/art-consistency-openshift-4.13-ose-etcd
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+HEAD is now at 67f1639c5 Merge pull request #1450 from rphillips/test_readiness_probes_fix_openshift
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/machine-config-operator/.git/
+HEAD is now at 46ecd47a Merge pull request #3523 from djoshy/mcd-pivot-error-ocpbugs-5520
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/openshift-controller-manager/.git/
+HEAD is now at 847b3e9 Merge pull request #249 from ingvagabund/1.26-rebase
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager/.git/
+HEAD is now at 4d25295 Merge pull request #11 from atiratree/route-defaulting
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/service-ca-operator/.git/
+HEAD is now at 1b89fdc Merge pull request #202 from benluddy/no-stop-error
+
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-02-03-145213 image repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/oc/.git/
+HEAD is now at 8b3f6f9 Merge pull request #1329 from ingvagabund/rebase-1.26.1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/coredns/.git/
+HEAD is now at 9aaa7e0 Merge pull request #78 from gcs278/bufsize-upstream-fix
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/router/.git/
+HEAD is now at 3b8c255 Merge pull request #439 from gcs278/endpoint-counting-port
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kube-rbac-proxy/.git/
+HEAD is now at 0aa2830 Merge pull request #63 from openshift-auth/master
+
+openssl not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/ovn-kubernetes/.git/
+HEAD is now at f4f3b3d Merge pull request #1496 from tssurya/merge-31-01-2023
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kubernetes/.git/
+HEAD is now at 67f1639c5 Merge pull request #1450 from rphillips/test_readiness_probes_fix_openshift
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/service-ca-operator/.git/
+HEAD is now at 1b89fdc Merge pull request #202 from benluddy/no-stop-error
+
+topolvm_csi not from release payload, skipping
+
+topolvm_csi_livenessprobe not from release payload, skipping
+
+topolvm_csi_provisioner not from release payload, skipping
+
+topolvm_csi_registrar not from release payload, skipping
+
+topolvm_csi_resizer not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/oc/.git/
+HEAD is now at 10f2c49 Merge pull request #1308 from openshift-bot/art-consistency-openshift-4.13-ose-tools
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/coredns/.git/
+HEAD is now at 9aaa7e0 Merge pull request #78 from gcs278/bufsize-upstream-fix
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/router/.git/
+HEAD is now at 6144b9a Merge pull request #445 from gcs278/CVE-2022-41717
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kube-rbac-proxy/.git/
+HEAD is now at 0aa2830 Merge pull request #63 from openshift-auth/master
+
+openssl not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/ovn-kubernetes/.git/
+HEAD is now at 9eeb7d6 Merge pull request #1487 from dcbw/ovn22.12-15
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kubernetes/.git/
+HEAD is now at 9eb81c20e Merge pull request #1466 from sanchezl/skip-gce
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/service-ca-operator/.git/
+HEAD is now at 1b89fdc Merge pull request #202 from benluddy/no-stop-error
+
+topolvm_csi not from release payload, skipping
+
+topolvm_csi_livenessprobe not from release payload, skipping
+
+topolvm_csi_provisioner not from release payload, skipping
+
+topolvm_csi_registrar not from release payload, skipping
+
+topolvm_csi_resizer not from release payload, skipping
+
+[34mdownloading LVMS operator bundles[00m
+/go/src/github.com/openshift/microshift/_output/staging/lvms/amd64 /go/src/github.com/openshift/microshift
+[34mextracting lvms operator bundle for "amd64" architecture[00m
+/go/src/github.com/openshift/microshift
+/go/src/github.com/openshift/microshift/_output/staging/lvms/arm64 /go/src/github.com/openshift/microshift
+[34mextracting lvms operator bundle for "arm64" architecture[00m
+/go/src/github.com/openshift/microshift
+error: branch 'rebase-4.13.0-0.nightly_amd64-2023-02-03-145213_arm64-2023-02-06-181757' not found.
+Switched to a new branch 'rebase-4.13.0-0.nightly_amd64-2023-02-03-145213_arm64-2023-02-06-181757'
+[34m## Updating last_rebase.sh[00m
+[34m## Committing changes to last_rebase.sh[00m
+[rebase-4.13.0-0.nightly_amd64-2023-02-03-145213_arm64-2023-02-06-181757 e3a7c115] update last_rebase.sh
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+cluster-dns-operator embedded-component no change
+
+cluster-policy-controller embedded-component no change
+
+etcd embedded-component no change
+
+route-controller-manager embedded-component no change
+
+service-ca-operator embedded-component no change
+
+coredns image-amd64 no change
+
+router image-amd64 no change
+
+kube-rbac-proxy image-amd64 no change
+
+service-ca-operator image-amd64 no change
+
+coredns image-arm64 no change
+
+kube-rbac-proxy image-arm64 no change
+
+service-ca-operator image-arm64 no change
+
+[34m## Committing changes to changelog[00m
+[rebase-4.13.0-0.nightly_amd64-2023-02-03-145213_arm64-2023-02-06-181757 b8dfeb13] update changelog
+ 2 files changed, 4467 insertions(+), 64 deletions(-)
+ rewrite scripts/auto-rebase/changelog.txt (96%)
+[34m# Updating go.mod[00m
+go mod edit -require github.com/openshift/cluster-policy-controller@3f8efde27bb6a50e5d50f0798877d4d2e1154dcb
+go: downloading github.com/openshift/build-machinery-go v0.0.0-20220720161851-9b4f0386f6b0
+go: downloading github.com/spf13/cobra v1.4.0
+go: downloading github.com/ghodss/yaml v1.0.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime v0.0.0-20230116233418-7dab57f2302e
+go: downloading gopkg.in/yaml.v2 v2.4.0
+go: downloading github.com/apparentlymart/go-cidr v1.1.0
+go: downloading github.com/openshift/api v0.0.0-20221116145627-676ae1a3836c
+go: downloading k8s.io/klog/v2 v2.70.1
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/kelseyhightower/envconfig v1.4.0
+go: downloading github.com/openshift/client-go v0.0.0-20220831193253-4950ae70c8ea
+go: downloading github.com/mitchellh/go-homedir v1.1.0
+go: downloading github.com/openshift/library-go v0.0.0-20221201214333-d679fe6f8248
+go: downloading github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e
+go: downloading sigs.k8s.io/yaml v1.2.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/spf13/pflag v1.0.5
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/cluster-policy-controller v0.0.0-20230112143856-3f8efde27bb6
+go: downloading github.com/pkg/errors v0.9.1
+go: downloading github.com/miekg/dns v1.1.35
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/route-controller-manager v0.0.0-20221129140309-4d25295dbf98
+go: downloading golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10
+go: downloading github.com/stretchr/testify v1.7.0
+go: downloading github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7
+go: downloading github.com/openshift/etcd/client/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7
+go: downloading github.com/google/go-cmp v0.5.8
+go: downloading k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/inconshreveable/mousetrap v1.0.0
+go: downloading github.com/go-logr/logr v1.2.3
+go: downloading github.com/evanphx/json-patch v4.12.0+incompatible
+go: downloading github.com/google/uuid v1.1.2
+go: downloading k8s.io/utils v0.0.0-20220922133306-665eaaec4324
+go: downloading github.com/davecgh/go-spew v1.1.1
+go: downloading sigs.k8s.io/kube-storage-version-migrator v0.0.4
+go: downloading github.com/gogo/protobuf v1.3.2
+go: downloading golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
+go: downloading golang.org/x/net v0.0.0-20220722155237-a158d28d115b
+go: downloading golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
+go: downloading github.com/google/gofuzz v1.1.0
+go: downloading github.com/jonboulle/clockwork v0.2.2
+go: downloading github.com/google/gnostic v0.5.7-v3refs
+go: downloading github.com/fvbommel/sortorder v1.0.1
+go: downloading github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de
+go: downloading github.com/MakeNowJust/heredoc v1.0.0
+go: downloading github.com/mitchellh/go-wordwrap v1.0.0
+go: downloading github.com/russross/blackfriday v1.5.2
+go: downloading go.uber.org/zap v1.19.0
+go: downloading github.com/imdario/mergo v0.3.6
+go: downloading golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
+go: downloading github.com/pmezard/go-difflib v1.0.0
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading sigs.k8s.io/structured-merge-diff/v4 v4.2.3
+go: downloading github.com/openshift/etcd/api/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7
+go: downloading google.golang.org/grpc v1.47.0
+go: downloading gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f
+go: downloading k8s.io/component-helpers v0.25.0
+go: downloading github.com/coreos/go-systemd/v22 v22.3.2
+go: downloading github.com/google/cadvisor v0.45.0
+go: downloading go.opentelemetry.io/otel/exporters/otlp v0.20.0
+go: downloading github.com/opencontainers/runc v1.1.3
+go: downloading go.opentelemetry.io/otel/sdk v0.20.0
+go: downloading go.opentelemetry.io/otel v0.20.0
+go: downloading go.opentelemetry.io/otel/trace v0.20.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/fsnotify/fsnotify v1.4.9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/metrics v0.0.0-20230116233418-7dab57f2302e
+go: downloading sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2
+go: downloading golang.org/x/text v0.3.7
+go: downloading sigs.k8s.io/kustomize/api v0.12.1
+go: downloading sigs.k8s.io/kustomize/kyaml v0.13.9
+go: downloading github.com/golang/protobuf v1.5.2
+go: downloading google.golang.org/protobuf v1.28.0
+go: downloading github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7
+go: downloading github.com/peterbourgon/diskv v2.0.1+incompatible
+go: downloading github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
+go: downloading github.com/blang/semver/v4 v4.0.0
+go: downloading github.com/prometheus/client_golang v1.12.1
+go: downloading github.com/blang/semver v3.5.1+incompatible
+go: downloading github.com/prometheus/client_model v0.2.0
+go: downloading github.com/prometheus/procfs v0.7.3
+go: downloading github.com/prometheus/common v0.32.1
+go: downloading gopkg.in/inf.v0 v0.9.1
+go: downloading github.com/openshift/onsi-ginkgo/v2 v2.0.0-20221005160638-5fa9cd70cd8c
+go: downloading github.com/onsi/gomega v1.20.1
+go: downloading github.com/chai2010/gettext-go v1.0.2
+go: downloading github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d
+go: downloading github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6
+go: downloading github.com/pkg/profile v1.3.0
+go: downloading github.com/sirupsen/logrus v1.8.1
+go: downloading github.com/emicklei/go-restful/v3 v3.8.0
+go: downloading go.uber.org/atomic v1.7.0
+go: downloading go.uber.org/multierr v1.6.0
+go: downloading go.uber.org/goleak v1.2.0
+go: downloading golang.org/x/time v0.0.0-20220210224613-90d013bbcef8
+go: downloading golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+go: downloading github.com/onsi/ginkgo v1.11.0
+go: downloading github.com/json-iterator/go v1.1.12
+go: downloading google.golang.org/genproto v0.0.0-20220502173005-c8bf987b8c21
+go: downloading github.com/coreos/go-semver v0.3.0
+go: downloading github.com/benbjohnson/clock v1.1.0
+go: downloading github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e
+go: downloading gopkg.in/square/go-jose.v2 v2.2.2
+go: downloading gopkg.in/natefinch/lumberjack.v2 v2.0.0
+go: downloading go.opentelemetry.io/otel/sdk/export/metric v0.20.0
+go: downloading go.opentelemetry.io/proto/otlp v0.7.0
+go: downloading go.opentelemetry.io/otel/metric v0.20.0
+go: downloading go.opentelemetry.io/otel/sdk/metric v0.20.0
+go: downloading github.com/cyphar/filepath-securejoin v0.2.3
+go: downloading github.com/moby/sys/mountinfo v0.6.0
+go: downloading github.com/Azure/azure-sdk-for-go v55.0.0+incompatible
+go: downloading github.com/Azure/go-autorest/autorest/adal v0.9.20
+go: downloading github.com/Azure/go-autorest/autorest v0.11.27
+go: downloading github.com/Azure/go-autorest v14.2.0+incompatible
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/Azure/go-autorest/autorest/to v0.4.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.20.0
+go: downloading go.opentelemetry.io/contrib v0.20.0
+go: downloading github.com/aws/aws-sdk-go v1.38.49
+go: downloading github.com/opencontainers/selinux v1.10.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cri-api v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/golang/mock v1.6.0
+go: downloading github.com/docker/go-units v0.4.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful v0.20.0
+go: downloading github.com/container-storage-interface/spec v1.6.0
+go: downloading github.com/heketi/heketi v10.3.0+incompatible
+go: downloading github.com/libopenstorage/openstorage v1.0.0
+go: downloading sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.33
+go: downloading github.com/openshift/apiserver-library-go v0.0.0-20221118165437-6006085c7412
+go: downloading github.com/karrick/godirwalk v1.16.1
+go: downloading github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417
+go: downloading github.com/containerd/typeurl v1.0.2
+go: downloading github.com/mindprince/gonvml v0.0.0-20190828220739-9ebdce4bb989
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap v0.0.0-20230116233418-7dab57f2302e
+go: downloading github.com/robfig/cron/v3 v3.0.1
+go: downloading github.com/robfig/cron v1.2.0
+go: downloading gonum.org/v1/gonum v0.6.2
+go: downloading github.com/google/btree v1.0.1
+go: downloading github.com/beorn7/perks v1.0.1
+go: downloading github.com/cespare/xxhash/v2 v2.1.2
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20230116233418-7dab57f2302e
+go: downloading k8s.io/gengo v0.0.0-20211129171323-c02415ce4185
+go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369
+go: downloading github.com/go-openapi/jsonreference v0.19.5
+go: downloading github.com/go-openapi/swag v0.19.14
+go: downloading github.com/creack/pty v1.1.11
+go: downloading gotest.tools/v3 v3.0.3
+go: downloading github.com/NYTimes/gziphandler v1.1.1
+go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+go: downloading github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.20.0
+go: downloading github.com/kr/text v0.2.0
+go: downloading github.com/openshift/etcd/server/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7
+go: downloading github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+go: downloading github.com/BurntSushi/toml v0.3.1
+go: downloading github.com/modern-go/reflect2 v1.0.2
+go: downloading go.opentelemetry.io/otel/oteltest v0.20.0
+go: downloading github.com/grpc-ecosystem/grpc-gateway v1.16.0
+go: downloading github.com/Azure/go-autorest/autorest/date v0.3.0
+go: downloading github.com/Azure/go-autorest/logger v0.2.1
+go: downloading github.com/Azure/go-autorest/tracing v0.6.0
+go: downloading github.com/golang-jwt/jwt/v4 v4.2.0
+go: downloading github.com/Azure/go-autorest/autorest/mocks v0.4.2
+go: downloading github.com/felixge/httpsnoop v1.0.1
+go: downloading gopkg.in/gcfg.v1 v1.2.0
+go: downloading github.com/rubiojr/go-vhd v0.0.0-20200706105327-02e210299021
+go: downloading cloud.google.com/go v0.97.0
+go: downloading github.com/GoogleCloudPlatform/k8s-cloud-provider v1.18.1-0.20220218231025-f11817397a1b
+go: downloading google.golang.org/api v0.60.0
+go: downloading github.com/gophercloud/gophercloud v0.1.0
+go: downloading github.com/mitchellh/mapstructure v1.4.1
+go: downloading github.com/vmware/govmomi v0.20.3
+go: downloading github.com/docker/distribution v2.8.1+incompatible
+go: downloading github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
+go: downloading github.com/Microsoft/hcsshim v0.8.22
+go: downloading github.com/Microsoft/go-winio v0.4.17
+go: downloading github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
+go: downloading github.com/lithammer/dedent v1.1.0
+go: downloading github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible
+go: downloading github.com/godbus/dbus/v5 v5.0.6
+go: downloading github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
+go: downloading github.com/moby/spdystream v0.2.0
+go: downloading github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
+go: downloading github.com/elazarl/goproxy v0.0.0-20180725130230-947c36da3153
+go: downloading go.opentelemetry.io/contrib/propagators v0.20.0
+go: downloading github.com/form3tech-oss/jwt-go v3.2.3+incompatible
+go: downloading github.com/gorilla/mux v1.8.0
+go: downloading github.com/heketi/tests v0.0.0-20151005000721-f3775cbcefd6
+go: downloading github.com/urfave/negroni v1.0.0
+go: downloading github.com/go-ozzo/ozzo-validation v3.5.0+incompatible
+go: downloading github.com/mohae/deepcopy v0.0.0-20170603005431-491d3605edfb
+go: downloading github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
+go: downloading github.com/hashicorp/golang-lru v0.5.1
+go: downloading github.com/coreos/go-oidc v2.1.0+incompatible
+go: downloading github.com/containerd/ttrpc v1.0.2
+go: downloading github.com/opencontainers/go-digest v1.0.0
+go: downloading github.com/euank/go-kmsg-parser v2.0.0+incompatible
+go: downloading golang.org/x/exp v0.0.0-20210220032938-85be41e4509f
+go: downloading golang.org/x/tools v0.1.12
+go: downloading github.com/fatih/camelcase v1.0.0
+go: downloading github.com/PuerkitoBio/purell v1.1.1
+go: downloading github.com/go-openapi/jsonpointer v0.19.5
+go: downloading github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1
+go: downloading github.com/mailru/easyjson v0.7.6
+go: downloading github.com/go-errors/errors v1.0.1
+go: downloading google.golang.org/appengine v1.6.7
+go: downloading github.com/stretchr/objx v0.4.0
+go: downloading gopkg.in/warnings.v0 v0.1.1
+go: downloading github.com/soheilhy/cmux v0.1.5
+go: downloading github.com/tmc/grpc-websocket-proxy v0.0.0-20201229170055-e5319fda7802
+go: downloading go.etcd.io/bbolt v1.3.6
+go: downloading github.com/openshift/etcd/pkg/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7
+go: downloading github.com/boltdb/bolt v1.3.1
+go: downloading github.com/lpabon/godbc v0.1.1
+go: downloading github.com/auth0/go-jwt-middleware v1.0.1
+go: downloading github.com/google/cel-go v0.12.5
+go: downloading github.com/checkpoint-restore/go-criu/v5 v5.3.0
+go: downloading github.com/containerd/console v1.0.3
+go: downloading github.com/mrunalp/fileutils v0.5.0
+go: downloading github.com/vishvananda/netlink v1.1.0
+go: downloading github.com/pquerna/cachecontrol v0.1.0
+go: downloading github.com/docker/docker v20.10.17+incompatible
+go: downloading github.com/docker/go-connections v0.4.0
+go: downloading gonum.org/v1/netlib v0.0.0-20190331212654-76723241ea4e
+go: downloading github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+go: downloading github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
+go: downloading github.com/xlab/treeprint v1.1.0
+go: downloading github.com/jmespath/go-jmespath v0.4.0
+go: downloading github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
+go: downloading github.com/josharian/intern v1.0.0
+go: downloading github.com/gorilla/websocket v1.4.2
+go: downloading github.com/dustin/go-humanize v1.0.0
+go: downloading github.com/openshift/etcd/raft/v3 v3.5.1-0.20220707134052-31b6b2d9b4d7
+go: downloading github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2
+go: downloading github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+go: downloading github.com/googleapis/gax-go/v2 v2.1.1
+go: downloading go.opencensus.io v0.23.0
+go: downloading github.com/cilium/ebpf v0.7.0
+go: downloading github.com/Azure/go-autorest/autorest/validation v0.1.0
+go: downloading github.com/gofrs/uuid v4.0.0+incompatible
+go: downloading github.com/dnaeon/go-vcr v1.0.1
+go: downloading github.com/go-ldap/ldap/v3 v3.4.3
+go: downloading github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635
+go: downloading github.com/seccomp/libseccomp-golang v0.9.2-0.20220502022130-f33da4d89646
+go: downloading github.com/stoewer/go-strcase v1.2.0
+go: downloading github.com/vishvananda/netns v0.0.0-20200728191858-db3c7e526aae
+go: downloading golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
+go: downloading go.etcd.io/etcd/client/v2 v2.305.4
+go: downloading github.com/jmespath/go-jmespath/internal/testify v1.5.1
+go: downloading github.com/containerd/cgroups v1.0.1
+go: downloading github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e
+go: downloading github.com/go-asn1-ber/asn1-ber v1.5.4
+go: downloading github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220418222510-f25a4f6275ed
+go: downloading github.com/frankban/quicktest v1.11.3
+go: downloading github.com/sergi/go-diff v1.1.0
+go: downloading go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5
+go: downloading github.com/kr/pretty v0.2.1
+go: downloading github.com/opencontainers/image-spec v1.0.2
+go mod edit -require github.com/openshift/route-controller-manager@4d25295dbf9821107fa9adeb968220877b3331e6
+go mod edit -replace k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@67f1639c55b4849e760e7a36c43def64fe4c3f29
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20230202125525-67f1639c55b4
+go: downloading k8s.io/utils v0.0.0-20221107191617-1a15be271d1d
+go: downloading google.golang.org/protobuf v1.28.1
+go: downloading golang.org/x/text v0.6.0
+go mod edit -replace k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20230202125525-67f1639c55b4
+go mod edit -replace github.com/MakeNowJust/heredoc=Script@exited with error.
+Script exited with error.
+go: -replace=github.com/MakeNowJust/heredoc=Script@exited with error.
+Script exited with error.: invalid new version: "exited with error.\nScript exited with error."
+Script exited with error.
