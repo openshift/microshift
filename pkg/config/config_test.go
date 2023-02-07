@@ -326,7 +326,6 @@ func TestHideUnsupportedFlags(t *testing.T) {
 
 	flags.String("url", "", "version usage")
 	flags.String("v", "10", "v usage")
-	flags.String("log_dir", "/tmp", "log_dir usage")
 	flags.String("version", "", "version usage")
 
 	HideUnsupportedFlags(flags)
@@ -339,8 +338,5 @@ func TestHideUnsupportedFlags(t *testing.T) {
 	}
 	if !flags.Lookup("version").Hidden {
 		t.Errorf("version should be hidden")
-	}
-	if !flags.Lookup("log_dir").Hidden {
-		t.Errorf("log_dir should be hidden")
 	}
 }
