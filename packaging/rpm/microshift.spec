@@ -50,8 +50,8 @@ BuildRequires: make
 BuildRequires: policycoreutils
 BuildRequires: systemd
 
-Requires: cri-o
-Requires: cri-tools
+Requires: cri-o >= 1.25
+Requires: cri-tools >= 1.25
 Requires: iptables
 Requires: microshift-selinux
 Requires: microshift-networking
@@ -273,6 +273,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Feb 06 2023 Ricardo Noriega de Soto <rnoriega@rehat.com> 4.13.0
+- Require minimum CRIO version
+
 * Fri Jan 27 2023 Miguel Angel Ajo Pelayo <majopela@rehat.com> 4.12.0
 - Add firewalld systemd service override configuration to avoid access to iptables
 
