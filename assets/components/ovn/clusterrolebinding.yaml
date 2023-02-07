@@ -9,7 +9,7 @@ roleRef:
   name: openshift-ovn-kubernetes-node
 subjects:
 - kind: ServiceAccount
-  name: ovn-kubernetes-controller
+  name: ovn-kubernetes-node
   namespace: openshift-ovn-kubernetes
 
 ---
