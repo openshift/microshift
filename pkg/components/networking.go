@@ -7,7 +7,6 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/config/ovn"
-	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
@@ -46,10 +45,8 @@ func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		return err
 	}
 
-	if ovnConfig.OVSInit.DisableOVSInit {
-		if err := ovnConfig.ValidateOVSBridge(util.OVNGatewayInterface); err != nil {
-			return fmt.Errorf("failed to find ovn-kubernetes gateway bridge %s: %v", util.OVNGatewayInterface, err)
-		}
+	if err := ovnConfig.Validate(); err != nil {
+		return fmt.Errorf("failed to validate ovn-kubernetes configurations %v", err)
 	}
 
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {

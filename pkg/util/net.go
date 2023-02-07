@@ -34,7 +34,8 @@ import (
 
 const (
 	// Used to get gateway IP when default route doesn't exist
-	OVNGatewayInterface = "br-ex"
+	OVNGatewayInterface         = "br-ex"
+	OVNExternalGatewayInterface = "br-ex1"
 )
 
 func GetHostIP() (string, error) {

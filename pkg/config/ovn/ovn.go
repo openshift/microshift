@@ -6,12 +6,14 @@ import (
 	"net"
 	"os"
 
+	"github.com/openshift/microshift/pkg/util"
 	"gopkg.in/yaml.v2"
 	"k8s.io/klog/v2"
 )
 
 const (
-	ConfigFileName = "ovn.yaml"
+	ConfigFileName         = "ovn.yaml"
+	GeneveHeaderLengthIPv4 = 58
 )
 
 type OVNKubernetesConfig struct {
@@ -20,7 +22,7 @@ type OVNKubernetesConfig struct {
 	// MTU to use for the geneve tunnel interface.
 	// This must be 100 bytes smaller than the uplink mtu.
 	// Default is 1400.
-	MTU uint32 `json:"mtu,omitempty"`
+	MTU int `json:"mtu,omitempty"`
 }
 
 type OVSInit struct {
@@ -33,10 +35,58 @@ type OVSInit struct {
 	ExternalGatewayInterface string `json:"externalGatewayInterface,omitempty"`
 }
 
-func (o *OVNKubernetesConfig) ValidateOVSBridge(bridge string) error {
-	_, err := net.InterfaceByName(bridge)
+func (o *OVNKubernetesConfig) Validate() error {
+	// br-ex is required to run ovn-kubernetes
+	err := o.validateOVSBridge()
 	if err != nil {
 		return err
+	}
+	err = o.validateConfig()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// validateOVSBridge validates the existence of ovn-kubernetes br-ex bridge
+func (o *OVNKubernetesConfig) validateOVSBridge() error {
+	_, err := net.InterfaceByName(util.OVNGatewayInterface)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// validateConfig validates the user defined configuration in /etc/microshift/ovn.yaml
+func (o *OVNKubernetesConfig) validateConfig() error {
+	// validate gateway interfaces conf
+	if o.OVSInit.GatewayInterface != "" {
+		_, err := net.InterfaceByName(o.OVSInit.GatewayInterface)
+		if err != nil {
+			return fmt.Errorf("gateway interface %s not found", o.OVSInit.GatewayInterface)
+		}
+	}
+	if o.OVSInit.ExternalGatewayInterface != "" {
+		_, err := net.InterfaceByName(o.OVSInit.ExternalGatewayInterface)
+		if err != nil {
+			return fmt.Errorf("external gateway interface %s not found", o.OVSInit.ExternalGatewayInterface)
+		}
+		_, err = net.InterfaceByName(util.OVNExternalGatewayInterface)
+		if err != nil {
+			return fmt.Errorf("external gateway interface %s is configured, but external gateway bridge %s not found",
+				o.OVSInit.ExternalGatewayInterface, util.OVNExternalGatewayInterface)
+		}
+	}
+
+	// validate MTU conf
+	iface, err := net.InterfaceByName(util.OVNGatewayInterface)
+	if err != nil {
+		return err
+	}
+	requiredMTU := o.MTU + GeneveHeaderLengthIPv4
+
+	if iface.MTU < requiredMTU {
+		return fmt.Errorf("interface MTU (%d) is too small for specified overlay MTU (%d)", iface.MTU, requiredMTU)
 	}
 	return nil
 }
