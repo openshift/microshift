@@ -27,11 +27,13 @@ trap 'echo "Script exited with error."' ERR
 #debugging options
 #trap 'echo "#L$LINENO: $BASH_COMMAND" >&2' DEBUG
 #set -xo functrace
+#PS4='+ $LINENO  '
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 RELEASE_TAG_RX="(.+)-([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6})"
+GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
@@ -343,7 +345,7 @@ replace_using_component_commit() {
         echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
         go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
         go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
-        pseudoversion=$(grep_pseudoversion "$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")")
+        pseudoversion=$(grep_pseudoversion "$(get_replace_directive "$(pwd)/go.mod" "${modulepath}")")
         pseudoversions["${component}"]="${pseudoversion}"
     fi
 }
@@ -477,9 +479,9 @@ update_comment() {
     local modulepath=$1
     local newcomment=$2
 
-    oldline=$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")
+    oldline=$(get_replace_directive "$(pwd)/go.mod" "${modulepath}")
     newline="$(strip_comment "${oldline}") // ${newcomment}"
-    sed -i "s|${oldline}|${newline}|" "${REPOROOT}/go.mod"
+    sed -i "s|${oldline}|${newline}|" "$(pwd)/go.mod"
 }
 
 # Validate that ${component} is in the allowed list for the lookup, else exit
@@ -500,7 +502,7 @@ list_staging_repos() {
   )
 }
 
-# Updates MicroShift's go.mod file by updating each ReplaceDirective's
+# Updates current dir's go.mod file by updating each ReplaceDirective's
 # new modulepath-version with that of one of the embedded components.
 # The go.mod file needs to specify which component to take this data from
 # and this is driven from keywords added as comments after each line of
@@ -511,9 +513,7 @@ list_staging_repos() {
 #   // override [${reason}]  keep existing replacement
 # Note directives without keyword comment are skipped with a warning.
 update_go_mod() {
-    pushd "${STAGING_DIR}" >/dev/null
-
-    title "# Updating go.mod"
+    title "# Updating $(basename "$(pwd)")/go.mod"
 
     # Require updated versions of RCM and CPC
     require_using_component_commit github.com/openshift/cluster-policy-controller cluster-policy-controller
@@ -524,7 +524,7 @@ update_go_mod() {
     for repo in $(list_staging_repos); do
         go mod edit -require "k8s.io/${repo}@v0.0.0"
         update_modulepath_to_kubernetes_staging "k8s.io/${repo}"
-        if [ -z "$(get_comment "$(get_replace_directive "${REPOROOT}/go.mod" "k8s.io/${repo}")")" ]; then
+        if [ -z "$(get_comment "$(get_replace_directive "$(pwd)/go.mod" "k8s.io/${repo}")")" ]; then
             update_comment "k8s.io/${repo}" "staging kubernetes"
         fi
     done
@@ -532,7 +532,7 @@ update_go_mod() {
     # Update existing replace directives
     replaced_modulepaths=$(go mod edit -json | jq -r '.Replace // []' | jq -r '.[].Old.Path' | xargs)
     for modulepath in ${replaced_modulepaths}; do
-        current_replace_directive=$(get_replace_directive "${REPOROOT}/go.mod" "${modulepath}")
+        current_replace_directive=$(get_replace_directive "$(pwd)/go.mod" "${modulepath}")
         comment=$(get_comment "${current_replace_directive}")
         command=${comment%% *}
         arguments=${comment#${command} }
@@ -560,10 +560,16 @@ update_go_mod() {
     done
 
     go mod tidy
-
-    popd >/dev/null
 }
 
+# Updates go.mod file in dirs defined in GO_MOD_DIRS
+update_go_mods() {
+    for d in "${GO_MOD_DIRS[@]}"; do
+        pushd "${d}" > /dev/null
+        update_go_mod
+        popd > /dev/null
+    done
+ }
 
 # Regenerates OpenAPIs after patching the vendor directory
 regenerate_openapi() {
@@ -681,8 +687,8 @@ update_manifests() {
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
     # - assets/core/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
 
-    yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults; 
-        .enforce = "restricted" | .audit = "restricted" | .warn = "restricted" | 
+    yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults;
+        .enforce = "restricted" | .audit = "restricted" | .warn = "restricted" |
         .enforce-version = "latest" | .audit-version = "latest" | .warn-version = "latest")' "${REPOROOT}"/assets/controllers/kube-apiserver/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
@@ -705,7 +711,7 @@ update_manifests() {
     # 1) Adopt resource manifests
     #    Replace all openshift-dns operand manifests
     rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
-    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns || true 
+    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns || true
     rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
     cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver || true
     #    Restore the openshift-dns ConfigMap. It's content is the Corefile that the operator generates
@@ -981,24 +987,25 @@ rebase_to() {
     update_last_rebase "${release_image_amd64}" "${release_image_arm64}" "${lvms_operator_bundle_manifest}"
 
     update_changelog
+    update_go_mods
+    for dirpath in "${GO_MOD_DIRS[@]}"; do
+        dirname=$(basename "${dirpath}")
+        if [[ -n "$(git status -s "${dirpath}/go.mod" "${dirpath}/go.sum")" ]]; then
+            title "## Committing changes to ${dirname}/go.mod"
+            git add "${dirpath}/go.mod" "${dirpath}/go.sum"
+            git commit -m "update ${dirname}/go.mod"
 
-    update_go_mod
-    go mod tidy
-    if [[ -n "$(git status -s go.mod go.sum)" ]]; then
-        title "## Committing changes to go.mod"
-        git add go.mod go.sum
-        git commit -m "update go.mod"
-
-        title "## Updating vendor directory"
-        make vendor
-        if [[ -n "$(git status -s vendor)" ]]; then
-            title "## Commiting changes to vendor directory"
-            git add vendor
-            git commit -m "update vendoring"
+            title "## Updating ${dirname}/vendor directory"
+            (cd "${dirpath}" && make vendor)
+            if [[ -n "$(git status -s "${dirpath}/vendor")" ]]; then
+                title "## Commiting changes to ${dirname}/vendor directory"
+                git add "${dirpath}/vendor"
+                git commit -m "update ${dirname}/vendor"
+            fi
+        else
+            echo "No changes in ${dirname}/go.mod."
         fi
-    else
-        echo "No changes in go.mod."
-    fi
+    done
 
     update_images
     update_lvms_images
@@ -1060,7 +1067,7 @@ case "$command" in
         ;;
     changelog) update_changelog;;
     buildfiles) update_buildfiles;;
-    go.mod) update_go_mod;;
+    go.mod) update_go_mods;;
     generated-apis) regenerate_openapi;;
     images)
         update_images
