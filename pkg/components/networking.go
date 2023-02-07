@@ -75,7 +75,9 @@ func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		return err
 	}
 	extraParams := assets.RenderParams{
-		"OVNConfig": ovnConfig,
+		"OVNConfig":      ovnConfig,
+		"KubeconfigPath": kubeconfigPath,
+		"KubeconfigDir":  filepath.Dir(kubeconfigPath),
 	}
 	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
