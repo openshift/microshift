@@ -245,8 +245,10 @@ reposync -n -a ${BUILD_ARCH} -a noarch --download-path openshift-local \
     --repo=${OCP_REPO_NAME} \
     --repo=fast-datapath-for-rhel-8-${BUILD_ARCH}-rpms >/dev/null
 
-# Remove coreos packages to avoid conflicts
+# Remove 'coreos' packages to avoid conflicts
 find openshift-local -name \*coreos\* -exec rm -f {} \;
+# Remove 'microshift' packages to avoid overrides from the remote repository
+find openshift-local -name \*microshift\* -exec rm -f {} \;
 # Exit if no RPM packages were found
 if [ $(find openshift-local -name '*.rpm' | wc -l) -eq 0 ] ; then
     echo "No RPM packages were found at the '${OCP_REPO_NAME}' repository. Exiting..."
