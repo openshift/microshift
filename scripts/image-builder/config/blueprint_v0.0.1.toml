@@ -12,6 +12,14 @@ name = "microshift"
 version = "*"
 
 [[packages]]
+name = "microshift-greenboot"
+version = "*"
+
+[[packages]]
+name = "microshift-release-info"
+version = "*"
+
+[[packages]]
 name = "openshift-clients"
 version = "*"
 

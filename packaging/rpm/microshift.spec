@@ -30,7 +30,6 @@
    restorecon -R /var/lib/kubelet/pods; \
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount
 
-
 # Git related details
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
@@ -96,6 +95,14 @@ Requires: jq
 %description networking
 The microshift-networking package provides the networking components necessary for the MicroShift default CNI driver.
 
+
+%package greenboot
+Summary: Greenboot components for MicroShift
+BuildArch: noarch
+Requires: greenboot
+
+%description greenboot
+The microshift-greenboot package provides the Greenboot scripts used for verifying that MicroShift is up and running.
 
 %prep
 
@@ -192,6 +199,10 @@ mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 
+# Greenboot scripts
+install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/check/required.d
+install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
+
 %post
 
 %systemd_post microshift.service
@@ -235,7 +246,6 @@ systemctl enable --now --quiet openvswitch || true
 
 
 %files
-
 %license LICENSE
 %{_bindir}/microshift
 %{_bindir}/microshift-etcd
@@ -248,7 +258,6 @@ systemctl enable --now --quiet openvswitch || true
 %{_datadir}/microshift/release/release*.json
 
 %files selinux
-
 /var/run/kubelet
 /var/lib/kubelet/pods
 /var/run/secrets/kubernetes.io/serviceaccount
@@ -256,11 +265,8 @@ systemctl enable --now --quiet openvswitch || true
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
 %files networking
-
 %{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
-
 %{_sysconfdir}/NetworkManager/conf.d/microshift-nm.conf
-
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
@@ -270,9 +276,15 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/configure-ovs.sh
 %{_bindir}/configure-ovs-microshift.sh
 
+%files greenboot
+%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
+
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Feb 07 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
+- Initial implementation of MicroShift integration with greenboot
+
 * Mon Feb 06 2023 Ricardo Noriega de Soto <rnoriega@rehat.com> 4.13.0
 - Require minimum CRIO version
 

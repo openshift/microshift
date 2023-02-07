@@ -93,13 +93,18 @@ make srpm
 
 The artifacts of the build are located in the `_output/rpmbuild` directory.
 ```bash
-$ cd ~/microshift/ && find _output -name \*.rpm
-_output/rpmbuild/RPMS/x86_64/microshift-4.13.0_20221215165847_758c8b61-1.el8.x86_64.rpm
-_output/rpmbuild/RPMS/x86_64/microshift-networking-4.13.0_20221215165847_758c8b61-1.el8.x86_64.rpm
-_output/rpmbuild/RPMS/noarch/microshift-release-info-4.13.0_20221215165847_758c8b61-1.el8.noarch.rpm
-_output/rpmbuild/RPMS/noarch/microshift-selinux-4.13.0_20221215165847_758c8b61-1.el8.noarch.rpm
-_output/rpmbuild/SRPMS/microshift-4.13.0_20221215165847_758c8b61-1.el8.src.rpm
+$ cd ~/microshift/_output/rpmbuild && find . -name \*.rpm 
+./RPMS/x86_64/microshift-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.x86_64.rpm
+./RPMS/x86_64/microshift-networking-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.x86_64.rpm
+./RPMS/noarch/microshift-release-info-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.noarch.rpm
+./RPMS/noarch/microshift-selinux-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.noarch.rpm
+./RPMS/noarch/microshift-greenboot-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.noarch.rpm
+./SRPMS/microshift-4.13.0_0.nightly_2023_01_17_152326_20230124083515_fad43b98_dirty-1.el8.src.rpm
 ```
+
+> The `microshift-release-info` and `microshift-greenboot` RPM packages are optional.
+> See [Embedding MicroShift Container Images for Offline Deployments](./howto_offline_containers.md) and
+> [Integrating MicroShift with Greenboot](./greenboot.md) for more information.
 
 ## Run MicroShift Executable
 Log into the development virtual machine with the `microshift` user credentials.
