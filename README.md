@@ -50,6 +50,7 @@ To install, configure and run MicroShift, refer to the following documentation:
 - [AMQ Broker on MicroShift](./docs/howto_amq_broker.md)
 - [MicroShift Mitigation of System Configuration Changes](./docs/howto_sysconf_watch.md)
 - [Firewall Configuration](./docs/howto_firewall.md)
+- [Integrating MicroShift with Greenboot](./docs/greenboot.md)
 - [Debugging Tips](./docs/debugging_tips.md)
 - [Known Limitations](./docs/known_limitations.md)
 
@@ -66,7 +67,8 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [MicroShift Storage Plugin Overview](./docs/default_csi_plugin.md)
 - [MicroShift Network Plugin Overview](./docs/network/default_cni_plugin.md)
 - [MicroShift Host Networking Overview](./docs/network/host_networking.md)
-- [MicroShift Traffic flows Overview](./docs/network/ovn_kubernetes_traffic_flows.md)
+- [MicroShift Traffic Flows Overview](./docs/network/ovn_kubernetes_traffic_flows.md)
+- [Testing MicroShift Integration with Greenboot](./docs/greenboot_dev.md)
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
