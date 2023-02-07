@@ -538,9 +538,9 @@ func (c *Controller) sync(key queueKey) error {
 	}
 	if !newCanonicalHostnames.Equal(oldCanonicalHostnames) {
 		updatedIngress := ingress.DeepCopy()
-		ingressIngresses := make([]corev1.LoadBalancerIngress, 0, newCanonicalHostnames.Len())
+		ingressIngresses := make([]networkingv1.IngressLoadBalancerIngress, 0, newCanonicalHostnames.Len())
 		for _, canonicalHostname := range newCanonicalHostnames.List() {
-			ingressIngresses = append(ingressIngresses, corev1.LoadBalancerIngress{Hostname: canonicalHostname})
+			ingressIngresses = append(ingressIngresses, networkingv1.IngressLoadBalancerIngress{Hostname: canonicalHostname})
 		}
 		updatedIngress.Status.LoadBalancer.Ingress = ingressIngresses
 		if _, err := c.ingressClient.Ingresses(key.namespace).UpdateStatus(context.TODO(), updatedIngress, metav1.UpdateOptions{}); err != nil {
