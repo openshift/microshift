@@ -32,8 +32,8 @@ pullspec_release_lvms="registry.access.redhat.com/lvms4/lvms-operator-bundle:${r
 
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
-ORG=openshift \
-REPO=microshift \
+ORG=${ORG:-openshift} \
+REPO=${REPO:-microshift} \
 AMD64_RELEASE=${pullspec_release_amd64} \
 ARM64_RELEASE=${pullspec_release_arm64} \
 LVMS_RELEASE=${pullspec_release_lvms} \
