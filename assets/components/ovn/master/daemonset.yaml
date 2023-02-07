@@ -40,55 +40,8 @@ spec:
       # /etc/openvswitch -> /var/lib/ovn/etc - ovsdb data
       # /var/lib/openvswitch -> /var/lib/ovn/data - ovsdb pki state
       # /run/openvswitch -> tmpfs - sockets
+      # /env -> configmap env-overrides - debug overrides
       containers:
-      # ovn-controller: programs the vswitch with flows from the sbdb
-      - name: ovn-controller
-        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
-        command:
-        - /bin/bash
-        - -c
-        - |
-          set -e
-
-          exec ovn-controller unix:/var/run/openvswitch/db.sock -vfile:off \
-            --no-chdir --pidfile=/var/run/ovn/ovn-controller.pid \
-            --syslog-method="null" \
-            --log-file=/var/log/ovn/acl-audit-log.log \
-            -vFACILITY:"local0" \
-            -vconsole:"${OVN_LOG_LEVEL}" -vconsole:"acl_log:off" \
-            -vPATTERN:console:"%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
-            -vsyslog:"acl_log:info" \
-            -vfile:"acl_log:info"
-        securityContext:
-          privileged: true
-        env:
-        - name: OVN_LOG_LEVEL
-          value: info
-        - name: K8S_NODE
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        volumeMounts:
-        - mountPath: /run/openvswitch
-          name: run-openvswitch
-        - mountPath: /run/ovn/
-          name: run-ovn
-        - mountPath: /etc/openvswitch
-          name: etc-openvswitch-node
-        - mountPath: /etc/ovn/
-          name: etc-openvswitch-node
-        - mountPath: /var/lib/openvswitch
-          name: var-lib-openvswitch
-        - mountPath: /var/log/ovn
-          name: node-log
-        - mountPath: /dev/log
-          name: log-socket
-        resources:
-          requests:
-            cpu: 10m
-            memory: 10Mi
-        terminationMessagePolicy: FallbackToLogsOnError
-
       # ovn-northd: convert network objects in nbdb to flows in sbdb
       - name: northd
         image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
@@ -97,6 +50,11 @@ spec:
         - -c
         - |
           set -xem
+          if [[ -f /env/_master ]]; then
+            set -o allexport
+            source /env/_master
+            set +o allexport
+          fi
 
           quit() {
             echo "$(date -Iseconds) - stopping ovn-northd"
@@ -129,6 +87,8 @@ spec:
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /env
+          name: env-overrides
         resources:
           requests:
             cpu: 10m
@@ -143,6 +103,11 @@ spec:
         - -c
         - |
           set -xem
+          if [[ -f /env/_master ]]; then
+            set -o allexport
+            source /env/_master
+            set +o allexport
+          fi
 
           quit() {
             echo "$(date -Iseconds) - stopping nbdb"
@@ -248,6 +213,8 @@ spec:
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /env
+          name: env-overrides
         resources:
           requests:
             cpu: 10m
@@ -262,6 +229,11 @@ spec:
         - -c
         - |
           set -xem
+          if [[ -f /env/_master ]]; then
+            set -o allexport
+            source /env/_master
+            set +o allexport
+          fi
 
           quit() {
             echo "$(date -Iseconds) - stopping sbdb"
@@ -333,6 +305,8 @@ spec:
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /env
+          name: env-overrides
         resources:
           requests:
             cpu: 10m
@@ -347,6 +321,11 @@ spec:
         - -c
         - |
           set -xe
+          if [[ -f "/env/_master" ]]; then
+            set -o allexport
+            source "/env/_master"
+            set +o allexport
+          fi
 
           # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
           echo "$(date -Iseconds) - starting ovnkube-master, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
@@ -406,6 +385,10 @@ spec:
           name: run-ovn
         - mountPath: /run/ovnkube-config/
           name: ovnkube-config
+        - mountPath: {{.KubeconfigDir}}
+          name: kubeconfig
+        - mountPath: /env
+          name: env-overrides
         - mountPath: /etc/cni/net.d
           name: host-cni-netd
         - mountPath: /cni-bin-dir
@@ -458,9 +441,6 @@ spec:
       - name: run-ovn
         hostPath:
           path: /var/run/ovn
-      - name: var-lib-openvswitch
-        hostPath:
-          path: /var/lib/openvswitch/data
 
       # used for iptables wrapper scripts
       - name: host-slash
@@ -490,8 +470,15 @@ spec:
         hostPath:
           path: "/opt/cni/bin"
 
+      - name: kubeconfig
+        hostPath:
+          path: {{.KubeconfigDir}}
       - name: ovnkube-config
         configMap:
           name: ovnkube-config
+      - name: env-overrides
+        configMap:
+          name: env-overrides
+          optional: true
       tolerations:
       - operator: "Exists"

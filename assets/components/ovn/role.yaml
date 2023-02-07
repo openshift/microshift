@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: openshift-ovn-kubernetes-controller
+  name: openshift-ovn-kubernetes-node
   namespace: openshift-ovn-kubernetes
 rules:
 - apiGroups: [""]
@@ -10,9 +10,6 @@ rules:
   - configmaps
   verbs:
   - get
-  - create
-  - update
-  - patch
   - list
   - watch
 - apiGroups: [certificates.k8s.io]
@@ -23,6 +20,14 @@ rules:
     - delete
     - update
     - list
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: openshift-ovn-kubernetes-sbdb
+  namespace: openshift-ovn-kubernetes
+rules:
 - apiGroups: [""]
   resources:
   - endpoints
@@ -30,12 +35,3 @@ rules:
   - create
   - update
   - patch
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - create
-  - get
-  - list
-  - update

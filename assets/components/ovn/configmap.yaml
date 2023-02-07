@@ -17,7 +17,7 @@ data:
     [kubernetes]
     service-cidrs={{.ServiceCIDR}}
     ovn-config-namespace="openshift-ovn-kubernetes"
-    apiserver="https://127.0.0.1:6443"
+    kubeconfig={{.KubeconfigPath}}
     host-network-namespace="openshift-host-network"
     platform-type="BareMetal"
 

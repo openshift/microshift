@@ -1,0 +1,129 @@
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: ovnkube-node
+  namespace: openshift-ovn-kubernetes
+  annotations:
+    kubernetes.io/description: |
+      This daemonset launches the ovn-kubernetes per node networking components.
+spec:
+  selector:
+    matchLabels:
+      app: ovnkube-node
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: ovnkube-node
+        component: network
+        type: infra
+        openshift.io/component: network
+        kubernetes.io/os: "linux"
+    spec:
+      serviceAccountName: ovn-kubernetes-node
+      hostNetwork: true
+      dnsPolicy: Default
+      hostPID: true
+      priorityClassName: "system-node-critical"
+      # volumes in all containers:
+      # (container) -> (host)
+      # /etc/openvswitch -> /etc/openvswitch - ovsdb system id
+      # /var/lib/openvswitch -> /var/lib/openvswitch/data - ovsdb data
+      # /run/openvswitch -> tmpfs - ovsdb sockets
+      # /env -> configmap env-overrides - debug overrides
+      containers:
+      # ovn-controller: programs the vswitch with flows from the sbdb
+      - name: ovn-controller
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          if [[ -f "/env/${K8S_NODE}" ]]; then
+            set -o allexport
+            source "/env/${K8S_NODE}"
+            set +o allexport
+          fi
+
+          # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
+          echo "$(date -Iseconds) - starting ovn-controller, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
+
+          exec ovn-controller unix:/var/run/openvswitch/db.sock -vfile:off \
+            --no-chdir --pidfile=/var/run/ovn/ovn-controller.pid \
+            --syslog-method="null" \
+            --log-file=/var/log/ovn/acl-audit-log.log \
+            -vFACILITY:"local0" \
+            -vconsole:"${OVN_LOG_LEVEL}" -vconsole:"acl_log:off" \
+            -vPATTERN:console:"%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
+            -vsyslog:"acl_log:info" \
+            -vfile:"acl_log:info"
+        securityContext:
+          privileged: true
+        env:
+        - name: OVN_LOG_LEVEL
+          value: info
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - mountPath: /run/openvswitch
+          name: run-openvswitch
+        - mountPath: /run/ovn/
+          name: run-ovn
+        - mountPath: /etc/openvswitch
+          name: etc-openvswitch
+        - mountPath: /etc/ovn/
+          name: etc-openvswitch
+        - mountPath: /var/lib/openvswitch
+          name: var-lib-openvswitch
+        - mountPath: /env
+          name: env-overrides
+        - mountPath: /var/log/ovn
+          name: node-log
+        - mountPath: /dev/log
+          name: log-socket
+        terminationMessagePolicy: FallbackToLogsOnError
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+      nodeSelector:
+        kubernetes.io/os: "linux"
+      volumes:
+      - name: var-lib-openvswitch
+        hostPath:
+          path: /var/lib/openvswitch/data
+      - name: etc-openvswitch
+        hostPath:
+          path: /etc/openvswitch
+      - name: run-openvswitch
+        hostPath:
+          path: /var/run/openvswitch
+      - name: run-ovn
+        hostPath:
+          path: /var/run/ovn
+      # Used for placement of ACL audit logs
+      - name: node-log
+        hostPath:
+          path: /var/log/ovn
+      - name: log-socket
+        hostPath:
+          path: /dev/log
+      - name: env-overrides
+        configMap:
+          name: env-overrides
+          optional: true
+      tolerations:
+      - operator: "Exists"
