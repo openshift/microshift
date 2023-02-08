@@ -1,11 +1,11 @@
 diff --git a/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/server.go b/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/server.go
-index 1c2150f4..7e4fd48c 100644
+index 07e120d7..a4ef2fbb 100644
 --- a/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/server.go
 +++ b/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/server.go
-@@ -179,7 +179,7 @@ cluster's shared state through which all other components interact.`,
- 				return utilerrors.NewAggregate(errs)
+@@ -170,7 +170,7 @@ cluster's shared state through which all other components interact.`,
  			}
- 
+ 			// add feature enablement metrics
+ 			utilfeature.DefaultMutableFeatureGate.AddMetrics()
 -			return Run(completedOptions, genericapiserver.SetupSignalHandlerIgnoringFurtherSignals())
 +			return Run(completedOptions, cmd.Context().Done())
  		},

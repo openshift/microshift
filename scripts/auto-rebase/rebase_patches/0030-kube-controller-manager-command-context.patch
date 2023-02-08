@@ -1,5 +1,5 @@
 diff --git a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
-index 28caa49e..9045347f 100644
+index acb364d1..c281a5bf 100644
 --- a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
 +++ b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
 @@ -35,7 +35,6 @@ import (
@@ -10,9 +10,9 @@ index 28caa49e..9045347f 100644
  	"k8s.io/apiserver/pkg/server/healthz"
  	"k8s.io/apiserver/pkg/server/mux"
  	utilfeature "k8s.io/apiserver/pkg/util/feature"
-@@ -147,8 +146,7 @@ controller, and serviceaccounts controller.`,
- 				return err
- 			}
+@@ -154,8 +153,7 @@ controller, and serviceaccounts controller.`,
+ 			// add feature enablement metrics
+ 			utilfeature.DefaultMutableFeatureGate.AddMetrics()
  
 -			stopCh := server.SetupSignalHandler()
 -			return Run(c.Complete(), stopCh)

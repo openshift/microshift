@@ -8,7 +8,7 @@ Start by downloading one of the supported boot images for the `x86_64` or `aarch
 * CentOS 9 Stream from https://www.centos.org/download
 
 ### Creating VM
-Create a RHEL virtual machine with 2 cores, 4096MB of RAM and 50GB of storage. 
+Create a RHEL virtual machine with 2 cores, 4096MB of RAM and 50GB of storage.
 > Visual Studio Code may consume around 2GB of RAM. For running the IDE on the development virtual machine, it is recommended to allocate at least 6144MB of RAM in total.
 
 Install the `libvirt` packages and reboot your system to start the virtualization environment.
@@ -65,10 +65,23 @@ sudo dnf clean all -y
 sudo dnf update -y
 sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
+
+# Install go1.19
+# This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
+# /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
+GO_VER=1.19.4
+GO_ARCH=$([ "$(uname -i)" == "x86_64" ] && echo "amd64" || echo "arm64")
+curl -L -o "go${GO_VER}.linux-${GO_ARCH}.tar.gz" "https://go.dev/dl/go${GO_VER}.linux-${GO_ARCH}.tar.gz" &&
+    sudo rm -rf "/usr/local/go${GO_VER}" && \
+    sudo mkdir -p "/usr/local/go${GO_VER}" && \
+    sudo tar -C "/usr/local/go${GO_VER}" -xzf "go${GO_VER}.linux-${GO_ARCH}.tar.gz" --strip-components 1 && \
+    sudo rm -rfv /usr/local/bin/{go,gofmt} && \
+    sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/ && \
+    rm -rfv "go${GO_VER}.linux-${GO_ARCH}.tar.gz"
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
 
-## Build MicroShift 
+## Build MicroShift
 Log into the development virtual machine with the `microshift` user credentials.
 Clone the repository to be used for building various artifacts.
 ```bash
@@ -85,7 +98,7 @@ make
 The artifact of the build is the `microshift` executable file located in the `_output/bin` directory.
 
 ### RPM Packages
-Run make command with the `rpm` or `srpm` argument in the top-level directory. 
+Run make command with the `rpm` or `srpm` argument in the top-level directory.
 ```bash
 make rpm
 make srpm
@@ -118,7 +131,7 @@ When working with MicroShift based on a pre-release _minor_ version `Y` of OpenS
 
 ```bash
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-    
+
 sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos \
     --enable rhocp-4.12-for-rhel-${OSVERSION}-$(uname -i)-rpms \
@@ -227,7 +240,7 @@ watch oc get pods -A
 Run the following command to stop the MicroShift process and make sure it is shut down by examining its log file.
 ```bash
 sudo kill microshift && sleep 3
-tail -3 /tmp/microshift.log 
+tail -3 /tmp/microshift.log
 ```
 > If MicroShift is running as a service, it is necessary to execute the `sudo systemctl stop microshift` command to shut it down and review the output of the `journalctl -xu microshift` command to verify the service termination.
 
@@ -239,7 +252,7 @@ echo 1 | ~/microshift/hack/cleanup.sh
 > Run the `sudo /usr/bin/configure-ovs.sh` command to revert to the original network settings.
 
 ## Quick Development and Edge Testing Cycle
-During the development cycle, it is practical to build and run MicroShift executable as demonstrated in the [Build MicroShift](#build-microshift) and [Run MicroShift Executable](#run-microshift-executable) sections above. However, it is also necessary to have a convenient technique for testing the system in a setup resembling the production environment. Such an environment can be created in a virtual machine as described in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document. 
+During the development cycle, it is practical to build and run MicroShift executable as demonstrated in the [Build MicroShift](#build-microshift) and [Run MicroShift Executable](#run-microshift-executable) sections above. However, it is also necessary to have a convenient technique for testing the system in a setup resembling the production environment. Such an environment can be created in a virtual machine as described in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document.
 
 Once a RHEL for Edge virtual machine is created, it is running a version of MicroShift with the latest changes. When MicroShift code is updated and the executable file is rebuilt with the new changes, the updates need to be installed on RHEL for Edge OS.
 
@@ -254,7 +267,7 @@ sudo rpm-ostree usroverlay
 This would enable a development mode where users can overwrite `/usr` directory contents. Note that all changes will be discarded on reboot.
 
 ### Updating MicroShift Executable
-Log into the development virtual machine with the `microshift` user credentials. 
+Log into the development virtual machine with the `microshift` user credentials.
 
 It is recommended to update the local `/etc/hosts` to resolve the `microshift-edge` host name. Also, generate local SSH keys and allow the `microshift` user to run SSH commands without the password on the RHEL for Edge machine.
 ```bash

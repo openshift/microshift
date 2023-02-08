@@ -161,7 +161,7 @@ update_lvms_manifests() {
           "topolvm.io_logicalvolumes.yaml"
     )
     for m in "${manifests[@]}"; do
-        cp -v "${src}/${m}" "${dest}/" || return 1
+        cp "${src}/${m}" "${dest}/" || return 1
         set_openshift_storage_ns "${dest}/${m}"
     done
 }
