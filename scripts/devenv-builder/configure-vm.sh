@@ -131,7 +131,6 @@ if [ $BUILD_AND_INSTALL = true ] ; then
     sudo systemctl enable firewalld --now
     sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
     sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
-    sudo firewall-cmd --permanent --add-service=mdns
     sudo firewall-cmd --reload
 
     # Run MicroShift Executable > Configuring MicroShift
