@@ -97,6 +97,7 @@ func (s *EtcdService) Run() error {
 	}
 	<-e.Server.ReadyNotify()
 
+	// Wait to be stopped.
 	sigTerm := make(chan os.Signal, 1)
 	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
 	sig := <-sigTerm
