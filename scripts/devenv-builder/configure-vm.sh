@@ -55,6 +55,19 @@ sudo dnf update -y
 sudo dnf install -y git cockpit make golang jq selinux-policy-devel rpm-build bash-completion
 sudo systemctl enable --now cockpit.socket
 
+# Install go1.19
+# This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
+# /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
+GO_VER=1.19.4
+GO_ARCH=$([ "$(uname -i)" == "x86_64" ] && echo "amd64" || echo "arm64")
+curl -L -o "go${GO_VER}.linux-${GO_ARCH}.tar.gz" "https://go.dev/dl/go${GO_VER}.linux-${GO_ARCH}.tar.gz" &&
+    sudo rm -rf "/usr/local/go${GO_VER}" && \
+    sudo mkdir -p "/usr/local/go${GO_VER}" && \
+    sudo tar -C "/usr/local/go${GO_VER}" -xzf "go${GO_VER}.linux-${GO_ARCH}.tar.gz" --strip-components 1 && \
+    sudo rm -rfv /usr/local/bin/{go,gofmt} && \
+    sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/ && \
+    rm -rfv "go${GO_VER}.linux-${GO_ARCH}.tar.gz"
+
 YQ_URL=https://github.com/mikefarah/yq/releases/download/v4.26.1/yq_linux_$(go env GOARCH)
 YQ_HASH_amd64=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582
 YQ_HASH_arm64=8966f9698a9bc321eae6745ffc5129b5e1b509017d3f710ee0eccec4f5568766
@@ -85,7 +98,7 @@ fi
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#runtime-prerequisites
 if [ $RHEL_SUBSCRIPTION = true ] ; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-    
+
     sudo subscription-manager config --rhsm.manage_repos=1
     sudo subscription-manager repos \
         --enable rhocp-4.12-for-rhel-${OSVERSION}-$(uname -i)-rpms \
