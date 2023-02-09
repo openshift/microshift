@@ -8,6 +8,6 @@ roleRef:
   kind: Role
   name: topolvm-controller
 subjects:
-  - kind: ServiceAccount
-    name: topolvm-controller
-    namespace: openshift-storage
+- kind: ServiceAccount
+  name: topolvm-controller
+  namespace: openshift-storage

@@ -88,7 +88,7 @@ spec:
             - mountPath: /var/run/configmaps/service-ca
               name: service-ca-bundle
               readOnly: true
-          image: {{ .ReleaseImage.haproxy_router }}
+          image: '{{ .ReleaseImage.haproxy_router }}'
           ports:
             - name: http
               containerPort: 80

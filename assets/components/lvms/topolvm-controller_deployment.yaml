@@ -26,7 +26,7 @@ spec:
       - command:
         - /topolvm-controller
         - --cert-dir=/certs
-        image: {{ .ReleaseImage.topolvm_csi }}
+        image: '{{ .ReleaseImage.topolvm_csi }}'
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -69,7 +69,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: {{ .ReleaseImage.topolvm_csi_provisioner }}
+        image: '{{ .ReleaseImage.topolvm_csi_provisioner }}'
         name: csi-provisioner
         resources:
           requests:
@@ -80,7 +80,7 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.topolvm_csi_resizer }}
+        image: '{{ .ReleaseImage.topolvm_csi_resizer }}'
         name: csi-resizer
         resources:
           requests:
@@ -91,7 +91,7 @@ spec:
           name: socket-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.topolvm_csi_livenessprobe }}
+        image: '{{ .ReleaseImage.topolvm_csi_livenessprobe }}'
         name: liveness-probe
         resources:
           requests:
@@ -106,7 +106,7 @@ spec:
         - -c
         - openssl req -nodes -x509 -newkey rsa:4096 -subj '/DC=self_signed_certificate'
           -keyout /certs/tls.key -out /certs/tls.crt -days 3650
-        image: {{ .ReleaseImage.openssl }}
+        image: '{{ .ReleaseImage.openssl }}'
         name: self-signed-cert-generator
         resources: {}
         volumeMounts:

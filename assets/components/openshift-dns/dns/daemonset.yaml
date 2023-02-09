@@ -50,7 +50,7 @@ spec:
             requests:
               cpu: 50m
               memory: 70Mi
-          image: {{ .ReleaseImage.coredns }}
+          image: '{{ .ReleaseImage.coredns }}'
         - name: kube-rbac-proxy
           args:
             - --logtostderr
@@ -70,7 +70,7 @@ spec:
             - mountPath: /etc/tls/private
               name: metrics-tls
               readOnly: true
-          image: {{ .ReleaseImage.kube_rbac_proxy }}
+          image: '{{ .ReleaseImage.kube_rbac_proxy }}'
           imagePullPolicy: IfNotPresent
       dnsPolicy: Default
       volumes:

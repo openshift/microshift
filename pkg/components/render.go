@@ -54,7 +54,7 @@ func renderLvmdParams(l *lvmd.Lvmd) (assets.RenderParams, error) {
 	if err != nil {
 		return nil, err
 	}
-	r["lvmd"] = fmt.Sprintf(`%q`, b)
+	r["lvmd"] = string(b)
 	r["SocketName"] = l.SocketName
 	return r, nil
 }
