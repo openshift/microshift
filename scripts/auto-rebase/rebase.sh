@@ -828,7 +828,7 @@ rebase_to() {
         arm64_date="$(cat ${STAGING_DIR}/release_arm64.json | jq -r .config.created | cut -f1 -dT)"
     fi
 
-    rebase_branch="rebase-${ver_stream}+amd64-${amd64_date}+arm64-${arm64_date}"
+    rebase_branch="rebase-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
