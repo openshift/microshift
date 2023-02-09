@@ -256,8 +256,8 @@ To reduce a need of Pull Request synchronization between repositories, keep logi
 #### Getting release image build references
 
 Rebase procedure expects references to AMD64 and ARM64 OpenShift release images, and LVM Storage (LVMS) Operator bundle image.
-OpenShift release images can be obtained from Release Status pages: (AMD64)[https://amd64.ocp.releases.ci.openshift.org/] and (ARM64)[https://arm64.ocp.releases.ci.openshift.org/] - navigate to section with nightly image builds for version that is currently worked on and pick latest approved for both architectures.
-LVMS Operator bundle image can be obtained from (Red Hat's catalog)[https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79] - tag can be just appended to following URI: `registry.access.redhat.com/lvms4/lvms-operator-bundle:`.
+OpenShift release images can be obtained from Release Status pages: [AMD64](https://amd64.ocp.releases.ci.openshift.org/) and [ARM64](https://arm64.ocp.releases.ci.openshift.org/) - navigate to section with nightly image builds for version that is currently worked on and pick latest approved for both architectures.
+LVMS Operator bundle image can be obtained from [Red Hat's catalog](https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79) - tag can be just appended to following URI: `registry.access.redhat.com/lvms4/lvms-operator-bundle:`.
 These references are passed to `rebase.py` using `AMD64_RELEASE`, `ARM64_RELEASE`, and `LVMS_RELEASE` environment variables, for example:
 ```
 AMD64_RELEASE=registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-01-27-165107 \
