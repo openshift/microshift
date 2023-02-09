@@ -60,9 +60,7 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		cd = []string{
 			"components/lvms/csi-driver.yaml",
 		}
-		cm = []string{
-			"components/lvms/topolvm-lvmd-config_configmap_v1.yaml",
-		}
+		cm = "components/lvms/topolvm-lvmd-config_configmap_v1.yaml"
 		ds = []string{
 			"components/lvms/topolvm-node_daemonset.yaml",
 		}
@@ -120,7 +118,7 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyConfigMaps(cm, renderTemplate, lvmdRenderParams, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMapWithData(cm, map[string]string{"lvmd.yaml": lvmdRenderParams["lvmd"].(string)}, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}

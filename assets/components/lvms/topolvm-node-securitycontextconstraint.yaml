@@ -5,16 +5,16 @@ allowHostPID: true
 allowHostPorts: false
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
-allowedCapabilities:
+allowedCapabilities: []
 apiVersion: security.openshift.io/v1
-defaultAddCapabilities:
+defaultAddCapabilities: []
 fsGroup:
   type: RunAsAny
 groups: []
 kind: SecurityContextConstraints
 metadata:
   name: topolvm-node
-priority:
+priority: null
 readOnlyRootFilesystem: false
 requiredDropCapabilities: []
 runAsUser:
