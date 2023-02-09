@@ -81,6 +81,7 @@ ovsInit:
   externalGatewayInterface: eth1
 mtu: 1300
 ```
+**NOTE:* The change of `mtu` configuration in `ovn.yaml` requires node reboot to take effect. <br>
 
 ### Configuring Host
 
