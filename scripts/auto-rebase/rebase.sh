@@ -53,12 +53,19 @@ download_lvms_operator_bundle_manifest(){
     title 'downloading LVMS operator bundles'
     local LVMS_STAGING="${STAGING_DIR}/lvms"
 
+    authentication=""
+    if [ -f "${PULL_SECRET_FILE}" ]; then
+        authentication="--registry-config ${PULL_SECRET_FILE}"
+    else
+        >&2 echo "Warning: no pull secret found at ${PULL_SECRET_FILE}"
+    fi
+
     for arch in ${ARCHS[@]}; do
         mkdir -p "$LVMS_STAGING/$arch"
         pushd "$LVMS_STAGING/$arch" || return 1
         title "extracting lvms operator bundle for \"$arch\" architecture"
         oc image extract \
-            --registry-config "$PULL_SECRET_FILE" \
+            ${authentication} \
             --path /manifests/:. "$bundle_manifest" \
             --filter-by-os "$arch" \
             ||  {
