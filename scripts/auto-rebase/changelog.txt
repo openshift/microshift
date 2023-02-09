@@ -1,8 +1,5 @@
-# cluster-network-operator embedded-component ea6bb1159ffdb9fb68095f9f187ffa56bd1e745a to 68d109ac3b8605525c2aabc29789415bc302c9c7
-6c6c7d46b5a0699fd91e3b88cd50c73453066475 2022-11-29T12:47:22+00:00 HyperShift: Co-locate OVN-Kubernetes master pods with other hosted control plane components
-# ovn-kubernetes image-amd64 a2c90a409b4757b03c35d1e1f51da86135187e79 to e5fff733e0936d3ce30633f41d402da82e173186
-bb24879a99459bf689884292ac95ea2e22fe6bcd 2023-01-13T15:01:12-05:00 ovnkube-node: Existing management port check
-# ovn-kubernetes image-arm64 a2c90a409b4757b03c35d1e1f51da86135187e79 to abcf2f9980650a56dceac6466960197bf71b78c4
-011ae64c8ef4331fd83c8cbcdf226e53ac770085 2023-01-24T11:01:24+01:00 ovnkube-trace: run ovn-sbctl and ovn-trace with --no-leader-only
-bb24879a99459bf689884292ac95ea2e22fe6bcd 2023-01-13T15:01:12-05:00 ovnkube-node: Existing management port check
-34bfbfa3fe4f24d1e88eafa3f703930a92c62faa 2023-01-12T10:38:52-05:00 Correct the deletion of noHostSubnet nodes
+# ovn-kubernetes image-arm64 abcf2f9980650a56dceac6466960197bf71b78c4 to 63ad553a4e09d78d60e1034afbfb20d828b7596f
+d65b4240266a54d732d885ab34c5128c62c8565c 2023-02-02T17:09:57+08:00 generate more-pkgs with sed cmd in Dockerfile.base
+c1f1b9a9cf33fd42c890937d21f446b585e5a909 2023-02-02T08:47:42+08:00 Update base image of Dockerfile
+d72f55630e174e446df8780ad93e9a7fba52a76c 2023-01-31T10:45:58+00:00 Fixup egress fw tcs after modification of ACL match output
+8b5f7f16e88d71f899ccccec12b55d46de186e73 2023-01-31T10:45:47+00:00 Fix egress firewall cluster exclusion in dualstack
