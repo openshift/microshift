@@ -4,14 +4,14 @@ metadata:
   name: topolvm-controller
   namespace: openshift-storage
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - get
-      - watch
-      - list
-      - delete
-      - update
-      - create
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - watch
+  - list
+  - delete
+  - update
+  - create
