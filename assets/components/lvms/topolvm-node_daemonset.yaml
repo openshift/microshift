@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       annotations:
-        lvms.microshift.io/lvmd_config_sha256sum: "{{ Sha256sum .lvmd }}"
+        lvms.microshift.io/lvmd_config_sha256sum: '{{ Sha256sum .lvmd }}'
       labels:
         app.kubernetes.io/component: topolvm-node
         app.kubernetes.io/managed-by: lvms-operator
@@ -30,16 +30,16 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-                - key: "kubernetes.io/os"
-                  operator: In
-                  values:
-                    - "linux"
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
       containers:
       - command:
         - /lvmd
         - --config=/etc/topolvm/lvmd.yaml
         - --container=true
-        image: {{ .ReleaseImage.topolvm_csi }}
+        image: '{{ .ReleaseImage.topolvm_csi }}'
         name: lvmd
         resources:
           requests:
@@ -49,7 +49,7 @@ spec:
           privileged: true
           runAsUser: 0
         volumeMounts:
-        - mountPath: {{ Dir .SocketName  }}
+        - mountPath: '{{ Dir .SocketName  }}'
           name: lvmd-socket-dir
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
@@ -61,7 +61,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        image: {{ .ReleaseImage.topolvm_csi }}
+        image: '{{ .ReleaseImage.topolvm_csi }}'
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -85,7 +85,7 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: node-plugin-dir
-        - mountPath: {{ Dir .SocketName  }}
+        - mountPath: '{{ Dir .SocketName  }}'
           name: lvmd-socket-dir
         - mountPath: /var/lib/kubelet/pods
           mountPropagation: Bidirectional
@@ -96,7 +96,7 @@ spec:
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         - --kubelet-registration-path=/var/lib/kubelet/plugins/topolvm.io/node/csi-topolvm.sock
-        image: {{ .ReleaseImage.topolvm_csi_registrar }}
+        image: '{{ .ReleaseImage.topolvm_csi_registrar }}'
         lifecycle:
           preStop:
             exec:
@@ -116,7 +116,7 @@ spec:
           name: registration-dir
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
-        image: {{ .ReleaseImage.topolvm_csi_livenessprobe }}
+        image: '{{ .ReleaseImage.topolvm_csi_livenessprobe }}'
         name: liveness-probe
         resources:
           requests:
@@ -132,7 +132,7 @@ spec:
         - -c
         - until [ -f /etc/topolvm/lvmd.yaml ]; do echo waiting for lvmd config file;
           sleep 5; done
-        image: {{ .ReleaseImage.openssl }}
+        image: '{{ .ReleaseImage.openssl }}'
         name: file-checker
         resources: {}
         volumeMounts:
@@ -156,12 +156,12 @@ spec:
           path: /var/lib/kubelet/pods/
           type: DirectoryOrCreate
         name: pod-volumes-dir
-      - name: lvmd-config-dir
-        configMap:
-          name: lvmd
+      - configMap:
           items:
-            - key: lvmd.yaml
-              path: lvmd.yaml
+          - key: lvmd.yaml
+            path: lvmd.yaml
+          name: lvmd
+        name: lvmd-config-dir
       - emptyDir:
           medium: Memory
         name: lvmd-socket-dir

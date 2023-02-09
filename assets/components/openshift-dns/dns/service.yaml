@@ -14,7 +14,7 @@ spec:
       port: 9154
       targetPort: metrics
       protocol: TCP
-  clusterIP: {{.ClusterIP}}
+  clusterIP: '{{.ClusterIP}}'
   selector:
     dns.operator.openshift.io/daemonset-dns: default
 metadata:
