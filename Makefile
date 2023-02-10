@@ -115,10 +115,12 @@ etcd:
 					$(LD_FLAGS)\"" \
 		$(MAKE) -C etcd
 
-.PHONY: verify-images
-verify: verify-images
+.PHONY: verify-images verify-assets
+verify: verify-images verify-assets
 verify-images:
 	./scripts/verify_images.sh
+verify-assets:
+	./scripts/auto-rebase/presubmit.py
 
 ###############################
 # post install validate       #
