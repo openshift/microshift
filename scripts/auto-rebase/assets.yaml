@@ -107,6 +107,10 @@ assets:
         files:
           - file: daemonset.yaml
           - file: serviceaccount.yaml
+      - dir: node/
+        files:
+          - file: daemonset.yaml
+          - file: serviceaccount.yaml
 
   - dir: components/service-ca/
     src: service-ca-operator/bindata/v4.0.0/controller/
@@ -210,8 +214,8 @@ assets:
   - dir: release/
     ignore: "it contains files generated during rebase procedure"
     files:
-      - release-aarch64.json
-      - release-x86_64.json
+      - file: release-aarch64.json
+      - file: release-x86_64.json
 
   - dir: version/
     no_clean: True
