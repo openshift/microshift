@@ -45,6 +45,34 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+check_preconditions() {
+    if ! hash yq; then
+        title "Installing yq"
+
+        YQ_VER=4.26.1
+        YQ_HASH_amd64=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582
+        YQ_HASH_arm64=8966f9698a9bc321eae6745ffc5129b5e1b509017d3f710ee0eccec4f5568766
+        yq_hash="YQ_HASH_$(go env GOARCH)"
+        YQ_URL=https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_$(go env GOARCH)
+        echo -n "${!yq_hash} -" > /tmp/sum.txt
+        if ! (curl -Ls "${YQ_URL}" | tee /tmp/yq | sha256sum -c /tmp/sum.txt &>/dev/null); then
+            echo "ERROR: Expected file at ${YQ_URL} to have checksum ${!yq_hash} but instead got $(sha256sum </tmp/yq | cut -d' ' -f1)"
+            exit 1
+        fi
+        chmod +x /tmp/yq && sudo cp /tmp/yq /usr/bin/yq
+    fi
+
+    if ! hash python3; then
+        echo "ERROR: python3 is not present on the system - please install"
+        exit 1
+    fi
+
+    if ! python3 -c "import yaml"; then
+        echo "ERROR: missing python's yaml library - please install"
+        exit 1
+    fi
+}
+
 # LVMS is not integrated into the ocp release image, so the work flow does not fit with core component rebase.  LVMS'
 # operator bundle is the authoritative source for manifest and image digests.
 download_lvms_operator_bundle_manifest(){
@@ -961,6 +989,8 @@ usage() {
     echo "$(basename "$0") manifests                                                               Rebases the component manifests to the downloaded release"
     exit 1
 }
+
+check_preconditions
 
 command=${1:-help}
 case "$command" in
