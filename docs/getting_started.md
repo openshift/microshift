@@ -1,10 +1,9 @@
 # Getting Started with MicroShift
 
-> **Disclaimer**<br>
-> This page describes an opinionated setup to facilitate a quick bootstrap of MicroShift in a virtual environment for **experimentation-only** purpose.
-> See [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) for more information on setting up a production-grade system with MicroShift.
+Refer to the [MicroShift product documentation](https://access.redhat.com/documentation/en-us/red_hat_build_of_microshift) for how to install MicroShift on a machine running RHEL and how to build a RHEL for Edge image embedding MicroShift. If you do not yet have a RHEL subscription, you can get a [no-cost Red Hat Developer subscription](https:
+//developers.redhat.com/blog/2021/02/10/how-to-activate-your-no-cost-red-hat-enterprise-linux-subscription).
 
-The remainder of this document describes how to install a virtual machine running RHEL 8.7 operating system and an **experimental version** of MicroShift from the [@redhat-et/microshift-testing](https://copr.fedorainfracloud.org/coprs/g/redhat-et/microshift-testing) `copr` repository.
+The remainder of this document describes an optionated, non-production setup to facilitate experimentation with MicroShift in a virtual machine running the RHEL 8.7 operating system.
 
 ## Prerequisites
 
@@ -19,7 +18,7 @@ sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client
 ```
 
 Download the Red Hat Enterprise Linux 8.7 DVD ISO image for the x86_64 architecture from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site and copy the file to the `/var/lib/libvirt/images` directory.
-> Other architectures, versions or flavors of operating systems are not supported. For this setup, only use the RHEL 8.7 DVD image for x86_64 architecture.
+> Other architectures, versions or flavors of operating systems are not supported in this opinionated environment. For this setup, only use the RHEL 8.7 DVD image for the x86_64 architecture.
 
 Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~/.pull-secret.json` file.
 
@@ -79,10 +78,37 @@ ssh redhat@192.168.122.2 # when prompted, password is `redhat`
 
 The remaining commands are to be executed from within the virtual machine as the `redhat` user.
 
-Configure `CRI-O` to use the pull secret and start the MicroShift service.
+Register your RHEL machine and attach your subscriptions.
+
+```bash
+sudo subscription-manager register --auto-attach
+```
+
+Enable the MicroShift RPM repos and install MicroShift and the `oc` and `kubectl` clients.
+
+```bash
+sudo subscription-manager repos \
+    --enable rhocp-4.12-for-rhel-8-x86_64-rpms \
+    --enable fast-datapath-for-rhel-8-x86_64-rpms
+sudo dnf install -y microshift openshift-clients
+```
+
+Confgure the minimum required firewall rules.
+```bash
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
+sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+sudo firewall-cmd --reload
+```
+
+Configure `CRI-O` to use the pull secret.
 
 ```bash
 sudo cp ~redhat/.pull-secret.json /etc/crio/openshift-pull-secret
+```
+
+Start the MicroShift service.
+
+```bash
 sudo systemctl enable --now microshift.service
 ```
 
