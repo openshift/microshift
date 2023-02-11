@@ -132,43 +132,37 @@ update_lvms_images(){
     popd
 }
 
-set_openshift_storage_ns(){
-        local manifest="$1"
-        local tmp="$(oc create --dry-run=client --namespace=openshift-storage -o yaml -f "${manifest}")"
-        # assume that if the returned string is nil, it's because the resource is not namespaced.  Failures
-        # like file-not-found will still result in the script exiting with a non-zero code.
-        if [ -z "$(echo "$tmp" | tr -d '[:space:]' )" ]; then
-            return 0
-        fi
-        echo "$tmp" > "$manifest"
-}
-
 update_lvms_manifests() {
     local src="${STAGING_DIR}/lvms/amd64"
     local dest="${REPOROOT}/assets/components/lvms"
-    local manifests=(
+    local cluster_scoped_manifests=(
           "topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
           "topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-          "topolvm-controller_v1_serviceaccount.yaml"
           "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml"
           "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml"
-          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml"
           "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml"
           "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
+          "topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml"
+          "topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
+          "topolvm.io_logicalvolumes.yaml"
+    )
+    local namespace_scoped_manifests=(
+          "topolvm-controller_v1_serviceaccount.yaml"
+          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml"
+          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml"
           "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml"
           "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml"
           "topolvm-metrics_rbac.authorization.k8s.io_v1_role.yaml"
           "topolvm-metrics_rbac.authorization.k8s.io_v1_rolebinding.yaml"
           "topolvm-node-metrics_v1_service.yaml"
-          "topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-          "topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
           "topolvm-node_v1_serviceaccount.yaml"
-          "topolvm.io_logicalvolumes.yaml"
     )
-    for m in "${manifests[@]}"; do
+    for m in "${cluster_scoped_manifests[@]}"; do
         cp "${src}/${m}" "${dest}/" || return 1
-        set_openshift_storage_ns "${dest}/${m}"
+    done
+    for m in "${namespace_scoped_manifests[@]}"; do
+        cp "${src}/${m}" "${dest}/" || return 1
+        yq -i '.metadata.namespace = "openshift-storage"' "${dest}/${m}" || return 1
     done
 }
 
