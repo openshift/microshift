@@ -32,7 +32,6 @@ trap 'echo "Script exited with error."' ERR
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
-RELEASE_TAG_RX="(.+)-([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6})"
 GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd"
@@ -971,21 +970,9 @@ rebase_to() {
     download_release "${release_image_amd64}" "${release_image_arm64}"
     download_lvms_operator_bundle_manifest "$lvms_operator_bundle_manifest"
 
-    if [[ "${release_image_amd64#*:}" =~ ${RELEASE_TAG_RX} ]]; then
-        ver_stream=${BASH_REMATCH[1]}
-        amd64_date=${BASH_REMATCH[2]}
-    else
-        echo "Failed to match regex against amd64 image tag, using release file"
-        ver_stream="$(cat ${STAGING_DIR}/release_amd64.json | jq -r '.config.config.Labels["io.openshift.release"]')"
-        amd64_date="$(cat ${STAGING_DIR}/release_amd64.json | jq -r .config.created | cut -f1 -dT)"
-    fi
-
-    if [[ "${release_image_arm64#*:}" =~ ${RELEASE_TAG_RX} ]]; then
-        arm64_date="${BASH_REMATCH[2]}"
-    else
-        echo "Failed to match regex against arm64 image tag, using release file"
-        arm64_date="$(cat ${STAGING_DIR}/release_arm64.json | jq -r .config.created | cut -f1 -dT)"
-    fi
+    ver_stream="$(cat ${STAGING_DIR}/release_amd64.json | jq -r '.config.config.Labels["io.openshift.release"]')"
+    amd64_date="$(cat ${STAGING_DIR}/release_amd64.json | jq -r .config.created | cut -f1 -dT)"
+    arm64_date="$(cat ${STAGING_DIR}/release_arm64.json | jq -r .config.created | cut -f1 -dT)"
 
     rebase_branch="rebase-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
