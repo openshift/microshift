@@ -30,7 +30,7 @@ volgroup rhel pv.01
 logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
 
 # Configure ostree
-ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/ostree/repo --ref=rhel/8/REPLACE_BUILD_ARCH/edge
+ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/ostree/repo --ref=rhel/REPLACE_OSVERSION/REPLACE_BUILD_ARCH/edge
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 

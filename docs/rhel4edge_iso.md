@@ -3,7 +3,7 @@ To test MicroShift in a setup similar to the production environment, it is neces
 
 ## Build RHEL for Edge Installer ISO
 Log into the development virtual machine with the `microshift` user credentials.
-> The development machine configuration guidelines can be found in the [MicroShift Development Environment.x](./devenv_setup.md) document.
+> The development machine configuration guidelines can be found in the [MicroShift Development Environment](./devenv_setup.md) document.
 
 Follow the instructions in the [RPM Packages](./devenv_setup.md#rpm-packages) section to create MicroShift RPM packages.
 
@@ -134,7 +134,7 @@ EOF
 
 > **NOTE** <br>
 > Embedding container images in the generated ISO requires the functionality from the latest version of the `rpm-ostree` package.
-> This functionality will be available in the future releases of the RHEL 8 operating system.
+> This functionality will be available in the future releases of the RHEL 8 and 9 operating systems.
 
 To install the necessary functionality, run the following command to upgrade your system with the up-to-date `rpm-ostree` software from the `copr` repository.
 ```bash
@@ -168,7 +168,6 @@ sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-bui
 Run the following commands to create a virtual machine using the installer image.
 ```bash
 VMNAME="microshift-edge"
-VERSION=$(grep "^var Base =" ~/microshift/pkg/release/release.go | cut -d\" -f 2)
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
 virt-install \
@@ -179,7 +178,7 @@ virt-install \
     --network network=default,model=virtio \
     --os-type generic \
     --events on_reboot=restart \
-    --cdrom ./microshift-installer-${VERSION}.$(uname -i).iso \
+    --cdrom ./microshift-installer-*.$(uname -i).iso \
 "
 ```
 
