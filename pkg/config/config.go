@@ -61,11 +61,20 @@ type IngressConfig struct {
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
-	SubjectAltNames []string      `json:"subjectAltNames"`
-	NodeName        string        `json:"nodeName"`
-	NodeIP          string        `json:"nodeIP"`
-	BaseDomain      string        `json:"baseDomain"`
-	Cluster         ClusterConfig `json:"cluster"`
+	SubjectAltNames []string `json:"subjectAltNames"`
+	NodeName        string   `json:"nodeName"`
+	NodeIP          string   `json:"nodeIP"`
+	// Kube apiserver advertise address to work around the certificates issue
+	// when requiring external access using the node IP. This will turn into
+	// the IP configured in the endpoint slice for kubernetes service. Must be
+	// a reachable IP from pods. Defaults to service network CIDR first
+	// address.
+	KASAdvertiseAddress string `json:"kasAdvertiseAddress"`
+	// Determines if kube-apiserver controller should configure the
+	// KASAdvertiseAddress in the loopback interface. Automatically computed.
+	SkipKASInterface bool          `json:"-"`
+	BaseDomain       string        `json:"baseDomain"`
+	Cluster          ClusterConfig `json:"cluster"`
 
 	Ingress IngressConfig `json:"-"`
 }
@@ -120,6 +129,9 @@ type DNS struct {
 type ApiServer struct {
 	// SubjectAltNames added to API server certs
 	SubjectAltNames []string `json:"subjectAltNames"`
+	// AdvertiseAddress for endpoint slices in kubernetes service. Developer
+	// only parameter, wont show in show-config commands or docs.
+	AdvertiseAddress string `json:"advertiseAddress,omitempty"`
 }
 
 type Node struct {
@@ -365,6 +377,9 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	if len(config.ApiServer.SubjectAltNames) > 0 {
 		c.SubjectAltNames = config.ApiServer.SubjectAltNames
 	}
+	if len(config.ApiServer.AdvertiseAddress) > 0 {
+		c.KASAdvertiseAddress = config.ApiServer.AdvertiseAddress
+	}
 
 	return nil
 }
@@ -427,6 +442,21 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 	}
 	c.Cluster.DNS = clusterDNS
 
+	// If KAS advertise address is not configured then grab it from the service
+	// CIDR automatically.
+	if len(c.KASAdvertiseAddress) == 0 {
+		// unchecked error because this was done when getting cluster DNS
+		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
+		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
+		if err != nil {
+			return fmt.Errorf("error getting apiserver IP: %v", err)
+		}
+		c.KASAdvertiseAddress = apiServerServiceIP.String()
+		c.SkipKASInterface = false
+	} else {
+		c.SkipKASInterface = true
+	}
+
 	if len(c.SubjectAltNames) > 0 {
 		// Any entry in SubjectAltNames will be included in the external access certificates.
 		// Any of the hostnames and IPs (except the node IP) listed below conflicts with
@@ -457,12 +487,6 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 			}
 		}
 
-		// unchecked error because this was done when getting cluster DNS
-		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
-		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
-		if err != nil {
-			return fmt.Errorf("error getting apiserver IP: %v", err)
-		}
 		if stringSliceContains(
 			c.SubjectAltNames,
 			"kubernetes",
@@ -473,7 +497,7 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagS
 			"openshift.default",
 			"openshift.default.svc",
 			"openshift.default.svc.cluster.local",
-			apiServerServiceIP.String(),
+			c.KASAdvertiseAddress,
 		) {
 			return fmt.Errorf("subjectAltNames must not contain apiserver kubernetes service names or IPs")
 		}
