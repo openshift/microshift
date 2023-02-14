@@ -338,8 +338,6 @@ sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
 sudo firewall-cmd --reload
 ```
 
-**Known issue:** ovn-kubernetes makes use of iptable rules for some traffic flows (such as nodePort service), these iptable rules are generated and insertd by ovn-kubernetes ovnkube-master container, but can be removed by reloading firewall rules, which in turn break the traffic flows. To avoid such situation, make sure to execute firewall commands before starting ovn-kubernetes pods. If firewall commands have to be executed after ovn-kubernetes pods have started, manually restart the ovnkube-master pod to trigger reinsertion of ovn-kubernetes iptable rules.
-
 ## IP Forward
 
 Host network `sysctl net.ipv4.ip_forward` is automatically enabled by ovn-kubernetes ovnkube-master container when it starts. This is needed to forward incoming traffic to ovn network. For example, node port service from outside of cluster fails if `ip_forward` is disabled.
