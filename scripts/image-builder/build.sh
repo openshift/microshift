@@ -6,6 +6,7 @@ SCRIPTDIR=${ROOTDIR}/scripts/image-builder
 IMGNAME=microshift
 IMAGE_VERSION=$(jq -r '.release.base' assets/release/release-$(uname -i).json)
 BUILD_ARCH=$(uname -i)
+OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
 OSTREE_SERVER_NAME=127.0.0.1:8080
 LVM_SYSROOT_SIZE_MIN=10240
 LVM_SYSROOT_SIZE=${LVM_SYSROOT_SIZE_MIN}
@@ -119,10 +120,10 @@ build_image() {
         sudo podman run -d --name=${parent_blueprint}-server -p 8080:8080 localhost/${parent_blueprint}:${parent_version}
 
         title "Building ${image_type} for ${blueprint} v${version}, parent ${parent_blueprint} v${parent_version}"
-        buildid=$(sudo composer-cli compose start-ostree --ref rhel/8/${BUILD_ARCH}/edge --url http://localhost:8080/repo/ ${blueprint} ${image_type} | awk '{print $2}')
+        buildid=$(sudo composer-cli compose start-ostree --ref rhel/${OSVERSION}/${BUILD_ARCH}/edge --url http://localhost:8080/repo/ ${blueprint} ${image_type} | awk '{print $2}')
     else
         title "Building ${image_type} for ${blueprint} v${version}"
-        buildid=$(sudo composer-cli compose start-ostree --ref rhel/8/${BUILD_ARCH}/edge ${blueprint} ${image_type} | awk '{print $2}')
+        buildid=$(sudo composer-cli compose start-ostree --ref rhel/${OSVERSION}/${BUILD_ARCH}/edge ${blueprint} ${image_type} | awk '{print $2}')
     fi
 
     waitfor_image ${buildid}
@@ -240,10 +241,10 @@ createrepo microshift-local >/dev/null
 
 # Download openshift local RPM packages (noarch for python and selinux packages)
 rm -rf openshift-local 2>/dev/null || true
-OCP_REPO_NAME=rhocp-4.12-for-rhel-8-${BUILD_ARCH}-rpms
+OCP_REPO_NAME=rhocp-4.12-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms
 reposync -n -a ${BUILD_ARCH} -a noarch --download-path openshift-local \
     --repo=${OCP_REPO_NAME} \
-    --repo=fast-datapath-for-rhel-8-${BUILD_ARCH}-rpms >/dev/null
+    --repo=fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms >/dev/null
 
 # Remove 'coreos' packages to avoid conflicts
 find openshift-local -name \*coreos\* -exec rm -f {} \;
@@ -305,7 +306,7 @@ fi
 
 # Add container images
 if ${EMBED_CONTAINERS} ; then
-    # TODO: This should be removed when RHEL 8.x stream gets an up-to-date package
+    # TODO: This should be removed when RHEL 8/9 streams gets an up-to-date package
     # Include up-to-date ostree packages in the image builder to support whiteouts    
     repo_name=ostree-copr
     cat ${SCRIPTDIR}/config/${repo_name}.toml | sed "s;REPLACE_ARCH_VALUE;${BUILD_ARCH};g" > ${repo_name}.toml
@@ -337,6 +338,7 @@ cat "${SCRIPTDIR}/config/kickstart.ks.template" \
     | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
     | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat $OCP_PULL_SECRET_FILE | jq -c);g" \
     | sed "s;REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS;${AUTHORIZED_KEYS};g" \
+    | sed "s;REPLACE_OSVERSION;${OSVERSION};g" \
     | sed "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
     > kickstart.ks
 
