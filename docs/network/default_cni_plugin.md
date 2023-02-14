@@ -149,9 +149,3 @@ The specified interface will be added in OVS bridge `br-ex` which acts as gatewa
 microshift-ovs-init.service is able to setup one additional host interface for cluster ingress/egress traffic.
 This is done by specifying the `externalGatewayInterface` in the CNI config file `/etc/microshift/ovn.yaml`.
 The external gateway interface will be added in a second OVS bridge `br-ex1`. Cluster pod traffic destinated to additional host subnet will be routed through `br-ex1`.
-
-## Known Issues
-
-* Firewall reload flushes iptable rules
-
-ovn-kubernetes makes use of iptable rules for some traffic flows (such as nodePort service), these iptable rules are generated and inserted by ovn-kubernetes (ovnkube-master container), but can be removed by reloading firewall rules, which in turn breaks the traffic flows. To avoid such situation, make sure to execute firewall commands before starting ovn-kubernetes pods. If firewall commands have to be executed after ovn-kubernetes pods have started, manually restart the ovnkube-master pod to trigger the reinsertion of ovn-kubernetes iptable rules. See section [NodePort Service](#external-to-nodeportservice) for details on the iptable rules.
