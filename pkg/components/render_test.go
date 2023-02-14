@@ -46,7 +46,7 @@ func Test_renderLvmdParams(t *testing.T) {
 			wantErr: false,
 			want: assets.RenderParams{
 				"SocketName": "/run/lvmd/lvmd.socket",
-				"lvmd":       `"device-classes:\n- default: true\n  lvcreate-options: null\n  name: test\n  spare-gb: 5\n  stripe: null\n  stripe-size: \"\"\n  thin-pool: null\n  type: \"\"\n  volume-group: vg\nsocket-name: /run/lvmd/lvmd.socket\n"`,
+				"lvmd":       "device-classes:\n- default: true\n  lvcreate-options: null\n  name: test\n  spare-gb: 5\n  stripe: null\n  stripe-size: \"\"\n  thin-pool: null\n  type: \"\"\n  volume-group: vg\nsocket-name: /run/lvmd/lvmd.socket\n",
 			},
 		},
 	}
@@ -59,57 +59,6 @@ func Test_renderLvmdParams(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("renderLvmdParams() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_renderLvmdConfig(t *testing.T) {
-
-	defL := (&lvmd.Lvmd{}).WithDefaults()
-
-	cmWrap := func(d []byte) []byte {
-		base :=
-			`# Source: topolvm/templates/lvmd/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: lvmd
-  namespace: openshift-storage
-data:
-  lvmd.yaml:`
-		return []byte(fmt.Sprintf("%s %q\n", base, d))
-	}
-
-	type args struct {
-		tb   []byte
-		data assets.RenderParams
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "should render topolvm configMap",
-			args: args{
-				tb:   embedded.MustAsset("components/lvms/topolvm-lvmd-config_configmap_v1.yaml"),
-				data: func() assets.RenderParams { p, _ := renderLvmdParams(defL); return p }(),
-			},
-			want:    cmWrap([]byte("device-classes:\n- default: true\n  lvcreate-options: null\n  name: default\n  spare-gb: 0\n  stripe: null\n  stripe-size: \"\"\n  thin-pool: null\n  type: \"\"\n  volume-group: rhel\nsocket-name: /run/lvmd/lvmd.socket\n")),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := renderTemplate(tt.args.tb, tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("renderTemplate() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("renderTemplate() got = %s, want %s", string(got), string(tt.want))
 			}
 		})
 	}

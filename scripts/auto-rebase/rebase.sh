@@ -44,6 +44,34 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+check_preconditions() {
+    if ! hash yq; then
+        title "Installing yq"
+
+        YQ_VER=4.26.1
+        YQ_HASH_amd64=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582
+        YQ_HASH_arm64=8966f9698a9bc321eae6745ffc5129b5e1b509017d3f710ee0eccec4f5568766
+        yq_hash="YQ_HASH_$(go env GOARCH)"
+        YQ_URL=https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_$(go env GOARCH)
+        echo -n "${!yq_hash} -" > /tmp/sum.txt
+        if ! (curl -Ls "${YQ_URL}" | tee /tmp/yq | sha256sum -c /tmp/sum.txt &>/dev/null); then
+            echo "ERROR: Expected file at ${YQ_URL} to have checksum ${!yq_hash} but instead got $(sha256sum </tmp/yq | cut -d' ' -f1)"
+            exit 1
+        fi
+        chmod +x /tmp/yq && sudo cp /tmp/yq /usr/bin/yq
+    fi
+
+    if ! hash python3; then
+        echo "ERROR: python3 is not present on the system - please install"
+        exit 1
+    fi
+
+    if ! python3 -c "import yaml"; then
+        echo "ERROR: missing python's yaml library - please install"
+        exit 1
+    fi
+}
+
 # LVMS is not integrated into the ocp release image, so the work flow does not fit with core component rebase.  LVMS'
 # operator bundle is the authoritative source for manifest and image digests.
 download_lvms_operator_bundle_manifest(){
@@ -133,19 +161,9 @@ update_lvms_images(){
 }
 
 update_lvms_manifests() {
-    local src="${STAGING_DIR}/lvms/amd64"
+    title "Modifying LVMS manifests"
+
     local dest="${REPOROOT}/assets/components/lvms"
-    local cluster_scoped_manifests=(
-          "topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-          "topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-          "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-          "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-          "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-          "topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-          "topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-          "topolvm.io_logicalvolumes.yaml"
-    )
     local namespace_scoped_manifests=(
           "topolvm-controller_v1_serviceaccount.yaml"
           "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml"
@@ -157,11 +175,7 @@ update_lvms_manifests() {
           "topolvm-node-metrics_v1_service.yaml"
           "topolvm-node_v1_serviceaccount.yaml"
     )
-    for m in "${cluster_scoped_manifests[@]}"; do
-        cp "${src}/${m}" "${dest}/" || return 1
-    done
     for m in "${namespace_scoped_manifests[@]}"; do
-        cp "${src}/${m}" "${dest}/" || return 1
         yq -i '.metadata.namespace = "openshift-storage"' "${dest}/${m}" || return 1
     done
 }
@@ -638,142 +652,77 @@ update_images() {
 }
 
 
-# Updates embedded component manifests by gathering these from various places
-# in the staged repos and copying them into the asset directory.
-update_manifests() {
+copy_manifests() {
     if [ ! -f "${STAGING_DIR}/release_amd64.json" ]; then
         >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
         exit 1
     fi
+    title "Copying manifests"
+    "$REPOROOT/scripts/auto-rebase/handle-assets.py"
+}
+
+
+# Updates embedded component manifests by gathering these from various places
+# in the staged repos and copying them into the asset directory.
+update_openshift_manifests() {
     pushd "${STAGING_DIR}" >/dev/null
 
-    title "Rebasing manifests"
+    title "Modifying OpenShift manifests"
 
     #-- OpenShift control plane ---------------------------
-    # 1) Adopt resource manifests
-    #    Selectively copy in only those core manifests that MicroShift is already using
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ns.yaml" "${REPOROOT}"/assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-ns.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml
-
-    # Copy embedded RBAC manifests that belong to the Route Controller Manager
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrole.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ingress-to-route-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-informer-clusterrole.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-informer-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-leader-role.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-leader-rolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-sa.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-separate-sa-role.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-separate-sa-rolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-tokenreview-clusterrole.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-    cp "${STAGING_DIR}/cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/route-controller-tokenreview-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/route-controller-manager/
-
-    # Copy various manifests needed by core components
-    cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/config-overrides.yaml" "${REPOROOT}"/assets/controllers/kube-apiserver
-    cp "${STAGING_DIR}/cluster-kube-apiserver-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/controllers/kube-apiserver
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/config/defaultconfig.yaml" "${REPOROOT}"/assets/controllers/kube-controller-manager
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrole.yaml" "${REPOROOT}"/assets/controllers/kube-controller-manager
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/kube-controller-manager
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-openshift-infra.yaml" "${REPOROOT}"/assets/core
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/ns.yaml" "${REPOROOT}"/assets/controllers/kube-controller-manager/namespace-openshift-kube-controller-manager.yaml
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrole.yaml" "${REPOROOT}"/assets/controllers/cluster-policy-controller
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/cluster-policy-controller
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrole.yaml" "${REPOROOT}"/assets/controllers/cluster-policy-controller
-    cp "${STAGING_DIR}/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml" "${REPOROOT}"/assets/controllers/cluster-policy-controller
-    #    Selectively copy in only those CRD manifests that MicroShift is already using
-    cp "${REPOROOT}"/vendor/github.com/openshift/api/route/v1/route.crd.yaml "${REPOROOT}"/assets/crd
-    cp "${STAGING_DIR}/release-manifests/0000_03_security-openshift_01_scc.crd.yaml" "${REPOROOT}"/assets/crd
-    cp "${STAGING_DIR}/release-manifests/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml" "${REPOROOT}"/assets/crd
-    # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
-    # - assets/core/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
-
     yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults;
         .enforce = "restricted" | .audit = "restricted" | .warn = "restricted" |
         .enforce-version = "latest" | .audit-version = "latest" | .warn-version = "latest")' "${REPOROOT}"/assets/controllers/kube-apiserver/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.flex-volume-plugin-dir)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
-
-    #    Replace all SCC manifests and their CRs/CRBs
-    rm -f "${REPOROOT}"/assets/controllers/openshift-default-scc-manager/*.yaml
-    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_cr-*.yaml "${REPOROOT}"/assets/controllers/openshift-default-scc-manager || true
-    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_crb-*.yaml "${REPOROOT}"/assets/controllers/openshift-default-scc-manager || true
-    cp "${STAGING_DIR}"/release-manifests/0000_20_kube-apiserver-operator_00_scc-*.yaml "${REPOROOT}"/assets/controllers/openshift-default-scc-manager || true
-    # 2) Render operand manifest templates like the operator would
-    #    n/a
-    # 3) Make MicroShift-specific changes
-    #    Add the missing scc shortName
     yq -i '.spec.names.shortNames = ["scc"]' "${REPOROOT}"/assets/crd/0000_03_security-openshift_01_scc.crd.yaml
-    # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
-    #    n/a
 
     #-- openshift-dns -------------------------------------
-    # 1) Adopt resource manifests
-    #    Replace all openshift-dns operand manifests
-    rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
-    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns || true
-    rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
-    cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver || true
-    #    Restore the openshift-dns ConfigMap. It's content is the Corefile that the operator generates
-    #    in https://github.com/openshift/cluster-dns-operator/blob/master/pkg/operator/controller/controller_dns_configmap.go
-    git restore "${REPOROOT}"/assets/components/openshift-dns/dns/configmap.yaml
-    #    Restore the template for the node-resolver DaemonSet. It matches what's programmatically created by the operator
-    #    in https://github.com/openshift/cluster-dns-operator/blob/master/pkg/operator/controller/controller_dns_node_resolver_daemonset.go
-    git restore "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl
-    # 2) Render operand manifest templates like the operator would
+    # Render operand manifest templates like the operator would
     #    Render the DNS DaemonSet
     yq -i '.metadata += {"name": "dns-default", "namespace": "openshift-dns"}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.metadata += {"labels": {"dns.operator.openshift.io/owning-dns": "default"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.spec.selector = {"matchLabels": {"dns.operator.openshift.io/daemonset-dns": "default"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.spec.template.metadata += {"labels": {"dns.operator.openshift.io/daemonset-dns": "default"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
-    yq -i '.spec.template.spec.containers[0].image = "REPLACE_COREDNS_IMAGE"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
-    yq -i '.spec.template.spec.containers[1].image = "REPLACE_RBAC_PROXY_IMAGE"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.coredns }}"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.containers[1].image = "{{ .ReleaseImage.kube_rbac_proxy }}"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.spec.template.spec.nodeSelector = {"kubernetes.io/os": "linux"}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.spec.template.spec.volumes[0].configMap.name = "dns-default"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.spec.template.spec.volumes[1] += {"secret": {"defaultMode": 420, "secretName": "dns-default-metrics-tls"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.spec.template.spec.tolerations = [{"key": "node-role.kubernetes.io/master", "operator": "Exists"}]' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+
     #    Render the node-resolver script into the DaemonSet template
     export NODE_RESOLVER_SCRIPT="$(sed 's|^.|          &|' "${REPOROOT}"/assets/components/openshift-dns/node-resolver/update-node-resolver.sh)"
     envsubst < "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl > "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml
+
     #    Render the DNS service
     yq -i '.metadata += {"annotations": {"service.beta.openshift.io/serving-cert-secret-name": "dns-default-metrics-tls"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
     yq -i '.metadata += {"name": "dns-default", "namespace": "openshift-dns"}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
-    yq -i '.spec.clusterIP = "REPLACE_CLUSTER_IP"' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
+    yq -i '.spec.clusterIP = "{{.ClusterIP}}"' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
     yq -i '.spec.selector = {"dns.operator.openshift.io/daemonset-dns": "default"}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
     sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
     sed -i '/#.*automatically managed/d' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
-    # 3) Make MicroShift-specific changes
-    #    Fix missing imagePullPolicy
+
+    # Fix missing imagePullPolicy
     yq -i '.spec.template.spec.containers[1].imagePullPolicy = "IfNotPresent"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
-    #    Temporary workaround for MicroShift's missing config parameter when rendering this DaemonSet
+    # Temporary workaround for MicroShift's missing config parameter when rendering this DaemonSet
     sed -i 's|OPENSHIFT_MARKER=|NAMESERVER=${DNS_DEFAULT_SERVICE_HOST}\n          OPENSHIFT_MARKER=|' "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml
-    # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
-    sed -i 's|REPLACE_COREDNS_IMAGE|{{ .ReleaseImage.coredns }}|' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
-    sed -i 's|REPLACE_RBAC_PROXY_IMAGE|{{ .ReleaseImage.kube_rbac_proxy }}|' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
-    sed -i 's|REPLACE_CLUSTER_IP|{{.ClusterIP}}|' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
 
 
     #-- openshift-router ----------------------------------
-    # 1) Adopt resource manifests
-    #    Replace all openshift-router operand manifests
-    rm -f "${REPOROOT}"/assets/components/openshift-router/*
-    git restore "${REPOROOT}"/assets/components/openshift-router/serving-certificate.yaml
-    cp "${STAGING_DIR}"/cluster-ingress-operator/assets/router/* "${REPOROOT}"/assets/components/openshift-router 2>/dev/null || true
-    #    Restore the openshift-router's service-ca ConfigMap
-    git restore "${REPOROOT}"/assets/components/openshift-router/configmap.yaml
-    rm -r "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-    # 2) Render operand manifest templates like the operator would
+    # Render operand manifest templates like the operator would
     yq -i '.metadata += {"name": "router-default", "namespace": "openshift-ingress"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.metadata += {"labels": {"ingresscontroller.operator.openshift.io/owning-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.minReadySeconds = 30' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.selector = {"matchLabels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.metadata += {"labels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].image = "REPLACE_ROUTER_IMAGE"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.haproxy_router }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "STATS_PORT", "value": "1936"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "RELOAD_INTERVAL", "value": "5s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_ALLOW_WILDCARD_ROUTES", "value": "false"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CANONICAL_HOSTNAME", "value": "router-default.apps.REPLACE_CLUSTER_DOMAIN"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CANONICAL_HOSTNAME", "value": "router-default.apps.{{ .BaseDomain }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CIPHERS", "value": "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CIPHERSUITES", "value": "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DISABLE_HTTP2", "value": "true"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
@@ -809,7 +758,8 @@ update_manifests() {
     yq -i '.metadata += {"name": "router-internal-default", "namespace": "openshift-ingress"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
     yq -i '.spec.selector = {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
     sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
-    # 3) Make MicroShift-specific changes
+
+    # MicroShift-specific changes
     #    Set replica count to 1, as we're single-node.
     yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Set deployment strategy type to Recreate.
@@ -820,40 +770,24 @@ update_manifests() {
     #    Not use proxy protocol due to lack of load balancer support
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_USE_PROXY_PROTOCOL", "value": "false"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "GRACEFUL_SHUTDOWN_DELAY", "value": "1s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DOMAIN", "value": "apps.REPLACE_CLUSTER_DOMAIN"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
-    sed -i 's|REPLACE_CLUSTER_DOMAIN|{{ .BaseDomain }}|g' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    sed -i 's|REPLACE_ROUTER_IMAGE|{{ .ReleaseImage.haproxy_router }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DOMAIN", "value": "apps.{{ .BaseDomain }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
 
     #-- service-ca ----------------------------------------
-    # 1) Adopt resource manifests
-    #    Replace all service-ca operand manifests
-    rm -f "${REPOROOT}"/assets/components/service-ca/*
-    cp "${STAGING_DIR}"/service-ca-operator/bindata/v4.0.0/controller/* "${REPOROOT}"/assets/components/service-ca || true
-    # 2) Render operand manifest templates like the operator would
-    # TODO: Remov the following annotations once CPC correctly creates them automatically
+    # Render operand manifest templates like the operator would
+    # TODO: Remove the following annotations once CPC correctly creates them automatically
     yq -i '.spec.template.spec.containers[0].args = ["-v=2"]' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
-    yq -i '.spec.template.spec.volumes[0].secret.secretName = "REPLACE_TLS_SECRET"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
-    yq -i '.spec.template.spec.volumes[1].configMap.name = "REPLACE_CA_CONFIG_MAP"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+    yq -i '.spec.template.spec.volumes[0].secret.secretName = "{{.TLSSecret}}"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+    yq -i '.spec.template.spec.volumes[1].configMap.name = "{{.CAConfigMap}}"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.service_ca_operator }}"' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
     yq -i 'del(.metadata.labels)' "${REPOROOT}"/assets/components/service-ca/ns.yaml
-    # 3) Make MicroShift-specific changes
-    #    Set replica count to 1, as we're single-node.
+
+    # Make MicroShift-specific changes
     yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
-    # 4) Replace MicroShift templating vars (do this last, as yq trips over Go templates)
-    sed -i 's|\${IMAGE}|{{ .ReleaseImage.service_ca_operator }}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
-    sed -i 's|REPLACE_TLS_SECRET|{{.TLSSecret}}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
-    sed -i 's|REPLACE_CA_CONFIG_MAP|{{.CAConfigMap}}|' "${REPOROOT}"/assets/components/service-ca/deployment.yaml
 
     #-- ovn-kubernetes -----------------------------------
-    # 1) Adopt resource manifests
-    #    Replace all ovn-kubernetes manifests
-    #
     # NOTE: As long as MicroShift is still based on OpenShift releases that do not yet contain the MicroShift-specific
     #       manifests we're manually updating them as needed for now.
-    # TODO: Remove this comments and uncomment the lines below once we've rebased to 4.12.
-    #rm -rf "${REPOROOT}"/assets/components/ovn/*
-    #cp -r "${STAGING_DIR}"/cluster-network-operator/bindata/network/ovn-kubernetes/microshift/* "${REPOROOT}"/assets/components/ovn || true
+    # TODO: Enable in assets.yaml and handle modifications
 
     popd >/dev/null
 }
@@ -1006,7 +940,8 @@ rebase_to() {
         echo "No changes in component images."
     fi
 
-    update_manifests
+    copy_manifests
+    update_openshift_manifests
     update_lvms_manifests
     if [[ -n "$(git status -s assets)" ]]; then
         title "## Committing changes to assets and pkg/assets"
@@ -1042,6 +977,8 @@ usage() {
     exit 1
 }
 
+check_preconditions
+
 command=${1:-help}
 case "$command" in
     to)
@@ -1062,7 +999,8 @@ case "$command" in
         update_lvms_images
         ;;
     manifests)
-        update_manifests
+        copy_manifests
+        update_openshift_manifests
         update_lvms_manifests
         ;;
     *) usage;;
