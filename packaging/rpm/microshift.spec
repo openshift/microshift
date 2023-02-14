@@ -56,6 +56,7 @@ Requires: microshift-selinux
 Requires: microshift-networking
 Requires: conntrack-tools
 Requires: sos
+Requires: crun
 
 %{?systemd_requires}
 
