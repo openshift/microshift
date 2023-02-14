@@ -93,6 +93,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
 	}
 
 	m := servicemanager.NewServiceManager()
+	util.Must(m.AddService(node.NewNetworkConfiguration(cfg)))
 	util.Must(m.AddService(controllers.NewEtcd(cfg)))
 	util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
 	util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))

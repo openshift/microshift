@@ -71,8 +71,9 @@ type KubeAPIServer struct {
 	verbosity      int
 	configureErr   error // todo: report configuration errors immediately
 
-	masterURL     string
-	servingCAPath string
+	masterURL        string
+	servingCAPath    string
+	advertiseAddress string
 }
 
 func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
@@ -84,7 +85,7 @@ func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
 }
 
 func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
-func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd"} }
+func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd", "network-configuration"} }
 
 func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	s.verbosity = cfg.LogVLevel
@@ -112,10 +113,11 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 
 	s.masterURL = cfg.Cluster.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
+	s.advertiseAddress = cfg.KASAdvertiseAddress
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
-			"advertise-address": {cfg.NodeIP},
+			"advertise-address": {s.advertiseAddress},
 			"audit-policy-file": {microshiftDataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
 			"client-ca-file":    {clientCABundlePath},
 			"etcd-cafile":       {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
