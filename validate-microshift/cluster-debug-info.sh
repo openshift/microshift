@@ -15,13 +15,17 @@ to_run sudo crictl version
 to_run uname -a
 to_run cat /etc/*-release
 
-RESOURCES=(nodes configmaps deployments daemonsets statefulsets services routes replicasets persistentvolumeclaims persistentvolumes storageclasses endpoints endpointslices csidrivers csinodes)
+RESOURCES=(nodes pods configmaps deployments daemonsets statefulsets services routes replicasets persistentvolumeclaims persistentvolumes storageclasses endpoints endpointslices csidrivers csinodes)
 for resource in ${RESOURCES[*]}; do
     to_run oc get "${resource}" -A
-    to_run oc get "${resource}" -A -o yaml
 done
 
+to_run oc describe nodes
 to_run oc get events -A --sort-by=.metadata.creationTimestamp
+
+for resource in ${RESOURCES[*]}; do
+    to_run oc get "${resource}" -A -o yaml
+done
 
 TO_DESCRIBE=(deployments daemonsets statefulsets replicasets)
 for ns in $(kubectl get namespace -o jsonpath='{.items..metadata.name}'); do
