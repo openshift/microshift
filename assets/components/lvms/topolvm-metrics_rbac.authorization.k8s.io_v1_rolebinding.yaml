@@ -9,6 +9,6 @@ roleRef:
   kind: Role
   name: topolvm-metrics
 subjects:
-- kind: ServiceAccount
-  name: prometheus-k8s
-  namespace: openshift-monitoring
+  - kind: ServiceAccount
+    name: prometheus-k8s
+    namespace: openshift-monitoring
