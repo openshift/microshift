@@ -57,6 +57,7 @@ Requires: microshift-networking
 Requires: conntrack-tools
 Requires: sos
 Requires: crun
+Requires: openshift-clients
 
 %{?systemd_requires}
 
