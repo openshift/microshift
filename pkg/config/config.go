@@ -35,6 +35,8 @@ const (
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
 	defaultManifestDirLib = "/usr/lib/microshift/manifests"
+	// default DNS resolve file when systemd-resolved is used
+	DefaultSystemdResolvedFile = "/run/systemd/resolve/resolv.conf"
 )
 
 var (

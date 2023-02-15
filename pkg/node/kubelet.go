@@ -18,7 +18,6 @@ package node
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -132,8 +131,8 @@ serverTLSBootstrap: false #TODO`)
 
 	// Load real resolv.conf in case systemd-resolved is used
 	// https://github.com/coredns/coredns/blob/master/plugin/loop/README.md#troubleshooting-loops-in-kubernetes-clusters
-	if _, err := os.Stat("/run/systemd/resolve/resolv.conf"); !errors.Is(err, os.ErrNotExist) {
-		data = append(data, "\nresolvConf: /run/systemd/resolve/resolv.conf"...)
+	if _, err := os.Stat(config.DefaultSystemdResolvedFile); err == nil {
+		data = append(data, fmt.Sprintf("\nresolvConf: %s\n", config.DefaultSystemdResolvedFile)...)
 	}
 
 	path := filepath.Join(microshiftDataDir, "resources", "kubelet", "config", "config.yaml")
