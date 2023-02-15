@@ -3,8 +3,8 @@ set -e
 
 SCRIPT_NAME=$(basename $0)
 SCRIPT_PID=$$
-OCGET_CMD="microshift get"
-OCGET_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig --no-headers"
+OCGET_CMD="oc get --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
+OCGET_OPT="--no-headers"
 PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage)
 PODS_CT_LIST=(2                        1                    1                 2             2)
 
