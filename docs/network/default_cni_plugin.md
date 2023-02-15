@@ -126,6 +126,7 @@ A wide range of networking features are available with MicroShift and ovn-kubern
 * Dynamic node IP
 * Custom gateway interface
 * Second gateway interface
+* Blocking external access to NodePort service on specific host interfaces
 
 ### Network Policy
 
@@ -149,3 +150,39 @@ The specified interface will be added in OVS bridge `br-ex` which acts as gatewa
 microshift-ovs-init.service is able to setup one additional host interface for cluster ingress/egress traffic.
 This is done by specifying the `externalGatewayInterface` in the CNI config file `/etc/microshift/ovn.yaml`.
 The external gateway interface will be added in a second OVS bridge `br-ex1`. Cluster pod traffic destinated to additional host subnet will be routed through `br-ex1`.
+
+### Blocking external access to NodePort service on specific host interfaces
+
+ovn-kubernetes doesn't restrict the host interfaces where NodePort service can be accessed from outside MicroShift node. The following `nft` instructions block NodePort service on a specific host interface. <br>
+
+Insert a new rule in table `ip nat` chain `PREROUTING` to drop the packet with matching destination port and ip:
+```text
+(host)$ NODEPORT=30700
+(host)$ INTERFACE_IP=192.168.150.33
+(host)$ nft -a insert rule ip nat PREROUTING tcp dport $NODEPORT ip daddr $INTERFACE_IP drop
+```
+> Replace value of NODEPORT variable with the host port number assigned to kubernetes NodePort service <br>
+> Replace value of INTERFACE_IP with the IP address from the host interface where you'd like to block the NodePort service <br>
+
+List the newly added nftable rule:
+```text
+(host)$ nft -a list chain ip nat PREROUTING
+table ip nat {
+	chain PREROUTING { # handle 1
+		type nat hook prerouting priority dstnat; policy accept;
+		tcp dport 30700 ip daddr 192.168.150.33 drop # handle 134
+		counter packets 108 bytes 18074 jump OVN-KUBE-ETP # handle 116
+		counter packets 108 bytes 18074 jump OVN-KUBE-EXTERNALIP # handle 114
+		counter packets 108 bytes 18074 jump OVN-KUBE-NODEPORT # handle 112
+	}
+}
+```
+
+> Record the `handle` number of the newly added rule (for removal)<br>
+
+Remove the custom nftable rule:
+```text
+(host)$ nft -a delete rule ip nat PREROUTING handle 134
+```
+
+Use [nftables systemd service](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_firewalls_and_packet_filters/getting-started-with-nftables_firewall-packet-filters#automatically-loading-nftables-rules-when-the-system-boots_writing-and-executing-nftables-scripts) to persist and automatically load nftable rules when the system boots
