@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 	"k8s.io/klog/v2"
 )
 
 const (
-	ConfigFileName = "ovn.yaml"
+	ovnConfigFileName           = "ovn.yaml"
+	GeneveHeaderLengthIPv4      = 58
+	OVNGatewayInterface         = "br-ex"
+	OVNExternalGatewayInterface = "br-ex1"
 )
 
 type OVNKubernetesConfig struct {
@@ -20,7 +24,7 @@ type OVNKubernetesConfig struct {
 	// MTU to use for the geneve tunnel interface.
 	// This must be 100 bytes smaller than the uplink mtu.
 	// Default is 1400.
-	MTU uint32 `json:"mtu,omitempty"`
+	MTU int `json:"mtu,omitempty"`
 }
 
 type OVSInit struct {
@@ -33,10 +37,55 @@ type OVSInit struct {
 	ExternalGatewayInterface string `json:"externalGatewayInterface,omitempty"`
 }
 
-func (o *OVNKubernetesConfig) ValidateOVSBridge(bridge string) error {
-	_, err := net.InterfaceByName(bridge)
+func (o *OVNKubernetesConfig) Validate() error {
+	// br-ex is required to run ovn-kubernetes
+	err := o.validateOVSBridge()
 	if err != nil {
 		return err
+	}
+	err = o.validateConfig()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// validateOVSBridge validates the existence of ovn-kubernetes br-ex bridge
+func (o *OVNKubernetesConfig) validateOVSBridge() error {
+	_, err := net.InterfaceByName(OVNGatewayInterface)
+	return err
+}
+
+// validateConfig validates the user defined configuration in /etc/microshift/ovn.yaml
+func (o *OVNKubernetesConfig) validateConfig() error {
+	// validate gateway interfaces conf
+	if o.OVSInit.GatewayInterface != "" {
+		_, err := net.InterfaceByName(o.OVSInit.GatewayInterface)
+		if err != nil {
+			return fmt.Errorf("gateway interface %s not found", o.OVSInit.GatewayInterface)
+		}
+	}
+	if o.OVSInit.ExternalGatewayInterface != "" {
+		_, err := net.InterfaceByName(o.OVSInit.ExternalGatewayInterface)
+		if err != nil {
+			return fmt.Errorf("external gateway interface %s not found", o.OVSInit.ExternalGatewayInterface)
+		}
+		_, err = net.InterfaceByName(OVNExternalGatewayInterface)
+		if err != nil {
+			return fmt.Errorf("external gateway interface %s is configured, but external gateway bridge %s not found",
+				o.OVSInit.ExternalGatewayInterface, OVNExternalGatewayInterface)
+		}
+	}
+
+	// validate MTU conf
+	iface, err := net.InterfaceByName(OVNGatewayInterface)
+	if err != nil {
+		return err
+	}
+	requiredMTU := o.MTU + GeneveHeaderLengthIPv4
+
+	if iface.MTU < requiredMTU {
+		return fmt.Errorf("interface MTU (%d) is too small for specified overlay MTU (%d)", iface.MTU, requiredMTU)
 	}
 	return nil
 }
@@ -61,7 +110,8 @@ func newOVNKubernetesConfigFromFile(path string) (*OVNKubernetesConfig, error) {
 	return o, nil
 }
 
-func NewOVNKubernetesConfigFromFileOrDefault(path string) (*OVNKubernetesConfig, error) {
+func NewOVNKubernetesConfigFromFileOrDefault(dir string) (*OVNKubernetesConfig, error) {
+	path := filepath.Join(dir, ovnConfigFileName)
 	if _, err := os.Stat(path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			klog.Info("OVNKubernetes config file not found, assuming default values")
@@ -76,4 +126,21 @@ func NewOVNKubernetesConfigFromFileOrDefault(path string) (*OVNKubernetesConfig,
 		return o, nil
 	}
 	return nil, fmt.Errorf("getting OVNKubernetes config: %v", err)
+}
+
+func GetOVNGatewayIP() (string, error) {
+	iface, err := net.InterfaceByName(OVNGatewayInterface)
+	if err != nil {
+		return "", err
+	}
+	addrs, err := iface.Addrs()
+	if err != nil {
+		return "", err
+	}
+	for _, addr := range addrs {
+		ip := addr.(*net.IPNet).IP
+		// return the first available addr, ipv4 takes precedence in ip.String()
+		return ip.String(), nil
+	}
+	return "", fmt.Errorf("failed to get ovn gateway IP address")
 }
