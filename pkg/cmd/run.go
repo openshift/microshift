@@ -18,7 +18,6 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 
 	"k8s.io/klog/v2"
 )
@@ -27,17 +26,6 @@ const (
 	gracefulShutdownTimeout = 60
 )
 
-func addRunFlags(cmd *cobra.Command, cfg *config.MicroshiftConfig) {
-	flags := cmd.Flags()
-	// All other flags will be read after reading both config file and env vars.
-	flags.String("hostname-override", cfg.NodeName, "The name to use to identify this node instead of the hostname.")
-	flags.String("node-ip", cfg.NodeIP, "The IP address of the node.")
-	flags.String("cluster-cidr", cfg.Cluster.ClusterCIDR, "The IP range in CIDR notation for pods in the cluster.")
-	flags.String("service-cidr", cfg.Cluster.ServiceCIDR, "The IP range in CIDR notation for services in the cluster.")
-	flags.String("service-node-port-range", cfg.Cluster.ServiceNodePortRange, "The port range to reserve for services with NodePort visibility. This must not overlap with the ephemeral port range on nodes.")
-	flags.String("base-domain", cfg.BaseDomain, "The base domain for this cluster.")
-}
-
 func NewRunMicroshiftCommand() *cobra.Command {
 	cfg := config.NewMicroshiftConfig()
 
@@ -45,18 +33,16 @@ func NewRunMicroshiftCommand() *cobra.Command {
 		Use:   "run",
 		Short: "Run MicroShift",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return RunMicroshift(cfg, cmd.Flags())
+			return RunMicroshift(cfg)
 		},
 	}
-
-	addRunFlags(cmd, cfg)
 
 	return cmd
 }
 
-func RunMicroshift(cfg *config.MicroshiftConfig, flags *pflag.FlagSet) error {
-	if err := cfg.ReadAndValidate(config.GetConfigFile(), flags); err != nil {
-		klog.Fatalf("Error in reading and validating flags: %v", err)
+func RunMicroshift(cfg *config.MicroshiftConfig) error {
+	if err := cfg.ReadAndValidate(config.GetConfigFile()); err != nil {
+		klog.Fatalf("Error in reading or validating configuration: %v", err)
 	}
 
 	// fail early if we don't have enough privileges

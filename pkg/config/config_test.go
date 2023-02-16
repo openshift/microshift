@@ -4,18 +4,14 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strconv"
-	"strings"
 	"testing"
 
-	"github.com/spf13/pflag"
+	"sigs.k8s.io/yaml"
 )
 
 const (
-	testConfigFile                   = "../../test/config.yaml"
-	testConfigFileBadSubjectAltNames = "../../test/config_bad_subjectaltnames.yaml"
-	IS_DEFAULT_NODENAME              = true
-	IS_NOT_DEFAULT_NODENAME          = false
+	IS_DEFAULT_NODENAME     = true
+	IS_NOT_DEFAULT_NODENAME = false
 )
 
 func setupSuiteDataDir(t *testing.T) func() {
@@ -29,40 +25,45 @@ func setupSuiteDataDir(t *testing.T) func() {
 	}
 }
 
-// tests to make sure that the config file is parsed correctly
 func TestConfigFile(t *testing.T) {
-
 	var ttests = []struct {
-		configFile string
-		err        error
-	}{
-		{testConfigFile, nil},
-		{testConfigFileBadSubjectAltNames, nil},
-	}
-
-	for _, tt := range ttests {
-		config := NewMicroshiftConfig()
-		err := config.ReadFromConfigFile(tt.configFile)
-		if (err != nil) != (tt.err != nil) {
-			t.Errorf("ReadFromConfigFile() error = %v, wantErr %v", err, tt.err)
-		}
-	}
-}
-
-// test that MicroShift is able to properly read the config from the commandline
-func TestCommandLineConfig(t *testing.T) {
-
-	var ttests = []struct {
-		config *MicroshiftConfig
-		err    error
+		config    Config
+		expected  MicroshiftConfig
+		expectErr bool
 	}{
 		{
-			config: &MicroshiftConfig{
-				LogVLevel:       4,
-				SubjectAltNames: []string{"node1"},
-				NodeName:        "node1",
-				NodeIP:          "1.2.3.4",
-				BaseDomain:      "example.com",
+			config: Config{
+				DNS: DNS{
+					BaseDomain: "example.com",
+				},
+				Network: Network{
+					ClusterNetwork: []ClusterNetworkEntry{
+						{
+							CIDR: "10.20.30.40/16",
+						},
+					},
+					ServiceNetwork:       []string{"40.30.20.10/16"},
+					ServiceNodePortRange: "1024-32767",
+				},
+				Node: Node{
+					HostnameOverride: "node1",
+					NodeIP:           "1.2.3.4",
+				},
+				ApiServer: ApiServer{
+					SubjectAltNames:  []string{"node1", "node2"},
+					AdvertiseAddress: "6.7.8.9",
+				},
+				Debugging: Debugging{
+					LogLevel: "Debug",
+				},
+			},
+			expected: MicroshiftConfig{
+				LogVLevel:           4,
+				SubjectAltNames:     []string{"node1", "node2"},
+				NodeName:            "node1",
+				NodeIP:              "1.2.3.4",
+				KASAdvertiseAddress: "6.7.8.9",
+				BaseDomain:          "example.com",
 				Cluster: ClusterConfig{
 					URL:                  "https://127.0.0.1:6443",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -70,173 +71,144 @@ func TestCommandLineConfig(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 				},
 			},
-			err: nil,
+			expectErr: false,
 		},
 	}
-
 	for _, tt := range ttests {
-		config := NewMicroshiftConfig()
-
-		flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		// all other flags unbound (looked up by name) and defaulted
-		flags.Int("v", config.LogVLevel, "")
-		flags.StringSlice("subject-alt-names", config.SubjectAltNames, "")
-		flags.String("hostname-override", config.NodeName, "")
-		flags.String("node-ip", config.NodeIP, "")
-		flags.String("cluster-cidr", config.Cluster.ClusterCIDR, "")
-		flags.String("service-cidr", config.Cluster.ServiceCIDR, "")
-		flags.String("service-node-port-range", config.Cluster.ServiceNodePortRange, "")
-		flags.String("base-domain", config.BaseDomain, "")
-
-		// parse the flags
-		var err error
-		err = flags.Parse([]string{
-			"--v=" + strconv.Itoa(tt.config.LogVLevel),
-			"--subject-alt-names=" + strings.Join(tt.config.SubjectAltNames, ","),
-			"--hostname-override=" + tt.config.NodeName,
-			"--node-ip=" + tt.config.NodeIP,
-			"--cluster-cidr=" + tt.config.Cluster.ClusterCIDR,
-			"--service-cidr=" + tt.config.Cluster.ServiceCIDR,
-			"--service-node-port-range=" + tt.config.Cluster.ServiceNodePortRange,
-			"--base-domain=" + tt.config.BaseDomain,
+		t.Run("", func(t *testing.T) {
+			f, err := os.CreateTemp("", "test")
+			if err != nil {
+				t.Errorf("unable to create temp file: %v", err)
+			}
+			defer os.Remove(f.Name())
+			d, err := yaml.Marshal(&tt.config)
+			if err != nil {
+				t.Errorf("unable to marshal configuration: %v", err)
+			}
+			_, err = f.Write(d)
+			if err != nil {
+				t.Errorf("unable to write to file: %v", err)
+			}
+			config := NewMicroshiftConfig()
+			err = config.ReadFromConfigFile(f.Name())
+			if tt.expectErr && err == nil {
+				t.Fatal("Expecting error and received nothing")
+			}
+			if !tt.expectErr && err != nil {
+				t.Fatalf("Not expecting error and received: %v", err)
+			}
+			if !tt.expectErr && !reflect.DeepEqual(*config, tt.expected) {
+				t.Errorf("ReadFromConfigFile() mismatch. got=%v, want=%v", *config, tt.expected)
+			}
 		})
-		if err != nil {
-			t.Errorf("failed to parse command line flags: %s", err)
-		}
-
-		// validate that we can read the config from the commandline
-		err = config.ReadFromCmdLine(flags)
-		if (err != nil) != (tt.err != nil) {
-			t.Errorf("failed to read config from commandline: %s", err)
-		}
-		if err == nil && !reflect.DeepEqual(config, tt.config) {
-			t.Errorf("struct read from commandline does not match: expected %+v, got %+v", tt.config, config)
-		}
 	}
 }
 
-// test to verify that MicroShift is able to populate the config from the environment variables
-func TestEnvironmentVariableConfig(t *testing.T) {
-	// set up the table tests using the above environment variables & the MicroShift config struct
-	var ttests = []struct {
-		desiredMicroShiftConfig *MicroshiftConfig
-		err                     error
-		envList                 []struct {
-			varName string
-			value   string
-		}
-	}{
-		{
-			desiredMicroShiftConfig: &MicroshiftConfig{
-				LogVLevel:       23,
-				SubjectAltNames: []string{"node1", "node2"},
-				NodeName:        "node1",
-				NodeIP:          "1.2.3.4",
-				BaseDomain:      "example.com",
-				Cluster: ClusterConfig{
-					URL:                  "https://cluster.com:4343/endpoint",
-					ClusterCIDR:          "10.20.30.40/16",
-					ServiceCIDR:          "40.30.20.10/16",
-					ServiceNodePortRange: "1024-32767",
-				},
-			},
-			err: nil,
-			envList: []struct {
-				varName string
-				value   string
-			}{
-				{"MICROSHIFT_LOGVLEVEL", "23"},
-				{"MICROSHIFT_NODENAME", "node1"},
-				{"MICROSHIFT_SUBJECTALTNAMES", "node1,node2"},
-				{"MICROSHIFT_NODEIP", "1.2.3.4"},
-				{"MICROSHIFT_BASEDOMAIN", "example.com"},
-				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
-				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
-				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
-				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
-			},
-		},
-		{
-			desiredMicroShiftConfig: &MicroshiftConfig{
-				LogVLevel:       23,
-				SubjectAltNames: []string{"node1"},
-				NodeName:        "node1",
-				NodeIP:          "1.2.3.4",
-				BaseDomain:      "another.example.com",
-				Cluster: ClusterConfig{
-					URL:                  "https://cluster.com:4343/endpoint",
-					ClusterCIDR:          "10.20.30.40/16",
-					ServiceCIDR:          "40.30.20.10/16",
-					ServiceNodePortRange: "1024-32767",
-				},
-			},
-			err: nil,
-			envList: []struct {
-				varName string
-				value   string
-			}{
-				{"MICROSHIFT_LOGVLEVEL", "23"},
-				{"MICROSHIFT_NODENAME", "node1"},
-				{"MICROSHIFT_SUBJECTALTNAMES", "node1"},
-				{"MICROSHIFT_NODEIP", "1.2.3.4"},
-				{"MICROSHIFT_BASEDOMAIN", "another.example.com"},
-				{"MICROSHIFT_CLUSTER_URL", "https://cluster.com:4343/endpoint"},
-				{"MICROSHIFT_CLUSTER_CLUSTERCIDR", "10.20.30.40/16"},
-				{"MICROSHIFT_CLUSTER_SERVICECIDR", "40.30.20.10/16"},
-				{"MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE", "1024-32767"},
-			},
-		},
-	}
-
-	for _, tt := range ttests {
-		// first set the values
-		for _, env := range tt.envList {
-			os.Setenv(env.varName, env.value)
-			defer os.Unsetenv(env.varName)
-		}
-		// then read the values
-		microShiftconfig := NewMicroshiftConfig()
-		err := microShiftconfig.ReadFromEnv()
-		if (err != nil && tt.err == nil) || (err == nil && tt.err != nil) {
-			t.Errorf("failed to read from env, expected error: %v, got: %v", tt.err, err)
-		}
-		if (err == nil && !reflect.DeepEqual(microShiftconfig, tt.desiredMicroShiftConfig)) ||
-			(err != nil && reflect.DeepEqual(microShiftconfig, tt.desiredMicroShiftConfig)) {
-			t.Errorf("structs don't match up, expected: %+v, got: %+v", tt.desiredMicroShiftConfig, microShiftconfig)
-		}
-	}
-}
-
-// test the MicroshiftConfig.ReadAndValidate function to verify that it configures MicroshiftConfig with a valid flagset
+// test the MicroshiftConfig.ReadAndValidate function to verify that it configures MicroshiftConfig from
+// a configuration file.
 func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
-	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
-	flags.Int("v", 0, "")
-
 	var ttests = []struct {
-		configFile string
-		expectErr  bool
+		name      string
+		config    Config
+		expected  MicroshiftConfig
+		expectErr bool
 	}{
 		{
-			configFile: testConfigFile,
-			expectErr:  false,
+			name: "Config OK full",
+			config: Config{
+				DNS: DNS{
+					BaseDomain: "example.com",
+				},
+				Network: Network{
+					ClusterNetwork: []ClusterNetworkEntry{
+						{
+							CIDR: "10.20.30.40/16",
+						},
+					},
+					ServiceNetwork:       []string{"40.30.20.10/16"},
+					ServiceNodePortRange: "1024-32767",
+				},
+				Node: Node{
+					HostnameOverride: "node1",
+					NodeIP:           "1.2.3.4",
+				},
+				ApiServer: ApiServer{
+					SubjectAltNames:  []string{"node1", "node2"},
+					AdvertiseAddress: "6.7.8.9",
+				},
+				Debugging: Debugging{
+					LogLevel: "Debug",
+				},
+			},
+			expected: MicroshiftConfig{
+				LogVLevel:           4,
+				SubjectAltNames:     []string{"node1", "node2"},
+				NodeName:            "node1",
+				NodeIP:              "1.2.3.4",
+				KASAdvertiseAddress: "6.7.8.9",
+				SkipKASInterface:    true,
+				BaseDomain:          "example.com",
+				Cluster: ClusterConfig{
+					URL:                  "https://127.0.0.1:6443",
+					ClusterCIDR:          "10.20.30.40/16",
+					ServiceCIDR:          "40.30.20.10/16",
+					ServiceNodePortRange: "1024-32767",
+					DNS:                  "40.30.0.10",
+				},
+			},
+			expectErr: false,
 		},
 		{
-			configFile: testConfigFileBadSubjectAltNames,
-			expectErr:  true,
+			name: "Config NOK with bad SAN localhost",
+			config: Config{
+				ApiServer: ApiServer{
+					SubjectAltNames: []string{"127.0.0.1", "localhost"},
+				},
+			},
+			expected:  MicroshiftConfig{},
+			expectErr: true,
+		},
+		{
+			name: "Config NOK with bad SAN kubernetes service",
+			config: Config{
+				ApiServer: ApiServer{
+					SubjectAltNames: []string{"kubernetes"},
+				},
+			},
+			expected:  MicroshiftConfig{},
+			expectErr: true,
 		},
 	}
 	for _, tt := range ttests {
-		microShiftConfig := NewMicroshiftConfig()
-		err := microShiftConfig.ReadAndValidate(tt.configFile, flags)
-		if tt.expectErr && err == nil {
-			t.Error("Expecting error and received nothing")
-		}
-		if !tt.expectErr && err != nil {
-			t.Errorf("Not expecting error and received: %v", err)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			f, err := os.CreateTemp("", "test")
+			if err != nil {
+				t.Errorf("unable to create temp file: %v", err)
+			}
+			defer os.Remove(f.Name())
+			d, err := yaml.Marshal(&tt.config)
+			if err != nil {
+				t.Errorf("unable to marshal configuration: %v", err)
+			}
+			_, err = f.Write(d)
+			if err != nil {
+				t.Errorf("unable to write to file: %v", err)
+			}
+			config := NewMicroshiftConfig()
+			err = config.ReadAndValidate(f.Name())
+			if tt.expectErr && err == nil {
+				t.Fatal("Expecting error and received nothing")
+			}
+			if !tt.expectErr && err != nil {
+				t.Fatalf("Not expecting error and received: %v", err)
+			}
+			if !tt.expectErr && !reflect.DeepEqual(*config, tt.expected) {
+				t.Errorf("ReadAndValidate() mismatch. got=%v, want=%v", *config, tt.expected)
+			}
+		})
 	}
 }
 
@@ -317,26 +289,5 @@ func TestMicroshiftConfigNodeNameValidationBadName(t *testing.T) {
 
 	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err == nil {
 		t.Errorf("failed to validate node name.")
-	}
-}
-
-// tests that the global flags have been initialized
-func TestHideUnsupportedFlags(t *testing.T) {
-	flags := pflag.NewFlagSet("test-flags", pflag.ContinueOnError)
-
-	flags.String("url", "", "version usage")
-	flags.String("v", "10", "v usage")
-	flags.String("version", "", "version usage")
-
-	HideUnsupportedFlags(flags)
-
-	if flags.Lookup("url").Hidden {
-		t.Errorf("url should not be hidden")
-	}
-	if flags.Lookup("v").Hidden {
-		t.Errorf("v should not be hidden")
-	}
-	if !flags.Lookup("version").Hidden {
-		t.Errorf("version should be hidden")
 	}
 }
