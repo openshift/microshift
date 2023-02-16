@@ -9,6 +9,6 @@ roleRef:
   kind: Role
   name: topolvm-csi-provisioner
 subjects:
-- kind: ServiceAccount
-  name: topolvm-controller
-  namespace: openshift-storage
+  - kind: ServiceAccount
+    name: topolvm-controller
+    namespace: openshift-storage
