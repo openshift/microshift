@@ -9,10 +9,10 @@ metadata:
   namespace: openshift-storage
 spec:
   ports:
-  - name: topolvm-metrics
-    port: 8080
-    protocol: TCP
-    targetPort: 8080
+    - name: topolvm-metrics
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
   selector:
     app.kubernetes.io/component: topolvm-node
 status:
