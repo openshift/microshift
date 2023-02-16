@@ -448,9 +448,6 @@ github.com/json-iterator/go
 # github.com/karrick/godirwalk v1.17.0
 ## explicit; go 1.13
 github.com/karrick/godirwalk
-# github.com/kelseyhightower/envconfig v1.4.0
-## explicit
-github.com/kelseyhightower/envconfig
 # github.com/libopenstorage/openstorage v1.0.0
 ## explicit
 github.com/libopenstorage/openstorage/api

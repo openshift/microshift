@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/apparentlymart/go-cidr v1.1.0
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
-	github.com/kelseyhightower/envconfig v1.4.0 // microshift
 	github.com/miekg/dns v1.1.35 // microshift
 	github.com/mitchellh/go-homedir v1.1.0 // microshift
 	github.com/openshift/api v0.0.0-20230120195050-6ba31fa438f2
@@ -162,7 +161,7 @@ require (
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 // indirect
-	github.com/vishvananda/netlink v1.1.0 // indirect
+	github.com/vishvananda/netlink v1.1.0
 	github.com/vishvananda/netns v0.0.0-20200728191858-db3c7e526aae // indirect
 	github.com/vmware/govmomi v0.20.3 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
