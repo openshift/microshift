@@ -41,11 +41,13 @@ Finally. git clone your personal fork of microshift and `cd` into it.
 
 ### A Note on Rebasing MicroShift's CSI Plugin
 
-The Logical Volume Manager Service is not integrated with the ocp release image and must be passed explicitly to the rebase script as its 4th argument (including the sub-command). Images can be found at [Red Hat Container Catalog](https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79?tag=v4.12.0-4&architecture=amd64&push_date=1673885582000&container-tabs=gti).
+The Logical Volume Manager Service is not integrated with the ocp release image and must be passed explicitly to the rebase script as its 4th argument (including the sub-command).
+Officially released images can be found at [Red Hat Container Catalog](https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79?tag=v4.12.0-4&architecture=amd64&push_date=1673885582000&container-tabs=gti).
+Engineering Candidates built each sprint can be found on [Quay.io](https://quay.io/repository/rh-storage-partners/lvms4-lvms-operator-bundle?tab=tags&tag=latest).
 
 ### Fully automatic rebasing
 
-The following command attempts a fully automatic rebase to a given target upstream release. It is what is run nighly from CI and should work for most cases within a z-stream. It creates a new branch named after the target release, then runs the individual steps described in the following sections, including creating the respective commits.
+The following command attempts a fully automatic rebase to a given target upstream release. It is what is run nightly from CI and should work for most cases within a z-stream. It creates a new branch named after the target release, then runs the individual steps described in the following sections, including creating the respective commits.
 
 ```shell
 ./scripts/auto-rebase/rebase.sh to quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64 registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]
@@ -257,12 +259,26 @@ To reduce a need of Pull Request synchronization between repositories, keep logi
 
 Rebase procedure expects references to AMD64 and ARM64 OpenShift release images, and LVM Storage (LVMS) Operator bundle image.
 OpenShift release images can be obtained from Release Status pages: [AMD64](https://amd64.ocp.releases.ci.openshift.org/) and [ARM64](https://arm64.ocp.releases.ci.openshift.org/) - navigate to section with nightly image builds for version that is currently worked on and pick latest approved for both architectures.
-LVMS Operator bundle image can be obtained from [Red Hat's catalog](https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79) - tag can be just appended to following URI: `registry.access.redhat.com/lvms4/lvms-operator-bundle:`.
+
+LVMS Operator bundle image can be obtained from either:
+- Official Release: [Red Hat's catalog](https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79) - tag can be just appended to following URI: `registry.access.redhat.com/lvms4/lvms-operator-bundle:`, or
+- Engineering Candidates (sprint builds): [Quay.io](https://quay.io/repository/rh-storage-partners/lvms4-lvms-operator-bundle?tab=tags&tag=latest) - pick latest image either manually or by running following command:
+  ```bash
+  echo "quay.io/rh-storage-partners/lvms4-lvms-operator-bundle@$(curl https://quay.io/api/v1/repository/rh-storage-partners/lvms4-lvms-operator-bundle/tag/ | jq -r '.tags | sort_by(.start_ts) | reverse | .[0].manifest_digest')"
+  ```
+
 These references are passed to `rebase.py` using `AMD64_RELEASE`, `ARM64_RELEASE`, and `LVMS_RELEASE` environment variables, for example:
 ```
 AMD64_RELEASE=registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-01-27-165107 \
 ARM64_RELEASE=registry.ci.openshift.org/ocp-arm64/release-arm64:4.13.0-0.nightly-arm64-2023-01-30-010253 \
 LVMS_RELEASE=registry.access.redhat.com/lvms4/lvms-operator-bundle:v4.12 \
+./scripts/auto-rebase/rebase.py
+
+# or use Quay refs for LVMS:
+
+AMD64_RELEASE=registry.ci.openshift.org/ocp/release:4.13.0-0.nightly-2023-01-27-165107 \
+ARM64_RELEASE=registry.ci.openshift.org/ocp-arm64/release-arm64:4.13.0-0.nightly-arm64-2023-01-30-010253 \
+LVMS_RELEASE=quay.io/rh-storage-partners/lvms4-lvms-operator-bundle@sha256:affe57ef424b866314e049e9a0605b8825ad6984cd30e5aee94df1788138351c \
 ./scripts/auto-rebase/rebase.py
 ```
 
