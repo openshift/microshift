@@ -1,16 +1,10 @@
-# cluster-network-operator embedded-component db00b4b6bab11ec3a27451cbf3c8597889e6e5da to 43bc195cf9fef2db627369f86d10e0f501e9d3fa
-e7cfad4810e9700eba7942ba1e0a82323024083d 2023-02-07T12:09:51+00:00 Add .hypershift.local to no proxy list
-b387d4a15cda95d0f937bafa91a773461cf3af90 2023-02-04T15:04:59+00:00 HyperShift: Do not use proxy for internal routes
-# machine-config-operator embedded-component 1fab7126698c52ba8e56ab1267b7aa3e7ab3e657 to 4099f3c4f4ea9df85a7516a6300a4c6e5504a5cd
-26eb14189a74637f58057ad40ca505ba1338630f 2023-02-01T17:24:06+00:00 Improvements for `configure-ovs.sh`
-619d0c1879db451239c1f061b9eee7596b3ffddf 2023-01-19T12:40:21+00:00 OCPBUGS-5379: There are not enough logs in case "oc extract" is stuck in mco first boot
-# ovn-kubernetes image-amd64 38cd36f558a793a46f4f46684adccb12f5a8b59b to d827e379656033d95c695787f1abdc512497c7bb
-7f0683dc53b1f113407b17c4536543543d46594e 2023-02-08T21:38:51+01:00 libovsdb bump: use database package
-7278edcd707a0a2dc0d7aabdb86554475a5ce619 2023-02-08T19:17:10+01:00 vendor: bump libovsdb to a6a1739938309190e605e21bd756035313c39741
-5989055a772f48e2db029ab2d0f6092971dd5f45 2023-02-08T19:09:10+01:00 Delete IGMP Groups when deleting stale chassis. IGMPGroup has a weak link to chassis, deleting multiple chassis may result in IGMP_Groups with identical values on columns "address", "datapath", and "chassis", when "chassis" goes empty
-63953311fa91fd379c9393bc02e16778a6cdd12b 2023-01-19T11:23:41+00:00 addMasqueradeRoute: fallback to gateway interface IPs
-# ovn-kubernetes image-arm64 38cd36f558a793a46f4f46684adccb12f5a8b59b to d827e379656033d95c695787f1abdc512497c7bb
-7f0683dc53b1f113407b17c4536543543d46594e 2023-02-08T21:38:51+01:00 libovsdb bump: use database package
-7278edcd707a0a2dc0d7aabdb86554475a5ce619 2023-02-08T19:17:10+01:00 vendor: bump libovsdb to a6a1739938309190e605e21bd756035313c39741
-5989055a772f48e2db029ab2d0f6092971dd5f45 2023-02-08T19:09:10+01:00 Delete IGMP Groups when deleting stale chassis. IGMPGroup has a weak link to chassis, deleting multiple chassis may result in IGMP_Groups with identical values on columns "address", "datapath", and "chassis", when "chassis" goes empty
-63953311fa91fd379c9393bc02e16778a6cdd12b 2023-01-19T11:23:41+00:00 addMasqueradeRoute: fallback to gateway interface IPs
+# cluster-kube-controller-manager-operator embedded-component 9243e022c42c6d55e1d97a15ed51831f6080984a to 73f7ea7014f57cc37d6f2c720d3bcc00c7d4718b
+da6fdd1b118b0270b0bb32a756dec31e506d88c6 2023-02-15T18:27:16+01:00 Guard pod set readiness probe endpoint explicitly
+# cluster-kube-scheduler-operator embedded-component e0b6bf9c4ddb0da9268d504d23ca2ca11880d970 to 845ae423e831b1cacf0bcae5e6528f1d21b5ddf2
+18b335846f3f8f017076a968a2b7895208de84e1 2023-02-15T18:24:53+01:00 Guard controller: set the readiness probe endpoint explicitly
+# ovn-kubernetes image-amd64 d827e379656033d95c695787f1abdc512497c7bb to cf9fb51510e1870961bf3a0f064b73536757a4f8
+05c725eb1b7bad08ec9b000e2d65c8ced203c8dc 2023-02-10T11:03:51+01:00 loadbalancer: Disable generation of neighbor responder flows for VIPs on LRs
+44e9626a0b8ddaf02cf45023401c508c421a8bd8 2023-02-10T10:47:08+01:00 Bump OVN to 22.12
+# ovn-kubernetes image-arm64 d827e379656033d95c695787f1abdc512497c7bb to cf9fb51510e1870961bf3a0f064b73536757a4f8
+05c725eb1b7bad08ec9b000e2d65c8ced203c8dc 2023-02-10T11:03:51+01:00 loadbalancer: Disable generation of neighbor responder flows for VIPs on LRs
+44e9626a0b8ddaf02cf45023401c508c421a8bd8 2023-02-10T10:47:08+01:00 Bump OVN to 22.12
