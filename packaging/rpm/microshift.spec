@@ -165,6 +165,7 @@ install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/manifests
 install -p -m644 packaging/microshift/config.yaml %{buildroot}%{_sysconfdir}/microshift/config.yaml.default
 
 # release-info files
@@ -191,7 +192,6 @@ install -p -m755 packaging/systemd/configure-ovs-microshift.sh %{buildroot}%{_bi
 
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d
 install -p -m644 packaging/systemd/firewalld-no-iptables.conf %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
-
 
 mkdir -p -m755 %{buildroot}/var/run/kubelet
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
@@ -253,6 +253,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/cleanup-all-microshift-data
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
+%dir %{_sysconfdir}/microshift/manifests
 %config(noreplace) %{_sysconfdir}/microshift/config.yaml.default
 
 %files release-info
@@ -283,6 +284,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Feb 20 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
+- Create empty manifests directory
+
 * Tue Feb 07 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
 - Initial implementation of MicroShift integration with greenboot
 
@@ -390,7 +394,6 @@ systemctl enable --now --quiet openvswitch || true
 
 * Thu Nov 4 2021 Miguel Angel Ajo <majopela@redhat.com> 4.8.0
 - Include the cleanup-all-microshift-data script for convenience
-
 
 * Thu Sep 23 2021 Miguel Angel Ajo <majopela@redhat.com> 4.7.0
 - Support commit based builds
