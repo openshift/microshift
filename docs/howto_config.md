@@ -1,10 +1,4 @@
 # Configuration
-
-MicroShift can be configured in the following ways, in order of precedence:
-* Command line arguments
-* Environment variables
-* Configuration file
-
 The MicroShift configuration file must be located at `~/.microshift/config.yaml` (user-specific) and `/etc/microshift/config.yaml` (system-wide), while the former takes precedence if it exists. A sample `/etc/microshift/config.yaml.default` configuration file is installed by the MicroShift RPM and it can be used as a template when customizing MicroShift.
 
 The format of the `config.yaml` configuration file is as follows.
@@ -27,19 +21,6 @@ apiServer:
 debugging:
   logLevel: ""
 ```
-
-The configuration settings alongside with the supported command line arguments and environment variables are presented below.
-
-| Field Name            | CLI Argument              | Environment Variable                    | Description |
-|-----------------------|---------------------------|-----------------------------------------|-------------|
-| cidr (clusterNetwork) | --cluster-cidr            | MICROSHIFT_CLUSTER_CLUSTERCIDR          | A block of IP addresses from which Pod IP addresses are allocated
-| serviceNetwork        | --service-cidr            | MICROSHIFT_CLUSTER_SERVICECIDR          | A block of virtual IP addresses for Kubernetes services
-| serviceNodePortRange  | --service-node-port-range | MICROSHIFT_CLUSTER_SERVICENODEPORTRANGE | The port range allowed for Kubernetes services of type NodePort
-| baseDomain            | --base-domain             | MICROSHIFT_BASEDOMAIN                   | Base domain of the cluster. All managed DNS records will be sub-domains of this base.
-| nodeIP                | --node-ip                 | MICROSHIFT_NODEIP                       | The IP address of the node, defaults to IP of the default route
-| hostnameOverride      | --hostname-override       | MICROSHIFT_HOSTNAMEOVERRIDE             | The name of the node, defaults to hostname
-| logLevel              | --v                       | MICROSHIFT_LOGVLEVEL                    | Log verbosity (Normal, Debug, Trace, TraceAll)
-| subjectAltNames       | --subject-alt-names       | MICROSHIFT_SUBJECTALTNAMES              | Subject Alternative Names for apiserver certificates
 
 ## Default Settings
 

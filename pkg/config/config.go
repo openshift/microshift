@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/apparentlymart/go-cidr/cidr"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/pflag"
 
@@ -384,55 +383,13 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	return nil
 }
 
-func (c *MicroshiftConfig) ReadFromEnv() error {
-	if err := envconfig.Process("microshift", c); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *MicroshiftConfig) ReadFromCmdLine(flags *pflag.FlagSet) error {
-	if f := flags.Lookup("v"); f != nil && flags.Changed("v") {
-		c.LogVLevel, _ = strconv.Atoi(f.Value.String())
-	}
-	if s, err := flags.GetStringSlice("subject-alt-names"); err == nil && flags.Changed("subject-alt-names") {
-		c.SubjectAltNames = s
-	}
-	if s, err := flags.GetString("hostname-override"); err == nil && flags.Changed("hostname-override") {
-		c.NodeName = s
-	}
-	if s, err := flags.GetString("node-ip"); err == nil && flags.Changed("node-ip") {
-		c.NodeIP = s
-	}
-	if s, err := flags.GetString("cluster-cidr"); err == nil && flags.Changed("cluster-cidr") {
-		c.Cluster.ClusterCIDR = s
-	}
-	if s, err := flags.GetString("service-cidr"); err == nil && flags.Changed("service-cidr") {
-		c.Cluster.ServiceCIDR = s
-	}
-	if s, err := flags.GetString("service-node-port-range"); err == nil && flags.Changed("service-node-port-range") {
-		c.Cluster.ServiceNodePortRange = s
-	}
-	if s, err := flags.GetString("base-domain"); err == nil && flags.Changed("base-domain") {
-		c.BaseDomain = s
-	}
-
-	return nil
-}
-
 // Note: add a configFile parameter here because of unit test requiring custom
 // local directory
-func (c *MicroshiftConfig) ReadAndValidate(configFile string, flags *pflag.FlagSet) error {
+func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 	if configFile != "" {
 		if err := c.ReadFromConfigFile(configFile); err != nil {
 			return err
 		}
-	}
-	if err := c.ReadFromEnv(); err != nil {
-		return err
-	}
-	if err := c.ReadFromCmdLine(flags); err != nil {
-		return err
 	}
 
 	// validate serviceCIDR
@@ -537,22 +494,6 @@ func stringSliceContains(list []string, elements ...string) bool {
 	return false
 }
 
-func HideUnsupportedFlags(flags *pflag.FlagSet) {
-	// hide logging flags that we do not use/support
-	loggingFlags := pflag.NewFlagSet("logging-flags", pflag.ContinueOnError)
-	logs.AddFlags(loggingFlags)
-
-	supportedLoggingFlags := sets.NewString("v")
-
-	loggingFlags.VisitAll(func(pf *pflag.Flag) {
-		if !supportedLoggingFlags.Has(pf.Name) {
-			flags.MarkHidden(pf.Name)
-		}
-	})
-
-	flags.MarkHidden("version")
-}
-
 // GetVerbosity returns the numerical value for LogLevel which is an enum
 func (c *Config) GetVerbosity() int {
 	var verbosity int
@@ -569,4 +510,20 @@ func (c *Config) GetVerbosity() int {
 		verbosity = 2
 	}
 	return verbosity
+}
+
+func HideUnsupportedFlags(flags *pflag.FlagSet) {
+	// hide logging flags that we do not use/support
+	loggingFlags := pflag.NewFlagSet("logging-flags", pflag.ContinueOnError)
+	logs.AddFlags(loggingFlags)
+
+	supportedLoggingFlags := sets.NewString("v")
+
+	loggingFlags.VisitAll(func(pf *pflag.Flag) {
+		if !supportedLoggingFlags.Has(pf.Name) {
+			flags.MarkHidden(pf.Name)
+		}
+	})
+
+	flags.MarkHidden("version")
 }
