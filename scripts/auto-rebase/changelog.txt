@@ -1,4 +1,11 @@
-# oc image-arm64 58e00ba9b58b30ee6b394dd1cc83bc1514191f27 to 49b1e9f681b3dbdd4f43ca3d288ac64f4c681e2d
+# cluster-kube-apiserver-operator embedded-component 9def85264fec138f12e8cb5746fe32d13e0747b5 to 077a493657eb3355f72fa37bf86cb029c1441983
+02ba3ecd099c767027c5c984d0ea8cb9dd411c5e 2023-02-13T17:43:33+01:00 go mod vendor
+3dab883ba3ab7539862609be1abf722b587adb04 2023-02-13T17:43:24+01:00 bump(api)
+# cluster-policy-controller embedded-component 3f8efde27bb6a50e5d50f0798877d4d2e1154dcb to 4611d671680183bcc55292522a3d97ceebc82070
+d009fb5bff42292d49ef87ce2cd5d0ecdc1267a2 2023-02-16T13:37:21+01:00 update controller-manager dependency to point to v0.25.0
+# kubernetes embedded-component c7296782f65144a9aed5b18bfb880fd4f9b9333e to 919a59b67b713a855471df7d17af2161884d8ca8
+37160090688c02fb77c43965a5898a8fc82a90e3 2023-02-15T11:44:25-06:00 UPSTREAM: <carry>: add default sysctls for kubelet in rpm
+# oc image-amd64 58e00ba9b58b30ee6b394dd1cc83bc1514191f27 to 49b1e9f681b3dbdd4f43ca3d288ac64f4c681e2d
 0cd51689b0038400efddf752c2c94700706d9ef2 2023-02-15T17:36:41+01:00 Use registry.k8s.io and update image version
-# kubernetes image-arm64 c7296782f65144a9aed5b18bfb880fd4f9b9333e to 919a59b67b713a855471df7d17af2161884d8ca8
+# kubernetes image-amd64 c7296782f65144a9aed5b18bfb880fd4f9b9333e to 919a59b67b713a855471df7d17af2161884d8ca8
 37160090688c02fb77c43965a5898a8fc82a90e3 2023-02-15T11:44:25-06:00 UPSTREAM: <carry>: add default sysctls for kubelet in rpm
