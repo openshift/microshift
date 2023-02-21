@@ -3,27 +3,21 @@ kind: DaemonSet
 metadata:
   labels:
     app.kubernetes.io/component: topolvm-node
-    app.kubernetes.io/managed-by: lvms-operator
     app.kubernetes.io/name: topolvm-csi-driver
-    app.kubernetes.io/part-of: lvms-provisioner
   name: topolvm-node
   namespace: openshift-storage
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: topolvm-node
-      app.kubernetes.io/managed-by: lvms-operator
       app.kubernetes.io/name: topolvm-csi-driver
-      app.kubernetes.io/part-of: lvms-provisioner
   template:
     metadata:
       annotations:
         lvms.microshift.io/lvmd_config_sha256sum: '{{ Sha256sum .lvmd }}'
       labels:
         app.kubernetes.io/component: topolvm-node
-        app.kubernetes.io/managed-by: lvms-operator
         app.kubernetes.io/name: topolvm-csi-driver
-        app.kubernetes.io/part-of: lvms-provisioner
     spec:
       affinity:
         nodeAffinity:
