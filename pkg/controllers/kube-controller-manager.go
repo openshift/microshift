@@ -117,7 +117,7 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 
 	// run readiness check
 	go func() {
-		healthcheckStatus := util.RetryInsecureHttpsGet("https://127.0.0.1:10257/healthz")
+		healthcheckStatus := util.RetryInsecureHttpsGet("https://localhost:10257/healthz")
 		if healthcheckStatus != 200 {
 			klog.Errorf("kube-controller-manager failed to start")
 			errorChannel <- errors.New("kube-controller-manager failed to start")

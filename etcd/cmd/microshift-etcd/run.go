@@ -69,16 +69,16 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	//s.etcdCfg.ForceNewCluster = true //TODO
 	s.etcdCfg.Logger = "zap"
 	s.etcdCfg.Dir = dataDir
-	url2380 := setURL([]string{"127.0.0.1"}, "2380")
-	url2379 := setURL([]string{"127.0.0.1"}, "2379")
+	url2380 := setURL([]string{"localhost"}, "2380")
+	url2379 := setURL([]string{"localhost"}, "2379")
 	s.etcdCfg.APUrls = url2380
 	s.etcdCfg.LPUrls = url2380
 	s.etcdCfg.ACUrls = url2379
 	s.etcdCfg.LCUrls = url2379
-	s.etcdCfg.ListenMetricsUrls = setURL([]string{"127.0.0.1"}, "2381")
+	s.etcdCfg.ListenMetricsUrls = setURL([]string{"localhost"}, "2381")
 
 	s.etcdCfg.Name = cfg.NodeName
-	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, "127.0.0.1")
+	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, "localhost")
 
 	s.etcdCfg.CipherSuites = tlsCipherSuites
 	s.etcdCfg.ClientTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdServingCertDir)
