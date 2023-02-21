@@ -1,10 +1,5 @@
-# cluster-kube-controller-manager-operator embedded-component 9243e022c42c6d55e1d97a15ed51831f6080984a to 73f7ea7014f57cc37d6f2c720d3bcc00c7d4718b
-da6fdd1b118b0270b0bb32a756dec31e506d88c6 2023-02-15T18:27:16+01:00 Guard pod set readiness probe endpoint explicitly
-# cluster-kube-scheduler-operator embedded-component e0b6bf9c4ddb0da9268d504d23ca2ca11880d970 to 845ae423e831b1cacf0bcae5e6528f1d21b5ddf2
-18b335846f3f8f017076a968a2b7895208de84e1 2023-02-15T18:24:53+01:00 Guard controller: set the readiness probe endpoint explicitly
-# ovn-kubernetes image-amd64 d827e379656033d95c695787f1abdc512497c7bb to cf9fb51510e1870961bf3a0f064b73536757a4f8
-05c725eb1b7bad08ec9b000e2d65c8ced203c8dc 2023-02-10T11:03:51+01:00 loadbalancer: Disable generation of neighbor responder flows for VIPs on LRs
-44e9626a0b8ddaf02cf45023401c508c421a8bd8 2023-02-10T10:47:08+01:00 Bump OVN to 22.12
-# ovn-kubernetes image-arm64 d827e379656033d95c695787f1abdc512497c7bb to cf9fb51510e1870961bf3a0f064b73536757a4f8
-05c725eb1b7bad08ec9b000e2d65c8ced203c8dc 2023-02-10T11:03:51+01:00 loadbalancer: Disable generation of neighbor responder flows for VIPs on LRs
-44e9626a0b8ddaf02cf45023401c508c421a8bd8 2023-02-10T10:47:08+01:00 Bump OVN to 22.12
+# cluster-kube-apiserver-operator embedded-component 336ffd5e7491f565faccf843571303377b1d4825 to a9a4df5f0cedeba2868a6ceb63ab58f67a0cdbf2
+f4c118ce9aec186b70615399ff71829bc7a0d044 2023-02-15T18:10:50+01:00 Guard pod set readiness probe endpoint explicitly
+# cluster-policy-controller embedded-component 105cc773b37f00be2351c9a4e6df24af94d547c1 to a78a00b3632f2c5a977ca200bf2b7a421eb121a8
+1bde0c94e6156fb9b28aac527ed601f7dff1c306 2023-02-18T11:22:19+01:00 update psa dependency version
+6e315800c16b38ec0b4dd7d2a37f4606d4ba707e 2023-02-17T15:34:48+01:00 update controller-manager dependency to point to v0.25.0
