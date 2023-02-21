@@ -11,7 +11,7 @@ require (
 	github.com/openshift/api v0.0.0-20221116152553-4b67c2b2bb1e
 	github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
 	github.com/openshift/client-go v0.0.0-20221019143426-16aed247da5c
-	github.com/openshift/cluster-policy-controller v0.0.0-20230117141919-105cc773b37f
+	github.com/openshift/cluster-policy-controller v0.0.0-20230220142510-a78a00b3632f
 	github.com/openshift/library-go v0.0.0-20221205131816-1700fb06ea43
 	github.com/openshift/route-controller-manager v0.0.0-20221130011049-9e74d175e81e
 	github.com/pkg/errors v0.9.1
@@ -225,7 +225,7 @@ require (
 	k8s.io/legacy-cloud-providers v0.0.0 // indirect
 	k8s.io/metrics v0.0.0 // indirect
 	k8s.io/mount-utils v0.0.0 // indirect
-	k8s.io/pod-security-admission v0.0.0 // indirect
+	k8s.io/pod-security-admission v0.25.0 // indirect
 	k8s.io/utils v0.0.0-20220922133306-665eaaec4324 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.33 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
