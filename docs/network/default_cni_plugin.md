@@ -63,14 +63,16 @@ MicroShift will assume default ovn-kubernetes config values if ovn-kubernetes co
 
 The following configs are supported in ovn-kubernetes config file:
 
-|Field                            |Required |Type    |Default |Description                                                       |Example|
-|:--------------------------------|:--------|:-------|:-------|:-----------------------------------------------------------------|:------|
-|ovsInit.disableOVSInit           |N        |bool    |false   |Skip configuring OVS bridge "br-ex" in microshift-ovs-init.service|true   |
-|ovsInit.gatewayInterface         |N        |string  |""      |Interface to be added in OVS gateway bridge "br-ex"               |eth0   |
-|ovsInit.externalGatewayInterface |N        |string  |""      |Interface to be added in external OVS gateway bridge "br-ex1"     |eth1   |
-|mtu                              |N        |uint32  |1400    |MTU value to be used for the Pods                                 |1300   |
+|Field                            |Required |Type    |Default |Description                                                                  |Example|
+|:--------------------------------|:--------|:-------|:-------|:----------------------------------------------------------------------------|:------|
+|ovsInit.disableOVSInit           |N        |bool    |false   |Skip configuring OVS bridge "br-ex" in microshift-ovs-init.service           |true   |
+|ovsInit.gatewayInterface         |N        |string  |""      |Interface to be added in OVS gateway bridge "br-ex"                          |eth0   |
+|ovsInit.externalGatewayInterface |N        |string  |""      |Interface to be added in external OVS gateway bridge "br-ex1"                |eth1   |
+|mtu                              |N        |int     |*auto*  |MTU value to be used for the Pods, must be less than or equal to the MTU of default route interface|1500|
 
 > When `disableOVSInit` is true, OVS bridge "br-ex" needs to be configured manually. This OVS bridge is required by ovn-kubernetes CNI. See section [OVS bridge](#ovs-bridge) for guidance on configuring the OVS gateway bridge manually.
+> When `gatewayInterface` is not provided, it defaults to the default route interface.
+> When `mtu` is not provided, it defaults to the MTU of `gatewayInterface` interface. In the case that `gatewayInterface` is not specified, it is set to the default route MTU.
 
 Below is an example of `ovn.yaml`:
 
@@ -79,7 +81,7 @@ ovsInit:
   disableOVSInit: true
   gatewayInterface: eth0
   externalGatewayInterface: eth1
-mtu: 1300
+mtu: 1500
 ```
 **NOTE:* The change of `mtu` configuration in `ovn.yaml` requires node reboot to take effect. <br>
 

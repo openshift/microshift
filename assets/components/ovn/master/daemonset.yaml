@@ -364,6 +364,7 @@ spec:
             --sb-address "" \
             --enable-multicast \
             --disable-snat-multiple-gws \
+            --single-node \
             --acl-logging-rate-limit "20"
         lifecycle:
           preStop:

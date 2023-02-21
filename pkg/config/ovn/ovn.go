@@ -7,27 +7,25 @@ import (
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
 	"k8s.io/klog/v2"
+	"sigs.k8s.io/yaml"
 )
 
 const (
 	ovnConfigFileName           = "ovn.yaml"
-	GeneveHeaderLengthIPv4      = 58
 	OVNGatewayInterface         = "br-ex"
 	OVNExternalGatewayInterface = "br-ex1"
+	defaultMTU                  = 1500
 )
 
 type OVNKubernetesConfig struct {
 	// Configuration for microshift-ovs-init.service
-	OVSInit OVSInit `json:"ovsInit,omitempty"`
-	// MTU to use for the geneve tunnel interface.
-	// This must be 100 bytes smaller than the uplink mtu.
-	// Default is 1400.
+	OVSInit OVSInitConfig `json:"ovsInit,omitempty"`
+	// MTU to use for the pod interface. Default is 1500.
 	MTU int `json:"mtu,omitempty"`
 }
 
-type OVSInit struct {
+type OVSInitConfig struct {
 	// disable microshift-ovs-init.service.
 	// OVS bridge "br-ex" needs to be configured manually when disableOVSInit is true.
 	DisableOVSInit bool `json:"disableOVSInit,omitempty"`
@@ -82,17 +80,28 @@ func (o *OVNKubernetesConfig) validateConfig() error {
 	if err != nil {
 		return err
 	}
-	requiredMTU := o.MTU + GeneveHeaderLengthIPv4
 
-	if iface.MTU < requiredMTU {
-		return fmt.Errorf("interface MTU (%d) is too small for specified overlay MTU (%d)", iface.MTU, requiredMTU)
+	if iface.MTU < o.MTU {
+		return fmt.Errorf("interface MTU (%d) is too small for specified overlay (%d)", iface.MTU, o.MTU)
 	}
 	return nil
 }
 
+// getSystemMTU retrieves MTU from ovn-kubernetes gateway interafce "br-ex",
+// and falls back to use 1500 when "br-ex" mtu is unable to get or less than 0.
+func (o *OVNKubernetesConfig) getSystemMTU() {
+	link, err := net.InterfaceByName(OVNGatewayInterface)
+	if err == nil && link.MTU > 0 {
+		o.MTU = link.MTU
+	} else {
+		o.MTU = defaultMTU
+	}
+}
+
+// withDefaults returns the default values when ovn.yaml is not provided
 func (o *OVNKubernetesConfig) withDefaults() *OVNKubernetesConfig {
 	o.OVSInit.DisableOVSInit = false
-	o.MTU = 1400
+	o.getSystemMTU()
 	return o
 }
 
@@ -107,6 +116,12 @@ func newOVNKubernetesConfigFromFile(path string) (*OVNKubernetesConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("parsing OVNKubernetes config: %v", err)
 	}
+	// in case mtu is not defined
+	if o.MTU == 0 {
+		o.getSystemMTU()
+	}
+	klog.Infof("parsed OVNKubernetes config from file %q: %+v", path, o)
+
 	return o, nil
 }
 
@@ -114,7 +129,7 @@ func NewOVNKubernetesConfigFromFileOrDefault(dir string) (*OVNKubernetesConfig, 
 	path := filepath.Join(dir, ovnConfigFileName)
 	if _, err := os.Stat(path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			klog.Info("OVNKubernetes config file not found, assuming default values")
+			klog.Infof("OVNKubernetes config file not found, assuming default values")
 			return new(OVNKubernetesConfig).withDefaults(), nil
 		}
 		return nil, fmt.Errorf("failed to get OVNKubernetes config file: %v", err)
@@ -122,7 +137,6 @@ func NewOVNKubernetesConfigFromFileOrDefault(dir string) (*OVNKubernetesConfig, 
 
 	o, err := newOVNKubernetesConfigFromFile(path)
 	if err == nil {
-		klog.Info("got OVNKubernetes config from file %q", path)
 		return o, nil
 	}
 	return nil, fmt.Errorf("getting OVNKubernetes config: %v", err)
