@@ -760,6 +760,8 @@ update_openshift_manifests() {
     sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
 
     # MicroShift-specific changes
+    #-- ingress ----------------------------------------
+    yq -i 'del(.metadata.annotations)' "${REPOROOT}"/assets/components/openshift-router/configmap.yaml
     #    Set replica count to 1, as we're single-node.
     yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Set deployment strategy type to Recreate.
