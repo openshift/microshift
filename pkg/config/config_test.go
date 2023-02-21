@@ -152,7 +152,7 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 				SkipKASInterface:    true,
 				BaseDomain:          "example.com",
 				Cluster: ClusterConfig{
-					URL:                  "https://127.0.0.1:6443",
+					URL:                  "https://localhost:6443",
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
