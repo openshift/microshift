@@ -1,19 +1,23 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"math"
 	"net"
 	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 
 	"github.com/spf13/cobra"
 	etcd "go.etcd.io/etcd/server/v3/embed"
+	"go.etcd.io/etcd/server/v3/mvcc/backend"
 	"k8s.io/klog/v2"
 )
 
@@ -30,6 +34,7 @@ func NewRunEtcdCommand() *cobra.Command {
 			return e.Run()
 		},
 	}
+
 	return cmd
 }
 
@@ -43,7 +48,11 @@ var tlsCipherSuites = []string{
 }
 
 type EtcdService struct {
-	etcdCfg *etcd.Config
+	etcdCfg                 *etcd.Config
+	minDefragBytes          int64
+	maxFragmentedPercentage float64
+	defragCheckFreq         time.Duration
+	doStartupDefrag         bool
 }
 
 func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
@@ -55,6 +64,11 @@ func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
 func (s *EtcdService) Name() string { return "etcd" }
 
 func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
+	s.minDefragBytes = cfg.Etcd.MinDefragBytes
+	s.maxFragmentedPercentage = cfg.Etcd.MaxFragmentedPercentage
+	s.defragCheckFreq = cfg.Etcd.DefragCheckFreq
+	s.doStartupDefrag = cfg.Etcd.DoStartupDefrag
+
 	microshiftDataDir := config.GetDataDir()
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 
@@ -69,6 +83,7 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	//s.etcdCfg.ForceNewCluster = true //TODO
 	s.etcdCfg.Logger = "zap"
 	s.etcdCfg.Dir = dataDir
+	s.etcdCfg.QuotaBackendBytes = cfg.Etcd.QuotaBackendBytes
 	url2380 := setURL([]string{"localhost"}, "2380")
 	url2379 := setURL([]string{"localhost"}, "2379")
 	s.etcdCfg.APUrls = url2380
@@ -96,6 +111,23 @@ func (s *EtcdService) Run() error {
 		return fmt.Errorf("microshift-etcd failed to start: %v", err)
 	}
 	<-e.Server.ReadyNotify()
+	defer func() {
+		e.Server.Stop()
+		<-e.Server.StopNotify()
+	}()
+
+	// If we were told to, go ahead and do a defragment now.
+	if s.doStartupDefrag {
+		if err := e.Server.Backend().Defrag(); err != nil {
+			err = fmt.Errorf("initial defragmentation failed: %v", err)
+			klog.Error(err)
+			return err
+		}
+	}
+
+	// Start up the defrag controller.
+	defragCtx, defragShutdown := context.WithCancel(context.Background())
+	go s.defragController(defragCtx, e.Server.Backend())
 
 	// Wait to be stopped.
 	sigTerm := make(chan os.Signal, 1)
@@ -103,9 +135,42 @@ func (s *EtcdService) Run() error {
 	sig := <-sigTerm
 	klog.Infof("microshift-etcd received signal %v - stopping", sig)
 
-	e.Server.Stop()
-	<-e.Server.StopNotify()
+	// Shutdown the defrag controller.
+	defragShutdown()
+
 	return nil
+}
+
+func (s *EtcdService) defragController(ctx context.Context, be backend.Backend) {
+	// Stop the controller if defrags are disabled.
+	if s.defragCheckFreq == 0 {
+		klog.Warning("defragmentation has been disabled")
+		return
+	}
+
+	// This timer will check the fragmented conditions periodically.
+	timer := time.NewTimer(s.defragCheckFreq)
+	defer func() {
+		if !timer.Stop() {
+			<-timer.C
+		}
+	}()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case start := <-timer.C:
+			if isBackendFragmented(be, s.maxFragmentedPercentage, s.minDefragBytes) {
+				klog.Info("attempting to defragment backend")
+				if err := be.Defrag(); err != nil {
+					klog.Errorf("defragmentation failed: %v", err)
+				} else {
+					klog.Infof("defragmentation took %v", time.Since(start))
+				}
+			}
+			timer.Reset(s.defragCheckFreq)
+		}
+	}
 }
 
 func setURL(hostnames []string, port string) []url.URL {
@@ -119,4 +184,18 @@ func setURL(hostnames []string, port string) []url.URL {
 		urls[i] = *u
 	}
 	return urls
+}
+
+func isBackendFragmented(b backend.Backend, maxFragmentedPercentage float64, minDefragBytes int64) bool {
+	fragmentedPercentage := checkFragmentationPercentage(b.Size(), b.SizeInUse())
+	if fragmentedPercentage > 0.00 {
+		klog.Infof("backend store fragmented: %.2f %%, dbSize: %d", fragmentedPercentage, b.Size())
+	}
+	return fragmentedPercentage >= maxFragmentedPercentage && b.Size() >= minDefragBytes
+}
+
+func checkFragmentationPercentage(ondisk, inuse int64) float64 {
+	diff := float64(ondisk - inuse)
+	fragmentedPercentage := (diff / float64(ondisk)) * 100
+	return math.Round(fragmentedPercentage*100) / 100
 }

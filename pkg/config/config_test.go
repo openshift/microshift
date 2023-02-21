@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+	"time"
 
 	"sigs.k8s.io/yaml"
 )
@@ -69,6 +70,13 @@ func TestConfigFile(t *testing.T) {
 					ClusterCIDR:          "10.20.30.40/16",
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
+				},
+				Etcd: EtcdConfig{
+					QuotaBackendBytes:       2 * 1024 * 1024 * 1024,
+					MinDefragBytes:          100 * 1024 * 1024,
+					MaxFragmentedPercentage: 45,
+					DefragCheckFreq:         5 * time.Minute,
+					DoStartupDefrag:         true,
 				},
 			},
 			expectErr: false,
@@ -157,6 +165,13 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "40.30.0.10",
+				},
+				Etcd: EtcdConfig{
+					QuotaBackendBytes:       2 * 1024 * 1024 * 1024,
+					MinDefragBytes:          100 * 1024 * 1024,
+					MaxFragmentedPercentage: 45,
+					DefragCheckFreq:         5 * time.Minute,
+					DoStartupDefrag:         true,
 				},
 			},
 			expectErr: false,
