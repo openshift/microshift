@@ -23,6 +23,12 @@ spec:
         - /topolvm-controller
         - --cert-dir=/certs
         image: '{{ .ReleaseImage.topolvm_csi }}'
+        startupProbe:
+          failureThreshold: 60
+          periodSeconds: 2
+          httpGet:
+            port: healthz
+            path: /healthz
         livenessProbe:
           failureThreshold: 3
           httpGet:
