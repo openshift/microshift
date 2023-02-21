@@ -606,12 +606,12 @@ github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d h1:RR
 github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d/go.mod h1:b1BuldmJlbA/xYtdZvKi+7j5YGB44qJUJDZ9zwiNCfE=
 github.com/openshift/client-go v0.0.0-20230120202327-72f107311084 h1:66uaqNwA+qYyQDwsMWUfjjau8ezmg1dzCqub13KZOcE=
 github.com/openshift/client-go v0.0.0-20230120202327-72f107311084/go.mod h1:M3h9m001PWac3eAudGG3isUud6yBjr5XpzLYLLTlHKo=
-github.com/openshift/cluster-policy-controller v0.0.0-20230216152151-4611d6716801 h1:FcDa2wq7aNkvtnEtvgabgoFx8TRdHDrnGJnMaQ7Gcak=
-github.com/openshift/cluster-policy-controller v0.0.0-20230216152151-4611d6716801/go.mod h1:v2cA8Iy4j3qfWzgdd0RiKKfdWSNoBF+wD+QX1yvtoYc=
+github.com/openshift/cluster-policy-controller v0.0.0-20230217170320-ac01e3463245 h1:BoNt9Hemwyc32xX+CZZaNGegWEiN7bGTVk4XaRboO8k=
+github.com/openshift/cluster-policy-controller v0.0.0-20230217170320-ac01e3463245/go.mod h1:vlkRuwyRueLOQ/ZRRle+rCrh+YNoh+pzJm9WaN9e6mU=
 github.com/openshift/kubernetes v0.0.0-20230216124407-919a59b67b71 h1:1pwsfTT2yL79E/RMWwZw9GJZOG/eUjTKS2JQzAMet2c=
 github.com/openshift/kubernetes v0.0.0-20230216124407-919a59b67b71/go.mod h1:X+oZfq0zUE+lpHZTcVDnge20xxiyXC+XSuyivKCn5YE=
-github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20230216124407-919a59b67b71 h1:+EmvPRVZiv68RJUVv1ixaE0SNOmJuJm2PPa/2auNaVQ=
-github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20230216124407-919a59b67b71/go.mod h1:SVFZVmcfr/QnDkKqmBvlVlhurEsml57BUNDH+R/CPqk=
+github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20230220092536-b9237230e688 h1:TAahWv4WMF1eNAkR2oAy5mVqwD7L30PA29xbj1zrqDI=
+github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20230220092536-b9237230e688/go.mod h1:SVFZVmcfr/QnDkKqmBvlVlhurEsml57BUNDH+R/CPqk=
 github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20230216124407-919a59b67b71 h1:3669roJx2prde25A0nwddqGjsorBqHAqYvLjG6glSHM=
 github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20230216124407-919a59b67b71/go.mod h1:6TuEWeKgBs443fLsnv4iOAeGNgpQcNytep4PPOq/l7Q=
 github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20230216124407-919a59b67b71 h1:NGZtXpd22jcIj7Uq4TzUo3WHYkTL6eGtX+lk4JqL04I=
