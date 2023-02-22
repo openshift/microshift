@@ -43,4 +43,9 @@ cdrom
 # Allow the default user to run sudo commands without password
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
 
+# Make sure all the Ethernet network interfaces are connected automatically
+for dev in $(nmcli -f name,type,autoconnect connection | awk '$2 == "ethernet" && $3 == "no" {print $1}') ; do
+    nmcli connection modify ${dev} connection.autoconnect yes
+done
+
 %end
