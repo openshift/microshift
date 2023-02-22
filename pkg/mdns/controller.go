@@ -3,11 +3,11 @@ package mdns
 import (
 	"context"
 	"net"
-	"regexp"
 	"strings"
 	"sync"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/config/ovn"
 	"github.com/openshift/microshift/pkg/mdns/server"
 	"k8s.io/klog/v2"
 )
@@ -47,13 +47,6 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	ifs, _ := net.Interfaces()
 
-	excludedInterfacesRegexp := regexp.MustCompile(
-		"^[A-Fa-f0-9]{15}|" + // OVN pod interfaces
-			"ovn.*|" + // OVN ovn-k8s-mp0 and similar interfaces
-			"br-int|" + // OVN integration bridge
-			"veth.*|cni.*|" + // Interfaces used in bridge-cni or flannel
-			"ovs-system$") // Internal OVS interface
-
 	// NOTE: this will listen on both br-ex and the physical interface attached to it
 	//       i.e. eth0 . We don't believe it's worth going into the complexities (and coupling)
 	//       of talking to OpenvSwitch to discover the physical interface(s) on br-ex. And
@@ -61,7 +54,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 	//       if those were to happend it would be harmless.
 	for n := range ifs {
 		name := ifs[n].Name
-		if excludedInterfacesRegexp.MatchString(name) {
+		if ovn.IsOVNKubernetesInternalInterface(name) {
 			continue
 		}
 		klog.Infof("mDNS: Starting server on interface %q, NodeIP %q, NodeName %q", name, c.NodeIP, c.NodeName)
@@ -74,6 +67,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 	for n := range ifs {
 		addrs, _ := ifs[n].Addrs()
 		if ipInAddrs(c.NodeIP, addrs) {
+			addrs = ovn.ExcludeOVNKubernetesMasqueradeIPs(addrs)
 			ips = addrsToStrings(addrs)
 		}
 	}

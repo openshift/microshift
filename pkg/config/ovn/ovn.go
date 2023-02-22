@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
@@ -16,6 +17,8 @@ const (
 	OVNGatewayInterface         = "br-ex"
 	OVNExternalGatewayInterface = "br-ex1"
 	defaultMTU                  = 1500
+	OVNKubernetesV4MasqueradeIP = "169.254.169.2"
+	OVNKubernetesV6MasqueradeIP = "fd69::2"
 )
 
 type OVNKubernetesConfig struct {
@@ -157,4 +160,26 @@ func GetOVNGatewayIP() (string, error) {
 		return ip.String(), nil
 	}
 	return "", fmt.Errorf("failed to get ovn gateway IP address")
+}
+
+func ExcludeOVNKubernetesMasqueradeIPs(addrs []net.Addr) []net.Addr {
+	var netAddrs []net.Addr
+	for _, a := range addrs {
+		ipNet, _, _ := net.ParseCIDR(a.String())
+		if ipNet.String() != OVNKubernetesV4MasqueradeIP && ipNet.String() != OVNKubernetesV6MasqueradeIP {
+			netAddrs = append(netAddrs, a)
+		}
+	}
+	return netAddrs
+}
+
+func IsOVNKubernetesInternalInterface(name string) bool {
+	excludedInterfacesRegexp := regexp.MustCompile(
+		"^[A-Fa-f0-9]{15}|" + // OVN pod interfaces
+			"ovn.*|" + // OVN ovn-k8s-mp0 and similar interfaces
+			"br-int|" + // OVN integration bridge
+			"veth.*|cni.*|" + // Interfaces used in bridge-cni or flannel
+			"ovs-system$") // Internal OVS interface
+
+	return excludedInterfacesRegexp.MatchString(name)
 }
