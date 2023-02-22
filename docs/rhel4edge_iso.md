@@ -132,17 +132,6 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 ```
 
-> **NOTE** <br>
-> Embedding container images in the generated ISO requires the functionality from the latest version of the `rpm-ostree` package.
-> This functionality will be available in the future releases of the RHEL 8 and 9 operating systems.
-
-To install the necessary functionality, run the following command to upgrade your system with the up-to-date `rpm-ostree` software from the `copr` repository.
-```bash
-~/microshift/hack/osbuild2copr.sh copr
-```
-
-> If necessary, rerun the `hack/osbuild2copr.sh` script with the `appstream` argument to revert to the standard `rpm-ostree` package.
-
 Proceed by running the build script with the `-embed_containers` argument to include the dependent container images into the generated ISO.
 ```bash
 ~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -embed_containers

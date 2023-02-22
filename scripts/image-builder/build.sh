@@ -159,7 +159,6 @@ while [ $# -gt 0 ] ; do
         [ -z "${CUSTOM_RPM_FILES}" ] && usage "Custom RPM packages not specified"
         shift
         ;;
-
     -embed_containers)
         EMBED_CONTAINERS=true
         shift
@@ -259,15 +258,15 @@ createrepo openshift-local >/dev/null
 
 # Install prometheus process exporter
 if ${PROMETHEUS} ; then
-  owner=ncabatoff
-  repo=process-exporter
-  version=$(curl -s https://api.github.com/repos/${owner}/${repo}/releases/latest | jq -r '.name')
-  url=https://github.com/${owner}/${repo}/releases/download/${version}/
-  file=${repo}_${version#v}_linux_amd64.rpm
+    owner=ncabatoff
+    repo=process-exporter
+    version=$(curl -s https://api.github.com/repos/${owner}/${repo}/releases/latest | jq -r '.name')
+    url=https://github.com/${owner}/${repo}/releases/download/${version}/
+    file=${repo}_${version#v}_linux_amd64.rpm
 
-  title "Downloading Prometheus exporter(s)"
-  wget -q ${url}${file}
-  CUSTOM_RPM_FILES+="$(pwd)/${file},"
+    title "Downloading Prometheus exporter(s)"
+    wget -q ${url}${file}
+    CUSTOM_RPM_FILES+="$(pwd)/${file},"
 fi
 
 # Copy user-specific RPM packages
@@ -306,13 +305,6 @@ fi
 
 # Add container images
 if ${EMBED_CONTAINERS} ; then
-    # TODO: This should be removed when RHEL 8/9 streams gets an up-to-date package
-    # Include up-to-date ostree packages in the image builder to support whiteouts    
-    repo_name=ostree-copr
-    cat ${SCRIPTDIR}/config/${repo_name}.toml | sed "s;REPLACE_ARCH_VALUE;${BUILD_ARCH};g" > ${repo_name}.toml
-    sudo composer-cli sources delete ${repo_name} 2>/dev/null || true
-    sudo composer-cli sources add ${BUILDDIR}/${repo_name}.toml
-
     # Add the list of all the container images
     jq -r '.images | .[] | ("[[containers]]\nsource = \"" + . + "\"\n")' \
         "${ROOTDIR}/assets/release/release-$(uname -i).json" \

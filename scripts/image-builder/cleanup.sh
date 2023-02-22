@@ -61,7 +61,7 @@ if [ "$FULL_CLEAN" = 1 ] ; then
 fi
 
 title "Clean osbuild worker cache"
-sudo systemctl stop osbuild-composer.socket osbuild-composer.service osbuild-worker@1.service
+sudo systemctl stop --now osbuild-composer.socket osbuild-composer.service osbuild-worker@1.service
 sleep 5
-sudo rm -rf /var/cache/osbuild-worker/*
+sudo rm -rf /var/cache/osbuild-worker/* /var/lib/osbuild-composer/*
 sudo systemctl start osbuild-composer.socket
