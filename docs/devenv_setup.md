@@ -131,11 +131,22 @@ When working with MicroShift based on a pre-release _minor_ version `Y` of OpenS
 
 ```bash
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
+OCP_REPO_NAME=rhocp-4.13-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms
+
+sudo tee /etc/yum.repos.d/${OCP_REPO_NAME}.repo >/dev/null <<EOF
+[${OCP_REPO_NAME}]
+name=Beta rhocp-4.13 RPMs for RHEL ${OSVERSION}
+baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/4.13-el${OSVERSION}-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
 
 sudo subscription-manager config --rhsm.manage_repos=1
-sudo subscription-manager repos \
-    --enable rhocp-4.12-for-rhel-${OSVERSION}-$(uname -i)-rpms \
-    --enable fast-datapath-for-rhel-${OSVERSION}-$(uname -i)-rpms
+# Uncomment this when OCP 4.13 is released
+# sudo subscription-manager repos \
+#     --enable rhocp-4.13-for-rhel-${OSVERSION}-$(uname -i)-rpms \
+#     --enable fast-datapath-for-rhel-${OSVERSION}-$(uname -i)-rpms
 ```
 </details>
 <details><summary>CentOS</summary>
