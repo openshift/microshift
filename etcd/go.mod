@@ -2,10 +2,10 @@ module github.com/openshift/microshift/etcd
 
 go 1.18
 
-require github.com/openshift/microshift v0.0.0-20221121140706-b79e07fef323
+require github.com/openshift/microshift v0.0.0
 
 replace (
-	github.com/openshift/microshift/ => ../
+	github.com/openshift/microshift => ../
 	github.com/openshift/microshift/pkg/config => ../pkg/config
 	github.com/openshift/microshift/pkg/util/cryptomaterial => ../pkg/util/cryptomaterial
 )
