@@ -4,7 +4,7 @@ It is recommended to review the current document and use the automation instruct
 
 ## Create Development Virtual Machine
 Start by downloading one of the supported boot images for the `x86_64` or `aarch64` architecture:
-* RHEL 8.7 or RHEL 9.1 from https://developers.redhat.com/products/rhel/download
+* RHEL 9.1 from https://developers.redhat.com/products/rhel/download
 * CentOS 9 Stream from https://www.centos.org/download
 
 ### Creating VM
@@ -19,7 +19,7 @@ sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client
 Move the ISO image to `/var/lib/libvirt/images` directory and run the following commands to create a virtual machine.
 ```bash
 VMNAME="microshift-dev"
-ISONAME=rhel-8.7-$(uname -i)-boot.iso
+ISONAME=rhel-baseos-9.1-$(uname -i)-boot.iso
 
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
@@ -63,7 +63,7 @@ Run the following commands to configure SUDO, upgrade the system, install basic 
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf clean all -y
 sudo dnf update -y
-sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
+sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build jq bash-completion
 sudo systemctl enable --now cockpit.socket
 
 # Install go1.19
