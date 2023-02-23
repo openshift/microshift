@@ -87,7 +87,7 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 		return err
 	}
 	if err := assets.ApplyConfigMapWithData(cm, cmData, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply sa %v: %v", cm, err)
+		klog.Warningf("Failed to apply configMap %v: %v", cm, err)
 		return err
 	}
 	extraParams := assets.RenderParams{
@@ -118,12 +118,10 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		sa = []string{
 			"components/openshift-router/service-account.yaml",
 		}
-		cm = []string{
-			"components/openshift-router/configmap.yaml",
-		}
 		svc = []string{
 			"components/openshift-router/service-internal.yaml",
 		}
+		cm                   = "components/openshift-router/configmap.yaml"
 		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"
 	)
 	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
@@ -142,8 +140,19 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
-	if err := assets.ApplyConfigMaps(cm, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply configMap %v, %v", cm, err)
+
+	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(microshiftDataDir))
+	caCertPath := cryptomaterial.CACertPath(serviceCADir)
+	cmData := map[string]string{}
+
+	caCertPEM, err := os.ReadFile(caCertPath)
+	if err != nil {
+		return err
+	}
+	cmData["service-ca.crt"] = string(caCertPEM)
+
+	if err := assets.ApplyConfigMapWithData(cm, cmData, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply configMap %v: %v", cm, err)
 		return err
 	}
 	if err := assets.ApplyServices(svc, nil, nil, kubeconfigPath); err != nil {
