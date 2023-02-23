@@ -44,7 +44,7 @@ fi
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf clean all -y
 sudo dnf update -y
-sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build bash-completion
+sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build jq bash-completion
 sudo systemctl enable --now cockpit.socket
 
 YQ_URL=https://github.com/mikefarah/yq/releases/download/v4.26.1/yq_linux_$(go env GOARCH)
@@ -62,7 +62,7 @@ if $BUILD_AND_INSTALL ; then
     # Build MicroShift
     # https://github.com/openshift/microshift/blob/release-4.12/docs/devenv_rhel8.md#build-microshift
     if [ ! -e ~/microshift ] ; then
-        git clone https://github.com/openshift/microshift.git ~/microshift
+        git clone https://github.com/openshift/microshift.git -b release-4.12 ~/microshift
     fi
     cd ~/microshift
 

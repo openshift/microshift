@@ -47,14 +47,21 @@ export DATAVOLSIZE=2
 Watch the output in the `Virt Viewer` popup, waiting for a successful completion of the installation procedure.
 
 ## Configure Virtual Machine
-Log into the hypervisor host and run the following command to get the IP address of the development virtual machine and use it to remotely connect to the system.
+Log into the hypervisor host and run the following commands to get the IP address of the development virtual machine and use it to remotely connect to the system.
 ```bash
 sudo virsh domifaddr microshift-dev
+...
+...
+VMIPADDR=192.168.122.29
+```
+
+Configure SSH not to require a password when logging into the system.
+```bash
+ssh-copy-id -f microshift@${VMIPADDR}
 ```
 
 Copy the configuration script and your OpenShift pull secret file to the virtual machine using `microshift:microshift` credentials.
 ```bash
-VMIPADDR=192.168.122.29
 scp scripts/devenv-builder/configure-vm.sh microshift@${VMIPADDR}:
 scp ~/.pull-secret.json microshift@${VMIPADDR}:
 ```

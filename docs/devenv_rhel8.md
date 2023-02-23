@@ -4,7 +4,7 @@ It is recommended to review the current document and use the automation instruct
 
 ## Create Development Virtual Machine
 Start by downloading the RHEL 8.7 ISO boot image for `x86_64` or `aarch64` architecture from the https://developers.redhat.com/products/rhel/download location.
-> RHEL 9.x operating system is not currently supported.
+> RHEL 9.x operating system is not supported for MicroShift 4.12 release.
 
 ### Creating VM
 Create a RHEL virtual machine with 2 cores, 4096MB of RAM and 50GB of storage. 
@@ -60,7 +60,7 @@ Run the following commands to configure SUDO, upgrade the system, install basic 
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf clean all -y
 sudo dnf update -y
-sudo dnf install -y git cockpit make gcc selinux-policy-devel rpm-build bash-completion
+sudo dnf install -y git cockpit make gcc selinux-policy-devel rpm-build jq bash-completion
 sudo systemctl enable --now cockpit.socket
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
@@ -69,7 +69,7 @@ You should now be able to access the VM Cockpit console using `https://<vm_ip>:9
 Log into the development virtual machine with the `microshift` user credentials.
 Clone the repository to be used for building various artifacts.
 ```bash
-git clone https://github.com/openshift/microshift.git ~/microshift
+git clone https://github.com/openshift/microshift.git -b release-4.12 ~/microshift
 cd ~/microshift
 ```
 
