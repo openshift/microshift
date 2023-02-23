@@ -27,7 +27,7 @@ As an example, run the following command to create a virtual machine named `micr
 > See the [Recommended system swap size](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/getting-started-with-swap_managing-storage-devices#recommended-system-swap-space_getting-started-with-swap) document for more information.
 
 ```bash
-ISONAME=rhel-8.7-$(uname -i)-dvd.iso
+ISONAME=rhel-baseos-9.1-$(uname -i)-dvd.iso
 
 ./scripts/devenv-builder/create-vm.sh microshift-dev \
     /var/lib/libvirt/images \
@@ -38,7 +38,7 @@ ISONAME=rhel-8.7-$(uname -i)-dvd.iso
 or
 
 ```bash
-ISONAME=rhel-8.7-$(uname -i)-dvd.iso
+ISONAME=rhel-baseos-9.1-$(uname -i)-dvd.iso
 
 export VMNAME=microshift-dev
 export VMDISKDIR=/var/lib/libvirt/images
@@ -57,18 +57,24 @@ Watch the output in the `virt-viewer` popup, waiting for a successful completion
 Log into the hypervisor host and run the following command to get the IP address of the development virtual machine and use it to remotely connect to the system.
 ```bash
 sudo virsh domifaddr microshift-dev
+...
+...
+VMIPADDR=192.168.122.29
+```
+
+Configure SSH not to require a password when logging into the system.
+```bash
+ssh-copy-id -f microshift@${VMIPADDR}
 ```
 
 Copy the configuration script and your OpenShift pull secret file to the virtual machine using `microshift:microshift` credentials.
 ```bash
-VMIPADDR=192.168.122.29
 scp scripts/devenv-builder/configure-vm.sh microshift@${VMIPADDR}:
 scp ~/.pull-secret.json microshift@${VMIPADDR}:
 ```
 
 Log into the development virtual machine using `microshift:microshift` credentials and run the following command to configure MicroShift.
 ```bash
-chmod a+x ~/configure-vm.sh
 ~/configure-vm.sh ~/.pull-secret.json
 ```
 
