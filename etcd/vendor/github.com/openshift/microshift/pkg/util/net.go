@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,6 @@ package util
 
 import (
 	"crypto/tls"
-	"fmt"
 	tcpnet "net"
 	"net/http"
 	"os"
@@ -26,51 +25,28 @@ import (
 	"strings"
 	"time"
 
+	"github.com/openshift/microshift/pkg/config/ovn"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 )
 
-const (
-	// Used to get gateway IP when default route doesn't exist
-	OVNGatewayInterface = "br-ex"
-)
-
 func GetHostIP() (string, error) {
+	// Prefer OVN-K gateway IP if it is the CNI
+	gatewayIP, err := ovn.GetOVNGatewayIP()
+	if err != nil && !strings.Contains(err.Error(), "no such network interface") {
+		return "", err
+	}
+	klog.V(2).Infof("ovn gateway IP address: %s", gatewayIP)
+
 	ip, err := net.ChooseHostInterface()
 	if err == nil {
 		return ip.String(), nil
 	}
 	klog.V(2).Infof("failed to find default route IP address: %v", err)
 
-	gatewayIP, err := getOVNGatewayIP()
-	if err != nil {
-		return "", err
-	}
-	klog.V(2).Infof("ovn gateway IP address: %s", gatewayIP)
-
 	return gatewayIP, nil
-}
-
-func getOVNGatewayIP() (string, error) {
-	iface, err := tcpnet.InterfaceByName(OVNGatewayInterface)
-	if err != nil {
-		return "", err
-	}
-	addrs, err := iface.Addrs()
-	if err != nil {
-		return "", err
-	}
-	for _, addr := range addrs {
-		ip := addr.(*tcpnet.IPNet).IP
-		if ip.To4() != nil {
-			return ip.To4().String(), nil
-		} else {
-			return ip.String(), nil
-		}
-	}
-	return "", fmt.Errorf("failed to get ovn gateway IP address")
 }
 
 func RetryInsecureHttpsGet(url string) int {
