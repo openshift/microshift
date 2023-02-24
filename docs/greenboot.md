@@ -17,7 +17,7 @@ interruption of service in case of a failed upgrade.
 
 ## Implementation Details
 
-### MicroShift Validation
+### Greenboot Configuration
 
 MicroShift includes the `40_microshift_running_check.sh` health check script to
 validate that all the required MicroShift services are up and running. There is
@@ -30,14 +30,26 @@ The health check script is installed into the `/etc/greenboot/check/required.d`
 directory and it is not executed during the system boot in case the `greenboot`
 package is not present.
 
+The `40_microshift_pre_rollback.sh` pre-rollback script is installed into the
+`/etc/greenboot/red.d` directory, to be executed right before the system rollback
+takes place. The script performs MicroShift pod and OVN cleanup to avoid potential
+conflicts with the software rolled back to a previous version.
+
+> The existing MicroShift data and container images are not affected by this operation.
+
 In addition, if the `greenboot-default-health-check` RPM subpackage is installed,
-it already includes
-[health check scripts](https://github.com/fedora-iot/greenboot#health-checks-included-with-subpackage-greenboot-default-health-checks)
+it already includes [health check scripts](https://github.com/fedora-iot/greenboot#health-checks-included-with-subpackage-greenboot-default-health-checks)
 verifying that DNS and `ostree` services can be accessed.
 
-Exiting the script with a non-zero status will have the boot declared as failed.
 Greenboot redirects all the script output to the system log, accessible via the
-`journalctl -u greenboot-healthcheck.service` command.
+following commands:
+* `journalctl -u greenboot-healthcheck.service` for the health check procedure
+* `journalctl -u redboot-task-runner.service` for the pre-rollback procedure
+
+### MicroShift Validation
+
+Exiting the health check script with a non-zero status will have the boot declared
+as failed. The following validations are performed by the script.
 
 |Validation                                           |Pass  |Fail  |
 |-----------------------------------------------------|------|------|
@@ -50,13 +62,16 @@ Greenboot redirects all the script output to the system log, accessible via the
 |For each core namespace, wait for Pods to be ready   |Next  |exit 1|
 |For each core namespace, check Pods not restarting   |exit 0|exit 1|
 
-> If the system is not booted using the `ostree` file system, the health check
-> procedures still run, but no rollback would be possible in case of an upgrade
-> failure.
+The pre-rollback script runs the `sudo microshift-cleanup-data --ovn` command
+to prepare the system for a potential software downgrade.
 
-The wait period in each validation starts from 5 minutes base time and it is
-incremented by the base wait period after each boot in the verification loop.
-It is possible to override the base time wait period setting with the
+> If the system is not booted using the `ostree` file system, the health check
+> and pre-rollback procedures still run, but no rollback would be possible in
+> case of an upgrade failure.
+
+The wait period in each health check validation starts from 5 minutes base time
+and it is incremented by the base wait period after each boot in the verification
+loop. It is possible to override the base time wait period setting with the
 `MICROSHIFT_WAIT_TIMEOUT_SEC` environment variable in the `/etc/greenboot/greenboot.conf`
 configuration file alongside other [Greenboot Configuration](https://github.com/fedora-iot/greenboot#configuration)
 settings.
@@ -79,3 +94,19 @@ boot_success=1
 > core MicroShift services. Users should install their own workload validation
 > scripts using `greenboot` facilities to ensure the successful operation after
 > system upgrades.
+
+## The `systemd` Journal Service Configuration
+
+The default configuration of the `systemd` journal service stores the data in
+the volatile `/run/log/journal` directory, which does not persist after a system
+boot. To monitor `greenboot` activities across system boots, it is recommended to
+enable the journal data persistency by creating the `/var/log/journal` directory
+and setting limits on the maximal journal data size.
+
+Run the following commands to configure the journal data persistency and limits.
+```bash
+sudo mkdir -p /var/log/journal/
+sudo sed -i 's/.*Storage=.*/Storage=auto/g'           /etc/systemd/journald.conf
+sudo sed -i 's/.*SystemMaxUse=.*/SystemMaxUse=1G/g'   /etc/systemd/journald.conf
+sudo sed -i 's/.*RuntimeMaxUse=.*/RuntimeMaxUse=1G/g' /etc/systemd/journald.conf
+```

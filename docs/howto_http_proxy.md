@@ -92,7 +92,7 @@ Log into the virtual machine to verify that MicroShift can run normally when `CR
 
 Run the following commands to clean up the existing `CRI-O` images and restart MicroShift.
 ```
-echo 1 | /usr/bin/cleanup-all-microshift-data
+echo 1 | sudo /usr/bin/microshift-cleanup-data --all
 sudo systemctl enable microshift --now
 ```
 Configure the MicroShift access and check if the PODs are up and running.

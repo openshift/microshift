@@ -52,4 +52,10 @@ if ! subscription-manager status >& /dev/null ; then
    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-*
 fi
 
+# Configure systemd journal service to persist logs between boots and limit their size to 1G
+mkdir -p /var/log/journal/
+sed -i 's/.*Storage=.*/Storage=auto/g'           /etc/systemd/journald.conf
+sed -i 's/.*SystemMaxUse=.*/SystemMaxUse=1G/g'   /etc/systemd/journald.conf
+sed -i 's/.*RuntimeMaxUse=.*/RuntimeMaxUse=1G/g' /etc/systemd/journald.conf
+
 %end

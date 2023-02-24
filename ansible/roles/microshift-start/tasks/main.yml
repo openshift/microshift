@@ -2,7 +2,8 @@
 # microshift-start tasks
 
 - name: cleanup microshift data
-  ansible.builtin.shell: echo 1 | /usr/bin/cleanup-all-microshift-data
+  become: yes
+  ansible.builtin.shell: echo 1 | /usr/bin/microshift-cleanup-data --all
   when: cleanup_microshift | default('true') | bool
 
 - name: disable microshift service

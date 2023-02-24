@@ -142,7 +142,7 @@ make
 install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
 install -p -m755 ./_output/microshift-etcd %{buildroot}%{_bindir}/microshift-etcd
-install -p -m755 hack/cleanup.sh %{buildroot}%{_bindir}/cleanup-all-microshift-data
+install -p -m755 scripts/microshift-cleanup-data.sh %{buildroot}%{_bindir}/microshift-cleanup-data
 
 restorecon -v %{buildroot}%{_bindir}/microshift
 restorecon -v %{buildroot}%{_bindir}/microshift-etcd
@@ -203,7 +203,9 @@ install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinu
 
 # Greenboot scripts
 install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/check/required.d
+install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
 install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
+install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
 
 %post
 
@@ -251,7 +253,7 @@ systemctl enable --now --quiet openvswitch || true
 %license LICENSE
 %{_bindir}/microshift
 %{_bindir}/microshift-etcd
-%{_bindir}/cleanup-all-microshift-data
+%{_bindir}/microshift-cleanup-data
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
 %dir %{_sysconfdir}/microshift/manifests
@@ -281,10 +283,14 @@ systemctl enable --now --quiet openvswitch || true
 
 %files greenboot
 %{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
+%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Fri Feb 24 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
+- Implement MicroShift pre-rollback greenboot procedure
+
 * Mon Feb 20 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
 - Create empty manifests directory
 

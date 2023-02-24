@@ -157,7 +157,7 @@ if [ $BUILD_AND_INSTALL = true ] ; then
     echo " - Clean up MicroShift service configuration"
     echo ""
     echo "watch sudo \$(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A"
-    echo "echo 1 | /usr/bin/cleanup-all-microshift-data"
+    echo "echo 1 | sudo /usr/bin/microshift-cleanup-data --all"
 fi
 
 echo ""

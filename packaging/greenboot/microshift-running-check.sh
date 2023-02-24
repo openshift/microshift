@@ -172,12 +172,13 @@ function namespace_pods_not_restarting() {
 # Exit if the current user is not 'root'
 if [ $(id -u) -ne 0 ] ; then
     echo "The '${SCRIPT_NAME}' script must be run with the 'root' user privileges"
-    exit 0
+    exit 1
 fi
 
 echo "STARTED"
 
-# Dump GRUB boot and Greenboot variables if any
+# Dump GRUB boot, Greenboot variables and ostree status affecting the script behavior.
+# This information is important for troubleshooting rollback issues.
 grub_vars=$(grub2-editenv - list | grep ^boot_ || true)
 boot_vars=$(set | egrep '^GREENBOOT_|^MICROSHIFT_' || true)
 
