@@ -1,22 +1,2 @@
-# cluster-kube-apiserver-operator embedded-component 077a493657eb3355f72fa37bf86cb029c1441983 to 4134462c6c60429941a309342d027463fe875b38
-7e1c089fd0a2399d3c1e9926a5a5c3da95d07e3b 2023-02-21T11:52:41+01:00 Bump openshift/api to enable DynamicResourceAllocation through TechPreviewNoUpgrade
-# cluster-kube-controller-manager-operator embedded-component 7f293daf4d14fca5855513d3aaaf5b07d0e01d61 to 4ca346ef97def3697f1aa0368c9b35459b9b2f59
-03b378684676993110d606f9c336588d6c12a176 2023-02-21T11:19:29+01:00 Bump openshift/api to enable DynamicResourceAllocation through TechPreviewNoUpgrade
-# cluster-kube-scheduler-operator embedded-component 05ac3aefa4d63bab9aadddc890dd9390a503ad57 to d3978864fb58063235be176c18fe50457b5223f3
-b67d3fe7f0eb59348b4d7e70edd14e0b3c44096d 2023-02-21T11:15:16+01:00 Bump openshift/api to enable DynamicResourceAllocation through TechPreviewNoUpgrade
-# cluster-network-operator embedded-component 139894ce16e6639f67e2d575453afad370755e91 to 3b5212db0bbc69f4dadb9fe353e3e5ac7eee3e33
-4059c6a23508f5ac4aca6164d5e2f822ad86da92 2023-02-20T15:21:55+01:00 Print RawCNIConfig in its string representation
-0a68f6b18470c7505e44cfc82efe645c998f89e4 2022-12-08T18:32:26+00:00 Updating cluster-network-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/ef52fa34ff45201392333743c99c4b25b52fe724/images/cluster-network-operator.yml
-# kubernetes embedded-component b9237230e688eee773b278f36f4cb2c8952e9cc6 to 518f3edfe79c93dcc01145153247ebffcd4fe6e6
-e068ca2fd22b16c7da3baca969094e36ade1e3cb 2023-02-20T09:48:29-05:00 UPSTREAM: 115863: Remove global framework variable
-25af2bbb261c415c60d4b9dcc5e4fee547cf6520 2023-01-04T14:00:56-08:00 UPSTREAM: 113799: tests: network: Prefer internal IPs first
-# machine-config-operator embedded-component f4c13d6e7004ec37f81fd28f4db3823f1d9b3b86 to 8671aa4a777a940b1e45c97b6bd72e26d76acace
-6be8c0349f56f69888baf4cbffcdfb46c92c128f 2023-02-20T11:34:03-06:00 add protectKerneLDefaults
-fae8adc4841d675f7caf983cf0649a8670920632 2023-01-27T17:38:48+01:00 OPNET-197: Remove node-ip from kubelet for dual-stack vSphere
-# ovn-kubernetes image-amd64 7eee3405c53fd655e409a1fb8c2df5c2f717fee2 to e75917d7dcd961d39b4c7768d88aa5d13ba67eb0
-d984ef4e8631c5e5b592b2ff2f0977ef7da4efd2 2023-02-14T13:19:02-05:00 Remove ICNIv1 from ovn-kubernetes
-# kubernetes image-amd64 b9237230e688eee773b278f36f4cb2c8952e9cc6 to 518f3edfe79c93dcc01145153247ebffcd4fe6e6
-e068ca2fd22b16c7da3baca969094e36ade1e3cb 2023-02-20T09:48:29-05:00 UPSTREAM: 115863: Remove global framework variable
-25af2bbb261c415c60d4b9dcc5e4fee547cf6520 2023-01-04T14:00:56-08:00 UPSTREAM: 113799: tests: network: Prefer internal IPs first
-# ovn-kubernetes image-arm64 7eee3405c53fd655e409a1fb8c2df5c2f717fee2 to e75917d7dcd961d39b4c7768d88aa5d13ba67eb0
-d984ef4e8631c5e5b592b2ff2f0977ef7da4efd2 2023-02-14T13:19:02-05:00 Remove ICNIv1 from ovn-kubernetes
+# oc image-arm64 49b1e9f681b3dbdd4f43ca3d288ac64f4c681e2d to a04d9dc7e12a1d251da3502df69d8dc8a48e18b8
+ed394856a5c5309b9f58b0b1aa532ba918047329 2023-02-20T15:51:14-08:00 pkg/cli/admin/upgrade/channel: Use PATCH instead of POST for spec updates
