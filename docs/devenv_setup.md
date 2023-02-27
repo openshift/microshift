@@ -217,7 +217,7 @@ watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kube
 
 Finalize the procedure by stopping the MicroShift service and cleaning up its images and configuration data.
 ```
-echo 1 | ~/microshift/hack/cleanup.sh
+echo 1 | sudo ~/microshift/scripts/microshift-cleanup-data.sh --all
 ```
 
 It should now be possible to run a standalone MicroShift executable file as presented in the next section.
@@ -257,7 +257,7 @@ tail -3 /tmp/microshift.log
 
 This command only stops the MicroShift process. To perform the full cleanup including `CRI-O`, MicroShift and OVN caches, run the following script.
 ```bash
-echo 1 | ~/microshift/hack/cleanup.sh
+echo 1 | sudo ~/microshift/scripts/microshift-cleanup-data.sh --all
 ```
 > The full cleanup does not remove OVS configuration applied by the MicroShift service initialization sequence.
 > Run the `sudo /usr/bin/configure-ovs.sh` command to revert to the original network settings.
@@ -290,7 +290,7 @@ Rebuild the MicroShift executable as described in the [Build MicroShift](#build-
 ```bash
 scp ~/microshift/_output/bin/microshift redhat@microshift-edge:
 ssh redhat@microshift-edge ' \
-    echo 1 | /usr/bin/cleanup-all-microshift-data && \
+    echo 1 | sudo /usr/bin/microshift-cleanup-data --all && \
     sudo cp ~redhat/microshift /usr/bin/microshift && \
     sudo systemctl enable microshift --now && \
     echo Done '

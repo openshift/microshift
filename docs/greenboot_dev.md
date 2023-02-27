@@ -41,6 +41,9 @@ FAILURE
 ...
 ```
 
+> Run the `sudo journalctl -o cat -u redboot-task-runner.service` command
+> to see the output of the pre-rollback script.
+
 After a few failed verification attempts, the system should roll back into the
 previous state. Use the `rpm-ostree` command to verify the current deployment.
 
@@ -125,6 +128,9 @@ FAILURE
 ...
 ...
 ```
+
+> Run the `sudo journalctl -o cat -u redboot-task-runner.service` command
+> to see the output of the pre-rollback script.
 
 After a few failed verification attempts, the system should roll back into the
 previous state. Use the `rpm-ostree` command to verify the current deployment.
