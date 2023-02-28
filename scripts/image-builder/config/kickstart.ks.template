@@ -72,8 +72,10 @@ sed -i 's/.*SystemMaxUse=.*/SystemMaxUse=1G/g'   /etc/systemd/journald.conf
 sed -i 's/.*RuntimeMaxUse=.*/RuntimeMaxUse=1G/g' /etc/systemd/journald.conf
 
 # Make sure all the Ethernet network interfaces are connected automatically
-for dev in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" && $3 == "no" {print $1}') ; do
-    nmcli connection modify ${dev} connection.autoconnect yes
+for uuid in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" && $3 == "no" {print $1}') ; do
+    # Remove autoconnect option from the configuration file to keep it enabled after reboot
+    file=$(nmcli -f uuid,filename connection | awk -v uuid=${uuid} '$1 == uuid' | sed "s/${uuid}//g" | xargs)
+    sed -i '/autoconnect=.*/d' "${file}"
 done
 
 %end
