@@ -7,8 +7,6 @@ import (
 	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
 	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/imagereferencemutators"
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccadmission"
-	configclient "github.com/openshift/client-go/config/clientset/versioned"
-	configv1informer "github.com/openshift/client-go/config/informers/externalversions"
 	securityv1client "github.com/openshift/client-go/security/clientset/versioned"
 	securityv1informer "github.com/openshift/client-go/security/informers/externalversions"
 	userclient "github.com/openshift/client-go/user/clientset/versioned"
@@ -22,7 +20,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/kubernetes/openshift-kube-apiserver/admission/authorization/restrictusers"
 	"k8s.io/kubernetes/openshift-kube-apiserver/admission/authorization/restrictusers/usercache"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/autoscaling/managementcpusoverride"
 	"k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/nodeenv"
 	"k8s.io/kubernetes/openshift-kube-apiserver/enablement"
 
@@ -56,7 +53,6 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
 		sccadmission.NewInitializer(openshiftInformers.getOpenshiftSecurityInformers().Security().V1().SecurityContextConstraints()),
 		nodeenv.NewInitializer(enablement.OpenshiftConfig().ProjectConfig.DefaultNodeSelector),
 		admissionrestconfig.NewInitializer(*rest.CopyConfig(genericConfig.LoopbackClientConfig)),
-		managementcpusoverride.NewInitializer(openshiftInformers.getOpenshiftInfraInformers().Config().V1().Infrastructures()),
 	)
 
 	// This is needed in order to have the correct initializers for the SCC admission plugin which is used to mutate
@@ -115,10 +111,6 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
 	if err != nil {
 		return nil, err
 	}
-	configClient, err := configclient.NewForConfig(loopbackClientConfig)
-	if err != nil {
-		return nil, err
-	}
 
 	// TODO find a single place to create and start informers.  During the 1.7 rebase this will come more naturally in a config object,
 	// before then we should try to eliminate our direct to storage access.  It's making us do weird things.
@@ -127,7 +119,6 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
 	ret := &kubeAPIServerInformers{
 		OpenshiftSecurityInformers: securityv1informer.NewSharedInformerFactory(securityClient, defaultInformerResyncPeriod),
 		OpenshiftUserInformers:     userinformer.NewSharedInformerFactory(userClient, defaultInformerResyncPeriod),
-		OpenshiftConfigInformers:   configv1informer.NewSharedInformerFactory(configClient, defaultInformerResyncPeriod),
 	}
 	if err := ret.OpenshiftUserInformers.User().V1().Groups().Informer().AddIndexers(cache.Indexers{
 		usercache.ByUserIndexName: usercache.ByUserIndexKeys,
@@ -141,7 +132,6 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
 type kubeAPIServerInformers struct {
 	OpenshiftSecurityInformers securityv1informer.SharedInformerFactory
 	OpenshiftUserInformers     userinformer.SharedInformerFactory
-	OpenshiftConfigInformers   configv1informer.SharedInformerFactory
 }
 
 func (i *kubeAPIServerInformers) getOpenshiftSecurityInformers() securityv1informer.SharedInformerFactory {
@@ -150,12 +140,8 @@ func (i *kubeAPIServerInformers) getOpenshiftSecurityInformers() securityv1infor
 func (i *kubeAPIServerInformers) getOpenshiftUserInformers() userinformer.SharedInformerFactory {
 	return i.OpenshiftUserInformers
 }
-func (i *kubeAPIServerInformers) getOpenshiftInfraInformers() configv1informer.SharedInformerFactory {
-	return i.OpenshiftConfigInformers
-}
 
 func (i *kubeAPIServerInformers) Start(stopCh <-chan struct{}) {
 	i.OpenshiftSecurityInformers.Start(stopCh)
 	i.OpenshiftUserInformers.Start(stopCh)
-	i.OpenshiftConfigInformers.Start(stopCh)
 }
