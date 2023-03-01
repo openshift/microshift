@@ -1,0 +1,25 @@
+# Unix domain socket endpoint of gRPC
+#socket-name: /run/lvmd/lvmd.socket
+
+device-classes:
+  # The name of a device-class
+  #- name: default
+
+    # The group where this device-class creates the logical volumes
+    #volume-group: rhel
+
+    # Storage capacity in GiB to be spared
+    #spare-gb: 0
+
+    # A flag to indicate that this device-class is used by default
+    #default: true
+
+    # The number of stripes in the logical volume
+    #stripe: ""
+
+    # The amount of data that is written to one device before moving to the next device
+    #stripe-size: ""
+
+    # Extra arguments to pass to lvcreate, e.g. ["--type=raid1"]
+    #lvcreate-options:
+      #- ""
