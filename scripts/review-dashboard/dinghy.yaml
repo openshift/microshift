@@ -1,0 +1,35 @@
+---
+digests:
+
+  - digest: microshift.html
+    title: Microshift Developer Dashboard
+
+    # Summarize the last day's activities in all queries
+    since: 1 day
+
+    items:
+
+      # Look for enhancement PRs that mention MicroShift
+      - title: Enhancements
+        search: repo:openshift/enhancements is:pr is:open ( microshift OR USHIFT )
+
+      # Include all pull requests against MicroShift itself
+      - title: Code Changes
+        url: https://github.com/openshift/microshift
+
+      # Include changes to MicroShift CI
+      - title: CI Changes
+        search: ( repo:openshift/origin OR repo:openshift/release ) is:pr is:open ( microshift OR USHIFT )
+
+      # Look for documentation changes for MicroShift
+      - title: Documentation
+        search: repo:openshift/openshift-docs is:pr is:open ( microshift OR USHIFT )
+
+defaults:
+  ignore_users:
+    # bots are ignored by default, but some of our bots don't look like
+    # bots, so ignore them explicitly
+    - ocpdocs-preview-bot
+    - openshift-ci
+    - openshift-ci-robot
+    - openshift-merge-robot
