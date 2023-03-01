@@ -5,7 +5,7 @@ https://github.com/openshift/cluster-kube-controller-manager-operator embedded-c
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 845ae423e831b1cacf0bcae5e6528f1d21b5ddf2
 https://github.com/openshift/cluster-network-operator embedded-component 6f5e144f260333ad0f70a88a55eab4fc81ecd7a2
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component d1915d130481541b8bacb5b98eddbc1541809d0a
-https://github.com/openshift/cluster-policy-controller embedded-component a78a00b3632f2c5a977ca200bf2b7a421eb121a8
+https://github.com/openshift/cluster-policy-controller embedded-component 139ac0499ac4d744023827ceb6d16aa6b467be27
 https://github.com/openshift/etcd embedded-component 978cfefd2f21c4ec1ac84ed95130cbff510fbe1b
 https://github.com/openshift/kubernetes embedded-component 18eadcaadf0be77350013c8911ca953bc2ca3778
 https://github.com/openshift/machine-config-operator embedded-component 4099f3c4f4ea9df85a7516a6300a4c6e5504a5cd
