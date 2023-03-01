@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/mitchellh/go-homedir"
@@ -57,6 +58,19 @@ type IngressConfig struct {
 	ServingKey         []byte
 }
 
+type EtcdConfig struct {
+	// The limit on the size of the etcd database; etcd will start failing writes if its size on disk reaches this value
+	QuotaBackendBytes int64
+	// If the backend is fragmented more than `maxFragmentedPercentage`
+	//		and the database size is greater than `minDefragBytes`, do a defrag.
+	MinDefragBytes          int64
+	MaxFragmentedPercentage float64
+	// How often to check the conditions for defragging (0 means no defrags, except for a single on startup if `doStartupDefrag` is set).
+	DefragCheckFreq time.Duration
+	// Whether or not to do a defrag when the server finishes starting
+	DoStartupDefrag bool
+}
+
 type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
@@ -76,6 +90,7 @@ type MicroshiftConfig struct {
 	Cluster          ClusterConfig `json:"cluster"`
 
 	Ingress IngressConfig `json:"-"`
+	Etcd    EtcdConfig    `json:"etcd"`
 }
 
 // Top level config file
@@ -222,6 +237,13 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			ClusterCIDR:          "10.42.0.0/16",
 			ServiceCIDR:          "10.43.0.0/16",
 			ServiceNodePortRange: "30000-32767",
+		},
+		Etcd: EtcdConfig{
+			MinDefragBytes:          100 * 1024 * 1024, // 100MB
+			MaxFragmentedPercentage: 45,                // percent
+			DefragCheckFreq:         5 * time.Minute,
+			DoStartupDefrag:         true,
+			QuotaBackendBytes:       2 * 1024 * 1024 * 1024, // 2GB
 		},
 	}
 }
