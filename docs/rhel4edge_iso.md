@@ -121,7 +121,7 @@ $ sudo vgdisplay -s
 ### Offline Containers
 The `scripts/image-builder/build.sh` script supports a special mode for including the MicroShift container image dependencies into the generated ISO. When the container images required by MicroShift are preinstalled, `CRI-O` does not attempt to pull them when MicroShift service is first started, saving network bandwidth and avoiding external network connections.
 
-Image Builder needs to be configured to use the pull secret for downloading container images during the build procedure. 
+Image Builder needs to be configured to use the pull secret for downloading container images during the build procedure.
 Run the following commands to reuse the `CRI-O` pull secret file.
 ```bash
 sudo mkdir -p /etc/osbuild-worker
@@ -168,6 +168,7 @@ virt-install \
     --os-type generic \
     --events on_reboot=restart \
     --cdrom ./microshift-installer-*.$(uname -i).iso \
+    --wait \
 "
 ```
 

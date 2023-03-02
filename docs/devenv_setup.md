@@ -32,6 +32,7 @@ virt-install \
     --os-type generic \
     --events on_reboot=restart \
     --cdrom ./${ISONAME} \
+    --wait \
 "
 ```
 
