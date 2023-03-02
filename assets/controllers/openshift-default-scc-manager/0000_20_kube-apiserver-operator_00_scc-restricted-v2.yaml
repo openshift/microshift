@@ -40,6 +40,7 @@ supplementalGroups:
 users: []
 volumes:
 - configMap
+- csi
 - downwardAPI
 - emptyDir
 - ephemeral
