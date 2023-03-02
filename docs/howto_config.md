@@ -20,6 +20,12 @@ apiServer:
     - ""
 debugging:
   logLevel: ""
+etcd:
+  quotaBackendSize: ""
+  defragCheckFreq: ""
+  doStartupDefrag: false
+  minDefragSize: ""
+  maxFragmentedPercentage: 0
 ```
 
 ## Default Settings
@@ -42,6 +48,12 @@ apiServer:
   subjectAltNames: []
 debugging:
   logLevel: "Normal"
+etcd:
+  quotaBackendSize: "2Gi"
+  defragCheckFreq: "5m"
+  doStartupDefrag: true
+  minDefragSize: "100Mi"
+  maxFragmentedPercentage: 45
 ```
 
 ## Service NodePort range
