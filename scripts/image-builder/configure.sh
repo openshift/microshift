@@ -5,7 +5,8 @@ OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
 
 sudo dnf install -y git osbuild-composer composer-cli ostree rpm-ostree \
     cockpit-composer cockpit-machines bash-completion podman genisoimage \
-    createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build
+    createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
+    containernetworking-plugins
 sudo systemctl enable osbuild-composer.socket --now
 sudo systemctl enable cockpit.socket --now
 sudo firewall-cmd --add-service=cockpit --permanent
