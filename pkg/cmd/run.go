@@ -11,6 +11,7 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/kustomize"
+	"github.com/openshift/microshift/pkg/loadbalancerservice"
 	"github.com/openshift/microshift/pkg/mdns"
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/servicemanager"
@@ -94,6 +95,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig) error {
 	util.Must(m.AddService((controllers.NewVersionManager((cfg)))))
 	util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	util.Must(m.AddService(node.NewKubeletServer(cfg)))
+	util.Must(m.AddService(loadbalancerservice.NewLoadbalancerServiceController(cfg)))
 
 	// Storing and clearing the env, so other components don't send the READY=1 until MicroShift is fully ready
 	notifySocket := os.Getenv("NOTIFY_SOCKET")
