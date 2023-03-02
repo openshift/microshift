@@ -1,7 +1,5 @@
-# Deploying a TCP Load Balancer for User Workloads
-MicroShift does not currently offer an implementation of network load balancers ([Services of type LoadBalancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer)). If load balancer facilities are required by user workloads, it is possible to deploy 3rd party load balancer services. 
-
-This document demonstates how to deploy the [MetalLB](https://metallb.universe.tf) service, which is a load balancer implementation for bare metal clusters.
+# Deploying a TCP Load Balancer type of Service for User Workloads
+MicroShift offers an built-in implementation of network load balancers ([Services of type LoadBalancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer)). It will use the node IP as the ingress IP of the loadbalancer type of service.
 
 ## Create MicroShift Server
 Use the instructions in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document to configure a virtual machine running MicroShift. 
@@ -12,39 +10,6 @@ Log into the virtual machine and run the following commands to configure the Mic
 mkdir ~/.kube
 sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
 oc get pods -A
-```
-
-## Install Load Balancer
-Log into the virtual machine and run the following commands to create the `MetalLB` namespace and deployment.
-
-```
-oc apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
-oc adm policy add-scc-to-user privileged -z controller -n metallb-system
-oc adm policy add-scc-to-user privileged -z speaker -n metallb-system
-```
-
-Verify that the `MetalLB` pods are up and running in the `metallb-system` namespace.
-
-```bash
-oc get pods -n metallb-system
-NAME                          READY   STATUS    RESTARTS   AGE
-controller-64cc46b9f9-2csb7   1/1     Running   0          107s
-speaker-fqmq4                 1/1     Running   0          107s
-```
-
-Once all the pods are available, create an `IPAddressPool` resource to define the default address pool for the load balancer to use.
-
-```bash
-oc create -f - <<EOF
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: default
-  namespace: metallb-system
-spec:
-  addresses:
-  - 192.168.1.240-192.168.1.250
-EOF
 ```
 
 ## Install User Workload
@@ -71,7 +36,7 @@ oc get pods -n $NAMESPACE
 ```
 
 ## Create Load Balancer Service
-Log into the virtual machine and run the following command to create the `LoadBalancer` service for `nginx` application using the default `MetalLB` address pool.
+Log into the virtual machine and run the following command to create the `LoadBalancer` service for `nginx` application.
 
 ```bash
 oc create -n $NAMESPACE -f - <<EOF
@@ -79,19 +44,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx
-  annotations:
-    metallb.universe.tf/address-pool: default
 spec:
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: 8080
   selector:
     app: nginx
   type: LoadBalancer
 EOF
 ```
 
-Verify that the service exists and an external IP address has been assigned to it.
+Verify that the service exists and an external IP address has been assigned to it. And the external IP is the same as the node IP.
 
 ```bash
 oc get svc -n $NAMESPACE

@@ -21,17 +21,23 @@ spec:
         app: nginx
     spec:
       containers:
-      - image: nginx:1.18
+      - image: quay.io/packit/nginx-unprivileged
         imagePullPolicy: Always
         name: nginx
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         volumeMounts:
         - name: nginx-configs
           subPath: headers.conf
           mountPath: /etc/nginx/conf.d/headers.conf
-      securityContext:
-        runAsUser: 0
+        securityContext:
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          runAsUser: 1000
       volumes:
         - name: nginx-configs
           configMap:
