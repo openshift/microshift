@@ -11,10 +11,10 @@
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5ab6561dbe5a00a9b96e1c29818d8376c8e871e6757875c9cf7f48e333425065",
     "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6b9d0e907a9d523423fbaee40c302df90e9e1b89ce3a5ae621821845e2b4188d",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:91e31c0e8171d92d991322419c860cde1d4126fa927be2c453fbe14aa22743f7",
-    "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel8@sha256:10bffded5317da9de6c45ba74f0bb10e0a08ddb2bfef23b11ac61287a37f10a1",
-    "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:a4319ff7c736ca9fe20500dc3e5862d6bb446f2428ea2eadfb5f042195f4f860",
-    "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:9df24be671271f5ea9414bfd08e58bc2fa3dc4bc68075002f3db0fd020b58be0",
-    "topolvm_csi_resizer": "registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:9d486daffd348664c00d8b80bd0da973b902f3650acdef37e1b813278ed6c107",
-    "topolvm_csi_provisioner": "registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:199eac2ba4c8390daa511b040315e415cfbcfa80aa7af978a33624445b96c17c"
+    "topolvm_csi": "quay.io/rhceph-dev/lvms4-topolvm-rhel8@sha256:8b83680c069677f5e541482e63087232a29f61f631f4f1fc3d7ecafa81dd9bb3",
+    "topolvm_csi_registrar": "quay.io/rhceph-dev/openshift-ose-csi-node-driver-registrar@sha256:df29101fc9f8e47ee64d641a25dd527aa700240f6d97fdd79c4544ae0aa84553",
+    "topolvm_csi_livenessprobe": "quay.io/rhceph-dev/openshift-ose-csi-livenessprobe@sha256:7417e06cbe4eb12e6c81eac5a2f6a5462e1ce775d4e9e46f04ebc4ea62fd4fb8",
+    "topolvm_csi_resizer": "quay.io/rhceph-dev/openshift-ose-csi-external-resizer@sha256:66bd5d06f5b452cccbf2fa18fd92aa90c5050d0bc2531cb1a7a66ec5ae6d7b28",
+    "topolvm_csi_provisioner": "quay.io/rhceph-dev/openshift-ose-csi-external-provisioner@sha256:2b373ee7206b65636332e8c747847a9abed6a5d042b65a0febc52b6c167673c2"
   }
 }
