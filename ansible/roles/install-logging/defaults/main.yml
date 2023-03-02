@@ -2,8 +2,8 @@
 # install-logging default vars
 
 logging_packages:
- - golang-github-prometheus
- - grafana
+  - golang-github-prometheus
+  - grafana
 
 logging_services:
   - prometheus

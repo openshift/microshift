@@ -23,7 +23,7 @@
   when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat") or (ansible_distribution == "Fedora")
 
 - name: copy prometheus config
-  template:
+  ansible.builtin.template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
     backup: true
@@ -38,6 +38,10 @@
 - name: get content of microshift grafana dashboard
   ansible.builtin.set_fact:
     microshift_dashboard: "{{ lookup('ansible.builtin.file', 'microshift_perf.json') }}"
+
+# The following URI commands fail without accessing some external network
+- name: wake up network access
+  ansible.builtin.command: curl github.com
 
 - name: create prometheus datasource in grafana
   ansible.builtin.uri:
