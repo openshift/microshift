@@ -3,11 +3,12 @@ package config
 import (
 	"os"
 	"path/filepath"
-	"reflect"
 	"testing"
 	"time"
 
 	"sigs.k8s.io/yaml"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -72,6 +73,7 @@ func TestConfigFile(t *testing.T) {
 				ApiServer: ApiServer{
 					SubjectAltNames:  []string{"node1", "node2"},
 					AdvertiseAddress: "6.7.8.9",
+					URL:              "https://localhost:6443",
 				},
 				Node: Node{
 					HostnameOverride: "node1",
@@ -80,11 +82,15 @@ func TestConfigFile(t *testing.T) {
 				DNS: DNS{
 					BaseDomain: "example.com",
 				},
-				Cluster: ClusterConfig{
-					URL:                  "https://localhost:6443",
-					ClusterCIDR:          "10.20.30.40/16",
-					ServiceCIDR:          "40.30.20.10/16",
+				Network: Network{
+					ClusterNetwork: []ClusterNetworkEntry{
+						{
+							CIDR: "10.20.30.40/16",
+						},
+					},
+					ServiceNetwork:       []string{"40.30.20.10/16"},
 					ServiceNodePortRange: "1024-32767",
+					DNS:                  "40.30.0.10",
 				},
 				Etcd: EtcdConfig{
 					QuotaBackendSize:        "2Gi",
@@ -123,8 +129,8 @@ func TestConfigFile(t *testing.T) {
 			if !tt.expectErr && err != nil {
 				t.Fatalf("Not expecting error and received: %v", err)
 			}
-			if !tt.expectErr && !reflect.DeepEqual(*config, tt.expected) {
-				t.Errorf("ReadFromConfigFile() mismatch. got=%v, want=%v", *config, tt.expected)
+			if !tt.expectErr {
+				assert.Equal(t, tt.expected, *config)
 			}
 		})
 	}
@@ -184,6 +190,7 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 					SubjectAltNames:  []string{"node1", "node2"},
 					AdvertiseAddress: "6.7.8.9",
 					SkipInterface:    true,
+					URL:              "https://localhost:6443",
 				},
 				Node: Node{
 					HostnameOverride: "node1",
@@ -192,10 +199,13 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 				DNS: DNS{
 					BaseDomain: "example.com",
 				},
-				Cluster: ClusterConfig{
-					URL:                  "https://localhost:6443",
-					ClusterCIDR:          "10.20.30.40/16",
-					ServiceCIDR:          "40.30.20.10/16",
+				Network: Network{
+					ClusterNetwork: []ClusterNetworkEntry{
+						{
+							CIDR: "10.20.30.40/16",
+						},
+					},
+					ServiceNetwork:       []string{"40.30.20.10/16"},
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "40.30.0.10",
 				},
@@ -256,8 +266,8 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 			if !tt.expectErr && err != nil {
 				t.Fatalf("Not expecting error and received: %v", err)
 			}
-			if !tt.expectErr && !reflect.DeepEqual(*config, tt.expected) {
-				t.Errorf("ReadAndValidate() mismatch. got=%v, want=%v", *config, tt.expected)
+			if !tt.expectErr {
+				assert.Equal(t, tt.expected, *config)
 			}
 		})
 	}

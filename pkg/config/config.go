@@ -46,14 +46,6 @@ var (
 	manifestsDir = findManifestsDir()
 )
 
-type ClusterConfig struct {
-	URL                  string `json:"-"`
-	ClusterCIDR          string `json:"clusterCIDR"`
-	ServiceCIDR          string `json:"serviceCIDR"`
-	ServiceNodePortRange string `json:"serviceNodePortRange"`
-	DNS                  string `json:"-"`
-}
-
 type IngressConfig struct {
 	ServingCertificate []byte
 	ServingKey         []byte
@@ -79,8 +71,6 @@ type EtcdConfig struct {
 }
 
 type MicroshiftConfig struct {
-	Cluster ClusterConfig `json:"cluster"`
-
 	Ingress IngressConfig `json:"-"`
 	Etcd    EtcdConfig    `json:"etcd"`
 
@@ -88,6 +78,7 @@ type MicroshiftConfig struct {
 	Node      Node      `json:"-"`
 	Debugging Debugging `json:"debugging"`
 	ApiServer ApiServer `json:"-"`
+	Network   Network   `json:"-"`
 }
 
 // Top level config file
@@ -118,6 +109,9 @@ type Network struct {
 	// installed.
 	// +kubebuilder:validation:Pattern=`^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])-([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$`
 	ServiceNodePortRange string `json:"serviceNodePortRange,omitempty"`
+
+	// The DNS server to use
+	DNS string `json:"-"`
 }
 
 type ClusterNetworkEntry struct {
@@ -150,6 +144,9 @@ type ApiServer struct {
 	// Determines if kube-apiserver controller should configure the
 	// AdvertiseAddress in the loopback interface. Automatically computed.
 	SkipInterface bool `json:"-"`
+
+	// The URL of the API server
+	URL string `json:"-"`
 }
 
 type Node struct {
@@ -236,6 +233,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		},
 		ApiServer: ApiServer{
 			SubjectAltNames: subjectAltNames,
+			URL:             "https://localhost:6443",
 		},
 		Node: Node{
 			HostnameOverride: nodeName,
@@ -244,11 +242,17 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		DNS: DNS{
 			BaseDomain: "example.com",
 		},
-		Cluster: ClusterConfig{
-			URL:                  "https://localhost:6443",
-			ClusterCIDR:          "10.42.0.0/16",
-			ServiceCIDR:          "10.43.0.0/16",
+		Network: Network{
+			ClusterNetwork: []ClusterNetworkEntry{
+				{
+					CIDR: "10.42.0.0/16",
+				},
+			},
+			ServiceNetwork: []string{
+				"10.43.0.0/16",
+			},
 			ServiceNodePortRange: "30000-32767",
+			DNS:                  "10.43.0.10",
 		},
 		Etcd: EtcdConfig{
 			MinDefragSize:           "100Mi",
@@ -315,10 +319,10 @@ func (c *MicroshiftConfig) validateNodeName(isDefaultNodeName bool) error {
 }
 
 // extract the api server port from the cluster URL
-func (c *ClusterConfig) ApiServerPort() (int, error) {
+func (c *MicroshiftConfig) ApiServerPort() (int, error) {
 	var port string
 
-	parsed, err := url.Parse(c.URL)
+	parsed, err := url.Parse(c.ApiServer.URL)
 	if err != nil {
 		return 0, err
 	}
@@ -393,17 +397,14 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	// Wire new Config type to existing MicroshiftConfig
 	c.Node = config.Node
 	c.Debugging = config.Debugging
-	if len(config.Network.ClusterNetwork) != 0 {
-		c.Cluster.ClusterCIDR = config.Network.ClusterNetwork[0].CIDR
+	c.Network = config.Network
+	if err := c.computeAndUpdateClusterDNS(); err != nil {
+		return fmt.Errorf("Failed to validate configuration file %s: %v", configFile, err)
 	}
-	if len(config.Network.ServiceNetwork) != 0 {
-		c.Cluster.ServiceCIDR = config.Network.ServiceNetwork[0]
-	}
-	if config.Network.ServiceNodePortRange != "" {
-		c.Cluster.ServiceNodePortRange = config.Network.ServiceNodePortRange
-	}
+
 	c.DNS = config.DNS
 	c.ApiServer = config.ApiServer
+	c.ApiServer.URL = "https://localhost:6443"
 
 	c.Etcd = config.Etcd
 	if c.Etcd.DefragCheckFreq != "" {
@@ -435,6 +436,19 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	return nil
 }
 
+func (c *MicroshiftConfig) computeAndUpdateClusterDNS() error {
+	if len(c.Network.ServiceNetwork) == 0 {
+		return fmt.Errorf("network.serviceNetwork not filled in")
+	}
+
+	clusterDNS, err := getClusterDNS(c.Network.ServiceNetwork[0])
+	if err != nil {
+		return fmt.Errorf("failed to get DNS IP: %v", err)
+	}
+	c.Network.DNS = clusterDNS
+	return nil
+}
+
 // Note: add a configFile parameter here because of unit test requiring custom
 // local directory
 func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
@@ -444,18 +458,15 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 		}
 	}
 
-	// validate serviceCIDR
-	clusterDNS, err := getClusterDNS(c.Cluster.ServiceCIDR)
-	if err != nil {
-		return fmt.Errorf("failed to get DNS IP: %v", err)
+	if err := c.computeAndUpdateClusterDNS(); err != nil {
+		return fmt.Errorf("Failed to validate configuration file %s: %v", configFile, err)
 	}
-	c.Cluster.DNS = clusterDNS
 
 	// If KAS advertise address is not configured then grab it from the service
 	// CIDR automatically.
 	if len(c.ApiServer.AdvertiseAddress) == 0 {
 		// unchecked error because this was done when getting cluster DNS
-		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
+		_, svcNet, _ := net.ParseCIDR(c.Network.ServiceNetwork[0])
 		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
 		if err != nil {
 			return fmt.Errorf("error getting apiserver IP: %v", err)
@@ -479,7 +490,7 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 		// the node IP it returns that certificate, which is the external access one. This
 		// breaks all pods trying to reach apiserver, as hostnames dont match and the certificate
 		// is invalid.
-		u, err := url.Parse(c.Cluster.URL)
+		u, err := url.Parse(c.ApiServer.URL)
 		if err != nil {
 			return fmt.Errorf("failed to parse cluster URL: %v", err)
 		}

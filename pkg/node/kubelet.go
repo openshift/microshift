@@ -112,7 +112,7 @@ cgroupDriver: "systemd"
 failSwapOn: false
 volumePluginDir: ` + microshiftDataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
-  - ` + cfg.Cluster.DNS + `
+  - ` + cfg.Network.DNS + `
 clusterDomain: cluster.local
 containerLogMaxSize: 50Mi
 maxPods: 250
