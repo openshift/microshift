@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
-import os
-import sys
 import json
 import logging
+import os
 import subprocess
+import sys
 from collections import namedtuple
+from pathlib import Path
 from timeit import default_timer as timer
 
-from git import Repo, PushInfo  # GitPython
-from github import GithubIntegration, Github, GithubException  # pygithub
-from pathlib import Path
+from git import PushInfo, Repo  # GitPython
+from github import Github, GithubException, GithubIntegration  # pygithub
 
 APP_ID_ENV = "APP_ID"  # GitHub App's ID
 KEY_ENV = "KEY"  # Path to GitHub App's key
