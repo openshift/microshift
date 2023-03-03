@@ -62,7 +62,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig) error {
 		cfg.Cluster.ServiceCIDR,
 		".svc",
 		".cluster.local",
-		"."+cfg.BaseDomain); err != nil {
+		"."+cfg.DNS.BaseDomain); err != nil {
 		klog.Fatal(err)
 	}
 
