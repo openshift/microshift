@@ -341,7 +341,6 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 		[]string{"kubelet-signer", "kube-csr-signer"},
 	).WithCABundle(
 		cryptomaterial.ServiceAccountTokenCABundlePath(certsDir),
-		[]string{"kube-apiserver-external-signer"},
 		[]string{"kube-apiserver-localhost-signer"},
 		[]string{"kube-apiserver-service-network-signer"},
 	).Complete()
@@ -370,9 +369,13 @@ func initKubeconfigs(
 	cfg *config.MicroshiftConfig,
 	certChains *certchains.CertificateChains,
 ) error {
-	inClusterTrustBundlePEM, err := os.ReadFile(cryptomaterial.ServiceAccountTokenCABundlePath(cryptomaterial.CertsDirectory(microshiftDataDir)))
+	externalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(microshiftDataDir))))
 	if err != nil {
-		return fmt.Errorf("failed to load the in-cluster trust bundle: %v", err)
+		return fmt.Errorf("failed to load the external trust signer: %v", err)
+	}
+	internalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(microshiftDataDir))))
+	if err != nil {
+		return fmt.Errorf("failed to load the internal trust signer: %v", err)
 	}
 
 	adminKubeconfigCertPEM, adminKubeconfigKeyPEM, err := certChains.GetCertKey("admin-kubeconfig-signer", "admin-kubeconfig-client")
@@ -390,12 +393,12 @@ func initKubeconfigs(
 	}
 
 	// Generate one kubeconfigs per name
-	for _, name := range append(cfg.SubjectAltNames, cfg.NodeName, "localhost") {
+	for _, name := range append(cfg.SubjectAltNames, cfg.NodeName) {
 		u.Host = fmt.Sprintf("%s:%d", name, apiServerPort)
 		if err := util.KubeConfigWithClientCerts(
 			cfg.KubeConfigAdminPath(name),
 			u.String(),
-			inClusterTrustBundlePEM,
+			externalTrustPEM,
 			adminKubeconfigCertPEM,
 			adminKubeconfigKeyPEM,
 		); err != nil {
@@ -406,7 +409,7 @@ func initKubeconfigs(
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeAdmin),
 		cfg.Cluster.URL,
-		inClusterTrustBundlePEM,
+		internalTrustPEM,
 		adminKubeconfigCertPEM,
 		adminKubeconfigKeyPEM,
 	); err != nil {
@@ -420,7 +423,7 @@ func initKubeconfigs(
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeControllerManager),
 		cfg.Cluster.URL,
-		inClusterTrustBundlePEM,
+		internalTrustPEM,
 		kcmCertPEM,
 		kcmKeyPEM,
 	); err != nil {
@@ -434,7 +437,7 @@ func initKubeconfigs(
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeScheduler),
 		cfg.Cluster.URL,
-		inClusterTrustBundlePEM,
+		internalTrustPEM,
 		schedulerCertPEM, schedulerKeyPEM,
 	); err != nil {
 		return err
@@ -447,7 +450,7 @@ func initKubeconfigs(
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.Kubelet),
 		cfg.Cluster.URL,
-		inClusterTrustBundlePEM,
+		internalTrustPEM,
 		kubeletCertPEM, kubeletKeyPEM,
 	); err != nil {
 		return err
@@ -459,7 +462,7 @@ func initKubeconfigs(
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.ClusterPolicyController),
 		cfg.Cluster.URL,
-		inClusterTrustBundlePEM,
+		internalTrustPEM,
 		clusterPolicyControllerCertPEM, clusterPolicyControllerKeyPEM,
 	); err != nil {
 		return err
@@ -472,7 +475,7 @@ func initKubeconfigs(
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.RouteControllerManager),
 		cfg.Cluster.URL,
-		inClusterTrustBundlePEM,
+		internalTrustPEM,
 		routeControllerManagerCertPEM, routeControllerManagerKeyPEM,
 	); err != nil {
 		return err
