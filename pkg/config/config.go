@@ -100,11 +100,12 @@ type MicroshiftConfig struct {
 	// Determines if kube-apiserver controller should configure the
 	// KASAdvertiseAddress in the loopback interface. Automatically computed.
 	SkipKASInterface bool          `json:"-"`
-	BaseDomain       string        `json:"baseDomain"`
 	Cluster          ClusterConfig `json:"cluster"`
 
 	Ingress IngressConfig      `json:"-"`
 	Etcd    InternalEtcdConfig `json:"etcd"`
+
+	DNS DNS `json:"-"`
 }
 
 // Top level config file
@@ -246,7 +247,9 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		SubjectAltNames: subjectAltNames,
 		NodeName:        nodeName,
 		NodeIP:          nodeIP,
-		BaseDomain:      "example.com",
+		DNS: DNS{
+			BaseDomain: "example.com",
+		},
 		Cluster: ClusterConfig{
 			URL:                  "https://localhost:6443",
 			ClusterCIDR:          "10.42.0.0/16",
@@ -407,9 +410,7 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	if config.Network.ServiceNodePortRange != "" {
 		c.Cluster.ServiceNodePortRange = config.Network.ServiceNodePortRange
 	}
-	if config.DNS.BaseDomain != "" {
-		c.BaseDomain = config.DNS.BaseDomain
-	}
+	c.DNS = config.DNS
 	if len(config.ApiServer.SubjectAltNames) > 0 {
 		c.SubjectAltNames = config.ApiServer.SubjectAltNames
 	}
