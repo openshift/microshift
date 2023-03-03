@@ -71,7 +71,9 @@ func TestConfigFile(t *testing.T) {
 				NodeName:            "node1",
 				NodeIP:              "1.2.3.4",
 				KASAdvertiseAddress: "6.7.8.9",
-				BaseDomain:          "example.com",
+				DNS: DNS{
+					BaseDomain: "example.com",
+				},
 				Cluster: ClusterConfig{
 					URL:                  "https://localhost:6443",
 					ClusterCIDR:          "10.20.30.40/16",
@@ -172,7 +174,9 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 				NodeIP:              "1.2.3.4",
 				KASAdvertiseAddress: "6.7.8.9",
 				SkipKASInterface:    true,
-				BaseDomain:          "example.com",
+				DNS: DNS{
+					BaseDomain: "example.com",
+				},
 				Cluster: ClusterConfig{
 					URL:                  "https://localhost:6443",
 					ClusterCIDR:          "10.20.30.40/16",

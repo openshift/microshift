@@ -72,7 +72,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 
 	externalCertNames := []string{
 		cfg.NodeName,
-		"api." + cfg.BaseDomain,
+		"api." + cfg.DNS.BaseDomain,
 	}
 	externalCertNames = append(externalCertNames, cfg.SubjectAltNames...)
 	// When Kube apiserver advertise address matches the node IP we can not add
@@ -229,7 +229,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
 				Hostnames: []string{
-					"*.apps." + cfg.BaseDomain, // wildcard for any additional auto-generated domains
+					"*.apps." + cfg.DNS.BaseDomain, // wildcard for any additional auto-generated domains
 				},
 			},
 		),
@@ -285,8 +285,8 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					"openshift.default",
 					"openshift.default.svc",
 					"openshift.default.svc.cluster.local",
-					"api." + cfg.BaseDomain,
-					"api-int." + cfg.BaseDomain,
+					"api." + cfg.DNS.BaseDomain,
+					"api-int." + cfg.DNS.BaseDomain,
 					apiServerServiceIP.String(),
 				},
 			},
