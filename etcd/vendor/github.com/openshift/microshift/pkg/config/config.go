@@ -59,17 +59,20 @@ type IngressConfig struct {
 
 type EtcdConfig struct {
 	// Set a memory limit, in megabytes, on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
-	MemoryLimit uint64
+	MemoryLimit uint64 `json:"memoryLimit"`
+
 	// The limit on the size of the etcd database; etcd will start failing writes if its size on disk reaches this value
-	QuotaBackendBytes int64
+	QuotaBackendBytes int64 `json:"-"`
+
 	// If the backend is fragmented more than `maxFragmentedPercentage`
 	//		and the database size is greater than `minDefragBytes`, do a defrag.
-	MinDefragBytes          int64
-	MaxFragmentedPercentage float64
+	MinDefragBytes          int64   `json:"-"`
+	MaxFragmentedPercentage float64 `json:"-"`
+
 	// How often to check the conditions for defragging (0 means no defrags, except for a single on startup if `doStartupDefrag` is set).
-	DefragCheckFreq time.Duration
+	DefragCheckFreq time.Duration `json:"-"`
 	// Whether or not to do a defrag when the server finishes starting
-	DoStartupDefrag bool
+	DoStartupDefrag bool `json:"-"`
 }
 
 type MicroshiftConfig struct {

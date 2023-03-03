@@ -56,6 +56,9 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 					SubjectAltNames: cfg.SubjectAltNames,
 				},
 				Debugging: cfg.Debugging,
+				Etcd: config.Etcd{
+					MemoryLimitMB: cfg.Etcd.MemoryLimit,
+				},
 			}
 			marshalled, err := yaml.Marshal(userCfg)
 			cmdutil.CheckErr(err)
