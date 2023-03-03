@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess
 import sys
+import textwrap
 from collections import namedtuple
 from pathlib import Path
 from timeit import default_timer as timer
@@ -192,11 +193,13 @@ def try_get_pr(gh_repo, org, base_branch, branch_name):
 
 
 def generate_pr_description(branch_name, amd_tag, arm_tag, prow_job_url, rebase_script_succeded):
-    base = (f"amd64: {amd_tag}\n"
-            f"arm64: {arm_tag}\n"
-            f"prow job: {prow_job_url}\n"
-            "\n"
-            "/label tide/merge-method-squash\n")
+    base = textwrap.dedent(f"""
+    amd64: {amd_tag}
+    arm64: {arm_tag}
+    prow job: {prow_job_url}
+
+    /label tide/merge-method-squash
+    """)
     return (base if rebase_script_succeded
             else "# rebase.sh failed - check committed rebase_sh.log\n\n" + base)
 
