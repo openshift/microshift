@@ -48,8 +48,8 @@ func (n *NetworkConfiguration) Name() string           { return componentNetwork
 func (n *NetworkConfiguration) Dependencies() []string { return []string{} }
 
 func (n *NetworkConfiguration) configure(cfg *config.MicroshiftConfig) {
-	n.kasAdvertiseAddress = cfg.KASAdvertiseAddress
-	n.skipInterfaceConfiguration = cfg.SkipKASInterface
+	n.kasAdvertiseAddress = cfg.ApiServer.AdvertiseAddress
+	n.skipInterfaceConfiguration = cfg.ApiServer.SkipInterface
 }
 
 func (n *NetworkConfiguration) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
