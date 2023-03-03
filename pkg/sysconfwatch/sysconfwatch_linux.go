@@ -36,7 +36,7 @@ type SysConfWatchController struct {
 	timerFd int
 }
 
-func NewSysConfWatchController(cfg *config.MicroshiftConfig) *SysConfWatchController {
+func NewSysConfWatchController(cfg *config.Config) *SysConfWatchController {
 	// Create a realtime clock timer with asynchronous read support
 	fd, err := unix.TimerfdCreate(unix.CLOCK_REALTIME, unix.TFD_CLOEXEC|unix.TFD_NONBLOCK)
 	if err != nil {

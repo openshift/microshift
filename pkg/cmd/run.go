@@ -41,7 +41,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	return cmd
 }
 
-func RunMicroshift(cfg *config.MicroshiftConfig) error {
+func RunMicroshift(cfg *config.Config) error {
 	if err := cfg.ReadAndValidate(config.GetConfigFile()); err != nil {
 		klog.Fatalf("Error in reading or validating configuration: %v", err)
 	}

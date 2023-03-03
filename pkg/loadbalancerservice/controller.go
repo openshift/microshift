@@ -34,7 +34,7 @@ type LoadbalancerServiceController struct {
 
 var _ servicemanager.Service = &LoadbalancerServiceController{}
 
-func NewLoadbalancerServiceController(cfg *config.MicroshiftConfig) *LoadbalancerServiceController {
+func NewLoadbalancerServiceController(cfg *config.Config) *LoadbalancerServiceController {
 	return &LoadbalancerServiceController{
 		NodeIP:     cfg.Node.NodeIP,
 		KubeConfig: cfg.KubeConfigPath(config.KubeAdmin),

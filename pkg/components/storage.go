@@ -24,7 +24,7 @@ func getCSIPluginConfig() (*lvmd.Lvmd, error) {
 	return lvmd.DefaultLvmdConfig()
 }
 
-func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+func startCSIPlugin(cfg *config.Config, kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"components/lvms/topolvm-openshift-storage_namespace.yaml",

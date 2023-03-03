@@ -40,9 +40,9 @@ type EtcdService struct {
 	memoryLimit uint64
 }
 
-func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
+func NewEtcd(cfg *config.Config) *EtcdService {
 	return &EtcdService{
-		memoryLimit: cfg.Etcd.MemoryLimit,
+		memoryLimit: cfg.Etcd.MemoryLimitMB,
 	}
 }
 

@@ -20,7 +20,7 @@ var templateFuncs = map[string]interface{}{
 	"Sha256sum": func(s string) string { return fmt.Sprintf("%x", sha256.Sum256([]byte(s))) },
 }
 
-func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderParams) assets.RenderParams {
+func renderParamsFromConfig(cfg *config.Config, extra assets.RenderParams) assets.RenderParams {
 	params := map[string]interface{}{
 		"ReleaseImage": release.Image,
 		"NodeName":     cfg.Node.HostnameOverride,

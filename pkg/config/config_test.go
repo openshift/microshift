@@ -30,7 +30,7 @@ func setupSuiteDataDir(t *testing.T) func() {
 func TestConfigFile(t *testing.T) {
 	var ttests = []struct {
 		config    Config
-		expected  MicroshiftConfig
+		expected  Config
 		expectErr bool
 	}{
 		{
@@ -59,7 +59,7 @@ func TestConfigFile(t *testing.T) {
 					LogLevel: "Debug",
 				},
 			},
-			expected: MicroshiftConfig{
+			expected: Config{
 				Debugging: Debugging{
 					LogLevel: "Debug",
 				},
@@ -86,7 +86,7 @@ func TestConfigFile(t *testing.T) {
 					DNS:                  "40.30.0.10",
 				},
 				Etcd: EtcdConfig{
-					MemoryLimit:             0,
+					MemoryLimitMB:           0,
 					QuotaBackendBytes:       8 * 1024 * 1024 * 1024,
 					MinDefragBytes:          100 * 1024 * 1024,
 					MaxFragmentedPercentage: 45,
@@ -136,7 +136,7 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 	var ttests = []struct {
 		name      string
 		config    Config
-		expected  MicroshiftConfig
+		expected  Config
 		expectErr bool
 	}{
 		{
@@ -166,7 +166,7 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 					LogLevel: "Debug",
 				},
 			},
-			expected: MicroshiftConfig{
+			expected: Config{
 				Debugging: Debugging{
 					LogLevel: "Debug",
 				},
@@ -194,7 +194,7 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 					DNS:                  "40.30.0.10",
 				},
 				Etcd: EtcdConfig{
-					MemoryLimit:             0,
+					MemoryLimitMB:           0,
 					QuotaBackendBytes:       8 * 1024 * 1024 * 1024,
 					MinDefragBytes:          100 * 1024 * 1024,
 					MaxFragmentedPercentage: 45,
@@ -211,7 +211,7 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 					SubjectAltNames: []string{"127.0.0.1", "localhost"},
 				},
 			},
-			expected:  MicroshiftConfig{},
+			expected:  Config{},
 			expectErr: true,
 		},
 		{
@@ -221,7 +221,7 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 					SubjectAltNames: []string{"kubernetes"},
 				},
 			},
-			expected:  MicroshiftConfig{},
+			expected:  Config{},
 			expectErr: true,
 		},
 	}

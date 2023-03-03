@@ -51,7 +51,7 @@ type KubeletServer struct {
 	kubeconfig   *kubeletconfig.KubeletConfiguration
 }
 
-func NewKubeletServer(cfg *config.MicroshiftConfig) *KubeletServer {
+func NewKubeletServer(cfg *config.Config) *KubeletServer {
 	s := &KubeletServer{}
 	s.configure(cfg)
 	return s
@@ -60,7 +60,7 @@ func NewKubeletServer(cfg *config.MicroshiftConfig) *KubeletServer {
 func (s *KubeletServer) Name() string           { return componentKubelet }
 func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
+func (s *KubeletServer) configure(cfg *config.Config) {
 
 	if err := s.writeConfig(cfg); err != nil {
 		klog.Fatalf("Failed to write kubelet config", err)
@@ -93,7 +93,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	s.kubeletflags = kubeletFlags
 }
 
-func (s *KubeletServer) writeConfig(cfg *config.MicroshiftConfig) error {
+func (s *KubeletServer) writeConfig(cfg *config.Config) error {
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 	servingCertDir := cryptomaterial.KubeletServingCertDir(certsDir)
 

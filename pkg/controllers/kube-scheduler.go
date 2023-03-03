@@ -39,7 +39,7 @@ type KubeScheduler struct {
 	kubeconfig string
 }
 
-func NewKubeScheduler(cfg *config.MicroshiftConfig) *KubeScheduler {
+func NewKubeScheduler(cfg *config.Config) *KubeScheduler {
 	s := &KubeScheduler{}
 	s.configure(cfg)
 	return s
@@ -48,7 +48,7 @@ func NewKubeScheduler(cfg *config.MicroshiftConfig) *KubeScheduler {
 func (s *KubeScheduler) Name() string           { return "kube-scheduler" }
 func (s *KubeScheduler) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
+func (s *KubeScheduler) configure(cfg *config.Config) {
 	if err := s.writeConfig(cfg); err != nil {
 		klog.Fatalf("failed to write kube-scheduler config: %v", err)
 	}
@@ -60,7 +60,7 @@ func (s *KubeScheduler) configure(cfg *config.MicroshiftConfig) {
 	s.kubeconfig = cfg.KubeConfigPath(config.KubeScheduler)
 }
 
-func (s *KubeScheduler) writeConfig(cfg *config.MicroshiftConfig) error {
+func (s *KubeScheduler) writeConfig(cfg *config.Config) error {
 	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta3
 kind: KubeSchedulerConfiguration
 clientConnection:
