@@ -193,10 +193,19 @@ def try_get_pr(gh_repo, org, base_branch, branch_name):
 
 
 def generate_pr_description(branch_name, amd_tag, arm_tag, prow_job_url, rebase_script_succeded):
+    try:
+        with open("scripts/auto-rebase/changelog.txt", "r") as f:
+            changelog = f.read()
+    except Exception as e:
+        logging.warn(f"Unable to read changelog file: {e}")
+        changelog = ""
+
     base = textwrap.dedent(f"""
     amd64: {amd_tag}
     arm64: {arm_tag}
     prow job: {prow_job_url}
+
+    {changelog}
 
     /label tide/merge-method-squash
     """)
