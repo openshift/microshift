@@ -66,7 +66,9 @@ func TestConfigFile(t *testing.T) {
 				},
 			},
 			expected: MicroshiftConfig{
-				LogVLevel:       4,
+				Debugging: Debugging{
+					LogLevel: "Debug",
+				},
 				SubjectAltNames: []string{"node1", "node2"},
 				Node: Node{
 					HostnameOverride: "node1",
@@ -170,7 +172,9 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 				},
 			},
 			expected: MicroshiftConfig{
-				LogVLevel:       4,
+				Debugging: Debugging{
+					LogLevel: "Debug",
+				},
 				SubjectAltNames: []string{"node1", "node2"},
 				Node: Node{
 					HostnameOverride: "node1",
