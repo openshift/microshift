@@ -84,11 +84,14 @@ func TestConfigFile(t *testing.T) {
 					ServiceCIDR:          "40.30.20.10/16",
 					ServiceNodePortRange: "1024-32767",
 				},
-				Etcd: InternalEtcdConfig{
+				Etcd: EtcdConfig{
+					QuotaBackendSize:        "2Gi",
 					QuotaBackendBytes:       2 * 1024 * 1024 * 1024,
+					MinDefragSize:           "100Mi",
 					MinDefragBytes:          100 * 1024 * 1024,
 					MaxFragmentedPercentage: 45,
-					DefragCheckFreq:         5 * time.Minute,
+					DefragCheckFreq:         "5m",
+					DefragCheckDuration:     5 * time.Minute,
 					DoStartupDefrag:         true,
 				},
 			},
@@ -192,11 +195,14 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 					DNS:                  "40.30.0.10",
 				},
-				Etcd: InternalEtcdConfig{
+				Etcd: EtcdConfig{
+					QuotaBackendSize:        "2Gi",
 					QuotaBackendBytes:       2 * 1024 * 1024 * 1024,
+					MinDefragSize:           "100Mi",
 					MinDefragBytes:          100 * 1024 * 1024,
 					MaxFragmentedPercentage: 45,
-					DefragCheckFreq:         5 * time.Minute,
+					DefragCheckFreq:         "5m",
+					DefragCheckDuration:     5 * time.Minute,
 					DoStartupDefrag:         true,
 				},
 			},

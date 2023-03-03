@@ -66,7 +66,7 @@ func (s *EtcdService) Name() string { return "etcd" }
 func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	s.minDefragBytes = cfg.Etcd.MinDefragBytes
 	s.maxFragmentedPercentage = cfg.Etcd.MaxFragmentedPercentage
-	s.defragCheckFreq = cfg.Etcd.DefragCheckFreq
+	s.defragCheckFreq = cfg.Etcd.DefragCheckDuration
 	s.doStartupDefrag = cfg.Etcd.DoStartupDefrag
 
 	microshiftDataDir := config.GetDataDir()
