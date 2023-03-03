@@ -58,8 +58,8 @@ func RunMicroshift(cfg *config.MicroshiftConfig) error {
 	if err := util.AddToNoProxyEnv(
 		cfg.Node.NodeIP,
 		cfg.Node.HostnameOverride,
-		cfg.Cluster.ClusterCIDR,
-		cfg.Cluster.ServiceCIDR,
+		cfg.Network.ClusterNetwork[0].CIDR,
+		cfg.Network.ServiceNetwork[0],
 		".svc",
 		".cluster.local",
 		"."+cfg.DNS.BaseDomain); err != nil {

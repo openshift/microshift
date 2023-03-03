@@ -110,12 +110,12 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	}
 
 	// Get the apiserver port so we can set it as an argument
-	apiServerPort, err := cfg.Cluster.ApiServerPort()
+	apiServerPort, err := cfg.ApiServerPort()
 	if err != nil {
 		return err
 	}
 
-	s.masterURL = cfg.Cluster.URL
+	s.masterURL = cfg.ApiServer.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 	s.advertiseAddress = cfg.ApiServer.AdvertiseAddress
 
@@ -139,7 +139,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},
 			"requestheader-client-ca-file":     {aggregatorCAPath},
 			"service-account-signing-key-file": {microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
-			"service-node-port-range":          {cfg.Cluster.ServiceNodePortRange},
+			"service-node-port-range":          {cfg.Network.ServiceNodePortRange},
 			"tls-cert-file":                    {servingCert},
 			"tls-private-key-file":             {servingKey},
 			"disable-admission-plugins": {
@@ -214,8 +214,8 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 		ServiceAccountPublicKeyFiles: []string{
 			microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.pub",
 		},
-		ServicesSubnet:        cfg.Cluster.ServiceCIDR,
-		ServicesNodePortRange: cfg.Cluster.ServiceNodePortRange,
+		ServicesSubnet:        cfg.Network.ServiceNetwork[0],
+		ServicesNodePortRange: cfg.Network.ServiceNodePortRange,
 	}
 
 	overridesBytes, err := json.Marshal(overrides)

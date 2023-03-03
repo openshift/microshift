@@ -210,7 +210,7 @@ func startDNSController(cfg *config.MicroshiftConfig, kubeconfigPath string) err
 	}
 
 	extraParams := assets.RenderParams{
-		"ClusterIP": cfg.Cluster.DNS,
+		"ClusterIP": cfg.Network.DNS,
 	}
 	if err := assets.ApplyServices(svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
