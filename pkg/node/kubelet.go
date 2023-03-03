@@ -75,8 +75,8 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	kubeletFlags.BootstrapKubeconfig = cfg.KubeConfigPath(config.Kubelet)
 	kubeletFlags.KubeConfig = cfg.KubeConfigPath(config.Kubelet)
 	kubeletFlags.RuntimeCgroups = "/system.slice/crio.service"
-	kubeletFlags.HostnameOverride = cfg.NodeName
-	kubeletFlags.NodeIP = cfg.NodeIP
+	kubeletFlags.HostnameOverride = cfg.Node.HostnameOverride
+	kubeletFlags.NodeIP = cfg.Node.NodeIP
 	kubeletFlags.ContainerRuntime = "remote"
 	kubeletFlags.RemoteRuntimeEndpoint = "unix:///var/run/crio/crio.sock"
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/control-plane"] = ""

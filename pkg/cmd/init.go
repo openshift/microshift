@@ -71,7 +71,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 	}
 
 	externalCertNames := []string{
-		cfg.NodeName,
+		cfg.Node.HostnameOverride,
 		"api." + cfg.DNS.BaseDomain,
 	}
 	externalCertNames = append(externalCertNames, cfg.SubjectAltNames...)
@@ -81,8 +81,8 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 	// which certificate to serve which destination IP, internal pods start
 	// getting the external certificate, which is signed by a different CA and
 	// does not match the hostname.
-	if cfg.KASAdvertiseAddress != cfg.NodeIP {
-		externalCertNames = append(externalCertNames, cfg.NodeIP)
+	if cfg.KASAdvertiseAddress != cfg.Node.NodeIP {
+		externalCertNames = append(externalCertNames, cfg.Node.NodeIP)
 	}
 
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
@@ -172,7 +172,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 						ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 					},
 					// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
-					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
+					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.Node.HostnameOverride, Groups: []string{"system:nodes"}},
 				},
 			).WithServingCertificates(
 				&certchains.ServingCertificateSigningRequestInfo{
@@ -180,7 +180,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 						Name:         "kubelet-server",
 						ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 					},
-					Hostnames: []string{cfg.NodeName},
+					Hostnames: []string{cfg.Node.HostnameOverride},
 				},
 			),
 		),
@@ -314,7 +314,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-peer:etcd-client", Groups: []string{"system:etcd-peers"}},
-				Hostnames: []string{"localhost", cfg.NodeName},
+				Hostnames: []string{"localhost", cfg.Node.HostnameOverride},
 			},
 			&certchains.PeerCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -322,7 +322,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-server:etcd-client", Groups: []string{"system:etcd-servers"}},
-				Hostnames: []string{"localhost", cfg.NodeName},
+				Hostnames: []string{"localhost", cfg.Node.HostnameOverride},
 			},
 		),
 	).WithCABundle(
@@ -390,7 +390,7 @@ func initKubeconfigs(
 	}
 
 	// Generate one kubeconfigs per name
-	for _, name := range append(cfg.SubjectAltNames, cfg.NodeName, "localhost") {
+	for _, name := range append(cfg.SubjectAltNames, cfg.Node.HostnameOverride, "localhost") {
 		u.Host = fmt.Sprintf("%s:%d", name, apiServerPort)
 		if err := util.KubeConfigWithClientCerts(
 			cfg.KubeConfigAdminPath(name),

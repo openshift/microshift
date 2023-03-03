@@ -66,10 +66,12 @@ func TestConfigFile(t *testing.T) {
 				},
 			},
 			expected: MicroshiftConfig{
-				LogVLevel:           4,
-				SubjectAltNames:     []string{"node1", "node2"},
-				NodeName:            "node1",
-				NodeIP:              "1.2.3.4",
+				LogVLevel:       4,
+				SubjectAltNames: []string{"node1", "node2"},
+				Node: Node{
+					HostnameOverride: "node1",
+					NodeIP:           "1.2.3.4",
+				},
 				KASAdvertiseAddress: "6.7.8.9",
 				DNS: DNS{
 					BaseDomain: "example.com",
@@ -168,10 +170,12 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 				},
 			},
 			expected: MicroshiftConfig{
-				LogVLevel:           4,
-				SubjectAltNames:     []string{"node1", "node2"},
-				NodeName:            "node1",
-				NodeIP:              "1.2.3.4",
+				LogVLevel:       4,
+				SubjectAltNames: []string{"node1", "node2"},
+				Node: Node{
+					HostnameOverride: "node1",
+					NodeIP:           "1.2.3.4",
+				},
 				KASAdvertiseAddress: "6.7.8.9",
 				SkipKASInterface:    true,
 				DNS: DNS{
@@ -251,7 +255,7 @@ func TestMicroshiftConfigIsDefaultNodeName(t *testing.T) {
 		t.Errorf("expected default IsDefaultNodeName to be true")
 	}
 
-	c.NodeName += "-suffix"
+	c.Node.HostnameOverride += "-suffix"
 	if c.isDefaultNodeName() {
 		t.Errorf("expected default IsDefaultNodeName to be false")
 	}
@@ -262,7 +266,7 @@ func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 	defer cleanup()
 
 	c := NewMicroshiftConfig()
-	c.NodeName = "node1"
+	c.Node.HostnameOverride = "node1"
 
 	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err != nil {
 		t.Errorf("failed to validate node name on first call: %v", err)
@@ -271,7 +275,7 @@ func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 	nodeNameFile := filepath.Join(dataDir, ".nodename")
 	if data, err := os.ReadFile(nodeNameFile); err != nil {
 		t.Errorf("failed to read node name from file %q: %v", nodeNameFile, err)
-	} else if string(data) != c.NodeName {
+	} else if string(data) != c.Node.HostnameOverride {
 		t.Errorf("node name file doesn't match the node name in the saved file: %v", err)
 	}
 
@@ -279,7 +283,7 @@ func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 		t.Errorf("failed to validate node name on second call without changes: %v", err)
 	}
 
-	c.NodeName = "node2"
+	c.Node.HostnameOverride = "node2"
 	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err == nil {
 		t.Errorf("validation should have failed for nodename change: %v", err)
 	}
@@ -307,7 +311,7 @@ func TestMicroshiftConfigNodeNameValidationFromDefault(t *testing.T) {
 		t.Errorf("failed to validate node name on second call without changes: %v", err)
 	}
 
-	c.NodeName = "node2"
+	c.Node.HostnameOverride = "node2"
 	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
 		t.Errorf("validation should have failed in this case, it must be a warning in logs: %v", err)
 	}
@@ -318,7 +322,7 @@ func TestMicroshiftConfigNodeNameValidationBadName(t *testing.T) {
 	defer cleanup()
 
 	c := NewMicroshiftConfig()
-	c.NodeName = "1.2.3.4"
+	c.Node.HostnameOverride = "1.2.3.4"
 
 	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err == nil {
 		t.Errorf("failed to validate node name.")

@@ -31,8 +31,8 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 
 			switch opts.Mode {
 			case "default":
-				cfg.NodeIP = ""
-				cfg.NodeName = ""
+				cfg.Node.NodeIP = ""
+				cfg.Node.HostnameOverride = ""
 			case "effective":
 				// Load the current configuration
 				if err := cfg.ReadAndValidate(config.GetConfigFile()); err != nil {
@@ -55,11 +55,8 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 					ServiceNetwork:       []string{cfg.Cluster.ServiceCIDR},
 					ServiceNodePortRange: cfg.Cluster.ServiceNodePortRange,
 				},
-				DNS: cfg.DNS,
-				Node: config.Node{
-					HostnameOverride: cfg.NodeName,
-					NodeIP:           cfg.NodeIP,
-				},
+				DNS:  cfg.DNS,
+				Node: cfg.Node,
 				ApiServer: config.ApiServer{
 					SubjectAltNames: cfg.SubjectAltNames,
 				},

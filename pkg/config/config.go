@@ -89,8 +89,6 @@ type MicroshiftConfig struct {
 	LogVLevel int `json:"logVLevel"`
 
 	SubjectAltNames []string `json:"subjectAltNames"`
-	NodeName        string   `json:"nodeName"`
-	NodeIP          string   `json:"nodeIP"`
 	// Kube apiserver advertise address to work around the certificates issue
 	// when requiring external access using the node IP. This will turn into
 	// the IP configured in the endpoint slice for kubernetes service. Must be
@@ -105,7 +103,8 @@ type MicroshiftConfig struct {
 	Ingress IngressConfig      `json:"-"`
 	Etcd    InternalEtcdConfig `json:"etcd"`
 
-	DNS DNS `json:"-"`
+	DNS  DNS  `json:"-"`
+	Node Node `json:"-"`
 }
 
 // Top level config file
@@ -245,8 +244,10 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	return &MicroshiftConfig{
 		LogVLevel:       2,
 		SubjectAltNames: subjectAltNames,
-		NodeName:        nodeName,
-		NodeIP:          nodeIP,
+		Node: Node{
+			HostnameOverride: nodeName,
+			NodeIP:           nodeIP,
+		},
 		DNS: DNS{
 			BaseDomain: "example.com",
 		},
@@ -272,7 +273,7 @@ func (c *MicroshiftConfig) isDefaultNodeName() bool {
 	if err != nil {
 		klog.Fatalf("Failed to get hostname %v", err)
 	}
-	return c.NodeName == hostname
+	return c.Node.HostnameOverride == hostname
 }
 
 // Read or set the NodeName that will be used for this MicroShift instance
@@ -282,10 +283,10 @@ func (c *MicroshiftConfig) establishNodeName() (string, error) {
 	if os.IsNotExist(err) {
 		// ensure that dataDir exists
 		os.MkdirAll(GetDataDir(), 0700)
-		if err := os.WriteFile(filePath, []byte(c.NodeName), 0444); err != nil {
+		if err := os.WriteFile(filePath, []byte(c.Node.HostnameOverride), 0444); err != nil {
 			return "", fmt.Errorf("failed to write nodename file %q: %v", filePath, err)
 		}
-		return c.NodeName, nil
+		return c.Node.HostnameOverride, nil
 	} else if err != nil {
 		return "", err
 	}
@@ -294,8 +295,8 @@ func (c *MicroshiftConfig) establishNodeName() (string, error) {
 
 // Validate the NodeName to be used for this MicroShift instances
 func (c *MicroshiftConfig) validateNodeName(isDefaultNodeName bool) error {
-	if addr := net.ParseIP(c.NodeName); addr != nil {
-		return fmt.Errorf("NodeName can not be an IP address: %q", c.NodeName)
+	if addr := net.ParseIP(c.Node.HostnameOverride); addr != nil {
+		return fmt.Errorf("NodeName can not be an IP address: %q", c.Node.HostnameOverride)
 	}
 
 	establishedNodeName, err := c.establishNodeName()
@@ -303,14 +304,14 @@ func (c *MicroshiftConfig) validateNodeName(isDefaultNodeName bool) error {
 		return fmt.Errorf("failed to establish NodeName: %v", err)
 	}
 
-	if establishedNodeName != c.NodeName {
+	if establishedNodeName != c.Node.HostnameOverride {
 		if !isDefaultNodeName {
 			return fmt.Errorf("configured NodeName %q does not match previous NodeName %q , NodeName cannot be changed for a device once established",
-				c.NodeName, establishedNodeName)
+				c.Node.HostnameOverride, establishedNodeName)
 		} else {
-			c.NodeName = establishedNodeName
+			c.Node.HostnameOverride = establishedNodeName
 			klog.Warningf("NodeName has changed due to a host name change, using previously established NodeName %q."+
-				"Please consider using a static NodeName in configuration", c.NodeName)
+				"Please consider using a static NodeName in configuration", c.Node.HostnameOverride)
 		}
 	}
 
@@ -395,12 +396,7 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 
 	// Wire new Config type to existing MicroshiftConfig
 	c.LogVLevel = config.GetVerbosity()
-	if config.Node.HostnameOverride != "" {
-		c.NodeName = config.Node.HostnameOverride
-	}
-	if config.Node.NodeIP != "" {
-		c.NodeIP = config.Node.NodeIP
-	}
+	c.Node = config.Node
 	if len(config.Network.ClusterNetwork) != 0 {
 		c.Cluster.ClusterCIDR = config.Network.ClusterNetwork[0].CIDR
 	}
@@ -504,10 +500,10 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 				return fmt.Errorf("subjectAltNames must not contain localhost, 127.0.0.1")
 			}
 		} else {
-			if stringSliceContains(c.SubjectAltNames, c.NodeIP) {
+			if stringSliceContains(c.SubjectAltNames, c.Node.NodeIP) {
 				return fmt.Errorf("subjectAltNames must not contain node IP")
 			}
-			if !stringSliceContains(c.SubjectAltNames, u.Host) || u.Host != c.NodeName {
+			if !stringSliceContains(c.SubjectAltNames, u.Host) || u.Host != c.Node.HostnameOverride {
 				return fmt.Errorf("Cluster URL host %v is not included in subjectAltNames or nodeName", u.String())
 			}
 		}
