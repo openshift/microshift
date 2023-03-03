@@ -50,11 +50,9 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 					ServiceNetwork:       []string{cfg.Cluster.ServiceCIDR},
 					ServiceNodePortRange: cfg.Cluster.ServiceNodePortRange,
 				},
-				DNS:  cfg.DNS,
-				Node: cfg.Node,
-				ApiServer: config.ApiServer{
-					SubjectAltNames: cfg.SubjectAltNames,
-				},
+				DNS:       cfg.DNS,
+				Node:      cfg.Node,
+				ApiServer: cfg.ApiServer,
 				Debugging: cfg.Debugging,
 				Etcd:      cfg.Etcd,
 			}

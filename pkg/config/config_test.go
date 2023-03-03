@@ -69,12 +69,14 @@ func TestConfigFile(t *testing.T) {
 				Debugging: Debugging{
 					LogLevel: "Debug",
 				},
-				SubjectAltNames: []string{"node1", "node2"},
+				ApiServer: ApiServer{
+					SubjectAltNames:  []string{"node1", "node2"},
+					AdvertiseAddress: "6.7.8.9",
+				},
 				Node: Node{
 					HostnameOverride: "node1",
 					NodeIP:           "1.2.3.4",
 				},
-				KASAdvertiseAddress: "6.7.8.9",
 				DNS: DNS{
 					BaseDomain: "example.com",
 				},
@@ -178,13 +180,15 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 				Debugging: Debugging{
 					LogLevel: "Debug",
 				},
-				SubjectAltNames: []string{"node1", "node2"},
+				ApiServer: ApiServer{
+					SubjectAltNames:  []string{"node1", "node2"},
+					AdvertiseAddress: "6.7.8.9",
+					SkipInterface:    true,
+				},
 				Node: Node{
 					HostnameOverride: "node1",
 					NodeIP:           "1.2.3.4",
 				},
-				KASAdvertiseAddress: "6.7.8.9",
-				SkipKASInterface:    true,
 				DNS: DNS{
 					BaseDomain: "example.com",
 				},
