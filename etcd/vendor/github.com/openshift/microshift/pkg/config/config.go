@@ -86,8 +86,6 @@ type EtcdConfig struct {
 }
 
 type MicroshiftConfig struct {
-	LogVLevel int `json:"logVLevel"`
-
 	SubjectAltNames []string `json:"subjectAltNames"`
 	// Kube apiserver advertise address to work around the certificates issue
 	// when requiring external access using the node IP. This will turn into
@@ -103,8 +101,9 @@ type MicroshiftConfig struct {
 	Ingress IngressConfig      `json:"-"`
 	Etcd    InternalEtcdConfig `json:"etcd"`
 
-	DNS  DNS  `json:"-"`
-	Node Node `json:"-"`
+	DNS       DNS       `json:"-"`
+	Node      Node      `json:"-"`
+	Debugging Debugging `json:"debugging"`
 }
 
 // Top level config file
@@ -242,7 +241,9 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	}
 
 	return &MicroshiftConfig{
-		LogVLevel:       2,
+		Debugging: Debugging{
+			LogLevel: "Normal",
+		},
 		SubjectAltNames: subjectAltNames,
 		Node: Node{
 			HostnameOverride: nodeName,
@@ -395,8 +396,8 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	}
 
 	// Wire new Config type to existing MicroshiftConfig
-	c.LogVLevel = config.GetVerbosity()
 	c.Node = config.Node
+	c.Debugging = config.Debugging
 	if len(config.Network.ClusterNetwork) != 0 {
 		c.Cluster.ClusterCIDR = config.Network.ClusterNetwork[0].CIDR
 	}
@@ -559,7 +560,7 @@ func stringSliceContains(list []string, elements ...string) bool {
 }
 
 // GetVerbosity returns the numerical value for LogLevel which is an enum
-func (c *Config) GetVerbosity() int {
+func (c *MicroshiftConfig) GetVerbosity() int {
 	var verbosity int
 	switch c.Debugging.LogLevel {
 	case "Normal":

@@ -93,7 +93,7 @@ func configure(cfg *config.MicroshiftConfig) (args []string, applyFn func() erro
 			"use-service-account-credentials":  {"true"},
 			"cluster-signing-cert-file":        {clusterSigningCert},
 			"cluster-signing-key-file":         {clusterSigningKey},
-			"v":                                {strconv.Itoa(cfg.LogVLevel)},
+			"v":                                {strconv.Itoa(cfg.GetVerbosity())},
 		},
 	}
 
