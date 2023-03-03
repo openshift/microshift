@@ -9,7 +9,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+func startServiceCAController(cfg *config.Config, kubeconfigPath string) error {
 	var (
 		//TODO: fix the rolebinding and sa
 		clusterRoleBinding = []string{
@@ -101,7 +101,7 @@ func startServiceCAController(cfg *config.MicroshiftConfig, kubeconfigPath strin
 	return nil
 }
 
-func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+func startIngressController(cfg *config.Config, kubeconfigPath string) error {
 	var (
 		clusterRoleBinding = []string{
 			"components/openshift-router/cluster-role-binding.yaml",
@@ -178,7 +178,7 @@ func startIngressController(cfg *config.MicroshiftConfig, kubeconfigPath string)
 	return nil
 }
 
-func startDNSController(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+func startDNSController(cfg *config.Config, kubeconfigPath string) error {
 	var (
 		clusterRoleBinding = []string{
 			"components/openshift-dns/dns/cluster-role-binding.yaml",

@@ -80,7 +80,7 @@ type KubeAPIServer struct {
 	advertiseAddress string
 }
 
-func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
+func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {
 	s := &KubeAPIServer{}
 	if err := s.configure(cfg); err != nil {
 		s.configureErr = err
@@ -91,7 +91,7 @@ func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
 func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
 func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd", "network-configuration"} }
 
-func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
+func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	s.verbosity = cfg.GetVerbosity()
 
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
@@ -255,7 +255,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	return nil
 }
 
-func (s *KubeAPIServer) configureAuditPolicy(cfg *config.MicroshiftConfig) error {
+func (s *KubeAPIServer) configureAuditPolicy(cfg *config.Config) error {
 	data := []byte(`
 apiVersion: audit.k8s.io/v1
 kind: Policy

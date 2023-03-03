@@ -70,25 +70,16 @@ type EtcdConfig struct {
 	DoStartupDefrag bool `json:"doStartupDefrag"`
 }
 
-type MicroshiftConfig struct {
-	Ingress IngressConfig `json:"-"`
-	Etcd    EtcdConfig    `json:"etcd"`
-
-	DNS       DNS       `json:"-"`
-	Node      Node      `json:"-"`
-	Debugging Debugging `json:"debugging"`
-	ApiServer ApiServer `json:"-"`
-	Network   Network   `json:"-"`
-}
-
-// Top level config file
 type Config struct {
 	DNS       DNS        `json:"dns"`
 	Network   Network    `json:"network"`
 	Node      Node       `json:"node"`
 	ApiServer ApiServer  `json:"apiServer"`
-	Debugging Debugging  `json:"debugging"`
 	Etcd      EtcdConfig `json:"etcd"`
+	Debugging Debugging  `json:"debugging"`
+
+	// Internal-only fields
+	Ingress IngressConfig `json:"-"`
 }
 
 type Network struct {
@@ -189,11 +180,11 @@ const (
 )
 
 // KubeConfigPath returns the path to the specified kubeconfig file.
-func (cfg *MicroshiftConfig) KubeConfigPath(id KubeConfigID) string {
+func (cfg *Config) KubeConfigPath(id KubeConfigID) string {
 	return filepath.Join(dataDir, "resources", string(id), "kubeconfig")
 }
 
-func (cfg *MicroshiftConfig) KubeConfigAdminPath(id string) string {
+func (cfg *Config) KubeConfigAdminPath(id string) string {
 	return filepath.Join(dataDir, "resources", string(KubeAdmin), id, "kubeconfig")
 }
 
@@ -213,7 +204,7 @@ func getAllHostnames() ([]string, error) {
 	return set.List(), nil
 }
 
-func NewMicroshiftConfig() *MicroshiftConfig {
+func NewMicroshiftConfig() *Config {
 	nodeName, err := os.Hostname()
 	if err != nil {
 		klog.Fatalf("Failed to get hostname %v", err)
@@ -227,7 +218,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		klog.Fatalf("failed to get all hostnames: %v", err)
 	}
 
-	return &MicroshiftConfig{
+	return &Config{
 		Debugging: Debugging{
 			LogLevel: "Normal",
 		},
@@ -268,7 +259,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 }
 
 // Determine if the config file specified a NodeName (by default it's assigned the hostname)
-func (c *MicroshiftConfig) isDefaultNodeName() bool {
+func (c *Config) isDefaultNodeName() bool {
 	hostname, err := os.Hostname()
 	if err != nil {
 		klog.Fatalf("Failed to get hostname %v", err)
@@ -277,7 +268,7 @@ func (c *MicroshiftConfig) isDefaultNodeName() bool {
 }
 
 // Read or set the NodeName that will be used for this MicroShift instance
-func (c *MicroshiftConfig) establishNodeName() (string, error) {
+func (c *Config) establishNodeName() (string, error) {
 	filePath := filepath.Join(GetDataDir(), ".nodename")
 	contents, err := os.ReadFile(filePath)
 	if os.IsNotExist(err) {
@@ -294,7 +285,7 @@ func (c *MicroshiftConfig) establishNodeName() (string, error) {
 }
 
 // Validate the NodeName to be used for this MicroShift instances
-func (c *MicroshiftConfig) validateNodeName(isDefaultNodeName bool) error {
+func (c *Config) validateNodeName(isDefaultNodeName bool) error {
 	if addr := net.ParseIP(c.Node.HostnameOverride); addr != nil {
 		return fmt.Errorf("NodeName can not be an IP address: %q", c.Node.HostnameOverride)
 	}
@@ -319,7 +310,7 @@ func (c *MicroshiftConfig) validateNodeName(isDefaultNodeName bool) error {
 }
 
 // extract the api server port from the cluster URL
-func (c *MicroshiftConfig) ApiServerPort() (int, error) {
+func (c *Config) ApiServerPort() (int, error) {
 	var port string
 
 	parsed, err := url.Parse(c.ApiServer.URL)
@@ -384,7 +375,7 @@ func StringInList(s string, list []string) bool {
 	return false
 }
 
-func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
+func (c *Config) ReadFromConfigFile(configFile string) error {
 	contents, err := os.ReadFile(configFile)
 	if err != nil {
 		return fmt.Errorf("reading config file %q: %v", configFile, err)
@@ -394,7 +385,7 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 		return fmt.Errorf("decoding config file %s: %v", configFile, err)
 	}
 
-	// Wire new Config type to existing MicroshiftConfig
+	// Wire new Config type to existing Config
 	c.Node = config.Node
 	c.Debugging = config.Debugging
 	c.Network = config.Network
@@ -436,7 +427,7 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	return nil
 }
 
-func (c *MicroshiftConfig) computeAndUpdateClusterDNS() error {
+func (c *Config) computeAndUpdateClusterDNS() error {
 	if len(c.Network.ServiceNetwork) == 0 {
 		return fmt.Errorf("network.serviceNetwork not filled in")
 	}
@@ -451,7 +442,7 @@ func (c *MicroshiftConfig) computeAndUpdateClusterDNS() error {
 
 // Note: add a configFile parameter here because of unit test requiring custom
 // local directory
-func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
+func (c *Config) ReadAndValidate(configFile string) error {
 	if configFile != "" {
 		if err := c.ReadFromConfigFile(configFile); err != nil {
 			return err
@@ -558,7 +549,7 @@ func stringSliceContains(list []string, elements ...string) bool {
 }
 
 // GetVerbosity returns the numerical value for LogLevel which is an enum
-func (c *MicroshiftConfig) GetVerbosity() int {
+func (c *Config) GetVerbosity() int {
 	var verbosity int
 	switch c.Debugging.LogLevel {
 	case "Normal":

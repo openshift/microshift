@@ -23,7 +23,7 @@ type MicroShiftmDNSController struct {
 	stopCh     chan struct{}
 }
 
-func NewMicroShiftmDNSController(cfg *config.MicroshiftConfig) *MicroShiftmDNSController {
+func NewMicroShiftmDNSController(cfg *config.Config) *MicroShiftmDNSController {
 	return &MicroShiftmDNSController{
 		NodeIP:     cfg.Node.NodeIP,
 		NodeName:   cfg.Node.HostnameOverride,

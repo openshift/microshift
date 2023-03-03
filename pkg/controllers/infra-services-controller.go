@@ -26,10 +26,10 @@ import (
 )
 
 type InfrastructureServicesManager struct {
-	cfg *config.MicroshiftConfig
+	cfg *config.Config
 }
 
-func NewInfrastructureServices(cfg *config.MicroshiftConfig) *InfrastructureServicesManager {
+func NewInfrastructureServices(cfg *config.Config) *InfrastructureServicesManager {
 	s := &InfrastructureServicesManager{}
 	s.cfg = cfg
 	return s
@@ -62,7 +62,7 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 	return ctx.Err()
 }
 
-func applyDefaultRBACs(cfg *config.MicroshiftConfig) error {
+func applyDefaultRBACs(cfg *config.Config) error {
 	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
 	var (
 		cr = []string{
