@@ -92,7 +92,7 @@ func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
 func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd", "network-configuration"} }
 
 func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
-	s.verbosity = cfg.LogVLevel
+	s.verbosity = cfg.GetVerbosity()
 
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 	kubeCSRSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)

@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	"k8s.io/klog/v2"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"sigs.k8s.io/yaml"
 
@@ -43,10 +42,6 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 			}
 
 			// map back from internal representation to user config
-			logLevels := []string{"", "", "Normal", "", "Debug", "", "Trace", "", "TraceAll"}
-			if cfg.LogVLevel < 0 || cfg.LogVLevel >= len(logLevels) {
-				klog.Fatal("logVLevel out of range [0..%d] %d", len(logLevels)-1, cfg.LogVLevel)
-			}
 			userCfg := config.Config{
 				Network: config.Network{
 					ClusterNetwork: []config.ClusterNetworkEntry{
@@ -60,9 +55,7 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 				ApiServer: config.ApiServer{
 					SubjectAltNames: cfg.SubjectAltNames,
 				},
-				Debugging: config.Debugging{
-					LogLevel: logLevels[cfg.LogVLevel],
-				},
+				Debugging: cfg.Debugging,
 			}
 			marshalled, err := yaml.Marshal(userCfg)
 			cmdutil.CheckErr(err)
