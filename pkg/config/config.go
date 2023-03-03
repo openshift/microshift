@@ -79,17 +79,7 @@ type EtcdConfig struct {
 }
 
 type MicroshiftConfig struct {
-	SubjectAltNames []string `json:"subjectAltNames"`
-	// Kube apiserver advertise address to work around the certificates issue
-	// when requiring external access using the node IP. This will turn into
-	// the IP configured in the endpoint slice for kubernetes service. Must be
-	// a reachable IP from pods. Defaults to service network CIDR first
-	// address.
-	KASAdvertiseAddress string `json:"kasAdvertiseAddress"`
-	// Determines if kube-apiserver controller should configure the
-	// KASAdvertiseAddress in the loopback interface. Automatically computed.
-	SkipKASInterface bool          `json:"-"`
-	Cluster          ClusterConfig `json:"cluster"`
+	Cluster ClusterConfig `json:"cluster"`
 
 	Ingress IngressConfig `json:"-"`
 	Etcd    EtcdConfig    `json:"etcd"`
@@ -97,6 +87,7 @@ type MicroshiftConfig struct {
 	DNS       DNS       `json:"-"`
 	Node      Node      `json:"-"`
 	Debugging Debugging `json:"debugging"`
+	ApiServer ApiServer `json:"-"`
 }
 
 // Top level config file
@@ -150,9 +141,15 @@ type DNS struct {
 type ApiServer struct {
 	// SubjectAltNames added to API server certs
 	SubjectAltNames []string `json:"subjectAltNames"`
-	// AdvertiseAddress for endpoint slices in kubernetes service. Developer
-	// only parameter, wont show in show-config commands or docs.
+	// Kube apiserver advertise address to work around the certificates issue
+	// when requiring external access using the node IP. This will turn into
+	// the IP configured in the endpoint slice for kubernetes service. Must be
+	// a reachable IP from pods. Defaults to service network CIDR first
+	// address.
 	AdvertiseAddress string `json:"advertiseAddress,omitempty"`
+	// Determines if kube-apiserver controller should configure the
+	// AdvertiseAddress in the loopback interface. Automatically computed.
+	SkipInterface bool `json:"-"`
 }
 
 type Node struct {
@@ -237,7 +234,9 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 		Debugging: Debugging{
 			LogLevel: "Normal",
 		},
-		SubjectAltNames: subjectAltNames,
+		ApiServer: ApiServer{
+			SubjectAltNames: subjectAltNames,
+		},
 		Node: Node{
 			HostnameOverride: nodeName,
 			NodeIP:           nodeIP,
@@ -404,12 +403,7 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 		c.Cluster.ServiceNodePortRange = config.Network.ServiceNodePortRange
 	}
 	c.DNS = config.DNS
-	if len(config.ApiServer.SubjectAltNames) > 0 {
-		c.SubjectAltNames = config.ApiServer.SubjectAltNames
-	}
-	if len(config.ApiServer.AdvertiseAddress) > 0 {
-		c.KASAdvertiseAddress = config.ApiServer.AdvertiseAddress
-	}
+	c.ApiServer = config.ApiServer
 
 	c.Etcd = config.Etcd
 	if c.Etcd.DefragCheckFreq != "" {
@@ -459,20 +453,20 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 
 	// If KAS advertise address is not configured then grab it from the service
 	// CIDR automatically.
-	if len(c.KASAdvertiseAddress) == 0 {
+	if len(c.ApiServer.AdvertiseAddress) == 0 {
 		// unchecked error because this was done when getting cluster DNS
 		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
 		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
 		if err != nil {
 			return fmt.Errorf("error getting apiserver IP: %v", err)
 		}
-		c.KASAdvertiseAddress = apiServerServiceIP.String()
-		c.SkipKASInterface = false
+		c.ApiServer.AdvertiseAddress = apiServerServiceIP.String()
+		c.ApiServer.SkipInterface = false
 	} else {
-		c.SkipKASInterface = true
+		c.ApiServer.SkipInterface = true
 	}
 
-	if len(c.SubjectAltNames) > 0 {
+	if len(c.ApiServer.SubjectAltNames) > 0 {
 		// Any entry in SubjectAltNames will be included in the external access certificates.
 		// Any of the hostnames and IPs (except the node IP) listed below conflicts with
 		// other certificates, such as the service network and localhost access.
@@ -490,20 +484,20 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 			return fmt.Errorf("failed to parse cluster URL: %v", err)
 		}
 		if u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" {
-			if stringSliceContains(c.SubjectAltNames, "localhost", "127.0.0.1") {
+			if stringSliceContains(c.ApiServer.SubjectAltNames, "localhost", "127.0.0.1") {
 				return fmt.Errorf("subjectAltNames must not contain localhost, 127.0.0.1")
 			}
 		} else {
-			if stringSliceContains(c.SubjectAltNames, c.Node.NodeIP) {
+			if stringSliceContains(c.ApiServer.SubjectAltNames, c.Node.NodeIP) {
 				return fmt.Errorf("subjectAltNames must not contain node IP")
 			}
-			if !stringSliceContains(c.SubjectAltNames, u.Host) || u.Host != c.Node.HostnameOverride {
+			if !stringSliceContains(c.ApiServer.SubjectAltNames, u.Host) || u.Host != c.Node.HostnameOverride {
 				return fmt.Errorf("Cluster URL host %v is not included in subjectAltNames or nodeName", u.String())
 			}
 		}
 
 		if stringSliceContains(
-			c.SubjectAltNames,
+			c.ApiServer.SubjectAltNames,
 			"kubernetes",
 			"kubernetes.default",
 			"kubernetes.default.svc",
@@ -512,7 +506,7 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 			"openshift.default",
 			"openshift.default.svc",
 			"openshift.default.svc.cluster.local",
-			c.KASAdvertiseAddress,
+			c.ApiServer.AdvertiseAddress,
 		) {
 			return fmt.Errorf("subjectAltNames must not contain apiserver kubernetes service names or IPs")
 		}
