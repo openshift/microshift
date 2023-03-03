@@ -36,7 +36,7 @@ var _ servicemanager.Service = &LoadbalancerServiceController{}
 
 func NewLoadbalancerServiceController(cfg *config.MicroshiftConfig) *LoadbalancerServiceController {
 	return &LoadbalancerServiceController{
-		NodeIP:     cfg.NodeIP,
+		NodeIP:     cfg.Node.NodeIP,
 		KubeConfig: cfg.KubeConfigPath(config.KubeAdmin),
 	}
 }

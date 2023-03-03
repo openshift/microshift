@@ -23,8 +23,8 @@ var templateFuncs = map[string]interface{}{
 func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderParams) assets.RenderParams {
 	params := map[string]interface{}{
 		"ReleaseImage": release.Image,
-		"NodeName":     cfg.NodeName,
-		"NodeIP":       cfg.NodeIP,
+		"NodeName":     cfg.Node.HostnameOverride,
+		"NodeIP":       cfg.Node.NodeIP,
 		"ClusterCIDR":  cfg.Cluster.ClusterCIDR,
 		"ServiceCIDR":  cfg.Cluster.ServiceCIDR,
 		"ClusterDNS":   cfg.Cluster.DNS,

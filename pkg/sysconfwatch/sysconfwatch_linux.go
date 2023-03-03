@@ -55,7 +55,7 @@ func NewSysConfWatchController(cfg *config.MicroshiftConfig) *SysConfWatchContro
 	}
 
 	return &SysConfWatchController{
-		NodeIP:  cfg.NodeIP,
+		NodeIP:  cfg.Node.NodeIP,
 		timerFd: fd,
 	}
 }

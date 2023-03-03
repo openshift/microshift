@@ -56,8 +56,8 @@ func RunMicroshift(cfg *config.MicroshiftConfig) error {
 	//        see https://github.com/openshift/microshift/pull/471
 
 	if err := util.AddToNoProxyEnv(
-		cfg.NodeIP,
-		cfg.NodeName,
+		cfg.Node.NodeIP,
+		cfg.Node.HostnameOverride,
 		cfg.Cluster.ClusterCIDR,
 		cfg.Cluster.ServiceCIDR,
 		".svc",
