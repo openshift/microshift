@@ -56,6 +56,7 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 					SubjectAltNames: cfg.SubjectAltNames,
 				},
 				Debugging: cfg.Debugging,
+				Etcd:      cfg.Etcd,
 			}
 			marshalled, err := yaml.Marshal(userCfg)
 			cmdutil.CheckErr(err)

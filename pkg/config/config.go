@@ -59,30 +59,23 @@ type IngressConfig struct {
 	ServingKey         []byte
 }
 
-type InternalEtcdConfig struct {
-	// The limit on the size of the etcd database; etcd will start failing writes if its size on disk reaches this value
-	QuotaBackendBytes int64
-	// If the backend is fragmented more than `maxFragmentedPercentage`
-	//		and the database size is greater than `minDefragBytes`, do a defrag.
-	MinDefragBytes          int64
-	MaxFragmentedPercentage float64
-	// How often to check the conditions for defragging (0 means no defrags, except for a single on startup if `doStartupDefrag` is set).
-	DefragCheckFreq time.Duration
-	// Whether or not to do a defrag when the server finishes starting
-	DoStartupDefrag bool
-}
-
 type EtcdConfig struct {
 	// The limit on the size of the etcd database; etcd will start failing writes if its size on disk reaches this value
-	QuotaBackendSize string
+	QuotaBackendSize  string `json:"quotaBackendSize"`
+	QuotaBackendBytes int64  `json:"-"`
+
 	// If the backend is fragmented more than `maxFragmentedPercentage`
 	//		and the database size is greater than `minDefragSize`, do a defrag.
-	MinDefragSize           string
-	MaxFragmentedPercentage float64
+	MinDefragSize           string  `json:"minDefragSize"`
+	MinDefragBytes          int64   `json:"-"`
+	MaxFragmentedPercentage float64 `json:"maxFragmentedPercentage"`
+
 	// How often to check the conditions for defragging (0 means no defrags, except for a single on startup if `doStartupDefrag` is set).
-	DefragCheckFreq string
+	DefragCheckFreq     string        `json:"defragCheckFreq"`
+	DefragCheckDuration time.Duration `json:"-"`
+
 	// Whether or not to do a defrag when the server finishes starting
-	DoStartupDefrag bool
+	DoStartupDefrag bool `json:"doStartupDefrag"`
 }
 
 type MicroshiftConfig struct {
@@ -98,8 +91,8 @@ type MicroshiftConfig struct {
 	SkipKASInterface bool          `json:"-"`
 	Cluster          ClusterConfig `json:"cluster"`
 
-	Ingress IngressConfig      `json:"-"`
-	Etcd    InternalEtcdConfig `json:"etcd"`
+	Ingress IngressConfig `json:"-"`
+	Etcd    EtcdConfig    `json:"etcd"`
 
 	DNS       DNS       `json:"-"`
 	Node      Node      `json:"-"`
@@ -258,12 +251,15 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			ServiceCIDR:          "10.43.0.0/16",
 			ServiceNodePortRange: "30000-32767",
 		},
-		Etcd: InternalEtcdConfig{
-			MinDefragBytes:          100 * 1024 * 1024, // 100MB
+		Etcd: EtcdConfig{
+			MinDefragSize:           "100Mi",
+			MinDefragBytes:          100 * 1024 * 1024, // 100MiB
 			MaxFragmentedPercentage: 45,                // percent
-			DefragCheckFreq:         5 * time.Minute,
+			DefragCheckFreq:         "5m",
+			DefragCheckDuration:     5 * time.Minute,
 			DoStartupDefrag:         true,
-			QuotaBackendBytes:       2 * 1024 * 1024 * 1024, // 2GB
+			QuotaBackendSize:        "2Gi",
+			QuotaBackendBytes:       2 * 1024 * 1024 * 1024, // 2GiB
 		},
 	}
 }
@@ -415,15 +411,16 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 		c.KASAdvertiseAddress = config.ApiServer.AdvertiseAddress
 	}
 
-	if config.Etcd.DefragCheckFreq != "" {
-		d, err := time.ParseDuration(config.Etcd.DefragCheckFreq)
+	c.Etcd = config.Etcd
+	if c.Etcd.DefragCheckFreq != "" {
+		d, err := time.ParseDuration(c.Etcd.DefragCheckFreq)
 		if err != nil {
 			return fmt.Errorf("failed to parse etcd defragCheckFreq: %v", err)
 		}
-		c.Etcd.DefragCheckFreq = d
+		c.Etcd.DefragCheckDuration = d
 	}
-	if config.Etcd.MinDefragSize != "" {
-		q, err := resource.ParseQuantity(config.Etcd.MinDefragSize)
+	if c.Etcd.MinDefragSize != "" {
+		q, err := resource.ParseQuantity(c.Etcd.MinDefragSize)
 		if err != nil {
 			return fmt.Errorf("failed to parse etcd minDefragSize: %v", err)
 		}
@@ -431,11 +428,8 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 			c.Etcd.MinDefragBytes = q.Value()
 		}
 	}
-	if config.Etcd.MaxFragmentedPercentage > 0 {
-		c.Etcd.MaxFragmentedPercentage = config.Etcd.MaxFragmentedPercentage
-	}
-	if config.Etcd.QuotaBackendSize != "" {
-		q, err := resource.ParseQuantity(config.Etcd.QuotaBackendSize)
+	if c.Etcd.QuotaBackendSize != "" {
+		q, err := resource.ParseQuantity(c.Etcd.QuotaBackendSize)
 		if err != nil {
 			return fmt.Errorf("failed to parse etcd quotaBackendSize: %v", err)
 		}
@@ -443,7 +437,6 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 			c.Etcd.QuotaBackendBytes = q.Value()
 		}
 	}
-	c.Etcd.DoStartupDefrag = config.Etcd.DoStartupDefrag
 
 	return nil
 }
