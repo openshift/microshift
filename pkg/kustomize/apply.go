@@ -30,7 +30,7 @@ type Kustomizer struct {
 	kubeconfig string
 }
 
-func NewKustomizer(cfg *config.MicroshiftConfig) *Kustomizer {
+func NewKustomizer(cfg *config.Config) *Kustomizer {
 	return &Kustomizer{
 		paths:      microshiftManifestsDir,
 		kubeconfig: cfg.KubeConfigPath(config.KubeAdmin),

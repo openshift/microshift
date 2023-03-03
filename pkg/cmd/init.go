@@ -36,7 +36,7 @@ import (
 
 var microshiftDataDir = config.GetDataDir()
 
-func initCerts(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, error) {
+func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 	certChains, err := certSetup(cfg)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func initCerts(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 	return certChains, err
 }
 
-func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, error) {
+func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 	_, svcNet, err := net.ParseCIDR(cfg.Network.ServiceNetwork[0])
 	if err != nil {
 		return nil, err
@@ -367,7 +367,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 }
 
 func initKubeconfigs(
-	cfg *config.MicroshiftConfig,
+	cfg *config.Config,
 	certChains *certchains.CertificateChains,
 ) error {
 	inClusterTrustBundlePEM, err := os.ReadFile(cryptomaterial.ServiceAccountTokenCABundlePath(cryptomaterial.CertsDirectory(microshiftDataDir)))

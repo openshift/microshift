@@ -10,7 +10,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func startCNIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
+func startCNIPlugin(cfg *config.Config, kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"components/ovn/namespace.yaml",

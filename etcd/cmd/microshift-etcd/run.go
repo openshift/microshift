@@ -55,7 +55,7 @@ type EtcdService struct {
 	doStartupDefrag         bool
 }
 
-func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
+func NewEtcd(cfg *config.Config) *EtcdService {
 	s := &EtcdService{}
 	s.configure(cfg)
 	return s
@@ -63,7 +63,7 @@ func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
 
 func (s *EtcdService) Name() string { return "etcd" }
 
-func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
+func (s *EtcdService) configure(cfg *config.Config) {
 	s.minDefragBytes = cfg.Etcd.MinDefragBytes
 	s.maxFragmentedPercentage = cfg.Etcd.MaxFragmentedPercentage
 	s.defragCheckFreq = cfg.Etcd.DefragCheckDuration

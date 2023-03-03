@@ -7,7 +7,7 @@ import (
 
 var microshiftDataDir = config.GetDataDir()
 
-func StartComponents(cfg *config.MicroshiftConfig) error {
+func StartComponents(cfg *config.Config) error {
 	kubeAdminConfig := cfg.KubeConfigPath(config.KubeAdmin)
 
 	if err := startServiceCAController(cfg, kubeAdminConfig); err != nil {

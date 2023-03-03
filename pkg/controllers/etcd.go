@@ -38,7 +38,7 @@ var (
 
 type EtcdService struct{}
 
-func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
+func NewEtcd(cfg *config.Config) *EtcdService {
 	return &EtcdService{}
 }
 

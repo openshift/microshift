@@ -44,7 +44,7 @@ const (
 	componentRCM = "route-controller-manager"
 )
 
-func NewRouteControllerManager(cfg *config.MicroshiftConfig) *OCPRouteControllerManager {
+func NewRouteControllerManager(cfg *config.Config) *OCPRouteControllerManager {
 	s := &OCPRouteControllerManager{}
 	s.configure(cfg)
 	return s
@@ -55,13 +55,13 @@ func (s *OCPRouteControllerManager) Dependencies() []string {
 	return []string{"kube-apiserver", "openshift-crd-manager"}
 }
 
-func (s *OCPRouteControllerManager) configure(cfg *config.MicroshiftConfig) {
+func (s *OCPRouteControllerManager) configure(cfg *config.Config) {
 	s.kubeconfig = cfg.KubeConfigPath(config.RouteControllerManager)
 	s.kubeadmconfig = cfg.KubeConfigPath(config.KubeAdmin)
 	s.config = s.writeConfig(cfg)
 }
 
-func (s *OCPRouteControllerManager) writeConfig(cfg *config.MicroshiftConfig) *openshiftcontrolplanev1.OpenShiftControllerManagerConfig {
+func (s *OCPRouteControllerManager) writeConfig(cfg *config.Config) *openshiftcontrolplanev1.OpenShiftControllerManagerConfig {
 	servingCertDir := cryptomaterial.RouteControllerManagerServingCertDir(cryptomaterial.CertsDirectory(microshiftDataDir))
 
 	c := &openshiftcontrolplanev1.OpenShiftControllerManagerConfig{

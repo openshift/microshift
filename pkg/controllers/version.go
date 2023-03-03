@@ -25,10 +25,10 @@ import (
 )
 
 type VersionManager struct {
-	cfg *config.MicroshiftConfig
+	cfg *config.Config
 }
 
-func NewVersionManager(cfg *config.MicroshiftConfig) *VersionManager {
+func NewVersionManager(cfg *config.Config) *VersionManager {
 	s := &VersionManager{}
 	s.cfg = cfg
 	return s

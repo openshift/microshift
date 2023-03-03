@@ -70,7 +70,7 @@ func isEstablished(cs *apiextclientv1.ApiextensionsV1Client, obj apiruntime.Obje
 	return false, err
 }
 
-func WaitForCrdsEstablished(cfg *config.MicroshiftConfig) error {
+func WaitForCrdsEstablished(cfg *config.Config) error {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.KubeConfigPath(config.KubeAdmin))
 	if err != nil {
 		return err
@@ -115,7 +115,7 @@ func applyCRD(client *apiextclientv1.ApiextensionsV1Client, crd *apiextv1.Custom
 	return err
 }
 
-func ApplyCRDs(cfg *config.MicroshiftConfig) error {
+func ApplyCRDs(cfg *config.Config) error {
 	lock.Lock()
 	defer lock.Unlock()
 
