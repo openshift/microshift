@@ -29,3 +29,20 @@ apiServer:
 debugging:
   # Log verbosity ('Normal', 'Debug', 'Trace', 'TraceAll'):
   #logLevel: 'Normal'
+
+etcd:
+  # The limit on the size of the etcd database; the etcd server will start failing writes if its size on disk reaches this value. (Default: 2GB)
+  #quotaBackendSize: '2Gi'
+
+  # How often to check the conditions for defragmenting the etcd database (0 means no defrags, except for a single on startup if `doStartupDefrag` is set). (Default: 5 minutes)
+  #defragCheckFreq: '5m'
+
+  # Whether or not to defragment the etcd database when the etcd server finishes starting. (Default: true)
+  #doStartupDefrag: true
+
+  # Defragment conditions: if both of the following are true when the condition check (controlled by the DefragCheckFreq) runs, defragment the etcd database.
+  # The minimum size of the etcd database, if the database is smaller than this value, defragmenting will not occur. (Default: 100MB)
+  #minDefragSize: '100Mi'
+
+  # The maximum allowed fragmented percentage, if the database is fragmented less than this value, defragmenting will not occur. (Default: 45)
+  #maxFragmentedPercentage: 45
