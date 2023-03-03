@@ -85,7 +85,7 @@ func configure(cfg *config.MicroshiftConfig) (args []string, applyFn func() erro
 			"authorization-kubeconfig":         {kubeConfig},
 			"service-account-private-key-file": {kcmServiceAccountPrivateKeyFile()},
 			"allocate-node-cidrs":              {"true"},
-			"cluster-cidr":                     {cfg.Cluster.ClusterCIDR},
+			"cluster-cidr":                     {cfg.Network.ClusterNetwork[0].CIDR},
 			"root-ca-file":                     {kcmRootCAFile()},
 			"bind-address":                     {"127.0.0.1"},
 			"secure-port":                      {"10257"},

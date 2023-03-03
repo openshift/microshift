@@ -45,10 +45,10 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 			userCfg := config.Config{
 				Network: config.Network{
 					ClusterNetwork: []config.ClusterNetworkEntry{
-						{CIDR: cfg.Cluster.ClusterCIDR},
+						{CIDR: cfg.Network.ClusterNetwork[0].CIDR},
 					},
-					ServiceNetwork:       []string{cfg.Cluster.ServiceCIDR},
-					ServiceNodePortRange: cfg.Cluster.ServiceNodePortRange,
+					ServiceNetwork:       []string{cfg.Network.ServiceNetwork[0]},
+					ServiceNodePortRange: cfg.Network.ServiceNodePortRange,
 				},
 				DNS:       cfg.DNS,
 				Node:      cfg.Node,

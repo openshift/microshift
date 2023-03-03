@@ -25,9 +25,9 @@ func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderPar
 		"ReleaseImage": release.Image,
 		"NodeName":     cfg.Node.HostnameOverride,
 		"NodeIP":       cfg.Node.NodeIP,
-		"ClusterCIDR":  cfg.Cluster.ClusterCIDR,
-		"ServiceCIDR":  cfg.Cluster.ServiceCIDR,
-		"ClusterDNS":   cfg.Cluster.DNS,
+		"ClusterCIDR":  cfg.Network.ClusterNetwork[0].CIDR,
+		"ServiceCIDR":  cfg.Network.ServiceNetwork[0],
+		"ClusterDNS":   cfg.Network.DNS,
 		"BaseDomain":   cfg.DNS.BaseDomain,
 	}
 	for k, v := range extra {

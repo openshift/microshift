@@ -60,7 +60,7 @@ func initCerts(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 }
 
 func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, error) {
-	_, svcNet, err := net.ParseCIDR(cfg.Cluster.ServiceCIDR)
+	_, svcNet, err := net.ParseCIDR(cfg.Network.ServiceNetwork[0])
 	if err != nil {
 		return nil, err
 	}
@@ -383,11 +383,11 @@ func initKubeconfigs(
 		return err
 	}
 
-	u, err := url.Parse(cfg.Cluster.URL)
+	u, err := url.Parse(cfg.ApiServer.URL)
 	if err != nil {
 		return fmt.Errorf("failed to parse cluster URL: %v", err)
 	}
-	apiServerPort, err := cfg.Cluster.ApiServerPort()
+	apiServerPort, err := cfg.ApiServerPort()
 	if err != nil {
 		return fmt.Errorf("failed to get apiserver port: %v", err)
 	}
@@ -408,7 +408,7 @@ func initKubeconfigs(
 
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeAdmin),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		adminKubeconfigCertPEM,
 		adminKubeconfigKeyPEM,
@@ -422,7 +422,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeControllerManager),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		kcmCertPEM,
 		kcmKeyPEM,
@@ -436,7 +436,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeScheduler),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		schedulerCertPEM, schedulerKeyPEM,
 	); err != nil {
@@ -449,7 +449,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.Kubelet),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		kubeletCertPEM, kubeletKeyPEM,
 	); err != nil {
@@ -461,7 +461,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.ClusterPolicyController),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		clusterPolicyControllerCertPEM, clusterPolicyControllerKeyPEM,
 	); err != nil {
@@ -474,7 +474,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.RouteControllerManager),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		routeControllerManagerCertPEM, routeControllerManagerKeyPEM,
 	); err != nil {
