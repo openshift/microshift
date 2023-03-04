@@ -3,12 +3,11 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"sigs.k8s.io/yaml"
-
-	"github.com/openshift/microshift/pkg/config"
 )
 
 type showConfigOptions struct {
@@ -21,42 +20,23 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 		Mode: "default",
 	}
 
-	cfg := config.NewMicroshiftConfig()
-
 	cmd := &cobra.Command{
 		Use:   "show-config",
 		Short: "Print MicroShift's configuration",
 		Run: func(cmd *cobra.Command, args []string) {
+			var cfg *config.Config
+			var err error
 
-			switch opts.Mode {
-			case "default":
-				cfg.Node.NodeIP = ""
-				cfg.Node.HostnameOverride = ""
-			case "effective":
-				// Load the current configuration
-				if err := cfg.ReadAndValidate(config.GetConfigFile()); err != nil {
+			if opts.Mode == "effective" {
+				cfg, err = config.GetActiveConfig()
+				if err != nil {
 					cmdutil.CheckErr(err)
 				}
-			default:
-				cmdutil.CheckErr(fmt.Errorf("Unknown mode %q", opts.Mode))
+			} else {
+				cfg = config.NewMicroshiftConfig()
 			}
 
-			// map back from internal representation to user config
-			userCfg := config.Config{
-				Network: config.Network{
-					ClusterNetwork: []config.ClusterNetworkEntry{
-						{CIDR: cfg.Network.ClusterNetwork[0].CIDR},
-					},
-					ServiceNetwork:       []string{cfg.Network.ServiceNetwork[0]},
-					ServiceNodePortRange: cfg.Network.ServiceNodePortRange,
-				},
-				DNS:       cfg.DNS,
-				Node:      cfg.Node,
-				ApiServer: cfg.ApiServer,
-				Debugging: cfg.Debugging,
-				Etcd:      cfg.Etcd,
-			}
-			marshalled, err := yaml.Marshal(userCfg)
+			marshalled, err := yaml.Marshal(cfg)
 			cmdutil.CheckErr(err)
 
 			fmt.Fprintf(ioStreams.Out, "%s\n", string(marshalled))

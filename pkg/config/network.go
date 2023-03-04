@@ -35,17 +35,16 @@ type ClusterNetworkEntry struct {
 	CIDR string `json:"cidr"`
 }
 
-func (c *Config) computeAndUpdateClusterDNS() error {
+func (c *Config) computeClusterDNS() (string, error) {
 	if len(c.Network.ServiceNetwork) == 0 {
-		return fmt.Errorf("network.serviceNetwork not filled in")
+		return "", fmt.Errorf("network.serviceNetwork not filled in")
 	}
 
 	clusterDNS, err := getClusterDNS(c.Network.ServiceNetwork[0])
 	if err != nil {
-		return fmt.Errorf("failed to get DNS IP: %v", err)
+		return "", fmt.Errorf("failed to get DNS IP: %v", err)
 	}
-	c.Network.DNS = clusterDNS
-	return nil
+	return clusterDNS, nil
 }
 
 // getClusterDNS returns cluster DNS IP that is 10th IP of the ServiceNetwork
