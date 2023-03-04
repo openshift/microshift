@@ -22,11 +22,11 @@ import (
 )
 
 func NewRunEtcdCommand() *cobra.Command {
-	cfg := config.NewMicroshiftConfig()
 	cmd := &cobra.Command{
 		Use: "run",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			if err := cfg.ReadAndValidate(config.GetConfigFile()); err != nil {
+			cfg, err := config.GetActiveConfig()
+			if err != nil {
 				klog.Fatalf("Error in reading and validating MicroShift config: %v", err)
 			}
 

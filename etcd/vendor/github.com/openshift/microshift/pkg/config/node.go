@@ -68,3 +68,10 @@ func (c *Config) validateNodeName(isDefaultNodeName bool) error {
 
 	return nil
 }
+
+func (c *Config) EnsureNodeNameHasNotChanged() error {
+	// Validate NodeName in config file, node-name should not be changed for an already
+	// initialized MicroShift instance. This can lead to Pods being re-scheduled, storage
+	// being orphaned or lost, and other side effects.
+	return c.validateNodeName(c.isDefaultNodeName())
+}

@@ -4,9 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
-
-	"sigs.k8s.io/yaml"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -27,102 +24,131 @@ func setupSuiteDataDir(t *testing.T) func() {
 	}
 }
 
-func TestConfigFile(t *testing.T) {
+func TestParse(t *testing.T) {
+	mkConfig := func() *Config {
+		c := NewMicroshiftConfig()
+		c.ApiServer.SkipInterface = true
+		return c
+	}
+
 	var ttests = []struct {
-		config    Config
-		expected  Config
+		name      string
+		config    string
+		expected  *Config
 		expectErr bool
 	}{
 		{
-			config: Config{
-				DNS: DNS{
-					BaseDomain: "example.com",
-				},
-				Network: Network{
-					ClusterNetwork: []ClusterNetworkEntry{
-						{
-							CIDR: "10.20.30.40/16",
-						},
+			name:     "empty",
+			config:   "",
+			expected: mkConfig(),
+		},
+		{
+			name: "dns",
+			config: `
+dns:
+  baseDomain: test-example.com
+`,
+			expected: func() *Config {
+				c := mkConfig()
+				c.DNS.BaseDomain = "test-example.com"
+				return c
+			}(),
+		},
+		{
+			name: "network",
+			config: `
+network:
+  clusterNetwork:
+  - cidr: "10.20.30.40/16"
+  serviceNetwork:
+  - "40.30.20.10/16"
+  serviceNodePortRange: "1024-32767"
+`,
+			expected: func() *Config {
+				c := mkConfig()
+				c.Network.ClusterNetwork = []ClusterNetworkEntry{
+					{
+						CIDR: "10.20.30.40/16",
 					},
-					ServiceNetwork:       []string{"40.30.20.10/16"},
-					ServiceNodePortRange: "1024-32767",
-				},
-				Node: Node{
-					HostnameOverride: "node1",
-					NodeIP:           "1.2.3.4",
-				},
-				ApiServer: ApiServer{
-					SubjectAltNames:  []string{"node1", "node2"},
-					AdvertiseAddress: "6.7.8.9",
-				},
-				Debugging: Debugging{
-					LogLevel: "Debug",
-				},
-				Etcd: EtcdConfig{
-					QuotaBackendSize:        "2Gi",
-					MinDefragSize:           "100Mi",
-					MaxFragmentedPercentage: 45,
-					DefragCheckFreq:         "5m",
-					DoStartupDefrag:         true,
-				},
-			},
-			expected: Config{
-				Debugging: Debugging{
-					LogLevel: "Debug",
-				},
-				ApiServer: ApiServer{
-					SubjectAltNames:  []string{"node1", "node2"},
-					AdvertiseAddress: "6.7.8.9",
-					URL:              "https://localhost:6443",
-				},
-				Node: Node{
-					HostnameOverride: "node1",
-					NodeIP:           "1.2.3.4",
-				},
-				DNS: DNS{
-					BaseDomain: "example.com",
-				},
-				Network: Network{
-					ClusterNetwork: []ClusterNetworkEntry{
-						{
-							CIDR: "10.20.30.40/16",
-						},
-					},
-					ServiceNetwork:       []string{"40.30.20.10/16"},
-					ServiceNodePortRange: "1024-32767",
-					DNS:                  "40.30.0.10",
-				},
-				Etcd: EtcdConfig{
-					QuotaBackendSize:        "2Gi",
-					QuotaBackendBytes:       2 * 1024 * 1024 * 1024,
-					MinDefragSize:           "100Mi",
-					MinDefragBytes:          100 * 1024 * 1024,
-					MaxFragmentedPercentage: 45,
-					DefragCheckFreq:         "5m",
-					DefragCheckDuration:     5 * time.Minute,
-					DoStartupDefrag:         true,
-				},
-			},
-			expectErr: false,
+				}
+				c.Network.ServiceNetwork = []string{"40.30.20.10/16"}
+				c.Network.ServiceNodePortRange = "1024-32767"
+				c.ApiServer.AdvertiseAddress = "40.30.0.1"
+				c.updateComputedValues() // recomputes DNS field
+				return c
+			}(),
+		},
+		{
+			name: "node",
+			config: `
+node:
+  hostnameOverride: "node1"
+  nodeIP: "1.2.3.4"
+`,
+			expected: func() *Config {
+				c := mkConfig()
+				c.Node.HostnameOverride = "node1"
+				c.Node.NodeIP = "1.2.3.4"
+				return c
+			}(),
+		},
+		{
+			name: "api-server",
+			config: `
+apiServer:
+  subjectAltNames:
+  - node1
+  - node2
+`,
+			expected: func() *Config {
+				c := mkConfig()
+				c.ApiServer.SubjectAltNames = []string{
+					"node1", "node2",
+				}
+				return c
+			}(),
+		},
+		{
+			name: "debugging",
+			config: `
+debugging:
+  logLevel: Info
+`,
+			expected: func() *Config {
+				c := mkConfig()
+				c.Debugging.LogLevel = "Info"
+				return c
+			}(),
+		},
+		{
+			name: "etcd",
+			config: `
+etcd:
+  quotaBackendSize: 100Gi
+  minDefragSize: 1Gi
+  maxFragmentedPercentage: 99
+  defragCheckFreq: 55m
+  doStartupDefrag: true
+`,
+			expected: func() *Config {
+				c := mkConfig()
+				c.Etcd.QuotaBackendSize = "100Gi"
+				c.Etcd.MinDefragSize = "1Gi"
+				c.Etcd.MaxFragmentedPercentage = 99
+				c.Etcd.DefragCheckFreq = "55m"
+				c.Etcd.DoStartupDefrag = true
+				c.updateComputedValues() // parse the time duration
+				// set some of the other expected values explicitly
+				c.Etcd.QuotaBackendBytes = 100 * 1024 * 1024 * 1024
+				c.Etcd.MinDefragBytes = 1024 * 1024 * 1024
+				return c
+			}(),
 		},
 	}
+
 	for _, tt := range ttests {
-		t.Run("", func(t *testing.T) {
-			f, err := os.CreateTemp("", "test")
-			if err != nil {
-				t.Errorf("unable to create temp file: %v", err)
-			}
-			defer os.Remove(f.Name())
-			d, err := yaml.Marshal(&tt.config)
-			if err != nil {
-				t.Errorf("unable to marshal configuration: %v", err)
-			}
-			_, err = f.Write(d)
-			if err != nil {
-				t.Errorf("unable to write to file: %v", err)
-			}
-			config := NewMicroshiftConfig()
-			err = config.ReadFromConfigFile(f.Name())
+		t.Run(tt.name, func(t *testing.T) {
+			config, err := parse([]byte(tt.config))
 			if tt.expectErr && err == nil {
 				t.Fatal("Expecting error and received nothing")
 			}
@@ -130,144 +156,69 @@ func TestConfigFile(t *testing.T) {
 				t.Fatalf("Not expecting error and received: %v", err)
 			}
 			if !tt.expectErr {
-				assert.Equal(t, tt.expected, *config)
+				assert.Equal(t, tt.expected, config)
 			}
 		})
 	}
 }
 
-// test the MicroshiftConfig.ReadAndValidate function to verify that it configures MicroshiftConfig from
-// a configuration file.
-func TestMicroshiftConfigReadAndValidate(t *testing.T) {
+// Test the validation logic
+func TestValidate(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
+	mkConfig := func() *Config {
+		c := NewMicroshiftConfig()
+		c.ApiServer.SkipInterface = true
+		return c
+	}
+
 	var ttests = []struct {
 		name      string
-		config    Config
-		expected  Config
+		config    *Config
 		expectErr bool
 	}{
 		{
-			name: "Config OK full",
-			config: Config{
-				DNS: DNS{
-					BaseDomain: "example.com",
-				},
-				Network: Network{
-					ClusterNetwork: []ClusterNetworkEntry{
-						{
-							CIDR: "10.20.30.40/16",
-						},
-					},
-					ServiceNetwork:       []string{"40.30.20.10/16"},
-					ServiceNodePortRange: "1024-32767",
-				},
-				Node: Node{
-					HostnameOverride: "node1",
-					NodeIP:           "1.2.3.4",
-				},
-				ApiServer: ApiServer{
-					SubjectAltNames:  []string{"node1", "node2"},
-					AdvertiseAddress: "6.7.8.9",
-				},
-				Debugging: Debugging{
-					LogLevel: "Debug",
-				},
-				Etcd: EtcdConfig{
-					QuotaBackendSize:        "2Gi",
-					MinDefragSize:           "100Mi",
-					MaxFragmentedPercentage: 45,
-					DefragCheckFreq:         "5m",
-					DoStartupDefrag:         true,
-				},
-			},
-			expected: Config{
-				Debugging: Debugging{
-					LogLevel: "Debug",
-				},
-				ApiServer: ApiServer{
-					SubjectAltNames:  []string{"node1", "node2"},
-					AdvertiseAddress: "6.7.8.9",
-					SkipInterface:    true,
-					URL:              "https://localhost:6443",
-				},
-				Node: Node{
-					HostnameOverride: "node1",
-					NodeIP:           "1.2.3.4",
-				},
-				DNS: DNS{
-					BaseDomain: "example.com",
-				},
-				Network: Network{
-					ClusterNetwork: []ClusterNetworkEntry{
-						{
-							CIDR: "10.20.30.40/16",
-						},
-					},
-					ServiceNetwork:       []string{"40.30.20.10/16"},
-					ServiceNodePortRange: "1024-32767",
-					DNS:                  "40.30.0.10",
-				},
-				Etcd: EtcdConfig{
-					QuotaBackendSize:        "2Gi",
-					QuotaBackendBytes:       2 * 1024 * 1024 * 1024,
-					MinDefragSize:           "100Mi",
-					MinDefragBytes:          100 * 1024 * 1024,
-					MaxFragmentedPercentage: 45,
-					DefragCheckFreq:         "5m",
-					DefragCheckDuration:     5 * time.Minute,
-					DoStartupDefrag:         true,
-				},
-			},
+			name:      "defaults-ok",
+			config:    NewMicroshiftConfig(),
 			expectErr: false,
 		},
 		{
-			name: "Config NOK with bad SAN localhost",
-			config: Config{
-				ApiServer: ApiServer{
-					SubjectAltNames: []string{"127.0.0.1", "localhost"},
-				},
-			},
-			expected:  Config{},
+			name: "subject-alt-names-with-localhost",
+			config: func() *Config {
+				c := mkConfig()
+				c.ApiServer.SubjectAltNames = []string{"localhost"}
+				return c
+			}(),
 			expectErr: true,
 		},
 		{
-			name: "Config NOK with bad SAN kubernetes service",
-			config: Config{
-				ApiServer: ApiServer{
-					SubjectAltNames: []string{"kubernetes"},
-				},
-			},
-			expected:  Config{},
+			name: "subject-alt-names-with-loopback-ipv4",
+			config: func() *Config {
+				c := mkConfig()
+				c.ApiServer.SubjectAltNames = []string{"127.0.0.1"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "subject-alt-names-with-kubernetes",
+			config: func() *Config {
+				c := mkConfig()
+				c.ApiServer.SubjectAltNames = []string{"kubernetes"}
+				return c
+			}(),
 			expectErr: true,
 		},
 	}
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
-			f, err := os.CreateTemp("", "test")
-			if err != nil {
-				t.Errorf("unable to create temp file: %v", err)
-			}
-			defer os.Remove(f.Name())
-			d, err := yaml.Marshal(&tt.config)
-			if err != nil {
-				t.Errorf("unable to marshal configuration: %v", err)
-			}
-			_, err = f.Write(d)
-			if err != nil {
-				t.Errorf("unable to write to file: %v", err)
-			}
-			config := NewMicroshiftConfig()
-			err = config.ReadAndValidate(f.Name())
+			err := tt.config.validate()
 			if tt.expectErr && err == nil {
 				t.Fatal("Expecting error and received nothing")
 			}
 			if !tt.expectErr && err != nil {
 				t.Fatalf("Not expecting error and received: %v", err)
-			}
-			if !tt.expectErr {
-				assert.Equal(t, tt.expected, *config)
 			}
 		})
 	}

@@ -28,12 +28,20 @@ const (
 )
 
 func NewRunMicroshiftCommand() *cobra.Command {
-	cfg := config.NewMicroshiftConfig()
-
 	cmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run MicroShift",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.GetActiveConfig()
+			if err != nil {
+				return err
+			}
+			// Things to very badly if the node's name has changed
+			// since the last time the server started.
+			err = cfg.EnsureNodeNameHasNotChanged()
+			if err != nil {
+				return err
+			}
 			return RunMicroshift(cfg)
 		},
 	}
@@ -42,10 +50,6 @@ func NewRunMicroshiftCommand() *cobra.Command {
 }
 
 func RunMicroshift(cfg *config.Config) error {
-	if err := cfg.ReadAndValidate(config.GetConfigFile()); err != nil {
-		klog.Fatalf("Error in reading or validating configuration: %v", err)
-	}
-
 	// fail early if we don't have enough privileges
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
