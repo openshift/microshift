@@ -1,0 +1,41 @@
+---
+# create-vm tasks
+
+- name: list all VMs
+  community.libvirt.virt:
+    command: list_vms
+  register: all_vms
+
+- name: find VMs that start with "microshift-*"
+  set_fact:
+    vm_match: "{{ all_vms.list_vms | join(' ') | regex_findall('microshift-\\S+', multiline=True, ignorecase=True) }}"
+
+- name: destroy microshift VM
+  community.libvirt.virt:
+    name: "{{ item }}"
+    state: destroyed
+  loop: "{{ vm_match }}"
+
+- name: undefine microshift VM
+  community.libvirt.virt:
+    name: "{{ item }}"
+    command: undefine
+  loop: "{{ vm_match }}"
+
+- name: find create-vm.sh
+  ansible.builtin.find:
+    paths: "{{ playbook_dir | dirname }}"
+    patterns: "create-vm.sh"
+    file_type: file
+    recurse: yes
+  register: sh_search_result
+
+- set_fact:
+    script_path: '{{ sh_search_result.files | selectattr("path", "search", "devenv") }}'
+
+- set_fact:
+    create_vm_path: "{{ script_path[0].path }}"
+
+- name: run create-vm shell script
+  ansible.builtin.script: 
+    cmd: "{{ create_vm_path }} {{ vm_name }} {{ vm_disk_dir }} {{ iso_file }} {{ num_cpu }} {{ ram_size }} {{ disk_size }} {{ swap_size }} {{ data_volume_size }}"
