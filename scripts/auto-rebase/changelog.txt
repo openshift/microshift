@@ -1,17 +1,9 @@
-# cluster-kube-apiserver-operator embedded-component 336ffd5e7491f565faccf843571303377b1d4825 to a9a4df5f0cedeba2868a6ceb63ab58f67a0cdbf2
-f4c118ce9aec186b70615399ff71829bc7a0d044 2023-02-15T18:10:50+01:00 Guard pod set readiness probe endpoint explicitly
-# cluster-network-operator embedded-component 43bc195cf9fef2db627369f86d10e0f501e9d3fa to 6f5e144f260333ad0f70a88a55eab4fc81ecd7a2
-3a98f98c4eb01338731c9dbd55b618f6b7c244b4 2023-01-17T20:11:33-06:00 added missing api field podref
-# cluster-policy-controller embedded-component 105cc773b37f00be2351c9a4e6df24af94d547c1 to a78a00b3632f2c5a977ca200bf2b7a421eb121a8
-1bde0c94e6156fb9b28aac527ed601f7dff1c306 2023-02-18T11:22:19+01:00 update psa dependency version
-6e315800c16b38ec0b4dd7d2a37f4606d4ba707e 2023-02-17T15:34:48+01:00 update controller-manager dependency to point to v0.25.0
-# kubernetes embedded-component a34b9e9499e6c3a94e2326652bd8236a5378c0b2 to 18eadcaadf0be77350013c8911ca953bc2ca3778
-57fc96959152c8c7ec33ac40b29f447accb6db17 2023-02-10T14:38:06+01:00 UPSTREAM: <drop>: bump(apiserver-library-go): scc admission - seccomp profiles fix
-# ovn-kubernetes image-amd64 cf9fb51510e1870961bf3a0f064b73536757a4f8 to 5f8cd83cb3efb1d167f0da085f880377958ea502
-08b8105edc3a7da9316a77c1f149a9121665018c 2023-02-10T10:17:26+01:00 Delete stale egress ip snat entries by node
-# kubernetes image-amd64 a34b9e9499e6c3a94e2326652bd8236a5378c0b2 to 18eadcaadf0be77350013c8911ca953bc2ca3778
-57fc96959152c8c7ec33ac40b29f447accb6db17 2023-02-10T14:38:06+01:00 UPSTREAM: <drop>: bump(apiserver-library-go): scc admission - seccomp profiles fix
-# ovn-kubernetes image-arm64 cf9fb51510e1870961bf3a0f064b73536757a4f8 to 5f8cd83cb3efb1d167f0da085f880377958ea502
-08b8105edc3a7da9316a77c1f149a9121665018c 2023-02-10T10:17:26+01:00 Delete stale egress ip snat entries by node
-# kubernetes image-arm64 a34b9e9499e6c3a94e2326652bd8236a5378c0b2 to 18eadcaadf0be77350013c8911ca953bc2ca3778
-57fc96959152c8c7ec33ac40b29f447accb6db17 2023-02-10T14:38:06+01:00 UPSTREAM: <drop>: bump(apiserver-library-go): scc admission - seccomp profiles fix
+# cluster-kube-apiserver-operator embedded-component a9a4df5f0cedeba2868a6ceb63ab58f67a0cdbf2 to e840002d36b0daeccfb040dabc1f37f309b7207b
+613faf75924e311f3af87fbe1d1d99503a522431 2023-02-01T11:12:25+01:00 make the bootstrap kube-apiserver honor cluster-wide featuregates
+# cluster-policy-controller embedded-component a78a00b3632f2c5a977ca200bf2b7a421eb121a8 to 139ac0499ac4d744023827ceb6d16aa6b467be27
+938944b9accb838dc7cd98e5f5f3399c332efed1 2023-02-22T13:01:35+01:00 psalabelsyncer: invert the enforce/log logic to default to logging
+300027404416cb1ce35e484707f6621aee732c99 2023-02-01T11:35:27+01:00 enforce pod security admission when techpreview is enabled
+# oc image-amd64 b05f7d40f9a2dac30771be620e9e9148d26ffd07 to 846602e50eb29ecdc7441ebed2fc846048959eaa
+2466e48e0833c33adda7c733cae9c7933ac58368 2023-02-24T18:27:49+00:00 pkg/cli/admin/upgrade/channel: Use PATCH instead of POST for spec updates
+# oc image-arm64 b05f7d40f9a2dac30771be620e9e9148d26ffd07 to 846602e50eb29ecdc7441ebed2fc846048959eaa
+2466e48e0833c33adda7c733cae9c7933ac58368 2023-02-24T18:27:49+00:00 pkg/cli/admin/upgrade/channel: Use PATCH instead of POST for spec updates
