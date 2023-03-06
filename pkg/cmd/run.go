@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"k8s.io/klog/v2"
+	"sigs.k8s.io/yaml"
 )
 
 const (
@@ -49,11 +51,24 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	return cmd
 }
 
+func logConfig(cfg *config.Config) {
+	marshalled, err := yaml.Marshal(cfg)
+	if err != nil {
+		klog.Fatal(err)
+	}
+	klog.Info("Effective configuration:")
+	for _, line := range strings.Split(string(marshalled), "\n") {
+		klog.Info(line)
+	}
+}
+
 func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
+
+	logConfig(cfg)
 
 	// TO-DO: When multi-node is ready, we need to add the controller host-name/mDNS hostname
 	//        or VIP to this list on start
