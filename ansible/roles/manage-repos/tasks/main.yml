@@ -41,6 +41,11 @@
       name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
       disable_gpg_check: true
       state: present
+
+  - name: install ocp beta repo
+    ansible.builtin.template:
+      src: ocpbeta.repo.j2
+      dest: /etc/yum.repos.d/{{ ocp_repo_name }}.repo
   when: ansible_distribution == "RedHat"
 
 - name: gather the package facts

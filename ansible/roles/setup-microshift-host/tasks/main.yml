@@ -7,6 +7,31 @@
     state: present
     update_cache: true
 
+- name: determine system architecture
+  ansible.builtin.set_fact:
+    go_arch: amd64
+  when: ansible_facts['architecture'] == "x86_64"
+
+- name: create target directory for go version
+  ansible.builtin.file:
+    path: "{{ go_install_dir }}"
+    state: directory
+
+- name: download & extract newer version of golang
+  ansible.builtin.unarchive:
+    src: https://go.dev/dl/go{{ go_version }}.linux-{{ go_arch }}.tar.gz
+    dest: "{{ go_install_dir }}"
+    remote_src: yes
+    extra_opts:
+      - "--strip-components=1"
+
+- name: create symbolic links
+  ansible.builtin.file:
+    src: "{{ go_install_dir }}/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+  with_items: "{{ go_files }}"
+
 - name: start and enable firewalld
   ansible.builtin.systemd:
     name: firewalld
@@ -28,6 +53,7 @@
   ansible.builtin.dnf:
     name: "*"
     state: latest
+    nobest: true
   notify: reboot machine
 
 - name: flush handlers

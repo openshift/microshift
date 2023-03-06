@@ -1,11 +1,19 @@
 ---
 # setup-microshift-host default vars
 
+go_arch: arm64
+go_files:
+  - go
+  - gofmt
+go_version: 1.19.6
+go_install_dir: /usr/local/go{{ go_version }}
+
 install_packages:
   - bash-completion
   - firewalld
   - git
   - golang
+  - jq
   - lvm2
   - make
   - openshift-clients
@@ -13,6 +21,7 @@ install_packages:
   - perf
   - rpm-build
   - selinux-policy-devel 
+  - tar
   - vnstat
 
 vg_name: rhel
