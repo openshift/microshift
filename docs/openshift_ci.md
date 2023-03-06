@@ -31,8 +31,6 @@ MicroShift generates a set of kubeconfig files in default configuration:
 # tree /var/lib/microshift/resources/kubeadmin/
 /var/lib/microshift/resources/kubeadmin/
 ├── kubeconfig
-├── localhost
-│   └── kubeconfig
 ├── microshift-dev
 │   └── kubeconfig
 └── microshift-dev.localdomain
@@ -40,7 +38,7 @@ MicroShift generates a set of kubeconfig files in default configuration:
 
 3 directories, 4 files
 ```
-Using default configuration there is a kubeconfig for each of the subject alternative names, localhost, and the one at the root directory which is using the cluster URL. If cluster URL is not using localhost then all these files are not generated.
+Using default configuration there is a kubeconfig for each of the subject alternative names and the one at the root directory which is using the cluster URL, which defaults to localhost.
 
 Having a DNS (or simply changing `/etc/hosts`) we have to select which of the kubeconfig files we need to use according to it. In this case we may copy the `microshift-dev` kubeconfig to our local environment and we will be able to use `oc`:
 ```
