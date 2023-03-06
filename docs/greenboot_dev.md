@@ -3,10 +3,68 @@
 ## Motivation
 
 [Integrating MicroShift with Greenboot](./greenboot.md) allows for automatic
-software upgrade rollbacks in case of a failure. The current document describes
-a few techniques for simulating software upgrade failures in a development
-environment. These guidelines can be used by developers for implementing CI/CD
-pipelines testing MicroShift integration with Greenboot.
+software upgrade rollbacks in case of a failure.
+
+The current document describes a few techniques for:
+* Adding user workload health check procedures in a production environment
+* Simulating software upgrade failures in a development environment
+
+These guidelines can be used by developers for implementing user workload
+health check using Greenboot facilities, as well as simulating failures for
+testing MicroShift integration with Greenboot in CI/CD pipelines.
+
+## User Workload Health
+
+### Installation
+
+Follow the instructions in [Auto-applying Manifests](./howto_config.md#auto-applying-manifests)
+section to install a dummy user workload, without restarting the MicroShift service
+at this time.
+
+Proceed by creating a health check script in the `/etc/greenboot/check/required.d`
+directory.
+> The name prefix of the user script should be chosen to make sure it runs after
+> the `40_microshift_running_check.sh` script, which implements the MicroShift
+> health check procedure for its core services.
+
+```
+SCRIPT_FILE=/etc/greenboot/check/required.d/50_busybox_running_check.sh
+sudo curl -s https://raw.githubusercontent.com/openshift/microshift/main/docs/config/busybox_running_check.sh \
+  -o ${SCRIPT_FILE} && echo SUCCESS || echo ERROR
+sudo chmod 755 ${SCRIPT_FILE}
+```
+
+### Testing
+
+Reboot the system and run the following command to examine the output of the
+Greenboot health checks. Note that the MicroShift core service health checks
+are running before the user workload health checks.
+
+```bash
+sudo journalctl -o cat -u greenboot-healthcheck.service
+```
+
+### Health Check Implementation
+
+The script utilizes the MicroShift health check functions that are available
+in the `/usr/share/microshift/functions/greenboot.sh` file to reuse procedures
+already implemented for the MicroShift core services. These functions need a
+definition of the user workload namespaces and the expected count of pods.
+
+```bash
+PODS_NS_LIST=(busybox)
+PODS_CT_LIST=(3      )
+```
+
+The script starts by running sanity checks to verify that it is executed from
+the `root` account and that the MicroShift service is enabled.
+
+Finally, the MicroShift health check functions are called to perform the
+following actions:
+- Get a wait timeout of the current boot cycle for the `wait_for` function
+- Call the `namespace_images_downloaded` function to wait until pod images are available
+- Call the `namespace_pods_ready` function to wait until pods are ready
+- Call the `namespace_pods_not_restarting` function to verify pods are not restarting
 
 ## MicroShift Service Failure
 
@@ -69,7 +127,7 @@ sudo rpm-ostree cleanup -b -r
 
 ## MicroShift Pod Failure
 
-To simulate a situation with the MicroShift pod failure after an upgrade, 
+To simulate a situation with the MicroShift pod failure after an upgrade,
 one can set the `network.serviceNetwork` MicroShift configuration option to a
 non-default `10.66.0.0/16` value without resetting the MicroShift data at the
 `/var/lib/microshift` directory.
