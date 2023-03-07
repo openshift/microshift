@@ -208,6 +208,8 @@ install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/check/required.d
 install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
 install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
 install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
+install -d -m755 %{buildroot}%{_datadir}/microshift/functions
+install -p -m644 packaging/greenboot/functions.sh %{buildroot}%{_datadir}/microshift/functions/greenboot.sh
 
 %post
 
@@ -289,6 +291,7 @@ systemctl enable --now --quiet openvswitch || true
 %files greenboot
 %{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
+%{_datadir}/microshift/functions/greenboot.sh
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
