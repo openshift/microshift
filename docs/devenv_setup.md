@@ -144,10 +144,9 @@ skip_if_unavailable=0
 EOF
 
 sudo subscription-manager config --rhsm.manage_repos=1
-# Uncomment this when OCP 4.13 is released
-# sudo subscription-manager repos \
-#     --enable rhocp-4.13-for-rhel-${OSVERSION}-$(uname -i)-rpms \
-#     --enable fast-datapath-for-rhel-${OSVERSION}-$(uname -i)-rpms
+sudo subscription-manager repos \
+    --enable rhocp-4.13-for-rhel-${OSVERSION}-$(uname -i)-rpms \
+    --enable fast-datapath-for-rhel-${OSVERSION}-$(uname -i)-rpms
 ```
 </details>
 <details><summary>CentOS</summary>
