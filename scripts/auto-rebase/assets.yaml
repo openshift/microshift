@@ -45,51 +45,29 @@ assets:
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml
-      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml
-      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
-      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml
-      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml
-      - file: topolvm-metrics_rbac.authorization.k8s.io_v1_role.yaml
-      - file: topolvm-metrics_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: topolvm-controller_v1_serviceaccount.yaml
+      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-node-securitycontextconstraint.yaml
       - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
       - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-node_v1_serviceaccount.yaml
       - file: topolvm.io_logicalvolumes.yaml
 
       - file: csi-driver.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
+        ignore: "provided by MicroShift"
       - file: topolvm-controller_deployment.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-controller_v1_serviceaccount.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-csi-snapshotter_rbac.authorization.k8s.io_v1_clusterrole.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-csi-snapshotter_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-leader-election_rbac.authorization.k8s.io_v1_role.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-leader-election_rbac.authorization.k8s.io_v1_rolebinding.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
+        ignore: "provided by MicroShift"
       - file: topolvm-lvmd-config_configmap_v1.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-node-metrics_v1_service.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
-      - file: topolvm-node-securitycontextconstraint.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
+        ignore: "provided by MicroShift"
       - file: topolvm-node_daemonset.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
+        ignore: "provided by MicroShift"
       - file: topolvm-openshift-storage_namespace.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
+        ignore: "provided by MicroShift"
       - file: topolvm_default-storage-class.yaml
-        ignore: "it's not yet available in LVMS Operator Bundle"
+        ignore: "provided by MicroShift"
 
 
 
