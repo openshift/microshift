@@ -229,7 +229,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	return &MicroshiftConfig{
 		LogVLevel:       2,
 		SubjectAltNames: subjectAltNames,
-		NodeName:        nodeName,
+		NodeName:        strings.ToLower(nodeName),
 		NodeIP:          nodeIP,
 		BaseDomain:      "example.com",
 		Cluster: ClusterConfig{
@@ -254,7 +254,7 @@ func (c *MicroshiftConfig) isDefaultNodeName() bool {
 	if err != nil {
 		klog.Fatalf("Failed to get hostname %v", err)
 	}
-	return c.NodeName == hostname
+	return c.NodeName == strings.ToLower(hostname)
 }
 
 // Read or set the NodeName that will be used for this MicroShift instance
@@ -378,7 +378,7 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	// Wire new Config type to existing MicroshiftConfig
 	c.LogVLevel = config.GetVerbosity()
 	if config.Node.HostnameOverride != "" {
-		c.NodeName = config.Node.HostnameOverride
+		c.NodeName = strings.ToLower(config.Node.HostnameOverride)
 	}
 	if config.Node.NodeIP != "" {
 		c.NodeIP = config.Node.NodeIP
