@@ -289,6 +289,37 @@ func TestMicroshiftConfigIsDefaultNodeName(t *testing.T) {
 	}
 }
 
+func TestCanonicalNodeName(t *testing.T) {
+	hostname, _ := os.Hostname()
+
+	var ttests = []struct {
+		name     string
+		value    string
+		expected string
+	}{
+		{
+			name:     "default",
+			value:    "",
+			expected: strings.ToLower(hostname),
+		},
+		{
+			name:     "upper-case",
+			value:    "Hostname",
+			expected: "hostname",
+		},
+	}
+
+	for _, tt := range ttests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := NewDefault()
+			if tt.value != "" { // account for default
+				c.Node.HostnameOverride = tt.value
+			}
+			assert.Equal(t, tt.expected, c.CanonicalNodeName())
+		})
+	}
+}
+
 func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()

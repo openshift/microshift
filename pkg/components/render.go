@@ -23,7 +23,7 @@ var templateFuncs = map[string]interface{}{
 func renderParamsFromConfig(cfg *config.Config, extra assets.RenderParams) assets.RenderParams {
 	params := map[string]interface{}{
 		"ReleaseImage": release.Image,
-		"NodeName":     cfg.Node.HostnameOverride,
+		"NodeName":     cfg.CanonicalNodeName(),
 		"NodeIP":       cfg.Node.NodeIP,
 		"ClusterCIDR":  cfg.Network.ClusterNetwork[0].CIDR,
 		"ServiceCIDR":  cfg.Network.ServiceNetwork[0],

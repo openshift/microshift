@@ -172,7 +172,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 						ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 					},
 					// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
-					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.Node.HostnameOverride, Groups: []string{"system:nodes"}},
+					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.CanonicalNodeName(), Groups: []string{"system:nodes"}},
 				},
 			).WithServingCertificates(
 				&certchains.ServingCertificateSigningRequestInfo{
