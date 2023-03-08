@@ -76,35 +76,38 @@ func findManifestsDir() []string {
 
 func parse(contents []byte) (*Config, error) {
 	c := &Config{}
-	fmt.Printf("parsing %s\n", string(contents))
 	if err := yaml.Unmarshal(contents, c); err != nil {
 		return nil, fmt.Errorf("Unable to decode configuration: %v", err)
-	}
-	if err := c.fillDefaults(); err != nil {
-		return nil, fmt.Errorf("Invalid configuration: %v", err)
-	}
-	if err := c.updateComputedValues(); err != nil {
-		return nil, fmt.Errorf("Invalid configuration: %v", err)
-	}
-	if err := c.validate(); err != nil {
-		return nil, fmt.Errorf("Invalid configuration: %v", err)
 	}
 	return c, nil
 }
 
-func Read(configFile string) (*Config, error) {
-	contents, err := os.ReadFile(configFile)
+func getActiveConfigFromYAML(contents []byte) (*Config, error) {
+	userSettings, err := parse(contents)
 	if err != nil {
-		return nil, fmt.Errorf("reading config file %q: %v", configFile, err)
+		return nil, fmt.Errorf("Error parsing config file %q: %v", configFile, err)
 	}
-	return parse(contents)
+
+	// Start with the defaults, then apply the user settings and
+	// recompute dynamic values.
+	results := &Config{}
+	if err := results.fillDefaults(); err != nil {
+		return nil, fmt.Errorf("Invalid configuration: %v", err)
+	}
+	results.incorporateUserSettings(userSettings)
+	if err := results.updateComputedValues(); err != nil {
+		return nil, fmt.Errorf("Invalid configuration: %v", err)
+	}
+	if err := results.validate(); err != nil {
+		return nil, fmt.Errorf("Invalid configuration: %v", err)
+	}
+	return results, nil
 }
 
 // Get the active configuration. If the configuration file exists,
 // read it and require it to be valid. Otherwise return the default
 // settings.
 func GetActiveConfig() (*Config, error) {
-	var cfg *Config
 	filename := GetConfigFile()
 	_, err := os.Stat(filename)
 	if os.IsNotExist(err) {
@@ -113,9 +116,11 @@ func GetActiveConfig() (*Config, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	cfg, err = Read(filename)
+
+	// Read the file and merge user-provided settings with the defaults
+	contents, err := os.ReadFile(configFile)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error reading config file %q: %v", configFile, err)
 	}
-	return cfg, nil
+	return getActiveConfigFromYAML(contents)
 }

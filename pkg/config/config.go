@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
@@ -30,84 +31,159 @@ type Config struct {
 	Debugging Debugging  `json:"debugging"`
 
 	// Internal-only fields
-	Ingress IngressConfig `json:"-"`
+	Ingress      IngressConfig `json:"-"`
+	userSettings *Config       `json:"-"` // the values read from the config file
 }
 
+// NewMicroshiftConfig creates a new Config struct populated with the
+// default values and with any computed values updated based on those
+// defaults.
 func NewMicroshiftConfig() *Config {
 	c := &Config{}
-	err := c.fillDefaults()
-	if err != nil {
+	if err := c.fillDefaults(); err != nil {
+		klog.Fatalf("Failed to initialize config: %v", err)
+	}
+	if err := c.updateComputedValues(); err != nil {
 		klog.Fatalf("Failed to initialize config: %v", err)
 	}
 	return c
 }
 
+// fillDefaults forcibly sets the configuration to the default
+// values. We do not use a static struct for the defaults because some
+// of them are computed from the environment. If any error occurs
+// probing the environment, the values in the Config instance are not
+// changed.
 func (c *Config) fillDefaults() error {
-	if c.Debugging.LogLevel == "" {
-		c.Debugging.LogLevel = "Normal"
+
+	// Look up any values that may generate an error
+	subjectAltNames, err := getAllHostnames()
+	if err != nil {
+		return fmt.Errorf("failed to get all hostnames: %v", err)
+	}
+	hostname, err := os.Hostname()
+	if err != nil {
+		return fmt.Errorf("Failed to get hostname %v", err)
+	}
+	nodeIP, err := util.GetHostIP()
+	if err != nil {
+		return fmt.Errorf("failed to get host IP: %v", err)
 	}
 
-	if len(c.ApiServer.SubjectAltNames) == 0 {
-		subjectAltNames, err := getAllHostnames()
-		if err != nil {
-			return fmt.Errorf("failed to get all hostnames: %v", err)
-		}
-		c.ApiServer.SubjectAltNames = subjectAltNames
+	c.Debugging = Debugging{
+		LogLevel: "Normal",
 	}
-	if c.ApiServer.URL == "" {
-		c.ApiServer.URL = "https://localhost:6443"
+	c.ApiServer = ApiServer{
+		SubjectAltNames: subjectAltNames,
+		URL:             "https://localhost:6443",
 	}
-
-	if c.Node.HostnameOverride == "" {
-		nodeName, err := os.Hostname()
-		if err != nil {
-			return fmt.Errorf("Failed to get hostname %v", err)
-		}
-		c.Node.HostnameOverride = strings.ToLower(nodeName)
+	c.Node = Node{
+		HostnameOverride: hostname,
+		NodeIP:           nodeIP,
 	}
-	if c.Node.NodeIP == "" {
-		nodeIP, err := util.GetHostIP()
-		if err != nil {
-			return fmt.Errorf("failed to get host IP: %v", err)
-		}
-		c.Node.NodeIP = nodeIP
+	c.DNS = DNS{
+		BaseDomain: "example.com",
 	}
-
-	if c.DNS.BaseDomain == "" {
-		c.DNS.BaseDomain = "example.com"
-	}
-
-	if len(c.Network.ClusterNetwork) == 0 {
-		c.Network.ClusterNetwork = []ClusterNetworkEntry{
+	c.Network = Network{
+		ClusterNetwork: []ClusterNetworkEntry{
 			{
 				CIDR: "10.42.0.0/16",
 			},
-		}
-	}
-	if len(c.Network.ServiceNetwork) == 0 {
-		c.Network.ServiceNetwork = []string{
+		},
+		ServiceNetwork: []string{
 			"10.43.0.0/16",
-		}
+		},
+		ServiceNodePortRange: "30000-32767",
+		DNS:                  "10.43.0.10",
 	}
-	if c.Network.ServiceNodePortRange == "" {
-		c.Network.ServiceNodePortRange = "30000-32767"
-	}
-	if c.Network.DNS == "" {
-		c.Network.DNS = "10.43.0.10"
+	c.Etcd = EtcdConfig{
+		MemoryLimitMB:           0,
+		DoStartupDefrag:         true, // FIXME: flip this to SkipStartupDefrag
+		QuotaBackendBytes:       8 * 1024 * 1024 * 1024,
+		MinDefragBytes:          100 * 1024 * 1024,
+		MaxFragmentedPercentage: 45,
+		DefragCheckFreq:         5 * time.Minute,
 	}
 
-	return c.updateComputedValues()
+	return nil
 }
 
+// incorporateUserSettings merges any values read from the
+// configuration file provided by the user with the existing settings
+// (usually the defaults).
+func (c *Config) incorporateUserSettings(u *Config) {
+	c.userSettings = u
+
+	if u.DNS.BaseDomain != "" {
+		c.DNS.BaseDomain = u.DNS.BaseDomain
+	}
+
+	if len(u.Network.ClusterNetwork) != 0 {
+		c.Network.ClusterNetwork = u.Network.ClusterNetwork
+	}
+	if len(u.Network.ServiceNetwork) != 0 {
+		c.Network.ServiceNetwork = u.Network.ServiceNetwork
+		// The default for the API server address is computed from the
+		// service network. If the user provides a network without
+		// also overriding the computed address, we need to clear the
+		// address here so it is recomputed later. If they provide
+		// both the network and the address, the address will be
+		// copied into place below with the other API server settings.
+		if u.ApiServer.AdvertiseAddress == "" {
+			c.ApiServer.AdvertiseAddress = ""
+		}
+	}
+	if u.Network.ServiceNodePortRange != "" {
+		c.Network.ServiceNodePortRange = u.Network.ServiceNodePortRange
+	}
+	if u.Network.DNS != "" {
+		c.Network.DNS = u.Network.DNS
+	}
+
+	if u.Etcd.MemoryLimitMB != 0 {
+		c.Etcd.MemoryLimitMB = u.Etcd.MemoryLimitMB
+	}
+
+	if u.Node.HostnameOverride != "" {
+		c.Node.HostnameOverride = u.Node.HostnameOverride
+	}
+	if u.Node.NodeIP != "" {
+		c.Node.NodeIP = u.Node.NodeIP
+	}
+
+	if len(u.ApiServer.SubjectAltNames) != 0 {
+		c.ApiServer.SubjectAltNames = u.ApiServer.SubjectAltNames
+	}
+	if u.ApiServer.AdvertiseAddress != "" {
+		c.ApiServer.AdvertiseAddress = u.ApiServer.AdvertiseAddress
+	}
+	if u.ApiServer.URL != "" {
+		c.ApiServer.URL = u.ApiServer.URL
+	}
+
+	if u.Debugging.LogLevel != "" {
+		c.Debugging.LogLevel = u.Debugging.LogLevel
+	}
+}
+
+// updateComputedValues examins the existing settings and converts any
+// inputs to more easily consumable units or fills in any defaults
+// computed based on the values of other settings.
 func (c *Config) updateComputedValues() error {
+
 	clusterDNS, err := c.computeClusterDNS()
 	if err != nil {
 		return err
 	}
 	c.Network.DNS = clusterDNS
 
-	// If KAS advertise address is not configured then compute it from the service
-	// CIDR automatically.
+	// If KAS advertise address configured, we do not want to apply
+	// the IP to the internal interface.
+	if c.userSettings != nil && len(c.userSettings.ApiServer.AdvertiseAddress) != 0 {
+		c.ApiServer.SkipInterface = true
+	}
+
+	// If we have no advertise address, pick one.
 	if len(c.ApiServer.AdvertiseAddress) == 0 {
 		// unchecked error because this was done when getting cluster DNS
 		_, svcNet, _ := net.ParseCIDR(c.Network.ServiceNetwork[0])
@@ -124,9 +200,6 @@ func (c *Config) updateComputedValues() error {
 		// First and last are the same because of the /32 netmask.
 		firstValidIP, _ := cidr.AddressRange(nextSubnet)
 		c.ApiServer.AdvertiseAddress = firstValidIP.String()
-		c.ApiServer.SkipInterface = false
-	} else {
-		c.ApiServer.SkipInterface = true
 	}
 
 	return nil

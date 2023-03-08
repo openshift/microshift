@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,11 +26,34 @@ func setupSuiteDataDir(t *testing.T) func() {
 	}
 }
 
-func TestParse(t *testing.T) {
-	mkConfig := func() *Config {
+// TestGetActiveConfigFromYAML verifies that reading the config file
+// correctly overrides the defaults and updates the computed values in
+// the Config struct.
+func TestGetActiveConfigFromYAML(t *testing.T) {
+	mkDefaultConfig := func() *Config {
 		c := NewMicroshiftConfig()
-		c.ApiServer.SkipInterface = true
 		return c
+	}
+
+	dedent := func(input string) string {
+		lines := strings.Split(input, "\n")
+		detectIndentFrom := lines[0]
+		if detectIndentFrom == "" {
+			detectIndentFrom = lines[1]
+		}
+		dedentedLine := strings.TrimLeft(detectIndentFrom, " \t")
+		prefixLen := len(detectIndentFrom) - len(dedentedLine)
+		if prefixLen == 0 {
+			return input
+		}
+		var b strings.Builder
+		for _, line := range lines {
+			if len(line) >= prefixLen {
+				line = line[prefixLen:]
+			}
+			fmt.Fprintf(&b, "%s\n", line)
+		}
+		return b.String()
 	}
 
 	var ttests = []struct {
@@ -40,32 +65,32 @@ func TestParse(t *testing.T) {
 		{
 			name:     "empty",
 			config:   "",
-			expected: mkConfig(),
+			expected: mkDefaultConfig(),
 		},
 		{
 			name: "dns",
-			config: `
-dns:
-  baseDomain: test-example.com
-`,
+			config: dedent(`
+            dns:
+              baseDomain: test-example.com
+            `),
 			expected: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.DNS.BaseDomain = "test-example.com"
 				return c
 			}(),
 		},
 		{
 			name: "network",
-			config: `
-network:
-  clusterNetwork:
-  - cidr: "10.20.30.40/16"
-  serviceNetwork:
-  - "40.30.20.10/16"
-  serviceNodePortRange: "1024-32767"
-`,
+			config: dedent(`
+            network:
+              clusterNetwork:
+                - cidr: "10.20.30.40/16"
+              serviceNetwork:
+                - "40.30.20.10/16"
+              serviceNodePortRange: "1024-32767"
+            `),
 			expected: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.Network.ClusterNetwork = []ClusterNetworkEntry{
 					{
 						CIDR: "10.20.30.40/16",
@@ -73,35 +98,35 @@ network:
 				}
 				c.Network.ServiceNetwork = []string{"40.30.20.10/16"}
 				c.Network.ServiceNodePortRange = "1024-32767"
-				c.ApiServer.AdvertiseAddress = "40.31.0.0" // computed default
-				c.updateComputedValues()                   // recomputes DNS field
+				c.ApiServer.AdvertiseAddress = "" // force value to be recomputed
+				c.updateComputedValues()          // recomputes DNS field
 				return c
 			}(),
 		},
 		{
 			name: "node",
-			config: `
-node:
-  hostnameOverride: "node1"
-  nodeIP: "1.2.3.4"
-`,
+			config: dedent(`
+            node:
+              hostnameOverride: "node1"
+              nodeIP: "1.2.3.4"
+            `),
 			expected: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.Node.HostnameOverride = "node1"
 				c.Node.NodeIP = "1.2.3.4"
 				return c
 			}(),
 		},
 		{
-			name: "api-server",
-			config: `
-apiServer:
-  subjectAltNames:
-  - node1
-  - node2
-`,
+			name: "api-server-subject-alt-names",
+			config: dedent(`
+            apiServer:
+              subjectAltNames:
+              - node1
+              - node2
+            `),
 			expected: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.ApiServer.SubjectAltNames = []string{
 					"node1", "node2",
 				}
@@ -109,26 +134,40 @@ apiServer:
 			}(),
 		},
 		{
-			name: "debugging",
-			config: `
-debugging:
-  logLevel: Info
-`,
+			name: "api-server-advertise-address",
+			config: dedent(`
+            apiServer:
+              advertiseAddress: 4.3.2.1
+            `),
 			expected: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
+				c.ApiServer.AdvertiseAddress = "4.3.2.1"
+				c.ApiServer.SkipInterface = true
+				return c
+			}(),
+		},
+		{
+			name: "debugging",
+			config: dedent(`
+            debugging:
+              logLevel: Info
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
 				c.Debugging.LogLevel = "Info"
 				return c
 			}(),
 		},
 		{
 			name: "etcd",
-			config: `
-etcd:
-  memoryLimitMB: 100
-`,
+			config: dedent(`
+            etcd:
+              memoryLimitMB: 100
+            `),
 			expected: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.Etcd.MemoryLimitMB = 100
+				c.updateComputedValues()
 				return c
 			}(),
 		},
@@ -136,7 +175,9 @@ etcd:
 
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
-			config, err := parse([]byte(tt.config))
+
+			config, err := getActiveConfigFromYAML([]byte(tt.config))
+
 			if tt.expectErr && err == nil {
 				t.Fatal("Expecting error and received nothing")
 			}
@@ -144,7 +185,13 @@ etcd:
 				t.Fatalf("Not expecting error and received: %v", err)
 			}
 			if !tt.expectErr {
-				assert.Equal(t, tt.expected, config)
+
+				// blank out the user settings because the expected value
+				// never has them and any computed value should be set so
+				// it should be safe to ignore them
+				config.userSettings = nil
+
+				assert.Equal(t, tt.expected, config, "config input:\n---%s\n---", tt.config)
 			}
 		})
 	}
@@ -155,7 +202,7 @@ func TestValidate(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
-	mkConfig := func() *Config {
+	mkDefaultConfig := func() *Config {
 		c := NewMicroshiftConfig()
 		c.ApiServer.SkipInterface = true
 		return c
@@ -174,7 +221,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "subject-alt-names-with-localhost",
 			config: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.ApiServer.SubjectAltNames = []string{"localhost"}
 				return c
 			}(),
@@ -183,7 +230,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "subject-alt-names-with-loopback-ipv4",
 			config: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.ApiServer.SubjectAltNames = []string{"127.0.0.1"}
 				return c
 			}(),
@@ -192,7 +239,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "subject-alt-names-with-kubernetes",
 			config: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.ApiServer.SubjectAltNames = []string{"kubernetes"}
 				return c
 			}(),
@@ -201,7 +248,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "etcd-memory-limit-low",
 			config: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.Etcd.MemoryLimitMB = 1
 				return c
 			}(),
@@ -210,7 +257,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "etcd-memory-zero",
 			config: func() *Config {
-				c := mkConfig()
+				c := mkDefaultConfig()
 				c.Etcd.MemoryLimitMB = 0
 				return c
 			}(),
