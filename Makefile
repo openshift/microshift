@@ -231,8 +231,8 @@ bin/lichen: bin vendor/modules.txt
 
 vendor:
 	go mod vendor
-	for p in $(wildcard scripts/auto-rebase/rebase_patches/*.patch); do \
+	for p in $(sort $(wildcard scripts/auto-rebase/rebase_patches/*.patch)); do \
 		echo "Applying patch $$p"; \
-		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply || exit 1; \
+		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply --reject || exit 1; \
 	done
 .PHONY: vendor
