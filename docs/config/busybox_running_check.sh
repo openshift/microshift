@@ -3,7 +3,7 @@ set -e
 
 SCRIPT_NAME=$(basename $0)
 PODS_NS_LIST=(busybox)
-PODS_CT_LIST=(3      )
+PODS_CT_LIST=(1      )
 
 # Source the MicroShift health check functions library
 source /usr/share/microshift/functions/greenboot.sh
