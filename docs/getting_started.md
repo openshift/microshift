@@ -1,7 +1,6 @@
 # Getting Started with MicroShift
 
-Refer to the [MicroShift product documentation](https://access.redhat.com/documentation/en-us/red_hat_build_of_microshift) for how to install MicroShift on a machine running RHEL and how to build a RHEL for Edge image embedding MicroShift. If you do not yet have a RHEL subscription, you can get a [no-cost Red Hat Developer subscription](https:
-//developers.redhat.com/blog/2021/02/10/how-to-activate-your-no-cost-red-hat-enterprise-linux-subscription).
+Refer to the [MicroShift product documentation](https://access.redhat.com/documentation/en-us/red_hat_build_of_microshift) for how to install MicroShift on a machine running RHEL and how to build a RHEL for Edge image embedding MicroShift. If you do not yet have a RHEL subscription, you can get a [no-cost Red Hat Developer subscription](https://developers.redhat.com/blog/2021/02/10/how-to-activate-your-no-cost-red-hat-enterprise-linux-subscription).
 
 The remainder of this document describes an optionated, non-production setup to facilitate experimentation with MicroShift in a virtual machine running the RHEL 8.7 operating system.
 
