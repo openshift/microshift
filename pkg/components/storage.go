@@ -34,11 +34,9 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 			"components/lvms/topolvm-controller_v1_serviceaccount.yaml",
 		}
 		role = []string{
-			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml",
 			"components/lvms/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml",
 		}
 		rb = []string{
-			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml",
 			"components/lvms/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml",
 		}
 		cr = []string{
