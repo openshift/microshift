@@ -76,7 +76,7 @@ const (
 	// request to the pod).
 	// Value is slightly offset from 2 minutes to make timeouts due to this
 	// constant recognizable.
-	podAttachAndMountTimeout = 2*time.Minute + 3*time.Second
+	podAttachAndMountTimeout = 13 * time.Second
 
 	// podAttachAndMountRetryInterval is the amount of time the GetVolumesForPod
 	// call waits before retrying
