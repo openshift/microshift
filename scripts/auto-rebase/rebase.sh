@@ -851,7 +851,7 @@ update_changelog() {
 
         if [[ -z "${old_commit}" ]]
         then
-            echo "# ${repo##*/} is a new ${purpose} dependency" >> "${changelog}"
+            echo "- ${repo##*/} is a new ${purpose} dependency" >> "${changelog}"
             echo >> "${changelog}"
             continue
         fi
@@ -873,18 +873,19 @@ update_changelog() {
                 repodir="${STAGING_DIR}/${image_arch}/${repo##*/}"
                 ;;
             *)
-                echo "Unknown commit purpose \"${purpose}\" for ${repo}" >> "${changelog}"
+                echo "- Unknown commit purpose \"${purpose}\" for ${repo}" >> "${changelog}"
                 continue
                 ;;
         esac
         pushd "${repodir}" >/dev/null
-        echo "# ${repo##*/} ${purpose} ${old_commit} to ${new_commit}" >> "${changelog}"
+        echo "- ${repo##*/} ${purpose} ${old_commit} to ${new_commit}" >> "${changelog}"
         (git log \
              --no-merges \
-             --pretty="format:%H %cI %s" \
+             --pretty="format:  - %h %cI %s" \
              --no-decorate \
              "${old_commit}..${new_commit}" \
              || echo "There was an error determining the changes") >> "${changelog}"
+        echo >> "${changelog}"
         echo >> "${changelog}"
         popd >/dev/null
     done < "${new_commits_file}"
