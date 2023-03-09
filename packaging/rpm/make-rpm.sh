@@ -57,7 +57,7 @@ EOF
   cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
 
   title "Building RPM packages"
-  rpmbuild --quiet "${RPMBUILD_OPT}" --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
+  rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 usage() {
@@ -74,6 +74,10 @@ case $1 in
   *)    usage
 esac
 shift
+
+if [ -n "${TARGET_ARCH}" ]; then
+  RPMBUILD_OPT="${RPMBUILD_OPT} --target=${TARGET_ARCH}"
+fi
 
 # prepare the rpmbuild env
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
