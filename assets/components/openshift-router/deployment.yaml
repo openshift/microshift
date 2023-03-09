@@ -1,67 +1,34 @@
 # Deployment with default values
+# Ingress Controller specific values are applied at runtime.
 kind: Deployment
 apiVersion: apps/v1
+# name and namespace are set at runtime.
 spec:
   progressDeadlineSeconds: 600
   template:
     metadata:
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
-      labels:
-        ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
       serviceAccountName: router
+      # nodeSelector is set at runtime.
       priorityClassName: system-cluster-critical
       containers:
         - name: router
+          # image is set at runtime.
           imagePullPolicy: IfNotPresent
           securityContext:
             # See https://bugzilla.redhat.com/2007246
             allowPrivilegeEscalation: true
           terminationMessagePolicy: FallbackToLogsOnError
+          # Merged at runtime.
           env:
-            - name: ROUTER_SERVICE_NAMESPACE
-              value: openshift-ingress
-            - name: DEFAULT_CERTIFICATE_DIR
-              value: /etc/pki/tls/private
-            - name: DEFAULT_DESTINATION_CA_PATH
-              value: /var/run/configmaps/service-ca/service-ca.crt
-            - name: STATS_PORT
-              value: "1936"
-            - name: RELOAD_INTERVAL
-              value: 5s
-            - name: ROUTER_ALLOW_WILDCARD_ROUTES
-              value: "false"
-            - name: ROUTER_CANONICAL_HOSTNAME
-              value: router-default.apps.{{ .BaseDomain }}
-            - name: ROUTER_CIPHERS
-              value: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
-            - name: ROUTER_CIPHERSUITES
-              value: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
-            - name: ROUTER_DISABLE_HTTP2
-              value: "true"
-            - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
-              value: "false"
-            - name: ROUTER_LOAD_BALANCE_ALGORITHM
-              value: random
-            - name: ROUTER_METRICS_TYPE
-              value: haproxy
-            - name: ROUTER_SERVICE_NAME
-              value: default
-            - name: ROUTER_SET_FORWARDED_HEADERS
-              value: append
-            - name: ROUTER_TCP_BALANCE_SCHEME
-              value: source
-            - name: ROUTER_THREADS
-              value: "4"
-            - name: SSL_MIN_VERSION
-              value: TLSv1.2
-            - name: ROUTER_USE_PROXY_PROTOCOL
-              value: "false"
-            - name: GRACEFUL_SHUTDOWN_DELAY
-              value: 1s
-            - name: ROUTER_DOMAIN
-              value: apps.{{ .BaseDomain }}
+          - name: ROUTER_SERVICE_NAMESPACE
+            value: openshift-ingress
+          - name: DEFAULT_CERTIFICATE_DIR
+            value: /etc/pki/tls/private
+          - name: DEFAULT_DESTINATION_CA_PATH
+            value: /var/run/configmaps/service-ca/service-ca.crt
           livenessProbe:
             httpGet:
               path: /healthz
@@ -82,56 +49,22 @@ spec:
               cpu: 100m
               memory: 256Mi
           volumeMounts:
-            - mountPath: /etc/pki/tls/private
-              name: default-certificate
-              readOnly: true
-            - mountPath: /var/run/configmaps/service-ca
-              name: service-ca-bundle
-              readOnly: true
-          image: '{{ .ReleaseImage.haproxy_router }}'
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-              hostPort: 80
-            - name: https
-              containerPort: 443
-              protocol: TCP
-              hostPort: 443
-            - name: metrics
-              containerPort: 1936
-              protocol: TCP
-      volumes:
-        - name: default-certificate
-          secret:
-            defaultMode: 420
-            secretName: router-certs-default
-        - name: service-ca-bundle
-          configMap:
-            items:
-              - key: service-ca.crt
-                path: service-ca.crt
+          - mountPath: /etc/pki/tls/private
+            name: default-certificate
+            readOnly: true
+          - mountPath: /var/run/configmaps/service-ca
             name: service-ca-bundle
-            optional: false
+            readOnly: true
+      volumes:
+      - name: default-certificate
+        secret:
           defaultMode: 420
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 3600
-      dnsPolicy: ClusterFirst
-      nodeSelector:
-        kubernetes.io/os: linux
-        node-role.kubernetes.io/worker: ""
-      serviceAccount: router
-      securityContext: {}
-      schedulerName: default-scheduler
-  minReadySeconds: 30
-  selector:
-    matchLabels:
-      ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  replicas: 1
-  strategy:
-    type: Recreate
-metadata:
-  name: router-default
-  namespace: openshift-ingress
-  labels:
-    ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
+          # SecretName is set at run-time.
+      - name: service-ca-bundle
+        configMap:
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: service-ca-bundle
+          optional: false
+        defaultMode: 420
