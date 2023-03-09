@@ -53,7 +53,7 @@ definition of the user workload namespaces and the expected count of pods.
 
 ```bash
 PODS_NS_LIST=(busybox)
-PODS_CT_LIST=(3      )
+PODS_CT_LIST=(1      )
 ```
 
 The script starts by running sanity checks to verify that it is executed from
