@@ -172,7 +172,6 @@ update_lvms_manifests() {
           "topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml"
           "topolvm-metrics_rbac.authorization.k8s.io_v1_role.yaml"
           "topolvm-metrics_rbac.authorization.k8s.io_v1_rolebinding.yaml"
-          "topolvm-node-metrics_v1_service.yaml"
           "topolvm-node_v1_serviceaccount.yaml"
     )
     for m in "${namespace_scoped_manifests[@]}"; do

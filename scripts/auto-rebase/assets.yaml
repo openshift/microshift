@@ -41,21 +41,22 @@ assets:
     files:
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-controller_v1_serviceaccount.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml
-      - file: topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
-      - file: topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml
-      - file: topolvm-controller_v1_serviceaccount.yaml
-      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
-      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
-      - file: topolvm-node-securitycontextconstraint.yaml
+      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_role.yaml
+      - file: topolvm-csi-resizer_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: topolvm-metrics_rbac.authorization.k8s.io_v1_role.yaml
+      - file: topolvm-metrics_rbac.authorization.k8s.io_v1_rolebinding.yaml
       - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
       - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-node_v1_serviceaccount.yaml
       - file: topolvm.io_logicalvolumes.yaml
-
+      
       - file: csi-driver.yaml
         ignore: "provided by MicroShift"
       - file: topolvm-controller_deployment.yaml
@@ -67,6 +68,12 @@ assets:
       - file: topolvm-openshift-storage_namespace.yaml
         ignore: "provided by MicroShift"
       - file: topolvm_default-storage-class.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-node-securitycontextconstraint.yaml
         ignore: "provided by MicroShift"
 
 

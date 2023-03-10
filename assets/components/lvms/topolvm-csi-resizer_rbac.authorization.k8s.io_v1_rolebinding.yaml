@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: topolvm-controller
-  namespace: openshift-storage
+  creationTimestamp: null
+  name: topolvm-csi-resizer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: topolvm-controller
+  name: topolvm-csi-resizer
 subjects:
 - kind: ServiceAccount
   name: topolvm-controller
