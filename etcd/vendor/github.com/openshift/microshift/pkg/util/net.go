@@ -32,19 +32,24 @@ import (
 	"k8s.io/klog/v2"
 )
 
+var previousGatewayIP string = ""
+
 func GetHostIP() (string, error) {
 	// Prefer OVN-K gateway IP if it is the CNI
 	gatewayIP, err := ovn.GetOVNGatewayIP()
 	if err != nil && !strings.Contains(err.Error(), "no such network interface") {
 		return "", err
 	}
-	klog.V(2).Infof("ovn gateway IP address: %s", gatewayIP)
+	if gatewayIP != previousGatewayIP {
+		previousGatewayIP = gatewayIP
+		klog.V(2).Infof("ovn gateway IP address: %s", gatewayIP)
+	}
 
 	ip, err := net.ChooseHostInterface()
 	if err == nil {
 		return ip.String(), nil
 	}
-	klog.V(2).Infof("failed to find default route IP address: %v", err)
+	klog.V(2).Infof("could not find default route IP address, using ovn gateway IP %q as host IP: %v", gatewayIP, err)
 
 	return gatewayIP, nil
 }
