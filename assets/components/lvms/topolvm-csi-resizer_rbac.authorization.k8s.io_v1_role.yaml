@@ -3,15 +3,16 @@ kind: Role
 metadata:
   creationTimestamp: null
   name: topolvm-csi-resizer
+  namespace: openshift-storage
 rules:
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - get
-  - watch
-  - list
-  - delete
-  - update
-  - create
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - watch
+      - list
+      - delete
+      - update
+      - create

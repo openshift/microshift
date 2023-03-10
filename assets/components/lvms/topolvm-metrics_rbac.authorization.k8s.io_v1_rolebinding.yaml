@@ -3,11 +3,12 @@ kind: RoleBinding
 metadata:
   creationTimestamp: null
   name: topolvm-metrics
+  namespace: openshift-storage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: topolvm-metrics
 subjects:
-- kind: ServiceAccount
-  name: prometheus-k8s
-  namespace: openshift-monitoring
+  - kind: ServiceAccount
+    name: prometheus-k8s
+    namespace: openshift-monitoring
