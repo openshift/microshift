@@ -98,7 +98,6 @@ func (c *Config) fillDefaults() error {
 	}
 	c.Etcd = EtcdConfig{
 		MemoryLimitMB:           0,
-		DoStartupDefrag:         true, // FIXME: flip this to SkipStartupDefrag
 		QuotaBackendBytes:       8 * 1024 * 1024 * 1024,
 		MinDefragBytes:          100 * 1024 * 1024,
 		MaxFragmentedPercentage: 45,

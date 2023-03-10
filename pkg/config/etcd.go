@@ -24,10 +24,6 @@ type EtcdConfig struct {
 	MaxFragmentedPercentage float64 `json:"-"`
 
 	// How often to check the conditions for defragging (0 means no
-	// defrags, except for a single on startup if `doStartupDefrag` is
-	// set).
+	// defrags, except for a single on startup).
 	DefragCheckFreq time.Duration `json:"-"`
-
-	// Whether or not to do a defrag when the server finishes starting
-	DoStartupDefrag bool `json:"-"`
 }

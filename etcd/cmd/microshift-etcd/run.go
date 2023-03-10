@@ -52,7 +52,6 @@ type EtcdService struct {
 	minDefragBytes          int64
 	maxFragmentedPercentage float64
 	defragCheckFreq         time.Duration
-	doStartupDefrag         bool
 }
 
 func NewEtcd(cfg *config.Config) *EtcdService {
@@ -67,7 +66,6 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.minDefragBytes = cfg.Etcd.MinDefragBytes
 	s.maxFragmentedPercentage = cfg.Etcd.MaxFragmentedPercentage
 	s.defragCheckFreq = cfg.Etcd.DefragCheckFreq
-	s.doStartupDefrag = cfg.Etcd.DoStartupDefrag
 
 	microshiftDataDir := config.GetDataDir()
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
@@ -120,13 +118,11 @@ func (s *EtcdService) Run() error {
 		<-e.Server.StopNotify()
 	}()
 
-	// If we were told to, go ahead and do a defragment now.
-	if s.doStartupDefrag {
-		if err := e.Server.Backend().Defrag(); err != nil {
-			err = fmt.Errorf("initial defragmentation failed: %v", err)
-			klog.Error(err)
-			return err
-		}
+	// Go ahead and do a defragment now.
+	if err := e.Server.Backend().Defrag(); err != nil {
+		err = fmt.Errorf("initial defragmentation failed: %v", err)
+		klog.Error(err)
+		return err
 	}
 
 	// Start up the defrag controller.
