@@ -35,10 +35,10 @@ type Config struct {
 	userSettings *Config       `json:"-"` // the values read from the config file
 }
 
-// NewMicroshiftConfig creates a new Config struct populated with the
+// NewDefault creates a new Config struct populated with the
 // default values and with any computed values updated based on those
 // defaults.
-func NewMicroshiftConfig() *Config {
+func NewDefault() *Config {
 	c := &Config{}
 	if err := c.fillDefaults(); err != nil {
 		klog.Fatalf("Failed to initialize config: %v", err)

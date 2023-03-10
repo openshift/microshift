@@ -28,12 +28,12 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 			var err error
 
 			if opts.Mode == "effective" {
-				cfg, err = config.GetActiveConfig()
+				cfg, err = config.ActiveConfig()
 				if err != nil {
 					cmdutil.CheckErr(err)
 				}
 			} else {
-				cfg = config.NewMicroshiftConfig()
+				cfg = config.NewDefault()
 			}
 
 			marshalled, err := yaml.Marshal(cfg)

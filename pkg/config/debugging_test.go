@@ -39,7 +39,7 @@ func TestGetVerbosity(t *testing.T) {
 
 	for _, tt := range ttests {
 		t.Run(tt.setting, func(t *testing.T) {
-			config := NewMicroshiftConfig()
+			config := NewDefault()
 			config.Debugging.LogLevel = tt.setting
 			verbosity := config.GetVerbosity()
 			assert.Equal(t, tt.level, verbosity)

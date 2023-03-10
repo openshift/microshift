@@ -104,15 +104,15 @@ func getActiveConfigFromYAML(contents []byte) (*Config, error) {
 	return results, nil
 }
 
-// Get the active configuration. If the configuration file exists,
-// read it and require it to be valid. Otherwise return the default
-// settings.
-func GetActiveConfig() (*Config, error) {
+// ActiveConfig returns the active configuration. If the configuration
+// file exists, read it and require it to be valid. Otherwise return
+// the default settings.
+func ActiveConfig() (*Config, error) {
 	filename := GetConfigFile()
 	_, err := os.Stat(filename)
 	if os.IsNotExist(err) {
 		// No configuration file, use the default settings
-		return NewMicroshiftConfig(), nil
+		return NewDefault(), nil
 	} else if err != nil {
 		return nil, err
 	}

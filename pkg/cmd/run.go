@@ -34,7 +34,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 		Use:   "run",
 		Short: "Run MicroShift",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg, err := config.GetActiveConfig()
+			cfg, err := config.ActiveConfig()
 			if err != nil {
 				return err
 			}

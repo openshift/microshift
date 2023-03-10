@@ -31,7 +31,7 @@ func setupSuiteDataDir(t *testing.T) func() {
 // the Config struct.
 func TestGetActiveConfigFromYAML(t *testing.T) {
 	mkDefaultConfig := func() *Config {
-		c := NewMicroshiftConfig()
+		c := NewDefault()
 		return c
 	}
 
@@ -203,7 +203,7 @@ func TestValidate(t *testing.T) {
 	defer cleanup()
 
 	mkDefaultConfig := func() *Config {
-		c := NewMicroshiftConfig()
+		c := NewDefault()
 		c.ApiServer.SkipInterface = true
 		return c
 	}
@@ -215,7 +215,7 @@ func TestValidate(t *testing.T) {
 	}{
 		{
 			name:      "defaults-ok",
-			config:    NewMicroshiftConfig(),
+			config:    NewDefault(),
 			expectErr: false,
 		},
 		{
@@ -278,7 +278,7 @@ func TestValidate(t *testing.T) {
 }
 
 func TestMicroshiftConfigIsDefaultNodeName(t *testing.T) {
-	c := NewMicroshiftConfig()
+	c := NewDefault()
 	if !c.isDefaultNodeName() {
 		t.Errorf("expected default IsDefaultNodeName to be true")
 	}
@@ -293,7 +293,7 @@ func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
-	c := NewMicroshiftConfig()
+	c := NewDefault()
 	c.Node.HostnameOverride = "node1"
 
 	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err != nil {
@@ -321,7 +321,7 @@ func TestMicroshiftConfigNodeNameValidationFromDefault(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
-	c := NewMicroshiftConfig()
+	c := NewDefault()
 
 	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
 		t.Errorf("failed to validate node name on first call: %v", err)
@@ -349,7 +349,7 @@ func TestMicroshiftConfigNodeNameValidationBadName(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
-	c := NewMicroshiftConfig()
+	c := NewDefault()
 	c.Node.HostnameOverride = "1.2.3.4"
 
 	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err == nil {

@@ -101,7 +101,7 @@ func Test_renderTopolvmDaemonsetTemplate(t *testing.T) {
 			name: "renders lvmd-socket-name path",
 			args: args{
 				tb:   tb,
-				data: renderParamsFromConfig(config.NewMicroshiftConfig(), assets.RenderParams{"SocketName": "/run/lvmd/lvmd.socket", "lvmd": "foobar"}),
+				data: renderParamsFromConfig(config.NewDefault(), assets.RenderParams{"SocketName": "/run/lvmd/lvmd.socket", "lvmd": "foobar"}),
 			},
 			want: wantBytes(tpl, map[string]interface{}{
 				"ReleaseImage": release.Image,
