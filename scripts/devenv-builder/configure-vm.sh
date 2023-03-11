@@ -52,8 +52,9 @@ fi
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 sudo dnf clean all -y
 sudo dnf update -y
-sudo dnf install -y git cockpit make golang jq selinux-policy-devel rpm-build jq bash-completion
+sudo dnf install -y git cockpit make golang jq selinux-policy-devel rpm-build jq bash-completion nss-mdns
 sudo systemctl enable --now cockpit.socket
+sudo systemctl enable --now avahi-daemon.service
 
 # Install go1.19
 # This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
