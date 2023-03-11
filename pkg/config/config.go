@@ -211,7 +211,12 @@ func (cfg *MicroshiftConfig) KubeConfigAdminPath(id string) string {
 	return filepath.Join(dataDir, "resources", string(KubeAdmin), id, "kubeconfig")
 }
 
+var allHostnames []string
+
 func getAllHostnames() ([]string, error) {
+	if len(allHostnames) != 0 {
+		return allHostnames, nil
+	}
 	cmd := exec.Command("/bin/hostname", "-A")
 	var out bytes.Buffer
 	cmd.Stdout = &out
@@ -224,7 +229,8 @@ func getAllHostnames() ([]string, error) {
 	// Remove duplicates to avoid having them in the certificates.
 	names := strings.Split(outString, " ")
 	set := sets.NewString(names...)
-	return set.List(), nil
+	allHostnames = set.List()
+	return allHostnames, nil
 }
 
 func NewMicroshiftConfig() *MicroshiftConfig {
