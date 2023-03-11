@@ -4,7 +4,106 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
+
+func TestGetLvmdConfigForVGs(t *testing.T) {
+	tests := []struct {
+		name        string
+		vgNames     []string
+		expected    *Lvmd
+		expectedErr error
+	}{
+		{
+			name: "no groups",
+			expected: &Lvmd{
+				SocketName:     defaultSockName,
+				DisabledReason: errorMessageNoVolumeGroups,
+			},
+		},
+		{
+			name:    "one group",
+			vgNames: []string{"choose-me"},
+			expected: &Lvmd{
+				SocketName: defaultSockName,
+				DeviceClasses: []*DeviceClass{
+					{
+						Name:        "default",
+						VolumeGroup: "choose-me",
+						Default:     true,
+						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
+					},
+				},
+			},
+		},
+		{
+			name:    "one group rhel",
+			vgNames: []string{"rhel"},
+			expected: &Lvmd{
+				SocketName: defaultSockName,
+				DeviceClasses: []*DeviceClass{
+					{
+						Name:        "default",
+						VolumeGroup: "rhel",
+						Default:     true,
+						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
+					},
+				},
+			},
+		},
+		{
+			name:    "rhel first",
+			vgNames: []string{"rhel", "other"},
+			expected: &Lvmd{
+				SocketName: defaultSockName,
+				DeviceClasses: []*DeviceClass{
+					{
+						Name:        "default",
+						VolumeGroup: "rhel",
+						Default:     true,
+						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
+					},
+				},
+			},
+		},
+		{
+			name:    "rhel last",
+			vgNames: []string{"other", "rhel"},
+			expected: &Lvmd{
+				SocketName: defaultSockName,
+				DeviceClasses: []*DeviceClass{
+					{
+						Name:        "default",
+						VolumeGroup: "rhel",
+						Default:     true,
+						SpareGB:     uint64Ptr(defaultSpareGB),
+					},
+				},
+			},
+		},
+		{
+			name:    "no rhel",
+			vgNames: []string{"other", "choose-me"},
+			expected: &Lvmd{
+				SocketName:     defaultSockName,
+				DisabledReason: errorMessageMultipleVolumeGroups,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual, err := getLvmdConfigForVGs(tt.vgNames)
+			assert.Equal(t, tt.expected, actual, "names: %v", tt.vgNames)
+			if tt.expectedErr != nil {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
 
 func Test_newLvmdConfigFromFile(t *testing.T) {
 
