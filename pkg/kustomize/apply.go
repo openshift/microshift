@@ -56,7 +56,7 @@ func (s *Kustomizer) ApplyKustomizationPath(path string) {
 	if _, err := os.Stat(kustomization); !errors.Is(err, os.ErrNotExist) {
 		klog.Infof("Applying kustomization at %v ", kustomization)
 		if err := ApplyKustomizationWithRetries(path, s.kubeconfig); err != nil {
-			klog.Fatalf("Applying kustomization at %v failed: %s. Giving up.", kustomization, err)
+			klog.Errorf("Applying kustomization at %v failed: %s. Giving up.", kustomization, err)
 		} else {
 			klog.Infof("Kustomization at %v applied successfully.", kustomization)
 		}
@@ -66,7 +66,7 @@ func (s *Kustomizer) ApplyKustomizationPath(path string) {
 }
 
 func ApplyKustomizationWithRetries(kustomization string, kubeconfig string) error {
-	return wait.Poll(retryInterval, retryTimeout, func() (bool, error) {
+	return wait.PollImmediate(retryInterval, retryTimeout, func() (bool, error) {
 		if err := ApplyKustomization(kustomization, kubeconfig); err != nil {
 			klog.Infof("Applying kustomization failed: %s. Retrying in %s.", err, retryInterval)
 			return false, nil
