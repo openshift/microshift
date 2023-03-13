@@ -103,8 +103,9 @@ type MicroshiftConfig struct {
 	BaseDomain       string        `json:"baseDomain"`
 	Cluster          ClusterConfig `json:"cluster"`
 
-	Ingress IngressConfig      `json:"-"`
-	Etcd    InternalEtcdConfig `json:"etcd"`
+	Ingress                       IngressConfig      `json:"-"`
+	Etcd                          InternalEtcdConfig `json:"etcd"`
+	DisableLoadBalancerController bool               `json:"disableLoadBalancerController"`
 }
 
 // Top level config file
@@ -135,6 +136,12 @@ type Network struct {
 	// installed.
 	// +kubebuilder:validation:Pattern=`^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])-([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$`
 	ServiceNodePortRange string `json:"serviceNodePortRange,omitempty"`
+
+	// Disable built-in loadbalancer service controller.
+	// Set it to true if an external loadbalancer implementation is deployed.
+	// This parameter can be updated after the cluster is
+	// installed.
+	DisableLoadBalancerController bool `json:"disableLoadBalancerController,omitempty"`
 }
 
 type ClusterNetworkEntry struct {
@@ -452,6 +459,8 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 		}
 	}
 	c.Etcd.DoStartupDefrag = config.Etcd.DoStartupDefrag
+
+	c.DisableLoadBalancerController = config.Network.DisableLoadBalancerController
 
 	return nil
 }
