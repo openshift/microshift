@@ -21,7 +21,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/component-base/logs"
 	"k8s.io/klog/v2"
-	ctrl "k8s.io/kubernetes/pkg/controlplane"
 	"sigs.k8s.io/yaml"
 
 	"github.com/openshift/microshift/pkg/util"
@@ -472,16 +471,24 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 	}
 	c.Cluster.DNS = clusterDNS
 
-	// If KAS advertise address is not configured then grab it from the service
+	// If KAS advertise address is not configured then compute it from the service
 	// CIDR automatically.
 	if len(c.KASAdvertiseAddress) == 0 {
 		// unchecked error because this was done when getting cluster DNS
 		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
-		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
-		if err != nil {
-			return fmt.Errorf("error getting apiserver IP: %v", err)
+		// Since the KAS advertise address was not provided we will default to the
+		// next immediate subnet after the service CIDR. This is due to the fact
+		// that using the actual apiserver service IP as an endpoint slice breaks
+		// host network pods trying to reach apiserver, as the VIP 10.43.0.1:443 is
+		// not translated to 10.43.0.1:6443. It remains unchanged and therefore
+		// connects to the ingress router instead, triggering all sorts of errors.
+		nextSubnet, exceed := cidr.NextSubnet(svcNet, 32)
+		if exceed {
+			return fmt.Errorf("unable to compute next subnet from service CIDR")
 		}
-		c.KASAdvertiseAddress = apiServerServiceIP.String()
+		// First and last are the same because of the /32 netmask.
+		firstValidIP, _ := cidr.AddressRange(nextSubnet)
+		c.KASAdvertiseAddress = firstValidIP.String()
 		c.SkipKASInterface = false
 	} else {
 		c.SkipKASInterface = true

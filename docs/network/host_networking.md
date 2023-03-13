@@ -34,6 +34,8 @@ Not all IP addresses are attached to specific physical interfaces, some of them 
 
 **NOTE:** These IPs shall be reserved for MicroShift.
 
+**NOTE:** There is another special IP reserved for MicroShift's apiserver. In order to allow external access using host IPs a new local IP must be allocated for the apiserver. It defaults to the first IP in the next available subnet from the service CIDR. If service CIDR is 10.43.0.0/16, then the new IP will be 10.44.0.0/32. This default IP is added to the loopback interface to allow connectivity without ovnk.
+
 ## Interfaces
 
 The following physical network interfaces are created or modified by ovn-kubernetes:
