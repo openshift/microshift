@@ -1,0 +1,56 @@
+Name: cockpit-starter-kit
+Version: %{VERSION}
+Release: 1%{?dist}
+Summary: Cockpit Starter Kit Example Module
+License: LGPLv2+
+
+Source0: https://github.com/cockpit-project/starter-kit/releases/download/%{version}/%{name}-%{version}.tar.xz
+Source1: https://github.com/cockpit-project/starter-kit/releases/download/%{version}/%{name}-node-%{version}.tar.xz
+BuildArch: noarch
+ExclusiveArch: %{nodejs_arches} noarch
+%if 0%{?fedora}
+BuildRequires: nodejs-devel
+%endif
+BuildRequires: nodejs
+BuildRequires: make
+BuildRequires: libappstream-glib
+BuildRequires: gettext
+%if 0%{?rhel} && 0%{?rhel} <= 8
+BuildRequires: libappstream-glib-devel
+%endif
+
+Requires: cockpit-bridge
+
+%description
+Cockpit Starter Kit Example Module
+
+%prep
+%autosetup -n %{name} -a 1
+# ignore pre-built bundle in release tarball and rebuild it
+# but keep it in RHEL/CentOS-8, as that has a too old nodejs
+%if ! 0%{?rhel} || 0%{?rhel} >= 9
+rm -rf dist
+%endif
+
+%build
+ESLINT=0 NODE_ENV=production make
+
+%install
+%make_install PREFIX=/usr
+
+# drop source maps, they are large and just for debugging
+find %{buildroot}%{_datadir}/cockpit/ -name '*.map' | xargs --no-run-if-empty rm --verbose
+
+%check
+appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/metainfo/*
+
+# this can't be meaningfully tested during package build; tests happen through
+# FMF (see plans/all.fmf) during package gating
+
+%files
+%doc README.md
+%license LICENSE dist/index.js.LICENSE.txt.gz
+%{_datadir}/cockpit/*
+%{_datadir}/metainfo/*
+
+%changelog

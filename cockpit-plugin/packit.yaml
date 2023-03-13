@@ -1,0 +1,56 @@
+# Enable RPM builds and running integration tests in PRs through https://packit.dev/
+# To use this, enable Packit-as-a-service in GitHub: https://packit.dev/docs/packit-as-a-service/
+# See https://packit.dev/docs/configuration/ for the format of this file
+
+specfile_path: cockpit-starter-kit.spec
+# use the nicely formatted release description from our upstream release, instead of git shortlog
+copy_upstream_release_description: true
+
+srpm_build_deps:
+  - make
+  - npm
+
+actions:
+  post-upstream-clone:
+    - make cockpit-starter-kit.spec
+    # replace Source1 manually, as create-archive: can't handle multiple tarballs
+    - make node-cache
+    - sh -c 'sed -i "/^Source1:/ s/https:.*/$(ls *-node*.tar.xz)/" cockpit-*.spec'
+  create-archive: make dist
+  # starter-kit.git has no release tags; your project can drop this once you have a release
+  get-current-version: make print-version
+
+jobs:
+  - job: tests
+    trigger: pull_request
+    targets:
+      - fedora-all
+      - centos-stream-8
+      - centos-stream-9
+
+  # Build releases in COPR: https://packit.dev/docs/configuration/#copr_build
+  #- job: copr_build
+  #  trigger: release
+  #  owner: your_copr_login
+  #  project: your_copr_project
+  #  preserve_project: True
+  #  targets:
+  #    - fedora-all
+  #    - centos-stream-9-x86_64
+
+  # Build releases in Fedora: https://packit.dev/docs/configuration/#propose_downstream
+  #- job: propose_downstream
+  #  trigger: release
+  #  dist_git_branches:
+  #    - fedora-all
+
+  #- job: koji_build
+  #  trigger: commit
+  #  dist_git_branches:
+  #    - fedora-all
+
+  #- job: bodhi_update
+  #  trigger: commit
+  #  dist_git_branches:
+  #    # rawhide updates are created automatically
+  #    - fedora-branched

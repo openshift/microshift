@@ -1,0 +1,10 @@
+#! /bin/sh
+set -eu
+
+# This is the expected entry point for Cockpit CI; will be called without
+# arguments but with an appropriate $TEST_OS, and optionally $TEST_SCENARIO
+
+TEST_SCENARIO="${TEST_SCENARIO:-}"
+[ "${TEST_SCENARIO}" = "${TEST_SCENARIO##firefox}" ] || export TEST_BROWSER=firefox
+export RUN_TESTS_OPTIONS=--track-naughties
+make check

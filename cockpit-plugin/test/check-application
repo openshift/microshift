@@ -1,0 +1,57 @@
+#!/usr/bin/python3
+# Run this with --help to see available options for tracing and debugging
+# See https://github.com/cockpit-project/cockpit/blob/main/test/common/testlib.py
+# "class Browser" and "class MachineCase" for the available API.
+
+import os
+import sys
+
+# import Cockpit's machinery for test VMs and its browser test API
+TEST_DIR = os.path.dirname(__file__)
+sys.path.append(os.path.join(TEST_DIR, "common"))
+sys.path.append(os.path.join(os.path.dirname(TEST_DIR), "bots/machine"))
+import testlib
+
+# Nondestructive tests all run in the same running VM. This allows them to run in Packit, Fedora, and RHEL dist-git gating
+# They must not permanently change any file or configuration on the system in a way that influences other tests.
+@testlib.nondestructive
+class TestApplication(testlib.MachineCase):
+    def testBasic(self):
+        b = self.browser
+        m = self.machine
+
+        self.login_and_go("/starter-kit")
+        # verify expected heading
+        b.wait_text(".pf-c-card__title", "Starter Kit")
+
+        # verify expected host name
+        hostname = m.execute("cat /etc/hostname").strip()
+        b.wait_in_text(".pf-c-alert__title", "Running on " + hostname)
+
+        # change current hostname
+        self.write_file("/etc/hostname", "new-" + hostname)
+        # verify new hostname name
+        b.wait_in_text(".pf-c-alert__title", "Running on new-" + hostname)
+
+        # change language to German
+        b.switch_to_top()
+        # the menu and dialog changed several times
+        b.click("#toggle-menu")
+        b.click(".display-language-menu")
+        b.wait_popup('display-language-modal')
+        b.click("#display-language-modal [data-value='de-de'] button")
+        b.click("#display-language-modal button.pf-m-primary")
+        b.wait_visible("#content")
+        # menu label (from manifest) should be translated
+        b.wait_text("#host-apps a[href='/starter-kit']", "Bausatz")
+        # window title should be translated; this is not considered as "visible"
+        self.assertIn("Bausatz", b.call_js_func("ph_text", "head title"))
+
+        b.go("/starter-kit")
+        b.enter_page("/starter-kit")
+        # page label (from js) should be translated
+        b.wait_in_text(".pf-c-alert__title", "Läuft auf")
+
+
+if __name__ == '__main__':
+    testlib.test_main()

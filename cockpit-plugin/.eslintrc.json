@@ -1,0 +1,52 @@
+{
+    "root": true,
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": ["eslint:recommended", "standard", "standard-jsx", "react-app"],
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+        "ecmaVersion": "7",
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "sourceType": "module"
+    },
+    "plugins": ["flowtype", "react", "react-hooks"],
+    "rules": {
+        "indent": ["error", 4,
+            {
+                "ObjectExpression": "first",
+                "CallExpression": {"arguments": "first"},
+                "MemberExpression": 2,
+                "ignoredNodes": [ "JSXAttribute" ]
+            }],
+        "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
+        "no-var": "error",
+        "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+        "prefer-promise-reject-errors": ["error", { "allowEmptyReject": true }],
+        "react/jsx-indent": ["error", 4],
+        "semi": ["error", "always", { "omitLastInOneLineBlock": true }],
+
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "error",
+
+        "camelcase": "off",
+        "comma-dangle": "off",
+        "curly": "off",
+        "jsx-quotes": "off",
+        "key-spacing": "off",
+        "no-console": "off",
+        "quotes": "off",
+        "react/jsx-curly-spacing": "off",
+        "react/jsx-indent-props": "off",
+        "react/prop-types": "off",
+        "space-before-function-paren": "off",
+        "standard/no-callback-literal": "off"
+    },
+    "globals": {
+        "require": false,
+        "module": false
+    }
+}

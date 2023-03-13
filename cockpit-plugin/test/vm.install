@@ -1,0 +1,12 @@
+#!/bin/sh
+# image-customize script to prepare a bots VM for testing this application
+# The application package will be installed separately
+set -eu
+
+# don't force https:// (self-signed cert)
+printf "[WebService]\\nAllowUnencrypted=true\\n" > /etc/cockpit/cockpit.conf
+
+if type firewall-cmd >/dev/null 2>&1; then
+    firewall-cmd --add-service=cockpit --permanent
+fi
+systemctl enable cockpit.socket
