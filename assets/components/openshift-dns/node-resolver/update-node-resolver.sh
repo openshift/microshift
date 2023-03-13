@@ -48,11 +48,17 @@ while true; do
     fi
 
     # Append resolver entries for services
+    rc=0
     for svc in "${!svc_ips[@]}"; do
       for ip in ${svc_ips[${svc}]}; do
-        echo "${ip} ${svc} ${svc}.${CLUSTER_DOMAIN} # ${OPENSHIFT_MARKER}" >> "${TEMP_FILE}"
+        echo "${ip} ${svc} ${svc}.${CLUSTER_DOMAIN} # ${OPENSHIFT_MARKER}" >> "${TEMP_FILE}" || rc=$?
       done
     done
+    if [[ $rc -ne 0 ]]; then
+      sleep 60 & wait
+      continue
+    fi
+
 
     # TODO: Update /etc/hosts atomically to avoid any inconsistent behavior
     # Replace /etc/hosts with our modified version if needed
