@@ -61,13 +61,13 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		return fmt.Errorf("%v failed to get exec path: %v", s.Name(), err)
 	}
 	etcdPath := filepath.Join(filepath.Dir(microshiftExecPath), "microshift-etcd")
-	// Not running the etcd binary directly, the proper etcd arguments are handled
-	//		in etcd/cmd/microshift-etcd/run.go.
+	// Not running the etcd binary directly, the proper etcd arguments
+	// are handled in etcd/cmd/microshift-etcd/run.go.
 	args := []string{}
 
-	// If we're launching MicroShift as a service, we need to do the same
-	//		with etcd, so wrap it in a transient systemd-unit that's tied
-	//		to the MicroShift service lifetime.
+	// If we're launching MicroShift as a service, we need to do the
+	// same with etcd, so wrap it in a transient systemd-unit that's
+	// tied to the MicroShift service lifetime.
 	var exe string
 	if runningAsSvc {
 		args = append(args,
