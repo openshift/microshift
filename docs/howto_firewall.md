@@ -8,6 +8,7 @@ It is mandatory to allow MicroShift pods the access to the internal CoreDNS and 
 |:-------------|:---------------------|:-----------|
 |10.42.0.0/16  |Yes                   |Pod network access to other pods |
 |10.43.0.0/16  |No                    |ClusterIP service network, used by pods to access services (like CoreDNS and MicroShift API) |
+|10.44.0.0/32  |No                    |Next available subnet from ClusterIP service network, used by pods to access apiserver |
 |169.254.169.1 |Yes                   |Special IP to access services backed by host endpoints, like MicroShift API Server |
 
 The following ports are optional and they should be considered for MicroShift if a firewall is enabled.
