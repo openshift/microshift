@@ -109,12 +109,6 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 		return fmt.Errorf("failed to configure kube-apiserver audit policy: %w", err)
 	}
 
-	// Get the apiserver port so we can set it as an argument
-	apiServerPort, err := cfg.ApiServerPort()
-	if err != nil {
-		return err
-	}
-
 	s.masterURL = cfg.ApiServer.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 	s.advertiseAddress = cfg.ApiServer.AdvertiseAddress
@@ -185,7 +179,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			},
 			ServingInfo: configv1.HTTPServingInfo{
 				ServingInfo: configv1.ServingInfo{
-					BindAddress:   net.JoinHostPort("0.0.0.0", strconv.Itoa(apiServerPort)),
+					BindAddress:   net.JoinHostPort("0.0.0.0", strconv.Itoa(cfg.ApiServer.Port)),
 					MinTLSVersion: string(fixedTLSProfile.MinTLSVersion),
 					CipherSuites:  crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
 					NamedCertificates: []configv1.NamedCertificate{

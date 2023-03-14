@@ -22,6 +22,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"k8s.io/apiserver/pkg/authentication/serviceaccount"
@@ -387,14 +388,10 @@ func initKubeconfigs(
 	if err != nil {
 		return fmt.Errorf("failed to parse cluster URL: %v", err)
 	}
-	apiServerPort, err := cfg.ApiServerPort()
-	if err != nil {
-		return fmt.Errorf("failed to get apiserver port: %v", err)
-	}
 
 	// Generate one kubeconfigs per name
 	for _, name := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
-		u.Host = fmt.Sprintf("%s:%d", name, apiServerPort)
+		u.Host = net.JoinHostPort(name, strconv.Itoa(cfg.ApiServer.Port))
 		if err := util.KubeConfigWithClientCerts(
 			cfg.KubeConfigAdminPath(name),
 			u.String(),

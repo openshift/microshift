@@ -76,6 +76,7 @@ func (c *Config) fillDefaults() error {
 	c.ApiServer = ApiServer{
 		SubjectAltNames: subjectAltNames,
 		URL:             "https://localhost:6443",
+		Port:            6443,
 	}
 	c.Node = Node{
 		HostnameOverride: hostname,
