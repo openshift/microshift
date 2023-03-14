@@ -1,0 +1,22 @@
+container:
+  # official cockpit CI container, with cockpit related build and test dependencies
+  # if you want to use your own, see the documentation about required packages:
+  # https://github.com/cockpit-project/cockpit/blob/main/HACKING.md#getting-the-development-dependencies
+  image: quay.io/cockpit/tasks
+  kvm: true
+  # increase this if you have many tests that benefit from parallelism
+  cpu: 1
+
+test_task:
+  env:
+    matrix:
+      - TEST_OS: fedora-37
+      - TEST_OS: centos-8-stream
+
+  fix_kvm_script: sudo chmod 666 /dev/kvm
+
+  # test PO template generation
+  pot_build_script: make po/starter-kit.pot
+
+  # chromium has too little /dev/shm, and we can't make that bigger
+  check_script: TEST_BROWSER=firefox TEST_JOBS=$(nproc) TEST_OS=$TEST_OS make check

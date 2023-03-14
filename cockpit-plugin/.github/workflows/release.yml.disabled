@@ -1,0 +1,34 @@
+# Create a GitHub upstream release. Replace "TARNAME" with your project tarball
+# name and enable this by dropping the ".disabled" suffix from the file name.
+# See README.md.
+name: release
+on:
+  push:
+    tags:
+      # this is a glob, not a regexp
+      - '[0-9]*'
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/cockpit-project/unit-tests
+      options: --user root
+    permissions:
+      # create GitHub release
+      contents: write
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Workaround for https://github.com/actions/checkout/pull/697
+        run: git fetch --force origin $(git describe --tags):refs/tags/$(git describe --tags)
+
+      - name: Build release
+        run: make dist
+
+      - name: Publish GitHub release
+        uses: cockpit-project/action-release@88d994da62d1451c7073e26748c18413fcdf46e9
+        with:
+          filename: "TARNAME-${{ github.ref_name }}.tar.xz"
