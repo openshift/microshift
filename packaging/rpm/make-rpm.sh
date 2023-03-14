@@ -57,7 +57,12 @@ EOF
   cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
 
   title "Building RPM packages"
-  rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" "${RPMBUILD_DIR}"SPECS/microshift.spec
+  # _binary_payload refers to the compression algorithm to be used in the final RPM.
+  # To see the defaults run `rpmbuild --showrc | grep binary_payload`. In this case
+  # it yields w19.zstdio, which means compression level 19 using zstd algorithm. To
+  # speed this up it runs w19T8.zstdio, which is the 8 thread version of the same
+  # algorithm.
+  rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" --define "_binary_payload w19T8.zstdio" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 usage() {
