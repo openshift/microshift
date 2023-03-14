@@ -19,6 +19,7 @@ firewall_ports:
   - 9100/tcp
   - 9256/tcp
   - 9537/tcp
+  - 10250/tcp
   - 17001/tcp
   - 30000-32767/tcp
   - 30000-32767/udp

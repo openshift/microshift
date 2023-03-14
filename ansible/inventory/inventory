@@ -1,5 +1,5 @@
 [microshift]
-microshift-dev ansible_host="{{ ansible_host_var | default('microshift-dev') }}" private_ip="{{ private_ip_var | default('') }}"
+microshift-dev ansible_host="{{ ansible_host_var | default('microshift-dev') }}"
 
 [microshift:vars]
 ansible_user="{{ ansible_user_var | default('microshift') }}"

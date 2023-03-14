@@ -1,34 +1,42 @@
-- name: setup prometheus exporters
+- name: install node-exporter
+  ansible.builtin.dnf:
+    name:
+    - golang-github-prometheus-node-exporter
+    state: present
+
+- name: install process-exporter
+  ansible.builtin.dnf:
+    name: "{{ process_exporter_url }}"
+    disable_gpg_check: true
+    state: present
+
+- name: external cadvisor steps
   block:
-  - name: install node-exporter
-    ansible.builtin.dnf:
-      name:
-      - golang-github-prometheus-node-exporter
-      state: present
+    - name: download cadvisor
+      ansible.builtin.get_url:
+        url: "{{ cadvisor_url }}"
+        dest: /usr/bin/cadvisor
+        checksum: "{{ cadvisor_checksum }}"
+        mode: '0755'
 
-  - name: install process-exporter
-    ansible.builtin.dnf:
-      name: "{{ process_exporter_url }}"
-      disable_gpg_check: true
-      state: present
+    - name: install systemd unit for cadvisor
+      ansible.builtin.template:
+        src: cadvisor.service.j2
+        dest: /usr/lib/systemd/system/cadvisor.service
+        backup: true
 
-  - name: download cadvisor
-    ansible.builtin.get_url:
-      url: "{{ cadvisor_url }}"
-      dest: /usr/bin/cadvisor
-      checksum: "{{ cadvisor_checksum }}"
-      mode: '0755'
+    - name: start and enable cadvisor service
+      ansible.builtin.systemd:
+        name: cadvisor
+        daemon_reload: yes
+        state: started
+        enabled: yes
+  when: cadvisor_external | bool
 
-  - name: install systemd unit for cadvisor
-    ansible.builtin.template:
-      src: cadvisor.service.j2
-      dest: /usr/lib/systemd/system/cadvisor.service
-      backup: true
-
-  - name: start and enable prometheus services
-    ansible.builtin.systemd:
-      name: "{{ item }}"
-      daemon_reload: yes
-      state: started
-      enabled: yes
-    with_items: "{{ prometheus_services }}"
+- name: start and enable prometheus exporter services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    daemon_reload: yes
+    state: started
+    enabled: yes
+  with_items: "{{ prometheus_services }}"

@@ -1,0 +1,25 @@
+---
+# create-service-account tasks
+
+- name: copy metrics service account yaml
+  ansible.builtin.copy:
+    src: metrics-sa.yaml
+    dest: metrics-sa.yaml
+
+- name: create service account for metrics gathering from kubelet
+  ansible.builtin.command: oc create -f metrics-sa.yaml
+
+- name: create token for service account
+  ansible.builtin.command: oc create token metrics-server -n kube-system
+  register: token
+
+- name: remove metrics service account yaml
+  ansible.builtin.file:
+    path: metrics-sa.yaml
+    state: absent
+
+- name: save token to disk
+  ansible.builtin.copy:
+    content: "{{ token.stdout }}"
+    dest: sa-token
+  delegate_to: localhost

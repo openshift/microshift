@@ -1,0 +1,50 @@
+---
+# add-kubelet-logging tasks
+
+- name: check to ensure promdir target exists
+  ansible.builtin.stat:
+    path: "{{ prometheus_dir }}"
+  register: promdir
+
+- name: load sa-token from localhost
+  ansible.builtin.slurp:
+    src: sa-token
+  register: bearer_token
+  delegate_to: localhost
+
+- name: copy metrics service account yaml
+  ansible.builtin.copy:
+    content: "{{ bearer_token.content | b64decode }}"
+    dest: "{{ kubelet_auth_token_file }}"
+  when: promdir.stat.exists
+
+- name: append kubelet scrape config target to prometheus config
+  ansible.builtin.blockinfile:
+    path: "{{ prometheus_config }}"
+    block: |
+      # kubelet targets
+        - job_name: kubelet
+          scheme: https
+          authorization:
+            credentials_file: "{{ kubelet_auth_token_file }}"
+          tls_config:
+            insecure_skip_verify: true
+          static_configs:
+            - targets:
+              - microshift-dev:10250
+
+        - job_name: kubelet cadvisor
+          scheme: https
+          authorization:
+            credentials_file: "{{ kubelet_auth_token_file }}"
+          tls_config:
+            insecure_skip_verify: true
+          metrics_path: /metrics/cadvisor
+          static_configs:
+            - targets:
+              - microshift-dev:10250
+
+- name: restart prometheus to pick up new target
+  ansible.builtin.systemd:
+    state: restarted
+    name: prometheus

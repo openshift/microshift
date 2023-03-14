@@ -1,0 +1,4 @@
+---
+# create-service-account default vars
+
+prometheus_dir: /etc/prometheus

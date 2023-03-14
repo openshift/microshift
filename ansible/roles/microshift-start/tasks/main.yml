@@ -128,6 +128,9 @@
   until: (pods.stdout | int ) >= 1
   retries: 10
 
+- name: create service account task(s)
+  include_tasks: roles/create-service-account/tasks/main.yml
+
 - name: wait for pods running
   ansible.builtin.shell: oc get pods -A -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' | grep -c False
   retries: 120
