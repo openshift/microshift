@@ -1,9 +1,9 @@
 {
-  "name": "starter-kit",
-  "description": "Scaffolding for a cockpit module",
+  "name": "microshift-cockpit-plugin",
+  "description": "MicroShift Cockpit Plugin",
   "type": "module",
   "main": "index.js",
-  "repository": "git@github.com:cockpit/starter-kit.git",
+  "repository": "https://github.com/openshift/microshift",
   "author": "",
   "license": "LGPL-2.1",
   "scripts": {

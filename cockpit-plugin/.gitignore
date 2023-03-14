@@ -17,3 +17,4 @@ POTFILES*
 tmp/
 /po/LINGUAS
 /tools
+/cockpit-tmp-repo

@@ -35,13 +35,16 @@ COCKPIT_REPO_FILES = \
 
 COCKPIT_REPO_URL = https://github.com/cockpit-project/cockpit.git
 COCKPIT_REPO_COMMIT = 54f2fd58a3645c4a222e2b1b9b5f1b9321bed998 # 285 + Move to a webpack module
+COCKPIT_REPO_TMP_DIR = cockpit-tmp-repo
 
 $(COCKPIT_REPO_FILES): $(COCKPIT_REPO_STAMP)
 COCKPIT_REPO_TREE = '$(strip $(COCKPIT_REPO_COMMIT))^{tree}'
 $(COCKPIT_REPO_STAMP): Makefile
-	@git rev-list --quiet --objects $(COCKPIT_REPO_TREE) -- 2>/dev/null || \
-	    git fetch --no-tags --no-write-fetch-head --depth=1 $(COCKPIT_REPO_URL) $(COCKPIT_REPO_COMMIT)
-	git archive $(COCKPIT_REPO_TREE) -- $(COCKPIT_REPO_FILES) | tar x
+	mkdir -p $(COCKPIT_REPO_TMP_DIR) && cd $(COCKPIT_REPO_TMP_DIR) ; \
+	git init ; \
+	git fetch --no-tags --no-write-fetch-head --depth=1 $(COCKPIT_REPO_URL) $(COCKPIT_REPO_COMMIT) ; \
+	git archive $(COCKPIT_REPO_TREE) -- $(COCKPIT_REPO_FILES) | (cd .. ; tar x) ; \
+	cd .. && rm -rf $(COCKPIT_REPO_TMP_DIR)
 
 #
 # i18n
@@ -90,6 +93,11 @@ clean:
 	rm -rf dist/
 	rm -f $(SPEC)
 	rm -f po/LINGUAS
+	rm -rf node_modules/
+	rm -f package-lock.json
+	rm -rf pkg/
+	rm -rf tools/
+	rm -rf $(COCKPIT_REPO_TMP_DIR)
 
 install: $(DIST_TEST) po/LINGUAS
 	mkdir -p $(DESTDIR)$(PREFIX)/share/cockpit/$(PACKAGE_NAME)
