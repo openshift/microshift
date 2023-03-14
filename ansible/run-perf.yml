@@ -6,6 +6,27 @@
 # ansible-playbook -i inventory/inventory run-perf.yml
 #
 
+- name: create vm and set up localhost
+  hosts: localhost
+  vars:
+    ansible_become: no
+    ansible_connection: local
+  vars_files:
+  - vars/all.yml
+  roles:
+    - role: create-vm
+      when: (create_devenv | bool)
+    - role: setup-localhost
+
+- name: set up logging node
+  hosts: logging
+  become: yes
+  vars_files:
+  - vars/all.yml
+  roles:
+    - role: install-logging
+      when: (prometheus_logging | bool)
+
 - name: entitle host and manage repos
   hosts: microshift
   become: yes
@@ -15,16 +36,23 @@
     - role: manage-repos
       when: (manage_repos | bool)
 
-- name: set up logging node
-  hosts: logging
-  become: yes
-  roles:
-    - install-logging
+#- name: install pbench
+#  hosts: microshift
+#  become: yes
+#  gather_facts: no
+#  vars_files:
+#    - vars/all.yml
+#  roles:
+#    - role: pbench_repo_install
+#      when: (install_pbench | bool) and (not pbench_installed | bool)
+#    - role: pbench_agent_install
+#      when: (install_pbench | bool) and (not pbench_installed | bool)
+#    - role: pbench_agent_config
+#      when: (install_pbench | bool) and (not pbench_installed | bool)
 
 - name: install packages, configure services & firewall
   hosts: microshift
   become: yes
-  gather_facts: no
   vars_files:
     - vars/all.yml
   roles:
@@ -48,4 +76,4 @@
   vars_files:
     - vars/all.yml
   roles:
-    - microshift-start
+    - role: microshift-start

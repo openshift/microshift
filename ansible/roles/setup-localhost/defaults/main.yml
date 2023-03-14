@@ -1,4 +1,8 @@
 ---
-# install-localhost defaults
+# setup-localhost defaults
 
-host_ips: []
+known_hosts:
+  - '^localhost'
+  - '^microshift-'
+
+microshift_pass: microshift

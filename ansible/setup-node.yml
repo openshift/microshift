@@ -6,7 +6,7 @@
 # ansible-playbook -i inventory/inventory setup-node.yml
 #
 
-- name: Set up localhost
+- name: create vm and set up localhost
   hosts: localhost
   vars:
     ansible_become: no
@@ -14,7 +14,18 @@
   vars_files:
   - vars/all.yml
   roles:
-    - setup-localhost
+    - role: create-vm
+      when: (create_devenv | bool)
+    - role: setup-localhost
+
+- name: set up logging node
+  hosts: logging
+  become: yes
+  vars_files:
+  - vars/all.yml
+  roles:
+    - role: install-logging
+      when: (prometheus_logging | bool)
 
 - name: entitle host and manage repos
   hosts: microshift
@@ -22,34 +33,12 @@
   vars_files:
     - vars/all.yml
   roles:
-    - manage-repos
-
-- name: install pbench
-  hosts: microshift
-  become: yes
-  gather_facts: no
-  vars_files:
-    - vars/all.yml
-  roles:
-    - role: pbench_repo_install
-      when: (install_pbench | bool) and (not pbench_installed | bool)
-    - role: pbench_agent_install
-      when: (install_pbench | bool) and (not pbench_installed | bool)
-    - role: install-logging-exporters
-      when: (prometheus_logging | bool)
-    - role: pbench_agent_config
-      when: (install_pbench | bool) and (not pbench_installed | bool)
-
-- name: set up logging node
-  hosts: logging
-  become: yes
-  roles:
-    - install-logging
+    - role: manage-repos
+      when: (manage_repos | bool)
 
 - name: install packages, configure services & firewall
   hosts: microshift
   become: yes
-  gather_facts: no
   vars_files:
     - vars/all.yml
   roles:
@@ -57,12 +46,20 @@
       when: (setup_microshift_host | bool)
     - role: configure-firewall
       when: (setup_microshift_host | bool)
+    - role: install-logging-exporters
+      when: (prometheus_logging | bool)
+
+- name: install microshift
+  hosts: microshift
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: install-microshift
+      when: (install_microshift | bool)
 
 - name: capture microshift metrics
   hosts: microshift
   vars_files:
     - vars/all.yml
   roles:
-    - install-microshift
-    - microshift-start
-
+    - role: microshift-start
