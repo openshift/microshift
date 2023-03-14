@@ -29,7 +29,7 @@ done
 
 TO_DESCRIBE=(deployments daemonsets statefulsets replicasets)
 for ns in $(kubectl get namespace -o jsonpath='{.items..metadata.name}'); do
-    oc get namespace $ns -o yaml
+    to_run oc get namespace $ns -o yaml
 
     for resource_type in ${TO_DESCRIBE[*]}; do
         for resource in $(kubectl get $resource_type -n $ns -o name); do
