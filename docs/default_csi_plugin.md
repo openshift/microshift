@@ -40,11 +40,17 @@ is run as.
 
 ## System Requirements
 
-### Volume Group Name
+### Default Volume Group
 
-The default integration of LVMS assumes a volume-group named `rhel`. LVMS's node-controller expects that volume
-group to exist prior to launching the service. If the volume group does not exist, the node-controller will fail to
-start and enter a CrashLoopBackoff state.
+If there is only one volume group on the system, LVMS uses it by
+default. If there are multiple volume groups, and no configuration
+file, LVMS looks for a volume group named `rhel`. If there is no
+volume group named `rhel`, LVMS is disabled.
+
+LVMS expects all volume groups to exist prior to launching the
+service. If LVMS is configured to use a volume group that does not
+exist, the node-controller Pod will fail and enter a CrashLoopBackoff
+state.
 
 ### Volume Size Increments
 
