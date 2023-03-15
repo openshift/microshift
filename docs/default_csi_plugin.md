@@ -31,12 +31,8 @@ Full documentation of the config spec can be found at [github.com/red-hat-storag
 
 #### Path
 
-The user provided lvmd config should be written to the same directory as the MicroShift config.  If a MicroShift config
-doesn't exist, MicroShift will assume default lvmd values. These paths will be checked for the config, depending on the user MicroShift
-is run as.
-
-1. User config dir: `~/.microshift/lvmd.yaml`
-2. Global config dir: `/etc/microshift/lvmd.yaml`
+The user provided lvmd config should be written to the same directory as the MicroShift config.  If an lvmd configuration file
+does not exist in `/etc/microshift/lvmd.yaml`, MicroShift will use default values. 
 
 ## System Requirements
 
