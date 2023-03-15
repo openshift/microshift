@@ -3,7 +3,7 @@
 > **IMPORTANT!** The default LVMS configuration is intended to match the developer environment described in [MicroShift Development Environment](./devenv_setup.md). See section **[Configuring LVMS](#Configuring-LVMS)** for guidance on configuring LVMS for your environment.
 
 MicroShift enables dynamic storage provisioning out of the box with the LVMS CSI plugin. This plugin is a downstream
-Red Hat fork of TopoLVM. This provisioner will create a new LVM logical volume in the `rhel` volume group for each
+Red Hat build of TopoLVM. This provisioner will create a new LVM logical volume in the `rhel` volume group for each
 PersistenVolumeClaim(PVC), and make these volumes available to pods. For more information on LVMS, visit the repo's
 [README](https://github.com/red-hat-storage/topolvm).
 
