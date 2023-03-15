@@ -37,10 +37,10 @@ EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkub
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator"
 
-declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
+declare -A GOARCH_TO_UNAME_MAP=(["amd64"]="x86_64" ["arm64"]="aarch64")
 
 title() {
-    echo -e "\E[34m$1\E[00m";
+    echo -e "\E[34m$1\E[00m"
 }
 
 # Clone a repo at a commit
@@ -51,8 +51,7 @@ clone_repo() {
 
     local repodir="${destdir}/${repo##*/}"
 
-    if [[ -d "${repodir}" ]]
-    then
+    if [[ -d "${repodir}" ]]; then
         return
     fi
 
@@ -74,11 +73,11 @@ download_image_state() {
     local new_commits_file="new-commits.txt"
 
     # Determine the repos and commits for the repos that build the images
-    cat "${release_info_file}" \
-        | jq -j '.references.spec.tags[] | if .annotations["io.openshift.build.source-location"] != "" then .name," ",.annotations["io.openshift.build.source-location"]," ",.annotations["io.openshift.build.commit.id"] else "" end,"\n"' \
-             | sort -u \
-             | grep -v '^$' \
-                    > "${commits_file}"
+    cat "${release_info_file}" |
+        jq -j '.references.spec.tags[] | if .annotations["io.openshift.build.source-location"] != "" then .name," ",.annotations["io.openshift.build.source-location"]," ",.annotations["io.openshift.build.commit.id"] else "" end,"\n"' |
+        sort -u |
+        grep -v '^$' \
+            >"${commits_file}"
 
     # Get list of MicroShift's container images. The names are not
     # arch-specific, so we just use the x86_64 list.
@@ -92,10 +91,8 @@ download_image_state() {
     # entire git repo.
     mkdir -p "${release_image_arch}"
     local image=""
-    for image in $images
-    do
-        if ! grep -q "^${image} " "${commits_file}"
-        then
+    for image in $images; do
+        if ! grep -q "^${image} " "${commits_file}"; then
             # some of the images we use do not come from the release payload
             echo "${image} not from release payload, skipping"
             echo
@@ -105,7 +102,7 @@ download_image_state() {
         local repo=$(echo "$line" | cut -f2 -d' ')
         local commit=$(echo "$line" | cut -f3 -d' ')
         clone_repo "${repo}" "${commit}" "${release_image_arch}"
-        echo "${repo} image-${release_image_arch} ${commit}" >> "${new_commits_file}"
+        echo "${repo} image-${release_image_arch} ${commit}" >>"${new_commits_file}"
         echo
     done
 }
@@ -124,13 +121,13 @@ download_release() {
     if [ -f "${PULL_SECRET_FILE}" ]; then
         authentication="-a ${PULL_SECRET_FILE}"
     else
-        >&2 echo "Warning: no pull secret found at ${PULL_SECRET_FILE}"
+        echo >&2 "Warning: no pull secret found at ${PULL_SECRET_FILE}"
     fi
 
     title "# Fetching release info for ${release_image_amd64} (amd64)"
-    oc adm release info ${authentication} "${release_image_amd64}" -o json > release_amd64.json
+    oc adm release info ${authentication} "${release_image_amd64}" -o json >release_amd64.json
     title "# Fetching release info for ${release_image_arm64} (arm64)"
-    oc adm release info ${authentication} "${release_image_arm64}" -o json > release_arm64.json
+    oc adm release info ${authentication} "${release_image_arm64}" -o json >release_arm64.json
 
     title "# Extracting ${release_image_amd64} manifest content"
     mkdir -p release-manifests
@@ -140,25 +137,24 @@ download_release() {
     popd >/dev/null
 
     title "# Cloning ${release_image_amd64} component repos"
-    cat release_amd64.json \
-       | jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' > source-commits
+    cat release_amd64.json |
+        jq -r '.references.spec.tags[] | "\(.name) \(.annotations."io.openshift.build.source-location") \(.annotations."io.openshift.build.commit.id")"' >source-commits
 
     local new_commits_file="new-commits.txt"
     touch "${new_commits_file}"
 
     git config --global advice.detachedHead false
     git config --global init.defaultBranch main
-    while IFS="" read -r line || [ -n "$line" ]
-    do
+    while IFS="" read -r line || [ -n "$line" ]; do
         component=$(echo "${line}" | cut -d ' ' -f 1)
         repo=$(echo "${line}" | cut -d ' ' -f 2)
         commit=$(echo "${line}" | cut -d ' ' -f 3)
         if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]]; then
             clone_repo "${repo}" "${commit}" "."
-            echo "${repo} embedded-component ${commit}" >> "${new_commits_file}"
+            echo "${repo} embedded-component ${commit}" >>"${new_commits_file}"
             echo
         fi
-    done < source-commits
+    done <source-commits
 
     title "# Cloning ${release_image_amd64} image repos"
     download_image_state "${release_image_amd64}" "amd64"
@@ -166,7 +162,6 @@ download_release() {
 
     popd >/dev/null
 }
-
 
 # Greps a Golang pseudoversion from input.
 grep_pseudoversion() {
@@ -180,7 +175,7 @@ require_using_component_commit() {
     local modulepath=$1
     local component=$2
 
-    commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
+    commit=$(cd "${STAGING_DIR}/${component}" && git rev-parse HEAD)
     echo "go mod edit -require ${modulepath}@${commit}"
     go mod edit -require "${modulepath}@${commit}"
     go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
@@ -198,7 +193,7 @@ replace_using_component_commit() {
         echo "go mod edit -replace ${modulepath}=${new_modulepath}@${pseudoversions[${component}]}"
         go mod edit -replace "${modulepath}=${new_modulepath}@${pseudoversions[${component}]}"
     else
-        commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
+        commit=$(cd "${STAGING_DIR}/${component}" && git rev-parse HEAD)
         echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
         go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
         go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
@@ -225,11 +220,11 @@ update_last_rebase() {
 EOF
     chmod +x "${last_rebase_script}"
 
-    (cd "${REPOROOT}" && \
-         test -n "$(git status -s scripts/auto-rebase/last_rebase.sh)" && \
-         title "## Committing changes to last_rebase.sh" && \
-         git add scripts/auto-rebase/last_rebase.sh && \
-         git commit -m "update last_rebase.sh" || true)
+    (cd "${REPOROOT}" &&
+        test -n "$(git status -s scripts/auto-rebase/last_rebase.sh)" &&
+        title "## Committing changes to last_rebase.sh" &&
+        git add scripts/auto-rebase/last_rebase.sh &&
+        git commit -m "update last_rebase.sh" || true)
 }
 
 # Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
@@ -242,7 +237,7 @@ update_modulepath_version_from_release() {
     if [ "${component}" = "etcd" ]; then
         path="${modulepath#go.etcd.io/etcd}"
     fi
-    repo=$( cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url )
+    repo=$(cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url)
     new_modulepath="${repo#https://}${path}"
     replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}"
 }
@@ -352,10 +347,10 @@ valid_component_or_exit() {
 
 # Return all o/k staging repos (borrowed from k/k's hack/lib/util.sh)
 list_staging_repos() {
-  (
-    cd "${STAGING_DIR}/kubernetes/staging/src/k8s.io" && \
-    find . -mindepth 1 -maxdepth 1 -type d | cut -c 3- | sort
-  )
+    (
+        cd "${STAGING_DIR}/kubernetes/staging/src/k8s.io" &&
+            find . -mindepth 1 -maxdepth 1 -type d | cut -c 3- | sort
+    )
 }
 
 # Updates MicroShift's go.mod file by updating each ReplaceDirective's
@@ -422,7 +417,6 @@ update_go_mod() {
     popd >/dev/null
 }
 
-
 # Regenerates OpenAPIs after patching the vendor directory
 regenerate_openapi() {
     pushd "${STAGING_DIR}/kubernetes" >/dev/null
@@ -434,7 +428,6 @@ regenerate_openapi() {
     popd >/dev/null
 }
 
-
 # Returns the list of release image names from a release_${arch}.go file
 get_release_images() {
     file=$1
@@ -445,7 +438,7 @@ get_release_images() {
 # Updates the image digests in pkg/release/release*.go
 update_images() {
     if [ ! -f "${STAGING_DIR}/release_amd64.json" ] || [ ! -f "${STAGING_DIR}/release_arm64.json" ]; then
-        >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
+        echo >&2 "No release found in ${STAGING_DIR}, you need to download one first."
         exit 1
     fi
     pushd "${STAGING_DIR}" >/dev/null
@@ -458,7 +451,7 @@ update_images() {
         base_release=$(jq -r ".metadata.version" "${STAGING_DIR}/release_${goarch}.json")
         jq --arg base "${base_release}" '
             .release.base = $base
-            ' "${REPOROOT}/assets/release/release-${arch}.json" > "${REPOROOT}/assets/release/release-${arch}.json.tmp"
+            ' "${REPOROOT}/assets/release/release-${arch}.json" >"${REPOROOT}/assets/release/release-${arch}.json.tmp"
         mv "${REPOROOT}/assets/release/release-${arch}.json.tmp" "${REPOROOT}/assets/release/release-${arch}.json"
 
         # Get list of MicroShift's container images
@@ -468,12 +461,12 @@ update_images() {
         jq --arg images "$images" '
             reduce .references.spec.tags[] as $img ({}; . + {($img.name): $img.from.name})
             | with_entries(select(.key == ($images | split(" ")[])))
-            ' "release_${goarch}.json" > "update_${goarch}.json"
+            ' "release_${goarch}.json" >"update_${goarch}.json"
 
         # Update MicroShift's release info with these pullspecs
         jq --slurpfile updates "update_${goarch}.json" '
             .images += $updates[0]
-            ' "${REPOROOT}/assets/release/release-${arch}.json" > "${REPOROOT}/assets/release/release-${arch}.json.tmp"
+            ' "${REPOROOT}/assets/release/release-${arch}.json" >"${REPOROOT}/assets/release/release-${arch}.json.tmp"
         mv "${REPOROOT}/assets/release/release-${arch}.json.tmp" "${REPOROOT}/assets/release/release-${arch}.json"
 
         # Update crio's pause image
@@ -489,12 +482,11 @@ update_images() {
     go fmt "${REPOROOT}"/pkg/release
 }
 
-
 # Updates embedded component manifests by gathering these from various places
 # in the staged repos and copying them into the asset directory.
 update_manifests() {
     if [ ! -f "${STAGING_DIR}/release_amd64.json" ]; then
-        >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
+        echo >&2 "No release found in ${STAGING_DIR}, you need to download one first."
         exit 1
     fi
     pushd "${STAGING_DIR}" >/dev/null
@@ -539,6 +531,9 @@ update_manifests() {
     # The following manifests are just MicroShift specific and are not present in any other OpenShift repo.
     # - assets/core/securityv1-local-apiservice.yaml (local API service for security API group, needed if OpenShift API server is not present)
 
+    yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults;
+        .enforce = "restricted" | .audit = "restricted" | .warn = "restricted" |
+        .enforce-version = "latest" | .audit-version = "latest" | .warn-version = "latest")' "${REPOROOT}"/assets/controllers/kube-apiserver/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-hostpath)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.flex-volume-plugin-dir)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
@@ -560,7 +555,7 @@ update_manifests() {
     # 1) Adopt resource manifests
     #    Replace all openshift-dns operand manifests
     rm -f "${REPOROOT}"/assets/components/openshift-dns/dns/*
-    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns || true 
+    cp "${STAGING_DIR}"/cluster-dns-operator/assets/dns/* "${REPOROOT}"/assets/components/openshift-dns/dns || true
     rm -f "${REPOROOT}"/assets/components/openshift-dns/node-resolver/*
     cp "${STAGING_DIR}/"cluster-dns-operator/assets/node-resolver/* "${REPOROOT}"/assets/components/openshift-dns/node-resolver || true
     #    Restore the openshift-dns ConfigMap. It's content is the Corefile that the operator generates
@@ -584,7 +579,7 @@ update_manifests() {
     sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     #    Render the node-resolver script into the DaemonSet template
     export NODE_RESOLVER_SCRIPT="$(sed 's|^.|          &|' "${REPOROOT}"/assets/components/openshift-dns/node-resolver/update-node-resolver.sh)"
-    envsubst < "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl > "${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml
+    envsubst <"${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl >"${REPOROOT}"/assets/components/openshift-dns/node-resolver/daemonset.yaml
     #    Render the DNS service
     yq -i '.metadata += {"annotations": {"service.beta.openshift.io/serving-cert-secret-name": "dns-default-metrics-tls"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
     yq -i '.metadata += {"name": "dns-default", "namespace": "openshift-dns"}' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
@@ -601,7 +596,6 @@ update_manifests() {
     sed -i 's|REPLACE_COREDNS_IMAGE|{{ .ReleaseImage.coredns }}|' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     sed -i 's|REPLACE_RBAC_PROXY_IMAGE|{{ .ReleaseImage.kube_rbac_proxy }}|' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     sed -i 's|REPLACE_CLUSTER_IP|{{.ClusterIP}}|' "${REPOROOT}"/assets/components/openshift-dns/dns/service.yaml
-
 
     #-- openshift-router ----------------------------------
     # 1) Adopt resource manifests
@@ -674,7 +668,6 @@ update_manifests() {
     sed -i 's|REPLACE_CLUSTER_DOMAIN|{{ .BaseDomain }}|g' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     sed -i 's|REPLACE_ROUTER_IMAGE|{{ .ReleaseImage.haproxy_router }}|' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
 
-
     #-- service-ca ----------------------------------------
     # 1) Adopt resource manifests
     #    Replace all service-ca operand manifests
@@ -707,12 +700,11 @@ update_manifests() {
     popd >/dev/null
 }
 
-
 # Updates buildfiles like the Makefile
 update_buildfiles() {
     KUBE_ROOT="${STAGING_DIR}/kubernetes"
     if [ ! -d "${KUBE_ROOT}" ]; then
-        >&2 echo "No kubernetes repo found at ${KUBE_ROOT}, you need to download a release first."
+        echo >&2 "No kubernetes repo found at ${KUBE_ROOT}, you need to download a release first."
         exit 1
     fi
 
@@ -721,7 +713,7 @@ update_buildfiles() {
     title "Rebasing Makefile"
     source hack/lib/version.sh
     kube::version::get_version_vars
-    cat <<EOF > "${REPOROOT}/Makefile.kube_git.var"
+    cat <<EOF >"${REPOROOT}/Makefile.kube_git.var"
 KUBE_GIT_MAJOR=${KUBE_GIT_MAJOR-}
 KUBE_GIT_MINOR=${KUBE_GIT_MINOR%%+*}
 KUBE_GIT_VERSION=${KUBE_GIT_VERSION%%-*}
@@ -732,31 +724,28 @@ EOF
     popd >/dev/null
 }
 
-
 # Builds a list of the changes for each repository touched in this rebase
 update_changelog() {
     local new_commits_file="${STAGING_DIR}/new-commits.txt"
     local old_commits_file="${REPOROOT}/scripts/auto-rebase/commits.txt"
     local changelog="${REPOROOT}/scripts/auto-rebase/changelog.txt"
 
-    local repo # the URL to the repository
+    local repo       # the URL to the repository
     local new_commit # the SHA of the commit to which we're updating
-    local purpose # the purpose of the repo
+    local purpose    # the purpose of the repo
 
     rm -f "$changelog"
     touch "$changelog"
 
-    while read repo purpose new_commit
-    do
+    while read repo purpose new_commit; do
         # Look for repo URL anchored at start of the line with a space
         # after it because some repos may have names that are
         # substrings of other repos.
         local old_commit=$(grep "^${repo} ${purpose} " "${old_commits_file}" | cut -f3 -d' ' | head -n 1)
 
-        if [[ -z "${old_commit}" ]]
-        then
-            echo "# ${repo##*/} is a new ${purpose} dependency" >> "${changelog}"
-            echo >> "${changelog}"
+        if [[ -z "${old_commit}" ]]; then
+            echo "# ${repo##*/} is a new ${purpose} dependency" >>"${changelog}"
+            echo >>"${changelog}"
             continue
         fi
 
@@ -769,40 +758,39 @@ update_changelog() {
 
         local repodir
         case "${purpose}" in
-            embedded-component)
-                repodir="${STAGING_DIR}/${repo##*/}"
-                ;;
-            image-*)
-                local image_arch=$(echo $purpose | cut -f2 -d-)
-                repodir="${STAGING_DIR}/${image_arch}/${repo##*/}"
-                ;;
-            *)
-                echo "Unknown commit purpose \"${purpose}\" for ${repo}" >> "${changelog}"
-                continue
-                ;;
+        embedded-component)
+            repodir="${STAGING_DIR}/${repo##*/}"
+            ;;
+        image-*)
+            local image_arch=$(echo $purpose | cut -f2 -d-)
+            repodir="${STAGING_DIR}/${image_arch}/${repo##*/}"
+            ;;
+        *)
+            echo "Unknown commit purpose \"${purpose}\" for ${repo}" >>"${changelog}"
+            continue
+            ;;
         esac
         pushd "${repodir}" >/dev/null
-        echo "# ${repo##*/} ${purpose} ${old_commit} to ${new_commit}" >> "${changelog}"
+        echo "# ${repo##*/} ${purpose} ${old_commit} to ${new_commit}" >>"${changelog}"
         (git log \
-             --no-merges \
-             --pretty="format:%H %cI %s" \
-             --no-decorate \
-             "${old_commit}..${new_commit}" \
-             || echo "There was an error determining the changes") >> "${changelog}"
-        echo >> "${changelog}"
+            --no-merges \
+            --pretty="format:%H %cI %s" \
+            --no-decorate \
+            "${old_commit}..${new_commit}" ||
+            echo "There was an error determining the changes") >>"${changelog}"
+        echo >>"${changelog}"
         popd >/dev/null
-    done < "${new_commits_file}"
+    done <"${new_commits_file}"
 
     cp "${new_commits_file}" "${old_commits_file}"
 
-    (cd "${REPOROOT}" && \
-         test -n "$(git status -s scripts/auto-rebase/changelog.txt scripts/auto-rebase/commits.txt)" && \
-         title "## Committing changes to changelog" && \
-         git add scripts/auto-rebase/commits.txt scripts/auto-rebase/changelog.txt && \
-         git commit -m "update changelog" || true)
+    (cd "${REPOROOT}" &&
+        test -n "$(git status -s scripts/auto-rebase/changelog.txt scripts/auto-rebase/commits.txt)" &&
+        title "## Committing changes to changelog" &&
+        git add scripts/auto-rebase/commits.txt scripts/auto-rebase/changelog.txt &&
+        git commit -m "update changelog" || true)
 
 }
-
 
 # Runs each rebase step in sequence, commiting the step's output to git
 rebase_to() {
@@ -886,7 +874,6 @@ rebase_to() {
     rm -rf "$REPOROOT/_output"
 }
 
-
 usage() {
     echo "Usage:"
     echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM         Performs all the steps to rebase to a release image. Specify both amd64 and arm64."
@@ -901,19 +888,19 @@ usage() {
 
 command=${1:-help}
 case "$command" in
-    to)
-        [[ $# -ne 3 ]] && usage
-        rebase_to "$2" "$3"
-        ;;
-    download)
-        [[ $# -ne 3 ]] && usage
-        download_release "$2" "$3"
-        ;;
-    changelog) update_changelog;;
-    buildfiles) update_buildfiles;;
-    go.mod) update_go_mod;;
-    generated-apis) regenerate_openapi;;
-    images) update_images;;
-    manifests) update_manifests;;
-    *) usage;;
+to)
+    [[ $# -ne 3 ]] && usage
+    rebase_to "$2" "$3"
+    ;;
+download)
+    [[ $# -ne 3 ]] && usage
+    download_release "$2" "$3"
+    ;;
+changelog) update_changelog ;;
+buildfiles) update_buildfiles ;;
+go.mod) update_go_mod ;;
+generated-apis) regenerate_openapi ;;
+images) update_images ;;
+manifests) update_manifests ;;
+*) usage ;;
 esac
