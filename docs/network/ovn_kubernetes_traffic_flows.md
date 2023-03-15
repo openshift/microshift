@@ -29,7 +29,7 @@ Below is the node/service/pod information used for the traffic flow examples in 
 ```text
 (host)$ oc get nodes -o wide
 NAME             STATUS   ROLES                         AGE    VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE
-microshift-dev   Ready    control-plane,master,worker   6d6h   v1.25.0   192.168.122.14   <none>        Red Hat Enterprise Linux 8.6 (Ootpa)
+microshift-dev   Ready    control-plane,master,worker   6d6h   v1.26.0   192.168.122.14   <none>        Red Hat Enterprise Linux 9.1 (Plow)
 
 (host)$ oc get pods -A -o wide
 NAMESPACE                  NAME                                  READY   STATUS       RESTARTS     AGE    IP               NODE
