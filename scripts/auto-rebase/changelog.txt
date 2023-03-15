@@ -1,254 +1,30 @@
-# cluster-dns-operator embedded-component ccd55d043b09c64ed4d5d8ed102cc2a0cb09cb3b to d96022a4d0d091955d73e7e99fc8cc81db56c86a
-195cabc41851da30d793eadc0720729bd628cdaa 2023-02-01T16:13:26-05:00 update-node-resolver.sh: Check for errors from >>
-# cluster-ingress-operator embedded-component 8eb2c667fd31a67d52c4d0ea6c5f014a9fe2ce0d to 6aa482c551de22016dc2b6c87ca11ef4ac2be04d
-f7bfa8949af33745f324fb68a71fc190b1c24deb 2023-01-27T15:27:44-05:00 NE-1186: Test_getRR: Fix typo: "excepted" → "expected"
-25eee8e06756f411e9eb94c000942751abe920ce 2022-11-23T09:13:37-06:00 configurable-route: Don't use NewKindWithCache
-# cluster-network-operator embedded-component 4d5a093d41e45def540ffbe4c5dc214550864d53 to c0208114e49b3ee34bb073ea7d09cf82273573b0
-d0c1518a642b07a8394c79e9e323c641c61659fa 2023-03-02T10:09:15-08:00 Add UTs around expanding clusternetwork CIDR mask
-5ea7d9162436d0814c2fff7e66850a9030f5db7b 2023-03-02T10:09:15-08:00 refactor out tests from larger TestIsChangeSafe()
-9d1ccf753f6b62460a73a663a042d168dcbccec6 2023-03-02T10:09:14-08:00 allow for expanding clusterNetwork CIDR mask
-d91d378516cc89295693e374eaa03b9275e24c35 2023-03-01T10:28:00-05:00 Enables nodeSelector to be used in egress firewall rule
-6da63840574bfa8b0abb188a9547adc505c7da30 2023-03-01T13:31:22+00:00 OVN IC: migrate subnet alloc alerts to cluster manager
-851a2512479252b5fe2074bb6bebedae345df60d 2023-02-23T16:03:58+01:00 Add ovnk alert for resource retry failure
-3a76d935df9fc54215a70a850da8a4dcd4ea0506 2023-02-10T18:41:46-06:00 ovn-kubernetes: use RHEL9-based images
-# kubernetes embedded-component 89232647de67ea787d339b1bd7c780a0ed97f3f9 to bc894ae6a3e52346a6cfec06c49c6cf78c12b2af
-219d4a68d1d9d0f3d805bc6b502b202f9d39b453 2023-03-03T10:44:43-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-2a18fca92cc928e763947fa0e6736d6ee22ddc5a 2023-03-03T10:44:21-05:00 UPSTREAM: <carry>: kubelet: fix readiness probes with pod termination
-20c1e3acdbd4f33d6096eb7cdc4cb5aae4e826b0 2023-03-03T10:25:46-05:00 UPSTREAM: <drop>: manually resolve conflicts
-5bb8838b4a2408385113ba108465bbcd4d19dd63 2023-02-28T13:17:25+01:00 UPSTREAM: 115968: add SeccompProfile to Pod and Container accessors/mutators
-d405dc93fb9145e771d76fc1c8951d345a9e4d41 2023-02-27T11:35:30+01:00 UPSTREAM: <carry>: PSa metrics: unset ocp_namespace on non-platform namespaces
-9626fc26ae199773b64a36f3bc699c78ca857dc7 2023-02-23T13:30:48-05:00 UPSTREAM: <drop>: OCPBUGS-5991: Kube APIServer panics in admission controller
-fc04e732bb3e7198d2fa44efa5457c7c6f8c0f5b 2023-02-22T13:32:21+00:00 Release commit for Kubernetes v1.26.2
-22d484661c514ddc00058c4bc677710cc3c25f15 2023-02-16T13:29:55-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-40eb36a15bac21c0375eeeba3141b891fd9de104 2023-02-16T14:11:41+01:00 releng: Update images, dependencies and version to Go 1.19.6
-26d4675e15df0fcc9a749e66fb3bdb82871f84d1 2023-02-14T23:18:23-05:00 Update golang.org/x/net to v0.7.0
-c5fe6226c4aee24c100cf35fdf105ad3abf82026 2023-02-08T18:06:10-08:00 Pin golang.org/x/net to v0.4.0 in 1.26
-4e95e99f00e4a2dad2c528f756bad1dce3bd5b21 2023-02-08T16:20:15-08:00 Enforce nodeName cannot be set along with non empty schedulingGates
-be1dc7d5c8d401a81365445859f0bffca3b09863 2023-02-08T13:56:28+05:30 *: Fix linter warnings
-07ee81cf87cc430dc098dc5afa21edf25c6b5ec0 2023-02-08T11:41:27+05:30 hack/tools: Bump golangci-lint version
-c651e4f7da1c43ddd956fbba303e990d6f27130a 2023-02-06T20:38:48-05:00 kubelet/client: collapse transport wiring onto standard approach
-5a6e365e101fd730ad7fedf76d497f8f6e24de8d 2023-02-06T17:37:22+00:00 Ignore container events with nil PodSandboxStatus
-6d4db15bf6c8079a3600f5992e36cd56502e8a30 2023-02-02T11:51:58-05:00 apiserver: remove 34s from DELETECOLLECTION rest handler
-a082cbd237439191326eaddfdcc09d449e5bb795 2023-02-01T23:16:53+00:00 update prev succeeded indexes for indexed jobs unconditionally
-b10dce49c3cb782404e09f50547120a736c03969 2023-01-30T15:37:01+01:00 dynamic resource allocation: avoid apiserver complaint about list content
-15b48cd3a0d5eb35ddf2ad14c6755aacf47c4377 2023-01-29T19:55:51-05:00 Avoid typechecking stdlib
-a9edc2c2191ae9b9fb527f9d65fa7d73406261ed 2023-01-27T12:40:09-08:00 Fix konnectivity-client metric registration.
-aa950773cf7d0c772108980df7b5ca0f81fbb40f 2023-01-26T21:52:53+00:00 Fix nil pointer error in nodevolumelimits csi logging
-d3b0f3f7db011e2d8e6781954a87d9f20312b8cf 2023-01-26T21:28:41+00:00 add scale test for probes
-7d2254d97b2755b337d02f9d78b0dc7bcc6fbe53 2023-01-26T10:51:24-03:00 kubectl: use v2 for hpa
-4cd96e61438d16345d611672f09266930e898331 2023-01-26T11:21:49+00:00 Fix panic on ClusterIP allocation for /28 subnets
-b6429e3d3490ad190e93f4d20c73b489b54807c7 2023-01-23T21:28:03+00:00 use custom dialer for http probes
-cc7e738f55d81a7c91edc1779061aad91b273697 2023-01-23T21:28:03+00:00 use custom dialer for tcp probes
-b48139c6570864c45245a1bd9ddd6eebaaf34d02 2023-01-23T21:28:03+00:00 add custom dialer optimized for probes
-5dc78931ff6bb9f60c9f399a10d20baff137e4db 2023-01-20T15:31:56+01:00 k8s.io/component-base/logs: match full help text in unit test
-576b56a587367cb44866c0605ac746a3bc57f465 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: relax flagset unit tests
-ce665b2a60395438d4e0026dd1760546d297b446 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: unit test for command line help output
-6495dd02edc337c0019414083de4b9a5064f4bcf 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: fix usage through Go flag package
-0b0a325bb812dc54fe305f4486fcefc11a5dfe70 2023-01-18T14:52:17-08:00 fix bug with param controllers being removed if used by more than one policy
-7ec8de509507505a37f5398e444596290977c286 2023-01-18T12:03:18-05:00 Fix shadowing lint error
-8f86f5739b38898bd0813780be82884179cdc429 2023-01-18T12:03:15-05:00 bump honnef.co/go/tools to support go1.20
-070518c50c0d045abc7765002087bc5f5f57a49d 2023-01-18T16:50:15+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.1
-8017dfff6ed8ec635aa89cd7f243e42369bf29b9 2023-01-18T15:51:25+00:00 Release commit for Kubernetes v1.26.2-rc.0
-8f94681cd294aa8cfd3407b8191f6c70214973a4 2023-01-18T15:51:24+00:00 Release commit for Kubernetes v1.26.1
-0248aa84d9a5155013da9ecda01740615e880bea 2023-01-17T20:03:15-08:00 Fixes the issue #114145
-0f05e26221bb85d86f784d55a5b12a2dfdc74bcf 2023-01-16T11:14:49+01:00 PodGC should not add DisruptionTarget condition for pods which are in terminal phase
-fd2245b845262be666ee56672598981e9487f247 2023-01-12T21:31:37+05:30 pkg/controller/job: re-honor exponential backoff
-fcc4ed670c6444aa8e636bd9ee81275a7b4a9817 2023-01-12T14:02:58+01:00 releng: Update images, dependencies and version to Go 1.19.5
-d23d4afdc05d94afcdb11fa7c6470bd6829512db 2023-01-12T10:03:57+01:00 Do not include scheduler name in the preemption event message
-242b82c860da1c880c326b70c84cfb4086dddd4d 2023-01-11T23:04:50-08:00 Explicitly call rand.Seed() method
-0085f2537be4154a5cce146617026f61c1a94efc 2023-01-10T19:32:26+00:00 Exports WarningPrinter field in DeleteOptions
-424b877bd604a29205ba3d2001f6c33dfa646704 2023-01-10T12:22:05-05:00 Improve vendor verification works for each staging repo
-5b7b949326199c18039c54c39107d61133fd03e4 2023-01-10T10:10:21+01:00 Do not leak cross namespace pod metadata in preemption events
-707031462a2fd9b11c98040001147a011ecdb34f 2023-01-10T10:06:11+01:00 Adjust DisruptionTarget condition message to do not include preemptor pod metadata
-91228a5749ca4cc370fb6b0fbea6a2836cc93c10 2023-01-09T19:22:52+00:00 egress_selector.go: register konnectivity-client metrics.
-57cea1f4d2dbb86a4df4f2bbf42a7fa75c21d057 2023-01-09T19:22:23+00:00 expose prometheus.Registerer so that we can hook into this from external sources
-529e773d9521fc209e93bbf63f90358219aaf725 2023-01-09T19:22:05+00:00 Bump konnectivity-client to v0.0.35
-fc27c43db28014bb185871da7ab14b0b065466f1 2023-01-05T15:17:47-05:00 Cherry pick 114857 to release-1.26
-c25004b88feadf069b3900649703bea00b942526 2023-01-05T12:54:40+05:30 Automated cherry pick of #114602: Removed the reverted changes from Changelogv1.26.md
-bfda7f6364105ee28a56e4bd77fcefbd1e22697f 2023-01-04T22:22:11+09:00 Update daemonSet status even if syncDaemonSet fails
-640f15b876569613d0c42cd2f311c55a091bcba1 2023-01-04T12:26:06+01:00 Licensing: skip modules with fewer subdirs than mods
-da22a8fd21eebc70c241ae23d0b00f6d758c51a1 2023-01-03T21:11:39+00:00 Fix issues in volumesnapshot test for ephemeral storage
-cceaf6c3ae51d45e71438c011ac958f00a5f60d1 2023-01-03T16:38:02+01:00 Fix clearing rate limiter in disruption controller
-b897fb4fa385881c9719b5f085198234e6dc11f1 2022-12-28T21:28:03+00:00 Add pod to dsw if termination is not completed during reconstruction #issues/113979
-a5c0a5f04681bbcd8b818df3e7c8d968735a8af2 2022-12-22T13:23:24-05:00 Add .go-version file containing build go version
-5e22175b1d9b623c3db4d7f61ab881bb17b2795c 2022-12-20T22:08:34+00:00 Resource claims should be a map type
-0b0eee5cc61a0db82138fc65f8114a8727be8657 2022-12-16T07:48:00+05:30 Windows Kube-Proxy implementation for internal traffic policy.
-cbeb5809b8cf5cfa1d7c076b6305d55ea40e4ae2 2022-12-15T15:16:56-08:00 Fix a regression that scheduler always go through all Filter plugins
-bbb5513b3b4c956c486685886634c71ce7c31b9f 2022-12-15T22:21:58+02:00 Fix SPDY proxy authentication with special chars
-674db522815df566ffae7fbe8daf5f8e3ced9033 2022-12-15T22:21:58+02:00 Improve error message when proxy connection fails
-de757c46a01b1b6236c7d1de273c3f33cf4f6dc5 2022-12-13T10:02:40-08:00 fix double lock and excercise its codepath in tests
-180e7dbbd61c1a0a2b4340f682b9a5fc38022ef2 2022-12-13T11:16:35-05:00 Reduce load of Job integration test
-e5539672b1394a3cbe0240fa179a38cac5b12433 2022-12-13T20:01:07+05:30 Creating Ingress IP loadbalancer alone when all the endpoints are terminating. KEP1669
-a3c81d8b4da61ebc1e1986a04055788189ee3fcd 2022-12-12T17:05:27+01:00 Deflake a preemption test that may patch Node incorrectly
-f8b99b1f09fb5d4d10b15e326c4b242cc705f007 2022-12-11T19:26:01-08:00 Check the correct error in d.downloadAPIs
-5108c2dde6deb08939e799e8bfd6bf75f7daa081 2022-12-08T20:50:46+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.0
-4c5225033fe188d19435cae8c1496d4aef7306ba 2022-12-08T19:51:44+00:00 Release commit for Kubernetes v1.26.1-rc.0
-a9241b145d77337314ffaa6e87b2579f9298ee2f 2022-11-21T17:01:38+05:30 Introducing LoadbalancerPortMapping flags for VipExternalIP
-40f01d0c811c49a22b7557f7d8d06e3af6b4cabd 2022-11-17T21:47:35-05:00 Limit request retrying to []byte request bodies
-# machine-config-operator embedded-component c078cdd2614e409faf0e9b13d97c426c065a71da to a8692a763fe156990882489908584be2363a3303
-3234b724123aa3fcb1c05b23ace77911e440fae7 2023-02-28T12:50:31-06:00 OPNET-208: Prefer ipv6 on v6-primary dual stack deployments
-626a3369ffcaf231be502197620fca575f404d1d 2023-02-27T20:32:46+02:00 Fixing platform path order as platform specific path should be the last
-865c41482f96ddb818b17971b44713d6e0a453eb 2023-02-23T14:49:28-05:00 daemon: Added no-op sync while waiting on node reboot
-459993144c7a74a6a3217a2d37d2ffc018d03cdd 2023-02-23T13:00:15-05:00 Add back cleanupDuplicateMC
-69c98ccbabe8f502cc9b671fd4d5143fb7d2800a 2023-02-21T16:56:41-06:00 added e2e testing to ensure password is updated and confirmed
-de59bd288d854c5146243e6f9d46a425a9074e7e 2023-02-17T10:39:47-06:00 set passwordhash enabled, udpated verifyUserFields, reworded comments
-# openshift-controller-manager embedded-component 1c8021fcf40ccdc95a16bd8569b5ce53ecc09f0a to 87de83867ac51730f506138ee790a56ca21d9fc9
-a9be5578800a57fb6b1ae0c078c7e4abf1d94db3 2023-01-19T11:41:05-05:00 Add explicit license
-# oc image-amd64 83fd126d7c7c598b1bfa398641d330e24596c2cf to 02362102a19e81ebecb90906f41687e4e4350dfe
-fe31e03201d00fa3ebe4a66b1f0c8e1ff1c3c43e 2023-02-28T15:53:55+01:00 Microshift command docs
-39679d53195c77ff541aeea2717b25bc2a03b3bc 2023-02-27T15:13:52+01:00 groupsync: cache ldap connection instead of spamming the LDAP server with conn/bind
-adce7bab1211a4ace5b910359d6203572c013a26 2023-02-27T15:13:52+01:00 bump(library-go): update to LDAP queries library
-b186341885cab69f82673153985fb721b9f9ade6 2023-02-21T11:07:44+01:00 Do not set master node selector if there's no masters
-# kubernetes image-amd64 89232647de67ea787d339b1bd7c780a0ed97f3f9 to bc894ae6a3e52346a6cfec06c49c6cf78c12b2af
-219d4a68d1d9d0f3d805bc6b502b202f9d39b453 2023-03-03T10:44:43-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-2a18fca92cc928e763947fa0e6736d6ee22ddc5a 2023-03-03T10:44:21-05:00 UPSTREAM: <carry>: kubelet: fix readiness probes with pod termination
-20c1e3acdbd4f33d6096eb7cdc4cb5aae4e826b0 2023-03-03T10:25:46-05:00 UPSTREAM: <drop>: manually resolve conflicts
-5bb8838b4a2408385113ba108465bbcd4d19dd63 2023-02-28T13:17:25+01:00 UPSTREAM: 115968: add SeccompProfile to Pod and Container accessors/mutators
-d405dc93fb9145e771d76fc1c8951d345a9e4d41 2023-02-27T11:35:30+01:00 UPSTREAM: <carry>: PSa metrics: unset ocp_namespace on non-platform namespaces
-9626fc26ae199773b64a36f3bc699c78ca857dc7 2023-02-23T13:30:48-05:00 UPSTREAM: <drop>: OCPBUGS-5991: Kube APIServer panics in admission controller
-fc04e732bb3e7198d2fa44efa5457c7c6f8c0f5b 2023-02-22T13:32:21+00:00 Release commit for Kubernetes v1.26.2
-22d484661c514ddc00058c4bc677710cc3c25f15 2023-02-16T13:29:55-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-40eb36a15bac21c0375eeeba3141b891fd9de104 2023-02-16T14:11:41+01:00 releng: Update images, dependencies and version to Go 1.19.6
-26d4675e15df0fcc9a749e66fb3bdb82871f84d1 2023-02-14T23:18:23-05:00 Update golang.org/x/net to v0.7.0
-c5fe6226c4aee24c100cf35fdf105ad3abf82026 2023-02-08T18:06:10-08:00 Pin golang.org/x/net to v0.4.0 in 1.26
-4e95e99f00e4a2dad2c528f756bad1dce3bd5b21 2023-02-08T16:20:15-08:00 Enforce nodeName cannot be set along with non empty schedulingGates
-be1dc7d5c8d401a81365445859f0bffca3b09863 2023-02-08T13:56:28+05:30 *: Fix linter warnings
-07ee81cf87cc430dc098dc5afa21edf25c6b5ec0 2023-02-08T11:41:27+05:30 hack/tools: Bump golangci-lint version
-c651e4f7da1c43ddd956fbba303e990d6f27130a 2023-02-06T20:38:48-05:00 kubelet/client: collapse transport wiring onto standard approach
-5a6e365e101fd730ad7fedf76d497f8f6e24de8d 2023-02-06T17:37:22+00:00 Ignore container events with nil PodSandboxStatus
-6d4db15bf6c8079a3600f5992e36cd56502e8a30 2023-02-02T11:51:58-05:00 apiserver: remove 34s from DELETECOLLECTION rest handler
-a082cbd237439191326eaddfdcc09d449e5bb795 2023-02-01T23:16:53+00:00 update prev succeeded indexes for indexed jobs unconditionally
-b10dce49c3cb782404e09f50547120a736c03969 2023-01-30T15:37:01+01:00 dynamic resource allocation: avoid apiserver complaint about list content
-15b48cd3a0d5eb35ddf2ad14c6755aacf47c4377 2023-01-29T19:55:51-05:00 Avoid typechecking stdlib
-a9edc2c2191ae9b9fb527f9d65fa7d73406261ed 2023-01-27T12:40:09-08:00 Fix konnectivity-client metric registration.
-aa950773cf7d0c772108980df7b5ca0f81fbb40f 2023-01-26T21:52:53+00:00 Fix nil pointer error in nodevolumelimits csi logging
-d3b0f3f7db011e2d8e6781954a87d9f20312b8cf 2023-01-26T21:28:41+00:00 add scale test for probes
-7d2254d97b2755b337d02f9d78b0dc7bcc6fbe53 2023-01-26T10:51:24-03:00 kubectl: use v2 for hpa
-4cd96e61438d16345d611672f09266930e898331 2023-01-26T11:21:49+00:00 Fix panic on ClusterIP allocation for /28 subnets
-b6429e3d3490ad190e93f4d20c73b489b54807c7 2023-01-23T21:28:03+00:00 use custom dialer for http probes
-cc7e738f55d81a7c91edc1779061aad91b273697 2023-01-23T21:28:03+00:00 use custom dialer for tcp probes
-b48139c6570864c45245a1bd9ddd6eebaaf34d02 2023-01-23T21:28:03+00:00 add custom dialer optimized for probes
-5dc78931ff6bb9f60c9f399a10d20baff137e4db 2023-01-20T15:31:56+01:00 k8s.io/component-base/logs: match full help text in unit test
-576b56a587367cb44866c0605ac746a3bc57f465 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: relax flagset unit tests
-ce665b2a60395438d4e0026dd1760546d297b446 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: unit test for command line help output
-6495dd02edc337c0019414083de4b9a5064f4bcf 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: fix usage through Go flag package
-0b0a325bb812dc54fe305f4486fcefc11a5dfe70 2023-01-18T14:52:17-08:00 fix bug with param controllers being removed if used by more than one policy
-7ec8de509507505a37f5398e444596290977c286 2023-01-18T12:03:18-05:00 Fix shadowing lint error
-8f86f5739b38898bd0813780be82884179cdc429 2023-01-18T12:03:15-05:00 bump honnef.co/go/tools to support go1.20
-070518c50c0d045abc7765002087bc5f5f57a49d 2023-01-18T16:50:15+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.1
-8017dfff6ed8ec635aa89cd7f243e42369bf29b9 2023-01-18T15:51:25+00:00 Release commit for Kubernetes v1.26.2-rc.0
-8f94681cd294aa8cfd3407b8191f6c70214973a4 2023-01-18T15:51:24+00:00 Release commit for Kubernetes v1.26.1
-0248aa84d9a5155013da9ecda01740615e880bea 2023-01-17T20:03:15-08:00 Fixes the issue #114145
-0f05e26221bb85d86f784d55a5b12a2dfdc74bcf 2023-01-16T11:14:49+01:00 PodGC should not add DisruptionTarget condition for pods which are in terminal phase
-fd2245b845262be666ee56672598981e9487f247 2023-01-12T21:31:37+05:30 pkg/controller/job: re-honor exponential backoff
-fcc4ed670c6444aa8e636bd9ee81275a7b4a9817 2023-01-12T14:02:58+01:00 releng: Update images, dependencies and version to Go 1.19.5
-d23d4afdc05d94afcdb11fa7c6470bd6829512db 2023-01-12T10:03:57+01:00 Do not include scheduler name in the preemption event message
-242b82c860da1c880c326b70c84cfb4086dddd4d 2023-01-11T23:04:50-08:00 Explicitly call rand.Seed() method
-0085f2537be4154a5cce146617026f61c1a94efc 2023-01-10T19:32:26+00:00 Exports WarningPrinter field in DeleteOptions
-424b877bd604a29205ba3d2001f6c33dfa646704 2023-01-10T12:22:05-05:00 Improve vendor verification works for each staging repo
-5b7b949326199c18039c54c39107d61133fd03e4 2023-01-10T10:10:21+01:00 Do not leak cross namespace pod metadata in preemption events
-707031462a2fd9b11c98040001147a011ecdb34f 2023-01-10T10:06:11+01:00 Adjust DisruptionTarget condition message to do not include preemptor pod metadata
-91228a5749ca4cc370fb6b0fbea6a2836cc93c10 2023-01-09T19:22:52+00:00 egress_selector.go: register konnectivity-client metrics.
-57cea1f4d2dbb86a4df4f2bbf42a7fa75c21d057 2023-01-09T19:22:23+00:00 expose prometheus.Registerer so that we can hook into this from external sources
-529e773d9521fc209e93bbf63f90358219aaf725 2023-01-09T19:22:05+00:00 Bump konnectivity-client to v0.0.35
-fc27c43db28014bb185871da7ab14b0b065466f1 2023-01-05T15:17:47-05:00 Cherry pick 114857 to release-1.26
-c25004b88feadf069b3900649703bea00b942526 2023-01-05T12:54:40+05:30 Automated cherry pick of #114602: Removed the reverted changes from Changelogv1.26.md
-bfda7f6364105ee28a56e4bd77fcefbd1e22697f 2023-01-04T22:22:11+09:00 Update daemonSet status even if syncDaemonSet fails
-640f15b876569613d0c42cd2f311c55a091bcba1 2023-01-04T12:26:06+01:00 Licensing: skip modules with fewer subdirs than mods
-da22a8fd21eebc70c241ae23d0b00f6d758c51a1 2023-01-03T21:11:39+00:00 Fix issues in volumesnapshot test for ephemeral storage
-cceaf6c3ae51d45e71438c011ac958f00a5f60d1 2023-01-03T16:38:02+01:00 Fix clearing rate limiter in disruption controller
-b897fb4fa385881c9719b5f085198234e6dc11f1 2022-12-28T21:28:03+00:00 Add pod to dsw if termination is not completed during reconstruction #issues/113979
-a5c0a5f04681bbcd8b818df3e7c8d968735a8af2 2022-12-22T13:23:24-05:00 Add .go-version file containing build go version
-5e22175b1d9b623c3db4d7f61ab881bb17b2795c 2022-12-20T22:08:34+00:00 Resource claims should be a map type
-0b0eee5cc61a0db82138fc65f8114a8727be8657 2022-12-16T07:48:00+05:30 Windows Kube-Proxy implementation for internal traffic policy.
-cbeb5809b8cf5cfa1d7c076b6305d55ea40e4ae2 2022-12-15T15:16:56-08:00 Fix a regression that scheduler always go through all Filter plugins
-bbb5513b3b4c956c486685886634c71ce7c31b9f 2022-12-15T22:21:58+02:00 Fix SPDY proxy authentication with special chars
-674db522815df566ffae7fbe8daf5f8e3ced9033 2022-12-15T22:21:58+02:00 Improve error message when proxy connection fails
-de757c46a01b1b6236c7d1de273c3f33cf4f6dc5 2022-12-13T10:02:40-08:00 fix double lock and excercise its codepath in tests
-180e7dbbd61c1a0a2b4340f682b9a5fc38022ef2 2022-12-13T11:16:35-05:00 Reduce load of Job integration test
-e5539672b1394a3cbe0240fa179a38cac5b12433 2022-12-13T20:01:07+05:30 Creating Ingress IP loadbalancer alone when all the endpoints are terminating. KEP1669
-a3c81d8b4da61ebc1e1986a04055788189ee3fcd 2022-12-12T17:05:27+01:00 Deflake a preemption test that may patch Node incorrectly
-f8b99b1f09fb5d4d10b15e326c4b242cc705f007 2022-12-11T19:26:01-08:00 Check the correct error in d.downloadAPIs
-5108c2dde6deb08939e799e8bfd6bf75f7daa081 2022-12-08T20:50:46+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.0
-4c5225033fe188d19435cae8c1496d4aef7306ba 2022-12-08T19:51:44+00:00 Release commit for Kubernetes v1.26.1-rc.0
-a9241b145d77337314ffaa6e87b2579f9298ee2f 2022-11-21T17:01:38+05:30 Introducing LoadbalancerPortMapping flags for VipExternalIP
-40f01d0c811c49a22b7557f7d8d06e3af6b4cabd 2022-11-17T21:47:35-05:00 Limit request retrying to []byte request bodies
-# oc image-arm64 83fd126d7c7c598b1bfa398641d330e24596c2cf to 02362102a19e81ebecb90906f41687e4e4350dfe
-fe31e03201d00fa3ebe4a66b1f0c8e1ff1c3c43e 2023-02-28T15:53:55+01:00 Microshift command docs
-39679d53195c77ff541aeea2717b25bc2a03b3bc 2023-02-27T15:13:52+01:00 groupsync: cache ldap connection instead of spamming the LDAP server with conn/bind
-adce7bab1211a4ace5b910359d6203572c013a26 2023-02-27T15:13:52+01:00 bump(library-go): update to LDAP queries library
-b186341885cab69f82673153985fb721b9f9ade6 2023-02-21T11:07:44+01:00 Do not set master node selector if there's no masters
-# kubernetes image-arm64 89232647de67ea787d339b1bd7c780a0ed97f3f9 to bc894ae6a3e52346a6cfec06c49c6cf78c12b2af
-219d4a68d1d9d0f3d805bc6b502b202f9d39b453 2023-03-03T10:44:43-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-2a18fca92cc928e763947fa0e6736d6ee22ddc5a 2023-03-03T10:44:21-05:00 UPSTREAM: <carry>: kubelet: fix readiness probes with pod termination
-20c1e3acdbd4f33d6096eb7cdc4cb5aae4e826b0 2023-03-03T10:25:46-05:00 UPSTREAM: <drop>: manually resolve conflicts
-5bb8838b4a2408385113ba108465bbcd4d19dd63 2023-02-28T13:17:25+01:00 UPSTREAM: 115968: add SeccompProfile to Pod and Container accessors/mutators
-d405dc93fb9145e771d76fc1c8951d345a9e4d41 2023-02-27T11:35:30+01:00 UPSTREAM: <carry>: PSa metrics: unset ocp_namespace on non-platform namespaces
-9626fc26ae199773b64a36f3bc699c78ca857dc7 2023-02-23T13:30:48-05:00 UPSTREAM: <drop>: OCPBUGS-5991: Kube APIServer panics in admission controller
-fc04e732bb3e7198d2fa44efa5457c7c6f8c0f5b 2023-02-22T13:32:21+00:00 Release commit for Kubernetes v1.26.2
-22d484661c514ddc00058c4bc677710cc3c25f15 2023-02-16T13:29:55-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-40eb36a15bac21c0375eeeba3141b891fd9de104 2023-02-16T14:11:41+01:00 releng: Update images, dependencies and version to Go 1.19.6
-26d4675e15df0fcc9a749e66fb3bdb82871f84d1 2023-02-14T23:18:23-05:00 Update golang.org/x/net to v0.7.0
-c5fe6226c4aee24c100cf35fdf105ad3abf82026 2023-02-08T18:06:10-08:00 Pin golang.org/x/net to v0.4.0 in 1.26
-4e95e99f00e4a2dad2c528f756bad1dce3bd5b21 2023-02-08T16:20:15-08:00 Enforce nodeName cannot be set along with non empty schedulingGates
-be1dc7d5c8d401a81365445859f0bffca3b09863 2023-02-08T13:56:28+05:30 *: Fix linter warnings
-07ee81cf87cc430dc098dc5afa21edf25c6b5ec0 2023-02-08T11:41:27+05:30 hack/tools: Bump golangci-lint version
-c651e4f7da1c43ddd956fbba303e990d6f27130a 2023-02-06T20:38:48-05:00 kubelet/client: collapse transport wiring onto standard approach
-5a6e365e101fd730ad7fedf76d497f8f6e24de8d 2023-02-06T17:37:22+00:00 Ignore container events with nil PodSandboxStatus
-6d4db15bf6c8079a3600f5992e36cd56502e8a30 2023-02-02T11:51:58-05:00 apiserver: remove 34s from DELETECOLLECTION rest handler
-a082cbd237439191326eaddfdcc09d449e5bb795 2023-02-01T23:16:53+00:00 update prev succeeded indexes for indexed jobs unconditionally
-b10dce49c3cb782404e09f50547120a736c03969 2023-01-30T15:37:01+01:00 dynamic resource allocation: avoid apiserver complaint about list content
-15b48cd3a0d5eb35ddf2ad14c6755aacf47c4377 2023-01-29T19:55:51-05:00 Avoid typechecking stdlib
-a9edc2c2191ae9b9fb527f9d65fa7d73406261ed 2023-01-27T12:40:09-08:00 Fix konnectivity-client metric registration.
-aa950773cf7d0c772108980df7b5ca0f81fbb40f 2023-01-26T21:52:53+00:00 Fix nil pointer error in nodevolumelimits csi logging
-d3b0f3f7db011e2d8e6781954a87d9f20312b8cf 2023-01-26T21:28:41+00:00 add scale test for probes
-7d2254d97b2755b337d02f9d78b0dc7bcc6fbe53 2023-01-26T10:51:24-03:00 kubectl: use v2 for hpa
-4cd96e61438d16345d611672f09266930e898331 2023-01-26T11:21:49+00:00 Fix panic on ClusterIP allocation for /28 subnets
-b6429e3d3490ad190e93f4d20c73b489b54807c7 2023-01-23T21:28:03+00:00 use custom dialer for http probes
-cc7e738f55d81a7c91edc1779061aad91b273697 2023-01-23T21:28:03+00:00 use custom dialer for tcp probes
-b48139c6570864c45245a1bd9ddd6eebaaf34d02 2023-01-23T21:28:03+00:00 add custom dialer optimized for probes
-5dc78931ff6bb9f60c9f399a10d20baff137e4db 2023-01-20T15:31:56+01:00 k8s.io/component-base/logs: match full help text in unit test
-576b56a587367cb44866c0605ac746a3bc57f465 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: relax flagset unit tests
-ce665b2a60395438d4e0026dd1760546d297b446 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: unit test for command line help output
-6495dd02edc337c0019414083de4b9a5064f4bcf 2023-01-20T15:30:36+01:00 k8s.io/component-base/logs: fix usage through Go flag package
-0b0a325bb812dc54fe305f4486fcefc11a5dfe70 2023-01-18T14:52:17-08:00 fix bug with param controllers being removed if used by more than one policy
-7ec8de509507505a37f5398e444596290977c286 2023-01-18T12:03:18-05:00 Fix shadowing lint error
-8f86f5739b38898bd0813780be82884179cdc429 2023-01-18T12:03:15-05:00 bump honnef.co/go/tools to support go1.20
-070518c50c0d045abc7765002087bc5f5f57a49d 2023-01-18T16:50:15+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.1
-8017dfff6ed8ec635aa89cd7f243e42369bf29b9 2023-01-18T15:51:25+00:00 Release commit for Kubernetes v1.26.2-rc.0
-8f94681cd294aa8cfd3407b8191f6c70214973a4 2023-01-18T15:51:24+00:00 Release commit for Kubernetes v1.26.1
-0248aa84d9a5155013da9ecda01740615e880bea 2023-01-17T20:03:15-08:00 Fixes the issue #114145
-0f05e26221bb85d86f784d55a5b12a2dfdc74bcf 2023-01-16T11:14:49+01:00 PodGC should not add DisruptionTarget condition for pods which are in terminal phase
-fd2245b845262be666ee56672598981e9487f247 2023-01-12T21:31:37+05:30 pkg/controller/job: re-honor exponential backoff
-fcc4ed670c6444aa8e636bd9ee81275a7b4a9817 2023-01-12T14:02:58+01:00 releng: Update images, dependencies and version to Go 1.19.5
-d23d4afdc05d94afcdb11fa7c6470bd6829512db 2023-01-12T10:03:57+01:00 Do not include scheduler name in the preemption event message
-242b82c860da1c880c326b70c84cfb4086dddd4d 2023-01-11T23:04:50-08:00 Explicitly call rand.Seed() method
-0085f2537be4154a5cce146617026f61c1a94efc 2023-01-10T19:32:26+00:00 Exports WarningPrinter field in DeleteOptions
-424b877bd604a29205ba3d2001f6c33dfa646704 2023-01-10T12:22:05-05:00 Improve vendor verification works for each staging repo
-5b7b949326199c18039c54c39107d61133fd03e4 2023-01-10T10:10:21+01:00 Do not leak cross namespace pod metadata in preemption events
-707031462a2fd9b11c98040001147a011ecdb34f 2023-01-10T10:06:11+01:00 Adjust DisruptionTarget condition message to do not include preemptor pod metadata
-91228a5749ca4cc370fb6b0fbea6a2836cc93c10 2023-01-09T19:22:52+00:00 egress_selector.go: register konnectivity-client metrics.
-57cea1f4d2dbb86a4df4f2bbf42a7fa75c21d057 2023-01-09T19:22:23+00:00 expose prometheus.Registerer so that we can hook into this from external sources
-529e773d9521fc209e93bbf63f90358219aaf725 2023-01-09T19:22:05+00:00 Bump konnectivity-client to v0.0.35
-fc27c43db28014bb185871da7ab14b0b065466f1 2023-01-05T15:17:47-05:00 Cherry pick 114857 to release-1.26
-c25004b88feadf069b3900649703bea00b942526 2023-01-05T12:54:40+05:30 Automated cherry pick of #114602: Removed the reverted changes from Changelogv1.26.md
-bfda7f6364105ee28a56e4bd77fcefbd1e22697f 2023-01-04T22:22:11+09:00 Update daemonSet status even if syncDaemonSet fails
-640f15b876569613d0c42cd2f311c55a091bcba1 2023-01-04T12:26:06+01:00 Licensing: skip modules with fewer subdirs than mods
-da22a8fd21eebc70c241ae23d0b00f6d758c51a1 2023-01-03T21:11:39+00:00 Fix issues in volumesnapshot test for ephemeral storage
-cceaf6c3ae51d45e71438c011ac958f00a5f60d1 2023-01-03T16:38:02+01:00 Fix clearing rate limiter in disruption controller
-b897fb4fa385881c9719b5f085198234e6dc11f1 2022-12-28T21:28:03+00:00 Add pod to dsw if termination is not completed during reconstruction #issues/113979
-a5c0a5f04681bbcd8b818df3e7c8d968735a8af2 2022-12-22T13:23:24-05:00 Add .go-version file containing build go version
-5e22175b1d9b623c3db4d7f61ab881bb17b2795c 2022-12-20T22:08:34+00:00 Resource claims should be a map type
-0b0eee5cc61a0db82138fc65f8114a8727be8657 2022-12-16T07:48:00+05:30 Windows Kube-Proxy implementation for internal traffic policy.
-cbeb5809b8cf5cfa1d7c076b6305d55ea40e4ae2 2022-12-15T15:16:56-08:00 Fix a regression that scheduler always go through all Filter plugins
-bbb5513b3b4c956c486685886634c71ce7c31b9f 2022-12-15T22:21:58+02:00 Fix SPDY proxy authentication with special chars
-674db522815df566ffae7fbe8daf5f8e3ced9033 2022-12-15T22:21:58+02:00 Improve error message when proxy connection fails
-de757c46a01b1b6236c7d1de273c3f33cf4f6dc5 2022-12-13T10:02:40-08:00 fix double lock and excercise its codepath in tests
-180e7dbbd61c1a0a2b4340f682b9a5fc38022ef2 2022-12-13T11:16:35-05:00 Reduce load of Job integration test
-e5539672b1394a3cbe0240fa179a38cac5b12433 2022-12-13T20:01:07+05:30 Creating Ingress IP loadbalancer alone when all the endpoints are terminating. KEP1669
-a3c81d8b4da61ebc1e1986a04055788189ee3fcd 2022-12-12T17:05:27+01:00 Deflake a preemption test that may patch Node incorrectly
-f8b99b1f09fb5d4d10b15e326c4b242cc705f007 2022-12-11T19:26:01-08:00 Check the correct error in d.downloadAPIs
-5108c2dde6deb08939e799e8bfd6bf75f7daa081 2022-12-08T20:50:46+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.0
-4c5225033fe188d19435cae8c1496d4aef7306ba 2022-12-08T19:51:44+00:00 Release commit for Kubernetes v1.26.1-rc.0
-a9241b145d77337314ffaa6e87b2579f9298ee2f 2022-11-21T17:01:38+05:30 Introducing LoadbalancerPortMapping flags for VipExternalIP
-40f01d0c811c49a22b7557f7d8d06e3af6b4cabd 2022-11-17T21:47:35-05:00 Limit request retrying to []byte request bodies
+# cluster-kube-apiserver-operator embedded-component 6ad0a9407be5d5229d605665986899be4b531b5e to 5cec361179f3658986890a87d0b51f40a1da89ad
+898d8e6d6499349c99dfe5e6bf0b2d4fe9c623eb 2023-03-08T19:55:27+01:00 *: add encryption tests for aesgcm provider
+0905c8657426282e85ddda34bc898555c84fda94 2023-03-08T19:55:05+01:00 bump(library-go,build-machinery-go)
+ced3a4e5e2f6aa99a825121a55f2483add4d091d 2023-03-07T13:30:20+01:00 Disable TestBoundTokenSignerController
+# kubernetes embedded-component bc894ae6a3e52346a6cfec06c49c6cf78c12b2af to 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb
+dd61b9abded58bd2a683e6e15aca02c864296f3d 2023-03-08T14:22:19+00:00 UPSTREAM: 116227: Fix mounted volume expansion tests
+# machine-config-operator embedded-component a8692a763fe156990882489908584be2363a3303 to 02d35277a879c72f48e63c31f36072376c7e2598
+8d66006499528e0939d0f82849193ffc7cc03845 2023-03-10T10:31:40+01:00 daemon: Only switchkernel if we are doing an OS update or kernel change
+26f9ee914e8970e8498b73abfb1b337eedf4bb98 2023-03-09T20:33:56-05:00 Dockerfile: Fix removing extensions for fcos/scos
+f76f989f6708046fd8f94cbf059c11f8e33519b3 2023-03-09T20:24:29-05:00 daemon: Only switchkernel if we are doing an OS update or kernel change
+3463da92918895066475bf4c52edcaa9546632dd 2023-03-09T20:24:29-05:00 daemon: Always remove pending deployment before we do updates
+0c9a071becb07313078f161cd01ba01e309ce1a0 2023-03-09T20:24:29-05:00 daemon: Move cleanup of pending deployment earlier
+963ec9f1ef4f237e1bef2003700245419654cf78 2023-03-10T01:19:07+00:00 openshift-azure-routes: Avoid synchronizing too quickly
+e3e55f177342e8a8ebd41a8cb34874786c2cc4c3 2023-03-10T01:19:07+00:00 daemon: Also override `kernel-modules-core`
+3028a784b175d1962d00fd78931f826d1425f6b6 2023-03-10T01:19:07+00:00 Switch to rhel-coreos (9)
+e3ccab32e102964bb633544c9cd30f857f7471ff 2023-03-10T01:19:07+00:00 checks perms for SSH key path dirs as well
+85ae4ff6314f5aeee50ddf2126c31484ae3e4664 2023-03-10T01:19:07+00:00 teaches TestIgn3Cfg about the new RHCOS 9 key path
+3ea8b6d286f99f9c19a03c3739847d161ddfb9d9 2023-03-10T01:19:07+00:00 ensures SSH keys get moved to the correct location
+bba2cf04169f09be6fa942131987e8344325e868 2023-03-10T01:19:07+00:00 OKD release controller is out-of-date
+a39d54043389605da6f633966dee5dbee0f76095 2023-03-10T01:19:07+00:00 ensures that RHCOS 9 SSH keys are in the right place
+c844f7a78eac41165abe723d26ab9b77d0a6e0ad 2023-03-08T09:49:38-05:00 daemon: Make switchKernel less stateful
+3b34b0794782c3ce9a180a88a62e1eb6d8870439 2023-03-08T09:49:28-05:00 vendor: Bump coreos/rpm-ostree-client-go
+417c591bf074ce22db86bc81358fbab650b8f293 2023-03-08T09:47:27-05:00 daemon: Clean up `switchKernel` a bit
+8c9f2e7587f2d46bfdb37ca540ea4423d87c8cf6 2023-03-08T14:19:43+00:00 Revert "daemon: Temporarily copy auth file with more open perms on FCOS"
+8ffc3e24f61f04de1680c95bf051c785c3f0fc14 2023-03-07T03:54:38+00:00 Fix minor issues
+fff7825abafc5a4de2abf4b5a48b7b5a41dd82a7 2023-03-07T03:54:38+00:00 Default the cgroup version to "v1" via base template controller
+# kubernetes image-amd64 bc894ae6a3e52346a6cfec06c49c6cf78c12b2af to 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb
+dd61b9abded58bd2a683e6e15aca02c864296f3d 2023-03-08T14:22:19+00:00 UPSTREAM: 116227: Fix mounted volume expansion tests
+# kubernetes image-arm64 bc894ae6a3e52346a6cfec06c49c6cf78c12b2af to 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb
+dd61b9abded58bd2a683e6e15aca02c864296f3d 2023-03-08T14:22:19+00:00 UPSTREAM: 116227: Fix mounted volume expansion tests
