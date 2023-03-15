@@ -186,6 +186,9 @@ func setURL(hostnames []string, port string) []url.URL {
 	return urls
 }
 
+// The following 'fragemented' logic is copied from the Openshift Cluster Etcd Operator.
+//
+//	https://github.com/openshift/cluster-etcd-operator/blob/0584b0d1c8868535baf889d8c199f605aef4a3ae/pkg/operator/defragcontroller/defragcontroller.go#L282
 func isBackendFragmented(b backend.Backend, maxFragmentedPercentage float64, minDefragBytes int64) bool {
 	fragmentedPercentage := checkFragmentationPercentage(b.Size(), b.SizeInUse())
 	if fragmentedPercentage > 0.00 {
