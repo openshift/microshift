@@ -8,10 +8,10 @@ set -x
 echo "Environment:"
 printenv
 
-if [[ "$JOB_NAME" == rehearse* ]]; then
-    echo "INFO: \$JOB_NAME starts with rehearse - running in DRY RUN mode"
-    export DRY_RUN=y
-fi
+# if [[ "$JOB_NAME" == rehearse* ]]; then
+#     echo "INFO: \$JOB_NAME starts with rehearse - running in DRY RUN mode"
+#     export DRY_RUN=y
+# fi
 
 cp /secrets/ci-pull-secret/.dockercfg "$HOME/.pull-secret.json" || {
     echo "WARN: Could not copy registry secret file"
