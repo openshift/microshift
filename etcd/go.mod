@@ -23,43 +23,12 @@ require (
 )
 
 require (
-	github.com/NYTimes/gziphandler v1.1.1 // indirect
-	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
-	github.com/coreos/go-oidc v2.1.0+incompatible // indirect
-	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/felixge/httpsnoop v1.0.3 // indirect
-	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/google/cel-go v0.12.6 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0 // indirect
-	github.com/moby/sys/mountinfo v0.6.2 // indirect
-	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/selinux v1.10.0 // indirect
-	github.com/openshift/library-go v0.0.0-20230222090221-582055a1d5c4 // indirect
-	github.com/pquerna/cachecontrol v0.1.0 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/stoewer/go-strcase v1.2.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.35.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.10.0 // indirect
-	go.opentelemetry.io/otel/metric v0.31.0 // indirect
-	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/tools v0.2.0 // indirect
-	gopkg.in/square/go-jose.v2 v2.2.2 // indirect
-	k8s.io/apiserver v0.26.1 // indirect
-	k8s.io/cloud-provider v0.0.0 // indirect
-	k8s.io/cluster-bootstrap v0.0.0 // indirect
-	k8s.io/component-helpers v0.26.1 // indirect
-	k8s.io/kms v0.26.1 // indirect
-	k8s.io/kubelet v0.0.0 // indirect
-	k8s.io/kubernetes v1.26.1 // indirect
-	k8s.io/mount-utils v0.0.0 // indirect
-	k8s.io/pod-security-admission v0.25.0 // indirect
-	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.35 // indirect
 )
 
 require (
