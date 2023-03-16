@@ -242,12 +242,12 @@ What traffic uses this flow?
 
 Example: from `pod-1` to kubernetes APIServer service `10.43.0.1:443`.
 
-|step|where                    |srcIP:port      |dstIP:port          |comment                                                                                 |
-|:---|:------------------------|:---------------|:-------------------|:---------------------------------------------------------------------------------------|
-|1   |ovn node switch          |10.42.0.12      |10.43.0.1:443       |a loadbalancer rule DNAT’s the service IP 10.43.0.1:443 to endpoint 192.168.122.14:6443 |
-|2   |ovn cluster router       |10.42.0.12      |192.168.122.14:6443 |a router policy rule routes the packet to ovn-k8s-mp0 via ovn node switch               |
-|3   |ovn node switch          |10.42.0.12      |192.168.122.14:6443 |forward to ovn-k8s-mp0                                                                  |
-|4   |ovn-k8s-mp0              |10.42.0.12      |192.168.122.14:6443 |packet is received by the host                                                          |
+|step|where                    |srcIP:port      |dstIP:port     |comment                                                                            |
+|:---|:------------------------|:---------------|:--------------|:----------------------------------------------------------------------------------|
+|1   |ovn node switch          |10.42.0.12      |10.43.0.1:443  |a loadbalancer rule DNAT’s the service IP 10.43.0.1:443 to endpoint 10.44.0.0:6443 |
+|2   |ovn cluster router       |10.42.0.12      |10.44.0.0:6443 |a router policy rule routes the packet to ovn-k8s-mp0 via ovn node switch          |
+|3   |ovn node switch          |10.42.0.12      |10.44.0.0:6443 |forward to ovn-k8s-mp0                                                             |
+|4   |ovn-k8s-mp0              |10.42.0.12      |10.44.0.0:6443 |packet is received by the host                                                     |
 
 Step 1, load balancer in ovn node switch:
 
@@ -265,7 +265,7 @@ name                : "Service_default/kubernetes_TCP_node_switch_microshift-dev
 options             : {event="false", reject="true", skip_snat="false"}
 protocol            : tcp
 selection_fields    : []
-vips                : {"10.43.0.1:443"="192.168.122.14:6443"}
+vips                : {"10.43.0.1:443"="10.44.0.0:6443"}
 ```
 
 Step 2, static policy in ovn cluster router:
@@ -344,15 +344,13 @@ What traffic uses this flow?
 
 Example: from host `192.168.122.14` to kubernetes APIServer service `10.43.0.1:443`.
 
-|step|where                    |srcIP:port      |dstIP:port          |comment                                                                              |
-|:---|:------------------------|:---------------|:-------------------|:------------------------------------------------------------------------------------|
-|1   |br-ex                    |192.168.122.14  |10.43.0.1:443       |a static openflow rule SNAT's the node IP to 169.254.169.2                           |
-|2   |ovn gateway router       |169.254.169.2   |10.43.0.1:443       |a loadbalancer rule DNAT’s the service IP 10.43.0.1:43 to endpoint 169.254.169.2:6443|
-|3   |ovn gateway router       |169.254.169.2   |169.254.169.2:6443  |a static route sets nexthop to the node gateway 192.168.122.1                        |
-|4   |ovn gateway router       |169.254.169.2   |169.254.169.2:6443  |a router port rule SNAT’s 169.254.169.2 to the node IP address 192.168.122.14        |
-|5   |br-ex                    |192.168.122.14  |169.254.169.2:6443  |a static openflow rule DNAT's the 169.254.169.2 to 192.168.122.14                    |
-|6   |br-ex                    |192.168.122.14  |192.168.122.14:6443 |a static openflow rule SNAT's the node IP to 169.254.169.1                           |
-|7   |br-ex                    |169.254.169.1   |192.168.122.14:6443 |forward to br-ex                                                                     |
+|step|where                    |srcIP:port      |dstIP:port          |comment                                                                           |
+|:---|:------------------------|:---------------|:-------------------|:---------------------------------------------------------------------------------|
+|1   |br-ex                    |192.168.122.14  |10.43.0.1:443       |a static openflow rule SNAT's the node IP to 169.254.169.2                        |
+|2   |ovn gateway router       |169.254.169.2   |10.43.0.1:443       |a loadbalancer rule DNAT’s the service IP 10.43.0.1:43 to endpoint 10.44.0.0:6443 |
+|3   |ovn gateway router       |169.254.169.2   |10.44.0.0:6443      |a static route sets nexthop to the node gateway 192.168.122.1                     |
+|4   |ovn gateway router       |169.254.169.2   |10.44.0.0:6443      |a router port rule SNAT’s 169.254.169.2 to the node IP address 192.168.122.14     |
+|5   |br-ex                    |192.168.122.14  |10.44.0.0:6443      |forward to loopback interface                                                     |
 
 Step 1, static openflow rule in br-ex:
 
@@ -370,18 +368,18 @@ c531f4a6-170e-4a4a-9d73-4363e3c1e609 (ovn_cluster_router)
 
 (northd)$ ovn-nbctl lr-lb-list GR_microshift-dev
 UUID                                    LB                  PROTO      VIP                   IPs
-be7decc8-1a90-464a-8d10-10b3752955e4    Service_default/    tcp        10.43.0.1:443         169.254.169.2:6443
+be7decc8-1a90-464a-8d10-10b3752955e4    Service_default/    tcp        10.43.0.1:443         10.44.0.0:6443
 
 (northd)$ ovn-nbctl list load_balancer be7decc8-1a90-464a-8d10-10b3752955e4
 _uuid               : be7decc8-1a90-464a-8d10-10b3752955e4
 external_ids        : {"k8s.ovn.org/kind"=Service, "k8s.ovn.org/owner"="default/kubernetes"}
 health_check        : []
 ip_port_mappings    : {}
-name                : "Service_default/kubernetes_TCP_node_router_microshift-dev"
-options             : {event="false", reject="true", skip_snat="false"}
+name                : "Service_default/kubernetes_TCP_node_router+switch_microshift-dev"
+options             : {event="false", hairpin_snat_ip="169.254.169.5 fd69::5", neighbor_responder=none, reject="true", skip_snat="false"}
 protocol            : tcp
 selection_fields    : []
-vips                : {"10.43.0.1:443"="169.254.169.2:6443"}
+vips                : {"10.43.0.1:443"="10.44.0.0:6443"}
 ```
 
 Step 3, static route in ovn gateway router:
@@ -390,6 +388,8 @@ Step 3, static route in ovn gateway router:
 (northd)$ ovn-nbctl lr-route-list GR_microshift-dev
 IPv4 Routes
 Route Table <main>:
+         169.254.169.0/29             169.254.169.4 dst-ip rtoe-GR_microshift-dev
+             10.42.0.0/16                100.64.0.1 dst-ip
                 0.0.0.0/0             192.168.122.1 dst-ip rtoe-GR_microshift-dev
 ```
 
@@ -411,14 +411,7 @@ Step 5, static openflow rule in br-ex:
 
 ```text
 (host)$ ovs-appctl bridge/dump-flows br-ex
-duration=538658s, n_packets=90, n_bytes=12756, priority=500,ip,in_port=2,nw_src=192.168.122.14,nw_dst=169.254.169.2,actions=ct(commit,table=4,zone=64001,nat(dst=192.168.122.14))
-```
-
-Step 6, static openflow rule in br-ex:
-
-```text
-(host)$ ovs-appctl bridge/dump-flows br-ex
-table_id=4, duration=522559s, n_packets=90, n_bytes=12756, ip,actions=ct(commit,table=3,zone=64002,nat(src=169.254.169.1))
+duration=538658s, n_packets=90, n_bytes=12756, priority=500,ip,in_port=2,nw_src=192.168.122.14,nw_dst=10.44.0.0,actions=ct(commit,table=4,zone=64001)
 ```
 
 ### pod to nodePortService
