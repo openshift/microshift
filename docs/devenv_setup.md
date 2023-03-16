@@ -41,7 +41,7 @@ In the OS installation wizard, set the following options:
 - Select "Installation Destination"
     - Under "Storage Configuration" sub-section, select "Custom" radial button
     - Select "Done" to open a window for configuring partitions
-    - Under "New Red Hat Enterprise Linux 8.x Installation", click "Click here to create them automatically"
+    - Under "New Red Hat Enterprise Linux 9.x Installation", click "Click here to create them automatically"
     - Select the root partition (`/`)
         - On the right side of the menu, set "Desired Capacity" to `40 GiB`
         - On the right side of the menu, verify the volume group is `rhel`.
@@ -107,7 +107,7 @@ make srpm
 
 The artifacts of the build are located in the `_output/rpmbuild` directory.
 ```bash
-$ cd ~/microshift/_output/rpmbuild && find . -name \*.rpm 
+$ cd ~/microshift/_output/rpmbuild && find . -name \*.rpm
 ./RPMS/x86_64/microshift-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.x86_64.rpm
 ./RPMS/x86_64/microshift-networking-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.x86_64.rpm
 ./RPMS/noarch/microshift-release-info-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.noarch.rpm
@@ -128,7 +128,7 @@ Enable the repositories required for installing MicroShift dependencies.
 
 <details><summary>RHEL</summary>
 
-When working with MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repository `rhocp-4.$Y-for-rhel-8-$ARCH-rpms` may not be available yet. In that case, use the `Y-1` released version or a `Y-beta` version from the public `https://mirror.openshift.com/pub/openshift-v4/$ARCH/dependencies/rpms/` OpenShift mirror repository.
+When working with MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repository `rhocp-4.$Y-for-rhel-9-$ARCH-rpms` may not be available yet. In that case, use the `Y-1` released version or a `Y-beta` version from the public `https://mirror.openshift.com/pub/openshift-v4/$ARCH/dependencies/rpms/` OpenShift mirror repository.
 
 ```bash
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
@@ -314,7 +314,7 @@ To view all the available profiles, run `oc get --raw /debug/pprof`.
 The following error message may be encountered when enabling the OpenShift RPM repositories.
 
 ```
-Error: 'fast-datapath-for-rhel-8-x86_64-rpms' does not match a valid repository ID.
+Error: 'fast-datapath-for-rhel-9-x86_64-rpms' does not match a valid repository ID.
 Use "subscription-manager repos --list" to see valid repositories.
 ```
 
@@ -325,18 +325,18 @@ $ sudo subscription-manager repos --list-enabled
 +----------------------------------------------------------+
     Available Repositories in /etc/yum.repos.d/redhat.repo
 +----------------------------------------------------------+
-Repo ID:   rhel-8-for-x86_64-appstream-rpms
-Repo Name: Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
-Repo URL:  https://cdn.redhat.com/content/dist/rhel8/$releasever/x86_64/appstream/os
+Repo ID:   rhel-9-for-x86_64-baseos-rpms
+Repo Name: Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/rhel9/$releasever/x86_64/baseos/os
 Enabled:   1
 
-Repo ID:   fast-datapath-for-rhel-8-x86_64-rpms
-Repo Name: Fast Datapath for RHEL 8 x86_64 (RPMs)
-Repo URL:  https://cdn.redhat.com/content/dist/layered/rhel8/x86_64/fast-datapath/os
+Repo ID:   fast-datapath-for-rhel-9-x86_64-rpms
+Repo Name: Fast Datapath for RHEL 9 x86_64 (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/layered/rhel9/x86_64/fast-datapath/os
 Enabled:   1
 
-Repo ID:   rhel-8-for-x86_64-baseos-rpms
-Repo Name: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
-Repo URL:  https://cdn.redhat.com/content/dist/rhel8/$releasever/x86_64/baseos/os
+Repo ID:   rhel-9-for-x86_64-appstream-rpms
+Repo Name: Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/rhel9/$releasever/x86_64/appstream/os
 Enabled:   1
 ```

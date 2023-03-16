@@ -109,13 +109,13 @@ previous state. Use the `rpm-ostree` command to verify the current deployment.
 $ rpm-ostree status
 State: idle
 Deployments:
-  edge:rhel/8/x86_64/edge
-                  Version: 8.7 (2022-12-26T10:28:32Z)
+  edge:rhel/9/x86_64/edge
+                  Version: 9.1 (2022-12-26T10:28:32Z)
                      Diff: 1 removed
       RemovedBasePackages: hostname 3.20-6.el8
 
-* edge:rhel/8/x86_64/edge
-                  Version: 8.7 (2022-12-26T10:28:32Z)
+* edge:rhel/9/x86_64/edge
+                  Version: 9.1 (2022-12-26T10:28:32Z)
 ```
 
 Finish by checking that all MicroShift pods run normally and cleaning up
@@ -197,8 +197,8 @@ previous state. Use the `rpm-ostree` command to verify the current deployment.
 $ rpm-ostree status
 State: idle
 Deployments:
-* edge:rhel/8/x86_64/edge
-                  Version: 8.7 (2022-12-28T16:50:54Z)
+* edge:rhel/9/x86_64/edge
+                  Version: 9.1 (2022-12-28T16:50:54Z)
 
   edge:eae8486a204bd72eb56ac35ca9c911a46aff3c68e83855f377ae36a3ea4e87ef
                 Timestamp: 2022-12-29T14:44:48Z

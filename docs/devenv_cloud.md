@@ -49,8 +49,7 @@ Proceed by creating a virtual instance using the following parameters.
 * Use a descriptive name prefixed by your user name if the account is shared with others (i.e. `myuser-ushift-dev`)
 * Select the Red Hat Linux operating system family
 * Select the `64-bit (x86)` or `64 bit (Arm)` architecture
-* Select Red Hat Enterprise Linux 8 (HVM) operating system. 
-> Do not attempt to use RHEL 9 as it is not supported for the development environment. The operating system will be upgraded to the 8.7 version in the configuration stage.
+* Select Red Hat Enterprise Linux 9 (HVM) operating system.
 * Select the instance type depending on your architecture of choice:
     * e.g. `c5.metal` for `x86_64`
     * e.g. `c6g.metal` for `aarch64`
@@ -60,7 +59,7 @@ Proceed by creating a virtual instance using the following parameters.
     * 90 GiB root volume on `gp3` storage type
     * 10 GiB data volume on `gp3` storage type
 
-Review your selections and lauch the cloud instance. 
+Review your selections and lauch the cloud instance.
 > Unless noted otherwise, all further configuration should be performed on the cloud instance created in this section.
 
 ### Other Cloud Environments
@@ -84,7 +83,7 @@ sudo useradd -m -s /bin/bash -p "$(openssl passwd -1 ${PASSWORD})" microshift
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
 
 sudo sed -i 's/PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-sudo systemctl reload sshd.service 
+sudo systemctl reload sshd.service
 ```
 > Choose a strong password and make sure you configure the security group to limit inbound connections on the SSH port 22 **only** from your IP address.
 
@@ -132,7 +131,7 @@ Follow the instructions in the [Create Virtual Machine](./devenv_setup_auto.md#c
 ```bash
 ./scripts/devenv-builder/create-vm.sh microshift-bench \
     /var/lib/libvirt/images \
-    /var/lib/libvirt/images/rhel-8.7-$(uname -i)-dvd.iso \
+    /var/lib/libvirt/images/rhel-baseos-9.*-$(uname -i)-dvd.iso \
     2 2 10 0 1
 ```
 
@@ -140,7 +139,7 @@ Follow the instructions in the [Create Virtual Machine](./devenv_setup_auto.md#c
 
 ### Virtual Machine Management
 
-To manage a virtual machine remotely, it is possible to use `virsh` command line or `Cockpit` Web interface running on the MicroShift development host. 
+To manage a virtual machine remotely, it is possible to use `virsh` command line or `Cockpit` Web interface running on the MicroShift development host.
 
 However, it is recommended to use the Virtual Machine Manager application to connect to the host remotely via the `File > Add Connection` menu option.
 
