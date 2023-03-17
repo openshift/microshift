@@ -32,7 +32,7 @@ Full documentation of the config spec can be found at [github.com/red-hat-storag
 #### Path
 
 The user provided lvmd config should be written to the same directory as the MicroShift config.  If an lvmd configuration file
-does not exist in `/etc/microshift/lvmd.yaml`, MicroShift will use default values. 
+does not exist in `/etc/microshift/lvmd.yaml`, MicroShift will use default values.
 
 ## System Requirements
 
@@ -40,8 +40,8 @@ does not exist in `/etc/microshift/lvmd.yaml`, MicroShift will use default value
 
 If there is only one volume group on the system, LVMS uses it by
 default. If there are multiple volume groups, and no configuration
-file, LVMS looks for a volume group named `rhel`. If there is no
-volume group named `rhel`, LVMS is disabled.
+file, LVMS looks for a volume group named `microshift`. If there is no
+volume group named `microshift`, LVMS is disabled.
 
 LVMS expects all volume groups to exist prior to launching the
 service. If LVMS is configured to use a volume group that does not

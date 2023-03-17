@@ -38,14 +38,14 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 			},
 		},
 		{
-			name:    "one group rhel",
-			vgNames: []string{"rhel"},
+			name:    "one group default",
+			vgNames: []string{defaultRHEL4EdgeVolumeGroup},
 			expected: &Lvmd{
 				SocketName: defaultSockName,
 				DeviceClasses: []*DeviceClass{
 					{
 						Name:        "default",
-						VolumeGroup: "rhel",
+						VolumeGroup: defaultRHEL4EdgeVolumeGroup,
 						Default:     true,
 						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
 					},
@@ -53,14 +53,14 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 			},
 		},
 		{
-			name:    "rhel first",
-			vgNames: []string{"rhel", "other"},
+			name:    "default first",
+			vgNames: []string{defaultRHEL4EdgeVolumeGroup, "other"},
 			expected: &Lvmd{
 				SocketName: defaultSockName,
 				DeviceClasses: []*DeviceClass{
 					{
 						Name:        "default",
-						VolumeGroup: "rhel",
+						VolumeGroup: defaultRHEL4EdgeVolumeGroup,
 						Default:     true,
 						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
 					},
@@ -68,14 +68,14 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 			},
 		},
 		{
-			name:    "rhel last",
-			vgNames: []string{"other", "rhel"},
+			name:    "default last",
+			vgNames: []string{"other", defaultRHEL4EdgeVolumeGroup},
 			expected: &Lvmd{
 				SocketName: defaultSockName,
 				DeviceClasses: []*DeviceClass{
 					{
 						Name:        "default",
-						VolumeGroup: "rhel",
+						VolumeGroup: defaultRHEL4EdgeVolumeGroup,
 						Default:     true,
 						SpareGB:     uint64Ptr(defaultSpareGB),
 					},
@@ -83,7 +83,7 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 			},
 		},
 		{
-			name:    "no rhel",
+			name:    "no default",
 			vgNames: []string{"other", "choose-me"},
 			expected: &Lvmd{
 				SocketName:     defaultSockName,
