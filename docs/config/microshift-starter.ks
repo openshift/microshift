@@ -53,9 +53,12 @@ if ! subscription-manager status >& /dev/null ; then
 fi
 
 # Configure systemd journal service to persist logs between boots and limit their size to 1G
-mkdir -p /var/log/journal/
-sed -i 's/.*Storage=.*/Storage=auto/g'           /etc/systemd/journald.conf
-sed -i 's/.*SystemMaxUse=.*/SystemMaxUse=1G/g'   /etc/systemd/journald.conf
-sed -i 's/.*RuntimeMaxUse=.*/RuntimeMaxUse=1G/g' /etc/systemd/journald.conf
+sudo mkdir -p /etc/systemd/journald.conf.d
+cat <<EOF | sudo tee /etc/systemd/journald.conf.d/microshift.conf &>/dev/null
+[Journal]
+Storage=persistent
+SystemMaxUse=1G
+RuntimeMaxUse=1G
+EOF
 
 %end
