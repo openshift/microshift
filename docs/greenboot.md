@@ -4,7 +4,7 @@
 
 Serviceability of Edge Devices is often limited or non-existent, which makes it
 challenging to troubleshoot device problems following a failed software or
-operating system upgrade. 
+operating system upgrade.
 
 To mitigate these problems, MicroShift uses [greenboot](https://github.com/fedora-iot/greenboot),
 the Generic Health Check Framework for `systemd` on `rpm-ostree` based systems.
@@ -105,8 +105,11 @@ and setting limits on the maximal journal data size.
 
 Run the following commands to configure the journal data persistency and limits.
 ```bash
-sudo mkdir -p /var/log/journal/
-sudo sed -i 's/.*Storage=.*/Storage=auto/g'           /etc/systemd/journald.conf
-sudo sed -i 's/.*SystemMaxUse=.*/SystemMaxUse=1G/g'   /etc/systemd/journald.conf
-sudo sed -i 's/.*RuntimeMaxUse=.*/RuntimeMaxUse=1G/g' /etc/systemd/journald.conf
+sudo mkdir -p /etc/systemd/journald.conf.d
+cat <<EOF | sudo tee /etc/systemd/journald.conf.d/microshift.conf &>/dev/null
+[Journal]
+Storage=persistent
+SystemMaxUse=1G
+RuntimeMaxUse=1G
+EOF
 ```
