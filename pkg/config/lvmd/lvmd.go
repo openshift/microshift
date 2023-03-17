@@ -13,7 +13,7 @@ import (
 const (
 	LvmdConfigFileName          = "lvmd.yaml"
 	defaultSockName             = "/run/lvmd/lvmd.socket"
-	defaultRHEL4EdgeVolumeGroup = "rhel"
+	defaultRHEL4EdgeVolumeGroup = "microshift"
 
 	errorMessageNoVolumeGroups       = "No volume groups found"
 	errorMessageMultipleVolumeGroups = "Multiple volume groups are available, but no configuration file was provided."
