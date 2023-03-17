@@ -144,8 +144,6 @@ func RunMicroshift(cfg *config.MicroshiftConfig) error {
 
 	select {
 	case <-stopped:
-	case <-sigTerm:
-		klog.Infof("Another interrupt received. Force terminating services")
 	case <-time.After(time.Duration(gracefulShutdownTimeout) * time.Second):
 		klog.Infof("Timed out waiting for services to stop")
 	}
