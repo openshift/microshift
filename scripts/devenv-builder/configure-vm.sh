@@ -47,6 +47,20 @@ if [ $RHEL_SUBSCRIPTION = true ] ; then
     fi
 fi
 
+# Temporarily use RHEL 9.2 nightly repositories
+sudo tee /etc/yum.repos.d/rhel-92.repo >/dev/null <<EOF
+[rhel-9-for-x86_64-appstream-nightly-rpms]
+name = Red Hat Enterprise Linux 9 for x86_64 - AppStream Nightly (RPMs)
+baseurl = http://download.eng.tlv.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.2.0/compose/AppStream/x86_64/os/
+enabled = 1
+gpgcheck = 0
+
+[rhel-9-for-x86_64-baseos-nightly-rpms]
+name = Red Hat Enterprise Linux 9 for x86_64 - BaseOS nightly (RPMs)
+baseurl = http://download.eng.tlv.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.2.0/compose/BaseOS/x86_64/os/
+enabled = 1
+gpgcheck = 0
+EOF
 # Create Development Virtual Machine > Configuring VM
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#configuring-vm
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift

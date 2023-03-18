@@ -318,6 +318,29 @@ ports = ["9256:tcp"]
 EOF
 fi
 
+# Temporarily override osbuild-conposer to use RHEL 9.2 nightly repositories
+sudo mkdir -p /etc/osbuild-composer/repositories/
+sudo tee /etc/osbuild-composer/repositories/rhel-92.json >/dev/null <<EOF
+{
+  "x86_64": [
+    {
+      "name": "baseos",
+      "baseurl": "http://download.eng.tlv.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.2.0/compose/BaseOS/x86_64/os/",
+      "rhsm": false,
+      "check_gpg": false
+    },
+    {
+      "name": "appstream",
+      "baseurl": "http://download.eng.tlv.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.2.0/compose/AppStream/x86_64/os/",
+      "rhsm": false,
+      "check_gpg": false
+    }
+  ]
+}
+EOF
+sudo rm -rf /var/cache/osbuild-composer/*
+sudo systemctl restart osbuild-composer
+
 build_image blueprint_v0.0.1.toml "${IMGNAME}-container" 0.0.1 edge-container
 build_image installer.toml        "${IMGNAME}-installer" 0.0.0 edge-installer "${IMGNAME}-container" 0.0.1
 
