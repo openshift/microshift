@@ -15,7 +15,8 @@ OCGET_CMD="oc get ${OCCONFIG_OPT}"
 #
 # The base value for the timeout and the maximum boot attempts can be defined in
 # the /etc/greenboot/greenboot.conf file using the MICROSHIFT_WAIT_TIMEOUT_SEC
-# and GREENBOOT_MAX_BOOTS settings.
+# and GREENBOOT_MAX_BOOTS settings. These values can be in the [60..9999] range
+# for MICROSHIFT_WAIT_TIMEOUT_SEC and the [1..9] range for GREENBOOT_MAX_BOOTS.
 #
 # args: None
 # return: Print the recommended timeout value to stdout
@@ -23,11 +24,29 @@ function get_wait_timeout() {
     # Source Greenboot configuration file if it exists
     local conf_file=/etc/greenboot/greenboot.conf
     [ -f "${conf_file}" ] && source ${conf_file}
+
+    # Read and verify the wait timeout value, allowing for the [60..9999] range
     local base_timeout=${MICROSHIFT_WAIT_TIMEOUT_SEC:-300}
+    local reSecs='^[1-9]{1}[0-9]{0,3}$'
+    if [[ ! ${base_timeout} =~ $reSecs ]] ; then
+        base_timeout=300
+        echo "Could not parse MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}': using '${base_timeout}' instead"
+    fi
+    if [[ ${base_timeout} -lt 60 ]] ; then
+        base_timeout=60
+        echo "MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}' is less than 60: using '${base_timeout}' instead"
+    fi
+
+    # Read and verify the max boots value, allowing for the [1..9] range
+    local max_boots=${GREENBOOT_MAX_BOOTS:-3}
+    local reBoots='^[1-9]{1}$'
+    if [[ ! ${max_boots} =~ $reBoots ]] ; then
+        max_boots=3
+        echo "GREENBOOT_MAX_BOOTS value '${GREENBOOT_MAX_BOOTS}' is not in the [1..9] range: using '${max_boots}' instead"
+    fi
 
     # Update the wait timeout according to the boot counter.
     # The new wait timeout is a product of the timeout base and the number of boot attempts.
-    local max_boots=${GREENBOOT_MAX_BOOTS:-3}
     local boot_counter=$(grub2-editenv - list | grep ^boot_counter= | awk -F= '{print $2}')
     [ -z "${boot_counter}" ] && boot_counter=$(( $max_boots - 1 ))
 
