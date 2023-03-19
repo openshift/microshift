@@ -54,7 +54,11 @@ func renderLvmdParams(l *lvmd.Lvmd) (assets.RenderParams, error) {
 	if err != nil {
 		return nil, err
 	}
-	r["lvmd"] = string(b)
+	content := string(b)
+	if l.Message != "" {
+		content = fmt.Sprintf("# %s\n%s", l.Message, content)
+	}
+	r["lvmd"] = content
 	r["SocketName"] = l.SocketName
 	return r, nil
 }
