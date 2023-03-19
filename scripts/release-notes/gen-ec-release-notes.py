@@ -34,11 +34,11 @@ import textwrap
 from urllib import request
 
 VERSION="4.13"
-RPM_LIST_URL=f"https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift/ocp-dev-preview/latest-{VERSION}/el8/os/rpm_list"
+RPM_LIST_URL=f"https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift/ocp-dev-preview/latest-{VERSION}/el9/os/rpm_list"
 MICROSHIFT_RPM_NAME_PREFIX=f"microshift-{VERSION}"
 
 # An RPM filename looks like
-# microshift-4.13.0~ec.3-202302130757.p0.ge636e15.assembly.ec.3.el8.aarch64.rpm
+# microshift-4.13.0~ec.4-202303070857.p0.gcf0bce2.assembly.ec.4.el9.aarch64.rpm
 VERSION_RE = re.compile(
     """
     microshift-      # prefix
@@ -74,6 +74,8 @@ def main():
     else:
         raise RuntimeError(f"Did not find {MICROSHIFT_RPM_NAME_PREFIX} in {rpm_list}")
 
+    print(f"Examining RPM {microshift_rpm_filename}")
+
     match = VERSION_RE.search(microshift_rpm_filename)
     if match is None:
         raise RuntimeError(f"Could not parse version info from '{microshift_rpm_filename}'")
@@ -91,7 +93,7 @@ def main():
     ])
 
     # Check if the release already exists
-    print(f"Checking for {release_name}...")
+    print(f"Checking for release {release_name}...")
     try:
         subprocess.run(["gh", "release", "view", release_name],
                        check=True,
