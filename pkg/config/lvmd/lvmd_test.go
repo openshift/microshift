@@ -18,8 +18,8 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 		{
 			name: "no groups",
 			expected: &Lvmd{
-				SocketName:     defaultSockName,
-				DisabledReason: errorMessageNoVolumeGroups,
+				SocketName: defaultSockName,
+				Message:    errorMessageNoVolumeGroups,
 			},
 		},
 		{
@@ -35,6 +35,7 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
 					},
 				},
+				Message: statusMessageDefaultAvailable,
 			},
 		},
 		{
@@ -50,6 +51,7 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
 					},
 				},
+				Message: statusMessageDefaultAvailable,
 			},
 		},
 		{
@@ -65,6 +67,7 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
 					},
 				},
+				Message: statusMessageFoundDefault,
 			},
 		},
 		{
@@ -80,14 +83,15 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 						SpareGB:     uint64Ptr(defaultSpareGB),
 					},
 				},
+				Message: statusMessageFoundDefault,
 			},
 		},
 		{
 			name:    "no default",
 			vgNames: []string{"other", "choose-me"},
 			expected: &Lvmd{
-				SocketName:     defaultSockName,
-				DisabledReason: errorMessageMultipleVolumeGroups,
+				SocketName: defaultSockName,
+				Message:    errorMessageMultipleVolumeGroups,
 			},
 		},
 	}
@@ -150,6 +154,7 @@ func Test_newLvmdConfigFromFile(t *testing.T) {
 						SpareGB:     iToP(5),
 					},
 				},
+				Message: "Read from ./test/lvmd.yaml",
 			},
 			wantErr: false,
 		},
