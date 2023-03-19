@@ -78,7 +78,7 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		return err
 	}
 	if !lvmdCfg.IsEnabled() {
-		klog.V(2).Info("CSI is disabled. %s", lvmdCfg.DisabledReason)
+		klog.V(2).Info("CSI is disabled. %s", lvmdCfg.Message)
 		return nil
 	}
 	lvmdRenderParams, err := renderLvmdParams(lvmdCfg)

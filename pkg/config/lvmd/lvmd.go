@@ -17,14 +17,16 @@ const (
 
 	errorMessageNoVolumeGroups       = "No volume groups found"
 	errorMessageMultipleVolumeGroups = "Multiple volume groups are available, but no configuration file was provided."
+	statusMessageFoundDefault        = "Found default volume group \"microshift\""
+	statusMessageDefaultAvailable    = "Defaulting to the only available volume group"
 )
 
 // Lvmd stores the read-in or defaulted values of the lvmd configuration and provides the topolvm-node process information
 // about its host's storage environment.
 type Lvmd struct {
-	DeviceClasses  []*DeviceClass `json:"device-classes"`
-	SocketName     string         `json:"socket-name"`
-	DisabledReason string         `json:"-"`
+	DeviceClasses []*DeviceClass `json:"device-classes"`
+	SocketName    string         `json:"socket-name"`
+	Message       string         `json:"-"`
 }
 
 // IsEnabled returns a boolean indicating whether the CSI driver
@@ -45,7 +47,7 @@ func getLvmdConfigForVGs(vgNames []string) (*Lvmd, error) {
 	vgName := ""
 	if len(vgNames) == 0 {
 
-		response.DisabledReason = errorMessageNoVolumeGroups
+		response.Message = errorMessageNoVolumeGroups
 		klog.V(2).Info(errorMessageNoVolumeGroups)
 		return response, nil
 
@@ -53,6 +55,7 @@ func getLvmdConfigForVGs(vgNames []string) (*Lvmd, error) {
 
 		vgName = vgNames[0]
 		klog.V(2).Infof("Using volume group %q", vgName)
+		response.Message = statusMessageDefaultAvailable
 
 	} else {
 
@@ -60,6 +63,7 @@ func getLvmdConfigForVGs(vgNames []string) (*Lvmd, error) {
 			if name == defaultRHEL4EdgeVolumeGroup {
 				klog.V(2).Infof("Using default volume group %q", defaultRHEL4EdgeVolumeGroup)
 				vgName = name
+				response.Message = statusMessageFoundDefault
 				break
 			}
 		}
@@ -68,7 +72,7 @@ func getLvmdConfigForVGs(vgNames []string) (*Lvmd, error) {
 		// multiple volume groups, disable the CSI driver.
 		if vgName == "" {
 			klog.V(2).Infof("Multiple volume groups available but no configuration file is present, disabling CSI. %v", vgNames)
-			response.DisabledReason = errorMessageMultipleVolumeGroups
+			response.Message = errorMessageMultipleVolumeGroups
 			return response, nil
 		}
 	}
@@ -133,5 +137,6 @@ func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
 	if l.SocketName == "" {
 		l.SocketName = defaultSockName
 	}
+	l.Message = fmt.Sprintf("Read from %s", p)
 	return l, nil
 }
