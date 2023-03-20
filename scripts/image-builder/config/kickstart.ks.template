@@ -13,10 +13,10 @@ network --bootproto=dhcp --device=link --activate --onboot=on
 # For example, a 20GB disk would be partitioned in the following way:
 #
 # NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-# sda             8:0    0  20G  0 disk 
+# sda             8:0    0  20G  0 disk
 # ├─sda1          8:1    0 200M  0 part /boot/efi
 # ├─sda1          8:1    0 800M  0 part /boot
-# └─sda2          8:2    0  19G  0 part 
+# └─sda2          8:2    0  19G  0 part
 #  └─rhel-root  253:0    0  10G  0 lvm  /sysroot
 #
 zerombr
@@ -66,10 +66,13 @@ firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
 echo -e 'export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig' >> /root/.profile
 
 # Configure systemd journal service to persist logs between boots and limit their size to 1G
-mkdir -p /var/log/journal/
-sed -i 's/.*Storage=.*/Storage=auto/g'           /etc/systemd/journald.conf
-sed -i 's/.*SystemMaxUse=.*/SystemMaxUse=1G/g'   /etc/systemd/journald.conf
-sed -i 's/.*RuntimeMaxUse=.*/RuntimeMaxUse=1G/g' /etc/systemd/journald.conf
+sudo mkdir -p /etc/systemd/journald.conf.d
+cat <<EOF | sudo tee /etc/systemd/journald.conf.d/microshift.conf &>/dev/null
+[Journal]
+Storage=persistent
+SystemMaxUse=1G
+RuntimeMaxUse=1G
+EOF
 
 # Make sure all the Ethernet network interfaces are connected automatically
 for uuid in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" && $3 == "no" {print $1}') ; do
