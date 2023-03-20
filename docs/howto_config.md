@@ -147,7 +147,7 @@ resources:
   - busybox.yaml
 images:
   - name: BUSYBOX_IMAGE
-    newName: registry.k8s.io/busybox
+    newName: busybox:1.35
 EOF
 ```
 
