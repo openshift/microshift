@@ -13,7 +13,7 @@ Create a RHEL virtual machine with 2 cores, 4096MB of RAM and 50GB of storage.
 
 Install the `libvirt` packages and reboot your system to start the virtualization environment.
 ```
-sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img
+sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass
 ```
 
 Move the ISO image to `/var/lib/libvirt/images` directory and run the following commands to create a virtual machine.

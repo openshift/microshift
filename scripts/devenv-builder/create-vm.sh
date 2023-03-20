@@ -52,7 +52,7 @@ if [ "${SWAPSIZE}" -eq 0 ] ; then
     sed -i "s;^part swap;#part swap;" ${KICKSTART_FILE}
 fi
 
-sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img
+sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass
 if [ $(systemctl is-active libvirtd.socket) != "active" ] ; then
     echo "Restart your host to initialize the virtualization environment"
     exit 1
