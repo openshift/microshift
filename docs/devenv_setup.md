@@ -232,7 +232,7 @@ Examine the `/tmp/microshift.log` log file to ensure a successful startup.
 
 > An alternative way of running MicroShift is to update `/usr/bin/microshift` file and restart the service. The logs would then be accessible by running the `journalctl -xu microshift` command.
 > ```bash
-> sudo cp -f ~/microshift/_output_/bin/microshift /usr/bin/microshift
+> sudo cp -f ~/microshift/_output/bin/microshift /usr/bin/microshift
 > sudo systemctl restart microshift
 > ```
 
