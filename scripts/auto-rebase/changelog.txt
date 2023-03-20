@@ -1,0 +1,13 @@
+# cluster-network-operator embedded-component c0208114e49b3ee34bb073ea7d09cf82273573b0 to a7ff73ab336c8b3ed8467f14bbcd5657ff08d9cf
+53d3972e5e287c3d4eabbbb8485324f72ceddb4f 2023-03-10T13:05:19+00:00 HyperShift: Set priority class for CNCC
+7f983c90f1f9a1c2259bc41503c443b62dc5b10c 2023-03-10T13:05:19+00:00 HyperShift: Adapt affinity and tolerations
+1756b472710f9a53e6669ae4923246c267c63d98 2023-03-10T13:05:19+00:00 HyperShift: Co-locate CNCC and multus admission controller with other hcp pods
+fa7c5559546a8a3434c41a7be945dbfcd5de10f6 2023-03-09T15:24:09+01:00 Set healthz-bind-address to 0.0.0.0:10256 for ovnk
+ea081581bf467c22faeb9f178cab66c551fad588 2023-03-09T15:24:08+01:00 Pass POD_NAME to ovnkube node for node healthz server checks
+fa545fad09bd9d8fbc447fd7a6759c96c12d5390 2023-03-03T14:26:59+00:00 OVN-K alerts: add OVS overflow alerts
+# machine-config-operator embedded-component 02d35277a879c72f48e63c31f36072376c7e2598 to 6c040c7be4b1459a0cd0db114e1aaa078943d487
+f9f358260da206bf27d4c6579bcab3ec93a4875f 2023-03-14T02:28:32+00:00 Remove hard requirement for the afterburn from early-running aws-related services
+# oc image-amd64 02362102a19e81ebecb90906f41687e4e4350dfe to eed143055ede731029931ad204b19cd2f565ef1a
+c3d6a7830ec95b4cf8dc413c15b57d0c5176e3ca 2023-03-16T06:25:04+00:00 Add microshift into generate-docs
+# oc image-arm64 02362102a19e81ebecb90906f41687e4e4350dfe to eed143055ede731029931ad204b19cd2f565ef1a
+c3d6a7830ec95b4cf8dc413c15b57d0c5176e3ca 2023-03-16T06:25:04+00:00 Add microshift into generate-docs
