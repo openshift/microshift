@@ -146,7 +146,7 @@
     runtime: "{{ ((ansible_date_time.iso8601[:19] | to_datetime('%Y-%m-%dT%H:%M:%S')) - (start_time | to_datetime('%Y-%m-%dT%H:%M:%S'))).seconds }}"
 
 - name: Add boot info to local file
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: boot.txt
     line: "First boot: {{ runtime }}"
     create: yes
@@ -176,14 +176,22 @@
   include_tasks: roles/common/tasks/disk.yml
   loop: "{{ du_dirs }}"
 
-- name: get vnstat network usage
-  command: vnstat
-  register: vnstat
-  when: vnstat_check.rc == 0
+- name: vnstat collection tasks
+  block:
+    - name: wait for vnstat db to populate
+      ansible.builtin.shell: vnstat | grep rx
+      retries: 60
+      delay: 10
+      register: vnstat_db
+      until: vnstat_db.rc == 0
 
-- name: record network usage to file
-  local_action:
-    module: copy
-    content: "{{ vnstat.stdout }}"
-    dest: network.txt
+    - name: get vnstat network usage
+      ansible.builtin.command: vnstat
+      register: vnstat
+
+    - name: record network usage to file
+      local_action:
+        module: copy
+        content: "{{ vnstat.stdout }}"
+        dest: network.txt
   when: vnstat_check.rc == 0
