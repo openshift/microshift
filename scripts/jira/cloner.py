@@ -4,8 +4,8 @@ from tabulate import tabulate
 import argparse
 from tqdm import tqdm
 
-JQL_GLOBAL_QUERY = 'filter = "MicroShift - Bugs in Project" and resolution = Unresolved order by key asc'
-JQL_ISSUE_QUERY = 'filter = "MicroShift - Bugs in Project" and resolution = Unresolved and key in ({}) order by key asc'
+JQL_GLOBAL_QUERY = 'filter = "MicroShift - Bugs in Project" and status in (New, Assigned, Post, "To Do", "In Progress", "Code Review") order by key asc'
+JQL_ISSUE_QUERY = 'key in ({}) order by key asc'
 JIRA_SERVER = 'https://issues.redhat.com'
 JIRA_URL_PREFIX = JIRA_SERVER+'/browse/'
 
@@ -17,28 +17,6 @@ def is_original_issue(issue):
             return False
     return True
 
-def get_issue_fix_versions(issue):
-    l = []
-    if hasattr(issue.fields, 'fixVersions') and issue.fields.fixVersions is not None:
-        for x in issue.fields.fixVersions:
-            if hasattr(x, 'name'):
-                l.append(x.name)
-    if len(l) == 0:
-        raise RuntimeError(f"[{issue.key}] Fix versions empty")
-    return sorted(l)[::-1]
-
-def get_issue_target_versions(issue):
-    l = []
-    if hasattr(issue.fields, 'customfield_12319940') and issue.fields.customfield_12319940 is not None:
-        for x in issue.fields.customfield_12319940:
-            if hasattr(x, 'name'):
-                l.append(x.name)
-    if len(l) == 0:
-        raise RuntimeError("Target version empty")
-    if len(l) > 1:
-        raise RuntimeError("Target version must have only 1 value")
-    return l[0]
-
 def get_clone_by_issues(issue, connection):
     l = []
     for link in issue.fields.issuelinks:
@@ -48,7 +26,28 @@ def get_clone_by_issues(issue, connection):
             l.append(connection.issue(link.inwardIssue.key))
     return l
 
-def get_clones_issue(issue, connection):
+def get_assignee(issue):
+    if not hasattr(issue.fields, 'assignee') or issue.fields.assignee is None:
+        return None
+    return issue.fields.assignee.emailAddress
+
+def get_fix_versions(issue):
+    l = []
+    if hasattr(issue.fields, 'fixVersions') and issue.fields.fixVersions is not None:
+        for x in issue.fields.fixVersions:
+            if hasattr(x, 'name'):
+                l.append(x.name)
+    return sorted(l)[::-1]
+
+def get_target_versions(issue):
+    l = []
+    if hasattr(issue.fields, 'customfield_12319940') and issue.fields.customfield_12319940 is not None:
+        for x in issue.fields.customfield_12319940:
+            if hasattr(x, 'name'):
+                l.append(x.name)
+    return l
+
+def get_parent_issue(issue, connection):
     for link in issue.fields.issuelinks:
         if link.type.name != 'Cloners':
             continue
@@ -56,9 +55,42 @@ def get_clones_issue(issue, connection):
             return connection.issue(link.outwardIssue.key)
     return None
 
-def set_fix_versions(issue, fixVersions, connection):
+def is_issue_a_cve(issue):
+    for label in issue.fields.labels:
+        if label.startswith('CVE-'):
+            return True
+    return False
+
+def has_fix_versions_label(issue):
+    for label in issue.fields.labels:
+        if label == 'needs-fix-version':
+            return True
+    return False
+
+def set_target_version(issue, version):
     issue.update(fields={
-        'fixVersions': [{'name': x} for x in fixVersions]
+        'fixVersions': [{'name': version}]
+    })
+
+def set_needs_fix_version_label(issue):
+    labels = issue.fields.labels + ['needs-fix-version']
+    issue.update(fields={
+        'labels': [{'name': x} for x in labels]
+    })
+
+def remove_needs_fix_version_label(issue):
+    labels = []
+    for l in issue.fields.labels:
+        if l == 'needs-fix-version':
+            continue
+        labels.append({'name': l})
+    issue.ipdate(fields={
+        'labels': labels
+    })
+
+def set_target_version(issue, version):
+    issue.update(fields={
+        'customfield_12319940': [{'name': version}]
     })
 
 def clone_issue(issue, target, connection):
@@ -76,7 +108,7 @@ def clone_issue(issue, target, connection):
     data_dict['fixVersions'] = [{'name': x.name} for x in issue.fields.fixVersions]
     # QA contact
     if hasattr(issue.fields, 'customfield_12315948'):
-        data_dict['customfield_12315948'] = {'value': issue.fields.customfield_12315948.value}
+        data_dict['customfield_12315948'] = {'value': issue.fields.customfield_12315948.name}
     data_dict['customfield_12320947'] = [{'value': x.value} for x in issue.fields.customfield_12320947]
     # Target version
     data_dict['customfield_12319940'] = [{'name': target}]
@@ -86,100 +118,95 @@ def clone_issue(issue, target, connection):
     connection.create_issue_link("Blocks", inwardIssue=issue.key, outwardIssue=new_issue.key)
     return new_issue
 
-def check_clones(issue, connection, dry_run):
+def add_blocks_link(issue, parent, connection):
+    connection.create_issue_link("Blocks", inwardIssue=parent.key, outwardIssue=issue.key)
+
+class Action:
+    def __init__(self, i, c, f, **kwargs):
+        def _internal_fn():
+            return f(**kwargs)
+        self.issue = i
+        self.comment = c
+        self.action = None
+        if f is not None:
+            self.action = _internal_fn
+
+def scan_original_issue(issue, connection):
     actions = []
-    try:
-        fix_versions = get_issue_fix_versions(issue)
-    except RuntimeError as e:
-        actions.append([JIRA_URL_PREFIX+issue.key, "", "Fix versions field empty. Please fill it."])
-        return actions
-
-    try:
-        target_version = get_issue_target_versions(issue)
-    except RuntimeError as e:
-        actions.append([JIRA_URL_PREFIX+issue.key, "", f"Target field problems: {e}. Please check."])
-        return actions
-
-    if not is_original_issue(issue):
-        return actions
-
-    if target_version != fix_versions[0]:
-        actions.append([JIRA_URL_PREFIX+issue.key, "", f"Target version does not target first Fix version. {target_version} != {fix_versions[0]}. Please check."])
-        return actions
+    fix_versions = get_fix_versions(issue)
+    target_versions = get_target_versions(issue)
+    if len(target_versions) > 1:
+        actions.append(Action(issue.key, "Too many Target versions. Set to latest in Fix versions.", set_target_version, issue=issue, version=fix_versions[0]))
+    elif len(target_versions) == 0:
+        actions.append(Action(issue.key, "Empty Target versions. Set to latest in Fix versions.", set_target_version, issue=issue, version=fix_versions[0]))
+    elif target_versions[0] != fix_versions[0]:
+        actions.append(Action(issue.key, "Target versions do not match Fix versions latest. Set to latest in Fix versions.", set_target_version, issue=issue, version=fix_versions[0]))
 
     fix_versions_missing = set(fix_versions[1:])
-    clones = get_clone_by_issues(issue, connection)
-    for clone in clones:
-        clone_fix_versions = []
-        try:
-            clone_fix_versions = get_issue_fix_versions(clone)
-        except RuntimeError as e:
-            if dry_run:
-                actions.append([JIRA_URL_PREFIX+clone.key, JIRA_URL_PREFIX+issue.key, f"Dry run. Skip set Fix versions."])
-            else:
-                try:
-                    set_fix_versions(clone, fix_versions, connection)
-                except RuntimeError as e:
-                    actions.append([JIRA_URL_PREFIX+clone.key, JIRA_URL_PREFIX+issue.key, f"Unable to update Fix versions: {e}"])
-                    continue
-                finally:
-                    actions.append([JIRA_URL_PREFIX+clone.key, JIRA_URL_PREFIX+issue.key, "Fix versions updated to match original"])
-
-        if clone_fix_versions != fix_versions:
-            if dry_run:
-                actions.append([JIRA_URL_PREFIX+clone.key, JIRA_URL_PREFIX+issue.key, "Dry run. Skip set Fix versions of clone to original"])
-            else:
-                try:
-                    set_fix_versions(clone, fix_versions, connection)
-                except RuntimeError as e:
-                    actions.append([JIRA_URL_PREFIX+clone.key, JIRA_URL_PREFIX+issue.key, f"Clone Fix versions does not match original issue. Unable to update Fix versions: {e}"])
-                    continue
-                finally:
-                    actions.append([JIRA_URL_PREFIX+clone.key, JIRA_URL_PREFIX+issue.key, "Fix versions updated to match original"])
-
-        try:
-            target_version = get_issue_target_versions(clone)
-        except RuntimeError as e:
-            actions.append([JIRA_URL_PREFIX+clone.key, JIRA_URL_PREFIX+issue.key, f"Target version problems: {e}"])
-            continue
-
-        if target_version not in fix_versions:
-            actions.append([JIRA_URL_PREFIX+clone.key, JIRA_URL_PREFIX+issue.key, f"Target version {target_version} not included in parent Fix versions"])
-            continue
-
-        if target_version in fix_versions_missing:
-            fix_versions_missing.remove(target_version)
-
+    cloning_issues = get_clone_by_issues(issue, connection)
+    for clone in cloning_issues:
+        clone_target_versions = get_target_versions(clone)
+        if len(target_versions) > 1:
+            actions.append(Action(clone.key, "Target versions has more than one field. Fix manually.", None))
+        elif len(target_versions) == 0:
+            actions.append(Action(clone.key, "Target versions is empty. Fix manually", None))
+        else:
+            if clone_target_versions[0] in fix_versions_missing:
+                fix_versions_missing.remove(clone_target_versions[0])
     for version in fix_versions_missing:
-        if dry_run:
-            actions.append([JIRA_URL_PREFIX+issue.key, "", f"Dry run. Skip cloning bug for version {version}"])
+        actions.append(Action(issue.key, f"Clone for Target version {version}", clone_issue, issue=issue, target=version, connection=connection))
+    return actions
+
+def scan_cloned_issue(issue, connection):
+    actions = []
+    parent = get_parent_issue(issue, connection)
+    parent_fix_versions = get_fix_versions(parent)
+    fix_versions = get_fix_versions(issue)
+    if parent_fix_versions != fix_versions:
+        actions.append(Action(issue.key, "Fix versions update to match parent's", None))
+
+    target_version = get_target_versions(issue)
+    if len(target_version) > 1:
+        actions.append(Action(issue.key, "Target versions has more than one value. Fix manually.", None))
+    elif len(target_version) == 0:
+        actions.append(Action(issue.key, "Target versions is empty. Fix manually.", None))
+    else:
+        if target_version[0] not in parent_fix_versions:
+            actions.append(Action(issue.key, "Target version not in parent Fix versions. Fix manually.", None))
+
+    for link in issue.fields.issuelinks:
+        if link.type.name != 'Blocks':
             continue
-        try:
-            new_issue = clone_issue(issue, version, connection)
-        except RuntimeError as e:
-            actions.append([JIRA_URL_PREFIX+issue.key, "", f"Unable to clone for version {version}: {e}"])
-        finally:
-            actions.append([JIRA_URL_PREFIX+new_issue.key, JIRA_URL_PREFIX+issue.key, f"New clone created targetting {version}"])
+        if hasattr(link, 'inwardIssue'):
+            if link.inwardIssue.key == parent.key:
+                return actions
+    actions.append(Action(issue.key, "Add Blocks link with parent issue", add_blocks_link, issue=issue, parent=parent, connection=connection))
 
     return actions
 
-def check_blocks(issue, connection, dry_run):
+
+def scan_issue(issue, connection):
     actions = []
-    original = get_clones_issue(issue, connection)
-    if original is None:
+    if is_issue_a_cve(issue):
         return actions
 
-    for link in original.fields.issuelinks:
-        if link.type.name != 'Blocks':
-            continue
-        if hasattr(link, 'outwardIssue'):
-            if link.outwardIssue.key == issue.key:
-                return actions
-    if dry_run:
-        actions.append([JIRA_URL_PREFIX+issue.key, JIRA_URL_PREFIX+original.key, "Dry run. Skip adding Blocks link"])
+    assignee = get_assignee(issue)
+    if assignee is None:
+        actions.append(Action(issue.key, "Issue needs to be assigned. Fix manually", None))
+        return actions
+
+    fix_versions = get_fix_versions(issue)
+    if len(fix_versions) == 0:
+        actions.append(Action(issue.key, "Fix versions empty. Add label needs-fix-versions", set_needs_fix_version_label, issue=issue))
+        return actions
     else:
-        connection.create_issue_link("Blocks", inwardIssue=original.key, outwardIssue=issue.key)
-        actions.append([JIRA_URL_PREFIX+issue.key, JIRA_URL_PREFIX+original.key, "Blocks link added"])
+        if has_fix_versions_label(issue):
+            actions.append(Action(issue.key, "Remove Fix versions label", remove_needs_fix_version_label, issue=issue))
+
+    if is_original_issue(issue):
+        actions.extend(scan_original_issue(issue, connection))
+    else:
+        actions.extend(scan_cloned_issue(issue, connection))
     return actions
 
 if __name__ == '__main__':
@@ -189,7 +216,7 @@ if __name__ == '__main__':
     )
     parser.add_argument('-t', '--token', help='JIRA Auth token. Defaults to JIRA_TOKEN env var', default=os.environ['JIRA_TOKEN'])
     parser.add_argument('-i', '--issue', help='Target a specific issue. Can be comma separated list', default="")
-    parser.add_argument('-d', '--dry-run', help='Run everything but do not perform server updates', default=False, action='store_true')
+    parser.add_argument('-y', '--auto-accept', help='Do not prompt for action execution confirmation', action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -201,16 +228,32 @@ if __name__ == '__main__':
     if len(args.issue) > 0:
         jql_query = JQL_ISSUE_QUERY.format(args.issue)
 
-    if args.dry_run:
-        print("Dry run activated. Will not perform any server changes")
-
-    query = connection.search_issues(jql_str=jql_query, json_result=True, fields="key", maxResults=9999)
-    print(f"Scanning {len(query['issues'])} issues")
+    try:
+        query = connection.search_issues(jql_str=jql_query, maxResults=9999)
+        print(f"Scanning {len(query)} issues")
+    except Exception as e:
+        print(f"Unable to retrieve issues: {e}")
+        exit(1)
 
     actions = []
-    for i in tqdm(range(len(query['issues']))):
-        issue = connection.issue(query['issues'][i]['key'])
-        actions.extend(check_clones(issue, connection, args.dry_run))
-        actions.extend(check_blocks(issue, connection, args.dry_run))
+    for i in tqdm(range(len(query))):
+        try:
+            issue = query[i]
+        except Exception as e:
+            print(f"Unable to retrieve issue {query[i]}: {e}")
+            continue
+        actions.extend(scan_issue(issue, connection))
+
+    print(tabulate([[x.issue, x.comment, 'Y' if x.action is None else 'N'] for x in actions], headers=['Issue', 'Action', 'Manual']))
+
+    answer = ''
+    if args.auto_accept:
+        answer = 'y'
+    while answer not in ['y', 'n']:
+        answer = input('Perform non manual actions? [Y/N]').lower()
+    if answer == 'n':
+        exit(0)
     
-    print(tabulate(actions, headers=["Issue", "Clones", "Action"]))
+    for i in tqdm(range(len(actions))):
+        if actions[i].action is not None:
+            actions[i].action()
