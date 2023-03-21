@@ -106,6 +106,10 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 }
 
 func (s *EtcdService) Run() error {
+	if os.Geteuid() > 0 {
+		klog.Fatalf("microshift-etcd must be run privileged")
+	}
+
 	e, err := etcd.StartEtcd(s.etcdCfg)
 	if err != nil {
 		return fmt.Errorf("microshift-etcd failed to start: %v", err)
