@@ -37,7 +37,7 @@ git
 jq
 make
 NetworkManager-ovs
-python36
+python3
 selinux-policy-devel
 %end
 
@@ -54,7 +54,7 @@ fi
 
 # Configure systemd journal service to persist logs between boots and limit their size to 1G
 sudo mkdir -p /etc/systemd/journald.conf.d
-cat <<EOF | sudo tee /etc/systemd/journald.conf.d/microshift.conf &>/dev/null
+tee /etc/systemd/journald.conf.d/microshift.conf &>/dev/null <<EOF
 [Journal]
 Storage=persistent
 SystemMaxUse=1G
