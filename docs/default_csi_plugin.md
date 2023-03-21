@@ -3,7 +3,7 @@
 > **IMPORTANT!** The default LVMS configuration is intended to match the developer environment described in [MicroShift Development Environment](./devenv_setup.md). See section **[Configuring LVMS](#Configuring-LVMS)** for guidance on configuring LVMS for your environment.
 
 MicroShift enables dynamic storage provisioning out of the box with the LVMS CSI plugin. This plugin is a downstream
-Red Hat fork of TopoLVM. This provisioner will create a new LVM logical volume in the `rhel` volume group for each
+Red Hat build of TopoLVM. This provisioner will create a new LVM logical volume in the `rhel` volume group for each
 PersistenVolumeClaim(PVC), and make these volumes available to pods. For more information on LVMS, visit the repo's
 [README](https://github.com/red-hat-storage/topolvm).
 
@@ -31,20 +31,22 @@ Full documentation of the config spec can be found at [github.com/red-hat-storag
 
 #### Path
 
-The user provided lvmd config should be written to the same directory as the MicroShift config.  If a MicroShift config
-doesn't exist, MicroShift will assume default lvmd values. These paths will be checked for the config, depending on the user MicroShift
-is run as.
-
-1. User config dir: `~/.microshift/lvmd.yaml`
-2. Global config dir: `/etc/microshift/lvmd.yaml`
+The user provided lvmd config should be written to the same directory as the MicroShift config.  If an lvmd configuration file
+does not exist in `/etc/microshift/lvmd.yaml`, MicroShift will use default values.
 
 ## System Requirements
 
-### Volume Group Name
+### Default Volume Group
 
-The default integration of LVMS assumes a volume-group named `rhel`. LVMS's node-controller expects that volume
-group to exist prior to launching the service. If the volume group does not exist, the node-controller will fail to
-start and enter a CrashLoopBackoff state.
+If there is only one volume group on the system, LVMS uses it by
+default. If there are multiple volume groups, and no configuration
+file, LVMS looks for a volume group named `microshift`. If there is no
+volume group named `microshift`, LVMS is disabled.
+
+LVMS expects all volume groups to exist prior to launching the
+service. If LVMS is configured to use a volume group that does not
+exist, the node-controller Pod will fail and enter a CrashLoopBackoff
+state.
 
 ### Volume Size Increments
 
