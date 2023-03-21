@@ -2,6 +2,8 @@
 ## explicit; go 1.16
 github.com/Azure/go-ansiterm
 github.com/Azure/go-ansiterm/winterm
+# github.com/BurntSushi/toml v1.2.0
+## explicit; go 1.16
 # github.com/MakeNowJust/heredoc v1.0.0
 ## explicit; go 1.12
 github.com/MakeNowJust/heredoc
@@ -11,6 +13,9 @@ github.com/apparentlymart/go-cidr/cidr
 # github.com/beorn7/perks v1.0.1
 ## explicit; go 1.11
 github.com/beorn7/perks/quantile
+# github.com/bgentry/speakeasy v0.1.0
+## explicit
+github.com/bgentry/speakeasy
 # github.com/blang/semver/v4 v4.0.0
 ## explicit; go 1.14
 github.com/blang/semver/v4
@@ -26,6 +31,8 @@ github.com/chai2010/gettext-go
 github.com/chai2010/gettext-go/mo
 github.com/chai2010/gettext-go/plural
 github.com/chai2010/gettext-go/po
+# github.com/cockroachdb/redact v1.1.3
+## explicit; go 1.14
 # github.com/coreos/go-semver v0.3.0
 ## explicit
 github.com/coreos/go-semver/semver
@@ -48,8 +55,10 @@ github.com/evanphx/json-patch
 # github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d
 ## explicit
 github.com/exponent-io/jsonpath
-# github.com/go-errors/errors v1.0.1
-## explicit
+# github.com/getsentry/sentry-go v0.19.0
+## explicit; go 1.18
+# github.com/go-errors/errors v1.4.2
+## explicit; go 1.14
 github.com/go-errors/errors
 # github.com/go-logr/logr v1.2.3
 ## explicit; go 1.16
@@ -77,6 +86,8 @@ github.com/gogo/protobuf/sortkeys
 # github.com/golang-jwt/jwt/v4 v4.4.2
 ## explicit; go 1.16
 github.com/golang-jwt/jwt/v4
+# github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
+## explicit
 # github.com/golang/protobuf v1.5.2
 ## explicit; go 1.9
 github.com/golang/protobuf/descriptor
@@ -112,7 +123,7 @@ github.com/google/gofuzz/bytesource
 # github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 ## explicit; go 1.13
 github.com/google/shlex
-# github.com/google/uuid v1.1.2
+# github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid
 # github.com/gorilla/websocket v1.4.2
@@ -155,11 +166,16 @@ github.com/json-iterator/go
 # github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de
 ## explicit
 github.com/liggitt/tabwriter
-# github.com/mailru/easyjson v0.7.6
+# github.com/mailru/easyjson v0.7.7
 ## explicit; go 1.12
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
+# github.com/mattn/go-colorable v0.1.13
+## explicit; go 1.15
+# github.com/mattn/go-runewidth v0.0.9
+## explicit; go 1.9
+github.com/mattn/go-runewidth
 # github.com/matttproud/golang_protobuf_extensions v1.0.2
 ## explicit; go 1.9
 github.com/matttproud/golang_protobuf_extensions/pbutil
@@ -189,6 +205,9 @@ github.com/monochromegane/go-gitignore
 # github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
 ## explicit
 github.com/munnerz/goautoneg
+# github.com/olekukonko/tablewriter v0.0.5
+## explicit; go 1.12
+github.com/olekukonko/tablewriter
 # github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
 ## explicit; go 1.13
 github.com/openshift/build-machinery-go
@@ -233,7 +252,7 @@ github.com/prometheus/procfs/internal/util
 # github.com/russross/blackfriday/v2 v2.1.0
 ## explicit
 github.com/russross/blackfriday/v2
-# github.com/sirupsen/logrus v1.8.1
+# github.com/sirupsen/logrus v1.9.0
 ## explicit; go 1.13
 github.com/sirupsen/logrus
 # github.com/soheilhy/cmux v0.1.5
@@ -257,7 +276,7 @@ github.com/xlab/treeprint
 # go.etcd.io/bbolt v1.3.6
 ## explicit; go 1.12
 go.etcd.io/bbolt
-# go.etcd.io/etcd/api/v3 v3.5.6 => github.com/openshift/etcd/api/v3 v3.5.1-0.20230316155625-384dc49aed5e
+# go.etcd.io/etcd/api/v3 v3.5.7 => github.com/openshift/etcd/api/v3 v3.5.1-0.20230316155625-384dc49aed5e
 ## explicit; go 1.16
 go.etcd.io/etcd/api/v3/authpb
 go.etcd.io/etcd/api/v3/etcdserverpb
@@ -266,7 +285,7 @@ go.etcd.io/etcd/api/v3/membershippb
 go.etcd.io/etcd/api/v3/mvccpb
 go.etcd.io/etcd/api/v3/v3rpc/rpctypes
 go.etcd.io/etcd/api/v3/version
-# go.etcd.io/etcd/client/pkg/v3 v3.5.6 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20230316155625-384dc49aed5e
+# go.etcd.io/etcd/client/pkg/v3 v3.5.7 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20230316155625-384dc49aed5e
 ## explicit; go 1.16
 go.etcd.io/etcd/client/pkg/v3/fileutil
 go.etcd.io/etcd/client/pkg/v3/logutil
@@ -276,19 +295,30 @@ go.etcd.io/etcd/client/pkg/v3/systemd
 go.etcd.io/etcd/client/pkg/v3/tlsutil
 go.etcd.io/etcd/client/pkg/v3/transport
 go.etcd.io/etcd/client/pkg/v3/types
-# go.etcd.io/etcd/client/v2 v2.305.6
-## explicit; go 1.16
+# go.etcd.io/etcd/client/v2 v2.305.7
+## explicit; go 1.17
 go.etcd.io/etcd/client/v2
-# go.etcd.io/etcd/client/v3 v3.5.6 => github.com/openshift/etcd/client/v3 v3.5.1-0.20230316155625-384dc49aed5e
+# go.etcd.io/etcd/client/v3 v3.5.7 => github.com/openshift/etcd/client/v3 v3.5.1-0.20230316155625-384dc49aed5e
 ## explicit; go 1.16
 go.etcd.io/etcd/client/v3
 go.etcd.io/etcd/client/v3/concurrency
 go.etcd.io/etcd/client/v3/credentials
 go.etcd.io/etcd/client/v3/internal/endpoint
 go.etcd.io/etcd/client/v3/internal/resolver
-# go.etcd.io/etcd/pkg/v3 v3.5.6 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20230316155625-384dc49aed5e
+go.etcd.io/etcd/client/v3/mirror
+go.etcd.io/etcd/client/v3/snapshot
+# go.etcd.io/etcd/etcdctl/v3 v3.5.7
+## explicit; go 1.17
+go.etcd.io/etcd/etcdctl/v3/ctlv3
+go.etcd.io/etcd/etcdctl/v3/ctlv3/command
+# go.etcd.io/etcd/etcdutl/v3 v3.5.7
+## explicit; go 1.17
+go.etcd.io/etcd/etcdutl/v3/etcdutl
+go.etcd.io/etcd/etcdutl/v3/snapshot
+# go.etcd.io/etcd/pkg/v3 v3.5.7 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20230316155625-384dc49aed5e
 ## explicit; go 1.16
 go.etcd.io/etcd/pkg/v3/adt
+go.etcd.io/etcd/pkg/v3/cobrautl
 go.etcd.io/etcd/pkg/v3/contention
 go.etcd.io/etcd/pkg/v3/cpuutil
 go.etcd.io/etcd/pkg/v3/crc
@@ -299,18 +329,19 @@ go.etcd.io/etcd/pkg/v3/idutil
 go.etcd.io/etcd/pkg/v3/ioutil
 go.etcd.io/etcd/pkg/v3/netutil
 go.etcd.io/etcd/pkg/v3/pbutil
+go.etcd.io/etcd/pkg/v3/report
 go.etcd.io/etcd/pkg/v3/runtime
 go.etcd.io/etcd/pkg/v3/schedule
 go.etcd.io/etcd/pkg/v3/traceutil
 go.etcd.io/etcd/pkg/v3/wait
-# go.etcd.io/etcd/raft/v3 v3.5.6 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20230316155625-384dc49aed5e
+# go.etcd.io/etcd/raft/v3 v3.5.7 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20230316155625-384dc49aed5e
 ## explicit; go 1.16
 go.etcd.io/etcd/raft/v3
 go.etcd.io/etcd/raft/v3/confchange
 go.etcd.io/etcd/raft/v3/quorum
 go.etcd.io/etcd/raft/v3/raftpb
 go.etcd.io/etcd/raft/v3/tracker
-# go.etcd.io/etcd/server/v3 v3.5.5 => github.com/openshift/etcd/server/v3 v3.5.1-0.20230316155625-384dc49aed5e
+# go.etcd.io/etcd/server/v3 v3.5.7 => github.com/openshift/etcd/server/v3 v3.5.1-0.20230316155625-384dc49aed5e
 ## explicit; go 1.16
 go.etcd.io/etcd/server/v3/auth
 go.etcd.io/etcd/server/v3/config
@@ -352,6 +383,10 @@ go.etcd.io/etcd/server/v3/proxy/grpcproxy/adapter
 go.etcd.io/etcd/server/v3/verify
 go.etcd.io/etcd/server/v3/wal
 go.etcd.io/etcd/server/v3/wal/walpb
+# go.etcd.io/etcd/tests/v3 v3.5.7
+## explicit; go 1.17
+# go.etcd.io/etcd/v3 v3.5.7
+## explicit; go 1.17
 # go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.35.0
 ## explicit; go 1.17
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
@@ -463,7 +498,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/time v0.0.0-20220210224613-90d013bbcef8
+# golang.org/x/time v0.0.0-20220922220347-f3bd1da661af
 ## explicit
 golang.org/x/time/rate
 # google.golang.org/appengine v1.6.7
@@ -572,6 +607,9 @@ google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/fieldmaskpb
 google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/known/wrapperspb
+# gopkg.in/cheggaaa/pb.v1 v1.0.28
+## explicit
+gopkg.in/cheggaaa/pb.v1
 # gopkg.in/inf.v0 v0.9.1
 ## explicit
 gopkg.in/inf.v0
