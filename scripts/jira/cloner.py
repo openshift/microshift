@@ -55,6 +55,16 @@ def get_parent_issue(issue, connection):
             return connection.issue(link.outwardIssue.key)
     return None
 
+def get_sprint(issue):
+    if not hasattr(issue.fields, 'customfield_12310940'):
+        return None
+    if issue.fields.customfield_12310940 is None or len(issue.fields.customfield_12310940) == 0:
+        return None
+    last_sprint = issue.fields.customfield_12310940[-1]
+    first_index = last_sprint.find('id=')+3
+    last_index = last_sprint.find(',', first_index)
+    return last_sprint[first_index:last_index]
+
 def is_issue_a_cve(issue):
     for label in issue.fields.labels:
         if label.startswith('CVE-'):
@@ -84,7 +94,7 @@ def remove_needs_fix_version_label(issue):
         if l == 'needs-fix-version':
             continue
         labels.append({'name': l})
-    issue.ipdate(fields={
+    issue.update(fields={
         'labels': labels
     })
 
@@ -116,6 +126,11 @@ def clone_issue(issue, target, connection):
     new_issue = connection.create_issue(data_dict)
     connection.create_issue_link("Cloners", inwardIssue=new_issue.key, outwardIssue=issue.key)
     connection.create_issue_link("Blocks", inwardIssue=issue.key, outwardIssue=new_issue.key)
+
+    sprint = get_sprint(issue)
+    if sprint is not None:
+        connection.add_issues_to_sprint(sprint, [new_issue])
+
     return new_issue
 
 def add_blocks_link(issue, parent, connection):
@@ -203,6 +218,9 @@ def scan_issue(issue, connection):
         if has_fix_versions_label(issue):
             actions.append(Action(issue.key, "Remove Fix versions label", remove_needs_fix_version_label, issue=issue))
 
+    if get_sprint(issue) is None:
+        actions.append(Action(issue.key, "Issue needs to be included in a sprint", None))
+
     if is_original_issue(issue):
         actions.extend(scan_original_issue(issue, connection))
     else:
@@ -223,7 +241,7 @@ if __name__ == '__main__':
     connection = jira.JIRA(
         server=JIRA_SERVER,
         token_auth=args.token)
-    
+
     jql_query = JQL_GLOBAL_QUERY
     if len(args.issue) > 0:
         jql_query = JQL_ISSUE_QUERY.format(args.issue)
