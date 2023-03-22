@@ -4,8 +4,10 @@ from tabulate import tabulate
 import argparse
 from tqdm import tqdm
 
-JQL_GLOBAL_QUERY = 'filter = "MicroShift - Bugs in Project" and status in (New, Assigned, Post, "To Do", "In Progress", "Code Review") order by key asc'
-JQL_ISSUE_QUERY = 'key in ({}) order by key asc'
+JQL_FILTER_QUERY = 'filter = "MicroShift - Bugs in Project" and status in (New, Assigned, Post, "To Do", "In Progress", "Code Review")'
+JQL_FILTER_ISSUE = 'key in ({})'
+JQL_FILTER_USER = 'assignee in ({})'
+JQL_ORDER_BY = 'order by key asc'
 JIRA_SERVER = 'https://issues.redhat.com'
 JIRA_URL_PREFIX = JIRA_SERVER+'/browse/'
 
@@ -227,14 +229,25 @@ def scan_issue(issue, connection):
         actions.extend(scan_cloned_issue(issue, connection))
     return actions
 
+def query_build(issue, user):
+    query = JQL_FILTER_QUERY
+    if issue:
+        query += f' and {JQL_FILTER_ISSUE.format(issue)}'
+    if user:
+        users = [f'"{x}"' for x in user.split(',')]
+        query += f' and {JQL_FILTER_USER.format(",".join(users))}'
+    query += f' {JQL_ORDER_BY}'
+    return query
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog='cloner',
         description='Automatic MicroShift bug JIRA cloner'
     )
     parser.add_argument('-t', '--token', help='JIRA Auth token. Defaults to JIRA_TOKEN env var', default=os.environ['JIRA_TOKEN'])
-    parser.add_argument('-i', '--issue', help='Target a specific issue. Can be comma separated list', default="")
+    parser.add_argument('-i', '--issue', help='Target a specific issue. Can be comma separated list', default='')
     parser.add_argument('-y', '--auto-accept', help='Do not prompt for action execution confirmation', action='store_true', default=False)
+    parser.add_argument('-u', '--user', help='Issues owned by this user', default='')
 
     args = parser.parse_args()
 
@@ -242,9 +255,8 @@ if __name__ == '__main__':
         server=JIRA_SERVER,
         token_auth=args.token)
 
-    jql_query = JQL_GLOBAL_QUERY
-    if len(args.issue) > 0:
-        jql_query = JQL_ISSUE_QUERY.format(args.issue)
+    jql_query = query_build(args.issue, args.user)
+    print(f"JQL Query: '{jql_query}'")
 
     try:
         query = connection.search_issues(jql_str=jql_query, maxResults=9999)
