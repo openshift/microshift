@@ -77,17 +77,8 @@ fi
 
 echo "STARTED"
 
-# Dump GRUB boot, Greenboot variables and ostree status affecting the script behavior.
-# This information is important for troubleshooting rollback issues.
-grub_vars=$(grub2-editenv - list | grep ^boot_ || true)
-boot_vars=$(set | egrep '^GREENBOOT_|^MICROSHIFT_' || true)
-
-[ -z "${grub_vars}" ] && grub_vars=None
-[ -z "${boot_vars}" ] && boot_vars=None
-
-echo -e "GRUB boot variables:\n${grub_vars}"
-echo -e "Greenboot variables:\n${boot_vars}"
-echo -e "The ostree status:\n$(ostree admin status || true)"
+# Print the boot variable status
+print_boot_status
 
 # Exit if the MicroShift service is not enabled
 if [ $(systemctl is-enabled microshift.service 2>/dev/null) != "enabled" ] ; then
