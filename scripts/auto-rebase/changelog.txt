@@ -1,21 +1,3 @@
-# cluster-network-operator embedded-component c0208114e49b3ee34bb073ea7d09cf82273573b0 to 040d5efed272789341b16858f63c2d0bcdb71b50
-aa97a84efe7f3bf892f7d74d94ed4405b123fd65 2023-03-17T03:15:52+00:00 Point libreswan to proper nss location
-53d3972e5e287c3d4eabbbb8485324f72ceddb4f 2023-03-10T13:05:19+00:00 HyperShift: Set priority class for CNCC
-7f983c90f1f9a1c2259bc41503c443b62dc5b10c 2023-03-10T13:05:19+00:00 HyperShift: Adapt affinity and tolerations
-1756b472710f9a53e6669ae4923246c267c63d98 2023-03-10T13:05:19+00:00 HyperShift: Co-locate CNCC and multus admission controller with other hcp pods
-fa7c5559546a8a3434c41a7be945dbfcd5de10f6 2023-03-09T15:24:09+01:00 Set healthz-bind-address to 0.0.0.0:10256 for ovnk
-ea081581bf467c22faeb9f178cab66c551fad588 2023-03-09T15:24:08+01:00 Pass POD_NAME to ovnkube node for node healthz server checks
-fa545fad09bd9d8fbc447fd7a6759c96c12d5390 2023-03-03T14:26:59+00:00 OVN-K alerts: add OVS overflow alerts
-# machine-config-operator embedded-component 02d35277a879c72f48e63c31f36072376c7e2598 to 40575b862f7bd42a2c40c8e6b7203cd4c29b0021
-4c693157fbbac8962d0b2b5de77893f49c8a6879 2023-03-16T19:28:55+00:00 daemon: Drop duplicate `--authfile` used in `run`
-f9f358260da206bf27d4c6579bcab3ec93a4875f 2023-03-14T02:28:32+00:00 Remove hard requirement for the afterburn from early-running aws-related services
-# oc image-amd64 02362102a19e81ebecb90906f41687e4e4350dfe to eed143055ede731029931ad204b19cd2f565ef1a
-c3d6a7830ec95b4cf8dc413c15b57d0c5176e3ca 2023-03-16T06:25:04+00:00 Add microshift into generate-docs
-# ovn-kubernetes image-amd64 Script exited with error. to dd45efd39e5db428d4578ed6787e6c08b79e2df5
-There was an error determining the changes
-
-# oc image-arm64 02362102a19e81ebecb90906f41687e4e4350dfe to eed143055ede731029931ad204b19cd2f565ef1a
-c3d6a7830ec95b4cf8dc413c15b57d0c5176e3ca 2023-03-16T06:25:04+00:00 Add microshift into generate-docs
-# ovn-kubernetes image-arm64 Script exited with error. to dd45efd39e5db428d4578ed6787e6c08b79e2df5
-There was an error determining the changes
-
+# kubernetes image-arm64 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb to dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf
+916c65ebea0205d3c18d3701f48cf568ef9e7220 2023-03-17T23:03:18+00:00 UPSTREAM: 115328: annotate early and late requests
+a6938113b34b64c0626efa322cd4d3c1132d64fb 2023-03-17T23:03:18+00:00 UPSTREAM: <drop>: Revert "UPSTREAM: <carry>: annotate audit events for requests during unready phase and graceful termination phase"
