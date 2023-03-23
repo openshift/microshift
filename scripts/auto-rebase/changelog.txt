@@ -1,3 +1,45 @@
-- ovn-kubernetes image-arm64 5cfa88c4b777819b8f89d3dc16ca5a703a7116f0 to 10a45326f5afb47e9ffbf674945ed7c08b9f7754
+- ovn-kubernetes image-amd64 5cfa88c4b777819b8f89d3dc16ca5a703a7116f0 to 10a45326f5afb47e9ffbf674945ed7c08b9f7754
   - 8f13d71 2023-03-17T07:18:43-05:00 Dockerfiles: copy RHEL9 to regular Dockerfiles
+
+- oc image-arm64 07ee29c0df5c8d234feadfce0bfb86970ce45336 to b860ec0761be98968f427136cf94437e85fff700
+  - 906a3bb 2023-03-21T16:28:43+01:00 OCPBUGS-10622: bump repo sclorg/s2i-ruby-container location for newapp
+
+- ovn-kubernetes image-arm64 10a45326f5afb47e9ffbf674945ed7c08b9f7754 to 98fbfbae439127f6836413eed89c3a3a672f46f8
+  - eb5bbd7 2023-03-21T17:11:46+00:00 Start master metrics server for all master instances
+  - 54b67a3 2023-03-16T15:20:36+01:00 don't create acl if no namespace address sets are selected. Previously "ip4.dst == {}" match was created, and ovn-controller throws an error on such acl
+  - 7f4b409 2023-03-16T15:19:31+01:00 Add PodSelectorAddressSet tests.
+  - ed34024 2023-03-16T14:44:26+01:00 Rework gressPolicy ACLs build: previously all gress policies with at least one selector had peerAddressSet, and empty gress (allow all) was identified by "gp.sizeOfAddressSet() > 0". Now we don't create address sets like that, therefore a new hasPeerSelector field was added to distinguish empty gress from the one that just doesn't have any address sets added yet.
+  - 120140f 2023-03-16T14:44:22+01:00 Add PodSelectorAddressSet object, that should be used to manage address sets for pod selector (network policy object is only responsible for local pods and peer namespace-only handlers). The locking mechanism is copied from networkPolicy.
+  - f6f3ed8 2023-03-16T14:35:04+01:00 Unlock shared default deny port group early, when no db changes required, to unlock other handlers from the same namespace.
+  - cad6ed3 2023-03-15T12:49:07-04:00 Add Device Plugin Resource For Mgmt Port
+  - a59ce84 2023-03-15T17:31:04+01:00 docs, multi-homing: fix localnet topology typo
+  - 0f62d33 2023-03-14T14:24:33-04:00 Add error checking for addEventHandler calls
+  - 0975a93 2023-03-14T14:21:00-04:00 Bump K8S_VERSION to 1.26.0 for KIND setup
+  - 3850450 2023-03-14T14:21:00-04:00 sets package update
+  - 94756df 2023-03-14T14:21:00-04:00 exec.Stream deprecated
+  - 65c79af 2023-03-14T14:21:00-04:00 Bump K8s vendored libraries to use kube 1.26
+  - db5aaa2 2023-03-14T13:26:02+00:00 Single leader election
+  - b0e72e3 2023-03-10T19:02:35+01:00 Node healthz server: return unhealthy when pod is to be deleted
+  - af58536 2023-03-10T07:27:34-08:00 Emit logs when metrics servers start and stop.
+  - edc3a34 2023-03-10T16:00:57+01:00 unidling: Keep `event=true` during grace period
+  - 41b4393 2023-03-10T15:09:20+01:00 kind: Support local registry at "--deploy"
+  - 51d7584 2023-03-09T14:51:57-08:00 fix potential pod IP leak in case that addLogicalPortToNetwork() fails
+  - 0d467f0 2023-03-09T22:45:09+01:00 e2e: Don't pin nodePort
+  - 2ea2fd5 2023-03-09T11:15:04-06:00 factory: consolidate handler queue management
+  - f69e284 2023-03-09T10:14:06-06:00 factory: use same queue balancing logic for initial adds
+  - 0b2f33b 2023-03-09T10:13:59-06:00 factory: rename handler "events" to "queues"
+  - 170443c 2023-03-09T15:47:36+01:00 unidling: Add e2e test
+  - 41046e8 2023-03-09T09:07:32-05:00 Fix egress firewall CRD
+  - 11283d6 2023-03-09T13:23:33+01:00 fix multiple error aggregation: `errors.Wrapf` always returns nil if the first argument is nil.
+  - bdeb82f 2023-03-09T17:24:45+08:00 Fix duplicated metric registration
+  - 81acdc2 2023-03-08T18:08:48+01:00 Optimize egress firewall cleanup to only select switches that have stale acls.
+  - 1896e16 2023-03-08T18:08:43+01:00 Batch potentially big transaction on egress firewall ACLs migration. The default transaction timeout is 10 seconds, it can be reached when we delete all egress firewall acls during migration to port groups from switches.
+  - ba449fa 2023-03-08T16:31:39+01:00 update k8s image registry from k8s.gcr.io to registry.k8s.io. https://kubernetes.io/blog/2023/02/06/k8s-gcr-io-freeze-announcement/
+  - 692b885 2023-03-07T16:12:52-05:00 fedora: Update OVN to latest release - 23.03.0.
+  - 26f8f66 2023-03-07T12:17:28+01:00 Fix egress firewall unit tests gatewayMode setup update "egress firewall with node selector updates during node update" to work for both gateway modes.
+  - 66c8801 2023-03-07T12:17:03+01:00 Egress firewall creation error was overridden by the status update error and never returned. That would prevent retry on failure.
+  - d8b4945 2023-03-07T09:46:19+01:00 docs, multi-homing: fix markdown for netAttachDefName attribute
+  - 8a3ebe0 2023-03-03T16:22:29+01:00 docs, multi-homing: attachment config via net-selection-elements
+  - e6fe1f1 2023-03-03T16:21:17+01:00 docs, multi-homing, localnet: move subnet to a different bullet
+  - fc39aab 2023-03-03T12:37:00+00:00 Fix NAD controller Stop
 
