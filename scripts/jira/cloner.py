@@ -4,8 +4,10 @@ from tabulate import tabulate
 import argparse
 from tqdm import tqdm
 
-JQL_GLOBAL_QUERY = 'filter = "MicroShift - Bugs in Project" and status in (New, Assigned, Post, "To Do", "In Progress", "Code Review") order by key asc'
-JQL_ISSUE_QUERY = 'key in ({}) order by key asc'
+JQL_FILTER_QUERY = 'filter = "MicroShift - Bugs in Project" and status in (New, Assigned, Post, "To Do", "In Progress", "Code Review")'
+JQL_FILTER_ISSUE = 'key in ({})'
+JQL_FILTER_USER = 'assignee in ({})'
+JQL_ORDER_BY = 'order by key asc'
 JIRA_SERVER = 'https://issues.redhat.com'
 JIRA_URL_PREFIX = JIRA_SERVER+'/browse/'
 
@@ -55,6 +57,16 @@ def get_parent_issue(issue, connection):
             return connection.issue(link.outwardIssue.key)
     return None
 
+def get_sprint(issue):
+    if not hasattr(issue.fields, 'customfield_12310940'):
+        return None
+    if issue.fields.customfield_12310940 is None or len(issue.fields.customfield_12310940) == 0:
+        return None
+    last_sprint = issue.fields.customfield_12310940[-1]
+    first_index = last_sprint.find('id=')+3
+    last_index = last_sprint.find(',', first_index)
+    return last_sprint[first_index:last_index]
+
 def is_issue_a_cve(issue):
     for label in issue.fields.labels:
         if label.startswith('CVE-'):
@@ -75,7 +87,7 @@ def set_target_version(issue, version):
 def set_needs_fix_version_label(issue):
     labels = issue.fields.labels + ['needs-fix-version']
     issue.update(fields={
-        'labels': [{'name': x} for x in labels]
+        'labels': [x for x in labels]
     })
 
 def remove_needs_fix_version_label(issue):
@@ -84,7 +96,7 @@ def remove_needs_fix_version_label(issue):
         if l == 'needs-fix-version':
             continue
         labels.append({'name': l})
-    issue.ipdate(fields={
+    issue.update(fields={
         'labels': labels
     })
 
@@ -93,30 +105,51 @@ def set_target_version(issue, version):
         'customfield_12319940': [{'name': version}]
     })
 
+def set_assignee(issue, assignee):
+    issue.update(fields={
+        'assignee': {
+            'name': assignee
+        }
+    })
+
+def set_fix_versions(issue, fix_versions):
+    issue.update(fields={
+        'fixVersions': [{'name': x} for x in fix_versions]
+    })
+
+def set_qa_contact(issue, contact):
+    issue.update(fields={
+        'customfield_12315948': {'value': contact}
+    })
+
+def set_sprint(issue, sprint, connection):
+    connection.add_issues_to_sprint(sprint, [issue.key])
+
 def clone_issue(issue, target, connection):
     data_dict = {}
     data_dict['priority'] = {'id': issue.fields.priority.id}
     data_dict['labels'] = issue.fields.labels + ['backport']
-    data_dict['assignee'] = {'name': issue.fields.assignee.name}
-    data_dict['reporter'] = {'name': issue.fields.reporter.name}
-    data_dict['issuetype'] = {'name': issue.fields.issuetype.name}
+    data_dict['issuetype'] = {'id': issue.fields.issuetype.id}
     data_dict['project'] = {'id': issue.fields.project.id}
     data_dict['summary'] = issue.fields.summary
     data_dict['description'] = issue.fields.description
-    data_dict['components'] = [{'id': x.name} for x in issue.fields.components]
+    data_dict['components'] = [{'id': x.id} for x in issue.fields.components]
     data_dict['versions'] = [{'name': x.name} for x in issue.fields.versions]
-    data_dict['fixVersions'] = [{'name': x.name} for x in issue.fields.fixVersions]
-    # QA contact
-    if hasattr(issue.fields, 'customfield_12315948'):
-        data_dict['customfield_12315948'] = {'value': issue.fields.customfield_12315948.name}
-    data_dict['customfield_12320947'] = [{'value': x.value} for x in issue.fields.customfield_12320947]
     # Target version
     data_dict['customfield_12319940'] = [{'name': target}]
 
     new_issue = connection.create_issue(data_dict)
+    set_assignee(new_issue, issue.fields.assignee.name)
+    set_fix_versions(new_issue, [x.name for x in issue.fields.fixVersions])
+    if hasattr(issue.fields, 'customfield_12315948'):
+        set_qa_contact(new_issue, issue.fields.customfield_12315948.name)
+
     connection.create_issue_link("Cloners", inwardIssue=new_issue.key, outwardIssue=issue.key)
     connection.create_issue_link("Blocks", inwardIssue=issue.key, outwardIssue=new_issue.key)
-    return new_issue
+
+    sprint = get_sprint(issue)
+    if sprint is not None:
+        connection.add_issues_to_sprint(sprint, [new_issue.key])
 
 def add_blocks_link(issue, parent, connection):
     connection.create_issue_link("Blocks", inwardIssue=parent.key, outwardIssue=issue.key)
@@ -142,6 +175,9 @@ def scan_original_issue(issue, connection):
     elif target_versions[0] != fix_versions[0]:
         actions.append(Action(issue.key, "Target versions do not match Fix versions latest. Set to latest in Fix versions.", set_target_version, issue=issue, version=fix_versions[0]))
 
+    if get_sprint(issue) is None:
+        actions.append(Action(issue.key, "Issue needs to be included in a sprint", None))
+
     fix_versions_missing = set(fix_versions[1:])
     cloning_issues = get_clone_by_issues(issue, connection)
     for clone in cloning_issues:
@@ -163,7 +199,7 @@ def scan_cloned_issue(issue, connection):
     parent_fix_versions = get_fix_versions(parent)
     fix_versions = get_fix_versions(issue)
     if parent_fix_versions != fix_versions:
-        actions.append(Action(issue.key, "Fix versions update to match parent's", None))
+        actions.append(Action(issue.key, "Fix versions update to match parent", set_fix_versions, issue=issue, fix_versions=parent_fix_versions))
 
     target_version = get_target_versions(issue)
     if len(target_version) > 1:
@@ -173,6 +209,13 @@ def scan_cloned_issue(issue, connection):
     else:
         if target_version[0] not in parent_fix_versions:
             actions.append(Action(issue.key, "Target version not in parent Fix versions. Fix manually.", None))
+
+    if get_sprint(issue) is None:
+        parent_sprint = get_sprint(parent)
+        if parent_sprint is not None:
+            actions.append(Action(issue.key, "Sprint empty, copy from parent", set_sprint, issue=issue, sprint=parent_sprint, connection=connection))
+        else:
+            actions.append(Action(issue.key, "Issue needs to be included in a sprint", None))
 
     for link in issue.fields.issuelinks:
         if link.type.name != 'Blocks':
@@ -197,7 +240,10 @@ def scan_issue(issue, connection):
 
     fix_versions = get_fix_versions(issue)
     if len(fix_versions) == 0:
-        actions.append(Action(issue.key, "Fix versions empty. Add label needs-fix-versions", set_needs_fix_version_label, issue=issue))
+        if not has_fix_versions_label(issue):
+            actions.append(Action(issue.key, "Fix versions empty. Add label needs-fix-versions", set_needs_fix_version_label, issue=issue))
+        else:
+            actions.append(Action(issue.key, "Fix versions empty. Label needs-fix-versions present", None))
         return actions
     else:
         if has_fix_versions_label(issue):
@@ -209,24 +255,34 @@ def scan_issue(issue, connection):
         actions.extend(scan_cloned_issue(issue, connection))
     return actions
 
+def query_build(issue, user):
+    query = JQL_FILTER_QUERY
+    if issue:
+        query += f' and {JQL_FILTER_ISSUE.format(issue)}'
+    if user:
+        users = [f'"{x}"' for x in user.split(',')]
+        query += f' and {JQL_FILTER_USER.format(",".join(users))}'
+    query += f' {JQL_ORDER_BY}'
+    return query
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog='cloner',
         description='Automatic MicroShift bug JIRA cloner'
     )
     parser.add_argument('-t', '--token', help='JIRA Auth token. Defaults to JIRA_TOKEN env var', default=os.environ['JIRA_TOKEN'])
-    parser.add_argument('-i', '--issue', help='Target a specific issue. Can be comma separated list', default="")
+    parser.add_argument('-i', '--issue', help='Target a specific issue. Can be comma separated list', default='')
     parser.add_argument('-y', '--auto-accept', help='Do not prompt for action execution confirmation', action='store_true', default=False)
+    parser.add_argument('-u', '--user', help='Issues owned by this user', default='')
 
     args = parser.parse_args()
 
     connection = jira.JIRA(
         server=JIRA_SERVER,
         token_auth=args.token)
-    
-    jql_query = JQL_GLOBAL_QUERY
-    if len(args.issue) > 0:
-        jql_query = JQL_ISSUE_QUERY.format(args.issue)
+
+    jql_query = query_build(args.issue, args.user)
+    print(f"JQL Query: '{jql_query}'")
 
     try:
         query = connection.search_issues(jql_str=jql_query, maxResults=9999)
@@ -245,15 +301,24 @@ if __name__ == '__main__':
         actions.extend(scan_issue(issue, connection))
 
     print(tabulate([[x.issue, x.comment, 'Y' if x.action is None else 'N'] for x in actions], headers=['Issue', 'Action', 'Manual']))
+    print()
+
+    actions = list(filter(lambda x: x.action is not None, actions))
+    if len(actions) == 0:
+        print("No automatic actions to perform.")
+        exit(0)
 
     answer = ''
     if args.auto_accept:
         answer = 'y'
     while answer not in ['y', 'n']:
-        answer = input('Perform non manual actions? [Y/N]').lower()
+        answer = input(f'Perform {len(actions)} non manual actions? [Y/N]').lower()
     if answer == 'n':
         exit(0)
     
     for i in tqdm(range(len(actions))):
         if actions[i].action is not None:
-            actions[i].action()
+            try:
+                actions[i].action()
+            except Exception as e:
+                print(f'Error executing action "{actions[i].comment}" on issue {actions[i].issue}:\n\t{e}')
