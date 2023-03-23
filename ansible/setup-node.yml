@@ -63,3 +63,12 @@
     - vars/all.yml
   roles:
     - role: microshift-start
+
+- name: add kubelet endpoint to prometheus
+  hosts: logging
+  become: yes
+  gather_facts: no
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: add-kubelet-logging

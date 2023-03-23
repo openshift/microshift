@@ -109,12 +109,11 @@ The MicroShift host name or IP address must be configured to match the current e
 > The following Ansible command line options can be used instead of editing the `inventory/inventory` file.
 > - `-e ansible_host_var=<hostname>`
 > - `-e ansible_user_var=<username>`
-> - `-e private_ip_var=<ipaddress>`
 
 **Sample Inventory File**
 ```
 [microshift]
-microshift-dev ansible_host=microshift-dev private_ip=
+microshift-dev ansible_host=microshift-dev
 
 [microshift:vars]
 ansible_user=microshift
