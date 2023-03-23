@@ -1,3 +1,6 @@
-# kubernetes image-arm64 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb to dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf
+# kubernetes embedded-component 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb to dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf
+916c65ebea0205d3c18d3701f48cf568ef9e7220 2023-03-17T23:03:18+00:00 UPSTREAM: 115328: annotate early and late requests
+a6938113b34b64c0626efa322cd4d3c1132d64fb 2023-03-17T23:03:18+00:00 UPSTREAM: <drop>: Revert "UPSTREAM: <carry>: annotate audit events for requests during unready phase and graceful termination phase"
+# kubernetes image-amd64 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb to dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf
 916c65ebea0205d3c18d3701f48cf568ef9e7220 2023-03-17T23:03:18+00:00 UPSTREAM: 115328: annotate early and late requests
 a6938113b34b64c0626efa322cd4d3c1132d64fb 2023-03-17T23:03:18+00:00 UPSTREAM: <drop>: Revert "UPSTREAM: <carry>: annotate audit events for requests during unready phase and graceful termination phase"
