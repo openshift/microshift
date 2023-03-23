@@ -1,0 +1,36 @@
+run:
+  timeout: 5m
+  modules-download-mode: vendor
+
+linters:
+  # https://golangci-lint.run/usage/linters/
+  # Extra linters on top of default
+  enable:
+  - asasalint
+  - asciicheck
+  - bidichk
+  - bodyclose
+  - containedctx
+  - contextcheck
+  - decorder
+  - exhaustive
+  - exportloopref
+  - gocheckcompilerdirectives
+  - goconst
+  - gosec
+  - importas
+  - ireturn
+  - loggercheck
+  - misspell
+  - nestif
+  - nilerr
+  - nilnil
+  - nosprintfhostport
+  - prealloc
+  - predeclared
+  - reassign
+  - unconvert
+  - unparam
+  - usestdlibvars
+  - wastedassign
+  - whitespace
