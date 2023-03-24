@@ -143,6 +143,7 @@ install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
 install -p -m755 ./_output/microshift-etcd %{buildroot}%{_bindir}/microshift-etcd
 install -p -m755 scripts/microshift-cleanup-data.sh %{buildroot}%{_bindir}/microshift-cleanup-data
+install -p -m755 scripts/microshift-disable.sh %{buildroot}%{_bindir}/microshift-disable
 
 restorecon -v %{buildroot}%{_bindir}/microshift
 restorecon -v %{buildroot}%{_bindir}/microshift-etcd
@@ -258,6 +259,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/microshift
 %{_bindir}/microshift-etcd
 %{_bindir}/microshift-cleanup-data
+%{_bindir}/microshift-disable
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
 %dir %{_sysconfdir}/microshift
@@ -296,6 +298,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Fri Mar 24 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
+- Add microshift-disable command
+
 * Wed Mar 01 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
 - Add lvmd.yaml and ovn.yaml default configuration files
 
