@@ -89,6 +89,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	}
 	args = append(args, "run")
 	// Not using context as canceling ctx sends SIGKILL to process
+	klog.Infof("starting etcd via %s with args %v", exe, args)
 	cmd := exec.Command(exe, args...)
 
 	wd, err := os.Getwd()
