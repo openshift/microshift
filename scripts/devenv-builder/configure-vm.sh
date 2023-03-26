@@ -130,7 +130,7 @@ if [ $RHEL_SUBSCRIPTION = true ] ; then
     sudo dnf install -y openshift-clients
 else
     OCC_REM=https://mirror.openshift.com/pub/openshift-v4/$(uname -i)/clients/ocp-dev-preview/latest-4.13/openshift-client-linux.tar.gz
-    OCC_LOC=/tmp/openshift-client-linux.tar.gz
+    OCC_LOC=$(mktemp /tmp/openshift-client-linux-XXXXX.tar.gz)
 
     curl -s ${OCC_REM} --output ${OCC_LOC}
     sudo tar zxf ${OCC_LOC} -C /usr/bin

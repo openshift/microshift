@@ -190,7 +190,7 @@ sudo dnf install -y openshift-clients
 
 ```bash
 OCC_REM=https://mirror.openshift.com/pub/openshift-v4/$(uname -i)/clients/ocp-dev-preview/latest-4.13/openshift-client-linux.tar.gz
-OCC_LOC=/tmp/openshift-client-linux.tar.gz
+OCC_LOC=$(mktemp /tmp/openshift-client-linux-XXXXX.tar.gz)
 
 curl -s ${OCC_REM} --output ${OCC_LOC}
 sudo tar zxf ${OCC_LOC} -C /usr/bin
@@ -226,9 +226,9 @@ It should now be possible to run a standalone MicroShift executable file as pres
 ### Running MicroShift
 Run the MicroShift executable file in the background using the following command.
 ```bash
-nohup sudo ~/microshift/_output/bin/microshift run >> /tmp/microshift.log &
+nohup sudo ~/microshift/_output/bin/microshift run >> ~/microshift.log &
 ```
-Examine the `/tmp/microshift.log` log file to ensure a successful startup.
+Examine the `~/microshift.log` log file to ensure a successful startup.
 
 > An alternative way of running MicroShift is to update `/usr/bin/microshift` file and restart the service. The logs would then be accessible by running the `journalctl -xu microshift` command.
 > ```bash
@@ -252,7 +252,7 @@ watch oc get pods -A
 Run the following command to stop the MicroShift process and make sure it is shut down by examining its log file.
 ```bash
 sudo kill microshift && sleep 3
-tail -3 /tmp/microshift.log
+tail -3 ~/microshift.log
 ```
 > If MicroShift is running as a service, it is necessary to execute the `sudo systemctl stop microshift` command to shut it down and review the output of the `journalctl -xu microshift` command to verify the service termination.
 

@@ -17,12 +17,12 @@ sudo dnf install -y mock
 sudo usermod -a -G mock $(whoami)
 
 # Verify umask and home directory permissions
-TEST_FILE=/tmp/configure_perm_test.$$
+TEST_FILE=$(mktemp /tmp/configure-perm-test.XXXXX)
 
-touch ${TEST_FILE}
+touch ${TEST_FILE}.file
 mkdir ${TEST_FILE}.dir
 HOME_PERM=$(stat -c 0%a ~)
-FILE_PERM=$(stat -c 0%a ${TEST_FILE})
+FILE_PERM=$(stat -c 0%a ${TEST_FILE}.file)
 DIR_PERM=$(stat -c 0%a ${TEST_FILE}.dir)
 rm -rf ${TEST_FILE}*
 
