@@ -1,0 +1,22 @@
+FROM registry.access.redhat.com/ubi8/ubi:latest
+USER root
+RUN echo -e '[google-cloud-sdk]\n\
+name=Google Cloud SDK\n\
+baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el8-x86_64\n\
+enabled=1\n\
+gpgcheck=1\n\
+repo_gpgcheck=1\n\
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg\n\
+      https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg' > /etc/yum.repos.d/google-cloud-sdk.repo
+RUN dnf update -y && \
+    dnf install --setopt=tsflags=nodocs -y diffutils gcc git glibc-static google-cloud-sdk-365.0.1 jq make python3-devel util-linux && \
+    pip3 install pygithub GitPython && \
+    dnf clean all && rm -rf /var/cache/dnf/*
+RUN YQ_URL=https://github.com/mikefarah/yq/releases/download/v4.26.1/yq_linux_amd64 ; \
+    YQ_HASH=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582 ; \
+    echo -n "${YQ_HASH} -" > /tmp/sum.txt ; \
+    if ! (curl -Ls "${YQ_URL}" | tee /tmp/yq | sha256sum -c /tmp/sum.txt &>/dev/null); then \
+      echo "ERROR: Expected file at ${YQ_URL} to have checksum ${YQ_HASH} but instead got $(sha256sum </tmp/yq | cut -d' ' -f1)" ; \
+      exit 1 ; \
+    fi ; \
+    chmod +x /tmp/yq && mv /tmp/yq /usr/bin/yq
