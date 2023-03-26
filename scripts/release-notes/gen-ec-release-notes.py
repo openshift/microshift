@@ -34,17 +34,20 @@ import textwrap
 from urllib import request
 
 VERSION="4.13"
-RPM_LIST_URL=f"https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift/ocp-dev-preview/latest-{VERSION}/el9/os/rpm_list"
+URL_BASE="https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift"
+URL_BASE_X86="https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
 MICROSHIFT_RPM_NAME_PREFIX=f"microshift-{VERSION}"
 
-# An RPM filename looks like
+# An EC RPM filename looks like
 # microshift-4.13.0~ec.4-202303070857.p0.gcf0bce2.assembly.ec.4.el9.aarch64.rpm
+# an RC RPM filename looks like
+# microshift-4.13.0~rc.0-202303212136.p0.gbd6fb96.assembly.rc.0.el9.aarch64.rpm
 VERSION_RE = re.compile(
     """
     microshift-      # prefix
     (?P<product_version>\d+\.\d+\.\d+)    # product version
     ~                # separator
-    ec\.(?P<ec_number>\d+)          # ec number
+    (?P<candidate_type>ec|rc)\.(?P<candidate_number>\d+)  # which candidate of which type
     -
     (?P<release_date>\d+)\.            # date
     p(?P<patch_num>\d+)\.           # patch number
@@ -55,8 +58,15 @@ VERSION_RE = re.compile(
 
 
 def main():
-    # Get the list of the latest RPMs for the VERSION of MicroShift.
-    rpm_list_response = request.urlopen(RPM_LIST_URL)
+    check_one('ocp-dev-preview', VERSION)
+    check_one('ocp', VERSION)
+
+
+def check_one(release_type, version):
+    # Get the list of the latest RPMs for the release type and vbersion.
+    rpm_list_url = f"{URL_BASE}/{release_type}/latest-{version}/el9/os/rpm_list"
+    print(f"\nFetching {rpm_list_url} ...")
+    rpm_list_response = request.urlopen(rpm_list_url)
     rpm_list = rpm_list_response.read().decode("utf-8").splitlines()
 
     # Look for the RPM for MicroShift itself, with a name like
@@ -81,15 +91,16 @@ def main():
         raise RuntimeError(f"Could not parse version info from '{microshift_rpm_filename}'")
     rpm_version_details = match.groupdict()
     product_version = rpm_version_details["product_version"]
-    ec_number = rpm_version_details["ec_number"]
+    candidate_type = rpm_version_details["candidate_type"]
+    candidate_number = rpm_version_details["candidate_number"]
     commit_sha = rpm_version_details["commit_sha"]
 
     # To be consistent with past releases, the release name should
     # look like: 4.13.0-ec-2
     release_name = "-".join([
-        rpm_version_details["product_version"],
-        "ec",
-        rpm_version_details["ec_number"],
+        product_version,
+        candidate_type,
+        candidate_number,
     ])
 
     # Check if the release already exists
@@ -115,17 +126,17 @@ def main():
     except subprocess.CalledProcessError:
         print(f"Check for tag {release_name} on commit {commit_sha}")
         print("")
-        print(f"git tag -s -m '{product_version} EC {ec_number}' {release_name} {commit_sha}")
+        print(f"git tag -s -m '{product_version} {candidate_type.upper()} {candidate_number}' {release_name} {commit_sha}")
         print(f"git push origin {release_name}")
         return
 
     # Set up the release notes preamble with download links
     notes = textwrap.dedent(f"""
-    This is a pre-release Engineering Candidate for {product_version}.
+    This is a candidate release for {product_version}.
 
     See the mirror for build artifacts:
-    - https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift/ocp-dev-preview/{product_version}-ec.{ec_number}/
-    - https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift/ocp-dev-preview/{product_version}-ec.{ec_number}/
+    - {URL_BASE_X86}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/
+    - {URL_BASE}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/
 
     """)
 
