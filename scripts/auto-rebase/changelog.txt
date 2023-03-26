@@ -1,10 +1,13 @@
-- ovn-kubernetes image-amd64 5cfa88c4b777819b8f89d3dc16ca5a703a7116f0 to 10a45326f5afb47e9ffbf674945ed7c08b9f7754
-  - 8f13d71 2023-03-17T07:18:43-05:00 Dockerfiles: copy RHEL9 to regular Dockerfiles
+- cluster-kube-apiserver-operator embedded-component ef8bdac3cfe79a108d2caaf6a5f7db261aad3fe8 to d1089b83b9162a237be88332bef281d86aa2d9b3
+  - 009866f 2023-02-13T08:56:04-05:00 update apf configuration to use v1beta3
 
-- oc image-arm64 07ee29c0df5c8d234feadfce0bfb86970ce45336 to b860ec0761be98968f427136cf94437e85fff700
+- cluster-network-operator embedded-component 5ebd764b5747784a79bb1bcf39b0fc9a1a747f13 to a3e00272ea4ab220a83a245d58026c791f9c022e
+  - 6c9f626 2023-03-21T16:29:49+00:00 operConfig reconcile can return nil error on failure
+
+- oc image-amd64 07ee29c0df5c8d234feadfce0bfb86970ce45336 to b860ec0761be98968f427136cf94437e85fff700
   - 906a3bb 2023-03-21T16:28:43+01:00 OCPBUGS-10622: bump repo sclorg/s2i-ruby-container location for newapp
 
-- ovn-kubernetes image-arm64 10a45326f5afb47e9ffbf674945ed7c08b9f7754 to 98fbfbae439127f6836413eed89c3a3a672f46f8
+- ovn-kubernetes image-amd64 10a45326f5afb47e9ffbf674945ed7c08b9f7754 to 98fbfbae439127f6836413eed89c3a3a672f46f8
   - eb5bbd7 2023-03-21T17:11:46+00:00 Start master metrics server for all master instances
   - 54b67a3 2023-03-16T15:20:36+01:00 don't create acl if no namespace address sets are selected. Previously "ip4.dst == {}" match was created, and ovn-controller throws an error on such acl
   - 7f4b409 2023-03-16T15:19:31+01:00 Add PodSelectorAddressSet tests.
