@@ -1,20 +1,10 @@
-# cluster-network-operator embedded-component 6f5e144f260333ad0f70a88a55eab4fc81ecd7a2 to 41a8c00b633446c2ee05fc19b924240de2d8b18f
-dcb9c4fd8f4f5d6e05f286154c74edf506db9baf 2023-03-15T10:23:47+00:00 HyperShift: Set priority class for CNCC
-bd1a5dfce88be9eae38e990a19807eb84d685181 2023-03-15T10:23:47+00:00 HyperShift: Adapt affinity and tolerations
-2693dff4ed419454ac3ee166ef3f7eda434fc3b1 2023-03-15T10:23:47+00:00 HyperShift: Co-locate CNCC and multus admission controller with other hcp pods
-f0b1a5c9f0b5671e9f3036837ad42d5bcb1f3fde 2023-03-09T15:33:56+01:00 Set healthz-bind-address to 0.0.0.0:10256 for ovnk
-f5829e9512e9fc889bbfc2cf7a0c695dc5cad803 2023-03-09T15:33:27+01:00 Pass POD_NAME to ovnkube node for node healthz server checks
-e68f4544baf91dcd51d2040ed0ed77de31784b36 2023-02-28T09:07:48+00:00 Bug 2104997: add default noProxy config for Azure
-# etcd embedded-component 978cfefd2f21c4ec1ac84ed95130cbff510fbe1b to 1f438849661e691748dc3b24fc373444439415b6
-d9ba334e195930833bb7a70c99993491ca78c16a 2022-11-22T10:53:27+00:00 Updating ose-etcd images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/82677d9ecf22d7b5589bbcd83e507a10fb6a89c6/images/ose-etcd.yml
-# machine-config-operator embedded-component 731341b89e72d53abb349aff98d09e281e471066 to f6c21976e39cf6cb9e2ca71141478d5e612fb53f
-1d35900a3b929c2e8a2046b31d3a39e4f2aa9176 2023-03-17T18:45:41+00:00 daemon: Drop duplicate `--authfile` used in `run`
-7c35afd89d49230379c0ecceec67253d1bdd533b 2023-03-15T22:35:59+00:00 Remove hard requirement for the afterburn from early-running aws-related services
-# ovn-kubernetes image-amd64 1ec7d41fac8e6489013847a3b45bee4658b95d1a to b99f9300d6563ab4637941dd98e16c72297299e7
-cc79d2606a14af32f36110e15eb316278f157355 2023-03-17T12:12:26+01:00 Move checkForStaleOVSInterfaces and related code to node.go
-5ee65cb283570e5f8bedd549132369ea03782259 2023-03-13T12:53:13-04:00 Fully remove dependency on default gateway for services
-f2b6a8d66ad3d53d1676276aeca899ae6fe8d34b 2023-03-09T13:14:54+01:00 node: add node healthz server for cloud load balancers
-1a2774d35517757f73f7a2d974266f1bd09b203f 2023-03-09T12:57:05+01:00 node: split openflowManager and service health check code
-048ece68d496f011c31bc80c25e7386ed7db7398 2023-02-23T23:25:27+00:00 [release-4.12] OCPBUGS-7732: Fix leak in service controller cache
-# ovn-kubernetes image-arm64 34a028a1e17471a797662701c405e361dfcf7952 to b99f9300d6563ab4637941dd98e16c72297299e7
-048ece68d496f011c31bc80c25e7386ed7db7398 2023-02-23T23:25:27+00:00 [release-4.12] OCPBUGS-7732: Fix leak in service controller cache
+# etcd embedded-component 1f438849661e691748dc3b24fc373444439415b6 to c1d76ffd4b4cf0a0d2a6056a505fbef0b187c027
+a96bf4cd5c6aa314b443063e7c900448d90b3e80 2023-03-23T08:14:34+00:00 Update owners
+# oc image-amd64 846602e50eb29ecdc7441ebed2fc846048959eaa to 31aa3e89a926f81aa0af30320ffcb71acadf3015
+0be76451bf9b46771daefb2a953d5d61d3917d30 2023-03-23T10:45:00+00:00 OCPBUGS-10622: bump repo sclorg/s2i-ruby-container location for newapp
+# ovn-kubernetes image-amd64 b99f9300d6563ab4637941dd98e16c72297299e7 to bcf6c596aa35342f5fa89cc4b4c516c43a63562d
+b72f15e83f7760ba261b2977730337bebfb6bd4a 2023-01-19T11:00:12+01:00 Update egress node assignability on every egress node update
+# oc image-arm64 846602e50eb29ecdc7441ebed2fc846048959eaa to 31aa3e89a926f81aa0af30320ffcb71acadf3015
+0be76451bf9b46771daefb2a953d5d61d3917d30 2023-03-23T10:45:00+00:00 OCPBUGS-10622: bump repo sclorg/s2i-ruby-container location for newapp
+# ovn-kubernetes image-arm64 b99f9300d6563ab4637941dd98e16c72297299e7 to bcf6c596aa35342f5fa89cc4b4c516c43a63562d
+b72f15e83f7760ba261b2977730337bebfb6bd4a 2023-01-19T11:00:12+01:00 Update egress node assignability on every egress node update
