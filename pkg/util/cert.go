@@ -69,7 +69,7 @@ func GenKeys(pubPath, keyPath string) error {
 		return fmt.Errorf("failed to write the private key to %s: %v", keyPath, err)
 	}
 
-	ioutil.WriteFile(pubPath, pubPEM, 0644)
+	ioutil.WriteFile(pubPath, pubPEM, 0400)
 
 	return nil
 }
