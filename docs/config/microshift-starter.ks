@@ -5,7 +5,7 @@ text
 reboot
 
 # Configure network to use DHCP and activate on boot
-network --bootproto=dhcp --device=link --activate --onboot=on --hostname=microshift-starter.local --noipv6
+network --bootproto=dhcp --device=link --activate --onboot=on --hostname=microshift-starter --noipv6
 
 # Partition disk with a 1GB boot XFS partition and a 10GB LVM volume containing system root
 # The remainder of the volume will be used by the CSI driver for storing data

@@ -50,7 +50,7 @@ In the OS installation wizard, set the following options:
     - Click "Done" button.
     - At the "Summary of Changes" window, select "Accept Changes"
 
-- Connect network card and set the hostname (i.e. `microshift-dev.localdomain`)
+- Connect network card and set the hostname (i.e. `microshift-dev`)
 - Register the system with Red Hat using your credentials (toggle off Red Hat Insights connection)
 - In the Software Selection, select Minimal Install base environment and toggle on Headless Management to enable Cockpit
 
