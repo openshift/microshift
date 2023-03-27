@@ -19,7 +19,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -138,7 +137,7 @@ serverTLSBootstrap: false #TODO`)
 
 	path := filepath.Join(microshiftDataDir, "resources", "kubelet", "config", "config.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
-	return ioutil.WriteFile(path, data, 0400)
+	return os.WriteFile(path, data, 0400)
 }
 
 func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
