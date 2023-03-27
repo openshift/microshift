@@ -39,18 +39,18 @@ echo -e 'url=http://REPLACE_OSTREE_SERVER_NAME/repo/' >> /etc/ostree/remotes.d/e
 
 # The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
 # The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
-cat > /etc/crio/openshift-pull-secret << EOF
+cat > /etc/crio/openshift-pull-secret <<EOF
 REPLACE_OCP_PULL_SECRET_CONTENTS
 EOF
 chmod 600 /etc/crio/openshift-pull-secret
 
-# Create a default redhat user, allowing it to run sudo commands without password
-useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 -G wheel redhat
-echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' >> /etc/sudoers
+# Create a default redhat user, allowing it to run sudo commands with password
+useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 redhat
+echo -e 'redhat\tALL=(ALL)\tPASSWD: ALL' > /etc/sudoers.d/microshift
 
 # Add authorized ssh keys
 mkdir -m 700 /home/redhat/.ssh
-cat > /home/redhat/.ssh/authorized_keys << EOF
+cat > /home/redhat/.ssh/authorized_keys <<EOF
 REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS
 EOF
 chmod 600 /home/redhat/.ssh/authorized_keys
@@ -67,7 +67,7 @@ echo -e 'export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig' >
 
 # Configure systemd journal service to persist logs between boots and limit their size to 1G
 sudo mkdir -p /etc/systemd/journald.conf.d
-cat <<EOF | sudo tee /etc/systemd/journald.conf.d/microshift.conf &>/dev/null
+cat > /etc/systemd/journald.conf.d/microshift.conf <<EOF
 [Journal]
 Storage=persistent
 SystemMaxUse=1G

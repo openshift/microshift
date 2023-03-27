@@ -44,8 +44,8 @@ selinux-policy-devel
 # Post install configuration
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
-# Allow the default user to run sudo commands without password
-echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/redhat
+# Allow the default user to run sudo commands with password
+echo -e 'redhat\tALL=(ALL)\tPASSWD: ALL' > /etc/sudoers.d/microshift
 
 # Import Red Hat public keys to allow RPM GPG check (not necessary if a system is registered)
 if ! subscription-manager status >& /dev/null ; then
@@ -54,7 +54,7 @@ fi
 
 # Configure systemd journal service to persist logs between boots and limit their size to 1G
 sudo mkdir -p /etc/systemd/journald.conf.d
-cat <<EOF | sudo tee /etc/systemd/journald.conf.d/microshift.conf &>/dev/null
+cat > /etc/systemd/journald.conf.d/microshift.conf <<EOF
 [Journal]
 Storage=persistent
 SystemMaxUse=1G
