@@ -133,7 +133,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"kubelet-certificate-authority":   {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
 			"kubelet-client-certificate":      {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":              {cryptomaterial.ClientKeyPath(kubeletClientDir)},
-			"kubelet-preferred-address-types": {"Hostname"},
+			"kubelet-preferred-address-types": {"InternalIP", "Hostname"},
 
 			"proxy-client-cert-file":           {cryptomaterial.ClientCertPath(aggregatorClientCertDir)},
 			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},
