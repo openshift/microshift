@@ -146,7 +146,8 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	defer close(stopped)
 	// run readiness check
 	go func() {
-		healthcheckStatus := util.RetryInsecureHttpsGet("http://localhost:10248/healthz")
+		// This endpoint does not use TLS, but reusing the same function without verification.
+		healthcheckStatus := util.RetryInsecureGet("http://localhost:10248/healthz")
 		if healthcheckStatus != 200 {
 			klog.Fatalf("", fmt.Errorf("%s failed to start", s.Name()))
 		}
