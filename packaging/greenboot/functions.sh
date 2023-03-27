@@ -9,6 +9,28 @@ OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
 OCGET_OPT="--no-headers"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
 
+# Print GRUB boot, Greenboot variables and ostree status affecting the script
+# behavior. This information is important for troubleshooting rollback issues.
+#
+# args: None
+# return: Print the GRUB boot variables, /etc/greenboot/greenboot.conf settings
+# and ostree status to stdout
+function print_boot_status() {
+    # Source Greenboot configuration file if it exists
+    local conf_file=/etc/greenboot/greenboot.conf
+    [ -f "${conf_file}" ] && source ${conf_file}
+
+    local grub_vars=$(grub2-editenv - list | grep ^boot_ || true)
+    local boot_vars=$(set | egrep '^GREENBOOT_|^MICROSHIFT_' || true)
+
+    [ -z "${grub_vars}" ] && grub_vars=None
+    [ -z "${boot_vars}" ] && boot_vars=None
+
+    echo -e "GRUB boot variables:\n${grub_vars}"
+    echo -e "Greenboot variables:\n${boot_vars}"
+    echo -e "The ostree status:\n$(ostree admin status || true)"
+}
+
 # Get the recommended wait timeout to be used for running health check operations.
 # The returned timeout is a product of a base value and a boot attempt counter, so
 # that the timeout increases after every boot attempt.
@@ -19,7 +41,8 @@ OCGET_CMD="oc get ${OCCONFIG_OPT}"
 # for MICROSHIFT_WAIT_TIMEOUT_SEC and the [1..9] range for GREENBOOT_MAX_BOOTS.
 #
 # args: None
-# return: Print the recommended timeout value to stdout
+# return: Print the recommended timeout value to stdout. If the values are not
+# in range, errors are printed to stderr.
 function get_wait_timeout() {
     # Source Greenboot configuration file if it exists
     local conf_file=/etc/greenboot/greenboot.conf
@@ -30,11 +53,11 @@ function get_wait_timeout() {
     local reSecs='^[1-9]{1}[0-9]{0,3}$'
     if [[ ! ${base_timeout} =~ $reSecs ]] ; then
         base_timeout=300
-        echo "Could not parse MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}': using '${base_timeout}' instead"
+        >&2 echo "Could not parse MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}': using '${base_timeout}' instead"
     fi
     if [[ ${base_timeout} -lt 60 ]] ; then
         base_timeout=60
-        echo "MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}' is less than 60: using '${base_timeout}' instead"
+        >&2 echo "MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}' is less than 60: using '${base_timeout}' instead"
     fi
 
     # Read and verify the max boots value, allowing for the [1..9] range
@@ -42,7 +65,7 @@ function get_wait_timeout() {
     local reBoots='^[1-9]{1}$'
     if [[ ! ${max_boots} =~ $reBoots ]] ; then
         max_boots=3
-        echo "GREENBOOT_MAX_BOOTS value '${GREENBOOT_MAX_BOOTS}' is not in the [1..9] range: using '${max_boots}' instead"
+        >&2 echo "GREENBOOT_MAX_BOOTS value '${GREENBOOT_MAX_BOOTS}' is not in the [1..9] range: using '${max_boots}' instead"
     fi
 
     # Update the wait timeout according to the boot counter.
