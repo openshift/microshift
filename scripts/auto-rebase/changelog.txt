@@ -1,26 +1,9 @@
-# cluster-kube-apiserver-operator embedded-component 5cec361179f3658986890a87d0b51f40a1da89ad to 3e62b53e39db960ccc16d717d1a25d751d4e9c49
-1c5fd4bda695466143aedbd0879a3c7817d5190e 2023-03-22T14:10:31+01:00 bump o/api for updated featuregates
-4cd9677808d79ec82541c97cc9140f59e87edebb 2023-03-15T14:13:20-04:00 revert dev cert rotation for 4.13
-e85a5c62570176c72e7b0b45e0a4e217c1654105 2023-03-15T14:12:07+01:00 psaconfig: invert the enforce/log logic to default to logging
-# cluster-kube-controller-manager-operator embedded-component 4ca346ef97def3697f1aa0368c9b35459b9b2f59 to 2a3e578c1007d7534eadffcca2adc979cb712995
-decb5bb7cb39f9eaa2443d2210a25cbddcae4273 2023-03-20T09:46:22-04:00 update vendor folder
-24c84fdcd65444c9fbf2635b1848309abefc6edc 2023-03-20T09:46:10-04:00 bump(library-go)
-# etcd embedded-component 13c18c444a8c6a86ccbba16cce664008f5f948bd to f70da9d78221bc3e6bf8ac14c0c4ecc106f4f57d
-5c156b653c1f67d0d49d4857fd868f72cc0c854f 2023-01-11T14:39:32-08:00 Update owners
-# kubernetes embedded-component 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb to dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf
-916c65ebea0205d3c18d3701f48cf568ef9e7220 2023-03-17T23:03:18+00:00 UPSTREAM: 115328: annotate early and late requests
-a6938113b34b64c0626efa322cd4d3c1132d64fb 2023-03-17T23:03:18+00:00 UPSTREAM: <drop>: Revert "UPSTREAM: <carry>: annotate audit events for requests during unready phase and graceful termination phase"
-# router image-amd64 69eda4bd427c3f27d9993afa35461f4fc1dc0357 to e28644631982fb4596e065d3ae85099f0886829d
-5381cb80c2905550549406ddba3891bec541fc8e 2023-03-20T12:57:57+00:00 OCPBUGS-10003: Revert "NE-1115: Update haproxy container builds to use haproxy 2.6"
-# kubernetes image-amd64 06e8c46c9f0d3f6bfcd1e146c09647e4b634e4eb to dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf
-916c65ebea0205d3c18d3701f48cf568ef9e7220 2023-03-17T23:03:18+00:00 UPSTREAM: 115328: annotate early and late requests
-a6938113b34b64c0626efa322cd4d3c1132d64fb 2023-03-17T23:03:18+00:00 UPSTREAM: <drop>: Revert "UPSTREAM: <carry>: annotate audit events for requests during unready phase and graceful termination phase"
-# oc image-arm64 eed143055ede731029931ad204b19cd2f565ef1a to 92b1a3d0e5d092430b523f6541aa0c504b2222b3
-32496b16599a0ee1d834a9d6685aca398d49c79d 2023-03-23T10:44:51+00:00 OCPBUGS-10622: bump repo sclorg/s2i-ruby-container location for newapp
-# router image-arm64 69eda4bd427c3f27d9993afa35461f4fc1dc0357 to e28644631982fb4596e065d3ae85099f0886829d
-5381cb80c2905550549406ddba3891bec541fc8e 2023-03-20T12:57:57+00:00 OCPBUGS-10003: Revert "NE-1115: Update haproxy container builds to use haproxy 2.6"
-# ovn-kubernetes image-arm64 dd45efd39e5db428d4578ed6787e6c08b79e2df5 to ebb5dcaf65a49156b7ea220176fa5dd6f3e3f716
-f9632bfa3ca30fd6173f59cb7657bf910dd7719d 2023-03-23T09:40:51+08:00 Fix duplicated metric registration
-eb64a87cca1ad699edfb9cda876602ebdeb69d8a 2023-03-22T17:30:51-04:00 Fix egress firewall CRD
-dec0b99f54538591d1f8b6461940b609a29dc9d9 2023-03-17T10:53:58+00:00 Updating ovn-kubernetes-base images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/3ea7e6d582117c0c2b118319e4f4a4bd35edce51/images/ovn-kubernetes-base.yml
-3baa3d367651fc620dbfa50c82c14c20f988db04 2023-03-08T02:28:51+00:00 Updating ovn-kubernetes-microshift images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/724eedd015d4972b55704e41a4117c533e240935/images/ovn-kubernetes-microshift.yml
+# ovn-kubernetes image-arm64 ebb5dcaf65a49156b7ea220176fa5dd6f3e3f716 to cb89e52240fe7346409589a9acae9c0106d24b03
+8513b38e5a74c0c5f303dca30a27e6cc24bdf89c 2023-03-24T16:52:21+01:00 update to before-kube-1.26 bump
+46d2b9e1a902cfde6ed0a85251b336f60b0876b6 2023-03-23T17:26:47+01:00 don't create acl if no namespace address sets are selected. Previously "ip4.dst == {}" match was created, and ovn-controller throws an error on such acl
+7ab410d18906602b127ae54fc49fb9e70d80ba03 2023-03-23T17:26:40+01:00 Add PodSelectorAddressSet tests.
+efa8741efd682bca78571cc71f0a5cb94e71449b 2023-03-23T17:26:34+01:00 Rework gressPolicy ACLs build: previously all gress policies with at least one selector had peerAddressSet, and empty gress (allow all) was identified by "gp.sizeOfAddressSet() > 0". Now we don't create address sets like that, therefore a new hasPeerSelector field was added to distinguish empty gress from the one that just doesn't have any address sets added yet.
+e0c35b2619f4084a0babea4aa554f5018e52ef5a 2023-03-23T17:26:26+01:00 Add PodSelectorAddressSet object, that should be used to manage address sets for pod selector (network policy object is only responsible for local pods and peer namespace-only handlers). The locking mechanism is copied from networkPolicy.
+4a03b84b53431d8147818f311bba63ea78d2a6dc 2023-03-23T17:26:19+01:00 Unlock shared default deny port group early, when no db changes required, to unlock other handlers from the same namespace.
+06c9270dc3c69e8128d57a42b8def7b51ab1bbf8 2023-03-23T17:25:41+01:00 Add an option to enable scale metrics in kind
+6d96be9e761aa544c3500c54508a61c102dbdd77 2023-03-23T17:25:30+01:00 Add MetricMasterSyncDuration metric to track how much it takes for ovn-k master to start watching every resource. Add scale metrics for network policies, rename existing enable-eip-scale-metrics flag to more general enable-scale-metrics, and use it for network policy metric too.
