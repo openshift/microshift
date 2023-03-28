@@ -30,7 +30,7 @@ BOT_REMOTE_NAME = "bot-creds"
 REMOTE_ORIGIN = "origin"
 
 # List of reviewers to always requestes review from
-REVIEWERS = ["pmtk", "ggiguash"]
+REVIEWERS = []
 
 # If True, then just log action such as branch push and PR or comment creation
 REMOTE_DRY_RUN = False
