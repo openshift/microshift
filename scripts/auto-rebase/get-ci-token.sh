@@ -28,9 +28,9 @@ EOF
 fi
 
 # Get a current pull secret for registry.ci.openshift.org using the token
-tmpkubeconfig="/tmp/registry-kubeconfig"
+tmpkubeconfig=$(mktemp /tmp/registry-kubeconfig-XXXXX)
 oc login https://${CI_SERVER}:6443 --kubeconfig=$tmpkubeconfig --token=${CI_TOKEN}
-tmppullsecret="/tmp/registry-pull-secret"
+tmppullsecret=$(mktemp /tmp/registry-pull-secret-XXXXX)
 echo '{}' >$tmppullsecret
 oc registry login --kubeconfig=$tmpkubeconfig --to=$tmppullsecret
 
@@ -38,3 +38,4 @@ echo "Add this to your ~/.pull_secret.json file:"
 echo
 cat $tmppullsecret
 echo
+rm -f $tmpkubeconfig $tmppullsecret

@@ -14,9 +14,11 @@ RUN dnf update -y && \
     dnf clean all && rm -rf /var/cache/dnf/*
 RUN YQ_URL=https://github.com/mikefarah/yq/releases/download/v4.26.1/yq_linux_amd64 ; \
     YQ_HASH=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582 ; \
-    echo -n "${YQ_HASH} -" > /tmp/sum.txt ; \
-    if ! (curl -Ls "${YQ_URL}" | tee /tmp/yq | sha256sum -c /tmp/sum.txt &>/dev/null); then \
-      echo "ERROR: Expected file at ${YQ_URL} to have checksum ${YQ_HASH} but instead got $(sha256sum </tmp/yq | cut -d' ' -f1)" ; \
+    YQ_EXE=$(mktemp /tmp/yq-exe.XXXXX) ; \
+    YQ_SUM=$(mktemp /tmp/yq-sum.XXXXX) ; \
+    echo -n "${YQ_HASH} -" > ${YQ_SUM} ; \
+    if ! (curl -Ls "${YQ_URL}" | tee ${YQ_EXE} | sha256sum -c ${YQ_SUM} &>/dev/null); then \
+      echo "ERROR: Expected file at ${YQ_URL} to have checksum ${YQ_HASH} but instead got $(sha256sum <${YQ_EXE} | cut -d' ' -f1)" ; \
       exit 1 ; \
     fi ; \
-    chmod +x /tmp/yq && mv /tmp/yq /usr/bin/yq
+    chmod +x ${YQ_EXE} && mv ${YQ_EXE} /usr/bin/yq

@@ -196,7 +196,7 @@ It may sometimes be necessary to install a virtual machine that does not have ac
 
 Create a new isolated `libvirt` network configuration by running the following commands.
 ```bash
-NETCONFIG_FILE=/tmp/isolated-network.xml
+NETCONFIG_FILE=$(mktemp /tmp/isolated-network-XXXXX.xml)
 cat > $NETCONFIG_FILE <<EOF
 <network>
   <name>isolated</name>
@@ -215,6 +215,7 @@ EOF
 sudo virsh net-define    $NETCONFIG_FILE
 sudo virsh net-start     isolated
 sudo virsh net-autostart isolated
+rm -f $NETCONFIG_FILE
 ```
 
 Follow the instruction in the [Install MicroShift for Edge](#install-microshift-for-edge) section to install a new virtual machine using the `isolated` network configuration.

@@ -42,7 +42,7 @@ SYSROOTSIZE=$(( ${SYSROOTSIZE} * 1024 ))
 # Swap size is expected in MB
 SWAPSIZE=$(( ${SWAPSIZE} * 1024 ))
 
-KICKSTART_FILE=/tmp/${VMNAME}-kickstart.ks
+KICKSTART_FILE=$(mktemp /tmp/kickstart-${VMNAME}-XXXXX.ks)
 cat ${ROOTDIR}/config/kickstart.ks.template | \
     sed "s;REPLACE_HOST_NAME;${VMNAME};" | \
     sed "s;REPLACE_SWAP_SIZE;${SWAPSIZE};" | \
