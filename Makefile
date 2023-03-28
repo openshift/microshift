@@ -115,12 +115,39 @@ etcd:
 					$(LD_FLAGS)\"" \
 		$(MAKE) -C etcd
 
-.PHONY: verify-images verify-assets
+.PHONY: verify verify-images verify-assets
 verify: verify-images verify-assets
+
 verify-images:
 	./scripts/verify_images.sh
+
 verify-assets:
 	./scripts/auto-rebase/presubmit.py
+
+.PHONY: verify-go verify-golangci verify-govulncheck
+verify-go: verify-golangci verify-govulncheck
+
+verify-golangci:
+	./scripts/fetch_tools.sh golangci-lint && \
+	./_output/bin/golangci-lint run --verbose
+
+verify-govulncheck:
+	@if ! command -v govulncheck &>/dev/null; then \
+		go install golang.org/x/vuln/cmd/govulncheck@latest ; \
+	fi
+	govulncheck ./...
+
+.PHONY: verify-sh
+verify-sh:
+	./scripts/fetch_tools.sh shellcheck && \
+	./_output/bin/shellcheck $$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.sh' -print)
+
+.PHONY: verify-py
+verify-py:
+	@if ! command -v pylint &>/dev/null; then \
+		pip install pylint ; \
+	fi
+	pylint $$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
 
 ###############################
 # post install validate       #
