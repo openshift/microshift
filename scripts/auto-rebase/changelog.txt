@@ -1,10 +1,2 @@
-# etcd embedded-component 1f438849661e691748dc3b24fc373444439415b6 to c1d76ffd4b4cf0a0d2a6056a505fbef0b187c027
-a96bf4cd5c6aa314b443063e7c900448d90b3e80 2023-03-23T08:14:34+00:00 Update owners
-# oc image-amd64 846602e50eb29ecdc7441ebed2fc846048959eaa to 31aa3e89a926f81aa0af30320ffcb71acadf3015
-0be76451bf9b46771daefb2a953d5d61d3917d30 2023-03-23T10:45:00+00:00 OCPBUGS-10622: bump repo sclorg/s2i-ruby-container location for newapp
-# ovn-kubernetes image-amd64 b99f9300d6563ab4637941dd98e16c72297299e7 to bcf6c596aa35342f5fa89cc4b4c516c43a63562d
-b72f15e83f7760ba261b2977730337bebfb6bd4a 2023-01-19T11:00:12+01:00 Update egress node assignability on every egress node update
-# oc image-arm64 846602e50eb29ecdc7441ebed2fc846048959eaa to 31aa3e89a926f81aa0af30320ffcb71acadf3015
-0be76451bf9b46771daefb2a953d5d61d3917d30 2023-03-23T10:45:00+00:00 OCPBUGS-10622: bump repo sclorg/s2i-ruby-container location for newapp
-# ovn-kubernetes image-arm64 b99f9300d6563ab4637941dd98e16c72297299e7 to bcf6c596aa35342f5fa89cc4b4c516c43a63562d
-b72f15e83f7760ba261b2977730337bebfb6bd4a 2023-01-19T11:00:12+01:00 Update egress node assignability on every egress node update
+# ovn-kubernetes image-arm64 bcf6c596aa35342f5fa89cc4b4c516c43a63562d to 411e730257507b239fcefb37406ef5ce7055b223
+aceef010daf0697fe81dba91a39ed0fdb6563dea 2023-03-17T17:41:40+01:00 Check the "Serving" field for endpoints
