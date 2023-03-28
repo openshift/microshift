@@ -54,12 +54,17 @@ func GetHostIP() (string, error) {
 	return gatewayIP, nil
 }
 
-func RetryInsecureHttpsGet(url string) int {
-
+func RetryInsecureGet(url string) int {
 	status := 0
 	err := wait.Poll(5*time.Second, 120*time.Second, func() (bool, error) {
-		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-		resp, err := http.Get(url)
+		c := http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			},
+		}
+		resp, err := c.Get(url)
 		if err == nil {
 			status = resp.StatusCode
 			return true, nil
