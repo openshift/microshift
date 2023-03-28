@@ -144,7 +144,7 @@ func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
 
 func LvmSupported() error {
 	if _, err := exec.LookPath("vgs"); err != nil {
-		return fmt.Errorf("lvm utility 'vgs' not found in PATH")
+		return fmt.Errorf("failed to find 'vgs' command line tool: %v", err)
 	}
 	return nil
 }
