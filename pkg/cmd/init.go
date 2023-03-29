@@ -180,7 +180,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 						Name:         "kubelet-server",
 						ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 					},
-					Hostnames: []string{cfg.NodeName},
+					Hostnames: []string{cfg.NodeName, cfg.NodeIP},
 				},
 			),
 		),
