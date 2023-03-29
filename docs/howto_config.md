@@ -157,3 +157,7 @@ Restart the MicroShift service to apply the manifests and verify that the `busyb
 sudo systemctl restart microshift
 oc get pods -n busybox
 ```
+
+## Storage Configuration
+
+MicroShift's included CSI plugin manages LVM LogicialVolumes to provide persistent workload storage. For specific storage configuration, refer to the dedicated [documentation](./storage/configuration.md).
