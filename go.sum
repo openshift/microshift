@@ -606,8 +606,8 @@ github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d h1:RR
 github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d/go.mod h1:b1BuldmJlbA/xYtdZvKi+7j5YGB44qJUJDZ9zwiNCfE=
 github.com/openshift/client-go v0.0.0-20230120202327-72f107311084 h1:66uaqNwA+qYyQDwsMWUfjjau8ezmg1dzCqub13KZOcE=
 github.com/openshift/client-go v0.0.0-20230120202327-72f107311084/go.mod h1:M3h9m001PWac3eAudGG3isUud6yBjr5XpzLYLLTlHKo=
-github.com/openshift/cluster-policy-controller v0.0.0-20230217170320-ac01e3463245 h1:BoNt9Hemwyc32xX+CZZaNGegWEiN7bGTVk4XaRboO8k=
-github.com/openshift/cluster-policy-controller v0.0.0-20230217170320-ac01e3463245/go.mod h1:vlkRuwyRueLOQ/ZRRle+rCrh+YNoh+pzJm9WaN9e6mU=
+github.com/openshift/cluster-policy-controller v0.0.0-20230324020700-d02c85ab3203 h1:rafkiE1rN2dQC0rq7q44mI4/69aEkcxmdpxVlwvTOPY=
+github.com/openshift/cluster-policy-controller v0.0.0-20230324020700-d02c85ab3203/go.mod h1:vlkRuwyRueLOQ/ZRRle+rCrh+YNoh+pzJm9WaN9e6mU=
 github.com/openshift/kubernetes v0.0.0-20230320215851-dc93b13d1f65 h1:KxRTY0GQUEGc61T5PInmFfDtmIcYBCLcHydOFeAmTzs=
 github.com/openshift/kubernetes v0.0.0-20230320215851-dc93b13d1f65/go.mod h1:FFmjFkZxW22qBBjGCdvUj9MzYgHeh1t+7fG3n7162tM=
 github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20230320215851-dc93b13d1f65 h1:R+QHGTVvds4UdDuNj3iM0DAptll1ZGTu+3CeBUVKY7U=
