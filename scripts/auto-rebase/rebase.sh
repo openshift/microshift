@@ -644,16 +644,6 @@ update_images() {
             "${REPOROOT}/packaging/crio.conf.d/microshift_${goarch}.conf"
     done
 
-    # 2023-03-02: Freeze ovn-kubernetes-microshift-rhel-9 to avoid using image "double metrics registration panic" issue
-    # TODO: Remove when issue is fixed
-    jq -e '.images."ovn-kubernetes-microshift-rhel-9" = "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5ab6561dbe5a00a9b96e1c29818d8376c8e871e6757875c9cf7f48e333425065"' \
-        "${REPOROOT}/assets/release/release-x86_64.json" > "${REPOROOT}/assets/release/release-x86_64.json.tmp"
-    mv "${REPOROOT}/assets/release/release-x86_64.json.tmp" "${REPOROOT}/assets/release/release-x86_64.json"
-
-    jq -e '.images."ovn-kubernetes-microshift-rhel-9" = "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ad6a1b1a01f928dad3ed9b1d1288c4d5e665868c1713ca54c64ff21ebe4fb8ca"' \
-        "${REPOROOT}/assets/release/release-aarch64.json" > "${REPOROOT}/assets/release/release-aarch64.json.tmp"
-    mv "${REPOROOT}/assets/release/release-aarch64.json.tmp" "${REPOROOT}/assets/release/release-aarch64.json"
-
     popd >/dev/null
 
     go fmt "${REPOROOT}"/pkg/release
