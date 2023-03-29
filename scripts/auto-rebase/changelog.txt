@@ -1,2 +1,7 @@
-# ovn-kubernetes image-arm64 bcf6c596aa35342f5fa89cc4b4c516c43a63562d to 411e730257507b239fcefb37406ef5ce7055b223
+# machine-config-operator embedded-component f6c21976e39cf6cb9e2ca71141478d5e612fb53f to 52fe26136643a946ff1dd1307012cbdef31ebf97
+02d7d03f41ecdddf2861f00e413ffd3588e31b49 2023-02-07T18:31:02+00:00 Avoid 'too restrictive' scc by being more explicit
+# ovn-kubernetes image-amd64 bcf6c596aa35342f5fa89cc4b4c516c43a63562d to 0fd023bf51ad97cc6cf62274355e812faee35a3a
 aceef010daf0697fe81dba91a39ed0fdb6563dea 2023-03-17T17:41:40+01:00 Check the "Serving" field for endpoints
+46c1e0e6eddcc6a84468b3877ab906cca93c4714 2023-02-07T05:56:10+00:00 Updating ovn-kubernetes-microshift images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c7ac94640962a636b925565e356b2d87262f041f/images/ovn-kubernetes-microshift.yml
+# ovn-kubernetes image-arm64 411e730257507b239fcefb37406ef5ce7055b223 to 0fd023bf51ad97cc6cf62274355e812faee35a3a
+46c1e0e6eddcc6a84468b3877ab906cca93c4714 2023-02-07T05:56:10+00:00 Updating ovn-kubernetes-microshift images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c7ac94640962a636b925565e356b2d87262f041f/images/ovn-kubernetes-microshift.yml
