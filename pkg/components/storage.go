@@ -71,6 +71,11 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		}
 	)
 
+	if err := lvmd.LvmSupported(); err != nil {
+		klog.Warning("skipping CSI deployment: %v", err)
+		return nil
+	}
+
 	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
 	// csi plugin.
 	lvmdCfg, err := getCSIPluginConfig()
