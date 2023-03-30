@@ -66,9 +66,6 @@ prechecks() {
 main() {
     prechecks
 
-    export IP="$USHIFT_IP"
-    export USER="$USHIFT_USER"
-
     local gather_debug=false
     for test in "${SCRIPT_PATH}"/tests/*.sh; do
         echo "RUNNING $(basename "${test}")"
