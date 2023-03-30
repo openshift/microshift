@@ -3,6 +3,7 @@ package mdns
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/openshift/microshift/pkg/mdns/server"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
@@ -26,7 +27,7 @@ func newTestController() *MicroShiftmDNSController {
 func Test_addedRoute(t *testing.T) {
 	ctl := newTestController()
 	route := &unstructured.Unstructured{Object: make(map[string]interface{})}
-	unstructured.SetNestedField(route.Object, testRouteHost, "spec", "host")
+	assert.NoError(t, unstructured.SetNestedField(route.Object, testRouteHost, "spec", "host"))
 
 	ctl.addedRoute(route)
 	if !ctl.resolver.HasDomain(testRouteHost + ".") {
@@ -38,7 +39,7 @@ func Test_deletedRoute(t *testing.T) {
 	ctl := newTestController()
 	route := &unstructured.Unstructured{Object: make(map[string]interface{})}
 
-	unstructured.SetNestedField(route.Object, testRouteHost, "spec", "host")
+	assert.NoError(t, unstructured.SetNestedField(route.Object, testRouteHost, "spec", "host"))
 	ctl.addedRoute(route)
 	ctl.addedRoute(route)
 	ctl.deletedRoute(route)
@@ -55,10 +56,10 @@ func Test_deletedRoute(t *testing.T) {
 func Test_updatedRoute(t *testing.T) {
 	ctl := newTestController()
 	routeOld := &unstructured.Unstructured{Object: make(map[string]interface{})}
-	unstructured.SetNestedField(routeOld.Object, testRouteHost, "spec", "host")
+	assert.NoError(t, unstructured.SetNestedField(routeOld.Object, testRouteHost, "spec", "host"))
 
 	routeNew := &unstructured.Unstructured{Object: make(map[string]interface{})}
-	unstructured.SetNestedField(routeNew.Object, testRouteHost2, "spec", "host")
+	assert.NoError(t, unstructured.SetNestedField(routeNew.Object, testRouteHost2, "spec", "host"))
 
 	ctl.addedRoute(routeOld)
 	ctl.updatedRoute(routeOld, routeNew)
@@ -75,10 +76,10 @@ func Test_updatedRoute(t *testing.T) {
 func Test_updatedRouteDupHost(t *testing.T) {
 	ctl := newTestController()
 	routeOld := &unstructured.Unstructured{Object: make(map[string]interface{})}
-	unstructured.SetNestedField(routeOld.Object, testRouteHost, "spec", "host")
+	assert.NoError(t, unstructured.SetNestedField(routeOld.Object, testRouteHost, "spec", "host"))
 
 	routeNew := &unstructured.Unstructured{Object: make(map[string]interface{})}
-	unstructured.SetNestedField(routeNew.Object, testRouteHost2, "spec", "host")
+	assert.NoError(t, unstructured.SetNestedField(routeNew.Object, testRouteHost2, "spec", "host"))
 
 	ctl.addedRoute(routeOld)
 	ctl.addedRoute(routeOld) // two routes with the same hostname

@@ -3,8 +3,6 @@
 
 package lvmd
 
-import "regexp"
-
 type DeviceType string
 
 const (
@@ -12,14 +10,6 @@ const (
 	TypeThin       = DeviceType("thin")
 	TypeThick      = DeviceType("thick")
 )
-
-// This regexp is based on the following validation:
-//
-//	https://github.com/kubernetes/apimachinery/blob/v0.18.3/pkg/util/validation/validation.go#L42
-var qualifiedNameRegexp = regexp.MustCompile("^([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$")
-
-// This regexp is used to check StripeSize format
-var stripeSizeRegexp = regexp.MustCompile("(?i)^([0-9]*)(k|m|g|t|p|e|b|s)?$")
 
 // ThinPoolConfig holds the configuration of thin pool in a volume group
 type ThinPoolConfig struct {

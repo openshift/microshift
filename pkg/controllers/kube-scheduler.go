@@ -30,10 +30,6 @@ import (
 	schedulerOptions "k8s.io/kubernetes/cmd/kube-scheduler/app/options"
 )
 
-const (
-	kubeSchedulerStartupTimeout = 30
-)
-
 type KubeScheduler struct {
 	options    *schedulerOptions.Options
 	kubeconfig string

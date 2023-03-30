@@ -33,7 +33,7 @@ import (
 
 var (
 	HealthCheckRetries = 10
-	HealthCheckWait    = time.Duration(3 * time.Second)
+	HealthCheckWait    = 3 * time.Second
 )
 
 type EtcdService struct {

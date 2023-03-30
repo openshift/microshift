@@ -74,6 +74,7 @@ func (cs *CertificateChains) WalkChains(rootPath []string, fn CertWalkFunc) erro
 		return nil
 	}
 
+	//nolint:nestif
 	if signer := cs.GetSigner(rootPath...); signer != nil {
 		// the path points to a signer
 		if err := fn(rootPath, *signer.signerConfig.Config.Certs[0]); err != nil {
@@ -87,7 +88,6 @@ func (cs *CertificateChains) WalkChains(rootPath []string, fn CertWalkFunc) erro
 			}
 		}
 		return nil
-
 	} else if len(rootPath) == 1 {
 		// the path is a single element but no such signer exists
 		return fmt.Errorf("%v is not a path to a signer", rootPath)

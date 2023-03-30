@@ -17,7 +17,6 @@ import (
 )
 
 func Test_renderLvmdParams(t *testing.T) {
-
 	iToP := func(i int) *uint64 { r := uint64(i); return &r }
 
 	type args struct {

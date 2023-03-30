@@ -247,7 +247,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	return nil
 }
 
-func (s *KubeAPIServer) configureAuditPolicy(cfg *config.Config) error {
+func (s *KubeAPIServer) configureAuditPolicy(_ *config.Config) error {
 	data := []byte(`
 apiVersion: audit.k8s.io/v1
 kind: Policy

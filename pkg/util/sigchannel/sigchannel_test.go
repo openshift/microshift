@@ -77,7 +77,7 @@ func TestAnd(t *testing.T) {
 				t.Errorf("And() on closed channels returned 'true' expected 'false'")
 			}
 			return
-		case <-time.After(time.Duration(time.Second * 5)):
+		case <-time.After(time.Second * 5):
 			t.Errorf("timed out waiting for And() to close channels")
 			return
 		}

@@ -43,6 +43,7 @@ type certificateSigner struct {
 }
 
 // NewCertificateSigner returns a builder object for a certificate chain for the given signer
+//nolint:ireturn
 func NewCertificateSigner(signerName, signerDir string, validityDays int) CertificateSignerBuilder {
 	return &certificateSigner{
 		signerName:         signerName,
@@ -58,16 +59,19 @@ func (s *certificateSigner) ValidityDays() int { return s.signerValidityDays }
 // WithSignerConfig uses the provided configuration in `config` to sign its
 // direct certificates.
 // This is useful when creating intermediate signers.
+//nolint:ireturn
 func (s *certificateSigner) WithSignerConfig(config *crypto.CA) CertificateSignerBuilder {
 	s.signerConfig = config
 	return s
 }
 
+//nolint:ireturn
 func (s *certificateSigner) WithCABundlePaths(bundlePaths ...string) CertificateSignerBuilder {
 	s.caBundlePaths = append(s.caBundlePaths, bundlePaths...)
 	return s
 }
 
+//nolint:ireturn
 func (s *certificateSigner) WithClientCertificates(signInfos ...*ClientCertificateSigningRequestInfo) CertificateSignerBuilder {
 	for _, signInfo := range signInfos {
 		s.certificatesToSign = append(s.certificatesToSign, signInfo)
@@ -75,6 +79,7 @@ func (s *certificateSigner) WithClientCertificates(signInfos ...*ClientCertifica
 	return s
 }
 
+//nolint:ireturn
 func (s *certificateSigner) WithServingCertificates(signInfos ...*ServingCertificateSigningRequestInfo) CertificateSignerBuilder {
 	for _, signInfo := range signInfos {
 		s.certificatesToSign = append(s.certificatesToSign, signInfo)
@@ -82,6 +87,7 @@ func (s *certificateSigner) WithServingCertificates(signInfos ...*ServingCertifi
 	return s
 }
 
+//nolint:ireturn
 func (s *certificateSigner) WithPeerCertificiates(signInfos ...*PeerCertificateSigningRequestInfo) CertificateSignerBuilder {
 	for _, signInfo := range signInfos {
 		s.certificatesToSign = append(s.certificatesToSign, signInfo)
@@ -89,6 +95,7 @@ func (s *certificateSigner) WithPeerCertificiates(signInfos ...*PeerCertificateS
 	return s
 }
 
+//nolint:ireturn
 func (s *certificateSigner) WithSubCAs(subCAsInfo ...CertificateSignerBuilder) CertificateSignerBuilder {
 	s.subCAs = append(s.subCAs, subCAsInfo...)
 	return s

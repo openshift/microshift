@@ -55,7 +55,7 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 	}
 
 	// TO-DO add readiness check
-	if err := components.StartComponents(s.cfg); err != nil {
+	if err := components.StartComponents(s.cfg); err != nil { //nolint:contextcheck
 		return err
 	}
 	klog.Infof("%s launched ocp componets", s.Name())

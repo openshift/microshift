@@ -19,7 +19,9 @@ func AppendCertsToFile(bundlePath string, certs ...[]byte) error {
 	defer f.Close()
 
 	for _, c := range certs {
+		// nolint:errcheck
 		f.WriteString("\n")
+		// nolint:errcheck
 		f.Write(c)
 	}
 
