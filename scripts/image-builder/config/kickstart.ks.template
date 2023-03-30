@@ -44,9 +44,9 @@ REPLACE_OCP_PULL_SECRET_CONTENTS
 EOF
 chmod 600 /etc/crio/openshift-pull-secret
 
-# Create a default redhat user, allowing it to run sudo commands with password
+# Create a default redhat user, allowing it to run sudo commands without password
 useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 redhat
-echo -e 'redhat\tALL=(ALL)\tPASSWD: ALL' > /etc/sudoers.d/microshift
+echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
 
 # Add authorized ssh keys
 mkdir -m 700 /home/redhat/.ssh
