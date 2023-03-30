@@ -1,27 +1,18 @@
-- cluster-kube-apiserver-operator embedded-component d1089b83b9162a237be88332bef281d86aa2d9b3 to ae0d2fb3f70f13903a7bf03f942949b80bddcb37
-  - df29a11 2023-03-13T14:57:11+01:00 bump(api)
+- cluster-kube-controller-manager-operator embedded-component 014c24e248ed2a5381503ac09f08f428bc38ae3a to 2b6494a23a0882c1c1fb870474d60358e7f5bff8
+  - 475195f 2023-03-27T20:24:45+02:00 OCPBUGS-10568: migrate to using lease objects for leader election
+  - 58a40f1 2023-03-22T15:41:29+01:00 OWNERS: remove ravi from the owners
+  - 5cb3cb3 2023-03-10T07:56:37+00:00 Updating ose-cluster-kube-controller-manager-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/ose-cluster-kube-controller-manager-operator.yml
 
-- cluster-kube-controller-manager-operator embedded-component d28c67af6498a1859a30c7ebe75bd4abaf72a71c to 014c24e248ed2a5381503ac09f08f428bc38ae3a
-  - db14605 2023-03-09T10:10:38+00:00 Reset library-go to openshift fork
+- cluster-openshift-controller-manager-operator embedded-component 7867c26e6c91e2cc279317dfc080befe63a60749 to 22f249180f9f1f8e806f6353b26edd196ad1fc4a
+  - 04e8eee 2023-03-26T12:05:53-04:00 Add Divyanshu Agrawal as a reviewer
 
-- cluster-kube-scheduler-operator embedded-component d3978864fb58063235be176c18fe50457b5223f3 to 09d0cfa6eb47871ee71cf2de7d563baab80411f4
-  - 5378044 2023-03-14T06:24:10-04:00 disable debug pporf with unauthenticated port
+- openshift-controller-manager embedded-component 87de83867ac51730f506138ee790a56ca21d9fc9 to b288916c2beb117fd8f3cb6aadb150184747a707
+  - 6ce319f 2023-03-26T14:28:27-04:00 Add Divyanshu Agrawal as a reviewer
 
-- cluster-network-operator embedded-component a3e00272ea4ab220a83a245d58026c791f9c022e to 8832c119e455ed40cf99da9d2a32b6f3b22619ce
-  - 02023f5 2023-03-23T16:43:52+01:00 Add POD_NAME env to ovnkube-node
-
-- etcd embedded-component 384dc49aed5ecac0b9772bf07cee3e4ee85e1d8b to 53cdd6b0519f0e57da9032b473465799bba4b1a0
-  - 6a391d87 2023-03-23T08:12:39+00:00 Update owners
-
-- machine-config-operator embedded-component 238cb899decd327fdbc68c04d28cf098d0edf827 to 9c80619e2655536f7b371d08b9a19d0caf02c3b5
-  - 8dd94bcc 2023-03-22T11:31:36-04:00 adds unit tests for our helper funcs
-  - d58078e2 2023-03-22T11:31:28-04:00 adds OS image override test
-
-- oc image-amd64 b860ec0761be98968f427136cf94437e85fff700 to 82fec8035662441b95478d9b97861acf9253932b
-  - 4cece33 2023-03-25T08:38:12+00:00 Updating ose-cli-artifacts images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/8b1a74dceea1a289bee2412844cdc5f960df7d56/images/ose-cli-artifacts.yml
-  - 8fd6dbf 2023-03-22T18:34:41+00:00 Always copy the blobs if the target isn't a registry
-  - 778bba6 2023-03-16T16:52:40+01:00 The architecture of oc in the cli-artifacts' /usr/bin folder should the one of the built image
-
-- oc image-arm64 222ec0d76d05ee8ea612286441a6d5e12a702268 to 82fec8035662441b95478d9b97861acf9253932b
-  - 8fd6dbf 2023-03-22T18:34:41+00:00 Always copy the blobs if the target isn't a registry
+- oc image-arm64 82fec8035662441b95478d9b97861acf9253932b to ea20e4c4de773326cc8efe642c311afbc6ca9f45
+  - 3e3d592 2023-03-22T18:33:28+00:00 Allow submodule using file transport with newer git
+  - f2409ee 2023-03-16T17:05:57-04:00 exclude irrelevant adm commands from MicroShift documentation
+  - 62948a0 2023-03-16T16:46:29-04:00 Exclude autoscale from MicroShift documentation
+  - b5d3633 2023-03-13T15:02:08+00:00 Updating openshift-enterprise-deployer images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7ce51feaf65258715109cad8d18b1bd0db0fbb2e/images/openshift-enterprise-deployer.yml
+  - 091bc4c 2023-03-08T21:06:27+00:00 Updating openshift-enterprise-cli images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/openshift-enterprise-cli.yml
 

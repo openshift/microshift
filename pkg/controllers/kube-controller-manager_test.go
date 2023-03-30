@@ -61,7 +61,7 @@ func TestConfigure(t *testing.T) {
 		"--kube-api-qps=150",
 		fmt.Sprintf("--kubeconfig=%s", cfg.KubeConfigPath(config.KubeControllerManager)),
 		"--leader-elect-renew-deadline=12s",
-		"--leader-elect-resource-lock=configmapsleases",
+		"--leader-elect-resource-lock=leases",
 		"--leader-elect-retry-period=3s",
 		"--leader-elect=false",
 		fmt.Sprintf("--root-ca-file=%s", kcmRootCAFile()),
