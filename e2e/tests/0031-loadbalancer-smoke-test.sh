@@ -8,13 +8,13 @@ SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 # shellcheck disable=SC2317  # Don't warn about unreachable commands in this function
 cleanup() {
-    oc delete service hello-microshift
-    oc delete -f "${SCRIPT_PATH}/assets/hello-microshift.yaml"
-    firewall::close_port tcp:5678
+    oc delete service hello-microshift || true
+    oc delete -f "${SCRIPT_PATH}/assets/hello-microshift.yaml" || true
+    firewall::close_port 5678 tcp || true
 }
 trap cleanup EXIT
 
-firewall::open_port tcp:5678
+firewall::open_port 5678 tcp
 oc create -f "${SCRIPT_PATH}/assets/hello-microshift.yaml"
 oc create service loadbalancer hello-microshift --tcp=5678:8080
 oc wait pods -l app=hello-microshift --for condition=Ready --timeout=60s

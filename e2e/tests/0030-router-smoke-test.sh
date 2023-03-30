@@ -8,14 +8,14 @@ SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 # shellcheck disable=SC2317  # Don't warn about unreachable commands in this function
 cleanup() {
-    oc delete route hello-microshift
-    oc delete service hello-microshift
-    oc delete -f "${SCRIPT_PATH}/assets/hello-microshift.yaml"
-    firewall::close_port tcp:80
+    oc delete route hello-microshift || true
+    oc delete service hello-microshift || true
+    oc delete -f "${SCRIPT_PATH}/assets/hello-microshift.yaml" || true
+    firewall::close_port 80 tcp || true
 }
 trap cleanup EXIT
 
-firewall::open_port tcp:80
+firewall::open_port 80 tcp
 oc create -f "${SCRIPT_PATH}/assets/hello-microshift.yaml"
 oc expose pod hello-microshift
 oc expose svc hello-microshift --hostname hello-microshift.cluster.local
