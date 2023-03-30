@@ -108,12 +108,32 @@ func RunMicroshift(cfg *config.MicroshiftConfig) error {
 		klog.Fatalf("failed to determine when to rotate certificates: %v", err)
 	}
 
-	// TODO: figure out a way to tell the user why the service restarted
-	ctx, cancel := context.WithDeadline(context.Background(), rotationDate)
+	// Establish a deadline for restarting to rotate the certificates.
+	certCtx, certCancel := context.WithDeadline(context.Background(), rotationDate)
+
+	// Establish the context we will use to control execution
+	runCtx, runCancel := context.WithCancel(context.Background())
+
+	// Watch for the certificate deadline context to be done, log a
+	// message, and cancel the run context to propagate the shutdown.
+	go func() {
+		select {
+		case <-certCtx.Done():
+			klog.Info("Stopping services for certificate rotation")
+			runCancel()
+			return
+		case <-runCtx.Done():
+			klog.Info("Certificate watcher exiting")
+			certCancel()
+			return
+		}
+	}()
+
+	// Start everything up
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	go func() {
 		klog.Infof("Started %s", m.Name())
-		if err := m.Run(ctx, ready, stopped); err != nil {
+		if err := m.Run(runCtx, ready, stopped); err != nil {
 			klog.Errorf("Stopped %s: %v", m.Name(), err)
 		} else {
 			klog.Infof("%s completed", m.Name())
@@ -121,6 +141,7 @@ func RunMicroshift(cfg *config.MicroshiftConfig) error {
 		}
 	}()
 
+	// Connect signal handler
 	sigTerm := make(chan os.Signal, 1)
 	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
 
@@ -136,16 +157,21 @@ func RunMicroshift(cfg *config.MicroshiftConfig) error {
 			klog.Info("service does not support sd_notify readiness messages")
 		}
 
+		// Watch for SIGTERM to exit, now that we are ready.
 		<-sigTerm
+		klog.Info("Interrupt received")
 	case <-sigTerm:
+		// A signal that comes in before we are ready is handled here.
+		klog.Info("Interrupt received")
+	case <-runCtx.Done():
+		// We might end up here if the certificate rotation is
+		// triggered and we exit on our own, instead of via a signal.
 	}
-	klog.Infof("Interrupt received. Stopping services")
-	cancel()
+	klog.Info("Stopping services")
+	runCancel()
 
 	select {
 	case <-stopped:
-	case <-sigTerm:
-		klog.Infof("Another interrupt received. Force terminating services")
 	case <-time.After(time.Duration(gracefulShutdownTimeout) * time.Second):
 		klog.Infof("Timed out waiting for services to stop")
 	}
