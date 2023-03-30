@@ -5,6 +5,7 @@ metadata:
   labels:
     app: hello-microshift
 spec:
+  terminationGracePeriodSeconds: 0
   containers:
   - name: hello-microshift
     image: busybox:1.35
