@@ -4,7 +4,7 @@ It is recommended to review the current document and use the automation instruct
 
 ## Create Development Virtual Machine
 Start by downloading one of the supported boot images for the `x86_64` or `aarch64` architecture:
-* RHEL 9.1 from https://developers.redhat.com/products/rhel/download
+* RHEL 9.2 from https://developers.redhat.com/products/rhel/download
 * CentOS 9 Stream from https://www.centos.org/download
 
 ### Creating VM
@@ -66,19 +66,6 @@ sudo dnf clean all -y
 sudo dnf update -y
 sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build jq bash-completion
 sudo systemctl enable --now cockpit.socket
-
-# Install go1.19
-# This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
-# /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
-GO_VER=1.19.4
-GO_ARCH=$([ "$(uname -i)" == "x86_64" ] && echo "amd64" || echo "arm64")
-curl -L -o "go${GO_VER}.linux-${GO_ARCH}.tar.gz" "https://go.dev/dl/go${GO_VER}.linux-${GO_ARCH}.tar.gz" &&
-    sudo rm -rf "/usr/local/go${GO_VER}" && \
-    sudo mkdir -p "/usr/local/go${GO_VER}" && \
-    sudo tar -C "/usr/local/go${GO_VER}" -xzf "go${GO_VER}.linux-${GO_ARCH}.tar.gz" --strip-components 1 && \
-    sudo rm -rfv /usr/local/bin/{go,gofmt} && \
-    sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/ && \
-    rm -rfv "go${GO_VER}.linux-${GO_ARCH}.tar.gz"
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
 
