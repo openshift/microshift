@@ -6,7 +6,7 @@ set -x
 
 SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
-scp "$SCRIPT_PATH/../../docs/config/busybox_running_check.sh" "$USHIFT_USER@$USHIFT_IP":~/busybox_running_check.sh
+scp "$SCRIPT_PATH/assets/busybox_running_check.sh" "$USHIFT_USER@$USHIFT_IP":~/busybox_running_check.sh
 
 ssh -q "$USHIFT_USER@$USHIFT_IP" <<'ENDSSH'
 cat << 'ENDCAT' > ~/greenboot-test.sh
