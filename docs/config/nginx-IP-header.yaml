@@ -37,7 +37,6 @@ spec:
           capabilities:
             drop: ["ALL"]
           runAsNonRoot: true
-          runAsUser: 1000
       volumes:
         - name: nginx-configs
           configMap:
