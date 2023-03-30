@@ -19,7 +19,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -71,7 +70,7 @@ leaderElection:
 
 	path := filepath.Join(microshiftDataDir, "resources", "kube-scheduler", "config", "config.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
-	return ioutil.WriteFile(path, data, 0644)
+	return os.WriteFile(path, data, 0400)
 }
 
 func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
