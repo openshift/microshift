@@ -17,7 +17,6 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/pflag"
 
-	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/component-base/logs"
 	"k8s.io/klog/v2"
@@ -58,7 +57,9 @@ type IngressConfig struct {
 	ServingKey         []byte
 }
 
-type InternalEtcdConfig struct {
+type EtcdConfig struct {
+	// Set a memory limit, in megabytes, on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
+	MemoryLimit uint64
 	// The limit on the size of the etcd database; etcd will start failing writes if its size on disk reaches this value
 	QuotaBackendBytes int64
 	// If the backend is fragmented more than `maxFragmentedPercentage`
@@ -67,19 +68,6 @@ type InternalEtcdConfig struct {
 	MaxFragmentedPercentage float64
 	// How often to check the conditions for defragging (0 means no defrags, except for a single on startup if `doStartupDefrag` is set).
 	DefragCheckFreq time.Duration
-	// Whether or not to do a defrag when the server finishes starting
-	DoStartupDefrag bool
-}
-
-type EtcdConfig struct {
-	// The limit on the size of the etcd database; etcd will start failing writes if its size on disk reaches this value
-	QuotaBackendSize string
-	// If the backend is fragmented more than `maxFragmentedPercentage`
-	//		and the database size is greater than `minDefragSize`, do a defrag.
-	MinDefragSize           string
-	MaxFragmentedPercentage float64
-	// How often to check the conditions for defragging (0 means no defrags, except for a single on startup if `doStartupDefrag` is set).
-	DefragCheckFreq string
 	// Whether or not to do a defrag when the server finishes starting
 	DoStartupDefrag bool
 }
@@ -102,18 +90,28 @@ type MicroshiftConfig struct {
 	BaseDomain       string        `json:"baseDomain"`
 	Cluster          ClusterConfig `json:"cluster"`
 
-	Ingress IngressConfig      `json:"-"`
-	Etcd    InternalEtcdConfig `json:"etcd"`
+	Ingress IngressConfig `json:"-"`
+	Etcd    EtcdConfig    `json:"etcd"`
 }
 
 // Top level config file
 type Config struct {
-	DNS       DNS        `json:"dns"`
-	Network   Network    `json:"network"`
-	Node      Node       `json:"node"`
-	ApiServer ApiServer  `json:"apiServer"`
-	Debugging Debugging  `json:"debugging"`
-	Etcd      EtcdConfig `json:"etcd"`
+	DNS       DNS       `json:"dns"`
+	Network   Network   `json:"network"`
+	Node      Node      `json:"node"`
+	ApiServer ApiServer `json:"apiServer"`
+	Debugging Debugging `json:"debugging"`
+	Etcd      Etcd      `json:"etcd"`
+}
+
+const (
+	// Etcd performance degrades significantly if the memory available is less than 50MB, enfore this minimum.
+	EtcdMinimumMemoryLimit = 50
+)
+
+type Etcd struct {
+	// Set a memory limit, in megabytes, on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
+	MemoryLimitMB uint64 `json:"memoryLimitMB"`
 }
 
 type Network struct {
@@ -258,12 +256,13 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			ServiceCIDR:          "10.43.0.0/16",
 			ServiceNodePortRange: "30000-32767",
 		},
-		Etcd: InternalEtcdConfig{
+		Etcd: EtcdConfig{
+			MemoryLimit:             0,                 // No limit
 			MinDefragBytes:          100 * 1024 * 1024, // 100MB
 			MaxFragmentedPercentage: 45,                // percent
 			DefragCheckFreq:         5 * time.Minute,
 			DoStartupDefrag:         true,
-			QuotaBackendBytes:       2 * 1024 * 1024 * 1024, // 2GB
+			QuotaBackendBytes:       8 * 1024 * 1024 * 1024, // 8GB
 		},
 	}
 }
@@ -422,35 +421,14 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 		c.KASAdvertiseAddress = config.ApiServer.AdvertiseAddress
 	}
 
-	if config.Etcd.DefragCheckFreq != "" {
-		d, err := time.ParseDuration(config.Etcd.DefragCheckFreq)
-		if err != nil {
-			return fmt.Errorf("failed to parse etcd defragCheckFreq: %v", err)
-		}
-		c.Etcd.DefragCheckFreq = d
-	}
-	if config.Etcd.MinDefragSize != "" {
-		q, err := resource.ParseQuantity(config.Etcd.MinDefragSize)
-		if err != nil {
-			return fmt.Errorf("failed to parse etcd minDefragSize: %v", err)
-		}
-		if !q.IsZero() {
-			c.Etcd.MinDefragBytes = q.Value()
+	if config.Etcd.MemoryLimitMB > 0 {
+		// If the memory limit is than the minimum, set it to the minimum and continue.
+		if config.Etcd.MemoryLimitMB < EtcdMinimumMemoryLimit {
+			c.Etcd.MemoryLimit = EtcdMinimumMemoryLimit
+		} else {
+			c.Etcd.MemoryLimit = config.Etcd.MemoryLimitMB
 		}
 	}
-	if config.Etcd.MaxFragmentedPercentage > 0 {
-		c.Etcd.MaxFragmentedPercentage = config.Etcd.MaxFragmentedPercentage
-	}
-	if config.Etcd.QuotaBackendSize != "" {
-		q, err := resource.ParseQuantity(config.Etcd.QuotaBackendSize)
-		if err != nil {
-			return fmt.Errorf("failed to parse etcd quotaBackendSize: %v", err)
-		}
-		if !q.IsZero() {
-			c.Etcd.QuotaBackendBytes = q.Value()
-		}
-	}
-	c.Etcd.DoStartupDefrag = config.Etcd.DoStartupDefrag
 
 	return nil
 }

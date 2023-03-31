@@ -36,10 +36,14 @@ var (
 	HealthCheckWait    = time.Duration(3 * time.Second)
 )
 
-type EtcdService struct{}
+type EtcdService struct {
+	memoryLimit uint64
+}
 
 func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
-	return &EtcdService{}
+	return &EtcdService{
+		memoryLimit: cfg.Etcd.MemoryLimit,
+	}
 }
 
 func (s *EtcdService) Name() string           { return "etcd" }
@@ -59,24 +63,31 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	etcdPath := filepath.Join(filepath.Dir(microshiftExecPath), "microshift-etcd")
 	// Not running the etcd binary directly, the proper etcd arguments are handled
 	//		in etcd/cmd/microshift-etcd/run.go.
-	args := []string{"run"}
+	args := []string{}
 
 	// If we're launching MicroShift as a service, we need to do the same
 	//		with etcd, so wrap it in a transient systemd-unit that's tied
 	//		to the MicroShift service lifetime.
 	var exe string
 	if runningAsSvc {
-		args = append([]string{
+		args = append(args,
 			"--uid=root",
 			"--scope",
-			"--property", "BindsTo=microshift.service",
 			"--unit", "microshift-etcd",
-			etcdPath,
-		}, args...)
+			"--property", "BindsTo=microshift.service",
+		)
+
+		if s.memoryLimit > 0 {
+			args = append(args, "--property", fmt.Sprintf("MemoryHigh=%vM", s.memoryLimit))
+		}
+
+		args = append(args, etcdPath)
+
 		exe = "systemd-run"
 	} else {
 		exe = etcdPath
 	}
+	args = append(args, "run")
 	// Not using context as canceling ctx sends SIGKILL to process
 	cmd := exec.Command(exe, args...)
 
