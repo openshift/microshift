@@ -287,3 +287,15 @@ vendor:
 		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply --reject || exit 1; \
 	done
 .PHONY: vendor
+
+# Update the etcd dependencies, including especially MicroShift itself.
+vendor-etcd:
+	$(MAKE) -C etcd vendor
+.PHONY: vendor-etcd
+
+# There should be no modified files in the etcd/vendor directory after
+# running `make vendor-etcd`.
+.PHONY: verify-vendor-etcd
+verify: verify-vendor-etcd
+verify-vendor-etcd: vendor-etcd
+	./hack/verify-vendor-etcd.sh
