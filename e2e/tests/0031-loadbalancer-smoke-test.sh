@@ -22,7 +22,7 @@ oc wait pods -l app=hello-microshift --for condition=Ready --timeout=60s
 retries=3
 backoff=3s
 for _ in $(seq 1 "${retries}"); do
-    RESPONSE=$(curl -i "${IP}":5678 2>&1)
+    RESPONSE=$(curl -i "${USHIFT_IP}":5678 2>&1)
     RESULT=$?
     [ $RESULT -eq 0 ] &&
         echo "${RESPONSE}" | grep -q -E "HTTP.*200" &&
