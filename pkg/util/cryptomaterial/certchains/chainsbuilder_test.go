@@ -116,7 +116,7 @@ func Test_certificateChains_Complete(t *testing.T) {
 
 				gotCert := pemToCert(t, gotPEM)
 
-				if cn := gotCert.Subject.CommonName; cn !=  sets.List[string](expectedHostnames)[0] {
+				if cn := gotCert.Subject.CommonName; cn != sets.List[string](expectedHostnames)[0] {
 					t.Errorf("expected certificate CN at path %q to be %q, but it is %q", path, sets.List[string](expectedHostnames)[0], cn)
 				}
 

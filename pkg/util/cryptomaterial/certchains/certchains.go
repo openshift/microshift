@@ -74,7 +74,6 @@ func (cs *CertificateChains) WalkChains(rootPath []string, fn CertWalkFunc) erro
 		return nil
 	}
 
-	//nolint:nestif
 	if signer := cs.GetSigner(rootPath...); signer != nil {
 		// the path points to a signer
 		if err := fn(rootPath, *signer.signerConfig.Config.Certs[0]); err != nil {
@@ -88,22 +87,21 @@ func (cs *CertificateChains) WalkChains(rootPath []string, fn CertWalkFunc) erro
 			}
 		}
 		return nil
-	} else if len(rootPath) == 1 {
+	}
+	if len(rootPath) == 1 {
 		// the path is a single element but no such signer exists
 		return fmt.Errorf("%v is not a path to a signer", rootPath)
-	} else {
-		// the path points to a leaf certificate
-		signerPath := rootPath[:len(rootPath)-1]
-		if signer := cs.GetSigner(signerPath...); signer != nil {
-			cert := signer.signedCertificates[rootPath[len(rootPath)-1]]
-			if cert == nil {
-				return fmt.Errorf("the requested element does not exist")
-			}
-			return fn(rootPath, *cert.tlsConfig.Certs[0])
-		}
-
-		return fmt.Errorf("a non-leaf fragment of the path '%v' either is not a signer or it doesn't exist", rootPath)
 	}
+	// the path points to a leaf certificate
+	signerPath := rootPath[:len(rootPath)-1]
+	if signer := cs.GetSigner(signerPath...); signer != nil {
+		cert := signer.signedCertificates[rootPath[len(rootPath)-1]]
+		if cert == nil {
+			return fmt.Errorf("the requested element does not exist")
+		}
+		return fn(rootPath, *cert.tlsConfig.Certs[0])
+	}
+	return fmt.Errorf("a non-leaf fragment of the path '%v' either is not a signer or it doesn't exist", rootPath)
 }
 
 func WhenToRotateAtEarliest(cs *CertificateChains) ([]string, time.Time, error) {

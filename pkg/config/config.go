@@ -55,7 +55,6 @@ func NewDefault() *Config {
 // probing the environment, the values in the Config instance are not
 // changed.
 func (c *Config) fillDefaults() error {
-
 	// Look up any values that may generate an error
 	subjectAltNames, err := getAllHostnames()
 	if err != nil {
@@ -150,7 +149,6 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Node.NodeIP != "" {
 		c.Node.NodeIP = u.Node.NodeIP
 	}
-
 	if len(u.ApiServer.SubjectAltNames) != 0 {
 		c.ApiServer.SubjectAltNames = u.ApiServer.SubjectAltNames
 	}
@@ -170,7 +168,6 @@ func (c *Config) incorporateUserSettings(u *Config) {
 // inputs to more easily consumable units or fills in any defaults
 // computed based on the values of other settings.
 func (c *Config) updateComputedValues() error {
-
 	clusterDNS, err := c.computeClusterDNS()
 	if err != nil {
 		return err
@@ -206,6 +203,7 @@ func (c *Config) updateComputedValues() error {
 }
 
 func (c *Config) validate() error {
+	//nolint:nestifs // extracting the nested ifs will just increase the complexity of the if expressions as validation expands
 	if len(c.ApiServer.SubjectAltNames) > 0 {
 		// Any entry in SubjectAltNames will be included in the external access certificates.
 		// Any of the hostnames and IPs (except the node IP) listed below conflicts with
