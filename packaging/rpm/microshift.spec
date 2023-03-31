@@ -9,7 +9,7 @@
 }
 
 # golang specifics
-%global golang_version 1.18
+%global golang_version 1.19
 #debuginfo not supported with Go
 %global debug_package %{nil}
 # modifying the Go binaries breaks the DWARF debugging
@@ -296,6 +296,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Mar 29 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
+- Upgrade golang build-time dependency to 1.19 version
+
 * Wed Mar 01 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
 - Add lvmd.yaml and ovn.yaml default configuration files
 
