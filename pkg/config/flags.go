@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/component-base/logs"
+	"k8s.io/klog/v2"
 )
 
 func HideUnsupportedFlags(flags *pflag.FlagSet) {
@@ -15,9 +16,12 @@ func HideUnsupportedFlags(flags *pflag.FlagSet) {
 
 	loggingFlags.VisitAll(func(pf *pflag.Flag) {
 		if !supportedLoggingFlags.Has(pf.Name) {
-			flags.MarkHidden(pf.Name)
+			if err := flags.MarkHidden(pf.Name); err != nil {
+				klog.Error("failed to hide flag %q: %v", pf.Name, err)
+			}
 		}
 	})
-
-	flags.MarkHidden("version")
+	if err := flags.MarkHidden("version"); err != nil {
+		klog.Error("failed to hide flag %q: %v", "version", err)
+	}
 }

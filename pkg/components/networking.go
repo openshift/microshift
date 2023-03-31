@@ -79,7 +79,7 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		"KubeconfigPath": kubeconfigPath,
 		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
 	}
-	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
 		return err
 	}

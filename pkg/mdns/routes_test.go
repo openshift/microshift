@@ -3,8 +3,8 @@ package mdns
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/openshift/microshift/pkg/mdns/server"
+	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 

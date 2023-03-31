@@ -97,8 +97,8 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				}
 				c.Network.ServiceNetwork = []string{"40.30.20.10/16"}
 				c.Network.ServiceNodePortRange = "1024-32767"
-				c.ApiServer.AdvertiseAddress = "" // force value to be recomputed
-				c.updateComputedValues()          // recomputes DNS field
+				c.ApiServer.AdvertiseAddress = ""           // force value to be recomputed
+				assert.NoError(t, c.updateComputedValues()) // recomputes DNS field
 				return c
 			}(),
 		},
@@ -166,7 +166,7 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			expected: func() *Config {
 				c := mkDefaultConfig()
 				c.Etcd.MemoryLimitMB = 129
-				c.updateComputedValues()
+				assert.NoError(t, c.updateComputedValues())
 				return c
 			}(),
 		},
@@ -174,7 +174,6 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			config, err := getActiveConfigFromYAML([]byte(tt.config))
 
 			if tt.expectErr && err == nil {
@@ -184,7 +183,6 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				t.Fatalf("Not expecting error and received: %v", err)
 			}
 			if !tt.expectErr {
-
 				// blank out the user settings because the expected value
 				// never has them and any computed value should be set so
 				// it should be safe to ignore them

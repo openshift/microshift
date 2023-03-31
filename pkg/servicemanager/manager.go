@@ -105,7 +105,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 					klog.Errorf("%s panicked: %s", service.Name(), r)
 					klog.Error("Stopping MicroShift")
 					if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
-						klog.Warningf("error killing process: %w", err)
+						klog.Warningf("error killing process: %v", err)
 					}
 					if !sigchannel.IsClosed(stopped) {
 						close(stopped)
@@ -117,7 +117,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 			if err := service.Run(ctx, ready, stopped); err != nil && !errors.Is(err, context.Canceled) {
 				klog.Errorf("service %s exited with error: %s, stopping MicroShift", service.Name(), err)
 				if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
-					klog.Warningf("error killing process: %w", err)
+					klog.Warningf("error killing process: %v", err)
 				}
 			} else {
 				klog.Infof("%s completed", service.Name())

@@ -62,13 +62,11 @@ func (n *NetworkConfiguration) Run(ctx context.Context, ready chan<- struct{}, s
 			return err
 		}
 		go func() {
-			select {
-			case <-ctx.Done():
-				if err := n.removeServiceIPLoopback(); err != nil {
-					klog.Warningf("failed to remove IP from interface: %v", err)
-				}
-				close(stopChan)
+			<-ctx.Done()
+			if err := n.removeServiceIPLoopback(); err != nil {
+				klog.Warningf("failed to remove IP from interface: %v", err)
 			}
+			close(stopChan)
 		}()
 	}
 	klog.Infof("%q is ready", n.Name())

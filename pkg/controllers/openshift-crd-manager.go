@@ -39,7 +39,7 @@ func (s *OpenShiftCRDManager) Dependencies() []string { return []string{"kube-ap
 func (s *OpenShiftCRDManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
-	if err := assets.ApplyCRDs(s.cfg, ctx); err != nil {
+	if err := assets.ApplyCRDs(ctx, s.cfg); err != nil {
 		klog.Errorf("%s unable to apply default CRDs: %v", s.Name(), err)
 		return err
 	}

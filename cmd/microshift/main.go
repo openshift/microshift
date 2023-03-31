@@ -23,7 +23,7 @@ func newCommand() *cobra.Command {
 		Use:   "microshift",
 		Short: "MicroShift, a minimal OpenShift",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
+			_ = cmd.Help() // err is always nil
 			os.Exit(1)
 		},
 	}

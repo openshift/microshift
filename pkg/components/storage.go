@@ -73,7 +73,7 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 	)
 
 	if err := lvmd.LvmSupported(); err != nil {
-		klog.Warningf("skipping CSI deployment: %w", err)
+		klog.Warningf("skipping CSI deployment: %v", err)
 		return nil
 	}
 

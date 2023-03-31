@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -85,7 +86,9 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatal(err)
 	}
 
-	os.MkdirAll(config.DataDir, 0700)
+	if err := os.MkdirAll(config.DataDir, 0700); err != nil {
+		return fmt.Errorf("failed to create dir %q: %w", config.DataDir, err)
+	}
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	certChains, err := initCerts(cfg)
@@ -114,7 +117,7 @@ func RunMicroshift(cfg *config.Config) error {
 	util.Must(m.AddService(controllers.NewOpenShiftDefaultSCCManager(cfg)))
 	util.Must(m.AddService(mdns.NewMicroShiftmDNSController(cfg)))
 	util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
-	util.Must(m.AddService((controllers.NewVersionManager((cfg)))))
+	util.Must(m.AddService(controllers.NewVersionManager(cfg)))
 	util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	util.Must(m.AddService(node.NewKubeletServer(cfg)))
 	util.Must(m.AddService(loadbalancerservice.NewLoadbalancerServiceController(cfg)))
@@ -156,7 +159,6 @@ func RunMicroshift(cfg *config.Config) error {
 			klog.Errorf("Stopped %s: %v", m.Name(), err)
 		} else {
 			klog.Infof("%s completed", m.Name())
-
 		}
 	}()
 

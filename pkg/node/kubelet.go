@@ -59,7 +59,6 @@ func (s *KubeletServer) Name() string           { return componentKubelet }
 func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *KubeletServer) configure(cfg *config.Config) {
-
 	if err := s.writeConfig(cfg); err != nil {
 		klog.Fatalf("Failed to write kubelet config", err)
 	}
@@ -134,12 +133,13 @@ serverTLSBootstrap: false #TODO`)
 	}
 
 	path := filepath.Join(config.DataDir, "resources", "kubelet", "config", "config.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
+	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0700)); err != nil {
+		return fmt.Errorf("failed to create dir %q: %w", path, err)
+	}
 	return os.WriteFile(path, data, 0400)
 }
 
 func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-
 	defer close(stopped)
 	// run readiness check
 	go func() {

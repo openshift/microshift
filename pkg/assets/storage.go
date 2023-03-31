@@ -81,7 +81,7 @@ func applySCs(ctx context.Context, scs []string, applier readerApplier, render R
 	return nil
 }
 
-func ApplyStorageClasses(ctx context.Context,scs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplyStorageClasses(ctx context.Context, scs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	sc := &scApplier{}
 	sc.Client = scClient(kubeconfigPath)
 	return applySCs(ctx, scs, sc, render, params)

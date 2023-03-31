@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -24,12 +23,12 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apiserver/pkg/authentication/user"
 )
 
 func Test_certsToRegenerate(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		chains  *certchains.CertificateChains

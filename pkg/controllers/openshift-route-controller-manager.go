@@ -58,10 +58,10 @@ func (s *OCPRouteControllerManager) Dependencies() []string {
 func (s *OCPRouteControllerManager) configure(cfg *config.Config) {
 	s.kubeconfig = cfg.KubeConfigPath(config.RouteControllerManager)
 	s.kubeadmconfig = cfg.KubeConfigPath(config.KubeAdmin)
-	s.config = s.writeConfig(cfg)
+	s.config = s.writeConfig()
 }
 
-func (s *OCPRouteControllerManager) writeConfig(cfg *config.Config) *openshiftcontrolplanev1.OpenShiftControllerManagerConfig {
+func (s *OCPRouteControllerManager) writeConfig() *openshiftcontrolplanev1.OpenShiftControllerManagerConfig {
 	servingCertDir := cryptomaterial.RouteControllerManagerServingCertDir(cryptomaterial.CertsDirectory(config.DataDir))
 
 	c := &openshiftcontrolplanev1.OpenShiftControllerManagerConfig{

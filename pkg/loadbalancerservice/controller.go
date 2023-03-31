@@ -70,7 +70,7 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 	c.informer = serviceInformer.Informer()
 	c.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	c.indexer = c.informer.GetIndexer()
-	_ , err = c.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	_, err = c.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {

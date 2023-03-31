@@ -110,7 +110,7 @@ func readCRDOrDie(objBytes []byte) *apiextv1.CustomResourceDefinition {
 	return &crd
 }
 
-func applyCRD(client *apiextclientv1.ApiextensionsV1Client, crd *apiextv1.CustomResourceDefinition, ctx context.Context) error {
+func applyCRD(ctx context.Context, client *apiextclientv1.ApiextensionsV1Client, crd *apiextv1.CustomResourceDefinition) error {
 	_, _, err := resourceapply.ApplyCustomResourceDefinitionV1(ctx, client, assetsEventRecorder, crd)
 	return err
 }
@@ -159,7 +159,7 @@ func ApplyCRDs(ctx context.Context, cfg *config.Config) error {
 		}
 		c := readCRDOrDie(crdBytes)
 		if err := wait.Poll(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
-			if err := applyCRD(client, c, ctx); err != nil {
+			if err := applyCRD(ctx, client, c); err != nil {
 				klog.Warningf("failed to apply openshift CRD %s: %v", crd, err)
 				return false, nil
 			}

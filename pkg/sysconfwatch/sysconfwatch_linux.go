@@ -72,11 +72,16 @@ func getSysMonTimes() (int64, int64) {
 	// System-wide clock that measures real (i.e. wall-clock) time
 	// This clock is affected by discontinuous jumps in the system time (e.g. if the system administrator manually changes the clock)
 	// and by the incremental adjustments performed by adjtime and NTP
-	unix.ClockGettime(unix.CLOCK_REALTIME, &stm)
+	if err := unix.ClockGettime(unix.CLOCK_REALTIME, &stm); err != nil {
+		klog.Errorf("failed to init clock: %v", err)
+	}
+
 	// Clock that cannot be set and represents monotonic time since some unspecified starting point
 	// It provides access to a raw hardware-based time that is not subject to NTP adjustments
 	// or the incremental adjustments performed by adjtime
-	unix.ClockGettime(unix.CLOCK_MONOTONIC_RAW, &mtm)
+	if err := unix.ClockGettime(unix.CLOCK_MONOTONIC_RAW, &mtm); err != nil {
+		klog.Errorf("failed to initialize clock: %v", err)
+	}
 
 	return stm.Sec, mtm.Sec
 }

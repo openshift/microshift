@@ -203,7 +203,7 @@ func (c *Config) updateComputedValues() error {
 }
 
 func (c *Config) validate() error {
-	//nolint:nestifs // extracting the nested ifs will just increase the complexity of the if expressions as validation expands
+	//nolint:nestif // extracting the nested ifs will just increase the complexity of the if expressions as validation expands
 	if len(c.ApiServer.SubjectAltNames) > 0 {
 		// Any entry in SubjectAltNames will be included in the external access certificates.
 		// Any of the hostnames and IPs (except the node IP) listed below conflicts with

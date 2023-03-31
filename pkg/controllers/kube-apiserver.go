@@ -103,7 +103,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	servingCert := cryptomaterial.ServingCertPath(serviceNetworkServingCertDir)
 	servingKey := cryptomaterial.ServingKeyPath(serviceNetworkServingCertDir)
 
-	if err := s.configureAuditPolicy(cfg); err != nil {
+	if err := s.configureAuditPolicy(); err != nil {
 		return fmt.Errorf("failed to configure kube-apiserver audit policy: %w", err)
 	}
 
@@ -247,7 +247,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	return nil
 }
 
-func (s *KubeAPIServer) configureAuditPolicy(_ *config.Config) error {
+func (s *KubeAPIServer) configureAuditPolicy() error {
 	data := []byte(`
 apiVersion: audit.k8s.io/v1
 kind: Policy

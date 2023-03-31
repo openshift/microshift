@@ -42,8 +42,10 @@ func (c *Config) establishNodeName(dataDir string) (string, error) {
 	contents, err := os.ReadFile(filePath)
 	if os.IsNotExist(err) {
 		// ensure that dataDir exists
-		os.MkdirAll(dataDir, 0700)
-		if err := os.WriteFile(filePath, []byte(name), 0444); err != nil {
+		if err := os.MkdirAll(dataDir, 0700); err != nil {
+			return "", fmt.Errorf("failed to create data dir: %w", err)
+		}
+		if err := os.WriteFile(filePath, []byte(name), 0400); err != nil {
 			return "", fmt.Errorf("failed to write nodename file %q: %v", filePath, err)
 		}
 		return name, nil

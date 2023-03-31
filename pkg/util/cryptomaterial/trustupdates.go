@@ -20,10 +20,10 @@ func AppendCertsToFile(bundlePath string, certs ...[]byte) error {
 
 	for _, c := range certs {
 		if _, err = f.WriteString("\n"); err != nil {
-		    return err
+			return err
 		}
 		if _, err = f.Write(c); err != nil {
-		    return err
+			return err
 		}
 	}
 	return nil

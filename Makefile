@@ -116,7 +116,7 @@ etcd:
 		$(MAKE) -C etcd
 
 .PHONY: verify verify-images verify-assets licensecheck
-verify: verify-images verify-assets verify-sh verify-py verify-container licensecheck
+verify: verify-images verify-assets verify-sh verify-go verify-py verify-container licensecheck
 
 verify-images:
 	./hack/verify_images.sh
@@ -133,7 +133,7 @@ verify-golangci:
 
 verify-govulncheck:
 	@if ! command -v govulncheck &>/dev/null; then \
-		go install golang.org/x/vuln/cmd/govulncheck@latest ; \
+		go install -mod=mod golang.org/x/vuln/cmd/govulncheck@latest ; \
 	fi
 	govulncheck ./...
 

@@ -85,7 +85,7 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	go func() {
 		if err := c.startRouteInformer(c.stopCh); err != nil {
-			klog.Errorf("error running router: %w", err)
+			klog.Errorf("error running router: %v", err)
 		}
 	}()
 

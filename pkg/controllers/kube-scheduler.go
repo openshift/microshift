@@ -65,7 +65,9 @@ leaderElection:
   leaderElect: false`)
 
 	path := filepath.Join(config.DataDir, "resources", "kube-scheduler", "config", "config.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
+	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0700)); err != nil {
+		return fmt.Errorf("creating directory path %s: %w", path, err)
+	}
 	return os.WriteFile(path, data, 0400)
 }
 

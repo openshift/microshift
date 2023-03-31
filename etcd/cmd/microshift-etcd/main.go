@@ -16,13 +16,12 @@ func main() {
 	cmd := &cobra.Command{
 		Use: "microshift-etcd",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
+			_ = cmd.Help() // err is always nil
 			os.Exit(1)
 		},
 	}
 
 	cmd.AddCommand(NewRunEtcdCommand())
 	cmd.AddCommand(NewVersionCommand(genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}))
-
 	os.Exit(cli.Run(cmd))
 }
