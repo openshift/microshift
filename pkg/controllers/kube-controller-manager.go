@@ -50,10 +50,10 @@ type KubeControllerManager struct {
 	configureErr error
 }
 
-func NewKubeControllerManager(cfg *config.Config) *KubeControllerManager {
+func NewKubeControllerManager(ctx context.Context, cfg *config.Config) *KubeControllerManager {
 	s := &KubeControllerManager{}
 	// TODO: manage and invoke the configure bits independently outside of this.
-	s.args, s.applyFn, s.configureErr = configure(cfg)
+	s.args, s.applyFn, s.configureErr = configure(ctx, cfg)
 	return s
 }
 
@@ -75,7 +75,7 @@ func kcmServiceAccountPrivateKeyFile() string {
 	return filepath.Join(config.DataDir, "/resources/kube-apiserver/secrets/service-account-key/service-account.key")
 }
 
-func configure(cfg *config.Config) (args []string, applyFn func() error, err error) {
+func configure(ctx context.Context, cfg *config.Config) (args []string, applyFn func() error, err error) {
 	kubeConfig := cfg.KubeConfigPath(config.KubeControllerManager)
 	clusterSigningKey, clusterSigningCert := kcmClusterSigningCertKeyAndFile()
 
@@ -100,7 +100,7 @@ func configure(cfg *config.Config) (args []string, applyFn func() error, err err
 
 	args, err = mergeAndConvertToArgs(overrides)
 	applyFn = func() error {
-		return assets.ApplyNamespaces([]string{
+		return assets.ApplyNamespaces(ctx, []string{
 			"controllers/kube-controller-manager/namespace-openshift-kube-controller-manager.yaml",
 			"core/namespace-openshift-infra.yaml",
 		}, cfg.KubeConfigPath(config.KubeAdmin))

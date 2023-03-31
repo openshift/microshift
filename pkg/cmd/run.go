@@ -98,13 +98,16 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("failed to create the necessary kubeconfigs for internal components: %v", err)
 	}
 
+	// Establish the context we will use to control execution
+	runCtx, runCancel := context.WithCancel(context.Background())
+
 	m := servicemanager.NewServiceManager()
 	util.Must(m.AddService(node.NewNetworkConfiguration(cfg)))
 	util.Must(m.AddService(controllers.NewEtcd(cfg)))
 	util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
 	util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
 	util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
-	util.Must(m.AddService(controllers.NewKubeControllerManager(cfg)))
+	util.Must(m.AddService(controllers.NewKubeControllerManager(runCtx, cfg)))
 	util.Must(m.AddService(controllers.NewOpenShiftCRDManager(cfg)))
 	util.Must(m.AddService(controllers.NewRouteControllerManager(cfg)))
 	util.Must(m.AddService(controllers.NewClusterPolicyController(cfg)))
@@ -129,9 +132,6 @@ func RunMicroshift(cfg *config.Config) error {
 
 	// Establish a deadline for restarting to rotate the certificates.
 	certCtx, certCancel := context.WithDeadline(context.Background(), rotationDate)
-
-	// Establish the context we will use to control execution
-	runCtx, runCancel := context.WithCancel(context.Background())
 
 	// Watch for the certificate deadline context to be done, log a
 	// message, and cancel the run context to propagate the shutdown.

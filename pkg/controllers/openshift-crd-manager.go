@@ -39,14 +39,14 @@ func (s *OpenShiftCRDManager) Dependencies() []string { return []string{"kube-ap
 func (s *OpenShiftCRDManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
-	if err := assets.ApplyCRDs(s.cfg); err != nil { //nolint:contextcheck
+	if err := assets.ApplyCRDs(s.cfg, ctx); err != nil {
 		klog.Errorf("%s unable to apply default CRDs: %v", s.Name(), err)
 		return err
 	}
 	klog.Infof("%s applied default CRDs", s.Name())
 
 	klog.Infof("%s waiting for CRDs acceptance before proceeding", s.Name())
-	if err := assets.WaitForCrdsEstablished(s.cfg); err != nil { //nolint:contextcheck
+	if err := assets.WaitForCrdsEstablished(ctx, s.cfg); err != nil {
 		klog.Errorf("%s unable to confirm all CRDs are ready: %v", s.Name(), err)
 	}
 	klog.Infof("%s all CRDs are ready", s.Name())

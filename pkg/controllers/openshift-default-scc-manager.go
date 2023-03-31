@@ -43,7 +43,7 @@ func (s *OpenShiftDefaultSCCManager) Dependencies() []string {
 func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(ready)
 	// TO-DO add readiness check
-	if err := ApplyDefaultSCCs(s.cfg); err != nil {
+	if err := ApplyDefaultSCCs(ctx, s.cfg); err != nil {
 		klog.Errorf("%s unable to apply default SCCs: %v", s.Name(), err)
 		return err
 	}
@@ -51,7 +51,7 @@ func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struc
 	return ctx.Err()
 }
 
-func ApplyDefaultSCCs(cfg *config.Config) error {
+func ApplyDefaultSCCs(ctx context.Context, cfg *config.Config) error {
 	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
 	var (
 		clusterRole = []string{
@@ -82,15 +82,15 @@ func ApplyDefaultSCCs(cfg *config.Config) error {
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted.yaml",
 		}
 	)
-	if err := assets.ApplySCCs(sccs, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplySCCs(ctx, sccs, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("failed to apply sccs %v", err)
 		return err
 	}
-	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoles(ctx, clusterRole, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRole %v: %v", clusterRole, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoleBindings(ctx, clusterRoleBinding, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
 		return err
 	}

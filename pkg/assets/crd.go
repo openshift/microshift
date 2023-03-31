@@ -52,11 +52,11 @@ func init() {
 	}
 }
 
-func isEstablished(cs *apiextclientv1.ApiextensionsV1Client, obj apiruntime.Object) (bool, error) {
+func isEstablished(ctx context.Context, cs *apiextclientv1.ApiextensionsV1Client, obj apiruntime.Object) (bool, error) {
 	var err error
 	switch crd := obj.(type) {
 	case *apiextv1.CustomResourceDefinition:
-		if crd, err = cs.CustomResourceDefinitions().Get(context.TODO(), crd.Name, metav1.GetOptions{}); err == nil {
+		if crd, err = cs.CustomResourceDefinitions().Get(ctx, crd.Name, metav1.GetOptions{}); err == nil {
 			for _, condition := range crd.Status.Conditions {
 				if condition.Type == apiextv1.Established && condition.Status == apiextv1.ConditionTrue {
 					return true, nil
@@ -70,7 +70,7 @@ func isEstablished(cs *apiextclientv1.ApiextensionsV1Client, obj apiruntime.Obje
 	return false, err
 }
 
-func WaitForCrdsEstablished(cfg *config.Config) error {
+func WaitForCrdsEstablished(ctx context.Context, cfg *config.Config) error {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", cfg.KubeConfigPath(config.KubeAdmin))
 	if err != nil {
 		return err
@@ -87,7 +87,7 @@ func WaitForCrdsEstablished(cfg *config.Config) error {
 		obj := readCRDOrDie(crdBytes)
 
 		if err = wait.PollImmediate(customResourceReadyInterval, customResourceReadyTimeout, func() (done bool, err error) {
-			done, e := isEstablished(clientSet, obj)
+			done, e := isEstablished(ctx, clientSet, obj)
 			// Intermittent errors can occur when calling the apiserver.  To be on the safe side, log them, but poll until timeout
 			if e != nil {
 				klog.Errorf("polling for crd condition status \"established\"=\"true\": %v", e)
@@ -110,12 +110,12 @@ func readCRDOrDie(objBytes []byte) *apiextv1.CustomResourceDefinition {
 	return &crd
 }
 
-func applyCRD(client *apiextclientv1.ApiextensionsV1Client, crd *apiextv1.CustomResourceDefinition) error {
-	_, _, err := resourceapply.ApplyCustomResourceDefinitionV1(context.TODO(), client, assetsEventRecorder, crd)
+func applyCRD(client *apiextclientv1.ApiextensionsV1Client, crd *apiextv1.CustomResourceDefinition, ctx context.Context) error {
+	_, _, err := resourceapply.ApplyCustomResourceDefinitionV1(ctx, client, assetsEventRecorder, crd)
 	return err
 }
 
-func ApplyCRDs(cfg *config.Config) error {
+func ApplyCRDs(ctx context.Context, cfg *config.Config) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -143,7 +143,7 @@ func ApplyCRDs(cfg *config.Config) error {
 		if err != nil {
 			return err
 		}
-		_, _, err = resourceapply.ApplyAPIService(context.TODO(), apiRegistrationClient, assetsEventRecorder, &apiService)
+		_, _, err = resourceapply.ApplyAPIService(ctx, apiRegistrationClient, assetsEventRecorder, &apiService)
 		if err != nil {
 			return err
 		}
@@ -159,7 +159,7 @@ func ApplyCRDs(cfg *config.Config) error {
 		}
 		c := readCRDOrDie(crdBytes)
 		if err := wait.Poll(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
-			if err := applyCRD(client, c); err != nil {
+			if err := applyCRD(client, c, ctx); err != nil {
 				klog.Warningf("failed to apply openshift CRD %s: %v", crd, err)
 				return false, nil
 			}

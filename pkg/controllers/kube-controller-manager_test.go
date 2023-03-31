@@ -17,6 +17,7 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"testing"
@@ -38,7 +39,7 @@ func TestKCMDefaultConfigAsset(t *testing.T) {
 
 func TestConfigure(t *testing.T) {
 	cfg := config.NewDefault()
-	kcm := NewKubeControllerManager(cfg)
+	kcm := NewKubeControllerManager(context.TODO(), cfg)
 
 	clusterSigningKey, clusterSigningCert := kcmClusterSigningCertKeyAndFile()
 	argsWant := []string{

@@ -2,10 +2,9 @@ package certchains
 
 import (
 	"fmt"
-
-	"github.com/openshift/library-go/pkg/crypto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	"github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
@@ -43,6 +42,7 @@ type certificateSigner struct {
 }
 
 // NewCertificateSigner returns a builder object for a certificate chain for the given signer
+//
 //nolint:ireturn
 func NewCertificateSigner(signerName, signerDir string, validityDays int) CertificateSignerBuilder {
 	return &certificateSigner{
@@ -59,6 +59,7 @@ func (s *certificateSigner) ValidityDays() int { return s.signerValidityDays }
 // WithSignerConfig uses the provided configuration in `config` to sign its
 // direct certificates.
 // This is useful when creating intermediate signers.
+//
 //nolint:ireturn
 func (s *certificateSigner) WithSignerConfig(config *crypto.CA) CertificateSignerBuilder {
 	s.signerConfig = config
@@ -128,7 +129,7 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 		subCAs:             make(map[string]*CertificateSigner),
 		signedCertificates: make(map[string]*signedCertificateInfo),
 
-		caBundlePaths: sets.NewString(),
+		caBundlePaths: sets.New[string](),
 	}
 
 	for _, subCA := range s.subCAs {

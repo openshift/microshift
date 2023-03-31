@@ -58,11 +58,11 @@ func (s *sccApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	s.scc = obj.(*sccv1.SecurityContextConstraints)
 }
 
-func (s *sccApplier) Applier() error {
+func (s *sccApplier) Applier(ctx context.Context) error {
 	// adapted from cvo
-	existing, err := s.Client.SecurityContextConstraints().Get(context.TODO(), s.scc.Name, metav1.GetOptions{})
+	existing, err := s.Client.SecurityContextConstraints().Get(ctx, s.scc.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := s.Client.SecurityContextConstraints().Create(context.TODO(), s.scc, metav1.CreateOptions{})
+		_, err := s.Client.SecurityContextConstraints().Create(ctx, s.scc, metav1.CreateOptions{})
 		return err
 	}
 	if err != nil {
@@ -75,11 +75,11 @@ func (s *sccApplier) Applier() error {
 		return nil
 	}
 
-	_, err = s.Client.SecurityContextConstraints().Update(context.TODO(), existing, metav1.UpdateOptions{})
+	_, err = s.Client.SecurityContextConstraints().Update(ctx, existing, metav1.UpdateOptions{})
 	return err
 }
 
-func applySCCs(sccs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applySCCs(ctx context.Context, sccs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -90,7 +90,7 @@ func applySCCs(sccs []string, applier readerApplier, render RenderFunc, params R
 			return fmt.Errorf("error getting asset %s: %v", scc, err)
 		}
 		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(); err != nil {
+		if err := applier.Applier(ctx); err != nil {
 			klog.Warningf("Failed to apply scc api %s: %v", scc, err)
 			return err
 		}
@@ -98,8 +98,8 @@ func applySCCs(sccs []string, applier readerApplier, render RenderFunc, params R
 	return nil
 }
 
-func ApplySCCs(sccs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplySCCs(ctx context.Context, sccs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	scc := &sccApplier{}
 	scc.Client = sccClient(kubeconfigPath)
-	return applySCCs(sccs, scc, render, params)
+	return applySCCs(ctx, sccs, scc, render, params)
 }

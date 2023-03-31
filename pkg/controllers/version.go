@@ -53,7 +53,7 @@ func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	}
 
 	kubeConfigPath := s.cfg.KubeConfigPath(config.KubeAdmin)
-	if err := assets.ApplyConfigMapWithData(cm, data, kubeConfigPath); err != nil { //nolint:contextcheck
+	if err := assets.ApplyConfigMapWithData(ctx, cm, data, kubeConfigPath); err != nil { //nolint:contextcheck
 		klog.Warningf("Failed to apply configMap %v, %v", cm, err)
 		return err
 	}

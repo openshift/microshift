@@ -1,6 +1,7 @@
 package components
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -24,7 +25,7 @@ func getCSIPluginConfig() (*lvmd.Lvmd, error) {
 	return lvmd.DefaultLvmdConfig()
 }
 
-func startCSIPlugin(cfg *config.Config, kubeconfigPath string) error {
+func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"components/lvms/topolvm-openshift-storage_namespace.yaml",
@@ -91,51 +92,51 @@ func startCSIPlugin(cfg *config.Config, kubeconfigPath string) error {
 		return fmt.Errorf("rendering lvmd params: %v", err)
 	}
 
-	if err := assets.ApplyStorageClasses(sc, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyStorageClasses(ctx, sc, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
 		return err
 	}
-	if err := assets.ApplyCSIDrivers(cd, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyCSIDrivers(ctx, cd, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply csiDriver %v: %v", sc, err)
 		return err
 	}
-	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
+	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		return err
 	}
-	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
+	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply sa %v: %v", sa, err)
 		return err
 	}
-	if err := assets.ApplyRoles(role, kubeconfigPath); err != nil {
+	if err := assets.ApplyRoles(ctx, role, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply role %v: %v", cr, err)
 		return err
 	}
-	if err := assets.ApplyRoleBindings(rb, kubeconfigPath); err != nil {
+	if err := assets.ApplyRoleBindings(ctx, rb, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply rolebinding %v: %v", cr, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterrole %v: %v", cr, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoleBindings(ctx, crb, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyConfigMapWithData(cm, map[string]string{"lvmd.yaml": lvmdRenderParams["lvmd"].(string)}, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMapWithData(ctx, cm, map[string]string{"lvmd.yaml": lvmdRenderParams["lvmd"].(string)}, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyDeployments(deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+	if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ds, renderTemplate, renderParamsFromConfig(cfg, lvmdRenderParams), kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ctx, ds, renderTemplate, renderParamsFromConfig(cfg, lvmdRenderParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
 		return err
 	}
-	if err := assets.ApplySCCs(scc, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplySCCs(ctx, scc, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply sccs %v: %v", scc, err)
 		return err
 	}

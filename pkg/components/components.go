@@ -1,33 +1,34 @@
 package components
 
 import (
+	"context"
 	"github.com/openshift/microshift/pkg/config"
 	"k8s.io/klog/v2"
 )
 
-func StartComponents(cfg *config.Config) error {
+func StartComponents(cfg *config.Config, ctx context.Context) error {
 	kubeAdminConfig := cfg.KubeConfigPath(config.KubeAdmin)
 
-	if err := startServiceCAController(cfg, kubeAdminConfig); err != nil {
+	if err := startServiceCAController(ctx, cfg, kubeAdminConfig); err != nil {
 		klog.Warningf("Failed to start service-ca controller: %v", err)
 		return err
 	}
 
-	if err := startCSIPlugin(cfg, cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
+	if err := startCSIPlugin(ctx, cfg, cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
 		klog.Warningf("Failed to start csi plugin: %v", err)
 		return err
 	}
 
-	if err := startIngressController(cfg, kubeAdminConfig); err != nil {
+	if err := startIngressController(ctx, cfg, kubeAdminConfig); err != nil {
 		klog.Warningf("Failed to start ingress router controller: %v", err)
 		return err
 	}
-	if err := startDNSController(cfg, kubeAdminConfig); err != nil {
+	if err := startDNSController(ctx, cfg, kubeAdminConfig); err != nil {
 		klog.Warningf("Failed to start DNS controller: %v", err)
 		return err
 	}
 
-	if err := startCNIPlugin(cfg, kubeAdminConfig); err != nil {
+	if err := startCNIPlugin(ctx, cfg, kubeAdminConfig); err != nil {
 		klog.Warningf("Failed to start CNI plugin: %v", err)
 		return err
 	}

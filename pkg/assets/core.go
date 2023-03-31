@@ -57,8 +57,8 @@ func (ns *nsApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	ns.ns = obj.(*corev1.Namespace)
 }
 
-func (ns *nsApplier) Applier() error {
-	_, _, err := resourceapply.ApplyNamespace(context.TODO(), ns.Client, assetsEventRecorder, ns.ns)
+func (ns *nsApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyNamespace(ctx, ns.Client, assetsEventRecorder, ns.ns)
 	return err
 }
 
@@ -82,8 +82,8 @@ func (secret *secretApplier) Reader(objBytes []byte, render RenderFunc, params R
 	secret.secret = obj.(*corev1.Secret)
 }
 
-func (secret *secretApplier) Applier() error {
-	_, _, err := resourceapply.ApplySecret(context.TODO(), secret.Client, assetsEventRecorder, secret.secret)
+func (secret *secretApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplySecret(ctx, secret.Client, assetsEventRecorder, secret.secret)
 	return err
 }
 
@@ -107,8 +107,8 @@ func (svc *svcApplier) Reader(objBytes []byte, render RenderFunc, params RenderP
 	svc.svc = obj.(*corev1.Service)
 }
 
-func (svc *svcApplier) Applier() error {
-	_, _, err := resourceapply.ApplyService(context.TODO(), svc.Client, assetsEventRecorder, svc.svc)
+func (svc *svcApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyService(ctx, svc.Client, assetsEventRecorder, svc.svc)
 	return err
 }
 
@@ -132,8 +132,8 @@ func (sa *saApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	sa.sa = obj.(*corev1.ServiceAccount)
 }
 
-func (sa *saApplier) Applier() error {
-	_, _, err := resourceapply.ApplyServiceAccount(context.TODO(), sa.Client, assetsEventRecorder, sa.sa)
+func (sa *saApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyServiceAccount(ctx, sa.Client, assetsEventRecorder, sa.sa)
 	return err
 }
 
@@ -157,12 +157,12 @@ func (cm *cmApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	cm.cm = obj.(*corev1.ConfigMap)
 }
 
-func (cm *cmApplier) Applier() error {
-	_, _, err := resourceapply.ApplyConfigMap(context.TODO(), cm.Client, assetsEventRecorder, cm.cm)
+func (cm *cmApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyConfigMap(ctx, cm.Client, assetsEventRecorder, cm.cm)
 	return err
 }
 
-func applyCore(cores []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applyCore(ctx context.Context, cores []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -173,7 +173,7 @@ func applyCore(cores []string, applier readerApplier, render RenderFunc, params 
 			return fmt.Errorf("error getting asset %s: %v", core, err)
 		}
 		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(); err != nil {
+		if err := applier.Applier(ctx); err != nil {
 			klog.Warningf("Failed to apply corev1 api %s: %v", core, err)
 			return err
 		}
@@ -182,31 +182,31 @@ func applyCore(cores []string, applier readerApplier, render RenderFunc, params 
 	return nil
 }
 
-func ApplyNamespaces(cores []string, kubeconfigPath string) error {
+func ApplyNamespaces(ctx context.Context, cores []string, kubeconfigPath string) error {
 	ns := &nsApplier{}
 	ns.Client = coreClient(kubeconfigPath)
-	return applyCore(cores, ns, nil, nil)
+	return applyCore(ctx, cores, ns, nil, nil)
 }
 
-func ApplyServices(cores []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplyServices(ctx context.Context, cores []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	svc := &svcApplier{}
 	svc.Client = coreClient(kubeconfigPath)
-	return applyCore(cores, svc, render, params)
+	return applyCore(ctx, cores, svc, render, params)
 }
 
-func ApplyServiceAccounts(cores []string, kubeconfigPath string) error {
+func ApplyServiceAccounts(ctx context.Context, cores []string, kubeconfigPath string) error {
 	sa := &saApplier{}
 	sa.Client = coreClient(kubeconfigPath)
-	return applyCore(cores, sa, nil, nil)
+	return applyCore(ctx, cores, sa, nil, nil)
 }
 
-func ApplyConfigMaps(cores []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplyConfigMaps(ctx context.Context, cores []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	cm := &cmApplier{}
 	cm.Client = coreClient(kubeconfigPath)
-	return applyCore(cores, cm, render, params)
+	return applyCore(ctx, cores, cm, render, params)
 }
 
-func ApplyConfigMapWithData(cmPath string, data map[string]string, kubeconfigPath string) error {
+func ApplyConfigMapWithData(ctx context.Context, cmPath string, data map[string]string, kubeconfigPath string) error {
 	cm := &cmApplier{}
 	cm.Client = coreClient(kubeconfigPath)
 	cmBytes, err := embedded.Asset(cmPath)
@@ -215,11 +215,11 @@ func ApplyConfigMapWithData(cmPath string, data map[string]string, kubeconfigPat
 	}
 	cm.Reader(cmBytes, nil, nil)
 	cm.cm.Data = data
-	_, _, err = resourceapply.ApplyConfigMap(context.TODO(), cm.Client, assetsEventRecorder, cm.cm)
+	_, _, err = resourceapply.ApplyConfigMap(ctx, cm.Client, assetsEventRecorder, cm.cm)
 	return err
 }
 
-func ApplySecretWithData(secretPath string, data map[string][]byte, kubeconfigPath string) error {
+func ApplySecretWithData(ctx context.Context, secretPath string, data map[string][]byte, kubeconfigPath string) error {
 	secret := &secretApplier{}
 	secret.Client = coreClient(kubeconfigPath)
 	secretBytes, err := embedded.Asset(secretPath)
@@ -228,6 +228,6 @@ func ApplySecretWithData(secretPath string, data map[string][]byte, kubeconfigPa
 	}
 	secret.Reader(secretBytes, nil, nil)
 	secret.secret.Data = data
-	_, _, err = resourceapply.ApplySecret(context.TODO(), secret.Client, assetsEventRecorder, secret.secret)
+	_, _, err = resourceapply.ApplySecret(ctx, secret.Client, assetsEventRecorder, secret.secret)
 	return err
 }

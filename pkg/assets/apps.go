@@ -57,8 +57,8 @@ func (d *dpApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	d.dp = obj.(*appsv1.Deployment)
 }
 
-func (d *dpApplier) Applier() error {
-	_, _, err := resourceapply.ApplyDeployment(context.TODO(), d.Client, assetsEventRecorder, d.dp, 0)
+func (d *dpApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyDeployment(ctx, d.Client, assetsEventRecorder, d.dp, 0)
 	return err
 }
 
@@ -81,12 +81,12 @@ func (d *dsApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	}
 	d.ds = obj.(*appsv1.DaemonSet)
 }
-func (d *dsApplier) Applier() error {
-	_, _, err := resourceapply.ApplyDaemonSet(context.TODO(), d.Client, assetsEventRecorder, d.ds, 0)
+func (d *dsApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyDaemonSet(ctx, d.Client, assetsEventRecorder, d.ds, 0)
 	return err
 }
 
-func applyApps(apps []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applyApps(ctx context.Context, apps []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -97,7 +97,7 @@ func applyApps(apps []string, applier readerApplier, render RenderFunc, params R
 			return fmt.Errorf("error getting asset %s: %v", app, err)
 		}
 		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(); err != nil {
+		if err := applier.Applier(ctx); err != nil {
 			klog.Warningf("Failed to apply apps api %s: %v", app, err)
 			return err
 		}
@@ -106,14 +106,14 @@ func applyApps(apps []string, applier readerApplier, render RenderFunc, params R
 	return nil
 }
 
-func ApplyDeployments(dps []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplyDeployments(ctx context.Context, dps []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	dp := &dpApplier{}
 	dp.Client = appsClient(kubeconfigPath)
-	return applyApps(dps, dp, render, params)
+	return applyApps(ctx, dps, dp, render, params)
 }
 
-func ApplyDaemonSets(apps []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplyDaemonSets(ctx context.Context, apps []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	ds := &dsApplier{}
 	ds.Client = appsClient(kubeconfigPath)
-	return applyApps(apps, ds, render, params)
+	return applyApps(ctx, apps, ds, render, params)
 }

@@ -43,26 +43,26 @@ func (s *InfrastructureServicesManager) Dependencies() []string {
 func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(ready)
 
-	if err := applyDefaultRBACs(s.cfg); err != nil {
+	if err := applyDefaultRBACs(ctx, s.cfg); err != nil {
 		klog.Errorf("%s unable to apply default RBACs: %v", s.Name(), err)
 		return err
 	}
 
 	priorityClasses := []string{"core/priority-class-openshift-user-critical.yaml"}
-	if err := assets.ApplyPriorityClasses(priorityClasses, s.cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
+	if err := assets.ApplyPriorityClasses(ctx, priorityClasses, s.cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
 		klog.Errorf("%s unable to apply PriorityClasses: %v", s.Name(), err)
 		return err
 	}
 
 	// TO-DO add readiness check
-	if err := components.StartComponents(s.cfg); err != nil { //nolint:contextcheck
+	if err := components.StartComponents(s.cfg, ctx); err != nil {
 		return err
 	}
 	klog.Infof("%s launched ocp componets", s.Name())
 	return ctx.Err()
 }
 
-func applyDefaultRBACs(cfg *config.Config) error {
+func applyDefaultRBACs(ctx context.Context, cfg *config.Config) error {
 	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
 	var (
 		cr = []string{
@@ -76,11 +76,11 @@ func applyDefaultRBACs(cfg *config.Config) error {
 			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml",
 		}
 	)
-	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
 		klog.Warningf("failed to apply cluster roles %v", err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoleBindings(ctx, crb, kubeconfigPath); err != nil {
 		klog.Warningf("failed to apply cluster roles %v", err)
 		return err
 	}
