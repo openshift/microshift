@@ -1,4 +1,23 @@
-# ovn-kubernetes image-arm64 ebb5dcaf65a49156b7ea220176fa5dd6f3e3f716 to cb89e52240fe7346409589a9acae9c0106d24b03
+# cluster-kube-apiserver-operator embedded-component 3e62b53e39db960ccc16d717d1a25d751d4e9c49 to f2d9ccd2f585c57409257fae99da7f52ed6042cf
+8110dfa09769bf3bf7877147512146296de1483c 2023-03-24T17:54:23+01:00 bump(api)
+# cluster-kube-controller-manager-operator embedded-component 2a3e578c1007d7534eadffcca2adc979cb712995 to 280c115d63367f4ede8a4e893549cdc5919e8920
+487b8546158cf243b30c1ed8bb5daeb2cf301087 2023-03-22T14:14:21+01:00 fix render test
+7dd94053e9f79d445923c679af2c3dfb603e226b 2023-03-22T14:14:19+01:00 bump o/api for the updated featureflags
+# cluster-kube-scheduler-operator embedded-component d3978864fb58063235be176c18fe50457b5223f3 to fbc6ef4df8b0d9ea97acf9b0330d44a3a171b4fd
+20c9a9af04d84b932b9cecb25a2263960cf72893 2023-03-20T10:11:15-04:00 update vendor folder
+4924d0c1a19c3300ce0ed2d06a0c49c6542d757c 2023-03-20T10:11:03-04:00 bump(library-go)
+# cluster-network-operator embedded-component 040d5efed272789341b16858f63c2d0bcdb71b50 to ae70394d0198a1d5a310410ba3468f38ce0522c2
+f9c32cf30aa63582adba034c90bf62a4ca0b6176 2023-03-22T13:55:35+00:00 operConfig reconcile can return nil error on failure
+# cluster-policy-controller embedded-component ac01e3463245f2dd9312145368d7f4099a8a0bb9 to d02c85ab3203fe22eddcc4694e17504ef34935de
+11d8891790e3c92405a3fb7c35b021d15b571053 2023-03-20T14:26:27+01:00 psalabelsyncer: invert the enforce/log logic to default to logging
+# machine-config-operator embedded-component 40575b862f7bd42a2c40c8e6b7203cd4c29b0021 to a4e68fb1d5eed30d4c1b6f60e9385baf41a30bb3
+09c94a511e2a6190ad2a64d43ec8f7ff11569be7 2023-03-15T19:57:23+00:00 e2e: add testing for cert rotation
+6fcc0ed596861cc38fe36b843993c16efd4961af 2023-03-15T19:57:23+00:00 Remove paused pool kubelet ca alert metrics
+70131ba52f71de6ac9634f10cec58c580a440cc4 2023-03-15T19:57:23+00:00 server: add path to also serve the latest kubelet ca
+77fd8d39c0e49d05dbf68de9380b668531920940 2023-03-15T19:57:23+00:00 daemon: have a special path to sync in certs
+# oc image-amd64 eed143055ede731029931ad204b19cd2f565ef1a to 92b1a3d0e5d092430b523f6541aa0c504b2222b3
+32496b16599a0ee1d834a9d6685aca398d49c79d 2023-03-23T10:44:51+00:00 OCPBUGS-10622: bump repo sclorg/s2i-ruby-container location for newapp
+# ovn-kubernetes image-amd64 dd45efd39e5db428d4578ed6787e6c08b79e2df5 to cb89e52240fe7346409589a9acae9c0106d24b03
 8513b38e5a74c0c5f303dca30a27e6cc24bdf89c 2023-03-24T16:52:21+01:00 update to before-kube-1.26 bump
 46d2b9e1a902cfde6ed0a85251b336f60b0876b6 2023-03-23T17:26:47+01:00 don't create acl if no namespace address sets are selected. Previously "ip4.dst == {}" match was created, and ovn-controller throws an error on such acl
 7ab410d18906602b127ae54fc49fb9e70d80ba03 2023-03-23T17:26:40+01:00 Add PodSelectorAddressSet tests.
@@ -7,3 +26,11 @@ e0c35b2619f4084a0babea4aa554f5018e52ef5a 2023-03-23T17:26:26+01:00 Add PodSelect
 4a03b84b53431d8147818f311bba63ea78d2a6dc 2023-03-23T17:26:19+01:00 Unlock shared default deny port group early, when no db changes required, to unlock other handlers from the same namespace.
 06c9270dc3c69e8128d57a42b8def7b51ab1bbf8 2023-03-23T17:25:41+01:00 Add an option to enable scale metrics in kind
 6d96be9e761aa544c3500c54508a61c102dbdd77 2023-03-23T17:25:30+01:00 Add MetricMasterSyncDuration metric to track how much it takes for ovn-k master to start watching every resource. Add scale metrics for network policies, rename existing enable-eip-scale-metrics flag to more general enable-scale-metrics, and use it for network policy metric too.
+f9632bfa3ca30fd6173f59cb7657bf910dd7719d 2023-03-23T09:40:51+08:00 Fix duplicated metric registration
+eb64a87cca1ad699edfb9cda876602ebdeb69d8a 2023-03-22T17:30:51-04:00 Fix egress firewall CRD
+dec0b99f54538591d1f8b6461940b609a29dc9d9 2023-03-17T10:53:58+00:00 Updating ovn-kubernetes-base images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/3ea7e6d582117c0c2b118319e4f4a4bd35edce51/images/ovn-kubernetes-base.yml
+3baa3d367651fc620dbfa50c82c14c20f988db04 2023-03-08T02:28:51+00:00 Updating ovn-kubernetes-microshift images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/724eedd015d4972b55704e41a4117c533e240935/images/ovn-kubernetes-microshift.yml
+# ovn-kubernetes image-arm64 cb89e52240fe7346409589a9acae9c0106d24b03 to 9799fbc9bef06304e8195fbc4b37b2e095ec9325
+74f95e997d116f572b64c7cf7775d483aeed86d1 2023-03-23T17:14:38+01:00 fix multiple error aggregation: `errors.Wrapf` always returns nil if the first argument is nil.
+362fa553d572b418f5b305b9c8fb68eb1a4e13cc 2023-03-23T17:14:26+01:00 Fix egress firewall unit tests gatewayMode setup update "egress firewall with node selector updates during node update" to work for both gateway modes.
+2e3d170c179fc806bfebbdaf1bab3f606a562ecf 2023-03-23T17:14:18+01:00 Egress firewall creation error was overridden by the status update error and never returned. That would prevent retry on failure.
