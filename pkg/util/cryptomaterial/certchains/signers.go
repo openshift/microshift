@@ -58,7 +58,7 @@ type CertificateSigner struct {
 	subCAs             map[string]*CertificateSigner
 	signedCertificates map[string]*signedCertificateInfo
 
-	caBundlePaths sets.Set[string] //nolint:staticcheck
+	caBundlePaths sets.Set[string]
 }
 
 type signedCertificateInfo struct {

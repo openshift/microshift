@@ -129,8 +129,7 @@ func TestCertificateSigner_Regenerate(t *testing.T) {
 				),
 		),
 	)
-	//nolint:errcheck
-	filepath.Walk(tmpDir, func(name string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(tmpDir, func(name string, info os.FileInfo, err error) error {
 		fmt.Println(name)
 		return nil
 	})

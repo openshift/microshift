@@ -118,7 +118,7 @@ func TestRunCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	go func() {
-		assert.NoError(t, m.Run(ctx, ready, stopped))
+		assert.Error(t, m.Run(ctx, ready, stopped))
 	}()
 
 	select {

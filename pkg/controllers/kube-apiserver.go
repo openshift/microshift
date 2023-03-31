@@ -283,7 +283,9 @@ rules:
   - "RequestReceived"`)
 
 	path := filepath.Join(config.DataDir, "resources", "kube-apiserver-audit-policies", "default.yaml")
-	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
+	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0700)); err != nil {
+		return err
+	}
 	return os.WriteFile(path, data, 0400)
 }
 
@@ -356,7 +358,9 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	}
 
 	// audit logs go here
-	os.MkdirAll("/var/log/kube-apiserver", 0700)
+	if err := os.MkdirAll("/var/log/kube-apiserver", 0700); err != nil {
+		return err
+	}
 
 	// Carrying a patch for NewAPIServerCommand to use cmd.Context().Done() as the stop channel
 	// instead of the channel returned by SetupSignalHandler, which expects to be called at most
