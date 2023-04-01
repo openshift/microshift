@@ -10,8 +10,6 @@ import subprocess
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-testsuite = ET.Element("testsuite")
-
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s   %(levelname)s   %(message)s')
 
 _SCRIPT_DIR = os.path.realpath(os.path.dirname(__file__))
@@ -113,7 +111,7 @@ def run_test(test, host, user):
         testcase.set("time", f"{elapsed:.2f}")
         if not success:
             ET.SubElement(testcase, "failure", attrib={"msg": ""})
-        logging.info(f"Test case {test.name} - {success=} {elapsed=:.2f}s")
+        logging.info(f"Test case {test.name} - success={success} elapsed={elapsed:.2f}s")
 
     except Exception as e:
         logging.error(f"Exception happened: '{e}'")
@@ -127,7 +125,7 @@ def run_test(test, host, user):
 
 def run_tests(tests, host, user):
     testsuite = ET.Element("testsuite", attrib={"tests": f"{len(tests)}"})
-    logging.info(f"Running test suite")
+    logging.info("Running test suite")
     testsuite_start = time.time()
     failures = 0
     for t in tests:
@@ -137,7 +135,7 @@ def run_tests(tests, host, user):
         test_elapsed = time.time() - test_start
         if not success:
             failures = failures + 1
-        logging.info(f"Test case and other activities took {test_elapsed=:.2f}s")
+        logging.info(f"Test case and other activities took {test_elapsed:.2f}s")
 
     testsuite_elapsed = time.time() - testsuite_start
     testsuite.set("time", f"{testsuite_elapsed:.2f}")
