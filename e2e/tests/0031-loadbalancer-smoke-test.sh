@@ -2,6 +2,7 @@
 
 set -euo pipefail
 IFS=$'\n\t'
+PS4='+ $(date "+%T.%N")\011 '
 set -x
 
 SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
@@ -10,11 +11,13 @@ SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 cleanup() {
     oc delete service hello-microshift || true
     oc delete -f "${SCRIPT_PATH}/assets/hello-microshift.yaml" || true
-    firewall::close_port 5678 tcp || true
+    if declare -F firewall::close_port; then firewall::close_port 5678 tcp || true; fi
 }
-trap cleanup EXIT
+RESULT=1
+# explicit exit after cleanup, to not have cleanup override RESULT
+trap 'cleanup; exit $RESULT' EXIT
 
-firewall::open_port 5678 tcp
+declare -F firewall::open_port && firewall::open_port 80 tcp
 oc create -f "${SCRIPT_PATH}/assets/hello-microshift.yaml"
 oc create service loadbalancer hello-microshift --tcp=5678:8080
 oc wait pods -l app=hello-microshift --for condition=Ready --timeout=60s
@@ -24,12 +27,11 @@ backoff=3s
 for _ in $(seq 1 "${retries}"); do
     RESPONSE=$(curl -i "${USHIFT_IP}":5678 2>&1)
     RESULT=$?
-    [ $RESULT -eq 0 ] &&
+    if [ $RESULT -eq 0 ] &&
         echo "${RESPONSE}" | grep -q -E "HTTP.*200" &&
-        echo "${RESPONSE}" | grep -q "Hello MicroShift" &&
-        exit 0
-
+        echo "${RESPONSE}" | grep -q "Hello MicroShift"; then
+        RESULT=0
+        break
+    fi
     sleep "${backoff}"
 done
-
-exit 1
