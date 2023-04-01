@@ -110,7 +110,7 @@ def run_test(test, host, user):
         elapsed = time.time() - start
         testcase.set("time", f"{elapsed:.2f}")
         if not success:
-            ET.SubElement(testcase, "failure", attrib={"msg": ""})
+            ET.SubElement(testcase, "failure", attrib={"msg": xml_out.text})
         logging.info(f"Test case {test.name} - success={success} elapsed={elapsed:.2f}s")
 
     except Exception as e:
