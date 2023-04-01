@@ -36,6 +36,8 @@ while read source_file image; do
             debug "$image OK";;
         registry.redhat.io/odf4/*)
             debug "$image OK";;
+        registry.redhat.io/lvms4/*)
+            debug "$image OK";;
         *)
             echo "$image used in $source_file is not from an approved location" 1>&2
             approved=false;;
