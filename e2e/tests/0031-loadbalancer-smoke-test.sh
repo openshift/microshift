@@ -17,7 +17,7 @@ RESULT=1
 # explicit exit after cleanup, to not have cleanup override RESULT
 trap 'cleanup; exit $RESULT' EXIT
 
-declare -F firewall::open_port && firewall::open_port 80 tcp
+declare -F firewall::open_port && firewall::open_port 5678 tcp
 oc create -f "${SCRIPT_PATH}/assets/hello-microshift.yaml"
 oc create service loadbalancer hello-microshift --tcp=5678:8080
 oc wait pods -l app=hello-microshift --for condition=Ready --timeout=60s
