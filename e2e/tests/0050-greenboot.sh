@@ -2,16 +2,18 @@
 
 set -euo pipefail
 IFS=$'\n\t'
+PS4='+ $(date "+%T.%N")\011 '
 set -x
 
 SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
-scp "$SCRIPT_PATH/assets/busybox_running_check.sh" "$USHIFT_USER@$USHIFT_IP":~/busybox_running_check.sh
+scp "$SCRIPT_PATH/assets/busybox_running_check.sh" "$USHIFT_USER@$USHIFT_IP":/tmp/busybox_running_check.sh
 
 ssh -q "$USHIFT_USER@$USHIFT_IP" <<'ENDSSH'
 cat << 'ENDCAT' > ~/greenboot-test.sh
 set -euo pipefail
 IFS=$'\n\t'
+PS4='+ $(date "+%T.%N")\011 '
 set -x
 
 function check_greenboot_exit_status() {
@@ -92,7 +94,7 @@ EOF
 
 SCRIPT_FILE=/etc/greenboot/check/required.d/50_busybox_running_check.sh
 # The file comes from payload.tar
-ln -s ~/busybox_running_check.sh ${SCRIPT_FILE}
+ln -s /tmp/busybox_running_check.sh ${SCRIPT_FILE}
 
 check_greenboot_exit_status 0 1
 rm -f ${SCRIPT_FILE}
@@ -126,7 +128,7 @@ rm -f ${YAML_FILE}
 check_greenboot_exit_status 0 1
 ENDCAT
 
-chmod +x ~/greenboot-test.sh ~/busybox_running_check.sh
+chmod +x ~/greenboot-test.sh /tmp/busybox_running_check.sh
 ENDSSH
 
 ssh -q "$USHIFT_USER@$USHIFT_IP" "sudo ~/greenboot-test.sh"
