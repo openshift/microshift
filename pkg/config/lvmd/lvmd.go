@@ -108,6 +108,7 @@ func DefaultLvmdConfig() (*Lvmd, error) {
 
 // getVolumeGroups returns a slice of volume group names.
 func getVolumeGroups() ([]string, error) {
+
 	cmd := exec.Command("vgs", "--readonly", "--options=name", "--noheadings")
 	output, err := cmd.Output()
 	if err != nil {
@@ -139,4 +140,11 @@ func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
 	}
 	l.Message = fmt.Sprintf("Read from %s", p)
 	return l, nil
+}
+
+func LvmSupported() error {
+	if _, err := exec.LookPath("vgs"); err != nil {
+		return fmt.Errorf("failed to find 'vgs' command line tool: %v", err)
+	}
+	return nil
 }
