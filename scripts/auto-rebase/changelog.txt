@@ -1,18 +1,3 @@
-- cluster-kube-controller-manager-operator embedded-component 014c24e248ed2a5381503ac09f08f428bc38ae3a to 2b6494a23a0882c1c1fb870474d60358e7f5bff8
-  - 475195f 2023-03-27T20:24:45+02:00 OCPBUGS-10568: migrate to using lease objects for leader election
-  - 58a40f1 2023-03-22T15:41:29+01:00 OWNERS: remove ravi from the owners
-  - 5cb3cb3 2023-03-10T07:56:37+00:00 Updating ose-cluster-kube-controller-manager-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/ose-cluster-kube-controller-manager-operator.yml
-
-- cluster-openshift-controller-manager-operator embedded-component 7867c26e6c91e2cc279317dfc080befe63a60749 to 22f249180f9f1f8e806f6353b26edd196ad1fc4a
-  - 04e8eee 2023-03-26T12:05:53-04:00 Add Divyanshu Agrawal as a reviewer
-
-- openshift-controller-manager embedded-component 87de83867ac51730f506138ee790a56ca21d9fc9 to b288916c2beb117fd8f3cb6aadb150184747a707
-  - 6ce319f 2023-03-26T14:28:27-04:00 Add Divyanshu Agrawal as a reviewer
-
-- oc image-arm64 82fec8035662441b95478d9b97861acf9253932b to ea20e4c4de773326cc8efe642c311afbc6ca9f45
-  - 3e3d592 2023-03-22T18:33:28+00:00 Allow submodule using file transport with newer git
-  - f2409ee 2023-03-16T17:05:57-04:00 exclude irrelevant adm commands from MicroShift documentation
-  - 62948a0 2023-03-16T16:46:29-04:00 Exclude autoscale from MicroShift documentation
-  - b5d3633 2023-03-13T15:02:08+00:00 Updating openshift-enterprise-deployer images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7ce51feaf65258715109cad8d18b1bd0db0fbb2e/images/openshift-enterprise-deployer.yml
-  - 091bc4c 2023-03-08T21:06:27+00:00 Updating openshift-enterprise-cli images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/openshift-enterprise-cli.yml
+- oc image-arm64 ea20e4c4de773326cc8efe642c311afbc6ca9f45 to bb3e40f7518e6955e9f7e77d86990bdbe6b117cb
+  - 10764dd 2023-03-29T10:03:16+03:00 Fix deprecated oc command suggestion
 
