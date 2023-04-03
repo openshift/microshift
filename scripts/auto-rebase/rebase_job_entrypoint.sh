@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=all
 set -o nounset
 set -o errexit
 set -o pipefail

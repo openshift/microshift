@@ -116,10 +116,10 @@ etcd:
 		$(MAKE) -C etcd
 
 .PHONY: verify verify-images verify-assets
-verify: verify-images verify-assets
+verify: verify-images verify-assets verify-sh
 
 verify-images:
-	./scripts/verify_images.sh
+	./hack/verify_images.sh
 
 verify-assets:
 	./scripts/auto-rebase/presubmit.py
@@ -137,10 +137,13 @@ verify-govulncheck:
 	fi
 	govulncheck ./...
 
+# We use the IGNORE var instead of `shellcheck disable=all` for files that are taken from
+# upstream and we wish to keep them with out added shellcheck declaratives.
 .PHONY: verify-sh
 verify-sh:
+	IGNORE="configure-ovs*.sh" ; \
 	./scripts/fetch_tools.sh shellcheck && \
-	./_output/bin/shellcheck $$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.sh' -print)
+	./_output/bin/shellcheck -x $$(find . \( -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor -o -path ./hack -o -path ./docs \) -o -name "$$IGNORE" \) -prune -o -name '*.sh' -print)
 
 .PHONY: verify-py
 verify-py:

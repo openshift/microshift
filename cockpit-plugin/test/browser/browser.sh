@@ -1,16 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 set -eux
 
-TESTS="$(realpath $(dirname "$0"))"
+TESTS="$(realpath "$(dirname "$0")")"
 if [ -d source ]; then
     # path for standard-test-source
     SOURCE="$(pwd)/source"
 else
-    SOURCE="$(realpath $TESTS/../..)"
+    SOURCE="$(realpath "${TESTS}/../..")"
 fi
 LOGS="$(pwd)/logs"
-mkdir -p "$LOGS"
-chmod a+w "$LOGS"
+mkdir -p "${LOGS}"
+chmod a+w "${LOGS}"
 
 # HACK: https://bugzilla.redhat.com/show_bug.cgi?id=2033020
 dnf update -y pam || true
@@ -44,7 +44,7 @@ if ! id runtest 2>/dev/null; then
     curl https://raw.githubusercontent.com/cockpit-project/bots/main/machine/identity.pub  >> /root/.ssh/authorized_keys
     chmod 600 /root/.ssh/authorized_keys
 fi
-chown -R runtest "$SOURCE"
+chown -R runtest "${SOURCE}"
 
 # disable core dumps, we rather investigate them upstream where test VMs are accessible
 echo core > /proc/sys/kernel/core_pattern
@@ -52,7 +52,7 @@ echo core > /proc/sys/kernel/core_pattern
 systemctl enable --now cockpit.socket
 
 # Run tests as unprivileged user
-su - -c "env TEST_BROWSER=firefox SOURCE=$SOURCE LOGS=$LOGS $TESTS/run-test.sh" runtest
+su - -c "env TEST_BROWSER=firefox SOURCE=${SOURCE} LOGS=${LOGS} ${TESTS}/run-test.sh" runtest
 
-RC=$(cat $LOGS/exitcode)
-exit ${RC:-1}
+RC="$(cat "${LOGS}/exitcode")"
+exit "${RC:-1}"
