@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 
+"""
+This script verifies all the assets for auto-rebase.
+It checks that all files in the assets directory are listed in the assets.yaml file, and vice versa.
+
+File: presubmit.py
+"""
+
+from functools import reduce
+import glob
 import os
 import sys
-import glob
 import yaml
-from functools import reduce
 
+# pylint: disable=R0801
 try:
     from yaml import CLoader as Loader
 except ImportError:
@@ -16,29 +24,33 @@ STAGING_DIR = "_output/staging/"
 RECIPE_FILEPATH = "./scripts/auto-rebase/assets.yaml"
 
 
-def build_assets_filelist_from_asset_dir(dir, prefix=""):
-    dir_path = os.path.join(prefix, dir['dir'])
-    return ([os.path.join(dir_path, f['file']) for f in dir.get('files', [])] +
+def build_assets_filelist_from_asset_dir(asset_dir, prefix=""):
+    """Recursively builds a list of assests filepaths from an asset directory."""
+    dir_path = os.path.join(prefix, asset_dir['dir'])
+    return ([os.path.join(dir_path, f['file']) for f in asset_dir.get('files', [])] +
             reduce(lambda x, y: x+y,
-                   [build_assets_filelist_from_asset_dir(subdir, dir_path) for subdir in dir.get('dirs', [])],
+                   [build_assets_filelist_from_asset_dir(subdir, dir_path) for subdir in asset_dir.get('dirs', [])],
                    []))
 
 
 def build_assets_filelist_from_recipe(recipe):
-    return reduce(lambda x, y: x+[y] if type(y) == str else x+y,
+    """Builds a list of assests filepaths from a recipe file."""
+    return reduce(lambda x, y: x+[y] if isinstance(y, str) else x+y,
                   [build_assets_filelist_from_asset_dir(asset) if 'dir' in asset else asset['file'] for asset in recipe['assets']],
                   [])
 
 
 def main():
+    """Main function for checking assets against an asset recipe."""
     if not os.path.isdir(ASSETS_DIR):
         print(f"ERROR: Expected to run in root directory of microshift repository but was in {os.getcwd()}")
         sys.exit(1)
 
-    recipe = yaml.load(open(RECIPE_FILEPATH).read(), Loader=Loader)
+    with open(RECIPE_FILEPATH, encoding='utf-8') as recipe_file:
+        recipe = yaml.load(recipe_file.read(), Loader=Loader)
 
     assets_filelist = set(build_assets_filelist_from_recipe(recipe))
-    realfiles = set([f.replace('assets/', '') for f in glob.glob('assets/**/*.*', recursive=True)])
+    realfiles = {f.replace('assets/', '') for f in glob.glob('assets/**/*.*', recursive=True)}
 
     missing_in_recipe = realfiles - assets_filelist
     superfluous_in_recipe = assets_filelist - realfiles
