@@ -67,7 +67,7 @@ EOF'
 
 microshift_debug_info() {
     log "Gathering debug info"
-    scp "$SCRIPT_DIR/cluster-debug-info.sh" "$USHIFT_USER@$USHIFT_IP:/tmp/cluster-debug-info.sh"
+    scp "$SCRIPT_DIR/../validate-microshift/cluster-debug-info.sh" "$USHIFT_USER@$USHIFT_IP:/tmp/cluster-debug-info.sh"
     ssh "$USHIFT_USER@$USHIFT_IP" "sudo KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig /tmp/cluster-debug-info.sh"
 }
 
