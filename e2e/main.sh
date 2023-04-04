@@ -5,6 +5,8 @@ set -o nounset
 set -o pipefail
 
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
+OUTPUT_DIR="${ARTIFACT_DIR:-_output}/microshift-e2e-$(date +'%Y%m%d-%H%M%S')/"
+[ ! -d "${OUTPUT_DIR}" ] && mkdir -p "${OUTPUT_DIR}"
 
 log() {
     echo -e "$(date +'%H:%M:%S.%N')    $*"
@@ -48,32 +50,44 @@ microshift_get_konfig() {
 }
 
 microshift_check_readiness() {
+    local test_output="${1}"
     log "Waiting for MicroShift to become ready"
     ssh "$USHIFT_USER@$USHIFT_IP" \
         "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh | \
-        while IFS= read -r line; do printf '%s %s\\n' \"\$(date +'%H:%M:%S.%N')\" \"\$line\"; done"
+        while IFS= read -r line; do printf '%s %s\\n' \"\$(date +'%H:%M:%S.%N')\" \"\$line\"; done" &>"${test_output}/0002-readiness-check.log"
 }
 
 microshift_setup() {
+    local test_output="${1}"
     log "Setting up and starting MicroShift"
     ssh "$USHIFT_USER@$USHIFT_IP" 'cat << EOF | sudo tee /etc/microshift/config.yaml
 ---
 apiServer:
   subjectAltNames:
   - '"$USHIFT_IP"'
-EOF'
-    ssh "$USHIFT_USER@$USHIFT_IP" "sudo systemctl enable --now microshift"
+EOF' &>"${test_output}/0001-setup.log"
+    ssh "$USHIFT_USER@$USHIFT_IP" "sudo systemctl enable --now microshift" &>>"${test_output}/0001-setup.log"
 }
 
 microshift_debug_info() {
-    log "Gathering debug info"
+    local test_output="${1}"
+    log "Gathering debug info to ${test_output}/0020-cluster-debug-info.log"
     scp "$SCRIPT_DIR/../validate-microshift/cluster-debug-info.sh" "$USHIFT_USER@$USHIFT_IP:/tmp/cluster-debug-info.sh"
-    ssh "$USHIFT_USER@$USHIFT_IP" "sudo /tmp/cluster-debug-info.sh"
+    ssh "$USHIFT_USER@$USHIFT_IP" "sudo /tmp/cluster-debug-info.sh" &>"${test_output}/0020-cluster-debug-info.log"
 }
 
 microshift_cleanup() {
+    local test_output="${1}"
     log "Cleaning MicroShift"
-    ssh "$USHIFT_USER@$USHIFT_IP" "echo 1 | sudo microshift-cleanup-data --all"
+    ssh "$USHIFT_USER@$USHIFT_IP" "echo 1 | sudo microshift-cleanup-data --all" &>"${test_output}/0000-cleanup.log"
+}
+
+microshift_health_summary() {
+    local konfig=${1}
+    log "Summary of MicroShift health"
+    oc --kubeconfig "${konfig}" get pods -A
+    oc --kubeconfig "${konfig}" get nodes -o wide
+    oc --kubeconfig "${konfig}" get events -A --sort-by=.metadata.creationTimestamp | head -n 20
 }
 
 run_test() {
@@ -81,20 +95,22 @@ run_test() {
     echo -e "\n\n=================================================="
     log "${test} - RUNNING"
 
-    microshift_cleanup
-    microshift_setup
-    microshift_check_readiness
+    local test_output="${OUTPUT_DIR}/${test}/"
+    mkdir -p "${test_output}"
+
+    microshift_cleanup "${test_output}"
+    microshift_setup "${test_output}"
+    microshift_check_readiness "${test_output}"
     konfig=$(microshift_get_konfig)
     trap 'rm -f "${konfig}"' RETURN
 
     start=$(date +%s)
     set +e
-    KUBECONFIG="$konfig" "${SCRIPT_DIR}/tests/${test}"
+    KUBECONFIG="$konfig" "${SCRIPT_DIR}/tests/${test}" &>"${test_output}/0010-test.log"
     res=$?
     set -e
 
-    end="$(date +%s)"
-    duration_total_seconds=$((end - start))
+    duration_total_seconds=$(($(date +%s) - start))
     log "${test} - took ${duration_total_seconds}s"
     if [ $res -eq 0 ]; then
         log "${test} - SUCCESS"
@@ -102,7 +118,8 @@ run_test() {
     fi
 
     log "${test} - FAILURE"
-    microshift_debug_info || true # TODO: > artifacts/file
+    microshift_health_summary "${konfig}"
+    microshift_debug_info "${test_output}" || true
     return 1
 }
 
