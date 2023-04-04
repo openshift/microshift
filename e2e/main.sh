@@ -85,13 +85,13 @@ run_test() {
     microshift_setup
     microshift_check_readiness
     konfig=$(microshift_get_konfig)
+    trap 'rm -f "${konfig}"' RETURN
 
     start=$(date +%s)
     set +e
     KUBECONFIG="$konfig" "${SCRIPT_DIR}/tests/${test}"
     res=$?
     set -e
-    rm -f "${konfig}"
 
     end="$(date +%s)"
     duration_total_seconds=$((end - start))
