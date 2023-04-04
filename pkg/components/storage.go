@@ -76,7 +76,7 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 	)
 
 	if err := lvmd.LvmSupported(); err != nil {
-		klog.Warning("skipping CSI deployment: %v", err)
+		klog.Warningf("skipping CSI deployment: %w", err)
 		return nil
 	}
 
