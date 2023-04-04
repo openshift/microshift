@@ -26,7 +26,7 @@ STAGING_DIR = "_output/staging/"
 
 
 def merge_paths(pathl, pathr):
-    """Merge two paths into one"""
+    """Merge two paths into one by removing any '/' prefix from pathr and then appending it to pathl"""
     if pathr.startswith("/"):
         return pathr[1:]
     return os.path.join(pathl, pathr)
