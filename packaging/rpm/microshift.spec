@@ -81,7 +81,7 @@ BuildRequires: selinux-policy >= %{selinux_policyver}
 BuildRequires: selinux-policy-devel >= %{selinux_policyver}
 Requires: container-selinux >= %{container_policy_epoch}:%{container_policyver}
 BuildArch: noarch
-%{?selinux_requires}
+Requires: selinux-policy >= %{selinux_policyver}
 
 %description selinux
 The microshift-selinux package provides the SELinux policy modules required by MicroShift.
