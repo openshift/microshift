@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=logging-fstring-interpolation,logging-not-lazy
 
 """
 This script updates assets based on a YAML recipe (`assets.yaml`)

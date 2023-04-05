@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # pylint: disable=too-few-public-methods, broad-except
 """
 This script provides various functions for Automatic MicroShift bug JIRA cloner.
