@@ -129,13 +129,12 @@ run_test() {
 }
 
 list() {
-    find "${SCRIPT_DIR}/tests" -maxdepth 1 -iname "*.sh" -printf "%f\n"
+    local -r filter="*${1:-}*.sh"
+    find "${SCRIPT_DIR}/tests" -maxdepth 1 -iname "$filter" -printf "%f\n"
 }
 
 run() {
-    local -r filter="*${1:-}*.sh"
-
-    local -r to_run=$(find "${SCRIPT_DIR}/tests" -maxdepth 1 -iname "$filter" -printf "%f\n")
+    local -r to_run=$(list "${1}")
     log "Following tests will run:\n$to_run"
 
     prechecks
