@@ -116,7 +116,7 @@ etcd:
 		$(MAKE) -C etcd
 
 .PHONY: verify verify-images verify-assets
-verify: verify-images verify-assets
+verify: verify-images verify-assets verify-py
 
 verify-images:
 	./scripts/verify_images.sh
