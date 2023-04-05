@@ -28,8 +28,10 @@ oc wait pods -l app=hello-microshift --for condition=Ready --timeout=60s
 retries=3
 backoff=3s
 for _ in $(seq 1 "${retries}"); do
+    set +x
     RESPONSE=$(curl -i http://hello-microshift.cluster.local --resolve "hello-microshift.cluster.local:80:${USHIFT_IP}" 2>&1)
     RESULT=$?
+    set -x
     if [ $RESULT -eq 0 ] &&
         echo "${RESPONSE}" | grep -q -E "HTTP.*200" &&
         echo "${RESPONSE}" | grep -q "Hello MicroShift"; then
