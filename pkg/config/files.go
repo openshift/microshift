@@ -10,10 +10,9 @@ import (
 )
 
 const (
-	DefaultUserConfigFile   = "~/.microshift/config.yaml"
-	defaultUserDataDir      = "~/.microshift/data"
-	DefaultGlobalConfigFile = "/etc/microshift/config.yaml"
-	defaultGlobalDataDir    = "/var/lib/microshift"
+	defaultUserDataDir   = "~/.microshift/data"
+	ConfigFile           = "/etc/microshift/config.yaml"
+	defaultGlobalDataDir = "/var/lib/microshift"
 	// for files managed via management system in /etc, i.e. user applications
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
@@ -21,14 +20,9 @@ const (
 )
 
 var (
-	configFile   = findConfigFile()
 	dataDir      = findDataDir()
 	manifestsDir = findManifestsDir()
 )
-
-func GetConfigFile() string {
-	return configFile
-}
 
 func GetDataDir() string {
 	return dataDir
@@ -36,21 +30,6 @@ func GetDataDir() string {
 
 func GetManifestsDir() []string {
 	return manifestsDir
-}
-
-// Returns the default user config file if that exists, else the default global
-// config file, else the empty string.
-func findConfigFile() string {
-	userConfigFile, _ := homedir.Expand(DefaultUserConfigFile)
-	if _, err := os.Stat(userConfigFile); errors.Is(err, os.ErrNotExist) {
-		if _, err := os.Stat(DefaultGlobalConfigFile); errors.Is(err, os.ErrNotExist) {
-			return ""
-		} else {
-			return DefaultGlobalConfigFile
-		}
-	} else {
-		return userConfigFile
-	}
 }
 
 // Returns the default user data dir if it exists or the user is non-root.
@@ -85,7 +64,7 @@ func parse(contents []byte) (*Config, error) {
 func getActiveConfigFromYAML(contents []byte) (*Config, error) {
 	userSettings, err := parse(contents)
 	if err != nil {
-		return nil, fmt.Errorf("Error parsing config file %q: %v", configFile, err)
+		return nil, fmt.Errorf("Error parsing config file %q: %v", ConfigFile, err)
 	}
 
 	// Start with the defaults, then apply the user settings and
@@ -108,8 +87,7 @@ func getActiveConfigFromYAML(contents []byte) (*Config, error) {
 // file exists, read it and require it to be valid. Otherwise return
 // the default settings.
 func ActiveConfig() (*Config, error) {
-	filename := GetConfigFile()
-	_, err := os.Stat(filename)
+	_, err := os.Stat(ConfigFile)
 	if os.IsNotExist(err) {
 		// No configuration file, use the default settings
 		return NewDefault(), nil
@@ -118,9 +96,9 @@ func ActiveConfig() (*Config, error) {
 	}
 
 	// Read the file and merge user-provided settings with the defaults
-	contents, err := os.ReadFile(configFile)
+	contents, err := os.ReadFile(ConfigFile)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading config file %q: %v", configFile, err)
+		return nil, fmt.Errorf("Error reading config file %q: %v", ConfigFile, err)
 	}
 	return getActiveConfigFromYAML(contents)
 }

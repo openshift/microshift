@@ -17,7 +17,7 @@ import (
 // the lvmd config.  If not found, returns a default-value lvmd config.  If an unmarshalling errors, returns nil
 // and the error.
 func getCSIPluginConfig() (*lvmd.Lvmd, error) {
-	lvmdConfig := filepath.Join(filepath.Dir(config.DefaultGlobalConfigFile), lvmd.LvmdConfigFileName)
+	lvmdConfig := filepath.Join(filepath.Dir(config.ConfigFile), lvmd.LvmdConfigFileName)
 	if _, err := os.Stat(lvmdConfig); !errors.Is(err, os.ErrNotExist) {
 		return lvmd.NewLvmdConfigFromFile(lvmdConfig)
 	}
