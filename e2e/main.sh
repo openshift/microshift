@@ -83,11 +83,16 @@ microshift_cleanup() {
 }
 
 microshift_health_summary() {
-    local konfig=${1}
     log "Summary of MicroShift health"
-    oc --kubeconfig "${konfig}" get pods -A
-    oc --kubeconfig "${konfig}" get nodes -o wide
-    oc --kubeconfig "${konfig}" get events -A --sort-by=.metadata.creationTimestamp | head -n 20
+
+    # Because test might be "destructive" (i.e. tear down and set up again MicroShift)
+    # so these commands are executed via ssh.
+    # Alternative is to copy kubeconfig second time in the same time.
+    ssh "$USHIFT_USER@$USHIFT_IP" \
+        "mkdir -p ~/.kube/ && sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config ; \
+            oc get pods -A ; \
+            oc get nodes -o wide ; \
+            oc get events -A --sort-by=.metadata.creationTimestamp | head -n 20"
 }
 
 run_test() {
@@ -118,7 +123,7 @@ run_test() {
     fi
 
     log "${test} - FAILURE"
-    microshift_health_summary "${konfig}"
+    microshift_health_summary
     microshift_debug_info "${test_output}" || true
     return 1
 }
