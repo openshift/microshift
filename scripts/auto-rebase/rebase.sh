@@ -656,7 +656,7 @@ copy_manifests() {
         exit 1
     fi
     title "Copying manifests"
-    "$REPOROOT/scripts/auto-rebase/handle-assets.py"
+    "$REPOROOT/scripts/auto-rebase/handle_assets.py"
 }
 
 

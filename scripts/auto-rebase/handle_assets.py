@@ -4,7 +4,7 @@
 This script updates assets based on a YAML recipe (`assets.yaml`)
 The recipe specifies what files and directories should be copied, ignored, and restored.
 
-File: handle-assets.py
+File: handle_assets.py
 """
 
 import logging
