@@ -7,22 +7,22 @@ set -eo pipefail
 ROOTDIR=$(git rev-parse --show-toplevel)/scripts/devenv-builder
 
 function usage() {
-    echo "Usage: $(basename $0) [<VMNAME> <VMDISKDIR> <ISOFILE> <NCPUS> <RAMSIZE> <DISKSIZE> <SWAPSIZE> <DATAVOLSIZE>]"
+    echo "Usage: $(basename "$0") [<VMNAME> <VMDISKDIR> <ISOFILE> <NCPUS> <RAMSIZE> <DISKSIZE> <SWAPSIZE> <DATAVOLSIZE>]"
     echo "INFO: Specify 0 swap size to disable swap partition"
     echo "INFO: Positional arguments also can be specified using environment variables"
     echo "INFO: All sizes in GB"
-    [ ! -z "$1" ] && echo -e "\nERROR: $1"
+    [ -n "$1" ] && echo -e "\nERROR: $1"
     exit 1
 }
 
-VMNAME=${1:-$VMNAME}
-VMDISKDIR=${2:-$VMDISKDIR}
-ISOFILE=${3:-$ISOFILE}
-NCPUS=${4:-$NCPUS}
-RAMSIZE=${5:-$RAMSIZE}
-DISKSIZE=${6:-$DISKSIZE}
-SWAPSIZE=${7:-$SWAPSIZE}
-DATAVOLSIZE=${8:-$DATAVOLSIZE}
+VMNAME=${1:-${VMNAME}}
+VMDISKDIR=${2:-${VMDISKDIR}}
+ISOFILE=${3:-${ISOFILE}}
+NCPUS=${4:-${NCPUS}}
+RAMSIZE=${5:-${RAMSIZE}}
+DISKSIZE=${6:-${DISKSIZE}}
+SWAPSIZE=${7:-${SWAPSIZE}}
+DATAVOLSIZE=${8:-${DATAVOLSIZE}}
 [ -z "${VMNAME}" ]      && usage "Invalid VM name: '${VMNAME}'"
 [ ! -e "${VMDISKDIR}" ] && usage "VM disk directory '${VMDISKDIR}' is not accessible"
 [ ! -e "${ISOFILE}" ]   && usage "Installation ISO file '${ISOFILE}' is not accessible"
@@ -34,31 +34,31 @@ DATAVOLSIZE=${8:-$DATAVOLSIZE}
 [[ ! "${DATAVOLSIZE}" =~ ^[0-9]+$ ]] || [[ "${DATAVOLSIZE}" -le 0 ]] && usage "Invalid data volume size: '${DATAVOLSIZE}'"
 
 # RAM size is expected in MB
-RAMSIZE=$(( ${RAMSIZE} * 1024 ))
+RAMSIZE=$(( RAMSIZE * 1024 ))
 # Calculate system root partition size (1GB is allocated to the boot partition)
-SYSROOTSIZE=$(( ${DISKSIZE} - 1 - ${SWAPSIZE} - ${DATAVOLSIZE} ))
+SYSROOTSIZE=$(( DISKSIZE - 1 - SWAPSIZE - DATAVOLSIZE ))
 # System root size is expected in MB
-SYSROOTSIZE=$(( ${SYSROOTSIZE} * 1024 ))
+SYSROOTSIZE=$(( SYSROOTSIZE * 1024 ))
 # Swap size is expected in MB
-SWAPSIZE=$(( ${SWAPSIZE} * 1024 ))
+SWAPSIZE=$(( SWAPSIZE * 1024 ))
 
-KICKSTART_FILE=$(mktemp /tmp/kickstart-${VMNAME}-XXXXX.ks)
-cat ${ROOTDIR}/config/kickstart.ks.template | \
+KICKSTART_FILE=$(mktemp "/tmp/kickstart-${VMNAME}-XXXXX.ks")
+cat < "${ROOTDIR}/config/kickstart.ks.template" | \
     sed "s;REPLACE_HOST_NAME;${VMNAME};" | \
     sed "s;REPLACE_SWAP_SIZE;${SWAPSIZE};" | \
-    sed "s;REPLACE_LVM_SYSROOT_SIZE;${SYSROOTSIZE};" > ${KICKSTART_FILE}
+    sed "s;REPLACE_LVM_SYSROOT_SIZE;${SYSROOTSIZE};" > "${KICKSTART_FILE}"
 # Disable swap if its size is 0
 if [ "${SWAPSIZE}" -eq 0 ] ; then
-    sed -i "s;^part swap;#part swap;" ${KICKSTART_FILE}
+    sed -i "s;^part swap;#part swap;" "${KICKSTART_FILE}"
 fi
 
 sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass
-if [ $(systemctl is-active libvirtd.socket) != "active" ] ; then
+if [ "$(systemctl is-active libvirtd.socket)" != "active" ] ; then
     echo "Restart your host to initialize the virtualization environment"
     exit 1
 fi
 # Necessary to allow remote connections in the virt-viewer application
-sudo usermod -a -G libvirt $(whoami)
+sudo usermod -a -G libvirt "$(whoami)"
 
 sudo -b bash -c " \
 cd ${VMDISKDIR} && \
@@ -71,6 +71,6 @@ virt-install \
     --events on_reboot=restart \
     --location ${ISOFILE} \
     --initrd-inject=${KICKSTART_FILE} \
-    --extra-args \"inst.ks=file:/$(basename ${KICKSTART_FILE})\" \
+    --extra-args \"inst.ks=file:/$(basename "${KICKSTART_FILE}")\" \
     --wait \
 "

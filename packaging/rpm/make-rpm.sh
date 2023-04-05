@@ -3,7 +3,7 @@ set -e -o pipefail
 
 # must be passed down to this script from Makefile
 ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_TREE_STATE"
-for env in $ENV_VARS ; do
+for env in ${ENV_VARS} ; do
   if [[ -z "${!env}" ]] ; then
     echo "Error: Mandatory environment variable '${env}' is missing"
     echo ""
@@ -15,7 +15,7 @@ done
 # generated from other info
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
-MICROSHIFT_VERSION=$(echo ${MICROSHIFT_VERSION} | sed s/-/_/g)
+MICROSHIFT_VERSION=${MICROSHIFT_VERSION//-/_}
 
 GIT_SHA=$(git rev-parse HEAD)
 # using this instead of rev-parse --short because github's is 1 char shorter than --short
@@ -39,7 +39,7 @@ create_local_tarball() {
 
 download_commit_tarball() {
   title "Downloading commit tarball"
-  GIT_SHA=${1:-$GIT_SHA}
+  GIT_SHA=${1:-${GIT_SHA}}
   spectool -g --define "_topdir ${RPMBUILD_DIR}" --define="release ${RPM_RELEASE}" --define="version ${MICROSHIFT_VERSION}" \
           --define "git_commit ${GIT_SHA}" \
           -R "${SCRIPT_DIR}/microshift.spec"
@@ -62,11 +62,13 @@ EOF
   # it yields w19.zstdio, which means compression level 19 using zstd algorithm. To
   # speed this up it runs w19T8.zstdio, which is the 8 thread version of the same
   # algorithm.
+  # shellcheck disable=SC2086
+  # We want word splitting to happen with RPMBUILD_OPT for flags to be interpreted correctly
   rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" --define "_binary_payload w19T8.zstdio" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 usage() {
-  echo "Usage: $(basename $0) <all | rpm | srpm> < local | commit <commit-id> >"
+  echo "Usage: $(basename "$0") <all | rpm | srpm> < local | commit <commit-id> >"
   exit 1
 }
 
