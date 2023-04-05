@@ -1,46 +1,10 @@
-# cluster-kube-apiserver-operator embedded-component f2d9ccd2f585c57409257fae99da7f52ed6042cf to 5f038db7df7ade2f3da707394a14e391c693d25c
-dc69ddf3b698821326080cecb074c0ed8899cf06 2023-03-28T18:34:20+02:00 PSA Violation alert: add ocp_namespace label
-# cluster-kube-controller-manager-operator embedded-component 280c115d63367f4ede8a4e893549cdc5919e8920 to cdde94837bec1810dbad71ca070a84f212de0cbb
-f226a31e90685099c832e47856c6ab9b91a7c0c4 2023-03-31T15:07:22+00:00 OCPBUGS-7440: do not degrade KCM when when monitoring stack rollout is in progress
-dfaa63e6d0617f195cfc52a637df3681747a3581 2023-03-27T20:26:01+02:00 OCPBUGS-7785: migrate to using lease objects for leader election
-# cluster-kube-scheduler-operator embedded-component fbc6ef4df8b0d9ea97acf9b0330d44a3a171b4fd to dc5cba57ddcdb5a4b43240d1c2ab908fa953d887
-7c538dbf1a70bf47279c3d133bdcfe702cca7eb6 2023-03-27T20:31:17+02:00 OCPBUGS-7785: migrate to using lease objects for leader election
-# cluster-network-operator embedded-component ae70394d0198a1d5a310410ba3468f38ce0522c2 to 756cae2baa82af3604fbe016eb0f776d8efaa61b
-5327d1c6dd1e72fc7687bdca9fe087be9b13a49a 2023-03-27T16:54:09+00:00 use annotation daemonset to update hybrid overlay
-d4f451d8ada4a53859bf7f8e92e987d849433bfa 2023-03-27T09:33:07+00:00 Add POD_NAME env to ovnkube-node
-# cluster-openshift-controller-manager-operator embedded-component 7867c26e6c91e2cc279317dfc080befe63a60749 to 9a8aba8cad6491a31e743a7e366d758351482d88
-76e46aac4d10280b413ac6e3c69538ec22819657 2023-03-20T10:05:28-04:00 update vendor folder
-3e88e932fea15f87c4ba30b4ff858f543d63a530 2023-03-20T10:05:19-04:00 bump(library-go)
-# kubernetes embedded-component dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf to 7195e44fb36b487f275becffbf5828e2021f94d4
-0c95851f899bd4be5fcbbd78ef19eec55d91f9d3 2023-03-27T17:20:41+02:00 UPSTREAM: <drop>: legacy-cloud-providers: azure: do not detach masters from lb when unready
-be9f2c07315cad2be925fb27cb3dfe040dbd4171 2023-03-27T17:18:47+02:00 UPSTREAM: <drop>: legacy-cloud-providers: azure: use kube-proxy based health probes by default
-# machine-config-operator embedded-component a4e68fb1d5eed30d4c1b6f60e9385baf41a30bb3 to 428c2e0655c6a5fc876dad8864a5451142b5c3e2
-0e1f2424348fb1dd509f9b0f3791d67c12f27e17 2023-03-29T17:44:43+00:00 OCPBUGS-4963: Enable nodeip-configuration for vsphere upi
-a0bdf3aa85bef50d7f641d59e505b46b246d789e 2023-03-29T11:02:08+00:00 remove container runtime flag
-a1b2afb9ba50b5f629be1d6a8377ee507e3ae1c2 2023-03-10T16:25:36+00:00 OCPBUGS-5872: Wrap podman commands in a while loop
-# ovn-kubernetes image-amd64 cb89e52240fe7346409589a9acae9c0106d24b03 to 9d94b5f604f18016e41b2ba507ae3df373800754
+# ovn-kubernetes image-arm64 9b3dfbb7fa73f07e936bf6e610ab31af2db94926 to 9d94b5f604f18016e41b2ba507ae3df373800754
 7ba8af501478c9b2b5b0be7b55c5eeabcca97291 2023-03-28T17:16:25-04:00 Fix invalid peer test syntax
 f61f2cd55dc003582e1096cb8915a36007539212 2023-03-28T15:15:30-04:00 Add error checking for addEventHandler calls
 858872e78aa5a34ef18b89b96df29f0ddb39c1ff 2023-03-28T14:59:25-04:00 Bump K8S_VERSION to 1.26.0 for KIND setup
 e582cf5b361d484e8c444800e40c22c8e684f303 2023-03-28T14:59:14-04:00 sets package update
 b2bb806212b8f6e1cf8e1fe80b5d44af0b88b758 2023-03-28T14:59:06-04:00 exec.Stream deprecated
 f74f2cba7d6163fbc50410e2bb55ba1b31a67ddc 2023-03-28T14:58:54-04:00 Bump K8s vendored libraries to use kube 1.26
-eb246f156fb681f9ddb8797f4f82440c4370316e 2023-03-28T08:15:44+00:00 Defer wait on startOvnKube might prevent panic crash
-d2fee85be49ed478a0862daeca0a230833dc70dd 2023-03-28T08:15:43+00:00 Start master metrics server for all master instances
-37336490ec3e7b71c45aa7837f3bb1c482e35068 2023-03-28T08:15:43+00:00 Single leader election
-363b633d1180c4e43f82fdb49f9b384aee7f9a4e 2023-03-28T08:15:42+00:00 Fix NAD controller Stop
-34eb56293928264919eb9e817eddaf62321a9370 2023-03-23T17:39:12+01:00 Optimize egress firewall cleanup to only select switches that have stale acls.
-7fb527e1eb9b511981cb51be6b79901e4aedbd2f 2023-03-23T17:38:41+01:00 Batch potentially big transaction on egress firewall ACLs migration. The default transaction timeout is 10 seconds, it can be reached when we delete all egress firewall acls during migration to port groups from switches.
-74f95e997d116f572b64c7cf7775d483aeed86d1 2023-03-23T17:14:38+01:00 fix multiple error aggregation: `errors.Wrapf` always returns nil if the first argument is nil.
-362fa553d572b418f5b305b9c8fb68eb1a4e13cc 2023-03-23T17:14:26+01:00 Fix egress firewall unit tests gatewayMode setup update "egress firewall with node selector updates during node update" to work for both gateway modes.
-2e3d170c179fc806bfebbdaf1bab3f606a562ecf 2023-03-23T17:14:18+01:00 Egress firewall creation error was overridden by the status update error and never returned. That would prevent retry on failure.
-# kubernetes image-amd64 dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf to 7195e44fb36b487f275becffbf5828e2021f94d4
+# kubernetes image-arm64 dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf to 7195e44fb36b487f275becffbf5828e2021f94d4
 0c95851f899bd4be5fcbbd78ef19eec55d91f9d3 2023-03-27T17:20:41+02:00 UPSTREAM: <drop>: legacy-cloud-providers: azure: do not detach masters from lb when unready
 be9f2c07315cad2be925fb27cb3dfe040dbd4171 2023-03-27T17:18:47+02:00 UPSTREAM: <drop>: legacy-cloud-providers: azure: use kube-proxy based health probes by default
-# ovn-kubernetes image-arm64 9799fbc9bef06304e8195fbc4b37b2e095ec9325 to 9b3dfbb7fa73f07e936bf6e610ab31af2db94926
-eb246f156fb681f9ddb8797f4f82440c4370316e 2023-03-28T08:15:44+00:00 Defer wait on startOvnKube might prevent panic crash
-d2fee85be49ed478a0862daeca0a230833dc70dd 2023-03-28T08:15:43+00:00 Start master metrics server for all master instances
-37336490ec3e7b71c45aa7837f3bb1c482e35068 2023-03-28T08:15:43+00:00 Single leader election
-363b633d1180c4e43f82fdb49f9b384aee7f9a4e 2023-03-28T08:15:42+00:00 Fix NAD controller Stop
-34eb56293928264919eb9e817eddaf62321a9370 2023-03-23T17:39:12+01:00 Optimize egress firewall cleanup to only select switches that have stale acls.
-7fb527e1eb9b511981cb51be6b79901e4aedbd2f 2023-03-23T17:38:41+01:00 Batch potentially big transaction on egress firewall ACLs migration. The default transaction timeout is 10 seconds, it can be reached when we delete all egress firewall acls during migration to port groups from switches.
