@@ -25,7 +25,7 @@ RECIPE_FILEPATH = "./scripts/auto-rebase/assets.yaml"
 
 
 def build_assets_filelist_from_asset_dir(asset_dir, prefix=""):
-    """Recursively builds a list of assests filepaths from an asset directory."""
+    """Recursively builds a list of assets filepaths from an asset directory."""
     dir_path = os.path.join(prefix, asset_dir['dir'])
     return ([os.path.join(dir_path, f['file']) for f in asset_dir.get('files', [])] +
             reduce(lambda x, y: x+y,
@@ -34,7 +34,7 @@ def build_assets_filelist_from_asset_dir(asset_dir, prefix=""):
 
 
 def build_assets_filelist_from_recipe(recipe):
-    """Builds a list of assests filepaths from a recipe file."""
+    """Builds a list of assets filepaths from a recipe file."""
     return reduce(lambda x, y: x+[y] if isinstance(y, str) else x+y,
                   [build_assets_filelist_from_asset_dir(asset) if 'dir' in asset else asset['file'] for asset in recipe['assets']],
                   [])

@@ -159,7 +159,7 @@ def set_sprint(issue, sprint, connection):
     connection.add_issues_to_sprint(sprint, [issue.key])
 
 def clone_issue(issue, target, connection):
-    """Clones the specified issue"""
+    """Clones the specified issue."""
     data_dict = {}
     data_dict['priority'] = {'id': issue.fields.priority.id}
     data_dict['labels'] = issue.fields.labels + ['backport']
@@ -186,7 +186,7 @@ def clone_issue(issue, target, connection):
         connection.add_issues_to_sprint(sprint, [new_issue.key])
 
 def add_blocks_link(issue, parent, connection):
-    """Adds a 'Blocks' link between an issue and parent issue"""
+    """Adds a 'Blocks' link between an issue and parent issue."""
     connection.create_issue_link("Blocks", inwardIssue=parent.key, outwardIssue=issue.key)
 
 class Action:
@@ -201,7 +201,7 @@ class Action:
             self.action = _internal_fn
 
 def scan_original_issue(issue, connection):
-    """Scans the spefied original issue, and returns a list of actions to take"""
+    """Scans the spefied original issue, and returns a list of actions to take."""
     actions = []
     fix_versions = get_fix_versions(issue)
     target_versions = get_target_versions(issue)
@@ -231,7 +231,7 @@ def scan_original_issue(issue, connection):
     return actions
 
 def scan_cloned_issue(issue, connection):
-    """Scans the spefied cloned issue, and returns a list of actions to take"""
+    """Scans the spefied cloned issue, and returns a list of actions to take."""
     actions = []
     parent = get_parent_issue(issue, connection)
     parent_fix_versions = get_fix_versions(parent)

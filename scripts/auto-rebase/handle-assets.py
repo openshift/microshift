@@ -2,7 +2,7 @@
 
 """
 This script updates assets based on a YAML recipe (`assets.yaml`)
-The recipe specifies what files and directories should be copied, ignored, and restored
+The recipe specifies what files and directories should be copied, ignored, and restored.
 
 File: handle-assets.py
 """
@@ -26,14 +26,18 @@ STAGING_DIR = "_output/staging/"
 
 
 def merge_paths(pathl, pathr):
-    """Merge two paths into one by removing any '/' prefix from pathr and then appending it to pathl"""
+    """
+    Merge two paths depending upon following conditions:
+    - If `pathr` is absolute (starts with `/`), then discard the leading `/` and return rest `pathr`.
+    - If `pathr` is relative, then return `pathl/pathr`.
+    """
     if pathr.startswith("/"):
         return pathr[1:]
     return os.path.join(pathl, pathr)
 
 
 def run_command(args=None):
-    """Run a command with the given args and return True if successful"""
+    """Run a command with the given args and return True if successful."""
     if args is None:
         args = []
     if not args:
@@ -52,14 +56,14 @@ def run_command(args=None):
 
 
 def git_restore(path):
-    """Restore a file from git"""
+    """Restore a file from git."""
     path = os.path.join(ASSETS_DIR, path)
     logging.info(f"Restoring {path}")
     return run_command(["git", "restore", path])
 
 
 def copy(src, dst):
-    """Copy a file from the source path to the destination path"""
+    """Copy a file from the source path to the destination path."""
     src = os.path.join(STAGING_DIR, src)
     dst = os.path.join(ASSETS_DIR, dst)
     logging.debug(f"Copying {dst} <- {src}")
@@ -67,7 +71,7 @@ def copy(src, dst):
 
 
 def clear_dir(path):
-    """Clear the contents of a directory"""
+    """Clear the contents of a directory."""
     path = os.path.join(ASSETS_DIR, path)
     logging.info(f"Clearing directory {path}")
     shutil.rmtree(path)
@@ -75,7 +79,7 @@ def clear_dir(path):
 
 
 def should_be_ignored(asset, dst):
-    """Check if an asset should be ignored based on its 'ignore' field"""
+    """Check if an asset should be ignored based on its 'ignore' field."""
     if 'ignore' in asset:
         reason = asset['ignore']
         if not reason:
@@ -107,7 +111,7 @@ def handle_file(file, dst_dir="", src_prefix=""):
 
 
 def handle_dir(dir_, dst_dir="", src_prefix=""):
-    """"Recursively handle a directory, its files and subdirectories"""
+    """"Recursively handle a directory, its files and subdirectories."""
     dst = merge_paths(dst_dir, dir_['dir'])
     new_src_prefix = merge_paths(src_prefix, dir_['src'] if "src" in dir_ else "")
 

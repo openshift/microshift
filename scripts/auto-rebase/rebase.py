@@ -90,7 +90,7 @@ def commit_str(commit):
 
 
 def get_installation_access_token(app_id, key_path, org, repo):
-    """Get a personal access token for a GitHub App installation."""
+    """Get a installation access token for a GitHub App installation."""
     integration = GithubIntegration(app_id, Path(key_path).read_text(encoding='utf-8'))
     app_installation = integration.get_installation(org, repo)
     if app_installation is None:
@@ -118,22 +118,22 @@ def rebase_script_made_changes_considered_functional(git_repo, base_branch):
     diffs = git_repo.active_branch.commit.diff(base_branch)
     logging.info(f"Following files changed: {[ d.a_path for d in diffs ]}")
 
-    for d_diff in diffs:
-        if 'scripts/auto-rebase/' in d_diff.a_path:
-            logging.info(f" - {d_diff.a_path} - ignoring")
+    for diff in diffs:
+        if 'scripts/auto-rebase/' in diff.a_path:
+            logging.info(f" - {diff.a_path} - ignoring")
             continue
 
-        if "assets/release/release-" in d_diff.a_path:
-            old_images = set(json.loads(d_diff.a_blob.data_stream.read())['images'].items())
-            new_images = set(json.loads(d_diff.b_blob.data_stream.read())['images'].items())
-            diff = old_images ^ new_images
-            if not diff:
-                logging.info(f" - {d_diff.a_path} - images did not change - ignoring")
+        if "assets/release/release-" in diff.a_path:
+            old_images = set(json.loads(diff.a_blob.data_stream.read())['images'].items())
+            new_images = set(json.loads(diff.b_blob.data_stream.read())['images'].items())
+            diff_images = old_images ^ new_images
+            if not diff_images:
+                logging.info(f" - {diff.a_path} - images did not change - ignoring")
                 continue
-            logging.info(f" - {d_diff.a_path} - images changed")
+            logging.info(f" - {diff.a_path} - images changed")
             return True
 
-        logging.info(f" - File {d_diff.a_path} is considered functional")
+        logging.info(f" - File {diff.a_path} is considered functional")
         return True
 
     return False
@@ -141,8 +141,8 @@ def rebase_script_made_changes_considered_functional(git_repo, base_branch):
 
 def get_remote_with_token(git_repo, token, org, repo):
     """
-    Returns the Git remote for the given repository
-    using the provided personal access token.
+    Returns the Git remote for the given repository using
+    the provided installation (or personal) access token.
     """
     remote_url = f"https://x-access-token:{token}@github.com/{org}/{repo}"
     try:
@@ -183,7 +183,7 @@ def try_get_rebase_branch_ref_from_remote(remote, branch_name):
 def is_local_branch_based_on_newer_base_branch_commit(git_repo, base_branch_name, remote_branch_name, local_branch_name):
     """
     Compares local and remote rebase branches by looking at their start on base branch.
-    Returns True if local branch is starts on newer commit and needs to be pushed to remote,
+    Returns True if local branch starts on newer commit and needs to be pushed to remote,
     otherwise False.
     """
     remote_merge_base = git_repo.merge_base(base_branch_name, remote_branch_name)
@@ -234,7 +234,7 @@ def try_get_pr(gh_repo, org, base_branch, branch_name):
     return pull_req
 
 
-def generate_pr_description(branch_name, amd_tag, arm_tag, prow_job_url, rebase_script_succeded):
+def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succeded):
     """
     Returns a string that represents the body of a pull request (PR) description.
     Note: This function expects that there is a "scripts/auto-rebase/changelog.txt" file present.
@@ -293,9 +293,8 @@ def update_pr(pull_req, title, desc):
 
 def post_comment(pull_req, comment=""):
     """
-    Posts a comment on a GitHub pull request.
-    If there are any extra messages in the global `_extra_msgs` list,
-    they will be appended to the comment.
+    Posts a comment on a GitHub pull request with
+    the contents of the global `_extra_msgs` list.
     """
     if len(_extra_msgs) != 0:
         if comment != "":
@@ -444,7 +443,7 @@ def main():
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
-    REMOTE_DRY_RUN = False if try_get_env(DRY_RUN_ENV, die=False) == "" else True
+    REMOTE_DRY_RUN = try_get_env(DRY_RUN_ENV, die=False) != ""
     if REMOTE_DRY_RUN:
         logging.info("Dry run mode")
 
@@ -490,7 +489,7 @@ def main():
 
     prow_job_url = try_create_prow_job_url()
     pr_title = create_pr_title(rebase_branch_name, rebase_result.success)
-    desc = generate_pr_description(rebase_branch_name, get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
+    desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
 
     comment = ""
     pull_req = try_get_pr(gh_repo, org, base_branch, rebase_branch_name)
