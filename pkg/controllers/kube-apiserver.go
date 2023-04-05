@@ -80,7 +80,7 @@ type KubeAPIServer struct {
 	advertiseAddress string
 }
 
-func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
+func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {
 	s := &KubeAPIServer{}
 	if err := s.configure(cfg); err != nil {
 		s.configureErr = err
@@ -91,8 +91,8 @@ func NewKubeAPIServer(cfg *config.MicroshiftConfig) *KubeAPIServer {
 func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
 func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd", "network-configuration"} }
 
-func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
-	s.verbosity = cfg.LogVLevel
+func (s *KubeAPIServer) configure(cfg *config.Config) error {
+	s.verbosity = cfg.GetVerbosity()
 
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 	kubeCSRSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
@@ -109,15 +109,9 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 		return fmt.Errorf("failed to configure kube-apiserver audit policy: %w", err)
 	}
 
-	// Get the apiserver port so we can set it as an argument
-	apiServerPort, err := cfg.Cluster.ApiServerPort()
-	if err != nil {
-		return err
-	}
-
-	s.masterURL = cfg.Cluster.URL
+	s.masterURL = cfg.ApiServer.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
-	s.advertiseAddress = cfg.KASAdvertiseAddress
+	s.advertiseAddress = cfg.ApiServer.AdvertiseAddress
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
@@ -139,7 +133,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},
 			"requestheader-client-ca-file":     {aggregatorCAPath},
 			"service-account-signing-key-file": {microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
-			"service-node-port-range":          {cfg.Cluster.ServiceNodePortRange},
+			"service-node-port-range":          {cfg.Network.ServiceNodePortRange},
 			"tls-cert-file":                    {servingCert},
 			"tls-private-key-file":             {servingKey},
 			"disable-admission-plugins": {
@@ -172,7 +166,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 									APIVersion: "route.openshift.io/v1",
 									Kind:       "HostAssignmentAdmissionConfig",
 								},
-								Domain: "apps." + cfg.BaseDomain,
+								Domain: "apps." + cfg.DNS.BaseDomain,
 							},
 						},
 					},
@@ -185,7 +179,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			},
 			ServingInfo: configv1.HTTPServingInfo{
 				ServingInfo: configv1.ServingInfo{
-					BindAddress:   net.JoinHostPort("0.0.0.0", strconv.Itoa(apiServerPort)),
+					BindAddress:   net.JoinHostPort("0.0.0.0", strconv.Itoa(cfg.ApiServer.Port)),
 					MinTLSVersion: string(fixedTLSProfile.MinTLSVersion),
 					CipherSuites:  crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
 					NamedCertificates: []configv1.NamedCertificate{
@@ -214,8 +208,8 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 		ServiceAccountPublicKeyFiles: []string{
 			microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.pub",
 		},
-		ServicesSubnet:        cfg.Cluster.ServiceCIDR,
-		ServicesNodePortRange: cfg.Cluster.ServiceNodePortRange,
+		ServicesSubnet:        cfg.Network.ServiceNetwork[0],
+		ServicesNodePortRange: cfg.Network.ServiceNodePortRange,
 	}
 
 	overridesBytes, err := json.Marshal(overrides)
@@ -255,7 +249,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 	return nil
 }
 
-func (s *KubeAPIServer) configureAuditPolicy(cfg *config.MicroshiftConfig) error {
+func (s *KubeAPIServer) configureAuditPolicy(cfg *config.Config) error {
 	data := []byte(`
 apiVersion: audit.k8s.io/v1
 kind: Policy

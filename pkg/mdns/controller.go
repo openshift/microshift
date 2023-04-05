@@ -23,10 +23,10 @@ type MicroShiftmDNSController struct {
 	stopCh     chan struct{}
 }
 
-func NewMicroShiftmDNSController(cfg *config.MicroshiftConfig) *MicroShiftmDNSController {
+func NewMicroShiftmDNSController(cfg *config.Config) *MicroShiftmDNSController {
 	return &MicroShiftmDNSController{
-		NodeIP:     cfg.NodeIP,
-		NodeName:   cfg.NodeName,
+		NodeIP:     cfg.Node.NodeIP,
+		NodeName:   cfg.Node.HostnameOverride,
 		KubeConfig: cfg.KubeConfigPath(config.KubeAdmin),
 		hostCount:  make(map[string]int),
 	}

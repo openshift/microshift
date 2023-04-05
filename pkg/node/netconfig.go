@@ -38,7 +38,7 @@ type NetworkConfiguration struct {
 	skipInterfaceConfiguration bool
 }
 
-func NewNetworkConfiguration(cfg *config.MicroshiftConfig) *NetworkConfiguration {
+func NewNetworkConfiguration(cfg *config.Config) *NetworkConfiguration {
 	n := &NetworkConfiguration{}
 	n.configure(cfg)
 	return n
@@ -47,9 +47,9 @@ func NewNetworkConfiguration(cfg *config.MicroshiftConfig) *NetworkConfiguration
 func (n *NetworkConfiguration) Name() string           { return componentNetworkConfiguration }
 func (n *NetworkConfiguration) Dependencies() []string { return []string{} }
 
-func (n *NetworkConfiguration) configure(cfg *config.MicroshiftConfig) {
-	n.kasAdvertiseAddress = cfg.KASAdvertiseAddress
-	n.skipInterfaceConfiguration = cfg.SkipKASInterface
+func (n *NetworkConfiguration) configure(cfg *config.Config) {
+	n.kasAdvertiseAddress = cfg.ApiServer.AdvertiseAddress
+	n.skipInterfaceConfiguration = cfg.ApiServer.SkipInterface
 }
 
 func (n *NetworkConfiguration) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {

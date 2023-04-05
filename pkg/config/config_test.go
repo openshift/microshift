@@ -1,13 +1,13 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
+	"strings"
 	"testing"
-	"time"
 
-	"sigs.k8s.io/yaml"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -26,218 +26,297 @@ func setupSuiteDataDir(t *testing.T) func() {
 	}
 }
 
-func TestConfigFile(t *testing.T) {
+// TestGetActiveConfigFromYAML verifies that reading the config file
+// correctly overrides the defaults and updates the computed values in
+// the Config struct.
+func TestGetActiveConfigFromYAML(t *testing.T) {
+	mkDefaultConfig := func() *Config {
+		c := NewDefault()
+		return c
+	}
+
+	dedent := func(input string) string {
+		lines := strings.Split(input, "\n")
+		detectIndentFrom := lines[0]
+		if detectIndentFrom == "" {
+			detectIndentFrom = lines[1]
+		}
+		dedentedLine := strings.TrimLeft(detectIndentFrom, " \t")
+		prefixLen := len(detectIndentFrom) - len(dedentedLine)
+		if prefixLen == 0 {
+			return input
+		}
+		var b strings.Builder
+		for _, line := range lines {
+			if len(line) >= prefixLen {
+				line = line[prefixLen:]
+			}
+			fmt.Fprintf(&b, "%s\n", line)
+		}
+		return b.String()
+	}
+
 	var ttests = []struct {
-		config    Config
-		expected  MicroshiftConfig
+		name      string
+		config    string
+		expected  *Config
 		expectErr bool
 	}{
 		{
-			config: Config{
-				DNS: DNS{
-					BaseDomain: "example.com",
-				},
-				Network: Network{
-					ClusterNetwork: []ClusterNetworkEntry{
-						{
-							CIDR: "10.20.30.40/16",
-						},
+			name:     "empty",
+			config:   "",
+			expected: mkDefaultConfig(),
+		},
+		{
+			name: "dns",
+			config: dedent(`
+            dns:
+              baseDomain: test-example.com
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.BaseDomain = "test-example.com"
+				return c
+			}(),
+		},
+		{
+			name: "network",
+			config: dedent(`
+            network:
+              clusterNetwork:
+                - cidr: "10.20.30.40/16"
+              serviceNetwork:
+                - "40.30.20.10/16"
+              serviceNodePortRange: "1024-32767"
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ClusterNetwork = []ClusterNetworkEntry{
+					{
+						CIDR: "10.20.30.40/16",
 					},
-					ServiceNetwork:       []string{"40.30.20.10/16"},
-					ServiceNodePortRange: "1024-32767",
-				},
-				Node: Node{
-					HostnameOverride: "node1",
-					NodeIP:           "1.2.3.4",
-				},
-				ApiServer: ApiServer{
-					SubjectAltNames:  []string{"node1", "node2"},
-					AdvertiseAddress: "6.7.8.9",
-				},
-				Debugging: Debugging{
-					LogLevel: "Debug",
-				},
-			},
-			expected: MicroshiftConfig{
-				LogVLevel:           4,
-				SubjectAltNames:     []string{"node1", "node2"},
-				NodeName:            "node1",
-				NodeIP:              "1.2.3.4",
-				KASAdvertiseAddress: "6.7.8.9",
-				BaseDomain:          "example.com",
-				Cluster: ClusterConfig{
-					URL:                  "https://localhost:6443",
-					ClusterCIDR:          "10.20.30.40/16",
-					ServiceCIDR:          "40.30.20.10/16",
-					ServiceNodePortRange: "1024-32767",
-				},
-				Etcd: EtcdConfig{
-					MemoryLimit:             0,
-					QuotaBackendBytes:       8 * 1024 * 1024 * 1024,
-					MinDefragBytes:          100 * 1024 * 1024,
-					MaxFragmentedPercentage: 45,
-					DefragCheckFreq:         5 * time.Minute,
-					DoStartupDefrag:         true,
-				},
-			},
-			expectErr: false,
+				}
+				c.Network.ServiceNetwork = []string{"40.30.20.10/16"}
+				c.Network.ServiceNodePortRange = "1024-32767"
+				c.ApiServer.AdvertiseAddress = "" // force value to be recomputed
+				c.updateComputedValues()          // recomputes DNS field
+				return c
+			}(),
+		},
+		{
+			name: "node",
+			config: dedent(`
+            node:
+              hostnameOverride: "node1"
+              nodeIP: "1.2.3.4"
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Node.HostnameOverride = "node1"
+				c.Node.NodeIP = "1.2.3.4"
+				return c
+			}(),
+		},
+		{
+			name: "api-server-subject-alt-names",
+			config: dedent(`
+            apiServer:
+              subjectAltNames:
+              - node1
+              - node2
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.SubjectAltNames = []string{
+					"node1", "node2",
+				}
+				return c
+			}(),
+		},
+		{
+			name: "api-server-advertise-address",
+			config: dedent(`
+            apiServer:
+              advertiseAddress: 4.3.2.1
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.AdvertiseAddress = "4.3.2.1"
+				c.ApiServer.SkipInterface = true
+				return c
+			}(),
+		},
+		{
+			name: "debugging",
+			config: dedent(`
+            debugging:
+              logLevel: Info
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Debugging.LogLevel = "Info"
+				return c
+			}(),
+		},
+		{
+			name: "etcd",
+			config: dedent(`
+            etcd:
+              memoryLimitMB: 100
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Etcd.MemoryLimitMB = 100
+				c.updateComputedValues()
+				return c
+			}(),
 		},
 	}
+
 	for _, tt := range ttests {
-		t.Run("", func(t *testing.T) {
-			f, err := os.CreateTemp("", "test")
-			if err != nil {
-				t.Errorf("unable to create temp file: %v", err)
-			}
-			defer os.Remove(f.Name())
-			d, err := yaml.Marshal(&tt.config)
-			if err != nil {
-				t.Errorf("unable to marshal configuration: %v", err)
-			}
-			_, err = f.Write(d)
-			if err != nil {
-				t.Errorf("unable to write to file: %v", err)
-			}
-			config := NewMicroshiftConfig()
-			err = config.ReadFromConfigFile(f.Name())
+		t.Run(tt.name, func(t *testing.T) {
+
+			config, err := getActiveConfigFromYAML([]byte(tt.config))
+
 			if tt.expectErr && err == nil {
 				t.Fatal("Expecting error and received nothing")
 			}
 			if !tt.expectErr && err != nil {
 				t.Fatalf("Not expecting error and received: %v", err)
 			}
-			if !tt.expectErr && !reflect.DeepEqual(*config, tt.expected) {
-				t.Errorf("ReadFromConfigFile() mismatch. got=%v, want=%v", *config, tt.expected)
+			if !tt.expectErr {
+
+				// blank out the user settings because the expected value
+				// never has them and any computed value should be set so
+				// it should be safe to ignore them
+				config.userSettings = nil
+
+				assert.Equal(t, tt.expected, config, "config input:\n---%s\n---", tt.config)
 			}
 		})
 	}
 }
 
-// test the MicroshiftConfig.ReadAndValidate function to verify that it configures MicroshiftConfig from
-// a configuration file.
-func TestMicroshiftConfigReadAndValidate(t *testing.T) {
+// Test the validation logic
+func TestValidate(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
+	mkDefaultConfig := func() *Config {
+		c := NewDefault()
+		c.ApiServer.SkipInterface = true
+		return c
+	}
+
 	var ttests = []struct {
 		name      string
-		config    Config
-		expected  MicroshiftConfig
+		config    *Config
 		expectErr bool
 	}{
 		{
-			name: "Config OK full",
-			config: Config{
-				DNS: DNS{
-					BaseDomain: "example.com",
-				},
-				Network: Network{
-					ClusterNetwork: []ClusterNetworkEntry{
-						{
-							CIDR: "10.20.30.40/16",
-						},
-					},
-					ServiceNetwork:       []string{"40.30.20.10/16"},
-					ServiceNodePortRange: "1024-32767",
-				},
-				Node: Node{
-					HostnameOverride: "node1",
-					NodeIP:           "1.2.3.4",
-				},
-				ApiServer: ApiServer{
-					SubjectAltNames:  []string{"node1", "node2"},
-					AdvertiseAddress: "6.7.8.9",
-				},
-				Debugging: Debugging{
-					LogLevel: "Debug",
-				},
-			},
-			expected: MicroshiftConfig{
-				LogVLevel:           4,
-				SubjectAltNames:     []string{"node1", "node2"},
-				NodeName:            "node1",
-				NodeIP:              "1.2.3.4",
-				KASAdvertiseAddress: "6.7.8.9",
-				SkipKASInterface:    true,
-				BaseDomain:          "example.com",
-				Cluster: ClusterConfig{
-					URL:                  "https://localhost:6443",
-					ClusterCIDR:          "10.20.30.40/16",
-					ServiceCIDR:          "40.30.20.10/16",
-					ServiceNodePortRange: "1024-32767",
-					DNS:                  "40.30.0.10",
-				},
-				Etcd: EtcdConfig{
-					MemoryLimit:             0,
-					QuotaBackendBytes:       8 * 1024 * 1024 * 1024,
-					MinDefragBytes:          100 * 1024 * 1024,
-					MaxFragmentedPercentage: 45,
-					DefragCheckFreq:         5 * time.Minute,
-					DoStartupDefrag:         true,
-				},
-			},
+			name:      "defaults-ok",
+			config:    NewDefault(),
 			expectErr: false,
 		},
 		{
-			name: "Config NOK with bad SAN localhost",
-			config: Config{
-				ApiServer: ApiServer{
-					SubjectAltNames: []string{"127.0.0.1", "localhost"},
-				},
-			},
-			expected:  MicroshiftConfig{},
+			name: "subject-alt-names-with-localhost",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.SubjectAltNames = []string{"localhost"}
+				return c
+			}(),
 			expectErr: true,
 		},
 		{
-			name: "Config NOK with bad SAN kubernetes service",
-			config: Config{
-				ApiServer: ApiServer{
-					SubjectAltNames: []string{"kubernetes"},
-				},
-			},
-			expected:  MicroshiftConfig{},
+			name: "subject-alt-names-with-loopback-ipv4",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.SubjectAltNames = []string{"127.0.0.1"}
+				return c
+			}(),
 			expectErr: true,
+		},
+		{
+			name: "subject-alt-names-with-kubernetes",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.SubjectAltNames = []string{"kubernetes"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "etcd-memory-limit-low",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Etcd.MemoryLimitMB = 1
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "etcd-memory-zero",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Etcd.MemoryLimitMB = 0
+				return c
+			}(),
+			expectErr: false,
 		},
 	}
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
-			f, err := os.CreateTemp("", "test")
-			if err != nil {
-				t.Errorf("unable to create temp file: %v", err)
-			}
-			defer os.Remove(f.Name())
-			d, err := yaml.Marshal(&tt.config)
-			if err != nil {
-				t.Errorf("unable to marshal configuration: %v", err)
-			}
-			_, err = f.Write(d)
-			if err != nil {
-				t.Errorf("unable to write to file: %v", err)
-			}
-			config := NewMicroshiftConfig()
-			err = config.ReadAndValidate(f.Name())
+			err := tt.config.validate()
 			if tt.expectErr && err == nil {
 				t.Fatal("Expecting error and received nothing")
 			}
 			if !tt.expectErr && err != nil {
 				t.Fatalf("Not expecting error and received: %v", err)
-			}
-			if !tt.expectErr && !reflect.DeepEqual(*config, tt.expected) {
-				t.Errorf("ReadAndValidate() mismatch. got=%v, want=%v", *config, tt.expected)
 			}
 		})
 	}
 }
 
 func TestMicroshiftConfigIsDefaultNodeName(t *testing.T) {
-	c := NewMicroshiftConfig()
+	c := NewDefault()
 	if !c.isDefaultNodeName() {
 		t.Errorf("expected default IsDefaultNodeName to be true")
 	}
 
-	c.NodeName += "-suffix"
+	c.Node.HostnameOverride += "-suffix"
 	if c.isDefaultNodeName() {
 		t.Errorf("expected default IsDefaultNodeName to be false")
+	}
+}
+
+func TestCanonicalNodeName(t *testing.T) {
+	hostname, _ := os.Hostname()
+
+	var ttests = []struct {
+		name     string
+		value    string
+		expected string
+	}{
+		{
+			name:     "default",
+			value:    "",
+			expected: strings.ToLower(hostname),
+		},
+		{
+			name:     "upper-case",
+			value:    "Hostname",
+			expected: "hostname",
+		},
+	}
+
+	for _, tt := range ttests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := NewDefault()
+			if tt.value != "" { // account for default
+				c.Node.HostnameOverride = tt.value
+			}
+			assert.Equal(t, tt.expected, c.CanonicalNodeName())
+		})
 	}
 }
 
@@ -245,8 +324,8 @@ func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
-	c := NewMicroshiftConfig()
-	c.NodeName = "node1"
+	c := NewDefault()
+	c.Node.HostnameOverride = "node1"
 
 	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err != nil {
 		t.Errorf("failed to validate node name on first call: %v", err)
@@ -255,7 +334,7 @@ func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 	nodeNameFile := filepath.Join(dataDir, ".nodename")
 	if data, err := os.ReadFile(nodeNameFile); err != nil {
 		t.Errorf("failed to read node name from file %q: %v", nodeNameFile, err)
-	} else if string(data) != c.NodeName {
+	} else if string(data) != c.Node.HostnameOverride {
 		t.Errorf("node name file doesn't match the node name in the saved file: %v", err)
 	}
 
@@ -263,7 +342,7 @@ func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 		t.Errorf("failed to validate node name on second call without changes: %v", err)
 	}
 
-	c.NodeName = "node2"
+	c.Node.HostnameOverride = "node2"
 	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err == nil {
 		t.Errorf("validation should have failed for nodename change: %v", err)
 	}
@@ -273,7 +352,7 @@ func TestMicroshiftConfigNodeNameValidationFromDefault(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
-	c := NewMicroshiftConfig()
+	c := NewDefault()
 
 	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
 		t.Errorf("failed to validate node name on first call: %v", err)
@@ -291,7 +370,7 @@ func TestMicroshiftConfigNodeNameValidationFromDefault(t *testing.T) {
 		t.Errorf("failed to validate node name on second call without changes: %v", err)
 	}
 
-	c.NodeName = "node2"
+	c.Node.HostnameOverride = "node2"
 	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
 		t.Errorf("validation should have failed in this case, it must be a warning in logs: %v", err)
 	}
@@ -301,8 +380,8 @@ func TestMicroshiftConfigNodeNameValidationBadName(t *testing.T) {
 	cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
-	c := NewMicroshiftConfig()
-	c.NodeName = "1.2.3.4"
+	c := NewDefault()
+	c.Node.HostnameOverride = "1.2.3.4"
 
 	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err == nil {
 		t.Errorf("failed to validate node name.")

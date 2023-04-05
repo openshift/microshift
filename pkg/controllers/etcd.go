@@ -40,9 +40,9 @@ type EtcdService struct {
 	memoryLimit uint64
 }
 
-func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
+func NewEtcd(cfg *config.Config) *EtcdService {
 	return &EtcdService{
-		memoryLimit: cfg.Etcd.MemoryLimit,
+		memoryLimit: cfg.Etcd.MemoryLimitMB,
 	}
 }
 
@@ -61,13 +61,13 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		return fmt.Errorf("%v failed to get exec path: %v", s.Name(), err)
 	}
 	etcdPath := filepath.Join(filepath.Dir(microshiftExecPath), "microshift-etcd")
-	// Not running the etcd binary directly, the proper etcd arguments are handled
-	//		in etcd/cmd/microshift-etcd/run.go.
+	// Not running the etcd binary directly, the proper etcd arguments
+	// are handled in etcd/cmd/microshift-etcd/run.go.
 	args := []string{}
 
-	// If we're launching MicroShift as a service, we need to do the same
-	//		with etcd, so wrap it in a transient systemd-unit that's tied
-	//		to the MicroShift service lifetime.
+	// If we're launching MicroShift as a service, we need to do the
+	// same with etcd, so wrap it in a transient systemd-unit that's
+	// tied to the MicroShift service lifetime.
 	var exe string
 	if runningAsSvc {
 		args = append(args,
@@ -89,6 +89,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	}
 	args = append(args, "run")
 	// Not using context as canceling ctx sends SIGKILL to process
+	klog.Infof("starting etcd via %s with args %v", exe, args)
 	cmd := exec.Command(exe, args...)
 
 	wd, err := os.Getwd()

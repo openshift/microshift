@@ -20,15 +20,15 @@ var templateFuncs = map[string]interface{}{
 	"Sha256sum": func(s string) string { return fmt.Sprintf("%x", sha256.Sum256([]byte(s))) },
 }
 
-func renderParamsFromConfig(cfg *config.MicroshiftConfig, extra assets.RenderParams) assets.RenderParams {
+func renderParamsFromConfig(cfg *config.Config, extra assets.RenderParams) assets.RenderParams {
 	params := map[string]interface{}{
 		"ReleaseImage": release.Image,
-		"NodeName":     cfg.NodeName,
-		"NodeIP":       cfg.NodeIP,
-		"ClusterCIDR":  cfg.Cluster.ClusterCIDR,
-		"ServiceCIDR":  cfg.Cluster.ServiceCIDR,
-		"ClusterDNS":   cfg.Cluster.DNS,
-		"BaseDomain":   cfg.BaseDomain,
+		"NodeName":     cfg.CanonicalNodeName(),
+		"NodeIP":       cfg.Node.NodeIP,
+		"ClusterCIDR":  cfg.Network.ClusterNetwork[0].CIDR,
+		"ServiceCIDR":  cfg.Network.ServiceNetwork[0],
+		"ClusterDNS":   cfg.Network.DNS,
+		"BaseDomain":   cfg.DNS.BaseDomain,
 	}
 	for k, v := range extra {
 		params[k] = v

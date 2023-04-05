@@ -51,7 +51,7 @@ type KubeletServer struct {
 	kubeconfig   *kubeletconfig.KubeletConfiguration
 }
 
-func NewKubeletServer(cfg *config.MicroshiftConfig) *KubeletServer {
+func NewKubeletServer(cfg *config.Config) *KubeletServer {
 	s := &KubeletServer{}
 	s.configure(cfg)
 	return s
@@ -60,7 +60,7 @@ func NewKubeletServer(cfg *config.MicroshiftConfig) *KubeletServer {
 func (s *KubeletServer) Name() string           { return componentKubelet }
 func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
+func (s *KubeletServer) configure(cfg *config.Config) {
 
 	if err := s.writeConfig(cfg); err != nil {
 		klog.Fatalf("Failed to write kubelet config", err)
@@ -74,8 +74,8 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	kubeletFlags.BootstrapKubeconfig = cfg.KubeConfigPath(config.Kubelet)
 	kubeletFlags.KubeConfig = cfg.KubeConfigPath(config.Kubelet)
 	kubeletFlags.RuntimeCgroups = "/system.slice/crio.service"
-	kubeletFlags.HostnameOverride = cfg.NodeName
-	kubeletFlags.NodeIP = cfg.NodeIP
+	kubeletFlags.HostnameOverride = cfg.Node.HostnameOverride
+	kubeletFlags.NodeIP = cfg.Node.NodeIP
 	kubeletFlags.ContainerRuntime = "remote"
 	kubeletFlags.RemoteRuntimeEndpoint = "unix:///var/run/crio/crio.sock"
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/control-plane"] = ""
@@ -93,7 +93,7 @@ func (s *KubeletServer) configure(cfg *config.MicroshiftConfig) {
 	s.kubeletflags = kubeletFlags
 }
 
-func (s *KubeletServer) writeConfig(cfg *config.MicroshiftConfig) error {
+func (s *KubeletServer) writeConfig(cfg *config.Config) error {
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
 	servingCertDir := cryptomaterial.KubeletServingCertDir(certsDir)
 
@@ -111,7 +111,7 @@ cgroupDriver: "systemd"
 failSwapOn: false
 volumePluginDir: ` + microshiftDataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
-  - ` + cfg.Cluster.DNS + `
+  - ` + cfg.Network.DNS + `
 clusterDomain: cluster.local
 containerLogMaxSize: 50Mi
 maxPods: 250

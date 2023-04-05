@@ -37,7 +37,7 @@ func TestKCMDefaultConfigAsset(t *testing.T) {
 }
 
 func TestConfigure(t *testing.T) {
-	cfg := config.NewMicroshiftConfig()
+	cfg := config.NewDefault()
 	kcm := NewKubeControllerManager(cfg)
 
 	clusterSigningKey, clusterSigningCert := kcmClusterSigningCertKeyAndFile()

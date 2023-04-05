@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"k8s.io/klog/v2"
+	"sigs.k8s.io/yaml"
 )
 
 const (
@@ -28,12 +30,20 @@ const (
 )
 
 func NewRunMicroshiftCommand() *cobra.Command {
-	cfg := config.NewMicroshiftConfig()
-
 	cmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run MicroShift",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.ActiveConfig()
+			if err != nil {
+				return err
+			}
+			// Things to very badly if the node's name has changed
+			// since the last time the server started.
+			err = cfg.EnsureNodeNameHasNotChanged()
+			if err != nil {
+				return err
+			}
 			return RunMicroshift(cfg)
 		},
 	}
@@ -41,28 +51,37 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	return cmd
 }
 
-func RunMicroshift(cfg *config.MicroshiftConfig) error {
-	if err := cfg.ReadAndValidate(config.GetConfigFile()); err != nil {
-		klog.Fatalf("Error in reading or validating configuration: %v", err)
+func logConfig(cfg *config.Config) {
+	marshalled, err := yaml.Marshal(cfg)
+	if err != nil {
+		klog.Fatal(err)
 	}
+	klog.Info("Effective configuration:")
+	for _, line := range strings.Split(string(marshalled), "\n") {
+		klog.Info(line)
+	}
+}
 
+func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
+
+	logConfig(cfg)
 
 	// TO-DO: When multi-node is ready, we need to add the controller host-name/mDNS hostname
 	//        or VIP to this list on start
 	//        see https://github.com/openshift/microshift/pull/471
 
 	if err := util.AddToNoProxyEnv(
-		cfg.NodeIP,
-		cfg.NodeName,
-		cfg.Cluster.ClusterCIDR,
-		cfg.Cluster.ServiceCIDR,
+		cfg.Node.NodeIP,
+		cfg.Node.HostnameOverride,
+		cfg.Network.ClusterNetwork[0].CIDR,
+		cfg.Network.ServiceNetwork[0],
 		".svc",
 		".cluster.local",
-		"."+cfg.BaseDomain); err != nil {
+		"."+cfg.DNS.BaseDomain); err != nil {
 		klog.Fatal(err)
 	}
 
