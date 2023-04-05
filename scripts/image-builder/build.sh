@@ -295,7 +295,7 @@ for f in openshift-local microshift-local custom-rpms ; do
 done
 
 title "Preparing blueprints"
-cp -f "${SCRIPTDIR}/config/{blueprint_v0.0.1.toml,installer.toml}" .
+cp -f "${SCRIPTDIR}"/config/{blueprint_v0.0.1.toml,installer.toml} .
 if [ -n "${CUSTOM_RPM_FILES}" ] ; then
     for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
         rpm_name=$(rpm -qp "${rpm}" --queryformat "%{NAME}")
