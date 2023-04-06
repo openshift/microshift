@@ -36,8 +36,8 @@ prechecks() {
 
     # Just warning for now
     # Following functions needed only for runs in CI
-    function_should_be_exported firewall::open_port
-    function_should_be_exported firewall::close_port
+    function_should_be_exported firewall::open_port || true
+    function_should_be_exported firewall::close_port || true
 }
 
 microshift_get_konfig() {
