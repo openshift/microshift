@@ -6,14 +6,14 @@ set -x
 
 SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
-_RETRIES=5
-_BACKOFF=20
+RETRIES=5
+BACKOFF=20
 
 wait_until() {
     local cmd=$*
-    for _ in $(seq "${_RETRIES}"); do
+    for _ in $(seq "${RETRIES}"); do
         ${cmd} && return 0
-        sleep "${_BACKOFF}"
+        sleep "${BACKOFF}"
     done
     return 1
 }
