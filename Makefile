@@ -145,7 +145,7 @@ verify-sh:
 .PHONY: verify-py
 verify-py:
 	@if ! command -v pylint &>/dev/null; then \
-		pip install pylint ; \
+		pip3 install pylint ; \
 	fi
 	pylint $$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
 

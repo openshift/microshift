@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=line-too-long
 
 """
 This script verifies all the assets for auto-rebase.

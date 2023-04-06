@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pylint: disable=too-few-public-methods, broad-except
+# pylint: disable=too-few-public-methods, broad-except, line-too-long
 """
 This script provides various functions for Automatic MicroShift bug JIRA cloner.
 
@@ -349,9 +349,9 @@ if __name__ == '__main__':
         print("No automatic actions to perform.")
         sys.exit(0)
 
-    answer = ''
+    answer = ''                         #pylint: disable=invalid-name
     if args.auto_accept:
-        answer = 'y'
+        answer = 'y'                    #pylint: disable=invalid-name
     while answer not in ['y', 'n']:
         answer = input(f'Perform {len(actions_list)} non manual actions? [Y/N]').lower()
     if answer == 'n':

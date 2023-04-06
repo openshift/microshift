@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # pylint: disable=fixme,global-statement,too-many-statements,too-many-locals,broad-except
-# pylint: disable=logging-fstring-interpolation,logging-not-lazy
+# pylint: disable=logging-fstring-interpolation,logging-not-lazy,line-too-long
 
 """
 This Python script automates the process of rebasing a Git branch
