@@ -49,16 +49,31 @@ var_should_not_be_empty() {
 function_should_be_exported() {
     local fname=${1}
     if ! declare -F "$fname"; then
-        echo >&2 "Function '$fname' is unexported. It is expected that function is provided for interacting with cloud provider"
+        log "WARNING: Function '$fname' is unexported. It is expected that function is provided for interacting with cloud provider"
         return 1
     fi
 }
 
+check_passwordless_ssh() {
+    ssh -o BatchMode=yes "$USHIFT_USER@$USHIFT_IP" "true" || {
+        echo "Failed to access ${USHIFT_IP}:"
+        echo "  - Test runner should have MicroShift's sshd key in ~/.ssh/known_keys"
+        echo "  - Remote \$USHIFT_USER should have test runner's key in ~/.ssh/authorized_keys"
+        exit 1
+    }
+}
+
+check_passwordless_sudo() {
+    ssh -o BatchMode=yes "$USHIFT_USER@$USHIFT_IP" "sudo --non-interactive true" || {
+        echo "Failed to run sudo command as ${USHIFT_USER} without password"
+        exit 1
+    }
+}
+
 prechecks() {
-    var_should_not_be_empty USHIFT_IP || exit 1
-    var_should_not_be_empty USHIFT_USER || exit 1
-    # TODO Check passwordless SSH
-    # TODO Check passwordless sudo
+    var_should_not_be_empty USHIFT_IP && var_should_not_be_empty USHIFT_USER || exit 1
+    check_passwordless_ssh
+    check_passwordless_sudo
 
     # Just warning for now
     # Following functions needed only for runs in CI
