@@ -98,7 +98,7 @@ microshift_health_summary() {
 run_test() {
     local test=$1
     echo -e "\n\n=================================================="
-    log "${test} - RUNNING"
+    log "${test} - PREPARING"
 
     local test_output="${OUTPUT_DIR}/${test}/"
     mkdir -p "${test_output}"
@@ -110,7 +110,9 @@ run_test() {
     konfig=$(microshift_get_konfig)
     trap 'rm -f "${konfig}"' RETURN
     prep_dur=$(($(date +%s) - prep_start))
+    log "Cleanup, setup, and readiness took $((prep_dur / 60))m $((prep_dur % 60))s."
 
+    log "${test} - RUNNING"
     test_start=$(date +%s)
     set +e
     KUBECONFIG="$konfig" "${SCRIPT_DIR}/tests/${test}" &>"${test_output}/0010-test.log"
@@ -118,8 +120,7 @@ run_test() {
     set -e
     test_dur=$(($(date +%s) - test_start))
 
-    log "${test} took $((test_dur / 60))m $((test_dur % 60))s." \
-        "Setup and readiness took $((prep_dur / 60))m $((prep_dur % 60))s."
+    log "${test} took $((test_dur / 60))m $((test_dur % 60))s."
     if [ $res -eq 0 ]; then
         log "${test} - SUCCESS"
         return 0
