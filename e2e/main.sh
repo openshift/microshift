@@ -103,20 +103,23 @@ run_test() {
     local test_output="${OUTPUT_DIR}/${test}/"
     mkdir -p "${test_output}"
 
+    prep_start=$(date +%s)
     microshift_cleanup "${test_output}"
     microshift_setup "${test_output}"
     microshift_check_readiness "${test_output}"
     konfig=$(microshift_get_konfig)
     trap 'rm -f "${konfig}"' RETURN
+    prep_dur=$(($(date +%s) - prep_start))
 
-    start=$(date +%s)
+    test_start=$(date +%s)
     set +e
     KUBECONFIG="$konfig" "${SCRIPT_DIR}/tests/${test}" &>"${test_output}/0010-test.log"
     res=$?
     set -e
+    test_dur=$(($(date +%s) - test_start))
 
-    duration_total_seconds=$(($(date +%s) - start))
-    log "${test} - took ${duration_total_seconds}s"
+    log "${test} took $((test_dur / 60))m $((test_dur % 60))s." \
+        "Setup and readiness took $((prep_dur / 60))m $((prep_dur % 60))s."
     if [ $res -eq 0 ]; then
         log "${test} - SUCCESS"
         return 0
