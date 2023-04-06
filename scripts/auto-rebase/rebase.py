@@ -80,8 +80,7 @@ def run_rebase_sh(release_amd64, release_arm64, release_lvms):
                  f"{result.stdout}" +
                  "==================================================\n")
     end = timer() - start
-    logging.info(f"Script returned code: {result.returncode}. " +
-                 f"It ran for {end/60:.0f}m{end%60:.0f}s.")
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
     return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
 
 
@@ -119,22 +118,22 @@ def rebase_script_made_changes_considered_functional(git_repo, base_branch):
     diffs = git_repo.active_branch.commit.diff(base_branch)
     logging.info(f"Following files changed: {[ d.a_path for d in diffs ]}")
 
-    for diff in diffs:
-        if 'scripts/auto-rebase/' in diff.a_path:
-            logging.info(f" - {diff.a_path} - ignoring")
+    for d in diffs:
+        if 'scripts/auto-rebase/' in d.a_path:
+            logging.info(f" - {d.a_path} - ignoring")
             continue
 
-        if "assets/release/release-" in diff.a_path:
-            old_images = set(json.loads(diff.a_blob.data_stream.read())['images'].items())
-            new_images = set(json.loads(diff.b_blob.data_stream.read())['images'].items())
-            diff_images = old_images ^ new_images
-            if not diff_images:
-                logging.info(f" - {diff.a_path} - images did not change - ignoring")
+        if "assets/release/release-" in d.a_path:
+            old_images = set(json.loads(d.a_blob.data_stream.read())['images'].items())
+            new_images = set(json.loads(d.b_blob.data_stream.read())['images'].items())
+            diff = old_images ^ new_images
+            if not diff:
+                logging.info(f" - {d.a_path} - images did not change - ignoring")
                 continue
-            logging.info(f" - {diff.a_path} - images changed")
+            logging.info(f" - {d.a_path} - images changed")
             return True
 
-        logging.info(f" - File {diff.a_path} is considered functional")
+        logging.info(f" - File {d.a_path} is considered functional")
         return True
 
     return False

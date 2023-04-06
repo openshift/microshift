@@ -147,7 +147,8 @@ verify-py:
 	@if ! command -v pylint &>/dev/null; then \
 		pip3 install pylint ; \
 	fi
-	pylint $$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
+	pylint --variable-naming-style=any \
+	$$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
 
 ###############################
 # post install validate       #

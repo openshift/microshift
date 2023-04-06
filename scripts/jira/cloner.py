@@ -39,13 +39,13 @@ def is_original_issue(issue):
 
 def get_clone_by_issues(issue, connection):
     """Returns a list of clone issues for the given issue."""
-    lst = []
+    l = []
     for link in issue.fields.issuelinks:
         if link.type.name != 'Cloners':
             continue
         if hasattr(link, 'inwardIssue'):
-            lst.append(connection.issue(link.inwardIssue.key))
-    return lst
+            l.append(connection.issue(link.inwardIssue.key))
+    return l
 
 def get_assignee(issue):
     """Returns the email address of the assignee of the given issue."""
@@ -55,21 +55,21 @@ def get_assignee(issue):
 
 def get_fix_versions(issue):
     """Returns a list of fix versions for the given issue."""
-    lst = []
+    l = []
     if hasattr(issue.fields, 'fixVersions') and issue.fields.fixVersions is not None:
         for fver in issue.fields.fixVersions:
             if hasattr(fver, 'name'):
-                lst.append(fver.name)
-    return sorted(lst)[::-1]
+                l.append(fver.name)
+    return sorted(l)[::-1]
 
 def get_target_versions(issue):
     """Returns a list of target versions for the given issue."""
-    lst = []
+    l = []
     if hasattr(issue.fields, 'customfield_12319940') and issue.fields.customfield_12319940 is not None:
         for tver in issue.fields.customfield_12319940:
             if hasattr(tver, 'name'):
-                lst.append(tver.name)
-    return lst
+                l.append(tver.name)
+    return l
 
 def get_parent_issue(issue, connection):
     """Returns the parent issue for the given issue."""
