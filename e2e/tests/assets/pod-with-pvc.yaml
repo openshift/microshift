@@ -18,17 +18,18 @@ metadata:
   namespace: default
 spec:
   securityContext:
-    runAsNonRoot: false # TODO pick different image
+    runAsNonRoot: true
     privileged: false
-    capabilities:
-      drop:
-      - 'ALL'
-    allowPrivilegeEscalation: false
     seccompProfile:
       type: RuntimeDefault
   containers:
   - name: test-container
-    image: quay.io/openshifttest/hello-openshift:1.2.0
+    image: nginxinc/nginx-unprivileged:latest
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
     command:
     - sh
     - -c

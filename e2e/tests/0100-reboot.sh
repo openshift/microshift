@@ -23,9 +23,6 @@ cleanup() {
 }
 trap 'cleanup' EXIT
 
-# TODO: Remove the labels again once https://issues.redhat.com/browse/OCPBUGS-1969 has been fixed upstream
-oc label namespaces default "pod-security.kubernetes.io/"{enforce,audit,warn}"-version=v1.24"
-oc label namespaces default "pod-security.kubernetes.io/"{enforce,audit,warn}"=privileged"
 oc create -f "${SCRIPT_PATH}/assets/pod-with-pvc.yaml"
 oc wait --for=condition=Ready --timeout=120s pod/test-pod
 
