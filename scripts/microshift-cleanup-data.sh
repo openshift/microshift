@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_NAME=$(basename $0)
+SCRIPT_NAME=$(basename "$0")
 # The 'openshift-ovn-kubernetes' namespace must be in the end of the list
 # to allow for pod deletion when MicroShift is stopped
 PODS_NS_LIST=(openshift-service-ca openshift-ingress openshift-dns openshift-storage openshift-ovn-kubernetes)
@@ -46,16 +46,17 @@ function stop_clean_pods() {
     # of processes (i.e. conmon, etc.) that use the files under /var/run/ovn.
     # The cleanup of OVN data only works if the files under /var/run/ovn are not in use.
     echo Removing MicroShift pods
-    for i in ${!PODS_NS_LIST[@]}; do
-        ns=${PODS_NS_LIST[$i]}    
-
+    for i in "${!PODS_NS_LIST[@]}"; do
+        local ns
+        ns=${PODS_NS_LIST[${i}]}
         retries=5
         while [ ${retries} -gt 0 ] ; do
-            ocp_pods=$(crictl pods --namespace ${ns} -q)
-            if [ "$(echo ${ocp_pods} | wc -w)" -eq 0 ] ; then
+            local ocp_pods
+            ocp_pods=$(crictl pods --namespace "${ns}" -q)
+            if [ "$(echo "${ocp_pods}" | wc -w)" -eq 0 ] ; then
                 break
             fi
-            crictl rmp -f ${ocp_pods} &>/dev/null
+            crictl rmp -f "${ocp_pods}" &>/dev/null
             retries=$(( retries - 1 ))
         done
     done
@@ -106,7 +107,7 @@ case $1 in
 esac
 
 # Exit if the current user is not 'root'
-if [ $(id -u) -ne 0 ] ; then
+if [ "$(id -u)" -ne 0 ] ; then
     echo "The '${SCRIPT_NAME}' script must be run with the 'root' user privileges"
     exit 1
 fi

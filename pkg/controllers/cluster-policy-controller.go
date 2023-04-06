@@ -35,7 +35,7 @@ type ClusterPolicyController struct {
 	configErr error
 }
 
-func NewClusterPolicyController(cfg *config.MicroshiftConfig) *ClusterPolicyController {
+func NewClusterPolicyController(cfg *config.Config) *ClusterPolicyController {
 	s := &ClusterPolicyController{}
 	s.configErr = s.configure(cfg)
 	return s
@@ -44,7 +44,7 @@ func NewClusterPolicyController(cfg *config.MicroshiftConfig) *ClusterPolicyCont
 func (s *ClusterPolicyController) Name() string           { return "cluster-policy-controller" }
 func (s *ClusterPolicyController) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *ClusterPolicyController) configure(cfg *config.MicroshiftConfig) error {
+func (s *ClusterPolicyController) configure(cfg *config.Config) error {
 	s.kubeconfig = cfg.KubeConfigPath(config.ClusterPolicyController)
 
 	scheme := runtime.NewScheme()

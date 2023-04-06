@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=all
 
 # Taken from utils.sh in openshift-metal3/dev-scripts
 

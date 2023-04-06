@@ -24,10 +24,10 @@ import (
 )
 
 type OpenShiftCRDManager struct {
-	cfg *config.MicroshiftConfig
+	cfg *config.Config
 }
 
-func NewOpenShiftCRDManager(cfg *config.MicroshiftConfig) *OpenShiftCRDManager {
+func NewOpenShiftCRDManager(cfg *config.Config) *OpenShiftCRDManager {
 	s := &OpenShiftCRDManager{}
 	s.cfg = cfg
 	return s

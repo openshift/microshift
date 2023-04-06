@@ -6,44 +6,46 @@ IFS=$'\n\t'
 ARCH="$(uname -p)"
 
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
-DEST_DIR="$(realpath "${DEST_DIR:-${SCRIPT_DIR}/../_output/bin}")"
+DEST_DIR="${DEST_DIR:-${SCRIPT_DIR}/../_output/bin}"
+[ -d "${DEST_DIR}" ] || mkdir -p "${DEST_DIR}"
+DEST_DIR="$(realpath "${DEST_DIR}")"
 
 _install() {
     local url="$1"
     local checksum="$2"
     local filename="$3"
     local initial_filename="$4"
-    local dest="$DEST_DIR/$filename"
+    local dest="${DEST_DIR}/${filename}"
 
     [[ -e "${dest}" ]] && return 0
-    echo "Installing $filename to $DEST_DIR"
+    echo "Installing ${filename} to ${DEST_DIR}"
 
     tmp=$(mktemp -d)
     trap 'rm -rfv ${tmp} &>/dev/null' EXIT
 
-    filename="$(basename "$url")"
-    echo -n "$checksum -" >"$tmp/checksum.txt"
+    filename="$(basename "${url}")"
+    echo -n "${checksum} -" >"${tmp}/checksum.txt"
 
-    curl -sSfLO --retry 5 --retry-all-errors --retry-delay 3 --output-dir "${tmp}" "${url}"
+    curl -sSfL --retry 5 --retry-delay 3 -o "${tmp}/${filename}" "${url}"
 
-    if ! sha256sum -c "${tmp}/checksum.txt" < "$tmp/$filename" &>/dev/null; then
-        echo "  Checksum for $filename doesn't match"
-        echo "    Expected: $checksum"
-        echo "         Got: $(sha256sum < "$tmp/$filename" | cut -d' ' -f1)"
+    if ! sha256sum -c "${tmp}/checksum.txt" < "${tmp}/${filename}" &>/dev/null; then
+        echo "  Checksum for ${filename} doesn't match"
+        echo "    Expected: ${checksum}"
+        echo "         Got: $(sha256sum < "${tmp}/${filename}" | cut -d' ' -f1)"
         return 1
     fi
 
     # Check type of downloaded file - if it's not executable, then assume it is an archive and needs extracting
-    if [[ "$(file --brief --mime-type "$tmp/$filename")" != "application/x-executable" ]]; then
+    if [[ "$(file --brief --mime-type "${tmp}/${filename}")" != "application/x-executable" ]]; then
         # Extract binary from the archive. 
-        # --transform removes any leading dirs leaving just filenames so binary is extracted directly into $tmp
+        # --transform removes any leading dirs leaving just filenames so binary is extracted directly into ${tmp}
         # --wildcards match binary's name so only that file is extracted
-        (cd "$tmp" && tar xvf "$filename" --transform 's,.*\/,,g' --wildcards "*/$initial_filename" >/dev/null)
+        (cd "${tmp}" && tar xvf "${filename}" --transform 's,.*\/,,g' --wildcards "*/${initial_filename}" >/dev/null)
     fi
 
-    chmod +x "$tmp/$initial_filename"
-    mkdir -p "$(dirname "$dest")"
-    mv "$tmp/$initial_filename" "$dest"
+    chmod +x "${tmp}/${initial_filename}"
+    mkdir -p "$(dirname "${dest}")"
+    mv "${tmp}/${initial_filename}" "${dest}"
 }
 
 get_golangci-lint() {
@@ -56,13 +58,13 @@ get_golangci-lint() {
         ["x86_64"]="amd64" 
         ["aarch64"]="arm64")
 
-    local arch="${arch_map[$ARCH]}"
-    local checksum="${checksums[$ARCH]}"
+    local arch="${arch_map[${ARCH}]}"
+    local checksum="${checksums[${ARCH}]}"
     local filename="golangci-lint"
 
     local url="https://github.com/golangci/golangci-lint/releases/download/v${ver}/golangci-lint-${ver}-linux-${arch}.tar.gz"
 
-    _install "$url" "$checksum" "$filename" "$filename"
+    _install "${url}" "${checksum}" "${filename}" "${filename}"
 }
 
 get_shellcheck() {
@@ -75,12 +77,12 @@ get_shellcheck() {
         ["x86_64"]="x86_64"
         ["aarch64"]="aarch64")
 
-    local arch="${arch_map[$ARCH]}"
-    local checksum="${checksums[$ARCH]}"
+    local arch="${arch_map[${ARCH}]}"
+    local checksum="${checksums[${ARCH}]}"
     local filename="shellcheck"
-    local url="https://github.com/koalaman/shellcheck/releases/download/$ver/shellcheck-$ver.linux.$arch.tar.xz"
+    local url="https://github.com/koalaman/shellcheck/releases/download/${ver}/shellcheck-${ver}.linux.${arch}.tar.xz"
 
-    _install "$url" "$checksum" "$filename" "$filename"
+    _install "${url}" "${checksum}" "${filename}" "${filename}"
 }
 
 get_kuttl() {
@@ -93,12 +95,12 @@ get_kuttl() {
         ["x86_64"]="x86_64" 
         ["aarch64"]="arm64")
 
-    local arch="${arch_map[$ARCH]}"
-    local checksum="${checksums[$ARCH]}"
+    local arch="${arch_map[${ARCH}]}"
+    local checksum="${checksums[${ARCH}]}"
     local filename="kuttl"
     local url="https://github.com/kudobuilder/kuttl/releases/download/v${ver}/kubectl-kuttl_${ver}_linux_${arch}"
 
-    _install "$url" "$checksum" "$filename" "kubectl-kuttl_${ver}_linux_${arch}"
+    _install "${url}" "${checksum}" "${filename}" "kubectl-kuttl_${ver}_linux_${arch}"
 }
 
 get_yq() {
@@ -111,12 +113,12 @@ get_yq() {
         ["x86_64"]="amd64" 
         ["aarch64"]="arm64")
 
-    local arch="${arch_map[$ARCH]}"
-    local checksum="${checksums[$ARCH]}"
+    local arch="${arch_map[${ARCH}]}"
+    local checksum="${checksums[${ARCH}]}"
     local filename="yq"
     local url="https://github.com/mikefarah/yq/releases/download/v${ver}/yq_linux_${arch}.tar.gz"
 
-    _install "$url" "$checksum" "$filename" "yq_linux_${arch}"
+    _install "${url}" "${checksum}" "${filename}" "yq_linux_${arch}"
 }
 
 tool_getters=$(declare -F |  cut -d' ' -f3 | grep "get_" | sed 's/get_//g')
@@ -125,33 +127,34 @@ usage() {
     local msg="${1:-}"
     echo "Script for downloading various tools"
     echo ""
-    echo "Usage: $(basename $0) <all | specific-tool...>"
-    echo "Destination can be changed using DEST_DIR environmental variable. Default: '$DEST_DIR'"
+    echo "Usage: $(basename "$0") <all | specific-tool...>"
+    echo "Destination can be changed using DEST_DIR environmental variable. Default: '${DEST_DIR}'"
     echo ""
     echo "Tools: "
-    echo "$tool_getters" | sed 's/^/ - /g'
+    # shellcheck disable=SC2001
+    echo "${tool_getters}" | sed 's/^/ - /g'
 
-    [ ! -z "$msg" ] && echo -e "\nERROR: $msg"
+    [ -n "${msg}" ] && echo -e "\nERROR: ${msg}"
     exit 1
 }
 
 [[ "$(uname -o)" == "GNU/Linux" ]] || { echo "Script only runs on Linux"; exit 1; }
-[[ "$ARCH" =~ x86_64|aarch64 ]] || { echo "Only x86_64 and aarch64 architectures are supported"; exit 1; }
+[[ "${ARCH}" =~ x86_64|aarch64 ]] || { echo "Only x86_64 and aarch64 architectures are supported"; exit 1; }
 
 [ $# -eq 0 ] && usage "Expected at least one argument"
 
 tools_to_install=()
 if echo "$@" | grep -q all; then
-    readarray -t tools_to_install <<<"$tool_getters"
+    readarray -t tools_to_install <<<"${tool_getters}"
 else
     for arg in "$@"; do 
-        if ! echo "$tool_getters" | grep -q "$arg" || [ "$(echo "$tool_getters" | grep "$arg")" != "$arg" ]; then
-            usage "Unknown tool: $arg"
+        if ! echo "${tool_getters}" | grep -q "${arg}" || [ "$(echo "${tool_getters}" | grep "${arg}")" != "${arg}" ]; then
+            usage "Unknown tool: ${arg}"
         fi
-        tools_to_install+=("$arg")
+        tools_to_install+=("${arg}")
     done
 fi
 
 for f in "${tools_to_install[@]}"; do
-    "get_$f"
+    "get_${f}"
 done

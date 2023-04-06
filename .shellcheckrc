@@ -1,0 +1,2 @@
+# Enforce styling by suggesting ${VAR} in place of $VAR
+enable=require-variable-braces

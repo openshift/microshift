@@ -22,11 +22,11 @@ import (
 )
 
 func NewRunEtcdCommand() *cobra.Command {
-	cfg := config.NewMicroshiftConfig()
 	cmd := &cobra.Command{
 		Use: "run",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			if err := cfg.ReadAndValidate(config.GetConfigFile()); err != nil {
+			cfg, err := config.ActiveConfig()
+			if err != nil {
 				klog.Fatalf("Error in reading and validating MicroShift config: %v", err)
 			}
 
@@ -52,10 +52,9 @@ type EtcdService struct {
 	minDefragBytes          int64
 	maxFragmentedPercentage float64
 	defragCheckFreq         time.Duration
-	doStartupDefrag         bool
 }
 
-func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
+func NewEtcd(cfg *config.Config) *EtcdService {
 	s := &EtcdService{}
 	s.configure(cfg)
 	return s
@@ -63,11 +62,10 @@ func NewEtcd(cfg *config.MicroshiftConfig) *EtcdService {
 
 func (s *EtcdService) Name() string { return "etcd" }
 
-func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
+func (s *EtcdService) configure(cfg *config.Config) {
 	s.minDefragBytes = cfg.Etcd.MinDefragBytes
 	s.maxFragmentedPercentage = cfg.Etcd.MaxFragmentedPercentage
 	s.defragCheckFreq = cfg.Etcd.DefragCheckFreq
-	s.doStartupDefrag = cfg.Etcd.DoStartupDefrag
 
 	microshiftDataDir := config.GetDataDir()
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
@@ -92,8 +90,8 @@ func (s *EtcdService) configure(cfg *config.MicroshiftConfig) {
 	s.etcdCfg.LCUrls = url2379
 	s.etcdCfg.ListenMetricsUrls = setURL([]string{"localhost"}, "2381")
 
-	s.etcdCfg.Name = cfg.NodeName
-	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.NodeName, "localhost")
+	s.etcdCfg.Name = cfg.Node.HostnameOverride
+	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.Node.HostnameOverride, "localhost")
 
 	s.etcdCfg.CipherSuites = tlsCipherSuites
 	s.etcdCfg.ClientTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdServingCertDir)
@@ -120,13 +118,11 @@ func (s *EtcdService) Run() error {
 		<-e.Server.StopNotify()
 	}()
 
-	// If we were told to, go ahead and do a defragment now.
-	if s.doStartupDefrag {
-		if err := e.Server.Backend().Defrag(); err != nil {
-			err = fmt.Errorf("initial defragmentation failed: %v", err)
-			klog.Error(err)
-			return err
-		}
+	// Go ahead and do a defragment now.
+	if err := e.Server.Backend().Defrag(); err != nil {
+		err = fmt.Errorf("initial defragmentation failed: %v", err)
+		klog.Error(err)
+		return err
 	}
 
 	// Start up the defrag controller.

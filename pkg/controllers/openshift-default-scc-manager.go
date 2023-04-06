@@ -24,10 +24,10 @@ import (
 )
 
 type OpenShiftDefaultSCCManager struct {
-	cfg *config.MicroshiftConfig
+	cfg *config.Config
 }
 
-func NewOpenShiftDefaultSCCManager(cfg *config.MicroshiftConfig) *OpenShiftDefaultSCCManager {
+func NewOpenShiftDefaultSCCManager(cfg *config.Config) *OpenShiftDefaultSCCManager {
 	s := &OpenShiftDefaultSCCManager{}
 	s.cfg = cfg
 	return s
@@ -51,7 +51,7 @@ func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struc
 	return ctx.Err()
 }
 
-func ApplyDefaultSCCs(cfg *config.MicroshiftConfig) error {
+func ApplyDefaultSCCs(cfg *config.Config) error {
 	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
 	var (
 		clusterRole = []string{

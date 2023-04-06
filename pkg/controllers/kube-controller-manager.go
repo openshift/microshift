@@ -49,7 +49,7 @@ type KubeControllerManager struct {
 	configureErr error
 }
 
-func NewKubeControllerManager(cfg *config.MicroshiftConfig) *KubeControllerManager {
+func NewKubeControllerManager(cfg *config.Config) *KubeControllerManager {
 	s := &KubeControllerManager{}
 	// TODO: manage and invoke the configure bits independently outside of this.
 	s.args, s.applyFn, s.configureErr = configure(cfg)
@@ -74,7 +74,7 @@ func kcmServiceAccountPrivateKeyFile() string {
 	return microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"
 }
 
-func configure(cfg *config.MicroshiftConfig) (args []string, applyFn func() error, err error) {
+func configure(cfg *config.Config) (args []string, applyFn func() error, err error) {
 	kubeConfig := cfg.KubeConfigPath(config.KubeControllerManager)
 	clusterSigningKey, clusterSigningCert := kcmClusterSigningCertKeyAndFile()
 
@@ -85,7 +85,7 @@ func configure(cfg *config.MicroshiftConfig) (args []string, applyFn func() erro
 			"authorization-kubeconfig":         {kubeConfig},
 			"service-account-private-key-file": {kcmServiceAccountPrivateKeyFile()},
 			"allocate-node-cidrs":              {"true"},
-			"cluster-cidr":                     {cfg.Cluster.ClusterCIDR},
+			"cluster-cidr":                     {cfg.Network.ClusterNetwork[0].CIDR},
 			"root-ca-file":                     {kcmRootCAFile()},
 			"bind-address":                     {"127.0.0.1"},
 			"secure-port":                      {"10257"},
@@ -93,7 +93,7 @@ func configure(cfg *config.MicroshiftConfig) (args []string, applyFn func() erro
 			"use-service-account-credentials":  {"true"},
 			"cluster-signing-cert-file":        {clusterSigningCert},
 			"cluster-signing-key-file":         {clusterSigningKey},
-			"v":                                {strconv.Itoa(cfg.LogVLevel)},
+			"v":                                {strconv.Itoa(cfg.GetVerbosity())},
 		},
 	}
 

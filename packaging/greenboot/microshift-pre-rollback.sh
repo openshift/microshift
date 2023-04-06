@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e -o pipefail
 
-SCRIPT_NAME=$(basename $0)
+SCRIPT_NAME=$(basename "$0")
 
 # Source the MicroShift health check functions library
+# shellcheck source=packaging/greenboot/functions.sh
 source /usr/share/microshift/functions/greenboot.sh
 
 # Set the exit handler to log the exit status
@@ -15,8 +16,7 @@ trap 'script_exit' EXIT
 # args: None
 # return: None
 function script_exit() {
-    [ "$?" -ne 0 ] && status=FAILURE || status=FINISHED
-    echo $status
+    [ "$?" -ne 0 ] && echo "FAILURE" || echo "FINISHED"
 }
 
 #
@@ -24,7 +24,7 @@ function script_exit() {
 #
 
 # Exit if the current user is not 'root'
-if [ $(id -u) -ne 0 ] ; then
+if [ "$(id -u)" -ne 0 ] ; then
     echo "The '${SCRIPT_NAME}' script must be run with the 'root' user privileges"
     exit 1
 fi

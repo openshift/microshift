@@ -2,42 +2,42 @@
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-OUTDIR="${1:-$HOME/MicroShiftReviews}"
+OUTDIR="${1:-${HOME}/MicroShiftReviews}"
 
-if [ -z "$OUTDIR" ]; then
+if [ -z "${OUTDIR}" ]; then
     echo "Specify an output directory as the first argument to the script." 1>&2
     exit 1
 fi
 
-if [ -d "$OUTDIR" ]; then
-    echo "$OUTDIR already exists" 1>&2
+if [ -d "${OUTDIR}" ]; then
+    echo "${OUTDIR} already exists" 1>&2
     exit 1
 fi
 
-if [ -z "$GITHUB_TOKEN" ]; then
+if [ -z "${GITHUB_TOKEN}" ]; then
     echo "Set GITHUB_TOKEN variable" 1>&2
     exit 1
 fi
 
-echo "Creating $OUTDIR ..."
-mkdir -p "$OUTDIR"
-chmod 0700 "$OUTDIR"
+echo "Creating ${OUTDIR} ..."
+mkdir -p "${OUTDIR}"
+chmod 0700 "${OUTDIR}"
 
-echo "Creating $OUTDIR/venv ..."
-python3 -m venv "$OUTDIR/venv"
+echo "Creating ${OUTDIR}/venv ..."
+python3 -m venv "${OUTDIR}/venv"
 
 echo "Installing dinghy ..."
-"$OUTDIR/venv/bin/python3" -m pip install dinghy
+"${OUTDIR}/venv/bin/python3" -m pip install dinghy
 
 echo "Configuring dinghy ..."
-cp "$SCRIPTDIR/dinghy.yaml" "$OUTDIR/"
-cat - >"$OUTDIR/update.sh" <<EOF
+cp "${SCRIPTDIR}/dinghy.yaml" "${OUTDIR}/"
+cat - >"${OUTDIR}/update.sh" <<EOF
 #!/usr/bin/env bash
 
-export GITHUB_TOKEN="$GITHUB_TOKEN"
+export GITHUB_TOKEN="${GITHUB_TOKEN}"
 
-cd "$OUTDIR"
+cd "${OUTDIR}"
 
 ./venv/bin/python3 -m dinghy ./dinghy.yaml
 EOF
-chmod 0700 "$OUTDIR/update.sh"
+chmod 0700 "${OUTDIR}/update.sh"

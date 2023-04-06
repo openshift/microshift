@@ -22,6 +22,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"k8s.io/apiserver/pkg/authentication/serviceaccount"
@@ -36,7 +37,7 @@ import (
 
 var microshiftDataDir = config.GetDataDir()
 
-func initCerts(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, error) {
+func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 	certChains, err := certSetup(cfg)
 	if err != nil {
 		return nil, err
@@ -59,8 +60,8 @@ func initCerts(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 	return certChains, err
 }
 
-func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, error) {
-	_, svcNet, err := net.ParseCIDR(cfg.Cluster.ServiceCIDR)
+func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
+	_, svcNet, err := net.ParseCIDR(cfg.Network.ServiceNetwork[0])
 	if err != nil {
 		return nil, err
 	}
@@ -71,18 +72,18 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 	}
 
 	externalCertNames := []string{
-		cfg.NodeName,
-		"api." + cfg.BaseDomain,
+		cfg.Node.HostnameOverride,
+		"api." + cfg.DNS.BaseDomain,
 	}
-	externalCertNames = append(externalCertNames, cfg.SubjectAltNames...)
+	externalCertNames = append(externalCertNames, cfg.ApiServer.SubjectAltNames...)
 	// When Kube apiserver advertise address matches the node IP we can not add
 	// it to the certificates or else the internal pod access to apiserver is
 	// broken. Because of client-go not using SNI and the way apiserver handles
 	// which certificate to serve which destination IP, internal pods start
 	// getting the external certificate, which is signed by a different CA and
 	// does not match the hostname.
-	if cfg.KASAdvertiseAddress != cfg.NodeIP {
-		externalCertNames = append(externalCertNames, cfg.NodeIP)
+	if cfg.ApiServer.AdvertiseAddress != cfg.Node.NodeIP {
+		externalCertNames = append(externalCertNames, cfg.Node.NodeIP)
 	}
 
 	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
@@ -172,7 +173,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 						ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 					},
 					// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
-					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.NodeName, Groups: []string{"system:nodes"}},
+					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.CanonicalNodeName(), Groups: []string{"system:nodes"}},
 				},
 			).WithServingCertificates(
 				&certchains.ServingCertificateSigningRequestInfo{
@@ -180,7 +181,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 						Name:         "kubelet-server",
 						ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 					},
-					Hostnames: []string{cfg.NodeName, cfg.NodeIP},
+					Hostnames: []string{cfg.Node.HostnameOverride, cfg.Node.NodeIP},
 				},
 			),
 		),
@@ -229,7 +230,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
 				Hostnames: []string{
-					"*.apps." + cfg.BaseDomain, // wildcard for any additional auto-generated domains
+					"*.apps." + cfg.DNS.BaseDomain, // wildcard for any additional auto-generated domains
 				},
 			},
 		),
@@ -285,8 +286,8 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					"openshift.default",
 					"openshift.default.svc",
 					"openshift.default.svc.cluster.local",
-					"api." + cfg.BaseDomain,
-					"api-int." + cfg.BaseDomain,
+					"api." + cfg.DNS.BaseDomain,
+					"api-int." + cfg.DNS.BaseDomain,
 					apiServerServiceIP.String(),
 				},
 			},
@@ -314,7 +315,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-peer:etcd-client", Groups: []string{"system:etcd-peers"}},
-				Hostnames: []string{"localhost", cfg.NodeName},
+				Hostnames: []string{"localhost", cfg.Node.HostnameOverride},
 			},
 			&certchains.PeerCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -322,7 +323,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-server:etcd-client", Groups: []string{"system:etcd-servers"}},
-				Hostnames: []string{"localhost", cfg.NodeName},
+				Hostnames: []string{"localhost", cfg.Node.HostnameOverride},
 			},
 		),
 	).WithCABundle(
@@ -366,7 +367,7 @@ func certSetup(cfg *config.MicroshiftConfig) (*certchains.CertificateChains, err
 }
 
 func initKubeconfigs(
-	cfg *config.MicroshiftConfig,
+	cfg *config.Config,
 	certChains *certchains.CertificateChains,
 ) error {
 	externalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(microshiftDataDir))))
@@ -383,18 +384,14 @@ func initKubeconfigs(
 		return err
 	}
 
-	u, err := url.Parse(cfg.Cluster.URL)
+	u, err := url.Parse(cfg.ApiServer.URL)
 	if err != nil {
 		return fmt.Errorf("failed to parse cluster URL: %v", err)
 	}
-	apiServerPort, err := cfg.Cluster.ApiServerPort()
-	if err != nil {
-		return fmt.Errorf("failed to get apiserver port: %v", err)
-	}
 
 	// Generate one kubeconfigs per name
-	for _, name := range append(cfg.SubjectAltNames, cfg.NodeName) {
-		u.Host = fmt.Sprintf("%s:%d", name, apiServerPort)
+	for _, name := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
+		u.Host = net.JoinHostPort(name, strconv.Itoa(cfg.ApiServer.Port))
 		if err := util.KubeConfigWithClientCerts(
 			cfg.KubeConfigAdminPath(name),
 			u.String(),
@@ -408,7 +405,7 @@ func initKubeconfigs(
 
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeAdmin),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		adminKubeconfigCertPEM,
 		adminKubeconfigKeyPEM,
@@ -422,7 +419,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeControllerManager),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		kcmCertPEM,
 		kcmKeyPEM,
@@ -436,7 +433,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeScheduler),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		schedulerCertPEM, schedulerKeyPEM,
 	); err != nil {
@@ -449,7 +446,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.Kubelet),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		kubeletCertPEM, kubeletKeyPEM,
 	); err != nil {
@@ -461,7 +458,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.ClusterPolicyController),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		clusterPolicyControllerCertPEM, clusterPolicyControllerKeyPEM,
 	); err != nil {
@@ -474,7 +471,7 @@ func initKubeconfigs(
 	}
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.RouteControllerManager),
-		cfg.Cluster.URL,
+		cfg.ApiServer.URL,
 		internalTrustPEM,
 		routeControllerManagerCertPEM, routeControllerManagerKeyPEM,
 	); err != nil {
