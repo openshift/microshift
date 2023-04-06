@@ -6,7 +6,6 @@ set -o pipefail
 
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 OUTPUT_DIR="${ARTIFACT_DIR:-_output}/microshift-e2e-$(date +'%Y%m%d-%H%M%S')/"
-[ ! -d "${OUTPUT_DIR}" ] && mkdir -p "${OUTPUT_DIR}"
 
 log() {
     echo -e "$(date +'%H:%M:%S.%N')    $*"
@@ -142,6 +141,8 @@ run() {
     log "Following tests will run:\n$to_run"
 
     prechecks
+    [ ! -d "${OUTPUT_DIR}" ] && mkdir -p "${OUTPUT_DIR}"
+
     all_successful=true
     for t in $to_run; do
         run_test "${t}" || all_successful=false
