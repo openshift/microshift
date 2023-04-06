@@ -91,8 +91,7 @@ microshift_check_readiness() {
     local test_output="${1}"
     log "Waiting for MicroShift to become ready"
     ssh "${USHIFT_USER}@${USHIFT_IP}" \
-        "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh | \
-        while IFS= read -r line; do printf '%s %s\\n' \"\$(date +'%H:%M:%S.%N')\" \"\$line\"; done" &>"${test_output}/0002-readiness-check.log"
+        "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh" &>"${test_output}/0002-readiness-check.log"
 }
 
 microshift_setup() {
