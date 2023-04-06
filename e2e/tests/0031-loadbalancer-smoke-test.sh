@@ -29,7 +29,7 @@ for _ in $(seq "${RETRIES}"); do
     result=$?
     set -e
 
-    [ $result -eq 0 ] &&
+    [ ${result} -eq 0 ] &&
         echo "${response}" | grep -q -E "HTTP.*200" &&
         echo "${response}" | grep -q "Hello MicroShift" &&
         exit 0

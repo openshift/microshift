@@ -27,7 +27,7 @@ oc create -f "${SCRIPT_PATH}/assets/pod-with-pvc.yaml"
 oc wait --for=condition=Ready --timeout=120s pod/test-pod
 
 set +e
-ssh -v "$USHIFT_USER@$USHIFT_IP" "sudo reboot now"
+ssh -v "${USHIFT_USER}@${USHIFT_IP}" "sudo reboot now"
 res=$?
 set -e
 
@@ -37,8 +37,8 @@ if [ "${res}" -ne 0 ] && [ "${res}" -ne 255 ]; then
     exit 1
 fi
 
-wait_until ssh "$USHIFT_USER@$USHIFT_IP" "true"
+wait_until ssh "${USHIFT_USER}@${USHIFT_IP}" "true"
 # Just check if KAS is up and serving
 wait_until oc get node
-ssh "$USHIFT_USER@$USHIFT_IP" "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh"
+ssh "${USHIFT_USER}@${USHIFT_IP}" "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh"
 oc wait --for=condition=Ready --timeout=120s pod/test-pod

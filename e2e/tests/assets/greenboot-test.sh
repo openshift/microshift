@@ -9,19 +9,19 @@ function check_greenboot_exit_status() {
     local expectedRC=$1
     local cleanup=$2
 
-    if [ ${cleanup} -ne 0 ]; then
+    if [ "${cleanup}" -ne 0 ]; then
         echo 1 | microshift-cleanup-data --all
         systemctl enable --now microshift || true
     fi
 
     for check_script in $(find /etc/greenboot/check/ -name \*.sh | sort); do
-        echo Running ${check_script}...
+        echo Running "${check_script}"...
         local currentRC=1
         if ${check_script}; then
             currentRC=0
         fi
 
-        if [ ${currentRC} != ${expectedRC} ]; then
+        if [ ${currentRC} != "${expectedRC}" ]; then
             exit 1
         fi
     done
