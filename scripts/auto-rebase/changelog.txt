@@ -1,7 +1,28 @@
-# cluster-network-operator embedded-component 41a8c00b633446c2ee05fc19b924240de2d8b18f to 6878a2cec16309dcd96aaf03ae0d7db8f37d3cde
-4fbe0b47753fd408689b94b7ee0094f7db8da6e2 2022-12-09T11:58:33+00:00 Fix info log formatting
-# machine-config-operator embedded-component 52fe26136643a946ff1dd1307012cbdef31ebf97 to e8291b07876fd93fad5ef8c09b9f47621186cb17
-963248648c0e90610fd3d88ee252d9d484c73d7a 2023-01-17T15:54:12+00:00 OCPBUGS-5872: Wrap podman commands in a while loop
-# ovn-kubernetes image-amd64 78938a80db83ac5df2d450103829c319c733b23a to ffce71cb9cc045517288ed0f28a5d25c059d2438
-8ce4aa4f4594271b53e7833dd9713605845d2b3a 2023-03-28T10:16:27+02:00 fix multiple error aggregation: `errors.Wrapf` always returns nil if the first argument is nil.
-c43e230cff6bdd811448d528699635387187b74f 2023-03-28T10:14:11+02:00 Egress firewall creation error was overridden by the status update error and never returned. That would prevent retry on failure.
+# cluster-network-operator embedded-component 6878a2cec16309dcd96aaf03ae0d7db8f37d3cde to 529ff4a694ff0f4598d5763b20f78fe44cd14f22
+5dd5e9963ec960c0c6a1f28ad9137d1bfe2ba77f 2023-03-30T20:35:41+00:00 remove TLS_RSA_WITH_AES_128_CBC_SHA256 cipher
+# ovn-kubernetes image-arm64 ffce71cb9cc045517288ed0f28a5d25c059d2438 to 3780f16d8e9c3a5495ba3b1caff3bc53070f6bb6
+0bc8f1412f1a462900961e4e54bc747b7a83d52a 2023-03-30T18:38:13+02:00 Optimize egress firewall cleanup to only select switches that have stale acls.
+88ecd8b1b477c09a10bc7e151a181580fc8ca79f 2023-03-30T09:44:23+02:00 Batch potentially big transaction on egress firewall ACLs migration. The default transaction timeout is 10 seconds, it can be reached when we delete all egress firewall acls during migration to port groups from switches.
+# kubernetes image-arm64 eab9cc98fe4c002916621ace6cdd623afa519203 to db63dbe4698bd34bab98717093af4f5424482286
+60398d079008c394fb817b1f5f37155dd47cc346 2023-03-30T18:47:02+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+0ce7342c984110dfc93657d64df5dc3b2c0d1fe9 2023-03-15T13:31:32+00:00 Release commit for Kubernetes v1.25.8
+42c5d12dabca806ca24cf886b26f5eb29ebb7af7 2023-03-09T16:00:44-05:00 One lock among PodNominator and SchedulingQueue
+360e5303abc8ef88f4fa7f388d303b81cb60c028 2023-03-09T10:09:17+01:00 releng/go: Update images, dependencies and version to Go 1.19.7
+a561bb21aa9eb60cc00f1f203f04bb16da3365da 2023-03-03T11:20:16+05:30 Fix for windows kube-proxy: 'externalTrafficPolicy: Local' results in no clusterIP entry in windows node.
+e64823164d7569f2eea7ce43c8a5e6b45d8aec3d 2023-03-02T02:28:33+00:00 add unit test
+ca14d024105553724722ba44d9b30f4f6e2e5fa5 2023-03-02T02:28:32+00:00 fix 116028
+fa67514717bd8ab66be9dd35de66b54e07d5168c 2023-02-28T17:11:26-03:00 Re-enable label selector
+557582e467fa64bd468f793e3ba4645feb436fee 2023-02-28T17:11:26-03:00 Add integration test for diff --prune --selector
+92fff2577a08b0db131193a63b7d5903b75d2d4c 2023-02-28T17:11:24-03:00 Use label selector for filtering out resources when pruning. Matches same behavior as for kubectl apply
+33c239a372de8fae329ddc898c431621549bc355 2023-02-24T20:21:38+01:00 scheduler/framework/plugins/volumebinding: fix inaccurate log for when a volume is bound to a claim
+1f40263f4f1b1a28e69172e9b364e6ec0af70751 2023-02-22T14:59:51+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.7
+0dd0c702133d51d69d0e6ed019820eeaecb1242f 2023-02-22T13:56:51+00:00 Release commit for Kubernetes v1.25.8-rc.0
+05844c82d10b2b735fba485a8fc32a53a3678a30 2023-02-14T17:47:25+00:00 Remove check for CSI driver running on node for CSI migration attach operations
+792b44dfe04e1b832ed7959ac7d84d6e04235b52 2023-02-13T21:31:10-05:00 Simplify construction of /metrics request
+02d8672f8f8b2c4d0c5e7b9e902f2fee733001e9 2023-02-10T09:57:24-07:00 test: remove flaky pod update test in CSIInlineVolumes e2e
+8f09151d9c11b0219450ca8160fb770512fe68e5 2023-02-09T10:47:54-08:00 Move CSI json file saving to SetUpAt()
+9be591d06a0a7da0100401deea1e39be18f171d6 2023-02-08T16:49:10+05:30 Fix for issue with Loadbalancer policy creation for IPV6 endpoints in Dualstack mode.
+029bde8d3d2111d05c72b26f31779e43f0082254 2023-02-03T00:03:49-05:00 Invoke gimme from kube::golang::verify_go_version
+8b8eee429c84938f17d9d6ed4c1c604810020a6f 2023-02-03T00:03:49-05:00 Add gimme
+441276ceb06eb5804256ab8331e10da8b46c2f1e 2023-02-03T00:03:48-05:00 Defer builds to test-cmd and test-integration targets
+514352be24319a5825de8ed23940beaf83cc04c4 2023-01-30T15:38:00-05:00 Carefully compute request path for metrics
