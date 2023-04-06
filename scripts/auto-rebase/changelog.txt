@@ -1,7 +1,14 @@
-- machine-config-operator embedded-component 60de0ad4be10a7fa84305dc1fe1ad53223d700af to 4acaaded2422e859d9f500f45a1b39f7e6d60600
-  - 10e17d65 2023-03-31T15:03:38-04:00 daemon: write certificate in OnceFrom and HyperShift
-
-- oc image-amd64 2727f37143ee46259ddd0d569d9bf42926291433 to c6df0e998fd1fd1c54586e5b6e9e366a91916f20
+- oc image-arm64 bb3e40f7518e6955e9f7e77d86990bdbe6b117cb to c6df0e998fd1fd1c54586e5b6e9e366a91916f20
+  - 03056a3 2023-03-22T20:12:51-04:00 IR-301: generates ImageStreamTags with import-mode when using oc new-build
+  - cace2b4 2023-03-22T20:12:51-04:00 IR-300: enhances oc new-app with ImageRegistry ImportMode
   - ddf90d3 2023-03-13T15:16:21+00:00 Updating ose-tools images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7ce51feaf65258715109cad8d18b1bd0db0fbb2e/images/ose-tools.yml
   - 323f313 2023-03-06T07:59:59-08:00 append: expose keep-manifest-list option and preserve manifestlist when appending to specific arch images
+  - a2a49c1 2023-02-28T13:11:08-08:00 pkg/cli/admin/upgrade: Client-side checks for --to-multi-arch
+
+- coredns image-arm64 5560e4ad8c343c211f0b2f9d85ce7331b20b87cb to 5af9cd2d70adaf8f4a7346879dbd593934ad3cc0
+  - 20fb775 2023-03-09T20:06:18+00:00 Updating coredns images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/coredns.yml
+
+- kubernetes image-arm64 54b552033300ab1f94ddf8a9d16032e6619556da to ff8ecbc24c150ec5bd0669ce6644d1c7046f636e
+  - f27d453cb 2023-04-03T13:56:19+02:00 UPSTREAM: <drop>: bump: apiserver-lib-go for fixed SCC admission
+  - c25f8d98c 2023-04-03T13:56:05+02:00 UPSTREAM: <carry>: SCC pod extractor: assume default SA if SA is empty
 
