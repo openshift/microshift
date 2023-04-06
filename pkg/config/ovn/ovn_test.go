@@ -15,7 +15,7 @@ func TestNewOVNKubernetesConfigFromFileOrDefault(t *testing.T) {
 	}
 
 	for _, tt := range ttests {
-		_, err := NewOVNKubernetesConfigFromFileOrDefault(tt.configFile)
+		_, err := NewOVNKubernetesConfigFromFileOrDefault(tt.configFile, false)
 		if (err != nil) != (tt.err != nil) {
 			t.Errorf("NewOVNKubernetesConfigFromFileOrDefault() error = %v, wantErr %v", err, tt.err)
 		}

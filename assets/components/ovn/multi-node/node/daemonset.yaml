@@ -1,0 +1,276 @@
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: ovnkube-node
+  namespace: openshift-ovn-kubernetes
+  annotations:
+    kubernetes.io/description: |
+      This daemonset launches the ovn-kubernetes per node networking components.
+spec:
+  selector:
+    matchLabels:
+      app: ovnkube-node
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: ovnkube-node
+        component: network
+        type: infra
+        openshift.io/component: network
+        kubernetes.io/os: "linux"
+    spec:
+      serviceAccountName: ovn-kubernetes-node
+      hostNetwork: true
+      dnsPolicy: Default
+      hostPID: true
+      priorityClassName: "system-node-critical"
+      # volumes in all containers:
+      # (container) -> (host)
+      # /etc/openvswitch -> /etc/openvswitch - ovsdb system id
+      # /var/lib/openvswitch -> /var/lib/openvswitch/data - ovsdb data
+      # /run/openvswitch -> tmpfs - ovsdb sockets
+      # /env -> configmap env-overrides - debug overrides
+      containers:
+      # ovn-controller: programs the vswitch with flows from the sbdb
+      - name: ovn-controller
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          if [[ -f "/env/${K8S_NODE}" ]]; then
+            set -o allexport
+            source "/env/${K8S_NODE}"
+            set +o allexport
+          fi
+
+          # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
+          echo "$(date -Iseconds) - starting ovn-controller, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
+
+          exec ovn-controller unix:/var/run/openvswitch/db.sock -vfile:off \
+            --no-chdir --pidfile=/var/run/ovn/ovn-controller.pid \
+            --syslog-method="null" \
+            --log-file=/var/log/ovn/acl-audit-log.log \
+            -vFACILITY:"local0" \
+            -vconsole:"${OVN_LOG_LEVEL}" -vconsole:"acl_log:off" \
+            -vPATTERN:console:"%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
+            -vsyslog:"acl_log:info" \
+            -vfile:"acl_log:info"
+        securityContext:
+          privileged: true
+        env:
+        - name: OVN_LOG_LEVEL
+          value: info
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - mountPath: /run/openvswitch
+          name: run-openvswitch
+        - mountPath: /run/ovn/
+          name: run-ovn
+        - mountPath: /etc/openvswitch
+          name: etc-openvswitch
+        - mountPath: /etc/ovn/
+          name: etc-openvswitch
+        - mountPath: /var/lib/openvswitch
+          name: var-lib-openvswitch
+        - mountPath: /env
+          name: env-overrides
+        - mountPath: /var/log/ovn
+          name: node-log
+        - mountPath: /dev/log
+          name: log-socket
+
+        terminationMessagePolicy: FallbackToLogsOnError
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+      # ovnkube node: does node level bookkeeping and configuration
+      - name: ovnkube-node
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xe
+          if [[ -f "/env/_master" ]]; then
+            set -o allexport
+            source "/env/_master"
+            set +o allexport
+          fi
+
+          # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
+          echo "$(date -Iseconds) - starting ovnkube-node, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
+
+          echo "I$(date "+%m%d %H:%M:%S.%N") - copy ovn-k8s-cni-overlay"
+          cp -f /usr/libexec/cni/ovn-k8s-cni-overlay /cni-bin-dir/
+
+          echo "I$(date "+%m%d %H:%M:%S.%N") - disable conntrack on geneve port"
+          iptables -t raw -A PREROUTING -p udp --dport 6081 -j NOTRACK
+          iptables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
+          ip6tables -t raw -A PREROUTING -p udp --dport 6081 -j NOTRACK
+          ip6tables -t raw -A OUTPUT -p udp --dport 6081 -j NOTRACK
+          echo "I$(date "+%m%d %H:%M:%S.%N") - starting ovnkube-node"
+
+          gateway_mode_flags="--gateway-mode local --gateway-interface br-ex"
+
+          sysctl net.ipv4.ip_forward=1
+
+          gw_interface_flag=
+          # if br-ex1 is configured on the node, we want to use it for external gateway traffic
+          if [ -d /sys/class/net/br-ex1 ]; then
+            gw_interface_flag="--exgw-interface=br-ex1"
+            # the functionality depends on ip_forwarding being enabled
+          fi
+
+          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-node - start ovnkube --init-node ${K8S_NODE}"
+          exec /usr/bin/ovnkube \
+            --init-node "${K8S_NODE}" \
+            --nb-address "{{.OVN_NB_DB_LIST}}" \
+            --sb-address "{{.OVN_SB_DB_LIST}}" \
+            --config-file=/run/ovnkube-config/ovnkube.conf \
+            --loglevel "${OVN_KUBE_LOG_LEVEL}" \
+            ${gateway_mode_flags} \
+            ${gw_interface_flag} \
+            --inactivity-probe="180000" \
+            --disable-snat-multiple-gws \
+        lifecycle:
+          preStop:
+            exec:
+              command: ["rm","-f","/etc/cni/net.d/10-ovn-kubernetes.conf"]
+        readinessProbe:
+          exec:
+            command: ["test", "-f", "/etc/cni/net.d/10-ovn-kubernetes.conf"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        # for checking ovs-configuration service
+        - mountPath: /etc/systemd/system
+          name: systemd-units
+          readOnly: true
+        - mountPath: /run/openvswitch/
+          name: run-openvswitch
+        - mountPath: /run/ovn/
+          name: run-ovn
+        - mountPath: /run/ovnkube-config/
+          name: ovnkube-config
+        - mountPath: {{.KubeconfigDir}}
+          name: kubeconfig
+        - mountPath: /env
+          name: env-overrides
+        - mountPath: /etc/cni/net.d
+          name: host-cni-netd
+        - mountPath: /cni-bin-dir
+          name: host-cni-bin
+        - mountPath: /run/ovn-kubernetes/
+          name: host-run-ovn-kubernetes
+        - mountPath: /host
+          name: host-slash
+          readOnly: true
+          mountPropagation: HostToContainer
+        - mountPath: /run/netns
+          name: host-run-netns
+          readOnly: true
+          mountPropagation: HostToContainer
+        - mountPath: /etc/openvswitch
+          name: etc-openvswitch-node
+        - mountPath: /etc/ovn/
+          name: etc-openvswitch-node
+
+        resources:
+          requests:
+            cpu: 10m
+            memory: 60Mi
+        env:
+        - name: OVN_KUBE_LOG_LEVEL
+          value: "4"
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        securityContext:
+          privileged: true
+        terminationMessagePolicy: FallbackToLogsOnError
+
+      nodeSelector:
+        kubernetes.io/os: "linux"
+      volumes:
+      # for checking ovs-configuration service
+      - name: systemd-units
+        hostPath:
+          path: /etc/systemd/system
+      # used for iptables wrapper scripts
+      - name: host-slash
+        hostPath:
+          path: /
+      - name: host-run-netns
+        hostPath:
+          path: /run/netns
+      - name: var-lib-openvswitch
+        hostPath:
+          path: /var/lib/openvswitch/data
+      - name: etc-openvswitch
+        hostPath:
+          path: /etc/openvswitch
+      - name: run-openvswitch
+        hostPath:
+          path: /var/run/openvswitch
+      - name: run-ovn
+        hostPath:
+          path: /var/run/ovn
+
+      - name: etc-openvswitch-node
+        hostPath:
+          path: /etc/openvswitch
+      # Used for placement of ACL audit logs
+      - name: node-log
+        hostPath:
+          path: /var/log/ovn
+      - name: log-socket
+        hostPath:
+          path: /dev/log
+
+      # For CNI server
+      - name: host-run-ovn-kubernetes
+        hostPath:
+          path: /run/ovn-kubernetes
+      - name: host-cni-netd
+        hostPath:
+          path: "/etc/cni/net.d"
+      - name: host-cni-bin
+        hostPath:
+          path: "/opt/cni/bin"
+      - name: host-var-lib-cni-networks-ovn-kubernetes
+        hostPath:
+          path: /var/lib/cni/networks/ovn-k8s-cni-overlay
+      - name: kubeconfig
+        hostPath:
+          path: /var/lib/microshift/resources/kubeadmin
+      - name: ovnkube-config
+        configMap:
+          name: ovnkube-config
+      - name: env-overrides
+        configMap:
+          name: env-overrides
+          optional: true
+      tolerations:
+      - operator: "Exists"

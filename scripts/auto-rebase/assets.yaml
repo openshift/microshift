@@ -76,22 +76,33 @@ assets:
 
   - dir: components/ovn/
     ignore: "it's not covered by rebase script yet"
-    files:
-      - file: clusterrole.yaml
-      - file: clusterrolebinding.yaml
-      - file: configmap.yaml
-      - file: namespace.yaml
-      - file: role.yaml
-      - file: rolebinding.yaml
     dirs:
-      - dir: master/
+      - dir: common/
         files:
-          - file: daemonset.yaml
-          - file: serviceaccount.yaml
-      - dir: node/
-        files:
-          - file: daemonset.yaml
-          - file: serviceaccount.yaml
+          - file: clusterrole.yaml
+          - file: clusterrolebinding.yaml
+          - file: configmap.yaml
+          - file: master-serviceaccount.yaml
+          - file: namespace.yaml
+          - file: node-serviceaccount.yaml
+          - file: role.yaml
+          - file: rolebinding.yaml
+      - dir: multi-node/
+        dirs:
+          - dir: master/
+            files:
+              - file: daemonset.yaml
+          - dir: node/
+            files:
+              - file: daemonset.yaml
+      - dir: single-node/
+        dirs:
+          - dir: master/
+            files:
+              - file: daemonset.yaml
+          - dir: node/
+            files:
+              - file: daemonset.yaml
 
   - dir: components/service-ca/
     src: service-ca-operator/bindata/v4.0.0/controller/

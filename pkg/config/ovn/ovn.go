@@ -19,6 +19,15 @@ const (
 	defaultMTU                  = 1500
 	OVNKubernetesV4MasqueradeIP = "169.254.169.2"
 	OVNKubernetesV6MasqueradeIP = "fd69::2"
+
+	// used for multinode ovn database transport
+	OVN_NB_PORT = "9641"
+	OVN_SB_PORT = "9642"
+
+	// geneve header length for IPv4
+	GeneveHeaderLengthIPv4 = 58
+	// geneve header length for IPv6
+	GeneveHeaderLengthIPv6 = GeneveHeaderLengthIPv4 + 20
 )
 
 type OVNKubernetesConfig struct {
@@ -90,25 +99,29 @@ func (o *OVNKubernetesConfig) validateConfig() error {
 	return nil
 }
 
-// getSystemMTU retrieves MTU from ovn-kubernetes gateway interafce "br-ex",
+// getClusterMTU retrieves MTU from ovn-kubernetes gateway interface "br-ex",
 // and falls back to use 1500 when "br-ex" mtu is unable to get or less than 0.
-func (o *OVNKubernetesConfig) getSystemMTU() {
+func (o *OVNKubernetesConfig) getClusterMTU(multinode bool) {
 	link, err := net.InterfaceByName(OVNGatewayInterface)
 	if err == nil && link.MTU > 0 {
 		o.MTU = link.MTU
 	} else {
 		o.MTU = defaultMTU
 	}
+
+	if multinode {
+		o.MTU = o.MTU - GeneveHeaderLengthIPv6
+	}
 }
 
 // withDefaults returns the default values when ovn.yaml is not provided
-func (o *OVNKubernetesConfig) withDefaults() *OVNKubernetesConfig {
+func (o *OVNKubernetesConfig) withDefaults(multinode bool) *OVNKubernetesConfig {
 	o.OVSInit.DisableOVSInit = false
-	o.getSystemMTU()
+	o.getClusterMTU(multinode)
 	return o
 }
 
-func newOVNKubernetesConfigFromFile(path string) (*OVNKubernetesConfig, error) {
+func newOVNKubernetesConfigFromFile(path string, multinode bool) (*OVNKubernetesConfig, error) {
 	o := new(OVNKubernetesConfig)
 	buf, err := os.ReadFile(path)
 	if err != nil {
@@ -121,24 +134,24 @@ func newOVNKubernetesConfigFromFile(path string) (*OVNKubernetesConfig, error) {
 	}
 	// in case mtu is not defined
 	if o.MTU == 0 {
-		o.getSystemMTU()
+		o.getClusterMTU(multinode)
 	}
 	klog.Infof("parsed OVNKubernetes config from file %q: %+v", path, o)
 
 	return o, nil
 }
 
-func NewOVNKubernetesConfigFromFileOrDefault(dir string) (*OVNKubernetesConfig, error) {
+func NewOVNKubernetesConfigFromFileOrDefault(dir string, multinode bool) (*OVNKubernetesConfig, error) {
 	path := filepath.Join(dir, ovnConfigFileName)
 	if _, err := os.Stat(path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			klog.Infof("OVNKubernetes config file not found, assuming default values")
-			return new(OVNKubernetesConfig).withDefaults(), nil
+			return new(OVNKubernetesConfig).withDefaults(multinode), nil
 		}
 		return nil, fmt.Errorf("failed to get OVNKubernetes config file: %v", err)
 	}
 
-	o, err := newOVNKubernetesConfigFromFile(path)
+	o, err := newOVNKubernetesConfigFromFile(path, multinode)
 	if err == nil {
 		return o, nil
 	}

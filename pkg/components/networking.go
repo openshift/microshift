@@ -14,34 +14,41 @@ import (
 func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
 		ns = []string{
-			"components/ovn/namespace.yaml",
+			"components/ovn/common/namespace.yaml",
 		}
 		sa = []string{
-			"components/ovn/node/serviceaccount.yaml",
-			"components/ovn/master/serviceaccount.yaml",
+			"components/ovn/common/master-serviceaccount.yaml",
+			"components/ovn/common/node-serviceaccount.yaml",
 		}
 		r = []string{
-			"components/ovn/role.yaml",
+			"components/ovn/common/role.yaml",
 		}
 		rb = []string{
-			"components/ovn/rolebinding.yaml",
+			"components/ovn/common/rolebinding.yaml",
 		}
 		cr = []string{
-			"components/ovn/clusterrole.yaml",
+			"components/ovn/common/clusterrole.yaml",
 		}
 		crb = []string{
-			"components/ovn/clusterrolebinding.yaml",
+			"components/ovn/common/clusterrolebinding.yaml",
 		}
 		cm = []string{
-			"components/ovn/configmap.yaml",
+			"components/ovn/common/configmap.yaml",
 		}
 		apps = []string{
-			"components/ovn/master/daemonset.yaml",
-			"components/ovn/node/daemonset.yaml",
+			"components/ovn/single-node/master/daemonset.yaml",
+			"components/ovn/single-node/node/daemonset.yaml",
 		}
 	)
 
-	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.ConfigFile))
+	if cfg.MultiNode.Enabled {
+		apps = []string{
+			"components/ovn/multi-node/master/daemonset.yaml",
+			"components/ovn/multi-node/node/daemonset.yaml",
+		}
+	}
+
+	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.ConfigFile), cfg.MultiNode.Enabled)
 	if err != nil {
 		return err
 	}
@@ -74,10 +81,16 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		klog.Warningf("Failed to apply clusterRoleBinding %v %v", crb, err)
 		return err
 	}
+
+	// Multinode only params: OVN_NB_DB_LIST, OVN_SB_DB_LIST, OVN_NB_PORT, OVN_SB_PORT
 	extraParams := assets.RenderParams{
 		"OVNConfig":      ovnConfig,
 		"KubeconfigPath": kubeconfigPath,
 		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
+		"OVN_NB_DB_LIST": fmt.Sprintf("tcp:%s:%s", cfg.MultiNode.Controlplane, ovn.OVN_NB_PORT),
+		"OVN_SB_DB_LIST": fmt.Sprintf("tcp:%s:%s", cfg.MultiNode.Controlplane, ovn.OVN_SB_PORT),
+		"OVN_NB_PORT":    ovn.OVN_NB_PORT,
+		"OVN_SB_PORT":    ovn.OVN_SB_PORT,
 	}
 	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
