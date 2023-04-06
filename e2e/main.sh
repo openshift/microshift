@@ -5,6 +5,32 @@ set -euo pipefail
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 OUTPUT_DIR="${ARTIFACT_DIR:-_output}/microshift-e2e-$(date +'%Y%m%d-%H%M%S')/"
 
+usage() {
+    echo "Usage: $(basename "${0}") {list|run} [filter]"
+    echo ""
+    echo "   list      Lists tests"
+    echo "   run       Runs tests"
+    echo "   filter    Simple string to match against test files, e.g. 'reboot', 'boot', 'smoke'"
+    echo ""
+    echo " Script expects two environmental variables:"
+    echo "   - USHIFT_IP"
+    echo "   - USHIFT_USER"
+    echo ""
+    echo " Script assumes following:"
+    echo "   - Passwordless SSH to \$USHIFT_USER@\$USHIFT_IP is configured"
+    echo "   - Both hosts already exchanged their public keys:"
+    echo "     - Test runner has MicroShift's sshd key in ~/.ssh/known_keys"
+    echo "     - Remote \$USHIFT_USER has test runner's key in ~/.ssh/authorized_keys"
+    echo "   - Passwordless sudo for \$USHIFT_USER"
+    echo ""
+    echo " Script aims to be target platform agnostic. It means that for some environments (e.g. GCP)"
+    echo " it might be required to export firewall::open_port and firewall::close_port functions"
+    echo " so the tests can open custom ports"
+
+    [ -n "$1" ] && echo -e "\nERROR: $1"
+    exit 1
+}
+
 log() {
     echo -e "$(date +'%H:%M:%S.%N')    $*"
 }
@@ -149,8 +175,7 @@ run() {
 }
 
 [ $# -eq 0 ] && {
-    echo "usage"
-    exit 1
+    usage "Expected arguments"
 }
 
 cmd="$1"
