@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-set -o errtrace
-set -o nounset
-set -o pipefail
+set -euo pipefail
 
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 OUTPUT_DIR="${ARTIFACT_DIR:-_output}/microshift-e2e-$(date +'%Y%m%d-%H%M%S')/"
