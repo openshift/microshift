@@ -124,7 +124,7 @@ microshift_health_summary() {
 
     # Because test might be "destructive" (i.e. tear down and set up again MicroShift)
     # so these commands are executed via ssh.
-    # Alternative is to copy kubeconfig second time in the same time.
+    # Alternative is to copy kubeconfig second time in the same test.
     ssh "${USHIFT_USER}@${USHIFT_IP}" \
         "mkdir -p ~/.kube/ && sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config ; \
             oc get pods -A ; \
