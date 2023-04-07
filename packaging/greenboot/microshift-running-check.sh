@@ -124,7 +124,7 @@ for i in "${!PODS_NS_LIST[@]}"; do
     CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
 
     echo "Checking pod restart count in the '${CHECK_PODS_NS}' namespace"
-    namespace_pods_not_restarting "${CHECK_PODS_NS}"
+    namespace_pods_not_restarting "${CHECK_PODS_NS}" &
     pids+=($!)
 done
 
