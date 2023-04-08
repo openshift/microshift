@@ -40,7 +40,7 @@ func startCNIPlugin(cfg *config.Config, kubeconfigPath string) error {
 		}
 	)
 
-	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.DefaultGlobalConfigFile))
+	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.ConfigFile))
 	if err != nil {
 		return err
 	}
