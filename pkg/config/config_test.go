@@ -15,13 +15,12 @@ const (
 	IS_NOT_DEFAULT_NODENAME = false
 )
 
-func setupSuiteDataDir(t *testing.T) func() {
+func setupSuiteDataDir(t *testing.T) (string, func()) {
 	tmpdir, err := os.MkdirTemp("", "microshift")
 	if err != nil {
 		t.Errorf("failed to create temp dir: %v", err)
 	}
-	dataDir = tmpdir
-	return func() {
+	return tmpdir, func() {
 		os.RemoveAll(tmpdir)
 	}
 }
@@ -199,9 +198,6 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 
 // Test the validation logic
 func TestValidate(t *testing.T) {
-	cleanup := setupSuiteDataDir(t)
-	defer cleanup()
-
 	mkDefaultConfig := func() *Config {
 		c := NewDefault()
 		c.ApiServer.SkipInterface = true
@@ -321,13 +317,13 @@ func TestCanonicalNodeName(t *testing.T) {
 }
 
 func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
-	cleanup := setupSuiteDataDir(t)
+	dataDir, cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
 	c := NewDefault()
 	c.Node.HostnameOverride = "node1"
 
-	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err != nil {
+	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME, dataDir); err != nil {
 		t.Errorf("failed to validate node name on first call: %v", err)
 	}
 
@@ -338,23 +334,23 @@ func TestMicroshiftConfigNodeNameValidation(t *testing.T) {
 		t.Errorf("node name file doesn't match the node name in the saved file: %v", err)
 	}
 
-	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err != nil {
+	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME, dataDir); err != nil {
 		t.Errorf("failed to validate node name on second call without changes: %v", err)
 	}
 
 	c.Node.HostnameOverride = "node2"
-	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME); err == nil {
+	if err := c.validateNodeName(IS_NOT_DEFAULT_NODENAME, dataDir); err == nil {
 		t.Errorf("validation should have failed for nodename change: %v", err)
 	}
 }
 
 func TestMicroshiftConfigNodeNameValidationFromDefault(t *testing.T) {
-	cleanup := setupSuiteDataDir(t)
+	dataDir, cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
 	c := NewDefault()
 
-	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
+	if err := c.validateNodeName(IS_DEFAULT_NODENAME, dataDir); err != nil {
 		t.Errorf("failed to validate node name on first call: %v", err)
 	}
 
@@ -366,24 +362,24 @@ func TestMicroshiftConfigNodeNameValidationFromDefault(t *testing.T) {
 		t.Errorf("node name file doesn't match the node name in the saved file: %v", err)
 	}
 
-	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
+	if err := c.validateNodeName(IS_DEFAULT_NODENAME, dataDir); err != nil {
 		t.Errorf("failed to validate node name on second call without changes: %v", err)
 	}
 
 	c.Node.HostnameOverride = "node2"
-	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err != nil {
+	if err := c.validateNodeName(IS_DEFAULT_NODENAME, dataDir); err != nil {
 		t.Errorf("validation should have failed in this case, it must be a warning in logs: %v", err)
 	}
 }
 
 func TestMicroshiftConfigNodeNameValidationBadName(t *testing.T) {
-	cleanup := setupSuiteDataDir(t)
+	dataDir, cleanup := setupSuiteDataDir(t)
 	defer cleanup()
 
 	c := NewDefault()
 	c.Node.HostnameOverride = "1.2.3.4"
 
-	if err := c.validateNodeName(IS_DEFAULT_NODENAME); err == nil {
+	if err := c.validateNodeName(IS_DEFAULT_NODENAME, dataDir); err == nil {
 		t.Errorf("failed to validate node name.")
 	}
 }

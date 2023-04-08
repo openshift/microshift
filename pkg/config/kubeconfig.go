@@ -16,9 +16,9 @@ const (
 
 // KubeConfigPath returns the path to the specified kubeconfig file.
 func (cfg *Config) KubeConfigPath(id KubeConfigID) string {
-	return filepath.Join(dataDir, "resources", string(id), "kubeconfig")
+	return filepath.Join(DataDir, "resources", string(id), "kubeconfig")
 }
 
 func (cfg *Config) KubeConfigAdminPath(id string) string {
-	return filepath.Join(dataDir, "resources", string(KubeAdmin), id, "kubeconfig")
+	return filepath.Join(DataDir, "resources", string(KubeAdmin), id, "kubeconfig")
 }

@@ -35,8 +35,6 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 )
 
-var microshiftDataDir = config.GetDataDir()
-
 func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 	certChains, err := certSetup(cfg)
 	if err != nil {
@@ -86,7 +84,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		externalCertNames = append(externalCertNames, cfg.Node.NodeIP)
 	}
 
-	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 
 	certChains, err := certchains.NewCertificateChains(
 		// ------------------------------
@@ -350,7 +348,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		return nil, err
 	}
 
-	saKeyDir := filepath.Join(microshiftDataDir, "/resources/kube-apiserver/secrets/service-account-key")
+	saKeyDir := filepath.Join(config.DataDir, "/resources/kube-apiserver/secrets/service-account-key")
 	if err := util.EnsureKeyPair(
 		filepath.Join(saKeyDir, "service-account.pub"),
 		filepath.Join(saKeyDir, "service-account.key"),
@@ -370,11 +368,11 @@ func initKubeconfigs(
 	cfg *config.Config,
 	certChains *certchains.CertificateChains,
 ) error {
-	externalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(microshiftDataDir))))
+	externalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(config.DataDir))))
 	if err != nil {
 		return fmt.Errorf("failed to load the external trust signer: %v", err)
 	}
-	internalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(microshiftDataDir))))
+	internalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(config.DataDir))))
 	if err != nil {
 		return fmt.Errorf("failed to load the internal trust signer: %v", err)
 	}

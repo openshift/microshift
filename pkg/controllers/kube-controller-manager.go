@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strconv"
 
@@ -60,18 +61,18 @@ func (s *KubeControllerManager) Name() string           { return "kube-controlle
 func (s *KubeControllerManager) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func kcmRootCAFile() string {
-	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	return cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 }
 
 func kcmClusterSigningCertKeyAndFile() (string, string) {
-	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	csrSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
 	return cryptomaterial.CAKeyPath(csrSignerDir), cryptomaterial.CACertPath(csrSignerDir)
 }
 
 func kcmServiceAccountPrivateKeyFile() string {
-	return microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"
+	return filepath.Join(config.DataDir, "/resources/kube-apiserver/secrets/service-account-key/service-account.key")
 }
 
 func configure(cfg *config.Config) (args []string, applyFn func() error, err error) {
