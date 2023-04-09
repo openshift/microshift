@@ -152,6 +152,11 @@ verify-py:
 	fi
 	pylint $$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
 
+.PHONY: verify-container
+verify-container:
+	./scripts/fetch_tools.sh hadolint && \
+	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output")
+
 ###############################
 # post install validate       #
 ###############################
