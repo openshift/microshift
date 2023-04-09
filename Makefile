@@ -147,11 +147,7 @@ verify-sh:
 
 .PHONY: verify-py
 verify-py:
-	@if ! command -v pylint &>/dev/null; then \
-		pip3 install pylint ; \
-	fi
-	pylint --variable-naming-style=any \
-	$$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
+	./hack/verify-py.sh
 
 ###############################
 # post install validate       #
