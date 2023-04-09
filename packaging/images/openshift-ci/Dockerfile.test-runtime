@@ -1,3 +1,4 @@
+# hadolint global ignore=DL3002,DL4006,SC3037,SC2086
 FROM registry.access.redhat.com/ubi8/ubi:latest
 USER root
 RUN echo -e '[google-cloud-sdk]\n\
