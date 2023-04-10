@@ -279,14 +279,9 @@ clean-cross-build:
 clean: clean-cross-build
 .PHONY: clean
 
-licensecheck: microshift bin/lichen
-	$(GO_BUILD_BINDIR)/lichen -c .lichen.yaml $(GO_BUILD_BINDIR)/microshift
-
-bin:
-	mkdir -p $@
-
-bin/lichen: bin vendor/modules.txt
-	GOBIN=$(realpath $(GO_BUILD_BINDIR)) go install github.com/uw-labs/lichen@latest
+licensecheck: microshift
+	./scripts/fetch_tools.sh lichen && \
+	./_output/bin/lichen -c .lichen.yaml ./_output/bin/microshift
 
 vendor:
 	go mod vendor

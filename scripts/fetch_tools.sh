@@ -139,6 +139,11 @@ get_hadolint() {
     _install "${url}" "${checksum}" "${filename}" "hadolint-Linux-${arch}"
 }
 
+get_lichen() {
+    local ver="v0.1.7"
+    GOBIN=${DEST_DIR} GOFLAGS="" go install github.com/uw-labs/lichen@${ver}
+}
+
 tool_getters=$(declare -F |  cut -d' ' -f3 | grep "get_" | sed 's/get_//g')
 
 usage() {
