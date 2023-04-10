@@ -1,0 +1,7 @@
+ignored:
+  - DL3007 # Instead of latest use explicit release tag
+  - DL3018 # Instead of `apk add <package>` use `apk add <package>=<version>`
+  - DL3013 # Instead of `pip install <package>` use `pip install <package>==<version>`
+  - DL3042 # Avoid use of cache directory. Use `pip install --no-cache-dir <package>`
+  - DL3041 # Specify version with `dnf install -y <package>-<version>`
+  - DL3002 # Last USER should not be root

@@ -116,7 +116,7 @@ etcd:
 		$(MAKE) -C etcd
 
 .PHONY: verify verify-images verify-assets
-verify: verify-images verify-assets verify-sh
+verify: verify-images verify-assets verify-sh verify-container
 
 verify-images:
 	./hack/verify_images.sh
@@ -151,6 +151,11 @@ verify-py:
 		pip install pylint ; \
 	fi
 	pylint $$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
+
+.PHONY: verify-container
+verify-container:
+	./scripts/fetch_tools.sh hadolint && \
+	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output")
 
 ###############################
 # post install validate       #
