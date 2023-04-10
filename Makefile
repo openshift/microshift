@@ -154,8 +154,8 @@ verify-py:
 
 .PHONY: verify-container
 verify-container:
-	./scripts/fetch_tools.sh hadolint && \
-	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output")
+	podman run -it --rm -v $$(pwd):/mnt:Z ghcr.io/hadolint/hadolint:v2.12.0 hadolint -c /mnt/.hadolint.yaml \
+		$$(find . -type f -not -path "*/vendor/*" -not -path "*/_output/*" \( -iname 'Containerfile*' -o -iname 'Dockerfile*' \) -exec echo /mnt/{} \;)
 
 ###############################
 # post install validate       #
