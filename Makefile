@@ -115,8 +115,8 @@ etcd:
 					$(LD_FLAGS)\"" \
 		$(MAKE) -C etcd
 
-.PHONY: verify verify-images verify-assets
-verify: verify-images verify-assets verify-sh verify-container
+.PHONY: verify verify-images verify-assets licensecheck
+verify: verify-images verify-assets verify-sh verify-container licensecheck
 
 verify-images:
 	./hack/verify_images.sh
@@ -279,14 +279,9 @@ clean-cross-build:
 clean: clean-cross-build
 .PHONY: clean
 
-licensecheck: microshift bin/lichen
-	bin/lichen -c .lichen.yaml microshift
-
-bin:
-	mkdir -p $@
-
-bin/lichen: bin vendor/modules.txt
-	GOBIN=$(realpath ./bin) go install github.com/uw-labs/lichen@latest
+licensecheck: microshift
+	./scripts/fetch_tools.sh lichen && \
+	./_output/bin/lichen -c .lichen.yaml ./_output/bin/microshift
 
 vendor:
 	go mod vendor
