@@ -115,8 +115,8 @@ etcd:
 					$(LD_FLAGS)\"" \
 		$(MAKE) -C etcd
 
-.PHONY: verify verify-images verify-assets
-verify: verify-images verify-assets verify-sh verify-container
+.PHONY: verify verify-images verify-assets licensecheck
+verify: verify-images verify-assets verify-sh verify-container licensecheck
 
 verify-images:
 	./hack/verify_images.sh
