@@ -162,11 +162,11 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			name: "etcd",
 			config: dedent(`
             etcd:
-              memoryLimitMB: 100
+              memoryLimitMB: 129
             `),
 			expected: func() *Config {
 				c := mkDefaultConfig()
-				c.Etcd.MemoryLimitMB = 100
+				c.Etcd.MemoryLimitMB = 129
 				c.updateComputedValues()
 				return c
 			}(),
