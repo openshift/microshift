@@ -1,25 +1,22 @@
-# cluster-network-operator embedded-component 756cae2baa82af3604fbe016eb0f776d8efaa61b to 14d77982b2de583913a2b8c0b885c32cfe6362ba
-ee27f7576645894248381bdfe4834fc6393fc365 2023-04-02T02:48:12+00:00 Split out konnectivity certs
-422bc3abaa833a98ec965e33e029b84df072f742 2023-03-30T16:23:59+00:00 pin k8s.io/apimachinery for 1.26_rebase
-30f5a8bbbdb02c50bd397359cedb7bb54614f5b1 2023-03-30T16:23:59+00:00 Fix kube-proxy related breakages for 1.26 rebase
-e95af93a0ad01bbe902e8a66d4c7b2a9e2e8d0fd 2023-03-30T16:23:59+00:00 unpin konnectivity-client and cluster-api for 1.26_rebase
-6ac981ebe9aacd7a91760ff0620754f672cca9a4 2023-03-30T16:23:59+00:00 update go from 1.18 to 1.19 for 1.26_rebase
-9621a1634824beadea285d79abe2a2b6502cca13 2023-03-30T16:23:59+00:00 go get/tidy/vendor for 1.26_rebase
-# ovn-kubernetes image-amd64 9d94b5f604f18016e41b2ba507ae3df373800754 to 159a714da138391477024d824fd56b5e65083000
-7d2f340271383ac2c597e1bdbcad96988e0069f9 2023-04-03T12:02:01+02:00 Don't call `addEgressFirewallRules` when no rules need to be updated, otherwise ALL egress firewall ACLs will be updated.
-554be4b5cb45f7a747ad78169e77f4c570bf6eb0 2023-04-03T11:59:23+02:00 Add e2e test for network policy hairpinned connections.
-5dd299e9e58a3954438d581e334254ff6a6b3bf4 2023-04-03T11:59:14+02:00 always allow hairpinned traffic, since it should be the same as pod connecting to its own ip. That allows to remove hairpinned match condition for ingress network policies and reduce the number of ovs flows.
-# ovn-kubernetes image-arm64 9b3dfbb7fa73f07e936bf6e610ab31af2db94926 to 159a714da138391477024d824fd56b5e65083000
-7d2f340271383ac2c597e1bdbcad96988e0069f9 2023-04-03T12:02:01+02:00 Don't call `addEgressFirewallRules` when no rules need to be updated, otherwise ALL egress firewall ACLs will be updated.
-554be4b5cb45f7a747ad78169e77f4c570bf6eb0 2023-04-03T11:59:23+02:00 Add e2e test for network policy hairpinned connections.
-5dd299e9e58a3954438d581e334254ff6a6b3bf4 2023-04-03T11:59:14+02:00 always allow hairpinned traffic, since it should be the same as pod connecting to its own ip. That allows to remove hairpinned match condition for ingress network policies and reduce the number of ovs flows.
-7ba8af501478c9b2b5b0be7b55c5eeabcca97291 2023-03-28T17:16:25-04:00 Fix invalid peer test syntax
-f61f2cd55dc003582e1096cb8915a36007539212 2023-03-28T15:15:30-04:00 Add error checking for addEventHandler calls
-858872e78aa5a34ef18b89b96df29f0ddb39c1ff 2023-03-28T14:59:25-04:00 Bump K8S_VERSION to 1.26.0 for KIND setup
-e582cf5b361d484e8c444800e40c22c8e684f303 2023-03-28T14:59:14-04:00 sets package update
-b2bb806212b8f6e1cf8e1fe80b5d44af0b88b758 2023-03-28T14:59:06-04:00 exec.Stream deprecated
-f74f2cba7d6163fbc50410e2bb55ba1b31a67ddc 2023-03-28T14:58:54-04:00 Bump K8s vendored libraries to use kube 1.26
-# kubernetes image-arm64 dc93b13d1f6518d62ea9e3dea64d843c2ce35cbf to 22308ca177342eb6820b95e0cad1142e385ef4c9
-0c95851f899bd4be5fcbbd78ef19eec55d91f9d3 2023-03-27T17:20:41+02:00 UPSTREAM: <drop>: legacy-cloud-providers: azure: do not detach masters from lb when unready
-be9f2c07315cad2be925fb27cb3dfe040dbd4171 2023-03-27T17:18:47+02:00 UPSTREAM: <drop>: legacy-cloud-providers: azure: use kube-proxy based health probes by default
+# cluster-network-operator embedded-component 14d77982b2de583913a2b8c0b885c32cfe6362ba to b7b90a5bef21ebe3c91362bb1415469197e0290b
+f4e8c66cfaa70d3e998b89fbfbacd989096c90c9 2023-04-07T09:38:38-07:00 update 4.13 Dockerfile to use rhel-8 and go 1.19
+e4572bb8ea38cdaccc7bb41b716750b6a390b838 2023-04-05T15:33:20+02:00 Fix tier label, privileged, HOSTNAME/NODENAME in whereabouts reconciler
+c6256d0ba6cbcfc168fa3c0fbaae193a25c0b1d4 2023-04-05T15:33:13+02:00 Whereabouts should implement the reconciliation controller
+# kubernetes embedded-component 7195e44fb36b487f275becffbf5828e2021f94d4 to 22308ca177342eb6820b95e0cad1142e385ef4c9
 582c77525a5a6928e9164b389487b86496332c3e 2022-12-07T15:36:23+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/openshift-enterprise-pod.yml
+# machine-config-operator embedded-component 428c2e0655c6a5fc876dad8864a5451142b5c3e2 to cfe839676e53af8617e762467336d5992e39ebfe
+398cefa6f4aaf70a8979b6361dc43a2f966e23e9 2023-04-03T14:13:13+00:00 daemon: write certificate in OnceFrom and HyperShift
+# ovn-kubernetes image-amd64 159a714da138391477024d824fd56b5e65083000 to b0c2ab425330f587517e7aeee369883e509717ac
+a7bf3cea3eeb674e1311c5cfbaab72c8d76c6af1 2023-04-04T10:30:40-04:00 Lint fix in policy.go
+b016909f6bcb91bf5693e3d9c2396487fc79a91d 2023-04-04T10:20:48-04:00 Fix node_dpu_test
+3f0ffd25ac2ae0f0f982068099cbecd42a03a68e 2023-04-04T10:20:37-04:00 Add e2e test for static pods
+b8de796d434fddfef8d738429dbb80a938929d26 2023-04-04T10:20:25-04:00 Allow static pod creation
+62b001a83cc2c376f8731500af872ce6f9353926 2023-04-04T10:20:15-04:00 Add Functions needed to check for static pod
+# kubernetes image-amd64 7195e44fb36b487f275becffbf5828e2021f94d4 to 22308ca177342eb6820b95e0cad1142e385ef4c9
+582c77525a5a6928e9164b389487b86496332c3e 2022-12-07T15:36:23+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/openshift-enterprise-pod.yml
+# ovn-kubernetes image-arm64 159a714da138391477024d824fd56b5e65083000 to b0c2ab425330f587517e7aeee369883e509717ac
+a7bf3cea3eeb674e1311c5cfbaab72c8d76c6af1 2023-04-04T10:30:40-04:00 Lint fix in policy.go
+b016909f6bcb91bf5693e3d9c2396487fc79a91d 2023-04-04T10:20:48-04:00 Fix node_dpu_test
+3f0ffd25ac2ae0f0f982068099cbecd42a03a68e 2023-04-04T10:20:37-04:00 Add e2e test for static pods
+b8de796d434fddfef8d738429dbb80a938929d26 2023-04-04T10:20:25-04:00 Allow static pod creation
+62b001a83cc2c376f8731500af872ce6f9353926 2023-04-04T10:20:15-04:00 Add Functions needed to check for static pod
