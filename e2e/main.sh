@@ -35,6 +35,11 @@ log() {
     echo -e "$(date +'%H:%M:%S.%N')    $*"
 }
 
+ssh_cmd() {
+    local cmd="${1}"
+    ssh -o BatchMode=yes "${USHIFT_USER}@${USHIFT_IP}" "${cmd}"
+}
+
 var_should_not_be_empty() {
     local var_name=${1}
     if [ -z "${!var_name+x}" ]; then
@@ -55,7 +60,7 @@ function_should_be_exported() {
 }
 
 check_passwordless_ssh() {
-    ssh -o BatchMode=yes "${USHIFT_USER}@${USHIFT_IP}" "true" || {
+    ssh_cmd "true" || {
         echo "Failed to access ${USHIFT_IP}:"
         echo "  - Test runner should have MicroShift's sshd key in ~/.ssh/known_keys"
         echo "  - Remote \$USHIFT_USER should have test runner's key in ~/.ssh/authorized_keys"
@@ -64,7 +69,7 @@ check_passwordless_ssh() {
 }
 
 check_passwordless_sudo() {
-    ssh -o BatchMode=yes "${USHIFT_USER}@${USHIFT_IP}" "sudo --non-interactive true" || {
+    ssh_cmd "sudo --non-interactive true" || {
         echo "Failed to run sudo command as ${USHIFT_USER} without password"
         exit 1
     }
@@ -83,40 +88,39 @@ prechecks() {
 
 microshift_get_konfig() {
     tmpfile=$(mktemp /tmp/microshift-e2e-konfig.XXXXXX)
-    ssh "${USHIFT_USER}@${USHIFT_IP}" 'sudo cat /var/lib/microshift/resources/kubeadmin/'"${USHIFT_IP}"'/kubeconfig' >"${tmpfile}"
+    ssh_cmd 'sudo cat /var/lib/microshift/resources/kubeadmin/'"${USHIFT_IP}"'/kubeconfig' >"${tmpfile}"
     echo "${tmpfile}"
 }
 
 microshift_check_readiness() {
     local test_output="${1}"
     log "Waiting for MicroShift to become ready"
-    ssh "${USHIFT_USER}@${USHIFT_IP}" \
-        "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh" &>"${test_output}/0002-readiness-check.log"
+    ssh_cmd "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh" &>"${test_output}/0002-readiness-check.log"
 }
 
 microshift_setup() {
     local test_output="${1}"
     log "Setting up and starting MicroShift"
-    ssh "${USHIFT_USER}@${USHIFT_IP}" 'cat << EOF | sudo tee /etc/microshift/config.yaml
+    ssh_cmd 'cat << EOF | sudo tee /etc/microshift/config.yaml
 ---
 apiServer:
   subjectAltNames:
   - '"${USHIFT_IP}"'
 EOF' &>"${test_output}/0001-setup.log"
-    ssh "${USHIFT_USER}@${USHIFT_IP}" "sudo systemctl enable --now microshift" &>>"${test_output}/0001-setup.log"
+    ssh_cmd "sudo systemctl enable --now microshift" &>>"${test_output}/0001-setup.log"
 }
 
 microshift_debug_info() {
     local test_output="${1}"
     log "Gathering debug info to ${test_output}/0020-cluster-debug-info.log"
     scp "${SCRIPT_DIR}/../validate-microshift/cluster-debug-info.sh" "${USHIFT_USER}@${USHIFT_IP}:/tmp/cluster-debug-info.sh"
-    ssh "${USHIFT_USER}@${USHIFT_IP}" "sudo /tmp/cluster-debug-info.sh" &>"${test_output}/0020-cluster-debug-info.log"
+    ssh_cmd "sudo /tmp/cluster-debug-info.sh" &>"${test_output}/0020-cluster-debug-info.log"
 }
 
 microshift_cleanup() {
     local test_output="${1}"
     log "Cleaning MicroShift"
-    ssh "${USHIFT_USER}@${USHIFT_IP}" "echo 1 | sudo microshift-cleanup-data --all" &>"${test_output}/0000-cleanup.log"
+    ssh_cmd "echo 1 | sudo microshift-cleanup-data --all" &>"${test_output}/0000-cleanup.log"
 }
 
 microshift_health_summary() {
@@ -125,8 +129,7 @@ microshift_health_summary() {
     # Because test might be "destructive" (i.e. tear down and set up again MicroShift)
     # so these commands are executed via ssh.
     # Alternative is to copy kubeconfig second time in the same test.
-    ssh "${USHIFT_USER}@${USHIFT_IP}" \
-        "mkdir -p ~/.kube/ && sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config ; \
+    ssh_cmd "mkdir -p ~/.kube/ && sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config ; \
             oc get pods -A ; \
             oc get nodes -o wide ; \
             oc get events -A --sort-by=.metadata.creationTimestamp | head -n 20"
