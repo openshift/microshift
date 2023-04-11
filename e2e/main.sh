@@ -93,34 +93,45 @@ microshift_get_konfig() {
 }
 
 microshift_check_readiness() {
-    local test_output="${1}"
+    local output_dir="${1}"
     log "Waiting for MicroShift to become ready"
-    ssh_cmd "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh" &>"${test_output}/0002-readiness-check.log"
+    ssh_cmd "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh" &>"${output_dir}/0002-readiness-check.log"
 }
 
 microshift_setup() {
-    local test_output="${1}"
+    local output_dir="${1}"
     log "Setting up and starting MicroShift"
     ssh_cmd 'cat << EOF | sudo tee /etc/microshift/config.yaml
 ---
 apiServer:
   subjectAltNames:
   - '"${USHIFT_IP}"'
-EOF' &>"${test_output}/0001-setup.log"
-    ssh_cmd "sudo systemctl enable --now microshift" &>>"${test_output}/0001-setup.log"
+EOF' &>"${output_dir}/0001-setup.log"
+    ssh_cmd "sudo systemctl enable --now microshift" &>>"${output_dir}/0001-setup.log"
 }
 
 microshift_debug_info() {
-    local test_output="${1}"
-    log "Gathering debug info to ${test_output}/0020-cluster-debug-info.log"
+    local output_dir="${1}"
+    log "Gathering debug info to ${output_dir}/0020-cluster-debug-info.log"
     scp "${SCRIPT_DIR}/../validate-microshift/cluster-debug-info.sh" "${USHIFT_USER}@${USHIFT_IP}:/tmp/cluster-debug-info.sh"
-    ssh_cmd "sudo /tmp/cluster-debug-info.sh" &>"${test_output}/0020-cluster-debug-info.log"
+    ssh_cmd "sudo /tmp/cluster-debug-info.sh" &>"${output_dir}/0020-cluster-debug-info.log"
 }
 
 microshift_cleanup() {
-    local test_output="${1}"
+    local output_dir="${1}"
     log "Cleaning MicroShift"
-    ssh_cmd "echo 1 | sudo microshift-cleanup-data --all" &>"${test_output}/0000-cleanup.log"
+    ssh_cmd "echo 1 | sudo microshift-cleanup-data --all" &>"${output_dir}/0000-cleanup.log"
+}
+
+microshift_reprovision() {
+    local output_dir="$1"
+
+    prep_start=$(date +%s)
+    microshift_cleanup "${output_dir}"
+    microshift_setup "${output_dir}"
+    microshift_check_readiness "${output_dir}"
+    prep_dur=$(($(date +%s) - prep_start))
+    log "Reprovision took $((prep_dur / 60))m $((prep_dur % 60))s."
 }
 
 microshift_health_summary() {
@@ -137,38 +148,27 @@ microshift_health_summary() {
 
 run_test() {
     local test=$1
-    echo -e "\n\n=================================================="
-    log "${test} - PREPARING"
+    local output=$2
+    log "${test} - RUNNING"
 
-    local test_output="${OUTPUT_DIR}/${test}/"
-    mkdir -p "${test_output}"
-
-    prep_start=$(date +%s)
-    microshift_cleanup "${test_output}"
-    microshift_setup "${test_output}"
-    microshift_check_readiness "${test_output}"
     konfig=$(microshift_get_konfig)
     trap 'rm -f "${konfig}"' RETURN
-    prep_dur=$(($(date +%s) - prep_start))
-    log "Cleanup, setup, and readiness took $((prep_dur / 60))m $((prep_dur % 60))s."
 
-    log "${test} - RUNNING"
     test_start=$(date +%s)
     set +e
-    KUBECONFIG="${konfig}" "${SCRIPT_DIR}/tests/${test}" &>"${test_output}/0010-test.log"
+    KUBECONFIG="${konfig}" "${SCRIPT_DIR}/tests/${test}" &>"${output}/0010-test.log"
     res=$?
     set -e
     test_dur=$(($(date +%s) - test_start))
 
-    log "${test} took $((test_dur / 60))m $((test_dur % 60))s."
     if [ ${res} -eq 0 ]; then
-        log "${test} - SUCCESS"
+        log "${test} - SUCCESS after $((test_dur / 60))m $((test_dur % 60))s."
         return 0
     fi
 
-    log "${test} - FAILURE"
-    microshift_health_summary
-    microshift_debug_info "${test_output}" || true
+    log "${test} - FAILURE after $((test_dur / 60))m $((test_dur % 60))s."
+    microshift_health_summary || true
+    microshift_debug_info "${output}" || true
     return 1
 }
 
@@ -184,10 +184,29 @@ run() {
     log "Following tests will run:\n${to_run}"
     [ ! -d "${OUTPUT_DIR}" ] && mkdir -p "${OUTPUT_DIR}"
 
+    testsuite_start=$(date +%s)
+    microshift_reprovision "${OUTPUT_DIR}"
+
     all_successful=true
+    reprovision=false
     for t in ${to_run}; do
-        run_test "${t}" || all_successful=false
+        local tout="${OUTPUT_DIR}/${t}/"
+        mkdir -p "${tout}"
+
+        if "${reprovision}"; then
+            log "Reprovisioning MicroShift before next test"
+            microshift_reprovision "${tout}"
+        fi
+
+        run_test "${t}" "${tout}" || all_successful=false
+
+        if grep -q "reprovision_after_test=true" "${SCRIPT_DIR}/tests/${t}"; then
+            reprovision=true
+        fi
     done
+
+    testsuite_dur=$(($(date +%s) - testsuite_start))
+    log "MicroShift E2E took $((testsuite_dur / 60))m $((testsuite_dur % 60))s."
     "${all_successful}"
 }
 

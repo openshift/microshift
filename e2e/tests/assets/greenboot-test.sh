@@ -84,6 +84,7 @@ EOF
 SCRIPT_FILE=/etc/greenboot/check/required.d/50_busybox_running_check.sh
 # The file comes from payload.tar
 ln -s /tmp/busybox_running_check.sh ${SCRIPT_FILE}
+trap 'rm -f ${SCRIPT_FILE}' EXIT # in case next check_greenboot_exit_status fails
 
 check_greenboot_exit_status 0 1
 rm -f ${SCRIPT_FILE}

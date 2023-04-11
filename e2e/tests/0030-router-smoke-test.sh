@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# reprovision_after_test=false
+
 set -euo pipefail
 IFS=$'\n\t'
 PS4='+ $(date "+%T.%N")\011 '
