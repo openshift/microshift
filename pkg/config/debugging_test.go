@@ -16,7 +16,15 @@ func TestGetVerbosity(t *testing.T) {
 			level:   2,
 		},
 		{
+			setting: "normal",
+			level:   2,
+		},
+		{
 			setting: "Debug",
+			level:   4,
+		},
+		{
+			setting: "debug",
 			level:   4,
 		},
 		{
@@ -24,11 +32,23 @@ func TestGetVerbosity(t *testing.T) {
 			level:   6,
 		},
 		{
+			setting: "trace",
+			level:   6,
+		},
+		{
 			setting: "TraceAll",
 			level:   8,
 		},
 		{
+			setting: "traceall",
+			level:   8,
+		},
+		{
 			setting: "Unknown",
+			level:   2,
+		},
+		{
+			setting: "unknown",
 			level:   2,
 		},
 		{
