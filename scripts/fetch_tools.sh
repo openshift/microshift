@@ -9,6 +9,8 @@ SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 DEST_DIR="${DEST_DIR:-${SCRIPT_DIR}/../_output/bin}"
 [ -d "${DEST_DIR}" ] || mkdir -p "${DEST_DIR}"
 DEST_DIR="$(realpath "${DEST_DIR}")"
+WORK_DIR=$(mktemp -d)
+trap 'rm -rfv ${WORK_DIR} &>/dev/null' EXIT
 
 _install() {
     local url="$1"
@@ -20,32 +22,29 @@ _install() {
     [[ -e "${dest}" ]] && return 0
     echo "Installing ${filename} to ${DEST_DIR}"
 
-    tmp=$(mktemp -d)
-    trap 'rm -rfv ${tmp} &>/dev/null' EXIT
-
     filename="$(basename "${url}")"
-    echo -n "${checksum} -" >"${tmp}/checksum.txt"
+    echo -n "${checksum} -" >"${WORK_DIR}/checksum.txt"
 
-    curl -sSfL --retry 5 --retry-delay 3 -o "${tmp}/${filename}" "${url}"
+    curl -sSfL --retry 5 --retry-delay 3 -o "${WORK_DIR}/${filename}" "${url}"
 
-    if ! sha256sum -c "${tmp}/checksum.txt" < "${tmp}/${filename}" &>/dev/null; then
+    if ! sha256sum -c "${WORK_DIR}/checksum.txt" < "${WORK_DIR}/${filename}" &>/dev/null; then
         echo "  Checksum for ${filename} doesn't match"
         echo "    Expected: ${checksum}"
-        echo "         Got: $(sha256sum < "${tmp}/${filename}" | cut -d' ' -f1)"
+        echo "         Got: $(sha256sum < "${WORK_DIR}/${filename}" | cut -d' ' -f1)"
         return 1
     fi
 
     # Check type of downloaded file - if it's not executable, then assume it is an archive and needs extracting
-    if [[ "$(file --brief --mime-type "${tmp}/${filename}")" != "application/x-executable" ]]; then
+    if [[ "$(file --brief --mime-type "${WORK_DIR}/${filename}")" != "application/x-executable" ]]; then
         # Extract binary from the archive. 
-        # --transform removes any leading dirs leaving just filenames so binary is extracted directly into ${tmp}
+        # --transform removes any leading dirs leaving just filenames so binary is extracted directly into ${WORK_DIR}
         # --wildcards match binary's name so only that file is extracted
-        (cd "${tmp}" && tar xvf "${filename}" --transform 's,.*\/,,g' --wildcards "*/${initial_filename}" >/dev/null)
+        (cd "${WORK_DIR}" && tar xvf "${filename}" --transform 's,.*\/,,g' --wildcards "*/${initial_filename}" >/dev/null)
     fi
 
-    chmod +x "${tmp}/${initial_filename}"
+    chmod +x "${WORK_DIR}/${initial_filename}"
     mkdir -p "$(dirname "${dest}")"
-    mv "${tmp}/${initial_filename}" "${dest}"
+    mv "${WORK_DIR}/${initial_filename}" "${dest}"
 }
 
 get_golangci-lint() {
