@@ -105,8 +105,8 @@ type Config struct {
 }
 
 const (
-	// Etcd performance degrades significantly if the memory available is less than 50MB, enfore this minimum.
-	EtcdMinimumMemoryLimit = 50
+	// Etcd performance degrades significantly if the memory available is less than 128MB, enfore this minimum.
+	EtcdMinimumMemoryLimit = 128
 )
 
 type Etcd struct {
