@@ -9,6 +9,8 @@ SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 DEST_DIR="${DEST_DIR:-${SCRIPT_DIR}/../_output/bin}"
 [ -d "${DEST_DIR}" ] || mkdir -p "${DEST_DIR}"
 DEST_DIR="$(realpath "${DEST_DIR}")"
+WORK_DIR=$(mktemp -d)
+trap 'rm -rfv ${WORK_DIR} &>/dev/null' EXIT
 
 _install() {
     local url="$1"
@@ -20,42 +22,39 @@ _install() {
     [[ -e "${dest}" ]] && return 0
     echo "Installing ${filename} to ${DEST_DIR}"
 
-    tmp=$(mktemp -d)
-    trap 'rm -rfv ${tmp} &>/dev/null' EXIT
-
     filename="$(basename "${url}")"
-    echo -n "${checksum} -" >"${tmp}/checksum.txt"
+    echo -n "${checksum} -" >"${WORK_DIR}/checksum.txt"
 
-    curl -sSfL --retry 5 --retry-delay 3 -o "${tmp}/${filename}" "${url}"
+    curl -sSfL --retry 5 --retry-delay 3 -o "${WORK_DIR}/${filename}" "${url}"
 
-    if ! sha256sum -c "${tmp}/checksum.txt" < "${tmp}/${filename}" &>/dev/null; then
+    if ! sha256sum -c "${WORK_DIR}/checksum.txt" < "${WORK_DIR}/${filename}" &>/dev/null; then
         echo "  Checksum for ${filename} doesn't match"
         echo "    Expected: ${checksum}"
-        echo "         Got: $(sha256sum < "${tmp}/${filename}" | cut -d' ' -f1)"
+        echo "         Got: $(sha256sum < "${WORK_DIR}/${filename}" | cut -d' ' -f1)"
         return 1
     fi
 
     # Check type of downloaded file - if it's not executable, then assume it is an archive and needs extracting
-    if [[ "$(file --brief --mime-type "${tmp}/${filename}")" != "application/x-executable" ]]; then
-        # Extract binary from the archive. 
-        # --transform removes any leading dirs leaving just filenames so binary is extracted directly into ${tmp}
+    if [[ "$(file --brief --mime-type "${WORK_DIR}/${filename}")" != "application/x-executable" ]]; then
+        # Extract binary from the archive.
+        # --transform removes any leading dirs leaving just filenames so binary is extracted directly into ${WORK_DIR}
         # --wildcards match binary's name so only that file is extracted
-        (cd "${tmp}" && tar xvf "${filename}" --transform 's,.*\/,,g' --wildcards "*/${initial_filename}" >/dev/null)
+        (cd "${WORK_DIR}" && tar xvf "${filename}" --transform 's,.*\/,,g' --wildcards "*/${initial_filename}" >/dev/null)
     fi
 
-    chmod +x "${tmp}/${initial_filename}"
+    chmod +x "${WORK_DIR}/${initial_filename}"
     mkdir -p "$(dirname "${dest}")"
-    mv "${tmp}/${initial_filename}" "${dest}"
+    mv "${WORK_DIR}/${initial_filename}" "${dest}"
 }
 
 get_golangci-lint() {
     local ver="1.52.1"
     declare -A checksums=(
-        ["x86_64"]="f31a6dc278aff92843acdc2671f17c753c6e2cb374d573c336479e92daed161f" 
+        ["x86_64"]="f31a6dc278aff92843acdc2671f17c753c6e2cb374d573c336479e92daed161f"
         ["aarch64"]="30dbea4ddde140010981b491740b4dd9ba973ce53a1a2f447a5d57053efe51cf")
 
     declare -A arch_map=(
-        ["x86_64"]="amd64" 
+        ["x86_64"]="amd64"
         ["aarch64"]="arm64")
 
     local arch="${arch_map[${ARCH}]}"
@@ -70,7 +69,7 @@ get_golangci-lint() {
 get_shellcheck() {
     local ver="v0.9.0"
     declare -A checksums=(
-        ["x86_64"]="700324c6dd0ebea0117591c6cc9d7350d9c7c5c287acbad7630fa17b1d4d9e2f" 
+        ["x86_64"]="700324c6dd0ebea0117591c6cc9d7350d9c7c5c287acbad7630fa17b1d4d9e2f"
         ["aarch64"]="179c579ef3481317d130adebede74a34dbbc2df961a70916dd4039ebf0735fae")
 
     declare -A arch_map=(
@@ -88,11 +87,11 @@ get_shellcheck() {
 get_kuttl() {
     local ver="0.15.0"
     declare -A checksums=(
-        ["x86_64"]="f6edcf22e238fc71b5aa389ade37a9efce596017c90f6994141c45215ba0f862" 
+        ["x86_64"]="f6edcf22e238fc71b5aa389ade37a9efce596017c90f6994141c45215ba0f862"
         ["aarch64"]="a3393f2824e632a9aa0f17fdd5c763f9b633f7a7d3f58696e94885c6b3b8af96")
 
     declare -A arch_map=(
-        ["x86_64"]="x86_64" 
+        ["x86_64"]="x86_64"
         ["aarch64"]="arm64")
 
     local arch="${arch_map[${ARCH}]}"
@@ -106,11 +105,11 @@ get_kuttl() {
 get_yq() {
     local ver="4.26.1"
     declare -A checksums=(
-        ["x86_64"]="4d3afe5ddf170ac7e70f4c23eea2969eca357947b56d5d96b8516bdf9ce56577" 
+        ["x86_64"]="4d3afe5ddf170ac7e70f4c23eea2969eca357947b56d5d96b8516bdf9ce56577"
         ["aarch64"]="837a659c5a04599f3ee7300b85bf6ccabdfd7ce39f5222de27281e0ea5bcc477")
 
     declare -A arch_map=(
-        ["x86_64"]="amd64" 
+        ["x86_64"]="amd64"
         ["aarch64"]="arm64")
 
     local arch="${arch_map[${ARCH}]}"
@@ -124,11 +123,11 @@ get_yq() {
 get_hadolint() {
     local ver="2.12.0"
     declare -A checksums=(
-        ["x86_64"]="56de6d5e5ec427e17b74fa48d51271c7fc0d61244bf5c90e828aab8362d55010" 
+        ["x86_64"]="56de6d5e5ec427e17b74fa48d51271c7fc0d61244bf5c90e828aab8362d55010"
         ["aarch64"]="5798551bf19f33951881f15eb238f90aef023f11e7ec7e9f4c37961cb87c5df6")
-    
+
     declare -A arch_map=(
-        ["x86_64"]="x86_64" 
+        ["x86_64"]="x86_64"
         ["aarch64"]="arm64")
 
     local arch="${arch_map[${ARCH}]}"
@@ -137,6 +136,16 @@ get_hadolint() {
     local url="https://github.com/hadolint/hadolint/releases/download/v${ver}/hadolint-Linux-${arch}"
 
     _install "${url}" "${checksum}" "${filename}" "hadolint-Linux-${arch}"
+
+    # SELinux context change is required on some systems to prevent the following error
+    #
+    # SELinux is preventing <exename> from execmod access on the file.
+    # If you want to allow all unconfined executables to use libraries requiring text relocation
+    # that are not labeled textrel_shlib_t, then you must tell SELinux about this by enabling the
+    # 'selinuxuser_execmod' boolean.
+    if selinuxenabled ; then
+        chcon -t textrel_shlib_t "${DEST_DIR}/${filename}"
+    fi
 }
 
 get_lichen() {
@@ -170,7 +179,7 @@ tools_to_install=()
 if echo "$@" | grep -q all; then
     readarray -t tools_to_install <<<"${tool_getters}"
 else
-    for arg in "$@"; do 
+    for arg in "$@"; do
         if ! echo "${tool_getters}" | grep -q "${arg}" || [ "$(echo "${tool_getters}" | grep "${arg}")" != "${arg}" ]; then
             usage "Unknown tool: ${arg}"
         fi
