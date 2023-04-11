@@ -179,26 +179,6 @@ update_lvms_manifests() {
     done
 }
 
-update_release_go() {
-    local src=$1
-    local arch=$2
-
-    case "$arch" in
-        amd64|x86_64)   release_file="${REPOROOT}/pkg/assets/release-x86_64.json"   ;;
-        arm64|aarch64)  release_file="${REPOROOT}/pkg/assets/release-aarch64.json"  ;;
-    esac
-
-    local staged_release
-    staged_release="$(mktemp -d)/$(basename "$release_file")"
-    cp "$release_file" "${staged_release}" || return 1
-    # shellcheck disable=SC2155
-    local images
-    images="$(parse_images "$src")" || return 1
-    while IFS=' ' read -r line; do
-        yq '.images['""']'
-    done <"$images"
-    cp -f "$staged_release" "$release_file" || return 1
-}
 # Clone a repo at a commit
 clone_repo() {
     local repo="$1"
@@ -793,6 +773,24 @@ update_openshift_manifests() {
     popd >/dev/null
 }
 
+update_version_makefile() {
+    local arch="$1"
+    local uname_i="$2"
+
+    local release_file
+    case "$arch" in
+        amd64|x86_64)   release_file="${REPOROOT}/assets/release/release-x86_64.json"   ;;
+        arm64|aarch64)  release_file="${REPOROOT}/assets/release/release-aarch64.json"  ;;
+    esac
+
+    local -r version_makefile="${REPOROOT}/Makefile.version.${uname_i}.var"
+    local -r ocp_version=$(jq -r '.release.base' "$release_file")
+
+    cat <<EOF > "$version_makefile"
+OCP_VERSION := ${ocp_version}
+EOF
+}
+
 # Updates buildfiles like the Makefile
 update_buildfiles() {
     KUBE_ROOT="${STAGING_DIR}/kubernetes"
@@ -815,6 +813,9 @@ KUBE_GIT_TREE_STATE=${KUBE_GIT_TREE_STATE-}
 EOF
 
     popd >/dev/null
+
+    update_version_makefile amd64 x86_64
+    update_version_makefile arm64 aarch64
 }
 
 

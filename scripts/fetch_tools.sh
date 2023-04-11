@@ -121,6 +121,29 @@ get_yq() {
     _install "${url}" "${checksum}" "${filename}" "yq_linux_${arch}"
 }
 
+get_hadolint() {
+    local ver="2.12.0"
+    declare -A checksums=(
+        ["x86_64"]="56de6d5e5ec427e17b74fa48d51271c7fc0d61244bf5c90e828aab8362d55010" 
+        ["aarch64"]="5798551bf19f33951881f15eb238f90aef023f11e7ec7e9f4c37961cb87c5df6")
+    
+    declare -A arch_map=(
+        ["x86_64"]="x86_64" 
+        ["aarch64"]="arm64")
+
+    local arch="${arch_map[${ARCH}]}"
+    local checksum="${checksums[${ARCH}]}"
+    local filename="hadolint"
+    local url="https://github.com/hadolint/hadolint/releases/download/v${ver}/hadolint-Linux-${arch}"
+
+    _install "${url}" "${checksum}" "${filename}" "hadolint-Linux-${arch}"
+}
+
+get_lichen() {
+    local ver="v0.1.7"
+    GOBIN=${DEST_DIR} GOFLAGS="" go install github.com/uw-labs/lichen@${ver}
+}
+
 tool_getters=$(declare -F |  cut -d' ' -f3 | grep "get_" | sed 's/get_//g')
 
 usage() {

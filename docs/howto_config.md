@@ -1,5 +1,5 @@
 # Configuration
-The MicroShift configuration file must be located at `~/.microshift/config.yaml` (user-specific) and `/etc/microshift/config.yaml` (system-wide), while the former takes precedence if it exists. A sample `/etc/microshift/config.yaml.default` configuration file is installed by the MicroShift RPM and it can be used as a template when customizing MicroShift.
+The MicroShift configuration file must be located at `/etc/microshift/config.yaml`. A sample `/etc/microshift/config.yaml.default` configuration file is installed by the MicroShift RPM and it can be used as a template when customizing MicroShift.
 
 The format of the `config.yaml` configuration file is as follows.
 
@@ -86,9 +86,9 @@ List of ports that you must avoid:
 
 By default, etcd will be allowed to use as much memory as it needs to handle the load on the system; however, in memory constrained systems, it may be preferred or necessary to limit the amount of memory etcd is allowed to use at a given time.
 
-Setting the `memoryLimitMB` to a value greater than 0 will result in a soft memory limit being applied to etcd; etcd will be allowed to go over this value during operation, but memory will be more aggresively reclaimed from it if it does. A value of `128` megabytes is the recommended starting place for this limit; however, the configuration floor is `50` megabytes - attempting to set the limit below 50 megabytes will result in the configuration being 50 megabytes.
+Setting the `memoryLimitMB` to a value greater than 0 will result in a soft memory limit being applied to etcd; etcd will be allowed to go over this value during operation, but memory will be more aggresively reclaimed from it if it does. A value of `128` megabytes is the  configuration floor - attempting to set the limit below 128 megabytes will result in the configuration being 128 megabytes.
 
-Please note that values between 50 and 128 megabytes will heavily trade off memory footprint for etcd performance: the lower the memory limit, the more time etcd will spend on paging memory to disk and will take longer to respond to queries or even timing requests out if the limit is low and the etcd usage is high.
+Please note that values close to the floor may be more likely to impact etcd performance - the memory limit is a trade-off of memory footprint and etcd performance. The lower the limit, the more time etcd will spend on paging memory to disk and will take longer to respond to queries or even timing requests out if the limit is low and the etcd usage is high.
 
 # Auto-applying Manifests
 

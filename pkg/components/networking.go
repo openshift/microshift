@@ -40,7 +40,7 @@ func startCNIPlugin(cfg *config.Config, kubeconfigPath string) error {
 		}
 	)
 
-	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.DefaultGlobalConfigFile))
+	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.ConfigFile))
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func startCNIPlugin(cfg *config.Config, kubeconfigPath string) error {
 	extraParams := assets.RenderParams{
 		"OVNConfig":      ovnConfig,
 		"KubeconfigPath": kubeconfigPath,
-		"KubeconfigDir":  filepath.Join(microshiftDataDir, "/resources/kubeadmin"),
+		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
 	}
 	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)

@@ -14,7 +14,7 @@ export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
 SOURCE_GIT_COMMIT_TIMESTAMP ?= $(shell TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H%M%S' --format="%cd")
 
-OCP_VERSION := $(shell jq -r '.release.base' ${PROJECT_DIR}/assets/release/release-$(shell uname -i).json)
+include Makefile.version.$(shell uname -i).var
 MICROSHIFT_VERSION ?= $(subst -clean,,$(shell echo '${OCP_VERSION}-${SOURCE_GIT_COMMIT_TIMESTAMP}-${SOURCE_GIT_COMMIT}-${SOURCE_GIT_TREE_STATE}'))
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
@@ -115,8 +115,8 @@ etcd:
 					$(LD_FLAGS)\"" \
 		$(MAKE) -C etcd
 
-.PHONY: verify verify-images verify-assets
-verify: verify-images verify-assets verify-sh verify-py
+.PHONY: verify verify-images verify-assets licensecheck
+verify: verify-images verify-assets verify-sh verify-py verify-container licensecheck
 
 verify-images:
 	./hack/verify_images.sh
@@ -148,6 +148,11 @@ verify-sh:
 .PHONY: verify-py
 verify-py:
 	./hack/verify-py.sh
+
+.PHONY: verify-container
+verify-container:
+	./scripts/fetch_tools.sh hadolint && \
+	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output")
 
 ###############################
 # post install validate       #
@@ -271,14 +276,9 @@ clean-cross-build:
 clean: clean-cross-build
 .PHONY: clean
 
-licensecheck: microshift bin/lichen
-	bin/lichen -c .lichen.yaml microshift
-
-bin:
-	mkdir -p $@
-
-bin/lichen: bin vendor/modules.txt
-	GOBIN=$(realpath ./bin) go install github.com/uw-labs/lichen@latest
+licensecheck: microshift
+	./scripts/fetch_tools.sh lichen && \
+	./_output/bin/lichen -c .lichen.yaml ./_output/bin/microshift
 
 vendor:
 	go mod vendor

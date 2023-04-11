@@ -44,8 +44,6 @@ const (
 	componentKubelet = "kubelet"
 )
 
-var microshiftDataDir = config.GetDataDir()
-
 type KubeletServer struct {
 	kubeletflags *kubeletoptions.KubeletFlags
 	kubeconfig   *kubeletconfig.KubeletConfiguration
@@ -83,7 +81,7 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/worker"] = ""
 	kubeletFlags.NodeLabels["node.openshift.io/os_id"] = osID
 
-	kubeletConfig, err := loadConfigFile(microshiftDataDir + "/resources/kubelet/config/config.yaml")
+	kubeletConfig, err := loadConfigFile(filepath.Join(config.DataDir, "/resources/kubelet/config/config.yaml"))
 
 	if err != nil {
 		klog.Fatalf("Failed to load Kubelet Configuration", err)
@@ -94,7 +92,7 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 }
 
 func (s *KubeletServer) writeConfig(cfg *config.Config) error {
-	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	servingCertDir := cryptomaterial.KubeletServingCertDir(certsDir)
 
 	data := []byte(`
@@ -102,14 +100,14 @@ kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
   x509:
-    clientCAFile: ` + cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(microshiftDataDir)) + `
+    clientCAFile: ` + cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(config.DataDir)) + `
   anonymous:
     enabled: false
 tlsCertFile: ` + cryptomaterial.ServingCertPath(servingCertDir) + `
 tlsPrivateKeyFile: ` + cryptomaterial.ServingKeyPath(servingCertDir) + `
 cgroupDriver: "systemd"
 failSwapOn: false
-volumePluginDir: ` + microshiftDataDir + `/kubelet-plugins/volume/exec
+volumePluginDir: ` + config.DataDir + `/kubelet-plugins/volume/exec
 clusterDNS:
   - ` + cfg.Network.DNS + `
 clusterDomain: cluster.local
@@ -135,7 +133,7 @@ serverTLSBootstrap: false #TODO`)
 		data = append(data, fmt.Sprintf("\nresolvConf: %s\n", config.DefaultSystemdResolvedFile)...)
 	}
 
-	path := filepath.Join(microshiftDataDir, "resources", "kubelet", "config", "config.yaml")
+	path := filepath.Join(config.DataDir, "resources", "kubelet", "config", "config.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return os.WriteFile(path, data, 0400)
 }

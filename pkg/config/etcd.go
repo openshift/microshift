@@ -4,8 +4,8 @@ import "time"
 
 const (
 	// Etcd performance degrades significantly if the memory available
-	// is less than 50MB, enforce this minimum.
-	EtcdMinimumMemoryLimit = 50
+	// is less than 128MB, enforce this minimum.
+	EtcdMinimumMemoryLimit = 128
 )
 
 type EtcdConfig struct {

@@ -56,8 +56,6 @@ var (
 		embedded.MustAsset("controllers/kube-apiserver/defaultconfig.yaml"),
 		embedded.MustAsset("controllers/kube-apiserver/config-overrides.yaml"),
 	}
-
-	microshiftDataDir = config.GetDataDir()
 )
 
 var fixedTLSProfile *configv1.TLSProfileSpec
@@ -94,7 +92,7 @@ func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd", "netwo
 func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	s.verbosity = cfg.GetVerbosity()
 
-	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	kubeCSRSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
 	kubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
@@ -116,7 +114,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
 			"advertise-address": {s.advertiseAddress},
-			"audit-policy-file": {microshiftDataDir + "/resources/kube-apiserver-audit-policies/default.yaml"},
+			"audit-policy-file": {filepath.Join(config.DataDir, "/resources/kube-apiserver-audit-policies/default.yaml")},
 			"client-ca-file":    {clientCABundlePath},
 			"etcd-cafile":       {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
 			"etcd-certfile":     {cryptomaterial.ClientCertPath(etcdClientCertDir)},
@@ -132,7 +130,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			"proxy-client-cert-file":           {cryptomaterial.ClientCertPath(aggregatorClientCertDir)},
 			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},
 			"requestheader-client-ca-file":     {aggregatorCAPath},
-			"service-account-signing-key-file": {microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.key"},
+			"service-account-signing-key-file": {filepath.Join(config.DataDir, "/resources/kube-apiserver/secrets/service-account-key/service-account.key")},
 			"service-node-port-range":          {cfg.Network.ServiceNodePortRange},
 			"tls-cert-file":                    {servingCert},
 			"tls-private-key-file":             {servingKey},
@@ -206,7 +204,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			},
 		},
 		ServiceAccountPublicKeyFiles: []string{
-			microshiftDataDir + "/resources/kube-apiserver/secrets/service-account-key/service-account.pub",
+			filepath.Join(config.DataDir, "/resources/kube-apiserver/secrets/service-account-key/service-account.pub"),
 		},
 		ServicesSubnet:        cfg.Network.ServiceNetwork[0],
 		ServicesNodePortRange: cfg.Network.ServiceNodePortRange,
@@ -284,7 +282,7 @@ rules:
   omitStages:
   - "RequestReceived"`)
 
-	path := filepath.Join(microshiftDataDir, "resources", "kube-apiserver-audit-policies", "default.yaml")
+	path := filepath.Join(config.DataDir, "resources", "kube-apiserver-audit-policies", "default.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
 	return os.WriteFile(path, data, 0400)
 }

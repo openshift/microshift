@@ -147,7 +147,7 @@ func checkIfEtcdIsReady(ctx context.Context) error {
 }
 
 func getEtcdClient(ctx context.Context) (*clientv3.Client, error) {
-	certsDir := cryptomaterial.CertsDirectory(config.GetDataDir())
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	etcdAPIServerClientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
 
 	tlsInfo := transport.TLSInfo{

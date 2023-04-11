@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ROOTDIR=$(git rev-parse --show-toplevel)
-REQ_FILE=${ROOTDIR}/requirements.txt
+REQ_FILE=${ROOTDIR}/scripts/requirements.txt
 VENV="/tmp/venv"
 PYLINT="pylint"
 
@@ -15,7 +15,7 @@ if ! command -v ${PYLINT} &>/dev/null; then
         python3 -m venv ${VENV}
  	    ${VENV}/bin/python3 -m pip install --upgrade pip
  	    ${VENV}/bin/python3 -m pip install -r ${REQ_FILE}
-        PYLINT="/tmp/venv/bin/pylint"
+        PYLINT="${VENV}/bin/pylint"
     fi
 fi
 
