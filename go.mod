@@ -6,7 +6,6 @@ require (
 	github.com/apparentlymart/go-cidr v1.1.0
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
 	github.com/miekg/dns v1.1.35 // microshift
-	github.com/mitchellh/go-homedir v1.1.0 // microshift
 	github.com/openshift/api v0.0.0-20230208193339-068b2ae5534f
 	github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
 	github.com/openshift/client-go v0.0.0-20230120202327-72f107311084
