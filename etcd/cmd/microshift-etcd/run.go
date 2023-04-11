@@ -67,13 +67,12 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.maxFragmentedPercentage = cfg.Etcd.MaxFragmentedPercentage
 	s.defragCheckFreq = cfg.Etcd.DefragCheckFreq
 
-	microshiftDataDir := config.GetDataDir()
-	certsDir := cryptomaterial.CertsDirectory(microshiftDataDir)
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 
 	etcdServingCertDir := cryptomaterial.EtcdServingCertDir(certsDir)
 	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
 	etcdSignerCertPath := cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))
-	dataDir := filepath.Join(microshiftDataDir, s.Name())
+	dataDir := filepath.Join(config.DataDir, s.Name())
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	s.etcdCfg = etcd.NewConfig()

@@ -36,13 +36,13 @@ func (c *Config) CanonicalNodeName() string {
 }
 
 // Read or set the NodeName that will be used for this MicroShift instance
-func (c *Config) establishNodeName() (string, error) {
+func (c *Config) establishNodeName(dataDir string) (string, error) {
 	name := c.CanonicalNodeName()
-	filePath := filepath.Join(GetDataDir(), ".nodename")
+	filePath := filepath.Join(dataDir, ".nodename")
 	contents, err := os.ReadFile(filePath)
 	if os.IsNotExist(err) {
 		// ensure that dataDir exists
-		os.MkdirAll(GetDataDir(), 0700)
+		os.MkdirAll(dataDir, 0700)
 		if err := os.WriteFile(filePath, []byte(name), 0444); err != nil {
 			return "", fmt.Errorf("failed to write nodename file %q: %v", filePath, err)
 		}
@@ -54,13 +54,13 @@ func (c *Config) establishNodeName() (string, error) {
 }
 
 // Validate the NodeName to be used for this MicroShift instances
-func (c *Config) validateNodeName(isDefaultNodeName bool) error {
+func (c *Config) validateNodeName(isDefaultNodeName bool, dataDir string) error {
 	currentNodeName := c.CanonicalNodeName()
 	if addr := net.ParseIP(currentNodeName); addr != nil {
 		return fmt.Errorf("NodeName can not be an IP address: %q", currentNodeName)
 	}
 
-	establishedNodeName, err := c.establishNodeName()
+	establishedNodeName, err := c.establishNodeName(dataDir)
 	if err != nil {
 		return fmt.Errorf("failed to establish NodeName: %v", err)
 	}
@@ -83,5 +83,5 @@ func (c *Config) EnsureNodeNameHasNotChanged() error {
 	// Validate NodeName in config file, node-name should not be changed for an already
 	// initialized MicroShift instance. This can lead to Pods being re-scheduled, storage
 	// being orphaned or lost, and other side effects.
-	return c.validateNodeName(c.isDefaultNodeName())
+	return c.validateNodeName(c.isDefaultNodeName(), DataDir)
 }

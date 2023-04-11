@@ -85,7 +85,7 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatal(err)
 	}
 
-	os.MkdirAll(microshiftDataDir, 0700)
+	os.MkdirAll(config.DataDir, 0700)
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	certChains, err := initCerts(cfg)

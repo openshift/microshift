@@ -39,7 +39,7 @@ func startServiceCAController(cfg *config.Config, kubeconfigPath string) error {
 		cmName     = "signing-cabundle"
 	)
 
-	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(microshiftDataDir))
+	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(config.DataDir))
 	caCertPath := cryptomaterial.CACertPath(serviceCADir)
 	caKeyPath := cryptomaterial.CAKeyPath(serviceCADir)
 
@@ -141,7 +141,7 @@ func startIngressController(cfg *config.Config, kubeconfigPath string) error {
 		return err
 	}
 
-	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(microshiftDataDir))
+	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(config.DataDir))
 	caCertPath := cryptomaterial.CACertPath(serviceCADir)
 	cmData := map[string]string{}
 

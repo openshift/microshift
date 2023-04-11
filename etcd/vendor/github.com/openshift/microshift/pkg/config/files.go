@@ -1,18 +1,15 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
-	"github.com/mitchellh/go-homedir"
 	"sigs.k8s.io/yaml"
 )
 
 const (
-	defaultUserDataDir   = "~/.microshift/data"
-	ConfigFile           = "/etc/microshift/config.yaml"
-	defaultGlobalDataDir = "/var/lib/microshift"
+	ConfigFile = "/etc/microshift/config.yaml"
+	DataDir    = "/var/lib/microshift"
 	// for files managed via management system in /etc, i.e. user applications
 	defaultManifestDirEtc = "/etc/microshift/manifests"
 	// for files embedded in ostree. i.e. cni/other component customizations
@@ -20,31 +17,11 @@ const (
 )
 
 var (
-	dataDir      = findDataDir()
 	manifestsDir = findManifestsDir()
 )
 
-func GetDataDir() string {
-	return dataDir
-}
-
 func GetManifestsDir() []string {
 	return manifestsDir
-}
-
-// Returns the default user data dir if it exists or the user is non-root.
-// Returns the default global data dir otherwise.
-func findDataDir() string {
-	userDataDir, _ := homedir.Expand(defaultUserDataDir)
-	if _, err := os.Stat(userDataDir); errors.Is(err, os.ErrNotExist) {
-		if os.Geteuid() > 0 {
-			return userDataDir
-		} else {
-			return defaultGlobalDataDir
-		}
-	} else {
-		return userDataDir
-	}
 }
 
 // Returns the default manifests directories
