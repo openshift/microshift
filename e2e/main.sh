@@ -192,7 +192,7 @@ run() {
 }
 
 [ $# -eq 0 ] && {
-    usage "Expected arguments"
+    usage "Missing expected arguments"
 }
 
 cmd="$1"
