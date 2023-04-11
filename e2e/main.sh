@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
-OUTPUT_DIR="${ARTIFACT_DIR:-_output}/microshift-e2e-$(date +'%Y%m%d-%H%M%S')/"
+OUTPUT_DIR="${ARTIFACT_DIR:-${SCRIPT_DIR}/../_output}/microshift-e2e-$(date +'%Y%m%d-%H%M%S')/"
 
 usage() {
     echo "Usage: $(basename "${0}") {list|run} [filter]"
