@@ -131,7 +131,7 @@ microshift_reprovision() {
     microshift_setup "${output_dir}"
     microshift_check_readiness "${output_dir}"
     prep_dur=$(($(date +%s) - prep_start))
-    log "Reprovision took $((prep_dur / 60))m $((prep_dur % 60))s."
+    log "Reprovisioning took $((prep_dur / 60))m $((prep_dur % 60))s."
 }
 
 microshift_health_summary() {
