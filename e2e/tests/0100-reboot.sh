@@ -38,7 +38,5 @@ if [ "${res}" -ne 0 ] && [ "${res}" -ne 255 ]; then
 fi
 
 wait_until ssh "${USHIFT_USER}@${USHIFT_IP}" "true"
-# Just check if KAS is up and serving
-wait_until oc get node
 ssh "${USHIFT_USER}@${USHIFT_IP}" "sudo /etc/greenboot/check/required.d/40_microshift_running_check.sh"
 oc wait --for=condition=Ready --timeout=120s pod/test-pod
