@@ -403,7 +403,7 @@ func initKubeconfigs(
 		}
 	}
 
-	if err := cleanupStaleKubeconfigs(cfg); err != nil {
+	if err := cleanupStaleKubeconfigs(cfg, cfg.KubeConfigRootAdminPath()); err != nil {
 		klog.Warningf("Unable to remove stale kubeconfigs: %v", err)
 	}
 
@@ -517,12 +517,12 @@ func certsToRegenerate(cs *certchains.CertificateChains) ([][]string, error) {
 	return regenCerts, err
 }
 
-func cleanupStaleKubeconfigs(cfg *config.Config) error {
+func cleanupStaleKubeconfigs(cfg *config.Config, path string) error {
 	currentKubeconfigs := make(map[string]struct{})
 	for _, name := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
 		currentKubeconfigs[name] = struct{}{}
 	}
-	files, err := os.ReadDir(cfg.KubeConfigRootAdminPath())
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return err
 	}
@@ -532,14 +532,14 @@ func cleanupStaleKubeconfigs(cfg *config.Config) error {
 			continue
 		}
 		if _, ok := currentKubeconfigs[file.Name()]; !ok {
-			deleteDirs = append(deleteDirs, filepath.Join(cfg.KubeConfigRootAdminPath(), file.Name()))
+			deleteDirs = append(deleteDirs, filepath.Join(path, file.Name()))
 		}
 	}
-	for _, path := range deleteDirs {
-		if err := os.RemoveAll(path); err != nil {
-			klog.Warningf("Unable to remove %s: %v", path, err)
+	for _, deletePath := range deleteDirs {
+		if err := os.RemoveAll(deletePath); err != nil {
+			klog.Warningf("Unable to remove %s: %v", deletePath, err)
 		}
-		klog.Infof("Removed stale kubeconfig %s", path)
+		klog.Infof("Removed stale kubeconfig %s", deletePath)
 	}
 	return nil
 }
