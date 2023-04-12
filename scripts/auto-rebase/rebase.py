@@ -1,8 +1,16 @@
 #!/usr/bin/env python
+# pylint: disable=fixme,global-statement,too-many-statements,too-many-locals,broad-except
+# pylint: disable=logging-fstring-interpolation,logging-not-lazy,line-too-long
+
+"""
+This Python script automates the process of rebasing a Git branch
+of MicroShift repository on a given release.
+"""
 
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 import textwrap
@@ -44,6 +52,10 @@ RebaseScriptResult = namedtuple("RebaseScriptResult", ["success", "output"])
 
 
 def try_get_env(var_name, die=True):
+    """
+    Attempts to retrieve the value of an environment variable with the given name, and
+    exits the script if the variable is not defined.
+    """
     val = os.getenv(var_name)
     if val is None or val == "":
         if die:
@@ -56,11 +68,13 @@ def try_get_env(var_name, die=True):
 
 
 def run_rebase_sh(release_amd64, release_arm64, release_lvms):
+    """Run the 'rebase.sh' script with the given release versions and return the script's output."""
     script_dir = os.path.abspath(os.path.dirname(__file__))
     args = [f"{script_dir}/rebase.sh", "to", release_amd64, release_arm64, release_lvms]
     logging.info(f"Running: '{' '.join(args)}'")
     start = timer()
-    result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    result = subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False)
     logging.info(f"Return code: {result.returncode}. Output:\n" +
                  "==================================================\n" +
                  f"{result.stdout}" +
@@ -71,18 +85,22 @@ def run_rebase_sh(release_amd64, release_arm64, release_lvms):
 
 
 def commit_str(commit):
+    """Returns the first 8 characters of the commit's SHA hash and the commit summary."""
     return f"{commit.hexsha[:8]} - {commit.summary}"
 
 
 def get_installation_access_token(app_id, key_path, org, repo):
-    integration = GithubIntegration(app_id, Path(key_path).read_text())
+    """Get a installation access token for a GitHub App installation."""
+    integration = GithubIntegration(app_id, Path(key_path).read_text(encoding='utf-8'))
     app_installation = integration.get_installation(org, repo)
-    if app_installation == None:
-        sys.exit(f"Failed to get app_installation for {org}/{repo}. Response: {app_installation.raw_data}")
+    if app_installation is None:
+        sys.exit(f"Failed to get app_installation for {org}/{repo}. " +
+                 f"Response: {app_installation.raw_data}")
     return integration.get_access_token(app_installation.id).token
 
 
 def make_sure_rebase_script_created_new_commits_or_exit(git_repo, base_branch):
+    """Exit the script if the 'rebase.sh' script did not create any new commits."""
     if git_repo.active_branch.commit == git_repo.branches[base_branch].commit:
         logging.info(f"There's no new commit on branch {git_repo.active_branch} compared to '{base_branch}' "
                      "meaning that the rebase.sh script didn't create any commits and "
@@ -92,6 +110,10 @@ def make_sure_rebase_script_created_new_commits_or_exit(git_repo, base_branch):
 
 
 def rebase_script_made_changes_considered_functional(git_repo, base_branch):
+    """
+    Returns True if the changes made by the 'rebase.sh' script are
+    considered functional, False otherwise.
+    """
     logging.info(f"Deciding if PR should be created by diffing against {base_branch} branch")
     diffs = git_repo.active_branch.commit.diff(base_branch)
     logging.info(f"Following files changed: {[ d.a_path for d in diffs ]}")
@@ -118,6 +140,10 @@ def rebase_script_made_changes_considered_functional(git_repo, base_branch):
 
 
 def get_remote_with_token(git_repo, token, org, repo):
+    """
+    Returns the Git remote for the given repository using
+    the provided installation (or personal) access token.
+    """
     remote_url = f"https://x-access-token:{token}@github.com/{org}/{repo}"
     try:
         remote = git_repo.remote(BOT_REMOTE_NAME)
@@ -129,6 +155,10 @@ def get_remote_with_token(git_repo, token, org, repo):
 
 
 def try_get_rebase_branch_ref_from_remote(remote, branch_name):
+    """
+    Get the reference for the given branch on the specified Git remote,
+    otherwise return None if the branch does not exist.
+    """
     remote.fetch()
     matching_remote_refs = [ref for ref in remote.refs if BOT_REMOTE_NAME + "/" + branch_name == ref.name]
 
@@ -138,66 +168,82 @@ def try_get_rebase_branch_ref_from_remote(remote, branch_name):
 
     if len(matching_remote_refs) > 1:
         matching_branches = ", ".join([r.name for r in matching_remote_refs])
-        logging.warning(f"Found more than one branch matching '{branch_name}' on remote: {matching_branches}. Taking first one")
-        _extra_msgs.append(f"Found more than one branch matching '{branch_name}' on remote: {matching_branches}.")
+        logging.warning(f"Found more than one branch matching '{branch_name}' " +
+                        f"on remote: {matching_branches}. Taking first one")
+        _extra_msgs.append(f"Found more than one branch matching '{branch_name}' " +
+                           f"on remote: {matching_branches}.")
         return matching_remote_refs[0]
 
     if len(matching_remote_refs) == 1:
         logging.info(f"Branch '{branch_name}' already exists on remote")
         return matching_remote_refs[0]
 
+    return None
 
 def is_local_branch_based_on_newer_base_branch_commit(git_repo, base_branch_name, remote_branch_name, local_branch_name):
     """
     Compares local and remote rebase branches by looking at their start on base branch.
-    Returns True if local branch is starts on newer commit and needs to be pushed to remote, otherwise False.
+    Returns True if local branch starts on newer commit and needs to be pushed to remote,
+    otherwise False.
     """
     remote_merge_base = git_repo.merge_base(base_branch_name, remote_branch_name)
     local_merge_base = git_repo.merge_base(base_branch_name, local_branch_name)
 
     if remote_merge_base[0] == local_merge_base[0]:
-        logging.info(f"Remote branch is up to date. Branch-off commit: {commit_str(remote_merge_base[0])}")
+        logging.info("Remote branch is up to date. " +
+                     f"Branch-off commit: {commit_str(remote_merge_base[0])}")
         return False
-    else:
-        logging.info(f"Remote branch is older - it needs updating. "
-                     f"Remote branch is on top of {base_branch_name}'s commit: '{commit_str(remote_merge_base[0])}'. "
-                     f"Local branch is on top of {base_branch_name}'s commit '{commit_str(local_merge_base[0])}'")
-        return True
+
+    logging.info(f"Remote branch is older - it needs updating. "
+                    f"Remote branch is on top of {base_branch_name}'s commit: '{commit_str(remote_merge_base[0])}'. "
+                    f"Local branch is on top of {base_branch_name}'s commit '{commit_str(local_merge_base[0])}'")
+    return True
 
 
 def try_get_pr(gh_repo, org, base_branch, branch_name):
+    """
+    Try to get a pull request for a branch on a GitHub repository.
+    Returns
+    - The pull request if it exists and is open, otherwise None.
+    - If more than one pull request is found, then the first one will be used.
+    """
     prs = gh_repo.get_pulls(base=base_branch, head=f"{org}:{branch_name}", state="all")
 
     if prs.totalCount == 0:
         logging.info(f"PR for branch {branch_name} does not exist yet on {gh_repo.full_name}")
         return None
 
-    pr = None
+    pull_req = None
     if prs.totalCount > 1:
-        pr = prs[0]
-        logging.warning(f"Found more than one PR for branch {branch_name} on {gh_repo.full_name} - this is unexpected, continuing with first one of: {[(x.state, x.html_url) for x in prs]}")
+        pull_req = prs[0]
+        logging.warning(f"Found more than one PR for branch {branch_name} on {gh_repo.full_name} -"+
+                        f"this is unexpected, continuing with first one of: {[(x.state, x.html_url) for x in prs]}")
 
     if prs.totalCount == 1:
-        pr = prs[0]
-        logging.info(f"Found PR #{pr.number} for branch {branch_name} on {gh_repo.full_name}: {pr.html_url}")
+        pull_req = prs[0]
+        logging.info(f"Found PR #{pull_req.number} for branch {branch_name} on {gh_repo.full_name}: {pull_req.html_url}")
 
-    if pr.state == 'closed':
-        logging.warning(f"PR #{pr.number} is not open - new PR will be created")
-        if pr.is_merged():
-            logging.warning(f"PR #{pr.number} for '{branch_name}' branch is already merged but rebase.sh produced results")
-            _extra_msgs.append(f"PR #{pr.number} for '{branch_name}' was already merged but rebase.sh produced results")
+    if pull_req.state == 'closed':
+        logging.warning(f"PR #{pull_req.number} is not open - new PR will be created")
+        if pull_req.is_merged():
+            logging.warning(f"PR #{pull_req.number} for '{branch_name}' branch is already merged but rebase.sh produced results")
+            _extra_msgs.append(f"PR #{pull_req.number} for '{branch_name}' was already merged but rebase.sh produced results")
         else:
-            _extra_msgs.append(f"PR #{pr.number} for '{branch_name}' exists already but was closed")
+            _extra_msgs.append(f"PR #{pull_req.number} for '{branch_name}' exists already but was closed")
         return None
-    return pr
+    return pull_req
 
 
-def generate_pr_description(branch_name, amd_tag, arm_tag, prow_job_url, rebase_script_succeded):
+def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succeded):
+    """
+    Returns a string that represents the body of a pull request (PR) description.
+    Note: This function expects that there is a "scripts/auto-rebase/changelog.txt" file present.
+    """
     try:
-        with open("scripts/auto-rebase/changelog.txt", "r") as f:
-            changelog = f.read()
-    except Exception as e:
-        logging.warn(f"Unable to read changelog file: {e}")
+        with open("scripts/auto-rebase/changelog.txt", mode="r", encoding='utf-8') as file:
+            changelog = file.read()
+    except Exception as err:
+        logging.warning(f"Unable to read changelog file: {err}")
         changelog = ""
 
     base = textwrap.dedent(f"""
@@ -214,32 +260,42 @@ def generate_pr_description(branch_name, amd_tag, arm_tag, prow_job_url, rebase_
 
 
 def create_pr(gh_repo, base_branch, branch_name, title, desc):
+    """
+    Creates a pull request (and requests reviews) for a given branch on a GitHub repository.
+    If the `REMOTE_DRY_RUN` variable is True, it logs the PR creation request without actually creating it.
+    """
     if REMOTE_DRY_RUN:
         logging.info(f"[DRY RUN] Create PR: branch='{branch_name}', title='{title}', desc='{desc}'")
         logging.info(f"[DRY RUN] Requesting review from {REVIEWERS}")
-        return
+        return None
 
-    pr = gh_repo.create_pull(title=title, body=desc, base=base_branch, head=branch_name, maintainer_can_modify=True)
-    logging.info(f"Created pull request: {pr.html_url}")
+    pull_req = gh_repo.create_pull(
+        title=title, body=desc, base=base_branch, head=branch_name, maintainer_can_modify=True)
+    logging.info(f"Created pull request: {pull_req.html_url}")
     try:
-        pr.create_review_request(reviewers=REVIEWERS)
+        pull_req.create_review_request(reviewers=REVIEWERS)
         logging.info(f"Requested review from {REVIEWERS}")
-    except GithubException as e:
-        logging.info(f"Failed to request review from {REVIEWERS} because: {e}")
-    return pr
+    except GithubException as err:
+        logging.info(f"Failed to request review from {REVIEWERS} because: {err}")
+    return pull_req
 
 
-def update_pr(pr, title, desc):
+def update_pr(pull_req, title, desc):
+    """Updates the title and description of a pull request on a GitHub repository."""
     if REMOTE_DRY_RUN:
-        logging.info(f"[DRY RUN] Update PR #{pr.number}: {title}\n{desc}")
+        logging.info(f"[DRY RUN] Update PR #{pull_req.number}: {title}\n{desc}")
         return
 
-    pr.edit(title=title, body=desc)
-    pr.update()  # arm64 release or prow job url might've changed
-    logging.info(f"Updated PR #{pr.number}: {title}\n{desc}")
+    pull_req.edit(title=title, body=desc)
+    pull_req.update()  # arm64 release or prow job url might've changed
+    logging.info(f"Updated PR #{pull_req.number}: {title}\n{desc}")
 
 
-def post_comment(pr, comment=""):
+def post_comment(pull_req, comment=""):
+    """
+    Posts a comment on a GitHub pull request with
+    the contents of the global `_extra_msgs` list.
+    """
     if len(_extra_msgs) != 0:
         if comment != "":
             comment += "\n\n"
@@ -248,15 +304,19 @@ def post_comment(pr, comment=""):
     if comment.strip() != "":
         logging.info(f"Comment to post: {comment}")
         if REMOTE_DRY_RUN:
-            logging.info(f"[DRY RUN] Posted a comment")
+            logging.info("[DRY RUN] Posted a comment")
             return
-        issue = pr.as_issue()
+        issue = pull_req.as_issue()
         issue.create_comment(comment)
     else:
-        logging.info(f"No content for comment")
+        logging.info("No content for comment")
 
 
 def push_branch_or_die(remote, branch_name):
+    """
+    Attempts to push a branch to a remote Git repository,
+    and terminates the program if the push fails.
+    """
     if REMOTE_DRY_RUN:
         logging.info(f"[DRY RUN] git push --force {branch_name}")
         return
@@ -273,47 +333,68 @@ def push_branch_or_die(remote, branch_name):
 
 
 def get_release_tag(release):
+    """
+    Given a release string in the format "abc:xyz", returns the "xyz" portion of the string.
+    If the string is not in that format, logs an error and returns the original string.
+    """
     parts = release.split(":")
     if len(parts) == 2:
         return parts[1]
-    else:
-        logging.error(f"Couldn't find tag in '{release}' - using it as is as branch name")
-        _extra_msgs.append(f"Couldn't find tag in '{release}' - using it as is as branch name")
-        return release
+
+    logging.error(f"Couldn't find tag in '{release}' - using it as is as branch name")
+    _extra_msgs.append(f"Couldn't find tag in '{release}' - using it as is as branch name")
+    return release
 
 
 def try_create_prow_job_url():
+    """
+    Attempts to infer the URL for a Prow job based on JOB_NAME_ENV and BUILD_ID_ENV environment variables.
+    If successful, logs the URL and returns it. Otherwise, logs a warning and returns "-".
+    """
     job_name = try_get_env(JOB_NAME_ENV, False)
     build_id = try_get_env(BUILD_ID_ENV, False)
     if job_name != "" and build_id != "":
         url = f"https://prow.ci.openshift.org/view/gs/origin-ci-test/logs/{job_name}/{build_id}"
         logging.info(f"Inferred probable prow job url: {url}")
         return url
-    else:
-        logging.warning(f"Couldn't infer prow job url. Env vars: '{JOB_NAME_ENV}'='{job_name}', '{BUILD_ID_ENV}'='{build_id}'")
-        _extra_msgs.append(f"Couldn't infer prow job url. Env vars: '{JOB_NAME_ENV}'='{job_name}', '{BUILD_ID_ENV}'='{build_id}'")
-        return "-"
+
+    logging.warning("Couldn't infer prow job url. " +
+                    f"Env vars: '{JOB_NAME_ENV}'='{job_name}', '{BUILD_ID_ENV}'='{build_id}'")
+    _extra_msgs.append("Couldn't infer prow job url. " +
+                        f"Env vars: '{JOB_NAME_ENV}'='{job_name}', '{BUILD_ID_ENV}'='{build_id}'")
+    return "-"
 
 
 def create_pr_title(branch_name, successful_rebase):
+    """
+    Given a branch name, creates a pull request title. If the rebase was successful,
+    the title is just the branch name, else "**FAILURE**" followed by the branch name.
+    """
     return branch_name if successful_rebase else f"**FAILURE** {branch_name}"
 
 
 def get_expected_branch_name(amd, arm):
+    """
+    Given amd and arm release strings, constructs a branch name in the format
+    "rebase-{version_stream}_amd64-{date}_arm64-{date}".
+    """
     amd_tag, arm_tag = get_release_tag(amd), get_release_tag(arm)
-    import re
-    rx = "(?P<version_stream>.+)-(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6})"
-    match_amd, match_arm = re.match(rx, amd_tag), re.match(rx, arm_tag)
+    rxp = "(?P<version_stream>.+)-(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6})"
+    match_amd, match_arm = re.match(rxp, amd_tag), re.match(rxp, arm_tag)
     return f"rebase-{match_amd['version_stream']}_amd64-{match_amd['date']}_arm64-{match_arm['date']}"
 
 
 def cleanup_branches(gh_repo):
+    """
+    Deletes branches with names in the format "rebase-4*" that are
+    associated with closed pull requests for a given github repo.
+    """
     logging.info("Cleaning up branches for closed PRs")
     rebase_branches = [b for b in gh_repo.get_branches() if b.name.startswith("rebase-4")]
     deleted_branches = []
     for branch in rebase_branches:
         prs = gh_repo.get_pulls(head=f"{gh_repo.owner.login}:{branch.name}", state="all")
-        all_prs_are_closed = all([pr.state == "closed" for pr in prs])
+        all_prs_are_closed = all(pr.state == "closed" for pr in prs)
         logging.info(f"'{branch.name}' is referenced in following PRs: " + ", ".join([f"#{pr.number} ({pr.state})" for pr in prs]))
         if all_prs_are_closed:
             ref = gh_repo.get_git_ref(f"heads/{branch.name}")
@@ -325,12 +406,12 @@ def cleanup_branches(gh_repo):
                     ref.delete()
                     logging.info(f"Deleted '{ref.ref}'")
                     deleted_branches.append(branch.name)
-                except GithubException as e:
-                    logging.warning(f"Failed to delete '{ref.ref}' because: {e}")
-                    _extra_msgs.append(f"Failed to delete '{ref.ref}' because: {e}")
+                except GithubException as err:
+                    logging.warning(f"Failed to delete '{ref.ref}' because: {err}")
+                    _extra_msgs.append(f"Failed to delete '{ref.ref}' because: {err}")
 
     if len(deleted_branches) != 0:
-        _extra_msgs.append(f"Deleted following branches: " + ", ".join(deleted_branches))
+        _extra_msgs.append("Deleted following branches: " + ", ".join(deleted_branches))
 
 
 def get_token(org, repo):
@@ -350,6 +431,10 @@ def get_token(org, repo):
 
 
 def main():
+    """
+    The main function of the script. Reads environment variables, retrieves the necessary
+    information from GitHub, performs a rebase, creates a pull request, and cleans up old branches.
+    """
     org = try_get_env(ORG_ENV)
     repo = try_get_env(REPO_ENV)
     release_amd = try_get_env(AMD64_RELEASE_ENV)
@@ -358,7 +443,7 @@ def main():
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
-    REMOTE_DRY_RUN = False if try_get_env(DRY_RUN_ENV, die=False) == "" else True
+    REMOTE_DRY_RUN = try_get_env(DRY_RUN_ENV, die=False) != ""
     if REMOTE_DRY_RUN:
         logging.info("Dry run mode")
 
@@ -380,7 +465,7 @@ def main():
             sys.exit(0)
     else:
         logging.warning("Rebase script failed - everything will be committed")
-        with open('rebase_sh.log', 'w') as writer:
+        with open('rebase_sh.log', mode='w', encoding='utf-8') as writer:
             writer.write(rebase_result.output)
         if git_repo.active_branch.name == base_branch:
             # rebase.sh didn't reach the step that would create a branch
@@ -394,9 +479,9 @@ def main():
     git_remote = get_remote_with_token(git_repo, token, org, repo)
     remote_branch = try_get_rebase_branch_ref_from_remote(git_remote, rebase_branch_name)  # {BOT_REMOTE_NAME}/{rebase_branch_name}
 
-    rbranch_does_not_exists = remote_branch == None
+    rbranch_does_not_exists = remote_branch is None
     rbranch_exists_and_needs_update = (
-        remote_branch != None and
+        remote_branch is not None and
         is_local_branch_based_on_newer_base_branch_commit(git_repo, base_branch, remote_branch.name, rebase_branch_name)
     )
     if rbranch_does_not_exists or rbranch_exists_and_needs_update:
@@ -404,19 +489,19 @@ def main():
 
     prow_job_url = try_create_prow_job_url()
     pr_title = create_pr_title(rebase_branch_name, rebase_result.success)
-    desc = generate_pr_description(rebase_branch_name, get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
+    desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
 
     comment = ""
-    pr = try_get_pr(gh_repo, org, base_branch, rebase_branch_name)
-    if pr == None:
-        pr = create_pr(gh_repo, base_branch, rebase_branch_name, pr_title, desc)
+    pull_req = try_get_pr(gh_repo, org, base_branch, rebase_branch_name)
+    if pull_req is None:
+        pull_req = create_pr(gh_repo, base_branch, rebase_branch_name, pr_title, desc)
     else:
-        update_pr(pr, pr_title, desc)
+        update_pr(pull_req, pr_title, desc)
         comment = f"Rebase job updated the branch\n{desc}"
 
     if base_branch == "main":
         cleanup_branches(gh_repo)
-    post_comment(pr, comment)
+    post_comment(pull_req, comment)
 
     git_remote.remove(git_repo, BOT_REMOTE_NAME)
     sys.exit(0 if rebase_result.success else 1)

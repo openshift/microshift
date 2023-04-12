@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=too-many-locals, line-too-long
 
 """Release Note Tool
 
@@ -55,7 +56,7 @@ URL_BASE_X86="https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
 # an RC RPM filename looks like
 # microshift-4.13.0~rc.0-202303212136.p0.gbd6fb96.assembly.rc.0.el9.aarch64.rpm
 VERSION_RE = re.compile(
-    """
+    r"""
     microshift-      # prefix
     (?P<product_version>\d+\.\d+\.\d+)    # product version
     ~                # separator
@@ -70,43 +71,47 @@ VERSION_RE = re.compile(
 
 
 def main():
-    p = argparse.ArgumentParser(
+    """
+    The main function of the script. It runs the `check_one()` function for both 'ocp-dev-preview'
+    and 'ocp' release types and for a specified version depending upon provided arguments.
+    """
+    parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    p.add_argument(
+    parser.add_argument(
         '-v', '--version',
         action='store',
         help='Specify the MicroShift major and minor version. (Default: %(default)s)',
         dest='version',
         default=VERSION,
     )
-    p.add_argument(
+    parser.add_argument(
         '--ec',
         action='store_true',
         default=True,
         dest='ec',
         help='Include engineering candidates (default)',
     )
-    p.add_argument(
+    parser.add_argument(
         '--no-ec',
         action='store_false',
         dest='ec',
         help='Do not include engineering candidates',
     )
-    p.add_argument(
+    parser.add_argument(
         '--rc',
         action='store_true',
         default=True,
         help='Include release candidates (default)',
     )
-    p.add_argument(
+    parser.add_argument(
         '--no-rc',
         action='store_false',
         dest='rc',
         help='Do not include release candidates',
     )
-    args = p.parse_args()
+    args = parser.parse_args()
     if args.ec:
         check_one('ocp-dev-preview', args.version)
     if args.rc:
@@ -114,11 +119,15 @@ def main():
 
 
 def check_one(release_type, version):
+    """
+    Checks the latest RPMs for a given release type and version,
+    and emits instructions for creating the release and tag, if they don't exist.
+    """
     # Get the list of the latest RPMs for the release type and vbersion.
     rpm_list_url = f"{URL_BASE}/{release_type}/latest-{version}/el9/os/rpm_list"
     print(f"\nFetching {rpm_list_url} ...")
-    rpm_list_response = request.urlopen(rpm_list_url)
-    rpm_list = rpm_list_response.read().decode("utf-8").splitlines()
+    with request.urlopen(rpm_list_url) as rpm_list_response:
+        rpm_list = rpm_list_response.read().decode("utf-8").splitlines()
 
     # Look for the RPM for MicroShift itself, with a name like
     #

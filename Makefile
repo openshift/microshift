@@ -116,7 +116,7 @@ etcd:
 		$(MAKE) -C etcd
 
 .PHONY: verify verify-images verify-assets licensecheck
-verify: verify-images verify-assets verify-sh verify-container licensecheck
+verify: verify-images verify-assets verify-sh verify-py verify-container licensecheck
 
 verify-images:
 	./hack/verify_images.sh
@@ -147,10 +147,7 @@ verify-sh:
 
 .PHONY: verify-py
 verify-py:
-	@if ! command -v pylint &>/dev/null; then \
-		pip install pylint ; \
-	fi
-	pylint $$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
+	./hack/verify-py.sh
 
 .PHONY: verify-container
 verify-container:

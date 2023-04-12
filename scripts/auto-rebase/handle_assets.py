@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
+# pylint: disable=logging-fstring-interpolation,logging-not-lazy,line-too-long
 
+"""
+This script updates assets based on a YAML recipe (`assets.yaml`)
+The recipe specifies what files and directories should be copied, ignored, and restored.
+
+File: handle_assets.py
+"""
+
+import logging
 import os
 import sys
-import yaml
 import shutil
-import logging
 import subprocess
+import yaml
 
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Loader
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)-27s %(levelname)-10s %(message)s')
 
@@ -19,18 +27,27 @@ STAGING_DIR = "_output/staging/"
 
 
 def merge_paths(pathl, pathr):
+    """
+    Merge two paths depending upon following conditions:
+    - If `pathr` is absolute (starts with `/`), then discard the leading `/` and return rest `pathr`.
+    - If `pathr` is relative, then return `pathl/pathr`.
+    """
     if pathr.startswith("/"):
         return pathr[1:]
     return os.path.join(pathl, pathr)
 
 
-def run_command(args=[]):
+def run_command(args=None):
+    """Run a command with the given args and return True if successful."""
+    if args is None:
+        args = []
     if not args:
         logging.error("run_command() received empty args")
         sys.exit(1)
 
     logging.debug(f"Executing '{' '.join(args)}'")
-    result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    result = subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,check=False)
 
     if result.returncode != 0:
         logging.error(f"Command '{' '.join(args)}' returned {result.returncode}. Output: {result.stdout}")
@@ -40,12 +57,14 @@ def run_command(args=[]):
 
 
 def git_restore(path):
+    """Restore a file from git."""
     path = os.path.join(ASSETS_DIR, path)
     logging.info(f"Restoring {path}")
     return run_command(["git", "restore", path])
 
 
 def copy(src, dst):
+    """Copy a file from the source path to the destination path."""
     src = os.path.join(STAGING_DIR, src)
     dst = os.path.join(ASSETS_DIR, dst)
     logging.debug(f"Copying {dst} <- {src}")
@@ -53,6 +72,7 @@ def copy(src, dst):
 
 
 def clear_dir(path):
+    """Clear the contents of a directory."""
     path = os.path.join(ASSETS_DIR, path)
     logging.info(f"Clearing directory {path}")
     shutil.rmtree(path)
@@ -60,6 +80,7 @@ def clear_dir(path):
 
 
 def should_be_ignored(asset, dst):
+    """Check if an asset should be ignored based on its 'ignore' field."""
     if 'ignore' in asset:
         reason = asset['ignore']
         if not reason:
@@ -71,6 +92,7 @@ def should_be_ignored(asset, dst):
 
 
 def handle_file(file, dst_dir="", src_prefix=""):
+    """Handle a file by copying, restoring or ignoring it."""
     name = file['file']
     dst = merge_paths(dst_dir, name)
 
@@ -89,26 +111,28 @@ def handle_file(file, dst_dir="", src_prefix=""):
     copy(src, dst)
 
 
-def handle_dir(dir, dst_dir="", src_prefix=""):
-    dst = merge_paths(dst_dir, dir['dir'])
-    new_src_prefix = merge_paths(src_prefix, dir['src'] if "src" in dir else "")
+def handle_dir(dir_, dst_dir="", src_prefix=""):
+    """"Recursively handle a directory, its files and subdirectories."""
+    dst = merge_paths(dst_dir, dir_['dir'])
+    new_src_prefix = merge_paths(src_prefix, dir_['src'] if "src" in dir_ else "")
 
-    if should_be_ignored(dir, dst):
+    if should_be_ignored(dir_, dst):
         return
 
-    if dir.get('no_clean', False):
+    if dir_.get('no_clean', False):
         logging.info(f"Not clearing dir {dst}")
     else:
         clear_dir(dst)
 
-    for f in dir.get('files', []):
-        handle_file(f, dst, new_src_prefix)
+    for file in dir_.get('files', []):
+        handle_file(file, dst, new_src_prefix)
 
-    for d in dir.get('dirs', []):
-        handle_dir(d, dst, new_src_prefix)
+    for sub_dir in dir_.get('dirs', []):
+        handle_dir(sub_dir, dst, new_src_prefix)
 
 
 def main():
+    """Main function for handling assets based on the recipe file."""
     if not os.path.isdir(ASSETS_DIR):
         logging.error(f"Expected to run in root directory of microshift repository but was in {os.getcwd()}")
         sys.exit(1)
@@ -118,7 +142,9 @@ def main():
         sys.exit(1)
 
     recipe_filepath = "./scripts/auto-rebase/assets.yaml"
-    recipe = yaml.load(open(recipe_filepath).read(), Loader=Loader)
+    with open(recipe_filepath, encoding='utf-8') as recipe_file:
+        recipe = yaml.load(recipe_file.read(), Loader=Loader)
+
     for asset in recipe['assets']:
         if "dir" in asset:
             handle_dir(asset)
