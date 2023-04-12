@@ -33,6 +33,8 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
+
+	"k8s.io/klog/v2"
 )
 
 func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
@@ -401,6 +403,10 @@ func initKubeconfigs(
 		}
 	}
 
+	if err := cleanupStaleKubeconfigs(cfg, cfg.KubeConfigRootAdminPath()); err != nil {
+		klog.Warningf("Unable to remove stale kubeconfigs: %v", err)
+	}
+
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeAdmin),
 		cfg.ApiServer.URL,
@@ -509,4 +515,31 @@ func certsToRegenerate(cs *certchains.CertificateChains) ([][]string, error) {
 	})
 
 	return regenCerts, err
+}
+
+func cleanupStaleKubeconfigs(cfg *config.Config, path string) error {
+	currentKubeconfigs := make(map[string]struct{})
+	for _, name := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
+		currentKubeconfigs[name] = struct{}{}
+	}
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return err
+	}
+	deleteDirs := make([]string, 0)
+	for _, file := range files {
+		if !file.IsDir() {
+			continue
+		}
+		if _, ok := currentKubeconfigs[file.Name()]; !ok {
+			deleteDirs = append(deleteDirs, filepath.Join(path, file.Name()))
+		}
+	}
+	for _, deletePath := range deleteDirs {
+		if err := os.RemoveAll(deletePath); err != nil {
+			klog.Warningf("Unable to remove %s: %v", deletePath, err)
+		}
+		klog.Infof("Removed stale kubeconfig %s", deletePath)
+	}
+	return nil
 }

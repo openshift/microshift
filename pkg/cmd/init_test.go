@@ -16,9 +16,12 @@ limitations under the License.
 package cmd
 
 import (
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apiserver/pkg/authentication/user"
@@ -123,6 +126,45 @@ func Test_certsToRegenerate(t *testing.T) {
 				t.Errorf("certsToRegenerate() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func Test_removeStaleKubeconfig(t *testing.T) {
+	rootDir, err := os.MkdirTemp("", "test")
+	if err != nil {
+		t.Fatalf("unable to create temporary dir: %v", err)
+	}
+	defer os.RemoveAll(rootDir)
+
+	cfg := &config.Config{
+		Node: config.Node{
+			HostnameOverride: "hostname",
+		},
+		ApiServer: config.ApiServer{
+			SubjectAltNames: []string{"altname1", "altname2"},
+		},
+	}
+	for _, dir := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
+		os.Mkdir(filepath.Join(rootDir, dir), 0600)
+	}
+
+	staleDir, err := os.MkdirTemp(rootDir, "example")
+	if err != nil {
+		t.Fatalf("unable to create temporary dir: %v", err)
+	}
+	cleanupStaleKubeconfigs(cfg, rootDir)
+	_, err = os.Stat(staleDir)
+	if err == nil {
+		t.Fatalf("%s should have been deleted", staleDir)
+	}
+	if !os.IsNotExist(err) {
+		t.Fatalf("unable to check %s existence: %v", staleDir, err)
+	}
+	for _, dir := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
+		d := filepath.Join(rootDir, dir)
+		if _, err = os.Stat(d); err != nil {
+			t.Fatalf("dir %s should remain: %v", d, err)
+		}
 	}
 }
 

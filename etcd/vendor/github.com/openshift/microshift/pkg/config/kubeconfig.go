@@ -20,5 +20,9 @@ func (cfg *Config) KubeConfigPath(id KubeConfigID) string {
 }
 
 func (cfg *Config) KubeConfigAdminPath(id string) string {
-	return filepath.Join(DataDir, "resources", string(KubeAdmin), id, "kubeconfig")
+	return filepath.Join(cfg.KubeConfigRootAdminPath(), id, "kubeconfig")
+}
+
+func (cfg *Config) KubeConfigRootAdminPath() string {
+	return filepath.Join(DataDir, "resources", string(KubeAdmin))
 }
