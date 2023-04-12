@@ -68,6 +68,9 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 				Debugging: config.Debugging{
 					LogLevel: logLevels[cfg.LogVLevel],
 				},
+				Etcd: config.Etcd{
+					MemoryLimitMB: cfg.Etcd.MemoryLimit,
+				},
 			}
 			marshalled, err := yaml.Marshal(userCfg)
 			cmdutil.CheckErr(err)
