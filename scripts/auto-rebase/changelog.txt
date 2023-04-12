@@ -1,22 +1,9 @@
-# cluster-network-operator embedded-component 14d77982b2de583913a2b8c0b885c32cfe6362ba to b7b90a5bef21ebe3c91362bb1415469197e0290b
-f4e8c66cfaa70d3e998b89fbfbacd989096c90c9 2023-04-07T09:38:38-07:00 update 4.13 Dockerfile to use rhel-8 and go 1.19
-e4572bb8ea38cdaccc7bb41b716750b6a390b838 2023-04-05T15:33:20+02:00 Fix tier label, privileged, HOSTNAME/NODENAME in whereabouts reconciler
-c6256d0ba6cbcfc168fa3c0fbaae193a25c0b1d4 2023-04-05T15:33:13+02:00 Whereabouts should implement the reconciliation controller
-# kubernetes embedded-component 7195e44fb36b487f275becffbf5828e2021f94d4 to 22308ca177342eb6820b95e0cad1142e385ef4c9
-582c77525a5a6928e9164b389487b86496332c3e 2022-12-07T15:36:23+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/openshift-enterprise-pod.yml
-# machine-config-operator embedded-component 428c2e0655c6a5fc876dad8864a5451142b5c3e2 to cfe839676e53af8617e762467336d5992e39ebfe
-398cefa6f4aaf70a8979b6361dc43a2f966e23e9 2023-04-03T14:13:13+00:00 daemon: write certificate in OnceFrom and HyperShift
-# ovn-kubernetes image-amd64 159a714da138391477024d824fd56b5e65083000 to b0c2ab425330f587517e7aeee369883e509717ac
-a7bf3cea3eeb674e1311c5cfbaab72c8d76c6af1 2023-04-04T10:30:40-04:00 Lint fix in policy.go
-b016909f6bcb91bf5693e3d9c2396487fc79a91d 2023-04-04T10:20:48-04:00 Fix node_dpu_test
-3f0ffd25ac2ae0f0f982068099cbecd42a03a68e 2023-04-04T10:20:37-04:00 Add e2e test for static pods
-b8de796d434fddfef8d738429dbb80a938929d26 2023-04-04T10:20:25-04:00 Allow static pod creation
-62b001a83cc2c376f8731500af872ce6f9353926 2023-04-04T10:20:15-04:00 Add Functions needed to check for static pod
-# kubernetes image-amd64 7195e44fb36b487f275becffbf5828e2021f94d4 to 22308ca177342eb6820b95e0cad1142e385ef4c9
-582c77525a5a6928e9164b389487b86496332c3e 2022-12-07T15:36:23+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/openshift-enterprise-pod.yml
-# ovn-kubernetes image-arm64 159a714da138391477024d824fd56b5e65083000 to b0c2ab425330f587517e7aeee369883e509717ac
-a7bf3cea3eeb674e1311c5cfbaab72c8d76c6af1 2023-04-04T10:30:40-04:00 Lint fix in policy.go
-b016909f6bcb91bf5693e3d9c2396487fc79a91d 2023-04-04T10:20:48-04:00 Fix node_dpu_test
-3f0ffd25ac2ae0f0f982068099cbecd42a03a68e 2023-04-04T10:20:37-04:00 Add e2e test for static pods
-b8de796d434fddfef8d738429dbb80a938929d26 2023-04-04T10:20:25-04:00 Allow static pod creation
-62b001a83cc2c376f8731500af872ce6f9353926 2023-04-04T10:20:15-04:00 Add Functions needed to check for static pod
+# machine-config-operator embedded-component cfe839676e53af8617e762467336d5992e39ebfe to 0318874b6243752bb0bd30f8e99bd03d19278b37
+90b3d03d97a797a5468f16eb70e71cbfd0825381 2023-04-11T07:36:58+00:00 Accomodate ART limitation in parsing [[]] bash The downstream build pipeline parses bash in Dockerfile `RUN` commands in order to smooth over yum/dnf invocations that break downstream builds. For example, upstream Dockerfiles may use `--disablerepo` / `--enablerepo` / `microdnf` -- none of which will work as intended in brew/koji builds.
+333d9389069e1d5c12c6fa0ce6304cf0086934dd 2023-04-06T19:41:10+00:00 OCPBUGS-10787: Persist static IP addressed NIC names from rhel8
+# ovn-kubernetes image-amd64 b0c2ab425330f587517e7aeee369883e509717ac to c66883c01e06722319fdf18e9997231b6abda3aa
+c52131126d9fb909dbe48c1c695a961d7308b11c 2023-04-05T21:15:08+00:00 CARRY: use "prefer local" for annotated services
+# kube-rbac-proxy image-arm64 0aa2830ed7359fd8cd0e2f7db0ed96a733c5990e to 11b1439d48a47a408ae7e2dd851989f7b7b4f595
+d5860627135014563aa3d06de75f9a82c4ce2821 2022-12-07T09:27:19+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/kube-rbac-proxy.yml
+# ovn-kubernetes image-arm64 b0c2ab425330f587517e7aeee369883e509717ac to c66883c01e06722319fdf18e9997231b6abda3aa
+c52131126d9fb909dbe48c1c695a961d7308b11c 2023-04-05T21:15:08+00:00 CARRY: use "prefer local" for annotated services
