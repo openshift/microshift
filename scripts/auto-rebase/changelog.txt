@@ -1,0 +1,8 @@
+- ovn-kubernetes image-amd64 Script exited with error. to c2e3a6472b7a0a6a52f85b1f905fb0dfbf95eda7
+There was an error determining the changes
+
+
+- ovn-kubernetes image-arm64 Script exited with error. to c2e3a6472b7a0a6a52f85b1f905fb0dfbf95eda7
+There was an error determining the changes
+
+
