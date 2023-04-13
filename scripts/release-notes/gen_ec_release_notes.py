@@ -42,12 +42,12 @@ NOTE:
 """
 
 import argparse
+import html.parser
 import re
 import subprocess
 import textwrap
 from urllib import request
 
-VERSION="4.13"
 URL_BASE="https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift"
 URL_BASE_X86="https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
 
@@ -69,6 +69,11 @@ VERSION_RE = re.compile(
     re.VERBOSE,
 )
 
+# Include the major.minor version string in this list to ignore
+# processing very old versions for which we do not anticipate future
+# candidate builds.
+OLD_VERSIONS = ['4.12']
+
 
 def main():
     """
@@ -78,13 +83,6 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument(
-        '-v', '--version',
-        action='store',
-        help='Specify the MicroShift major and minor version. (Default: %(default)s)',
-        dest='version',
-        default=VERSION,
     )
     parser.add_argument(
         '--ec',
@@ -113,18 +111,96 @@ def main():
     )
     args = parser.parse_args()
     if args.ec:
-        check_one('ocp-dev-preview', args.version)
+        find_releases(URL_BASE, 'ocp-dev-preview')
+        find_releases(URL_BASE_X86, 'ocp-dev-preview')
     if args.rc:
-        check_one('ocp', args.version)
+        find_releases(URL_BASE, 'ocp')
+        find_releases(URL_BASE_X86, 'ocp')
 
 
-def check_one(release_type, version):
+class VersionListParser(html.parser.HTMLParser):
+    """HTMLParser to extract version numbers from the mirror file list pages.
+
+    A page like https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift/ocp-dev-preview/
+
+    contains HTML like
+
+        <tr class="file">
+            <td></td>
+            <td>
+                <a href="4.12.0-rc.6/">
+                    <svg width="1.5em" height="1em" version="1.1" viewBox="0 0 265 323"><use xlink:href="#folder"></use></svg>
+                    <span class="name">4.12.0-rc.6</span>
+                </a>
+            </td>
+            <td data-order="-1">&mdash;</td>
+            <td class="hideable"><time datetime="">-</time></td>
+            <td class="hideable"></td>
+        </tr>
+
+    so we look for the 'span' tags with class 'name' and extract the
+    text between the tags as the version.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self._in_version = False
+        self.versions = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag != 'span':
+            return
+        attr_d = dict(attrs)
+        self._in_version = attr_d.get('class', '') == 'name'
+
+    def handle_endtag(self, tag):
+        self._in_version = False
+
+    def handle_data(self, data):
+        if not self._in_version:
+            return
+        data = data.strip()
+        if not data:
+            return
+        if data.startswith('latest-'):
+            return
+        self.versions.append(data)
+
+    def error(self, message):
+        print("WARNING: error processing HTML: {message}")
+
+
+def find_releases(url_base, release_type):
+
+    """Finds the versions for the release type and checks all of them for
+    new releases.
+
+    """
+    # Get the list of the latest RPMs for the release type and vbersion.
+    version_list_url = f"{url_base}/{release_type}/"
+    with request.urlopen(version_list_url) as response:
+        content = response.read().decode("utf-8")
+    parser = VersionListParser()
+    parser.feed(content)
+    for version in parser.versions:
+        # Skip very old RCs, indicated by the first 2 parts of the
+        # version string major.minor.
+        version_prefix = '.'.join(version.split('.')[:2])
+        if version_prefix in OLD_VERSIONS:
+            continue
+        try:
+            check_for_new_releases(url_base, release_type, version)
+        except Exception as err:  # pylint: disable=broad-except
+            print(f"WARNING: could not process {release_type} {version}: {err}")
+
+
+def check_for_new_releases(url_base, release_type, version):
     """
     Checks the latest RPMs for a given release type and version,
     and emits instructions for creating the release and tag, if they don't exist.
     """
     # Get the list of the latest RPMs for the release type and vbersion.
-    rpm_list_url = f"{URL_BASE}/{release_type}/latest-{version}/el9/os/rpm_list"
+    rpm_list_url = f"{url_base}/{release_type}/{version}/el9/os/rpm_list"
     print(f"\nFetching {rpm_list_url} ...")
     with request.urlopen(rpm_list_url) as rpm_list_response:
         rpm_list = rpm_list_response.read().decode("utf-8").splitlines()
@@ -135,7 +211,8 @@ def check_one(release_type, version):
     #
     # then parse out the EC version number and other details needed to
     # build the release tag.
-    microshift_rpm_name_prefix=f"microshift-{version}"
+    version_prefix = version.partition('-')[0]
+    microshift_rpm_name_prefix=f"microshift-{version_prefix}"
     microshift_rpm_filename = None
     for package_path in rpm_list:
         parts = package_path.split("/")
@@ -143,7 +220,9 @@ def check_one(release_type, version):
             microshift_rpm_filename = parts[-1]
             break
     else:
-        raise RuntimeError(f"Did not find {microshift_rpm_name_prefix} in {rpm_list}")
+        rpm_names = ',\n'.join(rpm_list)
+        print(f"WARNING: Did not find {microshift_rpm_name_prefix} in {rpm_names}")
+        return
 
     print(f"Examining RPM {microshift_rpm_filename}")
 
