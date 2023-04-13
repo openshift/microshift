@@ -55,3 +55,13 @@ source = "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:82cfef91557f9a70
 
 ...
 ```
+
+To add a pull secret for authenticating to a registry, set the
+`auth_file_path` in the `[containers]` section.
+
+```
+[containers]
+auth_file_path = "/etc/osbuild-worker/pull-secret.json"
+```
+
+Refer to the [Container registry credentials section of the osbuild guide](https://www.osbuild.org/guides/user-guide/container-auth.html) for more details.
