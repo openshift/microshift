@@ -2,10 +2,11 @@
 Documentation       MicroShift e2e test suite
 
 Library             SSHLibrary
-Library             String
 Library             OperatingSystem
 Library             Process
 Library             RequestsLibrary
+Resource            ../resources/common.resource
+Library             ../resources/sample.py
 
 Suite Setup         Get Kubeconfig
 Suite Teardown      Remove Kubeconfig
@@ -86,23 +87,6 @@ Failed Test
 
 
 *** Keywords ***
-Get Kubeconfig
-    [Documentation]    X
-    Open Connection    ${USHIFT_IP}
-    Login    ${USHIFT_USER}    allow_agent=True
-    ${konfig}=    Execute Command
-    ...    cat /var/lib/microshift/resources/kubeadmin/${USHIFT_IP}/kubeconfig
-    ...    sudo=True
-    Should Not Be Empty    ${konfig}
-    ${rand}=    Generate Random String
-    ${path}=    Join Path    /tmp    ${rand}
-    Create File    ${path}    ${konfig}
-    Close Connection
-    Set Suite Variable    \${KUBECONFIG}    ${path}
-
-Remove Kubeconfig
-    Remove File    ${KUBECONFIG}
-
 Access Hello Microshift via Router
     ${result}=    Run Process
     ...    curl -i http://hello-microshift.cluster.local --resolve "hello-microshift.cluster.local:80:${USHIFT_IP}"
@@ -112,14 +96,6 @@ Access Hello Microshift via Router
 Access Hello Microshift via LB
     ${result}=    Run Process    curl -i ${USHIFT_IP}:5678    shell=True    timeout=15s
     Check HTTP Response    ${result}
-
-Check HTTP Response
-    [Arguments]    ${result}
-    Log    ${result.stdout}
-    Log    ${result.stderr}
-    Should Be Equal As Integers    ${result.rc}    0
-    Should Match Regexp    ${result.stdout}    HTTP.*200
-    Should Match    ${result.stdout}    *Hello MicroShift*
 
 Create Pod With PVC
     Run With Kubeconfig    oc create -f ../e2e/tests/assets/pod-with-pvc.yaml
@@ -143,14 +119,6 @@ Delete Hello MicroShift Pod Route And Service
     Run With Kubeconfig    oc delete route hello-microshift    True
     Run With Kubeconfig    oc delete service hello-microshift    True
     Run With Kubeconfig    oc delete -f ../e2e/tests/assets/hello-microshift.yaml    True
-
-Run With Kubeconfig
-    [Arguments]    ${cmd}    ${allow_fail}=False
-    ${result}=    Run Process    ${cmd}    env:KUBECONFIG=${KUBECONFIG}    stderr=STDOUT    shell=True
-    Log    ${result.stdout}
-    IF    ${allow_fail} == False
-        Should Be Equal As Integers    ${result.rc}    0
-    END
 
 Open Port
     [Arguments]    ${number}    ${protocol}
