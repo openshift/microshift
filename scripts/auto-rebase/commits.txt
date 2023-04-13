@@ -15,7 +15,7 @@ https://github.com/openshift/service-ca-operator embedded-component 1b89fdce3fcc
 https://github.com/openshift/oc image-amd64 92b1a3d0e5d092430b523f6541aa0c504b2222b3
 https://github.com/openshift/coredns image-amd64 5560e4ad8c343c211f0b2f9d85ce7331b20b87cb
 https://github.com/openshift/router image-amd64 e28644631982fb4596e065d3ae85099f0886829d
-https://github.com/openshift/kube-rbac-proxy image-amd64 0aa2830ed7359fd8cd0e2f7db0ed96a733c5990e
+https://github.com/openshift/kube-rbac-proxy image-amd64 11b1439d48a47a408ae7e2dd851989f7b7b4f595
 https://github.com/openshift/ovn-kubernetes image-amd64 c66883c01e06722319fdf18e9997231b6abda3aa
 https://github.com/openshift/kubernetes image-amd64 22308ca177342eb6820b95e0cad1142e385ef4c9
 https://github.com/openshift/service-ca-operator image-amd64 1b89fdce3fcccecdc5fdb705fe674cd4bfc58a2a
