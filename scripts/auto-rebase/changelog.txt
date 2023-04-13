@@ -1,9 +1,2 @@
-# machine-config-operator embedded-component cfe839676e53af8617e762467336d5992e39ebfe to 0318874b6243752bb0bd30f8e99bd03d19278b37
-90b3d03d97a797a5468f16eb70e71cbfd0825381 2023-04-11T07:36:58+00:00 Accomodate ART limitation in parsing [[]] bash The downstream build pipeline parses bash in Dockerfile `RUN` commands in order to smooth over yum/dnf invocations that break downstream builds. For example, upstream Dockerfiles may use `--disablerepo` / `--enablerepo` / `microdnf` -- none of which will work as intended in brew/koji builds.
-333d9389069e1d5c12c6fa0ce6304cf0086934dd 2023-04-06T19:41:10+00:00 OCPBUGS-10787: Persist static IP addressed NIC names from rhel8
-# ovn-kubernetes image-amd64 b0c2ab425330f587517e7aeee369883e509717ac to c66883c01e06722319fdf18e9997231b6abda3aa
-c52131126d9fb909dbe48c1c695a961d7308b11c 2023-04-05T21:15:08+00:00 CARRY: use "prefer local" for annotated services
-# kube-rbac-proxy image-arm64 0aa2830ed7359fd8cd0e2f7db0ed96a733c5990e to 11b1439d48a47a408ae7e2dd851989f7b7b4f595
+# kube-rbac-proxy image-amd64 0aa2830ed7359fd8cd0e2f7db0ed96a733c5990e to 11b1439d48a47a408ae7e2dd851989f7b7b4f595
 d5860627135014563aa3d06de75f9a82c4ce2821 2022-12-07T09:27:19+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/kube-rbac-proxy.yml
-# ovn-kubernetes image-arm64 b0c2ab425330f587517e7aeee369883e509717ac to c66883c01e06722319fdf18e9997231b6abda3aa
-c52131126d9fb909dbe48c1c695a961d7308b11c 2023-04-05T21:15:08+00:00 CARRY: use "prefer local" for annotated services
