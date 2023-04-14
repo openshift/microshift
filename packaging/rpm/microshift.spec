@@ -296,7 +296,7 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
-* Wed Apr 12 2023 Zenghui Shi <zshi@redhat.com> 4.14.0
+* Wed Apr 12 2023 Zenghui Shi <zshi@redhat.com> 4.13.0
 - Upgrade openvswitch package version to 3.1
 
 * Wed Mar 29 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
