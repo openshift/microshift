@@ -1,8 +1,6 @@
-# cluster-ingress-operator embedded-component 992b43b3cf3e1784bfe8d3083229c7ecb410e7e3 to 6f3e22f1d08f03e0d1e333bbc718600baa79ebb7
-23717f3df36a9e4ebaea93ad13485e0a72547842 2022-11-11T01:10:39+00:00 Ingress controller should not have affinity policy in single-replica clusters
-# cluster-network-operator embedded-component 529ff4a694ff0f4598d5763b20f78fe44cd14f22 to b8bda59578bd266b94de75a361b8102ecff660e3
-ec6099f9f787215dae7d5caf9d4da2e65bdc55dd 2023-04-06T03:05:58+00:00 Split out konnectivity certs
-# kube-rbac-proxy image-amd64 513fd32175af4bb03f2e8a31030477e63380b5bc to 94f3fde785a22afdc77768f5c346c7d3195274d2
-46303c802e312a67e8319e8d6815013ca2776fa9 2022-10-01T10:07:12+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/b44f15ec9e84d1831eac81f8c757b3bed985dbeb/images/kube-rbac-proxy.yml
-# kube-rbac-proxy image-arm64 513fd32175af4bb03f2e8a31030477e63380b5bc to 94f3fde785a22afdc77768f5c346c7d3195274d2
-46303c802e312a67e8319e8d6815013ca2776fa9 2022-10-01T10:07:12+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/b44f15ec9e84d1831eac81f8c757b3bed985dbeb/images/kube-rbac-proxy.yml
+# cluster-network-operator embedded-component b8bda59578bd266b94de75a361b8102ecff660e3 to 4ff7caec8e5bbb761e00f723bdd3fff26f04bc54
+4560ace0d525a9d5bcf484bf2e89178d1bc4907d 2023-03-28T13:52:16+00:00 Add POD_NAME env to ovnkube-node
+# ovn-kubernetes image-amd64 3780f16d8e9c3a5495ba3b1caff3bc53070f6bb6 to d69a62a5a254c5860caf896f020796732720d860
+d4b0b95123e254d9fdb5f87ddc4fdb3f0a977846 2023-04-12T12:08:32+02:00 CARRY: use "prefer local" for annotated services
+# ovn-kubernetes image-arm64 3780f16d8e9c3a5495ba3b1caff3bc53070f6bb6 to d69a62a5a254c5860caf896f020796732720d860
+d4b0b95123e254d9fdb5f87ddc4fdb3f0a977846 2023-04-12T12:08:32+02:00 CARRY: use "prefer local" for annotated services
