@@ -1,16 +1,14 @@
-# cluster-kube-apiserver-operator embedded-component 5f038db7df7ade2f3da707394a14e391c693d25c to 02ea4a4120dd0f8eb49d070b1fe420ed6d1debba
-083565cf97e4077cff36091aba5a276d469f8eed 2023-03-22T18:35:00+00:00 update apf configuration to use v1beta3
-# kubernetes embedded-component 22308ca177342eb6820b95e0cad1142e385ef4c9 to 0c79814882f4a4b842fbeab001c9f92f9de9a9b9
-71873f411a7949e19aca37d65494aba17cdbe2da 2023-03-16T19:57:24+00:00 UPSTREAM: <carry>: STOR-829: Add CSIInlineVolumeSecurity admission plugin
-# machine-config-operator embedded-component 0318874b6243752bb0bd30f8e99bd03d19278b37 to 5d6b4e794bda70accd168867bba815e3b3e3b02a
-f98d25046fa825cb91c2b6f97c928f44b53b1b0f 2023-03-28T08:02:56+00:00 OCPBUGS-8676: Fix kubelet.service node-ip for v6-primary dual-stack
-# kubernetes image-amd64 22308ca177342eb6820b95e0cad1142e385ef4c9 to 0c79814882f4a4b842fbeab001c9f92f9de9a9b9
-71873f411a7949e19aca37d65494aba17cdbe2da 2023-03-16T19:57:24+00:00 UPSTREAM: <carry>: STOR-829: Add CSIInlineVolumeSecurity admission plugin
-# kubernetes image-arm64 22308ca177342eb6820b95e0cad1142e385ef4c9 to 85375332a108abce2f23a61958ae7adcc449477c
+# cluster-network-operator embedded-component b7b90a5bef21ebe3c91362bb1415469197e0290b to d9b70b9b587762e53863d61d0447f2f74580bd4b
+498475d4f534072c1d49befb0d12b88059082f93 2023-04-13T05:50:19+00:00 OCPBUGS-11046: Fix allowlist ds template
+# kubernetes embedded-component 0c79814882f4a4b842fbeab001c9f92f9de9a9b9 to 19816eefa6829861687df6dfe573708756c464cc
+2e08e352eb705054f78f03a534a627ff8a038209 2023-04-12T20:02:20+02:00 UPSTREAM: <drop>: bump: apiserver-lib-go for fixed SCC admission
+7101082be4e94ecdbad1da83df354131d90f5560 2023-04-12T17:00:37+00:00 UPSTREAM: 117242: vendor: bump runc to 1.1.6
+b75565423e47cd3d2bb7fbcc56f0bff21562c2a7 2023-04-12T17:00:37+00:00 UPSTREAM: 117242: CVE-2023-27561: Bump runc go module v1.1.4 -> v1.1.5
+5a2bcff32a30b8d9f9f937c6cb5d5d3e6ca5069f 2023-04-12T17:00:37+00:00 UPSTREAM: <carry>: disable load balancing on created cgroups when managed is enabled
+c376be027feb599a81f5f38e5b1922e9c05065b2 2023-04-12T17:53:58+02:00 UPSTREAM: <carry>: SCC pod extractor: assume default SA if SA is empty
 1721e67a44c1e57c0751240b0feb62fe610186be 2023-04-11T20:28:05+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
 e61f3ad194851a5db1489aab125ead07612bb170 2023-04-11T20:25:49+02:00 UPSTREAM: <carry>: Force using the go tooling from the system
 6aebbd28015e52d856ed6097f1918a8246316f35 2023-04-11T20:23:23+02:00 UPSTREAM: <drop>: manually resolve conflicts
-71873f411a7949e19aca37d65494aba17cdbe2da 2023-03-16T19:57:24+00:00 UPSTREAM: <carry>: STOR-829: Add CSIInlineVolumeSecurity admission plugin
 9e644106593f3f4aa98f8a84b23db5fa378900bd 2023-03-15T13:33:11+00:00 Release commit for Kubernetes v1.26.3
 6138cccca8d2c9cbe81d62c20b573078cd846907 2023-03-09T16:10:53-05:00 Avoid metric lookup in Parallelizer.Util on every work piece
 7cc066c1050a55201e391a1c354464c008d36c82 2023-03-09T15:47:02-05:00 One lock among PodNominator and SchedulingQueue
@@ -48,3 +46,62 @@ d87b53b15dcc60f15a418dd23cf4912d92c41eaa 2023-02-03T00:01:07-05:00 Invoke gimme 
 25183b77325b58abdcd09d9c0e94791e7a6232c1 2023-02-03T00:01:06-05:00 Defer builds to test-cmd and test-integration targets
 a50ebe3c210c0744166d5e2d1510ff4aac732aef 2023-01-31T16:08:55-05:00 Set node_stage whenever available
 6206ce9fbf49e09cbf950317db7cece29d2e023a 2023-01-30T15:37:02-05:00 Carefully compute request path for metrics
+# machine-config-operator embedded-component 5d6b4e794bda70accd168867bba815e3b3e3b02a to 35b049f9d3eaac15fdf6632e2ecd8cf55bd539e3
+b1826289224b1e973b88f3d0903b63cc9118af83 2023-04-13T16:32:58+00:00 OCPBUGS-11280: Fixing forcedns dispatcher script permission issue for assisted sno rhel9 upgrade
+1e962e3c33c905d86871fc740eaac69e3b6f12a8 2023-03-29T13:52:01+00:00 Splitting NetworkManager-onprem.conf.yaml to 2 files: 1. NetworkManager-onprem.conf.yaml will set unmanaged field as before and will do it only for onprem platforms as before 2. NetworkManager-ipv6.conf.yaml will set ipv6 flags for all platforms
+# ovn-kubernetes image-amd64 c66883c01e06722319fdf18e9997231b6abda3aa to e3bef98aa599a90a7f24ab077e7b979d688eb537
+13db0f8dc40dea0a2a6d89810750f3dc9c3603d9 2023-03-28T10:56:40-04:00 Fixes Egress Firewall node selector for ipv6
+# kubernetes image-amd64 0c79814882f4a4b842fbeab001c9f92f9de9a9b9 to 19816eefa6829861687df6dfe573708756c464cc
+2e08e352eb705054f78f03a534a627ff8a038209 2023-04-12T20:02:20+02:00 UPSTREAM: <drop>: bump: apiserver-lib-go for fixed SCC admission
+7101082be4e94ecdbad1da83df354131d90f5560 2023-04-12T17:00:37+00:00 UPSTREAM: 117242: vendor: bump runc to 1.1.6
+b75565423e47cd3d2bb7fbcc56f0bff21562c2a7 2023-04-12T17:00:37+00:00 UPSTREAM: 117242: CVE-2023-27561: Bump runc go module v1.1.4 -> v1.1.5
+5a2bcff32a30b8d9f9f937c6cb5d5d3e6ca5069f 2023-04-12T17:00:37+00:00 UPSTREAM: <carry>: disable load balancing on created cgroups when managed is enabled
+c376be027feb599a81f5f38e5b1922e9c05065b2 2023-04-12T17:53:58+02:00 UPSTREAM: <carry>: SCC pod extractor: assume default SA if SA is empty
+1721e67a44c1e57c0751240b0feb62fe610186be 2023-04-11T20:28:05+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+e61f3ad194851a5db1489aab125ead07612bb170 2023-04-11T20:25:49+02:00 UPSTREAM: <carry>: Force using the go tooling from the system
+6aebbd28015e52d856ed6097f1918a8246316f35 2023-04-11T20:23:23+02:00 UPSTREAM: <drop>: manually resolve conflicts
+9e644106593f3f4aa98f8a84b23db5fa378900bd 2023-03-15T13:33:11+00:00 Release commit for Kubernetes v1.26.3
+6138cccca8d2c9cbe81d62c20b573078cd846907 2023-03-09T16:10:53-05:00 Avoid metric lookup in Parallelizer.Util on every work piece
+7cc066c1050a55201e391a1c354464c008d36c82 2023-03-09T15:47:02-05:00 One lock among PodNominator and SchedulingQueue
+6968f56567c90ea4329448a9185445bb1f114295 2023-03-09T12:39:06-08:00 Removes old discovery hack ignoring 403 and 404
+363bcdd815c051e52954b1aab1cd503dfc19bff7 2023-03-09T12:38:02-08:00 Plumb stale GroupVersions through aggregated discovery
+24f79b28edf2496aa63b7578b083362e009a987e 2023-03-09T10:08:08+01:00 releng/go: Update images, dependencies and version to Go 1.19.7
+6e8addd9a0a9e2983e3040e337b1b7ba6df83d87 2023-03-08T04:00:34+00:00 Tolerate empty discovery response in memcache client
+5aefc0c454e0e4f7c431ddfdfe767859b36b55ac 2023-03-03T10:00:26+05:30 Fix for windows kube-proxy: 'externalTrafficPolicy: Local' results in no clusterIP entry in windows node.
+4bab824def3417109b6dca8e16ad3b7fa80d74c8 2023-03-02T11:39:47-08:00 Deflake tests in staging/src/k8s.io/kube-aggregator/pkg/apiserver
+20f36098d951df73b131e9408f1a37a74b84ba5d 2023-03-02T11:39:42-08:00 Fix a data race in TestDirty
+d07478bd5a863273aec874c869bb8cd3de911bdc 2023-03-02T11:39:38-08:00 ut: fix TestLegacyFallbackNoCache versions order
+b1f6dc0311402ffc8849ffab2998b38d839b9924 2023-03-02T11:36:43-08:00 Fix legacy fallback stale for aggregated discovery
+3df1e8e32fdc4462bdfe1537d90ce4e6d83e6a9a 2023-03-02T02:29:31+00:00 add unit test
+86a6f5d1b58ee63de1133b515001dd6d333b207a 2023-03-02T02:29:31+00:00 fix 116028
+e8627059b02a360f30a869abc7c1cbec00163651 2023-02-28T17:19:34-03:00 Re-enable label selector
+1b063e1248ce9f38fda5456054fca77ecb320eec 2023-02-28T17:19:34-03:00 Add integration test for diff --prune --selector
+215a91b4381ec2fded38e8d0253e0e3f3675f9cb 2023-02-28T17:19:32-03:00 Use label selector for filtering out resources when pruning. Matches same behavior as for kubectl apply
+9ec50f523aa50219f2449b1acc119619d0642051 2023-02-27T10:58:28+01:00 svc: Support pods with same address
+a4ea8e56c1558292233d6b4bb1d0712a21bf3518 2023-02-27T08:37:59+01:00 api: generated files
+bb8e051b4b95e1eb0e2dc4e3e25b4373a8a6307d 2023-02-27T08:33:04+01:00 api: drop Resources.Claims from PVC and PVC template
+5ea3848172c54a35b0e86a3709b983136e277293 2023-02-24T20:23:32+01:00 scheduler/framework/plugins/volumebinding: fix inaccurate log for when a volume is bound to a claim
+f5261ae7362e90f20db2557bc83d590e83aeb7be 2023-02-24T07:25:58-08:00 Fix validation.go to validate without StatefulSetStartOrdinal feature gate check. Adds test case to validate regression fix of validation failing when spec.ordinals set and feature gate disabled
+f945942cfa18acc3cb0d063a065fafa1e710dc88 2023-02-22T14:30:11+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.2
+a87eb5d44f4d0008ef910d98d3b1983e3320bab7 2023-02-22T13:32:21+00:00 Release commit for Kubernetes v1.26.3-rc.0
+a05ec2e0147acb5955b21e4b971ae2e59a3ea019 2023-02-20T23:05:34+01:00 Remove global framework variable
+072703c70b066c590686b9b75dcacab5a3f737dd 2023-02-15T10:25:09-08:00 fix race in aggregated discovery handler
+bdecd47143ebfddfeacb36b9ff980446476eec9c 2023-02-14T17:46:31+00:00 Remove check for CSI driver running on node for CSI migration attach operations
+00e1ab6b5dbf815eb6853a497b8ce1685a717536 2023-02-14T11:06:01-05:00 Disable multiple pv mount tests for vsphere intree driver
+192f90ac9c5f0e04f0b9973952e0227cb37c5c4e 2023-02-13T21:26:58-05:00 Simplify construction of /metrics request
+4e7930724f2afb60efc29b94ce1c5c75ceecb7cc 2023-02-08T16:54:52+05:30 Fix for issue with Loadbalancer policy creation for IPV6 endpoints in Dualstack mode.
+83c3ca63a12eaadfa2fb20ea5d6b588904461193 2023-02-07T17:03:20-08:00 Bump konnectivity-client to v0.0.36
+29f810fc071157cfa55603e97c0065e50f45a131 2023-02-06T21:51:40+00:00 make GetSubnetPrefix IP family agnostic
+d87b53b15dcc60f15a418dd23cf4912d92c41eaa 2023-02-03T00:01:07-05:00 Invoke gimme from kube::golang::verify_go_version
+62386bb73950cbdec1f8938a3250937702222749 2023-02-03T00:01:07-05:00 Add gimme
+25183b77325b58abdcd09d9c0e94791e7a6232c1 2023-02-03T00:01:06-05:00 Defer builds to test-cmd and test-integration targets
+a50ebe3c210c0744166d5e2d1510ff4aac732aef 2023-01-31T16:08:55-05:00 Set node_stage whenever available
+6206ce9fbf49e09cbf950317db7cece29d2e023a 2023-01-30T15:37:02-05:00 Carefully compute request path for metrics
+# ovn-kubernetes image-arm64 c66883c01e06722319fdf18e9997231b6abda3aa to e3bef98aa599a90a7f24ab077e7b979d688eb537
+13db0f8dc40dea0a2a6d89810750f3dc9c3603d9 2023-03-28T10:56:40-04:00 Fixes Egress Firewall node selector for ipv6
+# kubernetes image-arm64 85375332a108abce2f23a61958ae7adcc449477c to 19816eefa6829861687df6dfe573708756c464cc
+2e08e352eb705054f78f03a534a627ff8a038209 2023-04-12T20:02:20+02:00 UPSTREAM: <drop>: bump: apiserver-lib-go for fixed SCC admission
+7101082be4e94ecdbad1da83df354131d90f5560 2023-04-12T17:00:37+00:00 UPSTREAM: 117242: vendor: bump runc to 1.1.6
+b75565423e47cd3d2bb7fbcc56f0bff21562c2a7 2023-04-12T17:00:37+00:00 UPSTREAM: 117242: CVE-2023-27561: Bump runc go module v1.1.4 -> v1.1.5
+5a2bcff32a30b8d9f9f937c6cb5d5d3e6ca5069f 2023-04-12T17:00:37+00:00 UPSTREAM: <carry>: disable load balancing on created cgroups when managed is enabled
+c376be027feb599a81f5f38e5b1922e9c05065b2 2023-04-12T17:53:58+02:00 UPSTREAM: <carry>: SCC pod extractor: assume default SA if SA is empty
