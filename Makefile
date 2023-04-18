@@ -103,7 +103,7 @@ build: export CGO_ENABLED=0
 microshift: build
 
 .PHONY: etcd
-export GO_BUILD_FLAGS 
+export GO_BUILD_FLAGS
 etcd:
 	GO_LD_FLAGS="$(GC_FLAGS) -ldflags \"\
                    -X main.majorFromGit=$(MAJOR) \
@@ -115,22 +115,35 @@ etcd:
 					$(LD_FLAGS)\"" \
 		$(MAKE) -C etcd
 
-.PHONY: verify verify-images verify-assets licensecheck
-verify: verify-images verify-assets verify-sh verify-go verify-py verify-container licensecheck
+# Default verify target for developers
+.PHONY: verify
+verify: verify-fast
 
+# Fast verification checks that developers can/should run locally
+.PHONY: verify-fast
+verify-fast: verify-go verify-assets verify-sh verify-py
+
+# Full verification checks that should run in CI
+.PHONY: verify-ci
+verify-ci: verify-fast verify-images licensecheck verify-container # verify-govulncheck # TODO temporarily disabled
+
+.PHONY: verify-images
 verify-images:
 	./hack/verify_images.sh
 
+.PHONY: verify-assets
 verify-assets:
 	./scripts/auto-rebase/presubmit.py
 
-.PHONY: verify-go verify-golangci verify-govulncheck
-verify-go: verify-golangci # verify-govulncheck # TODO temporarily disabled
+.PHONY: verify-go
+verify-go: verify-golangci
 
+.PHONY: verify-golangci
 verify-golangci:
 	./scripts/fetch_tools.sh golangci-lint && \
 	./_output/bin/golangci-lint run --verbose --timeout 20m0s
 
+.PHONY: verify-govulncheck
 verify-govulncheck:
 	@if ! command -v govulncheck &>/dev/null; then \
 		go install -mod=mod golang.org/x/vuln/cmd/govulncheck@latest ; \
@@ -176,7 +189,7 @@ endef
 # Execute kuttl health checks against infra pods
 .PHONY: validate-cluster
 validate-cluster:
-	cd validate-microshift && ./kuttl-test.sh 
+	cd validate-microshift && ./kuttl-test.sh
 
 ##@ Download utilities
 
@@ -239,7 +252,7 @@ image-build-configure:
 	./scripts/image-builder/configure.sh
 .PHONY: image-build-configure
 
-image-build-iso: rpm 
+image-build-iso: rpm
 	./scripts/image-builder/build.sh $(IMAGE_BUILDER_ARGS)
 .PHONY: image-build-iso
 
