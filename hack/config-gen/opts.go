@@ -65,10 +65,10 @@ func (opt configGenOpts) Run() error {
 			return err
 		}
 		dataReader = f
+		defer dataReader.Close()
 	default:
 		dataReader = os.Stdin
 	}
-	defer dataReader.Close()
 
 	crdRawData, err := ioutil.ReadAll(dataReader)
 	if err != nil {
