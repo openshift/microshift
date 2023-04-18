@@ -1,6 +1,7 @@
 package assets
 
 import (
+	"context"
 	"sync"
 
 	"github.com/openshift/library-go/pkg/operator/events"
@@ -18,5 +19,5 @@ type RenderFunc func([]byte, RenderParams) ([]byte, error)
 
 type readerApplier interface {
 	Reader([]byte, RenderFunc, RenderParams)
-	Applier() error
+	Applier(ctx context.Context) error
 }

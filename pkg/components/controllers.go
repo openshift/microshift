@@ -1,6 +1,7 @@
 package components
 
 import (
+	"context"
 	"os"
 
 	"github.com/openshift/microshift/pkg/assets"
@@ -9,7 +10,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func startServiceCAController(cfg *config.Config, kubeconfigPath string) error {
+func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
 		//TODO: fix the rolebinding and sa
 		clusterRoleBinding = []string{
@@ -58,35 +59,35 @@ func startServiceCAController(cfg *config.Config, kubeconfigPath string) error {
 	secretData["tls.crt"] = caCertPEM
 	secretData["tls.key"] = caKeyPEM
 
-	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
+	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoleBindings(ctx, clusterRoleBinding, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoles(ctx, clusterRole, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRole %v: %v", clusterRole, err)
 		return err
 	}
-	if err := assets.ApplyRoleBindings(roleBinding, kubeconfigPath); err != nil {
+	if err := assets.ApplyRoleBindings(ctx, roleBinding, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply rolebinding %v: %v", roleBinding, err)
 		return err
 	}
-	if err := assets.ApplyRoles(role, kubeconfigPath); err != nil {
+	if err := assets.ApplyRoles(ctx, role, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply role %v: %v", role, err)
 		return err
 	}
-	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
+	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply sa %v: %v", sa, err)
 		return err
 	}
-	if err := assets.ApplySecretWithData(secret, secretData, kubeconfigPath); err != nil {
+	if err := assets.ApplySecretWithData(ctx, secret, secretData, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply secret %v: %v", secret, err)
 		return err
 	}
-	if err := assets.ApplyConfigMapWithData(cm, cmData, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMapWithData(ctx, cm, cmData, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", cm, err)
 		return err
 	}
@@ -94,14 +95,14 @@ func startServiceCAController(cfg *config.Config, kubeconfigPath string) error {
 		"CAConfigMap": cmName,
 		"TLSSecret":   secretName,
 	}
-	if err := assets.ApplyDeployments(apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}
 	return nil
 }
 
-func startIngressController(cfg *config.Config, kubeconfigPath string) error {
+func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
 		clusterRoleBinding = []string{
 			"components/openshift-router/cluster-role-binding.yaml",
@@ -124,19 +125,19 @@ func startIngressController(cfg *config.Config, kubeconfigPath string) error {
 		cm                   = "components/openshift-router/configmap.yaml"
 		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"
 	)
-	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
+	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply namespaces %v: %v", ns, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoles(ctx, clusterRole, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRole %v: %v", clusterRole, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoleBindings(ctx, clusterRoleBinding, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRolebinding %v: %v", clusterRoleBinding, err)
 		return err
 	}
-	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
+	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
@@ -151,15 +152,16 @@ func startIngressController(cfg *config.Config, kubeconfigPath string) error {
 	}
 	cmData["service-ca.crt"] = string(caCertPEM)
 
-	if err := assets.ApplyConfigMapWithData(cm, cmData, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMapWithData(ctx, cm, cmData, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyServices(svc, nil, nil, kubeconfigPath); err != nil {
+	if err := assets.ApplyServices(ctx, svc, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
 		return err
 	}
 	if err := assets.ApplySecretWithData(
+		ctx,
 		servingKeypairSecret,
 		map[string][]byte{
 			"tls.crt": cfg.Ingress.ServingCertificate,
@@ -171,14 +173,14 @@ func startIngressController(cfg *config.Config, kubeconfigPath string) error {
 		return err
 	}
 
-	if err := assets.ApplyDeployments(apps, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}
 	return nil
 }
 
-func startDNSController(cfg *config.Config, kubeconfigPath string) error {
+func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
 		clusterRoleBinding = []string{
 			"components/openshift-dns/dns/cluster-role-binding.yaml",
@@ -204,7 +206,7 @@ func startDNSController(cfg *config.Config, kubeconfigPath string) error {
 			"components/openshift-dns/dns/service.yaml",
 		}
 	)
-	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
+	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply", "namespace", ns, "err", err)
 		return err
 	}
@@ -212,20 +214,20 @@ func startDNSController(cfg *config.Config, kubeconfigPath string) error {
 	extraParams := assets.RenderParams{
 		"ClusterIP": cfg.Network.DNS,
 	}
-	if err := assets.ApplyServices(svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
 		// service already created by coreDNS, not re-create it.
 		return nil
 	}
-	if err := assets.ApplyClusterRoles(clusterRole, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoles(ctx, clusterRole, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRole %v %v", clusterRole, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(clusterRoleBinding, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoleBindings(ctx, clusterRoleBinding, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRoleBinding %v %v", clusterRoleBinding, err)
 		return err
 	}
-	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
+	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
@@ -236,11 +238,11 @@ func startDNSController(cfg *config.Config, kubeconfigPath string) error {
 	} else {
 		extraParams["UpstreamResolver"] = ""
 	}
-	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
 		return err
 	}

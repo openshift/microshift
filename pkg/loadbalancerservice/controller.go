@@ -54,11 +54,11 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 	stopCh := make(chan struct{})
 	defer close(stopCh)
 
-	config, err := c.restConfig()
+	restCfg, err := c.restConfig()
 	if err != nil {
 		return errors.Wrap(err, "error creating rest config for service controller")
 	}
-	c.client, err = kubernetes.NewForConfig(config)
+	c.client, err = kubernetes.NewForConfig(restCfg)
 	if err != nil {
 		return errors.Wrap(err, "failed to create clientset for service controller")
 	}
@@ -70,15 +70,15 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 	c.informer = serviceInformer.Informer()
 	c.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	c.indexer = c.informer.GetIndexer()
-	c.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	_, err = c.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
 				c.queue.Add(key)
 			}
 		},
-		UpdateFunc: func(old interface{}, new interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(new)
+		UpdateFunc: func(oldObj interface{}, newObj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(newObj)
 			if err == nil {
 				c.queue.Add(key)
 			}
@@ -90,6 +90,9 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 			}
 		},
 	})
+	if err != nil {
+		return errors.Wrap(err, "failed to initialize informer event handlers")
+	}
 
 	factory.Start(stopCh)
 

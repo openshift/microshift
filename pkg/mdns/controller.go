@@ -2,6 +2,7 @@ package mdns
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"strings"
 	"sync"
@@ -32,8 +33,8 @@ func NewMicroShiftmDNSController(cfg *config.Config) *MicroShiftmDNSController {
 	}
 }
 
-func (s *MicroShiftmDNSController) Name() string { return "microshift-mdns-controller" }
-func (s *MicroShiftmDNSController) Dependencies() []string {
+func (c *MicroShiftmDNSController) Name() string { return "microshift-mdns-controller" }
+func (c *MicroShiftmDNSController) Dependencies() []string {
 	return []string{"openshift-default-scc-manager"}
 }
 
@@ -51,14 +52,16 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 	//       i.e. eth0 . We don't believe it's worth going into the complexities (and coupling)
 	//       of talking to OpenvSwitch to discover the physical interface(s) on br-ex. And
 	//       we have also verified that no duplicate mDNS answers will happen because of this,
-	//       if those were to happend it would be harmless.
+	//       if those were to happened it would be harmless.
 	for n := range ifs {
 		name := ifs[n].Name
 		if ovn.IsOVNKubernetesInternalInterface(name) {
 			continue
 		}
 		klog.Infof("mDNS: Starting server on interface %q, NodeIP %q, NodeName %q", name, c.NodeIP, c.NodeName)
-		server.New(&ifs[n], c.resolver, c.stopCh)
+		if _, err := server.New(&ifs[n], c.resolver, c.stopCh); err != nil {
+			return fmt.Errorf("failed to start server: %w", err)
+		}
 	}
 
 	ips := []string{c.NodeIP}
@@ -73,16 +76,18 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 	}
 
 	c.myIPs = ips
-
 	if strings.HasSuffix(c.NodeName, server.DefaultmDNSTLD) {
-
 		klog.Infof("mDNS: Host FQDN %q will be announced via mDNS on IPs %q", c.NodeName, ips)
 		c.resolver.AddDomain(c.NodeName+".", ips)
 	}
 
 	close(ready)
 
-	go c.startRouteInformer(c.stopCh)
+	go func() {
+		if err := c.startRouteInformer(c.stopCh); err != nil {
+			klog.Errorf("error running router: %v", err)
+		}
+	}()
 
 	<-ctx.Done()
 
@@ -100,7 +105,7 @@ func ipInAddrs(ip string, addrs []net.Addr) bool {
 }
 
 func addrsToStrings(addrs []net.Addr) []string {
-	var ipAddrs []string
+	var ipAddrs = make([]string, 0)
 
 	for _, a := range addrs {
 		ipAddr, _, _ := net.ParseCIDR(a.String())

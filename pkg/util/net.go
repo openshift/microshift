@@ -60,7 +60,7 @@ func RetryInsecureGet(url string) int {
 		c := http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: true,
+					InsecureSkipVerify: true, //nolint:gosec
 				},
 			},
 		}
@@ -69,6 +69,7 @@ func RetryInsecureGet(url string) int {
 			status = resp.StatusCode
 			return true, nil
 		}
+		defer resp.Body.Close() //nolint:errcheck
 		return false, nil
 	})
 

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/openshift/microshift/pkg/util/sigchannel"
+	"github.com/stretchr/testify/assert"
 )
 
 type serviceTest struct {
@@ -75,8 +76,8 @@ func TestRunToCompletion(t *testing.T) {
 	}
 
 	m := NewServiceManager()
-	m.AddService(NewGenericService("foo", nil, runToCompletionFunc))
-	m.AddService(NewGenericService("bar", []string{"foo"}, runToCompletionFunc))
+	assert.NoError(t, m.AddService(NewGenericService("foo", nil, runToCompletionFunc)))
+	assert.NoError(t, m.AddService(NewGenericService("bar", []string{"foo"}, runToCompletionFunc)))
 	wg.Add(2)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -110,14 +111,14 @@ func TestRunCancellation(t *testing.T) {
 	}
 
 	m := NewServiceManager()
-	m.AddService(NewGenericService("foo", nil, runToCompletionFunc))
-	m.AddService(NewGenericService("bar", []string{"foo"}, runToCompletionFunc))
+	assert.NoError(t, m.AddService(NewGenericService("foo", nil, runToCompletionFunc)))
+	assert.NoError(t, m.AddService(NewGenericService("bar", []string{"foo"}, runToCompletionFunc)))
 	wg.Add(2)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	go func() {
-		m.Run(ctx, ready, stopped)
+		assert.Error(t, m.Run(ctx, ready, stopped))
 	}()
 
 	select {
@@ -150,8 +151,8 @@ func TestRunToServiceCrash(t *testing.T) {
 	}
 
 	m := NewServiceManager()
-	m.AddService(NewGenericService("foo", nil, waitForContext))
-	m.AddService(NewGenericService("bar-crash", []string{"foo"}, runAndPanic))
+	assert.NoError(t, m.AddService(NewGenericService("foo", nil, waitForContext)))
+	assert.NoError(t, m.AddService(NewGenericService("bar-crash", []string{"foo"}, runAndPanic)))
 	wg.Add(2)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -203,14 +204,11 @@ func TestRunToServicePanic(t *testing.T) {
 		<-time.After(time.Second)
 		wg.Done()
 		panic("I'm in panic")
-
 	}
-
 	m := NewServiceManager()
-	m.AddService(NewGenericService("foo", nil, waitForContext))
-	m.AddService(NewGenericService("bar-panic", []string{"foo"}, runAndCrash))
+	assert.NoError(t, m.AddService(NewGenericService("foo", nil, waitForContext)))
+	assert.NoError(t, m.AddService(NewGenericService("bar-panic", []string{"foo"}, runAndCrash)))
 	wg.Add(2)
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

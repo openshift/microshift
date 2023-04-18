@@ -54,7 +54,9 @@ func (c *MicroShiftmDNSController) run(stopCh chan struct{}, dc dynamic.Interfac
 		DeleteFunc: c.deletedRoute,
 	}
 
-	informer.AddEventHandler(handlers)
+	if _, err := informer.AddEventHandler(handlers); err != nil {
+		return errors.Wrap(err, "failed to initialize event handler: %w")
+	}
 	informer.Run(stopCh)
 
 	return nil

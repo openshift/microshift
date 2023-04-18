@@ -56,12 +56,12 @@ func (s *scApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	}
 	s.sc = obj.(*scv1.StorageClass)
 }
-func (s *scApplier) Applier() error {
-	_, _, err := resourceapply.ApplyStorageClass(context.TODO(), s.Client, assetsEventRecorder, s.sc)
+func (s *scApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyStorageClass(ctx, s.Client, assetsEventRecorder, s.sc)
 	return err
 }
 
-func applySCs(scs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applySCs(ctx context.Context, scs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -72,7 +72,7 @@ func applySCs(scs []string, applier readerApplier, render RenderFunc, params Ren
 			return fmt.Errorf("error getting asset %s: %v", sc, err)
 		}
 		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(); err != nil {
+		if err := applier.Applier(ctx); err != nil {
 			klog.Warningf("Failed to apply sc api %s: %v", sc, err)
 			return err
 		}
@@ -81,10 +81,10 @@ func applySCs(scs []string, applier readerApplier, render RenderFunc, params Ren
 	return nil
 }
 
-func ApplyStorageClasses(scs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplyStorageClasses(ctx context.Context, scs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	sc := &scApplier{}
 	sc.Client = scClient(kubeconfigPath)
-	return applySCs(scs, sc, render, params)
+	return applySCs(ctx, scs, sc, render, params)
 }
 
 type cdApplier struct {
@@ -107,18 +107,18 @@ func (c *cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	c.cd = obj.(*scv1.CSIDriver)
 }
 
-func (c *cdApplier) Applier() error {
-	_, _, err := resourceapply.ApplyCSIDriver(context.TODO(), c.Client, assetsEventRecorder, c.cd)
+func (c *cdApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyCSIDriver(ctx, c.Client, assetsEventRecorder, c.cd)
 	return err
 }
 
-func ApplyCSIDrivers(drivers []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
+func ApplyCSIDrivers(ctx context.Context, drivers []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	applier := &cdApplier{}
 	applier.Client = scClient(kubeconfigPath)
-	return applyCDs(drivers, applier, render, params)
+	return applyCDs(ctx, drivers, applier, render, params)
 }
 
-func applyCDs(cds []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applyCDs(ctx context.Context, cds []string, applier readerApplier, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -129,7 +129,7 @@ func applyCDs(cds []string, applier readerApplier, render RenderFunc, params Ren
 			return fmt.Errorf("error getting asset %s: %v", cd, err)
 		}
 		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(); err != nil {
+		if err := applier.Applier(ctx); err != nil {
 			klog.Warningf("Failed to apply CSIDriver api %s: %v", cd, err)
 			return err
 		}

@@ -1,6 +1,7 @@
 package components
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 
@@ -10,7 +11,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func startCNIPlugin(cfg *config.Config, kubeconfigPath string) error {
+func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
 		ns = []string{
 			"components/ovn/namespace.yaml",
@@ -49,27 +50,27 @@ func startCNIPlugin(cfg *config.Config, kubeconfigPath string) error {
 		return fmt.Errorf("failed to validate ovn-kubernetes configurations %v", err)
 	}
 
-	if err := assets.ApplyNamespaces(ns, kubeconfigPath); err != nil {
+	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		return err
 	}
-	if err := assets.ApplyServiceAccounts(sa, kubeconfigPath); err != nil {
+	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
-	if err := assets.ApplyRoles(r, kubeconfigPath); err != nil {
+	if err := assets.ApplyRoles(ctx, r, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply role %v: %v", r, err)
 		return err
 	}
-	if err := assets.ApplyRoleBindings(rb, kubeconfigPath); err != nil {
+	if err := assets.ApplyRoleBindings(ctx, rb, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply rolebinding %v: %v", rb, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoles(cr, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRole %v %v", cr, err)
 		return err
 	}
-	if err := assets.ApplyClusterRoleBindings(crb, kubeconfigPath); err != nil {
+	if err := assets.ApplyClusterRoleBindings(ctx, crb, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRoleBinding %v %v", crb, err)
 		return err
 	}
@@ -78,11 +79,11 @@ func startCNIPlugin(cfg *config.Config, kubeconfigPath string) error {
 		"KubeconfigPath": kubeconfigPath,
 		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
 	}
-	if err := assets.ApplyConfigMaps(cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := assets.ApplyDaemonSets(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
 		return err
 	}

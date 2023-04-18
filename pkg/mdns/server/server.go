@@ -125,7 +125,6 @@ func (s *Server) handlemDNSPacket(conn *net.UDPConn, packet []byte, from net.Add
 }
 
 func (s *Server) sendmDNSResponse(conn *net.UDPConn, resp *dns.Msg, from net.Addr, unicast bool) error {
-
 	destAddr := from.(*net.UDPAddr)
 
 	buf, err := resp.Pack()

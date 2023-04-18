@@ -38,7 +38,7 @@ func NewResolver() *Resolver {
 func (r *Resolver) AddDomain(name string, ipStrs []string) {
 	r.Lock()
 	defer r.Unlock()
-	var ips []net.IP
+	var ips = make([]net.IP, 0)
 
 	for _, ip := range ipStrs {
 		ips = append(ips, net.ParseIP(ip))

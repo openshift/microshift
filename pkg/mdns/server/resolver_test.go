@@ -56,8 +56,8 @@ func TestResolver_DeleteDomain(t *testing.T) {
 	if len(res) != 0 {
 		t.Errorf("With no domains resolver should not respond, but it did: %+v", res)
 	}
-
 }
+
 func testResolverDomainTypeAddress(t *testing.T, r *Resolver, name string, qtype uint16, addr string) {
 	res := r.Answer(dns.Question{Qtype: qtype, Name: name})
 

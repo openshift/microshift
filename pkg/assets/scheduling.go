@@ -48,11 +48,11 @@ func (s *pcApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	s.pc = obj.(*sv1.PriorityClass)
 }
 
-func (s *pcApplier) Applier() error {
+func (s *pcApplier) Applier(ctx context.Context) error {
 	// adapted from cvo
-	existing, err := s.Client.PriorityClasses().Get(context.TODO(), s.pc.Name, metav1.GetOptions{})
+	existing, err := s.Client.PriorityClasses().Get(ctx, s.pc.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := s.Client.PriorityClasses().Create(context.TODO(), s.pc, metav1.CreateOptions{})
+		_, err := s.Client.PriorityClasses().Create(ctx, s.pc, metav1.CreateOptions{})
 		return err
 	}
 	if err != nil {
@@ -65,11 +65,11 @@ func (s *pcApplier) Applier() error {
 		return nil
 	}
 
-	_, err = s.Client.PriorityClasses().Update(context.TODO(), existing, metav1.UpdateOptions{})
+	_, err = s.Client.PriorityClasses().Update(ctx, existing, metav1.UpdateOptions{})
 	return err
 }
 
-func applyPriorityClasses(pcs []string, applier readerApplier) error {
+func applyPriorityClasses(ctx context.Context, pcs []string, applier readerApplier) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -80,7 +80,7 @@ func applyPriorityClasses(pcs []string, applier readerApplier) error {
 			return fmt.Errorf("error getting asset %s: %v", pc, err)
 		}
 		applier.Reader(objBytes, nil, nil)
-		if err := applier.Applier(); err != nil {
+		if err := applier.Applier(ctx); err != nil {
 			klog.Warningf("Failed to apply PriorityClass CR %s: %v", pc, err)
 			return err
 		}
@@ -88,7 +88,7 @@ func applyPriorityClasses(pcs []string, applier readerApplier) error {
 	return nil
 }
 
-func ApplyPriorityClasses(pcs []string, kubeconfigPath string) error {
+func ApplyPriorityClasses(ctx context.Context, pcs []string, kubeconfigPath string) error {
 	schedulingScheme := runtime.NewScheme()
 	if err := sv1.AddToScheme(schedulingScheme); err != nil {
 		return err
@@ -98,5 +98,5 @@ func ApplyPriorityClasses(pcs []string, kubeconfigPath string) error {
 		Client: pcClient(kubeconfigPath),
 		codecs: serializer.NewCodecFactory(schedulingScheme),
 	}
-	return applyPriorityClasses(pcs, pcApplier)
+	return applyPriorityClasses(ctx, pcs, pcApplier)
 }

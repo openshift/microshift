@@ -22,23 +22,12 @@ import (
 	"encoding/pem"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/pkg/errors"
 	"k8s.io/client-go/util/keyutil"
 )
 
-const (
-	defaultDurationDays = 365
-	defaultDuration     = defaultDurationDays * 24 * time.Hour
-	defaultHostname     = "localhost"
-
-	keySize = 2048
-
-	ValidityOneDay   = 24 * time.Hour
-	ValidityOneYear  = 365 * ValidityOneDay
-	ValidityTenYears = 10 * ValidityOneYear
-)
+const keySize = 2048
 
 func EnsureKeyPair(pubKeyPath, privKeyPath string) error {
 	if _, err := getKeyPair(pubKeyPath, privKeyPath); err == nil {
@@ -69,7 +58,9 @@ func GenKeys(pubPath, keyPath string) error {
 		return fmt.Errorf("failed to write the private key to %s: %v", keyPath, err)
 	}
 
-	os.WriteFile(pubPath, pubPEM, 0400)
+	if err := os.WriteFile(pubPath, pubPEM, 0400); err != nil {
+		return fmt.Errorf("failed to write public key to %s: %v", pubPath, err)
+	}
 
 	return nil
 }

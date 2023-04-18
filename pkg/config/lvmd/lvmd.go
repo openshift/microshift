@@ -43,22 +43,16 @@ func getLvmdConfigForVGs(vgNames []string) (*Lvmd, error) {
 	response := &Lvmd{
 		SocketName: defaultSockName,
 	}
-
 	vgName := ""
 	if len(vgNames) == 0 {
-
 		response.Message = errorMessageNoVolumeGroups
 		klog.V(2).Info(errorMessageNoVolumeGroups)
 		return response, nil
-
 	} else if len(vgNames) == 1 {
-
 		vgName = vgNames[0]
 		klog.V(2).Infof("Using volume group %q", vgName)
 		response.Message = statusMessageDefaultAvailable
-
 	} else {
-
 		for _, name := range vgNames {
 			if name == defaultRHEL4EdgeVolumeGroup {
 				klog.V(2).Infof("Using default volume group %q", defaultRHEL4EdgeVolumeGroup)
@@ -101,14 +95,11 @@ func DefaultLvmdConfig() (*Lvmd, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Failed to discover local volume groups: %s", err)
 	}
-
 	return getLvmdConfigForVGs(vgNames)
-
 }
 
 // getVolumeGroups returns a slice of volume group names.
 func getVolumeGroups() ([]string, error) {
-
 	cmd := exec.Command("vgs", "--readonly", "--options=name", "--noheadings")
 	output, err := cmd.Output()
 	if err != nil {

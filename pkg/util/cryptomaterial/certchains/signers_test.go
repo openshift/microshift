@@ -69,7 +69,6 @@ func Test_certificateSigner_Complete(t *testing.T) {
 			}
 			if gotSubCANames := got.GetSubCANames(); !reflect.DeepEqual(gotSubCANames, tt.wantSubCAs) {
 				t.Errorf("the completed signer sub-CA names = %v, want %v", gotSubCANames, tt.wantSubCAs)
-
 			}
 		})
 	}
@@ -130,8 +129,7 @@ func TestCertificateSigner_Regenerate(t *testing.T) {
 				),
 		),
 	)
-
-	filepath.Walk(tmpDir, func(name string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(tmpDir, func(name string, info os.FileInfo, err error) error {
 		fmt.Println(name)
 		return nil
 	})

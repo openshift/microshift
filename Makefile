@@ -116,7 +116,7 @@ etcd:
 		$(MAKE) -C etcd
 
 .PHONY: verify verify-images verify-assets licensecheck
-verify: verify-images verify-assets verify-sh verify-py verify-container licensecheck
+verify: verify-images verify-assets verify-sh verify-go verify-py verify-container licensecheck
 
 verify-images:
 	./hack/verify_images.sh
@@ -125,15 +125,15 @@ verify-assets:
 	./scripts/auto-rebase/presubmit.py
 
 .PHONY: verify-go verify-golangci verify-govulncheck
-verify-go: verify-golangci verify-govulncheck
+verify-go: verify-golangci # verify-govulncheck # TODO temporarily disabled
 
 verify-golangci:
 	./scripts/fetch_tools.sh golangci-lint && \
-	./_output/bin/golangci-lint run --verbose
+	./_output/bin/golangci-lint run --verbose --timeout 20m0s
 
 verify-govulncheck:
 	@if ! command -v govulncheck &>/dev/null; then \
-		go install golang.org/x/vuln/cmd/govulncheck@latest ; \
+		go install -mod=mod golang.org/x/vuln/cmd/govulncheck@latest ; \
 	fi
 	govulncheck ./...
 

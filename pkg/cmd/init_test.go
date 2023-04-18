@@ -23,12 +23,12 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apiserver/pkg/authentication/user"
 )
 
 func Test_certsToRegenerate(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		chains  *certchains.CertificateChains
@@ -145,14 +145,14 @@ func Test_removeStaleKubeconfig(t *testing.T) {
 		},
 	}
 	for _, dir := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
-		os.Mkdir(filepath.Join(rootDir, dir), 0600)
+		assert.NoError(t, os.Mkdir(filepath.Join(rootDir, dir), 0600))
 	}
 
 	staleDir, err := os.MkdirTemp(rootDir, "example")
 	if err != nil {
 		t.Fatalf("unable to create temporary dir: %v", err)
 	}
-	cleanupStaleKubeconfigs(cfg, rootDir)
+	assert.NoError(t, cleanupStaleKubeconfigs(cfg, rootDir))
 	_, err = os.Stat(staleDir)
 	if err == nil {
 		t.Fatalf("%s should have been deleted", staleDir)

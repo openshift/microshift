@@ -58,7 +58,7 @@ type CertificateSigner struct {
 	subCAs             map[string]*CertificateSigner
 	signedCertificates map[string]*signedCertificateInfo
 
-	caBundlePaths sets.String
+	caBundlePaths sets.Set[string]
 }
 
 type signedCertificateInfo struct {
@@ -128,7 +128,7 @@ func (s *CertificateSigner) regenerateSelf() error {
 
 	s.signerConfig = signerConfig
 
-	return s.AddToBundles(s.caBundlePaths.List()...)
+	return s.AddToBundles(sets.List[string](s.caBundlePaths)...)
 }
 
 func (s *CertificateSigner) regenerateSubCA(subCAName string) error {
@@ -185,9 +185,7 @@ func (s *CertificateSigner) AddToBundles(bundlePaths ...string) error {
 
 		var certsChanged, certFound bool
 		for i, c := range certs {
-			if c.Subject.String() == cert.Subject.String() &&
-				c.Issuer.String() == cert.Issuer.String() {
-
+			if c.Subject.String() == cert.Subject.String() && c.Issuer.String() == cert.Issuer.String() {
 				certFound = true
 				if c.SerialNumber != cert.SerialNumber {
 					certs[i] = cert
@@ -230,7 +228,7 @@ func (s *CertificateSigner) AddToBundles(bundlePaths ...string) error {
 	return nil
 }
 
-func (s *CertificateSigner) toBuilder() CertificateSignerBuilder {
+func (s *CertificateSigner) toBuilder() CertificateSignerBuilder { //nolint:ireturn
 	signer := NewCertificateSigner(s.signerName, s.signerDir, s.signerValidityDays)
 
 	for _, subCA := range s.subCAs {
@@ -250,7 +248,7 @@ func (s *CertificateSigner) toBuilder() CertificateSignerBuilder {
 		}
 	}
 
-	signer = signer.WithCABundlePaths(s.caBundlePaths.List()...)
+	signer = signer.WithCABundlePaths(sets.List[string](s.caBundlePaths)...)
 
 	return signer
 }
@@ -437,7 +435,7 @@ func signedCertificateInfoMapKeysOrdered(stringMap map[string]*signedCertificate
 // libraryGoEnsureSubCA comes from lib-go 4.12, use (ca *CA) EnsureSubCA from there once we get the updated lib-go
 func libraryGoEnsureSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expireDays int) (*crypto.CA, bool, error) {
 	if subCA, err := crypto.GetCA(certFile, keyFile, serialFile); err == nil {
-		return subCA, false, err
+		return subCA, false, nil
 	}
 	subCA, err := libraryGoMakeAndWriteSubCA(ca, certFile, keyFile, serialFile, name, expireDays)
 	return subCA, true, err
@@ -459,7 +457,7 @@ func libraryGoMakeAndWriteSubCA(ca *crypto.CA, certFile, keyFile, serialFile, na
 	var serialGenerator crypto.SerialGenerator
 	if len(serialFile) > 0 {
 		// create / overwrite the serial file with a zero padded hex value (ending in a newline to have a valid file)
-		if err := os.WriteFile(serialFile, []byte("00\n"), 0644); err != nil {
+		if err := os.WriteFile(serialFile, []byte("00\n"), 0600); err != nil {
 			return nil, err
 		}
 

@@ -50,8 +50,8 @@ func (crb *clusterRoleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ Re
 	crb.crb = obj.(*rbacv1.ClusterRoleBinding)
 }
 
-func (crb *clusterRoleBindingApplier) Applier() error {
-	_, _, err := resourceapply.ApplyClusterRoleBinding(context.TODO(), crb.client.RbacV1(), assetsEventRecorder, crb.crb)
+func (crb *clusterRoleBindingApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyClusterRoleBinding(ctx, crb.client.RbacV1(), assetsEventRecorder, crb.crb)
 	return err
 }
 
@@ -77,8 +77,8 @@ func (cr *clusterRoleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderPara
 	cr.cr = obj.(*rbacv1.ClusterRole)
 }
 
-func (cr *clusterRoleApplier) Applier() error {
-	_, _, err := resourceapply.ApplyClusterRole(context.TODO(), cr.client.RbacV1(), assetsEventRecorder, cr.cr)
+func (cr *clusterRoleApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyClusterRole(ctx, cr.client.RbacV1(), assetsEventRecorder, cr.cr)
 	return err
 }
 
@@ -104,8 +104,8 @@ func (rb *roleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderPara
 	rb.rb = obj.(*rbacv1.RoleBinding)
 }
 
-func (rb *roleBindingApplier) Applier() error {
-	_, _, err := resourceapply.ApplyRoleBinding(context.TODO(), rb.client.RbacV1(), assetsEventRecorder, rb.rb)
+func (rb *roleBindingApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyRoleBinding(ctx, rb.client.RbacV1(), assetsEventRecorder, rb.rb)
 	return err
 }
 
@@ -131,12 +131,12 @@ func (r *roleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
 	r.r = obj.(*rbacv1.Role)
 }
 
-func (r *roleApplier) Applier() error {
-	_, _, err := resourceapply.ApplyRole(context.TODO(), r.client.RbacV1(), assetsEventRecorder, r.r)
+func (r *roleApplier) Applier(ctx context.Context) error {
+	_, _, err := resourceapply.ApplyRole(ctx, r.client.RbacV1(), assetsEventRecorder, r.r)
 	return err
 }
 
-func applyRbac(rbacs []string, applier readerApplier) error {
+func applyRbac(ctx context.Context, rbacs []string, applier readerApplier) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -147,7 +147,7 @@ func applyRbac(rbacs []string, applier readerApplier) error {
 			return fmt.Errorf("error getting asset %s: %v", rbac, err)
 		}
 		applier.Reader(objBytes, nil, nil)
-		if err := applier.Applier(); err != nil {
+		if err := applier.Applier(ctx); err != nil {
 			klog.Warningf("Failed to apply rbac %s: %v", rbac, err)
 			return err
 		}
@@ -156,25 +156,25 @@ func applyRbac(rbacs []string, applier readerApplier) error {
 	return nil
 }
 
-func ApplyClusterRoleBindings(rbacs []string, kubeconfigPath string) error {
+func ApplyClusterRoleBindings(ctx context.Context, rbacs []string, kubeconfigPath string) error {
 	crb := &clusterRoleBindingApplier{}
 	crb.New(kubeconfigPath)
-	return applyRbac(rbacs, crb)
+	return applyRbac(ctx, rbacs, crb)
 }
 
-func ApplyClusterRoles(rbacs []string, kubeconfigPath string) error {
+func ApplyClusterRoles(ctx context.Context, rbacs []string, kubeconfigPath string) error {
 	cr := &clusterRoleApplier{}
 	cr.New(kubeconfigPath)
-	return applyRbac(rbacs, cr)
+	return applyRbac(ctx, rbacs, cr)
 }
-func ApplyRoleBindings(rbacs []string, kubeconfigPath string) error {
+func ApplyRoleBindings(ctx context.Context, rbacs []string, kubeconfigPath string) error {
 	rb := &roleBindingApplier{}
 	rb.New(kubeconfigPath)
-	return applyRbac(rbacs, rb)
+	return applyRbac(ctx, rbacs, rb)
 }
 
-func ApplyRoles(rbacs []string, kubeconfigPath string) error {
+func ApplyRoles(ctx context.Context, rbacs []string, kubeconfigPath string) error {
 	r := &roleApplier{}
 	r.New(kubeconfigPath)
-	return applyRbac(rbacs, r)
+	return applyRbac(ctx, rbacs, r)
 }

@@ -40,7 +40,6 @@ func (s *VersionManager) Dependencies() []string {
 }
 
 func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-
 	var cm = "version/microshift-version.yaml"
 
 	defer close(stopped)
@@ -54,7 +53,7 @@ func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	}
 
 	kubeConfigPath := s.cfg.KubeConfigPath(config.KubeAdmin)
-	if err := assets.ApplyConfigMapWithData(cm, data, kubeConfigPath); err != nil {
+	if err := assets.ApplyConfigMapWithData(ctx, cm, data, kubeConfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v, %v", cm, err)
 		return err
 	}

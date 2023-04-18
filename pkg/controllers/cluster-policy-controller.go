@@ -48,7 +48,10 @@ func (s *ClusterPolicyController) configure(cfg *config.Config) error {
 	s.kubeconfig = cfg.KubeConfigPath(config.ClusterPolicyController)
 
 	scheme := runtime.NewScheme()
-	openshiftcontrolplanev1.AddToScheme(scheme)
+	if err := openshiftcontrolplanev1.AddToScheme(scheme); err != nil {
+		return err
+	}
+
 	codec := serializer.NewCodecFactory(scheme).LegacyCodec(openshiftcontrolplanev1.GroupVersion)
 
 	encodedConfig, err := runtime.Encode(codec,
