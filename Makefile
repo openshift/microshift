@@ -312,3 +312,11 @@ vendor-etcd:
 verify: verify-vendor-etcd
 verify-vendor-etcd: vendor-etcd
 	./hack/verify-vendor-etcd.sh
+
+# Use helper `go generate script` to dynamically config information into packaging info as well as documentation.
+.PHONY: generate-config verify-config
+generate-config:
+	@go generate -mod vendor ./pkg/config
+
+verify-config: generate-config
+	./hack/verify-config.sh

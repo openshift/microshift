@@ -15,6 +15,7 @@ type Network struct {
 	// IP address pool for services.
 	// Currently, we only support a single entry here.
 	// This field is immutable after installation.
+	// +kubebuilder:default={"10.43.0.0/16"}
 	ServiceNetwork []string `json:"serviceNetwork"`
 
 	// The port range allowed for Services of type NodePort.
@@ -24,6 +25,7 @@ type Network struct {
 	// This parameter can be updated after the cluster is
 	// installed.
 	// +kubebuilder:validation:Pattern=`^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])-([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$`
+	// +kubebuilder:default="30000-32767"
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
 
 	// The DNS server to use
@@ -32,6 +34,7 @@ type Network struct {
 
 type ClusterNetworkEntry struct {
 	// The complete block for pod IPs.
+	// +kubebuilder:default="10.42.0.0/16"
 	CIDR string `json:"cidr"`
 }
 
