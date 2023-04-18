@@ -1,7 +1,6 @@
 package config
 
-//go:generate sh -c "controller-gen crd paths=../../hack/yaml-gen/configcrd output:stdout | go run -mod vendor ../../hack/yaml-gen -a ../../cockpit-plugin/packaging/config-openapi-spec.json -o ../../packaging/microshift/config.yaml"
-//go:generate sh -c "controller-gen crd paths=../../hack/yaml-gen/configcrd output:stdout | go run -mod vendor ../../hack/yaml-gen -o ../../docs/howto_config.md -t ../../docs/howto_config.md"
+//go:generate ../../hack/generate-config.sh
 
 import (
 	"bytes"
