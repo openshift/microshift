@@ -1,6 +1,4 @@
-# cluster-network-operator embedded-component b8bda59578bd266b94de75a361b8102ecff660e3 to 4ff7caec8e5bbb761e00f723bdd3fff26f04bc54
-4560ace0d525a9d5bcf484bf2e89178d1bc4907d 2023-03-28T13:52:16+00:00 Add POD_NAME env to ovnkube-node
-# ovn-kubernetes image-amd64 3780f16d8e9c3a5495ba3b1caff3bc53070f6bb6 to d69a62a5a254c5860caf896f020796732720d860
-d4b0b95123e254d9fdb5f87ddc4fdb3f0a977846 2023-04-12T12:08:32+02:00 CARRY: use "prefer local" for annotated services
-# ovn-kubernetes image-arm64 3780f16d8e9c3a5495ba3b1caff3bc53070f6bb6 to d69a62a5a254c5860caf896f020796732720d860
-d4b0b95123e254d9fdb5f87ddc4fdb3f0a977846 2023-04-12T12:08:32+02:00 CARRY: use "prefer local" for annotated services
+# ovn-kubernetes image-amd64 d69a62a5a254c5860caf896f020796732720d860 to 774134525ed229a934445ed209090a71d952ed7f
+079e096466401a68e83fad60c014fbd0b0e1103c 2023-04-13T14:06:36-04:00 fix hybridOverlay DRIP in ICNIv1 pods
+# ovn-kubernetes image-arm64 d69a62a5a254c5860caf896f020796732720d860 to 774134525ed229a934445ed209090a71d952ed7f
+079e096466401a68e83fad60c014fbd0b0e1103c 2023-04-13T14:06:36-04:00 fix hybridOverlay DRIP in ICNIv1 pods
