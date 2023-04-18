@@ -94,7 +94,7 @@ GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi 
 GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
 GO_TEST_PACKAGES=./cmd/... ./pkg/...
 
-all: microshift etcd
+all: generate-config microshift etcd
 
 # target "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
 # Disable CGO when building microshift binary
