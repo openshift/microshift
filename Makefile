@@ -129,7 +129,7 @@ verify-go: verify-golangci # verify-govulncheck # TODO temporarily disabled
 
 verify-golangci:
 	./scripts/fetch_tools.sh golangci-lint && \
-	./_output/bin/golangci-lint run --verbose
+	./_output/bin/golangci-lint run --verbose --timeout 3m0s
 
 verify-govulncheck:
 	@if ! command -v govulncheck &>/dev/null; then \
