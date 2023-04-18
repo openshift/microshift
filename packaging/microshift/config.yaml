@@ -1,35 +1,37 @@
-dns:
-  # Base domain of the cluster. All managed DNS records will be sub-domains of this base.
-  #baseDomain: microshift.example.com
-
-network:
-  clusterNetwork:
-  # IP range for use by the cluster
-  #- cidr: 10.42.0.0/16
-
-  serviceNetwork:
-  # IP range for services in the cluster
-  #- 10.43.0.0/16
-
-  # Node ports allowed for services
-  #serviceNodePortRange: 30000-32767
-
-node:
-  # If non-empty, use this string to identify the node instead of the hostname
-  #hostnameOverride: ''
-
-  # IP address of the node, passed to the kubelet.
-  # If not specified, kubelet will use the node's default IP address.
-  #nodeIP: ''
-
+#!! Do Not Edit
+#!! This is a generated file
 apiServer:
-  # The Subject Alternative Names for the external certificates in API server (defaults to hostname -A)
-  #subjectAltNames: []
-
+    # Kube apiserver advertise address to work around the certificates issue when requiring external access using the node IP. This will turn into the IP configured in the endpoint slice for kubernetes service. Must be a reachable IP from pods. Defaults to service network CIDR first address.
+    advertiseAddress: ""
+    # SubjectAltNames added to API server certs
+    subjectAltNames:
+        - ""
 debugging:
-  # Log verbosity ('Normal', 'Debug', 'Trace', 'TraceAll'):
-  #logLevel: 'Normal'
-
+    # Valid values are: "Normal", "Debug", "Trace", "TraceAll". Defaults to "Normal".
+    logLevel: Normal
+dns:
+    # baseDomain is the base domain of the cluster. All managed DNS records will be sub-domains of this base. 
+    #  For example, given the base domain `example.com`, router exposed domains will be formed as `*.apps.example.com` by default, and API service will have a DNS entry for `api.example.com`, as well as "api-int.example.com" for internal k8s API access. 
+    #  Once set, this field cannot be changed.
+    # example:
+    #   microshift.example.com
+    baseDomain: example.com
 etcd:
-  # Memory limit for etcd, in Megabytes: 0 is no limit.
-  #memoryLimitMB: 0
+    # Set a memory limit on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
+    memoryLimitMB: 0
+network:
+    # IP address pool to use for pod IPs. This field is immutable after installation.
+    clusterNetwork:
+        - # The complete block for pod IPs.
+          cidr: 10.42.0.0/16
+    # IP address pool for services. Currently, we only support a single entry here. This field is immutable after installation.
+    serviceNetwork:
+        - 10.43.0.0/16
+    # The port range allowed for Services of type NodePort. If not specified, the default of 30000-32767 will be used. Such Services without a NodePort specified will have one automatically allocated from this range. This parameter can be updated after the cluster is installed.
+    serviceNodePortRange: 30000-32767
+node:
+    # If non-empty, will use this string to identify the node instead of the hostname
+    hostnameOverride: ""
+    # IP address of the node, passed to the kubelet. If not specified, kubelet will use the node's default IP address.
+    nodeIP: ""
+

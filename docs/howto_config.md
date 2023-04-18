@@ -2,51 +2,68 @@
 The MicroShift configuration file must be located at `/etc/microshift/config.yaml`. A sample `/etc/microshift/config.yaml.default` configuration file is installed by the MicroShift RPM and it can be used as a template when customizing MicroShift.
 
 The format of the `config.yaml` configuration file is as follows.
-
+<!---
+{{- template "docsReplaceBasic" . }}
+{{- with deleteCurrent -}}
+--->
 ```yaml
-dns:
-  baseDomain: ""
-network:
-  clusterNetwork:
-    - cidr: ""
-  serviceNetwork:
-    - ""
-  serviceNodePortRange: ""
-node:
-  hostnameOverride: ""
-  nodeIP: ""
 apiServer:
-  subjectAltNames:
-    - ""
+    advertiseAddress: ""
+    subjectAltNames:
+        - ""
 debugging:
-  logLevel: ""
+    logLevel: ""
+dns:
+    baseDomain: ""
 etcd:
-  memoryLimitMB: 0
+    memoryLimitMB: 0
+network:
+    clusterNetwork:
+        - cidr: ""
+    serviceNetwork:
+        - ""
+    serviceNodePortRange: ""
+node:
+    hostnameOverride: ""
+    nodeIP: ""
+
 ```
+<!---
+{{- end }}
+--->
 
 ## Default Settings
 
 In case `config.yaml` is not provided, the following default settings will be used.
-
+<!---
+{{- template "docsReplaceFull" . }}
+{{- with deleteCurrent -}}
+--->
 ```yaml
-dns:
-  baseDomain: microshift.example.com
-network:
-  clusterNetwork:
-    - cidr: 10.42.0.0/16
-  serviceNetwork:
-    - 10.43.0.0/16
-  serviceNodePortRange: 30000-32767
-node:
-  hostnameOverride: ""
-  nodeIP: ''
 apiServer:
-  subjectAltNames: []
+    advertiseAddress: ""
+    subjectAltNames:
+        - ""
 debugging:
-  logLevel: "Normal"
+    logLevel: Normal
+dns:
+    baseDomain: example.com
 etcd:
-  memoryLimitMB: 0
+    memoryLimitMB: 0
+network:
+    clusterNetwork:
+        - cidr: 10.42.0.0/16
+    serviceNetwork:
+        - 10.43.0.0/16
+    serviceNodePortRange: 30000-32767
+node:
+    hostnameOverride: ""
+    nodeIP: ""
+
 ```
+<!---
+{{- end }}
+--->
 
 ## Service NodePort range
 
