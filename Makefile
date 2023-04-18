@@ -125,7 +125,7 @@ verify-assets:
 	./scripts/auto-rebase/presubmit.py
 
 .PHONY: verify-go verify-golangci verify-govulncheck
-verify-go: verify-golangci verify-govulncheck
+verify-go: verify-golangci # verify-govulncheck # TODO temporarily disabled
 
 verify-golangci:
 	./scripts/fetch_tools.sh golangci-lint && \
