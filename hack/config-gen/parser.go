@@ -29,6 +29,10 @@ func (p crdParser) parseToJsonSchema(data []byte) (v1ext.JSONSchemaProps, error)
 		return v1ext.JSONSchemaProps{}, fmt.Errorf("failed to unmarshal custom resource config: %w", err)
 	}
 
+	if len(crd.Spec.Versions) != 1 {
+		return v1ext.JSONSchemaProps{}, fmt.Errorf("expected length of crd.spec.versions to be 1 but got %d", len(crd.Spec.Versions))
+	}
+
 	configData := crd.Spec.Versions[0].Schema.OpenAPIV3Schema.Properties["config"]
 	return configData, nil
 }

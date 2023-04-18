@@ -99,8 +99,8 @@ func (opt configGenOpts) Run() error {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
 		dataWriter = file
+		defer dataWriter.Close()
 	} else {
 		dataWriter = os.Stdout
 	}
