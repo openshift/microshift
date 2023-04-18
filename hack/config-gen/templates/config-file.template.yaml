@@ -1,3 +1,1 @@
-#!! Do Not Edit
-#!! This is a generated file
 {{ parseToConfigYaml . }}

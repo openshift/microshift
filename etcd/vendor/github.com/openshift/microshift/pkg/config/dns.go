@@ -10,5 +10,7 @@ type DNS struct {
 	// as well as "api-int.example.com" for internal k8s API access.
 	//
 	// Once set, this field cannot be changed.
+	// +kubebuilder:default=example.com
+	// +kubebuilder:example=microshift.example.com
 	BaseDomain string `json:"baseDomain"`
 }

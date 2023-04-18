@@ -1,4 +1,4 @@
-# YAML-Gen
+# Config-Gen
 
 This is a simple generator tool that will read files for a specific struct and generate a yaml representation of it with comments to help keep things in sync. This is meant to be used as part of the `//go:generate` command but can also be installed and used as a stand alone binary.
 
@@ -14,26 +14,27 @@ CLI flags.
 
 ```sh
 Usage:
-  yaml-gen [flags]
+  config-gen [flags]
 
 Flags:
   -a, --api-output string              output path for openapi spec if desired
   -f, --file string                    default is stdin
-  -h, --help                           help for yaml-gen
+  -h, --help                           help for config-gen
   -o, --output string                  output path, default is stdout
   -t, --template string                template file to use
+  -v, --v Level                        number for the log level verbosity
 ```
 
 Use as a go generate command example
 ```go
-//go:generate sh -c "controller-gen crd paths=../../hack/yaml-gen/configcrd output:stdout | go run -mod vendor ../../hack/yaml-gen -a ../../cockpit-plugin/packaging/config-openapi-spec.json -o ../../packaging/microshift/config.yaml"
-//go:generate sh -c "controller-gen crd paths=../../hack/yaml-gen/configcrd output:stdout | go run -mod vendor ../../hack/yaml-gen -o ../../docs/howto_config.md -t ../../docs/howto_config.md"
+//go:generate sh -c "controller-gen crd paths=../../hack/config-gen/configcrd output:stdout | go run -mod vendor ../../hack/config-gen -a ../../cockpit-plugin/packaging/config-openapi-spec.json -o ../../packaging/microshift/config.yaml"
+//go:generate sh -c "controller-gen crd paths=../../hack/config-gen/configcrd output:stdout | go run -mod vendor ../../hack/config-gen -o ../../docs/howto_config.md -t ../../docs/howto_config.md"
 ```
 
-Use the example test to see it in action, run the command from the `hack/yaml-gen` directory.
+Use the example test to see it in action, run the command from the `hack/config-gen` directory.
 
 ```sh
-controller-gen crd paths=../../hack/yaml-gen/configcrd output:stdout | go run -mod vendor ../../hack/yaml-gen
+controller-gen crd paths=../../hack/config-gen/configcrd output:stdout | go run -mod vendor ../../hack/config-gen
 ```
 
 The sample output should be.
