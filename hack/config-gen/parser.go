@@ -68,48 +68,52 @@ func (p crdParser) toYamlNodeObject(val map[string]v1ext.JSONSchemaProps) *yaml.
 	orderedKeyNameArray := schemaKeyToOrderedArray(val)
 
 	for _, schemaKeyName := range orderedKeyNameArray {
-		if field, ok := val[schemaKeyName]; ok {
-			keyNode := &yaml.Node{
-				Value: schemaKeyName,
-				Kind:  yaml.ScalarNode,
-			}
-
-			if !p.NoComments {
-				keyNode.HeadComment = field.Description
-			}
-
-			valueNode := &yaml.Node{}
-			switch field.Type {
-			case jsonTypeArray:
-
-				valueNode = p.toYamlNodeArray(field.Items)
-				if nodes := parseArrayJSONValue(field.Default); nodes != nil && !p.NoDefaults {
-					valueNode.Content = nodes
-				}
-
-				if exampleValue := parseArrayJSONExample(field.Example); exampleValue != "" && !p.NoComments {
-					keyNode.HeadComment = fmt.Sprintf("%s\nexample:\n  %s", keyNode.HeadComment, exampleValue)
-				}
-
-			case jsonTypeObject:
-
-				valueNode = p.toYamlNodeObject(field.Properties)
-
-				if exampleValue := parseMapJSONExample(field.Example); exampleValue != "" && !p.NoComments {
-					keyNode.HeadComment = fmt.Sprintf("%s\nexample:\n  %s", keyNode.HeadComment, exampleValue)
-				}
-
-			default:
-
-				valueNode = p.toYamlNodeValue(field)
-
-				if exampleValue := parseScalarJSONExample(field.Example); exampleValue != "" && !p.NoComments {
-					keyNode.HeadComment = fmt.Sprintf("%s\nexample:\n  %s", keyNode.HeadComment, exampleValue)
-				}
-
-			}
-			node.Content = append(node.Content, keyNode, valueNode)
+		field, ok := val[schemaKeyName]
+		if !ok {
+			// This should never happen since the ordered key array is created from the keys in val.
+			// This would definitely mean it's time to panic.
+			panic(fmt.Errorf("failed to find %s in the map of JSONSchemaProps: \nData ===\n%+v\n==", schemaKeyName, val))
 		}
+
+		keyNode := &yaml.Node{
+			Value: schemaKeyName,
+			Kind:  yaml.ScalarNode,
+		}
+
+		if !p.NoComments {
+			keyNode.HeadComment = field.Description
+		}
+
+		var valueNode *yaml.Node
+		switch field.Type {
+		case jsonTypeArray:
+
+			valueNode = p.toYamlNodeArray(field.Items)
+			if nodes := parseArrayJSONValue(field.Default); nodes != nil && !p.NoDefaults {
+				valueNode.Content = nodes
+			}
+
+			if exampleValue := parseArrayJSONExample(field.Example); exampleValue != "" && !p.NoComments {
+				keyNode.HeadComment = fmt.Sprintf("%s\nexample:\n  %s", keyNode.HeadComment, exampleValue)
+			}
+
+		case jsonTypeObject:
+
+			valueNode = p.toYamlNodeObject(field.Properties)
+
+			if exampleValue := parseMapJSONExample(field.Example); exampleValue != "" && !p.NoComments {
+				keyNode.HeadComment = fmt.Sprintf("%s\nexample:\n  %s", keyNode.HeadComment, exampleValue)
+			}
+
+		default:
+
+			valueNode = p.toYamlNodeValue(field)
+
+			if exampleValue := parseScalarJSONExample(field.Example); exampleValue != "" && !p.NoComments {
+				keyNode.HeadComment = fmt.Sprintf("%s\nexample:\n  %s", keyNode.HeadComment, exampleValue)
+			}
+		}
+		node.Content = append(node.Content, keyNode, valueNode)
 	}
 	return node
 }
@@ -123,7 +127,7 @@ func (p crdParser) toYamlNodeArray(val *v1ext.JSONSchemaPropsOrArray) *yaml.Node
 	}
 
 	if val.Schema != nil {
-		valueNode := &yaml.Node{}
+		var valueNode *yaml.Node
 		switch val.Schema.Type {
 		case jsonTypeObject:
 			valueNode = p.toYamlNodeObject(val.Schema.Properties)
@@ -138,7 +142,7 @@ func (p crdParser) toYamlNodeArray(val *v1ext.JSONSchemaPropsOrArray) *yaml.Node
 	}
 
 	for _, field := range val.JSONSchemas {
-		valueNode := &yaml.Node{}
+		var valueNode *yaml.Node
 		switch field.Type {
 		case jsonTypeObject:
 			valueNode = p.toYamlNodeObject(field.Properties)

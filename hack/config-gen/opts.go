@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"text/template"
 
@@ -46,7 +45,6 @@ func (opt *configGenOpts) Options() error {
 }
 
 func (opt configGenOpts) Run() error {
-
 	yamlTemplate, err := template.New("yamlTemplate").Funcs(defaultTemplateFuncs).Parse(customTemplateBlocks)
 	if err != nil {
 		return err
@@ -70,7 +68,7 @@ func (opt configGenOpts) Run() error {
 		dataReader = os.Stdin
 	}
 
-	crdRawData, err := ioutil.ReadAll(dataReader)
+	crdRawData, err := io.ReadAll(dataReader)
 	if err != nil {
 		return err
 	}

@@ -75,7 +75,7 @@ func parseScalarJSONExample(rawJson *v1ext.JSON) string {
 // Best effort to parse raw json examples, controller-gen will break if the values are not valid json types.
 // If the values are valid json types but in, incorrect types (i.e. string in array), we panic and spit out
 // a meanginful message to show which raw json failed to be parsed into which type. There are two main reasons
-// we panic here, we control the input data to change as needed and these functions will primarly execute in
+// we panic here, we control the input data to change as needed and these functions will primarily execute in
 // the template engine where we want to halt if anything isn't right before we write any output.
 func parseArrayJSONValue(rawJson *v1ext.JSON) (node []*yaml.Node) {
 	if rawJson == nil {
