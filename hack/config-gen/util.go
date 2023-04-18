@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strconv"
 
@@ -71,17 +72,21 @@ func parseScalarJSONExample(rawJson *v1ext.JSON) string {
 	return toYaml(results)
 }
 
-// Best effort to parse raw json examples, controller-gen will break if the examples
-func parseArrayJSONValue(rawJson *v1ext.JSON) []*yaml.Node {
+// Best effort to parse raw json examples, controller-gen will break if the values are not valid json types.
+// If the values are valid json types but in, incorrect types (i.e. string in array), we panic and spit out
+// a meanginful message to show which raw json failed to be parsed into which type. There are two main reasons
+// we panic here, we control the input data to change as needed and these functions will primarly execute in
+// the template engine where we want to halt if anything isn't right before we write any output.
+func parseArrayJSONValue(rawJson *v1ext.JSON) (node []*yaml.Node) {
 	if rawJson == nil {
 		return nil
 	}
 	var arrayContainer []interface{}
 	if err := json.Unmarshal(rawJson.Raw, &arrayContainer); err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to parse %s into []interface{} type err: %w", string(rawJson.Raw), err))
 	}
-	_, node := parseJSONValue(arrayContainer)
-	return node
+	_, node = parseJSONValue(arrayContainer)
+	return
 }
 
 func parseMapJSONValue(rawJson *v1ext.JSON) (node []*yaml.Node) {
@@ -90,10 +95,10 @@ func parseMapJSONValue(rawJson *v1ext.JSON) (node []*yaml.Node) {
 	}
 	var mapContainer map[string]interface{}
 	if err := json.Unmarshal(rawJson.Raw, &mapContainer); err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to parse %s into map[string]interface{} type err: %w", string(rawJson.Raw), err))
 	}
 	_, node = parseJSONValue(mapContainer)
-	return node
+	return
 }
 
 func parseScalarJSONValue(rawJson *v1ext.JSON) string {
@@ -102,7 +107,7 @@ func parseScalarJSONValue(rawJson *v1ext.JSON) string {
 	}
 	var scalarContainer interface{}
 	if err := json.Unmarshal(rawJson.Raw, &scalarContainer); err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to parse %s into interface{} type err: %w", string(rawJson.Raw), err))
 	}
 	scalar, _ := parseJSONValue(scalarContainer)
 	return scalar
@@ -120,17 +125,19 @@ func parseJSONValue(jsonType interface{}) (value string, node []*yaml.Node) {
 		value = primativeToString(jsonVal)
 	case []interface{}:
 		for _, k := range jsonVal {
+			// Note: []interface{} can be an array of objects, currently we make an assumption on primitives only.
+			// We don't currently use complex structures in our defaults and examples. We might want to revisit later
+			// if we decide to default/example full structs.
 			value := primativeToString(k)
 			node = append(node, &yaml.Node{Kind: yaml.ScalarNode, Value: value})
 		}
 	case map[string]interface{}:
 		// TODO: parse objects and merge into a yaml node
+		// Currently none of our examples or defaults in the kubebuilder comments contain
+		// full objects. We might want to change that in the future but for now it's un-needed complexity.
 		yamlBytes, err := yaml.Marshal(jsonVal)
 		if err != nil {
-			// Something has gone very wrong if we get to this point
-			// crd generation will fail if either example/default values are not complient during
-			// the controller-gen action.
-			panic(err)
+			panic(fmt.Errorf("failed to parse %+v into map[string]interface{} type err: %w", jsonVal, err))
 		}
 		value = string(yamlBytes)
 	}
@@ -139,7 +146,7 @@ func parseJSONValue(jsonType interface{}) (value string, node []*yaml.Node) {
 
 func schemaKeyToOrderedArray[K string | int, V any](schemaProperties map[K]V) []K {
 	var ordered = []K{}
-	for k, _ := range schemaProperties {
+	for k := range schemaProperties {
 		ordered = append(ordered, k)
 	}
 	sort.Slice(ordered, func(i, j int) bool {
