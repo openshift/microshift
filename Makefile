@@ -316,7 +316,8 @@ verify-vendor-etcd: vendor-etcd
 # Use helper `go generate script` to dynamically config information into packaging info as well as documentation.
 .PHONY: generate-config verify-config
 generate-config:
-	@go generate -mod vendor ./pkg/config
+	./scripts/fetch_tools.sh controller-gen && \
+	go generate -mod vendor ./pkg/config
 
 verify-config: generate-config
 	./hack/verify-config.sh
