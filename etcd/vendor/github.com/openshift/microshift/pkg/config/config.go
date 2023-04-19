@@ -1,5 +1,7 @@
 package config
 
+//go:generate ../../hack/generate-config.sh
+
 import (
 	"bytes"
 	"fmt"

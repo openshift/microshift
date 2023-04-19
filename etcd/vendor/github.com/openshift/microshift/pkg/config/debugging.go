@@ -5,6 +5,7 @@ import "strings"
 type Debugging struct {
 	// Valid values are: "Normal", "Debug", "Trace", "TraceAll".
 	// Defaults to "Normal".
+	// +kubebuilder:default="Normal"
 	LogLevel string `json:"logLevel"`
 }
 

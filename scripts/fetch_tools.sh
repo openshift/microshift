@@ -153,6 +153,11 @@ get_lichen() {
     GOBIN=${DEST_DIR} GOFLAGS="" go install github.com/uw-labs/lichen@${ver}
 }
 
+get_controller-gen() {
+    local ver="v0.11.3"
+    GOBIN=${DEST_DIR} GOFLAGS="" go install sigs.k8s.io/controller-tools/cmd/controller-gen@${ver}
+}
+
 tool_getters=$(declare -F |  cut -d' ' -f3 | grep "get_" | sed 's/get_//g')
 
 usage() {

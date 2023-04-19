@@ -94,7 +94,7 @@ GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi 
 GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
 GO_TEST_PACKAGES=./cmd/... ./pkg/...
 
-all: microshift etcd
+all: generate-config microshift etcd
 
 # target "build:" defined in vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk
 # Disable CGO when building microshift binary
@@ -121,7 +121,7 @@ verify: verify-fast
 
 # Fast verification checks that developers can/should run locally
 .PHONY: verify-fast
-verify-fast: verify-go verify-assets verify-sh verify-py
+verify-fast: verify-go verify-assets verify-sh verify-py verify-config
 
 # Full verification checks that should run in CI
 .PHONY: verify-ci
@@ -312,3 +312,12 @@ vendor-etcd:
 verify: verify-vendor-etcd
 verify-vendor-etcd: vendor-etcd
 	./hack/verify-vendor-etcd.sh
+
+# Use helper `go generate script` to dynamically config information into packaging info as well as documentation.
+.PHONY: generate-config verify-config
+generate-config:
+	./scripts/fetch_tools.sh controller-gen && \
+	go generate -mod vendor ./pkg/config
+
+verify-config: generate-config
+	./hack/verify-config.sh
