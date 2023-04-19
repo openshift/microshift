@@ -1,6 +1,0 @@
-# kubernetes embedded-component 19816eefa6829861687df6dfe573708756c464cc to 379cd9f22597a7a7f6ea57471f590c1abf01ce92
-0ebbe8aec6deca7e2ca345772abc8147be08b60f 2023-04-14T09:51:38-04:00 UPSTREAM: 117311: kube-aggregator: correctly use client-go TLS cache with custom dialer
-# kubernetes image-amd64 19816eefa6829861687df6dfe573708756c464cc to 379cd9f22597a7a7f6ea57471f590c1abf01ce92
-0ebbe8aec6deca7e2ca345772abc8147be08b60f 2023-04-14T09:51:38-04:00 UPSTREAM: 117311: kube-aggregator: correctly use client-go TLS cache with custom dialer
-# kubernetes image-arm64 19816eefa6829861687df6dfe573708756c464cc to 379cd9f22597a7a7f6ea57471f590c1abf01ce92
-0ebbe8aec6deca7e2ca345772abc8147be08b60f 2023-04-14T09:51:38-04:00 UPSTREAM: 117311: kube-aggregator: correctly use client-go TLS cache with custom dialer
