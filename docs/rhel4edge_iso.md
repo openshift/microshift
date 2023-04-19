@@ -132,6 +132,17 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 ```
 
+> **NOTE** <br>
+> Embedding container images in the generated ISO requires the functionality from the latest version of the `osbuild` and `osbuild-composer` packages.
+> This functionality will be available in the future releases of the RHEL 9 operating system.
+
+To install the necessary functionality, run the following command to upgrade your system with the up-to-date software from the `copr` repository.
+```bash
+~/microshift/hack/osbuild2copr.sh copr
+```
+
+> If necessary, rerun the `hack/osbuild2copr.sh` script with the `appstream` argument to revert to the standard `osbuild` and `osbuild-composer` packages.
+
 Proceed by running the build script with the `-embed_containers` argument to include the dependent container images into the generated ISO.
 ```bash
 ~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -embed_containers
@@ -220,11 +231,16 @@ sudo virsh net-autostart isolated
 Follow the instruction in the [Install MicroShift for Edge](#install-microshift-for-edge) section to install a new virtual machine using the `isolated` network configuration.
 > When running the `virt-install` command, specify the `--network network=isolated,model=virtio` option to select the `isolated` network configuration.
 
-After the virtual machine is created, log into the system and verify that the Internet is not accessible.
+After the virtual machine is created, log into the system using the Virtual Machine Manager console and verify that the Internet is not accessible.
 ```bash
 $ curl -I redhat.com
 curl: (6) Could not resolve host: redhat.com
 ```
+
+> **NOTE** <br>
+> It may be more convenient to connect to the virtual machine using its serial console.
+> * Run the `sudo systemctl enable --now serial-getty@ttyS0.service` command on the virtual machine to enable the serial console service.
+> * Run the `sudo virsh console microshift-edge` command on the hypervisor to connect to the serial console.
 
 Make sure that `CRI-O` has access to all the container images required by MicroShift.
 ```bash
