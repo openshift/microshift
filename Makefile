@@ -125,11 +125,17 @@ verify-fast: verify-go verify-assets verify-sh verify-py verify-config
 
 # Full verification checks that should run in CI
 .PHONY: verify-ci
-verify-ci: verify-fast verify-images licensecheck verify-container # verify-govulncheck # TODO temporarily disabled
+verify-ci: verify-fast verify-images verify-license verify-container # verify-govulncheck # TODO temporarily disabled
 
 .PHONY: verify-images
 verify-images:
-	./hack/verify_images.sh
+	./scripts/verify/verify_images.sh
+
+.PHONY: verify-license
+verify-license: microshift etcd
+	./scripts/fetch_tools.sh lichen && \
+	./_output/bin/lichen -c .lichen.yaml ./_output/bin/microshift && \
+	./_output/bin/lichen -c .lichen.yaml ./_output/bin/microshift-etcd
 
 .PHONY: verify-assets
 verify-assets:
@@ -145,22 +151,16 @@ verify-golangci:
 
 .PHONY: verify-govulncheck
 verify-govulncheck:
-	@if ! command -v govulncheck &>/dev/null; then \
-		go install -mod=mod golang.org/x/vuln/cmd/govulncheck@latest ; \
-	fi
-	govulncheck ./...
+	./scripts/fetch_tools.sh govulncheck && \
+	./_output/bin/govulncheck ./...
 
-# We use the IGNORE var instead of `shellcheck disable=all` for files that are taken from
-# upstream and we wish to keep them with out added shellcheck declaratives.
 .PHONY: verify-sh
 verify-sh:
-	IGNORE="configure-ovs*.sh" ; \
-	./scripts/fetch_tools.sh shellcheck && \
-	./_output/bin/shellcheck -x $$(find . \( -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor -o -path ./hack -o -path ./docs \) -o -name "$$IGNORE" \) -prune -o -name '*.sh' -print)
+	./scripts/verify/verify-shell.sh
 
 .PHONY: verify-py
 verify-py:
-	./hack/verify-py.sh
+	./scripts/verify/verify-py.sh
 
 .PHONY: verify-container
 verify-container:
@@ -281,6 +281,7 @@ rpm-podman:
 clean-cross-build:
 	if [ -d '$(CROSS_BUILD_BINDIR)' ]; then $(RM) -rf '$(CROSS_BUILD_BINDIR)'; fi
 	if [ -d '$(OUTPUT_DIR)/staging' ]; then $(RM) -rf '$(OUTPUT_DIR)/staging'; fi
+	if [ -d '$(OUTPUT_DIR)/venv' ]; then $(RM) -rf '$(OUTPUT_DIR)/venv'; fi
 	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)'; fi
 	if [ -d '$(ISO_DIR)' ]; then $(RM) -rf '$(ISO_DIR)'; fi
 	if [ -d '$(OUTPUT_DIR)' ]; then rmdir --ignore-fail-on-non-empty '$(OUTPUT_DIR)'; fi
@@ -288,10 +289,6 @@ clean-cross-build:
 
 clean: clean-cross-build
 .PHONY: clean
-
-licensecheck: microshift
-	./scripts/fetch_tools.sh lichen && \
-	./_output/bin/lichen -c .lichen.yaml ./_output/bin/microshift
 
 vendor:
 	go mod vendor
@@ -311,7 +308,7 @@ vendor-etcd:
 .PHONY: verify-vendor-etcd
 verify: verify-vendor-etcd
 verify-vendor-etcd: vendor-etcd
-	./hack/verify-vendor-etcd.sh
+	./scripts/verify/verify-vendor-etcd.sh
 
 # Use helper `go generate script` to dynamically config information into packaging info as well as documentation.
 .PHONY: generate-config verify-config
@@ -320,4 +317,4 @@ generate-config:
 	go generate -mod vendor ./pkg/config
 
 verify-config: generate-config
-	./hack/verify-config.sh
+	./scripts/verify/verify-config.sh

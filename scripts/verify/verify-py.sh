@@ -1,11 +1,9 @@
 #!/bin/bash
-
 set -euo pipefail
 
 ROOTDIR=$(git rev-parse --show-toplevel)
 VENV_DIR="${ROOTDIR}/_output"
 VENV="${VENV_DIR}/venv"
-
 REQ_FILE=${ROOTDIR}/scripts/requirements.txt
 
 create_venv() {
@@ -15,23 +13,27 @@ create_venv() {
     [ -d "${VENV_DIR}" ] || mkdir -p "${VENV_DIR}"
 
     echo "Creating venv in '${VENV}' and installing packages..."
-    python3 -m venv ${VENV}
+    python3 -m venv "${VENV}"
     ${vpython} -m pip install --upgrade pip
-    ${vpython} -m pip install -r ${REQ_FILE}
+    ${vpython} -m pip install -r "${REQ_FILE}"
     echo "Done!"
 }
 
 run_pylint() {
     local pylint="${VENV}/bin/pylint"
-    local pyfiles=$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
-
-    if ! command -v ${pylint} &>/dev/null; then
+   
+    if ! command -v "${pylint}" &>/dev/null; then
         echo "Installing pylint..."
         create_venv
     fi
-    
-    printf "Running ${pylint} for \n${pyfiles}\n"
-    ${pylint} --variable-naming-style=any ${pyfiles}
+       
+    local pyfiles    
+    pyfiles=$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
+
+    for f in ${pyfiles} ; do
+        echo "pylint: ${f}"
+        ${pylint} --variable-naming-style=any --score=n "${f}"
+    done
 }
 
 run_pylint
