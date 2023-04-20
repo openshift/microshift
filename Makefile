@@ -125,17 +125,15 @@ verify-fast: verify-go verify-assets verify-sh verify-py verify-config
 
 # Full verification checks that should run in CI
 .PHONY: verify-ci
-verify-ci: verify-fast verify-images verify-license verify-container
+verify-ci: verify-fast verify-images verify-licenses verify-containers
 
 .PHONY: verify-images
 verify-images:
-	./scripts/verify/verify_images.sh
+	./scripts/verify/verify-images.sh
 
-.PHONY: verify-license
-verify-license: microshift etcd
-	./scripts/fetch_tools.sh lichen && \
-	./_output/bin/lichen -c .lichen.yaml ./_output/bin/microshift && \
-	./_output/bin/lichen -c .lichen.yaml ./_output/bin/microshift-etcd
+.PHONY: verify-licenses
+verify-licenses: microshift etcd
+	./scripts/verify/verify-licenses.sh
 
 .PHONY: verify-assets
 verify-assets:
@@ -157,8 +155,8 @@ verify-sh:
 verify-py:
 	./scripts/verify/verify-py.sh
 
-.PHONY: verify-container
-verify-container:
+.PHONY: verify-containers
+verify-containers:
 	./scripts/fetch_tools.sh hadolint && \
 	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output")
 
