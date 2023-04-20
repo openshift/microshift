@@ -24,6 +24,7 @@ import (
 	"github.com/vishvananda/netlink"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/config/ovn"
 )
 
 const (
@@ -76,9 +77,15 @@ func (n *NetworkConfiguration) Run(ctx context.Context, ready chan<- struct{}, s
 }
 
 func (n *NetworkConfiguration) addServiceIPLoopback() error {
-	link, err := netlink.LinkByName(loopbackInterface)
-	if err != nil {
-		return err
+	var link netlink.Link
+	var err error
+
+	link, err = netlink.LinkByName(ovn.OVNGatewayInterface)
+	if _, ok := err.(netlink.LinkNotFoundError); ok {
+		link, err = netlink.LinkByName(loopbackInterface)
+		if err != nil {
+			return err
+		}
 	}
 	address, err := netlink.ParseAddr(fmt.Sprintf("%s/32", n.kasAdvertiseAddress))
 	if err != nil {
@@ -97,9 +104,15 @@ func (n *NetworkConfiguration) addServiceIPLoopback() error {
 }
 
 func (n *NetworkConfiguration) removeServiceIPLoopback() error {
-	link, err := netlink.LinkByName(loopbackInterface)
-	if err != nil {
-		return err
+	var link netlink.Link
+	var err error
+
+	link, err = netlink.LinkByName(ovn.OVNGatewayInterface)
+	if _, ok := err.(netlink.LinkNotFoundError); ok {
+		link, err = netlink.LinkByName(loopbackInterface)
+		if err != nil {
+			return err
+		}
 	}
 	address, err := netlink.ParseAddr(fmt.Sprintf("%s/32", n.kasAdvertiseAddress))
 	if err != nil {

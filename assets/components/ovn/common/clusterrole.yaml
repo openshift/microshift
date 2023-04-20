@@ -153,12 +153,18 @@ rules:
   - egressfirewalls
   - egressips
   - egressqoses
+  - adminpolicybasedexternalroutes
   verbs:
   - get
   - list
   - watch
   - update
   - patch
+- apiGroups:
+  - k8s.ovn.org
+  resources:
+  - adminpolicybasedexternalroutes/status  
+  verbs: [ "update"]  
 - apiGroups: ["cloud.network.openshift.io"]
   resources:
   - cloudprivateipconfigs

@@ -6,6 +6,6 @@ Requires=openvswitch.service NetworkManager.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /usr/bin/configure-ovs.sh OVNKubernetes
+ExecStart=/bin/bash /usr/bin/configure-ovs.sh
 ExecStart=/bin/bash /usr/bin/configure-ovs-microshift.sh
 TimeoutSec=2m

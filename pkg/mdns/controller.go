@@ -48,14 +48,10 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	ifs, _ := net.Interfaces()
 
-	// NOTE: this will listen on both br-ex and the physical interface attached to it
-	//       i.e. eth0 . We don't believe it's worth going into the complexities (and coupling)
-	//       of talking to OpenvSwitch to discover the physical interface(s) on br-ex. And
-	//       we have also verified that no duplicate mDNS answers will happen because of this,
-	//       if those were to happened it would be harmless.
+	// NOTE: this will listen the physical interface of the host.
 	for n := range ifs {
 		name := ifs[n].Name
-		if ovn.IsOVNKubernetesInternalInterface(name) {
+		if ovn.IsOVNKubernetesInternalInterface(name) || name == ovn.OVNGatewayInterface {
 			continue
 		}
 		klog.Infof("mDNS: Starting server on interface %q, NodeIP %q, NodeName %q", name, c.NodeIP, c.NodeName)

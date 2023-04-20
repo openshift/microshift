@@ -144,23 +144,6 @@ func NewOVNKubernetesConfigFromFileOrDefault(dir string, multinode bool) (*OVNKu
 	return nil, fmt.Errorf("getting OVNKubernetes config: %v", err)
 }
 
-func GetOVNGatewayIP() (string, error) {
-	iface, err := net.InterfaceByName(OVNGatewayInterface)
-	if err != nil {
-		return "", err
-	}
-	addrs, err := iface.Addrs()
-	if err != nil {
-		return "", err
-	}
-	for _, addr := range addrs {
-		ip := addr.(*net.IPNet).IP
-		// return the first available addr, ipv4 takes precedence in ip.String()
-		return ip.String(), nil
-	}
-	return "", fmt.Errorf("failed to get ovn gateway IP address")
-}
-
 func ExcludeOVNKubernetesMasqueradeIPs(addrs []net.Addr) []net.Addr {
 	var netAddrs []net.Addr
 	for _, a := range addrs {
