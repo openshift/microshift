@@ -1,14 +1,15 @@
 #!/bin/bash
+set -euo pipefail
 
 config_spec_path=cockpit-plugin/packaging/config-openapi-spec.json
 config_file_path=packaging/microshift/config.yaml
 config_doc_path=docs/howto_config.md
 
-config_changed=$(git diff HEAD --name-only $config_file_path)
-doc_changed=$(git diff HEAD --name-only $config_doc_path)
-openapi_spec_changed=$(git diff HEAD --name-only $config_spec_path)
+config_changed=$(git diff HEAD --name-only ${config_file_path})
+doc_changed=$(git diff HEAD --name-only ${config_doc_path})
+openapi_spec_changed=$(git diff HEAD --name-only ${config_spec_path})
 
-if [ -n "$config_changed" ] || [ -n "$doc_changed" ] || [ -n "$openapi_spec_changed" ]; then
+if [ -n "${config_changed}" ] || [ -n "${doc_changed}" ] || [ -n "${openapi_spec_changed}" ]; then
     cat - <<EOF
 ERROR:
 

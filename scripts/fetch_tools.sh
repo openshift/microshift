@@ -153,6 +153,12 @@ get_lichen() {
     GOBIN=${DEST_DIR} GOFLAGS="" go install github.com/uw-labs/lichen@${ver}
 }
 
+get_govulncheck() {
+    # Must use latest to get up-to-date vulnerability checks
+    local ver="latest"
+    GOBIN=${DEST_DIR} GOFLAGS="" go install -mod=mod golang.org/x/vuln/cmd/govulncheck@${ver}
+}
+
 get_controller-gen() {
     local ver="v0.11.3"
     GOBIN=${DEST_DIR} GOFLAGS="" go install sigs.k8s.io/controller-tools/cmd/controller-gen@${ver}
