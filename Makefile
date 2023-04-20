@@ -125,7 +125,7 @@ verify-fast: verify-go verify-assets verify-sh verify-py verify-config
 
 # Full verification checks that should run in CI
 .PHONY: verify-ci
-verify-ci: verify-fast verify-images verify-license verify-container # verify-govulncheck # TODO temporarily disabled
+verify-ci: verify-fast verify-images verify-license verify-container
 
 .PHONY: verify-images
 verify-images:
@@ -149,11 +149,6 @@ verify-golangci:
 	./scripts/fetch_tools.sh golangci-lint && \
 	./_output/bin/golangci-lint run --verbose --timeout 20m0s
 
-.PHONY: verify-govulncheck
-verify-govulncheck:
-	./scripts/fetch_tools.sh govulncheck && \
-	./_output/bin/govulncheck ./...
-
 .PHONY: verify-sh
 verify-sh:
 	./scripts/verify/verify-shell.sh
@@ -166,6 +161,15 @@ verify-py:
 verify-container:
 	./scripts/fetch_tools.sh hadolint && \
 	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output")
+
+# Vulnerability check is not run in any default verify target
+# It should be run explicitly before the release to track and fix known vulnerabilities
+# Note: Errors are ignored to allow listing vulnerabilities from all the dependencies
+.PHONY: verify-govulncheck
+verify-govulncheck: microshift etcd
+	./scripts/fetch_tools.sh govulncheck
+	-./_output/bin/govulncheck -mode=binary ./_output/bin/microshift
+	-./_output/bin/govulncheck -mode=binary ./_output/bin/microshift-etcd
 
 ###############################
 # post install validate       #
