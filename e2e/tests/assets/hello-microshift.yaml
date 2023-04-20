@@ -8,7 +8,7 @@ spec:
   terminationGracePeriodSeconds: 0
   containers:
   - name: hello-microshift
-    image: quay.io/microshift/microshift-test-workload:latest
+    image: quay.io/microshift/microshift-test:latest
     ports:
     - containerPort: 8080
       protocol: TCP
