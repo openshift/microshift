@@ -33,7 +33,7 @@ for _ in $(seq "${RETRIES}"); do
 
     [ ${result} -eq 0 ] &&
         echo "${response}" | grep -q -E "HTTP.*200" &&
-        echo "${response}" | grep -q "Hello MicroShift" &&
+        echo "${response}" | grep -q "Microshift Test" &&
         exit 0
 
     sleep "${BACKOFF}"
