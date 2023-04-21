@@ -5,6 +5,7 @@
     "debugging",
     "dns",
     "etcd",
+    "manifests",
     "network",
     "node"
   ],
@@ -65,6 +66,25 @@
           "description": "Set a memory limit on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.",
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "manifests": {
+      "type": "object",
+      "required": [
+        "kustomizePaths"
+      ],
+      "properties": {
+        "kustomizePaths": {
+          "description": "The locations on the filesystem to scan for kustomization.yaml files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests.",
+          "type": "array",
+          "default": [
+            "/var/lib/microshift/manifests",
+            "/etc/microshift/manifests"
+          ],
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

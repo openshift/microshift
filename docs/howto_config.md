@@ -17,6 +17,9 @@ dns:
     baseDomain: ""
 etcd:
     memoryLimitMB: 0
+manifests:
+    kustomizePaths:
+        - ""
 network:
     clusterNetwork:
         - cidr: ""
@@ -50,6 +53,10 @@ dns:
     baseDomain: example.com
 etcd:
     memoryLimitMB: 0
+manifests:
+    kustomizePaths:
+        - /var/lib/microshift/manifests
+        - /etc/microshift/manifests
 network:
     clusterNetwork:
         - cidr: 10.42.0.0/16
@@ -117,6 +124,23 @@ The reason for providing multiple directories is to allow a flexible method to m
 |-------------------------------|--------|
 | /etc/microshift/manifests     | Read-write location for configuration management systems or development
 | /usr/lib/microshift/manifests | Read-only location for embedding configuration manifests on ostree based systems
+
+To override the list of paths, set `manifests.kustomizePaths` in the configuration file.
+
+```yaml
+manifests:
+    kustomizePaths:
+        - "/opt/alternate/path"
+```
+
+To disable loading manifests, set the configuration option to an empty
+list.
+
+```yaml
+manifests:
+    kustomizePaths: []
+```
+
 
 ## Manifest Example
 
