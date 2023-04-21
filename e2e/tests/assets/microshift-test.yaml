@@ -1,13 +1,13 @@
 kind: Pod
 apiVersion: v1
 metadata:
-  name: hello-microshift
+  name: microshift-test
   labels:
-    app: hello-microshift
+    app: microshift-test
 spec:
   terminationGracePeriodSeconds: 0
   containers:
-  - name: hello-microshift
+  - name: microshift-test
     image: quay.io/microshift/microshift-test:latest
     ports:
     - containerPort: 8080
