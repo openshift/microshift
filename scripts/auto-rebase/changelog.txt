@@ -1,3 +1,110 @@
-- oc image-arm64 756f16558225a25de9a8b3a25f3259f3be3024dd to 5f8c36d7f69632ba80bff9c6862327099198f6b3
+- cluster-dns-operator embedded-component d96022a4d0d091955d73e7e99fc8cc81db56c86a to d36aebfd86866143d441b5a443d112daf40e4429
+  - 5c4f0ad 2023-03-31T16:47:33-04:00 Set DNS DaemonSet's maxSurge value to 10%
+  - 4a969d7 2023-03-08T20:23:30+00:00 Updating ose-cluster-dns-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/ose-cluster-dns-operator.yml
+
+- cluster-kube-apiserver-operator embedded-component afaa2d15b7ffa657597735e8dc6597a510941211 to 0eb5517f7faec395d53258c590ba0936d8536d3d
+  - 7f074bb 2023-04-04T10:59:17-04:00 Revert "Merge pull request #1474 from benluddy/oapi-bump"
+
+- cluster-kube-controller-manager-operator embedded-component 3396d80b68983df85f279fe7c462b022cd68d536 to 4f04a1ddf6c828f2e01cf326f90cf2e3391f0021
+  - 92049f2 2023-04-03T22:15:17+01:00 AWS should not use external-cloud-volume-plugin post CSI migration
+
+- cluster-network-operator embedded-component 120af24662c238d601c4d110d34792eb75973c44 to 29e7dafd3136c6bc229c79ebff4e26e515f4b754
+  - a17bc48 2023-04-06T20:53:58+02:00 OCPBUGS-11046: Fix allowlist ds template
+  - 8b3c21e 2023-04-04T22:45:40+00:00 Updating cluster-network-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/8cccd34fd9ba8105a459f8d0d13ae31bfad323f8/images/cluster-network-operator.yml
+  - e52c952 2023-03-21T19:48:34+00:00 With Hypershift run as user passed from hypershift
+  - e9e490e 2023-01-19T10:00:27-05:00 The cluster-readers group should be able to get NetworkAttachmentDefinitions
+
+- cluster-openshift-controller-manager-operator embedded-component 816cbe6407b69d87c535c8e2803b6bb45f9a0221 to 3d9105887e9f9a167a159a2f691789a5539f21b6
+  - effb730 2023-04-18T08:11:06+00:00 Updating ose-cluster-openshift-controller-manager-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4226a9050f3e0ecf87c4ec509072192f7a6e965e/images/ose-cluster-openshift-controller-manager-operator.yml
+  - 4ae336e 2023-04-04T16:33:55+00:00 Bump golang.org/x/net from 0.5.0 to 0.7.0
+  - 76b59ab 2023-03-08T22:46:03+00:00 Updating ose-cluster-openshift-controller-manager-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/ose-cluster-openshift-controller-manager-operator.yml
+
+- cluster-policy-controller embedded-component 1a5f0ca08be72de944f8c0c410e37221c9ec811a to 9fdc871455680b2bda1dfb4c1258da89fb918959
+  - a3568f2 2023-04-04T17:00:04+02:00 fixup! psalabelsyncer: handle empty namespace of a rolebinding subject
+  - 7796e9c 2023-04-03T14:26:45+02:00 psalabelsyncer: handle empty namespace of a rolebinding subject
+
+- kubernetes embedded-component 54b552033300ab1f94ddf8a9d16032e6619556da to d2e245fcc3f3d67b3bbedfe317ad0106f1b23f5d
+  - 80813e67c 2023-04-14T09:41:50-04:00 UPSTREAM: 117310: kube-aggregator: correctly use client-go TLS cache with custom dialer
+  - 6d90b3248 2023-04-12T10:04:45-04:00 UPSTREAM: 117242: vendor: bump runc to 1.1.6
+  - 3f4df4ed4 2023-04-12T10:04:40-04:00 UPSTREAM: 117242: CVE-2023-27561: Bump runc go module v1.1.4 -> v1.1.5
+  - 718526230 2023-04-10T16:26:54-04:00 UPSTREAM: <carry>: add shutdown annotation to response header
+  - f7b7abc89 2023-04-06T14:47:15+02:00 UPSTREAM: <drop>: Update generated
+  - 1399bb6f4 2023-04-06T14:47:15+02:00 UPSTREAM: <carry>: Move k8s-specific rules to our fork
+  - 6040b9610 2023-04-06T14:47:15+02:00 UPSTREAM: <carry>: Change annotation mechanics to allow injecting testMaps and filter out tests
+  - e3df01cd2 2023-04-06T14:47:12+02:00 UPSTREAM: <carry>: Create minimal wrapper needed to run k8s e2e tests
+  - fa81b46cc 2023-04-04T14:26:23-04:00 UPSTREAM: <carry>: disable load balancing on created cgroups when managed is enabled
+  - f27d453cb 2023-04-03T13:56:19+02:00 UPSTREAM: <drop>: bump: apiserver-lib-go for fixed SCC admission
+  - c25f8d98c 2023-04-03T13:56:05+02:00 UPSTREAM: <carry>: SCC pod extractor: assume default SA if SA is empty
+
+- machine-config-operator embedded-component 4acaaded2422e859d9f500f45a1b39f7e6d60600 to 598197a12a7eeaa43564d579543c1c6d8a717600
+  - cd587a9b 2023-04-14T15:52:14-04:00 Add quotes to variable with -z
+  - 93dfec19 2023-04-11T14:01:33-03:00 Revert "Block RHCOS gcp-routes service on both masters and workers"
+  - f56c1d3c 2023-04-10T12:01:15-04:00 Accomodate ART limitation in parsing [[]] bash The downstream build pipeline parses bash in Dockerfile `RUN` commands in order to smooth over yum/dnf invocations that break downstream builds. For example, upstream Dockerfiles may use `--disablerepo`  / `--enablerepo` / `microdnf` -- none of which will work as intended in brew/koji builds.
+  - 19add0d0 2023-04-07T08:53:51-04:00 Removed pivot func and added depreciation warning
+  - c1f5e353 2023-04-05T20:27:27-04:00 OCPBUGS-10787: Persist static IP addressed NIC names from rhel8
+  - 1a4b8584 2023-04-04T16:10:17+03:00 OCPBUGS-11280: Fixing forcedns dispatcher script permission issue for assisted sno rhel9 upgrade
+  - 7b6c14ff 2023-04-04T00:22:38-05:00 Mark controllerconfig embedded fields as embedded
+  - 0f3c8463 2023-04-03T10:57:17-04:00 OCPBUGS-4122: Do not add deep nested scope to atomic transport
+  - f6c97b01 2023-03-31T09:43:36-05:00 changed error handling so no runtime error
+  - c02a9d2d 2023-03-27T22:24:03-04:00 add support for operator metrics
+  - d2c9ff7f 2023-03-23T13:06:54+01:00 OCPBUGS-10414: Fix regex dot in coredns config file
+  - e9bccbf2 2023-03-20T12:30:22-04:00 Block RHCOS gcp-routes service on both masters and workers
+  - a0bdf3e3 2023-03-08T14:14:22+00:00 Updating openshift-proxy-pull-test images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/openshift-proxy-pull-test.yml
+
+- openshift-controller-manager embedded-component 97f5456b0e2d070c826ecd572369b6f21cc3cd15 to cc6818b2a945e320e3b85603fa5437d1600eeeff
+  - 26f95bb 2023-04-18T13:54:36+00:00 Updating ose-openshift-controller-manager images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4226a9050f3e0ecf87c4ec509072192f7a6e965e/images/ose-openshift-controller-manager.yml
+  - 2372c67 2023-03-09T05:52:55+00:00 Updating ose-openshift-controller-manager images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/ose-openshift-controller-manager.yml
+
+- oc image-amd64 c6df0e998fd1fd1c54586e5b6e9e366a91916f20 to 5f8c36d7f69632ba80bff9c6862327099198f6b3
+  - 36a21da 2023-04-11T13:13:24-04:00 adm catalog mirror update example to idms
+  - 21b7076 2023-04-11T15:36:14+08:00 fix trim
+  - 2e750bc 2023-04-06T14:09:44-04:00 [OCPNODE-1581] adm catalog mirror generates idms manifest
+  - ef1109c 2023-04-03T09:07:10-04:00 Use linux/arch when user's OS isn't in manifests
+  - 9f903f9 2023-03-30T17:48:33+03:00 oc debug: Not deleting namespace if preserve-pod flag is passed
+  - 9519c95 2023-03-30T17:46:04+03:00 oc debug: Add suffix in pod name to make it unique
+  - c3f97f6 2023-03-22T18:34:23+00:00 Support OCI manifests
+  - 4830891 2023-03-22T18:34:08+00:00 Fix bug when recreating an index with fewer images
+  - 25afc5d 2023-03-10T11:11:26+03:00 Remove already deprecated adm createkubeconfig command
   - 10bd469 2022-06-24T20:26:04-07:00 pkg/cli/admin/upgrade: Clarify client-side vs. server-side docs
+
+- router image-amd64 d35eab518fb332b19a75a51a92c19971e61e4f20 to c763d27d562ac6c7103888b67524d4c4267cf538
+  - 01cd613 2023-04-10T09:58:19-04:00 Revert "[NE-1267] container builds: switch to haproxy26 package"
+  - e33830c 2023-04-04T16:00:22+01:00 [NE-1267] container builds: switch to haproxy26 package
+  - 7de4547 2023-03-10T04:09:17+00:00 Updating ose-haproxy-router-base images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/ose-haproxy-router-base.yml
+
+- kube-rbac-proxy image-amd64 0aa2830ed7359fd8cd0e2f7db0ed96a733c5990e to 10a48c67ad88d51e3b4fe2c4ac2e96c0770f2fe0
+  - 566ee8b 2023-03-09T00:25:37+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e18d948b6ec9fc99c368102cffc1eea0c01f5765/images/kube-rbac-proxy.yml
+
+- ovn-kubernetes image-amd64 c2e3a6472b7a0a6a52f85b1f905fb0dfbf95eda7 to 04fcf6c04bf15107eb557aa3edf65147e5198c7b
+  - c68498e 2023-04-10T13:23:44-05:00 Remove no-longer-used rhel9-specific dockerfiles
+  - f062cbb 2023-04-03T13:23:16+02:00 Control forwarding on OVNK managed interfaces
+  - c28d9cf 2023-04-03T13:22:26+02:00 Enable forwarding on br-ex && br-ex1
+  - 1da418f 2023-04-03T12:17:56+02:00 Enable forwarding on mp0
+  - a2a2d6d 2023-03-31T19:54:57-07:00 Move from math/rand to crypto/rand package
+  - 7d764c5 2023-03-31T23:48:23+02:00 CARRY: use "prefer local" for annotated services
+  - 09494a5 2023-03-31T10:40:29-07:00 cni: Initialize OVS exec runner on CmdDel CNI request
+  - ba12c20 2023-03-31T10:40:09-07:00 Add support for creating stateless OVN ACLs for K8s Network Policies
+  - 2ba9738 2023-03-31T14:50:41+00:00 Updating ovn-kubernetes-microshift images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7503c3888291b999232b64ff88aa7da0efa3fa03/images/ovn-kubernetes-microshift.yml
+  - 0737c42 2023-03-31T11:33:55+08:00 Enable kind scripts on ARM machine
+  - 43d485a 2023-03-29T12:49:24-07:00 e2e, multi-homing: add layer3 secondary network IPv6 test
+  - df60b30 2023-03-28T16:56:47-07:00 Cannot create routed secondary network with an IPv6 subnet
+  - e026919 2023-03-27T09:41:23-07:00 poll "egress firewall policy functionality" tests
+  - 9390e37 2023-03-12T09:01:36+02:00 lgw: append init rules instead insert
+  - 39b55de 2023-03-08T11:49:55+01:00 Drop packets coming from pods headed externally that were not properly SNATed
+  - a1f84fd 2022-12-09T15:26:28+00:00 Use ovsdb client to detect if schema needs changing
+  - 19cfd49 2022-11-22T04:46:46+00:00 Update ubuntu to 22.04
+  - 702c7e3 2022-04-27T10:14:01-07:00 ovnkube-master pod failed to reconnect to ovn db due to ssl expire
+
+- kubernetes image-amd64 54b552033300ab1f94ddf8a9d16032e6619556da to d2e245fcc3f3d67b3bbedfe317ad0106f1b23f5d
+  - 80813e67c 2023-04-14T09:41:50-04:00 UPSTREAM: 117310: kube-aggregator: correctly use client-go TLS cache with custom dialer
+  - 6d90b3248 2023-04-12T10:04:45-04:00 UPSTREAM: 117242: vendor: bump runc to 1.1.6
+  - 3f4df4ed4 2023-04-12T10:04:40-04:00 UPSTREAM: 117242: CVE-2023-27561: Bump runc go module v1.1.4 -> v1.1.5
+  - 718526230 2023-04-10T16:26:54-04:00 UPSTREAM: <carry>: add shutdown annotation to response header
+  - f7b7abc89 2023-04-06T14:47:15+02:00 UPSTREAM: <drop>: Update generated
+  - 1399bb6f4 2023-04-06T14:47:15+02:00 UPSTREAM: <carry>: Move k8s-specific rules to our fork
+  - 6040b9610 2023-04-06T14:47:15+02:00 UPSTREAM: <carry>: Change annotation mechanics to allow injecting testMaps and filter out tests
+  - e3df01cd2 2023-04-06T14:47:12+02:00 UPSTREAM: <carry>: Create minimal wrapper needed to run k8s e2e tests
+  - fa81b46cc 2023-04-04T14:26:23-04:00 UPSTREAM: <carry>: disable load balancing on created cgroups when managed is enabled
+  - f27d453cb 2023-04-03T13:56:19+02:00 UPSTREAM: <drop>: bump: apiserver-lib-go for fixed SCC admission
+  - c25f8d98c 2023-04-03T13:56:05+02:00 UPSTREAM: <carry>: SCC pod extractor: assume default SA if SA is empty
 
