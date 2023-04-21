@@ -133,6 +133,14 @@ manifests:
         - "/opt/alternate/path"
 ```
 
+The values of `kustomizePaths` may be glob patterns.
+
+```yaml
+manifests:
+    kustomizePaths:
+        - "/opt/alternative/path.d/*"
+```
+
 To disable loading manifests, set the configuration option to an empty
 list.
 
