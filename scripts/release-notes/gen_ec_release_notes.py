@@ -42,6 +42,7 @@ NOTE:
 """
 
 import argparse
+import collections
 import html.parser
 import re
 import subprocess
@@ -73,6 +74,13 @@ VERSION_RE = re.compile(
 # processing very old versions for which we do not anticipate future
 # candidate builds.
 OLD_VERSIONS = ['4.12']
+
+
+# Representation of one release
+Release = collections.namedtuple(
+    'Release',
+    "release_name commit_sha product_version candidate_type candidate_number release_type",
+)
 
 
 def main():
@@ -109,13 +117,36 @@ def main():
         dest='rc',
         help='Do not include release candidates',
     )
+    parser.add_argument(
+        '-n', '--dry-run',
+        action='store_true',
+        dest='dry_run',
+        default=False,
+        help='Report but take no action',
+    )
     args = parser.parse_args()
+
+    new_releases = []
     if args.ec:
-        find_releases(URL_BASE, 'ocp-dev-preview')
-        find_releases(URL_BASE_X86, 'ocp-dev-preview')
+        new_releases.extend(find_new_releases(URL_BASE, 'ocp-dev-preview'))
+        new_releases.extend(find_new_releases(URL_BASE_X86, 'ocp-dev-preview'))
     if args.rc:
-        find_releases(URL_BASE, 'ocp')
-        find_releases(URL_BASE_X86, 'ocp')
+        new_releases.extend(find_new_releases(URL_BASE, 'ocp'))
+        new_releases.extend(find_new_releases(URL_BASE_X86, 'ocp'))
+
+    if not new_releases:
+        print("No new releases found.")
+        return
+
+    print()
+
+    unique_releases = {
+        r.commit_sha: r
+        for r in new_releases
+    }
+
+    for new_release in unique_releases.values():
+        publish_release(new_release, not args.dry_run)
 
 
 class VersionListParser(html.parser.HTMLParser):
@@ -170,12 +201,10 @@ class VersionListParser(html.parser.HTMLParser):
         print("WARNING: error processing HTML: {message}")
 
 
-def find_releases(url_base, release_type):
-
-    """Finds the versions for the release type and checks all of them for
-    new releases.
-
+def find_new_releases(url_base, release_type):
+    """Returns a list of Release instances for missing releases.
     """
+    new_releases = []
     # Get the list of the latest RPMs for the release type and vbersion.
     version_list_url = f"{url_base}/{release_type}/"
     with request.urlopen(version_list_url) as response:
@@ -189,15 +218,18 @@ def find_releases(url_base, release_type):
         if version_prefix in OLD_VERSIONS:
             continue
         try:
-            check_for_new_releases(url_base, release_type, version)
+            nr = check_for_new_releases(url_base, release_type, version)
+            if nr:
+                new_releases.append(nr)
         except Exception as err:  # pylint: disable=broad-except
             print(f"WARNING: could not process {release_type} {version}: {err}")
+    return new_releases
 
 
 def check_for_new_releases(url_base, release_type, version):
     """
     Checks the latest RPMs for a given release type and version,
-    and emits instructions for creating the release and tag, if they don't exist.
+    and returns a Release instance for any that don't exist.
     """
     # Get the list of the latest RPMs for the release type and vbersion.
     rpm_list_url = f"{url_base}/{release_type}/{version}/el9/os/rpm_list"
@@ -222,7 +254,7 @@ def check_for_new_releases(url_base, release_type, version):
     else:
         rpm_names = ',\n'.join(rpm_list)
         print(f"WARNING: Did not find {microshift_rpm_name_prefix} in {rpm_names}")
-        return
+        return None
 
     print(f"Examining RPM {microshift_rpm_filename}")
 
@@ -255,20 +287,44 @@ def check_for_new_releases(url_base, release_type, version):
         print("Not found")
     else:
         print("Found an existing release, no work to do")
-        return
+        return None
 
-    # Check for the tag to be present in the local git repository
+    return Release(release_name, commit_sha, product_version, candidate_type, candidate_number, release_type)
+
+
+def tag_exists(release_name):
+    "Checks if a given tag exists in the local repository."
     try:
         subprocess.run(["git", "show", release_name],
                        stdout=subprocess.DEVNULL,
                        stderr=subprocess.DEVNULL,
                        check=True)
-        print(f"Found tag for {release_name}")
+        return True
     except subprocess.CalledProcessError:
+        return False
+
+
+def publish_release(new_release, take_action):
+    """Does the work to tag and publish a release.
+    """
+    release_name = new_release.release_name
+    commit_sha = new_release.commit_sha
+    product_version = new_release.product_version
+    candidate_type = new_release.candidate_type
+    candidate_number = new_release.candidate_number
+    release_type = new_release.release_type
+
+    if not tag_exists(release_name):
         print(f"Tag {release_name} on commit {commit_sha} by running:")
         print("")
         print(f"git tag -s -m '{product_version} {candidate_type.upper()} {candidate_number}' {release_name} {commit_sha}")
         print(f"git push origin {release_name}")
+        print()
+        print("Then run the script again.")
+        return
+
+    if not take_action:
+        print('Dry run')
         return
 
     # Set up the release notes preamble with download links
@@ -293,7 +349,6 @@ def check_for_new_releases(url_base, release_type, version):
                        check=True)
     except subprocess.CalledProcessError as err:
         print(f"Failed to create the release: {err}")
-        return
 
 
 if __name__ == "__main__":
