@@ -204,5 +204,10 @@ assets:
       - file: microshift-version.yaml
         ignore: "it's a template for ConfigMap processed during runtime"
 
+  - dir: config/
+    ignore: "it contains format specification for configuration files"
+    files:
+      - file: config-openapi-spec.json
+
   - file: embed.go
     ignore: "it's a MicroShift specific Go file that embeds into a binary"
