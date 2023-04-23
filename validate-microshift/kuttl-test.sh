@@ -8,8 +8,8 @@ ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../")"
 KUTTL_VERSION="0.15.0"
 KUTTL="${ROOT}/bin/kuttl"
 
-unamep=$(uname -p)
-case ${unamep} in
+unamem=$(uname -m)
+case ${unamem} in
 "x86_64")
     ARCH=x86_64
     ;;
@@ -17,7 +17,7 @@ case ${unamep} in
     ARCH=arm64
     ;;
 *)
-    echo >&2 "Unknown architecture: ${unamep}"
+    echo >&2 "Unknown architecture: ${unamem}"
     exit 1
     ;;
 esac
