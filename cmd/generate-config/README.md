@@ -1,6 +1,9 @@
 # Config-Gen
 
-This is a simple generator tool that will read files for a specific struct and generate a yaml representation of it with comments to help keep things in sync. This is meant to be used as part of the `//go:generate` command but can also be installed and used as a stand alone binary.
+This is a tool that will read files for a specific struct and generate its yaml
+representation with comments to help keep things in sync. The tool is meant to
+be used as part of the `//go:generate` command, but it can also be installed and
+used as a standalone binary.
 
 ### Install
 
@@ -13,34 +16,37 @@ go install .
 CLI flags.
 
 ```sh
+$ go run . -h
+use openapiv3 schemas in CRDs format to generate yaml or embed in files
+
 Usage:
-  config-gen [flags]
+  generate-config [flags]
 
 Flags:
   -a, --api-output string              output path for openapi spec if desired
   -f, --file string                    default is stdin
-  -h, --help                           help for config-gen
+  -h, --help                           help for generate-config
+      --log-flush-frequency duration   Maximum number of seconds between log flushes (default 5s)
   -o, --output string                  output path, default is stdout
   -t, --template string                template file to use
   -v, --v Level                        number for the log level verbosity
+      --vmodule moduleSpec             comma-separated list of pattern=N settings for file-filtered logging (only works for the default text log format)
 ```
 
 Use as a go generate command example
 ```go
-//go:generate sh -c "controller-gen crd paths=../../hack/config-gen/configcrd output:stdout | go run -mod vendor ../../hack/config-gen -a ../../cockpit-plugin/packaging/config-openapi-spec.json -o ../../packaging/microshift/config.yaml"
-//go:generate sh -c "controller-gen crd paths=../../hack/config-gen/configcrd output:stdout | go run -mod vendor ../../hack/config-gen -o ../../docs/howto_config.md -t ../../docs/howto_config.md"
+//go:generate sh -c "controller-gen crd paths=../../cmd/generate-config/configcrd output:stdout | go run -mod vendor ../../cmd/generate-config -a ../../assets/config/config-openapi-spec.json -o ../../packaging/microshift/config.yaml"
+//go:generate sh -c "controller-gen crd paths=../../cmd/generate-config/configcrd output:stdout | go run -mod vendor ../../cmd/generate-config -o ../../docs/howto_config.md -t ../../docs/howto_config.md"
 ```
 
-Use the example test to see it in action, run the command from the `hack/config-gen` directory.
+Use the example test to see it in action, run the command from the `generate-config` directory.
 
 ```sh
-controller-gen crd paths=../../hack/config-gen/configcrd output:stdout | go run -mod vendor ../../hack/config-gen
+controller-gen crd paths=../../cmd/generate-config/configcrd output:stdout | go run -mod vendor .
 ```
 
 The sample output should be.
 ```yaml
-#!! Do Not Edit
-#!! This is a generated file
 apiServer:
     # Kube apiserver advertise address to work around the certificates issue when requiring external access using the node IP. This will turn into the IP configured in the endpoint slice for kubernetes service. Must be a reachable IP from pods. Defaults to service network CIDR first address.
     advertiseAddress: ""
@@ -51,8 +57,8 @@ debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll". Defaults to "Normal".
     logLevel: Normal
 dns:
-    # baseDomain is the base domain of the cluster. All managed DNS records will be sub-domains of this base. 
-    #  For example, given the base domain `example.com`, router exposed domains will be formed as `*.apps.example.com` by default, and API service will have a DNS entry for `api.example.com`, as well as "api-int.example.com" for internal k8s API access. 
+    # baseDomain is the base domain of the cluster. All managed DNS records will be sub-domains of this base.
+    #  For example, given the base domain `example.com`, router exposed domains will be formed as `*.apps.example.com` by default, and API service will have a DNS entry for `api.example.com`, as well as "api-int.example.com" for internal k8s API access.
     #  Once set, this field cannot be changed.
     # example:
     #   microshift.example.com

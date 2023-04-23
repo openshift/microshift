@@ -17,7 +17,7 @@ func newCommand() *cobra.Command {
 	opt := configGenOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "config-gen",
+		Use:   "generate-config",
 		Short: "use openapiv3 schemas in CRDs format to generate yaml or embed in files",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := opt.Options(); err != nil {
