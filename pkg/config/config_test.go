@@ -170,6 +170,69 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				return c
 			}(),
 		},
+		{
+			name: "manifests-default",
+			config: dedent(`
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				assert.NoError(t, c.updateComputedValues())
+				return c
+			}(),
+		},
+		{
+			name: "manifests-default2",
+			config: dedent(`
+            # the manifests struct is present, but no paths are listed
+            manifests:
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				assert.NoError(t, c.updateComputedValues())
+				return c
+			}(),
+		},
+		{
+			name: "manifests-default3",
+			config: dedent(`
+            # the manifests struct and paths keys are present but the paths
+            # item is not a YAML list
+            manifests:
+              kustomizePaths:
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				assert.NoError(t, c.updateComputedValues())
+				return c
+			}(),
+		},
+		{
+			name: "manifests-empty-list",
+			config: dedent(`
+            manifests:
+              kustomizePaths: []
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Manifests.KustomizePaths = []string{}
+				assert.NoError(t, c.updateComputedValues())
+				return c
+			}(),
+		},
+		{
+			name: "manifests-override",
+			config: dedent(`
+            manifests:
+              kustomizePaths:
+                - /tmp/some/other/directory
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Manifests.KustomizePaths = []string{"/tmp/some/other/directory"}
+				assert.NoError(t, c.updateComputedValues())
+				return c
+			}(),
+		},
 	}
 
 	for _, tt := range ttests {

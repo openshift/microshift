@@ -23,8 +23,6 @@ const (
 	retryTimeout  = 1 * time.Minute
 )
 
-var microshiftManifestsDir = config.GetManifestsDir()
-
 type Kustomizer struct {
 	paths      []string
 	kubeconfig string
@@ -32,7 +30,7 @@ type Kustomizer struct {
 
 func NewKustomizer(cfg *config.Config) *Kustomizer {
 	return &Kustomizer{
-		paths:      microshiftManifestsDir,
+		paths:      cfg.Manifests.KustomizePaths,
 		kubeconfig: cfg.KubeConfigPath(config.KubeAdmin),
 	}
 }

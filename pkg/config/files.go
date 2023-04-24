@@ -10,25 +10,7 @@ import (
 const (
 	ConfigFile = "/etc/microshift/config.yaml"
 	DataDir    = "/var/lib/microshift"
-	// for files managed via management system in /etc, i.e. user applications
-	defaultManifestDirEtc = "/etc/microshift/manifests"
-	// for files embedded in ostree. i.e. cni/other component customizations
-	defaultManifestDirLib = "/usr/lib/microshift/manifests"
 )
-
-var (
-	manifestsDir = findManifestsDir()
-)
-
-func GetManifestsDir() []string {
-	return manifestsDir
-}
-
-// Returns the default manifests directories
-func findManifestsDir() []string {
-	var manifestsDir = []string{defaultManifestDirLib, defaultManifestDirEtc}
-	return manifestsDir
-}
 
 func parse(contents []byte) (*Config, error) {
 	c := &Config{}
