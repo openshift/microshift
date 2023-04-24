@@ -29,6 +29,9 @@ data:
     [gateway]
     mode=local
     nodeport=true
+{{- if not .DefaultGatewayExist}}
+    next-hop=169.254.169.4
+{{- end}}
 
     [masterha]
     election-lease-duration=137

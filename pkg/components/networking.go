@@ -8,6 +8,7 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/config/ovn"
+	"github.com/vishvananda/netlink"
 	"k8s.io/klog/v2"
 )
 
@@ -81,16 +82,24 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		klog.Warningf("Failed to apply clusterRoleBinding %v %v", crb, err)
 		return err
 	}
-
+	defaultGWExist, err := ovn.HasDefaultGateway(netlink.FAMILY_V4)
+	if err != nil {
+		klog.Warningf("Failed to check if default gateway exist on br-ex %v %v", crb, err)
+		return err
+	}
+	if !defaultGWExist {
+		klog.Info("Cannot find default gateway on br-ex, using dummy next-hop masquerade address as OVN-K default gateway")
+	}
 	// Multinode only params: OVN_NB_DB_LIST, OVN_SB_DB_LIST, OVN_NB_PORT, OVN_SB_PORT
 	extraParams := assets.RenderParams{
-		"OVNConfig":      ovnConfig,
-		"KubeconfigPath": kubeconfigPath,
-		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
-		"OVN_NB_DB_LIST": fmt.Sprintf("tcp:%s:%s", cfg.MultiNode.Controlplane, ovn.OVN_NB_PORT),
-		"OVN_SB_DB_LIST": fmt.Sprintf("tcp:%s:%s", cfg.MultiNode.Controlplane, ovn.OVN_SB_PORT),
-		"OVN_NB_PORT":    ovn.OVN_NB_PORT,
-		"OVN_SB_PORT":    ovn.OVN_SB_PORT,
+		"OVNConfig":           ovnConfig,
+		"KubeconfigPath":      kubeconfigPath,
+		"KubeconfigDir":       filepath.Join(config.DataDir, "/resources/kubeadmin"),
+		"OVN_NB_DB_LIST":      fmt.Sprintf("tcp:%s:%s", cfg.MultiNode.Controlplane, ovn.OVN_NB_PORT),
+		"OVN_SB_DB_LIST":      fmt.Sprintf("tcp:%s:%s", cfg.MultiNode.Controlplane, ovn.OVN_SB_PORT),
+		"OVN_NB_PORT":         ovn.OVN_NB_PORT,
+		"OVN_SB_PORT":         ovn.OVN_SB_PORT,
+		"DefaultGatewayExist": defaultGWExist,
 	}
 	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)

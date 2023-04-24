@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/vishvananda/netlink"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 )
@@ -195,4 +196,76 @@ func IsOVNKubernetesInternalInterface(name string) bool {
 			"ovs-system$") // Internal OVS interface
 
 	return excludedInterfacesRegexp.MatchString(name)
+}
+
+func HasDefaultGateway(family int) (bool, error) {
+	// filter the default route to obtain the gateway
+	filter := &netlink.Route{Dst: nil}
+	mask := netlink.RT_FILTER_DST
+
+	routeList, err := netlink.RouteListFiltered(family, filter, mask)
+	if err != nil {
+		return false, fmt.Errorf("failed to get routing table in node: %v", err)
+	}
+
+	link, err := netlink.LinkByName(OVNGatewayInterface)
+	if err != nil {
+		return false, fmt.Errorf("error looking up gw interface %s: %v", OVNGatewayInterface, err)
+	}
+	if link.Attrs() == nil {
+		return false, fmt.Errorf("no attributes found for link: %#v", link)
+	}
+	// filter routes pass br-ex
+	routes := filterRoutesByIfIndex(routeList, link.Attrs().Index)
+	for _, r := range routes {
+		// no multipath
+		if len(r.MultiPath) == 0 {
+			if r.Gw == nil {
+				klog.Infof("Failed to get gateway for route %v : %v", r, err)
+				continue
+			}
+			klog.Infof("Found gateway for route %v", r)
+			return true, nil
+		}
+
+		// multipath, use the first valid entry
+		for _, nh := range r.MultiPath {
+			if nh.Gw == nil {
+				klog.Infof("Failed to get gateway for multipath route %v : %v", nh, err)
+				continue
+			}
+			klog.Infof("Found gateway for multipath route %v", r)
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func filterRoutesByIfIndex(routesUnfiltered []netlink.Route, ifIdx int) []netlink.Route {
+	if ifIdx <= 0 {
+		return routesUnfiltered
+	}
+	var routes []netlink.Route
+	for _, r := range routesUnfiltered {
+		if r.LinkIndex == ifIdx ||
+			multipathRouteMatchesIfIndex(r, ifIdx) {
+			routes = append(routes, r)
+		}
+	}
+	return routes
+}
+
+func multipathRouteMatchesIfIndex(r netlink.Route, ifIdx int) bool {
+	if r.LinkIndex != 0 {
+		return false
+	}
+	if len(r.MultiPath) == 0 {
+		return false
+	}
+	for _, mr := range r.MultiPath {
+		if mr.LinkIndex != ifIdx {
+			return false
+		}
+	}
+	return true
 }
