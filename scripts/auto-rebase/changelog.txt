@@ -1,2 +1,4 @@
-# kubernetes image-arm64 27e744f55d2e99eb8265c837e2571e47559079f6 to 37a9a084bcb483a38e8f88349fa6a21c1b6be8a3
+# kubernetes embedded-component 27e744f55d2e99eb8265c837e2571e47559079f6 to 37a9a084bcb483a38e8f88349fa6a21c1b6be8a3
+fcc276e6484511855b2f9407913625d4b067b77a 2023-02-16T12:47:20+00:00 UPSTREAM: <carry>: add default sysctls for kubelet in rpm
+# kubernetes image-amd64 27e744f55d2e99eb8265c837e2571e47559079f6 to 37a9a084bcb483a38e8f88349fa6a21c1b6be8a3
 fcc276e6484511855b2f9407913625d4b067b77a 2023-02-16T12:47:20+00:00 UPSTREAM: <carry>: add default sysctls for kubelet in rpm
