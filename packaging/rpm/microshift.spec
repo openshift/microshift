@@ -18,8 +18,9 @@
 # SELinux specifics
 %global selinuxtype targeted
 %define selinux_policyver 3.14.3-67
-%define container_policyver 2.189.0
-%define container_policy_epoch 3
+# FIXME: Specified by make-rpm.sh
+#define container_policyver 2.189.0
+#define container_policy_epoch 3
 %define microshift_relabel_files() \
    mkdir -p /var/hpvolumes; \
    mkdir -p /var/run/kubelet; \

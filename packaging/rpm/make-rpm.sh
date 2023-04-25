@@ -54,6 +54,19 @@ build_commit() {
 %global embedded_git_tag ${SOURCE_GIT_TAG}
 %global embedded_git_tree_state ${SOURCE_GIT_TREE_STATE}
 EOF
+
+  if grep -q '9.2' /etc/redhat-release; then
+    cat >>"${RPMBUILD_DIR}SPECS/microshift.spec" <<EOF
+%define container_policyver 2.208.0
+%define container_policy_epoch 3
+EOF
+  else
+    cat >>"${RPMBUILD_DIR}SPECS/microshift.spec" <<EOF
+%define container_policyver 2.189.0
+%define container_policy_epoch 3
+EOF
+  fi
+
   cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
 
   title "Building RPM packages"
