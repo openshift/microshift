@@ -17,9 +17,9 @@
 
 # SELinux specifics
 %global selinuxtype targeted
-%define selinux_policyver 3.14.3-67
-%define container_policyver 2.189.0
-%define container_policy_epoch 3
+# %%define selinux_policyver 3.14.3-67
+# %%define container_policyver 2.189.0
+# %%define container_policy_epoch 3
 %define microshift_relabel_files() \
    mkdir -p /var/hpvolumes; \
    mkdir -p /var/run/kubelet; \
@@ -77,11 +77,11 @@ MicroShift and can be used to embed those images into osbuilder blueprints.
 
 %package selinux
 Summary: SELinux policies for MicroShift
-BuildRequires: selinux-policy >= %{selinux_policyver}
-BuildRequires: selinux-policy-devel >= %{selinux_policyver}
-Requires: container-selinux < %{container_policy_epoch}:%{container_policyver}
+BuildRequires: selinux-policy
+BuildRequires: selinux-policy-devel
+Requires: container-selinux
 BuildArch: noarch
-Requires: selinux-policy >= %{selinux_policyver}
+Requires: selinux-policy
 
 %description selinux
 The microshift-selinux package provides the SELinux policy modules required by MicroShift.
