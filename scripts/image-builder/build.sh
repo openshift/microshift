@@ -335,7 +335,7 @@ cat < "${SCRIPTDIR}/config/kickstart.ks.template" \
     | sed "s;REPLACE_LVM_SYSROOT_SIZE;${LVM_SYSROOT_SIZE};g" \
     | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
     | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat < "${OCP_PULL_SECRET_FILE}" | jq -c);g" \
-    | sed "s;REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS;${AUTHORIZED_KEYS};g" \
+    | sed "s^REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS^${AUTHORIZED_KEYS}^g" \
     | sed "s;REPLACE_OSVERSION;${OSVERSION};g" \
     | sed "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
     > kickstart.ks
