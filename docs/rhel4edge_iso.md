@@ -152,7 +152,7 @@ Proceed by running the build script with the `-embed_containers` argument to inc
 
 When executed in this mode, the `scripts/image-builder/build.sh` script performs an extra step to append the list of the MicroShift container images to the blueprint so that they are installed when the operating system boots for the first time. The list of these images can be obtained by the following command.
 ```bash
-jq -r '.images | .[]' ~/microshift/assets/release/release-$(uname -i).json
+jq -r '.images | .[]' ~/microshift/assets/release/release-$(uname -m).json
 ```
 
 > See [Embedding MicroShift Container Images for Offline Deployments](./howto_offline_containers.md) for more information.
@@ -162,7 +162,7 @@ Log into the host machine using your user credentials. The remainder of this sec
 
 Start by copying the installer image from the development virtual machine to the host file system.
 ```bash
-sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-builder/microshift-installer-*.$(uname -i).iso /var/lib/libvirt/images/
+sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-builder/microshift-installer-*.$(uname -m).iso /var/lib/libvirt/images/
 ```
 
 Run the following commands to create a virtual machine using the installer image.
@@ -178,7 +178,7 @@ virt-install \
     --network network=default,model=virtio \
     --os-type generic \
     --events on_reboot=restart \
-    --cdrom ./microshift-installer-*.$(uname -i).iso \
+    --cdrom ./microshift-installer-*.$(uname -m).iso \
     --wait \
 "
 ```

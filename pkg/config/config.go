@@ -31,6 +31,7 @@ type Config struct {
 	ApiServer ApiServer  `json:"apiServer"`
 	Etcd      EtcdConfig `json:"etcd"`
 	Debugging Debugging  `json:"debugging"`
+	Manifests Manifests  `json:"manifests"`
 
 	// Internal-only fields
 	Ingress      IngressConfig `json:"-"`
@@ -105,6 +106,9 @@ func (c *Config) fillDefaults() error {
 		MaxFragmentedPercentage: 45,
 		DefragCheckFreq:         5 * time.Minute,
 	}
+	c.Manifests = Manifests{
+		KustomizePaths: []string{defaultManifestDirLib, defaultManifestDirEtc},
+	}
 
 	return nil
 }
@@ -163,6 +167,13 @@ func (c *Config) incorporateUserSettings(u *Config) {
 
 	if u.Debugging.LogLevel != "" {
 		c.Debugging.LogLevel = u.Debugging.LogLevel
+	}
+
+	// Check for nil instead of an empty list because if a user
+	// provides a list but it is empty we want to treat that as
+	// disabling the manifest loader.
+	if u.Manifests.KustomizePaths != nil {
+		c.Manifests.KustomizePaths = u.Manifests.KustomizePaths
 	}
 }
 

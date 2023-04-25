@@ -12,7 +12,7 @@ RUN addgroup -g $USER_GID $GROUPNAME \
 USER $USERNAME
 
 WORKDIR /e2e
-RUN echo "Microshift Test" > index.html
+RUN echo "MicroShift Test" > index.html
 
 EXPOSE 8080
 ENTRYPOINT [ "/bin/sh" ]

@@ -1,16 +1,14 @@
 kind: Pod
 apiVersion: v1
 metadata:
-  name: hello-microshift
+  name: microshift-test
   labels:
-    app: hello-microshift
+    app: microshift-test
 spec:
   terminationGracePeriodSeconds: 0
   containers:
-  - name: hello-microshift
-    image: busybox:1.35
-    command: ["/bin/sh"]
-    args: ["-c", "while true; do echo -ne \"HTTP/1.0 200 OK\r\nContent-Length: 16\r\n\r\nHello MicroShift\" | nc -l -p 8080 ; done"]
+  - name: microshift-test
+    image: quay.io/microshift/microshift-test:latest
     ports:
     - containerPort: 8080
       protocol: TCP

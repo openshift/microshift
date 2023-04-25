@@ -28,12 +28,12 @@ sudo rm -rf /var/lib/osbuild-composer || true
 sudo rm -rf /var/cache/{osbuild-composer,osbuild-worker} || true
 sudo rm -f  /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:*osbuild* || true
 
-sudo dnf copr -y "${COPR_MODE}" @osbuild/osbuild          "epel-9-$(uname -i)"
-sudo dnf copr -y "${COPR_MODE}" @osbuild/osbuild-composer "epel-9-$(uname -i)"
+sudo dnf copr -y "${COPR_MODE}" @osbuild/osbuild          "epel-9-$(uname -m)"
+sudo dnf copr -y "${COPR_MODE}" @osbuild/osbuild-composer "epel-9-$(uname -m)"
 
 # Uncomment the following to use the packages from PRs before their merge
-# sudo dnf copr -y "${COPR_MODE}" packit/osbuild-osbuild-1252          "epel-9-$(uname -i)"
-# sudo dnf copr -y "${COPR_MODE}" packit/osbuild-osbuild-composer-3398 "epel-9-$(uname -i)"
+# sudo dnf copr -y "${COPR_MODE}" packit/osbuild-osbuild-1252          "epel-9-$(uname -m)"
+# sudo dnf copr -y "${COPR_MODE}" packit/osbuild-osbuild-composer-3398 "epel-9-$(uname -m)"
 
 echo "Installing new 'osbuild' packages..."
 "${ROOTDIR}/../scripts/image-builder/configure.sh"
