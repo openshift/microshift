@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-config_spec_path=cockpit-plugin/packaging/config-openapi-spec.json
+config_spec_path=assets/config/config-openapi-spec.json
 config_file_path=packaging/microshift/config.yaml
 config_doc_path=docs/howto_config.md
 
