@@ -34,19 +34,32 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run MicroShift",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg, err := config.ActiveConfig()
-			if err != nil {
-				return err
-			}
-			// Things to very badly if the node's name has changed
-			// since the last time the server started.
-			err = cfg.EnsureNodeNameHasNotChanged()
-			if err != nil {
-				return err
-			}
-			return RunMicroshift(cfg)
-		},
+	}
+
+	var multinode bool
+
+	flags := cmd.Flags()
+	flags.BoolVar(&multinode, "multinode", false, "enable multinode mode")
+	err := flags.MarkHidden("multinode")
+	if err != nil {
+		panic(err)
+	}
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		cfg, err := config.ActiveConfig()
+		if err != nil {
+			return err
+		}
+
+		cfg = config.ConfigMultiNode(cfg, multinode)
+
+		// Things to very badly if the node's name has changed
+		// since the last time the server started.
+		err = cfg.EnsureNodeNameHasNotChanged()
+		if err != nil {
+			return err
+		}
+		return RunMicroshift(cfg)
 	}
 
 	return cmd

@@ -1,0 +1,492 @@
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: ovnkube-master
+  namespace: openshift-ovn-kubernetes
+  annotations:
+    kubernetes.io/description: |
+      This daemonset launches the ovn-kubernetes controller (master) networking components.
+spec:
+  selector:
+    matchLabels:
+      app: ovnkube-master
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # by default, Deployments spin up the new pod before terminating the old one
+      # but we don't want that - because ovsdb holds the lock.
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: ovnkube-master
+        ovn-db-pod: "true"
+        component: network
+        type: infra
+        openshift.io/component: network
+        kubernetes.io/os: "linux"
+    spec:
+      serviceAccountName: ovn-kubernetes-controller
+      hostNetwork: true
+      dnsPolicy: Default
+      priorityClassName: "system-cluster-critical"
+      # volumes in all containers:
+      # (container) -> (host)
+      # /etc/openvswitch -> /var/lib/ovn/etc - ovsdb data
+      # /var/lib/openvswitch -> /var/lib/ovn/data - ovsdb pki state
+      # /run/openvswitch -> tmpfs - sockets
+      # /env -> configmap env-overrides - debug overrides
+      containers:
+      # ovn-northd: convert network objects in nbdb to flows in sbdb
+      - name: northd
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xem
+          if [[ -f /env/_master ]]; then
+            set -o allexport
+            source /env/_master
+            set +o allexport
+          fi
+
+          quit() {
+            echo "$(date -Iseconds) - stopping ovn-northd"
+            OVN_MANAGE_OVSDB=no /usr/share/ovn/scripts/ovn-ctl stop_northd
+            echo "$(date -Iseconds) - ovn-northd stopped"
+            rm -f /var/run/ovn/ovn-northd.pid
+            exit 0
+          }
+          # end of quit
+          trap quit TERM INT
+
+          echo "$(date -Iseconds) - starting ovn-northd"
+          exec ovn-northd \
+            --no-chdir "-vconsole:${OVN_LOG_LEVEL}" -vfile:off "-vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
+            --ovnnb-db "{{.OVN_NB_DB_LIST}}" \
+            --ovnsb-db "{{.OVN_SB_DB_LIST}}" \
+            --pidfile /var/run/ovn/ovn-northd.pid &
+
+          wait $!
+        lifecycle:
+          preStop:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - OVN_MANAGE_OVSDB=no /usr/share/ovn/scripts/ovn-ctl stop_northd
+        env:
+        - name: OVN_LOG_LEVEL
+          value: info
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - mountPath: /run/openvswitch/
+          name: run-openvswitch
+        - mountPath: /run/ovn/
+          name: run-ovn
+        - mountPath: /env
+          name: env-overrides
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+
+      # nbdb: the northbound, or logical network object DB. In raft mode
+      - name: nbdb
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xem
+          if [[ -f /env/_master ]]; then
+            set -o allexport
+            source /env/_master
+            set +o allexport
+          fi
+
+          quit() {
+            echo "$(date -Iseconds) - stopping nbdb"
+            /usr/share/ovn/scripts/ovn-ctl stop_nb_ovsdb
+            echo "$(date -Iseconds) - nbdb stopped"
+            rm -f /var/run/ovn/ovnnb_db.pid
+            exit 0
+          }
+          # end of quit
+          trap quit TERM INT
+
+          bracketify() { case "$1" in *:*) echo "[$1]" ;; *) echo "$1" ;; esac }
+          compact() {
+            sleep 15
+            while true; do
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovn${1}_db.ctl --timeout=5 ovsdb-server/compact 2>/dev/null || true
+              sleep 600
+            done
+          }
+          # initialize variables
+          db="nb"
+          ovn_db_file="/etc/ovn/ovn${db}_db.db"
+
+          OVN_ARGS="--db-nb-cluster-local-port=9643 \
+            --db-nb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
+            --db-nb-cluster-local-proto=tcp \
+            --no-monitor"
+
+          echo "$(date -Iseconds) - starting nbdb"
+
+          exec /usr/share/ovn/scripts/ovn-ctl \
+            ${OVN_ARGS} \
+            --ovn-nb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
+            --db-nb-election-timer=10000 \
+            run_nb_ovsdb &
+
+          db_pid=$!
+          compact $db &
+          wait $db_pid
+
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                set -x
+                rm -f /var/run/ovn/ovnnb_db.pid
+
+                retries=0
+                while [[ "${retries}" -lt 60 ]]; do
+                  ovn-nbctl --no-leader-only -t 5 set-connection ptcp:{{.OVN_NB_PORT}} -- set connection . inactivity_probe=60000
+                  if [[ $? == 0 ]]; then
+                    echo "Successfully set nbdb connection"
+                    break
+                  else
+                    sleep 2
+                    (( retries += 1 ))
+                  fi
+                  echo "Failed to set nbdb connection"
+                done
+
+                #configure northd_probe_interval
+                OVN_NB_CTL="ovn-nbctl --db "{{.OVN_NB_DB_LIST}}""
+                northd_probe_interval=${OVN_NORTHD_PROBE_INTERVAL:-10000}
+                echo "Setting northd probe interval to ${northd_probe_interval} ms"
+                retries=0
+                current_probe_interval=0
+                while [[ "${retries}" -lt 10 ]]; do
+                  current_probe_interval=$(${OVN_NB_CTL} --if-exists get NB_GLOBAL . options:northd_probe_interval)
+                  if [[ $? == 0 ]]; then
+                    current_probe_interval=$(echo ${current_probe_interval} | tr -d '\"')
+                    break
+                  else
+                    sleep 2
+                    (( retries += 1 ))
+                  fi
+                done
+
+                if [[ "${current_probe_interval}" != "${northd_probe_interval}" ]]; then
+                  retries=0
+                  while [[ "${retries}" -lt 10 ]]; do
+                    ${OVN_NB_CTL} set NB_GLOBAL . options:northd_probe_interval=${northd_probe_interval}
+                    if [[ $? != 0 ]]; then
+                      echo "Failed to set northd probe interval to ${northd_probe_interval}. retrying....."
+                      sleep 2
+                      (( retries += 1 ))
+                    else
+                      echo "Successfully set northd probe interval to ${northd_probe_interval} ms"
+                      break
+                    fi
+                  done
+                fi
+
+          preStop:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                echo "$(date -Iseconds) - stopping nbdb"
+                /usr/share/ovn/scripts/ovn-ctl stop_nb_ovsdb
+                echo "$(date -Iseconds) - nbdb stopped"
+                rm -f /var/run/ovn/ovnnb_db.pid
+        readinessProbe:
+          timeoutSeconds: 5
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -xeo pipefail
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
+
+        env:
+        - name: OVN_LOG_LEVEL
+          value: info
+        - name: OVN_NORTHD_PROBE_INTERVAL
+          value: "5000"
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - mountPath: /run/openvswitch/
+          name: run-openvswitch
+        - mountPath: /run/ovn/
+          name: run-ovn
+        - mountPath: /env
+          name: env-overrides
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+
+        ports:
+        - name: nb-db-port
+          containerPort: {{.OVN_NB_PORT}}
+        terminationMessagePolicy: FallbackToLogsOnError
+
+      # sbdb: The southbound, or flow DB. In raft mode
+      - name: sbdb
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xem
+          if [[ -f /env/_master ]]; then
+            set -o allexport
+            source /env/_master
+            set +o allexport
+          fi
+
+          quit() {
+            echo "$(date -Iseconds) - stopping sbdb"
+            /usr/share/ovn/scripts/ovn-ctl stop_sb_ovsdb
+            echo "$(date -Iseconds) - sbdb stopped"
+            rm -f /var/run/ovn/ovnsb_db.pid
+            exit 0
+          }
+          # end of quit
+          trap quit TERM INT
+
+          bracketify() { case "$1" in *:*) echo "[$1]" ;; *) echo "$1" ;; esac }
+          compact() {
+            sleep 15
+            while true; do
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovn${1}_db.ctl --timeout=5 ovsdb-server/compact 2>/dev/null || true
+              sleep 600
+            done
+          }
+
+          # initialize variables
+          db="sb"
+          ovn_db_file="/etc/ovn/ovn${db}_db.db"
+
+          OVN_ARGS="--db-sb-cluster-local-port=9644 \
+            --db-sb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
+            --db-sb-cluster-local-proto=tcp \
+            --no-monitor"
+
+          echo "$(date -Iseconds) - starting sbdb "
+          exec /usr/share/ovn/scripts/ovn-ctl \
+            ${OVN_ARGS} \
+            --ovn-sb-log="-vconsole:${OVN_LOG_LEVEL} -vfile:off -vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
+            --db-sb-election-timer=16000 \
+            run_sb_ovsdb &
+          db_pid=$!
+          compact $db &
+          wait $db_pid
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                set -x
+                rm -f /var/run/ovn/ovnsb_db.pid
+
+                retries=0
+                while [[ "${retries}" -lt 60 ]]; do
+                  ovn-sbctl --no-leader-only -t 5 set-connection ptcp:{{.OVN_SB_PORT}} -- set connection . inactivity_probe=60000
+                  if [[ $? == 0 ]]; then
+                    echo "Successfully set sbdb connection"
+                    break
+                  else
+                    sleep 2
+                    (( retries += 1 ))
+                  fi
+                  echo "Failed to set sbdb connection"
+                done
+
+
+          preStop:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                echo "$(date -Iseconds) - stopping sbdb"
+                /usr/share/ovn/scripts/ovn-ctl stop_sb_ovsdb
+                echo "$(date -Iseconds) - sbdb stopped"
+                rm -f /var/run/ovn/ovnsb_db.pid
+        readinessProbe:
+          timeoutSeconds: 5
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -xeo pipefail
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
+        env:
+        - name: OVN_LOG_LEVEL
+          value: info
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - mountPath: /run/openvswitch/
+          name: run-openvswitch
+        - mountPath: /run/ovn/
+          name: run-ovn
+        - mountPath: /env
+          name: env-overrides
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+
+        ports:
+        - name: sb-db-port
+          containerPort: {{.OVN_SB_PORT}}
+        terminationMessagePolicy: FallbackToLogsOnError
+
+      # ovnkube master: convert kubernetes objects in to nbdb logical network components
+      - name: ovnkube-master
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xe
+          if [[ -f "/env/_master" ]]; then
+            set -o allexport
+            source "/env/_master"
+            set +o allexport
+          fi
+
+          # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
+          echo "$(date -Iseconds) - starting ovnkube-master, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
+
+          gateway_mode_flags="--gateway-mode local --gateway-interface br-ex"
+
+          sysctl net.ipv4.ip_forward=1
+
+          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE}"
+          exec /usr/bin/ovnkube \
+            --init-master "${K8S_NODE}" \
+            --nb-address "{{.OVN_NB_DB_LIST}}" \
+            --sb-address "{{.OVN_SB_DB_LIST}}" \
+            --config-file=/run/ovnkube-config/ovnkube.conf \
+            --loglevel "${OVN_KUBE_LOG_LEVEL}" \
+            ${gateway_mode_flags} \
+            --inactivity-probe="180000" \
+            --enable-multicast \
+            --disable-snat-multiple-gws \
+            --acl-logging-rate-limit "20"
+        volumeMounts:
+        # for checking ovs-configuration service
+        - mountPath: /etc/systemd/system
+          name: systemd-units
+          readOnly: true
+        - mountPath: /run/openvswitch/
+          name: run-openvswitch
+        - mountPath: /run/ovn/
+          name: run-ovn
+        - mountPath: /run/ovnkube-config/
+          name: ovnkube-config
+        - mountPath: {{.KubeconfigDir}}
+          name: kubeconfig
+        - mountPath: /env
+          name: env-overrides
+        - mountPath: /run/ovn-kubernetes/
+          name: host-run-ovn-kubernetes
+        - mountPath: /dev/log
+          name: log-socket
+        - mountPath: /var/log/ovn
+          name: node-log
+        - mountPath: /etc/openvswitch
+          name: etc-openvswitch-node
+        - mountPath: /etc/ovn/
+          name: etc-openvswitch-node
+        resources:
+          requests:
+            cpu: 10m
+            memory: 60Mi
+        env:
+        - name: OVN_KUBE_LOG_LEVEL
+          value: "4"
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        securityContext:
+          privileged: true
+        terminationMessagePolicy: FallbackToLogsOnError
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+        kubernetes.io/os: "linux"
+      volumes:
+      # for checking ovs-configuration service
+      - name: systemd-units
+        hostPath:
+          path: /etc/systemd/system
+      - name: run-openvswitch
+        hostPath:
+          path: /var/run/openvswitch
+      - name: run-ovn
+        hostPath:
+          path: /var/run/ovn
+
+      - name: etc-openvswitch-node
+        hostPath:
+          path: /etc/openvswitch
+      # Used for placement of ACL audit logs
+      - name: node-log
+        hostPath:
+          path: /var/log/ovn
+      - name: log-socket
+        hostPath:
+          path: /dev/log
+      # For CNI server
+      - name: host-run-ovn-kubernetes
+        hostPath:
+          path: /run/ovn-kubernetes
+
+      - name: kubeconfig
+        hostPath:
+          path: {{.KubeconfigDir}}
+      - name: ovnkube-config
+        configMap:
+          name: ovnkube-config
+      - name: env-overrides
+        configMap:
+          name: env-overrides
+          optional: true
+      tolerations:
+      - operator: "Exists"

@@ -36,6 +36,8 @@ type Config struct {
 	// Internal-only fields
 	Ingress      IngressConfig `json:"-"`
 	userSettings *Config       `json:"-"` // the values read from the config file
+
+	MultiNode MultiNodeConfig `json:"-"` // the value read from commond line
 }
 
 // NewDefault creates a new Config struct populated with the
@@ -109,6 +111,8 @@ func (c *Config) fillDefaults() error {
 	c.Manifests = Manifests{
 		KustomizePaths: []string{defaultManifestDirLib, defaultManifestDirEtc},
 	}
+
+	c.MultiNode.Enabled = false
 
 	return nil
 }
