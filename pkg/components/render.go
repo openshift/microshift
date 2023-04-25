@@ -25,7 +25,7 @@ func renderParamsFromConfig(cfg *config.Config, extra assets.RenderParams) asset
 		"ReleaseImage": release.Image,
 		"NodeName":     cfg.CanonicalNodeName(),
 		"NodeIP":       cfg.Node.NodeIP,
-		"ClusterCIDR":  cfg.Network.ClusterNetwork[0].CIDR,
+		"ClusterCIDR":  cfg.Network.ClusterNetwork[0],
 		"ServiceCIDR":  cfg.Network.ServiceNetwork[0],
 		"ClusterDNS":   cfg.Network.DNS,
 		"BaseDomain":   cfg.DNS.BaseDomain,

@@ -99,18 +99,11 @@
         "clusterNetwork": {
           "description": "IP address pool to use for pod IPs. This field is immutable after installation.",
           "type": "array",
+          "default": [
+            "10.42.0.0/16"
+          ],
           "items": {
-            "type": "object",
-            "required": [
-              "cidr"
-            ],
-            "properties": {
-              "cidr": {
-                "description": "The complete block for pod IPs.",
-                "type": "string",
-                "default": "10.42.0.0/16"
-              }
-            }
+            "type": "string"
           }
         },
         "serviceNetwork": {

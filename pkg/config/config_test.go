@@ -83,18 +83,14 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			config: dedent(`
             network:
               clusterNetwork:
-                - cidr: "10.20.30.40/16"
+                - "10.20.30.40/16"
               serviceNetwork:
                 - "40.30.20.10/16"
               serviceNodePortRange: "1024-32767"
             `),
 			expected: func() *Config {
 				c := mkDefaultConfig()
-				c.Network.ClusterNetwork = []ClusterNetworkEntry{
-					{
-						CIDR: "10.20.30.40/16",
-					},
-				}
+				c.Network.ClusterNetwork = []string{"10.20.30.40/16"}
 				c.Network.ServiceNetwork = []string{"40.30.20.10/16"}
 				c.Network.ServiceNodePortRange = "1024-32767"
 				c.ApiServer.AdvertiseAddress = ""           // force value to be recomputed

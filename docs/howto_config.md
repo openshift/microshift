@@ -22,7 +22,7 @@ manifests:
         - ""
 network:
     clusterNetwork:
-        - cidr: ""
+        - ""
     serviceNetwork:
         - ""
     serviceNodePortRange: ""
@@ -59,7 +59,7 @@ manifests:
         - /etc/microshift/manifests
 network:
     clusterNetwork:
-        - cidr: 10.42.0.0/16
+        - 10.42.0.0/16
     serviceNetwork:
         - 10.43.0.0/16
     serviceNodePortRange: 30000-32767

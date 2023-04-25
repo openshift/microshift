@@ -91,7 +91,7 @@ func RunMicroshift(cfg *config.Config) error {
 	if err := util.AddToNoProxyEnv(
 		cfg.Node.NodeIP,
 		cfg.Node.HostnameOverride,
-		cfg.Network.ClusterNetwork[0].CIDR,
+		cfg.Network.ClusterNetwork[0],
 		cfg.Network.ServiceNetwork[0],
 		".svc",
 		".cluster.local",

@@ -90,10 +90,8 @@ func (c *Config) fillDefaults() error {
 		BaseDomain: "example.com",
 	}
 	c.Network = Network{
-		ClusterNetwork: []ClusterNetworkEntry{
-			{
-				CIDR: "10.42.0.0/16",
-			},
+		ClusterNetwork: []string{
+			"10.42.0.0/16",
 		},
 		ServiceNetwork: []string{
 			"10.43.0.0/16",
