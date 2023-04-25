@@ -30,7 +30,7 @@ oc wait pods -l app=microshift-test --for condition=Ready --timeout=60s
 
 for _ in $(seq "${RETRIES}"); do
     set +e
-    response=$(curl -i http://microshift-test.cluster.local --resolve "microshift-test.cluster.local:80:${USHIFT_IP}" 2>&1)
+    response=$(curl -i http://microshift-test.cluster.local --connect-to "microshift-test.cluster.local:80:${USHIFT_IP}:80" 2>&1)
     result=$?
     set -e
 
