@@ -93,7 +93,7 @@ fi
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#runtime-prerequisites
 if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-    OCP_REPO_NAME=rhocp-4.13-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms
+    OCP_REPO_NAME=rhocp-4.13-for-rhel-${OSVERSION}-mirrorbeta-$(uname -m)-rpms
 
     sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
 [${OCP_REPO_NAME}]
@@ -107,12 +107,12 @@ EOF
     sudo subscription-manager config --rhsm.manage_repos=1
     # Uncomment this when OCP 4.13 is released
     # sudo subscription-manager repos \
-    #     --enable rhocp-4.13-for-rhel-${OSVERSION}-$(uname -i)-rpms \
-    #     --enable fast-datapath-for-rhel-${OSVERSION}-$(uname -i)-rpms
+    #     --enable rhocp-4.13-for-rhel-${OSVERSION}-$(uname -m)-rpms \
+    #     --enable fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms
 else
     sudo dnf install -y centos-release-nfv-common
-    sudo dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -i)"
-    sudo tee "/etc/yum.repos.d/openvswitch2-$(uname -i)-rpms.repo" >/dev/null <<EOF
+    sudo dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"
+    sudo tee "/etc/yum.repos.d/openvswitch2-$(uname -m)-rpms.repo" >/dev/null <<EOF
 [sig-nfv]
 name=CentOS Stream 9 - SIG NFV
 baseurl=http://mirror.stream.centos.org/SIGs/9-stream/nfv/\$basearch/openvswitch-2/
@@ -138,7 +138,7 @@ fi
 if ${RHEL_SUBSCRIPTION}; then
     sudo dnf install -y openshift-clients 
 else
-    OCC_REM=https://mirror.openshift.com/pub/openshift-v4/$(uname -i)/clients/ocp-dev-preview/latest-4.13/openshift-client-linux.tar.gz
+    OCC_REM=https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp-dev-preview/latest-4.13/openshift-client-linux.tar.gz
     OCC_LOC=$(mktemp /tmp/openshift-client-linux-XXXXX.tar.gz)
 
     curl -s "${OCC_REM}" --output "${OCC_LOC}"

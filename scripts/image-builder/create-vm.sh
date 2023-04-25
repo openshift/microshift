@@ -11,7 +11,7 @@ fi
 
 VMNAME=$1
 NETNAME=$2
-CDROM=$(ls -1 "${ISODIR}/microshift-installer-*.$(uname -i).iso" 2>/dev/null || true)
+CDROM=$(ls -1 "${ISODIR}/microshift-installer-*.$(uname -m).iso" 2>/dev/null || true)
 
 if [ ! -e "${CDROM}" ] ; then
     echo "The image ISO '${CDROM}' file does not exist. Run 'make iso' to create it"

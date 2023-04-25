@@ -4,8 +4,8 @@ set -e -o pipefail
 ROOTDIR=$(git rev-parse --show-toplevel)
 SCRIPTDIR=${ROOTDIR}/scripts/image-builder
 IMGNAME=microshift
-IMAGE_VERSION=$(jq -r '.release.base' "assets/release/release-$(uname -i).json")
-BUILD_ARCH=$(uname -i)
+IMAGE_VERSION=$(jq -r '.release.base' "assets/release/release-$(uname -m).json")
+BUILD_ARCH=$(uname -m)
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
 OSTREE_SERVER_NAME=127.0.0.1:8080
 LVM_SYSROOT_SIZE_MIN=10240
@@ -313,7 +313,7 @@ fi
 if ${EMBED_CONTAINERS} ; then
     # Add the list of all the container images
     jq -r '.images | .[] | ("[[containers]]\nsource = \"" + . + "\"\n")' \
-        "${ROOTDIR}/assets/release/release-$(uname -i).json" \
+        "${ROOTDIR}/assets/release/release-$(uname -m).json" \
         >> blueprint_v0.0.1.toml
 fi
 
