@@ -79,7 +79,7 @@ MicroShift and can be used to embed those images into osbuilder blueprints.
 Summary: SELinux policies for MicroShift
 BuildRequires: selinux-policy >= %{selinux_policyver}
 BuildRequires: selinux-policy-devel >= %{selinux_policyver}
-Requires: container-selinux < %{container_policy_epoch}:%{container_policyver}
+Requires: container-selinux
 BuildArch: noarch
 Requires: selinux-policy >= %{selinux_policyver}
 
