@@ -3,7 +3,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-ARCH="$(uname -p)"
+ARCH="$(uname -m)"
 
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 DEST_DIR="${DEST_DIR:-${SCRIPT_DIR}/../_output/bin}"
