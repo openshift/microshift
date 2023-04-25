@@ -77,11 +77,11 @@ MicroShift and can be used to embed those images into osbuilder blueprints.
 
 %package selinux
 Summary: SELinux policies for MicroShift
-BuildRequires: selinux-policy
-BuildRequires: selinux-policy-devel
-Requires: container-selinux
+# BuildRequires: selinux-policy
+# BuildRequires: selinux-policy-devel
+# Requires: container-selinux
 BuildArch: noarch
-Requires: selinux-policy
+# Requires: selinux-policy
 
 %description selinux
 The microshift-selinux package provides the SELinux policy modules required by MicroShift.
