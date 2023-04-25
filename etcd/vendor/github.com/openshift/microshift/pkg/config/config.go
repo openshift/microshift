@@ -1,6 +1,6 @@
 package config
 
-//go:generate ../../hack/generate-config.sh
+//go:generate ../../scripts/generate-config.sh
 
 import (
 	"bytes"
