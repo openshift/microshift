@@ -6,6 +6,13 @@ import (
 )
 
 func NewOstreeCommand() *cobra.Command {
+	preRun := &cobra.Command{
+		Use:   "pre-run",
+		Short: "Execute ostree-specific pre-run procedures",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return ostree.PreRun()
+		},
+	}
 	scheduleBackup := &cobra.Command{
 		Use:   "schedule-backup",
 		Short: "Schedule backup for next boot",
@@ -20,6 +27,7 @@ func NewOstreeCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(scheduleBackup)
+	cmd.AddCommand(preRun)
 
 	return cmd
 }
