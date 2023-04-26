@@ -125,7 +125,14 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			"kubelet-certificate-authority":   {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
 			"kubelet-client-certificate":      {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":              {cryptomaterial.ClientKeyPath(kubeletClientDir)},
-			"kubelet-preferred-address-types": {"InternalIP", "Hostname"},
+			// MicroShift nodes expose these two types of addresses. In order to support having more than one
+			// node with the current approach (which is running a stand alone kubelet and share certificates
+			// with the master node) we need to use names only because of the way certificates are generated.
+			// The names are fed through the subjectAltNames configuration parameter, and using master node
+			// IP in the certificates when having more than one node is not possible due to apiserver SNI
+			// limitations. For this, we prefer using names and IPs as a fallback, supporting both single
+			// and multi node.
+			"kubelet-preferred-address-types": {"Hostname", "InternalIP"},
 
 			"proxy-client-cert-file":           {cryptomaterial.ClientCertPath(aggregatorClientCertDir)},
 			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},
