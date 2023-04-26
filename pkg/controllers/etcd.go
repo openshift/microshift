@@ -75,6 +75,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 			"--scope",
 			"--unit", "microshift-etcd",
 			"--property", "BindsTo=microshift.service",
+			"--property", "ExecStop=/bin/kill -s TERM $MAINPID",
 		)
 
 		if s.memoryLimit > 0 {
