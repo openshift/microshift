@@ -3,6 +3,7 @@ package ostree
 import (
 	"fmt"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -67,4 +68,17 @@ func Test_PersistOnDisk_FailWriting(t *testing.T) {
 		err := nb.Persist()
 		assert.Error(t, err)
 	}
+}
+
+func Test_nextBootFromDisk(t *testing.T) {
+	r := strings.NewReader(`{"action":"backup","ostree":"rhel-1234.0"}`)
+	expectedNB := &nextBoot{Action: actionBackup, OstreeID: "rhel-1234.0"}
+
+	getFileReader = func() (io.Reader, error) {
+		return r, nil
+	}
+
+	nb, err := nextBootFromDisk()
+	assert.NoError(t, err)
+	assert.Equal(t, expectedNB, nb)
 }

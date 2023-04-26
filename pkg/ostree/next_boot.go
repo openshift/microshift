@@ -25,6 +25,10 @@ var getFileWriter = func() (io.Writer, error) {
 	return os.OpenFile(filepath.Join(auxDir, nextBootFile), os.O_RDWR|os.O_CREATE|os.O_TRUNC, filePerm)
 }
 
+var getFileReader = func() (io.Reader, error) {
+	return os.Open(filepath.Join(auxDir, nextBootFile))
+}
+
 type nextBoot struct {
 	Action   action `json:"action"`
 	OstreeID string `json:"ostree,omitempty"`
@@ -51,4 +55,23 @@ func (nb *nextBoot) Persist() error {
 	}
 
 	return nil
+}
+
+func nextBootFromDisk() (*nextBoot, error) {
+	reader, err := getFileReader()
+	if err != nil {
+		return nil, err
+	}
+	b, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	nb := &nextBoot{}
+	err = json.Unmarshal(b, nb)
+	if err != nil {
+		return nil, err
+	}
+
+	return nb, nil
 }
