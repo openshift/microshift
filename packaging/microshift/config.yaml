@@ -25,8 +25,7 @@ manifests:
 network:
     # IP address pool to use for pod IPs. This field is immutable after installation.
     clusterNetwork:
-        - # The complete block for pod IPs.
-          cidr: 10.42.0.0/16
+        - 10.42.0.0/16
     # IP address pool for services. Currently, we only support a single entry here. This field is immutable after installation.
     serviceNetwork:
         - 10.43.0.0/16

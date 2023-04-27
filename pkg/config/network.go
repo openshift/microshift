@@ -10,7 +10,8 @@ import (
 type Network struct {
 	// IP address pool to use for pod IPs.
 	// This field is immutable after installation.
-	ClusterNetwork []ClusterNetworkEntry `json:"clusterNetwork"`
+	// +kubebuilder:default={"10.42.0.0/16"}
+	ClusterNetwork []string `json:"clusterNetwork"`
 
 	// IP address pool for services.
 	// Currently, we only support a single entry here.
@@ -30,12 +31,6 @@ type Network struct {
 
 	// The DNS server to use
 	DNS string `json:"-"`
-}
-
-type ClusterNetworkEntry struct {
-	// The complete block for pod IPs.
-	// +kubebuilder:default="10.42.0.0/16"
-	CIDR string `json:"cidr"`
 }
 
 func (c *Config) computeClusterDNS() (string, error) {

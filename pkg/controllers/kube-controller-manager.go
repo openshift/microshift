@@ -86,7 +86,7 @@ func configure(ctx context.Context, cfg *config.Config) (args []string, applyFn 
 			"authorization-kubeconfig":         {kubeConfig},
 			"service-account-private-key-file": {kcmServiceAccountPrivateKeyFile()},
 			"allocate-node-cidrs":              {"true"},
-			"cluster-cidr":                     {cfg.Network.ClusterNetwork[0].CIDR},
+			"cluster-cidr":                     {cfg.Network.ClusterNetwork[0]},
 			"root-ca-file":                     {kcmRootCAFile()},
 			"bind-address":                     {"127.0.0.1"},
 			"secure-port":                      {"10257"},
