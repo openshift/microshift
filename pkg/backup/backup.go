@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
@@ -28,10 +29,16 @@ func MakeBackup(subdir string) error {
 	}
 
 	link := filepath.Join(config.AuxDataDir, latestBackupDir)
-	if err := os.Remove(link); err != nil {
-		klog.Errorf("Failed to remove old symlink: %v", link, err)
+
+	if exists, err := util.CheckIfFileExists(link); exists {
+		if err := os.Remove(link); err != nil {
+			klog.Errorf("Failed to remove old symlink: %v", link, err)
+			return err
+		}
+	} else if err != nil {
 		return err
 	}
+
 	if err := os.Symlink(dest, link); err != nil {
 		klog.Errorf("Failed to make symlink: %v", link, err)
 		return err

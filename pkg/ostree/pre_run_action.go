@@ -2,13 +2,13 @@ package ostree
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
@@ -37,13 +37,7 @@ var getFileReader = func() (io.Reader, error) {
 }
 
 var fileExists = func() (bool, error) {
-	if _, err := os.Stat(preRunActionFilepath); err == nil {
-		return true, nil
-	} else if errors.Is(err, os.ErrNotExist) {
-		return false, nil
-	} else {
-		return false, err
-	}
+	return util.CheckIfFileExists(preRunActionFilepath)
 }
 
 type preRunAction struct {
