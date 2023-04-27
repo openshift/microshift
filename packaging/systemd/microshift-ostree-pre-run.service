@@ -1,0 +1,13 @@
+[Unit]
+Description=Initiates pre-run procedure for ostree-based systems
+Before=microshift.service
+RefuseManualStart=true
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutSec=5m
+ExecStart=/usr/bin/microshift ostree pre-run
+
+[Install]
+RequiredBy=microshift.service

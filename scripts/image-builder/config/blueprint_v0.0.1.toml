@@ -52,4 +52,4 @@ version = "*"
 [customizations]
 
 [customizations.services]
-enabled = ["crio", "microshift"]
+enabled = ["crio", "microshift", "microshift-ostree-pre-run"]

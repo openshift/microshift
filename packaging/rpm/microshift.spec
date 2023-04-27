@@ -164,6 +164,7 @@ install -p -m644  packaging/network-manager-conf/microshift-nm.conf %{buildroot}
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
+install -p -m644 packaging/systemd/microshift-ostree-pre-run.service %{buildroot}%{_unitdir}/microshift-ostree-pre-run.service
 
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/manifests
@@ -250,6 +251,9 @@ sed -i -n -e '/^OPTIONS=/!p' -e '$aOPTIONS="--no-mlockall"' /etc/sysconfig/openv
 systemctl is-active --quiet NetworkManager && systemctl restart --quiet NetworkManager || true
 systemctl enable --now --quiet openvswitch || true
 
+%post greenboot
+%systemd_post microshift-ostree-pre-run.service
+
 %preun networking
 %systemd_preun microshift-ovs-init.service
 
@@ -298,6 +302,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
 %{_sysconfdir}/greenboot/green.d/40_microshift.sh
 %{_datadir}/microshift/functions/greenboot.sh
+%{_unitdir}/microshift-ostree-pre-run.service
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
