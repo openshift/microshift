@@ -77,6 +77,7 @@ func Test_nextBootFromDisk(t *testing.T) {
 	getFileReader = func() (io.Reader, error) {
 		return r, nil
 	}
+	fileExists = func() (bool, error) { return true, nil }
 
 	nb, err := nextBootFromDisk()
 	assert.NoError(t, err)
