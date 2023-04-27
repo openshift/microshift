@@ -9,9 +9,9 @@ require (
 	github.com/openshift/api v0.0.0-20230208193339-068b2ae5534f
 	github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
 	github.com/openshift/client-go v0.0.0-20230120202327-72f107311084
-	github.com/openshift/cluster-policy-controller v0.0.0-20230405152830-9fdc87145568
+	github.com/openshift/cluster-policy-controller v0.0.0-20230424132259-62adf796a213
 	github.com/openshift/library-go v0.0.0-20230222090221-582055a1d5c4
-	github.com/openshift/route-controller-manager v0.0.0-20230205134410-d7a8e22db412
+	github.com/openshift/route-controller-manager v0.0.0-20230424160305-8f894ac488ac
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.6.0
 	github.com/spf13/pflag v1.0.5
