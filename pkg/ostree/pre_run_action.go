@@ -19,25 +19,25 @@ const (
 	actionRestore action = "restore"
 	actionMissing action = "missing"
 
-	nextBootFile = ".next_boot"
-	filePerm     = os.FileMode(0644)
+	persistenceFile = "pre_run_action"
+	filePerm        = os.FileMode(0644)
 )
 
-var nextBootFilePath = filepath.Join(config.AuxDataDir, nextBootFile)
+var preRunActionFilepath = filepath.Join(config.AuxDataDir, persistenceFile)
 
 var getFileWriter = func() (io.Writer, error) {
 	if err := config.EnsureAuxDirExists(); err != nil {
 		return nil, err
 	}
-	return os.OpenFile(nextBootFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, filePerm)
+	return os.OpenFile(preRunActionFilepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, filePerm)
 }
 
 var getFileReader = func() (io.Reader, error) {
-	return os.Open(nextBootFilePath)
+	return os.Open(preRunActionFilepath)
 }
 
 var fileExists = func() (bool, error) {
-	if _, err := os.Stat(nextBootFilePath); err == nil {
+	if _, err := os.Stat(preRunActionFilepath); err == nil {
 		return true, nil
 	} else if errors.Is(err, os.ErrNotExist) {
 		return false, nil
@@ -46,12 +46,12 @@ var fileExists = func() (bool, error) {
 	}
 }
 
-type nextBoot struct {
+type preRunAction struct {
 	Action   action `json:"action"`
 	OstreeID string `json:"ostree,omitempty"`
 }
 
-func (nb *nextBoot) Persist() error {
+func (nb *preRunAction) Persist() error {
 	w, err := getFileWriter()
 	if err != nil {
 		return err
@@ -68,30 +68,30 @@ func (nb *nextBoot) Persist() error {
 
 	if n != len(b) {
 		return fmt.Errorf(
-			"writing nextBoot was incomplete - wrote %d bytes, expected %d", n, len(b))
+			"writing pre-run-action was incomplete - wrote %d bytes, expected %d", n, len(b))
 	}
 
 	return nil
 }
 
-func (nb *nextBoot) RemoveFromDisk() error {
+func (nb *preRunAction) RemoveFromDisk() error {
 	exists, err := fileExists()
 
 	if err != nil {
 		return err
 	}
 	if exists {
-		klog.Infof("Removing %s", nextBootFilePath)
-		return os.Remove(nextBootFilePath)
+		klog.Infof("Removing %s", preRunActionFilepath)
+		return os.Remove(preRunActionFilepath)
 	}
 	return nil
 }
 
-func nextBootFromDisk() (*nextBoot, error) {
+func preRunActionFromDisk() (*preRunAction, error) {
 	if exists, err := fileExists(); err != nil {
-		return nil, fmt.Errorf("problem with next boot file: %w", err)
+		return nil, fmt.Errorf("problem with pre-run-action file: %w", err)
 	} else if !exists {
-		return &nextBoot{Action: actionMissing}, nil
+		return &preRunAction{Action: actionMissing}, nil
 	}
 
 	reader, err := getFileReader()
@@ -103,7 +103,7 @@ func nextBootFromDisk() (*nextBoot, error) {
 		return nil, err
 	}
 
-	nb := &nextBoot{}
+	nb := &preRunAction{}
 	err = json.Unmarshal(b, nb)
 	if err != nil {
 		return nil, err
@@ -117,6 +117,6 @@ func nextBootFromDisk() (*nextBoot, error) {
 		return nil, fmt.Errorf("unknown action deserialized: %s", nb.Action)
 	}
 
-	klog.Infof("Loaded next boot action: %#v", nb)
+	klog.Infof("Loaded pre-run-action: %#v", nb)
 	return nb, nil
 }

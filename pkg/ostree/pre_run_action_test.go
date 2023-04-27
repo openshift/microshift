@@ -29,7 +29,7 @@ func (w *testWriter) Write(p []byte) (int, error) {
 }
 
 func Test_PersistOnDisk_success(t *testing.T) {
-	nb := nextBoot{Action: actionBackup, OstreeID: "rhel-1234.0"}
+	nb := preRunAction{Action: actionBackup, OstreeID: "rhel-1234.0"}
 	expectedData := `{"action":"backup","ostree":"rhel-1234.0"}`
 
 	writer := &testWriter{writeFail: false, lenFail: false}
@@ -43,7 +43,7 @@ func Test_PersistOnDisk_success(t *testing.T) {
 }
 
 func Test_PersistOnDisk_FailGettingWriter(t *testing.T) {
-	nb := nextBoot{Action: actionBackup, OstreeID: "rhel-1234.0"}
+	nb := preRunAction{Action: actionBackup, OstreeID: "rhel-1234.0"}
 
 	getFileWriter = func() (io.Writer, error) {
 		return nil, fmt.Errorf("failed to open file")
@@ -54,7 +54,7 @@ func Test_PersistOnDisk_FailGettingWriter(t *testing.T) {
 }
 
 func Test_PersistOnDisk_FailWriting(t *testing.T) {
-	nb := nextBoot{Action: actionBackup, OstreeID: "rhel-1234.0"}
+	nb := preRunAction{Action: actionBackup, OstreeID: "rhel-1234.0"}
 
 	writers := []*testWriter{
 		{writeFail: true, lenFail: false},
@@ -70,16 +70,16 @@ func Test_PersistOnDisk_FailWriting(t *testing.T) {
 	}
 }
 
-func Test_nextBootFromDisk(t *testing.T) {
+func Test_preRunActionFromDisk(t *testing.T) {
 	r := strings.NewReader(`{"action":"backup","ostree":"rhel-1234.0"}`)
-	expectedNB := &nextBoot{Action: actionBackup, OstreeID: "rhel-1234.0"}
+	expectedNB := &preRunAction{Action: actionBackup, OstreeID: "rhel-1234.0"}
 
 	getFileReader = func() (io.Reader, error) {
 		return r, nil
 	}
 	fileExists = func() (bool, error) { return true, nil }
 
-	nb, err := nextBootFromDisk()
+	nb, err := preRunActionFromDisk()
 	assert.NoError(t, err)
 	assert.Equal(t, expectedNB, nb)
 }

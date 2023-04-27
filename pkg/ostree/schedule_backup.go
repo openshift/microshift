@@ -69,7 +69,7 @@ func ScheduleBackup() error {
 		return err
 	}
 
-	data := nextBoot{
+	data := preRunAction{
 		Action:   actionBackup,
 		OstreeID: id,
 	}
