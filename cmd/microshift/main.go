@@ -39,5 +39,6 @@ func newCommand() *cobra.Command {
 	cmd.AddCommand(cmds.NewVersionCommand(ioStreams))
 	cmd.AddCommand(cmds.NewShowConfigCommand(ioStreams))
 	cmd.AddCommand(cmds.NewOstreeCommand())
+	cmd.AddCommand(cmds.NewDataCommand())
 	return cmd
 }
