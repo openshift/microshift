@@ -65,6 +65,7 @@ func (nb *preRunAction) Persist() error {
 			"writing pre-run-action was incomplete - wrote %d bytes, expected %d", n, len(b))
 	}
 
+	klog.Infof("Persisted next pre-run action '%s' to %s", string(b), preRunActionFilepath)
 	return nil
 }
 
