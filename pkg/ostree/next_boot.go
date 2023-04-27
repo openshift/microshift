@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/openshift/microshift/pkg/config"
 )
 
 type action string
@@ -19,14 +21,16 @@ const (
 )
 
 var getFileWriter = func() (io.Writer, error) {
-	if err := EnsureAuxDirExists(); err != nil {
+	if err := config.EnsureAuxDirExists(); err != nil {
 		return nil, err
 	}
-	return os.OpenFile(filepath.Join(auxDir, nextBootFile), os.O_RDWR|os.O_CREATE|os.O_TRUNC, filePerm)
+	return os.OpenFile(filepath.Join(config.AuxDataDir, nextBootFile),
+		os.O_RDWR|os.O_CREATE|os.O_TRUNC,
+		filePerm)
 }
 
 var getFileReader = func() (io.Reader, error) {
-	return os.Open(filepath.Join(auxDir, nextBootFile))
+	return os.Open(filepath.Join(config.AuxDataDir, nextBootFile))
 }
 
 type nextBoot struct {

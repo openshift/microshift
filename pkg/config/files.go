@@ -8,8 +8,10 @@ import (
 )
 
 const (
-	ConfigFile = "/etc/microshift/config.yaml"
-	DataDir    = "/var/lib/microshift"
+	ConfigFile     = "/etc/microshift/config.yaml"
+	DataDir        = "/var/lib/microshift"
+	AuxDataDir     = DataDir + ".aux"
+	auxDataDirPerm = os.FileMode(0644)
 )
 
 func parse(contents []byte) (*Config, error) {
@@ -60,4 +62,8 @@ func ActiveConfig() (*Config, error) {
 		return nil, fmt.Errorf("Error reading config file %q: %v", ConfigFile, err)
 	}
 	return getActiveConfigFromYAML(contents)
+}
+
+func EnsureAuxDirExists() error {
+	return os.MkdirAll(AuxDataDir, auxDataDirPerm)
 }
