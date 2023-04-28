@@ -21,7 +21,7 @@ func MakeBackup(subdir string) error {
 	}
 
 	dest := filepath.Join(config.AuxDataDir, subdir)
-	cmd := exec.Command("cp", "--recursive", "--reflink=auto", config.DataDir, dest) //nolint:gosec
+	cmd := exec.Command("cp", "--preserve", "--recursive", "--reflink=auto", config.DataDir, dest) //nolint:gosec
 
 	if out, err := cmd.CombinedOutput(); err != nil {
 		klog.Errorf("Failed to make backup - copy failed: %s err: %v", out, err)
