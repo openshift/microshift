@@ -5,9 +5,6 @@ ovsInit:
   # Interface to be added in OVS gateway bridge "br-ex"
   #gatewayInterface: ""
 
-  # Interface to be added in external OVS gateway bridge "br-ex1"
-  #externalGatewayInterface: ""
-
 # MTU value to be used for the Pods, must be less than or equal to the MTU of
 # default route interface.
 #mtu: 1500
