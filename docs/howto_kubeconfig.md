@@ -49,7 +49,7 @@ Certificate:
 ```
 This means we need to use `localhost` to connect to it, and have our kubeconfig use the same CA that signed the certificate above.
 
-The local access kubeconfig is always generated at `/var/lib/microshift/resources/kubeadmin/kubeconfig`. This one is not impacted/driven by configuration parameters. It allows access to API server using `localhost` and uses the `localhost` internal CA:
+The local access kubeconfig is always generated at `/var/lib/microshift/live/resources/kubeadmin/kubeconfig`. This one is not impacted/driven by configuration parameters. It allows access to API server using `localhost` and uses the `localhost` internal CA:
 ```yaml
 clusters:
 - cluster:

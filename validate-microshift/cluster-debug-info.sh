@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
+export KUBECONFIG=/var/lib/microshift/live/resources/kubeadmin/kubeconfig
 
 declare -a commands_to_run=()
 function to_run() {

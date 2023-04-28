@@ -23,10 +23,10 @@ const (
 	filePerm        = os.FileMode(0644)
 )
 
-var preRunActionFilepath = filepath.Join(config.AuxDataDir, persistenceFile)
+var preRunActionFilepath = filepath.Join(config.BaseDataDir, persistenceFile)
 
 var getFileWriter = func() (io.Writer, error) {
-	if err := config.EnsureAuxDirExists(); err != nil {
+	if err := config.CreateDir(config.BaseDataDir); err != nil {
 		return nil, err
 	}
 	return os.OpenFile(preRunActionFilepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, filePerm)

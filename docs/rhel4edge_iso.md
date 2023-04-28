@@ -193,7 +193,7 @@ sudo virsh domifaddr microshift-edge
 Log into the system using `redhat:redhat` credentials and run the following commands to configure MicroShift access.
 ```bash
 mkdir ~/.kube
-sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
+sudo cat /var/lib/microshift/live/resources/kubeadmin/kubeconfig > ~/.kube/config
 ```
 
 Finally, check if MicroShift is up and running by executing `oc` commands.
@@ -264,5 +264,5 @@ registry.redhat.io/openshift4/ose-csi-node-driver-registrar   latest            
 
 Finally, wait until all the MicroShift pods are up and running.
 ```bash
-watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A
+watch sudo $(which oc) --kubeconfig /var/lib/microshift/live/resources/kubeadmin/kubeconfig get pods -A
 ```

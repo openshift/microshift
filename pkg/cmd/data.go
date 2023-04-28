@@ -17,7 +17,7 @@ func NewDataCommand() *cobra.Command {
 		},
 	}
 	backup.PersistentFlags().String("name", "backup-0",
-		fmt.Sprintf("Name of the backup. It is a name of directory inside %s", config.AuxDataDir))
+		fmt.Sprintf("Name of the backup. It is a name of directory inside %s", config.BackupsDir))
 
 	cmd := &cobra.Command{
 		Use:   "data",

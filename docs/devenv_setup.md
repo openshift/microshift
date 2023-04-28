@@ -200,7 +200,7 @@ sudo systemctl start microshift
 
 Wait until all the pods are up and running.
 ```bash
-watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A
+watch sudo $(which oc) --kubeconfig /var/lib/microshift/live/resources/kubeadmin/kubeconfig get pods -A
 ```
 
 Finalize the procedure by stopping the MicroShift service and cleaning up its images and configuration data.
@@ -226,7 +226,7 @@ Examine the `~/microshift.log` log file to ensure a successful startup.
 Copy `kubeconfig` to the default location that can be accessed without the administrator privilege.
 ```bash
 mkdir -p ~/.kube/
-sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
+sudo cat /var/lib/microshift/live/resources/kubeadmin/kubeconfig > ~/.kube/config
 ```
 
 Verify that the MicroShift is running.

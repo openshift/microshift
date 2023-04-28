@@ -172,7 +172,7 @@ if ${BUILD_AND_RUN}; then
     echo ""
     echo "The configuration phase completed. Run the following commands to:"
     echo " - Wait until all MicroShift pods are running"
-    echo "      watch sudo \$(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A"
+    echo "      watch sudo \$(which oc) --kubeconfig /var/lib/microshift/live/resources/kubeadmin/kubeconfig get pods -A"
     echo ""
     echo " - Get MicroShift logs"
     echo "      sudo journalctl -u microshift"

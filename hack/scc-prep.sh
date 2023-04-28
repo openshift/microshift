@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
+export KUBECONFIG=/var/lib/microshift/live/resources/kubeadmin/kubeconfig
 
 oc apply -f - <<EOF
 ---

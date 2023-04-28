@@ -63,7 +63,7 @@ firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
 firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
 
 # Make the KUBECONFIG from MicroShift directly available for the root user
-echo -e 'export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig' >> /root/.profile
+echo -e 'export KUBECONFIG=/var/lib/microshift/live/resources/kubeadmin/kubeconfig' >> /root/.profile
 
 # Configure systemd journal service to persist logs between boots and limit their size to 1G
 sudo mkdir -p /etc/systemd/journald.conf.d

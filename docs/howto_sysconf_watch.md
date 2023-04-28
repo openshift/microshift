@@ -11,7 +11,7 @@ Log into the virtual machine and run the following commands to configure the Mic
 
 ```
 mkdir ~/.kube
-sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
+sudo cat /var/lib/microshift/live/resources/kubeadmin/kubeconfig > ~/.kube/config
 oc get pods -A
 ```
 

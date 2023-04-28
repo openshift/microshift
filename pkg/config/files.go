@@ -3,15 +3,24 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"sigs.k8s.io/yaml"
 )
 
 const (
-	ConfigFile     = "/etc/microshift/config.yaml"
-	DataDir        = "/var/lib/microshift"
-	AuxDataDir     = DataDir + ".aux"
-	auxDataDirPerm = os.FileMode(0644)
+	ConfigFile  = "/etc/microshift/config.yaml"
+	BaseDataDir = "/var/lib/microshift"
+
+	workingDirName = "live"
+	backupsDirName = "backups"
+
+	dataDirPerm = os.FileMode(0700)
+)
+
+var (
+	DataDir    = filepath.Join(BaseDataDir, workingDirName)
+	BackupsDir = filepath.Join(BaseDataDir, backupsDirName)
 )
 
 func parse(contents []byte) (*Config, error) {
@@ -64,6 +73,6 @@ func ActiveConfig() (*Config, error) {
 	return getActiveConfigFromYAML(contents)
 }
 
-func EnsureAuxDirExists() error {
-	return os.MkdirAll(AuxDataDir, auxDataDirPerm)
+func CreateDir(path string) error {
+	return os.MkdirAll(path, dataDirPerm)
 }

@@ -62,7 +62,7 @@ The configuration phase completed. Run the following commands to:
  - Wait until all MicroShift pods are running
  - Clean up MicroShift service configuration
 
-watch sudo $(which oc) --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig get pods -A
+watch sudo $(which oc) --kubeconfig /var/lib/microshift/live/resources/kubeadmin/kubeconfig get pods -A
 echo 1 | sudo /usr/bin/microshift-cleanup-data --all
 
 Done

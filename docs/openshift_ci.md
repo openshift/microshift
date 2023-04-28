@@ -10,7 +10,7 @@ E2e jobs are executed in parallel, each against its own isolated MicroShift clus
 Prior to opening a PR it is useful and efficient to be able to run tests locally relying on your own resources. In order to do it you need a running instance of MicroShift and a valid version of [openshift-tests](https://github.com/openshift/origin).
 > `openshift-tests` follows the same branching strategy than the rest of the product, so be sure to check base version in `pkg/release/release.go`.
 
-`openshift-tests` requires a kubeconfig and `oc` binary as well. MicroShift generates a kubeconfig located in `/var/lib/microshift/resources/kubeadmin/kubeconfig`, but we will see how to use it depending on local vs remote access to MicroShift instances.
+`openshift-tests` requires a kubeconfig and `oc` binary as well. MicroShift generates a kubeconfig located in `/var/lib/microshift/live/resources/kubeadmin/kubeconfig`, but we will see how to use it depending on local vs remote access to MicroShift instances.
 
 Once we have the kubeconfig working, we can launch the tests. In order to run `openshift-tests` for `MicroShift` we need to provide KUBECONFIG and one specific option:
 ```

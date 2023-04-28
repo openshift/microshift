@@ -140,7 +140,7 @@ microshift_health_summary() {
     # Because test might be "destructive" (i.e. tear down and set up again MicroShift)
     # so these commands are executed via ssh.
     # Alternative is to copy kubeconfig second time in the same test.
-    ssh_cmd "mkdir -p ~/.kube/ && sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config ; \
+    ssh_cmd "mkdir -p ~/.kube/ && sudo cat /var/lib/microshift/live/resources/kubeadmin/kubeconfig > ~/.kube/config ; \
             oc get pods -A ; \
             oc get nodes -o wide ; \
             oc get events -A --sort-by=.metadata.creationTimestamp | head -n 20"

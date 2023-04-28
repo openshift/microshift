@@ -5,7 +5,7 @@
 #
 SCRIPT_PID=$$
 
-OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
+OCCONFIG_OPT="--kubeconfig /var/lib/microshift/live/resources/kubeadmin/kubeconfig"
 OCGET_OPT="--no-headers"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
 

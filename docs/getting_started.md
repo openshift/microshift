@@ -115,7 +115,7 @@ Proceed by configuring MicroShift access for the `redhat` user account.
 
 ```bash
 mkdir ~/.kube
-sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
+sudo cat /var/lib/microshift/live/resources/kubeadmin/kubeconfig > ~/.kube/config
 ```
 
 Finally, check if MicroShift is up and running by executing `oc` commands.

@@ -1,7 +1,6 @@
----
 # microshift-start default vars
 
-remote_kubeconfig_path: /var/lib/microshift/resources/kubeadmin/kubeconfig
+remote_kubeconfig_path: /var/lib/microshift/live/resources/kubeadmin/kubeconfig
 
 du_dirs:
   - /

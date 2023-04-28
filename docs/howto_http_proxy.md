@@ -98,6 +98,6 @@ sudo systemctl enable microshift --now
 Configure the MicroShift access and check if the PODs are up and running.
 ```
 mkdir ~/.kube
-sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
+sudo cat /var/lib/microshift/live/resources/kubeadmin/kubeconfig > ~/.kube/config
 oc get pods -A
 ```
