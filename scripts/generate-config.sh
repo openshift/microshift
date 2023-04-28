@@ -11,9 +11,9 @@ generate_crd() {
 
 pushd "${ROOTDIR}" &>/dev/null
 
-echo "Generating packaging/microshift/config.yaml and assets/config/config-openapi-spec.json"
+echo "Generating packaging/microshift/config.yaml and cmd/generate-config/config/config-openapi-spec.json"
 generate_crd | go run -mod vendor ./cmd/generate-config \
--a ./assets/config/config-openapi-spec.json \
+-a ./cmd/generate-config/config/config-openapi-spec.json \
 -o ./packaging/microshift/config.yaml
 
 echo "Updating docs/howto_config.md"
