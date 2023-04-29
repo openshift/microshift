@@ -97,6 +97,8 @@ disable=raw-checker-failed,
         # The linter runs in a virtualenv without robot framework, so
         # cannot import modules.
         import-error,
+        # Humbug
+        no-self-use,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
