@@ -198,7 +198,8 @@ class VersionListParser(html.parser.HTMLParser):
         self.versions.append(data)
 
     def error(self, message):
-        print("WARNING: error processing HTML: {message}")
+        "Handle an error processing the HTML"
+        print(f"WARNING: error processing HTML: {message}")
 
 
 def find_new_releases(url_base, release_type):
