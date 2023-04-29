@@ -37,6 +37,7 @@ Run With Kubeconfig
     IF    ${allow_fail} == False
         Should Be Equal As Integers    ${result.rc}    0
     END
+    RETURN  ${result.stdout}
 
 Create Namespace
     [Documentation]    Creates a namespace with the given name.
