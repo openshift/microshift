@@ -126,7 +126,7 @@ assets:
       - file: podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml
 
   - dir: controllers/kube-apiserver/
-    src: cluster-kube-apiserver-operator/bindata/assets/config/
+    src: cluster-kube-apiserver-operator/bindata/cmd/generate-config/config/
     files:
       - file: config-overrides.yaml
       - file: defaultconfig.yaml
@@ -214,11 +214,6 @@ assets:
     files:
       - file: microshift-version.yaml
         ignore: "it's a template for ConfigMap processed during runtime"
-
-  - dir: config/
-    ignore: "it contains format specification for configuration files"
-    files:
-      - file: config-openapi-spec.json
 
   - file: embed.go
     ignore: "it's a MicroShift specific Go file that embeds into a binary"

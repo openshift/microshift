@@ -35,7 +35,7 @@ Flags:
 
 Use as a go generate command example
 ```go
-//go:generate sh -c "controller-gen crd paths=../../cmd/generate-config/configcrd output:stdout | go run -mod vendor ../../cmd/generate-config -a ../../assets/config/config-openapi-spec.json -o ../../packaging/microshift/config.yaml"
+//go:generate sh -c "controller-gen crd paths=../../cmd/generate-config/configcrd output:stdout | go run -mod vendor ../../cmd/generate-config -a ../../cmd/generate-config/config/config-openapi-spec.json -o ../../packaging/microshift/config.yaml"
 //go:generate sh -c "controller-gen crd paths=../../cmd/generate-config/configcrd output:stdout | go run -mod vendor ../../cmd/generate-config -o ../../docs/howto_config.md -t ../../docs/howto_config.md"
 ```
 
