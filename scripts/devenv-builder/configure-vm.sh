@@ -47,6 +47,14 @@ if [ $RHEL_SUBSCRIPTION = true ] ; then
     fi
 fi
 
+# FIXME: Temporarily disable selinux until we update the version of
+# RHEL used in CI.
+if ! grep -q 'Red Hat Enterprise Linux release 9.2' /etc/redhat-release; then
+    echo "WARNING: disabling selinux on $(cat /etc/redhat-release)"
+    sudo setenforce Permissive
+    sudo sed --in-place -e 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config
+fi
+
 # Create Development Virtual Machine > Configuring VM
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#configuring-vm
 echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
