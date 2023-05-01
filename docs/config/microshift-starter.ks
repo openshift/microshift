@@ -32,7 +32,7 @@ conntrack-tools
 containernetworking-plugins
 containers-common
 container-selinux
-criu
+crio
 git
 jq
 make
