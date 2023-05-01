@@ -67,6 +67,14 @@ if ${RHEL_SUBSCRIPTION}; then
     fi
 fi
 
+# FIXME: Temporarily disable selinux until we update the version of
+# RHEL used in CI.
+if ! grep -q 'Red Hat Enterprise Linux release 9.2' /etc/redhat-release; then
+    echo "WARNING: disabling selinux on $(cat /etc/redhat-release)"
+    sudo setenforce Permissive
+    sudo sed --in-place -e 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config
+fi
+
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     sudo dnf clean all -y
     sudo dnf update -y
