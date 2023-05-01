@@ -18,8 +18,8 @@
 # SELinux specifics
 %global selinuxtype targeted
 %define selinux_policyver 3.14.3-67
-%define container_policyver 2.208.0
-%define container_policy_epoch 3
+%define container_policyver 2.167.0-1
+%define container_policy_epoch 2
 %define microshift_relabel_files() \
    mkdir -p /var/hpvolumes; \
    mkdir -p /var/run/kubelet; \
