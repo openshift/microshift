@@ -18,8 +18,6 @@
 # SELinux specifics
 %global selinuxtype targeted
 %define selinux_policyver 3.14.3-67
-%define container_policyver 2.208.0
-%define container_policy_epoch 3
 %define microshift_relabel_files() \
    mkdir -p /var/hpvolumes; \
    mkdir -p /var/run/kubelet; \
@@ -79,7 +77,7 @@ MicroShift and can be used to embed those images into osbuilder blueprints.
 Summary: SELinux policies for MicroShift
 BuildRequires: selinux-policy >= %{selinux_policyver}
 BuildRequires: selinux-policy-devel >= %{selinux_policyver}
-Requires: container-selinux >= %{container_policy_epoch}:%{container_policyver}
+Requires: container-selinux
 BuildArch: noarch
 Requires: selinux-policy >= %{selinux_policyver}
 
@@ -296,6 +294,10 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon May 01 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
+- Remove version specifier for container-selinux to let the system
+  make the best choice.
+
 * Wed Apr 12 2023 Zenghui Shi <zshi@redhat.com> 4.13.0
 - Upgrade openvswitch package version to 3.1
 
