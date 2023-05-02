@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pylint: disable=too-few-public-methods, broad-except, line-too-long
+# pylint: disable=too-few-public-methods, broad-except
 """
 This script provides various functions for Automatic MicroShift bug JIRA cloner.
 
@@ -17,9 +17,11 @@ File : cloner.py
 import argparse
 import os
 import sys
-import jira
+
 from tabulate import tabulate
 from tqdm import tqdm
+
+import jira
 
 JQL_FILTER_QUERY = 'filter = "MicroShift - Bugs in Project" and status in (New, Assigned, Post, "To Do", "In Progress", "Code Review")'
 JQL_FILTER_ISSUE = 'key in ({})'
