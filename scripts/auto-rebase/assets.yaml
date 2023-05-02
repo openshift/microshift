@@ -126,7 +126,7 @@ assets:
       - file: podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml
 
   - dir: controllers/kube-apiserver/
-    src: cluster-kube-apiserver-operator/bindata/cmd/generate-config/config/
+    src: cluster-kube-apiserver-operator/bindata/assets/config/
     files:
       - file: config-overrides.yaml
       - file: defaultconfig.yaml
