@@ -75,7 +75,7 @@ func (plugin *vsphereVolumePlugin) GetPluginName() string {
 }
 
 func (plugin *vsphereVolumePlugin) IsMigratedToCSI() bool {
-	return utilfeature.DefaultFeatureGate.Enabled(features.CSIMigrationvSphere)
+	return utilfeature.DefaultFeatureGate.Enabled(features.CSIMigrationvSphere) && features.OpenShiftStartCSIMigrationVSphere()
 }
 
 func (plugin *vsphereVolumePlugin) GetVolumeName(spec *volume.Spec) (string, error) {
