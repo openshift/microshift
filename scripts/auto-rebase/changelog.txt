@@ -1,0 +1,33 @@
+# cluster-kube-controller-manager-operator embedded-component cdde94837bec1810dbad71ca070a84f212de0cbb to 9f53628279a765cccb234b1ef992075ad7cddf96
+575641955b551b25f46d9a488e6b628586059f73 2023-04-06T11:51:33-06:00 STOR-1287: make imports more consistent, add env only to KCM
+34bb79751d8e539538c505f4a611f377be724861 2023-04-05T17:05:54-06:00 STOR-1287: KCMO and MCO must set env var for CSI migration
+efbc7b8f1e7326a05a8900ca2dff489d355cd942 2023-03-31T14:45:03-06:00 STOR-1267: Bump openshift/api
+# cluster-policy-controller embedded-component d02c85ab3203fe22eddcc4694e17504ef34935de to 20a47733b59ba746aa3c6410dca2d1a1ab6339de
+75fbc68ef756126cf0f44ea700ca614a5fa99526 2023-04-06T09:24:30+00:00 fixup! psalabelsyncer: handle empty namespace of a rolebinding subject
+55b7373652b533381ca2a38ff774ab4fc49194f5 2023-04-06T09:24:30+00:00 psalabelsyncer: handle empty namespace of a rolebinding subject
+# kubernetes embedded-component 379cd9f22597a7a7f6ea57471f590c1abf01ce92 to b40493584076fb1ab29f3bed1d05d16cbc5b17f1
+67514bd97ffc19c35df84a3bd5143091f05728aa 2023-04-18T10:42:09-06:00 UPSTREAM: <carry>: STOR-1270: Admission plugin to deny deletion of storages.operator.openshift.io
+152fe4e59b4c1270cdd7db47f38c4a740e9f3467 2023-04-18T10:42:09-06:00 UPSTREAM: <carry>: STOR-1270: Enable CSI migration configuration via env vars
+ee8faf43953bfecc4ef2c2725cd5688a774e4493 2023-04-18T10:42:09-06:00 UPSTREAM: <carry>: STOR-1270: Restore carry patch that enables CSI migration in any order
+8d0fd272f6d4ff78d58bc249e914c3c8e8f68384 2023-04-18T10:41:47-06:00 UPSTREAM: 116396: Unlock CSIMigrationvSphere feature gate until there is a supported vSphere CSI driver available
+# machine-config-operator embedded-component 35b049f9d3eaac15fdf6632e2ecd8cf55bd539e3 to 70aa0a560c0b0a01093f695cb358a8749d30b3d2
+c5705132563d12a4c6648d07bd1779acf84bd991 2023-04-19T17:49:10+00:00 Revert "openshift-azure-routes: Avoid synchronizing too quickly"
+2bdde549f884a035a95463ab7a81e455908a07aa 2023-04-19T17:49:10+00:00 Do not trigger openshift-azure-routes service based on file existence
+7f43eafb0a8cd942be74e8944a7fecf0e6a5bd7b 2023-04-17T04:12:34-04:00 add a bootstrap e2e test for Storage CR
+31ce8359c4aebdea9c7ca6e18bbe411872d75509 2023-04-12T16:21:39-04:00 add handling for Storage CR and vSphere CSI migration
+bd7ecc7e0aeb23121dd2b6782cfd57c15db7b9ab 2023-04-04T14:17:25-04:00 update vendor for openshift/api
+# ovn-kubernetes image-amd64 e3bef98aa599a90a7f24ab077e7b979d688eb537 to 49f6f059507ed04116d91d8f9e8dadd6fd1978d9
+49cca4708e73f4bbee3960e761dfe82049032837 2023-04-20T15:19:44-04:00 clustermanager: update node annotations on dual->single stack converstion
+d9beb4c5423411354404858ed3590e0c53d32225 2023-04-20T15:19:36-04:00 Cannot create routed secondary network with an IPv6 subnet
+a37fa030cf89edd729f8c38a7173328c2776f478 2023-04-20T14:15:43-04:00 Small cleanups to log messages and test suite name
+1e95c2ca8c55c575d0e4384166c88d1265af4104 2023-04-06T10:43:17+02:00 Delete equivalent ACLs when searching by predicate.
+ccf1a4b36b8cfcdb5989fed29819a8eb795da5fb 2023-03-30T15:21:45+02:00 Fix default node network controller initialization
+e9ccb2057db4aa000d376e05483da92579d56db5 2023-03-30T15:17:21+02:00 Node healthz server: return unhealthy when pod is to be deleted
+# kubernetes image-amd64 379cd9f22597a7a7f6ea57471f590c1abf01ce92 to b40493584076fb1ab29f3bed1d05d16cbc5b17f1
+67514bd97ffc19c35df84a3bd5143091f05728aa 2023-04-18T10:42:09-06:00 UPSTREAM: <carry>: STOR-1270: Admission plugin to deny deletion of storages.operator.openshift.io
+152fe4e59b4c1270cdd7db47f38c4a740e9f3467 2023-04-18T10:42:09-06:00 UPSTREAM: <carry>: STOR-1270: Enable CSI migration configuration via env vars
+ee8faf43953bfecc4ef2c2725cd5688a774e4493 2023-04-18T10:42:09-06:00 UPSTREAM: <carry>: STOR-1270: Restore carry patch that enables CSI migration in any order
+8d0fd272f6d4ff78d58bc249e914c3c8e8f68384 2023-04-18T10:41:47-06:00 UPSTREAM: 116396: Unlock CSIMigrationvSphere feature gate until there is a supported vSphere CSI driver available
+# ovn-kubernetes image-arm64 e114945aeb8f405413f695673bdc0df605ac65a5 to 49f6f059507ed04116d91d8f9e8dadd6fd1978d9
+ccf1a4b36b8cfcdb5989fed29819a8eb795da5fb 2023-03-30T15:21:45+02:00 Fix default node network controller initialization
+e9ccb2057db4aa000d376e05483da92579d56db5 2023-03-30T15:17:21+02:00 Node healthz server: return unhealthy when pod is to be deleted
