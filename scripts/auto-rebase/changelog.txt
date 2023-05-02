@@ -1,93 +1,35 @@
-- cluster-kube-apiserver-operator embedded-component 0eb5517f7faec395d53258c590ba0936d8536d3d to c39ec045b29820df372a22b28027b7abe3f79630
-  - 88daf40 2023-04-20T11:06:36+02:00 pod security: use v1 api
+- cluster-ingress-operator embedded-component a29464eda9614ac3d70c185b572f4839195e7306 to 43395efe070b6e60bd90193a974855acba8fe721
+  - e5382b2 2023-04-27T10:12:45-04:00 Replace Bugzilla link with Red Hat Issue Tracker
+  - 5cd2a01 2023-04-26T12:03:53-04:00 waitForDeploymentCompleteWithOldPodTermination fix
+  - 7149fcc 2023-04-23T07:27:58+00:00 Updating ose-cluster-ingress-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-cluster-ingress-operator.yml
+  - 20e4e38 2023-04-19T13:26:14-04:00 Rename waitForDeploymentCompleteWithCleanup to waitForDeploymentCompleteWithOldPodTermination
+  - 1a9b492 2023-04-04T17:03:07-04:00 Fix TestClientTLS: Wait for old router pods to be cleaned up before testing new mTLS config
+  - 09277e9 2023-03-22T11:04:44-04:00 gatewayclass: Update for OSSM 2.4 API change
 
-- cluster-kube-controller-manager-operator embedded-component 4f04a1ddf6c828f2e01cf326f90cf2e3391f0021 to a4a07126a43fd95d225201c9ed855bd466cf3059
-  - 085e612 2023-04-25T12:13:31-04:00 start using the new featuregateaccessor via the API
-  - 9c23c32 2023-04-25T12:13:31-04:00 update api and library-go for new featuregates
-  - 4819152 2023-04-24T17:54:14+01:00 Update Azure volume plugin tests now it's no longer GA
-  - c131e54 2023-04-24T14:53:49+01:00 Reset library-go dependency to master
-  - ecf28e5 2023-04-24T14:52:08+01:00 Revert "Revert "Merge pull request #721 from JoelSpeed/aws-no-ecvp""
-  - eaad155 2023-04-19T13:33:02+02:00 Updating ose-cluster-kube-controller-manager-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4226a9050f3e0ecf87c4ec509072192f7a6e965e/images/ose-cluster-kube-controller-manager-operator.yml
-  - f75f710 2023-04-18T10:30:58-04:00 Revert "Merge pull request #721 from JoelSpeed/aws-no-ecvp"
-  - a3fc7be 2023-04-18T09:57:30-04:00 Revert "Update library-go dependency to move Azure to out of tree"
-  - 3e8d2f6 2023-04-18T09:57:19-04:00 Revert "Reset library-go to openshift fork"
+- cluster-kube-apiserver-operator embedded-component c39ec045b29820df372a22b28027b7abe3f79630 to 6e29997865b1b6fd851d31c6fcdae860b2609556
+  - c3260a3 2023-04-26T13:24:31-04:00 Cover featuregate access errors in PSA configobserver unit tests.
+  - f2d80b3 2023-04-26T13:24:24-04:00 Bump library-go for stubbable featuregate access.
+  - c0fbca0 2023-04-25T13:42:24-04:00 switch to featuregates via the API
+  - 306324b 2023-04-25T11:04:30-04:00 update api and library-go for featuregates
 
-- cluster-kube-scheduler-operator embedded-component 68d9fec13be63a377d0fcffce4737c580f22895a to 3b0f96635824491daffc1a60164f410042886ba2
-  - b418c29 2023-04-19T22:30:21+02:00 Updating ose-cluster-kube-scheduler-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4226a9050f3e0ecf87c4ec509072192f7a6e965e/images/ose-cluster-kube-scheduler-operator.yml
+- cluster-network-operator embedded-component ddb4322285a1b9b19250e0ab4a53f99813f1d3ed to 7174d7398892b54bd63c4705630c635f15968823
+  - a807914 2023-04-26T17:08:48+01:00 Depreciate field manager
+  - 7f2f900 2023-04-25T14:59:31+00:00 rbac: ovn-kubernetes: add aggregate-to-cluster-reader permissions
 
-- cluster-network-operator embedded-component 29e7dafd3136c6bc229c79ebff4e26e515f4b754 to ddb4322285a1b9b19250e0ab4a53f99813f1d3ed
-  - 84e1404 2023-04-25T12:22:05+02:00 Fix priority class name on allowlist daemonset
-  - 4fe37f8 2023-04-25T11:51:24+02:00 Ensure pods are present for allowlist daemonset
-  - 14fd6c3 2023-04-25T11:41:59+02:00 Improve logging on allowlist controller
-  - 62abd8e 2023-04-11T09:13:47+02:00 HyperShift: Add support for HostedControlPlane nodeSelector field
-  - 8a50244 2023-04-11T09:13:47+02:00 HyperShift: Retrieve HostedControlPlane as part of bootstrap process
-  - cc53553 2023-04-11T09:13:47+02:00 HyperShift: Move hypershift.go to platform package
-  - 4cc44a6 2023-04-11T09:13:47+02:00 Migrate to hypershift v1beta1
-  - f4d45a7 2023-04-11T09:13:46+02:00 Fix go mod.
-  - 09086a7 2023-04-06T16:40:47+02:00 Enhance controller to remove stale check objects
-  - 0d78f7c 2023-04-06T16:40:36+02:00 Use apply config for check objects
+- machine-config-operator embedded-component 67faae41bae92de126236ab818240bcaf105547a to 4fef55681565469c588ae888e3e244a11f995c34
+  - 9ba29179 2023-04-20T14:53:56+02:00 Bug OCPBUGS-4476: keepalived/ingress: change healthcheck script
 
-- cluster-openshift-controller-manager-operator embedded-component 3d9105887e9f9a167a159a2f691789a5539f21b6 to 9b7ea79904af754d3bb792d6d3284f83564b25e7
-  - 2cbc78d 2023-04-22T06:42:46+00:00 Updating ose-cluster-openshift-controller-manager-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-cluster-openshift-controller-manager-operator.yml
-  - 26e6ddf 2023-04-20T01:13:39+00:00 Updating ose-cluster-openshift-controller-manager-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/72a796df61d16e0b1063bcb7ce545255c99aba3d/images/ose-cluster-openshift-controller-manager-operator.yml
+- router image-amd64 40b2cbdd515299b8b1495cfd94358ec441cb7551 to 4bb311fb189f5f02fccae405f10a8dbeb36f5249
+  - 4071ae3 2023-04-23T04:08:01+00:00 Updating ose-haproxy-router-base images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-haproxy-router-base.yml
+  - 65cc696 2023-04-12T13:50:18+00:00 Updating openshift-enterprise-haproxy-router images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/600c6ff0fadafd1e7cc1761029366b22ed0e9f98/images/openshift-enterprise-haproxy-router.yml
 
-- cluster-policy-controller embedded-component 9fdc871455680b2bda1dfb4c1258da89fb918959 to 62adf796a213b4c9758de9315cd3542ad33eb85a
-  - 2681ff3 2023-04-22T03:37:22+00:00 Updating cluster-policy-controller images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/cluster-policy-controller.yml
-  - f077f29 2023-04-18T19:13:44+08:00 Update README.md
-  - 54b5b7f 2023-03-04T20:30:34+08:00 complete controller description
+- kube-rbac-proxy image-amd64 458cdd194eca0c3ebd07341dc6fc201b84e69411 to 27c255551673ba529ac6c9419abe13451afa3e4d
+  - 0530406 2023-04-22T08:08:23+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/kube-rbac-proxy.yml
 
-- machine-config-operator embedded-component 598197a12a7eeaa43564d579543c1c6d8a717600 to 67faae41bae92de126236ab818240bcaf105547a
-  - 6c024a01 2023-04-19T12:41:24-05:00 Proxy should not be marked as embedded resource
-  - 23febb46 2023-04-12T20:07:40+02:00 Revert "openshift-azure-routes: Avoid synchronizing too quickly"
-  - 390518f7 2023-04-05T09:48:46+02:00 Do not trigger openshift-azure-routes service based on file existence
+- router image-arm64 40b2cbdd515299b8b1495cfd94358ec441cb7551 to 4bb311fb189f5f02fccae405f10a8dbeb36f5249
+  - 4071ae3 2023-04-23T04:08:01+00:00 Updating ose-haproxy-router-base images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-haproxy-router-base.yml
+  - 65cc696 2023-04-12T13:50:18+00:00 Updating openshift-enterprise-haproxy-router images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/600c6ff0fadafd1e7cc1761029366b22ed0e9f98/images/openshift-enterprise-haproxy-router.yml
 
-- openshift-controller-manager embedded-component cc6818b2a945e320e3b85603fa5437d1600eeeff to 76ef4f658ee7a5e6e4038f2860ef2bb9bc36e579
-  - c5f9ea9 2023-04-22T11:43:25+00:00 Updating ose-openshift-controller-manager images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-openshift-controller-manager.yml
-  - 5761498 2023-04-20T03:26:11+00:00 Updating ose-openshift-controller-manager images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/72a796df61d16e0b1063bcb7ce545255c99aba3d/images/ose-openshift-controller-manager.yml
-
-- route-controller-manager embedded-component d7a8e22db412b6fabb7028ca0da8de8f3d9ac3c3 to 8f894ac488ac3bcf6a89780733ec93ca4c70ed1e
-  - a35b2a8 2023-04-22T19:20:27+00:00 Updating ose-route-controller-manager images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-route-controller-manager.yml
-  - b5f763f 2023-04-20T07:04:26+00:00 Updating ose-route-controller-manager images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/72a796df61d16e0b1063bcb7ce545255c99aba3d/images/ose-route-controller-manager.yml
-  - 6584473 2023-04-18T22:42:55+00:00 Updating ose-route-controller-manager images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4226a9050f3e0ecf87c4ec509072192f7a6e965e/images/ose-route-controller-manager.yml
-
-- service-ca-operator embedded-component 8f1e2fabfc0ded40557cdb7f6f2894020c465e8c to f0bd313003d3d79593b44936fb7cf0bab2a6daae
-  - 4d24fc1 2023-04-25T15:30:41+02:00 go mod tidy
-  - 24a8298 2023-04-25T15:07:57+02:00 make update-gofmt
-  - e0768f3 2023-04-22T14:19:41+00:00 Updating ose-service-ca-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-service-ca-operator.yml
-
-- oc image-amd64 5f8c36d7f69632ba80bff9c6862327099198f6b3 to 42126f8cb42302f0cb4cc559fd545f8bb9fcf175
-  - 1b6669c 2023-04-19T16:04:59+03:00 oc login: unwrap tls.CertificateVerificationError to use x509 errors
-
-- coredns image-amd64 5af9cd2d70adaf8f4a7346879dbd593934ad3cc0 to 5f5e9d8f20b308561fe8acbfc965aadb49b266cc
-  - 2c776fc 2023-04-22T21:43:35+00:00 Updating coredns images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/coredns.yml
-
-- router image-amd64 c763d27d562ac6c7103888b67524d4c4267cf538 to 40b2cbdd515299b8b1495cfd94358ec441cb7551
-  - 5a06c61 2023-04-04T22:58:11+02:00 OCPBUGS-8646: bump openshift/library-go to drop mongo-driver references
-
-- kube-rbac-proxy image-amd64 10a48c67ad88d51e3b4fe2c4ac2e96c0770f2fe0 to 458cdd194eca0c3ebd07341dc6fc201b84e69411
-  - f62096c 2023-04-26T10:45:17+02:00 vendor: bump
-  - 055a1eb 2023-04-06T18:58:31+02:00 *: cut v0.14.1 release
-  - 9f436d4 2023-04-06T18:10:57+02:00 Makefile: make local testing work with one command
-  - 717c9c5 2023-02-18T05:08:30+00:00 build(deps): bump golang.org/x/net from 0.4.0 to 0.7.0
-  - e98b305 2023-02-17T16:13:16+01:00 Use formatted logging function
-
-- ovn-kubernetes image-amd64 04fcf6c04bf15107eb557aa3edf65147e5198c7b to d03d2d00b52692d7f889831d828a75c1d808ab8f
-  - ba263ab 2023-04-21T10:00:00+02:00 Use loadbalancer.Name as client index Revert predicate search optimization 3369d387417ede05033c002b782b0279b201ea76 as predicate search should not bee needed anymore
-  - f05c0cf 2023-04-17T15:02:07-04:00 clustermanager: update node annotations on dual->single stack converstion
-  - eb4e2af 2023-04-17T15:01:50-04:00 Small cleanups to log messages and test suite name
-
-- service-ca-operator image-amd64 8f1e2fabfc0ded40557cdb7f6f2894020c465e8c to f0bd313003d3d79593b44936fb7cf0bab2a6daae
-  - 4d24fc1 2023-04-25T15:30:41+02:00 go mod tidy
-  - 24a8298 2023-04-25T15:07:57+02:00 make update-gofmt
-  - e0768f3 2023-04-22T14:19:41+00:00 Updating ose-service-ca-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-service-ca-operator.yml
-
-- coredns image-arm64 5af9cd2d70adaf8f4a7346879dbd593934ad3cc0 to 5f5e9d8f20b308561fe8acbfc965aadb49b266cc
-  - 2c776fc 2023-04-22T21:43:35+00:00 Updating coredns images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/coredns.yml
-
-- kube-rbac-proxy image-arm64 10a48c67ad88d51e3b4fe2c4ac2e96c0770f2fe0 to 458cdd194eca0c3ebd07341dc6fc201b84e69411
-  - f62096c 2023-04-26T10:45:17+02:00 vendor: bump
-  - 055a1eb 2023-04-06T18:58:31+02:00 *: cut v0.14.1 release
-  - 9f436d4 2023-04-06T18:10:57+02:00 Makefile: make local testing work with one command
-  - 717c9c5 2023-02-18T05:08:30+00:00 build(deps): bump golang.org/x/net from 0.4.0 to 0.7.0
-  - e98b305 2023-02-17T16:13:16+01:00 Use formatted logging function
+- kube-rbac-proxy image-arm64 458cdd194eca0c3ebd07341dc6fc201b84e69411 to 27c255551673ba529ac6c9419abe13451afa3e4d
+  - 0530406 2023-04-22T08:08:23+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/kube-rbac-proxy.yml
 
