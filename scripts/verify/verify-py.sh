@@ -21,19 +21,19 @@ create_venv() {
 
 run_pylint() {
     local pylint="${VENV}/bin/pylint"
-   
+
     if ! command -v "${pylint}" &>/dev/null; then
         echo "Installing pylint..."
         create_venv
     fi
-       
-    local pyfiles    
-    pyfiles=$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
 
-    for f in ${pyfiles} ; do
-        echo "pylint: ${f}"
-        ${pylint} --variable-naming-style=any --score=n "${f}"
-    done
+    local pyfiles
+    pyfiles=$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
+    echo "Checking: ${pyfiles}"
+
+    # shellcheck disable=SC2086
+    ${pylint} --rcfile="${ROOTDIR}/.pylintrc" ${pyfiles}
+
 }
 
 run_pylint
