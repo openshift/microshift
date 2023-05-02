@@ -6,6 +6,7 @@ function to_run() {
     commands_to_run+=("${cmd}")
 }
 
+to_run sudo vgs
 to_run oc get cm -n kube-public microshift-version -o=jsonpath='{.data}'
 to_run microshift version
 to_run microshift version -o yaml
