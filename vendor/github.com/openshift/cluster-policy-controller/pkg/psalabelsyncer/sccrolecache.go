@@ -184,7 +184,13 @@ func BySAIndexKeys(obj interface{}) ([]string, error) {
 	for _, subject := range roleBinding.Subjects() {
 		switch {
 		case subject.APIGroup == "" && subject.Kind == "ServiceAccount":
-			serviceAccounts = append(serviceAccounts, serviceaccount.MakeUsername(subject.Namespace, subject.Name))
+			subjectNS := subject.Namespace
+			// a subject of a rolebinding may not have "namespace" set, in that case
+			// local namespace is implied
+			if len(subjectNS) == 0 {
+				subjectNS = roleBinding.Namespace()
+			}
+			serviceAccounts = append(serviceAccounts, serviceaccount.MakeUsername(subjectNS, subject.Name))
 		case subject.APIGroup == rbacv1.GroupName && subject.Kind == "Group":
 			if subject.Name == serviceaccount.AllServiceAccountsGroup ||
 				subject.Name == user.AllAuthenticated ||
