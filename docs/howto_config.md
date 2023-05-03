@@ -55,7 +55,7 @@ etcd:
     memoryLimitMB: 0
 manifests:
     kustomizePaths:
-        - /var/lib/microshift/manifests
+        - /usr/lib/microshift/manifests
         - /etc/microshift/manifests
 network:
     clusterNetwork:
