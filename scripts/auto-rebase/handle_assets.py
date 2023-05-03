@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-# pylint: disable=logging-fstring-interpolation,logging-not-lazy,line-too-long
-
 """
 This script updates assets based on a YAML recipe (`assets.yaml`)
 The recipe specifies what files and directories should be copied, ignored, and restored.
@@ -10,9 +8,10 @@ File: handle_assets.py
 
 import logging
 import os
-import sys
 import shutil
 import subprocess
+import sys
+
 import yaml
 
 try:

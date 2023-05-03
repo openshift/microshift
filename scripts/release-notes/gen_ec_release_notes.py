@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pylint: disable=too-many-locals, line-too-long
+# pylint: disable=too-many-locals
 
 """Release Note Tool
 

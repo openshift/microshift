@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# pylint: disable=line-too-long
 
 """
 This script verifies all the assets for auto-rebase.
@@ -8,10 +7,11 @@ It checks that all files in the assets directory are listed in the assets.yaml f
 File: presubmit.py
 """
 
-from functools import reduce
 import glob
 import os
 import sys
+from functools import reduce
+
 import yaml
 
 # pylint: disable=R0801
