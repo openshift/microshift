@@ -13,6 +13,6 @@ type Manifests struct {
 	// only those paths. Set to an empty list to disable loading
 	// manifests.
 	//
-	// +kubebuilder:default={"/var/lib/microshift/manifests","/etc/microshift/manifests"}
+	// +kubebuilder:default={"/usr/lib/microshift/manifests","/etc/microshift/manifests"}
 	KustomizePaths []string `json:"kustomizePaths"`
 }
