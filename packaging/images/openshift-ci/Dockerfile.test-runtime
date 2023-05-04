@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi:latest
+FROM registry.access.redhat.com/ubi9/ubi:latest
 USER root
 RUN printf '%s\n' \
     '[google-cloud-sdk]' \
