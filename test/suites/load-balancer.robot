@@ -10,8 +10,6 @@ Suite Setup     Setup Suite With Namespace
 Suite Teardown  Teardown Suite With Namespace
 
 *** Variables ***
-${USHIFT_HOST}    ${EMPTY}
-${USHIFT_USER}    ${EMPTY}
 ${HELLO_USHIFT}   assets/hello-microshift.yaml
 
 *** Test Cases ***

@@ -2,3 +2,4 @@ robotframework==6.0.2
 robotframework-requests==0.9.4
 robotframework-scplibrary==1.2.0
 robotframework-sshlibrary==3.8.0
+pyyaml==6.0

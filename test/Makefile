@@ -2,7 +2,8 @@ tests = $(wildcard **/*.robot)
 RF_VENV :=../_output/.venv
 RF_BINARY :=../_output/.venv/bin/robot
 OUTPUT_DIR ?= ../_output/e2e-$$(date +''%Y%m%d-%H%M%S)
-RF_OUT :=--outputdir $(OUTPUT_DIR)
+RF_VARIABLES ?=suites/variables.yaml
+RF_OPTIONS :=--randomize all --loglevel DEBUG -x junit.xml -V $(RF_VARIABLES) --outputdir $(OUTPUT_DIR)
 
 .PHONY: setup dry-run all $(tests)
 
@@ -13,15 +14,12 @@ setup:
 $(tests):
 	$(RF_BINARY) \
 		$(RF_OPTIONS) \
-		$(RF_OUT) \
 		$@
 
-dry-run: RF_OPTIONS=--dryrun
+dry-run: ROBOT_OPTIONS=--dryrun
 dry-run: $(tests)
 
-all: RF_OPTIONS=-v USHIFT_HOST:$${USHIFT_HOST} -v USHIFT_USER:$${USHIFT_USER} -x junit.xml
 all:
 	$(RF_BINARY) \
 		$(RF_OPTIONS) \
-		$(RF_OUT) \
 		./suites
