@@ -1,0 +1,6 @@
+# USHIFT_HOST: MicroShift host, can be a name or IP
+USHIFT_HOST: microshift
+# USHIFT_USER: User to log into MicroShift's host
+USHIFT_USER: microshift
+# SSH Private key to use when logging into MicroShift's host.
+SSH_PRIV_KEY: /home/microshift/.ssh/id_rsa
