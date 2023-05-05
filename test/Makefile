@@ -1,9 +1,10 @@
 tests = $(wildcard **/*.robot)
 RF_VENV :=../_output/.venv
 RF_BINARY :=../_output/.venv/bin/robot
-RF_OUT :=--outputdir ../_output/e2e-$$(date +''%Y%m%d-%H%M%S)
+OUTPUT_DIR ?= ../_output/e2e-$$(date +''%Y%m%d-%H%M%S)
+RF_OUT :=--outputdir $(OUTPUT_DIR)
 
-.PHONY: setup dry-run with-filter with-tag all $(tests)
+.PHONY: setup dry-run all $(tests)
 
 setup:
 	python3 -m venv $(RF_VENV)  && \
@@ -18,5 +19,9 @@ $(tests):
 dry-run: RF_OPTIONS=--dryrun
 dry-run: $(tests)
 
-all: RF_OPTIONS=-v USHIFT_HOST:$${USHIFT_HOST} -v USHIFT_USER:microshift -x xunit.xml
-all: $(tests)
+all: RF_OPTIONS=-v USHIFT_HOST:$${USHIFT_HOST} -v USHIFT_USER:$${USHIFT_USER} -x junit.xml
+all:
+	$(RF_BINARY) \
+		$(RF_OPTIONS) \
+		$(RF_OUT) \
+		./suites
