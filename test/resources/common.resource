@@ -1,6 +1,5 @@
 *** Settings ***
 Library    OperatingSystem
-Library    SSHLibrary
 Library    String
 Resource   ../resources/kubeconfig.resource
 

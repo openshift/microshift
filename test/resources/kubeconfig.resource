@@ -8,7 +8,7 @@ Get Kubeconfig
     [Documentation]    Get the kubeconfig file from the host argument and return contents
     [Arguments]    ${host}
     SSHLibrary.Open Connection    ${host}
-    SSHLibrary.Login              ${USHIFT_USER}    allow_agent=True
+    SSHLibrary.Login With Public Key    ${USHIFT_USER}    ${SSH_PRIV_KEY}
     ${kubeconfig}    ${rc}=    Execute Command
     ...    cat /var/lib/microshift/resources/kubeadmin/${host}/kubeconfig
     ...    sudo=True    return_rc=True
