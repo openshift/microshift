@@ -12,6 +12,7 @@ Suite Teardown  Teardown Suite With Namespace
 *** Variables ***
 ${USHIFT_HOST}    ${EMPTY}
 ${USHIFT_USER}    ${EMPTY}
+${HELLO_USHIFT}   assets/hello-microshift.yaml
 
 *** Test Cases ***
 Load Balancer Smoke Test
@@ -28,7 +29,7 @@ Load Balancer Smoke Test
 
 *** Keywords ***
 Create Hello MicroShift Pod
-    Run With Kubeconfig    oc create -f ../e2e/tests/assets/hello-microshift.yaml -n ${NAMESPACE}
+    Run With Kubeconfig    oc create -f ${HELLO_USHIFT} -n ${NAMESPACE}
     Run With Kubeconfig    oc wait pods -l app\=hello-microshift --for condition\=Ready --timeout\=60s -n ${NAMESPACE}
 
 Expose Hello MicroShift Pod Via LB
@@ -46,4 +47,4 @@ Access Hello Microshift via LB
 Delete Hello MicroShift Pod Route And Service
     Run With Kubeconfig    oc delete route hello-microshift -n ${NAMESPACE}    True
     Run With Kubeconfig    oc delete service hello-microshift -n ${NAMESPACE}   True
-    Run With Kubeconfig    oc delete -f ../e2e/tests/assets/hello-microshift.yaml -n ${NAMESPACE}    True
+    Run With Kubeconfig    oc delete -f ${HELLO_USHIFT} -n ${NAMESPACE}    True
