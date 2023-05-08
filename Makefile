@@ -261,6 +261,12 @@ image-build-iso: rpm
 iso: image-build-configure image-build-iso
 .PHONY: iso
 
+image-build-commit: rpm
+	./scripts/image-builder/build.sh $(IMAGE_BUILDER_ARGS) -build_edge_commit
+
+commit: image-build-configure image-build-commit
+.PHONY: commit
+
 rpm-podman:
 	RPM_BUILDER_IMAGE_TAG="rhel-8-release-golang-1.19-openshift-4.13"; \
 	podman build \

@@ -34,8 +34,8 @@ ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/o
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
-# Replace the ostree server name
-echo -e 'url=http://REPLACE_OSTREE_SERVER_NAME/repo/' >> /etc/ostree/remotes.d/edge.conf
+# Replace the ostree server URL
+echo -e 'url=REPLACE_OSTREE_SERVER_URL' >> /etc/ostree/remotes.d/edge.conf
 
 # The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
 # The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
@@ -80,5 +80,34 @@ for uuid in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" 
     file=$(nmcli -f uuid,filename connection | awk -v uuid=${uuid} '$1 == uuid' | sed "s/${uuid}//g" | xargs)
     sed -i '/autoconnect=.*/d' "${file}"
 done
+
+# Configure an empty local ostree repository and server if the "edge" remote points to "localhost:8085"
+if grep -q '^url=http://127.0.0.1:8085' /etc/ostree/remotes.d/edge.conf ; then
+    ostree_repo=/var/lib/ostree-server-local
+    ostree_serv=ostree-server-local.service
+
+    # Create an empty repository with a summary
+    mkdir -p ${ostree_repo}/repo
+    ostree --repo=${ostree_repo}/repo init --mode=archive-z2
+    ostree summary --repo ${ostree_repo}/repo --update
+
+    # Create an HTTP server for the repository
+    cat > /etc/systemd/system/${ostree_serv} <<EOF
+[Unit]
+Description=Caddy HTTP server for the local ostree repository
+
+[Service]
+User=root
+WorkingDirectory=${ostree_repo}
+ExecStart=/bin/caddy file-server -listen 127.0.0.1:8085 -root ${ostree_repo} -browse
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    systemctl daemon-reload
+    systemctl enable ${ostree_serv}
+fi
 
 %end

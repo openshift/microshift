@@ -56,9 +56,11 @@ Optional arguments:
           included in the image (default: none)
   -embed_containers
           Embed the MicroShift container dependencies in the image
-  -ostree_server_name name_or_ip
-          Name or IP address and optionally port of the ostree
-          server (default: 127.0.0.1:8080)
+  -ostree_server_url URL
+          URL of the ostree server (default: http://127.0.0.1:8085/repo)
+  -build_edge_commit
+          Build edge commit archive instead of an ISO image. The
+          archive contents can be used for serving ostree updates.
   -lvm_sysroot_size num_in_MB
           Size of the system root LVM partition. The remaining
           disk space will be allocated for data (default: 10240)
@@ -200,6 +202,123 @@ Finally, check if MicroShift is up and running by executing `oc` commands.
 ```bash
 oc get cs
 oc get pods -A
+```
+
+### The `ostree` Update Server
+
+**Default Configuration**
+
+The default ISO image is configured to run a Caddy HTTP server for the `ostree`
+updates at the `http://127.0.0.1:8085` URL, serving the contents of the local
+`/var/lib/ostree-server-local` directory containing an empty `ostree` update
+repository.
+
+Log into the MicroShift server using `redhat:redhat` credentials and run the
+following commands to check the local `ostree` server configuration.
+
+```bash
+$ systemctl is-active ostree-server-local.service
+active
+
+$ sudo journalctl -u ostree-server-local.service --output cat
+Started Caddy HTTP server for the local ostree repository.
+...
+...
+
+$ ostree remote list
+edge
+
+$ ostree remote show-url edge
+http://127.0.0.1:8085/repo
+
+$ ostree remote summary edge
+Repository Mode (ostree.summary.mode): archive-z2
+Last-Modified (ostree.summary.last-modified): 2023-04-28T04:55:59-04
+Has Tombstone Commits (ostree.summary.tombstone-commits): No
+ostree.summary.indexed-deltas: true
+```
+
+> The default `ostree` local repository is empty and it does not contain any
+> commit revisions to be installed.
+
+**Custom Server**
+
+This default behavior can be overriden by specifying the `-ostree_server_url`
+command line argument when running the `scripts/image-builder/build.sh` script.
+The URL parameter of this argument should point to a custom `ostree` server to
+be used for installing updates on an existing image.
+
+Log into the MicroShift server using `redhat:redhat` credentials and run the
+following commands to check the custom `ostree` server configuration and
+install updates.
+
+```bash
+$ ostree remote list
+edge
+
+$ ostree remote show-url edge
+<YOUR_OSTREE_SERVER_URL>
+
+$ ostree remote summary edge
+<YOUR_OSTREE_REPO_SUMMARY_AND_COMMIT_REV>
+
+$ sudo rpm-ostree deploy <YOUR_OSTREE_COMMIT_REV>
+...
+...
+# Reboot the system for the update to become active
+```
+
+**Local Updates**
+
+When the default Caddy HTTP server is configured for the `ostree` updates, users
+can overwrite the contents of the `/var/lib/ostree-server-local` directory and
+install the updates locally.
+
+One of the techniques for generating `ostree` updates is supported by the
+`scripts/image-builder/build.sh` script. When the `-build_edge_commit` command
+line argument is specified, the script builds an edge commit archive instead of
+an ISO image.
+
+```bash
+~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -build_edge_commit
+...
+...
+# Edge commit created
+The contents of the archive can be used for serving ostree updates:
+/home/microshift/microshift/_output/image-builder/microshift-0.0.1-commit.tar
+
+# Done
+```
+
+> Optionally specify additional `-microshift_rpms`, `-custom_rpms`, or
+> `-embed_containers` arguments to customize the edge commit archive contents.
+
+Copy the produced `microshift-0.0.1-commit.tar` archive to the
+MicroShift server and unpack it at the `/var/lib/ostree-server-local` directory,
+deleting the previous contents.
+
+Run the following commands to generate the update summary, check the new
+`ostree` commit revision and install the update.
+
+```bash
+$ sudo ostree summary --repo /var/lib/ostree-server-local/repo --update
+
+$ ostree remote summary edge
+* rhel/9/x86_64/edge
+    Latest Commit (17.3 kB):
+      8982a0afae721e55cd75954f23760c77a27b4cfd7d7c5bf39c3115c9d134cec6
+    Version (ostree.commit.version): 9.2
+    Timestamp (ostree.commit.timestamp): 2023-04-28T06:41:55-04
+
+Repository Mode (ostree.summary.mode): archive-z2
+Last-Modified (ostree.summary.last-modified): 2023-04-28T06:58:16-04
+Has Tombstone Commits (ostree.summary.tombstone-commits): No
+ostree.summary.indexed-deltas: true
+
+$ sudo rpm-ostree deploy 8982a0afae721e55cd75954f23760c77a27b4cfd7d7c5bf39c3115c9d134cec6
+...
+...
+# Reboot the system for the update to become active
 ```
 
 ### Offline Mode
