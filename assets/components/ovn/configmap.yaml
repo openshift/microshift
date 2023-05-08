@@ -29,6 +29,7 @@ data:
     [gateway]
     mode=local
     nodeport=true
+    next-hop=169.254.169.4
 
     [masterha]
     election-lease-duration=137
