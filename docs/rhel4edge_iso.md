@@ -75,7 +75,7 @@ Continue by running the build script with the pull secret file argument and wait
 ~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json
 ```
 The script performs the following tasks:
-- Check for minimum 10GB of available disk space
+- Check for minimum 20GB of available disk space
 - Set up a local MicroShift RPM repository using a local RPM build or a remote URL (if specified in the command line) as a source
 - Set up a local OpenShift RPM repository using public OpenShift repositories necessary for CRI-O and OpenShift client package installation
 - Configure Image Builder to use the local MicroShift and OpenShift RPM repositories for image builds
