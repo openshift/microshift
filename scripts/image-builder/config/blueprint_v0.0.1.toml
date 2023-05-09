@@ -1,4 +1,4 @@
-name = "microshift-container"
+name = "microshift"
 
 description = ""
 version = "0.0.1"
@@ -39,6 +39,10 @@ version = "*"
 
 [[packages]]
 name = "iotop"
+version = "*"
+
+[[packages]]
+name = "strace"
 version = "*"
 
 # other

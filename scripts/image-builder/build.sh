@@ -4,10 +4,10 @@ set -e -o pipefail
 ROOTDIR=$(git rev-parse --show-toplevel)
 SCRIPTDIR=${ROOTDIR}/scripts/image-builder
 IMGNAME=microshift
-IMAGE_VERSION=$(jq -r '.release.base' "assets/release/release-$(uname -m).json")
+IMAGE_VERSION=$(jq -r '.release.base' "${ROOTDIR}/assets/release/release-$(uname -m).json")
 BUILD_ARCH=$(uname -m)
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-OSTREE_SERVER_NAME=127.0.0.1:8080
+OSTREE_SERVER_URL=http://127.0.0.1:8085/repo
 LVM_SYSROOT_SIZE_MIN=10240
 LVM_SYSROOT_SIZE=${LVM_SYSROOT_SIZE_MIN}
 OCP_PULL_SECRET_FILE=
@@ -16,11 +16,10 @@ AUTHORIZED_KEYS_FILE=
 AUTHORIZED_KEYS=
 PROMETHEUS=false
 EMBED_CONTAINERS=false
+BUILD_IMAGE_TYPE=container
 # shellcheck disable=SC2034
 STARTTIME="$(date +%s)"
 BUILDDIR=${ROOTDIR}/_output/image-builder
-
-trap '${SCRIPTDIR}/cleanup.sh' INT
 
 usage() {
     local error_message="$1"
@@ -45,9 +44,11 @@ usage() {
     echo "          included in the image (default: none)"
     echo "  -embed_containers"
     echo "          Embed the MicroShift container dependencies in the image"
-    echo "  -ostree_server_name name_or_ip"
-    echo "          Name or IP address and optionally port of the ostree"
-    echo "          server (default: ${OSTREE_SERVER_NAME})"
+    echo "  -ostree_server_url URL"
+    echo "          URL of the ostree server (default: ${OSTREE_SERVER_URL})"
+    echo "  -build_edge_commit"
+    echo "          Build edge commit archive instead of an ISO image. The"
+    echo "          archive contents can be used for serving ostree updates."
     echo "  -lvm_sysroot_size num_in_MB"
     echo "          Size of the system root LVM partition. The remaining"
     echo "          disk space will be allocated for data (default: ${LVM_SYSROOT_SIZE})"
@@ -120,10 +121,10 @@ build_image() {
         sudo podman rmi -f "localhost/${parent_blueprint}:${parent_version}" 2>/dev/null || true
         imageid=$(cat < "./${parent_blueprint}-${parent_version}-container.tar" | sudo podman load | grep -o -P '(?<=sha256[@:])[a-z0-9]*')
         sudo podman tag "${imageid}" "localhost/${parent_blueprint}:${parent_version}"
-        sudo podman run -d --name="${parent_blueprint}-server" -p 8080:8080 "localhost/${parent_blueprint}:${parent_version}"
+        sudo podman run -d --name="${parent_blueprint}-server" -p 8085:8080 "localhost/${parent_blueprint}:${parent_version}"
 
         title "Building ${image_type} for ${blueprint} v${version}, parent ${parent_blueprint} v${parent_version}"
-        buildid=$(sudo composer-cli compose start-ostree --ref "rhel/${OSVERSION}/${BUILD_ARCH}/edge" --url http://localhost:8080/repo/ "${blueprint}" "${image_type}" | awk '{print $2}')
+        buildid=$(sudo composer-cli compose start-ostree --ref "rhel/${OSVERSION}/${BUILD_ARCH}/edge" --url http://localhost:8085/repo/ "${blueprint}" "${image_type}" | awk '{print $2}')
     else
         title "Building ${image_type} for ${blueprint} v${version}"
         buildid=$(sudo composer-cli compose start-ostree --ref "rhel/${OSVERSION}/${BUILD_ARCH}/edge" "${blueprint}" "${image_type}" | awk '{print $2}')
@@ -146,6 +147,15 @@ install_prometheus_rpm() {
         title "Downloading Prometheus exporter(s)"
         wget -q "${url}${file}"
         CUSTOM_RPM_FILES+="$(pwd)/${file},"
+    fi
+}
+
+install_caddy_rpm() {
+    if [ "${OSTREE_SERVER_URL}" = "http://127.0.0.1:8085/repo" ] ; then
+        title "Downloading Caddy package"
+        # The package comes from the EPEL repository
+        dnf download -y -q caddy
+        CUSTOM_RPM_FILES+="$(pwd)/caddy-*.rpm,"
     fi
 }
 
@@ -181,10 +191,14 @@ while [ $# -gt 0 ] ; do
         EMBED_CONTAINERS=true
         shift
         ;;
-    -ostree_server_name)
+    -ostree_server_url)
         shift
-        OSTREE_SERVER_NAME="$1"
-        [ -z "${OSTREE_SERVER_NAME}" ] && usage "ostree server name not specified"
+        OSTREE_SERVER_URL="$1"
+        [ -z "${OSTREE_SERVER_URL}" ] && usage "ostree server URL not specified"
+        shift
+        ;;
+    -build_edge_commit)
+        BUILD_IMAGE_TYPE=commit
         shift
         ;;
     -lvm_sysroot_size)
@@ -210,7 +224,7 @@ while [ $# -gt 0 ] ; do
     esac
 done
 
-if [ -z "${OSTREE_SERVER_NAME}" ] || [ -z "${OCP_PULL_SECRET_FILE}" ] ; then
+if [ -z "${OSTREE_SERVER_URL}" ] || [ -z "${OCP_PULL_SECRET_FILE}" ] ; then
     usage
 fi
 if [ ! -r "${OCP_PULL_SECRET_FILE}" ] ; then
@@ -226,9 +240,6 @@ if [ -n "${AUTHORIZED_KEYS_FILE}" ]; then
     fi
 fi
 
-# Set the elapsed time trap only if command line parsing was successful
-trap 'echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
-
 mkdir -p "${BUILDDIR}"
 pushd "${BUILDDIR}" &>/dev/null
 
@@ -239,6 +250,9 @@ if [ "${build_disk}" -lt 20971520 ] ; then
     echo "ERROR: Less then 20GB of disk space is available for the build"
     exit 1
 fi
+
+# Set the cleanup and elapsed time traps only if command line parsing was successful
+trap '${SCRIPTDIR}/cleanup.sh; echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
 
 title "Downloading local OpenShift and MicroShift repositories"
 # Copy MicroShift RPM packages
@@ -274,6 +288,9 @@ createrepo openshift-local >/dev/null
 
 # Install prometheus process exporter
 install_prometheus_rpm
+
+# Install Caddy HTTP server
+install_caddy_rpm
 
 # Copy user-specific RPM packages
 rm -rf custom-rpms 2>/dev/null || true
@@ -326,28 +343,38 @@ ports = ["9256:tcp"]
 EOF
 fi
 
-build_image blueprint_v0.0.1.toml "${IMGNAME}-container" 0.0.1 edge-container
-build_image installer.toml        "${IMGNAME}-installer" 0.0.0 edge-installer "${IMGNAME}-container" 0.0.1
-
-title "Embedding kickstart in the installer image"
+title "Preparing kickstart"
 # Create a kickstart file from a template, compacting pull secret contents if necessary
 cat < "${SCRIPTDIR}/config/kickstart.ks.template" \
     | sed "s;REPLACE_LVM_SYSROOT_SIZE;${LVM_SYSROOT_SIZE};g" \
-    | sed "s;REPLACE_OSTREE_SERVER_NAME;${OSTREE_SERVER_NAME};g" \
+    | sed "s;REPLACE_OSTREE_SERVER_URL;${OSTREE_SERVER_URL};g" \
     | sed "s;REPLACE_OCP_PULL_SECRET_CONTENTS;$(cat < "${OCP_PULL_SECRET_FILE}" | jq -c);g" \
     | sed "s^REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS^${AUTHORIZED_KEYS}^g" \
     | sed "s;REPLACE_OSVERSION;${OSVERSION};g" \
     | sed "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
     > kickstart.ks
 
-# Run the ISO creation procedure
-sudo mkksiso kickstart.ks "${IMGNAME}-installer-0.0.0-installer.iso" "${IMGNAME}-installer-${IMAGE_VERSION}.${BUILD_ARCH}.iso"
+# Build the edge container/commit image using the blueprint
+build_image blueprint_v0.0.1.toml "${IMGNAME}" 0.0.1 edge-${BUILD_IMAGE_TYPE}
+
+if [ "${BUILD_IMAGE_TYPE}" = "commit" ] ; then
+    # Nothing else to be done for edge commits
+    title "Edge commit created"
+    echo "The contents of the archive can be used for serving ostree updates:"
+    ls -1 "${BUILDDIR}/${IMGNAME}-0.0.1-${BUILD_IMAGE_TYPE}.tar"
+else
+    # Create an ISO installer for edge containers
+    build_image installer.toml "${IMGNAME}-installer" 0.0.0 edge-installer "${IMGNAME}" 0.0.1
+
+    title "Embedding kickstart in the installer image"
+    sudo mkksiso kickstart.ks "${IMGNAME}-installer-0.0.0-installer.iso" "${IMGNAME}-installer-${IMAGE_VERSION}.${BUILD_ARCH}.iso"
+
+    # Remove intermediate artifacts to free disk space
+    rm -f "${IMGNAME}-installer-0.0.0-installer.iso"
+fi
+
+# Update the build output files to be owned by the current user
 sudo chown -R "$(whoami)". "${BUILDDIR}"
-
-# Remove intermediate artifacts to free disk space
-rm -f "${IMGNAME}-installer-0.0.0-installer.iso"
-
-"${SCRIPTDIR}"/cleanup.sh
 
 title "Done"
 popd &>/dev/null
