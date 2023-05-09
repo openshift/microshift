@@ -245,7 +245,14 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
         logging.warning(f"Unable to read changelog file: {err}")
         changelog = ""
 
-    base = textwrap.dedent(f"""
+    # The GitHub API has a length limit for commit messages. It is
+    # longer than the limit imposed here, but this limit seems like
+    # the maximum that it would be reasonable to expect someone to
+    # actually try to read.
+    if len(changelog) > 5000:
+        changelog = f'{changelog}\n\nThe change list was truncated. See scripts/auto-rebase/changelog.txt in the PR for the full details.'
+
+    template = textwrap.dedent("""
     amd64: {amd_tag}
     arm64: {arm_tag}
     prow job: {prow_job_url}
@@ -254,6 +261,7 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
 
     /label tide/merge-method-squash
     """)
+    base = template.format(amd_tag=amd_tag, arm_tag=arm_tag, prow_job_url=prow_job_url)
     return (base if rebase_script_succeded
             else "# rebase.sh failed - check committed rebase_sh.log\n\n" + base)
 
