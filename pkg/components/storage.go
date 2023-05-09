@@ -84,7 +84,7 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		return err
 	}
 	if !lvmdCfg.IsEnabled() {
-		klog.V(2).Info("CSI is disabled. %s", lvmdCfg.Message)
+		klog.V(2).Infof("CSI is disabled. %s", lvmdCfg.Message)
 		return nil
 	}
 	lvmdRenderParams, err := renderLvmdParams(lvmdCfg)
