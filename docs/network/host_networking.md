@@ -43,7 +43,6 @@ The following physical network interfaces are created or modified by ovn-kuberne
 |name               |type              |description            |comment                                                                                             |
 |:------------------|:-----------------|:----------------------|:---------------------------------------------------------------------------------------------------|
 |br-ex              |OVS bridge        |gateway bridge         |created by microshift-ovs-init.service or manually                                                  |
-|br-ex1             |OVS bridge        |external gateway bridge|created by microshift-ovs-init.service when externalGatewayInterface is configured                  |
 |br-int             |OVS bridge        |integration bridge     |created by ovnkube-master container                                                                 |
 |patch-br-ex        |OVS patch port    |                       |created by ovnkube-master container, connect br-ex to br-int                                        |
 |patch-br-int       |OVS patch port    |                       |created by ovnkube-master container, connect br-int to br-ex                                        |
@@ -52,7 +51,6 @@ The following physical network interfaces are created or modified by ovn-kuberne
 |7ea12e348b34f1e    |veth              |pod veth interface     |created and plugged to br-int by ovnkube-master container, the other end connects to pod namespace  |
 
 - `7ea12e348b34f1e` is one end of veth pair that connects pod to br-int, it is named after the first 15 bits of pod sandbox ID. The other end of veth pair is in pod network namespace (named `eth0` inside pod). There could be as many veth pairs as the number of pods. <br>
-- `br-ex1` is created by `microshift-ovs.init.service` when `externalGatewayInterface` is configured in `/etc/microshift/ovn.yaml`. `externalGatewayInterface` is added into `br-ex1` as its uplink port whose IP is also moved to `br-ex1`. Cluster egress traffic destinated to `externalGatewayInterface` subnet will be routed through `br-ex1`. <br>
 
 A snapshot of OVS interfaces from running MicroShift cluster:
 

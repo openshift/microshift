@@ -67,7 +67,6 @@ The following configs are supported in ovn-kubernetes config file:
 |:--------------------------------|:--------|:-------|:-------|:----------------------------------------------------------------------------|:------|
 |ovsInit.disableOVSInit           |N        |bool    |false   |Skip configuring OVS bridge "br-ex" in microshift-ovs-init.service           |true   |
 |ovsInit.gatewayInterface         |N        |string  |""      |Interface to be added in OVS gateway bridge "br-ex"                          |eth0   |
-|ovsInit.externalGatewayInterface |N        |string  |""      |Interface to be added in external OVS gateway bridge "br-ex1"                |eth1   |
 |mtu                              |N        |int     |*auto*  |MTU value to be used for the Pods, must be less than or equal to the MTU of default route interface|1500|
 
 > When `disableOVSInit` is true, OVS bridge "br-ex" needs to be configured manually. This OVS bridge is required by ovn-kubernetes CNI. See section [OVS bridge](#ovs-bridge) for guidance on configuring the OVS gateway bridge manually.
@@ -80,7 +79,6 @@ Below is an example of `ovn.yaml`:
 ovsInit:
   disableOVSInit: true
   gatewayInterface: eth0
-  externalGatewayInterface: eth1
 mtu: 1500
 ```
 **NOTE:* The change of `mtu` configuration in `ovn.yaml` requires node reboot to take effect. <br>
@@ -146,12 +144,6 @@ Upon restarting, it recreates ovnkube-master daemonset with updated IP address i
 microshift-ovs-init.service is able to use user specified host interface for cluster network.
 This is done by specifying the `gatewayInterface` in the CNI config file `/etc/microshift/ovn.yaml`.
 The specified interface will be added in OVS bridge `br-ex` which acts as gateway bridge for ovn-kubernetes CNI network.
-
-### Second gateway interface
-
-microshift-ovs-init.service is able to setup one additional host interface for cluster ingress/egress traffic.
-This is done by specifying the `externalGatewayInterface` in the CNI config file `/etc/microshift/ovn.yaml`.
-The external gateway interface will be added in a second OVS bridge `br-ex1`. Cluster pod traffic destinated to additional host subnet will be routed through `br-ex1`.
 
 ### Blocking external access to NodePort service on specific host interfaces
 
