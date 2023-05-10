@@ -1,13 +1,17 @@
-FROM docker.io/alpine:latest
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 
-RUN apk add --no-cache tinyproxy \
- && apk add --no-cache nano
+# The tinyproxy package is only available in EPEL7
+RUN microdnf install -y dnf && \
+    microdnf clean -y all && \
+    dnf install -y "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm" && \
+    dnf install -y tinyproxy && \
+    dnf clean -y all
 
 RUN cp /etc/tinyproxy/tinyproxy.conf /etc/tinyproxy/tinyproxy.conf.orig \
- &&  sed -r -e 's/^(Allow .+)$/#\1/g' -i /etc/tinyproxy/tinyproxy.conf \
- &&  sed -r -e 's/^(ViaProxyName .+)$/#\1/g' -i /etc/tinyproxy/tinyproxy.conf \
- &&  sed -r -e 's/^(MaxRequestsPerChild) 0$/\1 10000/g' -i /etc/tinyproxy/tinyproxy.conf
+    &&  sed -r -e 's/^(Allow .+)$/#\1/g' -i /etc/tinyproxy/tinyproxy.conf \
+    &&  sed -r -e 's/^(ViaProxyName .+)$/#\1/g' -i /etc/tinyproxy/tinyproxy.conf \
+    &&  sed -r -e 's/^(MaxRequestsPerChild) 0$/\1 10000/g' -i /etc/tinyproxy/tinyproxy.conf
 
 EXPOSE 8888
-ENTRYPOINT ["/usr/bin/tinyproxy"]
+ENTRYPOINT ["/usr/sbin/tinyproxy"]
 CMD ["-d"]
