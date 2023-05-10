@@ -21,7 +21,7 @@ func getCSIPluginConfig() (*lvmd.Lvmd, error) {
 	if _, err := os.Stat(lvmdConfig); !errors.Is(err, os.ErrNotExist) {
 		return lvmd.NewLvmdConfigFromFile(lvmdConfig)
 	}
-	return (&lvmd.Lvmd{}).WithDefaults(), nil
+	return lvmd.DefaultLvmdConfig()
 }
 
 func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
@@ -75,11 +75,20 @@ func startCSIPlugin(cfg *config.MicroshiftConfig, kubeconfigPath string) error {
 		}
 	)
 
+	if err := lvmd.LvmSupported(); err != nil {
+		klog.Warningf("skipping CSI deployment: %w", err)
+		return nil
+	}
+
 	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
 	// csi plugin.
 	lvmdCfg, err := getCSIPluginConfig()
 	if err != nil {
 		return err
+	}
+	if !lvmdCfg.IsEnabled() {
+		klog.V(2).Info("CSI is disabled. %s", lvmdCfg.Message)
+		return nil
 	}
 	lvmdRenderParams, err := renderLvmdParams(lvmdCfg)
 	if err != nil {

@@ -29,3 +29,7 @@ apiServer:
 debugging:
   # Log verbosity ('Normal', 'Debug', 'Trace', 'TraceAll'):
   #logLevel: 'Normal'
+
+etcd:
+  # Memory limit for etcd, in Megabytes: 0 is no limit.
+  #memoryLimitMB: 0

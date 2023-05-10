@@ -20,7 +20,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/component-base/logs"
 	"k8s.io/klog/v2"
-	ctrl "k8s.io/kubernetes/pkg/controlplane"
 	"sigs.k8s.io/yaml"
 
 	"github.com/openshift/microshift/pkg/util"
@@ -59,6 +58,8 @@ type IngressConfig struct {
 }
 
 type EtcdConfig struct {
+	// Set a memory limit, in megabytes, on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
+	MemoryLimit uint64
 	// The limit on the size of the etcd database; etcd will start failing writes if its size on disk reaches this value
 	QuotaBackendBytes int64
 	// If the backend is fragmented more than `maxFragmentedPercentage`
@@ -100,6 +101,17 @@ type Config struct {
 	Node      Node      `json:"node"`
 	ApiServer ApiServer `json:"apiServer"`
 	Debugging Debugging `json:"debugging"`
+	Etcd      Etcd      `json:"etcd"`
+}
+
+const (
+	// Etcd performance degrades significantly if the memory available is less than 128MB, enfore this minimum.
+	EtcdMinimumMemoryLimit = 128
+)
+
+type Etcd struct {
+	// Set a memory limit, in megabytes, on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
+	MemoryLimitMB uint64 `json:"memoryLimitMB"`
 }
 
 type Network struct {
@@ -229,7 +241,7 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 	return &MicroshiftConfig{
 		LogVLevel:       2,
 		SubjectAltNames: subjectAltNames,
-		NodeName:        nodeName,
+		NodeName:        strings.ToLower(nodeName),
 		NodeIP:          nodeIP,
 		BaseDomain:      "example.com",
 		Cluster: ClusterConfig{
@@ -239,11 +251,12 @@ func NewMicroshiftConfig() *MicroshiftConfig {
 			ServiceNodePortRange: "30000-32767",
 		},
 		Etcd: EtcdConfig{
+			MemoryLimit:             0,                 // No limit
 			MinDefragBytes:          100 * 1024 * 1024, // 100MB
 			MaxFragmentedPercentage: 45,                // percent
 			DefragCheckFreq:         5 * time.Minute,
 			DoStartupDefrag:         true,
-			QuotaBackendBytes:       2 * 1024 * 1024 * 1024, // 2GB
+			QuotaBackendBytes:       8 * 1024 * 1024 * 1024, // 8GB
 		},
 	}
 }
@@ -254,7 +267,7 @@ func (c *MicroshiftConfig) isDefaultNodeName() bool {
 	if err != nil {
 		klog.Fatalf("Failed to get hostname %v", err)
 	}
-	return c.NodeName == hostname
+	return c.NodeName == strings.ToLower(hostname)
 }
 
 // Read or set the NodeName that will be used for this MicroShift instance
@@ -378,7 +391,7 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 	// Wire new Config type to existing MicroshiftConfig
 	c.LogVLevel = config.GetVerbosity()
 	if config.Node.HostnameOverride != "" {
-		c.NodeName = config.Node.HostnameOverride
+		c.NodeName = strings.ToLower(config.Node.HostnameOverride)
 	}
 	if config.Node.NodeIP != "" {
 		c.NodeIP = config.Node.NodeIP
@@ -402,6 +415,15 @@ func (c *MicroshiftConfig) ReadFromConfigFile(configFile string) error {
 		c.KASAdvertiseAddress = config.ApiServer.AdvertiseAddress
 	}
 
+	if config.Etcd.MemoryLimitMB > 0 {
+		// If the memory limit is than the minimum, set it to the minimum and continue.
+		if config.Etcd.MemoryLimitMB < EtcdMinimumMemoryLimit {
+			c.Etcd.MemoryLimit = EtcdMinimumMemoryLimit
+		} else {
+			c.Etcd.MemoryLimit = config.Etcd.MemoryLimitMB
+		}
+	}
+
 	return nil
 }
 
@@ -421,16 +443,24 @@ func (c *MicroshiftConfig) ReadAndValidate(configFile string) error {
 	}
 	c.Cluster.DNS = clusterDNS
 
-	// If KAS advertise address is not configured then grab it from the service
+	// If KAS advertise address is not configured then compute it from the service
 	// CIDR automatically.
 	if len(c.KASAdvertiseAddress) == 0 {
 		// unchecked error because this was done when getting cluster DNS
 		_, svcNet, _ := net.ParseCIDR(c.Cluster.ServiceCIDR)
-		_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
-		if err != nil {
-			return fmt.Errorf("error getting apiserver IP: %v", err)
+		// Since the KAS advertise address was not provided we will default to the
+		// next immediate subnet after the service CIDR. This is due to the fact
+		// that using the actual apiserver service IP as an endpoint slice breaks
+		// host network pods trying to reach apiserver, as the VIP 10.43.0.1:443 is
+		// not translated to 10.43.0.1:6443. It remains unchanged and therefore
+		// connects to the ingress router instead, triggering all sorts of errors.
+		nextSubnet, exceed := cidr.NextSubnet(svcNet, 32)
+		if exceed {
+			return fmt.Errorf("unable to compute next subnet from service CIDR")
 		}
-		c.KASAdvertiseAddress = apiServerServiceIP.String()
+		// First and last are the same because of the /32 netmask.
+		firstValidIP, _ := cidr.AddressRange(nextSubnet)
+		c.KASAdvertiseAddress = firstValidIP.String()
 		c.SkipKASInterface = false
 	} else {
 		c.SkipKASInterface = true

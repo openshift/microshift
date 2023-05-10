@@ -210,7 +210,7 @@ func (s *CertificateSigner) AddToBundles(bundlePaths ...string) error {
 			return err
 		}
 
-		certFileWriter, err := os.OpenFile(bundlePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		certFileWriter, err := os.OpenFile(bundlePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			return err
 		}

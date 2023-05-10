@@ -133,7 +133,7 @@ func (s *KubeAPIServer) configure(cfg *config.MicroshiftConfig) error {
 			"kubelet-certificate-authority":   {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
 			"kubelet-client-certificate":      {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":              {cryptomaterial.ClientKeyPath(kubeletClientDir)},
-			"kubelet-preferred-address-types": {"Hostname"},
+			"kubelet-preferred-address-types": {"InternalIP", "Hostname"},
 
 			"proxy-client-cert-file":           {cryptomaterial.ClientCertPath(aggregatorClientCertDir)},
 			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},
@@ -292,7 +292,7 @@ rules:
 
 	path := filepath.Join(microshiftDataDir, "resources", "kube-apiserver-audit-policies", "default.yaml")
 	os.MkdirAll(filepath.Dir(path), os.FileMode(0700))
-	return os.WriteFile(path, data, 0644)
+	return os.WriteFile(path, data, 0400)
 }
 
 func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {

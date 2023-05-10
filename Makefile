@@ -14,7 +14,7 @@ export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
 SOURCE_GIT_COMMIT_TIMESTAMP ?= $(shell TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H%M%S' --format="%cd")
 
-OCP_VERSION := $(shell jq -r '.release.base' ${PROJECT_DIR}/assets/release/release-$(shell uname -i).json)
+include Makefile.version.$(shell uname -i).var
 MICROSHIFT_VERSION ?= $(subst -clean,,$(shell echo '${OCP_VERSION}-${SOURCE_GIT_COMMIT_TIMESTAMP}-${SOURCE_GIT_COMMIT}-${SOURCE_GIT_TREE_STATE}'))
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
@@ -160,9 +160,18 @@ _build_local:
 	+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(MAKE) --no-print-directory build \
 		GO_BUILD_PACKAGES:=./cmd/microshift \
 		GO_BUILD_BINDIR:=$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
-	+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(MAKE) -C etcd --no-print-directory build \
-		GO_BUILD_PACKAGES:=./cmd/microshift-etcd \
-		GO_BUILD_BINDIR:=../$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
+	+@GOOS=$(GOOS) GOARCH=$(GOARCH) \
+		GO_LD_FLAGS="$(GC_FLAGS) -ldflags \"\
+                   -X main.majorFromGit=$(MAJOR) \
+                   -X main.minorFromGit=$(MINOR) \
+                   -X main.versionFromGit=$(EMBEDDED_GIT_TAG) \
+                   -X main.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
+                   -X main.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
+                   -X main.buildDate=$(BIN_TIMESTAMP) \
+					$(LD_FLAGS)\"" \
+		$(MAKE) -C etcd --no-print-directory build \
+			GO_BUILD_PACKAGES:=./cmd/microshift-etcd \
+			GO_BUILD_BINDIR:=../$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
 
 cross-build-linux-amd64:
 	+$(MAKE) _build_local GOOS=linux GOARCH=amd64
@@ -231,8 +240,8 @@ bin/lichen: bin vendor/modules.txt
 
 vendor:
 	go mod vendor
-	for p in $(wildcard scripts/auto-rebase/rebase_patches/*.patch); do \
+	for p in $(sort $(wildcard scripts/auto-rebase/rebase_patches/*.patch)); do \
 		echo "Applying patch $$p"; \
-		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply || exit 1; \
+		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply --reject || exit 1; \
 	done
 .PHONY: vendor

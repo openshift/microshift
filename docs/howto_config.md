@@ -20,6 +20,8 @@ apiServer:
     - ""
 debugging:
   logLevel: ""
+etcd:
+  memoryLimitMB: 0
 ```
 
 ## Default Settings
@@ -42,6 +44,8 @@ apiServer:
   subjectAltNames: []
 debugging:
   logLevel: "Normal"
+etcd:
+  memoryLimitMB: 0
 ```
 
 ## Service NodePort range
@@ -77,6 +81,14 @@ List of ports that you must avoid:
 | 10248/tcp     | kubelet healthz port
 | 10259/tcp     | kube scheduler
 |---------------|-----------------------------------------------------------------|
+
+## Etcd Memory Limit
+
+By default, etcd will be allowed to use as much memory as it needs to handle the load on the system; however, in memory constrained systems, it may be preferred or necessary to limit the amount of memory etcd is allowed to use at a given time.
+
+Setting the `memoryLimitMB` to a value greater than 0 will result in a soft memory limit being applied to etcd; etcd will be allowed to go over this value during operation, but memory will be more aggresively reclaimed from it if it does. A value of `128` megabytes is the  configuration floor - attempting to set the limit below 128 megabytes will result in the configuration being 128 megabytes.
+
+Please note that values close to the floor may be more likely to impact etcd performance - the memory limit is a trade-off of memory footprint and etcd performance. The lower the limit, the more time etcd will spend on paging memory to disk and will take longer to respond to queries or even timing requests out if the limit is low and the etcd usage is high.
 
 # Auto-applying Manifests
 

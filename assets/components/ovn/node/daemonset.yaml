@@ -40,7 +40,7 @@ spec:
       containers:
       # ovn-controller: programs the vswitch with flows from the sbdb
       - name: ovn-controller
-        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift_rhel_9 }}
         command:
         - /bin/bash
         - -c

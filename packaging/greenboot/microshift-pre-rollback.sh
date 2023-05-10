@@ -3,6 +3,9 @@ set -e -o pipefail
 
 SCRIPT_NAME=$(basename $0)
 
+# Source the MicroShift health check functions library
+source /usr/share/microshift/functions/greenboot.sh
+
 # Set the exit handler to log the exit status
 trap 'script_exit' EXIT
 
@@ -28,13 +31,8 @@ fi
 
 echo "STARTED"
 
-# Dump GRUB boot variables and ostree status affecting the script behavior.
-# This information is important for troubleshooting cleanup issues.
-grub_vars=$(grub2-editenv - list | grep ^boot_ || true)
-[ -z "${grub_vars}" ] && grub_vars=None
-
-echo -e "GRUB boot variables:\n${grub_vars}"
-echo -e "The ostree status:\n$(ostree admin status || true)"
+# Print the boot variable status
+print_boot_status
 
 # Exit normally if the boot counter is not set to zero
 if ! grub2-editenv - list | grep -q ^boot_counter=0 ; then

@@ -89,7 +89,7 @@ As an example, run the following command to create a virtual machine named `micr
 > See the [Recommended system swap size](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/getting-started-with-swap_managing-storage-devices#recommended-system-swap-space_getting-started-with-swap) document for more information.
 
 ```bash
-ISONAME=rhel-baseos-9.1-$(uname -i)-dvd.iso
+ISONAME=rhel-9.2-$(uname -i)-dvd.iso
 
 ./scripts/devenv-builder/create-vm.sh microshift-dev \
     /var/lib/libvirt/images \
@@ -100,7 +100,7 @@ ISONAME=rhel-baseos-9.1-$(uname -i)-dvd.iso
 or
 
 ```bash
-ISONAME=rhel-baseos-9.1-$(uname -i)-dvd.iso
+ISONAME=rhel-9.2-$(uname -m)-dvd.iso
 
 export VMNAME=microshift-dev
 export VMDISKDIR=/var/lib/libvirt/images

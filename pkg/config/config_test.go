@@ -72,7 +72,8 @@ func TestConfigFile(t *testing.T) {
 					ServiceNodePortRange: "1024-32767",
 				},
 				Etcd: EtcdConfig{
-					QuotaBackendBytes:       2 * 1024 * 1024 * 1024,
+					MemoryLimit:             0,
+					QuotaBackendBytes:       8 * 1024 * 1024 * 1024,
 					MinDefragBytes:          100 * 1024 * 1024,
 					MaxFragmentedPercentage: 45,
 					DefragCheckFreq:         5 * time.Minute,
@@ -167,7 +168,8 @@ func TestMicroshiftConfigReadAndValidate(t *testing.T) {
 					DNS:                  "40.30.0.10",
 				},
 				Etcd: EtcdConfig{
-					QuotaBackendBytes:       2 * 1024 * 1024 * 1024,
+					MemoryLimit:             0,
+					QuotaBackendBytes:       8 * 1024 * 1024 * 1024,
 					MinDefragBytes:          100 * 1024 * 1024,
 					MaxFragmentedPercentage: 45,
 					DefragCheckFreq:         5 * time.Minute,

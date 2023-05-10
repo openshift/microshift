@@ -4,7 +4,7 @@ It is recommended to review the current document and use the automation instruct
 
 ## Create Development Virtual Machine
 Start by downloading one of the supported boot images for the `x86_64` or `aarch64` architecture:
-* RHEL 9.1 from https://developers.redhat.com/products/rhel/download
+* RHEL 9.2 from https://developers.redhat.com/products/rhel/download
 * CentOS 9 Stream from https://www.centos.org/download
 
 ### Creating VM
@@ -19,7 +19,7 @@ sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client
 Move the ISO image to `/var/lib/libvirt/images` directory and run the following commands to create a virtual machine.
 ```bash
 VMNAME="microshift-dev"
-ISONAME=rhel-baseos-9.1-$(uname -i)-boot.iso
+ISONAME=rhel-9.2-$(uname -i)-boot.iso
 
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
@@ -41,7 +41,7 @@ In the OS installation wizard, set the following options:
 - Select "Installation Destination"
     - Under "Storage Configuration" sub-section, select "Custom" radial button
     - Select "Done" to open a window for configuring partitions
-    - Under "New Red Hat Enterprise Linux 8.x Installation", click "Click here to create them automatically"
+    - Under "New Red Hat Enterprise Linux 9.x Installation", click "Click here to create them automatically"
     - Select the root partition (`/`)
         - On the right side of the menu, set "Desired Capacity" to `40 GiB`
         - On the right side of the menu, verify the volume group is `rhel`.
@@ -50,7 +50,7 @@ In the OS installation wizard, set the following options:
     - Click "Done" button.
     - At the "Summary of Changes" window, select "Accept Changes"
 
-- Connect network card and set the hostname (i.e. `microshift-dev.localdomain`)
+- Connect network card and set the hostname (i.e. `microshift-dev`)
 - Register the system with Red Hat using your credentials (toggle off Red Hat Insights connection)
 - In the Software Selection, select Minimal Install base environment and toggle on Headless Management to enable Cockpit
 
@@ -66,19 +66,6 @@ sudo dnf clean all -y
 sudo dnf update -y
 sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build jq bash-completion
 sudo systemctl enable --now cockpit.socket
-
-# Install go1.19
-# This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
-# /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
-GO_VER=1.19.4
-GO_ARCH=$([ "$(uname -i)" == "x86_64" ] && echo "amd64" || echo "arm64")
-curl -L -o "go${GO_VER}.linux-${GO_ARCH}.tar.gz" "https://go.dev/dl/go${GO_VER}.linux-${GO_ARCH}.tar.gz" &&
-    sudo rm -rf "/usr/local/go${GO_VER}" && \
-    sudo mkdir -p "/usr/local/go${GO_VER}" && \
-    sudo tar -C "/usr/local/go${GO_VER}" -xzf "go${GO_VER}.linux-${GO_ARCH}.tar.gz" --strip-components 1 && \
-    sudo rm -rfv /usr/local/bin/{go,gofmt} && \
-    sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/ && \
-    rm -rfv "go${GO_VER}.linux-${GO_ARCH}.tar.gz"
 ```
 You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
 
@@ -107,7 +94,7 @@ make srpm
 
 The artifacts of the build are located in the `_output/rpmbuild` directory.
 ```bash
-$ cd ~/microshift/_output/rpmbuild && find . -name \*.rpm 
+$ cd ~/microshift/_output/rpmbuild && find . -name \*.rpm
 ./RPMS/x86_64/microshift-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.x86_64.rpm
 ./RPMS/x86_64/microshift-networking-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.x86_64.rpm
 ./RPMS/noarch/microshift-release-info-4.13.0_0.nightly_2023_01_17_152326_20230124054037_b67f6bc3_dirty-1.el8.noarch.rpm
@@ -128,7 +115,7 @@ Enable the repositories required for installing MicroShift dependencies.
 
 <details><summary>RHEL</summary>
 
-When working with MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repository `rhocp-4.$Y-for-rhel-8-$ARCH-rpms` may not be available yet. In that case, use the `Y-1` released version or a `Y-beta` version from the public `https://mirror.openshift.com/pub/openshift-v4/$ARCH/dependencies/rpms/` OpenShift mirror repository.
+When working with MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repository `rhocp-4.$Y-for-rhel-9-$ARCH-rpms` may not be available yet. In that case, use the `Y-1` released version or a `Y-beta` version from the public `https://mirror.openshift.com/pub/openshift-v4/$ARCH/dependencies/rpms/` OpenShift mirror repository.
 
 ```bash
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
@@ -232,7 +219,7 @@ Examine the `/tmp/microshift.log` log file to ensure a successful startup.
 
 > An alternative way of running MicroShift is to update `/usr/bin/microshift` file and restart the service. The logs would then be accessible by running the `journalctl -xu microshift` command.
 > ```bash
-> sudo cp -f ~/microshift/_output_/bin/microshift /usr/bin/microshift
+> sudo cp -f ~/microshift/_output/bin/microshift /usr/bin/microshift
 > sudo systemctl restart microshift
 > ```
 
@@ -314,7 +301,7 @@ To view all the available profiles, run `oc get --raw /debug/pprof`.
 The following error message may be encountered when enabling the OpenShift RPM repositories.
 
 ```
-Error: 'fast-datapath-for-rhel-8-x86_64-rpms' does not match a valid repository ID.
+Error: 'fast-datapath-for-rhel-9-x86_64-rpms' does not match a valid repository ID.
 Use "subscription-manager repos --list" to see valid repositories.
 ```
 
@@ -325,18 +312,18 @@ $ sudo subscription-manager repos --list-enabled
 +----------------------------------------------------------+
     Available Repositories in /etc/yum.repos.d/redhat.repo
 +----------------------------------------------------------+
-Repo ID:   rhel-8-for-x86_64-appstream-rpms
-Repo Name: Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
-Repo URL:  https://cdn.redhat.com/content/dist/rhel8/$releasever/x86_64/appstream/os
+Repo ID:   rhel-9-for-x86_64-baseos-rpms
+Repo Name: Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/rhel9/$releasever/x86_64/baseos/os
 Enabled:   1
 
-Repo ID:   fast-datapath-for-rhel-8-x86_64-rpms
-Repo Name: Fast Datapath for RHEL 8 x86_64 (RPMs)
-Repo URL:  https://cdn.redhat.com/content/dist/layered/rhel8/x86_64/fast-datapath/os
+Repo ID:   fast-datapath-for-rhel-9-x86_64-rpms
+Repo Name: Fast Datapath for RHEL 9 x86_64 (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/layered/rhel9/x86_64/fast-datapath/os
 Enabled:   1
 
-Repo ID:   rhel-8-for-x86_64-baseos-rpms
-Repo Name: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
-Repo URL:  https://cdn.redhat.com/content/dist/rhel8/$releasever/x86_64/baseos/os
+Repo ID:   rhel-9-for-x86_64-appstream-rpms
+Repo Name: Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)
+Repo URL:  https://cdn.redhat.com/content/dist/rhel9/$releasever/x86_64/appstream/os
 Enabled:   1
 ```

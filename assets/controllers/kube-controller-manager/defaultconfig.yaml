@@ -14,9 +14,9 @@ extendedArguments:
   leader-elect-retry-period:
     - "3s"
   leader-elect-resource-lock:
-    - "configmapsleases"
+    - "leases"
   leader-elect-renew-deadline:
-    - "12s" # Increase api call timeout value from default 5s to 6s, required in case primary dns server fail.  
+    - "12s" # Increase api call timeout value from default 5s to 6s, required in case primary dns server fail.
   controllers:
     - "*"
     - "-ttl" # TODO: this is excluded in kube-core, but not in #21092

@@ -16,9 +16,9 @@ func runPodSecurityAdmissionLabelSynchronizationController(ctx context.Context, 
 
 	featureGates := sets.NewString(controllerCtx.OpenshiftControllerConfig.FeatureGates...)
 	switch {
-	case featureGates.Has("OpenShiftPodSecurityAdmission=false"):
-		// if explicitly off, disable
-		controller, err := psalabelsyncer.NewAdvisingPodSecurityAdmissionLabelSynchronizationController(
+	case featureGates.Has("OpenShiftPodSecurityAdmission=true"):
+		// if explicitly on, enable
+		controller, err := psalabelsyncer.NewEnforcingPodSecurityAdmissionLabelSynchronizationController(
 			kubeClient.CoreV1().Namespaces(),
 			controllerCtx.KubernetesInformers.Core().V1().Namespaces(),
 			controllerCtx.KubernetesInformers.Rbac().V1(),
@@ -31,11 +31,11 @@ func runPodSecurityAdmissionLabelSynchronizationController(ctx context.Context, 
 		}
 		go controller.Run(ctx, 1)
 
-	case featureGates.Has("OpenShiftPodSecurityAdmission=true"):
-		// if explicitly on or unspecified, run as enforcing.
+	case featureGates.Has("OpenShiftPodSecurityAdmission=false"):
+		// if explicitly off or unspecified, run as logging.
 		fallthrough
 	default:
-		controller, err := psalabelsyncer.NewEnforcingPodSecurityAdmissionLabelSynchronizationController(
+		controller, err := psalabelsyncer.NewAdvisingPodSecurityAdmissionLabelSynchronizationController(
 			kubeClient.CoreV1().Namespaces(),
 			controllerCtx.KubernetesInformers.Core().V1().Namespaces(),
 			controllerCtx.KubernetesInformers.Rbac().V1(),

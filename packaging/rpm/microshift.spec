@@ -9,7 +9,7 @@
 }
 
 # golang specifics
-%global golang_version 1.18
+%global golang_version 1.19
 #debuginfo not supported with Go
 %global debug_package %{nil}
 # modifying the Go binaries breaks the DWARF debugging
@@ -18,8 +18,6 @@
 # SELinux specifics
 %global selinuxtype targeted
 %define selinux_policyver 3.14.3-67
-%define container_policyver 2.167.0-1
-%define container_policy_epoch 2
 %define microshift_relabel_files() \
    mkdir -p /var/hpvolumes; \
    mkdir -p /var/run/kubelet; \
@@ -79,9 +77,9 @@ MicroShift and can be used to embed those images into osbuilder blueprints.
 Summary: SELinux policies for MicroShift
 BuildRequires: selinux-policy >= %{selinux_policyver}
 BuildRequires: selinux-policy-devel >= %{selinux_policyver}
-Requires: container-selinux >= %{container_policy_epoch}:%{container_policyver}
+Requires: container-selinux
 BuildArch: noarch
-%{?selinux_requires}
+Requires: selinux-policy >= %{selinux_policyver}
 
 %description selinux
 The microshift-selinux package provides the SELinux policy modules required by MicroShift.
@@ -89,7 +87,7 @@ The microshift-selinux package provides the SELinux policy modules required by M
 
 %package networking
 Summary: Networking components for MicroShift
-Requires: openvswitch2.17
+Requires: openvswitch3.1
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
@@ -208,6 +206,8 @@ install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/check/required.d
 install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
 install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
 install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
+install -d -m755 %{buildroot}%{_datadir}/microshift/functions
+install -p -m644 packaging/greenboot/functions.sh %{buildroot}%{_datadir}/microshift/functions/greenboot.sh
 
 %post
 
@@ -289,10 +289,21 @@ systemctl enable --now --quiet openvswitch || true
 %files greenboot
 %{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
+%{_datadir}/microshift/functions/greenboot.sh
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon May 01 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
+- Remove version specifier for container-selinux to let the system
+  make the best choice.
+
+* Wed Apr 12 2023 Zenghui Shi <zshi@redhat.com> 4.13.0
+- Upgrade openvswitch package version to 3.1
+
+* Wed Mar 29 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
+- Upgrade golang build-time dependency to 1.19 version
+
 * Wed Mar 01 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.13.0
 - Add lvmd.yaml and ovn.yaml default configuration files
 
