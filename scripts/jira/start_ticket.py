@@ -82,14 +82,17 @@ def custom_field_manager(server):
         f['name']: f
         for f in field_info
     }
+
     def get_field_value(ticket, name):
         field_details = fields_by_name[name]
         return getattr(ticket.fields, field_details['id'])
+
     def set_field_value(ticket, name, value):
         field_details = fields_by_name[name]
         return ticket.update(fields={
             field_details['id']: value,
         })
+
     return get_field_value, set_field_value
 
 

@@ -46,7 +46,7 @@ def run_command(args=None):
 
     logging.debug(f"Executing '{' '.join(args)}'")
     result = subprocess.run(
-        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,check=False)
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False)
 
     if result.returncode != 0:
         logging.error(f"Command '{' '.join(args)}' returned {result.returncode}. Output: {result.stdout}")
