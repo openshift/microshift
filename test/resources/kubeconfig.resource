@@ -1,18 +1,17 @@
 *** Settings ***
 Library    OperatingSystem
-Library    SSHLibrary
 Library    String
+Resource   ../resources/microshift-host.resource
 
 *** Keywords ***
 Get Kubeconfig
     [Documentation]    Get the kubeconfig file from the host argument and return contents
     [Arguments]    ${host}
-    SSHLibrary.Open Connection    ${host}
-    SSHLibrary.Login With Public Key    ${USHIFT_USER}    ${SSH_PRIV_KEY}
+    Login MicroShift Host
     ${kubeconfig}    ${rc}=    Execute Command
     ...    cat /var/lib/microshift/resources/kubeadmin/${host}/kubeconfig
     ...    sudo=True    return_rc=True
-    SSHLibrary.Close Connection
+    Logout MicroShift Host
     Should Be Equal As Integers    ${rc}    0
     Should Not Be Empty            ${kubeconfig}
     [Return]    ${kubeconfig}
