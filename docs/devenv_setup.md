@@ -19,7 +19,7 @@ sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client
 Move the ISO image to `/var/lib/libvirt/images` directory and run the following commands to create a virtual machine.
 ```bash
 VMNAME="microshift-dev"
-ISONAME=rhel-baseos-9.2-$(uname -m)-boot.iso
+ISONAME=rhel-9.2-$(uname -m)-boot.iso
 
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
