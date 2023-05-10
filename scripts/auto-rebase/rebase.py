@@ -233,7 +233,7 @@ def try_get_pr(gh_repo, org, base_branch, branch_name):
     return pull_req
 
 
-def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succeded):
+def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succeded):  # pylint: disable=unused-argument
     """
     Returns a string that represents the body of a pull request (PR) description.
     Note: This function expects that there is a "scripts/auto-rebase/changelog.txt" file present.
@@ -261,7 +261,7 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
 
     /label tide/merge-method-squash
     """)
-    base = template.format(amd_tag=amd_tag, arm_tag=arm_tag, prow_job_url=prow_job_url)
+    base = template.format(**locals())
     return (base if rebase_script_succeded
             else "# rebase.sh failed - check committed rebase_sh.log\n\n" + base)
 
