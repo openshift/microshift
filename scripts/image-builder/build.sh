@@ -272,10 +272,12 @@ createrepo microshift-local >/dev/null
 
 # Download openshift local RPM packages (noarch for python and selinux packages)
 rm -rf openshift-local 2>/dev/null || true
-OCP_REPO_NAME="rhocp-4.13-for-rhel-${OSVERSION}-mirrorbeta-${BUILD_ARCH}-rpms"
+
+# TODO: Start using 'rhocp-4.13' repository when OCP 4.13 is released
+OCP_REPO_NAME="rhocp-4.12-for-rhel-${OSVERSION}-$(uname -m)-rpms"
 reposync -n -a "${BUILD_ARCH}" -a noarch --download-path openshift-local \
-    --repo="${OCP_REPO_NAME}" >/dev/null
-#    --repo=fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms
+    --repo="${OCP_REPO_NAME}" \
+    --repo="fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms" >/dev/null
 
 # Remove 'microshift' packages to avoid overrides from the remote repository
 find openshift-local -name \*microshift\* -exec rm -f {} \;
