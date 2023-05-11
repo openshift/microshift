@@ -1,64 +1,1938 @@
-- cluster-dns-operator embedded-component d36aebfd86866143d441b5a443d112daf40e4429 to cc166e02a8b9363079f67a735c9c8ff0a76a1fb0
-  - 55550c7 2023-04-28T10:14:50-04:00 Enable topology-aware hints iff nodes have zones
+- oc image-arm64 42126f8cb42302f0cb4cc559fd545f8bb9fcf175 to f843bb1e3acc667e60fd6831afbc6da5b0063518
+  - 0df87c9 2023-05-04T12:49:41+03:00 Improve error log messages in event filtering
 
-- cluster-ingress-operator embedded-component a29464eda9614ac3d70c185b572f4839195e7306 to 43395efe070b6e60bd90193a974855acba8fe721
-  - e5382b2 2023-04-27T10:12:45-04:00 Replace Bugzilla link with Red Hat Issue Tracker
-  - 5cd2a01 2023-04-26T12:03:53-04:00 waitForDeploymentCompleteWithOldPodTermination fix
-  - 7149fcc 2023-04-23T07:27:58+00:00 Updating ose-cluster-ingress-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-cluster-ingress-operator.yml
-  - 20e4e38 2023-04-19T13:26:14-04:00 Rename waitForDeploymentCompleteWithCleanup to waitForDeploymentCompleteWithOldPodTermination
-  - 1a9b492 2023-04-04T17:03:07-04:00 Fix TestClientTLS: Wait for old router pods to be cleaned up before testing new mTLS config
-  - 09277e9 2023-03-22T11:04:44-04:00 gatewayclass: Update for OSSM 2.4 API change
+- ovn-kubernetes image-arm64 7a7d6050fbde5df36471764eaa5f7c2fcbed978c to a2eb4c392dce404b578f12e65c971d4c836c04f2
+  - 3c7b1a4 2023-05-02T11:36:27-04:00 OCPBUGS-12971:Fix bug that resulted in routes not be restored to a new vnic
 
-- cluster-kube-apiserver-operator embedded-component c39ec045b29820df372a22b28027b7abe3f79630 to 85f3e3c4ae21e516861d00359981d9df1ee42746
-  - 20b8ed0 2023-05-02T12:13:33-04:00 update library-go for consuming featuresets from manifests
-  - e18bda9 2023-05-02T12:10:36-04:00 read featureset from the manifests
-  - 47abf56 2023-05-01T13:30:34-04:00 update library-go for rendering ease
-  - 31e9abb 2023-05-01T13:30:34-04:00 read featuregates from manifests
-  - 3a8420f 2023-05-01T09:57:40-04:00 update library-go to get more restrictive featuregate reader
-  - 774299b 2023-05-01T09:56:25-04:00 react to tighter featuregate config
-  - c3260a3 2023-04-26T13:24:31-04:00 Cover featuregate access errors in PSA configobserver unit tests.
-  - f2d80b3 2023-04-26T13:24:24-04:00 Bump library-go for stubbable featuregate access.
-  - c0fbca0 2023-04-25T13:42:24-04:00 switch to featuregates via the API
-  - 306324b 2023-04-25T11:04:30-04:00 update api and library-go for featuregates
-
-- cluster-kube-controller-manager-operator embedded-component a4a07126a43fd95d225201c9ed855bd466cf3059 to 60412f05a87ac59e047c124eac18e4bfe64a1e48
-  - e8c5cf2 2023-05-02T12:16:57-04:00 update library-go for consuming featuresets from manifests
-  - 2a912ae 2023-05-02T12:16:20-04:00 allow consumption of featuregates from manifests
-  - 136095e 2023-05-01T11:36:00-04:00 update to more restrictive interface
-  - ffdf9b8 2023-05-01T11:36:00-04:00 update library-go to get more restrictive featuregate reader
-
-- cluster-network-operator embedded-component ddb4322285a1b9b19250e0ab4a53f99813f1d3ed to 7174d7398892b54bd63c4705630c635f15968823
-  - a807914 2023-04-26T17:08:48+01:00 Depreciate field manager
-  - 7f2f900 2023-04-25T14:59:31+00:00 rbac: ovn-kubernetes: add aggregate-to-cluster-reader permissions
-
-- machine-config-operator embedded-component 67faae41bae92de126236ab818240bcaf105547a to 4fef55681565469c588ae888e3e244a11f995c34
-  - 9ba29179 2023-04-20T14:53:56+02:00 Bug OCPBUGS-4476: keepalived/ingress: change healthcheck script
-
-- coredns image-amd64 5f5e9d8f20b308561fe8acbfc965aadb49b266cc to a2c62dd3976b27d6a45e273532c63ba914700917
-  - 48a4955 2023-04-28T08:33:46-04:00 OCPBUGS-12494: Address CVE-2022-41723
-
-- router image-amd64 40b2cbdd515299b8b1495cfd94358ec441cb7551 to c407ebbc5d8d85daea2ef2d1ba539444a06f4d25
-  - f7081eb 2023-04-28T08:30:18-04:00 OCPBUGS-12610: Address CVE-2022-41723
-  - 4071ae3 2023-04-23T04:08:01+00:00 Updating ose-haproxy-router-base images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-haproxy-router-base.yml
-  - 65cc696 2023-04-12T13:50:18+00:00 Updating openshift-enterprise-haproxy-router images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/600c6ff0fadafd1e7cc1761029366b22ed0e9f98/images/openshift-enterprise-haproxy-router.yml
-
-- kube-rbac-proxy image-amd64 458cdd194eca0c3ebd07341dc6fc201b84e69411 to 27c255551673ba529ac6c9419abe13451afa3e4d
-  - 0530406 2023-04-22T08:08:23+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/kube-rbac-proxy.yml
-
-- ovn-kubernetes image-amd64 d03d2d00b52692d7f889831d828a75c1d808ab8f to 7a7d6050fbde5df36471764eaa5f7c2fcbed978c
-  - d7407e8 2023-05-01T12:11:19-04:00 Check if the status of a pod before trying to get its ip
-
-- coredns image-arm64 5f5e9d8f20b308561fe8acbfc965aadb49b266cc to a2c62dd3976b27d6a45e273532c63ba914700917
-  - 48a4955 2023-04-28T08:33:46-04:00 OCPBUGS-12494: Address CVE-2022-41723
-
-- router image-arm64 40b2cbdd515299b8b1495cfd94358ec441cb7551 to c407ebbc5d8d85daea2ef2d1ba539444a06f4d25
-  - f7081eb 2023-04-28T08:30:18-04:00 OCPBUGS-12610: Address CVE-2022-41723
-  - 4071ae3 2023-04-23T04:08:01+00:00 Updating ose-haproxy-router-base images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ose-haproxy-router-base.yml
-  - 65cc696 2023-04-12T13:50:18+00:00 Updating openshift-enterprise-haproxy-router images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/600c6ff0fadafd1e7cc1761029366b22ed0e9f98/images/openshift-enterprise-haproxy-router.yml
-
-- kube-rbac-proxy image-arm64 458cdd194eca0c3ebd07341dc6fc201b84e69411 to 27c255551673ba529ac6c9419abe13451afa3e4d
-  - 0530406 2023-04-22T08:08:23+00:00 Updating kube-rbac-proxy images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/kube-rbac-proxy.yml
-
-- ovn-kubernetes image-arm64 d03d2d00b52692d7f889831d828a75c1d808ab8f to 7a7d6050fbde5df36471764eaa5f7c2fcbed978c
-  - d7407e8 2023-05-01T12:11:19-04:00 Check if the status of a pod before trying to get its ip
+- kubernetes image-arm64 d2e245fcc3f3d67b3bbedfe317ad0106f1b23f5d to 53f3066f47d3a594d6b93843916e8711ee673715
+  - 6631e7a48 2023-05-06T09:13:13-03:00 UPSTREAM: <carry>: legacy-cloud-providers: azure: do not detach masters from lb when unready
+  - 6972e61a6 2023-05-04T08:51:41-03:00 UPSTREAM: 116995: kubelet: Ensure pods that have not started track a pendingUpdate
+  - 170d2eb10 2023-05-03T15:35:47-03:00 UPSTREAM: <drop>: make update
+  - 4186c9c52 2023-05-03T15:03:50-03:00 UPSTREAM: <drop>: update OpenShift dependencies
+  - 1b87c2837 2023-05-01T16:21:49-04:00 UPSTREAM: <carry>: add conditional shutdown response header
+  - fedc9184f 2023-04-28T14:55:14-03:00 UPSTREAM: <carry>: Export internal code from k8s.io/apimachinery/pkg/util/managedfields
+  - ce1cc019e 2023-04-28T14:55:14-03:00 UPSTREAM: <carry>: APISelfSubjectReview: only test v1beta1 API
+  - 501f19354 2023-04-28T14:55:14-03:00 UPSTREAM: <carry>: don't fail integration due to too many goroutines
+  - 8549ee278 2023-04-28T14:55:14-03:00 UPSTREAM: 117310: kube-aggregator: correctly use client-go TLS cache with custom dialer
+  - b83468e68 2023-04-28T14:55:14-03:00 UPSTREAM: 117242: vendor: bump runc to 1.1.6
+  - 6c03aae25 2023-04-28T14:55:14-03:00 UPSTREAM: <carry>: add shutdown annotation to response header
+  - 7f1299a9c 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: Create minimal wrapper needed to run k8s e2e tests
+  - 461dce542 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: disable load balancing on created cgroups when managed is enabled
+  - cf4f07eea 2023-04-28T14:55:13-03:00 UPSTREAM: 115328: annotate early and late requests
+  - f4c20eabc 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: PSa metrics: log platform namespaces in audit denies
+  - fd9f7ae7d 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: kubelet: fix readiness probes with pod termination
+  - 8f9af7eb1 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: disable failing dnsPolicy test
+  - 6bd495652 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: make the PSA workload admission warnings honor the changes that SCC will eventually make to the pod
+  - 123d5e810 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: optionally enable retry after until apiserver is ready
+  - d53595a95 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: fix [sig-auth] ServiceAccounts no secret-based service account token should be auto-generated
+  - a5472b6e2 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: e2e-framework: don't autosync PodSecurity labels
+  - d9a9eaaa6 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: use console-public config map for console redirect
+  - eba79c27f 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: Release lock on KCM and KS termination
+  - 2492a2ad4 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: sets X-OpenShift-Internal-If-Not-Ready HTTP Header for GC and Namespace controllers
+  - 1a5576d61 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: add max_housekeeping_interval
+  - 7ae8a08d1 2023-04-28T14:55:13-03:00 UPSTREAM: <carry>: send Retry-After when not ready with a caller opt in
+  - da12b35e1 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: Revert "Remove Endpoints write access from aggregated edit role"
+  - 6868f0144 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: skip posting failures to aggregated APIs to avoid getting false positives until the server becomes ready
+  - 4bd3ff410 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: add a way to inject a vulnerable, legacy service-ca.crt for migration compatibility
+  - 03b92e737 2023-04-28T14:55:12-03:00 UPSTREAM: 103612: tolerate additional, but congruent, events for integration test
+  - 19eb2f166 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: openshift's kube-apiserver is in openshift-kube-apiserver
+  - b2f9e5b72 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: only chown if non-windows machine
+  - 03b4efeb0 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: crd: add ClusterOperator condition message table column
+  - 130a79dfb 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: emit event when readyz goes true
+  - f7173fb4c 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: apiserver: add system_client=kube-{apiserver,cm,s} to apiserver_request_total
+  - 1d2ab9a7d 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: Ensure service ca is mounted for projected tokens
+  - 35a4f4fe7 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: allows for switching KCM to talk to Kube API over localhost
+  - 86d4f76e9 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: APIRequestCount Handler
+  - 840b8d2d8 2023-04-28T14:55:12-03:00 UPSTREAM: <carry>: add management support to kubelet
+  - f54802d32 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: allows for switching KS to talk to Kube API over localhost
+  - 9c6e8ed9a 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: provide events, messages, and bodies for probe failures of important pods
+  - 732411bd8 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: allow kubelet to self-authorize metrics scraping
+  - 47932df05 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: use hardcoded metrics scraping authorizer for delegated apiservers
+  - b7529dd14 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: kube-apiserver: ignore SIGTERM/INT after the first one
+  - aac9951b2 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: Skip unit tests incompatible with openshift ci
+  - 04e31b8b1 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: noderestrictions: add node-role.kubernetes.io/* to allowed node labels
+  - a56897d5f 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: export HandleFlags
+  - 790645e80 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+  - 2474cfb8f 2023-04-28T14:55:11-03:00 UPSTREAM: 90452: refactor/improve CRD publishing e2e tests in an HA setup
+  - 0b1b9a9d2 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: conditionally fill the UserAgent from the currently running test
+  - 3af3d609e 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: Remove excessive e2e logging
+  - 0922a4b0f 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: bump nodes ready timeout
+  - 4b2eb0c9a 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: disable AES24, not supported by FIPS
+  - 5cd70d30a 2023-04-28T14:55:11-03:00 UPSTREAM: <carry>: warn only about unknown feature gates
+  - 83ac22b7b 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: bootstrap-rbac-policy: move over .well-known rules
+  - e7fc99b2d 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: create termination events
+  - 165266f7d 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: kube-apiserver: wire through isTerminating into handler chain
+  - d7459afbb 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: openshift-kube-apiserver: add kube-apiserver patches
+  - 8556e8176 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: Always test PDB's during service upgrade test
+  - 9fbd6b045 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: kube-apiserver: priorize some CRD groups over others
+  - 5e74b8442 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: kube-apiserver: allow injection of kube-apiserver options
+  - 21eaefe9a 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: kube-apiserver: add our immortal namespaces directly to admission plugin
+  - 41ff4d6c3 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: kube-controller-manager: exclude some origin resources from quota
+  - 25fb5884d 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: kube-controller-manager: allow running bare kube-controller-manager
+  - c58812d6f 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: kube-controller-manager: add service serving cert signer to token controller
+  - d3441b4a3 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: Extend NodeLogQuery feature
+  - 5c5688996 2023-04-28T14:55:10-03:00 UPSTREAM: <carry>: hardcoded restmapper with a few entries to rebootstrap SDN when SDN is down
+  - 1adc3da99 2023-04-28T14:55:09-03:00 UPSTREAM: <carry>: remove apiservice from sync in CRD registration when it exists
+  - 1eb8bd51b 2023-04-28T14:55:09-03:00 UPSTREAM: <carry>: patch aggregator to allow delegating resources
+  - 88e1af093 2023-04-28T14:55:09-03:00 UPSTREAM: <carry>: filter out CustomResourceQuota paths from OpenAPI
+  - 2418fbbf0 2023-04-28T14:55:09-03:00 UPSTREAM: 93286: wait for apiservices on startup
+  - 032ab12a1 2023-04-28T14:55:09-03:00 UPSTREAM: 84466: gce: ensureInternalInstanceGroups: reuse instance-groups for internal load balancers
+  - 435a664d4 2023-04-28T14:55:09-03:00 UPSTREAM: 74956: apiserver: switch authorization to use protobuf client
+  - 4c9411232 2023-04-14T13:14:41+00:00 Release commit for Kubernetes v1.27.1
+  - 1601bb754 2023-04-13T17:12:22-04:00 fix: add the bug as a known issue o on the v1.26 release note
+  - 845ba3e3a 2023-04-13T15:06:08-04:00 Revert "Optimization on running prePreEnqueuePlugins before adding pods into activeQ"
+  - a1f97a35f 2023-04-13T12:52:21-04:00 Revert "Merge pull request #113151 from ncdc/refactor-crd-conversion"
+  - 1da781e29 2023-04-13T12:52:21-04:00 Revert "CR conversion: protect from converter input edits"
+  - d662e339a 2023-04-12T16:55:48-04:00 kubelet: Do not mutate pods in the pod manager
+  - 398e38784 2023-04-11T17:27:35+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.0
+  - 1b4df30b3 2023-04-11T17:04:23+00:00 Release commit for Kubernetes v1.27.0
+  - 2b6072ba0 2023-04-06T20:17:17+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.0-rc.1
+  - ad1895425 2023-04-06T20:17:16+00:00 CHANGELOG: Update directory for v1.27.0-rc.1 release
+  - 80bc6ffd0 2023-04-06T19:52:26+00:00 Release commit for Kubernetes v1.27.0-rc.1
+  - 4e0bc2397 2023-04-06T10:31:33+02:00 Update publishing-bot rules for release branches to Go 1.19.8
+  - 1972dd100 2023-04-05T20:24:12-04:00 Do not log entire pod struct while attaching the volume
+  - b19c362bf 2023-04-06T01:37:14+02:00 Update distroless-iptables to v0.2.3
+  - 2a69edb43 2023-04-05T23:46:34+02:00 [go] Bump images, dependencies and versions to go 1.20.3
+  - b5dd5f1f3 2023-04-04T19:21:15+02:00 Investigate and fix the handling of Succeeded pods in DaemonSet
+  - 873127e3b 2023-04-04T13:25:49+00:00 Export WebhookHandler struct because some CCMs use Run directly
+  - 735bbc135 2023-03-30T16:38:15-04:00 Clean up formatting
+  - 27ad623b3 2023-03-27T19:07:43+02:00 Skip vendor directory when removing generated files
+  - 63b5ca69f 2023-03-27T19:18:05+05:30 .*: update vendor dir and cleanup
+  - 1ad7cacba 2023-03-24T18:08:53-04:00 publishing-bot rules for the new release-1.27 branch
+  - b83600de0 2023-03-24T18:50:43+08:00 fix  nil pointer dereference panic for deprecated metrics
+  - f33498a82 2023-03-23T19:51:32+00:00 CHANGELOG: Update directory for v1.27.0-rc.0 release
+  - cf60ee255 2023-03-23T18:59:05+00:00 Release commit for Kubernetes v1.27.0-rc.0
+  - 5469c198e 2023-03-22T21:48:53-04:00 kmsv2: validate encrypt response at DEK generation time
+  - 6843c5206 2023-03-22T18:33:49+00:00 remove kubernetes.io/grpc standard protocol
+  - 0e9dd5c51 2023-03-22T16:19:19+00:00 Call function that validates in-place vpa resize policy
+  - a2bba333c 2023-03-22T10:38:42-04:00 Drop development dependencies from test targets
+  - 7537cec56 2023-03-21T21:38:35-07:00 Fix MatchConditions webhook validation testing (#116784)
+  - f41702b8d 2023-03-22T00:24:00+00:00 Return updatedPod if resize upon successful checkpointing of allocated resources
+  - e154b7353 2023-03-22T07:40:29+08:00 safe-sysctl: skip checking for windows
+  - c68bc27f7 2023-03-21T22:21:57+00:00 kubelet: Read DNS Config options from file for Windows
+  - 933dfe3a5 2023-03-21T14:18:34-07:00 use longer timeouts to avoid flakes on heavily loaded systems
+  - 0740b1107 2023-03-21T14:14:23-07:00 allow multiple sources to add/remove from discovery without clobbering each other
+  - 0e4cece0e 2023-03-21T15:18:41-04:00 Update kube_features comment for aggregated discovery and openapi v3
+  - e9866d279 2023-03-21T10:51:22-04:00 Clear front proxy headers after authentication is complete
+  - 188844c3d 2023-03-21T09:23:45-04:00 Make prerelease tag optional in CI versions
+  - 2010eaac5 2023-03-21T09:08:05-04:00 Annotate CI version regexes
+  - 9ba4df15f 2023-03-21T09:08:05-04:00 Drop unused regex grouping
+  - bff737d32 2023-03-21T09:08:04-04:00 Update comments
+  - e33a233c3 2023-03-21T09:08:04-04:00 Delete unused version regex function
+  - 0567c93b2 2023-03-21T20:37:53+08:00 Improve the performance of map usage
+  - d109f60a0 2023-03-20T18:24:10-07:00 Clean up reference to deleted denied function
+  - 9cce3fa10 2023-03-20T16:09:30-07:00 Deflake GC e2e test
+  - a0cff3010 2023-03-20T18:21:04-04:00 Use standard *.kubernetes.io instead of *.k8s.io for ApplySet
+  - 33c3fe3f7 2023-03-20T12:13:21-07:00 differentiate kinds of expressions.
+  - 5949cb4d5 2023-03-20T11:01:51-04:00 Fixup 1.27 release note
+  - 62889f416 2023-03-20T10:29:25-04:00 Preserve UID/ResourceVersion in the BindingREST endpoint
+  - 78530ec0a 2023-03-19T09:28:58-07:00 Clarify EPSlice docs wrt the Ready conditions
+  - d75389326 2023-03-18T17:57:25+00:00 Do not modify original pod object when processing pod resource resize
+  - 51c0e2374 2023-03-17T22:18:07+01:00 API-initiated eviction: handle deleteOptions correctly
+  - fd16329f6 2023-03-17T19:07:06+00:00 CHANGELOG: Update directory for v1.26.3 release
+  - 358474b71 2023-03-17T18:00:04+00:00 Explicitly return from checkpoint update failures. SyncPod will retry
+  - 7387ccbd3 2023-03-17T17:48:15+00:00 CHANGELOG: Update directory for v1.25.8 release
+  - a4e62edcc 2023-03-17T17:10:22+00:00 CHANGELOG: Update directory for v1.24.12 release
+  - 26313ed2b 2023-03-17T10:28:32-04:00 Move the arm deprecation notice in a different spot
+  - 5134520a3 2023-03-17T21:29:10+08:00 add lock in volume manager reconciler to avoid data race
+  - f66e8848e 2023-03-17T08:50:52+00:00 Fix pod object update that may cause data race
+  - 7afcfe182 2023-03-17T15:45:39+08:00 kubelet: use filepath.Clean before init, validate it in setupDataDirs
+  - 0c2c13200 2023-03-17T05:43:30+00:00 Update in-place pod resize changelog to remove unwanted release note, make feature description user friendly
+  - 0ee5d43d7 2023-03-17T05:43:30+00:00 Add unit tests covering ephemeral storage resource combinations
+  - 07c567a84 2023-03-17T05:43:30+00:00 Add missing unit test for resource resize policy defaulting
+  - 8d38b30f8 2023-03-17T13:06:06+08:00 update openapi-spec
+  - 8e01ee79b 2023-03-17T00:49:13+00:00 CHANGELOG: Update directory for v1.27.0-beta.0 release
+  - 3d68f362c 2023-03-16T21:25:29+01:00 Give terminal phase correctly to all pods that will not be restarted
+  - 58d1dc669 2023-03-16T21:22:43+01:00 kubelet: Remove status manager channel
+  - c84c8add7 2023-03-16T10:15:21-07:00 Decouple batch/job back-off logic from workqueues (#114768)
+  - 3277d8560 2023-03-16T14:32:11+01:00 Fix missed watch events
+  - 51f759aa0 2023-03-15T20:19:48-07:00 ClusterTrustBundles: kube-apiserver integration tests
+  - 2e4b637bf 2023-03-15T20:10:59-07:00 ClusterTrustBundles: make update
+  - 6a75e7c40 2023-03-15T20:10:18-07:00 ClusterTrustBundles: Define types
+  - e5fd204c3 2023-03-15T17:23:15-07:00 Custom match criteria (#116350)
+  - 068ee321b 2023-03-15T17:15:51-04:00 Add CloudDualStackNodeIPs feature gate(s)
+  - 6ead3e394 2023-03-15T14:00:39-07:00 test: Update standalone test in node e2e
+  - e76dff38c 2023-03-15T20:45:45+00:00 Change where transformers are called.
+  - b3690bf63 2023-03-16T03:38:43+08:00 accept either FIELD or RESOURCE for kubectl explain to meet skew policy
+  - e3aacb4f3 2023-03-15T14:50:17-04:00 Update GetNodeAddressesFromNodeIP and ParseNodeIPAnnotation for cloud dual-stack
+  - d6a11b713 2023-03-15T14:50:17-04:00 Update GetNodeAddressesFromNodeIP to take the unparsed annotation
+  - 760516362 2023-03-15T14:50:17-04:00 Split up PreferNodeIP into legacy and non-legacy versions
+  - 77e0fbe77 2023-03-15T14:50:17-04:00 Update ParseNodeIPArgument for cloud dual-stack
+  - 0f1f1711f 2023-03-15T14:50:17-04:00 Move kubelet `--node-ip` parsing to component-helpers
+  - 9e571c042 2023-03-15T18:37:02+00:00 Adding validation for topology annotations
+  - 9d27f5c93 2023-03-15T10:10:02-07:00 update documentation for metrics for 1.27
+  - 0b09566dc 2023-03-16T04:17:37+13:00 Update pending_eligible_endpoints.yaml
+  - 0ba519fee 2023-03-15T13:01:42+00:00 Add missing trace dependency to kubemark
+  - 88b498f23 2023-03-15T17:27:34+05:30 test/e2e: Improve kubectl subresource e2e test
+  - 5e5b3029f 2023-03-14T20:28:26-07:00 Matchconditions admission webhooks alpha implementation for kep-3716 (#116261)
+  - 812d55d23 2023-03-14T19:26:33-07:00 Updated: Redefine AppProtocol field description and add new standard values (#115433)
+  - ac626f8ab 2023-03-15T09:47:10+08:00 remove test in strategy_test
+  - 804d8b205 2023-03-15T01:28:08+00:00 [KMSv2] remove key hierarchy in reference implementation
+  - ef0485e42 2023-03-15T00:59:55+00:00 first iteration to add standalone mode
+  - c09aa7dea 2023-03-15T00:18:58+00:00 fix: increases timeout to avoid flake
+  - 9ad7d9645 2023-03-15T00:07:37+00:00 Add metrics for OpenAPI V3
+  - 86f413600 2023-03-14T23:28:05+00:00 Webhook framework for cloud controller manager
+  - ad698cc0a 2023-03-14T23:18:16+00:00 [KMSv2] Generate proto API and update feature gate for beta
+  - 579295e72 2023-03-14T23:09:44+00:00 Update kubeletplugin API for DynamicResourceAllocation to v1alpha2
+  - ba42ed9a4 2023-03-14T22:58:12+00:00 make update
+  - ca1cba8f9 2023-03-14T22:58:11+00:00 integration etcd data
+  - 23252d70b 2023-03-14T22:58:11+00:00 add integration test
+  - 756f1bfe9 2023-03-14T22:58:11+00:00 add repair loop
+  - 811c2f50a 2023-03-14T22:58:11+00:00 remove apiserver limitations
+  - b2c8190ee 2023-03-14T22:58:11+00:00 allow to set the service reference on the allocator
+  - e6f197a99 2023-03-14T22:58:11+00:00 plumb new ipallocators in the apiserver
+  - b02247544 2023-03-14T22:58:11+00:00 clusterip allocator based on IPAddress API
+  - aa18a0cd3 2023-03-14T22:58:11+00:00 enable IPAddress on storage
+  - a2dfbd611 2023-03-14T22:58:11+00:00 Add IPAddress API to the REST registry
+  - d9cc62553 2023-03-14T22:58:11+00:00 add apis to apiserver storage
+  - befd131fa 2023-03-14T22:58:11+00:00 add feature gate
+  - d6d057b9a 2023-03-14T22:58:11+00:00 hack import aliases
+  - d06dbadd1 2023-03-14T22:58:07+00:00 IPAddress printers
+  - 53dbf1752 2023-03-14T22:56:44+00:00 kubectl describe IPAddress
+  - c36562dfd 2023-03-14T22:56:44+00:00 IPAddress validation
+  - 036f57f3c 2023-03-14T22:56:44+00:00 Add IPAddress API
+  - ffb07d1e7 2023-03-15T00:50:45+02:00 kubelet dra: add lock to addCDIDevices
+  - 543f15d10 2023-03-14T22:47:24+00:00 HPA: expose the metrics "metric_computation_duration_seconds" and "metric_computation_total" from HPA controller
+  - 452f345c4 2023-03-14T22:41:44+00:00 Update generated code for resource.k8s.io/v1alpha2
+  - 6ba9b9160 2023-03-14T22:34:19+00:00 Update e2e tests for recent changes to resource.k8s.io/v1alpha2
+  - 74d634a02 2023-03-14T22:34:18+00:00 Update kubelet support for recent changes to resource.k8s.io/v1alpha2
+  - da0b75f8f 2023-03-14T22:34:18+00:00 Update validation for recent changes to resource.k8s.io/v1alpha2
+  - 53dda4ffe 2023-03-14T22:34:18+00:00 Update AllocationResult and ResourceHandle for resource.k8s.io/v1alpha2
+  - 87b64744d 2023-03-15T03:42:17+05:30 test/e2e: Fix flaking subresource test
+  - f33581271 2023-03-14T22:11:29+00:00 unittests: Fixes unit tests for Windows (part 5)
+  - 82eee59d0 2023-03-14T22:06:38+00:00 prunev2: find resources in parallel
+  - fe59e091e 2023-03-14T22:26:27+01:00 dependencies: ginkgo v2.9.1, gomega v1.27.4
+  - 8eacf0964 2023-03-14T21:24:44+00:00 [KMSv2] use encDEK, keyID and annotations to generate cache key
+  - 1e6281e4a 2023-03-14T20:46:41+00:00 first iteration to add standalone mode
+  - 81586ff81 2023-03-14T16:31:54-04:00 Add k8s.io/kms/internal/plugins/mock to internal modules
+  - 86efc8bd7 2023-03-14T20:30:02+00:00 Add isInPlacePodVerticalScalingAllowed for restart check block
+  - 4fb638514 2023-03-14T12:47:09-07:00 fix test to look for FIELD: not RESOURCE: when a field was looked up
+  - 0c0a91d4d 2023-03-14T12:47:08-07:00 throw missing field in std err
+  - ee294de56 2023-03-14T15:46:31-04:00 missed registering kubelet-config-file for the command line use case running test-e2e-node target
+  - d1aa73312 2023-03-14T12:38:14-07:00 pkg/controller/util support contextual logging (#115049)
+  - 5b2682ac0 2023-03-14T19:37:35+00:00 Make in-place resize exclusion conditions (such as static pods) very obvious
+  - 223a7c550 2023-03-14T19:32:21+00:00 Remove the unit test to enable the feature gate
+  - 180c312f3 2023-03-14T12:20:11-07:00 log name of mising field, not path
+  - 133dd6157 2023-03-14T13:14:11-06:00 wait: Deprecate legacy Poll methods for new context aware methods
+  - 3dae9ba6d 2023-03-14T15:01:59-04:00 Optimize topology spreading for null selector
+  - 26bf8a7ce 2023-03-14T18:50:06+00:00 Aggregated discovery resilient to nil GVK
+  - 44159dfc3 2023-03-14T18:35:01+00:00 AppArmor no reevaluation of host is needed
+  - 636c25947 2023-03-14T11:20:16-07:00 use referred type's type when it is not an object
+  - f26f89612 2023-03-14T19:17:31+01:00 hack/logcheck.conf: enforce contextual logging in kube-controller-manager
+  - 99151c39b 2023-03-14T19:16:32+01:00 kube-controller-manager: convert to structured logging
+  - d1dfa8995 2023-03-14T13:57:11-04:00 Add integration test for DefaultBinder
+  - d016fdcc8 2023-03-14T17:56:47+00:00 kubectl prunev2: Refactor the applyset to be more reusable
+  - 58c4ead0a 2023-03-14T18:47:17+01:00 Add featureGate to CSIDriver.SELinuxMount
+  - 67a71c0bd 2023-03-14T19:33:04+02:00 kubelet podresources: add unit tests for DyanmicResource and Get method
+  - 2a568bcfc 2023-03-14T19:33:04+02:00 kubelet podresources: extend List to support Dynamic Resources and implement Get API
+  - 9c5761391 2023-03-14T19:33:04+02:00 Add ClassName to chekpoint state and in-memory cache
+  - 71d6e4d53 2023-03-14T19:33:03+02:00 kubelet metrics: add pod resources get metrics
+  - 91234c701 2023-03-14T19:33:03+02:00 kube features: add KubeletPodResourcesDynamicResources and KubeletPodResourcesGet
+  - 5e0399899 2023-03-14T19:33:01+02:00 kubelet: podresources: pack parameters in a struct
+  - 04ae8e9b2 2023-03-14T16:45:29+00:00 kubectl prunev2: simple e2e/integration test
+  - 0bdb2db18 2023-03-14T22:12:17+05:30 update internal type of csiNodeExpand feature to beta
+  - 09e6e4db1 2023-03-14T11:40:28-05:00 Update kubectl kustomize to kyaml/v0.14.1, cmd/config/v0.11.1, api/v0.13.2, kustomize/v5.0.1
+  - b49b34c03 2023-03-14T09:39:42-07:00 HPA: expose the metrics "reconciliations_total" and "reconciliation_duration_seconds" from HPA controller (#116010)
+  - a77269116 2023-03-14T09:38:36-07:00 Update pod_container_manager_linux.go (#114598)
+  - 7696bcd10 2023-03-14T12:18:58-04:00 Remove some now-obviously-unnecessary checks
+  - c5c0d9f5b 2023-03-14T12:18:58-04:00 Make deleteEndpointConnection test use syncProxyRules
+  - dea8e34ea 2023-03-14T12:18:58-04:00 Improve the naming of the stale-conntrack-entry-tracking fields
+  - 4381973a4 2023-03-14T12:18:58-04:00 Revert (most of) "Issue 70020; Flush Conntrack entities for SCTP"
+  - 9fbd08e07 2023-03-14T21:44:32+05:30 kubectl: Change subresource flag to beta
+  - d12696c20 2023-03-14T08:54:36-07:00 kubelet: Expose simple journald and Get-WinEvent shims on the logs endpoint
+  - 199c37ace 2023-03-14T23:51:50+08:00 feat: update matchLabelKeys comment and code auto-generate
+  - a53c6f1dc 2023-03-14T16:49:55+01:00 Add validation of CSIDriver.SELinuxMount
+  - 26279a528 2023-03-14T08:45:20-07:00 kubelet: Add validation for EnableNodeLogQuery
+  - aadad0941 2023-03-14T08:45:19-07:00 api: Add EnableNodeLogQuery to KubeletConfiguration
+  - d52cbd4a5 2023-03-14T08:45:18-07:00 feature: Add NodeLogQuery feature gate
+  - a466b7f5a 2023-03-14T21:01:44+05:30 test/e2e: Add e2e tests for kubectl --subresource
+  - 923d9b63f 2023-03-14T11:09:08-04:00 Allow conformant CRDs to be ApplySet parents
+  - 8a1f9f43e 2023-03-14T22:36:41+08:00 feat: validate matchLabelKeys when labelSelector isn't set
+  - a1d157bf3 2023-03-14T10:36:25-04:00 Add some missing flags
+  - eca25d9e1 2023-03-14T19:57:57+05:30 lock CSIMigrationvSphere feature gate
+  - 832d6f0e1 2023-03-14T10:23:50-04:00 kmsv2: re-use DEK while key ID is unchanged
+  - cdf501f77 2023-03-14T22:54:30+09:00 Add service-feature-gates argument to node_e2e
+  - a84dc2d5c 2023-03-14T14:32:38+01:00 Flip SELinuxMountReadWriteOncePod to Beta
+  - 80ff4b90a 2023-03-14T21:12:31+08:00 e2e: test for node expand volume with secrets failed
+  - 92f59b632 2023-03-14T17:57:24+05:30 Update NodeExpandSecretRef comment for beta
+  - 9c5c8b243 2023-03-14T12:06:44+00:00 kubectl diff: refactor tracker into a separate type
+  - 126e184bc 2023-03-14T17:34:07+05:30 noderesourcetopology: remove reference to NRT-API in README.
+  - 6a31757f4 2023-03-14T04:46:16-07:00 Applyset dry run tests + ID value (#116265)
+  - c4f8c3f62 2023-03-14T12:32:21+01:00 Fix volume reconstruction in standalone mode
+  - e97531b34 2023-03-14T11:58:41+01:00 api: extend validation of dynamic resource allocation fields in PodSpec
+  - a5587de2e 2023-03-14T18:03:08+08:00 print all calls when compare CSI call failed
+  - 4f16887a1 2023-03-14T09:45:16+00:00 unit tests: Fixes init and rejoin unit tests for Windows
+  - 76d9b8dd8 2023-03-14T15:13:35+05:30 noderesourcetopology-api: Remove nrt from publishing-bot rules.yaml
+  - 2b8a4e809 2023-03-14T10:18:08+01:00 api: generated files for PodSchedulingContext
+  - fec523366 2023-03-14T10:18:08+01:00 api: resource.k8s.io PodScheduling -> PodSchedulingContext
+  - ee18f6025 2023-03-14T02:15:20-07:00 apiserver: exclude APF queue wait time from SLO latency metrics (#116420)
+  - c51223278 2023-03-14T17:02:25+08:00 Migrate pkg/scheduler/framework/plugins/defaultbinder to contextual logging
+  - 4e5171b39 2023-03-14T16:51:46+08:00 upgrade csi provisioner to v3.4.0
+  - 40d543a59 2023-03-14T16:51:46+08:00 check node expand secret ref and fix CSI calls compare failure
+  - 2f71a635a 2023-03-14T16:51:46+08:00 get pvc again to get the pv name that bound to the PVC
+  - 4c8ee8e00 2023-03-14T13:03:01+05:30 noderesourcetopology-api: Vendor update
+  - 5a2adda7f 2023-03-14T12:58:31+05:30 noderesourcetopology-api: Remove from staging
+  - 29941b8d3 2023-03-14T07:52:03+01:00 api: resource.k8s.io v1alpha1 -> v1alpha2
+  - e0e835c63 2023-03-14T14:09:54+08:00 check if test volumes created
+  - f7ab37948 2023-03-14T01:19:12-04:00 Fix StatefulSet fuzzer
+  - 74b8fc753 2023-03-13T20:35:00-07:00 Add statefulsets to v1beta1 default_test
+  - 08dfa41f1 2023-03-14T11:25:04+08:00 fix: key in matchLabelKeys needs to be ignored when LabelSelector is nil
+  - 42ddbb427 2023-03-14T11:23:40+08:00 Fix PreFilter logic problem in node affinity
+  - 2a3b5f66e 2023-03-13T19:45:17-07:00 generated: UPDATE_COMPATIBILITY_FIXTURE_DATA
+  - deb467261 2023-03-13T19:44:28-07:00 generated: ./hack/update-codegen.sh && ./hack/update-openapi-spec.sh
+  - e23af041f 2023-03-14T02:23:11+00:00 Introducing Topology Mode Annotation, Deprecating Topology Hints Annotation
+  - 488d7650f 2023-03-14T09:42:41+08:00 update description
+  - 61d408832 2023-03-13T18:42:36-07:00 use title case for "Object" type
+  - aa80f8fb8 2023-03-13T21:01:17-04:00 token/cache: use go 1.20's approach for no-copy string/bytes conversions
+  - 7198bcffc 2023-03-14T08:50:27+08:00 daemonset: use contextual logging
+  - 361e4ff0f 2023-03-14T08:37:30+08:00 volume: use contextual logging
+  - 1d6df8233 2023-03-13T17:09:29-07:00 Graduate StatefulSetAutoDelete to beta
+  - 50cb3268b 2023-03-14T00:37:43+02:00 DRA: add constant PluginClientTimeout
+  - 71a36529d 2023-03-13T16:24:37-06:00 kubelet: TestSyncKnownPods should not race
+  - ac394c5c1 2023-03-13T22:55:34+01:00 Cleanup deprecated metrics
+  - 35eb667e3 2023-03-13T14:45:33-07:00 Update generated files
+  - ec0410a26 2023-03-13T22:28:04+01:00 kubelet: Move userns manager to its own package
+  - 16d76f681 2023-03-13T22:28:04+01:00 kubelet: Don't reserve mapping for userns phase II
+  - 8af3cce7f 2023-03-13T22:28:03+01:00 kubelet: remove GetHostIDsForPod()
+  - 9075404dc 2023-03-13T22:28:03+01:00 kubelet: use idmapped mounts for all volumes
+  - 79a34cf6a 2023-03-13T22:21:32+01:00 cri-api: add mappings for volumes
+  - a889cc7f7 2023-03-13T17:07:00-04:00 prevent initializing the same flag more than once
+  - ce3385ab1 2023-03-13T14:03:41-07:00 enable openapiv3 by default
+  - 64182b2d7 2023-03-13T14:00:27-07:00 "contails" -> "contains" updated
+  - f17a319dc 2023-03-13T20:06:59+00:00 prunev2: Implement basic pruning
+  - b3a67abec 2023-03-13T12:13:24-07:00 Updating perfCounterUpdatePerioud for Windows to 10 seconds
+  - d5aa8351e 2023-03-13T20:06:10+01:00 Fix DescribeTable for selfsubjectreview e2e
+  - ea974280d 2023-03-13T11:37:59-07:00 Fix broken API docs URLs
+  - 380892032 2023-03-13T11:37:59-07:00 Add a script to verify that URLs in API documentation are valid
+  - 8d4004bbc 2023-03-13T12:06:06-06:00 wait: Update tests to reference the constant error
+  - ba471884f 2023-03-13T12:47:36-04:00 Explicit bump to go 1.20
+  - be42dcfd7 2023-03-13T12:33:47-04:00 re-organize remote e2e test to be pluggable
+  - 009a2cbbc 2023-03-13T16:16:03+00:00 initialize feature gates in test project
+  - eaa0791b5 2023-03-13T11:20:36-04:00 copy pkg/proxy OWNERS to pkg/util/conntrack
+  - 685688c70 2023-03-13T12:52:41+00:00 Update DRAManager to allow multiple plugins to process a single claim
+  - 569ed33d7 2023-03-13T12:52:41+00:00 Add additional tests to DRAManager checkpointing
+  - fd7370b84 2023-03-13T12:52:41+00:00 Update DRAManager checkpoint to store a map for CDIDevices
+  - 273a8ffad 2023-03-13T12:52:41+00:00 Rename CdiDevices to CDIDevices in dramanager checkpoint
+  - 95df201d3 2023-03-13T13:36:55+01:00 [KCCM]: service controller - Add node.deletionTimestamp predicate
+  - 0ccab9804 2023-03-13T13:34:48+01:00 Remove obviously redundant tests
+  - f56e62ca1 2023-03-13T13:34:48+01:00 Add helper funcs to clean up svc controller tests
+  - d00364902 2023-03-13T13:31:07+01:00 events: fix EventSeries starting count discrepancy
+  - e3edf1348 2023-03-13T12:08:15+00:00 unittests: Adds winstats unittests
+  - d34b0275a 2023-03-13T04:34:56-07:00 dynamic resource allocation: add timeouts for communiction with plugin (#114844)
+  - 66bda6c09 2023-03-13T19:00:44+08:00 deployment controller: use contextual logging
+  - 033f4b177 2023-03-13T11:35:10+01:00 Stop clear non-existant retention policy rule
+  - 36a215603 2023-03-13T10:18:08+01:00 Add a SecurityContextDeny feature gate disabled by default
+  - 69465d294 2023-03-13T02:08:44-07:00 Adding test coverage for NewPodContainerManager() (#110220)
+  - 1c0a5aa84 2023-03-13T09:00:36+01:00 Link `apiextensions-apiserver` binary statically
+  - ffcf653e0 2023-03-13T08:37:13+01:00 Properly align synctrack.SingleFileTracker struct
+  - 49032c394 2023-03-13T15:06:04+08:00 The storage.k8s.io/v1beta1 API version of CSIStorageCapacity will no longer be served in v1.27.
+  - f5bd8c86d 2023-03-13T14:59:17+08:00 namespace controller: use contextual logging
+  - 23f71f0eb 2023-03-12T21:26:01-05:00 refactor remote test running
+  - e56f3e078 2023-03-13T10:18:40+08:00 Migrate `pkg/controller/bootstrap` to contextual logging
+  - 1e01358ea 2023-03-13T00:16:44+00:00 Initialize pod resource allocation checkpoint manager to noop
+  - 06e169237 2023-03-12T23:46:40+00:00 Update generated files
+  - 9a805db01 2023-03-12T23:46:40+00:00 Set default resize policy only for specified resource types, rename RestartNotRequired -> NotRequired
+  - 941105044 2023-03-12T23:46:39+00:00 Set default resource resize restart policy to RestartNotRequired
+  - c5130fb0d 2023-03-12T23:46:39+00:00 Restructure naming of resource resize restart policy - generated files
+  - 8b23497ae 2023-03-12T23:11:32+00:00 Restructure naming of resource resize restart policy
+  - 609ae5139 2023-03-12T15:26:56+01:00 Updated setcap to use released image `registry.k8s.io/build-image/setcap:bullseye-v1.4.2`
+  - 7b0b87e05 2023-03-12T15:26:15+01:00 Updated distroless iptables to use released image `registry.k8s.io/build-image/distroless-iptables:v0.2.2`
+  - c2cadd2b6 2023-03-12T15:24:31+01:00 Promote whoami kubectl command
+  - c77182b01 2023-03-12T13:36:19+00:00 feature(hpa): beta graduation for the container resource metrics
+  - 2c79af0d6 2023-03-12T09:13:19+02:00 kubelet dra: add unit tests for checkpoint
+  - 3766e060e 2023-03-12T15:06:26+08:00 Avoid using negative words in PreFilter and PreScore tests.
+  - 1c7850c35 2023-03-12T05:59:14+00:00 Fix null pointer access in doPodResizeAction for kubeletonly mode
+  - fafbed3b1 2023-03-12T14:48:48+09:00 fix the error message
+  - 639007b28 2023-03-12T05:10:29+00:00 cleanup(scheduler): move metric labels to metrics package
+  - 669746706 2023-03-12T04:45:52+00:00 add(scheduler): implement "plugin_execution_duration_seconds" metric in PreEnqueue
+  - 4204251ac 2023-03-12T09:50:09+08:00 Remove unnecessary int64 type conversion
+  - 320cb6d9e 2023-03-11T14:09:16-05:00 Revert "Disable unified build and static init optimization for tests"
+  - aef8cbab8 2023-03-11T12:27:38+00:00 Add batch.kubernetes.io to labels created in the Job controller.
+  - 556d77494 2023-03-11T10:42:14+01:00 kubelet: create top-level traces for pod sync and GC
+  - c2b2a7622 2023-03-11T07:10:05+00:00 revert azuredisk test removal change
+  - b837a0c1f 2023-03-11T08:00:54+01:00 kubelet: podresources: DOS prevention with builtin  ratelimit
+  - e1678f2b6 2023-03-10T16:22:01-08:00 generated: UPDATE_COMPATIBILITY_FIXTURE_DATA
+  - a60624ffb 2023-03-10T17:48:10-05:00 Allow custom metric provider for retry metrics
+  - fea83b782 2023-03-10T17:46:26-05:00 Unify queue constructors, deprecate current constructors
+  - 13855373e 2023-03-10T18:42:14+00:00 three more checks for containers lifecycle
+  - 86f41dc01 2023-03-10T18:30:09+00:00 mutable pod scheduling directives
+  - 6e78e3279 2023-03-10T17:49:53+00:00 consider default a system namespace to be managed by the namespace controller
+  - eecfaf658 2023-03-10T17:49:47+00:00 decouple system namespaces from bootstrap controller
+  - 1fff4949b 2023-03-10T09:03:49-08:00 generated: ./hack/update-codegen.sh && ./hack/update-openapi-spec.sh
+  - 1efa1a65e 2023-03-10T17:43:09+01:00 pkg/registry: rename pod logs metrics
+  - a1aed50a7 2023-03-10T10:16:19-06:00 wait: Split methods into files by role
+  - df3e8ee17 2023-03-10T10:02:27-06:00 wait: Group ExponentialBackoff* functions together in file
+  - be080584c 2023-03-10T07:44:53-08:00 scheduler(NodeResourcesFit & NodeResourcesBalancedAllocation): calculatePodResourceRequest in PreScore phase (#115655)
+  - 4dbb993d9 2023-03-10T15:38:04+00:00 don't process unsupported loadbalancers with mixed protocols
+  - d011cc4d8 2023-03-10T15:21:56+00:00 Fix up after rebasing on top of dedup pod resource req calculation PR
+  - 565fd4116 2023-03-10T14:49:26+00:00 Rename ContainerStatus.ResourcesAllocated to ContainerStatus.AllocatedResources - generated files
+  - 01b96e770 2023-03-10T14:49:26+00:00 Rename ContainerStatus.ResourcesAllocated to ContainerStatus.AllocatedResources
+  - 05cd2ba86 2023-03-10T15:03:56+01:00 Don't bump nr. of admitted volumes on retry
+  - 48ea6a3f3 2023-03-10T15:03:56+01:00 Fix SELinux mismatch metrics
+  - 771c9be29 2023-03-10T15:03:56+01:00 Add e2e test for SELinux metrics
+  - 966b26d55 2023-03-10T12:16:13+01:00 cache/controller: Add ENABLE_CLIENT_GO_WATCH_LIST_ALPHA
+  - 194ffd779 2023-03-10T12:16:08+01:00 reflector watchlist tests
+  - 51ec7305a 2023-03-10T11:56:47+01:00 reflector: use watchlist
+  - 519695c40 2023-03-10T10:53:33+00:00 make MixedProtocolNotSupported public
+  - e7256e08d 2023-03-10T12:22:15+02:00 kubelet dra: add checkpointing mechanism in the DRA Manager
+  - 7f21a9ce0 2023-03-10T11:06:54+01:00 kubelet/kuberuntime: Improving test coverage
+  - 2fed6b8a1 2023-03-10T10:33:44+01:00 reflector: introduce watchList
+  - 09517c27c 2023-03-10T10:28:52+01:00 kubelet: podresources: pack parameters in a struct
+  - 57b0f7aa3 2023-03-10T10:03:44+01:00 Add a Clear() function to generic sets
+  - 3b1238252 2023-03-10T09:57:14+01:00 update go to 1.19.7 in publishing bot rules for active release branches
+  - 43c841fa5 2023-03-10T09:56:49+01:00 drop 1.23 config due to EOL
+  - 6fb59e94a 2023-03-10T07:48:58+01:00 Fix setting resource version after init events for RV=0 case
+  - 0bc0ad01c 2023-03-10T07:48:58+01:00 Fix the bug of returning future data in watch
+  - 406b4d440 2023-03-10T14:14:41+08:00 [UT] add increase coverage for probe/util.go
+  - 4e26f680a 2023-03-09T23:37:59+00:00 Implement MessageExpression.
+  - 6defbb441 2023-03-09T23:37:49+00:00 Update codegen/openapi spec.
+  - 4096c9209 2023-03-09T17:15:53-06:00 dedupe pod resource request calculation
+  - 4a54225bb 2023-03-09T22:25:38+00:00 Add MessageExpression field.
+  - 346f39e18 2023-03-09T15:53:45-05:00 no-op: drop baseTransformerFunc indirection
+  - b4751a52d 2023-03-09T21:24:19+01:00 client-go: shut down watch reflector as soon as stop channel closes
+  - 9dec9e04c 2023-03-09T11:54:24-08:00 update vendor modules
+  - 9597abd08 2023-03-09T11:54:24-08:00 add explain tests for openapiv3
+  - 8249a827b 2023-03-09T11:54:24-08:00 kubectl: alias plaintext-openapiv2 to old explain
+  - 81dd9e3d2 2023-03-09T11:54:23-08:00 refactor factory to support fake openapiv3
+  - 88ec8fba3 2023-03-09T11:29:44-08:00 Update kubernetes code for minor API changes to kube-openapi
+  - 9bbdb9f13 2023-03-09T11:29:40-08:00 Update kube-openapi to 15aac26d736a
+  - 6c5ab4263 2023-03-09T18:27:47+01:00 Implement metrics agreed on the KEP
+  - 387d97605 2023-03-09T17:24:02+00:00 Add metrics for aggregated discovery
+  - 30bca1e1d 2023-03-09T17:12:30+00:00 Avoid metric lookup in Parallelizer.Util on every work piece
+  - fd62265d1 2023-03-09T16:58:25+00:00 unexport buggy function nodeSelectorAsSelector
+  - 5ca235e0e 2023-03-09T16:26:01+01:00 e2e: podresources: promote platform-independent test as NodeConformance
+  - 5f65c4b56 2023-03-09T13:24:11+00:00 update vendor
+  - 0b61e0d9f 2023-03-09T13:24:11+00:00 fix intree test
+  - 5d0a54dcb 2023-03-09T13:24:08+00:00 remove Azure Disk in-tree driver code
+  - a901bb630 2023-03-09T05:16:01-08:00 Enable plugin resolution as subcommand for selected builtin commands (#116293)
+  - d7060f02c 2023-03-09T12:04:51+01:00 Implement KEP-3458
+  - e30c49b0e 2023-03-09T12:03:21+01:00 Add StableLoadBalancerNodeSet feature gate
+  - f6161a51e 2023-03-09T11:29:51+01:00 reflector: allow watch method to accept a watcher
+  - 99c80ac11 2023-03-09T09:57:45+01:00 [go] Bump images, dependencies and versions to go 1.20.2
+  - 78ca93e39 2023-03-08T23:17:17-06:00 rework init containers test to remove host file dependency
+  - 6b9a38118 2023-03-08T22:03:51-06:00 kubelet: Force deleted pods can fail to move out of terminating
+  - a1def4b9c 2023-03-09T11:14:32+08:00 pod-infra-container-image: update comments as it will be removed in couple more releases
+  - d8be7aa9c 2023-03-08T17:36:11-08:00 implement message expression.
+  - f4ee476a3 2023-03-08T16:18:42-08:00 [API REVIEW] Validation.MessageExpression
+  - c1431af4f 2023-03-08T15:42:33-08:00 KEP-3325: Promote SelfSubjectReview to Beta (#116274)
+  - 0a954cc10 2023-03-08T15:17:58-08:00 always get fresh object before updating.
+  - 361391117 2023-03-08T23:03:52+00:00 Enable aggregated discovery
+  - 82eb24156 2023-03-08T15:01:06-08:00 add test for reset fields.
+  - c57bc292d 2023-03-08T14:55:58-08:00 Add e2e tests for StatefulSetStartOrdinal feature
+  - f5865043e 2023-03-08T22:20:39+00:00 Fallback query param verifier
+  - 9382fab9b 2023-03-08T22:18:49+00:00 feat: implements encrypt all
+  - 4f3859ce9 2023-03-08T13:44:00-08:00 managedfields: Move most of fieldmanager package to managefields
+  - ac876e503 2023-03-08T16:21:59-05:00 Turn off P&F filter in standalone CRD server tests
+  - 07a73bb2e 2023-03-08T16:18:36-05:00 One lock among PodNominator and SchedulingQueue
+  - 267eb25e6 2023-03-08T15:51:25-05:00 Recognize etcd/grpc cancel errors correctly
+  - 123ab8033 2023-03-08T14:39:10-06:00 add more init container lifetime testing
+  - 003b6d229 2023-03-08T11:38:32-05:00 Detect and clean up unneeded  after_roundtrip fixtures
+  - 5f568d51b 2023-03-08T17:37:50+01:00 hack/local-up-cluster.sh: Cleaup on SIGINT
+  - c9bc2f98d 2023-03-08T08:34:44-08:00 fix: remove SchedulingMigratedInTreePVs feature gate in sched perf test
+  - be82872ef 2023-03-08T17:26:47+01:00 cronjob: shut down integration test quickly again
+  - a04e20f62 2023-03-08T15:23:27+01:00 golangci-lint: synchronize configs and add verification for that
+  - cbf7d96a8 2023-03-08T08:37:56-05:00 garbagecollector: structured logging of objectReference
+  - 26e3dab78 2023-03-08T08:37:56-05:00 garbagecollector: use contextual logging
+  - 0c11171b7 2023-03-08T11:59:59+01:00 add tests for probe errors and ExecProbeTimeout
+  - a239b9986 2023-03-08T18:57:57+08:00 Migrated the StatefulSet controller (within `kube-controller-manager) to use [contextual logging](https://k8s.io/docs/concepts/cluster-administration/system-logs/#contextual-logging)
+  - 0e98533d1 2023-03-08T11:58:28+03:00 Not share process namespace if user explicitly disables it
+  - 0ffac5012 2023-03-08T16:53:19+08:00 cleanup container runtime options
+  - f368413d6 2023-03-08T14:04:51+08:00 sync default qps of kubelet change
+  - 23a583dc3 2023-03-08T13:15:46+08:00 cleanup: sync testdata as CronJobTimeZone is GAed
+  - 0e6636eb3 2023-03-08T12:47:14+08:00 nodeipam: return error instead of panics
+  - fed7bb7c5 2023-03-08T03:28:01+00:00 Plumb stale GroupVersions through aggregated discovery
+  - 4fdca4c5f 2023-03-08T11:10:51+08:00 node ipam ut: run test in parallel to avoid timeout; and optimize the panic check
+  - 7a87b4363 2023-03-08T10:27:50+08:00 e2e: add e2e test to node expand volume with secret
+  - 4346c5e5e 2023-03-07T15:51:09-08:00 generated: ./hack/update-vendor.sh
+  - 501976cc3 2023-03-13T14:40:47-07:00 fix broken tests after dependency injection.
+  - feb18b3f5 2023-03-07T15:49:19-08:00 implmementing type checking
+  - 54283a1d3 2023-03-07T15:48:21-08:00 exempt validatingadmissionpolicies/status
+  - 68ac7acbc 2023-03-07T15:43:34-08:00 [API REVIEW] ValidatingAdmissionPolicyStatus
+  - 4014d0fbb 2023-03-07T21:39:39+00:00 graduate API Server tracing to beta
+  - 7cb135a88 2023-03-07T21:30:39+00:00 e2e network test for multiple protocol services on same port
+  - 4c0ed3b52 2023-03-07T20:26:27+00:00 Unlock CSIMigrationvSphere feature gate until there is a supported vSphere CSI driver available
+  - 658ea4b59 2023-03-07T20:04:00+00:00 Refactor aggregated apiserver e2e, add openapi e2e
+  - 9c20cee50 2023-03-07T11:50:52-08:00 Revert "node: device-mgr: Handle recovery flow by checking if healthy devices exist"
+  - 04700e97d 2023-03-07T19:38:32+01:00 hack: prepare for strict golangci-lint in pull-verify-kubernetes
+  - 78a343060 2023-03-07T19:37:57+01:00 golangci-lint: support stricter checking in new code
+  - cae19f9e8 2023-03-07T18:14:18+00:00 Remove deprecated pod-eviction-timeout flag from controller-manager
+  - 98bbeae99 2023-03-07T18:11:51+00:00 address comments
+  - 15daa48e3 2023-03-07T18:11:51+00:00 Deprecate CLI flag pod-eviction-timeout
+  - e5c812bbe 2023-03-07T18:11:49+00:00 Remove CLI flag enable-taint-manager
+  - bcc61bbb8 2023-03-07T17:48:07+00:00 test connectivity for terminating pods
+  - 64c426a90 2023-03-07T10:56:12-06:00 migrate versionedattr to avoid circular dependency
+  - b50d9d1e2 2023-03-07T10:27:15-05:00 Cleanup vendor/
+  - 0826438d7 2023-03-07T15:12:22+00:00 Revert "do not assume backend on e2e service jig"
+  - 5ee679b34 2023-03-07T16:04:32+01:00 test/integration/logs: use stable struct for unit test
+  - eaa95b917 2023-03-07T16:04:32+01:00 test/integration/logs: benchmark using logsapi
+  - 10c15d7a6 2023-03-07T16:04:32+01:00 test/integration/logs: replace assert.Contains
+  - a862a269b 2023-03-07T16:04:32+01:00 test/integration/logs: remove useless stats case
+  - 97a8d72a6 2023-03-07T16:03:48+01:00 test/integration/logs: update benchmark support
+  - 5a5ca8aa0 2023-03-07T22:57:08+08:00 remove residual code associated with DynamicKubeletConfig
+  - 21fb98105 2023-03-07T15:09:02+01:00 cacher: Add WaitUntilWatchCacheFreshAndForceAllEvents method
+  - 90d185b7e 2023-03-07T09:00:12-05:00 Drop AWS kubelet credential provider and cleanup AWS storage e2e tests
+  - 27d5cda81 2023-03-07T14:18:31+01:00 Simplify waitForStatusCurrentReplicas helper
+  - 17117dc47 2023-03-07T14:18:29+01:00 Replace context.TODO with proper context
+  - 4482d1c2f 2023-03-07T13:00:46+00:00 e2e support Services with multiple EndpointSlices
+  - b6f9a6555 2023-03-07T04:19:59-08:00 Migrating `pkg/controller/serviceaccount` to contextual logging (#114918)
+  - 8f45b64c9 2023-03-07T04:19:51-08:00 Migrated `pkg/controller/replicaset` to contextual logging (#114871)
+  - 8c97443b7 2023-03-07T04:18:17-08:00 rolebinding often used for serviceaccount (#107124)
+  - e047c859b 2023-03-07T12:58:59+01:00 Update generated
+  - 1b825c179 2023-03-07T12:58:57+01:00 Promote CronJob TZ to GA
+  - bea99ae1e 2023-03-07T11:11:31+00:00 node: topologymgr: update autogenerated code
+  - e5ad3cbf6 2023-03-07T09:52:07+00:00 node: topologymgr: update node e2e test tags
+  - ae964a493 2023-03-07T09:42:54+00:00 node: topologymgr: remove comments with feature gate references
+  - 780ef3afb 2023-03-07T15:50:01+08:00 use klog.InfoS instead of klog.V(0),Info
+  - 1445e0371 2023-03-07T06:50:33+00:00 Rebase changes.
+  - 92e5b0947 2023-03-07T06:11:00+00:00 Add test for context cancellation.
+  - c400002fa 2023-03-07T06:10:58+00:00 Apply context cancellation to ValidatingAdmissionPolicy.
+  - 98e8f42f3 2023-03-07T05:59:34+00:00 panic on pod resources alloc checkpoint failure
+  - 9e7737d7d 2023-03-07T08:45:26+03:00 Unit tests to assure List type not support fieldvalidation
+  - c8d10dcae 2023-03-07T11:16:10+08:00 allow to mutate pv nodeaffinity label key
+  - c2b387150 2023-03-06T21:51:33-05:00 Add integration tests
+  - 932a4d972 2023-03-06T21:51:33-05:00 Generate code
+  - d221ddb89 2023-03-06T21:51:27-05:00 Implement validationActions and auditAnnotations
+  - 749d2ba8a 2023-03-07T10:11:01+08:00 delete Evicted pods first during pod gc
+  - 910ce0ed0 2023-03-06T16:38:52-08:00 Run ./hack/update-* scripts to update generated files
+  - fd6105d01 2023-03-06T18:47:02-05:00 fix last minute scheduler changes for inplace update
+  - d3214226d 2023-03-06T15:38:45-08:00 test: Fix node e2e shutdown test flake
+  - fe96e5704 2023-03-06T14:53:15-08:00 bash: compare numbers numerically, not lexically
+  - 6d0821165 2023-03-06T22:37:52+00:00 Fix CI
+  - 5da6f786d 2023-03-06T17:31:50-05:00 Drop linux/arm from regular builds
+  - 6c0b876a6 2023-03-06T14:26:33-08:00 Verifier does not support List
+  - 5ba74c81c 2023-03-06T20:46:05+00:00 unit tests: Skip flaky tests on Windows
+  - 1f4a9dd91 2023-03-06T20:43:59+00:00 Update CRD validation rules path accordingly.
+  - 244c63a2e 2023-03-06T20:43:59+00:00 Apply resource constraints to ValidatingAdmissionPolicy.
+  - bb0070754 2023-03-06T09:38:49-08:00 skip reconcile for unchanged Spec
+  - 4d30c4349 2023-03-06T12:08:53-05:00 Add integration tests for secondary authz
+  - 60bc5660d 2023-03-06T12:08:40-05:00 Generate code
+  - 7bbda746f 2023-03-06T12:08:14-05:00 Implement secondary authz
+  - 9ca548fcf 2023-03-06T17:48:59+01:00 Add metrics for force cleaned mounts after failed reconstruction
+  - 6aebda9b1 2023-03-06T14:01:15+00:00 Remove AWS legacy cloud provider + EBS in-tree storage plugin
+  - 937d33039 2023-03-06T12:51:11+00:00 node: topologymgr: Remove ResourceAllocator as TM is always enabled
+  - 6a62f0236 2023-03-06T12:51:11+00:00 node: topologymgr: trivial internal variable renaming
+  - d536a342b 2023-03-06T12:51:05+00:00 node: topologymgr: GA graduation implies Feature Gate is ON by default
+  - 04438aa6f 2023-03-06T12:47:59+00:00 node: topologymgr: Graduate Kubelet Topology Manager to GA
+  - 34fe27355 2023-03-06T13:40:35+01:00 reflector: extract watch and startResyncAsync methods
+  - 01a914888 2023-03-06T12:15:59+00:00 node: device-mgr: e2e: adapt to sample device plugin refactoring
+  - bae8a164e 2023-03-06T12:15:58+00:00 node: device-mgr: e2e: address e2e test review comments
+  - 674879a95 2023-03-06T12:15:58+00:00 node: device-mgr: e2e: Update the e2e test to reproduce issue:109595
+  - db7afc1cd 2023-03-06T11:52:23+00:00 node: device-mgr: e2e: Implement End to end test
+  - 5b2a3dbbd 2023-03-06T11:52:23+00:00 node: device-mgr: explicitly check if pre-allocated devices are healthy
+  - a799ffb57 2023-03-06T11:52:23+00:00 node: device-mgr: unit-tests: admission failure due to unhealthy devices
+  - 7ac399c20 2023-03-06T11:52:23+00:00 node: device-mgr: Handle recovery by checking if healthy devices exist
+  - 280651abc 2023-03-06T12:08:34+01:00 Autogenerated
+  - 760acbbbe 2023-03-06T12:07:52+01:00 Bump QPS limits for Kubelet
+  - 528a47130 2023-03-06T18:33:13+08:00 remove unused resize.go from pkg/kubelet/container
+  - 8fd9d573f 2023-03-06T11:30:39+01:00 cacher: deflake TestGetCurrentResourceVersionFromStorage
+  - ec917850a 2023-03-06T10:53:17+01:00 Add proxy healthz result to ETP=local health check
+  - b0dce923f 2023-03-06T09:50:12+00:00 Add Get interfaces for container's checkpointed ResourcesAllocated and Resize values, remove error logging for valid standalone kubelet scenario
+  - 13b941e12 2023-03-06T14:46:17+08:00 feat: graduate matchLabelKeys in podTopologySpread to beta
+  - 88274d96f 2023-03-06T14:23:14+08:00 update code style
+  - f762145e0 2023-03-06T09:00:40+08:00 minor code improvement
+  - 608f4808f 2023-03-06T00:48:30+00:00 support PreFilter as well
+  - 357bfbc43 2023-03-05T15:05:26-08:00 Codegen: subprojects: clean up verify scripts
+  - f76258f0f 2023-03-05T15:01:34+00:00 fix based on the suggestion
+  - 35fd124f4 2023-03-05T16:49:56+02:00 DRA: fix CDI spec version
+  - d1877f514 2023-03-04T21:20:24+01:00 adjust comment prefixes in k8s.io/api/apps/v1beta1/types.go
+  - f74724a3f 2023-03-04T19:57:52+01:00 update obsolete links
+  - 83fdbd76a 2023-03-05T00:35:51+08:00 Improve the performance when Resource Clone
+  - 12435b26f 2023-03-04T08:07:40+00:00 Fix nil pointer access panic in kubelet from uninitialized pod allocation checkpoint manager in standalone kubelet scenario
+  - 8d2c81e7e 2023-03-04T13:03:15+09:00 Fix comments at fit_test.go to increase redability
+  - eb541bb81 2023-03-04T11:17:55+08:00 controller-manager: fix a bug that the kubeconfig field of kubecontrollermanager.config.k8s.io configuration is not set correctly
+  - 04189b1fc 2023-03-04T01:48:16+00:00 rename ExperimentalPodPidsLimit to PodPidsLimit
+  - 747ffe785 2023-03-03T23:03:06+01:00 improve message, log level and testing for unmanaged pods in disruption controller
+  - a49f13258 2023-03-03T11:36:53-08:00 Tolerate empty discovery response in memcache client
+  - 3b0e13482 2023-03-03T13:31:04-05:00 Feedback and linter
+  - 3181db460 2023-03-03T13:16:36-05:00 Belatedly remove controller-manager IPv6DualStack feature gate
+  - 736123f44 2023-03-03T08:43:44-08:00 Update kube-openapi to afdc3dddf62d31f5e3868d699379c571a6007920
+  - c5a1f0188 2023-03-03T10:00:48-06:00 test: Add node e2e test to verify static pod termination
+  - 1c75c2cda 2023-03-03T10:00:48-06:00 test: Add e2e to verify static pod termination
+  - 39fa78fe7 2023-03-03T16:47:11+01:00 Fix deadlock in ready test
+  - c496c92f4 2023-03-03T11:53:22+01:00 verify: include "govet-levee" in normal "make verify"
+  - e78d05dae 2023-03-03T13:04:03+03:00 Skip hasSupport check for List type
+  - e2ea40e5f 2023-03-02T23:12:05-08:00 Open API V3 version of QueryParamVerifier
+  - 5331973fa 2023-03-03T07:51:04+01:00 verify-govet-levee.sh: optimize "go list"
+  - fd8523aa0 2023-03-03T07:51:04+01:00 golangci-lint: enable running specific linters
+  - a58eb1b3d 2023-03-03T07:51:04+01:00 staging: fix "go vet" issues
+  - 7f874c910 2023-03-03T00:56:30-05:00 Create and update the ApplySet parent object
+  - 3c7e7be3b 2023-03-03T05:20:56+00:00 CHANGELOG: Update directory for v1.27.0-alpha.3 release
+  - 53585ec00 2023-03-02T22:36:24-05:00 Bump the timeout for volume expansion
+  - 28e9775fd 2023-03-02T19:33:55-08:00 deps: Update github.com/coreos/go-systemd/v22 to v22.4.0
+  - 81c5a122c 2023-03-03T11:24:50+08:00 add pageSize to memory.high formula
+  - 7dab6253e 2023-03-03T11:24:40+08:00 default memoryThrottlingFactor to 0.9 and optimize the memory.high calculation formulas
+  - d0a213aba 2023-03-02T22:24:19-05:00 Handle AllAlpha and AllBeta in SetFeatureGateDuringTest
+  - 8647c23c1 2023-03-02T19:22:59-08:00 test: Fix path to e2e node sample device plugin
+  - 9633cb8d7 2023-03-02T17:24:31-08:00 composited type systems for CEL.
+  - 51db940dc 2023-03-02T16:36:07-08:00 kmsv2: improve test coverage
+  - dc83af0b4 2023-03-03T00:01:22+00:00 Add custom error struct for Group/Version not found
+  - 0da57ddc4 2023-03-02T22:55:00+00:00 Promote OpenAPI V3 to GA
+  - b9b2bc8cb 2023-03-02T22:36:15+00:00 update docs for ContainerStatus fields
+  - e360de48b 2023-03-02T22:07:59+00:00 GRPCContainerProbe is GA
+  - cd71486cf 2023-03-02T19:47:58+00:00 update documentation on generateSelector for manual selector case
+  - 951decd1e 2023-03-02T20:21:35+01:00 kubelet: fix recording when pulling image did finish
+  - 471985557 2023-03-02T19:15:29+01:00 remove retention policy for staging buckets
+  - 99fe00797 2023-03-02T12:57:17-05:00 Wait for pod to be running before expanding
+  - 539f734bf 2023-03-02T12:02:34-05:00 kmsv2: retain more key ID metrics
+  - 42a91c29e 2023-03-02T20:56:05+05:30 proxier: track metrics before conntrack cleaning
+  - b23cb9770 2023-03-02T20:54:34+05:30 proxier: syncing ipvs conntrack cleaning with iptables.
+  - 0e9b92090 2023-03-02T16:00:58+01:00 node: cpumgr: stricter precheck for full-pcpus-only
+  - dad95e1be 2023-03-02T15:06:00+01:00 update lease controller
+  - 52ce41a29 2023-03-02T10:59:48+01:00 cacher_watcher: Add support for consistent streaming
+  - 7c7e77330 2023-03-02T10:59:47+01:00 cacher: Add support for consistent streaming
+  - 571adf6e8 2023-03-01T22:26:55-08:00 Improved FormatMap: Improves performance by about 4x, or nearly 2x in the worst case (#112661)
+  - bea956568 2023-03-02T12:40:42+08:00 add ip_local_reserved_ports to safe sysctl allow list only if kernel version >= 3.16
+  - 572e6e0ff 2023-03-02T03:57:59+00:00 Add MaxParallelImagePulls support
+  - fa5e6587f 2023-03-02T03:15:13+01:00 handle new error where sa jwt issued in the future
+  - 031075d14 2023-03-02T03:09:49+01:00 check jwt timestamp for zero value
+  - df8fa2eab 2023-03-02T02:53:17+01:00 bump go-jose to v2.6.0
+  - 1f42ebc01 2023-03-01T20:14:10-05:00 Add a warning event when pdb has found a unmanaged pod
+  - e96ef3118 2023-03-01T18:46:45-06:00 refactor admission cel validator and compiler to be reusable
+  - ab020ee62 2023-03-01T14:08:46-08:00 Adding e2e test to verify hyperv container is running inside a VM on Windows
+  - 3489ace70 2023-03-01T21:43:25+00:00 generated code
+  - 17cd59ec1 2023-03-01T21:27:37+00:00 Fixes bug with Root not handling Group without Version
+  - cb9334ebb 2023-03-01T20:39:47+00:00 update batch apis
+  - 2da3e839b 2023-03-01T20:39:47+00:00 remove ValidateJobSpec and add more test cases to batch validation
+  - 3fd3a76eb 2023-03-01T17:17:23-03:00 Poll for stats until Windows kubelet present it in the stats endpoint
+  - 0199276f8 2023-03-01T11:32:19-08:00 include beta metrics in documentation and update docs for metrics
+  - 961819a4d 2023-03-01T19:03:50+01:00 dependencies: update klog v2.90.1
+  - c52ac0d59 2023-03-01T18:03:37+00:00 [KMSv2] update ci script to create cluster and gather metrics
+  - 412b4b332 2023-03-01T11:35:27-05:00 Add connection related metrics to EventedPLEG
+  - bf08cc38d 2023-03-01T17:25:38+01:00 Add retention policy to staging buckets
+  - 0b5fa1934 2023-03-01T09:06:30-05:00 cleanup: replace deprecated sets.String
+  - 74785074c 2023-03-01T15:02:03+01:00 e2e dra: update logging
+  - 106fce6fa 2023-03-01T15:00:30+01:00 e2e dra: improve goroutine handling
+  - 50a025acd 2023-03-01T08:08:33-05:00 e2e: Remove dead code in tests
+  - d6f81c01f 2023-03-01T11:58:57+00:00 start to count time since the connection was actually established
+  - 91089ce65 2023-03-01T18:44:59+08:00 kubelet: remove the deprecated --master-service-namespace flag
+  - 7ea35d0cd 2023-03-01T10:01:34+00:00 node: device-mgr: sample device plugin: manifest to avoid registration
+  - 2c8fc26b8 2023-03-01T10:00:52+00:00 node: device-mgr: sample device plugin: control registration process
+  - b5ecc658a 2023-03-01T11:00:36+01:00 Update TestCompatibility
+  - 52d613efd 2023-03-01T11:00:32+01:00 Add SetListOptionsDefaults for setting defaults on ListOptions
+  - 69e4de131 2023-03-01T11:00:25+01:00 generated
+  - 7b67bbbcf 2023-03-01T11:00:12+01:00 Disable SendInitialEvents for etcd and watch cache
+  - e1537fc41 2023-03-01T10:57:42+01:00 Add SendInitialEvents to storage ListOptions
+  - 4b3e0a39e 2023-03-01T10:57:35+01:00 Update calls to ValidateListOptions
+  - ea084ff4d 2023-03-01T10:57:17+01:00 Add WatchList feature gate
+  - 2ae115e5a 2023-03-01T10:55:40+01:00 Add SendInitialEvents parameter to ListOption
+  - b99fe0d5b 2023-02-28T23:09:17-08:00 client-go: support `Shutdown()` for metadata and dynamic informers (#114434)
+  - 4d6be42c1 2023-03-01T06:48:37+00:00 add unit test
+  - 7d8437933 2023-03-01T12:55:58+08:00 retry on conflict for negative TerminationGracePeriodSeconds update
+  - e24e3de37 2023-03-01T13:29:17+09:00 Deflake tests in staging/src/k8s.io/kube-aggregator/pkg/apiserver
+  - e7d8dfb5a 2023-03-01T13:23:27+09:00 Fix a data race in TestDirty
+  - b5dbb33da 2023-03-01T12:14:52+08:00 upgrade etcd deps to v3.5.7
+  - f0b706348 2023-02-28T20:45:06-06:00 fix restricted debug profile
+  - 43acba808 2023-03-01T00:11:17+00:00 feat: kms base64 plugin for e2e tests
+  - 23909d3c2 2023-02-28T22:56:38+00:00 CHANGELOG: Update directory for v1.26.2 release
+  - cc4bcd1d8 2023-02-28T23:08:23+01:00 scheduler_perf: report data items as benchmark results
+  - 961129c5f 2023-02-28T23:08:17+01:00 scheduler_perf: add logging flags
+  - 00d145953 2023-02-28T23:06:00+01:00 test/utils: extend ktesting
+  - c00873294 2023-02-28T23:05:17+01:00 test/integration: add StartEtcd
+  - 27ec02e07 2023-02-28T21:51:56+00:00 CHANGELOG: Update directory for v1.25.7 release
+  - c485cb243 2023-02-28T13:29:57-08:00 supply OpenAPIV3Config unconditionally
+  - 7b004c456 2023-02-28T13:29:57-08:00 Revert "Revert "Merge pull request #115324 from alexzielenski/apiserver/smd/use-openapiv3"
+  - 9ef1fc543 2023-02-28T13:21:35-08:00 skip special features in TestPodSecurityGAOnly
+  - 42909af61 2023-02-28T21:21:29+00:00 Add windows nodeSelector to provisioning functions
+  - c4ca8ccf3 2023-02-28T21:06:52+00:00 CHANGELOG: Update directory for v1.23.17 release
+  - a003138bf 2023-02-28T20:22:51+00:00 CHANGELOG: Update directory for v1.24.11 release
+  - 85359d74e 2023-02-28T20:30:17+01:00 Add metrics for number of events received from etcd
+  - d971809b4 2023-02-28T13:57:30-05:00 Graduate Evented PLEG to Beta
+  - ab0583084 2023-02-28T13:27:33-05:00 prunev2: Add labels for objects that we apply
+  - 6a09ba8f5 2023-02-28T10:17:52-08:00 Codegen: set LC_ALL and unset GREP_OPTIONS
+  - e0d44fd21 2023-02-28T17:52:30+00:00 update otelhttp to v0.35.1
+  - 5a8689507 2023-02-28T19:21:20+02:00 DRA: pass CDI devices through CRI CDIDevice field
+  - fb3f8ac3c 2023-02-28T19:21:11+02:00 CRI: add CDIDevice to the ContainerConfig
+  - fa98647a3 2023-02-28T17:22:33+01:00 golangci-lint: update logcheck original-url
+  - cf2e6291d 2023-02-28T17:22:31+01:00 hack: move golangci-lint config files
+  - 2d513e133 2023-02-28T17:21:52+01:00 golangci-lint: show more information about actual invocation
+  - 2ecd24011 2023-02-28T15:47:13+00:00 Graduate JobMutableNodeSchedulingDirectives feature to GA
+  - 75ef75981 2023-02-28T22:58:40+08:00 kubelet: avoid duplicate printing the flag deprecation warnings during re-parsing
+  - 3b17aece1 2023-02-28T03:23:16-08:00 cacher allow context cancellation if not ready (#116024)
+  - a8b1e5724 2023-02-28T00:40:51-08:00 add support for pulling images from private registry
+  - e00188459 2023-02-28T00:24:40-08:00 test: Add some default flags ginkgo flags for node e2e
+  - e9ecdf353 2023-02-28T00:21:34-08:00 test: Emit ginkgo log for each node e2e
+  - 0980f026c 2023-02-28T00:21:03-08:00 test: Remove tests argument from node e2e image config
+  - 81987dba3 2023-02-28T00:13:24+01:00 update obsolete links
+  - 9828f6223 2023-02-27T14:39:21-08:00 turn field validation e2e tests into conformance tests
+  - 1c2fa0c7f 2023-02-27T20:38:11+00:00 Partition watchers by namespace/name scope
+  - 23eaa6e1e 2023-02-27T11:57:46-08:00 Fix codegen for older bash
+  - 018475269 2023-02-27T14:16:02-05:00 Update generated files
+  - 588884dd6 2023-02-27T14:12:59-05:00 Add CRD compatibility objects
+  - 9997683ba 2023-02-27T14:12:59-05:00 Use custom-defined type generators for slice elements in compatibility objects
+  - 688f5babb 2023-02-27T14:12:58-05:00 Skip unmarshaled fields with generating compatibility fixtures
+  - 5f9a04228 2023-02-27T14:12:58-05:00 Explicitly exclude unmarshaled fields for custom-marshaled types from standard JSON handling
+  - 93a74afcc 2023-02-27T18:45:58+00:00 move AllowElasticIndexedJobs into JobValidationOptions declaration
+  - 0dd346673 2023-02-27T09:20:40-08:00 Introduce CLI for ApplySet-based pruning (#115979)
+  - a24aef651 2023-02-27T09:13:36-08:00 Replace a function closure
+  - 6fd6657d4 2023-02-27T08:54:53-08:00 kmsv2: add mock kms for reference implementation
+  - ccde866a2 2023-02-27T23:53:19+08:00 Improve the performance of method CandidatesToVictimsMap
+  - 791fcd6fb 2023-02-27T10:49:49-05:00 apiserver: make watch termination during shutdown configurable
+  - 6385b86a9 2023-02-27T10:49:49-05:00 apiserver: terminate watch with a rate limiter during shutdown
+  - 697d96710 2023-02-27T10:49:30-05:00 apiserver: watch gets notified on server shutdown signal
+  - a5252e93c 2023-02-27T21:34:34+08:00 add testdate for pod secuirty v1.26 and v1.27 for ip_local_reserved_ports
+  - a50c9db09 2023-02-27T21:09:07+08:00 Typo: fix EndpointsLeasesResourceLock ->ConfigMapsLeasesResourceLock
+  - d06c0995c 2023-02-27T12:49:44+00:00 fix 116028
+  - 1a8339313 2023-02-27T19:26:49+08:00 add sysctls_allowed_1_27 and will add min version for it
+  - ca4022c4d 2023-02-27T19:02:20+08:00 add net.ipv4.ip_local_reserved_ports to safe sysctls
+  - b225d6c7a 2023-02-27T13:00:06+02:00 kubelet: Fix fs quota monitoring on volumes
+  - fbe39a8e9 2023-02-27T10:47:02+01:00 skip e2e test for checking filesystem resizing on Windows
+  - 7484c69a1 2023-02-27T10:47:02+01:00 add e2e test for snapshot restore resizing
+  - 8567eafa0 2023-02-27T10:47:02+01:00 add anti-capability to allow resize test skipping
+  - b62794c52 2023-02-27T10:47:02+01:00 fix a typo
+  - ed2caf17e 2023-02-27T16:02:59+08:00 kubelet: remove unused DockerID type
+  - 36eef0600 2023-02-27T08:15:46+01:00 Fix the flaky OOMKiller test by sleep at start
+  - 4f913dbcd 2023-02-27T14:34:53+08:00 bump kube-dns to v1.22.20
+  - 81aefe5fe 2023-02-27T14:25:48+08:00 Improve spec.template.spec.restartPolicy description
+  - 70b33409d 2023-02-27T12:19:31+08:00 kubeadm: modify '--config' flag from required to optional for 'kubeadm kubeconfig user'
+  - a82545070 2023-02-27T10:41:25+08:00 kubeadm: improve test coverage by validating the data structure
+  - b929908f3 2023-02-26T18:37:58-08:00 Add symlink check to e2e statefulset app
+  - 119c5f451 2023-02-27T10:08:02+08:00 update openapi-spec, generated proto and generated openapi
+  - 00c836b44 2023-02-27T10:02:56+08:00 Fix API field references for autoscaling v1, v2 and v2beta2
+  - 1f98b49bf 2023-02-27T00:47:46+00:00 [KMS] move util from envelope to kms package
+  - e40b3cf54 2023-02-27T00:00:36+00:00 [KMSv2] log request metadata as part of read/write
+  - b24725eed 2023-02-26T09:25:40+08:00 update coredns to v1.10.1
+  - 33daba24f 2023-02-25T23:04:07+00:00 fix(HPA): ignore the container resource metrics in HPA controller  when the feature gate is disabled
+  - 6165a12c7 2023-02-25T16:14:23-05:00 Revert "Merge pull request #115324 from alexzielenski/apiserver/smd/use-openapiv3"
+  - b1ee8c8b8 2023-02-25T21:53:28+08:00 kubeadm: no need to check if target coredns version is not changed
+  - 744d9bfda 2023-02-25T21:39:44+08:00 update github.com/coredns/corefile-migration v1.0.20 - Minor change: Don't return Unsupported/Deprecated plugins for non-migration cases, i.e. when the start version is the same as the end version.
+  - 6b4d08bd5 2023-02-25T19:06:07+09:00 fix: typo
+  - 1033cf80d 2023-02-25T08:54:51+04:00 e2e: promote gRPC probe tests to conformance
+  - 0e06d0967 2023-02-24T23:23:40+00:00 [KMSv2] remove setting `dek_cache_inter_arrival_time_seconds` for KMSv2 only
+  - 5883203c8 2023-02-24T13:11:48-08:00 update swagger.json used in tests
+  - 8a85077a6 2023-02-24T13:11:48-08:00 crd directly create smd schema from spec.Schema
+  - 3e96127af 2023-02-24T13:10:01-08:00 clean up unnecessary field
+  - 5b482476b 2023-02-24T11:54:34-08:00 OpenAPI V3 Root interface and basic implementation
+  - 7db339dba 2023-02-24T18:21:21+00:00 This commit contains the following: 1. Scheduler bug-fix + scheduler-focussed E2E tests 2. Add cgroup v2 support for in-place pod resize 3. Enable full E2E pod resize test for containerd>=1.6.9 and EventedPLEG related changes.
+  - f2bd94a0d 2023-02-24T18:21:21+00:00 In-place Pod Vertical Scaling - core implementation 1. Core Kubelet changes to implement In-place Pod Vertical Scaling. 2. E2E tests for In-place Pod Vertical Scaling. 3. Refactor kubelet code and add missing tests (Derek's kubelet review) 4. Add a new hash over container fields without Resources field to allow feature gate toggling without restarting containers not using the feature. 5. Fix corner-case where resize A->B->A gets ignored 6. Add cgroup v2 support to pod resize E2E test. KEP: /enhancements/keps/sig-node/1287-in-place-update-pod-resources
+  - 231849a90 2023-02-24T18:14:21+00:00 In-place Pod Vertical Scaling - Scheduler changes
+  - 5bca18254 2023-02-24T18:10:26+00:00 Allow mutating schedulingGates in the Pod template for suspended Jobs
+  - 3c70be1a1 2023-02-24T17:18:04+00:00 Generated files and compat data from API changes
+  - 76962b0fa 2023-02-24T17:18:04+00:00 In-place Pod Vertical Scaling - API changes  1. Define ContainerResizePolicy and add it to Container struct.  2. Add ResourcesAllocated and Resources fields to ContainerStatus struct.  3. Define ResourcesResizeStatus and add it to PodStatus struct.  4. Add InPlacePodVerticalScaling feature gate and drop disabled fields.  5. ResizePolicy validation & defaulting and Resources mutability for CPU/Memory.  6. Various fixes from code review feedback (originally committed on Apr 12, 2022) KEP: /enhancements/keps/sig-node/1287-in-place-update-pod-resources
+  - 5531295bf 2023-02-24T16:43:38+01:00 scheduler/framework/plugins/volumebinding: fix inaccurate log for when a volume is bound to a claim
+  - 093469fb3 2023-02-24T16:32:58+01:00 api: generated files
+  - f32302e74 2023-02-24T16:32:58+01:00 api: drop Resources.Claims from PVC and PVC template
+  - 2ea50fc20 2023-02-24T14:47:38+00:00 fix(HPA): make a difference in SuccessfulRescale  events between the resource metric and the container resource metric
+  - e25badc5d 2023-02-24T13:19:05+00:00 Reduce possible number of scale steps to improve test stability
+  - a53704911 2023-02-24T11:59:01+01:00 Split cacheWatcher into its own file
+  - 96b9531f3 2023-02-24T16:02:35+08:00 fix apiserver metrics `RecordsWatchCacheCapacityChange` use watchCache as increase total
+  - a68b28a36 2023-02-23T16:35:45-08:00 Move StatefulSetStartOrdinal feature gate to beta
+  - a714e9e48 2023-02-23T16:22:56-08:00 Fix validation.go to validate without StatefulSetStartOrdinal feature gate check. Adds test case to validate regression fix of validation failing when spec.ordinals set and feature gate disabled
+  - 298cb361c 2023-02-23T15:18:03-08:00 Removes old discovery hack ignoring 403 and 404
+  - 8d31da459 2023-02-23T21:05:03+00:00 add validation test case for immutable completions on indexed jobs when AllowElasticIndexedJobs is false
+  - e352d94e4 2023-02-23T12:13:16-08:00 Refactor to use openapi fake client
+  - e1aa521c1 2023-02-23T20:20:37+01:00 Minor refactor of DeleteCollection
+  - 15077a0f2 2023-02-23T18:09:47+00:00 plumb feature gate value through job validation opts and modify validateCompletions function to only check completions == parallelism after the update, not before
+  - 5df798f22 2023-02-23T12:22:32+00:00 Fix import alias issue for errors package
+  - f690a0ce4 2023-02-23T21:18:24+09:00 Fix createStaticPod to not use container.RestartPolicy
+  - 697ea476e 2023-02-23T11:37:57+01:00 svc: Support pods with same address
+  - 0891ba973 2023-02-23T17:26:30+08:00 resourceClaimController should be registered like the others one to keep code clean
+  - 181fc50f8 2023-02-23T09:51:42+01:00 e2e framework: deprecate gomega wrappers
+  - 7474d9b71 2023-02-23T14:03:10+05:30 storage: Get rid of TestListDeprecated
+  - b8ef5be44 2023-02-23T12:04:18+08:00 ut: fix TestLegacyFallbackNoCache versions order
+  - 214bb8e57 2023-02-22T19:30:13-08:00 Remove a closure function in statefulset e2e
+  - c63f44845 2023-02-23T03:25:17+00:00 change test names and address other comments
+  - b0b0959b9 2023-02-23T03:25:16+00:00 address comments
+  - d41302312 2023-02-23T03:25:16+00:00 update validation logic so completions is mutable iff completions is modified in tandem with parallelsim so completions == parallelism
+  - ba6fcf416 2023-02-23T09:35:56+08:00 add field-level warning for deprecated spec.externalID of node
+  - 3a76c95f8 2023-02-22T17:08:57-05:00 remove aws from e2e loadbalancer udp conntrack tests
+  - 16a15d0c4 2023-02-23T10:30:09+13:00 pending_eligible_endpoints.yaml
+  - 8a832d960 2023-02-22T19:36:05+01:00 golangci-lint: enable ginkgolinter
+  - 41f23f52d 2023-02-22T19:36:05+01:00 test: fix ginkgolinter issues
+  - 7bf999138 2023-02-22T18:43:38+01:00 Add metric for failed orphan pod cleanup
+  - 32ac4a958 2023-02-22T16:45:53+00:00 left over uncounted from tracking cleanup
+  - c4a2bb82d 2023-02-22T17:15:27+01:00 add SeccompProfile to Pod and Container accessors/mutators
+  - 13d25acdf 2023-02-22T16:03:18+00:00 Remove version check & 403 ignore
+  - d49bff855 2023-02-22T07:18:09-08:00 refine: the server-side http Request Body is always non-nil (#115908)
+  - 78c0018ca 2023-02-22T07:17:56-08:00 fix make verify (#115871)
+  - e4c25afa5 2023-02-22T13:51:01+00:00 Remove unneeded edit in error formatting
+  - b1980b2f6 2023-02-22T13:41:46+00:00 Update ExistsInDiscovery to ignore 404 & 403 errors in autoscaling utils framework
+  - c45fff589 2023-02-22T08:32:21-05:00 Optimize NodePortAddresses
+  - 0c2711bf2 2023-02-22T08:32:19-05:00 Make NodePortAddresses abstraction around GetNodeAddresses/ContainsIPv4Loopback
+  - d43878f97 2023-02-22T08:30:36-05:00 Put all iptables nodeport address handling in one place
+  - 00b41334b 2023-02-22T14:04:55+01:00 e2e: node: podresources: fix restart wait
+  - 92e00203e 2023-02-22T14:04:55+01:00 e2e: node: unify sample device plugin utilities
+  - 871201ba6 2023-02-22T14:04:22+01:00 e2e: node: remove kubevirt device plugin
+  - aa1a0385e 2023-02-22T13:49:13+01:00 e2e: node: podresources: internal cleanup
+  - bd73aee9d 2023-02-22T13:01:26+01:00 Add volume reconstruction metrics
+  - dfea1ae53 2023-02-22T16:29:26+08:00 add some ut for cronjob strategy and timezone in schedule
+  - d56218fb3 2023-02-22T16:00:17+08:00 add missed case of float types
+  - b84ba39a0 2023-02-22T16:55:15+09:00 run dummy command return status 0
+  - ac1c8aaed 2023-02-22T07:12:35+00:00 [KMSv2] update `kms_operations_latency_seconds` metric bucket range
+  - 443b1c6c2 2023-02-22T07:54:20+01:00 hack/tools: bump golangci-lint to v1.51.2
+  - b70d1377b 2023-02-22T13:36:16+08:00 Add test for Pod TerminationGracePeriodSeconds is negative
+  - 4bdc1364e 2023-02-22T13:36:15+08:00 Warn if the terminationGracePeriodSeconds is negative.
+  - 66f043f65 2023-02-22T10:02:54+08:00 kubeadm: skip ipv4 check if the cluster is using IPv6 address
+  - 177905302 2023-02-21T17:43:03-06:00 add integration tests for debug profiles general & baseline
+  - c9b8ad6a5 2023-02-21T22:40:25+00:00 [KMSv2] restructure kms staging dir
+  - 247299946 2023-02-21T22:05:02+01:00 Fix typo
+  - 191fe47b6 2023-02-21T20:35:54+01:00 Clean up FakeRecorder event emission
+  - 62742db16 2023-02-21T13:34:59-05:00 apiserver: fix APF tests, use T functions on the test goroutine
+  - 5292542b7 2023-02-21T09:42:40-08:00 kmsv2: add metrics for invalid_key_id_from_status_total
+  - 3bdd5ceae 2023-02-21T17:40:16+00:00 implement local kek generation and rotate based on status
+  - 2e2ef9b0e 2023-02-21T16:53:06+00:00 unit tests: Fixes kubeadm postupgrade failing unit test on Windows
+  - edc0455c5 2023-02-22T00:51:55+08:00 Improve performance of method haveOverlap
+  - 8373afef0 2023-02-21T16:42:37+01:00 Include annotations all the time
+  - 7a48c6e21 2023-02-21T16:29:38+01:00 Respond to review
+  - e36708c18 2023-02-21T09:08:00-05:00 api-machinery: add a rate limited request wait group
+  - 21adaa149 2023-02-21T14:55:03+02:00 logging migration of the ttlafterfinished
+  - 9fbc6f713 2023-02-21T12:33:03+01:00 Reuse generic watch tests for watchcache
+  - af85f410a 2023-02-21T19:30:27+08:00 Improve the performance of slice usage
+  - e1e07e34e 2023-02-21T16:50:10+08:00 Improve performance of method haveOverlap
+  - 692e7cd3b 2023-02-21T16:08:02+08:00 delete kubelet unused function
+  - 3db6cc5b8 2023-02-21T13:02:30+05:30 changes in NewValidator
+  - e33a4d656 2023-02-21T11:43:51+05:30 changes in NewValidator
+  - 02e609208 2023-02-21T11:24:39+05:30 made error nil
+  - d4a1bf83c 2023-02-21T05:41:16+00:00 cpuset: Convert Fatalf to Errrof in tests
+  - b536851fc 2023-02-21T05:40:54+00:00 cpuset: Add a few more test cases
+  - 62aed5de6 2023-02-21T10:40:40+05:30 [115783] Fix for windows kube-proxy: 'externalTrafficPolicy: Local' results in no clusterIP entry in windows node.
+  - 22d3f6785 2023-02-21T04:51:14+00:00 cpuset: Fix Parse() error message for n-k s.t. k<n
+  - b4fde8da8 2023-02-21T01:57:37+00:00 add cryptographic wearout for AES GCM transformer
+  - c6276cc2a 2023-02-21T10:32:40+09:00 Fix typo at most_allocated_test.go
+  - bcd148dff 2023-02-20T18:36:45-05:00 Generated: PDB health policy
+  - ebf54fc6e 2023-02-20T18:36:45-05:00 Changes to pdb healthy policy api docs
+  - a2c5863ad 2023-02-20T13:44:09+01:00 update distroless iptables to v0.2.1
+  - 58923c9f1 2023-02-20T12:16:32+01:00 Default to sandbox `Seccomp` field instead of `SeccompProfilePath`
+  - ba099644b 2023-02-20T11:00:12+01:00 Remove global framework variable
+  - 0c2136ab5 2023-02-20T09:52:39+01:00 Graduate `DownwardAPIHugePages` feature to stable / GA
+  - fd28f69ca 2023-02-20T08:15:45+01:00 Add e2e_node test for oom killed container reason
+  - a05b04ad9 2023-02-20T07:26:45+01:00 Remove un-used function
+  - 6c346e6cc 2023-02-20T09:10:51+03:00 Re-enable label selector
+  - 6e8a1beda 2023-02-20T09:10:50+03:00 Add integration test for diff --prune --selector
+  - 5e5c543b1 2023-02-20T13:14:31+08:00 Forcing the value of TerminationGracePeriodSeconds to 1 if it is negative
+  - 32495ae3f 2023-02-20T10:56:53+08:00 add lock in generate topology hints function
+  - 6ad09dc41 2023-02-19T18:25:17+01:00 Update unit-tests
+  - 32f806611 2023-02-19T18:25:13+01:00 Simplification and cleanup
+  - 8d63750c3 2023-02-19T18:25:07+01:00 Generic sets in netlink and utils
+  - 17e2c7d53 2023-02-19T18:25:02+01:00 Move variable closer to it's use
+  - 3325c7031 2023-02-19T18:24:56+01:00 Generic sets in ipset.go
+  - fbe671d3f 2023-02-19T18:24:51+01:00 Use generic sets
+  - 547db63bd 2023-02-19T18:24:45+01:00 Drop the IPGetter
+  - 10193062f 2023-02-19T21:26:43+05:30 undone last changes
+  - 7db787e97 2023-02-19T21:08:06+05:30 removed Validator.Validate Interface
+  - 84ff62130 2023-02-19T21:49:58+08:00 cleanup(controller): use IsSuperset to avoid interim slice
+  - 5049382a8 2023-02-19T13:09:21+01:00 Scdeny admission plugin: add warning on register
+  - a31820bac 2023-02-19T13:53:47+05:30 rebased
+  - 7cbf007e4 2023-02-18T20:44:10+09:00 Fix port number
+  - 411200db4 2023-02-17T23:18:46-08:00 generated files
+  - 72863f65d 2023-02-17T18:45:20-08:00 Graduate PodSchedulingReadiness to beta
+  - 26f95f475 2023-02-18T09:51:17+09:00 Fix arguments
+  - 9839ce96f 2023-02-17T16:38:10+01:00 Allow inclusion of annotations in channel events when using FakeRecorder
+  - 49af62e64 2023-02-17T14:21:24+04:00 client-go: change permissions of key
+  - 8bbd1a77c 2023-02-17T10:23:19+01:00 update go to 1.19.6 in publishing bot rules for active release branches
+  - ad55d0cbc 2023-02-17T17:13:35+08:00 Use context instead when cleaning up
+  - 014be8444 2023-02-17T17:10:38+08:00 Make sure resoruces will be cleaned up when initializing error
+  - 3cc99c5e7 2023-02-17T11:20:39+04:00 client-go: change permissions of GenerateSelfSignedCertKeyWithFixtures generated cert
+  - c94187743 2023-02-17T11:16:46+04:00 client-go: change permissions of directories and certs
+  - 4ecb4670c 2023-02-16T21:29:13-05:00 Remove unnecessary ETCD_UNSUPPORTED_ARCH for arm64
+  - 99d73dfae 2023-02-17T09:16:36+09:00 unit test not requiring priviledge
+  - 21e8d2958 2023-02-16T16:00:28-08:00 kubectl: add unit tests for kubectl debug profiles
+  - 195a55c84 2023-02-16T12:52:14-08:00 New openapi v3 testing file client
+  - dee494ece 2023-02-17T01:47:52+05:30 squashing without rebase
+  - 4101b7960 2023-02-16T06:47:33-08:00 kubectl: use pointer.Bool instead of deprecated pointer.BoolPtr
+  - 65230338a 2023-02-16T13:38:32+01:00 [go] Bump images, dependencies and versions to go 1.20.1
+  - 48b9f7bb6 2023-02-16T18:37:53+08:00 change unnecessary switch to if in metrics.go
+  - 501a7678b 2023-02-16T08:44:42+01:00 test/utils: avoid data race during parallel create
+  - 3d536bd14 2023-02-16T15:32:08+08:00 API docs: point to current docs instead of archived designs
+  - aa7b1766e 2023-02-16T07:27:08+00:00 cleanup(scheduler): move metricRecorder to metrics package
+  - f09eeaf10 2023-02-16T14:56:41+08:00 Validating the scheduling gate naming format
+  - bd0f7f8ee 2023-02-15T15:08:24-08:00 kmsv2: add metrics
+  - 9283429f2 2023-02-15T16:30:58-05:00 Remove checks for userspace proxy mode in e2e tests
+  - 51ae7265a 2023-02-15T20:57:31+01:00 restclient: revert metrics test to use old label
+  - 437c9d9ab 2023-02-15T20:08:13+01:00 Revert "restclient: rename "method" label to "verb""
+  - 7b823002f 2023-02-15T10:31:12-08:00 add 25s bucket
+  - 20b5205da 2023-02-15T09:17:41-08:00 use 10 seconds as the biggest bucket for webhook metrics otherwise charts will top out at 2.5s for webhook latencies
+  - 58ae44960 2023-02-16T00:49:28+09:00 Change etcd to agnhost
+  - 37caed0e1 2023-02-15T15:28:07+01:00 Graduate SeccompDefault feature to stable / GA
+  - 0e1139d02 2023-02-15T15:14:27+01:00 dra: avoid goroutine leaks from event broadcaster
+  - 20d7fa277 2023-02-15T15:12:19+01:00 e2e dra: fix resource limits in a mixed cluster
+  - 8442b450e 2023-02-15T14:04:10+00:00 node: topology-mgr: code optimization
+  - cf21dcef5 2023-02-15T13:59:56+00:00 node: topology-mgr: e2e: changes to validate admission latency metrics
+  - bc941633c 2023-02-15T13:59:47+00:00 node: topology-mgr: add metric to measure topology mgr admission latency
+  - 1d639085e 2023-02-15T15:21:42+05:30 storage/testing: Use Int64 method for pointers
+  - abe25e4eb 2023-02-15T04:19:34+00:00 CHANGELOG: Update directory for v1.27.0-alpha.2 release
+  - f8e00778d 2023-02-14T23:14:30-05:00 Update golang.org/x/net to v0.7.0
+  - f98944590 2023-02-14T22:14:37-05:00 Revert "Refactor fake versions of openapi client into testing subdir"
+  - c01fa8279 2023-02-15T11:13:21+08:00 Optimization on running prePreEnqueuePlugins before adding pods into activeQ
+  - 736720128 2023-02-14T16:34:04-05:00 increase expected fairness margin in TestDifferentWidths
+  - 532bb2288 2023-02-14T18:21:48+00:00 Move /proc/asound from defaultReadonlyPaths to defaultMaskedPaths (align with moby)
+  - be139f9bb 2023-02-14T10:09:58-08:00 feat: bump ReadWriteOncePod feature to beta
+  - f855c90c1 2023-02-14T10:09:58-08:00 chore: Update hostpath driver to v1.11.0
+  - 0e47d90dd 2023-02-14T10:09:57-08:00 test: e2e test for ReadWriteOncePod preemption
+  - ed98c1da6 2023-02-14T17:46:33+00:00 Fix legacy fallback stale for aggregated discovery
+  - 71ec5ed81 2023-02-14T07:19:31-08:00 resourcequota: use contexual logging (#113315)
+  - 326d4ce07 2023-02-14T23:30:27+09:00 Revert "Revert #114605: its unit test requires root permission"
+  - 4ae4266c9 2023-02-14T13:43:58+01:00 authenticator config: use static CA reader for OIDC CA
+  - bc70548c4 2023-02-14T20:08:11+08:00 Remove unused code
+  - f131cabfa 2023-02-14T12:11:37+01:00 test: use go-uber/goleak for strict leak checking
+  - a28385ebe 2023-02-14T10:05:35+01:00 Graduate KubeletTracing feature to beta
+  - 2d98d2412 2023-02-14T15:10:54+08:00 refine code
+  - 869da89ea 2023-02-13T17:43:01-08:00 Refactor fake versions of openapi client into testing subdir
+  - ceb37c3a5 2023-02-14T09:37:35+08:00 update node-local-dns to 1.22.18
+  - f5a69ffda 2023-02-13T14:53:29-08:00 feature(scheduler): won't run Score if PreScore returned a Skip status (#115652)
+  - f5095bf34 2023-02-13T14:39:38-08:00 kubectl debug: add netadmin profile
+  - 4d2611cf5 2023-02-14T09:00:44+13:00 Update ineligible endpoints yaml
+  - 27f4bcae5 2023-02-13T19:48:39+00:00 client-go/cache: update Replace comment to be more clear
+  - 50cfd6ca8 2023-02-13T19:11:21+01:00 Add uablrek in pkg/util/ipvs/OWNERS
+  - 673ea6af7 2023-02-13T18:50:29+01:00 Revert "add unit test for check unmounted behavior of Unmount"
+  - 6b34fafda 2023-02-13T09:19:29-08:00 Add ctx logging involved in KS startup (#115588)
+  - b62165f44 2023-02-13T18:06:59+01:00 Drop cp from the etcd images
+  - e7bd00b0b 2023-02-13T17:52:26+01:00 Revert "check umount result"
+  - d65262d1f 2023-02-13T11:16:39-05:00 Remove cgo dependency
+  - 7bcc3e00f 2023-02-13T14:59:56+00:00 client-go/cache: rewrite Replace to check queue first
+  - cd3e98b65 2023-02-13T14:59:44+00:00 client-go/cache: merge ReplaceMakesDeletionsForObjectsInQueue tests
+  - 0bf0546d9 2023-02-13T14:59:33+00:00 client-go/cache: fix missing delete event on replace without knownObjects
+  - 25d77218a 2023-02-13T14:41:08+00:00 client-go/cache: fix missing delete event on replace
+  - f69c1c474 2023-02-13T15:12:43+01:00 client-go: add an Error() function on Request
+  - 07fc074a6 2023-02-13T11:41:34+00:00 Revert "use kube-proxy defaults values for CI"
+  - f5b0d728c 2023-02-13T13:17:36+03:00 kubectl debug: Use restClientGetter instead cmd.Factory
+  - d66b33986 2023-02-13T13:17:31+03:00 kubectl debug: Initialize pod client and builder in complete
+  - 3ffdee7d2 2023-02-13T12:36:18+03:00 kubectl debug: Standartize add flag function
+  - 4e6d5dddf 2023-02-13T06:42:54+00:00 [KMSv2] Add kind cluster and encryption config for e2e
+  - b9e5f5ad2 2023-02-13T14:22:28+08:00 using const systemNodeRoleName instead of string system:node
+  - 3e760310b 2023-02-12T14:56:45+01:00 e2e: revise import restrictions
+  - a3405f35b 2023-02-12T20:50:39+09:00 Use predefined variable instead of duplicated string
+  - 244d7449c 2023-02-11T10:28:25+00:00 don't run loadbalancer tests on large environments
+  - 4f75949bc 2023-02-11T20:51:02+11:00 Ipvs: Add a new FlagSourceHash to "mh" distribution method.
+  - 826472c99 2023-02-10T16:54:31-08:00 test: e2e node shutdown test logging improvements
+  - e20d77bb7 2023-02-10T17:57:56-05:00 Disable unified build and static init optimization for tests
+  - ee2e1ff99 2023-02-10T22:12:34+00:00 implement service.Service interface and update localKEK generation
+  - 0c99212e7 2023-02-10T14:26:15-06:00 fix docker buildx check
+  - 80246e446 2023-02-10T11:03:05+01:00 Update staging modules and vendor dir with new code-generator version
+  - 634fb1b93 2023-02-10T11:01:37+01:00 Update client examples with generated apply configurations
+  - a6109241a 2023-02-10T11:01:37+01:00 code-generator: fix GOPATH unbound variable
+  - 65c09568d 2023-02-10T11:01:37+01:00 Add applyconfiguration-gen to code-generator tools.go
+  - 299f74c16 2023-02-10T11:01:35+01:00 code-generator: regen examples with apply configurations
+  - d2bd7d855 2023-02-10T10:59:35+01:00 Add applyconfiguration generator to code-generator script
+  - 3e2b26ce5 2023-02-10T10:20:20+01:00 e2e: revise complete report creation
+  - c40f9f8bb 2023-02-10T11:31:19+03:00 Add explicitNamespace into ignore list in debug unit tests
+  - e0fedec69 2023-02-10T10:21:30+03:00 (kubectl debug): Support debugging via files
+  - 711a98521 2023-02-10T07:18:57+00:00 kmsv2: add LocalKEKService
+  - d12b4d4c6 2023-02-10T14:59:40+08:00 kubeadm: show a warning message when detecting that the sandbox image of the container runtime is inconsistent with that used by kubeadm
+  - 82990268e 2023-02-10T14:46:15+08:00 kubeadm: remove the manual conversion from versioned cluster cfg to internal cfg
+  - 51089767a 2023-02-10T11:02:42+08:00 PodSecurity test: update registry from k8s.gcr.io to registry.k8s.io
+  - b6b00e65b 2023-02-10T02:28:39+00:00 logcheck.conf: ensure that kms and value/encrypt uses structured logging
+  - 1bdcd18bf 2023-02-10T09:51:26+08:00 close grpc server in test file to avoid goroutine leak
+  - 67f72d0e9 2023-02-09T16:37:32-08:00 Document risk of HTTP response body in probe failure msg
+  - 6db7496db 2023-02-09T23:57:07+00:00 [KMS] Use structured logging in value/encrypt
+  - 09e02052f 2023-02-09T20:09:41+00:00 Update k8s.io/utils to `a36077c30491`
+  - 49da8a1d4 2023-02-09T20:30:45+01:00 scheduler: promote pod resource metrics to stable
+  - de3b2d525 2023-02-09T18:51:37+00:00 [KMSv2] Add metrics for grpc service
+  - f72cf5c51 2023-02-09T17:26:27+00:00 [KMSv2] store hash of encrypted DEK as key in cache
+  - d35da348c 2023-02-09T09:18:22-08:00 Implement kubectl debug profiles: general, baseline, and restricted (#114280)
+  - 6a0a111bf 2023-02-09T17:11:10+01:00 Propose comment to standardize the reason field
+  - 85106dc32 2023-02-09T16:17:11+01:00 Allow SSH e2e node base64 key injection
+  - 5cce4bcca 2023-02-09T13:50:51+00:00 tests: Port kubelet tests to Windows
+  - 6ab8a8fbe 2023-02-09T09:37:44+05:30 Updated the change in registry
+  - 98f944f55 2023-02-09T02:45:02+00:00 Remove check for CSI driver running on node for CSI migration attach operations
+  - 7fe371a97 2023-02-08T13:58:45-08:00 test: Simplify NPD start timestamp calculation
+  - c6aa6e500 2023-02-08T22:44:07+01:00 apiserver/util/proxy: Improving test coverage
+  - cb4637b37 2023-02-08T19:50:02+01:00 getHost and getHostname have documentation swapped for IPv6
+  - 75da0cc91 2023-02-09T06:49:27+13:00 Migrate apiserver to registry.k8s.io
+  - 732b6e305 2023-02-08T21:09:48+05:30 promote CSINodeExpandSecret feature to Beta
+  - 544456608 2023-02-08T14:40:04+00:00 Split run controllers per controller-manager
+  - 1e8cc4b4a 2023-02-08T08:26:10-05:00 update IPTablesOwnershipCleanup to beta
+  - 019d2615a 2023-02-08T11:12:22+08:00 archived design proposals are now moved to Design Proposals Archive Repo.
+  - 69808b74e 2023-02-07T17:33:32-08:00 Remove obsolete GKE local SSD test
+  - b29f618ca 2023-02-07T15:57:05-08:00 generated: ./hack/update-vendor.sh
+  - 7106d42a2 2023-02-07T18:03:58-08:00 avoid deepcopying schemas.
+  - 999e9f14f 2023-02-08T11:55:44+13:00 remove conformance tested endpoints
+  - feed8c683 2023-02-07T13:53:28-08:00 Enforce nodeName cannot be set along with non empty schedulingGates
+  - b6318d4e5 2023-02-07T13:14:27-08:00 kubectl/pkg/drain: Include namespace in evictPods return error
+  - 99154b166 2023-02-07T21:37:31+08:00 fix concurrent-map-write of FakeOS.Create
+  - 456de495e 2023-02-07T12:41:36+00:00 Calculate more precise usage for replicas
+  - 60401d35d 2023-02-07T14:19:34+03:00 flaky test wait.sh: Add deployment assertion before running wait
+  - 83e9565dc 2023-02-07T16:13:14+05:30 [#115501] Unit testcase for the fix for issue with missing Loadbalancer policies for IPV6 endpoints in Dualstack mode.
+  - 69e50cabd 2023-02-07T18:24:31+08:00 kubeadm: fix a bug where the uploaded kubelet configuration in kube-system/kubelet-config ConfigMap does not respect user patch
+  - 5e1f440d0 2023-02-07T13:01:41+05:30 *: Fix linter warnings
+  - 9c31f14a7 2023-02-07T13:00:55+08:00 leaderelection: using le.clock for the time calculations
+  - 9d80516ab 2023-02-07T12:56:46+08:00 client-go: fix the wait time for trying to acquire the leader lease
+  - 7eb7c8b4f 2023-02-06T18:56:51-08:00 adaptor between structral and OpenAPI.
+  - 754cb3d60 2023-02-06T20:34:49-05:00 kubelet/client: collapse transport wiring onto standard approach
+  - d2dd415f0 2023-02-06T14:27:57-08:00 Add option to limit the number of concurrent mkfs calls
+  - e9973979d 2023-02-06T16:20:34-05:00 Simplify construction of /metrics request
+  - 92c490f0b 2023-02-06T12:27:31-08:00 Added serialization from etcd error metric
+  - 3bb203e7e 2023-02-06T19:34:29+00:00 replace nodeipam custom logic by a workqueue
+  - 4f88332ab 2023-02-06T20:40:11+02:00 kubelet: prepare DRA resources before CNI setup
+  - 25389ee0e 2023-02-06T16:00:51+00:00 Add nodeSelector to e2e storage testing pods
+  - 136f89dfc 2023-02-06T15:39:13+01:00 e2e: use error wrapping with %w
+  - 9878e735d 2023-02-06T15:39:13+01:00 e2e pod: unit test for pod status + API error
+  - 1bd1167d5 2023-02-06T15:39:13+01:00 e2e pod: remove dead code
+  - 3bb735e6f 2023-02-06T15:39:13+01:00 e2e pod: use gomega.Eventually in WaitForRestartablePods
+  - 1e346c4e4 2023-02-06T15:39:13+01:00 e2e pod: convert ProxyResponseChecker into matcher
+  - c3266cde7 2023-02-06T15:39:13+01:00 e2e: consolidate pod response checking
+  - 89a5d6d8a 2023-02-06T15:39:13+01:00 e2e pod: use gomega.Eventually in WaitForPodNotFoundInNamespace
+  - 9df3e2a47 2023-02-06T15:39:12+01:00 e2e: replace WaitForPodToDisappear with WaitForPodNotFoundInNamespace
+  - 45d463106 2023-02-06T15:39:12+01:00 e2e: consolidate checking a pod list
+  - d8428c6fb 2023-02-06T15:39:12+01:00 e2e pod: use gomega.Eventually in WaitTimeoutForPodReadyInNamespace/WaitForPodCondition
+  - 01a40d9d6 2023-02-06T15:39:12+01:00 e2e framework: support getting list of objects
+  - 3dd185aa4 2023-02-06T15:39:12+01:00 e2e pod: use gomega.Eventually in WaitForPodsRunningReady
+  - afbb2c532 2023-02-06T15:39:12+01:00 e2e framework: turn function into gomega.Matcher
+  - 4d63e7d4d 2023-02-06T15:39:12+01:00 e2e: remove unused label filter from WaitForPodsRunningReady
+  - 8181f97ec 2023-02-06T15:39:12+01:00 e2e framework: include additional stack backtrace in failures
+  - 005a9da0c 2023-02-06T15:39:12+01:00 e2e framework: implement pod polling with gomega.Eventually
+  - 71dc81ec8 2023-02-06T15:39:12+01:00 e2e framework: gomega assertions as errors
+  - d17ce64ac 2023-02-06T15:39:12+01:00 e2e storage: remove WaitForPodTerminatedInNamespace
+  - 7f5ae1c0c 2023-02-06T12:08:22+01:00 Revert "e2e: wait for pods with gomega"
+  - 5fbd49c10 2023-02-06T17:47:44+08:00 using BuildOpenAPISpecFromRoutes instead of deprecated BuildOpenAPISpec
+  - 80d21e592 2023-02-06T09:06:29+00:00 parallelize node-controller
+  - 64cf942ce 2023-02-06T12:27:16+05:30 hack/tools: Bump golangci-lint version
+  - 773b45abc 2023-02-05T20:28:54-08:00 Add enablement/disablement unit test for StatefulSetStartOrdinal feature
+  - f573e1494 2023-02-04T11:05:22-08:00 Update k8s.io/utils to latest version
+  - bdd3e1d8c 2023-02-04T16:15:44+00:00 fake cloud provider don't lock emulating delay
+  - 4f7717842 2023-02-04T07:21:03+00:00 feature(scheduler): implement plugin_evaluation_total metric
+  - 039a84827 2023-02-03T23:04:45-08:00 test: Add e2e node test to check for unknown pods
+  - c2923c472 2023-02-03T23:04:35-08:00 test: Move waitForAllContainerRemoval() into node e2e util
+  - b9ddf07a7 2023-02-03T22:55:24+01:00 [go] Bump images, dependencies and versions to go 1.20
+  - c5774a703 2023-02-03T20:35:52+01:00 component-base: add ScrapeAndCompare wrapper
+  - 15b01af9c 2023-02-03T20:02:48+01:00 client-go: don't wait too long after EventBroadcaster.Shutdown
+  - b6c369f5c 2023-02-03T09:04:10-05:00 client-go: add metric to count retries
+  - 7bf175d5a 2023-02-03T05:26:29-08:00 Add integration tests for StatefulSetStartOrdinal feature (#115466)
+  - fd17dcf38 2023-02-03T13:40:33+04:00 fix: comment about permission bits
+  - 5eb6f82c1 2023-02-03T11:14:20+05:30 [Issue:#115501] Fix for issue with Loadbalancer policy creation for IPV6 endpoints in Dualstack mode.
+  - 1e4a032a3 2023-02-02T17:12:23-05:00 Add golang.org/x/lint to unwanted dependencies
+  - b517d640a 2023-02-02T18:21:39+00:00 small comment the ephemeral containers are not accounted for the QoS calculation
+  - 8b48ff358 2023-02-02T19:06:00+01:00 Don't explicitly set image version in tests
+  - c9944709b 2023-02-02T14:09:21+01:00 restclient: rename "method" label to "verb"
+  - f8ed80b58 2023-02-02T12:11:09+00:00 Add cici37 as API reviewer
+  - 5f81c3005 2023-02-02T14:52:45+04:00 client-go: make generating certificate/key permissions more secure (600)
+  - 6f2cd1b5b 2023-02-02T14:27:13+08:00 Update `pkg/controller/cronjob/` for contextual logging
+  - 5127cbf94 2023-02-02T12:09:18+08:00 kubeadm: backup kubelet config file for `upgrade apply`
+  - 9e6e13e56 2023-02-02T12:00:19+08:00 kubeadm: include the err got from `PrintDryRunFile`
+  - c55a98fde 2023-02-02T11:43:18+08:00 kubeadm: fix `invalid cross-device link` error
+  - 016cc0c12 2023-02-02T11:43:18+08:00 kubeadm:[cherry-pick]backup kubelet config for "upgrade node"
+  - 0ed74145f 2023-02-01T17:29:30-08:00 make CEL admission controller code consumable (#115412)
+  - fa66ec647 2023-02-01T17:03:30-05:00 Invoke gimme from kube::golang::verify_go_version
+  - f6bb29c2d 2023-02-01T16:34:23-05:00 Add gimme
+  - 7cc6b724a 2023-02-01T15:35:14-05:00 Defer builds to test-cmd and test-integration targets
+  - ac2101013 2023-02-01T11:13:20-08:00 add "object" type to list schema openapi
+  - 0c0f52431 2023-02-01T11:13:20-08:00 add openapi typeconverter
+  - 197683f34 2023-02-01T15:35:14+00:00 Fixed ConcurrentNodeSyncs option validation
+  - 0816394e6 2023-02-01T15:35:13+00:00 Renamed WorkerCount option in node controller to ConcurrentNodeSyncs
+  - ceb6a4ebf 2023-02-01T15:35:13+00:00 Changed flag name to node-controller-worker-count
+  - 528f41490 2023-02-01T15:35:13+00:00 Update staging/src/k8s.io/cloud-provider/options/nodecontroller.go
+  - 446b0051d 2023-02-01T15:35:13+00:00 Update staging/src/k8s.io/cloud-provider/options/nodecontroller.go
+  - fea0667c5 2023-02-01T15:35:13+00:00 Added workerCount flag to cloud controller manager
+  - c791d69b3 2023-02-01T13:48:07+00:00 Fix the nodeSelector key creation mechanism
+  - 9875c1b66 2023-02-01T13:48:07+00:00 Add integration tests for MultiCIDRRangeAllocator
+  - a7f658e44 2023-02-01T12:42:50+01:00 test/integration: fix Broadcaster leak
+  - 113355a5a 2023-02-01T15:21:45+08:00 loosen check rules for ingress creation
+  - 3f8ada67c 2023-02-01T10:47:38+08:00 impove the coverage
+  - 225658884 2023-01-31T17:36:10-08:00 test: Fix node e2e device plugin flake
+  - fabcc9195 2023-01-31T22:50:51+00:00 Ignore container events with nil PodSandboxStatus
+  - b2882ed8a 2023-01-31T14:28:17-08:00 Update generated
+  - a3291a87d 2023-01-31T13:34:13-08:00 test: Use preloaded busybox image in mirror pod test
+  - 83652673b 2023-01-31T11:38:49-08:00 test: Update runtime class detection logic
+  - 2a81337e7 2023-01-31T19:15:53+00:00 update prev succeeded indexes for indexed jobs unconditionally
+  - cdebd8891 2023-01-31T10:33:26-08:00 Document relationship between requests/limits
+  - 5b22b13f6 2023-01-31T17:13:23+00:00 Revert "Add integration tests for MultiCIDRRangeAllocator"
+  - 52e7bf58c 2023-01-31T23:55:09+08:00 cut avoid unnecessary code duplications
+  - 9518ca20a 2023-01-31T23:09:08+08:00 Add test for pkg/kubelet/util
+  - 222f65506 2023-01-31T13:01:39+01:00 e2e: use error wrapping with %w
+  - 5973e2c8c 2023-01-31T13:01:39+01:00 e2e pod: unit test for pod status + API error
+  - 901928cd5 2023-01-31T13:01:39+01:00 e2e pod: remove dead code
+  - f5782f1db 2023-01-31T13:01:39+01:00 e2e pod: use gomega.Eventually in WaitForRestartablePods
+  - 5d8e970be 2023-01-31T13:01:39+01:00 e2e pod: convert ProxyResponseChecker into matcher
+  - 3b579fca9 2023-01-31T13:01:39+01:00 e2e: consolidate pod response checking
+  - 4491c8007 2023-01-31T13:01:39+01:00 e2e pod: use gomega.Eventually in WaitForPodNotFoundInNamespace
+  - 6eea1b2ef 2023-01-31T13:01:39+01:00 e2e: replace WaitForPodToDisappear with WaitForPodNotFoundInNamespace
+  - ec753fcb5 2023-01-31T11:49:26+00:00 unittests: Fixes unit tests for Windows (part 6)
+  - 3e6b95429 2023-01-31T09:38:48+00:00 Making a run test.
+  - 27c8184e1 2023-01-31T22:09:42+13:00 Update Conformance metadata for e2e test
+  - 539d0a0f6 2023-01-31T20:47:51+13:00 Create APIService lifecycle e2e test
+  - 4740d34ed 2023-01-31T07:52:26+01:00 e2e: consolidate checking a pod list
+  - cd0c756c7 2023-01-31T07:52:26+01:00 e2e pod: use gomega.Eventually in WaitTimeoutForPodReadyInNamespace/WaitForPodCondition
+  - 5c1723d81 2023-01-31T07:52:26+01:00 e2e framework: support getting list of objects
+  - 671835e97 2023-01-31T07:52:26+01:00 e2e pod: use gomega.Eventually in WaitForPodsRunningReady
+  - b6ede21ff 2023-01-31T07:52:26+01:00 e2e framework: turn function into gomega.Matcher
+  - 3ebab68c8 2023-01-31T07:52:26+01:00 e2e: remove unused label filter from WaitForPodsRunningReady
+  - 1b5da1035 2023-01-31T07:52:26+01:00 e2e framework: include additional stack backtrace in failures
+  - e8a50b058 2023-01-31T07:52:26+01:00 e2e framework: implement pod polling with gomega.Eventually
+  - 0872e8d92 2023-01-31T07:52:26+01:00 e2e framework: gomega assertions as errors
+  - b3366ce89 2023-01-31T07:52:26+01:00 e2e storage: remove WaitForPodTerminatedInNamespace
+  - 71719a603 2023-01-30T21:27:59-08:00 test: Bump timeout for `runPausePod`
+  - 3d0894fab 2023-01-30T16:21:00-08:00 Fix failure(context canceled) in scheduler_perf benchmark (#114843)
+  - b3f326722 2023-01-30T23:18:14+00:00 chore: improves tests
+  - 7e19850f3 2023-01-30T17:01:45-05:00 Validate format of timeZone
+  - ca492a9b6 2023-01-30T16:24:02-05:00 client-go: add unit test for Request thread safety
+  - 203b91c48 2023-01-30T20:42:55+00:00 Add integration tests for MultiCIDRRangeAllocator
+  - a8f120b76 2023-01-30T19:35:41+00:00 Fix the delete flow for ClusterCIDR objects
+  - f0394dd6e 2023-01-30T19:16:10+00:00 Separate Put and Patch Options
+  - 06aff8a54 2023-01-30T11:08:16-08:00 apiextensions: SchemaHas predicate must be read-only/non-captured
+  - 7dea3409d 2023-01-30T11:07:52-08:00 apiextensions: Pool schemas in SchemaHas
+  - dbc7d8ded 2023-01-30T10:59:22-08:00 feat: support preemption for pods using ReadWriteOncePod PVCs
+  - a7c0467e0 2023-01-30T10:07:53-08:00 apiextensions: Benchmark escaping in SchemaHas
+  - c9fc35c49 2023-01-30T11:37:30-05:00 reword the warning that gets printed on external expansion
+  - 709748a34 2023-01-30T10:55:52-05:00 apiserver: remove 34s from DELETECOLLECTION rest handler
+  - ef0e9b5cf 2023-01-30T21:19:48+08:00 Add test for pkg/kubelet/util
+  - 2b980b8c0 2023-01-29T19:39:58+01:00 Extend example to contain --as==...
+  - 8ca97dcde 2023-01-29T22:48:27+08:00 Add test for pkg/kubelet/sysctl/allowlist_test.go
+  - b3af95cb8 2023-01-29T19:55:43+08:00 cleanup: simplify pickOneNodeForPreemption in preemption
+  - 04bdd5bd2 2023-01-29T17:44:02+08:00 Cleanup: improve some note for code
+  - a5d7f516d 2023-01-28T23:32:50-05:00 Avoid typechecking stdlib
+  - 0461c4807 2023-01-29T00:10:06+00:00 add aojea as approver for networking APIs: services/allocators, networking group, ...
+  - 894d4b4aa 2023-01-28T14:09:31+08:00 fsquota: only generate pod uuid is nil
+  - d1278a083 2023-01-28T02:50:32-03:00 Fix: Improves the log for failing tests in e2e/apps. Issue #105678
+  - 8c7f3c211 2023-01-28T03:14:57+00:00 Making a run test.
+  - f994ae252 2023-01-27T18:24:38-05:00 Move GetHostname() from k/k/pkg/util/node to k/component-helpers/node/util
+  - 32851bb31 2023-01-27T16:51:21-05:00 Add e2e for node expansion with missing staging path
+  - 69f04a2fc 2023-01-27T13:59:40-06:00 update comment to match implementation
+  - 3da2acc0d 2023-01-27T23:53:43+05:30 Generated: PDB health policy
+  - 167ff4964 2023-01-27T23:52:21+05:30 Promote pdb health policy to beta
+  - 90570b759 2023-01-27T17:24:00+01:00 etcd: Update to version 3.5.7
+  - b38214891 2023-01-27T10:53:00-03:00 Trim out suffix added to backing file path of loopback device
+  - 508cd6076 2023-01-27T11:33:05+01:00 dynamic resource allocation: avoid apiserver complaint about list content
+  - 452343367 2023-01-26T17:46:21-08:00 Enable ComponentSLIs as beta feature
+  - eb55e2b98 2023-01-26T17:46:21-08:00 Add e2e test for checking /metrics/slis endpoint for API server
+  - 71174aa2d 2023-01-26T18:00:10-05:00 Generate proto uncontainerized if host has required protoc version
+  - 028683efe 2023-01-26T18:00:09-05:00 Add missing proto path to kube::protoc::protoc invocation
+  - d49d98846 2023-01-26T18:00:09-05:00 Allow init.sh and protoc.sh to be sourced idempotently
+  - 3548e7feb 2023-01-26T18:00:08-05:00 Add helper script to install protoc
+  - 238e0226d 2023-01-26T18:00:06-05:00 Check protoc version strictly
+  - 1a428fd1f 2023-01-26T14:41:29-08:00 Fix konnectivity-client metric registration.
+  - 6d484dc03 2023-01-26T23:03:02+02:00 Refactor: cleanup node/storage tests
+  - f052ea3ec 2023-01-26T15:27:20-05:00 Set node_stage whenever available
+  - 24fb6b898 2023-01-26T12:14:14-08:00 use transformer to set gvk back
+  - fa0ead381 2023-01-26T20:41:51+01:00 remove unecessary comment changes
+  - 1e57dae5e 2023-01-26T14:39:05-05:00 Ignore error when we can't find plugin capable of expanding the volume intre
+  - 402fe4ec9 2023-01-26T14:25:00-05:00 use expansion without recovery if allocatedResource is not unset
+  - 68c542d52 2023-01-26T12:11:48-05:00 client-go: add test to document retry conditions
+  - b149b9318 2023-01-26T14:31:40+00:00 update codegen
+  - 2d5ceb9b1 2023-01-26T14:16:58+00:00 drop Enabled() checks for ServerSideFieldValidation feature gate
+  - e98853ec2 2023-01-26T14:44:24+01:00 etcd: Build image 3.5.7-0
+  - 6cb022ff4 2023-01-26T00:37:01-08:00 test: Update Host Exec to support node e2e
+  - d48dd100b 2023-01-26T14:44:16+08:00 add kube_apiserver_nodeport_allocator_* to improve observability of ServiceNodePortStaticSubrange
+  - c18c6e1b8 2023-01-26T14:44:04+08:00 allocate nodeport with offset
+  - 65513eac3 2023-01-25T16:22:00-08:00 add unfortunate deepcopy
+  - 3fb4edb25 2023-01-26T00:02:30+00:00 skip scale test for probes
+  - 15b63c380 2023-01-25T23:55:27+00:00 use a proper regex looking for the restartCount
+  - cb4bb03c6 2023-01-25T23:51:23+00:00 change the comment in CRI API to point to the correct logs directory
+  - 4804baa01 2023-01-25T22:50:32+00:00 kmsv2: implement expire cache with clock
+  - ea99593fa 2023-01-25T20:32:40+00:00 Fix panic on ClusterIP allocation for /28 subnets
+  - 12b894470 2023-01-25T13:28:03-06:00 kubelet: use custom dialer for grpc probes
+  - 5e2f12e94 2023-01-25T09:37:46-08:00 Fix nil pointer error in nodevolumelimits csi logging
+  - 72d96f61d 2023-01-25T12:58:38+00:00 Decrease target value for scale up tests in HPA
+  - 6a06b6355 2023-01-25T11:44:12+01:00 comment change from t.Fatal to panic
+  - aa1279b5e 2023-01-25T09:55:50+01:00 dependencies: update gomega to v1.26.0
+  - 74885d1a1 2023-01-25T08:49:05+01:00 logs: add logger.V(5).Info example
+  - 0a38a5e68 2023-01-25T08:45:12+01:00 logs: remove example of secret data
+  - a753466fe 2023-01-25T08:43:01+01:00 logs: add examples for Go flag and unit testing
+  - cff4d0758 2023-01-24T17:32:51-08:00 fix race in aggregated discovery handler
+  - b96290c08 2023-01-24T14:43:24-08:00 e2e node: Update runtime class handler skip logic
+  - c865a641d 2023-01-24T22:30:09+00:00 CHANGELOG: Update directory for v1.27.0-alpha.1 release
+  - 1554e50be 2023-01-24T12:51:29-08:00 fix integration test by working around #3030
+  - 096d2e589 2023-01-24T21:45:32+01:00 remove unwanted newlines
+  - 3b6c4d307 2023-01-24T17:48:57+00:00 Graduate field validation to GA
+  - 636f8e1a3 2023-01-24T17:55:32+01:00 chore: changes needed before #111155
+  - 6f3e5e30e 2023-01-24T14:58:37+01:00 logs: consolidate unit tests
+  - d627b1686 2023-01-24T14:58:19+01:00 logs: support standard flag.FlagSet
+  - 8f6fa99b4 2023-01-24T11:02:44+02:00 Skip failing Windows unit tests (volume)
+  - 7641ff754 2023-01-23T15:32:33-08:00 update kube-openapi
+  - a832d1dbd 2023-01-24T03:59:01+05:30 e2e/network_policy: using expected==observed as condition for polling in probeConnectivity function
+  - 96541d3e5 2023-01-23T18:53:46+00:00 increasing coverage from 75% to 95% for strategy.go for batch/job
+  - f45505d19 2023-01-23T18:30:58+00:00 Conformance tests for server side field validation
+  - 86b62b86d 2023-01-23T18:07:35+00:00 Extend checkpoint e2e test to check for results
+  - bc1103e45 2023-01-23T09:48:39-08:00 Set proto go_package: kubelet plugin register API
+  - 22ddeb02c 2023-01-23T09:40:26-08:00 Set proto go_package: kubelet deviceplugin API
+  - e4e26a7f0 2023-01-23T09:36:45-08:00 Set proto go_package: kubelet dynamic resource API
+  - a2603fdb8 2023-01-23T09:31:20-08:00 Set proto go_package: podresources API
+  - ab11d8a44 2023-01-23T09:31:19-08:00 Set proto go_package: kms API
+  - 60ffa47f4 2023-01-23T09:31:18-08:00 Set proto go_package: kubelet example_plugin_apis
+  - c3e0a0a0b 2023-01-23T09:20:12-08:00 Fix update-mocks to use better globs
+  - 345f41f8e 2023-01-23T10:14:46-05:00 Prime KMS v2 key ID inline with transformer construction
+  - 1d199db03 2023-01-23T09:44:21-05:00 Carefully compute request path for metrics
+  - cca3d557e 2023-01-23T14:43:29+01:00 Split volume reconstruction refactoring from SELinuxMountReadWriteOncePod
+  - 7601347d9 2023-01-23T14:40:56+01:00 cloud-provider: extend sample for JSON log format
+  - e9379b3b3 2023-01-23T14:40:30+01:00 cloud-provider: add more log options
+  - 1d79a191c 2023-01-23T14:24:29+01:00 hack: update logtools to v0.4.1
+  - bc6c7fa91 2023-01-23T14:24:29+01:00 logging: fix names of keys
+  - 771ab7488 2023-01-23T21:07:45+11:00 Always emit the stopped leading event
+  - 7229364f0 2023-01-22T15:22:55-08:00 Make generated-stable-metrics use git ls-files
+  - 6a49eae42 2023-01-22T15:21:37-08:00 Make update-netparse-cve use ls-files
+  - 822745512 2023-01-22T15:16:23-08:00 Make update-gofmt use ls-files
+  - 1671efe7a 2023-01-22T14:11:26-05:00 Do not use a global variable for etcdURL
+  - dbf178a8d 2023-01-22T16:57:41+00:00 add scale test for probes
+  - bfd8f5178 2023-01-22T16:57:41+00:00 use custom dialer for http probes
+  - d21f98c6f 2023-01-22T16:57:41+00:00 use custom dialer for tcp probes
+  - 1978008c8 2023-01-22T16:57:32+00:00 add custom dialer optimized for probes
+  - d901992ea 2023-01-22T10:33:33-05:00 Split out HealthCheckNodePort stuff from service/endpoint map Update()
+  - 597d52ac1 2023-01-21T17:46:22-08:00 Remove openapi files before regen
+  - 0a8f10249 2023-01-21T17:29:13-08:00 Codegen: use ls files and pre-remove gen'ed mocks
+  - 1c466a819 2023-01-21T16:51:25-08:00 Generate swagger from update-codegen
+  - 0ef664c27 2023-01-21T16:32:18-08:00 Call update-generated-protobuf from update-codegen
+  - ac2890df4 2023-01-21T15:17:47-08:00 Make protobindings gen a bit safer
+  - afae40286 2023-01-21T15:17:46-08:00 Add debug output for protobindings generation
+  - c8ce229e6 2023-01-21T15:17:45-08:00 Codegen: rm protobindings
+  - 4dae505d5 2023-01-21T15:17:42-08:00 Call update-proto-bindings from update-codegen
+  - a057f35c9 2023-01-21T15:17:14-08:00 Move update-generated-runtime into common script
+  - e0ecccff3 2023-01-21T15:17:13-08:00 Merge 5 fragile proto-bindings scripts into 1
+  - ac90c60cf 2023-01-21T11:39:27-08:00 Codegen: rm informer files before regen
+  - 9a11efa71 2023-01-21T11:39:09-08:00 Codegen: rm lister files before regen
+  - bb53ed4ff 2023-01-21T11:38:44-08:00 Codegen: rm client files before regen
+  - b852b3655 2023-01-21T11:38:17-08:00 Codegen: rm applyconfig files before regen
+  - 6aea6fe86 2023-01-21T11:31:04-08:00 Codegen: rm openapi files before regen
+  - 7f87ecfb9 2023-01-21T11:30:42-08:00 Codegen: rm conversion files before regen
+  - e149f79d4 2023-01-21T11:30:22-08:00 Codegen: rm defaults files before regen
+  - 3f0c3f33c 2023-01-21T11:30:05-08:00 Codegen: rm prerelease files before regen
+  - 07f7941de 2023-01-21T11:29:40-08:00 Codegen: rm deepcopy files before regen
+  - 870433739 2023-01-21T11:27:01-08:00 Codegen: rm generated proto files before regen
+  - 463153fb7 2023-01-21T14:25:08-05:00 Fix ContainsIPv4Loopback() to match its caller's behavior
+  - 53b24f4dd 2023-01-21T14:25:08-05:00 Improve GetNodeAddresses unit test
+  - fe49e3933 2023-01-21T14:25:07-05:00 Move GetNodeAddresses() and ContainsIPv4Loopback() into a new file
+  - b201c08ce 2023-01-21T11:22:39-08:00 Simplify find in codegen
+  - 04c80d0a2 2023-01-21T11:16:15-08:00 Simplify verify-codegen to use worktrees
+  - 7c262b901 2023-01-21T11:16:14-08:00 Set GOCACHE and GOMODCACHE
+  - 965d5d860 2023-01-21T11:16:13-08:00 Make boilerplate.py smarter about generated
+  - c66808333 2023-01-20T14:09:36-08:00 Don't generate clients for example internal APIs
+  - 841311ada 2023-01-20T14:15:51-05:00 apiserver: CVE-2022-1996, validate cors-allowed-origins server option
+  - 8fbcad461 2023-01-20T10:44:02-08:00 Call 'go install' instead of build.sh
+  - 66dfac3b1 2023-01-20T19:31:57+01:00 kube-proxy: support the logging feature gates
+  - 80606c895 2023-01-20T14:58:46+00:00 solve race on NewHTTPProxyHandler
+  - faee4c33d 2023-01-20T20:05:28+05:30 e2e/network_policy: using PollImmediate for intra pod connectivity probes
+  - bc0962ad8 2023-01-19T10:48:46-08:00 fieldmanager: Use unstructured rather than built-in types to remove dependency
+  - b969dfec9 2023-01-19T10:05:48-08:00 use typedinformer if available
+  - 0c495cb42 2023-01-19T10:05:48-08:00 use namespacedName for keys in fakeCompiler
+  - 577f3d8c9 2023-01-19T09:38:04-08:00 fieldmanager: Copy LastAppliedAnnotation to remove dependency on corev1
+  - 8d40ba73f 2023-01-19T09:37:20-08:00 fieldmanager: Move structured benchmarks to their own file
+  - fd83273fa 2023-01-19T17:04:21+00:00 CHANGELOG: Update directory for v1.24.10 release
+  - 510ac9b39 2023-01-19T08:09:24-08:00 kmsv2: use status key ID to update staleness of encrypted data
+  - 340db7109 2023-01-19T14:40:37+00:00 node: e2e: topologymgr: add tests for topology manager metrics
+  - 51c6a1fbe 2023-01-19T14:18:05+00:00 node: e2e: cpumgr: Rename: s/getCPUManagerMetrics/getKubeletMetrics
+  - 08210a1cb 2023-01-19T22:14:40+08:00 Generated files
+  - b64dcf862 2023-01-19T22:08:29+08:00 Fix the name violation in apiextensions.k8s.io/v1,CustomResourceConversion, remove the failures file
+  - 76785d07e 2023-01-18T23:59:55-08:00 update kubelet go.mod
+  - 01e1da77e 2023-01-18T23:38:20-08:00 Fix kubelet-plugin-registration to add missing dir
+  - 4e4850624 2023-01-18T23:38:18-08:00 Fix generated-pod-resources to add missing dir
+  - d6480dacd 2023-01-19T08:29:31+01:00 k8s.io/component-base/logs: match full help text in unit test
+  - 571582b5b 2023-01-19T14:42:26+08:00 apiserver: update serialization version priority for policy API
+  - 5c01971f2 2023-01-19T04:35:31+00:00 Bump konnectivity-client to v0.1.1
+  - 2aed699d8 2023-01-19T10:18:17+08:00 test images: Update CudaVectorAdd test image to support arm64
+  - 3b20a007e 2023-01-19T01:24:18+00:00 feature(InterPodAffinity): return Skip in PreFilter
+  - 8d4a91198 2023-01-19T00:46:46+00:00 CHANGELOG: Update directory for v1.25.6 release
+  - 17422ff5c 2023-01-18T16:06:33-08:00 Use proper tmp directory for update-openapi-spec.sh (#115106)
+  - 9a491f79a 2023-01-18T15:00:55-08:00 Fix apiserver example2 to update gen'ed protobufs
+  - dc88f34ce 2023-01-18T14:54:22-08:00 Remove obsolete generated listers
+  - 37ca6b0fa 2023-01-18T14:54:21-08:00 Remove obsolete generated applyconfigs
+  - e127fffea 2023-01-18T14:54:20-08:00 Remove deprecated generated clients
+  - 95bf7b0af 2023-01-18T14:50:22-08:00 Don't generate clientset/doc.go in client-gen
+  - f95a840c1 2023-01-18T14:50:21-08:00 Fix client-go doc.go - not generated
+  - 01e0f784e 2023-01-18T21:37:46+00:00 CHANGELOG: Update directory for v1.23.16 release
+  - c5f044ca9 2023-01-18T21:00:18+00:00 CHANGELOG: Update directory for v1.26.1 release
+  - f61c4245c 2023-01-18T18:31:50+00:00 vendor: removed unused dep github.com/elazarl/goproxy
+  - 6bdb8ed56 2023-01-18T18:31:50+00:00 switch spdy round trip tests to simple http proxy
+  - be44d6756 2023-01-18T16:52:45+01:00 Re-use common parts between getNextScheduleTime and nextScheduledTimeDuration
+  - 4aec2b8b7 2023-01-18T10:50:12-05:00 Move KEP-3453 MinimizeIPTablesRestore to beta
+  - b9bc0e5ac 2023-01-18T10:50:12-05:00 Ensure needFullSync is set at iptables proxy startup
+  - 95051a63b 2023-01-18T10:00:47-05:00 wait: Use a context implementation for ContextForChannel
+  - 4add08dcc 2023-01-18T14:45:54+01:00 k8s.io/component-base/logs: relax flagset unit tests
+  - cb491a8d0 2023-01-18T13:40:23+01:00 Cleanups in controller utils
+  - 4df989d71 2023-01-18T14:18:41+02:00 Skip failing Windows unit tests
+  - bef16e817 2023-01-18T12:20:33+01:00 Fix lint errors at local-up-cluster.sh
+  - 6adf60fdf 2023-01-18T03:12:34-08:00 Do not create endpoints if service of type ExternalName (#114814)
+  - c25095b22 2023-01-18T18:50:15+08:00 the AdvancedAuditing featuregate has been GA since v1.12, and is locked to ture in v1.27
+  - 89539e80d 2023-01-18T11:15:38+01:00 Fix lint errors at local-up-cluster.sh
+  - be4b3c5ab 2023-01-18T10:58:41+01:00 Use proper mktmp command in local-up-cluster.sh
+  - d83c37c31 2023-01-18T13:24:40+05:30 Update CNI version to 1.2.0
+  - 2adb95c37 2023-01-18T10:49:12+08:00 Add linter to check if api docs match field tag names
+  - 84b226409 2023-01-17T18:02:41-08:00 Refactor validation files into openapi/validation
+  - ecd267d09 2023-01-17T16:26:18-08:00 fix bug with param controllers being removed if used by more than one policy
+  - 172c55d31 2023-01-17T17:50:29+00:00 node: topologymgr: add metrics about admission requests and errors
+  - a26174155 2023-01-17T17:22:24+00:00 Rename enum integration test
+  - 7a41b950c 2023-01-17T12:09:24-05:00 Fix shadowing lint error
+  - 8251a6326 2023-01-17T17:32:50+01:00 k8s.io/component-base/logs: unit test for command line help output
+  - 121088cb2 2023-01-17T10:42:55-05:00 bump honnef.co/go/tools to support go1.20
+  - 2f0eb543c 2023-01-17T10:21:42-05:00 New function for creating missing pvcs
+  - 8924b58e2 2023-01-17T10:21:42-05:00 Cleanup statefulset after e2e test
+  - 392cd5ce8 2023-01-17T10:21:42-05:00 Make e2e test not rely on local volumes
+  - 3cf636b22 2023-01-17T10:21:41-05:00 PR feedback
+  - e6a90aa48 2023-01-17T10:21:41-05:00 PR feedback
+  - c1cc18ccd 2023-01-17T10:21:41-05:00 Automatically recreate pvc when sts pod is stuck in pending
+  - 1dfe2225a 2023-01-17T08:39:15-05:00 wait: Make WaitFor and WaitForContext private
+  - 3d3da44e9 2023-01-17T13:39:35+01:00 Wait for logs pod to complete before counting lines
+  - b9c244956 2023-01-17T11:23:19+01:00 Rework createSELinuxMountPreHook to switch()
+  - d2bb866d3 2023-01-17T11:22:39+01:00 Remove useless Sprintf
+  - de4ce7b58 2023-01-17T11:22:12+01:00 Remove defer
+  - a41424d4c 2023-01-17T10:25:57+01:00 k8s.io/component-base/logs: allow overriding os.Stdout and os.Stderr
+  - 9b86f457e 2023-01-17T10:25:54+01:00 k8s.io/component-base/logs: support changing verbosity of JSON output
+  - 8881b7182 2023-01-17T10:20:59+01:00 k8s.io/component-base/logs/json: fix package name
+  - b7701b00e 2023-01-17T10:05:16+01:00 apiserver/kmsv2: mv Service interface into kmsv2
+  - e89547d30 2023-01-17T09:24:31+01:00 Check for all errors in CRI connection validation
+  - ae574993c 2023-01-17T10:13:21+08:00 cleanup(kubectl-e2e): remove invalid comments
+  - 34bfdc363 2023-01-16T14:57:57-05:00 wait: ExponentialBackoffWithContext should take context-aware fn
+  - 3b18e80fb 2023-01-16T21:43:36+08:00 delete unused functions in pkg directory
+  - b45f0a8de 2023-01-16T21:29:43+08:00 move kubectl log e2e to new file & add e2e test for kubectl default container annotation
+  - 79b799a0f 2023-01-16T21:19:11+08:00 delete unused functions in pkg/volume directory
+  - a8173eded 2023-01-16T20:00:49+08:00 delete unused functions in pkg/kubelet directory
+  - ea46c9186 2023-01-16T11:11:58+01:00 kubeadm: promote member after the static pod manifest was written
+  - 488b34eeb 2023-01-16T17:22:35+08:00 delete unused functions in pkg/util directory
+  - 6af5bf058 2023-01-16T09:12:30+01:00 e2e: enhance tests that check for pod staying pending
+  - 6b5f77b16 2023-01-16T09:05:37+01:00 e2e framework/pod: add gomega matchers
+  - 17eba2b2f 2023-01-16T09:05:37+01:00 e2e framework/pod: add Get helper
+  - 63ab23200 2023-01-16T09:05:37+01:00 e2e framework: support polling with Get
+  - 22341590b 2023-01-16T09:05:37+01:00 e2e framework: add NamespacedName
+  - 1ec4c7a41 2023-01-16T09:05:36+01:00 e2e framework: add test case for early abort of pod polling
+  - 610b67031 2023-01-16T13:29:07+05:30 cacher: Fix watch behaviour for unset RV
+  - a120e7380 2023-01-16T15:21:30+08:00 cleanup kubectl describe cronjob v1beta1
+  - 259367133 2023-01-16T12:48:43+05:30 cacher: Allow injecting errors for Watch()
+  - 063bcfb1f 2023-01-16T11:19:51+05:30 update changelog approver and reviewers for v1.27
+  - 11e5e92dc 2023-01-16T13:45:35+08:00 Fix bug in reflector not detecting "Too large resource version" error before 1.17.0
+  - 70e56fa71 2023-01-15T21:15:01+08:00 cleanup: EphemeralContainers feature gate related codes
+  - d9b98bc36 2023-01-14T16:13:24-05:00 Update to new release of moby/ipvs
+  - 91b3a81fb 2023-01-14T14:50:09-05:00 cache: Reflector should have the same injected clock as its informer
+  - 29086e2b0 2023-01-14T21:15:50+08:00 use klog instead of klog.V(0)
+  - 2ba4c00b3 2023-01-14T15:29:54+08:00 hasAnyNodeConstraint
+  - 63f109e14 2023-01-13T15:31:05-08:00 use --null instead of -Z in grep invocation
+  - 41817b188 2023-01-13T23:15:53+00:00 optionally ignore preferred terms of existing pods unless incoming pod has inter-pod affinities
+  - 5f59f4498 2023-01-13T14:52:38-08:00 refactor admission controller to avoid contention
+  - 7938631e2 2023-01-14T00:11:49+02:00 Revert "UpdateOrCreateToken get secrets err handling optimization"
+  - 4c74fc0a6 2023-01-13T16:20:14-05:00 run ./hack/update-vendor.sh
+  - a7de3e15a 2023-01-13T16:20:14-05:00 apiserver: use the identity value in the apiserver identity hash
+  - fb066a883 2023-01-13T15:37:22-05:00 apiserver: update lease identity prefix from kube-apiserver- to apiserver-
+  - 423539cf9 2023-01-13T15:37:22-05:00 test/integration/controlplane: add new apiserver identity test TestLeaseGarbageCollectionWithDeprecatedLabels
+  - 3da0f1809 2023-01-13T15:37:22-05:00 apiserver: update lease label key to apiserver.kubernetes.io/identity
+  - 3833c0c34 2023-01-13T18:28:44+01:00 PodGC should not add DisruptionTarget condition for pods which are in terminal phase
+  - 31c755194 2023-01-13T10:01:44-07:00 pause: remove obsolete Windows buildx workaround
+  - 4890928b7 2023-01-13T16:48:35+00:00 tracking with finalizers is the default way for the job controller
+  - 3a838033f 2023-01-13T16:39:18+00:00 Update SyncJob with PodControllerError updates in job unit tests
+  - 7065b42bb 2023-01-13T16:48:15+01:00 Fix the job controller unit test for enforcing ActiveDeadlineSeconds
+  - 950c147db 2023-01-13T22:19:39+08:00 apiserver: update serialization version priority for flowcontrol API
+  - a9d92bcb2 2023-01-13T08:27:42+00:00 remove unuse code in pkg/kubelet/util
+  - d13b40530 2023-01-12T13:32:54-08:00 fieldmanager: remove dependencies on internal
+  - 07a1bc5b3 2023-01-12T16:25:00-05:00 Update warnings for removed in-tree plugins
+  - 5a1091d88 2023-01-12T21:00:22+00:00 Fix N^2 startup for webhook configurations
+  - 63982fc1f 2023-01-12T18:06:14+01:00 Display generated config file locations on successful local-up-cluster.sh execution
+  - 8338deb4e 2023-01-12T17:18:25+01:00 update publishing rules to use go1.19.5
+  - af1f6a230 2023-01-12T17:11:52+01:00 Make seccomp annotations non-functional
+  - fd8d92a29 2023-01-12T20:34:10+05:30 pkg/controller/job: re-honor exponential backoff
+  - 457537a21 2023-01-12T14:57:38+01:00 Make tmp dir configurable and dynamic at local-up-cluster.sh
+  - 69b853fa3 2023-01-12T08:18:18-05:00 kubectl: use v2 for hpa
+  - e6591d24c 2023-01-12T20:50:02+08:00 when UpdateOrCreateTokens get secrets, if the error is not a NotFound, the error is thrown in time
+  - eb38f1508 2023-01-12T13:43:57+01:00 releng: Update images, dependencies and version to Go 1.19.5
+  - c31cc5ec4 2023-01-12T15:08:56+05:30 vclib: Modify x509.UnknownAuthorityError unwrap check
+  - e15cdb351 2023-01-12T15:08:56+05:30 vsphere: Adapt to govmomi version bumps
+  - 8b064fa4b 2023-01-12T15:08:45+05:30 *: Bump version of vmware/govmomi
+  - 3df577ea2 2023-01-12T12:30:30+08:00 kubeadm: remove unused variable DefaultAuditPolicyLogMaxAge
+  - cb6a1886c 2023-01-12T11:20:41+08:00 use python3 in hack
+  - 765ef1783 2023-01-12T10:59:34+08:00 kubeadm: stop using of CRI endpoints without URL scheme
+  - a7b610c3b 2023-01-12T10:59:34+08:00 kubeadm: use the right methods for logging if no args are passing
+  - aae1f2a85 2023-01-12T10:59:34+08:00 kubeadm: `cri-socket` is not allowed for mixed configuration
+  - 8e3a02efa 2023-01-11T16:07:39-08:00 Remove AcceleratorUsageMetrics from kubelet
+  - a0916996d 2023-01-11T16:07:29-08:00 Update hack/unwanted-dependencies.json
+  - 761dd3640 2023-01-11T16:07:12-08:00 deps: Bump to cAdvisor v0.47.1
+  - 3c88de52c 2023-01-11T12:34:39-08:00 controller/nodelifecycle: Make monitorNodeHealth process nodes concurrently
+  - e11ea145e 2023-01-11T10:08:11-08:00 make structural type use OpenAPI lib.
+  - de4d55236 2023-01-11T13:23:46+01:00 Add bart0sh as a sig-node reviewer
+  - 8b8e20fcd 2023-01-11T11:48:07+01:00 Bump kube-openapi
+  - a887a3b4f 2023-01-11T02:11:44-08:00 Changed code to improve output messages on error for files under test/e2e/apps  (#109944)
+  - 0a7b2eeae 2023-01-11T15:05:49+05:30 Revert "Fix:[Flake] [sig-node] Restart [Serial] [Slow] [Disruptive] Kubelet should correctly account for terminated pods after restart"
+  - 437179afc 2023-01-11T09:32:21+01:00 Do not include scheduler name in the preemption event message
+  - 789915734 2023-01-10T20:05:41-08:00 fieldmanagertest: Reduce API surface of the test package
+  - 50bc46bd8 2023-01-11T08:08:25+05:30 changes to the fatal message generated
+  - 2f184814b 2023-01-10T17:37:18-08:00 Removes deprecated kubectl openapi column printing
+  - bf77290bb 2023-01-11T09:44:34+09:00 add unit test for check unmounted behavior of Unmount
+  - 70b414b0e 2023-01-10T17:13:27-05:00 encryption-at-rest: clean up context usage and duplicated code
+  - 9093f126b 2023-01-10T16:18:55-05:00 apiserver: refactor WithWaitGroup handler
+  - 21f2f746a 2023-01-10T19:29:27+01:00 event_broadcaster: update isomorphic event def
+  - f14cc7fdf 2023-01-10T12:53:16-05:00 CR conversion: protect from converter input edits
+  - 3af2c257e 2023-01-10T16:56:14+00:00 unit tests: Fixes kubeadm enforce requirements test
+  - 3b64cb5f1 2023-01-10T11:26:34-05:00 Include head and tail of clipped test messages
+  - 6dfaeff33 2023-01-10T14:52:54+00:00 Remove Legacy Job Tracking
+  - 0b22cb0b7 2023-01-10T09:43:35-05:00 Prevent CSIMigrationAzureFile gate from being disabled
+  - 94ae3cbc4 2023-01-10T09:30:47-05:00 Improve vendor verification works for each staging repo
+  - 368fd9d01 2023-01-10T22:03:33+09:00 check umount result
+  - d5b4644d2 2023-01-10T20:24:51+08:00 fix doc of types.go of network v1, v1alpha1, v1beta1
+  - 0424c4654 2023-01-10T11:36:45+01:00 e2e gcp: use timeout from f.Timeouts
+  - 34aa661ee 2023-01-09T22:43:06-08:00 Removes kube-openapi dependency from Patcher
+  - 75ff830ab 2023-01-09T20:53:48-08:00 Exports WarningPrinter field in DeleteOptions
+  - 0f186fd6d 2023-01-10T04:49:49+00:00 Fixes the issue #114145
+  - 58e7b97b4 2023-01-09T16:20:17-05:00 Disable multiple pv mount tests for vsphere intree driver
+  - cb1edc00e 2023-01-09T20:55:26+01:00 Revert "e2e storage: define local PersistentVolume tests in deterministic order"
+  - baf832d80 2023-01-09T20:54:58+01:00 dependencies: update ginkgo to v2.7.0
+  - ad65b25cc 2023-01-09T10:10:17-08:00 fieldmanager: Remove obsolete comment
+  - adfc65ec2 2023-01-09T10:10:17-08:00 Make internal managers private
+  - f79a34d26 2023-01-09T18:30:19+01:00 Do not leak cross namespace pod metadata in preemption events
+  - 0362c6785 2023-01-09T17:12:52+00:00 Fix SyncPastDeadlineJobFinished for enabling finalizer path
+  - d53af2278 2023-01-09T10:42:40-06:00 Use label selector for filtering out resources when pruning. Matches same behavior as for kubectl apply
+  - 0f9a8d38b 2023-01-09T17:29:35+01:00 e2e framework: configure poll interval+duration for gomega
+  - 16a6f70e1 2023-01-09T17:29:35+01:00 e2e: add PollInterval()
+  - db394db39 2023-01-09T17:29:35+01:00 e2e: move several timeouts from TestContext into TimeoutContext
+  - 4c1b95ddf 2023-01-09T10:53:19-05:00 Ensure job is up to date in informer cache in test
+  - 2b70384d4 2023-01-09T14:30:15+01:00 fix: applyconfiguration-gen fails on map to struct fields
+  - 03beb014f 2023-01-09T14:00:57+01:00 Update error context messages
+  - bdf58ce2e 2023-01-09T12:22:19+01:00 Adjust DisruptionTarget condition message to do not include preemptor metadata
+  - b721272a1 2023-01-09T09:54:10+01:00 test/OWNERS: add pohly as approver
+  - c6da60216 2023-01-09T09:54:10+01:00 OWNERS: remove sig-testing-approvers
+  - 26ddc948e 2023-01-09T16:14:39+08:00 add archived dependencies into unwanted-dependencies.json
+  - 61916050d 2023-01-09T12:26:16+08:00 update staging README.md
+  - 7f3de6e53 2023-01-09T09:29:22+08:00 fix a typo in pkg/proxy/ipvs/proxier.go
+  - befb7d4a6 2023-01-09T11:24:05+13:00 Promote SubjectAccessReview e2e test to Conformance
+  - e02168d29 2023-01-08T18:52:03+05:30 Implemented MarshalLog in namespacedname.go
+  - 1fcc8fbf5 2023-01-08T13:44:09+01:00 kubelet: Replace deprecated pointer function
+  - c242e647a 2023-01-08T13:14:37+01:00 pkg/apis: Replace deprecated pointer function
+  - e0f11d9c5 2023-01-08T11:23:26+08:00 kubeadm: fix gocritic lint errors
+  - 733d5695f 2023-01-08T11:13:16+08:00 always run filter in test
+  - 5411c0546 2023-01-08T10:49:35+08:00 save state data for reserve
+  - 5d99ad118 2023-01-07T23:46:02+08:00 kubeadm: update .import-restrictions
+  - 0abdf6abc 2023-01-07T22:30:16+08:00 revert check in filter
+  - 059d52053 2023-01-07T21:58:54+08:00 return skip
+  - de7c8db7c 2023-01-07T21:48:30+08:00 return skip
+  - 526b4b4ce 2023-01-07T15:45:45+05:30 Added fatalf for error handling
+  - 570c2d703 2023-01-07T08:46:35+00:00 cleanup(nodeaffinity): remove impossible scenario from test cases
+  - 498eaacf0 2023-01-07T14:13:15+05:30 staging/publishing: remove rules for 1.22
+  - 2ceadfe88 2023-01-07T11:31:46+08:00 Code refactor for readability
+  - 32c44b33e 2023-01-06T20:41:46-05:00 Enable all features during etcd storage path test
+  - 5533e49e2 2023-01-06T23:32:51+00:00 cpuset: Add package comment
+  - cbb985a31 2023-01-06T23:32:51+00:00 cpuset: Delete 'builder' methods
+  - f3829c4be 2023-01-06T23:32:51+00:00 cpuset: Rename 'NewCPUSet' to 'New'
+  - 768b1ecfb 2023-01-06T23:32:51+00:00 cpuset: hide 'Filter' API
+  - e5143d16c 2023-01-06T23:32:51+00:00 cpuset: Make 'ToSlice*' methods look like 'set' methods
+  - a0c989b99 2023-01-06T23:32:51+00:00 cpuset: Remove *Int64 methods
+  - 67a057d4f 2023-01-06T23:32:51+00:00 cpuset: Remove 'MustParse' method
+  - 824bd57ad 2023-01-06T23:32:50+00:00 cpuset: Convert Union arguments to variadic
+  - 95ade66cc 2023-01-06T18:27:03-05:00 kms gRPC test: wait until server is healthy
+  - c2bae4dfb 2023-01-06T19:42:13+01:00 Ipvs: remove the scheduler validation
+  - e55c9843a 2023-01-06T12:24:30-05:00 Regenerate openapi
+  - d0967bbe5 2023-01-06T12:24:29-05:00 Prune trailing newlines when enums are disabled
+  - d78de56d7 2023-01-06T12:24:18-05:00 bump kube-openapi
+  - 527b905aa 2023-01-06T18:03:41+01:00 cmd/kubeapiserver: Clean code, avoid unnecessary condition, avoid non-nil but zero-length slice
+  - 371b3b3be 2023-01-06T13:43:32+01:00 kmsv2: add grpc service
+  - e41b1bff5 2023-01-06T17:29:23+08:00 client-go: remove extensions psp only
+  - b7d7bd8da 2023-01-06T17:07:02+08:00 psp cleanup: make update all generated files
+  - 99d402e58 2023-01-06T17:07:02+08:00 remove psp api utils
+  - e0bc0693e 2023-01-06T17:07:02+08:00 registry/storage: remove psp support
+  - 25686a2c7 2023-01-06T17:07:02+08:00 remove psp in extensions api/apis
+  - cc0f82805 2023-01-06T17:07:02+08:00 kubectl: remove psp support
+  - e5b536755 2023-01-06T07:38:15+00:00 feature(scheduler): won't run Filter if PreFilter returned a Skip status
+  - ed18ab54b 2023-01-05T18:09:05-08:00 Avoid mutation of PVC in stateful set controller shared cache
+  - 01a5c23dc 2023-01-05T17:16:22-05:00 add deads2k to approvers for code-generator and sample-controller
+  - 124fd62ad 2023-01-05T20:19:33+00:00 fix path for not approved licenses
+  - 8a69d206a 2023-01-05T14:24:00-05:00 Fix 114661 via cel-go bump to 0.12.6 to pick up cel-go#620
+  - 9b64025f3 2023-01-05T10:31:57-08:00 rename 'PreemptionByKubeScheduler' to 'PreemptionByScheduler'
+  - 91742e239 2023-01-05T10:31:57-08:00 Enhanced logic to identify eligible preemption node
+  - a46cfe5d1 2023-01-05T18:43:58+01:00 test/e2e: Replace deprecated pointer function
+  - 9e885bce3 2023-01-05T18:38:40+01:00 test/integration: Replace deprecated pointer function
+  - b774c1fb1 2023-01-05T09:40:52-05:00 Fix verify-license cleanup
+  - 14d798d94 2023-01-05T15:24:07+01:00 staging/publishing: open up kms pkg for subs/utils
+  - cca7a205a 2023-01-05T21:30:26+08:00 remove kubeadm v1beta2 support
+  - e1f62a9bc 2023-01-05T13:15:32+01:00 Add multi-pod tests with SELinux mounts
+  - f166a5257 2023-01-05T11:48:05+01:00 pkg/apis: Replace deprecated pointer function
+  - dbee23f7a 2023-01-05T17:58:33+08:00 remove support for seccomp annotations when determining whether a container update should trigger a policy evaluation
+  - 2c205e291 2023-01-05T16:59:19+08:00 Distinguish unschedulable with unresolvable in scheduler
+  - 23f75bf40 2023-01-05T16:21:15+08:00 kubeadm: fix the nil pointer dereference in testcase
+  - d79535b7d 2023-01-05T15:53:04+08:00 Revert "Add link to to file"
+  - 1617b06c0 2023-01-04T20:14:44-08:00 Give TypeConverter to TestFieldManager
+  - 49732716d 2023-01-05T12:13:19+08:00 kubeadm: unittest might run as non-root
+  - 572360c5a 2023-01-05T09:10:57+08:00 Fix:[Flake] [sig-node] Restart [Serial] [Slow] [Disruptive] Kubelet should correctly account for terminated pods after restart
+  - 43a6eba33 2023-01-04T23:15:34+00:00 egress_selector.go: register konnectivity-client metrics.
+  - 9f07c8e34 2023-01-04T17:58:08-05:00 Revert "bump golang.org/x/oauth2"
+  - cafc791aa 2023-01-04T15:45:41-05:00 Fix verify-licenses script
+  - e13198ec6 2023-01-04T13:21:45-07:00 code-generator: refer to the API package for GV{R,K}
+  - fc9a140ba 2023-01-04T11:16:43-05:00 bump golang.org/x/oauth2
+  - d570ab8bc 2023-01-04T14:12:32+01:00 plugin/pkg/admission: Replace deprecated pointer function
+  - 2d4eefe93 2023-01-04T08:01:48-05:00 Update staging/src/k8s.io/sample-controller/README.md
+  - 575616cc7 2023-01-04T01:51:59-08:00 fix: kubelet event about unattached volumes is incorrect (#112719)
+  - e2d8fc3f6 2023-01-04T10:38:09+01:00 pkg/registry: Replace deprecated pointer function
+  - ce46ba7be 2023-01-04T10:58:55+02:00 kubelet podresource: fix GetAllocatableResources metrics
+  - bc4a13bd7 2023-01-04T16:28:42+08:00 remove heapster rule from system:controller:horizontal-pod-autoscaler clusterrole
+  - 080d4a2a9 2023-01-04T16:15:32+08:00 Fix this e2e failure causing Kubelet not to restart
+  - b3056ea9b 2023-01-04T12:19:15+08:00 remove the deprecated kubeadm v1beta2 API
+  - e8092cc88 2023-01-04T01:07:47+00:00 cleanup(scheduler_perf): remove all removed feature gates
+  - a7ab6b86d 2023-01-03T15:48:11-08:00 Hide OpeAPI details behind the NewTypeConverter
+  - 7df98deda 2023-01-03T20:23:29+00:00 Bump konnectivity-client to v0.0.35
+  - e98a28e5c 2023-01-03T14:08:57-05:00 Update doc about json tag is needed to generate informer externalverion package
+  - f0cc05354 2023-01-03T17:01:33+01:00 e2e framework: enable extending TimeoutContext
+  - f146b4287 2023-01-03T16:48:35+01:00 Licensing: skip modules with fewer subdirs than mods
+  - cdb0cd038 2023-01-03T16:31:13+01:00 e2e framework: simplify timeout defaults
+  - c3d0e8ff0 2023-01-03T15:06:06+01:00 Fix clearing rate limiter in disruption controller
+  - fe2b658ef 2023-01-03T09:03:49-05:00 Drop unused Endpoints-only tracking code in kube-proxy
+  - c78b057d8 2023-01-03T09:03:46-05:00 Port TestUpdateEndpointsMap from Endpoints tracker to EndpointSlice
+  - cc1847e6e 2023-01-03T09:03:34-05:00 Port TestLastChangeTriggerTime from Endpoints tracker to EndpointSlice
+  - 169604d90 2023-01-03T09:01:45-05:00 Validate single-stack --nodeport-addresses sooner
+  - e7ed7220e 2023-01-03T09:01:45-05:00 Explicitly pass IP family to proxier
+  - fb84c4f0f 2023-01-03T09:01:35-05:00 Fix kube-proxy dual-stack-iptables-binary-presence check
+  - e743a6d14 2023-01-03T14:35:35+01:00 Allow SecretReference.Name in PVs to have 253 characters
+  - 0b6e64181 2023-01-03T13:16:55+00:00 Fix normal request metric verb correctly
+  - 281a2bdd2 2023-01-03T20:07:20+08:00 fix a small log error about proxy
+  - 4702503d1 2023-01-03T15:00:12+08:00 update test case
+  - 49e7e8099 2023-01-03T14:33:58+08:00 Modify the return type of RunFilterPlugins to *Status
+  - fd60b9c49 2023-01-03T10:45:12+08:00 kubeadm: return the output from stdout and stderr
+  - 30c586a64 2023-01-02T20:01:26+01:00 Update test/e2e/autoscaling/cluster_size_autoscaling.go with suggestions
+  - 5636418f1 2023-01-02T16:22:11+01:00 e2e storage: define local PersistentVolume tests in deterministic order
+  - 10ca605cd 2023-01-02T21:04:43+08:00 chroe: add k8s node-role.kubernetes.io/control-plane taint
+  - 249f763c7 2023-01-02T10:00:01+00:00 Generate warning for EndpointSlice AddressType FQDN
+  - 6c957c063 2023-01-02T10:47:09+01:00 e2e storage: restore timeout behavior in "CSI NodeStage error cases"
+  - a2722ffa4 2023-01-02T10:47:00+01:00 e2e: replace WithTimeout with NodeTimeout
+  - 2ea105df6 2023-01-01T16:57:27-05:00 Drop unused EndpointsHandler / EndpointsConfig from pkg/proxy/config
+  - 3da93e1fe 2023-01-01T16:57:25-05:00 "Port" HollowProxy from Endpoints to EndpointSlice
+  - c1f74466e 2023-01-01T15:07:04+01:00 CHANGELOG-1.26: move OpenStack in-tree provider removal to urgent notes
+  - 71d44a934 2023-01-01T00:26:37+00:00 Refactors kubelet's plugin watcher
+  - 96e99f564 2023-01-01T00:18:31+00:00 tests: Ports volume unit tests to Windows (part 2)
+  - 886c4b0cf 2022-12-31T12:03:23-05:00 Drop Endpoints-tracking-specific TestEndpointsToEndpointsMap
+  - 29ea5076e 2022-12-31T12:48:50+00:00 refactor current ipallocator
+  - df7e4a943 2022-12-30T19:51:35-05:00 Belatedly port pkg/proxy/config Endpoints unit tests to EndpointSlice
+  - 8848f848d 2022-12-30T10:13:54+08:00 [ut] add test for pkg/probe/http/request.go
+  - 0ea029596 2022-12-29T16:24:58-05:00 Duplicate the "anti-martian-packet" rule in kube-proxy
+  - 305641bd4 2022-12-29T16:24:58-05:00 Add iptablesKubeletJumpChains to iptables proxier
+  - 37a8a2bda 2022-12-29T16:24:58-05:00 fix indentation of iptables dumps in some test cases
+  - 1870c4cdd 2022-12-29T16:24:58-05:00 Add a comment-only rule to the end of KUBE-FW-* chains
+  - 80384bbb5 2022-12-29T17:55:17+00:00 spelling mistake rectified
+  - 50ed17a66 2022-12-29T17:42:02+01:00 Changed remaining code to improve output for files under test/e2e/autoscaling
+  - f380ef8b6 2022-12-29T10:57:43+00:00 Misleading message when there are no metrics.
+  - b9987eeb6 2022-12-29T18:27:08+08:00 fix allDevices map data race
+  - 94ea99dab 2022-12-29T17:39:10+08:00 Remove duplicate fmt.Sprintf for logging
+  - a5790d5ca 2022-12-29T17:11:29+08:00 Do not log errors when ServiceHealthServer is closed normally
+  - 776bbbb32 2022-12-29T08:58:31+00:00 fix: tryUnmount with SafeNotMountedBehavior
+  - 997cefc9d 2022-12-29T14:50:18+08:00 add unit test
+  - cc4126a01 2022-12-29T11:16:51+08:00 use klog.InfoS instead of klog.V(0).Info-proxy part
+  - 266aa4be5 2022-12-28T08:23:50+00:00 fix typo
+  - 77e41786a 2022-12-27T10:34:44-08:00 simplify group-version-to-pkg-path()
+  - 160f015ef 2022-12-27T16:04:25+08:00 kubelet: add key encipherment usage only if it is rsa key remove allowOmittingUsageKeyEncipherment as it is always true
+  - b5c5913db 2022-12-26T17:17:33-08:00 Make verify-generated-swagger-docs use worktree
+  - 90e290e49 2022-12-26T17:14:58-08:00 Make verify-yamlfmt.sh use git worktree
+  - ff7ba89b1 2022-12-26T17:14:14-08:00 Make verify-mocks.sh use git worktree
+  - db1f27896 2022-12-26T16:24:16-08:00 make update: Use a shell array instead of string
+  - 5b17cd61a 2022-12-26T16:23:36-08:00 Remove dep on gengo
+  - 0cba4a197 2022-12-26T16:09:08-08:00 Cleanup codegen subproject scripts
+  - 709dadb89 2022-12-26T16:08:59-08:00 codegen: safer use of 'sort' and 'xargs'
+  - 6e0832a5a 2022-12-27T00:09:59+08:00 update comment
+  - 3ace3eb74 2022-12-26T23:15:21+08:00 certificates default to tolerate no key encipherment
+  - 666605498 2022-12-26T22:06:44+08:00 Replace deprecated pointer function
+  - 650b42ce3 2022-12-26T15:11:38+08:00 fix-typo
+  - 7c7d79b05 2022-12-25T14:20:55-08:00 Make the warning about pod name clearer
+  - 5ff705fd7 2022-12-24T10:21:27+01:00 proxy/ipvs: Describe and handle a bug in moby/ipvs
+  - 96306f144 2022-12-24T07:59:41+02:00 Set permissions on volume before publishing update
+  - ed3ebbaaa 2022-12-23T12:32:17-08:00 Remove TODO about API proxy checking for svc
+  - aa7a828f2 2022-12-23T14:56:59-05:00 cmd/get: Remove cmd argument from Run()
+  - 57b9656e2 2022-12-23T11:06:44-08:00 Remove old comments about IPv6 not being ready
+  - 8bcf26b57 2022-12-23T17:10:42+01:00 k8s.io/component-base/logs: fix usage through Go flag package
+  - 6f08ab013 2022-12-23T10:11:21-05:00 portforward: Add unit test to cover stopChan usage
+  - 68d78c89e 2022-12-23T14:19:28+01:00 use netutils.ParseIPSloppy
+  - dc86bdc3a 2022-12-23T13:23:02+01:00 Handle an empty scheduler ("")
+  - 90c03dcf9 2022-12-23T12:34:31+01:00 gofmt
+  - 4ef7726c4 2022-12-23T11:46:45+01:00 Remove obsolete test case
+  - 7800dabb6 2022-12-23T18:43:49+08:00 e2e: comment the known limitation of the `ProgressReporter`
+  - 4adc68727 2022-12-23T11:13:55+01:00 Fixed typo
+  - cf214d073 2022-12-23T10:54:51+01:00 Clean-up un-used code
+  - 0c2c027eb 2022-12-23T10:36:06+01:00 e2e: clean up listing
+  - 3bd375942 2022-12-23T10:14:47+01:00 gofmt
+  - b169f22eb 2022-12-23T10:11:15+01:00 Updates after rewiew
+  - af258c819 2022-12-22T19:00:29-05:00 e2e: Remove kubeadm-ism in DNS HostNetwork test
+  - cd15ca054 2022-12-22T20:36:53+01:00 proxy/ipvs: Check that a dummy virtual server can be added
+  - f8da9ab28 2022-12-22T19:53:35+02:00 kubeadm: return stored FakedServerVersion when dry-running
+  - 5f69c0462 2022-12-22T11:43:23-05:00 Add .go-version file containing build go version
+  - 4f02671b2 2022-12-22T17:13:41+01:00 proxy/ipvs: Remove kernel module tests
+  - e9b35e7a3 2022-12-22T11:36:07+00:00 gitattributes: json and yaml files LF line endings
+  - c0c925f6f 2022-12-22T12:04:22+01:00 Minor cleanup in cacher
+  - febf95cc4 2022-12-22T15:38:38+08:00 Stop Cache in scheduler when test tears down
+  - 27c5c0a16 2022-12-22T14:59:41+08:00 pv_list to prefilter
+  - 973f7c49b 2022-12-22T11:52:23+08:00 Fix CONNECT requests from others requests
+  - 8fe3e8df4 2022-12-22T10:44:01+08:00 e2e: bring back total test spec for `Ginkgo` v2
+  - 09f7d54d0 2022-12-21T17:54:07-05:00 Update 1.23 publishing go version to go1.19.4
+  - e13fc3701 2022-12-21T13:40:55-08:00 expose prometheus.Registerer so that we can hook into this from external sources
+  - badde798c 2022-12-21T15:16:53-05:00 Update 1.24 publishing go version to go1.19.4
+  - c8908716e 2022-12-22T01:22:34+08:00 Make handling scheduleResult more readable
+  - 407bd6a4a 2022-12-21T08:07:27-08:00 Revert "Add e2e tests for node log viewer" (#114636)
+  - a4ab559ba 2022-12-21T23:23:47+08:00 Improve performance of NodeResourcesFit scoring
+  - 4ff1c86f7 2022-12-21T12:04:49+01:00 kubelet/cloudresource: Improving test coverage
+  - 54b73deac 2022-12-21T11:49:59+02:00 kubeadm: handle dry run GET actions from fake discovery
+  - 26d4f2321 2022-12-21T10:46:13+01:00 Add atiratree as sig-apps reviewer
+  - 0f823b333 2022-12-21T08:23:29+00:00 fit typo
+  - cbbc8ec69 2022-12-21T08:45:27+01:00 Add microbenchmark for listing from watchcache
+  - 34de5fa73 2022-12-21T08:45:27+01:00 Explicit sorting in TestList storage test
+  - ef8c4fbca 2022-12-21T08:45:27+01:00 Reuse generic List test for watchcache
+  - a5698efff 2022-12-21T10:34:53+03:00 Ignore api-resources not found error until it's ready
+  - aaaee155d 2022-12-21T08:25:37+01:00 Fix lack of sorting of list results in watchcache
+  - da8d197a7 2022-12-21T08:25:37+01:00 Fix inconsistency in returning list results both in etcd3 and watchcache
+  - e09c1327b 2022-12-21T07:00:35+00:00 Making a run test.
+  - cbb6ea5ca 2022-12-21T07:55:07+01:00 e2e: remove deprecated SuppressProgressReporting
+  - 1c66b708e 2022-12-21T07:55:07+01:00 ginkgo-e2e.sh: remove deprecated --slow-spec-threshold
+  - 766e7e07d 2022-12-21T07:55:07+01:00 e2e framework: verify JUnit result, not the in-memory structs
+  - f6cdd3704 2022-12-21T07:55:07+01:00 e2e framework: move JUnit write function
+  - a53753575 2022-12-21T07:55:07+01:00 e2e framework: stop overriding ginkgo verbosity/progress
+  - 463d42aeb 2022-12-21T07:55:07+01:00 e2e framework: remove injection of failures and skips into GinkgoWriter
+  - f4a837aff 2022-12-21T07:55:07+01:00 e2e framework: avoid storing redundant failure message string
+  - 6db4b741d 2022-12-21T07:55:07+01:00 e2e: dump full report information
+  - 3333d5195 2022-12-21T08:34:31+08:00 Modifies receiver names for struct FakeProxier to make them the same.
+  - 6b443c230 2022-12-20T19:30:42+00:00 Add jefftree to OWNERS
+  - e50e8a0c9 2022-12-20T19:05:07+00:00 Resource claims should be a map type
+  - 132f8127a 2022-12-20T17:02:23+01:00 Fix wait test timeout
+  - 208c3868c 2022-12-20T21:29:24+05:30 job controller: refactored job controller to be able to inject FakeClock for Unit Test
+  - 0a4f582c8 2022-12-20T10:29:02-05:00 cloud-controller-manager: don't run cloud IPAM controller when cloud provider is not enabled
+  - 99d83fac3 2022-12-20T10:29:02-05:00 kube-controller-manager: don't run cloud IPAM controller when cloud provider is not enabled
+  - b0f38b223 2022-12-20T16:28:28+02:00 kubeadm: revert feature to backup kubelet config for "upgrade node"
+  - e3d0452bc 2022-12-20T11:39:18+00:00 store cloud-controller-manager logs
+  - f333e5b4c 2022-12-20T10:21:59+00:00 e2e NodePorts should be tested within the cluster
+  - 3b9dd0421 2022-12-20T14:37:41+05:30 Removed the reverted changes from Changelogv1.26
+  - 460f796bb 2022-12-20T07:56:27+01:00 e2e: fix ginkgo parameter setup
+  - b39e56b47 2022-12-20T07:56:27+01:00 e2e: fix ginkgo-e2e.sh with no arguments
+  - f3ef40043 2022-12-20T07:55:51+01:00 dependencies: update to ginkgo v2.6.1, gomega v1.24.2
+  - 329e76db2 2022-12-20T09:37:36+08:00 drop the api testdata for v1.24.0
+  - 0194705db 2022-12-19T12:44:04-08:00 Indicate that manual Namespace creation for local ingress scale tests is intentional
+  - 62b77b7c0 2022-12-19T12:43:59-08:00 e2e: Use framework helpers to create namespaces for webhook tests
+  - 369534c6e 2022-12-19T09:21:56-08:00 kubectl wait: wire generic context (#114574)
+  - 8e3e3479d 2022-12-19T17:31:30+01:00 Skip .metadata.manageFields when describing unkown resources
+  - e789beb21 2022-12-19T23:52:06+08:00 errMsg
+  - 62a2c10c6 2022-12-19T21:46:20+08:00 Add v1.26.0 API testdata
+  - 6b7c365f8 2022-12-19T16:16:53+03:00 Embed context deadline exceeded in error to let errors.Is can work
+  - e0a23577d 2022-12-19T13:14:02+00:00 pass context to gomega
+  - a51999e95 2022-12-19T13:53:08+01:00 e2e framework: support Ginkgo decorators for framework.ConformanceIt
+  - 4d7e2894b 2022-12-19T11:23:53+01:00 e2e storage: fix "Stress with local volumes [Serial] should be able to process many pods and reuse local volumes"
+  - 1bc24630d 2022-12-19T10:00:00+01:00 e2e scheduling: remove redundant stopCh
+  - 29d6d03a3 2022-12-19T10:00:00+01:00 e2e scheduling: fix scope of context.WithTimeout
+  - 692f8aab2 2022-12-19T12:45:17+08:00 fix kubelet crash, concurrent map iteration and map write
+  - 65eb7f1e0 2022-12-18T22:58:23-05:00 fixed error
+  - cdd84a28b 2022-12-18T22:45:58-05:00 Removed factory from apply command flag struct
+  - df49c9f56 2022-12-19T09:20:06+08:00 fix test order in controller/openapi/builder/builderst.go
+  - 8357eead0 2022-12-18T22:44:20+00:00 e2e node tains stop controller with context
+  - a00221ee5 2022-12-18T23:19:47+01:00 kubelet/nodestatus: Improving test coverage
+  - 5d8f745e8 2022-12-18T19:23:36+00:00 e2e dns don't fail if configmap does not exist
+  - e05e96bfd 2022-12-18T16:22:15+00:00 e2e kubect run tests
+  - 2296fc4b1 2022-12-18T16:10:15+01:00 e2e apps: fix "context canceled" error
+  - 02b6b6520 2022-12-18T16:10:15+01:00 e2e kubectl: increase wait timeout
+  - c1580e960 2022-12-18T13:57:41+00:00 e2e kubectl test cleanup
+  - 78cb3862f 2022-12-17T23:27:38-05:00 Fix indentation/spacing in comments to render correctly in godoc
+  - 1cfbc8768 2022-12-17T22:08:54+08:00 github.com/Microsoft/hcsshim to v0.8.25
+  - 21393f1b1 2022-12-16T23:26:28-08:00 Fixes prune for server-side applied objects
+  - 37f5da904 2022-12-17T12:40:15+08:00 kubeadm: remove nested loops for member promotion
+  - fcf89f66a 2022-12-16T18:02:59-08:00 Fix installDriverToCSINode(): we should not skip CSINode update if Allocatable.Count changed
+  - 5e8ca1830 2022-12-16T16:32:34-08:00 Add pod to dsw if termination is not completed during reconstruction #issues/113979
+  - f41cd1c3d 2022-12-16T16:27:01-05:00 update cri-tools to 1.26.0
+  - 8f62b9499 2022-12-16T13:08:08-08:00 cronjob: API warn when name is not DNS label
+  - fec8e721b 2022-12-16T13:07:42-08:00 job: API warn when name is not DNS label
+  - b65cec86e 2022-12-16T13:07:13-08:00 deployment: API warn when name is not DNS label
+  - 820e2fff0 2022-12-16T13:06:43-08:00 rs: API warn when name is not DNS label
+  - e27cf7509 2022-12-16T13:06:10-08:00 rc: API warn when name is not DNS label
+  - c555d290c 2022-12-16T13:05:17-08:00 pod: API warn when name is not DNS label
+  - 276c7e860 2022-12-16T13:01:02-08:00 Change DNS Label validation to check for dots
+  - e878bc17e 2022-12-16T12:54:52-08:00 Update pkg/serviceaccount/legacy.go
+  - 2f6c4f5ea 2022-12-16T20:14:04+01:00 e2e: use Ginkgo context
+  - 4fd09a06d 2022-12-16T10:45:35-08:00 lock LegacyServiceAccountTokenNoAutoGeneration
+  - bf1d1dfd0 2022-12-16T19:42:26+01:00 e2e storage: pass around topologyTest pointer
+  - 0852a4902 2022-12-16T10:34:17-08:00 graduate LegacyServiceAccountTokenTracking to beta
+  - f38ccc1d4 2022-12-16T18:00:44+01:00 Makefile: Add example of how to run integration tests and get code coverage report.
+  - b3deecfb1 2022-12-16T21:09:59+08:00 add etcd as learner mode and promote when fg EtcdLearnerMode is enabled - use etcd backoff to wait; still has many warning messages Signed-off-by: Paco Xu <paco.xu@daocloud.io>
+  - 1b804fc87 2022-12-16T11:54:05+00:00 Services API: warnings
+  - 94fd5bd55 2022-12-16T03:26:27-08:00 Skip resize if fs is readonly (#114325)
+  - 0d2952202 2022-12-16T17:02:28+08:00 kubeadm upgrade: fix dry run of backing up kubelet config file
+  - 16c813d9b 2022-12-16T08:30:45+00:00 Making a run test.
+  - 517df8f30 2022-12-15T13:23:59-08:00 defer Done call
+  - 0aecf6b3d 2022-12-15T12:02:27-08:00 Fix a regression that scheduler always go through all Filter plugins
+  - 247c23aba 2022-12-16T07:42:50+13:00 Create e2e test for SubjectAccessReview endpoints
+  - 2c702b0e7 2022-12-15T19:03:25+01:00 sig-node-reviewers: add endocrimes
+  - bd6a86471 2022-12-15T19:01:52+01:00 kubeapiserver/admission: Improving test coverage
+  - c5c58eb65 2022-12-15T09:33:47-08:00 StatefulSet validation needs to allow old names
+  - 9ca3d0ec1 2022-12-15T16:04:59+01:00 Address follow up comments from #109706
+  - ea251b560 2022-12-15T08:59:10-05:00 apiserver: refactor cors filter
+  - ae7327ab8 2022-12-15T08:59:09-05:00 apiserver: refactor cors unit test
+  - 4860b67b4 2022-12-15T17:57:45+08:00 kubeadm: replace Runtime.GOOS with go:build tag
+  - a3d00c15b 2022-12-15T11:43:50+08:00 Remove ExpandPersistentVolumes feature gate
+  - 8a9a294c9 2022-12-15T11:43:50+08:00 Remove ExpandInUsePersistentVolumes feature gate
+  - ba9dbe3a0 2022-12-15T11:43:44+08:00 Remove ExpandCSIVolumes feature gate
+  - cd1f08217 2022-12-15T10:16:36+08:00 kubeadm: backup the kubelet config file before writting the new one
+  - 3ad2ab18f 2022-12-14T17:51:35-08:00 pkg/kubeapiserver/options: Improving test coverage (#114234)
+  - b3aefb7ba 2022-12-15T08:43:01+08:00 Update kuberuntime_manager_test.go
+  - 3d33178da 2022-12-14T15:28:05-05:00 Start adding e2e for recovery from expansion failure
+  - 8100efc7b 2022-12-14T18:43:33+00:00 Enable propagration of HasSynced
+  - e46172014 2022-12-14T10:21:15-08:00 Fix issues in volumesnapshot test for ephemeral storage
+  - 5c6d8a939 2022-12-14T09:19:36-08:00 add int. test for CEL type resolution.
+  - 43ef87a26 2022-12-14T09:19:25-08:00 create OWNERS file for cel libs.
+  - 26089a4c9 2022-12-14T09:18:54-08:00 implement OpenAPI-based schema resolver.
+  - f2ee977af 2022-12-14T09:18:27-08:00 refit CEL typing library
+  - b47748103 2022-12-14T11:41:10-05:00 client-go: properly return error in fake discovery (#79612)
+  - a4e4cec28 2022-12-14T14:18:46+00:00 Bump github.com/aws/aws-sdk-go to v1.44.147
+  - 8818c215c 2022-12-14T13:56:31+01:00 win: fix cpu count to calculate cpu_maximum
+  - f236ab24d 2022-12-14T17:34:47+05:30 *: Make docs more accurate for the contention-profiling flag
+  - fdc03dd2f 2022-12-14T07:39:51+01:00 e2e kubectl: improve Gomega check
+  - 2695ed6a0 2022-12-14T07:39:51+01:00 e2e: add missing error checks
+  - 8168434f0 2022-12-14T07:39:51+01:00 e2e storage: explain why cleanup is done inside the function
+  - f30d1867e 2022-12-14T07:39:48+01:00 e2e storage: remove obsolete testCleanups
+  - 2501a46b8 2022-12-14T12:00:49+08:00 kubeadm: avoid CRI detection for phase subcommand when it's --cri-socket flag is not set
+  - 861db2348 2022-12-14T11:07:46+08:00 kubeadm: add feature gate EtcdLearnerMode alpha
+  - 899534625 2022-12-14T10:54:03+08:00 kubeadm: add chendave as kubeadm reviewer
+  - 8c7609fbe 2022-12-14T10:31:18+08:00 kubeadm: bump to use golang generic
+  - c95d5d514 2022-12-14T09:38:09+08:00 fix: remove ioutil for new go version
+  - 41e1435d9 2022-12-13T16:24:42-05:00 Remove [Disruptive] from Feature:SCTPConnectivity tests
+  - 4cee7197e 2022-12-13T16:24:40-05:00 Move two SCTP tests
+  - d9981065d 2022-12-13T16:22:06-05:00 Drop iptables-specific test from SCTP HostPort test
+  - c6cc05667 2022-12-13T16:21:12-05:00 Replace iptables-proxy-specific SCTP e2e test with a unit test
+  - 9e5d0828e 2022-12-13T15:54:55-05:00 use defercleanup in all the places
+  - beb7d6cff 2022-12-13T14:52:39-05:00 CRConverter: change to UnstructuredList
+  - 0976267f0 2022-12-13T14:46:28-05:00 Make empty unstructured check common
+  - 0bdcb93b0 2022-12-13T14:38:21-05:00 Create new conversion Factory interface
+  - 02f8c48f7 2022-12-13T14:38:05-05:00 Rename crConverterInterface to CRConverter
+  - 6dd94f566 2022-12-13T14:26:07-05:00 Refactor mock tests in different files
+  - a9f041038 2022-12-13T13:32:42-05:00 portforward: return error on lost connection to pod
+  - 7510afb72 2022-12-13T10:01:06-08:00 fix double lock and excercise its codepath in tests
+  - 9b8b37878 2022-12-13T08:37:39-08:00 tests Windows: Fixes test failures related to COMPUTERNAMEs being truncated
+  - 213a6edc5 2022-12-13T14:54:48+00:00 node: e2e: Add descriptive messages for operation/error checks
+  - 21c41e79e 2022-12-13T14:38:21+00:00 Skip tests if SSH not working Functions involves TestVolumeUnmountsFromDeletedPodWithForceOption need to check if SSH works.
+  - 0df49542b 2022-12-13T15:29:18+01:00 e2e framework: fix unit test flake
+  - 2dce194e1 2022-12-13T14:27:35+01:00 Replace os.exit in diff
+  - 454290c58 2022-12-13T14:05:48+01:00 cmd/kube-controller-manager/app/options: Improving test coverage
+  - 2b0372f87 2022-12-13T12:26:13+00:00 e2e loadbalancer test connectivity within cluster first
+  - 7071a8557 2022-12-13T20:23:08+08:00 fix:Optimize code for else logic
+  - 556d3fc2b 2022-12-13T18:13:16+08:00 clean up master-service-namespace
+  - ada7fd641 2022-12-13T17:47:29+08:00 The MinDomainsInPodTopologySpread feature gate will be enabled by default as a Beta feature
+  - c51ce945a 2022-12-13T16:59:17+08:00 kubeadm: add missing --cri-socket flag for upload-certs phase
+  - 9abe8d921 2022-12-13T14:26:10+05:30 Windows Kube-Proxy implementation for internal traffic policy.
+  - f132215ac 2022-12-13T12:46:58+05:30 Creating Ingress IP loadbalancer alone when all the endpoints are terminating. KEP1669
+  - d4729008e 2022-12-13T08:09:01+01:00 e2e: simplify test cleanup
+  - f28f40e52 2022-12-13T14:00:29+08:00 remove a flag check that was introduced in #112542; address several comments
+  - 214a0ee7b 2022-12-13T14:00:29+08:00 Migrate container runtime endpoint flag to config
+  - 6ca62eb2c 2022-12-13T11:36:12+08:00 refactor
+  - 1da46b2f2 2022-12-12T19:07:59-08:00 Unexport OpenAPIGetter factory method
+  - 4a7ab7fd7 2022-12-13T10:43:58+08:00 Verify that the key matches the cert
+  - 16fcb1c70 2022-12-13T09:56:36+08:00 optimise some code
+  - 3540f948e 2022-12-12T21:50:07+00:00 Update method name to make it more explicit
+  - 94a29efe2 2022-12-12T20:08:24+01:00 scheduler/internal: Improving cache and heap test coverage
+  - c6b29a0b0 2022-12-12T17:02:04+00:00 nrt-api: Update nrt-api go.mod and update vendor directory
+  - fa1f7470c 2022-12-12T16:48:32+00:00 nrt-api: Update publishing-bot rules.yaml
+  - 4ff3f0374 2022-12-12T16:48:32+00:00 nrt-api: Add doc.go
+  - 5c0a59953 2022-12-12T16:48:32+00:00 nrt-api: Add a symlink to the staging repo in vendor/k8s.io
+  - 65aadd740 2022-12-12T16:48:32+00:00 nrt-api: Bootstrap repo
+  - 2ee2137fc 2022-12-12T16:48:32+00:00 nrt-api: Add noderesourcetopology-api to list of staging repos
+  - 6df5827f1 2022-12-12T16:48:32+00:00 nrt-api: Add manifest directory for example manifests
+  - 5c4fdb7fe 2022-12-12T16:48:31+00:00 nrt-api: Add hack directory for generation of autogenerated code
+  - 8594b2271 2022-12-12T16:48:31+00:00 nrt-api: Indicate that PRs are not directly accepted to the repo
+  - bd8f4680b 2022-12-12T16:48:31+00:00 nrt-api: Add all mandatory template files to the staging repo
+  - 62e4d39c2 2022-12-12T16:31:40+00:00 node: e2e: address review comments (2022/12/12)
+  - d9f2cc0c9 2022-12-12T08:00:48-08:00 endpoints: remove obsolete ServiceSelectorCache
+  - 090c36027 2022-12-12T23:56:24+08:00 apiserver: cleanup unused StrategyExceptions
+  - c085031a8 2022-12-12T07:22:09-08:00 Update the godoc on the encryption config API on how to specify group/resources to be encrypted
+  - 3feea9db7 2022-12-12T17:16:12+02:00 tests: Add DaemonSet with LB rolling update test
+  - a9e3689e6 2022-12-12T14:50:36+00:00 node: e2e: ensure clean cluster state before e2e tests are run
+  - 7e880d1ba 2022-12-12T14:50:32+00:00 node: e2e: ensure log rotation pod is deleted after test
+  - 9fd15f1fa 2022-12-12T11:43:22+00:00 use TotalScore summarized in NodePluginScores
+  - 5c09ca57f 2022-12-12T11:30:07+01:00 e2e storage: remove context.WithCancel
+  - 896c6fa08 2022-12-12T11:30:07+01:00 e2e framework: add AnnotatedLocationWithOffset
+  - c466c4968 2022-12-12T11:30:07+01:00 e2e apps: avoid assertions in wait.Until callback
+  - 2168dd533 2022-12-12T11:30:07+01:00 e2e apps: capture expected state before making changes
+  - 7454c3ff8 2022-12-12T11:30:07+01:00 e2e metrics: remove incorrect comment
+  - 8c27313cf 2022-12-12T11:30:07+01:00 e2e storage: don't panic when server stops
+  - f897c8611 2022-12-12T11:30:07+01:00 e2e framework: support ignoring "not found" errors during DeferCleanup
+  - 73b60ba76 2022-12-12T11:30:07+01:00 e2e framework: don't fail when DumpAllNamespaceInfo is nil
+  - d0f558612 2022-12-12T09:34:35+03:00 use io instead ioutil
+  - 4699801d6 2022-12-12T09:18:27+03:00 Add unit test for error case
+  - fb3d9e3ac 2022-12-12T09:18:26+03:00 rollout restart: Change error message to more descriptive
+  - 5e8648b9f 2022-12-11T18:20:28-08:00 Refactor to simplify factory Validator
+  - 193149433 2022-12-12T01:26:42+00:00 make GetSubnetPrefix IP family agnostic
+  - dd0a50336 2022-12-11T13:48:31-08:00 ServiceInternalTrafficPolicyType: s/Type//
+  - d0e2b0685 2022-12-11T13:48:27-08:00 ServiceExternalTrafficPolicyType: s/Type//
+  - 2956bb39a 2022-12-11T15:34:17+00:00 don't assert error inside goroutines
+  - 4c60ee00a 2022-12-11T19:27:41+08:00 remove GA featuregates: CSIInlineVolume, CSIMigration, DaemonSetUpdateSurge, EphemeralContainers, IdentifyPodOS, LocalStorageCapacityIsolation, NetworkPolicyEndPort, StatefulSetMinReadySeconds
+  - 76bb3364d 2022-12-11T15:52:12+08:00 kubeadm: cleanup the temporary workaround about kubelet --container-runtime flag
+  - 40a6d6306 2022-12-11T13:09:39+08:00 autoscaling: advance v2 as the preferred API version over v1
+  - cdebf3a64 2022-12-10T23:54:13-05:00 Mark github.com/gorilla dependencies to avoid increasing use
+  - 450ba4f50 2022-12-10T16:32:02-08:00 Check the correct error in d.downloadAPIs
+  - a4e6fea16 2022-12-10T21:49:05+01:00 e2e: fix line numbering in unit tests
+  - 16f05373f 2022-12-10T21:47:17+01:00 e2e framework internal: normalize anonymous functions with parameters
+  - 0d73c0d0e 2022-12-10T20:35:46+01:00 e2e: fix linter errors
+  - df5d84ae8 2022-12-10T19:50:18+01:00 e2e: accept context from Ginkgo
+  - 530f65d6f 2022-12-10T09:43:01-08:00 Removes unnecessary dry run verifier
+  - 270141aa0 2022-12-10T13:36:12+01:00 cmd/kube-controller-manager/app/options: Improving test coverage
+  - ef6d9edea 2022-12-10T11:44:10+00:00 endpointslicemirroring handle endpoints with multiple subsets
+  - b76650565 2022-12-10T17:04:40+08:00 [UT]And test for pkg/probe/util.go
+  - 69fcde750 2022-12-10T11:45:56+09:00 Update daemonSet status even if syncDaemonSet fails
+  - b78af4c5c 2022-12-09T16:57:39-08:00 Split options from flags for annotate command (#112817)
+  - 90357e62d 2022-12-09T23:50:48+00:00 add help for cel metrics
+  - d3ad61aa0 2022-12-09T20:31:08+01:00 e2e apimachiner: simplify cleanup
+  - 306725978 2022-12-09T09:02:51+00:00 rotate-certificates is a GA feature now
+  - 536e5f096 2022-12-09T03:47:40+00:00 CHANGELOG: Update directory for v1.26.0 release
+  - c28b28725 2022-12-09T11:02:47+08:00 clusterroleaggregation: use contextual logging
+  - abd5eb9a2 2022-12-08T14:54:42-08:00 Removes unused k8s.io/kubectl/pkg/apply files
+  - 20b01afec 2022-12-08T21:10:54+00:00 CHANGELOG: Update directory for v1.22.17 release
+  - 948ab9175 2022-12-08T12:34:06-08:00 Fix FakeObjectCreater ignoring given gvk
+  - 9815cda4b 2022-12-08T18:58:33+00:00 CHANGELOG: Update directory for v1.23.15 release
+  - 4477bf02f 2022-12-08T18:00:55+00:00 CHANGELOG: Update directory for v1.24.9 release
+  - bdbc0eb20 2022-12-08T09:23:20-08:00 fieldmanager: Move TestFieldManager into its own package
+  - 933494ab8 2022-12-08T08:57:45-05:00 Check for initial kubelet certificates more frequently
+  - e34647582 2022-12-08T18:31:57+05:30 Migrate sample-controller to contextual logging
+  - 180b082c4 2022-12-08T15:41:43+08:00 Make the error messages in scheduler cache more precise
+  - ba6afe213 2022-12-08T15:21:24+08:00 Reduce redundant conversions
+  - 8129b7968 2022-12-08T08:18:37+01:00 staging: add DRA repo to list
+  - 8525cfab0 2022-12-08T15:02:19+08:00 Log spelling formatting
+  - 034292718 2022-12-08T13:28:24+08:00 remove enabled by default beta resources that have been removed
+  - 206669d2e 2022-12-08T10:33:17+08:00 fix msg in /test/e2e/apps/daemon_set.go
+  - 667599b0d 2022-12-07T16:33:16-08:00 Allow profiling information to be served on Unix-Domain Socket
+  - a75c0709d 2022-12-07T14:30:34-08:00 Deflake a preemption test that may patch Node incorrectly
+  - 64eef3e9f 2022-12-07T14:19:28-05:00 kubeadm: set priority for "system-node-critical" Pods
+  - 2309c6b49 2022-12-07T09:48:08-08:00 Bump grpc to v1.51.0
+  - 56d8302bc 2022-12-07T18:16:16+01:00 Use k8s utils pointer instead of Azure autorest/to
+  - ba1195afe 2022-12-07T11:36:13+00:00 unittests: Fixes TestReplaceFile for Windows
+  - 712dea4ae 2022-12-07T09:23:24+02:00 Update github.com/aws/aws-sdk-go
+  - afbb21638 2022-12-07T12:30:51+05:30 Introducing LoadbalancerPortMapping flags for VipExternalIP
+  - dfac46de3 2022-12-06T00:16:31-05:00 Fix table in sync controller comment
+  - 50c6b6c86 2022-12-05T17:30:08+00:00 remove mime AddExtensionType in discovery test
+  - b501d6036 2022-12-05T15:18:45+00:00 add metric for max no. of CIDRs that can be allocated from MultiCIDRSet
+  - 37f4d4624 2022-12-05T15:18:45+00:00 add metric for max no. of CIDRs that can be allocated from CidrSet
+  - bf4f907bf 2022-12-05T12:10:10+05:30 Improving schedule extender test coverage
+  - 34d845502 2022-12-05T11:42:43+08:00 kubeadm: use coredns v1.10.0
+  - 9b633b3dd 2022-12-05T11:05:39+08:00 update github.com/coredns/corefile-migration v1.0.18
+  - d65ea5e71 2022-12-05T10:08:32+08:00 update coredns kube up to v1.10.0
+  - 25e990f73 2022-12-02T15:39:11-08:00 added validation check to block adding an ephemeral container to a static pod and test cases
+  - 02fdbf801 2022-12-02T14:44:26-07:00 legacy-cloud-providers: prevent index out-of-range in getNextUnitNumber
+  - 9e83e7e97 2022-12-02T14:08:11-05:00 Integrate new metrics provider option in test case
+  - 31f16db19 2022-12-02T14:06:37-05:00 Remove options from queue ctors w/o metrics
+  - 9e0a7c7ee 2022-12-03T02:11:04+08:00 add pre_filter for volume_zone
+  - 61fe6114b 2022-12-02T12:58:28-05:00 Reduce load of Job integration test
+  - 784ec157e 2022-12-02T12:39:58-05:00 reflector: refactor setting typeDescription & expectedGVK
+  - 474fc8c52 2022-12-02T12:22:04-05:00 Reflector: support logging Unstructured type
+  - 5eb30f276 2022-12-02T16:31:20+00:00 be more strict on network timeouts
+  - 55ec09d37 2022-12-02T16:36:09+01:00 tools/events: fix data race when emitting series
+  - 2f83117bc 2022-12-02T16:25:04+01:00 tools/events: retry on AlreadyExist for Series
+  - 3c0a78e92 2022-12-02T06:58:43-08:00 Make mounter interface exportable
+  - b84f192ac 2022-12-02T17:23:44+03:00 kubectl scale: proceed even if there is invalid resource in multi
+  - 76ee3788c 2022-12-02T16:27:18+03:00 kubectl scale: Add dry-run prefix to indicate result is not applied
+  - 13be899b4 2022-12-02T16:00:22+03:00 kubectl scale: Use visitor only once
+  - 832644f0b 2022-12-02T14:05:11+03:00 kubectl exec: return descriptive error message when multi resource passed
+  - 95ad089ff 2022-12-01T18:28:02-05:00 Add license header to new file
+  - ffec39cb2 2022-12-01T13:16:39-05:00 wait for ingress admission to catch up to the cache during testing
+  - bafeacd14 2022-12-01T10:32:12+00:00 use kube-proxy defaults values for CI
+  - 8a96ed0d2 2022-12-01T11:23:26+01:00 Link `kubectl-convert` binary statically
+  - 3698434d6 2022-12-01T11:20:24+01:00 Link `kube-aggregator` binary statically
+  - 6b7755f8e 2022-12-01T11:16:06+08:00 fix the alpha phase version of LegacyServiceAccountTokenTracking
+  - 56cac6465 2022-11-30T13:54:24-08:00 fieldmanager: Make all tests external
+  - 9c447177e 2022-11-30T13:54:21-08:00 fieldmanager: Move private setLastApplied to internal.SetLastApplied
+  - 530d25026 2022-11-30T13:54:21-08:00 fieldmanager: remove dependencies on dummy version conversion for tests
+  - 7217e0308 2022-11-30T13:54:16-08:00 fieldmanager: Remove unnecessary method for creating TestFieldManager
+  - 4e1c3a585 2022-11-30T13:05:07-05:00 Dedup serialization of status
+  - b62541fe8 2022-11-30T12:53:52-05:00 Avoid serialization of maps when log level < 10
+  - 1444f089f 2022-12-01T00:29:59+08:00 Fix go routine leaks
+  - a782bd62b 2022-11-30T15:12:04+08:00 add github.com/mindprince/gonvml to unwanted dependencies for license reason
+  - 7e9dfad2b 2022-11-30T14:37:53+08:00 sort unwanted dependencies in order
+  - c0dea5e31 2022-11-29T23:09:57-05:00 i18n: Fix bug where package-level variables are not translated.
+  - da7181151 2022-11-29T20:47:33-05:00 Allow setting per-queue metrics providers
+  - 6981a1acf 2022-11-29T15:56:15-05:00 fix spelling error in e2e upgrade apps daemonset test
+  - ffef2d1f1 2022-11-29T15:07:34-05:00 add more validation to rules.yaml
+  - 4dc7a260e 2022-11-29T16:32:26+00:00 unittests: Fixes unit tests for Windows (part 4)
+  - 847a39afc 2022-11-29T23:09:31+08:00 Retry patch when then service is unavailable or timeout.
+  - bfa4948bb 2022-11-29T09:42:49-05:00 Don't re-run EnsureChain/EnsureRules on partial syncs
+  - f04bb7187 2022-11-29T13:12:19+01:00 Tracing: sample always in `hack/local-up-cluster.sh`
+  - fb327ddd1 2022-11-29T16:02:47+08:00 improve performance
+  - 6553ba246 2022-11-29T14:44:14+08:00 pkg/kubelet/network/dns: omit unnecessary fmt.Sprintf
+  - f4c1682fb 2022-11-28T17:31:08-08:00 Validate StatefulSet names as DNS Label
+  - ab3c35322 2022-11-28T16:35:26-05:00 Improve error messages for parse errors of --kube-reserved, --system-reserved and --qos-reserved
+  - fa9c295ad 2022-11-28T12:08:36-05:00 update API Change in release note
+  - 1129f5714 2022-11-28T13:54:14+00:00 unittests: Skip test if not on GCE
+  - 357d0a860 2022-11-28T16:56:01+08:00 staging/src/k8s.io/legacy-cloud-providers/azure: remove unnecessary fmt.Sprintf
+  - 400f9c457 2022-11-28T08:22:08+05:30 Explicitly call rand.Seed() method
+  - a79670739 2022-11-28T09:46:46+08:00 Validate labelSelector in topologySpreadConstraints
+  - 0545a0a98 2022-11-28T08:57:21+13:00 update ineligible endpoints yaml
+  - b89f42be2 2022-11-25T08:52:35+00:00 remove flaky tag for GCE NEG tests
+  - ebc5b208a 2022-11-24T14:46:45+01:00 Fix OwnerReferencesPermissionEnforcement complaints when autodeleting PVCs
+  - 2121ce17d 2022-11-24T16:52:44+08:00 kubeadm: fix invalid testcase for `enforceRequirements`
+  - c3f520aab 2022-11-24T05:46:14+00:00 Making a run test.
+  - 21cd660a1 2022-11-24T12:29:10+08:00 kubeadm: respect user provided kubeconfig during discovery process
+  - aede3fbf4 2022-11-23T17:40:23+02:00 pkg/controller: Replace deprecated func usage from the `k8s.io/utils/pointer` pkg
+  - c032d7993 2022-11-23T16:03:28+01:00 Bump gcb-docker-gcloud to `v20221007-69e0da97ef`
+  - 05700b148 2022-11-23T15:23:34+08:00 update auto generated files
+  - 9ae5af4b6 2022-11-23T03:20:12+00:00 StorageVersionGC logger
+  - 059acc2f5 2022-11-23T10:59:08+08:00 kubernetes components using leader election to leases
+  - 70d31ea91 2022-11-23T00:54:50+00:00 Remove unused `numExistingEndpoints` variable
+  - 23fa8032f 2022-11-23T00:29:36+00:00 word misspelling
+  - 56c5a9584 2022-11-22T17:25:52+02:00 e2e: cpumanager: proper test clean-up
+  - 568fedea4 2022-11-22T16:59:25+08:00 fix doc of types.go of node
+  - d61849e80 2022-11-22T10:12:58+08:00 pkg/controller/deployment/util/deployment_util.go:Improving test coverage
+  - 43726e840 2022-11-21T17:18:24+01:00 pkg/api/persistentvolume: Improving test coverage.
+  - 43a889fc6 2022-11-21T09:59:37+03:00 Add integration test to test singularnames for all resources
+  - 70415b956 2022-11-19T12:42:25+03:00 Fix API refs for batch v1 and v1beta1
+  - 8b4b3d82a 2022-11-19T10:46:55+08:00 Add test for staging/src/k8s.io/apimachinery/pkg/version/staging/helpers.go
+  - 1f54f610e 2022-11-18T13:11:16+03:00 minor integration test fixes and more singular resource
+  - 23e289955 2022-11-18T12:21:19+03:00 Implement GetSingularName for LegacyBindingREST
+  - d14b7781e 2022-11-18T12:21:19+03:00 Use casted SingularName for rbac types
+  - 1abf94bec 2022-11-18T12:21:19+03:00 Remove GetSingularName for subresources
+  - 672e0b1e0 2022-11-18T12:21:19+03:00 Use correct singular name format for subresources
+  - 578ddde80 2022-11-18T12:21:13+03:00 Add singular name for the rest of types
+  - d6532f5eb 2022-11-18T12:21:13+03:00 run discovery tests if resources are supported
+  - 0990ba1cc 2022-11-18T12:21:07+03:00 Introduce singularNameProvider for core types
+  - ab376e09d 2022-11-18T12:18:31+03:00 Add integration tests for shortnames expanding to correct resources
+  - 380c7f248 2022-11-17T21:37:24-08:00 scheduler volumebinding: leverage PreFilterResult
+  - a1f5e36fa 2022-11-17T15:05:30-08:00 Add jpbetz to k8s.io/client-go/applyconfigurations
+  - b5f2130f2 2022-11-17T15:05:00-08:00 Add apelisse into some more OWNERS files
+  - 1b5e50008 2022-11-17T12:03:03-06:00 Add generated docs for discovery and storage types
+  - 9cb283796 2022-11-17T13:00:12-05:00 Guard against merging non-canonical replace directives
+  - 2fb2b7698 2022-11-17T10:11:03-06:00 Update API doc for Storage v1alpha1, v1beta1 types and Discovery v1 types
+  - 5aeb9db52 2022-11-17T18:24:54+08:00 fix invalid url
+  - b72be5c45 2022-11-17T10:58:40+05:30 formatted the file
+  - 19242ec34 2022-11-17T02:10:07+00:00 Add TestBindingRemoval.
+  - cd3d01461 2022-11-17T02:09:47+00:00 Add TestCRDParams.
+  - 2afc78bac 2022-11-17T09:39:30+08:00 kubectl: remove unnecessary TODO annotations
+  - fdcf7b3b9 2022-11-16T16:55:33-06:00 Add generated docs for discovery v1beta1 and storage v1 types
+  - 44c94f98b 2022-11-16T19:25:31+01:00 fix typo in cmd/kube-apiserver/app/options/validation_test.go
+  - 693f7aef6 2022-11-16T22:15:58+05:30 Changed API field references and generated docs for coordination v1 and v1beta1
+  - bf244d304 2022-11-16T16:49:07+08:00 Lower volume attached touch log level
+  - 44285a16e 2022-11-16T14:50:32+08:00 Add test for cmd/kubeadm/app/constants/constants.go
+  - 69fad419a 2022-11-15T20:25:02-05:00 Limit request retrying to []byte request bodies
+  - 524a8b32a 2022-11-15T23:51:57+00:00 add sig-storage reviewers, remove inactive sig-storage reviewers, remove redundant owners files
+  - 10b9a1fe1 2022-11-15T08:46:46-08:00 add alexzielenski to OWNERS
+  - 2670042dd 2022-11-15T17:36:26+08:00 fix wrong statement in unittest of BoundedFrequencyRunner
+  - 9c9a775d4 2022-11-15T08:48:42+05:30 added comment why we are suppressing the errors
+  - 424486f33 2022-11-14T12:59:50-07:00 Add mpuckett159 to sig-cli reviewers
+  - 7e4efab6a 2022-11-14T14:07:34-05:00 cri-api: document expectation of 16 MB limit
+  - 1a80cfdc5 2022-11-14T12:05:33-06:00 Update API doc to use the field name in description
+  - f98aa32c5 2022-11-14T17:56:46+01:00 tests: network: Prefer internal IPs first
+  - 4e5487de1 2022-11-14T08:39:04-08:00 Update name and docs
+  - 6a57404e2 2022-11-14T23:05:32+08:00 kubelet: cleanup secretManager and configManager in podManager
+  - b3c92f964 2022-11-13T23:51:09+05:30 Removed the TODO tag
+  - f5f7723f1 2022-11-13T20:28:26+05:30 Added generated Docs for scheduling v1, v1beta1 and v1alpha1
+  - 79ffc163a 2022-11-13T20:19:23+05:30 Added generated Docs for coordination v1 and v1beta1
+  - ad04936a8 2022-11-13T19:13:43+05:30 Change API field references for coordination v1 and v1beta1
+  - 776995e68 2022-11-13T18:46:35+05:30 Change API field references for scheduling v1, v1alpha1 and v1beta1
+  - 69547267e 2022-11-13T17:56:58+08:00 kubeadm: remove unused command flag constants
+  - 81b21f0bb 2022-11-12T16:11:40+05:30 Error Suppression in printer/internalversion/printers
+  - ec0b200f3 2022-11-10T22:47:23+01:00 statefulset: handle API error on pod deletion
+  - 47fdbd97d 2022-11-10T16:20:20+01:00 cmd/kube-apiserver/app/options: Improving test coverage
+  - 7b7da83a8 2022-11-10T14:07:02+08:00 Fix: resourceToWeightMap will never be nil
+  - 02db35ab1 2022-11-10T00:49:20+08:00 Optimize case conditions
+  - 23d32cf1b 2022-11-09T18:16:35+02:00 Fix SPDY proxy authentication with special chars
+  - 0c74b9e00 2022-11-09T18:04:55+02:00 Improve error message when proxy connection fails
+  - e2a4565a2 2022-11-09T09:54:41+08:00 cleanup:Omit comparison with boolean constant
+  - 01a6668ec 2022-11-09T09:54:34+08:00 fix: Remove dependency on github.com/pkg/errors
+  - b9bf3e5c4 2022-11-08T16:05:48+00:00 Replaces path.Operation with filepath.Operation (kubelet)
+  - 774ab1349 2022-11-08T21:11:53+09:00 Remove ioutil from kubectl
+  - a0c139f8d 2022-11-08T11:36:32+08:00 remove FeatureEnabled in controller-manager/pkg/leadermigration/feature.go
+  - 1a1ca5173 2022-11-02T15:24:14-07:00 Combine RequestAuditConfig with RequestAuditConfigWithLevel
+  - 5b310565f 2022-11-02T07:53:13-07:00 Address comments: re-use code, grow buffer, add comments
+  - 6da08775f 2022-11-02T17:40:19+08:00 diff.ObjectReflectDiff is DEPRECATED use cmp.Diff
+  - eadb0a29c 2022-11-02T15:49:09+08:00 remove FG ControllerManagerLeaderMigration
+  - c0bb425d8 2022-11-02T12:03:19+08:00 enhance priority-level dumping by adding total requests of dispatched,timed out and rejected
+  - 20b5308c6 2022-11-02T10:52:08+08:00 sort by PriorityLevel Configuration name when dumping priority levels
+  - a4dac224e 2022-11-01T09:46:54-04:00 kubectl displays seccomp profile for pod and container
+  - 1c8d3226a 2022-10-31T16:29:19+08:00 Replace the ioutil by the os and io for the pkg/proxy/ipvs
+  - 214a2930a 2022-10-24T10:43:00+08:00 update release-note for cherry-picks of #110255
+  - 856146e67 2022-10-24T08:36:52+08:00 Fix incorrect log information
+  - 9f2ac979a 2022-10-21T11:57:07-07:00 Remove unused RBAC rule from system:kubelet-api-admin
+  - b1e575aaf 2022-10-20T09:22:35+02:00 Self-nominate mimowo as a reviewer for pkg/controller/job & test/integration/job
+  - 0b9399435 2022-10-19T09:13:29+03:00 Add link to to file
+  - a4c6696c4 2022-10-15T21:00:45-04:00 fix OldReplicaSets
+  - 5d514601a 2022-10-13T01:47:08+00:00 gofmt
+  - 3ab5e3d07 2022-10-13T01:10:33+00:00 [API][Doc] Update NodeStatus about IP change
+  - ce868cb75 2022-10-12T12:40:03-07:00 instead of changing existing method, add a new type
+  - 3f2c0e174 2022-10-10T16:23:19-07:00 Optimize turning a Set into a Selector
+  - 1d1dc364b 2022-10-09T11:22:10+08:00 Close body when Report non-OK status code
+  - 3ac1c4366 2022-10-08T13:03:21+08:00 Optimize testcases arrangement
+  - 3f3bb7fd9 2022-10-07T20:38:08+00:00 added limit value to the pod validation error to simplify debugging
+  - 970d19b4e 2022-10-06T00:20:03+05:30 update apiserver to APIServer
+  - cec1c71fb 2022-10-06T00:17:42+05:30 apiserver: grammar correction of comment
+  - 95028d3ae 2022-09-22T12:54:17+08:00 sample-apiserver: create the client cert with SHA256
+  - 963935ed2 2022-09-20T14:44:24+03:00 Kubemark: fix typos to be HollowKubeletOptions
+  - 8ed932427 2022-09-16T11:15:45+08:00 update comment of annotation_key_constants.go
+  - 01c755985 2022-09-06T14:38:30+02:00 fix(docs): wrong comment block for ResolveEndpoint function
+  - b9e11207b 2022-08-26T12:03:49+01:00 Ensure go-to-protobuf gen can run when not in GOPATH
+  - c62a7cdb3 2022-08-26T01:25:44+09:00 fix: test
+  - 12d49b6bf 2022-08-26T00:44:31+09:00 fix: rename
+  - 65e693ecc 2022-08-24T17:57:47-07:00 Set correct SELinux label for host paths volumes created by host path provisioner
+  - f2e7211ab 2022-08-23T23:36:09+00:00 delete stale code in kubelet volumemanager
+  - bb3fcde85 2022-08-19T16:28:25+08:00 add unit test coverage for pkg/kubelet/types/
+  - be2c9139f 2022-08-17T11:21:46+08:00 Route controller should update routes with NodeIP changed When a node reboots or kubelet restarts, it is possible that its IP is changed. In this case, node route should be updated with the correct IP. In this PR, it checks if the IP in an existing route is the same as the actual one. If not, it marks it as "update" so the old route will be deleted and a new one will be created. There's a new field EnableNodeAddresses, which is a feature gate for specific cloud providers to enable after they update their cloud provider code for CreateRoute().
+  - 42f72a3fe 2022-08-14T13:53:25+08:00 Cleanup reportedVerb only from
+  - a6f75d8de 2022-08-04T11:16:52+08:00 code cleanup
+  - ccb8b2ebc 2022-08-02T20:47:44+08:00 docs(desired_state_of_world.go): log in desired_state_of_world.go seems to be wrong
+  - 1a1ad16a5 2022-07-30T23:30:29+09:00 Remove ioutil from auth plugin
+  - aa6d0f5bb 2022-07-24T21:16:21+08:00 code cleanup
+  - 5494b30ce 2022-07-24T19:04:08+09:00 feat: improve naming
+  - bf369e98e 2022-07-23T20:09:40+05:30 [Minor] Correct Typos in getBeginingAndEndIndices func Name
+  - fba637c33 2022-07-18T16:06:20+08:00 code clean up
+  - e536d565e 2022-07-15T20:22:37+08:00 clean up code
+  - ca8f3dff9 2022-06-23T17:57:17+08:00 add unit test coverage for pkg/kubelet/util/queue
+  - 538fd832a 2022-05-09T16:48:16+00:00 Skip generic ephemeral tests if Immediate binding and topology keys set
 
