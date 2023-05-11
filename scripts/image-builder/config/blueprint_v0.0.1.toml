@@ -55,5 +55,11 @@ version = "*"
 
 [customizations]
 
+[customizations.firewall]
+ports = ["6443:tcp"]
+
+[customizations.firewall.services]
+enabled = ["ssh"]
+
 [customizations.services]
 enabled = ["crio", "microshift"]
