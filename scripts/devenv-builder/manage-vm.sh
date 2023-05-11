@@ -41,19 +41,16 @@ function get_base_isofile {
 
     case ${rhel_version} in
         8)
-            echo "rhel-8.7-x86_64-dvd.iso"
+            echo "rhel-8.7-$(uname -m)-dvd.iso"
             ;;
         8.*)
-            echo "rhel-${rhel_version}-x86_64-dvd.iso"
+            echo "rhel-${rhel_version}-$(uname -m)-dvd.iso"
             ;;
         9)
-            echo "rhel-9.2-beta-x86_64-dvd.iso"
+            echo "rhel-9.2-$(uname -m)-dvd.iso"
             ;;
-        9.1)
-            echo "rhel-baseos-9.1-x86_64-dvd.iso"
-            ;;
-        9.2-beta)
-            echo "rhel-9.2-beta-x86_64-dvd.iso"
+        9.*)
+            echo "rhel-${rhel_version}-$(uname -m)-dvd.iso"
             ;;
         *)
             echo "unknown RHEL version ${rhel_version}" 1>&2

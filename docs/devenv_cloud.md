@@ -131,7 +131,7 @@ Follow the instructions in the [Create Virtual Machine](./devenv_setup_auto.md#c
 ```bash
 ./scripts/devenv-builder/create-vm.sh microshift-bench \
     /var/lib/libvirt/images \
-    /var/lib/libvirt/images/rhel-baseos-9.2-$(uname -m)-dvd.iso \
+    /var/lib/libvirt/images/rhel-9.2-$(uname -m)-dvd.iso \
     2 2 10 0 1
 ```
 
