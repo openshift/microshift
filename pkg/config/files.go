@@ -10,6 +10,7 @@ import (
 const (
 	ConfigFile = "/etc/microshift/config.yaml"
 	DataDir    = "/var/lib/microshift"
+	BackupsDir = "/var/lib/microshift-backups"
 )
 
 func parse(contents []byte) (*Config, error) {
@@ -60,4 +61,8 @@ func ActiveConfig() (*Config, error) {
 		return nil, fmt.Errorf("Error reading config file %q: %v", ConfigFile, err)
 	}
 	return getActiveConfigFromYAML(contents)
+}
+
+func CreateDir(path string) error {
+	return os.MkdirAll(path, 0700)
 }
