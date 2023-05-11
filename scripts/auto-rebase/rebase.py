@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=fixme,global-statement,too-many-statements,too-many-locals,broad-except
 
 """
 This Python script automates the process of rebasing a Git branch
@@ -179,6 +178,7 @@ def try_get_rebase_branch_ref_from_remote(remote, branch_name):
 
     return None
 
+
 def is_local_branch_based_on_newer_base_branch_commit(git_repo, base_branch_name, remote_branch_name, local_branch_name):
     """
     Compares local and remote rebase branches by looking at their start on base branch.
@@ -193,9 +193,11 @@ def is_local_branch_based_on_newer_base_branch_commit(git_repo, base_branch_name
                      f"Branch-off commit: {commit_str(remote_merge_base[0])}")
         return False
 
-    logging.info(f"Remote branch is older - it needs updating. "
-                    f"Remote branch is on top of {base_branch_name}'s commit: '{commit_str(remote_merge_base[0])}'. "
-                    f"Local branch is on top of {base_branch_name}'s commit '{commit_str(local_merge_base[0])}'")
+    logging.info(
+        f"Remote branch is older - it needs updating. "
+        f"Remote branch is on top of {base_branch_name}'s commit: '{commit_str(remote_merge_base[0])}'. "
+        f"Local branch is on top of {base_branch_name}'s commit '{commit_str(local_merge_base[0])}'"
+    )
     return True
 
 
@@ -215,8 +217,10 @@ def try_get_pr(gh_repo, org, base_branch, branch_name):
     pull_req = None
     if prs.totalCount > 1:
         pull_req = prs[0]
-        logging.warning(f"Found more than one PR for branch {branch_name} on {gh_repo.full_name} -"+
-                        f"this is unexpected, continuing with first one of: {[(x.state, x.html_url) for x in prs]}")
+        logging.warning(
+            f"Found more than one PR for branch {branch_name} on {gh_repo.full_name} -" +
+            f"this is unexpected, continuing with first one of: {[(x.state, x.html_url) for x in prs]}"
+        )
 
     if prs.totalCount == 1:
         pull_req = prs[0]
@@ -368,7 +372,7 @@ def try_create_prow_job_url():
     logging.warning("Couldn't infer prow job url. " +
                     f"Env vars: '{JOB_NAME_ENV}'='{job_name}', '{BUILD_ID_ENV}'='{build_id}'")
     _extra_msgs.append("Couldn't infer prow job url. " +
-                        f"Env vars: '{JOB_NAME_ENV}'='{job_name}', '{BUILD_ID_ENV}'='{build_id}'")
+                       f"Env vars: '{JOB_NAME_ENV}'='{job_name}', '{BUILD_ID_ENV}'='{build_id}'")
     return "-"
 
 
@@ -457,9 +461,11 @@ def main():
     token = get_token(org, repo)
     gh_repo = Github(token).get_repo(f"{org}/{repo}")
     git_repo = Repo('.')
-    base_branch = (git_repo.active_branch.name
+    base_branch = (
+        git_repo.active_branch.name
         if base_branch_override == ""
-        else base_branch_override)
+        else base_branch_override
+    )
 
     rebase_result = run_rebase_sh(release_amd, release_arm, release_lvms)
     if rebase_result.success:

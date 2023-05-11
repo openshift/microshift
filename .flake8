@@ -1,0 +1,5 @@
+[flake8]
+extend-ignore =
+  # amgiguous variable names (single letters)
+  E741,
+max-line-length = 200

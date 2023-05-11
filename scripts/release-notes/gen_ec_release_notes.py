@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# pylint: disable=too-many-locals
 
 """Release Note Tool
 
@@ -49,8 +48,8 @@ import subprocess
 import textwrap
 from urllib import request
 
-URL_BASE="https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift"
-URL_BASE_X86="https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
+URL_BASE = "https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift"
+URL_BASE_X86 = "https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
 
 # An EC RPM filename looks like
 # microshift-4.13.0~ec.4-202303070857.p0.gcf0bce2.assembly.ec.4.el9.aarch64.rpm
@@ -245,7 +244,7 @@ def check_for_new_releases(url_base, release_type, version):
     # then parse out the EC version number and other details needed to
     # build the release tag.
     version_prefix = version.partition('-')[0]
-    microshift_rpm_name_prefix=f"microshift-{version_prefix}"
+    microshift_rpm_name_prefix = f"microshift-{version_prefix}"
     microshift_rpm_filename = None
     for package_path in rpm_list:
         parts = package_path.split("/")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# pylint: disable=too-few-public-methods, broad-except
 """
 This script provides various functions for Automatic MicroShift bug JIRA cloner.
 
@@ -30,6 +29,7 @@ JQL_ORDER_BY = 'order by key asc'
 JIRA_SERVER = 'https://issues.redhat.com'
 JIRA_URL_PREFIX = JIRA_SERVER+'/browse/'
 
+
 def is_original_issue(issue):
     """Returns True if the given issue is an original issue (not a clone), False otherwise."""
     for link in issue.fields.issuelinks:
@@ -38,6 +38,7 @@ def is_original_issue(issue):
         if hasattr(link, 'outwardIssue'):
             return False
     return True
+
 
 def get_clone_by_issues(issue, connection):
     """Returns a list of clone issues for the given issue."""
@@ -49,11 +50,13 @@ def get_clone_by_issues(issue, connection):
             l.append(connection.issue(link.inwardIssue.key))
     return l
 
+
 def get_assignee(issue):
     """Returns the email address of the assignee of the given issue."""
     if not hasattr(issue.fields, 'assignee') or issue.fields.assignee is None:
         return None
     return issue.fields.assignee.emailAddress
+
 
 def get_fix_versions(issue):
     """Returns a list of fix versions for the given issue."""
@@ -64,6 +67,7 @@ def get_fix_versions(issue):
                 l.append(fver.name)
     return sorted(l)[::-1]
 
+
 def get_target_versions(issue):
     """Returns a list of target versions for the given issue."""
     l = []
@@ -73,6 +77,7 @@ def get_target_versions(issue):
                 l.append(tver.name)
     return l
 
+
 def get_parent_issue(issue, connection):
     """Returns the parent issue for the given issue."""
     for link in issue.fields.issuelinks:
@@ -81,6 +86,7 @@ def get_parent_issue(issue, connection):
         if hasattr(link, 'outwardIssue'):
             return connection.issue(link.outwardIssue.key)
     return None
+
 
 def get_sprint(issue):
     """Returns the sprint that the given issue is currently assigned to, or None if not assigned."""
@@ -93,12 +99,14 @@ def get_sprint(issue):
     last_index = last_sprint.find(',', first_index)
     return last_sprint[first_index:last_index]
 
+
 def is_issue_a_cve(issue):
     """Returns True if the given issue has a label that starts with "CVE-", False otherwise."""
     for label in issue.fields.labels:
         if label.startswith('CVE-'):
             return True
     return False
+
 
 def has_fix_versions_label(issue):
     """Returns True if the given issue has a label "needs-fix-version", False otherwise."""
@@ -107,11 +115,13 @@ def has_fix_versions_label(issue):
             return True
     return False
 
+
 def set_fix_version(issue, version):
     """Sets the fix version for the given issue to the specified version."""
     issue.update(fields={
         'fixVersions': [{'name': version}]
     })
+
 
 def set_needs_fix_version_label(issue):
     """Adds the label "needs-fix-version" to the given issue's labels."""
@@ -119,6 +129,7 @@ def set_needs_fix_version_label(issue):
     issue.update(fields={
         'labels': list(labels)
     })
+
 
 def remove_needs_fix_version_label(issue):
     """Removes the label "needs-fix-version" from the issue's labels."""
@@ -131,11 +142,13 @@ def remove_needs_fix_version_label(issue):
         'labels': labels
     })
 
+
 def set_target_version(issue, version):
     """Sets the target version for the given issue to the specified version."""
     issue.update(fields={
         'customfield_12319940': [{'name': version}]
     })
+
 
 def set_assignee(issue, assignee):
     """Sets the assignee of the issue to the specified user."""
@@ -145,11 +158,13 @@ def set_assignee(issue, assignee):
         }
     })
 
+
 def set_fix_versions(issue, fix_versions):
     """Sets the fix versions of the issue to the specified list of fix versions."""
     issue.update(fields={
         'fixVersions': [{'name': x} for x in fix_versions]
     })
+
 
 def set_qa_contact(issue, contact):
     """Sets the QA contact for the issue to the specified user."""
@@ -157,9 +172,11 @@ def set_qa_contact(issue, contact):
         'customfield_12315948': {'value': contact}
     })
 
+
 def set_sprint(issue, sprint, connection):
     """Sets the issue to the specified sprint."""
     connection.add_issues_to_sprint(sprint, [issue.key])
+
 
 def clone_issue(issue, target, connection):
     """Clones the specified issue."""
@@ -188,9 +205,11 @@ def clone_issue(issue, target, connection):
     if sprint is not None:
         connection.add_issues_to_sprint(sprint, [new_issue.key])
 
+
 def add_blocks_link(issue, parent, connection):
     """Adds a 'Blocks' link between an issue and parent issue."""
     connection.create_issue_link("Blocks", inwardIssue=parent.key, outwardIssue=issue.key)
+
 
 class Action:
     """This class defines actions that can be taken on an issue, along with associated metadata."""
@@ -202,6 +221,7 @@ class Action:
         self.action = None
         if func is not None:
             self.action = _internal_fn
+
 
 def scan_original_issue(issue, connection):
     """Scans the spefied original issue, and returns a list of actions to take."""
@@ -232,6 +252,7 @@ def scan_original_issue(issue, connection):
     for version in fix_versions_missing:
         actions.append(Action(issue.key, f"Clone for Target version {version}", clone_issue, issue=issue, target=version, connection=connection))
     return actions
+
 
 def scan_cloned_issue(issue, connection):
     """Scans the spefied cloned issue, and returns a list of actions to take."""
@@ -297,6 +318,7 @@ def scan_issue(issue, connection):
         actions.extend(scan_cloned_issue(issue, connection))
     return actions
 
+
 def query_build(issue, user):
     """Builds a JIRA JQL query string based on the specified issue and/or user names."""
     query_str = JQL_FILTER_QUERY
@@ -307,6 +329,7 @@ def query_build(issue, user):
         query_str += f' and {JQL_FILTER_USER.format(",".join(users))}'
     query_str += f' {JQL_ORDER_BY}'
     return query_str
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -351,9 +374,9 @@ if __name__ == '__main__':
         print("No automatic actions to perform.")
         sys.exit(0)
 
-    answer = ''                         #pylint: disable=invalid-name
+    answer = ''
     if args.auto_accept:
-        answer = 'y'                    #pylint: disable=invalid-name
+        answer = 'y'
     while answer not in ['y', 'n']:
         answer = input(f'Perform {len(actions_list)} non manual actions? [Y/N]').lower()
     if answer == 'n':

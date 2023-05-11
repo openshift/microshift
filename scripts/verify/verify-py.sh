@@ -19,11 +19,11 @@ create_venv() {
     echo "Done!"
 }
 
-run_pylint() {
-    local pylint="${VENV}/bin/pylint"
+run_flake8() {
+    local flake8="${VENV}/bin/flake8"
 
-    if ! command -v "${pylint}" &>/dev/null; then
-        echo "Installing pylint..."
+    if ! command -v "${flake8}" &>/dev/null; then
+        echo "Installing tools..."
         create_venv
     fi
 
@@ -32,8 +32,8 @@ run_pylint() {
     echo "Checking: ${pyfiles}"
 
     # shellcheck disable=SC2086
-    ${pylint} --rcfile="${ROOTDIR}/.pylintrc" ${pyfiles}
+    ${flake8} ${pyfiles}
 
 }
 
-run_pylint
+run_flake8
