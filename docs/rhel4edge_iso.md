@@ -132,17 +132,6 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 ```
 
-> **NOTE** <br>
-> Embedding container images in the generated ISO requires the functionality from the latest version of the `osbuild` and `osbuild-composer` packages.
-> This functionality will be available in the future releases of the RHEL 9 operating system.
-
-To install the necessary functionality, run the following command to upgrade your system with the up-to-date software from the `copr` repository.
-```bash
-~/microshift/hack/osbuild2copr.sh copr
-```
-
-> If necessary, rerun the `hack/osbuild2copr.sh` script with the `appstream` argument to revert to the standard `osbuild` and `osbuild-composer` packages.
-
 Proceed by running the build script with the `-embed_containers` argument to include the dependent container images into the generated ISO.
 ```bash
 ~/microshift/scripts/image-builder/build.sh -pull_secret_file ~/.pull-secret.json -embed_containers
@@ -242,23 +231,10 @@ curl: (6) Could not resolve host: redhat.com
 > * Run the `sudo systemctl enable --now serial-getty@ttyS0.service` command on the virtual machine to enable the serial console service.
 > * Run the `sudo virsh console microshift-edge` command on the hypervisor to connect to the serial console.
 
-Make sure that `CRI-O` has access to all the container images required by MicroShift.
+Make sure that `CRI-O` has access to the container images required by MicroShift.
 ```bash
-$ sudo crictl images
-IMAGE                                                         TAG                 IMAGE ID            SIZE
-quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              abfe4b141323c       400MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev                latest              e838beef2dc33       352MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              46485ef27b75a       354MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              c9ab25a51ced3       331MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              075ed082f7130       343MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              d9ab25a51c123       415MB
-quay.io/openshift-release-dev/ocp-v4.0-art-dev                <none>              075eabc2f7a0a       466MB
-registry.access.redhat.com/ubi8/openssl                       latest              6f0b85db494c0       40.7MB
-registry.redhat.io/odf4/odf-topolvm-rhel8                     latest              7772af7c5ac84       222MB
-registry.redhat.io/openshift4/ose-csi-external-provisioner    latest              f4f57fec63a30       389MB
-registry.redhat.io/openshift4/ose-csi-external-resizer        latest              ffee6b6e833e3       387MB
-registry.redhat.io/openshift4/ose-csi-livenessprobe           latest              f67b4438d40d3       349MB
-registry.redhat.io/openshift4/ose-csi-node-driver-registrar   latest              161662e2189a0       350MB
+$ sudo crictl images | egrep -c 'openshift|redhat'
+13
 ```
 
 Finally, wait until all the MicroShift pods are up and running.
