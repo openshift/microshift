@@ -9,15 +9,17 @@ BUILD_AND_RUN=true
 INSTALL_BUILD_DEPS=true
 FORCE_FIREWALL=false
 RHEL_SUBSCRIPTION=false
+SET_RHEL_RELEASE=true
 
 start=$(date +%s)
 
 function usage() {
-    echo "Usage: $(basename "$0") [--no-build] [--no-build-deps] [--force-firewall] <openshift-pull-secret-file>"
+    echo "Usage: $(basename "$0") [--no-build] [--no-build-deps] [--force-firewall] [--no-set-release-version] <openshift-pull-secret-file>"
     echo ""
-    echo "  --no-build         Do not build, install and start MicroShift"
-    echo "  --no-build-deps    Do not install dependencies for building binaries and RPMs (implies --no-build)"
-    echo "  --force-firewall   Install and configure firewalld regardless of other options"
+    echo "  --no-build                Do not build, install and start MicroShift"
+    echo "  --no-build-deps           Do not install dependencies for building binaries and RPMs (implies --no-build)"
+    echo "  --force-firewall          Install and configure firewalld regardless of other options"
+    echo "  --no-set-release-version  Do NOT set the release subscription to the current release version"
 
     [ -n "$1" ] && echo -e "\nERROR: $1"
     exit 1
@@ -36,6 +38,10 @@ while [ $# -gt 1 ]; do
         ;;
     --force-firewall)
         FORCE_FIREWALL=true
+        shift
+        ;;
+    --no-set-release-version)
+        SET_RHEL_RELEASE=false
         shift
         ;;
     *) usage ;;
@@ -64,6 +70,14 @@ echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}"
 if ${RHEL_SUBSCRIPTION}; then
     if ! sudo subscription-manager status >&/dev/null; then
         sudo subscription-manager register
+    fi
+
+    if ${SET_RHEL_RELEASE}; then
+        # https://access.redhat.com/solutions/238533
+        source /etc/os-release
+        sudo subscription-manager release --set ${VERSION_ID}
+        sudo subscription-manager release --show
+        sudo dnf clean all -y
     fi
 fi
 
