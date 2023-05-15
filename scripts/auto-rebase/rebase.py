@@ -254,7 +254,10 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
     # the maximum that it would be reasonable to expect someone to
     # actually try to read.
     if len(changelog) > 5000:
-        changelog = f'{changelog}\n\nThe change list was truncated. See scripts/auto-rebase/changelog.txt in the PR for the full details.'
+        logging.warning("Truncating changelog from %d characters to 5000.", len(changelog))
+        logging.info(f"Old changelog:\n{changelog}")
+        changelog = f'{changelog[:5000]}\n\nThe change list was truncated. See scripts/auto-rebase/changelog.txt in the PR for the full details.'
+        logging.info(f"New changelog:\n{changelog}")
 
     template = textwrap.dedent("""
     amd64: {amd_tag}
