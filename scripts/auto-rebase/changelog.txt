@@ -1,4 +1,17 @@
-# kubernetes embedded-component 27e744f55d2e99eb8265c837e2571e47559079f6 to 37a9a084bcb483a38e8f88349fa6a21c1b6be8a3
-fcc276e6484511855b2f9407913625d4b067b77a 2023-02-16T12:47:20+00:00 UPSTREAM: <carry>: add default sysctls for kubelet in rpm
-# kubernetes image-amd64 27e744f55d2e99eb8265c837e2571e47559079f6 to 37a9a084bcb483a38e8f88349fa6a21c1b6be8a3
-fcc276e6484511855b2f9407913625d4b067b77a 2023-02-16T12:47:20+00:00 UPSTREAM: <carry>: add default sysctls for kubelet in rpm
+# cluster-network-operator embedded-component 4ff7caec8e5bbb761e00f723bdd3fff26f04bc54 to 7f29be15e3ce04284797da0c7a4804166093d406
+ac15f91de8671b5150819757cf806c2475adcc9c 2023-05-03T15:25:46-04:00 Whereabouts should implement the reconciliation controller
+886c4d2e5d950644ee59e17d5658ee3a74b4dc25 2023-04-07T23:34:39+00:00 With Hypershift run as user passed from hypershift
+259925bb0e5946a7352c0166630fffca34f7d9bf 2022-12-22T11:58:35+01:00 Fix CNO crashing when Kuryr without MTU is set
+bbdcb0a831427037d88fe5b03fb763342648bd0a 2022-12-15T11:43:34+00:00 Kuryr: If set use MTU from Config for svc net
+# ovn-kubernetes image-amd64 774134525ed229a934445ed209090a71d952ed7f to 401c3ae3508d24dccb5fce60cf903d1718f90832
+916443e21442e51435fb467138015daf70952932 2023-04-26T18:46:58+02:00 Delete equivalent ACLs when searching by predicate.
+c16fe5ac36515c76d656d8e37ca45ab30923da13 2023-04-21T19:10:12+02:00 Add an option to enable scale metrics in kind
+371e5589369c35a0121f1cee7edfb2d46b45e3af 2023-04-21T19:01:31+02:00 Add MetricMasterSyncDuration metric to track how much it takes for ovn-k master to start watching every resource. Add scale metrics for network policies, rename existing enable-eip-scale-metrics flag to more general enable-scale-metrics, and use it for network policy metric too.
+24229b2684a0b700edcc3660b463046e466d0974 2023-02-14T09:55:42+02:00 Egress Services: Fix nodeSelector parsing
+e237e479f64783e561b0405e010418251631c4bd 2023-02-14T09:55:32+02:00 Egress Service: split the contexts of the tests
+# ovn-kubernetes image-arm64 774134525ed229a934445ed209090a71d952ed7f to 401c3ae3508d24dccb5fce60cf903d1718f90832
+916443e21442e51435fb467138015daf70952932 2023-04-26T18:46:58+02:00 Delete equivalent ACLs when searching by predicate.
+c16fe5ac36515c76d656d8e37ca45ab30923da13 2023-04-21T19:10:12+02:00 Add an option to enable scale metrics in kind
+371e5589369c35a0121f1cee7edfb2d46b45e3af 2023-04-21T19:01:31+02:00 Add MetricMasterSyncDuration metric to track how much it takes for ovn-k master to start watching every resource. Add scale metrics for network policies, rename existing enable-eip-scale-metrics flag to more general enable-scale-metrics, and use it for network policy metric too.
+24229b2684a0b700edcc3660b463046e466d0974 2023-02-14T09:55:42+02:00 Egress Services: Fix nodeSelector parsing
+e237e479f64783e561b0405e010418251631c4bd 2023-02-14T09:55:32+02:00 Egress Service: split the contexts of the tests
