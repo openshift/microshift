@@ -10,9 +10,11 @@ import (
 
 const (
 	// for files managed via management system in /etc, i.e. user applications
-	defaultManifestDirEtc = "/etc/microshift/manifests"
+	defaultManifestDirEtc     = "/etc/microshift/manifests"
+	defaultManifestDirEtcGlob = "/etc/microshift/manifests.d/*"
 	// for files embedded in ostree. i.e. cni/other component customizations
-	defaultManifestDirLib = "/usr/lib/microshift/manifests"
+	defaultManifestDirLib     = "/usr/lib/microshift/manifests"
+	defaultManifestDirLibGlob = "/usr/lib/microshift/manifests.d/*"
 )
 
 type Manifests struct {
@@ -22,7 +24,7 @@ type Manifests struct {
 	// manifests. The entries in the list can be glob patterns to
 	// match multiple subdirectories.
 	//
-	// +kubebuilder:default={"/usr/lib/microshift/manifests","/etc/microshift/manifests"}
+	// +kubebuilder:default={"/usr/lib/microshift/manifests","/usr/lib/microshift/manifests.d/*","/etc/microshift/manifests","/etc/microshift/manifests.d/*"}
 	KustomizePaths []string `json:"kustomizePaths"`
 }
 

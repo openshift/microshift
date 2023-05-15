@@ -21,7 +21,9 @@ manifests:
     # The locations on the filesystem to scan for kustomization.yaml files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests. The entries in the list can be glob patterns to match multiple subdirectories.
     kustomizePaths:
         - /usr/lib/microshift/manifests
+        - /usr/lib/microshift/manifests.d/*
         - /etc/microshift/manifests
+        - /etc/microshift/manifests.d/*
 network:
     # IP address pool to use for pod IPs. This field is immutable after installation.
     clusterNetwork:

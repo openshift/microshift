@@ -107,7 +107,12 @@ func (c *Config) fillDefaults() error {
 		DefragCheckFreq:         5 * time.Minute,
 	}
 	c.Manifests = Manifests{
-		KustomizePaths: []string{defaultManifestDirLib, defaultManifestDirEtc},
+		KustomizePaths: []string{
+			defaultManifestDirLib,
+			defaultManifestDirLibGlob,
+			defaultManifestDirEtc,
+			defaultManifestDirEtcGlob,
+		},
 	}
 
 	c.MultiNode.Enabled = false

@@ -80,7 +80,9 @@
           "type": "array",
           "default": [
             "/usr/lib/microshift/manifests",
-            "/etc/microshift/manifests"
+            "/usr/lib/microshift/manifests.d/*",
+            "/etc/microshift/manifests",
+            "/etc/microshift/manifests.d/*"
           ],
           "items": {
             "type": "string"
