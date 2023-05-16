@@ -182,9 +182,10 @@ def main():
 
     print(f'finding ticket {args.ticket_id}')
     ticket = server.issue(args.ticket_id)
+    print(f'found: "{ticket.fields.summary}"')
 
     jira_id = server.myself()['key']
-    print(f'  updating assignment to "{jira_id}"')
+    print(f'...updating assignment to "{jira_id}"')
     server.assign_issue(ticket, jira_id)
 
     if args.target_version:
@@ -194,14 +195,14 @@ def main():
                 break
         else:
             raise ValueError('Unknown version')
-        print(f'  setting the target version to "{args.target_version}"')
+        print(f'...setting the target version to "{args.target_version}"')
         setter(ticket, 'Target Version', [{'name': args.target_version}])
 
     if args.sprint:
         active_sprint = get_active_sprint(server, project_id)
         if not active_sprint:
             raise ValueError('No active sprint found')
-        print(f'  setting the sprint to "{active_sprint}"')
+        print(f'...setting the sprint to "{active_sprint}"')
         server.add_issues_to_sprint(active_sprint.id, [ticket.key])
 
     print(f'  setting ticket status to "{args.status}"')
