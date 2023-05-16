@@ -17,7 +17,7 @@ type showConfigOptions struct {
 
 func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 	opts := showConfigOptions{
-		Mode: "default",
+		Mode: "effective",
 	}
 
 	cmd := &cobra.Command{
@@ -27,13 +27,16 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 			var cfg *config.Config
 			var err error
 
-			if opts.Mode == "effective" {
+			switch opts.Mode {
+			case "effective":
 				cfg, err = config.ActiveConfig()
 				if err != nil {
 					cmdutil.CheckErr(err)
 				}
-			} else {
+			case "default":
 				cfg = config.NewDefault()
+			default:
+				cmdutil.CheckErr(fmt.Errorf("Unrecognized mode %q", opts.Mode))
 			}
 
 			marshalled, err := yaml.Marshal(cfg)
