@@ -55,6 +55,9 @@ usage() {
     echo "  -authorized_keys_file path_to_file"
     echo "          Path to an SSH authorized_keys file to allow SSH access"
     echo "          into the default 'redhat' account"
+    echo "  -open_firewall_ports port1[:protocol1],...,portN[:protocolN]"
+    echo "          One or more comma-separated ports (optionally with protocol)"
+    echo "          to be allowed by firewall (default: none)"
     echo "  -prometheus"
     echo "          Add Prometheus process exporter to the image. See"
     echo "          https://github.com/ncabatoff/process-exporter for more information"
@@ -62,7 +65,7 @@ usage() {
 }
 
 title() {
-    echo -e "\E[34m\n# $1\E[00m";
+    echo -e "\E[34m\n# $1\E[00m"
 }
 
 waitfor_image() {
@@ -214,6 +217,12 @@ while [ $# -gt 0 ] ; do
         [ -z "${AUTHORIZED_KEYS_FILE}" ] && usage "Authorized keys file not specified"
         shift
         ;;
+     -open_firewall_ports)
+        shift
+        OPEN_FIREWALL_PORTS="$1"
+        [ -z "${OPEN_FIREWALL_PORTS}" ] && usage "Firewall ports not specified"
+        shift
+        ;;
     -prometheus)
         PROMETHEUS=true
         shift
@@ -334,6 +343,17 @@ if ${EMBED_CONTAINERS} ; then
     jq -r '.images | .[] | ("[[containers]]\nsource = \"" + . + "\"\n")' \
         "${ROOTDIR}/assets/release/release-$(uname -m).json" \
         >> blueprint_v0.0.1.toml
+fi
+
+# Add open firewall ports
+if [ -n "${OPEN_FIREWALL_PORTS}" ] ; then
+    for port in ${OPEN_FIREWALL_PORTS//,/ } ; do
+        cat >> blueprint_v0.0.1.toml <<EOF
+
+[customizations.firewall]
+ports = ["${port}"]
+EOF
+    done
 fi
 
 # Add the firewall customization required by Prometheus

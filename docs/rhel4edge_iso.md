@@ -67,6 +67,9 @@ Optional arguments:
   -authorized_keys_file path_to_file
           Path to an SSH authorized_keys file to allow SSH access
           into the default 'redhat' account
+  -open_firewall_ports port1[:protocol1],...,portN[:protocolN]
+          One or more comma-separated ports (optionally with protocol)
+          to be allowed by firewall (default: none)
   -prometheus
           Add Prometheus process exporter to the image. See
           https://github.com/ncabatoff/process-exporter for more information
