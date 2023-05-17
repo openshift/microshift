@@ -1006,5 +1006,8 @@ case "$command" in
         update_openshift_manifests
         update_lvms_manifests
         ;;
+    buildfiles)
+        update_buildfiles
+        ;;
     *) usage;;
 esac
