@@ -107,10 +107,13 @@ fi
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#runtime-prerequisites
 if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
+    # This version might not match the version under development
+    # because we need to pull in dependencies that are already
+    # released.
+    OCPVERSION=4.13
     sudo subscription-manager config --rhsm.manage_repos=1
-    # TODO: Start using 'rhocp-4.13' repository when OCP 4.13 is released
     sudo subscription-manager repos \
-        --enable "rhocp-4.12-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
+        --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
         --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
 else
     sudo dnf install -y centos-release-nfv-common
