@@ -298,13 +298,19 @@ clean-cross-build:
 clean: clean-cross-build
 .PHONY: clean
 
-vendor:
+.PHONY: vendor
+vendor: vendor-update vendor-patch
+
+.PHONY: vendor-update
+vendor-update:
 	go mod vendor
+
+.PHONY: vendor-patch
+vendor-patch:
 	for p in $(sort $(wildcard scripts/auto-rebase/rebase_patches/*.patch)); do \
 		echo "Applying patch $$p"; \
 		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply --reject || exit 1; \
 	done
-.PHONY: vendor
 
 # Update the etcd dependencies, including especially MicroShift itself.
 vendor-etcd:
