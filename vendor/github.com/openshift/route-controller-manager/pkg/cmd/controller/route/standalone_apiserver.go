@@ -64,7 +64,7 @@ func RunControllerServer(servingInfo configv1.HTTPServingInfo, kubeExternal clie
 	// TODO need audiences
 
 	//handler = apifilters.WithAuthentication(handler, authn, apifilters.Unauthorized(legacyscheme.Codecs, false), nil)
-	handler = apifilters.WithAuthentication(handler, authn, apifilters.Unauthorized(serializer.WithoutConversionCodecFactory{CodecFactory: legacyscheme.Codecs}), nil)
+	handler = apifilters.WithAuthentication(handler, authn, apifilters.Unauthorized(serializer.WithoutConversionCodecFactory{CodecFactory: legacyscheme.Codecs}), nil, nil)
 	handler = apiserverfilters.WithPanicRecovery(handler, requestInfoResolver)
 	handler = apifilters.WithRequestInfo(handler, requestInfoResolver)
 
