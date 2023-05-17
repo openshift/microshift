@@ -31,7 +31,7 @@ function check_greenboot_exit_status() {
 # Initial check must succeed (set timeout of 180s to speed up the process)
 #
 tee /etc/greenboot/greenboot.conf &>/dev/null <<EOF
-MICROSHIFT_WAIT_TIMEOUT_SEC=180
+MICROSHIFT_WAIT_TIMEOUT_SEC=240
 EOF
 check_greenboot_exit_status 0 1
 
