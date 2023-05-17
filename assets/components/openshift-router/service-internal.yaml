@@ -16,7 +16,7 @@ spec:
     - name: metrics
       port: 1936
       protocol: TCP
-      targetPort: 1936
+      targetPort: metrics
   selector:
     ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
 metadata:
