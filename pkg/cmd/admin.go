@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/openshift/microshift/pkg/admin"
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/version"
 
 	"github.com/spf13/cobra"
@@ -24,7 +25,7 @@ func newAdminBackupCommand() *cobra.Command {
 	v := version.Get()
 	backup.PersistentFlags().String(
 		"dest",
-		"/var/lib/microshift-backups",
+		config.BackupsDir,
 		"Directory with backups",
 	)
 	backup.PersistentFlags().String(
