@@ -121,7 +121,7 @@ verify: verify-fast
 
 # Fast verification checks that developers can/should run locally
 .PHONY: verify-fast
-verify-fast: verify-go verify-assets verify-sh verify-py verify-config
+verify-fast: verify-go verify-assets verify-sh verify-py verify-config verify-rf
 
 # Full verification checks that should run in CI
 .PHONY: verify-ci
@@ -154,6 +154,10 @@ verify-sh:
 .PHONY: verify-py
 verify-py:
 	./scripts/verify/verify-py.sh
+
+.PHONY: verify-rf
+verify-rf:
+	./scripts/verify/verify-rf.sh
 
 .PHONY: verify-containers
 verify-containers:

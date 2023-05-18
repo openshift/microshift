@@ -68,11 +68,7 @@ if [ ! -f "${RF_VARIABLES}" ]; then
     exit 1
 fi
 
-if [ ! -d "${RF_VENV}" ]; then
-    python3 -m venv "${RF_VENV}"
-    "${RF_VENV}/bin/python3" -m pip install --upgrade pip
-    "${RF_VENV}/bin/python3" -m pip install -r "${SCRIPTDIR}/requirements.txt"
-fi
+DEST_DIR="${RF_VENV}" "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 
 cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
 
