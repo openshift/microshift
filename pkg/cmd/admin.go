@@ -5,32 +5,41 @@ import (
 	"time"
 
 	"github.com/openshift/microshift/pkg/admin"
-	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/version"
 
 	"github.com/spf13/cobra"
 )
 
-func NewAdminCommand() *cobra.Command {
+func newAdminBackupCommand() *cobra.Command {
 	backup := &cobra.Command{
 		Use:   "backup",
-		Short: "Back up current data",
-		Long:  fmt.Sprintf("Backs up current MicroShift data to %s", config.BackupsDir),
+		Short: "Makes a backup of MicroShift data",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return admin.MakeBackup(cmd.Flag("name").Value.String())
+			return admin.MakeBackup(
+				cmd.Flag("dest").Value.String(),
+				cmd.Flag("name").Value.String(),
+			)
 		},
 	}
-
 	v := version.Get()
-	backup.PersistentFlags().String("name",
+	backup.PersistentFlags().String(
+		"dest",
+		"/var/lib/microshift-backups",
+		"Directory with backups",
+	)
+	backup.PersistentFlags().String(
+		"name",
 		fmt.Sprintf("%s.%s__%s", v.Major, v.Minor, time.Now().UTC().Format("20060102_150405")),
-		fmt.Sprintf("Backup dir name in %s", config.BackupsDir))
+		"Backup name",
+	)
+	return backup
+}
 
+func NewAdminCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "admin",
 		Short: "Commands for managing MicroShift",
 	}
-	cmd.AddCommand(backup)
-
+	cmd.AddCommand(newAdminBackupCommand())
 	return cmd
 }

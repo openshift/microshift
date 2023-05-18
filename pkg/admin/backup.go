@@ -19,13 +19,13 @@ var (
 	}
 )
 
-func MakeBackup(name string) error {
-	if err := config.CreateDir(config.BackupsDir); err != nil {
-		klog.Errorf("Failed to create dir %s: %v", config.BackupsDir, err)
+func MakeBackup(target, name string) error {
+	if err := config.CreateDir(target); err != nil {
+		klog.Errorf("Failed to create dir %s: %v", target, err)
 		return err
 	}
 
-	dest := filepath.Join(config.BackupsDir, name)
+	dest := filepath.Join(target, name)
 	tmp_dest := dest + "-tmp"
 
 	args := append(cpArgs, config.DataDir, tmp_dest)
@@ -45,7 +45,6 @@ func MakeBackup(name string) error {
 		klog.Errorf("Failed to rename %s to %s: %v", tmp_dest, dest, err)
 		return err
 	}
-
-	klog.Infof("Backed up current data to %s", dest)
+	klog.Infof("Backed %s to %s", config.DataDir, dest)
 	return nil
 }
