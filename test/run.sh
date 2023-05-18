@@ -81,7 +81,7 @@ else
     # shellcheck disable=SC2086
     "${RF_BINARY}" \
         --randomize all \
-        --loglevel DEBUG \
+        --loglevel TRACE \
         -V "${RF_VARIABLES}" \
         -x junit.xml \
         --outputdir "${OUTDIR}" \
