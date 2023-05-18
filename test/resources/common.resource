@@ -1,7 +1,9 @@
 *** Settings ***
+Documentation    Keywords common to many test suites
 Library    OperatingSystem
 Library    String
 Resource   ../resources/kubeconfig.resource
+
 
 *** Keywords ***
 Setup Suite
@@ -32,5 +34,9 @@ Teardown Suite With Namespace
 
 Check Required Env Variables
     [Documentation]    Fail if any of the required environment variables is missing.
-    Run Keyword If  "${USHIFT_HOST}"=="${EMPTY}"    Fatal Error    USHIFT_HOST variable is required
-    Run Keyword If  "${USHIFT_USER}"=="${EMPTY}"    Fatal Error    USHIFT_USER variable is required
+    IF  "${USHIFT_HOST}"=="${EMPTY}"
+        Fatal Error    USHIFT_HOST variable is required
+    END
+    IF  "${USHIFT_USER}"=="${EMPTY}"
+        Fatal Error    USHIFT_USER variable is required
+    END

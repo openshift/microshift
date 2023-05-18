@@ -1,7 +1,9 @@
 *** Settings ***
+Documentation    Keywords for accessing a kubeconfig file for the MicroShift host
 Library    OperatingSystem
 Library    String
 Resource   ../resources/microshift-host.resource
+
 
 *** Keywords ***
 Get Kubeconfig
@@ -12,7 +14,7 @@ Get Kubeconfig
     ...    sudo=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
     Should Not Be Empty            ${kubeconfig}
-    [Return]    ${kubeconfig}
+    RETURN    ${kubeconfig}
 
 Setup Kubeconfig
     [Documentation]    Get the kubeconfig file from the configured $USHIFT_HOST, create a temporary file

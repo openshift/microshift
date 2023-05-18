@@ -1,5 +1,6 @@
 *** Settings ***
-Library    SSHLibrary
+Documentation    Keywords for working with the MicroShift host
+Library          SSHLibrary
 
 
 *** Keywords ***

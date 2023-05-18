@@ -1,8 +1,11 @@
 *** Settings ***
+Documentation  Keywords for running the microshift command line.
+
 Library    Process
-Library    SSHLibrary
 Library    String
 Library    OperatingSystem
+
+Library    SSHLibrary
 Resource    ../resources/microshift-host.resource
 Library    ../resources/YAML.py
 
