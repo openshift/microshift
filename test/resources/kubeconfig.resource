@@ -34,6 +34,7 @@ Run With Kubeconfig
     [Arguments]    ${cmd}    ${allow_fail}=False
     ${result}=    Run Process    ${cmd}    env:KUBECONFIG=${KUBECONFIG}    stderr=STDOUT    shell=True
     Log    ${result.stdout}
+    Log    ${result.stderr}
     IF    ${allow_fail} == False
         Should Be Equal As Integers    ${result.rc}    0
     END
