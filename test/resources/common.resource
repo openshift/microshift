@@ -12,6 +12,7 @@ Setup Suite
 Setup Suite With Namespace
     [Documentation]    Setup a test suite by creating a unique namespace and configuring Kubeconfig
     Check Required Env Variables
+    Login MicroShift Host
     Setup Kubeconfig
     ${rand}=    Generate Random String
     ${rand}=    Convert To Lower Case    ${rand}
@@ -22,6 +23,7 @@ Setup Suite With Namespace
 Teardown Suite
     [Documentation]    Teardown the namespace-less test suite by removing the Kubeconfig.
     Remove Kubeconfig
+    Login MicroShift Host
 
 Teardown Suite With Namespace
     [Documentation]    Teardown the namespaced test suite by removing the namespace and removing the Kubeconfig.

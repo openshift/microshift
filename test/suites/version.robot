@@ -44,12 +44,14 @@ ConfigMap Matches CLI
 Setup
     [Documentation]  Test suite setup
     Check Required Env Variables
+    Login MicroShift Host
     Setup Kubeconfig
     Read Expected Versions
 
 Teardown
     [Documentation]  Test suite teardown
     Remove Kubeconfig
+    Logout MicroShift Host
 
 Read Expected Versions  # robocop: disable=too-many-calls-in-keyword
     [Documentation]  Read ../Makefile.version.aarch64.var to find the expected versions

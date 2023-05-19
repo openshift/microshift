@@ -7,11 +7,9 @@ Resource   ../resources/microshift-host.resource
 Get Kubeconfig
     [Documentation]    Get the kubeconfig file from the host argument and return contents
     [Arguments]    ${host}
-    Login MicroShift Host
     ${kubeconfig}    ${rc}=    Execute Command
     ...    cat /var/lib/microshift/resources/kubeadmin/${host}/kubeconfig
     ...    sudo=True    return_rc=True
-    Logout MicroShift Host
     Should Be Equal As Integers    ${rc}    0
     Should Not Be Empty            ${kubeconfig}
     [Return]    ${kubeconfig}
