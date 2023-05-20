@@ -1,11 +1,13 @@
 package admin
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 
 	"k8s.io/klog/v2"
 )
@@ -19,32 +21,113 @@ var (
 	}
 )
 
-func MakeBackup(target, name string) error {
-	if err := config.CreateDir(target); err != nil {
-		klog.Errorf("Failed to create dir %s: %v", target, err)
+type BackupConfig struct {
+	// Target is the base directory storing all backups
+	Target string
+
+	// Name is backup's directory name
+	Name string
+}
+
+// MakeBackup backs up MicroShift data (/var/lib/microshift) to
+// target/name/ (e.g. /var/lib/microshift-backups/backup-00001).
+func MakeBackup(cfg BackupConfig) error {
+	if err := ensureDirExists(cfg.Target); err != nil {
 		return err
 	}
 
-	dest := filepath.Join(target, name)
-	tmp_dest := dest + "-tmp"
+	dest := filepath.Join(cfg.Target, cfg.Name)
+	dest_tmp := dest + ".tmp"
 
-	args := append(cpArgs, config.DataDir, tmp_dest)
-	out, err := exec.Command("cp", args...).CombinedOutput() //nolint:gosec
-	klog.Infof("Output of cp (%v): %v", args, string(out))
+	if err := dirShouldNotExist(dest_tmp); err != nil {
+		return err
+	}
+
+	if err := copyDataDir(dest_tmp); err != nil {
+		return err
+	}
+
+	if err := removeDirBeforeRenaming(dest); err != nil {
+		return err
+	}
+
+	if err := renameDir(dest_tmp, dest); err != nil {
+		return err
+	}
+
+	klog.InfoS("Data backed up", "data", config.DataDir, "backup", dest)
+	return nil
+}
+
+func ensureDirExists(path string) error {
+	klog.InfoS("Making sure %s exists", path)
+
+	found, err := util.FileExists(path)
 	if err != nil {
-		klog.Errorf("Failed to make backup - copy failed: %v", err)
-		return err
+		return fmt.Errorf("failed checking if %s exists: %w", path, err)
+	}
+	if found {
+		klog.Infof("Directory %s already exists", path)
+		return nil
 	}
 
-	if err := os.RemoveAll(dest); err != nil {
-		klog.Errorf("Failed to remove %s directory: %v", tmp_dest, err)
-		return err
+	err = util.MakeDir(path)
+	if err != nil {
+		return fmt.Errorf("failed creating %s: %w", path, err)
+	}
+	return err
+}
+
+func dirShouldNotExist(path string) error {
+	klog.Infof("Making sure %s does not exist", path)
+
+	found, err := util.FileExists(path)
+	if err != nil {
+		return fmt.Errorf("failed to check if %s exists: %w", path, err)
+	}
+	if found {
+		return fmt.Errorf("directory %s already exists", path)
+	}
+	return nil
+}
+
+func removeDirBeforeRenaming(path string) error {
+	found, err := util.FileExists(path)
+	if err != nil {
+		return fmt.Errorf("failed to check if %s exists: %w", path, err)
+	}
+	if found {
+		klog.Infof("Removing %s before renaming tmp directory", path)
+		if err := os.RemoveAll(path); err != nil {
+			return fmt.Errorf("failed to remove %s: %w", path, err)
+		}
+	}
+	return nil
+}
+
+func copyDataDir(dest string) error {
+	cmd := exec.Command("cp", append(cpArgs, config.DataDir, dest)...) //nolint:gosec
+	klog.InfoS("Executing command", "cmd", cmd)
+	out, err := cmd.CombinedOutput()
+	klog.InfoS("Command finished running", "cmd", cmd, "output", out)
+
+	if err != nil {
+		return fmt.Errorf("failed to copy data: %w", err)
+	}
+	return nil
+}
+
+func renameDir(from, to string) error {
+	klog.InfoS("Renaming directory", "from", from, "to", to)
+	err := os.Rename(from, to)
+	if err == nil {
+		return nil
 	}
 
-	if err := os.Rename(tmp_dest, dest); err != nil {
-		klog.Errorf("Failed to rename %s to %s: %v", tmp_dest, dest, err)
-		return err
+	klog.ErrorS(err, "Renaming directory failed - deleting 'from' dir", "from", from, "to", to)
+	if rmErr := os.RemoveAll(from); rmErr != nil {
+		klog.ErrorS(rmErr, "Failed to remove directory", "dir", from)
+		return fmt.Errorf("failed to remove %s: %w: %w", from, err, rmErr)
 	}
-	klog.Infof("Backed %s to %s", config.DataDir, dest)
 	return nil
 }

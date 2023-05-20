@@ -62,7 +62,3 @@ func ActiveConfig() (*Config, error) {
 	}
 	return getActiveConfigFromYAML(contents)
 }
-
-func CreateDir(path string) error {
-	return os.MkdirAll(path, 0700)
-}

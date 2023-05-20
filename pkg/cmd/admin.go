@@ -17,8 +17,10 @@ func newAdminBackupCommand() *cobra.Command {
 		Short: "Makes a backup of MicroShift data",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return admin.MakeBackup(
-				cmd.Flag("dest").Value.String(),
-				cmd.Flag("name").Value.String(),
+				admin.BackupConfig{
+					Target: cmd.Flag("dest").Value.String(),
+					Name:   cmd.Flag("name").Value.String(),
+				},
 			)
 		},
 	}

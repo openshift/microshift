@@ -99,7 +99,7 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatal(err)
 	}
 
-	if err := config.CreateDir(config.DataDir); err != nil {
+	if err := util.MakeDir(config.DataDir); err != nil {
 		return fmt.Errorf("failed to create dir %q: %w", config.DataDir, err)
 	}
 
