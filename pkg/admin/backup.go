@@ -32,6 +32,10 @@ type BackupConfig struct {
 // MakeBackup backs up MicroShift data (/var/lib/microshift) to
 // target/name/ (e.g. /var/lib/microshift-backups/backup-00001).
 func MakeBackup(cfg BackupConfig) error {
+	if err := microshiftShouldNotRun(); err != nil {
+		return err
+	}
+
 	if err := ensureDirExists(cfg.Target); err != nil {
 		return err
 	}
