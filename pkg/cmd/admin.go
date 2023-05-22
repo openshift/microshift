@@ -11,10 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newAdminBackupCommand() *cobra.Command {
+func newAdminDataCommand() *cobra.Command {
 	backup := &cobra.Command{
 		Use:   "backup",
-		Short: "Makes a backup of MicroShift data",
+		Short: "Backup MicroShift data",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return admin.MakeBackup(
 				admin.BackupConfig{
@@ -24,18 +24,25 @@ func newAdminBackupCommand() *cobra.Command {
 			)
 		},
 	}
+
+	data := &cobra.Command{
+		Use:   "data",
+		Short: "Commands for managing MicroShift data",
+	}
 	v := version.Get()
-	backup.PersistentFlags().String(
+	data.PersistentFlags().String(
 		"dest",
 		config.BackupsDir,
 		"Directory with backups",
 	)
-	backup.PersistentFlags().String(
+	data.PersistentFlags().String(
 		"name",
 		fmt.Sprintf("%s.%s__%s", v.Major, v.Minor, time.Now().UTC().Format("20060102_150405")),
 		"Backup name",
 	)
-	return backup
+
+	data.AddCommand(backup)
+	return data
 }
 
 func NewAdminCommand() *cobra.Command {
@@ -43,6 +50,6 @@ func NewAdminCommand() *cobra.Command {
 		Use:   "admin",
 		Short: "Commands for managing MicroShift",
 	}
-	cmd.AddCommand(newAdminBackupCommand())
+	cmd.AddCommand(newAdminDataCommand())
 	return cmd
 }

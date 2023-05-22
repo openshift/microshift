@@ -64,7 +64,7 @@ func MakeBackup(cfg BackupConfig) error {
 }
 
 func ensureDirExists(path string) error {
-	klog.InfoS("Making sure %s exists", path)
+	klog.Infof("Making sure %s exists", path)
 
 	found, err := util.FileExists(path)
 	if err != nil {
