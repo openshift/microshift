@@ -15,16 +15,16 @@ type DataManager interface {
 	Restore(BackupConfig) error
 }
 
-func NewDataManager() DataManager {
-	return &dataManager{}
+func NewDataManager() *IDataManager {
+	return &IDataManager{}
 }
 
-type dataManager struct{}
+type IDataManager struct{}
 
-func (dm *dataManager) Backup(cfg BackupConfig) error {
+func (dm *IDataManager) Backup(cfg BackupConfig) error {
 	return makeBackup(cfg)
 }
 
-func (dm *dataManager) Restore(cfg BackupConfig) error {
+func (dm *IDataManager) Restore(cfg BackupConfig) error {
 	return fmt.Errorf("not implemented")
 }
