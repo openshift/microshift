@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/openshift/microshift/pkg/admin"
+	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/version"
 
@@ -16,10 +16,10 @@ func newAdminDataCommand() *cobra.Command {
 		Use:   "backup",
 		Short: "Backup MicroShift data",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return admin.MakeBackup(
-				admin.BackupConfig{
-					Target: cmd.Flag("dest").Value.String(),
-					Name:   cmd.Flag("name").Value.String(),
+			return data.NewDataManager().Backup(
+				data.BackupConfig{
+					BackupsStorage: cmd.Flag("dest").Value.String(),
+					Name:           cmd.Flag("name").Value.String(),
 				},
 			)
 		},
