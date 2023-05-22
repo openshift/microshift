@@ -1,13 +1,18 @@
-# cluster-ingress-operator embedded-component 6aa482c551de22016dc2b6c87ca11ef4ac2be04d to 7262c34b3a6434b49851ff5f0cceec87a2ee9706
-7015b26e3144dd744059a96e191763fe7aa694dc 2023-05-05T12:25:24+00:00 OCPBUGS-12913: Deflake TestRouterCompressionOperation
-e0078fd9c69ac1d901456eaefdc802cd7fad8bf7 2023-05-03T19:55:53+00:00 waitForDeploymentCompleteWithOldPodTermination fix
-2e514cb78daba4ac79ab6586fa0206c4db34cc58 2023-05-03T19:55:53+00:00 Rename waitForDeploymentCompleteWithCleanup to waitForDeploymentCompleteWithOldPodTermination
-7bc9214b66b07c0301835eef7bccbbd19f8bcd8e 2023-05-03T19:55:53+00:00 Fix TestClientTLS: Wait for old router pods to be cleaned up before testing new mTLS config
-# cluster-network-operator embedded-component 823319ac7f3f51593a0956d5ba44e9f385f4e6cf to fed9560d379fa9e178441642a69746a126ac39b5
-7ec99008e321deaa249e10ed14456e63f7a43ca1 2023-04-27T13:49:01+00:00 rbac: ovn-kubernetes: add aggregate-to-cluster-reader permissions
-# machine-config-operator embedded-component 70aa0a560c0b0a01093f695cb358a8749d30b3d2 to f2cdca82301940d827f763dcdeaeb1d860c0bf6d
-03479518cf796fdabe761d346351040d927f20b5 2023-05-09T16:29:08+00:00 daemon: event only on actual OS updates
-# ovn-kubernetes image-amd64 49f6f059507ed04116d91d8f9e8dadd6fd1978d9 to 86284e6d4f67a4c56c9d6c2dc48e83f02ff84eef
-d7e64a946b043da51237b3850b5a0d62c80e63dc 2023-04-25T17:07:58+02:00 Use loadbalancer.Name as client index Revert predicate search optimization 3369d387417ede05033c002b782b0279b201ea76 as predicate search should not bee needed anymore
-# ovn-kubernetes image-arm64 49f6f059507ed04116d91d8f9e8dadd6fd1978d9 to 86284e6d4f67a4c56c9d6c2dc48e83f02ff84eef
-d7e64a946b043da51237b3850b5a0d62c80e63dc 2023-04-25T17:07:58+02:00 Use loadbalancer.Name as client index Revert predicate search optimization 3369d387417ede05033c002b782b0279b201ea76 as predicate search should not bee needed anymore
+# cluster-network-operator embedded-component fed9560d379fa9e178441642a69746a126ac39b5 to 3ed6bef191d49ede92ab8f7f684826a1b7967928
+fd324089e6266d3164e1982c090fc2bdabd5be72 2023-05-05T11:14:29+00:00 HyperShift: Add support for HostedControlPlane nodeSelector field
+10462673af4afde8854a25334b0fd52f6ab862ae 2023-05-05T11:14:29+00:00 HyperShift: Retrieve HostedControlPlane as part of bootstrap process
+65f31351f11e131ebfffa2191a66db495f23f553 2023-05-05T11:14:29+00:00 HyperShift: Move hypershift.go to platform package
+63bc9cfb0cb4b80d357bae7bdd7802a290bca338 2023-05-05T11:14:29+00:00 Migrate to hypershift v1beta1
+79ac53c377b60d121c68019d3271a7448401d6a0 2023-05-05T11:14:29+00:00 Fix go mod.
+c17476e3ee4cc9a190aa227aeb11af3f1584a8f6 2023-04-26T16:24:28+02:00 Fix priority class name on allowlist daemonset
+247b33c837d91ece2cb0d81699943d0aa2eeee19 2023-04-26T16:24:28+02:00 Ensure pods are present for allowlist daemonset
+14a718cf87a8ee27866f22eef97a22260286d29e 2023-04-26T16:24:28+02:00 Improve logging on allowlist controller
+# machine-config-operator embedded-component f2cdca82301940d827f763dcdeaeb1d860c0bf6d to 230bb7e5f5620af293f3dc5b9740e01f5644262f
+a46ecd83469dbec1c358935ba640d7c957260ec1 2023-04-28T16:32:06+00:00 Removed pivot func and added depreciation warning
+079d89218ceac3d887920912d10790af41f5ae31 2023-04-26T14:48:32+00:00 Bug OCPBUGS-4476: keepalived/ingress: change healthcheck script
+62de2db79f7a4668d4df8882ecfe906682802624 2023-04-03T16:37:38+00:00 OCPBUGS-10414: Fix regex dot in coredns config file
+f4f2e8beb4035d0f10ab2cd7cb65c6d1e8092c68 2023-03-28T12:06:22+00:00 configure-ovs: support UUID in vlan.parent
+# ovn-kubernetes image-amd64 86284e6d4f67a4c56c9d6c2dc48e83f02ff84eef to 9b6742d1022709cc023e395e2c7fa8a7141ea325
+2fb43e12293002b275e190789b63eb709f5ccaa1 2023-05-15T09:33:54+02:00 Call SyncEndpoints from AddService
+# ovn-kubernetes image-arm64 86284e6d4f67a4c56c9d6c2dc48e83f02ff84eef to 9b6742d1022709cc023e395e2c7fa8a7141ea325
+2fb43e12293002b275e190789b63eb709f5ccaa1 2023-05-15T09:33:54+02:00 Call SyncEndpoints from AddService
