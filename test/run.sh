@@ -9,9 +9,7 @@ ROOTDIR=$(git rev-parse --show-toplevel)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 RF_VENV="${ROOTDIR}/_output/robotenv"
-RF_BINARY="${RF_VENV}/bin/robot"
 RF_VARIABLES="${SCRIPTDIR}/variables.yaml"
-
 DRYRUN=false
 OUTDIR="${ROOTDIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
 
@@ -29,10 +27,14 @@ Options:
 
   -o DIR   The output directory. (${OUTDIR})
 
+  -v DIR   The venv directory. (${RF_VENV})
+
+  -i PATH  The variables file. (${RF_VARIABLES})
+
 EOF
 }
 
-while getopts "hno:" opt; do
+while getopts "hno:v:i:" opt; do
     case ${opt} in
         h)
             usage
@@ -44,6 +46,12 @@ while getopts "hno:" opt; do
         o)
             OUTDIR=${OPTARG}
             ;;
+        v)
+            RF_VENV=${OPTARG}
+            ;;
+        i)
+            RF_VARIABLES=${OPTARG}
+            ;;
         *)
             usage
             exit 1
@@ -52,9 +60,11 @@ while getopts "hno:" opt; do
 done
 shift $((OPTIND-1))
 
+RF_BINARY="${RF_VENV}/bin/robot"
+
 if [ ! -f "${RF_VARIABLES}" ]; then
-    echo "Please create a variables file at ${RF_VARIABLES}" 1>&2
-    echo "See ${RF_VARIABLES}.example for the expected content." 1>&2
+    echo "Please create or provide a variables file at ${RF_VARIABLES}" 1>&2
+    echo "See ${SCRIPTDIR}/variables.yaml.example for the expected content." 1>&2
     exit 1
 fi
 
