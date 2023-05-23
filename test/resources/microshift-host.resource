@@ -5,7 +5,11 @@ Library    SSHLibrary
 *** Keywords ***
 Login MicroShift Host
     [Documentation]  Login to the MicroShift host via ssh and leave the connection open
-    [Arguments]
+    ...
+    ...  This keyword is meant to be used at the suite level. This ensures
+    ...  most tests already have an open connection. Any tests that will take
+    ...  action that disrupt that connection are responsible for restoring it.
+
     Log  Host: ${USHIFT_HOST}
     SSHLibrary.Open Connection    ${USHIFT_HOST}
     ${variables}=  Get Variables
