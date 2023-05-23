@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This script automates the VM configuration steps described in the "MicroShift Development Environment" document.
+# This script implements the VM configuration steps described in the "MicroShift Development Environment" document.
 # See https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md
 #
 set -eo pipefail
@@ -62,8 +62,6 @@ OCP_PULL_SECRET=$1
 OCP_PULL_SECRET=$(realpath "${OCP_PULL_SECRET}")
 [ ! -f "${OCP_PULL_SECRET}" ] && usage "OpenShift pull secret '${OCP_PULL_SECRET}' is not a regular file"
 
-# Create Development Virtual Machine > Configuring VM
-# https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#configuring-vm
 echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}" 
 
 # Check the subscription status and register if necessary
@@ -84,33 +82,45 @@ fi
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     sudo dnf clean all -y
     sudo dnf update -y
-    sudo dnf install -y git cockpit make golang jq selinux-policy-devel rpm-build jq bash-completion
+    sudo dnf install -y git cockpit make jq selinux-policy-devel rpm-build jq bash-completion
     sudo systemctl enable --now cockpit.socket
 fi
 
+GO_VER=1.20.4
+GO_ARCH=$([ "$(uname -m)" == "x86_64" ] && echo "amd64" || echo "arm64")
+GO_INSTALL_DIR="/usr/local/go${GO_VER}"
+if ${INSTALL_BUILD_DEPS} && [ ! -d "${GO_INSTALL_DIR}" ]; then
+    echo "Installing go ${GO_VER}..."
+    # This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
+    # /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
+    curl -L -o "go${GO_VER}.linux-${GO_ARCH}.tar.gz" "https://go.dev/dl/go${GO_VER}.linux-${GO_ARCH}.tar.gz" &&
+        sudo rm -rf "/usr/local/go${GO_VER}" && \
+            sudo mkdir -p "/usr/local/go${GO_VER}" && \
+            sudo tar -C "/usr/local/go${GO_VER}" -xzf "go${GO_VER}.linux-${GO_ARCH}.tar.gz" --strip-components 1 && \
+            sudo rm -rfv /usr/local/bin/{go,gofmt} && \
+            sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/ && \
+            rm -rfv "go${GO_VER}.linux-${GO_ARCH}.tar.gz"
+fi
+
 if ${BUILD_AND_RUN}; then
-    # Build MicroShift
-    # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#build-microshift
     if [ ! -e ~/microshift ]; then
         git clone https://github.com/openshift/microshift.git ~/microshift
     fi
     cd ~/microshift
 
-    # Build MicroShift > RPM Packages
-    # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#rpm-packages
     make clean
     make rpm
     make srpm
 fi
 
-# Run MicroShift Executable > Runtime Prerequisites
-# https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#runtime-prerequisites
 if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
+    # This version might not match the version under development because we need
+    # to pull in dependencies that are already released
+    OCPVERSION=4.13
     sudo subscription-manager config --rhsm.manage_repos=1
-    # TODO: Start using 'rhocp-4.13' repository when OCP 4.13 is released
     sudo subscription-manager repos \
-        --enable "rhocp-4.12-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
+        --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
         --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
 else
     sudo dnf install -y centos-release-nfv-common
@@ -136,8 +146,6 @@ if [ ! -e "/etc/crio/openshift-pull-secret" ]; then
     sudo chmod 600 /etc/crio/openshift-pull-secret
 fi
 
-# Run MicroShift Executable > Installing Clients
-# https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#installing-clients
 if ${RHEL_SUBSCRIPTION}; then
     sudo dnf install -y openshift-clients 
 else
@@ -150,8 +158,6 @@ else
 fi
 
 if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
-    # Run MicroShift Executable > Configuring MicroShift > Firewalld
-    # https://github.com/openshift/microshift/blob/main/docs/howto_firewall.md#firewalld
     sudo dnf install -y firewalld
     sudo systemctl enable firewalld --now 
     sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 
@@ -167,8 +173,6 @@ if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
 fi
 
 if ${BUILD_AND_RUN}; then
-    # Run MicroShift Executable > Configuring MicroShift
-    # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#configuring-microshift
     sudo systemctl enable crio 
     sudo systemctl start microshift
 

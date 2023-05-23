@@ -56,19 +56,6 @@ In the OS installation wizard, set the following options:
 
 Click on Begin Installation and wait until the OS installation is complete.
 
-### Configuring VM
-Log into the virtual machine using SSH with the `microshift` user credentials.
-
-Run the following commands to configure SUDO, upgrade the system, install basic dependencies and enable remote Cockpit console.
-```bash
-echo -e 'microshift\tALL=(ALL)\tNOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift
-sudo dnf clean all -y
-sudo dnf update -y
-sudo dnf install -y git cockpit make golang selinux-policy-devel rpm-build jq bash-completion
-sudo systemctl enable --now cockpit.socket
-```
-You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
-
 ## Build MicroShift
 Log into the development virtual machine with the `microshift` user credentials.
 Clone the repository to be used for building various artifacts.
@@ -76,6 +63,23 @@ Clone the repository to be used for building various artifacts.
 git clone https://github.com/openshift/microshift.git ~/microshift
 cd ~/microshift
 ```
+
+### Configuring VM
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and store it in the `~/.pull-secret` file.
+The pull secret will also be used in the `CRI-O` configuration for pulling
+MicroShift container images.
+
+Run the following command to configure SUDO, upgrade the system, firewall, install
+the build and runtime dependencies, Kubernetes client utilities, and enable remote
+Cockpit console.
+
+```bash
+./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall ~/.pull-secret
+```
+You should now be able to access the VM Cockpit console using `https://<vm_ip>:9090` URL.
+
+> The script prompts for Red Hat subscription credentials if the system
+> has not been registered yet.
 
 ### Executable
 Run `make` command in the top-level directory. If necessary, add `DEBUG=true` argument to the `make` command for building a binary with debug symbols.
@@ -110,69 +114,10 @@ $ cd ~/microshift/_output/rpmbuild && find . -name \*.rpm
 ## Run MicroShift Executable
 Log into the development virtual machine with the `microshift` user credentials.
 
-### Runtime Prerequisites
-Enable the repositories required for installing MicroShift dependencies.
-
-<details><summary>RHEL</summary>
-
-When working with MicroShift based on a pre-release _minor_ version `Y` of OpenShift, the corresponding RPM repository `rhocp-4.$Y-for-rhel-9-$ARCH-rpms` may not be available yet. In that case, use the `Y-1` released version or a `Y-beta` version from the public `https://mirror.openshift.com/pub/openshift-v4/$ARCH/dependencies/rpms/` OpenShift mirror repository.
-
-```bash
-OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-sudo subscription-manager config --rhsm.manage_repos=1
-# TODO: Start using 'rhocp-4.13' repository when OCP 4.13 is released
-sudo subscription-manager repos \
-    --enable "rhocp-4.12-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
-    --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
-```
-</details>
-<details><summary>CentOS</summary>
-
-```bash
-sudo dnf install -y centos-release-nfv-common
-sudo dnf copr enable -y @OKD/okd centos-stream-9-$(uname -m)
-sudo tee /etc/yum.repos.d/openvswitch2-$(uname -m)-rpms.repo >/dev/null <<EOF
-[sig-nfv]
-name=CentOS Stream 9 - SIG NFV
-baseurl=http://mirror.stream.centos.org/SIGs/9-stream/nfv/\$basearch/openvswitch-2/
-gpgcheck=1
-enabled=1
-skip_if_unavailable=0
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-NFV
-EOF
-```
-</details>
-
 Proceed by installing the MicroShift RPM packages. This procedure pulls in the required package dependencies, also installing the necessary configuration files and `systemd` units.
 ```bash
 sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 ```
-
-Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page. Copy it to `/etc/crio/openshift-pull-secret` and update its file permissions so `CRI-O` can use it when fetching container images.
-```bash
-sudo chmod 600 /etc/crio/openshift-pull-secret
-```
-
-### Installing Clients
-Run the following commands to install `oc` and `kubectl` utilities.
-
-<details><summary>RHEL</summary>
-
-```bash
-sudo dnf install -y openshift-clients
-```
-</details>
-<details><summary>CentOS</summary>
-
-```bash
-OCC_REM=https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp-dev-preview/latest-4.13/openshift-client-linux.tar.gz
-OCC_LOC=$(mktemp /tmp/openshift-client-linux-XXXXX.tar.gz)
-
-curl -s ${OCC_REM} --output ${OCC_LOC}
-sudo tar zxf ${OCC_LOC} -C /usr/bin
-rm -f ${OCC_LOC}
-```
-</details>
 
 ### Configuring MicroShift
 MicroShift requires system configuration updates before it can be run. These updates include `CRI-O`, networking and file system customizations.
