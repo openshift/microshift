@@ -27,7 +27,7 @@ https://github.com/openshift/oc image-arm64 31aa3e89a926f81aa0af30320ffcb71acadf
 https://github.com/openshift/coredns image-arm64 9aaa7e0a86b69bafb9f544a0e5cb1873535a8f6b
 https://github.com/openshift/csi-external-provisioner image-arm64 140851f6c0e70cf917b3361808b31628c68ea8a5
 https://github.com/openshift/csi-external-resizer image-arm64 239d751f51743214417dd5058645c2c1d390d1b5
-https://github.com/openshift/csi-livenessprobe image-arm64 720e1d6e3e828dec9908091da9f5d80a31d75585
+https://github.com/openshift/csi-livenessprobe image-arm64 9cb056421c5a2e37435dbedbd7d73de8db1e094a
 https://github.com/openshift/csi-node-driver-registrar image-arm64 805d5ac247137b02e6081e3eb7aa1fb9f4c7b4b2
 https://github.com/openshift/router image-arm64 3065f6583f3925328fbdbfe95e3bc7bb7a084d33
 https://github.com/openshift/kube-rbac-proxy image-arm64 94f3fde785a22afdc77768f5c346c7d3195274d2
