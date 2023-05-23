@@ -1,14 +1,6 @@
-# cluster-network-operator embedded-component fed9560d379fa9e178441642a69746a126ac39b5 to 3ed6bef191d49ede92ab8f7f684826a1b7967928
-fd324089e6266d3164e1982c090fc2bdabd5be72 2023-05-05T11:14:29+00:00 HyperShift: Add support for HostedControlPlane nodeSelector field
-10462673af4afde8854a25334b0fd52f6ab862ae 2023-05-05T11:14:29+00:00 HyperShift: Retrieve HostedControlPlane as part of bootstrap process
-65f31351f11e131ebfffa2191a66db495f23f553 2023-05-05T11:14:29+00:00 HyperShift: Move hypershift.go to platform package
-63bc9cfb0cb4b80d357bae7bdd7802a290bca338 2023-05-05T11:14:29+00:00 Migrate to hypershift v1beta1
-79ac53c377b60d121c68019d3271a7448401d6a0 2023-05-05T11:14:29+00:00 Fix go mod.
-c17476e3ee4cc9a190aa227aeb11af3f1584a8f6 2023-04-26T16:24:28+02:00 Fix priority class name on allowlist daemonset
-247b33c837d91ece2cb0d81699943d0aa2eeee19 2023-04-26T16:24:28+02:00 Ensure pods are present for allowlist daemonset
-14a718cf87a8ee27866f22eef97a22260286d29e 2023-04-26T16:24:28+02:00 Improve logging on allowlist controller
-# machine-config-operator embedded-component f2cdca82301940d827f763dcdeaeb1d860c0bf6d to 230bb7e5f5620af293f3dc5b9740e01f5644262f
-a46ecd83469dbec1c358935ba640d7c957260ec1 2023-04-28T16:32:06+00:00 Removed pivot func and added depreciation warning
-079d89218ceac3d887920912d10790af41f5ae31 2023-04-26T14:48:32+00:00 Bug OCPBUGS-4476: keepalived/ingress: change healthcheck script
-62de2db79f7a4668d4df8882ecfe906682802624 2023-04-03T16:37:38+00:00 OCPBUGS-10414: Fix regex dot in coredns config file
-f4f2e8beb4035d0f10ab2cd7cb65c6d1e8092c68 2023-03-28T12:06:22+00:00 configure-ovs: support UUID in vlan.parent
+# cluster-policy-controller embedded-component 20a47733b59ba746aa3c6410dca2d1a1ab6339de to 4aa5ecd04fa2a35a5ae07a13707bd2e0239432a9
+08178e0ec64c4458590b5c0a5650f3ecccff75f4 2023-05-17T12:23:58+00:00 external template and route Informer
+# ovn-kubernetes image-amd64 86284e6d4f67a4c56c9d6c2dc48e83f02ff84eef to 9b6742d1022709cc023e395e2c7fa8a7141ea325
+2fb43e12293002b275e190789b63eb709f5ccaa1 2023-05-15T09:33:54+02:00 Call SyncEndpoints from AddService
+# ovn-kubernetes image-arm64 86284e6d4f67a4c56c9d6c2dc48e83f02ff84eef to 9b6742d1022709cc023e395e2c7fa8a7141ea325
+2fb43e12293002b275e190789b63eb709f5ccaa1 2023-05-15T09:33:54+02:00 Call SyncEndpoints from AddService
