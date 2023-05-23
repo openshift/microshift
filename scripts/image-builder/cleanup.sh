@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e -o pipefail
 
-ROOTDIR=$(git rev-parse --show-toplevel)
+ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )"
 BUILDDIR="${ROOTDIR}/_output/image-builder/"
 
 title() {
