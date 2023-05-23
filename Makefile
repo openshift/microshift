@@ -137,7 +137,7 @@ verify-licenses: microshift etcd
 
 .PHONY: verify-assets
 verify-assets:
-	./scripts/auto-rebase/presubmit.py
+	./scripts/verify/verify-assets.sh
 
 .PHONY: verify-go
 verify-go: verify-golangci
