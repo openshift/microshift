@@ -117,6 +117,7 @@ enforceNodeAllocatable: []
 rotateCertificates: false  #TODO
 serializeImagePulls: false
 # staticPodPath: /etc/kubernetes/manifests
+containerRuntimeEndpoint: unix:///var/run/crio/crio.sock
 featureGates:
   APIPriorityAndFairness: true
   PodSecurity: true
