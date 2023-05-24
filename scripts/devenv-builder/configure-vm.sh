@@ -81,14 +81,6 @@ if ${RHEL_SUBSCRIPTION}; then
     fi
 fi
 
-# FIXME: Temporarily disable selinux until we update the version of
-# RHEL used in CI.
-if ! grep -q 'Red Hat Enterprise Linux release 9.2' /etc/redhat-release; then
-    echo "WARNING: disabling selinux on $(cat /etc/redhat-release)"
-    sudo setenforce Permissive
-    sudo sed --in-place -e 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config
-fi
-
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     sudo dnf clean all -y
     sudo dnf update -y
@@ -116,9 +108,8 @@ fi
 if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     sudo subscription-manager config --rhsm.manage_repos=1
-    # TODO: Start using 'rhocp-4.13' repository when OCP 4.13 is released
     sudo subscription-manager repos \
-        --enable "rhocp-4.12-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
+        --enable "rhocp-4.13-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
         --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
 else
     sudo dnf install -y centos-release-nfv-common
