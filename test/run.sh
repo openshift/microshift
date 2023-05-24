@@ -5,8 +5,8 @@ IFS=$'\n\t'
 
 # shellcheck disable=SC2086
 
-ROOTDIR=$(git rev-parse --show-toplevel)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOTDIR="${SCRIPTDIR}/.."
 
 RF_VENV="${ROOTDIR}/_output/robotenv"
 RF_VARIABLES="${SCRIPTDIR}/variables.yaml"
