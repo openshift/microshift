@@ -1,6 +1,2 @@
-# cluster-policy-controller embedded-component 20a47733b59ba746aa3c6410dca2d1a1ab6339de to 4aa5ecd04fa2a35a5ae07a13707bd2e0239432a9
-08178e0ec64c4458590b5c0a5650f3ecccff75f4 2023-05-17T12:23:58+00:00 external template and route Informer
-# ovn-kubernetes image-amd64 86284e6d4f67a4c56c9d6c2dc48e83f02ff84eef to 9b6742d1022709cc023e395e2c7fa8a7141ea325
-2fb43e12293002b275e190789b63eb709f5ccaa1 2023-05-15T09:33:54+02:00 Call SyncEndpoints from AddService
-# ovn-kubernetes image-arm64 86284e6d4f67a4c56c9d6c2dc48e83f02ff84eef to 9b6742d1022709cc023e395e2c7fa8a7141ea325
-2fb43e12293002b275e190789b63eb709f5ccaa1 2023-05-15T09:33:54+02:00 Call SyncEndpoints from AddService
+# cluster-kube-controller-manager-operator embedded-component 9f53628279a765cccb234b1ef992075ad7cddf96 to 56b970786d152344f0d4762c8271d20e5fc9d28b
+c96d1544ebddefe19cf884df63efa7f7c60d6357 2023-05-03T11:45:10+02:00 AWS should not use external-cloud-volume-plugin post CSI migration
