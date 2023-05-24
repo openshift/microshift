@@ -101,11 +101,11 @@ func ApplyKustomization(kustomization string, kubeconfig string) error {
 	}
 	groups.Add(cmds)
 
-	applyFlags := apply.NewApplyFlags(f, ioStreams)
+	applyFlags := apply.NewApplyFlags(ioStreams)
 	applyFlags.DeleteFlags.FileNameFlags.Kustomize = &kustomization
 	applyFlags.AddFlags(cmds)
 
-	o, err := applyFlags.ToOptions(cmds, "kubectl", nil)
+	o, err := applyFlags.ToOptions(f, cmds, "kubectl", nil)
 	if err != nil {
 		return err
 	}
