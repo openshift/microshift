@@ -3,8 +3,8 @@ package data
 import "fmt"
 
 type BackupConfig struct {
-	// BackupsStorage is the base directory storing all backups
-	BackupsStorage string
+	// Storage is the base directory storing all backups
+	Storage string
 
 	// Name is backup's directory name
 	Name string

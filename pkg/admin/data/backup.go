@@ -24,15 +24,22 @@ var (
 // MakeBackup backs up MicroShift data (/var/lib/microshift) to
 // target/name/ (e.g. /var/lib/microshift-backups/backup-00001).
 func makeBackup(cfg BackupConfig) error {
+	if cfg.Storage == "" {
+		return fmt.Errorf("backup storage must not be empty")
+	}
+	if cfg.Name == "" {
+		return fmt.Errorf("backup name must not be empty")
+	}
+
 	if err := microshiftShouldNotRun(); err != nil {
 		return err
 	}
 
-	if err := ensureDirExists(cfg.BackupsStorage); err != nil {
+	if err := ensureDirExists(cfg.Storage); err != nil {
 		return err
 	}
 
-	dest := filepath.Join(cfg.BackupsStorage, cfg.Name)
+	dest := filepath.Join(cfg.Storage, cfg.Name)
 	dest_tmp := dest + ".tmp"
 
 	if err := dirShouldNotExist(dest_tmp); err != nil {

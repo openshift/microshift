@@ -18,8 +18,8 @@ func newAdminDataCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return data.NewDataManager().Backup(
 				data.BackupConfig{
-					BackupsStorage: cmd.Flag("dest").Value.String(),
-					Name:           cmd.Flag("name").Value.String(),
+					Storage: cmd.Flag("storage").Value.String(),
+					Name:    cmd.Flag("name").Value.String(),
 				},
 			)
 		},
@@ -31,7 +31,7 @@ func newAdminDataCommand() *cobra.Command {
 	}
 	v := version.Get()
 	data.PersistentFlags().String(
-		"dest",
+		"storage",
 		config.BackupsDir,
 		"Directory with backups",
 	)
