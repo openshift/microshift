@@ -78,7 +78,7 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	// run readiness check
 	go func() {
 		// This endpoint uses a self-signed certificate on purpose, we need to skip verification.
-		healthcheckStatus := util.RetryInsecureGet("https://localhost:10259/healthz")
+		healthcheckStatus := util.RetryInsecureGet(ctx, "https://localhost:10259/healthz")
 		if healthcheckStatus != 200 {
 			klog.Errorf("%s healthcheck failed", s.Name(), fmt.Errorf("kube-scheduler failed to start"))
 			errorChannel <- errors.New("kube-scheduler healthcheck failed")

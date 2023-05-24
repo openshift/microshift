@@ -100,7 +100,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 
 	// run readiness check
 	go func() {
-		healthcheckStatus := util.RetryTCPConnection("localhost", "8445")
+		healthcheckStatus := util.RetryTCPConnection(ctx, "localhost", "8445")
 		if !healthcheckStatus {
 			klog.Fatalf("initial healthcheck on %s failed", s.Name())
 		}

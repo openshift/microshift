@@ -86,7 +86,7 @@ func WaitForCrdsEstablished(ctx context.Context, cfg *config.Config) error {
 		}
 		obj := readCRDOrDie(crdBytes)
 
-		if err = wait.PollImmediate(customResourceReadyInterval, customResourceReadyTimeout, func() (done bool, err error) {
+		if err = wait.PollUntilContextTimeout(ctx, customResourceReadyInterval, customResourceReadyTimeout, true, func(ctx context.Context) (done bool, err error) {
 			done, e := isEstablished(ctx, clientSet, obj)
 			// Intermittent errors can occur when calling the apiserver.  To be on the safe side, log them, but poll until timeout
 			if e != nil {
@@ -158,7 +158,7 @@ func ApplyCRDs(ctx context.Context, cfg *config.Config) error {
 			return fmt.Errorf("error getting asset %s: %v", crd, err)
 		}
 		c := readCRDOrDie(crdBytes)
-		if err := wait.Poll(customResourceReadyInterval, customResourceReadyTimeout, func() (bool, error) {
+		if err = wait.PollUntilContextTimeout(ctx, customResourceReadyInterval, customResourceReadyTimeout, false, func(ctx context.Context) (done bool, err error) {
 			if err := applyCRD(ctx, client, c); err != nil {
 				klog.Warningf("failed to apply openshift CRD %s: %v", crd, err)
 				return false, nil
@@ -166,7 +166,7 @@ func ApplyCRDs(ctx context.Context, cfg *config.Config) error {
 			klog.Infof("Applied openshift CRD %s", crd)
 			return true, nil
 		}); err != nil {
-			if err == wait.ErrWaitTimeout {
+			if err == context.DeadlineExceeded {
 				return fmt.Errorf("%v during syncCustomResourceDefinitions", err)
 			}
 			return err
