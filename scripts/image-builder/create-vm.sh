@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-ROOTDIR=$(git rev-parse --show-toplevel)
+ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )"
 ISODIR=${ROOTDIR}/_output/image-builder
 
 if [ $# -ne 2 ] ; then

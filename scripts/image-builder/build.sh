@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e -o pipefail
 
-ROOTDIR=$(git rev-parse --show-toplevel)
+ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )"
 SCRIPTDIR=${ROOTDIR}/scripts/image-builder
 IMGNAME=microshift
-IMAGE_VERSION=$(jq -r '.release.base' "${ROOTDIR}/assets/release/release-$(uname -m).json")
+IMAGE_VERSION=undefined
 BUILD_ARCH=$(uname -m)
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
 OSTREE_SERVER_URL=http://127.0.0.1:8085/repo
@@ -263,6 +263,7 @@ else
     [ ! -d "${MICROSHIFT_RPM_SOURCE}" ] && echo "MicroShift RPM path '${MICROSHIFT_RPM_SOURCE}' does not exist" && exit 1
     cp -TR "${MICROSHIFT_RPM_SOURCE}" microshift-local
 fi
+
 # Exit if no RPM packages were found
 if [ "$(find microshift-local -name '*.rpm' | wc -l)" -eq 0 ] ; then
     echo "No RPM packages were found at '${MICROSHIFT_RPM_SOURCE}'. Exiting..."
@@ -270,11 +271,23 @@ if [ "$(find microshift-local -name '*.rpm' | wc -l)" -eq 0 ] ; then
 fi
 createrepo microshift-local >/dev/null
 
+# Determine the image version from the RPM contents
+RELEASE_INFO_FILE=$(find . -name 'microshift-release-info-*.rpm' | tail -1)
+if [ -z "${RELEASE_INFO_FILE}" ] ; then
+    echo "Cannot find microshift-release-info RPM package at '${MICROSHIFT_RPM_SOURCE}'. Exiting..."
+    exit 1
+fi
+rpm2cpio "${RELEASE_INFO_FILE}" | cpio --quiet -idm "*release-$(uname -m).json"
+IMAGE_VERSION=$(jq -r '.release.base' "./usr/share/microshift/release/release-$(uname -m).json")
+if [ -z "${IMAGE_VERSION}" ] ; then
+    echo "Cannot determine image version from microshift-release-info RPM package at '${MICROSHIFT_RPM_SOURCE}'. Exiting..."
+    exit 1
+fi
+
 # Download openshift local RPM packages (noarch for python and selinux packages)
 rm -rf openshift-local 2>/dev/null || true
 
-# TODO: Start using 'rhocp-4.13' repository when OCP 4.13 is released
-OCP_REPO_NAME="rhocp-4.12-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+OCP_REPO_NAME="rhocp-4.13-for-rhel-${OSVERSION}-$(uname -m)-rpms"
 reposync -n -a "${BUILD_ARCH}" -a noarch --download-path openshift-local \
     --repo="${OCP_REPO_NAME}" \
     --repo="fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms" >/dev/null
