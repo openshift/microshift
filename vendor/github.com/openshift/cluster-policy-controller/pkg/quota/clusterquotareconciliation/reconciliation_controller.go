@@ -82,7 +82,7 @@ type workItem struct {
 	forceRecalculation bool
 }
 
-func NewClusterQuotaReconcilationController(options ClusterQuotaReconcilationControllerOptions) (*ClusterQuotaReconcilationController, error) {
+func NewClusterQuotaReconcilationController(ctx context.Context, options ClusterQuotaReconcilationControllerOptions) (*ClusterQuotaReconcilationController, error) {
 	c := &ClusterQuotaReconcilationController{
 		clusterQuotaLister:  options.ClusterQuotaInformer.Lister(),
 		clusterQuotaMapper:  options.ClusterQuotaMapper,
@@ -120,44 +120,44 @@ func NewClusterQuotaReconcilationController(options ClusterQuotaReconcilationCon
 		return nil, err
 	}
 
-	if err = qm.SyncMonitors(resources); err != nil {
+	if err = qm.SyncMonitors(ctx, resources); err != nil {
 		utilruntime.HandleError(fmt.Errorf("initial monitor sync has error: %v", err))
 	}
 
 	// only start quota once all informers synced
-	c.informerSyncedFuncs = append(c.informerSyncedFuncs, qm.IsSynced)
+	c.informerSyncedFuncs = append(c.informerSyncedFuncs, func() bool { return qm.IsSynced(ctx) })
 
 	return c, nil
 }
 
 // Run begins quota controller using the specified number of workers
-func (c *ClusterQuotaReconcilationController) Run(workers int, stopCh <-chan struct{}) {
+func (c *ClusterQuotaReconcilationController) Run(workers int, ctx context.Context) {
 	defer utilruntime.HandleCrash()
 
 	klog.Infof("Starting the cluster quota reconciliation controller")
 
 	// the controllers that replenish other resources to respond rapidly to state changes
-	go c.quotaMonitor.Run(stopCh)
+	go c.quotaMonitor.Run(ctx)
 
-	if !cache.WaitForCacheSync(stopCh, c.informerSyncedFuncs...) {
+	if !cache.WaitForCacheSync(ctx.Done(), c.informerSyncedFuncs...) {
 		return
 	}
 
 	// the workers that chug through the quota calculation backlog
 	for i := 0; i < workers; i++ {
-		go wait.Until(c.worker, time.Second, stopCh)
+		go wait.Until(c.worker, time.Second, ctx.Done())
 	}
 
 	// the timer for how often we do a full recalculation across all quotas
-	go wait.Until(func() { c.calculateAll() }, c.resyncPeriod, stopCh)
+	go wait.Until(func() { c.calculateAll() }, c.resyncPeriod, ctx.Done())
 
-	<-stopCh
+	<-ctx.Done()
 	klog.Infof("Shutting down ClusterQuotaReconcilationController")
 	c.queue.ShutDown()
 }
 
 // Sync periodically resyncs the controller when new resources are observed from discovery.
-func (c *ClusterQuotaReconcilationController) Sync(discoveryFunc resourcequota.NamespacedResourcesFunc, period time.Duration, stopCh <-chan struct{}) {
+func (c *ClusterQuotaReconcilationController) Sync(discoveryFunc resourcequota.NamespacedResourcesFunc, period time.Duration, ctx context.Context) {
 	// Something has changed, so track the new state and perform a sync.
 	oldResources := make(map[schema.GroupVersionResource]struct{})
 	wait.Until(func() {
@@ -209,23 +209,23 @@ func (c *ClusterQuotaReconcilationController) Sync(discoveryFunc resourcequota.N
 		defer c.workerLock.Unlock()
 
 		// Perform the monitor resync and wait for controllers to report cache sync.
-		if err := c.resyncMonitors(newResources); err != nil {
+		if err := c.resyncMonitors(ctx, newResources); err != nil {
 			utilruntime.HandleError(fmt.Errorf("failed to sync resource monitors: %v", err))
 			return
 		}
-		if c.quotaMonitor != nil && !cache.WaitForCacheSync(stopCh, c.quotaMonitor.IsSynced) {
+		if c.quotaMonitor != nil && !cache.WaitForCacheSync(ctx.Done(), func() bool { return c.quotaMonitor.IsSynced(context.TODO()) }) {
 			utilruntime.HandleError(fmt.Errorf("timed out waiting for quota monitor sync"))
 		}
-	}, period, stopCh)
+	}, period, ctx.Done())
 }
 
 // resyncMonitors starts or stops quota monitors as needed to ensure that all
 // (and only) those resources present in the map are monitored.
-func (c *ClusterQuotaReconcilationController) resyncMonitors(resources map[schema.GroupVersionResource]struct{}) error {
+func (c *ClusterQuotaReconcilationController) resyncMonitors(ctx context.Context, resources map[schema.GroupVersionResource]struct{}) error {
 	// SyncMonitors can only fail if there was no Informer for the given gvr
-	err := c.quotaMonitor.SyncMonitors(resources)
+	err := c.quotaMonitor.SyncMonitors(ctx, resources)
 	// this is no-op for already running monitors
-	c.quotaMonitor.StartMonitors()
+	c.quotaMonitor.StartMonitors(ctx)
 	return err
 }
 
@@ -407,7 +407,7 @@ func (c *ClusterQuotaReconcilationController) syncQuotaForNamespaces(originalQuo
 }
 
 // replenishQuota is a replenishment function invoked by a controller to notify that a quota should be recalculated
-func (c *ClusterQuotaReconcilationController) replenishQuota(groupResource schema.GroupResource, namespace string) {
+func (c *ClusterQuotaReconcilationController) replenishQuota(ctx context.Context, groupResource schema.GroupResource, namespace string) {
 	// check if the quota controller can evaluate this kind, if not, ignore it altogether...
 	releventEvaluators := []utilquota.Evaluator{}
 	evaluators := c.registry.List()

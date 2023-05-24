@@ -13,7 +13,10 @@ import (
 // +openshift:compatibility-gen:level=1
 // +k8s:openapi-gen=true
 type NutanixMachineProviderConfig struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+
+	// metadata is the standard object's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// cluster is to identify the cluster (the Prism Element under management
@@ -56,6 +59,25 @@ type NutanixMachineProviderConfig struct {
 	// +kubebuilder:validation:Required
 	SystemDiskSize resource.Quantity `json:"systemDiskSize"`
 
+	// bootType indicates the boot type (Legacy, UEFI or SecureBoot) the Machine's VM uses to boot.
+	// If this field is empty or omitted, the VM will use the default boot type "Legacy" to boot.
+	// "SecureBoot" depends on "UEFI" boot, i.e., enabling "SecureBoot" means that "UEFI" boot is also enabled.
+	// +kubebuilder:validation:Enum="";Legacy;UEFI;SecureBoot
+	// +optional
+	BootType NutanixBootType `json:"bootType"`
+
+	// project optionally identifies a Prism project for the Machine's VM to associate with.
+	// +optional
+	Project NutanixResourceIdentifier `json:"project"`
+
+	// categories optionally adds one or more prism categories (each with key and value) for
+	// the Machine's VM to associate with. All the category key and value pairs specified must
+	// already exist in the prism central.
+	// +listType=map
+	// +listMapKey=key
+	// +optional
+	Categories []NutanixCategory `json:"categories"`
+
 	// userDataSecret is a local reference to a secret that contains the
 	// UserData to apply to the VM
 	UserDataSecret *corev1.LocalObjectReference `json:"userDataSecret,omitempty"`
@@ -65,6 +87,35 @@ type NutanixMachineProviderConfig struct {
 	// +kubebuilder:validation:Required
 	CredentialsSecret *corev1.LocalObjectReference `json:"credentialsSecret"`
 }
+
+// NutanixCategory identifies a pair of prism category key and value
+type NutanixCategory struct {
+	// key is the prism category key name
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=64
+	// +kubebuilder:validation:Required
+	Key string `json:"key"`
+
+	// value is the prism category value associated with the key
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=64
+	// +kubebuilder:validation:Required
+	Value string `json:"value"`
+}
+
+// NutanixBootType is an enumeration of different boot types for Nutanix VM.
+type NutanixBootType string
+
+const (
+	// NutanixLegacyBoot is the legacy BIOS boot type
+	NutanixLegacyBoot NutanixBootType = "Legacy"
+
+	// NutanixUEFIBoot is the UEFI boot type
+	NutanixUEFIBoot NutanixBootType = "UEFI"
+
+	// NutanixSecureBoot is the Secure boot type
+	NutanixSecureBoot NutanixBootType = "SecureBoot"
+)
 
 // NutanixIdentifierType is an enumeration of different resource identifier types.
 type NutanixIdentifierType string
