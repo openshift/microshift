@@ -1,2 +1,6 @@
-# cluster-kube-controller-manager-operator embedded-component 9f53628279a765cccb234b1ef992075ad7cddf96 to 56b970786d152344f0d4762c8271d20e5fc9d28b
-c96d1544ebddefe19cf884df63efa7f7c60d6357 2023-05-03T11:45:10+02:00 AWS should not use external-cloud-volume-plugin post CSI migration
+# machine-config-operator embedded-component 230bb7e5f5620af293f3dc5b9740e01f5644262f to 1ae3805822dfee3263bfd553d49fd36c648fbd12
+819069f10f96f923ac00d3cad15c14f82ea75dfb 2023-05-04T22:13:26+00:00 OCPBUGS-12951: daemon: Don't traverse `/run/ostree/auth.json` symlink
+# ovn-kubernetes image-amd64 9b6742d1022709cc023e395e2c7fa8a7141ea325 to db0dbadc1a409f40345e921e991bd3e22c55490a
+ca07b1bf4b3ca33023c8bbf04071ca6e224c9640 2023-05-05T15:40:04+00:00 OCPBUGS-12971:Fix bug that resulted in routes not be restored to a new vnic
+# ovn-kubernetes image-arm64 9b6742d1022709cc023e395e2c7fa8a7141ea325 to db0dbadc1a409f40345e921e991bd3e22c55490a
+ca07b1bf4b3ca33023c8bbf04071ca6e224c9640 2023-05-05T15:40:04+00:00 OCPBUGS-12971:Fix bug that resulted in routes not be restored to a new vnic
