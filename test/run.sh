@@ -70,6 +70,7 @@ fi
 
 if [ ! -d "${RF_VENV}" ]; then
     python3 -m venv "${RF_VENV}"
+    "${RF_VENV}/bin/python3" -m pip install --upgrade pip
     "${RF_VENV}/bin/python3" -m pip install -r "${SCRIPTDIR}/requirements.txt"
 fi
 
