@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Tool for bringing a ticket into the current sprint and updating its status.
 
