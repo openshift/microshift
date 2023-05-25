@@ -119,7 +119,7 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	// run readiness check
 	go func() {
 		// This endpoint uses a self-signed certificate on purpose, we need to skip verification.
-		healthcheckStatus := util.RetryInsecureGet("https://localhost:10257/healthz")
+		healthcheckStatus := util.RetryInsecureGet(ctx, "https://localhost:10257/healthz")
 		if healthcheckStatus != 200 {
 			klog.Errorf("kube-controller-manager failed to start")
 			errorChannel <- errors.New("kube-controller-manager failed to start")

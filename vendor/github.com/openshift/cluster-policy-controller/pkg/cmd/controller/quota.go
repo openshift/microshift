@@ -45,12 +45,12 @@ func RunResourceQuotaManager(ctx context.Context, controllerCtx *EnhancedControl
 		InformerFactory:           controllerCtx.GenericResourceInformer,
 		DiscoveryFunc:             discoveryFunc,
 	}
-	ctrl, err := kresourcequota.NewController(resourceQuotaControllerOptions)
+	ctrl, err := kresourcequota.NewController(ctx, resourceQuotaControllerOptions)
 	if err != nil {
 		return true, err
 	}
 	go ctrl.Run(ctx, concurrentResourceQuotaSyncs)
-	go ctrl.Sync(discoveryFunc, 30*time.Second, ctx.Done())
+	go ctrl.Sync(ctx, discoveryFunc, 30*time.Second)
 
 	return true, nil
 }
@@ -119,15 +119,15 @@ func RunClusterQuotaReconciliationController(ctx context.Context, controllerCtx 
 		InformersStarted:          controllerCtx.InformersStarted,
 		InformerFactory:           controllerCtx.GenericResourceInformer,
 	}
-	clusterQuotaReconciliationController, err := clusterquotareconciliation.NewClusterQuotaReconcilationController(options)
+	clusterQuotaReconciliationController, err := clusterquotareconciliation.NewClusterQuotaReconcilationController(ctx, options)
 	if err != nil {
 		return true, err
 	}
 	clusterQuotaMappingController.GetClusterQuotaMapper().AddListener(clusterQuotaReconciliationController)
 
 	go clusterQuotaMappingController.Run(5, ctx.Done())
-	go clusterQuotaReconciliationController.Run(5, ctx.Done())
-	go clusterQuotaReconciliationController.Sync(discoveryFunc, 30*time.Second, ctx.Done())
+	go clusterQuotaReconciliationController.Run(5, ctx)
+	go clusterQuotaReconciliationController.Sync(discoveryFunc, 30*time.Second, ctx)
 
 	return true, nil
 }

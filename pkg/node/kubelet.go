@@ -73,8 +73,6 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	kubeletFlags.RuntimeCgroups = "/system.slice/crio.service"
 	kubeletFlags.HostnameOverride = cfg.Node.HostnameOverride
 	kubeletFlags.NodeIP = cfg.Node.NodeIP
-	kubeletFlags.ContainerRuntime = "remote"
-	kubeletFlags.RemoteRuntimeEndpoint = "unix:///var/run/crio/crio.sock"
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/control-plane"] = ""
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/master"] = ""
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/worker"] = ""
@@ -119,6 +117,7 @@ enforceNodeAllocatable: []
 rotateCertificates: false  #TODO
 serializeImagePulls: false
 # staticPodPath: /etc/kubernetes/manifests
+containerRuntimeEndpoint: unix:///var/run/crio/crio.sock
 featureGates:
   APIPriorityAndFairness: true
   PodSecurity: true
@@ -144,7 +143,7 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	// run readiness check
 	go func() {
 		// This endpoint does not use TLS, but reusing the same function without verification.
-		healthcheckStatus := util.RetryInsecureGet("http://localhost:10248/healthz")
+		healthcheckStatus := util.RetryInsecureGet(ctx, "http://localhost:10248/healthz")
 		if healthcheckStatus != 200 {
 			klog.Fatalf("", fmt.Errorf("%s failed to start", s.Name()))
 		}

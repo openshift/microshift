@@ -43,17 +43,17 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 	defer close(ready)
 
 	for _, path := range s.paths {
-		s.ApplyKustomizationPath(path)
+		s.ApplyKustomizationPath(ctx, path)
 	}
 
 	return ctx.Err()
 }
 
-func (s *Kustomizer) ApplyKustomizationPath(path string) {
+func (s *Kustomizer) ApplyKustomizationPath(ctx context.Context, path string) {
 	kustomization := filepath.Join(path, "kustomization.yaml")
 	if _, err := os.Stat(kustomization); !errors.Is(err, os.ErrNotExist) {
 		klog.Infof("Applying kustomization at %v ", kustomization)
-		if err := ApplyKustomizationWithRetries(path, s.kubeconfig); err != nil {
+		if err := ApplyKustomizationWithRetries(ctx, path, s.kubeconfig); err != nil {
 			klog.Errorf("Applying kustomization at %v failed: %s. Giving up.", kustomization, err)
 		} else {
 			klog.Infof("Kustomization at %v applied successfully.", kustomization)
@@ -63,8 +63,8 @@ func (s *Kustomizer) ApplyKustomizationPath(path string) {
 	}
 }
 
-func ApplyKustomizationWithRetries(kustomization string, kubeconfig string) error {
-	return wait.PollImmediate(retryInterval, retryTimeout, func() (bool, error) {
+func ApplyKustomizationWithRetries(ctx context.Context, kustomization string, kubeconfig string) error {
+	return wait.PollUntilContextTimeout(ctx, retryInterval, retryTimeout, true, func(_ context.Context) (done bool, err error) {
 		if err := ApplyKustomization(kustomization, kubeconfig); err != nil {
 			klog.Infof("Applying kustomization failed: %s. Retrying in %s.", err, retryInterval)
 			return false, nil
@@ -101,11 +101,11 @@ func ApplyKustomization(kustomization string, kubeconfig string) error {
 	}
 	groups.Add(cmds)
 
-	applyFlags := apply.NewApplyFlags(f, ioStreams)
+	applyFlags := apply.NewApplyFlags(ioStreams)
 	applyFlags.DeleteFlags.FileNameFlags.Kustomize = &kustomization
 	applyFlags.AddFlags(cmds)
 
-	o, err := applyFlags.ToOptions(cmds, "kubectl", nil)
+	o, err := applyFlags.ToOptions(f, cmds, "kubectl", nil)
 	if err != nil {
 		return err
 	}

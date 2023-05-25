@@ -16,6 +16,7 @@ limitations under the License.
 package util
 
 import (
+	"context"
 	"crypto/tls"
 	tcpnet "net"
 	"net/http"
@@ -54,9 +55,9 @@ func GetHostIP() (string, error) {
 	return gatewayIP, nil
 }
 
-func RetryInsecureGet(url string) int {
+func RetryInsecureGet(ctx context.Context, url string) int {
 	status := 0
-	err := wait.Poll(5*time.Second, 120*time.Second, func() (bool, error) {
+	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, 120*time.Second, false, func(ctx context.Context) (bool, error) {
 		c := http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
@@ -73,16 +74,16 @@ func RetryInsecureGet(url string) int {
 		return false, nil
 	})
 
-	if err != nil && err == wait.ErrWaitTimeout {
+	if err != nil && err == context.DeadlineExceeded {
 		klog.Warningf("Endpoint is not returning any status code")
 	}
 
 	return status
 }
 
-func RetryTCPConnection(host string, port string) bool {
+func RetryTCPConnection(ctx context.Context, host string, port string) bool {
 	status := false
-	err := wait.Poll(5*time.Second, 120*time.Second, func() (bool, error) {
+	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, 120*time.Second, false, func(ctx context.Context) (bool, error) {
 		timeout := 30 * time.Second
 		_, err := tcpnet.DialTimeout("tcp", tcpnet.JoinHostPort(host, port), timeout)
 
@@ -92,7 +93,7 @@ func RetryTCPConnection(host string, port string) bool {
 		}
 		return false, nil
 	})
-	if err != nil && err == wait.ErrWaitTimeout {
+	if err != nil && err == context.DeadlineExceeded {
 		klog.Warningf("Endpoint is not returning any status code")
 	}
 	return status
