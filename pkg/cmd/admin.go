@@ -16,7 +16,7 @@ func newAdminDataCommand() *cobra.Command {
 		Use:   "backup",
 		Short: "Backup MicroShift data",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return data.NewDataManager().Backup(
+			return data.NewManager().Backup(
 				data.BackupConfig{
 					Storage: cmd.Flag("storage").Value.String(),
 					Name:    cmd.Flag("name").Value.String(),

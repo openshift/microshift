@@ -10,21 +10,21 @@ type BackupConfig struct {
 	Name string
 }
 
-type DataManager interface {
+type Manager interface {
 	Backup(BackupConfig) error
 	Restore(BackupConfig) error
 }
 
-func NewDataManager() *IDataManager {
-	return &IDataManager{}
+func NewManager() *manager {
+	return &manager{}
 }
 
-type IDataManager struct{}
+type manager struct{}
 
-func (dm *IDataManager) Backup(cfg BackupConfig) error {
+func (dm *manager) Backup(cfg BackupConfig) error {
 	return makeBackup(cfg)
 }
 
-func (dm *IDataManager) Restore(cfg BackupConfig) error {
+func (dm *manager) Restore(cfg BackupConfig) error {
 	return fmt.Errorf("not implemented")
 }
