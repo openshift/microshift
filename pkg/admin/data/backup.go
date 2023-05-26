@@ -78,7 +78,8 @@ func ensureDirExists(path string) error {
 	if err != nil {
 		return fmt.Errorf("failed creating %s: %w", path, err)
 	}
-	return err
+	klog.Infof("Directory %s created", path)
+	return nil
 }
 
 func dirShouldNotExist(path string) error {
