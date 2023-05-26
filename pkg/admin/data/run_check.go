@@ -25,11 +25,11 @@ func microshiftIsNotRunning() error {
 			return fmt.Errorf("error when checking if %s is active: %w", service, err)
 		}
 
-		if state != expectedState {
-			return fmt.Errorf("%s is %s - expected to be %s", service, state, expectedState)
-		}
+		klog.V(2).InfoS("Service state", "service", service, "state", state)
 
-		klog.Infof("Service %s is %s", service, state)
+		if state != expectedState {
+			return fmt.Errorf("service %s is %s - expected to be %s", service, state, expectedState)
+		}
 	}
 
 	return nil
