@@ -25,7 +25,7 @@ var (
 // MakeBackup backs up MicroShift data (/var/lib/microshift) to
 // target/name/ (e.g. /var/lib/microshift-backups/backup-00001).
 func makeBackup(cfg BackupConfig) error {
-	klog.V(2).InfoS("Starting backup procedure", "cfg", cfg)
+	klog.InfoS("Backup started", "cfg", cfg)
 
 	if err := cfg.Validate(); err != nil {
 		return fmt.Errorf("invalid BackupConfig: %w", err)
@@ -74,7 +74,7 @@ func makeBackup(cfg BackupConfig) error {
 		}
 	}
 
-	klog.InfoS("Data backed up", "data", config.DataDir, "backup", dest)
+	klog.InfoS("Backup finished", "backup", dest, "data", config.DataDir)
 	return nil
 }
 
