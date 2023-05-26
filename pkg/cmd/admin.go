@@ -28,6 +28,15 @@ func newAdminDataCommand() *cobra.Command {
 	data := &cobra.Command{
 		Use:   "data",
 		Short: "Commands for managing MicroShift data",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.Flag("storage").Value.String() == "" {
+				return fmt.Errorf("--storage must not be empty")
+			}
+			if cmd.Flag("name").Value.String() == "" {
+				return fmt.Errorf("--name must not be empty")
+			}
+			return nil
+		},
 	}
 	v := version.Get()
 	data.PersistentFlags().String(
