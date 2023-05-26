@@ -16,7 +16,7 @@ var (
 	services = []string{"microshift.service", "microshift-etcd.scope"}
 )
 
-func microshiftShouldNotRun() error {
+func microshiftIsNotRunning() error {
 	for _, service := range services {
 		cmd := exec.Command("systemctl", "show", "-p", "ActiveState", "--value", service)
 		out, err := cmd.CombinedOutput()

@@ -31,7 +31,7 @@ func makeBackup(cfg BackupConfig) error {
 		return fmt.Errorf("backup name must not be empty")
 	}
 
-	if err := microshiftShouldNotRun(); err != nil {
+	if err := microshiftIsNotRunning(); err != nil {
 		return err
 	}
 
