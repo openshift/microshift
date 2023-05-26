@@ -6,7 +6,9 @@ IFS=$'\n\t'
 ARCH="$(uname -m)"
 
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
-DEST_DIR="${DEST_DIR:-${SCRIPT_DIR}/../_output/bin}"
+ROOT_DIR=$(realpath "${SCRIPT_DIR}/..")
+DEFAULT_DEST_DIR="${ROOT_DIR}/_output/bin"
+DEST_DIR="${DEST_DIR:-${DEFAULT_DEST_DIR}}"
 [ -d "${DEST_DIR}" ] || mkdir -p "${DEST_DIR}"
 DEST_DIR="$(realpath "${DEST_DIR}")"
 WORK_DIR=$(mktemp -d)
@@ -162,6 +164,25 @@ get_govulncheck() {
 get_controller-gen() {
     local ver="v0.11.3"
     GOBIN=${DEST_DIR} GOFLAGS="" go install sigs.k8s.io/controller-tools/cmd/controller-gen@${ver}
+}
+
+get_robotframework() {
+    local venv
+
+    if [ "${DEST_DIR}" = "${DEFAULT_DEST_DIR}" ]; then
+        # Probably running as the user, not in CI.
+        venv="${ROOT_DIR}/_output/robotenv"
+    else
+        # Probably running in automation environment where the output
+        # location has been changed.
+        venv="${DEST_DIR}"
+    fi
+
+    if [ ! -f "${venv}/bin/robot" ]; then
+        python3 -m venv "${venv}"
+        "${venv}/bin/python3" -m pip install --upgrade pip
+        "${venv}/bin/python3" -m pip install -r "${ROOT_DIR}/test/requirements.txt"
+    fi
 }
 
 tool_getters=$(declare -F |  cut -d' ' -f3 | grep "get_" | sed 's/get_//g')
