@@ -14,14 +14,14 @@ type BackupConfig struct {
 }
 
 func (bc BackupConfig) Validate() error {
-	var err error
+	var errs []error
 	if bc.Storage == "" {
-		err = fmt.Errorf("backup storage must not be empty")
+		errs = append(errs, fmt.Errorf("backup storage must not be empty"))
 	}
 	if bc.Name == "" {
-		err = errors.Join(err, fmt.Errorf("backup name must not be empty"))
+		errs = append(errs, fmt.Errorf("backup name must not be empty"))
 	}
-	return err
+	return errors.Join(errs...)
 }
 
 type Manager interface {
