@@ -32,9 +32,15 @@ func newAdminDataCommand() *cobra.Command {
 			if cmd.Flag("storage").Value.String() == "" {
 				return fmt.Errorf("--storage must not be empty")
 			}
+
 			if cmd.Flag("name").Value.String() == "" {
 				return fmt.Errorf("--name must not be empty")
 			}
+
+			if err := data.MicroShiftIsNotRunning(); err != nil {
+				return fmt.Errorf("microshift must not be running: %w", err)
+			}
+
 			return nil
 		},
 	}

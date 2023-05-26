@@ -31,10 +31,6 @@ func makeBackup(cfg BackupConfig) error {
 		return fmt.Errorf("invalid BackupConfig: %w", err)
 	}
 
-	if err := microshiftIsNotRunning(); err != nil {
-		return err
-	}
-
 	if err := ensureDirExists(cfg.Storage); err != nil {
 		return err
 	}
