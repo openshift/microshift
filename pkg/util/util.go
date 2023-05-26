@@ -19,7 +19,7 @@ func Default(s string, defaultS string) string {
 	return s
 }
 
-func FileExists(path string) (bool, error) {
+func PathExists(path string) (bool, error) {
 	if _, err := os.Stat(path); err == nil {
 		return true, nil
 	} else if errors.Is(err, os.ErrNotExist) {
