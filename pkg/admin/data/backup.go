@@ -50,11 +50,17 @@ func makeBackup(cfg BackupConfig) error {
 		return err
 	}
 
-	if err := removeDirBeforeRenaming(dest); err != nil {
+	klog.Infof("Removing %s before renaming %s", dest, dest_tmp)
+	if err := removePath(dest); err != nil {
 		return err
 	}
 
 	if err := renameDir(dest_tmp, dest); err != nil {
+		klog.Errorf("Renaming directory failed - deleting %s: %v", dest_tmp, err)
+		if rmErr := removePath(dest_tmp); rmErr != nil {
+			klog.ErrorS(rmErr, "Failed to remove directory", "dir", dest_tmp)
+			return fmt.Errorf("failed to remove %s: %w: %w", dest_tmp, err, rmErr)
+		}
 		return err
 	}
 
@@ -95,17 +101,19 @@ func dirShouldNotExist(path string) error {
 	return nil
 }
 
-func removeDirBeforeRenaming(path string) error {
+func removePath(path string) error {
 	found, err := util.FileExists(path)
 	if err != nil {
 		return fmt.Errorf("failed to check if %s exists: %w", path, err)
 	}
 	if found {
-		klog.Infof("Removing %s before renaming tmp directory", path)
+		klog.Infof("Removing %s", path)
 		if err := os.RemoveAll(path); err != nil {
 			return fmt.Errorf("failed to remove %s: %w", path, err)
 		}
+		klog.Infof("Removed %s", path)
 	}
+	klog.Infof("Path %s not found - not removed", path)
 	return nil
 }
 
@@ -123,15 +131,5 @@ func copyDataDir(dest string) error {
 
 func renameDir(from, to string) error {
 	klog.InfoS("Renaming directory", "from", from, "to", to)
-	err := os.Rename(from, to)
-	if err == nil {
-		return nil
-	}
-
-	klog.ErrorS(err, "Renaming directory failed - deleting 'from' dir", "from", from, "to", to)
-	if rmErr := os.RemoveAll(from); rmErr != nil {
-		klog.ErrorS(rmErr, "Failed to remove directory", "dir", from)
-		return fmt.Errorf("failed to remove %s: %w: %w", from, err, rmErr)
-	}
-	return nil
+	return os.Rename(from, to)
 }
