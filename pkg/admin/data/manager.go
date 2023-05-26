@@ -1,6 +1,9 @@
 package data
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type BackupConfig struct {
 	// Storage is the base directory storing all backups
@@ -8,6 +11,17 @@ type BackupConfig struct {
 
 	// Name is backup's directory name
 	Name string
+}
+
+func (bc BackupConfig) Validate() error {
+	var err error
+	if bc.Storage == "" {
+		err = fmt.Errorf("backup storage must not be empty")
+	}
+	if bc.Name == "" {
+		err = errors.Join(err, fmt.Errorf("backup name must not be empty"))
+	}
+	return err
 }
 
 type Manager interface {

@@ -25,11 +25,8 @@ var (
 // MakeBackup backs up MicroShift data (/var/lib/microshift) to
 // target/name/ (e.g. /var/lib/microshift-backups/backup-00001).
 func makeBackup(cfg BackupConfig) error {
-	if cfg.Storage == "" {
-		return fmt.Errorf("backup storage must not be empty")
-	}
-	if cfg.Name == "" {
-		return fmt.Errorf("backup name must not be empty")
+	if err := cfg.Validate(); err != nil {
+		return fmt.Errorf("invalid BackupConfig: %w", err)
 	}
 
 	if err := microshiftIsNotRunning(); err != nil {
