@@ -42,7 +42,7 @@ Using default configuration there is a kubeconfig for each of the subject altern
 
 Having a DNS (or simply changing `/etc/hosts`) we have to select which of the kubeconfig files we need to use according to it. In this case we may copy the `microshift-dev` kubeconfig to our local environment and we will be able to use `oc`:
 ```
-$ yq -r '.clusters[].cluster.server' ~/.kube/microshift 
+$ yq -r '.clusters[].cluster.server' ~/.kube/microshift
 https://microshift-dev:6443
 
 $ KUBECONFIG=~/.kube/microshift oc get node
@@ -70,15 +70,15 @@ openshift-storage          topolvm-node-q6rr9                    4/4     Running
 ## Debugging
 > Test runtime objects (namespace, pods, build images) are garbage collected after 1 hour from test completion. The build log remains, but does not provide a holistic view of the job’s life.
 
-Prow/Openshift-CI provide CI bot management via GitHub comments. See [here](https://github.com/kubernetes/test-infra/blob/c341b223083a7e5766be99620eba58cc3c8142f1/prow/jobs.md#triggering-jobs-with-comments) for a complete list. Typically all you need is `/retest` to rerun Prow CI jobs. 
+Prow/Openshift-CI provide CI bot management via GitHub comments. See [here](https://github.com/kubernetes/test-infra/blob/c341b223083a7e5766be99620eba58cc3c8142f1/prow/jobs.md#triggering-jobs-with-comments) for a complete list. Typically all you need is `/retest` to rerun Prow CI jobs.
 
 CI related GitHub statuses can be identified by their `ci/prow/*` prefix. When a test fails, the first step should always be to check the status `Details` link.
 
 ![Details](./images/openshift_ci_details.png)
 
-The `Details` link will bring you to that test’s combined logs for the build, deploy, test, and teardown phases for that e2e job. Most of the time, this log can be invaluable for debugging test errors and exposing regressions. 
+The `Details` link will bring you to that test’s combined logs for the build, deploy, test, and teardown phases for that e2e job. Most of the time, this log can be invaluable for debugging test errors and exposing regressions.
 
-Occasionally, deeper investigation is warranted. Errors can be masked in the logs for a variety of reasons, or CI is experiencing some instability (not uncommon) that isn’t immediately obvious in the build log. 
+Occasionally, deeper investigation is warranted. Errors can be masked in the logs for a variety of reasons, or CI is experiencing some instability (not uncommon) that isn’t immediately obvious in the build log.
 
 ## Debugging CI Cluster Workloads
 > Only the PR author is authorized to access a job’s OCP namespace and build artifacts.
@@ -89,13 +89,13 @@ To access the OCP CI Cluster namespace for a given GitHub status/e2e suite, go t
 
 ![Build Log](./images/openshift_ci_buildlog.png)
 
-The console will ask you to login with either a `kubeadmin` or company SSO. Select Company SSO. After authenticating, you’ll be presented with the overview page for the OCP project. Expand the left-hand sidebar menu and select `Workloads -> Pods`. 
-> You may have to toggle the Developer view to Administrator, located at the top of the sidebar. 
+The console will ask you to login with either a `kubeadmin` or company SSO. Select Company SSO. After authenticating, you’ll be presented with the overview page for the OCP project. Expand the left-hand sidebar menu and select `Workloads -> Pods`.
+> You may have to toggle the Developer view to Administrator, located at the top of the sidebar.
 
 Openshift-CI uses [Prow](https://github.com/kubernetes/test-infra/tree/master/prow#) under the hood to drive CI operations. Without going too into detail, a CI job is divided into a sequence of steps, executed in parallel if possible. Each step is handled by a pod, named for the step’s CI configuration. Logs of the “test” step can always be found in the pod named `e2e-openshift-conformance-sig-[COMPONENT]-openshift-microshift-e2e-run`. Select that pod and examine its logs for the raw test output.
 
 ## Examining CI Build Artifacts
-When logs aren’t enough to expose a failure’s cause, it may be useful to examine the job’s container artifacts. It is possible to access the CI registry and pull down the job’s images. First, login to the CI cluster by following the steps in [Debugging CI Cluster Workloads]. At the console page, click your name in the upper right corner and select `Copy Login Command`. 
+When logs aren’t enough to expose a failure’s cause, it may be useful to examine the job’s container artifacts. It is possible to access the CI registry and pull down the job’s images. First, login to the CI cluster by following the steps in [Debugging CI Cluster Workloads]. At the console page, click your name in the upper right corner and select `Copy Login Command`.
 >You may be asked to authenticate again.
 
 ![Copy login command](./images/openshift_ci_copylogin.png)
@@ -107,7 +107,7 @@ CI build imageStreams are named `pipeline:bin`. Pull the image down:
 podman pull registry.build02.ci.openshift.org/[PROJECT]/pipeline:bin
 ```
 
-> The `build02` may not be the current build cluster. This may be changed by OpenShift CI maintainers without warning. 
+> The `build02` may not be the current build cluster. This may be changed by OpenShift CI maintainers without warning.
 
 # PoV: MicroShift CI Maintainer
 ## Historical Data
@@ -130,7 +130,7 @@ CI Operator golang API type definitions are specified in the `github.com/openshi
 
 MicroShift’s top level configuration files are located [here](https://github.com/openshift/release/tree/master/ci-operator/config/openshift/microshift).
 * The `openshift-microshift-main.yaml` file provides configuration for pull-request jobs
-* The `openshift-microshift-main__periodics.yaml` file specifies periodic jobs  
+* The `openshift-microshift-main__periodics.yaml` file specifies periodic jobs
 
 The files are nearly identical, save for cron configuration. These files are the core configuration for MicroShift’s CI.
 
@@ -171,7 +171,7 @@ Custom Images:
 A second, more precise configuration to invoke multi-stage builds is provided by the `inputs` field. This is analogous to the `COPY --from=$PREVIOUS_IMAGE` directive of multi-stage builds. A key distinction is that the data transfer is not directly between images. Rather, files are copied from `source_path` in the image to the current build’s context on the container host, then copied from build context into the current image. This is why all `destination:` values are `.` and why inline `Dockerfile` references file paths at the root of the build context.
 
 ## Test Config
-> Golang API type definitions of test’s data structure can be found [here](https://github.com/openshift/ci-tools/blob/67a38022272a48c357879d8abfc4da1ae39827e2/pkg/api/types.go#L608). 
+> Golang API type definitions of test’s data structure can be found [here](https://github.com/openshift/ci-tools/blob/67a38022272a48c357879d8abfc4da1ae39827e2/pkg/api/types.go#L608).
 
 MicroShift’s tests are configured as sequences of `steps`, which are translated by the CI into OpenShift Build and Prow Job specs. A [step](https://docs.ci.openshift.org/docs/architecture/step-registry/#step) defines the container image, dependencies, secret injections, and shell commands to be executed. Multiple step references are encapsulated into larger units called [chains](https://docs.ci.openshift.org/docs/architecture/step-registry/#chain) and [workflows](https://docs.ci.openshift.org/docs/architecture/step-registry/#workflow). The MicroShift CI operator config file specifies a workflow, the cluster profile, and conditionals for each test, under the tests arrays.
 
@@ -189,7 +189,7 @@ tests:
     workflow: openshift-microshift-e2e-openshift-conformance-sig-api-machinery
 ```
 
-* `as: NAME`<br> 
+* `as: NAME`<br>
 Prow job / pod name. **DO NOT REUSE THE NAME OF A TEST AS A STEP/CHAIN/WORKFLOW NAME**. This will cause CI to silently fail to build all same-named  step containers after the first instance of the name. This is a recurring bug with CI and can be time consuming to debug.
 * `optional: true`<br>
 Whether the CI should consider the test as merge blocking.
@@ -250,6 +250,93 @@ Credentials are provided to `create_pr.py` with following environmental variable
 - `KEY` - path to the private key
 - `REPO` - repository to work against (push branch and create PR)
 - `ORG` - repository's organization
+
+## CI Troubleshooting
+
+### sosreport Utility
+CI jobs spinning up MicroShift cluster run the [sosreport](https://github.com/sosreport)
+utility to collect the information about the job runtime environment, using the
+`container`, `network` and `microshift` plugins.
+
+The report is created before deprovisioning the CI infrastructure and the output
+of the utility is stored together with the CI artifacts, to be accessed under the
+`artifacts/<test_name>/openshift-microshift-infra-sos-aws` directory.
+
+The top-level `build-log.txt` file contains the runtime output of the `sosreport`
+utility, while another `artifacts` sub-directory contains the actual `sosreport`
+output archives.
+
+The `sosreport` archives need to be downloaded and unpacked using `tar xf` command
+to access the collected information.
+
+### Node Performance
+CI jobs spinning up MicroShift cluster install the [pcp-zeroconf](https://access.redhat.com/articles/3115691)
+package intended to simplify the installation and configuration of the most commonly
+needed [Performance Co-Pilot](https://pcp.io/documentation.html) features.
+
+The performance collection starts right after the MicroShift RPM packages are installed
+and the results file is generated before deprovisioning the CI infrastructure. The file
+is stored together with the CI artifacts, to be accessed under the `artifacts/<test_name>`
+directory.
+
+The `openshift-microshift-infra-pcp` sub-directory contains the `build-log.txt` file with
+the package installation logs, while the `openshift-microshift-infra-pmlogs` sub-directory
+contains the actual performance collection results.
+
+It is necessary to drill down to `openshift-microshift-infra-pmlogs/artifacts/<ci_hostname>`
+directory to reach the `pmlogger.log` collection logs and the `yyyymmdd.hh.mm.{0,index,meta}`
+collection data.
+
+One of the way of downloading the collection data directory contents is by using the `gsutil`
+utility, which can be installed using the following commands.
+```
+mkdir -p ~/pmlogs && cd ~pmlogs
+python3 -m venv .
+./bin/python3 -m pip install gsutil
+```
+
+Run the `gsutil` command as instructed on the CI we page and access the files locally
+under the `~/pmlogs/<ci_hostname>` directory.
+```
+./bin/gsutil -m cp -r gs://<path> ~/pmlogs/
+```
+
+#### Visualize Performance Results
+Install the `pcp` packages necessary for command line and GUI visualization.
+```
+sudo dnf install -y pcp pcp-gui
+```
+
+Run the following commands to visualize the downloaded performance data in the terminal.
+```
+cd ~/pmlogs/<ci_hostname>
+pmstat -a .
+@ Thu May 25 08:35:28 2023
+ loadavg                      memory      swap        io    system         cpu
+   1 min   swpd   free   buff  cache   pi   po   bi   bo   in   cs  us  sy  id
+    0.76      0 29722m   6932  1565m    0    0    0 1431 2587 2198   1   1  99
+    0.64      0 29714m   6932  1565m    0    0  474  252 6475 3967  13   2  85
+    0.64      0 29714m   6932  1565m    0    0  477  245 6497 3977  13   2  85
+    0.70      0 29652m   6932  1568m    0    0    2  532  13K  11K   9   2  88
+...
+...
+```
+
+Run the following commands to visualize the downloaded performance data in the
+`PCP Chart` application.
+```
+cd ~/pmlogs/<ci_hostname>
+pmchart -a .
+```
+
+In the application user interface, open `File > Open View...` dialog and select the
+type of data to be visualized. It is recommended to start with the `Overview` view
+and then drill down to more specific metrics as necessary.
+
+Finally, open the `Options > Show Time` dialog and scroll through the time position
+of the performance samples.
+
+![pcp_charts](./images/pcp_charts.png)
 
 
 ## [CI Config Contributions](https://docs.ci.openshift.org/docs/how-tos/contributing-openshift-release/)
