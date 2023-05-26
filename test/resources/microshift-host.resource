@@ -13,8 +13,10 @@ Login MicroShift Host
 
     Log  Host: ${USHIFT_HOST}
     SSHLibrary.Open Connection    ${USHIFT_HOST}
-    ${variables}=  Get Variables
-    IF  "\${SSH_PRIV_KEY}" in "${variables}"
+    # If there is an ssh key set in the global configuration, use that to
+    # login to the host. Otherwise assume that the ssh agent is running
+    # and configured properly.
+    IF  '${SSH_PRIV_KEY}'
         SSHLibrary.Login With Public Key    ${USHIFT_USER}    ${SSH_PRIV_KEY}
     ELSE
         SSHLibrary.Login    ${USHIFT_USER}  allow_agent=True
