@@ -3,42 +3,147 @@ package data
 import (
 	"errors"
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+
+	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
+	"k8s.io/klog/v2"
 )
 
-type BackupConfig struct {
-	// Storage is the base directory storing all backups
-	Storage string
-
-	// Name is backup's directory name
-	Name string
-}
-
-func (bc BackupConfig) Validate() error {
-	var errs []error
-	if bc.Storage == "" {
-		errs = append(errs, fmt.Errorf("backup storage must not be empty"))
+var (
+	cpArgs = []string{
+		"--verbose",
+		"--recursive",
+		"--preserve",
+		"--reflink=auto",
 	}
-	if bc.Name == "" {
-		errs = append(errs, fmt.Errorf("backup name must not be empty"))
+)
+
+func NewManager(storage StoragePath) (*manager, error) {
+	if storage == "" {
+		return nil, &EmptyArgErr{argName: "storage"}
 	}
-	return errors.Join(errs...)
+	return &manager{storage: storage}, nil
 }
 
-type Manager interface {
-	Backup(BackupConfig) error
-	Restore(BackupConfig) error
+type manager struct {
+	storage StoragePath
 }
 
-func NewManager() *manager {
-	return &manager{}
+func (dm *manager) GetBackupPath(name BackupName) string {
+	return filepath.Join(string(dm.storage), string(name))
 }
 
-type manager struct{}
-
-func (dm *manager) Backup(cfg BackupConfig) error {
-	return makeBackup(cfg)
+func (dm *manager) BackupExists(name BackupName) (bool, error) {
+	return pathExists(dm.GetBackupPath(name))
 }
 
-func (dm *manager) Restore(cfg BackupConfig) error {
+func (dm *manager) Backup(name BackupName) error {
+	klog.InfoS("Backing up the data",
+		"storage", dm.storage, "name", name, "data", config.DataDir)
+
+	if name == "" {
+		return &EmptyArgErr{"name"}
+	}
+
+	if found, err := pathExists(string(dm.storage)); err != nil {
+		return err
+	} else if !found {
+		if makeDirErr := util.MakeDir(string(dm.storage)); makeDirErr != nil {
+			return fmt.Errorf("making %s directory failed: %w", dm.storage, makeDirErr)
+		}
+		klog.InfoS("Backup storage directory created", "path", dm.storage)
+	} else {
+		klog.InfoS("Backup storage directory already existed", "path", dm.storage)
+	}
+
+	dest := dm.GetBackupPath(name)
+	tmp := dest + ".tmp"
+	old := dest + ".old"
+
+	// Make sure /storage/backup.tmp does not exist, so data isn't copied into that directory
+	if err := os.RemoveAll(tmp); err != nil {
+		return fmt.Errorf("failed to remove %s: %w", tmp, err)
+	}
+
+	if err := copyDataDir(tmp); err != nil {
+		return err
+	}
+
+	backupExists, err := dm.BackupExists(name)
+	if err != nil {
+		return err
+	} else if backupExists {
+		if err := renamePath(dest, old); err != nil {
+			return err
+		}
+		klog.InfoS("Temporarily renamed existing backup", "backup", dest, "renamed", old)
+	}
+
+	if err := renamePath(tmp, dest); err != nil {
+		klog.Errorf("Renaming path failed - renaming %s back and deleting %s: %v", old, tmp, err)
+		renameErr := renamePath(old, dest)
+		rmErr := removePath(tmp)
+		return errors.Join(err, renameErr, rmErr)
+	}
+
+	if backupExists {
+		if err := removePath(old); err != nil {
+			return err
+		}
+	}
+
+	klog.InfoS("Backup finished", "backup", dest, "data", config.DataDir)
+	return nil
+}
+
+func (dm *manager) Restore(n BackupName) error {
 	return fmt.Errorf("not implemented")
+}
+
+func removePath(path string) error {
+	exists, err := pathExists(path)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		if err := os.RemoveAll(path); err != nil {
+			return fmt.Errorf("failed to remove %s: %w", path, err)
+		}
+		klog.InfoS("Removed path", "path", path)
+	}
+	return nil
+}
+
+func copyDataDir(dest string) error {
+	cmd := exec.Command("cp", append(cpArgs, config.DataDir, dest)...) //nolint:gosec
+	klog.InfoS("Executing command", "cmd", cmd)
+
+	out, err := cmd.CombinedOutput()
+	klog.InfoS("Command finished running", "cmd", cmd, "output", out)
+
+	if err != nil {
+		return fmt.Errorf("command %s failed: %w", cmd, err)
+	}
+
+	klog.InfoS("Command successful", "cmd", cmd)
+	return nil
+}
+
+func renamePath(from, to string) error {
+	if err := os.Rename(from, to); err != nil {
+		return fmt.Errorf("renaming %s to %s failed: %w", from, to, err)
+	}
+	return nil
+}
+
+func pathExists(path string) (bool, error) {
+	exists, err := util.PathExists(path)
+	if err != nil {
+		return false, fmt.Errorf("checking if %s exists failed: %w", path, err)
+	}
+	return exists, nil
 }
