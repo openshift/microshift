@@ -25,20 +25,6 @@ user --plaintext --name=redhat --password=redhat
 cdrom
 %packages
 @^minimal-environment
-bash-completion
-cockpit
-conmon
-conntrack-tools
-containernetworking-plugins
-containers-common
-container-selinux
-crio
-git
-jq
-make
-NetworkManager-ovs
-python36
-selinux-policy-devel
 %end
 
 # Post install configuration
