@@ -28,6 +28,8 @@ func NewManager(storage StoragePath) (*manager, error) {
 	return &manager{storage: storage}, nil
 }
 
+var _ Manager = (*manager)(nil)
+
 type manager struct {
 	storage StoragePath
 }
@@ -100,7 +102,7 @@ func (dm *manager) Backup(name BackupName) error {
 }
 
 func (dm *manager) Restore(n BackupName) error {
-	return fmt.Errorf("not implemented")
+	return fmt.Errorf("Restore not implemented")
 }
 
 func removePath(path string) error {
