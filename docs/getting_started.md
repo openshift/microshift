@@ -1,9 +1,8 @@
 # Getting Started with MicroShift
 
-Refer to the [MicroShift product documentation](https://access.redhat.com/documentation/en-us/red_hat_build_of_microshift) for how to install MicroShift on a machine running RHEL and how to build a RHEL for Edge image embedding MicroShift. If you do not yet have a RHEL subscription, you can get a [no-cost Red Hat Developer subscription](https:
-//developers.redhat.com/blog/2021/02/10/how-to-activate-your-no-cost-red-hat-enterprise-linux-subscription).
+Refer to the [MicroShift product documentation](https://access.redhat.com/documentation/en-us/red_hat_build_of_microshift) for how to install MicroShift on a machine running RHEL and how to build a RHEL for Edge image embedding MicroShift. If you do not yet have a RHEL subscription, you can get a [no-cost Red Hat Developer subscription](https://developers.redhat.com/blog/2021/02/10/how-to-activate-your-no-cost-red-hat-enterprise-linux-subscription).
 
-The remainder of this document describes an optionated, non-production setup to facilitate experimentation with MicroShift in a virtual machine running the RHEL 8.7 operating system.
+The remainder of this document describes an opinionated, non-production setup to facilitate experimentation with MicroShift in a virtual machine running the RHEL 9.2 operating system.
 
 ## Prerequisites
 
@@ -17,8 +16,9 @@ Run the following command to install the necessary components for the [libvirt](
 sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img
 ```
 
-Download the Red Hat Enterprise Linux 8.7 DVD ISO image for the x86_64 architecture from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site and copy the file to the `/var/lib/libvirt/images` directory.
-> Other architectures, versions or flavors of operating systems are not supported in this opinionated environment. For this setup, only use the RHEL 8.7 DVD image for the x86_64 architecture.
+Download the Red Hat Enterprise Linux 9.2 DVD ISO image for the `x86_64` or `aarch64` architectures from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site and copy the file to the `/var/lib/libvirt/images` directory.
+> Other architectures, versions or flavors of operating systems are not supported in this opinionated environment.
+> For this setup, only use the RHEL 9.2 DVD image for the `x86_64` or `aarch64` architectures.
 
 Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~/.pull-secret.json` file.
 
@@ -28,7 +28,7 @@ Run the following commands to initiate the creation process of the `microshift-s
 
 ```bash
 VMNAME=microshift-starter
-DVDISO=/var/lib/libvirt/images/rhel-8.7-x86_64-dvd.iso
+DVDISO=/var/lib/libvirt/images/rhel-9.2-$(uname -m)-dvd.iso
 KICKSTART=https://raw.githubusercontent.com/openshift/microshift/main/docs/config/microshift-starter.ks
 
 sudo -b bash -c " \
@@ -47,7 +47,7 @@ virt-install \
 ```
 
 Watch the OS console of the virtual machine to see the progress of the installation, waiting until the machine is rebooted and the login prompt appears.
-The OS console is also accessible from the `virt-manager GUI` as a result of running `sudo virt-manager`. 
+The OS console is also accessible from the `virt-manager GUI` as a result of running `sudo virt-manager`.
 
 ## Access MicroShift
 
@@ -58,9 +58,6 @@ First, get the machine IP address with the following command.
 
 ```bash
 sudo virsh domifaddr microshift-starter
- Name       MAC address          Protocol     Address
--------------------------------------------------------------------------------
- vnet2      52:54:00:6d:08:f7    ipv4         192.168.122.2/24
 ```
 
 Copy your pull secret file to the MicroShift virtual machine using `redhat:redhat` credentials.
@@ -70,10 +67,10 @@ USHIFT_IP=192.168.122.2
 scp ~/.pull-secret.json redhat@${USHIFT_IP}:
 ```
 
-Log into the MicroShift virtual machine.
+Log into the MicroShift virtual machine using `redhat:redhat` credentials.
 
 ```bash
-ssh redhat@192.168.122.2 # when prompted, password is `redhat`
+ssh redhat@${USHIFT_IP}
 ```
 
 The remaining commands are to be executed from within the virtual machine as the `redhat` user.
@@ -88,8 +85,8 @@ Enable the MicroShift RPM repos and install MicroShift and the `oc` and `kubectl
 
 ```bash
 sudo subscription-manager repos \
-    --enable rhocp-4.12-for-rhel-8-x86_64-rpms \
-    --enable fast-datapath-for-rhel-8-x86_64-rpms
+    --enable rhocp-4.13-for-rhel-9-$(uname -m)-rpms \
+    --enable fast-datapath-for-rhel-9-$(uname -m)-rpms
 sudo dnf install -y microshift openshift-clients
 ```
 
