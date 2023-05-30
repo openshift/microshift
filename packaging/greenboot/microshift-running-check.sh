@@ -10,8 +10,17 @@ PODS_CT_LIST=(2                        1                    1                 2 
 # shellcheck source=packaging/greenboot/functions.sh
 source /usr/share/microshift/functions/greenboot.sh
 
+# Set the term handler to convert exit code to 1
+trap 'return_failure' TERM
+
 # Set the exit handler to log the exit status
 trap 'script_exit' EXIT
+
+# The term handler to override the default behavior and have a uniform and
+# homogeneous exit code in all controlled situations.
+function return_failure() {
+    exit 1
+}
 
 # The script exit handler logging the FAILURE or FINISHED message depending
 # on the exit status of the last command
