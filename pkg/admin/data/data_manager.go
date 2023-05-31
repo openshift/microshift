@@ -1,11 +1,13 @@
 package data
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
@@ -124,8 +126,14 @@ func copyDataDir(dest string) error {
 	cmd := exec.Command("cp", append(cpArgs, config.DataDir, dest)...) //nolint:gosec
 	klog.InfoS("Executing command", "cmd", cmd)
 
-	out, err := cmd.CombinedOutput()
-	klog.InfoS("Command finished running", "cmd", cmd, "output", out)
+	var outb, errb bytes.Buffer
+	cmd.Stdout = &outb
+	cmd.Stderr = &errb
+	err := cmd.Run()
+
+	klog.InfoS("Command finished running", "cmd", cmd,
+		"stdout", strings.ReplaceAll(outb.String(), "\n", `, `),
+		"stderr", errb.String())
 
 	if err != nil {
 		return fmt.Errorf("command %s failed: %w", cmd, err)
