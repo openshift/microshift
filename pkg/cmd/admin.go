@@ -15,7 +15,7 @@ func backup(cmd *cobra.Command, args []string) error {
 	storage := data.StoragePath(cmd.Flag("storage").Value.String())
 	name := data.BackupName(cmd.Flag("name").Value.String())
 
-	dataManager, err := data.NewManager(data.StoragePath(storage))
+	dataManager, err := data.NewManager(storage)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func backup(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	return dataManager.Backup(data.BackupName(name))
+	return dataManager.Backup(name)
 }
 
 func newAdminDataCommand() *cobra.Command {
