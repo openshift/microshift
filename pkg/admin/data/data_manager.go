@@ -2,9 +2,7 @@ package data
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -64,39 +62,9 @@ func (dm *manager) Backup(name BackupName) error {
 	}
 
 	dest := dm.GetBackupPath(name)
-	tmp := dest + ".tmp"
-	old := dest + ".old"
 
-	// Make sure /storage/backup.tmp does not exist, so data isn't copied into that directory
-	if err := os.RemoveAll(tmp); err != nil {
-		return fmt.Errorf("failed to remove %s: %w", tmp, err)
-	}
-
-	if err := copyDataDir(tmp); err != nil {
+	if err := copyDataDir(dest); err != nil {
 		return err
-	}
-
-	backupExists, err := dm.BackupExists(name)
-	if err != nil {
-		return err
-	} else if backupExists {
-		if err := renamePath(dest, old); err != nil {
-			return err
-		}
-		klog.InfoS("Temporarily renamed existing backup", "backup", dest, "renamed", old)
-	}
-
-	if err := renamePath(tmp, dest); err != nil {
-		klog.Errorf("Renaming path failed - renaming %s back and deleting %s: %v", old, tmp, err)
-		renameErr := renamePath(old, dest)
-		rmErr := removePath(tmp)
-		return errors.Join(err, renameErr, rmErr)
-	}
-
-	if backupExists {
-		if err := removePath(old); err != nil {
-			return err
-		}
 	}
 
 	klog.InfoS("Backup finished", "backup", dest, "data", config.DataDir)
@@ -105,21 +73,6 @@ func (dm *manager) Backup(name BackupName) error {
 
 func (dm *manager) Restore(n BackupName) error {
 	return fmt.Errorf("Restore not implemented")
-}
-
-func removePath(path string) error {
-	exists, err := pathExists(path)
-	if err != nil {
-		return err
-	}
-
-	if exists {
-		if err := os.RemoveAll(path); err != nil {
-			return fmt.Errorf("failed to remove %s: %w", path, err)
-		}
-		klog.InfoS("Removed path", "path", path)
-	}
-	return nil
 }
 
 func copyDataDir(dest string) error {
@@ -140,13 +93,6 @@ func copyDataDir(dest string) error {
 	}
 
 	klog.InfoS("Command successful", "cmd", cmd)
-	return nil
-}
-
-func renamePath(from, to string) error {
-	if err := os.Rename(from, to); err != nil {
-		return fmt.Errorf("renaming %s to %s failed: %w", from, to, err)
-	}
 	return nil
 }
 

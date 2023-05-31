@@ -23,12 +23,7 @@ func backup(cmd *cobra.Command, args []string) error {
 	if exists, err := dataManager.BackupExists(name); err != nil {
 		return err
 	} else if exists {
-		if force, err := cmd.Flags().GetBool("force"); err != nil {
-			return err
-		} else if !force {
-			return fmt.Errorf("backup %s already exists, use --force to overwrite",
-				dataManager.GetBackupPath(name))
-		}
+		return fmt.Errorf("backup %s already exists", dataManager.GetBackupPath(name))
 	}
 
 	return dataManager.Backup(name)
@@ -40,7 +35,6 @@ func newAdminDataCommand() *cobra.Command {
 		Short: "Backup MicroShift data",
 		RunE:  backup,
 	}
-	backup.PersistentFlags().Bool("force", false, "Overwrite existing backup")
 
 	data := &cobra.Command{
 		Use:   "data",
