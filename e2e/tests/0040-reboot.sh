@@ -8,7 +8,7 @@ set -x
 
 SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
-RETRIES=5
+RETRIES=15
 BACKOFF=20
 
 wait_until() {
