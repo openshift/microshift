@@ -36,18 +36,30 @@ type BootInfo struct {
 	PreRun PreRunStatus `json:"pre_run"`
 }
 
-func (bi BootInfo) Update(new BootInfo) BootInfo {
-	if new.Health != "" {
-		bi.Health = new.Health
+func (bi BootInfo) Update(newInfo BootInfo) BootInfo {
+	if newInfo.Health != "" {
+		bi.Health = newInfo.Health
 	}
-	if new.PreRun != "" {
-		bi.PreRun = new.PreRun
+	if newInfo.PreRun != "" {
+		bi.PreRun = newInfo.PreRun
 	}
 	return bi
 }
 
-type Boot struct {
+type DeploymentBoot struct {
 	system.Boot
+	DeploymentID system.DeploymentID `json:"deployment_id"`
+}
+
+func NewDeploymentBoot(b system.Boot, did system.DeploymentID) DeploymentBoot {
+	return DeploymentBoot{
+		Boot:         b,
+		DeploymentID: did,
+	}
+}
+
+type Boot struct {
+	DeploymentBoot
 	BootInfo
 }
 
@@ -71,13 +83,13 @@ func (h *History) GetBootByID(id system.BootID) (Boot, bool) {
 	return Boot{}, false
 }
 
-func (h *History) AddOrUpdate(boot system.Boot, info BootInfo) {
+func (h *History) AddOrUpdate(dp DeploymentBoot, info BootInfo) {
 	if h.Boots == nil {
 		h.Boots = make([]Boot, 0, 1)
 	}
 
 	for i, b := range h.Boots {
-		if b.ID == boot.ID {
+		if b.ID == dp.ID {
 			oldInfo := h.Boots[i].BootInfo
 			h.Boots[i].BootInfo = oldInfo.Update(info)
 
@@ -87,8 +99,8 @@ func (h *History) AddOrUpdate(boot system.Boot, info BootInfo) {
 	}
 
 	b := Boot{
-		Boot:     boot,
-		BootInfo: info,
+		DeploymentBoot: dp,
+		BootInfo:       info,
 	}
 	h.Boots = append([]Boot{b}, h.Boots...)
 	klog.InfoS("Added boot info", "boot", b)

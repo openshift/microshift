@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/openshift/microshift/pkg/admin/system"
 	"k8s.io/klog/v2"
 )
 
@@ -15,7 +14,7 @@ const (
 
 type HistoryManager interface {
 	Get() (*History, error)
-	Update(system.Boot, BootInfo) error
+	Update(DeploymentBoot, BootInfo) error
 }
 
 func NewHistoryManager(historyStorage HistoryStorage) *historyManager {
@@ -48,11 +47,11 @@ func (dhm *historyManager) Get() (*History, error) {
 	return history, nil
 }
 
-func (dhm *historyManager) Update(boot system.Boot, info BootInfo) error {
-	if boot.ID == "" {
+func (dhm *historyManager) Update(dp DeploymentBoot, info BootInfo) error {
+	if dp.ID == "" {
 		return fmt.Errorf("missing id")
 	}
-	if boot.DeploymentID == "" {
+	if dp.DeploymentID == "" {
 		return fmt.Errorf("missing deployment id")
 	}
 
@@ -66,7 +65,7 @@ func (dhm *historyManager) Update(boot system.Boot, info BootInfo) error {
 	}
 
 	klog.InfoS("Current boot history", "history", history)
-	history.AddOrUpdate(boot, info)
+	history.AddOrUpdate(dp, info)
 	history.RemoveOldEntries(maxBootHistory)
 	klog.InfoS("Updated boot history", "history", history)
 

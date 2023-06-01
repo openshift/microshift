@@ -16,8 +16,9 @@ type decisionData struct {
 
 	BootHistory *history.History
 
-	CurrentBoot  *system.Boot
-	PreviousBoot *system.Boot
+	CurrentBoot         *system.Boot
+	CurrentDeploymentID system.DeploymentID
+	PreviousBoot        *system.Boot
 
 	CurrentBootInfo  *history.Boot
 	PreviousBootInfo *history.Boot
@@ -56,9 +57,16 @@ func NewDecisionData(
 		}
 	}
 
+	d.CurrentDeploymentID, err = systemInfo.GetCurrentDeploymentID()
+	if err != nil {
+		return nil, fmt.Errorf("getting current deployment id failed: %w", err)
+	}
+
 	d.PreviousBoot, err = systemInfo.GetPreviousBoot()
 	if err != nil {
-		return nil, fmt.Errorf("getting previous boot info failed: %w", err)
+		if !errors.Is(err, system.ErrBootNotFound) {
+			return nil, fmt.Errorf("getting previous boot info failed: %w", err)
+		}
 	} else {
 		prevBootInfo, found := d.BootHistory.GetBootByID(d.PreviousBoot.ID)
 		if found {

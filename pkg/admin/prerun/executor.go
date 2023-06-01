@@ -77,7 +77,7 @@ func (e *executor) BackupPreviousBoot() error {
 
 func (e *executor) UpdatePreRunStatus(status history.PreRunStatus) error {
 	return e.historyManager.Update(
-		*e.decisionData.CurrentBoot,
+		history.NewDeploymentBoot(*e.decisionData.CurrentBoot, e.decisionData.CurrentDeploymentID),
 		history.BootInfo{PreRun: status},
 	)
 }

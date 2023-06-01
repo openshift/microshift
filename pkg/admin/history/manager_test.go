@@ -33,43 +33,44 @@ func (fs *fakeStorage) Save(history *History) error {
 }
 
 type testBoot struct {
-	info   system.Boot
-	health Health
+	boot     system.Boot
+	deployID system.DeploymentID
+	health   Health
 }
 
 func Test_SimulateRealScenario(t *testing.T) {
 	testBoots := []testBoot{
 		{
-			info: system.Boot{
-				ID:           "boot-1",
-				BootTime:     time.Date(2023, 06, 01, 0, 0, 0, 0, time.UTC),
-				DeploymentID: "deploy-1",
+			boot: system.Boot{
+				ID:       "boot-1",
+				BootTime: time.Date(2023, 06, 01, 0, 0, 0, 0, time.UTC),
 			},
-			health: Healthy,
+			deployID: "deploy-1",
+			health:   Healthy,
 		},
 		{
-			info: system.Boot{
-				ID:           "boot-2",
-				BootTime:     time.Date(2023, 06, 02, 0, 0, 0, 0, time.UTC),
-				DeploymentID: "deploy-1",
+			boot: system.Boot{
+				ID:       "boot-2",
+				BootTime: time.Date(2023, 06, 02, 0, 0, 0, 0, time.UTC),
 			},
-			health: Healthy,
+			deployID: "deploy-1",
+			health:   Healthy,
 		},
 		{
-			info: system.Boot{
-				ID:           "boot-3",
-				BootTime:     time.Date(2023, 06, 03, 0, 0, 0, 0, time.UTC),
-				DeploymentID: "deploy-1",
+			boot: system.Boot{
+				ID:       "boot-3",
+				BootTime: time.Date(2023, 06, 03, 0, 0, 0, 0, time.UTC),
 			},
-			health: Unhealthy,
+			deployID: "deploy-2",
+			health:   Unhealthy,
 		},
 		{
-			info: system.Boot{
-				ID:           "boot-4",
-				BootTime:     time.Date(2023, 06, 04, 0, 0, 0, 0, time.UTC),
-				DeploymentID: "deploy-1",
+			boot: system.Boot{
+				ID:       "boot-4",
+				BootTime: time.Date(2023, 06, 04, 0, 0, 0, 0, time.UTC),
 			},
-			health: Healthy,
+			deployID: "deploy-1",
+			health:   Healthy,
 		},
 	}
 
@@ -82,9 +83,9 @@ func Test_SimulateRealScenario(t *testing.T) {
 		// access items of history.Boots with `bootsNum-idx-1` because it is sorted (most recent first)
 		// and thus in reverse order compared to expectedBoots
 		for idx, eb := range expectedBoots {
-			assert.Equal(t, eb.info.ID, history.Boots[bootsNum-idx-1].ID)
-			assert.Equal(t, eb.info.BootTime, history.Boots[bootsNum-idx-1].BootTime)
-			assert.Equal(t, eb.info.DeploymentID, history.Boots[bootsNum-idx-1].DeploymentID)
+			assert.Equal(t, eb.boot.ID, history.Boots[bootsNum-idx-1].ID)
+			assert.Equal(t, eb.boot.BootTime, history.Boots[bootsNum-idx-1].BootTime)
+			assert.Equal(t, eb.deployID, history.Boots[bootsNum-idx-1].DeploymentID)
 			assert.Equal(t, eb.health, history.Boots[bootsNum-idx-1].Health)
 		}
 	}
@@ -95,16 +96,16 @@ func Test_SimulateRealScenario(t *testing.T) {
 	for idx, boot := range testBoots {
 		if idx > 0 {
 			history, err := dhm.Get()
-			boot, found := history.GetBootByID(testBoots[idx-1].info.ID)
+			boot, found := history.GetBootByID(testBoots[idx-1].boot.ID)
 			assert.NoError(t, err)
 			assert.True(t, found)
 			assert.Equal(t, testBoots[idx-1].health, boot.Health)
 		}
 
-		assert.NoError(t, dhm.Update(boot.info, BootInfo{Health: boot.health}))
+		assert.NoError(t, dhm.Update(NewDeploymentBoot(boot.boot, boot.deployID), BootInfo{Health: boot.health}))
 
 		history, err := dhm.Get()
-		boot, found := history.GetBootByID(boot.info.ID)
+		boot, found := history.GetBootByID(boot.boot.ID)
 		assert.NoError(t, err)
 		assert.True(t, found)
 		assert.Equal(t, testBoots[idx].health, boot.Health)
@@ -122,21 +123,21 @@ func Test_HistoryFileExistsButIsEmpty(t *testing.T) {
 		err := json.Unmarshal(bin.Bytes(), hist)
 		assert.NoError(t, err)
 
-		currentBootInfo := system.Boot{
-			ID:           "boot-1",
-			BootTime:     time.Date(2023, 06, 03, 0, 0, 0, 0, time.UTC),
-			DeploymentID: "0",
+		currentBoot := system.Boot{
+			ID:       "boot-1",
+			BootTime: time.Date(2023, 06, 03, 0, 0, 0, 0, time.UTC),
 		}
+		deployID := system.DeploymentID("0")
 
 		dhm := NewHistoryManager(&fakeStorage{loadErr: nil, history: hist})
-		err = dhm.Update(currentBootInfo, BootInfo{Health: Healthy})
+		err = dhm.Update(NewDeploymentBoot(currentBoot, deployID), BootInfo{Health: Healthy})
 		assert.NoError(t, err)
 
 		history, err := dhm.Get()
 		assert.NoError(t, err)
 		assert.Len(t, history.Boots, 1)
-		assert.Equal(t, currentBootInfo.ID, history.Boots[0].ID)
-		assert.Equal(t, currentBootInfo.DeploymentID, history.Boots[0].DeploymentID)
+		assert.Equal(t, currentBoot.ID, history.Boots[0].ID)
+		assert.Equal(t, deployID, history.Boots[0].DeploymentID)
 		assert.Equal(t, Healthy, history.Boots[0].Health)
 	}
 }
@@ -144,31 +145,31 @@ func Test_HistoryFileExistsButIsEmpty(t *testing.T) {
 func Test_HistoryFileDoesNotExist(t *testing.T) {
 	stor := &fakeStorage{loadErr: ErrNoHistory, history: nil}
 
-	currentBootInfo := system.Boot{
-		ID:           "boot-1",
-		BootTime:     time.Date(2023, 06, 03, 0, 0, 0, 0, time.UTC),
-		DeploymentID: "0",
+	currentBoot := system.Boot{
+		ID:       "boot-1",
+		BootTime: time.Date(2023, 06, 03, 0, 0, 0, 0, time.UTC),
 	}
+	deployID := system.DeploymentID("0")
 
 	dhm := NewHistoryManager(stor)
-	err := dhm.Update(currentBootInfo, BootInfo{Health: Healthy})
+	err := dhm.Update(NewDeploymentBoot(currentBoot, deployID), BootInfo{Health: Healthy})
 	assert.NoError(t, err)
 
 	history, err := dhm.Get()
 	assert.NoError(t, err)
 	assert.Len(t, history.Boots, 1)
-	assert.Equal(t, currentBootInfo.ID, history.Boots[0].ID)
-	assert.Equal(t, currentBootInfo.DeploymentID, history.Boots[0].DeploymentID)
+	assert.Equal(t, currentBoot.ID, history.Boots[0].ID)
+	assert.Equal(t, deployID, history.Boots[0].DeploymentID)
 	assert.Equal(t, Healthy, history.Boots[0].Health)
 
 	// Update health of the boot
-	err = dhm.Update(currentBootInfo, BootInfo{Health: Unhealthy})
+	err = dhm.Update(NewDeploymentBoot(currentBoot, deployID), BootInfo{Health: Unhealthy})
 	assert.NoError(t, err)
 	history, err = dhm.Get()
 	assert.NoError(t, err)
 	assert.Len(t, history.Boots, 1)
-	assert.Equal(t, currentBootInfo.ID, history.Boots[0].ID)
-	assert.Equal(t, currentBootInfo.DeploymentID, history.Boots[0].DeploymentID)
+	assert.Equal(t, currentBoot.ID, history.Boots[0].ID)
+	assert.Equal(t, deployID, history.Boots[0].DeploymentID)
 	assert.Equal(t, Unhealthy, history.Boots[0].Health)
 }
 
@@ -176,13 +177,13 @@ func Test_ProblemReadingHistoryFile(t *testing.T) {
 	loadErr := fmt.Errorf("no permissions")
 	stor := &fakeStorage{loadErr: loadErr, history: nil}
 
-	currentBootInfo := system.Boot{
-		ID:           "boot-1",
-		BootTime:     time.Date(2023, 06, 03, 0, 0, 0, 0, time.UTC),
-		DeploymentID: "0",
+	currentBoot := system.Boot{
+		ID:       "boot-1",
+		BootTime: time.Date(2023, 06, 03, 0, 0, 0, 0, time.UTC),
 	}
+	deployID := system.DeploymentID("0")
 
 	dhm := NewHistoryManager(stor)
-	err := dhm.Update(currentBootInfo, BootInfo{Health: Healthy})
+	err := dhm.Update(NewDeploymentBoot(currentBoot, deployID), BootInfo{Health: Healthy})
 	assert.ErrorIs(t, err, loadErr)
 }

@@ -1,17 +1,21 @@
 package system
 
 import (
+	"errors"
 	"fmt"
 	"time"
+)
+
+var (
+	ErrBootNotFound = errors.New("boot not found")
 )
 
 type BootID string
 type DeploymentID string
 
 type Boot struct {
-	ID           BootID       `json:"id"`
-	BootTime     time.Time    `json:"boot_time"`
-	DeploymentID DeploymentID `json:"deployment_id"`
+	ID       BootID    `json:"id"`
+	BootTime time.Time `json:"boot_time"`
 }
 
 type SystemInfo interface {
@@ -39,15 +43,7 @@ func (s *systemInfo) GetCurrentDeploymentID() (DeploymentID, error) {
 }
 
 func (s *systemInfo) GetCurrentBoot() (*Boot, error) {
-	bi, err := s.getBootByIndex(0)
-	if err != nil {
-		return nil, err
-	}
-	bi.DeploymentID, err = getCurrentDeploymentID()
-	if err != nil {
-		return nil, err
-	}
-	return bi, nil
+	return s.getBootByIndex(0)
 }
 
 func (s *systemInfo) GetPreviousBoot() (*Boot, error) {
@@ -61,7 +57,7 @@ func (s *systemInfo) getBootByIndex(index int) (*Boot, error) {
 	}
 	boot := bs.getBootByIndex(index)
 	if boot.BootID == "" {
-		return nil, nil
+		return nil, ErrBootNotFound
 	}
 	return &Boot{
 		ID:       boot.BootID,

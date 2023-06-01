@@ -50,10 +50,14 @@ func NewHealthCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			currentDeployID, err := system.NewSystemInfo().GetCurrentDeploymentID()
+			if err != nil {
+				return err
+			}
 
 			dhm := history.NewHistoryManager(&history.HistoryFileStorage{})
 			fmt.Printf("Updating current boot's health to %s\n\n", health)
-			return dhm.Update(*currentBoot, history.BootInfo{Health: health})
+			return dhm.Update(history.DeploymentBoot{Boot: *currentBoot, DeploymentID: currentDeployID}, history.BootInfo{Health: health})
 		},
 	}
 	setCurrent.Flags().Bool("healthy", false, "")

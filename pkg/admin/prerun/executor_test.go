@@ -18,8 +18,8 @@ func Test_Backup(t *testing.T) {
 	did := "system-abcd.0"
 	dd := decisionData{
 		PreviousBootInfo: &history.Boot{
-			Boot:     system.Boot{DeploymentID: system.DeploymentID(did)},
-			BootInfo: history.BootInfo{},
+			DeploymentBoot: history.NewDeploymentBoot(system.Boot{}, system.DeploymentID(did)),
+			BootInfo:       history.BootInfo{},
 		},
 	}
 	dm := &mocks.Manager{}
