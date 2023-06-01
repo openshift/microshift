@@ -5,6 +5,9 @@ IFS=$'\n\t'
 PS4='+ $(date "+%T.%N")\011 '
 set -x
 
+sudo dnf install -y --setopt=install_weak_deps=False podman 
+whereis skopeo || true
+
 function check_greenboot_exit_status() {
     local expectedRC=$1
     local cleanup=$2
