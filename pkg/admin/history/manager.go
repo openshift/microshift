@@ -9,6 +9,10 @@ import (
 	"k8s.io/klog/v2"
 )
 
+const (
+	maxBootHistory = 10
+)
+
 type HistoryManager interface {
 	Get() (*History, error)
 	Update(system.Boot, BootInfo) error
@@ -60,27 +64,11 @@ func (dhm *historyManager) Update(boot system.Boot, info BootInfo) error {
 		klog.InfoS("Boot history does not exist (yet)")
 		history = &History{}
 	}
-	if history.Boots == nil {
-		history.Boots = make([]Boot, 0, 1)
-	}
-	klog.InfoS("Updating boot history", "boot", boot, "info", info, "history", history)
 
-	for i, b := range history.Boots {
-		if b.ID == boot.ID {
-			oldInfo := history.Boots[i].BootInfo
-			history.Boots[i].BootInfo = oldInfo.Update(info)
-
-			klog.InfoS("Updated boot info", "oldInfo", oldInfo, "newBootEntry", history.Boots[i], "history", history)
-			return dhm.storage.Save(history)
-		}
-	}
-
-	b := Boot{
-		Boot:     boot,
-		BootInfo: info,
-	}
-	history.Boots = append(history.Boots, b)
-	klog.InfoS("Added boot info", "boot", b, "history", history)
+	klog.InfoS("Current boot history", "history", history)
+	history.AddOrUpdate(boot, info)
+	history.RemoveOldEntries(maxBootHistory)
+	klog.InfoS("Updated boot history", "history", history)
 
 	return dhm.storage.Save(history)
 }

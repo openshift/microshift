@@ -2,8 +2,10 @@ package history
 
 import (
 	"errors"
+	"sort"
 
 	"github.com/openshift/microshift/pkg/admin/system"
+	"k8s.io/klog/v2"
 )
 
 var (
@@ -67,4 +69,42 @@ func (h *History) GetBootByID(id system.BootID) (Boot, bool) {
 		}
 	}
 	return Boot{}, false
+}
+
+func (h *History) AddOrUpdate(boot system.Boot, info BootInfo) {
+	if h.Boots == nil {
+		h.Boots = make([]Boot, 0, 1)
+	}
+
+	for i, b := range h.Boots {
+		if b.ID == boot.ID {
+			oldInfo := h.Boots[i].BootInfo
+			h.Boots[i].BootInfo = oldInfo.Update(info)
+
+			klog.InfoS("Updated boot info", "old", oldInfo, "new", h.Boots[i])
+			return
+		}
+	}
+
+	b := Boot{
+		Boot:     boot,
+		BootInfo: info,
+	}
+	h.Boots = append([]Boot{b}, h.Boots...)
+	klog.InfoS("Added boot info", "boot", b)
+
+	sort.SliceStable(h.Boots, func(i, j int) bool {
+		return h.Boots[i].BootTime.After(h.Boots[j].BootTime)
+	})
+}
+
+func (h *History) RemoveOldEntries(keep int) {
+	if len(h.Boots) > keep {
+		removed := h.Boots[keep:]
+		h.Boots = h.Boots[:keep]
+		klog.InfoS("History to long - removed old entries",
+			"max", keep,
+			"removed", removed,
+			"current", h.Boots)
+	}
 }
