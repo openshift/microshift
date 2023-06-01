@@ -47,6 +47,19 @@ Wait For MicroShift
     # greenboot check script to let us use it even when not on a
     # greenboot host?
 
+MicroShift Service Is Active
+    [Documentation]    Check if microshift.service is active
+    ...    (process announced readiness)
+    ${state}=    Get Systemd Setting    microshift.service    ActiveState
+    Should Be Equal As Strings    ${state}    active
+
+Wait For MicroShift Service
+    [Documentation]  Wait for MicroShift service to be active
+    Wait Until Keyword Succeeds
+    ...  50x
+    ...  10s
+    ...  MicroShift Service Is Active
+
 Restart MicroShift
     [Documentation]  Restart the MicroShift service
     # Use separate stop and start steps to avoid a race condition with
