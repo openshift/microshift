@@ -9,5 +9,5 @@ else
 fi
 
 set -x
-microshift admin health set-current "--${HEALTH}"
+microshift health set-current "--${HEALTH}"
 
