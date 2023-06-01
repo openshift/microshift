@@ -1,4 +1,194 @@
-# machine-config-operator embedded-component 87fedee690ae487f8ae044ac416000172c9576a5 to 4accd895aa8fe5ccbd166b9562fdcf5a2112c5ec
-0f44dc1dd24d5a902d38b9a0b33a42ff864a7719 2023-05-17T20:40:13+00:00 Removed pivot func and added depreciation warning
-# csi-livenessprobe image-amd64 720e1d6e3e828dec9908091da9f5d80a31d75585 to 9cb056421c5a2e37435dbedbd7d73de8db1e094a
-bf20fae2da2649756ea3a638a7d43c23d2e29be4 2023-05-18T16:51:39-07:00 OCPBUGS-13821: Bump gRPC from 1.38.0 to 1.49.0
+# cluster-network-operator embedded-component d17cd49b76269870402b67a6967abdd6ddbc9952 to 422174789356e3bd2af543ab6513e3491593837f
+a5c63c6c5552abe862da3a8ff97e2cd6f2ad577d 2023-01-19T17:05:00+01:00 Update github.com/Masterminds/sprig to v3
+# cluster-policy-controller embedded-component 139ac0499ac4d744023827ceb6d16aa6b467be27 to 9aaf6fea45f75b813ccb7441b9c350fe35d1dd9f
+6249a8819009fa7ce046f53ae4dbba9c3abb07ac 2023-05-22T11:58:02+00:00 external template and route Informer
+# kubernetes embedded-component 37a9a084bcb483a38e8f88349fa6a21c1b6be8a3 to 3fe29064317f72fce3606a38883d66a91a7c43dc
+70f21ece6d1a6cf873475ed16256b524cf23dc0a 2023-05-23T15:05:58+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+2f033cdec2d935f95c3ce66b43964afd8973270d 2023-05-23T16:15:57+02:00 UPSTREAM: <drop>: manually resolve conflicts
+e770bdbb87cccdc2daa790ecd69f40cf4df3cc9d 2023-05-17T14:05:24+00:00 Release commit for Kubernetes v1.25.10
+289faa2810c6f02d667cc60bdd37cff0231a9299 2023-05-05T15:03:17-07:00 benchmark test to evaluate the overhead of podMatchesScopeFunc
+8d8ea64adffdfdd4c5641cbde51d17ab0067effa 2023-05-05T15:02:52-07:00 Fix incorrect calculation for ResourceQuota with PriorityClass as its scope
+712575d9acda6fc947bb2ee658a0949318dcce7d 2023-05-04T10:52:40+02:00 releng/go: Update images, dependencies and version to Go 1.19.9
+7f1809dbc73001cbcbd5c394a89c470b4e04f78d 2023-05-03T13:46:19+01:00 node: device-plugin: e2e: Additional test cases
+4ba6f87a0fb1ceea9ed6ba405879398e862a4b00 2023-05-03T13:36:53+01:00 node: device-plugin: add node reboot test scenario
+b50d53f6c683204c591ac1d5f30ea94e2b4283ca 2023-05-03T13:36:53+01:00 node: device-plugin: e2e: Capture pod admission failure
+9fc2d5c12c2e3f5abc17a1c1c5312f1c2b9de6d4 2023-05-03T13:36:53+01:00 node: device-mgr: e2e: adapt to sample device plugin refactoring
+6c0c91e0d0f25acd6e81c25673de7d4bcc2ecaab 2023-05-03T13:36:49+01:00 node: device-mgr: e2e: Update the e2e test to reproduce issue:109595
+4eb2808deb8c073b4b9d31848c767e62abaa36f9 2023-05-03T13:22:41+01:00 node: device-mgr: e2e: Implement End to end test
+337e6e76fbf110078a172430d610070b860dae67 2023-05-03T13:21:43+01:00 node: device-mgr: Handle recovery by checking if healthy devices exist
+57b644b976c3623577064a4bd33028fe3026e660 2023-05-03T13:21:43+01:00 node: device-plugin: e2e: Add test case for kubelet restart
+e53a7181a75d8cb379cf31b277868a3f81f51e98 2023-05-03T13:21:40+01:00 node: device-plugin: e2e: Provide sleep intervals via constants
+60d81f0a304b799c8da9e00cfde285642fc5d347 2023-05-03T13:20:06+01:00 node: device-plugin: e2e: Update test description to make it explicit
+b9ecf9862dc0d7825ca49483a5ee78b7cb90baed 2023-05-03T13:20:01+01:00 node: device-plugin: e2e: Isolate test to pod restart scenario
+d1605c37bdabd0539328780231e76b7c3761f231 2023-05-02T21:34:37+00:00 Move glusterfs 1.25 deprecation notice to the deprecation section.
+20f6635eb2394995159c5b97164ac75edd4ee450 2023-05-02T20:48:06+01:00 node: device-plugin: e2e: Annotate device check with error message
+6bae194b1cfae983626c038ef5028ed41039812c 2023-05-02T20:46:02+01:00 node: device-plugins: e2e: s/devLen/expectedSampleDevsAmount
+d00f41a173d35814affc044397356d4bf74f5fb3 2023-05-02T20:44:25+01:00 node: device-plugins: e2e: Refactor parse log to return string and error
+7d1756abc694fd92d08e032a1e346a7184535878 2023-05-02T20:31:52+01:00 test: Fix path to e2e node sample device plugin
+02e1fff86aaa0580097741d6e9e32f9f52212a16 2023-05-02T20:31:26+01:00 node: device-mgr: sample device plugin: manifest to avoid registration
+3a9c226299ee9079cc27be76476ea7795411064f 2023-05-02T20:31:26+01:00 node: device-mgr: sample device plugin: control registration process
+dd9dbcc5fde0a9e46fcf8daa8ab0a7c904c165c3 2023-05-02T20:27:29+01:00 e2e: node: unify sample device plugin utilities
+cc3bdb6e1e5b2f69f0cac5d5529ab67abf0c3d18 2023-04-28T17:03:58-07:00 [1.25] vendor: bump runc to 1.1.6
+7c41bbbbdf41da1f366db4237cf25dbe0f05dd3a 2023-04-25T12:47:01-07:00 Fix directory mismatch for `volume.SetVolumeOwnership()`
+f1a4bfbd597f25c0f1c9039423aadcbfebe550d3 2023-04-17T16:38:51+08:00 use case-insensitive header keys for http probes
+0d433ae74ec5b46ce8f03cda216bf3edaf1ea01d 2023-04-15T23:56:29+08:00 add log includes pod preemption details
+56f50bd0aecaa5877cf7b37bae6d5884007210b3 2023-04-14T08:26:13+00:00 fix: the volume is not detached after the pod and PVC objects are deleted
+e68ff4549631829367c5418a09fbc8d13ec7f046 2023-04-13T13:13:43+02:00 Do not look at VPC-related resources outside the cluster's network
+ad10f081586cac5b03bef619c90acd1f24c4c72e 2023-04-12T23:26:08-07:00 Bump konnectivity-client to 0.0.37
+f1a2a6c1e553056fe4cafa3182666fdc7518b555 2023-04-12T16:56:53-04:00 kubelet: Do not mutate pods in the pod manager
+28e1b5d635d6217a5fb36e3b6eee256b13fc48a3 2023-04-12T12:38:32+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.9
+a1a87a0a2bcd605820920c6b0e618a8ab7d117d4 2023-04-12T12:06:19+00:00 Release commit for Kubernetes v1.25.9
+bf21b6de4a97fa01ddef72a03f14ccd22a50db2f 2023-04-06T09:44:33+02:00 releng/go: Update images, dependencies and version to Go 1.19.8
+604ad21799c43d87456cc76d3e591487de0a5152 2023-04-05T15:38:17+00:00 Return error for localhost seccomp type with no localhost profile defined
+902a7591f917eb886306cca09e82a98ba815210a 2023-03-31T11:57:24-04:00 Clean up formatting
+38d2613d16f4c51647bb1c37c87ef5773bd757a0 2023-03-22T10:37:26-04:00 Drop development dependencies from test targets
+5355936e2022d550ce11e403922635e55d1ec82f 2023-03-21T11:42:25-04:00 Clear front proxy headers after authentication is complete
+fb0741c2e7276ffe25f8b3978a2354f7b1cd1328 2023-03-21T09:28:59-04:00 Make prerelease tag optional in CI versions
+7fc18651814feeae108cae82ebbcf977e95a0ea5 2023-03-21T09:09:12-04:00 Annotate CI version regexes
+fb5eefc66b1be9af8ff52835525440c659a6b63c 2023-03-21T09:09:11-04:00 Drop unused regex grouping
+7b88494c32dfb34f084035995dec7052faf21b88 2023-03-21T09:09:11-04:00 Update comments
+c55deb4868a8b209d83dcd6e1c065ea236793080 2023-03-21T09:09:10-04:00 Delete unused version regex function
+9cb693eadf04e0e71e6128d486ef846ea3ffb9db 2023-03-21T15:02:08+08:00 kubelet: Fix fs quota monitoring on volumes
+32d3b4ef594c8fee005eac9c2bdf9a6c0eefb006 2023-03-21T15:02:07+08:00 fsquota: only generate pod uuid is nil
+d72438efd47e4be01167dc44fd7623795da07783 2023-03-20T15:59:12-04:00 Preserve UID/ResourceVersion in the BindingREST endpoint
+2257dba12f06c6b137a4c9a93a4f7fded8524479 2023-03-20T15:59:11-04:00 Add integration test for DefaultBinder
+a247e48bcd3742da7ddb43aa0b4d2f947afc3d33 2023-03-17T14:51:09+00:00 Change where transformers are called.
+3a14fe1af239a07ff8cdd13c6bd8fdbdb97fabeb 2023-03-15T14:02:25+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.8
+b67fe6e75a92ba082474b08ac49a6c1c04456832 2023-03-11T00:31:38+00:00 wait again on pending state
+d7c1ba51f87c61572595be6206012e9431744279 2023-03-11T00:31:38+00:00 cacher allow context cancellation if not ready
+9ac9c468ec9222949a397fbf692e5a9a05398efb 2023-03-08T07:16:40+00:00 Route controller should update routes with NodeIP changed When a node reboots or kubelet restarts, it is possible that its IP is changed. In this case, node route should be updated with the correct IP. In this PR, it checks if the IP in an existing route is the same as the actual one. If not, it marks it as "update" so the old route will be deleted and a new one will be created. There's a new field EnableNodeAddresses, which is a feature gate for specific cloud providers to enable after they update their cloud provider code for CreateRoute().
+cc675a5367d9d09992d7f12b8a43a10d672370b9 2023-02-20T09:58:12+00:00 client-go/cache: update Replace comment to be more clear
+4283020151ab233101e77996fd8084488057f9c2 2023-02-20T09:58:12+00:00 client-go/cache: rewrite Replace to check queue first
+db451e163d97f6a2c023efa30aa12b751c785798 2023-02-20T09:58:11+00:00 client-go/cache: merge ReplaceMakesDeletionsForObjectsInQueue tests
+a818874dce54226ecc8ef384ff8b4c82aa6aaa85 2023-02-20T09:58:11+00:00 client-go/cache: fix missing delete event on replace without knownObjects
+bdc4a22309fc51f824aca41f11ee4466758ea9b0 2023-02-20T09:58:11+00:00 client-go/cache: fix missing delete event on replace
+3a5e85dff6d7412c512782da2f18ec7dde073e7d 2023-02-19T14:03:16-08:00 Bump konnectivity-client to v0.0.36
+c6d4552d7b5af6efe9a6af01b602c014da913cdb 2022-10-11T16:45:32-05:00 test: demote service ClientIP affinity timeout tests from conformance
+# oc image-amd64 31aa3e89a926f81aa0af30320ffcb71acadf3015 to 97c75d06a0f795872975e1d2335a2a932ca1b917
+e7786c5acc0de31c625a5fdbe9d75bfa2a242b5a 2023-05-29T13:19:33+00:00 Remove closed centos7 registry from newapp unit tests
+# kubernetes image-amd64 37a9a084bcb483a38e8f88349fa6a21c1b6be8a3 to 3fe29064317f72fce3606a38883d66a91a7c43dc
+70f21ece6d1a6cf873475ed16256b524cf23dc0a 2023-05-23T15:05:58+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+2f033cdec2d935f95c3ce66b43964afd8973270d 2023-05-23T16:15:57+02:00 UPSTREAM: <drop>: manually resolve conflicts
+e770bdbb87cccdc2daa790ecd69f40cf4df3cc9d 2023-05-17T14:05:24+00:00 Release commit for Kubernetes v1.25.10
+289faa2810c6f02d667cc60bdd37cff0231a9299 2023-05-05T15:03:17-07:00 benchmark test to evaluate the overhead of podMatchesScopeFunc
+8d8ea64adffdfdd4c5641cbde51d17ab0067effa 2023-05-05T15:02:52-07:00 Fix incorrect calculation for ResourceQuota with PriorityClass as its scope
+712575d9acda6fc947bb2ee658a0949318dcce7d 2023-05-04T10:52:40+02:00 releng/go: Update images, dependencies and version to Go 1.19.9
+7f1809dbc73001cbcbd5c394a89c470b4e04f78d 2023-05-03T13:46:19+01:00 node: device-plugin: e2e: Additional test cases
+4ba6f87a0fb1ceea9ed6ba405879398e862a4b00 2023-05-03T13:36:53+01:00 node: device-plugin: add node reboot test scenario
+b50d53f6c683204c591ac1d5f30ea94e2b4283ca 2023-05-03T13:36:53+01:00 node: device-plugin: e2e: Capture pod admission failure
+9fc2d5c12c2e3f5abc17a1c1c5312f1c2b9de6d4 2023-05-03T13:36:53+01:00 node: device-mgr: e2e: adapt to sample device plugin refactoring
+6c0c91e0d0f25acd6e81c25673de7d4bcc2ecaab 2023-05-03T13:36:49+01:00 node: device-mgr: e2e: Update the e2e test to reproduce issue:109595
+4eb2808deb8c073b4b9d31848c767e62abaa36f9 2023-05-03T13:22:41+01:00 node: device-mgr: e2e: Implement End to end test
+337e6e76fbf110078a172430d610070b860dae67 2023-05-03T13:21:43+01:00 node: device-mgr: Handle recovery by checking if healthy devices exist
+57b644b976c3623577064a4bd33028fe3026e660 2023-05-03T13:21:43+01:00 node: device-plugin: e2e: Add test case for kubelet restart
+e53a7181a75d8cb379cf31b277868a3f81f51e98 2023-05-03T13:21:40+01:00 node: device-plugin: e2e: Provide sleep intervals via constants
+60d81f0a304b799c8da9e00cfde285642fc5d347 2023-05-03T13:20:06+01:00 node: device-plugin: e2e: Update test description to make it explicit
+b9ecf9862dc0d7825ca49483a5ee78b7cb90baed 2023-05-03T13:20:01+01:00 node: device-plugin: e2e: Isolate test to pod restart scenario
+d1605c37bdabd0539328780231e76b7c3761f231 2023-05-02T21:34:37+00:00 Move glusterfs 1.25 deprecation notice to the deprecation section.
+20f6635eb2394995159c5b97164ac75edd4ee450 2023-05-02T20:48:06+01:00 node: device-plugin: e2e: Annotate device check with error message
+6bae194b1cfae983626c038ef5028ed41039812c 2023-05-02T20:46:02+01:00 node: device-plugins: e2e: s/devLen/expectedSampleDevsAmount
+d00f41a173d35814affc044397356d4bf74f5fb3 2023-05-02T20:44:25+01:00 node: device-plugins: e2e: Refactor parse log to return string and error
+7d1756abc694fd92d08e032a1e346a7184535878 2023-05-02T20:31:52+01:00 test: Fix path to e2e node sample device plugin
+02e1fff86aaa0580097741d6e9e32f9f52212a16 2023-05-02T20:31:26+01:00 node: device-mgr: sample device plugin: manifest to avoid registration
+3a9c226299ee9079cc27be76476ea7795411064f 2023-05-02T20:31:26+01:00 node: device-mgr: sample device plugin: control registration process
+dd9dbcc5fde0a9e46fcf8daa8ab0a7c904c165c3 2023-05-02T20:27:29+01:00 e2e: node: unify sample device plugin utilities
+cc3bdb6e1e5b2f69f0cac5d5529ab67abf0c3d18 2023-04-28T17:03:58-07:00 [1.25] vendor: bump runc to 1.1.6
+7c41bbbbdf41da1f366db4237cf25dbe0f05dd3a 2023-04-25T12:47:01-07:00 Fix directory mismatch for `volume.SetVolumeOwnership()`
+f1a4bfbd597f25c0f1c9039423aadcbfebe550d3 2023-04-17T16:38:51+08:00 use case-insensitive header keys for http probes
+0d433ae74ec5b46ce8f03cda216bf3edaf1ea01d 2023-04-15T23:56:29+08:00 add log includes pod preemption details
+56f50bd0aecaa5877cf7b37bae6d5884007210b3 2023-04-14T08:26:13+00:00 fix: the volume is not detached after the pod and PVC objects are deleted
+e68ff4549631829367c5418a09fbc8d13ec7f046 2023-04-13T13:13:43+02:00 Do not look at VPC-related resources outside the cluster's network
+ad10f081586cac5b03bef619c90acd1f24c4c72e 2023-04-12T23:26:08-07:00 Bump konnectivity-client to 0.0.37
+f1a2a6c1e553056fe4cafa3182666fdc7518b555 2023-04-12T16:56:53-04:00 kubelet: Do not mutate pods in the pod manager
+28e1b5d635d6217a5fb36e3b6eee256b13fc48a3 2023-04-12T12:38:32+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.9
+a1a87a0a2bcd605820920c6b0e618a8ab7d117d4 2023-04-12T12:06:19+00:00 Release commit for Kubernetes v1.25.9
+bf21b6de4a97fa01ddef72a03f14ccd22a50db2f 2023-04-06T09:44:33+02:00 releng/go: Update images, dependencies and version to Go 1.19.8
+604ad21799c43d87456cc76d3e591487de0a5152 2023-04-05T15:38:17+00:00 Return error for localhost seccomp type with no localhost profile defined
+902a7591f917eb886306cca09e82a98ba815210a 2023-03-31T11:57:24-04:00 Clean up formatting
+38d2613d16f4c51647bb1c37c87ef5773bd757a0 2023-03-22T10:37:26-04:00 Drop development dependencies from test targets
+5355936e2022d550ce11e403922635e55d1ec82f 2023-03-21T11:42:25-04:00 Clear front proxy headers after authentication is complete
+fb0741c2e7276ffe25f8b3978a2354f7b1cd1328 2023-03-21T09:28:59-04:00 Make prerelease tag optional in CI versions
+7fc18651814feeae108cae82ebbcf977e95a0ea5 2023-03-21T09:09:12-04:00 Annotate CI version regexes
+fb5eefc66b1be9af8ff52835525440c659a6b63c 2023-03-21T09:09:11-04:00 Drop unused regex grouping
+7b88494c32dfb34f084035995dec7052faf21b88 2023-03-21T09:09:11-04:00 Update comments
+c55deb4868a8b209d83dcd6e1c065ea236793080 2023-03-21T09:09:10-04:00 Delete unused version regex function
+9cb693eadf04e0e71e6128d486ef846ea3ffb9db 2023-03-21T15:02:08+08:00 kubelet: Fix fs quota monitoring on volumes
+32d3b4ef594c8fee005eac9c2bdf9a6c0eefb006 2023-03-21T15:02:07+08:00 fsquota: only generate pod uuid is nil
+d72438efd47e4be01167dc44fd7623795da07783 2023-03-20T15:59:12-04:00 Preserve UID/ResourceVersion in the BindingREST endpoint
+2257dba12f06c6b137a4c9a93a4f7fded8524479 2023-03-20T15:59:11-04:00 Add integration test for DefaultBinder
+a247e48bcd3742da7ddb43aa0b4d2f947afc3d33 2023-03-17T14:51:09+00:00 Change where transformers are called.
+3a14fe1af239a07ff8cdd13c6bd8fdbdb97fabeb 2023-03-15T14:02:25+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.8
+b67fe6e75a92ba082474b08ac49a6c1c04456832 2023-03-11T00:31:38+00:00 wait again on pending state
+d7c1ba51f87c61572595be6206012e9431744279 2023-03-11T00:31:38+00:00 cacher allow context cancellation if not ready
+9ac9c468ec9222949a397fbf692e5a9a05398efb 2023-03-08T07:16:40+00:00 Route controller should update routes with NodeIP changed When a node reboots or kubelet restarts, it is possible that its IP is changed. In this case, node route should be updated with the correct IP. In this PR, it checks if the IP in an existing route is the same as the actual one. If not, it marks it as "update" so the old route will be deleted and a new one will be created. There's a new field EnableNodeAddresses, which is a feature gate for specific cloud providers to enable after they update their cloud provider code for CreateRoute().
+cc675a5367d9d09992d7f12b8a43a10d672370b9 2023-02-20T09:58:12+00:00 client-go/cache: update Replace comment to be more clear
+4283020151ab233101e77996fd8084488057f9c2 2023-02-20T09:58:12+00:00 client-go/cache: rewrite Replace to check queue first
+db451e163d97f6a2c023efa30aa12b751c785798 2023-02-20T09:58:11+00:00 client-go/cache: merge ReplaceMakesDeletionsForObjectsInQueue tests
+a818874dce54226ecc8ef384ff8b4c82aa6aaa85 2023-02-20T09:58:11+00:00 client-go/cache: fix missing delete event on replace without knownObjects
+bdc4a22309fc51f824aca41f11ee4466758ea9b0 2023-02-20T09:58:11+00:00 client-go/cache: fix missing delete event on replace
+3a5e85dff6d7412c512782da2f18ec7dde073e7d 2023-02-19T14:03:16-08:00 Bump konnectivity-client to v0.0.36
+c6d4552d7b5af6efe9a6af01b602c014da913cdb 2022-10-11T16:45:32-05:00 test: demote service ClientIP affinity timeout tests from conformance
+# oc image-arm64 31aa3e89a926f81aa0af30320ffcb71acadf3015 to 97c75d06a0f795872975e1d2335a2a932ca1b917
+e7786c5acc0de31c625a5fdbe9d75bfa2a242b5a 2023-05-29T13:19:33+00:00 Remove closed centos7 registry from newapp unit tests
+# kubernetes image-arm64 37a9a084bcb483a38e8f88349fa6a21c1b6be8a3 to 3fe29064317f72fce3606a38883d66a91a7c43dc
+70f21ece6d1a6cf873475ed16256b524cf23dc0a 2023-05-23T15:05:58+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+2f033cdec2d935f95c3ce66b43964afd8973270d 2023-05-23T16:15:57+02:00 UPSTREAM: <drop>: manually resolve conflicts
+e770bdbb87cccdc2daa790ecd69f40cf4df3cc9d 2023-05-17T14:05:24+00:00 Release commit for Kubernetes v1.25.10
+289faa2810c6f02d667cc60bdd37cff0231a9299 2023-05-05T15:03:17-07:00 benchmark test to evaluate the overhead of podMatchesScopeFunc
+8d8ea64adffdfdd4c5641cbde51d17ab0067effa 2023-05-05T15:02:52-07:00 Fix incorrect calculation for ResourceQuota with PriorityClass as its scope
+712575d9acda6fc947bb2ee658a0949318dcce7d 2023-05-04T10:52:40+02:00 releng/go: Update images, dependencies and version to Go 1.19.9
+7f1809dbc73001cbcbd5c394a89c470b4e04f78d 2023-05-03T13:46:19+01:00 node: device-plugin: e2e: Additional test cases
+4ba6f87a0fb1ceea9ed6ba405879398e862a4b00 2023-05-03T13:36:53+01:00 node: device-plugin: add node reboot test scenario
+b50d53f6c683204c591ac1d5f30ea94e2b4283ca 2023-05-03T13:36:53+01:00 node: device-plugin: e2e: Capture pod admission failure
+9fc2d5c12c2e3f5abc17a1c1c5312f1c2b9de6d4 2023-05-03T13:36:53+01:00 node: device-mgr: e2e: adapt to sample device plugin refactoring
+6c0c91e0d0f25acd6e81c25673de7d4bcc2ecaab 2023-05-03T13:36:49+01:00 node: device-mgr: e2e: Update the e2e test to reproduce issue:109595
+4eb2808deb8c073b4b9d31848c767e62abaa36f9 2023-05-03T13:22:41+01:00 node: device-mgr: e2e: Implement End to end test
+337e6e76fbf110078a172430d610070b860dae67 2023-05-03T13:21:43+01:00 node: device-mgr: Handle recovery by checking if healthy devices exist
+57b644b976c3623577064a4bd33028fe3026e660 2023-05-03T13:21:43+01:00 node: device-plugin: e2e: Add test case for kubelet restart
+e53a7181a75d8cb379cf31b277868a3f81f51e98 2023-05-03T13:21:40+01:00 node: device-plugin: e2e: Provide sleep intervals via constants
+60d81f0a304b799c8da9e00cfde285642fc5d347 2023-05-03T13:20:06+01:00 node: device-plugin: e2e: Update test description to make it explicit
+b9ecf9862dc0d7825ca49483a5ee78b7cb90baed 2023-05-03T13:20:01+01:00 node: device-plugin: e2e: Isolate test to pod restart scenario
+d1605c37bdabd0539328780231e76b7c3761f231 2023-05-02T21:34:37+00:00 Move glusterfs 1.25 deprecation notice to the deprecation section.
+20f6635eb2394995159c5b97164ac75edd4ee450 2023-05-02T20:48:06+01:00 node: device-plugin: e2e: Annotate device check with error message
+6bae194b1cfae983626c038ef5028ed41039812c 2023-05-02T20:46:02+01:00 node: device-plugins: e2e: s/devLen/expectedSampleDevsAmount
+d00f41a173d35814affc044397356d4bf74f5fb3 2023-05-02T20:44:25+01:00 node: device-plugins: e2e: Refactor parse log to return string and error
+7d1756abc694fd92d08e032a1e346a7184535878 2023-05-02T20:31:52+01:00 test: Fix path to e2e node sample device plugin
+02e1fff86aaa0580097741d6e9e32f9f52212a16 2023-05-02T20:31:26+01:00 node: device-mgr: sample device plugin: manifest to avoid registration
+3a9c226299ee9079cc27be76476ea7795411064f 2023-05-02T20:31:26+01:00 node: device-mgr: sample device plugin: control registration process
+dd9dbcc5fde0a9e46fcf8daa8ab0a7c904c165c3 2023-05-02T20:27:29+01:00 e2e: node: unify sample device plugin utilities
+cc3bdb6e1e5b2f69f0cac5d5529ab67abf0c3d18 2023-04-28T17:03:58-07:00 [1.25] vendor: bump runc to 1.1.6
+7c41bbbbdf41da1f366db4237cf25dbe0f05dd3a 2023-04-25T12:47:01-07:00 Fix directory mismatch for `volume.SetVolumeOwnership()`
+f1a4bfbd597f25c0f1c9039423aadcbfebe550d3 2023-04-17T16:38:51+08:00 use case-insensitive header keys for http probes
+0d433ae74ec5b46ce8f03cda216bf3edaf1ea01d 2023-04-15T23:56:29+08:00 add log includes pod preemption details
+56f50bd0aecaa5877cf7b37bae6d5884007210b3 2023-04-14T08:26:13+00:00 fix: the volume is not detached after the pod and PVC objects are deleted
+e68ff4549631829367c5418a09fbc8d13ec7f046 2023-04-13T13:13:43+02:00 Do not look at VPC-related resources outside the cluster's network
+ad10f081586cac5b03bef619c90acd1f24c4c72e 2023-04-12T23:26:08-07:00 Bump konnectivity-client to 0.0.37
+f1a2a6c1e553056fe4cafa3182666fdc7518b555 2023-04-12T16:56:53-04:00 kubelet: Do not mutate pods in the pod manager
+28e1b5d635d6217a5fb36e3b6eee256b13fc48a3 2023-04-12T12:38:32+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.9
+a1a87a0a2bcd605820920c6b0e618a8ab7d117d4 2023-04-12T12:06:19+00:00 Release commit for Kubernetes v1.25.9
+bf21b6de4a97fa01ddef72a03f14ccd22a50db2f 2023-04-06T09:44:33+02:00 releng/go: Update images, dependencies and version to Go 1.19.8
+604ad21799c43d87456cc76d3e591487de0a5152 2023-04-05T15:38:17+00:00 Return error for localhost seccomp type with no localhost profile defined
+902a7591f917eb886306cca09e82a98ba815210a 2023-03-31T11:57:24-04:00 Clean up formatting
+38d2613d16f4c51647bb1c37c87ef5773bd757a0 2023-03-22T10:37:26-04:00 Drop development dependencies from test targets
+5355936e2022d550ce11e403922635e55d1ec82f 2023-03-21T11:42:25-04:00 Clear front proxy headers after authentication is complete
+fb0741c2e7276ffe25f8b3978a2354f7b1cd1328 2023-03-21T09:28:59-04:00 Make prerelease tag optional in CI versions
+7fc18651814feeae108cae82ebbcf977e95a0ea5 2023-03-21T09:09:12-04:00 Annotate CI version regexes
+fb5eefc66b1be9af8ff52835525440c659a6b63c 2023-03-21T09:09:11-04:00 Drop unused regex grouping
+7b88494c32dfb34f084035995dec7052faf21b88 2023-03-21T09:09:11-04:00 Update comments
+c55deb4868a8b209d83dcd6e1c065ea236793080 2023-03-21T09:09:10-04:00 Delete unused version regex function
+9cb693eadf04e0e71e6128d486ef846ea3ffb9db 2023-03-21T15:02:08+08:00 kubelet: Fix fs quota monitoring on volumes
+32d3b4ef594c8fee005eac9c2bdf9a6c0eefb006 2023-03-21T15:02:07+08:00 fsquota: only generate pod uuid is nil
+d72438efd47e4be01167dc44fd7623795da07783 2023-03-20T15:59:12-04:00 Preserve UID/ResourceVersion in the BindingREST endpoint
+2257dba12f06c6b137a4c9a93a4f7fded8524479 2023-03-20T15:59:11-04:00 Add integration test for DefaultBinder
+a247e48bcd3742da7ddb43aa0b4d2f947afc3d33 2023-03-17T14:51:09+00:00 Change where transformers are called.
+3a14fe1af239a07ff8cdd13c6bd8fdbdb97fabeb 2023-03-15T14:02:25+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.8
+b67fe6e75a92ba082474b08ac49a6c1c04456832 2023-03-11T00:31:38+00:00 wait again on pending state
+d7c1ba51f87c61572595be6206012e9431744279 2023-03-11T00:31:38+00:00 cacher allow context cancellation if not ready
+9ac9c468ec9222949a397fbf692e5a9a05398efb 2023-03-08T07:16:40+00:00 Route controller should update routes with NodeIP changed When a node reboots or kubelet restarts, it is possible that its IP is changed. In this case, node route should be updated with the correct IP. In this PR, it checks if the IP in an existing route is the same as the actual one. If not, it marks it as "update" so the old route will be deleted and a new one will be created. There's a new field EnableNodeAddresses, which is a feature gate for specific cloud providers to enable after they update their cloud provider code for CreateRoute().
+cc675a5367d9d09992d7f12b8a43a10d672370b9 2023-02-20T09:58:12+00:00 client-go/cache: update Replace comment to be more clear
+4283020151ab233101e77996fd8084488057f9c2 2023-02-20T09:58:12+00:00 client-go/cache: rewrite Replace to check queue first
+db451e163d97f6a2c023efa30aa12b751c785798 2023-02-20T09:58:11+00:00 client-go/cache: merge ReplaceMakesDeletionsForObjectsInQueue tests
+a818874dce54226ecc8ef384ff8b4c82aa6aaa85 2023-02-20T09:58:11+00:00 client-go/cache: fix missing delete event on replace without knownObjects
+bdc4a22309fc51f824aca41f11ee4466758ea9b0 2023-02-20T09:58:11+00:00 client-go/cache: fix missing delete event on replace
+3a5e85dff6d7412c512782da2f18ec7dde073e7d 2023-02-19T14:03:16-08:00 Bump konnectivity-client to v0.0.36
+c6d4552d7b5af6efe9a6af01b602c014da913cdb 2022-10-11T16:45:32-05:00 test: demote service ClientIP affinity timeout tests from conformance
