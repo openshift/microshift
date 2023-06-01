@@ -8,12 +8,9 @@ import (
 	"k8s.io/klog/v2"
 )
 
-const (
-	expectedState = "inactive"
-)
-
 var (
-	services = []string{"microshift.service", "microshift-etcd.scope"}
+	wrongStates = []string{"active", "activating", "deactivating"}
+	services    = []string{"microshift.service", "microshift-etcd.scope"}
 )
 
 func MicroShiftIsNotRunning() error {
@@ -27,8 +24,10 @@ func MicroShiftIsNotRunning() error {
 
 		klog.InfoS("Service state", "service", service, "state", state)
 
-		if state != expectedState {
-			return fmt.Errorf("service %s is %s - expected to be %s", service, state, expectedState)
+		for _, s := range wrongStates {
+			if state == s {
+				return fmt.Errorf("service %s is %s", service, state)
+			}
 		}
 	}
 
