@@ -10,6 +10,10 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"github.com/openshift/microshift/pkg/admin/data"
+	"github.com/openshift/microshift/pkg/admin/history"
+	"github.com/openshift/microshift/pkg/admin/prerun"
+	"github.com/openshift/microshift/pkg/admin/system"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/kustomize"
@@ -76,10 +80,38 @@ func logConfig(cfg *config.Config) {
 	}
 }
 
+func preRun() error {
+	dm, err := data.NewManager(config.BackupsDir)
+	if err != nil {
+		return err
+	}
+	si := system.NewSystemInfo()
+	hm := history.NewHistoryManager(&history.HistoryFileStorage{})
+
+	decisionData, err := prerun.NewDecisionData(dm, si, hm)
+	if err != nil {
+		return err
+	}
+
+	pa := prerun.NewPreconditionsAdvisor(*decisionData)
+	ba := prerun.NewBackupAdvisor(*decisionData)
+	executor := prerun.NewExecutor(dm, si, hm, *decisionData)
+	strategy := prerun.NewStrategy(pa, ba, executor)
+
+	if err := strategy.Run(); err != nil {
+		return fmt.Errorf("pre run procedure failed: %w", err)
+	}
+	return nil
+}
+
 func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
+	}
+
+	if err := preRun(); err != nil {
+		return err
 	}
 
 	logConfig(cfg)

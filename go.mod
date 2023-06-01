@@ -227,6 +227,7 @@ require (
 require (
 	github.com/lithammer/dedent v1.1.0 // indirect
 	github.com/moby/ipvs v1.1.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 )
 
 replace (
