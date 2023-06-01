@@ -3,6 +3,7 @@ package data
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -42,12 +43,39 @@ func (dm *manager) BackupExists(name BackupName) (bool, error) {
 	return pathExists(dm.GetBackupPath(name))
 }
 
+func (dm *manager) RemoveBackup(name BackupName) error {
+	return os.RemoveAll(dm.GetBackupPath(name))
+}
+
+func (dm *manager) GetBackupList() ([]BackupName, error) {
+	files, err := os.ReadDir(config.BackupsDir)
+	if err != nil {
+		return nil, err
+	}
+
+	backups := make([]BackupName, 0, len(files))
+	for _, file := range files {
+		if file.IsDir() {
+			backups = append(backups, BackupName(file.Name()))
+		}
+	}
+
+	return backups, nil
+}
+
 func (dm *manager) Backup(name BackupName) error {
 	klog.InfoS("Backing up the data",
 		"storage", dm.storage, "name", name, "data", config.DataDir)
 
 	if name == "" {
 		return &EmptyArgErr{"name"}
+	}
+
+	if exists, err := dm.BackupExists(name); err != nil {
+		return fmt.Errorf("checking if backup %s exists failed: %w", name, err)
+	} else if exists {
+		klog.ErrorS(nil, "Backup already exists - name should be unique", "name", name)
+		return fmt.Errorf("backup %s already exists", name)
 	}
 
 	if found, err := pathExists(string(dm.storage)); err != nil {
