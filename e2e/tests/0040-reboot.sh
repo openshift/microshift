@@ -8,13 +8,22 @@ set -x
 
 SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
-RETRIES=15
-BACKOFF=20
+RETRIES=25
+BACKOFF=10
+SUCCESSFUL_TRIES=3
 
 wait_until() {
+    successes=0
     local cmd=$*
     for _ in $(seq "${RETRIES}"); do
-        ${cmd} && return 0
+        if ${cmd}; then
+          successes=$((successes+=1))
+        else 
+          successes=0
+        fi
+        if [[ "${successes}" -ge "${SUCCESSFUL_TRIES}" ]]; then
+            return 0
+        fi
         sleep "${BACKOFF}"
     done
     return 1
