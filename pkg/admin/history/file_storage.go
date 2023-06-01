@@ -65,18 +65,23 @@ func (hfs *HistoryFileStorage) Save(history *History) error {
 		return fmt.Errorf("making directory %s failed: %w", config.BackupsDir, err)
 	}
 
-	file, err := os.OpenFile(historyFilepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	file, err := os.CreateTemp(config.BackupsDir, "history")
 	if err != nil {
-		return fmt.Errorf("opening file %s failed: %w", historyFilepath, err)
+		return fmt.Errorf("creating temporary history file failed: %w", err)
 	}
 	defer file.Close()
 
 	n, err := file.Write(b)
 	if err != nil {
-		return fmt.Errorf("writing to file %s failed: %w", historyFilepath, err)
+		return fmt.Errorf("writing to file %s failed: %w", file.Name(), err)
 	}
 	if n != len(b) {
-		return fmt.Errorf("writing to file %s failed: wrote %d bytes, expected %d", historyFilepath, n, len(b))
+		return fmt.Errorf("writing to file %s failed: wrote %d bytes, expected %d", file.Name(), n, len(b))
+	}
+	file.Close()
+
+	if err := os.Rename(file.Name(), historyFilepath); err != nil {
+		return fmt.Errorf("renaming %s to %s failed: %w", file.Name(), historyFilename, err)
 	}
 
 	return nil
