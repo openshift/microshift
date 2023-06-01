@@ -81,11 +81,18 @@ func logConfig(cfg *config.Config) {
 }
 
 func preRun() error {
+	si := system.NewSystemInfo()
+	if isOSTree, err := si.IsOSTree(); err != nil {
+		return err
+	} else if !isOSTree {
+		klog.InfoS("System is non-ostree - pre-run will be skipped")
+		return nil
+	}
+
 	dm, err := data.NewManager(config.BackupsDir)
 	if err != nil {
 		return err
 	}
-	si := system.NewSystemInfo()
 	hm := history.NewHistoryManager(&history.HistoryFileStorage{})
 
 	decisionData, err := prerun.NewDecisionData(dm, si, hm)
