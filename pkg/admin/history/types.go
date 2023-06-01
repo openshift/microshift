@@ -2,7 +2,6 @@ package history
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/openshift/microshift/pkg/admin/system"
 )
@@ -18,18 +17,6 @@ const (
 	Healthy   Health = "healthy"
 	Unhealthy Health = "unhealthy"
 )
-
-func StringToHealth(s string) (Health, error) {
-	h := Health(s)
-
-	switch h {
-	case Healthy, Unhealthy:
-		return h, nil
-	default:
-		return Health(""),
-			fmt.Errorf("invalid value: expected %s or %s", Healthy, Unhealthy)
-	}
-}
 
 type PreRunStatus string
 

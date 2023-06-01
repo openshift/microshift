@@ -67,76 +67,88 @@ func newAdminDataCommand() *cobra.Command {
 	return data
 }
 
-func newAdminOstreeCommand() *cobra.Command {
-	setHealth := &cobra.Command{
-		Use:       "set-health { healthy | unhealthy }",
-		Short:     "Persist health of current deployment",
-		Args:      cobra.ExactArgs(1),
-		ValidArgs: []string{"healthy", "unhealthy"},
+func newAdminHealthCommand() *cobra.Command {
+	setCurrent := &cobra.Command{
+		Use:   "set-current",
+		Short: "Store system health of current boot",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			health, err := history.StringToHealth(args[0])
+			healthy, err := cmd.Flags().GetBool("healthy")
 			if err != nil {
-				cmd.PrintErrf("Error: %v\n\n", err)
-				return cmd.Help()
+				return err
 			}
+			unhealthy, err := cmd.Flags().GetBool("unhealthy")
+			if err != nil {
+				return err
+			}
+
+			var health history.Health
+			if healthy {
+				health = history.Healthy
+			} else if unhealthy {
+				health = history.Unhealthy
+			} else {
+				return fmt.Errorf("command requires either --healthy or --unhealthy")
+			}
+
 			currentBoot, err := system.NewSystemInfo().GetCurrentBoot()
 			if err != nil {
 				return err
 			}
 
 			dhm := history.NewHistoryManager(&history.HistoryFileStorage{})
+			fmt.Printf("Updating current boot's health to %s\n\n", health)
 			return dhm.Update(*currentBoot, history.BootInfo{Health: health})
 		},
 	}
+	setCurrent.Flags().Bool("healthy", false, "")
+	setCurrent.Flags().Bool("unhealthy", false, "")
+	setCurrent.MarkFlagsMutuallyExclusive("healthy", "unhealthy")
 
-	getHealth := &cobra.Command{
-		Use:       "get-health { current | previous }",
-		Short:     "Get health of current or previous boot",
-		Args:      cobra.ExactArgs(1),
-		ValidArgs: []string{"current", "previous"},
+	get := func(friendlyName string, getter func() (*system.Boot, error)) error {
+		bootInfo, err := getter()
+		if err != nil {
+			return err
+		}
+		if bootInfo == nil {
+			return fmt.Errorf("no %s boot info", friendlyName)
+		}
+
+		history, err := history.NewHistoryManager(&history.HistoryFileStorage{}).Get()
+		if err != nil {
+			return err
+		}
+
+		boot, found := history.GetBootByID(bootInfo.ID)
+		if !found {
+			return fmt.Errorf("health for %s boot is not present in history", friendlyName)
+		}
+
+		fmt.Println(boot.Health)
+		return nil
+	}
+
+	getCurrent := &cobra.Command{
+		Use:   "get-current",
+		Short: "Get health of the system during current boot",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var bootInfo *system.Boot
-			found := true
-			var err error
-
-			sys := system.NewSystemInfo()
-			switch args[0] {
-			case "current":
-				bootInfo, err = sys.GetCurrentBoot()
-			case "previous":
-				bootInfo, err = sys.GetPreviousBoot()
-			default:
-				cmd.PrintErrf("Error: invalid argument: %s\n\n", args[0])
-				return cmd.Help()
-			}
-			if err != nil {
-				return err
-			}
-			if !found {
-				return fmt.Errorf("no %s boot", args[0])
-			}
-
-			dh := history.NewHistoryManager(&history.HistoryFileStorage{})
-			history, err := dh.Get()
-			if err != nil {
-				return err
-			}
-
-			bh, found := history.GetBootByID(bootInfo.ID)
-			if !found {
-				return fmt.Errorf("health for %s boot is not present in history", args[0])
-			}
-			fmt.Println(bh.Health)
-			return nil
+			return get("current", system.NewSystemInfo().GetCurrentBoot)
 		},
 	}
 
-	ostree := &cobra.Command{
-		Use:   "ostree",
-		Short: "Internal commands used in ostree-based systems",
+	getPrevious := &cobra.Command{
+		Use:   "get-previous",
+		Short: "Get health of the system during previous boot",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return get("previous", system.NewSystemInfo().GetPreviousBoot)
+		},
+	}
+
+	health := &cobra.Command{
+		Use:    "health",
+		Hidden: true,
+		Short:  "Internal commands used for managing system health information (ostree-based systems only)",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			sys := system.NewSystemInfo()
-			if isOstree, err := sys.IsOSTree(); err != nil {
+			if isOstree, err := system.NewSystemInfo().IsOSTree(); err != nil {
 				return err
 			} else if !isOstree {
 				return fmt.Errorf("this command is only for ostree-based systems")
@@ -144,9 +156,10 @@ func newAdminOstreeCommand() *cobra.Command {
 			return nil
 		},
 	}
-	ostree.AddCommand(getHealth)
-	ostree.AddCommand(setHealth)
-	return ostree
+	health.AddCommand(setCurrent)
+	health.AddCommand(getCurrent)
+	health.AddCommand(getPrevious)
+	return health
 }
 
 func NewAdminCommand() *cobra.Command {
@@ -155,7 +168,7 @@ func NewAdminCommand() *cobra.Command {
 		Short: "Commands for managing MicroShift",
 	}
 	cmd.AddCommand(newAdminDataCommand())
-	cmd.AddCommand(newAdminOstreeCommand())
+	cmd.AddCommand(newAdminHealthCommand())
 
 	return cmd
 }
