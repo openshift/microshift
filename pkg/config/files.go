@@ -10,6 +10,7 @@ import (
 const (
 	ConfigFile = "/etc/microshift/config.yaml"
 	DataDir    = "/var/lib/microshift"
+	BackupsDir = "/var/lib/microshift-backups"
 )
 
 func parse(contents []byte) (*Config, error) {
