@@ -9,7 +9,7 @@ sudo dnf install -y --setopt=install_weak_deps=False podman
 whereis skopeo || true
 
 mapfile -t images < <(podman images -q)
-podman save --multi-image-archive --output /root/images.tar "${images[@]}"
+podman save --output /root/images.tar "${images[@]}"
 
 function check_greenboot_exit_status() {
     local expectedRC=$1
