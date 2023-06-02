@@ -11,9 +11,11 @@ fi
 
 mkdir -p /var/lib/microshift-backups
 
-ID=$(rpm-ostree status --booted --jsonpath='$.deployments[0].id' | jq -r '.[0]')
+boot=$(tr -d '-' < /proc/sys/kernel/random/boot_id)
+deploy=$(rpm-ostree status --booted --jsonpath='$.deployments[0].id' | jq -r '.[0]')
 jq \
     --null-input \
     --arg health "${HEALTH}" \
-    --arg id "${ID}" \
-    '{ "health": $health, "deployment_id": $id }' > /var/lib/microshift-backups/health.json
+    --arg deploy "${deploy}" \
+    --arg boot "${boot}" \
+    '{ "health": $health, "deployment_id": $deploy, "boot_id": $boot }' > /var/lib/microshift-backups/health.json

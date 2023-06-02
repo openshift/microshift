@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
@@ -25,9 +24,17 @@ func Perform() error {
 		return nil
 	}
 
+	currentBootID, err := getCurrentBootID()
+	if err != nil {
+		klog.ErrorS(err, "Failed to get current boot ID")
+		return err
+	}
+	klog.InfoS("Current boot", "id", currentBootID)
+
 	info := struct {
 		Health       string `json:"health"`
 		DeploymentID string `json:"deployment_id"`
+		BootID       string `json:"boot_id"`
 	}{}
 	d, err := os.ReadFile(healthFile)
 	if err != nil {
@@ -40,9 +47,16 @@ func Perform() error {
 	}
 
 	klog.InfoS("Read health info", "info", info)
+
+	if info.BootID == currentBootID {
+		klog.InfoS("Current boot in health file - skipping backup")
+		return nil
+	}
+
 	if info.Health != "healthy" {
 		return nil
 	}
+	name := data.BackupName(fmt.Sprintf("%s_%s", info.DeploymentID, info.BootID))
 
 	dm, err := data.NewManager(config.BackupsDir)
 	if err != nil {
@@ -56,13 +70,16 @@ func Perform() error {
 
 	existingDeploymentBackups := make([]data.BackupName, 0)
 	for _, b := range backups {
+		if name == b {
+			klog.InfoS("Backup already exists", "deployment", info.DeploymentID, "boot", info.BootID)
+			return nil
+		}
 		if strings.Contains(string(b), info.DeploymentID) {
 			existingDeploymentBackups = append(existingDeploymentBackups, b)
 		}
 	}
 
-	name := fmt.Sprintf("%s_%s", info.DeploymentID, time.Now().UTC().Format("20060102_150405"))
-	if err := dm.Backup(data.BackupName(name)); err != nil {
+	if err := dm.Backup(name); err != nil {
 		return err
 	}
 
@@ -79,4 +96,12 @@ func Perform() error {
 	}
 
 	return nil
+}
+
+func getCurrentBootID() (string, error) {
+	content, err := os.ReadFile("/proc/sys/kernel/random/boot_id")
+	if err != nil {
+		return "", err
+	}
+	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
 }
