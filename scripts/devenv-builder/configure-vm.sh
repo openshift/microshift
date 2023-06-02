@@ -92,7 +92,7 @@ if ${BUILD_AND_RUN}; then
     # Build MicroShift
     # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md#build-microshift
     if [ ! -e ~/microshift ]; then
-        git clone https://github.com/openshift/microshift.git ~/microshift
+        git clone https://github.com/openshift/microshift.git -b release-4.13 ~/microshift
     fi
     cd ~/microshift
 
