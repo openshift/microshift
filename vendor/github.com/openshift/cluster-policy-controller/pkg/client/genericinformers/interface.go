@@ -3,7 +3,6 @@ package genericinformers
 import (
 	"k8s.io/klog/v2"
 
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/informers"
 )
@@ -12,19 +11,6 @@ type GenericResourceInformer interface {
 	ForResource(resource schema.GroupVersionResource) (informers.GenericInformer, error)
 	Start(stopCh <-chan struct{})
 }
-
-// GenericInternalResourceInformerFunc will return an internal informer for any resource matching
-// its group resource, instead of the external version. Only valid for use where the type is accessed
-// via generic interfaces, such as the garbage collector with ObjectMeta.
-type GenericInternalResourceInformerFunc func(resource schema.GroupVersionResource) (informers.GenericInformer, error)
-
-func (fn GenericInternalResourceInformerFunc) ForResource(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
-	resource.Version = runtime.APIVersionInternal
-	return fn(resource)
-}
-
-// this is a temporary condition until we rewrite enough of generation to auto-conform to the required interface and no longer need the internal version shim
-func (fn GenericInternalResourceInformerFunc) Start(stopCh <-chan struct{}) {}
 
 // genericResourceInformerFunc will handle a cast to a matching type
 type GenericResourceInformerFunc func(resource schema.GroupVersionResource) (informers.GenericInformer, error)
