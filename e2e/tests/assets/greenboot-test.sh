@@ -14,19 +14,20 @@ function check_greenboot_exit_status() {
 
     if [ "${cleanup}" -ne 0 ]; then
         crictl images
-        podman images
+        podman save --output /root/images.tar $(podman images -q | tr '\n' ' ')
+
         echo 1 | microshift-cleanup-data --all
+
+        podman load --input /root/images.tar
         crictl images
-        podman images
+
         systemctl enable --now microshift || true
-        crictl images
-        podman images
     fi
 
     for check_script in $(find /etc/greenboot/check/ -name \*.sh | sort); do
         echo Running "${check_script}"...
         local currentRC=1
-        if bash -x "${check_script}"; then
+        if "${check_script}"; then
             currentRC=0
         fi
 
