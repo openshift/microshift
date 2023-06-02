@@ -288,6 +288,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					"openshift.default.svc.cluster.local",
 					"api." + cfg.DNS.BaseDomain,
 					"api-int." + cfg.DNS.BaseDomain,
+					cfg.ApiServer.AdvertiseAddress,
 					apiServerServiceIP.String(),
 				},
 			},
