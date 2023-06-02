@@ -8,16 +8,19 @@ set -x
 sudo dnf install -y --setopt=install_weak_deps=False podman 
 whereis skopeo || true
 
+mapfile -t images < <(podman images -q)
+podman save --multi-image-archive --output /root/images.tar "${images[@]}"
+
 function check_greenboot_exit_status() {
     local expectedRC=$1
     local cleanup=$2
 
     if [ "${cleanup}" -ne 0 ]; then
         crictl images
-        podman save --output /root/images.tar $(podman images -q | tr '\n' ' ')
 
         echo 1 | microshift-cleanup-data --all
 
+        crictl images
         podman load --input /root/images.tar
         crictl images
 
