@@ -1,0 +1,39 @@
+- cluster-ingress-operator embedded-component 90d2feaaf3b4e657ce46098077e894aec053f7ca to 57256911f888e132d0f787ad7cdb19ed1579dc04
+  - 8f98c61 2023-05-26T14:50:58-04:00 OCPBUGS-13963: Bump vendors k8s libraries to 0.27.2
+
+- cluster-kube-apiserver-operator embedded-component dbe789b8b0c0354e8094267d904b966e430104ed to 838a1bfa8d986d9bdcbdbc9fe5f95cb682ea1b4e
+  - a9e50ec 2023-05-10T16:24:35-04:00 remove the old featureset flag from rendering
+  - 7b30080 2023-05-10T16:24:35-04:00 update library-go for render flag updates
+
+- ovn-kubernetes image-amd64 0f2fbd9d43d2681ad4bffb2f4a7b85a195fc989b to 8adae676ccfed289ea097ac70afe7970dca3f820
+  - 34cc232 2023-05-26T10:46:42+02:00 Bump OVN RPMs to 23.03.0-49.el9fdp
+  - 61e0379 2023-04-05T19:02:52+02:00 lb_config: Reduce number of required LB backend templates for NodePort.
+  - 4b3475a 2023-04-05T19:02:46+02:00 services: Use OVN template load balancers for NodePort services.
+  - 91b2e29 2023-04-05T09:38:22+02:00 model_client: Properly update map values.
+  - 0cdb9ec 2023-04-05T09:38:22+02:00 fedora: Update OVN to 23.03.0-16.
+  - 7e7e141 2023-04-05T09:38:22+02:00 dbs: Bump OVN schema to 23.03.
+  - b79d290 2023-04-05T09:38:22+02:00 Rename OVN_VERSION to OVN_SCHEMA_VERSION.
+  - 3207e3f 2023-04-05T09:38:22+02:00 lb_config: Merge LB referenced groups when merging LBs.
+  - c258f60 2023-04-05T09:38:22+02:00 node_tracker: Store node IPs as net.IP instead of string.
+  - 9ded3d8 2023-04-05T09:38:22+02:00 node_tracker: Track node chassis IDs too.
+  - b1fba8f 2023-04-05T09:38:22+02:00 services_controller_test: Test with LB groups enabled.
+
+- oc image-arm64 943559197d1a94253672e26dbc356e062df7a66d to 603c3afe81f7e705000d1505610314a819ddfc0d
+  - 568677d 2023-05-31T10:10:54+02:00 oc adm groups sync: all groups: print warning before caching
+
+- router image-arm64 5426a9b1597b9afd70b9d49caebe00cee6cc433f to ec0a69fdd7b1dc8a968dc679fe39a7b99d3160c9
+  - ab86723 2023-05-23T13:34:02-04:00 OCPBUGS-13969: Bump vendors k8s libraries to 0.27.2
+
+- ovn-kubernetes image-arm64 0f2fbd9d43d2681ad4bffb2f4a7b85a195fc989b to 8adae676ccfed289ea097ac70afe7970dca3f820
+  - 34cc232 2023-05-26T10:46:42+02:00 Bump OVN RPMs to 23.03.0-49.el9fdp
+  - 61e0379 2023-04-05T19:02:52+02:00 lb_config: Reduce number of required LB backend templates for NodePort.
+  - 4b3475a 2023-04-05T19:02:46+02:00 services: Use OVN template load balancers for NodePort services.
+  - 91b2e29 2023-04-05T09:38:22+02:00 model_client: Properly update map values.
+  - 0cdb9ec 2023-04-05T09:38:22+02:00 fedora: Update OVN to 23.03.0-16.
+  - 7e7e141 2023-04-05T09:38:22+02:00 dbs: Bump OVN schema to 23.03.
+  - b79d290 2023-04-05T09:38:22+02:00 Rename OVN_VERSION to OVN_SCHEMA_VERSION.
+  - 3207e3f 2023-04-05T09:38:22+02:00 lb_config: Merge LB referenced groups when merging LBs.
+  - c258f60 2023-04-05T09:38:22+02:00 node_tracker: Store node IPs as net.IP instead of string.
+  - 9ded3d8 2023-04-05T09:38:22+02:00 node_tracker: Track node chassis IDs too.
+  - b1fba8f 2023-04-05T09:38:22+02:00 services_controller_test: Test with LB groups enabled.
+
