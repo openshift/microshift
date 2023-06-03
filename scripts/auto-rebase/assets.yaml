@@ -39,6 +39,8 @@ assets:
     src: lvms/amd64/
     no_clean: True
     files:
+      - file: topolvm-controller-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-controller-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml
@@ -51,6 +53,10 @@ assets:
       - file: topolvm-node_v1_serviceaccount.yaml
       - file: topolvm.io_logicalvolumes.yaml
 
+      - file: topolvm-controller-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-controller-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+        ignore: "provided by MicroShift"
       - file: csi-driver.yaml
         ignore: "provided by MicroShift"
       - file: topolvm-controller_deployment.yaml

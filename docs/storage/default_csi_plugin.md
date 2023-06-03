@@ -61,6 +61,8 @@ group's capacity is less than 1Gb, the PersistentVolumeClaim will register a `Pr
 
 ## Usage
 
+### Create Workload Storage
+
 LVMS's [StorageClass](../assets/components/lvms/topolvm_default-storage-class.yaml) is deployed with a default
 StorageClass. Any PersistentVolumeClaim without a `.spec.storageClassName` defined will automatically have a
 PersistentVolume provisioned from the default StorageClass.
@@ -99,3 +101,10 @@ spec:
         claimName: my-lv-pvc
 EOF
 ```
+
+### Resize Workload Storage
+
+Resizing is the process of expanding the backend storage volume's capacity via the OpenShift GUI or CLI client. LVMS 
+supports volume expansion.  It does not support volume shrinking. Refer to OpenShift documentation on 
+[Expanding CSI Volumes](https://docs.openshift.com/container-platform/4.13/storage/expanding-persistent-volumes.html#expanding-csi-volumes_expanding-persistent-volumes)
+for resizing instructions.
