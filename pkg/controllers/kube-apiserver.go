@@ -122,9 +122,9 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			"etcd-servers": {
 				"https://localhost:2379",
 			},
-			"kubelet-certificate-authority":   {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
-			"kubelet-client-certificate":      {cryptomaterial.ClientCertPath(kubeletClientDir)},
-			"kubelet-client-key":              {cryptomaterial.ClientKeyPath(kubeletClientDir)},
+			"kubelet-certificate-authority": {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
+			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
+			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
 			// MicroShift nodes expose these two types of addresses. In order to support having more than one
 			// node with the current approach (which is running a stand alone kubelet and share certificates
 			// with the master node) we need to use names only because of the way certificates are generated.
