@@ -65,6 +65,39 @@ def check_assets_dir_against_instructions(recipe):
     return False
 
 
+def _check_for_redundant_instructions(path, instructions):
+    next_path = path + [instructions.get('dir', '')]
+    if 'dirs' in instructions:
+        # Use a list comprehension instead of a generator expression
+        # to ensure all of the sub-entries are checked.
+        return any([_check_for_redundant_instructions(next_path, d)
+                    for d in instructions['dirs']])
+    # Evaluate the files at this level
+    have_error = False
+    filenames = {}
+    for entry in instructions.get('files', []):
+        if entry['file'] in filenames:
+            existing_path, existing_entry = filenames[entry['file']]
+            print("ERROR: found multiple instructions for {}".format(entry['file']))
+            print("       {}:".format(' -> '.join(existing_path)))
+            print("       {}".format(existing_entry))
+            print("       AND")
+            print("       {}:".format(' -> '.join(next_path)))
+            print("       {}".format(entry))
+            print("")
+            have_error = True
+        filenames[entry['file']] = (next_path, entry)
+    return have_error
+
+
+def check_for_redundant_instructions(recipe):
+    """Look for assets that appear in the recipe file multiple times."""
+    return any([
+        _check_for_redundant_instructions([], asset)
+        for asset in recipe['assets']
+    ])
+
+
 def main():
     """Main function for checking assets against an asset recipe."""
     if not os.path.isdir(ASSETS_DIR):
@@ -74,7 +107,11 @@ def main():
     with open(RECIPE_FILEPATH, encoding='utf-8') as recipe_file:
         recipe = yaml.load(recipe_file.read(), Loader=Loader)
 
-    found_error = check_assets_dir_against_instructions(recipe)
+    found_error = any([
+        check_assets_dir_against_instructions(recipe),
+        check_for_redundant_instructions(recipe),
+    ])
+
     if found_error:
         print("\nFAILURE")
         sys.exit(1)
