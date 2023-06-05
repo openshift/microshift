@@ -76,11 +76,13 @@
       ],
       "properties": {
         "kustomizePaths": {
-          "description": "The locations on the filesystem to scan for kustomization.yaml files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests.",
+          "description": "The locations on the filesystem to scan for kustomization.yaml files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests. The entries in the list can be glob patterns to match multiple subdirectories.",
           "type": "array",
           "default": [
             "/usr/lib/microshift/manifests",
-            "/etc/microshift/manifests"
+            "/usr/lib/microshift/manifests.d/*",
+            "/etc/microshift/manifests",
+            "/etc/microshift/manifests.d/*"
           ],
           "items": {
             "type": "string"

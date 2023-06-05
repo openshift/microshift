@@ -45,6 +45,13 @@ Create Namespace
     [Arguments]    ${ns}
     Run With Kubeconfig    oc create namespace ${ns}
 
+Create Random Namespace
+    [Documentation]    Creates a namespace with a random name and return the name.
+    ${rand}=    Generate Random String
+    ${rand}=    Convert To Lowercase  ${rand}
+    Run With Kubeconfig    oc create namespace test-${rand}
+    RETURN  test-${rand}
+
 Remove Namespace
     [Documentation]    Removes the given namespace.
     [Arguments]    ${ns}

@@ -102,6 +102,14 @@ build: export CGO_ENABLED=0
 
 microshift: build
 
+# A target for local developer workflows. This assumes configure-vm.sh
+# was already run to build and install the RPM.
+.PHONY: install
+install: build
+	sudo systemctl stop microshift
+	sudo cp $(OUTPUT_DIR)/bin/microshift* /usr/bin/
+	sudo systemctl start microshift
+
 .PHONY: etcd
 export GO_BUILD_FLAGS
 etcd:

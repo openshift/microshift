@@ -56,7 +56,9 @@ etcd:
 manifests:
     kustomizePaths:
         - /usr/lib/microshift/manifests
+        - /usr/lib/microshift/manifests.d/*
         - /etc/microshift/manifests
+        - /etc/microshift/manifests.d/*
 network:
     clusterNetwork:
         - 10.42.0.0/16
@@ -116,14 +118,16 @@ Please note that values close to the floor may be more likely to impact etcd per
 
 # Auto-applying Manifests
 
-MicroShift leverages `kustomize` for Kubernetes-native templating and declarative management of resource objects. Upon start-up, it searches `/etc/microshift/manifests` and `/usr/lib/microshift/manifests` directories for a `kustomization.yaml` file. If it finds one, it automatically runs `kubectl apply -k` command to apply that manifest.
+MicroShift leverages `kustomize` for Kubernetes-native templating and declarative management of resource objects. Upon start-up, it searches `/etc/microshift/manifests`, `/etc/microshift/manifests.d/*`, `/usr/lib/microshift/manifests`, and `/usr/lib/microshift/manifests.d/*` directories for a `kustomization.yaml` file. If it finds one, it automatically runs `kubectl apply -k` command to apply that manifest.
 
 The reason for providing multiple directories is to allow a flexible method to manage MicroShift workloads.
 
-| Location                      | Intent |
-|-------------------------------|--------|
-| /etc/microshift/manifests     | Read-write location for configuration management systems or development
-| /usr/lib/microshift/manifests | Read-only location for embedding configuration manifests on ostree based systems
+| Location                          | Intent |
+|-----------------------------------|--------|
+| /etc/microshift/manifests         | Read-write location for configuration management systems or development
+| /etc/microshift/manifests.d/*     | Read-write location for configuration management systems or development
+| /usr/lib/microshift/manifests     | Read-only location for embedding configuration manifests on ostree based systems
+| /usr/lib/microshift/manifestsd./* | Read-only location for embedding configuration manifests on ostree based systems
 
 To override the list of paths, set `manifests.kustomizePaths` in the configuration file.
 
@@ -131,6 +135,14 @@ To override the list of paths, set `manifests.kustomizePaths` in the configurati
 manifests:
     kustomizePaths:
         - "/opt/alternate/path"
+```
+
+The values of `kustomizePaths` may be glob patterns.
+
+```yaml
+manifests:
+    kustomizePaths:
+        - "/opt/alternative/path.d/*"
 ```
 
 To disable loading manifests, set the configuration option to an empty

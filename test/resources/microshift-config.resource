@@ -55,26 +55,7 @@ Clear MicroShift Config
     ...    rm -f /etc/microshift/config.yaml
     ...    sudo=True  return_rc=True
 
-Upload MicroShift Config  # robocop: disable=too-many-calls-in-keyword
+Upload MicroShift Config
     [Documentation]  Upload a new configuration file to the MicroShift host
     [Arguments]  ${config_content}
-
-    ${rand}=    Generate Random String
-    ${local_tmp}=    Join Path    /tmp    ${rand}
-    Create File    ${local_tmp}    ${config_content}
-
-    ${rand}=    Generate Random String
-    ${remote_tmp}=    Join Path    /tmp    ${rand}
-    Put File  ${local_tmp}  ${remote_tmp}  mode=0644
-
-    Remove File  ${local_tmp}
-
-    ${stdout}  ${rc}=  Execute Command
-    ...    mv ${remote_tmp} /etc/microshift/config.yaml
-    ...    sudo=True  return_rc=True
-    Should Be Equal As Integers  0  ${rc}
-
-    ${stdout}  ${rc}=  Execute Command
-    ...    chown root:root /etc/microshift/config.yaml
-    ...    sudo=True  return_rc=True
-    Should Be Equal As Integers  0  ${rc}
+    Upload String To File  ${config_content}  /etc/microshift/config.yaml

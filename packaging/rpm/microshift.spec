@@ -174,9 +174,15 @@ install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/mi
 
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/manifests
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/manifests.d
 install -p -m644 packaging/microshift/config.yaml %{buildroot}%{_sysconfdir}/microshift/config.yaml.default
 install -p -m644 packaging/microshift/lvmd.yaml %{buildroot}%{_sysconfdir}/microshift/lvmd.yaml.default
 install -p -m644 packaging/microshift/ovn.yaml %{buildroot}%{_sysconfdir}/microshift/ovn.yaml.default
+
+# /usr/lib/microshift manifest directories for other packages to add to
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d
 
 # release-info files
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
@@ -275,9 +281,14 @@ systemctl enable --now --quiet openvswitch || true
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
 %dir %{_sysconfdir}/microshift
 %dir %{_sysconfdir}/microshift/manifests
+%dir %{_sysconfdir}/microshift/manifests.d
 %config(noreplace) %{_sysconfdir}/microshift/config.yaml.default
 %config(noreplace) %{_sysconfdir}/microshift/lvmd.yaml.default
 %config(noreplace) %{_sysconfdir}/microshift/ovn.yaml.default
+
+%dir %{_prefix}/lib/microshift
+%dir %{_prefix}/lib/microshift/manifests
+%dir %{_prefix}/lib/microshift/manifests.d
 
 %files release-info
 %{_datadir}/microshift/release/release*.json
@@ -311,9 +322,13 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
-* Mon May 01 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
+* Mon May 15 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
 - Remove version specifier for container-selinux to let the system
   make the best choice.
+
+* Mon Apr 24 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
+- Add /etc/microshift/manifests.d and /usr/lib/microshift/manifests.d
+  directories.
 
 * Wed Apr 12 2023 Zenghui Shi <zshi@redhat.com> 4.13.0
 - Upgrade openvswitch package version to 3.1
