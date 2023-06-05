@@ -21,4 +21,6 @@ type Manager interface {
 
 	BackupExists(BackupName) (bool, error)
 	GetBackupPath(BackupName) string
+	GetBackupList() ([]BackupName, error)
+	RemoveBackup(BackupName) error
 }

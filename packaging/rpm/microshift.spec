@@ -151,6 +151,9 @@ install -p -m755 scripts/microshift-cleanup-data.sh %{buildroot}%{_bindir}/micro
 restorecon -v %{buildroot}%{_bindir}/microshift
 restorecon -v %{buildroot}%{_bindir}/microshift-etcd
 
+install -d -m755 %{buildroot}{_sharedstatedir}/microshift
+install -d -m755 %{buildroot}{_sharedstatedir}/microshift-backups
+
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
 %ifarch %{arm} aarch64
@@ -208,12 +211,18 @@ install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 
 # Greenboot scripts
-install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/check/required.d
-install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
-install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
-install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
 install -d -m755 %{buildroot}%{_datadir}/microshift/functions
 install -p -m644 packaging/greenboot/functions.sh %{buildroot}%{_datadir}/microshift/functions/greenboot.sh
+
+install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/check/required.d
+install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
+
+install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
+install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
+install -p -m755 packaging/greenboot/microshift_set_unhealthy.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_set_unhealthy.sh
+
+install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/green.d
+install -p -m755 packaging/greenboot/microshift_set_healthy.sh %{buildroot}%{_sysconfdir}/greenboot/green.d/40_microshift_set_healthy.sh
 
 %post
 
@@ -295,6 +304,8 @@ systemctl enable --now --quiet openvswitch || true
 %files greenboot
 %{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
+%{_sysconfdir}/greenboot/red.d/40_microshift_set_unhealthy.sh
+%{_sysconfdir}/greenboot/green.d/40_microshift_set_healthy.sh
 %{_datadir}/microshift/functions/greenboot.sh
 
 # Use Git command to generate the log and replace the VERSION string
