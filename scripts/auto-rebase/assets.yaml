@@ -39,8 +39,6 @@ assets:
     src: lvms/amd64/
     no_clean: True
     files:
-      - file: topolvm-controller-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml
-      - file: topolvm-controller-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml
