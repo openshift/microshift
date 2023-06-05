@@ -153,12 +153,10 @@ run_test() {
 
     konfig=$(microshift_get_konfig)
     trap 'rm -f "${konfig}"' RETURN
-    
-    chmod +x "${SCRIPT_DIR}/tests/${test}"
 
     test_start=$(date +%s)
     set +e
-    KUBECONFIG="${konfig}" "${SCRIPT_DIR}/tests/${test}" &>"${output}/0010-test.log"
+    KUBECONFIG="${konfig}" bash "${SCRIPT_DIR}/tests/${test}" &>"${output}/0010-test.log"
     res=$?
     set -e
     test_dur=$(($(date +%s) - test_start))
