@@ -2,6 +2,7 @@ package prerun
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -12,96 +13,138 @@ import (
 	"k8s.io/klog/v2"
 )
 
+var (
+	errHealthFileDoesNotExist = errors.New("health file does not exist")
+)
+
+type HealthInfo struct {
+	Health       string `json:"health"`
+	DeploymentID string `json:"deployment_id"`
+	BootID       string `json:"boot_id"`
+}
+
+func (hi *HealthInfo) BackupName() data.BackupName {
+	return data.BackupName(fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID))
+}
+
+func (hi *HealthInfo) IsHealthy() bool {
+	return hi.Health == "healthy"
+}
+
 func Perform() error {
-	healthFile := "/var/lib/microshift-backups/health.json"
-	exists, err := util.PathExists(healthFile)
+	health, err := getHealthInfo()
 	if err != nil {
-		klog.ErrorS(err, "Could not access health file", "path", healthFile)
-		return err
-	}
-	if !exists {
-		klog.InfoS("Boot health information is missing - skipping backup")
-		return nil
-	}
-
-	currentBootID, err := getCurrentBootID()
-	if err != nil {
-		klog.ErrorS(err, "Failed to get current boot ID")
-		return err
-	}
-	klog.InfoS("Current boot", "id", currentBootID)
-
-	info := struct {
-		Health       string `json:"health"`
-		DeploymentID string `json:"deployment_id"`
-		BootID       string `json:"boot_id"`
-	}{}
-	d, err := os.ReadFile(healthFile)
-	if err != nil {
-		klog.ErrorS(err, "Failed to read file", "path", healthFile)
-		return err
-	}
-	if err := json.Unmarshal(d, &info); err != nil {
-		klog.ErrorS(err, "Failed to unmarshal json", "data", string(d))
-		return err
-	}
-
-	klog.InfoS("Read health info", "info", info)
-
-	if info.BootID == currentBootID {
-		klog.InfoS("Current boot in health file - skipping backup")
-		return nil
-	}
-
-	if info.Health != "healthy" {
-		return nil
-	}
-	name := data.BackupName(fmt.Sprintf("%s_%s", info.DeploymentID, info.BootID))
-
-	dm, err := data.NewManager(config.BackupsDir)
-	if err != nil {
-		return err
-	}
-
-	backups, err := dm.GetBackupList()
-	if err != nil {
-		return err
-	}
-
-	existingDeploymentBackups := make([]data.BackupName, 0)
-	for _, b := range backups {
-		if name == b {
-			klog.InfoS("Backup already exists", "deployment", info.DeploymentID, "boot", info.BootID)
+		if errors.Is(err, errHealthFileDoesNotExist) {
+			klog.InfoS("Health file does not exist - skipping backup")
 			return nil
 		}
-		if strings.Contains(string(b), info.DeploymentID) {
-			existingDeploymentBackups = append(existingDeploymentBackups, b)
-		}
+		klog.ErrorS(err, "Failed to load health from disk")
+		return err
+	}
+	klog.InfoS("Loaded health info from the disk", "health", health)
+
+	if isCurr, err := containsCurrentBootID(health.BootID); err != nil {
+		return err
+	} else if isCurr {
+		klog.InfoS("Health file contains current boot - skipping backup")
+		return nil
 	}
 
-	if err := dm.Backup(name); err != nil {
+	if !health.IsHealthy() {
+		klog.InfoS("System was not healthy - skipping backup")
+		return nil
+	}
+
+	dataManager, err := data.NewManager(config.BackupsDir)
+	if err != nil {
 		return err
 	}
 
-	if len(existingDeploymentBackups) > 0 {
-		klog.InfoS("Removing old deployment backups",
-			"deployment", info.DeploymentID,
-			"backups", existingDeploymentBackups)
-
-		for _, b := range existingDeploymentBackups {
-			if err := dm.RemoveBackup(b); err != nil {
-				klog.ErrorS(err, "Failed to remove backup", "name", b)
-			}
-		}
+	existingBackups, err := dataManager.GetBackupList()
+	if err != nil {
+		return err
 	}
+
+	// get list of already existing backups for deployment ID persisted in health file
+	// after creating backup, the list will be used to remove older backups
+	// (so only the most recent one for specific deployment is kept)
+	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, health.DeploymentID)
+
+	newBackupName := health.BackupName()
+	if backupAlreadyExists(backupsForDeployment, newBackupName) {
+		klog.InfoS("Backup already exists", "name", newBackupName)
+		return nil
+	}
+
+	if err := dataManager.Backup(newBackupName); err != nil {
+		return err
+	}
+
+	removeOldBackups(dataManager, backupsForDeployment)
 
 	return nil
 }
 
-func getCurrentBootID() (string, error) {
-	content, err := os.ReadFile("/proc/sys/kernel/random/boot_id")
+func containsCurrentBootID(id string) (bool, error) {
+	path := "/proc/sys/kernel/random/boot_id"
+	content, err := os.ReadFile(path)
 	if err != nil {
-		return "", err
+		klog.ErrorS(err, "Failed to read file", "path", path)
+		return false, fmt.Errorf("reading file %s failed: %w", path, err)
 	}
-	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
+	currentBootID := strings.ReplaceAll(strings.TrimSpace(string(content)), "-", "")
+	klog.InfoS("Comparing boot IDs", "current", currentBootID, "toCompare", id)
+	return id == currentBootID, nil
+}
+
+func getHealthInfo() (*HealthInfo, error) {
+	path := "/var/lib/microshift-backups/health.json"
+	if exists, err := util.PathExists(path); err != nil {
+		return nil, err
+	} else if !exists {
+		return nil, errHealthFileDoesNotExist
+	}
+
+	content, err := os.ReadFile(path)
+	if err != nil {
+		klog.ErrorS(err, "Failed to read file", "path", path)
+		return nil, err
+	}
+
+	health := &HealthInfo{}
+	if err := json.Unmarshal(content, &health); err != nil {
+		klog.ErrorS(err, "Failed to unmarshal file to json", "content", string(content))
+		return nil, err
+	}
+	return health, nil
+}
+
+func getExistingBackupsForTheDeployment(existingBackups []data.BackupName, deployID string) []data.BackupName {
+	existingDeploymentBackups := make([]data.BackupName, 0)
+
+	for _, existingBackup := range existingBackups {
+		if strings.HasPrefix(string(existingBackup), deployID) {
+			existingDeploymentBackups = append(existingDeploymentBackups, existingBackup)
+		}
+	}
+
+	return existingDeploymentBackups
+}
+
+func backupAlreadyExists(existingBackups []data.BackupName, name data.BackupName) bool {
+	for _, backup := range existingBackups {
+		if backup == name {
+			return true
+		}
+	}
+	return false
+}
+
+func removeOldBackups(dataManager data.Manager, backups []data.BackupName) {
+	for _, b := range backups {
+		klog.InfoS("Removing older backup", "name", b)
+		if err := dataManager.RemoveBackup(b); err != nil {
+			klog.ErrorS(err, "Failed to remove backup", "name", b)
+		}
+	}
 }
