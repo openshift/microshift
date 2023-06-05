@@ -34,8 +34,8 @@ import (
 	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
 	kubecm "k8s.io/kubernetes/cmd/kube-controller-manager/app"
 
-	"github.com/ghodss/yaml"
 	klog "k8s.io/klog/v2"
+	"sigs.k8s.io/yaml"
 )
 
 const (
