@@ -151,6 +151,9 @@ install -p -m755 scripts/microshift-cleanup-data.sh %{buildroot}%{_bindir}/micro
 restorecon -v %{buildroot}%{_bindir}/microshift
 restorecon -v %{buildroot}%{_bindir}/microshift-etcd
 
+install -d -m755 %{buildroot}{_sharedstatedir}/microshift
+install -d -m755 %{buildroot}{_sharedstatedir}/microshift-backups
+
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
 %ifarch %{arm} aarch64
