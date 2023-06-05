@@ -41,7 +41,6 @@ Source0: https://github.com/openshift/microshift/archive/%{commit}/microshift-%{
 
 ExclusiveArch: x86_64 aarch64
 
-BuildRequires: gcc
 BuildRequires: make
 BuildRequires: policycoreutils
 BuildRequires: systemd
