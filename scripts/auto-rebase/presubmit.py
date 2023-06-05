@@ -41,15 +41,11 @@ def build_assets_filelist_from_recipe(recipe):
                   [])
 
 
-def main():
-    """Main function for checking assets against an asset recipe."""
-    if not os.path.isdir(ASSETS_DIR):
-        print(f"ERROR: Expected to run in root directory of microshift repository but was in {os.getcwd()}")
-        sys.exit(1)
+def check_assets_dir_against_instructions(recipe):
+    """Reports errors if the contents of the assets directory do not match the instruction file.
 
-    with open(RECIPE_FILEPATH, encoding='utf-8') as recipe_file:
-        recipe = yaml.load(recipe_file.read(), Loader=Loader)
-
+    Returns boolean indicating whether an issue was found.
+    """
     assets_filelist = set(build_assets_filelist_from_recipe(recipe))
     realfiles = {f.replace('assets/', '') for f in glob.glob('assets/**/*.*', recursive=True)}
 
@@ -65,6 +61,58 @@ def main():
     if missing_in_recipe or superfluous_in_recipe:
         print("\nFiles in assets.yaml:\n\t -", '\n\t - '.join(sorted(assets_filelist)))
         print("\nFiles in assets/:\n\t -", '\n\t - '.join(sorted(realfiles)))
+        return True
+    return False
+
+
+def _check_for_redundant_instructions(path, instructions):
+    next_path = path + [instructions.get('dir', '')]
+    if 'dirs' in instructions:
+        # Use a list comprehension instead of a generator expression
+        # to ensure all of the sub-entries are checked.
+        return any([_check_for_redundant_instructions(next_path, d)
+                    for d in instructions['dirs']])
+    # Evaluate the files at this level
+    have_error = False
+    filenames = {}
+    for entry in instructions.get('files', []):
+        if entry['file'] in filenames:
+            existing_path, existing_entry = filenames[entry['file']]
+            print("ERROR: found multiple instructions for {}".format(entry['file']))
+            print("       {}:".format(' -> '.join(existing_path)))
+            print("       {}".format(existing_entry))
+            print("       AND")
+            print("       {}:".format(' -> '.join(next_path)))
+            print("       {}".format(entry))
+            print("")
+            have_error = True
+        filenames[entry['file']] = (next_path, entry)
+    return have_error
+
+
+def check_for_redundant_instructions(recipe):
+    """Look for assets that appear in the recipe file multiple times."""
+    return any([
+        _check_for_redundant_instructions([], asset)
+        for asset in recipe['assets']
+    ])
+
+
+def main():
+    """Main function for checking assets against an asset recipe."""
+    if not os.path.isdir(ASSETS_DIR):
+        print(f"ERROR: Expected to run in root directory of microshift repository but was in {os.getcwd()}")
+        sys.exit(1)
+
+    with open(RECIPE_FILEPATH, encoding='utf-8') as recipe_file:
+        recipe = yaml.load(recipe_file.read(), Loader=Loader)
+
+    found_error = any([
+        check_assets_dir_against_instructions(recipe),
+        check_for_redundant_instructions(recipe),
+    ])
+
+    if found_error:
         print("\nFAILURE")
         sys.exit(1)
 
