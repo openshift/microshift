@@ -103,7 +103,19 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		return fmt.Errorf("%s failed to start: %v", s.Name(), err)
 	}
 
-	// Make sure microshift-etcd is terminated whether it failed to properly start or MicroShift stops
+	// Handle microshift-etcd termination before microshift process exits
+	go func() {
+		if err := cmd.Wait(); err != nil {
+			klog.Warningf("%v failed waiting on process to finish: %+v", s.Name(), err)
+		}
+		klog.Infof("%v process quit: %v", s.Name(), cmd.ProcessState.String())
+
+		// Exit microshift to trigger microshift-etcd restart
+		klog.Warning("microshift-etcd process terminated prematurely, restarting MicroShift")
+		os.Exit(0)
+	}()
+
+	// Handle microshift-etcd termination after microshift process exits
 	defer func() {
 		if err := cmd.Process.Signal(os.Interrupt); err != nil {
 			klog.Warningf("%v failed interrupting the process: %+v", s.Name(), err)
@@ -111,10 +123,6 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 				klog.Warningf("%v failed killing the process: %+v", s.Name(), err)
 			}
 		}
-		if err := cmd.Wait(); err != nil {
-			klog.Warningf("%v failed waiting on process to finish: %+v", s.Name(), err)
-		}
-		klog.Infof("%v process quit: %v", s.Name(), cmd.ProcessState.String())
 	}()
 
 	if err := checkIfEtcdIsReady(ctx); err != nil {
