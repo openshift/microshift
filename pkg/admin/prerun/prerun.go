@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
-	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
@@ -31,36 +30,49 @@ func (hi *HealthInfo) IsHealthy() bool {
 	return hi.Health == "healthy"
 }
 
-func Perform() error {
+type PreRun struct {
+	dataManager data.Manager
+}
+
+func New(dataManager data.Manager) *PreRun {
+	return &PreRun{
+		dataManager: dataManager,
+	}
+}
+
+func (pr *PreRun) Perform() error {
 	health, err := getHealthInfo()
 	if err != nil {
 		if errors.Is(err, errHealthFileDoesNotExist) {
 			klog.InfoS("Health file does not exist - skipping backup")
 			return nil
 		}
-		klog.ErrorS(err, "Failed to load health from disk")
 		return err
 	}
-	klog.InfoS("Loaded health info from the disk", "health", health)
 
 	if isCurr, err := containsCurrentBootID(health.BootID); err != nil {
 		return err
 	} else if isCurr {
-		klog.InfoS("Health file contains current boot - skipping backup")
+		// This might happen if microshift is (re)started after greenboot finishes running.
+		// Green script will overwrite the health.json with
+		// current boot's ID, deployment ID, and health.
+		klog.InfoS("Health file contains current boot - skipping pre-run")
 		return nil
 	}
 
-	if !health.IsHealthy() {
-		klog.InfoS("System was not healthy - skipping backup")
-		return nil
+	klog.InfoS("Previous boot", "health", health.Health, "deploymentID", health.DeploymentID, "bootID", health.BootID)
+
+	if health.IsHealthy() {
+		return pr.backup(health)
 	}
 
-	dataManager, err := data.NewManager(config.BackupsDir)
-	if err != nil {
-		return err
-	}
+	return nil
+}
 
-	existingBackups, err := dataManager.GetBackupList()
+func (pr *PreRun) backup(health *HealthInfo) error {
+	klog.InfoS("Backing up the data for deployment", "deployment", health.DeploymentID)
+
+	existingBackups, err := pr.dataManager.GetBackupList()
 	if err != nil {
 		return err
 	}
@@ -76,20 +88,28 @@ func Perform() error {
 		return nil
 	}
 
-	if err := dataManager.Backup(newBackupName); err != nil {
+	if err := pr.dataManager.Backup(newBackupName); err != nil {
 		return err
 	}
 
-	removeOldBackups(dataManager, backupsForDeployment)
+	pr.removeOldBackups(backupsForDeployment)
 
 	return nil
+}
+
+func (pr *PreRun) removeOldBackups(backups []data.BackupName) {
+	for _, b := range backups {
+		klog.InfoS("Removing older backup", "name", b)
+		if err := pr.dataManager.RemoveBackup(b); err != nil {
+			klog.ErrorS(err, "Failed to remove backup", "name", b)
+		}
+	}
 }
 
 func containsCurrentBootID(id string) (bool, error) {
 	path := "/proc/sys/kernel/random/boot_id"
 	content, err := os.ReadFile(path)
 	if err != nil {
-		klog.ErrorS(err, "Failed to read file", "path", path)
 		return false, fmt.Errorf("reading file %s failed: %w", path, err)
 	}
 	currentBootID := strings.ReplaceAll(strings.TrimSpace(string(content)), "-", "")
@@ -107,14 +127,12 @@ func getHealthInfo() (*HealthInfo, error) {
 
 	content, err := os.ReadFile(path)
 	if err != nil {
-		klog.ErrorS(err, "Failed to read file", "path", path)
-		return nil, err
+		return nil, fmt.Errorf("reading file %s failed: %w", path, err)
 	}
 
 	health := &HealthInfo{}
 	if err := json.Unmarshal(content, &health); err != nil {
-		klog.ErrorS(err, "Failed to unmarshal file to json", "content", string(content))
-		return nil, err
+		return nil, fmt.Errorf("unmarshalling '%s' failed: %w", strings.TrimSpace(string(content)), err)
 	}
 	return health, nil
 }
@@ -138,13 +156,4 @@ func backupAlreadyExists(existingBackups []data.BackupName, name data.BackupName
 		}
 	}
 	return false
-}
-
-func removeOldBackups(dataManager data.Manager, backups []data.BackupName) {
-	for _, b := range backups {
-		klog.InfoS("Removing older backup", "name", b)
-		if err := dataManager.RemoveBackup(b); err != nil {
-			klog.ErrorS(err, "Failed to remove backup", "name", b)
-		}
-	}
 }

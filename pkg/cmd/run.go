@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
@@ -77,13 +78,23 @@ func logConfig(cfg *config.Config) {
 	}
 }
 
+func performPrerun() error {
+	dataManager, err := data.NewManager(config.BackupsDir)
+	if err != nil {
+		return err
+	}
+
+	return prerun.New(dataManager).Perform()
+}
+
 func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
 
-	if err := prerun.Perform(); err != nil {
+	if err := performPrerun(); err != nil {
+		klog.ErrorS(err, "Pre-run procedure failed")
 		return err
 	}
 
