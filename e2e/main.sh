@@ -153,6 +153,8 @@ run_test() {
 
     konfig=$(microshift_get_konfig)
     trap 'rm -f "${konfig}"' RETURN
+    
+    chmod +x "${SCRIPT_DIR}/tests/${test}"
 
     test_start=$(date +%s)
     set +e
