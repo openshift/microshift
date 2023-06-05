@@ -1,10 +1,12 @@
 package prerun
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
@@ -66,7 +68,7 @@ func (pr *PreRun) Perform() error {
 		return pr.backup(health)
 	}
 
-	return nil
+	return pr.restore()
 }
 
 func (pr *PreRun) backup(health *HealthInfo) error {
@@ -95,6 +97,62 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 	pr.removeOldBackups(backupsForDeployment)
 
 	return nil
+}
+
+func (pr *PreRun) restore() error {
+	// TODO: Check if containers are already running (i.e. microshift.service was restarted)?
+
+	currentDeploymentID, err := getCurrentDeploymentID()
+	if err != nil {
+		return err
+	}
+	klog.InfoS("Restoring data for current deployment", "deployID", currentDeploymentID)
+
+	existingBackups, err := pr.dataManager.GetBackupList()
+	if err != nil {
+		return err
+	}
+	klog.InfoS("List of existing backups", "backups", existingBackups)
+	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, currentDeploymentID)
+
+	if len(backupsForDeployment) == 0 {
+		return fmt.Errorf("there is no backup to restore for current deployment (%s)", currentDeploymentID)
+	}
+
+	if len(backupsForDeployment) > 1 {
+		// could happen during backing up when removing older backups failed
+		klog.InfoS("TODO: more than 1 backup, need to pick most recent one")
+	}
+
+	return pr.dataManager.Restore(backupsForDeployment[0])
+}
+
+func getCurrentDeploymentID() (string, error) {
+	cmd := exec.Command("rpm-ostree", "status", "--jsonpath=$.deployments[0].id", "--booted")
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("command %s failed: %s", strings.TrimSpace(cmd.String()), strings.TrimSpace(stderr.String()))
+	}
+
+	ids := []string{}
+	if err := json.Unmarshal(stdout.Bytes(), &ids); err != nil {
+		return "", fmt.Errorf("unmarshalling '%s' to json failed: %w", strings.TrimSpace(stdout.String()), err)
+	}
+
+	if len(ids) != 1 {
+		// this shouldn't happen if running on ostree system, but just in case
+		klog.ErrorS(nil, "Unexpected amount of deployments in rpm-ostree output",
+			"cmd", cmd.String(),
+			"stdout", strings.TrimSpace(stdout.String()),
+			"stderr", strings.TrimSpace(stderr.String()),
+			"unmarshalledIDs", ids)
+		return "", fmt.Errorf("rpm-ostree returned unexpected amount of deployment IDs: %d", len(ids))
+	}
+
+	return ids[0], nil
 }
 
 func (pr *PreRun) removeOldBackups(backups []data.BackupName) {
