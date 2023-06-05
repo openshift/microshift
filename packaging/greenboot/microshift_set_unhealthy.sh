@@ -4,6 +4,12 @@ set -ex
 
 HEALTH=unhealthy
 
+SCRIPT_NAME=$(basename "$0")
+if [ "$(id -u)" -ne 0 ] ; then
+    echo "The '${SCRIPT_NAME}' script must be run with the 'root' user privileges"
+    exit 1
+fi
+
 if [ ! -f /run/ostree-booted ]; then
     echo "System is not booted with ostree"
     exit 0
