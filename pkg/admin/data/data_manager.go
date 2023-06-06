@@ -10,7 +10,6 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
-	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/klog/v2"
 )
 
@@ -110,19 +109,28 @@ func (dm *manager) Restore(name BackupName) error {
 	if exists, err := dm.BackupExists(name); err != nil {
 		return fmt.Errorf("checking if backup %s exists failed: %w", name, err)
 	} else if !exists {
-		klog.ErrorS(nil, "Backup to restore does not exist", "name", name)
-		return fmt.Errorf("backup %s does not exist", name)
+		return fmt.Errorf("failed to restore backup, %s does not exist", name)
 	}
 
-	tmp := fmt.Sprintf("%s.%s", config.DataDir, rand.String(8))
+	tmp := fmt.Sprintf("%s.saved", config.DataDir)
 	klog.InfoS("Temporarily renaming data dir", "data", config.DataDir, "renamedTo", tmp)
 	if err := os.Rename(config.DataDir, tmp); err != nil {
-		return fmt.Errorf("renaming data dir failed: %w", err)
+		return fmt.Errorf("renaming %s to %s failed: %w", config.DataDir, tmp, err)
 	}
 
 	src := dm.GetBackupPath(name)
 	if err := copy(src, config.DataDir); err != nil {
-		return err
+		klog.ErrorS(err, "Copying backup failed - restoring previous data dir")
+
+		if err := os.RemoveAll(config.DataDir); err != nil {
+			return fmt.Errorf("removing %s failed: %w", config.DataDir, err)
+		}
+
+		if err := os.Rename(tmp, config.DataDir); err != nil {
+			return fmt.Errorf("renaming %s to %s failed: %w", tmp, config.DataDir, err)
+		}
+
+		return fmt.Errorf("restoring backup %s failed: %w", src, err)
 	}
 
 	klog.InfoS("Removing temporary data dir", "path", tmp)
