@@ -1,0 +1,80 @@
+- cluster-ingress-operator embedded-component 90d2feaaf3b4e657ce46098077e894aec053f7ca to b2af3796ef0ded090ebb837ba07cb6e2fb7978f3
+  - ee58397 2023-06-01T14:43:52-04:00 Pull operand proxy variables from the cluster proxy config instead of the ingress operator's environment
+  - b648921 2023-05-31T16:48:17-04:00 Revert "Revert "OCPBUGS-6661, OCPBUGS-9464: Move mTLS CRL handling into the router, and fix accidental duplication of CRLs""
+  - 8f98c61 2023-05-26T14:50:58-04:00 OCPBUGS-13963: Bump vendors k8s libraries to 0.27.2
+
+- cluster-kube-apiserver-operator embedded-component dbe789b8b0c0354e8094267d904b966e430104ed to 0afbcf1bafc85805fa9d8f8a55df1d7c27e47012
+  - 1996db8 2023-05-31T10:43:22+02:00 Change manifest directory permissions
+  - a9e50ec 2023-05-10T16:24:35-04:00 remove the old featureset flag from rendering
+  - 7b30080 2023-05-10T16:24:35-04:00 update library-go for render flag updates
+
+- cluster-kube-controller-manager-operator embedded-component c27b0e585ff6c7d68f72ce8a74ab90dd9567ed19 to 1e15498f434994aa6676c146638b886e08c93aa5
+  - b05a7f6 2023-05-31T10:57:51+02:00 Change manifest directory permissions
+  - df62336 2023-05-23T16:49:11+02:00 add "openshift-infra" into kubeInformers for StaticResourceController
+  - 349c769 2023-05-23T16:44:34+02:00 remove RBAC for cluster-policy-controller CM leader election
+
+- cluster-kube-scheduler-operator embedded-component d67fd0782ff7060e548446815f460d6c9e10e057 to f42458c923d20576d88decb5495888c410ac6051
+  - 7f0192a 2023-05-31T10:30:38+02:00 Change manifest directory permissions
+
+- cluster-network-operator embedded-component f68e72f6cf4315646e2baecf2f2e2370b012f2b8 to 6c0b42e4aec50b530ed68138435fb25101c5453b
+  - cfa1d6d 2023-05-29T18:31:20+02:00 OCPBUGS-11882: Added safe-to-evict annotation to ovnkube-master, multus admission controller and cloud-network-config components
+
+- cluster-openshift-controller-manager-operator embedded-component cb01e0b306daedbe42d50d9b0e88ce2618863647 to 2628fefee51de6da59388603881ea8d4f2b032d9
+  - 7cca767 2023-05-21T13:46:07+08:00 add loglevel controller for ocm-O
+
+- kubernetes embedded-component 15f19ea2dd700767e5337502aec753d2a6e26905 to cc041e853bbd41b7b675d3563c445d01336bda33
+  - b5a21166e 2023-06-01T14:51:32-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
+
+- openshift-controller-manager embedded-component 76ef4f658ee7a5e6e4038f2860ef2bb9bc36e579 to 41104bfd3c2a492e4e20516fd7065b9c86e2ad7e
+  - c5766ba 2023-06-01T15:28:18-04:00 code updates due to version bumps
+  - 145954f 2023-06-01T15:27:59-04:00 vendoring dependencies
+  - f83079e 2023-06-01T15:27:26-04:00 Updating Kubernetes and dependencies
+
+- oc image-amd64 943559197d1a94253672e26dbc356e062df7a66d to 60caadec339755236fdac53b50defd79991d3409
+  - 568677d 2023-05-31T10:10:54+02:00 oc adm groups sync: all groups: print warning before caching
+  - 97ef696 2023-05-11T14:40:23-04:00 OCPBUGS-12793: refactored the processing of the manifest list to serialize directly to dockerImage.Config
+  - 9b85730 2023-05-11T07:47:38-04:00 Use 'multi' when mirroring a multi release image
+
+- router image-amd64 5426a9b1597b9afd70b9d49caebe00cee6cc433f to ec0a69fdd7b1dc8a968dc679fe39a7b99d3160c9
+  - ab86723 2023-05-23T13:34:02-04:00 OCPBUGS-13969: Bump vendors k8s libraries to 0.27.2
+
+- ovn-kubernetes image-amd64 0f2fbd9d43d2681ad4bffb2f4a7b85a195fc989b to 8adae676ccfed289ea097ac70afe7970dca3f820
+  - 34cc232 2023-05-26T10:46:42+02:00 Bump OVN RPMs to 23.03.0-49.el9fdp
+  - 61e0379 2023-04-05T19:02:52+02:00 lb_config: Reduce number of required LB backend templates for NodePort.
+  - 4b3475a 2023-04-05T19:02:46+02:00 services: Use OVN template load balancers for NodePort services.
+  - 91b2e29 2023-04-05T09:38:22+02:00 model_client: Properly update map values.
+  - 0cdb9ec 2023-04-05T09:38:22+02:00 fedora: Update OVN to 23.03.0-16.
+  - 7e7e141 2023-04-05T09:38:22+02:00 dbs: Bump OVN schema to 23.03.
+  - b79d290 2023-04-05T09:38:22+02:00 Rename OVN_VERSION to OVN_SCHEMA_VERSION.
+  - 3207e3f 2023-04-05T09:38:22+02:00 lb_config: Merge LB referenced groups when merging LBs.
+  - c258f60 2023-04-05T09:38:22+02:00 node_tracker: Store node IPs as net.IP instead of string.
+  - 9ded3d8 2023-04-05T09:38:22+02:00 node_tracker: Track node chassis IDs too.
+  - b1fba8f 2023-04-05T09:38:22+02:00 services_controller_test: Test with LB groups enabled.
+
+- kubernetes image-amd64 15f19ea2dd700767e5337502aec753d2a6e26905 to cc041e853bbd41b7b675d3563c445d01336bda33
+  - b5a21166e 2023-06-01T14:51:32-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
+
+- oc image-arm64 943559197d1a94253672e26dbc356e062df7a66d to 60caadec339755236fdac53b50defd79991d3409
+  - 568677d 2023-05-31T10:10:54+02:00 oc adm groups sync: all groups: print warning before caching
+  - 97ef696 2023-05-11T14:40:23-04:00 OCPBUGS-12793: refactored the processing of the manifest list to serialize directly to dockerImage.Config
+  - 9b85730 2023-05-11T07:47:38-04:00 Use 'multi' when mirroring a multi release image
+
+- router image-arm64 5426a9b1597b9afd70b9d49caebe00cee6cc433f to ec0a69fdd7b1dc8a968dc679fe39a7b99d3160c9
+  - ab86723 2023-05-23T13:34:02-04:00 OCPBUGS-13969: Bump vendors k8s libraries to 0.27.2
+
+- ovn-kubernetes image-arm64 0f2fbd9d43d2681ad4bffb2f4a7b85a195fc989b to 8adae676ccfed289ea097ac70afe7970dca3f820
+  - 34cc232 2023-05-26T10:46:42+02:00 Bump OVN RPMs to 23.03.0-49.el9fdp
+  - 61e0379 2023-04-05T19:02:52+02:00 lb_config: Reduce number of required LB backend templates for NodePort.
+  - 4b3475a 2023-04-05T19:02:46+02:00 services: Use OVN template load balancers for NodePort services.
+  - 91b2e29 2023-04-05T09:38:22+02:00 model_client: Properly update map values.
+  - 0cdb9ec 2023-04-05T09:38:22+02:00 fedora: Update OVN to 23.03.0-16.
+  - 7e7e141 2023-04-05T09:38:22+02:00 dbs: Bump OVN schema to 23.03.
+  - b79d290 2023-04-05T09:38:22+02:00 Rename OVN_VERSION to OVN_SCHEMA_VERSION.
+  - 3207e3f 2023-04-05T09:38:22+02:00 lb_config: Merge LB referenced groups when merging LBs.
+  - c258f60 2023-04-05T09:38:22+02:00 node_tracker: Store node IPs as net.IP instead of string.
+  - 9ded3d8 2023-04-05T09:38:22+02:00 node_tracker: Track node chassis IDs too.
+  - b1fba8f 2023-04-05T09:38:22+02:00 services_controller_test: Test with LB groups enabled.
+
+- kubernetes image-arm64 15f19ea2dd700767e5337502aec753d2a6e26905 to cc041e853bbd41b7b675d3563c445d01336bda33
+  - b5a21166e 2023-06-01T14:51:32-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
+
