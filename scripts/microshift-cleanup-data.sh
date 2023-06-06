@@ -5,13 +5,15 @@ SCRIPT_NAME=$(basename "$0")
 # to allow for pod deletion when MicroShift is stopped
 PODS_NS_LIST=(openshift-service-ca openshift-ingress openshift-dns openshift-storage openshift-ovn-kubernetes)
 FULL_CLEAN=true
+KEEP_IMAGE=false
 
 function usage() {
     echo "Stop all MicroShift services, also cleaning their data"
     echo ""
-    echo "Usage: ${SCRIPT_NAME} <--all | --ovn>"
-    echo "   --all   Clean all MicroShift and OVN data"
-    echo "   --ovn   Clean OVN data only"
+    echo "Usage: ${SCRIPT_NAME} <--all [--keep-images] | --ovn>"
+    echo "   --all         Clean all MicroShift and OVN data"
+    echo "   --keep-images Keep container images when cleaning all data"
+    echo "   --ovn         Clean OVN data only"
     exit 1
 }
 
@@ -34,15 +36,16 @@ function stop_disable_services() {
 }
 
 function stop_clean_pods() {
-    # Wipe the crio data off and return
-    if ${FULL_CLEAN} ; then
+    # Wipe all the crio data off and return
+    if ${FULL_CLEAN} && ! ${KEEP_IMAGE} ; then
         echo Removing crio container and image storage
         crio wipe -f &>/dev/null
         systemctl restart crio
         return
     fi
 
-    # It is necessary to stop the pods (OVN-related last) to allow for further termination
+    # Delete pods only, preserving images
+    # It is necessary to remove the pods (OVN-related last) to allow for further termination
     # of processes (i.e. conmon, etc.) that use the files under /var/run/ovn.
     # The cleanup of OVN data only works if the files under /var/run/ovn are not in use.
     echo Removing MicroShift pods
@@ -56,7 +59,8 @@ function stop_clean_pods() {
             if [ "$(echo "${ocp_pods}" | wc -w)" -eq 0 ] ; then
                 break
             fi
-            crictl rmp -f "${ocp_pods}" &>/dev/null
+            # shellcheck disable=SC2086
+            crictl rmp -f ${ocp_pods} &>/dev/null
             retries=$(( retries - 1 ))
         done
     done
@@ -97,6 +101,7 @@ function clean_data() {
 # Parse command line
 case $1 in
 --all)
+    [ "$2" = "--keep-images" ] && KEEP_IMAGE=true
     ;;
 --ovn)
     FULL_CLEAN=false
@@ -116,11 +121,11 @@ if ${FULL_CLEAN} ; then
     echo "DATA LOSS WARNING: Do you wish to stop and clean ALL MicroShift data AND cri-o container workloads?"
     select yn in "Yes" "No"; do
         case "${yn}" in
-        Yes) 
+        Yes)
             break
             ;;
         *)
-            echo "Aborting cleanup" 
+            echo "Aborting cleanup"
             exit 0
             ;;
         esac

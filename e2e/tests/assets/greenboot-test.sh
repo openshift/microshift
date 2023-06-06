@@ -10,7 +10,8 @@ function check_greenboot_exit_status() {
     local cleanup=$2
 
     if [ "${cleanup}" -ne 0 ]; then
-        echo 1 | microshift-cleanup-data --all
+        # Skip image deletion to speed up the test and make it more reliable
+        echo 1 | microshift-cleanup-data --all --keep-images
         systemctl enable --now microshift || true
     fi
 
