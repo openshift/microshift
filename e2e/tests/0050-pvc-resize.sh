@@ -28,5 +28,5 @@ oc wait --for=condition=Ready --timeout=120s pod/test-pod
 
 RESIZE_TO=2Gi
 TIME_OUT=3m
-oc patch pvc my-pvc -p '{"spec":{"resources":{"requests":{"storage":"'${RESIZE_TO}'"}}}}'
-oc wait --timeout ${TIME_OUT} --for=jsonpath="{.spec.resources.requests.storage}"=${RESIZE_TO} pvc/my-pvc
+oc patch pvc test-claim -p '{"spec":{"resources":{"requests":{"storage":"'${RESIZE_TO}'"}}}}'
+oc wait --timeout ${TIME_OUT} --for=jsonpath="{.spec.resources.requests.storage}"=${RESIZE_TO} pvc/test-claim
