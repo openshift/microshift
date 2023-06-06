@@ -108,3 +108,9 @@ Resizing is the process of expanding the backend storage volume's capacity via t
 supports volume expansion.  It does not support volume shrinking. Refer to OpenShift documentation on 
 [Expanding CSI Volumes](https://docs.openshift.com/container-platform/4.13/storage/expanding-persistent-volumes.html#expanding-csi-volumes_expanding-persistent-volumes)
 for resizing instructions.
+
+### PVC to PVC Cloning
+
+LVMS supports PVC cloning for LVM thin-volumes (thick volumes are not supported).  Cloning is
+only allowed within the same namespace; you cannot clone a PVC from one namespace to another.
+For more details on PVC to PVC cloning, see the [OpenShift documentation](https://docs.openshift.com/container-platform/4.13/storage/container_storage_interface/persistent-storage-csi-cloning.html).
