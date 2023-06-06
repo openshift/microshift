@@ -666,12 +666,6 @@ if [ "$1" == "OVNKubernetes" ]; then
     else
       rm -f "${iface_default_hint_file}"
     fi
-    externalGatewayInterface=$(get_cni_config "externalGatewayInterface")
-    if [ "$externalGatewayInterface" != "" ]; then
-      write_iface_external_hint "${extra_bridge_file}" "${externalGatewayInterface}"
-    else
-      rm -f "${extra_bridge_file}"
-    fi
   fi
   # Configures NICs onto OVS bridge "br-ex"
   # Configuration is either auto-detected or provided through a config file written already in Network Manager
@@ -737,15 +731,14 @@ if [ "$1" == "OVNKubernetes" ]; then
     fi
   fi
   convert_to_bridge "$iface" "br-ex" "phys0" "${BRIDGE_METRIC}"
-  # Check if we need to configure the second bridge
-  if [ -f "$extra_bridge_file" ] && (! nmcli connection show br-ex1 &> /dev/null || ! nmcli connection show ovs-if-phys1 &> /dev/null); then
-    interface=$(head -n 1 $extra_bridge_file)
-    convert_to_bridge "$interface" "br-ex1" "phys1" "${BRIDGE1_METRIC}"
-  fi
-  # Check if we need to remove the second bridge
-  if [ ! -f "$extra_bridge_file" ] && (nmcli connection show br-ex1 &> /dev/null || nmcli connection show ovs-if-phys1 &> /dev/null); then
+  # Remove the second bridge
+  if nmcli connection show br-ex1 &> /dev/null || nmcli connection show ovs-if-phys1 &> /dev/null; then
     update_nm_conn_files br-ex1 phys1
     rm_nm_conn_files
+  fi
+  # Remove the second bridge hint file
+  if [ -f "$extra_bridge_file" ]; then
+    rm -f "$extra_bridge_file"
   fi
   # Remove bridges created by openshift-sdn
   ovs-vsctl --timeout=30 --if-exists del-br br0
@@ -757,9 +750,6 @@ if [ "$1" == "OVNKubernetes" ]; then
     fi
   done < <(nmcli -g NAME c)
   connections+=(ovs-if-phys0 ovs-if-br-ex)
-  if [ -f "$extra_bridge_file" ]; then
-    connections+=(ovs-if-phys1 ovs-if-br-ex1)
-  fi
   activate_nm_connections "${connections[@]}"
 elif [ "$1" == "OpenShiftSDN" ]; then
   # Revert changes made by /usr/local/bin/configure-ovs.sh during SDN migration.
