@@ -91,7 +91,7 @@ func (dm *manager) Backup(name BackupName) error {
 
 	dest := dm.GetBackupPath(name)
 
-	if err := copy(config.DataDir, dest); err != nil {
+	if err := copyPath(config.DataDir, dest); err != nil {
 		return err
 	}
 
@@ -119,7 +119,7 @@ func (dm *manager) Restore(name BackupName) error {
 	}
 
 	src := dm.GetBackupPath(name)
-	if err := copy(src, config.DataDir); err != nil {
+	if err := copyPath(src, config.DataDir); err != nil {
 		klog.ErrorS(err, "Copying backup failed - restoring previous data dir")
 
 		if err := os.RemoveAll(config.DataDir); err != nil {
@@ -135,14 +135,14 @@ func (dm *manager) Restore(name BackupName) error {
 
 	klog.InfoS("Removing temporary data dir", "path", tmp)
 	if err := os.RemoveAll(tmp); err != nil {
-		klog.ErrorS(err, "Failed to remove %s", tmp)
+		klog.ErrorS(err, "Failed to remove path", "path", tmp)
 	}
 
 	klog.InfoS("Restore finished", "backup", src, "data", config.DataDir)
 	return nil
 }
 
-func copy(src, dest string) error {
+func copyPath(src, dest string) error {
 	cmd := exec.Command("cp", append(cpArgs, src, dest)...) //nolint:gosec
 	klog.InfoS("Executing command", "cmd", cmd)
 
