@@ -157,7 +157,7 @@ install_caddy_rpm() {
     if [ "${OSTREE_SERVER_URL}" = "http://127.0.0.1:8085/repo" ] ; then
         title "Downloading Caddy package"
         # The package comes from the EPEL repository
-        dnf download -y -q caddy
+        sudo dnf download -y -q caddy
         CUSTOM_RPM_FILES+="$(pwd)/caddy-*.rpm,"
     fi
 }
