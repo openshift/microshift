@@ -46,6 +46,17 @@ BuildRequires: make
 BuildRequires: policycoreutils
 BuildRequires: systemd
 
+# DO NOT REMOVE
+#
+# Without the dependency on the compiler via this file, the production
+# build pipeline does not work. Sometimes that pipeline requires
+# compiling with a version of go that is not released into public RHEL
+# repos, yet, so we do not specify a version here. Instead, the
+# version is checked in the prep step below.
+#
+BuildRequires: golang
+# DO NOT REMOVE
+
 Requires: cri-o >= 1.25
 Requires: cri-tools >= 1.25
 Requires: iptables
@@ -322,6 +333,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Jun  6 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
+- Restore golang BuildRequires setting
+
 * Mon May 15 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
 - Remove version specifier for container-selinux to let the system
   make the best choice.
