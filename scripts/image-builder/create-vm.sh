@@ -1,27 +1,24 @@
 #!/bin/bash
 set -e
 
-ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )"
-ISODIR=${ROOTDIR}/_output/image-builder
-
-if [ $# -ne 2 ] ; then
-    echo "Usage: $(basename "$0") <vm_name> <network_name>"
+if [ $# -ne 3 ] ; then
+    echo "Usage: $(basename "$0") <vm_name> <network_name> <iso_path>"
     exit 1
 fi
 
 VMNAME=$1
 NETNAME=$2
-CDROM=$(ls -1 "${ISODIR}/microshift-installer-*.$(uname -m).iso" 2>/dev/null || true)
+CDROM=$3
 
 if [ ! -e "${CDROM}" ] ; then
-    echo "The image ISO '${CDROM}' file does not exist. Run 'make iso' to create it"
+    echo "The image ISO '${CDROM}' file does not exist."
     exit 1
 fi
 
 sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass
 if [ "$(systemctl is-active libvirtd.socket)" != "active" ] ; then
-    echo "Restart your host to initialize the virtualization environment"
-    exit 1
+    echo "Enabling libvirtd"
+    sudo systemctl enable --now libvirtd
 fi
 # Necessary to allow remote connections in the virt-viewer application
 sudo usermod -a -G libvirt "$(whoami)"

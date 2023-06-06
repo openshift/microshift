@@ -116,8 +116,9 @@ In the [Install MicroShift for Edge](./rhel4edge_iso.md#install-microshift-for-e
 ```bash
 VMNAME=microshift-edge
 NETNAME=default
+ISO=$(ls -1 "_output/image-builder/microshift-installer-*.$(uname -m).iso")
 
-./scripts/image-builder/create-vm.sh $VMNAME $NETNAME
+./scripts/image-builder/create-vm.sh $VMNAME $NETNAME $ISO
 ```
 
 > The RHEL for Edge host is created with 2 cores and 3 GB of RAM to allow for a better performance in a nested virtualization environment.
