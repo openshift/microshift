@@ -91,7 +91,7 @@ func (dm *manager) Backup(name BackupName) error {
 
 	dest := dm.GetBackupPath(name)
 
-	if err := copyDataDir(dest); err != nil {
+	if err := copyPath(config.DataDir, dest); err != nil {
 		return err
 	}
 
@@ -99,12 +99,51 @@ func (dm *manager) Backup(name BackupName) error {
 	return nil
 }
 
-func (dm *manager) Restore(n BackupName) error {
-	return fmt.Errorf("Restore not implemented")
+func (dm *manager) Restore(name BackupName) error {
+	klog.InfoS("Restoring the data", "storage", dm.storage, "name", name, "data", config.DataDir)
+
+	if name == "" {
+		return &EmptyArgErr{"name"}
+	}
+
+	if exists, err := dm.BackupExists(name); err != nil {
+		return fmt.Errorf("checking if backup %s exists failed: %w", name, err)
+	} else if !exists {
+		return fmt.Errorf("failed to restore backup, %s does not exist", name)
+	}
+
+	tmp := fmt.Sprintf("%s.saved", config.DataDir)
+	klog.InfoS("Temporarily renaming data dir", "data", config.DataDir, "renamedTo", tmp)
+	if err := os.Rename(config.DataDir, tmp); err != nil {
+		return fmt.Errorf("renaming %s to %s failed: %w", config.DataDir, tmp, err)
+	}
+
+	src := dm.GetBackupPath(name)
+	if err := copyPath(src, config.DataDir); err != nil {
+		klog.ErrorS(err, "Copying backup failed - restoring previous data dir")
+
+		if err := os.RemoveAll(config.DataDir); err != nil {
+			return fmt.Errorf("removing %s failed: %w", config.DataDir, err)
+		}
+
+		if err := os.Rename(tmp, config.DataDir); err != nil {
+			return fmt.Errorf("renaming %s to %s failed: %w", tmp, config.DataDir, err)
+		}
+
+		return fmt.Errorf("restoring backup %s failed: %w", src, err)
+	}
+
+	klog.InfoS("Removing temporary data dir", "path", tmp)
+	if err := os.RemoveAll(tmp); err != nil {
+		klog.ErrorS(err, "Failed to remove path", "path", tmp)
+	}
+
+	klog.InfoS("Restore finished", "backup", src, "data", config.DataDir)
+	return nil
 }
 
-func copyDataDir(dest string) error {
-	cmd := exec.Command("cp", append(cpArgs, config.DataDir, dest)...) //nolint:gosec
+func copyPath(src, dest string) error {
+	cmd := exec.Command("cp", append(cpArgs, src, dest)...) //nolint:gosec
 	klog.InfoS("Executing command", "cmd", cmd)
 
 	var outb, errb bytes.Buffer
