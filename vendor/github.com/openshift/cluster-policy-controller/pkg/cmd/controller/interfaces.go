@@ -141,13 +141,13 @@ func (c *EnhancedControllerContext) ToGenericInformer() genericinformers.Generic
 		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
 			return c.ImageInformers.ForResource(resource)
 		}),
-		genericinformers.GenericInternalResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
+		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
 			return c.QuotaInformers.ForResource(resource)
 		}),
 		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
 			return c.RouteInformers.ForResource(resource)
 		}),
-		genericinformers.GenericInternalResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
+		genericinformers.GenericResourceInformerFunc(func(resource schema.GroupVersionResource) (informers.GenericInformer, error) {
 			return c.TemplateInformers.ForResource(resource)
 		}),
 	)
