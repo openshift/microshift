@@ -82,7 +82,7 @@ fi
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     sudo dnf clean all -y
     sudo dnf update -y
-    sudo dnf install -y gcc git cockpit make jq selinux-policy-devel rpm-build jq bash-completion
+    sudo dnf install -y gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion
     sudo systemctl enable --now cockpit.socket
 fi
 
