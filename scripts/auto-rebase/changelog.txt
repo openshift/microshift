@@ -1,80 +1,74 @@
-- cluster-ingress-operator embedded-component 90d2feaaf3b4e657ce46098077e894aec053f7ca to b2af3796ef0ded090ebb837ba07cb6e2fb7978f3
-  - ee58397 2023-06-01T14:43:52-04:00 Pull operand proxy variables from the cluster proxy config instead of the ingress operator's environment
-  - b648921 2023-05-31T16:48:17-04:00 Revert "Revert "OCPBUGS-6661, OCPBUGS-9464: Move mTLS CRL handling into the router, and fix accidental duplication of CRLs""
-  - 8f98c61 2023-05-26T14:50:58-04:00 OCPBUGS-13963: Bump vendors k8s libraries to 0.27.2
+- oc image-arm64 60caadec339755236fdac53b50defd79991d3409 to 7339186217e1d2a37687d732e839b21dfea331d0
+  - a99b3f0 2023-05-17T09:47:41-07:00 OCPBUGS-11652: Extend adm node-logs to new API
 
-- cluster-kube-apiserver-operator embedded-component dbe789b8b0c0354e8094267d904b966e430104ed to 0afbcf1bafc85805fa9d8f8a55df1d7c27e47012
-  - 1996db8 2023-05-31T10:43:22+02:00 Change manifest directory permissions
-  - a9e50ec 2023-05-10T16:24:35-04:00 remove the old featureset flag from rendering
-  - 7b30080 2023-05-10T16:24:35-04:00 update library-go for render flag updates
+- router image-arm64 ec0a69fdd7b1dc8a968dc679fe39a7b99d3160c9 to 0cd9a58dff77127562f7851ccfa5cda79b8cef48
+  - ae441eb 2023-05-24T14:29:03+01:00 NE-1304: container builds: switch to haproxy26 package
 
-- cluster-kube-controller-manager-operator embedded-component c27b0e585ff6c7d68f72ce8a74ab90dd9567ed19 to 1e15498f434994aa6676c146638b886e08c93aa5
-  - b05a7f6 2023-05-31T10:57:51+02:00 Change manifest directory permissions
-  - df62336 2023-05-23T16:49:11+02:00 add "openshift-infra" into kubeInformers for StaticResourceController
-  - 349c769 2023-05-23T16:44:34+02:00 remove RBAC for cluster-policy-controller CM leader election
-
-- cluster-kube-scheduler-operator embedded-component d67fd0782ff7060e548446815f460d6c9e10e057 to f42458c923d20576d88decb5495888c410ac6051
-  - 7f0192a 2023-05-31T10:30:38+02:00 Change manifest directory permissions
-
-- cluster-network-operator embedded-component f68e72f6cf4315646e2baecf2f2e2370b012f2b8 to 6c0b42e4aec50b530ed68138435fb25101c5453b
-  - cfa1d6d 2023-05-29T18:31:20+02:00 OCPBUGS-11882: Added safe-to-evict annotation to ovnkube-master, multus admission controller and cloud-network-config components
-
-- cluster-openshift-controller-manager-operator embedded-component cb01e0b306daedbe42d50d9b0e88ce2618863647 to 2628fefee51de6da59388603881ea8d4f2b032d9
-  - 7cca767 2023-05-21T13:46:07+08:00 add loglevel controller for ocm-O
-
-- kubernetes embedded-component 15f19ea2dd700767e5337502aec753d2a6e26905 to cc041e853bbd41b7b675d3563c445d01336bda33
-  - b5a21166e 2023-06-01T14:51:32-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
-
-- openshift-controller-manager embedded-component 76ef4f658ee7a5e6e4038f2860ef2bb9bc36e579 to 41104bfd3c2a492e4e20516fd7065b9c86e2ad7e
-  - c5766ba 2023-06-01T15:28:18-04:00 code updates due to version bumps
-  - 145954f 2023-06-01T15:27:59-04:00 vendoring dependencies
-  - f83079e 2023-06-01T15:27:26-04:00 Updating Kubernetes and dependencies
-
-- oc image-amd64 943559197d1a94253672e26dbc356e062df7a66d to 60caadec339755236fdac53b50defd79991d3409
-  - 568677d 2023-05-31T10:10:54+02:00 oc adm groups sync: all groups: print warning before caching
-  - 97ef696 2023-05-11T14:40:23-04:00 OCPBUGS-12793: refactored the processing of the manifest list to serialize directly to dockerImage.Config
-  - 9b85730 2023-05-11T07:47:38-04:00 Use 'multi' when mirroring a multi release image
-
-- router image-amd64 5426a9b1597b9afd70b9d49caebe00cee6cc433f to ec0a69fdd7b1dc8a968dc679fe39a7b99d3160c9
-  - ab86723 2023-05-23T13:34:02-04:00 OCPBUGS-13969: Bump vendors k8s libraries to 0.27.2
-
-- ovn-kubernetes image-amd64 0f2fbd9d43d2681ad4bffb2f4a7b85a195fc989b to 8adae676ccfed289ea097ac70afe7970dca3f820
-  - 34cc232 2023-05-26T10:46:42+02:00 Bump OVN RPMs to 23.03.0-49.el9fdp
-  - 61e0379 2023-04-05T19:02:52+02:00 lb_config: Reduce number of required LB backend templates for NodePort.
-  - 4b3475a 2023-04-05T19:02:46+02:00 services: Use OVN template load balancers for NodePort services.
-  - 91b2e29 2023-04-05T09:38:22+02:00 model_client: Properly update map values.
-  - 0cdb9ec 2023-04-05T09:38:22+02:00 fedora: Update OVN to 23.03.0-16.
-  - 7e7e141 2023-04-05T09:38:22+02:00 dbs: Bump OVN schema to 23.03.
-  - b79d290 2023-04-05T09:38:22+02:00 Rename OVN_VERSION to OVN_SCHEMA_VERSION.
-  - 3207e3f 2023-04-05T09:38:22+02:00 lb_config: Merge LB referenced groups when merging LBs.
-  - c258f60 2023-04-05T09:38:22+02:00 node_tracker: Store node IPs as net.IP instead of string.
-  - 9ded3d8 2023-04-05T09:38:22+02:00 node_tracker: Track node chassis IDs too.
-  - b1fba8f 2023-04-05T09:38:22+02:00 services_controller_test: Test with LB groups enabled.
-
-- kubernetes image-amd64 15f19ea2dd700767e5337502aec753d2a6e26905 to cc041e853bbd41b7b675d3563c445d01336bda33
-  - b5a21166e 2023-06-01T14:51:32-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
-
-- oc image-arm64 943559197d1a94253672e26dbc356e062df7a66d to 60caadec339755236fdac53b50defd79991d3409
-  - 568677d 2023-05-31T10:10:54+02:00 oc adm groups sync: all groups: print warning before caching
-  - 97ef696 2023-05-11T14:40:23-04:00 OCPBUGS-12793: refactored the processing of the manifest list to serialize directly to dockerImage.Config
-  - 9b85730 2023-05-11T07:47:38-04:00 Use 'multi' when mirroring a multi release image
-
-- router image-arm64 5426a9b1597b9afd70b9d49caebe00cee6cc433f to ec0a69fdd7b1dc8a968dc679fe39a7b99d3160c9
-  - ab86723 2023-05-23T13:34:02-04:00 OCPBUGS-13969: Bump vendors k8s libraries to 0.27.2
-
-- ovn-kubernetes image-arm64 0f2fbd9d43d2681ad4bffb2f4a7b85a195fc989b to 8adae676ccfed289ea097ac70afe7970dca3f820
-  - 34cc232 2023-05-26T10:46:42+02:00 Bump OVN RPMs to 23.03.0-49.el9fdp
-  - 61e0379 2023-04-05T19:02:52+02:00 lb_config: Reduce number of required LB backend templates for NodePort.
-  - 4b3475a 2023-04-05T19:02:46+02:00 services: Use OVN template load balancers for NodePort services.
-  - 91b2e29 2023-04-05T09:38:22+02:00 model_client: Properly update map values.
-  - 0cdb9ec 2023-04-05T09:38:22+02:00 fedora: Update OVN to 23.03.0-16.
-  - 7e7e141 2023-04-05T09:38:22+02:00 dbs: Bump OVN schema to 23.03.
-  - b79d290 2023-04-05T09:38:22+02:00 Rename OVN_VERSION to OVN_SCHEMA_VERSION.
-  - 3207e3f 2023-04-05T09:38:22+02:00 lb_config: Merge LB referenced groups when merging LBs.
-  - c258f60 2023-04-05T09:38:22+02:00 node_tracker: Store node IPs as net.IP instead of string.
-  - 9ded3d8 2023-04-05T09:38:22+02:00 node_tracker: Track node chassis IDs too.
-  - b1fba8f 2023-04-05T09:38:22+02:00 services_controller_test: Test with LB groups enabled.
-
-- kubernetes image-arm64 15f19ea2dd700767e5337502aec753d2a6e26905 to cc041e853bbd41b7b675d3563c445d01336bda33
-  - b5a21166e 2023-06-01T14:51:32-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
+- ovn-kubernetes image-arm64 8adae676ccfed289ea097ac70afe7970dca3f820 to 2fc3d892ae9e3ac508f005c255dab2f01d8c666d
+  - d7e5bb9 2023-06-01T09:38:24+02:00 Add enable-multi-networkpolicy CLI flag
+  - fe63418 2023-06-01T07:14:48+02:00 Fix cleanupStalePodSNATs if no podIPs are found
+  - d414888 2023-06-01T07:14:43+02:00 Extract all namespace pod ips only when creating nsInfo.
+  - 9e4bb07 2023-04-28T14:11:17+00:00 Bump golang.org/x/crypto in /test/e2e
+  - 891ee94 2023-04-27T16:17:20+02:00 e2e, multi-homing: add tests for localnet
+  - 0bd35c1 2023-04-27T16:17:20+02:00 e2e, multi-homing: refactor `connectToServer` func
+  - cecb2be 2023-04-27T16:17:20+02:00 e2e, multi-homing: move stuff around to an utils file
+  - 2b517fa 2023-04-27T16:17:19+02:00 multi-homing, policy, e2e: add test with namespaceSelectors
+  - d7d48b7 2023-04-27T10:16:39-04:00 if egressfirewall DNS result is truncated fall back to TCP
+  - c2651f2 2023-04-27T11:46:34+02:00 Fix go mod vendor; go mod tidy; error
+  - 0b570a1 2023-04-26T19:11:32+02:00 Add netpol unit test for network policies with equivalent CIDR-based rules.
+  - d785c01 2023-04-26T19:11:05+02:00 netpol unittest refactoring: 1. make new function with less args for most popular usages 2. update getDefaultDenyData to getDefaultDenyDataHelper, abstract it to work with any number of network policies in the same namespace 3. add helpers getNamespaceWithSinglePolicyExpectedData and getNamespaceWithMultiplePoliciesExpectedData to get expected db data. It is not always possible use these functions, if extra arguments need to be passed, or if the internals on gress and default deny data need to be adjusted because acls are not cleaned up by the test server. 4. update 2-line err := app.Run([]string{app.Name}) gomega.Expect(err).NotTo(gomega.HaveOccurred()) to 1-line gomega.Expect(app.Run([]string{app.Name})).To(gomega.Succeed())
+  - d33ccd8 2023-04-26T14:14:56+01:00 Fail if we found default gw for v4, but not for v6
+  - 43d3dde 2023-04-26T13:12:46+02:00 Replace deprecated BoolPtr with Bool from k8s.io/utils/pointer
+  - 8c7ea95 2023-04-26T13:12:42+02:00 Cleanup of endpoint handling functions
+  - b028d6f 2023-04-26T12:21:57+02:00 multi-homing, policy, e2e: add test with ipBlock for routed topo
+  - 0ae80e7 2023-04-26T12:21:57+02:00 multi-homing, policy, e2e: add test with ipBlock
+  - 82cbc38 2023-04-26T12:21:57+02:00 multi-homing, policy, e2e: assert feature works via e2e tests
+  - 5283e00 2023-04-25T17:58:39-07:00 add DPU support for secondary network
+  - 9f8f606 2023-04-25T17:58:39-07:00 fix several CNI issues
+  - 78a88df 2023-04-25T17:58:39-07:00 fix several issues in watchPodsDPU()
+  - 9161599 2023-04-25T08:51:31-07:00 add multi-network-policy unit testing cases
+  - c973d61 2023-04-24T17:28:32-07:00 add multi-policy support to secondary network controller
+  - 04201ab 2023-04-24T17:28:31-07:00 MultiNetworkPolicy, multi-policy handlers: watch multi-policy provisioning
+  - c55c557 2023-04-21T16:07:26+00:00 Temporary fix for metallb issue
+  - 8bd9b3e 2023-04-21T17:35:40+02:00 Fix ETP iptables for shared gateway mode
+  - b37a99e 2023-04-21T08:19:01-07:00 Add Scalable Functions support
+  - 5e8b6d0 2023-04-21T14:42:06+00:00 Add logical router name as client index
+  - 4962a23 2023-04-21T14:42:06+00:00 Add logical switch name as client index
+  - c6dc8e2 2023-04-18T11:25:10+08:00 Detect bridge name when 'gateway-interface' is specified
+  - d5d8586 2023-04-17T20:45:05+02:00 Added option to install additional cni plugins to kind.sh
+  - ad052c1 2023-04-17T10:55:45+02:00 Use loadbalancer.Name as client index Revert predicate search optimization 3369d387417ede05033c002b782b0279b201ea76 as predicate search should not bee needed anymore
+  - 2adc58f 2023-04-14T13:13:51-04:00 Convert unstortedList() to sets.List()
+  - dde7ea8 2023-04-14T17:16:42+02:00 Serve NodePort services on every `host-addresses`
+  - 09f7548 2023-04-14T16:45:59+02:00 Improve e2e test assertion message
+  - 978e4d9 2023-04-14T22:43:57+08:00 Make --gateway-nexthop support dual-stack
+  - f7469b5 2023-04-13T21:50:49+02:00 Automatically copy yamls as j2 files
+  - 3395e83 2023-04-13T19:03:26+02:00 Add unit test to check multicast+long ns name work
+  - 030a4ee 2023-04-13T19:03:24+02:00 Add info about -me flag to kind helper
+  - 357e79b 2023-04-12T10:09:47-04:00 remove the fakeaddressset code from egress_firewall_test.go
+  - bf3da15 2023-04-12T08:57:26+02:00 Ensure VF representor is not managed by OVS before renaming.
+  - 0c79228 2023-04-12T00:12:20-05:00 clustermanager: update node annotations on dual->single stack converstion
+  - 8f0bfab 2023-04-11T19:41:53+02:00 Consider serving endpoints in hasLocalHostNetworkEndpoints
+  - 71232c9 2023-04-11T23:23:29+08:00 Add -scm to the output of kind.sh --help
+  - e069c2b 2023-04-11T23:23:28+08:00 Remove the local gw node-ip migration lane from CI
+  - fd69b62 2023-04-11T23:23:28+08:00 Add compact-mode test to CI
+  - 2d6b870 2023-04-11T23:22:32+08:00 Add compact mode support to kind.sh
+  - bff6a06 2023-04-11T10:12:10-04:00 allow the use of the regular addressset in testing
+  - b14eb72 2023-04-11T08:53:36-05:00 Small cleanups to log messages and test suite name
+  - d9d6187 2023-04-10T20:38:55+02:00 Updating endpoints when using allocateLBNP=0, lgw mode fails
+  - c1cf2db 2023-04-07T10:52:25+02:00 Make `pokeEndpoint` not failing in case of error
+  - 2a89def 2023-04-06T20:54:02+02:00 services: Don't try to list/cleanup templates when OVN doesn't support that.
+  - ffdcf1b 2023-04-06T16:53:03+02:00 delete getNewLocalPolicyPorts log
+  - b7afb8a 2023-04-06T16:52:37+02:00 optimize deleteStaleNetpolPeerAddrSets to iterate over all acls only once
+  - 9d216fc 2023-04-06T15:47:02+02:00 Use PrimaryID as a client index for ACL.
+  - fc17f7e 2023-04-04T11:37:48+02:00 Separate make modelgen from make codegen
+  - ab51224 2023-04-03T13:11:23-07:00 vendor: bump containernetworking/plugins to v1.2.0
+  - 448cfc1 2023-04-03T14:28:40+02:00 Update e2e tests for acl logging with the new acl names. Now Egress firewall ACLs are named "EF:<namespace>:<priority>" default deny netpol ACLs "NP:<namespace>:<direction>" gress ACLs "NP:<policyNamespace>:<policyName>:<direction>:<gressIdx>"
+  - 447b11b 2023-04-03T14:28:39+02:00 Finalize new ACL dbIndex usage: 1. rename BuildACLFromDbIndex to BuildACL, since it is the only method that should be used now. 2. Rename getACLMatchFromACLDir to getACLMatch, remove stale version. 3. update isEquivalentACL to checkACLPrimaryID, that matches on primaryID until we get client indexes. 4. Add acls.md doc explaining all acls that are used by ovn-k and their dependencies with examples 5. Update multicast docs
+  - d75cee1 2023-04-03T13:00:30+02:00 Update EgressFirewall ACLs to have new dbIndex. Add EgressFirewallOwnerType for egress firewall ACLs.
+  - 28396ad 2023-04-03T13:00:28+02:00 Update DefaultDeny ACLs to have new dbIDs. Add NetpolNamespaceOwnerType for namespace-wide default deny acls.
+  - 2aab19e 2023-04-03T12:58:56+02:00 Update gress policy ACLs to use new dbIndex. Move gress-related constants from policy.go to gress_policy.go. Use old externalIDs for syncs only.
+  - cb4c4b3 2023-04-03T12:54:40+02:00 Allow from node ACL: 1. Use dbIDs with new NetpolNodeOwnerType 2. Add aclSync for allow from node ACL 3. Rework AllowFromNode ACL unit tests to run everything for ipv4 and ipv6
+  - f89913e 2023-04-03T12:54:39+02:00 Start using new ExternalIDs for ACLs. Multicast. Add new BuildACLFromDbIDs function, that should be the only one used in the end of acls indexes update.
+  - 18dcd72 2023-04-03T12:54:39+02:00 rename aclType to aclPipelineType, add aclDirection type to separate intention from implementation.
+  - 11b7e2f 2023-04-03T12:54:39+02:00 update all fields on CreateOrUpdateACLsOps, especially for nil values, which mean reset, not ignore. When acls are updated on initial sync (by handling add events) if namespace log levels were reset, acls should also be updated with nil Severity.
 
