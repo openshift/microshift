@@ -65,7 +65,23 @@ func (pr *PreRun) Perform() error {
 	klog.InfoS("Previous boot", "health", health.Health, "deploymentID", health.DeploymentID, "bootID", health.BootID)
 
 	if health.IsHealthy() {
-		return pr.backup(health)
+		if err := pr.backup(health); err != nil {
+			return err
+		}
+
+		migrationNeeded, err := pr.checkVersions()
+		if err != nil {
+			return err
+		}
+
+		klog.InfoS("Version checks successful", "is-migration-needed?", migrationNeeded)
+
+		if migrationNeeded {
+			_ = migrationNeeded
+			// TODO: data migration
+		}
+
+		return nil
 	}
 
 	return pr.restore()
@@ -125,6 +141,31 @@ func (pr *PreRun) restore() error {
 	}
 
 	return pr.dataManager.Restore(backupsForDeployment[0])
+}
+
+// checkVersions compares version of data and executable
+//
+// It returns true if migration should be performed.
+// It returns non-nil error if difference between versions is unsupported.
+func (pr *PreRun) checkVersions() (bool, error) {
+	execVer, err := getVersionOfExecutable()
+	if err != nil {
+		return false, err
+	}
+
+	dataVer, err := getVersionOfData()
+	if err != nil {
+		if errors.Is(err, errDataVersionDoesNotExist) {
+			klog.InfoS("Version file of data does not exist - assuming data version is 4.13")
+			// TODO: 4.13
+			return true, nil
+		}
+		return false, err
+	}
+
+	klog.InfoS("Checking version difference between data and executable", "data", dataVer, "exec", execVer)
+
+	return checkVersionDiff(execVer, dataVer)
 }
 
 func getCurrentDeploymentID() (string, error) {

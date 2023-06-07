@@ -119,6 +119,10 @@ func RunMicroshift(cfg *config.Config) error {
 		return fmt.Errorf("failed to create dir %q: %w", config.DataDir, err)
 	}
 
+	if err := prerun.CreateOrValidateDataVersion(); err != nil {
+		return err
+	}
+
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	certChains, err := initCerts(cfg)
 	if err != nil {
