@@ -31,6 +31,23 @@ Rebooting Healthy System Should Result In Data Backup
 
     Backup For Booted Deployment Should Exist
 
+Rebooting Unhealthy System Should Result In Restoring Data From A Backup
+    [Documentation]    Check if rebooting unhealthy system will result
+    ...    restoring MicroShift data from a backup
+
+    Wait Until Greenboot Health Check Exited    # we don't want greenboot to overwrite health.json
+    Remove Existing Backup For Current Deployment
+
+    ${backup_name}=    Make Masquerading Backup
+    Create Marker In Backup Dir    ${backup_name}
+
+    Mark System As Unhealthy    # to trigger restore after reboot
+    Reboot MicroShift Host
+    Wait For MicroShift Service
+
+    Marker Should Exist In Data Dir
+    Remove Marker From Data Dir
+
 
 *** Keywords ***
 Setup
@@ -76,3 +93,49 @@ System Should Be Healthy
     [Documentation]    Asserts that persisted health information is "healthy"
     ${health}=    Get System Health
     Should Be Equal As Strings    healthy    ${health}
+
+Make Masquerading Backup
+    [Documentation]    Stops MicroShift and creates manual backup that
+    ...    masquerades as automated one (by prefixing the backup name with deployment ID)
+    Systemctl    stop    microshift.service
+
+    ${deploy_id}=    Get Booted Deployment ID
+    ${backup_name}=    Set Variable    ${deploy_id}_manual
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    microshift admin data backup --name "${backup_name}"
+    ...    sudo=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
+    RETURN    ${backup_name}
+
+Mark System As Unhealthy
+    [Documentation]    Marks systems as unhealthy by executing microshift's red script
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    /etc/greenboot/red.d/40_microshift_set_unhealthy.sh
+    ...    sudo=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
+Create Marker In Backup Dir
+    [Documentation]    Creates a marker file in backup directory
+    [Arguments]    ${backup_name}
+
+    # create a marker that we expect to show up in data directory after restore
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    touch ${BACKUP_STORAGE}/${backup_name}/marker
+    ...    sudo=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
+Marker Should Exist In Data Dir
+    [Documentation]    Checks if marker file exists in MicroShift data directory
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    stat ${DATA_DIR}/marker
+    ...    sudo=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
+Remove Marker From Data Dir
+    [Documentation]    Removes marker file from MicroShift data directory
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    rm -fv ${DATA_DIR}/marker
+    ...    sudo=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
