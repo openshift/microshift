@@ -104,3 +104,19 @@ func getVersionOfData() (versionMetadata, error) {
 
 	return versionMetadataFromString(string(versionFileContents))
 }
+
+func checkVersionDiff(execVer, dataVer versionMetadata) (bool, error) {
+	if execVer == dataVer {
+		return false, nil
+	}
+
+	if execVer.X != dataVer.X {
+		return false, fmt.Errorf("major (X) versions are different: %d and %d", dataVer.X, execVer.X)
+	}
+
+	if execVer.Y < dataVer.Y {
+		return false, fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
+	}
+
+	return false, nil
+}
