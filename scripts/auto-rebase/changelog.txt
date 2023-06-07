@@ -1,0 +1,8 @@
+# router image-amd64 e28644631982fb4596e065d3ae85099f0886829d to 065deab84f342615db2d2f5c78a19ae04bb43912
+9af59fceebfe478ed69fede910e5a5d92ae586bf 2023-05-23T15:10:16+00:00 Revert to pkix.CertificateList instead of x509.RevocationList
+971e6124169ec10e6e6aa9e39002066cf025f10d 2023-05-23T15:10:16+00:00 Cache current CRLs in memory instead of re-parsing from disk
+876f51adeed692dc01009d15972884190360c3a1 2023-05-23T15:10:16+00:00 Download and manage CRLs in openshift-router
+# router image-arm64 e28644631982fb4596e065d3ae85099f0886829d to 065deab84f342615db2d2f5c78a19ae04bb43912
+9af59fceebfe478ed69fede910e5a5d92ae586bf 2023-05-23T15:10:16+00:00 Revert to pkix.CertificateList instead of x509.RevocationList
+971e6124169ec10e6e6aa9e39002066cf025f10d 2023-05-23T15:10:16+00:00 Cache current CRLs in memory instead of re-parsing from disk
+876f51adeed692dc01009d15972884190360c3a1 2023-05-23T15:10:16+00:00 Download and manage CRLs in openshift-router
