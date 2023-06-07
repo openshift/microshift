@@ -3,7 +3,6 @@ package prerun
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/pkg/errors"
 	"k8s.io/klog/v2"
 )
 
@@ -43,38 +43,54 @@ func New(dataManager data.Manager) *PreRun {
 }
 
 func (pr *PreRun) Perform() error {
+	klog.InfoS("Starting pre-run")
+
 	health, err := getHealthInfo()
 	if err != nil {
 		if errors.Is(err, errHealthFileDoesNotExist) {
-			klog.InfoS("Health file does not exist - skipping backup")
+			klog.InfoS("Skipping pre-run: Health status file does not exist")
 			return nil
 		}
-		return err
+		return errors.Wrap(err, "Failed to determine the current system health")
 	}
 
-	if isCurr, err := containsCurrentBootID(health.BootID); err != nil {
-		return err
-	} else if isCurr {
+	currentBootID, err := getCurrentBootID()
+	if err != nil {
+		return errors.Wrap(err, "Failed to determine the current boot ID")
+	}
+
+	klog.InfoS("Found boot details",
+		"health", health.Health,
+		"deploymentID", health.DeploymentID,
+		"previousBootID", health.BootID,
+		"currentBootID", currentBootID,
+	)
+
+	if currentBootID == health.BootID {
 		// This might happen if microshift is (re)started after greenboot finishes running.
 		// Green script will overwrite the health.json with
 		// current boot's ID, deployment ID, and health.
-		klog.InfoS("Health file contains current boot - skipping pre-run")
+		klog.InfoS("Skipping pre-run: Health file refers to the current boot ID")
 		return nil
 	}
 
-	klog.InfoS("Previous boot", "health", health.Health, "deploymentID", health.DeploymentID, "bootID", health.BootID)
-
+	// TODO: We may end up needing to split this if statement into
+	// functions, but for now let's just tell the linter not to apply
+	// the rule.
+	//
+	//nolint:nestif
 	if health.IsHealthy() {
+		klog.Info("Previous boot was healthy")
 		if err := pr.backup(health); err != nil {
-			return err
+			return errors.Wrap(err, "Failed to backup during pre-run")
 		}
 
 		migrationNeeded, err := pr.checkVersions()
 		if err != nil {
-			return err
+			return errors.Wrap(err, "Failed version checks")
 		}
 
-		klog.InfoS("Version checks successful", "is-migration-needed?", migrationNeeded)
+		klog.InfoS("Completed version checks", "is-migration-needed?", migrationNeeded)
 
 		if migrationNeeded {
 			_ = migrationNeeded
@@ -82,17 +98,27 @@ func (pr *PreRun) Perform() error {
 		}
 
 		return nil
+	} else {
+		klog.Info("Previous boot was not healthy")
+		if err = pr.restore(); err != nil {
+			return errors.Wrap(err, "Failed to restore during pre-run")
+		}
 	}
 
-	return pr.restore()
+	klog.InfoS("Finished pre-run")
+	return nil
 }
 
 func (pr *PreRun) backup(health *HealthInfo) error {
-	klog.InfoS("Backing up the data for deployment", "deployment", health.DeploymentID)
+	newBackupName := health.BackupName()
+	klog.InfoS("Preparing to backup",
+		"deploymentID", health.DeploymentID,
+		"name", newBackupName,
+	)
 
 	existingBackups, err := pr.dataManager.GetBackupList()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to determine the existing backups")
 	}
 
 	// get list of already existing backups for deployment ID persisted in health file
@@ -100,39 +126,48 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 	// (so only the most recent one for specific deployment is kept)
 	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, health.DeploymentID)
 
-	newBackupName := health.BackupName()
 	if backupAlreadyExists(backupsForDeployment, newBackupName) {
-		klog.InfoS("Backup already exists", "name", newBackupName)
+		klog.InfoS("Skipping backup: Backup already exists",
+			"deploymentID", health.DeploymentID,
+			"name", newBackupName,
+		)
 		return nil
 	}
 
 	if err := pr.dataManager.Backup(newBackupName); err != nil {
-		return err
+		return errors.Wrap(err, fmt.Sprintf("Failed to create new backup %q", newBackupName))
 	}
 
 	pr.removeOldBackups(backupsForDeployment)
 
+	klog.InfoS("Finished backup",
+		"deploymentID", health.DeploymentID,
+		"destination", newBackupName,
+	)
 	return nil
 }
 
 func (pr *PreRun) restore() error {
 	// TODO: Check if containers are already running (i.e. microshift.service was restarted)?
+	klog.Info("Preparing to restore")
 
 	currentDeploymentID, err := getCurrentDeploymentID()
 	if err != nil {
 		return err
 	}
-	klog.InfoS("Restoring data for current deployment", "deployID", currentDeploymentID)
 
 	existingBackups, err := pr.dataManager.GetBackupList()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to determine the existing backups")
 	}
-	klog.InfoS("List of existing backups", "backups", existingBackups)
+	klog.InfoS("Found existing backups",
+		"currentDeploymentID", currentDeploymentID,
+		"backups", existingBackups,
+	)
 	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, currentDeploymentID)
 
 	if len(backupsForDeployment) == 0 {
-		return fmt.Errorf("there is no backup to restore for current deployment (%s)", currentDeploymentID)
+		return fmt.Errorf("there is no backup to restore for current deployment %q", currentDeploymentID)
 	}
 
 	if len(backupsForDeployment) > 1 {
@@ -140,7 +175,13 @@ func (pr *PreRun) restore() error {
 		klog.InfoS("TODO: more than 1 backup, need to pick most recent one")
 	}
 
-	return pr.dataManager.Restore(backupsForDeployment[0])
+	err = pr.dataManager.Restore(backupsForDeployment[0])
+	if err != nil {
+		return errors.Wrap(err, "Failed to restore backup")
+	}
+
+	klog.Info("Finished restore")
+	return nil
 }
 
 // checkVersions compares version of data and executable
@@ -148,9 +189,10 @@ func (pr *PreRun) restore() error {
 // It returns true if migration should be performed.
 // It returns non-nil error if difference between versions is unsupported.
 func (pr *PreRun) checkVersions() (bool, error) {
+	klog.Info("Starting version checks")
 	execVer, err := getVersionOfExecutable()
 	if err != nil {
-		return false, err
+		return false, errors.Wrap(err, "Failed to determine the active version of the MicroShift")
 	}
 
 	dataVer, err := getVersionOfData()
@@ -160,10 +202,10 @@ func (pr *PreRun) checkVersions() (bool, error) {
 			// TODO: 4.13
 			return true, nil
 		}
-		return false, err
+		return false, errors.Wrap(err, "Failed to determine the version of the existing data")
 	}
 
-	klog.InfoS("Checking version difference between data and executable", "data", dataVer, "exec", execVer)
+	klog.InfoS("Comparing versions", "data", dataVer, "active", execVer)
 
 	return checkVersionDiff(execVer, dataVer)
 }
@@ -175,45 +217,44 @@ func getCurrentDeploymentID() (string, error) {
 	cmd.Stderr = &stderr
 
 	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("command %s failed: %s", strings.TrimSpace(cmd.String()), strings.TrimSpace(stderr.String()))
+		return "", fmt.Errorf("Failed to determine the rpm-ostree deployment id, command %q failed: %s", strings.TrimSpace(cmd.String()), strings.TrimSpace(stderr.String()))
 	}
 
 	ids := []string{}
 	if err := json.Unmarshal(stdout.Bytes(), &ids); err != nil {
-		return "", fmt.Errorf("unmarshalling '%s' to json failed: %w", strings.TrimSpace(stdout.String()), err)
+		return "", errors.Wrap(err, fmt.Sprintf("Failed to determine the rpm-ostree deployment id from %q", strings.TrimSpace(stdout.String())))
 	}
 
 	if len(ids) != 1 {
 		// this shouldn't happen if running on ostree system, but just in case
-		klog.ErrorS(nil, "Unexpected amount of deployments in rpm-ostree output",
+		klog.ErrorS(nil, "Unexpected number of deployments in rpm-ostree output",
 			"cmd", cmd.String(),
 			"stdout", strings.TrimSpace(stdout.String()),
 			"stderr", strings.TrimSpace(stderr.String()),
 			"unmarshalledIDs", ids)
-		return "", fmt.Errorf("rpm-ostree returned unexpected amount of deployment IDs: %d", len(ids))
+		return "", fmt.Errorf("Expected 1 deployment ID, rpm-ostree returned %d", len(ids))
 	}
 
 	return ids[0], nil
 }
 
 func (pr *PreRun) removeOldBackups(backups []data.BackupName) {
+	klog.Info("Preparing to prune backups")
 	for _, b := range backups {
-		klog.InfoS("Removing older backup", "name", b)
 		if err := pr.dataManager.RemoveBackup(b); err != nil {
-			klog.ErrorS(err, "Failed to remove backup", "name", b)
+			klog.ErrorS(err, "Failed to remove backup, ignoring", "name", b)
 		}
 	}
+	klog.Info("Finished pruning backups")
 }
 
-func containsCurrentBootID(id string) (bool, error) {
+func getCurrentBootID() (string, error) {
 	path := "/proc/sys/kernel/random/boot_id"
 	content, err := os.ReadFile(path)
 	if err != nil {
-		return false, fmt.Errorf("reading file %s failed: %w", path, err)
+		return "", errors.Wrap(err, fmt.Sprintf("Failed to determine boot ID from %s", path))
 	}
-	currentBootID := strings.ReplaceAll(strings.TrimSpace(string(content)), "-", "")
-	klog.InfoS("Comparing boot IDs", "current", currentBootID, "toCompare", id)
-	return id == currentBootID, nil
+	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
 }
 
 func getHealthInfo() (*HealthInfo, error) {
@@ -226,12 +267,12 @@ func getHealthInfo() (*HealthInfo, error) {
 
 	content, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("reading file %s failed: %w", path, err)
+		return nil, errors.Wrap(err, fmt.Sprintf("Failed to read health data from %q", path))
 	}
 
 	health := &HealthInfo{}
 	if err := json.Unmarshal(content, &health); err != nil {
-		return nil, fmt.Errorf("unmarshalling '%s' failed: %w", strings.TrimSpace(string(content)), err)
+		return nil, errors.Wrap(err, fmt.Sprintf("Failed to parse health data %q", strings.TrimSpace(string(content))))
 	}
 	return health, nil
 }
