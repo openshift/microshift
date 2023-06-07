@@ -70,6 +70,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [MicroShift Host Networking Overview](./docs/network/host_networking.md)
 - [MicroShift Traffic Flows Overview](./docs/network/ovn_kubernetes_traffic_flows.md)
 - [Testing MicroShift Integration with Greenboot](./docs/greenboot_dev.md)
+- [Multinode Testing Environment for MicroShift](./docs/multinode/setup.md)
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.

@@ -162,6 +162,11 @@ install_caddy_rpm() {
     fi
 }
 
+open_repo_permissions() {
+    find "$1" -type f -exec chmod a+r  {} \;
+    find "$1" -type d -exec chmod a+rx {} \;
+}
+
 # Parse the command line
 while [ $# -gt 0 ] ; do
     case $1 in
@@ -279,6 +284,7 @@ if [ "$(find microshift-local -name '*.rpm' | wc -l)" -eq 0 ] ; then
     exit 1
 fi
 createrepo microshift-local >/dev/null
+open_repo_permissions microshift-local
 
 # Determine the image version from the RPM contents
 RELEASE_INFO_FILE=$(find . -name 'microshift-release-info-*.rpm' | tail -1)
@@ -309,6 +315,7 @@ if [ "$(find openshift-local -name '*.rpm' | wc -l)" -eq 0 ] ; then
     exit 1
 fi
 createrepo openshift-local >/dev/null
+open_repo_permissions openshift-local
 
 # Install prometheus process exporter
 install_prometheus_rpm
@@ -325,6 +332,7 @@ if [ -n "${CUSTOM_RPM_FILES}" ] ; then
         cp "${rpm}" custom-rpms
     done
     createrepo custom-rpms >/dev/null
+    open_repo_permissions custom-rpms
 fi
 
 title "Loading sources for OpenShift and MicroShift"
@@ -358,23 +366,21 @@ if ${EMBED_CONTAINERS} ; then
         >> blueprint_v0.0.1.toml
 fi
 
-# Add open firewall ports
-if [ -n "${OPEN_FIREWALL_PORTS}" ] ; then
-    for port in ${OPEN_FIREWALL_PORTS//,/ } ; do
-        cat >> blueprint_v0.0.1.toml <<EOF
-
-[customizations.firewall]
-ports = ["${port}"]
-EOF
-    done
+# Open the firewall ports required by Prometheus
+if ${PROMETHEUS} ; then
+    if [ -z "${OPEN_FIREWALL_PORTS}" ] ; then
+        OPEN_FIREWALL_PORTS="9256:tcp"
+    else
+        OPEN_FIREWALL_PORTS+=",9256:tcp"
+    fi
 fi
 
-# Add the firewall customization required by Prometheus
-if ${PROMETHEUS} ; then
+# Add open firewall ports to the blueprint
+if [ -n "${OPEN_FIREWALL_PORTS}" ] ; then
     cat >> blueprint_v0.0.1.toml <<EOF
 
 [customizations.firewall]
-ports = ["9256:tcp"]
+ports = ["${OPEN_FIREWALL_PORTS//,/\", \"}"]
 EOF
 fi
 
