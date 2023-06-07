@@ -43,7 +43,7 @@ Access Hello Microshift Via LB
     ${result}=    Run Process
     ...    curl -i http://hello-microshift.cluster.local --connect-to "hello-microshift.cluster.local:80:${USHIFT_HOST}:5678"
     ...    shell=True    timeout=15s
-    Log    ${result}
+    Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
     Should Be Equal As Integers    ${result.rc}    0
     Should Match Regexp    ${result.stdout}    HTTP.*200
     Should Match    ${result.stdout}    *Hello MicroShift*
