@@ -1,0 +1,22 @@
+---
+name: "Staticcheck"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.go'
+  pull_request:
+    paths:
+      - '**.go'
+jobs:
+  staticcheck:
+    name: "Staticcheck"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - uses: dominikh/staticcheck-action@v1.2.0
+        with:
+          version: "2022.1.1"
