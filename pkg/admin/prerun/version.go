@@ -54,32 +54,32 @@ func CreateOrValidateDataVersion() error {
 }
 
 type versionMetadata struct {
-	X, Y int
+	Major, Minor int
 }
 
 func (v versionMetadata) String() string {
-	return fmt.Sprintf("%d.%d", v.X, v.Y)
+	return fmt.Sprintf("%d.%d", v.Major, v.Minor)
 }
 
-// versionMetadataFromString creates versionMetadata object from "X.Y" string where X and Y are integers
-func versionMetadataFromString(xy string) (versionMetadata, error) {
-	xy = strings.TrimSpace(xy)
-	xys := strings.Split(xy, ".")
-	if len(xys) != 2 {
-		return versionMetadata{}, fmt.Errorf("invalid version string (%s): expected X.Y", xy)
+// versionMetadataFromString creates versionMetadata object from "major.minor" string where X and Y are integers
+func versionMetadataFromString(majorMinor string) (versionMetadata, error) {
+	majorMinor = strings.TrimSpace(majorMinor)
+	majorMinorSplit := strings.Split(majorMinor, ".")
+	if len(majorMinorSplit) != 2 {
+		return versionMetadata{}, fmt.Errorf("invalid version string (%s): expected X.Y", majorMinor)
 	}
 
-	x, err := strconv.Atoi(xys[0])
+	major, err := strconv.Atoi(majorMinorSplit[0])
 	if err != nil {
-		return versionMetadata{}, fmt.Errorf("converting '%s' to an int failed: %w", xys[0], err)
+		return versionMetadata{}, fmt.Errorf("converting '%s' to an int failed: %w", majorMinorSplit[0], err)
 	}
 
-	y, err := strconv.Atoi(xys[1])
+	minor, err := strconv.Atoi(majorMinorSplit[1])
 	if err != nil {
-		return versionMetadata{}, fmt.Errorf("converting '%s' to an int failed: %w", xys[1], err)
+		return versionMetadata{}, fmt.Errorf("converting '%s' to an int failed: %w", majorMinorSplit[1], err)
 	}
 
-	return versionMetadata{X: x, Y: y}, nil
+	return versionMetadata{Major: major, Minor: minor}, nil
 }
 
 func getVersionOfExecutable() (versionMetadata, error) {
@@ -110,11 +110,11 @@ func checkVersionDiff(execVer, dataVer versionMetadata) (bool, error) {
 		return false, nil
 	}
 
-	if execVer.X != dataVer.X {
-		return false, fmt.Errorf("major (X) versions are different: %d and %d", dataVer.X, execVer.X)
+	if execVer.Major != dataVer.Major {
+		return false, fmt.Errorf("major versions are different: %d and %d", dataVer.Major, execVer.Major)
 	}
 
-	if execVer.Y < dataVer.Y {
+	if execVer.Minor < dataVer.Minor {
 		return false, fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
 	}
 

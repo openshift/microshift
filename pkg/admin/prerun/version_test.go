@@ -7,7 +7,6 @@ import (
 )
 
 func TestCheckVersionDiff(t *testing.T) {
-
 	testData := []struct {
 		name                      string
 		execVer                   versionMetadata
@@ -17,22 +16,22 @@ func TestCheckVersionDiff(t *testing.T) {
 	}{
 		{
 			name:                      "equal versions: no migration, no error",
-			execVer:                   versionMetadata{X: 4, Y: 14},
-			dataVer:                   versionMetadata{X: 4, Y: 14},
+			execVer:                   versionMetadata{Major: 4, Minor: 14},
+			dataVer:                   versionMetadata{Major: 4, Minor: 14},
 			expectedMigrationRequired: false,
 			errExpected:               false,
 		},
 		{
 			name:                      "X versions must be the same",
-			execVer:                   versionMetadata{X: 4, Y: 14},
-			dataVer:                   versionMetadata{X: 5, Y: 14},
+			execVer:                   versionMetadata{Major: 4, Minor: 14},
+			dataVer:                   versionMetadata{Major: 5, Minor: 14},
 			expectedMigrationRequired: false,
 			errExpected:               true,
 		},
 		{
 			name:                      "binary must not be older than data",
-			execVer:                   versionMetadata{X: 4, Y: 14},
-			dataVer:                   versionMetadata{X: 4, Y: 15},
+			execVer:                   versionMetadata{Major: 4, Minor: 14},
+			dataVer:                   versionMetadata{Major: 4, Minor: 15},
 			expectedMigrationRequired: false,
 			errExpected:               true,
 		},
@@ -51,5 +50,4 @@ func TestCheckVersionDiff(t *testing.T) {
 			}
 		})
 	}
-
 }
