@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "4.12.0-0.nightly-2023-06-06-200734"
+    "base": "4.12.0-0.nightly-2023-06-07-081825"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4ce010cf8a1292ce086a6c321775578aaa492c8dbb2186976c8df4c824f41615",
