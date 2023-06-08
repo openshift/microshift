@@ -9,6 +9,7 @@ approvers:
 - eggfoobar
 - chiragkyal
 - jerpeter1
+- jogeo
 reviewers:
 - copejon
 - dhellmann
@@ -17,6 +18,7 @@ reviewers:
 - pacevedom
 - pliurh
 - jerpeter1
+- jogeo
 emeritus_approvers:
 - cooktheryan
 - husky-parul
