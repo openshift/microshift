@@ -51,10 +51,9 @@ remotely via ssh.
 
 `SSH_PRIV_KEY` should be an ssh key file to use for authenticating as
 `USHIFT_USER`. The key must not require a password. To connect to
-hosts using a key with a password, leave `SSH_PRIV_KEY` unspecified in
-the variables file (comment it out) and the tests will connect as
-`USHIFT_USER` and rely on the ssh agent to provide the correct
-credentials.
+hosts using a key with a password, leave `SSH_PRIV_KEY` set to an
+empty string and the tests will connect as `USHIFT_USER` and rely on
+the ssh agent to provide the correct credentials.
 
 ## Running the tests
 
