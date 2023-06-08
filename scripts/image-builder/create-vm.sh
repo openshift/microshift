@@ -23,7 +23,7 @@ fi
 # Necessary to allow remote connections in the virt-viewer application
 sudo usermod -a -G libvirt "$(whoami)"
 
-sudo -b bash -c " \
+sudo bash -c " \
 virt-install \
     --name ${VMNAME} \
     --vcpus 2 \
