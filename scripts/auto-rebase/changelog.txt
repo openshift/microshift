@@ -1,8 +1,5 @@
-# router image-amd64 e28644631982fb4596e065d3ae85099f0886829d to 065deab84f342615db2d2f5c78a19ae04bb43912
-9af59fceebfe478ed69fede910e5a5d92ae586bf 2023-05-23T15:10:16+00:00 Revert to pkix.CertificateList instead of x509.RevocationList
-971e6124169ec10e6e6aa9e39002066cf025f10d 2023-05-23T15:10:16+00:00 Cache current CRLs in memory instead of re-parsing from disk
-876f51adeed692dc01009d15972884190360c3a1 2023-05-23T15:10:16+00:00 Download and manage CRLs in openshift-router
-# router image-arm64 e28644631982fb4596e065d3ae85099f0886829d to 065deab84f342615db2d2f5c78a19ae04bb43912
-9af59fceebfe478ed69fede910e5a5d92ae586bf 2023-05-23T15:10:16+00:00 Revert to pkix.CertificateList instead of x509.RevocationList
-971e6124169ec10e6e6aa9e39002066cf025f10d 2023-05-23T15:10:16+00:00 Cache current CRLs in memory instead of re-parsing from disk
-876f51adeed692dc01009d15972884190360c3a1 2023-05-23T15:10:16+00:00 Download and manage CRLs in openshift-router
+# cluster-ingress-operator embedded-component 502e3517f8f10b7d36c7d9d78197db49dae7f2e6 to 052f4163fdfc55043afcc499e25193c21348dee7
+73a446d7240616079057bc24e98fd16d6ac6f46e 2023-06-01T16:14:39-04:00 Revert bump to library-go
+0ac4585e33d0d7d8257413b06bbbf65008fabe86 2023-06-01T16:14:39-04:00 Pull operand proxy variables from the cluster proxy config instead of the ingress operator's environment
+31894efeb3e090347ca6fcc2028b4e756f984bad 2023-05-23T11:30:25-04:00 Add test case to test CRL updates
+0f94a4a27cdafd74bab3c1b0ef4aa4fd2ba7733b 2023-05-23T11:30:10-04:00 Remove CRL management code from ingress operator

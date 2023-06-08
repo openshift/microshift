@@ -1,5 +1,5 @@
 https://github.com/openshift/cluster-dns-operator embedded-component d96022a4d0d091955d73e7e99fc8cc81db56c86a
-https://github.com/openshift/cluster-ingress-operator embedded-component 502e3517f8f10b7d36c7d9d78197db49dae7f2e6
+https://github.com/openshift/cluster-ingress-operator embedded-component 052f4163fdfc55043afcc499e25193c21348dee7
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 02ea4a4120dd0f8eb49d070b1fe420ed6d1debba
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 56b970786d152344f0d4762c8271d20e5fc9d28b
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component dc5cba57ddcdb5a4b43240d1c2ab908fa953d887
