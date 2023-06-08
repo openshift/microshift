@@ -24,7 +24,7 @@ Download the OpenShift pull secret from the https://console.redhat.com/openshift
 
 ## Bootstrap MicroShift
 
-Run the following commands to initiate the creation process of the `microshift-starter` virtual machine with 2 CPU cores, 2GB RAM and 20GB storage.
+Run the following commands to initiate the creation process of the `microshift-starter` virtual machine with 2 CPU cores, 3GB RAM and 20GB storage.
 
 ```bash
 VMNAME=microshift-starter
@@ -36,7 +36,7 @@ cd /var/lib/libvirt/images && \
 virt-install \
     --name ${VMNAME} \
     --vcpus 2 \
-    --memory 2048 \
+    --memory 3072 \
     --disk path=./${VMNAME}.qcow2,size=20 \
     --network network=default,model=virtio \
     --events on_reboot=restart \
