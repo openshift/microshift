@@ -1,3 +1,14 @@
-# cluster-policy-controller embedded-component 9aaf6fea45f75b813ccb7441b9c350fe35d1dd9f to a83965ee1e76beb788bf572dcb86375ceaba3889
-f062afba8cca4bb53c28add96e4fd78b093c1b49 2023-05-26T17:48:29+02:00 go mod vendor
-7d2c4122553c277e40b4413c92c3ddc2507fd8d2 2023-05-26T17:48:29+02:00 fix ClusterResourceQuotas to work for all api resources
+# cluster-ingress-operator embedded-component 21c38d53ccc9e2b96f412ca58b8208ecfb6e6294 to 37c11f6d320035ca369571fc198a251533c8c5ef
+6ecfabab0a636df9f0da2d29f92d873231e4839e 2023-06-01T18:51:19-04:00 Remove CRL management code from ingress operator
+# cluster-network-operator embedded-component 422174789356e3bd2af543ab6513e3491593837f to df823f355353ae0fabc51e3e6ae71c47d1b66d1d
+6ff325d15a5686d68cc68d444cb09ccff483342c 2023-06-06T16:38:35-04:00 Fix tier label, privileged, HOSTNAME/NODENAME in whereabouts reconciler
+# router image-amd64 3065f6583f3925328fbdbfe95e3bc7bb7a084d33 to 3a1f43ca2b7e1549c6d108b6311cda59fcca28d6
+ef34ee46e4adab9af0920919c620633e7c42ca8a 2023-06-01T18:32:01-04:00 Revert to pkix.CertificateList instead of x509.RevocationList
+68b68ff80679ef2c091afd5130a04b17a3a5d214 2023-06-01T18:32:01-04:00 Cache current CRLs in memory instead of re-parsing from disk
+dd5c9866ed990b315ee73c4a8a0008b75b663927 2023-06-01T18:32:00-04:00 Download and manage CRLs in openshift-router
+# oc image-arm64 97c75d06a0f795872975e1d2335a2a932ca1b917 to 3c01edd8dbf1fa374b11d1ba35ad7830827587f2
+35c001718f3ff1f622751078e6c88c062b55a16a 2023-03-09T16:52:49+00:00 Do not set master node selector if there's no masters
+# router image-arm64 3065f6583f3925328fbdbfe95e3bc7bb7a084d33 to 3a1f43ca2b7e1549c6d108b6311cda59fcca28d6
+ef34ee46e4adab9af0920919c620633e7c42ca8a 2023-06-01T18:32:01-04:00 Revert to pkix.CertificateList instead of x509.RevocationList
+68b68ff80679ef2c091afd5130a04b17a3a5d214 2023-06-01T18:32:01-04:00 Cache current CRLs in memory instead of re-parsing from disk
+dd5c9866ed990b315ee73c4a8a0008b75b663927 2023-06-01T18:32:00-04:00 Download and manage CRLs in openshift-router
