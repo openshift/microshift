@@ -1,5 +1,6 @@
-# cluster-ingress-operator embedded-component 502e3517f8f10b7d36c7d9d78197db49dae7f2e6 to 052f4163fdfc55043afcc499e25193c21348dee7
-73a446d7240616079057bc24e98fd16d6ac6f46e 2023-06-01T16:14:39-04:00 Revert bump to library-go
-0ac4585e33d0d7d8257413b06bbbf65008fabe86 2023-06-01T16:14:39-04:00 Pull operand proxy variables from the cluster proxy config instead of the ingress operator's environment
-31894efeb3e090347ca6fcc2028b4e756f984bad 2023-05-23T11:30:25-04:00 Add test case to test CRL updates
-0f94a4a27cdafd74bab3c1b0ef4aa4fd2ba7733b 2023-05-23T11:30:10-04:00 Remove CRL management code from ingress operator
+# kubernetes embedded-component 7a891f05c7beb9527024c7616d95f6ff5c309f27 to 7d221229dc97969b79a272b63ad97b84d93cddb2
+1032f81f01f368abc226efefda5e16def0d841d7 2023-06-02T10:55:36-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
+# kubernetes image-amd64 7a891f05c7beb9527024c7616d95f6ff5c309f27 to 7d221229dc97969b79a272b63ad97b84d93cddb2
+1032f81f01f368abc226efefda5e16def0d841d7 2023-06-02T10:55:36-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
+# kubernetes image-arm64 7a891f05c7beb9527024c7616d95f6ff5c309f27 to 7d221229dc97969b79a272b63ad97b84d93cddb2
+1032f81f01f368abc226efefda5e16def0d841d7 2023-06-02T10:55:36-04:00 UPSTREAM: 118383: bump cadvisor for upstream patch 3301
