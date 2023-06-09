@@ -123,6 +123,30 @@ assets:
       - file: signing-cabundle.yaml
       - file: signing-secret.yaml
 
+  - dir: components/csi-snapshot-controller/
+    no_clean: True
+    src: cluster-csi-snapshot-controller-operator/assets
+    files:
+    - file: csi_controller_deployment.yaml
+    - file: serviceaccount.yaml
+    - file: webhook_config.yaml
+    - file: webhook_deployment.yaml
+    - file: webhook_service.yaml
+    - file: volumesnapshotclasses.yaml
+    - file: volumesnapshotcontents.yaml
+    - file: volumesnapshots.yaml
+    - file: namespace.yaml
+      ignore: "provided by microshift"
+    - file: clusterRole.yaml
+      ignore: "provided by microshift"
+    - file: clusterRoleBinding.yaml
+      ignore: "provided by microshift"
+    - file: role.yaml
+      ignore: "provided by microshift"
+    - file: roleBinding.yaml
+      ignore: "provided by microshift"
+
+
   - dir: controllers/cluster-policy-controller/
     src: cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/
     files:

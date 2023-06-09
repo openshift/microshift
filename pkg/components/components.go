@@ -14,6 +14,11 @@ func StartComponents(cfg *config.Config, ctx context.Context) error {
 		return err
 	}
 
+	if err := startCSISnapshotController(ctx, cfg, kubeAdminConfig); err != nil {
+		klog.Warningf("Failed to start csi snapshot controller: %v", err)
+		return err
+	}
+
 	if err := startCSIPlugin(ctx, cfg, cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
 		klog.Warningf("Failed to start csi plugin: %v", err)
 		return err
