@@ -98,7 +98,7 @@ sudo pvcreate      ${DEVICE}
 sudo vgcreate rhel ${DEVICE}
 ```
 
-Finish by running the `scripts/devenv-builder/configure-vm.sh` script to perform the initial configuration as described in the [Configure Virtual Machine](./devenv_setup_auto.md#configure-virtual-machine) document.
+Finish by running the `scripts/devenv-builder/configure-vm.sh` script to perform the initial configuration as described in the [Configure Virtual Machine](./devenv_setup.md#configuring-vm) document.
 > Reboot your host in the end of the configuration procedure to make sure it is running the latest operating system components.
 
 ## Nested Virtualization
@@ -127,10 +127,12 @@ ISO=$(ls -1 "_output/image-builder/microshift-installer-*.$(uname -m).iso")
 
 Log into the development virtual machine running in the cloud using the `microshift` user account.
 
-Follow the instructions in the [Create Virtual Machine](./devenv_setup_auto.md#create-virtual-machine) section to create a new virtual machine using **nested** virtualization.
+Run the following command to create a new virtual machine using **nested** virtualization.
 
 ```bash
-./scripts/devenv-builder/create-vm.sh microshift-bench \
+VMNAME=microshift-bench
+
+./scripts/devenv-builder/create-vm.sh ${VMNAME} \
     /var/lib/libvirt/images \
     /var/lib/libvirt/images/rhel-9.2-$(uname -m)-dvd.iso \
     2 2 10 0 1
