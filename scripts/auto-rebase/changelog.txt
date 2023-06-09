@@ -1,10 +1,36 @@
-- oc image-arm64 60caadec339755236fdac53b50defd79991d3409 to 7339186217e1d2a37687d732e839b21dfea331d0
+- cluster-dns-operator embedded-component 8d84af3ad3ebd7462c26b86eceb218a1cc8ae845 to 5c85a318807b790705c16816f5022d0cc31148ba
+  - a9eff7f 2023-05-26T10:50:00-04:00 OCPBUGS-6829: Add support for protocolStrategy API field to enable force_tcp configuration
+
+- cluster-ingress-operator embedded-component b2af3796ef0ded090ebb837ba07cb6e2fb7978f3 to e068d04e01cca70be8efb0a595188835525b4792
+  - 475c9b6 2023-06-01T09:23:33-07:00 Add AzureWorkloadIdentity featureGate
+  - b37da5a 2023-06-01T09:23:33-07:00 Enable Azure Workload Identity authentication.
+  - 8e64b2f 2023-06-01T09:22:09-07:00 Bump azidentity to v1.3.0 which includes support for WorkloadIdentityCredential.
+
+- cluster-kube-apiserver-operator embedded-component 0afbcf1bafc85805fa9d8f8a55df1d7c27e47012 to a1de1b1cc85ce2d41e918d14534e5187b981819b
+  - c7dff8a 2023-05-31T13:15:19+02:00 webhooksupportabilitycontroller: log the name of the webhook on dial errors
+  - 8f1d46d 2023-05-31T13:15:13+02:00 webhooksupportabilitycontroller: react only to changes to a conversion webhook configuration of a CRD
+
+- kubernetes embedded-component cc041e853bbd41b7b675d3563c445d01336bda33 to 55f2dbe862f9797f524432795c67a775a63025d4
+  - a9f3c7a36 2023-06-05T11:09:47-03:00 UPSTREAM: <drop>: make update
+  - 95e513995 2023-06-05T11:09:38-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+  - 9401cab58 2023-06-02T11:55:31-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+
+- machine-config-operator embedded-component 5843b7a4b27f15bc3313ce8a41ef6de792081fcb to dadba5bda3ad2051050a93e7dd0ea9e7f1324b21
+  - 2a209f8d 2023-06-02T09:44:53-04:00 add support for a node pool hierarchy
+  - 3de0564f 2023-05-18T15:14:14+01:00 Limit code generator to client,lister,informer
+  - 08ab7147 2023-05-18T12:50:10+01:00 Fix linter errors introduced with bumps
+  - f2f2a550 2023-05-18T10:31:34+01:00 Should not register external types in the machineconfiguration scheme
+  - 49ec50cc 2023-05-18T10:31:33+01:00 Update envtest version
+  - 9a01ac9d 2023-05-18T10:31:32+01:00 Update code for library changes
+  - d37b5ea1 2023-05-18T10:31:31+01:00 Update library-go and api dependencies
+
+- oc image-amd64 60caadec339755236fdac53b50defd79991d3409 to 7339186217e1d2a37687d732e839b21dfea331d0
   - a99b3f0 2023-05-17T09:47:41-07:00 OCPBUGS-11652: Extend adm node-logs to new API
 
-- router image-arm64 ec0a69fdd7b1dc8a968dc679fe39a7b99d3160c9 to 0cd9a58dff77127562f7851ccfa5cda79b8cef48
+- router image-amd64 ec0a69fdd7b1dc8a968dc679fe39a7b99d3160c9 to 0cd9a58dff77127562f7851ccfa5cda79b8cef48
   - ae441eb 2023-05-24T14:29:03+01:00 NE-1304: container builds: switch to haproxy26 package
 
-- ovn-kubernetes image-arm64 8adae676ccfed289ea097ac70afe7970dca3f820 to c488e2f552b076e921ce0bf9816cee83b5630e8e
+- ovn-kubernetes image-amd64 8adae676ccfed289ea097ac70afe7970dca3f820 to c488e2f552b076e921ce0bf9816cee83b5630e8e
   - ca4a60e 2023-06-05T22:47:02+02:00 Fix load balancer ocphack unit tests
   - 016976e 2023-06-05T21:57:13+02:00 Fix unit test for localWithFallback
   - d7e5bb9 2023-06-01T09:38:24+02:00 Add enable-multi-networkpolicy CLI flag
@@ -74,7 +100,7 @@
   - 18dcd72 2023-04-03T12:54:39+02:00 rename aclType to aclPipelineType, add aclDirection type to separate intention from implementation.
   - 11b7e2f 2023-04-03T12:54:39+02:00 update all fields on CreateOrUpdateACLsOps, especially for nil values, which mean reset, not ignore. When acls are updated on initial sync (by handling add events) if namespace log levels were reset, acls should also be updated with nil Severity.
 
-- kubernetes image-arm64 cc041e853bbd41b7b675d3563c445d01336bda33 to 55f2dbe862f9797f524432795c67a775a63025d4
+- kubernetes image-amd64 cc041e853bbd41b7b675d3563c445d01336bda33 to 55f2dbe862f9797f524432795c67a775a63025d4
   - a9f3c7a36 2023-06-05T11:09:47-03:00 UPSTREAM: <drop>: make update
   - 95e513995 2023-06-05T11:09:38-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
   - 9401cab58 2023-06-02T11:55:31-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
