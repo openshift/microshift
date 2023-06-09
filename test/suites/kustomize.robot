@@ -52,11 +52,30 @@ Do Not Load From Unonfigured Dir
     ConfigMap Should Be Missing
     [Teardown]    Teardown With Config
 
+Yaml Extension
+    [Documentation]    /etc/microshift/manifests/kustomization.yaml
+    [Setup]    Setup    /etc/microshift/manifests    kustomization.yaml
+    ConfigMap Path Should Match
+    [Teardown]    Teardown
+
+Yml Extension
+    [Documentation]    /etc/microshift/manifests/kustomization.yml
+    [Setup]    Setup    /etc/microshift/manifests    kustomization.yml
+    ConfigMap Path Should Match
+    [Teardown]    Teardown
+
+No Extension
+    [Documentation]    /etc/microshift/manifests/Kustomization
+    [Setup]    Setup    /etc/microshift/manifests    Kustomization
+    ConfigMap Path Should Match
+    [Teardown]    Teardown
+
 
 *** Keywords ***
 Setup
     [Documentation]    Set up for test
-    [Arguments]    ${path}
+    [Arguments]    ${path}    ${kfile}=kustomization.yaml
+
     Set Suite Variable    \${MANIFEST_DIR}    ${path}
     Check Required Env Variables
     Login MicroShift Host
@@ -64,7 +83,7 @@ Setup
     ${ns}=    Create Random Namespace
     Set Suite Variable    \${NAMESPACE}    ${ns}
     Clear Manifest Directory
-    Write Manifests
+    Write Manifests    ${kfile}
     Restart MicroShift
 
 Teardown
@@ -166,6 +185,7 @@ Clear Manifest Directory
 
 Write Manifests
     [Documentation]    Install manifests
+    [Arguments]    ${kfile}=kustomization.yaml
     # Make sure the manifest directory exists
     ${stdout}    ${rc}=    Execute Command
     ...    mkdir -p ${MANIFEST_DIR}
@@ -177,7 +197,7 @@ Write Manifests
     ...    - configmap.yaml
     ...    namespace: ${NAMESPACE}
     ...
-    Upload String To File    ${kustomization}    ${MANIFEST_DIR}/kustomization.yaml
+    Upload String To File    ${kustomization}    ${MANIFEST_DIR}/${kfile}
     # Build a configmap with unique data for this scenario
     ${configmap}=    Catenate    SEPARATOR=\n
     ...    apiVersion: v1
@@ -188,3 +208,4 @@ Write Manifests
     ...    \ \ path: ${MANIFEST_DIR}
     ...
     Upload String To File    ${configmap}    ${MANIFEST_DIR}/configmap.yaml
+

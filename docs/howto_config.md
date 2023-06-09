@@ -118,9 +118,9 @@ Please note that values close to the floor may be more likely to impact etcd per
 
 # Auto-applying Manifests
 
-MicroShift leverages `kustomize` for Kubernetes-native templating and declarative management of resource objects. Upon start-up, it searches `/etc/microshift/manifests`, `/etc/microshift/manifests.d/*`, `/usr/lib/microshift/manifests`, and `/usr/lib/microshift/manifests.d/*` directories for a `kustomization.yaml` file. If it finds one, it automatically runs `kubectl apply -k` command to apply that manifest.
+MicroShift leverages `kustomize` for Kubernetes-native templating and declarative management of resource objects. Upon start-up, it searches `/etc/microshift/manifests`, `/etc/microshift/manifests.d/*`, `/usr/lib/microshift/manifests`, and `/usr/lib/microshift/manifests.d/*` directories for a `kustomization.yaml`, `kustomization.yml`, or `Kustomization` file. If it finds one, it automatically runs `kubectl apply -k` command to apply that manifest.
 
-The reason for providing multiple directories is to allow a flexible method to manage MicroShift workloads.
+Loading from multiple directories allows you to manage MicroShift workloads more flexibly. Different workloads can be independent of each other, instead of having to be loaded from a merged set of inputs.
 
 | Location                          | Intent |
 |-----------------------------------|--------|

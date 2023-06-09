@@ -16,8 +16,18 @@ func TestGetKustomizationPaths(t *testing.T) {
 		return filepath.Join(dataDir, path)
 	}
 
-	makeTestKustomize := func(path string) error {
+	makeTestKustomizeYaml := func(path string) error {
 		filename := filepath.Join(kustomizeDirName(path), "kustomization.yaml")
+		return os.WriteFile(filename, []byte{}, 0600)
+	}
+
+	makeTestKustomizeYml := func(path string) error {
+		filename := filepath.Join(kustomizeDirName(path), "kustomization.yml")
+		return os.WriteFile(filename, []byte{}, 0600)
+	}
+
+	makeTestKustomize := func(path string) error {
+		filename := filepath.Join(kustomizeDirName(path), "Kustomization")
 		return os.WriteFile(filename, []byte{}, 0600)
 	}
 
@@ -26,10 +36,18 @@ func TestGetKustomizationPaths(t *testing.T) {
 	}
 
 	assert.NoError(t, makeTestKustomizeDir("empty"))
-	assert.NoError(t, makeTestKustomizeDir("one"))
-	assert.NoError(t, makeTestKustomize("one"))
-	assert.NoError(t, makeTestKustomizeDir("two"))
-	assert.NoError(t, makeTestKustomize("two"))
+	assert.NoError(t, makeTestKustomizeDir("yaml"))
+	assert.NoError(t, makeTestKustomizeYaml("yaml"))
+	assert.NoError(t, makeTestKustomizeDir("yml"))
+	assert.NoError(t, makeTestKustomizeYml("yml"))
+	assert.NoError(t, makeTestKustomizeDir("no-ext"))
+	assert.NoError(t, makeTestKustomize("no-ext"))
+
+	assert.NoError(t, makeTestKustomizeDir("parent"))
+	assert.NoError(t, makeTestKustomizeDir("parent/a"))
+	assert.NoError(t, makeTestKustomizeYaml("parent/a"))
+	assert.NoError(t, makeTestKustomizeDir("parent/b"))
+	assert.NoError(t, makeTestKustomizeYaml("parent/b"))
 
 	var ttests = []struct {
 		name        string
@@ -48,37 +66,39 @@ func TestGetKustomizationPaths(t *testing.T) {
 			name: "all",
 			manifests: &Manifests{
 				KustomizePaths: []string{
-					kustomizeDirName("one"),
-					kustomizeDirName("two"),
 					kustomizeDirName("empty"),
+					kustomizeDirName("no-ext"),
+					kustomizeDirName("yaml"),
+					kustomizeDirName("yml"),
 				},
 			},
 			results: []string{
-				kustomizeDirName("one"),
-				kustomizeDirName("two"),
+				kustomizeDirName("no-ext"),
+				kustomizeDirName("yaml"),
+				kustomizeDirName("yml"),
 			},
 		},
 		{
 			name: "o*",
 			manifests: &Manifests{
 				KustomizePaths: []string{
-					kustomizeDirName("o*"),
+					kustomizeDirName("ya*"),
 				},
 			},
 			results: []string{
-				kustomizeDirName("one"),
+				kustomizeDirName("yaml"),
 			},
 		},
 		{
 			name: "*o*",
 			manifests: &Manifests{
 				KustomizePaths: []string{
-					kustomizeDirName("*o*"),
+					kustomizeDirName("*m*"),
 				},
 			},
 			results: []string{
-				kustomizeDirName("one"),
-				kustomizeDirName("two"),
+				kustomizeDirName("yaml"),
+				kustomizeDirName("yml"),
 			},
 		},
 		{
@@ -89,6 +109,34 @@ func TestGetKustomizationPaths(t *testing.T) {
 				},
 			},
 			results: []string{},
+		},
+		{
+			// Ensure that glob results within a directory are sorted.
+			name: "glob-sort",
+			manifests: &Manifests{
+				KustomizePaths: []string{
+					kustomizeDirName("parent/*"),
+				},
+			},
+			results: []string{
+				kustomizeDirName("parent/a"),
+				kustomizeDirName("parent/b"),
+			},
+		},
+		{
+			// Ensure that if paths are listed explicitly, they come
+			// back in that order.
+			name: "force-order",
+			manifests: &Manifests{
+				KustomizePaths: []string{
+					kustomizeDirName("parent/b"),
+					kustomizeDirName("parent/a"),
+				},
+			},
+			results: []string{
+				kustomizeDirName("parent/b"),
+				kustomizeDirName("parent/a"),
+			},
 		},
 	}
 

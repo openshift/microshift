@@ -17,6 +17,7 @@ import (
 	"k8s.io/kubectl/pkg/cmd/apply"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"k8s.io/kubectl/pkg/util/templates"
+	"sigs.k8s.io/kustomize/api/konfig"
 )
 
 const (
@@ -56,18 +57,22 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 }
 
 func (s *Kustomizer) applyKustomizationPath(ctx context.Context, path string) {
-	kustomization := filepath.Join(path, "kustomization.yaml")
+	kustomizationFileNames := konfig.RecognizedKustomizationFileNames()
 
-	if _, err := os.Stat(kustomization); errors.Is(err, os.ErrNotExist) {
-		klog.Infof("No kustomization found at " + kustomization)
-		return
-	}
+	for _, filename := range kustomizationFileNames {
+		kustomization := filepath.Join(path, filename)
 
-	klog.Infof("Applying kustomization at %v ", kustomization)
-	if err := applyKustomizationWithRetries(ctx, path, s.kubeconfig); err != nil {
-		klog.Errorf("Applying kustomization at %v failed: %w. Giving up.", kustomization, err)
-	} else {
-		klog.Infof("Kustomization at %v applied successfully.", kustomization)
+		if _, err := os.Stat(kustomization); errors.Is(err, os.ErrNotExist) {
+			klog.Infof("No kustomization found at " + kustomization)
+			continue
+		}
+
+		klog.Infof("Applying kustomization at %v ", kustomization)
+		if err := applyKustomizationWithRetries(ctx, path, s.kubeconfig); err != nil {
+			klog.Errorf("Applying kustomization at %v failed: %w. Giving up.", kustomization, err)
+		} else {
+			klog.Infof("Kustomization at %v applied successfully.", kustomization)
+		}
 	}
 }
 
