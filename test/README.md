@@ -76,5 +76,36 @@ Options:
   -o DIR   The output directory.
 ```
 
+### Running a Single Suite
+
 By default, all of the test suites will be run. To run a subset,
 specify the filenames as arguments on the command line.
+
+```
+$ ./test/run.sh suite/show-config.robot
+```
+
+### Running a Subset of Tests
+
+To run a single test, or subset of tests, use the `robot` command's
+features for filtering the tests. Use `--` to separate arguments to
+`run.sh` from arguments to be passed unaltered to `robot`. The input
+files must also be specified explicitly in all of these cases.
+
+To run tests with names matching a pattern, use the `-t` option:
+
+```
+$ ./test/run.sh -- -t '*No Mode*' suites/show-config.robot
+```
+
+To run tests with specific tags, use the `-i` option:
+
+```
+$ ./test/run.sh -- -i etcd suites/*.robot
+```
+
+For more options, see the help output for the `robot` command.
+
+```
+$ ./_output/robotenv/bin/robot -h
+```
