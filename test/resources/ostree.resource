@@ -1,7 +1,8 @@
 *** Settings ***
-Documentation    Keywords for OSTree-based systems
+Documentation       Keywords for OSTree-based systems
 
-Library     SSHLibrary
+Library             SSHLibrary
+Library             DataFormats.py
 
 
 *** Variables ***
@@ -17,14 +18,14 @@ Get Booted Deployment Status
     ...    rpm-ostree status --booted --json
     ...    return_rc=True
     Should Be Equal As Integers    0    ${rc}
-    ${json}=    Evaluate    json.loads('''${ostree_status}''')    json
-    RETURN    ${json}
+    ${status}=    Json Parse    ${ostree_status}
+    RETURN    ${status}
 
 Get Booted Deployment ID
     [Documentation]    Get ID of currently booted deployment
 
     ${status}=    Get Booted Deployment Status
-    RETURN    ${status["deployments"][0]["id"]}
+    RETURN    ${status.deployments[0].id}
 
 Get Booted Deployment Backup Prefix Path
     [Documentation]    Get backup path prefix for current deployment

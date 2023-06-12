@@ -6,7 +6,7 @@ Library    String
 Library    OperatingSystem
 
 Library    SSHLibrary
-Library     ../resources/YAML.py
+Library    DataFormats.py
 
 
 *** Keywords ***

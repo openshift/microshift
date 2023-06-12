@@ -6,10 +6,10 @@ Library    String
 Library    OperatingSystem
 
 Library    SSHLibrary
-Resource    ../resources/oc.resource
-Resource    ../resources/systemd.resource
-Resource    ../resources/microshift-host.resource
-Library     ../resources/YAML.py
+Resource   oc.resource
+Resource   systemd.resource
+Resource   microshift-host.resource
+Library    DataFormats.py
 
 
 *** Keywords ***
