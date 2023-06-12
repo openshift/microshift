@@ -8,3 +8,5 @@ RF_VENV="${ROOTDIR}/_output/robotenv"
 
 cd "${ROOTDIR}/test"
 "${RF_VENV}/bin/robocop"
+
+"${RF_VENV}/bin/robotidy" --check --diff .

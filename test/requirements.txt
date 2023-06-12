@@ -4,3 +4,4 @@ robotframework-scplibrary==1.2.0
 robotframework-sshlibrary==3.8.0
 pyyaml==6.0
 robotframework-robocop==3.1.1
+robotframework-tidy==4.3.0
