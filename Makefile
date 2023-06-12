@@ -148,7 +148,7 @@ verify-assets:
 	./scripts/verify/verify-assets.sh
 
 .PHONY: verify-go
-verify-go: verify-golangci
+verify-go: verify-gofmt verify-golangci
 
 .PHONY: verify-golangci
 verify-golangci:
