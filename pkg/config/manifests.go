@@ -34,7 +34,7 @@ func (m *Manifests) GetKustomizationPaths() ([]string, error) {
 		pattern := filepath.Join(path, "kustomization.yaml")
 		matches, err := filepath.Glob(pattern)
 		if err != nil {
-			return nil, fmt.Errorf("Could not understand kustomizePath value %v: %w", path, err)
+			return nil, fmt.Errorf("failed to expand pattern in kustomizePath %v: %w", path, err)
 		}
 		if len(matches) == 0 {
 			klog.Infof("No kustomize path matches %v", pattern)

@@ -93,7 +93,7 @@ func getLvmdConfigForVGs(vgNames []string) (*Lvmd, error) {
 func DefaultLvmdConfig() (*Lvmd, error) {
 	vgNames, err := getVolumeGroups()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to discover local volume groups: %s", err)
+		return nil, fmt.Errorf("failed to discover local volume groups: %s", err)
 	}
 	return getLvmdConfigForVGs(vgNames)
 }

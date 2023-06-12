@@ -16,7 +16,7 @@ const (
 func parse(contents []byte) (*Config, error) {
 	c := &Config{}
 	if err := yaml.Unmarshal(contents, c); err != nil {
-		return nil, fmt.Errorf("Unable to decode configuration: %v", err)
+		return nil, fmt.Errorf("failed to decode configuration: %v", err)
 	}
 	return c, nil
 }
@@ -24,21 +24,21 @@ func parse(contents []byte) (*Config, error) {
 func getActiveConfigFromYAML(contents []byte) (*Config, error) {
 	userSettings, err := parse(contents)
 	if err != nil {
-		return nil, fmt.Errorf("Error parsing config file %q: %v", ConfigFile, err)
+		return nil, fmt.Errorf("failed to parse config file %q: %v", ConfigFile, err)
 	}
 
 	// Start with the defaults, then apply the user settings and
 	// recompute dynamic values.
 	results := &Config{}
 	if err := results.fillDefaults(); err != nil {
-		return nil, fmt.Errorf("Invalid configuration: %v", err)
+		return nil, fmt.Errorf("invalid configuration: %v", err)
 	}
 	results.incorporateUserSettings(userSettings)
 	if err := results.updateComputedValues(); err != nil {
-		return nil, fmt.Errorf("Invalid configuration: %v", err)
+		return nil, fmt.Errorf("invalid configuration: %v", err)
 	}
 	if err := results.validate(); err != nil {
-		return nil, fmt.Errorf("Invalid configuration: %v", err)
+		return nil, fmt.Errorf("invalid configuration: %v", err)
 	}
 	return results, nil
 }
@@ -58,7 +58,7 @@ func ActiveConfig() (*Config, error) {
 	// Read the file and merge user-provided settings with the defaults
 	contents, err := os.ReadFile(ConfigFile)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading config file %q: %v", ConfigFile, err)
+		return nil, fmt.Errorf("error reading config file %q: %v", ConfigFile, err)
 	}
 	return getActiveConfigFromYAML(contents)
 }

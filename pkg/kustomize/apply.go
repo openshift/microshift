@@ -45,7 +45,7 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 
 	kustomizationPaths, err := s.cfg.Manifests.GetKustomizationPaths()
 	if err != nil {
-		return fmt.Errorf("Could not find kustomization paths: %w", err)
+		return fmt.Errorf("failed to find any kustomization paths: %w", err)
 	}
 
 	for _, path := range kustomizationPaths {

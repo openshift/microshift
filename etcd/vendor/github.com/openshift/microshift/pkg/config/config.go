@@ -67,7 +67,7 @@ func (c *Config) fillDefaults() error {
 	}
 	hostname, err := os.Hostname()
 	if err != nil {
-		return fmt.Errorf("Failed to get hostname %v", err)
+		return fmt.Errorf("failed to get hostname %v", err)
 	}
 	nodeIP, err := util.GetHostIP()
 	if err != nil {
@@ -250,7 +250,7 @@ func (c *Config) validate() error {
 				return fmt.Errorf("subjectAltNames must not contain node IP")
 			}
 			if !stringSliceContains(c.ApiServer.SubjectAltNames, u.Host) || u.Host != c.Node.HostnameOverride {
-				return fmt.Errorf("Cluster URL host %v is not included in subjectAltNames or nodeName", u.String())
+				return fmt.Errorf("cluster URL host %q must be included in subjectAltNames or nodeName", u.String())
 			}
 		}
 		if stringSliceContains(
@@ -289,7 +289,7 @@ func getAllHostnames() ([]string, error) {
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		return nil, fmt.Errorf("Error when executing 'hostname -A': %v", err)
+		return nil, fmt.Errorf("error when executing 'hostname -A': %v", err)
 	}
 	outString := out.String()
 	outString = strings.Trim(outString[:len(outString)-1], " ")
