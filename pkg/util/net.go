@@ -18,6 +18,7 @@ package util
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	tcpnet "net"
 	"net/http"
 	"os"
@@ -27,7 +28,6 @@ import (
 	"time"
 
 	"github.com/openshift/microshift/pkg/config/ovn"
-	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
@@ -123,7 +123,10 @@ func AddToNoProxyEnv(additionalEntries ...string) error {
 
 	// unset the lower-case one, and keep only upper-case
 	os.Unsetenv("no_proxy")
-	return errors.Wrap(os.Setenv("NO_PROXY", noProxyEnv), "error updating NO_PROXY")
+	if err := os.Setenv("NO_PROXY", noProxyEnv); err != nil {
+		return fmt.Errorf("failed to update NO_PROXY: %w", err)
+	}
+	return nil
 }
 
 func mapKeys(entries map[string]struct{}) []string {

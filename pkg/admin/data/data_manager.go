@@ -10,7 +10,6 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
-	"github.com/pkg/errors"
 	"k8s.io/klog/v2"
 )
 
@@ -49,7 +48,7 @@ func (dm *manager) RemoveBackup(name BackupName) error {
 		"name", name,
 	)
 	if err := os.RemoveAll(dm.GetBackupPath(name)); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Failed to delete backup %q", name))
+		return fmt.Errorf("Failed to delete backup %q: %w", name, err)
 	}
 	klog.InfoS("Removed backup",
 		"name", name,
@@ -85,16 +84,19 @@ func (dm *manager) Backup(name BackupName) error {
 	}
 
 	if exists, err := dm.BackupExists(name); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Failed to determine if backup %s exists", name))
+		return fmt.Errorf("Failed to determine if backup %q exists: %w", name, err)
 	} else if exists {
-		return fmt.Errorf("Failed to create backup destination %q because it already exists", name)
+		return fmt.Errorf("Failed to create backup destination %q because it already exists",
+			name)
 	}
 
 	if found, err := pathExists(string(dm.storage)); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Failed to determine if storage location %q exists", dm.storage))
+		return fmt.Errorf("Failed to determine if storage location %q for backup exists: %w",
+			dm.storage, err)
 	} else if !found {
 		if makeDirErr := util.MakeDir(string(dm.storage)); makeDirErr != nil {
-			return errors.Wrap(makeDirErr, fmt.Sprintf("Failed to create backup storage directory %q", dm.storage))
+			return fmt.Errorf("Failed to create backup storage directory %q: %w",
+				dm.storage, makeDirErr)
 		}
 		klog.InfoS("Created backup storage directory", "path", dm.storage)
 	} else {
@@ -123,7 +125,7 @@ func (dm *manager) Restore(name BackupName) error {
 	}
 
 	if exists, err := dm.BackupExists(name); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Failed to determine if backup %q exists failed", name))
+		return fmt.Errorf("Failed to determine if backup %q exists: %w", name, err)
 	} else if !exists {
 		return fmt.Errorf("Failed to restore backup, %q does not exist", name)
 	}
@@ -131,7 +133,8 @@ func (dm *manager) Restore(name BackupName) error {
 	tmp := fmt.Sprintf("%s.saved", config.DataDir)
 	klog.InfoS("Renaming existing data dir", "data", config.DataDir, "renamedTo", tmp)
 	if err := os.Rename(config.DataDir, tmp); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Failed to rename existing data directory %q to %q", config.DataDir, tmp))
+		return fmt.Errorf("Failed to rename existing data directory %q to %q: %w",
+			config.DataDir, tmp, err)
 	}
 
 	src := dm.GetBackupPath(name)
@@ -139,14 +142,15 @@ func (dm *manager) Restore(name BackupName) error {
 		klog.ErrorS(err, "Failed to restore from backup, restoring current data dir")
 
 		if err := os.RemoveAll(config.DataDir); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("Failed to remove data directory %q", config.DataDir))
+			return fmt.Errorf("Failed to remove data directory %q: %w", config.DataDir, err)
 		}
 
 		if err := os.Rename(tmp, config.DataDir); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("Failed to rename temporary directory %q to %q", tmp, config.DataDir))
+			return fmt.Errorf("Failed to rename temporary directory %q to %q: %w",
+				tmp, config.DataDir, err)
 		}
 
-		return errors.Wrap(err, "Failed to restore backup")
+		return fmt.Errorf("Failed to restore backup: %w", err)
 	}
 
 	klog.InfoS("Removing temporary data directory", "path", tmp)
@@ -174,7 +178,7 @@ func copyPath(src, dest string) error {
 		klog.InfoS("Failed to copy", "cmd", cmd,
 			"stdout", strings.ReplaceAll(outb.String(), "\n", `, `),
 			"stderr", errb.String())
-		return errors.Wrap(err, fmt.Sprintf("Failed to copy %q to %q", src, dest))
+		return fmt.Errorf("Failed to copy %q to %q: %w", src, dest, err)
 	}
 
 	klog.InfoS("Finished copy", "cmd", cmd)
@@ -184,7 +188,7 @@ func copyPath(src, dest string) error {
 func pathExists(path string) (bool, error) {
 	exists, err := util.PathExists(path)
 	if err != nil {
-		return false, errors.Wrap(err, fmt.Sprintf("failed to check if %q exists", path))
+		return false, fmt.Errorf("Failed to check if path %q exists: %w", path, err)
 	}
 	return exists, nil
 }

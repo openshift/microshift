@@ -2,11 +2,11 @@ package mdns
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/openshift/microshift/pkg/mdns/server"
-	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -30,12 +30,12 @@ func (c *MicroShiftmDNSController) startRouteInformer(stopCh chan struct{}) erro
 	klog.Infof("Starting MicroShift mDNS route watcher")
 	cfg, err := c.restConfig()
 	if err != nil {
-		return errors.Wrap(err, "error creating rest config for route informer")
+		return fmt.Errorf("failed to create rest config for route informer: %w", err)
 	}
 
 	dc, err := dynamic.NewForConfig(cfg)
 	if err != nil {
-		return errors.Wrap(err, "error creating dynamic informer")
+		return fmt.Errorf("failed to create dynamic informer for route controller: %w", err)
 	}
 
 	return c.run(stopCh, dc)
@@ -55,7 +55,7 @@ func (c *MicroShiftmDNSController) run(stopCh chan struct{}, dc dynamic.Interfac
 	}
 
 	if _, err := informer.AddEventHandler(handlers); err != nil {
-		return errors.Wrap(err, "failed to initialize event handler: %w")
+		return fmt.Errorf("failed to initialize event handler for route controller: %w", err)
 	}
 	informer.Run(stopCh)
 
