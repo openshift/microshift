@@ -199,6 +199,10 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/release/release*.json %{buildroot}%{_datadir}/microshift/release
 
+# spec validation files
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/spec
+install -p -m644 cmd/generate-config/config/config-openapi-spec.json %{buildroot}%{_datadir}/microshift/spec/config-openapi-spec.json
+
 # Memory tweaks to the OpenvSwitch services
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovsdb-server.service.d
@@ -290,6 +294,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/microshift-cleanup-data
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
+%{_datadir}/microshift/spec/config-openapi-spec.json
 %dir %{_sysconfdir}/microshift
 %dir %{_sysconfdir}/microshift/manifests
 %dir %{_sysconfdir}/microshift/manifests.d
