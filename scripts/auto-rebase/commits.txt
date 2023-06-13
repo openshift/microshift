@@ -12,7 +12,7 @@ https://github.com/openshift/machine-config-operator embedded-component 4accd895
 https://github.com/openshift/openshift-controller-manager embedded-component b6528f9ea28164af9f1ceea0e50f18116fe3c90e
 https://github.com/openshift/route-controller-manager embedded-component 0f141ce9d349fb30755e3d0d7f9f196a91782957
 https://github.com/openshift/service-ca-operator embedded-component 299b7097a49385fdd4f86eccedc07f3a192e2504
-https://github.com/openshift/oc image-amd64 97c75d06a0f795872975e1d2335a2a932ca1b917
+https://github.com/openshift/oc image-amd64 3c01edd8dbf1fa374b11d1ba35ad7830827587f2
 https://github.com/openshift/coredns image-amd64 9aaa7e0a86b69bafb9f544a0e5cb1873535a8f6b
 https://github.com/openshift/csi-external-provisioner image-amd64 140851f6c0e70cf917b3361808b31628c68ea8a5
 https://github.com/openshift/csi-external-resizer image-amd64 239d751f51743214417dd5058645c2c1d390d1b5
