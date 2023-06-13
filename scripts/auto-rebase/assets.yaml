@@ -135,17 +135,10 @@ assets:
     - file: volumesnapshotclasses.yaml
     - file: volumesnapshotcontents.yaml
     - file: volumesnapshots.yaml
+    - file: 05_operand_rbac.yaml
+      src: ../manifests/
     - file: namespace.yaml
       ignore: "provided by microshift"
-    - file: clusterRole.yaml
-      ignore: "provided by microshift"
-    - file: clusterRoleBinding.yaml
-      ignore: "provided by microshift"
-    - file: role.yaml
-      ignore: "provided by microshift"
-    - file: roleBinding.yaml
-      ignore: "provided by microshift"
-
 
   - dir: controllers/cluster-policy-controller/
     src: cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/

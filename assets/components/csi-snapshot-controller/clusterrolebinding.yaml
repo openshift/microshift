@@ -10,7 +10,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: csi-snapshot-controller
-    namespace: openshift-cluster-storage-operator
+    namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: openshift-csi-snapshot-controller-runner

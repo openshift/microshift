@@ -10,10 +10,8 @@ metadata:
     capability.openshift.io/name: CSISnapshot
 spec:
   ports:
-  - name: webhook
-    port: 443
-    targetPort: 8443
+    - name: webhook
+      port: 443
+      targetPort: 8443
   selector:
     app: csi-snapshot-webhook
-
-

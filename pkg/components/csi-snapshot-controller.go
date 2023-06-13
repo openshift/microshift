@@ -11,9 +11,8 @@ import (
 func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 
 	var (
-		ns         = []string{"components/csi-snapshot-controller/namespace.yaml"}
-		cr         = []string{"components/csi-snapshot-controller/clusterRole.yaml"}
-		crb        = []string{"components/csi-snapshot-controller/clusterRoleBinding.yaml"}
+		cr         = []string{"components/csi-snapshot-controller/clusterrole.yaml"}
+		crb        = []string{"components/csi-snapshot-controller/clusterrolebinding.yaml"}
 		sa         = []string{"components/csi-snapshot-controller/serviceaccount.yaml"}
 		svc        = []string{"components/csi-snapshot-controller/webhook_service.yaml"}
 		webhookCfg = []string{"components/csi-snapshot-controller/webhook_config.yaml"}
@@ -23,9 +22,6 @@ func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubecon
 		}
 	)
 
-	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
-		return fmt.Errorf("apply kube-system ns: %w", err)
-	}
 	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
 		return fmt.Errorf("apply clusterRole: %w", err)
 	}

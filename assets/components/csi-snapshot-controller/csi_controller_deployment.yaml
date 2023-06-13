@@ -35,25 +35,18 @@ spec:
             capabilities:
               drop:
                 - ALL
+            runAsUser: 65534
           image: '{{ .ReleaseImage.csi_snapshot_controller }}'
           args:
-            - "--v=${LOG_LEVEL}"
-            - "--leader-election=true"
-            # Leader election values are from
-            # https://github.com/openshift/library-go/blob/master/pkg/config/leaderelection/leaderelection.go
-            - "--leader-election-lease-duration=137s"
-            - "--leader-election-renew-deadline=107s"
-            - "--leader-election-retry-period=26s"
-            # Force the namespace name for HyperShift
-            - "--leader-election-namespace=openshift-cluster-storage-operator"
-            # guest --kubeconfig= will be injected by the operator when running on HyperShift
+            - --v=2
+            - --leader-election=false
           imagePullPolicy: IfNotPresent
           resources:
             requests:
               # TODO: measure on a real cluster
               cpu: 10m
               memory: 50Mi
-          # volumeMount with guest Kubeconfig will be added by the operator
+              # volumeMount with guest Kubeconfig will be added by the operator
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -66,15 +59,15 @@ spec:
       nodeSelector:
         node-role.kubernetes.io/master: ""
       tolerations:
-      - key: "node.kubernetes.io/unreachable"
-        operator: "Exists"
-        effect: "NoExecute"
-        tolerationSeconds: 120
-      - key: "node.kubernetes.io/not-ready"
-        operator: "Exists"
-        effect: "NoExecute"
-        tolerationSeconds: 120
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: "NoSchedule"
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 120
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 120
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: "NoSchedule"
       # volume with guest Kubeconfig will be added by the operator
