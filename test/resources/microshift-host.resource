@@ -12,7 +12,11 @@ Login MicroShift Host
     ...  action that disrupt that connection are responsible for restoring it.
 
     Log  Host: ${USHIFT_HOST}
-    SSHLibrary.Open Connection    ${USHIFT_HOST}
+    IF   '${SSH_PORT}'
+        SSHLibrary.Open Connection    ${USHIFT_HOST}    port=${SSH_PORT}
+    ELSE
+        SSHLibrary.Open Connection    ${USHIFT_HOST}
+    END
     # If there is an ssh key set in the global configuration, use that to
     # login to the host. Otherwise assume that the ssh agent is running
     # and configured properly.
