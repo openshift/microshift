@@ -6,3 +6,6 @@ USHIFT_USER: microshift
 # Set this variable to "" to use ssh agent.
 #SSH_PRIV_KEY: ""
 SSH_PRIV_KEY: /home/microshift/.ssh/id_rsa
+# SSH port to use when connecting to MicroShift's host.
+# Defaults to 22.
+#SSH_PORT: 22
