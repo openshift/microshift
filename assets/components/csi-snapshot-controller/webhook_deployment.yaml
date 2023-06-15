@@ -45,6 +45,7 @@ spec:
             capabilities:
               drop:
                 - ALL
+            runAsUser: 65534
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -59,7 +60,6 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
-        runAsUser: 65534
       nodeSelector:
         node-role.kubernetes.io/master: ""
       volumes:
