@@ -1,7 +1,38 @@
-- oc image-arm64 4e136762ec0ea7216f04665eb983ca30633b1f9f to 9c7b9edaea80a0d6acbe5f1b0278b7d55cc2d7d9
+- cluster-ingress-operator embedded-component e068d04e01cca70be8efb0a595188835525b4792 to 0e500e647303c6a63a7077de4a3d465d45f683d2
+  - 7251aaa 2023-06-06T12:51:22-04:00 Add support for AWS shared VPC in another account
+  - 56a4055 2023-06-06T09:11:46-04:00 Bump openshift/api for PrivateHostedZoneAWS
+
+- cluster-network-operator embedded-component 6cf62caf70d0a5905511b1f85e204bad7e57903c to 5b8884021f201dbe7784c13dbc5e6939a70d5b44
+  - 529def9 2023-06-12T12:42:18+02:00 Do not determine if HyperShift is enabled based on the ControlPlaneTopology value
+  - 19c0dc9 2023-05-30T15:59:15-07:00 Add necessary manifest changes for cloud-network-config-controller
+
+- machine-config-operator embedded-component 6511a6d5b008459e9d7126bdd154c06eddb3d8aa to 3d84f653e08d760d446442ddc80c3da21d8d7e59
+  - 28c26ea8 2023-05-18T18:00:37+02:00 OpenStack: configure ipv6 addresses
+
+- oc image-amd64 4e136762ec0ea7216f04665eb983ca30633b1f9f to 9c7b9edaea80a0d6acbe5f1b0278b7d55cc2d7d9
   - 61cc186c 2023-06-12T15:55:26-04:00 Minor updates to CLI help text
   - 32d7dfc6 2023-06-12T16:07:35+02:00 add leaf certs regen, reusing the original logic for toplevel
   - c049419c 2023-06-12T16:06:39+02:00 remove previous testing proposal
   - 744cbd0a 2023-06-09T13:16:00+02:00 vendor in fake confiv1client for testing
   - 48a2359a 2023-06-09T13:15:59+02:00 add a command to wait for the cluster to become stable
+
+- oc image-arm64 9c7b9edaea80a0d6acbe5f1b0278b7d55cc2d7d9 to 995cc1a6a1a2ef5a6fd0afaeca3f41c18d1606f6
+  - 9722dda5 2023-06-13T17:03:35+02:00 trustpurge: use RetryOnConflict for conflict handling
+  - 1b15e234 2023-06-13T10:07:53-04:00 add newline between polls to make it easier to read by hu9mans
+  - 6fd3c946 2023-06-13T10:04:49-04:00 update output to make the wait easier to see and print all proceeding operators
+  - e7ae218b 2023-06-13T16:04:23+02:00 ocpcertificates: hardcode resources to use with given commands
+  - c1c8a43c 2023-06-13T16:04:22+02:00 trustpurge: allow excluding ca-bundles
+  - dc2d78de 2023-06-13T16:04:22+02:00 trustpurge: move to Update, retry on Update() conflicts
+  - 008cde4b 2023-06-13T16:04:22+02:00 ocpcertificates: add the 'remove-old-trust' subcommand
+  - a9eea729 2023-06-13T16:04:22+02:00 certregen: return error on failed apply to stop from further progressing
+  - 38d9a8fa 2023-06-13T16:04:22+02:00 certregen: add unit tests for leaf cert regen
+  - 7f7be0ae 2023-06-13T16:04:09+02:00 certregen: only generate 2048 bit keys to speed up tests
+  - 4d4c49ca 2023-06-13T09:42:18-04:00 update wait for stability to  handle short durations
+  - 91393bbd 2023-06-13T09:23:40-04:00 update for comments
+  - 7380acd1 2023-06-13T07:20:36-04:00 include new shell escaping dependency
+  - 636d40fc 2023-06-13T07:07:22-04:00 create command to create new adminkubeconfig
+  - 480437d8 2023-06-12T19:08:14-04:00 add a command to copy content to every node
+  - f7f6eee3 2023-06-12T17:58:03-04:00 refactor the restart kubelet to extract PerNodePod commands
+  - a9e42596 2023-06-12T09:03:05-04:00 add kubelet restart
+  - 9c890a84 2023-06-09T13:28:28-04:00 add command to restart kubelets
 
