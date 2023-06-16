@@ -1,7 +1,229 @@
-- oc image-arm64 4e136762ec0ea7216f04665eb983ca30633b1f9f to 9c7b9edaea80a0d6acbe5f1b0278b7d55cc2d7d9
+- cluster-ingress-operator embedded-component e068d04e01cca70be8efb0a595188835525b4792 to 0e500e647303c6a63a7077de4a3d465d45f683d2
+  - 7251aaa 2023-06-06T12:51:22-04:00 Add support for AWS shared VPC in another account
+  - 56a4055 2023-06-06T09:11:46-04:00 Bump openshift/api for PrivateHostedZoneAWS
+
+- cluster-network-operator embedded-component 6cf62caf70d0a5905511b1f85e204bad7e57903c to 5b8884021f201dbe7784c13dbc5e6939a70d5b44
+  - 529def9 2023-06-12T12:42:18+02:00 Do not determine if HyperShift is enabled based on the ControlPlaneTopology value
+  - 19c0dc9 2023-05-30T15:59:15-07:00 Add necessary manifest changes for cloud-network-config-controller
+
+- machine-config-operator embedded-component 6511a6d5b008459e9d7126bdd154c06eddb3d8aa to 3d84f653e08d760d446442ddc80c3da21d8d7e59
+  - 28c26ea8 2023-05-18T18:00:37+02:00 OpenStack: configure ipv6 addresses
+
+- oc image-amd64 4e136762ec0ea7216f04665eb983ca30633b1f9f to c7a312c09ad02847322b3237d4222c51fcf9db4e
+  - 758b5c35 2023-06-14T19:32:06+02:00 pernodepod: percent works like this
+  - 89c64979 2023-06-14T16:55:19+02:00 ocpcertificates: don't make assumptions on resources not to bring piping from -oname commands
+  - 207976bb 2023-06-14T12:58:45+02:00 clusteroperator,ocpcertificates: add command descriptions and examples
+  - 6cdb77f6 2023-06-14T10:27:36+02:00 waitforstable: fix typo in minimum-stable-period flag
+  - 0885b3c9 2023-06-14T10:06:55+02:00 ocpcertificates: fix handling resources by names explicitly
+  - 83d4101b 2023-06-13T18:45:45-04:00 add new kubelet bootstrap command
+  - e64e7bd0 2023-06-13T16:32:55-04:00 add directives and fix percentage node calculation
+  - c41e53ec 2023-06-13T16:14:04-04:00 skip unready nodes quickly
+  - b97709a6 2023-06-13T16:02:40-04:00 add the option to add a command when restarting kubelets
+  - 9722dda5 2023-06-13T17:03:35+02:00 trustpurge: use RetryOnConflict for conflict handling
+  - 1b15e234 2023-06-13T10:07:53-04:00 add newline between polls to make it easier to read by hu9mans
+  - 6fd3c946 2023-06-13T10:04:49-04:00 update output to make the wait easier to see and print all proceeding operators
+  - e7ae218b 2023-06-13T16:04:23+02:00 ocpcertificates: hardcode resources to use with given commands
+  - c1c8a43c 2023-06-13T16:04:22+02:00 trustpurge: allow excluding ca-bundles
+  - dc2d78de 2023-06-13T16:04:22+02:00 trustpurge: move to Update, retry on Update() conflicts
+  - 008cde4b 2023-06-13T16:04:22+02:00 ocpcertificates: add the 'remove-old-trust' subcommand
+  - a9eea729 2023-06-13T16:04:22+02:00 certregen: return error on failed apply to stop from further progressing
+  - 38d9a8fa 2023-06-13T16:04:22+02:00 certregen: add unit tests for leaf cert regen
+  - 7f7be0ae 2023-06-13T16:04:09+02:00 certregen: only generate 2048 bit keys to speed up tests
+  - 4d4c49ca 2023-06-13T09:42:18-04:00 update wait for stability to  handle short durations
+  - 91393bbd 2023-06-13T09:23:40-04:00 update for comments
+  - 7380acd1 2023-06-13T07:20:36-04:00 include new shell escaping dependency
+  - 636d40fc 2023-06-13T07:07:22-04:00 create command to create new adminkubeconfig
+  - 480437d8 2023-06-12T19:08:14-04:00 add a command to copy content to every node
+  - f7f6eee3 2023-06-12T17:58:03-04:00 refactor the restart kubelet to extract PerNodePod commands
   - 61cc186c 2023-06-12T15:55:26-04:00 Minor updates to CLI help text
   - 32d7dfc6 2023-06-12T16:07:35+02:00 add leaf certs regen, reusing the original logic for toplevel
   - c049419c 2023-06-12T16:06:39+02:00 remove previous testing proposal
+  - a9e42596 2023-06-12T09:03:05-04:00 add kubelet restart
+  - 9c890a84 2023-06-09T13:28:28-04:00 add command to restart kubelets
   - 744cbd0a 2023-06-09T13:16:00+02:00 vendor in fake confiv1client for testing
   - 48a2359a 2023-06-09T13:15:59+02:00 add a command to wait for the cluster to become stable
+
+- ovn-kubernetes image-amd64 8f60d8256d695de33219c36fc3b83a924264eddf to 23c67c62ed1d912387791a1d8eb422b367c422dc
+  - ece5840 2023-06-13T21:48:59+02:00 Use the old leadership lock name for global zone
+  - 52ac333 2023-06-13T21:48:32+02:00 Fix podIPs not found on IC
+  - 5d2d473 2023-06-07T14:35:19+02:00 Stop using a waitgroup in route manager
+  - dcd5003 2023-06-06T15:24:45+02:00 Update OCPHACKs to use nodeipt pkg
+  - 214b3ba 2023-05-23T17:36:20+02:00 Pretty print CPUSet
+  - 1286207 2023-05-23T17:36:20+02:00 Add smoke tests for  OVS CPU affinity pinning
+  - 46d2ce5 2023-05-23T17:36:20+02:00 OVS Daemon CPU Pinning
+  - e9e6120 2023-05-22T10:28:21+00:00 Fix localnet set as layer2 in netinfo
+  - e48a187 2023-05-19T12:05:12-05:00 Always use OVN's iface-id-ver option in non-DPUHost mode
+  - 8e8a80b 2023-05-19T11:45:35-05:00 workflows: set read-only permissions where possible
+  - 61541cf 2023-05-18T13:03:01-04:00 initial pods are not wired for hybrid overlay
+  - c2907d1 2023-05-17T10:53:24-05:00 ovn: assume Logical Datapath Groups are always supported
+  - d253dfa 2023-05-17T10:41:19-05:00 ovn: assume ACL logging is always supported
+  - 13aac28 2023-05-17T10:03:27-05:00 network-controller: assume multicast/IGMP_Group is supported by OVN
+  - a87ec0a 2023-05-17T17:17:11+03:00 Drop MgmtPortRepresentor config variable
+  - 5c6edd6 2023-05-16T11:09:47+00:00 Egress IP, Services: use all node IP addresses
+  - 8889f47 2023-05-15T15:15:28+01:00 Emit node events only when retry failure
+  - 2200972 2023-05-15T11:51:27+02:00 Expose PfID and VfID in DPU host mode and read that in DPU mode
+  - dea653a 2023-05-11T22:52:42+02:00 Call SyncEndpoints from AddService
+  - bbc8ecf 2023-05-11T20:49:57+00:00 Bump github.com/docker/distribution in /test/e2e
+  - eddd4fe 2023-05-11T12:58:59+02:00 Fix handling alternative netdev names
+  - 454119c 2023-05-11T10:29:13+02:00 e2e: Move NodePort test to Services suite
+  - f041b03 2023-05-11T10:29:13+02:00 Dualstack Service unit test
+  - 8d0252b 2023-05-11T10:29:13+02:00 Configure TemplateLB with all host addresses
+  - ce0d8bc 2023-05-09T14:41:58-04:00 Single interface for network information
+  - 1f80cb5 2023-05-09T16:29:10+03:00 Egress Service: document known non-SNATed traffic issue
+  - 03ea2c4 2023-05-09T12:12:51+02:00 Add unit test for getDefaultGatewayInterfaceByFamily and getDefaultGatewayInterfaceDetails
+  - e70b35b 2023-05-09T12:12:51+02:00 getDefaultGatewayInterfaceDetails: do not return empty gateway IPs
+  - 1fbcc39 2023-05-09T12:12:50+02:00 Allow a scenario where there is only IPv4 default GW specified in a dual-stack cluster
+  - d245054 2023-05-09T09:28:30+03:00 Add EgressService "Network" E2E
+  - 8378793 2023-05-09T09:28:30+03:00 Update EgressService docs
+  - 94228ab 2023-05-09T09:28:30+03:00 Update EgressService E2E
+  - 912a2d0 2023-05-09T09:28:30+03:00 Update manifests for EgressService
+  - e1eb338 2023-05-09T09:28:30+03:00 node-tests: Lock FakeIPTables
+  - ec5685b 2023-05-09T09:28:27+03:00 EgressService refactor: ovnkube-node side
+  - 24b820e 2023-05-09T09:26:58+03:00 EgressService refactor: ovnkube-master
+  - 8a349d3 2023-05-09T09:26:58+03:00 Remove old egress-service annotations
+  - e0886c2 2023-05-09T09:26:58+03:00 Add EgressService CRD
+  - 4adec1b 2023-05-08T23:34:21+02:00 Add enable-multi-networkpolicy CLI flag
+  - 7b88e0a 2023-05-08T15:00:25-04:00 Fix stale SNAT entries for completed pods
+  - e8197b4 2023-05-08T14:58:44-04:00 Add route manager
+  - 89a16ff 2023-05-08T10:17:52+02:00 docs, multi-net policy: provide user documentation
+  - 7438591 2023-05-05T09:35:47+02:00 Provide dependency check for python3-pip
+  - 1c64fab 2023-05-05T09:35:47+02:00 Adjust python ssl library dependency check
+  - 3f429e5 2023-05-04T18:10:37-04:00 Clean up the mgmt port on OvS bridge for the DPU-Host (Tenant Cluster)
+  - fa78a2c 2023-05-04T11:24:23-04:00 Adds code owners
+  - c272f8e 2023-05-04T10:42:40+02:00 multi-homing, policy, e2e: add requiresExtraNamespace attribute to pod config
+  - c5f760a 2023-05-03T11:54:07-04:00 Enable github actions merge group
+  - 5f1fbb8 2023-05-02T09:46:59+02:00 Filter out IP addresses added by keepalived
+  - c174dd5 2023-05-01T17:25:13-07:00 cmdDel should return if connection details annotation does not exist
+  - 5cf99d2 2023-04-29T11:17:04+02:00 Avoid external connectivity flakes in E2E
+  - 58c7719 2023-04-28T21:15:17-04:00 Fix handling of DPU on node address change/setting
+  - 6b7959f 2023-04-28T20:09:28-04:00 Fix minor typo in error string
+  - 667d85e 2023-04-28T12:02:52-04:00 Disable Secondary networks - layer2 and localnet when Interconnect feature is enabled.
+  - 3d4c1b0 2023-04-28T11:58:05-04:00 Add interconnect support for secondary layer3 networks.
+  - f7c40b0 2023-04-28T11:58:04-04:00 Add a new option to specify the zone name.
+  - 1d76233 2023-04-28T11:58:02-04:00 network-controller-manager: Add zone support for services.
+  - 93a0dc7 2023-04-28T11:58:01-04:00 network-controller-manager: Manage network policies for each zone.
+  - 8aa1423 2023-04-28T11:58:00-04:00 network-controller-manager: Create interconnect resources.
+  - ae27492 2023-04-28T11:57:58-04:00 cluster-manager:  Generate Transit switch port ips.
+  - 2e32b52 2023-04-28T11:57:57-04:00 network-controller-manager: Manage the nodes which belong to local zone.
+  - 4ff3c32 2023-04-28T11:57:56-04:00 cluster-manager: Allocate node's GW router port addresses.
+  - 9c81678 2023-04-28T11:57:56-04:00 ovnkube-node: Set node zone name in the node annotation.
+  - 8227f9d 2023-04-28T11:57:54-04:00 cluster-manager:  Generate a unique ID (int) for each node.
+  - ff4bd26 2023-04-28T11:10:40+02:00 Use new sriovnet.GetPfIndexByVfPciAddress function
+  - 146c4f4 2023-04-28T11:10:37+02:00 Upgrade sriovnet
+  - 3a9a0bb 2023-04-28T11:10:33+02:00 Regenerate mockery changes for SriovnetOps
+  - 4323405 2023-04-27T14:23:28-04:00 Check if the status of a pod before trying to get its ip
+  - 82adc2a 2023-04-18T07:30:09-06:00 Fix bug that resulted in routes not be restored to a new vnic
+
+- oc image-arm64 9c7b9edaea80a0d6acbe5f1b0278b7d55cc2d7d9 to a2f337a204f5afe07e0118a946ed17ac53a2bad2
+  - 758b5c35 2023-06-14T19:32:06+02:00 pernodepod: percent works like this
+  - b0a8593f 2023-06-14T11:26:23-04:00 ocpcertificates: complete MCS CA rotation command
+  - 38aebecc 2023-06-14T11:16:27-04:00 regeneratemco: Vendor dataurl
+  - ed0b45df 2023-06-14T11:16:25-04:00 ocpcertificates: Add regenerate-mco
+  - 89c64979 2023-06-14T16:55:19+02:00 ocpcertificates: don't make assumptions on resources not to bring piping from -oname commands
+  - 207976bb 2023-06-14T12:58:45+02:00 clusteroperator,ocpcertificates: add command descriptions and examples
+  - 6cdb77f6 2023-06-14T10:27:36+02:00 waitforstable: fix typo in minimum-stable-period flag
+  - 0885b3c9 2023-06-14T10:06:55+02:00 ocpcertificates: fix handling resources by names explicitly
+  - 83d4101b 2023-06-13T18:45:45-04:00 add new kubelet bootstrap command
+  - e64e7bd0 2023-06-13T16:32:55-04:00 add directives and fix percentage node calculation
+  - c41e53ec 2023-06-13T16:14:04-04:00 skip unready nodes quickly
+  - b97709a6 2023-06-13T16:02:40-04:00 add the option to add a command when restarting kubelets
+  - 9722dda5 2023-06-13T17:03:35+02:00 trustpurge: use RetryOnConflict for conflict handling
+  - 1b15e234 2023-06-13T10:07:53-04:00 add newline between polls to make it easier to read by hu9mans
+  - 6fd3c946 2023-06-13T10:04:49-04:00 update output to make the wait easier to see and print all proceeding operators
+  - e7ae218b 2023-06-13T16:04:23+02:00 ocpcertificates: hardcode resources to use with given commands
+  - c1c8a43c 2023-06-13T16:04:22+02:00 trustpurge: allow excluding ca-bundles
+  - dc2d78de 2023-06-13T16:04:22+02:00 trustpurge: move to Update, retry on Update() conflicts
+  - 008cde4b 2023-06-13T16:04:22+02:00 ocpcertificates: add the 'remove-old-trust' subcommand
+  - a9eea729 2023-06-13T16:04:22+02:00 certregen: return error on failed apply to stop from further progressing
+  - 38d9a8fa 2023-06-13T16:04:22+02:00 certregen: add unit tests for leaf cert regen
+  - 7f7be0ae 2023-06-13T16:04:09+02:00 certregen: only generate 2048 bit keys to speed up tests
+  - 4d4c49ca 2023-06-13T09:42:18-04:00 update wait for stability to  handle short durations
+  - 91393bbd 2023-06-13T09:23:40-04:00 update for comments
+  - 7380acd1 2023-06-13T07:20:36-04:00 include new shell escaping dependency
+  - 636d40fc 2023-06-13T07:07:22-04:00 create command to create new adminkubeconfig
+  - 480437d8 2023-06-12T19:08:14-04:00 add a command to copy content to every node
+  - f7f6eee3 2023-06-12T17:58:03-04:00 refactor the restart kubelet to extract PerNodePod commands
+  - a9e42596 2023-06-12T09:03:05-04:00 add kubelet restart
+  - 9c890a84 2023-06-09T13:28:28-04:00 add command to restart kubelets
+  - 67340f1a 2023-06-06T15:19:07+03:00 Add source per mirror source registry
+  - 2d8b3ee9 2023-06-05T10:39:35+03:00 Not add source if MirrorSourcePolicy is NeverContactSource
+  - 1c0b85df 2023-06-05T10:39:35+03:00 oc image extract: add --idms-file flag and deprecate icsp
+  - 4616eb46 2023-06-05T10:39:35+03:00 Introduce IDMS support as alternative source strategy
+
+- ovn-kubernetes image-arm64 8f60d8256d695de33219c36fc3b83a924264eddf to 5217351470aaa77bcfca04a1b6ee1ebf2bfbe7d9
+  - ece5840 2023-06-13T21:48:59+02:00 Use the old leadership lock name for global zone
+  - 52ac333 2023-06-13T21:48:32+02:00 Fix podIPs not found on IC
+  - eacdaa7 2023-06-13T09:44:38+02:00 Validate port before deleting conntrack flow
+  - d829d7d 2023-06-13T09:44:21+02:00 Use no-uplink gateway bridge in compact-mode e2e test
+  - f764a79 2023-06-13T09:44:16+02:00 Allow external gateway bridge without uplink port In local gateway mode
+  - 5d2d473 2023-06-07T14:35:19+02:00 Stop using a waitgroup in route manager
+  - dcd5003 2023-06-06T15:24:45+02:00 Update OCPHACKs to use nodeipt pkg
+  - 214b3ba 2023-05-23T17:36:20+02:00 Pretty print CPUSet
+  - 1286207 2023-05-23T17:36:20+02:00 Add smoke tests for  OVS CPU affinity pinning
+  - 46d2ce5 2023-05-23T17:36:20+02:00 OVS Daemon CPU Pinning
+  - e9e6120 2023-05-22T10:28:21+00:00 Fix localnet set as layer2 in netinfo
+  - e48a187 2023-05-19T12:05:12-05:00 Always use OVN's iface-id-ver option in non-DPUHost mode
+  - 8e8a80b 2023-05-19T11:45:35-05:00 workflows: set read-only permissions where possible
+  - 61541cf 2023-05-18T13:03:01-04:00 initial pods are not wired for hybrid overlay
+  - c2907d1 2023-05-17T10:53:24-05:00 ovn: assume Logical Datapath Groups are always supported
+  - d253dfa 2023-05-17T10:41:19-05:00 ovn: assume ACL logging is always supported
+  - 13aac28 2023-05-17T10:03:27-05:00 network-controller: assume multicast/IGMP_Group is supported by OVN
+  - a87ec0a 2023-05-17T17:17:11+03:00 Drop MgmtPortRepresentor config variable
+  - 5c6edd6 2023-05-16T11:09:47+00:00 Egress IP, Services: use all node IP addresses
+  - 8889f47 2023-05-15T15:15:28+01:00 Emit node events only when retry failure
+  - 2200972 2023-05-15T11:51:27+02:00 Expose PfID and VfID in DPU host mode and read that in DPU mode
+  - dea653a 2023-05-11T22:52:42+02:00 Call SyncEndpoints from AddService
+  - bbc8ecf 2023-05-11T20:49:57+00:00 Bump github.com/docker/distribution in /test/e2e
+  - eddd4fe 2023-05-11T12:58:59+02:00 Fix handling alternative netdev names
+  - 454119c 2023-05-11T10:29:13+02:00 e2e: Move NodePort test to Services suite
+  - f041b03 2023-05-11T10:29:13+02:00 Dualstack Service unit test
+  - 8d0252b 2023-05-11T10:29:13+02:00 Configure TemplateLB with all host addresses
+  - ce0d8bc 2023-05-09T14:41:58-04:00 Single interface for network information
+  - 1f80cb5 2023-05-09T16:29:10+03:00 Egress Service: document known non-SNATed traffic issue
+  - 03ea2c4 2023-05-09T12:12:51+02:00 Add unit test for getDefaultGatewayInterfaceByFamily and getDefaultGatewayInterfaceDetails
+  - e70b35b 2023-05-09T12:12:51+02:00 getDefaultGatewayInterfaceDetails: do not return empty gateway IPs
+  - 1fbcc39 2023-05-09T12:12:50+02:00 Allow a scenario where there is only IPv4 default GW specified in a dual-stack cluster
+  - d245054 2023-05-09T09:28:30+03:00 Add EgressService "Network" E2E
+  - 8378793 2023-05-09T09:28:30+03:00 Update EgressService docs
+  - 94228ab 2023-05-09T09:28:30+03:00 Update EgressService E2E
+  - 912a2d0 2023-05-09T09:28:30+03:00 Update manifests for EgressService
+  - e1eb338 2023-05-09T09:28:30+03:00 node-tests: Lock FakeIPTables
+  - ec5685b 2023-05-09T09:28:27+03:00 EgressService refactor: ovnkube-node side
+  - 24b820e 2023-05-09T09:26:58+03:00 EgressService refactor: ovnkube-master
+  - 8a349d3 2023-05-09T09:26:58+03:00 Remove old egress-service annotations
+  - e0886c2 2023-05-09T09:26:58+03:00 Add EgressService CRD
+  - 4adec1b 2023-05-08T23:34:21+02:00 Add enable-multi-networkpolicy CLI flag
+  - 7b88e0a 2023-05-08T15:00:25-04:00 Fix stale SNAT entries for completed pods
+  - e8197b4 2023-05-08T14:58:44-04:00 Add route manager
+  - 89a16ff 2023-05-08T10:17:52+02:00 docs, multi-net policy: provide user documentation
+  - 7438591 2023-05-05T09:35:47+02:00 Provide dependency check for python3-pip
+  - 1c64fab 2023-05-05T09:35:47+02:00 Adjust python ssl library dependency check
+  - 3f429e5 2023-05-04T18:10:37-04:00 Clean up the mgmt port on OvS bridge for the DPU-Host (Tenant Cluster)
+  - fa78a2c 2023-05-04T11:24:23-04:00 Adds code owners
+  - c272f8e 2023-05-04T10:42:40+02:00 multi-homing, policy, e2e: add requiresExtraNamespace attribute to pod config
+  - c5f760a 2023-05-03T11:54:07-04:00 Enable github actions merge group
+  - 5f1fbb8 2023-05-02T09:46:59+02:00 Filter out IP addresses added by keepalived
+  - c174dd5 2023-05-01T17:25:13-07:00 cmdDel should return if connection details annotation does not exist
+  - 5cf99d2 2023-04-29T11:17:04+02:00 Avoid external connectivity flakes in E2E
+  - 58c7719 2023-04-28T21:15:17-04:00 Fix handling of DPU on node address change/setting
+  - 6b7959f 2023-04-28T20:09:28-04:00 Fix minor typo in error string
+  - 667d85e 2023-04-28T12:02:52-04:00 Disable Secondary networks - layer2 and localnet when Interconnect feature is enabled.
+  - 3d4c1b0 2023-04-28T11:58:05-04:00 Add interconnect support for secondary layer3 networks.
+  - f7c40b0 2023-04-28T11:58:04-04:00 Add a new option to specify the zone name.
+  - 1d76233 2023-04-28T11:58:02-04:00 network-controller-manager: Add zone support for services.
+  - 93a0dc7 2023-04-28T11:58:01-04:00 network-controller-manager: Manage network policies for each zone.
+  - 8aa1423 2023-04-28T11:58:00-04:00 network-controller-manager: Create interconnect resources.
+  - ae27492 2023-04-28T11:57:58-04:00 cluster-manager:  Generate Transit switch port ips.
+  - 2e32b52 2023-04-28T11:57:57-04:00 network-controller-manager: Manage the nodes which belong to local zone.
+  - 4ff3c32 2023-04-28T11:57:56-04:00 cluster-manager: Allocate node's GW router port addresses.
+  - 9c81678 2023-04-28T11:57:56-04:00 ovnkube-node: Set node zone name in the node annotation.
+  - 8227f9d 2023-04-28T11:57:54-04:00 cluster-manager:  Generate a unique ID (int) for each node.
+  - ff4bd26 2023-04-28T11:10:40+02:00 Use new sriovnet.GetPfIndexByVfPciAddress function
+  - 146c4f4 2023-04-28T11:10:37+02:00 Upgrade sriovnet
+  - 3a9a0bb 2023-04-28T11:10:33+02:00 Regenerate mockery changes for SriovnetOps
+  - 4323405 2023-04-27T14:23:28-04:00 Check if the status of a pod before trying to get its ip
+  - 82adc2a 2023-04-18T07:30:09-06:00 Fix bug that resulted in routes not be restored to a new vnic
+
+- kubernetes image-arm64 55f2dbe862f9797f524432795c67a775a63025d4 to 27b445f51acd71c57d8d57a86e504976dcef6271
+  - b1e891582 2023-06-14T14:03:11+00:00 UPSTREAM: <drop>: bump apiserver-library-go
 
