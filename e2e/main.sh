@@ -107,6 +107,30 @@ apiServer:
   subjectAltNames:
   - '"${USHIFT_IP}"'
 EOF' &>"${output_dir}/0001-setup.log"
+
+    ssh_cmd 'cat <<EOF | sudo tee /etc/microshift/lvmd.yaml
+    # The fields here reflect LVM state of the CI smoke-testing instance.
+    device-classes:
+      # The name of a device-class
+      - name: default
+
+        # The group where this device-class creates the logical volumes
+        volume-group: rhel
+
+        # Storage capacity in GiB to be spared
+        spare-gb: 0
+
+        # A flag to indicate that this device-class is used by default
+        default: true
+      - name: thin
+        volume-group: rhel
+        spare-gb: 0
+        default: false
+        type: thin
+        thin-pool:
+          name: thin
+          overprovision-ratio: 10.0
+    EOF' &>>"${output_dir}/0001-setup.log"
     ssh_cmd "sudo systemctl enable --now microshift" &>>"${output_dir}/0001-setup.log"
 }
 

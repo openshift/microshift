@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+  name: topolvm-provisioner-thin
+parameters:
+  csi.storage.k8s.io/fstype: xfs
+  topolvm.io/device-class: "thin"
+provisioner: topolvm.io
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
