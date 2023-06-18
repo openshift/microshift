@@ -41,6 +41,8 @@ SYSROOTSIZE=$(( DISKSIZE - 1 - SWAPSIZE - DATAVOLSIZE ))
 SYSROOTSIZE=$(( SYSROOTSIZE * 1024 ))
 # Swap size is expected in MB
 SWAPSIZE=$(( SWAPSIZE * 1024 ))
+# Network name
+NETWORK=${NETWORK:-default}
 
 KICKSTART_FILE=$(mktemp "/tmp/kickstart-${VMNAME}-XXXXX.ks")
 cat < "${ROOTDIR}/config/kickstart.ks.template" | \
@@ -67,7 +69,7 @@ virt-install \
     --vcpus ${NCPUS} \
     --memory ${RAMSIZE} \
     --disk path=./${VMNAME}.qcow2,size=${DISKSIZE} \
-    --network network=default,model=virtio \
+    --network network=${NETWORK},model=virtio \
     --events on_reboot=restart \
     --location ${ISOFILE} \
     --initrd-inject=${KICKSTART_FILE} \

@@ -40,7 +40,7 @@ Note that the command deletes various user and system data, including:
 
 Run the build script without arguments to see its usage.
 ```bash
-~/microshift/scripts/image-builder/build.sh
+$ ~/microshift/scripts/image-builder/build.sh
 Usage: build.sh <-pull_secret_file path_to_file> [OPTION]...
 
   -pull_secret_file path_to_file
@@ -70,6 +70,15 @@ Optional arguments:
   -open_firewall_ports port1[:protocol1],...,portN[:protocolN]
           One or more comma-separated ports (optionally with protocol)
           to be allowed by firewall (default: none)
+  -mirror_registry_host host[:port]
+          Host and optionally port of the mirror container registry to
+          be used by the container runtime when pulling images. The connection
+          to the mirror is configured as unsecure unless a CA trust certificate
+          is specified using -ca_trust_files parameter
+  -ca_trust_files /path/to/file1.pem,...,/path/to/fileN.pem
+          Path to one or more comma-separated public certificate files
+          to be included in the image at the /etc/pki/ca-trust/source/anchors
+          directory and installed using the update-ca-trust utility
   -prometheus
           Add Prometheus process exporter to the image. See
           https://github.com/ncabatoff/process-exporter for more information
@@ -322,14 +331,10 @@ NETCONFIG_FILE=$(mktemp /tmp/isolated-network-XXXXX.xml)
 cat > $NETCONFIG_FILE <<EOF
 <network>
   <name>isolated</name>
-  <dns>
-    <host ip='192.168.100.1'>
-      <hostname>gateway</hostname>
-    </host>
-  </dns>
-  <ip address='192.168.100.1' netmask='255.255.255.0' localPtr='yes'>
+  <forward mode='none'/>
+  <ip address='192.168.111.1' netmask='255.255.255.0' localPtr='yes'>
     <dhcp>
-      <range start='192.168.100.10' end='192.168.100.20'/>
+      <range start='192.168.111.100' end='192.168.111.254'/>
     </dhcp>
   </ip>
 </network>
@@ -343,16 +348,11 @@ rm -f $NETCONFIG_FILE
 Follow the instruction in the [Install MicroShift for Edge](#install-microshift-for-edge) section to install a new virtual machine using the `isolated` network configuration.
 > When running the `virt-install` command, specify the `--network network=isolated,model=virtio` option to select the `isolated` network configuration.
 
-After the virtual machine is created, log into the system using the Virtual Machine Manager console and verify that the Internet is not accessible.
+After the virtual machine is created, log into the system and verify that the Internet is not accessible.
 ```bash
 $ curl -I redhat.com
 curl: (6) Could not resolve host: redhat.com
 ```
-
-> **NOTE** <br>
-> It may be more convenient to connect to the virtual machine using its serial console.
-> * Run the `sudo systemctl enable --now serial-getty@ttyS0.service` command on the virtual machine to enable the serial console service.
-> * Run the `sudo virsh console microshift-edge` command on the hypervisor to connect to the serial console.
 
 Make sure that `CRI-O` has access to the container images required by MicroShift.
 ```bash
