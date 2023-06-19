@@ -1,6 +1,0 @@
-# machine-config-operator embedded-component 74ba23a6c90bb007b6b7cb0b5734b0c91c5fe3b6 to 95816efa5d37e980b65f65d98311ceeb8c946db7
-a42d60097bab5b4fbb89247645dbbd877fe710aa 2023-05-09T16:28:34+00:00 daemon: write certs in firstboot-complete path
-# ovn-kubernetes image-amd64 a69523609f7bbfa2a487e0d1bef52e194c282f90 to 6a2a027e6bd46d43ca05c6259d2ea08147f2f47f
-cfccce3a3762dc542b0b8869217f609a77cf4c8a 2023-06-02T09:44:10-05:00 Dockerfiles: sync RHEL9 dockerfiles to regular ones
-# ovn-kubernetes image-arm64 a69523609f7bbfa2a487e0d1bef52e194c282f90 to 6a2a027e6bd46d43ca05c6259d2ea08147f2f47f
-cfccce3a3762dc542b0b8869217f609a77cf4c8a 2023-06-02T09:44:10-05:00 Dockerfiles: sync RHEL9 dockerfiles to regular ones
