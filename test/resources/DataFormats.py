@@ -1,7 +1,19 @@
-"""Expose YAML parser to robot tests.
+"""Provides helpers for common data formats
 """
+import json
 import yaml
 from robot.utils import DotDict
+
+
+def json_parse(data):
+    """Parse input string as JSON and return DotDict instance.
+
+    If the input data is empty, return an empty DotDict.
+    """
+    if not data:
+        return DotDict()
+    parsed = json.loads(data)
+    return DotDict(parsed)
 
 
 def yaml_parse(data):

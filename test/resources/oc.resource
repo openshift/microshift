@@ -5,7 +5,7 @@ Documentation    Keywords for using the oc command line.
 ...              'oc' is in the $PATH.
 
 Resource    common.resource
-Library     YAML.py
+Library     DataFormats.py
 
 
 *** Keywords ***

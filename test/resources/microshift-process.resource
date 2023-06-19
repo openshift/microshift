@@ -6,10 +6,10 @@ Library    String
 Library    OperatingSystem
 
 Library    SSHLibrary
-Resource    ../resources/oc.resource
-Resource    ../resources/systemd.resource
-Resource    ../resources/microshift-host.resource
-Library     ../resources/YAML.py
+Resource   oc.resource
+Resource   systemd.resource
+Resource   microshift-host.resource
+Library    DataFormats.py
 
 
 *** Keywords ***
@@ -46,6 +46,19 @@ Wait For MicroShift
     # We could also wait for relevant pods. Can we restructure the
     # greenboot check script to let us use it even when not on a
     # greenboot host?
+
+MicroShift Service Is Active
+    [Documentation]    Check if microshift.service is active
+    ...    (process announced readiness)
+    ${state}=    Get Systemd Setting    microshift.service    ActiveState
+    Should Be Equal As Strings    ${state}    active
+
+Wait For MicroShift Service
+    [Documentation]  Wait for MicroShift service to be active
+    Wait Until Keyword Succeeds
+    ...  50x
+    ...  10s
+    ...  MicroShift Service Is Active
 
 Restart MicroShift
     [Documentation]  Restart the MicroShift service

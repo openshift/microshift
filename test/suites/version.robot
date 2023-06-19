@@ -5,7 +5,7 @@ Resource            ../resources/common.resource
 Resource            ../resources/oc.resource
 Resource            ../resources/microshift-process.resource
 Library             Collections
-Library             ../resources/YAML.py
+Library             ../resources/DataFormats.py
 
 Suite Setup         Setup
 Suite Teardown      Teardown

@@ -29,3 +29,15 @@ Login MicroShift Host
 Logout MicroShift Host
     [Documentation]  Close the open ssh connection to the MicroShift host
     SSHLibrary.Close Connection
+
+Reboot MicroShift Host
+    [Documentation]    Reboot the MicroShift host
+    ...
+    ...    Expects that SSH connection to MicroShift host is active.
+
+    SSHLibrary.Start Command    reboot    sudo=True
+    Sleep    30s
+    Wait Until Keyword Succeeds    5m    15s    Login MicroShift Host
+
+    ${rc}=    SSHLibrary.Execute Command    true    return_stdout=False    return_rc=True
+    Should Be Equal As Integers    0    ${rc}

@@ -5,7 +5,7 @@ Resource    ../resources/common.resource
 Resource    ../resources/microshift-config.resource
 Resource    ../resources/microshift-host.resource
 Resource    ../resources/microshift-process.resource
-Library     ../resources/YAML.py
+Library     ../resources/DataFormats.py
 
 Suite Setup     Setup
 Suite Teardown  Teardown
