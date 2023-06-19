@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"k8s.io/client-go/util/keyutil"
 )
 
@@ -41,12 +40,12 @@ func EnsureKeyPair(pubKeyPath, privKeyPath string) error {
 func GenKeys(pubPath, keyPath string) error {
 	rsaKey, err := rsa.GenerateKey(rand.Reader, keySize)
 	if err != nil {
-		return errors.Wrap(err, "error generating RSA private key")
+		return fmt.Errorf("failed to generate RSA private key: %w", err)
 	}
 
 	keyPEM, err := keyutil.MarshalPrivateKeyToPEM(rsaKey)
 	if err != nil {
-		return fmt.Errorf("failed to encode private key to PEM: %v", err)
+		return fmt.Errorf("failed to encode private key to PEM: %w", err)
 	}
 
 	pubPEM, err := PublicKeyToPem(&rsaKey.PublicKey)
@@ -55,11 +54,11 @@ func GenKeys(pubPath, keyPath string) error {
 	}
 
 	if err := keyutil.WriteKey(keyPath, keyPEM); err != nil {
-		return fmt.Errorf("failed to write the private key to %s: %v", keyPath, err)
+		return fmt.Errorf("failed to write the private key to %s: %w", keyPath, err)
 	}
 
 	if err := os.WriteFile(pubPath, pubPEM, 0400); err != nil {
-		return fmt.Errorf("failed to write public key to %s: %v", pubPath, err)
+		return fmt.Errorf("failed to write public key to %s: %w", pubPath, err)
 	}
 
 	return nil
@@ -69,7 +68,7 @@ func GenKeys(pubPath, keyPath string) error {
 func PublicKeyToPem(key *rsa.PublicKey) ([]byte, error) {
 	keyInBytes, err := x509.MarshalPKIXPublicKey(key)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to MarshalPKIXPublicKey")
+		return nil, fmt.Errorf("failed to MarshalPKIXPublicKey: %w", err)
 	}
 	keyinPem := pem.EncodeToMemory(
 		&pem.Block{

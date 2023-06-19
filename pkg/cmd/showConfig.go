@@ -36,7 +36,7 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 			case "default":
 				cfg = config.NewDefault()
 			default:
-				cmdutil.CheckErr(fmt.Errorf("Unrecognized mode %q", opts.Mode))
+				cmdutil.CheckErr(fmt.Errorf("unrecognized mode %q", opts.Mode))
 			}
 
 			marshalled, err := yaml.Marshal(cfg)

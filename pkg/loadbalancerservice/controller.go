@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
@@ -56,11 +55,11 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 
 	restCfg, err := c.restConfig()
 	if err != nil {
-		return errors.Wrap(err, "error creating rest config for service controller")
+		return fmt.Errorf("failed to create rest config for service controller: %w", err)
 	}
 	c.client, err = kubernetes.NewForConfig(restCfg)
 	if err != nil {
-		return errors.Wrap(err, "failed to create clientset for service controller")
+		return fmt.Errorf("failed to create clientset for service controller: %w", err)
 	}
 
 	klog.Infof("Starting service controller")
@@ -91,7 +90,7 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 		},
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to initialize informer event handlers")
+		return fmt.Errorf("failed to initialize informer event handlers: %w", err)
 	}
 
 	factory.Start(stopCh)

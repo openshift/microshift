@@ -44,7 +44,16 @@ func (dm *manager) BackupExists(name BackupName) (bool, error) {
 }
 
 func (dm *manager) RemoveBackup(name BackupName) error {
-	return os.RemoveAll(dm.GetBackupPath(name))
+	klog.InfoS("Removing backup",
+		"name", name,
+	)
+	if err := os.RemoveAll(dm.GetBackupPath(name)); err != nil {
+		return fmt.Errorf("failed to delete backup %q: %w", name, err)
+	}
+	klog.InfoS("Removed backup",
+		"name", name,
+	)
+	return nil
 }
 
 func (dm *manager) GetBackupList() ([]BackupName, error) {
@@ -64,29 +73,34 @@ func (dm *manager) GetBackupList() ([]BackupName, error) {
 }
 
 func (dm *manager) Backup(name BackupName) error {
-	klog.InfoS("Backing up the data",
-		"storage", dm.storage, "name", name, "data", config.DataDir)
+	klog.InfoS("Starting backup",
+		"storage", dm.storage,
+		"name", name,
+		"data", config.DataDir,
+	)
 
 	if name == "" {
 		return &EmptyArgErr{"name"}
 	}
 
 	if exists, err := dm.BackupExists(name); err != nil {
-		return fmt.Errorf("checking if backup %s exists failed: %w", name, err)
+		return fmt.Errorf("failed to determine if backup %q exists: %w", name, err)
 	} else if exists {
-		klog.ErrorS(nil, "Backup already exists - name should be unique", "name", name)
-		return fmt.Errorf("backup %s already exists", name)
+		return fmt.Errorf("failed to create backup destination %q because it already exists",
+			name)
 	}
 
 	if found, err := pathExists(string(dm.storage)); err != nil {
-		return err
+		return fmt.Errorf("failed to determine if storage location %q for backup exists: %w",
+			dm.storage, err)
 	} else if !found {
 		if makeDirErr := util.MakeDir(string(dm.storage)); makeDirErr != nil {
-			return fmt.Errorf("making %s directory failed: %w", dm.storage, makeDirErr)
+			return fmt.Errorf("failed to create backup storage directory %q: %w",
+				dm.storage, makeDirErr)
 		}
-		klog.InfoS("Backup storage directory created", "path", dm.storage)
+		klog.InfoS("Created backup storage directory", "path", dm.storage)
 	} else {
-		klog.InfoS("Backup storage directory already existed", "path", dm.storage)
+		klog.InfoS("Found existing backup storage directory", "path", dm.storage)
 	}
 
 	dest := dm.GetBackupPath(name)
@@ -100,73 +114,81 @@ func (dm *manager) Backup(name BackupName) error {
 }
 
 func (dm *manager) Restore(name BackupName) error {
-	klog.InfoS("Restoring the data", "storage", dm.storage, "name", name, "data", config.DataDir)
+	klog.InfoS("Starting restore",
+		"storage", dm.storage,
+		"name", name,
+		"data", config.DataDir,
+	)
 
 	if name == "" {
 		return &EmptyArgErr{"name"}
 	}
 
 	if exists, err := dm.BackupExists(name); err != nil {
-		return fmt.Errorf("checking if backup %s exists failed: %w", name, err)
+		return fmt.Errorf("failed to determine if backup %q exists: %w", name, err)
 	} else if !exists {
-		return fmt.Errorf("failed to restore backup, %s does not exist", name)
+		return fmt.Errorf("failed to restore backup, %q does not exist", name)
 	}
 
 	tmp := fmt.Sprintf("%s.saved", config.DataDir)
-	klog.InfoS("Temporarily renaming data dir", "data", config.DataDir, "renamedTo", tmp)
+	klog.InfoS("Renaming existing data dir", "data", config.DataDir, "renamedTo", tmp)
 	if err := os.Rename(config.DataDir, tmp); err != nil {
-		return fmt.Errorf("renaming %s to %s failed: %w", config.DataDir, tmp, err)
+		return fmt.Errorf("failed to rename existing data directory %q to %q: %w",
+			config.DataDir, tmp, err)
 	}
 
 	src := dm.GetBackupPath(name)
 	if err := copyPath(src, config.DataDir); err != nil {
-		klog.ErrorS(err, "Copying backup failed - restoring previous data dir")
+		klog.ErrorS(err, "Failed to restore from backup, restoring current data dir")
 
 		if err := os.RemoveAll(config.DataDir); err != nil {
-			return fmt.Errorf("removing %s failed: %w", config.DataDir, err)
+			return fmt.Errorf("failed to remove data directory %q: %w", config.DataDir, err)
 		}
 
 		if err := os.Rename(tmp, config.DataDir); err != nil {
-			return fmt.Errorf("renaming %s to %s failed: %w", tmp, config.DataDir, err)
+			return fmt.Errorf("failed to rename temporary directory %q to %q: %w",
+				tmp, config.DataDir, err)
 		}
 
-		return fmt.Errorf("restoring backup %s failed: %w", src, err)
+		return fmt.Errorf("failed to restore backup: %w", err)
 	}
 
-	klog.InfoS("Removing temporary data dir", "path", tmp)
+	klog.InfoS("Removing temporary data directory", "path", tmp)
 	if err := os.RemoveAll(tmp); err != nil {
-		klog.ErrorS(err, "Failed to remove path", "path", tmp)
+		klog.ErrorS(err, "Failed to remove temporary data directory, leaving in place", "path", tmp)
 	}
 
-	klog.InfoS("Restore finished", "backup", src, "data", config.DataDir)
+	klog.InfoS("Finished restore",
+		"name", name,
+		"data", config.DataDir,
+	)
 	return nil
 }
 
 func copyPath(src, dest string) error {
 	cmd := exec.Command("cp", append(cpArgs, src, dest)...) //nolint:gosec
-	klog.InfoS("Executing command", "cmd", cmd)
+	klog.InfoS("Starting copy", "cmd", cmd)
 
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
 	err := cmd.Run()
 
-	klog.InfoS("Command finished running", "cmd", cmd,
-		"stdout", strings.ReplaceAll(outb.String(), "\n", `, `),
-		"stderr", errb.String())
-
 	if err != nil {
-		return fmt.Errorf("command %s failed: %w", cmd, err)
+		klog.InfoS("Failed to copy", "cmd", cmd,
+			"stdout", strings.ReplaceAll(outb.String(), "\n", `, `),
+			"stderr", errb.String())
+		return fmt.Errorf("failed to copy %q to %q: %w", src, dest, err)
 	}
 
-	klog.InfoS("Command successful", "cmd", cmd)
+	klog.InfoS("Finished copy", "cmd", cmd)
 	return nil
 }
 
 func pathExists(path string) (bool, error) {
 	exists, err := util.PathExists(path)
 	if err != nil {
-		return false, fmt.Errorf("checking if %s exists failed: %w", path, err)
+		return false, fmt.Errorf("failed to check if path %q exists: %w", path, err)
 	}
 	return exists, nil
 }
