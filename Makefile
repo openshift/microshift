@@ -343,3 +343,7 @@ verify-config: generate-config
 .PHONY: e2e
 e2e:
 	./test/run.sh
+
+.PHONY: rf-fmt
+rf-fmt:
+	@./test/format.sh
