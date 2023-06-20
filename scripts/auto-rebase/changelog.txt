@@ -1,58 +1,11 @@
-- cluster-network-operator embedded-component 5b8884021f201dbe7784c13dbc5e6939a70d5b44 to d1e994081a11db21f2c37731545a53836d7682c7
-  - 89d9ec6 2023-06-12T16:24:08-04:00 Updates unit test for controller-runtime status
-  - 5a4cef2 2023-06-12T10:31:21-04:00 rebase_1.27: unit tests
-  - 4e8eecb 2023-06-12T10:21:27-04:00 rebase_1.27: lint fixes
-  - 9d6ce8d 2023-06-12T10:06:58-04:00 Hacked to oblivion
-  - db57a47 2023-06-12T10:06:58-04:00 Rebase to kube 1.27
+- oc image-arm64 fcd851887c7c44255c535c2908f9a7d9cacf07c8 to f8c5669d53c43ffeda027fee23842098ad635511
+  - f8c5669d 2023-06-19T09:21:32-04:00 Allow keeping sparse manifest lists (#1334)
 
-- kubernetes embedded-component 55f2dbe862f9797f524432795c67a775a63025d4 to b4518170e4f4b621ae1e97d5fd178191bf2b285d
-  - b1e891582 2023-06-14T14:03:11+00:00 UPSTREAM: <drop>: bump apiserver-library-go
-  - 4f9ce199a 2023-04-14T09:44:23-06:00 UPSTREAM: <carry>: STOR-1270: Admission plugin to deny deletion of storages.operator.openshift.io
-
-- oc image-amd64 c7a312c09ad02847322b3237d4222c51fcf9db4e to fcd851887c7c44255c535c2908f9a7d9cacf07c8
-  - 51742e25 2023-06-16T11:53:18-04:00 cleanup naming
-  - 01e95002 2023-06-16T10:34:50-04:00 wait for node reboot
-  - e7d0d5d3 2023-06-15T16:54:18-04:00 better qualify name
-  - 8e30475d 2023-06-15T16:17:00-04:00 add reboot-nodes
-  - 7464784a 2023-06-15T14:54:07-04:00 tweak output format
-  - 4c591b7b 2023-06-15T14:02:34-04:00 correct the cert matching
-  - 45f344ab 2023-06-15T13:25:36-04:00 trustpurge: scope the observed NSes to "openshift-" prefixed ones
-  - 9326cbd8 2023-06-15T13:25:36-04:00 trustpurge: extend observing the trust changes to all leaf certs
-  - c0fca090 2023-06-15T13:25:36-04:00 trustpurge: fix docs issues
-  - 6628c5e7 2023-06-15T13:25:36-04:00 trustpurge: don't proceed if trustbundle changes affect trust
-  - 8360a2bc 2023-06-15T12:11:23-04:00 fix directories for constitency
-  - b0a8593f 2023-06-14T11:26:23-04:00 ocpcertificates: complete MCS CA rotation command
-  - 38aebecc 2023-06-14T11:16:27-04:00 regeneratemco: Vendor dataurl
-  - ed0b45df 2023-06-14T11:16:25-04:00 ocpcertificates: Add regenerate-mco
-  - 67340f1a 2023-06-06T15:19:07+03:00 Add source per mirror source registry
-  - dc8de097 2023-06-06T12:32:24+08:00 [OCPNODE-1580]update oc amd release mirror output using idms
-  - 2d8b3ee9 2023-06-05T10:39:35+03:00 Not add source if MirrorSourcePolicy is NeverContactSource
-  - 1c0b85df 2023-06-05T10:39:35+03:00 oc image extract: add --idms-file flag and deprecate icsp
-  - 4616eb46 2023-06-05T10:39:35+03:00 Introduce IDMS support as alternative source strategy
-
-- ovn-kubernetes image-amd64 23c67c62ed1d912387791a1d8eb422b367c422dc to 5217351470aaa77bcfca04a1b6ee1ebf2bfbe7d9
-  - eacdaa7 2023-06-13T09:44:38+02:00 Validate port before deleting conntrack flow
-  - d829d7d 2023-06-13T09:44:21+02:00 Use no-uplink gateway bridge in compact-mode e2e test
-  - f764a79 2023-06-13T09:44:16+02:00 Allow external gateway bridge without uplink port In local gateway mode
-
-- kubernetes image-amd64 55f2dbe862f9797f524432795c67a775a63025d4 to b4518170e4f4b621ae1e97d5fd178191bf2b285d
-  - b1e891582 2023-06-14T14:03:11+00:00 UPSTREAM: <drop>: bump apiserver-library-go
-  - 4f9ce199a 2023-04-14T09:44:23-06:00 UPSTREAM: <carry>: STOR-1270: Admission plugin to deny deletion of storages.operator.openshift.io
-
-- oc image-arm64 a2f337a204f5afe07e0118a946ed17ac53a2bad2 to fcd851887c7c44255c535c2908f9a7d9cacf07c8
-  - 51742e25 2023-06-16T11:53:18-04:00 cleanup naming
-  - 01e95002 2023-06-16T10:34:50-04:00 wait for node reboot
-  - e7d0d5d3 2023-06-15T16:54:18-04:00 better qualify name
-  - 8e30475d 2023-06-15T16:17:00-04:00 add reboot-nodes
-  - 7464784a 2023-06-15T14:54:07-04:00 tweak output format
-  - 4c591b7b 2023-06-15T14:02:34-04:00 correct the cert matching
-  - 45f344ab 2023-06-15T13:25:36-04:00 trustpurge: scope the observed NSes to "openshift-" prefixed ones
-  - 9326cbd8 2023-06-15T13:25:36-04:00 trustpurge: extend observing the trust changes to all leaf certs
-  - c0fca090 2023-06-15T13:25:36-04:00 trustpurge: fix docs issues
-  - 6628c5e7 2023-06-15T13:25:36-04:00 trustpurge: don't proceed if trustbundle changes affect trust
-  - 8360a2bc 2023-06-15T12:11:23-04:00 fix directories for constitency
-  - dc8de097 2023-06-06T12:32:24+08:00 [OCPNODE-1580]update oc amd release mirror output using idms
-
-- kubernetes image-arm64 27b445f51acd71c57d8d57a86e504976dcef6271 to b4518170e4f4b621ae1e97d5fd178191bf2b285d
-  - 4f9ce199a 2023-04-14T09:44:23-06:00 UPSTREAM: <carry>: STOR-1270: Admission plugin to deny deletion of storages.operator.openshift.io
+- kube-rbac-proxy image-arm64 27c255551673ba529ac6c9419abe13451afa3e4d to 86f31e2de5221ed4acd6509fa7a010a286089f1f
+  - f0deaab 2023-06-05T17:35:49+02:00 vendor: bump
+  - 27fe09d 2023-06-05T15:12:28+02:00 cut release v0.14.2
+  - 87a2ff9 2023-06-05T12:04:55+02:00 go*: update deps without k8s
+  - 12a02cf 2023-05-12T11:45:14+02:00 bump up golang version to 1.20
+  - 7c550b6 2023-05-12T11:38:39+02:00 propagate GOOS to docker container build in test local setup
+  - 85e4ad4 2023-05-12T11:25:11+02:00 bump up golang version to 1.20
 
