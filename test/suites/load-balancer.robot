@@ -1,17 +1,16 @@
 *** Settings ***
-Documentation   Load balancer test suite.
+Documentation       Load balancer test suite.
 
-Library         Process
+Library             Process
+Resource            ../resources/common.resource
+Resource            ../resources/kubeconfig.resource
 
-Resource        ../resources/common.resource
-Resource        ../resources/kubeconfig.resource
-
-Suite Setup     Setup Suite With Namespace
-Suite Teardown  Teardown Suite With Namespace
+Suite Setup         Setup Suite With Namespace
+Suite Teardown      Teardown Suite With Namespace
 
 
 *** Variables ***
-${HELLO_USHIFT}   assets/hello-microshift.yaml
+${HELLO_USHIFT}     assets/hello-microshift.yaml
 
 
 *** Test Cases ***
@@ -19,10 +18,12 @@ Load Balancer Smoke Test
     [Documentation]    Verify that Load Balancer correctly exposes HTTP service
     [Tags]    smoke
     [Setup]    Run Keywords
-    ...    Create Hello MicroShift Pod    AND
+    ...    Create Hello MicroShift Pod
+    ...    AND
     ...    Expose Hello MicroShift Pod Via LB
 
-    Wait Until Keyword Succeeds    3x    3s    Access Hello Microshift Via LB
+    Wait Until Keyword Succeeds    3x    3s
+    ...    Access Hello Microshift Via LB
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Pod Route And Service
@@ -42,7 +43,8 @@ Access Hello Microshift Via LB
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
     ${result}=    Run Process
     ...    curl -i http://hello-microshift.cluster.local --connect-to "hello-microshift.cluster.local:80:${USHIFT_HOST}:5678"
-    ...    shell=True    timeout=15s
+    ...    shell=True
+    ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
     Should Be Equal As Integers    ${result.rc}    0
     Should Match Regexp    ${result.stdout}    HTTP.*200
@@ -51,5 +53,5 @@ Access Hello Microshift Via LB
 Delete Hello MicroShift Pod Route And Service
     [Documentation]    Remove the "hello microshift" resources
     Run With Kubeconfig    oc delete route hello-microshift -n ${NAMESPACE}    True
-    Run With Kubeconfig    oc delete service hello-microshift -n ${NAMESPACE}   True
+    Run With Kubeconfig    oc delete service hello-microshift -n ${NAMESPACE}    True
     Run With Kubeconfig    oc delete -f ${HELLO_USHIFT} -n ${NAMESPACE}    True

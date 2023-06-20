@@ -1,8 +1,9 @@
 *** Settings ***
-Documentation    Keywords common to many test suites
-Library    OperatingSystem
-Library    String
-Resource   ../resources/kubeconfig.resource
+Documentation       Keywords common to many test suites
+
+Library             OperatingSystem
+Library             String
+Resource            ../resources/kubeconfig.resource
 
 
 *** Keywords ***
@@ -34,28 +35,28 @@ Teardown Suite With Namespace
 
 Check Required Env Variables
     [Documentation]    Fail if any of the required environment variables is missing.
-    IF  "${USHIFT_HOST}"=="${EMPTY}"
+    IF    "${USHIFT_HOST}"=="${EMPTY}"
         Fatal Error    USHIFT_HOST variable is required
     END
-    IF  "${USHIFT_USER}"=="${EMPTY}"
+    IF    "${USHIFT_USER}"=="${EMPTY}"
         Fatal Error    USHIFT_USER variable is required
     END
 
-Upload String To File  # robocop: disable=too-many-calls-in-keyword
-    [Documentation]  Write the string to a remote file
-    [Arguments]  ${content}  ${remote_filename}
+Upload String To File    # robocop: disable=too-many-calls-in-keyword
+    [Documentation]    Write the string to a remote file
+    [Arguments]    ${content}    ${remote_filename}
     ${rand}=    Generate Random String
     ${local_tmp}=    Join Path    /tmp    ${rand}
     Create File    ${local_tmp}    ${content}
     ${rand}=    Generate Random String
     ${remote_tmp}=    Join Path    /tmp    ${rand}
-    Put File  ${local_tmp}  ${remote_tmp}  mode=0644
-    Remove File  ${local_tmp}
-    ${stdout}  ${rc}=  Execute Command
+    Put File    ${local_tmp}    ${remote_tmp}    mode=0644
+    Remove File    ${local_tmp}
+    ${stdout}    ${rc}=    Execute Command
     ...    mv ${remote_tmp} ${remote_filename}
-    ...    sudo=True  return_rc=True
-    Should Be Equal As Integers  0  ${rc}
-    ${stdout}  ${rc}=  Execute Command
+    ...    sudo=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+    ${stdout}    ${rc}=    Execute Command
     ...    chown root:root ${remote_filename}
-    ...    sudo=True  return_rc=True
-    Should Be Equal As Integers  0  ${rc}
+    ...    sudo=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
