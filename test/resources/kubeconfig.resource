@@ -1,8 +1,9 @@
 *** Settings ***
-Documentation    Keywords for accessing a kubeconfig file for the MicroShift host
-Library    OperatingSystem
-Library    String
-Resource   ../resources/microshift-host.resource
+Documentation       Keywords for accessing a kubeconfig file for the MicroShift host
+
+Library             OperatingSystem
+Library             String
+Resource            ../resources/microshift-host.resource
 
 
 *** Keywords ***
@@ -13,12 +14,12 @@ Get Kubeconfig
     ...    cat /var/lib/microshift/resources/kubeadmin/${host}/kubeconfig
     ...    sudo=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
-    Should Not Be Empty            ${kubeconfig}
+    Should Not Be Empty    ${kubeconfig}
     RETURN    ${kubeconfig}
 
 Setup Kubeconfig
     [Documentation]    Get the kubeconfig file from the configured $USHIFT_HOST, create a temporary file
-    ...                and export it as $KUBECONFIG variable.
+    ...    and export it as $KUBECONFIG variable.
     ${kubeconfig}=    Get Kubeconfig    ${USHIFT_HOST}
     ${rand}=    Generate Random String
     ${path}=    Join Path    /tmp    ${rand}
@@ -38,7 +39,7 @@ Run With Kubeconfig
     IF    ${allow_fail} == False
         Should Be Equal As Integers    ${result.rc}    0
     END
-    RETURN  ${result.stdout}
+    RETURN    ${result.stdout}
 
 Create Namespace
     [Documentation]    Creates a namespace with the given name.
@@ -48,9 +49,9 @@ Create Namespace
 Create Random Namespace
     [Documentation]    Creates a namespace with a random name and return the name.
     ${rand}=    Generate Random String
-    ${rand}=    Convert To Lowercase  ${rand}
+    ${rand}=    Convert To Lowercase    ${rand}
     Run With Kubeconfig    oc create namespace test-${rand}
-    RETURN  test-${rand}
+    RETURN    test-${rand}
 
 Remove Namespace
     [Documentation]    Removes the given namespace.

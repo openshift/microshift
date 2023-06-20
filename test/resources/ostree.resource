@@ -59,5 +59,5 @@ Does Backup For Booted Deployment Exist
     ...    sudo=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
-    IF    "${output}" == "0"    RETURN    ${False}
-    RETURN    ${True}
+    IF    "${output}" == "0"    RETURN    ${FALSE}
+    RETURN    ${TRUE}

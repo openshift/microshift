@@ -10,69 +10,69 @@ Library             Collections
 Suite Setup         Setup
 Suite Teardown      Teardown
 
-Test Tags           etcd  configuration  restart  slow
+Test Tags           configuration    etcd    restart    slow
 
 
 *** Variables ***
 ${ETCD_SYSTEMD_UNIT}    microshift-etcd.scope
-${MEMLIMIT128}      SEPARATOR=\n
-...  ---
-...  etcd:
-...  \ \ memoryLimitMB: 128
-${MEMLIMIT0}      SEPARATOR=\n
-...  ---
-...  etcd:
-...  \ \ memoryLimitMB: 0
+${MEMLIMIT128}          SEPARATOR=\n
+...                     ---
+...                     etcd:
+...                     \ \ memoryLimitMB: 128
+${MEMLIMIT0}            SEPARATOR=\n
+...                     ---
+...                     etcd:
+...                     \ \ memoryLimitMB: 0
 
 
 *** Test Cases ***
 Set MemoryHigh Limit Unlimited
-    [Documentation]  The default configuration should not limit RAM
+    [Documentation]    The default configuration should not limit RAM
     ...
-    ...  Since we cannot assume that the default configuration file is
-    ...  being used, the test explicitly configures a '0' limit, which
-    ...  is equivalent to not having any configuration at all.
-    [Setup]  Setup With Custom Config  ${MEMLIMIT0}
-    Expect MemoryHigh  infinity
+    ...    Since we cannot assume that the default configuration file is
+    ...    being used, the test explicitly configures a '0' limit, which
+    ...    is equivalent to not having any configuration at all.
+    [Setup]    Setup With Custom Config    ${MEMLIMIT0}
+    Expect MemoryHigh    infinity
 
 Set MemoryHigh Limit 128MB
-    [Documentation]  Set the memory limit for etcd to 128MB and ensure it takes effect
-    [Setup]  Setup With Custom Config  ${MEMLIMIT128}
+    [Documentation]    Set the memory limit for etcd to 128MB and ensure it takes effect
+    [Setup]    Setup With Custom Config    ${MEMLIMIT128}
     # Expecting the setting to be 128 * 1024 * 1024
-    Expect MemoryHigh  134217728
-    [Teardown]  Restore Default Config
+    Expect MemoryHigh    134217728
+    [Teardown]    Restore Default Config
 
 
 *** Keywords ***
 Setup
-    [Documentation]  Test suite setup
+    [Documentation]    Test suite setup
     Check Required Env Variables
     Login MicroShift Host
-    Setup Kubeconfig  # for readiness checks
+    Setup Kubeconfig    # for readiness checks
     Save Default MicroShift Config
 
 Teardown
-    [Documentation]  Test suite teardown
+    [Documentation]    Test suite teardown
     Restore Default Config
     Logout MicroShift Host
     Remove Kubeconfig
 
 Restore Default Config
-    [Documentation]  Remove any custom config and restart MicroShift
+    [Documentation]    Remove any custom config and restart MicroShift
     Restore Default MicroShift Config
     Restart MicroShift
 
 Setup With Custom Config
-    [Documentation]  Install a custom config and restart MicroShift
-    [Arguments]  ${config_content}
-    ${merged}=  Extend MicroShift Config  ${config_content}
-    Upload MicroShift Config  ${merged}
+    [Documentation]    Install a custom config and restart MicroShift
+    [Arguments]    ${config_content}
+    ${merged}=    Extend MicroShift Config    ${config_content}
+    Upload MicroShift Config    ${merged}
     Restart MicroShift
 
 Expect MemoryHigh
-    [Documentation]  Verify that the MemoryHigh setting for etcd matches the expected value
-    [Arguments]  ${expected}
-    ${actual}=  Get Systemd Setting  microshift-etcd.scope  MemoryHigh
+    [Documentation]    Verify that the MemoryHigh setting for etcd matches the expected value
+    [Arguments]    ${expected}
+    ${actual}=    Get Systemd Setting    microshift-etcd.scope    MemoryHigh
     # Using integer comparison is complicated here because sometimes
     # the returned or expected value is 'infinity'.
-    Should Be Equal  ${expected}  ${actual}
+    Should Be Equal    ${expected}    ${actual}
