@@ -1,58 +1,114 @@
-- cluster-network-operator embedded-component 5b8884021f201dbe7784c13dbc5e6939a70d5b44 to d1e994081a11db21f2c37731545a53836d7682c7
-  - 89d9ec6 2023-06-12T16:24:08-04:00 Updates unit test for controller-runtime status
-  - 5a4cef2 2023-06-12T10:31:21-04:00 rebase_1.27: unit tests
-  - 4e8eecb 2023-06-12T10:21:27-04:00 rebase_1.27: lint fixes
-  - 9d6ce8d 2023-06-12T10:06:58-04:00 Hacked to oblivion
-  - db57a47 2023-06-12T10:06:58-04:00 Rebase to kube 1.27
+- cluster-ingress-operator embedded-component 0e500e647303c6a63a7077de4a3d465d45f683d2 to b1a6bb5c8b9ee864fd54374bc833fc24b7b935fd
+  - 960a8d6 2023-06-07T13:04:25-04:00 OCPBUGS-13810: Update TestAWSELBConnectionIdleTimeout to not use wildcard DNS record
 
-- kubernetes embedded-component 55f2dbe862f9797f524432795c67a775a63025d4 to b4518170e4f4b621ae1e97d5fd178191bf2b285d
-  - b1e891582 2023-06-14T14:03:11+00:00 UPSTREAM: <drop>: bump apiserver-library-go
-  - 4f9ce199a 2023-04-14T09:44:23-06:00 UPSTREAM: <carry>: STOR-1270: Admission plugin to deny deletion of storages.operator.openshift.io
+- cluster-kube-controller-manager-operator embedded-component 1e15498f434994aa6676c146638b886e08c93aa5 to 1807a0d1872e8a2a15afc663da269eaacd84fd57
+  - 77fb2dd 2023-06-16T10:10:21+02:00 OCPCLOUD-2010: Re-vendor api and library-go for external platform support
 
-- oc image-amd64 c7a312c09ad02847322b3237d4222c51fcf9db4e to fcd851887c7c44255c535c2908f9a7d9cacf07c8
-  - 51742e25 2023-06-16T11:53:18-04:00 cleanup naming
-  - 01e95002 2023-06-16T10:34:50-04:00 wait for node reboot
-  - e7d0d5d3 2023-06-15T16:54:18-04:00 better qualify name
-  - 8e30475d 2023-06-15T16:17:00-04:00 add reboot-nodes
-  - 7464784a 2023-06-15T14:54:07-04:00 tweak output format
-  - 4c591b7b 2023-06-15T14:02:34-04:00 correct the cert matching
-  - 45f344ab 2023-06-15T13:25:36-04:00 trustpurge: scope the observed NSes to "openshift-" prefixed ones
-  - 9326cbd8 2023-06-15T13:25:36-04:00 trustpurge: extend observing the trust changes to all leaf certs
-  - c0fca090 2023-06-15T13:25:36-04:00 trustpurge: fix docs issues
-  - 6628c5e7 2023-06-15T13:25:36-04:00 trustpurge: don't proceed if trustbundle changes affect trust
-  - 8360a2bc 2023-06-15T12:11:23-04:00 fix directories for constitency
-  - b0a8593f 2023-06-14T11:26:23-04:00 ocpcertificates: complete MCS CA rotation command
-  - 38aebecc 2023-06-14T11:16:27-04:00 regeneratemco: Vendor dataurl
-  - ed0b45df 2023-06-14T11:16:25-04:00 ocpcertificates: Add regenerate-mco
-  - 67340f1a 2023-06-06T15:19:07+03:00 Add source per mirror source registry
-  - dc8de097 2023-06-06T12:32:24+08:00 [OCPNODE-1580]update oc amd release mirror output using idms
-  - 2d8b3ee9 2023-06-05T10:39:35+03:00 Not add source if MirrorSourcePolicy is NeverContactSource
-  - 1c0b85df 2023-06-05T10:39:35+03:00 oc image extract: add --idms-file flag and deprecate icsp
-  - 4616eb46 2023-06-05T10:39:35+03:00 Introduce IDMS support as alternative source strategy
+- cluster-kube-scheduler-operator embedded-component f42458c923d20576d88decb5495888c410ac6051 to c2928b4ab9aa2c1e9bcc0989caa1d209b610b863
+  - 4502640 2023-06-17T12:05:15+08:00 remove loglevel in deploy
 
-- ovn-kubernetes image-amd64 23c67c62ed1d912387791a1d8eb422b367c422dc to 5217351470aaa77bcfca04a1b6ee1ebf2bfbe7d9
-  - eacdaa7 2023-06-13T09:44:38+02:00 Validate port before deleting conntrack flow
-  - d829d7d 2023-06-13T09:44:21+02:00 Use no-uplink gateway bridge in compact-mode e2e test
-  - f764a79 2023-06-13T09:44:16+02:00 Allow external gateway bridge without uplink port In local gateway mode
+- cluster-openshift-controller-manager-operator embedded-component 005db16dd2e3847c0dc76d1a91314c51a55f99b4 to bab7be17127e3e8a661991d78aecd7d5a0542cec
+  - ee183a2 2023-05-11T09:08:17+08:00 change the operator log level to 2
 
-- kubernetes image-amd64 55f2dbe862f9797f524432795c67a775a63025d4 to b4518170e4f4b621ae1e97d5fd178191bf2b285d
-  - b1e891582 2023-06-14T14:03:11+00:00 UPSTREAM: <drop>: bump apiserver-library-go
-  - 4f9ce199a 2023-04-14T09:44:23-06:00 UPSTREAM: <carry>: STOR-1270: Admission plugin to deny deletion of storages.operator.openshift.io
+- oc image-amd64 fcd851887c7c44255c535c2908f9a7d9cacf07c8 to feedec57726f8a276ebc3a680441086562a35480
+  - f8c5669d 2023-06-19T09:21:32-04:00 Allow keeping sparse manifest lists (#1334)
+  - 5922e0a8 2023-06-07T16:37:50-07:00 pkg/cli/admin/upgrade: Surface Recommended=Unknown more prominently
+  - 6a9508c6 2023-01-26T10:03:16-08:00 pkg/cli/admin/upgrade: Add post-period to space to some error messages
 
-- oc image-arm64 a2f337a204f5afe07e0118a946ed17ac53a2bad2 to fcd851887c7c44255c535c2908f9a7d9cacf07c8
-  - 51742e25 2023-06-16T11:53:18-04:00 cleanup naming
-  - 01e95002 2023-06-16T10:34:50-04:00 wait for node reboot
-  - e7d0d5d3 2023-06-15T16:54:18-04:00 better qualify name
-  - 8e30475d 2023-06-15T16:17:00-04:00 add reboot-nodes
-  - 7464784a 2023-06-15T14:54:07-04:00 tweak output format
-  - 4c591b7b 2023-06-15T14:02:34-04:00 correct the cert matching
-  - 45f344ab 2023-06-15T13:25:36-04:00 trustpurge: scope the observed NSes to "openshift-" prefixed ones
-  - 9326cbd8 2023-06-15T13:25:36-04:00 trustpurge: extend observing the trust changes to all leaf certs
-  - c0fca090 2023-06-15T13:25:36-04:00 trustpurge: fix docs issues
-  - 6628c5e7 2023-06-15T13:25:36-04:00 trustpurge: don't proceed if trustbundle changes affect trust
-  - 8360a2bc 2023-06-15T12:11:23-04:00 fix directories for constitency
-  - dc8de097 2023-06-06T12:32:24+08:00 [OCPNODE-1580]update oc amd release mirror output using idms
+- kube-rbac-proxy image-amd64 27c255551673ba529ac6c9419abe13451afa3e4d to 86f31e2de5221ed4acd6509fa7a010a286089f1f
+  - f0deaab 2023-06-05T17:35:49+02:00 vendor: bump
+  - 27fe09d 2023-06-05T15:12:28+02:00 cut release v0.14.2
+  - 87a2ff9 2023-06-05T12:04:55+02:00 go*: update deps without k8s
+  - 12a02cf 2023-05-12T11:45:14+02:00 bump up golang version to 1.20
+  - 7c550b6 2023-05-12T11:38:39+02:00 propagate GOOS to docker container build in test local setup
+  - 85e4ad4 2023-05-12T11:25:11+02:00 bump up golang version to 1.20
 
-- kubernetes image-arm64 27b445f51acd71c57d8d57a86e504976dcef6271 to b4518170e4f4b621ae1e97d5fd178191bf2b285d
-  - 4f9ce199a 2023-04-14T09:44:23-06:00 UPSTREAM: <carry>: STOR-1270: Admission plugin to deny deletion of storages.operator.openshift.io
+- oc image-arm64 fcd851887c7c44255c535c2908f9a7d9cacf07c8 to 97651ff6bfeee420c8ac2bdc6b2a08c9066ea6bc
+  - f8c5669d 2023-06-19T09:21:32-04:00 Allow keeping sparse manifest lists (#1334)
+  - 5922e0a8 2023-06-07T16:37:50-07:00 pkg/cli/admin/upgrade: Surface Recommended=Unknown more prominently
+  - f9fa6f66 2023-05-29T10:08:19+02:00 Fix the output of error prompt
+  - 6a9508c6 2023-01-26T10:03:16-08:00 pkg/cli/admin/upgrade: Add post-period to space to some error messages
+
+- kube-rbac-proxy image-arm64 27c255551673ba529ac6c9419abe13451afa3e4d to 86f31e2de5221ed4acd6509fa7a010a286089f1f
+  - f0deaab 2023-06-05T17:35:49+02:00 vendor: bump
+  - 27fe09d 2023-06-05T15:12:28+02:00 cut release v0.14.2
+  - 87a2ff9 2023-06-05T12:04:55+02:00 go*: update deps without k8s
+  - 12a02cf 2023-05-12T11:45:14+02:00 bump up golang version to 1.20
+  - 7c550b6 2023-05-12T11:38:39+02:00 propagate GOOS to docker container build in test local setup
+  - 85e4ad4 2023-05-12T11:25:11+02:00 bump up golang version to 1.20
+
+- ovn-kubernetes image-arm64 5217351470aaa77bcfca04a1b6ee1ebf2bfbe7d9 to 2bb2d9ff3911f5eefc66fdf3b45c55c408f8fe9a
+  - f90d045 2023-06-18T15:00:27-04:00 CARRY: bump dockerfile to golang 1.20
+  - 4e8a543 2023-06-15T10:47:35-07:00 update go version for github jobs
+  - cb5374a 2023-06-15T10:47:35-07:00 rebase_1.27: update lint to v1.52.2 (latest) and fix lint errors
+  - 3ce2d31 2023-06-15T10:47:35-07:00 rebase_1.27: update OnAdd calls from client-go
+  - 2c4701d 2023-06-15T10:47:34-07:00 rebase_1.27: update k8s.io modules and vendor
+  - 70918fc 2023-06-14T15:55:08+00:00 Use the old leadership lock name for global zone
+  - 908d683 2023-06-14T13:15:56+00:00 fake address set: don't check for concurrency on destroy
+  - 092234d 2023-06-12T19:18:13+02:00 Validate port before deleting conntrack flow
+  - 36a9193 2023-06-12T11:34:39+02:00 Add NCMWatchFactory
+  - 747d3b4 2023-06-09T16:38:18-04:00 kind ic: Fix kind deployment failure if cluster name is specified.
+  - afee2e8 2023-06-09T14:23:18-04:00 Skip APB External Route tests in e2e when IC is enabled
+  - 29ca926 2023-06-09T14:05:26-04:00 pod annotations: refactor GetPodCIDRsWithFullMask
+  - 9434ddc 2023-06-09T14:05:26-04:00 pod annotations: refactor GetPodIPsOfNetwork
+  - a92deee 2023-06-09T14:05:26-04:00 pod annotations, tests: GetPodIPsOfNetwork for secondary network
+  - f029b4c 2023-06-09T14:05:26-04:00 pod annotations, tests: parametrize GetPodIPsOfNetwork networkInfo
+  - 5f0e846 2023-06-09T14:05:26-04:00 Fixes usages of get pod IPs
+  - 13edc85 2023-06-09T13:54:30-04:00 Fix golangci-lint issues
+  - 91e29d9 2023-06-09T11:37:32-04:00 APB External Route fixes for unit test: * Fixed APB External Route flaky unit test when comparing static hop slices for policy changes by ensuring the comparison is done after the CR has been updated * Removed sorting functions in gatewayInfoList as they were not clear how they would sort the struct and were only used in test scenarios. They have been replaced by the Equal() functions.
+  - 3888bea 2023-06-08T10:26:14-07:00 fix issue running tests in docker
+  - 7bd8d5d 2023-06-08T11:41:13-04:00 fix hybrid overlay test flakes by removing periodic syncflows from testing
+  - e2d9ee7 2023-06-07T11:48:01-04:00 kind: Remove separate cluster manager support.
+  - 49ae4e3 2023-06-07T16:42:19+02:00 multi-homing, tests: skip NetConfList network configurations
+  - e881c76 2023-06-07T16:42:19+02:00 multi-homing, tests: test parsing the default network config
+  - 4c6bc6f 2023-06-07T16:42:19+02:00 multi-homing, tests: add successful scenario
+  - e7b5dc9 2023-06-07T16:42:19+02:00 multi-homing: remove redundant check
+  - a111f50 2023-06-07T16:42:19+02:00 multi-homing: fail if NetAttachDef provides ipam key
+  - 857019f 2023-06-07T08:36:20-04:00 Add EgressService flag to IC templates
+  - fa5c490 2023-06-07T08:36:20-04:00 Fix CPU Pinning tests in control plane for IC=true
+  - 77713d2 2023-06-07T08:36:20-04:00 Fix EIP control-plane tests when IC=true
+  - f49c71c 2023-06-07T08:36:20-04:00 CI: Add lane for kind-dual-stack-conversion with ovn-ic enabled
+  - f9a7975 2023-06-07T08:36:20-04:00 CI: Test multizone interconnect.
+  - 981900c 2023-06-07T08:36:20-04:00 e2e cp tests: Strip the leading and trailing qoutes from stdout of a cmd.
+  - 0742ee4 2023-06-07T08:36:20-04:00 kind: Enhance interconnect support to deploy multiple nodes in a zone.
+  - 3f96b2f 2023-06-07T08:36:20-04:00 kind: Add support for interconnect and multiple zones support.
+  - c9dccc44 2023-06-06T08:14:50-04:00 Remove check for removal of egress GW annotation in namespace during tests
+  - 25d892c 2023-06-05T17:11:48-04:00 Fixes invalid error while getting router NATs
+  - e62ff50 2023-06-05T12:48:07-05:00 test: use new libovsdb test server CreateTestData() in address set tests
+  - bc487cb 2023-06-05T12:47:49-05:00 testing: add CreateTestData() method for libovsdb test server
+  - 4a4046e 2023-06-05T12:47:49-05:00 test: rename libovsdbtest Cleanup -> Context
+  - a44dc11 2023-06-05T18:49:04+02:00 Add multi-zone support for egressservice
+  - d93a590 2023-06-05T18:49:04+02:00 Move egressservice allocation to cluster-manager
+  - 815884a 2023-06-05T18:49:04+02:00 Unify egressservice file naming
+  - 2560332 2023-06-03T12:24:48-04:00 fedora: Update OVN to 23.06.0-0.
+  - f543d45 2023-06-02T12:09:04-05:00 apbroute: consolidate some startup code
+  - 7368222 2023-06-02T18:21:45+02:00 CVE-2022-41723: net/http, golang.org/x/net/http2: avoid quadratic complexity in HPACK decoding
+  - a1b8aef 2023-06-02T09:35:13+02:00 Stop using a waitgroup in route manager
+  - 0927ea4 2023-06-01T10:12:27+00:00 Increase unit test timeout to 20m for ovn pkg
+  - 91e8a3b 2023-06-01T06:19:11+02:00 Fix cleanupStalePodSNATs if no podIPs are found
+  - 77ba451 2023-05-31T18:06:16+02:00 Extract all namespace pod ips only when creating nsInfo.
+  - ed147de 2023-05-31T10:40:20+02:00 multi-net, e2e, kind: remove shift instruction
+  - e579396 2023-05-31T10:40:20+02:00 multi-homing, localnet, tests: configure underlay
+  - d4a92b5 2023-05-31T10:40:20+02:00 multi-homing, e2e tests: extra interface for the kind deployment
+  - a747b14 2023-05-31T10:40:20+02:00 e2e, kind: parametrize OCI_BIN when creating secondary interfaces
+  - 5742aa1 2023-05-30T12:58:46-05:00 code in the AddPod() for hybrid overlay that inits the Node not required
+  - 6af07aa 2023-05-30T12:58:46-05:00 rename podLister to localPodLister for hybrid overlay
+  - 28d8241 2023-05-26T16:33:53+02:00 docs, multi-homing, policy: document IPAM-less policies restrictions
+  - ae94d5b 2023-05-26T13:39:07+02:00 multi-net policies, IPAM less: only warn for IPAMed networks
+  - dc94736 2023-05-26T13:39:07+02:00 multi-net policies, IPAM less, e2e: add test for IPAMless flat L2 policies
+  - faa0a7e 2023-05-26T13:39:07+02:00 multi-net policies, IPAM less: allow ipBlock peers
+  - 8ae10c3 2023-05-26T13:39:07+02:00 multi-net policies, IPAM less: fail when converting invalid policies
+  - 5acded9 2023-05-26T13:39:07+02:00 e2e: improve the error message of the getNetCIDRSubnet func
+  - e80027a 2023-05-26T10:23:22+08:00 Use no-uplink gateway bridge in compact-mode e2e test
+  - 89f953d 2023-05-26T10:23:03+08:00 Allow external gateway bridge without uplink port In local gateway mode
+  - 41fb665 2023-05-25T14:19:35-04:00 upgrade go and linter versions
+  - 513482b 2023-05-25T19:25:36+02:00 Initialize EgressIP stopChan in cluster-manager
+  - 91046e8 2023-05-24T16:27:33-04:00 Summary of changes: * Implements controllers for Admin Policy Based External Route to handle changes to namespaces, pods and admin policy based external route CRs. * Initialize in master node to handle interactions with the north bound DB. Initialize in worker nodes to handle changes to the conntrack (delete ECMP entries when a gateway IP is no longer a valid external gateway IP) * Implements repair() function for the master node. * Integrates with the annotation logic to avoid duplications in cache by sharing the externalGWCache and EXGWCacheMutex objects between the annotation and controller logic. * Updates the annotation logic to ensure the namespace anontation k8s.ovn.org/external-gw-pod-ips is updated when changes occur in a CR instance that coexists in the same namespace and that can impact the list of dynamic gateway IPs. * The implementation no longer relies on namespace annotations, including "k8s.ovn.org/external-gw-pod-ips", instead it uses its own cache structure to identify the valid pod IPs for a given namespace. * Implement E2E tests for admin policy based external route. The tests are a duplication of the existing annotated based logic for external gateways using the CR instead.
+  - 39bdf00 2023-05-24T14:27:06-04:00 Add Admin Policy Based External Route CRD and related generated code (informer,lister,api)
+  - df58e4f 2023-05-24T17:50:04+02:00 Add doc changes for IC metrics move
+  - b74b3aa 2023-05-24T17:47:14+02:00 EIP: Move relevant metrics to CM
+  - 665b934 2023-05-23T21:28:30+02:00 Split egressip into global and zone controllers
+  - 744f097 2023-05-23T21:28:30+02:00 Add utility DeleteLogicalRouterStaticRoutesWithPredicateOps
+  - 79a9b52 2023-05-23T21:28:30+02:00 Add egressIP factory to cluster-manager
+  - 2356819 2023-05-23T21:28:30+02:00 Add egressip feature enable flag to CM
 
