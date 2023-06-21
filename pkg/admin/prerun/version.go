@@ -105,6 +105,8 @@ func getVersionOfData() (versionMetadata, error) {
 	return versionMetadataFromString(string(versionFileContents))
 }
 
+// checkVersionDiff compares versions of executable and existing data for purposes of data migration.
+// It returns true if the migration should be performed.
 func checkVersionDiff(execVer, dataVer versionMetadata) (bool, error) {
 	if execVer == dataVer {
 		return false, nil
@@ -116,6 +118,14 @@ func checkVersionDiff(execVer, dataVer versionMetadata) (bool, error) {
 
 	if execVer.Minor < dataVer.Minor {
 		return false, fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
+	}
+
+	if execVer.Minor > dataVer.Minor {
+		if execVer.Minor-1 == dataVer.Minor {
+			return true, nil
+		} else {
+			return false, fmt.Errorf("executable (%s) is too recent compared to existing data (%s): maximum minor version difference is 1", execVer.String(), dataVer.String())
+		}
 	}
 
 	return false, nil
