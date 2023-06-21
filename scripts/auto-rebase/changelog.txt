@@ -1,6 +1,7 @@
-# machine-config-operator embedded-component 74ba23a6c90bb007b6b7cb0b5734b0c91c5fe3b6 to 95816efa5d37e980b65f65d98311ceeb8c946db7
-a42d60097bab5b4fbb89247645dbbd877fe710aa 2023-05-09T16:28:34+00:00 daemon: write certs in firstboot-complete path
-# ovn-kubernetes image-amd64 a69523609f7bbfa2a487e0d1bef52e194c282f90 to 6a2a027e6bd46d43ca05c6259d2ea08147f2f47f
-cfccce3a3762dc542b0b8869217f609a77cf4c8a 2023-06-02T09:44:10-05:00 Dockerfiles: sync RHEL9 dockerfiles to regular ones
-# ovn-kubernetes image-arm64 a69523609f7bbfa2a487e0d1bef52e194c282f90 to 6a2a027e6bd46d43ca05c6259d2ea08147f2f47f
-cfccce3a3762dc542b0b8869217f609a77cf4c8a 2023-06-02T09:44:10-05:00 Dockerfiles: sync RHEL9 dockerfiles to regular ones
+# cluster-network-operator embedded-component 924fd3c589f0dc345807550965ef80099311b82a to cf774f4844621d058b951457a4068aeb3e1e609e
+ff5d378a5e8a9af3d20692d11c1b9270549d075e 2023-06-12T19:27:03+00:00 Do not determine if HyperShift is enabled based on the ControlPlaneTopology value
+cfdebe8dca3e6b74109a00683480f1c82c956ae9 2023-05-18T19:15:03+00:00 Use `IfNotPresent` instead of `Always` in OVNK upgrades pre-puller
+# ovn-kubernetes image-amd64 6a2a027e6bd46d43ca05c6259d2ea08147f2f47f to 723ce848a1a3f1a699409d0c2e5ff52114e5be89
+cd99b41e441a917e51f983f69d34578167293395 2023-06-18T17:49:56+02:00 Fix stale SNAT entries for completed pods
+# ovn-kubernetes image-arm64 6a2a027e6bd46d43ca05c6259d2ea08147f2f47f to 723ce848a1a3f1a699409d0c2e5ff52114e5be89
+cd99b41e441a917e51f983f69d34578167293395 2023-06-18T17:49:56+02:00 Fix stale SNAT entries for completed pods
