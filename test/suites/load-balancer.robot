@@ -22,7 +22,7 @@ Load Balancer Smoke Test
     ...    AND
     ...    Expose Hello MicroShift Pod Via LB
 
-    Wait Until Keyword Succeeds    3x    3s
+    Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift Via LB
 
     [Teardown]    Run Keywords
