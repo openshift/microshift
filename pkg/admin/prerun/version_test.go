@@ -35,6 +35,20 @@ func TestCheckVersionDiff(t *testing.T) {
 			expectedMigrationRequired: false,
 			errExpected:               true,
 		},
+		{
+			name:                      "binary must be newer only by one minor version",
+			execVer:                   versionMetadata{Major: 4, Minor: 15},
+			dataVer:                   versionMetadata{Major: 4, Minor: 14},
+			expectedMigrationRequired: true,
+			errExpected:               false,
+		},
+		{
+			name:                      "binary newer more than one minor version is not supported",
+			execVer:                   versionMetadata{Major: 4, Minor: 15},
+			dataVer:                   versionMetadata{Major: 4, Minor: 13},
+			expectedMigrationRequired: false,
+			errExpected:               true,
+		},
 	}
 
 	for _, td := range testData {
