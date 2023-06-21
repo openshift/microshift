@@ -12,7 +12,7 @@ The scripts for building the installer are located in the `scripts/image-builder
 ### Prerequisites
 Execute the `scripts/image-builder/configure.sh` script to install the tools necessary for building the installer image.
 
-Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~microshift/.pull-secret.json` file.
+Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~/.pull-secret.json` file.
 
 Make sure there is more than 20GB of free disk space necessary for the build artifacts. Run the following command to free the space if necessary.
 ```bash
