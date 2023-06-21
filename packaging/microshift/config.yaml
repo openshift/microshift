@@ -18,7 +18,7 @@ etcd:
     # Set a memory limit on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
     memoryLimitMB: 0
 manifests:
-    # The locations on the filesystem to scan for kustomization.yaml files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests. The entries in the list can be glob patterns to match multiple subdirectories.
+    # The locations on the filesystem to scan for kustomization files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests. The entries in the list can be glob patterns to match multiple subdirectories.
     kustomizePaths:
         - /usr/lib/microshift/manifests
         - /usr/lib/microshift/manifests.d/*
