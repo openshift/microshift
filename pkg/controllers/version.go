@@ -49,6 +49,7 @@ func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	var data = map[string]string{
 		"major":   versionInfo.Major,
 		"minor":   versionInfo.Minor,
+		"patch":   versionInfo.Patch,
 		"version": versionInfo.String(),
 	}
 

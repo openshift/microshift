@@ -21,25 +21,35 @@ var (
 	majorFromGit string
 	// minor version
 	minorFromGit string
+	// patch version
+	patchFromGit string
 	// build date in ISO8601 format, output of $(date -u +'%Y-%m-%dT%H:%M:%SZ')
 	buildDate string
 	// state of git tree, either "clean" or "dirty"
 	gitTreeState string
 )
 
+type Info struct {
+	version.Info
+	Patch string `json:"patch"`
+}
+
 // Get returns the overall codebase version. It's for detecting
 // what code a binary was built from.
-func Get() version.Info {
-	return version.Info{
-		Major:        majorFromGit,
-		Minor:        minorFromGit,
-		GitCommit:    commitFromGit,
-		GitVersion:   versionFromGit,
-		GitTreeState: gitTreeState,
-		BuildDate:    buildDate,
-		GoVersion:    runtime.Version(),
-		Compiler:     runtime.Compiler,
-		Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
+func Get() Info {
+	return Info{
+		Info: version.Info{
+			Major:        majorFromGit,
+			Minor:        minorFromGit,
+			GitCommit:    commitFromGit,
+			GitVersion:   versionFromGit,
+			GitTreeState: gitTreeState,
+			BuildDate:    buildDate,
+			GoVersion:    runtime.Version(),
+			Compiler:     runtime.Compiler,
+			Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
+		},
+		Patch: patchFromGit,
 	}
 }
 

@@ -24,11 +24,18 @@ var (
 	majorFromGit string
 	// minor version
 	minorFromGit string
+	// patch version
+	patchFromGit string
 	// build date in ISO8601 format, output of $(date -u +'%Y-%m-%dT%H:%M:%SZ')
 	buildDate string
 	// state of git tree, either "clean" or "dirty"
 	gitTreeState string
 )
+
+type Info struct {
+	version.Info
+	Patch string `json:"patch"`
+}
 
 type VersionOptions struct {
 	Output string
@@ -58,16 +65,19 @@ func NewVersionCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 }
 
 func (o *VersionOptions) Run() error {
-	versionInfo := version.Info{
-		Major:        majorFromGit,
-		Minor:        minorFromGit,
-		GitCommit:    commitFromGit,
-		GitVersion:   versionFromGit,
-		GitTreeState: gitTreeState,
-		BuildDate:    buildDate,
-		GoVersion:    runtime.Version(),
-		Compiler:     runtime.Compiler,
-		Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
+	versionInfo := Info{
+		Info: version.Info{
+			Major:        majorFromGit,
+			Minor:        minorFromGit,
+			GitCommit:    commitFromGit,
+			GitVersion:   versionFromGit,
+			GitTreeState: gitTreeState,
+			BuildDate:    buildDate,
+			GoVersion:    runtime.Version(),
+			Compiler:     runtime.Compiler,
+			Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
+		},
+		Patch: patchFromGit,
 	}
 
 	switch o.Output {

@@ -23,8 +23,9 @@ SOURCE_GIT_TAG := ${MICROSHIFT_VERSION}
 EMBEDDED_GIT_TAG ?= ${SOURCE_GIT_TAG}
 EMBEDDED_GIT_COMMIT ?= ${SOURCE_GIT_COMMIT}
 EMBEDDED_GIT_TREE_STATE ?= ${SOURCE_GIT_TREE_STATE}
-MAJOR := $(shell echo $(SOURCE_GIT_TAG) | cut -f1 -d.)
-MINOR := $(shell echo $(SOURCE_GIT_TAG) | cut -f2 -d.)
+MAJOR := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._-]' '{print $$1}')
+MINOR := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._-]' '{print $$2}')
+PATCH := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._-]' '{print $$3}')
 
 SRC_ROOT :=$(shell pwd)
 
@@ -76,6 +77,7 @@ GO_LD_FLAGS := $(GC_FLAGS) -ldflags " \
                    -X k8s.io/client-go/pkg/version.buildDate=$(BIN_TIMESTAMP) \
                    -X github.com/openshift/microshift/pkg/version.majorFromGit=$(MAJOR) \
                    -X github.com/openshift/microshift/pkg/version.minorFromGit=$(MINOR) \
+                   -X github.com/openshift/microshift/pkg/version.patchFromGit=$(PATCH) \
                    -X github.com/openshift/microshift/pkg/version.versionFromGit=$(EMBEDDED_GIT_TAG) \
                    -X github.com/openshift/microshift/pkg/version.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
                    -X github.com/openshift/microshift/pkg/version.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
@@ -116,6 +118,7 @@ etcd:
 	GO_LD_FLAGS="$(GC_FLAGS) -ldflags \"\
                    -X main.majorFromGit=$(MAJOR) \
                    -X main.minorFromGit=$(MINOR) \
+                   -X main.patchFromGit=$(PATCH) \
                    -X main.versionFromGit=$(EMBEDDED_GIT_TAG) \
                    -X main.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
                    -X main.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \

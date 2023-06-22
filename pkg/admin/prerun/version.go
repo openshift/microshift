@@ -54,37 +54,42 @@ func CreateOrValidateDataVersion() error {
 }
 
 type versionMetadata struct {
-	Major, Minor int
+	Major, Minor, Patch int
 }
 
 func (v versionMetadata) String() string {
-	return fmt.Sprintf("%d.%d", v.Major, v.Minor)
+	return fmt.Sprintf("%d.%d.%d", v.Major, v.Minor, v.Patch)
 }
 
-// versionMetadataFromString creates versionMetadata object from "major.minor" string where X and Y are integers
-func versionMetadataFromString(majorMinor string) (versionMetadata, error) {
-	majorMinor = strings.TrimSpace(majorMinor)
-	majorMinorSplit := strings.Split(majorMinor, ".")
-	if len(majorMinorSplit) != 2 {
-		return versionMetadata{}, fmt.Errorf("invalid version string (%s): expected X.Y", majorMinor)
+// versionMetadataFromString creates versionMetadata object from "major.minor.patch" string where major, minor, and patch are integers
+func versionMetadataFromString(majorMinorPatch string) (versionMetadata, error) {
+	majorMinorPatch = strings.TrimSpace(majorMinorPatch)
+	split := strings.Split(majorMinorPatch, ".")
+	if len(split) != 3 {
+		return versionMetadata{}, fmt.Errorf("invalid version string (%s): expected Major.Minor.Patch", majorMinorPatch)
 	}
 
-	major, err := strconv.Atoi(majorMinorSplit[0])
+	major, err := strconv.Atoi(split[0])
 	if err != nil {
-		return versionMetadata{}, fmt.Errorf("converting '%s' to an int failed: %w", majorMinorSplit[0], err)
+		return versionMetadata{}, fmt.Errorf("converting %q to an int failed: %w", split[0], err)
 	}
 
-	minor, err := strconv.Atoi(majorMinorSplit[1])
+	minor, err := strconv.Atoi(split[1])
 	if err != nil {
-		return versionMetadata{}, fmt.Errorf("converting '%s' to an int failed: %w", majorMinorSplit[1], err)
+		return versionMetadata{}, fmt.Errorf("converting %q to an int failed: %w", split[1], err)
 	}
 
-	return versionMetadata{Major: major, Minor: minor}, nil
+	patch, err := strconv.Atoi(split[2])
+	if err != nil {
+		return versionMetadata{}, fmt.Errorf("converting %q to an int failed: %w", split[2], err)
+	}
+
+	return versionMetadata{Major: major, Minor: minor, Patch: patch}, nil
 }
 
 func getVersionOfExecutable() (versionMetadata, error) {
 	ver := version.Get()
-	return versionMetadataFromString(fmt.Sprintf("%s.%s", ver.Major, ver.Minor))
+	return versionMetadataFromString(fmt.Sprintf("%s.%s.%s", ver.Major, ver.Minor, ver.Patch))
 }
 
 func getVersionOfData() (versionMetadata, error) {
