@@ -170,7 +170,6 @@ virt-install \
     --memory 3072 \
     --disk path=./${VMNAME}.qcow2,size=20 \
     --network network=default,model=virtio \
-    --os-type generic \
     --events on_reboot=restart \
     --cdrom ./microshift-installer-*.$(uname -m).iso \
     --wait \
