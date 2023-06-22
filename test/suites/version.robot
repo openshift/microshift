@@ -23,6 +23,7 @@ ConfigMap Contents
     ${configmap}=    Oc Get    configmap    kube-public    microshift-version
     Should Be Equal As Integers    ${configmap.data.major}    ${MAJOR_VERSION}
     Should Be Equal As Integers    ${configmap.data.minor}    ${MINOR_VERSION}
+    Should Be Equal As Integers    ${configmap.data.patch}    ${PATCH_VERSION}
 
 CLI Output
     [Documentation]    Check the version reported by the process
@@ -30,6 +31,7 @@ CLI Output
     ${version}=    MicroShift Version
     Should Be Equal As Integers    ${version.major}    ${MAJOR_VERSION}
     Should Be Equal As Integers    ${version.minor}    ${MINOR_VERSION}
+    Should Be Equal As Integers    ${version.patch}    ${PATCH_VERSION}
     Should Start With    ${version.gitVersion}    ${Y_STREAM}
 
 ConfigMap Matches CLI
@@ -83,3 +85,10 @@ Read Expected Versions    # robocop: disable=too-many-calls-in-keyword
     # 4.14
     ${ystream}=    Format String    {}.{}    ${major}    ${minor}
     Set Suite Variable    \${Y_STREAM}    ${ystream}
+
+    # 0-0.nightly-arm64-2023-05-04-012046
+    ${without_majorminor}=    Get Substring    ${without_major}    3
+
+    # 0
+    ${patch}=    Fetch From Left    ${without_majorminor}    -
+    Set Suite Variable    \${PATCH_VERSION}    ${patch}

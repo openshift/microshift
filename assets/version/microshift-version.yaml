@@ -7,4 +7,5 @@ metadata:
 data:
   major: ""
   minor: ""
+  patch: ""
   version: ""
