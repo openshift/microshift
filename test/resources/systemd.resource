@@ -30,11 +30,13 @@ Systemctl    # robocop: disable=too-long-keyword
     ...    "start" or "restart", this keyword will wait for the unit
     ...    to report that it is "running". When the verb is "stop", this
     ...    keyword will wait for the unit to report that it is "dead".
+    ...    When the verb is "enable", this keyword will only check success
+    ...    of the operation and not wait for any change to the service..
     [Arguments]    ${verb}    ${unit_name}
 
     IF    "${verb}" in {"restart", "start"}
         ${state}=    Set Variable    running
-    ELSE
+    ELSE IF    "${verb}" in {"stop"}
         ${state}=    Set Variable    dead
     END
 
@@ -55,6 +57,8 @@ Systemctl    # robocop: disable=too-long-keyword
         ...    return_stdout=True
     END
     Should Be Equal As Integers    0    ${rc}
+
+    IF    "${verb}" == "enable"    RETURN
 
     # It takes a bit for systemd to respond, and if we check too soon
     # then it looks like microshift is up, even though it is about to

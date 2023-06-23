@@ -1,64 +1,88 @@
 *** Settings ***
 Documentation       Keywords for OSTree-based systems
 
-Library             SSHLibrary
-Library             DataFormats.py
+Resource            systemd.resource
+Resource            microshift-process.resource
+Library             libostree.py
 
 
 *** Variables ***
-${DATA_DIR}             /var/lib/microshift
-${BACKUP_STORAGE}       /var/lib/microshift-backups
-${HEALTH_FILE}          /var/lib/microshift-backups/health.json
+${DATA_DIR}             "/var/lib/microshift"
+${BACKUP_STORAGE}       "/var/lib/microshift-backups"
 
 
 *** Keywords ***
-Get Booted Deployment Status
-    [Documentation]    Get rpm-ostree status of booted deployment as a json
+Wait Until Greenboot Health Check Exited
+    [Documentation]    Wait until greenboot healthchecks are done
 
-    ${ostree_status}    ${rc}=    Execute Command
-    ...    rpm-ostree status --booted --json
-    ...    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
-    ${status}=    Json Parse    ${ostree_status}
-    RETURN    ${status}
+    Wait Until Keyword Succeeds    10m    15s
+    ...    Greenboot Health Check Exited
 
-Get Booted Deployment ID
-    [Documentation]    Get ID of currently booted deployment
+Greenboot Health Check Exited
+    [Documentation]    Checks if greenboot-healthcheck finished running successfully (exited)
 
-    ${status}=    Get Booted Deployment Status
-    RETURN    ${status.deployments[0].id}
+    ${value}=    Get Systemd Setting    greenboot-healthcheck.service    SubState
+    Should Be Equal As Strings    ${value}    exited
 
-Get Booted Deployment Backup Prefix Path
-    [Documentation]    Get backup path prefix for current deployment
-    ...
-    ...    Prefix path is BACKUP_STORAGE/deployment-id.
-    ...    Globbing directories starting with the prefix will yield
-    ...    list of backups for the deployment.
+Get Future Backup Name For Current Boot
+    [Documentation]    Provides a name for future backup:
+    ...    "4.13" for MicroShift 4.13, otherwise deployment ID + boot ID
 
-    ${current_deployment_id}=    Get Booted Deployment ID
-    Should Not Be Empty    ${current_deployment_id}
-    Should Not Be Empty    ${BACKUP_STORAGE}
-    ${backup_path}=    Catenate    SEPARATOR=/    ${BACKUP_STORAGE}    ${current_deployment_id}
-    RETURN    ${backup_path}
-
-Get System Health
-    [Documentation]    Get system health information from health.json file
-
-    ${health}    ${stderr}    ${rc}=    Execute Command
-    ...    jq -r '.health' ${BACKUP_STORAGE}/health.json
-    ...    sudo=True    return_rc=True    return_stderr=True
-    Should Be Equal As Integers    0    ${rc}
-    RETURN    ${health}
-
-Does Backup For Booted Deployment Exist
-    [Documentation]    Checks if any backup for current deployment exists
-    ...    by finding paths starting with "backup prefix path"
+    # When system is upgrading from 4.13, there is no metadata regarding previous boot,
+    # therefore, when naming backup for existing data, "4.13" will be used as deployment ID,
+    # i.e. it should reside in `/var/lib/microshift-backups/4.13`
+    ${version}=    MicroShift Version
+    IF    ${version.minor} == 13    RETURN    4.13
 
     ${deploy_id}=    Get Booted Deployment ID
-    ${output}    ${rc}=    Execute Command
-    ...    find ${BACKUP_STORAGE} -name '${deploy_id}*' | wc -l
-    ...    sudo=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
+    ${boot_id}=    Get Current Boot Id
+    ${backup_name}=    Catenate    ${deploy_id}    ${boot_id}    SEPARATOR=_
+    RETURN    ${backup_name}
 
-    IF    "${output}" == "0"    RETURN    ${FALSE}
-    RETURN    ${TRUE}
+Backup Should Exist
+    [Documentation]    Checks if backup identified by deployment ID
+    ...    and (optionally) boot ID exists
+    [Arguments]    ${deployment_id}    ${boot_id}=${EMPTY}
+    ${exists}=    Does Backup Exist    ${deployment_id}    ${boot_id}
+    Should Be True    ${exists}
+
+Remove Existing Backup For Current Deployment
+    [Documentation]    Remove any existing backup for currently running deployment
+    ${deploy_id}=    Get Booted Deployment Id
+    Remove Backups For Deployment    ${deploy_id}
+
+Rebase System And Verify
+    [Documentation]    Deploys given ostree ref on the host, reboots it,
+    ...    and checks if the host is healthy.
+    [Arguments]    ${ref}
+
+    Rebase Ostree System    ${ref}
+    Reboot MicroShift Host
+
+    Wait Until Greenboot Health Check Exited
+    System Should Be Healthy
+
+    ${ref_after_reboot}=    Get Current Ref
+    Should Be Equal As Strings    ${ref_after_reboot}    ${ref}
+
+System Should Be Healthy
+    [Documentation]    Verifies if system is healthy by looking at health.json.
+    ...    If this runs after greenboot-healthcheck finishes, it verifies
+    ...    health of current boot.
+
+    # Health of system with MicroShift 4.13 is implicitly checked by "Greenboot Health Check Exited"
+    ${version}=    MicroShift Version
+    IF    ${version.minor} == 13    RETURN
+
+    ${health}=    Get Persisted System Health
+    Should Be Equal As Strings    ${health}    healthy
+
+MicroShift 413 Should Not Have Upgrade Artifacts
+    [Documentation]    Verifies that host running MicroShift 4.13
+    ...    does not have upgrade related artifacts.
+
+    ${version}=    MicroShift Version
+    IF    ${version.minor} == 13
+        Path Should Not Exist    ${BACKUP_STORAGE}
+        Path Should Not Exist    /var/lib/microshift/version
+    END

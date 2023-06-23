@@ -67,3 +67,15 @@ Restart MicroShift
     Sleep    10 seconds
     Systemctl With Retry    start    microshift.service
     Wait For MicroShift
+
+Stop MicroShift
+    [Documentation]    Stop the MicroShift service
+    Systemctl With Retry    stop    microshift.service
+
+Cleanup MicroShift
+    [Documentation]    Cleanup
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    echo 1 | sudo microshift-cleanup-data --all
+    ...    sudo=True    return_stderr=True    return_rc=True
+    Log Many    ${stdout}    ${stderr}    ${rc}
+    Should Be Equal As Integers    ${rc}    0
