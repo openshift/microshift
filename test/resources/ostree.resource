@@ -6,6 +6,7 @@ Library             DataFormats.py
 
 
 *** Variables ***
+${DATA_DIR}             /var/lib/microshift
 ${BACKUP_STORAGE}       /var/lib/microshift-backups
 ${HEALTH_FILE}          /var/lib/microshift-backups/health.json
 
