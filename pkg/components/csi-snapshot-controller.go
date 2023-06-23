@@ -9,7 +9,6 @@ import (
 )
 
 func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
-
 	var (
 		cr         = []string{"components/csi-snapshot-controller/clusterrole.yaml"}
 		crb        = []string{"components/csi-snapshot-controller/clusterrolebinding.yaml"}

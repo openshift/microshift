@@ -26,7 +26,7 @@ type validationWebhookCfg struct {
 	validationWebhookConfig *admissionregistrationV1.ValidatingWebhookConfiguration
 }
 
-func (v validationWebhookCfg) Reader(objBytes []byte, renderFunc RenderFunc, params RenderParams) {
+func (v *validationWebhookCfg) Reader(objBytes []byte, renderFunc RenderFunc, params RenderParams) {
 	var err error
 	if renderFunc != nil {
 		objBytes, err = renderFunc(objBytes, RenderParams{})
@@ -41,12 +41,12 @@ func (v validationWebhookCfg) Reader(objBytes []byte, renderFunc RenderFunc, par
 	v.validationWebhookConfig = obj.(*admissionregistrationV1.ValidatingWebhookConfiguration)
 }
 
-func (v validationWebhookCfg) Applier(ctx context.Context) error {
+func (v *validationWebhookCfg) Applier(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyValidatingWebhookConfigurationImproved(ctx, v.Client, assetsEventRecorder, v.validationWebhookConfig, nil)
 	return err
 }
 
-func admissionRegistrationClient(ctx context.Context, kubeconfigPath string) *admclientV1.AdmissionregistrationV1Client {
+func admissionRegistrationClient(kubeconfigPath string) *admclientV1.AdmissionregistrationV1Client {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		klog.Fatalf("failed to create admission-registration client: %w", err)
@@ -75,6 +75,6 @@ func applyAdmissionRegistration(ctx context.Context, admissionRegistrations []st
 
 func ApplyValidatingWebhookConfiguration(ctx context.Context, admissionRegistrations []string, kubeconfigPath string) error {
 	a := &validationWebhookCfg{}
-	a.Client = admissionRegistrationClient(ctx, kubeconfigPath)
+	a.Client = admissionRegistrationClient(kubeconfigPath)
 	return applyAdmissionRegistration(ctx, admissionRegistrations, a, nil, nil)
 }
