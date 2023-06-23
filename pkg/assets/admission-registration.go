@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 	admissionregistrationV1 "k8s.io/api/admissionregistration/v1"
@@ -11,6 +12,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
+
+	embedded "github.com/openshift/microshift/assets"
 )
 
 var (
@@ -55,6 +58,18 @@ func applyAdmissionRegistration(ctx context.Context, admissionRegistrations []st
 	lock.Lock()
 	defer lock.Unlock()
 
+	for _, ar := range admissionRegistrations {
+		klog.Infof("applying admissionRegistration: %s", ar)
+		objBytes, err := embedded.Asset(ar)
+		if err != nil {
+			return fmt.Errorf("error getting embedded asset %s: %v", ar, err)
+		}
+		applier.Reader(objBytes, render, params)
+		if err := applier.Applier(ctx); err != nil {
+			klog.Warningf("failed to apply admissionRegistration object: %s, %v", ar, err)
+			return err
+		}
+	}
 	return nil
 }
 

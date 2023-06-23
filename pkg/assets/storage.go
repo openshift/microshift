@@ -192,10 +192,12 @@ func applyVolumeSnapshotClass(ctx context.Context, applier readerApplier, vcs []
 	return nil
 }
 
+// dynamicClient returns a generic kubernetes client which can handle arbitrary API schemas.  We use this instead of th
+// volumeSnapshot client to avoid vendoring
 func dynamicClient(kubeconfigPath string) *dynamic.DynamicClient {
 	restCfg, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}
-	return dynamic.NewForConfigOrDie(restCfg)
+	return dynamic.NewForConfigOrDie(rest.AddUserAgent(restCfg, "storage-dynamic-client"))
 }
