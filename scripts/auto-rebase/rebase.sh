@@ -26,9 +26,9 @@ shopt -s extglob
 trap 'echo "Script exited with error."' ERR
 
 #debugging options
-trap 'echo "#L$LINENO: $BASH_COMMAND" >&2' DEBUG
-set -xo functrace
-PS4='+ $LINENO  '
+#trap 'echo "#L$LINENO: $BASH_COMMAND" >&2' DEBUG
+#set -xo functrace
+#PS4='+ $LINENO  '
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="$REPOROOT/_output/staging"
