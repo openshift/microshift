@@ -133,5 +133,5 @@ func checkVersionDiff(execVer, dataVer versionMetadata) (bool, error) {
 		}
 	}
 
-	return false, nil
+	return IsUpgradeBlocked(execVer, dataVer)
 }
