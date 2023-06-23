@@ -25,23 +25,17 @@ var (
 // Function is intended to be invoked by main MicroShift run procedure, just before starting,
 // to ensure that storage migration (which should update the version file) was performed.
 func CreateOrValidateDataVersion() error {
-	execVer, err := getVersionOfExecutable()
-	if err != nil {
-		return err
-	}
-
 	dataVer, err := getVersionOfData()
 	if err != nil {
 		if errors.Is(err, errDataVersionDoesNotExist) {
 			// First run of MicroShift, create version file shortly after creating DataDir
-			execVerS := execVer.String()
-			klog.InfoS("Version file in data directory does not exist - creating", "version", execVerS)
-
-			if err := os.WriteFile(versionFilePath, []byte(execVerS), 0600); err != nil {
-				return fmt.Errorf("writing '%s' to %s failed: %w", execVerS, versionFilePath, err)
-			}
-			return nil
+			return writeExecVersionToData()
 		}
+		return err
+	}
+
+	execVer, err := getVersionOfExecutable()
+	if err != nil {
 		return err
 	}
 	klog.InfoS("Comparing versions of MicroShift data on disk and executable", "data", dataVer, "exec", execVer)
@@ -50,6 +44,20 @@ func CreateOrValidateDataVersion() error {
 		return fmt.Errorf("data version (%s) does not match binary version (%s) - missing migration?", dataVer, execVer)
 	}
 
+	return nil
+}
+
+func writeExecVersionToData() error {
+	execVer, err := getVersionOfExecutable()
+	if err != nil {
+		return err
+	}
+	version := execVer.String()
+	klog.InfoS("Writing MicroShift version to the file in data directory", "version", version)
+
+	if err := os.WriteFile(versionFilePath, []byte(version), 0600); err != nil {
+		return fmt.Errorf("writing '%s' to %s failed: %w", version, versionFilePath, err)
+	}
 	return nil
 }
 
