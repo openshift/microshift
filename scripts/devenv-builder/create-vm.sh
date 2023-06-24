@@ -49,23 +49,6 @@ if [ "${SWAPSIZE}" -eq 0 ] ; then
     sed -i "s;^part swap;#part swap;" "${KICKSTART_FILE}"
 fi
 
-# Allow the VM creation to run in parallel using multiple instances of this script
-# Note: If 'dnf' command is run in parallel, its database is corrupted
-# === Start critical section ===
-exec {LOCK_FD}<"$0"
-flock --exclusive ${LOCK_FD}
-
-sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass
-if [ "$(systemctl is-active libvirtd.socket)" != "active" ] ; then
-    echo "Restart your host to initialize the virtualization environment"
-    exit 1
-fi
-# Necessary to allow remote connections in the virt-viewer application
-sudo usermod -a -G libvirt "$(whoami)"
-
-# === End critical section ===
-flock --unlock ${LOCK_FD}
-
 sudo -b bash -c " \
 cd ${VMDISKDIR} && \
 virt-install \
@@ -78,5 +61,6 @@ virt-install \
     --location ${ISOFILE} \
     --initrd-inject=${KICKSTART_FILE} \
     --extra-args \"inst.ks=file:/$(basename "${KICKSTART_FILE}")\" \
+    --noautoconsole \
     --wait \
 "

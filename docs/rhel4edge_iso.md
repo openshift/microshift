@@ -162,6 +162,7 @@ sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-bui
 Run the following commands to create a virtual machine using the installer image.
 ```bash
 VMNAME="microshift-edge"
+NETNAME="default"
 sudo -b bash -c " \
 cd /var/lib/libvirt/images/ && \
 virt-install \
@@ -169,9 +170,10 @@ virt-install \
     --vcpus 2 \
     --memory 3072 \
     --disk path=./${VMNAME}.qcow2,size=20 \
-    --network network=default,model=virtio \
+    --network network=${NETNAME},model=virtio \
     --events on_reboot=restart \
     --cdrom ./microshift-installer-*.$(uname -m).iso \
+    --noautoconsole \
     --wait \
 "
 ```

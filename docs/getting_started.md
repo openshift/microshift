@@ -42,12 +42,13 @@ virt-install \
     --events on_reboot=restart \
     --location ${DVDISO} \
     --extra-args \"inst.ks=${KICKSTART}\" \
+    --noautoconsole \
     --wait \
 "
 ```
 
+The OS console is accessible from the `virt-manager` application, which can be run using the `sudo virt-manager` command.
 Watch the OS console of the virtual machine to see the progress of the installation, waiting until the machine is rebooted and the login prompt appears.
-The OS console is also accessible from the `virt-manager GUI` as a result of running `sudo virt-manager`.
 
 ## Access MicroShift
 
