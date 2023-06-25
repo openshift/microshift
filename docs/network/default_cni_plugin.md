@@ -65,58 +65,16 @@ The following configs are supported in ovn-kubernetes config file:
 
 |Field                            |Required |Type    |Default |Description                                                                  |Example|
 |:--------------------------------|:--------|:-------|:-------|:----------------------------------------------------------------------------|:------|
-|ovsInit.disableOVSInit           |N        |bool    |false   |Skip configuring OVS bridge "br-ex" in microshift-ovs-init.service           |true   |
-|ovsInit.gatewayInterface         |N        |string  |""      |Interface to be added in OVS gateway bridge "br-ex"                          |eth0   |
 |mtu                              |N        |int     |*auto*  |MTU value to be used for the Pods, must be less than or equal to the MTU of default route interface|1500|
 
-> When `disableOVSInit` is true, OVS bridge "br-ex" needs to be configured manually. This OVS bridge is required by ovn-kubernetes CNI. See section [OVS bridge](#ovs-bridge) for guidance on configuring the OVS gateway bridge manually.
-> When `gatewayInterface` is not provided, it defaults to the default route interface.
-> When `mtu` is not provided, it defaults to the MTU of `gatewayInterface` interface. In the case that `gatewayInterface` is not specified, it is set to the default route MTU.
+> When `mtu` is not provided, it is set to the default route MTU.
 
 Below is an example of `ovn.yaml`:
 
 ```yaml
-ovsInit:
-  disableOVSInit: true
-  gatewayInterface: eth0
 mtu: 1500
 ```
 **NOTE:* The change of `mtu` configuration in `ovn.yaml` requires node reboot to take effect. <br>
-
-### Configuring Host
-
-#### OVS bridge
-
-When `disableOVSInit` is set to true in ovn-kubernetes CNI config file, OVS bridge "br-ex" needs to be manually configured:
-
-```bash
-nmcli con add type ovs-bridge con-name br-ex conn.interface br-ex 802-3-ethernet.mtu 1500 connection.autoconnect no
-nmcli con add type ovs-port conn.interface enp1s0 master br-ex con-name ovs-port-phys0 connection.autoconnect no
-nmcli con add type ovs-port conn.interface br-ex master br-ex con-name ovs-port-br-ex connection.autoconnect no
-
-nmcli con add type 802-3-ethernet conn.interface enp1s0 master ovs-port-phys0 con-name ovs-if-phys0 \
-	connection.autoconnect-priority 100 802-3-ethernet.mtu 1500 connection.autoconnect no
-
-ovs_port_conn=$(nmcli -g connection.uuid conn show ovs-port-br-ex)
-iface_mac=$(<"/sys/class/net/enp1s0/address")
-
-nmcli con add type ovs-interface slave-type ovs-port conn.interface br-ex master "$ovs_port_conn" con-name \
-	ovs-if-br-ex 802-3-ethernet.mtu 1500 802-3-ethernet.cloned-mac-address ${iface_mac} \
-	ipv4.route-metric 48 ipv6.route-metric 48 connection.autoconnect no
-
-nmcli con up ovs-if-phys0
-nmcli con up ovs-if-br-ex
-nmcli con mod ovs-if-phys0 connection.autoconnect yes
-nmcli con mod ovs-if-br-ex connection.autoconnect yes
-```
-
-Replace `enp1s0` with the network interface name where node IP address is assigned to. <br>
-Replace `1500` with the actual MTU on the network interface. <br>
-
-**NOTE:* Copy the above NetworkManager command in a script and execute them at once. <br>
-**NOTE:* Execution of the above commands will cause transient network disconnection from the node IP. <br>
-
-[comment]: # (TODO: replace OVS commands with nmcli which can be easily installed under /etc)
 
 ## Network Features
 
@@ -138,12 +96,6 @@ See [ovn-kubernetes network policy](https://github.com/ovn-org/ovn-kubernetes/bl
 
 MicroShift is able to detect node IP change and restarts itself to take in the new IP address.
 Upon restarting, it recreates ovnkube-master daemonset with updated IP address in openshift-ovn-kubernetes namespace.
-
-### Custom gateway interface
-
-microshift-ovs-init.service is able to use user specified host interface for cluster network.
-This is done by specifying the `gatewayInterface` in the CNI config file `/etc/microshift/ovn.yaml`.
-The specified interface will be added in OVS bridge `br-ex` which acts as gateway bridge for ovn-kubernetes CNI network.
 
 ### Blocking external access to NodePort service on specific host interfaces
 

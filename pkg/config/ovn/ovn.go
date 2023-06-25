@@ -30,18 +30,8 @@ const (
 )
 
 type OVNKubernetesConfig struct {
-	// Configuration for microshift-ovs-init.service
-	OVSInit OVSInitConfig `json:"ovsInit,omitempty"`
 	// MTU to use for the pod interface. Default is 1500.
 	MTU int `json:"mtu,omitempty"`
-}
-
-type OVSInitConfig struct {
-	// disable microshift-ovs-init.service.
-	// OVS bridge "br-ex" needs to be configured manually when disableOVSInit is true.
-	DisableOVSInit bool `json:"disableOVSInit,omitempty"`
-	// Uplink interface for OVS bridge "br-ex"
-	GatewayInterface string `json:"gatewayInterface,omitempty"`
 }
 
 func (o *OVNKubernetesConfig) Validate() error {
@@ -65,14 +55,6 @@ func (o *OVNKubernetesConfig) validateOVSBridge() error {
 
 // validateConfig validates the user defined configuration in /etc/microshift/ovn.yaml
 func (o *OVNKubernetesConfig) validateConfig() error {
-	// validate gateway interfaces conf
-	if o.OVSInit.GatewayInterface != "" {
-		_, err := net.InterfaceByName(o.OVSInit.GatewayInterface)
-		if err != nil {
-			return fmt.Errorf("gateway interface %s not found", o.OVSInit.GatewayInterface)
-		}
-	}
-
 	// validate MTU conf
 	iface, err := net.InterfaceByName(OVNGatewayInterface)
 	if err != nil {
@@ -102,7 +84,6 @@ func (o *OVNKubernetesConfig) getClusterMTU(multinode bool) {
 
 // withDefaults returns the default values when ovn.yaml is not provided
 func (o *OVNKubernetesConfig) withDefaults(multinode bool) *OVNKubernetesConfig {
-	o.OVSInit.DisableOVSInit = false
 	o.getClusterMTU(multinode)
 	return o
 }

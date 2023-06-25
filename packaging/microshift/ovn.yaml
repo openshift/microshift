@@ -1,10 +1,3 @@
-ovsInit:
-  # Skip configuring OVS bridge "br-ex" in microshift-ovs-init.service
-  #disableOVSInit: false
-
-  # Interface to be added in OVS gateway bridge "br-ex"
-  #gatewayInterface: ""
-
 # MTU value to be used for the Pods, must be less than or equal to the MTU of
 # default route interface.
 #mtu: 1500

@@ -1,3 +1,1 @@
-ovsInit:
-  disableOVSInit: true
 mtu: 1300
