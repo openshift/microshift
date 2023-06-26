@@ -9,8 +9,8 @@ set -x
 
 SCRIPT_PATH="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
-RETRIES=3
-BACKOFF=3s
+RETRIES=10
+BACKOFF=6s
 
 # shellcheck disable=SC2317  # Don't warn about unreachable commands in this function
 cleanup() {
