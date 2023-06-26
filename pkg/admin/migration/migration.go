@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"sync"
 	"time"
 
 	crdclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -85,52 +84,38 @@ func (d *migrator) start(ctx context.Context) (*MigrationResultList, error) {
 	start := time.Now()
 	klog.Info("schema migration started")
 
-	wg := sync.WaitGroup{}
-	lock := sync.Mutex{}
-	wg.Add(len(schemas))
 	for _, sch := range schemas {
-		go func(wg *sync.WaitGroup, sch schema.GroupVersionResource) {
-			defer wg.Done()
-			objectList := &unstructured.UnstructuredList{}
+		objectList := &unstructured.UnstructuredList{}
 
-			migrationErr := retry.OnError(retry.DefaultBackoff, canRetry, func() error {
-				var err error
-				objectList, err = d.client.Resource(sch).Namespace(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
-				if err != nil {
-					return err
-				}
-				return nil
-			})
+		migrationErr := retry.OnError(retry.DefaultBackoff, canRetry, func() error {
+			var err error
+			objectList, err = d.client.Resource(sch).Namespace(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 
+		if migrationErr != nil {
+			errorOccured = true
+			migrationErr = fmt.Errorf("could not list resources: %+v", migrationErr)
+			results.Items = append(results.Items, MigrationResult{Error: migrationErr, ResourceVersion: sch, Timestamp: time.Now()})
+			continue
+		}
+
+		for _, object := range objectList.Items {
+			ref := object
+			migrationErr := d.migrateOneItem(ctx, sch, &ref)
 			if migrationErr != nil {
 				errorOccured = true
-				migrationErr = fmt.Errorf("could not list resources: %+v", migrationErr)
-				lock.Lock()
-				defer lock.Unlock()
-				results.Items = append(results.Items, MigrationResult{Error: migrationErr, ResourceVersion: sch, Timestamp: time.Now()})
-				return
 			}
-
-			localResults := &MigrationResultList{Status: MigrationSuccess}
-			for _, object := range objectList.Items {
-				ref := object
-				migrationErr := d.migrateOneItem(ctx, sch, &ref)
-				if migrationErr != nil {
-					errorOccured = true
-				}
-				localResults.Items = append(localResults.Items, MigrationResult{
-					Error:           migrationErr,
-					ResourceVersion: sch,
-					NamespacedName:  getNamespacedName(&ref),
-					Timestamp:       time.Now()})
-			}
-
-			lock.Lock()
-			defer lock.Unlock()
-			results.Items = append(results.Items, localResults.Items...)
-		}(&wg, sch)
+			results.Items = append(results.Items, MigrationResult{
+				Error:           migrationErr,
+				ResourceVersion: sch,
+				NamespacedName:  getNamespacedName(&ref),
+				Timestamp:       time.Now()})
+		}
 	}
-	wg.Wait()
 	if errorOccured {
 		results.Status = MigrationFailure
 	}
@@ -221,6 +206,7 @@ func (m *migrator) migrateOneItem(ctx context.Context, resource schema.GroupVers
 	for {
 		getBeforePut, err = m.try(ctx, resource, namespace, name, item, getBeforePut)
 		if err == nil || errors.IsNotFound(err) {
+			klog.InfoS("successfully migrated object", "name", name, "namespace", namespace, "resource", resource.String())
 			return nil
 		}
 		if canRetry(err) {
