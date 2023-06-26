@@ -11,18 +11,14 @@ Start by downloading one of the boot DVD images for the `x86_64` or `aarch64` ar
 Log into the hypervisor host and run the following commands to create a RHEL virtual
 machine with 4 cores, 8GB of RAM and 50GB of storage.
 
-Install the `libvirt` packages and reboot your system to start the virtualization environment.
-```
-sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass
-```
-
 Move the boot DVD image to `/var/lib/libvirt/images` directory and run the following
-commands to create a virtual machine.
+commands to install the `libvirt` packages and create a virtual machine.
 ```
 VMNAME="microshift-dev"
 
 git clone https://github.com/openshift/microshift.git ~/microshift
 cd ~/microshift
+./scripts/devenv-builder/manage-vm.sh config
 ./scripts/devenv-builder/manage-vm.sh create -n ${VMNAME}
 ```
 

@@ -111,17 +111,29 @@ Log into the development virtual machine running in the cloud using the `microsh
 
 Follow the instructions in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document to create an ISO and install a new virtual machine using **nested** virtualization.
 
-In the [Install MicroShift for Edge](./rhel4edge_iso.md#install-microshift-for-edge) section, use the following command to install the virtualization prerequisites and bootstrap a virtual machine using the ISO image from the `_output/image-builder` directory.
+In the [Install MicroShift for Edge](./rhel4edge_iso.md#install-microshift-for-edge) section, use the following commands to install the virtualization prerequisites and bootstrap a virtual machine using the ISO image from the `_output/image-builder` directory.
 
 ```bash
 VMNAME=microshift-edge
 NETNAME=default
-ISO=$(ls -1 "_output/image-builder/microshift-installer-*.$(uname -m).iso")
 
-./scripts/image-builder/create-vm.sh $VMNAME $NETNAME $ISO
+./scripts/image-builder/manage-vm.sh config
+
+sudo mv "$(ls -1 "_output/image-builder/microshift-installer-*.$(uname -m).iso")" /var/lib/libvirt/images/ 
+sudo -b bash -c " \
+cd /var/lib/libvirt/images/ && \
+virt-install \
+    --name ${VMNAME} \
+    --vcpus 2 \
+    --memory 3072 \
+    --disk path=./${VMNAME}.qcow2,size=20 \
+    --network network=${NETNAME},model=virtio \
+    --events on_reboot=restart \
+    --cdrom ./microshift-installer-*.$(uname -m).iso \
+    --noautoconsole \
+    --wait \
+"
 ```
-
-> The RHEL for Edge host is created with 2 cores and 3 GB of RAM to allow for a better performance in a nested virtualization environment.
 
 ### Ansible Control Node Virtual Machine
 
@@ -131,14 +143,19 @@ Run the following command to create a new virtual machine using **nested** virtu
 
 ```bash
 VMNAME=microshift-bench
+ISO="/var/lib/libvirt/images/rhel-9.2-$(uname -m)-dvd.iso"
 
-./scripts/devenv-builder/create-vm.sh ${VMNAME} \
-    /var/lib/libvirt/images \
-    /var/lib/libvirt/images/rhel-9.2-$(uname -m)-dvd.iso \
-    2 2 10 0 1
+export NCPUS=2
+export RAMSIZE=2
+export SWAPSIZE=0
+export DISKSIZE=10
+export DATAVOLSIZE=1
+
+./scripts/image-builder/manage-vm.sh config
+./scripts/image-builder/manage-vm.sh create -n "${VMNAME}" -i "${ISO}"
 ```
 
-> The resources required for the automation host are relatively modest as reflected in the above command.
+> The resources required for the automation host are relatively modest as reflected in the above commands.
 
 ### Virtual Machine Management
 

@@ -58,6 +58,16 @@ function get_base_isofile {
     esac
 }
 
+function action_config() {
+    sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass
+    if [ "$(systemctl is-active libvirtd.socket)" != "active" ] ; then
+        echo "Enabling libvirtd"
+        sudo systemctl enable --now libvirtd
+    fi
+    # Necessary to allow remote connections in the virt-viewer application
+    sudo usermod -a -G libvirt "$(whoami)"
+}
+
 # Create the VM, if it does not exist
 function action_create {
     # Set the variables needed by create-vm.sh instead of passing them as
@@ -168,6 +178,7 @@ ${script_name} (create|ip|delete|rm|help) [options]
 
 Commands:
 
+  config    -- install and start libvirt
   create    -- create a new VM
   ip        -- show the IP of the VM
   delete|rm -- delete the VM
@@ -213,6 +224,10 @@ EOF
 
 # The first argument should always be what action to take.
 case "$1" in
+    config)
+        action_config
+        exit 0
+        ;;
     create|ip|delete|rm|help)
         action="$1"
         shift
