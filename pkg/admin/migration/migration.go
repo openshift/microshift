@@ -26,7 +26,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-var blackListResources = sets.NewString(
+var excludeResources = sets.NewString(
 	"events",
 )
 
@@ -42,23 +42,23 @@ type migrator struct {
 func NewMigrator(kubeConfigPath string) (*migrator, error) {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build rest config: %w", err)
 	}
 	clientset, err := kubernetes.NewForConfig(restConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build kubernetes clientset config: %w", err)
 	}
 	crd, err := crdclient.NewForConfig(restConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build crd clientset config: %w", err)
 	}
 	apiservice, err := apiserviceclient.NewForConfig(restConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build apiservice client config: %w", err)
 	}
 	dynamic, err := dynamic.NewForConfig(restConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build dynamic client config: %w", err)
 	}
 
 	return &migrator{
@@ -92,12 +92,12 @@ func (d *migrator) start(ctx context.Context) (*MigrationResultList, error) {
 		go func(wg *sync.WaitGroup, sch schema.GroupVersionResource) {
 			defer wg.Done()
 			objectList := &unstructured.UnstructuredList{}
-			var migrationErr error
 
-			migrationErr = retry.OnError(retry.DefaultBackoff, canRetry, func() error {
-				objectList, migrationErr = d.list(ctx, sch, metav1.ListOptions{})
-				if migrationErr != nil {
-					return migrationErr
+			migrationErr := retry.OnError(retry.DefaultBackoff, canRetry, func() error {
+				var err error
+				objectList, err = d.client.Resource(sch).Namespace(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
+				if err != nil {
+					return err
 				}
 				return nil
 			})
@@ -106,35 +106,49 @@ func (d *migrator) start(ctx context.Context) (*MigrationResultList, error) {
 				errorOccured = true
 				migrationErr = fmt.Errorf("could not list resources: %+v", migrationErr)
 				lock.Lock()
+				defer lock.Unlock()
 				results.Items = append(results.Items, MigrationResult{Error: migrationErr, ResourceVersion: sch, Timestamp: time.Now()})
-				lock.Unlock()
 				return
 			}
 
+			localResults := &MigrationResultList{Status: MigrationSuccess}
 			for _, object := range objectList.Items {
 				ref := object
 				migrationErr := d.migrateOneItem(ctx, sch, &ref)
 				if migrationErr != nil {
 					errorOccured = true
 				}
-				lock.Lock()
-				results.Items = append(results.Items, MigrationResult{
+				localResults.Items = append(localResults.Items, MigrationResult{
 					Error:           migrationErr,
 					ResourceVersion: sch,
-					ObjectMeta:      getObjectMeta(&ref),
+					NamespacedName:  getNamespacedName(&ref),
 					Timestamp:       time.Now()})
-				lock.Unlock()
 			}
+
+			lock.Lock()
+			defer lock.Unlock()
+			results.Items = append(results.Items, localResults.Items...)
 		}(&wg, sch)
 	}
+	wg.Wait()
 	if errorOccured {
 		results.Status = MigrationFailure
 	}
-	wg.Wait()
-	klog.Infof("schema migration finished, it took %s to complete", time.Since(start).String())
+	klog.InfoS("schema migration finished", "duration", time.Since(start).String())
 	return results, nil
 }
 
+// findMigratableResources finds all the resources that potentially need
+// migration. Although all migratable resources are accessible via multiple
+// versions, the returned list only include one version.
+//
+// It builds the list in these steps:
+// 1. build a map from resource name to the groupVersions, excluding subresources, custom resources, or aggregated resources.
+// 2. exclude all the resource that is only available from one groupVersions.
+// 3. exclude the resource that does not support "list" and "update" (thus not migratable).
+//
+// More information can be found here:
+// https://github.com/kubernetes-sigs/kube-storage-version-migrator/blob/acdee30ced218b79e39c6a701985e8cd8bd33824/pkg/initializer/discover.go#L55-L125
 func (d *migrator) findMigratableResources(ctx context.Context) ([]schema.GroupVersionResource, error) {
 	customGroups, err := d.findCustomGroups(ctx)
 	if err != nil {
@@ -152,15 +166,15 @@ func (d *migrator) findMigratableResources(ctx context.Context) ([]schema.GroupV
 	for _, resourceList := range resourceLists {
 		gv, err := schema.ParseGroupVersion(resourceList.GroupVersion)
 		if err != nil {
-			klog.Errorf("cannot parse group version %s, ignored", resourceList.GroupVersion)
+			klog.ErrorS(err, "cannot parse group version, ignored", "groupVersion", resourceList.GroupVersion)
 			continue
 		}
 		if customGroups.Has(gv.Group) {
-			klog.V(4).Infof("ignored group %v because it's a custom group", gv.Group)
+			klog.InfoS("ignored because it's a custom group", "group", gv.Group)
 			continue
 		}
 		if aggregatedGroups.Has(gv.Group) {
-			klog.V(4).Infof("ignored group %v because it's an aggregated group", gv.Group)
+			klog.InfoS("ignored because it's an aggregated group", "group", gv.Group)
 			continue
 		}
 		for _, r := range resourceList.APIResources {
@@ -168,7 +182,8 @@ func (d *migrator) findMigratableResources(ctx context.Context) ([]schema.GroupV
 			if strings.Contains(r.Name, "/") {
 				continue
 			}
-			if blackListResources.Has(r.Name) {
+			// ignore excluded resources
+			if excludeResources.Has(r.Name) {
 				continue
 			}
 			// ignore resources that cannot be listed and updated
@@ -183,6 +198,8 @@ func (d *migrator) findMigratableResources(ctx context.Context) ([]schema.GroupV
 
 	ret := []schema.GroupVersionResource{}
 	for resource, groupVersions := range resourceToGroupVersions {
+		// if a resource only has one version, no migration is required
+		// resources that have more than one version are eligible for migration.
 		if len(groupVersions) == 1 {
 			continue
 		}
@@ -208,17 +225,9 @@ func (m *migrator) migrateOneItem(ctx context.Context, resource schema.GroupVers
 		}
 		if canRetry(err) {
 			seconds, delay := errors.SuggestsClientDelay(err)
-			switch {
-			case delay && len(namespace) > 0:
-				klog.Warningf("migration of %s, in the %s namespace, will be retried after a %ds delay: %v", name, namespace, seconds, err)
+			klog.ErrorS(err, "migration of an object will be retried", "name", name, "namespace", namespace, "delay", seconds)
+			if delay {
 				time.Sleep(time.Duration(seconds) * time.Second)
-			case delay:
-				klog.Warningf("migration of %s will be retried after a %ds delay: %v", name, seconds, err)
-				time.Sleep(time.Duration(seconds) * time.Second)
-			case !delay && len(namespace) > 0:
-				klog.Warningf("migration of %s, in the %s namespace, will be retried: %v", name, namespace, err)
-			default:
-				klog.Warningf("migration of %s will be retried: %v", name, err)
 			}
 			continue
 		}
@@ -246,13 +255,6 @@ func (m *migrator) try(ctx context.Context, resource schema.GroupVersionResource
 		return false, nil
 	}
 	return errors.IsConflict(err), err
-}
-
-func (m *migrator) list(ctx context.Context, resource schema.GroupVersionResource, options metav1.ListOptions) (*unstructured.UnstructuredList, error) {
-	return m.client.
-		Resource(resource).
-		Namespace(metav1.NamespaceAll).
-		List(ctx, options)
 }
 
 func (d *migrator) findCustomGroups(ctx context.Context) (sets.Set[string], error) {

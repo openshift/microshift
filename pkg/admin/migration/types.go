@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	apitypes "k8s.io/apimachinery/pkg/types"
 )
 
 type MigratonStatus string
@@ -21,7 +21,7 @@ type MigrationResult struct {
 	Error           error                       `json:"error,omitempty"`
 	ResourceVersion schema.GroupVersionResource `json:"resourceVersion"`
 	Timestamp       time.Time                   `json:"timestamp"`
-	ObjectMeta      *metav1.ObjectMeta          `json:"object,omitempty"`
+	NamespacedName  apitypes.NamespacedName     `json:"namespacedName,omitempty"`
 }
 
 type MigrationResultList struct {
@@ -33,9 +33,7 @@ func (m MigrationResultList) String() string {
 	buffer := strings.Builder{}
 	for _, result := range m.Items {
 		objectInfo := result.ResourceVersion.String()
-		if result.ObjectMeta != nil {
-			objectInfo = fmt.Sprintf("%s Namespace=%s Name=%s", objectInfo, result.ObjectMeta.GetNamespace(), result.ObjectMeta.GetName())
-		}
+		objectInfo = fmt.Sprintf("%s Namespace=%s Name=%s", objectInfo, result.NamespacedName.Namespace, result.NamespacedName.Name)
 
 		info := fmt.Sprintf("%s MigrationStatus=%s %s\n", result.Timestamp.String(), MigrationSuccess, objectInfo)
 		if result.Error != nil {
