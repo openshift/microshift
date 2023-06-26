@@ -1,9 +1,12 @@
 # Install MicroShift on RHEL for Edge
 To test MicroShift in a setup similar to the production environment, it is necessary to create a RHEL for Edge ISO installer with all the necessary components preloaded on the image.
 
+The procedures described in this document require the following setup:
+* A `physical hypervisor host` with the [libvirt](https://libvirt.org/) virtualization platform, to be used for starting virtual machines that run RHEL for Edge OS containing MicroShift binaries
+* A `development virtual machine` set up according to the [MicroShift Development Environment](./devenv_setup.md) instructions, to be used for building a RHEL for Edge ISO installer
+
 ## Build RHEL for Edge Installer ISO
-Log into the development virtual machine with the `microshift` user credentials.
-> The development machine configuration guidelines can be found in the [MicroShift Development Environment](./devenv_setup.md) document.
+Log into the `development virtual machine` with the `microshift` user credentials.
 
 Follow the instructions in the [RPM Packages](./devenv_setup.md#rpm-packages) section to create MicroShift RPM packages.
 
@@ -93,7 +96,7 @@ The script performs the following tasks:
 The artifact of the build is the `_output/image-builder/microshift-installer-${VERSION}.${ARCH}.iso` bootable RHEL for Edge OS image.
 
 ### Disk Partitioning
-The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such parititioning is required for the data volume to be utilized by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
+The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such partitioning is required for the data volume to be utilized by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
 
 By default, the following partition layout is created and formatted with the `XFS` file system:
 * EFI partition with EFI file system (200MB)
@@ -152,9 +155,9 @@ jq -r '.images | .[]' ~/microshift/assets/release/release-$(uname -m).json
 > See [Embedding MicroShift Container Images for Offline Deployments](./howto_offline_containers.md) for more information.
 
 ## Install MicroShift for Edge
-Log into the host machine using your user credentials. The remainder of this section describes how to install a virtual machine running RHEL for Edge OS containing MicroShift binaries.
+Log into the `physical hypervisor host` using your user credentials. The remainder of this section describes how to install a virtual machine running RHEL for Edge OS containing MicroShift binaries.
 
-Start by copying the installer image from the development virtual machine to the host file system.
+Start by copying the installer image from the `development virtual machine` to the host file system.
 ```bash
 sudo scp microshift@microshift-dev:/home/microshift/microshift/_output/image-builder/microshift-installer-*.$(uname -m).iso /var/lib/libvirt/images/
 ```
