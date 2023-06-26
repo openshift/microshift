@@ -1,125 +1,82 @@
-# cluster-kube-scheduler-operator embedded-component 845ae423e831b1cacf0bcae5e6528f1d21b5ddf2 to f260530473d36272959d21eb2ddfd0f7d944ea3f
-2775cf17d3713c3f3636eb581e3aef2f0885e17d 2023-04-20T07:51:02-04:00 disable debug pporf with unauthenticated port
-# oc image-amd64 3c01edd8dbf1fa374b11d1ba35ad7830827587f2 to 55f2e3c2dbb865cf6b6b365ba01a2cf19bfc44e7
-9077359fa2b8ffb520ac06d877c83b991f0bafcd 2023-06-19T13:22:08+02:00 ocpcertificates-tests: work around server-side apply not supported in the fake client
-bf1d885893f1db534c4c4bce0835f1239bb8f2f6 2023-06-16T13:23:28-04:00 tweak for older apimachinery levels
-b38b9c2b7f86a506bdb3d1c5612266becb88c173 2023-06-16T13:20:16-04:00 update vendor
-4bd0f430e7c26101a27b469a2019d08733b720fa 2023-06-16T13:19:49-04:00 cleanup naming
-dbf2f1ed3f392cbf65f73c6d01cb67048751da28 2023-06-16T13:19:49-04:00 wait for node reboot
-68ef4abd906b346da89492428f8d00a2034600a2 2023-06-16T13:19:49-04:00 better qualify name
-c20756aa8358af274c7f55a368f53a3d9c1774c5 2023-06-16T13:19:49-04:00 add reboot-nodes
-5583c6cdbea8ef1f274e1ece9ab806d92dc6e6e0 2023-06-16T13:19:49-04:00 tweak output format
-96ee9e80f38c4a950b962f24562ac2eab66aaca9 2023-06-16T13:19:49-04:00 correct the cert matching
-e90219d439098eda42c88bd5b914d702160fed07 2023-06-16T13:19:49-04:00 trustpurge: scope the observed NSes to "openshift-" prefixed ones
-aeb3bf5db359faaa12c3cab2c20a187fb2bc9ee4 2023-06-16T13:19:49-04:00 trustpurge: extend observing the trust changes to all leaf certs
-f2de1bc7b2ea337d77e2c7f0e591bb167255e987 2023-06-16T13:19:49-04:00 trustpurge: fix docs issues
-d128503a54d94c6259eeb0bfc7686a756e4e0758 2023-06-16T13:19:49-04:00 trustpurge: don't proceed if trustbundle changes affect trust
-ad6a5744066eca41a5c7f924f2582a2080368e19 2023-06-16T13:19:49-04:00 fix directories for constitency
-1c67af2c8c4f4486967545d893f39cfc72108231 2023-06-16T13:19:49-04:00 pernodepod: percent works like this
-15a9715a6ddacaf443eace778e95ae5d0c0e16f5 2023-06-16T13:19:49-04:00 ocpcertificates: complete MCS CA rotation command
-851fe3ea59ef0eb03d955ce3321d7bf6d84de79d 2023-06-16T13:19:49-04:00 ocpcertificates: Add regenerate-mco
-963f1ce5747ee8775c8dbd46f59e4a165249d9fb 2023-06-16T13:19:49-04:00 ocpcertificates: don't make assumptions on resources not to bring piping from -oname commands
-e6a8d852c92f065db9f2d581bc23415828daca04 2023-06-16T13:19:49-04:00 clusteroperator,ocpcertificates: add command descriptions and examples
-37774613dab11a75bff1b2f2801a93664309f5f1 2023-06-16T13:19:49-04:00 waitforstable: fix typo in minimum-stable-period flag
-3833d7945d0e1347e70b3713f27463dfa92e3b16 2023-06-16T13:19:49-04:00 ocpcertificates: fix handling resources by names explicitly
-608cc926f08b8cccd7cdb56bf3e3cb9bbeb343a5 2023-06-16T13:19:49-04:00 add new kubelet bootstrap command
-5421de40fa722a1aeca3ce4ab736066f4025009e 2023-06-16T13:19:49-04:00 add directives and fix percentage node calculation
-76dd6ea38a4df7fe784c84f8229d3f5f89a88316 2023-06-16T13:19:49-04:00 skip unready nodes quickly
-3efb58e98458215030932a42c7aa8ce8477e3ff2 2023-06-16T13:19:49-04:00 add the option to add a command when restarting kubelets
-13f5de2c9d8c2d1b2ab6ced1e3d32896be5a0a40 2023-06-16T13:19:49-04:00 trustpurge: use RetryOnConflict for conflict handling
-7b0c896396f17f62c0043cec1624c4349702a48f 2023-06-16T13:19:48-04:00 add newline between polls to make it easier to read by hu9mans
-4cc72ccc8df1adaa30b6532290a0530b171621b4 2023-06-16T13:19:48-04:00 update output to make the wait easier to see and print all proceeding operators
-fbc33bc0025708598fad867dbef9b0cee9d8c77d 2023-06-16T13:19:48-04:00 ocpcertificates: hardcode resources to use with given commands
-4852a260eaa66ea7ef5fef02b4aacf1f98f7d14d 2023-06-16T13:19:48-04:00 trustpurge: allow excluding ca-bundles
-2287539c2d22825abcef11571bb9376c23d6bf55 2023-06-16T13:19:48-04:00 trustpurge: move to Update, retry on Update() conflicts
-49bd8627bac0afa1357ef44b25082ac08e9a21c0 2023-06-16T13:19:48-04:00 ocpcertificates: add the 'remove-old-trust' subcommand
-f2495135079e5f884ad8b6c455481275e552b038 2023-06-16T13:19:48-04:00 certregen: return error on failed apply to stop from further progressing
-3e09468a50f2d40b8a4bddc200631f7e6dcfe784 2023-06-16T13:19:48-04:00 certregen: add unit tests for leaf cert regen
-57d08726e37b30f3df2b71a58afc69874e968420 2023-06-16T13:19:48-04:00 certregen: only generate 2048 bit keys to speed up tests
-a5c24144d01baf1f335e236e80d77d2590992bab 2023-06-16T13:19:48-04:00 update wait for stability to  handle short durations
-46eb97dade8165b66c8e24fb862ca3de31001196 2023-06-16T13:19:48-04:00 update for comments
-a8830a9d7cb49474dce22b695794f61d8e7062de 2023-06-16T13:19:48-04:00 create command to create new adminkubeconfig
-d25ea1a470c913828b9ad81a32ae844b7d30785e 2023-06-16T13:19:48-04:00 add a command to copy content to every node
-0f956c82d513bc8c9639ca04ed33bb389a7cfdc4 2023-06-16T13:19:48-04:00 refactor the restart kubelet to extract PerNodePod commands
-41c8dc72f92bc396a6d51fbd148916c2398a5d64 2023-06-16T13:19:48-04:00 add leaf certs regen, reusing the original logic for toplevel
-0109ccc8a8ba64d86dc3db5c2a6212ddc3973d98 2023-06-16T13:19:47-04:00 remove previous testing proposal
-d420a7b9e7cf3c2f4a645cd49776bae41608051f 2023-06-16T13:19:30-04:00 add kubelet restart
-1b485fd461c461917701e5144a8bb8ef115b1ee8 2023-06-16T13:19:30-04:00 add command to restart kubelets
-004ccd0a8acd2d6860e144fe4c266c1ba35ae6d2 2023-06-16T13:19:30-04:00 refactor to better match kubectl best practice
-ff03c22965a056b5817fe7f295f7845cb6d9f5c8 2023-06-16T13:19:30-04:00 fix linting problems
-241b6a7f9f32858a2fb9c447cbf3be7a1f4d8e48 2023-06-16T13:19:30-04:00 fix node lease namespace
-a6ad30632d71e581630d403983b9123de9d9b7d8 2023-06-16T13:19:29-04:00 add detection for updated SA trust bundles
-093627e65305b31065d125b798e83c74788c5941 2023-06-16T13:19:29-04:00 add revision printing
-2c5f8eb7e3c7fced086f0e6989ba7e235196fe02 2023-06-16T13:19:29-04:00 fix comments on the monitor command
-f000dcc0d153cb650a48968cf726faed34ac869a 2023-06-16T13:19:29-04:00 add a command to wait for the cluster to become stable
-5c1e7c63e57fa4804ea8bb9b1e30c1c391c56a2c 2023-06-16T13:19:29-04:00 add command to produce an updated CA bundle for trusting the kube-apiserver
-9dbe282b7ea7f4e30d453bb8c6b515b80fdd0847 2023-06-16T13:19:29-04:00 add certificate monitoring
-e6b5bb8be1c55e7e669fe7dfb4ed4e1d0ba1cc55 2023-06-16T13:19:28-04:00 unit test forceRegenerationOnSecret
-01b1fc2fa68ce6ce624402838d3049b753e1d9d2 2023-06-16T13:19:05-04:00 add basic testing
-da8f06d6d5d1dd79fb1be046a209e0269b8837a9 2023-06-16T13:19:04-04:00 rename regenerate-signers to regeneration-top-level
-7fb3f1c04b4f2da428b6095d5f7ea674ca221068 2023-06-16T13:19:04-04:00 add a filter to only regenerate those certs that were valid before a particular datetime
-2904b7bd3ae9a82e90a3bc52a85f346b53d6ced4 2023-06-16T13:19:04-04:00 add command to rotate signing certificates
-4216d9aa41e8c8fc917ae1d774d779de54356852 2023-06-16T13:19:04-04:00 copy functions from cluster-debug-tools, they can vendor it back
-# oc image-arm64 3c01edd8dbf1fa374b11d1ba35ad7830827587f2 to ea7c11aac7fa39d9eb733b62251ee1bc4a242c99
+# cluster-network-operator embedded-component df823f355353ae0fabc51e3e6ae71c47d1b66d1d to 88b572015b92a5b9cfe679ce56394c1a78d9c71f
+4e7b1b5db99571f8b5f65fdedae358eb945ea0a5 2023-06-14T13:56:36+02:00 Do not determine if HyperShift is enabled based on the ControlPlaneTopology value
+6ad1fceea5edaf7adda9dd9325808120795e937e 2023-05-29T13:40:18+02:00 HyperShift: Add support for HostedControlPlane nodeSelector field
+a5c7bc7bab2ca4d9d83aab24953d8e4a30b8abb0 2023-05-29T13:40:18+02:00 HyperShift: Retrieve HostedControlPlane as part of bootstrap process
+d40981bf6b56e350f776d4f639be6d73ddef10a5 2023-05-29T13:40:18+02:00 HyperShift: Move hypershift.go to platform package
+667e48d735b0eae419ebfde8d329df085d59d5e9 2023-05-29T13:40:17+02:00 Migrate to hypershift v1beta1
+9049a7663e3c49e601c9e7a23d4af2df25c96e26 2023-05-29T13:39:46+02:00 Bump hypershift dependency to v0.1.2
+# kubernetes embedded-component 8c210201e58450becf3834a4fb9dcd520ab54679 to c43ddea5eec2220b3e691afe6a2f1529e0a454cd
+8b8d4e84f27acdb9c1c0693b0e6c52d3d5c8605a 2023-06-22T17:24:14+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+27a378f7a0f08ddada4dd6bf8915ccd24facdaa7 2023-06-22T15:22:10+00:00 UPSTREAM: <drop>: manually resolve conflicts
+8cfcba0b15c343a8dc48567a74c29ec4844e0b9e 2023-06-14T09:47:35+00:00 Release commit for Kubernetes v1.25.11
+61254725a43ce127f1ffe99b0df766415e2e7aa8 2023-06-08T00:18:54-06:00 update-vendor: update vendored go.sums
+79bcb106a768afb57cf147126479e7354f0e169c 2023-06-07T23:50:33-06:00 [release-1.25] releng/go: Update images, deps and ver to go 1.19.10
+fba66ccd049e3823afbff40aff40f4b0c3319932 2023-06-06T21:20:11+00:00 kube-proxy avoid race condition using LocalModeNodeCIDR
+8781d503a08ff8a1a29179c80252470ac77b3bd5 2023-06-05T13:36:07-07:00 Add ephemeralcontainer to imagepolicy securityaccount admission plugin
+c0cd9cc82915b6eab0fca254eae80e551100cc6b 2023-05-23T14:32:04-04:00 Switch to assert.ErrorEquals from assert.Equal to check error equality
+788b3de7a70c5ef859d6d20fae6795e463a81f8e 2023-05-23T00:23:59+08:00 update webhook test to go 1.21
+8f7a971aa20cda8b4b473ee243f710c931495486 2023-05-18T14:03:31-04:00 Test APIService safe handling at startup
+9e3ad13051ebb38d994bd3fad88325e2cdcb1aef 2023-05-18T12:51:47-04:00 Fix waiting for CRD sync at server start
+fa797f82fdfb2ef53d30d193a5e23dc9cd538f3b 2023-05-18T23:03:15+08:00 kubeadm: fix a bug where the static pod changes detection logic is inconsistent with kubelet
+19d3546843f4561153b3327d517cffc45290642f 2023-05-17T14:27:30+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.10
+df8dde018682e33760d28e8736d88d546233d516 2023-05-16T15:40:10-07:00 kubeadm: Make etcd member removal idempotent
+c079b7d70a2413548b89e6f9bcbe9dd56818c6f1 2023-05-16T15:40:08-07:00 kubeadm: Add etcd client unit tests
+96d31bc648a5f29dd3dbcba3fb1b4ff76c2d0353 2023-05-16T15:40:08-07:00 kubeadm: Use internal etcd client through an interface
+fa1445a07f81204f6bd2f8600a11a68ca039624d 2023-03-10T12:47:30+05:30 vclib: Modify x509.UnknownAuthorityError unwrap check
+7f61dcb611d74c6653d9525394a2bd6076ef6e46 2023-03-10T12:47:29+05:30 vsphere: Adapt to govmomi version bumps
+0ef4b72cf0cfec94fecc80d78f149d9eb56a6a10 2023-03-10T12:47:29+05:30 *: Bump version of vmware/govmomi
+f560b86429bb7b845fbdb5c8f137f358030eac1d 2022-10-13T11:51:20-04:00 kubelet/stats: drop makePodStorageStats errors to V(6)
+332b0175dc4c727cfa648540cbec3ee0b63bf129 2022-10-13T11:51:09-04:00 kubelet/stats: deduplicate makePodStorageStats
+# machine-config-operator embedded-component 4accd895aa8fe5ccbd166b9562fdcf5a2112c5ec to 01f999aa710dd62d43bee8cf1e2ca6a226c7dce3
+aeeb0b0bbbdb43c1f2f230a17262037a0295ba16 2023-04-03T16:38:19+00:00 OCPBUGS-10414: Fix regex dot in coredns config file
+# oc image-amd64 55f2e3c2dbb865cf6b6b365ba01a2cf19bfc44e7 to ea7c11aac7fa39d9eb733b62251ee1bc4a242c99
 fc5e0d8cb4afbf915148d980e67ba38a53cbdf41 2023-06-21T19:02:22+00:00 handle the error case of node retrieval while waiting for reboot
-9077359fa2b8ffb520ac06d877c83b991f0bafcd 2023-06-19T13:22:08+02:00 ocpcertificates-tests: work around server-side apply not supported in the fake client
-bf1d885893f1db534c4c4bce0835f1239bb8f2f6 2023-06-16T13:23:28-04:00 tweak for older apimachinery levels
-b38b9c2b7f86a506bdb3d1c5612266becb88c173 2023-06-16T13:20:16-04:00 update vendor
-4bd0f430e7c26101a27b469a2019d08733b720fa 2023-06-16T13:19:49-04:00 cleanup naming
-dbf2f1ed3f392cbf65f73c6d01cb67048751da28 2023-06-16T13:19:49-04:00 wait for node reboot
-68ef4abd906b346da89492428f8d00a2034600a2 2023-06-16T13:19:49-04:00 better qualify name
-c20756aa8358af274c7f55a368f53a3d9c1774c5 2023-06-16T13:19:49-04:00 add reboot-nodes
-5583c6cdbea8ef1f274e1ece9ab806d92dc6e6e0 2023-06-16T13:19:49-04:00 tweak output format
-96ee9e80f38c4a950b962f24562ac2eab66aaca9 2023-06-16T13:19:49-04:00 correct the cert matching
-e90219d439098eda42c88bd5b914d702160fed07 2023-06-16T13:19:49-04:00 trustpurge: scope the observed NSes to "openshift-" prefixed ones
-aeb3bf5db359faaa12c3cab2c20a187fb2bc9ee4 2023-06-16T13:19:49-04:00 trustpurge: extend observing the trust changes to all leaf certs
-f2de1bc7b2ea337d77e2c7f0e591bb167255e987 2023-06-16T13:19:49-04:00 trustpurge: fix docs issues
-d128503a54d94c6259eeb0bfc7686a756e4e0758 2023-06-16T13:19:49-04:00 trustpurge: don't proceed if trustbundle changes affect trust
-ad6a5744066eca41a5c7f924f2582a2080368e19 2023-06-16T13:19:49-04:00 fix directories for constitency
-1c67af2c8c4f4486967545d893f39cfc72108231 2023-06-16T13:19:49-04:00 pernodepod: percent works like this
-15a9715a6ddacaf443eace778e95ae5d0c0e16f5 2023-06-16T13:19:49-04:00 ocpcertificates: complete MCS CA rotation command
-851fe3ea59ef0eb03d955ce3321d7bf6d84de79d 2023-06-16T13:19:49-04:00 ocpcertificates: Add regenerate-mco
-963f1ce5747ee8775c8dbd46f59e4a165249d9fb 2023-06-16T13:19:49-04:00 ocpcertificates: don't make assumptions on resources not to bring piping from -oname commands
-e6a8d852c92f065db9f2d581bc23415828daca04 2023-06-16T13:19:49-04:00 clusteroperator,ocpcertificates: add command descriptions and examples
-37774613dab11a75bff1b2f2801a93664309f5f1 2023-06-16T13:19:49-04:00 waitforstable: fix typo in minimum-stable-period flag
-3833d7945d0e1347e70b3713f27463dfa92e3b16 2023-06-16T13:19:49-04:00 ocpcertificates: fix handling resources by names explicitly
-608cc926f08b8cccd7cdb56bf3e3cb9bbeb343a5 2023-06-16T13:19:49-04:00 add new kubelet bootstrap command
-5421de40fa722a1aeca3ce4ab736066f4025009e 2023-06-16T13:19:49-04:00 add directives and fix percentage node calculation
-76dd6ea38a4df7fe784c84f8229d3f5f89a88316 2023-06-16T13:19:49-04:00 skip unready nodes quickly
-3efb58e98458215030932a42c7aa8ce8477e3ff2 2023-06-16T13:19:49-04:00 add the option to add a command when restarting kubelets
-13f5de2c9d8c2d1b2ab6ced1e3d32896be5a0a40 2023-06-16T13:19:49-04:00 trustpurge: use RetryOnConflict for conflict handling
-7b0c896396f17f62c0043cec1624c4349702a48f 2023-06-16T13:19:48-04:00 add newline between polls to make it easier to read by hu9mans
-4cc72ccc8df1adaa30b6532290a0530b171621b4 2023-06-16T13:19:48-04:00 update output to make the wait easier to see and print all proceeding operators
-fbc33bc0025708598fad867dbef9b0cee9d8c77d 2023-06-16T13:19:48-04:00 ocpcertificates: hardcode resources to use with given commands
-4852a260eaa66ea7ef5fef02b4aacf1f98f7d14d 2023-06-16T13:19:48-04:00 trustpurge: allow excluding ca-bundles
-2287539c2d22825abcef11571bb9376c23d6bf55 2023-06-16T13:19:48-04:00 trustpurge: move to Update, retry on Update() conflicts
-49bd8627bac0afa1357ef44b25082ac08e9a21c0 2023-06-16T13:19:48-04:00 ocpcertificates: add the 'remove-old-trust' subcommand
-f2495135079e5f884ad8b6c455481275e552b038 2023-06-16T13:19:48-04:00 certregen: return error on failed apply to stop from further progressing
-3e09468a50f2d40b8a4bddc200631f7e6dcfe784 2023-06-16T13:19:48-04:00 certregen: add unit tests for leaf cert regen
-57d08726e37b30f3df2b71a58afc69874e968420 2023-06-16T13:19:48-04:00 certregen: only generate 2048 bit keys to speed up tests
-a5c24144d01baf1f335e236e80d77d2590992bab 2023-06-16T13:19:48-04:00 update wait for stability to  handle short durations
-46eb97dade8165b66c8e24fb862ca3de31001196 2023-06-16T13:19:48-04:00 update for comments
-a8830a9d7cb49474dce22b695794f61d8e7062de 2023-06-16T13:19:48-04:00 create command to create new adminkubeconfig
-d25ea1a470c913828b9ad81a32ae844b7d30785e 2023-06-16T13:19:48-04:00 add a command to copy content to every node
-0f956c82d513bc8c9639ca04ed33bb389a7cfdc4 2023-06-16T13:19:48-04:00 refactor the restart kubelet to extract PerNodePod commands
-41c8dc72f92bc396a6d51fbd148916c2398a5d64 2023-06-16T13:19:48-04:00 add leaf certs regen, reusing the original logic for toplevel
-0109ccc8a8ba64d86dc3db5c2a6212ddc3973d98 2023-06-16T13:19:47-04:00 remove previous testing proposal
-d420a7b9e7cf3c2f4a645cd49776bae41608051f 2023-06-16T13:19:30-04:00 add kubelet restart
-1b485fd461c461917701e5144a8bb8ef115b1ee8 2023-06-16T13:19:30-04:00 add command to restart kubelets
-004ccd0a8acd2d6860e144fe4c266c1ba35ae6d2 2023-06-16T13:19:30-04:00 refactor to better match kubectl best practice
-ff03c22965a056b5817fe7f295f7845cb6d9f5c8 2023-06-16T13:19:30-04:00 fix linting problems
-241b6a7f9f32858a2fb9c447cbf3be7a1f4d8e48 2023-06-16T13:19:30-04:00 fix node lease namespace
-a6ad30632d71e581630d403983b9123de9d9b7d8 2023-06-16T13:19:29-04:00 add detection for updated SA trust bundles
-093627e65305b31065d125b798e83c74788c5941 2023-06-16T13:19:29-04:00 add revision printing
-2c5f8eb7e3c7fced086f0e6989ba7e235196fe02 2023-06-16T13:19:29-04:00 fix comments on the monitor command
-f000dcc0d153cb650a48968cf726faed34ac869a 2023-06-16T13:19:29-04:00 add a command to wait for the cluster to become stable
-5c1e7c63e57fa4804ea8bb9b1e30c1c391c56a2c 2023-06-16T13:19:29-04:00 add command to produce an updated CA bundle for trusting the kube-apiserver
-9dbe282b7ea7f4e30d453bb8c6b515b80fdd0847 2023-06-16T13:19:29-04:00 add certificate monitoring
-e6b5bb8be1c55e7e669fe7dfb4ed4e1d0ba1cc55 2023-06-16T13:19:28-04:00 unit test forceRegenerationOnSecret
-01b1fc2fa68ce6ce624402838d3049b753e1d9d2 2023-06-16T13:19:05-04:00 add basic testing
-da8f06d6d5d1dd79fb1be046a209e0269b8837a9 2023-06-16T13:19:04-04:00 rename regenerate-signers to regeneration-top-level
-7fb3f1c04b4f2da428b6095d5f7ea674ca221068 2023-06-16T13:19:04-04:00 add a filter to only regenerate those certs that were valid before a particular datetime
-2904b7bd3ae9a82e90a3bc52a85f346b53d6ced4 2023-06-16T13:19:04-04:00 add command to rotate signing certificates
-4216d9aa41e8c8fc917ae1d774d779de54356852 2023-06-16T13:19:04-04:00 copy functions from cluster-debug-tools, they can vendor it back
-# ovn-kubernetes image-arm64 fec58c449e8fc691aff537ef64576e204b7191c3 to 48c7db9d8f3d90164e9c1134a6a5515ecc647357
+# ovn-kubernetes image-amd64 fec58c449e8fc691aff537ef64576e204b7191c3 to 17f9ed57beb21648ed53e5c360a6ad35f3791091
+c8c33964d1fdce253008de37cf7bbe640e878c53 2023-06-16T10:28:48-04:00 Validate port before deleting conntrack flow
 b57eb3ecc9892aa43c6709314304b1ba460f35d9 2023-05-24T17:32:35+00:00 OCPBUGS-12971:Fix bug that resulted in routes not be restored to a new vnic
+# kubernetes image-amd64 8c210201e58450becf3834a4fb9dcd520ab54679 to c43ddea5eec2220b3e691afe6a2f1529e0a454cd
+8b8d4e84f27acdb9c1c0693b0e6c52d3d5c8605a 2023-06-22T17:24:14+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+27a378f7a0f08ddada4dd6bf8915ccd24facdaa7 2023-06-22T15:22:10+00:00 UPSTREAM: <drop>: manually resolve conflicts
+8cfcba0b15c343a8dc48567a74c29ec4844e0b9e 2023-06-14T09:47:35+00:00 Release commit for Kubernetes v1.25.11
+61254725a43ce127f1ffe99b0df766415e2e7aa8 2023-06-08T00:18:54-06:00 update-vendor: update vendored go.sums
+79bcb106a768afb57cf147126479e7354f0e169c 2023-06-07T23:50:33-06:00 [release-1.25] releng/go: Update images, deps and ver to go 1.19.10
+fba66ccd049e3823afbff40aff40f4b0c3319932 2023-06-06T21:20:11+00:00 kube-proxy avoid race condition using LocalModeNodeCIDR
+8781d503a08ff8a1a29179c80252470ac77b3bd5 2023-06-05T13:36:07-07:00 Add ephemeralcontainer to imagepolicy securityaccount admission plugin
+c0cd9cc82915b6eab0fca254eae80e551100cc6b 2023-05-23T14:32:04-04:00 Switch to assert.ErrorEquals from assert.Equal to check error equality
+788b3de7a70c5ef859d6d20fae6795e463a81f8e 2023-05-23T00:23:59+08:00 update webhook test to go 1.21
+8f7a971aa20cda8b4b473ee243f710c931495486 2023-05-18T14:03:31-04:00 Test APIService safe handling at startup
+9e3ad13051ebb38d994bd3fad88325e2cdcb1aef 2023-05-18T12:51:47-04:00 Fix waiting for CRD sync at server start
+fa797f82fdfb2ef53d30d193a5e23dc9cd538f3b 2023-05-18T23:03:15+08:00 kubeadm: fix a bug where the static pod changes detection logic is inconsistent with kubelet
+19d3546843f4561153b3327d517cffc45290642f 2023-05-17T14:27:30+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.10
+df8dde018682e33760d28e8736d88d546233d516 2023-05-16T15:40:10-07:00 kubeadm: Make etcd member removal idempotent
+c079b7d70a2413548b89e6f9bcbe9dd56818c6f1 2023-05-16T15:40:08-07:00 kubeadm: Add etcd client unit tests
+96d31bc648a5f29dd3dbcba3fb1b4ff76c2d0353 2023-05-16T15:40:08-07:00 kubeadm: Use internal etcd client through an interface
+fa1445a07f81204f6bd2f8600a11a68ca039624d 2023-03-10T12:47:30+05:30 vclib: Modify x509.UnknownAuthorityError unwrap check
+7f61dcb611d74c6653d9525394a2bd6076ef6e46 2023-03-10T12:47:29+05:30 vsphere: Adapt to govmomi version bumps
+0ef4b72cf0cfec94fecc80d78f149d9eb56a6a10 2023-03-10T12:47:29+05:30 *: Bump version of vmware/govmomi
+f560b86429bb7b845fbdb5c8f137f358030eac1d 2022-10-13T11:51:20-04:00 kubelet/stats: drop makePodStorageStats errors to V(6)
+332b0175dc4c727cfa648540cbec3ee0b63bf129 2022-10-13T11:51:09-04:00 kubelet/stats: deduplicate makePodStorageStats
+# ovn-kubernetes image-arm64 48c7db9d8f3d90164e9c1134a6a5515ecc647357 to 17f9ed57beb21648ed53e5c360a6ad35f3791091
+c8c33964d1fdce253008de37cf7bbe640e878c53 2023-06-16T10:28:48-04:00 Validate port before deleting conntrack flow
+# kubernetes image-arm64 8c210201e58450becf3834a4fb9dcd520ab54679 to c43ddea5eec2220b3e691afe6a2f1529e0a454cd
+8b8d4e84f27acdb9c1c0693b0e6c52d3d5c8605a 2023-06-22T17:24:14+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+27a378f7a0f08ddada4dd6bf8915ccd24facdaa7 2023-06-22T15:22:10+00:00 UPSTREAM: <drop>: manually resolve conflicts
+8cfcba0b15c343a8dc48567a74c29ec4844e0b9e 2023-06-14T09:47:35+00:00 Release commit for Kubernetes v1.25.11
+61254725a43ce127f1ffe99b0df766415e2e7aa8 2023-06-08T00:18:54-06:00 update-vendor: update vendored go.sums
+79bcb106a768afb57cf147126479e7354f0e169c 2023-06-07T23:50:33-06:00 [release-1.25] releng/go: Update images, deps and ver to go 1.19.10
+fba66ccd049e3823afbff40aff40f4b0c3319932 2023-06-06T21:20:11+00:00 kube-proxy avoid race condition using LocalModeNodeCIDR
+8781d503a08ff8a1a29179c80252470ac77b3bd5 2023-06-05T13:36:07-07:00 Add ephemeralcontainer to imagepolicy securityaccount admission plugin
+c0cd9cc82915b6eab0fca254eae80e551100cc6b 2023-05-23T14:32:04-04:00 Switch to assert.ErrorEquals from assert.Equal to check error equality
+788b3de7a70c5ef859d6d20fae6795e463a81f8e 2023-05-23T00:23:59+08:00 update webhook test to go 1.21
+8f7a971aa20cda8b4b473ee243f710c931495486 2023-05-18T14:03:31-04:00 Test APIService safe handling at startup
+9e3ad13051ebb38d994bd3fad88325e2cdcb1aef 2023-05-18T12:51:47-04:00 Fix waiting for CRD sync at server start
+fa797f82fdfb2ef53d30d193a5e23dc9cd538f3b 2023-05-18T23:03:15+08:00 kubeadm: fix a bug where the static pod changes detection logic is inconsistent with kubelet
+19d3546843f4561153b3327d517cffc45290642f 2023-05-17T14:27:30+00:00 Update CHANGELOG/CHANGELOG-1.25.md for v1.25.10
+df8dde018682e33760d28e8736d88d546233d516 2023-05-16T15:40:10-07:00 kubeadm: Make etcd member removal idempotent
+c079b7d70a2413548b89e6f9bcbe9dd56818c6f1 2023-05-16T15:40:08-07:00 kubeadm: Add etcd client unit tests
+96d31bc648a5f29dd3dbcba3fb1b4ff76c2d0353 2023-05-16T15:40:08-07:00 kubeadm: Use internal etcd client through an interface
+fa1445a07f81204f6bd2f8600a11a68ca039624d 2023-03-10T12:47:30+05:30 vclib: Modify x509.UnknownAuthorityError unwrap check
+7f61dcb611d74c6653d9525394a2bd6076ef6e46 2023-03-10T12:47:29+05:30 vsphere: Adapt to govmomi version bumps
+0ef4b72cf0cfec94fecc80d78f149d9eb56a6a10 2023-03-10T12:47:29+05:30 *: Bump version of vmware/govmomi
+f560b86429bb7b845fbdb5c8f137f358030eac1d 2022-10-13T11:51:20-04:00 kubelet/stats: drop makePodStorageStats errors to V(6)
+332b0175dc4c727cfa648540cbec3ee0b63bf129 2022-10-13T11:51:09-04:00 kubelet/stats: deduplicate makePodStorageStats
