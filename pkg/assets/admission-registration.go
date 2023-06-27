@@ -57,7 +57,7 @@ func applyAdmissionRegistration(ctx context.Context, admissionRegistrations []st
 		klog.Infof("applying admissionRegistration: %s", ar)
 		objBytes, err := embedded.Asset(ar)
 		if err != nil {
-			return fmt.Errorf("error getting embedded asset %s: %v", ar, err)
+			return fmt.Errorf("error getting embedded asset %s: %w", ar, err)
 		}
 		applier.Reader(objBytes, render, params)
 		if err := applier.Applier(ctx); err != nil {
