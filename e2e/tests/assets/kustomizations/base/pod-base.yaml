@@ -1,25 +1,10 @@
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  namespace: default
-  name: test-claim
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: topolvm-provisioner
-  resources:
-    requests:
-      storage: 1Gi
----
 kind: Pod
 apiVersion: v1
 metadata:
-  name: test-pod
-  namespace: default
+  name: base
 spec:
   securityContext:
     runAsNonRoot: true
-    privileged: false
     seccompProfile:
       type: RuntimeDefault
   containers:
@@ -39,5 +24,3 @@ spec:
       name: test-vol
   volumes:
   - name: test-vol
-    persistentVolumeClaim:
-      claimName: test-claim
