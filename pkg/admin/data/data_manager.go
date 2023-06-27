@@ -57,6 +57,12 @@ func (dm *manager) RemoveBackup(name BackupName) error {
 }
 
 func (dm *manager) GetBackupList() ([]BackupName, error) {
+	if exists, err := util.PathExists(config.BackupsDir); err != nil {
+		return nil, err
+	} else if !exists {
+		return []BackupName{}, nil
+	}
+
 	files, err := os.ReadDir(config.BackupsDir)
 	if err != nil {
 		return nil, err

@@ -10,11 +10,13 @@ import (
 	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
 var (
+	healthFilepath            = "/var/lib/microshift-backups/health.json"
 	errHealthFileDoesNotExist = errors.New("health file does not exist")
 )
 
@@ -44,13 +46,104 @@ func New(dataManager data.Manager) *PreRun {
 
 func (pr *PreRun) Perform() error {
 	klog.InfoS("Starting pre-run")
+	defer klog.InfoS("Pre-run complete")
 
-	health, err := getHealthInfo()
+	if isOstree, err := util.PathExists("/run/ostree-booted"); err != nil {
+		return fmt.Errorf("failed to check if system is ostree: %w", err)
+	} else if !isOstree {
+		klog.InfoS("System is not OSTree-based")
+		return nil
+	}
+
+	dataExists, err := util.PathExists(config.DataDir)
 	if err != nil {
-		if errors.Is(err, errHealthFileDoesNotExist) {
-			klog.InfoS("Skipping pre-run: Health status file does not exist")
+		return fmt.Errorf("failed to check if data directory already exists: %w", err)
+	}
+
+	versionExists, err := util.PathExists(versionFilePath)
+	if err != nil {
+		return fmt.Errorf("checking if version metadata exists failed: %w", err)
+	}
+
+	healthExists, err := util.PathExists(healthFilepath)
+	if err != nil {
+		return fmt.Errorf("failed to check if health file already exists: %w", err)
+	}
+
+	klog.InfoS("Existence of important paths",
+		"data-exists?", dataExists,
+		"version-exists?", versionExists,
+		"health-exists?", healthExists,
+	)
+
+	/*
+		| id  | data | version | health | comment                                                                                                     |
+		| --- | ---- | ------- | ------ | ----------------------------------------------------------------------------------------------------------- |
+		| 1   | 0    | 0       | 0      | first, clean start of MicroShift                                                                            |
+		| 2   | 0    | 0       | 1      | data removed manually, but health/backups kept                                                              |
+		| 3   | 0    | 1       | 0      | impossible to detect right now [0]                                                                          |
+		| 4   | 0    | 1       | 1      | impossible to detect right now [0]                                                                          |
+		| 5   | 1    | 0       | 0      | upgrade from 4.13                                                                                           |
+		| 6   | 1    | 0       | 1      | first boot failed very early, or upgrade from 4.13 failed (e.g. healthcheck didn't see service being ready) |
+		| 7   | 1    | 1       | 0      | first start, rebooted before green/red scripts managed to write health info                                 |
+		| 8   | 1    | 1       | 1      | regular                                                                                                     |
+
+		[0] it would need a comprehensive check if data exists, not just existence of /var/lib/microshift
+	*/
+
+	if !dataExists {
+		// Implies !versionExists
+
+		// 1
+		if !healthExists {
+			klog.InfoS("Neither data dir nor health file exist - assuming first start of MicroShift")
 			return nil
 		}
+
+		// 2
+		// TODO: Health needs to be extended into a history of boots and their health
+		// so prerun can look into the past and decide if a backup should be restored
+		// for currently running deployment
+		return fmt.Errorf("TODO: data is missing, but health file exists")
+	}
+
+	if !versionExists {
+		// 5
+		if !healthExists {
+			klog.InfoS("Data dir exists, but health and version files are missing: assuming upgrade from 4.13")
+			return pr.upgradeFrom413()
+		}
+
+		// 6
+		// TODO: Check if health data is for previous boot (according to journalctl --list-boots)
+		// This could happen if system rolled back to 4.13, backup was manually restored to attempt upgrade again,
+		// but health file not deleted leaving stale data behind.
+		return fmt.Errorf("TODO: health file exist, but version metadata does not")
+	}
+
+	// 7
+	if !healthExists {
+		// MicroShift might end up here if first run of MicroShift gets interrupted
+		// before green/red script manages to write the health file.
+		// Examples include:
+		// - host reboot
+		// - if e2e test restarts MicroShift (e.g. to reload the config) or reboots the host
+		//   - due to the way microshift-etcd now runs, `restart microshift` causes a restart of both
+		//     microshift-etcd and microshift - if m-etcd restarts before microshift,
+		//     microshift will restart it self as a way to start m-etcd again
+		klog.InfoS("TODO: Version file exists, but health info is missing")
+		return nil
+	}
+
+	// 8 - regular flow
+	return pr.regularPrerun()
+}
+
+// regularPrerun performs actions in prerun flow that is most expected in day to day usage
+// (i.e. data, version metadata, and health information exist)
+func (pr *PreRun) regularPrerun() error {
+	health, err := getHealthInfo()
+	if err != nil {
 		return fmt.Errorf("failed to determine the current system health: %w", err)
 	}
 
@@ -95,9 +188,11 @@ func (pr *PreRun) Perform() error {
 		if migrationNeeded {
 			_ = migrationNeeded
 			// TODO: data migration
-		}
 
-		return nil
+			if err := writeExecVersionToData(); err != nil {
+				return fmt.Errorf("failed to write MicroShift version to data directory: %w", err)
+			}
+		}
 	} else {
 		klog.Info("Previous boot was not healthy")
 		if err = pr.restore(); err != nil {
@@ -105,7 +200,22 @@ func (pr *PreRun) Perform() error {
 		}
 	}
 
-	klog.InfoS("Finished pre-run")
+	return nil
+}
+
+func (pr *PreRun) upgradeFrom413() error {
+	backupName := data.BackupName("4.13")
+
+	if err := pr.dataManager.Backup(backupName); err != nil {
+		return fmt.Errorf("failed to create new backup %q: %w", backupName, err)
+	}
+
+	// TODO: data migration
+
+	if err := writeExecVersionToData(); err != nil {
+		return fmt.Errorf("failed to write MicroShift version to data directory: %w", err)
+	}
+
 	return nil
 }
 
@@ -197,11 +307,6 @@ func (pr *PreRun) checkVersions() (bool, error) {
 
 	dataVer, err := getVersionOfData()
 	if err != nil {
-		if errors.Is(err, errDataVersionDoesNotExist) {
-			klog.InfoS("Version file of data does not exist - assuming data version is 4.13")
-			// TODO: 4.13
-			return true, nil
-		}
 		return false, fmt.Errorf("failed to determine the version of the existing data: %w", err)
 	}
 
@@ -258,16 +363,15 @@ func getCurrentBootID() (string, error) {
 }
 
 func getHealthInfo() (*HealthInfo, error) {
-	path := "/var/lib/microshift-backups/health.json"
-	if exists, err := util.PathExists(path); err != nil {
+	if exists, err := util.PathExists(healthFilepath); err != nil {
 		return nil, err
 	} else if !exists {
 		return nil, errHealthFileDoesNotExist
 	}
 
-	content, err := os.ReadFile(path)
+	content, err := os.ReadFile(healthFilepath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read health data from %q: %w", path, err)
+		return nil, fmt.Errorf("failed to read health data from %q: %w", healthFilepath, err)
 	}
 
 	health := &HealthInfo{}
