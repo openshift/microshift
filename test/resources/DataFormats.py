@@ -87,3 +87,20 @@ def update_kubeconfig_server_url(kubeconfig_text, new_url):
     parsed = yaml.safe_load(kubeconfig_text)
     parsed['clusters'][0]['cluster']['server'] = new_url
     return yaml.dump(parsed)
+
+
+# lvmd_merge idempotently merges the provided patch into the base lvmd config. If the patch is already present in the
+# device class list, the base config is returned without mutation. Necessary because LVMD does not tolerate device-classes
+# of the same name.
+def lvmd_merge(base, patch):
+    if base is None:
+        raise ValueError('cannot process empty base')
+    if patch is None:
+        return base
+
+    dev_classes = yaml.safe_load(base)['device-classes']
+    dc_patch_name = yaml.safe_load(patch)['device-classes'][0]['name']
+
+    if any(d['name'] == dc_patch_name for d in dev_classes):
+        return base
+    return yaml_merge(base, patch)
