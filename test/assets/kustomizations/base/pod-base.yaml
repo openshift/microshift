@@ -1,21 +1,7 @@
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  namespace: default
-  name: test-claim-thin
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: topolvm-provisioner-thin
-  resources:
-    requests:
-      storage: 1Gi
----
 kind: Pod
 apiVersion: v1
 metadata:
-  name: test-pod-thin
-  namespace: default
+  name: base
 spec:
   securityContext:
     runAsNonRoot: true
@@ -36,7 +22,4 @@ spec:
     volumeMounts:
     - mountPath: /vol
       name: test-vol
-  volumes:
-  - name: test-vol
-    persistentVolumeClaim:
-      claimName: test-claim-thin
+  volumes: []

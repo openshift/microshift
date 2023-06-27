@@ -1,0 +1,9 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: base
+spec:
+  volumes:
+    - name: test-vol
+      persistentVolumeClaim:
+        claimName: snapshot-restore
