@@ -1,22 +1,2 @@
-# kubernetes image-arm64 7d221229dc97969b79a272b63ad97b84d93cddb2 to a7ee68b55354d8c146ef81f82444c0765ea8885f
-8f419074dece78017415ecd4a9fb51d8d3157379 2023-06-22T13:23:58+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-887fbef7851fbbfe25f9ba5dbfd37e0204d5b9c4 2023-06-22T13:23:30+02:00 UPSTREAM: <drop>: manually resolve conflicts
-ce1278ede14b2239de9916f27d480472a11e10dc 2023-06-20T16:57:39+02:00 UPSTREAM: <drop>: bump apiserver-library-go
-11902a838028edef305dfe2f96be929bc4d114d8 2023-06-14T09:49:06+00:00 Release commit for Kubernetes v1.26.6
-b204a2b57f12800767b5c06069d518513363dbce 2023-06-08T00:14:59-06:00 update-vendor: update vendored go.sums
-4bf442eb73b91b7d74f7cc4d238519b99904c9e5 2023-06-07T23:41:30-06:00 [release-1.26] releng/go: Update images, dependencies and version to Go 1.19.10
-36ed0ac6c5203a3f9d6da68869a0d1991a524b96 2023-06-06T21:16:45+00:00 kube-proxy avoid race condition using LocalModeNodeCIDR
-b171ae97e0e37ab70e31df8e3197dc6e7de28998 2023-06-05T13:51:35-07:00 Add ephemeralcontainer to imagepolicy securityaccount admission plugin
-b935de6df5447cbb749fb8d7e6dad0bcb01992a4 2023-05-29T09:37:52+02:00 Add DisruptionTarget condition when preempting for critical pod
-8d5ca2c486bacefbd678860d0002855c9f8b64b6 2023-05-23T00:15:07+08:00 update webhook test to go 1.21
-3ec283ec109d26d86f7c77ce43369a34b72e2123 2023-05-18T12:51:21-04:00 Test APIService safe handling at startup
-4e6a7801d8a28ae149642a087f5225339d6571d0 2023-05-18T12:24:55-04:00 Fix waiting for CRD sync at server start
-0b8b4babcb28ecf318f272b4f89a4ddef6c33c67 2023-05-18T22:43:22+08:00 kubeadm: fix a bug where the static pod changes detection logic is inconsistent with kubelet
-8ee0781227d37d2bd7f34874fc5deea14c371bfb 2023-05-17T14:30:16+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.5
-fd6645fcfd3afddc628271977a0e0bc61a92019f 2023-05-10T13:38:07-07:00 kubeadm: Make etcd member removal idempotent
-9164248629529e596f042ec76875a9c4caf6639d 2023-05-10T13:38:02-07:00 kubeadm: Add etcd client unit tests
-bbd16451e1e1f9116d4c33b2efea67316ddb3d88 2023-05-10T13:38:02-07:00 kubeadm: Use internal etcd client through an interface
-ef5e78fbebad85a230d1b82eb71442f2875cd774 2023-05-04T01:46:55+05:30 run update-vendor.sh
-b73b79d5308dede4ff76d22b105b142f5d0df0cb 2023-05-04T01:32:18+05:30 vclib: Modify x509.UnknownAuthorityError unwrap check
-40797a123dcff16ee32972fd82b5d4119a2aa592 2023-05-04T01:32:18+05:30 vsphere: Adapt to govmomi version bumps
-3ac70147ec3de3752b360a06bcb7d7c418619da2 2023-05-04T01:32:18+05:30 *: Bump version of vmware/govmomi
+# ovn-kubernetes image-arm64 855f4a44967fe932f6f067cd338d74d7b8f010c0 to 3e4ab30789e2a9607630a6c3be6cf624c82adcbc
+c5e0b8e5e20399aa9c4d3ea405ec4b436a928f34 2023-06-23T21:23:23+02:00 Add default deny acl externalID to avoid duplicate acls for namespaces with long names. every namespace has 4 default deny acls: ingress/egress and deny/allow. Direction was in the ExternalIDs before, but action was a suffix in acl name, that gets truncated for long namespace names, therefore deny and allow acls for the same direction would have the same name and ExternalIDs. New ExternalID should fix this case.
