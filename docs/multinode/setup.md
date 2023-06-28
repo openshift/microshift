@@ -75,3 +75,5 @@ watch oc get pods -A
 ```
 
 Run your test suite of choice using the primary and secondary MicroShift instances.
+
+If you want to run [openshift-tests](https://github.com/openshift/origin) suite, follow [this](../openshift_ci.md#running-tests-manually) document.

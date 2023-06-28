@@ -12,7 +12,51 @@ Prior to opening a PR it is useful and efficient to be able to run tests locally
 
 `openshift-tests` requires a kubeconfig and `oc` binary as well. MicroShift generates a kubeconfig located in `/var/lib/microshift/resources/kubeadmin/kubeconfig`, but we will see how to use it depending on local vs remote access to MicroShift instances.
 
-Once we have the kubeconfig working, we can launch the tests. In order to run `openshift-tests` for `MicroShift` we need to provide KUBECONFIG and one specific option:
+Once we have the kubeconfig working, we need to set the static manifests pointed through `STATIC_CONFIG_MANIFEST_DIR` environment variable.
+
+```sh
+mkdir ~/manifests
+export STATIC_CONFIG_MANIFEST_DIR=~/manifests
+```
+
+Currently only manifests from `[infrastructure|network].config.openshift.io/v1` are supported as static manifests.
+
+```sh
+MICROSHIFT_URL="<microshift-server-url>"
+cat > ${STATIC_CONFIG_MANIFEST_DIR}/infrastructure.yaml <<EOF
+apiVersion: "config.openshift.io/v1"
+kind: Infrastructure
+metadata:
+  name: cluster
+spec:
+  platformSpec:
+    type: None
+status:
+  apiServerURL: ${MICROSHIFT_URL}
+  controlPlaneTopology: SingleReplica
+  infrastructureTopology: SingleReplica
+  platform: None
+  platformStatus:
+    type: None
+EOF
+cat > ${STATIC_CONFIG_MANIFEST_DIR}/network.yaml <<EOF
+apiVersion: config.openshift.io/v1
+kind: Network
+metadata:
+  name: cluster
+spec:
+  networkType: OVNKubernetes
+status:
+  networkType: OVNKubernetes
+EOF
+```
+
+> Update `<microshift-server-url>` with the accessible MicroShift server url. 
+
+
+After storing these manifests into `~/manifests` directory, we can launch the tests. 
+
+In order to run `openshift-tests` for `MicroShift` we need to provide KUBECONFIG and one specific option:
 ```
 KUBECONFIG=~/.kube/microshift ./openshift-tests --provider none -v 2 <test suite name> -o <output file name> --junit-dir <junit dir path>
 ```
