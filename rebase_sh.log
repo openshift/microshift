@@ -1,0 +1,38 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-06-27-000502 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.14.0-0.nightly-arm64-2023-06-28-002233[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-06-27-000502 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.14.0-0.nightly-arm64-2023-06-28-002233 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-06-27-000502 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-06-27-000502 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 5c85a31 Merge pull request #359 from gcs278/force_tcp
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at ecb3786 Merge pull request #949 from candita/OCPBUGS-15100
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at 5096753 Merge pull request #1517 from deads2k/etcd-timeout-02
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 1807a0d Merge pull request #736 from adriengentil/revendor-library-go
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at c2928b4 Merge pull request #487 from lance5890/remove-loglevel-in-manifest
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at 25b4574 Merge pull request #1843 from dlom/CCO-358-followup
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at bab7be1 Merge pull request #289 from lance5890/change_log_level
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at cc787e1 Merge pull request #115 from atiratree/bug-13649-cluster-resource-quotas-fix-count
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at 53cdd6b0 Merge pull request #184 from openshift-cherrypick-robot/cherry-pick-177-to-openshift-4.14
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+error: 3759 bytes of body are still expected
+fetch-pack: unexpected disconnect while reading sideband packet
+fatal: early EOF
+fatal: fetch-pack: invalid index-pack output
+Script exited with error.
