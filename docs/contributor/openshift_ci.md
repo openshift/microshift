@@ -118,7 +118,7 @@ Prow/Openshift-CI provide CI bot management via GitHub comments. See [here](http
 
 CI related GitHub statuses can be identified by their `ci/prow/*` prefix. When a test fails, the first step should always be to check the status `Details` link.
 
-![Details](./images/openshift_ci_details.png)
+![Details](../images/openshift_ci_details.png)
 
 The `Details` link will bring you to that test’s combined logs for the build, deploy, test, and teardown phases for that e2e job. Most of the time, this log can be invaluable for debugging test errors and exposing regressions.
 
@@ -131,7 +131,7 @@ OpenShift GitHub org members may gain access to the OCP namespace and backend wo
 
 To access the OCP CI Cluster namespace for a given GitHub status/e2e suite, go to the status Details link and fully expand the build log. Each build log prints a URL to the OCP Console namespace for that CI run, near the very top of the log.
 
-![Build Log](./images/openshift_ci_buildlog.png)
+![Build Log](../images/openshift_ci_buildlog.png)
 
 The console will ask you to login with either a `kubeadmin` or company SSO. Select Company SSO. After authenticating, you’ll be presented with the overview page for the OCP project. Expand the left-hand sidebar menu and select `Workloads -> Pods`.
 > You may have to toggle the Developer view to Administrator, located at the top of the sidebar.
@@ -142,7 +142,7 @@ Openshift-CI uses [Prow](https://github.com/kubernetes/test-infra/tree/master/pr
 When logs aren’t enough to expose a failure’s cause, it may be useful to examine the job’s container artifacts. It is possible to access the CI registry and pull down the job’s images. First, login to the CI cluster by following the steps in [Debugging CI Cluster Workloads]. At the console page, click your name in the upper right corner and select `Copy Login Command`.
 >You may be asked to authenticate again.
 
-![Copy login command](./images/openshift_ci_copylogin.png)
+![Copy login command](../images/openshift_ci_copylogin.png)
 
 Click `Display Token` and copy and execute the `oc login --token=...` command. Then login to the CI registry with `oc registry login`.
 
@@ -157,7 +157,7 @@ podman pull registry.build02.ci.openshift.org/[PROJECT]/pipeline:bin
 ## Historical Data
 Access the [Openshift Release Prow Dashboard](https://prow.ci.openshift.org/?repo=redhat-et%2Fmicroshift) for a historical view of job performance. Jobs may be differentiated further using the drop down menus and search fields. To view only PR triggered jobs, select `pre-submit` from the Filter drop down. Select “periodics” to view the nightly history.
 
-![Prow Status](./images/openshift_ci_prowstatus.png)
+![Prow Status](../images/openshift_ci_prowstatus.png)
 
 ## Nightly Updates
 Join the `coreos#microshift-alerts` slack channel for reports of nightly e2e jobs. Unlike presubmit (pull-request) jobs, nightly jobs build MicroShift from `main:HEAD`.
@@ -258,7 +258,7 @@ Steps, chains, and workflows together define an execution tree, where each leaf 
 
 Each suite, as well as some one-off tests, are defined under their own execution tree. For example, `sig-apps`:
 
-![sig-apps](./images/openshift_ci_sigapps.png)
+![sig-apps](../images/openshift_ci_sigapps.png)
 
 > Bear in mind that workflows may specify other workflows, chains, or refs. Chains may specify other chains or refs.
 
@@ -282,10 +282,6 @@ At present MicroShift steps inject the following credentials:
 
 ### Obtaining GitHub App's ID and private key for PR creation script
 GitHub App can be presented as a set of credentials with specific permissions authorized against a repository. GitHub App can be created using the form at [github.com/settings/apps/new](https://github.com/settings/apps/new).
-
-[Pull Request creation script](../scripts/create_pr.py) requires the following read and write permissions:
-- Contents (to push branches directly to the repository)
-- Pull requests (to create Pull Requests)
 
 After creating the GitHub App, a private key must be generated and added to the Vault together with GitHub App ID.
 Step configuration contains a `credentials` stanza which needs to be configured to supply the credentials from the Vault to the step at runtime.
@@ -380,7 +376,7 @@ and then drill down to more specific metrics as necessary.
 Finally, open the `Options > Show Time` dialog and scroll through the time position
 of the performance samples.
 
-![pcp_charts](./images/pcp_charts.png)
+![pcp_charts](../images/pcp_charts.png)
 
 
 ## [CI Config Contributions](https://docs.ci.openshift.org/docs/how-tos/contributing-openshift-release/)

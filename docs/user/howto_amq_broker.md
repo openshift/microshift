@@ -2,7 +2,7 @@
 This document describes a basic workflow for deploying and testing [Red Hat AMQ Broker](https://access.redhat.com/documentation/en-us/red_hat_amq/2020.q4) with MicroShift.
 
 ## Create MicroShift Server
-Use the instructions in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document to configure a virtual machine running MicroShift. 
+Use the instructions in the [Install MicroShift on RHEL for Edge](../contributor/rhel4edge_iso.md) document to configure a virtual machine running MicroShift. 
 
 Log into the virtual machine and run the following commands to configure the MicroShift access and check if the PODs are up and running.
 
@@ -96,7 +96,7 @@ Open a browser at the `http://VM_IP:AMQ_WEB_PORT` URL, click on the `Management 
 
 Navigate to `broker > addresses > microshift-queue` in the tree and select the `Queues` tab. Review the `Message Count` column in the table, noting that there are fifty messages remaining to be consumed in the queue.
 
-![AMQ Broker Queue](./images/howto_amq_broker_queue.png)
+![AMQ Broker Queue](../images/howto_amq_broker_queue.png)
 
 > See [Producing and consuming test messages](https://access.redhat.com/documentation/en-us/red_hat_amq/2020.q4/html/getting_started_with_amq_broker/creating-standalone-getting-started#producing-consuming-test-messages-getting-started) for more information.
 

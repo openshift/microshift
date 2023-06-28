@@ -161,7 +161,7 @@ When executed in this mode, the `scripts/image-builder/build.sh` script performs
 jq -r '.images | .[]' ~/microshift/assets/release/release-$(uname -m).json
 ```
 
-> See [Embedding MicroShift Container Images for Offline Deployments](./howto_offline_containers.md) for more information.
+> See [Embedding MicroShift Container Images for Offline Deployments](../user/howto_offline_containers.md) for more information.
 
 ## Install MicroShift for Edge
 Log into the `physical hypervisor host` using your user credentials. The remainder of this section describes how to install a virtual machine running RHEL for Edge OS containing MicroShift binaries.

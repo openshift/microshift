@@ -64,4 +64,4 @@ To add a pull secret for authenticating to a registry, set the
 auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 ```
 
-Refer to the [Container registry credentials section of the osbuild guide](https://www.osbuild.org/guides/user-guide/container-auth.html) for more details.
+Refer to the [Container registry credentials](https://www.osbuild.org/guides/image-builder-on-premises/container-auth.html) section of the `osbuild` guide for more details.

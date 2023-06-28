@@ -2,7 +2,7 @@
 MicroShift offers an built-in implementation of network load balancers ([Services of type LoadBalancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer)). It will use the node IP as the ingress IP of the loadbalancer type of service.
 
 ## Create MicroShift Server
-Use the instructions in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document to configure a virtual machine running MicroShift.
+Use the instructions in the [Install MicroShift on RHEL for Edge](../contributor/rhel4edge_iso.md) document to configure a virtual machine running MicroShift.
 
 Log into the virtual machine and run the following commands to configure the MicroShift access and check if the PODs are up and running.
 
