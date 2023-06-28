@@ -81,6 +81,10 @@ for uuid in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" 
     sed -i '/autoconnect=.*/d' "${file}"
 done
 
+# Update certificate trust storage in case new certificates were
+# installed at /etc/pki/ca-trust/source/anchors directory
+update-ca-trust
+
 # Configure an empty local ostree repository and server if the "edge" remote points to "localhost:8085"
 if grep -q '^url=http://127.0.0.1:8085' /etc/ostree/remotes.d/edge.conf ; then
     ostree_repo=/var/lib/ostree-server-local

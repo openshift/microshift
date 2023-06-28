@@ -52,6 +52,7 @@ To install, configure and run MicroShift, refer to the following documentation:
 - [MicroShift Mitigation of System Configuration Changes](./docs/howto_sysconf_watch.md)
 - [Firewall Configuration](./docs/howto_firewall.md)
 - [Integrating MicroShift with Greenboot](./docs/greenboot.md)
+- [Mirror MicroShift Container Images](./docs/howto_mirror_images.md)
 - [Debugging Tips](./docs/debugging_tips.md)
 - [Known Limitations](./docs/known_limitations.md)
 
@@ -70,6 +71,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [MicroShift Host Networking Overview](./docs/network/host_networking.md)
 - [MicroShift Traffic Flows Overview](./docs/network/ovn_kubernetes_traffic_flows.md)
 - [Testing MicroShift Integration with Greenboot](./docs/greenboot_dev.md)
+- [Quay Mirror Registry Setup for Testing](./docs/howto_quay_mirror.md)
 - [Multinode Testing Environment for MicroShift](./docs/multinode/setup.md)
 
 ## Community
