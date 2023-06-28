@@ -355,6 +355,7 @@ spec:
           exec /usr/bin/ovnkube \
             --init-master "${K8S_NODE}" \
             --init-node "${K8S_NODE}" \
+            --allow-no-uplink \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
             ${gateway_mode_flags} \

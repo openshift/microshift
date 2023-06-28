@@ -27,7 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/openshift/microshift/pkg/config/ovn"
 	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
@@ -36,23 +35,17 @@ import (
 var previousGatewayIP string = ""
 
 func GetHostIP() (string, error) {
-	// Prefer OVN-K gateway IP if it is the CNI
-	gatewayIP, err := ovn.GetOVNGatewayIP()
-	if err != nil && !strings.Contains(err.Error(), "no such network interface") {
-		return "", err
-	}
-	if gatewayIP != previousGatewayIP {
-		previousGatewayIP = gatewayIP
-		klog.V(2).Infof("ovn gateway IP address: %s", gatewayIP)
-	}
-
 	ip, err := net.ChooseHostInterface()
 	if err == nil {
 		return ip.String(), nil
 	}
-	klog.V(2).Infof("could not find default route IP address, using ovn gateway IP %q as host IP: %v", gatewayIP, err)
+	hostIP := ip.String()
+	if hostIP != previousGatewayIP {
+		previousGatewayIP = hostIP
+		klog.V(2).Infof("host gateway IP address: %s", hostIP)
+	}
 
-	return gatewayIP, nil
+	return hostIP, nil
 }
 
 func RetryInsecureGet(ctx context.Context, url string) int {

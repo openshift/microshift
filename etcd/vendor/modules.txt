@@ -199,7 +199,6 @@ github.com/openshift/build-machinery-go/scripts
 # github.com/openshift/microshift v0.0.0 => ../
 ## explicit; go 1.20
 github.com/openshift/microshift/pkg/config
-github.com/openshift/microshift/pkg/config/ovn
 github.com/openshift/microshift/pkg/util
 github.com/openshift/microshift/pkg/util/cryptomaterial
 # github.com/peterbourgon/diskv v2.0.1+incompatible
