@@ -5,7 +5,7 @@ MicroShift depends on the device IP address and system-wide clock settings to re
 This document describes how to simulate system configuration changes in a virtual environment and verify that MicroShift service reacts by restarting when necessary.
 
 ## Create MicroShift Server
-Use the instructions in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document to configure a virtual machine running MicroShift. 
+Use the instructions in the [Install MicroShift on RHEL for Edge](../contributor/rhel4edge_iso.md) document to configure a virtual machine running MicroShift. 
 
 Log into the virtual machine and run the following commands to configure the MicroShift access and check if the PODs are up and running.
 
@@ -130,7 +130,7 @@ external serving certificate.
 
 The below (non-proportional!) graph shows when certificates are rotated.
 
-![Cert Rotation](./images/certrotation.png)
+![Cert Rotation](../images/certrotation.png)
 
 - a certificate in the **green zone** does not get rotated
 - a certificate in the **yellow zone** is rotated on Microshift start (or restart)

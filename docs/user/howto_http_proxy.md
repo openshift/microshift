@@ -36,7 +36,7 @@ sudo systemctl restart rpm-ostreed.service
 ```
 
 ## Testing Configuration
-Use the instructions in the [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md) document to configure a virtual machine running MicroShift.
+Use the instructions in the [Install MicroShift on RHEL for Edge](../contributor/rhel4edge_iso.md) document to configure a virtual machine running MicroShift.
 
 ### Hypervisor Settings
 Log into the hypervisor host and set up an `tinyproxy` server to be used as a forward proxy.

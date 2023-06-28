@@ -1,6 +1,6 @@
 # MicroShift Storage Plugin Overview
 
-> **IMPORTANT!** The default LVMS configuration is intended to match the developer environment described in [MicroShift Development Environment](./devenv_setup.md). See section **[Configuring LVMS](#Configuring-LVMS)** for guidance on configuring LVMS for your environment.
+> **IMPORTANT!** The default LVMS configuration is intended to match the developer environment described in [MicroShift Development Environment](../devenv_setup.md). See section **[Configuring LVMS](#Configuring-LVMS)** for guidance on configuring LVMS for your environment.
 
 MicroShift enables dynamic storage provisioning out of the box with the LVMS CSI plugin. This plugin is a downstream
 Red Hat build of TopoLVM. This provisioner will create a new LVM logical volume in the `rhel` volume group for each
@@ -9,7 +9,7 @@ PersistenVolumeClaim(PVC), and make these volumes available to pods. For more in
 
 ## Design
 
-LVMS manifests can be found in [microshift/assets/components/lvms](../assets/components/lvms). For an overview
+LVMS manifests can be found in [microshift/assets/components/lvms](../../../assets/components/lvms). For an overview
 of LVMS architecture, see the [design doc](https://github.com/red-hat-storage/topolvm/blob/main/docs/design.md).
 
 ## Deployment
@@ -63,7 +63,7 @@ group's capacity is less than 1Gb, the PersistentVolumeClaim will register a `Pr
 
 ### Create Workload Storage
 
-LVMS's [StorageClass](../assets/components/lvms/topolvm_default-storage-class.yaml) is deployed with a default
+LVMS's [StorageClass](../../../assets/components/lvms/topolvm_default-storage-class.yaml) is deployed with a default
 StorageClass. Any PersistentVolumeClaim without a `.spec.storageClassName` defined will automatically have a
 PersistentVolume provisioned from the default StorageClass.
 

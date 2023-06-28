@@ -29,6 +29,10 @@ type Manifests struct {
 	KustomizePaths []string `json:"kustomizePaths"`
 }
 
+// GetKustomizationPaths returns the list of configured paths for
+// which there are actual kustomization files to be loaded. The paths
+// are returned in the order given in the configuration file. The
+// results of any glob patterns are sorted lexicographically.
 func (m *Manifests) GetKustomizationPaths() ([]string, error) {
 	kustomizationFileNames := konfig.RecognizedKustomizationFileNames()
 	results := []string{}
@@ -47,13 +51,15 @@ func (m *Manifests) GetKustomizationPaths() ([]string, error) {
 			// directories where there is something to apply, but the
 			// results we need are the directory names, so convert the
 			// full match string back to a directory.
+			//
+			// Glob() does not explicitly say it sorts its return
+			// value, so we do it to ensure deterministic behavior.
+			sort.Strings(matches)
 			for _, match := range matches {
 				klog.Infof("Adding kustomize path %v", filepath.Dir(match))
 				results = append(results, filepath.Dir(match))
 			}
 		}
 	}
-	// Sort the results to ensure deterministic behavior.
-	sort.Strings(results)
 	return results, nil
 }

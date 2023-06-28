@@ -10,8 +10,8 @@ of the `scripts/image-builder/build.sh` script. Such ISO images and updates can
 be transferred to air gapped environments and installed on MicroShift instances.
 
 > The container embedding procedures are described in the
-> [Offline Containers](./rhel4edge_iso.md#offline-containers) and
-> [The `ostree` Update Server](./rhel4edge_iso.md#the-ostree-update-server)
+> [Offline Containers](../contributor/rhel4edge_iso.md#offline-containers) and
+> [The `ostree` Update Server](../contributor/rhel4edge_iso.md#the-ostree-update-server)
 > sections.
 
 However, a custom air gapped container registry may still be necessary due to

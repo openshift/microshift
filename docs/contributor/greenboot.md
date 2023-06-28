@@ -17,7 +17,7 @@ testing MicroShift integration with Greenboot in CI/CD pipelines.
 
 ### Installation
 
-Follow the instructions in [Auto-applying Manifests](./howto_config.md#auto-applying-manifests)
+Follow the instructions in [Auto-applying Manifests](../user/howto_config.md#auto-applying-manifests)
 section to install a dummy user workload, without restarting the MicroShift service
 at this time.
 

@@ -308,7 +308,7 @@ To test changes in context of "production" (CI Prow Job) environment it's recomm
      > This requires [installing](https://github.com/apps/microshift-rebase-script/installations/new) the [microshift-rebase-script](https://github.com/apps/microshift-rebase-script) for the fork (this will allow the job to push branches and create PRs)
   - `DRY_RUN=y` to not push branches or create PRs on `$ORG/microshift` - job will just log what it would do and continue the execution
 
-Then, create a dummy PR in [https://github.com/openshift/release](openshift/release) repository for rehearsing the rebase job that switches from `openshift/microshift` `main` branch to `org/microshift` for testing.
+Then, create a dummy PR in [openshift/release](https://github.com/openshift/release) repository for rehearsing the rebase job that switches from `openshift/microshift` `main` branch to `org/microshift` for testing.
 
 Example of `ci-operator/step-registry/openshift/microshift/rebase/openshift-microshift-rebase-commands.sh` (tweaked [PR](https://github.com/openshift/release/pull/35875/files):
 ```bash

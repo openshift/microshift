@@ -4,7 +4,7 @@
 
 The following diagram captures the OVN network topology for the MicroShift deployment:
 
-![picture_alt](ovn_topology.svg "OVN Topology")
+![OVN Topology](../../images/ovn_topology.svg)
 
 OVN logical components are marked as yellow which provides virtualized network for pods and services.
 - ovn external switch: a virtual switch named `ext_<node-name>`

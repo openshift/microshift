@@ -18,5 +18,5 @@ generate_crd | go run -mod vendor ./cmd/generate-config \
 
 echo "Updating docs/howto_config.md"
 generate_crd | go run -mod vendor ./cmd/generate-config \
--o ./docs/howto_config.md \
--t ./docs/howto_config.md
+-o ./docs/user/howto_config.md \
+-t ./docs/user/howto_config.md

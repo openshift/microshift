@@ -5,7 +5,7 @@
 The MicroShift development environment should be set up on a **local workstation** as a collection of virtual machines.
 * The [development virtual machine](./devenv_setup.md#create-development-virtual-machine) used for compiling and running the MicroShift binaries and building [RHEL for Edge Installer ISO](./rhel4edge_iso.md#build-rhel-for-edge-installer-iso) images
 * The [RHEL for Edge virtual machine](./rhel4edge_iso.md#install-microshift-for-edge) used for running MicroShift in a clean, production-like environment
-* The [Ansible control node virtual machine](../ansible/README.md) used for running performance benchmark automation scripts
+* The [Ansible control node virtual machine](../../ansible/README.md) used for running performance benchmark automation scripts
 
 However, depending on a local workstation hardware configuration and operating system, it may not always be possible to set up the desired development environment, as in the following cases.
 * Different hardware platform setup (i.e. `x86_64` local hardware vs `aarch64` development environment or vice versa)
@@ -174,4 +174,4 @@ From the remote instance, add the `microshift` user to the `libvirt` OS group to
 sudo usermod -a -G libvirt $(whoami)
 ```
 
-![Virtual Machine Manager Add Connection](./images/devenv_cloud_addcon.png)
+![Virtual Machine Manager Add Connection](../images/devenv_cloud_addcon.png)

@@ -1,6 +1,6 @@
 # RHEL with MicroShift RPMs
 Log into the `hypervisor host` and follow the instructions described in the
-[Getting Started with MicroShift](../getting_started.md) document to create
+[Getting Started with MicroShift](../../user/getting_started.md) document to create
 and configure the `microshift-pri` and `microshift-sec` virtual machines for
 running primary and secondary instances.
 

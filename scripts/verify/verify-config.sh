@@ -3,7 +3,7 @@ set -euo pipefail
 
 config_spec_path=cmd/generate-config/config/config-openapi-spec.json
 config_file_path=packaging/microshift/config.yaml
-config_doc_path=docs/howto_config.md
+config_doc_path=docs/user/howto_config.md
 
 config_changed=$(git diff HEAD --name-only ${config_file_path})
 doc_changed=$(git diff HEAD --name-only ${config_doc_path})

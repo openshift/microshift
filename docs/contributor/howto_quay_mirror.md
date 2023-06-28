@@ -124,10 +124,10 @@ curl -I -u ${MIRROR_USER}:${MIRROR_PASS} https://${MIRROR_HOST}
 
 Log into the hypervisor host and follow the steps below to mirror the container
 images to the `microshift-quay` host.
-* Obtain the [Container Image List](./howto_mirror_images.md#container-image-list) to be mirrored
-* Configure the [Mirroring Prerequisites](./howto_mirror_images.md#mirroring-prerequisites)
-* [Download Images](./howto_mirror_images.md#download-images) to a local directory
-* [Upload Images](./howto_mirror_images.md#upload-images) to the `microshift-quay` host
+* Obtain the [Container Image List](../user/howto_mirror_images.md#container-image-list) to be mirrored
+* Configure the [Mirroring Prerequisites](../user/howto_mirror_images.md#mirroring-prerequisites)
+* [Download Images](../user/howto_mirror_images.md#download-images) to a local directory
+* [Upload Images](../user/howto_mirror_images.md#upload-images) to the `microshift-quay` host
 
 > Make sure to resolve the `microshift-quay` host name on the hypervisor host and
 > enable the mirror registry certificate trust as described in the

@@ -213,4 +213,4 @@ oc get pods -n busybox
 
 ## Storage Configuration
 
-MicroShift's included CSI plugin manages LVM LogicialVolumes to provide persistent workload storage. For specific storage configuration, refer to the dedicated [documentation](./storage/configuration.md).
+MicroShift's included CSI plugin manages LVM LogicialVolumes to provide persistent workload storage. For specific storage configuration, refer to the dedicated [documentation](../contributor/storage/configuration.md).
