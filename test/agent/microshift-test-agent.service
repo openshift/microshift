@@ -1,0 +1,9 @@
+[Unit]
+Description=MicroShift Test Agent
+Before=microshift.service
+
+[Service]
+ExecStart=/bin/bash /usr/bin/microshift-test-agent.sh
+
+[Install]
+WantedBy=multi-user.target
