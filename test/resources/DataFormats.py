@@ -1,6 +1,7 @@
 """Provides helpers for common data formats
 """
 import json
+
 import yaml
 from robot.utils import DotDict
 
@@ -79,3 +80,10 @@ def yaml_merge(base, addition):
         parsed_addition = yaml.safe_load(addition)
     _merge(combined, parsed_addition)
     return yaml.dump(combined)
+
+
+def update_kubeconfig_server_url(kubeconfig_text, new_url):
+    """Change the server URL and return the new kubeconfig text."""
+    parsed = yaml.safe_load(kubeconfig_text)
+    parsed['clusters'][0]['cluster']['server'] = new_url
+    return yaml.dump(parsed)

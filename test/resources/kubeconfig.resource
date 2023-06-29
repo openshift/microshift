@@ -3,7 +3,12 @@ Documentation       Keywords for accessing a kubeconfig file for the MicroShift 
 
 Library             OperatingSystem
 Library             String
+Library             DataFormats.py
 Resource            ../resources/microshift-host.resource
+
+
+*** Variables ***
+${API_PORT}     ${EMPTY}    # overridden by scenario.sh in CI
 
 
 *** Keywords ***
@@ -18,9 +23,17 @@ Get Kubeconfig
     RETURN    ${kubeconfig}
 
 Setup Kubeconfig
-    [Documentation]    Get the kubeconfig file from the configured $USHIFT_HOST, create a temporary file
+    [Documentation]    Get the kubeconfig file from the configured $USHIFT_HOST,
+    ...    update the server URL based on the API_PORT, create a temporary file,
     ...    and export it as $KUBECONFIG variable.
     ${kubeconfig}=    Get Kubeconfig    ${USHIFT_HOST}
+    # If we have been given an explicit API port to use, make sure that
+    # port appears in the kubeconfig file.
+    IF    "${API_PORT}"!="${EMPTY}"
+        ${kubeconfig}=    Update Kubeconfig Server Url
+        ...    ${kubeconfig}
+        ...    https://${USHIFT_HOST}:${API_PORT}
+    END
     ${rand}=    Generate Random String
     ${path}=    Join Path    /tmp    ${rand}
     Create File    ${path}    ${kubeconfig}
