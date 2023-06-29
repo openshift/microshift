@@ -4,6 +4,7 @@ kind: Service
 apiVersion: v1
 spec:
   type: ClusterIP
+  internalTrafficPolicy: Cluster
   ports:
     - name: http
       port: 80
