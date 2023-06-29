@@ -23,11 +23,12 @@ Rebooting Healthy System Should Result In Data Backup
     Wait Until Greenboot Health Check Exited
     System Should Be Healthy
     Remove Existing Backup For Current Deployment
+    ${future_backup}=    Get Future Backup Name For Current Boot
 
     Reboot MicroShift Host
     Wait For MicroShift Service
 
-    Backup For Booted Deployment Should Exist
+    Backup Should Exist    ${future_backup}
 
 Rebooting Unhealthy System Should Result In Restoring Data From A Backup
     [Documentation]    Check if rebooting unhealthy system will result
@@ -56,11 +57,6 @@ Setup
 Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
-
-Backup For Booted Deployment Should Exist
-    [Documentation]    Asserts that backup for currently booted deployment exists
-    ${id}=    Get Booted Deployment ID
-    Backup Should Exist    ${id}
 
 Make Masquerading Backup
     [Documentation]    Stops MicroShift and creates manual backup that
