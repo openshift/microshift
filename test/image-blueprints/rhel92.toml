@@ -1,0 +1,7 @@
+name = "rhel-9.2"
+description = ""
+version = "0.0.1"
+distro = "rhel-92"
+modules = []
+groups = []
+packages = []

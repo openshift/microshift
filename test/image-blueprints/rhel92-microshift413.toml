@@ -1,0 +1,25 @@
+name = "rhel-9.2-microshift-4.13"
+description = ""
+version = "0.0.1"
+modules = []
+groups = []
+distro = "rhel-92"
+
+[[packages]]
+name = "microshift"
+version = "4.13*"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "4.13*"
+
+[[packages]]
+name = "microshift-networking"
+version = "4.13*"
+
+[[packages]]
+name = "microshift-selinux"
+version = "4.13*"
+
+[customizations.services]
+enabled = ["microshift"]

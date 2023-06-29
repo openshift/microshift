@@ -11,7 +11,8 @@ source "${SCRIPTDIR}/common.sh"
 DEFAULT_BOOT_BLUEPRINT="rhel-9.2"
 LVM_SYSROOT_SIZE="10240"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
-PULL_SECRET="$(jq -c . "${HOME}/.pull-secret.json")"
+PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
+PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=8m
 
@@ -55,7 +56,7 @@ prepare_kickstart() {
         | sed -e "s/REPLACE_LVM_SYSROOT_SIZE/${LVM_SYSROOT_SIZE}/g" \
               -e "s|REPLACE_OSTREE_SERVER_URL|${WEB_SERVER_URL}/repo|g" \
               -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
-              -e "s|REPLACE_PULL_SECRET|${PULL_SECRET}|g" \
+              -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
               -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
               -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
               -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
