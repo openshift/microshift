@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Set the PUBLIC_IP to the IP address used to access the hypervisor.
+# shellcheck disable=SC2034
+PUBLIC_IP=10.8.1.133
+
+# Set SSH_PUBLIC_KEY to the filename of the ssh key to be used to
+# access the VMs created.
+# shellcheck disable=SC2034
+SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-${HOME}/.ssh/id_rsa.pub}
+
+# Set SSH_PRIVATE_KEY to the filename of the matching ssh key,
+# if any. Set it to an empty string to use ssh-agent.
+#SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY:-${HOME}/.ssh/id_rsa}

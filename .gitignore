@@ -7,3 +7,4 @@ _output
 sshfile
 ansible/*.txt
 test/variables.yaml
+test/scenario_settings.sh
