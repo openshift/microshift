@@ -1,6 +1,8 @@
 package migration
 
 import (
+	"fmt"
+	"reflect"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -54,4 +56,16 @@ func interpret(err error) error {
 
 func isConnectionRefusedError(err error) bool {
 	return strings.Contains(err.Error(), "connection refused")
+}
+
+func inconsistentContinueToken(err error) (string, error) {
+	status, ok := err.(errors.APIStatus)
+	if !ok {
+		return "", fmt.Errorf("expected error to implement the APIStatus interface, got %v", reflect.TypeOf(err))
+	}
+	token := status.Status().ListMeta.Continue
+	if len(token) == 0 {
+		return "", fmt.Errorf("expected non empty continue token")
+	}
+	return token, nil
 }

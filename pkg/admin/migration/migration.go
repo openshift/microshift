@@ -84,36 +84,67 @@ func (d *migrator) start(ctx context.Context) (*MigrationResultList, error) {
 	start := time.Now()
 	klog.Info("schema migration started")
 
+	// Currenlty we are sequentially migrating items, we will need to revisit this if performance becomes a problem
 	for _, sch := range schemas {
-		objectList := &unstructured.UnstructuredList{}
+		// A list of objects might be very large, they will be chunked results with a continue token
+		// here we loop for as many times we have a continue token or an error occured
+		continueToken := ""
+		for {
+			objectList := &unstructured.UnstructuredList{}
+			migrationErr := retry.OnError(retry.DefaultBackoff, canRetry, func() error {
+				var err error
+				objectList, err = d.client.Resource(sch).Namespace(metav1.NamespaceAll).List(ctx, metav1.ListOptions{
+					Continue: continueToken,
+				})
+				if err != nil {
+					return err
+				}
+				return nil
+			})
 
-		migrationErr := retry.OnError(retry.DefaultBackoff, canRetry, func() error {
-			var err error
-			objectList, err = d.client.Resource(sch).Namespace(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
-			if err != nil {
-				return err
+			// If resource expired error, retry
+			if migrationErr != nil && errors.IsResourceExpired(migrationErr) {
+				token, err := inconsistentContinueToken(migrationErr)
+				if err != nil {
+					err = fmt.Errorf("failed to get continue token: %w", err)
+					results.Items = append(results.Items, MigrationResult{Error: err, ResourceVersion: sch, Timestamp: time.Now()})
+					break
+				}
+				continueToken = token
+				continue
 			}
-			return nil
-		})
 
-		if migrationErr != nil {
-			errorOccured = true
-			migrationErr = fmt.Errorf("could not list resources: %+v", migrationErr)
-			results.Items = append(results.Items, MigrationResult{Error: migrationErr, ResourceVersion: sch, Timestamp: time.Now()})
-			continue
-		}
-
-		for _, object := range objectList.Items {
-			ref := object
-			migrationErr := d.migrateOneItem(ctx, sch, &ref)
 			if migrationErr != nil {
 				errorOccured = true
+				migrationErr = fmt.Errorf("could not list resources: %w", migrationErr)
+				results.Items = append(results.Items, MigrationResult{Error: migrationErr, ResourceVersion: sch, Timestamp: time.Now()})
+				break
 			}
-			results.Items = append(results.Items, MigrationResult{
-				Error:           migrationErr,
-				ResourceVersion: sch,
-				NamespacedName:  getNamespacedName(&ref),
-				Timestamp:       time.Now()})
+
+			for _, object := range objectList.Items {
+				ref := object
+				migrationErr := d.migrateOneItem(ctx, sch, &ref)
+				if migrationErr != nil {
+					errorOccured = true
+				}
+				results.Items = append(results.Items, MigrationResult{
+					Error:           migrationErr,
+					ResourceVersion: sch,
+					NamespacedName:  getNamespacedName(&ref),
+					Timestamp:       time.Now()})
+			}
+
+			// Check if the list contains a continue token
+			token, err := metadataAccessor.Continue(objectList)
+			if err != nil {
+				err = fmt.Errorf("failed to get continue token: %w", err)
+				results.Items = append(results.Items, MigrationResult{Error: err, ResourceVersion: sch, Timestamp: time.Now()})
+				break
+			}
+			if len(token) == 0 {
+				break
+			}
+			continueToken = token
 		}
 	}
 	if errorOccured {
