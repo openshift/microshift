@@ -56,8 +56,8 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
 	enablement.SCCAdmissionPlugin.SetExternalKubeInformerFactory(kubeInformers)
 	// END ADMISSION
 
-	openshiftAPIServiceReachabilityCheck := newOpenshiftAPIServiceReachabilityCheck()
-	oauthAPIServiceReachabilityCheck := newOAuthPIServiceReachabilityCheck()
+	openshiftAPIServiceReachabilityCheck := newOpenshiftAPIServiceReachabilityCheck(genericConfig.PublicAddress)
+	oauthAPIServiceReachabilityCheck := newOAuthPIServiceReachabilityCheck(genericConfig.PublicAddress)
 	genericConfig.ReadyzChecks = append(genericConfig.ReadyzChecks, openshiftAPIServiceReachabilityCheck, oauthAPIServiceReachabilityCheck)
 
 	genericConfig.AddPostStartHookOrDie("openshift.io-startkubeinformers", func(context genericapiserver.PostStartHookContext) error {

@@ -113,6 +113,10 @@ apiServerArguments:
     - /etc/kubernetes/static-pod-resources/secrets/etcd-client/tls.key
   etcd-prefix:
     - kubernetes.io
+  etcd-healthcheck-timeout:
+    - 9s
+  etcd-readycheck-timeout:
+    - 9s
   event-ttl:
     - 3h
   goaway-chance:

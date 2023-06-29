@@ -42,6 +42,6 @@ index 1bf8509b..d402786d 100644
 -	}
 -	// END HANDLER CHAIN
 -
- 	openshiftAPIServiceReachabilityCheck := newOpenshiftAPIServiceReachabilityCheck()
- 	oauthAPIServiceReachabilityCheck := newOAuthPIServiceReachabilityCheck()
+ 	openshiftAPIServiceReachabilityCheck := newOpenshiftAPIServiceReachabilityCheck(genericConfig.PublicAddress)
+ 	oauthAPIServiceReachabilityCheck := newOAuthPIServiceReachabilityCheck(genericConfig.PublicAddress)
  	genericConfig.ReadyzChecks = append(genericConfig.ReadyzChecks, openshiftAPIServiceReachabilityCheck, oauthAPIServiceReachabilityCheck)
