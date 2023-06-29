@@ -11,6 +11,7 @@ Suite Teardown      Teardown Suite With Namespace
 
 *** Variables ***
 ${HELLO_USHIFT}     assets/hello-microshift.yaml
+${LB_PORT}          ${EMPTY}
 
 
 *** Test Cases ***
@@ -41,8 +42,13 @@ Expose Hello MicroShift Pod Via LB
 
 Access Hello Microshift Via LB
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
+    IF    "${LB_PORT}"=="${EMPTY}"
+        ${connect_to}=    Set Variable    "hello-microshift.cluster.local:80:${USHIFT_HOST}:5678"
+    ELSE
+        ${connect_to}=    Set Variable    "hello-microshift.cluster.local:80:${USHIFT_HOST}:${LB_PORT}"
+    END
     ${result}=    Run Process
-    ...    curl -i http://hello-microshift.cluster.local --connect-to "hello-microshift.cluster.local:80:${USHIFT_HOST}:5678"
+    ...    curl -i http://hello-microshift.cluster.local --connect-to ${connect_to}
     ...    shell=True
     ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
