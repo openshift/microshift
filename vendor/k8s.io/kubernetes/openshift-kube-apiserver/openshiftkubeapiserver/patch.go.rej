@@ -1,0 +1,28 @@
+diff a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go	(rejected hunks)
+@@ -86,26 +84,6 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
+ 	enablement.SCCAdmissionPlugin.SetExternalKubeInformerFactory(kubeInformers)
+ 	// END ADMISSION
+ 
+-	// HANDLER CHAIN (with oauth server and web console)
+-	apiserverClient, err := apiclientv1.NewForConfig(makeJSONRESTConfig(genericConfig.LoopbackClientConfig))
+-	if err != nil {
+-		return err
+-	}
+-	apiRequestCountController := apirequestcount.NewController(apiserverClient.APIRequestCounts(), nodeFor())
+-	genericConfig.AddPostStartHook("openshift.io-api-request-count-filter", func(context genericapiserver.PostStartHookContext) error {
+-		go apiRequestCountController.Start(context.StopCh)
+-		return nil
+-	})
+-	genericConfig.BuildHandlerChainFunc, err = BuildHandlerChain(
+-		enablement.OpenshiftConfig().AuthConfig.OAuthMetadataFile,
+-		kubeInformers.Core().V1().ConfigMaps(),
+-		apiRequestCountController,
+-	)
+-	if err != nil {
+-		return err
+-	}
+-	// END HANDLER CHAIN
+-
+ 	openshiftAPIServiceReachabilityCheck := newOpenshiftAPIServiceReachabilityCheck()
+ 	oauthAPIServiceReachabilityCheck := newOAuthPIServiceReachabilityCheck()
+ 	genericConfig.ReadyzChecks = append(genericConfig.ReadyzChecks, openshiftAPIServiceReachabilityCheck, oauthAPIServiceReachabilityCheck)
