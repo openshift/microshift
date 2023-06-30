@@ -12,7 +12,7 @@ BACKUP_STORAGE = "/var/lib/microshift-backups"
 HEALTH_FILE = f"{BACKUP_STORAGE}/health.json"
 
 
-def remote_sudo_rc(cmd: str) -> (str, int):
+def remote_sudo_rc(cmd: str) -> tuple[str, int]:
     ssh = BuiltIn().get_library_instance("SSHLibrary")
     stdout, stderr, rc = SSHLibrary.SSHLibrary.execute_command(
         ssh, command=cmd, sudo=True, return_stderr=True, return_rc=True
@@ -35,6 +35,16 @@ def get_booted_deployment_id() -> str:
     """
     stdout = remote_sudo("rpm-ostree status --booted --json")
     return DataFormats.json_parse(stdout)["deployments"][0]["id"]
+
+
+def get_staged_deployment_id() -> str:
+    """
+    Get ID of a staged deployment
+    """
+    stdout = remote_sudo("rpm-ostree status --json")
+    deploy = DataFormats.json_parse(stdout)["deployments"][0]
+    BuiltIn().should_be_true(deploy["staged"])
+    return deploy["id"]
 
 
 def get_deployment_backup_prefix_path(deploy_id: str) -> str:
@@ -81,11 +91,19 @@ def get_persisted_system_health() -> str:
     return remote_sudo(f"jq -r '.health' {BACKUP_STORAGE}/health.json")
 
 
-def rebase_ostree_system(ref: str) -> None:
+def rpm_ostree_rebase(ref: str) -> None:
     """
     Rebase system to given OSTRee ref
     """
     return remote_sudo(f"rpm-ostree rebase {ref}")
+
+
+def rebase_system(ref: str) -> str:
+    """
+    Rebase system to given OSTRee ref and return its deployment ID
+    """
+    rpm_ostree_rebase(ref)
+    return get_staged_deployment_id()
 
 
 def get_current_boot_id() -> str:
@@ -120,3 +138,7 @@ def path_should_not_exist(path: str) -> None:
 def cleanup_rpm_ostree() -> None:
     """Removes any pending or rollback deployments leaving only currently booted"""
     remote_sudo("rpm-ostree cleanup --pending --rollback")
+
+
+def create_agent_config(cfg: str) -> None:
+    remote_sudo(f"echo '{cfg}' | sudo tee /var/lib/microshift-test-agent.json")
