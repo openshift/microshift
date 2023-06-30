@@ -1,8 +1,4 @@
 #!/bin/bash
-#
-# This script implements the VM configuration steps described in the "MicroShift Development Environment" document.
-# See https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md
-#
 set -eo pipefail
 
 BUILD_AND_RUN=true
@@ -62,7 +58,7 @@ OCP_PULL_SECRET=$1
 OCP_PULL_SECRET=$(realpath "${OCP_PULL_SECRET}")
 [ ! -f "${OCP_PULL_SECRET}" ] && usage "OpenShift pull secret '${OCP_PULL_SECRET}' is not a regular file"
 
-echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}" 
+echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}"
 
 # Check the subscription status and register if necessary
 if ${RHEL_SUBSCRIPTION}; then
@@ -136,6 +132,19 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-NFV
 EOF
 fi
 
+if ${RHEL_SUBSCRIPTION}; then
+    sudo dnf install -y openshift-clients
+else
+    OCC_SRC="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.14-el9-beta"
+    OCC_RPM="$(curl -s "${OCC_SRC}/" | grep -o "openshift-clients-4[^\"']*.rpm" | sort | uniq)"
+    OCC_LOC="$(mktemp /tmp/openshift-client-XXXXX.rpm)"
+    OCC_REM="${OCC_SRC}/${OCC_RPM}"
+
+    curl -s "${OCC_REM}" --output "${OCC_LOC}"
+    sudo dnf localinstall -y "${OCC_LOC}"
+    rm -f "${OCC_LOC}"
+fi
+
 if ${BUILD_AND_RUN}; then
     sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
 fi
@@ -146,34 +155,39 @@ if [ ! -e "/etc/crio/openshift-pull-secret" ]; then
     sudo chmod 600 /etc/crio/openshift-pull-secret
 fi
 
-if ${RHEL_SUBSCRIPTION}; then
-    sudo dnf install -y openshift-clients 
-else
-    OCC_REM=https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp-dev-preview/latest-4.13/openshift-client-linux.tar.gz
-    OCC_LOC=$(mktemp /tmp/openshift-client-linux-XXXXX.tar.gz)
-
-    curl -s "${OCC_REM}" --output "${OCC_LOC}"
-    sudo tar zxf "${OCC_LOC}" -C /usr/bin
-    rm -f "${OCC_LOC}"
-fi
-
 if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
     sudo dnf install -y firewalld
-    sudo systemctl enable firewalld --now 
-    sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 
-    sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1 
-    sudo firewall-cmd --permanent --zone=public --add-port=80/tcp 
-    sudo firewall-cmd --permanent --zone=public --add-port=443/tcp 
-    sudo firewall-cmd --permanent --zone=public --add-port=5353/udp 
-    sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/tcp 
-    sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/udp 
-    sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp 
-    sudo firewall-cmd --permanent --zone=public --add-service=mdns 
-    sudo firewall-cmd --reload 
+    sudo systemctl enable firewalld --now
+    sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
+    sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+    sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=5353/udp
+    sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/udp
+    sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp
+    sudo firewall-cmd --permanent --zone=public --add-service=mdns
+    sudo firewall-cmd --reload
+fi
+
+# Optionally configure crun runtime for crio, required on CentOS 9
+if ! grep -q '\[crio.runtime.runtimes.crun\]' /etc/crio/crio.conf ; then
+    cat <<EOF | sudo tee -a /etc/crio/crio.conf &>/dev/null
+
+[crio.runtime.runtimes.crun]
+runtime_path = ""
+runtime_type = "oci"
+runtime_root = "/run/crun"
+runtime_config_path = ""
+monitor_path = ""
+monitor_cgroup = "system.slice"
+monitor_exec_cgroup = ""
+privileged_without_host_devices = false
+EOF
 fi
 
 if ${BUILD_AND_RUN}; then
-    sudo systemctl enable crio 
+    sudo systemctl enable crio
     sudo systemctl start microshift
 
     echo ""
@@ -188,8 +202,7 @@ if ${BUILD_AND_RUN}; then
     echo "      sudo journalctl -u microshift-etcd.scope"
     echo ""
     echo " - Clean up MicroShift service configuration"
-    echo "      echo 1 | sudo /usr/bin/microshift-cleanup-data --all"
-
+    echo "      echo 1 | sudo microshift-cleanup-data --all"
 fi
 
 end="$(date +%s)"
