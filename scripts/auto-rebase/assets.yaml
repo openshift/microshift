@@ -34,6 +34,8 @@ assets:
       - file: service-internal.yaml
       - file: serving-certificate.yaml
         git_restore: True
+      - file: cluster-role-aggregate-route.yaml
+        ignore: "it's required for adding routes permission in admin clusterrole"
 
   - dir: components/lvms/
     src: lvms/amd64/

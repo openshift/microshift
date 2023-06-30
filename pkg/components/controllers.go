@@ -109,6 +109,7 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		}
 		clusterRole = []string{
 			"components/openshift-router/cluster-role.yaml",
+			"components/openshift-router/cluster-role-aggregate-route.yaml",
 		}
 		apps = []string{
 			"components/openshift-router/deployment.yaml",
