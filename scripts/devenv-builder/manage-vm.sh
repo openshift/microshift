@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+set -eo pipefail
+
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup_auto.md
 
