@@ -78,13 +78,13 @@ func logConfig(cfg *config.Config) {
 	}
 }
 
-func performPrerun() error {
+func performPrerun(cfg *config.Config) error {
 	dataManager, err := data.NewManager(config.BackupsDir)
 	if err != nil {
 		return err
 	}
 
-	return prerun.New(dataManager).Perform()
+	return prerun.New(dataManager, cfg).Perform()
 }
 
 func RunMicroshift(cfg *config.Config) error {
@@ -93,7 +93,7 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
 
-	if err := performPrerun(); err != nil {
+	if err := performPrerun(cfg); err != nil {
 		klog.ErrorS(err, "Pre-run procedure failed")
 		return err
 	}
