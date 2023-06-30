@@ -101,7 +101,7 @@ func getVersionOfExecutable() (versionMetadata, error) {
 }
 
 func getVersionOfData() (versionMetadata, error) {
-	exists, err := util.PathExists(versionFilePath)
+	exists, err := util.PathExistsAndIsNotEmpty(versionFilePath)
 	if err != nil {
 		return versionMetadata{}, fmt.Errorf("checking if path exists failed: %w", err)
 	}

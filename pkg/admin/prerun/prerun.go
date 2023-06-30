@@ -57,17 +57,17 @@ func (pr *PreRun) Perform() error {
 		return nil
 	}
 
-	dataExists, err := util.PathExists(config.DataDir)
+	dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
 	if err != nil {
 		return fmt.Errorf("failed to check if data directory already exists: %w", err)
 	}
 
-	versionExists, err := util.PathExists(versionFilePath)
+	versionExists, err := util.PathExistsAndIsNotEmpty(versionFilePath)
 	if err != nil {
 		return fmt.Errorf("checking if version metadata exists failed: %w", err)
 	}
 
-	healthExists, err := util.PathExists(healthFilepath)
+	healthExists, err := util.PathExistsAndIsNotEmpty(healthFilepath)
 	if err != nil {
 		return fmt.Errorf("failed to check if health file already exists: %w", err)
 	}
@@ -375,7 +375,7 @@ func getCurrentBootID() (string, error) {
 }
 
 func getHealthInfo() (*HealthInfo, error) {
-	if exists, err := util.PathExists(healthFilepath); err != nil {
+	if exists, err := util.PathExistsAndIsNotEmpty(healthFilepath); err != nil {
 		return nil, err
 	} else if !exists {
 		return nil, errHealthFileDoesNotExist
