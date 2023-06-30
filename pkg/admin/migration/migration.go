@@ -84,10 +84,10 @@ func (d *migrator) start(ctx context.Context) (*MigrationResultList, error) {
 	start := time.Now()
 	klog.Info("schema migration started")
 
-	// Currenlty we are sequentially migrating items, we will need to revisit this if performance becomes a problem
+	// Currently we are sequentially migrating items, we will need to revisit this if performance becomes a problem
 	for _, sch := range schemas {
 		// A list of objects might be very large, they will be chunked results with a continue token
-		// here we loop for as many times we have a continue token or an error occured
+		// here we loop for as many times we have a continue token or an error occurred
 		continueToken := ""
 		for {
 			objectList := &unstructured.UnstructuredList{}
