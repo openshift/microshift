@@ -36,11 +36,13 @@ func (hi *HealthInfo) IsHealthy() bool {
 
 type PreRun struct {
 	dataManager data.Manager
+	config      *config.Config
 }
 
-func New(dataManager data.Manager) *PreRun {
+func New(dataManager data.Manager, config *config.Config) *PreRun {
 	return &PreRun{
 		dataManager: dataManager,
+		config:      config,
 	}
 }
 
@@ -187,6 +189,11 @@ func (pr *PreRun) regularPrerun() error {
 
 		if migrationNeeded {
 			_ = migrationNeeded
+			stop, err := runMinimalMicroshift(pr.config)
+			if err != nil {
+				return fmt.Errorf("minimal MicroShift run failed to be ready: %w", err)
+			}
+			defer stop()
 			// TODO: data migration
 
 			if err := writeExecVersionToData(); err != nil {
@@ -210,6 +217,11 @@ func (pr *PreRun) upgradeFrom413() error {
 		return fmt.Errorf("failed to create new backup %q: %w", backupName, err)
 	}
 
+	stop, err := runMinimalMicroshift(pr.config)
+	if err != nil {
+		return fmt.Errorf("minimal MicroShift run failed to be ready: %w", err)
+	}
+	defer stop()
 	// TODO: data migration
 
 	if err := writeExecVersionToData(); err != nil {
