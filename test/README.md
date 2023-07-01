@@ -321,14 +321,14 @@ $ ./bin/scenario.sh cleanup  ./scenarios/rhel-9.2-microshift-source-standard-sui
 
 ## CI Integration Scripts
 
-### ci_phase_iso_build_pre.sh
-
-Runs on the CI cluster, in a container. Copies everything needed to
-build ISOs onto the hypervisor, then triggers `ci_phase_iso_build.sh`.
-
 ### ci_phase_iso_build.sh
 
 Runs on the hypervisor. Responsible for all of the setup to build all
 needed images. Rebuilds MicroShift RPMs from source, sets up RPM repo,
 sets up osbuild workers, builds the images, and creates the web server
 to host the images.
+
+### ci_phase_iso_boot.sh
+
+Runs on the hypervisor. Responsible for launching all of the VMs that
+are used in the test step.
