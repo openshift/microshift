@@ -240,10 +240,10 @@ install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_
 
 install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
 install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
-install -p -m755 packaging/greenboot/microshift_set_unhealthy.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_set_unhealthy.sh
+install -p -m755 packaging/greenboot/microshift_set_restore.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_set_restore.sh
 
 install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/green.d
-install -p -m755 packaging/greenboot/microshift_set_healthy.sh %{buildroot}%{_sysconfdir}/greenboot/green.d/40_microshift_set_healthy.sh
+install -p -m755 packaging/greenboot/microshift_set_backup.sh %{buildroot}%{_sysconfdir}/greenboot/green.d/40_microshift_set_backup.sh
 
 %post
 
@@ -331,8 +331,8 @@ systemctl enable --now --quiet openvswitch || true
 %files greenboot
 %{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
-%{_sysconfdir}/greenboot/red.d/40_microshift_set_unhealthy.sh
-%{_sysconfdir}/greenboot/green.d/40_microshift_set_healthy.sh
+%{_sysconfdir}/greenboot/red.d/40_microshift_set_restore.sh
+%{_sysconfdir}/greenboot/green.d/40_microshift_set_backup.sh
 %{_datadir}/microshift/functions/greenboot.sh
 
 # Use Git command to generate the log and replace the VERSION string

@@ -17,8 +17,9 @@ ${USHIFT_USER}      ${EMPTY}
 
 
 *** Test Cases ***
-Rebooting Healthy System Should Result In Data Backup
-    [Documentation]    Check if rebooting healthy system will result in backing up of MicroShift data
+MicroShift Backs Up Data On Boot
+    [Documentation]    Check if rebooting system will result in backing up
+    ...    MicroShift data when system.json has 'backup' action
 
     Wait Until Greenboot Health Check Exited
     System Should Be Healthy
@@ -30,17 +31,17 @@ Rebooting Healthy System Should Result In Data Backup
 
     Backup Should Exist    ${future_backup}
 
-Rebooting Unhealthy System Should Result In Restoring Data From A Backup
-    [Documentation]    Check if rebooting unhealthy system will result
-    ...    restoring MicroShift data from a backup
+MicroShift Restores Data On Boot
+    [Documentation]    Check if rebooting system will result in restoring
+    ...    MicroShift data when system.json has 'restore' action
 
-    Wait Until Greenboot Health Check Exited    # we don't want greenboot to overwrite health.json
+    Wait Until Greenboot Health Check Exited    # we don't want greenboot to overwrite system.json
     Remove Existing Backup For Current Deployment
 
     ${backup_name}=    Make Masquerading Backup
     Create Marker In Backup Dir    ${backup_name}
 
-    Mark System As Unhealthy    # to trigger restore after reboot
+    Write Restore Action
     Reboot MicroShift Host
     Wait For MicroShift Service
 
@@ -73,10 +74,10 @@ Make Masquerading Backup
 
     RETURN    ${backup_name}
 
-Mark System As Unhealthy
-    [Documentation]    Marks systems as unhealthy by executing microshift's red script
+Write Restore Action
+    [Documentation]    Writes a restore action to perform on next boot by running red script.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    /etc/greenboot/red.d/40_microshift_set_unhealthy.sh
+    ...    /etc/greenboot/red.d/40_microshift_set_restore.sh
     ...    sudo=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 

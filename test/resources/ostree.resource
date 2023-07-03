@@ -66,7 +66,8 @@ Rebase System And Verify
     Should Be Equal As Strings    ${ref_after_reboot}    ${ref}
 
 System Should Be Healthy
-    [Documentation]    Verifies if system is healthy by looking at health.json.
+    [Documentation]    Verifies if system is healthy by checking if
+    ...    'backup' action is persisted in system.json.
     ...    If this runs after greenboot-healthcheck finishes, it verifies
     ...    health of current boot.
 
@@ -74,8 +75,8 @@ System Should Be Healthy
     ${version}=    MicroShift Version
     IF    ${version.minor} == 13    RETURN
 
-    ${health}=    Get Persisted System Health
-    Should Be Equal As Strings    ${health}    healthy
+    ${action}=    Get Data Action
+    Should Be Equal As Strings    ${action}    backup
 
 MicroShift 413 Should Not Have Upgrade Artifacts
     [Documentation]    Verifies that host running MicroShift 4.13

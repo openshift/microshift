@@ -59,7 +59,7 @@ def remove_backups_for_deployment(deploy_id: str) -> None:
 def remove_backup_storage() -> None:
     """
     Removes entire backup storage directory (/var/lib/microshift-backups)
-    which contains backups and health data
+    which contains backups and system info
     """
     remote_sudo(f"rm -rf {BACKUP_STORAGE}")
 
@@ -74,11 +74,11 @@ def get_current_ref() -> str:
     return ref.split(":")[1]
 
 
-def get_persisted_system_health() -> str:
+def get_data_action() -> str:
     """
-    Get system health information from health.json file
+    Get action from system.json file
     """
-    return remote_sudo(f"jq -r '.health' {BACKUP_STORAGE}/health.json")
+    return remote_sudo(f"jq -r '.action' {BACKUP_STORAGE}/system.json")
 
 
 def rebase_ostree_system(ref: str) -> None:

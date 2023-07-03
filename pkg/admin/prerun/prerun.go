@@ -16,22 +16,22 @@ import (
 )
 
 var (
-	healthFilepath            = "/var/lib/microshift-backups/health.json"
-	errHealthFileDoesNotExist = errors.New("health file does not exist")
+	systemInfoFilepath        = "/var/lib/microshift-backups/system.json"
+	errSystemFileDoesNotExist = errors.New("system file does not exist")
 )
 
-type HealthInfo struct {
-	Health       string `json:"health"`
+type SystemInfo struct {
+	Action       string `json:"action"`
 	DeploymentID string `json:"deployment_id"`
 	BootID       string `json:"boot_id"`
 }
 
-func (hi *HealthInfo) BackupName() data.BackupName {
+func (hi *SystemInfo) BackupName() data.BackupName {
 	return data.BackupName(fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID))
 }
 
-func (hi *HealthInfo) IsHealthy() bool {
-	return hi.Health == "healthy"
+func (hi *SystemInfo) IsBackup() bool {
+	return hi.Action == "backup"
 }
 
 type PreRun struct {
@@ -67,27 +67,27 @@ func (pr *PreRun) Perform() error {
 		return fmt.Errorf("checking if version metadata exists failed: %w", err)
 	}
 
-	healthExists, err := util.PathExistsAndIsNotEmpty(healthFilepath)
+	systemInfoExists, err := util.PathExistsAndIsNotEmpty(systemInfoFilepath)
 	if err != nil {
-		return fmt.Errorf("failed to check if health file already exists: %w", err)
+		return fmt.Errorf("failed to check if system info file already exists: %w", err)
 	}
 
 	klog.InfoS("Existence of important paths",
 		"data-exists?", dataExists,
 		"version-exists?", versionExists,
-		"health-exists?", healthExists,
+		"system-info-exists?", systemInfoExists,
 	)
 
 	/*
-		| id  | data | version | health | comment                                                                                                     |
+		| id  | data | version | system | comment                                                                                                     |
 		| --- | ---- | ------- | ------ | ----------------------------------------------------------------------------------------------------------- |
 		| 1   | 0    | 0       | 0      | first, clean start of MicroShift                                                                            |
-		| 2   | 0    | 0       | 1      | data removed manually, but health/backups kept                                                              |
+		| 2   | 0    | 0       | 1      | data removed manually, but system info/backups kept                                                         |
 		| 3   | 0    | 1       | 0      | impossible to detect right now [0]                                                                          |
 		| 4   | 0    | 1       | 1      | impossible to detect right now [0]                                                                          |
 		| 5   | 1    | 0       | 0      | upgrade from 4.13                                                                                           |
 		| 6   | 1    | 0       | 1      | first boot failed very early, or upgrade from 4.13 failed (e.g. healthcheck didn't see service being ready) |
-		| 7   | 1    | 1       | 0      | first start, rebooted before green/red scripts managed to write health info                                 |
+		| 7   | 1    | 1       | 0      | first start, rebooted before green/red scripts managed to write system info                                 |
 		| 8   | 1    | 1       | 1      | regular                                                                                                     |
 
 		[0] it would need a comprehensive check if data exists, not just existence of /var/lib/microshift
@@ -97,43 +97,43 @@ func (pr *PreRun) Perform() error {
 		// Implies !versionExists
 
 		// 1
-		if !healthExists {
-			klog.InfoS("Neither data dir nor health file exist - assuming first start of MicroShift")
+		if !systemInfoExists {
+			klog.InfoS("Neither data dir nor system info file exist - assuming first start of MicroShift")
 			return nil
 		}
 
 		// 2
-		// TODO: Health needs to be extended into a history of boots and their health
+		// TODO: System info needs to be extended into a history of boots and their health
 		// so prerun can look into the past and decide if a backup should be restored
 		// for currently running deployment
-		return fmt.Errorf("TODO: data is missing, but health file exists")
+		return fmt.Errorf("TODO: data is missing, but system info file exists")
 	}
 
 	if !versionExists {
 		// 5
-		if !healthExists {
-			klog.InfoS("Data dir exists, but health and version files are missing: assuming upgrade from 4.13")
+		if !systemInfoExists {
+			klog.InfoS("Data dir exists, but system info and version files are missing: assuming upgrade from 4.13")
 			return pr.upgradeFrom413()
 		}
 
 		// 6
-		// TODO: Check if health data is for previous boot (according to journalctl --list-boots)
+		// TODO: Check if system info is for previous boot (according to journalctl --list-boots)
 		// This could happen if system rolled back to 4.13, backup was manually restored to attempt upgrade again,
-		// but health file not deleted leaving stale data behind.
-		return fmt.Errorf("TODO: health file exist, but version metadata does not")
+		// but system info file not deleted leaving stale data behind.
+		return fmt.Errorf("TODO: system info file exist, but version metadata does not")
 	}
 
 	// 7
-	if !healthExists {
+	if !systemInfoExists {
 		// MicroShift might end up here if first run of MicroShift gets interrupted
-		// before green/red script manages to write the health file.
+		// before green/red script manages to write the system info file.
 		// Examples include:
 		// - host reboot
 		// - if e2e test restarts MicroShift (e.g. to reload the config) or reboots the host
 		//   - due to the way microshift-etcd now runs, `restart microshift` causes a restart of both
 		//     microshift-etcd and microshift - if m-etcd restarts before microshift,
 		//     microshift will restart it self as a way to start m-etcd again
-		klog.InfoS("TODO: Version file exists, but health info is missing")
+		klog.InfoS("TODO: Version file exists, but system info is missing")
 		return nil
 	}
 
@@ -142,11 +142,11 @@ func (pr *PreRun) Perform() error {
 }
 
 // regularPrerun performs actions in prerun flow that is most expected in day to day usage
-// (i.e. data, version metadata, and health information exist)
+// (i.e. data, version metadata, and system info information exist)
 func (pr *PreRun) regularPrerun() error {
-	health, err := getHealthInfo()
+	systemInfo, err := getSystemInfo()
 	if err != nil {
-		return fmt.Errorf("failed to determine the current system health: %w", err)
+		return fmt.Errorf("failed to determine the current system info: %w", err)
 	}
 
 	currentBootID, err := getCurrentBootID()
@@ -155,17 +155,17 @@ func (pr *PreRun) regularPrerun() error {
 	}
 
 	klog.InfoS("Found boot details",
-		"health", health.Health,
-		"deploymentID", health.DeploymentID,
-		"previousBootID", health.BootID,
+		"action", systemInfo.Action,
+		"deploymentID", systemInfo.DeploymentID,
+		"previousBootID", systemInfo.BootID,
 		"currentBootID", currentBootID,
 	)
 
-	if currentBootID == health.BootID {
+	if currentBootID == systemInfo.BootID {
 		// This might happen if microshift is (re)started after greenboot finishes running.
-		// Green script will overwrite the health.json with
-		// current boot's ID, deployment ID, and health.
-		klog.InfoS("Skipping pre-run: Health file refers to the current boot ID")
+		// Green script will overwrite the system.json with
+		// current boot's ID, deployment ID, and action.
+		klog.InfoS("Skipping pre-run: System info file refers to the current boot ID")
 		return nil
 	}
 
@@ -174,9 +174,9 @@ func (pr *PreRun) regularPrerun() error {
 	// the rule.
 	//
 	//nolint:nestif
-	if health.IsHealthy() {
+	if systemInfo.IsBackup() {
 		klog.Info("Previous boot was healthy")
-		if err := pr.backup(health); err != nil {
+		if err := pr.backup(systemInfo); err != nil {
 			return fmt.Errorf("failed to backup during pre-run: %w", err)
 		}
 
@@ -231,10 +231,10 @@ func (pr *PreRun) upgradeFrom413() error {
 	return nil
 }
 
-func (pr *PreRun) backup(health *HealthInfo) error {
-	newBackupName := health.BackupName()
+func (pr *PreRun) backup(systemInfo *SystemInfo) error {
+	newBackupName := systemInfo.BackupName()
 	klog.InfoS("Preparing to backup",
-		"deploymentID", health.DeploymentID,
+		"deploymentID", systemInfo.DeploymentID,
 		"name", newBackupName,
 	)
 
@@ -243,14 +243,14 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 		return fmt.Errorf("failed to determine the existing backups: %w", err)
 	}
 
-	// get list of already existing backups for deployment ID persisted in health file
+	// get list of already existing backups for deployment ID persisted in system info file
 	// after creating backup, the list will be used to remove older backups
 	// (so only the most recent one for specific deployment is kept)
-	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, health.DeploymentID)
+	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, systemInfo.DeploymentID)
 
 	if backupAlreadyExists(backupsForDeployment, newBackupName) {
 		klog.InfoS("Skipping backup: Backup already exists",
-			"deploymentID", health.DeploymentID,
+			"deploymentID", systemInfo.DeploymentID,
 			"name", newBackupName,
 		)
 		return nil
@@ -263,7 +263,7 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 	pr.removeOldBackups(backupsForDeployment)
 
 	klog.InfoS("Finished backup",
-		"deploymentID", health.DeploymentID,
+		"deploymentID", systemInfo.DeploymentID,
 		"destination", newBackupName,
 	)
 	return nil
@@ -374,23 +374,23 @@ func getCurrentBootID() (string, error) {
 	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
 }
 
-func getHealthInfo() (*HealthInfo, error) {
-	if exists, err := util.PathExistsAndIsNotEmpty(healthFilepath); err != nil {
+func getSystemInfo() (*SystemInfo, error) {
+	if exists, err := util.PathExistsAndIsNotEmpty(systemInfoFilepath); err != nil {
 		return nil, err
 	} else if !exists {
-		return nil, errHealthFileDoesNotExist
+		return nil, errSystemFileDoesNotExist
 	}
 
-	content, err := os.ReadFile(healthFilepath)
+	content, err := os.ReadFile(systemInfoFilepath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read health data from %q: %w", healthFilepath, err)
+		return nil, fmt.Errorf("failed to read system info from %q: %w", systemInfoFilepath, err)
 	}
 
-	health := &HealthInfo{}
-	if err := json.Unmarshal(content, &health); err != nil {
-		return nil, fmt.Errorf("failed to parse health data %q: %w", strings.TrimSpace(string(content)), err)
+	systemInfo := &SystemInfo{}
+	if err := json.Unmarshal(content, &systemInfo); err != nil {
+		return nil, fmt.Errorf("failed to parse system info %q: %w", strings.TrimSpace(string(content)), err)
 	}
-	return health, nil
+	return systemInfo, nil
 }
 
 func getExistingBackupsForTheDeployment(existingBackups []data.BackupName, deployID string) []data.BackupName {
