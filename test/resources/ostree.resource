@@ -56,7 +56,7 @@ Rebase System And Verify
     ...    and checks if the host is healthy.
     [Arguments]    ${ref}
 
-    Rebase Ostree System    ${ref}
+    Rebase System    ${ref}
     Reboot MicroShift Host
 
     Wait Until Greenboot Health Check Exited
