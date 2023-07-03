@@ -36,7 +36,7 @@ Get Future Backup Name For Current Boot
 
     ${deploy_id}=    Get Booted Deployment ID
     ${boot_id}=    Get Current Boot Id
-    ${backup_name}=    Catenate    ${deploy_id}    ${boot_id}    SEPARATOR=_
+    ${backup_name}=    Catenate    SEPARATOR=_    ${deploy_id}    ${boot_id}
     RETURN    ${backup_name}
 
 Backup Should Exist
