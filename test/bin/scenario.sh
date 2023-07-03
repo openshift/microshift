@@ -15,6 +15,7 @@ PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=8m
+MAKE_VAR_FILE="${TESTDIR}/../Makefile.version.$(uname -m).var"
 
 full_vm_name() {
     local base="${1}"
@@ -218,6 +219,25 @@ remove_vm() {
     # Remove the info file so something processing the VMs does not
     # assume the file exists. This is most useful in a local setting.
     rm -rf "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
+}
+
+
+# Function to report the full current version, e.g. "4.13.5"
+current_version() {
+    # OCP_VERSION := 4.14.0-0.nightly-2023-06-30-131338
+    grep OCP_VERSION "${MAKE_VAR_FILE}" | awk '{print $3}' | cut -f1 -d-
+}
+
+# Function to report only the minor portion of the current version,
+# e.g. from "4.13.5" reports "13"
+current_minor_version() {
+    current_version | cut -f2 -d.
+}
+
+# Function to report the *previous* minor version. If the current
+# version is "4.13.5", reports "12".
+previous_minor_version() {
+    echo $(( $(current_minor_version) - 1 ))
 }
 
 # Run the tests for the current scenario
