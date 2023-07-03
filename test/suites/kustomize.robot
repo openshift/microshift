@@ -14,8 +14,8 @@ Test Tags           restart    slow
 
 *** Variables ***
 ${CONFIGMAP_NAME}       test-configmap
-${NON_DEFAULT_DIR}      /usr/lib/microshift/test-manifests
-${UNCONFIGURED_DIR}     /usr/lib/microshift/test-manifests.d/unconfigured
+${NON_DEFAULT_DIR}      /home/${USHIFT_USER}/test-manifests
+${UNCONFIGURED_DIR}     /home/${USHIFT_USER}/test-manifests.d/unconfigured
 ${YAML_PATH}            /etc/microshift/manifests.d/yaml-ext
 ${YML_PATH}             /etc/microshift/manifests.d/yml-ext
 ${NOEXT_PATH}           /etc/microshift/manifests.d/no-ext
@@ -31,18 +31,21 @@ Load From /etc/microshift/manifestsd
     [Documentation]    Subdir of /etc/microshift/manifests.d
     ConfigMap Path Should Match    ${ETC_SUBDIR_NAMESPACE}    ${ETC_SUBDIR}
 
-Load From /usr/lib/microshift/manifests
-    [Documentation]    /usr/lib/microshift/manifests
-    ConfigMap Path Should Match    ${USR_NAMESPACE}    /usr/lib/microshift/manifests
-
-Load From /usr/lib/microshift/manifestsd
-    # Keyword names cannot have '.' in them
-    [Documentation]    Subdir of /usr/lib/microshift/manifests.d
-    ConfigMap Path Should Match    ${USR_SUBDIR_NAMESPACE}    ${USR_SUBDIR}
+# The metal CI automation currently _only_ works for ostree deployments,
+# and /usr/lib is not writable there.
+#
+# Load From /usr/lib/microshift/manifests
+#    [Documentation]    /usr/lib/microshift/manifests
+#    ConfigMap Path Should Match    ${USR_NAMESPACE}    /usr/lib/microshift/manifests
+#
+# Load From /usr/lib/microshift/manifestsd
+#    # Keyword names cannot have '.' in them
+#    [Documentation]    Subdir of /usr/lib/microshift/manifests.d
+#    ConfigMap Path Should Match    ${USR_SUBDIR_NAMESPACE}    ${USR_SUBDIR}
 
 Load From Configured Dir
     [Documentation]    Non-default directory
-    ConfigMap Path Should Match    ${NON_DEFAULT_NAMESPACE}    /usr/lib/microshift/test-manifests
+    ConfigMap Path Should Match    ${NON_DEFAULT_NAMESPACE}    ${NON_DEFAULT_DIR}
 
 Do Not Load From Unconfigured Dir
     [Documentation]    Manifests from a directory not in the config should not be loaded
@@ -78,15 +81,18 @@ Setup Suite    # robocop: disable=too-long-keyword
     ${ns}=    Generate Manifests    ${ETC_SUBDIR}
     Set Suite Variable    \${ETC_SUBDIR_NAMESPACE}    ${ns}
 
-    # Used by "Load From /usr/lib/microshift/manifests"
-    ${ns}=    Generate Manifests    /usr/lib/microshift/manifests
-    Set Suite Variable    \${USR_NAMESPACE}    ${ns}
-
-    # Used by "Load From /usr/lib/microshift/manifestsd"
-    ${rand}=    Generate Random String
-    Set Suite Variable    \${USR_SUBDIR}    /usr/lib/microshift/manifests.d/${rand}
-    ${ns}=    Generate Manifests    ${USR_SUBDIR}
-    Set Suite Variable    \${USR_SUBDIR_NAMESPACE}    ${ns}
+    # The metal CI automation currently _only_ works for ostree deployments,
+    # and /usr/lib is not writable there.
+    #
+    # # Used by "Load From /usr/lib/microshift/manifests"
+    # ${ns}=    Generate Manifests    /usr/lib/microshift/manifests
+    # Set Suite Variable    \${USR_NAMESPACE}    ${ns}
+    #
+    # # Used by "Load From /usr/lib/microshift/manifestsd"
+    # ${rand}=    Generate Random String
+    # Set Suite Variable    \${USR_SUBDIR}    /usr/lib/microshift/manifests.d/${rand}
+    # ${ns}=    Generate Manifests    ${USR_SUBDIR}
+    # Set Suite Variable    \${USR_SUBDIR_NAMESPACE}    ${ns}
 
     # Used by "Load From Configured Dir"
     ${ns}=    Generate Manifests    ${NON_DEFAULT_DIR}
@@ -119,7 +125,7 @@ Setup Suite    # robocop: disable=too-long-keyword
     ...    \ \ \ \ - /usr/lib/microshift/manifests.d/*
     ...    \ \ \ \ - ${NON_DEFAULT_DIR}
     ...    \ \ \ \ # Add a directory _without_ the glob for unconfigured test
-    ...    \ \ \ \ - /usr/lib/microshift/test-manifests.d
+    ...    \ \ \ \ - /home/${USHIFT_USER}/test-manifests.d
     ${merged}=    Extend MicroShift Config    ${config_content}
     Upload MicroShift Config    ${merged}
 
@@ -130,8 +136,11 @@ Teardown Suite    # robocop: disable=too-many-calls-in-keyword
 
     Clear Manifest Directory    /etc/microshift/manifests
     Remove Manifest Directory    ${ETC_SUBDIR}
-    Clear Manifest Directory    /usr/lib/microshift/manifests
-    Remove Manifest Directory    ${USR_SUBDIR}
+    # The metal CI automation currently _only_ works for ostree deployments,
+    # and /usr/lib is not writable there.
+    #
+    # Clear Manifest Directory    /usr/lib/microshift/manifests
+    # Remove Manifest Directory    ${USR_SUBDIR}
     Remove Manifest Directory    ${NON_DEFAULT_DIR}
     Remove Manifest Directory    ${UNCONFIGURED_DIR}
     Remove Manifest Directory    ${YAML_PATH}
@@ -140,8 +149,11 @@ Teardown Suite    # robocop: disable=too-many-calls-in-keyword
 
     Run With Kubeconfig    oc delete namespace ${ETC_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${ETC_SUBDIR_NAMESPACE}    allow_fail=True
-    Run With Kubeconfig    oc delete namespace ${USR_NAMESPACE}    allow_fail=True
-    Run With Kubeconfig    oc delete namespace ${USR_SUBDIR_NAMESPACE}    allow_fail=True
+    # The metal CI automation currently _only_ works for ostree deployments,
+    # and /usr/lib is not writable there.
+    #
+    # Run With Kubeconfig    oc delete namespace ${USR_NAMESPACE}    allow_fail=True
+    # Run With Kubeconfig    oc delete namespace ${USR_SUBDIR_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${NON_DEFAULT_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${UNCONFIGURED_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${YAML_NAMESPACE}    allow_fail=True

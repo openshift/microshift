@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+set -eo pipefail
+
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup.md
 # https://github.com/openshift/microshift/blob/main/docs/devenv_setup_auto.md
 
@@ -59,7 +61,24 @@ function get_base_isofile {
 }
 
 function action_config() {
-    sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass
+    local tries=0
+    local failed=true
+    local deps="libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass"
+
+    set +e  # retry because we see errors caching different RPMs in CI
+    while [ ${tries} -lt 5 ]; do
+        # shellcheck disable=SC2086
+        if sudo dnf install -y ${deps}; then
+            failed=false
+            break
+        fi
+        ((tries+=1))
+    done
+    if ${failed}; then
+        exit 1
+    fi
+    set -e
+
     if [ "$(systemctl is-active libvirtd.socket)" != "active" ] ; then
         echo "Enabling libvirtd"
         sudo systemctl enable --now libvirtd

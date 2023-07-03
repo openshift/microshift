@@ -1,0 +1,25 @@
+name = "rhel-9.2-microshift-source"
+description = ""
+version = "0.0.1"
+modules = []
+groups = []
+distro = "rhel-92"
+
+[[packages]]
+name = "microshift"
+version = "${SOURCE_VERSION}"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "${SOURCE_VERSION}"
+
+[[packages]]
+name = "microshift-networking"
+version = "${SOURCE_VERSION}"
+
+[[packages]]
+name = "microshift-selinux"
+version = "${SOURCE_VERSION}"
+
+[customizations.services]
+enabled = ["microshift"]

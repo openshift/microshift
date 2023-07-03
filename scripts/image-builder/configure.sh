@@ -14,7 +14,7 @@ sudo firewall-cmd --add-service=cockpit --permanent
 
 # The mock utility comes from the EPEL repository
 sudo dnf install -y "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OSVERSION}.noarch.rpm"
-sudo dnf install -y mock 
+sudo dnf install -y mock caddy tomcli
 sudo usermod -a -G mock "$(whoami)"
 
 # Verify umask and home directory permissions
