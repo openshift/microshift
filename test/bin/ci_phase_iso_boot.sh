@@ -29,8 +29,23 @@ bash -x ./bin/start_webserver.sh
 
 # Build all of the needed VMs
 for scenario in scenarios/*.sh; do
-    time bash -x ./bin/scenario.sh create "${scenario}"
+    scenario_name=$(basename "${scenario}" .sh)
+    logfile="${SCENARIO_INFO_DIR}/${scenario_name}/boot.log"
+    mkdir -p "$(dirname "${logfile}")"
+    bash -x ./bin/scenario.sh create "${scenario}" >"${logfile}" 2>&1 &
 done
+
+FAIL=0
+for job in $(jobs -p) ; do
+    jobs -l
+    echo "Waiting for job: ${job}"
+    wait "${job}" || ((FAIL+=1))
+done
+
+if [ ${FAIL} -ne 0 ]; then
+    echo "Failed to boot all VMs"
+    exit 1
+fi
 
 # Set up port forwarding
 bash -x ./bin/manage_vm_connections.sh remote -a "${API_EXTERNAL_BASE_PORT}" -s "${SSH_EXTERNAL_BASE_PORT}" -l "${LB_EXTERNAL_BASE_PORT}"
