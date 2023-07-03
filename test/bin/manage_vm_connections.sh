@@ -177,6 +177,10 @@ action_cleanup() {
 }
 
 action_local() {
+    if [ ! -d "${SCENARIO_INFO_DIR}" ]; then
+        error "No scenario info directory at ${SCENARIO_INFO_DIR}, did you boot the VMs for a scenario?"
+        exit 1
+    fi
     cd "${SCENARIO_INFO_DIR}"
 
     local api_port=6443
