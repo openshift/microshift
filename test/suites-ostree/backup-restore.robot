@@ -76,7 +76,7 @@ Make Masquerading Backup
 Mark System As Unhealthy
     [Documentation]    Marks systems as unhealthy by executing microshift's red script
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    /etc/greenboot/red.d/40_microshift_set_unhealthy.sh
+    ...    FORCE=1 /etc/greenboot/red.d/40_microshift_set_unhealthy.sh
     ...    sudo=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 

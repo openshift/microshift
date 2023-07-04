@@ -15,27 +15,28 @@ Test Tags           ostree
 ${USHIFT_HOST}      ${EMPTY}
 ${USHIFT_USER}      ${EMPTY}
 
-${TARGET_REF}       ${EMPTY}
+${FAILING_REF}      ${EMPTY}
 
 
 *** Test Cases ***
-Upgrade
-    [Documentation]    Performs an upgrade to given reference
-    ...    and verifies if it was successful
+Staged Deployment Consistently Fails To Back Up The Data
+    [Documentation]    Verifies that instructions to back up the data
+    ...    ("healthy" system) is not lost if staged deployment fails
+    ...    to back up and it is performed after rolling back.
 
-    MicroShift 413 Should Not Have Upgrade Artifacts
     Wait For Healthy System
+    ${backup}=    Get Future Backup Name For Current Boot
 
-    ${future_backup}=    Get Future Backup Name For Current Boot
-    Deploy Commit Not Expecting A Rollback    ${TARGET_REF}
-    Backup Should Exist    ${future_backup}
+    TestAgent.Add Action For Next Deployment    every    prevent_backup
+    Deploy Commit Expecting A Rollback    ${FAILING_REF}
+    Backup Should Exist    ${backup}
 
 
 *** Keywords ***
 Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
-    Should Not Be Empty    ${TARGET_REF}    TARGET_REF variable is required
+    Should Not Be Empty    ${FAILING_REF}    FAILING_REF variable is required
     Login MicroShift Host
 
 Teardown
