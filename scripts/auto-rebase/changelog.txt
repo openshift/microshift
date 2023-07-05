@@ -1,2 +1,5 @@
-# ovn-kubernetes image-arm64 855f4a44967fe932f6f067cd338d74d7b8f010c0 to 3e4ab30789e2a9607630a6c3be6cf624c82adcbc
-c5e0b8e5e20399aa9c4d3ea405ec4b436a928f34 2023-06-23T21:23:23+02:00 Add default deny acl externalID to avoid duplicate acls for namespaces with long names. every namespace has 4 default deny acls: ingress/egress and deny/allow. Direction was in the ExternalIDs before, but action was a suffix in acl name, that gets truncated for long namespace names, therefore deny and allow acls for the same direction would have the same name and ExternalIDs. New ExternalID should fix this case.
+# kube-rbac-proxy image-arm64 11b1439d48a47a408ae7e2dd851989f7b7b4f595 to f1205e66bf34421046288bc74aed0d69b8434206
+e489c7afb2c9b23917ea3a52fc0db1d672d9d952 2023-04-26T15:41:17+02:00 go.mod: update golang.org/x/net to v0.7.0
+# ovn-kubernetes image-arm64 3e4ab30789e2a9607630a6c3be6cf624c82adcbc to 9f6376ea994246a3b609038f6fbfe2614032fe3b
+e0d5a1855dfaee14b99b4460f6dbda269e6d2f93 2023-06-15T11:04:17-05:00 Nuke old .rhel9 Dockerfiles
+710a8b52757138bd8a102c2d78ddd374ec88e1dc 2023-05-17T16:47:47+00:00 ovnkube-master pod failed to reconnect to ovn db due to ssl expire
