@@ -37,6 +37,9 @@ var (
 		"crd/0000_03_security-openshift_01_scc.crd.yaml",
 		"crd/route.crd.yaml",
 		"components/lvms/topolvm.io_logicalvolumes.yaml",
+		"components/csi-snapshot-controller/volumesnapshotclasses.yaml",
+		"components/csi-snapshot-controller/volumesnapshotcontents.yaml",
+		"components/csi-snapshot-controller/volumesnapshots.yaml",
 	}
 	// for apis that belong to a group served by openshift-apiserver but are themselves served
 	// as a CR, the crd registration controller will not automatically create local apiservices

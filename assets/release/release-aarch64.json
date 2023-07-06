@@ -15,6 +15,9 @@
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:a4319ff7c736ca9fe20500dc3e5862d6bb446f2428ea2eadfb5f042195f4f860",
     "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:9df24be671271f5ea9414bfd08e58bc2fa3dc4bc68075002f3db0fd020b58be0",
     "topolvm_csi_resizer": "registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:9d486daffd348664c00d8b80bd0da973b902f3650acdef37e1b813278ed6c107",
-    "topolvm_csi_provisioner": "registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:199eac2ba4c8390daa511b040315e415cfbcfa80aa7af978a33624445b96c17c"
+    "topolvm_csi_provisioner": "registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:199eac2ba4c8390daa511b040315e415cfbcfa80aa7af978a33624445b96c17c",
+    "csi-external-snapshotter": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3b9cfda15c30c5a9928a21ef934671cc39b69fb336220a631cc2bf9e2e8d3147",
+    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7b530d386a3facbbe0f659d899250969397ff2061f0ec8f4b0ae1925ad499a2a",
+    "csi-snapshot-validation-webhook": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f907482fcd91f8870f96076198c9a5050dc5bee11bcdd33834cbf217fbb98418"
   }
 }

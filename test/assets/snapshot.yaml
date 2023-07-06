@@ -1,0 +1,8 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: my-snap
+spec:
+  volumeSnapshotClassName: topolvm-snapclass
+  source:
+    persistentVolumeClaimName: test-claim-thin

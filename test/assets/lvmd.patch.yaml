@@ -1,0 +1,9 @@
+device-classes:
+- name: thin
+  volume-group: rhel
+  spare-gb: 0
+  default: false
+  type: thin
+  thin-pool:
+    name: thin
+    overprovision-ratio: 10.0

@@ -1,0 +1,73 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: csi-snapshot-controller
+  namespace: kube-system
+spec:
+  serviceName: "csi-snapshot-controller"
+  # Replicas for HyperShift. On standalone OCP it will be adjusted according to nr. of master nodes.
+  # TODO: adjust according to HostedControlPlane.Spec.AvailabilityPolicy.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: csi-snapshot-controller
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: csi-snapshot-controller
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccount: csi-snapshot-controller
+      containers:
+        - name: snapshot-controller
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 65534
+          image: '{{ .ReleaseImage.csi_snapshot_controller }}'
+          args:
+            - --v=2
+            - --leader-election=false
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              # TODO: measure on a real cluster
+              cpu: 10m
+              memory: 50Mi
+              # volumeMount with guest Kubeconfig will be added by the operator
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: csi-snapshot-controller
+                topologyKey: kubernetes.io/hostname
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 120
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 120
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: "NoSchedule"
+      # volume with guest Kubeconfig will be added by the operator

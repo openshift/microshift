@@ -102,6 +102,19 @@ spec:
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
+      - name: csi-snapshotter
+        image: '{{ .ReleaseImage.csi_external_snapshotter }}'
+        args:
+        - "--v=5"
+        - "--csi-address=$(ADDRESS)"
+        - "--leader-election=false"
+        env:
+        - name: ADDRESS
+          value: /csi/csi-topolvm.sock
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: socket-dir
+          mountPath: /csi
       initContainers:
       - command:
         - /usr/bin/bash

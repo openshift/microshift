@@ -1,0 +1,11 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-claim-thin
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: topolvm-provisioner-thin
+  resources:
+    requests:
+      storage: 1Gi

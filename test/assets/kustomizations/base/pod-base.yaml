@@ -1,0 +1,25 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: base
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: test-container
+    image: nginxinc/nginx-unprivileged:latest
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    command:
+    - sh
+    - -c
+    - sleep 1d
+    volumeMounts:
+    - mountPath: /vol
+      name: test-vol
+  volumes: []

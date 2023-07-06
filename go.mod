@@ -109,7 +109,7 @@ require (
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/cadvisor v0.47.1 // indirect
 	github.com/google/cel-go v0.12.6 // indirect
-	github.com/google/gnostic v0.5.7-v3refs // indirect
+	github.com/google/gnostic v0.6.9 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -210,7 +210,7 @@ require (
 	k8s.io/cri-api v0.0.0 // indirect
 	k8s.io/csi-translation-lib v0.0.0 // indirect
 	k8s.io/dynamic-resource-allocation v0.0.0 // indirect
-	k8s.io/gengo v0.0.0-20220902162205-c0856e24416d // indirect
+	k8s.io/gengo v0.0.0-20220913193501-391367153a38 // indirect
 	k8s.io/kms v0.27.1 // indirect
 	k8s.io/kube-controller-manager v0.0.0 // indirect
 	k8s.io/kube-scheduler v0.0.0 // indirect

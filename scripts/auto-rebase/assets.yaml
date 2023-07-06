@@ -79,6 +79,8 @@ assets:
         ignore: "provided by MicroShift"
       - file: topolvm_default-storage-class.yaml
         ignore: "provided by MicroShift"
+      - file: topolvm_default-volumeclass.yaml
+        ignore: "provided by microshift"
 
   - dir: components/ovn/
     ignore: "it's not covered by rebase script yet"
@@ -122,6 +124,25 @@ assets:
       - file: sa.yaml
       - file: signing-cabundle.yaml
       - file: signing-secret.yaml
+
+  - dir: components/csi-snapshot-controller/
+    no_clean: True
+    src: cluster-csi-snapshot-controller-operator/assets
+    files:
+    - file: csi_controller_deployment.yaml
+    - file: serviceaccount.yaml
+    - file: webhook_config.yaml
+    - file: webhook_deployment.yaml
+    - file: webhook_service.yaml
+    - file: volumesnapshotclasses.yaml
+    - file: volumesnapshotcontents.yaml
+    - file: volumesnapshots.yaml
+    - file: 05_operand_rbac.yaml
+      src: ../manifests/
+    - file: clusterrole.yaml
+      ignore: "extracted automatically from 05_operand_rbac.yaml"
+    - file: clusterrolebinding.yaml
+      ignore: "extracted automatically from 05_operand_rbac.yaml"
 
   - dir: controllers/cluster-policy-controller/
     src: cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/
