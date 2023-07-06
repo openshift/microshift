@@ -1,12 +1,12 @@
 package migration
 
 import (
+	"encoding/json"
 	"fmt"
-	"strings"
+	"os"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	apitypes "k8s.io/apimachinery/pkg/types"
 )
 
 type MigratonStatus string
@@ -14,14 +14,15 @@ type MigratonStatus string
 const (
 	MigrationSuccess MigratonStatus = "success"
 	MigrationFailure MigratonStatus = "failure"
+	MigrationRunning MigratonStatus = "running"
 )
 
 // Container for individual migration attempts
 type MigrationResult struct {
-	Error           error                       `json:"error,omitempty"`
-	ResourceVersion schema.GroupVersionResource `json:"resourceVersion"`
-	Timestamp       time.Time                   `json:"timestamp"`
-	NamespacedName  apitypes.NamespacedName     `json:"namespacedName,omitempty"`
+	Error     error `json:"Error,omitempty"`
+	Timestamp time.Time
+	Status    MigratonStatus
+	schema.GroupVersionResource
 }
 
 type MigrationResultList struct {
@@ -29,23 +30,17 @@ type MigrationResultList struct {
 	Items  []MigrationResult
 }
 
-func (m MigrationResultList) String() string {
-	buffer := strings.Builder{}
-	for _, result := range m.Items {
-		objectInfo := result.ResourceVersion.String()
-		objectInfo = fmt.Sprintf("%s Namespace=%s Name=%s", objectInfo, result.NamespacedName.Namespace, result.NamespacedName.Name)
-
-		info := fmt.Sprintf("%s MigrationStatus=%s %s\n", result.Timestamp.String(), MigrationSuccess, objectInfo)
-		if result.Error != nil {
-			info = fmt.Sprintf("%s MigrationStatus=%s %s : %v\n", result.Timestamp.String(), MigrationFailure, objectInfo, result.Error)
-		}
-		buffer.WriteString(info)
-	}
-	return buffer.String()
+func (m *MigrationResultList) WriteStatusFile(filePath string) error {
+	data := fmt.Sprintf(`{"Status": "%s"}`, m.Status)
+	return os.WriteFile(filePath, []byte(data), 0644)
 }
 
-func (m MigrationResultList) Bytes() []byte {
-	return []byte(m.String())
+func (m *MigrationResultList) WriteDataFile(filePath string) error {
+	fileData, err := json.Marshal(m.Items)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filePath, fileData, 0644)
 }
 
 type ErrRetriable struct {

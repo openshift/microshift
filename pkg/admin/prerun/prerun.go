@@ -2,14 +2,17 @@ package prerun
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
+	"github.com/openshift/microshift/pkg/admin/migration"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
@@ -17,6 +20,8 @@ import (
 
 var (
 	healthFilepath            = "/var/lib/microshift-backups/health.json"
+	migrationStatusFilepath   = "/var/lib/microshift-backups/migration-status.json"
+	migrationLogFilepath      = "/var/lib/microshift-backups/migration-log.json"
 	errHealthFileDoesNotExist = errors.New("health file does not exist")
 )
 
@@ -189,12 +194,10 @@ func (pr *PreRun) regularPrerun() error {
 
 		if migrationNeeded {
 			_ = migrationNeeded
-			stop, err := runMinimalMicroshift(pr.config)
-			if err != nil {
-				return fmt.Errorf("minimal MicroShift run failed to be ready: %w", err)
+
+			if err := pr.migrate(); err != nil {
+				return fmt.Errorf("failed to migrate resources: %w", err)
 			}
-			defer stop()
-			// TODO: data migration
 
 			if err := writeExecVersionToData(); err != nil {
 				return fmt.Errorf("failed to write MicroShift version to data directory: %w", err)
@@ -210,6 +213,61 @@ func (pr *PreRun) regularPrerun() error {
 	return nil
 }
 
+func (pr *PreRun) migrate() error {
+
+	// Run microshift in minimal mode
+	stop, err := runMinimalMicroshift(pr.config)
+	if err != nil {
+		return fmt.Errorf("minimal MicroShift run failed to be ready: %w", err)
+	}
+	defer stop()
+
+	// Use kubeconfig credentials for updating all resources
+	adminKubeConifg := filepath.Join(pr.config.KubeConfigRootAdminPath(), "kubeconfig")
+	m, err := migration.NewMigrator(adminKubeConifg)
+	if err != nil {
+		return fmt.Errorf("minimal MicroShift run failed to be ready: %w", err)
+	}
+
+	// Begin migration
+
+	// Create status container for results
+	results := &migration.MigrationResultList{
+		Status: migration.MigrationRunning,
+	}
+
+	// Open status file for migration process
+	err = results.WriteStatusFile(migrationStatusFilepath)
+	if err != nil {
+		return fmt.Errorf("failed to write migration status file: %w", err)
+	}
+
+	// Start updating resources
+	results, err = m.Start(context.Background())
+	if err != nil {
+		return fmt.Errorf("migration failed: %w", err)
+	}
+
+	// Write status of over all result
+	err = results.WriteStatusFile(migrationStatusFilepath)
+	if err != nil {
+		return fmt.Errorf("failed to write migration status file: %w", err)
+	}
+
+	// Fail fast if migration failed
+	if results.Status != migration.MigrationSuccess {
+		return fmt.Errorf("migration failed")
+	}
+
+	// Write all migration events as json
+	err = results.WriteDataFile(migrationLogFilepath)
+	if err != nil {
+		return fmt.Errorf("failed to write migration log to file: %w", err)
+	}
+
+	return nil
+}
+
 func (pr *PreRun) upgradeFrom413() error {
 	backupName := data.BackupName("4.13")
 
@@ -217,12 +275,9 @@ func (pr *PreRun) upgradeFrom413() error {
 		return fmt.Errorf("failed to create new backup %q: %w", backupName, err)
 	}
 
-	stop, err := runMinimalMicroshift(pr.config)
-	if err != nil {
-		return fmt.Errorf("minimal MicroShift run failed to be ready: %w", err)
+	if err := pr.migrate(); err != nil {
+		return fmt.Errorf("failed to migrate resources: %w", err)
 	}
-	defer stop()
-	// TODO: data migration
 
 	if err := writeExecVersionToData(); err != nil {
 		return fmt.Errorf("failed to write MicroShift version to data directory: %w", err)
