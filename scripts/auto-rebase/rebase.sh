@@ -23,8 +23,6 @@ set -o pipefail
 shopt -s expand_aliases
 shopt -s extglob
 
-trap 'echo "Script exited with error."' ERR
-
 #debugging options
 #trap 'echo "#L$LINENO: $BASH_COMMAND" >&2' DEBUG
 #set -xo functrace
