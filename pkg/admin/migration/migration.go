@@ -233,7 +233,7 @@ func (m *migrator) migrateOneItem(ctx context.Context, resource schema.GroupVers
 	}
 
 	for {
-		err = m.try(ctx, resource, namespace, name, item)
+		err = m.try(ctx, resource, namespace, item)
 		if err == nil || errors.IsNotFound(err) {
 			klog.InfoS("successfully migrated object", "name", name, "namespace", namespace, "resource", resource.String())
 			return nil
@@ -251,7 +251,7 @@ func (m *migrator) migrateOneItem(ctx context.Context, resource schema.GroupVers
 	}
 }
 
-func (m *migrator) try(ctx context.Context, resource schema.GroupVersionResource, namespace, name string, item *unstructured.Unstructured) error {
+func (m *migrator) try(ctx context.Context, resource schema.GroupVersionResource, namespace string, item *unstructured.Unstructured) error {
 	_, err := m.client.
 		Resource(resource).
 		Namespace(namespace).

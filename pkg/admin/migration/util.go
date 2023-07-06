@@ -6,17 +6,8 @@ import (
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	apitypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/net"
 )
-
-func getNamespacedName(item *unstructured.Unstructured) apitypes.NamespacedName {
-	return apitypes.NamespacedName{
-		Name:      item.GetName(),
-		Namespace: item.GetNamespace(),
-	}
-}
 
 func canRetry(err error) bool {
 	err = interpret(err)

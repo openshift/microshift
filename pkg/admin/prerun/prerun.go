@@ -214,7 +214,6 @@ func (pr *PreRun) regularPrerun() error {
 }
 
 func (pr *PreRun) migrate() error {
-
 	// Run microshift in minimal mode
 	stop, err := runMinimalMicroshift(pr.config)
 	if err != nil {

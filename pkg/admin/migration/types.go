@@ -32,7 +32,7 @@ type MigrationResultList struct {
 
 func (m *MigrationResultList) WriteStatusFile(filePath string) error {
 	data := fmt.Sprintf(`{"Status": "%s"}`, m.Status)
-	return os.WriteFile(filePath, []byte(data), 0644)
+	return os.WriteFile(filePath, []byte(data), 0600)
 }
 
 func (m *MigrationResultList) WriteDataFile(filePath string) error {
@@ -40,7 +40,7 @@ func (m *MigrationResultList) WriteDataFile(filePath string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filePath, fileData, 0644)
+	return os.WriteFile(filePath, fileData, 0600)
 }
 
 type ErrRetriable struct {
