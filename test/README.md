@@ -307,6 +307,11 @@ the primary host to use for connecting and any arguments to be given
 to `robot`, including the test suites and any unique variables that
 are not saved to the default variables file by the framework.
 
+## Troubleshooting
+
+Use `./bin/scenario.sh login` to login to a VM for a scenario as the
+`redhat` user.
+
 ## Cleaning up
 
 Use `./bin/composer_cleanup.sh` to stop any running jobs, remove
