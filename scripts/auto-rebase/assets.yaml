@@ -47,6 +47,8 @@ assets:
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml
       - file: topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: topolvm-csi-snapshotter_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-csi-snapshotter_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-controller_v1_serviceaccount.yaml
       - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
       - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
