@@ -25,6 +25,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// Skipping resources which might cycle quickly or cause a lot of overhead to migrate
 var excludeResources = sets.NewString(
 	"events",
 )
@@ -107,7 +108,10 @@ func (d *migrator) start(ctx context.Context) (*MigrationResultList, error) {
 				token, err := inconsistentContinueToken(migrationErr)
 				if err != nil {
 					err = fmt.Errorf("failed to get continue token: %w", err)
-					results.Items = append(results.Items, MigrationResult{Error: err, ResourceVersion: sch, Timestamp: time.Now()})
+					results.Items = append(results.Items, MigrationResult{
+						Error:                err,
+						GroupVersionResource: sch,
+						Timestamp:            time.Now()})
 					break
 				}
 				continueToken = token
@@ -117,28 +121,37 @@ func (d *migrator) start(ctx context.Context) (*MigrationResultList, error) {
 			if migrationErr != nil {
 				errorOccured = true
 				migrationErr = fmt.Errorf("could not list resources: %w", migrationErr)
-				results.Items = append(results.Items, MigrationResult{Error: migrationErr, ResourceVersion: sch, Timestamp: time.Now()})
+				results.Items = append(results.Items, MigrationResult{
+					Error:                migrationErr,
+					GroupVersionResource: sch,
+					Timestamp:            time.Now()})
 				break
 			}
 
+			status := MigrationSuccess
 			for _, object := range objectList.Items {
 				ref := object
 				migrationErr := d.migrateOneItem(ctx, sch, &ref)
 				if migrationErr != nil {
 					errorOccured = true
+					status = MigrationFailure
 				}
-				results.Items = append(results.Items, MigrationResult{
-					Error:           migrationErr,
-					ResourceVersion: sch,
-					NamespacedName:  getNamespacedName(&ref),
-					Timestamp:       time.Now()})
 			}
+
+			results.Items = append(results.Items, MigrationResult{
+				Error:                migrationErr,
+				Status:               status,
+				GroupVersionResource: sch,
+				Timestamp:            time.Now()})
 
 			// Check if the list contains a continue token
 			token, err := metadataAccessor.Continue(objectList)
 			if err != nil {
 				err = fmt.Errorf("failed to get continue token: %w", err)
-				results.Items = append(results.Items, MigrationResult{Error: err, ResourceVersion: sch, Timestamp: time.Now()})
+				results.Items = append(results.Items, MigrationResult{
+					Error:                err,
+					GroupVersionResource: sch,
+					Timestamp:            time.Now()})
 				break
 			}
 			if len(token) == 0 {
@@ -166,29 +179,22 @@ func (d *migrator) start(ctx context.Context) (*MigrationResultList, error) {
 // More information can be found here:
 // https://github.com/kubernetes-sigs/kube-storage-version-migrator/blob/acdee30ced218b79e39c6a701985e8cd8bd33824/pkg/initializer/discover.go#L55-L125
 func (d *migrator) findMigratableResources(ctx context.Context) ([]schema.GroupVersionResource, error) {
-	customGroups, err := d.findCustomGroups(ctx)
-	if err != nil {
-		return nil, err
-	}
 	aggregatedGroups, err := d.findAggregatedGroups(ctx)
 	if err != nil {
 		return nil, err
 	}
-	resourceToGroupVersions := make(map[string][]schema.GroupVersion)
-	_, resourceLists, err := d.discoveryClient.ServerGroupsAndResources()
+	ret := []schema.GroupVersionResource{}
+	resourceLists, err := d.discoveryClient.ServerPreferredResources()
 	if err != nil {
 		return nil, err
 	}
 	for _, resourceList := range resourceLists {
 		gv, err := schema.ParseGroupVersion(resourceList.GroupVersion)
 		if err != nil {
-			klog.ErrorS(err, "cannot parse group version, ignored", "groupVersion", resourceList.GroupVersion)
+			klog.ErrorS(err, "cannot parse group version, ignored", "version", resourceList.GroupVersion)
 			continue
 		}
-		if customGroups.Has(gv.Group) {
-			klog.InfoS("ignored because it's a custom group", "group", gv.Group)
-			continue
-		}
+
 		if aggregatedGroups.Has(gv.Group) {
 			klog.InfoS("ignored because it's an aggregated group", "group", gv.Group)
 			continue
@@ -196,31 +202,23 @@ func (d *migrator) findMigratableResources(ctx context.Context) ([]schema.GroupV
 		for _, r := range resourceList.APIResources {
 			// ignore subresources
 			if strings.Contains(r.Name, "/") {
+				klog.InfoS("ignored subresource", "group", gv.Group, "name", r.Name, "version", gv.Version)
 				continue
 			}
 			// ignore excluded resources
 			if excludeResources.Has(r.Name) {
+				klog.InfoS("ignored excluded resource", "group", gv.Group, "name", r.Name, "version", gv.Version)
 				continue
 			}
 			// ignore resources that cannot be listed and updated
 			if !sets.NewString(r.Verbs...).HasAll("list", "update") {
+				klog.InfoS("ignored because verb does not contain list or update", "group", gv.Group, "name", r.Name, "version", gv.Version)
 				continue
 			}
-			gvs := resourceToGroupVersions[r.Name]
-			gvs = append(gvs, gv)
-			resourceToGroupVersions[r.Name] = gvs
+			ret = append(ret, gv.WithResource(r.Name))
 		}
 	}
 
-	ret := []schema.GroupVersionResource{}
-	for resource, groupVersions := range resourceToGroupVersions {
-		// if a resource only has one version, no migration is required
-		// resources that have more than one version are eligible for migration.
-		if len(groupVersions) == 1 {
-			continue
-		}
-		ret = append(ret, groupVersions[0].WithResource(resource))
-	}
 	return ret, nil
 }
 
@@ -233,9 +231,9 @@ func (m *migrator) migrateOneItem(ctx context.Context, resource schema.GroupVers
 	if err != nil {
 		return err
 	}
-	getBeforePut := false
+
 	for {
-		getBeforePut, err = m.try(ctx, resource, namespace, name, item, getBeforePut)
+		err = m.try(ctx, resource, namespace, name, item)
 		if err == nil || errors.IsNotFound(err) {
 			klog.InfoS("successfully migrated object", "name", name, "namespace", namespace, "resource", resource.String())
 			return nil
@@ -253,37 +251,12 @@ func (m *migrator) migrateOneItem(ctx context.Context, resource schema.GroupVers
 	}
 }
 
-func (m *migrator) try(ctx context.Context, resource schema.GroupVersionResource, namespace, name string, item *unstructured.Unstructured, get bool) (bool, error) {
-	var err error
-	if get {
-		item, err = m.client.
-			Resource(resource).
-			Namespace(namespace).
-			Get(ctx, name, metav1.GetOptions{})
-		if err != nil {
-			return true, err
-		}
-	}
-	_, err = m.client.
+func (m *migrator) try(ctx context.Context, resource schema.GroupVersionResource, namespace, name string, item *unstructured.Unstructured) error {
+	_, err := m.client.
 		Resource(resource).
 		Namespace(namespace).
 		Update(ctx, item, metav1.UpdateOptions{})
-	if err == nil {
-		return false, nil
-	}
-	return errors.IsConflict(err), err
-}
-
-func (d *migrator) findCustomGroups(ctx context.Context) (sets.Set[string], error) {
-	ret := sets.New[string]()
-	l, err := d.crdClient.List(ctx, metav1.ListOptions{})
-	if err != nil {
-		return ret, err
-	}
-	for _, crd := range l.Items {
-		ret.Insert(crd.Spec.Group)
-	}
-	return ret, nil
+	return err
 }
 
 func (d *migrator) findAggregatedGroups(ctx context.Context) (sets.Set[string], error) {
