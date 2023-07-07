@@ -1,95 +1,70 @@
-- cluster-ingress-operator embedded-component d0be04b7aff1bf56d36b9753019e3000cab1c179 to 4c92a6d1ee80b6b120dd750855a40145a530153c
-  - 8ad42fa 2023-06-28T23:12:25-04:00 OCPBUGS-15100 Add the trailing dot to the hostname if missing, early enough so that all references use the trailing dot. Update hashed DNS record names in unit tests.
+- cluster-csi-snapshot-controller-operator is a new embedded-component dependency
 
-- ovn-kubernetes image-amd64 fb1c5655ec121f3f08eb0f2013e0d4252f8d982b to 083b00f6bef560b5c8deddcf5485894b46dfcb77
-  - 1c8cd59 2023-06-28T16:59:22-04:00 Fixes ovnkube-controller not waiting for zone
-  - 5461292 2023-06-28T16:09:21-04:00 ovspinning: use klog.Infof() instead of klog.Info()
-  - 404ed91 2023-06-28T16:32:01+00:00 Fix bad error logs in egressip e2e tests
-  - c089c2e 2023-06-28T14:35:32+02:00 Fix bad expected NAT on egressip unit test flake
-  - 462815d 2023-06-28T13:36:58+02:00 APB: Use label selector to match against namespace labels
-  - b7ac83a 2023-06-28T13:36:58+02:00 Add static hops when a new pod is added to a target namespace
-  - 9ebefc4 2023-06-28T13:36:58+02:00 Add check to validate if an event to a namespace impacts a namespace selector in a dynamic hop and queue the impacted policy
-  - 127c20c 2023-06-28T13:36:58+02:00 APB node controller: Store policy as key in the queue
-  - 70161d4 2023-06-28T13:36:58+02:00 Consolidate gateway IPs from static and dynamic hops before deleting them and update log levels.
-  - fc5d3df 2023-06-28T13:36:58+02:00 APB Controllers: use single loop level driven model
-  - f21d8ee 2023-06-28T11:11:31+00:00 Don't run commands workflow if not a command
-  - 01a2c4d 2023-06-28T10:49:17+02:00 Skip adding service flows to gateway bridge when no uplink in the bridge
-  - 1541b58 2023-06-28T00:37:36-04:00 Fixes panic with delete NAT operations
-  - 812f44e 2023-06-28T00:25:48+02:00 Don't enable multicast querier on transit switches.
-  - 4622d61 2023-06-27T17:42:45-04:00 Do not restart ovn-controller if encap IP doesn't change
-  - 64758a4 2023-06-27T17:34:22+00:00 Delete cleanup action
-  - a53550f 2023-06-27T17:34:05+00:00 Limit per-PR concurrency for the ovn-ci workflow
-  - 046e0e9 2023-06-27T16:10:24+02:00 EgressService: Do not try to remove the chain creation rule on startup
-  - 3c6a56c 2023-06-27T09:28:01-04:00 delete dead code from util/ovs, init() had impact on performance without being used by anyone
-  - ad7df09 2023-06-27T09:28:01-04:00 syncNodesPeriodic: get nodes from cache. Use nodeName lists for syncChassis to make sure cache objects are not modified.
-  - a5e770e 2023-06-26T22:06:24-04:00 Remove duplicate e2e control-plane job
-  - 9b50dd7 2023-06-26T22:04:15-04:00 test_syncNodes: Fix sync nodes to not remove transit switch
-  - 01ea116 2023-06-26T22:04:06-04:00 egressip_test: fix expected db after pod deletion flake
-  - e832ede 2023-06-26T17:03:33-04:00 Fix sync nodes to not remove transit switch
-  - 2dcddda 2023-06-26T11:31:03-04:00 Fixes dualstack check in e2e tests
-  - 253da92 2023-06-26T11:31:03-04:00 Clean up egress IP e2e tests
-  - 30f0661 2023-06-26T11:31:03-04:00 Fix e2e control plane tests to use wrapped framework
-  - d7b28e0 2023-06-24T00:48:37-04:00 Fixup for IC related changes
-  - cf116ea 2023-06-24T00:48:37-04:00 Split external gateway tests to their own CI lanes
-  - ee5ee70 2023-06-24T00:48:37-04:00 Add check to ensure the pod's node is in the same local zone when deleting the pod SNAT
-  - 5490d97 2023-06-24T00:48:37-04:00 Add Interconnect support in APB External Routecontroller and legacy Egress GW
-  - 7a43438 2023-06-24T00:48:37-04:00 Revert "Skip APB External Route tests in e2e when IC is enabled"
-  - 6e1a04d 2023-06-23T19:28:38+02:00 Delete POD IPs from the global EgressService address set
-  - 4dedbd9 2023-06-22T21:09:56-04:00 APB: remove init policy cache in repair.go
-  - 95397a2 2023-06-22T20:46:36+00:00 Trivial: add debug log when ensuring the pod zone
-  - b0c47f6 2023-06-22T20:26:27+00:00 Fix IC local -> remote
-  - 487bba3 2023-06-22T20:26:27+00:00 Improve syncNodes to remove stale data
-  - ee6a035 2023-06-22T12:53:07-04:00 Moved controllerName as parameter to northBound client
-  - ad985d2 2023-06-22T12:31:06-04:00 Fix libovsdbops panic when testing apb external controller due to empty controllerName value
-  - 074ff6e 2023-06-21T22:07:30-04:00 Fixes control plane shared gateway jobs
-  - 198c316 2023-06-21T17:48:33-04:00 Fix egressFirewall cleanup on failed Add. Return nil instead of error when egressFirewall is not found on delete.
-  - b5df6f4 2023-06-16T14:44:18+00:00 Don't run command jobs concurrently for a PR
-  - e4d4014 2023-06-12T15:28:05-05:00 pods: ensure Cluster and Service CIDR traffic always go to OVN interface
-  - 4763c62 2023-06-12T15:27:09-05:00 pods: always add join subnet route to pod network namespace
+- csi-external-snapshotter is a new embedded-component dependency
 
-- ovn-kubernetes image-arm64 fb1c5655ec121f3f08eb0f2013e0d4252f8d982b to 083b00f6bef560b5c8deddcf5485894b46dfcb77
-  - 1c8cd59 2023-06-28T16:59:22-04:00 Fixes ovnkube-controller not waiting for zone
-  - 5461292 2023-06-28T16:09:21-04:00 ovspinning: use klog.Infof() instead of klog.Info()
-  - 404ed91 2023-06-28T16:32:01+00:00 Fix bad error logs in egressip e2e tests
-  - c089c2e 2023-06-28T14:35:32+02:00 Fix bad expected NAT on egressip unit test flake
-  - 462815d 2023-06-28T13:36:58+02:00 APB: Use label selector to match against namespace labels
-  - b7ac83a 2023-06-28T13:36:58+02:00 Add static hops when a new pod is added to a target namespace
-  - 9ebefc4 2023-06-28T13:36:58+02:00 Add check to validate if an event to a namespace impacts a namespace selector in a dynamic hop and queue the impacted policy
-  - 127c20c 2023-06-28T13:36:58+02:00 APB node controller: Store policy as key in the queue
-  - 70161d4 2023-06-28T13:36:58+02:00 Consolidate gateway IPs from static and dynamic hops before deleting them and update log levels.
-  - fc5d3df 2023-06-28T13:36:58+02:00 APB Controllers: use single loop level driven model
-  - f21d8ee 2023-06-28T11:11:31+00:00 Don't run commands workflow if not a command
-  - 01a2c4d 2023-06-28T10:49:17+02:00 Skip adding service flows to gateway bridge when no uplink in the bridge
-  - 1541b58 2023-06-28T00:37:36-04:00 Fixes panic with delete NAT operations
-  - 812f44e 2023-06-28T00:25:48+02:00 Don't enable multicast querier on transit switches.
-  - 4622d61 2023-06-27T17:42:45-04:00 Do not restart ovn-controller if encap IP doesn't change
-  - 64758a4 2023-06-27T17:34:22+00:00 Delete cleanup action
-  - a53550f 2023-06-27T17:34:05+00:00 Limit per-PR concurrency for the ovn-ci workflow
-  - 046e0e9 2023-06-27T16:10:24+02:00 EgressService: Do not try to remove the chain creation rule on startup
-  - 3c6a56c 2023-06-27T09:28:01-04:00 delete dead code from util/ovs, init() had impact on performance without being used by anyone
-  - ad7df09 2023-06-27T09:28:01-04:00 syncNodesPeriodic: get nodes from cache. Use nodeName lists for syncChassis to make sure cache objects are not modified.
-  - a5e770e 2023-06-26T22:06:24-04:00 Remove duplicate e2e control-plane job
-  - 9b50dd7 2023-06-26T22:04:15-04:00 test_syncNodes: Fix sync nodes to not remove transit switch
-  - 01ea116 2023-06-26T22:04:06-04:00 egressip_test: fix expected db after pod deletion flake
-  - e832ede 2023-06-26T17:03:33-04:00 Fix sync nodes to not remove transit switch
-  - 2dcddda 2023-06-26T11:31:03-04:00 Fixes dualstack check in e2e tests
-  - 253da92 2023-06-26T11:31:03-04:00 Clean up egress IP e2e tests
-  - 30f0661 2023-06-26T11:31:03-04:00 Fix e2e control plane tests to use wrapped framework
-  - d7b28e0 2023-06-24T00:48:37-04:00 Fixup for IC related changes
-  - cf116ea 2023-06-24T00:48:37-04:00 Split external gateway tests to their own CI lanes
-  - ee5ee70 2023-06-24T00:48:37-04:00 Add check to ensure the pod's node is in the same local zone when deleting the pod SNAT
-  - 5490d97 2023-06-24T00:48:37-04:00 Add Interconnect support in APB External Routecontroller and legacy Egress GW
-  - 7a43438 2023-06-24T00:48:37-04:00 Revert "Skip APB External Route tests in e2e when IC is enabled"
-  - 6e1a04d 2023-06-23T19:28:38+02:00 Delete POD IPs from the global EgressService address set
-  - 4dedbd9 2023-06-22T21:09:56-04:00 APB: remove init policy cache in repair.go
-  - 95397a2 2023-06-22T20:46:36+00:00 Trivial: add debug log when ensuring the pod zone
-  - b0c47f6 2023-06-22T20:26:27+00:00 Fix IC local -> remote
-  - 487bba3 2023-06-22T20:26:27+00:00 Improve syncNodes to remove stale data
-  - ee6a035 2023-06-22T12:53:07-04:00 Moved controllerName as parameter to northBound client
-  - ad985d2 2023-06-22T12:31:06-04:00 Fix libovsdbops panic when testing apb external controller due to empty controllerName value
-  - 074ff6e 2023-06-21T22:07:30-04:00 Fixes control plane shared gateway jobs
-  - 198c316 2023-06-21T17:48:33-04:00 Fix egressFirewall cleanup on failed Add. Return nil instead of error when egressFirewall is not found on delete.
-  - b5df6f4 2023-06-16T14:44:18+00:00 Don't run command jobs concurrently for a PR
-  - e4d4014 2023-06-12T15:28:05-05:00 pods: ensure Cluster and Service CIDR traffic always go to OVN interface
-  - 4763c62 2023-06-12T15:27:09-05:00 pods: always add join subnet route to pod network namespace
+- kubernetes embedded-component ab0b8ee0d340f945f4bb4dabeef1bffa5fe5c6cc to e8b13aaf3b13581e62526d51f6f958b8fec93196
+  - 514cfd063 2023-07-03T14:51:15+00:00 UPSTREAM: <drop>: update openshift/api,openshift/apiserver-library-go
+
+- machine-config-operator embedded-component 63eb79470dd6f29d07535770d194f23ee83afc04 to 5ddeae5b35bb70320ba9946ed102ca3c114215c6
+  - 15356d1e 2023-07-03T15:28:06-03:00 test: added platform external render tests
+  - 0a4602e8 2023-06-30T17:23:14-03:00 feat/controller-crd: external platform field cloudControllerManager
+  - fc170f94 2023-06-30T17:19:28-03:00 fix/platform-external: make render know new platform type
+  - 3b4b0ac0 2023-06-30T13:11:49+02:00 Dockerfile: OKD: Reenable extensions image on SCOS
+  - c977554e 2023-06-30T03:52:14-04:00 faq: Talk about "no enabled repositories"
+  - 1658b10e 2023-06-29T14:51:21-04:00 Dockerfile: pin to nmstate-2.2.9
+  - 19e9f602 2023-06-29T11:38:45+02:00 golangci-lint: disable deprecated checks
+  - 908f2e6f 2023-06-29T11:38:45+02:00 depguard: check and deny if glog gets used in mco
+  - 71582c1f 2023-06-29T11:38:45+02:00 vendor: update golangci-lint to latest version 1.53.3
+  - c4dc9622 2023-06-29T11:38:45+02:00 golangci-lint: fix issues reported by linter
+  - 1075a8ac 2023-06-29T11:38:38+02:00 Dockerfile: update image to use golang-1.20
+  - 60a24b1d 2023-06-07T09:24:49-04:00 change the message annotation to description
+
+- oc image-amd64 c078876cc5aa434a02f14c28b8c2a56b9011aa13 to 2fd11272ef77febe027e597c8a65ee186c47b304
+  - 26507f35 2023-06-19T14:04:30+02:00 react to introduction of KUBECTL_ENABLE_CMD_SHADOW feature
+  - 4918366e 2023-06-19T14:04:30+02:00 react to changes in DeltaFIFO and CompGetResource
+  - 08b03abd 2023-06-19T14:04:30+02:00 update makefile
+  - 4eb0aab1 2023-06-19T13:42:13+02:00 go mod vendor
+  - 5d94ad33 2023-06-19T13:42:08+02:00 bump(k8s) to v0.27.2
+
+- csi-external-snapshotter is a new image-amd64 dependency
+
+- csi-external-snapshotter is a new image-amd64 dependency
+
+- csi-external-snapshotter is a new image-amd64 dependency
+
+- ovn-kubernetes image-amd64 083b00f6bef560b5c8deddcf5485894b46dfcb77 to ac45301151d508b088c6f9321a9731ed550abcdf
+  - f0c5bce 2023-06-15T08:05:49-05:00 Dockerfile: bump to ovn 23.03.0-69 (for LB templates) and ovs 3.1.0-32 (upgrade perf)
+
+- kubernetes image-amd64 ab0b8ee0d340f945f4bb4dabeef1bffa5fe5c6cc to e8b13aaf3b13581e62526d51f6f958b8fec93196
+  - 514cfd063 2023-07-03T14:51:15+00:00 UPSTREAM: <drop>: update openshift/api,openshift/apiserver-library-go
+
+- oc image-arm64 c078876cc5aa434a02f14c28b8c2a56b9011aa13 to 1a0e893160c98220969cb0ed3fcf1a62b3919c97
+  - 23ffd2d5 2023-07-05T11:01:00+03:00 add login flow using a browser
+  - b6d3b0d9 2023-07-05T10:59:39+03:00 add github.com/pkg/browser to go.mod and vendor
+  - efe83304 2023-07-05T01:02:15+02:00 react to changes in tokenrequest
+  - 7a9719c1 2023-07-05T00:52:24+02:00 pkg: fix NewManifestBuilder calls
+  - 90c0b077 2023-07-05T00:52:17+02:00 go mod vendor
+  - cc1c12dd 2023-07-05T00:52:17+02:00 go.mod: update library-go
+  - 9c981b63 2023-07-05T00:18:23+02:00 go.mod: upgrade distribution to v3
+  - 68e3d16b 2023-07-05T00:18:23+02:00 pkg: import distribution/v3
+  - 26507f35 2023-06-19T14:04:30+02:00 react to introduction of KUBECTL_ENABLE_CMD_SHADOW feature
+  - 4918366e 2023-06-19T14:04:30+02:00 react to changes in DeltaFIFO and CompGetResource
+  - 08b03abd 2023-06-19T14:04:30+02:00 update makefile
+  - 4eb0aab1 2023-06-19T13:42:13+02:00 go mod vendor
+  - 5d94ad33 2023-06-19T13:42:08+02:00 bump(k8s) to v0.27.2
+  - 585e44a3 2023-06-15T12:02:20+03:00 oc release info: Introduce --idms-file and deprecate --icsp-file
+
+- csi-external-snapshotter is a new image-arm64 dependency
+
+- csi-external-snapshotter is a new image-arm64 dependency
+
+- csi-external-snapshotter is a new image-arm64 dependency
+
+- ovn-kubernetes image-arm64 083b00f6bef560b5c8deddcf5485894b46dfcb77 to ac45301151d508b088c6f9321a9731ed550abcdf
+  - f0c5bce 2023-06-15T08:05:49-05:00 Dockerfile: bump to ovn 23.03.0-69 (for LB templates) and ovs 3.1.0-32 (upgrade perf)
+
+- kubernetes image-arm64 ab0b8ee0d340f945f4bb4dabeef1bffa5fe5c6cc to 879a9e767d5cb037ff3fc91208888e9a42809735
+  - b06b0c36d 2023-07-05T10:42:36+02:00 UPSTREAM: <drop>: make update
+  - ee62a2286 2023-07-04T17:36:00+02:00 UPSTREAM: 118915: remove legacy NetworkPolicy tests
+  - 514cfd063 2023-07-03T14:51:15+00:00 UPSTREAM: <drop>: update openshift/api,openshift/apiserver-library-go
 
