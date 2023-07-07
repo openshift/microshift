@@ -51,7 +51,7 @@ func (o *OVNKubernetesConfig) Validate() error {
 func (o *OVNKubernetesConfig) validateOVSBridge() error {
 	_, err := net.InterfaceByName(OVNGatewayInterface)
 	if err != nil {
-		fmt.Errorf("failed to find OVN gateway interface %q: %w", OVNGatewayInterface, err)
+		return fmt.Errorf("failed to find OVN gateway interface %q: %w", OVNGatewayInterface, err)
 	}
 	return nil
 }

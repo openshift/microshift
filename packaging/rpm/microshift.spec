@@ -97,7 +97,7 @@ The microshift-selinux package provides the SELinux policy modules required by M
 
 %package networking
 Summary: Networking components for MicroShift
-Requires: openvswitch3.1
+Requires: openvswitch3.1 == 3.1.0-14.el9fdp
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
