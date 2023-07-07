@@ -33,6 +33,10 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 				if err != nil {
 					cmdutil.CheckErr(err)
 				}
+				err = cfg.EnsureNodeNameHasNotChanged()
+				if err != nil {
+					cmdutil.CheckErr(err)
+				}
 			case "default":
 				cfg = config.NewDefault()
 			default:
