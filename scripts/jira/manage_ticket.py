@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
-"""Tool for bringing a ticket into the current sprint and updating its status.
+"""Tool for managing Jira ticket status from the command line.
+
+Start
+=====
+
+Bring a ticket into the current sprint and update its status.
 
 Ticket ID
 ---------
@@ -41,8 +46,13 @@ Status
 Use the `--in-progress` or `--review` options to control the
 status. The default is `--review`.
 
+Close
+=====
+
+Find open tickets with closed PRs and update their status.
+
 Authentication
---------------
+==============
 
 The script requires a Jira token passed via the `JIRA_API_TOKEN`
 environment variable. See README.md for details of creating the token.
@@ -52,11 +62,15 @@ environment variable. See README.md for details of creating the token.
 import argparse
 import os
 import subprocess
+import urllib.parse
+
+import github
 
 import jira
 
 SERVER_URL = 'https://issues.redhat.com/'
 SCRUM_BOARD = 14885
+NO_QE_LABEL = 'no-qe-needed'
 
 
 def custom_field_manager(server):
@@ -133,45 +147,8 @@ def guess_ticket_id():
     return parts[0] + '-' + parts[1]
 
 
-def main():
-    """The main program."""
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument(
-        '--ticket-id',
-        default=guess_ticket_id(),
-        help='the ticket id, defaults to the prefix of the branch name (%(default)s)',
-    )
-    parser.add_argument(
-        '--target-version',
-        help='the target version',
-    )
-    parser.add_argument(
-        '--no-sprint',
-        dest='sprint',
-        default=True,
-        action='store_false',
-        help='set the sprint to the active sprint',
-    )
-    parser.add_argument(
-        '--review',
-        dest='status',
-        default='Code Review',
-        action='store_const',
-        const='Code Review',
-        help='mark the ticket as ready for code review',
-    )
-    parser.add_argument(
-        '--in-progress',
-        dest='status',
-        action='store_const',
-        const='In Progress',
-        help='mark the ticket as having been started',
-    )
-    args = parser.parse_args()
-
+def command_start(args):
+    """Implement 'start' command."""
     actual_project_id = get_project_id_from_ticket_id(args.ticket_id)
     sprint_project_id = actual_project_id
     if sprint_project_id == 'OCPBUGS':
@@ -218,8 +195,144 @@ def main():
         )
 
 
+def is_pr_link(url):
+    """Returns boolean indicating whether the link points to a pull request."""
+    if not url.startswith('https://github.com/'):
+        return False
+    if '/pull/' not in url:
+        return False
+    return True
+
+
+def parse_pr_link(url):
+    """Return triple containing org, repo, and PR number."""
+    parsed = urllib.parse.urlparse(url)
+    path_parts = parsed.path.lstrip('/').split('/')
+    org = path_parts[0]
+    repo = path_parts[1]
+    prnum = path_parts[3]
+    return (org, repo, prnum)
+
+
+def command_close(args):
+    server = jira.JIRA(
+        server=SERVER_URL,
+        token_auth=os.environ.get('JIRA_API_TOKEN'),
+    )
+    getter, _ = custom_field_manager(server)
+    active_sprint = get_active_sprint(server, 'USHIFT')
+    jira_id = server.myself()['name']
+    gh_auth = github.Auth.Token(os.environ['GITHUB_TOKEN'])
+    gh = github.Github(auth=gh_auth)
+
+    print(f'finding open tickets assigned to {jira_id} in {active_sprint}')
+
+    query = f'Sprint = {active_sprint.id} and status in ("Code Review", "In Progress") and assignee = "{jira_id}"'
+    results = server.search_issues(query)
+    for ticket in results:
+        print()
+        print(f'{ticket}: {ticket.fields.summary}')
+        print(f'  URL: {SERVER_URL}browse/{ticket}')
+        print('  Status:', ticket.fields.status)
+        if ticket.fields.labels:
+            print('  Labels:', ticket.fields.labels)
+
+        all_merged = True
+        links = server.remote_links(ticket.id)
+        for link in links:
+            url = link.object.url
+            if not is_pr_link(url):
+                continue
+            org_name, repo_name, pr_num = parse_pr_link(url)
+            repo = gh.get_repo(f'{org_name}/{repo_name}')
+            pr = repo.get_pull(int(pr_num))
+            print(f'  Link: {url} ({pr.merged})')
+            if not pr.merged:
+                all_merged = False
+
+        actual_project_id = get_project_id_from_ticket_id(ticket.key)
+        if actual_project_id == 'OCPBUGS' or not all_merged:
+            print('  Transition: none')
+            continue
+
+        if NO_QE_LABEL in ticket.fields.labels:
+            next_state = 'Closed'
+        else:
+            next_state = 'Review'
+        print(f'  Transition: {next_state}')
+        if args.dry_run:
+            print('f  DRY RUN')
+        else:
+            server.transition_issue(
+                issue=ticket,
+                transition=next_state,
+            )
+
+
+def main():
+    """The main program."""
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+    subparsers = parser.add_subparsers(dest='command', help='commands')
+
+    start_parser = subparsers.add_parser(
+        'start', help='Mark a ticket as in progress or under review',
+    )
+    start_parser.add_argument(
+        '--ticket-id',
+        default=guess_ticket_id(),
+        help='the ticket id, defaults to the prefix of the branch name (%(default)s)',
+    )
+    start_parser.add_argument(
+        '--target-version',
+        help='the target version',
+    )
+    start_parser.add_argument(
+        '--no-sprint',
+        dest='sprint',
+        default=True,
+        action='store_false',
+        help='set the sprint to the active sprint',
+    )
+    start_parser.add_argument(
+        '--review',
+        dest='status',
+        default='Code Review',
+        action='store_const',
+        const='Code Review',
+        help='mark the ticket as ready for code review',
+    )
+    start_parser.add_argument(
+        '--in-progress',
+        dest='status',
+        action='store_const',
+        const='In Progress',
+        help='mark the ticket as having been started',
+    )
+
+    close_parser = subparsers.add_parser(
+        'close', help='Find tickets with closed PRs and move the ticket to the next state',
+    )
+    close_parser.add_argument(
+        '--dry-run',
+        dest='dry_run',
+        default=False,
+        action='store_true',
+        help='report but make no changes',
+    )
+
+    args = parser.parse_args()
+
+    if args.command == 'start':
+        command_start(args)
+    elif args.command == 'close':
+        command_close(args)
+    else:
+        parser.print_help()
+
+
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception as err:  # pylint: disable=broad-except
-        print(f'ERROR: {err}')
+    main()
