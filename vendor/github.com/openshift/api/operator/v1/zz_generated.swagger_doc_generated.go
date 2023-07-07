@@ -739,7 +739,8 @@ func (ClientTLS) SwaggerDoc() map[string]string {
 }
 
 var map_ContainerLoggingDestinationParameters = map[string]string{
-	"": "ContainerLoggingDestinationParameters describes parameters for the Container logging destination type.",
+	"":          "ContainerLoggingDestinationParameters describes parameters for the Container logging destination type.",
+	"maxLength": "maxLength is the maximum length of the log message.\n\nValid values are integers in the range 480 to 8192, inclusive.\n\nWhen omitted, the default value is 1024.",
 }
 
 func (ContainerLoggingDestinationParameters) SwaggerDoc() map[string]string {
@@ -1028,7 +1029,7 @@ var map_SyslogLoggingDestinationParameters = map[string]string{
 	"address":   "address is the IP address of the syslog endpoint that receives log messages.",
 	"port":      "port is the UDP port number of the syslog endpoint that receives log messages.",
 	"facility":  "facility specifies the syslog facility of log messages.\n\nIf this field is empty, the facility is \"local1\".",
-	"maxLength": "maxLength is the maximum length of the syslog message\n\nIf this field is empty, the maxLength is set to \"1024\".",
+	"maxLength": "maxLength is the maximum length of the log message.\n\nValid values are integers in the range 480 to 4096, inclusive.\n\nWhen omitted, the default value is 1024.",
 }
 
 func (SyslogLoggingDestinationParameters) SwaggerDoc() map[string]string {
@@ -1259,6 +1260,7 @@ func (FeaturesMigration) SwaggerDoc() map[string]string {
 var map_GatewayConfig = map[string]string{
 	"":               "GatewayConfig holds node gateway-related parsed config file parameters and command-line overrides",
 	"routingViaHost": "RoutingViaHost allows pod egress traffic to exit via the ovn-k8s-mp0 management port into the host before sending it out. If this is not set, traffic will always egress directly from OVN to outside without touching the host stack. Setting this to true means hardware offload will not be supported. Default is false if GatewayConfig is specified.",
+	"ipForwarding":   "IPForwarding controls IP forwarding for all traffic on OVN-Kubernetes managed interfaces (such as br-ex). By default this is set to Restricted, and Kubernetes related traffic is still forwarded appropriately, but other IP traffic will not be routed by the OCP node. If there is a desire to allow the host to forward traffic across OVN-Kubernetes managed interfaces, then set this field to \"Global\". The supported values are \"Restricted\" and \"Global\".",
 }
 
 func (GatewayConfig) SwaggerDoc() map[string]string {
