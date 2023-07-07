@@ -50,11 +50,11 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 
 	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.ConfigFile), cfg.MultiNode.Enabled)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create OVN-K configuration from %q: %w", config.ConfigFile, err)
 	}
 
 	if err := ovnConfig.Validate(); err != nil {
-		return fmt.Errorf("failed to validate ovn-kubernetes configurations %v", err)
+		return fmt.Errorf("failed to validate ovn-kubernetes configuration: %w", err)
 	}
 
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {

@@ -38,11 +38,11 @@ func (o *OVNKubernetesConfig) Validate() error {
 	// br-ex is required to run ovn-kubernetes
 	err := o.validateOVSBridge()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to validate OVS bridge: %w", err)
 	}
 	err = o.validateConfig()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to validate OVN-K configuration: %w", err)
 	}
 	return nil
 }
@@ -50,7 +50,10 @@ func (o *OVNKubernetesConfig) Validate() error {
 // validateOVSBridge validates the existence of ovn-kubernetes br-ex bridge
 func (o *OVNKubernetesConfig) validateOVSBridge() error {
 	_, err := net.InterfaceByName(OVNGatewayInterface)
-	return err
+	if err != nil {
+		fmt.Errorf("failed to find OVN gateway interface %q: %w", OVNGatewayInterface, err)
+	}
+	return nil
 }
 
 // validateConfig validates the user defined configuration in /etc/microshift/ovn.yaml
@@ -58,7 +61,7 @@ func (o *OVNKubernetesConfig) validateConfig() error {
 	// validate MTU conf
 	iface, err := net.InterfaceByName(OVNGatewayInterface)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find OVN gateway interface %q: %w", OVNGatewayInterface, err)
 	}
 
 	if iface.MTU < o.MTU {
