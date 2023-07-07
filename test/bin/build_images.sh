@@ -10,6 +10,14 @@ source "${SCRIPTDIR}/common.sh"
 
 mkdir -p "${IMAGEDIR}"
 
+if [ $# -ne 0 ]; then
+    TEMPLATES="$*"
+    BUILD_INSTALLER=false
+else
+    TEMPLATES="${TESTDIR}/image-blueprints/*.toml"
+    BUILD_INSTALLER=true
+fi
+
 # Determine the version of the RPM in the local repo so we can use it
 # in the blueprint templates.
 if [ ! -d "${LOCAL_REPO}" ]; then
@@ -66,7 +74,7 @@ BUILDIDS=""
 mkdir -p "${IMAGEDIR}/blueprints"
 mkdir -p "${IMAGEDIR}/builds"
 # shellcheck disable=SC2231  # allow glob expansion without quotes in for loop
-for template in ${TESTDIR}/image-blueprints/*.toml; do
+for template in ${TEMPLATES}; do
     echo
     echo "Blueprint ${template}"
 
@@ -98,17 +106,19 @@ for template in ${TESTDIR}/image-blueprints/*.toml; do
     BUILDIDS="${BUILDIDS} ${buildid}"
 done
 
-# In the future we may need to build multiple images with different
-# formats but for now we just have one special case to build an
-# installer image in a different format.
-echo "Building image-installer from ${INSTALLER_IMAGE_BLUEPRINT}"
-buildid=$(sudo composer-cli compose start \
-               "${INSTALLER_IMAGE_BLUEPRINT}" \
-                image-installer \
-              | awk '{print $2}')
-echo "Build ID ${buildid}"
-echo "${buildid}" > "${IMAGEDIR}/builds/${blueprint}.image-installer"
-BUILDIDS="${BUILDIDS} ${buildid}"
+if ${BUILD_INSTALLER}; then
+    # In the future we may need to build multiple images with different
+    # formats but for now we just have one special case to build an
+    # installer image in a different format.
+    echo "Building image-installer from ${INSTALLER_IMAGE_BLUEPRINT}"
+    buildid=$(sudo composer-cli compose start \
+                   "${INSTALLER_IMAGE_BLUEPRINT}" \
+                   image-installer \
+                  | awk '{print $2}')
+    echo "Build ID ${buildid}"
+    echo "${buildid}" > "${IMAGEDIR}/builds/${blueprint}.image-installer"
+    BUILDIDS="${BUILDIDS} ${buildid}"
+fi
 
 echo "Waiting for builds to complete..."
 # shellcheck disable=SC2086  # pass command arguments quotes to allow word splitting
