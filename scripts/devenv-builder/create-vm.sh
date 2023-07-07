@@ -51,7 +51,7 @@ if [ "${SWAPSIZE}" -eq 0 ] ; then
     sed -i "s;^part swap;#part swap;" "${KICKSTART_FILE}"
 fi
 
-sudo -b bash -c " \
+sudo bash -c " \
 cd ${VMDISKDIR} && \
 virt-install \
     --name ${VMNAME} \
