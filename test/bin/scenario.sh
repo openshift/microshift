@@ -310,6 +310,23 @@ action_cleanup() {
     scenario_remove_vms
 }
 
+action_login() {
+    load_global_settings
+    local vmname
+    if [ $# -eq 0 ]; then
+        vmname="host1"
+    else
+        vmname="$1"
+    fi
+    local ssh_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+    local ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
+
+    ssh_port=$(cat "${ssh_port_file}")
+    ip=$(cat "${ip_file}")
+
+    ssh "redhat@${ip}" -p "${ssh_port}"
+}
+
 action_run() {
     load_scenario_script
     scenario_run_tests
@@ -317,7 +334,7 @@ action_run() {
 
 usage() {
     cat - <<EOF
-scenario.sh (create|run|cleanup) scenario-directory
+scenario.sh (create|run|cleanup) scenario-script [args]
 
   create -- Set up the infrastructure for the test, such as VMs.
 
@@ -325,9 +342,15 @@ scenario.sh (create|run|cleanup) scenario-directory
 
   cleanup -- Remove the VMs created for the scenario.
 
+  login -- Login to a host for a scenario.
+
 Settings
 
   The script looks for ${TESTDIR}/scenario_settings.sh for some global settings.
+
+Login
+
+  scenario.sh login <scenario-script> <host>
 EOF
 }
 
@@ -339,11 +362,12 @@ fi
 action="$1"
 shift
 SCENARIO_SCRIPT="$1"
+shift
 SCENARIO=$(basename "${SCENARIO_SCRIPT}" .sh)
 
 case "${action}" in
-    create|run|cleanup)
-        "action_${action}"
+    create|run|cleanup|login)
+        "action_${action}" "$@"
         ;;
     *)
         error "Unknown instruction ${action}"
