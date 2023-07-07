@@ -990,7 +990,7 @@ rebase_to() {
     fi
 
     title "# Removing staging directory"
-    rm -rf "$REPOROOT/_output"
+    rm -rf "${STAGING_DIR}"
 }
 
 
