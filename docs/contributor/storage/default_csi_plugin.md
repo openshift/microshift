@@ -114,3 +114,169 @@ for resizing instructions.
 LVMS supports PVC cloning for LVM thin-volumes (thick volumes are not supported).  Cloning is
 only allowed within the same namespace; you cannot clone a PVC from one namespace to another.
 For more details on PVC to PVC cloning, see the [OpenShift documentation](https://docs.openshift.com/container-platform/4.13/storage/container_storage_interface/persistent-storage-csi-cloning.html).
+
+### Volume Snapshotting
+
+> NOTE: Only supported for LVM thin volumes.  LVM does not support cloning or snapshotting of thick LVs. See 
+[configuration.md](./configuration.md#lvm-thin-volumes) for information on setting up thin volume provisioning and snapshotting.
+
+> For details on VolumeSnapshot APIs, see [OpenShift documentation](https://docs.openshift.com/container-platform/4.13/storage/container_storage_interface/persistent-storage-csi-snapshots.html).
+
+To avoid data corruption, it is HIGHLY recommended that volume iops are halted while the snapshot is being created.  This
+is done by deleting the pod that the source volume is mounted to.  If the pod is managed via a replication controller
+(deployment, statefulset, etc), scale the replica count to zero instead of deleting the pod directly.  After snapshotting
+is complete, the source PVC can be re-mounted to a new pod.
+
+To create a snapshot, you need a source PVC or VolumeSnapshotContent object backed by a thin LV.  This sample workload
+deploys a single Pod and PVC for this use-case.  LVMS only supports `WaitForFirstConsumer` volumeBindingMode, 
+which means the storage volume will not be provisioned until a pod is ready to mount it.
+
+
+```shell
+cat <<'EOF' | oc apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-claim-thin
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: topolvm-provisioner-thin
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: base
+spec:
+  containers:
+  - command:
+    - sh
+    - -c
+    - sleep 1d
+    image: nginxinc/nginx-unprivileged:latest
+    name: test-container
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    volumeMounts:
+    - mountPath: /vol
+      name: test-vol
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - name: test-vol
+    persistentVolumeClaim:
+      claimName: test-claim-thin
+
+```
+
+Wait for the PVC to bind and the pod to enter a Running state, then write some simple data to the persistent volume.
+Execute the following:
+
+`oc exec my-pod -- bash -c 'echo FOOBAR > /data/demo.txt'`
+
+Next, delete the pod to ensure no data is written to the volume during snapshotting.
+
+`oc delete my-pod`
+
+Once the pod has been deleted, it is safe to generate a snapshot.  This is done by creating an instance of a 
+VolumeSnapshot API object. It is also possible to create a snapshot from an existing snapshot by specifying the 
+VolumeSnapshotContent as the source.
+
+_Snapshot of a PVC_
+```shell
+cat <<'EOF' | oc apply -f -
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: my-snap
+spec:
+  volumeSnapshotClassName: topolvm-snapclass
+  source:
+    persistentVolumeClaimName: test-claim-thin
+```
+
+It is also possible to create a snapshot from an existing snapshot by specifying the 
+VolumeSnapshotContent as the source.
+
+_Snapshot of a VolumeSnapshotContent_
+```shell
+cat <<'EOF' | oc apply -f -
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: my-snap
+  namespace: default
+spec:
+  source:
+    volumeSnapshotContentName: some-other-snapshot
+```
+
+Wait for the storage driver to finish creating the snapshot with the following command:
+
+`oc wait volumesnapshot/my-snap --for=jsonpath\='{.status.readyToUse}=true'`
+
+Once the volumeSnapshot is `ReadyToUse`, it can be restored as a volume for future PVCs.  This will cause a clone
+of the snapshot to be created and mounted to the new pod.
+
+```shell
+cat <<'EOF' | oc apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: snapshot-restore
+spec:
+  accessModes:
+  - ReadWriteOnce
+  dataSource:
+    apiGroup: snapshot.storage.k8s.io
+    kind: VolumeSnapshot
+    name: my-snap
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: topolvm-provisioner-thin
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: base
+spec:
+  containers:
+  - command:
+    - sh
+    - -c
+    - sleep 1d
+    image: nginxinc/nginx-unprivileged:latest
+    name: test-container
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    volumeMounts:
+    - mountPath: /vol
+      name: test-vol
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - name: test-vol
+    persistentVolumeClaim:
+      claimName: snapshot-restore
+```
+
+Once the new pod enters the Running state, verify that the data we wrote early was cloned to the new volume:
+
+```shell
+oc exec base -- cat /data/demo.txt
+FOOBAR
+```
