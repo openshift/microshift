@@ -9,6 +9,10 @@ source "${SCRIPTDIR}/common.sh"
 
 cd "${TESTDIR}"
 
+if [ ! -d "${RF_VENV}" ]; then
+    "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
+fi
+
 for scenario in ./scenarios/*.sh; do
     scenario_name="$(basename "${scenario}" .sh)"
     logfile="${SCENARIO_INFO_DIR}/${scenario_name}/run.log"
