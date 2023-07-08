@@ -50,7 +50,7 @@ Test Case Setup
     [Documentation]    Prepare the cluster-level APIs and a data-volume with some simple text
     Oc Apply    -f ${STORAGE_CLASS} -f ${SNAPSHOT_CLASS}
     Oc Apply    -k ${SOURCE_KUSTOMIZE} -n ${NAMESPACE}
-    Oc Wait For    pod/${POD_NAME_STATIC}    condition\=Ready
+    Oc Wait For    pod/${POD_NAME_STATIC}    condition\=Ready    timeout=60s
     Write To Volume    ${POD_NAME_STATIC}    ${TEST_DATA}
     Oc Delete    pod ${POD_NAME_STATIC} -n ${NAMESPACE}
     Oc Wait For    pod/${POD_NAME_STATIC}    delete
