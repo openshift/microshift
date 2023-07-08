@@ -255,7 +255,7 @@ API_PORT: ${api_port}
 LB_PORT: ${lb_port}
 USHIFT_HOST: ${public_ip}
 USHIFT_USER: redhat
-SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
+SSH_PRIV_KEY: ${SSH_PRIVATE_KEY:-${HOME}/.ssh/id_rsa}
 SSH_PORT: ${ssh_port}
 EOF
 
