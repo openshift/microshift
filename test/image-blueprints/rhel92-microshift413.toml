@@ -5,6 +5,11 @@ modules = []
 groups = []
 distro = "rhel-92"
 
+# FIXME: Temporarily pin the openvswitch version.
+[[packages]]
+name = "openvswitch3.1"
+version = "3.1.0-14.el9fdp"
+
 [[packages]]
 name = "microshift"
 version = "4.13*"
