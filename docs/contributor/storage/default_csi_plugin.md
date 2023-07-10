@@ -174,7 +174,7 @@ spec:
   - name: test-vol
     persistentVolumeClaim:
       claimName: test-claim-thin
-
+EOF
 ```
 
 Wait for the PVC to bind and the pod to enter a Running state, then write some simple data to the persistent volume.
