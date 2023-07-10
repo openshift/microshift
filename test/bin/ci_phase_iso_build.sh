@@ -21,6 +21,13 @@ exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${
 
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 
+# Clean the dnf cache to avoid corruption
+dnf clean all
+
+# Show what other dnf commands have been run to try to debug why we
+# sometimes see cache collisons.
+dnf history --reverse
+
 cd ~/microshift
 
 # Get firewalld and repos in place. Use scripts to get the right repos
