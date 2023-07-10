@@ -133,7 +133,7 @@ which means the storage volume will not be provisioned until a pod is ready to m
 
 
 ```shell
-cat <<'EOF' | oc apply -f -
+cat <<EOF | oc apply -f -
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
