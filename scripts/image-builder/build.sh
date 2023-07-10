@@ -324,6 +324,11 @@ fi
 createrepo microshift-local >/dev/null
 open_repo_permissions microshift-local
 
+# Determine the version of microshift we have, for use in blueprint templates later.
+MICROSHIFT_RELEASE_RPM=$(find "${MICROSHIFT_RPM_SOURCE}" -name 'microshift-release-info*.rpm' | tail -n 1)
+MICROSHIFT_VERSION=$(rpm -q --queryformat '%{version}' "${MICROSHIFT_RELEASE_RPM}")
+export MICROSHIFT_VERSION
+
 # Determine the image version from the RPM contents
 RELEASE_INFO_FILE=$(find . -name 'microshift-release-info-*.rpm' | tail -1)
 if [ -z "${RELEASE_INFO_FILE}" ] ; then
@@ -366,7 +371,10 @@ for f in microshift-local custom-rpms rhocp-4.13 fast-datapath; do
 done
 
 title "Preparing blueprints"
-cp -f "${SCRIPTDIR}"/config/{blueprint_v0.0.1.toml,installer.toml} .
+cp -f "${SCRIPTDIR}"/config/installer.toml .
+sed -e "s;REPLACE_MICROSHIFT_VERSION;${MICROSHIFT_VERSION};g" \
+    "${SCRIPTDIR}"/config/blueprint_v0.0.1.toml \
+    >blueprint_v0.0.1.toml
 if [ -n "${CUSTOM_RPM_FILES}" ] ; then
     for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
         rpm_name=$(rpm -qp "${rpm}" --queryformat "%{NAME}")

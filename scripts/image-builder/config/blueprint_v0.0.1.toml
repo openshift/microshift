@@ -9,23 +9,23 @@ groups = []
 
 [[packages]]
 name = "microshift"
-version = "${MICROSHIFT_VERSION}"
+version = "REPLACE_MICROSHIFT_VERSION"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "${MICROSHIFT_VERSION}"
+version = "REPLACE_MICROSHIFT_VERSION"
 
 [[packages]]
 name = "microshift-networking"
-version = "${SOURCE_VERSION}"
+version = "REPLACE_MICROSHIFT_VERSION"
 
 [[packages]]
 name = "microshift-selinux"
-version = "${SOURCE_VERSION}"
+version = "REPLACE_MICROSHIFT_VERSION"
 
 [[packages]]
 name = "microshift-release-info"
-version = "${MICROSHIFT_VERSION}"
+version = "REPLACE_MICROSHIFT_VERSION"
 
 [[packages]]
 name = "openshift-clients"
