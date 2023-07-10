@@ -1,7 +1,0 @@
-id = "openshift-local"
-name = "OpenShift Local Repo"
-type = "yum-baseurl"
-url = "file://REPLACE_IMAGE_BUILDER_DIR/openshift-local/"
-check_gpg = false
-check_ssl = false
-system = false

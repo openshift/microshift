@@ -337,24 +337,6 @@ if [ -z "${IMAGE_VERSION}" ] ; then
     exit 1
 fi
 
-# Download openshift local RPM packages (noarch for python and selinux packages)
-rm -rf openshift-local 2>/dev/null || true
-
-OCP_REPO_NAME="rhocp-4.13-for-rhel-${OSVERSION}-$(uname -m)-rpms"
-reposync -n -a "${BUILD_ARCH}" -a noarch --download-path openshift-local \
-    --repo="${OCP_REPO_NAME}" \
-    --repo="fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms" >/dev/null
-
-# Remove 'microshift' packages to avoid overrides from the remote repository
-find openshift-local -name \*microshift\* -exec rm -f {} \;
-# Exit if no RPM packages were found
-if [ "$(find openshift-local -name '*.rpm' | wc -l)" -eq 0 ] ; then
-    echo "No RPM packages were found at the '${OCP_REPO_NAME}' repository. Exiting..."
-    exit 1
-fi
-createrepo openshift-local >/dev/null
-open_repo_permissions openshift-local
-
 # Install prometheus process exporter
 install_prometheus_rpm
 
@@ -373,10 +355,12 @@ if [ -n "${CUSTOM_RPM_FILES}" ] ; then
     open_repo_permissions custom-rpms
 fi
 
-title "Loading sources for OpenShift and MicroShift"
-for f in openshift-local microshift-local custom-rpms ; do
-    [ ! -d ${f} ] && continue
-    sed "s;REPLACE_IMAGE_BUILDER_DIR;${BUILDDIR};g" "${SCRIPTDIR}/config/${f}.toml.template" > ${f}.toml
+title "Loading package sources"
+for f in microshift-local custom-rpms rhocp-4.13 fast-datapath; do
+    sed -e "s;REPLACE_IMAGE_BUILDER_DIR;${BUILDDIR};g" \
+        -e "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
+        "${SCRIPTDIR}/config/${f}.toml.template" \
+        > ${f}.toml
     sudo composer-cli sources delete ${f} 2>/dev/null || true
     sudo composer-cli sources add "${BUILDDIR}/${f}.toml"
 done
