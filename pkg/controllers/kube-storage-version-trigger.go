@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 MicroShift Contributors
+Copyright © 2023 MicroShift Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -106,6 +106,6 @@ func (s *KubeStorageVersionTrigger) runTrigger(ctx context.Context) error {
 	case <-ctx.Done():
 		return nil
 	default:
-		return fmt.Errorf("%s shutdown unexpeditly", kubeStorageVersionTrigger)
+		return fmt.Errorf("%s shutdown unexpectedly", kubeStorageVersionTrigger)
 	}
 }
