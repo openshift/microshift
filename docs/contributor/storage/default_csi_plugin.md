@@ -106,21 +106,21 @@ EOF
 
 Resizing is the process of expanding the backend storage volume's capacity via the OpenShift GUI or CLI client. LVMS 
 supports volume expansion.  It does not support volume shrinking. Refer to OpenShift documentation on 
-[Expanding CSI Volumes](https://docs.openshift.com/container-platform/4.13/storage/expanding-persistent-volumes.html#expanding-csi-volumes_expanding-persistent-volumes)
+[Expanding CSI Volumes](https://docs.okd.io/latest/storage/expanding-persistent-volumes.html#expanding-csi-volumes_expanding-persistent-volumes)
 for resizing instructions.
 
 ### PVC to PVC Cloning
 
 LVMS supports PVC cloning for LVM thin-volumes (thick volumes are not supported).  Cloning is
 only allowed within the same namespace; you cannot clone a PVC from one namespace to another.
-For more details on PVC to PVC cloning, see the [OpenShift documentation](https://docs.openshift.com/container-platform/4.13/storage/container_storage_interface/persistent-storage-csi-cloning.html).
+For more details on PVC to PVC cloning, see the [OpenShift documentation](https://docs.okd.io/latest/storage/container_storage_interface/persistent-storage-csi-cloning.html).
 
 ### Volume Snapshotting
 
 > NOTE: Only supported for LVM thin volumes.  LVM does not support cloning or snapshotting of thick LVs. See 
 [configuration.md](./configuration.md#lvm-thin-volumes) for information on setting up thin volume provisioning and snapshotting.
 
-> For details on VolumeSnapshot APIs, see [OpenShift documentation](https://docs.openshift.com/container-platform/4.13/storage/container_storage_interface/persistent-storage-csi-snapshots.html).
+> For details on VolumeSnapshot APIs, see [OKD documentation](https://docs.okd.io/latest/storage/container_storage_interface/persistent-storage-csi-snapshots.html).
 
 To avoid data corruption, it is HIGHLY recommended that volume iops are halted while the snapshot is being created.  This
 is done by deleting the pod that the source volume is mounted to.  If the pod is managed via a replication controller
@@ -202,28 +202,20 @@ spec:
     persistentVolumeClaimName: test-claim-thin
 ```
 
-It is also possible to create a snapshot from an existing snapshot by specifying the 
-VolumeSnapshotContent as the source.
-
-_Snapshot of a VolumeSnapshotContent_
-```shell
-cat <<'EOF' | oc apply -f -
-apiVersion: snapshot.storage.k8s.io/v1
-kind: VolumeSnapshot
-metadata:
-  name: my-snap
-  namespace: default
-spec:
-  source:
-    volumeSnapshotContentName: some-other-snapshot
-```
+> It is also possible to create a snapshot from an existing snapshot by specifying the 
+VolumeSnapshotContent as the source. See [OKD documentation](https://docs.okd.io/latest/storage/container_storage_interface/persistent-storage-csi-snapshots.html#persistent-storage-csi-snapshots-create_persistent-storage-csi-snapshots) for more information
 
 Wait for the storage driver to finish creating the snapshot with the following command:
 
 `oc wait volumesnapshot/my-snap --for=jsonpath\='{.status.readyToUse}=true'`
 
-Once the volumeSnapshot is `ReadyToUse`, it can be restored as a volume for future PVCs.  This will cause a clone
-of the snapshot to be created and mounted to the new pod.
+Once the volumeSnapshot is `ReadyToUse`, it can be restored as a volume for future PVCs.
+
+### Restoring a Snapshot
+
+Restoring a snapshot is done by specifying the VolumeSnapshot object as the `dataSource` in a PersistentVolumeClaim. The
+following workflow demonstrates snapshot restoration.  For demonstration purposes, we also verify the data we wrote to 
+source PVC is preserved and restored on the new PVC.
 
 ```shell
 cat <<'EOF' | oc apply -f -

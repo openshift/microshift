@@ -76,14 +76,10 @@ in more space being allocated that expected.
 
 Advanced storage features such as volume cloning and snapshotting are only supported on thin volumes, and thus require an
 LVM thin-pool on the host and the appropriate LVMS and cluster configuration.  For information on creating a thin-pool,
-see [OpenShift documentation](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_logical_volumes/creating-and-managing-thin-provisioned-volumes_configuring-and-managing-logical-volumes).
-
-> VMs created via the [Getting Started](../../user/getting_started.md) instructions are provisioned with a single
-thin-pool automatically. 
+see [RHEL documentation](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_logical_volumes/creating-and-managing-thin-provisioned-volumes_configuring-and-managing-logical-volumes).
 
 For LVMS to manage thin LVs, a thin-pool device class must be specified in the lvmd.yaml. Multiple thin-pool device classes 
-are permitted. LVM thin-pools must be attached to a volume group. However, it is not necessary to expose the volume-group 
-to LVMS unless thick volume provisioning is required as well.  For example, the following lvmd.yaml specifies a single 
+are permitted. LVM thin-pools must be attached to a volume group. For example, the following lvmd.yaml specifies a single 
 device class for a thin-pool:
 
 ```yaml
