@@ -81,10 +81,17 @@ func (s *KubeStorageVersionMigrator) Run(ctx context.Context, ready chan<- struc
 }
 
 func (s *KubeStorageVersionMigrator) runMigrator(ctx context.Context) error {
+	start, shutdown := util.HealthCheckServer(ctx, s.healthPath, s.healthPort)
 	go func() {
-		err := util.StartHealthCheck(s.healthPath, s.healthPort)
+		err := start()
 		if err != nil {
 			klog.ErrorS(err, "could not create health endpoint", "controller", s.Name())
+		}
+	}()
+	defer func() {
+		err := shutdown()
+		if err != nil {
+			klog.ErrorS(err, "liveness server did not shutdown gracefully", "controller", s.Name())
 		}
 	}()
 
