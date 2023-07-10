@@ -305,14 +305,15 @@ fi
 # Set the cleanup and elapsed time traps only if command line parsing was successful
 trap '${SCRIPTDIR}/cleanup.sh; echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
 
-title "Downloading local OpenShift and MicroShift repositories"
+title "Setting up local MicroShift repository"
 # Copy MicroShift RPM packages
 rm -rf microshift-local 2>/dev/null || true
 if [[ "${MICROSHIFT_RPM_SOURCE}" == http* ]] ; then
     wget -q -nd -r -L -P microshift-local -A rpm "${MICROSHIFT_RPM_SOURCE}"
 else
     [ ! -d "${MICROSHIFT_RPM_SOURCE}" ] && echo "MicroShift RPM path '${MICROSHIFT_RPM_SOURCE}' does not exist" && exit 1
-    cp -TR "${MICROSHIFT_RPM_SOURCE}" microshift-local
+    cp -TR "${MICROSHIFT_RPM_SOURCE}/RPMS" microshift-local
+    cp -TR "${MICROSHIFT_RPM_SOURCE}/SRPMS" microshift-local
 fi
 
 # Exit if no RPM packages were found

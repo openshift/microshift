@@ -9,15 +9,23 @@ groups = []
 
 [[packages]]
 name = "microshift"
-version = "*"
+version = "${MICROSHIFT_VERSION}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "*"
+version = "${MICROSHIFT_VERSION}"
+
+[[packages]]
+name = "microshift-networking"
+version = "${SOURCE_VERSION}"
+
+[[packages]]
+name = "microshift-selinux"
+version = "${SOURCE_VERSION}"
 
 [[packages]]
 name = "microshift-release-info"
-version = "*"
+version = "${MICROSHIFT_VERSION}"
 
 [[packages]]
 name = "openshift-clients"
@@ -43,12 +51,6 @@ version = "*"
 
 [[packages]]
 name = "strace"
-version = "*"
-
-# other
-
-[[packages]]
-name = "redhat-release"
 version = "*"
 
 # customizations
