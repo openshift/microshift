@@ -1,6 +1,0 @@
-# kubernetes embedded-component c43ddea5eec2220b3e691afe6a2f1529e0a454cd to 1485cc947720a841d83204046599f02432d32707
-6958d8f87fc5ab0658a8cc5a40e42a042870cc2e 2023-07-03T16:53:50+02:00 UPSTREAM: <drop>: bump apiserver-library-go
-# kubernetes image-amd64 c43ddea5eec2220b3e691afe6a2f1529e0a454cd to 1485cc947720a841d83204046599f02432d32707
-6958d8f87fc5ab0658a8cc5a40e42a042870cc2e 2023-07-03T16:53:50+02:00 UPSTREAM: <drop>: bump apiserver-library-go
-# ovn-kubernetes image-arm64 3aa743ca58669d91cc7da29aa5157648a4241361 to 3448f1cb0647d0d1764fb30b0def2a7121c4cfdf
-4e165deb3551ee59b6063d068685dada95614a15 2023-07-05T11:38:53+02:00 Remove non-existing functions test. introduced with 916443e21442e51435fb467138015daf70952932
