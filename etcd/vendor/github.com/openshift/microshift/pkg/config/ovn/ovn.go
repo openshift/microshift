@@ -15,7 +15,6 @@ import (
 const (
 	ovnConfigFileName           = "ovn.yaml"
 	OVNGatewayInterface         = "br-ex"
-	OVNExternalGatewayInterface = "br-ex1"
 	defaultMTU                  = 1500
 	OVNKubernetesV4MasqueradeIP = "169.254.169.2"
 	OVNKubernetesV6MasqueradeIP = "fd69::2"
@@ -34,8 +33,6 @@ type OVSInitConfig struct {
 	DisableOVSInit bool `json:"disableOVSInit,omitempty"`
 	// Uplink interface for OVS bridge "br-ex"
 	GatewayInterface string `json:"gatewayInterface,omitempty"`
-	// Uplink interface for OVS bridge "br-ex1"
-	ExternalGatewayInterface string `json:"externalGatewayInterface,omitempty"`
 }
 
 func (o *OVNKubernetesConfig) Validate() error {
@@ -64,17 +61,6 @@ func (o *OVNKubernetesConfig) validateConfig() error {
 		_, err := net.InterfaceByName(o.OVSInit.GatewayInterface)
 		if err != nil {
 			return fmt.Errorf("gateway interface %s not found", o.OVSInit.GatewayInterface)
-		}
-	}
-	if o.OVSInit.ExternalGatewayInterface != "" {
-		_, err := net.InterfaceByName(o.OVSInit.ExternalGatewayInterface)
-		if err != nil {
-			return fmt.Errorf("external gateway interface %s not found", o.OVSInit.ExternalGatewayInterface)
-		}
-		_, err = net.InterfaceByName(OVNExternalGatewayInterface)
-		if err != nil {
-			return fmt.Errorf("external gateway interface %s is configured, but external gateway bridge %s not found",
-				o.OVSInit.ExternalGatewayInterface, OVNExternalGatewayInterface)
 		}
 	}
 
