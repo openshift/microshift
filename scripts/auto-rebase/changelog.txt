@@ -1,5 +1,158 @@
-# kube-rbac-proxy image-arm64 11b1439d48a47a408ae7e2dd851989f7b7b4f595 to f1205e66bf34421046288bc74aed0d69b8434206
+# cluster-ingress-operator embedded-component 052f4163fdfc55043afcc499e25193c21348dee7 to a4dc8290ffb1c5a1876e0640ee3a87d9599c0a67
+649c4dfd5b6262b1b79e4dbc4824dbfa9e7d26a2 2023-06-29T17:55:26-04:00 OCPBUGS-15100 Add the trailing dot to the hostname if missing, early enough so that all references use the trailing dot. Update hashed DNS record names in unit tests.
+1bb13766f8cf4c0919355985e7bb113666cf2668 2023-06-29T17:55:26-04:00 OCPBUGS-15100: Fix invalid DNS name formatting for GCP
+52feedc4d02a74140cb53ae05fbf13fd41f9df6c 2023-06-28T15:04:50+00:00 OCPBUGS-13810: Update TestAWSELBConnectionIdleTimeout to not use wildcard DNS record
+411868f7677388cb8b5509c1c27864cecd4ec51c 2023-04-25T22:30:58+02:00 OCPBUGS-12743: bump controller-runtime to fix the multi namespace cache indexing
+# cluster-kube-apiserver-operator embedded-component 02ea4a4120dd0f8eb49d070b1fe420ed6d1debba to 0b4e454270fd837f94c8280178489add78ecc887
+1e913dcefd2cbad8f6efbe63f72e44edf4d925a6 2023-06-08T11:32:54+02:00 go mod vendor
+f83494380835c3f25658cd5b8285d99b4e3ec4f6 2023-06-08T11:32:36+02:00 bump library-go
+# cluster-network-operator embedded-component cf774f4844621d058b951457a4068aeb3e1e609e to 34ef7155cdb21807150b94e555e4575150498c22
+5c51f63734e7c13a59a3504964f7347c12698b36 2023-07-07T16:19:56-04:00 Add logic to pick the ovn-k8s-cni-overlay binary from the right source directory
+36104805c2331818d266a33a30280f19fc3b205b 2023-07-07T01:05:37+09:00 Change rhel7/8 to rhel8/9
+cbe9fc9ddb59c6cc714af20ec99d2fd4581dd2cd 2023-06-27T17:05:16+00:00 Add release version annotation to whereabouts-reconciler
+da7bee60f522cc96a841a03bdb41f8f9d291cb27 2023-06-19T07:28:34+00:00 Remove nodeSelector for architecture in whereabouts daemonset
+# kubernetes embedded-component 7d221229dc97969b79a272b63ad97b84d93cddb2 to a7ee68b55354d8c146ef81f82444c0765ea8885f
+8f419074dece78017415ecd4a9fb51d8d3157379 2023-06-22T13:23:58+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+887fbef7851fbbfe25f9ba5dbfd37e0204d5b9c4 2023-06-22T13:23:30+02:00 UPSTREAM: <drop>: manually resolve conflicts
+ce1278ede14b2239de9916f27d480472a11e10dc 2023-06-20T16:57:39+02:00 UPSTREAM: <drop>: bump apiserver-library-go
+11902a838028edef305dfe2f96be929bc4d114d8 2023-06-14T09:49:06+00:00 Release commit for Kubernetes v1.26.6
+b204a2b57f12800767b5c06069d518513363dbce 2023-06-08T00:14:59-06:00 update-vendor: update vendored go.sums
+4bf442eb73b91b7d74f7cc4d238519b99904c9e5 2023-06-07T23:41:30-06:00 [release-1.26] releng/go: Update images, dependencies and version to Go 1.19.10
+36ed0ac6c5203a3f9d6da68869a0d1991a524b96 2023-06-06T21:16:45+00:00 kube-proxy avoid race condition using LocalModeNodeCIDR
+b171ae97e0e37ab70e31df8e3197dc6e7de28998 2023-06-05T13:51:35-07:00 Add ephemeralcontainer to imagepolicy securityaccount admission plugin
+b935de6df5447cbb749fb8d7e6dad0bcb01992a4 2023-05-29T09:37:52+02:00 Add DisruptionTarget condition when preempting for critical pod
+8d5ca2c486bacefbd678860d0002855c9f8b64b6 2023-05-23T00:15:07+08:00 update webhook test to go 1.21
+3ec283ec109d26d86f7c77ce43369a34b72e2123 2023-05-18T12:51:21-04:00 Test APIService safe handling at startup
+4e6a7801d8a28ae149642a087f5225339d6571d0 2023-05-18T12:24:55-04:00 Fix waiting for CRD sync at server start
+0b8b4babcb28ecf318f272b4f89a4ddef6c33c67 2023-05-18T22:43:22+08:00 kubeadm: fix a bug where the static pod changes detection logic is inconsistent with kubelet
+8ee0781227d37d2bd7f34874fc5deea14c371bfb 2023-05-17T14:30:16+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.5
+fd6645fcfd3afddc628271977a0e0bc61a92019f 2023-05-10T13:38:07-07:00 kubeadm: Make etcd member removal idempotent
+9164248629529e596f042ec76875a9c4caf6639d 2023-05-10T13:38:02-07:00 kubeadm: Add etcd client unit tests
+bbd16451e1e1f9116d4c33b2efea67316ddb3d88 2023-05-10T13:38:02-07:00 kubeadm: Use internal etcd client through an interface
+ef5e78fbebad85a230d1b82eb71442f2875cd774 2023-05-04T01:46:55+05:30 run update-vendor.sh
+b73b79d5308dede4ff76d22b105b142f5d0df0cb 2023-05-04T01:32:18+05:30 vclib: Modify x509.UnknownAuthorityError unwrap check
+40797a123dcff16ee32972fd82b5d4119a2aa592 2023-05-04T01:32:18+05:30 vsphere: Adapt to govmomi version bumps
+3ac70147ec3de3752b360a06bcb7d7c418619da2 2023-05-04T01:32:18+05:30 *: Bump version of vmware/govmomi
+# machine-config-operator embedded-component 95816efa5d37e980b65f65d98311ceeb8c946db7 to 0ceebc00584733717887aed4c7c51b154cb33980
+2619e1b0b41bf8c713e03de60ea8a11737c3c5b9 2023-06-29T22:53:37-04:00 Dockerfile: use proper rhel9 image
+251fae70d719b31935a3e27f01a4f22aed871671 2023-06-28T11:41:49-04:00 Dockerfile: update rhel7 nmstate pin
+ce6cadfb71ca0b3d958fe4f2f939f48c5406e2cf 2023-06-26T18:09:34-04:00 4.13: use rhel9 builder for daemon binary
+1de6d18fceb097d1826ad38bbb0845849a488f36 2023-06-26T15:03:07+00:00 Minor fix to support `protectKernelDefaults` field in Kubelet Config
+c1807b224374cc8e382ac2ea92d9aeb00554d5c4 2023-06-01T23:34:45+00:00 daemon: Remove noisy log message
+# oc image-amd64 05d83eff7e17160e679898a2a5cd6019ec252c49 to e4c9a6aeac8e382ad8a5dd6c2031a694ca0b80eb
+eff56e48834680503831d230ee9b8e6d5d00dd5e 2023-06-21T19:00:35+00:00 handle the error case of node retrieval while waiting for reboot
+0bcbf9a594ad5aaec1d7f3b70315ed7f9b8b84f5 2023-06-16T13:16:06-04:00 update vendor
+0ab82d4252c007b5f84c35282dd24d4075fa80c7 2023-06-16T13:15:49-04:00 cleanup naming
+27fd33f1d1e2644171b42b8e920f45deb1650787 2023-06-16T13:15:49-04:00 wait for node reboot
+ae96b7748be552a9df5b25e8b258dc277a44b7a6 2023-06-16T13:15:49-04:00 better qualify name
+b8d0af2d3cce8ee87b3bce58261d0f0ee3106165 2023-06-16T13:15:49-04:00 add reboot-nodes
+3328a48ad82aeee0372a7a7e96803432b3bb0f2a 2023-06-16T13:15:49-04:00 tweak output format
+4c23f646b3c004373f9d59ebbc5e43b08857cfcb 2023-06-16T13:15:49-04:00 correct the cert matching
+eb6ac50db4a39ca520b02653379d8aa427b9bd32 2023-06-16T13:15:49-04:00 trustpurge: scope the observed NSes to "openshift-" prefixed ones
+94a60d4ad13ae3a36d2e68a2e7ad4a9d64f02d91 2023-06-16T13:15:49-04:00 trustpurge: extend observing the trust changes to all leaf certs
+4b26883c5b808f1c3c6ef6ab36f979658a9c44d3 2023-06-16T13:15:49-04:00 trustpurge: fix docs issues
+c94fc5eb135c93a513b804fa4f88edba195fd23e 2023-06-16T13:15:49-04:00 trustpurge: don't proceed if trustbundle changes affect trust
+23631889e95694d292d98fc23e71bf1f64423746 2023-06-16T13:15:49-04:00 fix directories for constitency
+557e4e767a8a2e7ba9588c2e5c8df4ca96b7c325 2023-06-16T13:15:49-04:00 pernodepod: percent works like this
+3e73f43845098c0143df1615e253824e83358214 2023-06-16T13:15:49-04:00 ocpcertificates: complete MCS CA rotation command
+e31b56daae6a4b0a7ab966bf111667e9504bd76b 2023-06-16T13:15:49-04:00 ocpcertificates: Add regenerate-mco
+c6f32a1a37153d7796631c939e2fbd38ea88abfd 2023-06-16T13:15:49-04:00 ocpcertificates: don't make assumptions on resources not to bring piping from -oname commands
+3d552036721143f147f0a009872c0011e93448b6 2023-06-16T13:15:49-04:00 clusteroperator,ocpcertificates: add command descriptions and examples
+d6dd0bbdf65c827391adb93e91e774d073d5775e 2023-06-16T13:15:49-04:00 waitforstable: fix typo in minimum-stable-period flag
+bd9ef42ba60e55a8c68a824f671135c7a32dc05d 2023-06-16T13:15:49-04:00 ocpcertificates: fix handling resources by names explicitly
+bca786a70ca96339ae58e4e94a817d705acc33b6 2023-06-16T13:15:49-04:00 add new kubelet bootstrap command
+7fcc1a71d73510dd203f9ed2d0eb9463ad0b385b 2023-06-16T13:15:49-04:00 add directives and fix percentage node calculation
+42b88bf2d1e923cb74555ec56c6f373b5cab2703 2023-06-16T13:15:49-04:00 skip unready nodes quickly
+d9d99d41428abfa942997863cd7208bc3aa217b6 2023-06-16T13:15:49-04:00 add the option to add a command when restarting kubelets
+787060e317c1d3ee5d9319e3af8022bf8feaf939 2023-06-16T13:15:49-04:00 trustpurge: use RetryOnConflict for conflict handling
+e7f5b9e85448e50ec46b157469d6c0c6615d6b27 2023-06-16T13:15:49-04:00 add newline between polls to make it easier to read by hu9mans
+7626cdaba4c3b2cce2fc16585004d9dd89d1bc73 2023-06-16T13:15:49-04:00 update output to make the wait easier to see and print all proceeding operators
+a443a97caf93329d513965ce650c999b9267591c 2023-06-16T13:15:49-04:00 ocpcertificates: hardcode resources to use with given commands
+c036aaf55e965ba2c90248a090469b297ff3616f 2023-06-16T13:15:49-04:00 trustpurge: allow excluding ca-bundles
+8810b9ea4d04d37d54c3ebfe5e1f1dcd0823e440 2023-06-16T13:15:49-04:00 trustpurge: move to Update, retry on Update() conflicts
+3357afef4dcc65becc2a30e516429c8c015a0f36 2023-06-16T13:15:49-04:00 ocpcertificates: add the 'remove-old-trust' subcommand
+03af9627a1d3f2a9d671f770a7222ad621f1171e 2023-06-16T13:15:49-04:00 certregen: return error on failed apply to stop from further progressing
+1ace080091d8e6681b5a4727824f653dfeea4d06 2023-06-16T13:15:49-04:00 certregen: add unit tests for leaf cert regen
+9a86471e3e3094d9b5c18dc02ebd2bcd217db2d3 2023-06-16T13:15:49-04:00 certregen: only generate 2048 bit keys to speed up tests
+6d7bce49eeb54352ed4706a368b33629c3063064 2023-06-16T13:15:49-04:00 update wait for stability to  handle short durations
+ccaf1682636e947ca20ddb69db12748eddf21630 2023-06-16T13:15:49-04:00 update for comments
+b999ee20ca600911d3e192b381ca16d17e5bbcab 2023-06-16T13:15:49-04:00 create command to create new adminkubeconfig
+aa99b3c2352691ba68faf6e6be3f9755dbad277d 2023-06-16T13:15:48-04:00 add a command to copy content to every node
+23457de36895d6875c09044c4dddf007bcfa5f40 2023-06-16T13:15:48-04:00 refactor the restart kubelet to extract PerNodePod commands
+9af72525a80a2c6b7e63d089b7ec4cf3429c162a 2023-06-16T13:15:48-04:00 add leaf certs regen, reusing the original logic for toplevel
+d866c5b4d44834a70ebc72d000a7b592b33afc6b 2023-06-16T13:15:48-04:00 remove previous testing proposal
+ff5316030c6503c7c38949d8ea58eb3baf6c8235 2023-06-16T13:15:48-04:00 add kubelet restart
+ea79c9ed4d05de2c2877d5366ccbf7cb52365b1f 2023-06-16T13:15:48-04:00 add command to restart kubelets
+469fa2351fe8b26b7d651e6349cc52258abfe7c9 2023-06-16T13:15:48-04:00 refactor to better match kubectl best practice
+4f6416008b9d7aaf0ee3b2b92d5dbfdee199003a 2023-06-16T13:15:48-04:00 fix linting problems
+ba405cd78838d0fbb56a317a8c2aeeaba5ec5f4f 2023-06-16T13:15:48-04:00 fix node lease namespace
+bea06c65383f46f25e2bcd4392791ad6a8a35e55 2023-06-16T13:15:48-04:00 add detection for updated SA trust bundles
+16195e81d06685dd89c75df8700d2ce8d6db0ffc 2023-06-16T13:15:48-04:00 add revision printing
+e1dbab0fcd35b7fe772a962c645a85816086a08f 2023-06-16T13:15:48-04:00 fix comments on the monitor command
+d7eeeb381d0161f43bd1989e6ca894619a95b753 2023-06-16T13:15:48-04:00 add a command to wait for the cluster to become stable
+8bd8774350c56818239971413c1e01065d687446 2023-06-16T13:15:48-04:00 add command to produce an updated CA bundle for trusting the kube-apiserver
+364342e4999a133562a449fd7829cf87175a8598 2023-06-16T13:15:48-04:00 add certificate monitoring
+b2e505d6a959c185b5342e12af17d67b41608086 2023-06-16T13:15:48-04:00 unit test forceRegenerationOnSecret
+e1e76e847c4d1b0d58d48b29bc3bef06a380ca17 2023-06-16T13:15:48-04:00 add basic testing
+80ae1fe94ae415a3bc075a770f544be5fe0c6ea9 2023-06-16T13:15:48-04:00 rename regenerate-signers to regeneration-top-level
+6554d9b8c98af768b7a28db82d3c1ce1823c3621 2023-06-16T13:15:48-04:00 add a filter to only regenerate those certs that were valid before a particular datetime
+c52610bcfb4fe8c0923d59269356d543a970d438 2023-06-16T13:15:48-04:00 add command to rotate signing certificates
+6c0beafe41e21c3274dc45a17d3372cd6d2f231e 2023-06-16T13:15:48-04:00 copy functions from cluster-debug-tools, they can vendor it back
+# kube-rbac-proxy image-amd64 11b1439d48a47a408ae7e2dd851989f7b7b4f595 to f1205e66bf34421046288bc74aed0d69b8434206
 e489c7afb2c9b23917ea3a52fc0db1d672d9d952 2023-04-26T15:41:17+02:00 go.mod: update golang.org/x/net to v0.7.0
-# ovn-kubernetes image-arm64 3e4ab30789e2a9607630a6c3be6cf624c82adcbc to 9f6376ea994246a3b609038f6fbfe2614032fe3b
+# ovn-kubernetes image-amd64 723ce848a1a3f1a699409d0c2e5ff52114e5be89 to 3d5f185ac07d93ba51b608aa0f39ac91f06e8518
+528654874d921ee5054cd668e551ec5e1700b3bc 2023-07-07T14:59:57-05:00 Dockerfile: build both RHEL8 and RHEL9 shims
+39cf9fc1469755f14fbe4a28d1d4f66e23ce0ff2 2023-07-04T15:00:06+02:00 Dockerfile: bump to ovn 23.03.0-69 (for LB templates) and ovs 3.1.0-32 (upgrade perf)
+539d594263789cf5be84faa2c69049e0ed303ce0 2023-07-04T14:59:03+02:00 services: Don't try to list/cleanup templates when OVN doesn't support that.
+084a90f45ccb5fc0eef1fce94c6d6410fe7aaf89 2023-07-04T14:59:03+02:00 lb_config: Reduce number of required LB backend templates for NodePort.
+932c2f0cd6996d86df59001666c3fdc620c34258 2023-07-04T14:59:03+02:00 services: Use OVN template load balancers for NodePort services.
+230823a42929cddd7247014c9ad1b282877c2442 2023-07-04T14:59:03+02:00 model_client: Properly update map values.
+f0307120d894f07eb60d52992926996906780965 2023-07-04T14:59:03+02:00 fedora: Update OVN to 23.03.0-16.
+1d3053120ff239f955046b06381f0970164bed6c 2023-07-04T14:59:03+02:00 dbs: Bump OVN schema to 23.03.
+9ca55de581b5420c05fae1ee2edffa1b5b05841e 2023-07-04T14:59:03+02:00 Rename OVN_VERSION to OVN_SCHEMA_VERSION.
+5d2b28972be43447df32e6223ec468206981df30 2023-07-04T14:59:03+02:00 lb_config: Merge LB referenced groups when merging LBs.
+371f13cf6b77eab52f2c1b02fd920dc4343068f8 2023-07-04T14:59:03+02:00 node_tracker: Store node IPs as net.IP instead of string.
+bc4f82d4552e8738804dcf0990e4ebfba37aebcd 2023-07-04T14:59:03+02:00 node_tracker: Track node chassis IDs too.
+80dd8cf317902f717c9111857c69c42ad260d49a 2023-07-04T14:59:03+02:00 services_controller_test: Test with LB groups enabled.
+89b457b27c1508cb13bae996d63d5f71a4a0ebfd 2023-07-03T13:08:07+02:00 Fix egressFirewall cleanup on failed Add. Return nil instead of error when egressFirewall is not found on delete.
+c5e0b8e5e20399aa9c4d3ea405ec4b436a928f34 2023-06-23T21:23:23+02:00 Add default deny acl externalID to avoid duplicate acls for namespaces with long names. every namespace has 4 default deny acls: ingress/egress and deny/allow. Direction was in the ExternalIDs before, but action was a suffix in acl name, that gets truncated for long namespace names, therefore deny and allow acls for the same direction would have the same name and ExternalIDs. New ExternalID should fix this case.
+edd859d22835c5692728490c529172cffc91096b 2023-06-16T10:24:16-04:00 Validate port before deleting conntrack flow
 e0d5a1855dfaee14b99b4460f6dbda269e6d2f93 2023-06-15T11:04:17-05:00 Nuke old .rhel9 Dockerfiles
 710a8b52757138bd8a102c2d78ddd374ec88e1dc 2023-05-17T16:47:47+00:00 ovnkube-master pod failed to reconnect to ovn db due to ssl expire
+# kubernetes image-amd64 7d221229dc97969b79a272b63ad97b84d93cddb2 to a7ee68b55354d8c146ef81f82444c0765ea8885f
+8f419074dece78017415ecd4a9fb51d8d3157379 2023-06-22T13:23:58+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+887fbef7851fbbfe25f9ba5dbfd37e0204d5b9c4 2023-06-22T13:23:30+02:00 UPSTREAM: <drop>: manually resolve conflicts
+ce1278ede14b2239de9916f27d480472a11e10dc 2023-06-20T16:57:39+02:00 UPSTREAM: <drop>: bump apiserver-library-go
+11902a838028edef305dfe2f96be929bc4d114d8 2023-06-14T09:49:06+00:00 Release commit for Kubernetes v1.26.6
+b204a2b57f12800767b5c06069d518513363dbce 2023-06-08T00:14:59-06:00 update-vendor: update vendored go.sums
+4bf442eb73b91b7d74f7cc4d238519b99904c9e5 2023-06-07T23:41:30-06:00 [release-1.26] releng/go: Update images, dependencies and version to Go 1.19.10
+36ed0ac6c5203a3f9d6da68869a0d1991a524b96 2023-06-06T21:16:45+00:00 kube-proxy avoid race condition using LocalModeNodeCIDR
+b171ae97e0e37ab70e31df8e3197dc6e7de28998 2023-06-05T13:51:35-07:00 Add ephemeralcontainer to imagepolicy securityaccount admission plugin
+b935de6df5447cbb749fb8d7e6dad0bcb01992a4 2023-05-29T09:37:52+02:00 Add DisruptionTarget condition when preempting for critical pod
+8d5ca2c486bacefbd678860d0002855c9f8b64b6 2023-05-23T00:15:07+08:00 update webhook test to go 1.21
+3ec283ec109d26d86f7c77ce43369a34b72e2123 2023-05-18T12:51:21-04:00 Test APIService safe handling at startup
+4e6a7801d8a28ae149642a087f5225339d6571d0 2023-05-18T12:24:55-04:00 Fix waiting for CRD sync at server start
+0b8b4babcb28ecf318f272b4f89a4ddef6c33c67 2023-05-18T22:43:22+08:00 kubeadm: fix a bug where the static pod changes detection logic is inconsistent with kubelet
+8ee0781227d37d2bd7f34874fc5deea14c371bfb 2023-05-17T14:30:16+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.5
+fd6645fcfd3afddc628271977a0e0bc61a92019f 2023-05-10T13:38:07-07:00 kubeadm: Make etcd member removal idempotent
+9164248629529e596f042ec76875a9c4caf6639d 2023-05-10T13:38:02-07:00 kubeadm: Add etcd client unit tests
+bbd16451e1e1f9116d4c33b2efea67316ddb3d88 2023-05-10T13:38:02-07:00 kubeadm: Use internal etcd client through an interface
+ef5e78fbebad85a230d1b82eb71442f2875cd774 2023-05-04T01:46:55+05:30 run update-vendor.sh
+b73b79d5308dede4ff76d22b105b142f5d0df0cb 2023-05-04T01:32:18+05:30 vclib: Modify x509.UnknownAuthorityError unwrap check
+40797a123dcff16ee32972fd82b5d4119a2aa592 2023-05-04T01:32:18+05:30 vsphere: Adapt to govmomi version bumps
+3ac70147ec3de3752b360a06bcb7d7c418619da2 2023-05-04T01:32:18+05:30 *: Bump version of vmware/govmomi
+# ovn-kubernetes image-arm64 9f6376ea994246a3b609038f6fbfe2614032fe3b to 3d5f185ac07d93ba51b608aa0f39ac91f06e8518
+528654874d921ee5054cd668e551ec5e1700b3bc 2023-07-07T14:59:57-05:00 Dockerfile: build both RHEL8 and RHEL9 shims
+39cf9fc1469755f14fbe4a28d1d4f66e23ce0ff2 2023-07-04T15:00:06+02:00 Dockerfile: bump to ovn 23.03.0-69 (for LB templates) and ovs 3.1.0-32 (upgrade perf)
+539d594263789cf5be84faa2c69049e0ed303ce0 2023-07-04T14:59:03+02:00 services: Don't try to list/cleanup templates when OVN doesn't support that.
+084a90f45ccb5fc0eef1fce94c6d6410fe7aaf89 2023-07-04T14:59:03+02:00 lb_config: Reduce number of required LB backend templates for NodePort.
+932c2f0cd6996d86df59001666c3fdc620c34258 2023-07-04T14:59:03+02:00 services: Use OVN template load balancers for NodePort services.
+230823a42929cddd7247014c9ad1b282877c2442 2023-07-04T14:59:03+02:00 model_client: Properly update map values.
+f0307120d894f07eb60d52992926996906780965 2023-07-04T14:59:03+02:00 fedora: Update OVN to 23.03.0-16.
+1d3053120ff239f955046b06381f0970164bed6c 2023-07-04T14:59:03+02:00 dbs: Bump OVN schema to 23.03.
+9ca55de581b5420c05fae1ee2edffa1b5b05841e 2023-07-04T14:59:03+02:00 Rename OVN_VERSION to OVN_SCHEMA_VERSION.
+5d2b28972be43447df32e6223ec468206981df30 2023-07-04T14:59:03+02:00 lb_config: Merge LB referenced groups when merging LBs.
+371f13cf6b77eab52f2c1b02fd920dc4343068f8 2023-07-04T14:59:03+02:00 node_tracker: Store node IPs as net.IP instead of string.
+bc4f82d4552e8738804dcf0990e4ebfba37aebcd 2023-07-04T14:59:03+02:00 node_tracker: Track node chassis IDs too.
+80dd8cf317902f717c9111857c69c42ad260d49a 2023-07-04T14:59:03+02:00 services_controller_test: Test with LB groups enabled.
+89b457b27c1508cb13bae996d63d5f71a4a0ebfd 2023-07-03T13:08:07+02:00 Fix egressFirewall cleanup on failed Add. Return nil instead of error when egressFirewall is not found on delete.
