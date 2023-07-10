@@ -187,8 +187,7 @@ Next, delete the pod to ensure no data is written to the volume during snapshott
 `oc delete my-pod`
 
 Once the pod has been deleted, it is safe to generate a snapshot.  This is done by creating an instance of a 
-VolumeSnapshot API object. It is also possible to create a snapshot from an existing snapshot by specifying the 
-VolumeSnapshotContent as the source.
+VolumeSnapshot API object.
 
 _Snapshot of a PVC_
 ```shell
