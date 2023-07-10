@@ -305,6 +305,8 @@ clean-cross-build:
 	if [ -d '$(CROSS_BUILD_BINDIR)' ]; then $(RM) -rf '$(CROSS_BUILD_BINDIR)'; fi
 	if [ -d '$(OUTPUT_DIR)/staging' ]; then $(RM) -rf '$(OUTPUT_DIR)/staging'; fi
 	if [ -d '$(OUTPUT_DIR)/venv' ]; then $(RM) -rf '$(OUTPUT_DIR)/venv'; fi
+	if [ -d '$(OUTPUT_DIR)/robotenv' ]; then $(RM) -rf '$(OUTPUT_DIR)/robotenv'; fi
+	if [ -d '$(OUTPUT_DIR)/goenv' ]; then $(RM) -rf '$(OUTPUT_DIR)/goenv'; fi
 	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)'; fi
 	if [ -d '$(ISO_DIR)' ]; then $(RM) -rf '$(ISO_DIR)'; fi
 	if [ -d '$(OUTPUT_DIR)' ]; then rmdir --ignore-fail-on-non-empty '$(OUTPUT_DIR)'; fi
