@@ -122,8 +122,8 @@ For more details on PVC to PVC cloning, see the [OpenShift documentation](https:
 
 > For details on VolumeSnapshot APIs, see [OKD documentation](https://docs.okd.io/latest/storage/container_storage_interface/persistent-storage-csi-snapshots.html).
 
-To avoid data corruption, it is HIGHLY recommended that volume iops are halted while the snapshot is being created.  This
-is done by deleting the pod that the source volume is mounted to.  If the pod is managed via a replication controller
+To avoid data corruption, it is HIGHLY recommended that writes to the volume are halted while the snapshot is being created.  This
+In this example, we delete the pod that the source volume is mounted to.  If the pod is managed via a replication controller
 (deployment, statefulset, etc), scale the replica count to zero instead of deleting the pod directly.  After snapshotting
 is complete, the source PVC can be re-mounted to a new pod.
 
