@@ -111,16 +111,18 @@ func (pr *PreRun) Perform() error {
 
 	if !versionExists {
 		// 5
-		if !healthExists {
-			klog.InfoS("Data dir exists, but health and version files are missing: assuming upgrade from 4.13")
-			return pr.upgradeFrom413()
-		}
+		// Expected 4.13 upgrade flow: data exists, but neither the version nor health files
 
 		// 6
-		// TODO: Check if health data is for previous boot (according to journalctl --list-boots)
-		// This could happen if system rolled back to 4.13, backup was manually restored to attempt upgrade again,
-		// but health file not deleted leaving stale data behind.
-		return fmt.Errorf("TODO: health file exist, but version metadata does not")
+		// Missing version means that version of the data is "4.13" as future
+		// versions doesn't start without creating that file.
+		//
+		// Let's assume that existence of health.json is result of incomplete
+		// manual intervention after system rolled back to 4.13
+		// (i.e. backup was manually restored but health.json not deleted).
+
+		klog.InfoS("Data exists, but version file is missing - assuming upgrade from 4.13")
+		return pr.upgradeFrom413()
 	}
 
 	// 7
