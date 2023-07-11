@@ -175,6 +175,11 @@ launch_vm() {
         echo "${PUBLIC_IP}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
     else
         echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+        # Set the defaults for the various ports so that connections
+        # from the hypervisor to the VM work.
+        echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+        echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
+        echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
     fi
 
     enable_ip_access "${full_vmname}" "${ip}"
