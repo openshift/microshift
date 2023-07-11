@@ -141,7 +141,7 @@ launch_vm() {
          --name "${full_vmname}" \
          --vcpus 2 \
          --memory 4092 \
-         --disk "path=${VM_DISK_DIR}/${full_vmname}.qcow2,size=30" \
+         --disk "pool=${VM_STORAGE_POOL},size=30" \
          --network network=default,model=virtio \
          --events on_reboot=restart \
          --location "${VM_DISK_DIR}/${boot_blueprint}.iso" \
