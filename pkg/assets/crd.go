@@ -36,6 +36,8 @@ var (
 		"crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml",
 		"crd/0000_03_security-openshift_01_scc.crd.yaml",
 		"crd/route.crd.yaml",
+		"crd/storage_version_migration.crd.yaml",
+		"crd/storage_version_state.crd.yaml",
 		"components/lvms/topolvm.io_logicalvolumes.yaml",
 		"components/csi-snapshot-controller/volumesnapshotclasses.yaml",
 		"components/csi-snapshot-controller/volumesnapshotcontents.yaml",

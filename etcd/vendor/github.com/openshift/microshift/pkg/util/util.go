@@ -3,7 +3,10 @@ package util
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -63,4 +66,29 @@ func PathExistsAndIsNotEmpty(path string, ignores ...string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+// StartHealthCheck starts a server for a simple health check endpoint
+// Note: typically servers return a non-nil error, here we return nil
+// if the server was naturally shutdown.
+func StartHealthCheck(path, port string) error {
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
+	livenessMux := http.NewServeMux()
+	livenessMux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "ok")
+	})
+
+	server := http.Server{
+		ReadTimeout: time.Second * 10,
+		Addr:        ":" + port,
+		Handler:     livenessMux,
+	}
+
+	err := server.ListenAndServe()
+	if err != http.ErrServerClosed {
+		return err
+	}
+	return nil
 }
