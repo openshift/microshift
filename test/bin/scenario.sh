@@ -334,9 +334,9 @@ action_run() {
 
 usage() {
     cat - <<EOF
-scenario.sh (create|run|cleanup) scenario-script [args]
+scenario.sh (create|boot|run|cleanup) scenario-script [args]
 
-  create -- Set up the infrastructure for the test, such as VMs.
+  create|boot -- Set up the infrastructure for the test, such as VMs.
 
   run -- Run the scenario.
 
@@ -368,6 +368,9 @@ SCENARIO=$(basename "${SCENARIO_SCRIPT}" .sh)
 case "${action}" in
     create|run|cleanup|login)
         "action_${action}" "$@"
+        ;;
+    boot)
+        action_create "$@"
         ;;
     *)
         error "Unknown instruction ${action}"
