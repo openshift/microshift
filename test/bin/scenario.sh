@@ -334,11 +334,13 @@ action_run() {
 
 usage() {
     cat - <<EOF
-scenario.sh (create|boot|run|cleanup) scenario-script [args]
+scenario.sh (create|boot|run|cleanup|rerun|login) scenario-script [args]
 
   create|boot -- Set up the infrastructure for the test, such as VMs.
 
   run -- Run the scenario.
+
+  rerun -- cleanup, create, run for the same scenario.
 
   cleanup -- Remove the VMs created for the scenario.
 
@@ -371,6 +373,12 @@ case "${action}" in
         ;;
     boot)
         action_create "$@"
+        ;;
+    rerun)
+        action_cleanup "$@"
+        action_create "$@"
+        "${SCRIPTDIR}/manage_vm_connections.sh" local
+        action_run "$@"
         ;;
     *)
         error "Unknown instruction ${action}"
