@@ -23,9 +23,9 @@ SOURCE_GIT_TAG := ${MICROSHIFT_VERSION}
 EMBEDDED_GIT_TAG ?= ${SOURCE_GIT_TAG}
 EMBEDDED_GIT_COMMIT ?= ${SOURCE_GIT_COMMIT}
 EMBEDDED_GIT_TREE_STATE ?= ${SOURCE_GIT_TREE_STATE}
-MAJOR := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._-]' '{print $$1}')
-MINOR := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._-]' '{print $$2}')
-PATCH := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._-]' '{print $$3}')
+MAJOR := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._~-]' '{print $$1}')
+MINOR := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._~-]' '{print $$2}')
+PATCH := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._~-]' '{print $$3}')
 
 SRC_ROOT :=$(shell pwd)
 
@@ -88,6 +88,9 @@ debug:
 	@echo FLAGS:"$(GO_LD_FLAGS)"
 	@echo TAG:"$(SOURCE_GIT_TAG)"
 	@echo SOURCE_GIT_TAG:"$(SOURCE_GIT_TAG)"
+	@echo MAJOR:"$(MAJOR)"
+	@echo MINOR:"$(MINOR)"
+	@echo PATCH:"$(PATCH)"
 
 # These tags make sure we can statically link and avoid shared dependencies
 GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netgo osusergo'
