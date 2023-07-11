@@ -60,7 +60,7 @@ Optional arguments:
   -embed_containers
           Embed the MicroShift container dependencies in the image
   -ostree_server_url URL
-          URL of the ostree server (default: http://127.0.0.1:8085/repo)
+          URL of the ostree server (default: file:///var/lib/ostree-local/repo)
   -build_edge_commit
           Build edge commit archive instead of an ISO image. The
           archive contents can be used for serving ostree updates.
@@ -175,7 +175,7 @@ Run the following commands to create a virtual machine using the installer image
 ```bash
 VMNAME="microshift-edge"
 NETNAME="default"
-sudo -b bash -c " \
+sudo bash -c " \
 cd /var/lib/libvirt/images/ && \
 virt-install \
     --name ${VMNAME} \
@@ -213,28 +213,19 @@ oc get pods -A
 
 **Default Configuration**
 
-The default ISO image is configured to run a Caddy HTTP server for the `ostree`
-updates at the `http://127.0.0.1:8085` URL, serving the contents of the local
-`/var/lib/ostree-server-local` directory containing an empty `ostree` update
-repository.
+The default ISO image is configured to use the local `/var/lib/ostree-local`
+directory as the source for `ostree` updates. This directory contains an empty
+`ostree` update repository.
 
 Log into the MicroShift server using `redhat:redhat` credentials and run the
 following commands to check the local `ostree` server configuration.
 
 ```bash
-$ systemctl is-active ostree-server-local.service
-active
-
-$ sudo journalctl -u ostree-server-local.service --output cat
-Started Caddy HTTP server for the local ostree repository.
-...
-...
-
 $ ostree remote list
 edge
 
 $ ostree remote show-url edge
-http://127.0.0.1:8085/repo
+file:///var/lib/ostree-local/repo
 
 $ ostree remote summary edge
 Repository Mode (ostree.summary.mode): archive-z2
@@ -275,9 +266,9 @@ $ sudo rpm-ostree deploy <YOUR_OSTREE_COMMIT_REV>
 
 **Local Updates**
 
-When the default Caddy HTTP server is configured for the `ostree` updates, users
-can overwrite the contents of the `/var/lib/ostree-server-local` directory and
-install the updates locally.
+When the local `ostree` repository is configured for the `ostree` updates, users
+can overwrite the contents of the `/var/lib/ostree-local` directory and install
+the updates locally.
 
 One of the techniques for generating `ostree` updates is supported by the
 `scripts/image-builder/build.sh` script. When the `-build_edge_commit` command
@@ -299,14 +290,14 @@ The contents of the archive can be used for serving ostree updates:
 > `-embed_containers` arguments to customize the edge commit archive contents.
 
 Copy the produced `microshift-0.0.1-commit.tar` archive to the
-MicroShift server and unpack it at the `/var/lib/ostree-server-local` directory,
+MicroShift server and unpack it at the `/var/lib/ostree-local` directory,
 deleting the previous contents.
 
 Run the following commands to generate the update summary, check the new
 `ostree` commit revision and install the update.
 
 ```bash
-$ sudo ostree summary --repo /var/lib/ostree-server-local/repo --update
+$ sudo ostree summary --repo /var/lib/ostree-local/repo --update
 
 $ ostree remote summary edge
 * rhel/9/x86_64/edge
