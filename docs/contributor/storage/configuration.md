@@ -50,6 +50,13 @@ device-classes:
   - name: hdd
     volume-group: hdd-vg
     spare-gb: 0
+  - name: thin
+    spare-gb: 0
+    thin-pool:
+      name: thin
+      overprovision-ratio: 10
+    type: thin
+    volume-group: ssd
   - name: striped
     volume-group: multi-pv-vg
     spare-gb: 0
@@ -62,7 +69,33 @@ device-classes:
 ```
 Caveats:
 - Specifying lvcreate-options is at your own risk and only provided as an escape hatch by the CSI plugin. 
-- Setting spare-gb to anything other than 0 is not recommended because it does not behave predictably and usually results in more space being allocated that expected.
+- Setting spare-gb to anything other than 0 is not recommended because it does not behave predictably and usually results
+in more space being allocated that expected.
+
+#### LVM Thin Volumes
+
+Advanced storage features such as volume cloning and snapshotting are only supported on thin volumes, and thus require an
+LVM thin-pool on the host and the appropriate LVMS and cluster configuration.  For information on creating a thin-pool,
+see [RHEL documentation](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_logical_volumes/creating-and-managing-thin-provisioned-volumes_configuring-and-managing-logical-volumes).
+
+For LVMS to manage thin LVs, a thin-pool device class must be specified in the lvmd.yaml. Multiple thin-pool device classes 
+are permitted. LVM thin-pools must be attached to a volume group. For example, the following lvmd.yaml specifies a single 
+device class for a thin-pool:
+
+```yaml
+device-classes:
+  - name: thin
+    default: true
+    spare-gb: 0
+    thin-pool:
+      name: thin
+      overprovision-ratio: 10
+    type: thin
+    volume-group: ssd
+```
+
+To enable dynamic provisioning on a thin-pool, a StorageClass must be present on the cluster which specifies the source
+device class via the `topolvm.io/device-class` parameter. See [Storage Class](#storage-class).  
 
 ### Storage Class
 
@@ -96,3 +129,26 @@ allowVolumeExpansion: false [6]
 4. Identifies which provisioner should manage this class.
 5. Whether to provision the volume before a client pod is present or immediately.  Options are `WaitForFirstConsumer` and `Immediate`. `WaitForFirstConsumer` is recommended to ensure storage is only provisioned for schedulable pods.
 6. Specifies whether the storage provide supports volume expansion.  MicroShift's CSI plugin does not support volume expansion, so this field has no effect.
+
+### Volume Snapshot Class
+
+> Supports LVM thin volumes only!
+
+Snapshotting is a CSI storage feature supported by LVMS.  To enable dynamic snapshotting, at least one VolumeSnapshotClass
+must be present on the cluster.
+
+```yaml
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: topolvm-snapclass
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "true" [1]
+driver: topolvm.io [2]
+deletionPolicy: Delete [3]
+```
+
+1. Determines which volumeSnapshotClass to use when none is specified by a VolumeSnapshot instance.
+2. Identifies which snapshot provisioner should manage VolumeSnapshots for this class.
+3. One of `Retain` or `Delete`. Determines whether VolumeSnapshotContent objects and the backing snapshots are deleted or
+kept when a bound VolumeSnapshot is deleted.
