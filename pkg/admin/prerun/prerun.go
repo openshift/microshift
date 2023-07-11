@@ -123,15 +123,20 @@ func (pr *PreRun) Perform() error {
 
 	// 7
 	if !healthExists {
-		// MicroShift might end up here if first run of MicroShift gets interrupted
+		// MicroShift might end up here if FIRST RUN of MicroShift gets interrupted
 		// before green/red script manages to write the health file.
-		// Examples include:
-		// - host reboot
-		// - if e2e test restarts MicroShift (e.g. to reload the config) or reboots the host
-		//   - due to the way microshift-etcd now runs, `restart microshift` causes a restart of both
-		//     microshift-etcd and microshift - if m-etcd restarts before microshift,
-		//     microshift will restart it self as a way to start m-etcd again
-		klog.InfoS("TODO: Version file exists, but health info is missing")
+		//
+		// Example scenarios:
+		// - host rebooted before the end of greenboot's procedure
+		// - test restarting MicroShift (e.g. to reload the config)
+		//
+		// For non-first boots the health file will exist, just contain slightly outdated boot ID
+		// which might result in repeating the action (backup (which should already exist) or restore).
+		//
+		// Continuing start up seems to be the best course of action in this situation;
+		// there is no health.json to steer the logic into backup or restore,
+		// and deleting the files is too invasive.
+		klog.InfoS("Health info is missing - continuing start up")
 		return nil
 	}
 
