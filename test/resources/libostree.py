@@ -152,3 +152,11 @@ def write_greenboot_microshift_wait_timeout(seconds: int) -> None:
 
 def remove_greenboot_microshift_wait_timeout() -> None:
     remote_sudo("rm /etc/greenboot/greenboot.conf")
+
+
+def no_transaction_in_progress() -> None:
+    stdout = remote_sudo("rpm-ostree status --json")
+    status = DataFormats.json_parse(stdout)
+    key = "transaction"
+    transaction_in_progress = key in status and status[key] is not None
+    BuiltIn().should_not_be_true(transaction_in_progress)

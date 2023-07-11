@@ -87,3 +87,13 @@ Mask Grub Boot Success Timer
     ...    return_rc=True
 
     Should Be Equal As Integers    ${rc}    0
+
+Wait For Transaction To End
+    [Documentation]    Wait for any ostree transaction to end.
+    ...    When grub boots previous deployment due to greenboot failure,
+    ...    ostree status is updated by greenboot running `rpm-ostree rollback`,
+    ...    so test must wait until that transaction is over before staging
+    ...    new deployment.
+
+    Wait Until Keyword Succeeds    2m    15s
+    ...    No Transaction In Progress
