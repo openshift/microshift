@@ -171,6 +171,18 @@ func (dm *manager) Restore(name BackupName) error {
 	return nil
 }
 
+func (dm *manager) RemoveData() error {
+	klog.InfoS("Starting MicroShift data removal")
+
+	err := os.RemoveAll(config.DataDir)
+	if err != nil {
+		return fmt.Errorf("failed to remove MicroShift data: %w", err)
+	}
+
+	klog.InfoS("Removed MicroShift data")
+	return nil
+}
+
 func copyPath(src, dest string) error {
 	cmd := exec.Command("cp", append(cpArgs, src, dest)...) //nolint:gosec
 	klog.InfoS("Starting copy", "cmd", cmd)
