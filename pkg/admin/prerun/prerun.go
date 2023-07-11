@@ -210,9 +210,10 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 	// get list of already existing backups for deployment ID persisted in health file
 	// after creating backup, the list will be used to remove older backups
 	// (so only the most recent one for specific deployment is kept)
-	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, health.DeploymentID)
+	allBackupsForDeployment := getBackupsForTheDeployment(existingBackups, health.DeploymentID)
+	healthyBackupsForDeployment := getOnlyHealthyBackups(allBackupsForDeployment)
 
-	if backupAlreadyExists(backupsForDeployment, newBackupName) {
+	if backupAlreadyExists(healthyBackupsForDeployment, newBackupName) {
 		klog.InfoS("Skipping backup: Backup already exists",
 			"deploymentID", health.DeploymentID,
 			"name", newBackupName,
@@ -224,7 +225,9 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 		return fmt.Errorf("failed to create new backup %q: %w", newBackupName, err)
 	}
 
-	pr.removeOldBackups(backupsForDeployment)
+	// if making a new backup, remove all old backups for the deployment
+	// including unhealthy ones
+	pr.removeOldBackups(allBackupsForDeployment)
 
 	klog.InfoS("Finished backup",
 		"deploymentID", health.DeploymentID,
@@ -343,16 +346,26 @@ func getCurrentBootID() (string, error) {
 	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
 }
 
-func getExistingBackupsForTheDeployment(existingBackups []data.BackupName, deployID string) []data.BackupName {
-	existingDeploymentBackups := make([]data.BackupName, 0)
-
-	for _, existingBackup := range existingBackups {
-		if strings.HasPrefix(string(existingBackup), deployID) {
-			existingDeploymentBackups = append(existingDeploymentBackups, existingBackup)
+func filterBackups(backups []data.BackupName, predicate func(data.BackupName) bool) []data.BackupName {
+	out := make([]data.BackupName, 0, len(backups))
+	for _, backup := range backups {
+		if predicate(backup) {
+			out = append(out, backup)
 		}
 	}
+	return out
+}
 
-	return existingDeploymentBackups
+func getOnlyHealthyBackups(backups []data.BackupName) []data.BackupName {
+	return filterBackups(backups, func(bn data.BackupName) bool {
+		return !strings.HasSuffix(string(bn), "unhealthy")
+	})
+}
+
+func getBackupsForTheDeployment(backups []data.BackupName, deployID string) []data.BackupName {
+	return filterBackups(backups, func(bn data.BackupName) bool {
+		return strings.HasPrefix(string(bn), deployID)
+	})
 }
 
 func backupAlreadyExists(existingBackups []data.BackupName, name data.BackupName) bool {
