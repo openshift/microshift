@@ -160,11 +160,6 @@ func (pr *PreRun) regularPrerun() error {
 		return nil
 	}
 
-	// TODO: We may end up needing to split this if statement into
-	// functions, but for now let's just tell the linter not to apply
-	// the rule.
-	//
-	//nolint:nestif
 	if health.IsHealthy() {
 		klog.Info("Previous boot was healthy")
 		if err := pr.backup(health); err != nil {
@@ -175,11 +170,12 @@ func (pr *PreRun) regularPrerun() error {
 			klog.Info("Current and previously booted deployments are different")
 			return pr.handleDeploymentSwitch(currentDeploymentID)
 		}
-	} else {
-		klog.Info("Previous boot was not healthy")
-		if err = pr.restore(); err != nil {
-			return fmt.Errorf("failed to restore during pre-run: %w", err)
-		}
+		return nil
+	}
+
+	klog.Info("Previous boot was not healthy")
+	if err = pr.handleUnhealthy(health); err != nil {
+		return fmt.Errorf("failed to handle unhealthy data during pre-run: %w", err)
 	}
 
 	return nil
@@ -236,9 +232,9 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 	return nil
 }
 
-func (pr *PreRun) restore() error {
+func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 	// TODO: Check if containers are already running (i.e. microshift.service was restarted)?
-	klog.Info("Preparing to restore")
+	klog.Info("Handling previously unhealthy system")
 
 	currentDeploymentID, err := getCurrentDeploymentID()
 	if err != nil {
@@ -253,24 +249,73 @@ func (pr *PreRun) restore() error {
 		"currentDeploymentID", currentDeploymentID,
 		"backups", existingBackups,
 	)
-	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, currentDeploymentID)
+	allBackupsForDeployment := getBackupsForTheDeployment(existingBackups, currentDeploymentID)
+	healthyBackupsForDeployment := getOnlyHealthyBackups(allBackupsForDeployment)
 
-	if len(backupsForDeployment) == 0 {
-		return fmt.Errorf("there is no backup to restore for current deployment %q", currentDeploymentID)
-	}
-
-	if len(backupsForDeployment) > 1 {
+	if len(healthyBackupsForDeployment) > 1 {
 		// could happen during backing up when removing older backups failed
 		klog.InfoS("TODO: more than 1 backup, need to pick most recent one")
 	}
 
-	err = pr.dataManager.Restore(backupsForDeployment[0])
-	if err != nil {
-		return fmt.Errorf("failed to restore backup: %w", err)
+	if len(healthyBackupsForDeployment) > 0 {
+		err = pr.dataManager.Restore(healthyBackupsForDeployment[0])
+		if err != nil {
+			return fmt.Errorf("failed to restore backup: %w", err)
+		}
+		klog.Info("Finished handling unhealthy system")
+		return nil
 	}
 
-	klog.Info("Finished restore")
-	return nil
+	klog.InfoS("There is no backup to restore for current deployment - trying to restore backup for rollback deployment")
+	rollbackDeployID, err := getRollbackDeploymentID()
+	if err != nil {
+		return err
+	}
+
+	if rollbackDeployID == "" {
+		// No backup for current deployment and there is no rollback deployment.
+		// This could be a unhealthy system that was manually rebooted to
+		// remediate the situation - let's not interfere: no backup, no restore, just proceed.
+		klog.InfoS("System has no rollback but health.json suggests system was rebooted - skipping prerun")
+		return nil
+	}
+
+	klog.InfoS("Obtained rollback deployment",
+		"rollback-deployment-id", rollbackDeployID,
+		"current-deployment-id", currentDeploymentID,
+		"health-deployment-id", health.DeploymentID)
+
+	if health.DeploymentID == rollbackDeployID {
+		return fmt.Errorf("deployment ID stored in health.json is the same as rollback's" +
+			" - MicroShift should not be updated from unhealthy system")
+	}
+
+	if health.DeploymentID == currentDeploymentID {
+		backupsForRollback := getBackupsForTheDeployment(existingBackups, rollbackDeployID)
+		if len(backupsForRollback) == 0 {
+			// This could happen if current deployment is unhealthy and rollback didn't run MicroShift
+			klog.InfoS("There is no backup for rollback deployment as well - removing existing data for clean start")
+			return pr.dataManager.RemoveData()
+		}
+
+		// There is no backup for current deployment, but there is a backup for the rollback.
+		// Let's restore it and act like it's first boot of newly staged deployment
+		klog.InfoS("Restoring backup for a rollback deployment to perform migration and try starting again",
+			"backup-name", backupsForRollback[0])
+		if err := pr.dataManager.Restore(backupsForRollback[0]); err != nil {
+			return fmt.Errorf("failed to restore backup: %w", err)
+		}
+		return nil
+	}
+
+	// DeployID in health.json is neither booted nor rollback deployment,
+	// so current deployment was staged over deployment without MicroShift
+	// but MicroShift data exists (created by another deployment that rolled back).
+	klog.InfoS("Deployment in health metadata is neither currently booted nor rollback deployment - backing up, then removing existing data for clean start")
+	if err := pr.backup(health); err != nil {
+		klog.ErrorS(err, "Failed to backup data of unhealthy system - ignoring")
+	}
+	return pr.dataManager.RemoveData()
 }
 
 func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
@@ -281,7 +326,7 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	if err != nil {
 		return fmt.Errorf("failed to determine the existing backups: %w", err)
 	}
-	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, currentDeploymentID)
+	backupsForDeployment := getBackupsForTheDeployment(existingBackups, currentDeploymentID)
 
 	if len(backupsForDeployment) > 0 {
 		klog.Info("Backup exists for current deployment - restoring")
@@ -375,4 +420,48 @@ func backupAlreadyExists(existingBackups []data.BackupName, name data.BackupName
 		}
 	}
 	return false
+}
+
+func getRollbackDeploymentID() (string, error) {
+	cmd := exec.Command("rpm-ostree", "status", "--json")
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("%q failed: %s: %w", cmd, stderr.String(), err)
+	}
+
+	type deploy struct {
+		ID     string `json:"id"`
+		Booted bool   `json:"booted"`
+	}
+	type statusOutput struct {
+		Deployments []deploy `json:"deployments"`
+	}
+
+	var status statusOutput
+	if err := json.Unmarshal(stdout.Bytes(), &status); err != nil {
+		return "", fmt.Errorf("failed to unmarshal %q: %w", cmd, err)
+	}
+
+	if len(status.Deployments) == 0 {
+		return "", fmt.Errorf("unexpected amount (0) of deployments from rpm-ostree status output")
+	}
+
+	if len(status.Deployments) == 1 {
+		return "", nil
+	}
+
+	afterBooted := false
+	for _, d := range status.Deployments {
+		if afterBooted {
+			return d.ID, nil
+		}
+
+		if d.Booted {
+			afterBooted = true
+		}
+	}
+
+	return "", fmt.Errorf("could not find rollback deployment in %v", status)
 }
