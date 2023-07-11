@@ -120,7 +120,7 @@ func (pr *PreRun) Perform() error {
 		// (i.e. backup was manually restored but health.json not deleted).
 
 		klog.InfoS("Data exists, but version file is missing - assuming upgrade from 4.13")
-		return pr.upgradeFrom413()
+		return pr.backup413()
 	}
 
 	// 7
@@ -184,22 +184,6 @@ func (pr *PreRun) regularPrerun() error {
 		if err := pr.backup(health); err != nil {
 			return fmt.Errorf("failed to backup during pre-run: %w", err)
 		}
-
-		migrationNeeded, err := pr.checkVersions()
-		if err != nil {
-			return fmt.Errorf("failed version checks: %w", err)
-		}
-
-		klog.InfoS("Completed version checks", "is-migration-needed?", migrationNeeded)
-
-		if migrationNeeded {
-			_ = migrationNeeded
-			// TODO: data migration
-
-			if err := writeExecVersionToData(); err != nil {
-				return fmt.Errorf("failed to write MicroShift version to data directory: %w", err)
-			}
-		}
 	} else {
 		klog.Info("Previous boot was not healthy")
 		if err = pr.restore(); err != nil {
@@ -210,17 +194,11 @@ func (pr *PreRun) regularPrerun() error {
 	return nil
 }
 
-func (pr *PreRun) upgradeFrom413() error {
+func (pr *PreRun) backup413() error {
 	backupName := data.BackupName("4.13")
 
 	if err := pr.dataManager.Backup(backupName); err != nil {
 		return fmt.Errorf("failed to create new backup %q: %w", backupName, err)
-	}
-
-	// TODO: data migration
-
-	if err := writeExecVersionToData(); err != nil {
-		return fmt.Errorf("failed to write MicroShift version to data directory: %w", err)
 	}
 
 	return nil
@@ -299,27 +277,6 @@ func (pr *PreRun) restore() error {
 
 	klog.Info("Finished restore")
 	return nil
-}
-
-// checkVersions compares version of data and executable
-//
-// It returns true if migration should be performed.
-// It returns non-nil error if difference between versions is unsupported.
-func (pr *PreRun) checkVersions() (bool, error) {
-	klog.Info("Starting version checks")
-	execVer, err := getVersionOfExecutable()
-	if err != nil {
-		return false, fmt.Errorf("failed to determine the active version of the MicroShift: %w", err)
-	}
-
-	dataVer, err := getVersionOfData()
-	if err != nil {
-		return false, fmt.Errorf("failed to determine the version of the existing data: %w", err)
-	}
-
-	klog.InfoS("Comparing versions", "data", dataVer, "active", execVer)
-
-	return checkVersionDiff(execVer, dataVer)
 }
 
 func getCurrentDeploymentID() (string, error) {
