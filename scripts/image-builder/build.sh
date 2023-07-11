@@ -7,7 +7,7 @@ IMGNAME=microshift
 IMAGE_VERSION=undefined
 BUILD_ARCH=$(uname -m)
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-OSTREE_SERVER_URL=http://127.0.0.1:8085/repo
+OSTREE_SERVER_URL=file:///var/lib/ostree-local/repo
 LVM_SYSROOT_SIZE_MIN=10240
 LVM_SYSROOT_SIZE=${LVM_SYSROOT_SIZE_MIN}
 OCP_PULL_SECRET_FILE=
@@ -162,15 +162,6 @@ install_prometheus_rpm() {
         title "Downloading Prometheus exporter(s)"
         wget -q "${url}${file}"
         CUSTOM_RPM_FILES+="$(pwd)/${file},"
-    fi
-}
-
-install_caddy_rpm() {
-    if [ "${OSTREE_SERVER_URL}" = "http://127.0.0.1:8085/repo" ] ; then
-        title "Downloading Caddy package"
-        # The package comes from the EPEL repository
-        sudo dnf download -y -q caddy
-        CUSTOM_RPM_FILES+="$(pwd)/caddy-*.rpm,"
     fi
 }
 
@@ -356,9 +347,6 @@ open_repo_permissions openshift-local
 
 # Install prometheus process exporter
 install_prometheus_rpm
-
-# Install Caddy HTTP server
-install_caddy_rpm
 
 # Copy user-specific RPM packages
 rm -rf custom-rpms 2>/dev/null || true
