@@ -35,12 +35,15 @@ Deploy Commit Expecting A Rollback
     ${initial_deploy_id}=    Get Booted Deployment Id
     ${deploy_id}=    Rebase System    ${ref}
     TestAgent.Write
+    Write Greenboot Microshift Wait Timeout    60
     Reboot MicroShift Host
 
     Log To Console    "Failing ref deployed - waiting for system to roll back"
     Wait Until Keyword Succeeds    20m    15s
     ...    Current Deployment Should Be    ${initial_deploy_id}
-    Log To Console    "System rolled back - deploying target ref"
+
+    Log To Console    "System rolled back"
+    Remove Greenboot Microshift Wait Timeout
 
 Deploy Commit Not Expecting A Rollback
     [Documentation]    Deploys given ref and configures test agent for failing greenboot.
@@ -69,3 +72,18 @@ System Is Running Right Ref And Healthy
     Should Be Equal As Strings    ${expected_deploy}    ${current_deploy}
     Greenboot Health Check Exited
     System Should Be Healthy
+
+Mask Grub Boot Success Timer
+    [Documentation]    Effectively disable a timer that sets boot_success
+    ...    to 1 after two minutes from user login.
+    ...    It impacts tests because grub's script to decrement boot_counter
+    ...    works only if boot_success is 0 (see /etc/grub.d/08_fallback_counting)
+    ...    resulting in more than requested amount of redboot induced reboots
+    ...    and system needing much more time to roll back.
+    ${out}    ${err}    ${rc}=    Execute Command
+    ...    systemctl --user mask grub-boot-success.timer
+    ...    return_stdout=True
+    ...    return_stderr=True
+    ...    return_rc=True
+
+    Should Be Equal As Integers    ${rc}    0

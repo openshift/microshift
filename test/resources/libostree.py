@@ -142,3 +142,13 @@ def cleanup_rpm_ostree() -> None:
 
 def create_agent_config(cfg: str) -> None:
     remote_sudo(f"echo '{cfg}' | sudo tee /var/lib/microshift-test-agent.json")
+
+
+def write_greenboot_microshift_wait_timeout(seconds: int) -> None:
+    remote_sudo(
+        f"echo 'MICROSHIFT_WAIT_TIMEOUT_SEC={seconds}' | sudo tee /etc/greenboot/greenboot.conf"
+    )
+
+
+def remove_greenboot_microshift_wait_timeout() -> None:
+    remote_sudo("rm /etc/greenboot/greenboot.conf")
