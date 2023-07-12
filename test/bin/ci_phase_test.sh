@@ -17,7 +17,7 @@ for scenario in ./scenarios/*.sh; do
     scenario_name="$(basename "${scenario}" .sh)"
     logfile="${SCENARIO_INFO_DIR}/${scenario_name}/run.log"
     mkdir -p "$(dirname "${logfile}")"
-    bash -x ./bin/scenario.sh run "${scenario}" >"${logfile}" 2>&1 &
+    SSH_PRIVATE_KEY="${HOME}/.ssh/id_rsa" bash -x ./bin/scenario.sh run "${scenario}" >"${logfile}" 2>&1 &
 done
 
 FAIL=0
