@@ -16,7 +16,6 @@ part /boot --fstype=xfs --asprimary --size=800
 part pv.01 --grow
 volgroup rhel pv.01
 logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
-logvol none --thinpool --vgname=rhel --fstype="None" --size=100 --name=thin
 
 # Configure users
 rootpw --lock
