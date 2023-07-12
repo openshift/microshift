@@ -1,6 +1,7 @@
 package util
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -69,9 +70,11 @@ func PathExistsAndIsNotEmpty(path string, ignores ...string) (bool, error) {
 }
 
 // StartHealthCheck starts a server for a simple health check endpoint
+// Returns a start and shutdown handler.
+//
 // Note: typically servers return a non-nil error, here we return nil
 // if the server was naturally shutdown.
-func StartHealthCheck(path, port string) error {
+func HealthCheckServer(ctx context.Context, path, port string) (start func() error, shutdown func() error) {
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
@@ -86,9 +89,23 @@ func StartHealthCheck(path, port string) error {
 		Handler:     livenessMux,
 	}
 
-	err := server.ListenAndServe()
-	if err != http.ErrServerClosed {
-		return err
+	start = func() error {
+		err := server.ListenAndServe()
+		if err != http.ErrServerClosed {
+			return err
+		}
+		return nil
 	}
-	return nil
+
+	shutdown = func() error {
+		ctx, cancel := context.WithTimeout(ctx, time.Millisecond*10)
+		defer cancel()
+		err := server.Shutdown(ctx)
+		if err != http.ErrServerClosed {
+			return err
+		}
+		return nil
+	}
+
+	return start, shutdown
 }
