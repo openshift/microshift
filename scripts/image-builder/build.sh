@@ -296,14 +296,15 @@ fi
 # Set the cleanup and elapsed time traps only if command line parsing was successful
 trap '${SCRIPTDIR}/cleanup.sh; echo "Execution time: $(( ($(date +%s) - STARTTIME) / 60 )) minutes"' EXIT
 
-title "Downloading local OpenShift and MicroShift repositories"
+title "Setting up local MicroShift repository"
 # Copy MicroShift RPM packages
 rm -rf microshift-local 2>/dev/null || true
 if [[ "${MICROSHIFT_RPM_SOURCE}" == http* ]] ; then
     wget -q -nd -r -L -P microshift-local -A rpm "${MICROSHIFT_RPM_SOURCE}"
 else
     [ ! -d "${MICROSHIFT_RPM_SOURCE}" ] && echo "MicroShift RPM path '${MICROSHIFT_RPM_SOURCE}' does not exist" && exit 1
-    cp -TR "${MICROSHIFT_RPM_SOURCE}" microshift-local
+    cp -TR "${MICROSHIFT_RPM_SOURCE}/RPMS" microshift-local
+    cp -TR "${MICROSHIFT_RPM_SOURCE}/SRPMS" microshift-local
 fi
 
 # Exit if no RPM packages were found
@@ -313,6 +314,11 @@ if [ "$(find microshift-local -name '*.rpm' | wc -l)" -eq 0 ] ; then
 fi
 createrepo microshift-local >/dev/null
 open_repo_permissions microshift-local
+
+# Determine the version of microshift we have, for use in blueprint templates later.
+MICROSHIFT_RELEASE_RPM=$(find "${MICROSHIFT_RPM_SOURCE}" -name 'microshift-release-info*.rpm' | tail -n 1)
+MICROSHIFT_VERSION=$(rpm -q --queryformat '%{version}' "${MICROSHIFT_RELEASE_RPM}")
+export MICROSHIFT_VERSION
 
 # Determine the image version from the RPM contents
 RELEASE_INFO_FILE=$(find . -name 'microshift-release-info-*.rpm' | tail -1)
@@ -326,24 +332,6 @@ if [ -z "${IMAGE_VERSION}" ] ; then
     echo "Cannot determine image version from microshift-release-info RPM package at '${MICROSHIFT_RPM_SOURCE}'. Exiting..."
     exit 1
 fi
-
-# Download openshift local RPM packages (noarch for python and selinux packages)
-rm -rf openshift-local 2>/dev/null || true
-
-OCP_REPO_NAME="rhocp-4.13-for-rhel-${OSVERSION}-$(uname -m)-rpms"
-reposync -n -a "${BUILD_ARCH}" -a noarch --download-path openshift-local \
-    --repo="${OCP_REPO_NAME}" \
-    --repo="fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms" >/dev/null
-
-# Remove 'microshift' packages to avoid overrides from the remote repository
-find openshift-local -name \*microshift\* -exec rm -f {} \;
-# Exit if no RPM packages were found
-if [ "$(find openshift-local -name '*.rpm' | wc -l)" -eq 0 ] ; then
-    echo "No RPM packages were found at the '${OCP_REPO_NAME}' repository. Exiting..."
-    exit 1
-fi
-createrepo openshift-local >/dev/null
-open_repo_permissions openshift-local
 
 # Install prometheus process exporter
 install_prometheus_rpm
@@ -360,16 +348,21 @@ if [ -n "${CUSTOM_RPM_FILES}" ] ; then
     open_repo_permissions custom-rpms
 fi
 
-title "Loading sources for OpenShift and MicroShift"
-for f in openshift-local microshift-local custom-rpms ; do
-    [ ! -d ${f} ] && continue
-    sed "s;REPLACE_IMAGE_BUILDER_DIR;${BUILDDIR};g" "${SCRIPTDIR}/config/${f}.toml.template" > ${f}.toml
+title "Loading package sources"
+for f in microshift-local custom-rpms rhocp-4.13 fast-datapath; do
+    sed -e "s;REPLACE_IMAGE_BUILDER_DIR;${BUILDDIR};g" \
+        -e "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
+        "${SCRIPTDIR}/config/${f}.toml.template" \
+        > ${f}.toml
     sudo composer-cli sources delete ${f} 2>/dev/null || true
     sudo composer-cli sources add "${BUILDDIR}/${f}.toml"
 done
 
 title "Preparing blueprints"
-cp -f "${SCRIPTDIR}"/config/{blueprint_v0.0.1.toml,installer.toml} .
+cp -f "${SCRIPTDIR}"/config/installer.toml .
+sed -e "s;REPLACE_MICROSHIFT_VERSION;${MICROSHIFT_VERSION};g" \
+    "${SCRIPTDIR}"/config/blueprint_v0.0.1.toml \
+    >blueprint_v0.0.1.toml
 if [ -n "${CUSTOM_RPM_FILES}" ] ; then
     for rpm in ${CUSTOM_RPM_FILES//,/ } ; do
         rpm_name=$(rpm -qp "${rpm}" --queryformat "%{NAME}")

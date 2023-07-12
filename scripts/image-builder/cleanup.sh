@@ -65,3 +65,4 @@ sudo systemctl stop --now osbuild-composer.socket osbuild-composer.service osbui
 sleep 5
 sudo rm -rf /var/cache/osbuild-worker/* /var/lib/osbuild-composer/*
 sudo systemctl start osbuild-composer.socket
+sudo systemctl start "osbuild-worker@1.service"
