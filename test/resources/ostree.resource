@@ -3,86 +3,69 @@ Documentation       Keywords for OSTree-based systems
 
 Resource            systemd.resource
 Resource            microshift-process.resource
+Resource            ostree-data.resource
+Resource            ostree-health.resource
 Library             libostree.py
-
-
-*** Variables ***
-${DATA_DIR}             "/var/lib/microshift"
-${BACKUP_STORAGE}       "/var/lib/microshift-backups"
+Library             ../resources/TestAgent.py
 
 
 *** Keywords ***
-Wait Until Greenboot Health Check Exited
-    [Documentation]    Wait until greenboot healthchecks are done
+Make New SSH Connection
+    [Documentation]    Closes all SSH connections and makes a new one.
+    # Staging deployments potentially introduces multiple reboots
+    # which could break existing SSH connection
 
-    Wait Until Keyword Succeeds    10m    15s
-    ...    Greenboot Health Check Exited
+    SSHLibrary.Close All Connections
+    Login MicroShift Host
 
-Greenboot Health Check Exited
-    [Documentation]    Checks if greenboot-healthcheck finished running successfully (exited)
+Current Deployment Should Be
+    [Documentation]    Checks if currently booted deployment is as expected
+    [Arguments]    ${expected_deploy}
 
-    ${value}=    Get Systemd Setting    greenboot-healthcheck.service    SubState
-    Should Be Equal As Strings    ${value}    exited
+    Make New SSH Connection
 
-Get Future Backup Name For Current Boot
-    [Documentation]    Provides a name for future backup:
-    ...    "4.13" for MicroShift 4.13, otherwise deployment ID + boot ID
+    ${current_deploy}=    libostree.Get Booted Deployment Id
+    Should Be Equal As Strings    ${expected_deploy}    ${current_deploy}
 
-    # When system is upgrading from 4.13, there is no metadata regarding previous boot,
-    # therefore, when naming backup for existing data, "4.13" will be used as deployment ID,
-    # i.e. it should reside in `/var/lib/microshift-backups/4.13`
-    ${version}=    MicroShift Version
-    IF    ${version.minor} == 13    RETURN    4.13
-
-    ${deploy_id}=    Get Booted Deployment ID
-    ${boot_id}=    Get Current Boot Id
-    ${backup_name}=    Catenate    SEPARATOR=_    ${deploy_id}    ${boot_id}
-    RETURN    ${backup_name}
-
-Backup Should Exist
-    [Documentation]    Checks if backup identified by deployment ID
-    ...    and (optionally) boot ID exists
-    [Arguments]    ${deployment_id}    ${boot_id}=${EMPTY}
-    ${exists}=    Does Backup Exist    ${deployment_id}    ${boot_id}
-    Should Be True    ${exists}
-
-Remove Existing Backup For Current Deployment
-    [Documentation]    Remove any existing backup for currently running deployment
-    ${deploy_id}=    Get Booted Deployment Id
-    Remove Backups For Deployment    ${deploy_id}
-
-Rebase System And Verify
-    [Documentation]    Deploys given ostree ref on the host, reboots it,
-    ...    and checks if the host is healthy.
+Deploy Commit Expecting A Rollback
+    [Documentation]    Deploys given ref and configures test agent for failing greenboot.
+    ...    It expects the system to roll back.
     [Arguments]    ${ref}
 
-    Rebase System    ${ref}
+    ${initial_deploy_id}=    Get Booted Deployment Id
+    ${deploy_id}=    Rebase System    ${ref}
+    TestAgent.Write
     Reboot MicroShift Host
 
-    Wait Until Greenboot Health Check Exited
-    System Should Be Healthy
+    Log To Console    "Failing ref deployed - waiting for system to roll back"
+    Wait Until Keyword Succeeds    20m    15s
+    ...    Current Deployment Should Be    ${initial_deploy_id}
+    Log To Console    "System rolled back - deploying target ref"
 
-    ${ref_after_reboot}=    Get Current Ref
-    Should Be Equal As Strings    ${ref_after_reboot}    ${ref}
+Deploy Commit Not Expecting A Rollback
+    [Documentation]    Deploys given ref and configures test agent for failing greenboot.
+    ...    It expects the system to roll back.
+    [Arguments]    ${target_ref}
 
-System Should Be Healthy
-    [Documentation]    Verifies if system is healthy by looking at health.json.
-    ...    If this runs after greenboot-healthcheck finishes, it verifies
-    ...    health of current boot.
+    ${initial_deploy_id}=    Get Booted Deployment Id
+    ${deploy_id}=    Rebase System    ${target_ref}
+    Reboot MicroShift Host
 
-    # Health of system with MicroShift 4.13 is implicitly checked by "Greenboot Health Check Exited"
-    ${version}=    MicroShift Version
-    IF    ${version.minor} == 13    RETURN
+    Log To Console    "Target ref deployed - starting health checking"
+    Wait Until Keyword Succeeds    10m    15s
+    ...    System Is Running Right Ref And Healthy    ${deploy_id}    ${initial_deploy_id}
 
-    ${health}=    Get Persisted System Health
-    Should Be Equal As Strings    ${health}    healthy
+System Is Running Right Ref And Healthy
+    [Documentation]    Checks if system is running right reference and is healthy
+    [Arguments]    ${expected_deploy}    ${initial_deploy}
 
-MicroShift 413 Should Not Have Upgrade Artifacts
-    [Documentation]    Verifies that host running MicroShift 4.13
-    ...    does not have upgrade related artifacts.
+    Make New SSH Connection
 
-    ${version}=    MicroShift Version
-    IF    ${version.minor} == 13
-        Path Should Not Exist    ${BACKUP_STORAGE}
-        Path Should Not Exist    /var/lib/microshift/version
+    ${current_deploy}=    libostree.Get Booted Deployment Id
+    IF    "${current_deploy}" == "${initial_deploy}"
+        Fatal Error    "System rolled back to initial deployment"
     END
+
+    Should Be Equal As Strings    ${expected_deploy}    ${current_deploy}
+    Greenboot Health Check Exited
+    System Should Be Healthy
