@@ -83,10 +83,10 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.etcdCfg.QuotaBackendBytes = cfg.Etcd.QuotaBackendBytes
 	url2380 := setURL([]string{"localhost"}, "2380")
 	url2379 := setURL([]string{"localhost"}, "2379")
-	s.etcdCfg.APUrls = url2380
-	s.etcdCfg.LPUrls = url2380
-	s.etcdCfg.ACUrls = url2379
-	s.etcdCfg.LCUrls = url2379
+	s.etcdCfg.AdvertisePeerUrls = url2380
+	s.etcdCfg.ListenPeerUrls = url2380
+	s.etcdCfg.AdvertiseClientUrls = url2379
+	s.etcdCfg.ListenClientUrls = url2379
 	s.etcdCfg.ListenMetricsUrls = setURL([]string{"localhost"}, "2381")
 
 	s.etcdCfg.Name = cfg.Node.HostnameOverride
