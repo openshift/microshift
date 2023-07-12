@@ -17,10 +17,6 @@ echo "Logging to ${LOGFILE}"
 # Set fd 1 and 2 to write to the log file
 exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${LOGFILE}"))
 
-API_EXTERNAL_BASE_PORT="${1}"
-SSH_EXTERNAL_BASE_PORT="${2}"
-LB_EXTERNAL_BASE_PORT="${3}"
-
 cd ~/microshift/test
 
 # Start the web server to host the kickstart files and ostree commit
@@ -46,9 +42,6 @@ if [ ${FAIL} -ne 0 ]; then
     echo "Failed to boot all VMs"
     exit 1
 fi
-
-# Set up port forwarding
-bash -x ./bin/manage_vm_connections.sh remote -a "${API_EXTERNAL_BASE_PORT}" -s "${SSH_EXTERNAL_BASE_PORT}" -l "${LB_EXTERNAL_BASE_PORT}"
 
 # Kill the web server
 pkill caddy || true
