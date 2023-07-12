@@ -26,7 +26,6 @@ action_create() {
 virsh pool-define-as '"${VM_STORAGE_POOL}"' dir --target '"${VM_DISK_DIR}"'
 virsh pool-build '"${VM_STORAGE_POOL}"'
 virsh pool-start '"${VM_STORAGE_POOL}"'
-virsh pool-autostart '"${VM_STORAGE_POOL}"'
 '
 }
 
