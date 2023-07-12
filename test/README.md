@@ -196,6 +196,20 @@ providing password-less access to the VMs.
 providing password-less access to the VMs. Set to an empty string to
 use ssh-agent.
 
+### Preparing storage pool for VMs
+
+Use `./bin/manage_vm_storage_pool.sh` to create the necessary storage
+pool for VMs.
+
+```
+$ ./bin/manage_vm_storage_pool.sh create
+```
+
+To cleanup after execution and teardown of VMs use `cleanup`.
+```
+$ ./bin/manage_vm_storage_pool.sh cleanup
+```
+
 ### Creating test infrastructure
 
 Use `./bin/start_webserver.sh` to run a caddy web server to serve the
