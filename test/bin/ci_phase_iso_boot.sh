@@ -23,11 +23,8 @@ cd ~/microshift/test
 # repository.
 bash -x ./bin/start_webserver.sh
 
-# set up the storage pool for VMs
-sudo virsh pool-define-as "${VM_STORAGE_POOL}" dir - - - - "${VM_DISK_DIR}"
-sudo virsh pool-build "${VM_STORAGE_POOL}"
-sudo virsh pool-start "${VM_STORAGE_POOL}"
-sudo virsh pool-autostart "${VM_STORAGE_POOL}"
+# Set up the storage pool for VMs
+bash -x ./bin/manage_vm_storage_pool.sh create
 
 # Build all of the needed VMs
 for scenario in scenarios/*.sh; do
