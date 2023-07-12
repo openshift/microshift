@@ -3,8 +3,8 @@ set -e
 
 SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
-PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage)
-PODS_CT_LIST=(2                        1                    1                 2             2)
+PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system)
+PODS_CT_LIST=(2                        1                    1                 2             2                 2)
 
 # Source the MicroShift health check functions library
 # shellcheck source=packaging/greenboot/functions.sh
