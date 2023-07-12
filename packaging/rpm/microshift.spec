@@ -87,7 +87,7 @@ The microshift-selinux package provides the SELinux policy modules required by M
 
 %package networking
 Summary: Networking components for MicroShift
-Requires: openvswitch3.1 <= 3.1.0-14.el9fdp
+Requires: openvswitch3.1
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
@@ -209,6 +209,11 @@ install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_s
 install -d -m755 %{buildroot}%{_datadir}/microshift/functions
 install -p -m644 packaging/greenboot/functions.sh %{buildroot}%{_datadir}/microshift/functions/greenboot.sh
 
+%pre networking
+
+getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
+usermod -a -G hugetlbfs openvswitch
+
 %post
 
 %systemd_post microshift.service
@@ -294,7 +299,10 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
-* Mon May 01 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
+* Fri Jul 21 2023 Zenghui Shi <zshi@redhat.com> 4.13.0
+- Add openvswitch user to hugetlbfs group
+
+* Mon May 15 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
 - Remove version specifier for container-selinux to let the system
   make the best choice.
 
