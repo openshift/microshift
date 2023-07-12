@@ -3,7 +3,6 @@ package prerun
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -14,25 +13,6 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
-
-var (
-	healthFilepath            = "/var/lib/microshift-backups/health.json"
-	errHealthFileDoesNotExist = errors.New("health file does not exist")
-)
-
-type HealthInfo struct {
-	Health       string `json:"health"`
-	DeploymentID string `json:"deployment_id"`
-	BootID       string `json:"boot_id"`
-}
-
-func (hi *HealthInfo) BackupName() data.BackupName {
-	return data.BackupName(fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID))
-}
-
-func (hi *HealthInfo) IsHealthy() bool {
-	return hi.Health == "healthy"
-}
 
 type PreRun struct {
 	dataManager data.Manager
@@ -120,7 +100,7 @@ func (pr *PreRun) Perform() error {
 		// (i.e. backup was manually restored but health.json not deleted).
 
 		klog.InfoS("Data exists, but version file is missing - assuming upgrade from 4.13")
-		return pr.upgradeFrom413()
+		return pr.backup413()
 	}
 
 	// 7
@@ -184,22 +164,6 @@ func (pr *PreRun) regularPrerun() error {
 		if err := pr.backup(health); err != nil {
 			return fmt.Errorf("failed to backup during pre-run: %w", err)
 		}
-
-		migrationNeeded, err := pr.checkVersions()
-		if err != nil {
-			return fmt.Errorf("failed version checks: %w", err)
-		}
-
-		klog.InfoS("Completed version checks", "is-migration-needed?", migrationNeeded)
-
-		if migrationNeeded {
-			_ = migrationNeeded
-			// TODO: data migration
-
-			if err := writeExecVersionToData(); err != nil {
-				return fmt.Errorf("failed to write MicroShift version to data directory: %w", err)
-			}
-		}
 	} else {
 		klog.Info("Previous boot was not healthy")
 		if err = pr.restore(); err != nil {
@@ -210,17 +174,11 @@ func (pr *PreRun) regularPrerun() error {
 	return nil
 }
 
-func (pr *PreRun) upgradeFrom413() error {
+func (pr *PreRun) backup413() error {
 	backupName := data.BackupName("4.13")
 
 	if err := pr.dataManager.Backup(backupName); err != nil {
 		return fmt.Errorf("failed to create new backup %q: %w", backupName, err)
-	}
-
-	// TODO: data migration
-
-	if err := writeExecVersionToData(); err != nil {
-		return fmt.Errorf("failed to write MicroShift version to data directory: %w", err)
 	}
 
 	return nil
@@ -301,27 +259,6 @@ func (pr *PreRun) restore() error {
 	return nil
 }
 
-// checkVersions compares version of data and executable
-//
-// It returns true if migration should be performed.
-// It returns non-nil error if difference between versions is unsupported.
-func (pr *PreRun) checkVersions() (bool, error) {
-	klog.Info("Starting version checks")
-	execVer, err := getVersionOfExecutable()
-	if err != nil {
-		return false, fmt.Errorf("failed to determine the active version of the MicroShift: %w", err)
-	}
-
-	dataVer, err := getVersionOfData()
-	if err != nil {
-		return false, fmt.Errorf("failed to determine the version of the existing data: %w", err)
-	}
-
-	klog.InfoS("Comparing versions", "data", dataVer, "active", execVer)
-
-	return checkVersionDiff(execVer, dataVer)
-}
-
 func getCurrentDeploymentID() (string, error) {
 	cmd := exec.Command("rpm-ostree", "status", "--jsonpath=$.deployments[0].id", "--booted")
 	var stdout, stderr bytes.Buffer
@@ -367,25 +304,6 @@ func getCurrentBootID() (string, error) {
 		return "", fmt.Errorf("failed to determine boot ID from %q: %w", path, err)
 	}
 	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
-}
-
-func getHealthInfo() (*HealthInfo, error) {
-	if exists, err := util.PathExistsAndIsNotEmpty(healthFilepath); err != nil {
-		return nil, err
-	} else if !exists {
-		return nil, errHealthFileDoesNotExist
-	}
-
-	content, err := os.ReadFile(healthFilepath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read health data from %q: %w", healthFilepath, err)
-	}
-
-	health := &HealthInfo{}
-	if err := json.Unmarshal(content, &health); err != nil {
-		return nil, fmt.Errorf("failed to parse health data %q: %w", strings.TrimSpace(string(content)), err)
-	}
-	return health, nil
 }
 
 func getExistingBackupsForTheDeployment(existingBackups []data.BackupName, deployID string) []data.BackupName {

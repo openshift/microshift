@@ -10,21 +10,21 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func IsUpgradeBlocked(execVersion versionMetadata, dataVersion versionMetadata) (bool, error) {
+func isUpgradeBlocked(execVersion versionMetadata, dataVersion versionMetadata) error {
 	buf, err := getBlockedUpgradesAsset()
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			return false, nil
+			return nil
 		}
-		return false, fmt.Errorf("failed to load embedded blocked upgrades asset: %w", err)
+		return fmt.Errorf("failed to load embedded blocked upgrades asset: %w", err)
 	}
 
 	m, err := unmarshalBlockedUpgrades(buf)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	return isBlocked(m, execVersion.String(), dataVersion.String()), nil
+	return isBlocked(m, execVersion.String(), dataVersion.String())
 }
 
 func getBlockedUpgradesAsset() ([]byte, error) {
@@ -40,20 +40,21 @@ func unmarshalBlockedUpgrades(data []byte) (map[string][]string, error) {
 	return blockedEdges, nil
 }
 
-func isBlocked(blockedUpgrades map[string][]string, execVersion, dataVersion string) bool {
-	klog.InfoS("Checking if upgrade is allowed", "existing-data-version", dataVersion, "new-binary-version", execVersion, "blocked-upgrades", blockedUpgrades)
+func isBlocked(blockedUpgrades map[string][]string, execVersion, dataVersion string) error {
+	klog.InfoS("Checking if upgrade is allowed",
+		"existing-data-version", dataVersion,
+		"new-binary-version", execVersion,
+		"blocked-upgrades", blockedUpgrades)
 
 	for targetVersion, fromVersions := range blockedUpgrades {
 		if targetVersion == execVersion {
 			for _, from := range fromVersions {
 				if from == dataVersion {
-					klog.ErrorS(nil, "Detected an attempt of unsupported upgrade", "existing-data-version", dataVersion, "new-binary-version", execVersion)
-					return true
+					return fmt.Errorf("upgrade from %q to %q is blocked", dataVersion, execVersion)
 				}
 			}
 		}
 	}
 
-	klog.InfoS("Upgrade is allowed", "existing-data-version", dataVersion, "new-binary-version", execVersion)
-	return false
+	return nil
 }

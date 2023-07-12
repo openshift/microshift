@@ -119,7 +119,7 @@ func RunMicroshift(cfg *config.Config) error {
 		return fmt.Errorf("failed to create dir %q: %w", config.DataDir, err)
 	}
 
-	if err := prerun.CreateOrValidateDataVersion(); err != nil {
+	if err := prerun.CheckAndUpdateDataVersion(); err != nil {
 		return err
 	}
 

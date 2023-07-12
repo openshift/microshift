@@ -20,44 +20,34 @@ var (
 	errDataVersionDoesNotExist = errors.New("version file for MicroShift data does not exist")
 )
 
-// CreateOrValidateDataVersion creates or compares data version against executable's version
-//
-// Function is intended to be invoked by main MicroShift run procedure, just before starting,
-// to ensure that storage migration (which should update the version file) was performed.
-func CreateOrValidateDataVersion() error {
+// CheckAndUpdateDataVersion checks version skew between data and executable,
+// and updates data version
+func CheckAndUpdateDataVersion() error {
+	execVer, err := getVersionOfExecutable()
+	if err != nil {
+		return fmt.Errorf("failed to get version of MicroShift executable: %w", err)
+	}
+
 	dataVer, err := getVersionOfData()
 	if err != nil {
-		if errors.Is(err, errDataVersionDoesNotExist) {
-			// First run of MicroShift, create version file shortly after creating DataDir
-			return writeExecVersionToData()
+		if !errors.Is(err, errDataVersionDoesNotExist) {
+			return fmt.Errorf("failed to get version of existing MicroShift data: %w", err)
 		}
-		return err
+		klog.InfoS("Version file does not exist yet")
+	} else {
+		if err := checkVersionCompatibility(execVer, dataVer); err != nil {
+			return fmt.Errorf("checking version skew failed: %w", err)
+		}
+
+		if err := isUpgradeBlocked(execVer, dataVer); err != nil {
+			return err
+		}
 	}
 
-	execVer, err := getVersionOfExecutable()
-	if err != nil {
-		return err
-	}
-	klog.InfoS("Comparing versions of MicroShift data on disk and executable", "data", dataVer, "exec", execVer)
-
-	if execVer != dataVer {
-		return fmt.Errorf("data version (%s) does not match binary version (%s) - missing migration?", dataVer, execVer)
+	if err := writeDataVersion(execVer); err != nil {
+		return fmt.Errorf("failed to update data version: %w", err)
 	}
 
-	return nil
-}
-
-func writeExecVersionToData() error {
-	execVer, err := getVersionOfExecutable()
-	if err != nil {
-		return err
-	}
-	version := execVer.String()
-	klog.InfoS("Writing MicroShift version to the file in data directory", "version", version)
-
-	if err := os.WriteFile(versionFilePath, []byte(version), 0600); err != nil {
-		return fmt.Errorf("writing '%s' to %s failed: %w", version, versionFilePath, err)
-	}
 	return nil
 }
 
@@ -118,28 +108,37 @@ func getVersionOfData() (versionMetadata, error) {
 	return versionMetadataFromString(string(versionFileContents))
 }
 
-// checkVersionDiff compares versions of executable and existing data for purposes of data migration.
-// It returns true if the migration should be performed.
-func checkVersionDiff(execVer, dataVer versionMetadata) (bool, error) {
+// checkVersionCompatibility compares versions of executable and existing data for purposes of data migration.
+func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
 	if execVer == dataVer {
-		return false, nil
+		return nil
 	}
 
 	if execVer.Major != dataVer.Major {
-		return false, fmt.Errorf("major versions are different: %d and %d", dataVer.Major, execVer.Major)
+		return fmt.Errorf("major versions are different: %d and %d", dataVer.Major, execVer.Major)
 	}
 
 	if execVer.Minor < dataVer.Minor {
-		return false, fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
+		return fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
 	}
 
 	if execVer.Minor > dataVer.Minor {
 		if execVer.Minor-1 == dataVer.Minor {
-			return true, nil
+			return nil
 		} else {
-			return false, fmt.Errorf("executable (%s) is too recent compared to existing data (%s): maximum minor version difference is 1", execVer.String(), dataVer.String())
+			return fmt.Errorf("executable (%s) is too recent compared to existing data (%s): maximum minor version difference is 1", execVer.String(), dataVer.String())
 		}
 	}
 
-	return IsUpgradeBlocked(execVer, dataVer)
+	return nil
+}
+
+func writeDataVersion(v versionMetadata) error {
+	s := v.String()
+	klog.InfoS("Writing MicroShift version to the file in data directory", "version", s)
+
+	if err := os.WriteFile(versionFilePath, []byte(s), 0600); err != nil {
+		return fmt.Errorf("writing %q to %q failed: %w", s, versionFilePath, err)
+	}
+	return nil
 }

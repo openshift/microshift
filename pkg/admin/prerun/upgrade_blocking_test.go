@@ -35,43 +35,47 @@ func Test_IsBlocked(t *testing.T) {
 	}
 
 	testData := []struct {
-		dataVersion    string
-		execVersion    string
-		expectedResult bool
+		dataVersion string
+		execVersion string
+		errExpected bool
 	}{
 		{
-			dataVersion:    "4.14.4",
-			execVersion:    "4.14.10",
-			expectedResult: false,
+			dataVersion: "4.14.4",
+			execVersion: "4.14.10",
+			errExpected: false,
 		},
 		{
-			dataVersion:    "4.14.5",
-			execVersion:    "4.14.10",
-			expectedResult: true,
+			dataVersion: "4.14.5",
+			execVersion: "4.14.10",
+			errExpected: true,
 		},
 		{
-			dataVersion:    "4.14.6",
-			execVersion:    "4.14.10",
-			expectedResult: true,
+			dataVersion: "4.14.6",
+			execVersion: "4.14.10",
+			errExpected: true,
 		},
 		{
-			dataVersion:    "4.14.7",
-			execVersion:    "4.14.10",
-			expectedResult: false,
+			dataVersion: "4.14.7",
+			execVersion: "4.14.10",
+			errExpected: false,
 		},
 		{
-			dataVersion:    "4.14.7",
-			execVersion:    "4.15.0",
-			expectedResult: false,
+			dataVersion: "4.14.7",
+			execVersion: "4.15.0",
+			errExpected: false,
 		},
 		{
-			dataVersion:    "4.15.2",
-			execVersion:    "4.15.5",
-			expectedResult: true,
+			dataVersion: "4.15.2",
+			execVersion: "4.15.5",
+			errExpected: true,
 		},
 	}
 
 	for _, td := range testData {
-		assert.Equal(t, td.expectedResult, isBlocked(edges, td.execVersion, td.dataVersion))
+		if td.errExpected {
+			assert.Error(t, isBlocked(edges, td.execVersion, td.dataVersion))
+		} else {
+			assert.NoError(t, isBlocked(edges, td.execVersion, td.dataVersion))
+		}
 	}
 }
