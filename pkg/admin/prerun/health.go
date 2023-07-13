@@ -23,7 +23,13 @@ type HealthInfo struct {
 }
 
 func (hi *HealthInfo) BackupName() data.BackupName {
-	return data.BackupName(fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID))
+	name := fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID)
+
+	if hi.IsHealthy() {
+		return data.BackupName(name)
+	}
+
+	return data.BackupName(fmt.Sprintf("%s_unhealthy", name))
 }
 
 func (hi *HealthInfo) IsHealthy() bool {

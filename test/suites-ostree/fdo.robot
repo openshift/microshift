@@ -28,6 +28,7 @@ FIDO Onboarding Device
     ...    MicroShift data, unhealthy stored in health file,
     ...    and a deployment gap (no-microshift rollback).
 
+    Mask Grub Boot Success Timer
     System Should Not Feature MicroShift
     TestAgent.Add Action For Next Deployment    every    fail_greenboot
     Deploy Commit Expecting A Rollback    ${FAILING_REF}

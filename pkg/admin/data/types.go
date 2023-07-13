@@ -23,4 +23,6 @@ type Manager interface {
 	GetBackupPath(BackupName) string
 	GetBackupList() ([]BackupName, error)
 	RemoveBackup(BackupName) error
+
+	RemoveData() error
 }
