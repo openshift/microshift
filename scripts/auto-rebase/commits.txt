@@ -23,6 +23,6 @@ https://github.com/openshift/oc image-arm64 e4c9a6aeac8e382ad8a5dd6c2031a694ca0b
 https://github.com/openshift/coredns image-arm64 5560e4ad8c343c211f0b2f9d85ce7331b20b87cb
 https://github.com/openshift/router image-arm64 065deab84f342615db2d2f5c78a19ae04bb43912
 https://github.com/openshift/kube-rbac-proxy image-arm64 f1205e66bf34421046288bc74aed0d69b8434206
-https://github.com/openshift/ovn-kubernetes image-arm64 3d5f185ac07d93ba51b608aa0f39ac91f06e8518
+https://github.com/openshift/ovn-kubernetes image-arm64 a6143fb1974d9165289a46a40f901b86410ddc0f
 https://github.com/openshift/kubernetes image-arm64 a7ee68b55354d8c146ef81f82444c0765ea8885f
 https://github.com/openshift/service-ca-operator image-arm64 1b89fdce3fcccecdc5fdb705fe674cd4bfc58a2a
