@@ -1,0 +1,7 @@
+apiVersion: test.resource/v1beta1
+kind: Migrate
+metadata:
+  name: default
+spec:
+  host: sample
+  port: "8080"
