@@ -15,7 +15,6 @@ PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=8m
-MAKE_VAR_FILE="${TESTDIR}/../Makefile.version.$(uname -m).var"
 
 full_vm_name() {
     local base="${1}"
@@ -224,8 +223,7 @@ remove_vm() {
 
 # Function to report the full current version, e.g. "4.13.5"
 current_version() {
-    # OCP_VERSION := 4.14.0-0.nightly-2023-06-30-131338
-    grep OCP_VERSION "${MAKE_VAR_FILE}" | awk '{print $3}' | cut -f1 -d-
+    "${SCRIPTDIR}/get_latest_rpm_version.sh"
 }
 
 # Function to report only the minor portion of the current version,
