@@ -254,6 +254,9 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 	// after making a new backup, remove all old backups for the deployment
 	// including unhealthy ones
 	existingBackups.getForDeployment(health.DeploymentID).removeAll(pr.dataManager)
+	if err := pr.removeBackupsWithoutExistingDeployments(existingBackups); err != nil {
+		klog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
+	}
 
 	klog.InfoS("Finished backup",
 		"deploymentID", health.DeploymentID,
@@ -364,6 +367,20 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	} else {
 		klog.Info("There is no backup for current deployment - continuing start up")
 	}
+
+	return nil
+}
+
+func (pr *PreRun) removeBackupsWithoutExistingDeployments(backups Backups) error {
+	deployments, err := getAllDeploymentIDs()
+	if err != nil {
+		return err
+	}
+
+	toRemove := backups.getDangling(deployments)
+	klog.InfoS("Removing backups for no longer existing deployments",
+		"backups-to-remove", toRemove)
+	toRemove.removeAll(pr.dataManager)
 
 	return nil
 }

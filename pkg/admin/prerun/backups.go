@@ -6,6 +6,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/admin/data"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 )
 
@@ -73,6 +74,44 @@ func (bs Backups) removeAll(dataManager data.Manager) {
 func (bs Backups) getOneOrNone() data.BackupName {
 	if len(bs) > 0 {
 		return bs[0]
+	}
+	return ""
+}
+
+// getDangling filters backups using given list of deployments
+// and returns a list of backups that do not belong to any of these deployments
+func (bs Backups) getDangling(deploymentIDs []string) Backups {
+	backupsToRemove := []data.BackupName{}
+	unknownDeployments := []data.BackupName{}
+
+	ds := sets.New(deploymentIDs...)
+
+	for _, b := range bs {
+		deploy := getDeploymentIDForTheBackup(b)
+
+		if deploy != "" {
+			if !ds.Has(deploy) {
+				backupsToRemove = append(backupsToRemove, b)
+			}
+		} else {
+			unknownDeployments = append(unknownDeployments, b)
+		}
+	}
+
+	if len(unknownDeployments) > 0 {
+		// Expecting to be "4.13"
+		klog.InfoS("Found backups not belonging to any deployment - they need to be deleted manually", "backups", unknownDeployments)
+	}
+
+	return backupsToRemove
+}
+
+// getDeploymentIDForTheBackup returns a deployment ID from backup's name
+// according to the schema: deploy-id_boot-id
+func getDeploymentIDForTheBackup(backup data.BackupName) string {
+	spl := strings.Split(string(backup), "_")
+	if len(spl) > 1 {
+		return spl[0]
 	}
 	return ""
 }

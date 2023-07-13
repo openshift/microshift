@@ -92,3 +92,17 @@ func getRollbackDeploymentID() (string, error) {
 
 	return "", fmt.Errorf("could not find rollback deployment in %#v", deployments)
 }
+
+func getAllDeploymentIDs() ([]string, error) {
+	deployments, err := getDeploymentsFromOSTree()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get deployments: %w", err)
+	}
+
+	ids := make([]string, 0, len(deployments))
+	for _, deployment := range deployments {
+		ids = append(ids, deployment.ID)
+	}
+
+	return ids, nil
+}
