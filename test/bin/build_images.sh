@@ -9,6 +9,8 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 mkdir -p "${IMAGEDIR}"
+LOGDIR="${IMAGEDIR}/build-logs"
+mkdir -p "${LOGDIR}"
 
 if [ $# -ne 0 ]; then
     TEMPLATES="$*"
@@ -93,7 +95,8 @@ for template in ${TEMPLATES}; do
     sudo composer-cli blueprints push "${blueprint_file}"
 
     echo "Resolving dependencies for ${blueprint}"
-    sudo composer-cli blueprints depsolve "${blueprint}"
+    sudo composer-cli blueprints depsolve "${blueprint}" \
+         2>&1 | tee "${LOGDIR}/image-${blueprint}-depsolve.log"
 
     echo "Building edge-commit from ${blueprint}"
     buildid=$(sudo composer-cli compose start-ostree \
