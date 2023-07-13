@@ -1,11 +1,7 @@
 package prerun
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
@@ -397,34 +393,6 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	return nil
 }
 
-func getCurrentDeploymentID() (string, error) {
-	cmd := exec.Command("rpm-ostree", "status", "--jsonpath=$.deployments[0].id", "--booted")
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("failed to determine the rpm-ostree deployment id, command %q failed: %s: %w", strings.TrimSpace(cmd.String()), strings.TrimSpace(stderr.String()), err)
-	}
-
-	ids := []string{}
-	if err := json.Unmarshal(stdout.Bytes(), &ids); err != nil {
-		return "", fmt.Errorf("failed to determine the rpm-ostree deployment id from %q: %w", strings.TrimSpace(stdout.String()), err)
-	}
-
-	if len(ids) != 1 {
-		// this shouldn't happen if running on ostree system, but just in case
-		klog.ErrorS(nil, "Unexpected number of deployments in rpm-ostree output",
-			"cmd", cmd.String(),
-			"stdout", strings.TrimSpace(stdout.String()),
-			"stderr", strings.TrimSpace(stderr.String()),
-			"unmarshalledIDs", ids)
-		return "", fmt.Errorf("expected 1 deployment ID, rpm-ostree returned %d", len(ids))
-	}
-
-	return ids[0], nil
-}
-
 func (pr *PreRun) removeOldBackups(backups []data.BackupName) {
 	klog.Info("Preparing to prune backups")
 	for _, b := range backups {
@@ -433,15 +401,6 @@ func (pr *PreRun) removeOldBackups(backups []data.BackupName) {
 		}
 	}
 	klog.Info("Finished pruning backups")
-}
-
-func getCurrentBootID() (string, error) {
-	path := "/proc/sys/kernel/random/boot_id"
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return "", fmt.Errorf("failed to determine boot ID from %q: %w", path, err)
-	}
-	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
 }
 
 func filterBackups(backups []data.BackupName, predicate func(data.BackupName) bool) []data.BackupName {
@@ -473,48 +432,4 @@ func backupAlreadyExists(existingBackups []data.BackupName, name data.BackupName
 		}
 	}
 	return false
-}
-
-func getRollbackDeploymentID() (string, error) {
-	cmd := exec.Command("rpm-ostree", "status", "--json")
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("%q failed: %s: %w", cmd, stderr.String(), err)
-	}
-
-	type deploy struct {
-		ID     string `json:"id"`
-		Booted bool   `json:"booted"`
-	}
-	type statusOutput struct {
-		Deployments []deploy `json:"deployments"`
-	}
-
-	var status statusOutput
-	if err := json.Unmarshal(stdout.Bytes(), &status); err != nil {
-		return "", fmt.Errorf("failed to unmarshal %q: %w", cmd, err)
-	}
-
-	if len(status.Deployments) == 0 {
-		return "", fmt.Errorf("unexpected amount (0) of deployments from rpm-ostree status output")
-	}
-
-	if len(status.Deployments) == 1 {
-		return "", nil
-	}
-
-	afterBooted := false
-	for _, d := range status.Deployments {
-		if afterBooted {
-			return d.ID, nil
-		}
-
-		if d.Booted {
-			afterBooted = true
-		}
-	}
-
-	return "", fmt.Errorf("could not find rollback deployment in %v", status)
 }
