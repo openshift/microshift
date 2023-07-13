@@ -12,11 +12,8 @@ mkdir -p "${VM_DISK_DIR}"
 
 download_image() {
     local buildid="${1}"
-    # FIXME: These logs should go to the artifacts directory instead
-    # of the build web server.
     # shellcheck disable=SC2086  # pass glob args without quotes
     rm -f ${buildid}-*.tar
-    sudo composer-cli compose logs "${buildid}"
     sudo composer-cli compose metadata "${buildid}"
     sudo composer-cli compose image "${buildid}"
     # shellcheck disable=SC2086  # pass glob args without quotes

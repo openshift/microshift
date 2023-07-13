@@ -126,3 +126,21 @@ fi
 echo "Waiting for builds to complete..."
 # shellcheck disable=SC2086  # pass command arguments quotes to allow word splitting
 time "${SCRIPTDIR}/wait_images.py" ${BUILDIDS}
+
+echo "Downloading build logs..."
+cd "${IMAGEDIR}/builds"
+for buildid in ${BUILDIDS}; do
+    blueprint=$(grep "${buildid}" -- *.image-installer *.edge-commit | cut -f1 -d:)
+
+    # shellcheck disable=SC2086  # pass glob args without quotes
+    rm -f ${buildid}-*.tar
+
+    sudo composer-cli compose logs "${buildid}"
+    # shellcheck disable=SC2086  # pass glob args without quotes
+    sudo chown "$(whoami)." ${buildid}-*
+
+    # Each tar file contains 1 log file. Extract that file and move it
+    # to the log directory with a unique name.
+    tar xf "${buildid}-logs.tar"
+    mv logs/osbuild.log "${LOGDIR}/image-${blueprint}-osbuild-${buildid}.log"
+done
