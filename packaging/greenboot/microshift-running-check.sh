@@ -128,15 +128,29 @@ for i in "${!PODS_NS_LIST[@]}"; do
 done
 
 # Verify that MicroShift core pods are not restarting
-pids=()
+declare -A pid2name
 for i in "${!PODS_NS_LIST[@]}"; do
     CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
 
     echo "Checking pod restart count in the '${CHECK_PODS_NS}' namespace"
     namespace_pods_not_restarting "${CHECK_PODS_NS}" &
-    pids+=($!)
+    pid=$!
+
+    pid2name["${pid}"]="${CHECK_PODS_NS}"
 done
 
-for pid in "${pids[@]}"; do
-    wait "${pid}"
+# Wait for the restart check functions to complete, printing errors in case of a failure
+check_failed=false
+for pid in "${!pid2name[@]}"; do
+    if ! wait "${pid}" ; then
+        check_failed=true
+
+        name=${pid2name["${pid}"]}
+        echo "Pod restart count check failed for the '${name}' namespace"
+    fi
 done
+
+# Exit with an error code if the pod restart check failed
+if ${check_failed} ; then
+    exit 1
+fi
