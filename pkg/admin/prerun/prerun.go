@@ -139,11 +139,17 @@ func (pr *PreRun) regularPrerun() error {
 		return fmt.Errorf("failed to determine the current boot ID: %w", err)
 	}
 
+	currentDeploymentID, err := getCurrentDeploymentID()
+	if err != nil {
+		return err
+	}
+
 	klog.InfoS("Found boot details",
 		"health", health.Health,
 		"deploymentID", health.DeploymentID,
 		"previousBootID", health.BootID,
 		"currentBootID", currentBootID,
+		"currentDeploymentID", currentDeploymentID,
 	)
 
 	if currentBootID == health.BootID {
@@ -163,6 +169,11 @@ func (pr *PreRun) regularPrerun() error {
 		klog.Info("Previous boot was healthy")
 		if err := pr.backup(health); err != nil {
 			return fmt.Errorf("failed to backup during pre-run: %w", err)
+		}
+
+		if health.DeploymentID != currentDeploymentID {
+			klog.Info("Current and previously booted deployments are different")
+			return pr.handleDeploymentSwitch(currentDeploymentID)
 		}
 	} else {
 		klog.Info("Previous boot was not healthy")
@@ -256,6 +267,32 @@ func (pr *PreRun) restore() error {
 	}
 
 	klog.Info("Finished restore")
+	return nil
+}
+
+func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
+	// System booted into different deployment
+	// It might be a rollback (restore existing backup), or
+	// it might be a newly staged one (continue start up)
+	existingBackups, err := pr.dataManager.GetBackupList()
+	if err != nil {
+		return fmt.Errorf("failed to determine the existing backups: %w", err)
+	}
+	backupsForDeployment := getExistingBackupsForTheDeployment(existingBackups, currentDeploymentID)
+
+	if len(backupsForDeployment) > 0 {
+		klog.Info("Backup exists for current deployment - restoring")
+
+		err = pr.dataManager.Restore(backupsForDeployment[0])
+		if err != nil {
+			return fmt.Errorf("failed to restore backup: %w", err)
+		}
+
+		klog.Info("Restored existing backup for current deployment")
+	} else {
+		klog.Info("There is no backup for current deployment - continuing start up")
+	}
+
 	return nil
 }
 
