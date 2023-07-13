@@ -349,7 +349,12 @@ if [ -n "${CUSTOM_RPM_FILES}" ] ; then
 fi
 
 title "Loading package sources"
-for f in microshift-local custom-rpms rhocp-4.13 fast-datapath; do
+PACKAGE_SOURCES="microshift-local rhocp-4.13 fast-datapath"
+if [ -n "${CUSTOM_RPM_FILES}" ] ; then
+    PACKAGE_SOURCES+=" custom-rpms"
+fi
+# shellcheck disable=SC2086
+for f in ${PACKAGE_SOURCES} ; do
     sed -e "s;REPLACE_IMAGE_BUILDER_DIR;${BUILDDIR};g" \
         -e "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
         "${SCRIPTDIR}/config/${f}.toml.template" \
