@@ -2,7 +2,6 @@ package prerun
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
@@ -212,10 +211,11 @@ func (pr *PreRun) missingDataExistingHealth() error {
 	if err != nil {
 		return err
 	}
-	backup, err := pr.getBackupToRestore(currentDeploymentID)
+	existingBackups, err := getBackups(pr.dataManager)
 	if err != nil {
 		return err
 	}
+	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 	if backup == "" {
 		klog.InfoS("There is no backup to restore - continuing start up")
 		return nil
@@ -234,18 +234,12 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 		"name", newBackupName,
 	)
 
-	existingBackups, err := pr.dataManager.GetBackupList()
+	existingBackups, err := getBackups(pr.dataManager)
 	if err != nil {
-		return fmt.Errorf("failed to determine the existing backups: %w", err)
+		return err
 	}
 
-	// get list of already existing backups for deployment ID persisted in health file
-	// after creating backup, the list will be used to remove older backups
-	// (so only the most recent one for specific deployment is kept)
-	allBackupsForDeployment := getBackupsForTheDeployment(existingBackups, health.DeploymentID)
-	healthyBackupsForDeployment := getOnlyHealthyBackups(allBackupsForDeployment)
-
-	if backupAlreadyExists(healthyBackupsForDeployment, newBackupName) {
+	if existingBackups.has(newBackupName) {
 		klog.InfoS("Skipping backup: Backup already exists",
 			"deploymentID", health.DeploymentID,
 			"name", newBackupName,
@@ -257,37 +251,15 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 		return fmt.Errorf("failed to create new backup %q: %w", newBackupName, err)
 	}
 
-	// if making a new backup, remove all old backups for the deployment
+	// after making a new backup, remove all old backups for the deployment
 	// including unhealthy ones
-	pr.removeOldBackups(allBackupsForDeployment)
+	existingBackups.getForDeployment(health.DeploymentID).removeAll(pr.dataManager)
 
 	klog.InfoS("Finished backup",
 		"deploymentID", health.DeploymentID,
 		"destination", newBackupName,
 	)
 	return nil
-}
-
-func (pr *PreRun) getBackupToRestore(deploymentID string) (data.BackupName, error) {
-	existingBackups, err := pr.dataManager.GetBackupList()
-	if err != nil {
-		return "", fmt.Errorf("failed to get the existing backups: %w", err)
-	}
-	klog.InfoS("Found existing backups", "backups", existingBackups)
-
-	allBackupsForDeployment := getBackupsForTheDeployment(existingBackups, deploymentID)
-	healthyBackupsForDeployment := getOnlyHealthyBackups(allBackupsForDeployment)
-
-	if len(healthyBackupsForDeployment) == 0 {
-		return "", nil
-	}
-
-	if len(healthyBackupsForDeployment) > 1 {
-		// could happen during backing up when removing older backups failed
-		klog.InfoS("TODO: more than 1 backup, need to pick most recent one")
-	}
-
-	return healthyBackupsForDeployment[0], nil
 }
 
 func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
@@ -299,10 +271,12 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 		return err
 	}
 
-	backup, err := pr.getBackupToRestore(currentDeploymentID)
+	existingBackups, err := getBackups(pr.dataManager)
 	if err != nil {
 		return err
 	}
+
+	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 	if backup != "" {
 		err = pr.dataManager.Restore(backup)
 		if err != nil {
@@ -337,7 +311,7 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 	}
 
 	if health.DeploymentID == currentDeploymentID {
-		rollbackBackup, err := pr.getBackupToRestore(rollbackDeployID)
+		rollbackBackup := existingBackups.getForDeployment(rollbackDeployID).getOnlyHealthyBackups().getOneOrNone()
 		if err != nil {
 			return err
 		}
@@ -371,16 +345,17 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	// System booted into different deployment
 	// It might be a rollback (restore existing backup), or
 	// it might be a newly staged one (continue start up)
-	existingBackups, err := pr.dataManager.GetBackupList()
-	if err != nil {
-		return fmt.Errorf("failed to determine the existing backups: %w", err)
-	}
-	backupsForDeployment := getBackupsForTheDeployment(existingBackups, currentDeploymentID)
 
-	if len(backupsForDeployment) > 0 {
+	existingBackups, err := getBackups(pr.dataManager)
+	if err != nil {
+		return err
+	}
+	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
+
+	if backup != "" {
 		klog.Info("Backup exists for current deployment - restoring")
 
-		err = pr.dataManager.Restore(backupsForDeployment[0])
+		err = pr.dataManager.Restore(backup)
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
@@ -391,45 +366,4 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	}
 
 	return nil
-}
-
-func (pr *PreRun) removeOldBackups(backups []data.BackupName) {
-	klog.Info("Preparing to prune backups")
-	for _, b := range backups {
-		if err := pr.dataManager.RemoveBackup(b); err != nil {
-			klog.ErrorS(err, "Failed to remove backup, ignoring", "name", b)
-		}
-	}
-	klog.Info("Finished pruning backups")
-}
-
-func filterBackups(backups []data.BackupName, predicate func(data.BackupName) bool) []data.BackupName {
-	out := make([]data.BackupName, 0, len(backups))
-	for _, backup := range backups {
-		if predicate(backup) {
-			out = append(out, backup)
-		}
-	}
-	return out
-}
-
-func getOnlyHealthyBackups(backups []data.BackupName) []data.BackupName {
-	return filterBackups(backups, func(bn data.BackupName) bool {
-		return !strings.HasSuffix(string(bn), "unhealthy")
-	})
-}
-
-func getBackupsForTheDeployment(backups []data.BackupName, deployID string) []data.BackupName {
-	return filterBackups(backups, func(bn data.BackupName) bool {
-		return strings.HasPrefix(string(bn), deployID)
-	})
-}
-
-func backupAlreadyExists(existingBackups []data.BackupName, name data.BackupName) bool {
-	for _, backup := range existingBackups {
-		if backup == name {
-			return true
-		}
-	}
-	return false
 }
