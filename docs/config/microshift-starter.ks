@@ -17,9 +17,8 @@ part pv.01 --grow
 volgroup rhel pv.01
 logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
 
-# Configure users
+# Lock root user account
 rootpw --lock
-user --plaintext --name=redhat --password=redhat
 
 # Minimal package setup
 cdrom
@@ -30,7 +29,8 @@ cdrom
 # Post install configuration
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
-# Allow the default user to run sudo commands without password
+# Create a default redhat user, allowing it to run sudo commands without password
+useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 redhat
 echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
 
 # Import Red Hat public keys to allow RPM GPG check (not necessary if a system is registered)
