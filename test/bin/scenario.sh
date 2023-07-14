@@ -10,6 +10,7 @@ source "${SCRIPTDIR}/common.sh"
 
 DEFAULT_BOOT_BLUEPRINT="rhel-9.2"
 LVM_SYSROOT_SIZE="10240"
+LVM_THINPOOL_SIZE="4096"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
@@ -69,6 +70,7 @@ prepare_kickstart() {
               -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
               -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
               -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
+              -e "s|REPLACE_LVM_THINPOOL_SIZE|${LVM_THINPOOL_SIZE}|g" \
               > "${output_file}"
 }
 

@@ -28,6 +28,7 @@ part /boot --fstype=xfs --asprimary --size=800
 part pv.01 --grow
 volgroup rhel pv.01
 logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
+logvol none --thinpool --size=REPLACE_LVM_THINPOOL_SIZE --fstype=None --name=thin --vgname=rhel
 
 # Lock root user account
 rootpw --lock
@@ -46,6 +47,22 @@ EOF
 if [ -n "REPLACE_PUBLIC_IP" ]; then
     echo "    - REPLACE_PUBLIC_IP" >>/etc/microshift/config.yaml
 fi
+
+# Set the /etc/microshift/lvmd.yaml file to expose the LVM configuration
+cat - >/etc/microshift/lvmd.yaml <<EOF
+device-classes:
+- default: true
+  name: default
+  volume-group: rhel
+  spare-gb: 0
+- name: thin
+  thin-pool:
+    name: thinpool
+    overprovision-ratio: 0
+  type: thin
+  volume-group: rhel
+  spare-gb: 0
+EOF
 
 # Update the ostree server URL
 ostree remote delete edge
