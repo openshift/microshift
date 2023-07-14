@@ -58,7 +58,7 @@ device-classes:
 - name: thin
   thin-pool:
     name: ushift-thin
-    overprovision-ratio: 0
+    overprovision-ratio: 10
   type: thin
   volume-group: rhel
   spare-gb: 0
