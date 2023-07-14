@@ -9,6 +9,8 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 mkdir -p "${IMAGEDIR}"
+LOGDIR="${IMAGEDIR}/build-logs"
+mkdir -p "${LOGDIR}"
 
 if [ $# -ne 0 ]; then
     TEMPLATES="$*"
@@ -95,7 +97,8 @@ for template in ${TEMPLATES}; do
     sudo composer-cli blueprints push "${blueprint_file}"
 
     echo "Resolving dependencies for ${blueprint}"
-    sudo composer-cli blueprints depsolve "${blueprint}"
+    sudo composer-cli blueprints depsolve "${blueprint}" \
+         2>&1 | tee "${LOGDIR}/image-${blueprint}-depsolve.log"
 
     echo "Building edge-commit from ${blueprint}"
     buildid=$(sudo composer-cli compose start-ostree \
@@ -125,3 +128,21 @@ fi
 echo "Waiting for builds to complete..."
 # shellcheck disable=SC2086  # pass command arguments quotes to allow word splitting
 time "${SCRIPTDIR}/wait_images.py" ${BUILDIDS}
+
+echo "Downloading build logs..."
+cd "${IMAGEDIR}/builds"
+for buildid in ${BUILDIDS}; do
+    blueprint=$(grep "${buildid}" -- *.image-installer *.edge-commit | cut -f1 -d:)
+
+    # shellcheck disable=SC2086  # pass glob args without quotes
+    rm -f ${buildid}-*.tar
+
+    sudo composer-cli compose logs "${buildid}"
+    # shellcheck disable=SC2086  # pass glob args without quotes
+    sudo chown "$(whoami)." ${buildid}-*
+
+    # Each tar file contains 1 log file. Extract that file and move it
+    # to the log directory with a unique name.
+    tar xf "${buildid}-logs.tar"
+    mv logs/osbuild.log "${LOGDIR}/image-${blueprint}-osbuild-${buildid}.log"
+done
