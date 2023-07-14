@@ -18,9 +18,12 @@ INSTALLER_IMAGE_BLUEPRINT="rhel-9.2"
 # The location the web server should serve.
 export IMAGEDIR="${ROOTDIR}/_output/test-images"
 
+# The storage pool name for VMs
+VM_STORAGE_POOL="vm-storage"
+
 # The location for storage for the VMs.
 # shellcheck disable=SC2034  # used elsewhere
-VM_DISK_DIR="${IMAGEDIR}/vm-storage"
+VM_DISK_DIR="${IMAGEDIR}/${VM_STORAGE_POOL}"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere

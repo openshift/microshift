@@ -23,6 +23,9 @@ cd ~/microshift/test
 # repository.
 bash -x ./bin/start_webserver.sh
 
+# Set up the storage pool for VMs
+bash -x ./bin/manage_vm_storage_pool.sh create
+
 # Build all of the needed VMs
 for scenario in scenarios/*.sh; do
     scenario_name=$(basename "${scenario}" .sh)
