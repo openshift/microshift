@@ -21,6 +21,24 @@ function usage() {
     exit 1
 }
 
+function dnf_retry() {
+    local -r mode=$1
+    local -r args=$2
+
+    local retVal=1
+    for _ in $(seq 3) ; do
+        # shellcheck disable=SC2086
+        if ! sudo dnf "${mode}" -y ${args} ; then
+            sudo dnf clean -y all
+        else
+            retVal=0
+            break
+        fi
+    done
+
+    return ${retVal}
+}
+
 while [ $# -gt 1 ]; do
     case "$1" in
     --no-build)
@@ -71,14 +89,14 @@ if ${RHEL_SUBSCRIPTION}; then
         source /etc/os-release
         sudo subscription-manager release --set ${VERSION_ID}
         sudo subscription-manager release --show
-        sudo dnf clean all -y
+        dnf_retry clean all
     fi
 fi
 
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
-    sudo dnf clean all -y
-    sudo dnf update -y
-    sudo dnf install -y gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion
+    dnf_retry clean all
+    dnf_retry update
+    dnf_retry install "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion"
     sudo systemctl enable --now cockpit.socket
 fi
 
@@ -119,7 +137,7 @@ if ${RHEL_SUBSCRIPTION}; then
         --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
         --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
 else
-    sudo dnf install -y centos-release-nfv-common
+    dnf_retry install centos-release-nfv-common
     sudo dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"
     sudo tee "/etc/yum.repos.d/openvswitch2-$(uname -m)-rpms.repo" >/dev/null <<EOF
 [sig-nfv]
@@ -133,7 +151,7 @@ EOF
 fi
 
 if ${RHEL_SUBSCRIPTION}; then
-    sudo dnf install -y openshift-clients
+    dnf_retry install openshift-clients
 else
     OCC_SRC="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.14-el9-beta"
     OCC_RPM="$(curl -s "${OCC_SRC}/" | grep -o "openshift-clients-4[^\"']*.rpm" | sort | uniq)"
@@ -141,38 +159,25 @@ else
     OCC_REM="${OCC_SRC}/${OCC_RPM}"
 
     curl -s "${OCC_REM}" --output "${OCC_LOC}"
-    sudo dnf localinstall -y "${OCC_LOC}"
+    dnf_retry localinstall "${OCC_LOC}"
     rm -f "${OCC_LOC}"
 fi
 
 if ${BUILD_AND_RUN}; then
-    sudo dnf localinstall -y ~/microshift/_output/rpmbuild/RPMS/*/*.rpm
+    dnf_retry localinstall "$(ls -1 ~/microshift/_output/rpmbuild/RPMS/*/*.rpm)"
 fi
 
+# Configure OpenShift pull secret
 if [ ! -e "/etc/crio/openshift-pull-secret" ]; then
     sudo mkdir -p /etc/crio/
     sudo cp -f "${OCP_PULL_SECRET}" /etc/crio/openshift-pull-secret
     sudo chmod 600 /etc/crio/openshift-pull-secret
 fi
 
-if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
-    sudo dnf install -y firewalld
-    sudo systemctl enable firewalld --now
-    sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
-    sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
-    sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
-    sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
-    sudo firewall-cmd --permanent --zone=public --add-port=5353/udp
-    sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/tcp
-    sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/udp
-    sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp
-    sudo firewall-cmd --permanent --zone=public --add-service=mdns
-    sudo firewall-cmd --reload
-fi
-
 # Optionally configure crun runtime for crio, required on CentOS 9
-if ! grep -q '\[crio.runtime.runtimes.crun\]' /etc/crio/crio.conf ; then
-    cat <<EOF | sudo tee -a /etc/crio/crio.conf &>/dev/null
+if [ -e /etc/crio/crio.conf  ] ; then
+    if ! grep -q '\[crio.runtime.runtimes.crun\]' /etc/crio/crio.conf ; then
+        cat <<EOF | sudo tee -a /etc/crio/crio.conf &>/dev/null
 
 [crio.runtime.runtimes.crun]
 runtime_path = ""
@@ -184,6 +189,22 @@ monitor_cgroup = "system.slice"
 monitor_exec_cgroup = ""
 privileged_without_host_devices = false
 EOF
+    fi
+fi
+
+if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
+    dnf_retry install firewalld
+    sudo systemctl enable firewalld --now
+    sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
+    sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+    sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=5353/udp
+    sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/tcp
+    sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/udp
+    sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp
+    sudo firewall-cmd --permanent --zone=public --add-service=mdns
+    sudo firewall-cmd --reload
 fi
 
 if ${BUILD_AND_RUN}; then
