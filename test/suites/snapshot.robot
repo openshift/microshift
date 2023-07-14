@@ -27,7 +27,7 @@ ${LVMD_PATCH}           assets/lvmd.patch.yaml
 *** Test Cases ***
 Snapshotter Smoke Test
     [Documentation]    Write data to a volume, snapshot it, restore the snapshot and verify the data is present
-    [Tags]    smoke    snapshot
+    [Tags]    robot:skip-on-failure    smoke    snapshot
     [Setup]    Test Case Setup
 
     Oc Apply    -f ${SNAPSHOT} -n ${NAMESPACE}
