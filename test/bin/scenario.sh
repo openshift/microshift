@@ -21,6 +21,15 @@ full_vm_name() {
     echo "${SCENARIO}-${base}"
 }
 
+sos_report() {
+    for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
+        ip=$(cat "${vmdir}/ip")
+        ssh "redhat@${ip}" "sudo sos report --batch --all-logs --tmp-dir /tmp && sudo chmod +r /tmp/sosreport*"
+        mkdir -p "${vmdir}/sos"
+        scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
+    done
+}
+
 # Public function to render a unique kickstart from a template for a
 # VM in a scenario.
 #
@@ -306,6 +315,7 @@ load_scenario_script() {
 action_create() {
     load_global_settings
     load_scenario_script
+    trap "sos_report" EXIT
     scenario_create_vms
 }
 
@@ -334,6 +344,7 @@ action_login() {
 
 action_run() {
     load_scenario_script
+    trap "sos_report" EXIT
     scenario_run_tests
 }
 
