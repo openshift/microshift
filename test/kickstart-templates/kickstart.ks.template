@@ -28,6 +28,8 @@ part /boot --fstype=xfs --asprimary --size=800
 part pv.01 --grow
 volgroup rhel pv.01
 logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
+
+# Lock root user account
 rootpw --lock
 
 # Configure ostree
@@ -45,8 +47,9 @@ if [ -n "REPLACE_PUBLIC_IP" ]; then
     echo "    - REPLACE_PUBLIC_IP" >>/etc/microshift/config.yaml
 fi
 
-# Replace the ostree server URL
-echo -e 'url=REPLACE_OSTREE_SERVER_URL' >> /etc/ostree/remotes.d/edge.conf
+# Update the ostree server URL
+ostree remote delete edge
+ostree remote add --no-gpg-verify edge REPLACE_OSTREE_SERVER_URL
 
 # The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
 # The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
