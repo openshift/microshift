@@ -50,7 +50,8 @@ bash -x ./bin/configure_hypervisor_firewall.sh
 # Re-build from source.
 cd ~/microshift/
 rm -rf ./_output/rpmbuild
-make rpm
+time make rpm
+time make -C test/ fake-next-minor-rpm
 
 # Set up for scenario tests
 cd ~/microshift/test/

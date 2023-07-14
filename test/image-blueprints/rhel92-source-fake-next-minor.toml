@@ -1,0 +1,25 @@
+name = "rhel-9.2-microshift-source-fake-next-minor"
+description = ""
+version = "0.0.1"
+modules = []
+groups = []
+distro = "rhel-92"
+
+[[packages]]
+name = "microshift"
+version = "${FAKE_NEXT_MINOR_VERSION}"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "${FAKE_NEXT_MINOR_VERSION}"
+
+[[packages]]
+name = "microshift-networking"
+version = "${FAKE_NEXT_MINOR_VERSION}"
+
+[[packages]]
+name = "microshift-selinux"
+version = "${FAKE_NEXT_MINOR_VERSION}"
+
+[customizations.services]
+enabled = ["microshift"]

@@ -24,20 +24,22 @@ if [ ! -d "${LOCAL_REPO}" ]; then
     error "Run ${SCRIPTDIR}/create_local_repo.sh before building images."
     exit 1
 fi
-release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm')
+release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' -a -not -name '*_fake_*')
 if [ -z "${release_info_rpm}" ]; then
     error "Failed to find microshift-release-info RPM in ${LOCAL_REPO}"
     exit 1
 fi
 SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
+FAKE_NEXT_MINOR_VERSION=$(cd "${SCRIPTDIR}/.." && make fake-next-minor)
 
 ## TEMPLATE VARIABLES
 #
 # Machine platform type ("x86_64")
 UNAME_M=$(uname -m)
 export UNAME_M
-export LOCAL_REPO  # defined in common.sh
-export SOURCE_VERSION  # defined earlier
+export LOCAL_REPO              # defined in common.sh
+export SOURCE_VERSION          # defined earlier
+export FAKE_NEXT_MINOR_VERSION # defined earlier
 
 # Add our sources. It is OK to run these steps repeatedly, if the
 # details change they are updated in the service.
