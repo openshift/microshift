@@ -69,6 +69,6 @@ done
 title "Updating ostree references in ${IMAGEDIR}/repo"
 cd "${IMAGEDIR}"
 ostree refs --repo=repo --force \
-       --create "rhel-9.2-microshift-failing" "rhel-9.2-microshift-source"
+       --create "rhel-9.2-microshift-source-aux" "rhel-9.2-microshift-source"
 ostree summary --update --repo=repo
 ostree summary --view --repo=repo

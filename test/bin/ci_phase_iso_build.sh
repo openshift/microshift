@@ -4,7 +4,7 @@
 
 set -xeuo pipefail
 
-SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Cannot use common.sh because virsh is not installed, but we only
 # need ROOTDIR to set up logging in this script.
 ROOTDIR="$(cd "${SCRIPTDIR}/../.." && pwd)"

@@ -29,6 +29,7 @@ Staged Deployment Consistently Fails To Back Up The Data
 
     TestAgent.Add Action For Next Deployment    every    prevent_backup
     Deploy Commit Expecting A Rollback    ${FAILING_REF}
+    Wait For MicroShift Service
     Backup Should Exist    ${backup}
 
 
