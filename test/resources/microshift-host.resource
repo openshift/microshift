@@ -31,15 +31,27 @@ Logout MicroShift Host
     [Documentation]    Close the open ssh connection to the MicroShift host
     SSHLibrary.Close Connection
 
+Make New SSH Connection
+    [Documentation]    Closes all SSH connections and makes a new one.
+    # Staging deployments potentially introduces multiple reboots
+    # which could break existing SSH connection
+
+    Logout MicroShift Host
+    Login MicroShift Host
+
+SSH Connection To MicroShift Host Should Be Functional
+    [Documentation]    Creates new SSH connection and checks if is working
+    Make New SSH Connection
+    ${rc}=    SSHLibrary.Execute Command    true    return_stdout=False    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
 Reboot MicroShift Host
-    [Documentation]    Reboot the MicroShift host
+    [Documentation]    Reboot the MicroShift host and wait until
+    ...    SSH connection is working again
     ...
-    ...    Expects that SSH connection to MicroShift host is active.
+    ...    Expects that intial SSH connection to MicroShift host is active.
 
     SSHLibrary.Start Command    reboot    sudo=True
     Sleep    30s
     Wait Until Keyword Succeeds    5m    15s
-    ...    Login MicroShift Host
-
-    ${rc}=    SSHLibrary.Execute Command    true    return_stdout=False    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
+    ...    SSH Connection To MicroShift Host Should Be Functional
