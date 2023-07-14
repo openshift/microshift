@@ -64,6 +64,21 @@ device-classes:
   spare-gb: 0
 EOF
 
+# Deploy a storageClass to enable provisioning on the thin-pool
+cat - >/etc/microshift/manifests/thin-sc.yaml <<EOF
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: thin
+parameters:
+  csi.storage.k8s.io/fstype: xfs
+  "topolvm.io/device-class": "ushift-thin"
+provisioner: topolvm.io
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+EOF
+
 # Update the ostree server URL
 ostree remote delete edge
 ostree remote add --no-gpg-verify edge REPLACE_OSTREE_SERVER_URL
