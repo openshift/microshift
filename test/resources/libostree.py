@@ -98,6 +98,13 @@ def rpm_ostree_rebase(ref: str) -> None:
     return remote_sudo(f"rpm-ostree rebase {ref}")
 
 
+def rpm_ostree_rollback() -> None:
+    """
+    Rollback system
+    """
+    return remote_sudo("rpm-ostree rollback")
+
+
 def rebase_system(ref: str) -> str:
     """
     Rebase system to given OSTRee ref and return its deployment ID

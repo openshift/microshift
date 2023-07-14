@@ -4,8 +4,8 @@ export SHELL := $(shell which bash)
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 
 # Include openshift build-machinery-go libraries
-include ./vendor/github.com/openshift/build-machinery-go/make/golang.mk
-include ./vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
+include $(PROJECT_DIR)/vendor/github.com/openshift/build-machinery-go/make/golang.mk
+include $(PROJECT_DIR)/vendor/github.com/openshift/build-machinery-go/make/targets/openshift/deps.mk
 
 # TIMESTAMP is defined here, and only here, and propagated through out the build flow.  This ensures that every artifact
 # (binary version and image tag) all have the exact same build timestamp.  Because kubectl/oc expect
@@ -14,7 +14,7 @@ export BIN_TIMESTAMP ?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 export TIMESTAMP ?=$(shell echo $(BIN_TIMESTAMP) | tr -d ':' | tr 'T' '-' | tr -d 'Z')
 SOURCE_GIT_COMMIT_TIMESTAMP ?= $(shell TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H%M%S' --format="%cd")
 
-include Makefile.version.$(shell uname -m).var
+include $(PROJECT_DIR)/Makefile.version.$(shell uname -m).var
 MICROSHIFT_VERSION ?= $(subst -clean,,$(shell echo '${OCP_VERSION}-${SOURCE_GIT_COMMIT_TIMESTAMP}-${SOURCE_GIT_COMMIT}-${SOURCE_GIT_TREE_STATE}'))
 
 # Overload SOURCE_GIT_TAG value set in vendor/github.com/openshift/build-machinery-go/make/lib/golang.mk
@@ -61,7 +61,7 @@ else
 endif
 
 
-include Makefile.kube_git.var
+include $(PROJECT_DIR)/Makefile.kube_git.var
 GO_LD_FLAGS := $(GC_FLAGS) -ldflags " \
                    -X k8s.io/component-base/version.gitMajor=$(KUBE_GIT_MAJOR) \
                    -X k8s.io/component-base/version.gitMinor=$(KUBE_GIT_MINOR) \
