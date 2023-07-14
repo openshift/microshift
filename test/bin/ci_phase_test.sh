@@ -9,6 +9,9 @@ source "${SCRIPTDIR}/common.sh"
 
 cd "${TESTDIR}"
 
+# Start the web server to host ostree commit repository.
+bash -x ./bin/start_webserver.sh
+
 if [ ! -d "${RF_VENV}" ]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 fi
@@ -26,6 +29,9 @@ for job in $(jobs -p) ; do
     echo "Waiting for job: ${job}"
     wait "${job}" || ((FAIL+=1))
 done
+
+# Kill the web server
+pkill caddy || true
 
 echo "Test phase complete"
 if [[ ${FAIL} -ne 0 ]]; then
