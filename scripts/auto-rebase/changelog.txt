@@ -1,3 +1,10 @@
-# ovn-kubernetes image-arm64 3d5f185ac07d93ba51b608aa0f39ac91f06e8518 to a6143fb1974d9165289a46a40f901b86410ddc0f
+# cluster-network-operator embedded-component 34ef7155cdb21807150b94e555e4575150498c22 to c690bc97e5ef78e193b7e0b1c94d9d0df623d746
+6f32abe2a62973d33b68035bd022dd92b30a0205 2023-07-10T16:15:49-04:00 Add logic to pick the openshift-sdn shims from right directories
+# ovn-kubernetes image-amd64 3d5f185ac07d93ba51b608aa0f39ac91f06e8518 to a6143fb1974d9165289a46a40f901b86410ddc0f
 b27bc1a0dbc0cc08b1e4005800109f47ed6ae843 2023-07-07T12:16:01+02:00 fix egressfirewall unit tests, introduced https://github.com/openshift/ovn-kubernetes/pull/1733
 172552ee9547d502fd71a4495af17a51a0945811 2023-07-07T12:15:14+02:00 Allow hostNetwork ingress for network policies with empty namespace selector. The previous version used shared address sets for empty namespace selector to reuse the address set, but it didn't include a special config.Kubernetes.HostNetworkNamespace that only has an address set, but no pods. This difference may break existing network policies for hostNetwork pods, therefore we explicitly add this address sets for an empty namespace selector.
+# ovn-kubernetes image-arm64 a6143fb1974d9165289a46a40f901b86410ddc0f to 63fe940402a596fbce8a50ecef05b25cbc083231
+661a3744d9cb5f1c57fbb3e60251af2ad6d10ffe 2023-07-11T18:01:49+00:00 Fixes panic with delete NAT operations
+912d90aac3a4036caaceb1c29e8b28d0b6d93413 2023-07-11T18:01:40+00:00 Fixes invalid error while getting router NATs
+6b7581280a113166104f2e0d98148d748ead20b4 2023-07-11T17:54:30+00:00 Fix IC local -> remote
+345c22af372b606ac9b9e57609632c82d2b98d1e 2023-07-03T19:37:49+00:00 Improve syncNodes to remove stale data
