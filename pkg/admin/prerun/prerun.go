@@ -1,12 +1,7 @@
 package prerun
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"os"
-	"os/exec"
-	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
@@ -216,10 +211,11 @@ func (pr *PreRun) missingDataExistingHealth() error {
 	if err != nil {
 		return err
 	}
-	backup, err := pr.getBackupToRestore(currentDeploymentID)
+	existingBackups, err := getBackups(pr.dataManager)
 	if err != nil {
 		return err
 	}
+	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 	if backup == "" {
 		klog.InfoS("There is no backup to restore - continuing start up")
 		return nil
@@ -238,18 +234,12 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 		"name", newBackupName,
 	)
 
-	existingBackups, err := pr.dataManager.GetBackupList()
+	existingBackups, err := getBackups(pr.dataManager)
 	if err != nil {
-		return fmt.Errorf("failed to determine the existing backups: %w", err)
+		return err
 	}
 
-	// get list of already existing backups for deployment ID persisted in health file
-	// after creating backup, the list will be used to remove older backups
-	// (so only the most recent one for specific deployment is kept)
-	allBackupsForDeployment := getBackupsForTheDeployment(existingBackups, health.DeploymentID)
-	healthyBackupsForDeployment := getOnlyHealthyBackups(allBackupsForDeployment)
-
-	if backupAlreadyExists(healthyBackupsForDeployment, newBackupName) {
+	if existingBackups.has(newBackupName) {
 		klog.InfoS("Skipping backup: Backup already exists",
 			"deploymentID", health.DeploymentID,
 			"name", newBackupName,
@@ -261,37 +251,18 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 		return fmt.Errorf("failed to create new backup %q: %w", newBackupName, err)
 	}
 
-	// if making a new backup, remove all old backups for the deployment
+	// after making a new backup, remove all old backups for the deployment
 	// including unhealthy ones
-	pr.removeOldBackups(allBackupsForDeployment)
+	existingBackups.getForDeployment(health.DeploymentID).removeAll(pr.dataManager)
+	if err := pr.removeBackupsWithoutExistingDeployments(existingBackups); err != nil {
+		klog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
+	}
 
 	klog.InfoS("Finished backup",
 		"deploymentID", health.DeploymentID,
 		"destination", newBackupName,
 	)
 	return nil
-}
-
-func (pr *PreRun) getBackupToRestore(deploymentID string) (data.BackupName, error) {
-	existingBackups, err := pr.dataManager.GetBackupList()
-	if err != nil {
-		return "", fmt.Errorf("failed to get the existing backups: %w", err)
-	}
-	klog.InfoS("Found existing backups", "backups", existingBackups)
-
-	allBackupsForDeployment := getBackupsForTheDeployment(existingBackups, deploymentID)
-	healthyBackupsForDeployment := getOnlyHealthyBackups(allBackupsForDeployment)
-
-	if len(healthyBackupsForDeployment) == 0 {
-		return "", nil
-	}
-
-	if len(healthyBackupsForDeployment) > 1 {
-		// could happen during backing up when removing older backups failed
-		klog.InfoS("TODO: more than 1 backup, need to pick most recent one")
-	}
-
-	return healthyBackupsForDeployment[0], nil
 }
 
 func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
@@ -303,10 +274,12 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 		return err
 	}
 
-	backup, err := pr.getBackupToRestore(currentDeploymentID)
+	existingBackups, err := getBackups(pr.dataManager)
 	if err != nil {
 		return err
 	}
+
+	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 	if backup != "" {
 		err = pr.dataManager.Restore(backup)
 		if err != nil {
@@ -341,7 +314,7 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 	}
 
 	if health.DeploymentID == currentDeploymentID {
-		rollbackBackup, err := pr.getBackupToRestore(rollbackDeployID)
+		rollbackBackup := existingBackups.getForDeployment(rollbackDeployID).getOnlyHealthyBackups().getOneOrNone()
 		if err != nil {
 			return err
 		}
@@ -375,16 +348,17 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	// System booted into different deployment
 	// It might be a rollback (restore existing backup), or
 	// it might be a newly staged one (continue start up)
-	existingBackups, err := pr.dataManager.GetBackupList()
-	if err != nil {
-		return fmt.Errorf("failed to determine the existing backups: %w", err)
-	}
-	backupsForDeployment := getBackupsForTheDeployment(existingBackups, currentDeploymentID)
 
-	if len(backupsForDeployment) > 0 {
+	existingBackups, err := getBackups(pr.dataManager)
+	if err != nil {
+		return err
+	}
+	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
+
+	if backup != "" {
 		klog.Info("Backup exists for current deployment - restoring")
 
-		err = pr.dataManager.Restore(backupsForDeployment[0])
+		err = pr.dataManager.Restore(backup)
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
@@ -397,124 +371,16 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	return nil
 }
 
-func getCurrentDeploymentID() (string, error) {
-	cmd := exec.Command("rpm-ostree", "status", "--jsonpath=$.deployments[0].id", "--booted")
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("failed to determine the rpm-ostree deployment id, command %q failed: %s: %w", strings.TrimSpace(cmd.String()), strings.TrimSpace(stderr.String()), err)
-	}
-
-	ids := []string{}
-	if err := json.Unmarshal(stdout.Bytes(), &ids); err != nil {
-		return "", fmt.Errorf("failed to determine the rpm-ostree deployment id from %q: %w", strings.TrimSpace(stdout.String()), err)
-	}
-
-	if len(ids) != 1 {
-		// this shouldn't happen if running on ostree system, but just in case
-		klog.ErrorS(nil, "Unexpected number of deployments in rpm-ostree output",
-			"cmd", cmd.String(),
-			"stdout", strings.TrimSpace(stdout.String()),
-			"stderr", strings.TrimSpace(stderr.String()),
-			"unmarshalledIDs", ids)
-		return "", fmt.Errorf("expected 1 deployment ID, rpm-ostree returned %d", len(ids))
-	}
-
-	return ids[0], nil
-}
-
-func (pr *PreRun) removeOldBackups(backups []data.BackupName) {
-	klog.Info("Preparing to prune backups")
-	for _, b := range backups {
-		if err := pr.dataManager.RemoveBackup(b); err != nil {
-			klog.ErrorS(err, "Failed to remove backup, ignoring", "name", b)
-		}
-	}
-	klog.Info("Finished pruning backups")
-}
-
-func getCurrentBootID() (string, error) {
-	path := "/proc/sys/kernel/random/boot_id"
-	content, err := os.ReadFile(path)
+func (pr *PreRun) removeBackupsWithoutExistingDeployments(backups Backups) error {
+	deployments, err := getAllDeploymentIDs()
 	if err != nil {
-		return "", fmt.Errorf("failed to determine boot ID from %q: %w", path, err)
-	}
-	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
-}
-
-func filterBackups(backups []data.BackupName, predicate func(data.BackupName) bool) []data.BackupName {
-	out := make([]data.BackupName, 0, len(backups))
-	for _, backup := range backups {
-		if predicate(backup) {
-			out = append(out, backup)
-		}
-	}
-	return out
-}
-
-func getOnlyHealthyBackups(backups []data.BackupName) []data.BackupName {
-	return filterBackups(backups, func(bn data.BackupName) bool {
-		return !strings.HasSuffix(string(bn), "unhealthy")
-	})
-}
-
-func getBackupsForTheDeployment(backups []data.BackupName, deployID string) []data.BackupName {
-	return filterBackups(backups, func(bn data.BackupName) bool {
-		return strings.HasPrefix(string(bn), deployID)
-	})
-}
-
-func backupAlreadyExists(existingBackups []data.BackupName, name data.BackupName) bool {
-	for _, backup := range existingBackups {
-		if backup == name {
-			return true
-		}
-	}
-	return false
-}
-
-func getRollbackDeploymentID() (string, error) {
-	cmd := exec.Command("rpm-ostree", "status", "--json")
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("%q failed: %s: %w", cmd, stderr.String(), err)
+		return err
 	}
 
-	type deploy struct {
-		ID     string `json:"id"`
-		Booted bool   `json:"booted"`
-	}
-	type statusOutput struct {
-		Deployments []deploy `json:"deployments"`
-	}
+	toRemove := backups.getDangling(deployments)
+	klog.InfoS("Removing backups for no longer existing deployments",
+		"backups-to-remove", toRemove)
+	toRemove.removeAll(pr.dataManager)
 
-	var status statusOutput
-	if err := json.Unmarshal(stdout.Bytes(), &status); err != nil {
-		return "", fmt.Errorf("failed to unmarshal %q: %w", cmd, err)
-	}
-
-	if len(status.Deployments) == 0 {
-		return "", fmt.Errorf("unexpected amount (0) of deployments from rpm-ostree status output")
-	}
-
-	if len(status.Deployments) == 1 {
-		return "", nil
-	}
-
-	afterBooted := false
-	for _, d := range status.Deployments {
-		if afterBooted {
-			return d.ID, nil
-		}
-
-		if d.Booted {
-			afterBooted = true
-		}
-	}
-
-	return "", fmt.Errorf("could not find rollback deployment in %v", status)
+	return nil
 }
