@@ -238,6 +238,12 @@ previous_minor_version() {
     echo $(( $(current_minor_version) - 1 ))
 }
 
+# Function to report the *next* minor version. If the current
+# version is "4.14.5", reports "15".
+next_minor_version() {
+    echo $(( $(current_minor_version) + 1 ))
+}
+
 # Run the tests for the current scenario
 run_tests() {
     local vmname="${1}"

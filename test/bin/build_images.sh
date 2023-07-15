@@ -26,15 +26,15 @@ if [ ! -d "${LOCAL_REPO}" ]; then
     error "Run ${SCRIPTDIR}/create_local_repo.sh before building images."
     exit 1
 fi
-release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' -a -not -name '*_fake_*')
+release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
 if [ -z "${release_info_rpm}" ]; then
     error "Failed to find microshift-release-info RPM in ${LOCAL_REPO}"
     exit 1
 fi
 SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
-FAKE_NEXT_MINOR_VERSION=$(cd "${SCRIPTDIR}/.." && make fake-next-minor)
 MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
 PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
+FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 
 ## TEMPLATE VARIABLES
 #
