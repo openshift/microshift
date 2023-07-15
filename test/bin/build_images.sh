@@ -58,6 +58,9 @@ for template in ${TESTDIR}/package-sources/*.toml; do
     echo "Rendering ${template} to ${outfile}"
     envsubst <"${template}" >"${outfile}"
     echo "Adding package source from ${outfile}"
+    if sudo composer-cli sources list | grep "^${name}\$"; then
+        sudo composer-cli sources delete "${name}"
+    fi
     sudo composer-cli sources add "${outfile}"
 done
 
