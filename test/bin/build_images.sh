@@ -42,6 +42,7 @@ PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 UNAME_M=$(uname -m)
 export UNAME_M
 export LOCAL_REPO              # defined in common.sh
+export NEXT_REPO               # defined in common.sh
 export SOURCE_VERSION          # defined earlier
 export FAKE_NEXT_MINOR_VERSION # defined earlier
 export MINOR_VERSION           # defined earlier
