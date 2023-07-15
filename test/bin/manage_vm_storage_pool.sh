@@ -22,18 +22,22 @@ EOF
 }
 
 action_create() {
-    sudo sh -c '
+    if ! sudo virsh pool-info "${VM_STORAGE_POOL}"; then
+        sudo sh -c '
 virsh pool-define-as '"${VM_STORAGE_POOL}"' dir --target '"${VM_DISK_DIR}"'
 virsh pool-build '"${VM_STORAGE_POOL}"'
 virsh pool-start '"${VM_STORAGE_POOL}"'
 '
+    fi
 }
 
 action_cleanup() {
-    sudo sh -c '
+    if sudo virsh pool-info "${VM_STORAGE_POOL}"; then
+        sudo sh -c '
 virsh pool-destroy '"${VM_STORAGE_POOL}"'
 virsh pool-undefine '"${VM_STORAGE_POOL}"'
 '
+    fi
 }
 
 if [ $# -eq 0 ]; then
