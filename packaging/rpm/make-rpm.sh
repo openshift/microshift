@@ -22,7 +22,8 @@ GIT_SHA=$(git rev-parse HEAD)
 GITHUB_SHA="${GIT_SHA:0:7}"
 
 TARBALL_FILE="microshift-${GITHUB_SHA}.tar.gz"
-RPMBUILD_DIR="$(git rev-parse --show-toplevel)/_output/rpmbuild/"
+DEFAULT_RPMBUILD_DIR="$(git rev-parse --show-toplevel)/_output/rpmbuild/"
+RPMBUILD_DIR="${RPMBUILD_DIR:-${DEFAULT_RPMBUILD_DIR}}"
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
@@ -87,6 +88,7 @@ if [ -n "${TARGET_ARCH}" ]; then
 fi
 
 # prepare the rpmbuild env
+echo "Building to ${RPMBUILD_DIR}"
 mkdir -p "${RPMBUILD_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 case $1 in
