@@ -1,8 +1,10 @@
 #!/bin/bash
 #
-# This script cancels any composer jobs and deletes failed and completed jobs.
+# This script cleans up osbuild-composer. It cancels any running
+# builds, deletes failed and completed builds, and removes package
+# sources other than the defaults.
 
-cancel() {
+cancel_build() {
     local status="$1"
 
     for id in $(sudo composer-cli compose list | grep "${status}" | cut -f1 -d' '); do
@@ -11,13 +13,21 @@ cancel() {
     done
 }
 
-do_delete() {
+delete_builds() {
     for id in $(sudo composer-cli compose list | grep -v "^ID" | cut -f1 -d' '); do
         echo "Deleting ${id}"
         sudo composer-cli compose delete "${id}"
     done
 }
 
-cancel WAITING
-cancel RUNNING
-do_delete
+remove_sources() {
+    for src in $(sudo composer-cli sources list | grep -v appstream | grep -v baseos); do
+        echo "Removing source ${src}"
+        sudo composer-cli sources delete "${src}"
+    done
+}
+
+cancel_build WAITING
+cancel_build RUNNING
+delete_builds
+remove_sources
