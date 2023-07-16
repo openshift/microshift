@@ -11,7 +11,7 @@ if [ ! -d "${ENVDIR}" ]; then
     echo "Setting up required tools..."
     mkdir -p "${OUTPUT_DIR}"
     python3 -m venv "${ENVDIR}"
-    "${ENVDIR}/bin/pip3" install jira
+    "${ENVDIR}/bin/pip3" install -r "${SCRIPTDIR}/requirements.txt"
 fi
 
 "${ENVDIR}/bin/python3" "${SCRIPTDIR}/manage_ticket.py" "$@"
