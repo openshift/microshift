@@ -28,7 +28,7 @@ Deploy Commit Expecting A Rollback
     ${initial_deploy_id}=    Get Booted Deployment Id
     ${deploy_id}=    Rebase System    ${ref}
     IF    ${write_agent_cfg}    TestAgent.Write
-    Write Greenboot Microshift Wait Timeout    60
+    Write Greenboot Microshift Wait Timeout    90
     Reboot MicroShift Host
 
     Log To Console    "System rebased to ${ref} and rebooted - waiting for system to roll back"
