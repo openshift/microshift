@@ -41,6 +41,14 @@ ConfigMap Matches CLI
     ${cli}=    MicroShift Version
     Should Be Equal    ${configmap.data.version}    ${cli.gitVersion}
 
+Metadata File Contents
+    [Documentation]    Ensure the metadata file contents match the expected version.
+
+    ${contents}=    Execute Command
+    ...    cat /var/lib/microshift/version
+    ...    sudo=True    return_rc=False
+    Should Be Equal    ${contents}    ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+
 
 *** Keywords ***
 Setup
@@ -70,25 +78,15 @@ Read Expected Versions    # robocop: disable=too-many-calls-in-keyword
     ${version_full_raw}=    Fetch From Right    ${unparsed}    :=
     ${version_full}=    Strip String    ${version_full_raw}
     Set Suite Variable    \${FULL_VERSION}    ${version_full}
-
+    # 4.14.0
+    ${version_short_matches}=    Get Regexp Matches    ${version_full}    ^(\\d+.\\d+.\\d+)
+    ${version_short_parts}=    Split String    ${version_short_matches}[0]    .
     # 4
-    ${major}=    Fetch From Left    ${version_full}    .
-    Set Suite Variable    \${MAJOR_VERSION}    ${major}
-
-    # 14.0-0.nightly-arm64-2023-05-04-012046
-    ${without_major}=    Get Substring    ${version_full}    2
-
+    Set Suite Variable    \${MAJOR_VERSION}    ${version_short_parts}[0]
     # 14
-    ${minor}=    Fetch From Left    ${without_major}    .
-    Set Suite Variable    \${MINOR_VERSION}    ${minor}
-
-    # 4.14
-    ${ystream}=    Format String    {}.{}    ${major}    ${minor}
-    Set Suite Variable    \${Y_STREAM}    ${ystream}
-
-    # 0-0.nightly-arm64-2023-05-04-012046
-    ${without_majorminor}=    Get Substring    ${without_major}    3
-
+    Set Suite Variable    \${MINOR_VERSION}    ${version_short_parts}[1]
     # 0
-    ${patch}=    Fetch From Left    ${without_majorminor}    -
-    Set Suite Variable    \${PATCH_VERSION}    ${patch}
+    Set Suite Variable    \${PATCH_VERSION}    ${version_short_parts}[2]
+    # 4.14
+    ${ystream}=    Format String    {}.{}    ${MAJOR_VERSION}    ${MINOR_VERSION}
+    Set Suite Variable    \${Y_STREAM}    ${ystream}
