@@ -9,23 +9,31 @@ set -euo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
+make_repo() {
+    local repodir="$1"
+    local builddir="$2"
+
+    if [ -d "${repodir}" ]; then
+        echo "Cleaning up existing repository"
+        rm -rf "${repodir}"
+    fi
+    mkdir -p "${repodir}"
+
+    # Create the local RPM repository for whatever was built from source.
+    echo "Copying RPMs from ${builddir} to ${repodir}"
+    # shellcheck disable=SC2086  # no quotes for command arguments to allow word splitting
+    cp -R ${builddir}/{RPMS,SPECS,SRPMS} "${repodir}/"
+
+    echo "Creating RPM repo at ${repodir}"
+    createrepo "${repodir}"
+
+    echo "Fixing permissions of RPM repo contents"
+    find "${repodir}" -type f -print -exec chmod a+r  {} \;
+    find "${repodir}" -type d -exec chmod a+rx {} \;
+}
+
 mkdir -p "${IMAGEDIR}"
 cd "${IMAGEDIR}"
 
-if [ -d "${LOCAL_REPO}" ]; then
-    echo "Cleaning up existing repository"
-    rm -rf "${LOCAL_REPO}"
-fi
-mkdir -p "${LOCAL_REPO}"
-
-# Create the local RPM repository for whatever was built from source.
-echo "Copying RPMs from ${RPM_SOURCE} to ${LOCAL_REPO}"
-# shellcheck disable=SC2086  # no quotes for command arguments to allow word splitting
-cp -R ${RPM_SOURCE}/{RPMS,SPECS,SRPMS} "${LOCAL_REPO}/"
-
-echo "Creating RPM repo at ${LOCAL_REPO}"
-createrepo "${LOCAL_REPO}"
-
-echo "Fixing permissions of RPM repo contents"
-find "${LOCAL_REPO}" -type f -exec chmod a+r  {} \;
-find "${LOCAL_REPO}" -type d -exec chmod a+rx {} \;
+make_repo "${LOCAL_REPO}" "${RPM_SOURCE}"
+make_repo "${NEXT_REPO}" "${NEXT_RPM_SOURCE}"

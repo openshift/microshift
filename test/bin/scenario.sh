@@ -220,6 +220,30 @@ remove_vm() {
     rm -rf "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
 }
 
+
+# Function to report the full current version, e.g. "4.13.5"
+current_version() {
+    "${SCRIPTDIR}/get_latest_rpm_version.sh"
+}
+
+# Function to report only the minor portion of the current version,
+# e.g. from "4.13.5" reports "13"
+current_minor_version() {
+    current_version | cut -f2 -d.
+}
+
+# Function to report the *previous* minor version. If the current
+# version is "4.13.5", reports "12".
+previous_minor_version() {
+    echo $(( $(current_minor_version) - 1 ))
+}
+
+# Function to report the *next* minor version. If the current
+# version is "4.14.5", reports "15".
+next_minor_version() {
+    echo $(( $(current_minor_version) + 1 ))
+}
+
 # Run the tests for the current scenario
 run_tests() {
     local vmname="${1}"
