@@ -12,6 +12,7 @@ source "${SCRIPTDIR}/common.sh"
 cd "${ROOTDIR}"
 rm -rf _output/rpmbuild
 make rpm
+make -C test/ fake-next-minor-rpm
 
 cd "${TESTDIR}"
 
