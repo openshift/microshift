@@ -68,10 +68,6 @@ chmod 600 /home/redhat/.ssh/authorized_keys
 # Make sure redhat user directory contents ownership is correct
 chown -R redhat:redhat /home/redhat/
 
-# Configure the firewall (rules reload is not necessary here)
-firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
-firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
-
 # Make the KUBECONFIG from MicroShift directly available for the root user
 echo -e 'export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig' >> /root/.profile
 
