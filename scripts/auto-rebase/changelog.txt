@@ -1,171 +1,154 @@
-- cluster-ingress-operator embedded-component 4c92a6d1ee80b6b120dd750855a40145a530153c to 0cdc132376aab6f665e8f228bb07378357bb1e48
-  - 6745e08 2023-06-13T21:32:41-04:00 OCPBUGS-7546: Allow only 1 disruption with 3 replicas
+- cluster-network-operator embedded-component 59d47ed54a1b5a15020a4fe203fd7cdcb6e84631 to fd05db194cae71d99500eef3b9042c20b8d912ee
+  - 063b771 2023-07-13T21:03:02+09:00 Change rhel7/8 to rhel8/9
 
-- cluster-kube-apiserver-operator embedded-component 8b642494e3bffc365cb24383b416dc0f530547d9 to 2e060d6686e4e6ba375a68a85268c9ed0ebbed9b
-  - 1ed9bf7 2023-07-07T13:00:57+02:00 certrotation: rotate kube-apiserver-to-kubelet-signer when 80% of validity is over.
-  - b04d091 2023-06-28T12:20:45+02:00 manifests: add openshift-oauth-apiserver on API Servers dashboard
-  - 04f36e7 2023-06-28T11:26:05+02:00 manifests: add new PrometheusRule for recording rules
-  - 2d682ba 2023-06-28T11:18:47+02:00 manifests: remove unnecessary v2 suffix in dashboard name
+- cluster-openshift-controller-manager-operator embedded-component bab7be17127e3e8a661991d78aecd7d5a0542cec to 08ed2c75cd3ea2995722d7c7a8a3a02f9ac426ca
+  - 30bfc7a 2023-07-11T21:52:02-04:00 updating dependencies
 
-- cluster-network-operator embedded-component 64ab110f331b37f862eefe9d3b99c61445b87890 to 59d47ed54a1b5a15020a4fe203fd7cdcb6e84631
-  - 8f4bd57 2023-07-10T10:19:42+02:00 Enable EgressService controller
-  - ef2c381 2023-07-07T09:36:49-05:00 Revert "OCPBUGS-10765: Remove oldest ovn acl log files when file limit exceeded"
-  - 98c7509 2023-07-06T19:02:54+02:00 Add adminpolicybasedexternalroutes right for ovnkube-node. It shouldn't change the object, therefore get, list, watch should be enough.
-  - d67eb33 2023-07-05T13:58:45-07:00 update openshift/api to get maxLogFiles config
-  - 440054f 2023-07-05T00:34:38-04:00 fix: add missing annotation for workload partitioning
-  - abd3596 2023-06-29T13:05:56-07:00 Remove oldest ovn acl log files when file limit exceeded
-  - db8b596 2023-06-26T07:19:44-04:00 Add support for missing (new) kube-proxy option overrides
-  - 0c58696 2023-06-26T07:19:44-04:00 Fix up ordering in kubeproxy.go to match upstream struct definition
-  - 53e6d98 2023-06-26T07:18:44-04:00 Force k8s.io/kube-proxy to v0.27.2
-  - 6fae35d 2023-06-01T08:14:23-05:00 Edited multus-admission-controller deployment config to not add automount a service account token
+- cluster-policy-controller embedded-component cc787e1b1e177696817b66689a03471914083a67 to 726cf3d31ef9bac3096f2a5e78706e1b0c527c0c
+  - d38befc 2023-07-11T09:12:22+02:00 Add ingvagabund to owners
+  - 0c14ec2 2023-07-11T08:42:30+03:00 Add logs for quota namespace syncing with verbosity level 2
 
-- etcd embedded-component 53cdd6b0519f0e57da9032b473465799bba4b1a0 to 5a36b9b6b329d92d7c26d1c944e6b1192f9d1523
-  - 0970055c 2023-07-05T14:51:12+02:00 UPSTREAM <carry>: add etcdutl to our container image
-  - a66a9b83 2023-07-05T14:47:32+02:00 update etcdctl flag description for snapshot restores
-  - cfa79a5d 2023-07-05T14:47:25+02:00 etcdutl: update description for --mark-compacted and --bump-revision flags in snapshot restore command
-  - dc7b2599 2023-07-05T14:47:15+02:00 Adding optional revision bump and mark compacted to snapshot restore
-  - bdbbde99 2023-05-11T13:39:43+02:00 version: bump up to 3.5.9
-  - da125abc 2023-05-11T10:23:19+02:00 DOWNSTREAM: <carry>: update go.mod
-  - 4b310a07 2023-05-10T18:28:51+02:00 DOWNSTREAM: <carry>: update Dockerfile build image go1.19
-  - 45d8cb25 2023-05-09T13:50:34+02:00 Move go version to dedicated .go-version file
-  - e38eb678 2023-05-08T22:47:58+09:00 tests: e2e and integration test for timetolive
-  - d1b1aa9d 2023-05-08T22:45:38+09:00 etcdserver: protect lease timetilive with auth
-  - fce6fd8d 2023-05-04T18:30:57+02:00 UPSTREAM: <carry>: rebase script
-  - fb8fba71 2023-05-04T14:13:56+12:00 Backport go update to latest patch release 1.19.9.
-  - b91025ab 2023-05-04T14:13:39+12:00 Backport centralising go version for actions workflows.
-  - c0f2954e 2023-04-25T08:02:39+02:00 server: backport 15743, improved description of --initial-cluster-state flag
-  - 217d183e 2023-04-13T12:08:47+02:00 version: bump up to 3.5.8
-  - cd019255 2023-04-11T09:51:48+08:00 etcdserver: Guarantee order of requested progress notifications
-  - 643e6e19 2023-04-10T08:21:43+08:00 etcdserver: verify field 'username' and 'revision' present when decoding a JWT token
-  - b31caa3f 2023-04-07T13:33:39+08:00 set zap logging to wsproxy
-  - e6c2e380 2023-04-06T20:12:02+09:00 security: remove password after authenticating the user
-  - 291cb717 2023-04-06T20:11:20+09:00 test: add an e2e test to reproduce https://nvd.nist.gov/vuln/detail/CVE-2021-28235
-  - f905e2c2 2023-04-06T14:27:40+08:00 bump golang to 1.19.8
-  - e6eeca68 2023-04-03T22:55:55+09:00 server/auth: disallow creating empty permission ranges
-  - 55bce22e 2023-04-02T08:57:56+08:00 chore: enable strict mode for test CI
-  - 77baf66b 2023-04-01T23:29:25+08:00 Fixes: #15266 All docker images of Architecture show amd64
-  - 9e506593 2023-04-01T16:47:08+05:30 scripts: Add testing of etcd in local image in release workflow.
-  - 073c5309 2023-03-30T16:01:29+02:00 server: Fix defer function closure escape
-  - 6637aee8 2023-03-30T16:01:28+02:00 tests: Test separate http port connection multiplexing
-  - c0421c73 2023-03-30T15:53:11+02:00 server: Add --listen-client-http-urls flag to allow running grpc server separate from http server
-  - 2d5f48a7 2023-03-30T15:11:59+02:00 server: Pick one address that all grpc gateways connect to
-  - a9e0a04c 2023-03-30T15:11:59+02:00 server: Extract resolveUrl helper function
-  - 245067b1 2023-03-30T15:11:59+02:00 server: Separate client listener grouping from serving
-  - 63576a25 2023-03-30T15:11:58+02:00 refactor: Use proper variable names for urls
-  - f7ac9dfc 2023-03-30T19:13:33+08:00 sever/auth: fix addUserWithNoOption of store_test
-  - dcb1bf60 2023-03-30T19:13:33+08:00 server/auth: fix auth panic bug when user changes password
-  - 44d78bf9 2023-03-30T16:39:08+05:30 Automated cherry-pick of #14860: Trigger release in current branch for github workflow case
-  - 9e974792 2023-03-20T20:41:49+08:00 server/embed: fix data race when start insecure grpc
-  - 92e56ab6 2023-03-20T12:04:43+01:00 server: Test watch restore
-  - dafdaaed 2023-03-20T12:02:49+01:00 mvcc: update minRev when watcher stays synced
-  - 86101d33 2023-03-17T10:51:36+01:00 tests: Add v2 API to connection multiplexing test
-  - eb614c35 2023-03-17T10:51:35+01:00 tests: Add connection muiltiplexer testing
-  - 2eeb2608 2023-03-17T10:50:21+01:00 tests: Backport RunUtilCompletion
-  - 00e1e5db 2023-03-17T10:50:19+01:00 tests: Backport tls for etcdctl
-  - 46d6c1d7 2023-03-16T17:24:42+01:00 tests: Extract e2e test utils
-  - 2f4d75fe 2023-03-16T17:24:42+01:00 tests: Allow specifying http version in curl
-  - 4e9911ec 2023-03-16T17:24:42+01:00 tests: Refactor newClient args
-  - 64bc55ef 2023-03-16T17:24:42+01:00 tests: Refactor CURLPrefixArgs
-  - 358bcf3f 2023-03-15T14:10:14+13:00 Backport tls 1.3 support.
-  - 55bfad95 2023-03-14T09:16:46+01:00 server: Switch back to random scheduler to improve resilience to watch starvation
-  - 3f96014d 2023-03-14T09:16:46+01:00 test: Test etcd watch stream starvation under high read response load when sharing the same connection
-  - 98861410 2023-03-14T09:16:46+01:00 tests: Allow configuring progress notify interval in e2e tests
-  - e44995e6 2023-03-13T16:56:11+01:00 Run go mod tidy
-  - f0aa228d 2023-03-08T22:33:13+13:00 Updated go to 1.19.7.
-  - 1ea808b5 2023-02-24T22:01:41+13:00 Backport go_srcs_in_module changes and fix goword failures.
-  - 183af509 2023-02-20T21:33:59+13:00 Formatted source code for go 1.19.6.
-  - 1bd83538 2023-02-20T12:52:43+13:00  Bump to go 1.19.6
-  - 5996b5fa 2023-02-20T12:51:17+13:00  Bump golang.org/x/net to v0.7.0 to address CVE GO-2023-1571.
-  - d41d8ac1 2023-02-10T21:03:43+08:00 test:enhance the test case TestV3WatchProgressOnMemberRestart
-  - e896cc72 2023-02-10T16:47:49+08:00 clientv3: correct the nextRev on receving progress notification response
-  - 452164a1 2023-02-09T07:03:04+08:00 etcdserver: add failpoints walBeforeSync and walAfterSync
-  - b9568dba 2023-02-03T21:45:45+13:00 Fix regression in timestamp resolution
-  - 2a0ecd40 2023-01-31T14:42:15+08:00 upgrade cockroachdb/datadriven to v1.0.2 to remove archived dependencies
-  - 78e73908 2023-01-31T07:12:46+08:00 bump github.com/stretchr/testify to v1.8.1
-  - 747de584 2023-01-31T07:12:46+08:00 bump bbolt to v1.3.7 for release-3.5
-  - 41ed809c 2023-01-26T11:11:25+01:00 netutil: consistently format ipv6 addresses
-  - 82004d01 2023-01-25T02:46:11+08:00 docker: remove nsswitch.conf
-  - 215b53cf 2023-01-20T11:15:12+01:00 version: bump up to 3.5.7
-  - 53300ece 2023-01-17T06:24:27+08:00 etcdserver: return membership.ErrIDNotFound when the memberID not found
-  - e1fc545d 2023-01-08T05:30:01+08:00 etcdserver: process the scenaro of the last WAL record being partially synced to disk
-  - cff30450 2022-12-23T20:30:23+08:00 update nsswitch.conf for 3.5
-  - 1293f5d4 2022-12-23T18:38:40+08:00 3.5: remove the dependency on busybox
-  - 925c0611 2022-12-19T16:16:55+08:00 Remove dependency on gobin
-  - 413ec161 2022-12-19T13:28:25+08:00 resolve build error: parameter may not start with quote character '
-  - bf1b9021 2022-12-19T13:27:19+08:00 remove .travis.yml
-  - a612b928 2022-12-19T13:26:59+08:00 format the source code and tidy the dependencies using go 1.17.13
-  - 69ee8a83 2022-12-19T13:23:16+08:00 bump go version to 1.17.13
-  - 3337f35f 2022-12-19T09:28:07+08:00 deps: bump golang.org/x/net to v0.4.0 to address CVEs
-  - b766840c 2022-12-19T07:59:32+08:00 security: use distroless base image to address critical Vulnerabilities
-  - d178292f 2022-12-17T15:30:26+08:00 cidc:  specify the correct branch name of release-3.5 in workflow for trivy nightly scan
-  - 4d3c840a 2022-12-16T10:59:14+05:30 Add trivy nightly scan for release-3.5
-  - 1fdfb429 2022-12-15T02:12:49+08:00 clientv3: revert the client side change in 14547
-  - 96ca27a3 2022-12-13T00:12:15+00:00 client/pkg/v3: fixes Solaris build of transport
-  - c1a89973 2022-12-06T18:16:49+08:00 etcdserver: fix nil pointer panic for readonly txn
-  - 22f599a2 2022-12-05T21:04:09+00:00 Fix go fmt error
-  - 378ad6b5 2022-12-05T21:04:09+00:00 [3.5] Backport: non mutating requests pass through quotaKVServer when NOSPACE
-  - ba122c9d 2022-11-25T16:23:37+08:00 etcdserver: intentionally set the memberID as 0 in corruption alarm
-
-- kubernetes embedded-component e8b13aaf3b13581e62526d51f6f958b8fec93196 to af29f64acbf9e6d33cde7f3194cf858f54058d3b
-  - 362c559db 2023-07-05T16:51:09+02:00 UPSTREAM: 119107: Stop using deprecated API
-  - b06b0c36d 2023-07-05T10:42:36+02:00 UPSTREAM: <drop>: make update
-  - ee62a2286 2023-07-04T17:36:00+02:00 UPSTREAM: 118915: remove legacy NetworkPolicy tests
-
-- machine-config-operator embedded-component 5ddeae5b35bb70320ba9946ed102ca3c114215c6 to 2069e55cdb39419f9a127c5fed3673c560b4cc4e
-  - 8b776b65 2023-07-06T14:39:36-04:00 set MCO namespace on all events
-  - 75955afa 2023-07-06T11:40:58-03:00 OpenStack: restrict IPv6 configuration
-  - a346028e 2023-07-05T23:41:51-04:00 Update 0000_90_machine-config-operator_01_prometheus-rules.yaml
-  - ffb664e2 2023-07-05T15:57:23-04:00 add wasm extension
-  - b145b125 2023-07-05T14:44:31-04:00 set pool alert back to zero in more default scenarios.
-
-- oc image-amd64 2fd11272ef77febe027e597c8a65ee186c47b304 to 1a0e893160c98220969cb0ed3fcf1a62b3919c97
-  - 23ffd2d5 2023-07-05T11:01:00+03:00 add login flow using a browser
-  - b6d3b0d9 2023-07-05T10:59:39+03:00 add github.com/pkg/browser to go.mod and vendor
-  - efe83304 2023-07-05T01:02:15+02:00 react to changes in tokenrequest
-  - 7a9719c1 2023-07-05T00:52:24+02:00 pkg: fix NewManifestBuilder calls
-  - 90c0b077 2023-07-05T00:52:17+02:00 go mod vendor
-  - cc1c12dd 2023-07-05T00:52:17+02:00 go.mod: update library-go
-  - 9c981b63 2023-07-05T00:18:23+02:00 go.mod: upgrade distribution to v3
-  - 68e3d16b 2023-07-05T00:18:23+02:00 pkg: import distribution/v3
-  - 585e44a3 2023-06-15T12:02:20+03:00 oc release info: Introduce --idms-file and deprecate --icsp-file
-
-- router image-amd64 0cd9a58dff77127562f7851ccfa5cda79b8cef48 to 6cef4d006b96779a78d752909203812a451e8d27
-  - 89b38a1 2023-07-07T17:41:46-04:00 Set tune.http.cookielen when capture cookie length is greater than 63
-
-- ovn-kubernetes image-amd64 ac45301151d508b088c6f9321a9731ed550abcdf to e236fea83d62de8b60b9456770a3e0b525830051
-  - ab2776b 2023-07-07T14:49:14+02:00 EgressIP: Do not reconcile egressIPPod objects that are being deleted and the namespace no longer exists
-  - d3b10e8 2023-07-07T12:57:20+02:00 Add config flag 'enable-multi-external-gateway'
-  - 049bd59 2023-07-06T17:25:04+02:00 Fix updating egress firewall status
-  - eb87b04 2023-07-06T12:06:17+02:00 Healthchecks have moved to ovnkube-controller
-  - a3dd7de 2023-07-06T11:54:49+02:00 Ensure ovnkube-controller does not go remote->local
-  - 926a1dc 2023-07-05T17:23:11+02:00 Disable UTs for APB Temporarily
-  - 9dbe97e 2023-07-05T16:05:30+02:00 APB: add check for nil before returning number of dynamic hops in tests
-  - 5e446a6 2023-07-05T13:33:59+02:00 APB: Fix wrong structured logs
-  - 7c21e8f 2023-07-05T09:31:21+02:00 Fix acl sync to properly filter default deny acls. ExternalIDs[defaultDenyPolicyTypeACLExtIdKey] is also used by multicast acls (despite the name), but multicast acl have different priorities. It was not a bug, because multicast acls are updated before default deny, therefore only default deny acls will match the criteria. This commit just makes the filtering more specific.
-  - 77bf11b 2023-07-04T21:49:42-04:00 fix some typos in docs/INSTALL.OPENSHIFT.md
-  - 980abd3 2023-07-01T21:47:14+00:00 ovn-ic: node update missing static routes
-  - 8a95d1d 2023-07-01T00:04:39+02:00 APB: Expose nbCli functions in master_controller for unit test validation
-  - f7bdb40 2023-06-30T19:35:16+02:00 IC: Changes for metrics
-  - b3761b6 2023-06-30T14:38:54+02:00 APB: Delete all tracked external GW entries from the north bound when a pod is deleted
-  - f22e5af 2023-06-30T14:32:45+02:00 EQoS: Consider only local nodes and pods
-  - b4fcdce 2023-06-30T09:03:57+02:00 Move the APB repair function to the Default Network Controller's Init() function
-  - 059f62c 2023-06-30T08:36:41+02:00 Add check for overlapping external gateway IPs in egressgw when deleting/adding a pod from routeInfo and add unit tests
-  - 615848e 2023-06-29T13:10:18-07:00 rename incorrectly named test files - suit_test.go
-  - 762faa5 2023-06-29T15:04:10+02:00 Remove debug logline
-  - 0625e16 2023-06-29T12:33:38+02:00 Add debug statements to figure out ETP=local flake
-  - 28915ca 2023-06-29T10:27:42+02:00 User Facing change: Rename ncm to ovnkube-controller
-  - 5e3dc65 2023-06-29T09:47:46+02:00 Allow hostNetwork ingress for network policies with empty namespace selector. The previous version used shared address sets for empty namespace selector to reuse the address set, but it didn't include a special config.Kubernetes.HostNetworkNamespace that only has an address set, but no pods. This difference may break existing network policies for hostNetwork pods, therefore we explicitly add this address sets for an empty namespace selector.
-  - c5a4bcc 2023-06-28T22:47:41+00:00 Fix unidling test panic after not waiting to be done
-  - bc3446c 2023-06-23T11:36:35+00:00 Vendor upstream netlink
-
-- kubernetes image-amd64 e8b13aaf3b13581e62526d51f6f958b8fec93196 to af29f64acbf9e6d33cde7f3194cf858f54058d3b
-  - 362c559db 2023-07-05T16:51:09+02:00 UPSTREAM: 119107: Stop using deprecated API
-  - b06b0c36d 2023-07-05T10:42:36+02:00 UPSTREAM: <drop>: make update
-  - ee62a2286 2023-07-04T17:36:00+02:00 UPSTREAM: 118915: remove legacy NetworkPolicy tests
-
-- router image-arm64 0cd9a58dff77127562f7851ccfa5cda79b8cef48 to 6cef4d006b96779a78d752909203812a451e8d27
-  - 89b38a1 2023-07-07T17:41:46-04:00 Set tune.http.cookielen when capture cookie length is greater than 63
-
-- kubernetes image-arm64 af29f64acbf9e6d33cde7f3194cf858f54058d3b to 0abcd84431df81ed9f2a1846b5045e46d9032cc1
+- kubernetes embedded-component af29f64acbf9e6d33cde7f3194cf858f54058d3b to 4aaeaec06c95e0a1a868695792c256d8f0158075
   - 26497a751 2023-07-11T10:58:51+02:00 UPSTREAM: <drop>: hack/update-vendor.sh
+  - f032c2b78 2023-07-10T12:14:19+03:00 UPSTREAM: 118881: fix openapi/v3 non local apiservices aggregation
+
+- machine-config-operator embedded-component 2069e55cdb39419f9a127c5fed3673c560b4cc4e to d0c0670f38dcf95d1d267879614ad09e37e58d51
+  - 5ec8f1b2 2023-07-12T16:46:54+02:00 OCPBUGS-11997: Prevent NM from unsetting the hostname
+
+- openshift-controller-manager embedded-component 2caaf6b26c07395566c38e01d6154debb9117ecc to 80c4923e0b2014ec8b8a6845c21078e6cc036f91
+  - 7f53e15 2023-07-11T19:26:40-04:00 code fixes due to dependency updates
+  - db5d793 2023-07-11T15:00:28-04:00 update dependencies
+
+- oc image-amd64 1a0e893160c98220969cb0ed3fcf1a62b3919c97 to b23646318f85cd2f03853137363702655c8a8346
+  - d49f92f7 2023-07-11T14:21:33-04:00 reboot: set ignition version to 3.1
+  - 8b2bcf04 2023-07-10T17:54:53-04:00 MCO cert: update root-ca configmap if on BareMetal
+  - d14691e8 2023-07-10T15:32:57-04:00 mcs cert: account for environments that use IP directly
+  - f47f44da 2023-06-13T12:31:46-04:00 Add tls-server-name when exists property exists in kubeconfig
+
+- ovn-kubernetes image-amd64 e236fea83d62de8b60b9456770a3e0b525830051 to e7779d24f03913b58766e16469bc81e38fd4d268
+  - 4a23c23 2023-07-13T23:08:39-04:00 Dockerfile: bump to OVN 23.06
+  - 246acd6 2023-07-13T21:52:19+02:00 Ensure minimum disruption when upgrading to ic
+  - e79e5f9 2023-07-13T15:46:58-04:00 Suppress and fix errors thrown by adding remote nodes
+  - 906a598 2023-07-13T15:46:58-04:00 Adds suppressed type errors to ignore certain errors
+  - d000a80 2023-07-13T20:49:43+02:00 Create all existing ACLs in tier2
+  - 0d70fb8 2023-07-13T20:49:43+02:00 Bump OVN DB Schemas to 23.06
+  - c2d6de7 2023-07-13T15:01:16+02:00 multi-homing, e2e tests: wait for NAD creation to settle
+  - 19e63e7 2023-07-13T13:34:26+02:00 an attempt to fix "adds existing pod and processes an update event" getting 1 add event instead of 2.
+  - 06a8b8d 2023-07-13T12:02:42+02:00 Fix egressDNS test flake when EgressDNS hasn't started its goroutine listening to the added channel. If `Add` is called before that, message won't be sent because the channel didn't have a buffer.
+  - 7545c74 2023-07-13T12:02:36+02:00 Fix counting goroutines test: let the system settle down before counting goroutines. It used to flake ~ every 1000 iterations. Verified this fix with 7500 runs.
+  - 17401b8 2023-07-12T18:09:03-04:00 Wait for other SBDB objects
+  - 87885b0 2023-07-12T20:02:38+02:00 delete address sets after acls that reference them to avoid ovn-controller syntax errors
+  - b164c85 2023-07-12T17:51:49+02:00 Fix startup of ovnkube-node
+  - 6f637a2 2023-07-12T16:22:07+02:00 don't add event handlers for existing informers in constructor. Do so only if Run() is called, otherwise workqueues will be filled, but not handled.
+  - 46da353 2023-07-12T16:22:07+02:00 Fix unit test race, make sure add event is handled before delete event. Otherwise, sync logic will do nothing if the object is already deleted, but add event wasn't handled yet.
+  - 96b7803 2023-07-12T16:22:02+02:00 WaitForCacheSync function takes stopChannel as an argument, and it will retry syncing cache until it is closed. If we just use ovn-kube stop channel, it will never return an error (it will never return until either the cache is synced, or stopChannel is closed). To fix it, GetChildStopChanWithTimeout and some wrappers functions passing this channel with timeout were added. The default cache sync timeout is 20 seconds (with reflector exponential backoff it means 4 list() retries). If any informer failed to list its resource withing a given time period, return error to make the problem visible.
+  - 074607d 2023-07-12T08:51:51+00:00 Release network IDs
+  - c2274e0 2023-07-12T08:51:51+00:00 NodeAllocator allocates network IDs for L2
+  - fb9b78e 2023-07-12T08:51:49+00:00 Rename HostSubnetAllocator to NodeAllocator
+  - d30ee3c 2023-07-12T10:35:40+02:00 subnetallocator: fix and clean up used vs. count confusion
+  - 9a588e7 2023-07-12T10:21:07+02:00 rename SharedInformerFactory from routePolicyInformer to routePolicyFactory
+  - c8ec7c0 2023-07-11T23:51:13-04:00 Fixes race across node workers to create transit switch
+  - f7b2777 2023-07-11T16:51:48-04:00 Adds a wait for SB chassis for port binding
+  - 2cd1adf 2023-07-11T11:55:54+00:00 e2e multi-homing: fix uneeded replacement of network name
+  - fd07c04 2023-07-11T09:04:23+00:00 Enable cluster manager support for layer2 networks
+  - d9864de 2023-07-11T08:51:58+00:00 Change ID allocator to round robin strategy
+  - b3012cf 2023-07-11T08:51:57+00:00 Add ID allocator to PodAllocator
+  - cffc137 2023-07-11T08:51:57+00:00 Rename PodIPAllocator to PodAllocator
+  - 8b0bcb1 2023-07-11T08:51:57+00:00 Allocate an tunnel ID with the PodAnnotation
+  - e7763f1 2023-07-11T08:51:57+00:00 Add Named ID allocator
+  - cc23a1c 2023-07-11T08:51:57+00:00 Move ID allocator to allocator package
+  - 9ad0479 2023-07-11T08:51:57+00:00 Add ID Allocator interface
+  - 37e888f 2023-07-11T07:59:49+00:00 Enable multi-homing e2e tests for localnet with IC
+  - 05228cc 2023-07-10T14:58:04+02:00 Fix egressip test not waiting for update processing before delete
+  - 5d6b136 2023-07-10T14:21:50+02:00 netpolEventHandler: fix stopChan. We used to pass oc.stopChan to the retryFramework for network policy handlers, but that means that retry loop for failed objects will not be stopped on network policy delete, therefore leaking goroutines. Create getChildStopChan function to pass stop signal both on oc and network policy delete.
+  - ef362a8 2023-07-10T14:21:50+02:00 podSelectorAddressSet: fix deleting namespaceHandler. namespace and pod handlers need different commands to be cleaned up. we used to call RemovePodHandler for both namespace and pod handlers
+  - 7821862 2023-07-10T09:28:57+00:00 Enable localnet topology with interconnect
+  - d863c56 2023-07-10T09:28:57+00:00 Add ip allocator to cluster manager
+  - d86604b 2023-07-10T09:28:56+00:00 Move subnet handling out of network cluster controller
+  - 9b53357 2023-07-10T09:28:56+00:00 Refactor DPU annotations to use UpdatePodWithRetryOrRollback
+  - 379d785 2023-07-10T09:28:56+00:00 Add PodAnnotation update utility
+  - 7345cd4 2023-07-10T09:28:55+00:00 Refactor convertMultiNetPolicyToNetPolicy
+  - 819473c 2023-07-10T09:28:55+00:00 Annotation errors compatible with errors pkg
+  - 18f9dd6 2023-07-10T09:28:55+00:00 Pre-allocate subnets in subnet ip allocator
+  - 15d7c7a 2023-07-10T09:28:55+00:00 Add a subnet ip allocator
+  - aec6733 2023-07-10T09:28:55+00:00 Re-structure ipallocator package
+  - 05a522c 2023-07-10T09:28:54+00:00 Move ipallocator pkg out of the ovn pkg
+  - cf89213 2023-07-10T09:28:54+00:00 Remove cache of logical switch UUID
+  - 3d0dacc 2023-07-05T15:58:20+02:00 Fix db checks when service controller is running. Previously svc controller wasn't properly started, so new Chassis_Template_Var wasn't create on node update. The correct way to start service controller was oc.svcFactory.Start(oc.stopChan) oc.StartServiceController(oc.wg, true)) Now it is just oc.StartServiceController(oc.wg, true)) since factory is shared. Running service controller will create Chassis_Template_Var for existing nodes, update addNodeLogicalFlows.
+  - f64c91a 2023-07-05T15:58:16+02:00 Update service controller to use sharedInformerFactory from the default controller. It decreases kube-apiserver load and memory footprint, because service controller used to create its own SharedInformerFactory for Nodes, Services and EndpointSlices.
+  - 77c9268 2023-06-28T15:57:14+02:00 e2e multi-homing: remove --internal from docker localnet overlay
+  - 20ebbf2 2023-06-28T15:56:10+02:00 e2e multi-homing: fix missing underlay for localnet policy tests
+  - d5a53d7 2023-06-28T15:55:31+02:00 e2e multi-homing: fix bridge mapping physnet
+  - 3743494 2023-06-28T15:54:26+02:00 e2e multi-homing: fix network name changing throughout the test
+  - a6a0044 2023-06-28T15:51:07+02:00 multi-homing, localnet: update localnet port network name
+
+- kubernetes image-amd64 af29f64acbf9e6d33cde7f3194cf858f54058d3b to 4aaeaec06c95e0a1a868695792c256d8f0158075
+  - 26497a751 2023-07-11T10:58:51+02:00 UPSTREAM: <drop>: hack/update-vendor.sh
+  - f032c2b78 2023-07-10T12:14:19+03:00 UPSTREAM: 118881: fix openapi/v3 non local apiservices aggregation
+
+- oc image-arm64 1a0e893160c98220969cb0ed3fcf1a62b3919c97 to b23646318f85cd2f03853137363702655c8a8346
+  - d49f92f7 2023-07-11T14:21:33-04:00 reboot: set ignition version to 3.1
+  - 8b2bcf04 2023-07-10T17:54:53-04:00 MCO cert: update root-ca configmap if on BareMetal
+  - d14691e8 2023-07-10T15:32:57-04:00 mcs cert: account for environments that use IP directly
+  - f47f44da 2023-06-13T12:31:46-04:00 Add tls-server-name when exists property exists in kubeconfig
+
+- ovn-kubernetes image-arm64 e236fea83d62de8b60b9456770a3e0b525830051 to e7779d24f03913b58766e16469bc81e38fd4d268
+  - 4a23c23 2023-07-13T23:08:39-04:00 Dockerfile: bump to OVN 23.06
+  - 246acd6 2023-07-13T21:52:19+02:00 Ensure minimum disruption when upgrading to ic
+  - e79e5f9 2023-07-13T15:46:58-04:00 Suppress and fix errors thrown by adding remote nodes
+  - 906a598 2023-07-13T15:46:58-04:00 Adds suppressed type errors to ignore certain errors
+  - d000a80 2023-07-13T20:49:43+02:00 Create all existing ACLs in tier2
+  - 0d70fb8 2023-07-13T20:49:43+02:00 Bump OVN DB Schemas to 23.06
+  - c2d6de7 2023-07-13T15:01:16+02:00 multi-homing, e2e tests: wait for NAD creation to settle
+  - 19e63e7 2023-07-13T13:34:26+02:00 an attempt to fix "adds existing pod and processes an update event" getting 1 add event instead of 2.
+  - 06a8b8d 2023-07-13T12:02:42+02:00 Fix egressDNS test flake when EgressDNS hasn't started its goroutine listening to the added channel. If `Add` is called before that, message won't be sent because the channel didn't have a buffer.
+  - 7545c74 2023-07-13T12:02:36+02:00 Fix counting goroutines test: let the system settle down before counting goroutines. It used to flake ~ every 1000 iterations. Verified this fix with 7500 runs.
+  - 17401b8 2023-07-12T18:09:03-04:00 Wait for other SBDB objects
+  - 87885b0 2023-07-12T20:02:38+02:00 delete address sets after acls that reference them to avoid ovn-controller syntax errors
+  - b164c85 2023-07-12T17:51:49+02:00 Fix startup of ovnkube-node
+  - 6f637a2 2023-07-12T16:22:07+02:00 don't add event handlers for existing informers in constructor. Do so only if Run() is called, otherwise workqueues will be filled, but not handled.
+  - 46da353 2023-07-12T16:22:07+02:00 Fix unit test race, make sure add event is handled before delete event. Otherwise, sync logic will do nothing if the object is already deleted, but add event wasn't handled yet.
+  - 96b7803 2023-07-12T16:22:02+02:00 WaitForCacheSync function takes stopChannel as an argument, and it will retry syncing cache until it is closed. If we just use ovn-kube stop channel, it will never return an error (it will never return until either the cache is synced, or stopChannel is closed). To fix it, GetChildStopChanWithTimeout and some wrappers functions passing this channel with timeout were added. The default cache sync timeout is 20 seconds (with reflector exponential backoff it means 4 list() retries). If any informer failed to list its resource withing a given time period, return error to make the problem visible.
+  - 074607d 2023-07-12T08:51:51+00:00 Release network IDs
+  - c2274e0 2023-07-12T08:51:51+00:00 NodeAllocator allocates network IDs for L2
+  - fb9b78e 2023-07-12T08:51:49+00:00 Rename HostSubnetAllocator to NodeAllocator
+  - d30ee3c 2023-07-12T10:35:40+02:00 subnetallocator: fix and clean up used vs. count confusion
+  - 9a588e7 2023-07-12T10:21:07+02:00 rename SharedInformerFactory from routePolicyInformer to routePolicyFactory
+  - c8ec7c0 2023-07-11T23:51:13-04:00 Fixes race across node workers to create transit switch
+  - f7b2777 2023-07-11T16:51:48-04:00 Adds a wait for SB chassis for port binding
+  - 2cd1adf 2023-07-11T11:55:54+00:00 e2e multi-homing: fix uneeded replacement of network name
+  - fd07c04 2023-07-11T09:04:23+00:00 Enable cluster manager support for layer2 networks
+  - d9864de 2023-07-11T08:51:58+00:00 Change ID allocator to round robin strategy
+  - b3012cf 2023-07-11T08:51:57+00:00 Add ID allocator to PodAllocator
+  - cffc137 2023-07-11T08:51:57+00:00 Rename PodIPAllocator to PodAllocator
+  - 8b0bcb1 2023-07-11T08:51:57+00:00 Allocate an tunnel ID with the PodAnnotation
+  - e7763f1 2023-07-11T08:51:57+00:00 Add Named ID allocator
+  - cc23a1c 2023-07-11T08:51:57+00:00 Move ID allocator to allocator package
+  - 9ad0479 2023-07-11T08:51:57+00:00 Add ID Allocator interface
+  - 37e888f 2023-07-11T07:59:49+00:00 Enable multi-homing e2e tests for localnet with IC
+  - 05228cc 2023-07-10T14:58:04+02:00 Fix egressip test not waiting for update processing before delete
+  - 5d6b136 2023-07-10T14:21:50+02:00 netpolEventHandler: fix stopChan. We used to pass oc.stopChan to the retryFramework for network policy handlers, but that means that retry loop for failed objects will not be stopped on network policy delete, therefore leaking goroutines. Create getChildStopChan function to pass stop signal both on oc and network policy delete.
+  - ef362a8 2023-07-10T14:21:50+02:00 podSelectorAddressSet: fix deleting namespaceHandler. namespace and pod handlers need different commands to be cleaned up. we used to call RemovePodHandler for both namespace and pod handlers
+  - 7821862 2023-07-10T09:28:57+00:00 Enable localnet topology with interconnect
+  - d863c56 2023-07-10T09:28:57+00:00 Add ip allocator to cluster manager
+  - d86604b 2023-07-10T09:28:56+00:00 Move subnet handling out of network cluster controller
+  - 9b53357 2023-07-10T09:28:56+00:00 Refactor DPU annotations to use UpdatePodWithRetryOrRollback
+  - 379d785 2023-07-10T09:28:56+00:00 Add PodAnnotation update utility
+  - 7345cd4 2023-07-10T09:28:55+00:00 Refactor convertMultiNetPolicyToNetPolicy
+  - 819473c 2023-07-10T09:28:55+00:00 Annotation errors compatible with errors pkg
+  - 18f9dd6 2023-07-10T09:28:55+00:00 Pre-allocate subnets in subnet ip allocator
+  - 15d7c7a 2023-07-10T09:28:55+00:00 Add a subnet ip allocator
+  - aec6733 2023-07-10T09:28:55+00:00 Re-structure ipallocator package
+  - 05a522c 2023-07-10T09:28:54+00:00 Move ipallocator pkg out of the ovn pkg
+  - cf89213 2023-07-10T09:28:54+00:00 Remove cache of logical switch UUID
+  - 3d0dacc 2023-07-05T15:58:20+02:00 Fix db checks when service controller is running. Previously svc controller wasn't properly started, so new Chassis_Template_Var wasn't create on node update. The correct way to start service controller was oc.svcFactory.Start(oc.stopChan) oc.StartServiceController(oc.wg, true)) Now it is just oc.StartServiceController(oc.wg, true)) since factory is shared. Running service controller will create Chassis_Template_Var for existing nodes, update addNodeLogicalFlows.
+  - f64c91a 2023-07-05T15:58:16+02:00 Update service controller to use sharedInformerFactory from the default controller. It decreases kube-apiserver load and memory footprint, because service controller used to create its own SharedInformerFactory for Nodes, Services and EndpointSlices.
+  - 77c9268 2023-06-28T15:57:14+02:00 e2e multi-homing: remove --internal from docker localnet overlay
+  - 20ebbf2 2023-06-28T15:56:10+02:00 e2e multi-homing: fix missing underlay for localnet policy tests
+  - d5a53d7 2023-06-28T15:55:31+02:00 e2e multi-homing: fix bridge mapping physnet
+  - 3743494 2023-06-28T15:54:26+02:00 e2e multi-homing: fix network name changing throughout the test
+  - a6a0044 2023-06-28T15:51:07+02:00 multi-homing, localnet: update localnet port network name
+
+- kubernetes image-arm64 0abcd84431df81ed9f2a1846b5045e46d9032cc1 to 4aaeaec06c95e0a1a868695792c256d8f0158075
+  - f032c2b78 2023-07-10T12:14:19+03:00 UPSTREAM: 118881: fix openapi/v3 non local apiservices aggregation
 

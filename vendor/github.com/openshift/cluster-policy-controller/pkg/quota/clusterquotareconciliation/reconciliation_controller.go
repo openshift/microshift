@@ -164,6 +164,7 @@ func (c *ClusterQuotaReconcilationController) Sync(discoveryFunc resourcequota.N
 		// Get the current resource list from discovery.
 		newResources, err := resourcequota.GetQuotableResources(discoveryFunc)
 		if err != nil {
+			klog.V(2).Infof("error occurred GetQuotableResources err=%v", err)
 			utilruntime.HandleError(err)
 
 			if discovery.IsGroupDiscoveryFailedError(err) && len(newResources) > 0 {
@@ -231,6 +232,7 @@ func (c *ClusterQuotaReconcilationController) resyncMonitors(ctx context.Context
 
 func (c *ClusterQuotaReconcilationController) calculate(quotaName string, namespaceNames ...string) {
 	if len(namespaceNames) == 0 {
+		klog.V(2).Infof("no namespace is passed for quota %s", quotaName)
 		return
 	}
 	items := make([]interface{}, 0, len(namespaceNames))
@@ -238,6 +240,7 @@ func (c *ClusterQuotaReconcilationController) calculate(quotaName string, namesp
 		items = append(items, workItem{namespaceName: name, forceRecalculation: false})
 	}
 
+	klog.V(2).Infof("calculating items for quota %s with namespaces %v", quotaName, items)
 	c.queue.AddWithData(quotaName, items...)
 }
 
@@ -250,6 +253,7 @@ func (c *ClusterQuotaReconcilationController) forceCalculation(quotaName string,
 		items = append(items, workItem{namespaceName: name, forceRecalculation: true})
 	}
 
+	klog.V(2).Infof("force calculating items for quota %s with namespaces %v", quotaName, items)
 	c.queue.AddWithData(quotaName, items...)
 }
 
@@ -264,6 +268,7 @@ func (c *ClusterQuotaReconcilationController) calculateAll() {
 		// If we have namespaces we map to, force calculating those namespaces
 		namespaces, _ := c.clusterQuotaMapper.GetNamespacesFor(quota.Name)
 		if len(namespaces) > 0 {
+			klog.V(2).Infof("syncing quota %s with namespaces %v", quota.Name, namespaces)
 			c.forceCalculation(quota.Name, namespaces...)
 			continue
 		}
@@ -339,6 +344,7 @@ func (c *ClusterQuotaReconcilationController) syncQuotaForNamespaces(originalQuo
 		return fmt.Errorf("mapping not up to date, have=%v need=%v", quotaSelector, quota.Spec.Selector), workItems
 	}
 	matchingNamespaceNames := sets.NewString(matchingNamespaceNamesList...)
+	klog.V(2).Infof("syncing for quota %s with set of namespaces %v", quota.Name, matchingNamespaceNames)
 
 	reconcilationErrors := []error{}
 	retryItems := []workItem{}
@@ -422,6 +428,9 @@ func (c *ClusterQuotaReconcilationController) replenishQuota(ctx context.Context
 	}
 
 	quotaNames, _ := c.clusterQuotaMapper.GetClusterQuotasFor(namespace)
+	if len(quotaNames) > 0 {
+		klog.V(2).Infof("replenish quotas %v for namespace %s", quotaNames, namespace)
+	}
 
 	// only queue those quotas that are tracking a resource associated with this kind.
 	for _, quotaName := range quotaNames {
