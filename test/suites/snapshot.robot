@@ -10,7 +10,7 @@ Resource            ../resources/oc.resource
 Resource            ../resources/microshift-config.resource
 
 Suite Setup         Test Suite Setup
-Suite Teardown      Teardown Suite With Namespace
+Suite Teardown      Test Suite Teardown
 
 
 *** Variables ***
@@ -41,10 +41,20 @@ Snapshotter Smoke Test
 
 *** Keywords ***
 Test Suite Setup
-    [Documentation]    Setup test namespace, patch the lvmd for thin-volume support, and restart microshift
+    [Documentation]    Setup test namespace, patch the lvmd for thin-volume support, and restart microshift for
+    ...                it to take effect
     Setup Suite With Namespace
+    Create Thin Storage Pool
     Extend LVMD Config
     Restart Microshift
+
+Test Suite Teardown
+    [Documentation]     Clean up test suite resources
+    Delete LVMD Config
+    Delete Thin Storage Pool
+    Restart Microshift
+    Teardown Suite With Namespace
+
 
 Test Case Setup
     [Documentation]    Prepare the cluster-level APIs and a data-volume with some simple text
@@ -58,6 +68,8 @@ Test Case Setup
 Test Case Teardown
     [Documentation]    Remove cluster-scoped test APIs
     Oc Delete    -f ${STORAGE_CLASS} -f ${SNAPSHOT_CLASS}
+    Oc Delete    pvc -n ${NAMESPACE} --all
+    Oc Delete    volumesnapshot -n ${NAMESPACE} --all
 
 Write To Volume
     [Documentation]    Write some simple text to the data volume
@@ -73,7 +85,7 @@ Read From Volume
 Extend LVMD Config
     [Documentation]    The cluster is not expected to have the necessary configuration to provision thin volumes.
     ...    Instead, we need to patch the lvmd configuration to include a deviceClass for the thin-pool.
-    ...    This assumes a thin-pool named 'thin', which is provided by CI.    The base lvmd is pulled from
+    ...    This assumes a thin-pool named 'thin', which is created during suite setup. The base lvmd is pulled from
     ...    the lvmd configMap. This is preferable since no default lvmd.yaml is written to disk. And if one
     ...    is written to disk, it will have been populated into the configMap already.
     # Get the existing lvmd from the cluster.
@@ -83,3 +95,10 @@ Extend LVMD Config
     ${patch_cfg}=    OperatingSystem.Get File    ${LVMD_PATCH}
     ${merged_cfg}=    Lvmd Merge    ${default_cfg}    ${patch_cfg}
     Upload String To File    ${merged_cfg}    /etc/microshift/lvmd.yaml
+
+Delete LVMD Config
+    [Documentation]         Removes the LVMD configuration as part of restoring test environment
+    ${stderr}   ${rc}=       sshLibrary.Execute Command    rm -f /etc/microshift/lvmd.yaml
+    ...                     sudo=True     return_rc=True      return_stderr=True  return_stdout=False
+    Log                     ${stderr}
+    Should Be Equal As Integers     0       ${rc}
