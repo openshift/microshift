@@ -50,6 +50,7 @@ export PREVIOUS_MINOR_VERSION  # defined earlier
 
 # Add our sources. It is OK to run these steps repeatedly, if the
 # details change they are updated in the service.
+title "Expanding package source templates to ${IMAGEDIR}/package-sources"
 mkdir -p "${IMAGEDIR}/package-sources"
 # shellcheck disable=SC2231  # allow glob expansion without quotes in for loop
 for template in ${TESTDIR}/package-sources/*.toml; do
@@ -83,6 +84,7 @@ get_blueprint_name() {
 BUILDIDS=""
 
 # Upload the blueprint definitions
+title "Expanding blueprint templates to ${IMAGEDIR}/blueprints and starting image builds"
 mkdir -p "${IMAGEDIR}/blueprints"
 mkdir -p "${IMAGEDIR}/builds"
 # shellcheck disable=SC2231  # allow glob expansion without quotes in for loop
@@ -133,11 +135,11 @@ if ${BUILD_INSTALLER}; then
     BUILDIDS="${BUILDIDS} ${buildid}"
 fi
 
-echo "Waiting for builds to complete..."
+title "Waiting for builds to complete..."
 # shellcheck disable=SC2086  # pass command arguments quotes to allow word splitting
 time "${SCRIPTDIR}/wait_images.py" ${BUILDIDS}
 
-echo "Downloading build logs..."
+title "Downloading build logs to ${LOGDIR}"
 cd "${IMAGEDIR}/builds"
 for buildid in ${BUILDIDS}; do
     blueprint=$(grep "${buildid}" -- *.image-installer *.edge-commit | cut -f1 -d:)
