@@ -59,6 +59,15 @@ RF_VENV=${RF_VENV:-${ROOTDIR}/_output/robotenv}
 # Which port the web server should run on.
 WEB_SERVER_PORT=${WEB_SERVER_PORT:-8080}
 
+title() {
+    # Only use color when reporting to a terminal
+    if [ -t 1 ]; then
+        echo -e "\E[34m\n# $1\E[00m"
+    else
+        echo "$1"
+    fi
+}
+
 error() {
     local message="$*"
     echo "ERROR: ${message} [$(caller)]" 1>&2

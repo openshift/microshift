@@ -33,7 +33,7 @@ download_image() {
 download_dir="${IMAGEDIR}/builds"
 mkdir -p "${download_dir}"
 
-echo "Downloading installer images to ${download_dir}"
+title "Downloading installer images to ${download_dir}"
 cd "${download_dir}"
 for blueprint_build in *.image-installer; do
     blueprint=$(basename "${blueprint_build}" .image-installer)
@@ -52,7 +52,7 @@ if [ -d "${IMAGEDIR}/repo" ]; then
     rm -rf "${IMAGEDIR}/repo"
 fi
 
-echo "Downloading ostree commits and metadata to ${download_dir}"
+title "Downloading ostree commits and metadata to ${download_dir}"
 cd "${download_dir}"
 for blueprint_build in *.edge-commit; do
     blueprint=$(basename "${blueprint_build}" .edge-commit)
@@ -66,7 +66,7 @@ for blueprint_build in *.edge-commit; do
     tar -C "${IMAGEDIR}" -xf "${commit_file}"
 done
 
-echo "Updating references"
+title "Updating ostree references in ${IMAGEDIR}/repo"
 cd "${IMAGEDIR}"
 ostree refs --repo=repo --force \
        --create "rhel-9.2-microshift-failing" "rhel-9.2-microshift-source"
