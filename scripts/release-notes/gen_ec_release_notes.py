@@ -57,14 +57,16 @@ URL_BASE_X86 = "https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
 # microshift-4.13.0~rc.0-202303212136.p0.gbd6fb96.assembly.rc.0.el9.aarch64.rpm
 VERSION_RE = re.compile(
     r"""
-    microshift-      # prefix
-    (?P<product_version>\d+\.\d+\.\d+)    # product version
-    ~                # separator
-    (?P<candidate_type>ec|rc)\.(?P<candidate_number>\d+)  # which candidate of which type
-    -
-    (?P<release_date>\d+)\.            # date
-    p(?P<patch_num>\d+)\.           # patch number
-    g(?P<commit_sha>[\dabcdef]+)\.   # commit SHA prefix
+    microshift-                             # prefix
+    (?P<full_version>
+      (?P<product_version>\d+\.\d+\.\d+)    # product version
+      ~                                     # separator
+      (?P<candidate_type>ec|rc)\.(?P<candidate_number>\d+)  # which candidate of which type
+      -
+      (?P<release_date>\d+)\.               # date
+      p(?P<patch_num>\d+)\.                 # patch number
+      g(?P<commit_sha>[\dabcdef]+)          # commit SHA prefix
+    )\.
     """,
     re.VERBOSE,
 )
@@ -78,7 +80,7 @@ OLD_VERSIONS = ['4.12', '4.13']
 # Representation of one release
 Release = collections.namedtuple(
     'Release',
-    "release_name commit_sha product_version candidate_type candidate_number release_type",
+    "release_name commit_sha product_version candidate_type candidate_number release_type release_date",
 )
 
 
@@ -265,15 +267,16 @@ def check_for_new_releases(url_base, release_type, version):
     product_version = rpm_version_details["product_version"]
     candidate_type = rpm_version_details["candidate_type"]
     candidate_number = rpm_version_details["candidate_number"]
+    release_date = rpm_version_details["release_date"]
+    patch_number = rpm_version_details["patch_num"]
     commit_sha = rpm_version_details["commit_sha"]
 
-    # To be consistent with past releases, the release name should
-    # look like: 4.13.0-ec-2
-    release_name = "-".join([
-        product_version,
-        candidate_type,
-        candidate_number,
-    ])
+    # Older release names # look like "4.13.0-ec-2" but we had a few
+    # sprints where we published multiple builds, so use more of the
+    # version details as the release name now.
+    #
+    # 4.14.0~ec.3-202307170726.p0
+    release_name = f"{product_version}-{candidate_type}.{candidate_number}-{release_date}.p{patch_number}"
 
     # Check if the release already exists
     print(f"Checking for release {release_name}...")
@@ -289,7 +292,15 @@ def check_for_new_releases(url_base, release_type, version):
         print("Found an existing release, no work to do")
         return None
 
-    return Release(release_name, commit_sha, product_version, candidate_type, candidate_number, release_type)
+    return Release(
+        release_name,
+        commit_sha,
+        product_version,
+        candidate_type,
+        candidate_number,
+        release_type,
+        release_date,
+    )
 
 
 def tag_exists(release_name):
@@ -313,11 +324,12 @@ def publish_release(new_release, take_action):
     candidate_type = new_release.candidate_type
     candidate_number = new_release.candidate_number
     release_type = new_release.release_type
+    release_date = new_release.release_date
 
     if not tag_exists(release_name):
         print(f"Tag {release_name} on commit {commit_sha} by running:")
         print("")
-        print(f"git tag -s -m '{product_version} {candidate_type.upper()} {candidate_number}' {release_name} {commit_sha}")
+        print(f"git tag -s -m '{product_version} {candidate_type.upper()} {candidate_number} {release_date}' {release_name} {commit_sha}")
         print(f"git push origin {release_name}")
         print()
         print("Then run the script again.")
