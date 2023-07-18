@@ -4,7 +4,13 @@ version = "0.0.1"
 distro = "rhel-92"
 modules = []
 groups = []
-packages = []
+
+[[packages]]
+name = "microshift-test-agent"
+version = "*"
+
+[customizations.services]
+enabled = ["microshift-test-agent"]
 
 [customizations.firewall]
 ports = ["22:tcp"]

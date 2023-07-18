@@ -1,6 +1,6 @@
 [Unit]
 Description=MicroShift Test Agent
-Before=microshift.service
+Before=microshift.service sshd.service
 
 [Service]
 ExecStart=/bin/bash /usr/bin/microshift-test-agent.sh
