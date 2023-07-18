@@ -12,7 +12,7 @@ import (
 
 var (
 	preRunLogFilepath = filepath.Join(config.BackupsDir, "action_log.txt")
-	fileKlog          = multilogger.MustNewFileLogger(preRunLogFilepath)
+	fileKlog          = multilogger.NewFileLoggerWithFallback(preRunLogFilepath)
 )
 
 type PreRun struct {

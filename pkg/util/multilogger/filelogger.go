@@ -13,14 +13,21 @@ type fileLogger struct {
 	logger *klog.Logger
 }
 
+func (f *fileLogger) log() *klog.Logger {
+	if f.logger == nil {
+		return &klog.Logger{}
+	}
+	return f.logger
+}
+
 func (f *fileLogger) InfoS(msg string, kv ...interface{}) {
 	klog.InfoS(msg, kv...)
-	f.logger.Info(msg, kv...)
+	f.log().Info(msg, kv...)
 }
 
 func (f *fileLogger) ErrorS(err error, msg string, kv ...interface{}) {
 	klog.ErrorS(err, msg, kv...)
-	f.logger.Error(err, msg, kv...)
+	f.log().Error(err, msg, kv...)
 }
 
 // NewFileLogger creates a logger that writes to both klog and the specified file path.
@@ -44,11 +51,12 @@ func NewFileLogger(filePath string) (*fileLogger, error) {
 	}, nil
 }
 
-// MustNewFileLogger Will panic if a filepath cannot be created
-func MustNewFileLogger(filePath string) *fileLogger {
+// NewFileLoggerWithFallback Will try to create a file logger, but will fallback if it errors out
+func NewFileLoggerWithFallback(filePath string) *fileLogger {
 	fl, err := NewFileLogger(filePath)
 	if err != nil {
-		klog.Fatalf("failed to create file multi logger for filepath (%s): %w", filePath, err)
+		klog.ErrorS(err, "failed to create file multi logger, using just klog as fallback", "filepath", filePath)
+		return &fileLogger{}
 	}
 	return fl
 }
