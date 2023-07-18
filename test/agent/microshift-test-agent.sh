@@ -103,6 +103,14 @@ EOF
     CLEANUP_CMDS+=("rm -v ${path}")
 }
 
+# WORKAROUND START
+# When going from "just RHEL" to RHEL+MicroShift+dependencies there might be a
+# problem with groups. Following line ensures that sshd's keys are owned by
+# ssh_keys group and not some other.
+# When removing, change Before= in microshift-test-agent.service
+chown -v root:ssh_keys /etc/ssh/ssh_host*key
+# WORKAROUND END
+
 _debug_info
 
 current_boot="$(_get_current_boot_number)"

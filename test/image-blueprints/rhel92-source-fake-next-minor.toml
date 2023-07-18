@@ -21,8 +21,12 @@ version = "4.${FAKE_NEXT_MINOR_VERSION}.*"
 name = "microshift-selinux"
 version = "4.${FAKE_NEXT_MINOR_VERSION}.*"
 
+[[packages]]
+name = "microshift-test-agent"
+version = "*"
+
 [customizations.services]
-enabled = ["microshift"]
+enabled = ["microshift", "microshift-test-agent"]
 
 [customizations.firewall]
 ports = ["22:tcp", "80:tcp", "443:tcp", "5353:udp", "6443:tcp", "30000-32767:tcp", "30000-32767:udp"]

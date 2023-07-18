@@ -20,3 +20,9 @@ make rpm
 # but using the same source code as the normal build.
 title "Building fake next minor version"
 make -C test/ fake-next-minor-rpm
+
+
+# Build microshift-test-agent helping with creating unhealthy system scenarios
+# such as: microshift being unable to make a backup or greenboot checks failing
+title "Building test agent"
+./test/agent/build.sh

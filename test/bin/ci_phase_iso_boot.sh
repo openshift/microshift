@@ -47,7 +47,4 @@ if [ ${FAIL} -ne 0 ]; then
     exit 1
 fi
 
-# Kill the web server
-pkill caddy || true
-
 echo "Boot phase complete"
