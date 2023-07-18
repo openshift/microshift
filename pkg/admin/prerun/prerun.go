@@ -2,6 +2,7 @@ package prerun
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
@@ -10,7 +11,7 @@ import (
 )
 
 var (
-	preRunLogFilepath = "/var/lib/microshift-greenboot/prerun_action_log.txt"
+	preRunLogFilepath = filepath.Join(config.BackupsDir, "action_log.txt")
 	fileKlog          = multilogger.MustNewFileLogger(preRunLogFilepath)
 )
 
