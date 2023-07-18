@@ -6,6 +6,7 @@
 set -euo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
 DEFAULT_BOOT_BLUEPRINT="rhel-9.2"
@@ -313,7 +314,8 @@ load_global_settings() {
         error "No ${filename}"
         exit 1
     fi
-    # shellcheck disable=SC1090  # cannot follow source using variable
+
+    # shellcheck source=/dev/null
     source "${filename}"
 
     if [ -z "${SSH_PUBLIC_KEY}" ]; then
@@ -332,7 +334,7 @@ load_scenario_script() {
         exit 1
     fi
 
-    # shellcheck disable=SC1090  # cannot follow source using variable
+    # shellcheck source=/dev/null
     source "${SCENARIO_SCRIPT}"
 }
 
