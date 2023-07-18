@@ -3,8 +3,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# shellcheck disable=SC2086
-
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOTDIR="${SCRIPTDIR}/.."
 
@@ -17,20 +15,15 @@ OUTDIR="${ROOTDIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} [-h host] [-n] [-o output_dir] [test suite files]
+${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [test suite files]
 
 Options:
 
   -h       Print this help text.
-
   -n       Dry-run, do not run the tests.
-
   -o DIR   The output directory. (${OUTDIR})
-
   -v DIR   The venv directory. (${RF_VENV})
-
   -i PATH  The variables file. (${RF_VARIABLES})
-
 EOF
 }
 

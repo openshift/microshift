@@ -23,15 +23,10 @@ for f in ${CHECK_FILE_LIST} ; do
     # Use format=gcc so integration with editors allows a developer to
     # jump right to the file with an issue.
     #
-    # Exclude SC1091 because we source other scripts using variables
-    # and the linter cannot interpret the variables and find the
-    # files.
-    #
     # Add --external-sources to allow `source` calls from outside
     # the list of checked files.
     "${SHELL_CHECK}" \
         --format=gcc \
-        --exclude=SC1091 \
         --external-sources \
         "${f}"
 done

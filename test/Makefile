@@ -11,3 +11,7 @@ fake-next-minor-rpm:
 	MICROSHIFT_VERSION="$(MAJOR).$(NEXT_MINOR).$(PATCH)_fake_next_minor" \
 	RPMBUILD_DIR=$(RPMBUILD_DIR) \
 		$(MAKE) -C $(REPO) rpm
+
+.PHONY: robotidy
+robotidy:
+	cd .. && make verify-rf
