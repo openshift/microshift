@@ -3,6 +3,7 @@
 set -xeuo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
 "${SCRIPTDIR}/composer_cleanup.sh"

@@ -7,8 +7,7 @@ USHIFT_USER: microshift
 #SSH_PRIV_KEY: ""
 SSH_PRIV_KEY: /home/microshift/.ssh/id_rsa
 # SSH port to use when connecting to MicroShift's host.
-# Defaults to 22.
-#SSH_PORT: 22
+SSH_PORT: 22
 # API port, in case the connection is through a forwarded port.
 # Defaults to whatever is in the kubeconfig file.
 #API_PORT: 6443

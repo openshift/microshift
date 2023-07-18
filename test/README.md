@@ -39,6 +39,11 @@ USHIFT_USER: microshift
 # SSH Private key to use when logging into MicroShift's host.
 # Unset this variable to use ssh agent.
 SSH_PRIV_KEY: /home/microshift/.ssh/id_rsa
+# SSH port to use when connecting to MicroShift's host.
+SSH_PORT: 22
+# API port, in case the connection is through a forwarded port.
+# Defaults to whatever is in the kubeconfig file.
+#API_PORT: 6443
 ```
 
 `USHIFT_HOST` should be the host name or IP of the VM. The value must
@@ -55,25 +60,30 @@ hosts using a key with a password, leave `SSH_PRIV_KEY` set to an
 empty string and the tests will connect as `USHIFT_USER` and rely on
 the ssh agent to provide the correct credentials.
 
+`SSH_PORT` should be the port used for an ssh connection.
+
+`API_PORT` should be set when connections are performed through a
+forwarded port.
+
 ## Running the tests
 
 Use `run.sh` to run the tests. It will create a Python virtual
-environment in `$reporoot/_output` and install Robot Framework
+environment in the `_output` directory and install Robot Framework
 automatically.
 
 The `-h` option prints usage instructions:
 
 ```
 $ ./test/run.sh -h
-run.sh [-h] [-n] [-o output_dir] [test suite files]
+run.sh [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [test suite files]
 
 Options:
 
   -h       Print this help text.
-
   -n       Dry-run, do not run the tests.
-
   -o DIR   The output directory.
+  -v DIR   The venv directory.
+  -i PATH  The variables file.
 ```
 
 ### Running a Single Suite
@@ -82,8 +92,10 @@ By default, all of the test suites will be run. To run a subset,
 specify the filenames as arguments on the command line.
 
 ```
-$ ./test/run.sh suite/show-config.robot
+$ ./test/run.sh suites/show-config.robot
 ```
+
+> The test suite file names should be relative to the `test` directory.
 
 ### Running a Subset of Tests
 
