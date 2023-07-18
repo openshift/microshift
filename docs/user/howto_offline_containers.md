@@ -56,12 +56,16 @@ source = "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:82cfef91557f9a70
 ...
 ```
 
-To add a pull secret for authenticating to a registry, set the
-`auth_file_path` in the `[containers]` section.
+You need to add a pull secret for authenticating to the registry. To do so, set the
+`auth_file_path` in the `[containers]` section of the osbuilder worker configuration in `/etc/osbuild-worker/osbuild-worker.toml ` (you might need to create directory and file).
 
 ```
 [containers]
 auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 ```
+You need to restart the osbuild-worker when you changed that configuration using `sudo systemctl restart osbuild-worker@1`
+
 
 Refer to the [Container registry credentials](https://www.osbuild.org/guides/image-builder-on-premises/container-auth.html) section of the `osbuild` guide for more details.
+
+Now you can `composer-cli blueprint push ...` the modified blueprint and `composer-cli compose start ...` the build as usual. The resuling commit will have the images embedded.
