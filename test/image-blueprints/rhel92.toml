@@ -5,3 +5,9 @@ distro = "rhel-92"
 modules = []
 groups = []
 packages = []
+
+[customizations.firewall]
+ports = ["22:tcp"]
+
+[customizations.firewall.services]
+enabled = ["ssh"]

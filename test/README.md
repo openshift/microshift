@@ -169,13 +169,18 @@ rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
 
 ## Preparing to run test scenarios
 
-### Creating the local RPM repository
+### Building RPMs
+
+The upgrade and rollback test scenarios use multiple builds of
+MicroShift to create images with different versions. Use
+`./bin/build_rpms.sh` to build all of the necessary packages.
+
+### Creating the local RPM repositories
 
 After running `make rpm` at the top of the source tree, run
 `./bin/create_local_repo.sh` from this directory to copy the necessary
-files into a location that can be used as an RPM repository by
-Composer. If you build new RPMs, you need to re-run
-`create_local_repo.sh` *and* build new images.
+files into locations that can be used as a RPM repositories by
+Composer.
 
 ### Creating the images
 
@@ -191,6 +196,14 @@ blueprints available.
 Use `./bin/download_images.sh` to download all of the images from
 Composer's cache and set up the directory for the web server to host
 the files needed to launch VMs and run test scenarios.
+
+### Rebuilding from source easily
+
+If you build new RPMs, you need to re-run several steps (build the
+RPMs, build the local repos, build the images, download the
+images). Use `./bin/rebuild_source_images.sh` to automate all of those
+steps with 1 script while only rebuilding the images that use RPMs
+created from source (not already published releases).
 
 ### Global settings
 

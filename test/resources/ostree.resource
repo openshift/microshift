@@ -5,19 +5,12 @@ Resource            systemd.resource
 Resource            microshift-process.resource
 Resource            ostree-data.resource
 Resource            ostree-health.resource
+Resource            microshift-host.resource
 Library             libostree.py
 Library             ../resources/TestAgent.py
 
 
 *** Keywords ***
-Make New SSH Connection
-    [Documentation]    Closes all SSH connections and makes a new one.
-    # Staging deployments potentially introduces multiple reboots
-    # which could break existing SSH connection
-
-    SSHLibrary.Close All Connections
-    Login MicroShift Host
-
 Current Deployment Should Be
     [Documentation]    Checks if currently booted deployment is as expected
     [Arguments]    ${expected_deploy}
@@ -30,15 +23,15 @@ Current Deployment Should Be
 Deploy Commit Expecting A Rollback
     [Documentation]    Deploys given ref and configures test agent for failing greenboot.
     ...    It expects the system to roll back.
-    [Arguments]    ${ref}
+    [Arguments]    ${ref}    ${write_agent_cfg}=${TRUE}
 
     ${initial_deploy_id}=    Get Booted Deployment Id
     ${deploy_id}=    Rebase System    ${ref}
-    TestAgent.Write
-    Write Greenboot Microshift Wait Timeout    60
+    IF    ${write_agent_cfg}    TestAgent.Write
+    Write Greenboot Microshift Wait Timeout    90
     Reboot MicroShift Host
 
-    Log To Console    "Failing ref deployed - waiting for system to roll back"
+    Log To Console    "System rebased to ${ref} and rebooted - waiting for system to roll back"
     Wait Until Keyword Succeeds    20m    15s
     ...    Current Deployment Should Be    ${initial_deploy_id}
 
@@ -54,7 +47,7 @@ Deploy Commit Not Expecting A Rollback
     ${deploy_id}=    Rebase System    ${target_ref}
     Reboot MicroShift Host
 
-    Log To Console    "Target ref deployed - starting health checking"
+    Log To Console    "System rebased to ${target_ref} and rebooted - starting health checking"
     Wait Until Keyword Succeeds    10m    15s
     ...    System Is Running Right Ref And Healthy    ${deploy_id}    ${initial_deploy_id}
 

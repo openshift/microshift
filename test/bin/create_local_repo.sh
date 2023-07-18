@@ -14,6 +14,7 @@ make_repo() {
     local repodir="$1"
     local builddir="$2"
 
+    title "Creating RPM repo at ${repodir}"
     if [ -d "${repodir}" ]; then
         echo "Cleaning up existing repository"
         rm -rf "${repodir}"
@@ -25,7 +26,6 @@ make_repo() {
     # shellcheck disable=SC2086  # no quotes for command arguments to allow word splitting
     cp -R ${builddir}/{RPMS,SPECS,SRPMS} "${repodir}/"
 
-    echo "Creating RPM repo at ${repodir}"
     createrepo "${repodir}"
 
     echo "Fixing permissions of RPM repo contents"

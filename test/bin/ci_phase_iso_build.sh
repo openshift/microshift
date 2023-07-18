@@ -48,13 +48,9 @@ cd ~/microshift/test/
 bash -x ./bin/configure_hypervisor_firewall.sh
 
 # Re-build from source.
-cd ~/microshift/
-rm -rf ./_output/rpmbuild*
-time make rpm
-time make -C test/ fake-next-minor-rpm
+bash -x ./bin/build_rpms.sh
 
 # Set up for scenario tests
-cd ~/microshift/test/
 timeout 20m bash -x ./bin/create_local_repo.sh
 timeout 20m bash -x ./bin/start_osbuild_workers.sh 5
 timeout 20m bash -x ./bin/build_images.sh

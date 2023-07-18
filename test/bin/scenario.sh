@@ -90,19 +90,6 @@ wait_for_ssh() {
     timeout "${VM_BOOT_TIMEOUT}" bash -c "until ssh -oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip} 'echo host is up'; do date; sleep 5; done"
 }
 
-# Add the microshift config file needed to allow remote access via IP address
-enable_ip_access() {
-    local vmname="${1}"
-    local ip="${2}"
-
-    echo "Waiting ${VM_BOOT_TIMEOUT} for ${full_vmname} to boot"
-    wait_for_ssh "${ip}"
-
-    echo "Adjusting VM host settings"
-    scp "${SCRIPTDIR}/force_vm_settings.sh" "redhat@${ip}:/home/redhat/"
-    ssh "redhat@${ip}" "chmod +x /home/redhat/force_vm_settings.sh && sudo /home/redhat/force_vm_settings.sh"
-}
-
 # Wait for greenboot health check to complete, without checking the results
 wait_for_greenboot() {
     local vmname="${1}"
@@ -192,7 +179,7 @@ launch_vm() {
         echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
     fi
 
-    enable_ip_access "${full_vmname}" "${ip}"
+    wait_for_ssh "${ip}"
     wait_for_greenboot "${full_vmname}" "${ip}"
 
     echo "${full_vmname} is up and ready"

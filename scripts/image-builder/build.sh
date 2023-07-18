@@ -303,8 +303,7 @@ if [[ "${MICROSHIFT_RPM_SOURCE}" == http* ]] ; then
     wget -q -nd -r -L -P microshift-local -A rpm "${MICROSHIFT_RPM_SOURCE}"
 else
     [ ! -d "${MICROSHIFT_RPM_SOURCE}" ] && echo "MicroShift RPM path '${MICROSHIFT_RPM_SOURCE}' does not exist" && exit 1
-    cp -TR "${MICROSHIFT_RPM_SOURCE}/RPMS" microshift-local
-    cp -TR "${MICROSHIFT_RPM_SOURCE}/SRPMS" microshift-local
+    cp -TR "${MICROSHIFT_RPM_SOURCE}" microshift-local
 fi
 
 # Exit if no RPM packages were found
@@ -316,9 +315,8 @@ createrepo microshift-local >/dev/null
 open_repo_permissions microshift-local
 
 # Determine the version of microshift we have, for use in blueprint templates later.
-MICROSHIFT_RELEASE_RPM=$(find "${MICROSHIFT_RPM_SOURCE}" -name 'microshift-release-info*.rpm' | tail -n 1)
+MICROSHIFT_RELEASE_RPM=$(find microshift-local -name 'microshift-release-info*.rpm' | tail -n 1)
 MICROSHIFT_VERSION=$(rpm -q --queryformat '%{version}' "${MICROSHIFT_RELEASE_RPM}")
-export MICROSHIFT_VERSION
 
 # Determine the image version from the RPM contents
 RELEASE_INFO_FILE=$(find . -name 'microshift-release-info-*.rpm' | tail -1)

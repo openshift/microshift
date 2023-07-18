@@ -10,9 +10,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 # Rebuild the RPM from source
-cd "${ROOTDIR}"
-rm -rf _output/rpmbuild
-make rpm
+"${SCRIPTDIR}/build_rpms.sh"
 
 cd "${TESTDIR}"
 
@@ -27,6 +25,7 @@ get_blueprint_name() {
     tomcli-get "${filename}" name
 }
 
+title "Determining images to rebuild"
 TO_BUILD=""
 
 # shellcheck disable=SC2231  # allow glob expansion without quotes in for loop
