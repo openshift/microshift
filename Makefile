@@ -309,6 +309,7 @@ clean-cross-build:
 	if [ -d '$(OUTPUT_DIR)/staging' ]; then $(RM) -rf '$(OUTPUT_DIR)/staging'; fi
 	if [ -d '$(OUTPUT_DIR)/venv' ]; then $(RM) -rf '$(OUTPUT_DIR)/venv'; fi
 	if [ -d '$(OUTPUT_DIR)/robotenv' ]; then $(RM) -rf '$(OUTPUT_DIR)/robotenv'; fi
+	if ls $(OUTPUT_DIR)/e2e-* &>/dev/null ; then $(RM) -rf $(OUTPUT_DIR)/e2e-* ; fi
 	if [ -d '$(OUTPUT_DIR)/goenv' ]; then $(RM) -rf '$(OUTPUT_DIR)/goenv'; fi
 	if [ -d '$(RPM_BUILD_DIR)' ]; then $(RM) -rf '$(RPM_BUILD_DIR)'; fi
 	if [ -d '$(ISO_DIR)' ]; then $(RM) -rf '$(ISO_DIR)'; fi
