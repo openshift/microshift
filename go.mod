@@ -39,6 +39,7 @@ require (
 )
 
 require (
+	github.com/go-logr/stdr v1.2.2
 	sigs.k8s.io/kube-storage-version-migrator v0.0.4
 	sigs.k8s.io/kustomize/api v0.13.2
 )
@@ -98,7 +99,6 @@ require (
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-ldap/ldap/v3 v3.4.3 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
-	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/jsonreference v0.20.1 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
