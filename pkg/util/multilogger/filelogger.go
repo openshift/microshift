@@ -9,13 +9,15 @@ import (
 	"k8s.io/klog/v2"
 )
 
+var noop = &klog.Logger{}
+
 type fileLogger struct {
 	logger *klog.Logger
 }
 
 func (f *fileLogger) log() *klog.Logger {
 	if f.logger == nil {
-		return &klog.Logger{}
+		return noop
 	}
 	return f.logger
 }
