@@ -11,7 +11,6 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/version"
-	"k8s.io/klog/v2"
 )
 
 var (
@@ -33,7 +32,7 @@ func CheckAndUpdateDataVersion() error {
 		if !errors.Is(err, errDataVersionDoesNotExist) {
 			return fmt.Errorf("failed to get version of existing MicroShift data: %w", err)
 		}
-		klog.InfoS("Version file does not exist yet")
+		fileKlog.InfoS("Version file does not exist yet")
 	} else {
 		if err := checkVersionCompatibility(execVer, dataVer); err != nil {
 			return fmt.Errorf("checking version skew failed: %w", err)
@@ -135,7 +134,7 @@ func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
 
 func writeDataVersion(v versionMetadata) error {
 	s := v.String()
-	klog.InfoS("Writing MicroShift version to the file in data directory", "version", s)
+	fileKlog.InfoS("Writing MicroShift version to the file in data directory", "version", s)
 
 	if err := os.WriteFile(versionFilePath, []byte(s), 0600); err != nil {
 		return fmt.Errorf("writing %q to %q failed: %w", s, versionFilePath, err)

@@ -6,7 +6,12 @@ import (
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
-	"k8s.io/klog/v2"
+	"github.com/openshift/microshift/pkg/util/multilogger"
+)
+
+var (
+	preRunLogFilepath = "/var/lib/microshift-greenboot/prerun_action_log.txt"
+	fileKlog          = multilogger.MustNewFileLogger(preRunLogFilepath)
 )
 
 type PreRun struct {
@@ -20,13 +25,13 @@ func New(dataManager data.Manager) *PreRun {
 }
 
 func (pr *PreRun) Perform() error {
-	klog.InfoS("Starting pre-run")
-	defer klog.InfoS("Pre-run complete")
+	fileKlog.InfoS("Starting pre-run")
+	defer fileKlog.InfoS("Pre-run complete")
 
 	if isOstree, err := util.PathExists("/run/ostree-booted"); err != nil {
 		return fmt.Errorf("failed to check if system is ostree: %w", err)
 	} else if !isOstree {
-		klog.InfoS("System is not OSTree-based")
+		fileKlog.InfoS("System is not OSTree-based")
 		return nil
 	}
 
@@ -45,7 +50,7 @@ func (pr *PreRun) Perform() error {
 		return fmt.Errorf("failed to check if health file already exists: %w", err)
 	}
 
-	klog.InfoS("Existence of important paths",
+	fileKlog.InfoS("Existence of important paths",
 		"data-exists?", dataExists,
 		"version-exists?", versionExists,
 		"health-exists?", healthExists,
@@ -71,7 +76,7 @@ func (pr *PreRun) Perform() error {
 
 		// 1
 		if !healthExists {
-			klog.InfoS("Neither data dir nor health file exist - assuming first start of MicroShift")
+			fileKlog.InfoS("Neither data dir nor health file exist - assuming first start of MicroShift")
 			return nil
 		}
 
@@ -91,7 +96,7 @@ func (pr *PreRun) Perform() error {
 		// manual intervention after system rolled back to 4.13
 		// (i.e. backup was manually restored but health.json not deleted).
 
-		klog.InfoS("Data exists, but version file is missing - assuming upgrade from 4.13")
+		fileKlog.InfoS("Data exists, but version file is missing - assuming upgrade from 4.13")
 		return pr.backup413()
 	}
 
@@ -110,7 +115,7 @@ func (pr *PreRun) Perform() error {
 		// Continuing start up seems to be the best course of action in this situation;
 		// there is no health.json to steer the logic into backup or restore,
 		// and deleting the files is too invasive.
-		klog.InfoS("Health info is missing - continuing start up")
+		fileKlog.InfoS("Health info is missing - continuing start up")
 		return nil
 	}
 
@@ -136,7 +141,7 @@ func (pr *PreRun) regularPrerun() error {
 		return err
 	}
 
-	klog.InfoS("Found boot details",
+	fileKlog.InfoS("Found boot details",
 		"health", health.Health,
 		"deploymentID", health.DeploymentID,
 		"previousBootID", health.BootID,
@@ -148,24 +153,24 @@ func (pr *PreRun) regularPrerun() error {
 		// This might happen if microshift is (re)started after greenboot finishes running.
 		// Green script will overwrite the health.json with
 		// current boot's ID, deployment ID, and health.
-		klog.InfoS("Skipping pre-run: Health file refers to the current boot ID")
+		fileKlog.InfoS("Skipping pre-run: Health file refers to the current boot ID")
 		return nil
 	}
 
 	if health.IsHealthy() {
-		klog.Info("Previous boot was healthy")
+		fileKlog.InfoS("Previous boot was healthy")
 		if err := pr.backup(health); err != nil {
 			return fmt.Errorf("failed to backup during pre-run: %w", err)
 		}
 
 		if health.DeploymentID != currentDeploymentID {
-			klog.Info("Current and previously booted deployments are different")
+			fileKlog.InfoS("Current and previously booted deployments are different")
 			return pr.handleDeploymentSwitch(currentDeploymentID)
 		}
 		return nil
 	}
 
-	klog.Info("Previous boot was not healthy")
+	fileKlog.InfoS("Previous boot was not healthy")
 	if err = pr.handleUnhealthy(health); err != nil {
 		return fmt.Errorf("failed to handle unhealthy data during pre-run: %w", err)
 	}
@@ -196,14 +201,14 @@ func (pr *PreRun) missingDataExistingHealth() error {
 		return fmt.Errorf("failed to determine the current system health: %w", err)
 	}
 
-	klog.InfoS("MicroShift data doesn't exist, but health info exists",
+	fileKlog.InfoS("MicroShift data doesn't exist, but health info exists",
 		"health", health.Health,
 		"deploymentID", health.DeploymentID,
 		"previousBootID", health.BootID,
 	)
 
 	if health.IsHealthy() {
-		klog.InfoS("'Healthy' is persisted, but there's nothing to back up - continuing start up")
+		fileKlog.InfoS("'Healthy' is persisted, but there's nothing to back up - continuing start up")
 		return nil
 	}
 
@@ -217,7 +222,7 @@ func (pr *PreRun) missingDataExistingHealth() error {
 	}
 	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 	if backup == "" {
-		klog.InfoS("There is no backup to restore - continuing start up")
+		fileKlog.InfoS("There is no backup to restore - continuing start up")
 		return nil
 	}
 
@@ -229,7 +234,7 @@ func (pr *PreRun) missingDataExistingHealth() error {
 
 func (pr *PreRun) backup(health *HealthInfo) error {
 	newBackupName := health.BackupName()
-	klog.InfoS("Preparing to backup",
+	fileKlog.InfoS("Preparing to backup",
 		"deploymentID", health.DeploymentID,
 		"name", newBackupName,
 	)
@@ -240,7 +245,7 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 	}
 
 	if existingBackups.has(newBackupName) {
-		klog.InfoS("Skipping backup: Backup already exists",
+		fileKlog.InfoS("Skipping backup: Backup already exists",
 			"deploymentID", health.DeploymentID,
 			"name", newBackupName,
 		)
@@ -255,10 +260,10 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 	// including unhealthy ones
 	existingBackups.getForDeployment(health.DeploymentID).removeAll(pr.dataManager)
 	if err := pr.removeBackupsWithoutExistingDeployments(existingBackups); err != nil {
-		klog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
+		fileKlog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
 	}
 
-	klog.InfoS("Finished backup",
+	fileKlog.InfoS("Finished backup",
 		"deploymentID", health.DeploymentID,
 		"destination", newBackupName,
 	)
@@ -267,7 +272,7 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 
 func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 	// TODO: Check if containers are already running (i.e. microshift.service was restarted)?
-	klog.Info("Handling previously unhealthy system")
+	fileKlog.InfoS("Handling previously unhealthy system")
 
 	currentDeploymentID, err := getCurrentDeploymentID()
 	if err != nil {
@@ -285,11 +290,11 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
-		klog.Info("Finished handling unhealthy system")
+		fileKlog.InfoS("Finished handling unhealthy system")
 		return nil
 	}
 
-	klog.InfoS("There is no backup to restore for current deployment - trying to restore backup for rollback deployment")
+	fileKlog.InfoS("There is no backup to restore for current deployment - trying to restore backup for rollback deployment")
 	rollbackDeployID, err := getRollbackDeploymentID()
 	if err != nil {
 		return err
@@ -299,11 +304,11 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 		// No backup for current deployment and there is no rollback deployment.
 		// This could be a unhealthy system that was manually rebooted to
 		// remediate the situation - let's not interfere: no backup, no restore, just proceed.
-		klog.InfoS("System has no rollback but health.json suggests system was rebooted - skipping prerun")
+		fileKlog.InfoS("System has no rollback but health.json suggests system was rebooted - skipping prerun")
 		return nil
 	}
 
-	klog.InfoS("Obtained rollback deployment",
+	fileKlog.InfoS("Obtained rollback deployment",
 		"rollback-deployment-id", rollbackDeployID,
 		"current-deployment-id", currentDeploymentID,
 		"health-deployment-id", health.DeploymentID)
@@ -320,13 +325,13 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 		}
 		if rollbackBackup == "" {
 			// This could happen if current deployment is unhealthy and rollback didn't run MicroShift
-			klog.InfoS("There is no backup for rollback deployment as well - removing existing data for clean start")
+			fileKlog.InfoS("There is no backup for rollback deployment as well - removing existing data for clean start")
 			return pr.dataManager.RemoveData()
 		}
 
 		// There is no backup for current deployment, but there is a backup for the rollback.
 		// Let's restore it and act like it's first boot of newly staged deployment
-		klog.InfoS("Restoring backup for a rollback deployment to perform migration and try starting again",
+		fileKlog.InfoS("Restoring backup for a rollback deployment to perform migration and try starting again",
 			"backup-name", rollbackBackup)
 		if err := pr.dataManager.Restore(rollbackBackup); err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
@@ -337,9 +342,9 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 	// DeployID in health.json is neither booted nor rollback deployment,
 	// so current deployment was staged over deployment without MicroShift
 	// but MicroShift data exists (created by another deployment that rolled back).
-	klog.InfoS("Deployment in health metadata is neither currently booted nor rollback deployment - backing up, then removing existing data for clean start")
+	fileKlog.InfoS("Deployment in health metadata is neither currently booted nor rollback deployment - backing up, then removing existing data for clean start")
 	if err := pr.backup(health); err != nil {
-		klog.ErrorS(err, "Failed to backup data of unhealthy system - ignoring")
+		fileKlog.ErrorS(err, "Failed to backup data of unhealthy system - ignoring")
 	}
 	return pr.dataManager.RemoveData()
 }
@@ -356,16 +361,16 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 
 	if backup != "" {
-		klog.Info("Backup exists for current deployment - restoring")
+		fileKlog.InfoS("Backup exists for current deployment - restoring")
 
 		err = pr.dataManager.Restore(backup)
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
 
-		klog.Info("Restored existing backup for current deployment")
+		fileKlog.InfoS("Restored existing backup for current deployment")
 	} else {
-		klog.Info("There is no backup for current deployment - continuing start up")
+		fileKlog.InfoS("There is no backup for current deployment - continuing start up")
 	}
 
 	return nil
@@ -378,7 +383,7 @@ func (pr *PreRun) removeBackupsWithoutExistingDeployments(backups Backups) error
 	}
 
 	toRemove := backups.getDangling(deployments)
-	klog.InfoS("Removing backups for no longer existing deployments",
+	fileKlog.InfoS("Removing backups for no longer existing deployments",
 		"backups-to-remove", toRemove)
 	toRemove.removeAll(pr.dataManager)
 
