@@ -38,6 +38,7 @@ ostreesetup --nogpg --osname=rhel --remote=edge --url=REPLACE_OSTREE_SERVER_URL 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
 # Set the configuration of MicroShift to include subjectAltNames
+mkdir -p /etc/microshift
 cat - >/etc/microshift/config.yaml <<EOF
 apiServer:
   subjectAltNames:
@@ -49,6 +50,7 @@ fi
 
 # The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
 # The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
+mkdir -p /etc/crio
 cat > /etc/crio/openshift-pull-secret <<EOF
 REPLACE_PULL_SECRET
 EOF
