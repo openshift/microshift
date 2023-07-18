@@ -90,3 +90,18 @@ Wait For Transaction To End
 
     Wait Until Keyword Succeeds    2m    15s
     ...    No Transaction In Progress
+
+Journal Should Have Information About Failed Version Comparison
+    [Documentation]    Assert that unhealthy deployment's journal contains
+    ...    information about failed version compatibility check
+
+    FOR    ${boot}    IN RANGE    -3    0
+        ${stdout}    ${rc}=    Execute Command
+        ...    journalctl --unit=microshift --boot=${boot} | grep "checking version skew failed"
+        ...    sudo=True
+        ...    return_stdout=True
+        ...    return_rc=True
+
+        Log Many    ${stdout}    ${rc}
+        Should Be Equal As Integers    0    ${rc}
+    END
