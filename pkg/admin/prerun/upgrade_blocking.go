@@ -7,6 +7,7 @@ import (
 	"io/fs"
 
 	embedded "github.com/openshift/microshift/assets"
+	"k8s.io/klog/v2"
 )
 
 func isUpgradeBlocked(execVersion versionMetadata, dataVersion versionMetadata) error {
@@ -40,7 +41,7 @@ func unmarshalBlockedUpgrades(data []byte) (map[string][]string, error) {
 }
 
 func isBlocked(blockedUpgrades map[string][]string, execVersion, dataVersion string) error {
-	fileKlog.InfoS("Checking if upgrade is allowed",
+	klog.InfoS("Checking if upgrade is allowed",
 		"existing-data-version", dataVersion,
 		"new-binary-version", execVersion,
 		"blocked-upgrades", blockedUpgrades)

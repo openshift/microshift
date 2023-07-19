@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -108,4 +109,25 @@ func HealthCheckServer(ctx context.Context, path, port string) (start func() err
 	}
 
 	return start, shutdown
+}
+
+type LogFilePath string
+
+// Write writes data to the desired filename, calling multiple times will ovewrite
+// the file with the most recent data.
+func (l LogFilePath) Write(data []byte) error {
+	err := MakeDir(filepath.Dir(string(l)))
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(string(l), data, 0600)
+}
+
+// Remove Will remove the existing file if it exists.
+func (l LogFilePath) Remove() error {
+	exists, err := PathExists(string(l))
+	if exists {
+		return os.Remove(string(l))
+	}
+	return err
 }
