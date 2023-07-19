@@ -140,9 +140,10 @@ func (c *ClusterQuotaReconcilationController) Run(workers int, ctx context.Conte
 	go c.quotaMonitor.Run(ctx)
 
 	if !cache.WaitForCacheSync(ctx.Done(), c.informerSyncedFuncs...) {
+		utilruntime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
 		return
 	}
-
+	klog.Infof("Caches are synced")
 	// the workers that chug through the quota calculation backlog
 	for i := 0; i < workers; i++ {
 		go wait.Until(c.worker, time.Second, ctx.Done())
@@ -288,6 +289,7 @@ func (c *ClusterQuotaReconcilationController) worker() {
 	workFunc := func() bool {
 		uncastKey, uncastData, quit := c.queue.GetWithData()
 		if quit {
+			klog.V(2).Infof("worker is quited")
 			return true
 		}
 		defer c.queue.Done(uncastKey)
@@ -295,9 +297,11 @@ func (c *ClusterQuotaReconcilationController) worker() {
 		c.workerLock.RLock()
 		defer c.workerLock.RUnlock()
 
+		klog.V(2).Infof("quota %s is queued", uncastKey)
 		quotaName := uncastKey.(string)
 		quota, err := c.clusterQuotaLister.Get(quotaName)
 		if apierrors.IsNotFound(err) {
+			klog.V(2).Infof("queued quota %s not found in quota lister", quotaName)
 			c.queue.Forget(uncastKey)
 			return false
 		}
