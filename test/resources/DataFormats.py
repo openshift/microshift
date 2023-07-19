@@ -89,18 +89,18 @@ def update_kubeconfig_server_url(kubeconfig_text, new_url):
     return yaml.dump(parsed)
 
 
-# lvmd_merge idempotently merges the provided patch into the base lvmd config. If the patch is already present in the
-# device class list, the base config is returned without mutation. Necessary because LVMD does not tolerate device-classes
-# of the same name.
+# lvmd_merge merges the local lvmd.yaml into the base lvmd config. It will try to avoid duplicating
+# device-class list elements, since this breaks topolvm-node.
 def lvmd_merge(base, patch):
-    if base is None:
-        raise ValueError('cannot process empty base')
-    if patch is None:
-        return base
+    if not base:
+        return patch
 
-    dev_classes = yaml.safe_load(base)['device-classes']
-    dc_patch_name = yaml.safe_load(patch)['device-classes'][0]['name']
+    base_cfg = yaml.safe_load(base)
+    patch_cfg = yaml.safe_load(patch)
 
-    if any(d['name'] == dc_patch_name for d in dev_classes):
-        return base
-    return yaml_merge(base, patch)
+    for i, p_dc in enumerate(patch_cfg['device-classes']):
+        if any(dc['name'] == p_dc['name'] for dc in base_cfg['device-classes']):
+            del patch_cfg['device-classes'][i]
+    base_cfg['device-classes'].append(patch_cfg['device-classes'])
+
+    return yaml.safe_dump(base_cfg)
