@@ -42,6 +42,7 @@ function microshift_service_active() {
 
     # Terminate the script in case of a failed service - nothing to wait for
     if [ "${is_failed}" = "failed" ] ; then
+        print_failure_logs
         echo "The microshift.service systemd unit is failed. Terminating..."
         kill -TERM ${SCRIPT_PID}
     fi

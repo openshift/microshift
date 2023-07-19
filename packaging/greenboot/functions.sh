@@ -9,6 +9,10 @@ OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
 OCGET_OPT="--no-headers"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
 
+# Space seperated list of log file locations to be printed out during
+# health checks.
+LOG_FAILURE_FILES=("/var/lib/microshift-backups/prerun_log_failed.txt")
+
 # Print GRUB boot, Greenboot variables and ostree status affecting the script
 # behavior. This information is important for troubleshooting rollback issues.
 #
@@ -183,4 +187,16 @@ function namespace_pods_not_restarting() {
 
     [ "${restarts}" -lt 0 ] && return 0
     return 1
+}
+
+function print_failure_logs() {
+    for file in "${LOG_FAILURE_FILES[@]}"; do
+        if [ -f "${file}" ]; then
+            echo "======"
+            echo "Failure log in: (${file})"
+            echo "--"
+            cat "${file}"
+            echo ""
+        fi
+    done
 }
