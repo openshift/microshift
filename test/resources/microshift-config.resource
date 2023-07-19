@@ -6,8 +6,8 @@ Library             String
 Library             OperatingSystem
 Library             SSHLibrary
 Library             DataFormats.py
-
 Resource            common.resource
+
 
 *** Keywords ***
 Save Default MicroShift Config

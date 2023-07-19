@@ -57,16 +57,15 @@ Reboot MicroShift Host
     ...    SSH Connection To MicroShift Host Should Be Functional
 
 Create Thin Storage Pool
-    [Documentation]         Create a new thin storage pool
-    ${stderr}   ${rc}=      SSHLibrary.Execute Command    lvcreate --size 4G --thin /dev/rhel --name thin
-    ...                     sudo=True   return_rc=True  return_stderr=True  return_stdout=False
-    Log                     ${stderr}
-    Should Be Equal As Integers     0   ${rc}
-
+    [Documentation]    Create a new thin storage pool
+    ${stderr}    ${rc}=    SSHLibrary.Execute Command    lvcreate --size 4G --thin /dev/rhel --name thin
+    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
+    Log    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
 
 Delete Thin Storage Pool
-    [Documentation]         Delete the thin storage pool as part of restoring test env
-    ${stderr}   ${rc}=       SSHLibrary.Execute Command    lvremove -y rhel\thin
-    ...                     sudo=True   return_rc=True  return_stderr=True  return_stdout=False
-    Log                     ${stderr}
+    [Documentation]    Delete the thin storage pool as part of restoring test env
+    ${stderr}    ${rc}=    SSHLibrary.Execute Command    lvremove -y rhel/thin
+    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
+    Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}

@@ -42,23 +42,23 @@ Snapshotter Smoke Test
 *** Keywords ***
 Test Suite Setup
     [Documentation]    Setup test namespace, patch the lvmd for thin-volume support, and restart microshift for
-    ...                it to take effect
+    ...    it to take effect
     Setup Suite With Namespace
     Create Thin Storage Pool
     Extend LVMD Config
+    Oc Apply    -f ${STORAGE_CLASS} -f ${SNAPSHOT_CLASS}
     Restart Microshift
 
 Test Suite Teardown
-    [Documentation]     Clean up test suite resources
+    [Documentation]    Clean up test suite resources
     Delete LVMD Config
     Delete Thin Storage Pool
+    Oc Delete    -f ${STORAGE_CLASS} -f ${SNAPSHOT_CLASS}
     Restart Microshift
     Teardown Suite With Namespace
 
-
 Test Case Setup
     [Documentation]    Prepare the cluster-level APIs and a data-volume with some simple text
-    Oc Apply    -f ${STORAGE_CLASS} -f ${SNAPSHOT_CLASS}
     Oc Apply    -k ${SOURCE_KUSTOMIZE} -n ${NAMESPACE}
     Oc Wait For    pod/${POD_NAME_STATIC}    condition\=Ready    timeout=60s
     Write To Volume    ${POD_NAME_STATIC}    ${TEST_DATA}
@@ -67,9 +67,14 @@ Test Case Setup
 
 Test Case Teardown
     [Documentation]    Remove cluster-scoped test APIs
-    Oc Delete    -f ${STORAGE_CLASS} -f ${SNAPSHOT_CLASS}
-    Oc Delete    pvc -n ${NAMESPACE} --all
-    Oc Delete    volumesnapshot -n ${NAMESPACE} --all
+    Oc Delete    pod ${POD_NAME_STATIC} -n ${NAMESPACE}
+    Oc Wait For    pod/${POD_NAME_STATIC}    delete
+    Oc Delete    volumesnapshot my-snap -n ${NAMESPACE}
+    Oc Wait For    volumesnapshot/my-snap    delete
+    Oc Delete    pvc test-claim-thin -n ${NAMESPACE}
+    Oc Delete    pvc snapshot-restore -n ${NAMESPACE}
+    Oc Wait For    pvc/test-claim-thin    delete    timeout=120s
+    Oc Wait For    pvc/snapshot-restore    delete    timeout=120s
 
 Write To Volume
     [Documentation]    Write some simple text to the data volume
@@ -97,8 +102,8 @@ Extend LVMD Config
     Upload String To File    ${merged_cfg}    /etc/microshift/lvmd.yaml
 
 Delete LVMD Config
-    [Documentation]         Removes the LVMD configuration as part of restoring test environment
-    ${stderr}   ${rc}=       sshLibrary.Execute Command    rm -f /etc/microshift/lvmd.yaml
-    ...                     sudo=True     return_rc=True      return_stderr=True  return_stdout=False
-    Log                     ${stderr}
-    Should Be Equal As Integers     0       ${rc}
+    [Documentation]    Removes the LVMD configuration as part of restoring test environment
+    ${stderr}    ${rc}=    sshLibrary.Execute Command    rm -f /etc/microshift/lvmd.yaml
+    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
+    Log    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
