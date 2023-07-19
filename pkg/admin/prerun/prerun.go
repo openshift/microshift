@@ -2,16 +2,11 @@ package prerun
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
-)
-
-var (
-	preRunFailedLogPath = util.LogFilePath(filepath.Join(config.BackupsDir, "prerun_log_failed.txt"))
 )
 
 type PreRun struct {
@@ -25,19 +20,6 @@ func New(dataManager data.Manager) *PreRun {
 }
 
 func (pr *PreRun) Perform() error {
-	if err := pr.perform(); err != nil {
-		if errLog := preRunFailedLogPath.Write([]byte(err.Error())); errLog != nil {
-			klog.ErrorS(errLog, "failed to write PreRun log file", "path", preRunFailedLogPath)
-		}
-		return err
-	}
-	if err := preRunFailedLogPath.Remove(); err != nil {
-		klog.ErrorS(err, "failed to remove PreRun log file", "path", preRunFailedLogPath)
-	}
-	return nil
-}
-
-func (pr *PreRun) perform() error {
 	klog.InfoS("Starting pre-run")
 	defer klog.InfoS("Pre-run complete")
 
@@ -171,19 +153,19 @@ func (pr *PreRun) regularPrerun() error {
 	}
 
 	if health.IsHealthy() {
-		klog.InfoS("Previous boot was healthy")
+		klog.Info("Previous boot was healthy")
 		if err := pr.backup(health); err != nil {
 			return fmt.Errorf("failed to backup during pre-run: %w", err)
 		}
 
 		if health.DeploymentID != currentDeploymentID {
-			klog.InfoS("Current and previously booted deployments are different")
+			klog.Info("Current and previously booted deployments are different")
 			return pr.handleDeploymentSwitch(currentDeploymentID)
 		}
 		return nil
 	}
 
-	klog.InfoS("Previous boot was not healthy")
+	klog.Info("Previous boot was not healthy")
 	if err = pr.handleUnhealthy(health); err != nil {
 		return fmt.Errorf("failed to handle unhealthy data during pre-run: %w", err)
 	}
@@ -285,7 +267,7 @@ func (pr *PreRun) backup(health *HealthInfo) error {
 
 func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 	// TODO: Check if containers are already running (i.e. microshift.service was restarted)?
-	klog.InfoS("Handling previously unhealthy system")
+	klog.Info("Handling previously unhealthy system")
 
 	currentDeploymentID, err := getCurrentDeploymentID()
 	if err != nil {
@@ -303,7 +285,7 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
-		klog.InfoS("Finished handling unhealthy system")
+		klog.Info("Finished handling unhealthy system")
 		return nil
 	}
 
@@ -374,16 +356,16 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 
 	if backup != "" {
-		klog.InfoS("Backup exists for current deployment - restoring")
+		klog.Info("Backup exists for current deployment - restoring")
 
 		err = pr.dataManager.Restore(backup)
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
 
-		klog.InfoS("Restored existing backup for current deployment")
+		klog.Info("Restored existing backup for current deployment")
 	} else {
-		klog.InfoS("There is no backup for current deployment - continuing start up")
+		klog.Info("There is no backup for current deployment - continuing start up")
 	}
 
 	return nil

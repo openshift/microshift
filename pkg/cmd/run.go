@@ -77,8 +77,8 @@ func NewRunMicroshiftCommand() *cobra.Command {
 
 func cleanUpPreviousFileLogs() {
 	for _, p := range cleanUpFileLogPaths {
-		if err := p.Remove(); err != nil {
-			klog.ErrorS(err, "failed to remove log file", "path", p)
+		if errLog := p.Remove(); errLog != nil {
+			klog.ErrorS(errLog, "failed to remove log file", "path", p)
 		}
 	}
 }
