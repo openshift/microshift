@@ -145,6 +145,7 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 
 	if err := prerun.CheckAndUpdateDataVersion(); err != nil {
+		writeLogFileError(preRunFailedLogPath, err)
 		return err
 	}
 
