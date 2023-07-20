@@ -113,7 +113,7 @@ func HealthCheckServer(ctx context.Context, path, port string) (start func() err
 
 type LogFilePath string
 
-// Write writes data to the desired filename, calling multiple times will ovewrite
+// Write writes data to the desired filename, calling multiple times will overwrite
 // the file with the most recent data.
 func (l LogFilePath) Write(data []byte) error {
 	err := MakeDir(filepath.Dir(string(l)))

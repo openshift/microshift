@@ -11,7 +11,7 @@ OCGET_CMD="oc get ${OCCONFIG_OPT}"
 
 # Space seperated list of log file locations to be printed out during
 # health checks.
-LOG_FAILURE_FILES=("/var/lib/microshift-backups/prerun_log_failed.txt")
+LOG_FAILURE_FILES=("/var/lib/microshift-backups/prerun_failed.log")
 
 # Print GRUB boot, Greenboot variables and ostree status affecting the script
 # behavior. This information is important for troubleshooting rollback issues.
