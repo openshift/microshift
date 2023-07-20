@@ -1,9 +1,14 @@
-- cluster-policy-controller embedded-component 726cf3d31ef9bac3096f2a5e78706e1b0c527c0c to 922f9ad6819ff2aa24d17f367bd04a6226d03924
-  - 1b8d8ec 2023-07-17T12:46:56+03:00 Handle error if caches are not synced instead silently exit
+- cluster-network-operator embedded-component fd05db194cae71d99500eef3b9042c20b8d912ee to fd9024cf8abb99018e3ecc1a409e17840828c6c5
+  - aef22da 2023-07-17T09:56:56+05:30 Skip rendering 0.0.0.0/0 for cluster proxy status
 
-- ovn-kubernetes image-amd64 e7779d24f03913b58766e16469bc81e38fd4d268 to 567aee061b529bef8671e0423fda2242fdc6f568
-  - adf4c42 2023-07-14T13:50:22-04:00 Dockerfile: build both RHEL8 and RHEL9 shims
+- machine-config-operator embedded-component d0c0670f38dcf95d1d267879614ad09e37e58d51 to 81e4a55754a425de354a700c3a4a5c7572fe4670
+  - 1269a987 2023-07-12T12:13:46+02:00 OCPBUGS-15613: Soften grep pattern for ingress default router
+  - b7d030ec 2023-07-07T19:49:45-03:00 OpenStack: fix IPv6 configuration with additional network
+  - cb7f42e8 2023-06-29T06:39:14-04:00 operator: Stop mounting /etc/kubernetes/ca.crt
 
-- ovn-kubernetes image-arm64 e7779d24f03913b58766e16469bc81e38fd4d268 to 567aee061b529bef8671e0423fda2242fdc6f568
-  - adf4c42 2023-07-14T13:50:22-04:00 Dockerfile: build both RHEL8 and RHEL9 shims
+- oc image-amd64 b23646318f85cd2f03853137363702655c8a8346 to 26815bf97bc3b9abd5189e00f0572f72650f254f
+  - 29abd121 2023-07-18T01:27:31-07:00 pkg/cli/admin/release/extract: Centralize manifest extraction
+
+- oc image-arm64 b23646318f85cd2f03853137363702655c8a8346 to 26815bf97bc3b9abd5189e00f0572f72650f254f
+  - 29abd121 2023-07-18T01:27:31-07:00 pkg/cli/admin/release/extract: Centralize manifest extraction
 
