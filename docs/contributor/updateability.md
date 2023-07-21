@@ -405,9 +405,59 @@ file is created with version of the executable.
 If file existed and version checks were successful, the file is updated 
 with version of the executable.
 
-### Migration
+### Kubernetes Storage Migration
 
-TODO
+Storage migration is process of updating objects to newer versions,
+for example from `v1beta1` to `v1beta2`.
+
+Initially, the plan was to perform the migration with only etcd and 
+kube-apiserver running.
+This turned out to not be a viable options because migrating
+CustomResourceDefinitions might require webhooks which run as a Pods, 
+therefore requiring kubelet, CNI, DNS, scheduler, and other components.
+
+Right now, storage migration is comprised of two additional controllers
+embedded into the MicroShift: Kube Storage Version Trigger and
+Kube Storage Version Migrator. They make use of a `StorageVersionMigration` CR.
+
+### `StorageVersionMigration` Custom Resource
+
+It is a Custom Resources created by the Trigger and
+picked up to handle by the Migrator.
+It can be also used to monitor progress of the migration and get
+information about any failures.
+
+#### Kube Storage Version Trigger
+
+Trigger performs a discovery which is a process of gathering information about
+existing Kubernetes Resources and their versions.
+If the Trigger controller discovers that the Resource should be migrated,
+a `StorageVersionMigration` CR is created which is then picked up by 
+the Migrator.
+
+Trigger controller performs the discovery and creates `StorageVersionMigration`
+on start and every 10 minutes (discovery period; hardcoded in upstream code).
+
+> Hint: Restarting microshift.service may be used a way to quickly
+> retrigger the migration without waiting 10 minutes.
+
+#### Kube Storage Version Migrator
+
+Migrator watches for `StorageVersionMigration` CRs and for each
+will attempt to migrate related Kubernetes object.
+
+The very core of the Migrator's implementation is simply: `GET` resource from
+the API Server and `PUT` it back.
+(Almost) all the heavy lifting is done by the API Server.
+
+If schema of a CustomResourceDefinition changed substantially and requires custom logic
+to perform the conversion between the versions, a conversion webhook needs to be provided.
+If there are no schema changes between versions, API Server should handle
+the conversion by itself.
+
+For more information on migrating CRDs see 
+[Versions in CustomResourceDefinitions](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definition-versioning/)
+from Kubernetes documentation.
 
 ### Manual backup management (non-ostree)
 
