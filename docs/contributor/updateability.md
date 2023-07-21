@@ -461,7 +461,47 @@ from Kubernetes documentation.
 
 ### Manual backup management (non-ostree)
 
-TODO
+Automated backup management is intended only for ostree-based systems.
+For other, "regular RPM-based", systems `microshift` binary exposes following
+commands aiming to help with creating and restoring backups of the MicroShift data:
+- `microshift admin data backup`
+- `microshift admin data restore`
+
+> TODO: Initially `microshift admin` was supposed to group more subcommands.
+> Maybe it's worth dropping at least one level? E.g. `microshift [admin|data} {backup,restore}`
+
+##### `microshift admin data backup`
+
+The command creates a backup of current MicroShift data (`/var/lib/microshift`).
+It requires that `microshift.service` has status `exited` which means that
+MicroShift must not be running (to avoid corrupting data if etcd was running
+during the process and modifying the files).
+
+Currently, if `microshift.service`'s status is `failed`, the command will
+refuse to proceed.
+This is based on assumption that `failed` means the MicroShift stopped running 
+due to some runtime error and systemd gave up on restarting the service.
+This suggests that MicroShift's data might not be healthy and thus should not
+be backed up (mere existence of a backup suggests it contains valid data,
+just like it is on ostree-based system with some exceptions that are explicitly
+marked).
+
+Command has two options:
+- `--name` - backup name (effectively name of the directory which will hold the copy of the data).
+  Default value contains MicroShift's version and current datetime: `MAJOR.MINOR__YYYYmmDD_HHMMSS`
+- `--storage` - which a parent directory that will hold the backup.
+  Default value is the same as for ostree-based systems: `/var/lib/microshift-backups`
+
+> **TODO: Change default --name to contain version from `/var/lib/microshift/version` rather than executable's version**
+
+> **TODO: Change default --name to include PATCH version**
+
+
+##### `microshift admin data restore`
+
+> **TODO: This command is not implemented yet.**
+
+> **TODO: Decide: reuse `--name` and `--storage` from `backup` subcommand, or expect a full path?**
 
 # Test ideas
 
