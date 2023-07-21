@@ -145,6 +145,7 @@ spec:
             --sb-address "{{.OVN_SB_DB_LIST}}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
+            --allow-no-uplink \
             ${gateway_mode_flags} \
             ${gw_interface_flag} \
             --inactivity-probe="180000" \

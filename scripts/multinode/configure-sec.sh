@@ -40,6 +40,11 @@ function configure_microshift() {
     sleep 5
     sudo systemctl start microshift-ovs-init.service
 
+    # OVN-K expects br-ex to have IP address assigned, add dummy IP to br-ex.
+    if ! ip addr show br-ex 2>/dev/null | grep -q '10.44.0.0/32'; then
+        sudo ip addr add 10.44.0.0/32 dev br-ex
+    fi
+
     # Stop and unload the kubelet service, cleaning up its old data
     if [ "$(systemctl is-active kubelet.service)" = "active" ] ; then
         sudo systemctl stop --now kubelet
