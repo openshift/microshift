@@ -97,7 +97,7 @@ Journal Should Have Information About Failed Version Comparison
 
     FOR    ${boot}    IN RANGE    -3    0
         ${stdout}    ${rc}=    Execute Command
-        ...    journalctl --unit=microshift --boot=${boot} | grep "checking version skew failed"
+        ...    journalctl --unit=microshift --boot=${boot} | grep "checking version compatibility failed"
         ...    sudo=True
         ...    return_stdout=True
         ...    return_rc=True

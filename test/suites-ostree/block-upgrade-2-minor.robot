@@ -37,7 +37,7 @@ Upgrading MicroShift By Two Minor Versions Is Blocked
 Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
-    Should Not Be Empty    ${TOO_NEW_MICROSHIFT_REF}    FAILING_REF variable is required
+    Should Not Be Empty    ${TOO_NEW_MICROSHIFT_REF}    TOO_NEW_MICROSHIFT_REF variable is required
     Login MicroShift Host
 
 Teardown
