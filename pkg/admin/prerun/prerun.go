@@ -176,6 +176,42 @@ func (pr *PreRun) regularPrerun() error {
 func (pr *PreRun) backup413() error {
 	backupName := data.BackupName("4.13")
 
+	// If 4.13 backup already exists: remove old and make a new one.
+	// As an alternative we might rename existing backup and add some suffix,
+	// but 4.13 backups require manual cleanup.
+
+	// If the backup exists, it might mean that:
+	// - this is a subsequent boot after first boot of upgrade from 4.13 failed, or
+	// - this is first upgrade boot, but there was already attempt to
+	//   upgrade from 4.13 that left stale 4.13 backup (i.e. not cleaned by the admin)
+
+	// This function is called when data exists, but version file does not.
+	// It means version file wasn't created yet, meaning there was no attempt
+	// yet to migrate the data (version file creation is before any of the
+	// MicroShift components start), so it's not "corrupted" yet with
+	// newer-version-artifacts.
+
+	// Regardless which scenario it is (greenboot reboot after failed
+	// upgrade attempt or another attempt to upgrade from 4.13), we can
+	// assume that current data is the most up to date because failing to
+	// upgrade from 4.13 should be investigated and problems addressed before
+	// attempting again.
+
+	// Assuming this data is the most up to date, we prefer it over
+	// existing 4.13 backups.
+
+	if exists, err := pr.dataManager.BackupExists(backupName); err != nil {
+		return fmt.Errorf("failed to check if '%q' backup exists: %w",
+			backupName, err)
+	} else if exists {
+		klog.InfoS("Backup 4.13 already exists " +
+			"- assuming current data is the most up to date one: " +
+			"removing existing backup and creating a new one")
+		if err := pr.dataManager.RemoveBackup(backupName); err != nil {
+			return fmt.Errorf("failed to remove backup %q: %w", backupName, err)
+		}
+	}
+
 	if err := pr.dataManager.Backup(backupName); err != nil {
 		return fmt.Errorf("failed to create new backup %q: %w", backupName, err)
 	}
