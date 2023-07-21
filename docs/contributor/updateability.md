@@ -332,8 +332,78 @@ which deployment is no longer present on the system.
 
 ### Version metadata management
 
-TODO
+This stage is all about comparing executable's and data's versions
+to allow or block an upgrade and, if allowed, updating data version.
 
+#### Version of the executable (`microshift` binary)
+
+Version of executable is obtained from values embedded during built time:
+```
+# Makefile
+ -X github.com/openshift/microshift/pkg/version.majorFromGit=$(MAJOR) \
+ -X github.com/openshift/microshift/pkg/version.minorFromGit=$(MINOR) \
+ -X github.com/openshift/microshift/pkg/version.patchFromGit=$(PATCH) \
+```
+
+> Hint:
+>
+> Values in Makefile can be overridden which was used to create
+> "fake-next-minor" RPMs and commit - which is current code with
+> newer minor version used in some tests to verify that version
+> management works as expected.
+
+#### Version of the data
+
+Version of the data is loaded from `/var/lib/microshift/version` file.
+If data exists, but the file does not, MicroShift assumes version
+of the data is 4.13.
+
+If real (from file) or assumed (4.13.0) data version is known, it will be
+compared against version of the executable.
+If data does not exist, MicroShift skips the checks and
+proceeds to creation of the file.
+
+#### Version compatibility
+
+Following procedures compares the two versions making sure that:
+- major versions are the same
+- version of the data is not newer than version of the executable (e.g. downgrade)
+- if executable is newer, then it's only by one minor version
+
+#### Blocking certain upgrade paths
+
+Executable and data versions are compared against a list of "blocked upgrades".
+The list does not exist yet, but it is expected to be placed in 
+`assets/release/upgrade-blocks.json` file with following schema:
+
+```json
+{
+  "to-binary-version": ["blocked", "from", "data", "versions"],
+  "to-binary-version-2": ["blocked", "from", "data", "versions"]
+}
+```
+For example:
+```json
+{
+		"4.14.10": ["4.14.5", "4.14.6"],
+		"4.15.5":  ["4.15.2"]
+}
+```
+
+Mechanism searches for the "top-level" version that matches executable's version
+and, if one is found, checks if version of the data is present in the associated
+list of version from which upgrade is blocked.
+For example (using json data from above), if executable's version if "4.14.10"
+and `version` file contains "4.14.5", then MicroShift will refuse to run with 
+an error: "upgrade from '4.14.5' to '4.14.10' is blocked".
+
+#### Updating `/var/lib/microshift/version`
+
+If the data does not exist (i.e. it is a first run of MicroShift), then
+file is created with version of the executable.
+
+If file existed and version checks were successful, the file is updated 
+with version of the executable.
 
 ### Migration
 
@@ -349,3 +419,5 @@ TODO
 
 - System should roll back to "original" unhealthy deployment
 - Greenboot should declare "system need manual intervention"
+
+## Test idea: upgrade blocking by producing RPMs with fake versions.
