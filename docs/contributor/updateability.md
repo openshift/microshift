@@ -237,6 +237,18 @@ There are other services that are involved in grub's envvar management:
 Their impact on MicroShift was not investigated and is currently unknown,
 however it is not expected to be significant.
 
+## "grub * greenboot * rpm-ostree" integration summary
+
+<!-- 
+TODO
+Staging deployment causes greenboot to set boot_counter
+boot_counter is decremented on each boot by the grub
+if falls down to 0 or is already -1, it's set to -1, and default boot entry is changed to `1`
+
+greenboot starts, sees -1, issues `rpm-ostree rollback` which from currently booted systems is kind of a no-op, because
+the rollback deployment is already booted, but this ensures that rebooting the system will result in the same.
+-->
+
 ## MicroShift Updateability Implementation
 
 Upgradeability introduces following features that run in following order:
