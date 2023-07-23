@@ -82,11 +82,72 @@ All of MAJOR, MINOR, and PATCH are unsigned integers. For example: `4.14.0`
 
 ## Greenboot
 
-TODO: Difference between ostree and normal systems
+[Greenboot](https://github.com/fedora-iot/greenboot) is a health check framework,
+primarily for ostree-based systems.
 
-- `/etc/greenboot/green.d/40_microshift_set_healthy.sh`
-- `/etc/greenboot/red.d/40_microshift_set_unhealthy.sh`
-- `/etc/greenboot/red.d/40_microshift_pre_rollback.sh`
+For more in-depth information about greenboot and how MicroShift integrates
+with it see following enhancements:
+[Integrating MicroShift with Greenboot](https://github.com/openshift/enhancements/blob/master/enhancements/microshift/microshift-greenboot.md)
+[MicroShift updateability in ostree based systems: integration with greenboot](https://github.com/openshift/enhancements/blob/master/enhancements/microshift/microshift-updateability-ostree.md#integration-with-greenboot)
+
+In short, it works by running health check scripts
+(placed in dirs: `/etc/greenboot/check/{required.d,wanted.d}/`) and, depending
+on result of *required* scripts, will run either "green" (healthy) or
+"red" (unhealthy) scripts. 
+
+Greenboot heavily integrates with grub. In fact, it is the grub that decrements
+the `boot_counter` and actually rolls back the system (by selecting the other
+boot target). See [Grub](#grub-ostree) section for more information.
+
+MicroShift delivers these scripts in `microshift-greenboot` RPM package.
+
+Health check script for MicroShift is resides in the repository
+as `packaging/greenboot/microshift-running-check.sh`.
+
+Pre-updateability (and continues to do so), `microshift-greenboot` started to
+provide `packaging/greenboot/microshift-pre-rollback.sh` file as a "red" script.
+If `boot_counter` equals `0`, the script will run `microshift-cleanup-data --ovn`.
+
+> Note: It's a red script, so it runs after healthchecks decided that
+> system is unhealthy, and cleanup only happens when `boot_counter`
+> already fell down to `0`.
+
+### Updateability additions to `microshift-greenboot`
+
+Updateability feature added two, new files - one "green" and one "red" script:
+- `packaging/greenboot/microshift_set_healthy.sh` -> `/etc/greenboot/green.d/40_microshift_set_healthy.sh`
+- `packaging/greenboot/microshift_set_unhealthy.sh` -> `/etc/greenboot/red.d/40_microshift_set_unhealthy.sh`
+
+They work only on ostree-based systems (by checking if `/run/ostree-booted` exists).
+Reason for this is two-fold: how greenboot works on non-ostree systems, and
+deployment ID not being available, leaving only boot ID and health, which
+are not as useful without the deployment as backup name.
+Also, since automated backup management is only intended for ostree systems,
+there is no gain in creating `health.json` (also: information about the health
+can be found in the journal with greater context).
+
+Primary responsibility of "set healthy" and "set unhealthy" scripts
+is to create or update `health.json`.
+
+`microshift_set_unhealthy.sh` has an additional logic that, before
+updating `health.json`, checks if backup matching deployment and boot IDs
+from the `health.json` exists, and does not update the file if not.
+This ensures that, when upgrading (from a healthy system) MicroShift fails to
+create a backup, in effect causing the system to be unhealthy, that the new health
+information does not overwrite existing one ("healthy" instructs MicroShift to
+create a backup).
+Without this mechanism in place, healthy data of previous deployment, would not
+get backed up, `health.json` get updated with `unhealthy` causing subsequent
+starts of MicroShift want to restore a backup (which might not exist because it
+wasn't created, or it's outdated because it contains data of
+"second to last boot of previous deployment").
+
+### Greenboot on non-ostree systems
+
+Although greenboot can be installed and used on non-ostree system, its
+usefulness is greatly diminished. It does not perform automated reboots that
+try to help system get healthy, nor does it cause a rollback to previously
+working system or MicroShift version.
 
 ## (rpm-)ostree [ostree-only]
 
