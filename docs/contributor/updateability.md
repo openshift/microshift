@@ -60,15 +60,25 @@ that MicroShift should wipe the data and start from clean state
 
 ### `/var/lib/microshift/version`
 
-TODO
+This file holds version of MicroShift that ran or attempted to run
+using the data.
 
-Schema:
+On first start (defined at non-existence of the data), MicroShift writes
+its version to the file.
+
+On following starts, MicroShift will compare version stored in the file
+with version of the executable to check if an upgrade is allowed or should be blocked
+(see [Version metadata management](#version-metadata-management) for more information).
+
+Schema of `version` file:
 ```
 MAJOR.MINOR.PATCH
 ```
 
-All of MAJOR, MINOR, and PATCH are unsigned integers.
-For example: `4.14.0`
+All of MAJOR, MINOR, and PATCH are unsigned integers. For example: `4.14.0`
+
+> Note: MicroShift writes to a file without trailing newline.
+> However, it should successfully handle a file with newline.
 
 ## Greenboot
 
