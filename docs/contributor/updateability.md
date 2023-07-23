@@ -418,9 +418,10 @@ therefore requiring kubelet, CNI, DNS, scheduler, and other components.
 
 Right now, storage migration is comprised of two additional controllers
 embedded into the MicroShift: Kube Storage Version Trigger and
-Kube Storage Version Migrator. They make use of a `StorageVersionMigration` CR.
+Kube Storage Version Migrator. They make use of the `StorageState`
+and `StorageVersionMigration` CR.
 
-### `StorageVersionMigration` Custom Resource
+### `StorageState` and `StorageVersionMigration` Custom Resources
 
 It is a Custom Resources created by the Trigger and
 picked up to handle by the Migrator.
@@ -429,14 +430,13 @@ information about any failures.
 
 #### Kube Storage Version Trigger
 
-Trigger performs a discovery which is a process of gathering information about
-existing Kubernetes Resources and their versions.
-If the Trigger controller discovers that the Resource should be migrated,
-a `StorageVersionMigration` CR is created which is then picked up by 
-the Migrator.
-
-Trigger controller performs the discovery and creates `StorageVersionMigration`
-on start and every 10 minutes (discovery period; hardcoded in upstream code).
+Trigger controller performs the discovery and creates a `StorageState` and
+a `StorageVersionMigration` respectively.
+The `StorageState` contains the current discovered state of the API resource
+and the previous, if there is a version difference for that specific API resource,
+then a `StorageVersionMigration` is created by the Trigger.
+This check happens on start and every 10 minutes (discovery period;
+hardcoded in upstream code).
 
 > Hint: Restarting microshift.service may be used a way to quickly
 > retrigger the migration without waiting 10 minutes.
