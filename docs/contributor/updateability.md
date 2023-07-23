@@ -168,11 +168,11 @@ rpm-ostree -> deployments
 Deployment is a commit with a boot entry.
 -->
 
-## Useful `ostree` commands
+### Useful `ostree` commands
 
 TODO
 
-## Useful `rpm-ostree` commands
+### Useful `rpm-ostree` commands
 
 TODO
 
