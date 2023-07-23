@@ -107,12 +107,66 @@ TODO
 
 ## Grub [ostree]
 
-TODO
-- boot_counter and boot_success
+While greenboot sets and clears env vars such as `boot_counter` and `boot_success`,
+the data they store is actually acted upon by the grub.
+Package `grub2-tools` provides several files directly involved in that process.
 
-### grub-boot-success.timer
+#### 08_fallback_counting
 
-## Implementation
+File resides in `/etc/grub.d`.
+
+This file contains logic to do the actual counting down of the `boot_counter`.
+Functionality is only executed if `boot_counter` exists and `boot_success` equals `0`.
+
+> This is important because there is a `grub-boot-success.{timer,service}`
+> which, after 2 minutes from user's logon, sets `boot_success` to `1`
+> and thus causing `boot_counter` to not be decremented.
+
+If `boot_counter` is `0` or `-1`, then variable `default` is set to `1`.
+Otherwise, `boot_counter` is decremented
+(*it's set by the greenboot to a configurable value, by default `3`, when staging new deployment*).
+
+Setting `default` to `1` effectively changes which boot entry (1st one) will boot.
+
+#### 10_reset_boot_success and 12_menu_auto_hide
+
+Files reside in `/etc/grub.d`.
+
+`10_reset_boot_success` contains logic for deciding to hide the boot menu
+depending on values of `boot_success` (*last boot was ok*) and `boot_indeterminate` 
+(*first boot attempt to boot the entry*) and may change values of these to
+variables (and `menu_hide_ok`).
+
+`12_menu_auto_hide` makes use of `menu_hide_ok` variable.
+
+These scripts were not yet observed to have a big impact on efforts related to
+updateability feature.
+
+### grub-boot-success.{timer,service}
+
+Both files are installed into `/usr/lib/systemd/user/` meaning they are intended
+for a user, rather than a system.
+
+`grub-boot-success.timer` is a 2 minute timer that starts when user logs in.
+When user session is active for 2 minutes, it triggers `grub-boot-success.server`
+which sets `boot_success`.
+
+> **IMPORTANT**: Above means that active user session influences whole
+> ostree+greenboot+grub integration. By setting `boot_success` to `1` it causes
+> grub to not decrement the `boot_counter`.
+>
+> [Discussion on fedora-iot/greenboot about this particular issue](https://github.com/fedora-iot/greenboot/issues/108).
+
+### Other files
+
+There are other services that are involved in grub's envvar management: 
+- `/usr/lib/systemd/system/grub-boot-indeterminate.service`
+- `/usr/lib/systemd/system/grub2-systemd-integration.service`
+
+Their impact on MicroShift was not investigated and is currently unknown,
+however it is not expected to be significant.
+
+## MicroShift Updateability Implementation
 
 Upgradeability introduces following features that run in following order:
 - backup management,
