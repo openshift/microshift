@@ -1,9 +1,47 @@
-- cluster-policy-controller embedded-component 726cf3d31ef9bac3096f2a5e78706e1b0c527c0c to 922f9ad6819ff2aa24d17f367bd04a6226d03924
-  - 1b8d8ec 2023-07-17T12:46:56+03:00 Handle error if caches are not synced instead silently exit
+- cluster-ingress-operator embedded-component 0cdc132376aab6f665e8f228bb07378357bb1e48 to 80cfabf2f60148d4a169b384a54105eddebe3e0c
+  - aa400d8 2023-05-18T17:46:47-04:00 canary: Tolerate infra node NoExecute taint
 
-- ovn-kubernetes image-amd64 e7779d24f03913b58766e16469bc81e38fd4d268 to 567aee061b529bef8671e0423fda2242fdc6f568
-  - adf4c42 2023-07-14T13:50:22-04:00 Dockerfile: build both RHEL8 and RHEL9 shims
+- cluster-kube-apiserver-operator embedded-component 2e060d6686e4e6ba375a68a85268c9ed0ebbed9b to 84e3487b23f51cad656e5620d45c3024d9db0a1c
+  - fc239a9 2023-07-19T10:58:39+02:00 OCPBUGS-13635: make webhook connection failure a warning in log
 
-- ovn-kubernetes image-arm64 e7779d24f03913b58766e16469bc81e38fd4d268 to 567aee061b529bef8671e0423fda2242fdc6f568
-  - adf4c42 2023-07-14T13:50:22-04:00 Dockerfile: build both RHEL8 and RHEL9 shims
+- cluster-network-operator embedded-component fd05db194cae71d99500eef3b9042c20b8d912ee to 09c0898787721394d1fc6add1dd0388878a53bee
+  - ceac0bb 2023-07-19T09:32:53+02:00 ovn-k: Configure dns service namespace and name
+  - aef22da 2023-07-17T09:56:56+05:30 Skip rendering 0.0.0.0/0 for cluster proxy status
+  - 720bba6 2023-07-12T17:29:29+02:00 Add --enable-multi-external-gateway flag, since we disabled this feature on ovn-k by default. Don't enable this feature for microshift.
+
+- cluster-openshift-controller-manager-operator embedded-component 08ed2c75cd3ea2995722d7c7a8a3a02f9ac426ca to e004b58bcbe1e592746ee1dabee60d41234da3d8
+  - 43b7db8 2023-06-09T21:31:34+02:00 Revert "Revert "OCPBUGS-13895: [WRKLDS-730] route-controller-manager deployment updates""
+
+- cluster-policy-controller embedded-component 922f9ad6819ff2aa24d17f367bd04a6226d03924 to 838f4d0c9d151be3d60ce1947822398194b96f1a
+  - a6007b8 2023-07-20T13:17:03+03:00 Remove debugs logs in workqueuebucket
+  - 2a9b7b4 2023-07-19T10:33:07+03:00 Add more logs for queue operations
+
+- machine-config-operator embedded-component d0c0670f38dcf95d1d267879614ad09e37e58d51 to 2bcdd7fb108585396a08c5b2c17d2c804a5c4613
+  - 57b5d37b 2023-07-18T20:34:28+02:00 templates: launch mcd container during firstboot with --pid=host
+  - ae8730b5 2023-07-18T12:10:58+02:00 kubevirt: Configure IPv6 arp proxy default gw
+  - a622fbed 2023-07-18T12:10:58+02:00 kubevirt: Add owners
+  - 6c3e78cb 2023-07-17T13:33:17-04:00 daemon: Copy matching binary to host, re-exec with it
+  - afdd9a35 2023-07-16T16:16:52+03:00 MGMT-14843: ovs-configuration service should copy the statically configured address even if the method isn't manual. nmstate connection files allow configuring static IPs on an interface together with DHCP, see https://github.com/nmstate/nmstate/pull/2303 By cloning the existing connection file we should get both IPs (static and the one from DHCP) on the vr-ex bridge.
+  - a232ed05 2023-07-13T09:15:42-04:00 daemon: Run firstboot as a container image too
+  - 59d2b1a2 2023-07-13T08:42:13-04:00 build-sys: Drop setting CGO_ENABLED=0
+  - ccaf1603 2023-07-13T08:41:42-04:00 4.13: use rhel9 builder for daemon binary
+  - 1269a987 2023-07-12T12:13:46+02:00 OCPBUGS-15613: Soften grep pattern for ingress default router
+  - d72f74ba 2023-07-11T11:31:32-04:00 daemon: removed login monitor
+  - b7d030ec 2023-07-07T19:49:45-03:00 OpenStack: fix IPv6 configuration with additional network
+  - cb7f42e8 2023-06-29T06:39:14-04:00 operator: Stop mounting /etc/kubernetes/ca.crt
+
+- route-controller-manager embedded-component 38d9ec83ce464e9198af05918ab03a7995a11866 to 5710699f4e7ec00a14fa3fe600b81d0f722fc1ff
+  - 36213e7 2023-07-19T16:11:59+02:00 [WRKLDS-730] add dummy flags needed for a switch to library-go server and ControlerCommand
+
+- oc image-amd64 b23646318f85cd2f03853137363702655c8a8346 to 26815bf97bc3b9abd5189e00f0572f72650f254f
+  - 29abd121 2023-07-18T01:27:31-07:00 pkg/cli/admin/release/extract: Centralize manifest extraction
+
+- router image-amd64 6cef4d006b96779a78d752909203812a451e8d27 to 6117b7ba414c7073274e2d19c43082031393ccd7
+  - c9cee47 2023-04-14T14:55:21+01:00 RFE-3007: Expose option-contstats as an unsupported option
+
+- oc image-arm64 b23646318f85cd2f03853137363702655c8a8346 to 26815bf97bc3b9abd5189e00f0572f72650f254f
+  - 29abd121 2023-07-18T01:27:31-07:00 pkg/cli/admin/release/extract: Centralize manifest extraction
+
+- router image-arm64 6cef4d006b96779a78d752909203812a451e8d27 to 6117b7ba414c7073274e2d19c43082031393ccd7
+  - c9cee47 2023-04-14T14:55:21+01:00 RFE-3007: Expose option-contstats as an unsupported option
 
