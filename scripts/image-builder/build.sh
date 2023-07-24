@@ -246,6 +246,11 @@ reposync -n -a "${BUILD_ARCH}" -a noarch --download-path openshift-local \
     --repo="${OCP_REPO_NAME}" \
     --repo="fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms" >/dev/null
 
+# TODO: Remove this
+# Temporary w/a for openvswitch version pinning
+sudo dnf download openvswitch3.1-3.1.0-14.el9fdp --destdir "openshift-local/fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms"
+sudo chown -R $(whoami). "openshift-local/fast-datapath-for-rhel-${OSVERSION}-${BUILD_ARCH}-rpms"
+
 # Remove 'microshift' packages to avoid overrides from the remote repository
 find openshift-local -name \*microshift\* -exec rm -f {} \;
 # Exit if no RPM packages were found
