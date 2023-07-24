@@ -108,6 +108,23 @@ func getVersionOfData() (versionMetadata, error) {
 	return versionMetadataFromString(string(versionFileContents))
 }
 
+func GetVersionStringOfData() string {
+	versionMetadata, err := getVersionOfData()
+	if err != nil {
+		if errors.Is(err, errDataVersionDoesNotExist) {
+			dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
+			if err == nil && dataExists {
+				// version does not exists, but data exists
+				return "4.13"
+			}
+		}
+		klog.ErrorS(err, "Failed to read version - ignoring error")
+		// couldn't access the file for whatever reason
+		return "unknown"
+	}
+	return versionMetadata.String()
+}
+
 // checkVersionCompatibility compares versions of executable and existing data for purposes of data migration.
 func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
 	if execVer == dataVer {

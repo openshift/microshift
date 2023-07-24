@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/openshift/microshift/pkg/admin/data"
+	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/version"
 
 	"github.com/spf13/cobra"
 )
@@ -14,6 +14,16 @@ import (
 func backup(cmd *cobra.Command, args []string) error {
 	storage := data.StoragePath(cmd.Flag("storage").Value.String())
 	name := data.BackupName(cmd.Flag("name").Value.String())
+
+	if name == "" {
+		// If backup name is not given by user, construct a "default value".
+		// We cannot do it when creating cobra's flag because reading
+		// /var/lib/microshift/version requires elevated permissions
+		// and it would be poor UX to expect sudo for --help.
+		name = data.BackupName(fmt.Sprintf("%s__%s",
+			prerun.GetVersionStringOfData(),
+			time.Now().UTC().Format("20060102_150405")))
+	}
 
 	dataManager, err := data.NewManager(storage)
 	if err != nil {
@@ -44,10 +54,6 @@ func newAdminDataCommand() *cobra.Command {
 				return fmt.Errorf("--storage must not be empty")
 			}
 
-			if cmd.Flag("name").Value.String() == "" {
-				return fmt.Errorf("--name must not be empty")
-			}
-
 			if err := data.MicroShiftIsNotRunning(); err != nil {
 				return fmt.Errorf("microshift must not be running: %w", err)
 			}
@@ -55,11 +61,10 @@ func newAdminDataCommand() *cobra.Command {
 			return nil
 		},
 	}
-	v := version.Get()
+
+	data.PersistentFlags().String("name", "",
+		"Backup name (if not provided, name is based on version of MicroShift data directory and current date and time)")
 	data.PersistentFlags().String("storage", config.BackupsDir, "Directory with backups")
-	data.PersistentFlags().String("name",
-		fmt.Sprintf("%s.%s__%s", v.Major, v.Minor, time.Now().UTC().Format("20060102_150405")),
-		"Backup name")
 
 	data.AddCommand(backup)
 	return data
