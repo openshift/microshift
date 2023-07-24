@@ -218,6 +218,7 @@ func (c *ClusterQuotaReconcilationController) Sync(discoveryFunc resourcequota.N
 		if c.quotaMonitor != nil && !cache.WaitForCacheSync(ctx.Done(), func() bool { return c.quotaMonitor.IsSynced(context.TODO()) }) {
 			utilruntime.HandleError(fmt.Errorf("timed out waiting for quota monitor sync"))
 		}
+		klog.V(2).Infof("synced cluster resource quota controller")
 	}, period, ctx.Done())
 }
 

@@ -28,6 +28,8 @@ import (
 
 type RouteControllerManager struct {
 	ConfigFilePath string
+	Kubeconfig     string
+	Namespace      string
 	Output         io.Writer
 }
 
@@ -66,6 +68,10 @@ func NewRouteControllerManagerCommand(name string, out, errout io.Writer, ctx co
 	flags.StringVar(&options.ConfigFilePath, "config", options.ConfigFilePath, "Location of the master configuration file to run from.")
 	cmd.MarkFlagFilename("config", "yaml", "yml")
 	cmd.MarkFlagRequired("config")
+
+	// dummy flags needed for a switch to library-go server and ControlerCommand
+	flags.StringVar(&options.Kubeconfig, "kubeconfig", options.Kubeconfig, "dummy flag required for a switch to library-go server and ControlerCommand")
+	flags.StringVar(&options.Namespace, "namespace", options.Namespace, "dummy flag required for a switch to library-go server and ControlerCommand")
 
 	return cmd
 }
