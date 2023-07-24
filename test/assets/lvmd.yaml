@@ -1,4 +1,8 @@
 device-classes:
+- name: rhel
+  volume-group: rhel
+  spare-gb: 0
+  default: true
 - name: thin
   volume-group: rhel
   spare-gb: 0
