@@ -67,7 +67,7 @@ Make Masquerading Backup
     ${backup_name}=    Set Variable    ${deploy_id}_manual
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    microshift admin data backup --name "${backup_name}"
+    ...    microshift backup --name "${backup_name}"
     ...    sudo=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
