@@ -1,9 +1,19 @@
-# cluster-network-operator embedded-component 88b572015b92a5b9cfe679ce56394c1a78d9c71f to 85cbec1b7119d882eeaf2deb4d535d6ec3889764
-9ef2b9cf14a37a674ff3ea1d303d902b6b132fb7 2023-06-30T08:24:21+00:00 Add release version annotation to whereabouts-reconciler
-# ovn-kubernetes image-amd64 3aa743ca58669d91cc7da29aa5157648a4241361 to 58fff18eeb67a3d608fa83cb48419603e3b8eda4
-4e165deb3551ee59b6063d068685dada95614a15 2023-07-05T11:38:53+02:00 Remove non-existing functions test. introduced with 916443e21442e51435fb467138015daf70952932
-c3fbfed12bca5f55682ecb1b5461a4b91c5d7649 2023-06-26T09:21:02+05:30 Fix stale SNAT entries for completed pods
-45838ae69d015e41d636167bf73f6745bd6b6cc8 2023-05-22T12:41:55+02:00 Drop packets coming from pods headed externally that were not properly SNATed
-8dd42a055df37e02c75fabcdcff68c5862912b68 2023-05-22T12:36:24+02:00 Commit egress IP pod config as one libovsdb transaction
-20ba6175664b11fb8130cab982b75e522b7fb438 2023-05-22T12:18:01+02:00 Refactor handleEgressReroutePolicy into separate functions
-879314a35af3d339e997e6ec2f1e1d8abc43cdae 2023-05-22T12:17:48+02:00 Rename MatchIPNetFamily to MatchFirstIPNetFamily
+# cluster-ingress-operator embedded-component 37c11f6d320035ca369571fc198a251533c8c5ef to 7a507e4e92b382ec1275544458516d67fd834032
+51cd04c4b8412fd4ca5480d7df012c660a252496 2023-07-02T09:49:54+00:00 OCPBUGS-13810: Update TestAWSELBConnectionIdleTimeout to not use wildcard DNS record
+# cluster-policy-controller embedded-component a83965ee1e76beb788bf572dcb86375ceaba3889 to 67ef456a781429a06bdc744aae89783cff25315d
+1f1816e5162200c32bc54c5dcd90fb84f01467bb 2023-04-24T10:35:06+00:00 fixup! psalabelsyncer: handle empty namespace of a rolebinding subject
+60ca9de351ac9b4be7c844b0c94d10d5f72303a3 2023-04-24T10:35:06+00:00 psalabelsyncer: handle empty namespace of a rolebinding subject
+# oc image-amd64 ea7c11aac7fa39d9eb733b62251ee1bc4a242c99 to 49844f7424dd87611bf5f7caea3ec854240b6150
+165a015364acd5bee5147efafb3e0d1fe77a50c7 2023-07-13T18:33:00+00:00 reboot: set ignition version to 3.1
+# ovn-kubernetes image-amd64 58fff18eeb67a3d608fa83cb48419603e3b8eda4 to 81ddcd777f674128ba90907093b6afc59509e4f8
+de22ec1db9dab1a0a2166e84a419de4fc4d7e0d1 2023-07-12T21:47:17+00:00 Fixes panic with delete NAT operations
+2988fbed734ec89fc8ca9e508bef0d9a7cd70d56 2023-07-12T21:46:48+00:00 Fixes invalid error while getting router NATs
+83be0ccf1d3f7d38df8d0b57d6a687bfc1afabcd 2023-07-12T21:46:11+00:00 Fix IC local -> remote
+390a0cffa387f3445244d8e95b819d57baeb61a1 2023-07-12T21:44:25+00:00 Improve syncNodes to remove stale data
+56972eb3f9912d062300f0ba6648bc35015a5d45 2023-07-07T12:32:39+02:00 fix egressfirewall unit tests, introduced https://github.com/openshift/ovn-kubernetes/pull/1733
+97791cafca6efe6faa27237f0386cf21d4d7d473 2023-07-07T12:22:11+02:00 Fix egressFirewall cleanup on failed Add. Return nil instead of error when egressFirewall is not found on delete.
+# ovn-kubernetes image-arm64 58fff18eeb67a3d608fa83cb48419603e3b8eda4 to 41c329ec50ce02d4e0ca1dcde1fdc2c9592ebf90
+de22ec1db9dab1a0a2166e84a419de4fc4d7e0d1 2023-07-12T21:47:17+00:00 Fixes panic with delete NAT operations
+2988fbed734ec89fc8ca9e508bef0d9a7cd70d56 2023-07-12T21:46:48+00:00 Fixes invalid error while getting router NATs
+83be0ccf1d3f7d38df8d0b57d6a687bfc1afabcd 2023-07-12T21:46:11+00:00 Fix IC local -> remote
+390a0cffa387f3445244d8e95b819d57baeb61a1 2023-07-12T21:44:25+00:00 Improve syncNodes to remove stale data
