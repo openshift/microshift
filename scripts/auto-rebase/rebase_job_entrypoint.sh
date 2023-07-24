@@ -27,7 +27,7 @@ release_arm64="$(oc image info --registry-config=/tmp/registry.json $OPENSHIFT_R
 #  can increment independently from LVMS, and will usually be 1 y-stream ahead of LVMS in-between OCP releases.
 #  For example, ocp-release at 4.13 will more often than not correspond to 4.12 LVMS, until the official 4.13 release when
 #  both components will be 4.13.
-release_lvms="v4.12"
+release_lvms="v4.13.1-5"
 
 pullspec_release_amd64="registry.ci.openshift.org/ocp/release:${release_amd64}"
 pullspec_release_arm64="registry.ci.openshift.org/ocp-arm64/release-arm64:${release_arm64}"

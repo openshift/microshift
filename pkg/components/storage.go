@@ -36,27 +36,19 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		}
 		role = []string{
 			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml",
-			"components/lvms/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml",
 		}
 		rb = []string{
 			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml",
-			"components/lvms/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml",
 		}
 		cr = []string{
-			"components/lvms/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 			"components/lvms/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 			"components/lvms/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"components/lvms/topolvm-controller-resizer_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"components/lvms/topolvm-csi-snapshotter_rbac.authorization.k8s.io_v1_clusterrole.yaml",
 		}
 		crb = []string{
 			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"components/lvms/topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 			"components/lvms/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 			"components/lvms/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"components/lvms/topolvm-controller-resizer_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"components/lvms/topolvm-csi-snapshotter_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
 		}
 		cd = []string{
 			"components/lvms/csi-driver.yaml",
