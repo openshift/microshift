@@ -5,14 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 )
 
 var (
-	healthFilepath            = "/var/lib/microshift-backups/health.json"
+	healthFilepath            = filepath.Join(config.BackupsDir, "health.json")
 	errHealthFileDoesNotExist = errors.New("health file does not exist")
 )
 

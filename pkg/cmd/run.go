@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -30,6 +31,13 @@ import (
 
 const (
 	gracefulShutdownTimeout = 60
+)
+
+var (
+	preRunFailedLogPath = util.LogFilePath(filepath.Join(config.BackupsDir, "prerun_failed.log"))
+	cleanUpFileLogPaths = []util.LogFilePath{
+		preRunFailedLogPath,
+	}
 )
 
 func NewRunMicroshiftCommand() *cobra.Command {
@@ -67,6 +75,20 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	return cmd
 }
 
+func cleanUpPreviousLogFiles() {
+	for _, p := range cleanUpFileLogPaths {
+		if errLog := p.Remove(); errLog != nil {
+			klog.ErrorS(errLog, "Failed to remove log file", "path", p)
+		}
+	}
+}
+
+func writeLogFileError(l util.LogFilePath, err error) {
+	if errLog := l.Write([]byte(err.Error())); errLog != nil {
+		klog.ErrorS(errLog, "Failed to write log file", "path", l)
+	}
+}
+
 func logConfig(cfg *config.Config) {
 	marshalled, err := yaml.Marshal(cfg)
 	if err != nil {
@@ -93,8 +115,11 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
 
+	cleanUpPreviousLogFiles()
+
 	if err := performPrerun(); err != nil {
 		klog.ErrorS(err, "Pre-run procedure failed")
+		writeLogFileError(preRunFailedLogPath, err)
 		return err
 	}
 
@@ -120,6 +145,7 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 
 	if err := prerun.CheckAndUpdateDataVersion(); err != nil {
+		writeLogFileError(preRunFailedLogPath, err)
 		return err
 	}
 
