@@ -23,9 +23,10 @@ full_vm_name() {
 }
 
 sos_report() {
+    echo "Creating sos reports"
     for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
         ip=$(cat "${vmdir}/ip")
-        ssh "redhat@${ip}" "sudo sos report --batch --all-logs --tmp-dir /tmp && sudo chmod +r /tmp/sosreport*"
+        ssh "redhat@${ip}" "sudo sos report --quiet --batch --all-logs --tmp-dir /tmp && sudo chmod +r /tmp/sosreport*"
         mkdir -p "${vmdir}/sos"
         scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
     done

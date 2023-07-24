@@ -20,7 +20,7 @@ var (
 	errDataVersionDoesNotExist = errors.New("version file for MicroShift data does not exist")
 )
 
-// CheckAndUpdateDataVersion checks version skew between data and executable,
+// CheckAndUpdateDataVersion checks version compatibility between data and executable,
 // and updates data version
 func CheckAndUpdateDataVersion() error {
 	execVer, err := getVersionOfExecutable()
@@ -29,19 +29,37 @@ func CheckAndUpdateDataVersion() error {
 	}
 
 	dataVer, err := getVersionOfData()
-	if err != nil {
-		if !errors.Is(err, errDataVersionDoesNotExist) {
-			return fmt.Errorf("failed to get version of existing MicroShift data: %w", err)
-		}
-		klog.InfoS("Version file does not exist yet")
-	} else {
-		if err := checkVersionCompatibility(execVer, dataVer); err != nil {
-			return fmt.Errorf("checking version skew failed: %w", err)
-		}
+	dataVersionMissing := errors.Is(err, errDataVersionDoesNotExist)
 
-		if err := isUpgradeBlocked(execVer, dataVer); err != nil {
+	if err != nil && !dataVersionMissing {
+		return fmt.Errorf("failed to get version of existing MicroShift data: %w", err)
+	}
+
+	if dataVersionMissing {
+		// Ignoring .nodename to not get false positives from mere existence of the path
+		dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
+		if err != nil {
 			return err
 		}
+
+		if !dataExists {
+			// Data directory does not exist so it's first run of MicroShift
+			klog.InfoS("Version file does not exist yet - assuming first run of MicroShift")
+			return writeDataVersion(execVer)
+		}
+
+		// Data exists but without version file, let's assume 4.13 and compare versions
+		klog.InfoS("MicroShift data directory exists, but doesn't contain version file" +
+			" - assuming 4.13.0 and proceeding with version compatibility checks")
+		dataVer = versionMetadata{Major: 4, Minor: 13, Patch: 0}
+	}
+
+	if err := checkVersionCompatibility(execVer, dataVer); err != nil {
+		return fmt.Errorf("checking version compatibility failed: %w", err)
+	}
+
+	if err := isUpgradeBlocked(execVer, dataVer); err != nil {
+		return err
 	}
 
 	if err := writeDataVersion(execVer); err != nil {
