@@ -102,6 +102,12 @@ download_lvms_operator_bundle_manifest(){
                     popd
                     return 1
                 }
+
+        local csv="lvms-operator.clusterserviceversion.yaml"
+        local namespace="openshift-storage"
+        title "extracting lvms clusterserviceversion.yaml into separate RBAC"
+        extract_lvms_rbac_from_cluster_service_version ${PWD} ${csv} ${namespace}
+
         popd || return 1
     done
 }
@@ -166,16 +172,146 @@ update_lvms_images(){
 update_lvms_manifests() {
     title "Modifying LVMS manifests"
 
-    local dest="${REPOROOT}/assets/components/lvms"
-    local namespace_scoped_manifests=(
-        "topolvm-controller_v1_serviceaccount.yaml"
-        "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_role.yaml"
-        "topolvm-csi-provisioner_rbac.authorization.k8s.io_v1_rolebinding.yaml"
-        "topolvm-node_v1_serviceaccount.yaml"
-    )
-    for m in "${namespace_scoped_manifests[@]}"; do
-        yq -i '.metadata.namespace = "openshift-storage"' "${dest}/${m}" || return 1
-    done
+}
+
+
+# In the ClusterServiceVersion there are encoded RBAC information for OLM deployments.
+# Since microshift skips this installation and uses a custom one based on the bundle, we have to extract the RBAC
+# manifests from the CSV by reading them out into separate files.
+# shellcheck disable=SC2207
+extract_lvms_rbac_from_cluster_service_version() {
+  local dest="$1"
+  local csv="$2"
+  local namespace="$3"
+
+  local clusterPermissions=($(yq eval '.spec.install.spec.clusterPermissions[].serviceAccountName' < "${csv}"))
+  for service_account_name in "${clusterPermissions[@]}"; do
+    title "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
+
+    local clusterrole="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrole.yaml"
+    title "generating ${clusterrole}"
+    extract_lvms_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
+
+    local clusterrolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
+    title "generating ${clusterrolebinding}"
+    extract_lvms_clusterrolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${clusterrolebinding}"
+
+    local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
+    title "generating ${service_account}"
+    extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
+  done
+
+  local permissions=($(yq eval '.spec.install.spec.permissions[].serviceAccountName' < "${csv}"))
+  for service_account_name in "${permissions[@]}"; do
+    title "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
+
+    local role="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_role.yaml"
+    title "generating ${role}"
+    extract_lvms_role_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${csv}" "${role}"
+
+    local rolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_rolebinding.yaml"
+    title "generating ${rolebinding}"
+    extract_lvms_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
+
+    local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
+    title "generating ${service_account}"
+    extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
+  done
+}
+
+extract_lvms_clusterrole_from_csv_by_service_account_name() {
+  local service_account_name="$1"
+  local csv="$2"
+  local target="$3"
+  yq eval "
+    .spec.install.spec.clusterPermissions[] |
+    select(.serviceAccountName == \"${service_account_name}\") |
+    .apiVersion = \"rbac.authorization.k8s.io/v1\" |
+    .kind = \"ClusterRole\" |
+    .metadata.name = \"${service_account_name}\" |
+    del(.serviceAccountName)
+    " "${csv}" > "${target}"
+}
+
+extract_lvms_role_from_csv_by_service_account_name() {
+  local service_account_name="$1"
+  local namespace="$2"
+  local csv="$3"
+  local target="$4"
+  yq eval "
+    .spec.install.spec.permissions[] |
+    select(.serviceAccountName == \"${service_account_name}\") |
+    .apiVersion = \"rbac.authorization.k8s.io/v1\" |
+    .kind = \"Role\" |
+    .metadata.name = \"${service_account_name}\" |
+    .metadata.namespace = \"${namespace}\" |
+    del(.serviceAccountName)
+    " "${csv}" > "${target}"
+}
+
+extract_lvms_clusterrolebinding_from_csv_by_service_account_name() {
+  local service_account_name="$1"
+  local namespace="$2"
+  local target="$3"
+
+  crb=$(cat <<EOL
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ${service_account_name}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ${service_account_name}
+subjects:
+- kind: ServiceAccount
+  name: ${service_account_name}
+  namespace: ${namespace}
+EOL
+)
+  echo "${crb}" > "${target}"
+}
+
+extract_lvms_rolebinding_from_csv_by_service_account_name() {
+  local service_account_name="$1"
+  local namespace="$2"
+  local target="$3"
+
+  crb=$(cat <<EOL
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ${service_account_name}
+  namespace: ${namespace}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ${service_account_name}
+  namespace: ${namespace}
+subjects:
+- kind: ServiceAccount
+  name: ${service_account_name}
+  namespace: ${namespace}
+EOL
+)
+  echo "${crb}" > "${target}"
+}
+
+extract_lvms_service_account_from_csv_by_service_account_name() {
+  local service_account_name="$1"
+  local namespace="$2"
+  local target="$3"
+
+  serviceAccount=$(cat <<EOL
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: null
+  name: ${service_account_name}
+  namespace: ${namespace}
+EOL
+)
+    echo "${serviceAccount}" > "${target}"
 }
 
 # Clone a repo at a commit
