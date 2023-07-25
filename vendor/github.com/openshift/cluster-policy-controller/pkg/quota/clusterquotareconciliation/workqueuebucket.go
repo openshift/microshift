@@ -76,6 +76,7 @@ func (e *workQueueBucket) Done(key interface{}) {
 	defer e.workLock.Unlock()
 
 	e.queue.Done(key)
+
 	e.work[key] = e.dirtyWork[key]
 	delete(e.dirtyWork, key)
 	delete(e.inProgress, key)

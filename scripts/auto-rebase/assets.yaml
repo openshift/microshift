@@ -196,19 +196,18 @@ assets:
   - dir: controllers/route-controller-manager/
     src: cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/
     files:
-      - file: 0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml
-        src: route-controller-ns.yaml
-      - file: ingress-to-route-controller-clusterrole.yaml
-      - file: ingress-to-route-controller-clusterrolebinding.yaml
-      - file: route-controller-informer-clusterrole.yaml
-      - file: route-controller-informer-clusterrolebinding.yaml
-      - file: route-controller-leader-role.yaml
-      - file: route-controller-leader-rolebinding.yaml
-      - file: route-controller-sa.yaml
-      - file: route-controller-separate-sa-role.yaml
-      - file: route-controller-separate-sa-rolebinding.yaml
-      - file: route-controller-tokenreview-clusterrole.yaml
-      - file: route-controller-tokenreview-clusterrolebinding.yaml
+      - file: informer-clusterrolebinding.yaml
+      - file: informer-clusterrole.yaml
+      - file: route-controller-manager-ingress-to-route-controller-clusterrolebinding.yaml
+      - file: route-controller-manager-ingress-to-route-controller-clusterrole.yaml
+      - file: route-controller-manager-leader-rolebinding.yaml
+      - file: route-controller-manager-leader-role.yaml
+      - file: route-controller-manager-ns.yaml
+      - file: route-controller-manager-sa.yaml
+      - file: route-controller-manager-separate-sa-rolebinding.yaml
+      - file: route-controller-manager-separate-sa-role.yaml
+      - file: route-controller-manager-tokenreview-clusterrolebinding.yaml
+      - file: route-controller-manager-tokenreview-clusterrole.yaml
 
   - dir: core/
     no_clean: True

@@ -109,42 +109,42 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 	}()
 
 	if err := assets.ApplyNamespaces(ctx, []string{
-		"controllers/route-controller-manager/0000_50_cluster-openshift-route-controller-manager_00_namespace.yaml",
+		"controllers/route-controller-manager/route-controller-manager-ns.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply openshift namespaces %v", err)
 	}
 	if err := assets.ApplyClusterRoles(ctx, []string{
-		"controllers/route-controller-manager/ingress-to-route-controller-clusterrole.yaml",
-		"controllers/route-controller-manager/route-controller-informer-clusterrole.yaml",
-		"controllers/route-controller-manager/route-controller-tokenreview-clusterrole.yaml",
+		"controllers/route-controller-manager/informer-clusterrole.yaml",
+		"controllers/route-controller-manager/route-controller-manager-tokenreview-clusterrole.yaml",
+		"controllers/route-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrole.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager cluster roles %v", err)
 	}
 
 	if err := assets.ApplyClusterRoleBindings(ctx, []string{
-		"controllers/route-controller-manager/ingress-to-route-controller-clusterrolebinding.yaml",
-		"controllers/route-controller-manager/route-controller-informer-clusterrolebinding.yaml",
-		"controllers/route-controller-manager/route-controller-tokenreview-clusterrolebinding.yaml",
+		"controllers/route-controller-manager/informer-clusterrolebinding.yaml",
+		"controllers/route-controller-manager/route-controller-manager-tokenreview-clusterrolebinding.yaml",
+		"controllers/route-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrolebinding.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager cluster role bindings %v", err)
 	}
 
 	if err := assets.ApplyRoles(ctx, []string{
-		"controllers/route-controller-manager/route-controller-leader-role.yaml",
-		"controllers/route-controller-manager/route-controller-separate-sa-role.yaml",
+		"controllers/route-controller-manager/route-controller-manager-leader-role.yaml",
+		"controllers/route-controller-manager/route-controller-manager-separate-sa-role.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager roles %v", err)
 	}
 
 	if err := assets.ApplyRoleBindings(ctx, []string{
-		"controllers/route-controller-manager/route-controller-leader-rolebinding.yaml",
-		"controllers/route-controller-manager/route-controller-separate-sa-rolebinding.yaml",
+		"controllers/route-controller-manager/route-controller-manager-leader-rolebinding.yaml",
+		"controllers/route-controller-manager/route-controller-manager-separate-sa-rolebinding.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager role bindings %v", err)
 	}
 
 	if err := assets.ApplyServiceAccounts(ctx, []string{
-		"controllers/route-controller-manager/route-controller-sa.yaml",
+		"controllers/route-controller-manager/route-controller-manager-sa.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager service account %v", err)
 	}

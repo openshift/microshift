@@ -754,7 +754,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/cluster-policy-controller v0.0.0-20230717120144-922f9ad6819f
+# github.com/openshift/cluster-policy-controller v0.0.0-20230720122606-838f4d0c9d15
 ## explicit; go 1.20
 github.com/openshift/cluster-policy-controller/pkg/client/genericinformers
 github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller
@@ -810,7 +810,7 @@ github.com/openshift/library-go/pkg/route/validation
 github.com/openshift/library-go/pkg/security/ldaputil
 github.com/openshift/library-go/pkg/security/uid
 github.com/openshift/library-go/pkg/serviceability
-# github.com/openshift/route-controller-manager v0.0.0-20230524200047-38d9ec83ce46
+# github.com/openshift/route-controller-manager v0.0.0-20230720095017-5710699f4e7e
 ## explicit; go 1.20
 github.com/openshift/route-controller-manager/pkg/cmd/controller/route
 github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager
