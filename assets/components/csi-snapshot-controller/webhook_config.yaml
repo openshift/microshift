@@ -13,10 +13,10 @@ webhooks:
     clientConfig:
       service:
         name: csi-snapshot-webhook
-        namespace: kube-system
+        namespace: openshift-cluster-storage-operator
         path: /volumesnapshot
     rules:
-      - operations: ["CREATE", "UPDATE"]
+      - operations: [ "CREATE", "UPDATE" ]
         apiGroups: ["snapshot.storage.k8s.io"]
         apiVersions: ["v1beta1", "v1"]
         resources: ["volumesnapshots", "volumesnapshotcontents", "volumesnapshotclasses"]

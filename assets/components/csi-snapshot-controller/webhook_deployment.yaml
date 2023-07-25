@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: csi-snapshot-webhook
-  namespace: kube-system
+  namespace: ${CONTROLPLANE_NAMESPACE}
 spec:
   serviceName: "csi-snapshot-webhook"
   selector:
@@ -21,31 +21,30 @@ spec:
         app: csi-snapshot-webhook
     spec:
       containers:
-        - name: webhook
-          image: '{{ .ReleaseImage.csi_snapshot_validation_webhook }}'
-          args:
-            - --tls-cert-file=/etc/snapshot-validation-webhook/certs/tls.crt
-            - --tls-private-key-file=/etc/snapshot-validation-webhook/certs/tls.key
-            - "--v=2"
-            - --port=8443
-          ports:
-            - containerPort: 8443
-          volumeMounts:
-            - name: certs
-              mountPath: /etc/snapshot-validation-webhook/certs
-              readOnly: true
-              optional: true
-          imagePullPolicy: IfNotPresent
-          resources:
-            requests:
-              cpu: 10m
-              memory: 20Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            runAsUser: 65534
+      - name: webhook
+        image: ${OPERAND_IMAGE}
+        args:
+          - --tls-cert-file=/etc/snapshot-validation-webhook/certs/tls.crt
+          - --tls-private-key-file=/etc/snapshot-validation-webhook/certs/tls.key
+          - "--v=${LOG_LEVEL}"
+          - --port=8443
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+          - name: certs
+            mountPath: /etc/snapshot-validation-webhook/certs
+            readOnly: true
+            optional: true
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -55,6 +54,7 @@ spec:
                   matchLabels:
                     app: csi-snapshot-webhook
                 topologyKey: kubernetes.io/hostname
+      priorityClassName: ${PRIORITY_CLASS}
       restartPolicy: Always
       securityContext:
         runAsNonRoot: true
@@ -63,18 +63,18 @@ spec:
       nodeSelector:
         node-role.kubernetes.io/master: ""
       volumes:
-        - name: certs
-          secret:
-            secretName: csi-snapshot-webhook-secret
+      - name: certs
+        secret:
+          secretName: csi-snapshot-webhook-secret
       tolerations:
-        - key: "node.kubernetes.io/unreachable"
-          operator: "Exists"
-          effect: "NoExecute"
-          tolerationSeconds: 120
-        - key: "node.kubernetes.io/not-ready"
-          operator: "Exists"
-          effect: "NoExecute"
-          tolerationSeconds: 120
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: "NoSchedule"
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: "NoSchedule"

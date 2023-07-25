@@ -1,24 +1,19 @@
 kind: Service
 apiVersion: v1
+# name, namespace,labels and annotations are set at runtime
 spec:
+  # clusterIP will be automatically managed.
+  # selector is set at runtime
   ports:
-    - name: dns
-      port: 53
-      targetPort: dns
-      protocol: UDP
-    - name: dns-tcp
-      port: 53
-      targetPort: dns-tcp
-      protocol: TCP
-    - name: metrics
-      port: 9154
-      targetPort: metrics
-      protocol: TCP
-  clusterIP: '{{.ClusterIP}}'
-  selector:
-    dns.operator.openshift.io/daemonset-dns: default
-metadata:
-  annotations:
-    service.beta.openshift.io/serving-cert-secret-name: dns-default-metrics-tls
-  name: dns-default
-  namespace: openshift-dns
+  - name: dns
+    port: 53
+    targetPort: dns
+    protocol: UDP
+  - name: dns-tcp
+    port: 53
+    targetPort: dns-tcp
+    protocol: TCP
+  - name: metrics
+    port: 9154
+    targetPort: metrics
+    protocol: TCP
