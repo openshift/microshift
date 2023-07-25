@@ -1,5 +1,5 @@
 name = "rhel-9.2-microshift-source-fake-next-minor"
-description = ""
+description = "A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream."
 version = "0.0.1"
 modules = []
 groups = []
