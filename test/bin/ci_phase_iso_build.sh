@@ -51,9 +51,14 @@ bash -x ./bin/configure_hypervisor_firewall.sh
 bash -x ./bin/build_rpms.sh
 
 # Set up for scenario tests
-timeout 20m bash -x ./bin/create_local_repo.sh
-timeout 20m bash -x ./bin/start_osbuild_workers.sh 5
-timeout 20m bash -x ./bin/build_images.sh
-timeout 20m bash -x ./bin/download_images.sh
+bash -x ./bin/create_local_repo.sh
+
+# Start the web server to host the ostree commit repository for parent
+# images.
+bash -x ./bin/start_webserver.sh
+
+# Build all of the images
+bash -x ./bin/start_osbuild_workers.sh 5
+bash -x ./bin/build_images.sh
 
 echo "Build phase complete"
