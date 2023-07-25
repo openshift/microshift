@@ -47,7 +47,9 @@ Metadata File Contents
     ${contents}=    Execute Command
     ...    cat /var/lib/microshift/version
     ...    sudo=True    return_rc=False
-    Should Be Equal    ${contents}    ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+    Should Match
+    ...    ${contents}
+    ...    {"version":"${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}","deployment_id":"*","boot_id":"*"}
 
 
 *** Keywords ***
