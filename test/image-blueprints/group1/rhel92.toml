@@ -1,5 +1,5 @@
 name = "rhel-9.2"
-description = ""
+description = "Basic RHEL 9.2 edge image without MicroShift."
 version = "0.0.1"
 distro = "rhel-92"
 modules = []

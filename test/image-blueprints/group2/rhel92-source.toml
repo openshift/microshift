@@ -1,5 +1,5 @@
 name = "rhel-9.2-microshift-source"
-description = ""
+description = "A RHEL 9.2 image with the RPMs built from source."
 version = "0.0.1"
 modules = []
 groups = []

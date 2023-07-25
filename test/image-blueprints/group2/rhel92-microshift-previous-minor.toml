@@ -1,5 +1,5 @@
 name = "rhel-9.2-microshift-4.${PREVIOUS_MINOR_VERSION}"
-description = ""
+description = "RHEL 9.2 with MicroShift from the previous minor version (y-stream) installed."
 version = "0.0.1"
 modules = []
 groups = []

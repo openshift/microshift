@@ -165,11 +165,12 @@ Add blueprints as TOML files in the appropriate group directory in the
 `image-blueprints` directory, then add a short description of the
 image here for reference.
 
-Name | Purpose
----- | -------
-rhel-9.2 | A simple RHEL image without MicroShift.
-rhel-9.2-microshift-4.13 | A RHEL 9.2 image with the latest MicroShift 4.13 z-stream installed and enabled.
-rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
+Blueprint | Image Name | Purpose
+--------- | ---------- | -------
+group1/rhel92.toml | rhel-9.2 | A simple RHEL image without MicroShift.
+group2/rhel92-microshift-previous-minor.toml | rhel-9.2-microshift-4.13 | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
+group2/rhel92-source.toml | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
+group2/rhel92-source-fake-next-minor.toml | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
 
 ### Blueprint Naming
 
