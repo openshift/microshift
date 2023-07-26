@@ -1,0 +1,742 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-07-26-001154 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.14.0-0.nightly-arm64-2023-07-25-210314[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-07-26-001154 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.14.0-0.nightly-arm64-2023-07-25-210314 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-07-26-001154 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-07-26-001154 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at eaaf726 Merge pull request #151 from jsafrane/bump-4.14
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 47be7b5 Merge pull request #369 from gcs278/setlogger
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at 83c9c41 Merge pull request #884 from gcs278/NE-1187
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at 71f29f6 Merge pull request #1529 from mfojtik/bump-goproxy
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 5f49f59 Merge pull request #740 from ingvagabund/libary-go-perm-change
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at db92b6d Merge pull request #489 from ingvagabund/update-runbook_url
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at d4f68c0 Merge pull request #1901 from abhat/fips_4.14
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at e004b58 Merge pull request #295 from atiratree/rcm-restore
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at 8501bc8 Merge pull request #126 from ardaguclu/adjust-logs
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/csi-external-snapshotter/.git/
+HEAD is now at 712bf7c Merge pull request #101 from mpatlasov/rebase-v6.2.2
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at 5a36b9b6 Merge pull request #203 from tjungblu/rebase_4.14_3.5.9
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+HEAD is now at 4aaeaec06 Merge pull request #1629 from ardaguclu/non-local-openapiv3-fix
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/machine-config-operator/.git/
+HEAD is now at 3fb306d5 Merge pull request #3756 from cdoern/certVisibility
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/openshift-controller-manager/.git/
+HEAD is now at 80c4923 Merge pull request #263 from coreydaley/update_dependencies_2023_07_11
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager/.git/
+HEAD is now at 5710699 Merge pull request #29 from atiratree/add-dummy-flag
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/service-ca-operator/.git/
+HEAD is now at 46c0577 Merge pull request #212 from stlaz/kube-1.27
+
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-07-26-001154 image repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/oc/.git/
+HEAD is now at 643b040e Merge pull request #1424 from atiratree/introduce-plugin-tests
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/coredns/.git/
+HEAD is now at a2c62dd Merge pull request #92 from gcs278/CVE-2022-41723
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/csi-external-snapshotter/.git/
+HEAD is now at 712bf7c Merge pull request #101 from mpatlasov/rebase-v6.2.2
+
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/router/.git/
+HEAD is now at 6117b7b Merge pull request #449 from k-wall/RFE-3007-option-contstats
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kube-rbac-proxy/.git/
+HEAD is now at 86f31e2 Merge pull request #70 from ibihim/v0.14.2-downstream
+
+openssl not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/ovn-kubernetes/.git/
+HEAD is now at 7d9a0d3 Merge pull request #1750 from pperiyasamy/stale-egressip-status
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kubernetes/.git/
+HEAD is now at 4aaeaec06 Merge pull request #1629 from ardaguclu/non-local-openapiv3-fix
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/service-ca-operator/.git/
+HEAD is now at 46c0577 Merge pull request #212 from stlaz/kube-1.27
+
+topolvm_csi not from release payload, skipping
+
+topolvm_csi_livenessprobe not from release payload, skipping
+
+topolvm_csi_provisioner not from release payload, skipping
+
+topolvm_csi_registrar not from release payload, skipping
+
+topolvm_csi_resizer not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/oc/.git/
+HEAD is now at 643b040e Merge pull request #1424 from atiratree/introduce-plugin-tests
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/coredns/.git/
+HEAD is now at a2c62dd Merge pull request #92 from gcs278/CVE-2022-41723
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/csi-external-snapshotter/.git/
+HEAD is now at 712bf7c Merge pull request #101 from mpatlasov/rebase-v6.2.2
+
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/router/.git/
+HEAD is now at 6117b7b Merge pull request #449 from k-wall/RFE-3007-option-contstats
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kube-rbac-proxy/.git/
+HEAD is now at 86f31e2 Merge pull request #70 from ibihim/v0.14.2-downstream
+
+openssl not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/ovn-kubernetes/.git/
+HEAD is now at 7d9a0d3 Merge pull request #1750 from pperiyasamy/stale-egressip-status
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kubernetes/.git/
+HEAD is now at 4aaeaec06 Merge pull request #1629 from ardaguclu/non-local-openapiv3-fix
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/service-ca-operator/.git/
+HEAD is now at 46c0577 Merge pull request #212 from stlaz/kube-1.27
+
+topolvm_csi not from release payload, skipping
+
+topolvm_csi_livenessprobe not from release payload, skipping
+
+topolvm_csi_provisioner not from release payload, skipping
+
+topolvm_csi_registrar not from release payload, skipping
+
+topolvm_csi_resizer not from release payload, skipping
+
+[34mdownloading LVMS operator bundles[00m
+/go/src/github.com/openshift/microshift/_output/staging/lvms/amd64 /go/src/github.com/openshift/microshift
+[34mextracting lvms operator bundle for "amd64" architecture[00m
+[34mextracting lvms clusterserviceversion.yaml into separate RBAC[00m
+[34mextracting bundle .spec.install.spec.clusterPermissions by serviceAccountName lvms-operator[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/lvms-operator_rbac.authorization.k8s.io_v1_clusterrole.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/lvms-operator_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/lvms-operator_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.clusterPermissions by serviceAccountName topolvm-controller[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-controller_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.clusterPermissions by serviceAccountName topolvm-node[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-node_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.clusterPermissions by serviceAccountName vg-manager[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/vg-manager_rbac.authorization.k8s.io_v1_clusterrole.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/vg-manager_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/vg-manager_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.permissions by serviceAccountName lvms-operator[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/lvms-operator_rbac.authorization.k8s.io_v1_role.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/lvms-operator_rbac.authorization.k8s.io_v1_rolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/lvms-operator_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.permissions by serviceAccountName topolvm-controller[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/topolvm-controller_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.permissions by serviceAccountName vg-manager[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/vg-manager_rbac.authorization.k8s.io_v1_role.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/vg-manager_rbac.authorization.k8s.io_v1_rolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/amd64/vg-manager_v1_serviceaccount.yaml[00m
+/go/src/github.com/openshift/microshift
+/go/src/github.com/openshift/microshift/_output/staging/lvms/arm64 /go/src/github.com/openshift/microshift
+[34mextracting lvms operator bundle for "arm64" architecture[00m
+[34mextracting lvms clusterserviceversion.yaml into separate RBAC[00m
+[34mextracting bundle .spec.install.spec.clusterPermissions by serviceAccountName lvms-operator[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/lvms-operator_rbac.authorization.k8s.io_v1_clusterrole.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/lvms-operator_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/lvms-operator_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.clusterPermissions by serviceAccountName topolvm-controller[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-controller_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.clusterPermissions by serviceAccountName topolvm-node[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-node_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.clusterPermissions by serviceAccountName vg-manager[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/vg-manager_rbac.authorization.k8s.io_v1_clusterrole.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/vg-manager_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/vg-manager_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.permissions by serviceAccountName lvms-operator[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/lvms-operator_rbac.authorization.k8s.io_v1_role.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/lvms-operator_rbac.authorization.k8s.io_v1_rolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/lvms-operator_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.permissions by serviceAccountName topolvm-controller[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/topolvm-controller_v1_serviceaccount.yaml[00m
+[34mextracting bundle .spec.install.spec.permissions by serviceAccountName vg-manager[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/vg-manager_rbac.authorization.k8s.io_v1_role.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/vg-manager_rbac.authorization.k8s.io_v1_rolebinding.yaml[00m
+[34mgenerating /go/src/github.com/openshift/microshift/_output/staging/lvms/arm64/vg-manager_v1_serviceaccount.yaml[00m
+/go/src/github.com/openshift/microshift
+error: branch 'rebase-4.14.0-0.nightly-2023-07-26-001154_amd64-2023-07-26_arm64-2023-07-25' not found.
+Switched to a new branch 'rebase-4.14.0-0.nightly-2023-07-26-001154_amd64-2023-07-26_arm64-2023-07-25'
+[34m## Updating last_rebase.sh[00m
+[34m## Committing changes to last_rebase.sh[00m
+[rebase-4.14.0-0.nightly-2023-07-26-001154_amd64-2023-07-26_arm64-2023-07-25 32b6d0f6a] update last_rebase.sh
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+cluster-csi-snapshot-controller-operator embedded-component no change
+
+cluster-dns-operator embedded-component no change
+
+cluster-kube-controller-manager-operator embedded-component no change
+
+cluster-kube-scheduler-operator embedded-component no change
+
+cluster-openshift-controller-manager-operator embedded-component no change
+
+csi-external-snapshotter embedded-component no change
+
+etcd embedded-component no change
+
+kubernetes embedded-component no change
+
+openshift-controller-manager embedded-component no change
+
+route-controller-manager embedded-component no change
+
+coredns image-amd64 no change
+
+csi-external-snapshotter image-amd64 no change
+
+csi-external-snapshotter image-amd64 no change
+
+csi-external-snapshotter image-amd64 no change
+
+router image-amd64 no change
+
+kube-rbac-proxy image-amd64 no change
+
+kubernetes image-amd64 no change
+
+coredns image-arm64 no change
+
+csi-external-snapshotter image-arm64 no change
+
+csi-external-snapshotter image-arm64 no change
+
+csi-external-snapshotter image-arm64 no change
+
+router image-arm64 no change
+
+kube-rbac-proxy image-arm64 no change
+
+kubernetes image-arm64 no change
+
+[34m## Committing changes to changelog[00m
+[rebase-4.14.0-0.nightly-2023-07-26-001154_amd64-2023-07-26_arm64-2023-07-25 05bb8cdcd] update changelog
+ 2 files changed, 170 insertions(+), 58 deletions(-)
+[34m# Updating microshift/go.mod[00m
+go mod edit -require github.com/openshift/cluster-policy-controller@8501bc8c4084b57cfa8978afd533cc912f17cf31
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20230714130253-4aaeaec06c95
+go: downloading k8s.io/klog/v2 v2.100.1
+go: downloading github.com/spf13/cobra v1.7.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/apparentlymart/go-cidr v1.1.0
+go: downloading github.com/spf13/pflag v1.0.5
+go: downloading sigs.k8s.io/kustomize/api v0.13.2
+go: downloading sigs.k8s.io/yaml v1.3.0
+go: downloading github.com/stretchr/testify v1.8.1
+go: downloading github.com/openshift/api v0.0.0-20230703134140-1c2204a0195c
+go: downloading github.com/openshift/client-go v0.0.0-20230503144108-75015d2347cb
+go: downloading github.com/openshift/library-go v0.0.0-20230516103935-9536341565eb
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/cluster-policy-controller v0.0.0-20230724103459-8501bc8c4084
+go: downloading github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/vishvananda/netlink v1.1.0
+go: downloading github.com/openshift/build-machinery-go v0.0.0-20230306181456-d321ffa04533
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading golang.org/x/sys v0.8.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/miekg/dns v1.1.35
+go: downloading k8s.io/kube-openapi v0.0.0-20230501164219-8b0f38b5fd1f
+go: downloading github.com/openshift/route-controller-manager v0.0.0-20230720095017-5710699f4e7e
+go: downloading go.etcd.io/etcd/client/pkg/v3 v3.5.7
+go: downloading go.etcd.io/etcd/client/v3 v3.5.7
+go: downloading github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20230525153147-77c90ab82b46
+go: downloading github.com/google/go-cmp v0.5.9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/go-logr/logr v1.2.4
+go: downloading github.com/inconshreveable/mousetrap v1.1.0
+go: downloading gopkg.in/yaml.v2 v2.4.0
+go: downloading github.com/davecgh/go-spew v1.1.1
+go: downloading github.com/pmezard/go-difflib v1.0.0
+go: downloading github.com/evanphx/json-patch v4.12.0+incompatible
+go: downloading github.com/google/uuid v1.3.0
+go: downloading k8s.io/utils v0.0.0-20230505201702-9f6742963106
+go: downloading sigs.k8s.io/kustomize/kyaml v0.14.1
+go: downloading github.com/gogo/protobuf v1.3.2
+go: downloading github.com/google/gofuzz v1.2.0
+go: downloading github.com/ghodss/yaml v1.0.0
+go: downloading github.com/jonboulle/clockwork v0.2.2
+go: downloading github.com/pkg/errors v0.9.1
+go: downloading sigs.k8s.io/structured-merge-diff/v4 v4.2.3
+go: downloading github.com/MakeNowJust/heredoc v1.0.0
+go: downloading github.com/mitchellh/go-wordwrap v1.0.0
+go: downloading github.com/russross/blackfriday/v2 v2.1.0
+go: downloading github.com/imdario/mergo v0.3.11
+go: downloading golang.org/x/term v0.8.0
+go: downloading golang.org/x/time v0.0.0-20220210224613-90d013bbcef8
+go: downloading golang.org/x/net v0.10.0
+go: downloading github.com/vishvananda/netns v0.0.2
+go: downloading golang.org/x/crypto v0.1.0
+go: downloading golang.org/x/sync v0.1.0
+go: downloading go.uber.org/zap v1.19.0
+go: downloading go.etcd.io/etcd/api/v3 v3.5.7
+go: downloading google.golang.org/grpc v1.51.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/coreos/go-systemd/v22 v22.4.0
+go: downloading github.com/google/cadvisor v0.47.1
+go: downloading github.com/opencontainers/runc v1.1.6
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.10.0
+go: downloading go.opentelemetry.io/otel/sdk v1.10.0
+go: downloading go.opentelemetry.io/otel v1.10.0
+go: downloading go.opentelemetry.io/otel/trace v1.10.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib v0.0.0-20230714130253-4aaeaec06c95
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.10.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/fsnotify/fsnotify v1.6.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/metrics v0.0.0-20230714130253-4aaeaec06c95
+go: downloading sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd
+go: downloading github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de
+go: downloading github.com/google/gnostic v0.6.9
+go: downloading golang.org/x/text v0.9.0
+go: downloading github.com/golang/protobuf v1.5.3
+go: downloading google.golang.org/protobuf v1.28.1
+go: downloading github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7
+go: downloading github.com/peterbourgon/diskv v2.0.1+incompatible
+go: downloading gopkg.in/inf.v0 v0.9.1
+go: downloading github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
+go: downloading github.com/blang/semver/v4 v4.0.0
+go: downloading github.com/prometheus/client_golang v1.14.0
+go: downloading github.com/blang/semver v3.5.1+incompatible
+go: downloading github.com/prometheus/client_model v0.3.0
+go: downloading github.com/prometheus/procfs v0.8.0
+go: downloading github.com/prometheus/common v0.37.0
+go: downloading github.com/chai2010/gettext-go v1.0.2
+go: downloading github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d
+go: downloading github.com/moby/term v0.0.0-20221205130635-1aeaba878587
+go: downloading github.com/pkg/profile v1.3.0
+go: downloading github.com/sirupsen/logrus v1.9.0
+go: downloading github.com/emicklei/go-restful/v3 v3.9.0
+go: downloading go.uber.org/atomic v1.7.0
+go: downloading golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+go: downloading github.com/json-iterator/go v1.1.12
+go: downloading gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+go: downloading github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230317131656-c62d9de5a460
+go: downloading github.com/onsi/gomega v1.27.4
+go: downloading k8s.io/gengo v0.0.0-20220913193501-391367153a38
+go: downloading go.uber.org/multierr v1.6.0
+go: downloading go.uber.org/goleak v1.2.1
+go: downloading github.com/coreos/go-semver v0.3.0
+go: downloading google.golang.org/genproto v0.0.0-20220502173005-c8bf987b8c21
+go: downloading github.com/benbjohnson/clock v1.1.0
+go: downloading github.com/onsi/ginkgo v1.11.0
+go: downloading gopkg.in/square/go-jose.v2 v2.6.0
+go: downloading gopkg.in/natefinch/lumberjack.v2 v2.0.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.35.1
+go: downloading github.com/cyphar/filepath-securejoin v0.2.3
+go: downloading github.com/moby/sys/mountinfo v0.6.2
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/Azure/azure-sdk-for-go v55.0.0+incompatible
+go: downloading github.com/Azure/go-autorest/autorest/adal v0.9.20
+go: downloading github.com/Azure/go-autorest/autorest v0.11.27
+go: downloading go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.10.0
+go: downloading go.opentelemetry.io/proto/otlp v0.19.0
+go: downloading github.com/Azure/go-autorest v14.2.0+incompatible
+go: downloading github.com/opencontainers/selinux v1.10.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cri-api v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/docker/go-units v0.5.0
+go: downloading github.com/golang/mock v1.6.0
+go: downloading github.com/Microsoft/go-winio v0.4.17
+go: downloading go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful v0.35.0
+go: downloading github.com/container-storage-interface/spec v1.7.0
+go: downloading github.com/karrick/godirwalk v1.17.0
+go: downloading github.com/libopenstorage/openstorage v1.0.0
+go: downloading github.com/opencontainers/runtime-spec v1.0.3-0.20220909204839-494a5a6aca78
+go: downloading github.com/containerd/typeurl v1.0.2
+go: downloading sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.1.2
+go: downloading github.com/openshift/apiserver-library-go v0.0.0-20230703120157-e3794c5cc9fd
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/robfig/cron/v3 v3.0.1
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/robfig/cron v1.2.0
+go: downloading github.com/go-openapi/swag v0.22.3
+go: downloading github.com/go-openapi/jsonreference v0.20.1
+go: downloading github.com/google/btree v1.0.1
+go: downloading github.com/go-logr/zapr v1.2.3
+go: downloading github.com/go-errors/errors v1.4.2
+go: downloading github.com/beorn7/perks v1.0.1
+go: downloading github.com/cespare/xxhash/v2 v2.1.2
+go: downloading github.com/fvbommel/sortorder v1.0.1
+go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.2
+go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/creack/pty v1.1.18
+go: downloading github.com/google/cel-go v0.12.6
+go: downloading github.com/NYTimes/gziphandler v1.1.1
+go: downloading github.com/kr/pretty v0.3.0
+go: downloading github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+go: downloading github.com/modern-go/reflect2 v1.0.2
+go: downloading golang.org/x/tools v0.7.0
+go: downloading github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.35.0
+go: downloading go.etcd.io/etcd/server/v3 v3.5.7
+go: downloading github.com/BurntSushi/toml v0.3.1
+go: downloading github.com/felixge/httpsnoop v1.0.3
+go: downloading go.opentelemetry.io/otel/metric v0.31.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kms v0.0.0-20230714130253-4aaeaec06c95
+go: downloading github.com/rubiojr/go-vhd v0.0.0-20200706105327-02e210299021
+go: downloading cloud.google.com/go v0.97.0
+go: downloading github.com/vmware/govmomi v0.30.0
+go: downloading github.com/GoogleCloudPlatform/k8s-cloud-provider v1.18.1-0.20220218231025-f11817397a1b
+go: downloading gopkg.in/gcfg.v1 v1.2.0
+go: downloading google.golang.org/api v0.60.0
+go: downloading github.com/go-logr/stdr v1.2.2
+go: downloading github.com/cenkalti/backoff/v4 v4.1.3
+go: downloading github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0
+go: downloading github.com/Azure/go-autorest/logger v0.2.1
+go: downloading github.com/Azure/go-autorest/tracing v0.6.0
+go: downloading github.com/Azure/go-autorest/autorest/mocks v0.4.2
+go: downloading github.com/Azure/go-autorest/autorest/date v0.3.0
+go: downloading github.com/golang-jwt/jwt/v4 v4.4.2
+go: downloading github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible
+go: downloading github.com/docker/distribution v2.8.1+incompatible
+go: downloading github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
+go: downloading github.com/godbus/dbus/v5 v5.0.6
+go: downloading github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
+go: downloading github.com/Microsoft/hcsshim v0.8.25
+go: downloading github.com/lithammer/dedent v1.1.0
+go: downloading github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
+go: downloading go.opentelemetry.io/contrib/propagators/b3 v1.10.0
+go: downloading github.com/moby/spdystream v0.2.0
+go: downloading github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
+go: downloading github.com/mohae/deepcopy v0.0.0-20170603005431-491d3605edfb
+go: downloading github.com/containerd/ttrpc v1.1.0
+go: downloading github.com/opencontainers/go-digest v1.0.0
+go: downloading github.com/euank/go-kmsg-parser v2.0.0+incompatible
+go: downloading github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
+go: downloading github.com/mitchellh/mapstructure v1.4.1
+go: downloading github.com/hashicorp/golang-lru v0.5.1
+go: downloading github.com/coreos/go-oidc v2.1.0+incompatible
+go: downloading github.com/mailru/easyjson v0.7.7
+go: downloading github.com/sergi/go-diff v1.1.0
+go: downloading github.com/fatih/camelcase v1.0.0
+go: downloading github.com/go-openapi/jsonpointer v0.19.6
+go: downloading github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1
+go: downloading github.com/stoewer/go-strcase v1.2.0
+go: downloading github.com/kr/text v0.2.0
+go: downloading github.com/rogpeppe/go-internal v1.11.0
+go: downloading google.golang.org/appengine v1.6.7
+go: downloading github.com/grpc-ecosystem/grpc-gateway v1.16.0
+go: downloading github.com/soheilhy/cmux v0.1.5
+go: downloading github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75
+go: downloading go.etcd.io/bbolt v1.3.6
+go: downloading go.etcd.io/etcd/pkg/v3 v3.5.7
+go: downloading gopkg.in/warnings.v0 v0.1.1
+go: downloading github.com/stretchr/objx v0.5.0
+go: downloading github.com/checkpoint-restore/go-criu/v5 v5.3.0
+go: downloading github.com/containerd/console v1.0.3
+go: downloading github.com/mrunalp/fileutils v0.5.0
+go: downloading github.com/docker/docker v20.10.21+incompatible
+go: downloading github.com/docker/go-connections v0.4.0
+go: downloading github.com/pquerna/cachecontrol v0.1.0
+go: downloading github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
+go: downloading github.com/xlab/treeprint v1.1.0
+go: downloading github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+go: downloading github.com/josharian/intern v1.0.0
+go: downloading github.com/antlr/antlr4/runtime/Go/antlr v1.4.10
+go: downloading github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0
+go: downloading github.com/gorilla/websocket v1.4.2
+go: downloading go.etcd.io/etcd/raft/v3 v3.5.7
+go: downloading github.com/dustin/go-humanize v1.0.0
+go: downloading github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+go: downloading github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2
+go: downloading golang.org/x/mod v0.9.0
+go: downloading github.com/googleapis/gax-go/v2 v2.1.1
+go: downloading go.opencensus.io v0.23.0
+go: downloading github.com/golang/glog v1.0.0
+go: downloading github.com/cilium/ebpf v0.7.0
+go: downloading github.com/moby/ipvs v1.1.0
+go: downloading github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635
+go: downloading github.com/seccomp/libseccomp-golang v0.9.2-0.20220502022130-f33da4d89646
+go: downloading github.com/opencontainers/image-spec v1.0.2
+go: downloading github.com/go-ldap/ldap/v3 v3.4.3
+go: downloading github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1
+go: downloading go.etcd.io/etcd/client/v2 v2.305.7
+go: downloading github.com/frankban/quicktest v1.11.3
+go: downloading github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e
+go: downloading github.com/go-asn1-ber/asn1-ber v1.5.4
+go: downloading github.com/containerd/cgroups v1.0.1
+go: downloading go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5
+go: downloading github.com/Azure/go-autorest/autorest/validation v0.1.0
+go: downloading github.com/Azure/go-autorest/autorest/to v0.4.0
+go: downloading github.com/dnaeon/go-vcr v1.2.0
+go: downloading github.com/gofrs/uuid v4.0.0+incompatible
+go mod edit -require github.com/openshift/route-controller-manager@5710699f4e7ec00a14fa3fe600b81d0f722fc1ff
+go mod edit -replace k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@4aaeaec06c95e0a1a868695792c256d8f0158075
+go mod edit -replace k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace github.com/onsi/ginkgo/v2=github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20230317131656-c62d9de5a460
+go mod edit -replace k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubernetes=github.com/openshift/kubernetes@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20230714130253-4aaeaec06c95
+skipping modulepath sigs.k8s.io/kube-storage-version-migrator: no or unknown command []
+[34m# Updating etcd/go.mod[00m
+go mod edit -require github.com/openshift/cluster-policy-controller@8501bc8c4084b57cfa8978afd533cc912f17cf31
+go: downloading github.com/openshift/etcd/server/v3 v3.5.1-0.20230706085316-5a36b9b6b329
+go: downloading github.com/openshift/etcd/api/v3 v3.5.1-0.20230706085316-5a36b9b6b329
+go: downloading github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20230706085316-5a36b9b6b329
+go: downloading go.etcd.io/bbolt v1.3.7
+go: downloading github.com/openshift/etcd/client/v3 v3.5.1-0.20230706085316-5a36b9b6b329
+go: downloading github.com/openshift/etcd/pkg/v3 v3.5.1-0.20230706085316-5a36b9b6b329
+go: downloading github.com/openshift/etcd/raft/v3 v3.5.1-0.20230706085316-5a36b9b6b329
+go: downloading go.etcd.io/etcd/client/v2 v2.305.9
+go: downloading github.com/cockroachdb/datadriven v1.0.2
+go mod edit -require github.com/openshift/route-controller-manager@5710699f4e7ec00a14fa3fe600b81d0f722fc1ff
+go mod edit -replace k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20230714130253-4aaeaec06c95
+skipping modulepath github.com/openshift/microshift: no or unknown command []
+skipping modulepath github.com/openshift/microshift/pkg/config: no or unknown command []
+skipping modulepath github.com/openshift/microshift/pkg/util/cryptomaterial: no or unknown command []
+go mod edit -replace github.com/onsi/ginkgo/v2=github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20230317131656-c62d9de5a460
+go mod edit -replace go.etcd.io/etcd/api/v3=github.com/openshift/etcd/api/v3@5a36b9b6b329d92d7c26d1c944e6b1192f9d1523
+go mod edit -replace go.etcd.io/etcd/client/pkg/v3=github.com/openshift/etcd/client/pkg/v3@v3.5.1-0.20230706085316-5a36b9b6b329
+go mod edit -replace go.etcd.io/etcd/client/v3=github.com/openshift/etcd/client/v3@v3.5.1-0.20230706085316-5a36b9b6b329
+go mod edit -replace go.etcd.io/etcd/pkg/v3=github.com/openshift/etcd/pkg/v3@v3.5.1-0.20230706085316-5a36b9b6b329
+go mod edit -replace go.etcd.io/etcd/raft/v3=github.com/openshift/etcd/raft/v3@v3.5.1-0.20230706085316-5a36b9b6b329
+go mod edit -replace go.etcd.io/etcd/server/v3=github.com/openshift/etcd/server/v3@v3.5.1-0.20230706085316-5a36b9b6b329
+go mod edit -replace k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20230714130253-4aaeaec06c95
+go mod edit -replace k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20230714130253-4aaeaec06c95
+[34m## Committing changes to microshift/go.mod[00m
+[rebase-4.14.0-0.nightly-2023-07-26-001154_amd64-2023-07-26_arm64-2023-07-25 4635fe1b0] update microshift/go.mod
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+[34m## Updating microshift/vendor directory[00m
+go mod vendor
+for p in scripts/auto-rebase/rebase_patches/0001-Fix-CSI-initialization-conflict.patch scripts/auto-rebase/rebase_patches/0002-disable-APIrequestcount-controller.patch scripts/auto-rebase/rebase_patches/0003-disable-clusterQuotaMapping-controller.patch scripts/auto-rebase/rebase_patches/0004-remove-config-informer-and-cpu-partitioning-admission-plugin.patch scripts/auto-rebase/rebase_patches/0005-remove-user-informer.patch scripts/auto-rebase/rebase_patches/0010-kube-apiserver-command-context.patch scripts/auto-rebase/rebase_patches/0020-klog-component-names.patch scripts/auto-rebase/rebase_patches/0030-kube-controller-manager-command-context.patch; do \
+	echo "Applying patch $p"; \
+	git mailinfo /dev/null /dev/stderr 2<&1- < $p | git apply --reject || exit 1; \
+done
+Applying patch scripts/auto-rebase/rebase_patches/0001-Fix-CSI-initialization-conflict.patch
+Checking patch vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go...
+Applied patch vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0002-disable-APIrequestcount-controller.patch
+Checking patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go...
+Hunk #2 succeeded at 33 (offset 1 line).
+Hunk #3 succeeded at 86 (offset 2 lines).
+Applied patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0003-disable-clusterQuotaMapping-controller.patch
+Checking patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go...
+Hunk #2 succeeded at 26 (offset 1 line).
+Hunk #3 succeeded at 50 (offset 1 line).
+Hunk #4 succeeded at 109 (offset 2 lines).
+Hunk #5 succeeded at 127 (offset 2 lines).
+Hunk #6 succeeded at 141 (offset 2 lines).
+Hunk #7 succeeded at 157 (offset 2 lines).
+Applied patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0004-remove-config-informer-and-cpu-partitioning-admission-plugin.patch
+Checking patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go...
+Checking patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go...
+Applied patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go cleanly.
+Applied patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0005-remove-user-informer.patch
+Checking patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go...
+Applied patch vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0010-kube-apiserver-command-context.patch
+Checking patch vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/server.go...
+Hunk #1 succeeded at 173 (offset 3 lines).
+Applied patch vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/server.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0020-klog-component-names.patch
+Checking patch vendor/k8s.io/klog/v2/goroutine_labels.go...
+Checking patch vendor/k8s.io/klog/v2/internal/buffer/buffer.go...
+Hunk #1 succeeded at 139 (offset -10 lines).
+Checking patch vendor/k8s.io/klog/v2/internal/buffer/goroutine_labels.go...
+Applied patch vendor/k8s.io/klog/v2/goroutine_labels.go cleanly.
+Applied patch vendor/k8s.io/klog/v2/internal/buffer/buffer.go cleanly.
+Applied patch vendor/k8s.io/klog/v2/internal/buffer/goroutine_labels.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0030-kube-controller-manager-command-context.patch
+Checking patch vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go...
+Applied patch vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go cleanly.
+[34m## Commiting changes to microshift/vendor directory[00m
+[rebase-4.14.0-0.nightly-2023-07-26-001154_amd64-2023-07-26_arm64-2023-07-25 1edd2ba71] update microshift/vendor
+ 2 files changed, 36 insertions(+), 8 deletions(-)
+No changes in etcd/go.mod.
+[34mRebasing release_*.json[00m
+/go/src/github.com/openshift/microshift/_output/staging/lvms /go/src/github.com/openshift/microshift
+/go/src/github.com/openshift/microshift
+[34m## Committing changes to pkg/release[00m
+[rebase-4.14.0-0.nightly-2023-07-26-001154_amd64-2023-07-26_arm64-2023-07-25 4f1b97f36] update component images
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+[34mCopying manifests[00m
+2023-07-26 05:17:33,336     INFO       Clearing directory assets/components/openshift-dns/dns/
+2023-07-26 05:17:33,338     DEBUG      Copying assets/components/openshift-dns/dns/cluster-role-binding.yaml <- _output/staging/cluster-dns-operator/assets/dns/cluster-role-binding.yaml
+2023-07-26 05:17:33,339     DEBUG      Copying assets/components/openshift-dns/dns/cluster-role.yaml <- _output/staging/cluster-dns-operator/assets/dns/cluster-role.yaml
+2023-07-26 05:17:33,340     INFO       Restoring assets/components/openshift-dns/dns/configmap.yaml
+2023-07-26 05:17:33,340     DEBUG      Executing 'git restore assets/components/openshift-dns/dns/configmap.yaml'
+2023-07-26 05:17:33,391     DEBUG      Copying assets/components/openshift-dns/dns/daemonset.yaml <- _output/staging/cluster-dns-operator/assets/dns/daemonset.yaml
+2023-07-26 05:17:33,393     DEBUG      Copying assets/components/openshift-dns/dns/namespace.yaml <- _output/staging/cluster-dns-operator/assets/dns/namespace.yaml
+2023-07-26 05:17:33,394     DEBUG      Copying assets/components/openshift-dns/dns/service-account.yaml <- _output/staging/cluster-dns-operator/assets/dns/service-account.yaml
+2023-07-26 05:17:33,397     DEBUG      Copying assets/components/openshift-dns/dns/service.yaml <- _output/staging/cluster-dns-operator/assets/dns/service.yaml
+2023-07-26 05:17:33,398     INFO       Clearing directory assets/components/openshift-dns/node-resolver
+2023-07-26 05:17:33,399     WARNING    Ignoring components/openshift-dns/node-resolver/daemonset.yaml because it's created by processing daemonset.yaml.tmpl
+2023-07-26 05:17:33,399     INFO       Restoring assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl
+2023-07-26 05:17:33,399     DEBUG      Executing 'git restore assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl'
+2023-07-26 05:17:33,448     DEBUG      Copying assets/components/openshift-dns/node-resolver/service-account.yaml <- _output/staging/cluster-dns-operator/assets/node-resolver/service-account.yaml
+2023-07-26 05:17:33,450     DEBUG      Copying assets/components/openshift-dns/node-resolver/update-node-resolver.sh <- _output/staging/cluster-dns-operator/assets/node-resolver/update-node-resolver.sh
+2023-07-26 05:17:33,451     INFO       Clearing directory assets/components/openshift-router/
+2023-07-26 05:17:33,452     DEBUG      Copying assets/components/openshift-router/cluster-role-binding.yaml <- _output/staging/cluster-ingress-operator/assets/router/cluster-role-binding.yaml
+Traceback (most recent call last):
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 156, in <module>
+    main()
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 149, in main
+    handle_dir(asset)
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 127, in handle_dir
+    handle_file(file, dst, new_src_prefix)
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 110, in handle_file
+    copy(src, dst)
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 70, in copy
+    shutil.copyfile(src, dst)
+  File "/usr/lib64/python3.9/shutil.py", line 264, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: '_output/staging/cluster-ingress-operator/assets/router/cluster-role-binding.yaml'
