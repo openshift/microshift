@@ -1,47 +1,159 @@
-- cluster-ingress-operator embedded-component 0cdc132376aab6f665e8f228bb07378357bb1e48 to 80cfabf2f60148d4a169b384a54105eddebe3e0c
-  - aa400d8 2023-05-18T17:46:47-04:00 canary: Tolerate infra node NoExecute taint
+- cluster-ingress-operator embedded-component 80cfabf2f60148d4a169b384a54105eddebe3e0c to 83c9c4179f35ed2c79537f81f7e38cf0221638cb
+  - 0b761da 2023-07-20T15:14:49-04:00 Replace bindata using embed
+  - 8184bce 2023-07-20T09:40:07-03:00 RFE-3765: Add support to allow modification of HAProxy log length when using a sidecar.
+  - 1c68273 2023-07-19T14:15:04-04:00 NE-1183: Rename unit tests for specific functions
+  - f2327ab 2023-07-05T17:00:05-04:00 NE-1187: Use t.Run for table-driven tests
+  - 5f6efd1 2023-06-21T22:40:01-03:00 RFE-3765: Updating vendor files, 00-custom-resource-definition.yaml and bindata.go
 
-- cluster-kube-apiserver-operator embedded-component 2e060d6686e4e6ba375a68a85268c9ed0ebbed9b to 84e3487b23f51cad656e5620d45c3024d9db0a1c
-  - fc239a9 2023-07-19T10:58:39+02:00 OCPBUGS-13635: make webhook connection failure a warning in log
+- cluster-kube-apiserver-operator embedded-component 84e3487b23f51cad656e5620d45c3024d9db0a1c to 71f29f6df5edbc47aeb666de399a960685241e29
+  - ac3095b 2023-07-24T17:14:44+02:00 bump(*): vendor update
+  - 89b4856 2023-07-20T15:32:18-04:00 go mod vendor
+  - d5f7b3e 2023-07-20T15:32:18-04:00 remove dependency on typed prometheus client
 
-- cluster-network-operator embedded-component fd05db194cae71d99500eef3b9042c20b8d912ee to 09c0898787721394d1fc6add1dd0388878a53bee
-  - ceac0bb 2023-07-19T09:32:53+02:00 ovn-k: Configure dns service namespace and name
-  - aef22da 2023-07-17T09:56:56+05:30 Skip rendering 0.0.0.0/0 for cluster proxy status
-  - 720bba6 2023-07-12T17:29:29+02:00 Add --enable-multi-external-gateway flag, since we disabled this feature on ovn-k by default. Don't enable this feature for microshift.
+- cluster-network-operator embedded-component 09c0898787721394d1fc6add1dd0388878a53bee to d4f68c0e55c0f337a47ea7d9f5caaf239bc7b13f
+  - 3a696e9 2023-07-14T09:56:47-07:00 update openshift/api to commit for maxLogFiles
+  - aa22e33 2023-07-14T09:56:38-07:00 Revert "Revert "OCPBUGS-10765: Remove oldest ovn acl log files when file limit exceeded""
+  - ef1f70a 2023-07-14T11:59:06-04:00 Add logic to pick the openshift-sdn shims from right directories
+  - 226e096 2023-07-14T11:58:04-04:00 Add logic to pick the ovn-k8s-cni-overlay binary from the right source directory
 
-- cluster-openshift-controller-manager-operator embedded-component 08ed2c75cd3ea2995722d7c7a8a3a02f9ac426ca to e004b58bcbe1e592746ee1dabee60d41234da3d8
-  - 43b7db8 2023-06-09T21:31:34+02:00 Revert "Revert "OCPBUGS-13895: [WRKLDS-730] route-controller-manager deployment updates""
+- cluster-policy-controller embedded-component 838f4d0c9d151be3d60ce1947822398194b96f1a to 8501bc8c4084b57cfa8978afd533cc912f17cf31
+  - af876fe 2023-07-24T08:58:15+03:00 Adjust logs per generic troubleshooting
+  - b101671 2023-07-20T12:56:58+03:00 Add timeout into cache sync wait to prevent hanging forever
 
-- cluster-policy-controller embedded-component 922f9ad6819ff2aa24d17f367bd04a6226d03924 to 838f4d0c9d151be3d60ce1947822398194b96f1a
-  - a6007b8 2023-07-20T13:17:03+03:00 Remove debugs logs in workqueuebucket
-  - 2a9b7b4 2023-07-19T10:33:07+03:00 Add more logs for queue operations
+- machine-config-operator embedded-component 2bcdd7fb108585396a08c5b2c17d2c804a5c4613 to 3fb306d53f555ab6125d82cc790833f8a7bffa30
+  - b7e71493 2023-07-21T15:59:11-04:00 fix metrics test
+  - 48ac23ed 2023-07-18T11:16:28-04:00 adds podman builder and clarifies buildah
+  - bfb44686 2023-07-18T11:16:28-04:00 remove skopeo dependency for custom build pod
+  - 692f814b 2023-07-18T11:16:22-04:00 introduces buildcontroller with image builder backends
+  - a2cf4589 2023-07-17T10:53:40-04:00 vendor deps
+  - c20970c5 2023-07-17T10:53:40-04:00 we longer have 'legacy' OS containers
+  - d27c3dfc 2023-07-17T10:53:37-04:00 Adds some constants for layering and a helper.
+  - 010a23a1 2023-07-17T10:52:54-04:00 controller/common: image stream helpers and consts
+  - 3a4f2d4f 2023-07-17T10:52:10-04:00 Add build controller for layered/image builds
+  - f0368457 2023-07-17T10:52:10-04:00 Add structures defining pool-owned build resources
+  - 80e7b4db 2023-07-17T10:27:26-04:00 keep track of certs in ControllerConfigStatus
+  - 85b297c1 2023-07-10T09:53:55-04:00 daemon: Remove old legacy OS update path
 
-- machine-config-operator embedded-component d0c0670f38dcf95d1d267879614ad09e37e58d51 to 2bcdd7fb108585396a08c5b2c17d2c804a5c4613
-  - 57b5d37b 2023-07-18T20:34:28+02:00 templates: launch mcd container during firstboot with --pid=host
-  - ae8730b5 2023-07-18T12:10:58+02:00 kubevirt: Configure IPv6 arp proxy default gw
-  - a622fbed 2023-07-18T12:10:58+02:00 kubevirt: Add owners
-  - 6c3e78cb 2023-07-17T13:33:17-04:00 daemon: Copy matching binary to host, re-exec with it
-  - afdd9a35 2023-07-16T16:16:52+03:00 MGMT-14843: ovs-configuration service should copy the statically configured address even if the method isn't manual. nmstate connection files allow configuring static IPs on an interface together with DHCP, see https://github.com/nmstate/nmstate/pull/2303 By cloning the existing connection file we should get both IPs (static and the one from DHCP) on the vr-ex bridge.
-  - a232ed05 2023-07-13T09:15:42-04:00 daemon: Run firstboot as a container image too
-  - 59d2b1a2 2023-07-13T08:42:13-04:00 build-sys: Drop setting CGO_ENABLED=0
-  - ccaf1603 2023-07-13T08:41:42-04:00 4.13: use rhel9 builder for daemon binary
-  - 1269a987 2023-07-12T12:13:46+02:00 OCPBUGS-15613: Soften grep pattern for ingress default router
-  - d72f74ba 2023-07-11T11:31:32-04:00 daemon: removed login monitor
-  - b7d030ec 2023-07-07T19:49:45-03:00 OpenStack: fix IPv6 configuration with additional network
-  - cb7f42e8 2023-06-29T06:39:14-04:00 operator: Stop mounting /etc/kubernetes/ca.crt
+- service-ca-operator embedded-component f0bd313003d3d79593b44936fb7cf0bab2a6daae to 46c0577bee18108d6cc7743b4876830630f88442
+  - 067e863 2023-07-20T11:24:01+02:00 bump kube to 1.27.1
 
-- route-controller-manager embedded-component 38d9ec83ce464e9198af05918ab03a7995a11866 to 5710699f4e7ec00a14fa3fe600b81d0f722fc1ff
-  - 36213e7 2023-07-19T16:11:59+02:00 [WRKLDS-730] add dummy flags needed for a switch to library-go server and ControlerCommand
+- oc image-amd64 26815bf97bc3b9abd5189e00f0572f72650f254f to 643b040e4f38d2d5f353ddbc839195e3935c712c
+  - 1beb5999 2023-07-25T01:04:52+02:00 go mod vendor
+  - a9848279 2023-07-25T01:04:52+02:00 introduce plugin and plugin shadowing tests for oc
+  - d565f6de 2023-07-25T01:04:52+02:00 inject dependencies into NewDefaultOcCommand with KubectlOptions
+  - 2f959e4f 2023-07-24T12:27:47-07:00 pkg/cli/admin/upgrade: Newlines after --allow-upgrade-with-warnings errors
+  - 2f0a6285 2023-07-20T16:28:44+02:00 Fix typo in /var/log folder
+  - 5c665e90 2023-07-20T14:09:18+03:00 Bump oc to 1.27.4
+  - f1c9d17c 2023-07-20T14:05:26+03:00 Add profiling functionality and flags in oc
+  - 9bb67c0f 2023-07-14T16:50:55+03:00 login: improve usage message for --web option
 
-- oc image-amd64 b23646318f85cd2f03853137363702655c8a8346 to 26815bf97bc3b9abd5189e00f0572f72650f254f
-  - 29abd121 2023-07-18T01:27:31-07:00 pkg/cli/admin/release/extract: Centralize manifest extraction
+- ovn-kubernetes image-amd64 567aee061b529bef8671e0423fda2242fdc6f568 to 7d9a0d3920e6844b86681f455e30efdf6130c7a9
+  - 712978d 2023-07-21T09:55:08+02:00 Remove node check for syncing cloud private ip config
+  - 6367071 2023-07-20T10:57:36+02:00 Enable inactivity check on ovndb connection
+  - a4194bf 2023-07-20T10:57:36+02:00 testing: rework libovsdb helpers for libovsdb bump
+  - 5bf7264 2023-07-20T10:57:36+02:00 vendor: bump libovsdb to 6785b52d4020
+  - 6745d66 2023-07-20T10:22:49+02:00 Fix logging for release IP msg
+  - c94d11f 2023-07-19T17:32:39+00:00 Add secondary network namespace address set UTs
+  - 30f005f 2023-07-19T16:41:24+00:00 Replace child stop channels with cancelable contexts
+  - 8c2c616 2023-07-19T16:41:23+00:00 Enable layer2 interconnect e2e tests
+  - 0deb88c 2023-07-19T16:41:23+00:00 Enable layer2 interconnect support
+  - 69242d1 2023-07-19T16:41:23+00:00 Add IC support to layer2 network controller
+  - b21b59d 2023-07-19T16:41:23+00:00 Fetch network ID from any node in zone IC handler
+  - e50baa9 2023-07-19T16:41:22+00:00 Move zoneICHandler to base network controller
+  - eed5169 2023-07-19T16:41:22+00:00 Handle node events in layer2 controller
+  - ced3a5a 2023-07-19T16:41:22+00:00 Move Start/Stop entry points to the specific layer2 controllers
+  - 9fbc909 2023-07-19T16:41:22+00:00 Rename base layer2 event handler
+  - a11909f 2023-07-19T16:41:21+00:00 Move Multinetpol record event implementation to base handler
+  - 899d164 2023-07-19T16:41:21+00:00 Cache network ID in IC handler
+  - ed83605 2023-07-19T16:41:21+00:00 Fix missing addLogicalPortToNetworkForNAD error
+  - fd7267c 2023-07-19T14:27:21+02:00 kubevirt, refactor: Reuse ippool re-fill logic
+  - e1550f5 2023-07-19T14:27:21+02:00 kubevirt: Handle adding new node
+  - dbb6770 2023-07-19T14:27:21+02:00 test, e2e: test kubevirt live migration
+  - aa73f6a 2023-07-19T14:27:21+02:00 doc: Add KubeVirt live migration
+  - 8545136 2023-07-19T14:27:21+02:00 kubevirt, routing: Use point to point routing
+  - 01cafb2 2023-07-19T14:27:21+02:00 kubevirt, dhcp: Add DHCP with ARP Proxy to LSP
+  - 55bd70c 2023-07-19T14:27:21+02:00 pod, controller: Copy vm ovn pod annotation
+  - 39b16f4 2023-07-19T14:27:21+02:00 cni: Skip net configuration on live migratable pod
+  - 2bb60d4 2023-07-14T22:49:29-04:00 correct logs for Route delete
+  - 8e95a64 2023-07-14T12:07:46-04:00 Handle pod IPs correctly for address set selector
+  - f4822af 2023-07-14T15:57:35+02:00 Remove double quote in test name, it can cause logs collection error: [error]Artifact path is not valid: /ovn-control-plane/e2e-dbs/should_provide_Internet_connection_continuously_when_pod_running_master_instance_of_ovnkube-control-plane_is_killed"-nettest-9947/ovn-control-plane-conf.db. Contains the following character:  Double quote "
+  - 4fef43f 2023-07-14T15:57:35+02:00 Fix unit test cleanup: shutdown WatchFactory, call shutdown after every init.
+  - 65c2310 2023-07-14T15:57:35+02:00 Update external_gateway_apb_test.go to check policy status together with db state, simplify policy creation.
+  - e64f04d 2023-07-14T15:57:34+02:00 fix external gateway test that cleans up namespace annotation. It used to fail parsing namespace annotations, because they were empty. Add RunAPBExternalPolicyController call to handle apbroutes.
+  - b07cae5 2023-07-14T15:57:34+02:00 Fix deleting gateway pod with both CR and annotations. In this case gateway pod ip should be cleaned up.
+  - 0beaf4e 2023-07-14T15:57:34+02:00 fix gateway test annotatePodForGateway usage: when it was called for ip without double quotes, the following error occurred:
+  - de79d4d 2023-07-14T15:57:34+02:00 Update apbroute status with retry.
+  - 105fb86 2023-07-14T15:57:34+02:00 allow External Gateway tests with more detailed focus.
+  - 72ac3a5 2023-07-14T15:57:34+02:00 move gatewayInfoList to a sub-package to ensure correct usage
+  - c7ff20e 2023-07-14T15:57:34+02:00 Fix repair logic to work with the new controller design. Now repair will initialize policies cache by handling every existing policy, and return existing routes for future cleanup. Make sure Repair can return error, because if it fails, some stale routes may be left in the system, and it can't be fixed by any controller. Fix buildExternalIPGatewaysFromAnnotations function to only set dynamic gateway ips for pod in the target namespace instead of all pods.
+  - 2ac88df 2023-07-14T15:57:29+02:00 Update apbroute controller to fix cache inconsistencies and races with namespace and pod handlers. For cache fix, add routePolicySyncCache that stores the lates state for every target pod, and allows retries. For races add policyReferencedObjects cache to allow policy handler share the references objects it used for the latest config.
+  - c8c8b06 2023-07-14T13:13:13+02:00 use false in OnAdd in WithUpdateHandlingForObjReplace
+  - c08382b 2023-07-14T13:12:27+02:00 Add unit test for empty cloud private ip config
+  - 8dd5d2e 2023-07-14T13:12:27+02:00 Use CloudPrivateIPConfig sync function
+  - 152ae1e 2023-07-14T13:12:27+02:00 Remove stale egressip status entry
+  - 11f93d1 2023-07-14T09:22:56+02:00 Revert "Disable UTs for APB Temporarily"
+  - 9378b99 2023-07-13T20:31:39+02:00 Add mlb entry to kind.sh --help
 
-- router image-amd64 6cef4d006b96779a78d752909203812a451e8d27 to 6117b7ba414c7073274e2d19c43082031393ccd7
-  - c9cee47 2023-04-14T14:55:21+01:00 RFE-3007: Expose option-contstats as an unsupported option
+- service-ca-operator image-amd64 f0bd313003d3d79593b44936fb7cf0bab2a6daae to 46c0577bee18108d6cc7743b4876830630f88442
+  - 067e863 2023-07-20T11:24:01+02:00 bump kube to 1.27.1
 
-- oc image-arm64 b23646318f85cd2f03853137363702655c8a8346 to 26815bf97bc3b9abd5189e00f0572f72650f254f
-  - 29abd121 2023-07-18T01:27:31-07:00 pkg/cli/admin/release/extract: Centralize manifest extraction
+- oc image-arm64 26815bf97bc3b9abd5189e00f0572f72650f254f to 643b040e4f38d2d5f353ddbc839195e3935c712c
+  - 1beb5999 2023-07-25T01:04:52+02:00 go mod vendor
+  - a9848279 2023-07-25T01:04:52+02:00 introduce plugin and plugin shadowing tests for oc
+  - d565f6de 2023-07-25T01:04:52+02:00 inject dependencies into NewDefaultOcCommand with KubectlOptions
+  - 2f959e4f 2023-07-24T12:27:47-07:00 pkg/cli/admin/upgrade: Newlines after --allow-upgrade-with-warnings errors
+  - 2f0a6285 2023-07-20T16:28:44+02:00 Fix typo in /var/log folder
+  - 5c665e90 2023-07-20T14:09:18+03:00 Bump oc to 1.27.4
+  - f1c9d17c 2023-07-20T14:05:26+03:00 Add profiling functionality and flags in oc
+  - 9bb67c0f 2023-07-14T16:50:55+03:00 login: improve usage message for --web option
 
-- router image-arm64 6cef4d006b96779a78d752909203812a451e8d27 to 6117b7ba414c7073274e2d19c43082031393ccd7
-  - c9cee47 2023-04-14T14:55:21+01:00 RFE-3007: Expose option-contstats as an unsupported option
+- ovn-kubernetes image-arm64 567aee061b529bef8671e0423fda2242fdc6f568 to 7d9a0d3920e6844b86681f455e30efdf6130c7a9
+  - 712978d 2023-07-21T09:55:08+02:00 Remove node check for syncing cloud private ip config
+  - 6367071 2023-07-20T10:57:36+02:00 Enable inactivity check on ovndb connection
+  - a4194bf 2023-07-20T10:57:36+02:00 testing: rework libovsdb helpers for libovsdb bump
+  - 5bf7264 2023-07-20T10:57:36+02:00 vendor: bump libovsdb to 6785b52d4020
+  - 6745d66 2023-07-20T10:22:49+02:00 Fix logging for release IP msg
+  - c94d11f 2023-07-19T17:32:39+00:00 Add secondary network namespace address set UTs
+  - 30f005f 2023-07-19T16:41:24+00:00 Replace child stop channels with cancelable contexts
+  - 8c2c616 2023-07-19T16:41:23+00:00 Enable layer2 interconnect e2e tests
+  - 0deb88c 2023-07-19T16:41:23+00:00 Enable layer2 interconnect support
+  - 69242d1 2023-07-19T16:41:23+00:00 Add IC support to layer2 network controller
+  - b21b59d 2023-07-19T16:41:23+00:00 Fetch network ID from any node in zone IC handler
+  - e50baa9 2023-07-19T16:41:22+00:00 Move zoneICHandler to base network controller
+  - eed5169 2023-07-19T16:41:22+00:00 Handle node events in layer2 controller
+  - ced3a5a 2023-07-19T16:41:22+00:00 Move Start/Stop entry points to the specific layer2 controllers
+  - 9fbc909 2023-07-19T16:41:22+00:00 Rename base layer2 event handler
+  - a11909f 2023-07-19T16:41:21+00:00 Move Multinetpol record event implementation to base handler
+  - 899d164 2023-07-19T16:41:21+00:00 Cache network ID in IC handler
+  - ed83605 2023-07-19T16:41:21+00:00 Fix missing addLogicalPortToNetworkForNAD error
+  - fd7267c 2023-07-19T14:27:21+02:00 kubevirt, refactor: Reuse ippool re-fill logic
+  - e1550f5 2023-07-19T14:27:21+02:00 kubevirt: Handle adding new node
+  - dbb6770 2023-07-19T14:27:21+02:00 test, e2e: test kubevirt live migration
+  - aa73f6a 2023-07-19T14:27:21+02:00 doc: Add KubeVirt live migration
+  - 8545136 2023-07-19T14:27:21+02:00 kubevirt, routing: Use point to point routing
+  - 01cafb2 2023-07-19T14:27:21+02:00 kubevirt, dhcp: Add DHCP with ARP Proxy to LSP
+  - 55bd70c 2023-07-19T14:27:21+02:00 pod, controller: Copy vm ovn pod annotation
+  - 39b16f4 2023-07-19T14:27:21+02:00 cni: Skip net configuration on live migratable pod
+  - 2bb60d4 2023-07-14T22:49:29-04:00 correct logs for Route delete
+  - 8e95a64 2023-07-14T12:07:46-04:00 Handle pod IPs correctly for address set selector
+  - f4822af 2023-07-14T15:57:35+02:00 Remove double quote in test name, it can cause logs collection error: [error]Artifact path is not valid: /ovn-control-plane/e2e-dbs/should_provide_Internet_connection_continuously_when_pod_running_master_instance_of_ovnkube-control-plane_is_killed"-nettest-9947/ovn-control-plane-conf.db. Contains the following character:  Double quote "
+  - 4fef43f 2023-07-14T15:57:35+02:00 Fix unit test cleanup: shutdown WatchFactory, call shutdown after every init.
+  - 65c2310 2023-07-14T15:57:35+02:00 Update external_gateway_apb_test.go to check policy status together with db state, simplify policy creation.
+  - e64f04d 2023-07-14T15:57:34+02:00 fix external gateway test that cleans up namespace annotation. It used to fail parsing namespace annotations, because they were empty. Add RunAPBExternalPolicyController call to handle apbroutes.
+  - b07cae5 2023-07-14T15:57:34+02:00 Fix deleting gateway pod with both CR and annotations. In this case gateway pod ip should be cleaned up.
+  - 0beaf4e 2023-07-14T15:57:34+02:00 fix gateway test annotatePodForGateway usage: when it was called for ip without double quotes, the following error occurred:
+  - de79d4d 2023-07-14T15:57:34+02:00 Update apbroute status with retry.
+  - 105fb86 2023-07-14T15:57:34+02:00 allow External Gateway tests with more detailed focus.
+  - 72ac3a5 2023-07-14T15:57:34+02:00 move gatewayInfoList to a sub-package to ensure correct usage
+  - c7ff20e 2023-07-14T15:57:34+02:00 Fix repair logic to work with the new controller design. Now repair will initialize policies cache by handling every existing policy, and return existing routes for future cleanup. Make sure Repair can return error, because if it fails, some stale routes may be left in the system, and it can't be fixed by any controller. Fix buildExternalIPGatewaysFromAnnotations function to only set dynamic gateway ips for pod in the target namespace instead of all pods.
+  - 2ac88df 2023-07-14T15:57:29+02:00 Update apbroute controller to fix cache inconsistencies and races with namespace and pod handlers. For cache fix, add routePolicySyncCache that stores the lates state for every target pod, and allows retries. For races add policyReferencedObjects cache to allow policy handler share the references objects it used for the latest config.
+  - c8c8b06 2023-07-14T13:13:13+02:00 use false in OnAdd in WithUpdateHandlingForObjReplace
+  - c08382b 2023-07-14T13:12:27+02:00 Add unit test for empty cloud private ip config
+  - 8dd5d2e 2023-07-14T13:12:27+02:00 Use CloudPrivateIPConfig sync function
+  - 152ae1e 2023-07-14T13:12:27+02:00 Remove stale egressip status entry
+  - 11f93d1 2023-07-14T09:22:56+02:00 Revert "Disable UTs for APB Temporarily"
+  - 9378b99 2023-07-13T20:31:39+02:00 Add mlb entry to kind.sh --help
+
+- service-ca-operator image-arm64 f0bd313003d3d79593b44936fb7cf0bab2a6daae to 46c0577bee18108d6cc7743b4876830630f88442
+  - 067e863 2023-07-20T11:24:01+02:00 bump kube to 1.27.1
 
