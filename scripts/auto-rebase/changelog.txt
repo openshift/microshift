@@ -1,19 +1,9 @@
-# cluster-ingress-operator embedded-component 37c11f6d320035ca369571fc198a251533c8c5ef to 7a507e4e92b382ec1275544458516d67fd834032
-51cd04c4b8412fd4ca5480d7df012c660a252496 2023-07-02T09:49:54+00:00 OCPBUGS-13810: Update TestAWSELBConnectionIdleTimeout to not use wildcard DNS record
-# cluster-policy-controller embedded-component a83965ee1e76beb788bf572dcb86375ceaba3889 to 67ef456a781429a06bdc744aae89783cff25315d
-1f1816e5162200c32bc54c5dcd90fb84f01467bb 2023-04-24T10:35:06+00:00 fixup! psalabelsyncer: handle empty namespace of a rolebinding subject
-60ca9de351ac9b4be7c844b0c94d10d5f72303a3 2023-04-24T10:35:06+00:00 psalabelsyncer: handle empty namespace of a rolebinding subject
-# oc image-amd64 ea7c11aac7fa39d9eb733b62251ee1bc4a242c99 to 49844f7424dd87611bf5f7caea3ec854240b6150
-165a015364acd5bee5147efafb3e0d1fe77a50c7 2023-07-13T18:33:00+00:00 reboot: set ignition version to 3.1
-# ovn-kubernetes image-amd64 58fff18eeb67a3d608fa83cb48419603e3b8eda4 to 81ddcd777f674128ba90907093b6afc59509e4f8
-de22ec1db9dab1a0a2166e84a419de4fc4d7e0d1 2023-07-12T21:47:17+00:00 Fixes panic with delete NAT operations
-2988fbed734ec89fc8ca9e508bef0d9a7cd70d56 2023-07-12T21:46:48+00:00 Fixes invalid error while getting router NATs
-83be0ccf1d3f7d38df8d0b57d6a687bfc1afabcd 2023-07-12T21:46:11+00:00 Fix IC local -> remote
-390a0cffa387f3445244d8e95b819d57baeb61a1 2023-07-12T21:44:25+00:00 Improve syncNodes to remove stale data
-56972eb3f9912d062300f0ba6648bc35015a5d45 2023-07-07T12:32:39+02:00 fix egressfirewall unit tests, introduced https://github.com/openshift/ovn-kubernetes/pull/1733
-97791cafca6efe6faa27237f0386cf21d4d7d473 2023-07-07T12:22:11+02:00 Fix egressFirewall cleanup on failed Add. Return nil instead of error when egressFirewall is not found on delete.
-# ovn-kubernetes image-arm64 58fff18eeb67a3d608fa83cb48419603e3b8eda4 to 41c329ec50ce02d4e0ca1dcde1fdc2c9592ebf90
-de22ec1db9dab1a0a2166e84a419de4fc4d7e0d1 2023-07-12T21:47:17+00:00 Fixes panic with delete NAT operations
-2988fbed734ec89fc8ca9e508bef0d9a7cd70d56 2023-07-12T21:46:48+00:00 Fixes invalid error while getting router NATs
-83be0ccf1d3f7d38df8d0b57d6a687bfc1afabcd 2023-07-12T21:46:11+00:00 Fix IC local -> remote
-390a0cffa387f3445244d8e95b819d57baeb61a1 2023-07-12T21:44:25+00:00 Improve syncNodes to remove stale data
+# cluster-kube-apiserver-operator embedded-component 2076f3d0e4fea6fca54028ec7831407173ea81f5 to 353171ffeb5b211e65c304e2152295036f15826c
+9d5d782c5adfb4b57bc5c6e887b1f7427b1093a7 2023-07-17T13:49:06+02:00 go mod vendor
+e235958f9cc4c7b4f6de9bc1259ec8faa53e12d3 2023-07-10T15:39:28+02:00 go*: bump library-go
+# cluster-network-operator embedded-component 85cbec1b7119d882eeaf2deb4d535d6ec3889764 to f04476e2ceeb0802b89991bd4c71d0eb85b0898b
+d5eabce88631570114c56f589826166eeffc4fd8 2023-07-12T22:02:52+02:00 Improve logging on allowlist controller
+a8bda891196f28e966932c472baf9f6c19dc2fed 2023-07-12T22:02:37+02:00 Ensure pods are present for allowlist daemonset
+aaac8353c99e0156e8e776295478623ac546c51d 2023-04-03T14:18:46-04:00 use annotation daemonset to update hybrid overlay
+# ovn-kubernetes image-amd64 81ddcd777f674128ba90907093b6afc59509e4f8 to 70d15f04e3bfede87710b8a923a36534ffdf604d
+be3df1da432ff5eed99ddd637ffb4797ecb47fb9 2023-06-30T12:40:52+00:00 ovnkube-master pod failed to reconnect to ovn db due to ssl expire
