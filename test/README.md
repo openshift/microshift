@@ -158,14 +158,78 @@ case the change affects the way the image is used in different
 scenarios. Be careful adding unnecessary new images, since each image
 takes time to build and may slow down the overall test job.
 
-Add blueprints as TOML files in the `image-blueprints` directory, then
-add a short description of the image here for reference.
+Images are organized into "groups". Each group is built in order and
+all of the images in a group are built in parallel.
 
-Name | Purpose
----- | -------
-rhel-9.2 | A simple RHEL image without MicroShift.
-rhel-9.2-microshift-4.13 | A RHEL 9.2 image with the latest MicroShift 4.13 z-stream installed and enabled.
-rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
+Add blueprints as TOML files in the appropriate group directory in the
+`image-blueprints` directory, then add a short description of the
+image here for reference.
+
+Blueprint | Image Name | Purpose
+--------- | ---------- | -------
+group1/rhel92.toml | rhel-9.2 | A simple RHEL image without MicroShift.
+group2/rhel92-microshift-previous-minor.toml | rhel-9.2-microshift-4.13 | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
+group2/rhel92-source.toml | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
+group2/rhel92-source-fake-next-minor.toml | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
+
+### Blueprint Naming
+
+Blueprint names must be globally unique, regardless of the group that
+contains the blueprint template.
+
+Blueprint names should clearly identify the combination of operating
+system and MicroShift versions. The convention is to put the operating
+system first, followed by MicroShift. For example,
+`rhel-9.2-microshift-4.13`.
+
+Regardless of the branch, the blueprints using MicroShift built from
+the source PR should use "source" in the name to facilitate rebuilding
+only the source-based images. For example,
+`rhel-9.2-microshift-source`.
+
+To make it easy to include the right image in a test scenario, each
+blueprint produces an edge-commit image identified with a "ref" that
+is the same as the blueprint name contained within the blueprint file.
+
+### Image Parents
+
+ostree images work better when the "parent" image is clearly defined
+for variants derived from it. The automation relies on file naming
+conventions to determine the parent blueprint by extracting the prefix
+before the first `-` in the filename and then using that to find the
+blueprint **template** file, and ultimately the blueprint **name**.
+
+For example, `rhel92-microshift-source` has prefix `rhel92`. There is
+a blueprint template `image-blueprints/group1/rhel92.toml` that
+contains the name `rhel-9.2`, so when the image for
+`rhel92-microshift-source` is built the parent is configured as the
+`rhel-9.2` image.
+
+### Image Reference Aliases
+
+Sometimes it is useful to use the same image via a different
+reference. To define an alias from one ref to another, create a file
+with the name of the desired alias and the extension `.alias`
+containing the name of the reference the alias should point to. For
+example, to create an alias `rhel-9.2-microshift-source-aux` for
+`rhel-9.2-microshift-source`:
+
+```
+$ cat image-blueprints/group2/rhel-9.2-microshift-source-aux.alias
+rhel-9.2-microshift-source
+```
+
+### Installer ISO Images
+
+To create an ISO with an installer image from a blueprint, create a
+file with the extension `.image-installer` containing the name of the
+blueprint to base the image on. For example, to create a `rhel92.iso`
+file from the `rhel-9.2` blueprint:
+
+```
+$ cat image-blueprints/group1/rhel92.image-installer
+rhel-9.2
+```
 
 ## Preparing to run test scenarios
 
@@ -190,12 +254,6 @@ recommended on a laptop.
 
 Use `./bin/build_images.sh` to build all of the images for all of the
 blueprints available.
-
-### Downloading the images for use by the test scenarios
-
-Use `./bin/download_images.sh` to download all of the images from
-Composer's cache and set up the directory for the web server to host
-the files needed to launch VMs and run test scenarios.
 
 ### Rebuilding from source easily
 

@@ -1,25 +1,30 @@
-name = "rhel-9.2-microshift-source"
-description = ""
+name = "rhel-9.2-microshift-4.${PREVIOUS_MINOR_VERSION}"
+description = "RHEL 9.2 with MicroShift from the previous minor version (y-stream) installed."
 version = "0.0.1"
 modules = []
 groups = []
 distro = "rhel-92"
 
+# FIXME: Temporarily pin the openvswitch version.
+[[packages]]
+name = "openvswitch3.1"
+version = "3.1.0-14.el9fdp"
+
 [[packages]]
 name = "microshift"
-version = "${SOURCE_VERSION}"
+version = "4.${PREVIOUS_MINOR_VERSION}*"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "${SOURCE_VERSION}"
+version = "4.${PREVIOUS_MINOR_VERSION}*"
 
 [[packages]]
 name = "microshift-networking"
-version = "${SOURCE_VERSION}"
+version = "4.${PREVIOUS_MINOR_VERSION}*"
 
 [[packages]]
 name = "microshift-selinux"
-version = "${SOURCE_VERSION}"
+version = "4.${PREVIOUS_MINOR_VERSION}*"
 
 [[packages]]
 name = "microshift-test-agent"

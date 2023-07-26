@@ -1,5 +1,5 @@
-name = "rhel-9.2-microshift-source-fake-next-minor"
-description = ""
+name = "rhel-9.2-microshift-source"
+description = "A RHEL 9.2 image with the RPMs built from source."
 version = "0.0.1"
 modules = []
 groups = []
@@ -7,19 +7,19 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "4.${FAKE_NEXT_MINOR_VERSION}.*"
+version = "${SOURCE_VERSION}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "4.${FAKE_NEXT_MINOR_VERSION}.*"
+version = "${SOURCE_VERSION}"
 
 [[packages]]
 name = "microshift-networking"
-version = "4.${FAKE_NEXT_MINOR_VERSION}.*"
+version = "${SOURCE_VERSION}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "4.${FAKE_NEXT_MINOR_VERSION}.*"
+version = "${SOURCE_VERSION}"
 
 [[packages]]
 name = "microshift-test-agent"
