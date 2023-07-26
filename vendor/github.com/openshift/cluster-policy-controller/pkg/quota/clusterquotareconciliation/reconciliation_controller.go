@@ -201,9 +201,7 @@ func (c *ClusterQuotaReconcilationController) Sync(discoveryFunc resourcequota.N
 			return
 		}
 
-		// Something has changed, so track the new state and perform a sync.
-		klog.V(2).Infof("syncing resource quota controller with updated resources from discovery: %v", newResources)
-		oldResources = newResources
+		klog.V(2).Infof("syncing resource quota controller with updated resources from discovery: %s", printDiff(oldResources, newResources))
 
 		// Ensure workers are paused to avoid processing events before informers
 		// have resynced.
@@ -215,11 +213,43 @@ func (c *ClusterQuotaReconcilationController) Sync(discoveryFunc resourcequota.N
 			utilruntime.HandleError(fmt.Errorf("failed to sync resource monitors: %v", err))
 			return
 		}
-		if c.quotaMonitor != nil && !cache.WaitForCacheSync(ctx.Done(), func() bool { return c.quotaMonitor.IsSynced(context.TODO()) }) {
+		if c.quotaMonitor != nil && !cache.WaitForCacheSync(waitForStopOrTimeout(ctx.Done(), period), func() bool { return c.quotaMonitor.IsSynced(context.TODO()) }) {
 			utilruntime.HandleError(fmt.Errorf("timed out waiting for quota monitor sync"))
 		}
+
+		oldResources = newResources
 		klog.V(2).Infof("synced cluster resource quota controller")
 	}, period, ctx.Done())
+}
+
+// printDiff returns a human-readable summary of what resources were added and removed
+func printDiff(oldResources, newResources map[schema.GroupVersionResource]struct{}) string {
+	removed := sets.NewString()
+	for oldResource := range oldResources {
+		if _, ok := newResources[oldResource]; !ok {
+			removed.Insert(fmt.Sprintf("%+v", oldResource))
+		}
+	}
+	added := sets.NewString()
+	for newResource := range newResources {
+		if _, ok := oldResources[newResource]; !ok {
+			added.Insert(fmt.Sprintf("%+v", newResource))
+		}
+	}
+	return fmt.Sprintf("added: %v, removed: %v", added.List(), removed.List())
+}
+
+// waitForStopOrTimeout returns a stop channel that closes when the provided stop channel closes or when the specified timeout is reached
+func waitForStopOrTimeout(stopCh <-chan struct{}, timeout time.Duration) <-chan struct{} {
+	stopChWithTimeout := make(chan struct{})
+	go func() {
+		defer close(stopChWithTimeout)
+		select {
+		case <-stopCh:
+		case <-time.After(timeout):
+		}
+	}()
+	return stopChWithTimeout
 }
 
 // resyncMonitors starts or stops quota monitors as needed to ensure that all
@@ -290,7 +320,6 @@ func (c *ClusterQuotaReconcilationController) worker() {
 	workFunc := func() bool {
 		uncastKey, uncastData, quit := c.queue.GetWithData()
 		if quit {
-			klog.V(2).Infof("worker is quited")
 			return true
 		}
 		defer c.queue.Done(uncastKey)
@@ -298,11 +327,10 @@ func (c *ClusterQuotaReconcilationController) worker() {
 		c.workerLock.RLock()
 		defer c.workerLock.RUnlock()
 
-		klog.V(2).Infof("quota %s is queued", uncastKey)
 		quotaName := uncastKey.(string)
 		quota, err := c.clusterQuotaLister.Get(quotaName)
 		if apierrors.IsNotFound(err) {
-			klog.V(2).Infof("queued quota %s not found in quota lister", quotaName)
+			klog.V(4).Infof("queued quota %s not found in quota lister", quotaName)
 			c.queue.Forget(uncastKey)
 			return false
 		}
