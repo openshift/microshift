@@ -60,8 +60,8 @@ BuildRequires: golang
 Requires: cri-o >= 1.25
 Requires: cri-tools >= 1.25
 Requires: iptables
-Requires: microshift-selinux
-Requires: microshift-networking
+Requires: microshift-selinux = %{version}
+Requires: microshift-networking = %{version}
 Requires: conntrack-tools
 Requires: sos
 Requires: crun
@@ -76,6 +76,7 @@ The microshift package provides an OpenShift Kubernetes distribution optimized f
 %package release-info
 Summary: Release information for MicroShift
 BuildArch: noarch
+Requires: microshift = %{version}
 
 %description release-info
 The microshift-release package provides release information files for this
@@ -89,6 +90,7 @@ BuildRequires: selinux-policy >= %{selinux_policyver}
 BuildRequires: selinux-policy-devel >= %{selinux_policyver}
 Requires: container-selinux
 BuildArch: noarch
+Requires: microshift = %{version}
 Requires: selinux-policy >= %{selinux_policyver}
 
 %description selinux
@@ -97,6 +99,7 @@ The microshift-selinux package provides the SELinux policy modules required by M
 
 %package networking
 Summary: Networking components for MicroShift
+Requires: microshift = %{version}
 Requires: openvswitch3.1
 Requires: NetworkManager
 Requires: NetworkManager-ovs
@@ -109,6 +112,7 @@ The microshift-networking package provides the networking components necessary f
 %package greenboot
 Summary: Greenboot components for MicroShift
 BuildArch: noarch
+Requires: microshift = %{version}
 Requires: greenboot
 
 %description greenboot
@@ -343,10 +347,13 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
-* Tue Jul  21 2023 Zenghui Shi <zshi@redhat.com> 4.14.0
+* Tue Jul 25 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.14.0
+- Add explicit version dependencies among MicroShift RPM packages
+
+* Fri Jul 21 2023 Zenghui Shi <zshi@redhat.com> 4.14.0
 - Add openvswitch user to hugetlbfs group
 
-* Tue Jun  6 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
+* Tue Jun 06 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
 - Restore golang BuildRequires setting
 
 * Mon May 15 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.0
