@@ -89,4 +89,11 @@ for uuid in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" 
     sed -i '/autoconnect=.*/d' "${file}"
 done
 
+# Disable a timer that sets boot_success to 1 after two minutes from a user login.
+# It impacts greenboot checks because grub script decrementing boot_counter works
+# only if boot_success is 0 (see /etc/grub.d/08_fallback_counting). In case of a
+# user login, this results in more than requested amount of red-boot-induced reboots
+# and system needing much more time to roll back.
+ln -sf /dev/null /etc/systemd/user/grub-boot-success.timer
+
 %end

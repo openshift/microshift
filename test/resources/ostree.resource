@@ -66,21 +66,6 @@ System Is Running Right Ref And Healthy
     Greenboot Health Check Exited
     System Should Be Healthy
 
-Mask Grub Boot Success Timer
-    [Documentation]    Effectively disable a timer that sets boot_success
-    ...    to 1 after two minutes from user login.
-    ...    It impacts tests because grub's script to decrement boot_counter
-    ...    works only if boot_success is 0 (see /etc/grub.d/08_fallback_counting)
-    ...    resulting in more than requested amount of redboot induced reboots
-    ...    and system needing much more time to roll back.
-    ${out}    ${err}    ${rc}=    Execute Command
-    ...    systemctl --user mask grub-boot-success.timer
-    ...    return_stdout=True
-    ...    return_stderr=True
-    ...    return_rc=True
-
-    Should Be Equal As Integers    ${rc}    0
-
 Wait For Transaction To End
     [Documentation]    Wait for any ostree transaction to end.
     ...    When grub boots previous deployment due to greenboot failure,
