@@ -23,15 +23,6 @@ ${UNKOWN_DIR_REG}       unknown_fake*
 Rebooting Healthy System Should Result In Pruning Old Backups And Keeping Unknown Directories
     [Documentation]    Check that MicroShift backup logic prunes old backups and keeps unknown directories
 
-    Create Fake Backup Directories
-    Validate Fake Backups Exist
-
-    Create Unknown Fake Backup Directories
-    Validate Unknown Fake Backups Exist
-
-    Reboot MicroShift Host
-    Wait For Healthy System
-
     Validate Fake Backups Have Been Deleted
     Validate Unknown Fake Backups Exist
 
@@ -77,6 +68,15 @@ Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
     Login MicroShift Host
+
+    Create Fake Backup Directories
+    Validate Fake Backups Exist
+
+    Create Unknown Fake Backup Directories
+    Validate Unknown Fake Backups Exist
+
+    Reboot MicroShift Host
+    Wait For Healthy System
 
 Teardown
     [Documentation]    Test suite teardown
