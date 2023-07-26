@@ -383,7 +383,7 @@ def create_pr_title(branch_name, successful_rebase):
     Given a branch name, creates a pull request title. If the rebase was successful,
     the title is just the branch name, else "**FAILURE**" followed by the branch name.
     """
-    return branch_name if successful_rebase else f"**FAILURE** {branch_name}"
+    return f"NO-ISSUE: {branch_name}" if successful_rebase else f"**FAILURE** {branch_name}"
 
 
 def get_expected_branch_name(amd, arm):
