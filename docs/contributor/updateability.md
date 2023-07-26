@@ -24,6 +24,7 @@ It's updated by green and red script supplied by MicroShift.
 
 Because MicroShift's healthcheck takes some time to assess the state of the MicroShift,
 this file might be updated after couple minutes into system boot.
+To follow healthcheck's progress use command: `journalctl -fu greenboot-healthcheck`
 
 Schema:
 ```json
@@ -51,7 +52,14 @@ Schema:
 Backups are created by copying data directory with `--reflink`
 option to leverage Copy-on-Write functionality.
 
-Naming schema of backup directories: `deployment-id_boot-id[_unhealthy]`.
+Naming schema of backup directories: `deploymentID_bootID[_unhealthy]`.
+For example: 
+```
+rhel-fe6192b549e3a787baa0d146dfc078ec4274e16fe42e7017ffecc6153dc473a6.0_d5c48cf07f4442d1af593944789fb232_unhealthy
+rhel-027a0e8a3be037246cc3eb8d1a81f55305f7a7e3e501d0108898766273481748.0_ebeedaa333364d81aa1b0a6c5d0a4bf0
+|---------------------------------------------------------------------| |------------------------------|
+                          deployment ID                                             boot ID
+```
 
 Suffix `_unhealthy` is used to mark backups of unhealthy systems.
 These backups are performed when all existing metadata suggests that it is expected
@@ -101,10 +109,10 @@ boot target). See [Grub](#grub-ostree) section for more information.
 
 MicroShift delivers these scripts in `microshift-greenboot` RPM package.
 
-Health check script for MicroShift is resides in the repository
+Health check script for MicroShift resides in the repository
 as `packaging/greenboot/microshift-running-check.sh`.
 
-Pre-updateability (and continues to do so), `microshift-greenboot` started to
+Before the updateability feature was implemented, `microshift-greenboot` started to
 provide `packaging/greenboot/microshift-pre-rollback.sh` file as a "red" script.
 If `boot_counter` equals `0`, the script will run `microshift-cleanup-data --ovn`.
 
@@ -118,29 +126,37 @@ Updateability feature added two, new files - one "green" and one "red" script:
 - `packaging/greenboot/microshift_set_healthy.sh` -> `/etc/greenboot/green.d/40_microshift_set_healthy.sh`
 - `packaging/greenboot/microshift_set_unhealthy.sh` -> `/etc/greenboot/red.d/40_microshift_set_unhealthy.sh`
 
-They work only on ostree-based systems (by checking if `/run/ostree-booted` exists).
-Reason for this is two-fold: how greenboot works on non-ostree systems, and
-deployment ID not being available, leaving only boot ID and health, which
-are not as useful without the deployment as backup name.
-Also, since automated backup management is only intended for ostree systems,
-there is no gain in creating `health.json` (also: information about the health
-can be found in the journal with greater context).
+These scripts are only functional on ostree-based systems[^1] for following reasons:
+- greenboot on non-ostree systems is only informatory, not functional
+- `health.json` is more of a implementation detail to handle automated backups
+  - journal logs (`greenboot-healthcheck`, `microshift`) are recommended
+    for debugging system health issues
+- automated backup names include deployment ID, which is not available on non-ostree
+  - using deployment ID as a backup prefix serves as organization and allows to
+    relatively easy match backups to deployments (and in extension, specific ostree commits)
+
+[^1]: By checking if `/run/ostree-booted` file exists.
 
 Primary responsibility of "set healthy" and "set unhealthy" scripts
 is to create or update `health.json`.
 
-`microshift_set_unhealthy.sh` has an additional logic that, before
-updating `health.json`, checks if backup matching deployment and boot IDs
-from the `health.json` exists, and does not update the file if not.
-This ensures that, when upgrading (from a healthy system) MicroShift fails to
-create a backup, in effect causing the system to be unhealthy, that the new health
-information does not overwrite existing one ("healthy" instructs MicroShift to
-create a backup).
-Without this mechanism in place, healthy data of previous deployment, would not
-get backed up, `health.json` get updated with `unhealthy` causing subsequent
-starts of MicroShift want to restore a backup (which might not exist because it
-wasn't created, or it's outdated because it contains data of
-"second to last boot of previous deployment").
+`microshift_set_unhealthy.sh` will not overwrite `health.json` if a backup for
+information in that file was not created (deployment and boot IDs).
+This behavior ensures that MicroShift does not lose information that it should
+perform a backup.
+For example in following flow:
+- System is booted to newer deployment
+- MicroShift fails to create a backup
+- System ends up unhealthy
+- After reboot, we still want MicroShift to make an attempt to back up the data,
+  which would not happen if we'd write "unhealthy" to the file.
+  - Otherwise, after rollback, MicroShift would want to restore:
+    - Outdated backup (because the most recent one that should be created failed)
+    - No backup at all (because previous deployment was not rebooted,
+      so the one and only backup procedure failed).
+      - *Pending implementation: actually this should be handled by the MicroShift*
+        *when it will start comparing "backup-to-restore" with version metadata*
+        *extended with deployment and boot IDs.*
 
 ### Greenboot on non-ostree systems
 
@@ -178,8 +194,8 @@ TODO
 
 ## Grub [ostree]
 
-While greenboot sets and clears env vars such as `boot_counter` and `boot_success`,
-the data they store is actually acted upon by the grub.
+While greenboot sets and clears grub env vars such as `boot_counter` and `boot_success`,
+it is grub acting depending on their values.
 Package `grub2-tools` provides several files directly involved in that process.
 
 #### 08_fallback_counting
