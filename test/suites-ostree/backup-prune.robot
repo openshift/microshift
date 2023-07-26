@@ -2,6 +2,7 @@
 Documentation       Tests related to MicroShift backup functionality on OSTree-based systems
 
 Resource            ../resources/common.resource
+Resource            ../resources/ostree.resource
 Resource            ../resources/ostree-data.resource
 Library             Collections
 
@@ -16,15 +17,19 @@ ${USHIFT_HOST}          ${EMPTY}
 ${USHIFT_USER}          ${EMPTY}
 
 ${FAKE_DIR_REG}         *_fake*
-${UNKOWN_DIR_REG}       unknown_fake*
+${UNKOWN_DIR_REG}       unknown*
 
 
 *** Test Cases ***
-Rebooting Healthy System Should Result In Pruning Old Backups And Keeping Unknown Directories
-    [Documentation]    Check that MicroShift backup logic prunes old backups and keeps unknown directories
+Rebooting Healthy System Should Result In Pruning Old Backups
+    [Documentation]    Check that MicroShift backup logic prunes old backups
 
     Validate Fake Backups Have Been Deleted
-    Validate Unknown Fake Backups Exist
+
+Rebooting Healthy System Should Not Delete Unknown Directories
+    [Documentation]    Check that MicroShift backup logic does not delete unknown directories
+
+    Validate Unknown Directories Exist
 
 
 *** Keywords ***
@@ -40,15 +45,15 @@ Validate Fake Backups Have Been Deleted
     [Documentation]    Listing the fake backups should return an error code of 2 if no longer exists
     List Backups With Expected RC    2    ${FAKE_DIR_REG}
 
-Create Unknown Fake Backup Directories
-    [Documentation]    Create unknown fake backup folders
+Create Unknown Directories
+    [Documentation]    Create unknown fake folders that the pruning logic should not touch
     Create Fake Backups    2    True
 
-Validate Unknown Fake Backups Exist
+Validate Unknown Directories Exist
     [Documentation]    Make sure the unknown fake backups exist
     List Backups With Expected RC    0    ${UNKOWN_DIR_REG}
 
-Delete Unkown Fake Backups
+Delete Unknown Directories
     [Documentation]    Remove unknown directories
 
     ${stdout}    ${rc}=    Execute Command
@@ -72,13 +77,13 @@ Setup
     Create Fake Backup Directories
     Validate Fake Backups Exist
 
-    Create Unknown Fake Backup Directories
-    Validate Unknown Fake Backups Exist
+    Create Unknown Directories
+    Validate Unknown Directories Exist
 
     Reboot MicroShift Host
     Wait For Healthy System
 
 Teardown
     [Documentation]    Test suite teardown
-    Delete Unkown Fake Backups
+    Delete Unknown Directories
     Logout MicroShift Host
