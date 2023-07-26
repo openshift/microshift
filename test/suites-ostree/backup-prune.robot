@@ -20,22 +20,19 @@ ${UNKOWN_DIR_REG}       unknown_fake*
 
 
 *** Test Cases ***
-Rebooting Healthy System Should Result In Pruning Old Backups
-    [Documentation]    Check that MicroShift backup logic prunes old backups
+Rebooting Healthy System Should Result In Pruning Old Backups And Keeping Unknown Directories
+    [Documentation]    Check that MicroShift backup logic prunes old backups and keeps unknown directories
 
     Create Fake Backup Directories
     Validate Fake Backups Exist
-    Reboot MicroShift Host
-    Wait For MicroShift Service
-    Validate Fake Backups Have Been Deleted
 
-Rebooting Healthy System Should Not Delete Unknown Directories
-    [Documentation]    Check that MicroShift backup logic does not delete unknown directories
-
-    Create Fake Unknown Backup Directories
+    Create Unknown Fake Backup Directories
     Validate Unknown Fake Backups Exist
+
     Reboot MicroShift Host
-    Wait For MicroShift Service
+    Wait For Healthy System
+
+    Validate Fake Backups Have Been Deleted
     Validate Unknown Fake Backups Exist
 
 
@@ -52,7 +49,7 @@ Validate Fake Backups Have Been Deleted
     [Documentation]    Listing the fake backups should return an error code of 2 if no longer exists
     List Backups With Expected RC    2    ${FAKE_DIR_REG}
 
-Create Fake Unknown Backup Directories
+Create Unknown Fake Backup Directories
     [Documentation]    Create unknown fake backup folders
     Create Fake Backups    2    True
 
