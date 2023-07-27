@@ -15,12 +15,13 @@ New on-disk artifacts were added:
 
 New, additional directory for keeping health and backup related artifacts.
 For ostree systems it's a non-configurable directory where backups are created.
-For non-ostree systems it's a default (configurable) directory for backups.
+For non-ostree systems it's a default (configurable using cli options)
+directory for backups.
 
 #### `health.json` [ostree-only]
 
 Contains information about health of the system.
-It's updated by green and red script supplied by MicroShift.
+It's updated by green and red scripts supplied by MicroShift.
 
 Because MicroShift's healthcheck takes some time to assess the state of the MicroShift,
 this file might be updated after couple minutes into system boot.
@@ -62,21 +63,26 @@ rhel-027a0e8a3be037246cc3eb8d1a81f55305f7a7e3e501d0108898766273481748.0_ebeedaa3
 ```
 
 Suffix `_unhealthy` is used to mark backups of unhealthy systems.
-These backups are performed when all existing metadata suggests that it is expected
+These backups are performed when all existing metadata suggests
 that MicroShift should wipe the data and start from clean state
-(for example "FDO" scenario where unhealthy deployment leaves stale data).
+to improve chances for successful operation, but we want to err on a safe side
+and keep the data if admin wishes to access it.
+Example of such scenario is so called "FDO" where unhealthy deployment leaves
+stale data.
 
 ### `/var/lib/microshift/version`
 
-This file holds version of MicroShift that ran or attempted to run
-using the data.
+This file holds version of MicroShift executable that used the data.
 
-On first start (defined at non-existence of the data), MicroShift writes
-its version to the file.
+On first start (data does not exist yet) MicroShift will create
+the file with executable's version as a content.
 
-On following starts, MicroShift will compare version stored in the file
-with version of the executable to check if an upgrade is allowed or should be blocked
-(see [Version metadata management](#version-metadata-management) for more information).
+If the file already exists, MicroShift will compare it against version of executable.
+If comparison detects unsupported version change, MicroShift will stop
+and exit with an error. Specifics of version comparison are in
+[Version metadata management](#version-metadata-management) section.
+If comparison was successful, MicroShift executable's version will be persisted
+in the file.
 
 Schema of `version` file:
 ```
@@ -103,22 +109,28 @@ In short, it works by running health check scripts
 on result of *required* scripts, will run either "green" (healthy) or
 "red" (unhealthy) scripts. 
 
-Greenboot heavily integrates with grub. In fact, it is the grub that decrements
-the `boot_counter` and actually rolls back the system (by selecting the other
-boot target). See [Grub](#grub-ostree) section for more information.
+Greenboot strongly integrates with grub.
+When new deployment is staged, just before the host is rebooted,
+greenboot sets `boot_counter` variable to specific value (default: 3).
+Then, when host boots, it is grub that decrements that variable and
+if it falls down to 0, boots alternate entrypoint (i.e. rollback deployment).
+See [Grub](#grub-ostree) section for more information.
 
-MicroShift delivers these scripts in `microshift-greenboot` RPM package.
+MicroShift delivers health checks, red, and green scripts
+in `microshift-greenboot` RPM package.
 
 Health check script for MicroShift resides in the repository
 as `packaging/greenboot/microshift-running-check.sh`.
 
-Before the updateability feature was implemented, `microshift-greenboot` started to
-provide `packaging/greenboot/microshift-pre-rollback.sh` file as a "red" script.
-If `boot_counter` equals `0`, the script will run `microshift-cleanup-data --ovn`.
+Before the updateability feature was implemented, `microshift-greenboot` already
+provided `packaging/greenboot/microshift-pre-rollback.sh` file as a "red" script:
+if `boot_counter` equals `0`, the script will run `microshift-cleanup-data --ovn`.
 
 > Note: It's a red script, so it runs after healthchecks decided that
 > system is unhealthy, and cleanup only happens when `boot_counter`
 > already fell down to `0`.
+>
+> So it does not happen on each reboot of unhealthy system.
 
 ### Updateability additions to `microshift-greenboot`
 
@@ -194,11 +206,13 @@ TODO
 
 ## Grub [ostree]
 
-While greenboot sets and clears grub env vars such as `boot_counter` and `boot_success`,
-it is grub acting depending on their values.
-Package `grub2-tools` provides several files directly involved in that process.
+Greenboot sets and clears grub env vars such as `boot_counter` and `boot_success`.
+But it's the grub decrementing the `boot_counter` and selecting alternate boot entry
+(rollback deployment) when that variable falls down to 0.
 
-#### 08_fallback_counting
+Grub scripts involved in this process are delivered in `grub2-tools` package.
+
+### 08_fallback_counting
 
 File resides in `/etc/grub.d`.
 
@@ -215,7 +229,7 @@ Otherwise, `boot_counter` is decremented
 
 Setting `default` to `1` effectively changes which boot entry (1st one) will boot.
 
-#### 10_reset_boot_success and 12_menu_auto_hide
+### 10_reset_boot_success and 12_menu_auto_hide
 
 Files reside in `/etc/grub.d`.
 
@@ -227,7 +241,7 @@ variables (and `menu_hide_ok`).
 `12_menu_auto_hide` makes use of `menu_hide_ok` variable.
 
 These scripts were not yet observed to have a big impact on efforts related to
-updateability feature.
+updateability feature, but are most likely important part of grub and ostree integration.
 
 ### grub-boot-success.{timer,service}
 
@@ -243,6 +257,15 @@ which sets `boot_success`.
 > grub to not decrement the `boot_counter`.
 >
 > [Discussion on fedora-iot/greenboot about this particular issue](https://github.com/fedora-iot/greenboot/issues/108).
+
+It is recommended that the timer is masked, so user session does not interfere
+with the greenboot's process of assessing health, rebooting, and rolling back
+the system.
+This can be done during system installation in kickstart by including following
+command in the post install section:
+```
+ln -sf /dev/null /etc/systemd/user/grub-boot-success.timer
+```
 
 ### Other files
 
