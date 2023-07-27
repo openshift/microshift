@@ -5,10 +5,20 @@ to the feature of MicroShift's updateability.
 
 ## What is and isn't "MicroShift updateability"
 
-<!--
-TODO
-- ostree: auto-backups, non-ostree: manual backups
--->
+Updateability of MicroShift is set of features and components that allow
+MicroShift to be updated from version to another.
+
+It includes following areas:
+- backing up and restoring MicroShift's data
+- persisting and verifying version of MicroShift's data and binary
+- migrating Kubernetes objects to newer versions (e.g. `v1beta1` to `v1beta2`)
+
+On ostree-based systems, backups and restores are automated, tied to the
+lifecycle of ostree deployments. On regular RPM systems (non-ostree), the process
+is manual using `microshift backup` and `microshift restore` commands.
+
+Updateability is not a disaster recovery. Backups are created to allow
+rolling back to a healthy system after failed upgrade.
 
 ## High level flows
 
