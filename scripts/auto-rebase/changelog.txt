@@ -1,10 +1,4 @@
-# machine-config-operator embedded-component 56c0dc09bb5a0c0d73e356624a631fa5dba59f9f to 7b54f1dcce4ea9f69f300d0e1cf2316def45bf72
-2324a73bae3cb33bec9a8c7784b2e04f8d774e0b 2023-07-23T09:19:28+02:00 daemon: igmore mounting MCD pod content when target is "/"
-e2b1bd7c25dc2a7ea05b7ca41047a37f0080c2b4 2023-07-20T22:50:23+02:00 pkg: fix linter issue
-e3aeb97473a4e21428446fae5f43d93c0a32bd00 2023-07-20T22:26:53+02:00 templates: launch mcd container during firstboot with --pid=host
-b51c25957c1c5e02a0c45143b35416de220d0c9d 2023-07-20T22:24:41+02:00 daemon: Copy matching binary to host, re-exec with it
-d023f10ac4bf9952d93e2badbe605b77251fbc63 2023-07-20T22:22:53+02:00 daemon: Run firstboot as a container image too
-64969e47384314d3c24363f6c438b834ca5a99e2 2023-07-20T18:30:31+02:00 build-sys: Drop setting CGO_ENABLED=0
-06da42a149b7fd62e243ce1d36eda15d4e70bae3 2023-07-20T18:28:50+02:00 4.13: use rhel9 builder for daemon binary
-# oc image-arm64 8b4d4ed9a5314dfa8ad7fd67f119bc43248b15f5 to e561d37285c8bde273ce00d086bea599a9cdd3be
-8f9ccc2734a38925d4604b21414cfb6765df61f9 2023-07-13T18:33:00+00:00 reboot: set ignition version to 3.1
+# ovn-kubernetes image-amd64 256e112b4a66f2445d72e4eb0c3abe948115413b to bedda0d806c2f1f54148d8d6cd1955e0f688bd84
+1f100c84933abff25e1402530d5e878033293739 2023-07-17T10:44:43+02:00 delete address sets after acls that reference them to avoid ovn-controller syntax errors
+# ovn-kubernetes image-arm64 256e112b4a66f2445d72e4eb0c3abe948115413b to bedda0d806c2f1f54148d8d6cd1955e0f688bd84
+1f100c84933abff25e1402530d5e878033293739 2023-07-17T10:44:43+02:00 delete address sets after acls that reference them to avoid ovn-controller syntax errors
