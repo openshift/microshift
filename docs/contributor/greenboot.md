@@ -2,8 +2,8 @@
 
 ## Motivation
 
-[Integrating MicroShift with Greenboot](./greenboot.md) allows for automatic
-software upgrade rollbacks in case of a failure.
+[Integrating MicroShift with Greenboot](../user/greenboot.md) allows for
+automatic software upgrade rollbacks in case of a failure.
 
 The current document describes a few techniques for:
 * Adding user workload health check procedures in a production environment

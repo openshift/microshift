@@ -62,6 +62,7 @@ Requires: cri-tools >= 1.25
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
+Requires: microshift-greenboot = %{version}
 Requires: conntrack-tools
 Requires: sos
 Requires: crun
@@ -347,6 +348,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jul 27 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.14.0
+- The microshift-greenboot package is no longer optional
+
 * Tue Jul 25 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.14.0
 - Add explicit version dependencies among MicroShift RPM packages
 

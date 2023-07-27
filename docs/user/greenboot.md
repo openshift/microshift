@@ -20,11 +20,9 @@ interruption of service in case of a failed upgrade.
 ### Greenboot Configuration
 
 MicroShift includes the `40_microshift_running_check.sh` health check script to
-validate that all the required MicroShift services are up and running. There is
-no explicit dependency on the `greenboot` RPM from MicroShift core packages, or
-a requirement to use health check procedures. The health check script is packaged
-in the separate `microshift-greenboot` RPM, which may be installed on the system
-if the `greenboot` facilities are to be used.
+validate that all the required MicroShift services are up and running. The health
+check script is packaged in the separate mandatory `microshift-greenboot` RPM,
+which has an explicit dependency on the `greenboot` RPM.
 
 The health check script is installed into the `/etc/greenboot/check/required.d`
 directory and it is not executed during the system boot in case the `greenboot`
