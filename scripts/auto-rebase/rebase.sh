@@ -464,12 +464,13 @@ replace_using_component_commit() {
     local modulepath=$1
     local new_modulepath=$2
     local component=$3
+    local reponame=$4
 
     if [[ ${pseudoversions[${component}]+foo} ]]; then
         echo "go mod edit -replace ${modulepath}=${new_modulepath}@${pseudoversions[${component}]}"
         go mod edit -replace "${modulepath}=${new_modulepath}@${pseudoversions[${component}]}"
     else
-        commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
+        commit=$( cd "${STAGING_DIR}/${reponame}" && git rev-parse HEAD )
         echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
         go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
         go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
@@ -509,14 +510,19 @@ EOF
 update_modulepath_version_from_release() {
     local modulepath=$1
     local component=$2
+    local reponame=$3
+
+    local new_modulepath
+    local path
+    local repo
 
     path=""
     if [ "${component}" = "etcd" ]; then
         path="${modulepath#go.etcd.io/etcd}"
     fi
-    repo=$( cd "${STAGING_DIR}/${component}" && git config --get remote.origin.url )
+    repo=$( cd "${STAGING_DIR}/${reponame}" && git config --get remote.origin.url )
     new_modulepath="${repo#https://}${path}"
-    replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}"
+    replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}" "${reponame}"
 }
 
 # Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
@@ -525,7 +531,7 @@ update_modulepath_to_kubernetes_staging() {
     local modulepath=$1
 
     new_modulepath="github.com/openshift/kubernetes/staging/src/${modulepath}"
-    replace_using_component_commit "${modulepath}" "${new_modulepath}" "kubernetes"
+    replace_using_component_commit "${modulepath}" "${new_modulepath}" "kubernetes" "kubernetes"
 }
 
 # Returns the line (including trailing comment) in the #{gomod_file} containing the ReplaceDirective for ${module_path}
@@ -546,7 +552,7 @@ update_modulepath_version_from_component() {
 
     # Special-case etcd to use OpenShift's repo
     if [[ "${modulepath}" =~ ^go.etcd.io/etcd/ ]]; then
-        update_modulepath_version_from_release "${modulepath}" "${component}"
+        update_modulepath_version_from_release "${modulepath}" "${component}" "${component}"
         return
     fi
 
@@ -555,7 +561,7 @@ update_modulepath_version_from_component() {
     replacement=$(echo "${replace_directive}" | sed -E "s|.*=>[[:space:]]*(.*)[[:space:]]*|\1|")
     if [[ "${replacement}" =~ ^./staging ]]; then
         new_modulepath=$(echo "${replacement}" | sed 's|^./staging/|github.com/openshift/kubernetes/staging/|')
-        replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}"
+        replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}" "${component}"
     else
         echo "go mod edit -replace ${modulepath}=${replacement/ /@}"
         go mod edit -replace "${modulepath}=${replacement/ /@}"
@@ -675,8 +681,13 @@ update_go_mod() {
             ;;
         release)
             component=${arguments%% *}
+            reponame="${component}"
+            if [[ "${arguments}" =~ " via " ]]; then
+                argarray=( ${arguments} )
+                reponame="${argarray[2]}"
+            fi
             valid_component_or_exit "${component}"
-            update_modulepath_version_from_release "${modulepath}" "${component}"
+            update_modulepath_version_from_release "${modulepath}" "${component}" "${reponame}"
             ;;
         override)
             echo "skipping modulepath ${modulepath}: override [${arguments}]"
