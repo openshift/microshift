@@ -263,4 +263,4 @@ replace (
 	k8s.io/sample-controller => github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller v0.0.0-20230714130253-4aaeaec06c95 // from kubernetes
 )
 
-replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20230525153147-77c90ab82b46
+replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20230525153147-77c90ab82b46 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator

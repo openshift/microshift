@@ -33,7 +33,7 @@ STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
-EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd"
+EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd kube-storage-version-migrator"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator
 cluster-csi-snapshot-controller-operator"
