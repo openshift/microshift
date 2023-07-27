@@ -22,7 +22,122 @@ rolling back to a healthy system after failed upgrade.
 
 ## High level flows
 
-<!-- TODO -->
+### Preparing ostree commit (image) with MicroShift for initial install
+
+To build an ostree commit you need:
+- builder host with RHEL9, active Red Hat Subscription, and osbuild installed
+- MicroShift RPMs
+- blueprint for creating ostree commit (and, optionally, installer ISO)
+
+For instructions on installing MicroShift on R4E see 
+[Install MicroShift on RHEL for Edge](/docs/contributor/rhel4edge_iso.md).
+
+To learn about MicroShift's test harness for testing on ostree systems see
+[test/README.md](/test/README.md).
+
+### Updating system to a new ostree commit
+
+To update system to a newer commit (that may include newer MicroShift,
+but doesn't have to) follow the same procedure on preparing ostree commit,
+but this time provide new MicroShift RPMs.
+
+When new ostree commit is part of repository known to the system you can use
+of the following commands:
+- `rpm-ostree upgrade` - if new commit has the same reference
+  (e.g. `rhel/9/x86_64/edge/microshift`), ostree should detect that reference
+  points to a new commit, fetch it, and update the system
+- `rpm-ostree rebase` - if new commit has different reference,
+  `rebase` must be used to point ostree to a new reference to use for the system.
+
+After rpm-ostree staged new deployment (commit), restart the machine
+(e.g. `systemctl reboot`) to boot the new image and make system run using it.
+MicroShift will detect that the deployment (image) changed and will perform
+steps needed to synchronize on-disk data with the MicroShift executable.
+
+### Scenarios
+
+MicroShift uses Robot Framework to test updateability in automated fashion.
+Here's a list of existing scenario:
+
+[Healthy upgrade of MicroShift with one minor version bump](/test/suites-ostree/healthy-upgrade.robot):
+- System must be healthy
+- New deployment is staged and host is rebooted
+- System, using new image, should end up healthy and not roll back.
+- MicroShift should:
+  - Create a backup for previous deployment
+  - Migrate all Kubernetes resources to most recent versions
+
+[System rolls back because MicroShift fails to create a backup resulting in unhealthy system](/test/suites-ostree/failed-upgrade.robot):
+- Initially system must be healthy
+- New deployment is staged and host is rebooted
+- MicroShift never succeeds to make a backup of existing data:
+  - MicroShift never attempts to start the cluster
+  - Health check fails, i.e. system is unhealthy
+  - Greenboot restarts the host several times attempting to remediate the situation
+    but MicroShift consistently fails to back up
+- System rolls back to previous deployment
+- This time MicroShift does not have problems backing up the data
+- MicroShift starts fully
+- System is healthy
+- We check if MicroShift created the backup matching information of previous healthy boot
+
+> Note: test makes use of `microshift-test-agent` to make `/var/lib/microshift-backups`
+> immutable resulting in MicroShift not being able to create a backup directory.
+
+[Initially system does not feature MicroShift, first attempt to deploy image with MicroShift fails and second attempt succeeds (FDO)](/test/suites-ostree/fdo.robot):
+- Make sure system does not have `microshift` binary and neither
+  `/var/lib/microshift` nor `/var/lib/microshift-backups` does not exists
+- Deploy a new image with MicroShift and reboot the host
+- New deployment starts, but for any reason it never becomes healthy
+- After greenboot "healing" reboots are exhausted, system rolls back to initial
+  deployment that does not have `microshift` binary, but now it has
+  `/var/lib/microshift` and `/var/lib/microshift-backups`
+  (leftover from failed deployment)
+- Stage a new image with MicroShift and reboot the system
+- MicroShift starts, inspects existing on-disk artifacts and decides to remove
+  existing data to start from scratch.
+- MicroShift successfully starts, system is healthy and does not roll back to
+  initial deployment (without MicroShift)
+
+> Note: test makes use of `microshift-test-agent` to create additional
+> greenboot healthcheck script that always fails resulting in system rolling
+> back after all greenboot reboots are exhausted.
+
+[When system is healthy, rebooting it should trigger MicroShift to create a new backup](/test/suites-ostree/backup-restore.robot):
+- System is healthy
+- Host is rebooted manually
+- MicroShift starts and creates a new backup named: `currentDeploymentID_previousBootID`
+
+[When system is unhealthy, rebooting it should trigger MicroShift to restore data from a backup](/test/suites-ostree/backup-restore.robot):
+- Precondition: backup exists for current deployment
+- System is unhealthy
+- Host is rebooted manually
+- MicroShift restores existing backup matching currently booted deployment
+  and starts successfully (system should be healthy)
+
+[When new image contains older minor version of MicroShift, it will refuse to run resulting in a rollback](/test/suites-ostree/block-downgrade.robot)
+- System must be healthy
+- A new image is staged on the system which contains older minor version of
+  Microshift than the version that is currently running
+- System is rebooted
+- MicroShift starts and notices that current binary is "older" than
+  version of the data, so it refused to run
+- System becomes unhealthy, reboots couple of times, eventually rolls back to
+  previous deployment.
+- MicroShift's journal should contain an information about the failure:
+  `checking version compatibility failed`
+
+[When system is manually rolled back to a deployment that features older MicroShift, it should restore the backup for that version and run successfully](/test/suites-ostree/rollback.robot):
+- System should be running deployment with older MicroShift initially.
+- Stage new deployment with newer MicroShift and reboot the host.
+- MicroShift should create a backup for the old deployment,
+  then successfully start
+- When greenboot finishes run and determines the system to be healthy,
+  roll back the system: `rpm-ostree rollback` and reboot it.
+- When system starts, it should run initial deployment (with older MicroShift)
+- MicroShift should start successfully
+  - It should include an information that a backup was restored
+  - It should not attempt to perform an "upgrade"
 
 ## Context: RHEL For Edge
 
@@ -738,7 +853,8 @@ Command has two options:
 
 > **TODO: Decide: reuse `--name` and `--storage` from `backup` subcommand, or expect a full path?**
 
-# Test ideas
+<!--
+# Test/implementation ideas
 
 ## Test idea: upgrading from unhealthy system is blocked
 
@@ -746,3 +862,4 @@ Command has two options:
 - Greenboot should declare "system need manual intervention"
 
 ## Test idea: upgrade blocking by producing RPMs with fake versions.
+-->
