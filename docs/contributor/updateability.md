@@ -158,6 +158,12 @@ Here's a list of existing scenario:
 
 ## Context: RHEL For Edge
 
+MicroShift's updateability primarily target integration with RHEL For Edge,
+which is RHEL with some unique technologies and tools such as ostree
+(system immutability) and greenboot (health check framework for systems).
+
+This section provides an overview of this environment.
+
 ### Greenboot
 
 [Greenboot](https://github.com/fedora-iot/greenboot) is a health check framework,
@@ -168,19 +174,19 @@ with it see following enhancements:
 [Integrating MicroShift with Greenboot](https://github.com/openshift/enhancements/blob/master/enhancements/microshift/microshift-greenboot.md)
 [MicroShift updateability in ostree based systems: integration with greenboot](https://github.com/openshift/enhancements/blob/master/enhancements/microshift/microshift-updateability-ostree.md#integration-with-greenboot)
 
-In short, it works by running health check scripts
-(placed in dirs: `/etc/greenboot/check/{required.d,wanted.d}/`) and, depending
-on result of *required* scripts, will run either "green" (healthy) or
-"red" (unhealthy) scripts. 
+In short, on system boot, greenboot will run health check scripts
+(residing in `/etc/greenboot/check/{required.d,wanted.d}/`)
+and, depending on result of *required* scripts, will run either "green" 
+(healthy) or "red" (unhealthy) scripts. 
 
 Greenboot strongly integrates with grub.
-When new deployment is staged, just before the host is rebooted,
-greenboot sets `boot_counter` variable to specific value (default: 3).
-Then, when host boots, it is grub that decrements that variable and
-if it falls down to 0, boots alternate entrypoint (i.e. rollback deployment).
-See [Grub](#grub-ostree) section for more information.
+When new deployment is staged, greenboot sets `boot_counter` variable to a 
+specific value (default: 3). Then, when host boots, it is grub that decrements
+that variable. If `boot_counter` falls down to 0, grub will select alternate
+boot entry (i.e. rollback deployment). See [Grub](#grub-ostree) section for
+more information.
 
-MicroShift delivers health checks, red, and green scripts
+MicroShift delivers health check, red, and green scripts
 in `microshift-greenboot` RPM package.
 
 Health check script for MicroShift resides in the repository
@@ -198,7 +204,7 @@ if `boot_counter` equals `0`, the script will run `microshift-cleanup-data --ovn
 
 #### Updateability additions to `microshift-greenboot`
 
-Updateability feature added two, new files - one "green" and one "red" script:
+Updateability feature added two new files - one "green" and one "red" script:
 - `packaging/greenboot/microshift_set_healthy.sh` -> `/etc/greenboot/green.d/40_microshift_set_healthy.sh`
 - `packaging/greenboot/microshift_set_unhealthy.sh` -> `/etc/greenboot/red.d/40_microshift_set_unhealthy.sh`
 
@@ -220,7 +226,10 @@ is to create or update `health.json`.
 information in that file was not created (deployment and boot IDs).
 This behavior ensures that MicroShift does not lose information that it should
 perform a backup.
-For example in following flow:
+
+<details>
+<summary>Example of scenario that behavior is needed</summary>
+
 - System is booted to newer deployment
 - MicroShift fails to create a backup
 - System ends up unhealthy
@@ -233,6 +242,7 @@ For example in following flow:
       - *Pending implementation: actually this should be handled by the MicroShift*
         *when it will start comparing "backup-to-restore" with version metadata*
         *extended with deployment and boot IDs.*
+</details>
 
 #### Greenboot on non-ostree systems
 
@@ -957,14 +967,3 @@ Command has two options:
 > **TODO: This command is not implemented yet.**
 
 > **TODO: Decide: reuse `--name` and `--storage` from `backup` subcommand, or expect a full path?**
-
-<!--
-# Test/implementation ideas
-
-## Test idea: upgrading from unhealthy system is blocked
-
-- System should roll back to "original" unhealthy deployment
-- Greenboot should declare "system need manual intervention"
-
-## Test idea: upgrade blocking by producing RPMs with fake versions.
--->
