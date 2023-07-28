@@ -1,17 +1,29 @@
-- cluster-ingress-operator embedded-component 83c9c4179f35ed2c79537f81f7e38cf0221638cb to 74c0deb43e2efbc87dbf6240e4159d908389acfe
-  - 7ac333d 2023-07-25T17:12:08-04:00 Test_desiredLoadBalancerService: Annotation rework
-  - ef7e63e 2023-07-25T17:12:08-04:00 Test_desiredLoadBalancerService: Simplify logic
-  - e53db07 2023-07-25T17:12:08-04:00 Test_desiredLoadBalancerService: Kill scope check
-  - cee0cd5 2023-07-25T17:12:03-04:00 Test_desiredLoadBalancerService: Rename "expect"
-  - 89da9f5 2023-07-25T17:03:26-04:00 Test_desiredLoadBalancerService: Simplify platform
-  - 976fc62 2023-07-25T17:01:49-04:00 Test_desiredLoadBalancerService: Simplify strategy
-  - bb7eb65 2023-07-25T17:01:17-04:00 Test_desiredLoadBalancerService: Remove redundant test case
-  - a3bb33e 2023-07-25T17:01:11-04:00 Test_desiredLoadBalancerService: Fix NodePort case
+- cluster-csi-snapshot-controller-operator embedded-component eaaf7260464bd6cb6126dfd7259cb6217eb25340 to 4670bf64fb29fbe0fbd78368de63d9f88451fb23
+  - 68a800f 2023-07-26T14:59:50+02:00 Bump library-go to remove dependency on goproxy
+  - 613e344 2023-07-25T21:55:15-07:00 OCPBUGS-16783: Chore: Update OWNERS
 
-- machine-config-operator embedded-component 3fb306d53f555ab6125d82cc790833f8a7bffa30 to ddea245222e437e2259bb56f559a2b36fa7eaea0
-  - 42495051 2023-07-25T13:06:40+05:30 Add node related dashboard as a configmap
-  - 0f0777b9 2023-07-15T06:17:27+05:30 OCPNODE-1717: Make cgroupsv2 default in OCP-4.14
+- cluster-dns-operator embedded-component 47be7b57fbc7eecdd91bc3960f6bc4d7d0304133 to 6cfee191de08cede60bed8cea6f8e17f730adf61
+  - afb52de 2023-07-25T22:41:48-04:00 Replace bindata using embed
+  - 51a642d 2023-07-24T23:19:47-04:00 Replace Bugzilla link with Red Hat Issue Tracker
 
-- oc image-arm64 643b040e4f38d2d5f353ddbc839195e3935c712c to 13225e00caf1ad2d3603e1d1cc8651833f2effcb
+- cluster-ingress-operator embedded-component 74c0deb43e2efbc87dbf6240e4159d908389acfe to ddba423ea5d5885a33411ca2b4e47094776077e6
+  - 68d0899 2023-02-13T19:25:32+00:00 RFE-3007: Expose option-contstats as an unsupported option
+
+- cluster-network-operator embedded-component d4f68c0e55c0f337a47ea7d9f5caaf239bc7b13f to fc3e0e25b4cfa43e14122bdcdd6d7f2585017d75
+  - 4f7bdec 2023-07-10T15:17:59+02:00 add allow-guest-webhooks label for multus-admission-controller
+
+- machine-config-operator embedded-component ddea245222e437e2259bb56f559a2b36fa7eaea0 to 49540666fa3f8414b72a946e3198aabda02e2447
+  - 777d7770 2023-07-20T18:29:06-05:00 On-cluster build opt-in function, building machine-os-builder stub, RBAC and service acct inclusion, e2e tests
+
+- service-ca-operator embedded-component 46c0577bee18108d6cc7743b4876830630f88442 to 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003
+  - b9ee0d7 2023-07-26T10:36:56+02:00 bump lib-go to get rid of the goproxy dep
+
+- oc image-amd64 643b040e4f38d2d5f353ddbc839195e3935c712c to 13225e00caf1ad2d3603e1d1cc8651833f2effcb
   - 5d393981 2023-07-25T12:36:09+02:00 OCPBUGS-16735: Truncate existing files when writing from inspect
+
+- service-ca-operator image-amd64 46c0577bee18108d6cc7743b4876830630f88442 to 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003
+  - b9ee0d7 2023-07-26T10:36:56+02:00 bump lib-go to get rid of the goproxy dep
+
+- service-ca-operator image-arm64 46c0577bee18108d6cc7743b4876830630f88442 to 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003
+  - b9ee0d7 2023-07-26T10:36:56+02:00 bump lib-go to get rid of the goproxy dep
 
