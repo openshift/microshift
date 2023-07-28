@@ -174,6 +174,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: busybox-deployment
+  namespace: busybox
 spec:
   selector:
     matchLabels:

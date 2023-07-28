@@ -111,3 +111,12 @@ The `sos` archives may consume significant disk space. Make sure to delete the r
 ```bash
 sudo rm -f /var/tmp/sosreport-*
 ```
+
+## Pod Security Admission and Security Context Constraints
+
+MicroShift limits the SecurityContextConstraint of new namespaces to
+`restricted-v2` by default. This can mean that workloads that run on
+OpenShift result in pod security admission errors when run on
+MicroShift. Refer to the [pod security HowTo](howto_pod_security.md)
+for a detailed example of configuring a workload to run with a custom
+security context.
