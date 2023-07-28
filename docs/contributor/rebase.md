@@ -78,11 +78,13 @@ When resolving version mismatches between modules used by different embedded com
 The `rebase.sh` script automates updating the modulepaths (e.g. rewriting local paths like `./staging` to the global paths) and versions, but it needs hints which component's version to pick. We encode these hints as keywords in comments in MicroShift's `go.mod` file. Each replacement modulepath and versions are picked as follows:
 
 ```shell
-// from $COMPONENT          picks from the $COMPONENT's go.mod
-// staging kubernetes       picks the version in openshift/kubernetes's staging directory
-// release $COMPONENT       picks from the OpenShift's release image
-// override                 keep the current version / do not replace
+// from $COMPONENT                  picks from the $COMPONENT's go.mod
+// staging kubernetes               picks the version in openshift/kubernetes's staging directory
+// release $COMPONENT [via $REPO]   picks from the OpenShift's release image
+// override                         keep the current version / do not replace
 ```
+
+The optional `via $REPO` argument to `release` can be used when the git repository name does not match the component image name.
 
 Run the following to rebase the `go.mod`:
 

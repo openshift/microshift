@@ -10,6 +10,7 @@ https://github.com/openshift/cluster-policy-controller embedded-component 8501bc
 https://github.com/openshift/csi-external-snapshotter embedded-component 712bf7c316adfa0a3c8afc56d1db23abfadad58e
 https://github.com/openshift/etcd embedded-component 5a36b9b6b329d92d7c26d1c944e6b1192f9d1523
 https://github.com/openshift/kubernetes embedded-component 4aaeaec06c95e0a1a868695792c256d8f0158075
+https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 8558e14a116804168506d06e96eac5a79913a6eb
 https://github.com/openshift/machine-config-operator embedded-component 49540666fa3f8414b72a946e3198aabda02e2447
 https://github.com/openshift/openshift-controller-manager embedded-component 80c4923e0b2014ec8b8a6845c21078e6cc036f91
 https://github.com/openshift/route-controller-manager embedded-component 5710699f4e7ec00a14fa3fe600b81d0f722fc1ff
