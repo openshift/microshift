@@ -22,16 +22,16 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.7
 	golang.org/x/sys v0.8.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.27.1
-	k8s.io/apiextensions-apiserver v0.27.1
-	k8s.io/apimachinery v0.27.1
+	k8s.io/api v0.27.4
+	k8s.io/apiextensions-apiserver v0.27.4
+	k8s.io/apimachinery v0.27.4
 	k8s.io/apiserver v0.27.1
 	k8s.io/cli-runtime v0.27.1
-	k8s.io/client-go v0.27.1
+	k8s.io/client-go v0.27.4
 	k8s.io/cloud-provider v0.0.0
 	k8s.io/component-base v0.27.1
 	k8s.io/klog/v2 v2.100.1
-	k8s.io/kube-aggregator v0.27.1
+	k8s.io/kube-aggregator v0.27.4
 	k8s.io/kube-openapi v0.0.0-20230501164219-8b0f38b5fd1f
 	k8s.io/kubectl v0.27.1
 	k8s.io/kubernetes v1.27.1
@@ -188,14 +188,14 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.19.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
-	golang.org/x/mod v0.9.0 // indirect
+	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/term v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
-	golang.org/x/tools v0.7.0 // indirect
+	golang.org/x/tools v0.8.0 // indirect
 	google.golang.org/api v0.60.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220502173005-c8bf987b8c21 // indirect
@@ -263,4 +263,4 @@ replace (
 	k8s.io/sample-controller => github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller v0.0.0-20230714130253-4aaeaec06c95 // from kubernetes
 )
 
-replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20230525153147-77c90ab82b46 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
+replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20230724151845-8558e14a1168 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
