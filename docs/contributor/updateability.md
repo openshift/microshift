@@ -139,6 +139,23 @@ Here's a list of existing scenario:
   - It should include an information that a backup was restored
   - It should not attempt to perform an "upgrade"
 
+**Test ideas for implementation**
+- Testing that upgrading from unhealthy system is blocked
+  (this probably needs to be implemented)
+  - Make system with MicroShift unhealthy,
+    so that information is persisted in the `health.json`
+  - Stage a new deployment and reboot the host
+  - MicroShift should detect that it's a new deployment and previous one was unhealthy,
+    it should refuse to start, thus render system unhealthy
+  - System should roll back to "original" unhealthy deployment
+  - Greenboot should declare "system need manual intervention"
+
+- Testing "blocking upgrade from version"
+  - Set up a list of blocked upgrades with fake versions
+  - Build RPMs with these fake versions
+  - Deploy "from" MicroShift, then try upgrading to a version that has "from"
+    on block list
+
 ## Context: RHEL For Edge
 
 ### Greenboot
