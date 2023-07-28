@@ -385,15 +385,43 @@ however it is not expected to be significant.
 
 ### "grub * greenboot * rpm-ostree" integration summary
 
-<!-- 
-TODO
-Staging deployment causes greenboot to set boot_counter
-boot_counter is decremented on each boot by the grub
-if falls down to 0 or is already -1, it's set to -1, and default boot entry is changed to `1`
+Here's a brief summary on how grub, greenboot, and rpm-ostree work together.
 
-greenboot starts, sees -1, issues `rpm-ostree rollback` which from currently booted systems is kind of a no-op, because
-the rollback deployment is already booted, but this ensures that rebooting the system will result in the same.
--->
+- User deploys a new deployment, e.g. using `rpm-ostree rebase` or `upgrade`
+- User issues a command to reboot the host
+- Just before shutting down, `greenboot-grub2-set-counter.service` followed by
+  `ostree-finalize-staged.service` run.
+  - `greenboot-grub2-set-counter.service` sets `boot_counter` to specified value
+    (by default 3)
+  - `ostree-finalize-staged.service` executes internal commands to finalize
+    staged deployment
+- System shuts down and boots
+- Grub inspects `boot_counter` and `boot_success`
+  - If `boot_counter` is set and `boot_success` is 0, the counter is decremented
+- Grub boots recently staged deployment because it is first on the
+  list (set as default)
+- System starts, `greenboot-healthcheck.service` starts
+  - `greenboot-healthcheck.service` runs healthcheck scripts and
+    depending on the result runs green or red scripts
+  - If system was unhealthy, `redboot-auto-reboot.service` reboots the host
+    to give it another chance for a successful boot
+- System reboots, grub decrements the counter
+- Let's assume that new deployment continuously fails,
+  greenboot reboots the system several times
+- Grub sees that `boot_counter` is 0:
+  - It changes the default boot from 0 to 1,
+    that is: from failing deployment to the rollback deployment.
+  - Sets `boot_counter` to -1
+- Rollback deployment starts
+- `greenboot-rpm-ostree-grub2-check-fallback.service` runs and inspects 
+  `boot_counter` which is -1, so it executes `rpm-ostree rollback` command
+  without rebooting the system. This syncs the rpm-ostree state with grub's
+  new default boot. Then, it also removes the `boot_counter`.
+- If system ends up unhealthy again, `redboot-auto-reboot.service`:
+  - If `boot_counter` does not exist: print information that system is unhealthy
+    and requires manual intervention
+  - If `boot_counter` is `-1`: prints information that fallback boot was detect,
+    but system is still unhealthy and requires manual intervention
 
 ## MicroShift Updateability Implementation
 
