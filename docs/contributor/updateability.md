@@ -929,16 +929,10 @@ from Kubernetes documentation.
 Automated backup management is intended only for ostree-based systems.
 For other, "regular RPM-based", systems `microshift` binary exposes following
 commands aiming to help with creating and restoring backups of the MicroShift data:
-- `microshift admin data backup`
-- `microshift admin data restore`
+- `microshift backup`
+- `microshift restore`
 
-> TODO: Initially `microshift admin` was supposed to group more subcommands.
-> Maybe it's worth dropping at least one level? E.g. `microshift [admin|data} {backup,restore}`
-
-##### `microshift admin data backup`
-
-The command creates a backup of current MicroShift data (`/var/lib/microshift`).
-It requires that `microshift.service` has status `exited` which means that
+Both commands require that `microshift.service` has status `exited` which means that
 MicroShift must not be running (to avoid corrupting data if etcd was running
 during the process and modifying the files).
 
@@ -951,19 +945,23 @@ be backed up (mere existence of a backup suggests it contains valid data,
 just like it is on ostree-based system with some exceptions that are explicitly
 marked).
 
+##### `microshift backup`
+
+The command creates a backup of current MicroShift data (`/var/lib/microshift`).
+
 Command has two options:
 - `--name` - backup name (effectively name of the directory which will hold the copy of the data).
   Default value contains MicroShift's version and current datetime: `MAJOR.MINOR__YYYYmmDD_HHMMSS`
 - `--storage` - which a parent directory that will hold the backup.
   Default value is the same as for ostree-based systems: `/var/lib/microshift-backups`
 
-> **TODO: Change default --name to contain version from `/var/lib/microshift/version` rather than executable's version**
+##### `microshift restore`
 
-> **TODO: Change default --name to include PATCH version**
+Command restores a backup.
 
+It differs from `backup` command as it expects a full path of MicroShift 
+backup as an argument, for example: `microshift restore /var/lib/microshift-backups/my-4.14-backup`.
 
-##### `microshift admin data restore`
-
-> **TODO: This command is not implemented yet.**
-
-> **TODO: Decide: reuse `--name` and `--storage` from `backup` subcommand, or expect a full path?**
+> Note: this command does not verify if provided path is really MicroShift's
+> backup, so practically it could be used to copy any directory into
+> `/var/lib/microshift`.
