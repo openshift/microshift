@@ -15,7 +15,7 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
-VM_BOOT_TIMEOUT=8m
+VM_BOOT_TIMEOUT=15m
 
 full_vm_name() {
     local base="${1}"
