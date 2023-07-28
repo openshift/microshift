@@ -27,3 +27,5 @@
 - service-ca-operator image-arm64 46c0577bee18108d6cc7743b4876830630f88442 to 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003
   - b9ee0d7 2023-07-26T10:36:56+02:00 bump lib-go to get rid of the goproxy dep
 
+- kubernetes-kube-storage-version-migrator is a new embedded-component dependency
+
