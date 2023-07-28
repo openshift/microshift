@@ -1,6 +1,6 @@
 assets:
   - dir: components/openshift-dns/dns/
-    src: cluster-dns-operator/assets/dns/
+    src: cluster-dns-operator/pkg/manifests/assets/dns/
     files:
       - file: cluster-role-binding.yaml
       - file: cluster-role.yaml
@@ -12,7 +12,7 @@ assets:
       - file: service.yaml
 
   - dir: components/openshift-dns/node-resolver
-    src: cluster-dns-operator/assets/node-resolver/
+    src: cluster-dns-operator/pkg/manifests/assets/node-resolver/
     files:
       - file: daemonset.yaml
         ignore: "it's created by processing daemonset.yaml.tmpl"
