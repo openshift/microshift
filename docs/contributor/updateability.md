@@ -226,30 +226,90 @@ working system or MicroShift version.
 
 ### (rpm-)ostree [ostree-only]
 
-TODO
+ostree is technology for creating git-like repositories for filesystems.
+
+It allows to create whole operating system images and switch between them
+at boot time.
+It also provides an immutability - only handful of directories are writeable,
+core of the system should be updated by creating new images.
+
+For information:
+- [ostree](https://ostreedev.github.io/ostree/)
+- [rpm-ostree](https://coreos.github.io/rpm-ostree/)
 
 #### `rpm-ostree` vs `ostree`
 
-TODO
+`ostree` (also referred to as OSTree or libostree) is a shared library and
+set of tools for creating the repositories (which commits and branches).
+
+`rpm-ostree` is built on top of ostree to create "full hybrid image/package system".
+It connects power of ostree and dnf libraries to provide deployment upgrades
+and rollbacks and RPM package layering.
 
 #### Commits and deployments
 
-TODO
+Using osbuild to create new system images produces "ostree commits". Commit
+contains timestamp, log message, and checksums. Each commit can have a parent,
+so it can be used as a history of the builds.
 
-<!--
-ostree     -> commits
-rpm-ostree -> deployments
+When rpm-ostree is provided a commit to deploy, that commit becomes a
+deployment - a bootable root filesystem.
 
-Deployment is a commit with a boot entry.
--->
+> Note: ostree can be used to hold not only OS filesystems but any file structure.
+> One example of such project is flatpak which uses ostree internally,
+>
+> For example: `flatpak info -r com.slack.Slack` will print very familiar
+> looking reference `app/com.slack.Slack/x86_64/stable`.
+
+More information:
+- [Anatomy of an OSTree repository](https://ostreedev.github.io/ostree/repo/)
+- [rpm-ostree: client administration](https://coreos.github.io/rpm-ostree/administrator-handbook/)
+- [Flatpak: under the hood](https://docs.flatpak.org/en/latest/under-the-hood.html)
 
 #### Useful `ostree` commands
 
-TODO
+> Hint: By default, `ostree` searches for repository in current directory.
+>
+> Repository can be explicitly specified with option `--repo=PATH`.
+
+`ostree` is more about managing ostree repositories, but it also provides
+some functionality to manage ostree-booted systems with `ostree admin`.
+
+- List references in ostree repository: `ostree refs`
+- Create new reference pointing to a commit: `ostree refs --create=NEWREF REVISION`
+- List registered remotes: `ostree remote list`
+- List url of a remote: `ostree remote show-url REMOTE`
+- List references present on the remote: `ostree remote refs REMOTE`
+- Add references to local repository from another local repository
+  (for example after producing a new commit using osbuild): `ostree pull-local`
+- Clean repository from old data that is no longer accessible
+  directly by references: `ostree prune --refs-only`
+- Pin deployment so it's not deleted when new deployments
+  are added to the system: `ostree admin pin`
+
+More info:
+- [ostree: repository management](https://ostreedev.github.io/ostree/repository-management/)
 
 #### Useful `rpm-ostree` commands
 
-TODO
+
+- Get list of deployments on the system: `rpm-ostree status`
+- Switch to a different ostree reference, for example from `rhel-9.2-microshift-source` to 
+  `rhel-9.2-microshift-source-fake-next-minor`: `rpm-ostree rebase REF`
+- Rollback the system (sets previous deployment as active/current,
+  so it's default after reboot): `rpm-ostree rollback`
+- Update system to a newer version of current reference: `rpm-ostree upgrade`
+- Install additional RPMs by layering them on top of current deployment: `rpm-ostree install`
+- Remove layered RPMs: `rpm-ostree uninstall`
+- Replace base image RPM with different version: `rpm-ostree override replace`
+- Remove base image RPM: `rpm-ostree override remove`
+- Reset overrides: `rpm-ostree override reset`
+- Get kernel boot parameters: `rpm-ostree kargs`
+  - Edit parameters: `rpm-ostree kargs --editor`
+  - See also: `--append`, `--replace`, `--delete`
+
+More info:
+- [rpm-ostree: administrator's handbook](https://coreos.github.io/rpm-ostree/administrator-handbook/)
 
 ### Grub [ostree]
 
