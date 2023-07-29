@@ -499,7 +499,6 @@ case "${action}" in
     rerun)
         action_cleanup "$@"
         action_create "$@"
-        "${SCRIPTDIR}/manage_vm_connections.sh" local
         action_run "$@"
         ;;
     *)
