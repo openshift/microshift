@@ -382,8 +382,8 @@ fi
 # Add container images
 if ${EMBED_CONTAINERS} ; then
     # Add the list of all the container images
-    jq -r '.images | .[] | ("[[containers]]\nsource = \"" + . + "\"\n")' \
-        "${ROOTDIR}/assets/release/release-$(uname -m).json" \
+    jq -r '.images | .[] | ("\n[[containers]]\nsource = \"" + . + "\"\n")' \
+        "./usr/share/microshift/release/release-$(uname -m).json" \
         >> blueprint_v0.0.1.toml
 fi
 
