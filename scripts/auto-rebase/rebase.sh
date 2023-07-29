@@ -40,6 +40,8 @@ cluster-csi-snapshot-controller-operator"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
+LVMS_RELEASE_MULTI_ARCH="registry.access.redhat.com/lvms4/lvms-operator-bundle:v4.13.1-5"
+
 title() {
     echo -e "\E[34m$1\E[00m";
 }
@@ -485,7 +487,6 @@ replace_using_component_commit() {
 update_last_rebase() {
     local release_image_amd64=$1
     local release_image_arm64=$2
-    local lvms_operator_bundle_manifest=$3
 
     title "## Updating last_rebase.sh"
 
@@ -494,7 +495,7 @@ update_last_rebase() {
     rm -f "${last_rebase_script}"
     cat - >"${last_rebase_script}" <<EOF
 #!/bin/bash -x
-./scripts/auto-rebase/rebase.sh to "${release_image_amd64}" "${release_image_arm64}" "${lvms_operator_bundle_manifest}"
+./scripts/auto-rebase/rebase.sh to "${release_image_amd64}" "${release_image_arm64}"
 EOF
     chmod +x "${last_rebase_script}"
 
@@ -1068,7 +1069,7 @@ update_changelog() {
 rebase_to() {
     local release_image_amd64=$1
     local release_image_arm64=$2
-    local lvms_operator_bundle_manifest=$3
+    local lvms_operator_bundle_manifest="$3"
 
     title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
     download_release "${release_image_amd64}" "${release_image_arm64}"
@@ -1082,7 +1083,7 @@ rebase_to() {
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
-    update_last_rebase "${release_image_amd64}" "${release_image_arm64}" "${lvms_operator_bundle_manifest}"
+    update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
 
     update_changelog
     update_go_mods
@@ -1143,13 +1144,13 @@ rebase_to() {
 
 usage() {
     echo "Usage:"
-    echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM LVMS_RELEASE_MULTI_ARCH        Performs all the steps to rebase to a release image. Specify both amd64 and arm64 ocp releases, and multi-arch lvms operator bundle image."
-    echo "$(basename "$0") download RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM LVMS_RELEASE_MULTI_ARCH  Downloads the content of a release image to disk in preparation for rebasing. Specify both amd64 and arm64 and multi-arch lvms operator bundle image."
-    echo "$(basename "$0") buildfiles                                                              Updates build files (Makefile, Dockerfile, .spec)"
-    echo "$(basename "$0") go.mod                                                                  Updates the go.mod file to the downloaded release"
-    echo "$(basename "$0") generated-apis                                                          Regenerates OpenAPIs"
-    echo "$(basename "$0") images                                                                  Rebases the component images to the downloaded release"
-    echo "$(basename "$0") manifests                                                               Rebases the component manifests to the downloaded release"
+    echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM         Performs all the steps to rebase to a release image. Specify both amd64 and arm64 OCP releases."
+    echo "$(basename "$0") download RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM   Downloads the content of a release image to disk in preparation for rebasing. Specify both amd64 and arm64 OCP releases."
+    echo "$(basename "$0") buildfiles                                       Updates build files (Makefile, Dockerfile, .spec)"
+    echo "$(basename "$0") go.mod                                           Updates the go.mod file to the downloaded release"
+    echo "$(basename "$0") generated-apis                                   Regenerates OpenAPIs"
+    echo "$(basename "$0") images                                           Rebases the component images to the downloaded release"
+    echo "$(basename "$0") manifests                                        Rebases the component manifests to the downloaded release"
     exit 1
 }
 
@@ -1158,13 +1159,15 @@ check_preconditions
 command=${1:-help}
 case "$command" in
     to)
-        [[ $# -ne 4 ]] && usage
-        rebase_to "$2" "$3" "${4:-}"
+        # FIXME: Allow more than 3 arguments until pipelines stop passing LVMS value.
+        [[ $# -lt 3 ]] && usage
+        rebase_to "$2" "$3" "${LVMS_RELEASE_MULTI_ARCH}"
         ;;
     download)
-        [[ $# -ne 4 ]] && usage
+        # FIXME: Allow more than 3 arguments until pipelines stop passing LVMS value.
+        [[ $# -lt 3 ]] && usage
         download_release "$2" "$3"
-        download_lvms_operator_bundle_manifest "${4:-}"
+        download_lvms_operator_bundle_manifest "${LVMS_RELEASE_MULTI_ARCH}"
         ;;
     changelog) update_changelog;;
     buildfiles) update_buildfiles;;
