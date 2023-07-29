@@ -24,17 +24,13 @@ Storage Version Migration Test
     [Tags]    restart    slow    smoke
 
     # The migration trigger runs on a 10min cycle, we restart Microshift to speed up discovery.
-    Wait Until Keyword Succeeds    5x    20s
-    ...    Restart MicroShift
-
+    Restart MicroShift
     Wait Until Keyword Succeeds    5x    10s
     ...    Validate Migration    v1beta1    8F5KO5MYqcM=
 
     Update Beta CRD To Stable
 
-    Wait Until Keyword Succeeds    5x    20s
-    ...    Restart MicroShift
-
+    Restart MicroShift
     Wait Until Keyword Succeeds    5x    10s
     ...    Validate Migration    v1    O2TShlD54rQ=
 
@@ -47,7 +43,11 @@ Setup
     Setup Kubeconfig
 
     Create Beta CRD
-    Create Custom Resource
+    # There may be a lag between creating the CRD and being able to
+    # use it, so retry uploading the first copy of the resource a few
+    # times.
+    Wait Until Keyword Succeeds    5x    10s
+    ...    Create Custom Resource
 
 Teardown
     [Documentation]    Delete all created resources
