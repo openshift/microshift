@@ -80,7 +80,7 @@ check_preconditions() {
 download_lvms_operator_bundle_manifest(){
     bundle_manifest="$1"
 
-    title 'downloading LVMS operator bundles'
+    title "downloading LVMS operator bundles ${bundle_manifest}"
     local LVMS_STAGING="${STAGING_DIR}/lvms"
 
     authentication=""
@@ -1070,7 +1070,7 @@ rebase_to() {
     local release_image_arm64=$2
     local lvms_operator_bundle_manifest=$3
 
-    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
+    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64} with LVMS bundle ${lvms_operator_bundle_manifest}"
     download_release "${release_image_amd64}" "${release_image_arm64}"
     download_lvms_operator_bundle_manifest "$lvms_operator_bundle_manifest"
 
