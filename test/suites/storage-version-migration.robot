@@ -43,7 +43,11 @@ Setup
     Setup Kubeconfig
 
     Create Beta CRD
-    Create Custom Resource
+    # There may be a lag between creating the CRD and being able to
+    # use it, so retry uploading the first copy of the resource a few
+    # times.
+    Wait Until Keyword Succeeds    5x    10s
+    ...    Create Custom Resource
 
 Teardown
     [Documentation]    Delete all created resources
