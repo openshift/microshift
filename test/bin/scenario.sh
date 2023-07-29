@@ -16,6 +16,7 @@ PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=15m
+SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 
 full_vm_name() {
     local base="${1}"
@@ -23,6 +24,10 @@ full_vm_name() {
 }
 
 sos_report() {
+    if "${SKIP_SOS}"; then
+        echo "Skipping sos reports"
+        return
+    fi
     echo "Creating sos reports"
     for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
         if [ ! -d "${vmdir}" ]; then
@@ -440,6 +445,7 @@ action_login() {
 }
 
 action_run() {
+    load_global_settings
     load_scenario_script
     trap "sos_report" EXIT
     scenario_run_tests
