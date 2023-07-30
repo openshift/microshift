@@ -273,9 +273,9 @@ Use `./test/bin/start_webserver.sh` to run a caddy web server to serve the
 images needed for the build.
 
 Use `./test/bin/build_images.sh` to build all of the images for all of the
-blueprints available. 
+blueprints available.
 
-Run `./test/bin/build_images.sh -h ` to see all the supported modes for
+Run `./test/bin/build_images.sh -h` to see all the supported modes for
 building images. For example, run the following command to only rebuild the
 images that use RPMs created from source (not already published releases).
 
@@ -458,6 +458,9 @@ Use `./test/bin/scenario.sh login` to login to a VM for a scenario as the
 
 On a `development host`, use `./test/bin/composer_cleanup.sh` to stop any
 running jobs, remove everything from the queue, and delete existing builds.
+
+> It is recommended to use `./scripts/image-builder/cleanup.sh -full` to
+> fully clean Image Builder jobs and cache, also restarting its services.
 
 On a `hypervisor host`, use `./test/bin/scenario.sh cleanup` to remove the
 test infrastructure for a scenario.
