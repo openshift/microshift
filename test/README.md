@@ -352,7 +352,8 @@ Use `./test/bin/scenario.sh` to create test infrastructure for a scenario
 with the `create` argument and a scenario directory name as input.
 
 ```
-$ ./test/bin/scenario.sh create ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
+$ ./test/bin/scenario.sh create \
+      ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
 ```
 
 #### Enabling Connections to VMs
@@ -382,6 +383,7 @@ Use `./test/bin/scenario.sh run` with a scenario file to run the tests for
 the scenario.
 
 ```
+$ ./scripts/fetch_tools.sh robotframework
 $ ./test/bin/scenario.sh run \
       ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
 ```
