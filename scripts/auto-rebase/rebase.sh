@@ -107,7 +107,6 @@ download_lvms_operator_bundle_manifest(){
 
         local csv="lvms-operator.clusterserviceversion.yaml"
         local namespace="openshift-storage"
-        title "extracting lvms clusterserviceversion.yaml into separate RBAC"
         extract_lvms_rbac_from_cluster_service_version ${PWD} ${csv} ${namespace}
 
         popd || return 1
@@ -159,6 +158,8 @@ write_lvms_images_for_arch(){
 }
 
 update_lvms_images(){
+    title "Updating LVMS manifests"
+
     local workdir="$STAGING_DIR/lvms"
     [ -d "$workdir" ] || {
         >&2 echo 'lvms staging dir not found, aborting image update'
@@ -186,37 +187,39 @@ extract_lvms_rbac_from_cluster_service_version() {
   local csv="$2"
   local namespace="$3"
 
+  title "extracting lvms clusterserviceversion.yaml into separate RBAC"
+
   local clusterPermissions=($(yq eval '.spec.install.spec.clusterPermissions[].serviceAccountName' < "${csv}"))
   for service_account_name in "${clusterPermissions[@]}"; do
-    title "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
+    echo "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
 
     local clusterrole="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-    title "generating ${clusterrole}"
+    echo "generating ${clusterrole}"
     extract_lvms_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
 
     local clusterrolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-    title "generating ${clusterrolebinding}"
+    echo "generating ${clusterrolebinding}"
     extract_lvms_clusterrolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${clusterrolebinding}"
 
     local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
-    title "generating ${service_account}"
+    echo "generating ${service_account}"
     extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
   done
 
   local permissions=($(yq eval '.spec.install.spec.permissions[].serviceAccountName' < "${csv}"))
   for service_account_name in "${permissions[@]}"; do
-    title "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
+    echo "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
 
     local role="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_role.yaml"
-    title "generating ${role}"
+    echo "generating ${role}"
     extract_lvms_role_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${csv}" "${role}"
 
     local rolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_rolebinding.yaml"
-    title "generating ${rolebinding}"
+    echo "generating ${rolebinding}"
     extract_lvms_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
 
     local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
-    title "generating ${service_account}"
+    echo "generating ${service_account}"
     extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
   done
 }
