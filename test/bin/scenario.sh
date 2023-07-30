@@ -393,9 +393,12 @@ fi
 
 action="$1"
 shift
-SCENARIO_SCRIPT="$1"
+SCENARIO_SCRIPT="$(realpath "$1")"
 shift
 SCENARIO=$(basename "${SCENARIO_SCRIPT}" .sh)
+
+# Change directory to the test root
+cd "${SCRIPTDIR}/.."
 
 case "${action}" in
     create|run|cleanup|login)
