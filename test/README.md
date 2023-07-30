@@ -12,6 +12,7 @@ The document is organized in the following sections:
 * [Test Suites](#test-suites) run against an existing instance of MicroShift
 * [Test Scenarios](#test-scenarios) provide tools for complex test environments
 * [Troubleshooting](#troubleshooting) techniques for the test environments
+* [CI Integration Scripts](#ci-integration-scripts) run as part of CI flow
 
 ## Test Suites
 
@@ -477,16 +478,22 @@ $ ./test/bin/scenario.sh cleanup \
       ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
 ```
 
-### CI Integration Scripts
+## CI Integration Scripts
 
-#### ci_phase_iso_build.sh
+### ci_phase_iso_build.sh
 
 Runs on the hypervisor. Responsible for all of the setup to build all
 needed images. Rebuilds MicroShift RPMs from source, sets up RPM repo,
 sets up Image Builder workers, builds the images, and creates the web
 server to host the images.
 
-#### ci_phase_iso_boot.sh
+### ci_phase_iso_boot.sh
 
 Runs on the hypervisor. Responsible for launching all of the VMs that
 are used in the test step.
+
+### ci_phase_iso_test.sh
+
+Runs on the hypervisor. Responsible for running all of the tests from
+`./test/scenarios`, waiting for them to complete and exiting with an
+error code if at least one test failed.
