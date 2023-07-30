@@ -4,18 +4,22 @@ This directory includes tests for MicroShift that go beyond unit
 tests. They exercise the system more fully and verify behaviors
 end-to-end.
 
-The tests are written using [Robot
-Framework](https://robotframework.org), a test automation framework
-that separates the description of the test from the implementation of
-the test.
+The tests are written using [Robot Framework](https://robotframework.org),
+a test automation framework that separates the description of the test
+from the implementation of the test.
 
-## Test suites
+The document is organized in the following sections:
+* [Test Suites](#test-suites) run against an existing instance of MicroShift
+* [Test Scenarios](#test-scenarios) provide tools for complex test environments
+* [Troubleshooting](#troubleshooting) techniques for the test environments
+
+## Test Suites
 
 Groups of tests are saved to `.robot` files in the `suites/`
 directory. The tests in a suite should have the same basic
 prerequisites and should test related functionality.
 
-## Setting up
+### Setting Up
 
 To run the tests, you need an existing host running the version of
 MicroShift to be tested. Most suites expect the service to be running,
@@ -65,7 +69,7 @@ the ssh agent to provide the correct credentials.
 `API_PORT` should be set when connections are performed through a
 forwarded port.
 
-## Running the tests
+### Running Tests
 
 Use `run.sh` to run the tests. It will create a Python virtual
 environment in the `_output` directory and install Robot Framework
@@ -86,7 +90,7 @@ Options:
   -i PATH  The variables file.
 ```
 
-### Running a Single Suite
+#### Running a Single Suite
 
 By default, all of the test suites will be run. To run a subset,
 specify the filenames as arguments on the command line.
@@ -97,7 +101,7 @@ $ ./test/run.sh suites/show-config.robot
 
 > The test suite file names should be relative to the `test` directory.
 
-### Running a Subset of Tests
+#### Running a Subset of Tests
 
 To run a single test, or subset of tests, use the `robot` command's
 features for filtering the tests. Use `--` to separate arguments to
@@ -122,7 +126,7 @@ For more options, see the help output for the `robot` command.
 $ ./_output/robotenv/bin/robot -h
 ```
 
-## Test Scenarios in CI
+## Test Scenarios
 
 The test scenario tools in the `bin` directory are useful for running
 more complex test cases that require VMs and different images.
@@ -150,7 +154,7 @@ rhsm = true
 Refer to `./bin/build_images.sh` for the set of known variables that can
 be expanded.
 
-## Image Blueprints
+### Image Blueprints
 
 The image blueprints are independent of the test scenarios so that
 images can be reused. Be careful making changes to specific images in
@@ -172,7 +176,7 @@ group2/rhel92-microshift-previous-minor.toml | rhel-9.2-microshift-4.13 | A RHEL
 group2/rhel92-source.toml | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
 group2/rhel92-source-fake-next-minor.toml | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
 
-### Blueprint Naming
+#### Blueprint Naming
 
 Blueprint names must be globally unique, regardless of the group that
 contains the blueprint template.
@@ -231,22 +235,27 @@ $ cat image-blueprints/group1/rhel92.image-installer
 rhel-9.2
 ```
 
-## Preparing to run test scenarios
+### Preparing to Run Test Scenarios
 
-### Building RPMs
+The steps in this section need to be executed on a `development host`.
+Use `./test/bin/rebuild_source_images.sh` to automate all of those
+steps with one script, while only rebuilding the images that use RPMs
+created from source (not already published releases).
+
+#### Building RPMs
 
 The upgrade and rollback test scenarios use multiple builds of
 MicroShift to create images with different versions. Use
 `./bin/build_rpms.sh` to build all of the necessary packages.
 
-### Creating the local RPM repositories
+#### Creating Local RPM Repositories
 
 After running `make rpm` at the top of the source tree, run
 `./bin/create_local_repo.sh` from this directory to copy the necessary
 files into locations that can be used as a RPM repositories by
 Composer.
 
-### Creating the images
+#### Creating Images
 
 Use `./bin/start_osbuild_workers.sh` to create multiple workers for
 building images in parallel. This is optional, and not necessarily
@@ -255,15 +264,7 @@ recommended on a laptop.
 Use `./bin/build_images.sh` to build all of the images for all of the
 blueprints available.
 
-### Rebuilding from source easily
-
-If you build new RPMs, you need to re-run several steps (build the
-RPMs, build the local repos, build the images, download the
-images). Use `./bin/rebuild_source_images.sh` to automate all of those
-steps with 1 script while only rebuilding the images that use RPMs
-created from source (not already published releases).
-
-### Global settings
+### Global Settings
 
 The test scenario tool uses several global settings that may be
 configured before the tool is used in `./scenario_settings.sh`. You
@@ -279,7 +280,7 @@ providing password-less access to the VMs.
 providing password-less access to the VMs. Set to an empty string to
 use ssh-agent.
 
-### Preparing storage pool for VMs
+### Preparing Storage Pool for VMs
 
 Use `./bin/manage_vm_storage_pool.sh` to create the necessary storage
 pool for VMs.
@@ -293,7 +294,7 @@ To cleanup after execution and teardown of VMs use `cleanup`.
 $ ./bin/manage_vm_storage_pool.sh cleanup
 ```
 
-### Creating test infrastructure
+### Creating Test Infrastructure
 
 Use `./bin/start_webserver.sh` to run a caddy web server to serve the
 images needed for the test scenarios.
@@ -308,7 +309,7 @@ with the `create` argument and a scenario directory name as input.
 $ ./bin/scenario.sh create ./scenarios/rhel-9.2-microshift-source-standard-suite.sh
 ```
 
-### Enabling connections to the VMs
+### Enabling Connections to VMs
 
 Run `./bin/manage_vm_connections.sh` on the hypervisor to set up the API
 server and ssh port of each VM. The appropriate connection ports are
@@ -329,7 +330,7 @@ configuration, use `local` with no other arguments.
 $ ./bin/manage_vm_connections.sh local
 ```
 
-### Run a scenario
+### Run a Scenario
 
 Use `./bin/scenario.sh run` with a scenario file to run the tests for
 the scenario.
@@ -338,7 +339,7 @@ the scenario.
 $ ./bin/scenario.sh run ./scenarios/rhel-9.2-microshift-source-standard-suite.sh
 ```
 
-## Scenario definitions
+### Scenario Definitions
 
 Scenarios are saved as shell scripts under `scenarios`. Each
 scenario includes several functions that are combined
@@ -367,7 +368,7 @@ All of the functions that act as the scenario API are run in the
 context of `scenario.sh` and can therefore use any functions defined
 there.
 
-### scenario_create_vms
+#### scenario_create_vms
 
 This function should do any work needed to boot all of the VMs needed
 for the scenario, including producing kickstart files and launching
@@ -383,7 +384,7 @@ The `launch_vm` function takes as input the VM name. It expects a
 kickstart file to already exist, and it defines a new VM configured to
 boot from the installer ISO and the kickstart file.
 
-### scenario_remove_vms
+#### scenario_remove_vms
 
 This functions is used to remove any VMs defined by the scenario. It
 should call `remove_vm` for each VM created by `scenario_create_vms`,
@@ -393,7 +394,7 @@ scenario based on other steps taken in `scenario_create_vms`.
 It is not necessary to explicitly clean up the scenario metadata in
 `${SCENARIO_INFO_DIR}`.
 
-### scenario_run_tests
+#### scenario_run_tests
 
 This function runs the tests. It is invoked separately because the
 same host may be used with multiple test runs when working on a local
@@ -409,7 +410,7 @@ are not saved to the default variables file by the framework.
 Use `./bin/scenario.sh login` to login to a VM for a scenario as the
 `redhat` user.
 
-## Cleaning up
+### Cleaning Up
 
 Use `./bin/composer_cleanup.sh` to stop any running jobs, remove
 everything from the queue, and delete existing builds.
@@ -421,16 +422,16 @@ scenario.
 $ ./bin/scenario.sh cleanup  ./scenarios/rhel-9.2-microshift-source-standard-suite/
 ```
 
-## CI Integration Scripts
+### CI Integration Scripts
 
-### ci_phase_iso_build.sh
+#### ci_phase_iso_build.sh
 
 Runs on the hypervisor. Responsible for all of the setup to build all
 needed images. Rebuilds MicroShift RPMs from source, sets up RPM repo,
 sets up osbuild workers, builds the images, and creates the web server
 to host the images.
 
-### ci_phase_iso_boot.sh
+#### ci_phase_iso_boot.sh
 
 Runs on the hypervisor. Responsible for launching all of the VMs that
 are used in the test step.
