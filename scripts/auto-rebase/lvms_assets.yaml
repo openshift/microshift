@@ -1,0 +1,33 @@
+assets:
+
+  - dir: components/lvms/
+    src: lvms/amd64/
+    no_clean: True
+    files:
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
+      - file: topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: topolvm-controller_v1_serviceaccount.yaml
+      - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: topolvm-node_v1_serviceaccount.yaml
+      - file: topolvm.io_logicalvolumes.yaml
+      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+        ignore: "provided by MicroShift"
+      - file: csi-driver.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-controller_deployment.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-lvmd-config_configmap_v1.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-node_daemonset.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-node-securitycontextconstraint.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm-openshift-storage_namespace.yaml
+        ignore: "provided by MicroShift"
+      - file: topolvm_default-storage-class.yaml
+        ignore: "provided by MicroShift"

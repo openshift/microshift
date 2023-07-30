@@ -22,7 +22,10 @@ except ImportError:
 
 ASSETS_DIR = "assets/"
 STAGING_DIR = "_output/staging/"
-RECIPE_FILEPATH = "./scripts/auto-rebase/assets.yaml"
+RECIPE_FILEPATHS = [
+    "./scripts/auto-rebase/assets.yaml",
+    "./scripts/auto-rebase/lvms_assets.yaml",
+]
 
 
 def build_assets_filelist_from_asset_dir(asset_dir, prefix=""):
@@ -104,8 +107,14 @@ def main():
         print(f"ERROR: Expected to run in root directory of microshift repository but was in {os.getcwd()}")
         sys.exit(1)
 
-    with open(RECIPE_FILEPATH, encoding='utf-8') as recipe_file:
-        recipe = yaml.load(recipe_file.read(), Loader=Loader)
+    # Merge the data from all of the asset files into one set so we
+    # can ensure that everything in the assets directory is mentioned
+    # in at least one input file.
+    recipe = {"assets": []}
+    for filename in RECIPE_FILEPATHS:
+        with open(filename, encoding='utf-8') as recipe_file:
+            r = yaml.load(recipe_file.read(), Loader=Loader)
+            recipe["assets"].extend(r["assets"])
 
     found_error = any([
         check_assets_dir_against_instructions(recipe),

@@ -171,8 +171,15 @@ update_lvms_images(){
 }
 
 update_lvms_manifests() {
-    title "Modifying LVMS manifests"
+    title "Copying LVMS manifests"
 
+    local workdir="$STAGING_DIR/lvms"
+    [ -d "$workdir" ] || {
+        >&2 echo 'lvms staging dir not found, aborting asset update'
+        return 1
+    }
+
+    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/lvms_assets.yaml"
 }
 
 
@@ -785,7 +792,7 @@ copy_manifests() {
         exit 1
     fi
     title "Copying manifests"
-    "$REPOROOT/scripts/auto-rebase/handle_assets.py"
+    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets.yaml"
 }
 
 
