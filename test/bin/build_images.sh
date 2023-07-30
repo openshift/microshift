@@ -168,6 +168,19 @@ do_group() {
         echo "Waiting for builds to complete..."
         # shellcheck disable=SC2086  # pass command arguments quotes to allow word splitting
         time "${SCRIPTDIR}/wait_images.py" ${buildid_list}
+
+        echo "Checking build statuses..."
+        builds_failed=false
+        # shellcheck disable=SC2231  # allow glob expansion without quotes in for loop
+        for buildid in ${buildid_list}; do
+            bstat=$(sudo composer-cli compose status | grep "^${buildid}" | awk '{print $2}')
+            if [ "${bstat}" != "FINISHED" ] ; then
+                echo "Error: The build ID ${buildid} failed"
+                builds_failed=true
+            fi
+        done
+        # Exit the function on errors
+        ${builds_failed} && return 1
     fi
 
     echo "Downloading build logs, metadata, and image"
