@@ -238,9 +238,6 @@ rhel-9.2
 ### Preparing to Run Test Scenarios
 
 The steps in this section need to be executed on a `development host`.
-Use `./test/bin/rebuild_source_images.sh` to automate all of those
-steps with one script, while only rebuilding the images that use RPMs
-created from source (not already published releases).
 
 #### Building RPMs
 
@@ -282,6 +279,14 @@ images that use RPMs created from source (not already published releases).
 ```
 ./test/bin/build_images.sh -s
 ```
+
+#### Rebuilding from Sources Easily
+
+If you build new RPMs, you need to re-run several steps (build the
+RPMs, build the local repos, build the images, download the
+images). Use `./bin/rebuild_source_images.sh` to automate all of those
+steps with one script while only rebuilding the images that use RPMs
+created from source (not already published releases).
 
 ### Configuring Test Scenarios
 
