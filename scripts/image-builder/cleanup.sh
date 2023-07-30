@@ -65,7 +65,7 @@ sudo systemctl stop --now osbuild-composer.socket osbuild-composer.service
 for n in $(seq 100) ; do
     worker=osbuild-worker@${n}.service
     if sudo systemctl status "${worker}" &>/dev/null ; then
-        sudo systemctl stop --now osbuild-worker@${n}.service
+        sudo systemctl stop --now "osbuild-worker@${n}.service"
     else
         break
     fi
