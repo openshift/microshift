@@ -12,5 +12,11 @@ source "${SCRIPTDIR}/common.sh"
 # Rebuild the RPM from source
 "${SCRIPTDIR}/build_rpms.sh"
 
+# Create RPM repositories for the build
+"${SCRIPTDIR}/create_local_repo.sh"
+
+# Serve the images for the build
+"${SCRIPTDIR}/start_webserver.sh"
+
 # Rebuild the images
 "${SCRIPTDIR}/build_images.sh" -s
