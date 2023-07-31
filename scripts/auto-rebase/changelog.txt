@@ -1,31 +1,65 @@
-- cluster-csi-snapshot-controller-operator embedded-component eaaf7260464bd6cb6126dfd7259cb6217eb25340 to 4670bf64fb29fbe0fbd78368de63d9f88451fb23
-  - 68a800f 2023-07-26T14:59:50+02:00 Bump library-go to remove dependency on goproxy
-  - 613e344 2023-07-25T21:55:15-07:00 OCPBUGS-16783: Chore: Update OWNERS
+- machine-config-operator embedded-component 49540666fa3f8414b72a946e3198aabda02e2447 to 8e61b30333898a6e92c4a94f8bd89dc6804392d2
+  - 5de8b6e6 2023-07-28T15:48:39-04:00 Revert "OCPBUGS-16227: add Passwd to bootstrap served ignition"
+  - 96ed052d 2023-07-27T16:46:13-04:00 chmod kubeconfig path 0600 in func updateKubeConfigPermission - func update
+  - 963b9222 2023-07-27T09:41:39-04:00 fix certExpiry description
+  - 52faf402 2023-07-26T15:58:53-04:00 daemon: remove dead journal flag
+  - 21e9a640 2023-07-26T09:33:07-04:00 add Passwd to bootstrap served ignition
 
-- cluster-dns-operator embedded-component 47be7b57fbc7eecdd91bc3960f6bc4d7d0304133 to 6cfee191de08cede60bed8cea6f8e17f730adf61
-  - afb52de 2023-07-25T22:41:48-04:00 Replace bindata using embed
-  - 51a642d 2023-07-24T23:19:47-04:00 Replace Bugzilla link with Red Hat Issue Tracker
+- ovn-kubernetes image-amd64 7d9a0d3920e6844b86681f455e30efdf6130c7a9 to bf91a685ff6751a515c5e1a9c5392bc7022502e9
+  - 3ca8979 2023-07-28T09:33:10-04:00 Bump OVN to 23.06-23.06.0-51
+  - 9d810a5 2023-07-26T16:45:35+02:00 Change cluster-manager lock name for backwards compatibility
+  - 0d5c1e3 2023-07-26T10:12:47-04:00 Fixes service controller + node tracker start up race
+  - 914cf5b 2023-07-26T12:29:46+02:00 Replace centos/tools image with agnhostImage in the only test that was using it. Downloading an extra image for one test doesn't make a lot of sense, and can cause test failures like "docker: failed to register layer: ApplyLayer exit status 1 stdout: stderr: write /usr/lib64/dyninst/libparseAPI.so.9.3.1: no space left on device."
+  - cfa6c84 2023-07-26T12:21:53+02:00 Move acl.go from ovn to libovsdb/util pkg
+  - 31cd5a1 2023-07-26T12:21:53+02:00 Move GetNBZone to libovsdb/util pkg
+  - 0645776 2023-07-26T12:21:53+02:00 Move UpdateNodeSwitchExcludeIPs to libovsdb/util pkg
+  - 659d25c 2023-07-26T12:21:53+02:00 Move CreateMACBinding to libovsdb/util pkg
+  - eae890e 2023-07-26T12:21:53+02:00 Move ExtractPortAddresses&GetLRPAddrs into libovsdb/utils
+  - 10f9e73 2023-07-26T12:21:53+02:00 Move libovsdbops pkg to libovsdb/ops
+  - 06887de 2023-07-26T11:11:26+02:00 Bump to kind 0.20.0
+  - e2c8192 2023-07-25T19:41:51+00:00 Ensure ovnkube-controller does not go remote->local (cont.)
+  - 90cb6ac 2023-07-25T12:50:25+02:00 e2e, multihoming: Arrange imports
+  - ffb33fa 2023-07-25T12:50:25+02:00 e2e, localnet: Align case of all localnet tests
+  - 5876723 2023-07-25T10:19:15+02:00 Improve error message
+  - 7900ca1 2023-07-25T10:08:55+02:00 Use variable for kubectl version
+  - 2a0f539 2023-07-24T23:09:19+02:00 Ensure load-balancers are not delete till node migrates to remote
+  - 389c771 2023-07-24T20:14:38+02:00 Use NodePrimaryIp to set host-addresses in DPU mode
+  - 5e23296 2023-07-24T19:31:42+02:00 ovn-ic: node update missing static routes (try 2)
+  - c00f6be 2023-07-24T19:31:42+02:00 gh workflow test: save ovn dbs when e2e-dual-conversion fails
+  - 96f1d50 2023-07-21T20:44:22+00:00 Put chatty logs on a diet
+  - fa9028b 2023-07-21T16:46:54+02:00 kubevirtl: Replace node only at migration tests
+  - 6dc5c86 2023-07-21T09:34:36+05:30 Fix ovnkube-trace for dual stack cluster
+  - 519b875 2023-07-21T09:34:36+05:30 Install python3-pip for ovn-detrace command
+  - 0370da1 2023-07-21T09:34:26+05:30 Collect ovn trace on remote node
+  - e66372f 2023-07-21T09:03:10+05:30 Enhance ovnkube-trace for ovn interconnect
+  - ab5722d 2023-07-20T13:46:31+00:00 Bump google.golang.org/grpc from 1.49.0 to 1.53.0 in /go-controller
 
-- cluster-ingress-operator embedded-component 74c0deb43e2efbc87dbf6240e4159d908389acfe to ddba423ea5d5885a33411ca2b4e47094776077e6
-  - 68d0899 2023-02-13T19:25:32+00:00 RFE-3007: Expose option-contstats as an unsupported option
-
-- cluster-network-operator embedded-component d4f68c0e55c0f337a47ea7d9f5caaf239bc7b13f to fc3e0e25b4cfa43e14122bdcdd6d7f2585017d75
-  - 4f7bdec 2023-07-10T15:17:59+02:00 add allow-guest-webhooks label for multus-admission-controller
-
-- machine-config-operator embedded-component ddea245222e437e2259bb56f559a2b36fa7eaea0 to 49540666fa3f8414b72a946e3198aabda02e2447
-  - 777d7770 2023-07-20T18:29:06-05:00 On-cluster build opt-in function, building machine-os-builder stub, RBAC and service acct inclusion, e2e tests
-
-- service-ca-operator embedded-component 46c0577bee18108d6cc7743b4876830630f88442 to 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003
-  - b9ee0d7 2023-07-26T10:36:56+02:00 bump lib-go to get rid of the goproxy dep
-
-- oc image-amd64 643b040e4f38d2d5f353ddbc839195e3935c712c to 13225e00caf1ad2d3603e1d1cc8651833f2effcb
-  - 5d393981 2023-07-25T12:36:09+02:00 OCPBUGS-16735: Truncate existing files when writing from inspect
-
-- service-ca-operator image-amd64 46c0577bee18108d6cc7743b4876830630f88442 to 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003
-  - b9ee0d7 2023-07-26T10:36:56+02:00 bump lib-go to get rid of the goproxy dep
-
-- service-ca-operator image-arm64 46c0577bee18108d6cc7743b4876830630f88442 to 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003
-  - b9ee0d7 2023-07-26T10:36:56+02:00 bump lib-go to get rid of the goproxy dep
-
-- kubernetes-kube-storage-version-migrator is a new embedded-component dependency
+- ovn-kubernetes image-arm64 7d9a0d3920e6844b86681f455e30efdf6130c7a9 to bf91a685ff6751a515c5e1a9c5392bc7022502e9
+  - 3ca8979 2023-07-28T09:33:10-04:00 Bump OVN to 23.06-23.06.0-51
+  - 9d810a5 2023-07-26T16:45:35+02:00 Change cluster-manager lock name for backwards compatibility
+  - 0d5c1e3 2023-07-26T10:12:47-04:00 Fixes service controller + node tracker start up race
+  - 914cf5b 2023-07-26T12:29:46+02:00 Replace centos/tools image with agnhostImage in the only test that was using it. Downloading an extra image for one test doesn't make a lot of sense, and can cause test failures like "docker: failed to register layer: ApplyLayer exit status 1 stdout: stderr: write /usr/lib64/dyninst/libparseAPI.so.9.3.1: no space left on device."
+  - cfa6c84 2023-07-26T12:21:53+02:00 Move acl.go from ovn to libovsdb/util pkg
+  - 31cd5a1 2023-07-26T12:21:53+02:00 Move GetNBZone to libovsdb/util pkg
+  - 0645776 2023-07-26T12:21:53+02:00 Move UpdateNodeSwitchExcludeIPs to libovsdb/util pkg
+  - 659d25c 2023-07-26T12:21:53+02:00 Move CreateMACBinding to libovsdb/util pkg
+  - eae890e 2023-07-26T12:21:53+02:00 Move ExtractPortAddresses&GetLRPAddrs into libovsdb/utils
+  - 10f9e73 2023-07-26T12:21:53+02:00 Move libovsdbops pkg to libovsdb/ops
+  - 06887de 2023-07-26T11:11:26+02:00 Bump to kind 0.20.0
+  - e2c8192 2023-07-25T19:41:51+00:00 Ensure ovnkube-controller does not go remote->local (cont.)
+  - 90cb6ac 2023-07-25T12:50:25+02:00 e2e, multihoming: Arrange imports
+  - ffb33fa 2023-07-25T12:50:25+02:00 e2e, localnet: Align case of all localnet tests
+  - 5876723 2023-07-25T10:19:15+02:00 Improve error message
+  - 7900ca1 2023-07-25T10:08:55+02:00 Use variable for kubectl version
+  - 2a0f539 2023-07-24T23:09:19+02:00 Ensure load-balancers are not delete till node migrates to remote
+  - 389c771 2023-07-24T20:14:38+02:00 Use NodePrimaryIp to set host-addresses in DPU mode
+  - 5e23296 2023-07-24T19:31:42+02:00 ovn-ic: node update missing static routes (try 2)
+  - c00f6be 2023-07-24T19:31:42+02:00 gh workflow test: save ovn dbs when e2e-dual-conversion fails
+  - 96f1d50 2023-07-21T20:44:22+00:00 Put chatty logs on a diet
+  - fa9028b 2023-07-21T16:46:54+02:00 kubevirtl: Replace node only at migration tests
+  - 6dc5c86 2023-07-21T09:34:36+05:30 Fix ovnkube-trace for dual stack cluster
+  - 519b875 2023-07-21T09:34:36+05:30 Install python3-pip for ovn-detrace command
+  - 0370da1 2023-07-21T09:34:26+05:30 Collect ovn trace on remote node
+  - e66372f 2023-07-21T09:03:10+05:30 Enhance ovnkube-trace for ovn interconnect
+  - ab5722d 2023-07-20T13:46:31+00:00 Bump google.golang.org/grpc from 1.49.0 to 1.53.0 in /go-controller
 
