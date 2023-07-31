@@ -1,3 +1,3 @@
-# service-ca-operator image-arm64 1b89fdce3fcccecdc5fdb705fe674cd4bfc58a2a to 5984aac13df6c2f4440c67a1a14d32958bce9ec3
-dc83cc9b5fc197fab15388973df9d9a6b50ff5d8 2023-07-27T11:12:39+02:00 go.mod 1.18 -> 1.19, make update-gofmt
-c96897f89cb02bca63b9b79abe709d652f8db3e9 2022-12-07T20:19:52+00:00 Updating ose-service-ca-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-service-ca-operator.yml
+# oc image-arm64 e561d37285c8bde273ce00d086bea599a9cdd3be to e251b5ebd2466adde7b395bf3ab515b8f6cd0c84
+523502d468fd2241dc3e4271a86911df65f37d17 2023-07-11T18:24:20+00:00 MCO cert: update root-ca configmap if on BareMetal
+cda58a5c453f7def7fb8b71f064228fd8793dc35 2023-07-11T18:24:20+00:00 mcs cert: account for environments that use IP directly
