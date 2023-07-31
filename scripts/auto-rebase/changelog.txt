@@ -1,9 +1,6 @@
-# machine-config-operator embedded-component 01f999aa710dd62d43bee8cf1e2ca6a226c7dce3 to 05dd21653075fa389e62d64eba191a502c4ffd66
-3c7bf7f429bb385b50baf5134f031bae5fcf0168 2023-07-25T17:35:50-04:00 daemon: Remove unused code
-49f1e7fef5ee6fd2ca78d4e4d91a0635c7ed19c0 2023-07-25T15:08:52+00:00 OCPBUGS-12951: daemon: Don't traverse `/run/ostree/auth.json` symlink
-# oc image-arm64 ea7c11aac7fa39d9eb733b62251ee1bc4a242c99 to 49844f7424dd87611bf5f7caea3ec854240b6150
-165a015364acd5bee5147efafb3e0d1fe77a50c7 2023-07-13T18:33:00+00:00 reboot: set ignition version to 3.1
-# ovn-kubernetes image-arm64 41c329ec50ce02d4e0ca1dcde1fdc2c9592ebf90 to 70d15f04e3bfede87710b8a923a36534ffdf604d
-56972eb3f9912d062300f0ba6648bc35015a5d45 2023-07-07T12:32:39+02:00 fix egressfirewall unit tests, introduced https://github.com/openshift/ovn-kubernetes/pull/1733
-97791cafca6efe6faa27237f0386cf21d4d7d473 2023-07-07T12:22:11+02:00 Fix egressFirewall cleanup on failed Add. Return nil instead of error when egressFirewall is not found on delete.
-be3df1da432ff5eed99ddd637ffb4797ecb47fb9 2023-06-30T12:40:52+00:00 ovnkube-master pod failed to reconnect to ovn db due to ssl expire
+# ovn-kubernetes image-amd64 70d15f04e3bfede87710b8a923a36534ffdf604d to f704c408df54f6e7f98832a7599654f6164d600d
+80dc930e4bc44256a017849762bf6c5f949209fb 2023-07-18T17:41:46+02:00 Support AllocateLoadBalancerNodePortsFalse
+7d35642a980a3363f876d219dccb63a0883bb270 2023-07-18T17:07:03+02:00 Fix pointer issues in gateway code
+# ovn-kubernetes image-arm64 70d15f04e3bfede87710b8a923a36534ffdf604d to f704c408df54f6e7f98832a7599654f6164d600d
+80dc930e4bc44256a017849762bf6c5f949209fb 2023-07-18T17:41:46+02:00 Support AllocateLoadBalancerNodePortsFalse
+7d35642a980a3363f876d219dccb63a0883bb270 2023-07-18T17:07:03+02:00 Fix pointer issues in gateway code
