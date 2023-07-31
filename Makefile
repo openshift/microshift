@@ -36,13 +36,20 @@ CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
 CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 ARCH :=$(shell uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
-IPTABLES :=nft
-PULLSECRET :=~/.pull-secret.json
-AUTHORIZED_KEYS :=$(PROJECT_DIR)/authorized_keys
-IMAGE_BUILDER_ARGS := -pull_secret_file $(PULLSECRET)
-ifneq ("$(wildcard $(AUTHORIZED_KEYS))","")
-	IMAGE_BUILDER_ARGS := $(IMAGE_BUILDER_ARGS) -authorized_keys_file $(AUTHORIZED_KEYS)
+# Image builder arguments can be overriden from the environment:
+# - PULLSECRET: path to a pull secret file
+# - AUTHORIZED_KEYS: path to an SSH authorized keys file
+# - IMAGE_BUILDER_ARGS: any build.sh script options
+PULLSECRET ?= ~/.pull-secret.json
+BASE_IMAGE_BUILDER_ARGS := -pull_secret_file $(PULLSECRET)
+ifdef IMAGE_BUILDER_ARGS
+    BASE_IMAGE_BUILDER_ARGS += $(IMAGE_BUILDER_ARGS)
 endif
+AUTHORIZED_KEYS ?= $(HOME)/.ssh/authorized_keys
+ifneq ("$(wildcard $(AUTHORIZED_KEYS))","")
+    BASE_IMAGE_BUILDER_ARGS += -authorized_keys_file $(AUTHORIZED_KEYS)
+endif
+IMAGE_BUILDER_ARGS = $(BASE_IMAGE_BUILDER_ARGS)
 
 # restrict included verify-* targets to only process project files
 GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
