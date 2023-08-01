@@ -60,7 +60,7 @@ ssh-copy-id -f microshift@${VMIPADDR}
 
 scp ./scripts/devenv-builder/configure-vm.sh microshift@${VMIPADDR}:
 scp ~/.pull-secret.json microshift@${VMIPADDR}:
-ssh microshift@${VMIPADDR} "~/configure-vm.sh ~/.pull-secret.json"
+ssh -t microshift@${VMIPADDR} "~/configure-vm.sh ~/.pull-secret.json"
 ```
 
 > The script prompts for Red Hat subscription credentials if the system has not
