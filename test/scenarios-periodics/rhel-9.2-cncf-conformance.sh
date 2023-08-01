@@ -39,7 +39,7 @@ run_sonobuoy() {
     oc adm policy add-scc-to-group privileged system:authenticated system:serviceaccounts
     oc adm policy add-scc-to-group anyuid     system:authenticated system:serviceaccounts
 
-    go install github.com/vmware-tanzu/sonobuoy@latest
+    go install github.com/vmware-tanzu/sonobuoy@v0.56.16
     ~/go/bin/sonobuoy run \
       --mode=certified-conformance \
       --dns-namespace=openshift-dns \
@@ -56,23 +56,25 @@ run_sonobuoy() {
     done
     ${WAIT_FAILURE} && exit 1
 
-    # Wait until test complete (exit as soon as one of the tests failed)
-    TEST_FAILURE=false
-    while [ "$(~/go/bin/sonobuoy status --json | jq -r '.status')" = "running" ] ; do
+    while [ $(~/go/bin/sonobuoy status --json | jq -r '.status') = "running" ] ; do
         ~/go/bin/sonobuoy status --json | jq '.plugins[] | select(.plugin=="e2e") | .progress'
-        if [ "$(~/go/bin/sonobuoy status --json | jq -r '.plugins[] | select(.plugin=="e2e") | .progress.failed')" != "null" ] ; then
-            TEST_FAILURE=true
-            break
-        fi
         sleep 60
     done
-    ${TEST_FAILURE} && exit 1
 
+    while [ $(~/go/bin/sonobuoy status --json | jq -r '."tar-info".name') == "" ] ; do
+        echo "Waiting for results availability"
+        sleep 10
+    done
     RESULTS_DIR=$(mktemp -d -p /tmp)
     ~/go/bin/sonobuoy retrieve "${RESULTS_DIR}" -f results.tar.gz
     tar xf "${RESULTS_DIR}/results.tar.gz" -C "${RESULTS_DIR}"
     cp "${RESULTS_DIR}/plugins/e2e/results/global/junit_01.xml" "${SCENARIO_INFO_DIR}/${SCENARIO}/"
     rm -r "${RESULTS_DIR}"
+
+    if [ $(~/go/bin/sonobuoy status --json | jq -r '.plugins[] | select(.plugin=="e2e") | .progress.failed') != "null" ] ; then
+        echo "Test was finished with errors. Check junit"
+        exit 1
+    fi
 }
 
 scenario_create_vms() {
