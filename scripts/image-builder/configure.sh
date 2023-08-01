@@ -25,9 +25,14 @@ mkdir "${TEST_FILE}.dir"
 HOME_PERM=$(stat -c 0%a ~)
 FILE_PERM=$(stat -c 0%a "${TEST_FILE}.file")
 DIR_PERM=$(stat -c 0%a "${TEST_FILE}.dir")
-rm -rf "${TEST_FILE}"*
 
-if [ "${HOME_PERM}" -lt 0755 ] || [ "${FILE_PERM}" -lt 0644 ] || [ "${DIR_PERM}" -lt 0755 ] ; then
-    echo "Check home directory permissions and umask. The settings must allow read to group and others"
+# Set the Correct Permissions for osbuild-composer
+[ "${HOME_PERM}" -lt 0711 ]  && chmod go+x ~
+
+if [ "${FILE_PERM}" -lt 0644 ] || [ "${DIR_PERM}" -lt 0711 ] ; then
+    echo "Check ${TEST_FILE}.dir permissions. The umask setting must allow execute to group/others"
+    echo "Check ${TEST_FILE}.file permissions. The umask setting must allow read to group/others"    
     exit 1
 fi
+
+rm -rf "${TEST_FILE}"*
