@@ -233,11 +233,19 @@ def check_for_new_releases(url_base, release_type, version):
     Checks the latest RPMs for a given release type and version,
     and returns a Release instance for any that don't exist.
     """
-    # Get the list of the latest RPMs for the release type and vbersion.
-    rpm_list_url = f"{url_base}/{release_type}/{version}/el9/os/rpm_list"
-    print(f"\nFetching {rpm_list_url} ...")
-    with request.urlopen(rpm_list_url) as rpm_list_response:
-        rpm_list = rpm_list_response.read().decode("utf-8").splitlines()
+    # Get the list of the latest RPMs for the release type and
+    # version. Different versions use different "os name" components
+    # in the path.
+    for os_name in ['el9', 'elrhel-9']:
+        rpm_list_url = f"{url_base}/{release_type}/{version}/{os_name}/os/rpm_list"
+        print(f"\nFetching {rpm_list_url} ...")
+        try:
+            with request.urlopen(rpm_list_url) as rpm_list_response:
+                rpm_list = rpm_list_response.read().decode("utf-8").splitlines()
+        except Exception as err:
+            print(err)
+        else:
+            break
 
     # Look for the RPM for MicroShift itself, with a name like
     #
