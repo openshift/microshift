@@ -20,8 +20,8 @@ ${TOO_NEW_MICROSHIFT_REF}       ${EMPTY}
 
 *** Test Cases ***
 Upgrading MicroShift By Two Minor Versions Is Blocked
-    [Documentation]    Test verifies if attempt to upgrade MicroShift from
-    ...    X.Y-1 to X.Y+1 is blocked (skipping current X.Y).
+    [Documentation]    Test verifies if attempt to upgrade MicroShift
+    ...    by two minor versions is blocked.
 
     Wait For Healthy System
     ${initial_deploy_backup}=    Get Future Backup Name For Current Boot
@@ -31,6 +31,7 @@ Upgrading MicroShift By Two Minor Versions Is Blocked
     Wait For Healthy System
     Backup Should Exist    ${initial_deploy_backup}
     Journal Should Have Information About Failed Version Comparison
+    Journal Should Have Information That MicroShift Skipped Restoring
 
 
 *** Keywords ***
@@ -43,3 +44,27 @@ Setup
 Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
+
+Journal Should Have Information That MicroShift Skipped Restoring
+    [Documentation]    TODO
+
+    ${stdout}    ${rc}=    Execute Command
+    ...    journalctl --unit=microshift | grep "Starting restore"
+    ...    sudo=True
+    ...    return_stdout=True
+    ...    return_rc=True
+
+    # String should not be found
+    Should Be Equal As Integers    1    ${rc}
+
+    ${version}=    MicroShift Version
+    IF    ${version.minor} == 13    RETURN
+
+    ${stdout}    ${rc}=    Execute Command
+    ...    journalctl --unit=microshift | grep "Skipping restore - data directory already matches backup to restore"
+    ...    sudo=True
+    ...    return_stdout=True
+    ...    return_rc=True
+
+    Log Many    ${stdout}    ${rc}
+    Should Be Equal As Integers    0    ${rc}

@@ -1,0 +1,47 @@
+name = "rhel-9.2-microshift-source-fake-yplus2-minor"
+description = "A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the current+2 y-stream."
+version = "0.0.1"
+modules = []
+groups = []
+distro = "rhel-92"
+
+[[packages]]
+name = "microshift"
+version = "4.${FAKE_YPLUS2_MINOR_VERSION}.*"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "4.${FAKE_YPLUS2_MINOR_VERSION}.*"
+
+[[packages]]
+name = "microshift-networking"
+version = "4.${FAKE_YPLUS2_MINOR_VERSION}.*"
+
+[[packages]]
+name = "microshift-selinux"
+version = "4.${FAKE_YPLUS2_MINOR_VERSION}.*"
+
+[[packages]]
+name = "microshift-test-agent"
+version = "*"
+
+[customizations.services]
+enabled = ["microshift", "microshift-test-agent"]
+
+[customizations.firewall]
+ports = [
+    "22:tcp",
+    "80:tcp",
+    "443:tcp",
+    "5353:udp",
+    "6443:tcp",
+    "30000-32767:tcp",
+    "30000-32767:udp",
+]
+
+[customizations.firewall.services]
+enabled = ["mdns", "ssh", "http", "https"]
+
+[[customizations.firewall.zones]]
+name = "trusted"
+sources = ["10.42.0.0/16", "169.254.169.1"]
