@@ -14,10 +14,7 @@ if [ ! -d "${RF_VENV}" ]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 fi
 
-# Set up the scenario sources
-[[ -z "${PERIODICS}" ]] && SCENARIO_SOURCES="scenarios/*.sh" || SCENARIO_SOURCES="scenarios/periodics/*.sh"
-
-for scenario in ${SCENARIO_SOURCES}; do
+for scenario in ${SCENARIO_SOURCES}/*.sh; do
     scenario_name="$(basename "${scenario}" .sh)"
     logfile="${SCENARIO_INFO_DIR}/${scenario_name}/run.log"
     mkdir -p "$(dirname "${logfile}")"

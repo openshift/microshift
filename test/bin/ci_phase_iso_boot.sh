@@ -27,11 +27,8 @@ bash -x ./bin/start_webserver.sh
 # Set up the storage pool for VMs
 bash -x ./bin/manage_vm_storage_pool.sh create
 
-# Set up the scenario sources
-[[ -z "${PERIODICS}" ]] && SCENARIO_SOURCES="scenarios/*.sh" || SCENARIO_SOURCES="scenarios/periodics/*.sh"
-
 # Build all of the needed VMs
-for scenario in ${SCENARIO_SOURCES}; do
+for scenario in ${SCENARIO_SOURCES}/*.sh; do
     scenario_name=$(basename "${scenario}" .sh)
     logfile="${SCENARIO_INFO_DIR}/${scenario_name}/boot.log"
     mkdir -p "$(dirname "${logfile}")"

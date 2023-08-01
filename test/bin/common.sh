@@ -59,6 +59,11 @@ MAIN_REPO="${IMAGEDIR}/rpm-repos/microshift-main"
 # shellcheck disable=SC2034  # used elsewhere
 SCENARIO_INFO_DIR="${SCENARIO_INFO_DIR:-${IMAGEDIR}/scenario-info}"
 
+# Directory to crawl for scenarios when creating/running in batch mode.
+#
+# The CI system will override this depending on the job its running.
+SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
+
 # The location of the robot framework virtualenv.
 # The CI system will override this.
 # shellcheck disable=SC2034  # used elsewhere
