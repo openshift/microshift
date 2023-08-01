@@ -39,9 +39,9 @@ run_sonobuoy() {
 
     go install github.com/vmware-tanzu/sonobuoy@latest
     ~/go/bin/sonobuoy run \
-     --mode=certified-conformance \
-     --dns-namespace=openshift-dns \
-     --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default
+      --mode=certified-conformance \
+      --dns-namespace=openshift-dns \
+      --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default
 
     # Wait for up to 1m until tests start
     WAIT_FAILURE=true
@@ -65,6 +65,12 @@ run_sonobuoy() {
         sleep 60
     done
     ${TEST_FAILURE} && exit 1
+
+    RESULTS_DIR=$(mktemp -d -p /tmp)
+    ~/go/bin/sonobuoy retrieve "${RESULTS_DIR}" -f results.tar.gz
+    tar xf "${RESULTS_DIR}/results.tar.gz" -C "${RESULTS_DIR}"
+    cp "${RESULTS_DIR}/plugins/e2e/results/global/junit_01.xml" "${SCENARIO_INFO_DIR}/${SCENARIO}/"
+    rm -r "${RESULTS_DIR}"
 }
 
 scenario_create_vms() {
