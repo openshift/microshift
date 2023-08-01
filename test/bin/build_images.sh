@@ -174,6 +174,8 @@ do_group() {
 
     echo "Downloading build logs, metadata, and image"
     cd "${IMAGEDIR}/builds"
+
+    failed_builds=()
     # shellcheck disable=SC2231  # allow glob expansion without quotes in for loop
     for buildid in ${buildid_list}; do
         # shellcheck disable=SC2086  # pass glob args without quotes
@@ -193,6 +195,7 @@ do_group() {
         # is not finished (failed, canceled, etc.).
         status=$(sudo composer-cli compose status | grep "${buildid}" | awk '{print $2}')
         if [ "${status}" != "FINISHED" ]; then
+            failed_builds+=("${buildid}")
             sudo composer-cli compose info "${buildid}"
             continue
         fi
@@ -215,6 +218,13 @@ do_group() {
             echo "Do not know how to handle build ${build_name}"
         fi
     done
+
+    # Exit the function on build errors
+    if [ ${#failed_builds[@]} -ne 0 ] ; then
+        echo "Error: check the failed build jobs"
+        echo "${failed_builds[@]}"
+        return 1
+    fi
 
     for alias_file in "${groupdir}"/*.alias; do
         alias_name=$(basename "${alias_file}" .alias)

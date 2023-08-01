@@ -10,6 +10,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 echo "Starting web server in ${IMAGEDIR}"
+mkdir -p "${IMAGEDIR}"
 cd "${IMAGEDIR}"
 
 pkill caddy || true

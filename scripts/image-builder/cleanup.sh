@@ -55,14 +55,26 @@ sudo composer-cli sources delete openshift-local  2>/dev/null || true
 sudo composer-cli sources delete microshift-local 2>/dev/null || true
 
 if [ "${FULL_CLEAN}" = 1 ] ; then
-    title "Clean up user cache"
+    title "Cleaning up user cache"
     rm -rf ~/.cache 2>/dev/null || true
     sudo rm -rf /tmp/containers/* 2>/dev/null || true
 fi
 
-title "Clean osbuild worker cache"
-sudo systemctl stop --now osbuild-composer.socket osbuild-composer.service osbuild-worker@1.service
+title "Stopping osbuild services"
+sudo systemctl stop --now osbuild-composer.socket osbuild-composer.service 
+for n in $(seq 100) ; do
+    worker=osbuild-worker@${n}.service
+    if sudo systemctl status "${worker}" &>/dev/null ; then
+        sudo systemctl stop --now "osbuild-worker@${n}.service"
+    else
+        break
+    fi
+done
+
+title "Cleaning osbuild worker cache"
 sleep 5
 sudo rm -rf /var/cache/osbuild-worker/* /var/lib/osbuild-composer/*
+
+title "Starting osbuild services"
 sudo systemctl start osbuild-composer.socket
-sudo systemctl start "osbuild-worker@1.service"
+sudo systemctl start osbuild-worker@1.service
