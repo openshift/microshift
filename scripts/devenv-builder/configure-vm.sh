@@ -81,7 +81,7 @@ echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}"
 # Check the subscription status and register if necessary
 if ${RHEL_SUBSCRIPTION}; then
     if ! sudo subscription-manager status >&/dev/null; then
-        sudo subscription-manager register
+        sudo subscription-manager register --auto-attach
     fi
 
     if ${SET_RHEL_RELEASE}; then
