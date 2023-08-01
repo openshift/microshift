@@ -33,6 +33,10 @@ RPM_SOURCE="${ROOTDIR}/_output/rpmbuild"
 # shellcheck disable=SC2034  # used elsewhere
 NEXT_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-fake-next-minor"
 
+# Location of RPMs built from source
+# shellcheck disable=SC2034  # used elsewhere
+MAIN_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-main"
+
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
 LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
@@ -40,6 +44,10 @@ LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
 NEXT_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-next-minor"
+
+# Location of local repository used by composer
+# shellcheck disable=SC2034  # used elsewhere
+MAIN_REPO="${IMAGEDIR}/rpm-repos/microshift-main"
 
 # Location of data files created by the tools for managing scenarios
 # as they are run.

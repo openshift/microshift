@@ -23,10 +23,12 @@ configure_package_sources() {
     export UNAME_M
     export LOCAL_REPO              # defined in common.sh
     export NEXT_REPO               # defined in common.sh
+    export MAIN_REPO               # defined in common.sh
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
     export MINOR_VERSION
     export PREVIOUS_MINOR_VERSION
+    export SOURCE_VERSION_MAIN
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -288,10 +290,16 @@ if [ -z "${release_info_rpm}" ]; then
     error "Failed to find microshift-release-info RPM in ${LOCAL_REPO}"
     exit 1
 fi
+release_info_rpm_main=$(find "${MAIN_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
+if [ -z "${release_info_rpm_main}" ]; then
+    error "Failed to find microshift-release-info RPM in ${MAIN_REPO}"
+    exit 1
+fi
 SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
 MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
 PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
+SOURCE_VERSION_MAIN=$(rpm -q --queryformat '%{version}' "${release_info_rpm_main}")
 
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"

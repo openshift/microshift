@@ -23,7 +23,7 @@ EOF
 }
 
 action_create() {
-    if ! sudo virsh pool-info "${VM_STORAGE_POOL}"; then
+    if ! sudo virsh pool-info "${VM_STORAGE_POOL}" &>/dev/null; then
         sudo sh -c '
 virsh pool-define-as '"${VM_STORAGE_POOL}"' dir --target '"${VM_DISK_DIR}"'
 virsh pool-build '"${VM_STORAGE_POOL}"'
