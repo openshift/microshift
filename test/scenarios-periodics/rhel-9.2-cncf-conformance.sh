@@ -2,6 +2,8 @@
 
 # Sourced from cleanup_scenario.sh and uses functions defined there.
 
+KUBECONFIG="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
+
 prepare_hosts() {
     local primary_host_ip
     primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/public_ip")
@@ -27,8 +29,8 @@ prepare_hosts() {
     scp -P "${secondary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-sec.sh" "redhat@${secondary_host_ip}":
     ssh -p "${secondary_host_ssh_port}" "redhat@${secondary_host_ip}" ./configure-sec.sh "${primary_host_name}" "${primary_host_ip}" "${secondary_host_name}" "${secondary_host_ip}"
 
-    export KUBECONFIG=$(mktemp /tmp/microshift-kubeconfig.XXXXXXXXXX)
     scp -P "${primary_host_ssh_port}" "redhat@${primary_host_ip}":/home/redhat/kubeconfig-"${primary_host_name}" "${KUBECONFIG}"
+    export KUBECONFIG="${KUBECONFIG}"
     echo "${primary_host_ip} ${primary_host_name}" | sudo tee -a /etc/hosts &>/dev/null
 }
 
