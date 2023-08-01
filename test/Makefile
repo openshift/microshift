@@ -20,16 +20,14 @@ fake-yplus2-minor-rpm:
 	RPMBUILD_DIR=$(RPMBUILD_DIR) \
 		$(MAKE) -C $(REPO) rpm
 
-.PHONY: local-main-rpm
-local-main-rpm: TMP_REPO !=mktemp -d
-local-main-rpm: RPMBUILD_DIR :=$(REPO)/_output/rpmbuild-main/
-local-main-rpm: COMMIT !=git rev-parse main
-local-main-rpm:
-	git clone --single-branch --branch main --no-hardlinks "$(REPO)" "$(TMP_REPO)"
-	cd "$(TMP_REPO)" && \
-		MICROSHIFT_VERSION="$(MAJOR).$(MINOR).$(PATCH)-main-$(COMMIT)" \
-		RPMBUILD_DIR="$(RPMBUILD_DIR)"\
-		$(MAKE) rpm
+.PHONY: build-base-branch
+build-base-branch: BASE_BRANCH :=release-$(MAJOR).$(MINOR)
+build-base-branch: TMP_REPO !=mktemp -d
+build-base-branch:
+	if ! [ -d "$(REPO)/_output" ]; then mkdir $(REPO)/_output; fi
+	git clone --no-hardlinks --single-branch --branch $(BASE_BRANCH) "$(REPO)" "$(TMP_REPO)"
+	cd $(TMP_REPO) && $(MAKE) rpm
+	mv $(TMP_REPO)/_output/rpmbuild $(REPO)/_output/rpmbuild-base
 	rm -rf "$(TMP_REPO)"
 
 .PHONY: robotidy

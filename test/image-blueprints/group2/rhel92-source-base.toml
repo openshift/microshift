@@ -1,5 +1,5 @@
-name = "rhel-9.2-microshift-source-main"
-description = "A RHEL 9.2 image with the RPMs built from source from the branch 'main' for the current PR"
+name = "rhel-9.2-microshift-source-base"
+description = "A RHEL 9.2 image with the RPMs built from source from the base release branch"
 version = "0.0.1"
 modules = []
 groups = []
@@ -7,19 +7,19 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "${SOURCE_VERSION_MAIN}"
+version = "${SOURCE_VERSION_BASE}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "${SOURCE_VERSION_MAIN}"
+version = "${SOURCE_VERSION_BASE}"
 
 [[packages]]
 name = "microshift-networking"
-version = "${SOURCE_VERSION_MAIN}"
+version = "${SOURCE_VERSION_BASE}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "${SOURCE_VERSION_MAIN}"
+version = "${SOURCE_VERSION_BASE}"
 
 [[packages]]
 name = "microshift-test-agent"
