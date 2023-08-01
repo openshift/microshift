@@ -37,11 +37,11 @@ function configure_system() {
 
 function configure_microshift() {
     # Clean the current MicroShift configuration and stop the service
-    echo 1 | sudo microshift-cleanup-data --all
+    echo 1 | sudo microshift-cleanup-data --all --keep-images
 
     # Run OVN initialization script
     sleep 5
-    sudo systemctl start microshift-ovs-init.service
+    sudo systemctl start --wait microshift-ovs-init.service
 
     # OVN-K expects br-ex to have IP address assigned, add dummy IP to br-ex.
     if ! ip addr show br-ex 2>/dev/null | grep -q '10.44.0.0/32'; then

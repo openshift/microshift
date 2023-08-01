@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+OC_CMD="sudo -i oc --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
+
 PRI_NODE_HOST=
 PRI_NODE_ADDR=
 SEC_NODE_HOST=
@@ -34,25 +36,33 @@ function configure_system() {
 
 function configure_microshift() {
     # Clean the current MicroShift configuration and stop the service
-    echo 1 | sudo microshift-cleanup-data --all
+    echo 1 | sudo microshift-cleanup-data --all --keep-images
 
     # Run OVN initialization script
     sleep 5
-    sudo systemctl start microshift-ovs-init.service
+    sudo systemctl start --wait microshift-ovs-init.service
 
     # OVN-K expects br-ex to have IP address assigned, add dummy IP to br-ex.
     if ! ip addr show br-ex 2>/dev/null | grep -q '10.44.0.0/32'; then
         sudo ip addr add 10.44.0.0/32 dev br-ex
     fi
 
-    # Stop and unload the kubelet service, cleaning up its old data
+    # Stop and unload the kubelet service
     if [ "$(systemctl is-active kubelet.service)" = "active" ] ; then
         sudo systemctl stop --now kubelet
     fi
     sudo systemctl reset-failed kubelet || true
-    sudo pkill -9 --exact kubelet       || true
-    sudo rm -rf /var/lib/kubelet &> /dev/null || true
-
+    # Make sure the kubelet process is terminated
+    sudo pkill -9 --exact kubelet || true
+    until ! pidof kubelet &>/dev/null ; do
+        sleep 1
+    done
+    # Clean up the old kubelet data
+    for dir in $(mount | awk '{print $3}' | grep ^/var/lib/kubelet/) ; do
+        sudo umount "${dir}"
+    done
+    sudo rm -rf /var/lib/kubelet
+    # Remove the kubelet service unit
     sudo find /run/systemd -name kubelet.service -exec rm -f {} \;
     sudo systemctl daemon-reload
 }
@@ -109,6 +119,49 @@ EOF
         --cluster-domain=cluster.local
 }
 
+function configure_node() {
+    local service_ready=false
+
+    echo "Waiting for MicroShift nodes to be ready"
+    for _ in $(seq 300) ; do
+        if ${OC_CMD} wait --for=condition=Ready nodes "${PRI_NODE_HOST}" --timeout=0s &>/dev/null ; then
+            if ${OC_CMD} wait --for=condition=Ready nodes "${SEC_NODE_HOST}" --timeout=0s &>/dev/null ; then
+                service_ready=true
+                break
+            fi
+        fi
+        echo -n "."
+        sleep 1
+    done
+    echo
+
+    if ! ${service_ready} ; then
+        echo "Error: timed out waiting for MicroShift nodes to be ready"
+        exit 1
+    fi
+
+    # Labeling the second node as a worker
+    ${OC_CMD} label nodes "${SEC_NODE_HOST}" node-role.kubernetes.io/worker=
+}
+
+function wait_all_pods_ready() {
+    # shellcheck source=packaging/greenboot/functions.sh
+    source /usr/share/microshift/functions/greenboot.sh
+
+    local -r PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system)
+    local -r PODS_CT_LIST=(3                        1                    1                 4             3                 2)
+    local -r WAIT_TIMEOUT_SECS=300
+
+    # Wait for MicroShift core pods to enter ready state
+    for i in "${!PODS_NS_LIST[@]}"; do
+        local CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
+        local CHECK_PODS_CT=${PODS_CT_LIST[${i}]}
+
+        echo "Waiting ${WAIT_TIMEOUT_SECS}s for ${CHECK_PODS_CT} pod(s) from the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
+        wait_for "${WAIT_TIMEOUT_SECS}" namespace_pods_ready
+    done
+}
+
 #
 # Main function
 #
@@ -137,6 +190,12 @@ configure_microshift
 
 # Configure kubelet for the multinode environment
 configure_kubelet
+
+# Configure second node the multinode environment
+configure_node
+
+# Wait for all pods to be ready
+wait_all_pods_ready
 
 echo
 echo "Done"
