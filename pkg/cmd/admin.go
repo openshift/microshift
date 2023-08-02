@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/openshift/microshift/pkg/admin/data"
@@ -11,44 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func backup(cmd *cobra.Command, args []string) error {
-	storage := data.StoragePath(cmd.Flag("storage").Value.String())
-	name := data.BackupName(cmd.Flag("name").Value.String())
-
-	if name == "" {
-		// If backup name is not given by user, construct a "default value".
-		// We cannot do it when creating cobra's flag because reading
-		// /var/lib/microshift/version requires elevated permissions
-		// and it would be poor UX to expect sudo for --help.
-		name = data.BackupName(fmt.Sprintf("%s__%s",
-			prerun.GetVersionStringOfData(),
-			time.Now().UTC().Format("20060102_150405")))
-	}
-
-	dataManager, err := data.NewManager(storage)
-	if err != nil {
-		return err
-	}
-
-	if exists, err := dataManager.BackupExists(name); err != nil {
-		return err
-	} else if exists {
-		return fmt.Errorf("backup %s already exists", dataManager.GetBackupPath(name))
-	}
-
-	return dataManager.Backup(name)
-}
-
-func newAdminDataCommand() *cobra.Command {
-	backup := &cobra.Command{
+func NewBackupCommand() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "backup",
 		Short: "Backup MicroShift data",
-		RunE:  backup,
-	}
-
-	data := &cobra.Command{
-		Use:   "data",
-		Short: "Commands for managing MicroShift data",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if cmd.Flag("storage").Value.String() == "" {
 				return fmt.Errorf("--storage must not be empty")
@@ -60,21 +29,81 @@ func newAdminDataCommand() *cobra.Command {
 
 			return nil
 		},
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			storage := data.StoragePath(cmd.Flag("storage").Value.String())
+			name := data.BackupName(cmd.Flag("name").Value.String())
+
+			if name == "" {
+				// If backup name is not given by user, construct a "default value".
+				// We cannot do it when creating cobra's flag because reading
+				// /var/lib/microshift/version requires elevated permissions
+				// and it would be poor UX to expect sudo for --help.
+				name = data.BackupName(fmt.Sprintf("%s__%s",
+					prerun.GetVersionStringOfData(),
+					time.Now().UTC().Format("20060102_150405")))
+			}
+
+			dataManager, err := data.NewManager(storage)
+			if err != nil {
+				return err
+			}
+
+			if exists, err := dataManager.BackupExists(name); err != nil {
+				return err
+			} else if exists {
+				return fmt.Errorf("backup %q already exists", dataManager.GetBackupPath(name))
+			}
+
+			return dataManager.Backup(name)
+		},
 	}
 
-	data.PersistentFlags().String("name", "",
+	cmd.PersistentFlags().String("name", "",
 		"Backup name (if not provided, name is based on version of MicroShift data directory and current date and time)")
-	data.PersistentFlags().String("storage", config.BackupsDir, "Directory with backups")
+	cmd.PersistentFlags().String("storage", config.BackupsDir, "Directory with backups")
 
-	data.AddCommand(backup)
-	return data
+	return cmd
 }
 
-func NewAdminCommand() *cobra.Command {
+func NewRestoreCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "admin",
-		Short: "Commands for managing MicroShift",
+		Use:   "restore backup-path",
+		Short: "Restore MicroShift data from a backup",
+		Args:  cobra.ExactArgs(1),
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := data.MicroShiftIsNotRunning(); err != nil {
+				return fmt.Errorf("microshift must not be running: %w", err)
+			}
+			return nil
+		},
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// Remove trailing slash (/) so filepath.Dir gives us parent dir path.
+			// Otherwise, it would return the same path we got from a user.
+			path, _ := strings.CutSuffix(args[0], string(os.PathSeparator))
+			storage := data.StoragePath(filepath.Dir(path))
+			name := data.BackupName(filepath.Base(path))
+
+			if storage == "" || name == "" {
+				return fmt.Errorf("unexpected problem when parsing given path (%q)"+
+					" after transformation (%q)"+
+					" - storage (%q) or name (%q) is empty",
+					args[0], path, storage, name)
+			}
+
+			dataManager, err := data.NewManager(storage)
+			if err != nil {
+				return err
+			}
+
+			// TODO: Verify content of provided path
+			// Check if provided path points to a directory that is really
+			// a backup of MicroShift's data.
+
+			return dataManager.Restore(name)
+		},
 	}
-	cmd.AddCommand(newAdminDataCommand())
+
 	return cmd
 }

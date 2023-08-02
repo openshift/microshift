@@ -38,6 +38,7 @@ func newCommand() *cobra.Command {
 	cmd.AddCommand(cmds.NewRunMicroshiftCommand())
 	cmd.AddCommand(cmds.NewVersionCommand(ioStreams))
 	cmd.AddCommand(cmds.NewShowConfigCommand(ioStreams))
-	cmd.AddCommand(cmds.NewAdminCommand())
+	cmd.AddCommand(cmds.NewBackupCommand())
+	cmd.AddCommand(cmds.NewRestoreCommand())
 	return cmd
 }
