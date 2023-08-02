@@ -90,7 +90,8 @@ func getRollbackDeploymentID() (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("could not find rollback deployment in %#v", deployments)
+	// missing rollback deployment is valid scenario
+	return "", nil
 }
 
 func getAllDeploymentIDs() ([]string, error) {
