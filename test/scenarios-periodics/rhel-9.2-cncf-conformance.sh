@@ -4,7 +4,8 @@
 
 KUBECONFIG="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
 # Timeout in seconds
-TIMEOUT=3600
+TIMEOUT_TEST=3600
+TIMEOUT_RESULTS=300
 
 prepare_hosts() {
     local -r primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/public_ip")
@@ -46,7 +47,7 @@ run_sonobuoy() {
     # Wait for up to 5m until tests start
     WAIT_FAILURE=true
     for _ in $(seq 1 150) ; do
-        if ~/go/bin/sonobuoy status --json | jq '.status' &>/dev/null ; then
+        if [ "$(~/go/bin/sonobuoy status --json | jq -r '.status')" = "running" ]; then
             WAIT_FAILURE=false
             break
         fi
@@ -61,7 +62,7 @@ run_sonobuoy() {
     start=$(date +%s)
     while [ "$(~/go/bin/sonobuoy status --json | jq -r '.status')" = "running" ] ; do
         now=$(date +%s)
-        if [ $(( now - start )) -ge ${TIMEOUT} ]; then
+        if [ $(( now - start )) -ge ${TIMEOUT_TEST} ]; then
             echo "Tests running for 1h. Timing out"
             break
         fi
@@ -69,8 +70,14 @@ run_sonobuoy() {
         sleep 60
     done
 
+    start=$(date +%s)
     # shellcheck disable=SC2046  # Jq is unable to process escaped quotes
     while [ $(~/go/bin/sonobuoy status --json | jq -r '."tar-info".name') == "" ] ; do
+        now=$(date +%s)
+        if [ $(( now - start )) -ge ${TIMEOUT_RESULTS} ]; then
+            echo "Waited for results for 5m. Timing out"
+            break
+        fi
         echo "Waiting for results availability"
         sleep 10
     done
