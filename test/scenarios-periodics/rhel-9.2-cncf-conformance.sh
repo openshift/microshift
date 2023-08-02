@@ -3,6 +3,8 @@
 # Sourced from cleanup_scenario.sh and uses functions defined there.
 
 KUBECONFIG="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
+# Timeout in seconds
+TIMEOUT=3600
 
 prepare_hosts() {
     local -r primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/public_ip")
@@ -41,18 +43,28 @@ run_sonobuoy() {
         --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default \
         --e2e-parallel=y | oc apply -f -
 
-    # Wait for up to 1m until tests start
+    # Wait for up to 5m until tests start
     WAIT_FAILURE=true
-    for _ in $(seq 1 30) ; do
+    for _ in $(seq 1 150) ; do
         if ~/go/bin/sonobuoy status --json | jq '.status' &>/dev/null ; then
             WAIT_FAILURE=false
             break
         fi
         sleep 2
     done
-    ${WAIT_FAILURE} && exit 1
+    if ${WAIT_FAILURE}; then
+        echo "Failed to start tests after 5m"
+        exit 1
+    fi
 
+    # Use 1h timeout. A normal run on 2 CPUs takes 40-45min.
+    start=$(date +%s)
     while [ "$(~/go/bin/sonobuoy status --json | jq -r '.status')" = "running" ] ; do
+        now=$(date +%s)
+        if [ $(( now - start )) -ge ${TIMEOUT} ]; then
+            echo "Tests running for 1h. Timing out"
+            break
+        fi
         ~/go/bin/sonobuoy status --json | jq '.plugins[] | select(.plugin=="e2e") | .progress'
         sleep 60
     done
