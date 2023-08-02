@@ -1,3 +1,2 @@
-# oc image-arm64 e561d37285c8bde273ce00d086bea599a9cdd3be to e251b5ebd2466adde7b395bf3ab515b8f6cd0c84
-523502d468fd2241dc3e4271a86911df65f37d17 2023-07-11T18:24:20+00:00 MCO cert: update root-ca configmap if on BareMetal
-cda58a5c453f7def7fb8b71f064228fd8793dc35 2023-07-11T18:24:20+00:00 mcs cert: account for environments that use IP directly
+# ovn-kubernetes image-arm64 bedda0d806c2f1f54148d8d6cd1955e0f688bd84 to a7e2297982559407ccf93a76da1e5549e0dd8eb5
+6a6f4e5e69a850313fccfea2ed17e90cf609b1be 2023-07-31T16:09:19+00:00 Bump OVN to 23.06-23.06.0-51
