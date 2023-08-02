@@ -213,7 +213,7 @@ if echo "$@" | grep -q all; then
 else
     for arg in "$@"; do
         if ! echo "${tool_getters}" | grep -q "${arg}" || [ "$(echo "${tool_getters}" | grep "${arg}")" != "${arg}" ]; then
-            usage "Unknown tool: ${arg}"
+            usage "Unknown tool: \"${arg}\""
         fi
         tools_to_install+=("${arg}")
     done

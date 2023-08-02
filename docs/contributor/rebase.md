@@ -43,25 +43,27 @@ Finally. git clone your personal fork of microshift and `cd` into it.
 
 The Logical Volume Manager Service is not integrated with the ocp release image and must be passed explicitly to the rebase script as its 4th argument (including the sub-command). Images can be found at [Red Hat Container Catalog](https://catalog.redhat.com/software/containers/lvms4/lvms-operator-bundle/63972de4d8764b33ec4dbf79?tag=v4.12.0-4&architecture=amd64&push_date=1673885582000&container-tabs=gti).
 
-### Fully automatic rebasing
+### Fully automatic rebasing of OCP components
 
-The following command attempts a fully automatic rebase to a given target upstream release. It is what is run nighly from CI and should work for most cases within a z-stream. It creates a new branch named after the target release, then runs the individual steps described in the following sections, including creating the respective commits.
+The following command attempts a fully automatic rebase to a given target upstream OpenShift release. It is what is run nighly from CI and should work for most cases within a z-stream. It creates a new branch named after the target release, then runs the individual steps described in the following sections, including creating the respective commits.
 
 ```shell
-./scripts/auto-rebase/rebase.sh to quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64 registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]
+./scripts/auto-rebase/rebase.sh to quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64
 ```
 
-### Downloading the target OpenShift release
+### Manual rebasing of OCP components
+
+#### Downloading the target OpenShift release
 
 Run the following to download the OpenShift release to rebase to, specifying the target release images for _both_ Intel and Arm architectures, e.g.:
 
 ```shell
-./scripts/auto-rebase/rebase.sh download quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64 registry.redhat.io/lvms4/lvms-operator-bundle:v4.12
+./scripts/auto-rebase/rebase.sh download quay.io/openshift-release-dev/ocp-release:4.10.25-x86_64 quay.io/openshift-release-dev/ocp-release:4.10.25-aarch64
 ```
 
 This will create a directory `_output/staging`, download the specified release images' metadata (`release_{amd64,arm64}.json`) and manifests, git-clone (only) the repos of the embedded components and the operators of the loaded components, and check out the commit used by that OpenShift release.
 
-### Updating the changelog
+#### Updating the changelog
 
 The rebase process tracks the git commits used for the embedded code and images to build a changelog of the updates in each rebase. Having the changelog in the pull request makes it easier for reviewers to understand what changes are being pulled in as part of the rebase.
 
@@ -69,7 +71,7 @@ The rebase process tracks the git commits used for the embedded code and images 
 ./scripts/auto-rebase/rebase.sh changelog
 ```
 
-### Rebasing the go.mod file and vendoring
+#### Rebasing the go.mod file and vendoring
 
 In MicroShift's `go.mod` file, we only explicitly add the `require` directives needed by MicroShift itself (marked with the comment `// microshift`) whereas we let `go mod tidy` figure out the direct and indirect requirements for the embedded components. For the rebase, the focus is therefore on the `replace` directives.
 
@@ -105,7 +107,7 @@ git add vendor
 git commit -m "update vendoring"
 ```
 
-### Rebasing the hosted component images
+#### Rebasing the hosted component images
 
 To update the image references for the hosted components of the MicroShift release (incl. the pause image for CRI-O), run:
 
@@ -136,7 +138,7 @@ Each step consistes of zero or more transformations. These transformations shoul
 
 The step isn't automated at all yet, which is to compare whether the config parameters of embedded components changed, for example the kubelet configuration in `writeConfig(...)` of `pkg/node/kubelet.go` with OpenShift MCO's template (which the `rebase.sh` script downloads into `_output/staging/machine-config-operator/templates/master/01-master-kubelet/_base/files/kubelet.yaml`).
 
-### Rebasing the build files
+#### Rebasing the build files
 
 The final step is to update build files like the `Makefiles`, `Dockerfiles`, `.spec` etc.
 
@@ -158,6 +160,46 @@ Commit the changes:
 ```shell
 git add Makefile* packaging
 git commit -m "update buildfiles"
+```
+
+### Fully Automated Update of LVMS
+
+The following command attempts a fully automatic rebase to a given target LVMS release.  It creates a new branch named after the LVMS release, then runs the individual steps described in the following sections, including creating the respective commits.
+
+```shell
+./scripts/auto-rebase/rebase.sh lvms-to registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]
+```
+
+### Manual Update of LVMS
+
+#### Downloading the target LVMS release
+
+Run the following to download the LVMS release to update to, specifying the multi-arch target release image, e.g.:
+
+```shell
+./scripts/auto-rebase/rebase.sh lvms-download registry.redhat.io/lvms4/lvms-operator-bundle:v4.12
+```
+
+This will create a directory `_output/staging`, download the operator bundle for the specified LVMS release.
+
+#### Updating the LVMS component images
+
+To update the image references for LVMS, run:
+
+```shell
+./scripts/auto-rebase/rebase.sh lvms-images
+git add pkg/release
+git commit -m "update LVMS images"
+```
+
+#### Updating the LVMS manifests
+
+To update the manifests for LVMS, run:
+
+```shell
+./scripts/auto-rebase/rebase.sh lvms-manifests
+git add assets
+git commit -m "update LVMS manifests"
 ```
 
 ## Rebasing a Community OKD Release

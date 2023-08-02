@@ -40,8 +40,6 @@ cluster-csi-snapshot-controller-operator"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
-LVMS_RELEASE_MULTI_ARCH="registry.access.redhat.com/lvms4/lvms-operator-bundle:v4.13.1-5"
-
 title() {
     echo -e "\E[34m$1\E[00m";
 }
@@ -107,7 +105,6 @@ download_lvms_operator_bundle_manifest(){
 
         local csv="lvms-operator.clusterserviceversion.yaml"
         local namespace="openshift-storage"
-        title "extracting lvms clusterserviceversion.yaml into separate RBAC"
         extract_lvms_rbac_from_cluster_service_version ${PWD} ${csv} ${namespace}
 
         popd || return 1
@@ -159,6 +156,8 @@ write_lvms_images_for_arch(){
 }
 
 update_lvms_images(){
+    title "Updating LVMS images"
+
     local workdir="$STAGING_DIR/lvms"
     [ -d "$workdir" ] || {
         >&2 echo 'lvms staging dir not found, aborting image update'
@@ -172,8 +171,15 @@ update_lvms_images(){
 }
 
 update_lvms_manifests() {
-    title "Modifying LVMS manifests"
+    title "Copying LVMS manifests"
 
+    local workdir="$STAGING_DIR/lvms"
+    [ -d "$workdir" ] || {
+        >&2 echo 'lvms staging dir not found, aborting asset update'
+        return 1
+    }
+
+    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/lvms_assets.yaml"
 }
 
 
@@ -186,37 +192,39 @@ extract_lvms_rbac_from_cluster_service_version() {
   local csv="$2"
   local namespace="$3"
 
+  title "extracting lvms clusterserviceversion.yaml into separate RBAC"
+
   local clusterPermissions=($(yq eval '.spec.install.spec.clusterPermissions[].serviceAccountName' < "${csv}"))
   for service_account_name in "${clusterPermissions[@]}"; do
-    title "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
+    echo "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
 
     local clusterrole="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-    title "generating ${clusterrole}"
+    echo "generating ${clusterrole}"
     extract_lvms_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
 
     local clusterrolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-    title "generating ${clusterrolebinding}"
+    echo "generating ${clusterrolebinding}"
     extract_lvms_clusterrolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${clusterrolebinding}"
 
     local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
-    title "generating ${service_account}"
+    echo "generating ${service_account}"
     extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
   done
 
   local permissions=($(yq eval '.spec.install.spec.permissions[].serviceAccountName' < "${csv}"))
   for service_account_name in "${permissions[@]}"; do
-    title "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
+    echo "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
 
     local role="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_role.yaml"
-    title "generating ${role}"
+    echo "generating ${role}"
     extract_lvms_role_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${csv}" "${role}"
 
     local rolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_rolebinding.yaml"
-    title "generating ${rolebinding}"
+    echo "generating ${rolebinding}"
     extract_lvms_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
 
     local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
-    title "generating ${service_account}"
+    echo "generating ${service_account}"
     extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
   done
 }
@@ -784,7 +792,7 @@ copy_manifests() {
         exit 1
     fi
     title "Copying manifests"
-    "$REPOROOT/scripts/auto-rebase/handle_assets.py"
+    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets.yaml"
 }
 
 
@@ -1065,15 +1073,13 @@ update_changelog() {
 }
 
 
-# Runs each rebase step in sequence, commiting the step's output to git
+# Runs each OCP rebase step in sequence, commiting the step's output to git
 rebase_to() {
     local release_image_amd64=$1
     local release_image_arm64=$2
-    local lvms_operator_bundle_manifest="$3"
 
-    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64} with LVMS bundle ${lvms_operator_bundle_manifest}"
+    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
     download_release "${release_image_amd64}" "${release_image_arm64}"
-    download_lvms_operator_bundle_manifest "$lvms_operator_bundle_manifest"
 
     ver_stream="$(cat ${STAGING_DIR}/release_amd64.json | jq -r '.config.config.Labels["io.openshift.release"]')"
     amd64_date="$(cat ${STAGING_DIR}/release_amd64.json | jq -r .config.created | cut -f1 -dT)"
@@ -1107,7 +1113,6 @@ rebase_to() {
     done
 
     update_images
-    update_lvms_images
     if [[ -n "$(git status -s pkg/release packaging/crio.conf.d)" ]]; then
         title "## Committing changes to pkg/release"
         git add pkg/release
@@ -1119,7 +1124,6 @@ rebase_to() {
 
     copy_manifests
     update_openshift_manifests
-    update_lvms_manifests
     if [[ -n "$(git status -s assets)" ]]; then
         title "## Committing changes to assets and pkg/assets"
         git add assets pkg/assets
@@ -1141,6 +1145,63 @@ rebase_to() {
     rm -rf "${STAGING_DIR}"
 }
 
+update_last_lvms_rebase() {
+    local lvms_operator_bundle_manifest="$1"
+
+    title "## Updating last_lvms_rebase.sh"
+
+    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_lvms_rebase.sh"
+
+    rm -f "${last_rebase_script}"
+    cat - >"${last_rebase_script}" <<EOF
+#!/bin/bash -x
+./scripts/auto-rebase/rebase.sh lvms-to "${lvms_operator_bundle_manifest}"
+EOF
+    chmod +x "${last_rebase_script}"
+
+    (cd "${REPOROOT}" && \
+         test -n "$(git status -s scripts/auto-rebase/last_lvms_rebase.sh)" && \
+         title "## Committing changes to last_lvms_rebase.sh" && \
+         git add scripts/auto-rebase/last_lvms_rebase.sh && \
+         git commit -m "update last_lvms_rebase.sh" || true)
+}
+
+# Runs each LVMS rebase step in sequence, commiting the step's output to git
+rebase_lvms_to() {
+    local lvms_operator_bundle_manifest="$1"
+
+    title "# Rebasing LVMS to ${lvms_operator_bundle_manifest}"
+
+    download_lvms_operator_bundle_manifest "${lvms_operator_bundle_manifest}"
+
+    # LVMS image names may include `/` and `:`, which make messy branch names.
+    rebase_branch="rebase-lvms-${lvms_operator_bundle_manifest//[:\/]/-}"
+    git branch -D "${rebase_branch}" || true
+    git checkout -b "${rebase_branch}"
+
+    update_last_lvms_rebase "${lvms_operator_bundle_manifest}"
+
+    update_lvms_images
+    if [[ -n "$(git status -s pkg/release)" ]]; then
+        title "## Committing changes to pkg/release"
+        git add pkg/release
+        git commit -m "update LVMS images"
+    else
+        echo "No changes in LVMS images."
+    fi
+
+    update_lvms_manifests
+    if [[ -n "$(git status -s assets)" ]]; then
+        title "## Committing changes to assets and pkg/assets"
+        git add assets pkg/assets
+        git commit -m "update LVMS manifests"
+    else
+        echo "No changes to LVMS assets."
+    fi
+
+    title "# Removing staging directory"
+    rm -rf "${STAGING_DIR}"
+}
 
 usage() {
     echo "Usage:"
@@ -1161,13 +1222,12 @@ case "$command" in
     to)
         # FIXME: Allow more than 3 arguments until pipelines stop passing LVMS value.
         [[ $# -lt 3 ]] && usage
-        rebase_to "$2" "$3" "${LVMS_RELEASE_MULTI_ARCH}"
+        rebase_to "$2" "$3"
         ;;
     download)
         # FIXME: Allow more than 3 arguments until pipelines stop passing LVMS value.
         [[ $# -lt 3 ]] && usage
         download_release "$2" "$3"
-        download_lvms_operator_bundle_manifest "${LVMS_RELEASE_MULTI_ARCH}"
         ;;
     changelog) update_changelog;;
     buildfiles) update_buildfiles;;
@@ -1175,11 +1235,21 @@ case "$command" in
     generated-apis) regenerate_openapi;;
     images)
         update_images
-        update_lvms_images
         ;;
     manifests)
         copy_manifests
         update_openshift_manifests
+        ;;
+    lvms-to)
+        rebase_lvms_to "$2"
+        ;;
+    lvms-download)
+        download_lvms_operator_bundle_manifest "$2"
+        ;;
+    lvms-images)
+        update_lvms_images
+        ;;
+    lvms-manifests)
         update_lvms_manifests
         ;;
     *) usage;;

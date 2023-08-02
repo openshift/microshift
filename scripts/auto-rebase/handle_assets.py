@@ -6,6 +6,7 @@ The recipe specifies what files and directories should be copied, ignored, and r
 File: handle_assets.py
 """
 
+import argparse
 import logging
 import os
 import shutil
@@ -132,6 +133,11 @@ def handle_dir(dir_, dst_dir="", src_prefix=""):
 
 def main():
     """Main function for handling assets based on the recipe file."""
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("asset_file", action="store")
+    args = parser.parse_args()
+
     if not os.path.isdir(ASSETS_DIR):
         logging.error(f"Expected to run in root directory of microshift repository but was in {os.getcwd()}")
         sys.exit(1)
@@ -140,8 +146,7 @@ def main():
         logging.error(f"{STAGING_DIR} does not exist")
         sys.exit(1)
 
-    recipe_filepath = "./scripts/auto-rebase/assets.yaml"
-    with open(recipe_filepath, encoding='utf-8') as recipe_file:
+    with open(args.asset_file, encoding='utf-8') as recipe_file:
         recipe = yaml.load(recipe_file.read(), Loader=Loader)
 
     for asset in recipe['assets']:
