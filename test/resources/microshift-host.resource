@@ -69,3 +69,10 @@ Delete Thin Storage Pool
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
+
+Is System OSTree
+    [Documentation]    Returns true if system is ostree-based.
+
+    ${rc}=    Execute Command    stat /run/ostree-booted
+    ...    sudo=True    return_stderr=False    return_stdout=False    return_rc=True
+    IF    ${rc} == 0    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}

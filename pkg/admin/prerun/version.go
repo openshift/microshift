@@ -24,7 +24,6 @@ var (
 // CheckAndUpdateDataVersion checks version compatibility between data and executable,
 // and updates data version
 func CheckAndUpdateDataVersion() error {
-	// Q: Should we use separate version schema for ostree and non-ostree?
 	currentDeploymentID := ""
 	isOstree, err := util.PathExists("/run/ostree-booted")
 	if err != nil {
@@ -89,7 +88,7 @@ func CheckAndUpdateDataVersion() error {
 
 type versionFile struct {
 	Version      versionMetadata `json:"version"`
-	DeploymentID string          `json:"deployment_id"`
+	DeploymentID string          `json:"deployment_id,omitempty"`
 	BootID       string          `json:"boot_id"`
 }
 
