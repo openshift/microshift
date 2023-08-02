@@ -10,17 +10,17 @@ import (
 	"k8s.io/klog/v2"
 )
 
-type BackupManager struct {
+type DataManager struct {
 	dataManager data.Manager
 }
 
-func NewBackupManager(dataManager data.Manager) *BackupManager {
-	return &BackupManager{
+func NewDataManager(dataManager data.Manager) *DataManager {
+	return &DataManager{
 		dataManager: dataManager,
 	}
 }
 
-func (pr *BackupManager) Run() error {
+func (pr *DataManager) Run() error {
 	klog.InfoS("Starting pre-run")
 	defer klog.InfoS("Pre-run complete")
 
@@ -121,7 +121,7 @@ func (pr *BackupManager) Run() error {
 
 // regularPrerun performs actions in prerun flow that is most expected in day to day usage
 // (i.e. data, version metadata, and health information exist)
-func (pr *BackupManager) regularPrerun() error {
+func (pr *DataManager) regularPrerun() error {
 	health, err := getHealthInfo()
 	if err != nil {
 		return fmt.Errorf("failed to determine the current system health: %w", err)
@@ -174,7 +174,7 @@ func (pr *BackupManager) regularPrerun() error {
 	return nil
 }
 
-func (pr *BackupManager) backup413() error {
+func (pr *DataManager) backup413() error {
 	backupName := data.BackupName("4.13")
 
 	// If 4.13 backup already exists: remove old and make a new one.
@@ -227,7 +227,7 @@ func (pr *BackupManager) backup413() error {
 //   - try to restore a backup for current deployment (if exists), or
 //   - proceed with fresh start if "healthy" was persisted (nothing to back up)
 //     or backup does not exists (nothing to restore)
-func (pr *BackupManager) missingDataExistingHealth() error {
+func (pr *DataManager) missingDataExistingHealth() error {
 	health, err := getHealthInfo()
 	if err != nil {
 		return fmt.Errorf("failed to determine the current system health: %w", err)
@@ -264,7 +264,7 @@ func (pr *BackupManager) missingDataExistingHealth() error {
 	return nil
 }
 
-func (pr *BackupManager) backup(health *HealthInfo) error {
+func (pr *DataManager) backup(health *HealthInfo) error {
 	newBackupName := health.BackupName()
 	klog.InfoS("Preparing to backup",
 		"deploymentID", health.DeploymentID,
@@ -302,7 +302,7 @@ func (pr *BackupManager) backup(health *HealthInfo) error {
 	return nil
 }
 
-func (pr *BackupManager) handleUnhealthy(health *HealthInfo) error {
+func (pr *DataManager) handleUnhealthy(health *HealthInfo) error {
 	// TODO: Check if containers are already running (i.e. microshift.service was restarted)?
 	klog.Info("Handling previously unhealthy system")
 
@@ -381,7 +381,7 @@ func (pr *BackupManager) handleUnhealthy(health *HealthInfo) error {
 	return pr.dataManager.RemoveData()
 }
 
-func (pr *BackupManager) handleDeploymentSwitch(currentDeploymentID string) error {
+func (pr *DataManager) handleDeploymentSwitch(currentDeploymentID string) error {
 	// System booted into different deployment
 	// It might be a rollback (restore existing backup), or
 	// it might be a newly staged one (continue start up)
@@ -408,7 +408,7 @@ func (pr *BackupManager) handleDeploymentSwitch(currentDeploymentID string) erro
 	return nil
 }
 
-func (pr *BackupManager) removeBackupsWithoutExistingDeployments(backups Backups) error {
+func (pr *DataManager) removeBackupsWithoutExistingDeployments(backups Backups) error {
 	deployments, err := getAllDeploymentIDs()
 	if err != nil {
 		return err
