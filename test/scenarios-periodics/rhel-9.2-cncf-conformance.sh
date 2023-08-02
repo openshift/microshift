@@ -5,31 +5,26 @@
 KUBECONFIG="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
 
 prepare_hosts() {
-    local primary_host_ip
-    primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/public_ip")
-    local secondary_host_ip
-    secondary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/public_ip")
-    local primary_host_ssh_port
-    primary_host_ssh_port=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/ssh_port")
-    local secondary_host_ssh_port
-    secondary_host_ssh_port=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/ssh_port")
-    local primary_host_name
-    primary_host_name="$(full_vm_name host1)"
-    local secondary_host_name
-    secondary_host_name="$(full_vm_name host2)"
+    local -r primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/public_ip")
+    local -r secondary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/public_ip")
+    local -r primary_host_ssh_port=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/ssh_port")
+    local -r secondary_host_ssh_port=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/ssh_port")
+    local -r primary_host_name="$(full_vm_name host1)"
+    local -r secondary_host_name="$(full_vm_name host2)"
 
     scp -P "${primary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-pri.sh" "redhat@${primary_host_ip}":
     ssh -p "${primary_host_ssh_port}" "redhat@${primary_host_ip}" ./configure-pri.sh "${primary_host_name}" "${primary_host_ip}" "${secondary_host_name}" "${secondary_host_ip}"
 
     scp -3 -P "${primary_host_ssh_port}" \
-        "redhat@${primary_host_ip}":/home/redhat/kubelet-"${secondary_host_name}".{key,crt} \
-        "redhat@${primary_host_ip}":/home/redhat/kubeconfig-"${primary_host_name}" \
+        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.key" \
+        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.crt" \
+        "redhat@${primary_host_ip}:/home/redhat/kubeconfig-${primary_host_name}" \
         "redhat@${secondary_host_ip}":
 
     scp -P "${secondary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-sec.sh" "redhat@${secondary_host_ip}":
     ssh -p "${secondary_host_ssh_port}" "redhat@${secondary_host_ip}" ./configure-sec.sh "${primary_host_name}" "${primary_host_ip}" "${secondary_host_name}" "${secondary_host_ip}"
 
-    scp -P "${primary_host_ssh_port}" "redhat@${primary_host_ip}":/home/redhat/kubeconfig-"${primary_host_name}" "${KUBECONFIG}"
+    scp -P "${primary_host_ssh_port}" "redhat@${primary_host_ip}:/home/redhat/kubeconfig-${primary_host_name}" "${KUBECONFIG}"
     export KUBECONFIG="${KUBECONFIG}"
     echo "${primary_host_ip} ${primary_host_name}" | sudo tee -a /etc/hosts &>/dev/null
 }
@@ -57,11 +52,12 @@ run_sonobuoy() {
     done
     ${WAIT_FAILURE} && exit 1
 
-    while [ $(~/go/bin/sonobuoy status --json | jq -r '.status') = "running" ] ; do
+    while [ "$(~/go/bin/sonobuoy status --json | jq -r '.status')" = "running" ] ; do
         ~/go/bin/sonobuoy status --json | jq '.plugins[] | select(.plugin=="e2e") | .progress'
         sleep 60
     done
 
+    # shellcheck disable=SC2046  # Jq is unable to process escaped quotes
     while [ $(~/go/bin/sonobuoy status --json | jq -r '."tar-info".name') == "" ] ; do
         echo "Waiting for results availability"
         sleep 10
@@ -72,7 +68,7 @@ run_sonobuoy() {
     cp "${RESULTS_DIR}/plugins/e2e/results/global/junit_01.xml" "${SCENARIO_INFO_DIR}/${SCENARIO}/"
     rm -r "${RESULTS_DIR}"
 
-    if [ $(~/go/bin/sonobuoy status --json | jq -r '.plugins[] | select(.plugin=="e2e") | .progress.failed') != "null" ] ; then
+    if [ "$(~/go/bin/sonobuoy status --json | jq -r '.plugins[] | select(.plugin=="e2e") | .progress.failed')" != "null" ] ; then
         echo "Test was finished with errors. Check junit"
         exit 1
     fi
