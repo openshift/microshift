@@ -14,5 +14,6 @@ scenario_remove_vms() {
 scenario_run_tests() {
     run_tests host1 \
         --variable "FAILING_REF:rhel-9.2-microshift-source-aux" \
+        --variable "REASON:prevent_backup" \
         suites-ostree/failed-upgrade.robot
 }
