@@ -21,6 +21,9 @@ make rpm
 title "Building fake next minor version"
 make -C test/ fake-next-minor-rpm
 
+title "Building fake next next minor version"
+make -C test/ fake-yplus2-minor-rpm
+
 # Build RPMs from main:HEAD of this repo.  These RPMs are useful in providing a layer to upgrade from.
 title "Building from main branch"
 make -C test/ local-main-rpm

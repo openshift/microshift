@@ -1,6 +1,7 @@
 package prerun
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -57,4 +58,23 @@ func TestCheckVersionDiff(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestVersionFileSerialization(t *testing.T) {
+	expected := `{"version":"4.14.0","deployment_id":"deploy-id","boot_id":"b-id"}`
+
+	v := versionFile{
+		Version:      versionMetadata{Major: 4, Minor: 14, Patch: 0},
+		DeploymentID: "deploy-id",
+		BootID:       "b-id",
+	}
+
+	serialized, err := json.Marshal(v)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(serialized))
+
+	deserialized := &versionFile{}
+	err = json.Unmarshal(serialized, deserialized)
+	assert.NoError(t, err)
+	assert.Equal(t, v, *deserialized)
 }

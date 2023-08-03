@@ -2,6 +2,7 @@ package prerun
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
@@ -257,7 +258,7 @@ func (pr *PreRun) missingDataExistingHealth() error {
 		return nil
 	}
 
-	if err := pr.dataManager.Restore(backup); err != nil {
+	if err := pr.restore(backup); err != nil {
 		return fmt.Errorf("failed to restore backup: %w", err)
 	}
 	return nil
@@ -317,7 +318,7 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 
 	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 	if backup != "" {
-		err = pr.dataManager.Restore(backup)
+		err = pr.restore(backup)
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
@@ -364,7 +365,7 @@ func (pr *PreRun) handleUnhealthy(health *HealthInfo) error {
 		// Let's restore it and act like it's first boot of newly staged deployment
 		klog.InfoS("Restoring backup for a rollback deployment to perform migration and try starting again",
 			"backup-name", rollbackBackup)
-		if err := pr.dataManager.Restore(rollbackBackup); err != nil {
+		if err := pr.restore(rollbackBackup); err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
 		return nil
@@ -394,7 +395,7 @@ func (pr *PreRun) handleDeploymentSwitch(currentDeploymentID string) error {
 	if backup != "" {
 		klog.Info("Backup exists for current deployment - restoring")
 
-		err = pr.dataManager.Restore(backup)
+		err = pr.restore(backup)
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
@@ -417,6 +418,38 @@ func (pr *PreRun) removeBackupsWithoutExistingDeployments(backups Backups) error
 	klog.InfoS("Removing backups for no longer existing deployments",
 		"backups-to-remove", toRemove)
 	toRemove.removeAll(pr.dataManager)
+
+	return nil
+}
+
+func (pr *PreRun) restore(backup data.BackupName) error {
+	versionFile, err := getVersionFile()
+	if err == nil {
+		// `version` was successfully read, so we can compare
+		// with deployment and boot IDs extracted from backup's name
+
+		// deployment ID is not enough on its own in scenario:
+		// - first boot is okay, admin reboots the machine
+		// - second boot is unhealthy, admin reboots the machine
+		// - third boot should restore backup of data from #1 boot,
+		//   but it would not, because the deployment ID didn't change
+
+		deploy, boot := func() (string, string) {
+			spl := strings.Split(string(backup), "_")
+			return spl[0], spl[1]
+		}()
+
+		if versionFile.DeploymentID == deploy && versionFile.BootID == boot {
+			klog.InfoS("Skipping restore - data directory already matches backup to restore",
+				"backup-name", backup,
+				"version", versionFile)
+			return nil
+		}
+	}
+
+	if err := pr.dataManager.Restore(backup); err != nil {
+		return fmt.Errorf("failed to restore backup: %w", err)
+	}
 
 	return nil
 }

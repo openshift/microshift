@@ -24,8 +24,10 @@ configure_package_sources() {
     export LOCAL_REPO              # defined in common.sh
     export NEXT_REPO               # defined in common.sh
     export MAIN_REPO               # defined in common.sh
+    export YPLUS2_REPO             # defined in common.sh
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
+    export FAKE_YPLUS2_MINOR_VERSION
     export MINOR_VERSION
     export PREVIOUS_MINOR_VERSION
     export SOURCE_VERSION_MAIN
@@ -382,6 +384,7 @@ SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
 MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
 PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
+FAKE_YPLUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" + 2 ))
 SOURCE_VERSION_MAIN=$(rpm -q --queryformat '%{version}' "${release_info_rpm_main}")
 
 mkdir -p "${IMAGEDIR}"

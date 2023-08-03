@@ -47,7 +47,17 @@ Metadata File Contents
     ${contents}=    Execute Command
     ...    cat /var/lib/microshift/version
     ...    sudo=True    return_rc=False
-    Should Be Equal    ${contents}    ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+
+    ${is_ostree}=    Is System OSTree
+    IF    ${is_ostree}
+        ${expected}=    Set Variable
+        ...    {"version":"${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}","deployment_id":"*","boot_id":"*"}
+    ELSE
+        ${expected}=    Set Variable
+        ...    {"version":"${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}","boot_id":"*"}
+    END
+
+    Should Match    ${contents}    ${expected}
 
 
 *** Keywords ***

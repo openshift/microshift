@@ -1,14 +1,22 @@
 REPO := $(shell git rev-parse --show-toplevel)
 include $(REPO)/Makefile
 
-RPMBUILD_DIR := $(REPO)/_output/rpmbuild-fake-next-minor/
-
 NEXT_MINOR = $(shell expr $(MINOR) + 1)
+YPLUS2_MINOR = $(shell expr $(MINOR) + 2)
 
 .PHONY: fake-next-minor-rpm
+fake-next-minor-rpm: RPMBUILD_DIR := $(REPO)/_output/rpmbuild-fake-next-minor/
 fake-next-minor-rpm:
 	rm -rf $(RPMBUILD_DIR)
 	MICROSHIFT_VERSION="$(MAJOR).$(NEXT_MINOR).$(PATCH)_fake_next_minor" \
+	RPMBUILD_DIR=$(RPMBUILD_DIR) \
+		$(MAKE) -C $(REPO) rpm
+
+.PHONY: fake-yplus2-minor-rpm
+fake-yplus2-minor-rpm: RPMBUILD_DIR := $(REPO)/_output/rpmbuild-fake-yplus2-minor/
+fake-yplus2-minor-rpm:
+	rm -rf $(RPMBUILD_DIR)
+	MICROSHIFT_VERSION="$(MAJOR).$(YPLUS2_MINOR).$(PATCH)_fake_YPLUS2_minor" \
 	RPMBUILD_DIR=$(RPMBUILD_DIR) \
 		$(MAKE) -C $(REPO) rpm
 

@@ -35,6 +35,10 @@ NEXT_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-fake-next-minor"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
+YPLUS2_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-fake-yplus2-minor"
+
+# Location of RPMs built from source
+# shellcheck disable=SC2034  # used elsewhere
 MAIN_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-main"
 
 # Location of local repository used by composer
@@ -44,6 +48,10 @@ LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
 NEXT_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-next-minor"
+
+# Location of local repository used by composer
+# shellcheck disable=SC2034  # used elsewhere
+YPLUS2_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-yplus2-minor"
 
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere

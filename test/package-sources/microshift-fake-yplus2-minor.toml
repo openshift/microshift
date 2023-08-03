@@ -1,0 +1,7 @@
+id = "microshift-fake-yplus2-minor"
+name = "MicroShift Fake Y+2 Minor Version Repo"
+type = "yum-baseurl"
+url = "file://${YPLUS2_REPO}/"
+check_gpg = false
+check_ssl = false
+system = false

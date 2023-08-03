@@ -176,6 +176,7 @@ rhel92.toml | group1 | rhel-9.2 | A simple RHEL image without MicroShift.
 rhel92-microshift-previous-minor.toml | group2 | rhel-9.2-microshift-4.13 | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
 rhel92-source.toml | group2 | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
 rhel92-source-fake-next-minor.toml | group2 | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
+rhel92-source-fake-yplus2-minor.toml | group2 | rhel-9.2-microshift-4.16 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the current+2 y-stream.
 
 #### Blueprint Naming
 
