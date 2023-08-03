@@ -27,11 +27,16 @@ First Failed Staged Upgrade Should Restore Backup
     ${initial_backup}=    Get Future Backup Name For Current Boot
 
     TestAgent.Add Action For Next Deployment    1    fail_greenboot
-    Deploy Commit Not Expecting A Rollback    ${TARGET_REF}
+
+    # We don't expect a rollback here since after the first failure
+    # things should continue as desired. This test validates the
+    # restore function is working when the first boot is unhealthy.
+    Deploy Commit Not Expecting A Rollback    ${TARGET_REF}    ${TRUE}
 
     Wait For Healthy System
 
-    Validate Backup    ${initial_backup}
+    Validate Backup Is Restored    ${initial_backup}
+    Expected Boot Count    3
 
 
 *** Keywords ***
@@ -46,14 +51,29 @@ Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
 
-Validate Backup
+Validate Backup Is Restored
     [Documentation]    Validate that the desired backup exists and is the only one that exists
-    [Arguments]    ${initial_backup}
+    [Arguments]    ${backup_name}
 
-    Backup Should Exist    ${initial_backup}
+    Backup Should Exist    ${backup_name}
 
     ${stdout}    ${rc}=    Execute Command
     ...    cd ${BACKUP_STORAGE} && ls -d1 rhel-*
     ...    sudo=False    return_rc=True
 
-    Should Be Equal As Strings    ${stdout}    ${initial_backup}
+    ${grep_stdout}    ${grep_rc}=    Execute Command
+    ...    journalctl -u microshift.service | grep "Starting restore"
+    ...    sudo=True    return_rc=True
+
+    Should Be Equal As Strings    ${stdout}    ${backup_name}
+    Should Be Equal As Integers    0    ${grep_rc}
+
+Expected Boot Count
+    [Documentation]    Validate that the host rebooted only the specified number of times
+    [Arguments]    ${reboot_count}
+
+    ${stdout}    ${rc}=    Execute Command
+    ...    sudo journalctl --list-boots --quiet | wc -l
+    ...    sudo=True    return_rc=True
+
+    Should Be Equal As Integers    ${reboot_count}    ${stdout}
