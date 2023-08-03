@@ -1,3 +1,40 @@
-- machine-config-operator embedded-component 8e61b30333898a6e92c4a94f8bd89dc6804392d2 to 6b2fa8dc0973c383c258c0b687d697bd8ebc8826
-  - 4d5f77b5 2023-07-31T08:45:16-03:00 Revert "MCO-565: MCO-568: MCO-659: MCO-660 On-cluster build opt-in function, building machine-os-builder stub, RBAC and service acct inclusions"
+- router image-arm64 6117b7ba414c7073274e2d19c43082031393ccd7 to 8c552ab99d963f25afece3bd71f1ef52872ec22a
+  - 5d327c9 2023-07-31T09:58:39-04:00 OCPBUGS-16623: properly handle weight=0
+
+- kubernetes image-arm64 4aaeaec06c95e0a1a868695792c256d8f0158075 to 2f73c79c97f3e7ab83ba21c84c8343fb57799a22
+  - 658096e4b 2023-07-20T11:07:43-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - c82ea1c3e 2023-07-20T09:49:30-03:00 UPSTREAM: <drop>: manually resolve conflicts
+  - fa3d79901 2023-07-19T12:14:48+00:00 Release commit for Kubernetes v1.27.4
+  - a1b127ca7 2023-07-17T12:26:55+02:00 [release-1.27] releng/go: Bump images, versions and deps to use Go 1.20.6
+  - 1484a5c32 2023-07-13T00:08:19+08:00 Fix the converts an empty string to nil.
+  - 28c79be67 2023-07-10T12:31:07+02:00 Add unit tests for parallel StatefulSet create & delete
+  - 66f980be1 2023-07-10T12:31:07+02:00 Parallel StatefulSet pod create & delete
+  - 288504fbf 2023-07-10T12:31:07+02:00 Refactor StatefulSet controller update logic
+  - 92a0f58e2 2023-07-07T14:31:02-04:00 Only declare job as finished after removing all finalizers
+  - c655001fa 2023-07-06T18:57:02-07:00 Automated cherry pick of #118716 upstream release 1.27 (#118911)
+  - b383755e4 2023-07-06T10:21:55-07:00 Hide numberOfMissedSchedules as an algorithm internal number
+  - 26db84e04 2023-07-06T10:21:43-07:00 Update schedule logic to properly calculate missed schedules
+  - 3c115eec0 2023-07-05T10:44:56-07:00 Automated cherry pick of #118805: test comment should match the code in podgc (#118913)
+  - 39a4cd1a0 2023-07-05T08:18:25+03:00 call ./hack/update-vendor.sh
+  - 33af2a45f 2023-07-05T08:18:20+03:00 kubeadm: remove function pointer comparison in phase test
+  - 3f4643682 2023-07-04T13:26:14+02:00 CHANGELOG-1.27: Add note for AWS in-tree provider removal
+  - 703edddae 2023-07-02T11:17:05+02:00 Updating the nodeAffinity of gated pods having nil affinity should be allowed
+  - 3aa21cec0 2023-06-29T08:25:02-04:00 fix the existing problem (0 SerialNumber in all certificate) as part of this PR in a separate commit
+  - cd08820ba 2023-06-29T08:25:02-04:00 update serial number to a valid non-zero number in ca certificate
+  - 1260b8457 2023-06-28T11:43:24-05:00 Delete CRDs created during field validation tests.
+  - f689046fb 2023-06-28T13:52:09+02:00 kubectl explain should work for both cluster and namespace resources and without a GET method
+  - 59cd1d0b3 2023-06-25T14:15:45+00:00 always execute condition for wait.PollUntilContextTimeout with immediate=true
+  - 5423fffca 2023-06-23T14:37:24-07:00 Review remarks to improve HandlePodCleanups in kubelet
+  - 24c67c152 2023-06-23T14:37:24-07:00 Fix the deletion of rejected pods
+  - 62cf5ee1c 2023-06-22T15:34:22-07:00 Unset gated pod info timestamp in addToActiveQ
+  - 027b4632b 2023-06-21T09:38:30-04:00 deps: Bump to cAdvisor v0.47.2
+  - ea2af58b5 2023-06-15T11:48:03+02:00 Make etcd component status consistent with health probes
+  - f2548642c 2023-06-14T16:47:32+02:00 e2e storage: terminate worker quietly on test completion
+  - 9a001cea2 2023-06-14T16:46:43+02:00 Fix flaky persistent volumes e2e test
+  - eb5825b3a 2023-06-14T14:30:19+02:00 Set the node-ips annotation correctly with CloudDualStackNodeIPs
+  - a2ba2626e 2023-06-14T10:11:21+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.3
+  - 22e8a99ec 2023-05-27T01:01:01+08:00 Fix the git-repo test error caused by the correct use of loop variables
+  - 009a7a6fb 2023-05-26T17:18:07+02:00 dra scheduler plugin test: fix loopvar bug and "reserve" expected data
+  - fbcb7181f 2023-05-11T13:53:30+02:00 Add node check to vSphere cloud provider
+  - 7c07f475f 2023-04-12T08:44:08+05:30 Adding additional validations to queried endpoint list iteration.
 
