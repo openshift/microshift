@@ -321,6 +321,10 @@ providing password-less access to the VMs.
 providing password-less access to the VMs. Set to an empty string to
 use ssh-agent.
 
+`SKIP_SOS` -- Disable sos report collection. This can speed up setup
+in a local environment where sos can be run manually when
+necessary. Do not enable this option in CI.
+
 #### Preparing Storage Pool for VMs
 
 Use `./test/bin/manage_vm_storage_pool.sh` to create the necessary storage

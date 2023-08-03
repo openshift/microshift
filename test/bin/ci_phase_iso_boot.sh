@@ -42,6 +42,8 @@ for job in $(jobs -p) ; do
     wait "${job}" || ((FAIL+=1))
 done
 
+sudo virsh list --all
+
 if [ ${FAIL} -ne 0 ]; then
     echo "Failed to boot all VMs"
     exit 1

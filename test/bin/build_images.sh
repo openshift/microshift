@@ -83,12 +83,69 @@ get_image_parent() {
     fi
 }
 
+start_junit() {
+    local groupdir="$1"
+
+    local group
+    group="$(basename "${groupdir}")"
+
+    mkdir -p "${LOGDIR}/${group}"
+    local outputfile="${LOGDIR}/${group}/junit.xml"
+
+    echo "Creating ${outputfile}"
+
+    cat - >"${outputfile}" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="build-images:${group}" timestamp="$(date --iso-8601=ns)">
+EOF
+}
+
+close_junit() {
+    local groupdir="$1"
+
+    local group
+    group="$(basename "${groupdir}")"
+    local outputfile="${LOGDIR}/${group}/junit.xml"
+
+    echo '</testsuite>' >>"${outputfile}"
+}
+
+record_junit() {
+    local groupdir="$1"
+    local image_reference="$2"
+    local step="$3"
+    local results="$4"
+
+    local group
+    group="$(basename "${groupdir}")"
+    local outputfile="${LOGDIR}/${group}/junit.xml"
+
+    cat - >>"${outputfile}" <<EOF
+<testcase classname="${group} ${image_reference}" name="${step}">
+EOF
+
+    if [ "${results}" != "OK" ]; then
+        cat - >>"${outputfile}" <<EOF
+<failure message="${results}" type="createImageFailure">
+</failure>
+EOF
+    fi
+
+    cat - >>"${outputfile}" <<EOF
+</testcase>
+EOF
+
+}
+
 # Process a set of blueprint templates to create edge commit images
 # for them.
 do_group() {
     local groupdir="$1"
 
     title "Building ${groupdir}"
+
+    start_junit "${groupdir}"
+    trap 'close_junit ${groupdir}' RETURN
 
     local blueprint
     local blueprint_file
@@ -127,8 +184,12 @@ do_group() {
 
         echo "Resolving dependencies for ${blueprint}"
         # shellcheck disable=SC2024  # redirect and sudo
-        sudo composer-cli blueprints depsolve "${blueprint}" \
-             >"${LOGDIR}/${blueprint}-depsolve.log" 2>&1
+        if sudo composer-cli blueprints depsolve "${blueprint}" \
+                >"${LOGDIR}/${blueprint}-depsolve.log" 2>&1; then
+            record_junit "${groupdir}" "${blueprint}" "depsolve" "OK"
+        else
+            record_junit "${groupdir}" "${blueprint}" "depsolve" "FAILED"
+        fi
 
         parent_args=""
         parent=$(get_image_parent "${template}")
@@ -196,6 +257,7 @@ do_group() {
         status=$(sudo composer-cli compose status | grep "${buildid}" | awk '{print $2}')
         if [ "${status}" != "FINISHED" ]; then
             failed_builds+=("${buildid}")
+            record_junit "${groupdir}" "${build_name}" "compose" "${status}"
             sudo composer-cli compose info "${buildid}"
             continue
         fi
@@ -217,6 +279,8 @@ do_group() {
         else
             echo "Do not know how to handle build ${build_name}"
         fi
+
+        record_junit "${groupdir}" "${build_name}" "compose" "OK"
     done
 
     # Exit the function on build errors
@@ -226,13 +290,22 @@ do_group() {
         return 1
     fi
 
+    cd "${IMAGEDIR}"
+    echo "Updating ostree references in ${IMAGEDIR}/repo before adding aliases"
+    ostree summary --update --repo=repo
+    ostree summary --view --repo=repo
+
     for alias_file in "${groupdir}"/*.alias; do
         alias_name=$(basename "${alias_file}" .alias)
         point_to=$(cat "${alias_file}")
         echo "Creating image reference alias ${alias_name} -> ${point_to}"
-        (cd "${IMAGEDIR}" &&
-             ostree refs --repo=repo --force \
-                    --create "${alias_name}" "${point_to}")
+        if (cd "${IMAGEDIR}" &&
+                ostree refs --repo=repo --force \
+                       --create "${alias_name}" "${point_to}"); then
+            record_junit "${groupdir}" "${alias_name}" "alias" "OK"
+        else
+            record_junit "${groupdir}" "${alias_name}" "alias" "FAILED"
+        fi
     done
 
     cd "${IMAGEDIR}"

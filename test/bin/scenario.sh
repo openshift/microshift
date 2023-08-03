@@ -16,6 +16,7 @@ PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=15m
+SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 
 full_vm_name() {
     local base="${1}"
@@ -23,8 +24,16 @@ full_vm_name() {
 }
 
 sos_report() {
+    if "${SKIP_SOS}"; then
+        echo "Skipping sos reports"
+        return
+    fi
     echo "Creating sos reports"
     for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
+        if [ ! -d "${vmdir}" ]; then
+            # skip log files, etc.
+            continue
+        fi
         ip=$(cat "${vmdir}/ip")
         ssh "redhat@${ip}" "sudo sos report --quiet --batch --all-logs --tmp-dir /tmp && sudo chmod +r /tmp/sosreport*"
         mkdir -p "${vmdir}/sos"
@@ -59,6 +68,7 @@ prepare_kickstart() {
     if [ ! -f "${KICKSTART_TEMPLATE_DIR}/${template}" ]; then
         # FIXME: Perhaps we want a default kickstart to reduce duplication?
         error "No ${template} in ${KICKSTART_TEMPLATE_DIR}"
+        record_junit "${vmname}" "prepare_kickstart" "no-template"
         exit 1
     fi
     mkdir -p "$(dirname "${output_file}")"
@@ -72,6 +82,7 @@ prepare_kickstart() {
               -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
               -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
               > "${output_file}"
+    record_junit "${vmname}" "prepare_kickstart" "OK"
 }
 
 # Show the IP address of the VM
@@ -99,6 +110,49 @@ wait_for_greenboot() {
     echo "Waiting ${VM_BOOT_TIMEOUT} for greenboot on ${vmname} to complete"
     timeout "${VM_BOOT_TIMEOUT}" bash -c "until ssh redhat@${ip} \"sudo journalctl -n 5 -u greenboot-healthcheck; sudo systemctl status greenboot-healthcheck | grep 'active (exited)'\"; do date; sleep 10; done"
 }
+
+
+start_junit() {
+    local outputfile="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/junit.xml"
+    mkdir -p "$(dirname "${outputfile}")"
+
+    echo "Creating ${outputfile}"
+
+    cat - >"${outputfile}" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="infrastructure for ${SCENARIO}" timestamp="$(date --iso-8601=ns)">
+EOF
+}
+
+close_junit() {
+    local outputfile="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/junit.xml"
+
+    echo '</testsuite>' >>"${outputfile}"
+}
+
+record_junit() {
+    local vmname="$1"
+    local step="$2"
+    local results="$3"
+
+    local outputfile="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/junit.xml"
+
+    cat - >>"${outputfile}" <<EOF
+<testcase classname="${SCENARIO} ${vmname}" name="${step}">
+EOF
+
+    if [ "${results}" != "OK" ]; then
+        cat - >>"${outputfile}" <<EOF
+<failure message="${results}" type="${step}-failure">
+</failure>
+EOF
+    fi
+
+    cat - >>"${outputfile}" <<EOF
+</testcase>
+EOF
+}
+
 
 # Public function to start a VM.
 #
@@ -134,7 +188,7 @@ launch_vm() {
     # FIXME: variable for vcpus?
     # FIXME: variable for memory?
     # FIXME: variable for ISO
-    timeout "${VM_BOOT_TIMEOUT}" sudo virt-install \
+    if timeout "${VM_BOOT_TIMEOUT}" sudo virt-install \
          --noautoconsole \
          --name "${full_vmname}" \
          --vcpus 2 \
@@ -144,7 +198,12 @@ launch_vm() {
          --events on_reboot=restart \
          --location "${VM_DISK_DIR}/${boot_blueprint}.iso" \
          --extra-args "inst.ks=${kickstart_url}" \
-         --wait
+         --wait; then
+        record_junit "${vmname}" "launch_vm" "OK"
+    else
+        record_junit "${vmname}" "launch_vm" "FAILED"
+        return 1
+    fi
 
     # Wait for an IP to be assigned
     ip=$(get_vm_ip "${full_vmname}")
@@ -154,6 +213,7 @@ launch_vm() {
         ip=$(get_vm_ip "${full_vmname}")
     done
     echo "VM ${full_vmname} has IP ${ip}"
+    record_junit "${vmname}" "ip-assignment" "OK"
 
     # Remove any previous key info for the host
     if [ -f "${HOME}/.ssh/known_hosts" ]; then
@@ -180,8 +240,18 @@ launch_vm() {
         echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
     fi
 
-    wait_for_ssh "${ip}"
-    wait_for_greenboot "${full_vmname}" "${ip}"
+    if wait_for_ssh "${ip}"; then
+        record_junit "${vmname}" "ssh-access" "OK"
+    else
+        record_junit "${vmname}" "ssh-access" "FAILED"
+        return 1
+    fi
+    if wait_for_greenboot "${full_vmname}" "${ip}"; then
+        record_junit "${vmname}" "greenboot-complete" "OK"
+    else
+        record_junit "${vmname}" "greenboot-complete" "FAILED"
+        return 1
+    fi
 
     echo "${full_vmname} is up and ready"
 }
@@ -327,10 +397,28 @@ load_scenario_script() {
 }
 
 action_create() {
-    load_global_settings
-    load_scenario_script
+    start_junit
+    trap close_junit RETURN
+
+    if ! load_global_settings; then
+        record_junit "setup" "load_global_settings" "FAILED"
+        return 1
+    fi
+    record_junit "setup" "load_global_settings" "OK"
+
+    if ! load_scenario_script; then
+        record_junit "setup" "load_scenario_script" "FAILED"
+        return 1
+    fi
+    record_junit "setup" "load_scenario_script" "OK"
+
     trap "sos_report" EXIT
-    scenario_create_vms
+
+    if ! scenario_create_vms; then
+        record_junit "setup" "scenario_create_vms" "FAILED"
+        return 1
+    fi
+    record_junit "setup" "scenario_create_vms" "OK"
 }
 
 action_cleanup() {
@@ -357,6 +445,7 @@ action_login() {
 }
 
 action_run() {
+    load_global_settings
     load_scenario_script
     trap "sos_report" EXIT
     scenario_run_tests
@@ -410,7 +499,6 @@ case "${action}" in
     rerun)
         action_cleanup "$@"
         action_create "$@"
-        "${SCRIPTDIR}/manage_vm_connections.sh" local
         action_run "$@"
         ;;
     *)
