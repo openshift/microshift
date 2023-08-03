@@ -1,0 +1,7 @@
+id = "microshift-latest-ec"
+name = "Latest MicroShift Engineering Candidate"
+type = "yum-baseurl"
+url = "https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp-dev-preview/latest-4.14/elrhel-9/os/"
+check_gpg = false
+check_ssl = true
+system = false
