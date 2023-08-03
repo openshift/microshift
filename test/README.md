@@ -395,7 +395,8 @@ $ ./test/bin/scenario.sh run \
 
 ### Scenario Definitions
 
-Scenarios are saved as shell scripts under `./test/scenarios`.
+Scenarios are saved as shell scripts under `./test/scenarios` and
+`./test/scenarios-periodics`.
 Each scenario includes several functions that are combined
 with the framework scripts to take the specific actions for the
 combination of images and tests that make up the scenario.
@@ -494,10 +495,11 @@ server to host the images.
 ### ci_phase_iso_boot.sh
 
 Runs on the hypervisor. Responsible for launching all of the VMs that
-are used in the test step.
+are used in the test step. Scenarios are taken from `SCENARIO_SOURCES`
+variable, which defaults to `./test/scenarios`.
 
 ### ci_phase_iso_test.sh
 
-Runs on the hypervisor. Responsible for running all of the tests from
-`./test/scenarios`, waiting for them to complete and exiting with an
+Runs on the hypervisor. Responsible for running all of the scenarios from
+`SCENARIO_SOURCES`, waiting for them to complete and exiting with an
 error code if at least one test failed.
