@@ -266,6 +266,9 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
     {changelog}
 
     /label tide/merge-method-squash
+    /label cherry-pick-approved
+    /label backport-risk-assessed
+    /label bugzilla/valid-bug
     """)
     base = template.format(**locals())
     return (base if rebase_script_succeded
@@ -383,7 +386,7 @@ def create_pr_title(branch_name, successful_rebase):
     Given a branch name, creates a pull request title. If the rebase was successful,
     the title is just the branch name, else "**FAILURE**" followed by the branch name.
     """
-    return branch_name if successful_rebase else f"**FAILURE** {branch_name}"
+    return f"NO-ISSUE: {branch_name}" if successful_rebase else f"**FAILURE** {branch_name}"
 
 
 def get_expected_branch_name(amd, arm):
