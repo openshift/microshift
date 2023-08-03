@@ -11,7 +11,7 @@ PODS_CT_LIST=(2                        1                    1                 2 
 source /usr/share/microshift/functions/greenboot.sh
 
 # Set the term handler to convert exit code to 1
-trap 'return_failure' TERM
+trap 'return_failure' TERM SIGINT
 
 # Set the exit handler to log the exit status
 trap 'script_exit' EXIT
@@ -28,7 +28,32 @@ function return_failure() {
 # args: None
 # return: None
 function script_exit() {
-    [ "$?" -ne 0 ] && echo "FAILURE" || echo "FINISHED"
+    if [ "$?" -ne 0 ] ; then
+        print_failure_logs
+        echo "FAILURE"
+    else
+        echo "FINISHED"
+    fi
+}
+
+# Run a command specified in the arguments, redirect its output to a temporary
+# file and add this file to 'LOG_FAILURE_FILES' setting so that is it printed
+# in the logs if the script exits with failure.
+#
+# All the command output including stdout and stderr is redirected to its log file.
+#
+# arg1: A name to be used when creating "/tmp/${name}.XXXXXXXXXX" temporary files
+# arg2: A command to be run
+# return: None
+function log_failure_cmd() {
+    local -r logName="$1"
+    local -r logCmd="$2"
+    local -r logFile=$(mktemp "/tmp/${logName}.XXXXXXXXXX")
+
+    # Run the command ignoring errors and log its output
+    (${logCmd}) &> "${logFile}" || true
+    # Save the log file name in the list to be printed
+    LOG_FAILURE_FILES+=("${logFile}")
 }
 
 # Check the microshift.service systemd unit activity, terminating the script
@@ -42,8 +67,7 @@ function microshift_service_active() {
 
     # Terminate the script in case of a failed service - nothing to wait for
     if [ "${is_failed}" = "failed" ] ; then
-        print_failure_logs
-        echo "The microshift.service systemd unit is failed. Terminating..."
+        echo "Error: The microshift.service systemd unit is failed. Terminating..."
         kill -TERM ${SCRIPT_PID}
     fi
     # Check the service activity
@@ -99,24 +123,47 @@ fi
 # Set the wait timeout for the current check based on the boot counter
 WAIT_TIMEOUT_SECS=$(get_wait_timeout)
 
+# Always log potential MicroShift upgrade errors on failure
+LOG_FAILURE_FILES+=("/var/lib/microshift-backups/prerun_failed.log")
+
 # Wait for MicroShift service to be active (failed status terminates the script)
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for MicroShift service to be active and not failed"
-wait_for "${WAIT_TIMEOUT_SECS}" microshift_service_active
+if ! wait_for "${WAIT_TIMEOUT_SECS}" microshift_service_active ; then
+    echo "Error: Timed out waiting for MicroShift service to be active"
+    exit 1
+fi
 
 # Wait for MicroShift API health endpoints to be OK
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for MicroShift API health endpoints to be OK"
-wait_for "${WAIT_TIMEOUT_SECS}" microshift_health_endpoints_ok
+if ! wait_for "${WAIT_TIMEOUT_SECS}" microshift_health_endpoints_ok ; then
+    log_failure_cmd "health-readyz" "${OCGET_CMD} --raw=/readyz?verbose"
+    log_failure_cmd "health-livez"  "${OCGET_CMD} --raw=/livez?verbose"
+
+    echo "Error: Timed out waiting for MicroShift API health endpoints to be OK"
+    exit 1
+fi
+
+# Starting pod-specific checks
+# Log list of pods and their events on failure
+log_failure_cmd "pod-list" "${OCGET_CMD} pods -A -o wide"
+log_failure_cmd "pod-events" "${OCGET_CMD} events -A"
 
 # Wait for any pods to enter running state
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for any pods to be running"
-wait_for "${WAIT_TIMEOUT_SECS}" any_pods_running
+if ! wait_for "${WAIT_TIMEOUT_SECS}" any_pods_running ; then
+    echo "Error: Timed out waiting for any MicroShift pod to be running"
+    exit 1
+fi
 
 # Wait for MicroShift core pod images to be downloaded
 for i in "${!PODS_NS_LIST[@]}"; do
     CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
 
     echo "Waiting ${WAIT_TIMEOUT_SECS}s for pod image(s) from the '${CHECK_PODS_NS}' namespace to be downloaded"
-    wait_for "${WAIT_TIMEOUT_SECS}" namespace_images_downloaded
+    if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_images_downloaded ; then
+        echo "Error: Timed out waiting for pod image(s) from the '${CHECK_PODS_NS}' namespace to be downloaded"
+        exit 1
+    fi
 done
 
 # Wait for MicroShift core pods to enter ready state
@@ -125,7 +172,10 @@ for i in "${!PODS_NS_LIST[@]}"; do
     CHECK_PODS_CT=${PODS_CT_LIST[${i}]}
 
     echo "Waiting ${WAIT_TIMEOUT_SECS}s for ${CHECK_PODS_CT} pod(s) from the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
-    wait_for "${WAIT_TIMEOUT_SECS}" namespace_pods_ready
+    if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_pods_ready ; then
+        echo "Error: Timed out waiting for ${CHECK_PODS_CT} pod(s) in the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
+        exit 1
+    fi
 done
 
 # Verify that MicroShift core pods are not restarting
@@ -147,7 +197,7 @@ for pid in "${!pid2name[@]}"; do
         check_failed=true
 
         name=${pid2name["${pid}"]}
-        echo "Pod restart count check failed for the '${name}' namespace"
+        echo "Error: Pods are restarting too frequently in the '${name}' namespace"
     fi
 done
 
