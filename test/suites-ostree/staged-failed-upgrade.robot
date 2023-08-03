@@ -61,8 +61,11 @@ Validate Backup Is Restored
     ...    cd ${BACKUP_STORAGE} && ls -d1 rhel-*
     ...    sudo=False    return_rc=True
 
+    ${grep_query}=    Catenate    SEPARATOR=
+    ...    "Restoring backup for a rollback deployment to perform migration and try starting again"
+
     ${grep_stdout}    ${grep_rc}=    Execute Command
-    ...    journalctl -u microshift.service | grep "Starting restore"
+    ...    journalctl -u microshift.service -b0 | grep ${grep_query}
     ...    sudo=True    return_rc=True
 
     Should Be Equal As Strings    ${stdout}    ${backup_name}
