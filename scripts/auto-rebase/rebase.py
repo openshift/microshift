@@ -284,7 +284,7 @@ def try_create_prow_job_url():
 
 
 def create_pr_title(branch_name, successful_rebase):
-    return branch_name if successful_rebase else f"**FAILURE** {branch_name}"
+    return f"NO-ISSUE: {branch_name}" if successful_rebase else f"**FAILURE** {branch_name}"
 
 
 def get_expected_branch_name(amd, arm):
