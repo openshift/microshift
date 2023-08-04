@@ -65,7 +65,7 @@ Validate Backup Is Restored
     ...    "Restoring backup for a rollback deployment to perform migration and try starting again"
 
     ${grep_stdout}    ${grep_rc}=    Execute Command
-    ...    journalctl -u microshift.service -b0 | grep ${grep_query}
+    ...    journalctl -u microshift.service --no-pager -qb0 --grep ${grep_query}
     ...    sudo=True    return_rc=True
 
     Should Be Equal As Strings    ${stdout}    ${backup_name}
@@ -76,7 +76,7 @@ Expected Boot Count
     [Arguments]    ${reboot_count}
 
     ${stdout}    ${rc}=    Execute Command
-    ...    sudo journalctl --list-boots --quiet | wc -l
+    ...    journalctl --list-boots --quiet | wc -l
     ...    sudo=True    return_rc=True
 
     Should Be Equal As Integers    ${reboot_count}    ${stdout}
