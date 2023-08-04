@@ -60,7 +60,7 @@ Create Backup With Marker
     Systemctl    stop    microshift.service
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    microshift admin data backup --name "${backup_name}"
+    ...    microshift backup --name "${backup_name}"
     ...    sudo=True    return_stderr=True    return_rc=True
 
     # create a marker that we expect to show up in data directory after restore
