@@ -20,11 +20,13 @@ ${TARGET_REF}       ${EMPTY}
 
 *** Test Cases ***
 First Failed Staged Upgrade Should Restore Backup
-    [Documentation]    Performs an upgrade, when first unhealthy a restore is performend
+    [Documentation]    Staged deployment is unhealthy on first boot. After auto-greenboot-reboot MicroShift
+    ...    should restore rollback deployment's backup to reattempt the upgrade from healthy data.
 
     Wait For Healthy System
 
     ${initial_backup}=    Get Future Backup Name For Current Boot
+    Create Backup With Marker    ${initial_backup}
 
     TestAgent.Add Action For Next Deployment    1    fail_greenboot
 
@@ -51,6 +53,24 @@ Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
 
+Create Backup With Marker
+    [Documentation]    Stops MicroShift and creates manual backup that
+    ...    masquerades as automated one and creates marker file for validating restore.
+    [Arguments]    ${backup_name}
+    Systemctl    stop    microshift.service
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    microshift admin data backup --name "${backup_name}"
+    ...    sudo=True    return_stderr=True    return_rc=True
+
+    # create a marker that we expect to show up in data directory after restore
+    ${mark_stdout}    ${mark_stderr}    ${mark_rc}=    Execute Command
+    ...    touch ${BACKUP_STORAGE}/${backup_name}/marker
+    ...    sudo=True    return_stderr=True    return_rc=True
+
+    Should Be Equal As Integers    0    ${rc}
+    Should Be Equal As Integers    0    ${mark_rc}
+
 Validate Backup Is Restored
     [Documentation]    Validate that the desired backup exists and is the only one that exists
     [Arguments]    ${backup_name}
@@ -61,15 +81,12 @@ Validate Backup Is Restored
     ...    cd ${BACKUP_STORAGE} && ls -d1 rhel-*
     ...    sudo=False    return_rc=True
 
-    ${grep_query}=    Catenate    SEPARATOR=
-    ...    "Restoring backup for a rollback deployment to perform migration and try starting again"
-
-    ${grep_stdout}    ${grep_rc}=    Execute Command
-    ...    journalctl -u microshift.service --no-pager -qb0 --grep ${grep_query}
-    ...    sudo=True    return_rc=True
+    ${mark_stdout}    ${mark_stderr}    ${mark_rc}=    Execute Command
+    ...    stat ${DATA_DIR}/marker
+    ...    sudo=True    return_stderr=True    return_rc=True
 
     Should Be Equal As Strings    ${stdout}    ${backup_name}
-    Should Be Equal As Integers    0    ${grep_rc}
+    Should Be Equal As Integers    0    ${mark_rc}
 
 Expected Boot Count
     [Documentation]    Validate that the host rebooted only the specified number of times
