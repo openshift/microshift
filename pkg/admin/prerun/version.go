@@ -24,6 +24,9 @@ var (
 // CheckAndUpdateDataVersion checks version compatibility between data and executable,
 // and updates data version
 func CheckAndUpdateDataVersion() error {
+	klog.InfoS("Starting version metadata management")
+	defer klog.InfoS("Completed version metadata management")
+
 	currentDeploymentID := ""
 	isOstree, err := util.PathExists("/run/ostree-booted")
 	if err != nil {
@@ -171,6 +174,8 @@ func getVersionOfData() (versionMetadata, error) {
 }
 
 func getVersionFile() (versionFile, error) {
+	klog.InfoS("Reading version metadata from the file")
+
 	exists, err := util.PathExistsAndIsNotEmpty(versionFilePath)
 	if err != nil {
 		return versionFile{}, fmt.Errorf("checking if path exists failed: %w", err)
@@ -191,6 +196,7 @@ func getVersionFile() (versionFile, error) {
 			fmt.Errorf("unmarshalling %q failed: %w", string(versionFileContents), err)
 	}
 
+	klog.InfoS("Read version metadata from the file", "version", verFile)
 	return verFile, nil
 }
 
@@ -213,6 +219,9 @@ func GetVersionStringOfData() string {
 
 // checkVersionCompatibility compares versions of executable and existing data for purposes of data migration.
 func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
+	klog.InfoS("Starting version compatibility checks", "executable", execVer, "data", dataVer)
+	defer klog.InfoS("Completed version compatibility checks")
+
 	if execVer == dataVer {
 		return nil
 	}
@@ -237,15 +246,17 @@ func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
 }
 
 func writeDataVersion(v versionFile) error {
+	klog.InfoS("Writing MicroShift version to the version file", "version", v)
+
 	data, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Errorf("failed to marshal %v: %w", v, err)
 	}
 
-	klog.InfoS("Writing MicroShift version to the file in data directory", "version", string(data))
-
 	if err := os.WriteFile(versionFilePath, data, 0600); err != nil {
 		return fmt.Errorf("writing %q to %q failed: %w", string(data), versionFilePath, err)
 	}
+
+	klog.InfoS("Wrote MicroShift version to the version file", "json", string(data))
 	return nil
 }

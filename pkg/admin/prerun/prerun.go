@@ -21,29 +21,44 @@ func NewDataManager(dataManager datadir.Manager) *DataManager {
 }
 
 func (dm *DataManager) Run() error {
-	klog.InfoS("Starting pre-run")
-	defer klog.InfoS("Pre-run complete")
-
 	if isOstree, err := util.PathExists("/run/ostree-booted"); err != nil {
 		return fmt.Errorf("failed to check if system is ostree: %w", err)
 	} else if !isOstree {
-		klog.InfoS("System is not OSTree-based")
+		klog.InfoS("System is not OSTree-based - skipping data management")
 		return nil
 	}
 
+	handled, err := dm.handleSpecialCases()
+	if err != nil {
+		return fmt.Errorf("handling special cases failed: %w", err)
+	}
+
+	if handled {
+		klog.InfoS("Data management handled by one of the special cases - not performing regular procedure")
+		return nil
+	}
+
+	// 8 - regular flow
+	return dm.regularPrerun()
+}
+
+func (dm *DataManager) handleSpecialCases() (bool, error) {
+	klog.InfoS("Handling special cases of pre-run data management")
+	defer klog.InfoS("Completed handling special cases of pre-run data management")
+
 	dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
 	if err != nil {
-		return fmt.Errorf("failed to check if data directory already exists: %w", err)
+		return true, fmt.Errorf("failed to check if data directory already exists: %w", err)
 	}
 
 	versionExists, err := util.PathExistsAndIsNotEmpty(versionFilePath)
 	if err != nil {
-		return fmt.Errorf("checking if version metadata exists failed: %w", err)
+		return true, fmt.Errorf("checking if version metadata exists failed: %w", err)
 	}
 
 	healthExists, err := util.PathExistsAndIsNotEmpty(healthFilepath)
 	if err != nil {
-		return fmt.Errorf("failed to check if health file already exists: %w", err)
+		return true, fmt.Errorf("failed to check if health file already exists: %w", err)
 	}
 
 	klog.InfoS("Existence of important paths",
@@ -72,12 +87,13 @@ func (dm *DataManager) Run() error {
 
 		// 1
 		if !healthExists {
-			klog.InfoS("Neither data dir nor health file exist - assuming first start of MicroShift")
-			return nil
+			klog.InfoS("Neither data dir nor health file exist (assuming first start of MicroShift)" +
+				" - skipping data management")
+			return true, nil
 		}
 
 		// 2
-		return dm.missingDataExistingHealth()
+		return true, dm.missingDataExistingHealth()
 	}
 
 	if !versionExists {
@@ -92,8 +108,9 @@ func (dm *DataManager) Run() error {
 		// manual intervention after system rolled back to 4.13
 		// (i.e. backup was manually restored but health.json not deleted).
 
-		klog.InfoS("Data exists, but version file is missing - assuming upgrade from 4.13")
-		return dm.backup413()
+		klog.InfoS("Data exists, but version file is missing (assuming data version is 4.13)" +
+			" - backing up the data and continuing start up")
+		return true, dm.backup413()
 	}
 
 	// 7
@@ -111,20 +128,22 @@ func (dm *DataManager) Run() error {
 		// Continuing start up seems to be the best course of action in this situation;
 		// there is no health.json to steer the logic into backup or restore,
 		// and deleting the files is too invasive.
-		klog.InfoS("Health info is missing - continuing start up")
-		return nil
+		klog.InfoS("Health info is missing - skipping data management and continuing start up")
+		return true, nil
 	}
 
-	// 8 - regular flow
-	return dm.regularPrerun()
+	return false, nil
 }
 
 // regularPrerun performs actions in prerun flow that is most expected in day to day usage
 // (i.e. data, version metadata, and health information exist)
 func (dm *DataManager) regularPrerun() error {
+	klog.InfoS("Starting pre-run data management")
+	defer klog.InfoS("Completed pre-run data management")
+
 	health, err := getHealthInfo()
 	if err != nil {
-		return fmt.Errorf("failed to determine the current system health: %w", err)
+		return fmt.Errorf("failed to get health info: %w", err)
 	}
 
 	currentBootID, err := getCurrentBootID()
@@ -137,10 +156,10 @@ func (dm *DataManager) regularPrerun() error {
 		return err
 	}
 
-	klog.InfoS("Found boot details",
-		"health", health.Health,
-		"deploymentID", health.DeploymentID,
-		"previousBootID", health.BootID,
+	klog.InfoS("Obtained health info and current boot details",
+		"health.Health", health.Health,
+		"health.DeploymentID", health.DeploymentID,
+		"health.BootID", health.BootID,
 		"currentBootID", currentBootID,
 		"currentDeploymentID", currentDeploymentID,
 	)
@@ -149,33 +168,27 @@ func (dm *DataManager) regularPrerun() error {
 		// This might happen if microshift is (re)started after greenboot finishes running.
 		// Green script will overwrite the health.json with
 		// current boot's ID, deployment ID, and health.
-		klog.InfoS("Skipping pre-run: Health file refers to the current boot ID")
+		klog.InfoS("Boot ID in health file matches current boot - skipping data management and continuing start up")
 		return nil
 	}
 
 	if health.IsHealthy() {
-		klog.Info("Previous boot was healthy")
-		if err := dm.backup(health); err != nil {
-			return fmt.Errorf("failed to backup during pre-run: %w", err)
+		if err = dm.handleHealthy(health, currentDeploymentID); err != nil {
+			return fmt.Errorf("failed to handle healthy system: %w", err)
 		}
 
-		if health.DeploymentID != currentDeploymentID {
-			klog.Info("Current and previously booted deployments are different")
-			return dm.handleDeploymentSwitch(currentDeploymentID)
-		}
 		return nil
 	}
 
-	klog.Info("Previous boot was not healthy")
 	if err = dm.handleUnhealthy(health); err != nil {
-		return fmt.Errorf("failed to handle unhealthy data during pre-run: %w", err)
+		return fmt.Errorf("failed to handle unhealthy system: %w", err)
 	}
 
 	return nil
 }
 
 func (dm *DataManager) backup413() error {
-	backupName := datadir.BackupName("4.13")
+	klog.InfoS("Creating 4.13 backup")
 
 	// If 4.13 backup already exists: remove old and make a new one.
 	// As an alternative we might rename existing backup and add some suffix,
@@ -201,6 +214,7 @@ func (dm *DataManager) backup413() error {
 	// Assuming this data is the most up to date, we prefer it over
 	// existing 4.13 backups.
 
+	backupName := datadir.BackupName("4.13")
 	if exists, err := dm.dataManager.BackupExists(backupName); err != nil {
 		return fmt.Errorf("failed to check if '%q' backup exists: %w",
 			backupName, err)
@@ -209,14 +223,15 @@ func (dm *DataManager) backup413() error {
 			"- assuming current data is the most up to date one: " +
 			"removing existing backup and creating a new one")
 		if err := dm.dataManager.RemoveBackup(backupName); err != nil {
-			return fmt.Errorf("failed to remove backup %q: %w", backupName, err)
+			return fmt.Errorf("failed to remove old 4.13 backup: %w", err)
 		}
 	}
 
 	if err := dm.dataManager.Backup(backupName); err != nil {
-		return fmt.Errorf("failed to create new backup %q: %w", backupName, err)
+		return fmt.Errorf("failed to create new 4.13 backup: %w", err)
 	}
 
+	klog.InfoS("Created 4.13 backup")
 	return nil
 }
 
@@ -240,7 +255,10 @@ func (dm *DataManager) missingDataExistingHealth() error {
 	)
 
 	if health.IsHealthy() {
-		klog.InfoS("'Healthy' is persisted, but there's nothing to back up - continuing start up")
+		// Skipping data management and not attempting to restore a backup,
+		// to be consistent with other areas: healthy - backup, unhealthy - restore.
+		klog.InfoS("'Healthy' is persisted, but data does not exist (nothing to back up)" +
+			" - skipping data management and continuing start up")
 		return nil
 	}
 
@@ -254,7 +272,8 @@ func (dm *DataManager) missingDataExistingHealth() error {
 	}
 	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone()
 	if backup == "" {
-		klog.InfoS("There is no backup to restore - continuing start up")
+		klog.InfoS("No backup for current deployment exists (nothing to restore)" +
+			" - skipping data management and continuing start up")
 		return nil
 	}
 
@@ -265,27 +284,21 @@ func (dm *DataManager) missingDataExistingHealth() error {
 }
 
 func (dm *DataManager) backup(health *HealthInfo) error {
-	newBackupName := health.BackupName()
-	klog.InfoS("Preparing to backup",
-		"deploymentID", health.DeploymentID,
-		"name", newBackupName,
-	)
+	klog.Info("Creating backup")
 
 	existingBackups, err := getBackups(dm.dataManager)
 	if err != nil {
 		return err
 	}
 
+	newBackupName := health.BackupName()
 	if existingBackups.has(newBackupName) {
-		klog.InfoS("Skipping backup: Backup already exists",
-			"deploymentID", health.DeploymentID,
-			"name", newBackupName,
-		)
+		klog.InfoS("Backup already exists", "name", newBackupName)
 		return nil
 	}
 
 	if err := dm.dataManager.Backup(newBackupName); err != nil {
-		return fmt.Errorf("failed to create new backup %q: %w", newBackupName, err)
+		return fmt.Errorf("failed to create backup %q: %w", newBackupName, err)
 	}
 
 	// after making a new backup, remove all old backups for the deployment
@@ -295,16 +308,29 @@ func (dm *DataManager) backup(health *HealthInfo) error {
 		klog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
 	}
 
-	klog.InfoS("Finished backup",
-		"deploymentID", health.DeploymentID,
-		"destination", newBackupName,
-	)
+	klog.Info("Created backup")
+	return nil
+}
+
+func (dm *DataManager) handleHealthy(health *HealthInfo, currentDeploymentID string) error {
+	klog.Info("Handling healthy system")
+	defer klog.Info("Handled healthy system")
+
+	if err := dm.backup(health); err != nil {
+		return fmt.Errorf("failed to handle healthy system: %w", err)
+	}
+
+	if health.DeploymentID != currentDeploymentID {
+		klog.InfoS("Current deployment is different from deploymentID from health file")
+		return dm.handleDeploymentSwitch(currentDeploymentID)
+	}
+
 	return nil
 }
 
 func (dm *DataManager) handleUnhealthy(health *HealthInfo) error {
-	// TODO: Check if containers are already running (i.e. microshift.service was restarted)?
-	klog.Info("Handling previously unhealthy system")
+	klog.Info("Handling unhealthy system")
+	defer klog.Info("Handled unhealthy system")
 
 	currentDeploymentID, err := getCurrentDeploymentID()
 	if err != nil {
@@ -322,7 +348,6 @@ func (dm *DataManager) handleUnhealthy(health *HealthInfo) error {
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
-		klog.Info("Finished handling unhealthy system")
 		return nil
 	}
 
@@ -363,8 +388,7 @@ func (dm *DataManager) handleUnhealthy(health *HealthInfo) error {
 
 		// There is no backup for current deployment, but there is a backup for the rollback.
 		// Let's restore it and act like it's first boot of newly staged deployment
-		klog.InfoS("Restoring backup for a rollback deployment to perform migration and try starting again",
-			"backup-name", rollbackBackup)
+		klog.InfoS("Restoring rollback deployment's backup to try starting from healthy data")
 		if err := dm.restore(rollbackBackup); err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
@@ -386,6 +410,8 @@ func (dm *DataManager) handleDeploymentSwitch(currentDeploymentID string) error 
 	// It might be a rollback (restore existing backup), or
 	// it might be a newly staged one (continue start up)
 
+	klog.InfoS("Handling deployment switch")
+
 	existingBackups, err := getBackups(dm.dataManager)
 	if err != nil {
 		return err
@@ -399,12 +425,11 @@ func (dm *DataManager) handleDeploymentSwitch(currentDeploymentID string) error 
 		if err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
-
-		klog.Info("Restored existing backup for current deployment")
 	} else {
-		klog.Info("There is no backup for current deployment - continuing start up")
+		klog.Info("No backup for current deployment to restore - continuing start up")
 	}
 
+	klog.Info("Handled deployment switch")
 	return nil
 }
 
@@ -423,6 +448,8 @@ func (dm *DataManager) removeBackupsWithoutExistingDeployments(backups Backups) 
 }
 
 func (dm *DataManager) restore(backup datadir.BackupName) error {
+	klog.InfoS("Restoring backup", "name", backup)
+
 	versionFile, err := getVersionFile()
 	if err == nil {
 		// `version` was successfully read, so we can compare
@@ -440,7 +467,7 @@ func (dm *DataManager) restore(backup datadir.BackupName) error {
 		}()
 
 		if versionFile.DeploymentID == deploy && versionFile.BootID == boot {
-			klog.InfoS("Skipping restore - data directory already matches backup to restore",
+			klog.InfoS("Restore skipped - data directory already matches backup to restore",
 				"backup-name", backup,
 				"version", versionFile)
 			return nil
@@ -451,5 +478,6 @@ func (dm *DataManager) restore(backup datadir.BackupName) error {
 		return fmt.Errorf("failed to restore backup: %w", err)
 	}
 
+	klog.InfoS("Restored backup", "name", backup)
 	return nil
 }

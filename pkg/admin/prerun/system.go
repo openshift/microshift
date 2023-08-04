@@ -15,7 +15,7 @@ func getCurrentBootID() (string, error) {
 	path := "/proc/sys/kernel/random/boot_id"
 	content, err := os.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("failed to determine boot ID from %q: %w", path, err)
+		return "", fmt.Errorf("failed to read %q: %w", path, err)
 	}
 	// removing dashes to get the same format as `journalctl --list-boots`
 	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil

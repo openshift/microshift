@@ -61,7 +61,7 @@ Journal Should Have Information That MicroShift Skipped Restoring
     IF    ${version.minor} == 13    RETURN
 
     ${stdout}    ${rc}=    Execute Command
-    ...    journalctl --unit=microshift | grep "Skipping restore - data directory already matches backup to restore"
+    ...    journalctl --unit=microshift | grep "Restore skipped - data directory already matches backup to restore"
     ...    sudo=True
     ...    return_stdout=True
     ...    return_rc=True

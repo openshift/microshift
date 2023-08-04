@@ -47,12 +47,12 @@ func getHealthInfo() (*HealthInfo, error) {
 
 	content, err := os.ReadFile(healthFilepath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read health data from %q: %w", healthFilepath, err)
+		return nil, fmt.Errorf("failed to read %q: %w", healthFilepath, err)
 	}
 
 	health := &HealthInfo{}
 	if err := json.Unmarshal(content, &health); err != nil {
-		return nil, fmt.Errorf("failed to parse health data %q: %w", strings.TrimSpace(string(content)), err)
+		return nil, fmt.Errorf("failed to unmarshal %q: %w", strings.TrimSpace(string(content)), err)
 	}
 	return health, nil
 }
