@@ -3,6 +3,7 @@
 # This script runs on the hypervisor, from the iso-build step.
 
 set -xeuo pipefail
+PS4='+ $(date "+%T.%N")\011 '
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
@@ -27,19 +28,29 @@ bash -x ./bin/start_webserver.sh
 # Set up the storage pool for VMs
 bash -x ./bin/manage_vm_storage_pool.sh create
 
+declare -A pidToScenario
+
 # Build all of the needed VMs
 for scenario in "${SCENARIO_SOURCES}"/*.sh; do
     scenario_name=$(basename "${scenario}" .sh)
     logfile="${SCENARIO_INFO_DIR}/${scenario_name}/boot.log"
     mkdir -p "$(dirname "${logfile}")"
     bash -x ./bin/scenario.sh create "${scenario}" >"${logfile}" 2>&1 &
+    pidToScenario["$!"]="${scenario}"
 done
 
+set +x
+for pid in "${!pidToScenario[@]}"; do echo "${pid} - ${pidToScenario[${pid}]}"; done
+set -x
+
 FAIL=0
-for job in $(jobs -p) ; do
+for job in $(jobs -p); do
     jobs -l
     echo "Waiting for job: ${job}"
-    wait "${job}" || ((FAIL+=1))
+    if ! wait "${job}"; then
+        ((FAIL += 1))
+        echo "Failed to boot VMs for scenario: ${pidToScenario[${job}]}"
+    fi
 done
 
 sudo virsh list --all
