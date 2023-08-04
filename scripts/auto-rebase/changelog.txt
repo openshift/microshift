@@ -1,4 +1,33 @@
-# ovn-kubernetes image-arm64 a7e2297982559407ccf93a76da1e5549e0dd8eb5 to 2be24c3bd712ea04039c721102cf56daa4d39914
+# cluster-kube-apiserver-operator embedded-component 0b4e454270fd837f94c8280178489add78ecc887 to ad323b3657611da6bf7ea78eba8ffa998ba56fe9
+5e032580cee0032da27d98e3e4e1f8323e52a04b 2023-07-31T13:56:02+02:00 OCPBUGS-13635: make webhook connection failure a warning in log
+ded769245c4677cf550c9d65747f6c25363f985a 2023-07-31T13:55:25+02:00 webhooksupportabilitycontroller: do not use one second timeout when asserting a webhook connection
+b41ea35e08036421d2bd2ed1cdb90768996c5f98 2023-07-31T13:55:20+02:00 webhooksupportabilitycontroller: log the name of the webhook on dial errors
+03c53259a093197b82ad748c226a069c6eef7cf5 2023-07-31T13:55:15+02:00 webhooksupportabilitycontroller: react only to changes to a conversion webhook configuration of a CRD
+# machine-config-operator embedded-component 7b54f1dcce4ea9f69f300d0e1cf2316def45bf72 to 88fcb47c150db0de0bb1507919b55d0e81233139
+bba411e840656805ed9cc4df9dcff439ae17ed8c 2023-08-02T10:02:46-04:00 daemon: Always replace binary
+e75d09a028e8a1ff4e6c1e9c1b4b63fd2e486adf 2023-07-27T19:15:20+02:00 daemon: Make binary writing idempotent
+299d24b36ef29ece84a0e32fc41457ef6c3a49e8 2023-07-27T19:14:47+02:00 Revert "daemon: no need to reexec when target and source rhel version is same"
+69c3ac14ba00daeb9205c479d993df9f6736d239 2023-07-27T17:02:13+02:00 daemon: no need to reexec when target and source rhel version is same
+# openshift-controller-manager embedded-component 87de83867ac51730f506138ee790a56ca21d9fc9 to 385057e57752b7b4f21ef32d7a7993d266a591eb
+46d8dbfe6724bc2304f42c01b93650d3fa53cddd 2023-03-30T00:05:13+00:00 Mount build.Spec.Source.ConfigMaps for custom builder images
+# service-ca-operator embedded-component 1b89fdce3fcccecdc5fdb705fe674cd4bfc58a2a to 5984aac13df6c2f4440c67a1a14d32958bce9ec3
+dc83cc9b5fc197fab15388973df9d9a6b50ff5d8 2023-07-27T11:12:39+02:00 go.mod 1.18 -> 1.19, make update-gofmt
+c96897f89cb02bca63b9b79abe709d652f8db3e9 2022-12-07T20:19:52+00:00 Updating ose-service-ca-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-service-ca-operator.yml
+# oc image-amd64 e561d37285c8bde273ce00d086bea599a9cdd3be to e251b5ebd2466adde7b395bf3ab515b8f6cd0c84
+523502d468fd2241dc3e4271a86911df65f37d17 2023-07-11T18:24:20+00:00 MCO cert: update root-ca configmap if on BareMetal
+cda58a5c453f7def7fb8b71f064228fd8793dc35 2023-07-11T18:24:20+00:00 mcs cert: account for environments that use IP directly
+# ovn-kubernetes image-amd64 bedda0d806c2f1f54148d8d6cd1955e0f688bd84 to b1774d7a96a4864cdb54ad2c15996757080ede60
 5736aca573c187e3e3a1c2e08cbcaddee63cb3e0 2023-08-02T10:01:47+02:00 Enable inactivity check on ovndb connection
 4b023cd3c50be0c4ec192ab949be7b77d2234040 2023-08-02T09:59:58+02:00 testing: rework libovsdb helpers for libovsdb bump
 811a06b8519e3fe1cf83a14b46debd4349b2a756 2023-08-02T08:52:06+02:00 vendor: bump libovsdb to 6785b52d4020
+6a6f4e5e69a850313fccfea2ed17e90cf609b1be 2023-07-31T16:09:19+00:00 Bump OVN to 23.06-23.06.0-51
+b332d91192549c50babb3b5a26cbe1c0a590ebbb 2023-07-04T14:44:38+02:00 Add unit test for getDefaultGatewayInterfaceByFamily and getDefaultGatewayInterfaceDetails
+7b17395404446f332b6370ddd12cbc0dba8f6986 2023-07-04T14:44:25+02:00 getDefaultGatewayInterfaceDetails: do not return empty gateway IPs
+9cbdd3bec7b85648fd614d8730ccde84d5e75e51 2023-07-04T14:43:12+02:00 Allow a scenario where there is only IPv4 default GW specified in a dual-stack cluster
+# service-ca-operator image-amd64 1b89fdce3fcccecdc5fdb705fe674cd4bfc58a2a to 5984aac13df6c2f4440c67a1a14d32958bce9ec3
+dc83cc9b5fc197fab15388973df9d9a6b50ff5d8 2023-07-27T11:12:39+02:00 go.mod 1.18 -> 1.19, make update-gofmt
+c96897f89cb02bca63b9b79abe709d652f8db3e9 2022-12-07T20:19:52+00:00 Updating ose-service-ca-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/61541c1c730569d20db98c885bb07d7ee96e648c/images/ose-service-ca-operator.yml
+# ovn-kubernetes image-arm64 2be24c3bd712ea04039c721102cf56daa4d39914 to b1774d7a96a4864cdb54ad2c15996757080ede60
+b332d91192549c50babb3b5a26cbe1c0a590ebbb 2023-07-04T14:44:38+02:00 Add unit test for getDefaultGatewayInterfaceByFamily and getDefaultGatewayInterfaceDetails
+7b17395404446f332b6370ddd12cbc0dba8f6986 2023-07-04T14:44:25+02:00 getDefaultGatewayInterfaceDetails: do not return empty gateway IPs
+9cbdd3bec7b85648fd614d8730ccde84d5e75e51 2023-07-04T14:43:12+02:00 Allow a scenario where there is only IPv4 default GW specified in a dual-stack cluster
