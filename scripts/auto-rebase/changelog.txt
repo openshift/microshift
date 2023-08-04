@@ -1,6 +1,12 @@
-# ovn-kubernetes image-amd64 70d15f04e3bfede87710b8a923a36534ffdf604d to f704c408df54f6e7f98832a7599654f6164d600d
-80dc930e4bc44256a017849762bf6c5f949209fb 2023-07-18T17:41:46+02:00 Support AllocateLoadBalancerNodePortsFalse
-7d35642a980a3363f876d219dccb63a0883bb270 2023-07-18T17:07:03+02:00 Fix pointer issues in gateway code
-# ovn-kubernetes image-arm64 70d15f04e3bfede87710b8a923a36534ffdf604d to f704c408df54f6e7f98832a7599654f6164d600d
-80dc930e4bc44256a017849762bf6c5f949209fb 2023-07-18T17:41:46+02:00 Support AllocateLoadBalancerNodePortsFalse
-7d35642a980a3363f876d219dccb63a0883bb270 2023-07-18T17:07:03+02:00 Fix pointer issues in gateway code
+# cluster-ingress-operator embedded-component 7a507e4e92b382ec1275544458516d67fd834032 to e56a18d16519fad2e05b63a6a3c32135576e26b8
+2e8f3bb37eb560cdc9b4efdc885930810903a42b 2023-07-20T19:56:40+00:00 waitForDeploymentCompleteWithOldPodTermination fix
+73912c81fc7b688dc4464a4357bd1c0f4bd8eb09 2023-07-20T19:56:40+00:00 Rename waitForDeploymentCompleteWithCleanup to waitForDeploymentCompleteWithOldPodTermination
+a7128d476ebaca0a496da80839ff6de667d78040 2023-07-20T19:56:40+00:00 Fix TestClientTLS: Wait for old router pods to be cleaned up before testing new mTLS config
+# machine-config-operator embedded-component 05dd21653075fa389e62d64eba191a502c4ffd66 to 43b51b1824650420cbfa4177468c103c434421a4
+b60cdb1d22d2b384dd7ebb2b400e1cf194e8ecb1 2023-06-29T16:16:48+00:00 configure-ovs: support UUID in vlan.parent
+# oc image-amd64 49844f7424dd87611bf5f7caea3ec854240b6150 to 8669c6defc9bd1c7bbcd0fe06989ec4b8bbf582c
+8e5078d7ac47422f4b1abb433280c2d6101a8619 2023-07-11T18:24:22+00:00 MCO cert: update root-ca configmap if on BareMetal
+245432a56fc66b86c37b23cea58d6823764fc35a 2023-07-11T18:24:22+00:00 mcs cert: account for environments that use IP directly
+# oc image-arm64 49844f7424dd87611bf5f7caea3ec854240b6150 to 8669c6defc9bd1c7bbcd0fe06989ec4b8bbf582c
+8e5078d7ac47422f4b1abb433280c2d6101a8619 2023-07-11T18:24:22+00:00 MCO cert: update root-ca configmap if on BareMetal
+245432a56fc66b86c37b23cea58d6823764fc35a 2023-07-11T18:24:22+00:00 mcs cert: account for environments that use IP directly
