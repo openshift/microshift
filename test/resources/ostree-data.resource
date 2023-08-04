@@ -27,6 +27,25 @@ Get Future Backup Name For Current Boot
     ${backup_name}=    Catenate    SEPARATOR=_    ${deploy_id}    ${boot_id}
     RETURN    ${backup_name}
 
+Create Backup
+    [Documentation]    Stops MicroShift and creates manual backup
+    ...    and optional marker file for validating.
+    [Arguments]    ${backup_name}    ${create_marker_file}=${FALSE}
+    Systemctl    stop    microshift.service
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    microshift backup --name "${backup_name}"
+    ...    sudo=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
+    IF    ${create_marker_file}
+        # create a marker that we expect to show up in data directory after restore
+        ${mark_stdout}    ${mark_stderr}    ${mark_rc}=    Execute Command
+        ...    touch ${BACKUP_STORAGE}/${backup_name}/marker
+        ...    sudo=True    return_stderr=True    return_rc=True
+        Should Be Equal As Integers    0    ${mark_rc}
+    END
+
 Backup Should Exist
     [Documentation]    Checks if backup identified by deployment ID
     ...    and (optionally) boot ID exists

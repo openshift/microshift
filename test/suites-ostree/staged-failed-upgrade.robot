@@ -26,7 +26,7 @@ First Failed Staged Upgrade Should Restore Backup
     Wait For Healthy System
 
     ${initial_backup}=    Get Future Backup Name For Current Boot
-    Create Backup With Marker    ${initial_backup}
+    Create Backup    ${initial_backup}    ${TRUE}
 
     TestAgent.Add Action For Next Deployment    1    fail_greenboot
 
@@ -47,29 +47,10 @@ Setup
     Check Required Env Variables
     Should Not Be Empty    ${TARGET_REF}    TARGET_REF variable is required
     Login MicroShift Host
-    Setup Kubeconfig
 
 Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
-
-Create Backup With Marker
-    [Documentation]    Stops MicroShift and creates manual backup that
-    ...    masquerades as automated one and creates marker file for validating restore.
-    [Arguments]    ${backup_name}
-    Systemctl    stop    microshift.service
-
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    microshift backup --name "${backup_name}"
-    ...    sudo=True    return_stderr=True    return_rc=True
-
-    # create a marker that we expect to show up in data directory after restore
-    ${mark_stdout}    ${mark_stderr}    ${mark_rc}=    Execute Command
-    ...    touch ${BACKUP_STORAGE}/${backup_name}/marker
-    ...    sudo=True    return_stderr=True    return_rc=True
-
-    Should Be Equal As Integers    0    ${rc}
-    Should Be Equal As Integers    0    ${mark_rc}
 
 Validate Backup Is Restored
     [Documentation]    Validate that the desired backup exists and is the only one that exists
