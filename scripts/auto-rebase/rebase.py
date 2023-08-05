@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
-import os
-import sys
 import json
 import logging
+import os
 import subprocess
+import sys
+import textwrap
 from collections import namedtuple
+from pathlib import Path
 from timeit import default_timer as timer
 
-from git import Repo, PushInfo  # GitPython
-from github import GithubIntegration, Github, GithubException  # pygithub
-from pathlib import Path
+from git import PushInfo, Repo  # GitPython
+from github import Github, GithubException, GithubIntegration  # pygithub
 
 APP_ID_ENV = "APP_ID"  # GitHub App's ID
 KEY_ENV = "KEY"  # Path to GitHub App's key
@@ -192,11 +193,16 @@ def try_get_pr(gh_repo, org, base_branch, branch_name):
 
 
 def generate_pr_description(branch_name, amd_tag, arm_tag, prow_job_url, rebase_script_succeded):
-    base = (f"amd64: {amd_tag}\n"
-            f"arm64: {arm_tag}\n"
-            f"prow job: {prow_job_url}\n"
-            "\n"
-            "/label tide/merge-method-squash\n")
+    base = textwrap.dedent(f"""
+    amd64: {amd_tag}
+    arm64: {arm_tag}
+    prow job: {prow_job_url}
+
+    /label tide/merge-method-squash
+    /label cherry-pick-approved
+    /label backport-risk-assessed
+    /label bugzilla/valid-bug
+    """)
     return (base if rebase_script_succeded
             else "# rebase.sh failed - check committed rebase_sh.log\n\n" + base)
 
@@ -284,7 +290,7 @@ def try_create_prow_job_url():
 
 
 def create_pr_title(branch_name, successful_rebase):
-    return branch_name if successful_rebase else f"**FAILURE** {branch_name}"
+    return f"NO-ISSUE: {branch_name}" if successful_rebase else f"**FAILURE** {branch_name}"
 
 
 def get_expected_branch_name(amd, arm):
