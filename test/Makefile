@@ -20,16 +20,19 @@ fake-yplus2-minor-rpm:
 	RPMBUILD_DIR=$(RPMBUILD_DIR) \
 		$(MAKE) -C $(REPO) rpm
 
-.PHONY: local-main-rpm
-local-main-rpm: TMP_REPO !=mktemp -d
-local-main-rpm: RPMBUILD_DIR :=$(REPO)/_output/rpmbuild-main/
-local-main-rpm: COMMIT !=git rev-parse main
-local-main-rpm:
-	git clone --single-branch --branch main --no-hardlinks "$(REPO)" "$(TMP_REPO)"
-	cd "$(TMP_REPO)" && \
-		MICROSHIFT_VERSION="$(MAJOR).$(MINOR).$(PATCH)-main-$(COMMIT)" \
-		RPMBUILD_DIR="$(RPMBUILD_DIR)"\
-		$(MAKE) rpm
+# build-base-branch
+# By default, BASE_BRANCH is derived from the microshift/Makefile.version.$(uname -i).var string.
+# The BASE_BRANCH is pulled from the remote repo.  This is because OpenShift-CI fetches only PR commit tree
+# and the main:HEAD commit tree. This means that we can't rely on the local source when testing PRs
+# against non-main branches. The base-branch is used for the initial microshift layer deployed in some rpm-ostree scenarios.
+.PHONY: build-base-branch
+build-base-branch: BASE_BRANCH ?=release-$(MAJOR).$(MINOR)
+build-base-branch: TMP_REPO !=mktemp -d
+build-base-branch:
+	if ! [ -d "$(REPO)/_output" ]; then mkdir $(REPO)/_output; fi
+	git clone --single-branch --branch $(BASE_BRANCH) https://github.com/openshift/microshift.git $(TMP_REPO)
+	cd $(TMP_REPO) && $(MAKE) rpm
+	mv $(TMP_REPO)/_output/rpmbuild $(REPO)/_output/rpmbuild-base
 	rm -rf "$(TMP_REPO)"
 
 .PHONY: robotidy
