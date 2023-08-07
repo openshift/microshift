@@ -12,3 +12,7 @@ SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-${HOME}/.ssh/id_rsa.pub}
 # Set SSH_PRIVATE_KEY to the filename of the matching ssh key,
 # if any. Set it to an empty string to use ssh-agent.
 #SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY:-${HOME}/.ssh/id_rsa}
+
+# Disable sos report collection. This can speed up setup in a
+# local environment where sos can be run manually when necessary.
+#SKIP_SOS=true
