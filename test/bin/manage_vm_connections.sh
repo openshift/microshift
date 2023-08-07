@@ -171,6 +171,10 @@ action_cleanup() {
     for scenario in *; do
         pushd "${scenario}" >/dev/null
         for vm in vms/*; do
+            if [ ! -d "${vm}" ]; then
+                # Skip log files, etc.
+                continue
+            fi
             vm_name=$(basename "${vm}")
             vm_ip=$(cat "${vm}/ip")
 
@@ -198,6 +202,10 @@ action_local() {
     for scenario in *; do
         pushd "${scenario}" >/dev/null
         for vm in vms/*; do
+            if [ ! -d "${vm}" ]; then
+                # Skip log files, etc.
+                continue
+            fi
             vm_name=$(basename "${vm}")
             vm_ip=$(cat "${vm}/ip")
 
