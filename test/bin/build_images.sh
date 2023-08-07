@@ -56,6 +56,47 @@ configure_package_sources() {
     done
 }
 
+# Read a macro from a blueprint file and expand it into the list of the
+# container images. The format for the macro is "RENDER_CONTAINER_IMAGES=version".
+# The version is necessary to query the release info from the appropriate RPM package.
+render_container_images() {
+    local -r blueprint_file="${1}"
+    # Exit when no macro is present in the blueprint
+    if ! grep -q ^RENDER_CONTAINER_IMAGES= "${blueprint_file}" ; then
+        return
+    fi
+
+    # Extract the version string
+    local -r version="$(grep ^RENDER_CONTAINER_IMAGES= "${blueprint_file}" | cut -d'=' -f2 | xargs)"
+    if [ -z "${version}" ] ; then
+        echo "Error: missing version string for the RENDER_CONTAINER_IMAGES macro in ${blueprint_file}"
+        exit 1
+    fi
+
+    # Find the microshift-release-info RPM with the specified version
+    local -r release_info_rpm=$(find "${IMAGEDIR}/rpm-repos" -name "microshift-release-info-${version}*.rpm" | tail -1)
+    if [ -z "${release_info_rpm}" ] ; then
+        echo "Error: missing microshift-release-info RPM for the '${version}' version"
+        exit 1
+    fi
+
+    local -r release_tmp_dir=$(mktemp -d)
+    pushd "${release_tmp_dir}" >&/dev/null
+
+    # Extract the release info from the RPM
+    rpm2cpio "${release_info_rpm}" | cpio --quiet -idm "*release-$(uname -m).json"
+    # Delete the macro from the original blueprint
+    sed -i 's/^RENDER_CONTAINER_IMAGES=.*//g' "${blueprint_file}"
+    # Append the container images to the blueprint file
+    jq -r '.images | .[] | ("\n[[containers]]\nsource = \"" + . + "\"\n")' \
+        "./usr/share/microshift/release/release-$(uname -m).json" \
+        >> "${blueprint_file}"
+
+    # Cleanup
+    popd >&/dev/null
+    rm -rf "${release_tmp_dir}"
+}
+
 # Given a blueprint filename, extract the name value. It does not have
 # to match the filename, but some commands take the file and others
 # take the name, so we need to be able to have both.
@@ -143,6 +184,7 @@ EOF
 # for them.
 do_group() {
     local groupdir="$1"
+    local -r ip_addr_default=$(hostname -I | awk '{print $1}')
 
     title "Building ${groupdir}"
 
@@ -173,6 +215,8 @@ do_group() {
         blueprint_file="${IMAGEDIR}/blueprints/$(basename "${template}")"
         echo "Rendering ${template} to ${blueprint_file}"
         envsubst <"${template}" >"${blueprint_file}"
+        echo "Rendering container images to ${blueprint_file}"
+        render_container_images "${blueprint_file}"
 
         blueprint=$(get_blueprint_name "${blueprint_file}")
 
@@ -196,7 +240,7 @@ do_group() {
         parent_args=""
         parent=$(get_image_parent "${template}")
         if [ -n "${parent}" ]; then
-            parent_args="--parent ${parent} --url http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}/repo"
+            parent_args="--parent ${parent} --url http://${ip_addr_default}:${WEB_SERVER_PORT}/repo"
         fi
         echo "Building edge-commit from ${blueprint} ${parent_args}"
         # shellcheck disable=SC2086  # quote to avoid glob expansion

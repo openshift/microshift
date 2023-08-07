@@ -56,14 +56,12 @@ match one of the `kubeconfig` files generated for the host because
 many of the tests will try to download that file to connect to the API
 remotely.
 
-`USHIFT_USER` should be the username for logging in to `USHIFT_HOST`
-remotely via ssh.
-
-`SSH_PRIV_KEY` should be an ssh key file to use for authenticating as
 `USHIFT_USER`. The key must not require a password. To connect to
 hosts using a key with a password, leave `SSH_PRIV_KEY` set to an
 empty string and the tests will connect as `USHIFT_USER` and rely on
 the ssh agent to provide the correct credentials.
+
+`SSH_PRIV_KEY` should be an ssh key file to use for authenticating as
 
 `SSH_PORT` should be the port used for an ssh connection.
 
@@ -138,8 +136,11 @@ In order to build different images, Image Builder needs to be configured
 with all of the right package sources to pull the required RPMs. The
 sources used by all scenarios are in the `./test/package-sources` directory.
 
-Package source definition files are templates using `envsubst`,
-which means the files can have shell variables embedded.
+Package source definition files are templates that support embedded shell
+variables. Image build procedure expands those variables using `envsubst`.
+
+> Refer to `./test/bin/build_images.sh` for the set of known variables that
+> can be expanded.
 
 ```
 id = "fast-datapath"
@@ -151,9 +152,6 @@ check_ssl = true
 system = false
 rhsm = true
 ```
-
-Refer to `./test/bin/build_images.sh` for the set of known variables that can
-be expanded.
 
 ### Image Blueprints
 
@@ -177,6 +175,24 @@ rhel92-microshift-previous-minor.toml | group2 | rhel-9.2-microshift-4.13 | A RH
 rhel92-source.toml | group2 | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
 rhel92-source-fake-next-minor.toml | group2 | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
 rhel92-source-fake-yplus2-minor.toml | group2 | rhel-9.2-microshift-4.16 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the current+2 y-stream.
+
+#### Blueprint Customization
+
+Image blueprint definition files are templates that support embedded shell
+variables. Image build procedure expands those variables using `envsubst`.
+
+> Refer to `./test/bin/build_images.sh` for the set of known variables that
+> can be expanded.
+
+Image blueprint templates also support the `RENDER_CONTAINER_IMAGES=version`
+macro for rendering the embedded container image references into blueprints.
+The `version` value is mandatory and it can be hardcoded, or referenced by a
+shell variable. Version is used to uniquely identify the `microshift-release-info`
+RPM file name for extracting the container image reference information.
+
+```
+RENDER_CONTAINER_IMAGES="${SOURCE_VERSION}"
+```
 
 #### Blueprint Naming
 
@@ -285,8 +301,8 @@ images that use RPMs created from source (not already published releases).
 #### Rebuilding from Sources Easily
 
 If you build new RPMs, you need to re-run several steps (build the
-RPMs, build the local repos, build the images, download the
-images). Use `./bin/rebuild_source_images.sh` to automate all of those
+RPMs, build the local repos, build the images, download the images).
+Use `./bin/dev_rebuild_source_images.sh` to automate all of those
 steps with one script while only rebuilding the images that use RPMs
 created from source (not already published releases).
 
@@ -326,19 +342,24 @@ use ssh-agent.
 in a local environment where sos can be run manually when
 necessary. Do not enable this option in CI.
 
-#### Preparing Storage Pool for VMs
+#### Configuring Hypervisor
 
-Use `./test/bin/manage_vm_storage_pool.sh` to create the necessary storage
-pool for VMs.
+Use `./test/bin/manage_hypervisor_config.sh` to manage the following
+hypervisor settings:
+- Firewall
+- Storage pools used for VM images and disks
+- Isolated networks
+
+Create the necessary configuration using `create`.
 
 ```
-$ ./test/bin/manage_vm_storage_pool.sh create
+$ ./test/bin/manage_hypervisor_config.sh create
 ```
 
 To cleanup after execution and teardown of VMs use `cleanup`.
 
 ```
-$ ./test/bin/manage_vm_storage_pool.sh cleanup
+$ ./test/bin/manage_hypervisor_config.sh cleanup
 ```
 
 > For a full cleanup, the storage pool directory may need to be deleted manually.
@@ -350,9 +371,6 @@ $ ./test/bin/manage_vm_storage_pool.sh cleanup
 
 Use `./test/bin/start_webserver.sh` to run a caddy web server to serve the
 images needed for the test scenarios.
-
-Use `./test/bin/configure_hypervisor_firewall.sh` to set up the firewall
-rules that allow VMs to access the web server on the hypervisor.
 
 Use `./test/bin/scenario.sh` to create test infrastructure for a scenario
 with the `create` argument and a scenario directory name as input.
@@ -439,6 +457,12 @@ multiple times to create kickstart files for additional VMs.
 The `launch_vm` function takes as input the VM name. It expects a
 kickstart file to already exist, and it defines a new VM configured to
 boot from the installer ISO and the kickstart file.
+
+The `launch_vm` function also accepts two optional arguments:
+- The image blueprint used to create the ISO that should
+be used to boot the VM (default to `$DEFAULT_BOOT_BLUEPRINT`).
+- The name of the network used when creating the VM
+(defaults to `default`).
 
 #### scenario_remove_vms
 
