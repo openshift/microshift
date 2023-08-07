@@ -82,6 +82,14 @@ func (dm *DataManager) handleSpecialCases() (bool, error) {
 		[0] it would need a comprehensive check if data exists, not just existence of /var/lib/microshift
 	*/
 
+	if dataExists && versionExists && healthExists {
+		// 8 - regular flow
+		return false, nil
+	}
+
+	klog.InfoS("Handling special cases of pre-run data management")
+	defer klog.InfoS("Completed handling special cases of pre-run data management")
+
 	if !dataExists {
 		// Implies !versionExists
 
@@ -113,26 +121,23 @@ func (dm *DataManager) handleSpecialCases() (bool, error) {
 		return true, dm.backup413()
 	}
 
-	// 7
-	if !healthExists {
-		// MicroShift might end up here if FIRST RUN of MicroShift gets interrupted
-		// before green/red script manages to write the health file.
-		//
-		// Example scenarios:
-		// - host rebooted before the end of greenboot's procedure
-		// - test restarting MicroShift (e.g. to reload the config)
-		//
-		// For non-first boots the health file will exist, just contain slightly outdated boot ID
-		// which might result in repeating the action (backup (which should already exist) or restore).
-		//
-		// Continuing start up seems to be the best course of action in this situation;
-		// there is no health.json to steer the logic into backup or restore,
-		// and deleting the files is too invasive.
-		klog.InfoS("Health info is missing - skipping data management and continuing start up")
-		return true, nil
-	}
-
-	return false, nil
+	// 7 - !healthExists
+	//
+	// MicroShift might end up here if FIRST RUN of MicroShift gets interrupted
+	// before green/red script manages to write the health file.
+	//
+	// Example scenarios:
+	// - host rebooted before the end of greenboot's procedure
+	// - test restarting MicroShift (e.g. to reload the config)
+	//
+	// For non-first boots the health file will exist, just contain slightly outdated boot ID
+	// which might result in repeating the action (backup (which should already exist) or restore).
+	//
+	// Continuing start up seems to be the best course of action in this situation;
+	// there is no health.json to steer the logic into backup or restore,
+	// and deleting the files is too invasive.
+	klog.InfoS("Health info is missing - skipping data management and continuing start up")
+	return true, nil
 }
 
 // regularPrerun performs actions in prerun flow that is most expected in day to day usage
