@@ -268,7 +268,7 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
     /label tide/merge-method-squash
     /label cherry-pick-approved
     /label backport-risk-assessed
-    /label bugzilla/valid-bug
+    /label jira/valid-bug
     """)
     base = template.format(**locals())
     return (base if rebase_script_succeded
