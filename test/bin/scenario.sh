@@ -87,9 +87,10 @@ prepare_kickstart() {
 
 # Show the IP address of the VM
 function get_vm_ip {
-    local vmname="${1}"
-    start=$(date +%s)
-    ip=$(bash -c "${ROOTDIR}/scripts/devenv-builder/manage-vm.sh ip -n ${vmname}")
+    local -r vmname="${1}"
+    local -r start=$(date +%s)
+    local ip
+    ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}")
     while [ "${ip}" = "" ]; do
         now=$(date +%s)
         if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
@@ -97,7 +98,7 @@ function get_vm_ip {
             exit 1
         fi
         sleep 1
-        ip=$(bash -c "${ROOTDIR}/scripts/devenv-builder/manage-vm.sh ip -n ${vmname}")
+        ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}")
     done
     echo "${ip}"
 }
