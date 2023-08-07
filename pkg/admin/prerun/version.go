@@ -25,7 +25,6 @@ var (
 // and updates data version
 func CheckAndUpdateDataVersion() error {
 	klog.InfoS("Starting version metadata management")
-	defer klog.InfoS("Completed version metadata management")
 
 	currentDeploymentID := ""
 	isOstree, err := util.PathExists("/run/ostree-booted")
@@ -85,6 +84,8 @@ func CheckAndUpdateDataVersion() error {
 	if err := writeDataVersion(newVersionFile(execVer, currentDeploymentID, currentBootID)); err != nil {
 		return fmt.Errorf("failed to update data version: %w", err)
 	}
+
+	klog.InfoS("Completed version metadata management")
 
 	return nil
 }
@@ -218,31 +219,42 @@ func GetVersionStringOfData() string {
 }
 
 // checkVersionCompatibility compares versions of executable and existing data for purposes of data migration.
-func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
+func checkVersionCompatibility(execVer, dataVer versionMetadata) (err error) {
 	klog.InfoS("Starting version compatibility checks", "executable", execVer, "data", dataVer)
-	defer klog.InfoS("Completed version compatibility checks")
+	defer func() {
+		if err != nil {
+			klog.ErrorS(err, "Failed version compatibility checks")
+		} else {
+			klog.InfoS("Completed version compatibility checks")
+		}
+	}()
 
 	if execVer == dataVer {
-		return nil
+		klog.InfoS("Executable and data versions are the same - continuing")
+		return
 	}
 
 	if execVer.Major != dataVer.Major {
-		return fmt.Errorf("major versions are different: %d and %d", dataVer.Major, execVer.Major)
+		err = fmt.Errorf("major versions are different: %d and %d", dataVer.Major, execVer.Major)
+		return
 	}
 
 	if execVer.Minor < dataVer.Minor {
-		return fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
+		err = fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
+		return
 	}
 
 	if execVer.Minor > dataVer.Minor {
 		if execVer.Minor-1 == dataVer.Minor {
-			return nil
+			klog.InfoS("Executable is newer than data by 1 - continuing")
+			return
 		} else {
-			return fmt.Errorf("executable (%s) is too recent compared to existing data (%s): maximum minor version difference is 1", execVer.String(), dataVer.String())
+			err = fmt.Errorf("executable (%s) is too recent compared to existing data (%s): maximum minor version difference is 1", execVer.String(), dataVer.String())
+			return
 		}
 	}
 
-	return nil
+	return
 }
 
 func writeDataVersion(v versionFile) error {

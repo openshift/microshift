@@ -305,6 +305,7 @@ func (dm *DataManager) backup(health *HealthInfo) error {
 	if err := dm.dataManager.Backup(newBackupName); err != nil {
 		return fmt.Errorf("failed to create backup %q: %w", newBackupName, err)
 	}
+	klog.Info("Created backup")
 
 	// after making a new backup, remove all old backups for the deployment
 	// including unhealthy ones
@@ -313,7 +314,6 @@ func (dm *DataManager) backup(health *HealthInfo) error {
 		klog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
 	}
 
-	klog.Info("Created backup")
 	return nil
 }
 
@@ -445,6 +445,10 @@ func (dm *DataManager) removeBackupsWithoutExistingDeployments(backups Backups) 
 	}
 
 	toRemove := backups.getDangling(deployments)
+	if len(toRemove) == 0 {
+		return nil
+	}
+
 	klog.InfoS("Removing backups for no longer existing deployments",
 		"backups-to-remove", toRemove)
 	toRemove.removeAll(dm.dataManager)
