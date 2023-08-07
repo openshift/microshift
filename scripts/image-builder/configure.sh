@@ -3,8 +3,18 @@ set -exo pipefail
 
 OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
 
+# Necessary for embedding container images
+if [ ! -e /etc/osbuild-worker/pull-secret.json ] ; then
+    sudo mkdir -p /etc/osbuild-worker
+    sudo ln -s /etc/crio/openshift-pull-secret /etc/osbuild-worker/pull-secret.json
+    sudo tee /etc/osbuild-worker/osbuild-worker.toml &>/dev/null <<EOF
+[containers]
+auth_file_path = "/etc/osbuild-worker/pull-secret.json"
+EOF
+fi
+
 sudo dnf install -y git osbuild-composer composer-cli ostree rpm-ostree \
-    cockpit-composer cockpit-machines bash-completion podman runc genisoimage \
+    cockpit-composer bash-completion podman runc genisoimage \
     createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
     containernetworking-plugins
 
