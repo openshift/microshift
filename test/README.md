@@ -175,6 +175,7 @@ Blueprint | Group | Image Name | Purpose
 rhel92.toml | group1 | rhel-9.2 | A simple RHEL image without MicroShift.
 rhel92-microshift-previous-minor.toml | group2 | rhel-9.2-microshift-4.13 | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
 rhel92-source.toml | group2 | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
+rhel92-source-base.toml | group2 | rhel-9.2-microshift-source-base | A RHEL 9.2 image with the RPMs built from base release branch.
 rhel92-source-fake-next-minor.toml | group2 | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
 rhel92-source-fake-yplus2-minor.toml | group2 | rhel-9.2-microshift-4.16 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the current+2 y-stream.
 
@@ -443,6 +444,26 @@ directory. Kickstart templates are reused between scenarios.
 All of the functions that act as the scenario API are run in the
 context of `./test/bin/scenario.sh` and can therefore use any functions
 defined there.
+
+#### Scenarios testing between different MicroShift sources
+
+Scenarios utilize following distinct MicroShift sources:
+- `src`: built from source (code in PR)
+- `base`: built from base branch (PR's target branch)
+- `prev-minor`: previous MicroShift minor release
+
+| Starting ref | End ref | Successful upgrade scenario | Failed upgrade scenario |
+|--------------|---------|-----------------------------|-------------------------|
+| `base` | `src` |`el92_base_upgrade-ok.sh` | `el92_base_upgrade-failing.sh` |
+| `prev-minor` | `src` |`el92_prev-minor_upgrade-ok.sh` | `el92_prev-minor_upgrade-failing.sh` |
+| `src` | `src` |`el92_src_upgrade-ok.sh` | `el92_src_upgrade-failing.sh` |
+
+In future, another source of MicroShift should be added which is
+most recent MicroShift RPMs built by ART (EC, then RC, and finally
+Z stream releases matching version of currently tested code).
+Both successful and failed upgrades scenarios should be added:
+- `released` to `src` (presubmit)
+- `released` to `main` / `release-4.YY` (periodic)
 
 #### scenario_create_vms
 
