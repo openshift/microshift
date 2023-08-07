@@ -20,5 +20,5 @@ scenario_run_tests() {
     run_tests host1 \
               --variable "TARGET_REF:rhel-9.2-microshift-source" \
 		          --variable "REASON:fail_greenboot" \
-		          suites-ostree/failed-upgrade.robot
+		          suites-ostree/upgrade-failed.robot
 }
