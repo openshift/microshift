@@ -157,9 +157,10 @@ EOF
 # Public function to start a VM.
 #
 # Creates a new VM using the scenario name and the vmname given to
-# create a unique name. Uses the boot_blueprint argument to select the
-# ISO from which to boot. If no boot_blueprint is specified, uses
-# DEFAULT_BOOT_BLUEPRINT.
+# create a unique name. Uses the boot_blueprint and network_name
+# arguments to select the ISO and network from which to boot.
+# If no boot_blueprint is specified, uses DEFAULT_BOOT_BLUEPRINT.
+# If no network_name is specified, uses the "default" network.
 #
 # Arguments
 #  vmname -- The short name of the VM in the scenario (e.g., "host1").
@@ -167,9 +168,11 @@ EOF
 #                    should be used to boot the VM. This is _not_
 #                    necessarily the image to be installed (see
 #                    prepare_kickstart).
+# network_name -- The name of the network used when creating the VM.
 launch_vm() {
     local vmname="$1"
     local boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
+    local network_name="${3:-default}"
 
     local full_vmname
     local kickstart_url
@@ -194,7 +197,7 @@ launch_vm() {
          --vcpus 2 \
          --memory 4092 \
          --disk "pool=${VM_STORAGE_POOL},size=30" \
-         --network network=default,model=virtio \
+         --network network="${network_name}",model=virtio \
          --events on_reboot=restart \
          --location "${VM_DISK_DIR}/${boot_blueprint}.iso" \
          --extra-args "inst.ks=${kickstart_url}" \

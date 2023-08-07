@@ -25,6 +25,10 @@ VM_STORAGE_POOL="vm-storage"
 # shellcheck disable=SC2034  # used elsewhere
 VM_DISK_DIR="${IMAGEDIR}/${VM_STORAGE_POOL}"
 
+# The isolated network name used by some VMs.
+# shellcheck disable=SC2034  # used elsewhere
+export VM_ISOLATED_NETWORK="isolated"
+
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
 RPM_SOURCE="${ROOTDIR}/_output/rpmbuild"
@@ -95,6 +99,19 @@ error() {
 }
 
 get_vm_bridge_interface() {
+    local -r netdevice=${1:-default}
+
+    # Return an empty string if virsh is not installed
+    if ! which virsh &>/dev/null ; then
+        echo ""
+        return
+    fi
+    # Return an empty string if the network does not exist
+    if ! sudo virsh net-info "${netdevice}" &>/dev/null ; then
+        echo ""
+        return
+    fi
+
     # $ sudo virsh net-info default
     # Name:           default
     # UUID:           eaac9592-2324-4ae6-b2ec-a5ae94272456
@@ -102,18 +119,16 @@ get_vm_bridge_interface() {
     # Persistent:     yes
     # Autostart:      yes
     # Bridge:         virbr0
-
-    sudo virsh net-info default | grep '^Bridge:' | awk '{print $2}'
+    sudo virsh net-info "${netdevice}" | grep '^Bridge:' | awk '{print $2}'
 }
 
 get_vm_bridge_ip() {
-    local bridge
+    local -r netdevice=${1:-default}
+    local -r bridge="$(get_vm_bridge_interface "${netdevice}")"
 
     # When get_vm_bridge_interface is run on the CI cluster there is
     # no bridge, and possibly no virsh command. Do not fail, but
     # return an empty IP.
-    bridge="$(get_vm_bridge_interface || true)"
-
     if [ -z "${bridge}" ]; then
         echo ""
         return
@@ -123,11 +138,10 @@ get_vm_bridge_ip() {
     # 10: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
     #     inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
     #        valid_lft forever preferred_lft forever
-
     ip -f inet addr show "${bridge}" | grep inet | awk '{print $2}' | cut -d/ -f1
 }
 
 # The IP address of the current host on the bridge used for the
 # default network for libvirt VMs.
 # shellcheck disable=SC2034  # used elsewhere
-VM_BRIDGE_IP="$(get_vm_bridge_ip)"
+VM_BRIDGE_IP="$(get_vm_bridge_ip "default")"
