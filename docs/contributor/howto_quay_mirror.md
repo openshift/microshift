@@ -39,17 +39,23 @@ export NCPUS=2
 export RAMSIZE=6
 export DISKSIZE=30
 export SWAPSIZE=0
-export NETWORK=isolated
 
 VMNAME=microshift-quay
 ISO=/var/lib/libvirt/images/rhel-9.2-$(uname -m)-dvd.iso
 
 ./scripts/devenv-builder/manage-vm.sh create -n ${VMNAME} -i ${ISO}
 ```
-
 After the virtual machine installation is finished, the `manage-vm.sh` script
 prompts for a user name and password to register the operating system with a
 Red Hat subscription.
+
+Attach a second interface to the  `microshift-quay` virtual machine in the isolated network:
+```
+NETWORK=isolated
+VMNAME=microshift-quay
+virsh  attach-interface ${VMNAME} --type network --source ${NETWORK} --model virtio --config --live
+```
+
 
 ## Install Mirror Registry Service
 
