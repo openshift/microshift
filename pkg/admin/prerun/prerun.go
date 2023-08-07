@@ -43,9 +43,6 @@ func (dm *DataManager) Run() error {
 }
 
 func (dm *DataManager) handleSpecialCases() (bool, error) {
-	klog.InfoS("Handling special cases of pre-run data management")
-	defer klog.InfoS("Completed handling special cases of pre-run data management")
-
 	dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
 	if err != nil {
 		return true, fmt.Errorf("failed to check if data directory already exists: %w", err)
@@ -144,7 +141,6 @@ func (dm *DataManager) handleSpecialCases() (bool, error) {
 // (i.e. data, version metadata, and health information exist)
 func (dm *DataManager) regularPrerun() error {
 	klog.InfoS("Starting pre-run data management")
-	defer klog.InfoS("Completed pre-run data management")
 
 	health, err := getHealthInfo()
 	if err != nil {
@@ -189,6 +185,7 @@ func (dm *DataManager) regularPrerun() error {
 		return fmt.Errorf("failed to handle unhealthy system: %w", err)
 	}
 
+	klog.InfoS("Completed pre-run data management")
 	return nil
 }
 
@@ -319,7 +316,6 @@ func (dm *DataManager) backup(health *HealthInfo) error {
 
 func (dm *DataManager) handleHealthy(health *HealthInfo, currentDeploymentID string) error {
 	klog.Info("Handling healthy system")
-	defer klog.Info("Handled healthy system")
 
 	if err := dm.backup(health); err != nil {
 		return fmt.Errorf("failed to handle healthy system: %w", err)
@@ -330,12 +326,12 @@ func (dm *DataManager) handleHealthy(health *HealthInfo, currentDeploymentID str
 		return dm.handleDeploymentSwitch(currentDeploymentID)
 	}
 
+	klog.Info("Handled healthy system")
 	return nil
 }
 
 func (dm *DataManager) handleUnhealthy(health *HealthInfo) error {
 	klog.Info("Handling unhealthy system")
-	defer klog.Info("Handled unhealthy system")
 
 	currentDeploymentID, err := getCurrentDeploymentID()
 	if err != nil {
@@ -366,7 +362,7 @@ func (dm *DataManager) handleUnhealthy(health *HealthInfo) error {
 		// No backup for current deployment and there is no rollback deployment.
 		// This could be a unhealthy system that was manually rebooted to
 		// remediate the situation - let's not interfere: no backup, no restore, just proceed.
-		klog.InfoS("System has no rollback but health.json suggests system was rebooted - skipping prerun")
+		klog.InfoS("Handled unhealthy system: system has no rollback but health.json suggests system was rebooted - skipping prerun")
 		return nil
 	}
 
@@ -387,7 +383,7 @@ func (dm *DataManager) handleUnhealthy(health *HealthInfo) error {
 		}
 		if rollbackBackup == "" {
 			// This could happen if current deployment is unhealthy and rollback didn't run MicroShift
-			klog.InfoS("There is no backup for rollback deployment as well - removing existing data for clean start")
+			klog.InfoS("Handled unhealthy system: there is no backup for rollback deployment as well - removing existing data for clean start")
 			return dm.dataManager.RemoveData()
 		}
 
@@ -397,6 +393,8 @@ func (dm *DataManager) handleUnhealthy(health *HealthInfo) error {
 		if err := dm.restore(rollbackBackup); err != nil {
 			return fmt.Errorf("failed to restore backup: %w", err)
 		}
+
+		klog.InfoS("Handled unhealthy system")
 		return nil
 	}
 
@@ -407,7 +405,13 @@ func (dm *DataManager) handleUnhealthy(health *HealthInfo) error {
 	if err := dm.backup(health); err != nil {
 		klog.ErrorS(err, "Failed to backup data of unhealthy system - ignoring")
 	}
-	return dm.dataManager.RemoveData()
+
+	if err := dm.dataManager.RemoveData(); err != nil {
+		return fmt.Errorf("failed to remove existing data for clean start: %w", err)
+	}
+
+	klog.InfoS("Handled unhealthy system")
+	return nil
 }
 
 func (dm *DataManager) handleDeploymentSwitch(currentDeploymentID string) error {
