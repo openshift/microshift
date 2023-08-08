@@ -38,7 +38,6 @@ Rebooting Unhealthy System Should Result In Restoring Data From A Backup
     Remove Existing Backup For Current Deployment
 
     ${backup_name}=    Make Masquerading Backup
-    Create Marker In Backup Dir    ${backup_name}
 
     Mark System As Unhealthy    # to trigger restore after reboot
     Reboot MicroShift Host
@@ -66,10 +65,7 @@ Make Masquerading Backup
     ${deploy_id}=    Get Booted Deployment ID
     ${backup_name}=    Set Variable    ${deploy_id}_manual
 
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    microshift backup --name "${backup_name}"
-    ...    sudo=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
+    Create Backup    ${backup_name}    ${TRUE}
 
     RETURN    ${backup_name}
 
@@ -77,16 +73,6 @@ Mark System As Unhealthy
     [Documentation]    Marks systems as unhealthy by executing microshift's red script
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    FORCE=1 /etc/greenboot/red.d/40_microshift_set_unhealthy.sh
-    ...    sudo=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
-
-Create Marker In Backup Dir
-    [Documentation]    Creates a marker file in backup directory
-    [Arguments]    ${backup_name}
-
-    # create a marker that we expect to show up in data directory after restore
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    touch ${BACKUP_STORAGE}/${backup_name}/marker
     ...    sudo=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 

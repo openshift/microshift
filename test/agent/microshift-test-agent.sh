@@ -20,6 +20,7 @@ _cleanup() {
     for cmd in "${CLEANUP_CMDS[@]}"; do
         ${cmd}
     done
+    exit 0
 }
 trap "_cleanup" SIGTERM SIGQUIT INT
 

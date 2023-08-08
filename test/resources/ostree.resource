@@ -41,10 +41,11 @@ Deploy Commit Expecting A Rollback
 Deploy Commit Not Expecting A Rollback
     [Documentation]    Deploys given ref and configures test agent for failing greenboot.
     ...    It expects the system to roll back.
-    [Arguments]    ${target_ref}
+    [Arguments]    ${target_ref}    ${write_agent_cfg}=${FALSE}
 
     ${initial_deploy_id}=    Get Booted Deployment Id
     ${deploy_id}=    Rebase System    ${target_ref}
+    IF    ${write_agent_cfg}    TestAgent.Write
     Reboot MicroShift Host
 
     Log To Console    "System rebased to ${target_ref} and rebooted - starting health checking"

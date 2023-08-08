@@ -106,7 +106,7 @@ func performPrerun() error {
 		return err
 	}
 
-	return prerun.New(dataManager).Perform()
+	return prerun.NewDataManager(dataManager).Run()
 }
 
 func RunMicroshift(cfg *config.Config) error {
