@@ -64,7 +64,12 @@ func CheckAndUpdateDataVersion() error {
 		if !dataExists {
 			// Data directory does not exist so it's first run of MicroShift
 			klog.InfoS("Version file does not exist yet - assuming first run of MicroShift")
-			return writeDataVersion(newVersionFile(execVer, currentDeploymentID, currentBootID))
+			if err := writeDataVersion(newVersionFile(execVer, currentDeploymentID, currentBootID)); err != nil {
+				return fmt.Errorf("failed to write data version: %w", err)
+			}
+
+			klog.InfoS("Completed version metadata management")
+			return nil
 		}
 
 		// Data exists but without version file, let's assume 4.13 and compare versions
