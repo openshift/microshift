@@ -3,6 +3,7 @@
 # This script runs on the hypervisor, from the iso-build step.
 
 set -xeuo pipefail
+PS4='+ $(date "+%T.%N")\011 '
 
 SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Cannot use common.sh because virsh is not installed, but we only
