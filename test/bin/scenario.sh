@@ -15,7 +15,7 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
-VM_BOOT_TIMEOUT=15m
+VM_BOOT_TIMEOUT=900
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 
 full_vm_name() {
@@ -87,11 +87,20 @@ prepare_kickstart() {
 
 # Show the IP address of the VM
 function get_vm_ip {
-    local vmname="${1}"
-    sudo virsh domifaddr "${vmname}" \
-        | grep vnet \
-        | awk '{print $4}' \
-        | cut -f1 -d/
+    local -r vmname="${1}"
+    local -r start=$(date +%s)
+    local ip
+    ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}")
+    while [ "${ip}" = "" ]; do
+        now=$(date +%s)
+        if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
+            echo "Timed out while waiting for IP retrieval"
+            exit 1
+        fi
+        sleep 1
+        ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}")
+    done
+    echo "${ip}"
 }
 
 # Try to login to the host via ssh until the connection is accepted
@@ -206,12 +215,8 @@ launch_vm() {
     fi
 
     # Wait for an IP to be assigned
+    echo "Waiting for VM ${full_vmname} to have an IP"
     ip=$(get_vm_ip "${full_vmname}")
-    while [ -z "${ip}" ]; do
-        echo "Waiting for VM ${full_vmname} to have an IP"
-        sleep 30
-        ip=$(get_vm_ip "${full_vmname}")
-    done
     echo "VM ${full_vmname} has IP ${ip}"
     record_junit "${vmname}" "ip-assignment" "OK"
 
