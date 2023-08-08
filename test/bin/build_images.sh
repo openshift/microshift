@@ -74,7 +74,7 @@ render_container_images() {
     fi
 
     # Find the microshift-release-info RPM with the specified version
-    local -r release_info_rpm=$(find "${IMAGEDIR}/rpm-repos" -name "microshift-release-info-${version}*.rpm" | tail -1)
+    local -r release_info_rpm=$(find "${IMAGEDIR}/rpm-repos" -name "microshift-release-info-${version}*.rpm" | sort | tail -1)
     if [ -z "${release_info_rpm}" ] ; then
         echo "Error: missing microshift-release-info RPM for the '${version}' version"
         exit 1
