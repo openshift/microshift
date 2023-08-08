@@ -254,7 +254,8 @@ func checkVersionCompatibility(execVer, dataVer versionMetadata) (err error) {
 			klog.InfoS("Executable is newer than data by 1 - continuing")
 			return
 		} else {
-			err = fmt.Errorf("executable (%s) is too recent compared to existing data (%s): maximum minor version difference is 1", execVer.String(), dataVer.String())
+			err = fmt.Errorf("executable (%s) is too recent compared to existing data (%s): version difference is %d, maximum allowed difference is 1",
+				execVer.String(), dataVer.String(), execVer.Minor-dataVer.Minor)
 			return
 		}
 	}
