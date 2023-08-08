@@ -94,7 +94,7 @@ function action_create {
     export VMDISKDIR="${MICROSHIFT_VMDISKDIR}"
     export NCPUS="${NCPUS:-4}"
     export RAMSIZE="${RAMSIZE:-8}"
-    export DISKSIZE="${DISKSIZE:-60}"
+    export DISKSIZE="${DISKSIZE:-70}"
     export SWAPSIZE="${SWAPSIZE:-8}"
     export DATAVOLSIZE="${DATAVOLSIZE:-2}"
     if [ -z "${ISOFILE}" ]; then

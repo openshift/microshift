@@ -9,7 +9,10 @@ Start by downloading one of the boot DVD images for the `x86_64` or `aarch64` ar
 
 ### Creating VM
 Log into the hypervisor host and run the following commands to create a RHEL virtual
-machine with 4 cores, 8GB of RAM and 50GB of storage.
+machine with 4 cores, 8GB of RAM and 70GB of storage.
+
+> See [Increase Virtual Machine Disk Size](#increase-virtual-machine-disk-size) section
+> for increasing the storage size if necessary.
 
 Move the boot DVD image to `/var/lib/libvirt/images` directory and run the following
 commands to install the `libvirt` packages and create a virtual machine.
@@ -272,4 +275,35 @@ Repo ID:   rhel-9-for-x86_64-appstream-rpms
 Repo Name: Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)
 Repo URL:  https://cdn.redhat.com/content/dist/rhel9/$releasever/x86_64/appstream/os
 Enabled:   1
+```
+
+### Increase Virtual Machine Disk Size
+
+Log into the hypervisor host, and run the following commands to resize its disk.
+```
+VM_NAME=microshift-dev
+VM_DISK=/var/lib/libvirt/images/${VM_NAME}.qcow2
+INCREASE_BY=20
+
+sudo virsh shutdown ${VM_NAME}
+# Wait until the host is shut off
+
+sudo qemu-img resize ${VM_DISK} +${INCREASE_BY}G
+sudo virsh start ${VM_NAME}
+```
+
+Log into the virtual machine and run the following commands to extend its
+root partition.
+```
+# Use 'lsblk' command output to see your device and partition to be resized
+DEVICE=/dev/vda
+PARTNUM=3
+
+# Resize the device
+sudo parted ${DEVICE} ---pretend-input-tty resizepart ${PARTNUM} 100%
+sudo pvresize ${DEVICE}${PARTNUM}
+sudo lvextend -l +95%FREE /dev/mapper/rhel-root
+
+# Resize the file system
+sudo xfs_growfs /dev/mapper/rhel-root
 ```
