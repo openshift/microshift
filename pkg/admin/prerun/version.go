@@ -260,6 +260,7 @@ func checkVersionCompatibility(execVer, dataVer versionMetadata) (err error) {
 		}
 	}
 
+	klog.InfoS("All version checks passed")
 	return
 }
 
