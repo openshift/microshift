@@ -302,7 +302,7 @@ images that use RPMs created from source (not already published releases).
 
 If you build new RPMs, you need to re-run several steps (build the
 RPMs, build the local repos, build the images, download the images).
-Use `./bin/dev_rebuild_source_images.sh` to automate all of those
+Use `./bin/rebuild_source_images.sh` to automate all of those
 steps with one script while only rebuilding the images that use RPMs
 created from source (not already published releases).
 
