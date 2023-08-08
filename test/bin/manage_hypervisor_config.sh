@@ -51,13 +51,14 @@ action_create() {
     # Isolated network
     if ! sudo sudo virsh net-info "${VM_ISOLATED_NETWORK}" &>/dev/null ; then
         local -r netconfig_tmpl="${SCRIPTDIR}/../assets/isolated-network.xml"
-        local -r netconfig_file="$(mktemp /tmp/isolated-network-XXXXX.xml)"
+        local -r netconfig_file="${IMAGEDIR}/infra/isolated-network.xml"
 
+        mkdir -p "$(dirname "${netconfig_file}")"
         envsubst <"${netconfig_tmpl}" >"${netconfig_file}"
+
         sudo virsh net-define    "${netconfig_file}"
         sudo virsh net-start     "${VM_ISOLATED_NETWORK}"
         sudo virsh net-autostart "${VM_ISOLATED_NETWORK}"
-        rm -f "${netconfig_file}"
     fi
 
     # Firewall
