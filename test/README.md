@@ -205,12 +205,12 @@ contains the blueprint template.
 Blueprint names should clearly identify the combination of operating
 system and MicroShift versions. The convention is to put the operating
 system first, followed by `microshift`. For example,
-`rhel-9.2-microshift-4.13`.
+`el92-prev`.
 
 Regardless of the branch, the blueprints using MicroShift built from
-the source PR should use `source` in the name to facilitate rebuilding
+the source PR should use `src` in the name to facilitate rebuilding
 only the source-based images. For example,
-`rhel-9.2-microshift-source`.
+`el92-src`.
 
 To make it easy to include the right image in a test scenario, each
 blueprint produces an edge-commit image identified with a `ref` that
@@ -224,11 +224,11 @@ conventions to determine the parent blueprint by extracting the prefix
 before the first dash (`-`) in the filename and then using that to find
 the blueprint **template** file, and ultimately the blueprint **name**.
 
-For example, `rhel92-microshift-source` has prefix `rhel92`. There is
-a blueprint template `./test/image-blueprints/group1/rhel92.toml` that
-contains the name `rhel-9.2`, so when the image for
-`rhel92-microshift-source` is built, the parent is configured as the
-`rhel-9.2` image.
+For example, `el92-src` has prefix `el92`. There is
+a blueprint template `./test/image-blueprints/group1/el92.toml` that
+contains the name `el92`, so when the image for
+`el92-src` is built, the parent is configured as the
+`el92` image.
 
 #### Image Reference Aliases
 
@@ -236,23 +236,23 @@ Sometimes it is useful to use the same image via a different
 reference. To define an alias from one ref to another, create a file
 with the name of the desired alias and the extension `.alias`
 containing the name of the reference the alias should point to. For
-example, to create an alias `rhel-9.2-microshift-source-aux` for
-`rhel-9.2-microshift-source`:
+example, to create an alias `el92-src-aux` for
+`el92-src`:
 
 ```
-$ cat ./test/image-blueprints/group2/rhel-9.2-microshift-source-aux.alias
-rhel-9.2-microshift-source
+$ cat ./test/image-blueprints/group2/el92-src-aux.alias
+el92-src
 ```
 
 #### Installer ISO Images
 
 To create an ISO with an installer image from a blueprint, create a
 file with the extension `.image-installer` containing the name of the
-blueprint to base the image on. For example, to create a `rhel92.iso`
-file from the `rhel-9.2` blueprint:
+blueprint to base the image on. For example, to create a `el92.iso`
+file from the `el92` blueprint:
 
 ```
-$ cat ./test/image-blueprints/group1/rhel92.image-installer
+$ cat ./test/image-blueprints/group1/el92.image-installer
 rhel-9.2
 ```
 
@@ -380,7 +380,7 @@ with the `create` argument and a scenario directory name as input.
 
 ```
 $ ./test/bin/scenario.sh create \
-      ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
+      ./test/scenarios/el92_src_standard-suite.sh
 ```
 
 #### Enabling Connections to VMs
@@ -412,7 +412,7 @@ the scenario.
 ```
 $ ./scripts/fetch_tools.sh robotframework
 $ ./test/bin/scenario.sh run \
-      ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
+      ./test/scenarios/el92_src_standard-suite.sh
 ```
 
 ### Scenario Definitions
@@ -426,7 +426,7 @@ combination of images and tests that make up the scenario.
 The scenario script should be defined with a combination of the RHEL
 version(s), MicroShift version(s), and an indication of what sort of
 tests are being run. For example,
-`rhel-9.2-microshift-source-standard-suite.sh` runs the standard test
+`el92_src_standard-suite.sh` runs the standard test
 suite (not the `ostree` upgrade tests) against MicroShift built from
 source running on a RHEL 9.2 image.
 
