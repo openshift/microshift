@@ -173,7 +173,7 @@ image here for reference.
 Blueprint | Group | Image Name | Purpose
 --------- | ----- | ---------- | -------
 el92.toml | group1 | el92 | A simple RHEL image without MicroShift.
-el92-prev.toml | group2 | el92-4.13 | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
+el92-prev.toml | group2 | el92-prev | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
 el92-base.toml | group2 | el92-base | A RHEL 9.2 image with the RPMs built from base release branch (PR's merge target).
 el92-src.toml | group2 | el92-src | A RHEL 9.2 image with the RPMs built from source.
 el92-src-fake-y1.toml | group2 | el92-src-fake-y1 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.

@@ -1,4 +1,4 @@
-name = "el92-4.${PREVIOUS_MINOR_VERSION}"
+name = "el92-prev"
 description = "RHEL 9.2 with MicroShift from the previous minor version (y-stream) installed."
 version = "0.0.1"
 modules = []

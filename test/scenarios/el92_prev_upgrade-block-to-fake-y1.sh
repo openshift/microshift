@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     local start_image
-    start_image="el92-4.$(previous_minor_version)"
+    start_image="el92-prev"
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
     launch_vm host1
 }
