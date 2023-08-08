@@ -321,12 +321,13 @@ func (dm *DataManager) handleHealthy(health *HealthInfo, currentDeploymentID str
 		return fmt.Errorf("failed to handle healthy system: %w", err)
 	}
 
+	klog.Info("Handled healthy system")
+
 	if health.DeploymentID != currentDeploymentID {
 		klog.InfoS("Current deployment is different from deploymentID from health file")
 		return dm.handleDeploymentSwitch(currentDeploymentID)
 	}
 
-	klog.Info("Handled healthy system")
 	return nil
 }
 
