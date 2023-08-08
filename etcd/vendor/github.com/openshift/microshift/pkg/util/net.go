@@ -59,12 +59,12 @@ func RetryInsecureGet(ctx context.Context, url string) int {
 			},
 		}
 		resp, err := c.Get(url)
-		if err == nil {
-			status = resp.StatusCode
-			return true, nil
+		if err != nil {
+			return false, nil //nolint:nilerr
 		}
-		defer resp.Body.Close() //nolint:errcheck
-		return false, nil
+		defer resp.Body.Close()
+		status = resp.StatusCode
+		return true, nil
 	})
 
 	if err != nil && err == context.DeadlineExceeded {
