@@ -9,7 +9,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-DEFAULT_BOOT_BLUEPRINT="rhel-9.2"
+DEFAULT_BOOT_BLUEPRINT="el92"
 LVM_SYSROOT_SIZE="10240"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
@@ -20,7 +20,7 @@ SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 
 full_vm_name() {
     local base="${1}"
-    echo "${SCENARIO}-${base}"
+    echo "${SCENARIO//_/-}-${base}"
 }
 
 sos_report() {

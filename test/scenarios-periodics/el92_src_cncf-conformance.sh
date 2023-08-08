@@ -94,8 +94,8 @@ run_sonobuoy() {
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.2-microshift-source
-    prepare_kickstart host2 kickstart.ks.template rhel-9.2-microshift-source
+    prepare_kickstart host1 kickstart.ks.template el92-src
+    prepare_kickstart host2 kickstart.ks.template el92-src
     launch_vm host1
     launch_vm host2
 }

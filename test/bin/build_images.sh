@@ -109,7 +109,7 @@ get_blueprint_name() {
 # the prefix and use that to find the actual blueprint name that
 # composer knows.
 #
-# rhel92-microshift-source -> rhel-9.2
+# el92-src -> el92
 #
 # FIXME: We may need to change the prefix separator in the future if
 # we need a multi-level hierarchy.
@@ -206,7 +206,7 @@ do_group() {
     if ! ${ONLY_SOURCE}; then
         template_list=$(echo "${groupdir}"/*.toml)
     else
-        template_list=$(echo "${groupdir}"/*source*.toml)
+        template_list=$(echo "${groupdir}"/*src*.toml)
     fi
     for template in ${template_list}; do
         echo

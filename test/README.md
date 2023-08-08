@@ -172,12 +172,12 @@ image here for reference.
 
 Blueprint | Group | Image Name | Purpose
 --------- | ----- | ---------- | -------
-rhel92.toml | group1 | rhel-9.2 | A simple RHEL image without MicroShift.
-rhel92-microshift-previous-minor.toml | group2 | rhel-9.2-microshift-4.13 | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
-rhel92-source.toml | group2 | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
-rhel92-source-base.toml | group2 | rhel-9.2-microshift-source-base | A RHEL 9.2 image with the RPMs built from base release branch.
-rhel92-source-fake-next-minor.toml | group2 | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
-rhel92-source-fake-yplus2-minor.toml | group2 | rhel-9.2-microshift-4.16 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the current+2 y-stream.
+el92.toml | group1 | el92 | A simple RHEL image without MicroShift.
+el92-prev.toml | group2 | el92-4.13 | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
+el92-base.toml | group2 | el92-base | A RHEL 9.2 image with the RPMs built from base release branch (PR's merge target).
+el92-src.toml | group2 | el92-src | A RHEL 9.2 image with the RPMs built from source.
+el92-src-fake-y1.toml | group2 | el92-src-fake-y1 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
+el92-src-fake-y2.toml | group2 | el92-src-fake-y2 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the current+2 y-stream.
 
 #### Blueprint Customization
 

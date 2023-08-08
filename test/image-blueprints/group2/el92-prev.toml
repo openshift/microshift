@@ -1,5 +1,5 @@
-name = "rhel-9.2-microshift-source-base"
-description = "A RHEL 9.2 image with the RPMs built from source from the base release branch"
+name = "el92-4.${PREVIOUS_MINOR_VERSION}"
+description = "RHEL 9.2 with MicroShift from the previous minor version (y-stream) installed."
 version = "0.0.1"
 modules = []
 groups = []
@@ -7,19 +7,19 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "${SOURCE_VERSION_BASE}"
+version = "4.${PREVIOUS_MINOR_VERSION}*"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "${SOURCE_VERSION_BASE}"
+version = "4.${PREVIOUS_MINOR_VERSION}*"
 
 [[packages]]
 name = "microshift-networking"
-version = "${SOURCE_VERSION_BASE}"
+version = "4.${PREVIOUS_MINOR_VERSION}*"
 
 [[packages]]
 name = "microshift-selinux"
-version = "${SOURCE_VERSION_BASE}"
+version = "4.${PREVIOUS_MINOR_VERSION}*"
 
 [[packages]]
 name = "microshift-test-agent"

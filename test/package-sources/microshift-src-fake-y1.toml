@@ -1,4 +1,4 @@
-id = "microshift-fake-next-minor"
+id = "microshift-src-fake-y1"
 name = "MicroShift Fake Next Minor Version Repo"
 type = "yum-baseurl"
 url = "file://${NEXT_REPO}/"
