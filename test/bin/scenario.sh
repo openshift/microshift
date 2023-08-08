@@ -193,26 +193,29 @@ launch_vm() {
     fi
 
     echo "Creating ${full_vmname}"
+    local -r wait=$((VM_BOOT_TIMEOUT / 60))
 
     # FIXME: variable for vcpus?
     # FIXME: variable for memory?
     # FIXME: variable for ISO
-    if timeout "${VM_BOOT_TIMEOUT}" sudo virt-install \
-         --noautoconsole \
+    if sudo virt-install \
+         --autoconsole text \
          --name "${full_vmname}" \
          --vcpus 2 \
          --memory 4092 \
          --disk "pool=${VM_STORAGE_POOL},size=30" \
          --network network=default,model=virtio \
          --events on_reboot=restart \
+         --noreboot \
          --location "${VM_DISK_DIR}/${boot_blueprint}.iso" \
-         --extra-args "inst.ks=${kickstart_url}" \
-         --wait; then
-        record_junit "${vmname}" "launch_vm" "OK"
+         --extra-args "inst.ks=${kickstart_url} console=tty0 console=ttyS0,115200n8 inst.notmux" \
+         --wait "${wait}"; then
+        record_junit "${vmname}" "install_vm" "OK"
     else
-        record_junit "${vmname}" "launch_vm" "FAILED"
+        record_junit "${vmname}" "install_vm" "FAILED"
         return 1
     fi
+    sudo virsh start "${full_vmname}"
 
     # Wait for an IP to be assigned
     echo "Waiting for VM ${full_vmname} to have an IP"
