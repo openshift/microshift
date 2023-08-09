@@ -28,48 +28,48 @@ type versionFile struct {
 }
 
 func VersionMetadataManagement() error {
-	klog.InfoS("Starting version metadata management")
+	klog.InfoS("START version metadata management")
 	if err := versionMetadataManagement(); err != nil {
-		klog.ErrorS(err, "Failed version metadata management")
+		klog.ErrorS(err, "FAIL version metadata management")
 		return err
 	}
-	klog.InfoS("Completed version metadata management")
+	klog.InfoS("END version metadata management")
 	return nil
 }
 
 func versionMetadataManagement() error {
-	klog.InfoS("Obtaining versions")
+	klog.InfoS("START getting versions")
 	ver, err := getVersions()
 	if err != nil {
-		klog.ErrorS(err, "Failed to get versions")
+		klog.ErrorS(err, "FAIL getting versions")
 		return err
 	}
-	klog.InfoS("Obtained versions", "exec", ver.exec, "data", ver.data)
+	klog.InfoS("END getting versions", "exec", ver.exec, "data", ver.data)
 
 	if ver.data == nil {
-		klog.InfoS("Skipping version compatibility checks - data does not exist")
+		klog.InfoS("SKIP version compatibility checks - data does not exist")
 	} else {
-		klog.InfoS("Checking version compatibility")
+		klog.InfoS("START version compatibility checks")
 		if err := checkVersionCompatibility(ver.exec, *ver.data); err != nil {
-			klog.ErrorS(err, "Failed version compatibility check")
+			klog.ErrorS(err, "FAIL version compatibility checks")
 			return err
 		}
-		klog.InfoS("Checked version compatibility")
+		klog.InfoS("END version compatibility checks")
 
-		klog.InfoS("Checking if version upgrade is blocked")
+		klog.InfoS("START checking if version upgrade is blocked")
 		if err := isUpgradeBlocked(ver.exec, *ver.data); err != nil {
-			klog.ErrorS(err, "Failed to check if version upgrade is blocked")
+			klog.ErrorS(err, "FAIL checking if version upgrade is blocked")
 			return err
 		}
-		klog.InfoS("Checked if version upgrade is blocked")
+		klog.InfoS("END checking if version upgrade is blocked")
 	}
 
-	klog.InfoS("Updating version file")
+	klog.InfoS("START updating version file")
 	if err := updateVersionFile(ver.exec); err != nil {
-		klog.ErrorS(err, "Failed to update version file")
+		klog.ErrorS(err, "FAIL updating version file")
 		return err
 	}
-	klog.InfoS("Updated version file")
+	klog.InfoS("END updating version file")
 
 	return nil
 }
@@ -221,13 +221,13 @@ func getVersionOfExecutable() (versionMetadata, error) {
 }
 
 func getVersionOfData() (versionMetadata, error) {
-	klog.InfoS("Reading version file")
+	klog.InfoS("START reading version file")
 	verFile, err := getVersionFile()
 	if err != nil {
-		klog.ErrorS(err, "Failed to read version file")
+		klog.ErrorS(err, "FAIL reading version file")
 		return versionMetadata{}, err
 	}
-	klog.InfoS("Read version file", "contents", verFile)
+	klog.InfoS("END reading version file", "contents", verFile)
 	return verFile.Version, nil
 }
 

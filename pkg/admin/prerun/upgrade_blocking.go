@@ -12,29 +12,29 @@ import (
 )
 
 func isUpgradeBlocked(execVersion versionMetadata, dataVersion versionMetadata) error {
-	klog.InfoS("Obtaining list of blocked upgrades")
+	klog.InfoS("START obtaining list of blocked upgrades")
 	buf, err := getBlockedUpgradesAsset()
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			klog.InfoS("Embedded blocked upgrades asset does not exist - skipping check if upgrade is blocked")
+			klog.InfoS("SKIP obtaining list of blocked upgrades - embedded blocked upgrades asset does not exist - skipping check if upgrade is blocked")
 			return nil
 		}
-		klog.ErrorS(err, "Failed to obtain list of blocked upgrades")
+		klog.ErrorS(err, "FAIL obtaining list of blocked upgrades")
 		return err
 	}
 	m, err := unmarshalBlockedUpgrades(buf)
 	if err != nil {
-		klog.ErrorS(err, "Failed to unmarshal blocked upgrades asset", "asset", strings.ReplaceAll(string(buf), "\n", ""))
+		klog.ErrorS(err, "FAIL unmarshal blocked upgrades asset", "asset", strings.ReplaceAll(string(buf), "\n", ""))
 		return err
 	}
-	klog.InfoS("Obtained blocked upgrades", "blocked-upgrades", m)
+	klog.InfoS("END obtaining list of blocked upgrades", "blocked-upgrades", m)
 
-	klog.InfoS("Checking if upgrade is blocked", "existing-data-version", dataVersion, "new-binary-version", execVersion)
+	klog.InfoS("START checking if upgrade is blocked", "existing-data-version", dataVersion, "new-binary-version", execVersion)
 	if err := isBlocked(m, execVersion.String(), dataVersion.String()); err != nil {
-		klog.ErrorS(err, "Upgrade is blocked")
+		klog.ErrorS(err, "FAIL upgrade is blocked")
 		return err
 	}
-	klog.InfoS("Upgrade is not blocked", "existing-data-version", dataVersion, "new-binary-version", execVersion)
+	klog.InfoS("END upgrade is not blocked", "existing-data-version", dataVersion, "new-binary-version", execVersion)
 	return nil
 }
 
