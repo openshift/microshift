@@ -1,7 +1,7 @@
 id = "microshift-src"
 name = "MicroShift Src Repo"
 type = "yum-baseurl"
-url = "file://${LOCAL_REPO}/"
+url = "file://${REPO_SRC}/"
 check_gpg = false
 check_ssl = false
 system = false

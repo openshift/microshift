@@ -31,35 +31,35 @@ export VM_ISOLATED_NETWORK="isolated"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-RPM_SOURCE="${ROOTDIR}/_output/rpmbuild"
+RPM_SRC="${ROOTDIR}/_output/rpmbuild"
 
-# Location of RPMs built from source
+# Location of fake Y+1 RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-NEXT_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-fake-next-minor"
+RPM_FAKE_Y1="${ROOTDIR}/_output/rpmbuild-fake-y1"
 
-# Location of RPMs built from source
+# Location of fake Y+2 RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-YPLUS2_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-fake-yplus2-minor"
+RPM_FAKE_Y2="${ROOTDIR}/_output/rpmbuild-fake-y2"
 
-# Location of RPMs built from source
+# Location of base branch RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-BASE_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-base"
+RPM_BASE="${ROOTDIR}/_output/rpmbuild-base"
 
-# Location of local repository used by composer
+# Location of SRC RPM repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
-LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
+REPO_SRC="${IMAGEDIR}/rpm-repos/microshift-src"
 
-# Location of local repository used by composer
+# Location of fake Y+1 RPM repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
-NEXT_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-next-minor"
+REPO_FAKE_Y1="${IMAGEDIR}/rpm-repos/microshift-fake-y1"
 
-# Location of local repository used by composer
+# Location of fake Y+2 repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
-YPLUS2_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-yplus2-minor"
+REPO_FAKE_Y2="${IMAGEDIR}/rpm-repos/microshift-fake-y2"
 
-# Location of local repository used by composer
+# Location of base branch RPM repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
-BASE_REPO="${IMAGEDIR}/rpm-repos/microshift-base"
+REPO_BASE="${IMAGEDIR}/rpm-repos/microshift-base"
 
 # Location of data files created by the tools for managing scenarios
 # as they are run.

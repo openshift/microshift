@@ -21,13 +21,13 @@ configure_package_sources() {
     # Machine platform type ("x86_64")
     UNAME_M=$(uname -m)
     export UNAME_M
-    export LOCAL_REPO              # defined in common.sh
-    export NEXT_REPO               # defined in common.sh
-    export BASE_REPO               # defined in common.sh
-    export YPLUS2_REPO             # defined in common.sh
+    export REPO_SRC                # defined in common.sh
+    export REPO_BASE               # defined in common.sh
+    export REPO_FAKE_Y1            # defined in common.sh
+    export REPO_FAKE_Y2            # defined in common.sh
     export SOURCE_VERSION
-    export FAKE_NEXT_MINOR_VERSION
-    export FAKE_YPLUS2_MINOR_VERSION
+    export FAKE_Y1_MINOR_VERSION
+    export FAKE_Y2_MINOR_VERSION
     export MINOR_VERSION
     export PREVIOUS_MINOR_VERSION
     export SOURCE_VERSION_BASE
@@ -410,25 +410,25 @@ done
 
 # Determine the version of the RPM in the local repo so we can use it
 # in the blueprint templates.
-if [ ! -d "${LOCAL_REPO}" ]; then
-    error "Run ${SCRIPTDIR}/create_local_repo.sh before building images."
+if [ ! -d "${REPO_SRC}" ]; then
+    error "Run ${SCRIPTDIR}/create_rpm_repos.sh before building images."
     exit 1
 fi
-release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
+release_info_rpm=$(find "${REPO_SRC}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
 if [ -z "${release_info_rpm}" ]; then
-    error "Failed to find microshift-release-info RPM in ${LOCAL_REPO}"
+    error "Failed to find microshift-release-info RPM in ${REPO_SRC}"
     exit 1
 fi
-release_info_rpm_base=$(find "${BASE_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
+release_info_rpm_base=$(find "${REPO_BASE}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
 if [ -z "${release_info_rpm_base}" ]; then
-    error "Failed to find microshift-release-info RPM in ${BASE_REPO}"
+    error "Failed to find microshift-release-info RPM in ${REPO_BASE}"
     exit 1
 fi
 SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
 MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
-PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
-FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
-FAKE_YPLUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" + 2 ))
+PREVIOUS_MINOR_VERSION=$(("${MINOR_VERSION}" - 1))
+FAKE_Y1_MINOR_VERSION=$(("${MINOR_VERSION}" + 1))
+FAKE_Y2_MINOR_VERSION=$(("${MINOR_VERSION}" + 2))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
 
 mkdir -p "${IMAGEDIR}"

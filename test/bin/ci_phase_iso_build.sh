@@ -41,7 +41,7 @@ cd "${ROOTDIR}/test/"
 bash -x ./bin/build_rpms.sh
 
 # Set up for scenario tests
-bash -x ./bin/create_local_repo.sh
+bash -x ./bin/create_rpm_repos.sh
 
 # Start the web server to host the ostree commit repository for parent images
 bash -x ./bin/start_webserver.sh

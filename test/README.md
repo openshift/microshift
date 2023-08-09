@@ -268,7 +268,7 @@ MicroShift to create images with different versions. Use
 
 #### Creating Local RPM Repositories
 
-After building RPMs, run `./test/bin/create_local_repo.sh` to copy the
+After building RPMs, run `./test/bin/create_rpm_repos.sh` to copy the
 necessary files into locations that can be used as RPM repositories by
 Image Builder.
 

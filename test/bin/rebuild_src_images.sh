@@ -13,7 +13,7 @@ source "${SCRIPTDIR}/common.sh"
 "${SCRIPTDIR}/build_rpms.sh"
 
 # Create RPM repositories for the build
-"${SCRIPTDIR}/create_local_repo.sh"
+"${SCRIPTDIR}/create_rpm_repos.sh"
 
 # Serve the images for the build
 "${SCRIPTDIR}/start_webserver.sh"

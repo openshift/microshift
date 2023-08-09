@@ -36,7 +36,7 @@ make_repo() {
 mkdir -p "${IMAGEDIR}"
 cd "${IMAGEDIR}"
 
-make_repo "${LOCAL_REPO}" "${RPM_SOURCE}"
-make_repo "${NEXT_REPO}" "${NEXT_RPM_SOURCE}"
-make_repo "${YPLUS2_REPO}" "${YPLUS2_RPM_SOURCE}"
-make_repo "${BASE_REPO}" "${BASE_RPM_SOURCE}"
+make_repo "${REPO_SRC}" "${RPM_SRC}"
+make_repo "${REPO_FAKE_Y1}" "${RPM_FAKE_Y1}"
+make_repo "${REPO_FAKE_Y2}" "${RPM_FAKE_Y2}"
+make_repo "${REPO_BASE}" "${RPM_BASE}"
