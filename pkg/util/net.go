@@ -34,16 +34,33 @@ import (
 
 var previousGatewayIP string = ""
 
-func GetHostIP() (string, error) {
-	ip, err := net.ChooseHostInterface()
-	if err == nil {
-		return ip.String(), nil
+func GetHostIP(nodeIP string) (string, error) {
+	var hostIP string
+	var err error
+
+	if nodeIP != "" {
+		klog.Infof("try to find nodeIP %s on host", nodeIP)
+		hostIP, err = selectV4IPFromHostInterface(nodeIP)
+		if err != nil {
+			return "", fmt.Errorf("failed to find nodeIP %s on host: %v", nodeIP, err)
+		}
+		goto found
 	}
-	hostIP := ip.String()
+
+	if ip, err := net.ChooseHostInterface(); err == nil {
+		hostIP = ip.String()
+	} else {
+		klog.Infof("failed to get host IP by default route: %v", err)
+		if hostIP, err = selectV4IPFromHostInterface(""); err != nil {
+			return "", err
+		}
+	}
+
+found:
 	if hostIP != previousGatewayIP {
 		previousGatewayIP = hostIP
-		klog.V(2).Infof("host gateway IP address: %s", hostIP)
 	}
+	klog.V(2).Infof("host gateway IP address: %s", hostIP)
 
 	return hostIP, nil
 }
@@ -141,4 +158,39 @@ func addNoProxyEnvVarEntries(entries map[string]struct{}, envVar string) {
 			entries[strings.Trim(entry, " ")] = struct{}{}
 		}
 	}
+}
+
+func selectV4IPFromHostInterface(nodeIP string) (string, error) {
+	ifaces, err := tcpnet.Interfaces()
+	if err != nil {
+		return "", err
+	}
+
+	// get list of interfaces
+	for _, i := range ifaces {
+		if i.Name == "br-ex" {
+			continue
+		}
+		addrs, err := i.Addrs()
+		if err != nil {
+			klog.Warningf("failed to get IPs for interface %s: %v", i.Name, err)
+			continue
+		}
+
+		for _, addr := range addrs {
+			ip, _, err := tcpnet.ParseCIDR(addr.String())
+			if err != nil {
+				return "", fmt.Errorf("unable to parse CIDR for interface %q: %s", i.Name, err)
+			}
+			if ip.To4() == nil || ip.IsLoopback() {
+				// ignore IPv6 and loopback addresses
+				continue
+			}
+			if nodeIP != "" && nodeIP != ip.String() {
+				continue
+			}
+			return ip.String(), nil
+		}
+	}
+	return "", fmt.Errorf("no interface with valid address found on host")
 }

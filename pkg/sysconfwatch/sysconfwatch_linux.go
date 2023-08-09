@@ -32,8 +32,9 @@ const sysConfigCheckInterval = time.Second * 5
 const sysConfigAllowedTimeDrift = time.Second * 10
 
 type SysConfWatchController struct {
-	NodeIP  string
-	timerFd int
+	NodeIP     string
+	userNodeIP string
+	timerFd    int
 }
 
 func NewSysConfWatchController(cfg *config.Config) *SysConfWatchController {
@@ -53,10 +54,10 @@ func NewSysConfWatchController(cfg *config.Config) *SysConfWatchController {
 	if err != nil {
 		klog.Fatalf("failed to start a realtime clock timer %v", err)
 	}
-
 	return &SysConfWatchController{
-		NodeIP:  cfg.Node.NodeIP,
-		timerFd: fd,
+		NodeIP:     cfg.Node.NodeIP,
+		userNodeIP: cfg.UserNodeIP(),
+		timerFd:    fd,
 	}
 }
 
@@ -103,16 +104,21 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 		select {
 		case <-ticker.C:
 			// Check the IP change
-			currentIP, _ := util.GetHostIP()
+			currentIP, err := util.GetHostIP(c.userNodeIP)
+			if err != nil {
+				klog.Warningf("cannot find an host IP: %v", err)
+				os.Exit(1)
+				return nil
+			}
 			if c.NodeIP != currentIP {
 				klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIP, currentIP)
-				os.Exit(0)
+				os.Exit(1)
 				return nil
 			}
 
 			// Check the clock change by initiating an asynchronous read operation on the timer object
 			// When the clock is reset, the read operation returns with the ECANCELED error code
-			_, err := unix.Read(c.timerFd, buf)
+			_, err = unix.Read(c.timerFd, buf)
 			if err == unix.ECANCELED {
 				// Take a snapshot of the current system and monototic clocks
 				stimeCur, mtimeCur := getSysMonTimes()
