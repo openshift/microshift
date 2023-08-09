@@ -56,12 +56,14 @@ match one of the `kubeconfig` files generated for the host because
 many of the tests will try to download that file to connect to the API
 remotely.
 
+`USHIFT_USER` should be the username for logging in to `USHIFT_HOST`
+remotely via ssh.
+
+`SSH_PRIV_KEY` should be an ssh key file to use for authenticating as
 `USHIFT_USER`. The key must not require a password. To connect to
 hosts using a key with a password, leave `SSH_PRIV_KEY` set to an
 empty string and the tests will connect as `USHIFT_USER` and rely on
 the ssh agent to provide the correct credentials.
-
-`SSH_PRIV_KEY` should be an ssh key file to use for authenticating as
 
 `SSH_PORT` should be the port used for an ssh connection.
 
