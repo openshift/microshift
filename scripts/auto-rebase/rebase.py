@@ -201,7 +201,7 @@ def generate_pr_description(branch_name, amd_tag, arm_tag, prow_job_url, rebase_
     /label tide/merge-method-squash
     /label cherry-pick-approved
     /label backport-risk-assessed
-    /label bugzilla/valid-bug
+    /label jira/valid-bug
     """)
     return (base if rebase_script_succeded
             else "# rebase.sh failed - check committed rebase_sh.log\n\n" + base)
