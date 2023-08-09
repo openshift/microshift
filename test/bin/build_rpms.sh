@@ -19,10 +19,10 @@ make rpm
 # Build some RPMs with the version number of the next minor release,
 # but using the same source code as the normal build.
 title "Building fake next minor version"
-make -C test/ fake-next-minor-rpm
+make -C test/ fake-y1-rpm
 
 title "Building fake next next minor version"
-make -C test/ fake-yplus2-minor-rpm
+make -C test/ fake-y2-rpm
 
 # Build RPMs from release-$MAJOR.$MINOR of this repo.  These RPMs are useful in providing a layer to upgrade from.
 title "Building base release branch"

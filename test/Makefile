@@ -4,19 +4,19 @@ include $(REPO)/Makefile
 NEXT_MINOR = $(shell expr $(MINOR) + 1)
 YPLUS2_MINOR = $(shell expr $(MINOR) + 2)
 
-.PHONY: fake-next-minor-rpm
-fake-next-minor-rpm: RPMBUILD_DIR := $(REPO)/_output/rpmbuild-fake-next-minor/
-fake-next-minor-rpm:
+.PHONY: fake-y1-rpm
+fake-y1-rpm: RPMBUILD_DIR := $(REPO)/_output/rpmbuild-fake-y1/
+fake-y1-rpm:
 	rm -rf $(RPMBUILD_DIR)
-	MICROSHIFT_VERSION="$(MAJOR).$(NEXT_MINOR).$(PATCH)_fake_next_minor" \
+	MICROSHIFT_VERSION="$(MAJOR).$(NEXT_MINOR).$(PATCH)_fake_y1" \
 	RPMBUILD_DIR=$(RPMBUILD_DIR) \
 		$(MAKE) -C $(REPO) rpm
 
-.PHONY: fake-yplus2-minor-rpm
-fake-yplus2-minor-rpm: RPMBUILD_DIR := $(REPO)/_output/rpmbuild-fake-yplus2-minor/
-fake-yplus2-minor-rpm:
+.PHONY: fake-y2-rpm
+fake-y2-rpm: RPMBUILD_DIR := $(REPO)/_output/rpmbuild-fake-y2/
+fake-y2-rpm:
 	rm -rf $(RPMBUILD_DIR)
-	MICROSHIFT_VERSION="$(MAJOR).$(YPLUS2_MINOR).$(PATCH)_fake_YPLUS2_minor" \
+	MICROSHIFT_VERSION="$(MAJOR).$(YPLUS2_MINOR).$(PATCH)_fake_y2" \
 	RPMBUILD_DIR=$(RPMBUILD_DIR) \
 		$(MAKE) -C $(REPO) rpm
 
