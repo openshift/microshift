@@ -22,43 +22,36 @@ exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 
 # Clean the dnf cache to avoid corruption
-dnf clean all
+sudo dnf clean all
 
 # Show what other dnf commands have been run to try to debug why we
 # sometimes see cache collisons.
-dnf history --reverse
+sudo dnf history --reverse
 
-cd ~/microshift
+cd "${ROOTDIR}"
 
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
 bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
 bash -x ./scripts/image-builder/configure.sh
 
-# Make sure libvirtd is running. We do this here, because some of the
-# other scripts use virsh.
-bash -x ./scripts/devenv-builder/manage-vm.sh config
-
-# Fix up firewall so the VMs on their NAT network can talk to the
-# server running on the hypervisor. We do this here, before creating
-# any VMs, because the iptables rules added when the VMs are created
-# are not persistent and are lost when this script reloads the
-# firewall.
-cd ~/microshift/test/
-bash -x ./bin/configure_hypervisor_firewall.sh
+cd "${ROOTDIR}/test/"
 
 # Re-build from source.
-bash -x ./bin/build_rpms.sh
+time bash -x ./bin/build_rpms.sh
 
 # Set up for scenario tests
 bash -x ./bin/create_local_repo.sh
 
-# Start the web server to host the ostree commit repository for parent
-# images.
+# Start the web server to host the ostree commit repository for parent images
 bash -x ./bin/start_webserver.sh
 
 # Build all of the images
-bash -x ./bin/start_osbuild_workers.sh 5
-bash -x ./bin/build_images.sh
+CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
+MAX_WORKERS=5
+CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo ${MAX_WORKERS} )"
+
+bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
+time bash -x ./bin/build_images.sh
 
 echo "Build phase complete"

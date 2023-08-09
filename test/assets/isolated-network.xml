@@ -1,0 +1,9 @@
+<network>
+  <name>${VM_ISOLATED_NETWORK}</name>
+  <forward mode='none'/>
+  <ip address='192.168.111.1' netmask='255.255.255.0' localPtr='yes'>
+    <dhcp>
+      <range start='192.168.111.100' end='192.168.111.254'/>
+    </dhcp>
+  </ip>
+</network>

@@ -19,14 +19,20 @@ echo "Logging to ${LOGFILE}"
 # Set fd 1 and 2 to write to the log file
 exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${LOGFILE}"))
 
-cd ~/microshift/test
+cd "${ROOTDIR}"
+
+# Make sure libvirtd is running. We do this here, because some of the
+# other scripts use virsh.
+bash -x ./scripts/devenv-builder/manage-vm.sh config
+
+cd "${ROOTDIR}/test"
+
+# Set up the hypervisor configuration for the tests
+bash -x ./bin/manage_hypervisor_config.sh create
 
 # Start the web server to host the kickstart files and ostree commit
 # repository.
 bash -x ./bin/start_webserver.sh
-
-# Set up the storage pool for VMs
-bash -x ./bin/manage_vm_storage_pool.sh create
 
 declare -A pidToScenario
 
