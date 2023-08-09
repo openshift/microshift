@@ -21,11 +21,109 @@ var (
 	errDataVersionDoesNotExist = errors.New("version file for MicroShift data does not exist")
 )
 
-// CheckAndUpdateDataVersion checks version compatibility between data and executable,
-// and updates data version
-func CheckAndUpdateDataVersion() error {
-	klog.InfoS("Starting version metadata management")
+type versionFile struct {
+	Version      versionMetadata `json:"version"`
+	DeploymentID string          `json:"deployment_id,omitempty"`
+	BootID       string          `json:"boot_id"`
+}
 
+func VersionMetadataManagement() error {
+	klog.InfoS("Starting version metadata management")
+	if err := versionMetadataManagement(); err != nil {
+		klog.ErrorS(err, "Failed version metadata management")
+		return err
+	}
+	klog.InfoS("Completed version metadata management")
+	return nil
+}
+
+func versionMetadataManagement() error {
+	klog.InfoS("Obtaining versions")
+	ver, err := getVersions()
+	if err != nil {
+		klog.ErrorS(err, "Failed to get versions")
+		return err
+	}
+	klog.InfoS("Obtained versions", "exec", ver.exec, "data", ver.data)
+
+	if ver.data == nil {
+		klog.InfoS("Skipping version compatibility checks - data does not exist")
+	} else {
+		klog.InfoS("Checking version compatibility")
+		if err := checkVersionCompatibility(ver.exec, *ver.data); err != nil {
+			klog.ErrorS(err, "Failed version compatibility check")
+			return err
+		}
+		klog.InfoS("Checked version compatibility")
+
+		klog.InfoS("Checking if version upgrade is blocked")
+		if err := isUpgradeBlocked(ver.exec, *ver.data); err != nil {
+			klog.ErrorS(err, "Failed to check if version upgrade is blocked")
+			return err
+		}
+		klog.InfoS("Checked if version upgrade is blocked")
+	}
+
+	klog.InfoS("Updating version file")
+	if err := updateVersionFile(ver.exec); err != nil {
+		klog.ErrorS(err, "Failed to update version file")
+		return err
+	}
+	klog.InfoS("Updated version file")
+
+	return nil
+}
+
+type versions struct {
+	exec versionMetadata
+	data *versionMetadata
+}
+
+// getVersions obtains and returns versions of executable and data dir.
+// Version of data will be nil if the MicroShift data does not exist yet.
+func getVersions() (versions, error) {
+	execVer, err := getVersionOfExecutable()
+	if err != nil {
+		return versions{}, fmt.Errorf("failed to get version of MicroShift executable: %w", err)
+	}
+
+	vs := versions{
+		exec: execVer,
+		data: nil,
+	}
+
+	dataVer, err := getVersionOfData()
+	if err == nil {
+		vs.data = &dataVer
+		return vs, nil
+	}
+
+	if !errors.Is(err, errDataVersionDoesNotExist) {
+		// error is something else than "file does not exist", like permissions
+		return versions{}, fmt.Errorf("failed to get version of existing MicroShift data: %w", err)
+	}
+
+	// Ignoring .nodename to not get false positives from mere existence of the path
+	dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
+	if err != nil {
+		return versions{}, err
+	}
+
+	if !dataExists {
+		// Data directory does not exist so it's first run of MicroShift
+		klog.InfoS("Version file does not exist yet - assuming first run of MicroShift")
+		vs.data = nil // repeated for clarity
+		return vs, nil
+	}
+
+	// Data exists but without version file, let's assume 4.13 and compare versions
+	klog.InfoS("MicroShift data directory exists, but doesn't contain version file" +
+		" - assuming 4.13.0 and proceeding with version compatibility checks")
+	vs.data = &versionMetadata{Major: 4, Minor: 13, Patch: 0}
+	return vs, nil
+}
+
+func updateVersionFile(ver versionMetadata) error {
 	currentDeploymentID := ""
 	isOstree, err := util.PathExists("/run/ostree-booted")
 	if err != nil {
@@ -42,71 +140,24 @@ func CheckAndUpdateDataVersion() error {
 		return fmt.Errorf("failed to get current boot ID: %w", err)
 	}
 
-	execVer, err := getVersionOfExecutable()
+	v := versionFile{
+		Version:      ver,
+		DeploymentID: currentDeploymentID,
+		BootID:       currentBootID,
+	}
+
+	klog.InfoS("Version file contents to write", "data", v)
+
+	data, err := json.Marshal(v)
 	if err != nil {
-		return fmt.Errorf("failed to get version of MicroShift executable: %w", err)
+		return fmt.Errorf("failed to marshal %v: %w", v, err)
 	}
 
-	dataVer, err := getVersionOfData()
-	dataVersionMissing := errors.Is(err, errDataVersionDoesNotExist)
-
-	if err != nil && !dataVersionMissing {
-		return fmt.Errorf("failed to get version of existing MicroShift data: %w", err)
+	if err := os.WriteFile(versionFilePath, data, 0600); err != nil {
+		return fmt.Errorf("writing %q to %q failed: %w", string(data), versionFilePath, err)
 	}
-
-	if dataVersionMissing {
-		// Ignoring .nodename to not get false positives from mere existence of the path
-		dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
-		if err != nil {
-			return err
-		}
-
-		if !dataExists {
-			// Data directory does not exist so it's first run of MicroShift
-			klog.InfoS("Version file does not exist yet - assuming first run of MicroShift")
-			if err := writeDataVersion(newVersionFile(execVer, currentDeploymentID, currentBootID)); err != nil {
-				return fmt.Errorf("failed to write data version: %w", err)
-			}
-
-			klog.InfoS("Completed version metadata management")
-			return nil
-		}
-
-		// Data exists but without version file, let's assume 4.13 and compare versions
-		klog.InfoS("MicroShift data directory exists, but doesn't contain version file" +
-			" - assuming 4.13.0 and proceeding with version compatibility checks")
-		dataVer = versionMetadata{Major: 4, Minor: 13, Patch: 0}
-	}
-
-	if err := checkVersionCompatibility(execVer, dataVer); err != nil {
-		return fmt.Errorf("checking version compatibility failed: %w", err)
-	}
-
-	if err := isUpgradeBlocked(execVer, dataVer); err != nil {
-		return err
-	}
-
-	if err := writeDataVersion(newVersionFile(execVer, currentDeploymentID, currentBootID)); err != nil {
-		return fmt.Errorf("failed to update data version: %w", err)
-	}
-
-	klog.InfoS("Completed version metadata management")
 
 	return nil
-}
-
-type versionFile struct {
-	Version      versionMetadata `json:"version"`
-	DeploymentID string          `json:"deployment_id,omitempty"`
-	BootID       string          `json:"boot_id"`
-}
-
-func newVersionFile(version versionMetadata, deployID, bootID string) versionFile {
-	return versionFile{
-		Version:      version,
-		DeploymentID: deployID,
-		BootID:       bootID,
-	}
 }
 
 type versionMetadata struct {
@@ -170,18 +221,17 @@ func getVersionOfExecutable() (versionMetadata, error) {
 }
 
 func getVersionOfData() (versionMetadata, error) {
+	klog.InfoS("Reading version file")
 	verFile, err := getVersionFile()
 	if err != nil {
-		return versionMetadata{},
-			fmt.Errorf("failed to read version file: %w", err)
+		klog.ErrorS(err, "Failed to read version file")
+		return versionMetadata{}, err
 	}
-
+	klog.InfoS("Read version file", "contents", verFile)
 	return verFile.Version, nil
 }
 
 func getVersionFile() (versionFile, error) {
-	klog.InfoS("Reading version metadata from the file")
-
 	exists, err := util.PathExistsAndIsNotEmpty(versionFilePath)
 	if err != nil {
 		return versionFile{}, fmt.Errorf("checking if path exists failed: %w", err)
@@ -202,7 +252,6 @@ func getVersionFile() (versionFile, error) {
 			fmt.Errorf("unmarshalling %q failed: %w", string(versionFileContents), err)
 	}
 
-	klog.InfoS("Read version metadata from the file", "version", verFile)
 	return verFile, nil
 }
 
@@ -223,59 +272,32 @@ func GetVersionStringOfData() string {
 	return versionMetadata.String()
 }
 
-// checkVersionCompatibility compares versions of executable and existing data for purposes of data migration.
-func checkVersionCompatibility(execVer, dataVer versionMetadata) (err error) {
-	klog.InfoS("Starting version compatibility checks", "executable", execVer, "data", dataVer)
-	defer func() {
-		if err != nil {
-			klog.ErrorS(err, "Failed version compatibility checks")
-		} else {
-			klog.InfoS("Completed version compatibility checks")
-		}
-	}()
-
+// checkVersionCompatibility compares versions of executable and existing data
+// to detect unsupported version changes
+func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
 	if execVer == dataVer {
 		klog.InfoS("Executable and data versions are the same - continuing")
-		return
+		return nil
 	}
 
 	if execVer.Major != dataVer.Major {
-		err = fmt.Errorf("major versions are different: %d and %d", dataVer.Major, execVer.Major)
-		return
+		return fmt.Errorf("major versions are different: %d and %d", dataVer.Major, execVer.Major)
 	}
 
 	if execVer.Minor < dataVer.Minor {
-		err = fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
-		return
+		return fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
 	}
 
 	if execVer.Minor > dataVer.Minor {
 		if execVer.Minor-1 == dataVer.Minor {
 			klog.InfoS("Executable is newer than data by 1 - continuing")
-			return
+			return nil
 		} else {
-			err = fmt.Errorf("executable (%s) is too recent compared to existing data (%s): version difference is %d, maximum allowed difference is 1",
+			return fmt.Errorf("executable (%s) is too recent compared to existing data (%s): version difference is %d, maximum allowed difference is 1",
 				execVer.String(), dataVer.String(), execVer.Minor-dataVer.Minor)
-			return
 		}
 	}
 
 	klog.InfoS("All version checks passed")
-	return
-}
-
-func writeDataVersion(v versionFile) error {
-	klog.InfoS("Writing MicroShift version to the version file", "version", v)
-
-	data, err := json.Marshal(v)
-	if err != nil {
-		return fmt.Errorf("failed to marshal %v: %w", v, err)
-	}
-
-	if err := os.WriteFile(versionFilePath, data, 0600); err != nil {
-		return fmt.Errorf("writing %q to %q failed: %w", string(data), versionFilePath, err)
-	}
-
-	klog.InfoS("Wrote MicroShift version to the version file", "json", string(data))
 	return nil
 }
