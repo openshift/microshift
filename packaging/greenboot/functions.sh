@@ -98,7 +98,7 @@ function wait_for() {
     shift 1
 
     local -r start=$(date +%s)
-    until (timeout "${timeout}" "$@"); do
+    until ("$@"); do
         sleep 1
 
         local now
