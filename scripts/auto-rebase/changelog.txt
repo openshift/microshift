@@ -1,6 +1,0 @@
-# cluster-ingress-operator embedded-component a4dc8290ffb1c5a1876e0640ee3a87d9599c0a67 to 78a28b25f80972e05efc165088cbd68135566c9e
-1c6bac83c205164bb7e18d9715359f7c6818742e 2023-08-03T12:28:10-04:00 OCPBUGS-14998: Only use RoleARN for Route53 API
-ee34524d35665ef8a5445e3544723853e759fb5c 2023-08-03T12:27:56-04:00 Add support for AWS shared VPC in another account
-e37cacc9eaadd55ff11e0d84f2c8a15a86e8ed25 2023-08-03T12:27:01-04:00 Bump openshift/api for PrivateHostedZoneAWS
-# machine-config-operator embedded-component 88fcb47c150db0de0bb1507919b55d0e81233139 to 1871c13664555c6d27e2c4ca373015ee34e9db56
-6537bc6870fdf274db5cee65f8b14ff72754598a 2023-08-07T15:43:12+00:00 controller: add no-op if scheduler can't be found
