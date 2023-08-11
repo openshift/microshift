@@ -13,9 +13,6 @@ allow container_t container_runtime_tmpfs_t:file read_file_perms;
 allow container_t container_runtime_tmpfs_t:lnk_file read_file_perms;
 allow container_t container_runtime_tmpfs_t:file open;
 allow container_t container_runtime_tmpfs_t:file read;
-allow container_t container_var_lib_t:file open;
-allow container_t container_var_lib_t:file read;
-allow container_t container_var_lib_t:lnk_file read;
 allow container_t var_lib_t:file { open read };
 allow iptables_t cgroup_t:dir ioctl;
 
