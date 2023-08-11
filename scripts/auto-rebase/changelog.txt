@@ -1,23 +1,70 @@
-- cluster-network-operator embedded-component 829c5487c9c4c1a4dfc862227521d2b7d0cb4b36 to 2da32c1e9f45a969e500af67b362c64fc776308e
-  - 98d6298 2023-08-07T09:47:02+02:00 Check only pods owned by current allowlist sysctl DS
-  - 4e88f98 2023-08-07T09:47:02+02:00 Do not retry when allowlist pods are not ready
-  - 025043e 2023-08-07T09:47:02+02:00 Fix log level message when allowlist controller succeeds
-  - 886af31 2023-08-03T14:44:25-07:00 make MAXLOGFILES a real variable and work for self-hosted
+- cluster-ingress-operator embedded-component dbbf314db6f154cced2e3d352ad38e44702f8891 to 8f2f0352a02be251a9fa118fe1297ee3e90b58be
+  - 530d326 2023-08-03T01:59:13-04:00 Set spec.subdomain on the canary route
+  - ca2e8fa 2023-07-24T09:27:30-04:00 Test_desiredCanaryRoute: Use testify
+  - 3b69441 2023-07-24T09:26:54-04:00 Test_desiredCanaryRoute: Fix owner reference check
 
-- machine-config-operator embedded-component 9d8392054408e88120044435a98bc568c44d2543 to 886c5c3fc7a96e922a65d83ecd39d19f4921dd50
-  - fa24949a 2023-08-03T15:37:42-04:00 controller: add no-op if scheduler can't be found
+- cluster-network-operator embedded-component 2da32c1e9f45a969e500af67b362c64fc776308e to d8c28d4fbb6d4b4ab1242417d893b130e1dce30c
+  - a74d4cd 2023-08-08T20:07:04+02:00 Metrics for IC
+  - 20ec034 2023-08-08T20:06:51+02:00 RBAC for OVN interconnect
+  - 802fd06 2023-08-08T20:03:07+02:00 OVN interconnect support: fix unit tests
+  - 62d8b3d 2023-08-08T20:02:50+02:00 Full OVN interconnect support for self-hosted and managed
 
-- ovn-kubernetes image-amd64 239955b3e602c62bb72d2c7c8926daee9be8b616 to f05d79a6080efe659ad6445ccd2a5636cfabf172
-  - d28c5d7 2023-08-04T08:16:55+00:00 CARRY: Use pod name as identifier for cluster manager
-  - 7c74ebd 2023-08-03T19:53:47+02:00 EgressService: re-configure the global address set in repair
-  - f972802 2023-08-03T15:03:42+02:00 go mod: Manually solve dependabot conflicts
-  - bcb8955 2023-08-03T10:33:44+02:00 e2e, multihoming: Add underlay service connectivity test
-  - 78fdd2f 2023-08-02T19:47:55+02:00 Run remote node deletion by hostname if chassis id wasn't found
-  - 8fb9c13 2023-07-24T15:02:00+02:00 Make OVS pinning period shorter
-
-- kubernetes image-arm64 e12378702b580d923c5c68354a710eaa9e7d0997 to 54fa6e11070b296a0012e4730850da558a57a536
+- kubernetes embedded-component e12378702b580d923c5c68354a710eaa9e7d0997 to 5b9481160e974940c1ea42160a3352bc8d23acc2
+  - dff17b9de 2023-08-08T20:09:18+02:00 UPSTREAM: <drop>: update vendor
+  - 04c55aefc 2023-08-08T20:09:18+02:00 UPSTREAM: <carry>: merge v3 openapi discovery and specs for special groups
   - 7ddabeb24 2023-08-08T12:37:02+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - 4dccebd6c 2023-08-08T12:05:28+02:00 UPSTREAM: <carry>: Force using host go always and use host libriaries
   - 83c1d5b67 2023-08-08T12:03:22+02:00 UPSTREAM: 119761: Statefulset should wait for new replicas when removing .start.ordinal
   - 276d06acb 2023-08-08T12:02:35+02:00 Revert "Revert "OCPBUGS-16166: Update to Kubernetes 1.27.4""
+
+- machine-config-operator embedded-component 886c5c3fc7a96e922a65d83ecd39d19f4921dd50 to 40571adccaa3ef49a823abe8d7494bcdc48f2021
+  - d3a8ca0b 2023-08-07T15:30:25-04:00 migrate to LeasesResourceLock for leader elections
+
+- route-controller-manager embedded-component 5710699f4e7ec00a14fa3fe600b81d0f722fc1ff to 0a976ea8bb9f7bf1d0b22730dc0825f976b27ccc
+  - 6fafb9d 2023-07-19T16:49:13+02:00 consider POD_NAMESPACE when resolving component owner
+  - d15b12c 2023-07-19T16:49:13+02:00 Revert "Revert "[WRKLDS-730] refactor route controller manager to use library-go server and ControlerCommand for generic setup""
+  - 533cabf 2023-07-19T16:48:20+02:00 Revert "[WRKLDS-730] add dummy flags needed for a switch to library-go server and ControlerCommand"
+
+- router image-amd64 8c552ab99d963f25afece3bd71f1ef52872ec22a to 44a5304cf8972d235468e813fe228ce36b1532e8
+  - e68f171 2023-08-10T00:33:12+10:00 Santizes header name by escaping and quoting
+  - b51fe75 2023-08-10T00:33:00+10:00 Fix nits made by reviewers
+  - 23c7b09 2023-08-09T18:46:25+10:00 Add Test_configsAreEqual
+  - 6d77b55 2023-08-09T18:46:25+10:00 TestConfigTemplate: Add test cases for set headers
+  - 84c7f84 2023-08-09T18:46:25+10:00 TestConfigTemplate: Print haproxy.config if failed
+  - 3f7c183 2023-08-09T18:46:25+10:00 TestConfigTemplate: Change Fatalf to Fatal
+  - f3361bb 2023-08-09T18:46:25+10:00 Adds logic for setting and deleting headers via Ingress Operator CR and Route Object. `images/router/haproxy/conf/haproxy-config.template`  Sets the http-response and http-request stanzas to set or delete custom HTTP Response/Request headers. `pkg/cmd/infra/router/template.go` This consists the logic to get the value from the env var from router deployment and use it for setting/deleting HTTP response/request headers. `pkg/router/template/plugin.go` Adds new fields in the TemplatePluginConfig struct to set or delete HTTP request/reponse headers. These are needed to set the values we get from router deployment env var. `pkg/router/template/router.go` This consists of the logic extracting header values from the route object and then set/delete HTTP request/reponse headers. `pkg/router/template/router_test.go` This consists of units test cases to the logic to extract headers from route object and set/delete HTTP request/reponse headers. `pkg/router/template/types.go` This adds two fields HTTPResponseHeaders and HTTPRequestHeaders of type []HTTPHeader in the ServiceAliasConfig which is used in the haproxy-config.template to add the set/delete http-reponse and http-request stanzas for the header values fetched from the route object. This also add a struct called HTTPHeader which helps setting the HTTP response/request values in the http-reponse/http-request stanzas in the haproxy-config.template.
+  - dde2022 2023-08-09T18:45:55+10:00 Vendored changes gomfmt -w pkg/router/template/certmanager_test.go
+
+- ovn-kubernetes image-amd64 f05d79a6080efe659ad6445ccd2a5636cfabf172 to 06c951cae81fb24ad437f78deaad111785dceeab
+  - da9b065 2023-08-07T11:40:08-07:00 Consolidate several L4 OVN ACLs into smaller number of OVN ACLs
+  - 1cb56c3 2023-08-04T12:26:07+02:00 libovsdb: give monitor setup time to process than normal transactions
+  - 487b2a9 2023-08-01T17:41:32+02:00 APB: make namespaceSelector in dynamic hops mandatory
+
+- kubernetes image-amd64 e12378702b580d923c5c68354a710eaa9e7d0997 to 5b9481160e974940c1ea42160a3352bc8d23acc2
+  - dff17b9de 2023-08-08T20:09:18+02:00 UPSTREAM: <drop>: update vendor
+  - 04c55aefc 2023-08-08T20:09:18+02:00 UPSTREAM: <carry>: merge v3 openapi discovery and specs for special groups
+  - 7ddabeb24 2023-08-08T12:37:02+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4dccebd6c 2023-08-08T12:05:28+02:00 UPSTREAM: <carry>: Force using host go always and use host libriaries
+  - 83c1d5b67 2023-08-08T12:03:22+02:00 UPSTREAM: 119761: Statefulset should wait for new replicas when removing .start.ordinal
+  - 276d06acb 2023-08-08T12:02:35+02:00 Revert "Revert "OCPBUGS-16166: Update to Kubernetes 1.27.4""
+
+- router image-arm64 8c552ab99d963f25afece3bd71f1ef52872ec22a to 44a5304cf8972d235468e813fe228ce36b1532e8
+  - e68f171 2023-08-10T00:33:12+10:00 Santizes header name by escaping and quoting
+  - b51fe75 2023-08-10T00:33:00+10:00 Fix nits made by reviewers
+  - 23c7b09 2023-08-09T18:46:25+10:00 Add Test_configsAreEqual
+  - 6d77b55 2023-08-09T18:46:25+10:00 TestConfigTemplate: Add test cases for set headers
+  - 84c7f84 2023-08-09T18:46:25+10:00 TestConfigTemplate: Print haproxy.config if failed
+  - 3f7c183 2023-08-09T18:46:25+10:00 TestConfigTemplate: Change Fatalf to Fatal
+  - f3361bb 2023-08-09T18:46:25+10:00 Adds logic for setting and deleting headers via Ingress Operator CR and Route Object. `images/router/haproxy/conf/haproxy-config.template`  Sets the http-response and http-request stanzas to set or delete custom HTTP Response/Request headers. `pkg/cmd/infra/router/template.go` This consists the logic to get the value from the env var from router deployment and use it for setting/deleting HTTP response/request headers. `pkg/router/template/plugin.go` Adds new fields in the TemplatePluginConfig struct to set or delete HTTP request/reponse headers. These are needed to set the values we get from router deployment env var. `pkg/router/template/router.go` This consists of the logic extracting header values from the route object and then set/delete HTTP request/reponse headers. `pkg/router/template/router_test.go` This consists of units test cases to the logic to extract headers from route object and set/delete HTTP request/reponse headers. `pkg/router/template/types.go` This adds two fields HTTPResponseHeaders and HTTPRequestHeaders of type []HTTPHeader in the ServiceAliasConfig which is used in the haproxy-config.template to add the set/delete http-reponse and http-request stanzas for the header values fetched from the route object. This also add a struct called HTTPHeader which helps setting the HTTP response/request values in the http-reponse/http-request stanzas in the haproxy-config.template.
+  - dde2022 2023-08-09T18:45:55+10:00 Vendored changes gomfmt -w pkg/router/template/certmanager_test.go
+
+- ovn-kubernetes image-arm64 f05d79a6080efe659ad6445ccd2a5636cfabf172 to 06c951cae81fb24ad437f78deaad111785dceeab
+  - da9b065 2023-08-07T11:40:08-07:00 Consolidate several L4 OVN ACLs into smaller number of OVN ACLs
+  - 1cb56c3 2023-08-04T12:26:07+02:00 libovsdb: give monitor setup time to process than normal transactions
+  - 487b2a9 2023-08-01T17:41:32+02:00 APB: make namespaceSelector in dynamic hops mandatory
+
+- kubernetes image-arm64 54fa6e11070b296a0012e4730850da558a57a536 to deb2c6012264c4b300833165e51134de25441985
+  - dff17b9de 2023-08-08T20:09:18+02:00 UPSTREAM: <drop>: update vendor
+  - 04c55aefc 2023-08-08T20:09:18+02:00 UPSTREAM: <carry>: merge v3 openapi discovery and specs for special groups
+  - ffbc774c9 2023-08-08T15:14:04+02:00 UPSTREAM: <drop>: bump apiserver-library-go for updated required-scc errors
 
