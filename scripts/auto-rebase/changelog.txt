@@ -1,0 +1,6 @@
+# kubernetes embedded-component 73ac5612fbb16a50ee4ffe95f8c2dbe33e477dbf to 6bf3f75361ab014977af5a8c8ececab921cb3052
+6f196d293331054f51d1249447763b9a09f4a81b 2023-08-04T14:03:42+01:00 UPSTREAM: <carry>: Increase service idle max timeout to 100 minutes
+# kubernetes image-amd64 73ac5612fbb16a50ee4ffe95f8c2dbe33e477dbf to 6bf3f75361ab014977af5a8c8ececab921cb3052
+6f196d293331054f51d1249447763b9a09f4a81b 2023-08-04T14:03:42+01:00 UPSTREAM: <carry>: Increase service idle max timeout to 100 minutes
+# kubernetes image-arm64 73ac5612fbb16a50ee4ffe95f8c2dbe33e477dbf to 6bf3f75361ab014977af5a8c8ececab921cb3052
+6f196d293331054f51d1249447763b9a09f4a81b 2023-08-04T14:03:42+01:00 UPSTREAM: <carry>: Increase service idle max timeout to 100 minutes
