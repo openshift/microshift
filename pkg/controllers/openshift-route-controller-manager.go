@@ -17,14 +17,18 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
+	unstructuredv1 "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/klog/v2"
 
 	configv1 "github.com/openshift/api/config/v1"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
-	"github.com/openshift/library-go/pkg/config/configdefaults"
-	"github.com/openshift/library-go/pkg/config/helpers"
-	"github.com/openshift/library-go/pkg/config/leaderelection"
+	"github.com/openshift/api/operator/v1alpha1"
+	"github.com/openshift/library-go/pkg/controller/controllercmd"
 	route_controller_manager "github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager"
 
 	"github.com/openshift/microshift/pkg/assets"
@@ -34,9 +38,11 @@ import (
 )
 
 type OCPRouteControllerManager struct {
+	run           func(context.Context) error
 	kubeconfig    string
 	kubeadmconfig string
-	config        *openshiftcontrolplanev1.OpenShiftControllerManagerConfig
+
+	configErr error
 }
 
 const (
@@ -46,7 +52,7 @@ const (
 
 func NewRouteControllerManager(cfg *config.Config) *OCPRouteControllerManager {
 	s := &OCPRouteControllerManager{}
-	s.configure(cfg)
+	s.configErr = s.configure(cfg)
 	return s
 }
 
@@ -55,22 +61,12 @@ func (s *OCPRouteControllerManager) Dependencies() []string {
 	return []string{"kube-apiserver", "openshift-crd-manager"}
 }
 
-func (s *OCPRouteControllerManager) configure(cfg *config.Config) {
+func (s *OCPRouteControllerManager) configure(cfg *config.Config) error {
 	s.kubeconfig = cfg.KubeConfigPath(config.RouteControllerManager)
 	s.kubeadmconfig = cfg.KubeConfigPath(config.KubeAdmin)
-	s.config = s.writeConfig()
-}
 
-func (s *OCPRouteControllerManager) writeConfig() *openshiftcontrolplanev1.OpenShiftControllerManagerConfig {
 	servingCertDir := cryptomaterial.RouteControllerManagerServingCertDir(cryptomaterial.CertsDirectory(config.DataDir))
-
-	c := &openshiftcontrolplanev1.OpenShiftControllerManagerConfig{
-		KubeClientConfig: configv1.KubeClientConfig{
-			KubeConfig: s.kubeconfig,
-			ConnectionOverrides: configv1.ClientConnectionOverrides{
-				ContentType: "application/json",
-			},
-		},
+	rcmConfig := &openshiftcontrolplanev1.OpenShiftControllerManagerConfig{
 		ServingInfo: &configv1.HTTPServingInfo{
 			ServingInfo: configv1.ServingInfo{
 				BindAddress: "0.0.0.0:8445",
@@ -88,15 +84,46 @@ func (s *OCPRouteControllerManager) writeConfig() *openshiftcontrolplanev1.OpenS
 		},
 	}
 
-	// https://github.com/openshift/route-controller-manager/blob/main/pkg/cmd/route-controller-manager/openshiftcontrolplane_default.go
-	configdefaults.SetRecommendedHTTPServingInfoDefaults(c.ServingInfo)
-	configdefaults.SetRecommendedKubeClientConfigDefaults(&c.KubeClientConfig)
-	c.LeaderElection = leaderelection.LeaderElectionDefaulting(c.LeaderElection, "kube-system", "openshift-route-controllers")
-	return c
+	scheme := runtime.NewScheme()
+	if err := openshiftcontrolplanev1.AddToScheme(scheme); err != nil {
+		return err
+	}
+	codec := serializer.NewCodecFactory(scheme).LegacyCodec(openshiftcontrolplanev1.GroupVersion)
+	encodedConfig, err := runtime.Encode(codec, rcmConfig)
+	if err != nil {
+		return err
+	}
+	ctrlConfig := &unstructuredv1.Unstructured{}
+	if err := runtime.DecodeInto(codec, encodedConfig, ctrlConfig); err != nil {
+		return err
+	}
+
+	const namespace = "openshift-route-controller-manager"
+	builder := controllercmd.NewController(s.Name(), route_controller_manager.RunRouteControllerManager).
+		WithKubeConfigFile(s.kubeconfig, nil).
+		WithComponentNamespace(namespace).
+		// Without an explicit owner reference, the builder will try using POD_NAME or the
+		// first pod in the target namespace (and fail because we have no pod).
+		WithComponentOwnerReference(&corev1.ObjectReference{
+			APIVersion: corev1.SchemeGroupVersion.String(),
+			Kind:       "Namespace",
+			Name:       namespace,
+			Namespace:  namespace,
+		}).
+		WithServer(*rcmConfig.ServingInfo, v1alpha1.DelegatedAuthentication{}, v1alpha1.DelegatedAuthorization{})
+
+	s.run = func(ctx context.Context) error {
+		return builder.Run(ctx, ctrlConfig)
+	}
+
+	return nil
 }
 
 func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+	if s.configErr != nil {
+		return fmt.Errorf("configuration failed: %w", s.configErr)
+	}
 
 	// run readiness check
 	go func() {
@@ -130,14 +157,13 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 	}
 
 	if err := assets.ApplyRoles(ctx, []string{
-		"controllers/route-controller-manager/route-controller-manager-leader-role.yaml",
 		"controllers/route-controller-manager/route-controller-manager-separate-sa-role.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager roles %v", err)
 	}
 
 	if err := assets.ApplyRoleBindings(ctx, []string{
-		"controllers/route-controller-manager/route-controller-manager-leader-rolebinding.yaml",
+		"controllers/route-controller-manager/route-controller-manager-authentication-reader-rolebinding.yaml",
 		"controllers/route-controller-manager/route-controller-manager-separate-sa-rolebinding.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager role bindings %v", err)
@@ -149,10 +175,5 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		klog.Fatalf("failed to apply route controller manager service account %v", err)
 	}
 
-	clientConfig, err := helpers.GetKubeClientConfig(s.config.KubeClientConfig)
-	if err != nil {
-		return err
-	}
-
-	return route_controller_manager.RunRouteControllerManager(s.config, clientConfig, ctx)
+	return s.run(ctx)
 }
