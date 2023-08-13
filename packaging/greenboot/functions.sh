@@ -88,6 +88,7 @@ function get_wait_timeout() {
     echo "${wait_timeout}"
 }
 
+
 # Run a command with a second delay until it returns a zero exit status
 #
 # arg1: Time in seconds to wait for a command to succeed
@@ -96,11 +97,34 @@ function get_wait_timeout() {
 function wait_for() {
     local timeout=$1
     shift 1
-
     local -r start=$(date +%s)
-    until ("$@"); do
+    local file_rc=/tmp/$@.rc
+    echo 1 >${file_rc}
+
+    while : ; do
+
+        # run the command in the background and save its pid and return code,
+        # make sure its silenced.
+        { ( $@ ; echo $? >${file_rc}  ) & } 3>&2 2>- 
+        pid=$!
+        
+        # silence the stdout 
+        disown &>/dev/null
+
+        # poll the pid until timeout expired
+        timeout "${timeout}" tail --pid=$pid -f /dev/null
+
+        # return 0 if the command success
+        if [ $(cat ${file_rc}) -eq 0 ]; then
+            return 0
+        fi
+      
         sleep 1
 
+        # check if the child proccess still running then kill it.
+        pgrep ${pid} >/dev/null && kill -9 ${pid} 
+
+        # if timeout expired return error
         local now
         now=$(date +%s)
         [ $(( now - start )) -ge "${timeout}" ] && return 1
@@ -108,6 +132,7 @@ function wait_for() {
 
     return 0
 }
+
 
 # Check if all the pod images in a given namespace are downloaded.
 #
