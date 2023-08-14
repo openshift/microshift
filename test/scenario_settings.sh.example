@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # Set the PUBLIC_IP to the IP address used to access the hypervisor.
+# Enable this setting to connect to VMs via the specified IP using
+# port-forwarded connections. Otherwise, IP addresses assigned by
+# libvirt are used for accessing VMs.
 # shellcheck disable=SC2034
-PUBLIC_IP=10.8.1.133
+#PUBLIC_IP=1.2.3.4
 
 # Set SSH_PUBLIC_KEY to the filename of the ssh key to be used to
 # access the VMs created.
