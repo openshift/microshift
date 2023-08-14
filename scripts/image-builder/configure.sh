@@ -24,7 +24,7 @@ sudo firewall-cmd --add-service=cockpit --permanent
 
 # The mock utility comes from the EPEL repository
 sudo dnf install -y "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OSVERSION}.noarch.rpm"
-sudo dnf install -y mock caddy tomcli
+sudo dnf install -y mock nginx tomcli
 sudo usermod -a -G mock "$(whoami)"
 
 # Verify umask and home directory permissions
@@ -41,7 +41,7 @@ DIR_PERM=$(stat -c 0%a "${TEST_FILE}.dir")
 
 if [ "${FILE_PERM}" -lt 0644 ] || [ "${DIR_PERM}" -lt 0711 ] ; then
     echo "Check ${TEST_FILE}.dir permissions. The umask setting must allow execute to group/others"
-    echo "Check ${TEST_FILE}.file permissions. The umask setting must allow read to group/others"    
+    echo "Check ${TEST_FILE}.file permissions. The umask setting must allow read to group/others"
     exit 1
 fi
 
