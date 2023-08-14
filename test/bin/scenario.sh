@@ -177,17 +177,14 @@ EOF
 #                    should be used to boot the VM. This is _not_
 #                    necessarily the image to be installed (see
 #                    prepare_kickstart).
-# network_name -- The name of the network used when creating the VM.
+#  network_name -- The name of the network used when creating the VM.
 launch_vm() {
-    local vmname="$1"
-    local boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
-    local network_name="${3:-default}"
+    local -r vmname="$1"
+    local -r boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
+    local -r network_name="${3:-default}"
 
-    local full_vmname
-    local kickstart_url
-
-    full_vmname="$(full_vm_name "${vmname}")"
-    kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+    local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
 
     # Checking web server for kickstart file
     if ! curl -o /dev/null "${kickstart_url}" >/dev/null 2>&1; then
@@ -196,21 +193,46 @@ launch_vm() {
     fi
 
     echo "Creating ${full_vmname}"
+    local -r vm_wait_timeout=$(( VM_BOOT_TIMEOUT / 60 ))
 
-    # FIXME: variable for vcpus?
-    # FIXME: variable for memory?
-    # FIXME: variable for ISO
-    if timeout "${VM_BOOT_TIMEOUT}" sudo virt-install \
-         --noautoconsole \
-         --name "${full_vmname}" \
-         --vcpus 2 \
-         --memory 4092 \
-         --disk "pool=${VM_STORAGE_POOL},size=30" \
-         --network network="${network_name}",model=virtio \
-         --events on_reboot=restart \
-         --location "${VM_DISK_DIR}/${boot_blueprint}.iso" \
-         --extra-args "inst.ks=${kickstart_url}" \
-         --wait; then
+    # Implement retries on VM creation until the problem is fixed
+    # See https://github.com/virt-manager/virt-manager/issues/498
+    local vm_created=false
+    for attempt in $(seq 5) ; do
+        local vm_create_start
+        vm_create_start=$(date +%s)
+        # FIXME: variable for vcpus?
+        # FIXME: variable for memory?
+        # FIXME: variable for ISO
+        if ! sudo virt-install \
+            --noautoconsole \
+            --name "${full_vmname}" \
+            --vcpus 2 \
+            --memory 4092 \
+            --disk "pool=${VM_STORAGE_POOL},size=20" \
+            --network network="${network_name}",model=virtio \
+            --events on_reboot=restart \
+            --location "${VM_DISK_DIR}/${boot_blueprint}.iso" \
+            --extra-args "inst.ks=${kickstart_url}" \
+            --wait ${vm_wait_timeout} ; then
+
+            # Check if the command exited within 15s due to a failure
+            local vm_create_end
+            vm_create_end=$(date +%s)
+            if [ $(( vm_create_end -  vm_create_start )) -lt 15 ] ; then
+                echo "Error running virt-install on attempt ${attempt}: retrying in 5s"
+                sleep 5
+                continue
+            fi
+            # Stop retrying on timeout error
+            break
+        fi
+        # Stop retrying when VM is created successfully
+        vm_created=true
+        break
+    done
+
+    if ${vm_created} ; then
         record_junit "${vmname}" "launch_vm" "OK"
     else
         record_junit "${vmname}" "launch_vm" "FAILED"
@@ -219,7 +241,7 @@ launch_vm() {
 
     # Wait for an IP to be assigned
     echo "Waiting for VM ${full_vmname} to have an IP"
-    ip=$(get_vm_ip "${full_vmname}")
+    local -r ip=$(get_vm_ip "${full_vmname}")
     echo "VM ${full_vmname} has IP ${ip}"
     record_junit "${vmname}" "ip-assignment" "OK"
 
@@ -241,23 +263,17 @@ launch_vm() {
         echo "${PUBLIC_IP}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
     else
         echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
-        # Set the defaults for the various ports so that connections
-        # from the hypervisor to the VM work.
-        echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-        echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
-        echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
     fi
+    # Set the defaults for the various ports so that connections
+    # from the hypervisor to the VM work.
+    echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+    echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
+    echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
 
     if wait_for_ssh "${ip}"; then
         record_junit "${vmname}" "ssh-access" "OK"
     else
         record_junit "${vmname}" "ssh-access" "FAILED"
-        return 1
-    fi
-    if wait_for_greenboot "${full_vmname}" "${ip}"; then
-        record_junit "${vmname}" "greenboot-complete" "OK"
-    else
-        record_junit "${vmname}" "greenboot-complete" "FAILED"
         return 1
     fi
 
@@ -266,10 +282,8 @@ launch_vm() {
 
 # Clean up the resources for one VM.
 remove_vm() {
-    local vmname="${1}"
-
-    local full_vmname
-    full_vmname="$(full_vm_name "${vmname}")"
+    local -r vmname="${1}"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
 
     # Remove the actual VM and its storage
     if sudo virsh dumpxml "${full_vmname}" >/dev/null; then
@@ -313,7 +327,8 @@ next_minor_version() {
 
 # Run the tests for the current scenario
 run_tests() {
-    local vmname="${1}"
+    local -r vmname="${1}"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
     shift
 
     echo "Running tests with $# args" "$@"
@@ -328,30 +343,24 @@ run_tests() {
         exit 1
     fi
 
-
-    local ssh_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-    local api_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
-    local lb_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
-    local public_ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
-    local ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
-    local api_port
-    local ssh_port
-    local public_ip
-    local vm_ip
-    local f
+    local -r ssh_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+    local -r api_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
+    local -r lb_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
+    local -r public_ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+    local -r ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
     for f in "${ssh_port_file}" "${api_port_file}" "${lb_port_file}" "${public_ip_file}" "${ip_file}"; do
         if [ ! -f "${f}" ]; then
             error "Cannot read ${f}"
             exit 1
         fi
     done
-    ssh_port=$(cat "${ssh_port_file}")
-    api_port=$(cat "${api_port_file}")
-    lb_port=$(cat "${lb_port_file}")
-    public_ip=$(cat "${public_ip_file}")
-    vm_ip=$(cat "${ip_file}")
+    local -r ssh_port=$(cat "${ssh_port_file}")
+    local -r api_port=$(cat "${api_port_file}")
+    local -r lb_port=$(cat "${lb_port_file}")
+    local -r public_ip=$(cat "${public_ip_file}")
+    local -r vm_ip=$(cat "${ip_file}")
 
-    local variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
+    local -r variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
     echo "Writing variables to ${variable_file}"
     mkdir -p "$(dirname "${variable_file}")"
     cat - <<EOF | tee "${variable_file}"
@@ -363,6 +372,13 @@ USHIFT_USER: redhat
 SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
+
+    if wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
+        record_junit "${vmname}" "greenboot-complete" "OK"
+    else
+        record_junit "${vmname}" "greenboot-complete" "FAILED"
+        return 1
+    fi
 
     "${rf_binary}" \
         --name "${SCENARIO}" \
