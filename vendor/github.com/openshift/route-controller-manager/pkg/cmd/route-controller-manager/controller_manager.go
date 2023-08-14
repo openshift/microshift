@@ -2,32 +2,49 @@ package openshift_controller_manager
 
 import (
 	"context"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 
-	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
-	"github.com/openshift/library-go/pkg/serviceability"
-
-	routecontrollers "github.com/openshift/route-controller-manager/pkg/cmd/controller/route"
-	origincontrollers "github.com/openshift/route-controller-manager/pkg/cmd/routecontroller"
-	"github.com/openshift/route-controller-manager/pkg/version"
+	"github.com/openshift/library-go/pkg/controller/controllercmd"
+	"github.com/openshift/route-controller-manager/pkg/cmd/controller"
 )
 
-func RunRouteControllerManager(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig, clientConfig *rest.Config, ctx context.Context) error {
-	serviceability.InitLogrusFromKlog()
-	kubeClient, err := kubernetes.NewForConfig(clientConfig)
+func RunRouteControllerManager(ctx context.Context, controllerContext *controllercmd.ControllerContext) error {
+	config, err := asOpenshiftControllerManagerConfig(controllerContext.ComponentConfig)
 	if err != nil {
 		return err
 	}
 
-	// only serve if we have serving information.
-	if config.ServingInfo != nil {
-		klog.Infof("Starting controllers on %s (%s)", config.ServingInfo.BindAddress, version.Get().String())
+	routeControllerManagerContext, err := controller.NewControllerContext(ctx, controllerContext, *config)
+	if err != nil {
+		klog.Fatal(err)
+	}
+	if err := startControllers(ctx, routeControllerManagerContext); err != nil {
+		klog.Fatal(err)
+	}
+	routeControllerManagerContext.StartInformers(ctx.Done())
 
-		if err := routecontrollers.RunControllerServer(*config.ServingInfo, kubeClient); err != nil {
+	<-ctx.Done()
+	return nil
+}
+
+func startControllers(ctx context.Context, controllerContext *controller.EnhancedControllerContext) error {
+	for controllerName, initFn := range controller.ControllerManagerInitialization {
+		if !controllerContext.IsControllerEnabled(controllerName) {
+			klog.Warningf("%q is disabled", controllerName)
+			continue
+		}
+		klog.V(1).Infof("Starting %q", controllerName)
+		started, err := initFn(ctx, controllerContext)
+		if err != nil {
+			klog.Fatalf("Error starting %q (%v)", controllerName, err)
 			return err
 		}
+		if !started {
+			klog.Warningf("Skipping %q", controllerName)
+			continue
+		}
+		klog.Infof("Started %q", controllerName)
 	}
-	return origincontrollers.RunRouteControllerManager(config, kubeClient, clientConfig, ctx)
+	klog.Infof("Started Route Controllers")
+	return nil
 }
