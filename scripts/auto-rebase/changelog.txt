@@ -1,6 +1,2 @@
-# kubernetes embedded-component 73ac5612fbb16a50ee4ffe95f8c2dbe33e477dbf to 6bf3f75361ab014977af5a8c8ececab921cb3052
-6f196d293331054f51d1249447763b9a09f4a81b 2023-08-04T14:03:42+01:00 UPSTREAM: <carry>: Increase service idle max timeout to 100 minutes
-# kubernetes image-amd64 73ac5612fbb16a50ee4ffe95f8c2dbe33e477dbf to 6bf3f75361ab014977af5a8c8ececab921cb3052
-6f196d293331054f51d1249447763b9a09f4a81b 2023-08-04T14:03:42+01:00 UPSTREAM: <carry>: Increase service idle max timeout to 100 minutes
-# kubernetes image-arm64 73ac5612fbb16a50ee4ffe95f8c2dbe33e477dbf to 6bf3f75361ab014977af5a8c8ececab921cb3052
-6f196d293331054f51d1249447763b9a09f4a81b 2023-08-04T14:03:42+01:00 UPSTREAM: <carry>: Increase service idle max timeout to 100 minutes
+# machine-config-operator embedded-component 1871c13664555c6d27e2c4ca373015ee34e9db56 to 00f2deeebffb02b302c1dd0c02925f13c58949c7
+6c0059a6a2e1c61b2383eb2e0103ec42d700a85a 2023-08-08T10:16:57-04:00 Dockerfile: OKD: Reenable extensions image on SCOS
