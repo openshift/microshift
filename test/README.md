@@ -496,19 +496,12 @@ Use `./test/bin/scenario.sh login` to login to a VM for a scenario as the
 
 ### Cleaning Up
 
-On a `development host`, use `./test/bin/composer_cleanup.sh` to stop any
-running jobs, remove everything from the queue, and delete existing builds.
+On a `development host`, use `./test/bin/cleanup_composer.sh` to fully
+clean composer jobs and cache, also restarting its services.
 
-> It is recommended to use `./scripts/image-builder/cleanup.sh -full` to
-> fully clean Image Builder jobs and cache, also restarting its services.
-
-On a `hypervisor host`, use `./test/bin/scenario.sh cleanup` to remove the
-test infrastructure for a scenario.
-
-```
-$ ./test/bin/scenario.sh cleanup \
-      ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
-```
+On a `hypervisor host`, use `./test/bin/cleanup_hypervisor.sh` to remove
+the test infrastructure for all scenarios, undo the hypervisor configuration
+and kill the web server process.
 
 ## CI Integration Scripts
 

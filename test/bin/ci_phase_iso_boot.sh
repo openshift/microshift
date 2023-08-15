@@ -25,6 +25,9 @@ cd "${ROOTDIR}"
 # other scripts use virsh.
 bash -x ./scripts/devenv-builder/manage-vm.sh config
 
+# Clean up the image builder cache to free disk for virtual machines
+bash -x ./scripts/image-builder/cleanup.sh -full
+
 cd "${ROOTDIR}/test"
 
 # Set up the hypervisor configuration for the tests
@@ -43,6 +46,7 @@ for scenario in "${SCENARIO_SOURCES}"/*.sh; do
     mkdir -p "$(dirname "${logfile}")"
     bash -x ./bin/scenario.sh create "${scenario}" >"${logfile}" 2>&1 &
     pidToScenario["$!"]="${scenario}"
+    sleep 5
 done
 
 set +x
@@ -59,7 +63,14 @@ for job in $(jobs -p); do
     fi
 done
 
+echo "===================================="
+echo "System information after booting VMs"
+echo "===================================="
+free -h
+df -h
+sudo du -sk "${IMAGEDIR}"/* | sort -n
 sudo virsh list --all
+echo "===================================="
 
 if [ ${FAIL} -ne 0 ]; then
     echo "Failed to boot all VMs"
