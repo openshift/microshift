@@ -12,6 +12,6 @@ for scenario in scenarios/*.sh; do
     ./bin/scenario.sh cleanup "${scenario}"
 done
 
-pkill caddy || true
+sudo pkill nginx || true
 
 rm -rf "${IMAGEDIR}"

@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# This script should be run on the hypervisor to set up a caddy
-# file-server for the images used by Vms running test scenarios.
+# This script should be run on the hypervisor to set up an nginx
+# file-server for the images used by VMs running test scenarios.
 
 set -euo pipefail
 
@@ -13,9 +13,32 @@ echo "Starting web server in ${IMAGEDIR}"
 mkdir -p "${IMAGEDIR}"
 cd "${IMAGEDIR}"
 
-pkill caddy || true
-nohup caddy file-server \
-      --access-log \
-      --browse \
-      --listen "0.0.0.0:${WEB_SERVER_PORT}" \
-      --root "${IMAGEDIR}" >caddy.log 2>&1 &
+NGINX_CONFIG="${IMAGEDIR}/nginx.conf"
+cat > "${NGINX_CONFIG}" <<EOF
+worker_processes 8;
+events {
+}
+http {
+    access_log /dev/null;
+    error_log  ${IMAGEDIR}/nginx_error.log;
+    server {
+        listen 0.0.0.0:${WEB_SERVER_PORT};
+        root   ${IMAGEDIR};
+    }
+}
+pid ${IMAGEDIR}/nginx.pid;
+daemon on;
+EOF
+
+# Allow the current user to write to nginx temporary directories
+sudo chgrp -R "$(id -gn)" /var/lib/nginx
+
+# Kill running nginx processes and wait until down
+sudo pkill nginx || true
+while pidof nginx &>/dev/null ; do
+    sleep 1
+done
+
+nginx \
+    -c "${NGINX_CONFIG}" \
+    -e "${IMAGEDIR}/nginx.log"

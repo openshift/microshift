@@ -286,7 +286,7 @@ NCPUS=$(lscpu | grep '^CPU(s):' | awk '{print $2}')
 > This setting is optional and not necessarily recommended for configurations
 > with small number of CPUs and limited disk performance.
 
-Use `./test/bin/start_webserver.sh` to run a caddy web server to serve the
+Use `./test/bin/start_webserver.sh` to run an `nginx` web server to serve the
 images needed for the build.
 
 Use `./test/bin/build_images.sh` to build all of the images for all of the
@@ -371,7 +371,7 @@ $ ./test/bin/manage_hypervisor_config.sh cleanup
 
 #### Creating Test Infrastructure
 
-Use `./test/bin/start_webserver.sh` to run a caddy web server to serve the
+Use `./test/bin/start_webserver.sh` to run an `nginx` web server to serve the
 images needed for the test scenarios.
 
 Use `./test/bin/scenario.sh` to create test infrastructure for a scenario
