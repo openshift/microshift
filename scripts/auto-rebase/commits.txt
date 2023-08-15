@@ -8,7 +8,7 @@ https://github.com/openshift/cluster-openshift-controller-manager-operator embed
 https://github.com/openshift/cluster-policy-controller embedded-component 8d2af85d0b6dcf09256bd9fecc5d36ac77bc41d1
 https://github.com/openshift/etcd embedded-component 1b61faa606b5393076f5835418c6ec3cdc628615
 https://github.com/openshift/kubernetes embedded-component 6bf3f75361ab014977af5a8c8ececab921cb3052
-https://github.com/openshift/machine-config-operator embedded-component 1871c13664555c6d27e2c4ca373015ee34e9db56
+https://github.com/openshift/machine-config-operator embedded-component 00f2deeebffb02b302c1dd0c02925f13c58949c7
 https://github.com/openshift/openshift-controller-manager embedded-component 385057e57752b7b4f21ef32d7a7993d266a591eb
 https://github.com/openshift/route-controller-manager embedded-component 6667a6cbf9a87331fcc4407375118c0bb884c925
 https://github.com/openshift/service-ca-operator embedded-component 5984aac13df6c2f4440c67a1a14d32958bce9ec3
