@@ -38,7 +38,7 @@ bash -x ./scripts/image-builder/configure.sh
 cd "${ROOTDIR}/test/"
 
 # Re-build from source.
-time bash -x ./bin/build_rpms.sh
+bash -x ./bin/build_rpms.sh
 
 # Set up for scenario tests
 bash -x ./bin/create_local_repo.sh
@@ -52,6 +52,6 @@ MAX_WORKERS=5
 CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo ${MAX_WORKERS} )"
 
 bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
-time bash -x ./bin/build_images.sh
+bash -x ./bin/build_images.sh
 
 echo "Build phase complete"

@@ -27,9 +27,12 @@ firewall_settings() {
     local -r action=$1
 
     for netname in default "${VM_ISOLATED_NETWORK}" ; do
+        if ! sudo virsh net-info "${netname}" &>/dev/null ; then
+            continue
+        fi
+
         local vm_bridge
         local vm_bridge_cidr
-
         vm_bridge=$(sudo virsh net-info "${netname}" | grep '^Bridge:' | awk '{print $2}')
         vm_bridge_cidr=$(ip -f inet addr show "${vm_bridge}" | grep inet | awk '{print $2}')
 

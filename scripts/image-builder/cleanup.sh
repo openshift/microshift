@@ -8,6 +8,72 @@ title() {
     echo -e "\E[34m\n# $1\E[00m";
 }
 
+clean_podman_images() {
+    if ! which podman &>/dev/null ; then
+        return
+    fi
+
+    title "Cleaning up container images"
+    for id in $(sudo podman ps -a | grep microshift | awk '{print $1}') ; do
+        sudo podman rm -f "${id}"
+    done
+
+    if [ "${FULL_CLEAN}" = 1 ] ; then
+        sudo podman rmi -af
+    fi
+}
+
+clean_composer_jobs() {
+    if ! which composer-cli &>/dev/null ; then
+        return
+    fi
+
+    title "Cancelling composer jobs"
+    for id in $(sudo composer-cli compose list | grep -v "^ID"  | grep -E "WAITING|RUNNING" | cut -f1 -d' '); do
+        echo "Cancelling ${id}"
+        sudo composer-cli compose cancel "${id}"
+    done
+
+    if [ "${FULL_CLEAN}" = 1 ] ; then
+        title "Deleting composer jobs"
+        for id in $(sudo composer-cli compose list | grep -v "^ID" | cut -f1 -d' '); do
+            echo "Deleting ${id}"
+            sudo composer-cli compose delete "${id}"
+        done
+
+        title "Cleaning up composer sources"
+        for src in $(sudo composer-cli sources list | grep -Ev "appstream|baseos") ; do
+            echo "Removing source ${src}"
+            sudo composer-cli sources delete "${src}"
+        done
+    fi
+}
+
+clean_osbuilder_services() {
+    if ! sudo systemctl is-enabled osbuild-composer.socket &>/dev/null ; then
+        return
+    fi
+
+    title "Stopping osbuild services"
+    sudo systemctl stop --now osbuild-composer.socket osbuild-composer.service
+    for n in $(seq 100) ; do
+        worker=osbuild-worker@${n}.service
+        if sudo systemctl status "${worker}" &>/dev/null ; then
+            sudo systemctl stop --now "osbuild-worker@${n}.service"
+        else
+            break
+        fi
+    done
+
+    title "Cleaning osbuild worker cache"
+    sleep 5
+    sudo rm -rf /var/cache/osbuild-worker/* /var/lib/osbuild-composer/*
+
+    title "Starting osbuild services"
+    sudo systemctl start osbuild-composer.socket
+    sudo systemctl start osbuild-worker@1.service
+}
+
 # Parse command line
 if [ $# -ge 1 ] ; then
     case "$1" in
@@ -21,60 +87,15 @@ if [ $# -ge 1 ] ; then
     esac
 fi
 
+clean_podman_images
+clean_composer_jobs
+clean_osbuilder_services
+
 if [ "${FULL_CLEAN}" = 1 ] ; then
     title "Cleaning the build directory"
     rm -rf "${BUILDDIR}"
-fi
 
-title "Cleaning up local ostree container server"
-sudo podman rm -f microshift-container-server 2>/dev/null || true
-if [ "${FULL_CLEAN}" = 1 ] ; then
-    SRV_PID=$(pidof microshift) || true
-    if [ -n "${SRV_PID}" ] ; then
-        sudo kill "${SRV_PID}" 2>/dev/null || true
-        # Waiting for the server to exit
-        while sudo kill -0 "${SRV_PID}" 2>/dev/null; do sleep 5 ; done
-    fi
-    sudo podman rmi -af
-fi
-
-title "Cancelling composer jobs"
-for uid in $(sudo composer-cli compose list | awk '{print $1}') ; do
-    sudo composer-cli compose cancel "${uid}" 2>/dev/null || true
-done
-
-if [ "${FULL_CLEAN}" = 1 ] ; then
-    title "Deleting composer jobs"
-    for uid in $(sudo composer-cli compose list | awk '{print $1}') ; do
-        sudo composer-cli compose delete "${uid}" || true
-    done
-fi
-
-title "Cleaning up composer sources"
-sudo composer-cli sources delete openshift-local  2>/dev/null || true
-sudo composer-cli sources delete microshift-local 2>/dev/null || true
-
-if [ "${FULL_CLEAN}" = 1 ] ; then
     title "Cleaning up user cache"
     rm -rf ~/.cache 2>/dev/null || true
     sudo rm -rf /tmp/containers/* 2>/dev/null || true
 fi
-
-title "Stopping osbuild services"
-sudo systemctl stop --now osbuild-composer.socket osbuild-composer.service 
-for n in $(seq 100) ; do
-    worker=osbuild-worker@${n}.service
-    if sudo systemctl status "${worker}" &>/dev/null ; then
-        sudo systemctl stop --now "osbuild-worker@${n}.service"
-    else
-        break
-    fi
-done
-
-title "Cleaning osbuild worker cache"
-sleep 5
-sudo rm -rf /var/cache/osbuild-worker/* /var/lib/osbuild-composer/*
-
-title "Starting osbuild services"
-sudo systemctl start osbuild-composer.socket
-sudo systemctl start osbuild-worker@1.service
