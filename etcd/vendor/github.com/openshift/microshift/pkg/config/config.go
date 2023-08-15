@@ -69,7 +69,7 @@ func (c *Config) fillDefaults() error {
 	if err != nil {
 		return fmt.Errorf("failed to get hostname %v", err)
 	}
-	nodeIP, err := util.GetHostIP()
+	nodeIP, err := util.GetHostIP("")
 	if err != nil {
 		return fmt.Errorf("failed to get host IP: %v", err)
 	}
@@ -276,6 +276,14 @@ func (c *Config) validate() error {
 	}
 
 	return nil
+}
+
+// UserNodeIP return the user configured NodeIP, or "" if it's unset.
+func (c Config) UserNodeIP() string {
+	if c.userSettings != nil {
+		return c.userSettings.Node.NodeIP
+	}
+	return ""
 }
 
 var allHostnames []string
