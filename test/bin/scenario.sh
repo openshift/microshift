@@ -194,6 +194,19 @@ launch_vm() {
 
     echo "Creating ${full_vmname}"
     local -r vm_wait_timeout=$(( VM_BOOT_TIMEOUT / 60 ))
+    local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
+    local -r vm_pool_dir="${VM_DISK_BASEDIR}/${vm_pool_name}"
+
+    # Create the pool if it does not exist
+    if [ ! -d "${vm_pool_dir}" ] ; then
+        mkdir -p "${vm_pool_dir}"
+    fi
+    if ! sudo virsh pool-info "${vm_pool_name}" &>/dev/null; then
+        sudo virsh pool-define-as "${vm_pool_name}" dir --target "${vm_pool_dir}"
+        sudo virsh pool-build "${vm_pool_name}"
+        sudo virsh pool-start "${vm_pool_name}"
+        sudo virsh pool-autostart "${vm_pool_name}"
+    fi
 
     # Implement retries on VM creation until the problem is fixed
     # See https://github.com/virt-manager/virt-manager/issues/498
@@ -209,10 +222,10 @@ launch_vm() {
             --name "${full_vmname}" \
             --vcpus 2 \
             --memory 4092 \
-            --disk "pool=${VM_STORAGE_POOL},size=20" \
+            --disk "pool=${vm_pool_name},size=20" \
             --network network="${network_name}",model=virtio \
             --events on_reboot=restart \
-            --location "${VM_DISK_DIR}/${boot_blueprint}.iso" \
+            --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
             --extra-args "inst.ks=${kickstart_url}" \
             --wait ${vm_wait_timeout} ; then
 

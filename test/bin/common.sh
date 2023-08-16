@@ -19,11 +19,11 @@ INSTALLER_IMAGE_BLUEPRINT="rhel-9.2"
 export IMAGEDIR="${ROOTDIR}/_output/test-images"
 
 # The storage pool name for VMs
-VM_STORAGE_POOL="vm-storage"
+VM_POOL_BASENAME="vm-storage"
 
 # The location for storage for the VMs.
 # shellcheck disable=SC2034  # used elsewhere
-VM_DISK_DIR="${IMAGEDIR}/${VM_STORAGE_POOL}"
+VM_DISK_BASEDIR="${IMAGEDIR}/${VM_POOL_BASENAME}"
 
 # The isolated network name used by some VMs.
 # shellcheck disable=SC2034  # used elsewhere
