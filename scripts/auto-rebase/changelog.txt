@@ -1,2 +1,37 @@
-# machine-config-operator embedded-component 1871c13664555c6d27e2c4ca373015ee34e9db56 to 00f2deeebffb02b302c1dd0c02925f13c58949c7
-6c0059a6a2e1c61b2383eb2e0103ec42d700a85a 2023-08-08T10:16:57-04:00 Dockerfile: OKD: Reenable extensions image on SCOS
+# oc image-arm64 e251b5ebd2466adde7b395bf3ab515b8f6cd0c84 to 17b7accf8fd25125ce015cf4bea7d3cd3f336317
+7f7f62530941a292ebbfbd208c402126d9430865 2023-07-11T10:30:34+02:00 Bump golang.org/x dependencies
+# ovn-kubernetes image-arm64 13cba4453587d3080eaf126ecf9ae6de429da180 to e6dd7d0b48e1a47578cc6feb39695d5608bf0125
+280093ff1c72a60f9ea2acf947d8dbf0efb3f286 2023-08-09T16:23:21+02:00 libovsdb: give monitor setup time to process than normal transactions
+# kubernetes image-arm64 6bf3f75361ab014977af5a8c8ececab921cb3052 to 0ef5eae6ff8657d9628f3961d49f1f3031a210dd
+d48cfdd0ed0a2aa56b49c3c25e085693fe5aee17 2023-08-10T16:25:37+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+d885a03585268fc9e3c163aff2aef706843942b4 2023-08-10T16:25:29+02:00 UPSTREAM: <carry>: Force using host go always and use host libriaries
+fa47772e6e9b0f96cab5a71ad558743dd75b7f57 2023-08-10T16:25:16+02:00 UPSTREAM: <drop>: manually resolve conflicts
+84e1fc493a47446df2e155e70fca768d2653a398 2023-07-19T12:16:44+00:00 Release commit for Kubernetes v1.26.7
+8895bb42952f0bae4a60d869c7604d747772c6d6 2023-07-17T12:31:06+02:00 [release-1.26] releng/go: Bump images, versions and deps to use Go 1.20.6
+49cd3490f500cb6fa7b659bf5d963f09eed8b052 2023-07-13T00:07:22+08:00 Fix the converts an empty string to nil.
+a6a77bf49530a40f5dcc85c71bcd3f8a1c50a8d4 2023-07-11T13:54:06+02:00 Add unit tests for parallel StatefulSet create & delete
+523ff7ad7ab85367d857b605f645efceb9253168 2023-07-11T13:54:06+02:00 Parallel StatefulSet pod create & delete
+9aaa18645676cf2cba480775e6c24a57edc79223 2023-07-11T13:54:05+02:00 Refactor StatefulSet controller update logic
+1d687b16ef6563bc65c047c7c66a8e97d0afbbe5 2023-07-10T17:44:03+02:00 [release-1.26] releng/go: Update images, deps and version to go 1.20.5
+20fa256d5884081d238214cd62beec7f2279a222 2023-07-07T15:14:39-04:00 Only declare job as finished after removing all finalizers
+3510bf8280c736ba2a1330c64985a76debf4d2cb 2023-07-06T18:03:04-07:00 Cherry pick of #118716 upstream release 1.26 (#118912)
+65a61e8bcfe7693c3f0ccd34b611b9b77ed351ee 2023-07-06T10:19:08-07:00 Hide numberOfMissedSchedules as an algorithm internal number
+d46f42c14deca9898754bca7fb64a7d6a0ec1f18 2023-07-06T10:15:38-07:00 Update schedule logic to properly calculate missed schedules
+a65e7a7f4617777208a277a459dfe83a3728fa80 2023-07-05T21:24:43-04:00 kubeadm: set priority for "system-node-critical" Pods
+547bc024152e8a4226380d61e6b85bfad311d40a 2023-07-05T10:44:57-07:00 Automated cherry pick of #118805: test comment should match the code in podgc (#118914)
+bc89852f9e874a229aee255e54e7a87496d90980 2023-07-05T07:58:42+03:00 call ./hack/update-vendor.sh
+a2ab617b8cd03f5ea7a365657ef2347af70d5a3a 2023-07-05T07:39:38+03:00 kubeadm: remove function pointer comparison in phase test
+1703a30c6b4fbd7a9e94facb7adf923c556d64a1 2023-07-03T12:09:56+02:00 Make etcd component status consistent with health probes
+07ba40eaa7a13ccf8be4b1d9075a64ff759b300f 2023-07-03T07:18:09+00:00 Fix deadlock in ready test
+b28869a57c2cd2c11b7b094be63f51bafc17b359 2023-06-29T08:25:43-04:00 fix the existing problem (0 SerialNumber in all certificate) as part of this PR in a separate commit
+26285c1d6685720002464ce3660b44094568c21d 2023-06-29T08:25:43-04:00 update serial number to a valid non-zero number in ca certificate
+ecd139beed32c74eac0ad3bc7be1701bdda0cd77 2023-06-21T09:52:36-04:00 deps: Bump to cAdvisor v0.46.1
+1e1863fabd22ce3bb9ec8cee4d231b64466184a9 2023-06-14T10:18:03+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.6
+94876123338bc0e1a6448296772abb1ab60558a7 2023-05-31T16:38:28-04:00 AWS: fix code for picking region from zone
+b64f2a8f60fb99f8d774a938fbc3e0e626f955dc 2023-05-27T00:59:55+08:00 Fix the git-repo test error caused by the correct use of loop variables
+5895055fc491a072e4fb102b1cfffe249dcad00f 2023-05-26T17:21:14+02:00 dra scheduler plugin test: fix loopvar bug and "reserve" expected data
+6300196c8d7fb6586f45f9f8d7ca6d5b5d17e5ff 2023-05-25T08:24:42+00:00 don't process unsupported loadbalancers with mixed protocols
+32ff3190f236cd2c95824e96f4a359c3d5d18632 2023-05-25T08:24:42+00:00 make MixedProtocolNotSupported public
+d12a8f353c532a045d9a4a90b6ce581d6a73beb5 2023-05-11T13:53:54+02:00 Add node check to vSphere cloud provider
+c07160bd0afc73262ebf34a3d90185d7cf204d30 2023-05-04T22:21:45+03:00 Set permissions on volume before publishing update
+deba0877611f32607144e230ac1db644c7bb26f4 2023-04-12T08:43:51+05:30 Adding additional validations to queried endpoint list iteration.
