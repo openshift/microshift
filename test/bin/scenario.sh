@@ -220,8 +220,9 @@ launch_vm() {
             local vm_create_end
             vm_create_end=$(date +%s)
             if [ $(( vm_create_end -  vm_create_start )) -lt 15 ] ; then
-                echo "Error running virt-install on attempt ${attempt}: retrying in 5s"
-                sleep 5
+                local backoff=$(( attempt * 5 ))
+                echo "Error running virt-install on attempt ${attempt}: retrying in ${backoff}s"
+                sleep "${backoff}"
                 continue
             fi
             # Stop retrying on timeout error
