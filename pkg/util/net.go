@@ -59,8 +59,8 @@ func GetHostIP(nodeIP string) (string, error) {
 found:
 	if hostIP != previousGatewayIP {
 		previousGatewayIP = hostIP
+		klog.V(2).Infof("host gateway IP address: %s", hostIP)
 	}
-	klog.V(2).Infof("host gateway IP address: %s", hostIP)
 
 	return hostIP, nil
 }
