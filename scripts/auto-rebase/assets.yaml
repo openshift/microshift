@@ -155,14 +155,14 @@ assets:
       - file: informer-clusterrole.yaml
       - file: route-controller-manager-ingress-to-route-controller-clusterrolebinding.yaml
       - file: route-controller-manager-ingress-to-route-controller-clusterrole.yaml
-      - file: route-controller-manager-leader-rolebinding.yaml
-      - file: route-controller-manager-leader-role.yaml
       - file: route-controller-manager-ns.yaml
       - file: route-controller-manager-sa.yaml
       - file: route-controller-manager-separate-sa-rolebinding.yaml
       - file: route-controller-manager-separate-sa-role.yaml
       - file: route-controller-manager-tokenreview-clusterrolebinding.yaml
       - file: route-controller-manager-tokenreview-clusterrole.yaml
+      - file: route-controller-manager-authentication-reader-rolebinding.yaml
+        git_restore: True
 
   - dir: core/
     no_clean: True
