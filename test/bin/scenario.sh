@@ -220,7 +220,9 @@ launch_vm() {
             local vm_create_end
             vm_create_end=$(date +%s)
             if [ $(( vm_create_end -  vm_create_start )) -lt 15 ] ; then
-                local backoff=$(( attempt * 5 ))
+                # "7" to avoid retrying at almost the same time as new scenarios are creating the VMs
+                # (which happens 5 seconds apart)
+                local backoff=$(( attempt * 7 ))
                 echo "Error running virt-install on attempt ${attempt}: retrying in ${backoff}s"
                 sleep "${backoff}"
                 continue
