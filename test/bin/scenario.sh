@@ -217,16 +217,22 @@ launch_vm() {
         # FIXME: variable for vcpus?
         # FIXME: variable for memory?
         # FIXME: variable for ISO
-        if ! sudo virt-install \
-            --noautoconsole \
+
+        # When bash creates a background job (using `&`),
+        # the bg job does not get its own TTY.
+        # If the TTY is not provided, virt-install refuses
+        # to attach to the console. `unbuffer` provides the TTY.
+        if ! sudo unbuffer virt-install \
+            --autoconsole text \
             --name "${full_vmname}" \
             --vcpus 2 \
             --memory 4092 \
             --disk "pool=${vm_pool_name},size=20" \
             --network network="${network_name}",model=virtio \
             --events on_reboot=restart \
+            --noreboot \
             --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
-            --extra-args "inst.ks=${kickstart_url}" \
+            --extra-args "inst.ks=${kickstart_url} console=tty0 console=ttyS0,115200n8 inst.notmux" \
             --wait ${vm_wait_timeout} ; then
 
             # Check if the command exited within 15s due to a failure
@@ -247,11 +253,12 @@ launch_vm() {
     done
 
     if ${vm_created} ; then
-        record_junit "${vmname}" "launch_vm" "OK"
+        record_junit "${vmname}" "install_vm" "OK"
     else
-        record_junit "${vmname}" "launch_vm" "FAILED"
+        record_junit "${vmname}" "install_vm" "FAILED"
         return 1
     fi
+    sudo virsh start "${full_vmname}"
 
     # Wait for an IP to be assigned
     echo "Waiting for VM ${full_vmname} to have an IP"
