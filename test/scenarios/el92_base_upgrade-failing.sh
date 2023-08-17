@@ -13,7 +13,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
 	run_tests host1 \
-		--variable "TARGET_REF:el92-src" \
+		--variable "FAILING_REF:el92-src" \
 		--variable "REASON:fail_greenboot" \
 		suites-ostree/upgrade-failed.robot
 }

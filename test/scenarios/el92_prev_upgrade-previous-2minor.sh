@@ -13,6 +13,6 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "TOO_NEW_MICROSHIFT_REF:rhel-9.2-microshift-source-fake-next-minor" \
-        suites-ostree/block-upgrade-2-minor.robot
+        --variable "TOO_NEW_MICROSHIFT_REF:el92-src-fake-y1" \
+        suites-ostree/upgrade-block-2-minor.robot
 }
