@@ -74,8 +74,10 @@ Stop MicroShift
 
 Cleanup MicroShift
     [Documentation]    Cleanup
+    ...    opts=[--keep-images]
+    [Arguments]    ${opts}=""
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    echo 1 | sudo microshift-cleanup-data --all
+    ...    echo 1 | sudo microshift-cleanup-data --all ${opts}
     ...    sudo=True    return_stderr=True    return_rc=True
     Log Many    ${stdout}    ${stderr}    ${rc}
     Should Be Equal As Integers    ${rc}    0
