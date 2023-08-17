@@ -444,6 +444,26 @@ All of the functions that act as the scenario API are run in the
 context of `./test/bin/scenario.sh` and can therefore use any functions
 defined there.
 
+#### Scenarios coverage
+
+Scenarios utilize following distinct MicroShift sources:
+- `src`: built from source (code in PR)
+- `base`: built from base branch (PR's target branch)
+- `prev`: previous MicroShift minor release
+
+| Starting ref | End ref | Successful upgrade scenario | Failed upgrade scenario |
+|--------------|---------|-----------------------------|-------------------------|
+| `base` | `src` |`el92_base_upgrade-ok.sh` | **MISSING** |
+| `prev` | `src` |`el92_prev_upgrade-ok.sh` | **MISSING** |
+| `src` | `src` | **MISSING** | `el92_src_upgrade-failing-cannot-backup.sh` |
+
+In future, another source of MicroShift should be added which is
+most recent MicroShift RPMs built by ART (EC, then RC, and finally
+Z stream releases matching version of currently tested code).
+Both successful and failed upgrades scenarios should be added:
+- `released` to `src` (presubmit)
+- `released` to `main` / `release-4.YY` (periodic)
+
 #### scenario_create_vms
 
 This function should do any work needed to boot all of the VMs needed
