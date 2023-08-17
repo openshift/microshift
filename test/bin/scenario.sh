@@ -299,22 +299,29 @@ remove_vm() {
     local -r vmname="${1}"
     local -r full_vmname="$(full_vm_name "${vmname}")"
 
-    # Remove the actual VM and its storage
+    # Remove the actual VM
     if sudo virsh dumpxml "${full_vmname}" >/dev/null; then
         if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
             sudo virsh destroy "${full_vmname}"
         fi
         sudo virsh undefine "${full_vmname}"
     fi
-    if sudo virsh vol-dumpxml "${full_vmname}.qcow2" vm-storage >/dev/null; then
-        sudo virsh vol-delete "${full_vmname}.qcow2" vm-storage
+
+    # Remove the VM storage pool
+    local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
+    if sudo virsh pool-info "${vm_pool_name}" &>/dev/null; then
+        sudo virsh pool-destroy "${vm_pool_name}"
+        sudo virsh pool-undefine "${vm_pool_name}"
     fi
+
+    # Remove the pool directory
+    # ShellCheck: Using "${var:?}" to ensure this never expands to '/*'
+    rm -rf "${VM_DISK_BASEDIR:?}/${vm_pool_name}"
 
     # Remove the info file so something processing the VMs does not
     # assume the file exists. This is most useful in a local setting.
     rm -rf "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
 }
-
 
 # Function to report the full current version, e.g. "4.13.5"
 current_version() {

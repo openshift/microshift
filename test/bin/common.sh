@@ -18,7 +18,8 @@ INSTALLER_IMAGE_BLUEPRINT="rhel-9.2"
 # The location the web server should serve.
 export IMAGEDIR="${ROOTDIR}/_output/test-images"
 
-# The storage pool name for VMs
+# The storage pool base name for VMs.
+# The actual pool names will be '${VM_POOL_BASENAME}-${SCENARIO}'.
 VM_POOL_BASENAME="vm-storage"
 
 # The location for storage for the VMs.
