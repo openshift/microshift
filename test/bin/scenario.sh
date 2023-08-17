@@ -217,7 +217,12 @@ launch_vm() {
         # FIXME: variable for vcpus?
         # FIXME: variable for memory?
         # FIXME: variable for ISO
-        if ! sudo virt-install \
+
+        # When bash creates a background job (using `&`),
+        # the bg job does not get its own TTY.
+        # If the TTY is not provided, virt-install refuses
+        # to attach to the console. `unbuffer` provides the TTY.
+        if ! sudo unbuffer virt-install \
             --autoconsole text \
             --name "${full_vmname}" \
             --vcpus 2 \
