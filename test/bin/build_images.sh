@@ -320,8 +320,8 @@ do_group() {
         elif [[ "${build_name}" =~ image-installer ]]; then
             blueprint=${build_name//-image-installer/}
             iso_file="${buildid}-installer.iso"
-            echo "Moving ${iso_file} to ${VM_DISK_DIR}/${blueprint}.iso"
-            mv -f "${iso_file}" "${VM_DISK_DIR}/${blueprint}.iso"
+            echo "Moving ${iso_file} to ${VM_DISK_BASEDIR}/${blueprint}.iso"
+            mv -f "${iso_file}" "${VM_DISK_BASEDIR}/${blueprint}.iso"
         else
             echo "Do not know how to handle build ${build_name}"
         fi
@@ -436,7 +436,7 @@ LOGDIR="${IMAGEDIR}/build-logs"
 mkdir -p "${LOGDIR}"
 mkdir -p "${IMAGEDIR}/blueprints"
 mkdir -p "${IMAGEDIR}/builds"
-mkdir -p "${VM_DISK_DIR}"
+mkdir -p "${VM_DISK_BASEDIR}"
 
 configure_package_sources
 

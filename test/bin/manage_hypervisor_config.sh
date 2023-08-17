@@ -15,7 +15,7 @@ ${BASH_SOURCE[0]} (create|cleanup)
   -h           Show this help.
 
 create: Set up firewall, storage pool and network.
-        Uses the VM_STORAGE_POOL, VM_DISK_DIR and
+        Uses the VM_POOL_BASENAME, VM_DISK_BASEDIR and
         VM_ISOLATED_NETWORK variables.
 
 cleanup: Undo the settings made by 'create' command.
@@ -44,11 +44,12 @@ firewall_settings() {
 
 action_create() {
     # Storage pool
-    if ! sudo virsh pool-info "${VM_STORAGE_POOL}" &>/dev/null; then
-        sudo virsh pool-define-as "${VM_STORAGE_POOL}" dir --target "${VM_DISK_DIR}"
-        sudo virsh pool-build "${VM_STORAGE_POOL}"
-        sudo virsh pool-start "${VM_STORAGE_POOL}"
-        sudo virsh pool-autostart "${VM_STORAGE_POOL}"
+    # Only create the base pool - the rest are defined before each VM creation
+    if ! sudo virsh pool-info "${VM_POOL_BASENAME}" &>/dev/null; then
+        sudo virsh pool-define-as "${VM_POOL_BASENAME}" dir --target "${VM_DISK_BASEDIR}"
+        sudo virsh pool-build "${VM_POOL_BASENAME}"
+        sudo virsh pool-start "${VM_POOL_BASENAME}"
+        sudo virsh pool-autostart "${VM_POOL_BASENAME}"
     fi
 
     # Isolated network
@@ -79,11 +80,12 @@ action_cleanup() {
     fi
 
     # Storage pool
-    if sudo virsh pool-info "${VM_STORAGE_POOL}" &>/dev/null; then
-        sudo virsh pool-destroy "${VM_STORAGE_POOL}"
-        sudo virsh pool-undefine "${VM_STORAGE_POOL}"
-    fi
-
+    for pool_name in $(sudo virsh pool-list --name | awk '/vm-storage/ {print $1}') ; do       
+        if sudo virsh pool-info "${pool_name}" &>/dev/null; then
+            sudo virsh pool-destroy "${pool_name}"
+            sudo virsh pool-undefine "${pool_name}"
+        fi
+    done
 }
 
 if [ $# -eq 0 ]; then
