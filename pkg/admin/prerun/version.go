@@ -164,7 +164,10 @@ type versionMetadata struct {
 	Major, Minor, Patch int
 }
 
-func (v versionMetadata) String() string {
+func (v *versionMetadata) String() string {
+	if v == nil {
+		return "nil"
+	}
 	return fmt.Sprintf("%d.%d.%d", v.Major, v.Minor, v.Patch)
 }
 
