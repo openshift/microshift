@@ -11,6 +11,8 @@ import (
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
+
+	"k8s.io/klog/v2"
 )
 
 var (
@@ -47,12 +49,19 @@ func getHealthInfo() (*HealthInfo, error) {
 
 	content, err := os.ReadFile(healthFilepath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read health data from %q: %w", healthFilepath, err)
+		return nil, fmt.Errorf("failed to read %q: %w", healthFilepath, err)
 	}
 
 	health := &HealthInfo{}
 	if err := json.Unmarshal(content, &health); err != nil {
-		return nil, fmt.Errorf("failed to parse health data %q: %w", strings.TrimSpace(string(content)), err)
+		return nil, fmt.Errorf("failed to unmarshal %q: %w", strings.TrimSpace(string(content)), err)
 	}
+
+	klog.Info("Read health info from file",
+		"health", health.Health,
+		"deploymentID", health.DeploymentID,
+		"previousBootID", health.BootID,
+	)
+
 	return health, nil
 }

@@ -62,13 +62,18 @@ func (bs Backups) has(backup data.BackupName) bool {
 }
 
 func (bs Backups) removeAll(dataManager data.Manager) {
-	klog.Info("Preparing to prune backups")
+	if len(bs) == 0 {
+		return
+	}
+
+	klog.Info("Starting pruning backups")
+	defer klog.Info("Finished pruning backups")
+
 	for _, b := range bs {
 		if err := dataManager.RemoveBackup(b); err != nil {
 			klog.ErrorS(err, "Failed to remove backup - ignoring", "name", b)
 		}
 	}
-	klog.Info("Finished pruning backups")
 }
 
 func (bs Backups) getOneOrNone() data.BackupName {

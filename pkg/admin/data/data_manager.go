@@ -79,7 +79,7 @@ func (dm *manager) GetBackupList() ([]BackupName, error) {
 }
 
 func (dm *manager) Backup(name BackupName) error {
-	klog.InfoS("Starting backup",
+	klog.InfoS("Copying data to backup directory",
 		"storage", dm.storage,
 		"name", name,
 		"data", config.DataDir,
@@ -105,22 +105,20 @@ func (dm *manager) Backup(name BackupName) error {
 				dm.storage, makeDirErr)
 		}
 		klog.InfoS("Created backup storage directory", "path", dm.storage)
-	} else {
-		klog.InfoS("Found existing backup storage directory", "path", dm.storage)
 	}
 
 	dest := dm.GetBackupPath(name)
-
 	if err := copyPath(config.DataDir, dest); err != nil {
 		return err
 	}
 
-	klog.InfoS("Backup finished", "backup", dest, "data", config.DataDir)
+	klog.InfoS("Copied data to backup directory",
+		"backup", dest, "data", config.DataDir)
 	return nil
 }
 
 func (dm *manager) Restore(name BackupName) error {
-	klog.InfoS("Starting restore",
+	klog.InfoS("Copying backup to data directory",
 		"storage", dm.storage,
 		"name", name,
 		"data", config.DataDir,
@@ -145,7 +143,7 @@ func (dm *manager) Restore(name BackupName) error {
 
 	src := dm.GetBackupPath(name)
 	if err := copyPath(src, config.DataDir); err != nil {
-		klog.ErrorS(err, "Failed to restore from backup, restoring current data dir")
+		klog.ErrorS(err, "Failed to copy backup, restoring current data dir")
 
 		if err := os.RemoveAll(config.DataDir); err != nil {
 			return fmt.Errorf("failed to remove data directory %q: %w", config.DataDir, err)
@@ -156,7 +154,7 @@ func (dm *manager) Restore(name BackupName) error {
 				tmp, config.DataDir, err)
 		}
 
-		return fmt.Errorf("failed to restore backup: %w", err)
+		return fmt.Errorf("failed to copy backup to data dir: %w", err)
 	}
 
 	klog.InfoS("Removing temporary data directory", "path", tmp)
@@ -164,7 +162,7 @@ func (dm *manager) Restore(name BackupName) error {
 		klog.ErrorS(err, "Failed to remove temporary data directory, leaving in place", "path", tmp)
 	}
 
-	klog.InfoS("Finished restore",
+	klog.InfoS("Copied backup to data directory",
 		"name", name,
 		"data", config.DataDir,
 	)

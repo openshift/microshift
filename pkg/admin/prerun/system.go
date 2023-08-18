@@ -15,7 +15,7 @@ func getCurrentBootID() (string, error) {
 	path := "/proc/sys/kernel/random/boot_id"
 	content, err := os.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("failed to determine boot ID from %q: %w", path, err)
+		return "", fmt.Errorf("failed to read %q: %w", path, err)
 	}
 	// removing dashes to get the same format as `journalctl --list-boots`
 	return strings.ReplaceAll(strings.TrimSpace(string(content)), "-", ""), nil
@@ -38,8 +38,10 @@ func getDeploymentsFromOSTree() ([]deployment, error) {
 		return nil, fmt.Errorf("%q failed: %q: %w", cmd, stderr.String(), err)
 	}
 
-	klog.InfoS("rpm-ostree status",
-		"output", strings.ReplaceAll(stdout.String(), "\n", " "))
+	outputToLog := stdout.String()
+	outputToLog = strings.ReplaceAll(outputToLog, "\n", "")
+	outputToLog = strings.ReplaceAll(outputToLog, " ", "")
+	klog.InfoS("rpm-ostree status", "output", outputToLog)
 
 	status := struct {
 		Deployments []deployment `json:"deployments"`

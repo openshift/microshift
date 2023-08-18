@@ -100,13 +100,13 @@ func logConfig(cfg *config.Config) {
 	}
 }
 
-func performPrerun() error {
+func prerunDataManagement() error {
 	dataManager, err := data.NewManager(config.BackupsDir)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create data manager: %w", err)
 	}
 
-	return prerun.NewDataManager(dataManager).Run()
+	return prerun.DataManagement(dataManager)
 }
 
 func RunMicroshift(cfg *config.Config) error {
@@ -117,8 +117,7 @@ func RunMicroshift(cfg *config.Config) error {
 
 	cleanUpPreviousLogFiles()
 
-	if err := performPrerun(); err != nil {
-		klog.ErrorS(err, "Pre-run procedure failed")
+	if err := prerunDataManagement(); err != nil {
 		writeLogFileError(preRunFailedLogPath, err)
 		return err
 	}
@@ -144,7 +143,7 @@ func RunMicroshift(cfg *config.Config) error {
 		return fmt.Errorf("failed to create dir %q: %w", config.DataDir, err)
 	}
 
-	if err := prerun.CheckAndUpdateDataVersion(); err != nil {
+	if err := prerun.VersionMetadataManagement(); err != nil {
 		writeLogFileError(preRunFailedLogPath, err)
 		return err
 	}
