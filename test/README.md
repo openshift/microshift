@@ -453,9 +453,9 @@ Scenarios utilize following distinct MicroShift sources:
 
 | Starting ref | End ref | Successful upgrade scenario | Failed upgrade scenario |
 |--------------|---------|-----------------------------|-------------------------|
-| `base` | `src` |`el92_base_upgrade-ok.sh` | **MISSING** |
-| `prev` | `src` |`el92_prev_upgrade-ok.sh` | **MISSING** |
-| `src` | `src` | **MISSING** | `el92_src_upgrade-failing-cannot-backup.sh` |
+| `base` | `src` |`el92-base@upgrade-ok.sh` | **MISSING** |
+| `prev` | `src` |`el92-prev@upgrade-ok.sh` | **MISSING** |
+| `src` | `src` | **MISSING** | `el92-src@upgrade-failing-cannot-backup.sh` |
 
 In future, another source of MicroShift should be added which is
 most recent MicroShift RPMs built by ART (EC, then RC, and finally

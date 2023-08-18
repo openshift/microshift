@@ -20,7 +20,7 @@ SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 
 full_vm_name() {
     local base="${1}"
-    echo "${SCENARIO//_/-}-${base}"
+    echo "${SCENARIO//@/-}-${base}"
 }
 
 sos_report() {
