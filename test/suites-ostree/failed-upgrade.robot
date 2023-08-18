@@ -16,18 +16,19 @@ ${USHIFT_HOST}      ${EMPTY}
 ${USHIFT_USER}      ${EMPTY}
 
 ${FAILING_REF}      ${EMPTY}
+${REASON}           ${EMPTY}
 
 
 *** Test Cases ***
-Staged Deployment Consistently Fails To Back Up The Data
-    [Documentation]    Verifies that instructions to back up the data
-    ...    ("healthy" system) is not lost if staged deployment fails
-    ...    to back up and it is performed after rolling back.
+New Deployment Is Consistently Unhealthy And Rolls Back
+    [Documentation]    Verifies that whether the new deployment
+    ...    cannot create a backup or is simply unhealthy,
+    ...    system will rollback and become healthy.
 
     Wait For Healthy System
     ${backup}=    Get Future Backup Name For Current Boot
 
-    TestAgent.Add Action For Next Deployment    every    prevent_backup
+    TestAgent.Add Action For Next Deployment    every    ${REASON}
     Deploy Commit Expecting A Rollback    ${FAILING_REF}
     Wait For MicroShift Service
     Backup Should Exist    ${backup}
@@ -38,6 +39,7 @@ Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
     Should Not Be Empty    ${FAILING_REF}    FAILING_REF variable is required
+    Should Not Be Empty    ${REASON}    REASON variable is required
     Login MicroShift Host
 
 Teardown
