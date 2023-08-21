@@ -4,16 +4,12 @@ type microshift_t;
 domain_type(microshift_t);
 
 gen_require(`
-    type kubelet_exec_t, var_lib_t, container_var_lib_t, init_exec_t;
+    type kubelet_t, var_lib_t, container_var_lib_t, init_exec_t;
     class file { open read };
 ')
 
 # When microshift creates backup folders in /var/lib/microshift-backups, the correct labels are applied
 # Note: filetrans_pattern rules states;
-#   Process running as `kubelet_exec_t` that creates a `dir` called `microshift-backups`
+#   Process running as `kubelet_t` that creates a `dir` called `microshift-backups`
 #   in a folder labeled `var_lib_t` get's the label `container_var_lib_t`
-filetrans_pattern(kubelet_exec_t, var_lib_t, container_var_lib_t, dir, "microshift-backups")
-
-# greenboot-healthcheck runs as an init_exec_t context, here we make sure the correct label is applied when
-# greenboot creates the /var/lib/microshift-backups for the health.json file.
-filetrans_pattern(init_exec_t, var_lib_t, container_var_lib_t, dir, "microshift-backups")
+filetrans_pattern(kubelet_t, var_lib_t, container_var_lib_t, dir, "microshift-backups")

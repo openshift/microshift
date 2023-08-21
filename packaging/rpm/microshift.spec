@@ -23,10 +23,12 @@
    mkdir -p /var/run/kubelet; \
    mkdir -p /var/lib/kubelet/pods; \
    mkdir -p /var/run/secrets/kubernetes.io/serviceaccount; \
+   mkdir -p /var/lib/microshift-backups; \
    restorecon -R /var/hpvolumes; \
    restorecon -R /var/run/kubelet; \
    restorecon -R /var/lib/kubelet/pods; \
-   restorecon -R /var/run/secrets/kubernetes.io/serviceaccount
+   restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
+   restorecon -R /var/lib/microshift-backups
 
 # Git related details
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
@@ -167,8 +169,8 @@ install -p -m755 scripts/microshift-cleanup-data.sh %{buildroot}%{_bindir}/micro
 restorecon -v %{buildroot}%{_bindir}/microshift
 restorecon -v %{buildroot}%{_bindir}/microshift-etcd
 
-install -d -m755 %{buildroot}{_sharedstatedir}/microshift
-install -d -m755 %{buildroot}{_sharedstatedir}/microshift-backups
+install -d -m755 %{buildroot}%{_sharedstatedir}/microshift
+install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-backups
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
