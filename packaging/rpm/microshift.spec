@@ -19,12 +19,10 @@
 %global selinuxtype targeted
 %define selinux_policyver 3.14.3-67
 %define microshift_relabel_files() \
-   mkdir -p /var/hpvolumes; \
    mkdir -p /var/run/kubelet; \
    mkdir -p /var/lib/kubelet/pods; \
    mkdir -p /var/run/secrets/kubernetes.io/serviceaccount; \
    mkdir -p /var/lib/microshift-backups; \
-   restorecon -R /var/hpvolumes; \
    restorecon -R /var/run/kubelet; \
    restorecon -R /var/lib/kubelet/pods; \
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
@@ -270,9 +268,7 @@ fi
 %post selinux
 
 %selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
-if /usr/sbin/selinuxenabled ; then
-    %microshift_relabel_files
-fi
+%microshift_relabel_files
 
 %postun selinux
 
