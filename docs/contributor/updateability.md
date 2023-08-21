@@ -564,7 +564,8 @@ stale data.
 
 #### `/var/lib/microshift/version`
 
-This file holds version of last MicroShift executable that opened and used the data.
+This file holds version of last MicroShift executable that opened and used the data
+together with the deployment and boot IDs of when that happened.
 If MicroShift fails to perform backup or version metadata management and decides to
 exit without attempting to start, the file will not be updated.
 
@@ -581,10 +582,15 @@ For more details about version comparison see
 <summary>Schema of version file</summary>
 
 ```
-MAJOR.MINOR.PATCH
+{
+  "version": "MAJOR.MINOR.PATCH",
+  "deployment_id": "rhel-...",
+  "boot_id": ""
+}
 ```
 
-All of MAJOR, MINOR, and PATCH are unsigned integers. For example: `4.14.0`
+- All of MAJOR, MINOR, and PATCH are unsigned integers. For example: `4.14.0`
+- `deployment_id` is an optional field - it's not used on regular RPM (non-ostree) systems.
 
 > Note: MicroShift writes to a file without trailing newline.
 > However, it should successfully handle a file with newline.
