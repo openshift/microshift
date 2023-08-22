@@ -6,17 +6,25 @@ Library             selinux.py
 
 
 *** Keywords ***
-Run Container File Access
-    [Documentation]    Given a file path, converts it to a list and runs an access check With
-    ...    default list of files to check the access of, runcon command as a container_t
+Run Container Access Check On
+    [Documentation]    Given a file path or optional cmd, runcon command as a container_t,
     ...    returns a list of errors if access was granted
-    [Arguments]    ${file_path}
-    ${file_paths}=    Create List    ${file_path}
-    ${err_list}=    Run Access Check    ${file_paths}
+    [Arguments]    ${file_path}    ${cmd}=cat
+
+    ${cmd_list}=    Create List    ${cmd}
+    ${file_paths_map}=    Create Dictionary    ${file_path}=${cmd_list}
+    ${err_list}=    Run Access Check    ${file_paths_map}
+    RETURN    ${err_list}
+
+Run Default Container Access Check
+    [Documentation]    Runs default file path checks using runcon command as a container_t,
+    ...    returns a list of errors if access was granted
+
+    ${err_list}=    Run Default Access Check
     RETURN    ${err_list}
 
 Run Fcontext Types Check
-    [Documentation]    Validates file access by running a runcon command as a container_t
+    [Documentation]    Checks main MicroShift directories paths for expected fcontext,
     ...    returns a list of errors for fcontexts that did not match
     ${err_list}=    Run Fcontext Check
     RETURN    ${err_list}

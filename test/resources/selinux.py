@@ -1,5 +1,3 @@
-import DataFormats
-import SSHLibrary
 from robot.libraries.BuiltIn import BuiltIn
 from libostree import remote_sudo_rc, remote_sudo
 from typing import List
@@ -57,10 +55,12 @@ EXPECTED_FCONTEXT_LIST = [
 def get_expected_ocp_microshift_fcontext_list() -> List[str]:
     return EXPECTED_FCONTEXT_LIST
 
+
 def get_fcontext_list() -> List[str]:
     context_list = "kubernetes_file_t|container_var_lib_t|kubelet_exec_t|container_t"
     semanage_filter_cmd = f"semanage fcontext -l | grep -E  \"({context_list})\" | awk '{{print $1 }}'"
     return remote_sudo(semanage_filter_cmd).split('\n')
+
 
 def get_denial_audit_log() -> List[str]:
     ausearch_filter_cmd = "ausearch --input-logs -m avc | grep microshift"
@@ -69,22 +69,22 @@ def get_denial_audit_log() -> List[str]:
         return stdout.split('\n')
     return []
 
-def run_access_check(custom_access_list: List[str] = []) -> List[str]:
+
+def run_access_check(access_check_map: dict[str, List[str]]) -> List[str]:
     runcon_cmd = "runcon -u system_u -r system_r -t container_t"
     allowed_access = []
-    for file_path, commands in ACCESS_CHECK_MAP.items():
+    for file_path, commands in access_check_map.items():
         for command in commands:
             stdout, rc = remote_sudo_rc(f"{runcon_cmd} {command} {file_path}")
             if rc == 0:
                 allowed_access.append(f"should not have been allowed access to {file_path} by running {command}")
 
-    for file_path in custom_access_list:
-        for command in commands:
-            stdout, rc = remote_sudo_rc(f"{runcon_cmd} cat {file_path}")
-            if rc == 0:
-                allowed_access.append(f"should not have been allowed access to {file_path} by running ls")
-
     return allowed_access
+
+
+def run_default_access_check() -> List[str]:
+    return run_access_check(ACCESS_CHECK_MAP)
+
 
 def run_fcontext_check() -> List[str]:
     ls_cmd = "ls -Zd"

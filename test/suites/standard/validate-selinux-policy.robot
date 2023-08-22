@@ -24,7 +24,10 @@ Containers Should Not Have Access To Container Var Lib Labels
     ...    files or folders that are labeled with container var lib as well as the
     ...    generated backup file
 
-    ${result}=    Run Container File Access    "${BACKUP_STORAGE}/${BACKUP_NAME}/version"
+    ${default_result}=    Run Default Container Access Check
+    Should Be Empty    ${default_result}
+
+    ${result}=    Run Container Access Check On    "${BACKUP_STORAGE}/${BACKUP_NAME}/version"
     Should Be Empty    ${result}
 
 Folders Should Have Expected Fcontext Types
