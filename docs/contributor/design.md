@@ -66,11 +66,12 @@ When deciding between different design options, we follow the following principl
 ## Design Decisions
 ### Overall Architecture
 * MicroShift is an application deployed onto a running OS. As such, it cannot assume any responsiblity or control over the device or OS it runs on, including OS software or configuration updates or typical device management tasks such as configuring host CA certs or host telemetry.
-* MicroShift runs as a single binary embedding as goroutines only those services strictly necessary to bring up a *minimal Kubernetes/OpenShift control and data plane*. Motivation:
+* MicroShift runs as a single systemd unit. The main binary embeds as goroutines only those services strictly necessary to bring up a *minimal Kubernetes/OpenShift control and data plane*. Etcd is run as a separate process, managed by the main binary. Motivation:
   * Maximizes reproducibility; cluster will come up fully or not at all.
   * Does not require external orchestration, for example through operators, and allows for very fast start-up/update times.
   * Makes it simple to grok as workload for a a Linux admin persona, works well / easier to implement with systemd.
   * Reduces resource footprint by downloading and running "less stuff".
+  * Minimizes go library dependency compatibility challenges.
 * MicroShift provides a small, optional set of infrastructure services to support common use cases and reuses OpenShift's container images for these:
   * openshift-dns, openshift-router, service-ca, local storage provider
 * MicroShift does not bundle any OS user space! Bundling makes maintenance and security hard, breaks compliance. Instead, user space is provided by the host OS, the container image base layer or a sidecar container.
@@ -85,8 +86,8 @@ When deciding between different design options, we follow the following principl
 ### Configuration
 * MicroShift uses a strictly declarative style of configuration.
 * MicroShift uses as few configuration options as possible. Where it provides configuration options, they are intuitive and have sensible defaults respectively are auto-configured.
-* MicroShift is preferably configured through config files, but allows overriding of parameters via environment variables (for use in containers, systemd) and command line flags (for ad-hoc use).
-* MicroShift can use both user-local and system-wide configuration.
+* MicroShift is configured through config files.
+* MicroShift uses only system-wide configuration to maintain secure access to the runtime settings.
 * Components built into the `microshift` binary are configured by modifying `config.yaml` and restarting the service, instead of through Kubernetes APIs as in standalone OpenShift. This ensures that:
   * MicroShift can act as an "application running on RHEL", which avoids requiring Kubernetes expertise to deploy it.
   * Configuration changes can be packaged as part of an ostree update with the OS.
@@ -100,7 +101,7 @@ When deciding between different design options, we follow the following principl
 * Applications running on MicroShift are configured with Kubernetes resources, which can be loaded automatically from manifests or managed through the API.
 
 ### Security
-* MicroShift instances should run with least privileges. In particular Control Plane-only instances should run completely non-privileged.
+* MicroShift instances should run with least privileges.
 * MicroShift should minimize the number of open network ports. In particular Node-only instances should not open any listening ports.
 * Assume there is no way to access the device or MicroShift instance from remote, i.e. no SSH access nor Kubernetes API access (for kubectl). Instead, communication is *always* initiated from the device / cluster towards the management system.
 * Open issues / questions:
@@ -113,7 +114,6 @@ When deciding between different design options, we follow the following principl
 ### Networking
 * Host networking is configured by device management. MicroShift has to work with what it's been given by the host OS.
 * MicroShift uses the Red Hat OpenShift Networking CNI driver, based on OVN-Kubernetes.
-* No Multus.
 * Single-node, so no API load balancer.
 * Open issues / questions:
   * Ingress?
