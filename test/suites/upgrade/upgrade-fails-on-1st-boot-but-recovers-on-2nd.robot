@@ -1,8 +1,8 @@
 *** Settings ***
 Documentation       Tests related to upgrading MicroShift
 
-Resource            ../resources/common.resource
-Resource            ../resources/ostree.resource
+Resource            ../../resources/common.resource
+Resource            ../../resources/ostree.resource
 Library             Collections
 
 Suite Setup         Setup
