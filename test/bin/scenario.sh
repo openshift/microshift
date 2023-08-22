@@ -401,10 +401,7 @@ SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
 
-    if wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
-        record_junit "${vmname}" "greenboot-complete" "OK"
-    else
-        record_junit "${vmname}" "greenboot-complete" "FAILED"
+    if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
         return 1
     fi
 
