@@ -14,5 +14,5 @@ scenario_remove_vms() {
 scenario_run_tests() {
     run_tests host1 \
         --variable "TARGET_REF:rhel-9.2-microshift-source-fake-next-minor" \
-        suites-ostree/staged-failed-upgrade.robot
+        suites-ostree/upgrade-fails-on-1st-boot-but-recovers-on-2nd.robot
 }
