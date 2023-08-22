@@ -59,7 +59,7 @@ steps needed to synchronize on-disk data with the MicroShift executable.
 MicroShift uses Robot Framework to test updateability in automated fashion.
 Here's a list of existing scenario:
 
-[Healthy upgrade of MicroShift with one minor version bump](/test/suites-ostree/healthy-upgrade.robot):
+[Healthy upgrade of MicroShift with one minor version bump](/test/suites-ostree/upgrade-successful.robot):
 - System must be healthy
 - New deployment is staged and host is rebooted
 - System, using new image, should end up healthy and not roll back.
@@ -67,7 +67,7 @@ Here's a list of existing scenario:
   - Create a backup for previous deployment
   - Migrate all Kubernetes resources to most recent versions
 
-[System rolls back because MicroShift fails to create a backup resulting in unhealthy system](/test/suites-ostree/failed-upgrade.robot):
+[System rolls back because MicroShift fails to create a backup resulting in unhealthy system](/test/suites-ostree/upgrade-fails-and-rolls-back.robot):
 - Initially system must be healthy
 - New deployment is staged and host is rebooted
 - MicroShift never succeeds to make a backup of existing data:
@@ -103,19 +103,19 @@ Here's a list of existing scenario:
 > greenboot healthcheck script that always fails resulting in system rolling
 > back after all greenboot reboots are exhausted.
 
-[When system is healthy, rebooting it should trigger MicroShift to create a new backup](/test/suites-ostree/backup-restore.robot):
+[When system is healthy, rebooting it should trigger MicroShift to create a new backup](/test/suites-ostree/backup-restore-on-reboot.robot):
 - System is healthy
 - Host is rebooted manually
 - MicroShift starts and creates a new backup named: `currentDeploymentID_previousBootID`
 
-[When system is unhealthy, rebooting it should trigger MicroShift to restore data from a backup](/test/suites-ostree/backup-restore.robot):
+[When system is unhealthy, rebooting it should trigger MicroShift to restore data from a backup](/test/suites-ostree/backup-restore-on-reboot.robot):
 - Precondition: backup exists for current deployment
 - System is unhealthy
 - Host is rebooted manually
 - MicroShift restores existing backup matching currently booted deployment
   and starts successfully (system should be healthy)
 
-[When new image contains older minor version of MicroShift, it will refuse to run resulting in a rollback](/test/suites-ostree/block-downgrade.robot)
+[When new image contains older minor version of MicroShift, it will refuse to run resulting in a rollback](/test/suites-ostree/downgrade-block.robot)
 - System must be healthy
 - A new image is staged on the system which contains older minor version of
   Microshift than the version that is currently running
@@ -127,7 +127,7 @@ Here's a list of existing scenario:
 - MicroShift's journal should contain an information about the failure:
   `checking version compatibility failed`
 
-[When system is manually rolled back to a deployment that features older MicroShift, it should restore the backup for that version and run successfully](/test/suites-ostree/rollback.robot):
+[When system is manually rolled back to a deployment that features older MicroShift, it should restore the backup for that version and run successfully](/test/suites-ostree/rollback-manual.robot):
 - System should be running deployment with older MicroShift initially.
 - Stage new deployment with newer MicroShift and reboot the host.
 - MicroShift should create a backup for the old deployment,

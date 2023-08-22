@@ -19,5 +19,5 @@ scenario_remove_vms() {
 scenario_run_tests() {
     run_tests host1 \
               --variable "TARGET_REF:rhel-9.2-microshift-source" \
-              suites-ostree/healthy-upgrade.robot
+              suites-ostree/upgrade-successful.robot
 }
