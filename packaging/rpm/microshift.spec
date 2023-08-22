@@ -26,7 +26,9 @@
    restorecon -R /var/run/kubelet; \
    restorecon -R /var/lib/kubelet/pods; \
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
-   restorecon -R /var/lib/microshift-backups
+   restorecon -R /var/lib/microshift-backups; \
+   restorecon -v /usr/bin/microshift; \
+   restorecon -v /usr/bin/microshift-etcd
 
 # Git related details
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
@@ -163,9 +165,6 @@ install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
 install -p -m755 ./_output/microshift-etcd %{buildroot}%{_bindir}/microshift-etcd
 install -p -m755 scripts/microshift-cleanup-data.sh %{buildroot}%{_bindir}/microshift-cleanup-data
-
-restorecon -v %{buildroot}%{_bindir}/microshift
-restorecon -v %{buildroot}%{_bindir}/microshift-etcd
 
 install -d -m755 %{buildroot}%{_sharedstatedir}/microshift
 install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-backups
