@@ -1,10 +1,10 @@
 *** Settings ***
 Documentation       Tests for applying manifests automatically via the kustomize controller
 
-Resource            ../resources/common.resource
-Resource            ../resources/systemd.resource
-Resource            ../resources/microshift-config.resource
-Resource            ../resources/microshift-process.resource
+Resource            ../../resources/common.resource
+Resource            ../../resources/systemd.resource
+Resource            ../../resources/microshift-config.resource
+Resource            ../../resources/microshift-process.resource
 
 Suite Setup         Setup Suite
 Suite Teardown      Teardown Suite

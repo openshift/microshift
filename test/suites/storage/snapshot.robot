@@ -2,12 +2,12 @@
 Documentation       CSI Snapshotting Tests
 
 Library             SSHLibrary
-Library             ../resources/DataFormats.py
-Resource            ../resources/microshift-process.resource
-Resource            ../resources/common.resource
-Resource            ../resources/kubeconfig.resource
-Resource            ../resources/oc.resource
-Resource            ../resources/microshift-config.resource
+Library             ../../resources/DataFormats.py
+Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/common.resource
+Resource            ../../resources/kubeconfig.resource
+Resource            ../../resources/oc.resource
+Resource            ../../resources/microshift-config.resource
 
 Suite Setup         Test Suite Setup
 Suite Teardown      Test Suite Teardown

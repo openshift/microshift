@@ -2,11 +2,11 @@
 Documentation       Storage version migration test suite.
 
 Library             Process
-Library             ../resources/DataFormats.py
-Resource            ../resources/oc.resource
-Resource            ../resources/common.resource
-Resource            ../resources/kubeconfig.resource
-Resource            ../resources/microshift-process.resource
+Library             ../../resources/DataFormats.py
+Resource            ../../resources/oc.resource
+Resource            ../../resources/common.resource
+Resource            ../../resources/kubeconfig.resource
+Resource            ../../resources/microshift-process.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
