@@ -1,3 +1,3 @@
-- ovn-kubernetes image-arm64 973b7d0256905d0d5ba0281192694f9c0568044f to a468a16c0cc146d796ac6572dcbf160024a91559
-  - 24d0130 2023-08-17T07:01:10-04:00 CARRY: Removes restriction for ip scope universe on node ips
+- oc image-arm64 705ef3fd163df4c2763fce653151b68e2ad3a8f0 to 70d3cc5896928402fa962d4b728bae2ab2174e00
+  - 19279a34 2023-08-16T15:18:52+03:00 Bump go x/net library to 0.13.0
 
