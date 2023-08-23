@@ -66,8 +66,9 @@ DEST_DIR="${RF_VENV}" "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
 
 TESTS="$*"
+# if TESTS is not set - run the standard suite.
 if [ -z "${TESTS}" ]; then
-    TESTS="./suites"
+    TESTS="./suites/standard"
 fi
 
 set -x
