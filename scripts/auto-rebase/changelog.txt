@@ -1,3 +1,0 @@
-- oc image-arm64 705ef3fd163df4c2763fce653151b68e2ad3a8f0 to 70d3cc5896928402fa962d4b728bae2ab2174e00
-  - 19279a34 2023-08-16T15:18:52+03:00 Bump go x/net library to 0.13.0
-
