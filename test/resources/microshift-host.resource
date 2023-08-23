@@ -2,6 +2,7 @@
 Documentation       Keywords for working with the MicroShift host
 
 Library             SSHLibrary
+Library             libostree.py
 
 
 *** Keywords ***
@@ -47,14 +48,16 @@ SSH Connection To MicroShift Host Should Be Functional
 
 Reboot MicroShift Host
     [Documentation]    Reboot the MicroShift host and wait until
-    ...    SSH connection is working again
+    ...    SSH connection is working again and boot identifier changes
     ...
-    ...    Expects that intial SSH connection to MicroShift host is active.
+    ...    Expects that initial SSH connection to MicroShift host is active.
 
+    ${bootid}=    Get Current Boot Id
     SSHLibrary.Start Command    reboot    sudo=True
     Sleep    30s
+
     Wait Until Keyword Succeeds    5m    15s
-    ...    SSH Connection To MicroShift Host Should Be Functional
+    ...    Is System Rebooted    ${bootid}
 
 Create Thin Storage Pool
     [Documentation]    Create a new thin storage pool
@@ -76,3 +79,17 @@ Is System OSTree
     ${rc}=    Execute Command    stat /run/ostree-booted
     ...    sudo=True    return_stderr=False    return_stdout=False    return_rc=True
     IF    ${rc} == 0    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}
+
+Is System Rebooted
+    [Documentation]    Check if the system rebooted comparing the current and provided boot identifier
+    [Arguments]    ${old_bootid}
+
+    Make New SSH Connection
+    ${cur_bootid}=    Get Current Boot Id
+    ${len}=    Get Length    ${cur_bootid}
+    IF    ${len} == 0
+        RETURN    False
+    ELSE
+        ${system_rebooted}=    Evaluate    '${old_bootid}' != '${cur_bootid}'
+        RETURN    ${system_rebooted}
+    END

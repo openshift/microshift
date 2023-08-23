@@ -72,6 +72,10 @@ Stop MicroShift
     [Documentation]    Stop the MicroShift service
     Systemctl With Retry    stop    microshift.service
 
+Enable MicroShift
+    [Documentation]    Enable the MicroShift service
+    Systemctl    enable    microshift.service
+
 Cleanup MicroShift
     [Documentation]    Cleanup
     ...    opts=[--keep-images]
