@@ -15,5 +15,5 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "FAILING_REF:rhel-9.2-microshift-source-aux" \
         --variable "TARGET_REF:rhel-9.2-microshift-source" \
-        suites-ostree/fdo.robot
+        suites/upgrade/fdo.robot
 }

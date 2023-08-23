@@ -1,9 +1,9 @@
 *** Settings ***
 Documentation       Tests related to greenboot
 
-Resource            ../resources/systemd.resource
-Resource            ../resources/ostree.resource
-Resource            ../resources/microshift-config.resource
+Resource            ../../resources/systemd.resource
+Resource            ../../resources/ostree.resource
+Resource            ../../resources/microshift-config.resource
 
 Suite Setup         Setup Suite
 Suite Teardown      Teardown Suite

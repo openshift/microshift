@@ -1,10 +1,10 @@
 *** Settings ***
 Documentation       Tests related to how etcd is managed
 
-Resource            ../resources/common.resource
-Resource            ../resources/systemd.resource
-Resource            ../resources/microshift-config.resource
-Resource            ../resources/microshift-process.resource
+Resource            ../../resources/common.resource
+Resource            ../../resources/systemd.resource
+Resource            ../../resources/microshift-config.resource
+Resource            ../../resources/microshift-process.resource
 Library             Collections
 
 Suite Setup         Setup

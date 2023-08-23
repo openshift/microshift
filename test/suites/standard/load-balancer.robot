@@ -2,8 +2,8 @@
 Documentation       Load balancer test suite.
 
 Library             Process
-Resource            ../resources/common.resource
-Resource            ../resources/kubeconfig.resource
+Resource            ../../resources/common.resource
+Resource            ../../resources/kubeconfig.resource
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace

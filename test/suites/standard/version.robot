@@ -1,11 +1,11 @@
 *** Settings ***
 Documentation       Tests related to the version of MicroShift
 
-Resource            ../resources/common.resource
-Resource            ../resources/oc.resource
-Resource            ../resources/microshift-process.resource
+Resource            ../../resources/common.resource
+Resource            ../../resources/oc.resource
+Resource            ../../resources/microshift-process.resource
 Library             Collections
-Library             ../resources/DataFormats.py
+Library             ../../resources/DataFormats.py
 
 Suite Setup         Setup
 Suite Teardown      Teardown

@@ -1,9 +1,9 @@
 *** Settings ***
 Documentation       Tests related to MicroShift backup functionality on OSTree-based systems
 
-Resource            ../resources/common.resource
-Resource            ../resources/ostree.resource
-Resource            ../resources/ostree-data.resource
+Resource            ../../resources/common.resource
+Resource            ../../resources/ostree.resource
+Resource            ../../resources/ostree-data.resource
 Library             Collections
 
 Suite Setup         Setup

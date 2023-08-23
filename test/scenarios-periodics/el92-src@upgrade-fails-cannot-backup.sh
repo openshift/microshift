@@ -15,5 +15,5 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "FAILING_REF:rhel-9.2-microshift-source-aux" \
         --variable "REASON:prevent_backup" \
-        suites-ostree/upgrade-fails-and-rolls-back.robot
+        suites/upgrade/upgrade-fails-and-rolls-back.robot
 }
