@@ -22,7 +22,7 @@
    mkdir -p /var/run/kubelet; \
    mkdir -p /var/lib/kubelet/pods; \
    mkdir -p /var/run/secrets/kubernetes.io/serviceaccount; \
-   mkdir -p /var/lib/microshift-backups; \
+   mkdir -p /var/lib/microshift-backups; # Creating folder to avoid GreenBoot race condition so that correct label is applied \
    restorecon -R /var/run/kubelet; \
    restorecon -R /var/lib/kubelet/pods; \
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
