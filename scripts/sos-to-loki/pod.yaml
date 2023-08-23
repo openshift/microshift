@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sos-to-loki
+spec:
+  containers:
+
+  - image: docker.io/grafana/loki:2.8.2
+    name: loki
+    ports:
+    - hostPort: 3100
+    volumeMounts:
+    - mountPath: /etc/loki:Z
+      name: loki-cfg
+    securityContext:
+      runAsUser: 0
+
+  - image: docker.io/grafana/grafana:10.0.2
+    name: grafana
+    ports:
+    - hostPort: 3000
+    volumeMounts:
+    - mountPath: /etc/grafana:Z
+      name: grafana-cfg
+
+  - image: docker.io/grafana/promtail:2.8.2
+    name: promtail
+    volumeMounts:
+    - mountPath: /etc/promtail:Z
+      name: promtail-cfg
+    - mountPath: /logs:z
+      name: promtail-input
+
+  volumes:
+  - hostPath:
+      path: grafana
+      type: Directory
+    name: grafana-cfg
+
+  - hostPath:
+      path: loki
+      type: Directory
+    name: loki-cfg
+
+  - hostPath:
+      path: promtail
+      type: Directory
+    name: promtail-cfg
+
+  - hostPath:
+      path: $SOS_REPORT_INPUT
+      type: Directory
+    name: promtail-input

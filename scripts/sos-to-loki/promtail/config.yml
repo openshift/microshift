@@ -1,0 +1,64 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: container-logs
+      __path__: /logs/sos_commands/microshift/namespaces/**/{current,previous}.log
+  - targets:
+      - localhost
+    labels:
+      job: journal
+      __path__: /logs/sos_commands/logs/journalctl_--no-pager
+
+  pipeline_stages:
+    - match:
+        selector: '{job="container-logs"}'
+        stages:
+        - regex:
+            source: filename
+            expression: "/logs/sos_commands/microshift/namespaces/(?P<namespace>.+?)/pods/(?P<pod>.+?)/(?P<container>.+?)/.*"
+        - regex:
+            expression: "^(?s)(?P<time>[0-9-T:.]+) (?P<message>.*?)$"
+        - labels:
+            namespace:
+            pod:
+            container:
+            time:
+        - output:
+            source: message
+        - timestamp:
+            source: 'time'
+            format: RFC3339Nano
+    - match:
+        selector: '{job="journal"}'
+        stages:
+        - drop:
+            expression: "^-- Boot [0-9a-f]{32} --$"
+        # merge lines starting with space into proceeding lines
+        - multiline:
+            firstline: "^\\S"
+        - regex:
+            expression: "^(?s)(?P<time>\\S+ \\S+ \\S+) (?P<host>\\S+) (?P<service>[\\w.-]+)(\\[(?P<pid>\\d+)\\])*?: (?P<message>.*?)$"
+        - output:
+            source: message
+        - labels:
+            host:
+            service:
+            pid:
+            time:
+        - timestamp:
+            source: 'time'
+            format: 'Jan 2 15:04:05'
+            location: 'America/New_York'
