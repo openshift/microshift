@@ -72,7 +72,7 @@ run_sonobuoy() {
 
     start=$(date +%s)
     # shellcheck disable=SC2046  # Jq is unable to process escaped quotes
-    while [ $(~/go/bin/sonobuoy status --json | jq -r '."tar-info".name') == "" ] ; do
+    while [ -z $(~/go/bin/sonobuoy status --json | jq -r '."tar-info".name') ] ; do
         now=$(date +%s)
         if [ $(( now - start )) -ge ${TIMEOUT_RESULTS} ]; then
             echo "Waited for results for 5m. Timing out"
