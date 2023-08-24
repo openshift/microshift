@@ -48,4 +48,8 @@ for dev in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" &
     nmcli connection modify ${dev} connection.autoconnect yes
 done
 
+# Enable the serial console
+systemctl enable serial-getty@ttyS0.service
+systemctl start serial-getty@ttyS0.service
+
 %end
