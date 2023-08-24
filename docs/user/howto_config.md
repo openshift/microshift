@@ -11,6 +11,8 @@ apiServer:
     advertiseAddress: ""
     subjectAltNames:
         - ""
+csi:
+    disable:
 debugging:
     logLevel: ""
 dns:
@@ -47,6 +49,8 @@ apiServer:
     advertiseAddress: ""
     subjectAltNames:
         - ""
+csi:
+    disable:
 debugging:
     logLevel: Normal
 dns:

@@ -32,6 +32,7 @@ type Config struct {
 	Etcd      EtcdConfig `json:"etcd"`
 	Debugging Debugging  `json:"debugging"`
 	Manifests Manifests  `json:"manifests"`
+	CSI       CSI        `json:"csi"`
 
 	// Internal-only fields
 	Ingress      IngressConfig `json:"-"`

@@ -26,6 +26,16 @@ func getCSIPluginConfig() (*lvmd.Lvmd, error) {
 }
 
 func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
+	if cfg.CSI.Disable {
+		klog.Info("inbuilt CSI is disabled, skipping initialization")
+		return nil
+	}
+
+	if err := lvmd.LvmSupported(); err != nil {
+		klog.Warningf("skipping CSI deployment: %v", err)
+		return nil
+	}
+
 	var (
 		ns = []string{
 			"components/lvms/topolvm-openshift-storage_namespace.yaml",
@@ -67,11 +77,6 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 			"components/lvms/topolvm-node-securitycontextconstraint.yaml",
 		}
 	)
-
-	if err := lvmd.LvmSupported(); err != nil {
-		klog.Warningf("skipping CSI deployment: %v", err)
-		return nil
-	}
 
 	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
 	// csi plugin.

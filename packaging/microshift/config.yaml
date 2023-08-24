@@ -4,6 +4,10 @@ apiServer:
     # SubjectAltNames added to API server certs
     subjectAltNames:
         - ""
+# CSI provides configuration options for the inbuilt CSI infrastructure.
+csi:
+    # Disable completely disables all internal CSI implementations and allows for Plug & Play of own CSI Plugins instead.
+    disable:
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll". Defaults to "Normal".
     logLevel: Normal

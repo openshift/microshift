@@ -2,6 +2,7 @@
   "type": "object",
   "required": [
     "apiServer",
+    "csi",
     "debugging",
     "dns",
     "etcd",
@@ -26,6 +27,19 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "csi": {
+      "description": "CSI provides configuration options for the inbuilt CSI infrastructure.",
+      "type": "object",
+      "required": [
+        "disable"
+      ],
+      "properties": {
+        "disable": {
+          "description": "Disable completely disables all internal CSI implementations and allows for Plug \u0026 Play of own CSI Plugins instead.",
+          "type": "boolean"
         }
       }
     },
