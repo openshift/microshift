@@ -179,7 +179,7 @@ function action_delete {
     ip=$(get_ip "${VMNAME}")
 
     if [ -n "${ip}" ]; then
-        ssh "microshift@${ip}" "sudo subscription-manager unregister"
+        ssh "microshift@${ip}" "sudo subscription-manager unregister" || true
     fi
 
     sudo virsh destroy "${VMNAME}"
