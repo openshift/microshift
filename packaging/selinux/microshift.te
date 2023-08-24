@@ -4,31 +4,14 @@ type microshift_t;
 domain_type(microshift_t);
 
 gen_require(`
-    type container_runtime_t, var_lib_t, container_var_lib_t, container_runtime_tmpfs_t, container_t;
+    type kubelet_t, var_lib_t, container_var_lib_t, init_exec_t;
     class file { open read };
 ')
-filetrans_pattern(container_runtime_t, var_lib_t, container_var_lib_t, dir, "kubelet")
 
-allow container_t container_runtime_tmpfs_t:file read_file_perms;
-allow container_t container_runtime_tmpfs_t:lnk_file read_file_perms;
-allow container_t container_runtime_tmpfs_t:file open;
-allow container_t container_runtime_tmpfs_t:file read;
-allow container_t container_var_lib_t:file open;
-allow container_t container_var_lib_t:file read;
-allow container_t container_var_lib_t:lnk_file read;
-allow container_t var_lib_t:file { open read };
-allow iptables_t cgroup_t:dir ioctl;
-
-require {
-    type cgroup_t, iptables_t, init_var_run_t, container_t, var_lib_t, systemd_hostnamed_t;
-    class dir { ioctl write };
-    class file { open read };
-}
-
-gen_require(`
-    type container_runtime_t, container_var_lib_t, container_file_t, container_t, container_runtime_tmpfs_t;
-    class file read;
-')
-filetrans_pattern(container_runtime_t, container_var_lib_t, container_file_t, dir, "pods")
-
-fs_tmpfs_filetrans(container_runtime_t, container_runtime_tmpfs_t, { lnk_file})
+# When microshift creates backup folders in /var/lib/microshift-backups, the correct labels are applied
+# Note: filetrans_pattern rules states;
+#   Process running as `kubelet_t` that creates a `dir` called `microshift-backups`
+#   in a folder labeled `var_lib_t` get's the label `container_var_lib_t`
+filetrans_pattern(kubelet_t, var_lib_t, container_var_lib_t, dir, "microshift-backups")
+# Also make sure that during restore the temporary directory gets the same labels.
+filetrans_pattern(kubelet_t, var_lib_t, container_var_lib_t, dir, "microshift.saved")
