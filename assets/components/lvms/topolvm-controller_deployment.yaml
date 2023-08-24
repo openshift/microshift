@@ -9,7 +9,8 @@ spec:
     matchLabels:
       app.kubernetes.io/component: topolvm-controller
       app.kubernetes.io/name: topolvm-csi-driver
-  strategy: {}
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
