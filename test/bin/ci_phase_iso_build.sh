@@ -48,8 +48,8 @@ bash -x ./bin/start_webserver.sh
 
 # Build all of the images
 CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
-MAX_WORKERS=5
-CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo ${MAX_WORKERS} )"
+MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
+CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
 
 bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
 bash -x ./bin/build_images.sh

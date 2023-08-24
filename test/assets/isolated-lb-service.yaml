@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: isolated-lb-service
+spec:
+  ports:
+  - port: 31111
+    targetPort: 80
+  selector:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  type: LoadBalancer
