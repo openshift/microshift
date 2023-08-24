@@ -55,6 +55,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 		panic(err)
 	}
 
+	// test
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		cfg, err := config.ActiveConfig()
 		if err != nil {
