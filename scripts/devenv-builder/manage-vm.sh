@@ -168,6 +168,13 @@ function action_ssh {
     ssh "microshift@${ip}"
 }
 
+function action_console {
+    echo
+    echo "After connected, press RETURN to generate a login prompt and Control-] to disconnect"
+    echo
+    sudo virsh console "${VMNAME}"
+}
+
 function action_delete {
     ip=$(get_ip "${VMNAME}")
 
@@ -203,7 +210,7 @@ function action_help {
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} (create|ip|ssh|delete|rm|help) [options]
+${script_name} (create|ip|ssh|console|delete|rm|help) [options]
 
 Commands:
 
@@ -211,6 +218,7 @@ Commands:
   create    -- create a new VM
   ip        -- show the IP of the VM
   ssh       -- ssh into the VM
+  console   -- connect to the serial console of the VM
   delete|rm -- delete the VM
   help      -- show this help
 
@@ -258,7 +266,7 @@ case "$1" in
         action_config
         exit 0
         ;;
-    create|ip|ssh|delete|rm|help)
+    create|ip|ssh|console|delete|rm|help)
         action="$1"
         shift
         ;;
