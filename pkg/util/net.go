@@ -34,15 +34,23 @@ import (
 
 var previousGatewayIP string = ""
 
+// Remember whether we have successfully found the hard-coded nodeIP
+// on this host.
+var foundHardCodedNodeIP bool
+
 func GetHostIP(nodeIP string) (string, error) {
 	var hostIP string
 	var err error
 
 	if nodeIP != "" {
-		klog.Infof("try to find nodeIP %s on host", nodeIP)
+		if !foundHardCodedNodeIP {
+			foundHardCodedNodeIP = true
+			klog.Infof("trying to find configured nodeIP %q on host", nodeIP)
+		}
 		hostIP, err = selectV4IPFromHostInterface(nodeIP)
 		if err != nil {
-			return "", fmt.Errorf("failed to find nodeIP %s on host: %v", nodeIP, err)
+			foundHardCodedNodeIP = false
+			return "", fmt.Errorf("failed to find the configured nodeIP %q on host: %v", nodeIP, err)
 		}
 		goto found
 	}
