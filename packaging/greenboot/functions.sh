@@ -165,14 +165,20 @@ function namespace_pods_ready() {
 function namespace_pods_not_restarting() {
     local ns=$1
     local restarts=0
+    echo "namespace_pods_not_restarting for ${ns}"
 
     local count1
+    echo "${ns} before-initial-count1"
     count1=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].restartCount}' 2>/dev/null)
+    echo "${ns} initial-count1:${count1}"
+
     for i in $(seq 10) ; do
         sleep 5
         local countS
         local count2
+        echo "${ns} before-countS"
         countS=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].started}' 2>/dev/null | grep -vc false)
+        echo "${ns} before-count2"
         count2=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].restartCount}' 2>/dev/null)
 
         echo "${ns} count1:${count1} count2:${count2} countS:${countS}"
