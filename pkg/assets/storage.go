@@ -1,5 +1,7 @@
 package assets
 
+// DUMMY COMMENT!
+
 import (
 	"context"
 	"fmt"
