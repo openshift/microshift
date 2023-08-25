@@ -175,16 +175,21 @@ function namespace_pods_not_restarting() {
         countS=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].started}' 2>/dev/null | grep -vc false)
         count2=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].restartCount}' 2>/dev/null)
 
+        echo "${ns} count1:${count1} count2:${count2} countS:${countS}"
+
         # If pods started, a restart is detected by comparing the count string between the checks.
         # The number of pod restarts is incremented when a restart is detected, or decremented otherwise.
         if [ "${countS}" -ne 0 ] && [ "${count1}" = "${count2}" ] ; then
             restarts=$(( restarts - 1 ))
+            echo "${ns} restarts--:${restarts}"
         else
             restarts=$(( restarts + 1 ))
             count1=${count2}
+            echo "${ns} restarts++:${restarts}"
         fi
     done
 
+    echo "${ns} end-restarts:${restarts}"
     [ "${restarts}" -lt 0 ] && return 0
     return 1
 }
