@@ -17,6 +17,7 @@ PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=900
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
+VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 
 full_vm_name() {
     local base="${1}"
@@ -218,12 +219,19 @@ launch_vm() {
         # FIXME: variable for memory?
         # FIXME: variable for ISO
 
+        local graphics_args
+        graphics_args="none"
+        if "${VNC_CONSOLE}"; then
+            graphics_args="vnc,listen=0.0.0.0"
+        fi
+
         # When bash creates a background job (using `&`),
         # the bg job does not get its own TTY.
         # If the TTY is not provided, virt-install refuses
         # to attach to the console. `unbuffer` provides the TTY.
         if ! sudo unbuffer virt-install \
             --autoconsole text \
+            --graphics "${graphics_args}" \
             --name "${full_vmname}" \
             --vcpus 2 \
             --memory 4092 \

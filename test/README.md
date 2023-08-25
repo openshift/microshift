@@ -344,6 +344,10 @@ use ssh-agent.
 in a local environment where sos can be run manually when
 necessary. Do not enable this option in CI.
 
+`VNC_CONSOLE` -- Whether to add a VNC graphics console to hosts. This
+is useful in local developer settings where cockpit can be used to
+login to the host. Set to `true` to enable. Defaults to `false`.
+
 #### Configuring Hypervisor
 
 Use `./test/bin/manage_hypervisor_config.sh` to manage the following
