@@ -1,0 +1,40 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-claim
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: topolvm-provisioner
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: test-pod
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: test-container
+    image: nginxinc/nginx-unprivileged:latest
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    command:
+    - sh
+    - -c
+    - sleep 1d
+    volumeMounts:
+    - mountPath: /vol
+      name: test-vol
+  volumes:
+  - name: test-vol
+    persistentVolumeClaim:
+      claimName: test-claim

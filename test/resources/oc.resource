@@ -52,3 +52,10 @@ Oc Wait For
     ${timeout_opt}=    Set Variable    --timeout\=${timeout}
     ${output}=    Run With Kubeconfig    oc wait -n ${NAMESPACE} ${type_name} --for=${wait_for} ${timeout_opt}
     RETURN    ${output}
+
+Oc Create
+    [Documentation]    Run 'oc create' on a specific resource in the curret test namespace
+    ...    Returns the command's combined STDOUT/STDER
+    [Arguments]    ${opts}
+    ${output}=    Run With Kubeconfig    oc create ${opts}
+    RETURN    ${output}
