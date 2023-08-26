@@ -156,8 +156,14 @@ function deployment_ready() {
     local ready
     local reps
 
-    ready=$(${OCGET_CMD} -n "${ns}" "${dep}" -o jsonpath='{.status.readyReplicas}')
+    ready=$(${OCGET_CMD} -n "${ns}" "${dep}" -o jsonpath='{.status.availableReplicas}')
+    if [ -z "${ready}" ]; then
+        return 1
+    fi
     reps=$(${OCGET_CMD} -n "${ns}" "${dep}" -o jsonpath='{.status.replicas}')
+    if [ -z "${reps}" ]; then
+        return 1
+    fi
 
     echo "${ns}/${dep#*/} ${ready}/${reps}"
 
@@ -175,8 +181,14 @@ function daemonset_ready() {
     local ready
     local reps
 
-    ready=$(${OCGET_CMD} -n "${ns}" "${ds}" -o jsonpath='{.status.numberReady}')
+    ready=$(${OCGET_CMD} -n "${ns}" "${ds}" -o jsonpath='{.status.numberAvailable}')
+    if [ -z "${ready}" ]; then
+        return 1
+    fi
     reps=$(${OCGET_CMD} -n "${ns}" "${ds}" -o jsonpath='{.status.desiredNumberScheduled}')
+    if [ -z "${reps}" ]; then
+        return 1
+    fi
 
     echo "${ns}/${ds#*/} ${ready}/${reps}"
 
@@ -199,14 +211,14 @@ function namespace_ready() {
         is_ready=true
 
         for dep in $(${OCGET_CMD} deployment -n "${ns}" -o name); do
-            echo "Waiting ${WAIT_TIMEOUT_SECS}s for all pods from deployment ${ns}/${dep#*/} to be ready"
+            echo "Waiting ${WAIT_TIMEOUT_SECS}s for all pods from deployment ${ns}/${dep#*/} to be available"
             if ! wait_for "${WAIT_TIMEOUT_SECS}" deployment_ready "${ns}" "${dep}"; then
                 is_ready=false
             fi
         done
 
         for ds in $(${OCGET_CMD} daemonset -n "${ns}" -o name); do
-            echo "Waiting ${WAIT_TIMEOUT_SECS}s for all pods from daemonset ${ns}/${ds#*/} to be ready"
+            echo "Waiting ${WAIT_TIMEOUT_SECS}s for all pods from daemonset ${ns}/${ds#*/} to be available"
             if ! wait_for "${WAIT_TIMEOUT_SECS}" daemonset_ready "${ns}" "${ds}"; then
                 is_ready=false
             fi

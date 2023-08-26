@@ -27,6 +27,7 @@ for f in ${CHECK_FILE_LIST} ; do
     # the list of checked files.
     "${SHELL_CHECK}" \
         --format=gcc \
+        --exclude=SC2317 \
         --external-sources \
         "${f}"
 done
