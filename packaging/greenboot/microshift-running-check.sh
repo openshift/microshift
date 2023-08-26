@@ -4,7 +4,6 @@ set -e
 SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
 PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system)
-PODS_CT_LIST=(2                        1                    1                 2             2                 2)
 
 # Source the MicroShift health check functions library
 # shellcheck source=packaging/greenboot/functions.sh
@@ -18,6 +17,7 @@ trap 'script_exit' EXIT
 
 # The term handler to override the default behavior and have a uniform and
 # homogeneous exit code in all controlled situations.
+# shellcheck disable=SC2317
 function return_failure() {
     exit 1
 }
@@ -68,7 +68,7 @@ function microshift_service_active() {
     # Terminate the script in case of a failed service - nothing to wait for
     if [ "${is_failed}" = "failed" ] ; then
         echo "Error: The microshift.service systemd unit is failed. Terminating..."
-        kill -TERM ${SCRIPT_PID}
+        kill -TERM "${SCRIPT_PID}"
     fi
     # Check the service activity
     [ "${is_active}" = "active" ] && return 0
@@ -93,6 +93,7 @@ function microshift_health_endpoints_ok() {
 # args: None
 # return: 0 if any pods are in the 'Running' status, or 1 otherwise
 function any_pods_running() {
+    # shellcheck disable=SC2086
     local -r count=$(${OCGET_CMD} pods ${OCGET_OPT} -A 2>/dev/null | awk '$4~/Running/' | wc -l)
 
     [ "${count}" -gt 0 ] && return 0
@@ -148,60 +149,95 @@ fi
 log_failure_cmd "pod-list" "${OCGET_CMD} pods -A -o wide"
 log_failure_cmd "pod-events" "${OCGET_CMD} events -A"
 
-# Wait for any pods to enter running state
-echo "Waiting ${WAIT_TIMEOUT_SECS}s for any pods to be running"
-if ! wait_for "${WAIT_TIMEOUT_SECS}" any_pods_running ; then
-    echo "Error: Timed out waiting for any MicroShift pod to be running"
+function deployment_ready() {
+    local -r ns="$1"
+    local -r dep="$2"
+
+    local ready
+    local reps
+
+    ready=$(${OCGET_CMD} -n "${ns}" "${dep}" -o jsonpath='{.status.readyReplicas}')
+    reps=$(${OCGET_CMD} -n "${ns}" "${dep}" -o jsonpath='{.status.replicas}')
+
+    echo "${ns}/${dep#*/} ${ready}/${reps}"
+
+    if [ "${ready}" -ne "${reps}" ]; then
+        oc get pods -n "${ns}"
+        return 1
+    fi
+    return 0
+}
+
+function daemonset_ready() {
+    local -r ns="$1"
+    local -r ds="$2"
+
+    local ready
+    local reps
+
+    ready=$(${OCGET_CMD} -n "${ns}" "${ds}" -o jsonpath='{.status.numberReady}')
+    reps=$(${OCGET_CMD} -n "${ns}" "${ds}" -o jsonpath='{.status.desiredNumberScheduled}')
+
+    echo "${ns}/${ds#*/} ${ready}/${reps}"
+
+    if [ "${ready}" -ne "${reps}" ]; then
+        oc get pods -n "${ns}"
+        return 1
+    fi
+    return 0
+}
+
+function namespace_ready() {
+    local ns="$1"
+
+    local dep
+    local ds
+    local is_ready
+
+    for trial in $(seq 3); do
+        echo "Trial ${trial} for ${ns}"
+        is_ready=true
+
+        for dep in $(${OCGET_CMD} deployment -n "${ns}" -o name); do
+            echo "Waiting ${WAIT_TIMEOUT_SECS}s for all pods from deployment ${ns}/${dep#*/} to be ready"
+            if ! wait_for "${WAIT_TIMEOUT_SECS}" deployment_ready "${ns}" "${dep}"; then
+                is_ready=false
+            fi
+        done
+
+        for ds in $(${OCGET_CMD} daemonset -n "${ns}" -o name); do
+            echo "Waiting ${WAIT_TIMEOUT_SECS}s for all pods from daemonset ${ns}/${ds#*/} to be ready"
+            if ! wait_for "${WAIT_TIMEOUT_SECS}" daemonset_ready "${ns}" "${ds}"; then
+                is_ready=false
+            fi
+        done
+
+        if ${is_ready}; then
+            break
+        fi
+    done
+
+    if ${is_ready}; then
+        return 0
+    fi
+    return 1
+}
+
+function core_components_ready() {
+    local RC=0
+
+    local ns
+
+    # shellcheck disable=SC2068
+    for ns in ${PODS_NS_LIST[@]}; do
+        if ! namespace_ready "${ns}"; then
+            RC=1
+        fi
+    done
+    return "${RC}"
+}
+
+if ! core_components_ready; then
     exit 1
 fi
-
-# Wait for MicroShift core pod images to be downloaded
-for i in "${!PODS_NS_LIST[@]}"; do
-    CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
-
-    echo "Waiting ${WAIT_TIMEOUT_SECS}s for pod image(s) from the '${CHECK_PODS_NS}' namespace to be downloaded"
-    if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_images_downloaded ; then
-        echo "Error: Timed out waiting for pod image(s) from the '${CHECK_PODS_NS}' namespace to be downloaded"
-        exit 1
-    fi
-done
-
-# Wait for MicroShift core pods to enter ready state
-for i in "${!PODS_NS_LIST[@]}"; do
-    CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
-    CHECK_PODS_CT=${PODS_CT_LIST[${i}]}
-
-    echo "Waiting ${WAIT_TIMEOUT_SECS}s for ${CHECK_PODS_CT} pod(s) from the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
-    if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_pods_ready ; then
-        echo "Error: Timed out waiting for ${CHECK_PODS_CT} pod(s) in the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
-        exit 1
-    fi
-done
-
-# Verify that MicroShift core pods are not restarting
-declare -A pid2name
-for i in "${!PODS_NS_LIST[@]}"; do
-    CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
-
-    echo "Checking pod restart count in the '${CHECK_PODS_NS}' namespace"
-    namespace_pods_not_restarting "${CHECK_PODS_NS}" &
-    pid=$!
-
-    pid2name["${pid}"]="${CHECK_PODS_NS}"
-done
-
-# Wait for the restart check functions to complete, printing errors in case of a failure
-check_failed=false
-for pid in "${!pid2name[@]}"; do
-    if ! wait "${pid}" ; then
-        check_failed=true
-
-        name=${pid2name["${pid}"]}
-        echo "Error: Pods are restarting too frequently in the '${name}' namespace"
-    fi
-done
-
-# Exit with an error code if the pod restart check failed
-if ${check_failed} ; then
-    exit 1
-fi
+exit 0
