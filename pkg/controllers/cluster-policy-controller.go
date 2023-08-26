@@ -21,6 +21,7 @@ import (
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	clusterpolicycontroller "github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller"
 	"github.com/openshift/library-go/pkg/controller/controllercmd"
+	"github.com/openshift/library-go/pkg/operator/events"
 	"github.com/openshift/microshift/pkg/config"
 	corev1 "k8s.io/api/core/v1"
 	unstructuredv1 "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -81,7 +82,8 @@ func (s *ClusterPolicyController) configure(cfg *config.Config) error {
 			Kind:       "Namespace",
 			Name:       namespace,
 			Namespace:  namespace,
-		})
+		}).
+		WithEventRecorderOptions(events.RecommendedClusterSingletonCorrelatorOptions())
 
 	s.run = func(ctx context.Context) error {
 		return builder.Run(ctx, ctrlConfig)
