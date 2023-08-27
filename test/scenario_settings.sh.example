@@ -19,3 +19,8 @@ SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-${HOME}/.ssh/id_rsa.pub}
 # Disable sos report collection. This can speed up setup in a
 # local environment where sos can be run manually when necessary.
 #SKIP_SOS=true
+
+# Whether to add a VNC graphics console to hosts. This is useful in
+# local developer settings where cockpit can be used to login to the
+# host. Set to `true` to enable. Defaults to `false`.
+#VNC_CONSOLE=true
