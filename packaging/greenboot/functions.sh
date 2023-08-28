@@ -169,18 +169,18 @@ function namespace_pods_not_restarting() {
 
     local count1
     echo "${ns} before-initial-count1"
-    count1=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].restartCount}' --request-timeout=3s 2>/dev/null)
+    count1=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].restartCount}' 2>/dev/null)
     echo "${ns} initial-count1:${count1}"
 
     for i in $(seq 10) ; do
         sleep 5
         local countS
         local count2
-        echo "${ns} faux countS: $(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[]}' --request-timeout=3s)"
+        echo "${ns} faux countS: $(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[]}')"
         echo "${ns} before-countS"
-        countS=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].started}' --request-timeout=3s 2>/dev/null | grep -vc false)
+        countS=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].started}' 2>/dev/null | grep -vc false || true)
         echo "${ns} before-count2"
-        count2=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].restartCount}' --request-timeout=3s 2>/dev/null)
+        count2=$(${OCGET_CMD} pods ${OCGET_OPT} -n "${ns}" -o 'jsonpath={..status.containerStatuses[].restartCount}' 2>/dev/null)
 
         echo "${ns} count1:${count1} count2:${count2} countS:${countS}"
 
