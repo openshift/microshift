@@ -1,0 +1,47 @@
+---
+# common microshift boot start time script
+
+- block:
+  - name: find microshift cleanup script
+    ansible.builtin.find:
+      paths: /usr/bin
+      patterns:
+        - '.*microshift.*cleanup.*'
+        - '.*cleanup.*microshift.*'
+      use_regex: yes
+    register: find_cleanup
+
+  - name: set microshift_cleanup_bin variable
+    set_fact:
+      microshift_cleanup_bin: "{{ find_cleanup.files[0].path if find_cleanup.files }}"
+
+  - name: cleanup microshift data
+    become: yes
+    ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
+  when: cleanup_microshift | default('false') | bool
+
+- block:
+  - name: reboot machine
+    become: yes
+    ansible.builtin.reboot:
+      reboot_timeout: 600
+  
+  - name: Pause for 60 seconds for steady state post reboot
+    ansible.builtin.pause:
+      seconds: 60
+  when: reboot | default('false') | bool
+
+- name: run the microshift boot script
+  ansible.builtin.script:
+    cmd: ready.sh
+  register: script_output
+
+- name: display script output
+  ansible.builtin.debug:
+    var: script_output.stdout
+
+- name: save microshift boot info to local file
+  ansible.builtin.copy:
+    content: "{{ script_output.stdout }}"
+    dest: "{{ boot_output_filename | default('boot_quick.txt') }}"
+  delegate_to: localhost

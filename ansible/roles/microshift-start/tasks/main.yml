@@ -1,9 +1,23 @@
 ---
 # microshift-start tasks
 
-- name: cleanup microshift data
-  become: yes
-  ansible.builtin.shell: echo 1 | /usr/bin/microshift-cleanup-data --all
+- block:
+  - name: find microshift cleanup script
+    ansible.builtin.find:
+      paths: /usr/bin
+      patterns:
+        - '.*microshift.*cleanup.*'
+        - '.*cleanup.*microshift.*'
+      use_regex: yes
+    register: find_cleanup
+
+  - name: set microshift_cleanup_bin variable
+    set_fact:
+      microshift_cleanup_bin: "{{ find_cleanup.files[0].path if find_cleanup.files }}"
+
+  - name: cleanup microshift data
+    become: yes
+    ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
   when: cleanup_microshift | default('true') | bool
 
 - name: disable microshift service
@@ -80,80 +94,15 @@
   register: cadvisor_check
   ignore_errors: true
 
-- name: force update of current timestamp
-  ansible.builtin.setup:
-    filter:
-      - 'ansible_date_time'
-
-- name: set start_time
-  ansible.builtin.set_fact:
-    start_time: "{{ ansible_date_time.iso8601[:19] }}"
-
-- name: start microshift service
-  become: yes
-  ansible.builtin.systemd:
-    name: microshift
-    state: started
-    enabled: no
-
-- name: restart cadvisor to pick up new containers
-  become: yes
-  ansible.builtin.systemd:
-    name: cadvisor
-    state: restarted
-  when: cadvisor_check.rc == 0
-
-- name: wait for kubeconfig to exist on microshift node
-  become: yes
-  ansible.builtin.stat:
-    path: "{{ remote_kubeconfig_path }}"
-  register: remote_kubeconfig
-  until: remote_kubeconfig.stat.exists
-  retries: 300
-  delay: 3
-
-- name: create copy of kubeconfig
-  become: yes
-  ansible.builtin.copy:
-    src: "{{ remote_kubeconfig_path }}"
-    dest: "/home/{{ ansible_user }}/.kube/config"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    remote_src: yes
-    force: yes
-
-- name: wait for any pods
-  ansible.builtin.shell: oc get pods -A --no-headers | wc -l
-  register: pods
-  until: (pods.stdout | int ) >= 1
-  retries: 10
+- name: measure microshift service boot time
+  include_tasks: roles/common/tasks/boot.yml
+  vars:
+    boot_output_filename: "boot0.txt"
+    cleanup_microshift: false
+    reboot: false
 
 - name: create service account task(s)
   include_tasks: roles/create-service-account/tasks/main.yml
-
-- name: wait for pods running
-  ansible.builtin.shell: oc get pods -A -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' | grep -c False
-  retries: 120
-  delay: 5
-  register: result
-  until: result.stdout == "0"
-  failed_when: result.stderr != ''
-
-- name: force update of current timestamp
-  ansible.builtin.setup:
-    filter:
-      - 'ansible_date_time'
-
-- name: get runtime
-  ansible.builtin.set_fact:
-    runtime: "{{ ((ansible_date_time.iso8601[:19] | to_datetime('%Y-%m-%dT%H:%M:%S')) - (start_time | to_datetime('%Y-%m-%dT%H:%M:%S'))).seconds }}"
-
-- name: Add boot info to local file
-  ansible.builtin.lineinfile:
-    path: boot.txt
-    line: "First boot: {{ runtime }}"
-    create: yes
-  delegate_to: localhost
 
 - name: finish pbench capture
   become: yes
