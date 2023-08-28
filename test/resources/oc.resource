@@ -54,15 +54,22 @@ Oc Wait For
     RETURN    ${output}
 
 Oc Create
-    [Documentation]    Run 'oc create' on a specific resource in the curret test namespace
+    [Documentation]    Run 'oc create' on a specific resource in the current test namespace
     ...    Returns the combined STDOUT/STDERR output of the command.
     [Arguments]    ${opts}
     ${output}=    Run With Kubeconfig    oc create ${opts}
     RETURN    ${output}
 
 Oc Expose
-    [Documentation]    Run 'oc expose' on a specific resource in the curret test namespace
+    [Documentation]    Run 'oc expose' on a specific resource in the current test namespace
     ...    Returns the combined STDOUT/STDERR output of the command.
     [Arguments]    ${opts}
     ${output}=    Run With Kubeconfig    oc expose ${opts}
+    RETURN    ${output}
+
+Oc Patch
+    [Documentation]    Run 'oc patch' on a specific resource in the current test namespace
+    ...    Returns the combined STDOUT/STDER output of the command.
+    [Arguments]    ${type_name}    ${opts}
+    ${output}=    Run With Kubeconfig    oc patch -n ${NAMESPACE} ${type_name} -p ${opts}
     RETURN    ${output}
