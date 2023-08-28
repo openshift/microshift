@@ -9,6 +9,62 @@ groups = []
 name = "microshift-test-agent"
 version = "*"
 
+[[packages]]
+name = "cri-o"
+version = "*"
+
+[[packages]]
+name = "cri-tools"
+version = "*"
+
+[[packages]]
+name = "iptables"
+version = "*"
+
+[[packages]]
+name = "conntrack-tools"
+version = "*"
+
+[[packages]]
+name = "sos"
+version = "*"
+
+[[packages]]
+name = "crun"
+version = "*"
+
+[[packages]]
+name = "openshift-clients"
+version = "*"
+
+[[packages]]
+name = "container-selinux"
+version = "*"
+
+[[packages]]
+name = "selinux-policy"
+version = "*"
+
+[[packages]]
+name = "openvswitch3.1"
+version = "*"
+
+[[packages]]
+name = "NetworkManager"
+version = "*"
+
+[[packages]]
+name = "NetworkManager-ovs"
+version = "*"
+
+[[packages]]
+name = "jq"
+version = "*"
+
+[[packages]]
+name = "greenboot"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift-test-agent"]
 
