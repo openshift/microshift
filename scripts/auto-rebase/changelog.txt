@@ -1,0 +1,23 @@
+- ovn-kubernetes image-arm64 a468a16c0cc146d796ac6572dcbf160024a91559 to d54b88982138864d2163a9b68e535fd2b798d092
+  - 4085d7b 2023-08-25T09:44:23+00:00 kind: allow custom encap port configuration
+  - 22ac6c7 2023-08-25T09:32:12+00:00 Fix encap port configuration for remote chassis
+  - a707301 2023-08-24T13:53:53+00:00 Revert "kubevirt: pre pull fedora coreos image"
+  - bead1f5 2023-08-24T11:53:24+02:00 kubevirt: pre pull fedora coreos image
+  - 7f1cdd9 2023-08-24T10:40:19+02:00 Update apbroute Status check to allow notFound errors between retries, since it fetches the object from the informer cache which is not guaranteed to contain the object immediately after Create() call.
+  - 088c1ac 2023-08-24T10:40:19+02:00 NetworkControllerManager doesn't use given identity, remove.
+  - b2b25af 2023-08-24T10:40:19+02:00 After changing apbroute controller startup sequence, one test started failing. The problem is annotation-based and CR-based configs had different BFD settings. Before the change external_gw code always handled annotations before apbroute controller handled CRD, and annotation-based config took place, now with the change CR-based config is applied before. Add 2 explicit test cases for both handling orders to make sure the config will be the same.
+  - 2792d74 2023-08-24T10:40:19+02:00 Add APBRoute factory to the WatchFactory to share it between ovnkube-controller and ovnkube-node.
+  - bc8997f 2023-08-24T10:40:15+02:00 Add ovnkube-controller-with-node mode. ovnkube-controller and ovnkube-node depend on each other to start up, therefore they are run in parallel (but also to speed up the startup)
+  - 2c252f1 2023-08-22T17:13:16+02:00 Create egress firewall with one db transaction. Update cleanup test to have dns-based address set as a leftover, since all acls are commited in one transaction now.
+  - 7257515 2023-08-22T16:54:04+02:00 Fix DPU Mgnt port data race test regression
+  - 2577b7b 2023-08-22T15:35:30+02:00 Sort flags in ovnkube.sh
+  - 18f8966 2023-08-21T15:42:46+02:00 Fif Network Policy event handler: add AddressSetPodSelectorType to the types that have update function. Move network policy related functionality to the network_controller_policy_event_handler.go.
+  - 1a64e6a 2023-08-21T15:42:46+02:00 Add DefaultEventHandler to not duplicate the default implementations
+  - 3befb59 2023-08-21T12:45:43+02:00 e2e, multihoming: Add localnet MultiNetworkPolicy test
+  - 31d302b 2023-08-17T14:15:31+02:00 Register resource max retry failed metric for cluster manager
+
+- kubernetes image-arm64 f815d27efda36ebb7bc87dd642cf4811b2352f5e to d424288c25bfee0d82e799dbce1113c9f18f77b7
+  - 92131cabb 2023-08-23T13:19:36+02:00 UPSTREAM: 117245: Fix TopologyAwareHint not working when zone label is added after Node creation
+  - cb8f9c1f6 2023-08-21T14:30:13+02:00 UPSTREAM: 118189: TopologyAwareHints: Take lock in HasPopulatedHints
+  - 4cc600b2e 2023-08-21T14:27:27+02:00 UPSTREAM: 117249: Fix a data race in TopologyCache
+
