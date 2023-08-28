@@ -10,7 +10,7 @@
   ansible.builtin.command: oc create -f metrics-sa.yaml
 
 - name: create token for service account
-  ansible.builtin.command: oc create token metrics-server -n kube-system
+  ansible.builtin.command: oc create token metrics-server -n kube-system --duration 72h
   register: token
 
 - name: remove metrics service account yaml
@@ -18,8 +18,8 @@
     path: metrics-sa.yaml
     state: absent
 
-- name: save token to disk
+- name: save sa-token to disk
   ansible.builtin.copy:
     content: "{{ token.stdout }}"
-    dest: sa-token
+    dest: "{{ sa_token_file }}"
   delegate_to: localhost

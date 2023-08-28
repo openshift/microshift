@@ -6,17 +6,33 @@
     path: "{{ prometheus_dir }}"
   register: promdir
 
-- name: load sa-token from localhost
-  ansible.builtin.slurp:
-    src: sa-token
-  register: bearer_token
-  delegate_to: localhost
+- name: Check if the file exists
+  ansible.builtin.stat:
+    path: "{{ sa_token_file }}"
+  register: token_file
 
-- name: copy metrics service account yaml
-  ansible.builtin.copy:
-    content: "{{ bearer_token.content | b64decode }}"
-    dest: "{{ kubelet_auth_token_file }}"
-  when: promdir.stat.exists
+- block:
+  - name: load sa-token file from localhost
+    ansible.builtin.slurp:
+      src: "{{ sa_token_file }}"
+    register: bearer_token_slurp
+    delegate_to: localhost
+
+  - name: decode bearer token
+    set_fact:
+      bearer_token: "{{ bearer_token_slurp.content | b64decode }}"
+
+  - name: create metrics service account token file in prometheus folder
+    ansible.builtin.copy:
+      content: "{{ bearer_token }}"
+      dest: "{{ kubelet_auth_token_file }}"
+    when: promdir.stat.exists
+
+  - name: remove the sa-token file
+    ansible.builtin.file:
+      path: "{{ sa_token_file }}"
+      state: absent
+  when: token_file.stat.exists
 
 - name: append kubelet scrape config target to prometheus config
   ansible.builtin.blockinfile:
