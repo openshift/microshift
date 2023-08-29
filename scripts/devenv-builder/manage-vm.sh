@@ -210,7 +210,7 @@ function action_help {
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} (create|ip|ssh|console|delete|rm|help) [options]
+${script_name} (config|create|ip|ssh|console|delete|rm|help) [options]
 
 Commands:
 
