@@ -62,18 +62,22 @@ def get_deployment_backup_prefix_path(deploy_id: str) -> str:
 
 def create_fake_backups(count: int, type_unknown: bool = False) -> None:
     """
-    Create n number of fake Backup directories, unknown types
-    are directories that are not named in the backup prefix convention
-    and are therefore unknown to MicroShift.
+    Create number of fake Backup directories.
+    Unknown types are directories that do not match automated backups naming
+    convention of 'deploymentID_bootID' which can be described more
+    specifically by (osname)-(64 chars).(int)_(32 chars).
+    Such backups should not be automatically pruned by MicroShift.
     """
     deploy_id = get_booted_deployment_id()
-    prefix_path = f"{get_deployment_backup_prefix_path(deploy_id)}_fake"
+    prefix_path = (
+        f"{get_deployment_backup_prefix_path(deploy_id)}_fake000000000000000000000000"
+    )
 
     if type_unknown:
-        prefix_path = os.path.join(BACKUP_STORAGE, "unknown")
+        prefix_path = os.path.join(BACKUP_STORAGE, "unknown_")
 
     for number in range(0, count):
-        remote_sudo(f"mkdir -p {prefix_path}{number}")
+        remote_sudo(f"mkdir -p {prefix_path}{number:0>4}")
 
 
 def remove_backups_for_deployment(deploy_id: str) -> None:
