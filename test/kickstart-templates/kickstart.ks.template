@@ -32,10 +32,19 @@ logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
 # Lock root user account
 rootpw --lock
 
-# Configure ostree
+# Configure an ostree system
 ostreesetup --nogpg --osname=rhel --remote=edge --url=REPLACE_OSTREE_SERVER_URL --ref=REPLACE_BOOT_COMMIT_REF
 
+# Configure a non-ostree system
+#liveimg --url file:///run/install/repo/liveimg.tar.gz
+
 %post --log=/var/log/anaconda/post-install.log --erroronfail
+
+# Basic firewall configuration for a non-ostree system
+if ! ostree admin status &>/dev/null ; then
+    firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
+    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
+fi
 
 # Set the configuration of MicroShift to include subjectAltNames
 mkdir -p /etc/microshift

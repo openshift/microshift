@@ -42,8 +42,8 @@ sos_report() {
     done
 }
 
-# Public function to render a unique kickstart from a template for a
-# VM in a scenario.
+# Public function to render a unique kickstart from a template for an
+# ostree VM in a scenario.
 #
 # Arguments:
 #  vmname -- The short name of the VM (e.g., "host1")
@@ -53,17 +53,13 @@ sos_report() {
 #                     first on the host. This usually matches an image
 #                     blueprint name.
 prepare_kickstart() {
-    local vmname="$1"
-    local template="$2"
-    local boot_commit_ref="$3"
+    local -r vmname="$1"
+    local -r template="$2"
+    local -r boot_commit_ref="$3"
 
-    local full_vmname
-    local output_file
-    local vm_hostname
-
-    full_vmname="$(full_vm_name "${vmname}")"
-    output_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/kickstart.ks"
-    vm_hostname="${full_vmname/./-}"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+    local -r output_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/kickstart.ks"
+    local -r vm_hostname="${full_vmname/./-}"
 
     echo "Preparing kickstart file ${template} ${output_file}"
     if [ ! -f "${KICKSTART_TEMPLATE_DIR}/${template}" ]; then
@@ -83,7 +79,57 @@ prepare_kickstart() {
               -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
               -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
               > "${output_file}"
+
+    # When no ostree commit reference specified, switch to a non-ostree installation
+    if [ -z "${boot_commit_ref}" ] ; then
+        echo "Switching kickstart file to a non-ostree mode ${output_file}"
+        sed -i \
+            -e "s|^ostreesetup|#ostreesetup|g" \
+            -e "s|^#liveimg|liveimg|g" \
+            "${output_file}"
+    fi
+
     record_junit "${vmname}" "prepare_kickstart" "OK"
+}
+
+# Public function to install MicroShift RPMs on a non-ostree system,
+# reboot, wait for ssh access and greenboot to report success.
+#
+# Arguments:
+#  vmname -- The short name of the VM (e.g., "host1")
+#  microshift_repo -- The reference to local MicroShift RPM repository
+#                     to be copied to the host and installed.
+install_microshift_localrepo() {
+    local -r vmname="$1"
+    local -r microshift_repo="$2"
+
+    local -r repo_name="$(basename "${microshift_repo}")"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+    local -r vm_ip="$(get_vm_ip "${full_vmname}")"
+
+    scp -r "${microshift_repo}" "redhat@${vm_ip}":
+    # shellcheck disable=SC2029
+    ssh "redhat@${vm_ip}" "sudo dnf localinstall -y \$(find \"${repo_name}\" -name \*.rpm)"
+    ssh "redhat@${vm_ip}" "sudo systemctl enable microshift"
+    # Reboot and wait for SSH
+    wait_for_ssh "${vm_ip}" true
+    wait_for_greenboot "${vmname}" "${vm_ip}"
+}
+
+# Public function to uninstall MicroShift RPMs on a non-ostree system,
+# reboot and wait for ssh access.
+#
+# Arguments:
+#  vmname -- The short name of the VM (e.g., "host1")
+uninstall_microshift_localrepo() {
+    local -r vmname="$1"
+
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+    local -r vm_ip="$(get_vm_ip "${full_vmname}")"
+
+    ssh "redhat@${vm_ip}" "sudo dnf remove -y microshift\*"
+    # Reboot and wait for SSH
+    wait_for_ssh "${vm_ip}" true
 }
 
 # Show the IP address of the VM
@@ -104,12 +150,52 @@ function get_vm_ip {
     echo "${ip}"
 }
 
-# Try to login to the host via ssh until the connection is accepted
+# Try to login to the host via ssh until the connection is accepted.
+# Optionally pass "true" as the second argument to reboot the host
+# before waiting for ssh connection.
 wait_for_ssh() {
-    local ip="${1}"
+    local -r ip="${1}"
+    local -r reboot="${2:-}"
+
+    local -r ssh_bootid="-oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip} cat /proc/sys/kernel/random/boot_id"
+    local -r ssh_reboot="-oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip} sudo reboot"
+    local -r start_time=$(date +%s)
+
+    local old_bootid
+    local cur_bootid
+    # If asked, record the old bootid and reboot
+    old_bootid=""
+    if [ -n "${reboot}" ] ; then
+        # shellcheck disable=SC2086
+        old_bootid=$(timeout 15s ssh ${ssh_bootid} || echo "")
+        if [ -z "${old_bootid}" ] ; then
+            echo "Failed to retrieve the bootid from ${ip}"
+            return 1
+        fi
+        # shellcheck disable=SC2086
+        timeout 15s ssh ${ssh_reboot} || true
+    fi
 
     echo "Waiting ${VM_BOOT_TIMEOUT} for ssh access to ${ip}"
-    timeout "${VM_BOOT_TIMEOUT}" bash -c "until ssh -oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip} 'echo host is up'; do date; sleep 5; done"
+    while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
+        # shellcheck disable=SC2086
+        cur_bootid="$(timeout 10s ssh ${ssh_bootid} || echo "")"
+        if [ -n "${cur_bootid}" ] ; then
+            # Make sure bootid is different after reboot
+            if [ -n "${old_bootid}" ] ; then
+                [ "${old_bootid}" != "${cur_bootid}" ] && break
+            else
+                break
+            fi
+        fi
+        date
+        sleep 5
+    done
+
+    if [ -z "${cur_bootid}" ] ; then
+        return 1
+    fi
+    return 0
 }
 
 # Wait for greenboot health check to complete, without checking the results
@@ -120,7 +206,6 @@ wait_for_greenboot() {
     echo "Waiting ${VM_BOOT_TIMEOUT} for greenboot on ${vmname} to complete"
     timeout "${VM_BOOT_TIMEOUT}" bash -c "until ssh redhat@${ip} \"sudo journalctl -n 5 -u greenboot-healthcheck; sudo systemctl status greenboot-healthcheck | grep 'active (exited)'\"; do date; sleep 10; done"
 }
-
 
 start_junit() {
     local outputfile="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/junit.xml"
@@ -336,29 +421,6 @@ remove_vm() {
     # Remove the info file so something processing the VMs does not
     # assume the file exists. This is most useful in a local setting.
     rm -rf "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
-}
-
-# Function to report the full current version, e.g. "4.13.5"
-current_version() {
-    "${SCRIPTDIR}/get_latest_rpm_version.sh"
-}
-
-# Function to report only the minor portion of the current version,
-# e.g. from "4.13.5" reports "13"
-current_minor_version() {
-    current_version | cut -f2 -d.
-}
-
-# Function to report the *previous* minor version. If the current
-# version is "4.13.5", reports "12".
-previous_minor_version() {
-    echo $(( $(current_minor_version) - 1 ))
-}
-
-# Function to report the *next* minor version. If the current
-# version is "4.14.5", reports "15".
-next_minor_version() {
-    echo $(( $(current_minor_version) + 1 ))
 }
 
 # Run the tests for the current scenario
