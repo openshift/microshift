@@ -10,6 +10,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 )
 
@@ -20,6 +21,15 @@ var (
 		"--preserve",
 		"--reflink=auto",
 	}
+
+	expectedBackupContent = sets.New[string](
+		// .nodename omitted
+		"certs",
+		"etcd",
+		"kubelet-plugins",
+		"resources",
+		"version",
+	)
 )
 
 func NewManager(storage StoragePath) (*manager, error) {
@@ -128,10 +138,16 @@ func (dm *manager) Restore(name BackupName) error {
 		return &EmptyArgErr{"name"}
 	}
 
-	if exists, err := dm.BackupExists(name); err != nil {
+	path := dm.GetBackupPath(name)
+
+	if exists, err := util.PathExists(path); err != nil {
 		return fmt.Errorf("failed to determine if backup %q exists: %w", name, err)
 	} else if !exists {
-		return fmt.Errorf("failed to restore backup, %q does not exist", name)
+		return fmt.Errorf("failed to restore backup, %q does not exist", path)
+	}
+
+	if err := dm.isMicroShiftBackup(path); err != nil {
+		return fmt.Errorf("%q is not a valid MicroShift backup: %w", path, err)
 	}
 
 	tmp := fmt.Sprintf("%s.saved", config.DataDir)
@@ -141,8 +157,7 @@ func (dm *manager) Restore(name BackupName) error {
 			config.DataDir, tmp, err)
 	}
 
-	src := dm.GetBackupPath(name)
-	if err := copyPath(src, config.DataDir); err != nil {
+	if err := copyPath(path, config.DataDir); err != nil {
 		klog.ErrorS(err, "Failed to copy backup, restoring current data dir")
 
 		if err := os.RemoveAll(config.DataDir); err != nil {
@@ -178,6 +193,32 @@ func (dm *manager) RemoveData() error {
 	}
 
 	klog.InfoS("Removed MicroShift data")
+	return nil
+}
+
+// isMicroShiftBackup verifies if given path is a valid MicroShift backup
+// by checking if all expected subdirs exists
+func (dm *manager) isMicroShiftBackup(path string) error {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return fmt.Errorf("failed to ReadDir %q: %w", path, err)
+	}
+
+	existing := sets.Set[string]{}
+	for _, f := range files {
+		existing.Insert(f.Name())
+	}
+
+	return checkDirectoryContents(existing)
+}
+
+func checkDirectoryContents(existing sets.Set[string]) error {
+	diff := expectedBackupContent.Difference(existing)
+	if diff.Len() != 0 {
+		return fmt.Errorf("following expected subdirs are missing: %v",
+			strings.Join(diff.UnsortedList(), ", "))
+	}
+
 	return nil
 }
 
