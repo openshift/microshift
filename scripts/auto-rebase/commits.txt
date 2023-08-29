@@ -3,12 +3,12 @@ https://github.com/openshift/cluster-ingress-operator embedded-component 2ecad04
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component ad323b3657611da6bf7ea78eba8ffa998ba56fe9
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 56b970786d152344f0d4762c8271d20e5fc9d28b
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 5c00da0816faf0f15e643f05666c963d862a8299
-https://github.com/openshift/cluster-network-operator embedded-component 10a5ac5d7b20ee0e8764adeec761f6ea413cd830
+https://github.com/openshift/cluster-network-operator embedded-component 6ba9a2029a07d0062b81e17167b26d7fd8d32b54
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component 9a8aba8cad6491a31e743a7e366d758351482d88
 https://github.com/openshift/cluster-policy-controller embedded-component 8d2af85d0b6dcf09256bd9fecc5d36ac77bc41d1
 https://github.com/openshift/etcd embedded-component 1b61faa606b5393076f5835418c6ec3cdc628615
 https://github.com/openshift/kubernetes embedded-component 0ef5eae6ff8657d9628f3961d49f1f3031a210dd
-https://github.com/openshift/machine-config-operator embedded-component eebcd95ce3be079098c06c4a0f1bb28b072e99ff
+https://github.com/openshift/machine-config-operator embedded-component f930104efea02ba34ef1c4872799017fb2523593
 https://github.com/openshift/openshift-controller-manager embedded-component 385057e57752b7b4f21ef32d7a7993d266a591eb
 https://github.com/openshift/route-controller-manager embedded-component 6667a6cbf9a87331fcc4407375118c0bb884c925
 https://github.com/openshift/service-ca-operator embedded-component 5984aac13df6c2f4440c67a1a14d32958bce9ec3
