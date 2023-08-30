@@ -1,8 +1,6 @@
 kind: DaemonSet
 apiVersion: apps/v1
 spec:
-  # minReadySeconds should be 3x the readiness probe's polling interval (i.e. periodSeconds).
-  minReadySeconds: 9
   template:
     metadata:
       annotations:
@@ -35,7 +33,7 @@ spec:
               port: 8181
               scheme: HTTP
             initialDelaySeconds: 10
-            periodSeconds: 3 # Update the daemonset's spec.minReadySeconds above if you change this value!
+            periodSeconds: 3
             successThreshold: 1
             failureThreshold: 3
             timeoutSeconds: 3
@@ -94,14 +92,11 @@ spec:
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      # Set maxSurge to a positive value so that each node that has a pod
-      # continues to have a local ready pod during a rolling update.  This is
-      # important for topology-aware hints as well as for similar logic in
-      # openshift-sdn and ovn-kubernetes that prefers to use a local ready DNS
-      # pod whenever one exists.
-      maxSurge: 10%
-      # maxUnavailable must be zero when maxSurge is nonzero.
-      maxUnavailable: 0
+      # TODO: Consider setting maxSurge to a positive value.
+      maxSurge: 0
+      # Note: The daemon controller rounds the percentage up
+      # (unlike the deployment controller, which rounds down).
+      maxUnavailable: 10%
   selector:
     matchLabels:
       dns.operator.openshift.io/daemonset-dns: default
