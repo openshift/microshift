@@ -14,11 +14,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func shouldRunPrivileged() error {
+	if os.Geteuid() > 0 {
+		return fmt.Errorf("command requires root privileges")
+	}
+	return nil
+}
+
 func NewBackupCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "backup",
 		Short: "Backup MicroShift data",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := shouldRunPrivileged(); err != nil {
+				return err
+			}
+
 			if cmd.Flag("storage").Value.String() == "" {
 				return fmt.Errorf("--storage must not be empty")
 			}
@@ -72,6 +83,10 @@ func NewRestoreCommand() *cobra.Command {
 		Short: "Restore MicroShift data from a backup",
 		Args:  cobra.ExactArgs(1),
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := shouldRunPrivileged(); err != nil {
+				return err
+			}
+
 			if err := data.MicroShiftIsNotRunning(); err != nil {
 				return fmt.Errorf("microshift must not be running: %w", err)
 			}
