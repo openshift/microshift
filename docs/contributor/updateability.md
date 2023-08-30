@@ -477,10 +477,14 @@ New on-disk artifacts were added:
 
 New, supporting directory for files and directories related to updateability.
 
-It is a default directory where backups are created.
-- On ostree systems it is not configurable[^2].
-- On regular RPM-based (i.e. non-ostree) systems can be configured by providing
-  `--storage` option to `microshift backup` command.
+It is non-configurable directory where automated backups are created on
+ostree-based system[^2].
+
+Users can also create manual backups in that location by including it
+in the argument for `microshift backup` command, for example:
+```
+$ sudo microshift backup /var/lib/microshift-backups/manual-backup
+```
 
 [^2]: MicroShift's data and backup directories need to
 reside on the same filesystem to leverage Copy-on-Write.
@@ -953,20 +957,26 @@ marked).
 
 ##### `microshift backup`
 
-The command creates a backup of current MicroShift data (`/var/lib/microshift`).
+Command creates a backup of current MicroShift data (`/var/lib/microshift`).
+It expects a full path of new backup directory - there is no default value.
+The directory must not exist - MicroShift will create it.
 
-Command has two options:
-- `--name` - backup name (effectively name of the directory which will hold the copy of the data).
-  Default value contains MicroShift's version and current datetime: `MAJOR.MINOR__YYYYmmDD_HHMMSS`
-- `--storage` - which a parent directory that will hold the backup.
-  Default value is the same as for ostree-based systems: `/var/lib/microshift-backups`
+```sh
+$ sudo microshift backup /var/lib/microshift-backups/my-manual-backup
+# or
+$ sudo microshift backup /mnt/other-backups-location/another-manual-backup
+```
 
 ##### `microshift restore`
 
-Command restores a backup.
+Command to restore a MicroShift backup.
+It expects a full path to an existing backup directory.
 
-It differs from `backup` command as it expects a full path of MicroShift 
-backup as an argument, for example: `microshift restore /var/lib/microshift-backups/my-4.14-backup`.
+```sh
+$ sudo microshift restore /var/lib/microshift-backups/my-manual-backup
+# or
+$ sudo microshift restore /mnt/other-backups-location/another-manual-backup
+```
 
 > Note: this command does not verify if provided path is really MicroShift's
 > backup, so practically it could be used to copy any directory into
