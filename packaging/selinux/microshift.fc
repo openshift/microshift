@@ -3,6 +3,7 @@
 /var/lib/microshift.saved(/.*)?                                 gen_context(system_u:object_r:container_var_lib_t,s0)
 /var/lib/microshift(/.*)?                                       gen_context(system_u:object_r:container_var_lib_t,s0)
 /etc/microshift(/.*)?                                           gen_context(system_u:object_r:kubernetes_file_t,s0)
+/usr/lib/microshift(/.*)?                                       gen_context(system_u:object_r:kubernetes_file_t,s0)
 /usr/local/bin/microshift                                   --  gen_context(system_u:object_r:kubelet_exec_t,s0)
 /usr/bin/microshift                                         --  gen_context(system_u:object_r:kubelet_exec_t,s0)
 /usr/local/bin/microshift-etcd                              --  gen_context(system_u:object_r:kubelet_exec_t,s0)

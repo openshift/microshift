@@ -27,6 +27,8 @@
    restorecon -R /var/lib/kubelet/pods; \
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
    restorecon -R /var/lib/microshift-backups; \
+   restorecon -R /etc/microshift; \
+   restorecon -R /usr/lib/microshift; \
    restorecon -v /usr/bin/microshift; \
    restorecon -v /usr/bin/microshift-etcd
 
