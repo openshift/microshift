@@ -158,11 +158,28 @@ function action_create {
     echo "VM online at ${ip}"
 }
 
+function action_ssh {
+    ip=$(get_ip "${VMNAME}")
+
+    if [ -z "${ip}" ]; then
+        echo "${VMNAME} has no IP, try the 'console' command to this script"
+        return 1
+    fi
+    ssh "microshift@${ip}"
+}
+
+function action_console {
+    echo
+    echo "After connected, press RETURN to generate a login prompt and Control-] to disconnect"
+    echo
+    sudo virsh console "${VMNAME}"
+}
+
 function action_delete {
     ip=$(get_ip "${VMNAME}")
 
     if [ -n "${ip}" ]; then
-        ssh "microshift@${ip}" "sudo subscription-manager unregister"
+        ssh "microshift@${ip}" "sudo subscription-manager unregister" || true
     fi
 
     sudo virsh destroy "${VMNAME}"
@@ -193,13 +210,15 @@ function action_help {
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} (create|ip|delete|rm|help) [options]
+${script_name} (config|create|ip|ssh|console|delete|rm|help) [options]
 
 Commands:
 
   config    -- install and start libvirt
   create    -- create a new VM
   ip        -- show the IP of the VM
+  ssh       -- ssh into the VM
+  console   -- connect to the serial console of the VM
   delete|rm -- delete the VM
   help      -- show this help
 
@@ -247,7 +266,7 @@ case "$1" in
         action_config
         exit 0
         ;;
-    create|ip|delete|rm|help)
+    create|ip|ssh|console|delete|rm|help)
         action="$1"
         shift
         ;;

@@ -63,6 +63,7 @@ virt-install \
     --location ${ISOFILE} \
     --initrd-inject=${KICKSTART_FILE} \
     --extra-args \"inst.ks=file:/$(basename "${KICKSTART_FILE}")\" \
+    --graphics vnc,listen=0.0.0.0 \
     --noautoconsole \
     --wait \
 "
