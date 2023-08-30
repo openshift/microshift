@@ -140,20 +140,23 @@ The step isn't automated at all yet, which is to compare whether the config para
 
 #### Rebasing the build files
 
-The final step is to update build files like the `Makefiles`, `Dockerfiles`, `.spec` etc.
+The final step is to update build files which include following:
+* `Makefile.kube_git.var` contains information about Kubernetes version:
+  major, minor, full version, commit, and git tree state.
+  > Note: Kubernetes version is sourced from `openshift/kubernetes`'
+  > `openshift-hack/images/hyperkube/Dockerfile.rhel` file.
+  >
+  > If OCP/Kubernetes rebase process changes, MicroShift rebase tooling may require an update.
+* `Makefile.version.x86_64.var` and `Makefile.version.aarch64.var` are updated with the OCP version.
 
 ```shell
 ./scripts/auto-rebase/rebase.sh buildfiles
 ```
 
-At the moment, this only updates the `GO_LD_FLAGS` in the `Makefile.kube_git.var`. When updating to a new minor version of OpenShift, you may also need to update other locations, for example:
+When updating to a new minor version of OpenShift, you may also need to update other locations, for example:
 
-* in the [`Makefile`](https://github.com/openshift/microshift/blob/main/Makefile)
-  * the `RELEASE_BASE` variable
-* in the `Dockerfile`s (e.g. [openshift-ci image](https://github.com/openshift/microshift/blob/main/packaging/images/openshift-ci/Dockerfile))
-  * the version of the base images
-* in the [microshift.spec](https://github.com/openshift/microshift/blob/main/packaging/rpm/microshift.spec))
-  * the Golang version
+* [microshift.spec](/packaging/rpm/microshift.spec)
+  * the Golang version (`golang_version`)
 
 Commit the changes:
 

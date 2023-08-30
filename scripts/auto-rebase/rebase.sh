@@ -986,10 +986,17 @@ update_buildfiles() {
     title "Rebasing Makefile"
     source hack/lib/version.sh
     kube::version::get_version_vars
+
+    local -r kube_version=$(jq -j \
+        '.references.spec.tags[] | select(.name == "hyperkube") | .annotations["io.openshift.build.versions"] | split("=") | .[1]' \
+        "${STAGING_DIR}/release_amd64.json")
+    local -r kube_major=$(echo "${kube_version}" | awk -F'.' '{print $1}')
+    local -r kube_minor=$(echo "${kube_version}" | awk -F'.' '{print $2}')
+
     cat <<EOF > "${REPOROOT}/Makefile.kube_git.var"
-KUBE_GIT_MAJOR=${KUBE_GIT_MAJOR-}
-KUBE_GIT_MINOR=${KUBE_GIT_MINOR%%+*}
-KUBE_GIT_VERSION=${KUBE_GIT_VERSION%%-*}
+KUBE_GIT_MAJOR=${kube_major}
+KUBE_GIT_MINOR=${kube_minor}
+KUBE_GIT_VERSION=v${kube_version}
 KUBE_GIT_COMMIT=${KUBE_GIT_COMMIT-}
 KUBE_GIT_TREE_STATE=${KUBE_GIT_TREE_STATE-}
 EOF
