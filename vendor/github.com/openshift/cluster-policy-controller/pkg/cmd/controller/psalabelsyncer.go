@@ -51,3 +51,21 @@ func runPodSecurityAdmissionLabelSynchronizationController(ctx context.Context, 
 
 	return true, nil
 }
+
+func runPrivilegedNamespacesPSALabelSyncer(ctx context.Context, controllerCtx *EnhancedControllerContext) (bool, error) {
+	kubeClient, err := controllerCtx.ClientBuilder.Client(privilegedNamespacesPodSecurityAdmissionLabelSyncerServiceAccountName)
+	if err != nil {
+		return true, err
+	}
+
+	controller := psalabelsyncer.NewPrivilegedNamespacesPSALabelSyncer(
+		ctx,
+		kubeClient.CoreV1().Namespaces(),
+		controllerCtx.KubernetesInformers.Core().V1().Namespaces(),
+		controllerCtx.EventRecorder.ForComponent("privileged-namespaces-psa-label-syncer"),
+	)
+
+	go controller.Run(ctx, 1)
+
+	return true, nil
+}
