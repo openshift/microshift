@@ -74,6 +74,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 			"--uid=root",
 			"--scope",
 			"--unit", "microshift-etcd",
+			"--property", "Before=microshift.service",
 			"--property", "BindsTo=microshift.service",
 		)
 
@@ -113,16 +114,6 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		// Exit microshift to trigger microshift-etcd restart
 		klog.Warning("microshift-etcd process terminated prematurely, restarting MicroShift")
 		os.Exit(0)
-	}()
-
-	// Handle microshift-etcd termination after microshift process exits
-	defer func() {
-		if err := cmd.Process.Signal(os.Interrupt); err != nil {
-			klog.Warningf("%v failed interrupting the process: %+v", s.Name(), err)
-			if err := cmd.Process.Kill(); err != nil {
-				klog.Warningf("%v failed killing the process: %+v", s.Name(), err)
-			}
-		}
 	}()
 
 	if err := checkIfEtcdIsReady(ctx); err != nil {
