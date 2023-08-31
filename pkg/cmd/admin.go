@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -16,6 +17,48 @@ func shouldRunPrivileged() error {
 	if os.Geteuid() > 0 {
 		return fmt.Errorf("command requires root privileges")
 	}
+	return nil
+}
+
+func servicesShouldBeInactive(backingUp bool) error {
+	var services = []string{"microshift.service", "microshift-etcd.scope"}
+
+	for _, service := range services {
+		cmd := exec.Command("systemctl", "show", "-p", "ActiveState", "--value", service)
+		out, err := cmd.CombinedOutput()
+		state := strings.TrimSpace(string(out))
+		if err != nil {
+			return fmt.Errorf("error when checking if %q is active: %w", service, err)
+		}
+
+		if state == "failed" && backingUp {
+			return fmt.Errorf("service %q is %q which suggest that MicroShift data might be unhealthy - "+
+				"address any issues before attempting to create a backup again", service, state)
+		}
+
+		if state != "inactive" && state != "failed" {
+			return fmt.Errorf("MicroShift must be stopped before creating or restoring backup (%q is %q, should be %q)",
+				service, state, "inactive")
+		}
+	}
+
+	return nil
+}
+
+func checkPathExistence(path string, shouldExist bool) error {
+	exists, err := util.PathExists(path)
+	if err != nil {
+		return err
+	}
+
+	if shouldExist && !exists {
+		return fmt.Errorf("expected %q to exist", path)
+	}
+
+	if !shouldExist && exists {
+		return fmt.Errorf("expected %q to not exist", path)
+	}
+
 	return nil
 }
 
@@ -47,34 +90,48 @@ func backupPathToStorageAndName(path string) (data.StoragePath, data.BackupName,
 	return storage, name, nil
 }
 
+// backupRestorePreRun contains necessary checks before attempting to perform
+// backup or restore. It is meant to be used as PersistentPreRunE.
+// It is not a part of RunE because k8s.io/component-base/cli.Run() wrapper
+// sets up klog  which considerably decreases readability of errors because
+// they're hidden in logging information such as pid, datetime,
+// source file and line.
+func backupRestorePreRun(backingUp bool) func(*cobra.Command, []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		if err := shouldRunPrivileged(); err != nil {
+			return err
+		}
+
+		if err := servicesShouldBeInactive(backingUp); err != nil {
+			return err
+		}
+
+		path := args[0]
+		_, _, err := backupPathToStorageAndName(path)
+		if err != nil {
+			return err
+		}
+
+		pathShouldExist := !backingUp
+		if err := checkPathExistence(path, pathShouldExist); err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
 func NewBackupCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "backup PATH",
-		Short: "Create a backup of MicroShift data",
-		Long:  "Create a backup of MicroShift data. PATH should not exist.",
-		Args:  cobra.ExactArgs(1),
-
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := shouldRunPrivileged(); err != nil {
-				return err
-			}
-
-			if err := util.PathShouldNotExist(args[0]); err != nil {
-				return err
-			}
-
-			if err := data.MicroShiftIsNotRunning(); err != nil {
-				return fmt.Errorf("microshift must not be running: %w", err)
-			}
-			return nil
-		},
+		Use:               "backup PATH",
+		Short:             "Create a backup of MicroShift data",
+		Long:              "Create a backup of MicroShift data. PATH should not exist.",
+		Args:              cobra.ExactArgs(1),
+		PersistentPreRunE: backupRestorePreRun(true),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			storage, name, err := backupPathToStorageAndName(args[0])
-			if err != nil {
-				return err
-			}
-
+			// err is checked in PersistentPreRunE
+			storage, name, _ := backupPathToStorageAndName(args[0])
 			dataManager, err := data.NewManager(storage)
 			if err != nil {
 				return err
@@ -89,31 +146,14 @@ func NewBackupCommand() *cobra.Command {
 
 func NewRestoreCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "restore PATH",
-		Short: "Restore MicroShift data from a backup",
-		Args:  cobra.ExactArgs(1),
-
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := shouldRunPrivileged(); err != nil {
-				return err
-			}
-
-			if err := util.PathShouldExist(args[0]); err != nil {
-				return err
-			}
-
-			if err := data.MicroShiftIsNotRunning(); err != nil {
-				return fmt.Errorf("microshift must not be running: %w", err)
-			}
-			return nil
-		},
+		Use:               "restore PATH",
+		Short:             "Restore MicroShift data from a backup",
+		Args:              cobra.ExactArgs(1),
+		PersistentPreRunE: backupRestorePreRun(false),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			storage, name, err := backupPathToStorageAndName(args[0])
-			if err != nil {
-				return err
-			}
-
+			// err is checked in PersistentPreRunE
+			storage, name, _ := backupPathToStorageAndName(args[0])
 			dataManager, err := data.NewManager(storage)
 			if err != nil {
 				return err

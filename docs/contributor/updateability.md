@@ -942,12 +942,11 @@ commands aiming to help with creating and restoring backups of the MicroShift da
 - `microshift backup`
 - `microshift restore`
 
-Both commands require that `microshift.service` has status `exited` which means that
-MicroShift must not be running (to avoid corrupting data if etcd was running
-during the process and modifying the files).
+Both commands require MicroShift to be stopped (to avoid corrupting data
+if etcd was running during the process and modifying the files).
 
-Currently, if `microshift.service`'s status is `failed`, the command will
-refuse to proceed.
+It is possible to use `microshift restore` command if `microshift.service`'s
+status is `failed`, however the `microshift backup` will refuse to proceed.
 This is based on assumption that `failed` means the MicroShift stopped running 
 due to some runtime error and systemd gave up on restarting the service.
 This suggests that MicroShift's data might not be healthy and thus should not

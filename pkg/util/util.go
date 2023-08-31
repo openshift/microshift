@@ -36,24 +36,6 @@ func PathExists(path string) (bool, error) {
 	}
 }
 
-func PathShouldExist(path string) error {
-	if exists, err := PathExists(path); err != nil {
-		return err
-	} else if !exists {
-		return fmt.Errorf("expected %q to exist", path)
-	}
-	return nil
-}
-
-func PathShouldNotExist(path string) error {
-	if exists, err := PathExists(path); err != nil {
-		return err
-	} else if exists {
-		return fmt.Errorf("expected %q to not exist", path)
-	}
-	return nil
-}
-
 func MakeDir(path string) error {
 	return os.MkdirAll(path, 0700)
 }
