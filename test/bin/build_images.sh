@@ -259,7 +259,7 @@ do_group() {
 
     if ${BUILD_INSTALLER}; then
         for image_installer in "${groupdir}"/*.image-installer; do
-            blueprint=$(cat "${image_installer}")
+            blueprint=$(envsubst < "${image_installer}")
             echo "Building image-installer from ${blueprint}"
             buildid=$(sudo composer-cli compose start \
                            "${blueprint}" \

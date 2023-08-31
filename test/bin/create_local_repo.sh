@@ -29,7 +29,7 @@ make_repo() {
     createrepo "${repodir}"
 
     echo "Fixing permissions of RPM repo contents"
-    find "${repodir}" -type f -print -exec chmod a+r  {} \;
+    find "${repodir}" -type f -exec chmod a+r  {} \;
     find "${repodir}" -type d -exec chmod a+rx {} \;
 }
 

@@ -106,21 +106,42 @@ function get_vm_ip {
 
 # Try to login to the host via ssh until the connection is accepted
 wait_for_ssh() {
-    local ip="${1}"
+    local -r ip="${1}"
 
     echo "Waiting ${VM_BOOT_TIMEOUT} for ssh access to ${ip}"
-    timeout "${VM_BOOT_TIMEOUT}" bash -c "until ssh -oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip} 'echo host is up'; do date; sleep 5; done"
+
+    local -r start_time=$(date +%s)
+    while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
+        if ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new "redhat@${ip}" "echo host is up" ; then
+            return 0
+        fi
+        date
+        sleep 5
+    done
+    # Return an error if non of the ssh attempts succeeded
+    return 1
 }
 
 # Wait for greenboot health check to complete, without checking the results
 wait_for_greenboot() {
-    local vmname="${1}"
-    local ip="${2}"
+    local -r vmname="${1}"
+    local -r ip="${2}"
 
     echo "Waiting ${VM_BOOT_TIMEOUT} for greenboot on ${vmname} to complete"
-    timeout "${VM_BOOT_TIMEOUT}" bash -c "until ssh redhat@${ip} \"sudo journalctl -n 5 -u greenboot-healthcheck; sudo systemctl status greenboot-healthcheck | grep 'active (exited)'\"; do date; sleep 10; done"
-}
 
+    local -r start_time=$(date +%s)
+    while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
+        if ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new "redhat@${ip}" \
+                "sudo journalctl -n 5 -u greenboot-healthcheck; \
+                 systemctl show --property=SubState --value greenboot-healthcheck | grep -w exited" ; then
+            return 0
+        fi
+        date
+        sleep 10
+    done
+    # Return an error if non of the ssh attempts succeeded
+    return 1
+}
 
 start_junit() {
     local outputfile="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/junit.xml"
