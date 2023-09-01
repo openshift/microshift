@@ -112,10 +112,6 @@ func NewRestoreCommand() *cobra.Command {
 				return err
 			}
 
-			// TODO: Verify content of provided path
-			// Check if provided path points to a directory that is really
-			// a backup of MicroShift's data.
-
 			return dataManager.Restore(name)
 		},
 	}
