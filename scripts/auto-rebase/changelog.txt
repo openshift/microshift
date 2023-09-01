@@ -1,0 +1,8 @@
+# cluster-kube-apiserver-operator embedded-component ad323b3657611da6bf7ea78eba8ffa998ba56fe9 to 64248a87ca421b5f28d2d472c48cd29a465e75f8
+8aff59619dcfe5cf71e03bd19d9adfc949321479 2023-07-06T07:58:41+00:00 pkg/operator/configobserver: check that the serving certificate reference exists before applying
+# machine-config-operator embedded-component f930104efea02ba34ef1c4872799017fb2523593 to 03c07d3ec2c20d0b97c166035da02ddad2925e29
+3b6a96cc66ce64ee56ec9ad03d8cb552c59c188e 2023-08-22T20:57:56+00:00 Check whether /home/core/.ssh already exists before creating a new dir for the sshkey in func createSSHKeyDir; delete if owned by the wrong user and let the MCD create it again
+# ovn-kubernetes image-amd64 1a82abc4aedbd96a387ddf0bd8882e2b6afbb374 to 75d07f23eb921493aafee24c540b05771b03b6d6
+dad3f2af2e805cc9877e2b1882d4fa66551644a7 2023-08-24T12:08:04+02:00 Create egress firewall with one db transaction. Update cleanup test to have dns-based address set as a leftover, since all acls are commited in one transaction now.
+# ovn-kubernetes image-arm64 1a82abc4aedbd96a387ddf0bd8882e2b6afbb374 to 75d07f23eb921493aafee24c540b05771b03b6d6
+dad3f2af2e805cc9877e2b1882d4fa66551644a7 2023-08-24T12:08:04+02:00 Create egress firewall with one db transaction. Update cleanup test to have dns-based address set as a leftover, since all acls are commited in one transaction now.
