@@ -1,8 +1,0 @@
-- ovn-kubernetes image-arm64 d54b88982138864d2163a9b68e535fd2b798d092 to 4de7881cb8a12e2fd79e63acbb96a0036ae7dce4
-  - 98d9c11 2023-08-28T13:20:20-04:00 move clearInitialNodeNetworkUnavailableCondition to clustermanager
-
-- kubernetes image-arm64 d424288c25bfee0d82e799dbce1113c9f18f77b7 to 2c83a9f62be0827ace3f9ca12e035c85c043604d
-  - 01e0384d6 2023-08-30T10:44:17+02:00 UPSTREAM: <carry>: retry etcd Unavailable errors
-  - edbe47d95 2023-08-29T14:12:30+02:00 UPSTREAM: <drop>: run ./hack/update-vendor.sh
-  - 44356b8fd 2023-08-29T14:12:24+02:00 UPSTREAM: <carry>: retry etcd Unavailable errors
-
