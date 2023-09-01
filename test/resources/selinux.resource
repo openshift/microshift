@@ -11,7 +11,7 @@ Validate SELinux With Backup
     [Documentation]    Wrapper call for all SELinux checks with extra check inside backup folder
     [Arguments]    ${backup_name}
 
-    ${result}=    Run Container Access Check On    "${BACKUP_STORAGE}/${backup_name}/resources/kubeadmin/kubeconfig"
+    ${result}=    Run Access Check On Dir    "${BACKUP_STORAGE}/${backup_name}"
     Should Be Empty    ${result}
 
     Validate SELinux
@@ -55,7 +55,7 @@ Audit Log Should Be Empty For MicroShift
 
 # Helper Functions
 
-Run Container Access Check On
+Run Container Access Check On File
     [Documentation]    Given a file path or optional cmd, runcon command as a container_t,
     ...    returns a list of errors if access was granted
     [Arguments]    ${file_path}    ${cmd}=cat

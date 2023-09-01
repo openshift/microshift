@@ -268,6 +268,9 @@ if [ $1 -eq 1 ]; then
 	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
 fi
 
+%pre selinux
+%selinux_relabel_pre -s %{selinuxtype}
+
 %post selinux
 
 %selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2

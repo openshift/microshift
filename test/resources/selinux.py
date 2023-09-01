@@ -5,6 +5,8 @@ from typing import List
 ACCESS_CHECK_MAP = {
     "/var/lib/microshift/version": ["cat"],
     "/etc/microshift/config.yaml.default": ["cat"],
+    "/etc/microshift/lvmd.yaml.default": ["cat"],
+    "/etc/microshift/ovn.yaml.default": ["cat"],
 }
 
 CONTEXT_CHECK_MAP = {
@@ -18,9 +20,15 @@ CONTEXT_CHECK_MAP = {
     ],
     "system_u:object_r:kubernetes_file_t:s0": [
         "/etc/microshift",
+        "/etc/microshift/manifests",
+        "/etc/microshift/manifests.d",
     ],
 }
 
+# This list should only ever change if we alter the SELinux policy or
+# upstream container linux package changes something in these contexts,
+# those events should be rare. However, if anything changes these contexts, the test should
+# fail so we can decide what that means for MicroShift and update the list then.
 EXPECTED_FCONTEXT_LIST = [
     "/etc/kubernetes(/.*)?",
     "/etc/microshift(/.*)?",
@@ -55,6 +63,9 @@ def get_expected_ocp_microshift_fcontext_list() -> List[str]:
     return EXPECTED_FCONTEXT_LIST
 
 
+# Here we care about matching what our SELinux policy says with what the host says for contexts.
+# The contexts that effect us and OCP are `kubernetes_file_t|container_var_lib_t|kubelet_exec_t|container_t`
+# we query and filter for those contexts to validate against our expected list.
 def get_fcontext_list() -> List[str]:
     context_list = "kubernetes_file_t|container_var_lib_t|kubelet_exec_t|container_t"
     semanage_filter_cmd = f"semanage fcontext -l | grep -E  \"({context_list})\" | awk '{{print $1 }}'"
@@ -69,6 +80,10 @@ def get_denial_audit_log() -> List[str]:
     return []
 
 
+# In order to check access, we use the `runcon` command to initiate shell commands.
+# We use the user and role of `system_u` and `system_r` with a context type of `container_t`
+# because that is the context under which the container runtime will execute containers.
+# So here we simulate a container that has broken out trying to access files on the host.
 def run_access_check(access_check_map: dict[str, List[str]]) -> List[str]:
     runcon_cmd = "runcon -u system_u -r system_r -t container_t"
     allowed_access = []
@@ -80,6 +95,17 @@ def run_access_check(access_check_map: dict[str, List[str]]) -> List[str]:
                 allowed_access.append(f"should not have been allowed access to {file_path} by running {command}")
 
     return allowed_access
+
+
+# Gather a list of all files in the specified directory and call `run_access_check` to check `cat` access
+def run_access_check_on_dir(directory: str) -> List[str]:
+    du_ls_cmd = "sudo du -a"
+    stdout, rc = remote_sudo_rc(f"{du_ls_cmd} {directory} | awk '{{print $2 }}'")
+    BuiltIn().should_not_be_empty(stdout)
+    BuiltIn().should_be_equal_as_integers(rc, 0)
+    list_of_paths = stdout.splitlines()
+    directory_dict = {file_path: ["cat"] for file_path in list_of_paths if "." in file_path[len(directory):]}
+    return run_access_check(directory_dict)
 
 
 def run_default_access_check() -> List[str]:
