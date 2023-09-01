@@ -1,5 +1,8 @@
 #!/bin/bash
 
+UNAME_M=$(uname -m)
+export UNAME_M
+
 # The location of the test directory, relative to the script.
 TESTDIR="$(cd "${SCRIPTDIR}/.." && pwd)"
 

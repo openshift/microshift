@@ -177,6 +177,7 @@ rhel92-microshift-previous-minor.toml | group2 | rhel-9.2-microshift-4.13 | A RH
 rhel92-source.toml | group2 | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
 rhel92-source-fake-next-minor.toml | group2 | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
 rhel92-source-fake-yplus2-minor.toml | group2 | rhel-9.2-microshift-4.16 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the current+2 y-stream.
+rhel92-crel.toml | group2 | rhel-9.2-microshift-crel | A RHEL 9.2 image with MicroShift RPMs already built and released by ART like ECs, RCs, and Z-stream releases.
 
 #### Blueprint Customization
 
@@ -454,20 +455,16 @@ Scenarios utilize following distinct MicroShift sources:
 - `src`: built from source (code in PR)
 - `base`: built from base branch (PR's target branch)
 - `prel`: previous MicroShift minor release
+- `crel`: current MicroShift minor release (already built and released
+   RPMs like ECs, RCs, Z-stream). It is optional meaning that shortly after
+   branch cut, before first EC is released, it will be skipped.
 
 | Starting ref | End ref | Successful upgrade scenario | Failed upgrade scenario |
 |--------------|---------|-----------------------------|-------------------------|
 | `base` | `src` |`el92-base@upgrade-ok.sh` | **MISSING** |
 | `prel` | `src` |`el92-prel@upgrade-ok.sh` | **MISSING** |
 | `src` | `src` | **MISSING** | `el92-src@upgrade-failing-cannot-backup.sh` |
-
-In future, another source of MicroShift should be added which is
-most recent MicroShift RPMs built by ART (EC, then RC, and finally
-Z stream releases matching version of currently tested code).
-The source will have tag `crel` which stands for "current release".
-Both successful and failed upgrades scenarios should be added:
-- presubmit: upgrade from `crel` to code under test (PR)
-- periodic: upgrade from `crel` to `release-4.YY` branch
+| `crel` | `src` | `el92-crel@upgrade-ok.sh` | `el92-crel@upgrade-fails.sh` |
 
 #### scenario_create_vms
 

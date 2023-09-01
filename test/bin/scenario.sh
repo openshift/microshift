@@ -89,6 +89,17 @@ prepare_kickstart() {
     record_junit "${vmname}" "prepare_kickstart" "OK"
 }
 
+# Checks if provided commit exists in local ostree repository
+does_commit_exist() {
+    local -r commit="${1}"
+
+    if ostree refs --repo "${IMAGEDIR}/repo" | grep -q "${commit}"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Show the IP address of the VM
 function get_vm_ip {
     local -r vmname="${1}"
