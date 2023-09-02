@@ -34,7 +34,7 @@ Create Backup
     Systemctl    stop    microshift.service
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    microshift backup --name "${backup_name}"
+    ...    microshift backup "${BACKUP_STORAGE}/${backup_name}"
     ...    sudo=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
