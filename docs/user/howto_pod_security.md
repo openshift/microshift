@@ -157,7 +157,12 @@ EOF
 
 ## References
 
-* OpenShift Documentation: [About security context constraints](https://docs.openshift.com/container-platform/4.13/authentication/managing-security-context-constraints.html#security-context-constraints-about_configuring-internal-oauth)
-* OpenShift Documentation: [Security context constraint synchronization with pod security standards](https://docs.openshift.com/container-platform/4.13/authentication/understanding-and-managing-pod-security-admission.html#security-context-constraints-psa-synchronization_understanding-and-managing-pod-security-admission)
-* [Enforcing Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
-* [Important OpenShift changes to Pod Security Standards](https://connect.redhat.com/en/blog/important-openshift-changes-pod-security-standards)
+* OpenShift Documentation
+  * [Important Changes to Pod Security Standards](https://connect.redhat.com/en/blog/important-openshift-changes-pod-security-standards)
+  * [Pod Security Admission in OpenShift 4.11](https://cloud.redhat.com/blog/pod-security-admission-in-openshift-4.11)
+  * [Complying with pod security admission](https://docs.openshift.com/container-platform/4.13/operators/operator_sdk/osdk-complying-with-psa.html)
+  * [About security context constraints](https://docs.openshift.com/container-platform/4.13/authentication/managing-security-context-constraints.html#security-context-constraints-about_configuring-internal-oauth)
+  * [Security context constraint synchronization with pod security standards](https://docs.openshift.com/container-platform/4.13/authentication/understanding-and-managing-pod-security-admission.html#security-context-constraints-psa-synchronization_understanding-and-managing-pod-security-admission)
+* Kubernetes Documentation
+  * [Enforcing Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
+  * [Important OpenShift changes to Pod Security Standards](https://connect.redhat.com/en/blog/important-openshift-changes-pod-security-standards)
