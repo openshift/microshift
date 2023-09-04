@@ -75,7 +75,7 @@ MicroShift Service Is Active
 
 Wait For MicroShift Service
     [Documentation]    Wait for MicroShift service to be active
-    Wait Until Keyword Succeeds    30x    10s
+    Wait Until Keyword Succeeds    50x    10s
     ...    MicroShift Service Is Active
 
 Restart MicroShift

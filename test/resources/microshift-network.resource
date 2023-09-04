@@ -8,6 +8,7 @@ Library             SSHLibrary
 *** Variables ***
 ${HELLO_USHIFT}     ./assets/hello-microshift.yaml
 ${LB_PORT}          5678
+${NP_PORT}          32222
 ${HTTP_PORT}        80
 
 
@@ -21,11 +22,16 @@ Expose Hello MicroShift Pod Via LB
     [Documentation]    Expose the "hello microshift" application through the load balancer
     Run With Kubeconfig    oc create service loadbalancer hello-microshift --tcp=${LB_PORT}:8080 -n ${NAMESPACE}
 
+Expose Hello MicroShift Pod Via NodePort
+    [Documentation]    Expose the "hello microshift" application through the NodePort
+    Run With Kubeconfig
+    ...    oc create service nodeport hello-microshift --node-port=${NP_PORT} --tcp=8080 -n ${NAMESPACE}
+
 Access Hello Microshift
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
-    [Arguments]    ${ushift_port}
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}
 
-    ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${USHIFT_HOST}:${ushift_port}"
+    ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${ushift_ip}:${ushift_port}"
 
     ${result}=    Run Process
     ...    curl -i http://hello-microshift.cluster.local --connect-to ${connect_to}

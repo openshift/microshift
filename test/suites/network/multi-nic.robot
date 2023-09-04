@@ -30,7 +30,8 @@ Verify MicroShift Runs On Both NICs
 
     # Wait for MicroShift API readiness and run verification
     Wait For MicroShift
-    Verify Hello MicroShift Pod
+    Verify Hello MicroShift LB
+    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
 
 Verify MicroShift Runs On First NIC
     [Documentation]    Verify MicroShift can run on the first NIC
@@ -47,7 +48,8 @@ Verify MicroShift Runs On First NIC
 
     # Wait for MicroShift API readiness and run verification
     Wait For MicroShift
-    Verify Hello MicroShift Pod
+    Verify Hello MicroShift LB
+    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}    ${EMPTY}
 
     # Rebooting MicroShift host restores the network configuration
     [Teardown]    Run Keywords
@@ -70,7 +72,8 @@ Verify MicroShift Runs On Second NIC
 
     # Wait for MicroShift API readiness and run verification
     Wait For MicroShift
-    Verify Hello MicroShift Pod
+    Verify Hello MicroShift LB
+    Verify Hello MicroShift NodePort    ${EMPTY}    ${USHIFT_HOST_IP2}
 
     # Rebooting MicroShift host restores the network configuration
     [Teardown]    Run Keywords
@@ -140,7 +143,7 @@ Login Switch To IP
     [Documentation]    Switch to using the specified IP for SSH connections
     [Arguments]    ${new_ip}
 
-    IF    "${USHIFT_HOST}"!="${new_ip}"
+    IF    '${USHIFT_HOST}'!='${new_ip}'
         Logout MicroShift Host
         Set Global Variable    \${USHIFT_HOST}    ${new_ip}
         Login MicroShift Host
@@ -154,12 +157,30 @@ Login Switch To IP2
     [Documentation]    Switch to using the second IP for SSH connections
     Login Switch To IP    ${USHIFT_HOST_IP2}
 
-Verify Hello MicroShift Pod
-    [Documentation]    Run Hello MicroShift pod verification
+Verify Hello MicroShift LB
+    [Documentation]    Run Hello MicroShift Load Balancer verification
     Create Hello MicroShift Pod
     Expose Hello MicroShift Pod Via LB
     Wait Until Keyword Succeeds    30x    10s
     ...    Access Hello Microshift    ${LB_PORT}
+
+    [Teardown]    Run Keywords
+    ...    Delete Hello MicroShift Pod And Service
+
+Verify Hello MicroShift NodePort
+    [Documentation]    Run Hello MicroShift NodePort verification
+    [Arguments]    ${ip1}    ${ip2}
+    Create Hello MicroShift Pod
+    Expose Hello MicroShift Pod Via NodePort
+
+    IF    '${ip1}'!='${EMPTY}'
+        Wait Until Keyword Succeeds    30x    10s
+        ...    Access Hello Microshift    ${NP_PORT}    ${ip1}
+    END
+    IF    '${ip2}'!='${EMPTY}'
+        Wait Until Keyword Succeeds    30x    10s
+        ...    Access Hello Microshift    ${NP_PORT}    ${ip2}
+    END
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Pod And Service
