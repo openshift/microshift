@@ -91,7 +91,7 @@ function get_vm_ip {
     local -r vmname="${1}"
     local -r start=$(date +%s)
     local ip
-    ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}")
+    ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
     while [ "${ip}" = "" ]; do
         now=$(date +%s)
         if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
@@ -99,7 +99,7 @@ function get_vm_ip {
             exit 1
         fi
         sleep 1
-        ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}")
+        ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
     done
     echo "${ip}"
 }
@@ -200,10 +200,18 @@ EOF
 #                    necessarily the image to be installed (see
 #                    prepare_kickstart).
 #  network_name -- The name of the network used when creating the VM.
+#  vm_vcpus -- Number of vCPUs for the VM.
+#  vm_memory -- Size of RAM in MB for the VM.
+#  vm_disksize -- Size of disk in GB for the VM.
+#  vm_nics -- Number of network interfaces for the VM.
 launch_vm() {
     local -r vmname="$1"
     local -r boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
     local -r network_name="${3:-default}"
+    local -r vm_vcpus="${4:-2}"
+    local -r vm_memory="${5:-4096}"
+    local -r vm_disksize="${6:-20}"
+    local -r vm_nics="${7:-1}"
 
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
@@ -230,15 +238,20 @@ launch_vm() {
         sudo virsh pool-autostart "${vm_pool_name}"
     fi
 
+    # Prepare network arguments for the VM creation depending on
+    # the number of requested NICs
+    local vm_network_args
+    vm_network_args=""
+    for _ in $(seq "${vm_nics}") ; do
+        vm_network_args+="--network network=${network_name},model=virtio "
+    done
+
     # Implement retries on VM creation until the problem is fixed
     # See https://github.com/virt-manager/virt-manager/issues/498
     local vm_created=false
     for attempt in $(seq 5) ; do
         local vm_create_start
         vm_create_start=$(date +%s)
-        # FIXME: variable for vcpus?
-        # FIXME: variable for memory?
-        # FIXME: variable for ISO
 
         local graphics_args
         graphics_args="none"
@@ -250,14 +263,15 @@ launch_vm() {
         # the bg job does not get its own TTY.
         # If the TTY is not provided, virt-install refuses
         # to attach to the console. `unbuffer` provides the TTY.
+        # shellcheck disable=SC2086
         if ! sudo unbuffer virt-install \
             --autoconsole text \
             --graphics "${graphics_args}" \
             --name "${full_vmname}" \
-            --vcpus 2 \
-            --memory 4092 \
-            --disk "pool=${vm_pool_name},size=20" \
-            --network network="${network_name}",model=virtio \
+            --vcpus "${vm_vcpus}" \
+            --memory "${vm_memory}" \
+            --disk "pool=${vm_pool_name},size=${vm_disksize}" \
+            ${vm_network_args} \
             --events on_reboot=restart \
             --noreboot \
             --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
