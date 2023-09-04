@@ -32,7 +32,7 @@ func PathExists(path string) (bool, error) {
 	} else if errors.Is(err, os.ErrNotExist) {
 		return false, nil
 	} else {
-		return false, fmt.Errorf("checking if path (%s) exists failed: %w", path, err)
+		return false, fmt.Errorf("checking if path %q exists failed: %w", path, err)
 	}
 }
 
