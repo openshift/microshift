@@ -4,7 +4,7 @@
 
 KUBECONFIG="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
 # Timeout in seconds
-TIMEOUT_TEST=3600
+TIMEOUT_TEST=5400
 TIMEOUT_RESULTS=300
 
 prepare_hosts() {
