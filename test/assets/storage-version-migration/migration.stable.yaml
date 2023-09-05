@@ -1,0 +1,9 @@
+apiVersion: migration.k8s.io/v1alpha1
+kind: StorageVersionMigration
+metadata:
+  name: test.resource-v1
+spec:
+  resource:
+    group: test.resource
+    resource: migrates
+    version: v1

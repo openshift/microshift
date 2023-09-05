@@ -13,9 +13,11 @@ Suite Teardown      Teardown
 
 
 *** Variables ***
-${BETA_CRD}         assets/storage-version-migration/crd.beta.yaml
-${STABLE_CRD}       assets/storage-version-migration/crd.stable.yaml
-${CR_RESOURCE}      assets/storage-version-migration/cr.yaml
+${BETA_CRD}                     assets/storage-version-migration/crd.beta.yaml
+${STABLE_CRD}                   assets/storage-version-migration/crd.stable.yaml
+${CR_RESOURCE}                  assets/storage-version-migration/cr.yaml
+${BETA_MIGRATION_REQUEST}       assets/storage-version-migration/migration.beta.yaml
+${STABLE_MIGRATION_REQUEST}     assets/storage-version-migration/migration.stable.yaml
 
 
 *** Test Cases ***
@@ -23,16 +25,15 @@ Storage Version Migration Test
     [Documentation]    Verify that storage migrations get created when CRDs get updated.
     [Tags]    restart    slow    smoke
 
-    # The migration trigger runs on a 10min cycle, we restart Microshift to speed up discovery.
-    Restart MicroShift
+    Create Beta Migration
     Wait Until Keyword Succeeds    5x    10s
-    ...    Validate Migration    v1beta1    8F5KO5MYqcM=
+    ...    Validate Migration    v1beta1
 
     Update Beta CRD To Stable
 
-    Restart MicroShift
+    Create Stable Migration
     Wait Until Keyword Succeeds    5x    10s
-    ...    Validate Migration    v1    O2TShlD54rQ=
+    ...    Validate Migration    v1
 
 
 *** Keywords ***
@@ -57,6 +58,14 @@ Create Beta CRD
     [Documentation]    Create beta CRD
     Run With Kubeconfig    oc apply -f ${BETA_CRD}
 
+Create Beta Migration
+    [Documentation]    Create beta migration request
+    Run With Kubeconfig    oc apply -f ${BETA_MIGRATION_REQUEST}
+
+Create Stable Migration
+    [Documentation]    Create stable migration request
+    Run With Kubeconfig    oc apply -f ${STABLE_MIGRATION_REQUEST}
+
 Create Custom Resource
     [Documentation]    Create beta version resource
     Run With Kubeconfig    oc apply -f ${CR_RESOURCE}
@@ -66,20 +75,14 @@ Update Beta CRD To Stable
     Run With Kubeconfig    oc apply -f ${STABLE_CRD}
 
 Validate Migration
-    [Documentation]    Validate that a migration resource was created the CRD,
-    ...    we should expect to see a StorageState and StorageVersionMigration resource created.
-    ...    With in the Migration and State objects we should see the correct version and object
-    ...    hash defined. Storage hash is a trimmed base64 encoded value of the APIResource, it
-    ...    should be consistant per CRD structure.
-    [Arguments]    ${api_version}    ${hash}
+    [Documentation]    Validate that a migration resource has succeeded in migrating the CR,
+    ...    we should expect to see a StorageVersionMigration resource has succeeded and that the resource
+    ...    has the correct version updated.
+    [Arguments]    ${api_version}
     ${yaml_data}=    Oc Get    migrates.test.resource    ""    default
-    ${storage_yaml_data}=    Oc Get    storagestates.migration.k8s.io    ""    migrates.test.resource
-    ${migration_json_text}=    Run With Kubeconfig
-    ...    oc get storageversionmigration -o jsonpath="{.items[?(@.spec.resource.group=='test.resource')]}"
-    ${migration_json_data}=    Json Parse    ${migration_json_text}
+    ${storage_yaml_data}=    Oc Get    storageversionmigrations.migration.k8s.io    ""    test.resource-${api_version}
     Should Be Equal    ${yaml_data.apiVersion}    test.resource/${api_version}
-    Should Be Equal    ${storage_yaml_data.status.currentStorageVersionHash}    ${hash}
-    Should Be Equal    ${migration_json_data.spec.resource.version}    ${api_version}
+    Should Be Equal    ${storage_yaml_data.status.conditions[0].type}    Succeeded
 
 Delete Migration Resources
     [Documentation]    Remove the CRD and Storage State and Version Migration resources
@@ -88,5 +91,4 @@ Delete Migration Resources
     ...    oc get storageversionmigration -o jsonpath="${query}"
 
     Run With Kubeconfig    oc delete -f ${STABLE_CRD}    True
-    Run With Kubeconfig    oc delete storagestates migrates.test.resource    True
     Run With Kubeconfig    oc delete storageversionmigration ${migration_resource_name}    True
