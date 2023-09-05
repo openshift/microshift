@@ -1,5 +1,0 @@
-# cluster-network-operator embedded-component 6ba9a2029a07d0062b81e17167b26d7fd8d32b54 to 11c7b29545be8abc0004ec3d46de1695d3f8896a
-b11defc49a0d53a293af93ac5cf810afdd627d63 2023-08-02T19:35:46+00:00 Use encapsulation=true for IBM Cloud
-f7017c4623dac8adddc392a28e3af099e555485a 2023-05-22T14:35:31-04:00 Merge pull request #1770 from michael-topchiev/add-hypershift-annotation-to-multus-master
-# machine-config-operator embedded-component 03c07d3ec2c20d0b97c166035da02ddad2925e29 to aeb7d050748a23e0474f98a447d490e3b72e0ae6
-7f9ad0e74dc54d3555f95bd2e4115e9bec7a03a3 2023-07-14T07:38:38+00:00 OCPBUGS-11997: Prevent NM from unsetting the hostname
