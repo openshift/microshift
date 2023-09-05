@@ -57,7 +57,7 @@ func getHealthInfo() (*HealthInfo, error) {
 		return nil, fmt.Errorf("failed to unmarshal %q: %w", strings.TrimSpace(string(content)), err)
 	}
 
-	klog.Info("Read health info from file",
+	klog.InfoS("Read health info from file",
 		"health", health.Health,
 		"deploymentID", health.DeploymentID,
 		"previousBootID", health.BootID,
