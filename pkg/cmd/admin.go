@@ -32,13 +32,12 @@ func servicesShouldBeInactive(backingUp bool) error {
 		}
 
 		if state == "failed" && backingUp {
-			return fmt.Errorf("service %q is %q which suggest that MicroShift data might be unhealthy - "+
-				"address any issues before attempting to create a backup again", service, state)
+			fmt.Printf("WARNING: Service %q is %q - backup can potentially contain unhealthy data\n", service, state)
 		}
 
 		if state != "inactive" && state != "failed" {
-			return fmt.Errorf("MicroShift must be stopped before creating or restoring backup (%q is %q, should be %q)",
-				service, state, "inactive")
+			return fmt.Errorf("MicroShift must be stopped before creating or restoring backup (%q is %q, should be %q or %q)",
+				service, state, "inactive", "failed")
 		}
 	}
 
