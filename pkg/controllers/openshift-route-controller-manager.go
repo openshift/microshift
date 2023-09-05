@@ -137,6 +137,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 
 	if err := assets.ApplyNamespaces(ctx, []string{
 		"controllers/route-controller-manager/route-controller-manager-ns.yaml",
+		"controllers/route-controller-manager/ns.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply openshift namespaces %v", err)
 	}
@@ -144,6 +145,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		"controllers/route-controller-manager/informer-clusterrole.yaml",
 		"controllers/route-controller-manager/route-controller-manager-tokenreview-clusterrole.yaml",
 		"controllers/route-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrole.yaml",
+		"controllers/route-controller-manager/route-controller-manager-clusterrole.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager cluster roles %v", err)
 	}
@@ -152,6 +154,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		"controllers/route-controller-manager/informer-clusterrolebinding.yaml",
 		"controllers/route-controller-manager/route-controller-manager-tokenreview-clusterrolebinding.yaml",
 		"controllers/route-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrolebinding.yaml",
+		"controllers/route-controller-manager/route-controller-manager-clusterrolebinding.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager cluster role bindings %v", err)
 	}
@@ -171,6 +174,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 
 	if err := assets.ApplyServiceAccounts(ctx, []string{
 		"controllers/route-controller-manager/route-controller-manager-sa.yaml",
+		"controllers/route-controller-manager/sa.yaml",
 	}, s.kubeadmconfig); err != nil {
 		klog.Fatalf("failed to apply route controller manager service account %v", err)
 	}
