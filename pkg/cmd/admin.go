@@ -121,12 +121,32 @@ func backupRestorePreRun(backingUp bool) func(*cobra.Command, []string) error {
 	}
 }
 
+func validateArgs(cmd *cobra.Command, args []string) error {
+	var err error
+	if len(args) == 0 {
+		err = fmt.Errorf("command requires an argument")
+	} else if len(args) > 1 {
+		err = fmt.Errorf("command accepts only 1 argument")
+	} else if args[0] == "" {
+		err = fmt.Errorf("argument cannot be empty")
+	}
+
+	if err != nil {
+		// Remove 'Global Flags' and everything after because
+		// it contains some hidden flags.
+		usage, _, _ := strings.Cut(cmd.UsageString(), "Global Flags")
+		fmt.Printf("Error: %v\n\n%s", err, usage)
+		os.Exit(1)
+	}
+	return nil
+}
+
 func NewBackupCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "backup PATH",
 		Short:             "Create a backup of MicroShift data",
 		Long:              "Create a backup of MicroShift data. PATH should not exist.",
-		Args:              cobra.ExactArgs(1),
+		Args:              validateArgs,
 		PersistentPreRunE: backupRestorePreRun(true),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -148,7 +168,7 @@ func NewRestoreCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "restore PATH",
 		Short:             "Restore MicroShift data from a backup",
-		Args:              cobra.ExactArgs(1),
+		Args:              validateArgs,
 		PersistentPreRunE: backupRestorePreRun(false),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
