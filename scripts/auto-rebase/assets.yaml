@@ -151,6 +151,10 @@ assets:
   - dir: controllers/route-controller-manager/
     src: cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/
     files:
+      - file: ns.yaml
+      - file: sa.yaml
+      - file: route-controller-manager-clusterrole.yaml
+      - file: route-controller-manager-clusterrolebinding.yaml
       - file: informer-clusterrolebinding.yaml
       - file: informer-clusterrole.yaml
       - file: route-controller-manager-ingress-to-route-controller-clusterrolebinding.yaml
