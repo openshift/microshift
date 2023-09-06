@@ -1,14 +1,21 @@
 #!/bin/bash
 
+set -euo pipefail
+
 SCRIPT_NAME=$(basename "$0")
 # The 'openshift-ovn-kubernetes' namespace must be in the end of the list
 # to allow for pod deletion when MicroShift is stopped
-PODS_NS_LIST=(openshift-service-ca openshift-ingress openshift-dns openshift-storage openshift-ovn-kubernetes)
-FULL_CLEAN=true
+PODS_NS_LIST=(openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system openshift-ovn-kubernetes)
+FULL_CLEAN=false
 KEEP_IMAGE=false
+OVN_CLEAN=false
 
 function usage() {
-    echo "Stop all MicroShift services, also cleaning their data"
+    if [ $# -gt 0 ] ; then
+        echo "Error: $*"
+    else
+        echo "Stop all MicroShift services, also cleaning their data"
+    fi
     echo ""
     echo "Usage: ${SCRIPT_NAME} <--all [--keep-images] | --ovn>"
     echo "   --all         Clean all MicroShift and OVN data"
@@ -20,8 +27,8 @@ function usage() {
 function stop_disable_services() {
     echo Stopping MicroShift services
     for service in microshift microshift-etcd ; do
-        systemctl stop --now   ${service} 2>/dev/null
-        systemctl reset-failed ${service} 2>/dev/null
+        systemctl stop --now   ${service} 2>/dev/null || true
+        systemctl reset-failed ${service} 2>/dev/null || true
     done
 
     if ${FULL_CLEAN} ; then
@@ -31,16 +38,16 @@ function stop_disable_services() {
 
     # Killing the processes is the last resort after stopping the services with the 'systemctl stop' command.
     # Usually, this is only necessary in development environment.
-    pkill -9 --exact microshift
-    pkill -9 --exact microshift-etcd
+    pkill -9 --exact microshift      || true
+    pkill -9 --exact microshift-etcd || true
 }
 
 function stop_clean_pods() {
     # Wipe all the crio data off and return
     if ${FULL_CLEAN} && ! ${KEEP_IMAGE} ; then
         echo Removing crio container and image storage
-        crio wipe -f &>/dev/null
-        systemctl restart crio
+        crictl rm  -af &>/dev/null || true
+        crictl rmi -a  &>/dev/null || true
         return
     fi
 
@@ -60,8 +67,9 @@ function stop_clean_pods() {
                 break
             fi
             # shellcheck disable=SC2086
-            crictl rmp -f ${ocp_pods} &>/dev/null
+            crictl rmp -f ${ocp_pods} &>/dev/null || true
             retries=$(( retries - 1 ))
+            sleep 1
         done
     done
 }
@@ -81,7 +89,7 @@ function clean_processes() {
 
     echo Killing conmon, pause and OVN processes
     for pname in conmon pause ovn-controller ovn-northd ovsdb-server ; do
-        pkill -9 --exact ${pname}
+        pkill -9 --exact ${pname} || true
     done
 }
 
@@ -99,17 +107,30 @@ function clean_data() {
 }
 
 # Parse command line
-case $1 in
---all)
-    [ "$2" = "--keep-images" ] && KEEP_IMAGE=true
-    ;;
---ovn)
-    FULL_CLEAN=false
-    ;;
-*)
-    usage
-    ;;
-esac
+[ $# -lt 1 ] && usage
+
+while [ $# -gt 0 ] ; do
+    case $1 in
+    --all)
+        FULL_CLEAN=true
+        ;;
+    --keep-images)
+        KEEP_IMAGE=true
+        ;;
+    --ovn)
+        OVN_CLEAN=true
+        ;;
+    *)
+        usage
+        ;;
+    esac
+    shift
+done
+
+# Verify valid option combination
+! ${FULL_CLEAN} && ! ${OVN_CLEAN}  && usage "Either --all or --ovn option must be specified"
+! ${FULL_CLEAN} &&   ${KEEP_IMAGE} && usage "The --keep-images option can only be used with --all"
+  ${FULL_CLEAN} &&   ${OVN_CLEAN}  && usage "The --all and --ovn options are mutually exclusive"
 
 # Exit if the current user is not 'root'
 if [ "$(id -u)" -ne 0 ] ; then
@@ -118,18 +139,17 @@ if [ "$(id -u)" -ne 0 ] ; then
 fi
 
 if ${FULL_CLEAN} ; then
-    echo "DATA LOSS WARNING: Do you wish to stop and clean ALL MicroShift data AND cri-o container workloads?"
-    select yn in "Yes" "No"; do
-        case "${yn}" in
-        Yes)
-            break
+    read -r -p \
+        $'DATA LOSS WARNING: Do you wish to stop and clean ALL MicroShift data AND cri-o container workloads?\n1) Yes\n2) No\n#? ' \
+        answer
+    case "${answer,,}" in
+        yes|y|1)
             ;;
         *)
             echo "Aborting cleanup"
             exit 0
             ;;
-        esac
-    done
+    esac
 fi
 
 stop_disable_services
