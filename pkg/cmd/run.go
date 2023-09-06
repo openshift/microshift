@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -59,6 +60,14 @@ func NewRunMicroshiftCommand() *cobra.Command {
 		cfg, err := config.ActiveConfig()
 		if err != nil {
 			return err
+		}
+
+		// `v` is a flag registered in klog's init()
+		if vFlag := flags.Lookup("v"); vFlag != nil {
+			verbosity := strconv.Itoa(cfg.GetVerbosity())
+			if err := vFlag.Value.Set(verbosity); err != nil {
+				klog.Errorf("Failed to set log verbosity: %w", err)
+			}
 		}
 
 		cfg = config.ConfigMultiNode(cfg, multinode)
