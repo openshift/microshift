@@ -3,6 +3,7 @@ Documentation       Tests related to upgrading MicroShift
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/ostree.resource
+Resource            ../../resources/selinux.resource
 Library             Collections
 
 Suite Setup         Setup
@@ -21,7 +22,7 @@ ${TARGET_REF}       ${EMPTY}
 *** Test Cases ***
 Upgrade
     [Documentation]    Performs an upgrade to given reference
-    ...    and verifies if it was successful
+    ...    and verifies if it was successful, with SELinux validation
 
     MicroShift 413 Should Not Have Upgrade Artifacts
     Wait For Healthy System
@@ -29,6 +30,11 @@ Upgrade
     ${future_backup}=    Get Future Backup Name For Current Boot
     Deploy Commit Not Expecting A Rollback    ${TARGET_REF}
     Backup Should Exist    ${future_backup}
+
+    # Upgrade from 4.13 is not officially supported, skipping due to failure in relabeling
+    IF    "${future_backup}" != "4.13"
+        Validate SELinux With Backup    ${future_backup}
+    END
 
 
 *** Keywords ***

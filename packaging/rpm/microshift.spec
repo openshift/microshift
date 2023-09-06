@@ -21,12 +21,16 @@
 %define microshift_relabel_files() \
    mkdir -p /var/run/kubelet; \
    mkdir -p /var/lib/kubelet/pods; \
+   mkdir -p /etc/microshift; \
+   mkdir -p /usr/lib/microshift; \
    mkdir -p /var/run/secrets/kubernetes.io/serviceaccount; \
    mkdir -p /var/lib/microshift-backups; # Creating folder to avoid GreenBoot race condition so that correct label is applied \
    restorecon -R /var/run/kubelet; \
    restorecon -R /var/lib/kubelet/pods; \
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
    restorecon -R /var/lib/microshift-backups; \
+   restorecon -R /etc/microshift; \
+   restorecon -R /usr/lib/microshift; \
    restorecon -v /usr/bin/microshift; \
    restorecon -v /usr/bin/microshift-etcd
 
@@ -263,6 +267,9 @@ if [ $1 -eq 1 ]; then
 	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/microshift.conf
 	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
 fi
+
+%pre selinux
+%selinux_relabel_pre -s %{selinuxtype}
 
 %post selinux
 
