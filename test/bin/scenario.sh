@@ -36,7 +36,10 @@ sos_report() {
             continue
         fi
         ip=$(cat "${vmdir}/ip")
-        ssh "redhat@${ip}" "sudo sos report --quiet --batch --all-logs --tmp-dir /tmp && sudo chmod +r /tmp/sosreport*"
+        # Copy the sos helper for compatibility, it is only available in 4.14 RPMs
+        scp "${ROOTDIR}/scripts/microshift-sos-report.sh" "redhat@${ip}":/tmp
+        ssh "redhat@${ip}" \
+            "[ -f /usr/bin/microshift-sos-report ] && sudo /usr/bin/microshift-sos-report || sudo /tmp/microshift-sos-report.sh ; sudo chmod +r /tmp/sosreport*"
         mkdir -p "${vmdir}/sos"
         scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
     done
