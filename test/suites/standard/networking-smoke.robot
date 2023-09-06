@@ -29,16 +29,7 @@ Router Smoke Test
 
 Load Balancer Smoke Test
     [Documentation]    Verify that Load Balancer correctly exposes HTTP service
-    [Setup]    Run Keywords
-    ...    Create Hello MicroShift Pod
-    ...    AND
-    ...    Expose Hello MicroShift Pod Via LB
-
-    Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift    ${LB_PORT}
-
-    [Teardown]    Run Keywords
-    ...    Delete Hello MicroShift Pod And Service
+    Verify Hello MicroShift LB
 
 
 *** Keywords ***

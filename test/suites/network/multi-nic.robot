@@ -35,51 +35,11 @@ Verify MicroShift Runs On Both NICs
 
 Verify MicroShift Runs On First NIC
     [Documentation]    Verify MicroShift can run on the first NIC
-
-    ${cur_pid}=    MicroShift Process ID
-
-    Login Switch To IP1
-    Nmcli Connection Control    down    ${NIC2_NAME}
-
-    # MicroShift should restart due to IP change
-    Wait Until MicroShift Process ID Changes    ${cur_pid}
-    Wait For MicroShift Service
-    Setup Kubeconfig
-
-    # Wait for MicroShift API readiness and run verification
-    Wait For MicroShift
-    Verify Hello MicroShift LB
-    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}    ${EMPTY}
-
-    # Rebooting MicroShift host restores the network configuration
-    [Teardown]    Run Keywords
-    ...    Reboot MicroShift Host
-    ...    Login Switch To IP1
-    ...    Wait For Healthy System
+    Verify MicroShift On One NIC    ${USHIFT_HOST_IP1}    ${NIC2_NAME}    ${USHIFT_HOST_IP1}    ${EMPTY}
 
 Verify MicroShift Runs On Second NIC
     [Documentation]    Verify MicroShift can run on the second NIC
-
-    ${cur_pid}=    MicroShift Process ID
-
-    Login Switch To IP2
-    Nmcli Connection Control    down    ${NIC1_NAME}
-
-    # MicroShift should restart due to IP change
-    Wait Until MicroShift Process ID Changes    ${cur_pid}
-    Wait For MicroShift Service
-    Setup Kubeconfig
-
-    # Wait for MicroShift API readiness and run verification
-    Wait For MicroShift
-    Verify Hello MicroShift LB
-    Verify Hello MicroShift NodePort    ${EMPTY}    ${USHIFT_HOST_IP2}
-
-    # Rebooting MicroShift host restores the network configuration
-    [Teardown]    Run Keywords
-    ...    Reboot MicroShift Host
-    ...    Login Switch To IP1
-    ...    Wait For Healthy System
+    Verify MicroShift On One NIC    ${USHIFT_HOST_IP2}    ${NIC1_NAME}    ${EMPTY}    ${USHIFT_HOST_IP2}
 
 
 *** Keywords ***
@@ -157,16 +117,6 @@ Login Switch To IP2
     [Documentation]    Switch to using the second IP for SSH connections
     Login Switch To IP    ${USHIFT_HOST_IP2}
 
-Verify Hello MicroShift LB
-    [Documentation]    Run Hello MicroShift Load Balancer verification
-    Create Hello MicroShift Pod
-    Expose Hello MicroShift Pod Via LB
-    Wait Until Keyword Succeeds    30x    10s
-    ...    Access Hello Microshift    ${LB_PORT}
-
-    [Teardown]    Run Keywords
-    ...    Delete Hello MicroShift Pod And Service
-
 Verify Hello MicroShift NodePort
     [Documentation]    Run Hello MicroShift NodePort verification
     [Arguments]    ${ip1}    ${ip2}
@@ -184,3 +134,29 @@ Verify Hello MicroShift NodePort
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Pod And Service
+
+Verify MicroShift On One NIC
+    [Documentation]    Generic procedure to verify MicroShift network
+    ...    functionality while one of the network interfaces is down.
+    [Arguments]    ${login_ip}    ${down_nic}    ${verify_ip1}    ${verify_ip2}
+
+    ${cur_pid}=    MicroShift Process ID
+
+    Login Switch To IP    ${login_ip}
+    Nmcli Connection Control    down    ${down_nic}
+
+    # MicroShift should restart due to IP change
+    Wait Until MicroShift Process ID Changes    ${cur_pid}
+    Wait For MicroShift Service
+    Setup Kubeconfig
+
+    # Wait for MicroShift API readiness and run verification
+    Wait For MicroShift
+    Verify Hello MicroShift LB
+    Verify Hello MicroShift NodePort    ${verify_ip1}    ${verify_ip2}
+
+    # Rebooting MicroShift host restores the network configuration
+    [Teardown]    Run Keywords
+    ...    Reboot MicroShift Host
+    ...    Login Switch To IP1
+    ...    Wait For Healthy System

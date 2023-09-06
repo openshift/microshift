@@ -42,6 +42,16 @@ Access Hello Microshift
     Should Match Regexp    ${result.stdout}    HTTP.*200
     Should Match    ${result.stdout}    *Hello MicroShift*
 
+Verify Hello MicroShift LB
+    [Documentation]    Run Hello MicroShift Load Balancer verification
+    Create Hello MicroShift Pod
+    Expose Hello MicroShift Pod Via LB
+    Wait Until Keyword Succeeds    30x    10s
+    ...    Access Hello Microshift    ${LB_PORT}
+
+    [Teardown]    Run Keywords
+    ...    Delete Hello MicroShift Pod And Service
+
 Delete Hello MicroShift Pod And Service
     [Documentation]    Delete service and pod for cleanup.
     Oc Delete    service/hello-microshift -n ${NAMESPACE}
