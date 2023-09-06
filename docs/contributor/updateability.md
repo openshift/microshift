@@ -891,30 +891,18 @@ This turned out to not be a viable options because migrating
 CustomResourceDefinitions might require webhooks which run as a Pods, 
 therefore requiring kubelet, CNI, DNS, scheduler, and other components.
 
-Right now, storage migration is comprised of two additional controllers
-embedded into the MicroShift: Kube Storage Version Trigger and
-Kube Storage Version Migrator. They make use of the `StorageState`
-and `StorageVersionMigration` CR.
+Right now, storage migration is comprised of an additional controller embedded
+into MicroShift: Kube Storage Version Migrator. It makes use of the
+`StorageVersionMigration` CR to update a given resource by its group and
+version.
 
-### `StorageState` and `StorageVersionMigration` Custom Resources
+### `StorageVersionMigration` Custom Resources
 
-It is a Custom Resources created by the Trigger and
-picked up to handle by the Migrator.
-It can be also used to monitor progress of the migration and get
-information about any failures.
-
-#### Kube Storage Version Trigger
-
-Trigger controller performs the discovery and creates a `StorageState` and
-a `StorageVersionMigration` respectively.
-The `StorageState` contains the current discovered state of the API resource
-and the previous, if there is a version difference for that specific API resource,
-then a `StorageVersionMigration` is created by the Trigger.
-This check happens on start and every 10 minutes (discovery period;
-hardcoded in upstream code).
-
-> Hint: Restarting microshift.service may be used a way to quickly
-> retrigger the migration without waiting 10 minutes.
+This is the main API used by the Migrator Controller. It is a Custom Resource
+that is created manually by a user or another controller and picked up by the
+Migrator Controller. It specifies which resource to upgrade and to which
+version, the progress of the migration is posted to the
+`StorageVersionMigration` status.
 
 #### Kube Storage Version Migrator
 
