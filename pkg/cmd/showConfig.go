@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/spf13/cobra"
@@ -26,6 +27,10 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 		Run: func(cmd *cobra.Command, args []string) {
 			var cfg *config.Config
 			var err error
+
+			if os.Geteuid() > 0 {
+				cmdutil.CheckErr(fmt.Errorf("command requires root privileges"))
+			}
 
 			switch opts.Mode {
 			case "effective":

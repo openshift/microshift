@@ -19,6 +19,13 @@ ${MEMLIMIT128}      SEPARATOR=\n
 
 
 *** Test Cases ***
+No Sudo Command
+    [Documentation]    Test without priviledge elevation
+    ${output}    ${rc}=    Execute Command
+    ...    microshift show-config
+    ...    sudo=False    return_rc=True
+    Should Not Be Equal As Integers    0    ${rc}
+
 No Mode Argument
     [Documentation]    Test without any explicit --mode
     ${output}    ${rc}=    Execute Command
