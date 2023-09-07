@@ -6,7 +6,8 @@
 SCRIPT_PID=$$
 
 OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
-OCGET_OPT="--no-headers"
+OCGET_TIMEOUT="10s"
+OCGET_OPT="--no-headers --request-timeout=${OCGET_TIMEOUT}"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
 
 # Space separated list of log file locations to be printed out in case of
