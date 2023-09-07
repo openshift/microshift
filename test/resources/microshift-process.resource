@@ -42,6 +42,31 @@ Wait For MicroShift
     # greenboot check script to let us use it even when not on a
     # greenboot host?
 
+MicroShift Process ID
+    [Documentation]    Return the current MicroShift process ID
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    pidof microshift
+    ...    return_stdout=True    return_stderr=True    return_rc=True
+    Log    ${stderr}
+    RETURN    ${stdout}
+
+MicroShift Process ID Changed
+    [Documentation]    Compare the specified and current MicroShift process ID
+    [Arguments]    ${old_pid}
+    ${cur_pid}=    MicroShift Process ID
+    IF    "${cur_pid}"=="${old_pid}"
+        RETURN    False
+    ELSE
+        RETURN    True
+    END
+
+Wait Until MicroShift Process ID Changes
+    [Documentation]    Wait until the current MicroShift process ID changes
+    [Arguments]    ${old_pid}
+
+    Wait Until Keyword Succeeds    30x    10s
+    ...    MicroShift Process ID Changed    ${old_pid}
+
 MicroShift Service Is Active
     [Documentation]    Check if microshift.service is active
     ...    (process announced readiness)
@@ -63,14 +88,18 @@ Restart MicroShift
     # expect without worrying about the race. Any test that modifies
     # the MicroShift configuration file will be more reliable as a
     # result.
-    Systemctl With Retry    stop    microshift.service
+    Stop MicroShift
     Sleep    10 seconds
-    Systemctl With Retry    start    microshift.service
+    Start MicroShift
     Wait For MicroShift
 
 Stop MicroShift
     [Documentation]    Stop the MicroShift service
     Systemctl With Retry    stop    microshift.service
+
+Start MicroShift
+    [Documentation]    Start the MicroShift service
+    Systemctl With Retry    start    microshift.service
 
 Enable MicroShift
     [Documentation]    Enable the MicroShift service

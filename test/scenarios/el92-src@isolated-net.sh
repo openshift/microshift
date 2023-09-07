@@ -18,5 +18,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/isolated-net/isolated-network.robot
+    run_tests host1 suites/network/isolated-network.robot
 }
