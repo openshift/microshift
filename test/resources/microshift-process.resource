@@ -108,7 +108,7 @@ Enable MicroShift
 Cleanup MicroShift
     [Documentation]    Cleanup
     ...    opts=[--keep-images]
-    [Arguments]    ${opts}=""
+    [Arguments]    ${opts}=${EMPTY}
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    echo 1 | sudo microshift-cleanup-data --all ${opts}
     ...    sudo=True    return_stderr=True    return_rc=True
