@@ -508,10 +508,11 @@ EOF
     chmod +x "${last_rebase_script}"
 
     (cd "${REPOROOT}" && \
-         test -n "$(git status -s scripts/auto-rebase/last_rebase.sh)" && \
-         title "## Committing changes to last_rebase.sh" && \
-         git add scripts/auto-rebase/last_rebase.sh && \
-         git commit -m "update last_rebase.sh" || true)
+         if test -n "$(git status -s scripts/auto-rebase/last_rebase.sh)"; then \
+             title "## Committing changes to last_rebase.sh" && \
+             git add scripts/auto-rebase/last_rebase.sh && \
+             git commit -m "update last_rebase.sh"; \
+         fi)
 }
 
 # Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
@@ -1072,10 +1073,11 @@ update_changelog() {
     cp "${new_commits_file}" "${old_commits_file}"
 
     (cd "${REPOROOT}" && \
-         test -n "$(git status -s scripts/auto-rebase/changelog.txt scripts/auto-rebase/commits.txt)" && \
-         title "## Committing changes to changelog" && \
-         git add scripts/auto-rebase/commits.txt scripts/auto-rebase/changelog.txt && \
-         git commit -m "update changelog" || true)
+         if test -n "$(git status -s scripts/auto-rebase/changelog.txt scripts/auto-rebase/commits.txt)"; then \
+             title "## Committing changes to changelog" && \
+             git add scripts/auto-rebase/commits.txt scripts/auto-rebase/changelog.txt && \
+             git commit -m "update changelog"; \
+         fi)
 
 }
 
@@ -1167,10 +1169,11 @@ EOF
     chmod +x "${last_rebase_script}"
 
     (cd "${REPOROOT}" && \
-         test -n "$(git status -s scripts/auto-rebase/last_lvms_rebase.sh)" && \
-         title "## Committing changes to last_lvms_rebase.sh" && \
-         git add scripts/auto-rebase/last_lvms_rebase.sh && \
-         git commit -m "update last_lvms_rebase.sh" || true)
+         if test -n "$(git status -s scripts/auto-rebase/last_lvms_rebase.sh)"; then \
+             title "## Committing changes to last_lvms_rebase.sh" && \
+             git add scripts/auto-rebase/last_lvms_rebase.sh && \
+             git commit -m "update last_lvms_rebase.sh"; \
+         fi)
 }
 
 # Runs each LVMS rebase step in sequence, commiting the step's output to git
