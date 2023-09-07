@@ -1,4 +1,4 @@
-# cluster-network-operator embedded-component 11c7b29545be8abc0004ec3d46de1695d3f8896a to f91c5b944183bf189d866ecd8c6bbdb1b638f86b
-4885680221ca069a9d2961e46d9126c4306478ea 2023-08-30T15:14:02+00:00 Fix bond-cni's default directory in multus manifest
-# etcd embedded-component 1b61faa606b5393076f5835418c6ec3cdc628615 to 3734896c1ab0eb955e49374d30b0cf4d84b9deff
-61a5f1cdbf200a036c2fa3fd99e551c1968c7c14 2023-08-31T10:48:06+00:00 UPSTREAM <carry>: update build images to rhel9
+# router image-amd64 065deab84f342615db2d2f5c78a19ae04bb43912 to 54fb4419e676ed99daa42e726cce5e71442529ac
+ed9e8ca48a680e2c0519e0fc40b1ffc8965ca8df 2023-07-31T20:55:22+00:00 OCPBUGS-16623: properly handle weight=0
+# router image-arm64 065deab84f342615db2d2f5c78a19ae04bb43912 to 54fb4419e676ed99daa42e726cce5e71442529ac
+ed9e8ca48a680e2c0519e0fc40b1ffc8965ca8df 2023-07-31T20:55:22+00:00 OCPBUGS-16623: properly handle weight=0
