@@ -43,15 +43,6 @@ function stop_disable_services() {
 }
 
 function stop_clean_pods() {
-    # Wipe all the crio data off and return
-    if ${FULL_CLEAN} && ! ${KEEP_IMAGE} ; then
-        echo Removing crio container and image storage
-        crictl rm  -af &>/dev/null || true
-        crictl rmi -a  &>/dev/null || true
-        return
-    fi
-
-    # Delete pods only, preserving images
     # It is necessary to remove the pods (OVN-related last) to allow for further termination
     # of processes (i.e. conmon, etc.) that use the files under /var/run/ovn.
     # The cleanup of OVN data only works if the files under /var/run/ovn are not in use.
@@ -72,6 +63,13 @@ function stop_clean_pods() {
             sleep 1
         done
     done
+
+    # When full clean is requested, remove image storage
+    # after the pods are shut down
+    if ${FULL_CLEAN} && ! ${KEEP_IMAGE} ; then
+        echo Removing crio image storage
+        crictl rmi -a &>/dev/null || true
+    fi
 }
 
 function clean_processes() {

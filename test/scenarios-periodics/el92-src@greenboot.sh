@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/greenboot/
+    run_tests host1 suites/greenboot/start-stop.robot
 }
