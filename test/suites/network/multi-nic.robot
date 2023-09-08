@@ -22,6 +22,9 @@ ${NIC1_NAME}            ${EMPTY}
 ${NIC2_NAME}            ${EMPTY}
 ${NICS_COUNT}           2
 ${NMCLI_CMD}            nmcli -f name,type connection | awk '$2 == "ethernet" {print $1}' | sort
+${OSSL_CMD}             openssl x509 -text -noout -in
+${CERT_FILE}            /var/lib/microshift/certs/kube-apiserver-external-signer/kube-external-serving/server.crt
+${GREP_SUBJ_IPS}        grep -A1 'Subject Alternative Name:' | tail -1
 
 
 *** Test Cases ***
@@ -32,6 +35,7 @@ Verify MicroShift Runs On Both NICs
     Wait For MicroShift
     Verify Hello MicroShift LB
     Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
+    Verify MicroShift External Certificate    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
 
 Verify MicroShift Runs On First NIC
     [Documentation]    Verify MicroShift can run on the first NIC
@@ -93,9 +97,9 @@ Initialize Nmcli Variables
 Nmcli Connection Control
     [Documentation]    Run nmcli connection command with arguments
     [Arguments]    ${command}    ${conn_name}
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ${stderr}    ${rc}=    Execute Command
     ...    nmcli connection ${command} ${conn_name}
-    ...    sudo=True return_stdout=False    return_stderr=True    return_rc=True
+    ...    sudo=True    return_stdout=False    return_stderr=True    return_rc=True
     Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
 
@@ -154,9 +158,51 @@ Verify MicroShift On One NIC
     Wait For MicroShift
     Verify Hello MicroShift LB
     Verify Hello MicroShift NodePort    ${verify_ip1}    ${verify_ip2}
+    Verify MicroShift External Certificate    ${verify_ip1}    ${verify_ip2}
 
     # Rebooting MicroShift host restores the network configuration
     [Teardown]    Run Keywords
     ...    Reboot MicroShift Host
     ...    Login Switch To IP1
     ...    Wait For Healthy System
+
+Delete IP From MicroShift Config
+    [Documentation]    Delete the specified IP address line from the
+    ...    /etc/microshift/config.yaml file
+    [Arguments]    ${ip}
+
+    ${stderr}    ${rc}=    Execute Command
+    ...    sed -i '/${ip}\$/d' /etc/microshift/config.yaml
+    ...    sudo=True    return_stdout=False    return_stderr=True    return_rc=True
+    Log    ${stderr}
+    Should Be Equal As Integers    ${rc}    0
+
+Verify MicroShift External Certificate
+    [Documentation]    Verify that external certificate subject alternative
+    ...    name only contains the IPs of active network interfaces
+    [Arguments]    ${ip1}    ${ip2}
+
+    ${grep1_opt}=    Set Variable    ${EMPTY}
+    ${grep2_opt}=    Set Variable    ${EMPTY}
+    IF    '${ip1}'=='${EMPTY}'
+        ${grep1_opt}=    Set Variable    '--invert-match'
+    END
+    IF    '${ip2}'=='${EMPTY}'
+        ${grep2_opt}=    Set Variable    '--invert-match'
+    END
+
+    # Check IP presence or absence
+    Check IP Presence In External Certificate    ${USHIFT_HOST_IP1}    ${grep1_opt}
+    Check IP Presence In External Certificate    ${USHIFT_HOST_IP2}    ${grep2_opt}
+
+Check IP Presence In External Certificate
+    [Documentation]    Check the specified IP presence or absence in the
+    ...    external certificate file
+    [Arguments]    ${ip}    ${grep_opt}
+
+    # Check IP presence or absence
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    ${OSSL_CMD} ${CERT_FILE} | ${GREP_SUBJ_IPS} | grep -w ${grep_opt} 'DNS:${ip}'
+    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    Log    ${stderr}
+    Should Be Equal As Integers    ${rc}    0
