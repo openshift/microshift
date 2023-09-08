@@ -161,7 +161,7 @@ func ApplyCRDs(ctx context.Context, cfg *config.Config) error {
 			return fmt.Errorf("error getting asset %s: %v", crd, err)
 		}
 		c := readCRDOrDie(crdBytes)
-		if err = wait.PollUntilContextTimeout(ctx, customResourceReadyInterval, customResourceReadyTimeout, false, func(ctx context.Context) (done bool, err error) {
+		if err = wait.PollUntilContextTimeout(ctx, customResourceReadyInterval, customResourceReadyTimeout, true, func(ctx context.Context) (done bool, err error) {
 			if err := applyCRD(ctx, client, c); err != nil {
 				klog.Warningf("failed to apply openshift CRD %s: %v", crd, err)
 				return false, nil
