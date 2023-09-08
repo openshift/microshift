@@ -41,6 +41,7 @@ func (s *OpenShiftDefaultSCCManager) Dependencies() []string {
 }
 
 func (s *OpenShiftDefaultSCCManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
 	defer close(ready)
 	// TO-DO add readiness check
 	if err := ApplyDefaultSCCs(ctx, s.cfg); err != nil {
