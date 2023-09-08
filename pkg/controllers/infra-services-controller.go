@@ -41,6 +41,7 @@ func (s *InfrastructureServicesManager) Dependencies() []string {
 }
 
 func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
 	defer close(ready)
 
 	if err := applyDefaultRBACs(ctx, s.cfg); err != nil {
