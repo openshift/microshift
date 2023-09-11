@@ -1,0 +1,12 @@
+# ovn-kubernetes image-amd64 75d07f23eb921493aafee24c540b05771b03b6d6 to 9547107f8f6758e5b4183fb233c575159c33ac0c
+6c9697802feb9a1622f9b11e97d43cdc0a571371 2023-09-06T23:34:02+02:00 Do not set vlanID when its zero
+e36f4209c1aa6e9968c4910b32f884c95c577e2f 2023-09-06T23:33:53+02:00 Add e2e for mimicing pod2external case via GR
+638807155a9d04a2cb647c0c1aa507fcf4231ddb 2023-09-06T23:33:45+02:00 Enable gateway_mtu on rtoe port of GR
+e1903314c12671ade8b7fd31139961b251800784 2023-08-01T10:58:13+02:00 Remove node check for syncing cloud private ip config
+22908f651e8c3176c621d27c2ed1aed6452e17ae 2023-08-01T10:58:13+02:00 Remove stale egressip status entry
+# ovn-kubernetes image-arm64 75d07f23eb921493aafee24c540b05771b03b6d6 to 9547107f8f6758e5b4183fb233c575159c33ac0c
+6c9697802feb9a1622f9b11e97d43cdc0a571371 2023-09-06T23:34:02+02:00 Do not set vlanID when its zero
+e36f4209c1aa6e9968c4910b32f884c95c577e2f 2023-09-06T23:33:53+02:00 Add e2e for mimicing pod2external case via GR
+638807155a9d04a2cb647c0c1aa507fcf4231ddb 2023-09-06T23:33:45+02:00 Enable gateway_mtu on rtoe port of GR
+e1903314c12671ade8b7fd31139961b251800784 2023-08-01T10:58:13+02:00 Remove node check for syncing cloud private ip config
+22908f651e8c3176c621d27c2ed1aed6452e17ae 2023-08-01T10:58:13+02:00 Remove stale egressip status entry
