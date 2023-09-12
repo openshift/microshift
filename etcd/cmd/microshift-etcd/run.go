@@ -79,6 +79,7 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.etcdCfg.ClusterState = "new"
 	//s.etcdCfg.ForceNewCluster = true //TODO
 	s.etcdCfg.Logger = "zap"
+	s.etcdCfg.LogLevel = "debug"
 	s.etcdCfg.Dir = dataDir
 	s.etcdCfg.QuotaBackendBytes = cfg.Etcd.QuotaBackendBytes
 	url2380 := setURL([]string{"localhost"}, "2380")
