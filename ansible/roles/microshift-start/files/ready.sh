@@ -7,7 +7,7 @@ EXPECTED_PODS=6
 ALL_PODS=8
 # Define the location of the microshift kubeconfig
 KUBECONFIG="/var/lib/microshift/resources/kubeadmin/kubeconfig"
-USER_KUBECONFIG="$HOME/.kube"
+USER_KUBECONFIG="${HOME}/.kube"
 
 # Start the timer
 START_TIME=$(date +%s)
@@ -17,7 +17,7 @@ sudo systemctl start microshift.service
 
 # Check to see how long microshift.service took to start
 SYSTEMD_BLAME=$(systemd-analyze blame | grep microshift.service)
-echo $SYSTEMD_BLAME | awk '{print $2 ": " $1}' | sed 's/s$/ seconds/'
+echo "${SYSTEMD_BLAME}" | awk '{print $2 ": " $1}' | sed 's/s$/ seconds/'
 
 # Loop until the kubeconfig exists
 while ! sudo [ -e "${KUBECONFIG}" ]; do
@@ -31,15 +31,15 @@ DURATION=$((KUBE_TIME - START_TIME))
 echo "Kubeconfig: ${DURATION} seconds"
 
 # Copy the kubeconfig to the user homedir
-[ ! -d "${USER_KUBECONFIG}" ] && mkdir ${USER_KUBECONFIG}
-sudo cp ${KUBECONFIG} $HOME/.kube/config
-sudo chown $USER:$USER $HOME/.kube/config
+[ ! -d "${USER_KUBECONFIG}" ] && mkdir "${USER_KUBECONFIG}"
+sudo cp ${KUBECONFIG} "${USER_KUBECONFIG}"/config
+sudo chown "${USER}":"${USER}" "${USER_KUBECONFIG}"/config
 
 # podcheck fn waits for an expected number of pods to be in Ready state
 podcheck() {
   expected=$1
   while true; do
-      OUTPUT=$(eval ${COMMAND})
+      OUTPUT=$(eval "${COMMAND}")
       PODS_READY=$(echo "${OUTPUT}" | grep -o -w "True" | wc -l)
 
       # Wait until all pods report ready
