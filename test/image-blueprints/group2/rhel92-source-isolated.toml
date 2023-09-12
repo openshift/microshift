@@ -25,6 +25,10 @@ version = "${SOURCE_VERSION}"
 name = "microshift-test-agent"
 version = "*"
 
+[[packages]]
+name = "net-tools"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent"]
 
