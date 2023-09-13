@@ -55,11 +55,7 @@ MicroShift Process ID Changed
     [Documentation]    Compare the specified and current MicroShift process ID
     [Arguments]    ${old_pid}
     ${cur_pid}=    MicroShift Process ID
-    IF    "${cur_pid}"=="${old_pid}"
-        RETURN    False
-    ELSE
-        RETURN    True
-    END
+    Should Not Be Equal    ${cur_pid}    ${old_pid}
 
 Wait Until MicroShift Process ID Changes
     [Documentation]    Wait until the current MicroShift process ID changes
@@ -86,6 +82,8 @@ Restart MicroShift
     Systemctl With Retry    restart    microshift.service
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait Until MicroShift Etcd Process ID Changes    ${ushift_etcd_pid}
+    # Kubeconfig may change between restarts, ensure we are taking the latest one.
+    Setup Kubeconfig
     Wait For MicroShift
 
 Stop MicroShift
