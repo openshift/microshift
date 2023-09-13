@@ -23,11 +23,7 @@ MicroShift Etcd Process ID Changed
     [Documentation]    Compare the specified and current MicroShift Etcd process ID
     [Arguments]    ${old_pid}
     ${cur_pid}=    MicroShift Etcd Process ID
-    IF    "${cur_pid}"=="${old_pid}"
-        RETURN    False
-    ELSE
-        RETURN    True
-    END
+    Should Not Be Equal    ${cur_pid}    ${old_pid}
 
 Wait Until MicroShift Etcd Process ID Changes
     [Documentation]    Wait until the current MicroShift Etcd process ID changes
