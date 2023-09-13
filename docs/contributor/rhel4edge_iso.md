@@ -108,6 +108,8 @@ The artifact of the build is the `_output/image-builder/microshift-installer-${V
 The `kickstart.ks` file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such partitioning is required for the data volume to be utilized by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
 
 By default, the following partition layout is created and formatted with the `XFS` file system:
+* BIOS boot partition (1MB)
+  * It is required to boot ISO to systems with legacy BIOS while using GPT as the partitioning scheme.
 * EFI partition with EFI file system (200MB)
 * Boot partition is allocated on a 1GB volume
 * The rest of the disk is managed by the `LVM` in a single volume group named `rhel`
@@ -124,9 +126,10 @@ As an example, a 20GB disk is partitioned in the following manner by default.
 $ lsblk /dev/sda
 NAME          MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 sda             8:0    0   20G  0 disk
-├─sda1          8:1    0  200M  0 part /boot/efi
-├─sda2          8:2    0  800M  0 part /boot
-└─sda3          8:3    0   19G  0 part
+├─sda1          8:1    0    1M  0 part
+├─sda2          8:2    0  200M  0 part /boot/efi
+├─sda3          8:3    0  800M  0 part /boot
+└─sda4          8:4    0   19G  0 part
   └─rhel-root 253:0    0   10G  0 lvm  /sysroot
 
 $ sudo vgdisplay -s
