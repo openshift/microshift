@@ -223,7 +223,7 @@ Primary consumer of release image references.
 Script responsible for updating MicroShift's manifests, image references, and go.mod references based on contents of release images.
 It's executed by `rebase.py` to capture output and exit code.
 
-It also creates a git branch which name consists of prefix `rebase-`, version and stream (e.g. `4.13.0-0.nightly`), and creation datetimes of AMD and ARM nightly releases (e.g. `_amd64-2023-01-31-072358_arm64-2023-01-31-233557`).
+It also creates a git branch which name consists of prefix `rebase-`, onto branch, version and stream (e.g. `4.13.0-0.nightly`), and creation datetimes of AMD and ARM nightly releases (e.g. `_amd64-2023-01-31-072358_arm64-2023-01-31-233557`).
 
 ### rebase.py
 
