@@ -34,16 +34,18 @@ Verify MicroShift Runs On Both NICs
     # Wait for MicroShift API readiness and run verification
     Wait For MicroShift
     Verify Hello MicroShift LB
-    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
-    Verify MicroShift External Certificate    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
+    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}
+    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP2}
+    Check IP Present In External Certificate    ${USHIFT_HOST_IP1}
+    Check IP Present In External Certificate    ${USHIFT_HOST_IP2}
 
 Verify MicroShift Runs On First NIC
     [Documentation]    Verify MicroShift can run on the first NIC
-    Verify MicroShift On One NIC    ${USHIFT_HOST_IP1}    ${NIC2_NAME}    ${USHIFT_HOST_IP1}    ${EMPTY}
+    Verify MicroShift On One NIC    ${USHIFT_HOST_IP1}    ${NIC2_NAME}    ${USHIFT_HOST_IP2}
 
 Verify MicroShift Runs On Second NIC
     [Documentation]    Verify MicroShift can run on the second NIC
-    Verify MicroShift On One NIC    ${USHIFT_HOST_IP2}    ${NIC1_NAME}    ${EMPTY}    ${USHIFT_HOST_IP2}
+    Verify MicroShift On One NIC    ${USHIFT_HOST_IP2}    ${NIC1_NAME}    ${USHIFT_HOST_IP1}
 
 
 *** Keywords ***
@@ -117,24 +119,14 @@ Login Switch To IP1
     [Documentation]    Switch to using the first IP for SSH connections
     Login Switch To IP    ${USHIFT_HOST_IP1}
 
-Login Switch To IP2
-    [Documentation]    Switch to using the second IP for SSH connections
-    Login Switch To IP    ${USHIFT_HOST_IP2}
-
 Verify Hello MicroShift NodePort
     [Documentation]    Run Hello MicroShift NodePort verification
-    [Arguments]    ${ip1}    ${ip2}
+    [Arguments]    ${ip}
     Create Hello MicroShift Pod
     Expose Hello MicroShift Pod Via NodePort
 
-    IF    '${ip1}'!='${EMPTY}'
-        Wait Until Keyword Succeeds    30x    10s
-        ...    Access Hello Microshift    ${NP_PORT}    ${ip1}
-    END
-    IF    '${ip2}'!='${EMPTY}'
-        Wait Until Keyword Succeeds    30x    10s
-        ...    Access Hello Microshift    ${NP_PORT}    ${ip2}
-    END
+    Wait Until Keyword Succeeds    30x    10s
+    ...    Access Hello Microshift    ${NP_PORT}    ${ip}
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Pod And Service
@@ -142,67 +134,79 @@ Verify Hello MicroShift NodePort
 Verify MicroShift On One NIC
     [Documentation]    Generic procedure to verify MicroShift network
     ...    functionality while one of the network interfaces is down.
-    [Arguments]    ${login_ip}    ${down_nic}    ${verify_ip1}    ${verify_ip2}
+    [Arguments]    ${login_ip}    ${down_nic}    ${removed_ip}
+
+    Save Default MicroShift Config
+    Setup MicroShift Config    ${login_ip}
+
+    # MicroShift will only restart if there is an IP change. Force
+    # otherwise.
+    ${forced_restart}=    Set Variable    ${False}
+    IF    '${USHIFT_HOST}'=='${login_ip}'
+        ${forced_restart}=    Set Variable    ${True}
+    END
 
     ${cur_pid}=    MicroShift Process ID
 
     Login Switch To IP    ${login_ip}
     Nmcli Connection Control    down    ${down_nic}
 
-    # MicroShift should restart due to IP change
-    Wait Until MicroShift Process ID Changes    ${cur_pid}
-    Wait For MicroShift Service
-    Setup Kubeconfig
+    IF    ${forced_restart}
+        Restart MicroShift
+    ELSE
+        Wait Until MicroShift Process ID Changes    ${cur_pid}
+        Wait For MicroShift Service
+        Setup Kubeconfig
+        Wait For MicroShift
+    END
 
-    # Wait for MicroShift API readiness and run verification
-    Wait For MicroShift
     Verify Hello MicroShift LB
-    Verify Hello MicroShift NodePort    ${verify_ip1}    ${verify_ip2}
-    Verify MicroShift External Certificate    ${verify_ip1}    ${verify_ip2}
+    Verify Hello MicroShift NodePort    ${login_ip}
+    Check IP Present In External Certificate    ${login_ip}
+    Check IP Not Present In External Certificate    ${removed_ip}
 
     # Rebooting MicroShift host restores the network configuration
     [Teardown]    Run Keywords
+    ...    Restore Default MicroShift Config
     ...    Reboot MicroShift Host
     ...    Login Switch To IP1
     ...    Wait For Healthy System
 
-Delete IP From MicroShift Config
-    [Documentation]    Delete the specified IP address line from the
-    ...    /etc/microshift/config.yaml file
+Setup MicroShift Config
+    [Documentation]   Replace subjectAltNames entries to include only
+    ...    the one provided in the argument.
     [Arguments]    ${ip}
 
-    ${stderr}    ${rc}=    Execute Command
-    ...    sed -i '/${ip}\$/d' /etc/microshift/config.yaml
-    ...    sudo=True    return_stdout=False    return_stderr=True    return_rc=True
-    Log    ${stderr}
-    Should Be Equal As Integers    ${rc}    0
+    ${SUBJECT_ALT_NAMES}=    catenate    SEPARATOR=\n
+...    ---
+...    apiServer:
+...    \ \ subjectAltNames:
+...    \ \ - ${ip}
 
-Verify MicroShift External Certificate
-    [Documentation]    Verify that external certificate subject alternative
-    ...    name only contains the IPs of active network interfaces
-    [Arguments]    ${ip1}    ${ip2}
+    ${replaced}=    Replace MicroShift Config    ${SUBJECT_ALT_NAMES}
+    Upload MicroShift Config    ${replaced}
 
-    ${grep1_opt}=    Set Variable    ${EMPTY}
-    ${grep2_opt}=    Set Variable    ${EMPTY}
-    IF    '${ip1}'=='${EMPTY}'
-        ${grep1_opt}=    Set Variable    '--invert-match'
-    END
-    IF    '${ip2}'=='${EMPTY}'
-        ${grep2_opt}=    Set Variable    '--invert-match'
-    END
-
-    # Check IP presence or absence
-    Check IP Presence In External Certificate    ${USHIFT_HOST_IP1}    ${grep1_opt}
-    Check IP Presence In External Certificate    ${USHIFT_HOST_IP2}    ${grep2_opt}
-
-Check IP Presence In External Certificate
-    [Documentation]    Check the specified IP presence or absence in the
-    ...    external certificate file
+Check IP Certificate
     [Arguments]    ${ip}    ${grep_opt}
 
-    # Check IP presence or absence
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${OSSL_CMD} ${CERT_FILE} | ${GREP_SUBJ_IPS} | grep -w ${grep_opt} 'DNS:${ip}'
     ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
     Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
+
+Check IP Present In External Certificate
+    [Documentation]    Check the specified IP presence in the external
+    ...    certificate file
+    [Arguments]    ${ip}
+
+    ${grep_opt}=    Set Variable    ${EMPTY}
+    Check IP Certificate    ${ip}    ${grep_opt}
+
+Check IP Not Present In External Certificate
+    [Documentation]    Check the specified IP absence in the external
+    ...    certificate file
+    [Arguments]    ${ip}
+
+    ${grep_opt}=    Set Variable    '--invert-match'
+    Check IP Certificate    ${ip}    ${grep_opt}
