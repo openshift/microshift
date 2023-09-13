@@ -1098,7 +1098,7 @@ rebase_to() {
     # PULL_BASE_REF is expected in CI environments and should identify the active branch.
     if [[ "${PULL_BASE_REF:-}" == "" ]]; then
         >&2 echo 'Warning: env var PULL_BASE_REF not found or empty, falling back to local active branch.'
-        onto_branch=$(git branch rev-parse --abbrev-ref HEAD)
+        onto_branch=$(git rev-parse --abbrev-ref HEAD)
         if [[ "${onto_branch}" == 'HEAD' ]]; then
             >&2 echo 'Warning: detected HEAD in detached state, falling back to current abbreviated commit'
             onto_branch="$(git rev-parse --short HEAD)"
