@@ -905,7 +905,20 @@ rebase_to() {
     amd64_date="$(cat ${STAGING_DIR}/release_amd64.json | jq -r .config.created | cut -f1 -dT)"
     arm64_date="$(cat ${STAGING_DIR}/release_arm64.json | jq -r .config.created | cut -f1 -dT)"
 
-    rebase_branch="rebase-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
+    local onto_branch=""
+    # PULL_BASE_REF is expected in CI environments and should identify the active branch.
+    if [[ "${PULL_BASE_REF:-}" == "" ]]; then
+        >&2 echo 'Warning: env var PULL_BASE_REF not found or empty, falling back to local active branch.'
+        onto_branch=$(git branch rev-parse --abbrev-ref HEAD)
+        if [[ "${onto_branch}" == 'HEAD' ]]; then
+            >&2 echo 'Warning: detected HEAD in detached state, falling back to current abbreviated commit'
+            onto_branch="$(git rev-parse --short HEAD)"
+        fi
+    else
+        onto_branch="${PULL_BASE_REF}"
+    fi
+    # If onto_branch is not null, pad with "-", else onto_branch is empty so do not pad
+    rebase_branch="rebase${onto_branch:+"-$onto_branch"}-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
