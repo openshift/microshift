@@ -1,7 +1,7 @@
 id = "microshift-fake-next-minor"
 name = "MicroShift Fake Next Minor Version Repo"
 type = "yum-baseurl"
-url = "file://${NEXT_REPO}/"
+url = "file://{{ .Env.NEXT_REPO }}/"
 check_gpg = false
 check_ssl = false
 system = false

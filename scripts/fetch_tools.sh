@@ -166,6 +166,24 @@ get_controller-gen() {
     GOBIN=${DEST_DIR} GOFLAGS="" go install sigs.k8s.io/controller-tools/cmd/controller-gen@${ver}
 }
 
+get_gomplate() {
+    local ver="v3.11.5"
+    declare -A checksums=(
+        ["x86_64"]="16f6a01a0ff22cae1302980c42ce4f98ca20f8c55443ce5a8e62e37fc23487b3"
+        ["aarch64"]="fd980f9d233902e50f3f03f10ea65f36a2705385358a87aa18b19fb7cdf54c1d")
+
+    declare -A arch_map=(
+        ["x86_64"]="amd64"
+        ["aarch64"]="arm64")
+
+    local arch="${arch_map[${ARCH}]}"
+    local checksum="${checksums[${ARCH}]}"
+    local filename="gomplate"
+    local url="https://github.com/hairyhenderson/gomplate/releases/download/${ver}/gomplate_linux-${arch}"
+
+    _install "${url}" "${checksum}" "${filename}" "gomplate_linux-${arch}"
+}
+
 get_robotframework() {
     local venv
 
