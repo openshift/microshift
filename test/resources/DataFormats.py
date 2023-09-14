@@ -68,17 +68,6 @@ def _merge(dest, addition):
     return dest
 
 
-def _replace(dest, replacement):
-    """Implements data structure field replacement
-
-    The dest value is modified in place by replacing all
-    the values found in replacement parameter.
-    """
-    for key, value in replacement.items():
-        dest[key] = value
-    return dest
-
-
 def yaml_merge(base, addition):
     """Return combination of both YAML data structures, additively."""
     if not base:
@@ -103,7 +92,7 @@ def yaml_replace(base, replacement):
         parsed_replacement = {}
     else:
         parsed_replacement = yaml.safe_load(replacement)
-    _replace(combined, parsed_replacement)
+    combined.update(parsed_replacement)
     return yaml.dump(combined)
 
 
