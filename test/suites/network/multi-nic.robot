@@ -36,16 +36,64 @@ Verify MicroShift Runs On Both NICs
     Verify Hello MicroShift LB
     Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}
     Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP2}
-    Check IP Present In External Certificate    ${USHIFT_HOST_IP1}
-    Check IP Present In External Certificate    ${USHIFT_HOST_IP2}
+    IP Should Be Present In External Certificate    ${USHIFT_HOST_IP1}
+    IP Should Be Present In External Certificate    ${USHIFT_HOST_IP2}
 
-Verify MicroShift Runs On First NIC
-    [Documentation]    Verify MicroShift can run on the first NIC
-    Verify MicroShift On One NIC    ${USHIFT_HOST_IP1}    ${NIC2_NAME}    ${USHIFT_HOST_IP2}
+Verify MicroShift Runs Only On Primary NIC
+    [Documentation]    Verify MicroShift can run only on the primary NIC. The
+    ...    node IP will be taken from this NIC by default. When disabling the
+    ...    secondary NIC nothing will happen in MicroShift, as the IP did not
+    ...    change. A restart is forced so that MicroShift picks up the new
+    ...    configuration (without the secondary IP) and regenerates the
+    ...    certificates, which will be lacking the IP from secondary NIC.
+    [Setup]    Save Default MicroShift Config
 
-Verify MicroShift Runs On Second NIC
-    [Documentation]    Verify MicroShift can run on the second NIC
-    Verify MicroShift On One NIC    ${USHIFT_HOST_IP2}    ${NIC1_NAME}    ${USHIFT_HOST_IP1}
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP1}
+
+    ${cur_pid}=    MicroShift Process ID
+
+    Login Switch To IP    ${USHIFT_HOST_IP1}
+    Disable Interface    ${NIC2_NAME}
+
+    Restart MicroShift
+
+    Verify MicroShift On Single NIC    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
+
+    # Rebooting MicroShift host restores the network configuration
+    [Teardown]    Run Keywords
+    ...    Restore Default MicroShift Config
+    ...    Reboot MicroShift Host
+    ...    Login Switch To IP1
+    ...    Wait For Healthy System
+
+Verify MicroShift Runs Only On Secondary NIC
+    [Documentation]    Verify MicroShift can run only on the secondary NIC. The
+    ...    node IP will change when disabling the primary interface, triggering
+    ...    an automatic restart of the service. After restarting, the node IP will
+    ...    be that of the secondary NIC, and certificates will be updated according
+    ...    to the new configuration (which includes only the secondary IP).
+    [Setup]    Save Default MicroShift Config
+
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP2}
+
+    ${cur_pid}=    MicroShift Process ID
+
+    Login Switch To IP    ${USHIFT_HOST_IP2}
+    Disable Interface    ${NIC1_NAME}
+
+    Wait Until MicroShift Process ID Changes    ${cur_pid}
+    Wait For MicroShift Service
+    Setup Kubeconfig
+    Wait For MicroShift
+
+    Verify MicroShift On Single NIC    ${USHIFT_HOST_IP2}    ${USHIFT_HOST_IP1}
+
+    # Rebooting MicroShift host restores the network configuration
+    [Teardown]    Run Keywords
+    ...    Restore Default MicroShift Config
+    ...    Reboot MicroShift Host
+    ...    Login Switch To IP1
+    ...    Wait For Healthy System
 
 
 *** Keywords ***
@@ -67,7 +115,6 @@ Verify Multiple NICs
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${NMCLI_CMD} | wc -l
     ...    return_stdout=True    return_stderr=True    return_rc=True
-    Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
     Should Be Equal As Strings    ${stdout}    ${NICS_COUNT}
 
@@ -85,24 +132,21 @@ Initialize Nmcli Variables
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${NMCLI_CMD} | head -1
     ...    return_stdout=True    return_stderr=True    return_rc=True
-    Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
     Set Suite Variable    \${NIC1_NAME}    ${stdout}
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${NMCLI_CMD} | tail -1
     ...    return_stdout=True    return_stderr=True    return_rc=True
-    Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
     Set Suite Variable    \${NIC2_NAME}    ${stdout}
 
-Nmcli Connection Control
+Disable Interface
     [Documentation]    Run nmcli connection command with arguments
-    [Arguments]    ${command}    ${conn_name}
+    [Arguments]    ${conn_name}
     ${stderr}    ${rc}=    Execute Command
-    ...    nmcli connection ${command} ${conn_name}
+    ...    nmcli connection down ${conn_name}
     ...    sudo=True    return_stdout=False    return_stderr=True    return_rc=True
-    Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
 
 Login Switch To IP
@@ -131,71 +175,41 @@ Verify Hello MicroShift NodePort
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Pod And Service
 
-Verify MicroShift On One NIC
+Verify MicroShift On Single NIC
     [Documentation]    Generic procedure to verify MicroShift network
     ...    functionality while one of the network interfaces is down.
-    [Arguments]    ${login_ip}    ${down_nic}    ${removed_ip}
-
-    Save Default MicroShift Config
-    Setup MicroShift Config    ${login_ip}
-
-    # MicroShift will only restart if there is an IP change. Force
-    # otherwise.
-    ${forced_restart}=    Set Variable    ${False}
-    IF    '${USHIFT_HOST}'=='${login_ip}'
-        ${forced_restart}=    Set Variable    ${True}
-    END
-
-    ${cur_pid}=    MicroShift Process ID
-
-    Login Switch To IP    ${login_ip}
-    Nmcli Connection Control    down    ${down_nic}
-
-    IF    ${forced_restart}
-        Restart MicroShift
-    ELSE
-        Wait Until MicroShift Process ID Changes    ${cur_pid}
-        Wait For MicroShift Service
-        Setup Kubeconfig
-        Wait For MicroShift
-    END
+    [Arguments]    ${login_ip}    ${removed_ip}
 
     Verify Hello MicroShift LB
     Verify Hello MicroShift NodePort    ${login_ip}
-    Check IP Present In External Certificate    ${login_ip}
-    Check IP Not Present In External Certificate    ${removed_ip}
+    IP Should Be Present In External Certificate    ${login_ip}
+    IP Should Not Be Present In External Certificate    ${removed_ip}
 
-    # Rebooting MicroShift host restores the network configuration
-    [Teardown]    Run Keywords
-    ...    Restore Default MicroShift Config
-    ...    Reboot MicroShift Host
-    ...    Login Switch To IP1
-    ...    Wait For Healthy System
-
-Setup MicroShift Config
-    [Documentation]   Replace subjectAltNames entries to include only
-    ...    the one provided in the argument.
+Configure Subject Alternative Name
+    [Documentation]    Replace subjectAltNames entries in the configuration
+    ...    to include only the one provided in ${ip}.
     [Arguments]    ${ip}
 
-    ${SUBJECT_ALT_NAMES}=    catenate    SEPARATOR=\n
-...    ---
-...    apiServer:
-...    \ \ subjectAltNames:
-...    \ \ - ${ip}
+    ${subject_alt_names}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiServer:
+    ...    \ \ subjectAltNames:
+    ...    \ \ - ${ip}
 
-    ${replaced}=    Replace MicroShift Config    ${SUBJECT_ALT_NAMES}
+    ${replaced}=    Replace MicroShift Config    ${subject_alt_names}
     Upload MicroShift Config    ${replaced}
 
 Check IP Certificate
+    [Documentation]    Checks whether the ${ip} is present in the subject
+    ...    alternative names in ${CERT_FILE}.
     [Arguments]    ${ip}    ${grep_opt}
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${OSSL_CMD} ${CERT_FILE} | ${GREP_SUBJ_IPS} | grep -w ${grep_opt} 'DNS:${ip}'
     ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
 
-Check IP Present In External Certificate
+IP Should Be Present In External Certificate
     [Documentation]    Check the specified IP presence in the external
     ...    certificate file
     [Arguments]    ${ip}
@@ -203,7 +217,7 @@ Check IP Present In External Certificate
     ${grep_opt}=    Set Variable    ${EMPTY}
     Check IP Certificate    ${ip}    ${grep_opt}
 
-Check IP Not Present In External Certificate
+IP Should Not Be Present In External Certificate
     [Documentation]    Check the specified IP absence in the external
     ...    certificate file
     [Arguments]    ${ip}
