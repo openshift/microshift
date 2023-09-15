@@ -184,6 +184,8 @@ EOF
 # for them.
 do_group() {
     local groupdir="$1"
+    local -r template_arg="$2"
+
     local -r ip_addr_default=$(hostname -I | awk '{print $1}')
 
     title "Building ${groupdir}"
@@ -202,11 +204,15 @@ do_group() {
     local template_list
 
     # Upload the blueprint definitions
-    echo "Expanding blueprint templates to ${IMAGEDIR}/blueprints and starting edge-commit builds"
-    if ! ${ONLY_SOURCE}; then
-        template_list=$(echo "${groupdir}"/*.toml)
+    if [ -n "${template_arg}" ]; then
+        template_list="${template_arg}"
     else
-        template_list=$(echo "${groupdir}"/*source*.toml)
+        echo "Expanding blueprint templates to ${IMAGEDIR}/blueprints and starting edge-commit builds"
+        if ! ${ONLY_SOURCE}; then
+            template_list=$(echo "${groupdir}"/*.toml)
+        else
+            template_list=$(echo "${groupdir}"/*source*.toml)
+        fi
     fi
     for template in ${template_list}; do
         echo
@@ -362,7 +368,7 @@ do_group() {
 
 usage() {
     cat - <<EOF
-build_images.sh [-Is] [-g group-dir]
+build_images.sh [-Is] [-g group-dir] [-t template]
 
   -h      Show this help
 
@@ -373,14 +379,17 @@ build_images.sh [-Is] [-g group-dir]
   -s      Only build source images (implies -I).
 
   -g DIR  Build only one group.
+
+  -t FILE Build only one template. Implies -g based on filename.
 EOF
 }
 
 BUILD_INSTALLER=true
 ONLY_SOURCE=false
 GROUP=""
+TEMPLATE=""
 
-while getopts "iIg:sh" opt; do
+while getopts "iIg:st:h" opt; do
     case "${opt}" in
         h)
             usage
@@ -398,6 +407,10 @@ while getopts "iIg:sh" opt; do
         s)
             BUILD_INSTALLER=false
             ONLY_SOURCE=true
+            ;;
+        t)
+            TEMPLATE="${OPTARG}"
+            GROUP="$(basename "$(dirname "$(realpath "${OPTARG}")")")"
             ;;
         *)
             echo "ERROR: Unknown option ${opt}"
@@ -441,9 +454,9 @@ mkdir -p "${VM_DISK_BASEDIR}"
 configure_package_sources
 
 if [ -n "${GROUP}" ]; then
-    do_group "${GROUP}"
+    do_group "${GROUP}" "${TEMPLATE}"
 else
     for group in "${TESTDIR}"/image-blueprints/group*; do
-        do_group "${group}"
+        do_group "${group}" ""
     done
 fi
