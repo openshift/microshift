@@ -59,12 +59,7 @@ Verify MicroShift Runs Only On Primary NIC
 
     Verify MicroShift On Single NIC    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
 
-    # Rebooting MicroShift host restores the network configuration
-    [Teardown]    Run Keywords
-    ...    Restore Default MicroShift Config
-    ...    Reboot MicroShift Host
-    ...    Login Switch To IP1
-    ...    Wait For Healthy System
+    [Teardown]    Restore Network Configuration By Rebooting Host
 
 Verify MicroShift Runs Only On Secondary NIC
     [Documentation]    Verify MicroShift can run only on the secondary NIC. The
@@ -88,12 +83,7 @@ Verify MicroShift Runs Only On Secondary NIC
 
     Verify MicroShift On Single NIC    ${USHIFT_HOST_IP2}    ${USHIFT_HOST_IP1}
 
-    # Rebooting MicroShift host restores the network configuration
-    [Teardown]    Run Keywords
-    ...    Restore Default MicroShift Config
-    ...    Reboot MicroShift Host
-    ...    Login Switch To IP1
-    ...    Wait For Healthy System
+    [Teardown]    Restore Network Configuration By Rebooting Host
 
 
 *** Keywords ***
@@ -142,7 +132,8 @@ Initialize Nmcli Variables
     Set Suite Variable    \${NIC2_NAME}    ${stdout}
 
 Disable Interface
-    [Documentation]    Run nmcli connection command with arguments
+    [Documentation]    Disable NIC given in ${conn_name}. Change is not persistent. On
+    ...    the next reboot the interface will have its original status again.
     [Arguments]    ${conn_name}
     ${stderr}    ${rc}=    Execute Command
     ...    nmcli connection down ${conn_name}
@@ -158,10 +149,6 @@ Login Switch To IP
         Set Global Variable    \${USHIFT_HOST}    ${new_ip}
         Login MicroShift Host
     END
-
-Login Switch To IP1
-    [Documentation]    Switch to using the first IP for SSH connections
-    Login Switch To IP    ${USHIFT_HOST_IP1}
 
 Verify Hello MicroShift NodePort
     [Documentation]    Run Hello MicroShift NodePort verification
@@ -214,13 +201,19 @@ IP Should Be Present In External Certificate
     ...    certificate file
     [Arguments]    ${ip}
 
-    ${grep_opt}=    Set Variable    ${EMPTY}
-    Check IP Certificate    ${ip}    ${grep_opt}
+    Check IP Certificate    ${ip}    ${EMPTY}
 
 IP Should Not Be Present In External Certificate
     [Documentation]    Check the specified IP absence in the external
     ...    certificate file
     [Arguments]    ${ip}
 
-    ${grep_opt}=    Set Variable    '--invert-match'
-    Check IP Certificate    ${ip}    ${grep_opt}
+    Check IP Certificate    ${ip}    '--invert-match'
+
+Restore Network Configuration By Rebooting Host
+    [Documentation]    Restores network interface initial configuration
+    ...    by rebooting the host.
+    Restore Default MicroShift Config
+    Reboot MicroShift Host
+    Login Switch To IP    ${USHIFT_HOST_IP1}
+    Wait For Healthy System
