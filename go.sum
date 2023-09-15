@@ -396,6 +396,8 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0/go.mod h1:hgWBS7lorOAVIJEQMi4Zs
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.1 h1:0hERBMJE1eitiLkihrMvRVBYAkpHzc/J3QdDN+dAcgU=
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
+github.com/hashicorp/golang-lru v0.5.4 h1:YDjusn29QI/Das2iO9M0BHnIbxPeyuCHsjMW+lJfyTc=
+github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
@@ -507,6 +509,8 @@ github.com/opencontainers/selinux v1.10.0 h1:rAiKF8hTcgLI3w0DHm6i0ylVVcOrlgR1kK9
 github.com/opencontainers/selinux v1.10.0/go.mod h1:2i0OySw99QjzBBQByd1Gr9gSjvuho1lHsJxIJ3gGbJI=
 github.com/openshift/api v0.0.0-20230703134140-1c2204a0195c h1:b1aPWPgW3MyK4BEKFjKBIHTV2LrdwGwErITEUw//xl4=
 github.com/openshift/api v0.0.0-20230703134140-1c2204a0195c/go.mod h1:4VWG+W22wrB4HfBL88P40DxLEpSOaiBVxUnfalfJo9k=
+github.com/openshift/api v0.0.0-20230807132801-600991d550ac h1:HqT8MmYGXiUGUW0BjygTGOOvqO2wIsTaG3q8nboJyPY=
+github.com/openshift/api v0.0.0-20230807132801-600991d550ac/go.mod h1:yimSGmjsI+XF1mr+AKBs2//fSXIOhhetHGbMlBEfXbs=
 github.com/openshift/apiserver-library-go v0.0.0-20230807133552-675520b3d567 h1:s+XH/hrs4bb61OtP2OVnTIEU2MMiOqy/DZk8Q9dqvjY=
 github.com/openshift/apiserver-library-go v0.0.0-20230807133552-675520b3d567/go.mod h1:IB+lIRX6DAezD849VtIqlMZrWQIugSdEWMZzfOTP9kI=
 github.com/openshift/build-machinery-go v0.0.0-20230306181456-d321ffa04533 h1:mh3ZYs7kPIIe3UUY6tJcTExmtjnXXUu0MrBuK2W/Qvw=
@@ -575,6 +579,8 @@ github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0
 github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20230912035909-2c287eb3d350/go.mod h1:avu3AaWDIk2l9Ip/rt8oWZmsQ2oYibJzble98CyL9uk=
 github.com/openshift/library-go v0.0.0-20230516103935-9536341565eb h1:B1VhZf/XTcInahu7XmosGLDGlKgJHj9eYtNBq+tA2dY=
 github.com/openshift/library-go v0.0.0-20230516103935-9536341565eb/go.mod h1:PJVatR/oS/EaFciwylyAr9hORSqQHrC+5bXf4L0wsBY=
+github.com/openshift/library-go v0.0.0-20230908101047-d058c695f677 h1:TCNe5+9j3PpHY3lLPA355ejCaz0/r7OxFoyDSMzaJcw=
+github.com/openshift/library-go v0.0.0-20230908101047-d058c695f677/go.mod h1:ZFwNwC3opc/7aOvzUbU95zp33Lbxet48h80ryH3p6DY=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230317131656-c62d9de5a460 h1:PftK9Q7BUD+wj8fNvxtJ+RhxYkcTtd8LcAo1Gk1H1HM=
 github.com/openshift/route-controller-manager v0.0.0-20230809110842-0a976ea8bb9f h1:JITYoP8Rlg/LLRwCXMhmFoh7l1RzHWIwc6Udhi6kEEQ=
 github.com/openshift/route-controller-manager v0.0.0-20230809110842-0a976ea8bb9f/go.mod h1:wmediAYaRewO78uDlZ1qvvfFwL2c1thrRVhCvN7GP4o=

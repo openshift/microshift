@@ -22,6 +22,9 @@ ${NIC1_NAME}            ${EMPTY}
 ${NIC2_NAME}            ${EMPTY}
 ${NICS_COUNT}           2
 ${NMCLI_CMD}            nmcli -f name,type connection | awk '$2 == "ethernet" {print $1}' | sort
+${OSSL_CMD}             openssl x509 -text -noout -in
+${CERT_FILE}            /var/lib/microshift/certs/kube-apiserver-external-signer/kube-external-serving/server.crt
+${GREP_SUBJ_IPS}        grep -A1 'Subject Alternative Name:' | tail -1
 
 
 *** Test Cases ***
@@ -31,15 +34,56 @@ Verify MicroShift Runs On Both NICs
     # Wait for MicroShift API readiness and run verification
     Wait For MicroShift
     Verify Hello MicroShift LB
-    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
+    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}
+    Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP2}
+    IP Should Be Present In External Certificate    ${USHIFT_HOST_IP1}
+    IP Should Be Present In External Certificate    ${USHIFT_HOST_IP2}
 
-Verify MicroShift Runs On First NIC
-    [Documentation]    Verify MicroShift can run on the first NIC
-    Verify MicroShift On One NIC    ${USHIFT_HOST_IP1}    ${NIC2_NAME}    ${USHIFT_HOST_IP1}    ${EMPTY}
+Verify MicroShift Runs Only On Primary NIC
+    [Documentation]    Verify MicroShift can run only on the primary NIC. The
+    ...    node IP will be taken from this NIC by default. When disabling the
+    ...    secondary NIC nothing will happen in MicroShift, as the IP did not
+    ...    change. A restart is forced so that MicroShift picks up the new
+    ...    configuration (without the secondary IP) and regenerates the
+    ...    certificates, which will be lacking the IP from secondary NIC.
+    [Setup]    Save Default MicroShift Config
 
-Verify MicroShift Runs On Second NIC
-    [Documentation]    Verify MicroShift can run on the second NIC
-    Verify MicroShift On One NIC    ${USHIFT_HOST_IP2}    ${NIC1_NAME}    ${EMPTY}    ${USHIFT_HOST_IP2}
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP1}
+
+    ${cur_pid}=    MicroShift Process ID
+
+    Login Switch To IP    ${USHIFT_HOST_IP1}
+    Disable Interface    ${NIC2_NAME}
+
+    Restart MicroShift
+
+    Verify MicroShift On Single NIC    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
+
+    [Teardown]    Restore Network Configuration By Rebooting Host
+
+Verify MicroShift Runs Only On Secondary NIC
+    [Documentation]    Verify MicroShift can run only on the secondary NIC. The
+    ...    node IP will change when disabling the primary interface, triggering
+    ...    an automatic restart of the service. After restarting, the node IP will
+    ...    be that of the secondary NIC, and certificates will be updated according
+    ...    to the new configuration (which includes only the secondary IP).
+    [Setup]    Save Default MicroShift Config
+
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP2}
+
+    ${cur_pid}=    MicroShift Process ID
+
+    Login Switch To IP    ${USHIFT_HOST_IP2}
+    Disable Interface    ${NIC1_NAME}
+
+    Wait Until MicroShift Process ID Changes    ${cur_pid}
+    Wait For MicroShift Service
+    Setup Kubeconfig
+    Wait For MicroShift
+
+    Verify MicroShift On Single NIC    ${USHIFT_HOST_IP2}    ${USHIFT_HOST_IP1}
+
+    [Teardown]    Restore Network Configuration By Rebooting Host
 
 
 *** Keywords ***
@@ -61,7 +105,6 @@ Verify Multiple NICs
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${NMCLI_CMD} | wc -l
     ...    return_stdout=True    return_stderr=True    return_rc=True
-    Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
     Should Be Equal As Strings    ${stdout}    ${NICS_COUNT}
 
@@ -79,24 +122,22 @@ Initialize Nmcli Variables
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${NMCLI_CMD} | head -1
     ...    return_stdout=True    return_stderr=True    return_rc=True
-    Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
     Set Suite Variable    \${NIC1_NAME}    ${stdout}
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${NMCLI_CMD} | tail -1
     ...    return_stdout=True    return_stderr=True    return_rc=True
-    Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
     Set Suite Variable    \${NIC2_NAME}    ${stdout}
 
-Nmcli Connection Control
-    [Documentation]    Run nmcli connection command with arguments
-    [Arguments]    ${command}    ${conn_name}
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    nmcli connection ${command} ${conn_name}
-    ...    sudo=True return_stdout=False    return_stderr=True    return_rc=True
-    Log    ${stderr}
+Disable Interface
+    [Documentation]    Disable NIC given in ${conn_name}. Change is not persistent. On
+    ...    the next reboot the interface will have its original status again.
+    [Arguments]    ${conn_name}
+    ${stderr}    ${rc}=    Execute Command
+    ...    nmcli connection down ${conn_name}
+    ...    sudo=True    return_stdout=False    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
 
 Login Switch To IP
@@ -109,54 +150,70 @@ Login Switch To IP
         Login MicroShift Host
     END
 
-Login Switch To IP1
-    [Documentation]    Switch to using the first IP for SSH connections
-    Login Switch To IP    ${USHIFT_HOST_IP1}
-
-Login Switch To IP2
-    [Documentation]    Switch to using the second IP for SSH connections
-    Login Switch To IP    ${USHIFT_HOST_IP2}
-
 Verify Hello MicroShift NodePort
     [Documentation]    Run Hello MicroShift NodePort verification
-    [Arguments]    ${ip1}    ${ip2}
+    [Arguments]    ${ip}
     Create Hello MicroShift Pod
     Expose Hello MicroShift Pod Via NodePort
 
-    IF    '${ip1}'!='${EMPTY}'
-        Wait Until Keyword Succeeds    30x    10s
-        ...    Access Hello Microshift    ${NP_PORT}    ${ip1}
-    END
-    IF    '${ip2}'!='${EMPTY}'
-        Wait Until Keyword Succeeds    30x    10s
-        ...    Access Hello Microshift    ${NP_PORT}    ${ip2}
-    END
+    Wait Until Keyword Succeeds    30x    10s
+    ...    Access Hello Microshift    ${NP_PORT}    ${ip}
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Pod And Service
 
-Verify MicroShift On One NIC
+Verify MicroShift On Single NIC
     [Documentation]    Generic procedure to verify MicroShift network
     ...    functionality while one of the network interfaces is down.
-    [Arguments]    ${login_ip}    ${down_nic}    ${verify_ip1}    ${verify_ip2}
+    [Arguments]    ${login_ip}    ${removed_ip}
 
-    ${cur_pid}=    MicroShift Process ID
-
-    Login Switch To IP    ${login_ip}
-    Nmcli Connection Control    down    ${down_nic}
-
-    # MicroShift should restart due to IP change
-    Wait Until MicroShift Process ID Changes    ${cur_pid}
-    Wait For MicroShift Service
-    Setup Kubeconfig
-
-    # Wait for MicroShift API readiness and run verification
-    Wait For MicroShift
     Verify Hello MicroShift LB
-    Verify Hello MicroShift NodePort    ${verify_ip1}    ${verify_ip2}
+    Verify Hello MicroShift NodePort    ${login_ip}
+    IP Should Be Present In External Certificate    ${login_ip}
+    IP Should Not Be Present In External Certificate    ${removed_ip}
 
-    # Rebooting MicroShift host restores the network configuration
-    [Teardown]    Run Keywords
-    ...    Reboot MicroShift Host
-    ...    Login Switch To IP1
-    ...    Wait For Healthy System
+Configure Subject Alternative Name
+    [Documentation]    Replace subjectAltNames entries in the configuration
+    ...    to include only the one provided in ${ip}.
+    [Arguments]    ${ip}
+
+    ${subject_alt_names}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiServer:
+    ...    \ \ subjectAltNames:
+    ...    \ \ - ${ip}
+
+    ${replaced}=    Replace MicroShift Config    ${subject_alt_names}
+    Upload MicroShift Config    ${replaced}
+
+Check IP Certificate
+    [Documentation]    Checks whether the ${ip} is present in the subject
+    ...    alternative names in ${CERT_FILE}.
+    [Arguments]    ${ip}    ${grep_opt}
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    ${OSSL_CMD} ${CERT_FILE} | ${GREP_SUBJ_IPS} | grep -w ${grep_opt} 'DNS:${ip}'
+    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+
+IP Should Be Present In External Certificate
+    [Documentation]    Check the specified IP presence in the external
+    ...    certificate file
+    [Arguments]    ${ip}
+
+    Check IP Certificate    ${ip}    ${EMPTY}
+
+IP Should Not Be Present In External Certificate
+    [Documentation]    Check the specified IP absence in the external
+    ...    certificate file
+    [Arguments]    ${ip}
+
+    Check IP Certificate    ${ip}    '--invert-match'
+
+Restore Network Configuration By Rebooting Host
+    [Documentation]    Restores network interface initial configuration
+    ...    by rebooting the host.
+    Restore Default MicroShift Config
+    Reboot MicroShift Host
+    Login Switch To IP    ${USHIFT_HOST_IP1}
+    Wait For Healthy System

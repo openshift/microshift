@@ -82,6 +82,20 @@ def yaml_merge(base, addition):
     return yaml.dump(combined)
 
 
+def yaml_replace(base, replacement):
+    """Return base YAML data structure with replacement values"""
+    if not base:
+        combined = {}
+    else:
+        combined = yaml.safe_load(base)
+    if not replacement:
+        parsed_replacement = {}
+    else:
+        parsed_replacement = yaml.safe_load(replacement)
+    combined.update(parsed_replacement)
+    return yaml.dump(combined)
+
+
 def update_kubeconfig_server_url(kubeconfig_text, new_url):
     """Change the server URL and return the new kubeconfig text."""
     parsed = yaml.safe_load(kubeconfig_text)
