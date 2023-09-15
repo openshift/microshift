@@ -1,6 +1,0 @@
-- kubernetes embedded-component 6eeca630886010d770b880e94540152066578cc4 to 2c287eb3d35003a8f746482ca30b461e9434b1cd
-  - 067664a63 2023-09-08T18:51:52+00:00 UPSTREAM: <carry>: cm: reorder setting of sched_load_balance for sandbox slice
-
-- kubernetes image-amd64 6eeca630886010d770b880e94540152066578cc4 to 2c287eb3d35003a8f746482ca30b461e9434b1cd
-  - 067664a63 2023-09-08T18:51:52+00:00 UPSTREAM: <carry>: cm: reorder setting of sched_load_balance for sandbox slice
-
