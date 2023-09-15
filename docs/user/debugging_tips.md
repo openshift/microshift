@@ -65,11 +65,14 @@ The following profiles are available:
  24 profiles, 91 plugins
 ```
 
-Log into the host running MicroShift and execute the following command to generate an obfuscated
-report that should not contain sensitive information (in this example only microshift plugins are
-enabled. Your system's output may vary):
+Log into the host running MicroShift and execute the following command to generate a
+report (in this example only microshift plugins are enabled. Your system's output may vary):
+
+> Note: If necessary, sensitive data in the sos report may be obfuscated with the `--clean` flag.  `sosreport` includes
+> kubernetes logs, which may be large.  Obfuscation processes on large files can take as long as several hours.
+
 ```bash
-$ sos report --batch --clean --all-logs --profile microshift
+$ sos report --batch --all-logs --profile microshift
 
 sosreport (version 4.3)
 
@@ -91,7 +94,7 @@ A mapping of obfuscated elements is available at
 	/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-private_map
 
 Your sosreport has been generated and saved in:
-	/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-obfuscated.tar.xz
+	/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz
 
 ...
 ```
@@ -100,8 +103,8 @@ Your sosreport has been generated and saved in:
 The output file and its checksum are generated in `/var/tmp/` directory.
 ```bash
 $ sudo ls -tr /var/tmp/sosreport-* | tail -2
-/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-obfuscated.tar.xz
-/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-obfuscated.tar.xz.sha256
+/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz
+/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz.sha256
 ```
 
 Upload the archives to Red Hat Technical Support as described in [this section](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/generating_sos_reports_for_technical_support/index#methods-for-providing-an-sos-report-to-red-hat-technical-support_generating-an-sosreport-for-technical-support)
