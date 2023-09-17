@@ -15,7 +15,7 @@ install -p -m755  %{SOURCE0}/microshift-test-agent.sh %{buildroot}%{_bindir}/mic
 restorecon -v %{buildroot}%{_bindir}/microshift-test-agent.sh
 
 install -d %{buildroot}%{_unitdir}
-install -p -m755 %{SOURCE0}/microshift-test-agent.service %{buildroot}%{_unitdir}/microshift-test-agent.service
+install -p -m644 %{SOURCE0}/microshift-test-agent.service %{buildroot}%{_unitdir}/microshift-test-agent.service
 
 %files
 %{_bindir}/microshift-test-agent.sh
