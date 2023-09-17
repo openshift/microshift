@@ -35,3 +35,8 @@ System Should Be Healthy
 
     ${health}=    Get Persisted System Health
     Should Be Equal As Strings    ${health}    healthy
+
+Restart Greenboot And Wait For Success
+    [Documentation]    Restart the greenboot-healthcheck service and check its status
+    Systemctl    restart    greenboot-healthcheck.service
+    Wait Until Greenboot Health Check Exited

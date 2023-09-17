@@ -101,11 +101,11 @@ Enable MicroShift
     Systemctl    enable    microshift.service
 
 Cleanup MicroShift
-    [Documentation]    Cleanup
-    ...    opts=[--keep-images]
-    [Arguments]    ${opts}=${EMPTY}
+    [Documentation]    Cleanup MicroShift data
+    [Arguments]    ${cmd}="--all"    ${opt}=${EMPTY}
+
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    echo 1 | sudo microshift-cleanup-data --all ${opts}
-    ...    sudo=True    return_stderr=True    return_rc=True
+    ...    echo 1 | sudo microshift-cleanup-data ${cmd} ${opt}
+    ...    return_stdout=True    return_stderr=True    return_rc=True
     Log Many    ${stdout}    ${stderr}    ${rc}
     Should Be Equal As Integers    ${rc}    0
