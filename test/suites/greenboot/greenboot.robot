@@ -3,6 +3,7 @@ Documentation       Tests related to greenboot
 
 Resource            ../../resources/systemd.resource
 Resource            ../../resources/ostree.resource
+Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/microshift-config.resource
 
 Suite Setup         Setup Suite
@@ -36,7 +37,7 @@ Simulate Service Failure
     [Documentation]    Simulate Service failure
     Restart Greenboot And Wait For Success
     Disrupt Service
-    Cleanup MicroShift    "--keep-images"
+    Cleanup MicroShift    --all    --keep-images
     Run Keyword And Expect Error    0 != 1
     ...    Systemctl    enable    --now microshift
     Run Keyword And Expect Error    0 != 1
@@ -88,11 +89,6 @@ Cleanup User Workload
     ...    sudo=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
-Restart Greenboot And Wait For Success
-    [Documentation]    Restart the greenboot-healthcheck service and check its status
-    Systemctl    restart    greenboot-healthcheck.service
-    Wait Until Greenboot Health Check Exited
-
 Disrupt Service
     [Documentation]    Prevent Microshift service from starting correctly.
     ${is_ostree}=    Is System OSTree
@@ -136,7 +132,7 @@ Disrupt Pod Network
 
 Cleanup And Start
     [Documentation]    Wipe Microshift data and start it.
-    Cleanup MicroShift    "--keep-images"
+    Cleanup MicroShift    --all    --keep-images
     Systemctl    enable    --now microshift
     Setup Kubeconfig
     Restart Greenboot And Wait For Success
