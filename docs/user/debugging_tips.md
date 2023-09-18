@@ -107,7 +107,7 @@ $ sudo ls -tr /var/tmp/sosreport-* | tail -2
 /var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz.sha256
 ```
 
-Upload the archives to Red Hat Technical Support as described in [this section](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/generating_sos_reports_for_technical_support/index#methods-for-providing-an-sos-report-to-red-hat-technical-support_generating-an-sosreport-for-technical-support)
+Upload the archives to Red Hat Technical Support as described in [this section](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/getting_the_most_from_your_support_experience/generating-an-sos-report-for-technical-support_getting-the-most-from-your-support-experience#methods-for-providing-an-sos-report-to-red-hat-technical-support_generating-an-sosreport-for-technical-support)
 
 The `sos` archives may consume significant disk space. Make sure to delete the report files after uploading them.
 
