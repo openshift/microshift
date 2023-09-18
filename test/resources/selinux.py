@@ -14,6 +14,9 @@ CONTEXT_CHECK_MAP = {
         "/var/lib/microshift",
         "/var/lib/microshift-backups",
     ],
+    "system_u:object_r:container_log_t:s0": [
+        "/var/log/kube-apiserver",
+    ],
     "system_u:object_r:kubelet_exec_t:s0": [
         "/usr/bin/microshift",
         "/usr/bin/microshift-etcd",
