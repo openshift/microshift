@@ -3,6 +3,7 @@ Documentation       Keywords for OSTree-based systems
 
 Resource            ostree-data.resource
 Library             Collections
+Library             SSHLibrary
 Library             selinux.py
 
 
@@ -31,6 +32,16 @@ Containers Should Not Have Access To Container Var Lib Labels
 
     ${default_result}=    Run Default Access Check
     Should Be Empty    ${default_result}
+
+    # Copy over a test file that forks and execs the given command
+    SSHLibrary.Put File    ./assets/selinux-test-exec.sh    /tmp/selinux-test-exec.sh
+
+    # Here we check that given a priveleged context, it can not domain transition to a context with privelage.
+    #
+    # Validate that the given path `kubelet_exec_t -> kubelet_t -> container_var_lib_t` should not be possible
+    # when running under context container_t
+    ${default_transition_result}=    Run Default Access Binary Transition Check    /tmp/selinux-test-exec.sh
+    Should Be Empty    ${default_transition_result}
 
 Folders Should Have Expected Fcontext Types
     [Documentation]    Performs a check to make sure the folders created during rpm install

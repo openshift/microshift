@@ -100,6 +100,30 @@ def run_access_check(access_check_map: dict[str, List[str]]) -> List[str]:
     return allowed_access
 
 
+# We want to validate that when a binary that forks a process or runs as a privileged process, the SELinux transition
+# for that binary can not gain access to specific files.
+# Here we test that first the provided bin DOES have access, then we validate that when running under the
+# container_t it no longer has access to those files.
+def run_binary_domain_transition_check(test_bin: str, access_check_map: dict[str, List[str]]) -> List[str]:
+    runcon_cmd = "runcon -u system_u -r system_r -t container_t"
+    error_list = []
+
+    # When running in the container_t context, there is no binary transition that will allow it access
+    for file_path, commands in access_check_map.items():
+        for command in commands:
+            stdout_access, rc_access = remote_sudo_rc(f"{test_bin} {command} {file_path} 2>&1")
+            BuiltIn().should_not_match(stdout_access, "*No such file or directory*")
+            if rc_access != 0:
+                error_list.append(f"test bin should have been allowed access to {file_path} when not under container_t")
+
+            stdout_denied, rc_denied = remote_sudo_rc(f"{runcon_cmd} {test_bin} {command} {file_path} 2>&1")
+            BuiltIn().should_not_match(stdout_denied, "*No such file or directory*")
+            if rc_denied == 0:
+                error_list.append(f"should not have been allowed access to {file_path} by running {command}")
+
+    return error_list
+
+
 # Gather a list of all files in the specified directory and call `run_access_check` to check `cat` access
 def run_access_check_on_dir(directory: str) -> List[str]:
     du_ls_cmd = "sudo du -a"
@@ -113,6 +137,20 @@ def run_access_check_on_dir(directory: str) -> List[str]:
 
 def run_default_access_check() -> List[str]:
     return run_access_check(ACCESS_CHECK_MAP)
+
+
+# In order to test binary transition escapes, we give a test script the kubelet_exec_t context which has a
+# kubelet_t entrypoint, meaning that kubelet_exec_t will allow a forked process a transition to a kubelet_t context.
+# The kubelet_t context has access to the container_var_lib_t context.
+def run_default_access_binary_transition_check(script_file_path: str) -> List[str]:
+    chcon_cmd = "chcon -t kubelet_exec_t"
+    chmod_cmd = "chmod +x"
+    error_list = []
+    stdout, rc = remote_sudo_rc(f"{chcon_cmd} {script_file_path} && {chmod_cmd} {script_file_path} 2>&1")
+    if rc != 0:
+        error_list.append(f"failed to chcon of test file {script_file_path} to kubelet_exec_t")
+        return error_list
+    return run_binary_domain_transition_check(script_file_path, ACCESS_CHECK_MAP)
 
 
 def run_fcontext_check() -> List[str]:
