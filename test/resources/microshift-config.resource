@@ -49,6 +49,13 @@ Extend MicroShift Config
     ${merged}=    Yaml Merge    ${DEFAULT_MICROSHIFT_CONFIG}    ${config}
     RETURN    ${merged}
 
+Replace MicroShift Config
+    [Documentation]    Return a replacement of the input argument in the default config
+    ...    as a string.
+    [Arguments]    ${config}
+    ${replaced}=    Yaml Replace    ${DEFAULT_MICROSHIFT_CONFIG}    ${config}
+    RETURN    ${replaced}
+
 Clear MicroShift Config
     [Documentation]    Remove any configuration file
     ${stdout}    ${rc}=    Execute Command
