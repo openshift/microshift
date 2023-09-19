@@ -16,7 +16,7 @@ fi
 sudo dnf install -y git osbuild-composer composer-cli ostree rpm-ostree \
     cockpit-composer bash-completion podman runc genisoimage \
     createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
-    containernetworking-plugins expect
+    containernetworking-plugins expect avahi-tools
 
 sudo systemctl enable osbuild-composer.socket --now
 sudo systemctl enable cockpit.socket --now
