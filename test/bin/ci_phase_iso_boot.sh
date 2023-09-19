@@ -37,31 +37,16 @@ bash -x ./bin/manage_hypervisor_config.sh create
 # repository.
 bash -x ./bin/start_webserver.sh
 
-declare -A pidToScenario
+BOOT_LOG="${IMAGEDIR}/boot_vms.json"
 
-# Build all of the needed VMs
-for scenario in "${SCENARIO_SOURCES}"/*.sh; do
-    scenario_name=$(basename "${scenario}" .sh)
-    logfile="${SCENARIO_INFO_DIR}/${scenario_name}/boot.log"
-    mkdir -p "$(dirname "${logfile}")"
-    bash -x ./bin/scenario.sh create "${scenario}" >"${logfile}" 2>&1 &
-    pidToScenario["$!"]="${scenario}"
-    sleep 5
-done
-
-set +x
-for pid in "${!pidToScenario[@]}"; do echo "${pid} - ${pidToScenario[${pid}]}"; done
-set -x
-
-FAIL=0
-for job in $(jobs -p); do
-    jobs -l
-    echo "Waiting for job: ${job}"
-    if ! wait "${job}"; then
-        ((FAIL += 1))
-        echo "Failed to boot VMs for scenario: ${pidToScenario[${job}]}"
-    fi
-done
+BOOT_OK=true
+if ! parallel \
+        --results "${BOOT_LOG}" \
+        --jobs 3 \
+        bash -x ./bin/scenario.sh create {} \
+        ::: "${SCENARIO_SOURCES}"/*.sh ; then
+    BOOT_OK=false
+fi
 
 echo "===================================="
 echo "System information after booting VMs"
@@ -72,7 +57,7 @@ sudo du -sk "${IMAGEDIR}"/* | sort -n
 sudo virsh list --all
 echo "===================================="
 
-if [ ${FAIL} -ne 0 ]; then
+if ! ${BOOT_OK}; then
     echo "Failed to boot all VMs"
     exit 1
 fi
