@@ -96,7 +96,7 @@ fi
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     dnf_retry clean all
     dnf_retry update
-    dnf_retry install "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion"
+    dnf_retry install "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools"
     sudo systemctl enable --now cockpit.socket
 fi
 
