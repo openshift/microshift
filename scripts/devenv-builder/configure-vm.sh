@@ -203,7 +203,6 @@ if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
     sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/tcp
     sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/udp
     sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp
-    sudo firewall-cmd --permanent --zone=public --add-service=mdns
     sudo firewall-cmd --reload
 fi
 
