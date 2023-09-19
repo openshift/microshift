@@ -8,6 +8,7 @@ Library             SSHLibrary
 Resource            oc.resource
 Resource            systemd.resource
 Resource            microshift-host.resource
+Resource            microshift-etcd-process.resource
 Library             DataFormats.py
 
 
@@ -80,17 +81,11 @@ Wait For MicroShift Service
 
 Restart MicroShift
     [Documentation]    Restart the MicroShift service
-    # Use separate stop and start steps to avoid a race condition with
-    # restart where we can't tell when it is down and so we can't tell
-    # whether we should count it as back up yet. Forcing the service
-    # down, then back up, ensures that when we do things like check
-    # systemd settings for the running process we get the values we
-    # expect without worrying about the race. Any test that modifies
-    # the MicroShift configuration file will be more reliable as a
-    # result.
-    Stop MicroShift
-    Sleep    10 seconds
-    Start MicroShift
+    ${ushift_pid}=    MicroShift Process ID
+    ${ushift_etcd_pid}=    MicroShift Etcd Process ID
+    Systemctl With Retry    restart    microshift.service
+    Wait Until MicroShift Process ID Changes    ${ushift_pid}
+    Wait Until MicroShift Etcd Process ID Changes    ${ushift_etcd_pid}
     Wait For MicroShift
 
 Stop MicroShift
