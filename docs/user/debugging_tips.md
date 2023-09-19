@@ -65,38 +65,24 @@ The following profiles are available:
  24 profiles, 91 plugins
 ```
 
-Log into the host running MicroShift and execute the following command to generate a
-report (in this example only microshift plugins are enabled. Your system's output may vary):
-
-> Note: If necessary, sensitive data in the sos report may be obfuscated with the `--clean` flag.  `sosreport` includes
-> kubernetes logs, which may be large.  Obfuscation processes on large files can take as long as several hours.
+Log into the host running MicroShift and execute the following command to generate a report (in this example only 
+microshift plugins are enabled. Your system's output may vary):
 
 ```bash
-$ sos report --batch --all-logs --profile microshift
+$ sudo microshift-sos-report
 
-sosreport (version 4.3)
+sosreport (version 4.5.6)
 
-...
-
- Setting up archive ...
- Setting up plugins ...
- Running plugins. Please wait ...
-
-  Starting 1/1   microshift      [Running: microshift]
-
-  Finished running plugins
-
-Successfully obfuscated 1 report(s)
-
-Creating compressed archive...
-
-A mapping of obfuscated elements is available at
-	/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-private_map
 
 Your sosreport has been generated and saved in:
-	/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz
+        /tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz
 
-...
+ Size   7.74MiB
+ Owner  root
+ sha256 850ecd95897441e0ed6ff4595a0e2d46aaa5582b67ce84b32625041498dd0e1d
+
+Please send this file to your support representative.
+
 ```
 > Sos must always run with root privileges.
 
