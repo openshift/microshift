@@ -7,19 +7,19 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "${SOURCE_VERSION}"
+version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "${SOURCE_VERSION}"
+version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-networking"
-version = "${SOURCE_VERSION}"
+version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "${SOURCE_VERSION}"
+version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-test-agent"
@@ -38,4 +38,9 @@ enabled = ["mdns", "ssh", "http", "https"]
 name = "trusted"
 sources = ["10.42.0.0/16", "169.254.169.1"]
 
-RENDER_CONTAINER_IMAGES="${SOURCE_VERSION}"
+{{- if env.Getenv "SOURCE_IMAGES" "" }}
+{{ range (.Env.SOURCE_IMAGES | strings.Split ",") }}
+[[containers]]
+source = "{{ . }}"
+{{ end }}
+{{- end -}}

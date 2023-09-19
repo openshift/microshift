@@ -39,8 +39,14 @@ configure_package_sources() {
     for template in "${TESTDIR}"/package-sources/*.toml; do
         name=$(basename "${template}" .toml)
         outfile="${IMAGEDIR}/package-sources/${name}.toml"
+
         echo "Rendering ${template} to ${outfile}"
-        envsubst <"${template}" >"${outfile}"
+        ${GOMPLATE} --file "${template}" >"${outfile}" 
+        if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
+            echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
+            continue
+        fi
+
         echo "Adding package source from ${outfile}"
         if sudo composer-cli sources list | grep "^${name}\$"; then
             sudo composer-cli sources delete "${name}"
@@ -56,22 +62,10 @@ configure_package_sources() {
     done
 }
 
-# Read a macro from a blueprint file and expand it into the list of the
-# container images. The format for the macro is "RENDER_CONTAINER_IMAGES=version".
-# The version is necessary to query the release info from the appropriate RPM package.
-render_container_images() {
-    local -r blueprint_file="${1}"
-    # Exit when no macro is present in the blueprint
-    if ! grep -q ^RENDER_CONTAINER_IMAGES= "${blueprint_file}" ; then
-        return
-    fi
-
-    # Extract the version string
-    local -r version="$(grep ^RENDER_CONTAINER_IMAGES= "${blueprint_file}" | cut -d'=' -f2 | xargs)"
-    if [ -z "${version}" ] ; then
-        echo "Error: missing version string for the RENDER_CONTAINER_IMAGES macro in ${blueprint_file}"
-        exit 1
-    fi
+# Reads release-info RPM for provided version to obtain images 
+# and returns them as comma-separated list.
+get_container_images() {
+    local -r version="${1}"
 
     # Find the microshift-release-info RPM with the specified version
     local -r release_info_rpm=$(find "${IMAGEDIR}/rpm-repos" -name "microshift-release-info-${version}*.rpm" | sort | tail -1)
@@ -80,21 +74,8 @@ render_container_images() {
         exit 1
     fi
 
-    local -r release_tmp_dir=$(mktemp -d)
-    pushd "${release_tmp_dir}" >&/dev/null
-
-    # Extract the release info from the RPM
-    rpm2cpio "${release_info_rpm}" | cpio --quiet -idm "*release-$(uname -m).json"
-    # Delete the macro from the original blueprint
-    sed -i 's/^RENDER_CONTAINER_IMAGES=.*//g' "${blueprint_file}"
-    # Append the container images to the blueprint file
-    jq -r '.images | .[] | ("\n[[containers]]\nsource = \"" + . + "\"\n")' \
-        "./usr/share/microshift/release/release-$(uname -m).json" \
-        >> "${blueprint_file}"
-
-    # Cleanup
-    popd >&/dev/null
-    rm -rf "${release_tmp_dir}"
+    # Extract list of image URIs and join them with a comma
+    rpm2cpio "${release_info_rpm}" | cpio  -i --to-stdout "*release-$(uname -m).json" 2> /dev/null | jq -r '[ .images[] ] | join(",")'
 }
 
 # Given a blueprint filename, extract the name value. It does not have
@@ -203,6 +184,9 @@ do_group() {
     local template
     local template_list
 
+    SOURCE_IMAGES="$(get_container_images "${SOURCE_VERSION}")"
+    export SOURCE_IMAGES
+
     # Upload the blueprint definitions
     if [ -n "${template_arg}" ]; then
         template_list="${template_arg}"
@@ -219,10 +203,13 @@ do_group() {
         echo "Blueprint ${template}"
 
         blueprint_file="${IMAGEDIR}/blueprints/$(basename "${template}")"
+
         echo "Rendering ${template} to ${blueprint_file}"
-        envsubst <"${template}" >"${blueprint_file}"
-        echo "Rendering container images to ${blueprint_file}"
-        render_container_images "${blueprint_file}"
+        ${GOMPLATE} --file "${template}" >"${blueprint_file}"
+        if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
+            echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
+            continue
+        fi
 
         blueprint=$(get_blueprint_name "${blueprint_file}")
 
@@ -265,7 +252,7 @@ do_group() {
 
     if ${BUILD_INSTALLER}; then
         for image_installer in "${groupdir}"/*.image-installer; do
-            blueprint=$(envsubst < "${image_installer}")
+            blueprint=$("${GOMPLATE}" --file "${image_installer}")
             echo "Building image-installer from ${blueprint}"
             buildid=$(sudo composer-cli compose start \
                            "${blueprint}" \
@@ -420,6 +407,10 @@ while getopts "iIg:st:h" opt; do
             ;;
     esac
 done
+
+if [ ! -f "${GOMPLATE}" ]; then
+    "${ROOTDIR}/scripts/fetch_tools.sh" gomplate
+fi
 
 # Determine the version of the RPM in the local repo so we can use it
 # in the blueprint templates.
