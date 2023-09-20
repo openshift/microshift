@@ -248,14 +248,28 @@ func getVersionFile() (versionFile, error) {
 	if err != nil {
 		return versionFile{}, fmt.Errorf("reading %q failed: %w", versionFilePath, err)
 	}
+	return parseVersionFile(versionFileContents)
+}
 
+func parseVersionFile(contents []byte) (versionFile, error) {
 	verFile := versionFile{}
-	if err := json.Unmarshal(versionFileContents, &verFile); err != nil {
-		return versionFile{},
-			fmt.Errorf("unmarshalling %q failed: %w", string(versionFileContents), err)
+	jsonErr := json.Unmarshal(contents, &verFile)
+	if jsonErr == nil {
+		return verFile, nil
 	}
 
-	return verFile, nil
+	// Unmarshalling version as json failed - fallback to using previous version file schema
+	verMetadata, fallbackErr := versionMetadataFromString(string(contents))
+	if fallbackErr != nil {
+		return versionFile{},
+			fmt.Errorf("parsing %q failed: %w", string(contents), errors.Join(jsonErr, fallbackErr))
+	}
+
+	return versionFile{
+		Version:      verMetadata,
+		BootID:       "",
+		DeploymentID: "",
+	}, nil
 }
 
 func GetVersionStringOfData() string {
