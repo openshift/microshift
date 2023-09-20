@@ -82,6 +82,10 @@ SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
 # shellcheck disable=SC2034  # used elsewhere
 RF_VENV=${RF_VENV:-${ROOTDIR}/_output/robotenv}
 
+# The location of the gomplate binary.
+# shellcheck disable=SC2034  # used elsewhere
+GOMPLATE=${ROOTDIR}/_output/bin/gomplate
+
 # Which port the web server should run on.
 WEB_SERVER_PORT=${WEB_SERVER_PORT:-8080}
 
