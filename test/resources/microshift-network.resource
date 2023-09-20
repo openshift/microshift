@@ -33,12 +33,13 @@ Expose Hello MicroShift Pod Via NodePort
 
 Access Hello Microshift
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}
 
     ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${ushift_ip}:${ushift_port}"
+    ${url_path}=    Set Variable    "http://hello-microshift.cluster.local${path}"
 
     ${result}=    Run Process
-    ...    curl -i http://hello-microshift.cluster.local --connect-to ${connect_to}
+    ...    curl -i ${url_path} --connect-to ${connect_to}
     ...    shell=True
     ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
