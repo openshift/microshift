@@ -78,3 +78,56 @@ func TestVersionFileSerialization(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, v, *deserialized)
 }
+
+func TestParseVersionFile(t *testing.T) {
+	testData := []struct {
+		input          string
+		expectedResult versionFile
+		errorExpected  bool
+	}{
+		{
+			input: `{"version":"4.14.0","deployment_id":"deploy-id","boot_id":"b-id"}`,
+			expectedResult: versionFile{
+				Version:      versionMetadata{Major: 4, Minor: 14, Patch: 0},
+				DeploymentID: "deploy-id",
+				BootID:       "b-id",
+			},
+			errorExpected: false,
+		},
+		{
+			input: `4.14.0`,
+			expectedResult: versionFile{
+				Version:      versionMetadata{Major: 4, Minor: 14, Patch: 0},
+				DeploymentID: "",
+				BootID:       "",
+			},
+			errorExpected: false,
+		},
+		{
+			input:         `4.14.`,
+			errorExpected: true,
+		},
+		{
+			input:         `4.14`,
+			errorExpected: true,
+		},
+		{
+			input:         `4`,
+			errorExpected: true,
+		},
+		{
+			input:         ``,
+			errorExpected: true,
+		},
+	}
+
+	for _, td := range testData {
+		out, err := parseVersionFile([]byte(td.input))
+		if td.errorExpected {
+			assert.Error(t, err)
+		} else {
+			assert.NoError(t, err)
+			assert.Equal(t, td.expectedResult, out)
+		}
+	}
+}
