@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: hello-microshift
+  annotations:
+    haproxy.org/path-rewrite: /principal/(.*) /\1
+spec:
+  rules:
+    - host: hello-microshift.cluster.local
+      http:
+        paths:
+          - path: /principal
+            pathType: Prefix
+            backend:
+              service:
+                name: hello-microshift
+                port: 
+                  number: 8080
