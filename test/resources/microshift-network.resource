@@ -18,6 +18,10 @@ Create Hello MicroShift Pod
     Oc Create    -f ${HELLO_USHIFT} -n ${NAMESPACE}
     Oc Wait For    pods -l app=hello-microshift    condition\=Ready    timeout=300s
 
+Expose Hello MicroShift
+    [Documentation]    Expose the "hello microshift" application via cluster ip service
+    Run With Kubeconfig    oc expose pod hello-microshift -n ${NAMESPACE}
+
 Expose Hello MicroShift Pod Via LB
     [Documentation]    Expose the "hello microshift" application through the load balancer
     Run With Kubeconfig    oc create service loadbalancer hello-microshift --tcp=${LB_PORT}:8080 -n ${NAMESPACE}
