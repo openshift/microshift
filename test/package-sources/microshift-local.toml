@@ -1,7 +1,7 @@
 id = "microshift-local"
 name = "MicroShift Local Repo"
 type = "yum-baseurl"
-url = "file://${LOCAL_REPO}/"
+url = "file://{{ .Env.LOCAL_REPO }}/"
 check_gpg = false
 check_ssl = false
 system = false
