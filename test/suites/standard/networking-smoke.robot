@@ -11,8 +11,10 @@ Suite Teardown      Teardown Suite With Namespace
 
 Test Tags           smoke
 
+
 *** Variables ***
 ${HELLO_USHIFT_INGRESS}     ./assets/hello-microshift-ingress.yaml
+
 
 *** Test Cases ***
 Router Smoke Test
@@ -46,6 +48,7 @@ Ingress Smoke Test
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Ingress
     ...    Delete Hello MicroShift Pod And Service
+
 
 *** Keywords ***
 Expose Hello MicroShift Service Via Route
