@@ -10,7 +10,7 @@ require (
 	github.com/openshift/api v0.0.0-20230807132801-600991d550ac
 	github.com/openshift/build-machinery-go v0.0.0-20230306181456-d321ffa04533
 	github.com/openshift/client-go v0.0.0-20230503144108-75015d2347cb
-	github.com/openshift/cluster-policy-controller v0.0.0-20230823075520-b3cb22fa4830
+	github.com/openshift/cluster-policy-controller b3cb22fa48308962b4b520cd3ae694967c769bae
 	github.com/openshift/library-go v0.0.0-20230908101047-d058c695f677
 	github.com/openshift/route-controller-manager v0.0.0-20230809110842-0a976ea8bb9f
 	github.com/pkg/errors v0.9.1 // indirect
