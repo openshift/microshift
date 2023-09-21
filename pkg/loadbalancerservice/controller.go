@@ -45,7 +45,11 @@ func (c *LoadbalancerServiceController) Name() string {
 }
 
 func (c *LoadbalancerServiceController) Dependencies() []string {
-	return []string{}
+	return []string{
+		"network-configuration",
+		"kube-apiserver",                  // needed for informers
+		"infrastructure-services-manager", // starts CNI
+	}
 }
 
 func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
