@@ -14,6 +14,7 @@ Test Tags           smoke
 
 *** Variables ***
 ${HELLO_USHIFT_INGRESS}     ./assets/hello-microshift-ingress.yaml
+${HOSTNAME}                 hello-microshift.cluster.local
 
 
 *** Test Cases ***
@@ -27,7 +28,7 @@ Router Smoke Test
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}
 
-    Resolve Hello MicroShift MDNS
+    DNS Entry For Route Should Resolve
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Route
@@ -70,12 +71,12 @@ Delete Hello MicroShift Ingress
     [Documentation]    Delete ingress for cleanup.
     Oc Delete    -f ${HELLO_USHIFT_INGRESS} -n ${NAMESPACE}
 
-Resolve Hello MicroShift MDNS
-    [Documentation]    Resolve hello-microshift route via mDNS from the hypervisor/RF runner.
+DNS Entry For Route Should Resolve
+    [Documentation]    Resolve the name for a route via mDNS from the hypervisor/RF runner.
     ...    Expects RF runner host has opened port 5353 for libvirt zone.
 
     ${result}=    Run Process
-    ...    avahi-resolve-host-name hello-microshift.cluster.local
+    ...    avahi-resolve-host-name ${HOSTNAME}
     ...    shell=True
     ...    timeout=15s
     Log Many    ${result.stdout}    ${result.stderr}
