@@ -394,7 +394,6 @@ github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFb
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0 h1:BZHcxBETFHIdVyhyEfOvn/RdU/QGdLI4y34qQGjGWO0=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0/go.mod h1:hgWBS7lorOAVIJEQMi4ZsPv9hVvWI6+ch50m39Pf2Ks=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
-github.com/hashicorp/golang-lru v0.5.1 h1:0hERBMJE1eitiLkihrMvRVBYAkpHzc/J3QdDN+dAcgU=
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.4 h1:YDjusn29QI/Das2iO9M0BHnIbxPeyuCHsjMW+lJfyTc=
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
@@ -507,8 +506,6 @@ github.com/opencontainers/runtime-spec v1.0.3-0.20220909204839-494a5a6aca78 h1:R
 github.com/opencontainers/runtime-spec v1.0.3-0.20220909204839-494a5a6aca78/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opencontainers/selinux v1.10.0 h1:rAiKF8hTcgLI3w0DHm6i0ylVVcOrlgR1kK99DRLDhyU=
 github.com/opencontainers/selinux v1.10.0/go.mod h1:2i0OySw99QjzBBQByd1Gr9gSjvuho1lHsJxIJ3gGbJI=
-github.com/openshift/api v0.0.0-20230703134140-1c2204a0195c h1:b1aPWPgW3MyK4BEKFjKBIHTV2LrdwGwErITEUw//xl4=
-github.com/openshift/api v0.0.0-20230703134140-1c2204a0195c/go.mod h1:4VWG+W22wrB4HfBL88P40DxLEpSOaiBVxUnfalfJo9k=
 github.com/openshift/api v0.0.0-20230807132801-600991d550ac h1:HqT8MmYGXiUGUW0BjygTGOOvqO2wIsTaG3q8nboJyPY=
 github.com/openshift/api v0.0.0-20230807132801-600991d550ac/go.mod h1:yimSGmjsI+XF1mr+AKBs2//fSXIOhhetHGbMlBEfXbs=
 github.com/openshift/apiserver-library-go v0.0.0-20230807133552-675520b3d567 h1:s+XH/hrs4bb61OtP2OVnTIEU2MMiOqy/DZk8Q9dqvjY=
@@ -577,8 +574,6 @@ github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-2023091203
 github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20230912035909-2c287eb3d350/go.mod h1:FKR/pGAN4OT9lUvsUrbcBup8FdVXo2FxTF3MiZZjJWw=
 github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20230912035909-2c287eb3d350 h1:cvAmlYBlEC+vcz9TaRra5qEQH58qG/h00A8zrov7rEE=
 github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20230912035909-2c287eb3d350/go.mod h1:avu3AaWDIk2l9Ip/rt8oWZmsQ2oYibJzble98CyL9uk=
-github.com/openshift/library-go v0.0.0-20230516103935-9536341565eb h1:B1VhZf/XTcInahu7XmosGLDGlKgJHj9eYtNBq+tA2dY=
-github.com/openshift/library-go v0.0.0-20230516103935-9536341565eb/go.mod h1:PJVatR/oS/EaFciwylyAr9hORSqQHrC+5bXf4L0wsBY=
 github.com/openshift/library-go v0.0.0-20230908101047-d058c695f677 h1:TCNe5+9j3PpHY3lLPA355ejCaz0/r7OxFoyDSMzaJcw=
 github.com/openshift/library-go v0.0.0-20230908101047-d058c695f677/go.mod h1:ZFwNwC3opc/7aOvzUbU95zp33Lbxet48h80ryH3p6DY=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230317131656-c62d9de5a460 h1:PftK9Q7BUD+wj8fNvxtJ+RhxYkcTtd8LcAo1Gk1H1HM=
