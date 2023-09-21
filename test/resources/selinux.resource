@@ -21,6 +21,7 @@ Validate SELinux
     [Documentation]    Wrapper call for all SELinux checks
 
     Containers Should Not Have Access To Container Var Lib Labels
+    Run Default Traversal Access Check
     Folders Should Have Expected Fcontext Types
     Semanage Fcontext Should Have Combined List Of OCP And MicroShift Rules
     Audit Log Should Be Empty For MicroShift

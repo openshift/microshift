@@ -61,6 +61,10 @@ EXPECTED_FCONTEXT_LIST = [
     "/var/lib/registry(/.*)?",
 ]
 
+SOURCE_TARGET_TRANSITION = {
+    "container_t": ["container_var_lib_t"]
+}
+
 
 def get_expected_ocp_microshift_fcontext_list() -> List[str]:
     return EXPECTED_FCONTEXT_LIST
@@ -151,6 +155,58 @@ def run_default_access_binary_transition_check(script_file_path: str) -> List[st
         error_list.append(f"failed to chcon of test file {script_file_path} to kubelet_exec_t")
         return error_list
     return run_binary_domain_transition_check(script_file_path, ACCESS_CHECK_MAP)
+
+
+# For a given root source, query transition process types to recursivly
+def get_all_traversal_transition_contexts(source: str) -> List[str]:
+    sesearch_cmd = "sesearch --type_trans -c process -s"
+    accum = []
+    # Search for a process transition from the specified source
+    stdout, rc = remote_sudo_rc(f"{sesearch_cmd} {source} | awk '{{ print $3 }}' 2>&1")
+    BuiltIn().should_be_equal_as_integers(rc, 0)
+
+    transition_contexts = stdout.splitlines()
+    if len(transition_contexts) == 0:
+        return accum
+
+    for context in transition_contexts:
+        source = context.split(":")[0]
+        accum.append(source)
+        result = get_all_traversal_transition_contexts(source)
+        accum.extend(result)
+
+    # Remove dups
+    return list(set(accum))
+
+
+# Given a source context and target source target, try and traverse the process transiton path to see
+# if it's possible to gain access to the target context.
+def run_traversal_access_check(source_target_map: dict[str, List[str]]) -> List[str]:
+    allow_cmd = "sesearch -S -A"
+    error_list = []
+
+    for parent_source, targets in source_target_map.items():
+        # For a parent source, follow to get all possible sources
+        # i.e source_a --transition--> source_b --transition--> source_c
+        all_sources = get_all_traversal_transition_contexts(parent_source)
+        if len(all_sources) == 0:
+            return error_list
+
+        # for all desired targets check if the identified sources have allow rules to our target
+        # currently, we fail on any allow rules existing
+        for target in targets:
+            for source in all_sources:
+                stdout, rc = remote_sudo_rc(f"{allow_cmd} -s {source} -t {target} 2>&1")
+                if rc != 0:
+                    error_list.append(f"failed to run command {allow_cmd} on source: {source} and target: {target}")
+                if stdout != "":
+                    error_list.append(f"found access from source: {source} to target: {target}")
+
+    return error_list
+
+
+def run_default_traversal_access_check() -> List[str]:
+    return run_traversal_access_check(SOURCE_TARGET_TRANSITION)
 
 
 def run_fcontext_check() -> List[str]:
