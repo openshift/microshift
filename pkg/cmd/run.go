@@ -20,10 +20,12 @@ import (
 	"github.com/openshift/microshift/pkg/loadbalancerservice"
 	"github.com/openshift/microshift/pkg/mdns"
 	"github.com/openshift/microshift/pkg/node"
+	"github.com/openshift/microshift/pkg/release"
 	"github.com/openshift/microshift/pkg/servicemanager"
 	"github.com/openshift/microshift/pkg/sysconfwatch"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
+	"github.com/openshift/microshift/pkg/version"
 	"github.com/spf13/cobra"
 
 	"k8s.io/klog/v2"
@@ -57,6 +59,9 @@ func NewRunMicroshiftCommand() *cobra.Command {
 	}
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		versionInfo := version.Get()
+		klog.InfoS("Version", "microshift", versionInfo.String(), "base", release.Base)
+
 		cfg, err := config.ActiveConfig()
 		if err != nil {
 			return err
