@@ -24,7 +24,7 @@ validate that all the required MicroShift services are up and running. The healt
 check script is packaged in the separate mandatory `microshift-greenboot` RPM,
 which has an explicit dependency on the `greenboot` RPM.
 
-The health check script is installed into the `/etc/greenboot/check/required.d`
+The health check script is installed into the `/usr/lib/greenboot/check/required.d`
 directory and it is not executed during the system boot in case the `greenboot`
 package is not present.
 

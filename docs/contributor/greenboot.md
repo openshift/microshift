@@ -23,9 +23,9 @@ at this time.
 
 Proceed by creating a health check script in the `/etc/greenboot/check/required.d`
 directory.
-> The name prefix of the user script should be chosen to make sure it runs after
-> the `40_microshift_running_check.sh` script, which implements the MicroShift
-> health check procedure for its core services.
+> The name prefix of the user script should be chosen appropriately.
+> Because MicroShift's healthcheck resides in `/usr/lib/greenboot/check/require.d`,
+> it will run before any checks in `/etc/greenboot/check/require.d`.
 
 ```
 SCRIPT_FILE=/etc/greenboot/check/required.d/50_busybox_running_check.sh

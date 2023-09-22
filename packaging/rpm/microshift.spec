@@ -244,8 +244,8 @@ install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinu
 install -d -m755 %{buildroot}%{_datadir}/microshift/functions
 install -p -m644 packaging/greenboot/functions.sh %{buildroot}%{_datadir}/microshift/functions/greenboot.sh
 
-install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/check/required.d
-install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
+install -d -m755 %{buildroot}%{_prefix}/lib/greenboot/check/required.d
+install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_prefix}/lib/greenboot/check/required.d/40_microshift_running_check.sh
 
 install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
 install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
@@ -345,7 +345,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/configure-ovs-microshift.sh
 
 %files greenboot
-%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
+%{_prefix}/lib/greenboot/check/required.d/40_microshift_running_check.sh
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
 %{_sysconfdir}/greenboot/red.d/40_microshift_set_unhealthy.sh
 %{_sysconfdir}/greenboot/green.d/40_microshift_set_healthy.sh
@@ -354,6 +354,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Fri Sep 22 2023 Patryk Matuszak <pmatusza@redhat.com> 4.14.0
+- Move healthcheck script to /usr/lib/greenboot
+
 * Wed Sep 06 2023 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.14.0
 - Add microshift-sos-report binary
 

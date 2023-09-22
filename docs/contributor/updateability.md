@@ -175,7 +175,8 @@ with it see following enhancements:
 [MicroShift updateability in ostree based systems: integration with greenboot](https://github.com/openshift/enhancements/blob/master/enhancements/microshift/microshift-updateability-ostree.md#integration-with-greenboot)
 
 In short, on system boot, greenboot will run health check scripts
-(residing in `/etc/greenboot/check/{required.d,wanted.d}/`)
+(residing in `/usr/lib/greenboot/check/{required.d,wanted.d}/` and
+`/etc/greenboot/check/{required.d,wanted.d}/`)
 and, depending on result of *required* scripts, will run either "green" 
 (healthy) or "red" (unhealthy) scripts. 
 
