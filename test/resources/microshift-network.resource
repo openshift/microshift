@@ -18,6 +18,10 @@ Create Hello MicroShift Pod
     Oc Create    -f ${HELLO_USHIFT} -n ${NAMESPACE}
     Oc Wait For    pods -l app=hello-microshift    condition\=Ready    timeout=300s
 
+Expose Hello MicroShift
+    [Documentation]    Expose the "hello microshift" application via cluster ip service
+    Run With Kubeconfig    oc expose pod hello-microshift -n ${NAMESPACE}
+
 Expose Hello MicroShift Pod Via LB
     [Documentation]    Expose the "hello microshift" application through the load balancer
     Run With Kubeconfig    oc create service loadbalancer hello-microshift --tcp=${LB_PORT}:8080 -n ${NAMESPACE}
@@ -29,12 +33,13 @@ Expose Hello MicroShift Pod Via NodePort
 
 Access Hello Microshift
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}
 
     ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${ushift_ip}:${ushift_port}"
+    ${url_path}=    Set Variable    "http://hello-microshift.cluster.local${path}"
 
     ${result}=    Run Process
-    ...    curl -i http://hello-microshift.cluster.local --connect-to ${connect_to}
+    ...    curl -i ${url_path} --connect-to ${connect_to}
     ...    shell=True
     ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
