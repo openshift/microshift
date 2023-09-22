@@ -1,3 +1,4 @@
-- ovn-kubernetes image-amd64 495fe5a86a335072d6f5512c011142188fec0a6d to e56387263b152ddff938addda8bbd787db2ddf2d
+- ovn-kubernetes image-arm64 3169692876363cef51e57871d7a895cb7ecd2f70 to e56387263b152ddff938addda8bbd787db2ddf2d
   - d597385 2023-09-16T09:27:01-05:00 Dockerfile: bump OVN to ovn23.09-23.09.0-beta.31.el9fdp
+  - e04b010 2023-04-23T09:51:35+00:00 Updating ovn-kubernetes-microshift images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/7575d251c23bb6784e1f762f3566c2770b051097/images/ovn-kubernetes-microshift.yml
 
