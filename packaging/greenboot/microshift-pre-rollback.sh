@@ -40,5 +40,10 @@ if ! grub2-editenv - list | grep -q ^boot_counter=0 ; then
     exit 0
 fi
 
-echo "System rollback imminent - preparing MicroShift for a clean start"
+echo "System rollback imminent"
+
+echo "Instructing MicroShift to restore backup on rollback"
+touch /var/lib/microshift-backups/restore
+
+echo "Preparing MicroShift for a clean start"
 microshift-cleanup-data --ovn

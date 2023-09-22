@@ -2,12 +2,18 @@ package prerun
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	datadir "github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
+)
+
+var (
+	restoreFilepath = filepath.Join(config.BackupsDir, "restore")
 )
 
 func DataManagement(dataManager datadir.Manager) error {
@@ -17,7 +23,7 @@ func DataManagement(dataManager datadir.Manager) error {
 		dataManager: dataManager,
 	}
 
-	if err := dm.Perform(); err != nil {
+	if err := dm.newPerform(); err != nil {
 		klog.ErrorS(err, "FAIL pre-run data management")
 		return err
 	}
@@ -32,6 +38,188 @@ type importantPathsExistence struct {
 
 type dataManagement struct {
 	dataManager datadir.Manager
+}
+
+func (dm *dataManagement) newPerform() error {
+	if isOstree, err := util.PathExists("/run/ostree-booted"); err != nil {
+		return fmt.Errorf("failed to check if system is ostree: %w", err)
+	} else if !isOstree {
+		klog.InfoS("System is not OSTree-based - skipping data management")
+		return nil
+	}
+
+	klog.Info("START creating backup")
+	if err := dm.alwaysBackup(); err != nil {
+		klog.ErrorS(err, "FAIL creating backup")
+		return err
+	}
+	klog.Info("END creating backup")
+
+	klog.InfoS("START optional restore")
+	if err := dm.optionalRestore(); err != nil {
+		klog.ErrorS(err, "FAIL optional restore")
+		return err
+	}
+	klog.InfoS("END optional restore")
+
+	return nil
+}
+
+func (dm *dataManagement) alwaysBackup() error {
+	dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
+	if err != nil {
+		return fmt.Errorf("failed to check if data directory exists: %w", err)
+	}
+	if !dataExists {
+		klog.InfoS("MicroShift data does not exist - skipping backup, continuing startup")
+		return nil
+	}
+
+	versionFileExists, err := util.PathExistsAndIsNotEmpty(versionFilePath)
+	if err != nil {
+		return fmt.Errorf("checking if version metadata exists failed: %w", err)
+	}
+	if !versionFileExists {
+		klog.InfoS("Data exists, but version file is missing - assuming pre-4.14 data")
+		return dm.backup413()
+	}
+
+	versionFile, err := getVersionFile()
+	if err != nil {
+		return fmt.Errorf("loading version metadata failed: %w", err)
+	}
+	klog.InfoS("Contents of version file", "contents", versionFile)
+	return dm.newBackup(versionFile)
+}
+
+func (dm *dataManagement) optionalRestore() error {
+	restoreFileExists, err := util.PathExists(restoreFilepath)
+	if err != nil {
+		return err
+	}
+
+	if !restoreFileExists {
+		klog.InfoS("Restore marker file does not exist - skipping restore, "+
+			"continuing startup with current data", "path", restoreFilepath)
+		return nil
+	}
+	klog.InfoS("Restore marker file exists - attempting to restore",
+		"path", restoreFilepath)
+
+	currentDeploymentID, err := getCurrentDeploymentID()
+	if err != nil {
+		return err
+	}
+
+	existingBackups, err := getBackups(dm.dataManager)
+	if err != nil {
+		return err
+	}
+
+	backup := existingBackups.getForDeployment(currentDeploymentID).getOnlyHealthyBackups().getOneOrNone() // TODO: remove getOnlyHealthyBackups
+
+	if backup == "" {
+		klog.InfoS("WARNING: MicroShift was instructed to restore a backup, "+
+			"but there is no backup for the deployment - continuing start up with current data",
+			"deploymentID", currentDeploymentID)
+		return nil
+	}
+
+	dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
+	if err != nil {
+		return fmt.Errorf("failed to check if data directory exists: %w", err)
+	}
+	if !dataExists {
+		// Data doesn't exist, we have suitable backup, let's restore
+		if err := dm.restore(backup); err != nil {
+			klog.ErrorS(err, "Failed to restore")
+			return err
+		}
+
+		if err := dm.removeRestoreFile(); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	versionFileExists, err := util.PathExistsAndIsNotEmpty(versionFilePath)
+	if err != nil {
+		return fmt.Errorf("checking if version metadata exists failed: %w", err)
+	}
+	if !versionFileExists {
+		klog.InfoS("Backup found for active deployment, MicroShift data exists, but version file does not - " +
+			"assuming data is pre-4.14 and this new attempt to upgrade - not restoring, continuing start up with current data. " +
+			" If restore is expected perform manual restore.")
+		// Data exists, but version file does not - this suggests previous boot was running pre-4.14 MicroShift,
+		// however backup for this deployment exists.
+		// It could be a scenario:
+		// - pre-4.14 deployment
+		// - post-4.14 deployment that failed and rolled back
+		//   (though it rebooted several times resulting in backups)
+		// - pre-4.14 backup was restored manually, but post-4.14 backup was not removed
+		// - the same post-4.14 commit was deployed.
+		// Looks more like an upgrade, rather than rollback, so we should not restore and just let MicroShift run.
+		if err := dm.removeRestoreFile(); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	versionFile, err := getVersionFile()
+	if err != nil {
+		return fmt.Errorf("loading version metadata failed: %w", err)
+	}
+
+	klog.InfoS("Contents of version file", "contents", versionFile)
+
+	if currentDeploymentID == versionFile.DeploymentID {
+		klog.InfoS("Current active deployment ID and deployment ID in version file are the same - " +
+			"not restoring, continuing startup with current data.")
+		// MicroShift just created a backup according to information in versionFile,
+		// so if current active deployment is the same as previous boot's deployment,
+		// it would restore the very same data it backed up, so let's just skip restore.
+
+		// This could also happen if version checks blocked the upgrade (e.g. upgrading to Y+2),
+		// would refuse to run and not update version file. After rolling back, the data would be unchanged.
+		if err := dm.removeRestoreFile(); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	// At this point:
+	// - MicroShift was instructed to restore by existence of the restoreFilepath
+	// - Backup for current deployment exists
+	// - versionFile.DeploymentID is different from current deployment according to ostree
+	//	 (meaning last time MicroShift ran was on different deployment).
+	//
+	// Let's restore and remove the `restore` file
+
+	if err := dm.restore(backup); err != nil {
+		klog.ErrorS(err, "Failed to restore")
+		return err
+	}
+
+	if err := dm.removeRestoreFile(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dm *dataManagement) removeRestoreFile() error {
+	klog.InfoS("Removing restore marker filepath", "path", restoreFilepath)
+	if err := os.Remove(restoreFilepath); err != nil {
+		klog.ErrorS(err, "FATAL ERROR: Failed to remove file - existence of the file will result in unexpected data restores: "+
+			"remove the file manually and make sure microshift.service can manipulate it",
+			"file", restoreFilepath)
+		return err
+	}
+	klog.InfoS("Removed restore marker filepath", "path", restoreFilepath)
+	return nil
 }
 
 func (dm *dataManagement) Perform() error {
@@ -318,6 +506,33 @@ func (dm *dataManagement) missingDataExistingHealth() error {
 	return nil
 }
 
+func (dm *dataManagement) newBackup(vf versionFile) error {
+	existingBackups, err := getBackups(dm.dataManager)
+	if err != nil {
+		return err
+	}
+
+	newBackupName := vf.BackupName()
+	if existingBackups.has(newBackupName) {
+		klog.InfoS("Backup already exists", "name", newBackupName)
+		return nil
+	}
+
+	if err := dm.dataManager.Backup(newBackupName); err != nil {
+		return fmt.Errorf("failed to create backup %q: %w", newBackupName, err)
+	}
+
+	// after making a new backup, remove all old backups for the deployment
+	existingBackups.getForDeployment(vf.DeploymentID).removeAll(dm.dataManager)
+
+	// prune old backups
+	if err := dm.removeBackupsWithoutExistingDeployments(existingBackups); err != nil {
+		klog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
+	}
+
+	return nil
+}
+
 func (dm *dataManagement) backup(health *HealthInfo) error {
 	existingBackups, err := getBackups(dm.dataManager)
 	if err != nil {
@@ -477,6 +692,7 @@ func (dm *dataManagement) handleDeploymentSwitch(currentDeploymentID string) err
 }
 
 func (dm *dataManagement) removeBackupsWithoutExistingDeployments(backups Backups) error {
+	klog.InfoS("Attempting to remove backups for no longer existing deployments")
 	deployments, err := getAllDeploymentIDs()
 	if err != nil {
 		return err
@@ -484,6 +700,7 @@ func (dm *dataManagement) removeBackupsWithoutExistingDeployments(backups Backup
 
 	toRemove := backups.getDangling(deployments)
 	if len(toRemove) == 0 {
+		klog.InfoS("Found no backups for no longer existing deployments to remove")
 		return nil
 	}
 
@@ -499,12 +716,6 @@ func (dm *dataManagement) restore(backup datadir.BackupName) error {
 	if err == nil {
 		// `version` was successfully read, so we can compare
 		// with deployment and boot IDs extracted from backup's name
-
-		// deployment ID is not enough on its own in scenario:
-		// - first boot is okay, admin reboots the machine
-		// - second boot is unhealthy, admin reboots the machine
-		// - third boot should restore backup of data from #1 boot,
-		//   but it would not, because the deployment ID didn't change
 
 		deploy, boot := func() (string, string) {
 			spl := strings.Split(string(backup), "_")
