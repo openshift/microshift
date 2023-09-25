@@ -26,6 +26,8 @@ EOF
 firewall_settings() {
     local -r action=$1
 
+    sudo firewall-cmd --permanent --zone=libvirt "--${action}-service=mdns"
+
     for netname in default "${VM_ISOLATED_NETWORK}" ; do
         if ! sudo virsh net-info "${netname}" &>/dev/null ; then
             continue
