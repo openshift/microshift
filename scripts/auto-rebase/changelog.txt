@@ -1,0 +1,9 @@
+# cluster-network-operator embedded-component f91c5b944183bf189d866ecd8c6bbdb1b638f86b to 777eb7b410863537b87be8266533d4bdca15ada6
+58465814fbe2db66d8d191c3c369d603ff937549 2023-09-08T16:40:06+00:00 use templating
+f407b8d7e8c0f3adbd62263fff4ebfcb66159338 2023-09-08T16:40:06+00:00 remove annotation ibmcloud deployment
+# machine-config-operator embedded-component aeb7d050748a23e0474f98a447d490e3b72e0ae6 to 9f4854de8668c3a67f6f3350339081d7b710914b
+32369f6bccb8df0f3894eef7844cd17e7f09143a 2023-09-21T16:01:34+02:00 Rename ovnkube-controller to ovnkube-master
+cbc584386ccf3ccc46f13651eabddcfd43e0a128 2023-09-21T16:00:03+02:00 Ignore invoking nbctl calls if its SDN
+03fd76559f4588ade7dead688a4e1a640ad826e8 2023-09-19T14:55:58-04:00 chmod kubeconfig path 0600 in func updateKubeConfigPermission - func update
+1cdb75f6ce055429e528c84c47facc368e1693d5 2023-09-19T14:42:22+00:00 install: Recreate and delayed default ServiceAccount deletion
+3d7751ca83ab80051a868e3b0d609af2b1f3a341 2023-09-06T13:43:35+02:00 Ensure azure-routes hack for internalLB hairpin traffic works for SGW
