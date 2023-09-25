@@ -13,6 +13,6 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "FAKE_NEXT_MINOR_REF:rhel-9.2-microshift-source-fake-next-minor" \
+        --variable "UPGRADE_REF:rhel-9.2-microshift-source-aux" \
         suites/upgrade/rollback-manual.robot
 }

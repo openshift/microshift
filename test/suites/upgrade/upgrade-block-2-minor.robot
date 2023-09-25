@@ -17,18 +17,22 @@ ${USHIFT_USER}                  ${EMPTY}
 
 ${TOO_NEW_MICROSHIFT_REF}       ${EMPTY}
 
+${EXPECTED_LOG}                 Current active deployment ID and deployment ID
+...                             in version file are the same - not restoring,
+...                             continuing startup with current data.
+
 
 *** Test Cases ***
 Upgrading MicroShift By Two Minor Versions Is Blocked
     [Documentation]    Test verifies if attempt to upgrade MicroShift
     ...    by two minor versions is blocked.
 
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
     ${initial_deploy_backup}=    Get Future Backup Name For Current Boot
 
     Deploy Commit Expecting A Rollback    ${TOO_NEW_MICROSHIFT_REF}
 
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
     Backup Should Exist    ${initial_deploy_backup}
     Journal Should Have Information About Failed Version Comparison
     Journal Should Have Information That MicroShift Skipped Restoring
@@ -61,7 +65,7 @@ Journal Should Have Information That MicroShift Skipped Restoring
     IF    ${version.minor} == 13    RETURN
 
     ${stdout}    ${rc}=    Execute Command
-    ...    journalctl --unit=microshift | grep "Restore skipped - data directory already matches backup to restore"
+    ...    journalctl --unit=microshift | grep "${EXPECTED_LOG}"
     ...    sudo=True
     ...    return_stdout=True
     ...    return_rc=True

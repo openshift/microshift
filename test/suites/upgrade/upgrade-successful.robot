@@ -25,7 +25,7 @@ Upgrade
     ...    and verifies if it was successful, with SELinux validation
 
     MicroShift 413 Should Not Have Upgrade Artifacts
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
 
     ${future_backup}=    Get Future Backup Name For Current Boot
     Deploy Commit Not Expecting A Rollback    ${TARGET_REF}

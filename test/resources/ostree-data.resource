@@ -7,8 +7,8 @@ Library             libostree.py
 
 
 *** Variables ***
-${DATA_DIR}             "/var/lib/microshift"
-${BACKUP_STORAGE}       "/var/lib/microshift-backups"
+${DATA_DIR}             /var/lib/microshift
+${BACKUP_STORAGE}       /var/lib/microshift-backups
 
 
 *** Keywords ***
