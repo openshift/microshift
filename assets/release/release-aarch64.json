@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "4.14.0-0.nightly-arm64-2023-09-21-203353"
+    "base": "4.14.0-0.nightly-arm64-2023-09-24-033429"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6ac0c6b8df2448f655ec25c4be3d62e7bbeb5cc59d152ffbbc2b69d37deae6b4",
@@ -8,9 +8,9 @@
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b8fcb3bfe4655c9ffe7870976de581862d47d420fff873598628f2cfa231e5b8",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d1cdb5a55ed3f91bfc5cd42d5115214b72f89bb80a409c3f2706bbf161588c41",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
-    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:183844c65e9bf831c17be59e6db3027eda1737e5daf86a2395e1dc308051d50a",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1ee058516e689107a88d9d14f43e2870c1cb7aa31d55dc99e74426d566e1b3a3",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8dbb4cd8f94b7fd1737b24d67e2faabc2aba7a2ceff2b832a818e63d46a02790",
+    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:bed4e3c471046ec7b3ef68e737cca30267dc26809080b075b8d175c9f8d7d0d5",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:308a0c2224ae0e41aeac833f19521e3a591c33e891a1b63db80433ac2fda4300",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8648e4523507dcc1d69a12d8233a51946c8d91761cea49cf4cd1148ef1a19462",
     "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel8@sha256:f676e20b8ecdbe9f5fc994e2ff236a02d2afe666bf325e8ac02cd3a043df107e",
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:71d42a2b26fca9690036c95e54aa3641702c4dc7ba1912f8804d777320f9fbf8",
     "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:3c63c06561f20f5ead423946c6cc22030c397f0fe190004e6b5ccdb3bfaccdc4",
