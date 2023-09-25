@@ -93,7 +93,7 @@ Setup
     Initialize Global Variables
     Setup Suite With Namespace
     Verify Multiple NICs
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
 
 Teardown
     [Documentation]    Test suite teardown
@@ -216,4 +216,4 @@ Restore Network Configuration By Rebooting Host
     Restore Default MicroShift Config
     Reboot MicroShift Host
     Login Switch To IP    ${USHIFT_HOST_IP1}
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited

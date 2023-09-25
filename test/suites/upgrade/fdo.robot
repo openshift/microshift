@@ -22,16 +22,17 @@ ${TARGET_REF}       ${EMPTY}
 *** Test Cases ***
 FIDO Onboarding Device
     [Documentation]    No-MicroShift-system is staged with unhealthy deployment
-    ...    which rolls back and leaves stale data and staged again with healthy deployment.
+    ...    which rolls back and leaves stale data and staged again with deployment.
     ...
-    ...    It is expected that final deployment will gracefully handle existence of:
-    ...    MicroShift data, unhealthy stored in health file,
-    ...    and a deployment gap (no-microshift rollback).
+    ...    It is expected that MicroShift will not remove the data and will
+    ...    attempt to start with existing data.
+    ...    By providing fake Y+2 as first ref and Y+0 as second ref,
+    ...    we verify MicroShift will not remove the data and will refuse to start.
 
     System Should Not Feature MicroShift
     TestAgent.Add Action For Next Deployment    every    fail_greenboot
     Deploy Commit Expecting A Rollback    ${FAILING_REF}
-    Deploy Commit Not Expecting A Rollback    ${TARGET_REF}
+    Deploy Commit Expecting A Rollback    ${TARGET_REF}
 
 
 *** Keywords ***
