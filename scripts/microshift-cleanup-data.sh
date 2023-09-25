@@ -43,15 +43,6 @@ function stop_disable_services() {
 }
 
 function stop_clean_pods() {
-    # Wipe all the crio data off and return
-    if ${FULL_CLEAN} && ! ${KEEP_IMAGE} ; then
-        echo Removing crio container and image storage
-        crictl rm  -af &>/dev/null || true
-        crictl rmi -a  &>/dev/null || true
-        return
-    fi
-
-    # Delete pods only, preserving images
     # It is necessary to remove the pods (OVN-related last) to allow for further termination
     # of processes (i.e. conmon, etc.) that use the files under /var/run/ovn.
     # The cleanup of OVN data only works if the files under /var/run/ovn are not in use.
@@ -72,6 +63,13 @@ function stop_clean_pods() {
             sleep 1
         done
     done
+
+    # When full clean is requested, remove image storage
+    # after the pods are shut down
+    if ${FULL_CLEAN} && ! ${KEEP_IMAGE} ; then
+        echo Removing crio image storage
+        crictl rmi -a &>/dev/null || true
+    fi
 }
 
 function clean_processes() {
@@ -88,7 +86,8 @@ function clean_processes() {
     fi
 
     echo Killing conmon, pause and OVN processes
-    for pname in conmon pause ovn-controller ovn-northd ovsdb-server ; do
+    systemctl stop --now ovsdb-server.service 2>/dev/null || true
+    for pname in conmon pause ovn-controller ovn-northd ; do
         pkill -9 --exact ${pname} || true
     done
 }
@@ -100,8 +99,8 @@ function clean_data() {
     fi
 
     echo Removing OVN configuration
-    rm -rf /var/lib/ovnk
     rm -rf /var/run/ovn
+    rm -rf /var/run/ovn-kubernetes
     rm -f /etc/cni/net.d/10-ovn-kubernetes.conf
     rm -f /opt/cni/bin/ovn-k8s-cni-overlay
 }
