@@ -17,12 +17,10 @@ ${USHIFT_USER}      ${EMPTY}
 
 
 *** Test Cases ***
-Rebooting Healthy System Should Result In Data Backup
-    [Documentation]    Check if rebooting healthy system will result in backing up of MicroShift data
+Rebooting System Should Result In Data Backup
+    [Documentation]    Check if rebooting system will result in MicroShift creating backup
 
-    Wait Until Greenboot Health Check Exited
-    System Should Be Healthy
-    Remove Existing Backup For Current Deployment
+    Wait For MicroShift Service
     ${future_backup}=    Get Future Backup Name For Current Boot
 
     Reboot MicroShift Host
@@ -30,16 +28,17 @@ Rebooting Healthy System Should Result In Data Backup
 
     Backup Should Exist    ${future_backup}
 
-Rebooting Unhealthy System Should Result In Restoring Data From A Backup
+Existence Of Restore File Should Result In Restoring Data
     [Documentation]    Check if rebooting unhealthy system will result
     ...    restoring MicroShift data from a backup
 
-    Wait Until Greenboot Health Check Exited    # we don't want greenboot to overwrite health.json
+    Wait For MicroShift Service
     Remove Existing Backup For Current Deployment
 
     ${backup_name}=    Make Masquerading Backup
 
-    Mark System As Unhealthy    # to trigger restore after reboot
+    Override Deployment ID In Version File
+    Create Restore Marker File    # to trigger restore after reboot
     Reboot MicroShift Host
     Wait For MicroShift Service
 
@@ -69,10 +68,12 @@ Make Masquerading Backup
 
     RETURN    ${backup_name}
 
-Mark System As Unhealthy
-    [Documentation]    Marks systems as unhealthy by executing microshift's red script
+Create Restore Marker File
+    [Documentation]    Creates a special file which existence of MicroShift will
+    ...    interpret as request to restore a backup.
+
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    FORCE=1 /etc/greenboot/red.d/40_microshift_set_unhealthy.sh
+    ...    touch /var/lib/microshift-backups/restore
     ...    sudo=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
@@ -88,4 +89,23 @@ Remove Marker From Data Dir
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    rm -fv ${DATA_DIR}/marker
     ...    sudo=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
+Override Deployment ID In Version File
+    [Documentation]    Changes deployment_id in the version file to bypass
+    ...    check that blocks restore when current deployment matches
+    ...    deployment saved in the file.
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    jq '.deployment_id="test"' ${DATA_DIR}/version > /tmp/microshift-version.new
+    ...    sudo=True
+    ...    return_stderr=True
+    ...    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    sudo mv /tmp/microshift-version.new ${DATA_DIR}/version
+    ...    sudo=True
+    ...    return_stderr=True
+    ...    return_rc=True
     Should Be Equal As Integers    0    ${rc}
