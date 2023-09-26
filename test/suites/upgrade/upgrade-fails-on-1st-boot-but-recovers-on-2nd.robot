@@ -61,20 +61,6 @@ Validate Backup Is Restored
     ${stdout}=    Execute Command
     ...    cd ${BACKUP_STORAGE} && ls -d1 rhel-*
     ...    sudo=False    return_rc=False
-
-    ${mark_stdout}    ${mark_stderr}    ${mark_rc}=    Execute Command
-    ...    stat ${DATA_DIR}/marker
-    ...    sudo=True    return_stderr=True    return_rc=True
-
     Should Be Equal As Strings    ${stdout}    ${backup_name}
-    Should Be Equal As Integers    0    ${mark_rc}
 
-Expected Boot Count
-    [Documentation]    Validate that the host rebooted only the specified number of times
-    [Arguments]    ${reboot_count}
-
-    ${stdout}=    Execute Command
-    ...    journalctl --list-boots --quiet | wc -l
-    ...    sudo=True    return_rc=False
-
-    Should Be Equal As Integers    ${reboot_count}    ${stdout}
+    Marker Should Exist In Data Dir

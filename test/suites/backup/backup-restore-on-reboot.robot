@@ -68,24 +68,3 @@ Make Masquerading Backup
     Create Backup    ${backup_name}    ${TRUE}
 
     RETURN    ${backup_name}
-
-Mark System As Unhealthy
-    [Documentation]    Marks systems as unhealthy by executing microshift's red script
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    FORCE=1 /etc/greenboot/red.d/40_microshift_set_unhealthy.sh
-    ...    sudo=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
-
-Marker Should Exist In Data Dir
-    [Documentation]    Checks if marker file exists in MicroShift data directory
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    stat ${DATA_DIR}/marker
-    ...    sudo=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
-
-Remove Marker From Data Dir
-    [Documentation]    Removes marker file from MicroShift data directory
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    rm -fv ${DATA_DIR}/marker
-    ...    sudo=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}

@@ -3,6 +3,7 @@ Documentation       Keywords for OSTree-based systems
 
 Resource            systemd.resource
 Resource            microshift-process.resource
+Resource            marker-file.resource
 Library             libostree.py
 
 
@@ -40,10 +41,7 @@ Create Backup
 
     IF    ${create_marker_file}
         # create a marker that we expect to show up in data directory after restore
-        ${mark_stdout}    ${mark_stderr}    ${mark_rc}=    Execute Command
-        ...    touch ${BACKUP_STORAGE}/${backup_name}/marker
-        ...    sudo=True    return_stderr=True    return_rc=True
-        Should Be Equal As Integers    0    ${mark_rc}
+        Create Marker File    ${BACKUP_STORAGE}/${backup_name}
     END
 
 Backup Should Exist
@@ -52,6 +50,13 @@ Backup Should Exist
     [Arguments]    ${deployment_id}    ${boot_id}=${EMPTY}
     ${exists}=    Does Backup Exist    ${deployment_id}    ${boot_id}
     Should Be True    ${exists}
+
+Backup Should Not Exist
+    [Documentation]    Checks if backup identified by deployment ID
+    ...    and (optionally) boot ID exists
+    [Arguments]    ${deployment_id}    ${boot_id}=${EMPTY}
+    ${exists}=    Does Backup Exist    ${deployment_id}    ${boot_id}
+    Should Not Be True    ${exists}
 
 Remove Existing Backup For Current Deployment
     [Documentation]    Remove any existing backup for currently running deployment

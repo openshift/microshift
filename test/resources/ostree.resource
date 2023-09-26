@@ -40,7 +40,7 @@ Deploy Commit Expecting A Rollback
 
 Deploy Commit Not Expecting A Rollback
     [Documentation]    Deploys given ref and configures test agent for failing greenboot.
-    ...    It expects the system to roll back.
+    ...    It expects the system to not roll back.
     [Arguments]    ${target_ref}    ${write_agent_cfg}=${FALSE}
 
     ${initial_deploy_id}=    Get Booted Deployment Id
@@ -91,3 +91,20 @@ Journal Should Have Information About Failed Version Comparison
         Log Many    ${stdout}    ${rc}
         Should Be Equal As Integers    0    ${rc}
     END
+
+Mark System As Unhealthy
+    [Documentation]    Marks systems as unhealthy by executing microshift's red script
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    FORCE=1 /etc/greenboot/red.d/40_microshift_set_unhealthy.sh
+    ...    sudo=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
+Expected Boot Count
+    [Documentation]    Validate that the host rebooted only the specified number of times
+    [Arguments]    ${reboot_count}
+
+    ${stdout}=    Execute Command
+    ...    journalctl --list-boots --quiet | wc -l
+    ...    sudo=True    return_rc=False
+
+    Should Be Equal As Integers    ${reboot_count}    ${stdout}
