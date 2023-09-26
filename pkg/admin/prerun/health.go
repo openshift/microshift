@@ -2,22 +2,17 @@ package prerun
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/util"
 
 	"k8s.io/klog/v2"
 )
 
 var (
-	healthFilepath            = filepath.Join(config.BackupsDir, "health.json")
-	errHealthFileDoesNotExist = errors.New("health file does not exist")
+	healthFilepath = filepath.Join(config.BackupsDir, "health.json")
 )
 
 type HealthInfo struct {
@@ -53,44 +48,4 @@ func updateHealthInfo(vf versionFile) error {
 	}
 
 	return nil
-}
-
-func (hi *HealthInfo) BackupName() data.BackupName {
-	name := fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID)
-
-	if hi.IsHealthy() {
-		return data.BackupName(name)
-	}
-
-	return data.BackupName(fmt.Sprintf("%s_unhealthy", name))
-}
-
-func (hi *HealthInfo) IsHealthy() bool {
-	return hi.Health == "healthy"
-}
-
-func getHealthInfo() (*HealthInfo, error) {
-	if exists, err := util.PathExistsAndIsNotEmpty(healthFilepath); err != nil {
-		return nil, err
-	} else if !exists {
-		return nil, errHealthFileDoesNotExist
-	}
-
-	content, err := os.ReadFile(healthFilepath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read %q: %w", healthFilepath, err)
-	}
-
-	health := &HealthInfo{}
-	if err := json.Unmarshal(content, &health); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal %q: %w", strings.TrimSpace(string(content)), err)
-	}
-
-	klog.InfoS("Read health info from file",
-		"health", health.Health,
-		"deploymentID", health.DeploymentID,
-		"previousBootID", health.BootID,
-	)
-
-	return health, nil
 }
