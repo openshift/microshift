@@ -407,8 +407,9 @@ func (dm *dataManagement) handleUnhealthy(health *HealthInfo) error {
 		"health-deployment-id", health.DeploymentID)
 
 	if health.DeploymentID == rollbackDeployID {
-		return fmt.Errorf("deployment ID stored in health.json is the same as rollback's" +
-			" - MicroShift should not be updated from unhealthy system")
+		klog.Info("Unhealthy deployment stored in health.json matches rollback deployment - " +
+			"assuming upgrade from unhealthy system - continuing startup with existing data")
+		return nil
 	}
 
 	if health.DeploymentID == currentDeploymentID {
