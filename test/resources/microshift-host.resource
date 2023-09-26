@@ -93,3 +93,19 @@ Is System Rebooted
         ${system_rebooted}=    Evaluate    '${old_bootid}' != '${cur_bootid}'
         RETURN    ${system_rebooted}
     END
+
+Change Hostname
+    [Documentation]    Changes hostname to the argument. Returns old hostname
+    [Arguments]    ${hostname}
+
+    ${old_hostname}    ${stderr}    ${rc}=    SSHLibrary.Execute Command    hostname
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Log    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
+
+    ${stderr}    ${rc}=    SSHLibrary.Execute Command    hostnamectl hostname ${hostname}
+    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
+    Log    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
+
+    RETURN    ${old_hostname}
