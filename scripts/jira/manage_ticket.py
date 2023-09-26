@@ -239,16 +239,20 @@ def command_close(args):
 
         all_merged = True
         links = server.remote_links(ticket.id)
-        for link in links:
-            url = link.object.url
-            if not is_pr_link(url):
-                continue
-            org_name, repo_name, pr_num = parse_pr_link(url)
-            repo = gh.get_repo(f'{org_name}/{repo_name}')
-            pr = repo.get_pull(int(pr_num))
-            print(f'  Link: {url} ({pr.merged})')
-            if not pr.merged:
-                all_merged = False
+        print(f'  PRs: {len(links)}')
+        if not links:
+            all_merged = False
+        else:
+            for link in links:
+                url = link.object.url
+                if not is_pr_link(url):
+                    continue
+                org_name, repo_name, pr_num = parse_pr_link(url)
+                repo = gh.get_repo(f'{org_name}/{repo_name}')
+                pr = repo.get_pull(int(pr_num))
+                print(f'  Link: {url} ({pr.merged})')
+                if not pr.merged:
+                    all_merged = False
 
         actual_project_id = get_project_id_from_ticket_id(ticket.key)
         if actual_project_id == 'OCPBUGS' or not all_merged:
