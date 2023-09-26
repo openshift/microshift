@@ -413,14 +413,18 @@ func (dm *dataManagement) handleUnhealthy(health *HealthInfo) error {
 	}
 
 	if health.DeploymentID == currentDeploymentID {
+		klog.Info("Unhealthy deployment stored in health.json matches currently booted deployment - " +
+			"because there is no backup for the deployment, attempting to restore rollback's deployment backup to reattempt migration")
+
 		rollbackBackup := existingBackups.getForDeployment(rollbackDeployID).getOnlyHealthyBackups().getOneOrNone()
 		if err != nil {
 			return err
 		}
 		if rollbackBackup == "" {
 			// This could happen if current deployment is unhealthy and rollback didn't run MicroShift
-			klog.InfoS("There is no backup for rollback deployment as well - removing existing data for clean start")
-			return dm.dataManager.RemoveData()
+			klog.InfoS("There is no backup for rollback deployment as well - " +
+				"continuing startup with existing data, if fresh start is expected data must be removed manually")
+			return nil
 		}
 
 		// There is no backup for current deployment, but there is a backup for the rollback.
@@ -437,17 +441,8 @@ func (dm *dataManagement) handleUnhealthy(health *HealthInfo) error {
 	// DeployID in health.json is neither booted nor rollback deployment,
 	// so current deployment was staged over deployment without MicroShift
 	// but MicroShift data exists (created by another deployment that rolled back).
-	klog.InfoS("Deployment in health metadata is neither currently booted nor rollback deployment - backing up, then removing existing data for clean start")
-	if err := dm.backup(health); err != nil {
-		klog.ErrorS(err, "Failed to backup data of unhealthy system - ignoring")
-	}
-
-	klog.InfoS("START removing MicroShift data")
-	if err := dm.dataManager.RemoveData(); err != nil {
-		klog.ErrorS(err, "FAIL removing MicroShift data")
-		return err
-	}
-	klog.InfoS("END removing MicroShift data")
+	klog.InfoS("Deployment in health metadata is neither currently booted nor rollback deployment - " +
+		"continuing startup, if fresh start is expected data must be removed manually")
 
 	return nil
 }
