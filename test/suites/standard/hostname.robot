@@ -12,8 +12,8 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${NEW_HOSTNAME}    microshift.local
-${OLD_HOSTNAME}    ${EMPTY}
+${NEW_HOSTNAME}     microshift.local
+${OLD_HOSTNAME}     ${EMPTY}
 
 
 *** Test Cases ***
@@ -25,6 +25,7 @@ Verify local name resolution
     Oc Logs    namespace="openshift-ingress"    opts="deployment/router-default"
 
     [Teardown]    Restore Old Hostname
+
 
 *** Keywords ***
 Setup
