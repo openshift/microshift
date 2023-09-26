@@ -65,46 +65,35 @@ The following profiles are available:
  24 profiles, 91 plugins
 ```
 
-Log into the host running MicroShift and execute the following command to generate an obfuscated
-report that should not contain sensitive information (in this example only microshift plugins are
-enabled. Your system's output may vary):
+Log into the host running MicroShift and execute the following command to generate a report (in this example only 
+microshift plugins are enabled. Your system's output may vary):
+
 ```bash
-$ sos report --batch --clean --all-logs --profile microshift
+$ sudo microshift-sos-report
 
-sosreport (version 4.3)
+sosreport (version 4.5.6)
 
-...
-
- Setting up archive ...
- Setting up plugins ...
- Running plugins. Please wait ...
-
-  Starting 1/1   microshift      [Running: microshift]
-
-  Finished running plugins
-
-Successfully obfuscated 1 report(s)
-
-Creating compressed archive...
-
-A mapping of obfuscated elements is available at
-	/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-private_map
 
 Your sosreport has been generated and saved in:
-	/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-obfuscated.tar.xz
+        /tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz
 
-...
+ Size   7.74MiB
+ Owner  root
+ sha256 850ecd95897441e0ed6ff4595a0e2d46aaa5582b67ce84b32625041498dd0e1d
+
+Please send this file to your support representative.
+
 ```
 > Sos must always run with root privileges.
 
 The output file and its checksum are generated in `/var/tmp/` directory.
 ```bash
 $ sudo ls -tr /var/tmp/sosreport-* | tail -2
-/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-obfuscated.tar.xz
-/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc-obfuscated.tar.xz.sha256
+/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz
+/var/tmp/sosreport-microshift-2-2023-03-23-ylwbkjc.tar.xz.sha256
 ```
 
-Upload the archives to Red Hat Technical Support as described in [this section](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/generating_sos_reports_for_technical_support/index#methods-for-providing-an-sos-report-to-red-hat-technical-support_generating-an-sosreport-for-technical-support)
+Upload the archives to Red Hat Technical Support as described in [this section](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/getting_the_most_from_your_support_experience/generating-an-sos-report-for-technical-support_getting-the-most-from-your-support-experience#methods-for-providing-an-sos-report-to-red-hat-technical-support_generating-an-sosreport-for-technical-support)
 
 The `sos` archives may consume significant disk space. Make sure to delete the report files after uploading them.
 
