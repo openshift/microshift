@@ -47,10 +47,10 @@ Oc Wait For
     ...    ${wait_for}    expects a key=value. See 'oc wait --help' for examples
     ...    ${timeout}    Takes an integer and a single character time-unit identifier, e.g.: 30s
     ...    If no timeout value is provided, defaults to 30s.
-    [Arguments]    ${type_name}    ${wait_for}    ${timeout}=30s
+    [Arguments]    ${type_name}    ${wait_for}    ${timeout}=30s    ${ns}=${NAMESPACE}
 
     ${timeout_opt}=    Set Variable    --timeout\=${timeout}
-    ${output}=    Run With Kubeconfig    oc wait -n ${NAMESPACE} ${type_name} --for=${wait_for} ${timeout_opt}
+    ${output}=    Run With Kubeconfig    oc wait -n ${ns} ${type_name} --for=${wait_for} ${timeout_opt}
     RETURN    ${output}
 
 Oc Create
@@ -72,4 +72,11 @@ Oc Patch
     ...    Returns the combined STDOUT/STDER output of the command.
     [Arguments]    ${type_name}    ${opts}
     ${output}=    Run With Kubeconfig    oc patch -n ${NAMESPACE} ${type_name} -p ${opts}
+    RETURN    ${output}
+
+Oc Logs
+    [Documentation]    Run 'oc logs' on a specific resource in the given namespace.
+    ...    Returns the combined STDOUT/STDER output of the command.
+    [Arguments]    ${opts}    ${namespace}
+    ${output}=    Run With Kubeconfig    oc logs -n ${namespace} ${opts}
     RETURN    ${output}
