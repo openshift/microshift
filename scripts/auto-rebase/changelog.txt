@@ -1,243 +1,112 @@
-- cluster-csi-snapshot-controller-operator embedded-component 9a67364ca9b2761f9bfffd7f600018788f94a5dd to d8632d0f509eee4989561b0760b2c5ba7f7daf0f
-  - f546f7d 2023-09-20T14:53:06-04:00 Move readonlyRootFilesystem to the right place
+- cluster-kube-controller-manager-operator embedded-component d95b0c25ba55c4ef8e09e56461562ee60b22d51c to ba1ef05c11c467896e3eaf167ad43917ff38cc1d
+  - b687f84 2023-09-22T15:28:18+03:00 Bump library-go to get the correct permissions for static pod yamls
 
-- cluster-kube-apiserver-operator embedded-component cbe6c19dd6d139ac3aad15220b8cbcb791fbe79a to fb75cada6bf42222111af526c4cb2de6a6d34910
-  - 3a2275c 2023-09-18T17:53:06+00:00 manifests: don't include recording rules when console is disabled
+- cluster-kube-scheduler-operator embedded-component db92b6d9fcf410aa24efc4a70c4114925bb7b797 to 90992f08144cbf9ee137108dfaac15e4bb9c2672
+  - 05bddcf 2023-09-22T16:20:49+03:00 Bump library-go and k8s dependencies
 
-- cluster-network-operator embedded-component 72732895e757ba30483aa69ef7775d97ec324bc8 to 570a128a17c02eb80fcaaca51aecea7ebb3cc001
-  - 0f8a3f2 2023-09-22T15:38:37-04:00 Multus should request certificates per-node.
-  - 9703f60 2023-09-22T14:00:07+02:00 Network identity: node-specific certificate in ovnkube-node, validating webhook
-  - fddb5ab 2023-09-22T13:59:49+02:00 Limit OVN-Kubernetes RBAC
-  - 57c781c 2023-09-21T19:04:56+00:00 multus: set MULTUS_NODE_NAME to filter pods to local node
-  - 09b983d 2023-09-20T13:24:16+00:00 ipsec: doc update
-  - d746091 2023-09-20T13:24:16+00:00 ipsec: fix oopsy from 9ca4a98ce4
-  - 3a10bd6 2023-09-20T13:24:16+00:00 ipsec: make ipsec.service required for ipsec-host
-  - 7de4b26 2023-09-19T15:23:00+00:00 OVN Interconnect: Separate libovsdb Logs into a dedicated File
+- ovn-kubernetes image-amd64 731710f927063ab6a617a58473f99035f82f0d85 to 757426b5dc784d7eea60feed0d3ec7bfb3782bd4
+  - 7dc4804 2023-09-15T15:58:48+02:00 Introduce ovnkube-identity with per-node certs and a validating webhook
+  - ab27303 2023-09-15T15:58:47+02:00 vendor dependencies
+  - a61d357 2023-09-15T15:58:47+02:00 OVN-Kubernetes Node Identity docs
+  - 8055a47 2023-09-15T15:40:47+02:00 Free up more disk space, remove image once loaded
+  - afb304a 2023-09-15T15:40:47+02:00 Remove the centos image usages from e2e tests
+  - ccabba4 2023-09-14T10:52:25-04:00 clearInitialNodeNetworkUnavailableCondition() called on node update
+  - 01286a7 2023-09-14T09:09:08-05:00 Dockerfile: bump OVN to ovn23.09-23.09.0-beta.31.el9fdp
+  - 0046069 2023-09-14T14:07:38+01:00 EIP: fix entry of eip into validated eip set
+  - 1756511 2023-09-14T13:17:30+01:00 EIP test: fix incorrect node name passed to allocator
+  - 1141809 2023-09-14T13:17:04+01:00 EIP test: do not add non-OVN managed networks to EIP config
+  - 096ac00 2023-09-14T00:17:47+00:00 Update bridge flow cache when the host address changes
+  - 2666ed4 2023-09-12T14:06:00+01:00 Retry EIP node repair for a period of time
+  - 2107cc0 2023-09-12T14:06:00+01:00 Fix Egress IP detection of OVN and non-OVN networks
+  - e2b9680 2023-09-11T14:58:14+02:00 Refactor hybrid-overlay-node for linux nodes
+  - 4980714 2023-09-06T18:25:20+00:00 Check libovsdbclient.ErrNotFound on wrapped errors
+  - 099f803 2023-09-06T18:12:01+02:00 Add e2e for mimicing pod2external case via GR
+  - b805dfa 2023-09-06T18:12:01+02:00 Enable gateway_mtu on rtoe port of GR
+  - a747d8e 2023-09-06T12:23:00+02:00 Add e2e test for pmtud on an load balancer service
+  - bd40c03 2023-09-06T12:09:47+02:00 Make PMTUD works in shared gateway mode
+  - b7e85c7 2023-09-05T11:51:24-05:00 types: remove redundant meter names
+  - b534190 2023-09-05T11:51:24-05:00 ovn: add COPP for Service Monitor to prevent CVE-2023-3153
+  - e766245 2023-09-05T15:03:37+02:00 Make ovnkube-trace to work for ovnkube-controller
+  - f9394c3 2023-09-05T13:25:37+02:00 e2e, kubevirt: Pin fedora coreos image
+  - 7ece621 2023-09-04T23:02:36+02:00 Do not set vlanID when its zero
+  - 5738c58 2023-09-04T17:00:18+02:00 LGW: Fix the precedence of rules in FORWARD chain
+  - f6f3f84 2023-09-04T15:01:49+02:00 EIP multi NIC: ensure we exclude ovn managed networks
+  - c3b1a54 2023-09-04T12:28:08+02:00 e2e: Avoid test panic if unidling test fails
+  - 758b10d 2023-09-01T23:59:25-04:00 fix: build-go.sh capture k8s.io/client-go version to use in build tag
+  - 6ef8a10 2023-09-01T10:33:46-04:00 Set default network topology type to layer 3
+  - 6b345bf 2023-09-01T10:32:00-04:00 More perf optimizations with searching for Pod IPs
+  - 63f83fa 2023-08-30T18:09:37-04:00 Speed up getting pod ips from pod with default network
+  - 9a578a5 2023-08-30T18:09:37-04:00 When enabling metrics in kind, enable pprof
+  - 47ec3b8 2023-08-30T18:09:37-04:00 Fixes enabling scale metrics with kind
+  - 5d56a53 2023-08-30T18:59:57+02:00 Fix push image permissions
+  - 132065b 2023-08-30T10:51:20+02:00 fix race condition in hybrid overlay.
+  - e9ba301 2023-08-30T10:43:44+02:00 EIP multi NIC: fix possible exception when finding a network for EIP
+  - 9fee8d0 2023-08-30T10:40:21+02:00 Refactor RBAC
+  - 579d224 2023-08-30T10:40:21+02:00 Use the status subresource for setting labels and annotations
+  - 6798a9b 2023-08-29T13:16:38+02:00 EIP TC: stop flake by ensuring EIP spec and status are equal
+  - ee363c2 2023-08-28T15:16:18+02:00 kind: enable control plane/cluster manager HA with IC
+  - a5ea0b6 2023-08-28T11:42:22+02:00 Update ovnkube-trace readme file
+  - e14dc81 2023-08-25T13:53:49-04:00 APB: fix issue when policyConfig status is not flagged as failed when there is an error updating a policy
+  - 0419f8e 2023-08-25T13:05:10-04:00 Correct the operation of the hybrid overlay
+  - 9fde26f 2023-08-25T09:52:23-04:00 Change APB unit test to use multus annotation instead of hostnetwork to run the nbDB flow as part of the unit tests
+  - 0e75d7f 2023-08-25T12:49:22+02:00 Rename GetDbObjsForAS to GetTestDbAddrSets as it should be used only for testing. This is a follow-up to the 2c252f11344c80718fc1b291d0e0921e2afb4e41 where I added UUID generation for address sets, which can only be used for testing.
+  - 87a8c3f 2023-08-24T14:20:01-04:00 move clearInitialNodeNetworkUnavailableCondition to clustermanager
+  - 771c0ce 2023-08-24T15:02:00+00:00 kind: allow custom encap port configuration
+  - bf107a3 2023-08-24T14:14:03+00:00 Fix encap port configuration for remote chassis
+  - d21e770 2023-08-22T11:10:01+02:00 NIT: Rename annoation to annotation
+  - 1e0028f 2023-08-04T08:53:52+00:00 Remove secondary network ports on node local to remote event
+  - db7126c 2023-08-04T08:37:33+00:00 Watch nodes for localnet secondary networks
 
-- kubernetes embedded-component 2c287eb3d35003a8f746482ca30b461e9434b1cd to 16488786342bb5e6d11db24e1436a2643a1d729e
-  - 3cb8b51bf 2023-09-18T13:29:24-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 3f029a204 2023-09-18T11:13:41-03:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 741c8db18 2023-09-13T09:14:07+00:00 Release commit for Kubernetes v1.27.6
-  - 77c32144a 2023-09-07T15:33:21+02:00 [go] Bump images, versions and deps to use Go 1.20.8
-  - 588285d00 2023-09-05T19:30:43+00:00 fix: concurrent map writes in e2e test
-  - c0d2ca7bb 2023-09-03T23:53:49-07:00 Automated cherry pick of #119776: Fix a job quota related deadlock (#120320)
-  - 2274980ad 2023-09-01T23:38:02+08:00 Fix OpenAPI aggregation cleanup
-  - eafd33024 2023-09-01T11:02:06-04:00 Fallback to legacy discovery on a wider range of conditions in aggregator
-  - 28ea34497 2023-09-01T08:42:12-06:00 apiextensions-apiserver: generate applyconfigurations
-  - fc18ffe58 2023-08-31T16:38:51-04:00 TopologyAwareHints: Take lock in HasPopulatedHints
-  - 3449ab21b 2023-08-28T17:19:14+02:00 Mark Job onPodConditions as optional in pod failure policy
-  - dd6bc2548 2023-08-24T01:07:20+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.5
-  - 93e0d7146 2023-08-24T00:42:11+00:00 Release commit for Kubernetes v1.27.5
-  - 94c19e36b 2023-08-23T20:28:32+00:00 Incorporating feedback on 119341
-  - acc29048e 2023-08-23T07:00:53-07:00 Use environment varaibles for parameters in Powershell
-  - 172644fb5 2023-08-23T06:39:13-07:00 Use env varaibles for passing path
-  - d645863c2 2023-08-22T19:34:51-04:00 check for overflow
-  - b0d3be5af 2023-08-22T19:34:41-04:00 Fix CEL cost handling of zero length replacement strings
-  - 9c142a62f 2023-08-19T17:19:44+08:00 generate ReportingInstance and ReportingController in Event
-  - 78e14a2d8 2023-08-18T17:38:43+00:00 Pass Pinned field to kubecontainer.Image
-  - eb8524ba1 2023-08-18T10:11:24+05:30 prep for go1.21: use -e in go list
-  - 27d56a733 2023-08-17T13:35:50+00:00 Skip apiserver_admission_webhook_request_total during context-canceled
-  - 6c8436b1f 2023-08-17T13:35:50+00:00 Ignore context canceled from validate and mutate webhook failopen metric
-  - 5d6af9162 2023-08-17T14:48:04+03:00 kubeadm: fix nil pointer when etcd member is already removed
-  - 2898ccf28 2023-08-17T09:28:37+02:00 update to golangci-lint v1.54.1 + go-ruleguard v0.4.0
-  - e45173590 2023-08-15T13:30:35+00:00 fix: when PreFilter returns UnschedulableAndUnresolvable, copy the state in all nodes in statusmap
-  - 44e90d9dd 2023-08-14T09:51:50-07:00 Fix a bug that PostFilter plugin may not function if previous PreFilter plugins return Skip
-  - 5710aa179 2023-08-14T05:43:21+00:00 Issue 4230: remove readiness check for cache exclusion
-  - 3b6bcaa0b 2023-08-09T14:43:56-04:00 Avoid returning nil responseKind in v1beta1 aggregated discovery
-  - 99de7e6b7 2023-08-08T22:45:06+02:00 add test for apiservices.apiregistration.k8s.io discoverability in openapi/v3
-  - 2d9829785 2023-08-08T22:45:06+02:00 update openapi
-  - 19c84ad0c 2023-08-08T22:45:06+02:00 expose apiregistration.k8s.io into OpenAPIV3
-  - 7e13299aa 2023-08-08T22:26:35+02:00 fix openapi/v3 non local apiservices aggregation
-  - 94b3e00ee 2023-08-08T09:57:24-06:00 [release-1.27] releng/go: Bump images, versions and deps to use Go 1.20.7
-  - e5512149e 2023-08-08T13:36:40+02:00 node: devicemgr: topomgr: add logs
-  - c3c0ce4b0 2023-08-08T13:36:40+02:00 e2e: node: add test to check device-requiring pods are cleaned up
-  - 5bad46a24 2023-08-08T13:36:40+02:00 e2e: node: devices: improve the node reboot test
-  - dd851f488 2023-08-08T13:36:39+02:00 e2e: node: devicemanager: update tests
-  - 34f2a5803 2023-08-08T13:36:13+02:00 kubelet: devices: skip allocation for running pods
-  - 5ad0eeb35 2023-08-07T19:21:43-04:00 Add test coverage of result size of string operations
-  - aa13d7716 2023-08-07T18:31:55-04:00 Bump cel-go to v0.12.7
-  - 927dba258 2023-07-27T12:09:17-04:00 e2e_node: move getSampleDevicePluginPod to device_plugin_test.go
-  - db832fdfa 2023-07-26T21:44:00-04:00 fix 'pod' in kubelet prober metrics
-  - 4c67c5d5e 2023-07-25T20:20:07+00:00 priority & fairness: support dynamically configuring work estimator max seats
-  - 17c98720e 2023-07-22T09:38:04-07:00 Add mininumKubelet tag into ReadWriteOncePod test
-  - ed0cdc9e0 2023-07-21T09:31:49+02:00 Include ignored pods when computing backoff delay for Job pod failures
-  - ae24a5cf7 2023-07-21T09:29:47+02:00 Remarks
-  - 9e1050b4d 2023-07-20T16:29:26+02:00 Adjust the algorithm for computing the pod finish time
-  - fa950050c 2023-07-19T12:38:41+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.4
-  - aefc4d039 2023-07-17T11:18:48+02:00 Rename updateReconstructedFromAPIServer
-  - eeba02fc6 2023-07-17T11:18:48+02:00 Rename volumesNeedDevicePath
-  - 5eb3b748e 2023-07-17T11:18:48+02:00 Update volumesInUse after attachability is confirmed
-  - f8bb161ab 2023-07-17T11:18:48+02:00 Add uncertain state of volume attach-ability
-  - 08b7937d2 2023-07-17T11:18:48+02:00 Refactor FindAttachablePluginBySpec out of CSI code path
-  - ad569aec1 2023-07-05T17:19:03-04:00 kubeadm: backdate generated CAs by 5 minutes
-  - 0fc5c9721 2023-07-05T17:19:03-04:00 client-go: allow to set NotBefore in NewSelfSignedCACert()
-  - 0711be306 2023-04-19T22:04:23+02:00 e2e: fix flaky test 'should contain OpenAPI V3 for Aggregated APIServer'
-  - 6f8ce72c0 2023-04-13T11:13:02+08:00 Fix a data race in TopologyCache
-  - 668778d1b 2023-04-13T11:13:00+08:00 Fix TopologyAwareHint not working when zone label is added after Node creation
-  - 92adc4a8f 2023-04-12T09:42:04+00:00 Squashed commit of the following:
-
-- machine-config-operator embedded-component 600d383913160046b64a2ddf103cd556f07ebf93 to b03e081db8a6c261413dad3fb963433526fc31c4
-  - 433fbced 2023-09-21T15:57:18+02:00 Ignore invoking nbctl calls if its SDN
-  - 6e70da71 2023-09-21T08:23:28+00:00 daemon: always use `podman cp` to copy extensions container content
-
-- service-ca-operator embedded-component 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003 to 030a429b314d772b7cc7a1dd9af2073988a5b0a5
-  - 69d223c 2023-09-18T10:15:59+00:00 add e2e tests for multiple webhooks CA injection
-  - 75abf7a 2023-09-18T10:15:59+00:00 vendor in testify
-  - 92c791d 2023-09-18T10:15:59+00:00 fix admission webhookConfig CA injector only injecting a single webhook of the config object
-
-- ovn-kubernetes image-amd64 e56387263b152ddff938addda8bbd787db2ddf2d to 731710f927063ab6a617a58473f99035f82f0d85
-  - 1e19e99 2023-09-21T10:00:29+02:00 Add additonal certificate acceptance condition feature in ovnkube-identity
-  - b5cafa9 2023-09-21T07:54:23+02:00 Add ovnkube-identity binary to the downstream image
-  - cc23bc3 2023-09-21T07:54:10+02:00 Introduce ovnkube-identity with per-node certs and a validating webhook
-  - 1838531 2023-09-21T07:46:58+02:00 vendor dependencies
-  - c7522c0 2023-09-21T07:46:45+02:00 OVN-Kubernetes Node Identity docs
-  - ac25fb0 2023-09-21T07:46:21+02:00 Refactor RBAC
-  - 1e2715b 2023-09-21T07:46:09+02:00 Use the status subresource for setting labels and annotations
-  - f278f15 2023-09-19T15:57:02+00:00 Check libovsdbclient.ErrNotFound on wrapped errors
-  - 3340627 2023-09-14T01:15:10+00:00 Update bridge flow cache when the host address changes
-
-- kubernetes image-amd64 2c287eb3d35003a8f746482ca30b461e9434b1cd to 16488786342bb5e6d11db24e1436a2643a1d729e
-  - 3cb8b51bf 2023-09-18T13:29:24-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 3f029a204 2023-09-18T11:13:41-03:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 741c8db18 2023-09-13T09:14:07+00:00 Release commit for Kubernetes v1.27.6
-  - 77c32144a 2023-09-07T15:33:21+02:00 [go] Bump images, versions and deps to use Go 1.20.8
-  - 588285d00 2023-09-05T19:30:43+00:00 fix: concurrent map writes in e2e test
-  - c0d2ca7bb 2023-09-03T23:53:49-07:00 Automated cherry pick of #119776: Fix a job quota related deadlock (#120320)
-  - 2274980ad 2023-09-01T23:38:02+08:00 Fix OpenAPI aggregation cleanup
-  - eafd33024 2023-09-01T11:02:06-04:00 Fallback to legacy discovery on a wider range of conditions in aggregator
-  - 28ea34497 2023-09-01T08:42:12-06:00 apiextensions-apiserver: generate applyconfigurations
-  - fc18ffe58 2023-08-31T16:38:51-04:00 TopologyAwareHints: Take lock in HasPopulatedHints
-  - 3449ab21b 2023-08-28T17:19:14+02:00 Mark Job onPodConditions as optional in pod failure policy
-  - dd6bc2548 2023-08-24T01:07:20+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.5
-  - 93e0d7146 2023-08-24T00:42:11+00:00 Release commit for Kubernetes v1.27.5
-  - 94c19e36b 2023-08-23T20:28:32+00:00 Incorporating feedback on 119341
-  - acc29048e 2023-08-23T07:00:53-07:00 Use environment varaibles for parameters in Powershell
-  - 172644fb5 2023-08-23T06:39:13-07:00 Use env varaibles for passing path
-  - d645863c2 2023-08-22T19:34:51-04:00 check for overflow
-  - b0d3be5af 2023-08-22T19:34:41-04:00 Fix CEL cost handling of zero length replacement strings
-  - 9c142a62f 2023-08-19T17:19:44+08:00 generate ReportingInstance and ReportingController in Event
-  - 78e14a2d8 2023-08-18T17:38:43+00:00 Pass Pinned field to kubecontainer.Image
-  - eb8524ba1 2023-08-18T10:11:24+05:30 prep for go1.21: use -e in go list
-  - 27d56a733 2023-08-17T13:35:50+00:00 Skip apiserver_admission_webhook_request_total during context-canceled
-  - 6c8436b1f 2023-08-17T13:35:50+00:00 Ignore context canceled from validate and mutate webhook failopen metric
-  - 5d6af9162 2023-08-17T14:48:04+03:00 kubeadm: fix nil pointer when etcd member is already removed
-  - 2898ccf28 2023-08-17T09:28:37+02:00 update to golangci-lint v1.54.1 + go-ruleguard v0.4.0
-  - e45173590 2023-08-15T13:30:35+00:00 fix: when PreFilter returns UnschedulableAndUnresolvable, copy the state in all nodes in statusmap
-  - 44e90d9dd 2023-08-14T09:51:50-07:00 Fix a bug that PostFilter plugin may not function if previous PreFilter plugins return Skip
-  - 5710aa179 2023-08-14T05:43:21+00:00 Issue 4230: remove readiness check for cache exclusion
-  - 3b6bcaa0b 2023-08-09T14:43:56-04:00 Avoid returning nil responseKind in v1beta1 aggregated discovery
-  - 99de7e6b7 2023-08-08T22:45:06+02:00 add test for apiservices.apiregistration.k8s.io discoverability in openapi/v3
-  - 2d9829785 2023-08-08T22:45:06+02:00 update openapi
-  - 19c84ad0c 2023-08-08T22:45:06+02:00 expose apiregistration.k8s.io into OpenAPIV3
-  - 7e13299aa 2023-08-08T22:26:35+02:00 fix openapi/v3 non local apiservices aggregation
-  - 94b3e00ee 2023-08-08T09:57:24-06:00 [release-1.27] releng/go: Bump images, versions and deps to use Go 1.20.7
-  - e5512149e 2023-08-08T13:36:40+02:00 node: devicemgr: topomgr: add logs
-  - c3c0ce4b0 2023-08-08T13:36:40+02:00 e2e: node: add test to check device-requiring pods are cleaned up
-  - 5bad46a24 2023-08-08T13:36:40+02:00 e2e: node: devices: improve the node reboot test
-  - dd851f488 2023-08-08T13:36:39+02:00 e2e: node: devicemanager: update tests
-  - 34f2a5803 2023-08-08T13:36:13+02:00 kubelet: devices: skip allocation for running pods
-  - 5ad0eeb35 2023-08-07T19:21:43-04:00 Add test coverage of result size of string operations
-  - aa13d7716 2023-08-07T18:31:55-04:00 Bump cel-go to v0.12.7
-  - 927dba258 2023-07-27T12:09:17-04:00 e2e_node: move getSampleDevicePluginPod to device_plugin_test.go
-  - db832fdfa 2023-07-26T21:44:00-04:00 fix 'pod' in kubelet prober metrics
-  - 4c67c5d5e 2023-07-25T20:20:07+00:00 priority & fairness: support dynamically configuring work estimator max seats
-  - 17c98720e 2023-07-22T09:38:04-07:00 Add mininumKubelet tag into ReadWriteOncePod test
-  - ed0cdc9e0 2023-07-21T09:31:49+02:00 Include ignored pods when computing backoff delay for Job pod failures
-  - ae24a5cf7 2023-07-21T09:29:47+02:00 Remarks
-  - 9e1050b4d 2023-07-20T16:29:26+02:00 Adjust the algorithm for computing the pod finish time
-  - fa950050c 2023-07-19T12:38:41+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.4
-  - aefc4d039 2023-07-17T11:18:48+02:00 Rename updateReconstructedFromAPIServer
-  - eeba02fc6 2023-07-17T11:18:48+02:00 Rename volumesNeedDevicePath
-  - 5eb3b748e 2023-07-17T11:18:48+02:00 Update volumesInUse after attachability is confirmed
-  - f8bb161ab 2023-07-17T11:18:48+02:00 Add uncertain state of volume attach-ability
-  - 08b7937d2 2023-07-17T11:18:48+02:00 Refactor FindAttachablePluginBySpec out of CSI code path
-  - ad569aec1 2023-07-05T17:19:03-04:00 kubeadm: backdate generated CAs by 5 minutes
-  - 0fc5c9721 2023-07-05T17:19:03-04:00 client-go: allow to set NotBefore in NewSelfSignedCACert()
-  - 0711be306 2023-04-19T22:04:23+02:00 e2e: fix flaky test 'should contain OpenAPI V3 for Aggregated APIServer'
-  - 6f8ce72c0 2023-04-13T11:13:02+08:00 Fix a data race in TopologyCache
-  - 668778d1b 2023-04-13T11:13:00+08:00 Fix TopologyAwareHint not working when zone label is added after Node creation
-  - 92adc4a8f 2023-04-12T09:42:04+00:00 Squashed commit of the following:
-
-- service-ca-operator image-amd64 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003 to 030a429b314d772b7cc7a1dd9af2073988a5b0a5
-  - 69d223c 2023-09-18T10:15:59+00:00 add e2e tests for multiple webhooks CA injection
-  - 75abf7a 2023-09-18T10:15:59+00:00 vendor in testify
-  - 92c791d 2023-09-18T10:15:59+00:00 fix admission webhookConfig CA injector only injecting a single webhook of the config object
-
-- ovn-kubernetes image-arm64 e56387263b152ddff938addda8bbd787db2ddf2d to 731710f927063ab6a617a58473f99035f82f0d85
-  - 1e19e99 2023-09-21T10:00:29+02:00 Add additonal certificate acceptance condition feature in ovnkube-identity
-  - b5cafa9 2023-09-21T07:54:23+02:00 Add ovnkube-identity binary to the downstream image
-  - cc23bc3 2023-09-21T07:54:10+02:00 Introduce ovnkube-identity with per-node certs and a validating webhook
-  - 1838531 2023-09-21T07:46:58+02:00 vendor dependencies
-  - c7522c0 2023-09-21T07:46:45+02:00 OVN-Kubernetes Node Identity docs
-  - ac25fb0 2023-09-21T07:46:21+02:00 Refactor RBAC
-  - 1e2715b 2023-09-21T07:46:09+02:00 Use the status subresource for setting labels and annotations
-  - f278f15 2023-09-19T15:57:02+00:00 Check libovsdbclient.ErrNotFound on wrapped errors
-  - 3340627 2023-09-14T01:15:10+00:00 Update bridge flow cache when the host address changes
-
-- kubernetes image-arm64 2c287eb3d35003a8f746482ca30b461e9434b1cd to 16488786342bb5e6d11db24e1436a2643a1d729e
-  - 3cb8b51bf 2023-09-18T13:29:24-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 3f029a204 2023-09-18T11:13:41-03:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 741c8db18 2023-09-13T09:14:07+00:00 Release commit for Kubernetes v1.27.6
-  - 77c32144a 2023-09-07T15:33:21+02:00 [go] Bump images, versions and deps to use Go 1.20.8
-  - 588285d00 2023-09-05T19:30:43+00:00 fix: concurrent map writes in e2e test
-  - c0d2ca7bb 2023-09-03T23:53:49-07:00 Automated cherry pick of #119776: Fix a job quota related deadlock (#120320)
-  - 2274980ad 2023-09-01T23:38:02+08:00 Fix OpenAPI aggregation cleanup
-  - eafd33024 2023-09-01T11:02:06-04:00 Fallback to legacy discovery on a wider range of conditions in aggregator
-  - 28ea34497 2023-09-01T08:42:12-06:00 apiextensions-apiserver: generate applyconfigurations
-  - fc18ffe58 2023-08-31T16:38:51-04:00 TopologyAwareHints: Take lock in HasPopulatedHints
-  - 3449ab21b 2023-08-28T17:19:14+02:00 Mark Job onPodConditions as optional in pod failure policy
-  - dd6bc2548 2023-08-24T01:07:20+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.5
-  - 93e0d7146 2023-08-24T00:42:11+00:00 Release commit for Kubernetes v1.27.5
-  - 94c19e36b 2023-08-23T20:28:32+00:00 Incorporating feedback on 119341
-  - acc29048e 2023-08-23T07:00:53-07:00 Use environment varaibles for parameters in Powershell
-  - 172644fb5 2023-08-23T06:39:13-07:00 Use env varaibles for passing path
-  - d645863c2 2023-08-22T19:34:51-04:00 check for overflow
-  - b0d3be5af 2023-08-22T19:34:41-04:00 Fix CEL cost handling of zero length replacement strings
-  - 9c142a62f 2023-08-19T17:19:44+08:00 generate ReportingInstance and ReportingController in Event
-  - 78e14a2d8 2023-08-18T17:38:43+00:00 Pass Pinned field to kubecontainer.Image
-  - eb8524ba1 2023-08-18T10:11:24+05:30 prep for go1.21: use -e in go list
-  - 27d56a733 2023-08-17T13:35:50+00:00 Skip apiserver_admission_webhook_request_total during context-canceled
-  - 6c8436b1f 2023-08-17T13:35:50+00:00 Ignore context canceled from validate and mutate webhook failopen metric
-  - 5d6af9162 2023-08-17T14:48:04+03:00 kubeadm: fix nil pointer when etcd member is already removed
-  - 2898ccf28 2023-08-17T09:28:37+02:00 update to golangci-lint v1.54.1 + go-ruleguard v0.4.0
-  - e45173590 2023-08-15T13:30:35+00:00 fix: when PreFilter returns UnschedulableAndUnresolvable, copy the state in all nodes in statusmap
-  - 44e90d9dd 2023-08-14T09:51:50-07:00 Fix a bug that PostFilter plugin may not function if previous PreFilter plugins return Skip
-  - 5710aa179 2023-08-14T05:43:21+00:00 Issue 4230: remove readiness check for cache exclusion
-  - 3b6bcaa0b 2023-08-09T14:43:56-04:00 Avoid returning nil responseKind in v1beta1 aggregated discovery
-  - 99de7e6b7 2023-08-08T22:45:06+02:00 add test for apiservices.apiregistration.k8s.io discoverability in openapi/v3
-  - 2d9829785 2023-08-08T22:45:06+02:00 update openapi
-  - 19c84ad0c 2023-08-08T22:45:06+02:00 expose apiregistration.k8s.io into OpenAPIV3
-  - 7e13299aa 2023-08-08T22:26:35+02:00 fix openapi/v3 non local apiservices aggregation
-  - 94b3e00ee 2023-08-08T09:57:24-06:00 [release-1.27] releng/go: Bump images, versions and deps to use Go 1.20.7
-  - e5512149e 2023-08-08T13:36:40+02:00 node: devicemgr: topomgr: add logs
-  - c3c0ce4b0 2023-08-08T13:36:40+02:00 e2e: node: add test to check device-requiring pods are cleaned up
-  - 5bad46a24 2023-08-08T13:36:40+02:00 e2e: node: devices: improve the node reboot test
-  - dd851f488 2023-08-08T13:36:39+02:00 e2e: node: devicemanager: update tests
-  - 34f2a5803 2023-08-08T13:36:13+02:00 kubelet: devices: skip allocation for running pods
-  - 5ad0eeb35 2023-08-07T19:21:43-04:00 Add test coverage of result size of string operations
-  - aa13d7716 2023-08-07T18:31:55-04:00 Bump cel-go to v0.12.7
-  - 927dba258 2023-07-27T12:09:17-04:00 e2e_node: move getSampleDevicePluginPod to device_plugin_test.go
-  - db832fdfa 2023-07-26T21:44:00-04:00 fix 'pod' in kubelet prober metrics
-  - 4c67c5d5e 2023-07-25T20:20:07+00:00 priority & fairness: support dynamically configuring work estimator max seats
-  - 17c98720e 2023-07-22T09:38:04-07:00 Add mininumKubelet tag into ReadWriteOncePod test
-  - ed0cdc9e0 2023-07-21T09:31:49+02:00 Include ignored pods when computing backoff delay for Job pod failures
-  - ae24a5cf7 2023-07-21T09:29:47+02:00 Remarks
-  - 9e1050b4d 2023-07-20T16:29:26+02:00 Adjust the algorithm for computing the pod finish time
-  - fa950050c 2023-07-19T12:38:41+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.4
-  - aefc4d039 2023-07-17T11:18:48+02:00 Rename updateReconstructedFromAPIServer
-  - eeba02fc6 2023-07-17T11:18:48+02:00 Rename volumesNeedDevicePath
-  - 5eb3b748e 2023-07-17T11:18:48+02:00 Update volumesInUse after attachability is confirmed
-  - f8bb161ab 2023-07-17T11:18:48+02:00 Add uncertain state of volume attach-ability
-  - 08b7937d2 2023-07-17T11:18:48+02:00 Refactor FindAttachablePluginBySpec out of CSI code path
-  - ad569aec1 2023-07-05T17:19:03-04:00 kubeadm: backdate generated CAs by 5 minutes
-  - 0fc5c9721 2023-07-05T17:19:03-04:00 client-go: allow to set NotBefore in NewSelfSignedCACert()
-  - 0711be306 2023-04-19T22:04:23+02:00 e2e: fix flaky test 'should contain OpenAPI V3 for Aggregated APIServer'
-  - 6f8ce72c0 2023-04-13T11:13:02+08:00 Fix a data race in TopologyCache
-  - 668778d1b 2023-04-13T11:13:00+08:00 Fix TopologyAwareHint not working when zone label is added after Node creation
-  - 92adc4a8f 2023-04-12T09:42:04+00:00 Squashed commit of the following:
-
-- service-ca-operator image-arm64 5e9dfaadeb46f3ca7ff4343ed4f76f1186ea3003 to 030a429b314d772b7cc7a1dd9af2073988a5b0a5
-  - 69d223c 2023-09-18T10:15:59+00:00 add e2e tests for multiple webhooks CA injection
-  - 75abf7a 2023-09-18T10:15:59+00:00 vendor in testify
-  - 92c791d 2023-09-18T10:15:59+00:00 fix admission webhookConfig CA injector only injecting a single webhook of the config object
+- ovn-kubernetes image-arm64 731710f927063ab6a617a58473f99035f82f0d85 to 757426b5dc784d7eea60feed0d3ec7bfb3782bd4
+  - 7dc4804 2023-09-15T15:58:48+02:00 Introduce ovnkube-identity with per-node certs and a validating webhook
+  - ab27303 2023-09-15T15:58:47+02:00 vendor dependencies
+  - a61d357 2023-09-15T15:58:47+02:00 OVN-Kubernetes Node Identity docs
+  - 8055a47 2023-09-15T15:40:47+02:00 Free up more disk space, remove image once loaded
+  - afb304a 2023-09-15T15:40:47+02:00 Remove the centos image usages from e2e tests
+  - ccabba4 2023-09-14T10:52:25-04:00 clearInitialNodeNetworkUnavailableCondition() called on node update
+  - 01286a7 2023-09-14T09:09:08-05:00 Dockerfile: bump OVN to ovn23.09-23.09.0-beta.31.el9fdp
+  - 0046069 2023-09-14T14:07:38+01:00 EIP: fix entry of eip into validated eip set
+  - 1756511 2023-09-14T13:17:30+01:00 EIP test: fix incorrect node name passed to allocator
+  - 1141809 2023-09-14T13:17:04+01:00 EIP test: do not add non-OVN managed networks to EIP config
+  - 096ac00 2023-09-14T00:17:47+00:00 Update bridge flow cache when the host address changes
+  - 2666ed4 2023-09-12T14:06:00+01:00 Retry EIP node repair for a period of time
+  - 2107cc0 2023-09-12T14:06:00+01:00 Fix Egress IP detection of OVN and non-OVN networks
+  - e2b9680 2023-09-11T14:58:14+02:00 Refactor hybrid-overlay-node for linux nodes
+  - 4980714 2023-09-06T18:25:20+00:00 Check libovsdbclient.ErrNotFound on wrapped errors
+  - 099f803 2023-09-06T18:12:01+02:00 Add e2e for mimicing pod2external case via GR
+  - b805dfa 2023-09-06T18:12:01+02:00 Enable gateway_mtu on rtoe port of GR
+  - a747d8e 2023-09-06T12:23:00+02:00 Add e2e test for pmtud on an load balancer service
+  - bd40c03 2023-09-06T12:09:47+02:00 Make PMTUD works in shared gateway mode
+  - b7e85c7 2023-09-05T11:51:24-05:00 types: remove redundant meter names
+  - b534190 2023-09-05T11:51:24-05:00 ovn: add COPP for Service Monitor to prevent CVE-2023-3153
+  - e766245 2023-09-05T15:03:37+02:00 Make ovnkube-trace to work for ovnkube-controller
+  - f9394c3 2023-09-05T13:25:37+02:00 e2e, kubevirt: Pin fedora coreos image
+  - 7ece621 2023-09-04T23:02:36+02:00 Do not set vlanID when its zero
+  - 5738c58 2023-09-04T17:00:18+02:00 LGW: Fix the precedence of rules in FORWARD chain
+  - f6f3f84 2023-09-04T15:01:49+02:00 EIP multi NIC: ensure we exclude ovn managed networks
+  - c3b1a54 2023-09-04T12:28:08+02:00 e2e: Avoid test panic if unidling test fails
+  - 758b10d 2023-09-01T23:59:25-04:00 fix: build-go.sh capture k8s.io/client-go version to use in build tag
+  - 6ef8a10 2023-09-01T10:33:46-04:00 Set default network topology type to layer 3
+  - 6b345bf 2023-09-01T10:32:00-04:00 More perf optimizations with searching for Pod IPs
+  - 63f83fa 2023-08-30T18:09:37-04:00 Speed up getting pod ips from pod with default network
+  - 9a578a5 2023-08-30T18:09:37-04:00 When enabling metrics in kind, enable pprof
+  - 47ec3b8 2023-08-30T18:09:37-04:00 Fixes enabling scale metrics with kind
+  - 5d56a53 2023-08-30T18:59:57+02:00 Fix push image permissions
+  - 132065b 2023-08-30T10:51:20+02:00 fix race condition in hybrid overlay.
+  - e9ba301 2023-08-30T10:43:44+02:00 EIP multi NIC: fix possible exception when finding a network for EIP
+  - 9fee8d0 2023-08-30T10:40:21+02:00 Refactor RBAC
+  - 579d224 2023-08-30T10:40:21+02:00 Use the status subresource for setting labels and annotations
+  - 6798a9b 2023-08-29T13:16:38+02:00 EIP TC: stop flake by ensuring EIP spec and status are equal
+  - ee363c2 2023-08-28T15:16:18+02:00 kind: enable control plane/cluster manager HA with IC
+  - a5ea0b6 2023-08-28T11:42:22+02:00 Update ovnkube-trace readme file
+  - e14dc81 2023-08-25T13:53:49-04:00 APB: fix issue when policyConfig status is not flagged as failed when there is an error updating a policy
+  - 0419f8e 2023-08-25T13:05:10-04:00 Correct the operation of the hybrid overlay
+  - 9fde26f 2023-08-25T09:52:23-04:00 Change APB unit test to use multus annotation instead of hostnetwork to run the nbDB flow as part of the unit tests
+  - 0e75d7f 2023-08-25T12:49:22+02:00 Rename GetDbObjsForAS to GetTestDbAddrSets as it should be used only for testing. This is a follow-up to the 2c252f11344c80718fc1b291d0e0921e2afb4e41 where I added UUID generation for address sets, which can only be used for testing.
+  - 87a8c3f 2023-08-24T14:20:01-04:00 move clearInitialNodeNetworkUnavailableCondition to clustermanager
+  - 771c0ce 2023-08-24T15:02:00+00:00 kind: allow custom encap port configuration
+  - bf107a3 2023-08-24T14:14:03+00:00 Fix encap port configuration for remote chassis
+  - d21e770 2023-08-22T11:10:01+02:00 NIT: Rename annoation to annotation
+  - 1e0028f 2023-08-04T08:53:52+00:00 Remove secondary network ports on node local to remote event
+  - db7126c 2023-08-04T08:37:33+00:00 Watch nodes for localnet secondary networks
 
