@@ -169,6 +169,7 @@ install -d %{buildroot}%{_bindir}
 install -p -m755 ./_output/microshift %{buildroot}%{_bindir}/microshift
 install -p -m755 ./_output/microshift-etcd %{buildroot}%{_bindir}/microshift-etcd
 install -p -m755 scripts/microshift-cleanup-data.sh %{buildroot}%{_bindir}/microshift-cleanup-data
+install -p -m755 scripts/microshift-sos-report.sh %{buildroot}%{_bindir}/microshift-sos-report
 
 install -d -m755 %{buildroot}%{_sharedstatedir}/microshift
 install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-backups
@@ -306,6 +307,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/microshift
 %{_bindir}/microshift-etcd
 %{_bindir}/microshift-cleanup-data
+%{_bindir}/microshift-sos-report
 %{_unitdir}/microshift.service
 %{_sysconfdir}/crio/crio.conf.d/microshift.conf
 %{_datadir}/microshift/spec/config-openapi-spec.json
@@ -352,6 +354,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Sep 06 2023 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.14.0
+- Add microshift-sos-report binary
+
 * Thu Jul 27 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.14.0
 - The microshift-greenboot package is no longer optional
 
