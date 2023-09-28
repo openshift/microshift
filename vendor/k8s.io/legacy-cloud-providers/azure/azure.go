@@ -41,7 +41,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	cloudprovider "k8s.io/cloud-provider"
-	cloudproviderapi "k8s.io/cloud-provider/api"
 	"k8s.io/klog/v2"
 	"k8s.io/legacy-cloud-providers/azure/auth"
 	azcache "k8s.io/legacy-cloud-providers/azure/cache"
@@ -986,13 +985,4 @@ func (az *Cloud) ShouldNodeExcludedFromLoadBalancer(nodeName string) (bool, erro
 	}
 
 	return az.excludeLoadBalancerNodes.Has(nodeName), nil
-}
-
-func getCloudTaint(taints []v1.Taint) *v1.Taint {
-	for _, taint := range taints {
-		if taint.Key == cloudproviderapi.TaintExternalCloudProvider {
-			return &taint
-		}
-	}
-	return nil
 }
