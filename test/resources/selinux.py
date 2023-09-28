@@ -1,6 +1,7 @@
 from robot.libraries.BuiltIn import BuiltIn
 from libostree import remote_sudo_rc, remote_sudo
 from typing import List
+import re
 
 ACCESS_CHECK_MAP = {
     "/var/lib/microshift/version": ["cat"],
@@ -63,6 +64,12 @@ EXPECTED_FCONTEXT_LIST = [
 
 SOURCE_TARGET_TRANSITION = {
     "container_t": ["container_var_lib_t"]
+}
+
+# Ignoring things that are common of less privileged and thus not a concern.
+# https://github.com/fedora-selinux/selinux-policy/blob/b56ae8af271091a8eb8d1fe0421f4f8ffa151f2d/policy/modules/kernel/files.te#L216-L226
+DOMAIN_PERMISSION_IGNORE_REGEX = {
+    "^file_type [a-z_]+:filesystem$": ["associate"],
 }
 
 
@@ -157,7 +164,8 @@ def run_default_access_binary_transition_check(script_file_path: str) -> List[st
     return run_binary_domain_transition_check(script_file_path, ACCESS_CHECK_MAP)
 
 
-# For a given root source, query transition process types to recursivly
+# For a given root source, query transition process types to recursivly get all
+# contexts
 def get_all_traversal_transition_contexts(source: str) -> List[str]:
     sesearch_cmd = "sesearch --type_trans -c process -s"
     accum = []
@@ -179,6 +187,56 @@ def get_all_traversal_transition_contexts(source: str) -> List[str]:
     return list(set(accum))
 
 
+# Check if we should ignore this specific domain check
+def ignore_domain_check(source: str, key: str, domain_permissions: List[str]) -> bool:
+    # Ignore self refernce to filesystem associatation
+    found = re.search(f"{source} {source}:filesystem", key)
+    if found:
+        if len(domain_permissions) == 1 and "associate" in domain_permissions:
+            print(f"match on {source} key {key}")
+            return True
+
+    # Iterate over ignore rules
+    for reg, permissions in DOMAIN_PERMISSION_IGNORE_REGEX.items():
+        found = re.search(reg, key)
+        if found and all(perm in permissions for perm in domain_permissions):
+            print(f"match on {reg} key {key}")
+            return True
+    return False
+
+
+# Given a parent context and all of its possible transitional context sources check to make sure
+# each one of the transitional sources does not contain permissions that are not expected or more
+# than the parent permissions.
+# i.e. a permission to a context that the parent does not have.
+def sources_have_less_permission_than_parent(parent: str, all_sources: List[str]) -> List[str]:
+    allow_cmd = "sesearch -S -A"
+    semanage_cmd = "semanage fcontext -l"
+
+    parent_number_of_permissions, rc = remote_sudo_rc(f"{allow_cmd} -s {parent} | wc -l")
+    BuiltIn().should_be_equal_as_integers(rc, 0)
+    error_list = []
+
+    for source in all_sources:
+        domain_context = source
+        if "_exec_t" in domain_context:
+            domain_context = source.replace('_exec', '')
+
+        source_number_of_permissions, rc = remote_sudo_rc(f"{allow_cmd} -s {domain_context} | wc -l")
+        BuiltIn().should_be_equal_as_integers(rc, 0)
+
+        if source_number_of_permissions != parent_number_of_permissions:
+            file_path, rc = remote_sudo_rc(f"{semanage_cmd} | grep {source} | awk '{{ print $1 }}'")
+            BuiltIn().should_be_equal_as_integers(rc, 0)
+            file_exists, rc = remote_sudo_rc(f"[ -e {file_path} ] && echo found || echo safe")
+            BuiltIn().should_be_equal_as_integers(rc, 0)
+
+            if file_exists == "found":
+                error_list.append(f"source: {source} has differnt permission count than parent: {parent} with file({file_path}), needs investigation.")
+
+    return error_list
+
+
 # Given a source context and target source target, try and traverse the process transiton path to see
 # if it's possible to gain access to the target context.
 def run_traversal_access_check(source_target_map: dict[str, List[str]]) -> List[str]:
@@ -191,6 +249,10 @@ def run_traversal_access_check(source_target_map: dict[str, List[str]]) -> List[
         all_sources = get_all_traversal_transition_contexts(parent_source)
         if len(all_sources) == 0:
             return error_list
+
+        errs = sources_have_less_permission_than_parent(parent_source, all_sources)
+        if errs and len(errs) > 0:
+            error_list.extend(errs)
 
         # for all desired targets check if the identified sources have allow rules to our target
         # currently, we fail on any allow rules existing

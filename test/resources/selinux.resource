@@ -21,7 +21,7 @@ Validate SELinux
     [Documentation]    Wrapper call for all SELinux checks
 
     Containers Should Not Have Access To Container Var Lib Labels
-    Run Default Traversal Access Check
+    Context Traversal Should Not Gain More Access
     Folders Should Have Expected Fcontext Types
     Semanage Fcontext Should Have Combined List Of OCP And MicroShift Rules
     Audit Log Should Be Empty For MicroShift
@@ -63,6 +63,12 @@ Audit Log Should Be Empty For MicroShift
     [Documentation]    Checks that no permission denials have occured during running MicroShift
 
     ${result}=    Get Denial Audit Log
+    Should Be Empty    ${result}
+
+Context Traversal Should Not Gain More Access
+    [Documentation]    Checks that no extra permissions are gained via domain and context changes.
+
+    ${result}=    Run Default Traversal Access Check
     Should Be Empty    ${result}
 
 # Helper Functions
