@@ -23,7 +23,7 @@ func DataManagement(dataManager datadir.Manager) error {
 		dataManager: dataManager,
 	}
 
-	if err := dm.newPerform(); err != nil {
+	if err := dm.perform(); err != nil {
 		klog.ErrorS(err, "FAIL pre-run data management")
 		return err
 	}
@@ -36,7 +36,7 @@ type dataManagement struct {
 	dataManager datadir.Manager
 }
 
-func (dm *dataManagement) newPerform() error {
+func (dm *dataManagement) perform() error {
 	if isOstree, err := util.PathExists("/run/ostree-booted"); err != nil {
 		return fmt.Errorf("failed to check if system is ostree: %w", err)
 	} else if !isOstree {
@@ -45,7 +45,7 @@ func (dm *dataManagement) newPerform() error {
 	}
 
 	klog.Info("START creating backup")
-	if err := dm.alwaysBackup(); err != nil {
+	if err := dm.backup(); err != nil {
 		klog.ErrorS(err, "FAIL creating backup")
 		return err
 	}
@@ -61,7 +61,7 @@ func (dm *dataManagement) newPerform() error {
 	return nil
 }
 
-func (dm *dataManagement) alwaysBackup() error {
+func (dm *dataManagement) backup() error {
 	dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
 	if err != nil {
 		return fmt.Errorf("failed to check if data directory exists: %w", err)
@@ -85,7 +85,31 @@ func (dm *dataManagement) alwaysBackup() error {
 		return fmt.Errorf("loading version metadata failed: %w", err)
 	}
 	klog.InfoS("Contents of version file", "contents", versionFile)
-	return dm.newBackup(versionFile)
+
+	existingBackups, err := getBackups(dm.dataManager)
+	if err != nil {
+		return err
+	}
+
+	newBackupName := versionFile.BackupName()
+	if existingBackups.has(newBackupName) {
+		klog.InfoS("Backup already exists", "name", newBackupName)
+		return nil
+	}
+
+	if err := dm.dataManager.Backup(newBackupName); err != nil {
+		return fmt.Errorf("failed to create backup %q: %w", newBackupName, err)
+	}
+
+	// after making a new backup, remove all old backups for the deployment
+	existingBackups.getForDeployment(versionFile.DeploymentID).removeAll(dm.dataManager)
+
+	// prune old backups
+	if err := dm.removeBackupsWithoutExistingDeployments(existingBackups); err != nil {
+		klog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
+	}
+
+	return nil
 }
 
 func (dm *dataManagement) optionalRestore() error {
@@ -127,7 +151,7 @@ func (dm *dataManagement) optionalRestore() error {
 	}
 	if !dataExists {
 		// Data doesn't exist, we have suitable backup, let's restore
-		if err := dm.restore(backup); err != nil {
+		if err := dm.restore(backup, nil); err != nil {
 			klog.ErrorS(err, "Failed to restore")
 			return err
 		}
@@ -194,7 +218,7 @@ func (dm *dataManagement) optionalRestore() error {
 	//
 	// Let's restore and remove the `restore` file
 
-	if err := dm.restore(backup); err != nil {
+	if err := dm.restore(backup, &versionFile); err != nil {
 		klog.ErrorS(err, "Failed to restore")
 		return err
 	}
@@ -262,33 +286,6 @@ func (dm *dataManagement) backup413() error {
 	return nil
 }
 
-func (dm *dataManagement) newBackup(vf versionFile) error {
-	existingBackups, err := getBackups(dm.dataManager)
-	if err != nil {
-		return err
-	}
-
-	newBackupName := vf.BackupName()
-	if existingBackups.has(newBackupName) {
-		klog.InfoS("Backup already exists", "name", newBackupName)
-		return nil
-	}
-
-	if err := dm.dataManager.Backup(newBackupName); err != nil {
-		return fmt.Errorf("failed to create backup %q: %w", newBackupName, err)
-	}
-
-	// after making a new backup, remove all old backups for the deployment
-	existingBackups.getForDeployment(vf.DeploymentID).removeAll(dm.dataManager)
-
-	// prune old backups
-	if err := dm.removeBackupsWithoutExistingDeployments(existingBackups); err != nil {
-		klog.ErrorS(err, "Failed to remove backups belonging to no longer existing deployments - ignoring")
-	}
-
-	return nil
-}
-
 func (dm *dataManagement) removeBackupsWithoutExistingDeployments(backups Backups) error {
 	klog.InfoS("Attempting to remove backups for no longer existing deployments")
 	deployments, err := getAllDeploymentIDs()
@@ -309,9 +306,8 @@ func (dm *dataManagement) removeBackupsWithoutExistingDeployments(backups Backup
 	return nil
 }
 
-func (dm *dataManagement) restore(backup datadir.BackupName) error {
-	versionFile, err := getVersionFile()
-	if err == nil {
+func (dm *dataManagement) restore(backup datadir.BackupName, vf *versionFile) error {
+	if vf != nil {
 		// `version` was successfully read, so we can compare
 		// with deployment and boot IDs extracted from backup's name
 
@@ -320,10 +316,10 @@ func (dm *dataManagement) restore(backup datadir.BackupName) error {
 			return spl[0], spl[1]
 		}()
 
-		if versionFile.DeploymentID == deploy && versionFile.BootID == boot {
+		if vf.DeploymentID == deploy && vf.BootID == boot {
 			klog.InfoS("Restore skipped - data directory already matches backup to restore",
 				"backup-name", backup,
-				"version", versionFile)
+				"version", *vf)
 			return nil
 		}
 	}
