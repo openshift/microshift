@@ -18,6 +18,7 @@ source "${SCRIPTDIR}/common.sh"
 osbuild_logs() {
     workers_services=$(sudo systemctl list-units | awk '/osbuild-worker@/ {print $1} /osbuild-composer\.service/ {print $1}')
     for service in ${workers_services}; do
+        # shellcheck disable=SC2024  # redirect and sudo
         sudo journalctl -u "${service}" &> "${LOGDIR}/${service}.log"
     done
 }
