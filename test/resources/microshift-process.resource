@@ -108,3 +108,5 @@ Cleanup MicroShift
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Log Many    ${stdout}    ${stderr}    ${rc}
     Should Be Equal As Integers    ${rc}    0
+
+    Enable MicroShift
