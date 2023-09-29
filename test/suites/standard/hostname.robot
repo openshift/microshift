@@ -54,5 +54,6 @@ Setup Hostname
     IF    "${hostname}"=="${EMPTY}"    RETURN
     ${old}=    Change Hostname    ${hostname}
     Cleanup MicroShift    --all    --keep-images
+    Systemctl    enable    microshift
     Restart MicroShift
     RETURN    ${old}
