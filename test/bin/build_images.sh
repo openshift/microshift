@@ -15,6 +15,13 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+osbuild_logs() {
+    workers_services=$(sudo systemctl list-units | awk '/osbuild-worker@/ {print $1} /osbuild-composer\.service/ {print $1}')
+    for service in ${workers_services}; do
+        sudo journalctl -u "${service}" &> "${LOGDIR}/${service}.log"
+    done
+}
+
 configure_package_sources() {
     ## TEMPLATE VARIABLES
     #
@@ -443,6 +450,8 @@ mkdir -p "${IMAGEDIR}/builds"
 mkdir -p "${VM_DISK_BASEDIR}"
 
 configure_package_sources
+
+trap 'osbuild_logs' EXIT
 
 if [ -n "${GROUP}" ]; then
     do_group "${GROUP}" "${TEMPLATE}"
