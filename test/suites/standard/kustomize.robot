@@ -241,6 +241,7 @@ Restore Default Config
     ${is_ostree}=    Is System OSTree
     IF    ${is_ostree}
         Reboot MicroShift Host
+        Wait For MicroShift Service
         Wait For MicroShift
     ELSE
         Restart MicroShift
