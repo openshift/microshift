@@ -14,23 +14,25 @@ shopt -s nullglob
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+# shellcheck source=test/bin/get_crel_version_repo.sh
+source "${SCRIPTDIR}/get_crel_version_repo.sh"
 
 configure_package_sources() {
     ## TEMPLATE VARIABLES
-    #
-    # Machine platform type ("x86_64")
-    UNAME_M=$(uname -m)
-    export UNAME_M
+    export UNAME_M                 # defined in common.sh
     export LOCAL_REPO              # defined in common.sh
     export NEXT_REPO               # defined in common.sh
     export BASE_REPO               # defined in common.sh
     export YPLUS2_REPO             # defined in common.sh
+    export CURRENT_RELEASE_REPO
+
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
     export FAKE_YPLUS2_MINOR_VERSION
     export MINOR_VERSION
     export PREVIOUS_MINOR_VERSION
     export SOURCE_VERSION_BASE
+    export CURRENT_RELEASE_VERSION
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -434,6 +436,10 @@ PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 FAKE_YPLUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" + 2 ))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
+
+CURRENT_RELEASE_VERSION=""
+CURRENT_RELEASE_REPO=""
+get_crel_version_repo "${MINOR_VERSION}"
 
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"
