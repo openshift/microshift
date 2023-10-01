@@ -21,16 +21,20 @@
           state: present
           username: "{{ rhel_username }}"
           password: "{{ rhel_password }}"
-          pool_ids: "{{ rhel_pool_id }}"
 
       - name: enable repo management from subscription-manager
         ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
-
-      - name: disable all repos
-        community.general.rhsm_repository:
-          name: '*'
-          state: disabled
     when: manage_subscription
+
+  - name: slurp redhat-release
+    ansible.builtin.slurp:
+      src: /etc/redhat-release
+    register: redhat_release_slurp
+
+  - name: set beta release of RHEL
+    ansible.builtin.set_fact:
+      rhel_beta: beta-
+    when: "'Beta' in (redhat_release_slurp['content'] | b64decode)"
 
   - name: enable required repos for microshift
     community.general.rhsm_repository:
@@ -38,14 +42,15 @@
 
   - name: install EPEL repo
     ansible.builtin.dnf:
-      name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
+      name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
       disable_gpg_check: true
       state: present
 
-  - name: install ocp beta repo
+  - name: install ocp 4.xx beta repo
     ansible.builtin.template:
       src: ocpbeta.repo.j2
       dest: /etc/yum.repos.d/{{ ocp_repo_name }}.repo
+    when: rhel_beta != ''
   when: ansible_distribution == "RedHat"
 
 - name: gather the package facts
