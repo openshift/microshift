@@ -35,6 +35,7 @@ MicroShift Is Live
 
 Wait For MicroShift
     [Documentation]    Wait for various checks to ensure MicroShift is online.
+    Wait For MicroShift Service
     Wait Until Keyword Succeeds    30x    10s
     ...    MicroShift Is Ready
     Wait Until Keyword Succeeds    30x    10s
