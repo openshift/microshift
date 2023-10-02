@@ -17,6 +17,14 @@ source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/get_crel_version_repo.sh
 source "${SCRIPTDIR}/get_crel_version_repo.sh"
 
+osbuild_logs() {
+    workers_services=$(sudo systemctl list-units | awk '/osbuild-worker@/ {print $1} /osbuild-composer\.service/ {print $1}')
+    for service in ${workers_services}; do
+        # shellcheck disable=SC2024  # redirect and sudo
+        sudo journalctl -u "${service}" &> "${LOGDIR}/${service}.log"
+    done
+}
+
 configure_package_sources() {
     ## TEMPLATE VARIABLES
     export UNAME_M                 # defined in common.sh
@@ -449,6 +457,8 @@ mkdir -p "${IMAGEDIR}/builds"
 mkdir -p "${VM_DISK_BASEDIR}"
 
 configure_package_sources
+
+trap 'osbuild_logs' EXIT
 
 if [ -n "${GROUP}" ]; then
     do_group "${GROUP}" "${TEMPLATE}"
