@@ -51,7 +51,18 @@ CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
 MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
 CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
 
+collect_osbuild_logs(){
+    # for all osbuild-worker@[0-9]+ and osbuild-composer services, capture service logs to a file of the same name
+    mkdir /tmp/osbuilder-logs
+    workers_services=$(sudo systemctl list-units |systemctl list-units| awk '/osbuild\-(worker@[0-9]+|composer)\.service/ {print $1}')
+    while IFS= read -r service; do
+        journalctl -u "${service}" &> "${LOGDIR}/${service}"
+    done <<<"${workers_services}"
+}
+trap 'collect_osbuild_logs' EXIT
+
 bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
+
 bash -x ./bin/build_images.sh
 
 echo "Build phase complete"
