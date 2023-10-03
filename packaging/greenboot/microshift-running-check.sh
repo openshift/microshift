@@ -19,6 +19,7 @@ trap 'script_exit' EXIT
 # The term handler to override the default behavior and have a uniform and
 # homogeneous exit code in all controlled situations.
 function return_failure() {
+    echo "Signal received, terminating."
     exit 1
 }
 
