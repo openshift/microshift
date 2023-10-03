@@ -27,7 +27,7 @@ Downgrade Is Blocked
     ${initial_deploy_backup}=    Get Future Backup Name For Current Boot
 
     Deploy Commit Expecting A Rollback    ${OLDER_MICROSHIFT_REF}    write_agent_cfg=False
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
     Backup Should Exist    ${initial_deploy_backup}
     Journal Should Have Information About Failed Version Comparison
 
@@ -38,7 +38,7 @@ Setup
     Check Required Env Variables
     Should Not Be Empty    ${OLDER_MICROSHIFT_REF}    FAKE_NEXT_MINOR_REF variable is required
     Login MicroShift Host
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
 
 Teardown
     [Documentation]    Test suite teardown

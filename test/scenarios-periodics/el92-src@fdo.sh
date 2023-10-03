@@ -13,7 +13,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "FAILING_REF:rhel-9.2-microshift-source-aux" \
+        --variable "FAILING_REF:rhel-9.2-microshift-source-fake-yplus2-minor" \
         --variable "TARGET_REF:rhel-9.2-microshift-source" \
         suites/upgrade/fdo.robot
 }

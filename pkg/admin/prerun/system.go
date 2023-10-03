@@ -75,27 +75,6 @@ func getCurrentDeploymentID() (string, error) {
 	return "", fmt.Errorf("could not find booted deployment in %#v", deployments)
 }
 
-func getRollbackDeploymentID() (string, error) {
-	deployments, err := getDeploymentsFromOSTree()
-	if err != nil {
-		return "", fmt.Errorf("failed to get deployments: %w", err)
-	}
-
-	afterBooted := false
-	for _, d := range deployments {
-		if afterBooted {
-			return d.ID, nil
-		}
-
-		if d.Booted {
-			afterBooted = true
-		}
-	}
-
-	// missing rollback deployment is valid scenario
-	return "", nil
-}
-
 func getAllDeploymentIDs() ([]string, error) {
 	deployments, err := getDeploymentsFromOSTree()
 	if err != nil {
