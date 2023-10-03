@@ -12,10 +12,12 @@ Test Tags           ostree
 
 
 *** Variables ***
-${USHIFT_HOST}      ${EMPTY}
-${USHIFT_USER}      ${EMPTY}
+${USHIFT_HOST}          ${EMPTY}
+${USHIFT_USER}          ${EMPTY}
 
-${UPGRADE_REF}      ${EMPTY}
+${UPGRADE_REF}          ${EMPTY}
+
+${TEST_NAMESPACE}       default
 
 
 *** Test Cases ***
@@ -41,17 +43,17 @@ Manual Rollback Does Not Restore Data
     ${upgrade_deploy_backup}=    Get Future Backup Name For Current Boot
     ${upgrade_deploy_id}=    Get Booted Deployment Id
 
-    Oc Create    configmap -n default rollback-test
+    ConfigMap Create    rollback-test
 
     Rollback System And Verify    ${upgrade_deploy_backup}    ${initial_deploy_id}
     ${rolled_back_deploy_backup}=    Get Future Backup Name For Current Boot
 
-    Oc Get    configmap    default    rollback-test
-    Oc Create    configmap -n default rollback-test-2
+    ConfigMap Should Exist    rollback-test
+    ConfigMap Create    rollback-test-2
 
     Rollback System And Verify    ${rolled_back_deploy_backup}    ${upgrade_deploy_id}
-    Oc Get    configmap    default    rollback-test
-    Oc Get    configmap    default    rollback-test-2
+    ConfigMap Should Exist    rollback-test
+    ConfigMap Should Exist    rollback-test-2
 
 
 *** Keywords ***
@@ -79,3 +81,13 @@ Rollback System And Verify
 
     Backup Should Exist    ${backup_that_should_exist}
     Current Deployment Should Be    ${expected_deployment_id}
+
+ConfigMap Create
+    [Documentation]    Create config map in namespace
+    [Arguments]    ${config_map_name}
+    Oc Create    configmap -n ${TEST_NAMESPACE} ${config_map_name}
+
+ConfigMap Should Exist
+    [Documentation]    Verify config map exists in namespace
+    [Arguments]    ${config_map_name}
+    Oc Get    configmap    ${TEST_NAMESPACE}    ${config_map_name}

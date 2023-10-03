@@ -53,7 +53,7 @@ Journal Should Have Information That MicroShift Skipped Restoring
     [Documentation]    TODO
 
     ${stdout}    ${rc}=    Execute Command
-    ...    journalctl --unit=microshift | grep "Starting restore"
+    ...    journalctl --unit=microshift --grep "Starting restore" --case-sensitive=true
     ...    sudo=True
     ...    return_stdout=True
     ...    return_rc=True
@@ -65,7 +65,7 @@ Journal Should Have Information That MicroShift Skipped Restoring
     IF    ${version.minor} == 13    RETURN
 
     ${stdout}    ${rc}=    Execute Command
-    ...    journalctl --unit=microshift | grep "${EXPECTED_LOG}"
+    ...    journalctl --unit=microshift --grep "${EXPECTED_LOG}" --case-sensitive=true
     ...    sudo=True
     ...    return_stdout=True
     ...    return_rc=True
