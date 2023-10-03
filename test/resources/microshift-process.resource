@@ -94,6 +94,8 @@ Stop MicroShift
 Start MicroShift
     [Documentation]    Start the MicroShift service
     Systemctl With Retry    start    microshift.service
+    # Kubeconfig may change between restarts, ensure we are taking the latest one.
+    Setup Kubeconfig
 
 Enable MicroShift
     [Documentation]    Enable the MicroShift service
