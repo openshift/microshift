@@ -94,6 +94,8 @@ Stop MicroShift
 Start MicroShift
     [Documentation]    Start the MicroShift service
     Systemctl With Retry    start    microshift.service
+    # Kubeconfig may change between restarts, ensure we are taking the latest one.
+    Setup Kubeconfig
 
 Enable MicroShift
     [Documentation]    Enable the MicroShift service
@@ -108,3 +110,5 @@ Cleanup MicroShift
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Log Many    ${stdout}    ${stderr}    ${rc}
     Should Be Equal As Integers    ${rc}    0
+
+    Enable MicroShift
