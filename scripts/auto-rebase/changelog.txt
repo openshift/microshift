@@ -1,87 +1,15 @@
-- cluster-kube-apiserver-operator embedded-component fb75cada6bf42222111af526c4cb2de6a6d34910 to 8b38d12efe5f4c4906473acbe53e36961e91490f
-  - 6a60f38 2023-09-22T16:14:33+03:00 Bump library-go to fetch installer pod adjusted permissions
+- kubernetes embedded-component 6936c15a6f5d1755f839691c6cdffc001b94461c to 338dedc2eb83ad27f23fe27a083f462ff2d933d0
+  - e8caad223 2023-09-29T11:46:46-05:00 UPSTREAM: <carry>: kubelet/cm: use MkdirAll when creating cpuset to ignore file exists error
 
-- cluster-network-operator embedded-component 570a128a17c02eb80fcaaca51aecea7ebb3cc001 to b4268643accf0f82fb5da9cda4130f10a1224a10
-  - d6af1c8 2023-09-27T13:36:46-04:00 Multus per-node certificates should have 24h duration
-  - d0737e6 2023-09-26T20:02:23+00:00 remove prestop hooks for northd, sbdbd and nbdb
-  - 904841a 2023-09-26T12:11:06+00:00 Print IC upgrade status
-  - 905769e 2023-09-26T12:11:06+00:00 Relax conditions to get IC upgrade started
-  - 9793e68 2023-09-26T08:24:35+00:00 Fix config status MTU migration not being updated
-  - 234ea45 2023-09-26T09:37:57+02:00 Use port 9108 for ovnkube-control-plane metrics
-  - bf94c2f 2023-09-25T18:14:23+00:00 Do not enable node admission webhook if the CNI is not OVN-Kubernetes
-  - 841e983 2023-09-25T01:43:43+00:00 ipsec: remove preStop from host
-  - 92885a6 2023-09-21T06:08:41+00:00 use $CPE_NAME to find the OS major version
+- coredns image-amd64 a2c62dd3976b27d6a45e273532c63ba914700917 to fd70cf1b81d3d3a907663f61b651201de5f8e4e7
+  - 3ff1953 2023-09-28T10:50:47-04:00 UPSTREAM: <carry>: openshift: Fix OCPBUGS-19805
 
-- etcd embedded-component 6fc69d5d835662c88d21fe2ebed024d87b245f88 to ce96982907bdf2568473debfcff662793f366028
-  - 9ae5df23 2023-09-01T11:30:08+00:00 Updating ose-etcd images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/81061e91dd858c3c78e0e1c0a97bdc8123a8f074/images/ose-etcd.yml
+- kubernetes image-amd64 6936c15a6f5d1755f839691c6cdffc001b94461c to 338dedc2eb83ad27f23fe27a083f462ff2d933d0
+  - e8caad223 2023-09-29T11:46:46-05:00 UPSTREAM: <carry>: kubelet/cm: use MkdirAll when creating cpuset to ignore file exists error
 
-- kubernetes embedded-component 16488786342bb5e6d11db24e1436a2643a1d729e to 6936c15a6f5d1755f839691c6cdffc001b94461c
-  - 908a401cf 2023-09-27T13:48:41+02:00 UPSTREAM: <drop>: hack/update-vendor.sh
-  - d2d6750b7 2023-09-26T21:15:47+02:00 UPSTREAM: 120786: change rolling update logic to exclude sunsetting nodes
+- coredns image-arm64 a2c62dd3976b27d6a45e273532c63ba914700917 to fd70cf1b81d3d3a907663f61b651201de5f8e4e7
+  - 3ff1953 2023-09-28T10:50:47-04:00 UPSTREAM: <carry>: openshift: Fix OCPBUGS-19805
 
-- machine-config-operator embedded-component b03e081db8a6c261413dad3fb963433526fc31c4 to 34f1f953a51bec428b6276c532f96438dca08bbc
-  - 5545ba0d 2023-09-27T14:55:13-04:00 operator: add listers for secrets merge
-  - 08711a69 2023-09-25T13:04:45+00:00 operator: removed k8s pkg dependancy
-  - c9a6a7fa 2023-09-22T14:21:18+00:00 fix merged image registry CA and File behavior
-
-- ovn-kubernetes image-amd64 757426b5dc784d7eea60feed0d3ec7bfb3782bd4 to 5366edeb9dd8a7ac21d2ebcdcb4a5dac8d785023
-  - 49826e7 2023-09-29T10:52:46+02:00 Run node certificate manager in hybrid overlay
-  - 259e70b 2023-09-29T10:42:03+02:00 IC/ICNI: Remove the need for namespace updates
-  - af933ed 2023-09-29T10:41:38+02:00 Added missing documentation for new functions
-  - b8e052d 2023-09-29T10:41:33+02:00 [APB External Route]: Add unit test to cover pod delete -> recreate scenario
-  - c947bd4 2023-09-29T10:41:27+02:00 Update ExternalGatewayRouteInfoCache to only expose methods, and not internal locks. Use key-based locking to simplify locking logic.
-  - 2917c28 2023-09-29T10:41:23+02:00 Update SyncMap to enable any comparable key type, not just string.
-  - af5edf8 2023-09-29T10:41:16+02:00 [OCPBUGS-17692] Fixes an issue in APB External Route where deleting a pod and recreating it failed due to the Deleted state in the routeInfo. The solution involves getting the status before obtaining the routeInfo lock and comparing it after obtaining lock: if the values differ, return with error. If the values match, there has been no changes and it is safe to reuse the routeInfo in case it was deleted.
-  - 9a3c5e4 2023-09-28T10:47:45+01:00 Fix removal of address from link manager
-  - e55e617 2023-09-28T10:47:39+01:00 Allow ovnkube-node to set util.OvnNodeManagementPort
-  - d951934 2023-09-28T10:47:29+01:00 Allow OvnNodeGatewayMtuSupport in Node Admission Webhook
-  - fa5b7a3 2023-09-28T10:46:15+01:00 EIP multi NIC node tcs: add check for stale artifacts
-  - 95db804 2023-09-28T10:46:02+01:00 EIP multi NIC node tcs: add check to validate EIP IP
-  - 7547d7b 2023-09-28T10:45:54+01:00 EIP multi NIC: if no EIP config, return nil
-  - 408277e 2023-09-28T10:45:47+01:00 switch-manager: Remove ippool duplicate call
-  - c6dc121 2023-09-28T10:45:20+01:00 EIP multi NIC: pass ip family to func and rename vars to improve readability
-  - 0400f82 2023-09-28T10:45:13+01:00 EIP multi NIC: switch to use utilnet func to detect IP family
-  - e642060 2023-09-28T10:45:07+01:00 EIP multi NIC: refactor funcs to accept ip family as arg
-  - 690c152 2023-09-28T10:44:54+01:00 EIP multi NIC: only match EIP IP family with pod IP family
-  - 8332a7c 2023-09-28T10:44:35+01:00 EIP: remove extra arg in event log message
-  - 6a0103c 2023-09-28T10:43:49+01:00 Improve EIP multi NIC logging to detect if the correct network is chosen
-  - c6b697e 2023-09-28T10:43:32+01:00 EIP: remove all all references to status item Network field
-  - 8bdde40 2023-09-28T10:40:46+01:00 Revert "Update Egress IP CRD to include a new field called network in a status item"
-  - f33febd 2023-09-26T17:39:48-04:00 Clarify the behavior of ModelPredicate
-  - 02a75c5 2023-09-26T17:39:40-04:00 Fixes node ip migration with IC
-  - 7019ecd 2023-09-26T17:38:37-04:00 change the name of host-addresses annotation to host-cidrs
-  - ac3748c 2023-09-26T17:38:08-04:00 Fix kubevirt code to use createDefaultRouteToExternal utility
-  - 1748988 2023-09-26T17:38:01-04:00 Fix ESVC on IC
-  - 56632d6 2023-09-26T17:37:52-04:00 Fix EIP on IC
-  - 24319bb 2023-09-26T17:34:46-04:00 libovsdb/util: Add createDefaultRouteToExternal utility
-  - ab6e6da 2023-09-26T17:34:32-04:00 Move getClusterSubnets to util package
-  - bf3439c 2023-09-26T17:17:48-04:00 skip hybrid overlay nodes when upgrading to interconnect
-
-- kubernetes image-amd64 16488786342bb5e6d11db24e1436a2643a1d729e to 6936c15a6f5d1755f839691c6cdffc001b94461c
-  - 908a401cf 2023-09-27T13:48:41+02:00 UPSTREAM: <drop>: hack/update-vendor.sh
-  - d2d6750b7 2023-09-26T21:15:47+02:00 UPSTREAM: 120786: change rolling update logic to exclude sunsetting nodes
-
-- ovn-kubernetes image-arm64 07b9dc20840c176c2395c77d4a07b258dfc569c1 to 5366edeb9dd8a7ac21d2ebcdcb4a5dac8d785023
-  - 49826e7 2023-09-29T10:52:46+02:00 Run node certificate manager in hybrid overlay
-  - 259e70b 2023-09-29T10:42:03+02:00 IC/ICNI: Remove the need for namespace updates
-  - af933ed 2023-09-29T10:41:38+02:00 Added missing documentation for new functions
-  - b8e052d 2023-09-29T10:41:33+02:00 [APB External Route]: Add unit test to cover pod delete -> recreate scenario
-  - c947bd4 2023-09-29T10:41:27+02:00 Update ExternalGatewayRouteInfoCache to only expose methods, and not internal locks. Use key-based locking to simplify locking logic.
-  - 2917c28 2023-09-29T10:41:23+02:00 Update SyncMap to enable any comparable key type, not just string.
-  - af5edf8 2023-09-29T10:41:16+02:00 [OCPBUGS-17692] Fixes an issue in APB External Route where deleting a pod and recreating it failed due to the Deleted state in the routeInfo. The solution involves getting the status before obtaining the routeInfo lock and comparing it after obtaining lock: if the values differ, return with error. If the values match, there has been no changes and it is safe to reuse the routeInfo in case it was deleted.
-  - 9a3c5e4 2023-09-28T10:47:45+01:00 Fix removal of address from link manager
-  - e55e617 2023-09-28T10:47:39+01:00 Allow ovnkube-node to set util.OvnNodeManagementPort
-  - d951934 2023-09-28T10:47:29+01:00 Allow OvnNodeGatewayMtuSupport in Node Admission Webhook
-  - fa5b7a3 2023-09-28T10:46:15+01:00 EIP multi NIC node tcs: add check for stale artifacts
-  - 95db804 2023-09-28T10:46:02+01:00 EIP multi NIC node tcs: add check to validate EIP IP
-  - 7547d7b 2023-09-28T10:45:54+01:00 EIP multi NIC: if no EIP config, return nil
-  - 408277e 2023-09-28T10:45:47+01:00 switch-manager: Remove ippool duplicate call
-  - c6dc121 2023-09-28T10:45:20+01:00 EIP multi NIC: pass ip family to func and rename vars to improve readability
-  - 0400f82 2023-09-28T10:45:13+01:00 EIP multi NIC: switch to use utilnet func to detect IP family
-  - e642060 2023-09-28T10:45:07+01:00 EIP multi NIC: refactor funcs to accept ip family as arg
-  - 690c152 2023-09-28T10:44:54+01:00 EIP multi NIC: only match EIP IP family with pod IP family
-  - 8332a7c 2023-09-28T10:44:35+01:00 EIP: remove extra arg in event log message
-  - 6a0103c 2023-09-28T10:43:49+01:00 Improve EIP multi NIC logging to detect if the correct network is chosen
-  - c6b697e 2023-09-28T10:43:32+01:00 EIP: remove all all references to status item Network field
-  - 8bdde40 2023-09-28T10:40:46+01:00 Revert "Update Egress IP CRD to include a new field called network in a status item"
+- kubernetes image-arm64 6936c15a6f5d1755f839691c6cdffc001b94461c to 338dedc2eb83ad27f23fe27a083f462ff2d933d0
+  - e8caad223 2023-09-29T11:46:46-05:00 UPSTREAM: <carry>: kubelet/cm: use MkdirAll when creating cpuset to ignore file exists error
 
