@@ -27,9 +27,7 @@ func updateHealthInfo(vf versionFile) error {
 	// health.json in kept in place to support rollback to 4.14.0~rc.1 and earlier,
 	// as lack of the file would result in MicroShift neither backing up the data
 	// nor restoring a backup and we want to always create a backup.
-	// We should be able to remove the health.json file in 4.16 or even 4.15
-	// if we state that upgrading from rc.0 and rc.1 directly to 4.15 is not supported,
-	// but should be done with intermediate step to released 4.14.0.
+	// We should be able to remove the health.json file when 4.14 is no longer supported.
 
 	hi := HealthInfo{
 		Health:       "healthy",
