@@ -3,6 +3,7 @@
 # Functions used by MicroShift in Greenboot health check procedures.
 # This library may also be used for user workload health check verification.
 #
+SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
 
 OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
@@ -145,7 +146,7 @@ function namespace_pods_ready() {
 
     # Terminate the script in case more pods are ready than expected - nothing to wait for
     if [ "${tcount}" -gt "${ct}" ] ; then
-        echo "The number of ready pods in the '${ns}' namespace is greater than the expected '${ct}' count. Terminating..."
+        echo "The number of ready pods in the '${ns}' namespace is greater than the expected '${ct}' count. Terminating..." | tee >(systemd-cat -t "${SCRIPT_NAME}")
         kill -TERM ${SCRIPT_PID}
     fi
     # Exit with error if any pods are not ready yet
@@ -200,7 +201,7 @@ function print_failure_logs() {
         if [ -f "${file}" ]; then
             echo "Failure log in: '${file}'"
             echo "------"
-            cat "${file}"
+            echo "$(<${file})"
             echo "------"
         else
             echo "Info: Log file '${file}' does not exist"
