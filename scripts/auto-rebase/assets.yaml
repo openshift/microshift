@@ -106,6 +106,8 @@ assets:
       - file: namespace-security-allocation-controller-clusterrolebinding.yaml
       - file: podsecurity-admission-label-syncer-controller-clusterrole.yaml
       - file: podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml
+      - file: podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrole.yaml
+      - file: podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrolebinding.yaml
 
   - dir: controllers/kube-apiserver/
     src: cluster-kube-apiserver-operator/bindata/assets/config/

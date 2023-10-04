@@ -70,11 +70,13 @@ func applyDefaultRBACs(ctx context.Context, cfg *config.Config) error {
 			"controllers/kube-controller-manager/csr_approver_clusterrole.yaml",
 			"controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrole.yaml",
 			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrole.yaml",
+			"controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrole.yaml",
 		}
 		crb = []string{
 			"controllers/kube-controller-manager/csr_approver_clusterrolebinding.yaml",
 			"controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrolebinding.yaml",
 			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml",
+			"controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrolebinding.yaml",
 		}
 	)
 	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {

@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:openshift:controller:privileged-namespaces-psa-label-syncer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:controller:privileged-namespaces-psa-label-syncer
+subjects:
+- kind: ServiceAccount
+  name: privileged-namespaces-psa-label-syncer
+  namespace: openshift-infra
