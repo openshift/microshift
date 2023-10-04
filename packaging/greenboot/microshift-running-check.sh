@@ -11,14 +11,15 @@ PODS_CT_LIST=(2                        1                    1                 2 
 source /usr/share/microshift/functions/greenboot.sh
 
 # Set the term handler to convert exit code to 1
-trap 'return_failure' TERM SIGINT
+trap 'forced_termination' TERM SIGINT
 
 # Set the exit handler to log the exit status
 trap 'script_exit' EXIT
 
-# The term handler to override the default behavior and have a uniform and
-# homogeneous exit code in all controlled situations.
-function return_failure() {
+# Handler that will be called when the script is terminated by sending TERM or
+# INT signals. To override default exit codes it forces returning 1 like the
+# rest of the error conditions throughout the health check.
+function forced_termination() {
     echo "Signal received, terminating."
     exit 1
 }
