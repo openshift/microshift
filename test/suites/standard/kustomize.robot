@@ -31,17 +31,14 @@ Load From /etc/microshift/manifestsd
     [Documentation]    Subdir of /etc/microshift/manifests.d
     ConfigMap Path Should Match    ${ETC_SUBDIR_NAMESPACE}    ${ETC_SUBDIR}
 
-# The metal CI automation currently _only_ works for ostree deployments,
-# and /usr/lib is not writable there.
-#
-# Load From /usr/lib/microshift/manifests
-#    [Documentation]    /usr/lib/microshift/manifests
-#    ConfigMap Path Should Match    ${USR_NAMESPACE}    /usr/lib/microshift/manifests
-#
-# Load From /usr/lib/microshift/manifestsd
-#    # Keyword names cannot have '.' in them
-#    [Documentation]    Subdir of /usr/lib/microshift/manifests.d
-#    ConfigMap Path Should Match    ${USR_SUBDIR_NAMESPACE}    ${USR_SUBDIR}
+Load From /usr/lib/microshift/manifests
+    [Documentation]    /usr/lib/microshift/manifests
+    ConfigMap Path Should Match    ${USR_NAMESPACE}    /usr/lib/microshift/manifests
+
+Load From /usr/lib/microshift/manifestsd
+    # Keyword names cannot have '.' in them
+    [Documentation]    Subdir of /usr/lib/microshift/manifests.d
+    ConfigMap Path Should Match    ${USR_SUBDIR_NAMESPACE}    ${USR_SUBDIR}
 
 Load From Configured Dir
     [Documentation]    Non-default directory
@@ -70,6 +67,7 @@ Setup Suite    # robocop: disable=too-long-keyword
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig    # for readiness checks
+    Make Usr Writable If OSTree System
 
     # Used by "Load From /etc/microshift/manifests"
     ${ns}=    Generate Manifests    /etc/microshift/manifests
@@ -81,18 +79,15 @@ Setup Suite    # robocop: disable=too-long-keyword
     ${ns}=    Generate Manifests    ${ETC_SUBDIR}
     Set Suite Variable    \${ETC_SUBDIR_NAMESPACE}    ${ns}
 
-    # The metal CI automation currently _only_ works for ostree deployments,
-    # and /usr/lib is not writable there.
-    #
-    # # Used by "Load From /usr/lib/microshift/manifests"
-    # ${ns}=    Generate Manifests    /usr/lib/microshift/manifests
-    # Set Suite Variable    \${USR_NAMESPACE}    ${ns}
-    #
-    # # Used by "Load From /usr/lib/microshift/manifestsd"
-    # ${rand}=    Generate Random String
-    # Set Suite Variable    \${USR_SUBDIR}    /usr/lib/microshift/manifests.d/${rand}
-    # ${ns}=    Generate Manifests    ${USR_SUBDIR}
-    # Set Suite Variable    \${USR_SUBDIR_NAMESPACE}    ${ns}
+    # Used by "Load From /usr/lib/microshift/manifests"
+    ${ns}=    Generate Manifests    /usr/lib/microshift/manifests
+    Set Suite Variable    \${USR_NAMESPACE}    ${ns}
+
+    # Used by "Load From /usr/lib/microshift/manifestsd"
+    ${rand}=    Generate Random String
+    Set Suite Variable    \${USR_SUBDIR}    /usr/lib/microshift/manifests.d/${rand}
+    ${ns}=    Generate Manifests    ${USR_SUBDIR}
+    Set Suite Variable    \${USR_SUBDIR_NAMESPACE}    ${ns}
 
     # Used by "Load From Configured Dir"
     ${ns}=    Generate Manifests    ${NON_DEFAULT_DIR}
@@ -136,11 +131,8 @@ Teardown Suite    # robocop: disable=too-many-calls-in-keyword
 
     Clear Manifest Directory    /etc/microshift/manifests
     Remove Manifest Directory    ${ETC_SUBDIR}
-    # The metal CI automation currently _only_ works for ostree deployments,
-    # and /usr/lib is not writable there.
-    #
-    # Clear Manifest Directory    /usr/lib/microshift/manifests
-    # Remove Manifest Directory    ${USR_SUBDIR}
+    Clear Manifest Directory    /usr/lib/microshift/manifests
+    Remove Manifest Directory    ${USR_SUBDIR}
     Remove Manifest Directory    ${NON_DEFAULT_DIR}
     Remove Manifest Directory    ${UNCONFIGURED_DIR}
     Remove Manifest Directory    ${YAML_PATH}
@@ -149,11 +141,8 @@ Teardown Suite    # robocop: disable=too-many-calls-in-keyword
 
     Run With Kubeconfig    oc delete namespace ${ETC_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${ETC_SUBDIR_NAMESPACE}    allow_fail=True
-    # The metal CI automation currently _only_ works for ostree deployments,
-    # and /usr/lib is not writable there.
-    #
-    # Run With Kubeconfig    oc delete namespace ${USR_NAMESPACE}    allow_fail=True
-    # Run With Kubeconfig    oc delete namespace ${USR_SUBDIR_NAMESPACE}    allow_fail=True
+    Run With Kubeconfig    oc delete namespace ${USR_NAMESPACE}    allow_fail=True
+    Run With Kubeconfig    oc delete namespace ${USR_SUBDIR_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${NON_DEFAULT_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${UNCONFIGURED_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${YAML_NAMESPACE}    allow_fail=True
@@ -163,6 +152,11 @@ Teardown Suite    # robocop: disable=too-many-calls-in-keyword
     Restore Default Config
     Logout MicroShift Host
     Remove Kubeconfig
+
+Make Usr Writable If OSTree System
+    [Documentation]    Makes /usr directory writable if host is an OSTree system.
+    ${is_ostree}=    Is System OSTree
+    IF    ${is_ostree}    Create Usr Directory Overlay
 
 Generate Manifests
     [Documentation]    Create a namespace and the manifests in the given path.
@@ -214,6 +208,13 @@ ConfigMap Should Be Missing
     ...    shell=True
     Should Be Equal As Integers    ${result.rc}    1
 
+Create Usr Directory Overlay
+    [Documentation]    Make /usr dir writable by creating an overlay, rebooting will go back to being immutable.
+    ${stdout}    ${rc}=    Execute Command
+    ...    rpm-ostree usroverlay
+    ...    sudo=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+
 Clear Manifest Directory
     [Documentation]    Remove the contents of the manifest directory
     [Arguments]    ${manifest_dir}
@@ -233,5 +234,15 @@ Remove Manifest Directory
 Restore Default Config
     [Documentation]    Remove any custom config and restart MicroShift
     Restore Default MicroShift Config
-    Restart MicroShift
-    Sleep    10 seconds    # Wait for systemd to catch up
+
+    # When restoring, we check if ostree is active, if so we reboot
+    # to convert everything back to normal, MicroShift restart should not
+    # be needed in that instance
+    ${is_ostree}=    Is System OSTree
+    IF    ${is_ostree}
+        Reboot MicroShift Host
+        Wait For MicroShift
+    ELSE
+        Restart MicroShift
+        Sleep    10 seconds    # Wait for systemd to catch up
+    END
