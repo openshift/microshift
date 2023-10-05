@@ -201,7 +201,7 @@ function print_failure_logs() {
         if [ -f "${file}" ]; then
             echo "Failure log in: '${file}'"
             echo "------"
-            echo "$(<${file})"
+            echo "$(<"${file}")"
             echo "------"
         else
             echo "Info: Log file '${file}' does not exist"
