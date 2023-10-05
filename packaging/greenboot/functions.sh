@@ -10,6 +10,16 @@ OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
 OCGET_OPT="--no-headers"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
 
+# Note about the output
+# This file runs as part of a systemd unit, greenboot-healthcheck. All of the
+# output is captured by journald, and in order to link it to the unit it
+# belongs to, it needs to be printed in a certain way. Any foreground `echo`
+# command will automatically get picked up. External commands, such as `cat`
+# or running in the background requires special care. In order for journald
+# to take the output as part of the unit it needs to be channeled through
+# systemd-cat, which will propagate all the required configuration for it.
+# To keep it runable without systemd, it is also printed to regular stdout.
+
 # Space separated list of log file locations to be printed out in case of
 # a health check failure
 LOG_FAILURE_FILES=()
