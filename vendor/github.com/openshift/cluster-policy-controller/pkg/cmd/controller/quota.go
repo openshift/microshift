@@ -118,6 +118,7 @@ func RunClusterQuotaReconciliationController(ctx context.Context, controllerCtx 
 		IgnoredResourcesFunc:      quotaConfiguration.IgnoredResources,
 		InformersStarted:          controllerCtx.InformersStarted,
 		InformerFactory:           controllerCtx.GenericResourceInformer,
+		UpdateFilter:              quotainstall.DefaultUpdateFilter(),
 	}
 	clusterQuotaReconciliationController, err := clusterquotareconciliation.NewClusterQuotaReconcilationController(ctx, options)
 	if err != nil {
