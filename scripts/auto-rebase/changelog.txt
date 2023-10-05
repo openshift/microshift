@@ -1,3 +1,13 @@
-- kubernetes image-arm64 338dedc2eb83ad27f23fe27a083f462ff2d933d0 to 9ef6de6018e3917f751b0dcc3426f13c8f950338
+- cluster-network-operator embedded-component b4268643accf0f82fb5da9cda4130f10a1224a10 to 2cb637471666d96503232a856f8e3e8874d53e8f
+  - 991380e 2023-09-29T18:31:52+00:00 get ipsecStatus from host daemonset
+
+- kubernetes embedded-component 338dedc2eb83ad27f23fe27a083f462ff2d933d0 to 9ef6de6018e3917f751b0dcc3426f13c8f950338
+  - 2012ba9b7 2023-10-02T11:42:11-04:00 UPSTREAM: <carry>: vendor: bump cadvisor and runc to 1.1.9
+
+- machine-config-operator embedded-component 34f1f953a51bec428b6276c532f96438dca08bbc to a2469941c0dcccf9584e0f54b3e38c13b1292ca9
+  - e6f63c0b 2023-09-20T08:50:26+02:00 NO-ISSUE: Use `image exists` in resolv-prepender instead of `wc -l`
+  - 68de5475 2023-09-20T08:49:59+02:00 resolv-prepender: avoid pulling baremetalRuntimeCfgImage again if it already exists on the node
+
+- kubernetes image-amd64 338dedc2eb83ad27f23fe27a083f462ff2d933d0 to 9ef6de6018e3917f751b0dcc3426f13c8f950338
   - 2012ba9b7 2023-10-02T11:42:11-04:00 UPSTREAM: <carry>: vendor: bump cadvisor and runc to 1.1.9
 
