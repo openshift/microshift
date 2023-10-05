@@ -194,6 +194,10 @@ func (c *PodSecurityAdmissionLabelSynchronizationController) sync(ctx context.Co
 	qKey := controllerContext.QueueKey()
 	ns, err := c.namespaceLister.Get(qKey)
 	if err != nil {
+		if apierrors.IsNotFound(err) {
+			klog.V(4).Infof("namespace %q was not found, nothing to do", qKey)
+			return nil
+		}
 		return fmt.Errorf(errFmt, qKey, err)
 	}
 
