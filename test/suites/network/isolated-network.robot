@@ -42,7 +42,7 @@ Verify MicroShift Is Healthy In Isolated Network After Clean And Reboot
     Reboot MicroShift Host
 
     Verify No Internet Access
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
 
 
 *** Keywords ***
@@ -52,7 +52,7 @@ Setup
     Login MicroShift Host
 
     Verify No Internet Access
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
 
 Teardown
     [Documentation]    Test suite teardown

@@ -81,7 +81,7 @@ Setup
     Validate Unknown Directories Exist
 
     Reboot MicroShift Host
-    Wait For Healthy System
+    Wait Until Greenboot Health Check Exited
 
 Teardown
     [Documentation]    Test suite teardown
