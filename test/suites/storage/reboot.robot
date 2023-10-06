@@ -21,7 +21,7 @@ Rebooting Healthy System Should Keep Functional PVC
     [Setup]    Test Case Setup
     Reboot MicroShift Host
     Wait Until Greenboot Health Check Exited
-    Oc Wait For    pod/${POD_NAME_STATIC}    condition\=Ready    timeout=60s
+    Named Pod Should Be Ready    ${POD_NAME_STATIC}    timeout=120s
     [Teardown]    Test Case Teardown
 
 
@@ -29,8 +29,9 @@ Rebooting Healthy System Should Keep Functional PVC
 Test Case Setup
     [Documentation]    Prepare the cluster env and test pod workload.
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
-    Oc Wait For    pod/${POD_NAME_STATIC}    condition\=Ready    timeout=60s
+    Named Pod Should Be Ready    ${POD_NAME_STATIC}
 
 Test Case Teardown
     [Documentation]    Clean up test suite resources
     Oc Delete    -f ${SOURCE_POD} -n ${NAMESPACE}
+    Named Pod Should Be Deleted    ${POD_NAME_STATIC}    timeout=120s
