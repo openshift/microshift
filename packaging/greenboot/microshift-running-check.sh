@@ -5,20 +5,23 @@ SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
 PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system)
 PODS_CT_LIST=(2                        1                    1                 2             2                 2)
+RETRIEVE_PODS=false
 
 # Source the MicroShift health check functions library
 # shellcheck source=packaging/greenboot/functions.sh
 source /usr/share/microshift/functions/greenboot.sh
 
 # Set the term handler to convert exit code to 1
-trap 'return_failure' TERM SIGINT
+trap 'forced_termination' TERM SIGINT
 
 # Set the exit handler to log the exit status
 trap 'script_exit' EXIT
 
-# The term handler to override the default behavior and have a uniform and
-# homogeneous exit code in all controlled situations.
-function return_failure() {
+# Handler that will be called when the script is terminated by sending TERM or
+# INT signals. To override default exit codes it forces returning 1 like the
+# rest of the error conditions throughout the health check.
+function forced_termination() {
+    echo "Signal received, terminating."
     exit 1
 }
 
@@ -29,6 +32,10 @@ function return_failure() {
 # return: None
 function script_exit() {
     if [ "$?" -ne 0 ] ; then
+        if ${RETRIEVE_PODS}; then
+            log_failure_cmd "pod-list" "${OCGET_CMD} pods -A -o wide"
+            log_failure_cmd "pod-events" "${OCGET_CMD} events -A"
+        fi
         print_failure_logs
         echo "FAILURE"
     else
@@ -145,8 +152,7 @@ fi
 
 # Starting pod-specific checks
 # Log list of pods and their events on failure
-log_failure_cmd "pod-list" "${OCGET_CMD} pods -A -o wide"
-log_failure_cmd "pod-events" "${OCGET_CMD} events -A"
+RETRIEVE_PODS=true
 
 # Wait for any pods to enter running state
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for any pods to be running"
