@@ -36,6 +36,23 @@
       rhel_beta: beta-
     when: "'Beta' in (redhat_release_slurp['content'] | b64decode)"
 
+  - name: set microshift_prerelease if microshift_version is a prerelease
+    ansible.builtin.set_fact:
+      microshift_prerelease: "{{ 'rc' in microshift_version or 'ec' in microshift_version }}"
+
+  - name: install microshift mirror repo for pre-releases
+    ansible.builtin.template:
+      src: ocpbeta.repo.j2
+      dest: /etc/yum.repos.d/{{ ocp_repo_name }}.repo
+    when:
+      - microshift_prerelease
+      - not build_microshift
+
+  - name: overwrite ocp_version if microshift_prerelease
+    ansible.builtin.set_fact:
+      ocp_version: "{{ ocp_version.split('.')[0] }}.{{ (ocp_version.split('.')[1] | int) - 1 }}"
+    when: microshift_prerelease
+
   - name: enable required repos for microshift
     community.general.rhsm_repository:
       name: "{{ rhel_repos }}"
@@ -45,12 +62,6 @@
       name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
       disable_gpg_check: true
       state: present
-
-  - name: install ocp 4.xx beta repo
-    ansible.builtin.template:
-      src: ocpbeta.repo.j2
-      dest: /etc/yum.repos.d/{{ ocp_repo_name }}.repo
-    when: rhel_beta != ''
   when: ansible_distribution == "RedHat"
 
 - name: gather the package facts

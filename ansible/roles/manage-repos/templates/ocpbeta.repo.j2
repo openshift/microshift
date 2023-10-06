@@ -1,6 +1,6 @@
 [{{ ocp_repo_name }}]
-name=Beta rhocp-4.13 RPMs for RHEL {{ ansible_distribution_major_version }} 
-baseurl=https://mirror.openshift.com/pub/openshift-v4/$basearch/dependencies/rpms/4.13-el{{ ansible_distribution_major_version }}-beta/
+name=MicroShift {{ ocp_version }}  RPMs for RHEL {{ ansible_distribution_major_version }}
+baseurl=https://mirror.openshift.com/pub/openshift-v4/$basearch/microshift/ocp/{{ microshift_version }}/el9/os/
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0

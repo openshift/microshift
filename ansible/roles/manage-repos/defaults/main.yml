@@ -1,8 +1,9 @@
 ---
 # manage-repos default vars
 
-ocp_repo_name: rhocp-4.13-for-rhel-{{ ansible_distribution_major_version }}-mirrorbeta-{{ ansible_architecture }}-rpms
-ocp_version: 4.13
+microshift_version: 4.14.0-rc.4
+ocp_repo_name: microshift-{{ ocp_version }}-for-rhel-{{ ansible_distribution_major_version }}-mirrorbeta-{{ ansible_architecture }}-rpms
+ocp_version: "{{ microshift_version.split('.')[0] }}.{{ microshift_version.split('.')[1] }}"
 rhel_beta: ''
 rhel_repos:
   - rhel-{{ ansible_distribution_major_version }}-for-{{ ansible_architecture }}-baseos-{{ rhel_beta }}rpms
