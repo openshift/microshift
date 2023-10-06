@@ -1,0 +1,55 @@
+diff --git a/vendor/k8s.io/kubernetes/pkg/controller/resourcequota/resource_quota_controller.go b/vendor/k8s.io/kubernetes/pkg/controller/resourcequota/resource_quota_controller.go
+index 8b6292772c9..8eee7ef48c4 100644
+--- a/vendor/k8s.io/kubernetes/pkg/controller/resourcequota/resource_quota_controller.go
++++ b/vendor/k8s.io/kubernetes/pkg/controller/resourcequota/resource_quota_controller.go
+@@ -151,16 +151,15 @@ func NewController(ctx context.Context, options *ControllerOptions) (*Controller
+ 	)
+ 
+ 	if options.DiscoveryFunc != nil {
+-		qm := &QuotaMonitor{
+-			informersStarted:  options.InformersStarted,
+-			informerFactory:   options.InformerFactory,
+-			ignoredResources:  options.IgnoredResourcesFunc(),
+-			resourceChanges:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "resource_quota_controller_resource_changes"),
+-			resyncPeriod:      options.ReplenishmentResyncPeriod,
+-			replenishmentFunc: rq.replenishQuota,
+-			registry:          rq.registry,
+-			updateFilter:      options.UpdateFilter,
+-		}
++		qm := NewMonitor(
++			options.InformersStarted,
++			options.InformerFactory,
++			options.IgnoredResourcesFunc(),
++			options.ReplenishmentResyncPeriod,
++			rq.replenishQuota,
++			rq.registry,
++			options.UpdateFilter,
++		)
+ 
+ 		rq.quotaMonitor = qm
+ 
+diff --git a/vendor/k8s.io/kubernetes/pkg/controller/resourcequota/resource_quota_monitor.go b/vendor/k8s.io/kubernetes/pkg/controller/resourcequota/resource_quota_monitor.go
+index 34fba8a78ae..fc2c6b6382f 100644
+--- a/vendor/k8s.io/kubernetes/pkg/controller/resourcequota/resource_quota_monitor.go
++++ b/vendor/k8s.io/kubernetes/pkg/controller/resourcequota/resource_quota_monitor.go
+@@ -103,6 +103,20 @@ type QuotaMonitor struct {
+ 	updateFilter UpdateFilter
+ }
+ 
++// NewMonitor creates a new instance of a QuotaMonitor
++func NewMonitor(informersStarted <-chan struct{}, informerFactory informerfactory.InformerFactory, ignoredResources map[schema.GroupResource]struct{}, resyncPeriod controller.ResyncPeriodFunc, replenishmentFunc ReplenishmentFunc, registry quota.Registry, updateFilter UpdateFilter) *QuotaMonitor {
++	return &QuotaMonitor{
++		informersStarted:  informersStarted,
++		informerFactory:   informerFactory,
++		ignoredResources:  ignoredResources,
++		resourceChanges:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "resource_quota_controller_resource_changes"),
++		resyncPeriod:      resyncPeriod,
++		replenishmentFunc: replenishmentFunc,
++		registry:          registry,
++		updateFilter:      updateFilter,
++	}
++}
++
+ // monitor runs a Controller with a local stop channel.
+ type monitor struct {
+ 	controller cache.Controller
