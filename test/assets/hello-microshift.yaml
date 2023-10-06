@@ -8,7 +8,7 @@ spec:
   terminationGracePeriodSeconds: 0
   containers:
   - name: hello-microshift
-    image: busybox:1.35
+    image: quay.io/microshift/busybox:1.36
     command: ["/bin/sh"]
     args: ["-c", "while true; do echo -ne \"HTTP/1.0 200 OK\r\nContent-Length: 16\r\n\r\nHello MicroShift\" | nc -l -p 8080 ; done"]
     ports:
