@@ -1,8 +1,6 @@
 ---
 # install-microshift default vars
 
-build_microshift: false
-
 etcd_dir: "{{ ansible_env.HOME }}/etcd"
 etcd_repo: https://github.com/openshift/etcd.git
 
