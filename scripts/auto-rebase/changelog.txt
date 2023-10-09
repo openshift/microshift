@@ -1,0 +1,15 @@
+- cluster-network-operator embedded-component 2cb637471666d96503232a856f8e3e8874d53e8f to feb702714c27c13af182c209ae182f0e761ae1b9
+  - dd4d980 2023-10-05T09:00:20-04:00 Multus should determine kubeconfig path
+
+- kubernetes embedded-component 9ef6de6018e3917f751b0dcc3426f13c8f950338 to 4e94a885307b87ee4650f4fa187128eb6cc219d1
+  - ff221b91b 2023-10-06T12:01:47-04:00 UPSTREAM: <carry>: Do not allow nodes to set forbidden openshift labels
+  - 4a441d80f 2023-10-03T07:48:04-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+
+- kubernetes image-amd64 9ef6de6018e3917f751b0dcc3426f13c8f950338 to 4e94a885307b87ee4650f4fa187128eb6cc219d1
+  - ff221b91b 2023-10-06T12:01:47-04:00 UPSTREAM: <carry>: Do not allow nodes to set forbidden openshift labels
+  - 4a441d80f 2023-10-03T07:48:04-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+
+- kubernetes image-arm64 9ef6de6018e3917f751b0dcc3426f13c8f950338 to 4e94a885307b87ee4650f4fa187128eb6cc219d1
+  - ff221b91b 2023-10-06T12:01:47-04:00 UPSTREAM: <carry>: Do not allow nodes to set forbidden openshift labels
+  - 4a441d80f 2023-10-03T07:48:04-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+
