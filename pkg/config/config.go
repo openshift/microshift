@@ -221,6 +221,8 @@ func (c *Config) updateComputedValues() error {
 		c.ApiServer.AdvertiseAddress = firstValidIP.String()
 	}
 
+	c.computeLoggingSetting()
+
 	return nil
 }
 
