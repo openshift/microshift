@@ -77,6 +77,10 @@ func NewRunMicroshiftCommand() *cobra.Command {
 
 		cfg = config.ConfigMultiNode(cfg, multinode)
 
+		for _, w := range cfg.Warnings {
+			klog.Warningf("Configuration warning: %s", w)
+		}
+
 		// Things to very badly if the node's name has changed
 		// since the last time the server started.
 		err = cfg.EnsureNodeNameHasNotChanged()
