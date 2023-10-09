@@ -51,7 +51,7 @@ configure_package_sources() {
         outfile="${IMAGEDIR}/package-sources/${name}.toml"
 
         echo "Rendering ${template} to ${outfile}"
-        ${GOMPLATE} --file "${template}" >"${outfile}" 
+        ${GOMPLATE} --file "${template}" >"${outfile}"
         if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
             echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
             continue
@@ -72,7 +72,7 @@ configure_package_sources() {
     done
 }
 
-# Reads release-info RPM for provided version to obtain images 
+# Reads release-info RPM for provided version to obtain images
 # and returns them as comma-separated list.
 get_container_images() {
     local -r version="${1}"
