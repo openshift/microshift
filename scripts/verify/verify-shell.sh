@@ -9,7 +9,7 @@ pushd "${ROOTDIR}" &> /dev/null
 SHELL_CHECK=./_output/bin/shellcheck
 
 # Ignore paths containing external sources
-IGNORE_PATHS="-path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor -o -path ./hack -o -path ./docs"
+IGNORE_PATHS="-path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor -o -path ./hack -o -path ./docs -o -path ./origin"
 # Ignore files managed upstream
 IGNORE_FILES="configure-ovs.sh"
 

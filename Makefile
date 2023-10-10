@@ -183,7 +183,7 @@ verify-rf:
 .PHONY: verify-containers
 verify-containers:
 	./scripts/fetch_tools.sh hadolint && \
-	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output")
+	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output\|origin")
 
 # Vulnerability check is not run in any default verify target
 # It should be run explicitly before the release to track and fix known vulnerabilities
