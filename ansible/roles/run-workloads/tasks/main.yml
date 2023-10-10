@@ -1,0 +1,54 @@
+---
+# run-workloads tasks
+
+- name: iterate over user paths and find those containing 'local' && not 'usr'
+  ansible.builtin.set_fact:
+    local_paths: "{{ local_paths + [item] }}"
+  when:
+    - "'local' in item"
+    - "'usr' not in item"
+  with_items: "{{ lookup('env', 'PATH').split(':') | unique }}"
+
+- name: display local paths that match filters
+  ansible.builtin.debug:
+    msg: "{{ local_paths }}"
+
+- name: set variable local_bin_path
+  ansible.builtin.set_fact:
+    local_bin_path: "{{ local_paths[0] }}"
+
+- name: clone e2e-benchmarking repository
+  ansible.builtin.git:
+    repo: "{{ e2e_repo }}"
+    dest: "{{ e2e_path }}"
+    update: no
+
+- name: check if we have kube-burner installed
+  ansible.builtin.command: which kube-burner
+  register: which_kube_burner
+  ignore_errors: true
+  changed_when: false
+
+- block:
+  - name: download kube-burner tarball
+    ansible.builtin.get_url:
+      url: "{{ kube_burner_url }}"
+      dest: "{{ local_tarball_path }}"
+      mode: '0755'
+
+  - name: extract kube-burner files
+    ansible.builtin.unarchive:
+      src: "{{ local_tarball_path }}"
+      dest: "{{ local_bin_path }}"
+
+  - name: remove downloaded tarball
+    ansible.builtin.file:
+      path: "{{ local_tarball_path }}"
+      state: absent
+  when: which_kube_burner.rc != 0
+
+- name: iterate over kube-burner workloads
+  vars:
+    kube_burner_workload: "{{ item }}"
+  include_tasks: kube-burner.yml
+  loop: "{{ workloads_to_run }}"

@@ -79,3 +79,13 @@
     - vars/all.yml
   roles:
     - role: quick-microshift-boot
+
+- name: run performance workloads
+  hosts: localhost
+  vars:
+    ansible_become: no
+    ansible_connection: local
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: run-workloads

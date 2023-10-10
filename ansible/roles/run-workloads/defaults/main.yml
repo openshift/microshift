@@ -1,0 +1,22 @@
+---
+# run-workloads default vars
+
+local_paths: []
+temp_dest: "/tmp"
+tarball_name: "kube-burner-0.14.2-Linux-x86_64.tar.gz"
+e2e_path: "{{ temp_dest }}/e2e-benchmarking"
+e2e_repo: "https://github.com/cloud-bulldozer/e2e-benchmarking.git"
+local_tarball_path: "{{ temp_dest }}/{{ tarball_name }}"
+kube_burner_url: "https://github.com/cloud-bulldozer/kube-burner/releases/download/v0.14.2/{{ tarball_name }}"
+kube_burner_indexing: false
+kube_burner_qps: 10
+kube_burner_burst: 10
+pre_delete_pause_duration: 60
+post_run_pause_duration: 180
+delete_grace_period: 600
+delete_wait_timeout: 600
+delete_label_selectors:
+  - kube-burner-job
+workloads_to_run:
+  - node-density
+  - node-density-cni-networkpolicy

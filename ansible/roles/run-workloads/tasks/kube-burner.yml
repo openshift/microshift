@@ -1,0 +1,29 @@
+---
+# kube-burner tasks
+
+- name: "run kube-kube burner workload {{ kube_burner_workload }}"
+  ansible.builtin.command:
+    cmd: ./run.sh
+    chdir: "{{ e2e_path }}/workloads/kube-burner"
+  environment:
+    BURST: "{{ kube_burner_burst }}"
+    INDEXING: "{{ kube_burner_indexing }}"
+    QPS: "{{ kube_burner_qps }}"
+    WORKLOAD: "{{ kube_burner_workload }}"
+
+- ansible.builtin.pause:
+    seconds: "{{ pre_delete_pause_duration }}"
+
+- name: cleanup previous workload namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    state: absent
+    label_selectors: "{{ delete_label_selectors }}" 
+    delete_options:
+      gracePeriodSeconds: "{{ delete_grace_period }}"
+    wait: true
+    wait_timeout: "{{ delete_wait_timeout }}"
+
+- ansible.builtin.pause:
+    seconds: "{{ post_run_pause_duration }}"
