@@ -80,6 +80,13 @@
   roles:
     - role: quick-microshift-boot
 
+- name: pull kubeconfig from microshift host
+  hosts: microshift
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: fetch-kubeconfig
+
 - name: run performance workloads
   hosts: localhost
   vars:

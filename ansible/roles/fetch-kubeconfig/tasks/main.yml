@@ -1,0 +1,39 @@
+---
+# fetch-kubeconfig tasks
+
+- name: set local kubeconfig path
+  ansible.builtin.set_fact:
+    local_home: "{{ lookup('env', 'HOME') }}"
+
+- name: check if kubeconfig directory exists on local machine
+  ansible.builtin.stat:
+    path: "{{ kubeconfig_directory }}"
+  delegate_to: localhost
+  register: kubeconfig_directory_check
+
+- name: create .kube folder in home directory if missing
+  ansible.builtin.file:
+    path: "{{ kubeconfig_directory }}"
+    state: directory
+  delegate_to: localhost
+  when: not kubeconfig_directory_check.stat.isdir
+
+- name: check a kubeconfig file exists on local machine
+  ansible.builtin.stat:
+    path: "{{ kubeconfig_local_file }}"
+  delegate_to: localhost
+  register: kubeconfig_local_file_check
+
+- name: backup existing kubeconfig_local_file
+  ansible.builtin.copy:
+    src: "{{ kubeconfig_local_file }}"
+    dest: "{{ kubeconfig_local_file }}.old"
+  delegate_to: localhost
+  when: kubeconfig_local_file_check.stat.exists
+
+- name: try to fetch remote kubeconfig to local
+  become: yes
+  ansible.builtin.fetch:
+    src: "{{ kubeconfig_remote_file }}"
+    dest: "{{ kubeconfig_local_file }}"
+    flat: yes
