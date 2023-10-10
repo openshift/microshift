@@ -214,12 +214,21 @@ do_group() {
 
         blueprint_file="${IMAGEDIR}/blueprints/$(basename "${template}")"
 
+        # Check for the file to exist, in case the user passed a
+        # template on the command line.
+        if [ ! -f "${template}" ]; then
+            echo "ERROR: Template ${template} does not exist"
+            record_junit "${groupdir}" "${template}" "render" "FAILED"
+            return 1
+        fi
+
         echo "Rendering ${template} to ${blueprint_file}"
         ${GOMPLATE} --file "${template}" >"${blueprint_file}"
         if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
             echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
             continue
         fi
+        record_junit "${groupdir}" "${template}" "render" "OK"
 
         blueprint=$(get_blueprint_name "${blueprint_file}")
 
@@ -377,7 +386,9 @@ build_images.sh [-Is] [-g group-dir] [-t template]
 
   -g DIR  Build only one group.
 
-  -t FILE Build only one template. Implies -g based on filename.
+  -t FILE Build only one template. The FILE should be the path to
+          the template to build. Implies -g based on filename.
+
 EOF
 }
 
