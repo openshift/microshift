@@ -216,7 +216,7 @@ do_group() {
 
         echo "Rendering ${template} to ${blueprint_file}"
         ${GOMPLATE} --file "${template}" >"${blueprint_file}"
-        if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
+        if [[ "$(wc -l "${blueprint_file}" | cut -d ' ' -f1)" -eq 0 ]]; then
             echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
             continue
         fi

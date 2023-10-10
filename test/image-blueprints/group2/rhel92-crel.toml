@@ -1,4 +1,13 @@
 {{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
+{{- /*
+
+  We wrap this template in a test so that the body of the output is
+  empty when there is no "current" version release. The output file
+  must end up completely empty, so we need to remove whitespace from
+  around the first and last template instructions.
+
+*/ -}}
+
 name = "rhel-9.2-microshift-crel"
 description = "A RHEL 9.2 image with already built and released RPMs like EC, RC, or Z-stream release"
 version = "0.0.1"
@@ -46,4 +55,4 @@ enabled = ["mdns", "ssh", "http", "https"]
 [[customizations.firewall.zones]]
 name = "trusted"
 sources = ["10.42.0.0/16", "169.254.169.1"]
-{{ end }}
+{{- end -}}
