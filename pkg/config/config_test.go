@@ -145,11 +145,26 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			name: "debugging",
 			config: dedent(`
             debugging:
-              logLevel: Info
+              logLevel: Normal
             `),
 			expected: func() *Config {
 				c := mkDefaultConfig()
-				c.Debugging.LogLevel = "Info"
+				c.computeLoggingSetting()
+				return c
+			}(),
+		},
+		{
+			name: "debugging-invalid",
+			config: dedent(`
+            debugging:
+              logLevel: Unknown
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.computeLoggingSetting()
+				// We expect a warning, but do not want to check for
+				// the message string.
+				c.Warnings = []string{}
 				return c
 			}(),
 		},
@@ -234,6 +249,15 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
 			config, err := getActiveConfigFromYAML([]byte(tt.config))
+
+			// If we have any warnings, drop them. Use an empty array
+			// instead of nil so that we can differentiate between
+			// unexpected warnings (where we get an array instead of
+			// nil) and missing expected warnings (where we get nil
+			// but expect an array).
+			if config.Warnings != nil {
+				config.Warnings = []string{}
+			}
 
 			if tt.expectErr && err == nil {
 				t.Fatal("Expecting error and received nothing")
