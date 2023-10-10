@@ -30,10 +30,10 @@ $ rpm2cpio microshift-release-info-4.12.0-1.el8.noarch.rpm | cpio -idmv
 Using the release info for your CPU architecture, you can now generate the section to embed the container images to your `blueprint.toml`:
 
 ```
-$ jq -r '.images | .[] | ("[[containers]]\nsource = \"" + . + "\"\n")' release-$(uname -m).json >> blueprint.tonl
+$ jq -r '.images | .[] | ("[[containers]]\nsource = \"" + . + "\"\n")' release-$(uname -m).json >> blueprint.toml
 ```
 
-Remember to pin the version of the MicroShift RPMs in the blueprint to the version matching your container images. The resulting `blueprint.toml` should look simiar to this:
+Remember to pin the version of the MicroShift RPMs in the blueprint to the version matching your container images. The resulting `blueprint.toml` should look similar to this:
 
 ```
 name = "microshift-offline"
