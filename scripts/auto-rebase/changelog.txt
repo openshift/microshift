@@ -1,15 +1,16 @@
-- cluster-network-operator embedded-component 2cb637471666d96503232a856f8e3e8874d53e8f to feb702714c27c13af182c209ae182f0e761ae1b9
-  - dd4d980 2023-10-05T09:00:20-04:00 Multus should determine kubeconfig path
+- cluster-network-operator embedded-component feb702714c27c13af182c209ae182f0e761ae1b9 to ed997d2e9698a1b6fa1c187b1eb1d5c4a697cc08
+  - aee2e70 2023-10-06T08:53:08+00:00 Don't run network node identity as root
+  - 4d4c51a 2023-10-03T13:47:35+00:00 Revert "Kuryr: Set MTU on Bootstrap, not Render phase"
 
-- kubernetes embedded-component 9ef6de6018e3917f751b0dcc3426f13c8f950338 to 4e94a885307b87ee4650f4fa187128eb6cc219d1
-  - ff221b91b 2023-10-06T12:01:47-04:00 UPSTREAM: <carry>: Do not allow nodes to set forbidden openshift labels
-  - 4a441d80f 2023-10-03T07:48:04-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+- kubernetes embedded-component 4e94a885307b87ee4650f4fa187128eb6cc219d1 to 98158f96f30cce46b1fca344fa2c87db7a9c4b4c
+  - 55ef58d49 2023-09-12T13:34:16+00:00 UPSTREAM: <carry>: Export cpu stats of ovs.slice via prometheus
 
-- kubernetes image-amd64 9ef6de6018e3917f751b0dcc3426f13c8f950338 to 4e94a885307b87ee4650f4fa187128eb6cc219d1
-  - ff221b91b 2023-10-06T12:01:47-04:00 UPSTREAM: <carry>: Do not allow nodes to set forbidden openshift labels
-  - 4a441d80f 2023-10-03T07:48:04-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+- kubernetes image-amd64 4e94a885307b87ee4650f4fa187128eb6cc219d1 to 98158f96f30cce46b1fca344fa2c87db7a9c4b4c
+  - 55ef58d49 2023-09-12T13:34:16+00:00 UPSTREAM: <carry>: Export cpu stats of ovs.slice via prometheus
 
-- kubernetes image-arm64 9ef6de6018e3917f751b0dcc3426f13c8f950338 to 4e94a885307b87ee4650f4fa187128eb6cc219d1
-  - ff221b91b 2023-10-06T12:01:47-04:00 UPSTREAM: <carry>: Do not allow nodes to set forbidden openshift labels
-  - 4a441d80f 2023-10-03T07:48:04-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+- oc image-arm64 795bf1a6260847ecfc612da2ab11ea2d6e07da16 to 1c47b7e520a71227782d86ba83a9bf3309191f3a
+  - 7ad66430 2023-10-09T19:15:26+00:00 Use quay redis image instead docker mysql
+
+- kubernetes image-arm64 4e94a885307b87ee4650f4fa187128eb6cc219d1 to 98158f96f30cce46b1fca344fa2c87db7a9c4b4c
+  - 55ef58d49 2023-09-12T13:34:16+00:00 UPSTREAM: <carry>: Export cpu stats of ovs.slice via prometheus
 
