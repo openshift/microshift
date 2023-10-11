@@ -226,13 +226,14 @@ def sources_have_less_permission_than_parent(parent: str, all_sources: List[str]
         BuiltIn().should_be_equal_as_integers(rc, 0)
 
         if source_number_of_permissions != parent_number_of_permissions:
-            file_path, rc = remote_sudo_rc(f"{semanage_cmd} | grep {source} | awk '{{ print $1 }}'")
+            file_paths, rc = remote_sudo_rc(f"{semanage_cmd} | grep {source} | awk '{{ print $1 }}'")
             BuiltIn().should_be_equal_as_integers(rc, 0)
-            file_exists, rc = remote_sudo_rc(f"[ -e {file_path} ] && echo found || echo safe")
-            BuiltIn().should_be_equal_as_integers(rc, 0)
+            for file_path in file_paths.splitlines():
+                file_exists, rc = remote_sudo_rc(f"[ -e {file_path} ] && echo found || echo safe")
+                BuiltIn().should_be_equal_as_integers(rc, 0)
 
-            if file_exists == "found":
-                error_list.append(f"source: {source} has differnt permission count than parent: {parent} with file({file_path}), needs investigation.")
+                if file_exists == "found":
+                    error_list.append(f"source: {source} has differnt permission count than parent: {parent} with file({file_path}), needs investigation.")
 
     return error_list
 
