@@ -40,10 +40,18 @@
     ansible.builtin.set_fact:
       microshift_prerelease: "{{ 'rc' in microshift_version or 'ec' in microshift_version }}"
 
-  - name: install microshift mirror repo for pre-releases
-    ansible.builtin.template:
-      src: ocpbeta.repo.j2
-      dest: /etc/yum.repos.d/{{ ocp_repo_name }}.repo
+  - block:
+    - name: check if microshift_version is valid for pre-release
+      ansible.builtin.uri:
+        url: "{{ ocpbeta_base_url }}"
+        method: GET
+        status_code: 200
+        timeout: 5
+
+    - name: install microshift mirror repo for pre-releases
+      ansible.builtin.template:
+        src: ocpbeta.repo.j2
+        dest: /etc/yum.repos.d/{{ ocp_repo_name }}.repo
     when:
       - microshift_prerelease
       - not build_microshift
