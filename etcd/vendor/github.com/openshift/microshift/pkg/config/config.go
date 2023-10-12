@@ -38,6 +38,8 @@ type Config struct {
 	userSettings *Config       `json:"-"` // the values read from the config file
 
 	MultiNode MultiNodeConfig `json:"-"` // the value read from commond line
+
+	Warnings []string `json:"-"` // Warnings that should not prevent the service from starting.
 }
 
 // NewDefault creates a new Config struct populated with the
@@ -219,6 +221,8 @@ func (c *Config) updateComputedValues() error {
 		c.ApiServer.AdvertiseAddress = firstValidIP.String()
 	}
 
+	c.computeLoggingSetting()
+
 	return nil
 }
 
@@ -276,6 +280,11 @@ func (c *Config) validate() error {
 	}
 
 	return nil
+}
+
+// AddWarning saves a warning message to be reported later.
+func (c *Config) AddWarning(message string) {
+	c.Warnings = append(c.Warnings, message)
 }
 
 // UserNodeIP return the user configured NodeIP, or "" if it's unset.
