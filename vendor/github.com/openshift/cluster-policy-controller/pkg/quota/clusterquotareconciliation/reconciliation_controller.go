@@ -53,6 +53,8 @@ type ClusterQuotaReconcilationControllerOptions struct {
 	InformerFactory informerfactory.InformerFactory
 	// Controls full resync of objects monitored for replenihsment.
 	ReplenishmentResyncPeriod controller.ResyncPeriodFunc
+	// Filters update events so we only enqueue the ones where we know quota will change
+	UpdateFilter resourcequota.UpdateFilter
 }
 
 type ClusterQuotaReconcilationController struct {
@@ -108,6 +110,7 @@ func NewClusterQuotaReconcilationController(ctx context.Context, options Cluster
 		options.ReplenishmentResyncPeriod,
 		c.replenishQuota,
 		c.registry,
+		options.UpdateFilter,
 	)
 
 	c.quotaMonitor = qm
