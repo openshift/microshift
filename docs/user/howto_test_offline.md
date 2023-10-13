@@ -11,6 +11,16 @@ Deployments](howto_offline_containers.md) for instructions for
 preparing the ostree image with the necessary container images
 embedded when they cannot be pulled over the network.
 
+## Setup
+
+The commands below are meant to be exeuted as the root user. Please
+login as root. Make sure the appropriate kubeconfig file is available
+in your environment so the oc client commands can run as expected.
+
+Warning: These instructions involve disabling the network interface on
+the host. You will need to access the host directly, not via ssh. For
+VMs, `virsh console` is useful.
+
 ## MicroShift Configuration
 
 Kubernetes expects to have some basic network settings on the host for
@@ -27,10 +37,10 @@ operation.
 /usr/bin/microshift-cleanup-data --ovn
 ```
 
-3. Determine the interface on the host that has the default route
+3. Determine the interface on the host that has the default route.
 
 ```
-IFACE=$(ip route | grep default | awk '{print $5}')
+IFACE=$(ip route | grep default | awk 'NR==1 {print $5}')
 ```
 
 (This is usually enp1s0 in a VM)
@@ -101,6 +111,7 @@ oc get pods -A
 15. Re-enable the NIC
 
 ```
+IFACE=$(ip route | grep default | awk 'NR==1 {print $5}')
 nmcli connection up $IFACE
 ```
 
