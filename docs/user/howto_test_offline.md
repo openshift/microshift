@@ -15,7 +15,11 @@ embedded when they cannot be pulled over the network.
 
 The commands below are meant to be exeuted as the root user. Please
 login as root. Make sure the appropriate kubeconfig file is available
-in your environment so the oc client commands can run as expected
+in your environment so the oc client commands can run as expected.
+
+Warning: These instructions involve disabling the network interface on
+the host. You will need to access the host directly, not via ssh. For
+VMs, `virsh console` is useful.
 
 ## MicroShift Configuration
 
