@@ -6,4 +6,4 @@ url = "{{ .Env.CURRENT_RELEASE_REPO }}"
 check_gpg = false
 check_ssl = true
 system = false
-{{ end }}
+{{- end -}}

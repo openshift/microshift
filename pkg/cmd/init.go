@@ -27,7 +27,7 @@ import (
 
 	"k8s.io/apiserver/pkg/authentication/serviceaccount"
 	"k8s.io/apiserver/pkg/authentication/user"
-	ctrl "k8s.io/kubernetes/pkg/controlplane"
+	apiserveroptions "k8s.io/kubernetes/pkg/controlplane/apiserver/options"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
@@ -66,7 +66,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		return nil, err
 	}
 
-	_, apiServerServiceIP, err := ctrl.ServiceIPRange(*svcNet)
+	_, apiServerServiceIP, err := apiserveroptions.ServiceIPRange(*svcNet)
 	if err != nil {
 		return nil, err
 	}
