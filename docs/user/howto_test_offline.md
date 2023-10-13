@@ -34,10 +34,9 @@ operation.
 ```
 
 3. Determine the interface on the host that has the default route.
-   Make sure you only have one default route configured
 
 ```
-IFACE=$(ip route | grep default | awk '{print $5}')
+IFACE=$(ip route | grep default | awk 'NR==1 {print $5}')
 ```
 
 (This is usually enp1s0 in a VM)
@@ -108,7 +107,7 @@ oc get pods -A
 15. Re-enable the NIC
 
 ```
-IFACE=$(ip route | grep default | awk '{print $5}')
+IFACE=$(ip route | grep default | awk 'NR==1 {print $5}')
 nmcli connection up $IFACE
 ```
 
