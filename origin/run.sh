@@ -13,12 +13,12 @@ cd "${SCRIPT_DIR}"
 echo "Building openshift-tests"
 make build
 
-if ! which oc; then
+if ! which oc &>/dev/null; then
     echo "oc binary not found"
     exit 1
 fi
 
-if ! which kubectl; then
+if ! which kubectl &>/dev/null; then
     echo "kubectl binary not found"
     exit 1
 fi
