@@ -1,6 +1,11 @@
 ---
 # microshift-start tasks
 
+- name: check if microshift has run
+  ansible.builtin.shell: systemctl show -p ActiveEnterTimestampMonotonic microshift | awk -F"=" '{print $2}'
+  register: microshift_active
+  ignore_errors: true
+
 - block:
   - name: find microshift cleanup script
     ansible.builtin.find:
@@ -18,7 +23,9 @@
   - name: cleanup microshift data
     become: yes
     ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
-  when: cleanup_microshift | default('true') | bool
+  when:
+    - cleanup_microshift | default('true') | bool
+    - microshift_active.stdout | int != 0
 
 - name: disable microshift service
   become: yes
