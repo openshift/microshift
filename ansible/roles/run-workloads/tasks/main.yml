@@ -36,6 +36,17 @@
       dest: "{{ local_tarball_path }}"
       mode: '0755'
 
+  - name: check if local bin directory exists
+    ansible.builtin.stat:
+      path: "{{ local_bin_path }}"
+    register: local_bin_directory_check
+
+  - name: create local bin directory if missing
+    ansible.builtin.file:
+      path: "{{ local_bin_path }}"
+      state: directory
+    when: not local_bin_directory_check.stat.exists
+
   - name: extract kube-burner files
     ansible.builtin.unarchive:
       src: "{{ local_tarball_path }}"
