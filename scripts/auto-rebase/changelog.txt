@@ -1,16 +1,44 @@
-- cluster-network-operator embedded-component feb702714c27c13af182c209ae182f0e761ae1b9 to ed997d2e9698a1b6fa1c187b1eb1d5c4a697cc08
-  - aee2e70 2023-10-06T08:53:08+00:00 Don't run network node identity as root
-  - 4d4c51a 2023-10-03T13:47:35+00:00 Revert "Kuryr: Set MTU on Bootstrap, not Render phase"
+- cluster-network-operator embedded-component ed997d2e9698a1b6fa1c187b1eb1d5c4a697cc08 to 5572bce9c04feaf970862db03fe4c4fe03b912b4
+  - 368b52d 2023-10-13T20:22:03+00:00 volume mount ovnkube dir in single-zone-interconnect phase
 
-- kubernetes embedded-component 4e94a885307b87ee4650f4fa187128eb6cc219d1 to 98158f96f30cce46b1fca344fa2c87db7a9c4b4c
-  - 55ef58d49 2023-09-12T13:34:16+00:00 UPSTREAM: <carry>: Export cpu stats of ovs.slice via prometheus
+- cluster-openshift-controller-manager-operator embedded-component 7f0f4f9c1acbb5d40485e4806f1b1dea39bb4855 to d6ded7f422c87ceea152a22976833f4148d9b954
+  - 1f5bc51 2023-10-12T15:08:02-04:00 OCPBUGS-20164: Include Build CRD in manifests
+  - e159e9a 2023-10-12T15:08:02-04:00 bump(openshift/api):
 
-- kubernetes image-amd64 4e94a885307b87ee4650f4fa187128eb6cc219d1 to 98158f96f30cce46b1fca344fa2c87db7a9c4b4c
-  - 55ef58d49 2023-09-12T13:34:16+00:00 UPSTREAM: <carry>: Export cpu stats of ovs.slice via prometheus
+- kubernetes embedded-component 98158f96f30cce46b1fca344fa2c87db7a9c4b4c to 88e9b4c0d5978a2879307be87d25c592abb6eeea
+  - 77e4a400e 2023-10-13T09:00:30-04:00 UPSTREAM: 121199: Skip TestUnauthenticatedHTTP2ClientConnectionClose http1 tests
+  - 37834d9e5 2023-10-13T08:59:12-04:00 UPSTREAM: 121199: Prevent rapid reset http2 DOS on API server
+  - 986cdfc93 2023-10-12T11:15:53-04:00 UPSTREAM: 121127: [1.27][CVE-2023-39325] .: bump golang.org/x/net to v0.17.0
 
-- oc image-arm64 795bf1a6260847ecfc612da2ab11ea2d6e07da16 to 1c47b7e520a71227782d86ba83a9bf3309191f3a
+- machine-config-operator embedded-component a2469941c0dcccf9584e0f54b3e38c13b1292ca9 to 20d95766e888fd71d50e71681546cbd5f0d6da65
+  - 7e5eccea 2023-09-22T13:26:19+00:00 OCPBUGS-15910: After dual-stack conversion reconcile IPFamilies
+
+- oc image-amd64 795bf1a6260847ecfc612da2ab11ea2d6e07da16 to eaef63bdfaf849a023316269254dc0d8a89dd382
   - 7ad66430 2023-10-09T19:15:26+00:00 Use quay redis image instead docker mysql
+  - 4d625cdc 2023-10-09T15:34:18+00:00 Updating excluded list of unsupported oc adm commands in MicroShift
 
-- kubernetes image-arm64 4e94a885307b87ee4650f4fa187128eb6cc219d1 to 98158f96f30cce46b1fca344fa2c87db7a9c4b4c
-  - 55ef58d49 2023-09-12T13:34:16+00:00 UPSTREAM: <carry>: Export cpu stats of ovs.slice via prometheus
+- ovn-kubernetes image-amd64 5366edeb9dd8a7ac21d2ebcdcb4a5dac8d785023 to 7a232386623498f099ccdedfc58bc1c134c61ddd
+  - 2aaab29 2023-10-09T19:03:24+02:00 Fix webhook error & exit handling
+  - 71fcc29 2023-10-09T19:03:23+02:00 Update code, comments and tests with new transit switch CIDR
+  - f2bffa4 2023-10-09T19:03:22+02:00 Use private IPv4 address range for transit switch subnet
+  - 5f9cc0a 2023-09-26T13:53:18+00:00 Dockerfile: Copy ovnkube-trace file for RHEL8 platform
+
+- kubernetes image-amd64 98158f96f30cce46b1fca344fa2c87db7a9c4b4c to 88e9b4c0d5978a2879307be87d25c592abb6eeea
+  - 77e4a400e 2023-10-13T09:00:30-04:00 UPSTREAM: 121199: Skip TestUnauthenticatedHTTP2ClientConnectionClose http1 tests
+  - 37834d9e5 2023-10-13T08:59:12-04:00 UPSTREAM: 121199: Prevent rapid reset http2 DOS on API server
+  - 986cdfc93 2023-10-12T11:15:53-04:00 UPSTREAM: 121127: [1.27][CVE-2023-39325] .: bump golang.org/x/net to v0.17.0
+
+- oc image-arm64 1c47b7e520a71227782d86ba83a9bf3309191f3a to eaef63bdfaf849a023316269254dc0d8a89dd382
+  - 4d625cdc 2023-10-09T15:34:18+00:00 Updating excluded list of unsupported oc adm commands in MicroShift
+
+- ovn-kubernetes image-arm64 5366edeb9dd8a7ac21d2ebcdcb4a5dac8d785023 to 7a232386623498f099ccdedfc58bc1c134c61ddd
+  - 2aaab29 2023-10-09T19:03:24+02:00 Fix webhook error & exit handling
+  - 71fcc29 2023-10-09T19:03:23+02:00 Update code, comments and tests with new transit switch CIDR
+  - f2bffa4 2023-10-09T19:03:22+02:00 Use private IPv4 address range for transit switch subnet
+  - 5f9cc0a 2023-09-26T13:53:18+00:00 Dockerfile: Copy ovnkube-trace file for RHEL8 platform
+
+- kubernetes image-arm64 98158f96f30cce46b1fca344fa2c87db7a9c4b4c to 88e9b4c0d5978a2879307be87d25c592abb6eeea
+  - 77e4a400e 2023-10-13T09:00:30-04:00 UPSTREAM: 121199: Skip TestUnauthenticatedHTTP2ClientConnectionClose http1 tests
+  - 37834d9e5 2023-10-13T08:59:12-04:00 UPSTREAM: 121199: Prevent rapid reset http2 DOS on API server
+  - 986cdfc93 2023-10-12T11:15:53-04:00 UPSTREAM: 121127: [1.27][CVE-2023-39325] .: bump golang.org/x/net to v0.17.0
 
