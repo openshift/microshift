@@ -16,7 +16,7 @@
     path: "{{ kubeconfig_directory }}"
     state: directory
   delegate_to: localhost
-  when: not kubeconfig_directory_check.stat.isdir
+  when: not kubeconfig_directory_check.stat.exists
 
 - name: check a kubeconfig file exists on local machine
   ansible.builtin.stat:
