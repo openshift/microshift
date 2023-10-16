@@ -73,13 +73,6 @@
   roles:
     - role: add-kubelet-logging
 
-- name: capture microshift metrics (warm)
-  hosts: microshift
-  vars_files:
-    - vars/all.yml
-  roles:
-    - role: quick-microshift-boot
-
 - name: pull kubeconfig from microshift host
   hosts: microshift
   vars_files:
