@@ -14,8 +14,8 @@ shopt -s nullglob
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
-# shellcheck source=test/bin/get_crel_version_repo.sh
-source "${SCRIPTDIR}/get_crel_version_repo.sh"
+# shellcheck source=test/bin/get_rel_version_repo.sh
+source "${SCRIPTDIR}/get_rel_version_repo.sh"
 
 osbuild_logs() {
     workers_services=$(sudo systemctl list-units | awk '/osbuild-worker@/ {print $1} /osbuild-composer\.service/ {print $1}')
@@ -33,6 +33,7 @@ configure_package_sources() {
     export BASE_REPO               # defined in common.sh
     export YPLUS2_REPO             # defined in common.sh
     export CURRENT_RELEASE_REPO
+    export PREVIOUS_RELEASE_REPO
 
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
@@ -41,6 +42,7 @@ configure_package_sources() {
     export PREVIOUS_MINOR_VERSION
     export SOURCE_VERSION_BASE
     export CURRENT_RELEASE_VERSION
+    export PREVIOUS_RELEASE_VERSION
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -456,9 +458,13 @@ FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 FAKE_YPLUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" + 2 ))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
 
-CURRENT_RELEASE_VERSION=""
-CURRENT_RELEASE_REPO=""
-get_crel_version_repo "${MINOR_VERSION}"
+current_version_repo=$(get_rel_version_repo "${MINOR_VERSION}")
+CURRENT_RELEASE_VERSION=$(echo "${current_version_repo}" | cut -d, -f1)
+CURRENT_RELEASE_REPO=$(echo "${current_version_repo}" | cut -d, -f2)
+
+previous_version_repo=$(get_rel_version_repo "${PREVIOUS_MINOR_VERSION}")
+PREVIOUS_RELEASE_VERSION=$(echo "${previous_version_repo}" | cut -d, -f1)
+PREVIOUS_RELEASE_REPO=$(echo "${previous_version_repo}" | cut -d, -f2)
 
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"

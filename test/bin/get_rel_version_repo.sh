@@ -13,6 +13,8 @@ get_candidate_repo() {
 
 check_if_repo_exists() {
 	local -r repo="${1}"
+
+	local code
 	code=$(curl --silent --location --output /dev/null --write-out "%{http_code}" "${repo}/repodata/repomd.xml")
 	if [ "${code}" == "404" ]; then
 		return 1
@@ -24,12 +26,14 @@ check_if_repo_exists() {
 get_current_release_from_candidates() {
 	local -r minor="${1}"
 
+	local rc_repo
 	rc_repo=$(get_candidate_repo "${minor}" false)
 	if check_if_repo_exists "${rc_repo}"; then
 		echo "${rc_repo}"
 		return 0
 	fi
 
+	local ec_repo
 	ec_repo=$(get_candidate_repo "${minor}" true)
 	if check_if_repo_exists "${ec_repo}"; then
 		echo "${ec_repo}"
@@ -48,7 +52,10 @@ get_current_release_from_sub_repos() {
 	local -r minor="${1}"
 	local -r rhsm_repo="rhocp-4.${minor}-for-rhel-9-x86_64-rpms"
 
+	# getting version of RPM within a rhocp repo depends on the repo being enabled,
+	# which is done in configure_vm.sh
 	if dnf_repo_is_enabled "${rhsm_repo}"; then
+		local newest
 		newest=$(sudo dnf repoquery microshift --quiet --queryformat '%{version}-%{release}' --repo "${rhsm_repo}" | sort --version-sort | tail -n1)
 		if [ -n "${newest}" ]; then
 			echo "${newest}"
@@ -58,30 +65,31 @@ get_current_release_from_sub_repos() {
 	echo ""
 }
 
-# get_crel_version_repo attempts to obtain full version string and repository url
-# for "already released RPMs for current release" - this includes ECs and RCs from
+# get_version_repo attempts to obtain full version string and repository url
+# for "already released RPMs for minor release" - this includes ECs and RCs from
 # http mirrors, and packages in the ocp repository.
 #
 # Failed attempt to obtain version/repo is not a failure, at the start of each release,
 # there might not be an EC yet. In such case variables exported below might be empty,
 # and such osbuild source, blueprint, and test scenarios should be skipped.
-get_crel_version_repo() {
+get_rel_version_repo() {
 	local -r minor="${1}"
 
-	CURRENT_RELEASE_VERSION=$(get_current_release_from_sub_repos "${minor}")
-	if [ -n "${CURRENT_RELEASE_VERSION}" ]; then
-		export CURRENT_RELEASE_VERSION
+	local version
+	version=$(get_current_release_from_sub_repos "${minor}")
+	if [ -n "${version}" ]; then
+		echo "${version},"
 		return
 	fi
 
-	CURRENT_RELEASE_REPO=$(get_current_release_from_candidates "${minor}")
-	if [ -z "${CURRENT_RELEASE_REPO}" ]; then
+	local repo
+	repo=$(get_current_release_from_candidates "${minor}")
+	if [ -z "${repo}" ]; then
 		return
 	fi
-	export CURRENT_RELEASE_REPO
 
-	CURRENT_RELEASE_VERSION=$(sudo dnf repoquery microshift --quiet --queryformat '%{version}-%{release}' --disablerepo '*' --repofrompath "this,${CURRENT_RELEASE_REPO}")
-	if [ -n "${CURRENT_RELEASE_VERSION}" ]; then
-		export CURRENT_RELEASE_VERSION
+	version=$(sudo dnf repoquery microshift --quiet --queryformat '%{version}-%{release}' --disablerepo '*' --repofrompath "this,${repo}")
+	if [ -n "${version}" ]; then
+		echo "${version},${repo}"
 	fi
 }
