@@ -1081,15 +1081,7 @@ update_changelog() {
 
 }
 
-
-# Runs each OCP rebase step in sequence, commiting the step's output to git
-rebase_to() {
-    local release_image_amd64=$1
-    local release_image_arm64=$2
-
-    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
-    download_release "${release_image_amd64}" "${release_image_arm64}"
-
+checkout_rebase_branch() {
     ver_stream="$(cat ${STAGING_DIR}/release_amd64.json | jq -r '.config.config.Labels["io.openshift.release"]')"
     amd64_date="$(cat ${STAGING_DIR}/release_amd64.json | jq -r .config.created | cut -f1 -dT)"
     arm64_date="$(cat ${STAGING_DIR}/release_arm64.json | jq -r .config.created | cut -f1 -dT)"
@@ -1110,6 +1102,17 @@ rebase_to() {
     rebase_branch="rebase${onto_branch:+"-$onto_branch"}-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
+}
+
+# Runs each OCP rebase step in sequence, commiting the step's output to git
+rebase_to() {
+    local release_image_amd64=$1
+    local release_image_arm64=$2
+
+    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
+    download_release "${release_image_amd64}" "${release_image_arm64}"
+
+    checkout_rebase_branch
 
     update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
 
@@ -1226,10 +1229,38 @@ rebase_lvms_to() {
     rm -rf "${STAGING_DIR}"
 }
 
+to_just_images() {
+    local release_image_amd64=$1
+    local release_image_arm64=$2
+
+    download_release "${release_image_amd64}" "${release_image_arm64}"
+    checkout_rebase_branch
+    update_images
+
+    if [[ -n "$(git status -s assets/release packaging/crio.conf.d)" ]]; then
+        local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase.sh"
+        rm -f "${last_rebase_script}"
+        cat - >"${last_rebase_script}" <<EOF
+    #!/bin/bash -x
+    ./scripts/auto-rebase/rebase.sh images-to "${release_image_amd64}" "${release_image_arm64}"
+EOF
+        chmod +x "${last_rebase_script}"
+
+        title "## Committing new image references"
+        git add assets/release
+        git add packaging/crio.conf.d
+        git add scripts/auto-rebase/last_rebase.sh
+        git commit -m "update component images"
+    else
+        echo "No changes in component images."
+    fi
+}
+
 usage() {
     echo "Usage:"
     echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM         Performs all the steps to rebase to a release image. Specify both amd64 and arm64 OCP releases."
     echo "$(basename "$0") download RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM   Downloads the content of a release image to disk in preparation for rebasing. Specify both amd64 and arm64 OCP releases."
+    echo "$(basename "$0") images-to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM  Downloads release image and only updates image references. Specify both amd64 and arm64 OCP releases."
     echo "$(basename "$0") buildfiles                                       Updates build files (Makefile, Dockerfile, .spec)"
     echo "$(basename "$0") go.mod                                           Updates the go.mod file to the downloaded release"
     echo "$(basename "$0") generated-apis                                   Regenerates OpenAPIs"
@@ -1258,6 +1289,9 @@ case "$command" in
     generated-apis) regenerate_openapi;;
     images)
         update_images
+        ;;
+    images-to)
+        to_just_images "$2" "$3"
         ;;
     manifests)
         copy_manifests
