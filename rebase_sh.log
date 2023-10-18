@@ -1,0 +1,2698 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.15.0-0.nightly-2023-10-17-065657 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.15.0-0.nightly-arm64-2023-10-17-174304[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.15.0-0.nightly-2023-10-17-065657 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.15.0-0.nightly-arm64-2023-10-17-174304 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.15.0-0.nightly-2023-10-17-065657 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.15.0-0.nightly-2023-10-17-065657 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at 809d4ca Merge pull request #157 from mpatlasov/restart-controller-pods-if-webhook-secret-changed
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 5e12334 Merge pull request #384 from Miciah/OCPBUGS-20024-revert-revert-set-DNS-daemonset-maxSurge-value-to-10-percent
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at e27d000 Merge pull request #981 from rfredette/ocpbugs-20192-securityconstraints
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at c1fb42c Merge pull request #1561 from benluddy/validatingadmissionpolicy-v1beta1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 18f73fe Merge pull request #755 from atiratree/CVE-2023-44487-4.15
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at 5732430 Merge pull request #500 from knelasevero/CVE-2023-44487-4.15
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at 457336f Merge pull request #2065 from flavio-fernandes/failed-mkdir-release-4.15
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at bec461c Merge pull request #306 from adambkaplan/build-capability-crd
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at adaa98f Merge pull request #133 from ardaguclu/ocpbugs-21638
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/csi-external-snapshotter/.git/
+HEAD is now at 11bb38f Merge pull request #108 from dobsonj/CVE-2023-44487-origin
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at 6fc69d5d Merge pull request #211 from tjungblu/rhel9
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+HEAD is now at 481304af1 Merge pull request #1757 from ncdc/bump-x-net
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes-kube-storage-version-migrator/.git/
+HEAD is now at 8558e14 Merge pull request #198 from mfojtik/openshift-bump
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/machine-config-operator/.git/
+HEAD is now at d1493855 Merge pull request #3977 from dcbw/gcp-routes-retry
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/openshift-controller-manager/.git/
+HEAD is now at 1d4fb5b Merge pull request #272 from sanchezl/split-service-account-controller
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager/.git/
+HEAD is now at b139934 Merge pull request #31 from atiratree/bump-k8s-1.28
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/service-ca-operator/.git/
+HEAD is now at bbf914e Merge pull request #221 from openshift-bot/art-consistency-openshift-4.15-ose-service-ca-operator
+
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.15.0-0.nightly-2023-10-17-065657 image repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/oc/.git/
+HEAD is now at c365b47f Merge pull request #1578 from ardaguclu/ocpbugs-20381
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/coredns/.git/
+HEAD is now at ac051aa Merge pull request #94 from gcs278/merge-1.11.1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/csi-external-snapshotter/.git/
+HEAD is now at 11bb38f Merge pull request #108 from dobsonj/CVE-2023-44487-origin
+
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/router/.git/
+HEAD is now at f142a3a Merge pull request #513 from openshift-bot/art-consistency-openshift-4.15-openshift-enterprise-haproxy-router
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kube-rbac-proxy/.git/
+HEAD is now at 688b36e Merge pull request #72 from openshift-bot/art-consistency-openshift-4.15-kube-rbac-proxy
+
+openssl not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/ovn-kubernetes/.git/
+HEAD is now at 1cf6c03 Merge pull request #1702 from dcbw/no-cni-plugins
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kubernetes/.git/
+HEAD is now at 481304af1 Merge pull request #1757 from ncdc/bump-x-net
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/service-ca-operator/.git/
+HEAD is now at bbf914e Merge pull request #221 from openshift-bot/art-consistency-openshift-4.15-ose-service-ca-operator
+
+topolvm_csi not from release payload, skipping
+
+topolvm_csi_livenessprobe not from release payload, skipping
+
+topolvm_csi_provisioner not from release payload, skipping
+
+topolvm_csi_registrar not from release payload, skipping
+
+topolvm_csi_resizer not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/oc/.git/
+HEAD is now at d77b3812 Merge pull request #1557 from wking/oc-adm-upgrade-warn-on-unrecognized-subcommands
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/coredns/.git/
+HEAD is now at ac051aa Merge pull request #94 from gcs278/merge-1.11.1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/csi-external-snapshotter/.git/
+HEAD is now at 11bb38f Merge pull request #108 from dobsonj/CVE-2023-44487-origin
+
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/router/.git/
+HEAD is now at f142a3a Merge pull request #513 from openshift-bot/art-consistency-openshift-4.15-openshift-enterprise-haproxy-router
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kube-rbac-proxy/.git/
+HEAD is now at 688b36e Merge pull request #72 from openshift-bot/art-consistency-openshift-4.15-kube-rbac-proxy
+
+openssl not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/ovn-kubernetes/.git/
+HEAD is now at 1cf6c03 Merge pull request #1702 from dcbw/no-cni-plugins
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kubernetes/.git/
+HEAD is now at c0449761f Merge pull request #1685 from QiWang19/rm-mirror-vallidation
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/service-ca-operator/.git/
+HEAD is now at bbf914e Merge pull request #221 from openshift-bot/art-consistency-openshift-4.15-ose-service-ca-operator
+
+topolvm_csi not from release payload, skipping
+
+topolvm_csi_livenessprobe not from release payload, skipping
+
+topolvm_csi_provisioner not from release payload, skipping
+
+topolvm_csi_registrar not from release payload, skipping
+
+topolvm_csi_resizer not from release payload, skipping
+
+Warning: env var PULL_BASE_REF not found or empty, falling back to local active branch.
+error: branch 'rebase-main-4.15.0-0.nightly-2023-10-17-065657_amd64-2023-10-17_arm64-2023-10-17' not found.
+Switched to a new branch 'rebase-main-4.15.0-0.nightly-2023-10-17-065657_amd64-2023-10-17_arm64-2023-10-17'
+[34m## Updating last_rebase.sh[00m
+[34m## Committing changes to last_rebase.sh[00m
+[rebase-main-4.15.0-0.nightly-2023-10-17-065657_amd64-2023-10-17_arm64-2023-10-17 a90533a9f] update last_rebase.sh
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+cluster-csi-snapshot-controller-operator embedded-component no change
+
+cluster-kube-apiserver-operator embedded-component no change
+
+etcd embedded-component no change
+
+kubernetes-kube-storage-version-migrator embedded-component no change
+
+openshift-controller-manager embedded-component no change
+
+route-controller-manager embedded-component no change
+
+service-ca-operator embedded-component no change
+
+coredns image-amd64 no change
+
+router image-amd64 no change
+
+service-ca-operator image-amd64 no change
+
+coredns image-arm64 no change
+
+router image-arm64 no change
+
+service-ca-operator image-arm64 no change
+
+[34m## Committing changes to changelog[00m
+[rebase-main-4.15.0-0.nightly-2023-10-17-065657_amd64-2023-10-17_arm64-2023-10-17 751cec94d] update changelog
+ 2 files changed, 754 insertions(+), 5924 deletions(-)
+[34m# Updating microshift/go.mod[00m
+go mod edit -require github.com/openshift/cluster-policy-controller@adaa98fca9c663789f287c42a9a875706c6e392b
+Go compliance shim [4050] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4050] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4050] [][]: assessment: dynamic linking
+Go compliance shim [4050] [][]: EXEMPT: 0
+Go compliance shim [4050] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4050] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4050] [][]: final command line arguments: "mod" "edit" "-require" "github.com/openshift/cluster-policy-controller@adaa98fca9c663789f287c42a9a875706c6e392b" 
+
+Go compliance shim [4050] [][]: invoking real go binary
+Go compliance shim [4050] [][]: Exited with: 0
+Go compliance shim [4083] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4083] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4083] [][]: assessment: dynamic linking
+Go compliance shim [4083] [][]: EXEMPT: 0
+Go compliance shim [4083] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4083] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4083] [][]: final command line arguments: "mod" "tidy" 
+
+Go compliance shim [4083] [][]: invoking real go binary
+go: downloading github.com/openshift/build-machinery-go v0.0.0-20230824093055-6a18da01283c
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/spf13/cobra v1.7.0
+go: downloading github.com/openshift/api v0.0.0-20230919091950-86cd393582c0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/spf13/pflag v1.0.5
+go: downloading github.com/apparentlymart/go-cidr v1.1.0
+go: downloading github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e
+go: downloading github.com/openshift/client-go v0.0.0-20230926161409-848405da69e1
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading k8s.io/klog/v2 v2.100.1
+go: downloading github.com/openshift/library-go v0.0.0-20230927113136-405c34317fa4
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading sigs.k8s.io/yaml v1.3.0
+go: downloading sigs.k8s.io/kustomize/api v0.13.5-0.20230601165947-6ce0bf390ce3
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/stretchr/testify v1.8.2
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/miekg/dns v1.1.35
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/cluster-policy-controller v0.0.0-20231016143100-adaa98fca9c6
+go: downloading github.com/vishvananda/netlink v1.1.0
+go: downloading github.com/openshift/route-controller-manager v0.0.0-20230925114908-b1399340162b
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20230831104714-6fc69d5d8356
+go: downloading github.com/openshift/etcd/client/v3 v3.5.1-0.20230831104714-6fc69d5d8356
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20230724151845-8558e14a1168
+go: downloading github.com/google/go-cmp v0.5.9
+go: downloading golang.org/x/sys v0.12.0
+go: downloading github.com/inconshreveable/mousetrap v1.1.0
+go: downloading github.com/go-logr/logr v1.2.4
+go: downloading github.com/evanphx/json-patch v4.12.0+incompatible
+go: downloading github.com/google/uuid v1.3.0
+go: downloading k8s.io/utils v0.0.0-20230726121419-3b25d923346b
+go: downloading github.com/gogo/protobuf v1.3.2
+go: downloading github.com/google/gofuzz v1.2.0
+go: downloading k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9
+go: downloading github.com/davecgh/go-spew v1.1.1
+go: downloading github.com/ghodss/yaml v1.0.0
+go: downloading sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd
+go: downloading gopkg.in/yaml.v2 v2.4.0
+go: downloading github.com/pmezard/go-difflib v1.0.0
+go: downloading sigs.k8s.io/kustomize/kyaml v0.14.3-0.20230601165947-6ce0bf390ce3
+go: downloading golang.org/x/crypto v0.13.0
+go: downloading golang.org/x/net v0.15.0
+go: downloading golang.org/x/sync v0.2.0
+go: downloading github.com/jonboulle/clockwork v0.2.2
+go: downloading github.com/pkg/errors v0.9.1
+go: downloading sigs.k8s.io/structured-merge-diff/v4 v4.3.0
+go: downloading github.com/MakeNowJust/heredoc v1.0.0
+go: downloading github.com/mitchellh/go-wordwrap v1.0.1
+go: downloading github.com/russross/blackfriday/v2 v2.1.0
+go: downloading github.com/imdario/mergo v0.3.11
+go: downloading golang.org/x/term v0.12.0
+go: downloading golang.org/x/time v0.3.0
+go: downloading github.com/vishvananda/netns v0.0.4
+go: downloading go.uber.org/zap v1.19.0
+go: downloading github.com/openshift/etcd/api/v3 v3.5.1-0.20230831104714-6fc69d5d8356
+go: downloading google.golang.org/grpc v1.54.0
+go: downloading go.opentelemetry.io/otel/trace v1.10.0
+go: downloading github.com/google/cadvisor v0.47.3
+go: downloading github.com/coreos/go-systemd/v22 v22.5.0
+go: downloading go.opentelemetry.io/otel v1.10.0
+go: downloading gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+go: downloading github.com/opencontainers/runc v1.1.9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.10.0
+go: downloading go.opentelemetry.io/otel/sdk v1.10.0
+go: downloading github.com/fsnotify/fsnotify v1.6.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cri-api v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.10.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/metrics v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de
+go: downloading github.com/google/gnostic-models v0.6.8
+go: downloading golang.org/x/text v0.13.0
+go: downloading github.com/golang/protobuf v1.5.3
+go: downloading google.golang.org/protobuf v1.30.0
+go: downloading github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7
+go: downloading github.com/peterbourgon/diskv v2.0.1+incompatible
+go: downloading gopkg.in/inf.v0 v0.9.1
+go: downloading github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
+go: downloading github.com/blang/semver/v4 v4.0.0
+go: downloading github.com/prometheus/client_golang v1.16.0
+go: downloading github.com/blang/semver v3.5.1+incompatible
+go: downloading github.com/prometheus/client_model v0.4.0
+go: downloading github.com/prometheus/procfs v0.10.1
+go: downloading github.com/prometheus/common v0.44.0
+go: downloading github.com/chai2010/gettext-go v1.0.2
+go: downloading github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230811135323-13a5964cc98e
+go: downloading github.com/onsi/gomega v1.27.6
+go: downloading github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d
+go: downloading github.com/moby/term v0.0.0-20221205130635-1aeaba878587
+go: downloading github.com/pkg/profile v1.3.0
+go: downloading github.com/sirupsen/logrus v1.9.0
+go: downloading github.com/emicklei/go-restful/v3 v3.9.0
+go: downloading go.uber.org/atomic v1.10.0
+go: downloading github.com/json-iterator/go v1.1.12
+go: downloading golang.org/x/oauth2 v0.8.0
+go: downloading go.uber.org/multierr v1.11.0
+go: downloading go.uber.org/goleak v1.2.1
+go: downloading github.com/benbjohnson/clock v1.1.0
+go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20230525234035-dd9d682886f9
+go: downloading github.com/coreos/go-semver v0.3.1
+go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19
+go: downloading google.golang.org/genproto v0.0.0-20230526161137-0005af68ea54
+go: downloading gopkg.in/natefinch/lumberjack.v2 v2.2.1
+go: downloading gopkg.in/square/go-jose.v2 v2.6.0
+go: downloading go.etcd.io/etcd/server/v3 v3.5.9
+go: downloading github.com/onsi/ginkgo v1.16.5
+go: downloading github.com/kr/pretty v0.3.1
+go: downloading github.com/karrick/godirwalk v1.17.0
+go: downloading github.com/opencontainers/runtime-spec v1.0.3-0.20220909204839-494a5a6aca78
+go: downloading github.com/containerd/typeurl v1.0.2
+go: downloading github.com/docker/go-units v0.5.0
+go: downloading github.com/cyphar/filepath-securejoin v0.2.3
+go: downloading github.com/moby/sys/mountinfo v0.6.2
+go: downloading github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
+go: downloading github.com/Azure/go-autorest/autorest/adal v0.9.23
+go: downloading github.com/Azure/go-autorest/autorest v0.11.29
+go: downloading github.com/Azure/go-autorest v14.2.0+incompatible
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.35.1
+go: downloading sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.1.2
+go: downloading go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.10.0
+go: downloading go.opentelemetry.io/proto/otlp v0.19.0
+go: downloading github.com/openshift/apiserver-library-go v0.0.0-20230927115548-521857444d9a
+go: downloading github.com/opencontainers/selinux v1.10.0
+go: downloading github.com/golang/mock v1.6.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful v0.35.0
+go: downloading github.com/Microsoft/go-winio v0.6.0
+go: downloading github.com/google/cel-go v0.16.1
+go: downloading github.com/container-storage-interface/spec v1.8.0
+go: downloading github.com/libopenstorage/openstorage v1.0.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/robfig/cron/v3 v3.0.1
+go: downloading github.com/robfig/cron v1.2.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/endpointslice v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/go-openapi/swag v0.22.3
+go: downloading github.com/go-openapi/jsonreference v0.20.2
+go: downloading github.com/google/btree v1.0.1
+go: downloading github.com/go-logr/zapr v1.2.3
+go: downloading github.com/beorn7/perks v1.0.1
+go: downloading github.com/cespare/xxhash/v2 v2.2.0
+go: downloading github.com/go-errors/errors v1.4.2
+go: downloading k8s.io/gengo v0.0.0-20220913193501-391367153a38
+go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.4
+go: downloading github.com/fvbommel/sortorder v1.1.0
+go: downloading github.com/creack/pty v1.1.18
+go: downloading github.com/NYTimes/gziphandler v1.1.1
+go: downloading github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+go: downloading github.com/modern-go/reflect2 v1.0.2
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.35.0
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kms v0.0.0-20231003193349-6ab54b8d9a0e
+go: downloading github.com/coreos/go-oidc v2.2.1+incompatible
+go: downloading github.com/grpc-ecosystem/grpc-gateway v1.16.0
+go: downloading github.com/soheilhy/cmux v0.1.5
+go: downloading github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75
+go: downloading go.etcd.io/bbolt v1.3.7
+go: downloading go.etcd.io/etcd/pkg/v3 v3.5.9
+go: downloading github.com/kr/text v0.2.0
+go: downloading github.com/rogpeppe/go-internal v1.10.0
+go: downloading github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible
+go: downloading github.com/containerd/ttrpc v1.2.2
+go: downloading github.com/opencontainers/go-digest v1.0.0
+go: downloading github.com/euank/go-kmsg-parser v2.0.0+incompatible
+go: downloading github.com/Azure/go-autorest/autorest/date v0.3.0
+go: downloading github.com/Azure/go-autorest/logger v0.2.1
+go: downloading github.com/Azure/go-autorest/tracing v0.6.0
+go: downloading github.com/golang-jwt/jwt/v4 v4.5.0
+go: downloading github.com/Azure/go-autorest/autorest/mocks v0.4.2
+go: downloading github.com/felixge/httpsnoop v1.0.3
+go: downloading go.opentelemetry.io/otel/metric v0.31.0
+go: downloading github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
+go: downloading cloud.google.com/go/compute/metadata v0.2.3
+go: downloading github.com/GoogleCloudPlatform/k8s-cloud-provider v1.18.1-0.20220218231025-f11817397a1b
+go: downloading cloud.google.com/go/compute v1.19.0
+go: downloading google.golang.org/api v0.114.0
+go: downloading gopkg.in/gcfg.v1 v1.2.3
+go: downloading github.com/vmware/govmomi v0.30.0
+go: downloading github.com/rubiojr/go-vhd v0.0.0-20200706105327-02e210299021
+go: downloading github.com/go-logr/stdr v1.2.2
+go: downloading github.com/cenkalti/backoff/v4 v4.2.1
+go: downloading github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0
+go: downloading github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
+go: downloading github.com/containerd/cgroups v1.1.0
+go: downloading github.com/Microsoft/hcsshim v0.8.25
+go: downloading github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
+go: downloading github.com/lithammer/dedent v1.1.0
+go: downloading github.com/godbus/dbus/v5 v5.0.6
+go: downloading github.com/docker/distribution v2.8.2+incompatible
+go: downloading github.com/moby/spdystream v0.2.0
+go: downloading github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
+go: downloading golang.org/x/tools v0.8.0
+go: downloading go.opentelemetry.io/contrib/propagators/b3 v1.10.0
+go: downloading github.com/mohae/deepcopy v0.0.0-20170603005431-491d3605edfb
+go: downloading github.com/stoewer/go-strcase v1.2.0
+go: downloading github.com/go-openapi/jsonpointer v0.19.6
+go: downloading github.com/sergi/go-diff v1.1.0
+go: downloading github.com/mailru/easyjson v0.7.7
+go: downloading github.com/fatih/camelcase v1.0.0
+go: downloading github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1
+go: downloading google.golang.org/appengine v1.6.7
+go: downloading github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
+go: downloading github.com/pquerna/cachecontrol v0.1.0
+go: downloading github.com/gorilla/websocket v1.4.2
+go: downloading github.com/dustin/go-humanize v1.0.1
+go: downloading go.etcd.io/etcd/raft/v3 v3.5.9
+go: downloading github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2
+go: downloading github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+go: downloading github.com/stretchr/objx v0.5.0
+go: downloading github.com/checkpoint-restore/go-criu/v5 v5.3.0
+go: downloading github.com/containerd/console v1.0.3
+go: downloading github.com/mrunalp/fileutils v0.5.0
+go: downloading github.com/docker/docker v20.10.21+incompatible
+go: downloading github.com/docker/go-connections v0.4.0
+go: downloading gopkg.in/warnings.v0 v0.1.2
+go: downloading github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230305170008-8188dc5388df
+go: downloading github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
+go: downloading github.com/xlab/treeprint v1.2.0
+go: downloading github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+go: downloading github.com/josharian/intern v1.0.0
+go: downloading go.etcd.io/etcd/client/v2 v2.305.9
+go: downloading github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572
+go: downloading github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635
+go: downloading github.com/seccomp/libseccomp-golang v0.10.0
+go: downloading github.com/cilium/ebpf v0.9.1
+go: downloading github.com/opencontainers/image-spec v1.0.2
+go: downloading github.com/googleapis/gax-go/v2 v2.7.1
+go: downloading go.opencensus.io v0.24.0
+go: downloading github.com/go-ldap/ldap/v3 v3.4.3
+go: downloading github.com/golang/glog v1.0.0
+go: downloading github.com/moby/ipvs v1.1.0
+go: downloading golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
+go: downloading golang.org/x/mod v0.10.0
+go: downloading github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1
+go: downloading github.com/frankban/quicktest v1.14.0
+go: downloading github.com/googleapis/enterprise-certificate-proxy v0.2.3
+go: downloading github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e
+go: downloading github.com/go-asn1-ber/asn1-ber v1.5.4
+go: downloading go.starlark.net v0.0.0-20230525235612-a134d8f9ddca
+go: downloading cloud.google.com/go/longrunning v0.4.1
+go: downloading cloud.google.com/go v0.110.0
+go: downloading github.com/Azure/go-autorest/autorest/to v0.4.0
+go: downloading github.com/Azure/go-autorest/autorest/validation v0.3.1
+go: downloading github.com/dnaeon/go-vcr v1.2.0
+go: downloading github.com/gofrs/uuid v4.4.0+incompatible
+go: downloading golang.org/x/sys v0.13.0
+go: downloading golang.org/x/net v0.17.0
+go: downloading golang.org/x/term v0.13.0
+go: downloading golang.org/x/crypto v0.14.0
+Go compliance shim [4083] [][]: Exited with: 0
+go mod edit -require github.com/openshift/route-controller-manager@b1399340162be837615609c172bbee297ef478cb
+Go compliance shim [4128] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4128] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4128] [][]: assessment: dynamic linking
+Go compliance shim [4128] [][]: EXEMPT: 0
+Go compliance shim [4128] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4128] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4128] [][]: final command line arguments: "mod" "edit" "-require" "github.com/openshift/route-controller-manager@b1399340162be837615609c172bbee297ef478cb" 
+
+Go compliance shim [4128] [][]: invoking real go binary
+Go compliance shim [4128] [][]: Exited with: 0
+Go compliance shim [4161] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4161] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4161] [][]: assessment: dynamic linking
+Go compliance shim [4161] [][]: EXEMPT: 0
+Go compliance shim [4161] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4161] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4161] [][]: final command line arguments: "mod" "tidy" 
+
+Go compliance shim [4161] [][]: invoking real go binary
+Go compliance shim [4161] [][]: Exited with: 0
+Go compliance shim [4205] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4205] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4205] [][]: assessment: dynamic linking
+Go compliance shim [4205] [][]: EXEMPT: 0
+Go compliance shim [4205] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4205] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4205] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/api@v0.0.0" 
+
+Go compliance shim [4205] [][]: invoking real go binary
+Go compliance shim [4205] [][]: Exited with: 0
+go mod edit -replace k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@481304af1da9b2376ebb1ddefa2ca665e1e1ae40
+Go compliance shim [4239] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4239] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4239] [][]: assessment: dynamic linking
+Go compliance shim [4239] [][]: EXEMPT: 0
+Go compliance shim [4239] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4239] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4239] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@481304af1da9b2376ebb1ddefa2ca665e1e1ae40" 
+
+Go compliance shim [4239] [][]: invoking real go binary
+Go compliance shim [4239] [][]: Exited with: 0
+Go compliance shim [4271] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4271] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4271] [][]: assessment: dynamic linking
+Go compliance shim [4271] [][]: EXEMPT: 0
+Go compliance shim [4271] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4271] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4271] [][]: final command line arguments: "mod" "tidy" 
+
+Go compliance shim [4271] [][]: invoking real go binary
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231013210905-481304af1da9
+Go compliance shim [4271] [][]: Exited with: 0
+Go compliance shim [4344] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4344] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4344] [][]: assessment: dynamic linking
+Go compliance shim [4344] [][]: EXEMPT: 0
+Go compliance shim [4344] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4344] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4344] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [4344] [][]: invoking real go binary
+Go compliance shim [4344] [][]: Exited with: 0
+Go compliance shim [4385] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4385] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4385] [][]: assessment: dynamic linking
+Go compliance shim [4385] [][]: EXEMPT: 0
+Go compliance shim [4385] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4385] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4385] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [4385] [][]: invoking real go binary
+Go compliance shim [4385] [][]: Exited with: 0
+Go compliance shim [4424] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4424] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4424] [][]: assessment: dynamic linking
+Go compliance shim [4424] [][]: EXEMPT: 0
+Go compliance shim [4424] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4424] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4424] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/apiextensions-apiserver@v0.0.0" 
+
+Go compliance shim [4424] [][]: invoking real go binary
+Go compliance shim [4424] [][]: Exited with: 0
+go mod edit -replace k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [4457] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4457] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4457] [][]: assessment: dynamic linking
+Go compliance shim [4457] [][]: EXEMPT: 0
+Go compliance shim [4457] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4457] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4457] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [4457] [][]: invoking real go binary
+Go compliance shim [4457] [][]: Exited with: 0
+Go compliance shim [4493] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4493] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4493] [][]: assessment: dynamic linking
+Go compliance shim [4493] [][]: EXEMPT: 0
+Go compliance shim [4493] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4493] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4493] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [4493] [][]: invoking real go binary
+Go compliance shim [4493] [][]: Exited with: 0
+Go compliance shim [4532] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4532] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4532] [][]: assessment: dynamic linking
+Go compliance shim [4532] [][]: EXEMPT: 0
+Go compliance shim [4532] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4532] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4532] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/apimachinery@v0.0.0" 
+
+Go compliance shim [4532] [][]: invoking real go binary
+Go compliance shim [4532] [][]: Exited with: 0
+go mod edit -replace k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [4565] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4565] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4565] [][]: assessment: dynamic linking
+Go compliance shim [4565] [][]: EXEMPT: 0
+Go compliance shim [4565] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4565] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4565] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [4565] [][]: invoking real go binary
+Go compliance shim [4565] [][]: Exited with: 0
+Go compliance shim [4602] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4602] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4602] [][]: assessment: dynamic linking
+Go compliance shim [4602] [][]: EXEMPT: 0
+Go compliance shim [4602] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4602] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4602] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [4602] [][]: invoking real go binary
+Go compliance shim [4602] [][]: Exited with: 0
+Go compliance shim [4641] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4641] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4641] [][]: assessment: dynamic linking
+Go compliance shim [4641] [][]: EXEMPT: 0
+Go compliance shim [4641] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4641] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4641] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/apiserver@v0.0.0" 
+
+Go compliance shim [4641] [][]: invoking real go binary
+Go compliance shim [4641] [][]: Exited with: 0
+go mod edit -replace k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [4673] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4673] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4673] [][]: assessment: dynamic linking
+Go compliance shim [4673] [][]: EXEMPT: 0
+Go compliance shim [4673] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4673] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4673] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [4673] [][]: invoking real go binary
+Go compliance shim [4673] [][]: Exited with: 0
+Go compliance shim [4710] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4710] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4710] [][]: assessment: dynamic linking
+Go compliance shim [4710] [][]: EXEMPT: 0
+Go compliance shim [4710] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4710] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4710] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [4710] [][]: invoking real go binary
+Go compliance shim [4710] [][]: Exited with: 0
+Go compliance shim [4749] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4749] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4749] [][]: assessment: dynamic linking
+Go compliance shim [4749] [][]: EXEMPT: 0
+Go compliance shim [4749] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4749] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4749] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/cli-runtime@v0.0.0" 
+
+Go compliance shim [4749] [][]: invoking real go binary
+Go compliance shim [4749] [][]: Exited with: 0
+go mod edit -replace k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [4782] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4782] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4782] [][]: assessment: dynamic linking
+Go compliance shim [4782] [][]: EXEMPT: 0
+Go compliance shim [4782] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4782] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4782] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [4782] [][]: invoking real go binary
+Go compliance shim [4782] [][]: Exited with: 0
+Go compliance shim [4819] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4819] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4819] [][]: assessment: dynamic linking
+Go compliance shim [4819] [][]: EXEMPT: 0
+Go compliance shim [4819] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4819] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4819] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [4819] [][]: invoking real go binary
+Go compliance shim [4819] [][]: Exited with: 0
+Go compliance shim [4858] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4858] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4858] [][]: assessment: dynamic linking
+Go compliance shim [4858] [][]: EXEMPT: 0
+Go compliance shim [4858] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4858] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4858] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/client-go@v0.0.0" 
+
+Go compliance shim [4858] [][]: invoking real go binary
+Go compliance shim [4858] [][]: Exited with: 0
+go mod edit -replace k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [4891] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4891] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4891] [][]: assessment: dynamic linking
+Go compliance shim [4891] [][]: EXEMPT: 0
+Go compliance shim [4891] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4891] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4891] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [4891] [][]: invoking real go binary
+Go compliance shim [4891] [][]: Exited with: 0
+Go compliance shim [4928] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4928] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4928] [][]: assessment: dynamic linking
+Go compliance shim [4928] [][]: EXEMPT: 0
+Go compliance shim [4928] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4928] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4928] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [4928] [][]: invoking real go binary
+Go compliance shim [4928] [][]: Exited with: 0
+Go compliance shim [4967] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [4967] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [4967] [][]: assessment: dynamic linking
+Go compliance shim [4967] [][]: EXEMPT: 0
+Go compliance shim [4967] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [4967] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [4967] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/cloud-provider@v0.0.0" 
+
+Go compliance shim [4967] [][]: invoking real go binary
+Go compliance shim [4967] [][]: Exited with: 0
+go mod edit -replace k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5000] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5000] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5000] [][]: assessment: dynamic linking
+Go compliance shim [5000] [][]: EXEMPT: 0
+Go compliance shim [5000] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5000] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5000] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5000] [][]: invoking real go binary
+Go compliance shim [5000] [][]: Exited with: 0
+Go compliance shim [5037] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5037] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5037] [][]: assessment: dynamic linking
+Go compliance shim [5037] [][]: EXEMPT: 0
+Go compliance shim [5037] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5037] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5037] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5037] [][]: invoking real go binary
+Go compliance shim [5037] [][]: Exited with: 0
+Go compliance shim [5076] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5076] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5076] [][]: assessment: dynamic linking
+Go compliance shim [5076] [][]: EXEMPT: 0
+Go compliance shim [5076] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5076] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5076] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/cluster-bootstrap@v0.0.0" 
+
+Go compliance shim [5076] [][]: invoking real go binary
+Go compliance shim [5076] [][]: Exited with: 0
+go mod edit -replace k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5109] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5109] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5109] [][]: assessment: dynamic linking
+Go compliance shim [5109] [][]: EXEMPT: 0
+Go compliance shim [5109] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5109] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5109] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5109] [][]: invoking real go binary
+Go compliance shim [5109] [][]: Exited with: 0
+Go compliance shim [5146] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5146] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5146] [][]: assessment: dynamic linking
+Go compliance shim [5146] [][]: EXEMPT: 0
+Go compliance shim [5146] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5146] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5146] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5146] [][]: invoking real go binary
+Go compliance shim [5146] [][]: Exited with: 0
+Go compliance shim [5185] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5185] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5185] [][]: assessment: dynamic linking
+Go compliance shim [5185] [][]: EXEMPT: 0
+Go compliance shim [5185] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5185] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5185] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/code-generator@v0.0.0" 
+
+Go compliance shim [5185] [][]: invoking real go binary
+Go compliance shim [5185] [][]: Exited with: 0
+go mod edit -replace k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5218] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5218] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5218] [][]: assessment: dynamic linking
+Go compliance shim [5218] [][]: EXEMPT: 0
+Go compliance shim [5218] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5218] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5218] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5218] [][]: invoking real go binary
+Go compliance shim [5218] [][]: Exited with: 0
+Go compliance shim [5255] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5255] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5255] [][]: assessment: dynamic linking
+Go compliance shim [5255] [][]: EXEMPT: 0
+Go compliance shim [5255] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5255] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5255] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5255] [][]: invoking real go binary
+Go compliance shim [5255] [][]: Exited with: 0
+Go compliance shim [5294] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5294] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5294] [][]: assessment: dynamic linking
+Go compliance shim [5294] [][]: EXEMPT: 0
+Go compliance shim [5294] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5294] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5294] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/component-base@v0.0.0" 
+
+Go compliance shim [5294] [][]: invoking real go binary
+Go compliance shim [5294] [][]: Exited with: 0
+go mod edit -replace k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5327] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5327] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5327] [][]: assessment: dynamic linking
+Go compliance shim [5327] [][]: EXEMPT: 0
+Go compliance shim [5327] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5327] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5327] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5327] [][]: invoking real go binary
+Go compliance shim [5327] [][]: Exited with: 0
+Go compliance shim [5364] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5364] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5364] [][]: assessment: dynamic linking
+Go compliance shim [5364] [][]: EXEMPT: 0
+Go compliance shim [5364] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5364] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5364] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5364] [][]: invoking real go binary
+Go compliance shim [5364] [][]: Exited with: 0
+Go compliance shim [5403] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5403] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5403] [][]: assessment: dynamic linking
+Go compliance shim [5403] [][]: EXEMPT: 0
+Go compliance shim [5403] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5403] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5403] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/component-helpers@v0.0.0" 
+
+Go compliance shim [5403] [][]: invoking real go binary
+Go compliance shim [5403] [][]: Exited with: 0
+go mod edit -replace k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5436] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5436] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5436] [][]: assessment: dynamic linking
+Go compliance shim [5436] [][]: EXEMPT: 0
+Go compliance shim [5436] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5436] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5436] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5436] [][]: invoking real go binary
+Go compliance shim [5436] [][]: Exited with: 0
+Go compliance shim [5473] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5473] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5473] [][]: assessment: dynamic linking
+Go compliance shim [5473] [][]: EXEMPT: 0
+Go compliance shim [5473] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5473] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5473] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5473] [][]: invoking real go binary
+Go compliance shim [5473] [][]: Exited with: 0
+Go compliance shim [5512] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5512] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5512] [][]: assessment: dynamic linking
+Go compliance shim [5512] [][]: EXEMPT: 0
+Go compliance shim [5512] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5512] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5512] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/controller-manager@v0.0.0" 
+
+Go compliance shim [5512] [][]: invoking real go binary
+Go compliance shim [5512] [][]: Exited with: 0
+go mod edit -replace k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5545] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5545] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5545] [][]: assessment: dynamic linking
+Go compliance shim [5545] [][]: EXEMPT: 0
+Go compliance shim [5545] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5545] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5545] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5545] [][]: invoking real go binary
+Go compliance shim [5545] [][]: Exited with: 0
+Go compliance shim [5582] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5582] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5582] [][]: assessment: dynamic linking
+Go compliance shim [5582] [][]: EXEMPT: 0
+Go compliance shim [5582] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5582] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5582] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5582] [][]: invoking real go binary
+Go compliance shim [5582] [][]: Exited with: 0
+Go compliance shim [5620] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5620] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5620] [][]: assessment: dynamic linking
+Go compliance shim [5620] [][]: EXEMPT: 0
+Go compliance shim [5620] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5620] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5620] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/cri-api@v0.0.0" 
+
+Go compliance shim [5620] [][]: invoking real go binary
+Go compliance shim [5620] [][]: Exited with: 0
+go mod edit -replace k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5653] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5653] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5653] [][]: assessment: dynamic linking
+Go compliance shim [5653] [][]: EXEMPT: 0
+Go compliance shim [5653] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5653] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5653] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5653] [][]: invoking real go binary
+Go compliance shim [5653] [][]: Exited with: 0
+Go compliance shim [5690] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5690] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5690] [][]: assessment: dynamic linking
+Go compliance shim [5690] [][]: EXEMPT: 0
+Go compliance shim [5690] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5690] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5690] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5690] [][]: invoking real go binary
+Go compliance shim [5690] [][]: Exited with: 0
+Go compliance shim [5729] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5729] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5729] [][]: assessment: dynamic linking
+Go compliance shim [5729] [][]: EXEMPT: 0
+Go compliance shim [5729] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5729] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5729] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/csi-translation-lib@v0.0.0" 
+
+Go compliance shim [5729] [][]: invoking real go binary
+Go compliance shim [5729] [][]: Exited with: 0
+go mod edit -replace k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5762] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5762] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5762] [][]: assessment: dynamic linking
+Go compliance shim [5762] [][]: EXEMPT: 0
+Go compliance shim [5762] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5762] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5762] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5762] [][]: invoking real go binary
+Go compliance shim [5762] [][]: Exited with: 0
+Go compliance shim [5799] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5799] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5799] [][]: assessment: dynamic linking
+Go compliance shim [5799] [][]: EXEMPT: 0
+Go compliance shim [5799] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5799] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5799] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5799] [][]: invoking real go binary
+Go compliance shim [5799] [][]: Exited with: 0
+Go compliance shim [5838] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5838] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5838] [][]: assessment: dynamic linking
+Go compliance shim [5838] [][]: EXEMPT: 0
+Go compliance shim [5838] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5838] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5838] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/dynamic-resource-allocation@v0.0.0" 
+
+Go compliance shim [5838] [][]: invoking real go binary
+Go compliance shim [5838] [][]: Exited with: 0
+go mod edit -replace k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5871] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5871] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5871] [][]: assessment: dynamic linking
+Go compliance shim [5871] [][]: EXEMPT: 0
+Go compliance shim [5871] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5871] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5871] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5871] [][]: invoking real go binary
+Go compliance shim [5871] [][]: Exited with: 0
+Go compliance shim [5908] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5908] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5908] [][]: assessment: dynamic linking
+Go compliance shim [5908] [][]: EXEMPT: 0
+Go compliance shim [5908] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5908] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5908] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [5908] [][]: invoking real go binary
+Go compliance shim [5908] [][]: Exited with: 0
+Go compliance shim [5947] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5947] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5947] [][]: assessment: dynamic linking
+Go compliance shim [5947] [][]: EXEMPT: 0
+Go compliance shim [5947] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5947] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5947] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/endpointslice@v0.0.0" 
+
+Go compliance shim [5947] [][]: invoking real go binary
+Go compliance shim [5947] [][]: Exited with: 0
+go mod edit -replace k8s.io/endpointslice=github.com/openshift/kubernetes/staging/src/k8s.io/endpointslice@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [5980] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [5980] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [5980] [][]: assessment: dynamic linking
+Go compliance shim [5980] [][]: EXEMPT: 0
+Go compliance shim [5980] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [5980] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [5980] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/endpointslice=github.com/openshift/kubernetes/staging/src/k8s.io/endpointslice@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [5980] [][]: invoking real go binary
+Go compliance shim [5980] [][]: Exited with: 0
+Go compliance shim [6017] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6017] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6017] [][]: assessment: dynamic linking
+Go compliance shim [6017] [][]: EXEMPT: 0
+Go compliance shim [6017] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6017] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6017] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6017] [][]: invoking real go binary
+Go compliance shim [6017] [][]: Exited with: 0
+Go compliance shim [6056] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6056] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6056] [][]: assessment: dynamic linking
+Go compliance shim [6056] [][]: EXEMPT: 0
+Go compliance shim [6056] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6056] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6056] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/kms@v0.0.0" 
+
+Go compliance shim [6056] [][]: invoking real go binary
+Go compliance shim [6056] [][]: Exited with: 0
+go mod edit -replace k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6088] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6088] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6088] [][]: assessment: dynamic linking
+Go compliance shim [6088] [][]: EXEMPT: 0
+Go compliance shim [6088] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6088] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6088] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6088] [][]: invoking real go binary
+Go compliance shim [6088] [][]: Exited with: 0
+Go compliance shim [6125] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6125] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6125] [][]: assessment: dynamic linking
+Go compliance shim [6125] [][]: EXEMPT: 0
+Go compliance shim [6125] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6125] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6125] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6125] [][]: invoking real go binary
+Go compliance shim [6125] [][]: Exited with: 0
+Go compliance shim [6164] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6164] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6164] [][]: assessment: dynamic linking
+Go compliance shim [6164] [][]: EXEMPT: 0
+Go compliance shim [6164] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6164] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6164] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/kube-aggregator@v0.0.0" 
+
+Go compliance shim [6164] [][]: invoking real go binary
+Go compliance shim [6164] [][]: Exited with: 0
+go mod edit -replace k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6197] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6197] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6197] [][]: assessment: dynamic linking
+Go compliance shim [6197] [][]: EXEMPT: 0
+Go compliance shim [6197] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6197] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6197] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6197] [][]: invoking real go binary
+Go compliance shim [6197] [][]: Exited with: 0
+Go compliance shim [6234] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6234] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6234] [][]: assessment: dynamic linking
+Go compliance shim [6234] [][]: EXEMPT: 0
+Go compliance shim [6234] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6234] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6234] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6234] [][]: invoking real go binary
+Go compliance shim [6234] [][]: Exited with: 0
+Go compliance shim [6273] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6273] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6273] [][]: assessment: dynamic linking
+Go compliance shim [6273] [][]: EXEMPT: 0
+Go compliance shim [6273] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6273] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6273] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/kube-controller-manager@v0.0.0" 
+
+Go compliance shim [6273] [][]: invoking real go binary
+Go compliance shim [6273] [][]: Exited with: 0
+go mod edit -replace k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6306] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6306] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6306] [][]: assessment: dynamic linking
+Go compliance shim [6306] [][]: EXEMPT: 0
+Go compliance shim [6306] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6306] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6306] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6306] [][]: invoking real go binary
+Go compliance shim [6306] [][]: Exited with: 0
+Go compliance shim [6342] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6342] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6342] [][]: assessment: dynamic linking
+Go compliance shim [6342] [][]: EXEMPT: 0
+Go compliance shim [6342] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6342] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6342] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6342] [][]: invoking real go binary
+Go compliance shim [6342] [][]: Exited with: 0
+Go compliance shim [6381] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6381] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6381] [][]: assessment: dynamic linking
+Go compliance shim [6381] [][]: EXEMPT: 0
+Go compliance shim [6381] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6381] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6381] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/kube-proxy@v0.0.0" 
+
+Go compliance shim [6381] [][]: invoking real go binary
+Go compliance shim [6381] [][]: Exited with: 0
+go mod edit -replace k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6414] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6414] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6414] [][]: assessment: dynamic linking
+Go compliance shim [6414] [][]: EXEMPT: 0
+Go compliance shim [6414] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6414] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6414] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6414] [][]: invoking real go binary
+Go compliance shim [6414] [][]: Exited with: 0
+Go compliance shim [6451] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6451] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6451] [][]: assessment: dynamic linking
+Go compliance shim [6451] [][]: EXEMPT: 0
+Go compliance shim [6451] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6451] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6451] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6451] [][]: invoking real go binary
+Go compliance shim [6451] [][]: Exited with: 0
+Go compliance shim [6490] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6490] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6490] [][]: assessment: dynamic linking
+Go compliance shim [6490] [][]: EXEMPT: 0
+Go compliance shim [6490] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6490] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6490] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/kube-scheduler@v0.0.0" 
+
+Go compliance shim [6490] [][]: invoking real go binary
+Go compliance shim [6490] [][]: Exited with: 0
+go mod edit -replace k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6523] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6523] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6523] [][]: assessment: dynamic linking
+Go compliance shim [6523] [][]: EXEMPT: 0
+Go compliance shim [6523] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6523] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6523] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6523] [][]: invoking real go binary
+Go compliance shim [6523] [][]: Exited with: 0
+Go compliance shim [6560] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6560] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6560] [][]: assessment: dynamic linking
+Go compliance shim [6560] [][]: EXEMPT: 0
+Go compliance shim [6560] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6560] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6560] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6560] [][]: invoking real go binary
+Go compliance shim [6560] [][]: Exited with: 0
+Go compliance shim [6599] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6599] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6599] [][]: assessment: dynamic linking
+Go compliance shim [6599] [][]: EXEMPT: 0
+Go compliance shim [6599] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6599] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6599] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/kubectl@v0.0.0" 
+
+Go compliance shim [6599] [][]: invoking real go binary
+Go compliance shim [6599] [][]: Exited with: 0
+go mod edit -replace k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6632] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6632] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6632] [][]: assessment: dynamic linking
+Go compliance shim [6632] [][]: EXEMPT: 0
+Go compliance shim [6632] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6632] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6632] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6632] [][]: invoking real go binary
+Go compliance shim [6632] [][]: Exited with: 0
+Go compliance shim [6669] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6669] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6669] [][]: assessment: dynamic linking
+Go compliance shim [6669] [][]: EXEMPT: 0
+Go compliance shim [6669] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6669] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6669] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6669] [][]: invoking real go binary
+Go compliance shim [6669] [][]: Exited with: 0
+Go compliance shim [6708] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6708] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6708] [][]: assessment: dynamic linking
+Go compliance shim [6708] [][]: EXEMPT: 0
+Go compliance shim [6708] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6708] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6708] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/kubelet@v0.0.0" 
+
+Go compliance shim [6708] [][]: invoking real go binary
+Go compliance shim [6708] [][]: Exited with: 0
+go mod edit -replace k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6741] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6741] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6741] [][]: assessment: dynamic linking
+Go compliance shim [6741] [][]: EXEMPT: 0
+Go compliance shim [6741] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6741] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6741] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6741] [][]: invoking real go binary
+Go compliance shim [6741] [][]: Exited with: 0
+Go compliance shim [6778] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6778] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6778] [][]: assessment: dynamic linking
+Go compliance shim [6778] [][]: EXEMPT: 0
+Go compliance shim [6778] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6778] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6778] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6778] [][]: invoking real go binary
+Go compliance shim [6778] [][]: Exited with: 0
+Go compliance shim [6817] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6817] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6817] [][]: assessment: dynamic linking
+Go compliance shim [6817] [][]: EXEMPT: 0
+Go compliance shim [6817] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6817] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6817] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/legacy-cloud-providers@v0.0.0" 
+
+Go compliance shim [6817] [][]: invoking real go binary
+Go compliance shim [6817] [][]: Exited with: 0
+go mod edit -replace k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6850] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6850] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6850] [][]: assessment: dynamic linking
+Go compliance shim [6850] [][]: EXEMPT: 0
+Go compliance shim [6850] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6850] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6850] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6850] [][]: invoking real go binary
+Go compliance shim [6850] [][]: Exited with: 0
+Go compliance shim [6887] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6887] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6887] [][]: assessment: dynamic linking
+Go compliance shim [6887] [][]: EXEMPT: 0
+Go compliance shim [6887] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6887] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6887] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6887] [][]: invoking real go binary
+Go compliance shim [6887] [][]: Exited with: 0
+Go compliance shim [6926] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6926] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6926] [][]: assessment: dynamic linking
+Go compliance shim [6926] [][]: EXEMPT: 0
+Go compliance shim [6926] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6926] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6926] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/metrics@v0.0.0" 
+
+Go compliance shim [6926] [][]: invoking real go binary
+Go compliance shim [6926] [][]: Exited with: 0
+go mod edit -replace k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [6957] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6957] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6957] [][]: assessment: dynamic linking
+Go compliance shim [6957] [][]: EXEMPT: 0
+Go compliance shim [6957] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6957] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6957] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [6957] [][]: invoking real go binary
+Go compliance shim [6957] [][]: Exited with: 0
+Go compliance shim [6994] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [6994] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [6994] [][]: assessment: dynamic linking
+Go compliance shim [6994] [][]: EXEMPT: 0
+Go compliance shim [6994] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [6994] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [6994] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [6994] [][]: invoking real go binary
+Go compliance shim [6994] [][]: Exited with: 0
+Go compliance shim [7033] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7033] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7033] [][]: assessment: dynamic linking
+Go compliance shim [7033] [][]: EXEMPT: 0
+Go compliance shim [7033] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7033] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7033] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/mount-utils@v0.0.0" 
+
+Go compliance shim [7033] [][]: invoking real go binary
+Go compliance shim [7033] [][]: Exited with: 0
+go mod edit -replace k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [7066] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7066] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7066] [][]: assessment: dynamic linking
+Go compliance shim [7066] [][]: EXEMPT: 0
+Go compliance shim [7066] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7066] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7066] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [7066] [][]: invoking real go binary
+Go compliance shim [7066] [][]: Exited with: 0
+Go compliance shim [7103] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7103] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7103] [][]: assessment: dynamic linking
+Go compliance shim [7103] [][]: EXEMPT: 0
+Go compliance shim [7103] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7103] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7103] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7103] [][]: invoking real go binary
+Go compliance shim [7103] [][]: Exited with: 0
+Go compliance shim [7142] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7142] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7142] [][]: assessment: dynamic linking
+Go compliance shim [7142] [][]: EXEMPT: 0
+Go compliance shim [7142] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7142] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7142] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/pod-security-admission@v0.0.0" 
+
+Go compliance shim [7142] [][]: invoking real go binary
+Go compliance shim [7142] [][]: Exited with: 0
+go mod edit -replace k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [7175] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7175] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7175] [][]: assessment: dynamic linking
+Go compliance shim [7175] [][]: EXEMPT: 0
+Go compliance shim [7175] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7175] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7175] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [7175] [][]: invoking real go binary
+Go compliance shim [7175] [][]: Exited with: 0
+Go compliance shim [7212] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7212] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7212] [][]: assessment: dynamic linking
+Go compliance shim [7212] [][]: EXEMPT: 0
+Go compliance shim [7212] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7212] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7212] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7212] [][]: invoking real go binary
+Go compliance shim [7212] [][]: Exited with: 0
+Go compliance shim [7251] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7251] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7251] [][]: assessment: dynamic linking
+Go compliance shim [7251] [][]: EXEMPT: 0
+Go compliance shim [7251] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7251] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7251] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/sample-apiserver@v0.0.0" 
+
+Go compliance shim [7251] [][]: invoking real go binary
+Go compliance shim [7251] [][]: Exited with: 0
+go mod edit -replace k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [7284] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7284] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7284] [][]: assessment: dynamic linking
+Go compliance shim [7284] [][]: EXEMPT: 0
+Go compliance shim [7284] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7284] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7284] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [7284] [][]: invoking real go binary
+Go compliance shim [7284] [][]: Exited with: 0
+Go compliance shim [7321] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7321] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7321] [][]: assessment: dynamic linking
+Go compliance shim [7321] [][]: EXEMPT: 0
+Go compliance shim [7321] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7321] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7321] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7321] [][]: invoking real go binary
+Go compliance shim [7321] [][]: Exited with: 0
+Go compliance shim [7360] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7360] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7360] [][]: assessment: dynamic linking
+Go compliance shim [7360] [][]: EXEMPT: 0
+Go compliance shim [7360] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7360] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7360] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/sample-cli-plugin@v0.0.0" 
+
+Go compliance shim [7360] [][]: invoking real go binary
+Go compliance shim [7360] [][]: Exited with: 0
+go mod edit -replace k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [7393] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7393] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7393] [][]: assessment: dynamic linking
+Go compliance shim [7393] [][]: EXEMPT: 0
+Go compliance shim [7393] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7393] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7393] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [7393] [][]: invoking real go binary
+Go compliance shim [7393] [][]: Exited with: 0
+Go compliance shim [7429] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7429] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7429] [][]: assessment: dynamic linking
+Go compliance shim [7429] [][]: EXEMPT: 0
+Go compliance shim [7429] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7429] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7429] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7429] [][]: invoking real go binary
+Go compliance shim [7429] [][]: Exited with: 0
+Go compliance shim [7468] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7468] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7468] [][]: assessment: dynamic linking
+Go compliance shim [7468] [][]: EXEMPT: 0
+Go compliance shim [7468] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7468] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7468] [][]: final command line arguments: "mod" "edit" "-require" "k8s.io/sample-controller@v0.0.0" 
+
+Go compliance shim [7468] [][]: invoking real go binary
+Go compliance shim [7468] [][]: Exited with: 0
+go mod edit -replace k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [7500] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7500] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7500] [][]: assessment: dynamic linking
+Go compliance shim [7500] [][]: EXEMPT: 0
+Go compliance shim [7500] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7500] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7500] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [7500] [][]: invoking real go binary
+Go compliance shim [7500] [][]: Exited with: 0
+Go compliance shim [7537] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7537] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7537] [][]: assessment: dynamic linking
+Go compliance shim [7537] [][]: EXEMPT: 0
+Go compliance shim [7537] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7537] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7537] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7537] [][]: invoking real go binary
+Go compliance shim [7537] [][]: Exited with: 0
+Go compliance shim [7577] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7577] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7577] [][]: assessment: dynamic linking
+Go compliance shim [7577] [][]: EXEMPT: 0
+Go compliance shim [7577] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7577] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7577] [][]: final command line arguments: "mod" "edit" "-json" 
+
+Go compliance shim [7577] [][]: invoking real go binary
+Go compliance shim [7577] [][]: Exited with: 0
+Go compliance shim [7618] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7618] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7618] [][]: assessment: dynamic linking
+Go compliance shim [7618] [][]: EXEMPT: 0
+Go compliance shim [7618] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7618] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7618] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7618] [][]: invoking real go binary
+Go compliance shim [7618] [][]: Exited with: 0
+Go compliance shim [7659] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7659] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7659] [][]: assessment: dynamic linking
+Go compliance shim [7659] [][]: EXEMPT: 0
+Go compliance shim [7659] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7659] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7659] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [7659] [][]: invoking real go binary
+Go compliance shim [7659] [][]: Exited with: 0
+go mod edit -replace github.com/onsi/ginkgo/v2=github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20230811135323-13a5964cc98e
+Go compliance shim [7699] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7699] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7699] [][]: assessment: dynamic linking
+Go compliance shim [7699] [][]: EXEMPT: 0
+Go compliance shim [7699] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7699] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7699] [][]: final command line arguments: "mod" "edit" "-replace" "github.com/onsi/ginkgo/v2=github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20230811135323-13a5964cc98e" 
+
+Go compliance shim [7699] [][]: invoking real go binary
+Go compliance shim [7699] [][]: Exited with: 0
+Go compliance shim [7735] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7735] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7735] [][]: assessment: dynamic linking
+Go compliance shim [7735] [][]: EXEMPT: 0
+Go compliance shim [7735] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7735] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7735] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7735] [][]: invoking real go binary
+Go compliance shim [7735] [][]: Exited with: 0
+go mod edit -replace k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [7775] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7775] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7775] [][]: assessment: dynamic linking
+Go compliance shim [7775] [][]: EXEMPT: 0
+Go compliance shim [7775] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7775] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7775] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/api=github.com/openshift/kubernetes/staging/src/k8s.io/api@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [7775] [][]: invoking real go binary
+Go compliance shim [7775] [][]: Exited with: 0
+Go compliance shim [7811] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7811] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7811] [][]: assessment: dynamic linking
+Go compliance shim [7811] [][]: EXEMPT: 0
+Go compliance shim [7811] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7811] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7811] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7811] [][]: invoking real go binary
+Go compliance shim [7811] [][]: Exited with: 0
+go mod edit -replace k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [7851] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7851] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7851] [][]: assessment: dynamic linking
+Go compliance shim [7851] [][]: EXEMPT: 0
+Go compliance shim [7851] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7851] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7851] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/apiextensions-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [7851] [][]: invoking real go binary
+Go compliance shim [7851] [][]: Exited with: 0
+Go compliance shim [7887] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7887] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7887] [][]: assessment: dynamic linking
+Go compliance shim [7887] [][]: EXEMPT: 0
+Go compliance shim [7887] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7887] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7887] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7887] [][]: invoking real go binary
+Go compliance shim [7887] [][]: Exited with: 0
+go mod edit -replace k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [7927] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7927] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7927] [][]: assessment: dynamic linking
+Go compliance shim [7927] [][]: EXEMPT: 0
+Go compliance shim [7927] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7927] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7927] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/apimachinery=github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [7927] [][]: invoking real go binary
+Go compliance shim [7927] [][]: Exited with: 0
+Go compliance shim [7963] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [7963] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [7963] [][]: assessment: dynamic linking
+Go compliance shim [7963] [][]: EXEMPT: 0
+Go compliance shim [7963] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [7963] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [7963] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [7963] [][]: invoking real go binary
+Go compliance shim [7963] [][]: Exited with: 0
+go mod edit -replace k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8003] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8003] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8003] [][]: assessment: dynamic linking
+Go compliance shim [8003] [][]: EXEMPT: 0
+Go compliance shim [8003] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8003] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8003] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/apiserver@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8003] [][]: invoking real go binary
+Go compliance shim [8003] [][]: Exited with: 0
+Go compliance shim [8038] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8038] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8038] [][]: assessment: dynamic linking
+Go compliance shim [8038] [][]: EXEMPT: 0
+Go compliance shim [8038] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8038] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8038] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8038] [][]: invoking real go binary
+Go compliance shim [8038] [][]: Exited with: 0
+Go compliance shim [8080] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8080] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8080] [][]: assessment: dynamic linking
+Go compliance shim [8080] [][]: EXEMPT: 0
+Go compliance shim [8080] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8080] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8080] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [8080] [][]: invoking real go binary
+Go compliance shim [8080] [][]: Exited with: 0
+go mod edit -replace k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8123] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8123] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8123] [][]: assessment: dynamic linking
+Go compliance shim [8123] [][]: EXEMPT: 0
+Go compliance shim [8123] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8123] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8123] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/cli-runtime=github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8123] [][]: invoking real go binary
+Go compliance shim [8123] [][]: Exited with: 0
+Go compliance shim [8159] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8159] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8159] [][]: assessment: dynamic linking
+Go compliance shim [8159] [][]: EXEMPT: 0
+Go compliance shim [8159] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8159] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8159] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8159] [][]: invoking real go binary
+Go compliance shim [8159] [][]: Exited with: 0
+go mod edit -replace k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8199] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8199] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8199] [][]: assessment: dynamic linking
+Go compliance shim [8199] [][]: EXEMPT: 0
+Go compliance shim [8199] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8199] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8199] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/client-go=github.com/openshift/kubernetes/staging/src/k8s.io/client-go@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8199] [][]: invoking real go binary
+Go compliance shim [8199] [][]: Exited with: 0
+Go compliance shim [8235] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8235] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8235] [][]: assessment: dynamic linking
+Go compliance shim [8235] [][]: EXEMPT: 0
+Go compliance shim [8235] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8235] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8235] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8235] [][]: invoking real go binary
+Go compliance shim [8235] [][]: Exited with: 0
+Go compliance shim [8277] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8277] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8277] [][]: assessment: dynamic linking
+Go compliance shim [8277] [][]: EXEMPT: 0
+Go compliance shim [8277] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8277] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8277] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [8277] [][]: invoking real go binary
+Go compliance shim [8277] [][]: Exited with: 0
+go mod edit -replace k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8320] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8320] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8320] [][]: assessment: dynamic linking
+Go compliance shim [8320] [][]: EXEMPT: 0
+Go compliance shim [8320] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8320] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8320] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/cloud-provider=github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8320] [][]: invoking real go binary
+Go compliance shim [8320] [][]: Exited with: 0
+Go compliance shim [8356] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8356] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8356] [][]: assessment: dynamic linking
+Go compliance shim [8356] [][]: EXEMPT: 0
+Go compliance shim [8356] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8356] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8356] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8356] [][]: invoking real go binary
+Go compliance shim [8356] [][]: Exited with: 0
+Go compliance shim [8398] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8398] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8398] [][]: assessment: dynamic linking
+Go compliance shim [8398] [][]: EXEMPT: 0
+Go compliance shim [8398] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8398] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8398] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [8398] [][]: invoking real go binary
+Go compliance shim [8398] [][]: Exited with: 0
+go mod edit -replace k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8441] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8441] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8441] [][]: assessment: dynamic linking
+Go compliance shim [8441] [][]: EXEMPT: 0
+Go compliance shim [8441] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8441] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8441] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/cluster-bootstrap=github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8441] [][]: invoking real go binary
+Go compliance shim [8441] [][]: Exited with: 0
+Go compliance shim [8477] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8477] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8477] [][]: assessment: dynamic linking
+Go compliance shim [8477] [][]: EXEMPT: 0
+Go compliance shim [8477] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8477] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8477] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8477] [][]: invoking real go binary
+Go compliance shim [8477] [][]: Exited with: 0
+go mod edit -replace k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8517] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8517] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8517] [][]: assessment: dynamic linking
+Go compliance shim [8517] [][]: EXEMPT: 0
+Go compliance shim [8517] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8517] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8517] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/code-generator=github.com/openshift/kubernetes/staging/src/k8s.io/code-generator@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8517] [][]: invoking real go binary
+Go compliance shim [8517] [][]: Exited with: 0
+Go compliance shim [8553] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8553] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8553] [][]: assessment: dynamic linking
+Go compliance shim [8553] [][]: EXEMPT: 0
+Go compliance shim [8553] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8553] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8553] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8553] [][]: invoking real go binary
+Go compliance shim [8553] [][]: Exited with: 0
+go mod edit -replace k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8593] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8593] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8593] [][]: assessment: dynamic linking
+Go compliance shim [8593] [][]: EXEMPT: 0
+Go compliance shim [8593] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8593] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8593] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/component-base=github.com/openshift/kubernetes/staging/src/k8s.io/component-base@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8593] [][]: invoking real go binary
+Go compliance shim [8593] [][]: Exited with: 0
+Go compliance shim [8629] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8629] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8629] [][]: assessment: dynamic linking
+Go compliance shim [8629] [][]: EXEMPT: 0
+Go compliance shim [8629] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8629] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8629] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8629] [][]: invoking real go binary
+Go compliance shim [8629] [][]: Exited with: 0
+Go compliance shim [8671] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8671] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8671] [][]: assessment: dynamic linking
+Go compliance shim [8671] [][]: EXEMPT: 0
+Go compliance shim [8671] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8671] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8671] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [8671] [][]: invoking real go binary
+Go compliance shim [8671] [][]: Exited with: 0
+go mod edit -replace k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8714] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8714] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8714] [][]: assessment: dynamic linking
+Go compliance shim [8714] [][]: EXEMPT: 0
+Go compliance shim [8714] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8714] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8714] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/component-helpers=github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8714] [][]: invoking real go binary
+Go compliance shim [8714] [][]: Exited with: 0
+Go compliance shim [8750] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8750] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8750] [][]: assessment: dynamic linking
+Go compliance shim [8750] [][]: EXEMPT: 0
+Go compliance shim [8750] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8750] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8750] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8750] [][]: invoking real go binary
+Go compliance shim [8750] [][]: Exited with: 0
+Go compliance shim [8792] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8792] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8792] [][]: assessment: dynamic linking
+Go compliance shim [8792] [][]: EXEMPT: 0
+Go compliance shim [8792] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8792] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8792] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [8792] [][]: invoking real go binary
+Go compliance shim [8792] [][]: Exited with: 0
+go mod edit -replace k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8835] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8835] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8835] [][]: assessment: dynamic linking
+Go compliance shim [8835] [][]: EXEMPT: 0
+Go compliance shim [8835] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8835] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8835] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8835] [][]: invoking real go binary
+Go compliance shim [8835] [][]: Exited with: 0
+Go compliance shim [8871] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8871] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8871] [][]: assessment: dynamic linking
+Go compliance shim [8871] [][]: EXEMPT: 0
+Go compliance shim [8871] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8871] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8871] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8871] [][]: invoking real go binary
+Go compliance shim [8871] [][]: Exited with: 0
+Go compliance shim [8913] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8913] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8913] [][]: assessment: dynamic linking
+Go compliance shim [8913] [][]: EXEMPT: 0
+Go compliance shim [8913] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8913] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8913] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [8913] [][]: invoking real go binary
+Go compliance shim [8913] [][]: Exited with: 0
+go mod edit -replace k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [8956] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8956] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8956] [][]: assessment: dynamic linking
+Go compliance shim [8956] [][]: EXEMPT: 0
+Go compliance shim [8956] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8956] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8956] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/cri-api=github.com/openshift/kubernetes/staging/src/k8s.io/cri-api@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [8956] [][]: invoking real go binary
+Go compliance shim [8956] [][]: Exited with: 0
+Go compliance shim [8992] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [8992] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [8992] [][]: assessment: dynamic linking
+Go compliance shim [8992] [][]: EXEMPT: 0
+Go compliance shim [8992] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [8992] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [8992] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [8992] [][]: invoking real go binary
+Go compliance shim [8992] [][]: Exited with: 0
+Go compliance shim [9034] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9034] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9034] [][]: assessment: dynamic linking
+Go compliance shim [9034] [][]: EXEMPT: 0
+Go compliance shim [9034] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9034] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9034] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [9034] [][]: invoking real go binary
+Go compliance shim [9034] [][]: Exited with: 0
+go mod edit -replace k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9077] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9077] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9077] [][]: assessment: dynamic linking
+Go compliance shim [9077] [][]: EXEMPT: 0
+Go compliance shim [9077] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9077] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9077] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/csi-translation-lib=github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9077] [][]: invoking real go binary
+Go compliance shim [9077] [][]: Exited with: 0
+Go compliance shim [9113] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9113] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9113] [][]: assessment: dynamic linking
+Go compliance shim [9113] [][]: EXEMPT: 0
+Go compliance shim [9113] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9113] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9113] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9113] [][]: invoking real go binary
+Go compliance shim [9113] [][]: Exited with: 0
+go mod edit -replace k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9153] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9153] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9153] [][]: assessment: dynamic linking
+Go compliance shim [9153] [][]: EXEMPT: 0
+Go compliance shim [9153] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9153] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9153] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/dynamic-resource-allocation=github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9153] [][]: invoking real go binary
+Go compliance shim [9153] [][]: Exited with: 0
+Go compliance shim [9189] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9189] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9189] [][]: assessment: dynamic linking
+Go compliance shim [9189] [][]: EXEMPT: 0
+Go compliance shim [9189] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9189] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9189] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9189] [][]: invoking real go binary
+Go compliance shim [9189] [][]: Exited with: 0
+go mod edit -replace k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9229] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9229] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9229] [][]: assessment: dynamic linking
+Go compliance shim [9229] [][]: EXEMPT: 0
+Go compliance shim [9229] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9229] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9229] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kms=github.com/openshift/kubernetes/staging/src/k8s.io/kms@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9229] [][]: invoking real go binary
+Go compliance shim [9229] [][]: Exited with: 0
+Go compliance shim [9265] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9265] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9265] [][]: assessment: dynamic linking
+Go compliance shim [9265] [][]: EXEMPT: 0
+Go compliance shim [9265] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9265] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9265] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9265] [][]: invoking real go binary
+Go compliance shim [9265] [][]: Exited with: 0
+go mod edit -replace k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9305] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9305] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9305] [][]: assessment: dynamic linking
+Go compliance shim [9305] [][]: EXEMPT: 0
+Go compliance shim [9305] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9305] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9305] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kube-aggregator=github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9305] [][]: invoking real go binary
+Go compliance shim [9305] [][]: Exited with: 0
+Go compliance shim [9341] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9341] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9341] [][]: assessment: dynamic linking
+Go compliance shim [9341] [][]: EXEMPT: 0
+Go compliance shim [9341] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9341] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9341] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9341] [][]: invoking real go binary
+Go compliance shim [9341] [][]: Exited with: 0
+Go compliance shim [9383] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9383] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9383] [][]: assessment: dynamic linking
+Go compliance shim [9383] [][]: EXEMPT: 0
+Go compliance shim [9383] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9383] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9383] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [9383] [][]: invoking real go binary
+Go compliance shim [9383] [][]: Exited with: 0
+go mod edit -replace k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9426] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9426] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9426] [][]: assessment: dynamic linking
+Go compliance shim [9426] [][]: EXEMPT: 0
+Go compliance shim [9426] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9426] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9426] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kube-controller-manager=github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9426] [][]: invoking real go binary
+Go compliance shim [9426] [][]: Exited with: 0
+Go compliance shim [9462] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9462] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9462] [][]: assessment: dynamic linking
+Go compliance shim [9462] [][]: EXEMPT: 0
+Go compliance shim [9462] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9462] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9462] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9462] [][]: invoking real go binary
+Go compliance shim [9462] [][]: Exited with: 0
+Go compliance shim [9504] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9504] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9504] [][]: assessment: dynamic linking
+Go compliance shim [9504] [][]: EXEMPT: 0
+Go compliance shim [9504] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9504] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9504] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [9504] [][]: invoking real go binary
+Go compliance shim [9504] [][]: Exited with: 0
+go mod edit -replace k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9547] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9547] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9547] [][]: assessment: dynamic linking
+Go compliance shim [9547] [][]: EXEMPT: 0
+Go compliance shim [9547] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9547] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9547] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kube-proxy=github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9547] [][]: invoking real go binary
+Go compliance shim [9547] [][]: Exited with: 0
+Go compliance shim [9583] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9583] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9583] [][]: assessment: dynamic linking
+Go compliance shim [9583] [][]: EXEMPT: 0
+Go compliance shim [9583] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9583] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9583] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9583] [][]: invoking real go binary
+Go compliance shim [9583] [][]: Exited with: 0
+Go compliance shim [9625] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9625] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9625] [][]: assessment: dynamic linking
+Go compliance shim [9625] [][]: EXEMPT: 0
+Go compliance shim [9625] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9625] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9625] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [9625] [][]: invoking real go binary
+Go compliance shim [9625] [][]: Exited with: 0
+go mod edit -replace k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9668] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9668] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9668] [][]: assessment: dynamic linking
+Go compliance shim [9668] [][]: EXEMPT: 0
+Go compliance shim [9668] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9668] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9668] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kube-scheduler=github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9668] [][]: invoking real go binary
+Go compliance shim [9668] [][]: Exited with: 0
+Go compliance shim [9704] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9704] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9704] [][]: assessment: dynamic linking
+Go compliance shim [9704] [][]: EXEMPT: 0
+Go compliance shim [9704] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9704] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9704] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9704] [][]: invoking real go binary
+Go compliance shim [9704] [][]: Exited with: 0
+Go compliance shim [9746] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9746] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9746] [][]: assessment: dynamic linking
+Go compliance shim [9746] [][]: EXEMPT: 0
+Go compliance shim [9746] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9746] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9746] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [9746] [][]: invoking real go binary
+Go compliance shim [9746] [][]: Exited with: 0
+go mod edit -replace k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9789] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9789] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9789] [][]: assessment: dynamic linking
+Go compliance shim [9789] [][]: EXEMPT: 0
+Go compliance shim [9789] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9789] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9789] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kubectl=github.com/openshift/kubernetes/staging/src/k8s.io/kubectl@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9789] [][]: invoking real go binary
+Go compliance shim [9789] [][]: Exited with: 0
+Go compliance shim [9825] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9825] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9825] [][]: assessment: dynamic linking
+Go compliance shim [9825] [][]: EXEMPT: 0
+Go compliance shim [9825] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9825] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9825] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9825] [][]: invoking real go binary
+Go compliance shim [9825] [][]: Exited with: 0
+Go compliance shim [9867] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9867] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9867] [][]: assessment: dynamic linking
+Go compliance shim [9867] [][]: EXEMPT: 0
+Go compliance shim [9867] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9867] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9867] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [9867] [][]: invoking real go binary
+Go compliance shim [9867] [][]: Exited with: 0
+go mod edit -replace k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9910] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9910] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9910] [][]: assessment: dynamic linking
+Go compliance shim [9910] [][]: EXEMPT: 0
+Go compliance shim [9910] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9910] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9910] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kubelet=github.com/openshift/kubernetes/staging/src/k8s.io/kubelet@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9910] [][]: invoking real go binary
+Go compliance shim [9910] [][]: Exited with: 0
+Go compliance shim [9946] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9946] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9946] [][]: assessment: dynamic linking
+Go compliance shim [9946] [][]: EXEMPT: 0
+Go compliance shim [9946] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9946] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9946] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [9946] [][]: invoking real go binary
+Go compliance shim [9946] [][]: Exited with: 0
+go mod edit -replace k8s.io/kubernetes=github.com/openshift/kubernetes@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [9987] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [9987] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [9987] [][]: assessment: dynamic linking
+Go compliance shim [9987] [][]: EXEMPT: 0
+Go compliance shim [9987] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [9987] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [9987] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/kubernetes=github.com/openshift/kubernetes@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [9987] [][]: invoking real go binary
+Go compliance shim [9987] [][]: Exited with: 0
+Go compliance shim [10023] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10023] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10023] [][]: assessment: dynamic linking
+Go compliance shim [10023] [][]: EXEMPT: 0
+Go compliance shim [10023] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10023] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10023] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [10023] [][]: invoking real go binary
+Go compliance shim [10023] [][]: Exited with: 0
+Go compliance shim [10065] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10065] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10065] [][]: assessment: dynamic linking
+Go compliance shim [10065] [][]: EXEMPT: 0
+Go compliance shim [10065] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10065] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10065] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [10065] [][]: invoking real go binary
+Go compliance shim [10065] [][]: Exited with: 0
+go mod edit -replace k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [10108] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10108] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10108] [][]: assessment: dynamic linking
+Go compliance shim [10108] [][]: EXEMPT: 0
+Go compliance shim [10108] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10108] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10108] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/legacy-cloud-providers=github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [10108] [][]: invoking real go binary
+Go compliance shim [10108] [][]: Exited with: 0
+Go compliance shim [10144] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10144] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10144] [][]: assessment: dynamic linking
+Go compliance shim [10144] [][]: EXEMPT: 0
+Go compliance shim [10144] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10144] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10144] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [10144] [][]: invoking real go binary
+Go compliance shim [10144] [][]: Exited with: 0
+Go compliance shim [10186] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10186] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10186] [][]: assessment: dynamic linking
+Go compliance shim [10186] [][]: EXEMPT: 0
+Go compliance shim [10186] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10186] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10186] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [10186] [][]: invoking real go binary
+Go compliance shim [10186] [][]: Exited with: 0
+go mod edit -replace k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [10229] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10229] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10229] [][]: assessment: dynamic linking
+Go compliance shim [10229] [][]: EXEMPT: 0
+Go compliance shim [10229] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10229] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10229] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/metrics=github.com/openshift/kubernetes/staging/src/k8s.io/metrics@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [10229] [][]: invoking real go binary
+Go compliance shim [10229] [][]: Exited with: 0
+Go compliance shim [10264] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10264] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10264] [][]: assessment: dynamic linking
+Go compliance shim [10264] [][]: EXEMPT: 0
+Go compliance shim [10264] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10264] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10264] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [10264] [][]: invoking real go binary
+Go compliance shim [10264] [][]: Exited with: 0
+Go compliance shim [10306] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10306] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10306] [][]: assessment: dynamic linking
+Go compliance shim [10306] [][]: EXEMPT: 0
+Go compliance shim [10306] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10306] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10306] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [10306] [][]: invoking real go binary
+Go compliance shim [10306] [][]: Exited with: 0
+go mod edit -replace k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [10349] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10349] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10349] [][]: assessment: dynamic linking
+Go compliance shim [10349] [][]: EXEMPT: 0
+Go compliance shim [10349] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10349] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10349] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/mount-utils=github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [10349] [][]: invoking real go binary
+Go compliance shim [10349] [][]: Exited with: 0
+Go compliance shim [10385] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10385] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10385] [][]: assessment: dynamic linking
+Go compliance shim [10385] [][]: EXEMPT: 0
+Go compliance shim [10385] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10385] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10385] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [10385] [][]: invoking real go binary
+Go compliance shim [10385] [][]: Exited with: 0
+Go compliance shim [10427] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10427] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10427] [][]: assessment: dynamic linking
+Go compliance shim [10427] [][]: EXEMPT: 0
+Go compliance shim [10427] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10427] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10427] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [10427] [][]: invoking real go binary
+Go compliance shim [10427] [][]: Exited with: 0
+go mod edit -replace k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [10470] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10470] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10470] [][]: assessment: dynamic linking
+Go compliance shim [10470] [][]: EXEMPT: 0
+Go compliance shim [10470] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10470] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10470] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/pod-security-admission=github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [10470] [][]: invoking real go binary
+Go compliance shim [10470] [][]: Exited with: 0
+Go compliance shim [10506] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10506] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10506] [][]: assessment: dynamic linking
+Go compliance shim [10506] [][]: EXEMPT: 0
+Go compliance shim [10506] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10506] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10506] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [10506] [][]: invoking real go binary
+Go compliance shim [10506] [][]: Exited with: 0
+Go compliance shim [10548] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10548] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10548] [][]: assessment: dynamic linking
+Go compliance shim [10548] [][]: EXEMPT: 0
+Go compliance shim [10548] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10548] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10548] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [10548] [][]: invoking real go binary
+Go compliance shim [10548] [][]: Exited with: 0
+go mod edit -replace k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [10591] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10591] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10591] [][]: assessment: dynamic linking
+Go compliance shim [10591] [][]: EXEMPT: 0
+Go compliance shim [10591] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10591] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10591] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/sample-apiserver=github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [10591] [][]: invoking real go binary
+Go compliance shim [10591] [][]: Exited with: 0
+Go compliance shim [10627] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10627] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10627] [][]: assessment: dynamic linking
+Go compliance shim [10627] [][]: EXEMPT: 0
+Go compliance shim [10627] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10627] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10627] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [10627] [][]: invoking real go binary
+Go compliance shim [10627] [][]: Exited with: 0
+Go compliance shim [10669] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10669] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10669] [][]: assessment: dynamic linking
+Go compliance shim [10669] [][]: EXEMPT: 0
+Go compliance shim [10669] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10669] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10669] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [10669] [][]: invoking real go binary
+Go compliance shim [10669] [][]: Exited with: 0
+go mod edit -replace k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [10712] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10712] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10712] [][]: assessment: dynamic linking
+Go compliance shim [10712] [][]: EXEMPT: 0
+Go compliance shim [10712] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10712] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10712] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/sample-cli-plugin=github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [10712] [][]: invoking real go binary
+Go compliance shim [10712] [][]: Exited with: 0
+Go compliance shim [10748] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10748] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10748] [][]: assessment: dynamic linking
+Go compliance shim [10748] [][]: EXEMPT: 0
+Go compliance shim [10748] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10748] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10748] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [10748] [][]: invoking real go binary
+Go compliance shim [10748] [][]: Exited with: 0
+Go compliance shim [10790] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10790] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10790] [][]: assessment: dynamic linking
+Go compliance shim [10790] [][]: EXEMPT: 0
+Go compliance shim [10790] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10790] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10790] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/_output/staging/kubernetes/go.mod" 
+
+Go compliance shim [10790] [][]: invoking real go binary
+Go compliance shim [10790] [][]: Exited with: 0
+go mod edit -replace k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20231013210905-481304af1da9
+Go compliance shim [10833] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10833] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10833] [][]: assessment: dynamic linking
+Go compliance shim [10833] [][]: EXEMPT: 0
+Go compliance shim [10833] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10833] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10833] [][]: final command line arguments: "mod" "edit" "-replace" "k8s.io/sample-controller=github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller@v0.0.0-20231013210905-481304af1da9" 
+
+Go compliance shim [10833] [][]: invoking real go binary
+Go compliance shim [10833] [][]: Exited with: 0
+Go compliance shim [10869] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10869] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10869] [][]: assessment: dynamic linking
+Go compliance shim [10869] [][]: EXEMPT: 0
+Go compliance shim [10869] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10869] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10869] [][]: final command line arguments: "mod" "edit" "-print" "/go/src/github.com/openshift/microshift/go.mod" 
+
+Go compliance shim [10869] [][]: invoking real go binary
+Go compliance shim [10869] [][]: Exited with: 0
+go mod edit -replace go.etcd.io/etcd/api/v3=github.com/openshift/etcd/api/v3@6fc69d5d835662c88d21fe2ebed024d87b245f88
+Go compliance shim [10911] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10911] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10911] [][]: assessment: dynamic linking
+Go compliance shim [10911] [][]: EXEMPT: 0
+Go compliance shim [10911] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10911] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10911] [][]: final command line arguments: "mod" "edit" "-replace" "go.etcd.io/etcd/api/v3=github.com/openshift/etcd/api/v3@6fc69d5d835662c88d21fe2ebed024d87b245f88" 
+
+Go compliance shim [10911] [][]: invoking real go binary
+Go compliance shim [10911] [][]: Exited with: 0
+Go compliance shim [10944] [][]: Forcing GOTOOLCHAIN=local
+Go compliance shim [10944] [][]: assessment: CGO_ENABLED=1
+Go compliance shim [10944] [][]: assessment: dynamic linking
+Go compliance shim [10944] [][]: EXEMPT: 0
+Go compliance shim [10944] [][]: not exempt: FORCE_CGO_ENABLED="1" FORCE_DYNAMIC="1" FORCE_OPENSSL="1" FORCE_FOD_MODE="1"
+Go compliance shim [10944] [][]: setting GOEXPERIMENT=strictfipsruntime
+
+
+Go compliance shim [10944] [][]: final command line arguments: "mod" "tidy" 
+
+Go compliance shim [10944] [][]: invoking real go binary
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20231013210905-481304af1da9
+go: downloading github.com/openshift/kubernetes/staging/src/k8s.io/kms v0.0.0-20231013210905-481304af1da9
+go: k8s.io/kubernetes@v1.28.2 (replaced by github.com/openshift/kubernetes@v0.0.0-20231013210905-481304af1da9): verifying go.mod: github.com/openshift/kubernetes@v0.0.0-20231013210905-481304af1da9/go.mod: reading https://sum.golang.org/lookup/github.com/openshift/kubernetes@v0.0.0-20231013210905-481304af1da9: 404 Not Found
+	server response: not found: fetch timed out
+Go compliance shim [10944] [][]: Exited with: 1
