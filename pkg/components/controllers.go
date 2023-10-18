@@ -232,13 +232,6 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
-	// set DNS forward to systemd-resolved resolver if exists
-	// https://github.com/coredns/coredns/blob/master/plugin/loop/README.md#troubleshooting-loops-in-kubernetes-clusters
-	if _, err := os.Stat(config.DefaultSystemdResolvedFile); err == nil {
-		extraParams["UpstreamResolver"] = config.DefaultSystemdResolvedFile
-	} else {
-		extraParams["UpstreamResolver"] = ""
-	}
 	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
 		return err
