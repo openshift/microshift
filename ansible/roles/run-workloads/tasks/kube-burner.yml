@@ -8,6 +8,7 @@
   environment:
     BURST: "{{ kube_burner_burst }}"
     INDEXING: "{{ kube_burner_indexing }}"
+    POD_READY_THRESHOLD: "{{ kube_burner_pod_ready }}"
     QPS: "{{ kube_burner_qps }}"
     WORKLOAD: "{{ kube_burner_workload }}"
 
