@@ -5,6 +5,7 @@ BUILD_AND_RUN=true
 INSTALL_BUILD_DEPS=true
 FORCE_FIREWALL=false
 RHEL_SUBSCRIPTION=false
+RHEL_BETA_VERSION=false
 SET_RHEL_RELEASE=true
 
 start=$(date +%s)
@@ -70,6 +71,10 @@ fi
 if grep -q 'Red Hat Enterprise Linux' /etc/redhat-release; then
     RHEL_SUBSCRIPTION=true
 fi
+# Detect RHEL Beta versions
+if grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; then
+    RHEL_BETA_VERSION=true
+fi
 
 OCP_PULL_SECRET=$1
 [ ! -e "${OCP_PULL_SECRET}" ] && usage "OpenShift pull secret file '${OCP_PULL_SECRET}' does not exist"
@@ -84,7 +89,7 @@ if ${RHEL_SUBSCRIPTION}; then
         sudo subscription-manager register --auto-attach
     fi
 
-    if ${SET_RHEL_RELEASE}; then
+    if ${SET_RHEL_RELEASE} && ! ${RHEL_BETA_VERSION} ; then
         # https://access.redhat.com/solutions/238533
         source /etc/os-release
         sudo subscription-manager release --set ${VERSION_ID}
