@@ -138,9 +138,22 @@ if ${RHEL_SUBSCRIPTION}; then
     # to pull in dependencies that are already released
     OCPVERSION=4.13
     sudo subscription-manager config --rhsm.manage_repos=1
-    sudo subscription-manager repos \
-        --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
-        --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+
+    if ! ${RHEL_BETA_VERSION} ; then
+        sudo subscription-manager repos \
+            --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
+            --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+    else
+        OCP_REPO_NAME="rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms"
+        sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
+[${OCP_REPO_NAME}]
+name=Beta rhocp-${OCPVERSION} RPMs for RHEL ${OSVERSION}
+baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/${OCPVERSION}-el${OSVERSION}-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+    fi
 else
     dnf_retry install centos-release-nfv-common
     sudo dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"
