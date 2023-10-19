@@ -18,6 +18,7 @@ spec:
           securityContext:
             # See https://bugzilla.redhat.com/2007246
             allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: false
           terminationMessagePolicy: FallbackToLogsOnError
           env:
             - name: ROUTER_SERVICE_NAMESPACE
