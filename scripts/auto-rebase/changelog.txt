@@ -1,0 +1,9 @@
+- csi-external-snapshotter image-arm64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
+  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
+
+- csi-external-snapshotter image-arm64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
+  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
+
+- csi-external-snapshotter image-arm64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
+  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
+
