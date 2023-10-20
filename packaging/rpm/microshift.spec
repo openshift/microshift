@@ -127,8 +127,8 @@ The microshift-greenboot package provides the Greenboot scripts used for verifyi
 
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
-golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]')
-golang_required=%{golang_version}
+golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
+golang_required=$(echo %{golang_version} | cut -f1-2 -d.)
 if [[ "${golang_detected}" < "${golang_required}" ]] ; then
   echo "The detected go version ${golang_detected} is less than the required version ${golang_required}" > /dev/stderr
   exit 1
