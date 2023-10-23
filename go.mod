@@ -10,7 +10,7 @@ require (
 	github.com/openshift/api v0.0.0-20230807132801-600991d550ac
 	github.com/openshift/build-machinery-go v0.0.0-20230306181456-d321ffa04533
 	github.com/openshift/client-go v0.0.0-20230503144108-75015d2347cb
-	github.com/openshift/cluster-policy-controller v0.0.0-20230823075520-b3cb22fa4830
+	github.com/openshift/cluster-policy-controller v0.0.0-20231017103018-8af8cf302764
 	github.com/openshift/library-go v0.0.0-20230908101047-d058c695f677
 	github.com/openshift/route-controller-manager v0.0.0-20230809110842-0a976ea8bb9f
 	github.com/pkg/errors v0.9.1 // indirect
@@ -231,36 +231,36 @@ require (
 
 replace (
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230317131656-c62d9de5a460 // from kubernetes
-	k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/apiextensions-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/cli-runtime => github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/client-go => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/cloud-provider => github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/cluster-bootstrap => github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/code-generator => github.com/openshift/kubernetes/staging/src/k8s.io/code-generator v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/component-base => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/component-helpers => github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/controller-manager => github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/cri-api => github.com/openshift/kubernetes/staging/src/k8s.io/cri-api v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/csi-translation-lib => github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/dynamic-resource-allocation => github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/kms => github.com/openshift/kubernetes/staging/src/k8s.io/kms v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/kube-aggregator => github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20231013164624-88e9b4c0d597 // staging kubernetes
-	k8s.io/kube-controller-manager => github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/kube-proxy => github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/kube-scheduler => github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/kubectl => github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/kubelet => github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/kubernetes => github.com/openshift/kubernetes v0.0.0-20231013164624-88e9b4c0d597 // release kubernetes
-	k8s.io/legacy-cloud-providers => github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/metrics => github.com/openshift/kubernetes/staging/src/k8s.io/metrics v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/mount-utils => github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/pod-security-admission => github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/sample-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/sample-cli-plugin => github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
-	k8s.io/sample-controller => github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller v0.0.0-20231013164624-88e9b4c0d597 // from kubernetes
+	k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/apiextensions-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/cli-runtime => github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/client-go => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/cloud-provider => github.com/openshift/kubernetes/staging/src/k8s.io/cloud-provider v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/cluster-bootstrap => github.com/openshift/kubernetes/staging/src/k8s.io/cluster-bootstrap v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/code-generator => github.com/openshift/kubernetes/staging/src/k8s.io/code-generator v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/component-base => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/component-helpers => github.com/openshift/kubernetes/staging/src/k8s.io/component-helpers v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/controller-manager => github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/cri-api => github.com/openshift/kubernetes/staging/src/k8s.io/cri-api v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/csi-translation-lib => github.com/openshift/kubernetes/staging/src/k8s.io/csi-translation-lib v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/dynamic-resource-allocation => github.com/openshift/kubernetes/staging/src/k8s.io/dynamic-resource-allocation v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/kms => github.com/openshift/kubernetes/staging/src/k8s.io/kms v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/kube-aggregator => github.com/openshift/kubernetes/staging/src/k8s.io/kube-aggregator v0.0.0-20231020222044-f67aeb31c9b9 // staging kubernetes
+	k8s.io/kube-controller-manager => github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/kube-proxy => github.com/openshift/kubernetes/staging/src/k8s.io/kube-proxy v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/kube-scheduler => github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/kubectl => github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/kubelet => github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/kubernetes => github.com/openshift/kubernetes v0.0.0-20231020222044-f67aeb31c9b9 // release kubernetes
+	k8s.io/legacy-cloud-providers => github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/metrics => github.com/openshift/kubernetes/staging/src/k8s.io/metrics v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/mount-utils => github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/pod-security-admission => github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/sample-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/sample-cli-plugin => github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
+	k8s.io/sample-controller => github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller v0.0.0-20231020222044-f67aeb31c9b9 // from kubernetes
 )
 
 replace (
