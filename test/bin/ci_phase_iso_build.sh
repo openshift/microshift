@@ -88,6 +88,8 @@ run_image_build() {
     fi
 }
 
+cat /etc/os-release
+
 # Clean the dnf cache to avoid corruption
 $(dry_run) sudo dnf clean all
 

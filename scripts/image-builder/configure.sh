@@ -13,10 +13,27 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 fi
 
-sudo dnf install -y git osbuild-composer composer-cli ostree rpm-ostree \
+# osbuild from COPR to install version that:
+# 1. can build rhel-93 images
+# 2. doesn't have issues with unexpected mirror's RPM verification
+#    (like the one in 9.3 beta at the moment of writing this comment)
+sudo dnf copr enable -y @osbuild/osbuild
+sudo dnf copr enable -y @osbuild/osbuild-composer rhel-9-x86_64
+
+sudo dnf install -y \
+    osbuild-composer-92-1.20231018082656281262.main.1.g6663e6987.el9 \
+    osbuild-97-1.20231012222242311028.main.2.gd66d58a.el9 \
+    git composer-cli ostree rpm-ostree \
     cockpit-composer bash-completion podman runc genisoimage \
     createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
     containernetworking-plugins expect
+
+VID=$(source /etc/os-release && echo "${VERSION_ID}")
+if [[ "${VID}" == "9.2" ]] || { [[ "${VID}" == "9.3" ]] && grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; }; then
+    # If the system 9.2 or 9.3 beta: switch 9.3 repos to use beta packages
+    # Otherwise (like non-beta 9.3): keep original contents of the file
+    sudo sed -i "s,dist/rhel9/9.3,beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-93.json
+fi
 
 sudo systemctl enable osbuild-composer.socket --now
 sudo systemctl enable cockpit.socket --now
