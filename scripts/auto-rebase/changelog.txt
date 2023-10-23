@@ -1,19 +1,37 @@
-- oc image-arm64 d77b3812dad9b2b606ad60b10ba01142ba5e0257 to 835dbb5bdcbe531241ea7b093661e05aa5ef5478
-  - 109a4ef5 2023-10-18T10:50:08-06:00 create/identity: fail gracefully when no user API exists
-  - d4d9a6f5 2023-10-17T14:02:44+03:00 Fix some commands incorrect examples
-  - 701c2eee 2023-10-04T15:28:41-07:00 pkg/cli/admin/upgrade/status: Add tech-preview 'oc adm upgrade status'
+- oc image-arm64 835dbb5bdcbe531241ea7b093661e05aa5ef5478 to 2827643d6f79327d9e42df57c33a160742efcbac
+  - df2f47f5 2023-10-19T08:50:19-06:00 oc/*: gracefully fail when user group is not configured
+  - 453eeffa 2023-10-18T23:58:33-07:00 pkg/cli/admin/upgrade/status: Add update duration
 
-- router image-arm64 f142a3a4f2890527d6b22c211faf04f34ed86625 to 9abf51917908036cba6d6819805124a2fbf17257
-  - 80625b2 2023-10-18T09:37:35+01:00 haproxy-template: Add 'no strict-limits' to address HAProxy 2.6 issue
+- coredns image-arm64 ac051aa4594463c262d2a479af01065ef08b02d0 to 68ef945a78841a4a1be007fcefa929cc30eb9553
+  - c0451cd 2023-10-18T16:41:01-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
 
-- kube-rbac-proxy image-arm64 688b36e681b21a6a88522629b87991d7279df1b9 to 7a0795ecdf2abb40b90f7d406e0ca52138cb221b
-  - 8eb00e4 2023-10-17T12:19:42+02:00 go mod vendor
-  - 73e383f 2023-10-16T17:22:25+02:00 go.mod: bump golang.org/x/net to v0.17.0
+- router image-arm64 9abf51917908036cba6d6819805124a2fbf17257 to a97e096c9d3e14a68bef9dfe140ee262fb7ba973
+  - 1fdb9a3 2023-10-17T13:21:06-04:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
 
-- ovn-kubernetes image-arm64 1cf6c0376bf03a13d7c6a6ee91a98699df2aaa5c to 30f8cefeaca25f02b3beaec8dda572ce38872748
-  - 5cdcee0 2023-10-10T17:48:21+05:30 Handle tombstone of type cache.DeletedFinalStateUnknown while deleting net-attach-def
-  - c670398 2023-10-09T17:09:42-04:00 Move exgw e2e test out of e2e.go into external_gateways.go
-  - 0051718 2023-10-09T17:03:25-04:00 Fixes correctly syncing hybrid route policies for exgw Hybrid route policies were not unconditionally removed if there was not a matching ECMP route in OVN. This changes the behavior to fully clean hybrid policies as well as any stale addresses that exist in its related address set.
-  - 8b118bb 2023-10-09T17:03:25-04:00 exgw: try to remove hybrid policy when no gateways exist
-  - fd9dac3 2023-10-06T10:44:47+02:00 Synchronize node primary address update
+- ovn-kubernetes image-arm64 30f8cefeaca25f02b3beaec8dda572ce38872748 to 4229dafc9fa709537f3d5893c6920afc035040ea
+  - 2ee90cd 2023-10-16T15:12:29-04:00 Various fixes to hybrid overlay
+  - 14e1830 2023-10-16T12:09:53+00:00 Set mac binding age threshold in gateway routers
+  - ce0e1d0 2023-10-16T12:09:53+00:00 Delete HO static mac bindings
+  - c0cbb51 2023-10-16T12:09:52+00:00 Delete static mac bindings on gateway cleanup
+  - 93c9cea 2023-10-16T12:09:52+00:00 Add static mac bindings to the Static_Mac_Binding table
+  - cf050fa 2023-10-16T12:09:51+00:00 Delete legacy DGP mac binding using client native API
+  - d5532fc 2023-10-12T15:55:20+00:00 Bump golang.org/x/net from 0.10.0 to 0.17.0 in /go-controller
+  - 56cdcec 2023-10-11T23:31:34+00:00 Bump golang.org/x/net from 0.7.0 to 0.17.0 in /test/e2e
+  - 22ac494 2023-10-09T11:16:37+01:00 netdev can't be moved to pod namespace
+  - 39dfc98 2023-10-05T22:47:47+02:00 Log namespace name instead of the whole object
+  - 82f0d1e 2023-10-05T22:47:39+02:00 Add .test files to gitignore
+  - b6479a7 2023-10-04T18:43:13+02:00 Move shared functionality from master_controller.go and node_controller.go to external_controller.go. The only functional difference is updating status, which is implemented by passing updatePolicyStatusFunc
+  - 6c5bcaf 2023-09-29T23:45:02+05:30 Limiting stack size and increasing resource limit for ovs-node daemonset
+  - f8e6219 2023-09-26T21:41:24+05:30 Adding a warning message about high memory allocation due to high number of CPUs
+  - 7b5f963 2023-09-26T21:41:24+05:30 Setting custom value of n-handler-threads is not supported in per-cpu default mode
+  - e8cfa0d 2023-05-17T17:37:41+03:00 ovnkube-node: Remove redundant set of other_config:hwaddr
+
+- kubernetes image-arm64 c0449761f4ad0c3a585990c26aea90a1dadb82cb to d9813484616718b02352e5af919bde20b73a1200
+  - a67971f1f 2023-10-16T13:36:21-07:00 UPSTREAM: <carry>: Fix sporadic 141 errors in build-rpms
+
+- service-ca-operator image-arm64 bbf914e4df0f60617b8480c1dc87f5f0cde1f82c to df8d9d01827dc37e54f1babbac35ec94d9c7b257
+  - 05f72ab 2023-10-19T10:39:57+02:00 go mod vendor
+  - 82d93de 2023-10-19T10:39:46+02:00 go.mod: bump library-go
+  - 1e9f365 2023-10-17T12:31:16+02:00 go mod vendor
+  - 1b199cc 2023-10-17T12:30:59+02:00 go.mod: bump golang.org/x/net to v0.17.0
 
