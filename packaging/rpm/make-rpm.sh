@@ -24,6 +24,7 @@ GITHUB_SHA="${GIT_SHA:0:7}"
 TARBALL_FILE="microshift-${GITHUB_SHA}.tar.gz"
 DEFAULT_RPMBUILD_DIR="$(git rev-parse --show-toplevel)/_output/rpmbuild/"
 RPMBUILD_DIR="${RPMBUILD_DIR:-${DEFAULT_RPMBUILD_DIR}}"
+RPM_INFO_DIRS=""
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
@@ -68,6 +69,13 @@ EOF
   rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" --define "_binary_payload w19T8.zstdio" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
+print_info() {
+  title "RPM info"
+  for dir in ${RPM_INFO_DIRS}; do
+    find "${RPMBUILD_DIR}${dir}" -type f -exec sh -c 'i=$1; echo "${i}" && rpm -qip --dump "${i}" && echo' shell {} \;
+  done
+}
+
 usage() {
   echo "Usage: $(basename "$0") <all | rpm | srpm> < local | commit <commit-id> >"
   exit 1
@@ -76,10 +84,20 @@ usage() {
 [ $# -lt 2 ] && usage
 
 case $1 in
-  all)  RPMBUILD_OPT=-ba ;;
-  rpm)  RPMBUILD_OPT=-bb ;;
-  srpm) RPMBUILD_OPT=-bs ;;
-  *)    usage
+  all)
+    RPMBUILD_OPT=-ba
+    RPM_INFO_DIRS="RPMS SRPMS"
+    ;;
+  rpm)
+    RPMBUILD_OPT=-bb
+    RPM_INFO_DIRS="RPMS"
+    ;;
+  srpm)
+    RPMBUILD_OPT=-bs
+    RPM_INFO_DIRS="SRPMS"
+    ;;
+  *)
+    usage
 esac
 shift
 
@@ -103,3 +121,7 @@ case $1 in
     *)
       usage
 esac
+
+if [ -n "${RPM_INFO}" ]; then
+  print_info
+fi
