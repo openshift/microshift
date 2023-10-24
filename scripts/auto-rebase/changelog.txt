@@ -1,61 +1,10 @@
-- cluster-csi-snapshot-controller-operator embedded-component d8632d0f509eee4989561b0760b2c5ba7f7daf0f to 5d8bae88fdceefd3cc6e9befe3da641839403d9c
-  - eb29e11 2023-10-16T16:09:35-06:00 CVE-2023-44487: bump golang.org/x/net to v0.17.0
-
-- cluster-dns-operator embedded-component f5f12b76e1d19ca9c98013158a0a5aae278a4d57 to 5553a22698ac7fce2cc401ed5884eb1bdb36a02d
-  - 9c7cfc5 2023-10-20T11:39:45-04:00 OCPBUGS-21541: Bump golang.org/x/net/http2 to v0.17.0 for CVE-2023-39325 in cluster-dns-operator
-
-- cluster-ingress-operator embedded-component cd9777112490675bcb38d1aaff13e6082965eeb5 to 7e10070c45fe55862f323f6ecc0f7166e802fa24
-  - 00990ac 2023-10-18T17:49:44+00:00 OCPBUGS-21803: test/e2e: Add test case for 2000000 maxConnections
-
-- cluster-kube-controller-manager-operator embedded-component ba1ef05c11c467896e3eaf167ad43917ff38cc1d to 78354fc395484f25482319281fd48a2de4d5c40b
-  - 6249a86 2023-10-16T17:42:35+02:00 go mod vendor
-  - df498fc 2023-10-16T17:42:31+02:00 Bump deps to address CVE-2023-44487
-
-- cluster-policy-controller embedded-component b3cb22fa48308962b4b520cd3ae694967c769bae to 8af8cf302764c912993869db399b22f6c53b52c5
-  - aee12dd 2023-10-16T14:47:12+03:00 Bump deps to address CVE-2023-44487
-
-- csi-external-snapshotter embedded-component 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
-  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
-
-- kubernetes embedded-component 88e9b4c0d5978a2879307be87d25c592abb6eeea to f67aeb31c9b95fd8998de8b895ac91bfdf733b2e
-  - b6cf8b4c6 2023-10-19T07:48:27+00:00 UPSTREAM: <carry>: Fix sporadic 141 errors in build-rpms
-
-- machine-config-operator embedded-component 20d95766e888fd71d50e71681546cbd5f0d6da65 to 5ac7b4ae0bca76358e4d40f546306775a8e0ea2c
-  - a8aa4283 2023-10-17T01:45:57+00:00 CRI-O: Use `127.0.0.1` for stream server with random port
-  - 7b56544b 2023-10-10T21:58:48+00:00 dashboard should detect unknown and not ready for not ready dashboard
-  - f346b028 2023-10-03T01:42:03+00:00 OCPBUGS-18771: Consider ingress VIPs when selecting node IP
-
-- oc image-amd64 4a942f7ce874c894fda9cd3f162d1e58428364fa to 0c63f9da2694c080257111616c60005f32a5bf47
-  - 05ba1ec4 2023-10-13T03:52:48+00:00 OCPBUGS-20474: Set ImportPolicy to PreserveOriginal to honor --keep-manifest-list when mirroring a payload to an image stream
-
-- csi-external-snapshotter image-amd64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
-  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
-
-- csi-external-snapshotter image-amd64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
-  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
-
-- csi-external-snapshotter image-amd64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
-  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
-
-- router image-amd64 80e2d999242203ad62c39ce758966531ba59dd2c to 7cbd1526a359392ead30aa050dc9e2e81ffcc753
+- router image-arm64 80e2d999242203ad62c39ce758966531ba59dd2c to 7cbd1526a359392ead30aa050dc9e2e81ffcc753
   - dabe1f4 2023-10-18T15:35:10+00:00 haproxy-template: Add 'no strict-limits' to address HAProxy 2.6 issue
 
-- kube-rbac-proxy image-amd64 86f31e2de5221ed4acd6509fa7a010a286089f1f to 76810397fa1b6177178f925c3d7326a5b84cbeb4
+- kube-rbac-proxy image-arm64 86f31e2de5221ed4acd6509fa7a010a286089f1f to 76810397fa1b6177178f925c3d7326a5b84cbeb4
   - 2bd1f5a 2023-10-18T10:10:25+02:00 go mod vendor
   - a9242ef 2023-10-18T10:10:13+02:00 go.mod: bump golang.org/x/net to v0.17.0
 
-- kubernetes image-amd64 88e9b4c0d5978a2879307be87d25c592abb6eeea to f67aeb31c9b95fd8998de8b895ac91bfdf733b2e
+- kubernetes image-arm64 88e9b4c0d5978a2879307be87d25c592abb6eeea to f67aeb31c9b95fd8998de8b895ac91bfdf733b2e
   - b6cf8b4c6 2023-10-19T07:48:27+00:00 UPSTREAM: <carry>: Fix sporadic 141 errors in build-rpms
-
-- oc image-arm64 4a942f7ce874c894fda9cd3f162d1e58428364fa to 0c63f9da2694c080257111616c60005f32a5bf47
-  - 05ba1ec4 2023-10-13T03:52:48+00:00 OCPBUGS-20474: Set ImportPolicy to PreserveOriginal to honor --keep-manifest-list when mirroring a payload to an image stream
-
-- csi-external-snapshotter image-arm64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
-  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
-
-- csi-external-snapshotter image-arm64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
-  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
-
-- csi-external-snapshotter image-arm64 712bf7c316adfa0a3c8afc56d1db23abfadad58e to 0bf9276611e57cb87a05576c974fea1c38e3eb96
-  - b103796 2023-10-16T16:05:27-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
 
