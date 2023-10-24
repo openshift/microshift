@@ -105,7 +105,7 @@ if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     sudo systemctl enable --now cockpit.socket
 fi
 
-GO_VER=1.20.4
+GO_VER=1.20.10
 GO_ARCH=$([ "$(uname -m)" == "x86_64" ] && echo "amd64" || echo "arm64")
 GO_INSTALL_DIR="/usr/local/go${GO_VER}"
 if ${INSTALL_BUILD_DEPS} && [ ! -d "${GO_INSTALL_DIR}" ]; then
