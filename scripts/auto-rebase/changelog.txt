@@ -1,37 +1,19 @@
-- oc image-arm64 835dbb5bdcbe531241ea7b093661e05aa5ef5478 to 2827643d6f79327d9e42df57c33a160742efcbac
-  - df2f47f5 2023-10-19T08:50:19-06:00 oc/*: gracefully fail when user group is not configured
-  - 453eeffa 2023-10-18T23:58:33-07:00 pkg/cli/admin/upgrade/status: Add update duration
+- oc image-arm64 2827643d6f79327d9e42df57c33a160742efcbac to 4d243fd735fb7536e308590d01137a1fb0e7016c
+  - 43cf7003 2023-10-20T10:15:34+03:00 Add directive example to kubelet-restart command
 
-- coredns image-arm64 ac051aa4594463c262d2a479af01065ef08b02d0 to 68ef945a78841a4a1be007fcefa929cc30eb9553
-  - c0451cd 2023-10-18T16:41:01-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
-
-- router image-arm64 9abf51917908036cba6d6819805124a2fbf17257 to a97e096c9d3e14a68bef9dfe140ee262fb7ba973
-  - 1fdb9a3 2023-10-17T13:21:06-04:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
-
-- ovn-kubernetes image-arm64 30f8cefeaca25f02b3beaec8dda572ce38872748 to 4229dafc9fa709537f3d5893c6920afc035040ea
-  - 2ee90cd 2023-10-16T15:12:29-04:00 Various fixes to hybrid overlay
-  - 14e1830 2023-10-16T12:09:53+00:00 Set mac binding age threshold in gateway routers
-  - ce0e1d0 2023-10-16T12:09:53+00:00 Delete HO static mac bindings
-  - c0cbb51 2023-10-16T12:09:52+00:00 Delete static mac bindings on gateway cleanup
-  - 93c9cea 2023-10-16T12:09:52+00:00 Add static mac bindings to the Static_Mac_Binding table
-  - cf050fa 2023-10-16T12:09:51+00:00 Delete legacy DGP mac binding using client native API
-  - d5532fc 2023-10-12T15:55:20+00:00 Bump golang.org/x/net from 0.10.0 to 0.17.0 in /go-controller
-  - 56cdcec 2023-10-11T23:31:34+00:00 Bump golang.org/x/net from 0.7.0 to 0.17.0 in /test/e2e
-  - 22ac494 2023-10-09T11:16:37+01:00 netdev can't be moved to pod namespace
-  - 39dfc98 2023-10-05T22:47:47+02:00 Log namespace name instead of the whole object
-  - 82f0d1e 2023-10-05T22:47:39+02:00 Add .test files to gitignore
-  - b6479a7 2023-10-04T18:43:13+02:00 Move shared functionality from master_controller.go and node_controller.go to external_controller.go. The only functional difference is updating status, which is implemented by passing updatePolicyStatusFunc
-  - 6c5bcaf 2023-09-29T23:45:02+05:30 Limiting stack size and increasing resource limit for ovs-node daemonset
-  - f8e6219 2023-09-26T21:41:24+05:30 Adding a warning message about high memory allocation due to high number of CPUs
-  - 7b5f963 2023-09-26T21:41:24+05:30 Setting custom value of n-handler-threads is not supported in per-cpu default mode
-  - e8cfa0d 2023-05-17T17:37:41+03:00 ovnkube-node: Remove redundant set of other_config:hwaddr
-
-- kubernetes image-arm64 c0449761f4ad0c3a585990c26aea90a1dadb82cb to d9813484616718b02352e5af919bde20b73a1200
-  - a67971f1f 2023-10-16T13:36:21-07:00 UPSTREAM: <carry>: Fix sporadic 141 errors in build-rpms
-
-- service-ca-operator image-arm64 bbf914e4df0f60617b8480c1dc87f5f0cde1f82c to df8d9d01827dc37e54f1babbac35ec94d9c7b257
-  - 05f72ab 2023-10-19T10:39:57+02:00 go mod vendor
-  - 82d93de 2023-10-19T10:39:46+02:00 go.mod: bump library-go
-  - 1e9f365 2023-10-17T12:31:16+02:00 go mod vendor
-  - 1b199cc 2023-10-17T12:30:59+02:00 go.mod: bump golang.org/x/net to v0.17.0
+- kube-rbac-proxy image-arm64 7a0795ecdf2abb40b90f7d406e0ca52138cb221b to e8e8c84bcc6d4419970726f3028df4b178c0b1c9
+  - 9969ff7 2023-10-23T11:17:04+02:00 Dockerfile: pin env variable VERSION to ./VERSION
+  - 4111e7b 2023-10-20T13:13:47+02:00 vendor: bump
+  - ea70f9b 2023-10-20T11:59:22+02:00 cut release v0.15.0
+  - ab438d5 2023-10-20T11:23:02+02:00 http2: enable to disable, limit http2 resources
+  - fe65a9a 2023-10-19T18:45:01+02:00 deps: patch cve-2023-45142, not affecting krp
+  - 0bc66fd 2023-10-16T17:59:15+02:00 cut release v0.14.4
+  - 3893e96 2023-10-13T10:50:10+02:00 Bump golang version to address CVE-2023-44487
+  - 1ef0e21 2023-10-12T10:59:54+02:00 Bump golang.org/x/net to address CVE-2023-44487
+  - 96da89f 2023-09-15T16:53:57+02:00 Makefile: revert VERSION, add VERSION_SEMVER
+  - 3e2ea8f 2023-09-07T15:30:56+02:00 cut release v0.14.3
+  - 2540d5f 2023-09-07T15:30:55+02:00 go*: update dependencies
+  - e82d1a1 2023-09-05T16:15:33+02:00 version: add ldflags with versioning
+  - bcc5773 2023-09-05T16:15:32+02:00 version: Makefile variable shifting
+  - b90c95c 2023-06-05T17:24:35+02:00 CHANGELOG: v0.14.2, add Make-,Dockerfile change
 
