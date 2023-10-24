@@ -1,102 +1,57 @@
-# etcd embedded-component 3734896c1ab0eb955e49374d30b0cf4d84b9deff to 7efbc019a20e4c025d482749d49d0d72892dbfe1
-788475c001d39d97f0e0052514ed77d22cbdffcf 2023-09-04T09:06:17+00:00 Updating ose-etcd images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/76d48bd454bc374061b388ab02e7063587e88bdd/images/ose-etcd.yml
-# kubernetes embedded-component c7ee51f5bc2ac79fb9ec8dc9f9e8d9ca588b3124 to 52589e6ce268bdc7712fcd21159783f6b1ba09f1
-46910c6c1e2a3c5bafea314e2a06bf83612063e1 2023-09-26T14:13:31+02:00  UPSTREAM: 103612: tolerate additional, but congruent, events for integration test
-196c42f21622cc3748dd9d750cae9f0ad3d1fab8 2023-09-25T08:13:10+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-1c0f5011057c48b38f95fbcda31a1c283192b2b6 2023-09-19T21:50:24+02:00 UPSTREAM: <drop>: manually resolve conflicts
-d1483fdf7a0578c83523bc1e2212a606a44fd71d 2023-09-13T11:25:25+00:00 Release commit for Kubernetes v1.26.9
-68b93591a48f0dd115efea7a0e19825e3267f6d5 2023-09-07T15:41:55+02:00 [go] Bump images, versions and deps to use Go 1.20.8
-787b6276d9ec63fe56e20c30eb56243798e95959 2023-09-03T23:53:49-07:00 Automated cherry pick of #119776: Fix a job quota related deadlock (#120321)
-53994ce8224417ddf358d928025c241f17d6d6cf 2023-08-31T16:39:50-04:00 TopologyAwareHints: Take lock in HasPopulatedHints
-1ac405248c359758999b191caab67e481a9ec6f5 2023-08-28T17:19:31+02:00 Mark Job onPodConditions as optional in pod failure policy
-cd13da90d60d5379d23a67c07362f1db8956c094 2023-08-24T01:12:34+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.8
-395f0a2fdc940aeb9ab88849e8fa4321decbf6e1 2023-08-24T00:43:06+00:00 Release commit for Kubernetes v1.26.8
-c209cef63da00831a9a9b72de8c91ec8f6c92ed2 2023-08-23T20:59:32+00:00 Incorporating feedback on 119341
-cedd91c4fb4127d6cf38ea745646fa07420e245d 2023-08-23T07:03:28-07:00 Use environment varaibles for parameters in Powershell
-f8b33caff26992f371b655c729b5eb15b614e142 2023-08-23T06:45:21-07:00 Use env varaibles for passing path
-8aec647f36c43f1fa83687466cfa1910d5eb264d 2023-08-22T15:39:12-04:00 check for overflow
-bbeb517c97a95a75a05006c2fae3a315ad5ecc40 2023-08-22T15:38:46-04:00 Fix CEL cost handling of zero length replacement strings
-062aac6deed5c7d8316d0223f610710ac152f305 2023-08-19T17:19:07+08:00 generate ReportingInstance and ReportingController in Event
-946ac1df818ff7939461bb268ebf222754210b17 2023-08-18T17:39:47+00:00 Pass Pinned field to kubecontainer.Image
-a669a4d21a51c90bed7b39e3d6022dba6f347a5b 2023-08-18T17:13:39+00:00 update otelhttp to v0.35.1
-0f700bc303d79940fa4a767371efdb07f4479748 2023-08-18T10:08:04+05:30 prep for go1.21: use -e in go list
-da9d77f59a7c5bd399d6b591bd4a3086d9dedcc2 2023-08-17T13:35:30+00:00 Skip apiserver_admission_webhook_request_total during context-canceled
-b2be37f0a8799da1fa786d8a181664bff515de5d 2023-08-17T13:35:30+00:00 Ignore context canceled from validate and mutate webhook failopen metric
-442bdccb700c8572dff7d1a07bac5154dde403b8 2023-08-17T14:48:37+03:00 kubeadm: fix nil pointer when etcd member is already removed
-e3c192c9bfaaf49889fe8f6bb0bb9ef49ddd9073 2023-08-17T09:03:08+02:00 update to golangci-lint v1.54.1 + go-ruleguard v0.4.0
-f1f8ada33a399be8f2b7002f37239f06b3ac0593 2023-08-15T13:32:15+00:00 fix: when PreFilter returns UnschedulableAndUnresolvable, copy the state in all nodes in statusmap
-faca431241e0348bfe642252d52a07272a36f5be 2023-08-14T05:44:02+00:00 Issue 4230: remove readiness check for cache exclusion
-fc529b6d0c93caa5fb5c94dcab80bc8943216f6b 2023-08-09T15:24:56-04:00 Avoid returning nil responseKind in v1beta1 aggregated discovery
-e791a3f64d52905d38ceb23aebca9ccb8725490d 2023-08-08T14:41:46-06:00 [release-1.26] releng/go: Bump images, versions and deps to use Go 1.20.7 and update protoc
-4b3fa19bcd00929b2f19fbb558c788aac0de602f 2023-08-08T19:01:27+00:00 run dummy command return status 0
-ea203ebd7a5f388e89723d2b1dba717e49ce76a4 2023-08-08T17:21:29+00:00 unit test not requiring priviledge
-bb56e911a0340fb02a59dd8d935a2f20086b761b 2023-08-08T17:19:37+00:00 Revert "Revert #114605: its unit test requires root permission"
-180aa303e6b35472b1027e269fc919b1e1e2e741 2023-08-08T13:35:42+02:00 node: devicemgr: topomgr: add logs
-b6aaf8cc6037ff5d1b9cef1d1b9b04286cd876fe 2023-08-08T13:35:42+02:00 e2e: node: add test to check device-requiring pods are cleaned up
-22cddaf29b0d46f446c24b3db969bde7372f4b30 2023-08-08T13:35:42+02:00 e2e: node: devices: improve the node reboot test
-3e197e6ea2ba6ca98c5916b19e7106598bcb6838 2023-08-08T13:35:40+02:00 e2e: node: devicemanager: update tests
-6dc17e26d68b5c602bc114b9c93dd73b7d81a2f0 2023-08-08T13:35:03+02:00 kubelet: devices: skip allocation for running pods
-9888a01ae3966620646cef93f15759a25846c93c 2023-08-07T20:44:14-04:00 Add test coverage of result size of string operations
-61b89b642e221ac5f354cbb3d0eac6213541881d 2023-08-07T20:44:06-04:00 Bump cel-go to v0.12.7
-8fbc1e8c6f3493ccac35f7c659d10928142dcbd6 2023-07-27T12:10:28-04:00 e2e_node: move getSampleDevicePluginPod to device_plugin_test.go
-73c93bea52f3eba22b2edd49648d6c5067d8f77a 2023-07-26T21:45:24-04:00 fix 'pod' in kubelet prober metrics
-6c91cf9089c5423617cb2c0b12b870556e512aeb 2023-07-25T20:23:31+00:00 priority & fairness: support dynamically configuring work estimator max seats
-1bd57f9050dd9fb56d1bb01ea98d5bd9058779ff 2023-07-19T12:43:33+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.7
-62c9fa8fe6c2e04b1a40970e93055c2e92259b12 2023-07-17T16:34:02+02:00 events: fix EventSeries starting count discrepancy
-cfdd40b569d7630b9b31ddbe0557159b1f8b0f9e 2023-07-17T16:34:01+02:00 tools/events: fix data race when emitting series
-92c7042e640e148f54aa112591a4550d5450a132 2023-07-17T16:34:00+02:00 tools/events: retry on AlreadyExist for Series
-86989610c64eec5f2903733c9feb6bf76c9ae008 2023-07-05T17:19:54-04:00 kubeadm: backdate generated CAs by 5 minutes
-a85d04f86172369202efabd86d7b815f8b79c3ff 2023-07-05T17:19:54-04:00 client-go: allow to set NotBefore in NewSelfSignedCACert()
-12b70291733c08edd5ad6d9881f9483152b89122 2023-04-13T11:18:11+08:00 Fix a data race in TopologyCache
-b1215654de281a3bd407936faba59526d613e222 2023-04-13T11:17:34+08:00 Fix TopologyAwareHint not working when zone label is added after Node creation
-# machine-config-operator embedded-component 9f4854de8668c3a67f6f3350339081d7b710914b to 3d95390f8afe8456ceba69eb73d7b95d3b954f6d
-be86dd2c3b17f4337013d397d74566ef07a460d1 2023-09-22T21:07:40+02:00 daemon: always use `podman cp` to copy extensions container content
-# kubernetes image-amd64 c7ee51f5bc2ac79fb9ec8dc9f9e8d9ca588b3124 to 52589e6ce268bdc7712fcd21159783f6b1ba09f1
-46910c6c1e2a3c5bafea314e2a06bf83612063e1 2023-09-26T14:13:31+02:00  UPSTREAM: 103612: tolerate additional, but congruent, events for integration test
-196c42f21622cc3748dd9d750cae9f0ad3d1fab8 2023-09-25T08:13:10+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-1c0f5011057c48b38f95fbcda31a1c283192b2b6 2023-09-19T21:50:24+02:00 UPSTREAM: <drop>: manually resolve conflicts
-d1483fdf7a0578c83523bc1e2212a606a44fd71d 2023-09-13T11:25:25+00:00 Release commit for Kubernetes v1.26.9
-68b93591a48f0dd115efea7a0e19825e3267f6d5 2023-09-07T15:41:55+02:00 [go] Bump images, versions and deps to use Go 1.20.8
-787b6276d9ec63fe56e20c30eb56243798e95959 2023-09-03T23:53:49-07:00 Automated cherry pick of #119776: Fix a job quota related deadlock (#120321)
-53994ce8224417ddf358d928025c241f17d6d6cf 2023-08-31T16:39:50-04:00 TopologyAwareHints: Take lock in HasPopulatedHints
-1ac405248c359758999b191caab67e481a9ec6f5 2023-08-28T17:19:31+02:00 Mark Job onPodConditions as optional in pod failure policy
-cd13da90d60d5379d23a67c07362f1db8956c094 2023-08-24T01:12:34+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.8
-395f0a2fdc940aeb9ab88849e8fa4321decbf6e1 2023-08-24T00:43:06+00:00 Release commit for Kubernetes v1.26.8
-c209cef63da00831a9a9b72de8c91ec8f6c92ed2 2023-08-23T20:59:32+00:00 Incorporating feedback on 119341
-cedd91c4fb4127d6cf38ea745646fa07420e245d 2023-08-23T07:03:28-07:00 Use environment varaibles for parameters in Powershell
-f8b33caff26992f371b655c729b5eb15b614e142 2023-08-23T06:45:21-07:00 Use env varaibles for passing path
-8aec647f36c43f1fa83687466cfa1910d5eb264d 2023-08-22T15:39:12-04:00 check for overflow
-bbeb517c97a95a75a05006c2fae3a315ad5ecc40 2023-08-22T15:38:46-04:00 Fix CEL cost handling of zero length replacement strings
-062aac6deed5c7d8316d0223f610710ac152f305 2023-08-19T17:19:07+08:00 generate ReportingInstance and ReportingController in Event
-946ac1df818ff7939461bb268ebf222754210b17 2023-08-18T17:39:47+00:00 Pass Pinned field to kubecontainer.Image
-a669a4d21a51c90bed7b39e3d6022dba6f347a5b 2023-08-18T17:13:39+00:00 update otelhttp to v0.35.1
-0f700bc303d79940fa4a767371efdb07f4479748 2023-08-18T10:08:04+05:30 prep for go1.21: use -e in go list
-da9d77f59a7c5bd399d6b591bd4a3086d9dedcc2 2023-08-17T13:35:30+00:00 Skip apiserver_admission_webhook_request_total during context-canceled
-b2be37f0a8799da1fa786d8a181664bff515de5d 2023-08-17T13:35:30+00:00 Ignore context canceled from validate and mutate webhook failopen metric
-442bdccb700c8572dff7d1a07bac5154dde403b8 2023-08-17T14:48:37+03:00 kubeadm: fix nil pointer when etcd member is already removed
-e3c192c9bfaaf49889fe8f6bb0bb9ef49ddd9073 2023-08-17T09:03:08+02:00 update to golangci-lint v1.54.1 + go-ruleguard v0.4.0
-f1f8ada33a399be8f2b7002f37239f06b3ac0593 2023-08-15T13:32:15+00:00 fix: when PreFilter returns UnschedulableAndUnresolvable, copy the state in all nodes in statusmap
-faca431241e0348bfe642252d52a07272a36f5be 2023-08-14T05:44:02+00:00 Issue 4230: remove readiness check for cache exclusion
-fc529b6d0c93caa5fb5c94dcab80bc8943216f6b 2023-08-09T15:24:56-04:00 Avoid returning nil responseKind in v1beta1 aggregated discovery
-e791a3f64d52905d38ceb23aebca9ccb8725490d 2023-08-08T14:41:46-06:00 [release-1.26] releng/go: Bump images, versions and deps to use Go 1.20.7 and update protoc
-4b3fa19bcd00929b2f19fbb558c788aac0de602f 2023-08-08T19:01:27+00:00 run dummy command return status 0
-ea203ebd7a5f388e89723d2b1dba717e49ce76a4 2023-08-08T17:21:29+00:00 unit test not requiring priviledge
-bb56e911a0340fb02a59dd8d935a2f20086b761b 2023-08-08T17:19:37+00:00 Revert "Revert #114605: its unit test requires root permission"
-180aa303e6b35472b1027e269fc919b1e1e2e741 2023-08-08T13:35:42+02:00 node: devicemgr: topomgr: add logs
-b6aaf8cc6037ff5d1b9cef1d1b9b04286cd876fe 2023-08-08T13:35:42+02:00 e2e: node: add test to check device-requiring pods are cleaned up
-22cddaf29b0d46f446c24b3db969bde7372f4b30 2023-08-08T13:35:42+02:00 e2e: node: devices: improve the node reboot test
-3e197e6ea2ba6ca98c5916b19e7106598bcb6838 2023-08-08T13:35:40+02:00 e2e: node: devicemanager: update tests
-6dc17e26d68b5c602bc114b9c93dd73b7d81a2f0 2023-08-08T13:35:03+02:00 kubelet: devices: skip allocation for running pods
-9888a01ae3966620646cef93f15759a25846c93c 2023-08-07T20:44:14-04:00 Add test coverage of result size of string operations
-61b89b642e221ac5f354cbb3d0eac6213541881d 2023-08-07T20:44:06-04:00 Bump cel-go to v0.12.7
-8fbc1e8c6f3493ccac35f7c659d10928142dcbd6 2023-07-27T12:10:28-04:00 e2e_node: move getSampleDevicePluginPod to device_plugin_test.go
-73c93bea52f3eba22b2edd49648d6c5067d8f77a 2023-07-26T21:45:24-04:00 fix 'pod' in kubelet prober metrics
-6c91cf9089c5423617cb2c0b12b870556e512aeb 2023-07-25T20:23:31+00:00 priority & fairness: support dynamically configuring work estimator max seats
-1bd57f9050dd9fb56d1bb01ea98d5bd9058779ff 2023-07-19T12:43:33+00:00 Update CHANGELOG/CHANGELOG-1.26.md for v1.26.7
-62c9fa8fe6c2e04b1a40970e93055c2e92259b12 2023-07-17T16:34:02+02:00 events: fix EventSeries starting count discrepancy
-cfdd40b569d7630b9b31ddbe0557159b1f8b0f9e 2023-07-17T16:34:01+02:00 tools/events: fix data race when emitting series
-92c7042e640e148f54aa112591a4550d5450a132 2023-07-17T16:34:00+02:00 tools/events: retry on AlreadyExist for Series
-86989610c64eec5f2903733c9feb6bf76c9ae008 2023-07-05T17:19:54-04:00 kubeadm: backdate generated CAs by 5 minutes
-a85d04f86172369202efabd86d7b815f8b79c3ff 2023-07-05T17:19:54-04:00 client-go: allow to set NotBefore in NewSelfSignedCACert()
-12b70291733c08edd5ad6d9881f9483152b89122 2023-04-13T11:18:11+08:00 Fix a data race in TopologyCache
-b1215654de281a3bd407936faba59526d613e222 2023-04-13T11:17:34+08:00 Fix TopologyAwareHint not working when zone label is added after Node creation
+# cluster-kube-apiserver-operator embedded-component 64248a87ca421b5f28d2d472c48cd29a465e75f8 to d525f5d788e2a8bbf7dd01902084c3587d32a58f
+76454d471f7fbd34a72b16bba712a4ab3294130d 2023-09-27T15:38:59+03:00 Update staticpod file permissions to conform with CIS benchmarks
+# cluster-kube-controller-manager-operator embedded-component 56b970786d152344f0d4762c8271d20e5fc9d28b to cc6a31430749e2e0a1b0d9db18c6e664dd4b626e
+881d38532f66c22b87aefd6adaad959a463aea80 2023-09-27T15:40:45+03:00 Update staticpod file permissions to conform with CIS benchmarks
+# cluster-kube-scheduler-operator embedded-component 5c00da0816faf0f15e643f05666c963d862a8299 to b4c50a4d65f6971abeed1da815aac038d8700715
+59ec777c492b3be8000cde22397a7c6cfb27f396 2023-09-27T15:36:51+03:00 Update staticpod file permissions to conform with CIS benchmarks
+# cluster-network-operator embedded-component 777eb7b410863537b87be8266533d4bdca15ada6 to 961ca3d65ce046e29cd105e2c18563bd91dbfdae
+55ae57dbd353f68ef1e00bcc4390a79ecc199ab8 2023-09-13T08:21:05-07:00 JIRA: https://issues.redhat.com/browse/OCPBUGS-17391
+# kubernetes embedded-component 52589e6ce268bdc7712fcd21159783f6b1ba09f1 to c7606e743ff1b002c11b4d72da2add10d2057a9d
+3c2bb25299ab350ec11b886f44558a95668ea9cd 2023-10-13T09:03:10-04:00 UPSTREAM: 121200: Skip TestUnauthenticatedHTTP2ClientConnectionClose http1 tests
+e2afca81325743ffeb4626b163e0c5cc4eba130d 2023-10-13T09:02:49-04:00 UPSTREAM: 121200: Prevent rapid reset http2 DOS on API server
+248924dfa9257ea6c6cc2deb8f66f7bf56fdf574 2023-10-12T11:29:51-04:00 UPSTREAM: 121126: [1.26][CVE-2023-39325] .: bump golang.org/x/net to v0.17.0
+b0953d09877e5d0c547202aeb4b2dde71da0a213 2023-09-28T12:16:39+02:00 UPSTREAM: 120789: change rolling update logic to exclude sunsetting nodes
+# machine-config-operator embedded-component 3d95390f8afe8456ceba69eb73d7b95d3b954f6d to 1c52dd176fd85185f5ffa4709100d640c5991f3b
+0ad5c210f5b0e04726ff66e7346b0910c70d333e 2023-10-10T13:22:28+00:00 NO-ISSUE: Use `image exists` in resolv-prepender instead of `wc -l`
+fbce1e8658cd7696577d158fbe1fa800276a856f 2023-10-10T13:22:28+00:00 resolv-prepender: avoid pulling baremetalRuntimeCfgImage again if it already exists on the node
+8de4879070ae8c33f8c0414f3aea324d87c9719f 2023-09-29T16:44:16-04:00 Fix missing apiVersion and kind fields for embeds
+07da6c0fd167fc7b4ec19e63559cd0469927e5f0 2023-09-29T16:44:07-04:00 Proxy should not be marked as embedded resource
+7ee2013ebe6cb96ecb13a0f1093a6983b82c32c4 2023-09-29T16:43:55-04:00 Mark controllerconfig embedded fields as embedded
+a7a409d20eff3811f306a152479951e8d77ca0b1 2023-09-11T15:56:28+00:00 OCPBUGS-15613: Soften grep pattern for ingress default router
+# oc image-amd64 17b7accf8fd25125ce015cf4bea7d3cd3f336317 to 717d4a58931ec44cacd43af6dbc5eded5e8a9ab5
+37d4405dc2ed9fcf6071d15fc2ad542a9da2efd7 2023-10-10T04:44:10+00:00 Use quay redis image instead docker mysql
+b3234bc959feead443654408445ee9950eee40b0 2023-09-29T12:08:55+00:00 OCPBUGS-16735: Truncate existing files when writing from inspect
+# coredns image-amd64 5560e4ad8c343c211f0b2f9d85ce7331b20b87cb to 598440f54234b44ab650be9af7b88f70336b3941
+863ae8518f72123a58acd90d6e0895717d370129 2023-10-02T14:31:54+00:00 UPSTREAM: <carry>: openshift: Fix OCPBUGS-19805
+# ovn-kubernetes image-amd64 f2f537e24a74feaa364194f7921f2398d6a9b528 to 881909d784bd0ae06317d9502dca637612e0666f
+abc256065f322ea4fcfd2d713873a13efb165e47 2023-10-04T12:41:15+02:00 Provide dependency check for python3-pip
+a7446cc1cd21dcb26533ae93bba88e6cca44aceb 2023-10-04T12:40:48+02:00 Adjust python ssl library dependency check
+01aaec236accba8e93156133a514f9801a7518ea 2023-09-28T12:27:20-05:00 ovn: add COPP for Service Monitor to prevent CVE-2023-3153
+c277428243c1c64bbb092dc43f89289c5b3836d3 2023-09-28T10:20:57-05:00 Dockerfile: bump OVN to ovn23.06-23.06.1-8.el9fdp
+db1aaa063b6f64ae91d56757c100b2b6e89d133f 2023-09-26T20:46:07+00:00 Update bridge flow cache when the host address changes
+c76ae2c13a40492aab51e39563255691798aa448 2023-09-19T17:13:00+00:00 Check libovsdbclient.ErrNotFound on wrapped errors
+# kubernetes image-amd64 52589e6ce268bdc7712fcd21159783f6b1ba09f1 to c7606e743ff1b002c11b4d72da2add10d2057a9d
+3c2bb25299ab350ec11b886f44558a95668ea9cd 2023-10-13T09:03:10-04:00 UPSTREAM: 121200: Skip TestUnauthenticatedHTTP2ClientConnectionClose http1 tests
+e2afca81325743ffeb4626b163e0c5cc4eba130d 2023-10-13T09:02:49-04:00 UPSTREAM: 121200: Prevent rapid reset http2 DOS on API server
+248924dfa9257ea6c6cc2deb8f66f7bf56fdf574 2023-10-12T11:29:51-04:00 UPSTREAM: 121126: [1.26][CVE-2023-39325] .: bump golang.org/x/net to v0.17.0
+b0953d09877e5d0c547202aeb4b2dde71da0a213 2023-09-28T12:16:39+02:00 UPSTREAM: 120789: change rolling update logic to exclude sunsetting nodes
+# oc image-arm64 17b7accf8fd25125ce015cf4bea7d3cd3f336317 to 717d4a58931ec44cacd43af6dbc5eded5e8a9ab5
+37d4405dc2ed9fcf6071d15fc2ad542a9da2efd7 2023-10-10T04:44:10+00:00 Use quay redis image instead docker mysql
+b3234bc959feead443654408445ee9950eee40b0 2023-09-29T12:08:55+00:00 OCPBUGS-16735: Truncate existing files when writing from inspect
+# coredns image-arm64 5560e4ad8c343c211f0b2f9d85ce7331b20b87cb to 598440f54234b44ab650be9af7b88f70336b3941
+863ae8518f72123a58acd90d6e0895717d370129 2023-10-02T14:31:54+00:00 UPSTREAM: <carry>: openshift: Fix OCPBUGS-19805
+# ovn-kubernetes image-arm64 f2f537e24a74feaa364194f7921f2398d6a9b528 to cfe89e5a298b402df4323de38df1597be3c546a4
+abc256065f322ea4fcfd2d713873a13efb165e47 2023-10-04T12:41:15+02:00 Provide dependency check for python3-pip
+a7446cc1cd21dcb26533ae93bba88e6cca44aceb 2023-10-04T12:40:48+02:00 Adjust python ssl library dependency check
+01aaec236accba8e93156133a514f9801a7518ea 2023-09-28T12:27:20-05:00 ovn: add COPP for Service Monitor to prevent CVE-2023-3153
+c277428243c1c64bbb092dc43f89289c5b3836d3 2023-09-28T10:20:57-05:00 Dockerfile: bump OVN to ovn23.06-23.06.1-8.el9fdp
+db1aaa063b6f64ae91d56757c100b2b6e89d133f 2023-09-26T20:46:07+00:00 Update bridge flow cache when the host address changes
+c76ae2c13a40492aab51e39563255691798aa448 2023-09-19T17:13:00+00:00 Check libovsdbclient.ErrNotFound on wrapped errors
+7e984dfe63e6096dd68953c21b2835a0ae07f9d4 2023-05-25T13:19:10-04:00 Fix: compilation error in e2e.go tests due to missing int32 parameter
+# kubernetes image-arm64 52589e6ce268bdc7712fcd21159783f6b1ba09f1 to 636f2be6157d45217eb99744b72cc51e5e9c7e10
+fae8503caebcbc4849bfc93e65f5c6e598626262 2023-10-19T07:49:13+00:00 UPSTREAM: <carry>: Fix sporadic 141 errors in build-rpms
+3c2bb25299ab350ec11b886f44558a95668ea9cd 2023-10-13T09:03:10-04:00 UPSTREAM: 121200: Skip TestUnauthenticatedHTTP2ClientConnectionClose http1 tests
+e2afca81325743ffeb4626b163e0c5cc4eba130d 2023-10-13T09:02:49-04:00 UPSTREAM: 121200: Prevent rapid reset http2 DOS on API server
+248924dfa9257ea6c6cc2deb8f66f7bf56fdf574 2023-10-12T11:29:51-04:00 UPSTREAM: 121126: [1.26][CVE-2023-39325] .: bump golang.org/x/net to v0.17.0
+93489ed5b904c5fac96ce9297ad3083b4c070c9b 2023-10-10T08:59:36-04:00 UPSTREAM: <carry>: Do not allow nodes to set forbidden openshift labels
+b0953d09877e5d0c547202aeb4b2dde71da0a213 2023-09-28T12:16:39+02:00 UPSTREAM: 120789: change rolling update logic to exclude sunsetting nodes
