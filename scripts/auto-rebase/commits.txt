@@ -21,7 +21,7 @@ https://github.com/openshift/csi-external-snapshotter image-amd64 0bf9276611e57c
 https://github.com/openshift/csi-external-snapshotter image-amd64 0bf9276611e57cb87a05576c974fea1c38e3eb96
 https://github.com/openshift/csi-external-snapshotter image-amd64 0bf9276611e57cb87a05576c974fea1c38e3eb96
 https://github.com/openshift/router image-amd64 7cbd1526a359392ead30aa050dc9e2e81ffcc753
-https://github.com/openshift/kube-rbac-proxy image-amd64 76810397fa1b6177178f925c3d7326a5b84cbeb4
+https://github.com/openshift/kube-rbac-proxy image-amd64 1a646b98d8864e53accb726531d86f084ab13977
 https://github.com/openshift/ovn-kubernetes image-amd64 7a232386623498f099ccdedfc58bc1c134c61ddd
 https://github.com/openshift/kubernetes image-amd64 f67aeb31c9b95fd8998de8b895ac91bfdf733b2e
 https://github.com/openshift/service-ca-operator image-amd64 030a429b314d772b7cc7a1dd9af2073988a5b0a5
@@ -30,8 +30,8 @@ https://github.com/openshift/coredns image-arm64 fd70cf1b81d3d3a907663f61b651201
 https://github.com/openshift/csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96
 https://github.com/openshift/csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96
 https://github.com/openshift/csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96
-https://github.com/openshift/router image-arm64 80e2d999242203ad62c39ce758966531ba59dd2c
-https://github.com/openshift/kube-rbac-proxy image-arm64 86f31e2de5221ed4acd6509fa7a010a286089f1f
+https://github.com/openshift/router image-arm64 7cbd1526a359392ead30aa050dc9e2e81ffcc753
+https://github.com/openshift/kube-rbac-proxy image-arm64 1a646b98d8864e53accb726531d86f084ab13977
 https://github.com/openshift/ovn-kubernetes image-arm64 7a232386623498f099ccdedfc58bc1c134c61ddd
-https://github.com/openshift/kubernetes image-arm64 88e9b4c0d5978a2879307be87d25c592abb6eeea
+https://github.com/openshift/kubernetes image-arm64 f67aeb31c9b95fd8998de8b895ac91bfdf733b2e
 https://github.com/openshift/service-ca-operator image-arm64 030a429b314d772b7cc7a1dd9af2073988a5b0a5
