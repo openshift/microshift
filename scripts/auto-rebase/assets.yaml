@@ -22,10 +22,13 @@ assets:
       - file: update-node-resolver.sh
 
   - dir: components/openshift-router/
+    no_clean: true
     src: cluster-ingress-operator/pkg/manifests/assets/router/
     files:
       - file: cluster-role-binding.yaml
       - file: cluster-role.yaml
+      - file: cluster-role-system-router.yaml
+        ignore: "it's manually copied from OAS bootstrap policy. Not available in any repo rebase is using"
       - file: configmap.yaml
         git_restore: True
       - file: deployment.yaml
