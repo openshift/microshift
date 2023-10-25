@@ -110,7 +110,7 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		clusterRole = []string{
 			"components/openshift-router/cluster-role.yaml",
 			"components/openshift-router/cluster-role-aggregate-route.yaml",
-			//TODO another one here. see if the rebase will overwrite it!
+			"components/openshift-router/cluster-role-system-router.yaml",
 		}
 		apps = []string{
 			"components/openshift-router/deployment.yaml",
