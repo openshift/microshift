@@ -1,0 +1,6 @@
+name = "rhel-9.2-source-isolated-installer"
+description = "Empty blueprint used for building edge-installer images"
+version = "0.0.1"
+distro = "rhel-92"
+modules = []
+groups = []

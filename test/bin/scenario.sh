@@ -317,42 +317,49 @@ launch_vm() {
     fi
     sudo virsh start "${full_vmname}"
 
-    # Wait for an IP to be assigned
-    echo "Waiting for VM ${full_vmname} to have an IP"
-    local -r ip=$(get_vm_ip "${full_vmname}")
-    echo "VM ${full_vmname} has IP ${ip}"
-    record_junit "${vmname}" "ip-assignment" "OK"
+    # If there is at least 1 NIC attached, wait for an IP to be assigned and poll for SSH access
+    if  [ "${vm_nics}" -gt 0 ]; then
+        # Wait for an IP to be assigned
+        echo "Waiting for VM ${full_vmname} to have an IP"
+        local -r ip=$(get_vm_ip "${full_vmname}")
+        echo "VM ${full_vmname} has IP ${ip}"
+        record_junit "${vmname}" "ip-assignment" "OK"
 
-    # Remove any previous key info for the host
-    if [ -f "${HOME}/.ssh/known_hosts" ]; then
-        echo "Clearing known_hosts entry for ${ip}"
-        ssh-keygen -R "${ip}"
-    fi
+        # Remove any previous key info for the host
+        if [ -f "${HOME}/.ssh/known_hosts" ]; then
+            echo "Clearing known_hosts entry for ${ip}"
+            ssh-keygen -R "${ip}"
+        fi
 
-    # Record the IP of this VM so our caller can use it to configure
-    # port forwarding and the firewall.
-    mkdir -p "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
-    echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
-    # Record the _public_ IP of the VM so the test suite can use it to
-    # access the host. This is useful when the public IP is the
-    # hypervisor forwarding connections. If we have no PUBLIC_IP, use
-    # the VM IP and assume a local connection.
-    if [ -n "${PUBLIC_IP}" ]; then
-        echo "${PUBLIC_IP}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+        # Record the IP of this VM so our caller can use it to configure
+        # port forwarding and the firewall.
+        mkdir -p "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
+        echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
+        # Record the _public_ IP of the VM so the test suite can use it to
+        # access the host. This is useful when the public IP is the
+        # hypervisor forwarding connections. If we have no PUBLIC_IP, use
+        # the VM IP and assume a local connection.
+        if [ -n "${PUBLIC_IP}" ]; then
+            echo "${PUBLIC_IP}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+        else
+            echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+            # Set the defaults for the various ports so that connections
+            # from the hypervisor to the VM work.
+            echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+            echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
+            echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
+        fi
+
+        if wait_for_ssh "${ip}"; then
+            record_junit "${vmname}" "ssh-access" "OK"
+        else
+            record_junit "${vmname}" "ssh-access" "FAILED"
+            return 1
+        fi
     else
-        echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
-        # Set the defaults for the various ports so that connections
-        # from the hypervisor to the VM work.
-        echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-        echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
-        echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
-    fi
-
-    if wait_for_ssh "${ip}"; then
-        record_junit "${vmname}" "ssh-access" "OK"
-    else
-        record_junit "${vmname}" "ssh-access" "FAILED"
-        return 1
+        echo "VM ${full_vmname} has no NICs, skipping IP assignment and ssh polling"
+        record_junit "${vmname}" "ip-assignment" "SKIPPED"
+        record_junit "${vmname}" "ssh-access" "SKIPPED"
     fi
 
     echo "${full_vmname} is up and ready"

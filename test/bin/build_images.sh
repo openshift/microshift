@@ -285,6 +285,35 @@ do_group() {
             echo "${blueprint}-image-installer" > "${IMAGEDIR}/builds/${buildid}.build"
             buildid_list="${buildid_list} ${buildid}"
         done
+        for edge_installer in "${groupdir}"/*.edge-installer; do
+
+            blueprint_file="${IMAGEDIR}/blueprints/$(basename "${edge_installer}")"
+
+            echo "Rendering ${edge_installer} to ${blueprint_file}"
+            ${GOMPLATE} --file "${edge_installer}" >"${blueprint_file}"
+            if [[ "$(wc -l "${blueprint_file}" | cut -d ' ' -f1)" -eq 0 ]]; then
+                echo "WARNING: Templating '${edge_installer}' resulted in empty file! - SKIPPING"
+                continue
+            fi
+            record_junit "${groupdir}" "${edge_installer}" "render" "OK"
+
+            blueprint=$(get_blueprint_name "${blueprint_file}")
+
+            sudo composer-cli blueprints push "${blueprint_file}"
+
+            echo "Building edge-installer from ${blueprint}"
+            buildid=$(sudo composer-cli compose start-ostree \
+                           "${blueprint}" \
+                           edge-installer \
+                           --ref "$(basename "${edge_installer}" .edge-installer)" \
+                           --url "http://${ip_addr_default}:${WEB_SERVER_PORT}/repo" \
+                          | awk '{print $2}')
+            echo "Build ID ${buildid}"
+            # Record a "build name" to be used as part of the unique
+            # filename for the log we download next.
+            echo "${blueprint}-edge-installer" > "${IMAGEDIR}/builds/${buildid}.build"
+            buildid_list="${buildid_list} ${buildid}"
+        done
     fi
 
     if [ -n "${buildid_list}" ]; then
@@ -333,6 +362,11 @@ do_group() {
             tar -C "${IMAGEDIR}" -xf "${commit_file}"
         elif [[ "${build_name}" =~ image-installer ]]; then
             blueprint=${build_name//-image-installer/}
+            iso_file="${buildid}-installer.iso"
+            echo "Moving ${iso_file} to ${VM_DISK_BASEDIR}/${blueprint}.iso"
+            mv -f "${iso_file}" "${VM_DISK_BASEDIR}/${blueprint}.iso"
+        elif [[ "${build_name}" =~ edge-installer ]]; then
+            blueprint=${build_name//-edge-installer/}
             iso_file="${buildid}-installer.iso"
             echo "Moving ${iso_file} to ${VM_DISK_BASEDIR}/${blueprint}.iso"
             mv -f "${iso_file}" "${VM_DISK_BASEDIR}/${blueprint}.iso"
