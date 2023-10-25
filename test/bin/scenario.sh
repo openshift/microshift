@@ -131,12 +131,16 @@ wait_for_ssh() {
 
     local -r start_time=$(date +%s)
     while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
-        if ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new "redhat@${ip}" "echo host is up" ; then
+        if ssh -oConnectTimeout=10 -oBatchMode=yes -oKexAlgorithms=ecdh-sha2-nistp256 -oStrictHostKeyChecking=accept-new "redhat@${ip}" "echo host is up" ; then
             return 0
         fi
         date
         sleep 5
     done
+
+    # try logging again with more verbosity
+    #ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new "redhat@${ip}" -vvvvvv
+
     # Return an error if non of the ssh attempts succeeded
     return 1
 }
@@ -231,7 +235,7 @@ launch_vm() {
     local -r vm_memory="${5:-4096}"
     local -r vm_disksize="${6:-20}"
     local -r vm_nics="${7:-1}"
-
+    local -r fips_mode=${8:-1} 
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
 
@@ -263,7 +267,7 @@ launch_vm() {
     local vm_extra_args
     local vm_initrd_inject
     vm_network_args=""
-    vm_extra_args="console=tty0 console=ttyS0,115200n8 inst.notmux"
+    vm_extra_args="console=tty0 console=ttyS0,115200n8 inst.notmux fips=${fips_mode}"
     vm_initrd_inject=""
 
     for _ in $(seq "${vm_nics}") ; do
@@ -522,6 +526,12 @@ load_global_settings() {
     fi
 
     REDHAT_AUTHORIZED_KEYS="$(cat "${SSH_PUBLIC_KEY}")"
+    cat - <<EOF | tee -a "${HOME}/.ssh/config"
+Host 192.168.*
+  KexAlgorithms ecdh-sha2-nistp256
+  ConnectTimeout 10
+EOF
+
 }
 
 ## High-level action functions from command line arguments

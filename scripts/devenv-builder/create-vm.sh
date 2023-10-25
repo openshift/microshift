@@ -20,6 +20,9 @@ RAMSIZE=${5:-${RAMSIZE}}
 DISKSIZE=${6:-${DISKSIZE}}
 SWAPSIZE=${7:-${SWAPSIZE}}
 DATAVOLSIZE=${8:-${DATAVOLSIZE}}
+FIPSMODE=${9:-1} # FIPs Mode: 0-disable 1-enable
+
+
 [ -z "${VMNAME}" ]      && usage "Invalid VM name: '${VMNAME}'"
 [ ! -e "${VMDISKDIR}" ] && usage "VM disk directory '${VMDISKDIR}' is not accessible"
 [ ! -e "${ISOFILE}" ]   && usage "Installation ISO file '${ISOFILE}' is not accessible"
@@ -29,6 +32,7 @@ DATAVOLSIZE=${8:-${DATAVOLSIZE}}
 [[ ! "${DISKSIZE}" =~ ^[0-9]+$ ]]    || [[ "${DISKSIZE}" -le 0 ]]    && usage "Invalid disk size: '${DISKSIZE}'"
 [[ ! "${SWAPSIZE}" =~ ^[0-9]+$ ]]    || [[ "${SWAPSIZE}" -lt 0 ]]    && usage "Invalid swap size: '${SWAPSIZE}'"
 [[ ! "${DATAVOLSIZE}" =~ ^[0-9]+$ ]] || [[ "${DATAVOLSIZE}" -le 0 ]] && usage "Invalid data volume size: '${DATAVOLSIZE}'"
+[[ ! "${FIPSMODE}" =~ ^[0-1]+$ ]] || [[ "${FIPSMODE}" -le 0 ]] && usage "Invalid FIPs mode: '${FIPSMODE}'  (0-disable or 1-enable)"
 
 # RAM size is expected in MB
 RAMSIZE=$(( RAMSIZE * 1024 ))
@@ -62,7 +66,7 @@ virt-install \
     --events on_reboot=restart \
     --location ${ISOFILE} \
     --initrd-inject=${KICKSTART_FILE} \
-    --extra-args \"inst.ks=file:/$(basename "${KICKSTART_FILE}")\" \
+    --extra-args \"inst.ks=file:/$(basename "${KICKSTART_FILE}") fips=${FIPSMODE}\" \
     --graphics vnc,listen=0.0.0.0 \
     --noautoconsole \
     --wait \

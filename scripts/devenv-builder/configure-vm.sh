@@ -107,7 +107,7 @@ fi
 
 
 # Update to golang from centos-9-stream to make sure FIPS-compliant tools are used
-sudo curl https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official >/etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Official
+sudo curl https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Official
 
     sudo tee "/etc/yum.repos.d/centos-9-stream.repo" >/dev/null <<EOF
 [appstream]
