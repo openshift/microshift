@@ -1,14 +1,112 @@
-- oc image-arm64 2827643d6f79327d9e42df57c33a160742efcbac to 0874ae90d5908da0f266946202487b916f6b80f3
+- cluster-csi-snapshot-controller-operator embedded-component 809d4caef5ba829e1951985128f5bef29c2be560 to 4cfe20ac67bbf7d036c32350e1cdc204bbc562ab
+  - 0b69238 2023-10-16T10:54:39-06:00 UPSTREAM: <carry>: CVE-2023-44487: bump golang.org/x/net to v0.17.0
+
+- cluster-dns-operator embedded-component 5e1233474d5652de8b37add803a031dd30873619 to c18a9f38704b792786d90597b04c570431d7a419
+  - d54ea62 2023-10-19T13:11:01-04:00 OCPBUGS-22018: Bump golang.org/x/net/http2 to v0.17.0 for CVE-2023-39325 in ose-cluster-dns-operator-container
+
+- cluster-ingress-operator embedded-component e27d0004b5d560e57abc3e0217e4cb01d548d4c4 to e2aea389cea067a4c0943b6a835d2533334290f7
+  - e501577 2023-10-20T11:21:11-04:00 Bump golang.org/x/net for CVE-2023-44487
+  - 6dce379 2023-10-18T14:50:16+01:00 OCPBUGS-21803: test/e2e: Add test case for 2000000 maxConnections
+
+- cluster-kube-controller-manager-operator embedded-component 18f73fe6f9d1f9d5a44d36b3ca2e607ae0856998 to 839167b47a547bc10658fda1d89f2f80b8b66cb2
+  - 6bf0280 2023-10-19T17:17:16+02:00 go mod vendor
+  - 6ef5b9e 2023-10-19T17:16:53+02:00 bump(k8s)
+  - be56335 2023-10-18T11:34:58+02:00 bump(openshift/api|client-go|library-go) to pick up http2 disablement
+
+- cluster-kube-scheduler-operator embedded-component 573243056eec1e3462c7282a88e49f327782a8f2 to 00304850028f5e65c9d6eea1dc7be04b85cb09e0
+  - 47de675 2023-10-19T14:35:43+02:00 Bump openshift/library-go to disable http/2 by default
+
+- cluster-network-operator embedded-component 457336f3513f35b097a1c934b4489dbcd688b177 to baf4e62d09e261de2400b17a21ab08daa6f17527
+  - e669680 2023-10-20T10:13:13+01:00 Egress router: request at least 100 milliCPU
+  - 0dcae32 2023-10-20T10:57:27+02:00 OCPBUGS-19370: Added HCP labels to CNO pods
+  - 7eba405 2023-10-19T02:00:50+09:00 Revisit cipher suits for multus-admission-controller's rbac-proxy
+  - ce8924c 2023-10-17T13:51:37-05:00 ovnkube: disable conntrack on hybrid overlay VXLAN ports
+  - 5241a3a 2023-10-11T11:55:15+02:00 multinetworkpolicy: allow ICMP traffic
+  - f1685af 2023-10-04T10:57:10+01:00 SDN manifest: add node name from downward kapi to sdn controller
+  - 3e64a7d 2023-09-20T16:02:54-05:00 Ensure pods run in separate zones
+  - 3ad15a9 2023-09-05T17:35:45-05:00 hypershift: adjust backoff on infrastructure name retry
+  - 4d20bb5 2023-07-31T16:03:59+02:00 [ovn-kubernetes] Make APB External Route namespace selector mandatory for a dynamic hop
+
+- cluster-openshift-controller-manager-operator embedded-component bec461cc84f32d2898c8888cfb4fec0855e75bc4 to 3fb9157b6914c663bce1ba5b37f226533dbc3f78
+  - 02b1cb3 2023-10-19T10:08:00-04:00 update vendor
+  - cbf5da1 2023-10-19T10:07:17-04:00 bump(*)
+  - c8ed3ac 2023-10-19T10:04:44-04:00 disable sa-pull-secrets controller if no registry
+  - cf8c557 2023-10-19T10:04:44-04:00 fix Dockerfile name in Makefile
+  - ea16c54 2023-10-19T10:04:44-04:00 replace go-bindata with go:embed
+  - 3f6c793 2023-10-18T21:16:02+02:00 react to openshift/api changes
+  - 7c0e364 2023-10-18T21:06:21+02:00 go mod vendor
+  - d0487c4 2023-10-18T21:06:03+02:00 bump(k8s,openshift) to address CVE-2023-44487
+
+- cluster-policy-controller embedded-component adaa98fca9c663789f287c42a9a875706c6e392b to 50c2a8337f08856bbae4cd419bb8ffcbdf92567c
+  - 2d4289f 2023-10-19T17:26:15+02:00 go mod vendor
+  - d8c3870 2023-10-19T17:25:46+02:00 go.mod: remove replaces
+  - 874f65f 2023-10-18T20:37:06+02:00 go mod vendor
+  - c71f524 2023-10-18T20:34:08+02:00 bump(k8s,openshift) to address CVE-2023-44487
+
+- kubernetes embedded-component 481304af1da9b2376ebb1ddefa2ca665e1e1ae40 to d9813484616718b02352e5af919bde20b73a1200
+  - a67971f1f 2023-10-16T13:36:21-07:00 UPSTREAM: <carry>: Fix sporadic 141 errors in build-rpms
+  - 9201bb716 2023-10-02T12:02:28-04:00 UPSTREAM: <carry>: hack/update-vendor.sh
+  - 46047d5bc 2023-10-02T12:00:16-04:00 UPSTREAM: <carry>: support for both icsp and idms objects
+
+- machine-config-operator embedded-component d14938550422f1cd437bdfcae25c12a7dcecdd40 to 6296cd3fc9c3b961beb7de950c51900fe1f9fb8d
+  - 3cae3b25 2023-10-23T17:05:49+01:00 Switch kubelet nodename service to use environment file
+  - 0e8aab34 2023-10-20T16:09:38-04:00 OCPBUGS-21814: bump golang.org/x/net to v0.17.0
+  - ddd975ad 2023-10-20T09:49:15+02:00 Add a documentation note about realtime and 64k pages being mutually exclusive
+  - 905c2bcf 2023-10-20T09:49:12+02:00 Add an error message if kernel-64k is targeted and the node is not aarch64
+  - ca0f4078 2023-10-20T09:49:04+02:00 Add kernel-64k extension
+  - 16f26e78 2023-10-18T13:52:57-05:00 make go-deps
+  - 7f294c73 2023-10-18T13:52:56-05:00 sync crds from vendor
+  - b449635e 2023-10-17T11:51:58+00:00 configure-ovs: handle SIGINT and SIGTERM
+  - 83e642f5 2023-10-16T13:59:44+01:00 Require a hostname override for AWS
+  - f6192a22 2023-10-16T12:31:41+02:00 CRI-O: Use `127.0.0.1` for stream server with random port
+  - 65fa4185 2023-10-13T18:29:03-05:00 add cert observ fields back in
+  - 9b4d84b3 2023-10-13T18:29:03-05:00 update imports for code added since august
+  - 002b7c2a 2023-10-13T18:29:03-05:00 add api helpers
+  - 2d0182b8 2023-10-13T18:29:02-05:00 drop old MCO api, update imports to openshift/api
+  - ef1a55dd 2023-10-13T18:29:02-05:00 update default featuregates for 1.28
+  - 3d4a1f62 2023-10-13T18:29:02-05:00 kube 1.28 bump
+  - 2d8ea666 2023-10-03T19:44:06+08:00 Get the nmstate pinned package from kojijhub when building on top of a CentOS base image
+
+- route-controller-manager embedded-component b1399340162be837615609c172bbee297ef478cb to 03299cf434c31b01b08f696f644825f24ded908b
+  - 1a9548b 2023-10-19T17:31:05+02:00 go mod vendor
+  - 3c791b5 2023-10-19T17:30:45+02:00 go.mod: remove replaces
+  - ea3d90b 2023-10-18T20:56:05+02:00 go mod vendor
+  - 69388d6 2023-10-18T20:55:12+02:00  bump(k8s,openshift) to address CVE-2023-44487
+
+- service-ca-operator embedded-component bbf914e4df0f60617b8480c1dc87f5f0cde1f82c to df8d9d01827dc37e54f1babbac35ec94d9c7b257
+  - 05f72ab 2023-10-19T10:39:57+02:00 go mod vendor
+  - 82d93de 2023-10-19T10:39:46+02:00 go.mod: bump library-go
+  - 1e9f365 2023-10-17T12:31:16+02:00 go mod vendor
+  - 1b199cc 2023-10-17T12:30:59+02:00 go.mod: bump golang.org/x/net to v0.17.0
+
+- oc image-amd64 c365b47f538bd8d3bd9b498d179a360959ff69ff to b7596f03378a19fac47b673a629e5c6e169c23c6
   - 8d583c40 2023-10-24T08:56:07+03:00 Use mutex to prevent concurrent writes
   - 43cf7003 2023-10-20T10:15:34+03:00 Add directive example to kubelet-restart command
+  - df2f47f5 2023-10-19T08:50:19-06:00 oc/*: gracefully fail when user group is not configured
+  - 453eeffa 2023-10-18T23:58:33-07:00 pkg/cli/admin/upgrade/status: Add update duration
+  - 109a4ef5 2023-10-18T10:50:08-06:00 create/identity: fail gracefully when no user API exists
+  - 1f559614 2023-10-17T16:11:45-04:00 update library-go for cert library
+  - 704f1c11 2023-10-17T13:08:56-04:00 start using shared cert graph library
+  - d4d9a6f5 2023-10-17T14:02:44+03:00 Fix some commands incorrect examples
+  - 701c2eee 2023-10-04T15:28:41-07:00 pkg/cli/admin/upgrade/status: Add tech-preview 'oc adm upgrade status'
+  - eb4c104c 2023-10-04T11:52:09-07:00 pkg/cli/admin/upgrade: Warn on unrecognized subcommands
 
-- kube-rbac-proxy image-arm64 7a0795ecdf2abb40b90f7d406e0ca52138cb221b to e8e8c84bcc6d4419970726f3028df4b178c0b1c9
+- coredns image-amd64 ac051aa4594463c262d2a479af01065ef08b02d0 to 68ef945a78841a4a1be007fcefa929cc30eb9553
+  - c0451cd 2023-10-18T16:41:01-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
+
+- router image-amd64 f142a3a4f2890527d6b22c211faf04f34ed86625 to a97e096c9d3e14a68bef9dfe140ee262fb7ba973
+  - 80625b2 2023-10-18T09:37:35+01:00 haproxy-template: Add 'no strict-limits' to address HAProxy 2.6 issue
+  - 1fdb9a3 2023-10-17T13:21:06-04:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
+
+- kube-rbac-proxy image-amd64 688b36e681b21a6a88522629b87991d7279df1b9 to e8e8c84bcc6d4419970726f3028df4b178c0b1c9
   - 9969ff7 2023-10-23T11:17:04+02:00 Dockerfile: pin env variable VERSION to ./VERSION
   - 4111e7b 2023-10-20T13:13:47+02:00 vendor: bump
   - ea70f9b 2023-10-20T11:59:22+02:00 cut release v0.15.0
   - ab438d5 2023-10-20T11:23:02+02:00 http2: enable to disable, limit http2 resources
   - fe65a9a 2023-10-19T18:45:01+02:00 deps: patch cve-2023-45142, not affecting krp
+  - 8eb00e4 2023-10-17T12:19:42+02:00 go mod vendor
   - 0bc66fd 2023-10-16T17:59:15+02:00 cut release v0.14.4
+  - 73e383f 2023-10-16T17:22:25+02:00 go.mod: bump golang.org/x/net to v0.17.0
   - 3893e96 2023-10-13T10:50:10+02:00 Bump golang version to address CVE-2023-44487
   - 1ef0e21 2023-10-12T10:59:54+02:00 Bump golang.org/x/net to address CVE-2023-44487
   - 96da89f 2023-09-15T16:53:57+02:00 Makefile: revert VERSION, add VERSION_SEMVER
@@ -17,4 +115,42 @@
   - e82d1a1 2023-09-05T16:15:33+02:00 version: add ldflags with versioning
   - bcc5773 2023-09-05T16:15:32+02:00 version: Makefile variable shifting
   - b90c95c 2023-06-05T17:24:35+02:00 CHANGELOG: v0.14.2, add Make-,Dockerfile change
+
+- ovn-kubernetes image-amd64 1cf6c0376bf03a13d7c6a6ee91a98699df2aaa5c to 4229dafc9fa709537f3d5893c6920afc035040ea
+  - 2ee90cd 2023-10-16T15:12:29-04:00 Various fixes to hybrid overlay
+  - 14e1830 2023-10-16T12:09:53+00:00 Set mac binding age threshold in gateway routers
+  - ce0e1d0 2023-10-16T12:09:53+00:00 Delete HO static mac bindings
+  - c0cbb51 2023-10-16T12:09:52+00:00 Delete static mac bindings on gateway cleanup
+  - 93c9cea 2023-10-16T12:09:52+00:00 Add static mac bindings to the Static_Mac_Binding table
+  - cf050fa 2023-10-16T12:09:51+00:00 Delete legacy DGP mac binding using client native API
+  - d5532fc 2023-10-12T15:55:20+00:00 Bump golang.org/x/net from 0.10.0 to 0.17.0 in /go-controller
+  - 56cdcec 2023-10-11T23:31:34+00:00 Bump golang.org/x/net from 0.7.0 to 0.17.0 in /test/e2e
+  - 5cdcee0 2023-10-10T17:48:21+05:30 Handle tombstone of type cache.DeletedFinalStateUnknown while deleting net-attach-def
+  - c670398 2023-10-09T17:09:42-04:00 Move exgw e2e test out of e2e.go into external_gateways.go
+  - 0051718 2023-10-09T17:03:25-04:00 Fixes correctly syncing hybrid route policies for exgw Hybrid route policies were not unconditionally removed if there was not a matching ECMP route in OVN. This changes the behavior to fully clean hybrid policies as well as any stale addresses that exist in its related address set.
+  - 8b118bb 2023-10-09T17:03:25-04:00 exgw: try to remove hybrid policy when no gateways exist
+  - 22ac494 2023-10-09T11:16:37+01:00 netdev can't be moved to pod namespace
+  - fd9dac3 2023-10-06T10:44:47+02:00 Synchronize node primary address update
+  - 39dfc98 2023-10-05T22:47:47+02:00 Log namespace name instead of the whole object
+  - 82f0d1e 2023-10-05T22:47:39+02:00 Add .test files to gitignore
+  - b6479a7 2023-10-04T18:43:13+02:00 Move shared functionality from master_controller.go and node_controller.go to external_controller.go. The only functional difference is updating status, which is implemented by passing updatePolicyStatusFunc
+  - 6c5bcaf 2023-09-29T23:45:02+05:30 Limiting stack size and increasing resource limit for ovs-node daemonset
+  - f8e6219 2023-09-26T21:41:24+05:30 Adding a warning message about high memory allocation due to high number of CPUs
+  - 7b5f963 2023-09-26T21:41:24+05:30 Setting custom value of n-handler-threads is not supported in per-cpu default mode
+  - e8cfa0d 2023-05-17T17:37:41+03:00 ovnkube-node: Remove redundant set of other_config:hwaddr
+
+- kubernetes image-amd64 481304af1da9b2376ebb1ddefa2ca665e1e1ae40 to d9813484616718b02352e5af919bde20b73a1200
+  - a67971f1f 2023-10-16T13:36:21-07:00 UPSTREAM: <carry>: Fix sporadic 141 errors in build-rpms
+  - 9201bb716 2023-10-02T12:02:28-04:00 UPSTREAM: <carry>: hack/update-vendor.sh
+  - 46047d5bc 2023-10-02T12:00:16-04:00 UPSTREAM: <carry>: support for both icsp and idms objects
+
+- service-ca-operator image-amd64 bbf914e4df0f60617b8480c1dc87f5f0cde1f82c to df8d9d01827dc37e54f1babbac35ec94d9c7b257
+  - 05f72ab 2023-10-19T10:39:57+02:00 go mod vendor
+  - 82d93de 2023-10-19T10:39:46+02:00 go.mod: bump library-go
+  - 1e9f365 2023-10-17T12:31:16+02:00 go mod vendor
+  - 1b199cc 2023-10-17T12:30:59+02:00 go.mod: bump golang.org/x/net to v0.17.0
+
+- oc image-arm64 0874ae90d5908da0f266946202487b916f6b80f3 to b7596f03378a19fac47b673a629e5c6e169c23c6
+  - 1f559614 2023-10-17T16:11:45-04:00 update library-go for cert library
+  - 704f1c11 2023-10-17T13:08:56-04:00 start using shared cert graph library
 
