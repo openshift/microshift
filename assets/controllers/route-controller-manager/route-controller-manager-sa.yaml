@@ -1,5 +1,0 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  namespace: openshift-route-controller-manager
-  name: route-controller-manager-sa
