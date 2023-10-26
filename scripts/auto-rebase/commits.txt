@@ -26,7 +26,7 @@ https://github.com/openshift/ovn-kubernetes image-amd64 7a232386623498f099ccdedf
 https://github.com/openshift/kubernetes image-amd64 f67aeb31c9b95fd8998de8b895ac91bfdf733b2e
 https://github.com/openshift/service-ca-operator image-amd64 030a429b314d772b7cc7a1dd9af2073988a5b0a5
 https://github.com/openshift/oc image-arm64 0c63f9da2694c080257111616c60005f32a5bf47
-https://github.com/openshift/coredns image-arm64 fd70cf1b81d3d3a907663f61b651201de5f8e4e7
+https://github.com/openshift/coredns image-arm64 8341fa72820062869d3a01429ec20a79aebeded0
 https://github.com/openshift/csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96
 https://github.com/openshift/csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96
 https://github.com/openshift/csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96
