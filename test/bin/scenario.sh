@@ -60,13 +60,9 @@ prepare_kickstart() {
     local template="$2"
     local boot_commit_ref="$3"
 
-    local full_vmname
-    local output_file
-    local vm_hostname
-
-    full_vmname="$(full_vm_name "${vmname}")"
-    output_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/kickstart.ks"
-    vm_hostname="${full_vmname/./-}"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+    local -r output_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/kickstart.ks"
+    local -r vm_hostname="${full_vmname/./-}"
 
     echo "Preparing kickstart file ${template} ${output_file}"
     if [ ! -f "${KICKSTART_TEMPLATE_DIR}/${template}" ]; then
@@ -252,13 +248,30 @@ launch_vm() {
         sudo virsh pool-autostart "${vm_pool_name}"
     fi
 
-    # Prepare network arguments for the VM creation depending on
+    # Prepare network and extra arguments for the VM creation depending on
     # the number of requested NICs
     local vm_network_args
+    local vm_extra_args
+    local vm_initrd_inject
     vm_network_args=""
+    vm_extra_args="console=tty0 console=ttyS0,115200n8 inst.notmux"
+    vm_initrd_inject=""
+
     for _ in $(seq "${vm_nics}") ; do
         vm_network_args+="--network network=${network_name},model=virtio "
     done
+    if [ -z "${vm_network_args}" ] ; then
+        vm_network_args="--network none"
+
+        # Kickstart should be downloaded and injected into the ISO
+        local -r kickstart_file=$(mktemp /tmp/kickstart.XXXXXXXX.ks)
+        curl -s "${kickstart_url}" > "${kickstart_file}"
+
+        vm_extra_args+=" inst.ks=file:/$(basename "${kickstart_file}")"
+        vm_initrd_inject="--initrd-inject ${kickstart_file}"
+    else
+        vm_extra_args+=" inst.ks=${kickstart_url}"
+    fi
 
     # Implement retries on VM creation until the problem is fixed
     # See https://github.com/virt-manager/virt-manager/issues/498
@@ -289,7 +302,8 @@ launch_vm() {
             --events on_reboot=restart \
             --noreboot \
             --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
-            --extra-args "inst.ks=${kickstart_url} console=tty0 console=ttyS0,115200n8 inst.notmux" \
+            --extra-args "${vm_extra_args}" \
+            ${vm_initrd_inject} \
             --wait ${vm_wait_timeout} ; then
 
             # Check if the command exited within 15s due to a failure

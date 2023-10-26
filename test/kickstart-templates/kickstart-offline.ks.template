@@ -33,7 +33,7 @@ logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
 rootpw --lock
 
 # Configure ostree
-# ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/ostree/repo --ref=rhel-9.2-microshift-source-isolated
+ostreesetup --osname=rhel --url=file:///run/install/repo/ostree/repo --ref=rhel-9.2-microshift-source-isolated --nogpg
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
@@ -53,15 +53,6 @@ cat - >/etc/microshift/config.yaml <<EOF
 apiServer:
   subjectAltNames:
 EOF
-
-## The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
-## The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
-#mkdir -p /etc/crio
-#cat > /etc/crio/openshift-pull-secret <<EOF
-#REPLACE_PULL_SECRET
-#EOF
-#chmod 600 /etc/crio/openshift-pull-secret
-
 # Create a default redhat user, allowing it to run sudo commands without password
 useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 redhat
 echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
@@ -88,4 +79,4 @@ EOF
 # and system needing much more time to roll back.
 ln -sf /dev/null /etc/systemd/user/grub-boot-success.timer
 
-%endf
+%end
