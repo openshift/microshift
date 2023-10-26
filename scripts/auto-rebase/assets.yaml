@@ -151,7 +151,7 @@ assets:
       - file: 0000_20_kube-apiserver-operator_00_scc-restricted.yaml
 
   - dir: controllers/route-controller-manager/
-    src: cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/
+    src: cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/
     files:
       - file: ns.yaml
       - file: sa.yaml
@@ -174,7 +174,7 @@ assets:
     no_clean: True
     files:
       - file: 0000_50_cluster-openshift-controller-manager_00_namespace.yaml
-        src: /cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ns.yaml
+        src: /cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/ns.yaml
       - file: namespace-openshift-infra.yaml
         src: /cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/
       - file: priority-class-openshift-user-critical.yaml
