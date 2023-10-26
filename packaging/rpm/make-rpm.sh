@@ -82,12 +82,12 @@ check_built_rpms() {
   dir=$1
   rpm_list=$2
   rpm_not_found=""
-  for rpm in $rpm_list; do
-    if [ ! $(find "${RPMBUILD_DIR}${dir}" -name $rpm-${MICROSHIFT_VERSION}*.rpm) ]; then
+  for rpm in ${rpm_list}; do
+    if [ ! "$(find "${RPMBUILD_DIR}${dir}" -name "${rpm}-${MICROSHIFT_VERSION}*.rpm")" ]; then
       rpm_not_found="${rpm}-${MICROSHIFT_VERSION} ${rpm_not_found}"
     fi
   done
-  if [ ! -z "${rpm_not_found}" ]; then
+  if [ -n "${rpm_not_found}" ]; then
     echo "RPMs [${rpm_not_found}] not found"
     exit 1
   fi
