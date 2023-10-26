@@ -79,9 +79,9 @@ print_info() {
 }
 
 check_built_rpms() {
-  dir=$1
-  rpm_list=$2
-  rpm_not_found=""
+  local dir=$1
+  local rpm_list=$2
+  local rpm_not_found=""
   for rpm in ${rpm_list}; do
     if [ ! "$(find "${RPMBUILD_DIR}${dir}" -name "${rpm}-${MICROSHIFT_VERSION}*.rpm")" ]; then
       rpm_not_found="${rpm}-${MICROSHIFT_VERSION} ${rpm_not_found}"
