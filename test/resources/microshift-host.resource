@@ -1,6 +1,7 @@
 *** Settings ***
 Documentation       Keywords for working with the MicroShift host
 
+Library             sshlibrary_fips.py
 Library             SSHLibrary
 Library             libostree.py
 
