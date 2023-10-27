@@ -26,6 +26,8 @@ assets:
     files:
       - file: cluster-role-binding.yaml
       - file: cluster-role.yaml
+      - file: cluster-role-system-router.yaml
+        git_restore: True
       - file: configmap.yaml
         git_restore: True
       - file: deployment.yaml
