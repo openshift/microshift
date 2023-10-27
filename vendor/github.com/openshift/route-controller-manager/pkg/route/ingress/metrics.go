@@ -23,7 +23,7 @@ var (
 	ingressesWithoutClassName = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: metricIngressWithoutClassName,
 		Help: "Report the number of ingresses that do not specify ingressClassName.",
-	}, []string{"name"})
+	}, []string{"name", "namespace"})
 )
 
 func (c *Controller) Create(v *semver.Version) bool {
@@ -69,7 +69,7 @@ func (c *Controller) Collect(ch chan<- prometheus.Metric) {
 		if icName == nil || *icName == "" {
 			labelVal = 1
 		}
-		ingressesWithoutClassName.WithLabelValues(ingressInstance.Name).Set(float64(labelVal))
+		ingressesWithoutClassName.WithLabelValues(ingressInstance.Name, ingressInstance.Namespace).Set(float64(labelVal))
 	}
 
 	ingressesWithoutClassName.Collect(ch)
