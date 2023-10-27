@@ -9,7 +9,7 @@
 - name: create vm and set up localhost
   hosts: localhost
   vars:
-    ansible_become: no
+    become: no
     ansible_connection: local
   vars_files:
   - vars/all.yml
