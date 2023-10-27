@@ -37,44 +37,9 @@ liveimg --url file:///run/install/repo/liveimg.tar.gz
 
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
-# Set the configuration of MicroShift to include subjectAltNames
-mkdir -p /etc/microshift
-cat - >/etc/microshift/config.yaml <<EOF
-apiServer:
-  subjectAltNames:
-EOF
-
-DEFAULT_ROUTE_IPS="$(ip route show default 2>/dev/null | awk '{print $9}')"
-if [ -n "${DEFAULT_ROUTE_IPS}" ] ; then
-    for r in ${DEFAULT_ROUTE_IPS} ; do
-        echo "    - ${r}" >>/etc/microshift/config.yaml
-    done
-else
-    MAIN_HOST_IP="$(hostname -I | awk '{print $1}')"
-    echo "    - ${MAIN_HOST_IP}" >>/etc/microshift/config.yaml
-fi
-if [ -n "REPLACE_PUBLIC_IP" ]; then
-    echo "    - REPLACE_PUBLIC_IP" >>/etc/microshift/config.yaml
-fi
-
-# The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
-# The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
-mkdir -p /etc/crio
-cat > /etc/crio/openshift-pull-secret <<EOF
-REPLACE_PULL_SECRET
-EOF
-chmod 600 /etc/crio/openshift-pull-secret
-
 # Create a default redhat user, allowing it to run sudo commands without password
 useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 redhat
 echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
-
-# # Add authorized ssh keys
-mkdir -m 700 /home/redhat/.ssh
-cat >> /home/redhat/.ssh/authorized_keys <<EOF
-REPLACE_REDHAT_AUTHORIZED_KEYS
-EOF
-chmod 600 /home/redhat/.ssh/authorized_keys
 
 # Make sure redhat user directory contents ownership is correct
 chown -R redhat:redhat /home/redhat/
@@ -90,13 +55,6 @@ Storage=persistent
 SystemMaxUse=1G
 RuntimeMaxUse=1G
 EOF
-
-# Make sure all the Ethernet network interfaces are connected automatically
-for uuid in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" && $3 == "no" {print $1}') ; do
-    # Remove autoconnect option from the configuration file to keep it enabled after reboot
-    file=$(nmcli -f uuid,filename connection | awk -v uuid=${uuid} '$1 == uuid' | sed "s/${uuid}//g" | xargs)
-    sed -i '/autoconnect=.*/d' "${file}"
-done
 
 # Disable a timer that sets boot_success to 1 after two minutes from a user login.
 # It impacts greenboot checks because grub script decrementing boot_counter works
