@@ -252,13 +252,30 @@ launch_vm() {
         sudo virsh pool-autostart "${vm_pool_name}"
     fi
 
-    # Prepare network arguments for the VM creation depending on
+    # Prepare network and extra arguments for the VM creation depending on
     # the number of requested NICs
     local vm_network_args
+    local vm_extra_args
+    local vm_initrd_inject
     vm_network_args=""
+    vm_extra_args="console=tty0 console=ttyS0,115200n8 inst.notmux"
+    vm_initrd_inject=""
+
     for _ in $(seq "${vm_nics}") ; do
         vm_network_args+="--network network=${network_name},model=virtio "
     done
+    if [ -z "${vm_network_args}" ] ; then
+        vm_network_args="--network none"
+
+        # Kickstart should be downloaded and injected into the ISO
+        local -r kickstart_file=$(mktemp /tmp/kickstart.XXXXXXXX.ks)
+        curl -s "${kickstart_url}" > "${kickstart_file}"
+
+        vm_extra_args+=" inst.ks=file:/$(basename "${kickstart_file}")"
+        vm_initrd_inject="--initrd-inject ${kickstart_file}"
+    else
+        vm_extra_args+=" inst.ks=${kickstart_url}"
+    fi
 
     # Implement retries on VM creation until the problem is fixed
     # See https://github.com/virt-manager/virt-manager/issues/498
@@ -289,7 +306,8 @@ launch_vm() {
             --events on_reboot=restart \
             --noreboot \
             --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
-            --extra-args "inst.ks=${kickstart_url} console=tty0 console=ttyS0,115200n8 inst.notmux" \
+            --extra-args "${vm_extra_args}" \
+            ${vm_initrd_inject} \
             --wait ${vm_wait_timeout} ; then
 
             # Check if the command exited within 15s due to a failure
@@ -317,42 +335,49 @@ launch_vm() {
     fi
     sudo virsh start "${full_vmname}"
 
-    # Wait for an IP to be assigned
-    echo "Waiting for VM ${full_vmname} to have an IP"
-    local -r ip=$(get_vm_ip "${full_vmname}")
-    echo "VM ${full_vmname} has IP ${ip}"
-    record_junit "${vmname}" "ip-assignment" "OK"
+    # If there is at least 1 NIC attached, wait for an IP to be assigned and poll for SSH access
+    if  [ "${vm_nics}" -gt 0 ]; then
+        # Wait for an IP to be assigned
+        echo "Waiting for VM ${full_vmname} to have an IP"
+        local -r ip=$(get_vm_ip "${full_vmname}")
+        echo "VM ${full_vmname} has IP ${ip}"
+        record_junit "${vmname}" "ip-assignment" "OK"
 
-    # Remove any previous key info for the host
-    if [ -f "${HOME}/.ssh/known_hosts" ]; then
-        echo "Clearing known_hosts entry for ${ip}"
-        ssh-keygen -R "${ip}"
-    fi
+        # Remove any previous key info for the host
+        if [ -f "${HOME}/.ssh/known_hosts" ]; then
+            echo "Clearing known_hosts entry for ${ip}"
+            ssh-keygen -R "${ip}"
+        fi
 
-    # Record the IP of this VM so our caller can use it to configure
-    # port forwarding and the firewall.
-    mkdir -p "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
-    echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
-    # Record the _public_ IP of the VM so the test suite can use it to
-    # access the host. This is useful when the public IP is the
-    # hypervisor forwarding connections. If we have no PUBLIC_IP, use
-    # the VM IP and assume a local connection.
-    if [ -n "${PUBLIC_IP}" ]; then
-        echo "${PUBLIC_IP}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+        # Record the IP of this VM so our caller can use it to configure
+        # port forwarding and the firewall.
+        mkdir -p "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
+        echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
+        # Record the _public_ IP of the VM so the test suite can use it to
+        # access the host. This is useful when the public IP is the
+        # hypervisor forwarding connections. If we have no PUBLIC_IP, use
+        # the VM IP and assume a local connection.
+        if [ -n "${PUBLIC_IP}" ]; then
+            echo "${PUBLIC_IP}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+        else
+            echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+            # Set the defaults for the various ports so that connections
+            # from the hypervisor to the VM work.
+            echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+            echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
+            echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
+        fi
+
+        if wait_for_ssh "${ip}"; then
+            record_junit "${vmname}" "ssh-access" "OK"
+        else
+            record_junit "${vmname}" "ssh-access" "FAILED"
+            return 1
+        fi
     else
-        echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
-        # Set the defaults for the various ports so that connections
-        # from the hypervisor to the VM work.
-        echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-        echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
-        echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
-    fi
-
-    if wait_for_ssh "${ip}"; then
-        record_junit "${vmname}" "ssh-access" "OK"
-    else
-        record_junit "${vmname}" "ssh-access" "FAILED"
-        return 1
+        echo "VM ${full_vmname} has no NICs, skipping IP assignment and ssh polling"
+        record_junit "${vmname}" "ip-assignment" "SKIPPED"
+        record_junit "${vmname}" "ssh-access" "SKIPPED"
     fi
 
     echo "${full_vmname} is up and ready"
