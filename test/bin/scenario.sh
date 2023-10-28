@@ -36,6 +36,11 @@ sos_report() {
             continue
         fi
         ip=$(cat "${vmdir}/ip")
+        if [ -z "${ip}" ] ; then
+            # skip hosts without NICs
+            # FIXME: use virsh to copy sos report files
+            continue
+        fi
         # Copy the sos helper for compatibility, it is only available in 4.14 RPMs
         scp "${ROOTDIR}/scripts/microshift-sos-report.sh" "redhat@${ip}":/tmp
         ssh "redhat@${ip}" \
@@ -375,6 +380,10 @@ launch_vm() {
             return 1
         fi
     else
+        # Record no-IP for offline VMs to signal special sos report collection technique
+        mkdir -p "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
+        touch "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
+
         echo "VM ${full_vmname} has no NICs, skipping IP assignment and ssh polling"
         record_junit "${vmname}" "ip-assignment" "SKIPPED"
         record_junit "${vmname}" "ssh-access" "SKIPPED"
