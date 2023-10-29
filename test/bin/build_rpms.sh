@@ -12,9 +12,15 @@ source "${SCRIPTDIR}/common.sh"
 cd "${ROOTDIR}"
 rm -rf _output/rpmbuild*
 
-BUILD_CMDS=( \
-    # Normal build of current branch from source
-    'make rpm' \
+# Normal build of current branch from source
+BUILD_CMDS=('make rpm')
+
+# In CI, build the current branch from source with the build tools using used by OCP.
+if [ -v CI_JOB_NAME ] ; then
+    BUILD_CMDS=('make rpm-podman')
+fi
+
+BUILD_CMDS+=( 
     # Build RPMs with the version number of the next minor release,
     # but using the same source code as the normal build.
     'make -C test/ fake-next-minor-rpm' \
