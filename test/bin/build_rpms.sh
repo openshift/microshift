@@ -14,7 +14,7 @@ rm -rf _output/rpmbuild*
 
 BUILD_CMDS=( \
     # Normal build of current branch from source
-    'make rpm' \
+    'make rpm-podman' \
     # Build RPMs with the version number of the next minor release,
     # but using the same source code as the normal build.
     'make -C test/ fake-next-minor-rpm' \

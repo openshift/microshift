@@ -293,15 +293,14 @@ commit: image-build-configure image-build-commit
 .PHONY: commit
 
 rpm-podman:
-	RPM_BUILDER_IMAGE_TAG="rhel-8-release-golang-1.19-openshift-4.13"; \
+	RPM_BUILDER_IMAGE_TAG="rhel-8-release-golang-1.20-openshift-4.14"; \
 	podman build \
 		--volume /etc/pki/entitlement/:/etc/pki/entitlement \
 		--build-arg TAG=$$RPM_BUILDER_IMAGE_TAG \
 		--tag microshift-builder:$$RPM_BUILDER_IMAGE_TAG - < ./packaging/images/Containerfile.rpm-builder ; \
 	podman run \
 		--rm -ti \
-		--volume $$(pwd):/opt/microshift \
-		--volume $$(go env GOCACHE):/go/.cache \
+		--volume $$(pwd):/opt/microshift:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
 		microshift-builder:$$RPM_BUILDER_IMAGE_TAG \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; trap "pkill $${pid}" INT ; wait $${pid}'
