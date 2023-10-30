@@ -576,6 +576,8 @@ github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0
 github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20231020222044-f67aeb31c9b9/go.mod h1:PSwPqCagGk5mC04j59MWkT8e8At2vjFyx/UndV5c8GM=
 github.com/openshift/library-go v0.0.0-20230908101047-d058c695f677 h1:TCNe5+9j3PpHY3lLPA355ejCaz0/r7OxFoyDSMzaJcw=
 github.com/openshift/library-go v0.0.0-20230908101047-d058c695f677/go.mod h1:ZFwNwC3opc/7aOvzUbU95zp33Lbxet48h80ryH3p6DY=
+github.com/openshift/library-go v0.0.0-20231030114140-33085da695c8 h1:mHH2dYxSr6EB/UrAOUwvuGJPZ/cay0lhDaPB3Nplbhw=
+github.com/openshift/library-go v0.0.0-20231030114140-33085da695c8/go.mod h1:ZFwNwC3opc/7aOvzUbU95zp33Lbxet48h80ryH3p6DY=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230317131656-c62d9de5a460 h1:PftK9Q7BUD+wj8fNvxtJ+RhxYkcTtd8LcAo1Gk1H1HM=
 github.com/openshift/route-controller-manager v0.0.0-20230809110842-0a976ea8bb9f h1:JITYoP8Rlg/LLRwCXMhmFoh7l1RzHWIwc6Udhi6kEEQ=
 github.com/openshift/route-controller-manager v0.0.0-20230809110842-0a976ea8bb9f/go.mod h1:wmediAYaRewO78uDlZ1qvvfFwL2c1thrRVhCvN7GP4o=
