@@ -412,7 +412,7 @@ while getopts "iIg:st:h" opt; do
             BUILD_INSTALLER=false
             ;;
         g)
-            GROUP="${OPTARG}"
+            GROUP="$(realpath "${OPTARG}")"
             ;;
         s)
             BUILD_INSTALLER=false

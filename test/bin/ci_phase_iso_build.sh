@@ -52,6 +52,18 @@ MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
 CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
 
 bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
-bash -x ./bin/build_images.sh
+
+# Image build can be optimized in CI based on the job type
+if [ -v CI_JOB_NAME ] ; then
+    bash -x ./bin/build_images.sh -g ./image-blueprints/group1
+    bash -x ./bin/build_images.sh -g ./image-blueprints/group2
+    # Group 3 only contains images used in periodic CI jobs
+    if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
+        bash -x ./bin/build_images.sh -g ./image-blueprints/group3
+    fi
+else
+    # Fall back to full build when not running in CI
+    bash -x ./bin/build_images.sh
+fi
 
 echo "Build phase complete"
