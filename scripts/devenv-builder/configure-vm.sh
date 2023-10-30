@@ -101,25 +101,26 @@ fi
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     dnf_retry clean all
     dnf_retry update
-    dnf_retry install "gcc git cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools"
+    dnf_retry install "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools"
     sudo systemctl enable --now cockpit.socket
 fi
 
 
-# Update to golang from centos-9-stream to make sure FIPS-compliant tools are used
-sudo curl https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Official
-
-    sudo tee "/etc/yum.repos.d/centos-9-stream.repo" >/dev/null <<EOF
-[appstream]
-name=CentOS Stream 9 - AppStream
-baseurl=https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os
-gpgcheck=1
-enabled=0
-skip_if_unavailable=0
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Official
-EOF
-
-dnf_retry install "golang --enablerepo appstream"
+GO_VER=1.20.10
+GO_ARCH=$([ "$(uname -m)" == "x86_64" ] && echo "amd64" || echo "arm64")
+GO_INSTALL_DIR="/usr/local/go${GO_VER}"
+if ${INSTALL_BUILD_DEPS} && [ ! -d "${GO_INSTALL_DIR}" ]; then
+    echo "Installing go ${GO_VER}..."
+    # This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
+    # /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
+    curl -L -o "go${GO_VER}.linux-${GO_ARCH}.tar.gz" "https://go.dev/dl/go${GO_VER}.linux-${GO_ARCH}.tar.gz"
+    sudo rm -rf "/usr/local/go${GO_VER}"
+    sudo mkdir -p "/usr/local/go${GO_VER}"
+    sudo tar -C "/usr/local/go${GO_VER}" -xzf "go${GO_VER}.linux-${GO_ARCH}.tar.gz" --strip-components 1
+    sudo rm -rfv /usr/local/bin/{go,gofmt}
+    sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/
+    rm -rfv "go${GO_VER}.linux-${GO_ARCH}.tar.gz"
+fi
 
 
 if ${BUILD_AND_RUN}; then
