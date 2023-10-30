@@ -532,8 +532,8 @@ github.com/openshift/kubernetes v0.0.0-20231019074623-d98134846167 h1:WQyiNYnUsA
 github.com/openshift/kubernetes v0.0.0-20231019074623-d98134846167/go.mod h1:+zMWPGfGw4m+nw4BGf8HDsKxSngGrM1uPncL3pPFYFU=
 github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20230724151845-8558e14a1168 h1:gjPs80PVnSOjK7oBizuGNphNNYBdaevQBw0EvQ5/fsQ=
 github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20230724151845-8558e14a1168/go.mod h1:nc9vh1Bd8i4OnTM+uoZeFbRaJJ9uOs1AzaN69SdVnd8=
-github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231019074623-d98134846167 h1:VYG4cFRNBonv/qGZ5BmeRD2l/LVk4uM+r/YEEonuJRo=
-github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231019074623-d98134846167/go.mod h1:Eelar9xRzWfOdgwHVFOt9pB5sBAjvgFGhvawDAjPNi8=
+github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231026174244-fa9f9097c61b h1:WvsYQILbRjiQL7w5kp8HwVW8I/8RxwMgjPi0uFv4IOc=
+github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231026174244-fa9f9097c61b/go.mod h1:Eelar9xRzWfOdgwHVFOt9pB5sBAjvgFGhvawDAjPNi8=
 github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231019074623-d98134846167 h1:QsxSHQdSJsaLaTtQQ5zBSCPqWufkG4VHISHabKvt7rY=
 github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231019074623-d98134846167/go.mod h1:fmX6IIOINS5+32Y2KisexZ+69MXmLODn2/YVkGRuhzs=
 github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231019074623-d98134846167 h1:ZDh7lV8lVsGd1EIsKp/qrbjSMwoFKD/VgSclZ3+NmGg=
