@@ -1,4 +1,12 @@
-# cluster-ingress-operator embedded-component 2ecad04e6dcd3338b7180529a9f55cb13dff276d to 257c3b41f86851ff67133cf56d59f0552a09be75
-f78f6555cd12626969e97d7c4e5b5706286669ab 2023-10-25T14:17:34-04:00 TestHstsPolicyWorks: Wait for NS to be provisioned
-5171b5d67476be680941be217a397a44a2a41d27 2023-10-25T14:15:48-04:00 TestHstsPolicyWorks: Dump events if test fails
-62c4b13f8318c710fee39c05b900ab791f5cb8fd 2023-10-25T14:14:09-04:00 test/e2e: Don't use openshift/origin-node
+# cluster-ingress-operator embedded-component 257c3b41f86851ff67133cf56d59f0552a09be75 to 5379ce1cb9305d89e0349a3e80fac8801c72eb42
+0789e61786bb65f9105fb27a186fe5da3cb95d2d 2023-10-20T11:21:49-04:00 Bump golang.org/x/net for CVE-2023-44487
+# machine-config-operator embedded-component 645056ffc4f42e40fd6d2c0158231fc41be32676 to 935b199a2b6168de8f3304de55379ef3b62e5b96
+ef46c2e53595cb495f5014cd4c0d7613d4f2d333 2023-10-26T09:28:41-04:00 bootstrap_test: always set APIVersion and Kind for DNS
+# coredns image-amd64 598440f54234b44ab650be9af7b88f70336b3941 to ad0cf541c700ca53e9d638072354d22df68e60c8
+2423f7aeed3700d222f56005f81c47f807409331 2023-10-17T17:19:30-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
+# router image-amd64 057eae91f82fb3900fc3d18172b5e6e6ad2d59d8 to 431a6e667025931c68b4f747a224af29edf356f6
+148d5d26f058303d2b2c91789e1aec1463a32aa1 2023-10-20T12:05:12-04:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
+# coredns image-arm64 598440f54234b44ab650be9af7b88f70336b3941 to ad0cf541c700ca53e9d638072354d22df68e60c8
+2423f7aeed3700d222f56005f81c47f807409331 2023-10-17T17:19:30-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
+# router image-arm64 057eae91f82fb3900fc3d18172b5e6e6ad2d59d8 to 431a6e667025931c68b4f747a224af29edf356f6
+148d5d26f058303d2b2c91789e1aec1463a32aa1 2023-10-20T12:05:12-04:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
