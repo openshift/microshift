@@ -1,40 +1,40 @@
-- kube-rbac-proxy image-amd64 76810397fa1b6177178f925c3d7326a5b84cbeb4 to 1a646b98d8864e53accb726531d86f084ab13977
-  - 8aadf65 2023-10-23T12:27:50+02:00 Dockerfile: pin env variable VERSION to ./VERSION
-  - 67aeaac 2023-10-20T13:24:09+02:00 go mod vendor
-  - ea70f9b 2023-10-20T11:59:22+02:00 cut release v0.15.0
-  - ab438d5 2023-10-20T11:23:02+02:00 http2: enable to disable, limit http2 resources
-  - fe65a9a 2023-10-19T18:45:01+02:00 deps: patch cve-2023-45142, not affecting krp
-  - 0bc66fd 2023-10-16T17:59:15+02:00 cut release v0.14.4
-  - 3893e96 2023-10-13T10:50:10+02:00 Bump golang version to address CVE-2023-44487
-  - 1ef0e21 2023-10-12T10:59:54+02:00 Bump golang.org/x/net to address CVE-2023-44487
-  - 96da89f 2023-09-15T16:53:57+02:00 Makefile: revert VERSION, add VERSION_SEMVER
-  - 3e2ea8f 2023-09-07T15:30:56+02:00 cut release v0.14.3
-  - 2540d5f 2023-09-07T15:30:55+02:00 go*: update dependencies
-  - e82d1a1 2023-09-05T16:15:33+02:00 version: add ldflags with versioning
-  - bcc5773 2023-09-05T16:15:32+02:00 version: Makefile variable shifting
-  - b90c95c 2023-06-05T17:24:35+02:00 CHANGELOG: v0.14.2, add Make-,Dockerfile change
+- cluster-ingress-operator embedded-component 7e10070c45fe55862f323f6ecc0f7166e802fa24 to d876f5ab48e3748057ec196d90b6f7aae633b081
+  - af86255 2023-10-20T11:21:39-04:00 Bump golang.org/x/net for CVE-2023-44487
 
-- router image-arm64 80e2d999242203ad62c39ce758966531ba59dd2c to 7cbd1526a359392ead30aa050dc9e2e81ffcc753
-  - dabe1f4 2023-10-18T15:35:10+00:00 haproxy-template: Add 'no strict-limits' to address HAProxy 2.6 issue
+- cluster-kube-controller-manager-operator embedded-component 78354fc395484f25482319281fd48a2de4d5c40b to bc9ef03545147204bf6692d02db8e167a023ff44
+  - baa6c26 2023-10-24T14:38:44+02:00 go mod vendor
+  - bf76fd8 2023-10-24T14:38:44+02:00 bump(k8s,openshift) to address CVE-2023-44487
 
-- kube-rbac-proxy image-arm64 86f31e2de5221ed4acd6509fa7a010a286089f1f to 1a646b98d8864e53accb726531d86f084ab13977
-  - 8aadf65 2023-10-23T12:27:50+02:00 Dockerfile: pin env variable VERSION to ./VERSION
-  - 67aeaac 2023-10-20T13:24:09+02:00 go mod vendor
-  - ea70f9b 2023-10-20T11:59:22+02:00 cut release v0.15.0
-  - ab438d5 2023-10-20T11:23:02+02:00 http2: enable to disable, limit http2 resources
-  - fe65a9a 2023-10-19T18:45:01+02:00 deps: patch cve-2023-45142, not affecting krp
-  - 2bd1f5a 2023-10-18T10:10:25+02:00 go mod vendor
-  - a9242ef 2023-10-18T10:10:13+02:00 go.mod: bump golang.org/x/net to v0.17.0
-  - 0bc66fd 2023-10-16T17:59:15+02:00 cut release v0.14.4
-  - 3893e96 2023-10-13T10:50:10+02:00 Bump golang version to address CVE-2023-44487
-  - 1ef0e21 2023-10-12T10:59:54+02:00 Bump golang.org/x/net to address CVE-2023-44487
-  - 96da89f 2023-09-15T16:53:57+02:00 Makefile: revert VERSION, add VERSION_SEMVER
-  - 3e2ea8f 2023-09-07T15:30:56+02:00 cut release v0.14.3
-  - 2540d5f 2023-09-07T15:30:55+02:00 go*: update dependencies
-  - e82d1a1 2023-09-05T16:15:33+02:00 version: add ldflags with versioning
-  - bcc5773 2023-09-05T16:15:32+02:00 version: Makefile variable shifting
-  - b90c95c 2023-06-05T17:24:35+02:00 CHANGELOG: v0.14.2, add Make-,Dockerfile change
+- cluster-kube-scheduler-operator embedded-component dd7f55355efb68f3d3566a9405ef70530140e065 to 6e43991c07e36757a00c4ec26888e040917cf2df
+  - 555088b 2023-10-24T16:59:38+02:00 bump(k8s,openshift) to address CVE-2023-44487
 
-- kubernetes image-arm64 88e9b4c0d5978a2879307be87d25c592abb6eeea to f67aeb31c9b95fd8998de8b895ac91bfdf733b2e
-  - b6cf8b4c6 2023-10-19T07:48:27+00:00 UPSTREAM: <carry>: Fix sporadic 141 errors in build-rpms
+- cluster-openshift-controller-manager-operator embedded-component d6ded7f422c87ceea152a22976833f4148d9b954 to 04cec68a4cd060be0f324db5d30f02476a85d20e
+  - 5d7e3fb 2023-10-24T18:35:37+02:00 go mod vendor
+  - a760fcd 2023-10-24T18:35:36+02:00 bump(k8s,openshift) to address CVE-2023-44487
+
+- cluster-policy-controller embedded-component 8af8cf302764c912993869db399b22f6c53b52c5 to 219f6f6f072d867201d4923d39fd8bcaecbe7c59
+  - ed750a3 2023-10-24T18:26:09+02:00 go mod vendor
+  - 0bac2b0 2023-10-24T18:26:08+02:00 bump(k8s,openshift) to address CVE-2023-44487
+
+- etcd embedded-component ce96982907bdf2568473debfcff662793f366028 to 497a17f227c4cacf2fc16626c38f57879ec648be
+  - 3f4128d1 2023-10-19T09:20:24-04:00 Merge pull request #16790 from chaochn47/3.5-grpc-update
+  - 5f7848ee 2023-10-18T12:13:55-04:00 Merge pull request #16781 from chaochn47/release-3.5-backport-gRPC-update
+  - fb86de9c 2023-10-18T12:13:49-04:00 Merge pull request #16625 from chaochn47/release-3.5-backport-gRPC-go-updates
+  - 0e7f053a 2023-10-18T12:13:39-04:00 Merge pull request #16743 from dusk125/3.5-http2
+
+- route-controller-manager embedded-component 0a976ea8bb9f7bf1d0b22730dc0825f976b27ccc to 1a5e72f41b21f5ebcd6f9dd8227d92ad1fffbb1e
+  - 4a20672 2023-10-24T18:30:51+02:00 go mod vendor
+  - a506a70 2023-10-24T18:30:51+02:00 bump(k8s,openshift) to address CVE-2023-44487
+
+- coredns image-amd64 fd70cf1b81d3d3a907663f61b651201de5f8e4e7 to 8341fa72820062869d3a01429ec20a79aebeded0
+  - 1f947c6 2023-10-17T14:36:30-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
+
+- router image-amd64 7cbd1526a359392ead30aa050dc9e2e81ffcc753 to b3af193f191b8d20c0b7bac328cb2c397d5c2c27
+  - 86a3a54 2023-10-20T15:45:51+00:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
+
+- coredns image-arm64 fd70cf1b81d3d3a907663f61b651201de5f8e4e7 to 8341fa72820062869d3a01429ec20a79aebeded0
+  - 1f947c6 2023-10-17T14:36:30-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
+
+- router image-arm64 7cbd1526a359392ead30aa050dc9e2e81ffcc753 to b3af193f191b8d20c0b7bac328cb2c397d5c2c27
+  - 86a3a54 2023-10-20T15:45:51+00:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
 

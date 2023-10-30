@@ -17,7 +17,7 @@ github.com/blang/semver/v4
 # github.com/cenkalti/backoff/v4 v4.1.3
 ## explicit; go 1.13
 github.com/cenkalti/backoff/v4
-# github.com/cespare/xxhash/v2 v2.1.2
+# github.com/cespare/xxhash/v2 v2.2.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
 # github.com/chai2010/gettext-go v1.0.2
@@ -186,7 +186,7 @@ github.com/monochromegane/go-gitignore
 # github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
 ## explicit
 github.com/munnerz/goautoneg
-# github.com/openshift/build-machinery-go v0.0.0-20230306181456-d321ffa04533
+# github.com/openshift/build-machinery-go v0.0.0-20230816154005-5a38e1bfd880
 ## explicit; go 1.13
 github.com/openshift/build-machinery-go
 github.com/openshift/build-machinery-go/make
@@ -253,7 +253,7 @@ github.com/xlab/treeprint
 # go.etcd.io/bbolt v1.3.7
 ## explicit; go 1.17
 go.etcd.io/bbolt
-# go.etcd.io/etcd/api/v3 v3.5.9 => github.com/openshift/etcd/api/v3 v3.5.1-0.20230926113132-ce96982907bd
+# go.etcd.io/etcd/api/v3 v3.5.9 => github.com/openshift/etcd/api/v3 v3.5.1-0.20231027165955-497a17f227c4
 ## explicit; go 1.19
 go.etcd.io/etcd/api/v3/authpb
 go.etcd.io/etcd/api/v3/etcdserverpb
@@ -262,7 +262,7 @@ go.etcd.io/etcd/api/v3/membershippb
 go.etcd.io/etcd/api/v3/mvccpb
 go.etcd.io/etcd/api/v3/v3rpc/rpctypes
 go.etcd.io/etcd/api/v3/version
-# go.etcd.io/etcd/client/pkg/v3 v3.5.9 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20230926113132-ce96982907bd
+# go.etcd.io/etcd/client/pkg/v3 v3.5.9 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20231027165955-497a17f227c4
 ## explicit; go 1.19
 go.etcd.io/etcd/client/pkg/v3/fileutil
 go.etcd.io/etcd/client/pkg/v3/logutil
@@ -275,14 +275,14 @@ go.etcd.io/etcd/client/pkg/v3/types
 # go.etcd.io/etcd/client/v2 v2.305.9
 ## explicit; go 1.19
 go.etcd.io/etcd/client/v2
-# go.etcd.io/etcd/client/v3 v3.5.9 => github.com/openshift/etcd/client/v3 v3.5.1-0.20230926113132-ce96982907bd
+# go.etcd.io/etcd/client/v3 v3.5.9 => github.com/openshift/etcd/client/v3 v3.5.1-0.20231027165955-497a17f227c4
 ## explicit; go 1.19
 go.etcd.io/etcd/client/v3
 go.etcd.io/etcd/client/v3/concurrency
 go.etcd.io/etcd/client/v3/credentials
 go.etcd.io/etcd/client/v3/internal/endpoint
 go.etcd.io/etcd/client/v3/internal/resolver
-# go.etcd.io/etcd/pkg/v3 v3.5.9 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20230926113132-ce96982907bd
+# go.etcd.io/etcd/pkg/v3 v3.5.9 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20231027165955-497a17f227c4
 ## explicit; go 1.19
 go.etcd.io/etcd/pkg/v3/adt
 go.etcd.io/etcd/pkg/v3/contention
@@ -299,14 +299,14 @@ go.etcd.io/etcd/pkg/v3/runtime
 go.etcd.io/etcd/pkg/v3/schedule
 go.etcd.io/etcd/pkg/v3/traceutil
 go.etcd.io/etcd/pkg/v3/wait
-# go.etcd.io/etcd/raft/v3 v3.5.9 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20230926113132-ce96982907bd
+# go.etcd.io/etcd/raft/v3 v3.5.9 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20231027165955-497a17f227c4
 ## explicit; go 1.19
 go.etcd.io/etcd/raft/v3
 go.etcd.io/etcd/raft/v3/confchange
 go.etcd.io/etcd/raft/v3/quorum
 go.etcd.io/etcd/raft/v3/raftpb
 go.etcd.io/etcd/raft/v3/tracker
-# go.etcd.io/etcd/server/v3 v3.5.7 => github.com/openshift/etcd/server/v3 v3.5.1-0.20230926113132-ce96982907bd
+# go.etcd.io/etcd/server/v3 v3.5.7 => github.com/openshift/etcd/server/v3 v3.5.1-0.20231027165955-497a17f227c4
 ## explicit; go 1.19
 go.etcd.io/etcd/server/v3/auth
 go.etcd.io/etcd/server/v3/config
@@ -426,7 +426,6 @@ golang.org/x/crypto/blowfish
 # golang.org/x/net v0.17.0
 ## explicit; go 1.17
 golang.org/x/net/context
-golang.org/x/net/context/ctxhttp
 golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
@@ -435,8 +434,8 @@ golang.org/x/net/internal/socks
 golang.org/x/net/internal/timeseries
 golang.org/x/net/proxy
 golang.org/x/net/trace
-# golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
-## explicit; go 1.11
+# golang.org/x/oauth2 v0.10.0
+## explicit; go 1.17
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
 # golang.org/x/sys v0.13.0
@@ -472,15 +471,21 @@ google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
-# google.golang.org/genproto v0.0.0-20220502173005-c8bf987b8c21
-## explicit; go 1.15
+# google.golang.org/genproto v0.0.0-20230711160842-782d3b101e98
+## explicit; go 1.19
+google.golang.org/genproto/internal
+google.golang.org/genproto/protobuf/field_mask
+# google.golang.org/genproto/googleapis/api v0.0.0-20230711160842-782d3b101e98
+## explicit; go 1.19
+google.golang.org/genproto/googleapis/api
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/httpbody
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98
+## explicit; go 1.19
 google.golang.org/genproto/googleapis/rpc/errdetails
 google.golang.org/genproto/googleapis/rpc/status
-google.golang.org/genproto/protobuf/field_mask
-# google.golang.org/grpc v1.51.0
-## explicit; go 1.17
+# google.golang.org/grpc v1.58.3
+## explicit; go 1.19
 google.golang.org/grpc
 google.golang.org/grpc/attributes
 google.golang.org/grpc/backoff
@@ -513,6 +518,7 @@ google.golang.org/grpc/internal/grpclog
 google.golang.org/grpc/internal/grpcrand
 google.golang.org/grpc/internal/grpcsync
 google.golang.org/grpc/internal/grpcutil
+google.golang.org/grpc/internal/idle
 google.golang.org/grpc/internal/metadata
 google.golang.org/grpc/internal/pretty
 google.golang.org/grpc/internal/resolver
@@ -533,7 +539,7 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# google.golang.org/protobuf v1.28.1
+# google.golang.org/protobuf v1.31.0
 ## explicit; go 1.11
 google.golang.org/protobuf/encoding/protojson
 google.golang.org/protobuf/encoding/prototext
@@ -581,7 +587,7 @@ gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/api v0.27.4 => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231020222044-f67aeb31c9b9
+# k8s.io/api v0.27.7 => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231020222044-f67aeb31c9b9
 ## explicit; go 1.20
 k8s.io/api/admission/v1
 k8s.io/api/admission/v1beta1
@@ -638,7 +644,7 @@ k8s.io/api/scheduling/v1beta1
 k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
-# k8s.io/apimachinery v0.27.4 => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231020222044-f67aeb31c9b9
+# k8s.io/apimachinery v0.27.7 => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231020222044-f67aeb31c9b9
 ## explicit; go 1.20
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
@@ -694,7 +700,7 @@ k8s.io/apimachinery/third_party/forked/golang/reflect
 k8s.io/cli-runtime/pkg/genericclioptions
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v0.27.4 => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20231020222044-f67aeb31c9b9
+# k8s.io/client-go v0.27.7 => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20231020222044-f67aeb31c9b9
 ## explicit; go 1.20
 k8s.io/client-go/applyconfigurations/admissionregistration/v1
 k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1
@@ -840,7 +846,7 @@ k8s.io/client-go/util/homedir
 k8s.io/client-go/util/jsonpath
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/workqueue
-# k8s.io/component-base v0.27.4 => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20231020222044-f67aeb31c9b9
+# k8s.io/component-base v0.27.7 => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20231020222044-f67aeb31c9b9
 ## explicit; go 1.20
 k8s.io/component-base/cli
 k8s.io/component-base/cli/flag
@@ -887,7 +893,7 @@ k8s.io/kubectl/pkg/util/openapi
 k8s.io/kubectl/pkg/util/templates
 k8s.io/kubectl/pkg/util/term
 k8s.io/kubectl/pkg/validation
-# k8s.io/utils v0.0.0-20230505201702-9f6742963106
+# k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 ## explicit; go 1.18
 k8s.io/utils/clock
 k8s.io/utils/clock/testing
@@ -896,6 +902,7 @@ k8s.io/utils/integer
 k8s.io/utils/internal/third_party/forked/golang/net
 k8s.io/utils/net
 k8s.io/utils/pointer
+k8s.io/utils/ptr
 k8s.io/utils/strings/slices
 # sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd
 ## explicit; go 1.18
@@ -984,7 +991,7 @@ sigs.k8s.io/kustomize/kyaml/yaml/merge2
 sigs.k8s.io/kustomize/kyaml/yaml/merge3
 sigs.k8s.io/kustomize/kyaml/yaml/schema
 sigs.k8s.io/kustomize/kyaml/yaml/walk
-# sigs.k8s.io/structured-merge-diff/v4 v4.2.3
+# sigs.k8s.io/structured-merge-diff/v4 v4.3.0
 ## explicit; go 1.13
 sigs.k8s.io/structured-merge-diff/v4/fieldpath
 sigs.k8s.io/structured-merge-diff/v4/merge
@@ -998,12 +1005,12 @@ sigs.k8s.io/yaml
 # github.com/openshift/microshift/pkg/config => ../pkg/config
 # github.com/openshift/microshift/pkg/util/cryptomaterial => ../pkg/util/cryptomaterial
 # github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230317131656-c62d9de5a460
-# go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20230926113132-ce96982907bd
-# go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20230926113132-ce96982907bd
-# go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20230926113132-ce96982907bd
-# go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20230926113132-ce96982907bd
-# go.etcd.io/etcd/raft/v3 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20230926113132-ce96982907bd
-# go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.1-0.20230926113132-ce96982907bd
+# go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20231027165955-497a17f227c4
+# go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20231027165955-497a17f227c4
+# go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20231027165955-497a17f227c4
+# go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20231027165955-497a17f227c4
+# go.etcd.io/etcd/raft/v3 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20231027165955-497a17f227c4
+# go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.1-0.20231027165955-497a17f227c4
 # k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231020222044-f67aeb31c9b9
 # k8s.io/apiextensions-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231020222044-f67aeb31c9b9
 # k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231020222044-f67aeb31c9b9
