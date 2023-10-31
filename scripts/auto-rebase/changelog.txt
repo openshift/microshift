@@ -1,109 +1,80 @@
-- kubernetes embedded-component d9813484616718b02352e5af919bde20b73a1200 to fa9f9097c61b7dd9e7f21c894dba7ed5bd02a62a
-  - aaf560033 2023-10-19T11:56:06-03:00 UPSTREAM: 121196: Prevent rapid reset http2 DOS on API server
-  - d7db39b8d 2023-10-19T11:53:29-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
-  - c3b8416de 2023-10-19T11:53:29-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - a3cc33755 2023-10-19T11:53:29-03:00 UPSTREAM: <drop>: manually resolve conflicts
-  - a8a1abc25 2023-10-18T11:33:16+00:00 Release commit for Kubernetes v1.28.3
-  - 9921ba226 2023-10-13T17:55:28-04:00 Register UnauthenticatedHTTP2DOSMitigation into kube components
-  - 9fa4bdfc5 2023-10-12T19:16:45-04:00 Skip TestUnauthenticatedHTTP2ClientConnectionClose http1 tests
-  - 0f33a62f9 2023-10-12T17:50:33-04:00 Disable UnauthenticatedHTTP2DOSMitigation by default
-  - 238d89c9a 2023-10-12T17:50:06-04:00 Prevent rapid reset http2 DOS on API server
-  - 34f25ff8a 2023-10-12T17:39:49+02:00 Fix concurrent write when filling PVC labels
-  - ebdbb8a20 2023-10-12T17:39:49+02:00 Modify test PVC to detect concurrent map write bug
-  - b5e28b1cd 2023-10-11T17:18:36+02:00 [go] Bump images, dependencies and versions to go 1.20.10
-  - b43fee043 2023-10-11T08:57:15+05:30 Fix to honor PDB with an empty selector `{}`
-  - 1cd2ac995 2023-10-11T03:44:03+05:30 .: bump golang.org/x/net to v0.17.0
-  - cecc0e939 2023-10-09T18:49:31+02:00 Mark a volume as uncertain-attached after detach error
-  - 15101d92e 2023-10-06T18:00:36-04:00 Unit & integration tests for OpenAPIV2 AddUpdateAPIService
-  - 9f4011446 2023-10-06T18:00:36-04:00 Fix 120878 - Refactor cacheabledownloader so handler can be updated and fix AddUpdateAPIService to update handler
-  - 489c08ddf 2023-10-06T17:48:01-04:00 Fix 120739 - Prevent AddUpdateAPIService from blocking on updating spec
-  - d35a00e21 2023-10-06T17:48:01-04:00 Fix 120758 - prevent cache Load on uninitialized spec
-  - 985ef2655 2023-10-06T13:34:31-07:00 Add nil checks for hpa object target type values
-  - 88669d0a2 2023-10-06T11:17:40-04:00 Make a certain ipv4-vs-ipv6 config error non-fatal, for backward compat
-  - 84a3ad357 2023-10-06T15:29:41+02:00 [go] Bump images, versions and deps to use Go 1.20.9
-  - 63fcac91c 2023-09-28T15:12:09+02:00 Only configure swap if available on node
-  - 07a74666c 2023-09-28T15:12:09+02:00 Use local isCgroup2UnifiedMode consistently
-  - 57bbc335f 2023-09-21T14:57:48+00:00 cronjob controller: ensure already existing jobs are added to Active list of cronjobs
-  - 8ea9b219c 2023-09-21T11:38:23+02:00 reintroduce resourcequota.NewMonitor
-  - 794d56966 2023-09-21T01:39:58+00:00 change rolling update logic to exclude sunsetting nodes
-  - a08ec1215 2023-09-20T10:57:46+05:30 vsphere: adapt to govmomi bump
-  - ef63f36ff 2023-09-20T10:57:21+05:30 .: bump govmomi to v0.30.6
-  - aba7c4430 2023-09-14T14:16:57+02:00 Increase range of job_sync_duration_seconds
-  - bcaa53c9c 2023-09-14T06:33:52+00:00 sync Service API status rest storage
-  - a68748c7c 2023-09-13T09:54:55+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.2
-  - 0c6a0c3f6 2023-09-12T22:13:16+08:00 kubeadm: remove reference of k8s.io/kubernetes/pkg/apis/core/v1
-  - 47507f9f0 2023-09-12T11:04:50+08:00 fix race on etcd client constructor for healthchecks
-  - 7d33fba21 2023-09-11T17:47:58+02:00 e2e pods: fix WaitForPodsResponding retry
-  - 2480fce67 2023-09-09T17:59:42-07:00 kmsv2: reload metrics bug fix backport
-  - 110a6fe8a 2023-09-08T21:25:36+02:00 scheduler: start scheduling attempt with clean UnschedulablePlugins
+- cluster-kube-apiserver-operator embedded-component c1fb42cb128d60386aabde57bb62cc7fc626a980 to d01fc2ab557994e27d980483411b2429e53b13f7
+  - e95c0ee 2023-10-18T15:34:04+02:00 vendor: update
+  - 5fbdd44 2023-10-18T15:33:51+02:00 bump(library-go,api)
 
-- machine-config-operator embedded-component 76e4c1867cbf37bd8ba9a953fa83623de817bb93 to fdb3a89e62df24abbacfcd3c278162ef170e60de
-  - 0c9872f8 2023-10-26T13:42:12-04:00 OCPBUGS-7638: typo s/iface_default_hint_file/default_bridge_file/
+- cluster-network-operator embedded-component dfcf824f5f2de626447e35811544ea14e235152a to d7f8573633a33e1ac92832378977611fecf5fd85
+  - 00e6c3a 2023-10-26T13:58:43+00:00 OCPBUGS-11179: change CNO to use custom ServiceAccount
 
-- ovn-kubernetes image-amd64 4229dafc9fa709537f3d5893c6920afc035040ea to 814535a6dbae0124d34a6461355055108aa4e54d
-  - 531c462 2023-10-25T08:33:30+00:00 Fix remove remote pod when no IPs annotated
-  - 7d0df43 2023-10-24T12:52:10-04:00 Bump golang docker version for make check
-  - 0b1e330 2023-10-24T16:55:02+02:00 Remove IsHybridOverlayNode
-  - 810ed6a 2023-10-24T16:55:02+02:00 Handle LabelSelectorAsSelector error
-  - 67f4233 2023-10-24T16:33:27+02:00 Fix bad expected NAT on egressip unit test flake
-  - 45b1447 2023-10-24T14:56:13+02:00 kubevirt, e2e: Retrie VMIM creation
-  - 63608e4 2023-10-23T12:40:47+00:00 Track released live migrated pods on unassigned subnets
-  - 0ca2c4f 2023-10-23T12:40:46+00:00 Don't release completed pods sharing IPs with running pods
-  - d2cd1c3 2023-10-23T09:09:05+00:00 Allocate IPs of completed pods on startup
-  - c16cdea 2023-10-20T13:25:17+02:00 kind: Allow redeploy multi-network-enable OVN-K
-  - 8e81a05 2023-10-20T11:43:42+02:00 Replace deprecated api usage in e2e tests
-  - ab63d36 2023-10-20T11:43:42+02:00 Fix failure with node ip migration test
-  - a5f5ed8 2023-10-20T11:43:42+02:00 Collect metallb logs for lb test failure
-  - e0d2ab8 2023-10-19T09:56:31+02:00 kubevirt: Reserver migrated IPs at add node
-  - a1e196f 2023-10-19T09:56:31+02:00 kubevirt: Refactor unit test
-  - 50a5c60 2023-10-18T13:21:22-04:00 Update OVN 23.09 to latest version - ovn-23.09.0-37.
-  - e3dd38b 2023-10-18T10:01:36+01:00 Cluster manager: fix consumption of HA config file
-  - ab0ec61 2023-10-17T11:12:15+08:00 OVNK/GW: Use openflow13 flow formats
-  - 589b345 2023-10-12T12:51:03+01:00 vhost-vdpa support on secondary network
-  - 8ea6d19 2023-10-12T12:06:17+01:00 DeviceInfo support
-  - 0cab1e2 2023-07-10T14:21:27-07:00 use klog.Warningf while using format specifiers
-  - 93ef6eb 2023-07-10T14:20:29-07:00 use klog.Errorf while using format specifiers
+- cluster-openshift-controller-manager-operator embedded-component 3fb9157b6914c663bce1ba5b37f226533dbc3f78 to f45b3c501fcb9923814d5da0558bf31d1b86a15e
+  - f9ecfca 2023-10-29T13:10:24-04:00 Revert "Merge pull request #300 from sanchezl/image-pull-secret-cleanup-controller"
+  - f5944e8 2023-10-23T13:48:20-04:00 update vendor
+  - 3547130 2023-10-23T13:48:20-04:00 add ImagePullSecretCleanupController
 
-- kubernetes image-amd64 d9813484616718b02352e5af919bde20b73a1200 to fa9f9097c61b7dd9e7f21c894dba7ed5bd02a62a
-  - aaf560033 2023-10-19T11:56:06-03:00 UPSTREAM: 121196: Prevent rapid reset http2 DOS on API server
-  - d7db39b8d 2023-10-19T11:53:29-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
-  - c3b8416de 2023-10-19T11:53:29-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - a3cc33755 2023-10-19T11:53:29-03:00 UPSTREAM: <drop>: manually resolve conflicts
-  - a8a1abc25 2023-10-18T11:33:16+00:00 Release commit for Kubernetes v1.28.3
-  - 9921ba226 2023-10-13T17:55:28-04:00 Register UnauthenticatedHTTP2DOSMitigation into kube components
-  - 9fa4bdfc5 2023-10-12T19:16:45-04:00 Skip TestUnauthenticatedHTTP2ClientConnectionClose http1 tests
-  - 0f33a62f9 2023-10-12T17:50:33-04:00 Disable UnauthenticatedHTTP2DOSMitigation by default
-  - 238d89c9a 2023-10-12T17:50:06-04:00 Prevent rapid reset http2 DOS on API server
-  - 34f25ff8a 2023-10-12T17:39:49+02:00 Fix concurrent write when filling PVC labels
-  - ebdbb8a20 2023-10-12T17:39:49+02:00 Modify test PVC to detect concurrent map write bug
-  - b5e28b1cd 2023-10-11T17:18:36+02:00 [go] Bump images, dependencies and versions to go 1.20.10
-  - b43fee043 2023-10-11T08:57:15+05:30 Fix to honor PDB with an empty selector `{}`
-  - 1cd2ac995 2023-10-11T03:44:03+05:30 .: bump golang.org/x/net to v0.17.0
-  - cecc0e939 2023-10-09T18:49:31+02:00 Mark a volume as uncertain-attached after detach error
-  - 15101d92e 2023-10-06T18:00:36-04:00 Unit & integration tests for OpenAPIV2 AddUpdateAPIService
-  - 9f4011446 2023-10-06T18:00:36-04:00 Fix 120878 - Refactor cacheabledownloader so handler can be updated and fix AddUpdateAPIService to update handler
-  - 489c08ddf 2023-10-06T17:48:01-04:00 Fix 120739 - Prevent AddUpdateAPIService from blocking on updating spec
-  - d35a00e21 2023-10-06T17:48:01-04:00 Fix 120758 - prevent cache Load on uninitialized spec
-  - 985ef2655 2023-10-06T13:34:31-07:00 Add nil checks for hpa object target type values
-  - 88669d0a2 2023-10-06T11:17:40-04:00 Make a certain ipv4-vs-ipv6 config error non-fatal, for backward compat
-  - 84a3ad357 2023-10-06T15:29:41+02:00 [go] Bump images, versions and deps to use Go 1.20.9
-  - 63fcac91c 2023-09-28T15:12:09+02:00 Only configure swap if available on node
-  - 07a74666c 2023-09-28T15:12:09+02:00 Use local isCgroup2UnifiedMode consistently
-  - 57bbc335f 2023-09-21T14:57:48+00:00 cronjob controller: ensure already existing jobs are added to Active list of cronjobs
-  - 8ea9b219c 2023-09-21T11:38:23+02:00 reintroduce resourcequota.NewMonitor
-  - 794d56966 2023-09-21T01:39:58+00:00 change rolling update logic to exclude sunsetting nodes
-  - a08ec1215 2023-09-20T10:57:46+05:30 vsphere: adapt to govmomi bump
-  - ef63f36ff 2023-09-20T10:57:21+05:30 .: bump govmomi to v0.30.6
-  - aba7c4430 2023-09-14T14:16:57+02:00 Increase range of job_sync_duration_seconds
-  - bcaa53c9c 2023-09-14T06:33:52+00:00 sync Service API status rest storage
-  - a68748c7c 2023-09-13T09:54:55+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.2
-  - 0c6a0c3f6 2023-09-12T22:13:16+08:00 kubeadm: remove reference of k8s.io/kubernetes/pkg/apis/core/v1
-  - 47507f9f0 2023-09-12T11:04:50+08:00 fix race on etcd client constructor for healthchecks
-  - 7d33fba21 2023-09-11T17:47:58+02:00 e2e pods: fix WaitForPodsResponding retry
-  - 2480fce67 2023-09-09T17:59:42-07:00 kmsv2: reload metrics bug fix backport
-  - 110a6fe8a 2023-09-08T21:25:36+02:00 scheduler: start scheduling attempt with clean UnschedulablePlugins
+- etcd embedded-component 6fc69d5d835662c88d21fe2ebed024d87b245f88 to 9651438be519d3d4f1b34b4f8d166778aaa3e5ce
+  - 0223ca52 2023-10-27T12:33:25+02:00 version: bump up to 3.5.10
+  - 88beb6ca 2023-10-26T16:32:07+01:00 bump bbolt to 1.3.8 for etcd 3.5
+  - 1aa4aa8a 2023-10-17T11:07:08-07:00 3.5: upgrade gRPC-go to 1.58.3
+  - 5b8150a6 2023-10-17T14:37:14+02:00 Backport corrupt check test fix "etcd server shouldn't wait for the ready notification infinitely on startup"
+  - 04cfb4c6 2023-10-17T13:27:47+02:00 etcdserver: add cluster id check for hashKVHandler
+  - 6f4fa5a2 2023-10-16T21:43:00-07:00 [release-3.5]: upgrade gRPC-go to v1.52.0
+  - db160695 2023-10-12T09:46:49-07:00 backport #14125 to release-3.5: Update to grpc-1.47 (and fix the connection-string format)
+  - 404eeaa7 2023-10-12T15:19:17+02:00 Return to default write scheduler since golang.org/x/net@v0.11.0 started using round robin
+  - b916aff9 2023-10-11T11:07:02-04:00 Bump go to v1.20.10 Part of https://github.com/etcd-io/etcd/issues/16740
+  - 24ee8e49 2023-10-11T10:43:51-04:00 bump golang.org/x/net to 0.17.0 Part of https://github.com/etcd-io/etcd/issues/16740
+  - 19a6ec1c 2023-10-09T23:37:24+02:00 etcd: upgrade go version to 1.20.9
+  - bfb3494c 2023-09-10T21:02:38+12:00 Remove obsolete http 1.0 version.
+  - 078b0807 2023-09-09T20:03:18+05:30 fix:Ensure that go version is only defined in one file for release-3.5
+  - 7816df7f 2023-09-09T21:06:33+08:00 Fix panic in etcd validate secure endpoints
+  - bdae1d39 2023-09-08T17:50:49+01:00 dependency: bump golang to 1.20.8
+  - baa580a0 2023-09-07T20:42:03+12:00 Backport redirect metrics data into file to reduce output.
+  - ad5a6ea6 2023-08-28T21:00:51+08:00 test.sh: increase timeout for grpcproxy test
+  - 68e09def 2023-08-28T21:00:46+08:00 test: add v3 curl test to cover maintenance hash/hashkv REST API
+  - 83bf5dcb 2023-08-28T00:10:33+08:00 api: fix duplicate gateway url issue
+  - 7b8de819 2023-08-25T22:02:45+08:00 pkg: add a verification on the pagebytes which must be > 0
+  - b9e5d966 2023-08-19T21:41:56+12:00 tests: Backport deflake for TestWatchDelay
+  - 778f2260 2023-08-19T21:41:18+12:00 tests: Backport deflake for TestPageWriterRandom
+  - 164175df 2023-08-18T19:14:57+12:00 Backport adding unit test for socket options.
+  - 2a7bffc6 2023-08-18T12:05:19+12:00 Backport export reuse-port and reuse-address
+  - f62a894a 2023-08-11T21:47:30+12:00 Fix goword failure in rafthttp/transport.go.
+  - 9c7c8c6b 2023-08-11T21:16:01+12:00 Backport update to golang 1.20 minor release.
+  - de0df43c 2023-08-02T15:33:10+08:00 bump go version to 1.19.12
+  - 0d829e4b 2023-08-02T14:43:40+12:00 Update workflows to use makefile recipes for unit, integration & e2e-release.
+  - 84b85a0f 2023-08-02T09:12:36+12:00 Backport Makefile recipes for common test commands.
+  - 5df43d97 2023-07-26T21:37:32+08:00 pkg/flags: fix UniqueURLs'Set to remove duplicates in UniqueURLs'uss
+  - f9ae5f80 2023-07-22T11:00:45+12:00 Backport fix to e2e release version identifcation.
+  - a4fa4d3d 2023-07-18T14:53:08-05:00 Backport #14368 to v3.5
+  - eb9bfaa9 2023-07-18T10:54:16-05:00 Follow up https://github.com/etcd-io/etcd/pull/16068#discussion_r1263667496
+  - 6ac9d94d 2023-07-14T19:22:38-05:00 etcdserver: backport check scheduledCompactKeyName and finishedCompactKeyName before writing hash to release-3.5.
+  - 960cd26b 2023-07-14T12:50:21+08:00 Backport #13577 Disable auth gracefully without impacting existing watchers.
+  - 9fa58bfc 2023-07-12T16:54:34+01:00 bump go version to 1.19.11 to fix CVE GO-2023-1878
+  - 4d7b7e5f 2023-07-10T23:17:05+08:00 clientv3: create keepAliveCtxCloser goroutine only if ctx can be canceled
+  - 2921992c 2023-07-10T15:13:13+08:00 [3.5] etcdutl: fix db double closed
+  - 6be3ad36 2023-07-06T16:18:52+08:00 clientv3: remove v3.WithFirstKey() in Barrier.Wait()
+  - d0a56c00 2023-07-03T15:33:01+02:00 update etcdctl flag description for snapshot restores
+  - f6668e0b 2023-07-03T15:31:39+02:00 etcdutl: update description for --mark-compacted and --bump-revision flags in snapshot restore command
+  - 4425ef57 2023-07-03T12:57:12+02:00 Adding optional revision bump and mark compacted to snapshot restore
+  - 6c1f8836 2023-06-28T17:11:26+12:00 Revert "Merge pull request #16119 from natusameer/release-3.5"
+  - c31f2827 2023-06-25T02:00:24+00:00 Add e2e-arm64.yaml and tests-arm64.yaml to release-3.5 scheduled at 1.30
+  - b5f07c9b 2023-06-16T20:37:38+12:00 Backport .github/workflows: Read .go-version as a step and not separate workflow.
+  - 423f9514 2023-06-16T09:42:09+02:00 Add first unit test for authApplierV3
+  - b2fb75d1 2023-06-16T09:14:41+02:00 Early exit auth check on lease puts
+  - 620a6236 2023-06-13T16:45:41+08:00 remove stack log when etcdutl restore
+  - 8cffdbaf 2023-06-11T22:27:02+08:00 etcdserver: fix corruption check when server has just been compacted
+  - dca13c6d 2023-06-09T14:17:37+08:00 replace gobin with go install
+  - 15d2aefb 2023-06-08T21:12:20+12:00 [3.5] Backport updating go to latest patch release 1.19.10
+  - d3d530c5 2023-06-08T14:26:11+08:00 add compact hash check to help
+  - 98117389 2023-05-24T06:58:39+00:00 Fix test of clientv3/naming
+  - 2158f21a 2023-05-23T12:00:21+00:00 clientv3/naming/endpoints: fix endpoints prefix bug fixes bug with multiple endpoints with same prefix
+  - ecfed91e 2023-05-16T11:35:31+08:00 grpcproxy: fix memberlist results not update when proxy node down
 
-- kubernetes image-arm64 fa9f9097c61b7dd9e7f21c894dba7ed5bd02a62a to 993e262f7a5d6457cbbcef7a84b7128f9b0ff8fe
+- kubernetes embedded-component fa9f9097c61b7dd9e7f21c894dba7ed5bd02a62a to 993e262f7a5d6457cbbcef7a84b7128f9b0ff8fe
+  - ae470bcb4 2023-10-24T14:48:42-03:00 UPSTREAM: 121069: Add volume plugin label to SELinux metrics
+  - 57cef9aa5 2023-10-24T13:29:28-03:00 UPSTREAM: 121177: Move SELinux warning metric to be counted once per pod
+
+- machine-config-operator embedded-component fdb3a89e62df24abbacfcd3c278162ef170e60de to 0b8f2a3d04807fa4214596d8838ea238a0a7fb0a
+  - f6dd003f 2023-10-24T11:26:29+00:00 Use the bridge interface name for ofport request
+
+- kubernetes image-amd64 fa9f9097c61b7dd9e7f21c894dba7ed5bd02a62a to 993e262f7a5d6457cbbcef7a84b7128f9b0ff8fe
   - ae470bcb4 2023-10-24T14:48:42-03:00 UPSTREAM: 121069: Add volume plugin label to SELinux metrics
   - 57cef9aa5 2023-10-24T13:29:28-03:00 UPSTREAM: 121177: Move SELinux warning metric to be counted once per pod
 
