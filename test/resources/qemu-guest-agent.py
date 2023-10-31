@@ -47,13 +47,15 @@ def _do_guest_exec(vm_name: str, cmd: str, *args) -> int:
     #    }
     #  }
     result: ExecutionResult = Process().run_process('virsh', *virsh_args)
-    content = json.loads(result.stdout)['return']
-
-    BuiltIn().log(f'guest-exec result: {content}')
+    # check that the "virsh" process exited cleanly.  This is not the same as the guest process's exit code.
     if result.rc != 0:
-        raise RuntimeError(f'virsh command failed:\nstdout={result.stdout}'
+        raise RuntimeError(f'virsh command failed:'
+                           f'\nstdout={result.stdout}'
                            f'\nstderr={result.stderr}'
                            f'\nrc={result.rc}')
+    content = json.loads(result.stdout)['return']
+    BuiltIn().log(f'guest-exec result: {content}')
+
     return content['pid']
 
 
@@ -84,12 +86,14 @@ def _do_guest_exec_status(vm_name: str, pid: int) -> (dict, bool):
     #    }
     #  }
     result: ExecutionResult = Process().run_process('virsh', *virsh_args)
-    content = json.loads(result.stdout)['return']
-    BuiltIn().log(f'guest-exec-status result: {content}')
+    # check that the "virsh" process exited cleanly.  This is not the same as the guest process's exit code.
     if result.rc != 0:
-        raise RuntimeError(f'virsh command failed:\nstdout={result.stdout}'
+        raise RuntimeError(f'virsh command failed:'
+                           f'\nstdout={result.stdout}'
                            f'\nstderr={result.stderr}'
                            f'\nrc={result.rc}')
+    content = json.loads(result.stdout)['return']
+    BuiltIn().log(f'guest-exec-status result: {content}')
     return {
         'rc': content['exitcode'] if 'exitcode' in content else None,
         'stdout': base64.decodebytes(content['out-data'].encode('utf-8')) if 'out-data' in content else '',
