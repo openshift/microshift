@@ -125,6 +125,11 @@ func applyKustomization(kustomization string, kubeconfig string) error {
 		return err
 	}
 
+	// Enable server-side apply to ensure big resources are applied successfully.
+	o.ServerSideApply = true
+	// Force conflicts to ensure that resources are applied even if they have changed on kube.
+	o.ForceConflicts = true
+
 	if err := o.Validate(); err != nil {
 		return err
 	}
