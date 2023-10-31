@@ -10,10 +10,6 @@ name = "microshift"
 version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
-name = "microshift-greenboot"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
-
-[[packages]]
 name = "microshift-networking"
 version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 

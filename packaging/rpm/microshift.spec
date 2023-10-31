@@ -68,7 +68,6 @@ Requires: cri-tools >= 1.25
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
-Requires: microshift-greenboot = %{version}
 Requires: conntrack-tools
 Requires: sos
 Requires: crun
@@ -115,15 +114,6 @@ Requires: jq
 %description networking
 The microshift-networking package provides the networking components necessary for the MicroShift default CNI driver.
 
-
-%package greenboot
-Summary: Greenboot components for MicroShift
-BuildArch: noarch
-Requires: microshift = %{version}
-Requires: greenboot
-
-%description greenboot
-The microshift-greenboot package provides the Greenboot scripts used for verifying that MicroShift is up and running.
 
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
@@ -318,6 +308,10 @@ systemctl enable --now --quiet openvswitch || true
 %dir %{_prefix}/lib/microshift/manifests
 %dir %{_prefix}/lib/microshift/manifests.d
 
+%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
+%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
+%{_datadir}/microshift/functions/greenboot.sh
+
 %files release-info
 %{_datadir}/microshift/release/release*.json
 
@@ -340,14 +334,12 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/configure-ovs.sh
 %{_bindir}/configure-ovs-microshift.sh
 
-%files greenboot
-%{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
-%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
-%{_datadir}/microshift/functions/greenboot.sh
-
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Oct 31 2023 Doug Hellmann <dhellmann@redhat.com> 4.14.1
+- Remove greenboot RPM
+
 * Wed Sep 06 2023 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.14.0
 - Add microshift-sos-report binary
 
