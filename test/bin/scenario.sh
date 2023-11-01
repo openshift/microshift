@@ -47,6 +47,28 @@ set_vm_property() {
     echo "${value}" > "${property_file}"
 }
 
+run_command_on_vm() {
+    local -r vmname="$1"
+    shift
+    local -r command="$*"
+
+    local -r ip=$(get_vm_property "${vmname}" ip)
+    local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
+
+    ssh "redhat@${ip}" -p "${ssh_port}" -t "${command}"
+}
+
+copy_file_to_vm() {
+    local -r vmname="$1"
+    local -r local_filename="$2"
+    local -r remote_filename="$3"
+
+    local -r ip=$(get_vm_property "${vmname}" ip)
+    local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
+
+    scp -P "${ssh_port}" "${local_filename}" "redhat@${ip}:${remote_filename}"
+}
+
 sos_report() {
     if "${SKIP_SOS}"; then
         echo "Skipping sos reports"
@@ -58,16 +80,31 @@ sos_report() {
             # skip log files, etc.
             continue
         fi
-        ip=$(cat "${vmdir}/ip")
-        if [ -z "${ip}" ] ; then
+        local -r vmname=$(basename "${vmdir}")
+        local -r ip=$(get_vm_property "${vmname}" ip)
+        if [ -z "${ip}" ]; then
             # skip hosts without NICs
             # FIXME: use virsh to copy sos report files
             continue
         fi
-        # Copy the sos helper for compatibility, it is only available in 4.14 RPMs
-        scp "${ROOTDIR}/scripts/microshift-sos-report.sh" "redhat@${ip}":/tmp
-        ssh "redhat@${ip}" \
-            "[ -f /usr/bin/microshift-sos-report ] && sudo /usr/bin/microshift-sos-report || sudo PROFILES=network,security /tmp/microshift-sos-report.sh; sudo chmod +r /tmp/sosreport*"
+        # Some scenarios do not start with MicroShift installed, so we
+        # can't rely on the wrapper being there or working if it
+        # is. Copy the script to the host, just in case, along with a
+        # wrapper that knows how to execute it or the installed
+        # version.
+        cat - >/tmp/sos-wrapper.sh <<EOF
+#!/usr/bin/env bash
+if [ -f /usr/bin/microshift-sos-report ]; then
+    sudo /usr/bin/microshift-sos-report
+else
+    sudo chmod +x /tmp/microshift-sos-report.sh
+    sudo PROFILES=network,security /tmp/microshift-sos-report.sh
+fi
+sudo chmod +r /tmp/sosreport*
+EOF
+        copy_file_to_vm "${vmname}" "/tmp/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
+        copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
+        run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
         mkdir -p "${vmdir}/sos"
         scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
     done
