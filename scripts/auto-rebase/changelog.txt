@@ -1,0 +1,3 @@
+# cluster-kube-controller-manager-operator embedded-component cc6a31430749e2e0a1b0d9db18c6e664dd4b626e to 5dcd2221fae708cc47b2ca73e535724514e46730
+cc5dc3a39acecf44651af179a23aade6b06422f8 2023-10-27T16:30:16+02:00 go mod vendor
+b2192b652ecbd28d260c0c5ecb8ddfaa13c022b0 2023-10-27T16:30:16+02:00 bump(k8s,openshift) to address CVE-2023-44487
