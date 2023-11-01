@@ -1,40 +1,5 @@
-- cluster-ingress-operator embedded-component 7e10070c45fe55862f323f6ecc0f7166e802fa24 to d876f5ab48e3748057ec196d90b6f7aae633b081
-  - af86255 2023-10-20T11:21:39-04:00 Bump golang.org/x/net for CVE-2023-44487
-
-- cluster-kube-controller-manager-operator embedded-component 78354fc395484f25482319281fd48a2de4d5c40b to bc9ef03545147204bf6692d02db8e167a023ff44
-  - baa6c26 2023-10-24T14:38:44+02:00 go mod vendor
-  - bf76fd8 2023-10-24T14:38:44+02:00 bump(k8s,openshift) to address CVE-2023-44487
-
-- cluster-kube-scheduler-operator embedded-component dd7f55355efb68f3d3566a9405ef70530140e065 to 6e43991c07e36757a00c4ec26888e040917cf2df
-  - 555088b 2023-10-24T16:59:38+02:00 bump(k8s,openshift) to address CVE-2023-44487
-
-- cluster-openshift-controller-manager-operator embedded-component d6ded7f422c87ceea152a22976833f4148d9b954 to 04cec68a4cd060be0f324db5d30f02476a85d20e
-  - 5d7e3fb 2023-10-24T18:35:37+02:00 go mod vendor
-  - a760fcd 2023-10-24T18:35:36+02:00 bump(k8s,openshift) to address CVE-2023-44487
-
-- cluster-policy-controller embedded-component 8af8cf302764c912993869db399b22f6c53b52c5 to 219f6f6f072d867201d4923d39fd8bcaecbe7c59
-  - ed750a3 2023-10-24T18:26:09+02:00 go mod vendor
-  - 0bac2b0 2023-10-24T18:26:08+02:00 bump(k8s,openshift) to address CVE-2023-44487
-
-- etcd embedded-component ce96982907bdf2568473debfcff662793f366028 to 497a17f227c4cacf2fc16626c38f57879ec648be
-  - 3f4128d1 2023-10-19T09:20:24-04:00 Merge pull request #16790 from chaochn47/3.5-grpc-update
-  - 5f7848ee 2023-10-18T12:13:55-04:00 Merge pull request #16781 from chaochn47/release-3.5-backport-gRPC-update
-  - fb86de9c 2023-10-18T12:13:49-04:00 Merge pull request #16625 from chaochn47/release-3.5-backport-gRPC-go-updates
-  - 0e7f053a 2023-10-18T12:13:39-04:00 Merge pull request #16743 from dusk125/3.5-http2
-
-- route-controller-manager embedded-component 0a976ea8bb9f7bf1d0b22730dc0825f976b27ccc to 1a5e72f41b21f5ebcd6f9dd8227d92ad1fffbb1e
-  - 4a20672 2023-10-24T18:30:51+02:00 go mod vendor
-  - a506a70 2023-10-24T18:30:51+02:00 bump(k8s,openshift) to address CVE-2023-44487
-
-- coredns image-amd64 fd70cf1b81d3d3a907663f61b651201de5f8e4e7 to 8341fa72820062869d3a01429ec20a79aebeded0
-  - 1f947c6 2023-10-17T14:36:30-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
-
-- router image-amd64 7cbd1526a359392ead30aa050dc9e2e81ffcc753 to b3af193f191b8d20c0b7bac328cb2c397d5c2c27
-  - 86a3a54 2023-10-20T15:45:51+00:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
-
-- coredns image-arm64 fd70cf1b81d3d3a907663f61b651201de5f8e4e7 to 8341fa72820062869d3a01429ec20a79aebeded0
-  - 1f947c6 2023-10-17T14:36:30-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
-
-- router image-arm64 7cbd1526a359392ead30aa050dc9e2e81ffcc753 to b3af193f191b8d20c0b7bac328cb2c397d5c2c27
-  - 86a3a54 2023-10-20T15:45:51+00:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
+- machine-config-operator embedded-component 5ac7b4ae0bca76358e4d40f546306775a8e0ea2c to 9a084f98a93edd8f2acf4bcadba45d9b212ae711
+  - 7e1fb719 2023-10-24T10:54:35+02:00 templates: update default featureGates to be in sync with opnehsift/api
+  - bce22a67 2023-10-23T15:43:32+02:00 metrics: only allow http/1.1 request and allowable CipherSuites
+  - 52f960f4 2023-10-23T13:33:23+02:00 vendor: Update library-go and k8s dependencies to latest version
 
