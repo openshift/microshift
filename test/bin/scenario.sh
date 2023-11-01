@@ -611,11 +611,11 @@ Settings
 
 Login
 
-  scenario.sh login <scenario-script> <host>
+  scenario.sh login <scenario-script> [<host>]
 EOF
 }
 
-if [ $# -ne 2 ]; then
+if [ $# -lt 2 ]; then
     usage
     exit 1
 fi
