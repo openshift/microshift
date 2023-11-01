@@ -4,6 +4,7 @@ Documentation       Tests related to the version of MicroShift
 Resource            ../../resources/common.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/microshift-rpm.resource
 Library             Collections
 Library             ../../resources/DataFormats.py
 
@@ -74,19 +75,13 @@ Teardown
     Logout MicroShift Host
 
 Read Expected Versions    # robocop: disable=too-many-calls-in-keyword
-    [Documentation]    Read ../Makefile.version.aarch64.var to find the expected versions
+    [Documentation]    Ask dnf for the version of the MicroShift package to
+    ...    find the expected versions
+    ...
     ...    Sets suite variables FULL_VERSION, MAJOR_VERSION, MINOR_VERSION, and Y_STREAM based on
     ...    the content.
-
-    # The file contains content in this format:
-    #
-    #    OCP_VERSION := 4.14.0-0.nightly-arm64-2023-05-04-012046
-
-    ${unparsed}=    OperatingSystem.Get File    ../Makefile.version.aarch64.var
-
-    # 4.14.0-0.nightly-arm64-2023-05-04-012046
-    ${version_full_raw}=    Fetch From Right    ${unparsed}    :=
-    ${version_full}=    Strip String    ${version_full_raw}
+    # This returns a string like 4.14.0-0.nightly-arm64-2023-05-04-012046
+    ${version_full}=    Get Version Of MicroShift RPM
     Set Suite Variable    \${FULL_VERSION}    ${version_full}
     # 4.14.0
     ${version_short_matches}=    Get Regexp Matches    ${version_full}    ^(\\d+.\\d+.\\d+)
