@@ -1,80 +1,60 @@
-- cluster-kube-apiserver-operator embedded-component c1fb42cb128d60386aabde57bb62cc7fc626a980 to d01fc2ab557994e27d980483411b2429e53b13f7
-  - e95c0ee 2023-10-18T15:34:04+02:00 vendor: update
-  - 5fbdd44 2023-10-18T15:33:51+02:00 bump(library-go,api)
+- cluster-dns-operator embedded-component c18a9f38704b792786d90597b04c570431d7a419 to 25020f49f5ad8aa0f2409e0ac26738b52a9dc2e4
+  - 9155787 2023-10-31T13:07:27-04:00 OCPBUGS-20024: Remove modifiability of maxUnavailable
 
-- cluster-network-operator embedded-component dfcf824f5f2de626447e35811544ea14e235152a to d7f8573633a33e1ac92832378977611fecf5fd85
-  - 00e6c3a 2023-10-26T13:58:43+00:00 OCPBUGS-11179: change CNO to use custom ServiceAccount
+- cluster-ingress-operator embedded-component e2aea389cea067a4c0943b6a835d2533334290f7 to 23ee5bea964b757cfd4a7b1f66581b6ec7cf7647
+  - e9ceaf5 2023-10-25T00:33:55-04:00 clientca-configmap: Remove OperatorNamespace field
+  - 609b059 2023-10-25T00:33:55-04:00 Don't add clientca-configmap finalizer if deleting
 
-- cluster-openshift-controller-manager-operator embedded-component 3fb9157b6914c663bce1ba5b37f226533dbc3f78 to f45b3c501fcb9923814d5da0558bf31d1b86a15e
-  - f9ecfca 2023-10-29T13:10:24-04:00 Revert "Merge pull request #300 from sanchezl/image-pull-secret-cleanup-controller"
-  - f5944e8 2023-10-23T13:48:20-04:00 update vendor
-  - 3547130 2023-10-23T13:48:20-04:00 add ImagePullSecretCleanupController
+- cluster-kube-apiserver-operator embedded-component d01fc2ab557994e27d980483411b2429e53b13f7 to 5ac4554d4ad0f1331f3fb9b437e936e3b29fb735
+  - acd4178 2023-10-12T13:12:48-07:00 manifests/0000_90_kube-apiserver-operator_04_servicemonitor-apiserver: Rename to kube-apiserver-performance-recording-rules
+  - 7457da4 2023-10-10T21:37:41+02:00 manifests: rename API performance dashboard
 
-- etcd embedded-component 6fc69d5d835662c88d21fe2ebed024d87b245f88 to 9651438be519d3d4f1b34b4f8d166778aaa3e5ce
-  - 0223ca52 2023-10-27T12:33:25+02:00 version: bump up to 3.5.10
-  - 88beb6ca 2023-10-26T16:32:07+01:00 bump bbolt to 1.3.8 for etcd 3.5
-  - 1aa4aa8a 2023-10-17T11:07:08-07:00 3.5: upgrade gRPC-go to 1.58.3
-  - 5b8150a6 2023-10-17T14:37:14+02:00 Backport corrupt check test fix "etcd server shouldn't wait for the ready notification infinitely on startup"
-  - 04cfb4c6 2023-10-17T13:27:47+02:00 etcdserver: add cluster id check for hashKVHandler
-  - 6f4fa5a2 2023-10-16T21:43:00-07:00 [release-3.5]: upgrade gRPC-go to v1.52.0
-  - db160695 2023-10-12T09:46:49-07:00 backport #14125 to release-3.5: Update to grpc-1.47 (and fix the connection-string format)
-  - 404eeaa7 2023-10-12T15:19:17+02:00 Return to default write scheduler since golang.org/x/net@v0.11.0 started using round robin
-  - b916aff9 2023-10-11T11:07:02-04:00 Bump go to v1.20.10 Part of https://github.com/etcd-io/etcd/issues/16740
-  - 24ee8e49 2023-10-11T10:43:51-04:00 bump golang.org/x/net to 0.17.0 Part of https://github.com/etcd-io/etcd/issues/16740
-  - 19a6ec1c 2023-10-09T23:37:24+02:00 etcd: upgrade go version to 1.20.9
-  - bfb3494c 2023-09-10T21:02:38+12:00 Remove obsolete http 1.0 version.
-  - 078b0807 2023-09-09T20:03:18+05:30 fix:Ensure that go version is only defined in one file for release-3.5
-  - 7816df7f 2023-09-09T21:06:33+08:00 Fix panic in etcd validate secure endpoints
-  - bdae1d39 2023-09-08T17:50:49+01:00 dependency: bump golang to 1.20.8
-  - baa580a0 2023-09-07T20:42:03+12:00 Backport redirect metrics data into file to reduce output.
-  - ad5a6ea6 2023-08-28T21:00:51+08:00 test.sh: increase timeout for grpcproxy test
-  - 68e09def 2023-08-28T21:00:46+08:00 test: add v3 curl test to cover maintenance hash/hashkv REST API
-  - 83bf5dcb 2023-08-28T00:10:33+08:00 api: fix duplicate gateway url issue
-  - 7b8de819 2023-08-25T22:02:45+08:00 pkg: add a verification on the pagebytes which must be > 0
-  - b9e5d966 2023-08-19T21:41:56+12:00 tests: Backport deflake for TestWatchDelay
-  - 778f2260 2023-08-19T21:41:18+12:00 tests: Backport deflake for TestPageWriterRandom
-  - 164175df 2023-08-18T19:14:57+12:00 Backport adding unit test for socket options.
-  - 2a7bffc6 2023-08-18T12:05:19+12:00 Backport export reuse-port and reuse-address
-  - f62a894a 2023-08-11T21:47:30+12:00 Fix goword failure in rafthttp/transport.go.
-  - 9c7c8c6b 2023-08-11T21:16:01+12:00 Backport update to golang 1.20 minor release.
-  - de0df43c 2023-08-02T15:33:10+08:00 bump go version to 1.19.12
-  - 0d829e4b 2023-08-02T14:43:40+12:00 Update workflows to use makefile recipes for unit, integration & e2e-release.
-  - 84b85a0f 2023-08-02T09:12:36+12:00 Backport Makefile recipes for common test commands.
-  - 5df43d97 2023-07-26T21:37:32+08:00 pkg/flags: fix UniqueURLs'Set to remove duplicates in UniqueURLs'uss
-  - f9ae5f80 2023-07-22T11:00:45+12:00 Backport fix to e2e release version identifcation.
-  - a4fa4d3d 2023-07-18T14:53:08-05:00 Backport #14368 to v3.5
-  - eb9bfaa9 2023-07-18T10:54:16-05:00 Follow up https://github.com/etcd-io/etcd/pull/16068#discussion_r1263667496
-  - 6ac9d94d 2023-07-14T19:22:38-05:00 etcdserver: backport check scheduledCompactKeyName and finishedCompactKeyName before writing hash to release-3.5.
-  - 960cd26b 2023-07-14T12:50:21+08:00 Backport #13577 Disable auth gracefully without impacting existing watchers.
-  - 9fa58bfc 2023-07-12T16:54:34+01:00 bump go version to 1.19.11 to fix CVE GO-2023-1878
-  - 4d7b7e5f 2023-07-10T23:17:05+08:00 clientv3: create keepAliveCtxCloser goroutine only if ctx can be canceled
-  - 2921992c 2023-07-10T15:13:13+08:00 [3.5] etcdutl: fix db double closed
-  - 6be3ad36 2023-07-06T16:18:52+08:00 clientv3: remove v3.WithFirstKey() in Barrier.Wait()
-  - d0a56c00 2023-07-03T15:33:01+02:00 update etcdctl flag description for snapshot restores
-  - f6668e0b 2023-07-03T15:31:39+02:00 etcdutl: update description for --mark-compacted and --bump-revision flags in snapshot restore command
-  - 4425ef57 2023-07-03T12:57:12+02:00 Adding optional revision bump and mark compacted to snapshot restore
-  - 6c1f8836 2023-06-28T17:11:26+12:00 Revert "Merge pull request #16119 from natusameer/release-3.5"
-  - c31f2827 2023-06-25T02:00:24+00:00 Add e2e-arm64.yaml and tests-arm64.yaml to release-3.5 scheduled at 1.30
-  - b5f07c9b 2023-06-16T20:37:38+12:00 Backport .github/workflows: Read .go-version as a step and not separate workflow.
-  - 423f9514 2023-06-16T09:42:09+02:00 Add first unit test for authApplierV3
-  - b2fb75d1 2023-06-16T09:14:41+02:00 Early exit auth check on lease puts
-  - 620a6236 2023-06-13T16:45:41+08:00 remove stack log when etcdutl restore
-  - 8cffdbaf 2023-06-11T22:27:02+08:00 etcdserver: fix corruption check when server has just been compacted
-  - dca13c6d 2023-06-09T14:17:37+08:00 replace gobin with go install
-  - 15d2aefb 2023-06-08T21:12:20+12:00 [3.5] Backport updating go to latest patch release 1.19.10
-  - d3d530c5 2023-06-08T14:26:11+08:00 add compact hash check to help
-  - 98117389 2023-05-24T06:58:39+00:00 Fix test of clientv3/naming
-  - 2158f21a 2023-05-23T12:00:21+00:00 clientv3/naming/endpoints: fix endpoints prefix bug fixes bug with multiple endpoints with same prefix
-  - ecfed91e 2023-05-16T11:35:31+08:00 grpcproxy: fix memberlist results not update when proxy node down
+- cluster-network-operator embedded-component d7f8573633a33e1ac92832378977611fecf5fd85 to d25562d4a52220b7ed3be76bc848ba26eae068f2
+  - 9759c2e 2023-10-27T09:05:11-05:00 ovnkube: disable conntrack on Hybrid Overlay VXLAN port for multizone
+  - 64d3a05 2023-10-27T09:04:53-05:00 ovnkube: clean up manifest subdirs path handling
+  - 8fbfc30 2023-10-27T09:01:56-05:00 ovnkube: ensure ovnkube-node daemonset updates when script library does
+  - 5d8a96c 2023-10-27T09:01:56-05:00 ovnkube: make acl-logging wait a bit for ovn-controller to start
+  - 7e5655c 2023-10-27T09:01:56-05:00 ovnkube: no longer need ovn-ca and ovn-cert volumes
+  - a4a3bf3 2023-10-27T09:01:56-05:00 ovnkube: move ovnkube container script to common library
+  - 1bf5c8b 2023-10-27T09:01:56-05:00 ovnkube: move sbdb container script to common library
+  - 069cebe 2023-10-27T09:01:56-05:00 ovnkube: move nbdb container script to common library
+  - 9d04cb2 2023-10-27T09:01:56-05:00 ovnkube: move rbac proxy container script to common library
+  - ac3b251 2023-10-27T09:01:56-05:00 ovnkube: move audit log rotation container script to common library
+  - e874e2d 2023-10-27T09:01:56-05:00 ovnkube: move northd container script to common library
+  - ec71d60 2023-10-27T09:01:55-05:00 ovnkube: move ovn-controller container script to common library
+  - 2b4f184 2023-10-27T09:01:55-05:00 ovnkube: reduce diff between self-hosted and managed
+  - f641925 2023-10-27T09:01:55-05:00 ovnkube: set all NB_Global options in one go
+  - c59f6ff 2023-10-27T09:01:55-05:00 ovnkube: stop setting a pssl connection
+  - 80ed04a 2023-10-27T09:01:55-05:00 ovnkube: don't need to "kill time" while the cluster converges
+  - 5d8dba7 2023-10-27T09:01:55-05:00 ovnkube: move trim-on-compaction to postStart
+  - 01c5f04 2023-10-27T09:01:55-05:00 ovnkube: reduce readiness probe initialDelaySeconds to 10
+  - bab5296 2023-10-27T09:01:55-05:00 ovnkube: ovn-ctl upgrades the DB for us
+  - 45705c6 2023-10-27T09:01:55-05:00 ovnkube: remove pointless OVN_ARGS shell variable
+  - 991c443 2023-10-27T09:01:55-05:00 ovnkube: remove unused bracketify() function
+  - 9d6cc3b 2023-10-17T17:37:19+02:00 Bump golang.org/x/net
 
-- kubernetes embedded-component fa9f9097c61b7dd9e7f21c894dba7ed5bd02a62a to 993e262f7a5d6457cbbcef7a84b7128f9b0ff8fe
-  - ae470bcb4 2023-10-24T14:48:42-03:00 UPSTREAM: 121069: Add volume plugin label to SELinux metrics
-  - 57cef9aa5 2023-10-24T13:29:28-03:00 UPSTREAM: 121177: Move SELinux warning metric to be counted once per pod
+- kubernetes embedded-component 993e262f7a5d6457cbbcef7a84b7128f9b0ff8fe to 6c8041c1ecaac48c0c1fb220a6d273550c5b2297
+  - 6cf4ee7ce 2023-10-27T14:39:17-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
 
-- machine-config-operator embedded-component fdb3a89e62df24abbacfcd3c278162ef170e60de to 0b8f2a3d04807fa4214596d8838ea238a0a7fb0a
-  - f6dd003f 2023-10-24T11:26:29+00:00 Use the bridge interface name for ofport request
+- machine-config-operator embedded-component 0b8f2a3d04807fa4214596d8838ea238a0a7fb0a to f41e20d6ba3951ac9ce9411f0511558c34e60e53
+  - 643458de 2023-10-24T10:58:54-05:00 fixed import package
+  - a8d553e7 2023-10-18T11:00:15-05:00 fixes bugs for ssh and passwd add a separate onClusterBuild update function
 
-- kubernetes image-amd64 fa9f9097c61b7dd9e7f21c894dba7ed5bd02a62a to 993e262f7a5d6457cbbcef7a84b7128f9b0ff8fe
-  - ae470bcb4 2023-10-24T14:48:42-03:00 UPSTREAM: 121069: Add volume plugin label to SELinux metrics
-  - 57cef9aa5 2023-10-24T13:29:28-03:00 UPSTREAM: 121177: Move SELinux warning metric to be counted once per pod
+- oc image-amd64 3544c64b893926687ae799475168d6389022c121 to f67a45d28df578b29be8f539dd614f1497865082
+  - c839adff 2023-10-30T11:41:21-04:00 Updating content type variable name for CLI docs generation
+
+- router image-amd64 a97e096c9d3e14a68bef9dfe140ee262fb7ba973 to fb70ac4d547954e7f96c12b4bc329917f1695d35
+  - fb70ac4 2023-10-30T17:12:48+00:00 OCPBUGS-6958: Fix clipHAProxyTimeoutValue (#483)
+
+- kubernetes image-amd64 993e262f7a5d6457cbbcef7a84b7128f9b0ff8fe to 6c8041c1ecaac48c0c1fb220a6d273550c5b2297
+  - 6cf4ee7ce 2023-10-27T14:39:17-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+
+- oc image-arm64 3544c64b893926687ae799475168d6389022c121 to f67a45d28df578b29be8f539dd614f1497865082
+  - c839adff 2023-10-30T11:41:21-04:00 Updating content type variable name for CLI docs generation
+
+- router image-arm64 a97e096c9d3e14a68bef9dfe140ee262fb7ba973 to fb70ac4d547954e7f96c12b4bc329917f1695d35
+  - fb70ac4 2023-10-30T17:12:48+00:00 OCPBUGS-6958: Fix clipHAProxyTimeoutValue (#483)
+
+- kubernetes image-arm64 993e262f7a5d6457cbbcef7a84b7128f9b0ff8fe to 6c8041c1ecaac48c0c1fb220a6d273550c5b2297
+  - 6cf4ee7ce 2023-10-27T14:39:17-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
 
