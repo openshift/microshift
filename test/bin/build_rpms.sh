@@ -10,6 +10,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 cd "${ROOTDIR}"
+echo "Cleaning up any old builds"
 rm -rf _output/rpmbuild*
 
 # Normal build of current branch from source
@@ -21,7 +22,7 @@ if [ -v CI_JOB_NAME ] && [ "${UNAME_M}" == "x86_64" ]; then
     BUILD_CMDS=('make rpm-podman')
 fi
 
-BUILD_CMDS+=( 
+BUILD_CMDS+=(
     # Build RPMs with the version number of the next minor release,
     # but using the same source code as the normal build.
     'make -C test/ fake-next-minor-rpm' \
@@ -44,6 +45,8 @@ echo will cite | parallel --citation &>/dev/null
 # Run the commands in parallel
 # Avoid --progress option because it requires tty and
 # it slows down execution in interactive shells
+echo "Starting parallel builds:"
+printf -- "  - %s\n" "${BUILD_CMDS[@]}"
 BUILD_OK=true
 if ! parallel --results "${BUILD_RPMS_LOG}" \
         --jobs "${NUM_BUILD_CMDS}" \
@@ -53,7 +56,7 @@ fi
 
 if [ -f "${BUILD_RPMS_LOG}" ] ; then
     jq < "${BUILD_RPMS_LOG}"
-else 
+else
     echo "The RPM build log file does not exist"
     BUILD_OK=false
 fi
