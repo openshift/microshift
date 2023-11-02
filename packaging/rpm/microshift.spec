@@ -31,7 +31,8 @@
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
    restorecon -R /var/lib/microshift-backups; \
    restorecon -R /etc/microshift; \
-   restorecon -R /usr/lib/microshift; \
+   restorecon -R /usr/lib/microshift
+%define microshift_relabel_exes() \
    restorecon -v /usr/bin/microshift; \
    restorecon -v /usr/bin/microshift-etcd
 
@@ -258,6 +259,9 @@ usermod -a -G hugetlbfs openvswitch
 
 %post
 
+# This can be called only after microshift executable files are installed
+%microshift_relabel_exes
+
 %systemd_post microshift.service
 
 # only for install, not on upgrades
@@ -349,6 +353,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Nov 01 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
+- Fix selinux labeling for microshift executable files
+
 * Wed Sep 06 2023 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.14.0
 - Add microshift-sos-report binary
 
