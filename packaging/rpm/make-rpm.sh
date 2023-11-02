@@ -72,8 +72,9 @@ EOF
 }
 
 print_info() {
-  title "RPM info"
-  for dir in ${RPM_INFO_DIRS}; do
+  local dirs=$1
+  title "RPM info from ${dirs}"
+  for dir in ${dirs}; do
     find "${RPMBUILD_DIR}${dir}" -type f -exec sh -c 'i=$1; echo "${i}" && rpm -qip --dump "${i}" && echo' shell {} \;
   done
 }
@@ -152,5 +153,5 @@ if [ "${CHECK_SRPMS}" = "y" ]; then
 fi
 
 if [ -n "${RPM_INFO}" ]; then
-  print_info
+  print_info "${RPM_INFO_DIRS}"
 fi
