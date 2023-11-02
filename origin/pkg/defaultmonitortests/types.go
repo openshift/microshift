@@ -2,6 +2,7 @@ package defaultmonitortests
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/openshift/origin/pkg/monitortests/kubeapiserver/apiservergracefulrestart"
 
@@ -44,6 +45,9 @@ import (
 )
 
 func NewMonitorTestsFor(info monitortestframework.MonitorTestInitializationInfo) monitortestframework.MonitorTestRegistry {
+	if os.Getenv("MICROSHIFT_SKIP_MONITOR_TESTS") == "true" {
+		return monitortestframework.NewMonitorTestRegistry()
+	}
 	switch info.ClusterStabilityDuringTest {
 	case monitortestframework.Stable:
 		return newDefaultMonitorTests(info)
