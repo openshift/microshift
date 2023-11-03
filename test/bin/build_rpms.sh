@@ -15,8 +15,9 @@ rm -rf _output/rpmbuild*
 # Normal build of current branch from source
 BUILD_CMDS=('make rpm')
 
-# In CI, build the current branch from source with the build tools using used by OCP.
-if [ -v CI_JOB_NAME ] ; then
+# In CI, build the current branch from source with the build tools using used by OCP
+# (only for x86_64 - no FIPS support on ARM and no build image for ARM).
+if [ -v CI_JOB_NAME ] && [ "${UNAME_M}" == "x86_64" ]; then
     BUILD_CMDS=('make rpm-podman')
 fi
 
