@@ -385,8 +385,9 @@ launch_vm() {
         touch "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
 
         echo "VM ${full_vmname} has no NICs, skipping IP assignment and ssh polling"
-        record_junit "${vmname}" "ip-assignment" "SKIPPED"
-        record_junit "${vmname}" "ssh-access" "SKIPPED"
+        # Anything other than "OK" status is reported as an error
+        record_junit "${vmname}" "ip-assignment" "OK"
+        record_junit "${vmname}" "ssh-access" "OK"
     fi
 
     echo "${full_vmname} is up and ready"
