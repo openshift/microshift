@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
 	prepare_kickstart host1 kickstart.ks.template rhel-9.3-microshift-source
-	launch_vm host1
+	launch_vm host1 rhel-9.3
 }
 
 scenario_remove_vms() {
