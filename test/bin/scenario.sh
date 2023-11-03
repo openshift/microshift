@@ -191,12 +191,19 @@ record_junit() {
 <testcase classname="${SCENARIO} ${vmname}" name="${step}">
 EOF
 
-    if [ "${results}" != "OK" ]; then
+    case "${results}" in
+        OK)
+        ;;
+        SKIP*)
         cat - >>"${outputfile}" <<EOF
-<failure message="${results}" type="${step}-failure">
-</failure>
+<skipped message="${results}" type="${step}-skipped" />
 EOF
-    fi
+        ;;
+        *)
+        cat - >>"${outputfile}" <<EOF
+<failure message="${results}" type="${step}-failure" />
+EOF
+    esac
 
     cat - >>"${outputfile}" <<EOF
 </testcase>
