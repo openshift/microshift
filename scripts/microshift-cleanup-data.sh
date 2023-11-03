@@ -46,6 +46,10 @@ function stop_clean_pods() {
     # It is necessary to remove the pods (OVN-related last) to allow for further termination
     # of processes (i.e. conmon, etc.) that use the files under /var/run/ovn.
     # The cleanup of OVN data only works if the files under /var/run/ovn are not in use.
+    if [ ! -e /var/run/crio/crio.sock ]; then
+        echo "crio.sock is not present, not attempting to clean up pods"
+        return 0
+    fi
     echo Removing MicroShift pods
     for i in "${!PODS_NS_LIST[@]}"; do
         local ns
