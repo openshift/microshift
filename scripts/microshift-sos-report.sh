@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+set -x
 
 SCRIPT_NAME=$(basename "$0")
 PROFILES="network,security,microshift"
@@ -40,8 +41,9 @@ if [ ! -d "${TEMPDIR}" ]; then
     exit 1
 fi
 
+sos report --list-plugins --list-presets --list-profiles || true
+
 sos report \
-  --quiet \
   --batch \
   --all-logs \
   --tmp-dir "${TEMPDIR}" \
