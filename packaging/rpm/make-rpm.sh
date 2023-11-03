@@ -24,6 +24,9 @@ GITHUB_SHA="${GIT_SHA:0:7}"
 TARBALL_FILE="microshift-${GITHUB_SHA}.tar.gz"
 DEFAULT_RPMBUILD_DIR="$(git rev-parse --show-toplevel)/_output/rpmbuild/"
 RPMBUILD_DIR="${RPMBUILD_DIR:-${DEFAULT_RPMBUILD_DIR}}"
+RPM_INFO_DIRS=""
+CHECK_RPMS="n"
+CHECK_SRPMS="n"
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
@@ -68,6 +71,29 @@ EOF
   rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" --define "_binary_payload w19T8.zstdio" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
+print_info() {
+  local dirs=$1
+  title "RPM info from ${dirs}"
+  for dir in ${dirs}; do
+    find "${RPMBUILD_DIR}${dir}" -type f -exec sh -c 'i=$1; echo "${i}" && rpm -qip --dump "${i}" && echo' shell {} \;
+  done
+}
+
+check_built_rpms() {
+  local dir=$1
+  local rpm_list=$2
+  local rpm_not_found=""
+  for rpm in ${rpm_list}; do
+    if [ ! "$(find "${RPMBUILD_DIR}${dir}" -name "${rpm}-${MICROSHIFT_VERSION}*.rpm")" ]; then
+      rpm_not_found="${rpm}-${MICROSHIFT_VERSION} ${rpm_not_found}"
+    fi
+  done
+  if [ -n "${rpm_not_found}" ]; then
+    echo "RPMs [${rpm_not_found}] not found"
+    exit 1
+  fi
+}
+
 usage() {
   echo "Usage: $(basename "$0") <all | rpm | srpm> < local | commit <commit-id> >"
   exit 1
@@ -76,10 +102,24 @@ usage() {
 [ $# -lt 2 ] && usage
 
 case $1 in
-  all)  RPMBUILD_OPT=-ba ;;
-  rpm)  RPMBUILD_OPT=-bb ;;
-  srpm) RPMBUILD_OPT=-bs ;;
-  *)    usage
+  all)
+    RPMBUILD_OPT=-ba
+    RPM_INFO_DIRS="RPMS SRPMS"
+    CHECK_RPMS="y"
+    CHECK_SRPMS="y"
+    ;;
+  rpm)
+    RPMBUILD_OPT=-bb
+    RPM_INFO_DIRS="RPMS"
+    CHECK_RPMS="y"
+    ;;
+  srpm)
+    RPMBUILD_OPT=-bs
+    RPM_INFO_DIRS="SRPMS"
+    CHECK_SRPMS="y"
+    ;;
+  *)
+    usage
 esac
 shift
 
@@ -103,3 +143,15 @@ case $1 in
     *)
       usage
 esac
+
+if [ "${CHECK_RPMS}" = "y" ]; then
+  check_built_rpms "RPMS" "microshift microshift-networking microshift-greenboot microshift-selinux microshift-release-info"
+fi
+
+if [ "${CHECK_SRPMS}" = "y" ]; then
+  check_built_rpms "SRPMS" "microshift"
+fi
+
+if [ -n "${RPM_INFO}" ]; then
+  print_info "${RPM_INFO_DIRS}"
+fi
