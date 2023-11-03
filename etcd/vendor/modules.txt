@@ -250,11 +250,11 @@ github.com/xiang90/probing
 # github.com/xlab/treeprint v1.1.0
 ## explicit; go 1.13
 github.com/xlab/treeprint
-# go.etcd.io/bbolt v1.3.7
+# go.etcd.io/bbolt v1.3.8
 ## explicit; go 1.17
 go.etcd.io/bbolt
-# go.etcd.io/etcd/api/v3 v3.5.9 => github.com/openshift/etcd/api/v3 v3.5.1-0.20231027165955-497a17f227c4
-## explicit; go 1.19
+# go.etcd.io/etcd/api/v3 v3.5.10 => github.com/openshift/etcd/api/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+## explicit; go 1.20
 go.etcd.io/etcd/api/v3/authpb
 go.etcd.io/etcd/api/v3/etcdserverpb
 go.etcd.io/etcd/api/v3/etcdserverpb/gw
@@ -262,8 +262,8 @@ go.etcd.io/etcd/api/v3/membershippb
 go.etcd.io/etcd/api/v3/mvccpb
 go.etcd.io/etcd/api/v3/v3rpc/rpctypes
 go.etcd.io/etcd/api/v3/version
-# go.etcd.io/etcd/client/pkg/v3 v3.5.9 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20231027165955-497a17f227c4
-## explicit; go 1.19
+# go.etcd.io/etcd/client/pkg/v3 v3.5.10 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+## explicit; go 1.20
 go.etcd.io/etcd/client/pkg/v3/fileutil
 go.etcd.io/etcd/client/pkg/v3/logutil
 go.etcd.io/etcd/client/pkg/v3/pathutil
@@ -272,18 +272,18 @@ go.etcd.io/etcd/client/pkg/v3/systemd
 go.etcd.io/etcd/client/pkg/v3/tlsutil
 go.etcd.io/etcd/client/pkg/v3/transport
 go.etcd.io/etcd/client/pkg/v3/types
-# go.etcd.io/etcd/client/v2 v2.305.9
-## explicit; go 1.19
+# go.etcd.io/etcd/client/v2 v2.305.10
+## explicit; go 1.20
 go.etcd.io/etcd/client/v2
-# go.etcd.io/etcd/client/v3 v3.5.9 => github.com/openshift/etcd/client/v3 v3.5.1-0.20231027165955-497a17f227c4
-## explicit; go 1.19
+# go.etcd.io/etcd/client/v3 v3.5.10 => github.com/openshift/etcd/client/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+## explicit; go 1.20
 go.etcd.io/etcd/client/v3
 go.etcd.io/etcd/client/v3/concurrency
 go.etcd.io/etcd/client/v3/credentials
 go.etcd.io/etcd/client/v3/internal/endpoint
 go.etcd.io/etcd/client/v3/internal/resolver
-# go.etcd.io/etcd/pkg/v3 v3.5.9 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20231027165955-497a17f227c4
-## explicit; go 1.19
+# go.etcd.io/etcd/pkg/v3 v3.5.10 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+## explicit; go 1.20
 go.etcd.io/etcd/pkg/v3/adt
 go.etcd.io/etcd/pkg/v3/contention
 go.etcd.io/etcd/pkg/v3/cpuutil
@@ -299,15 +299,15 @@ go.etcd.io/etcd/pkg/v3/runtime
 go.etcd.io/etcd/pkg/v3/schedule
 go.etcd.io/etcd/pkg/v3/traceutil
 go.etcd.io/etcd/pkg/v3/wait
-# go.etcd.io/etcd/raft/v3 v3.5.9 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20231027165955-497a17f227c4
-## explicit; go 1.19
+# go.etcd.io/etcd/raft/v3 v3.5.10 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+## explicit; go 1.20
 go.etcd.io/etcd/raft/v3
 go.etcd.io/etcd/raft/v3/confchange
 go.etcd.io/etcd/raft/v3/quorum
 go.etcd.io/etcd/raft/v3/raftpb
 go.etcd.io/etcd/raft/v3/tracker
-# go.etcd.io/etcd/server/v3 v3.5.7 => github.com/openshift/etcd/server/v3 v3.5.1-0.20231027165955-497a17f227c4
-## explicit; go 1.19
+# go.etcd.io/etcd/server/v3 v3.5.7 => github.com/openshift/etcd/server/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+## explicit; go 1.20
 go.etcd.io/etcd/server/v3/auth
 go.etcd.io/etcd/server/v3/config
 go.etcd.io/etcd/server/v3/datadir
@@ -1005,12 +1005,12 @@ sigs.k8s.io/yaml
 # github.com/openshift/microshift/pkg/config => ../pkg/config
 # github.com/openshift/microshift/pkg/util/cryptomaterial => ../pkg/util/cryptomaterial
 # github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230317131656-c62d9de5a460
-# go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20231027165955-497a17f227c4
-# go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20231027165955-497a17f227c4
-# go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20231027165955-497a17f227c4
-# go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20231027165955-497a17f227c4
-# go.etcd.io/etcd/raft/v3 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20231027165955-497a17f227c4
-# go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.1-0.20231027165955-497a17f227c4
+# go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+# go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+# go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+# go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+# go.etcd.io/etcd/raft/v3 => github.com/openshift/etcd/raft/v3 v3.5.1-0.20231101164224-ba21c5bca59a
+# go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.1-0.20231101164224-ba21c5bca59a
 # k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231020222044-f67aeb31c9b9
 # k8s.io/apiextensions-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231020222044-f67aeb31c9b9
 # k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231020222044-f67aeb31c9b9

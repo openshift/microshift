@@ -1,40 +1,72 @@
-- cluster-ingress-operator embedded-component 7e10070c45fe55862f323f6ecc0f7166e802fa24 to d876f5ab48e3748057ec196d90b6f7aae633b081
-  - af86255 2023-10-20T11:21:39-04:00 Bump golang.org/x/net for CVE-2023-44487
+- cluster-kube-apiserver-operator embedded-component 8b38d12efe5f4c4906473acbe53e36961e91490f to edaeaedba6a90aa6ada77b7c86356432abb8e10e
+  - a74640b 2023-10-30T21:07:08+00:00 manifests: rename API performance dashboard
 
-- cluster-kube-controller-manager-operator embedded-component 78354fc395484f25482319281fd48a2de4d5c40b to bc9ef03545147204bf6692d02db8e167a023ff44
-  - baa6c26 2023-10-24T14:38:44+02:00 go mod vendor
-  - bf76fd8 2023-10-24T14:38:44+02:00 bump(k8s,openshift) to address CVE-2023-44487
+- etcd embedded-component 497a17f227c4cacf2fc16626c38f57879ec648be to ba21c5bca59afce3800577c1cbb073c5556ca990
+  - 0223ca52 2023-10-27T12:33:25+02:00 version: bump up to 3.5.10
+  - 88beb6ca 2023-10-26T16:32:07+01:00 bump bbolt to 1.3.8 for etcd 3.5
+  - 1aa4aa8a 2023-10-17T11:07:08-07:00 3.5: upgrade gRPC-go to 1.58.3
+  - 5b8150a6 2023-10-17T14:37:14+02:00 Backport corrupt check test fix "etcd server shouldn't wait for the ready notification infinitely on startup"
+  - 04cfb4c6 2023-10-17T13:27:47+02:00 etcdserver: add cluster id check for hashKVHandler
+  - 6f4fa5a2 2023-10-16T21:43:00-07:00 [release-3.5]: upgrade gRPC-go to v1.52.0
+  - db160695 2023-10-12T09:46:49-07:00 backport #14125 to release-3.5: Update to grpc-1.47 (and fix the connection-string format)
+  - 404eeaa7 2023-10-12T15:19:17+02:00 Return to default write scheduler since golang.org/x/net@v0.11.0 started using round robin
+  - b916aff9 2023-10-11T11:07:02-04:00 Bump go to v1.20.10 Part of https://github.com/etcd-io/etcd/issues/16740
+  - 24ee8e49 2023-10-11T10:43:51-04:00 bump golang.org/x/net to 0.17.0 Part of https://github.com/etcd-io/etcd/issues/16740
+  - 19a6ec1c 2023-10-09T23:37:24+02:00 etcd: upgrade go version to 1.20.9
+  - bfb3494c 2023-09-10T21:02:38+12:00 Remove obsolete http 1.0 version.
+  - 078b0807 2023-09-09T20:03:18+05:30 fix:Ensure that go version is only defined in one file for release-3.5
+  - 7816df7f 2023-09-09T21:06:33+08:00 Fix panic in etcd validate secure endpoints
+  - bdae1d39 2023-09-08T17:50:49+01:00 dependency: bump golang to 1.20.8
+  - baa580a0 2023-09-07T20:42:03+12:00 Backport redirect metrics data into file to reduce output.
+  - ad5a6ea6 2023-08-28T21:00:51+08:00 test.sh: increase timeout for grpcproxy test
+  - 68e09def 2023-08-28T21:00:46+08:00 test: add v3 curl test to cover maintenance hash/hashkv REST API
+  - 83bf5dcb 2023-08-28T00:10:33+08:00 api: fix duplicate gateway url issue
+  - 7b8de819 2023-08-25T22:02:45+08:00 pkg: add a verification on the pagebytes which must be > 0
+  - b9e5d966 2023-08-19T21:41:56+12:00 tests: Backport deflake for TestWatchDelay
+  - 778f2260 2023-08-19T21:41:18+12:00 tests: Backport deflake for TestPageWriterRandom
+  - 164175df 2023-08-18T19:14:57+12:00 Backport adding unit test for socket options.
+  - 2a7bffc6 2023-08-18T12:05:19+12:00 Backport export reuse-port and reuse-address
+  - f62a894a 2023-08-11T21:47:30+12:00 Fix goword failure in rafthttp/transport.go.
+  - 9c7c8c6b 2023-08-11T21:16:01+12:00 Backport update to golang 1.20 minor release.
+  - de0df43c 2023-08-02T15:33:10+08:00 bump go version to 1.19.12
+  - 0d829e4b 2023-08-02T14:43:40+12:00 Update workflows to use makefile recipes for unit, integration & e2e-release.
+  - 84b85a0f 2023-08-02T09:12:36+12:00 Backport Makefile recipes for common test commands.
+  - 5df43d97 2023-07-26T21:37:32+08:00 pkg/flags: fix UniqueURLs'Set to remove duplicates in UniqueURLs'uss
+  - f9ae5f80 2023-07-22T11:00:45+12:00 Backport fix to e2e release version identifcation.
+  - a4fa4d3d 2023-07-18T14:53:08-05:00 Backport #14368 to v3.5
+  - eb9bfaa9 2023-07-18T10:54:16-05:00 Follow up https://github.com/etcd-io/etcd/pull/16068#discussion_r1263667496
+  - 6ac9d94d 2023-07-14T19:22:38-05:00 etcdserver: backport check scheduledCompactKeyName and finishedCompactKeyName before writing hash to release-3.5.
+  - 960cd26b 2023-07-14T12:50:21+08:00 Backport #13577 Disable auth gracefully without impacting existing watchers.
+  - 9fa58bfc 2023-07-12T16:54:34+01:00 bump go version to 1.19.11 to fix CVE GO-2023-1878
+  - 4d7b7e5f 2023-07-10T23:17:05+08:00 clientv3: create keepAliveCtxCloser goroutine only if ctx can be canceled
+  - 2921992c 2023-07-10T15:13:13+08:00 [3.5] etcdutl: fix db double closed
+  - 6be3ad36 2023-07-06T16:18:52+08:00 clientv3: remove v3.WithFirstKey() in Barrier.Wait()
+  - d0a56c00 2023-07-03T15:33:01+02:00 update etcdctl flag description for snapshot restores
+  - f6668e0b 2023-07-03T15:31:39+02:00 etcdutl: update description for --mark-compacted and --bump-revision flags in snapshot restore command
+  - 4425ef57 2023-07-03T12:57:12+02:00 Adding optional revision bump and mark compacted to snapshot restore
+  - 6c1f8836 2023-06-28T17:11:26+12:00 Revert "Merge pull request #16119 from natusameer/release-3.5"
+  - c31f2827 2023-06-25T02:00:24+00:00 Add e2e-arm64.yaml and tests-arm64.yaml to release-3.5 scheduled at 1.30
+  - b5f07c9b 2023-06-16T20:37:38+12:00 Backport .github/workflows: Read .go-version as a step and not separate workflow.
+  - 423f9514 2023-06-16T09:42:09+02:00 Add first unit test for authApplierV3
+  - b2fb75d1 2023-06-16T09:14:41+02:00 Early exit auth check on lease puts
+  - 620a6236 2023-06-13T16:45:41+08:00 remove stack log when etcdutl restore
+  - 8cffdbaf 2023-06-11T22:27:02+08:00 etcdserver: fix corruption check when server has just been compacted
+  - dca13c6d 2023-06-09T14:17:37+08:00 replace gobin with go install
+  - 15d2aefb 2023-06-08T21:12:20+12:00 [3.5] Backport updating go to latest patch release 1.19.10
+  - d3d530c5 2023-06-08T14:26:11+08:00 add compact hash check to help
+  - 98117389 2023-05-24T06:58:39+00:00 Fix test of clientv3/naming
+  - 2158f21a 2023-05-23T12:00:21+00:00 clientv3/naming/endpoints: fix endpoints prefix bug fixes bug with multiple endpoints with same prefix
+  - ecfed91e 2023-05-16T11:35:31+08:00 grpcproxy: fix memberlist results not update when proxy node down
 
-- cluster-kube-scheduler-operator embedded-component dd7f55355efb68f3d3566a9405ef70530140e065 to 6e43991c07e36757a00c4ec26888e040917cf2df
-  - 555088b 2023-10-24T16:59:38+02:00 bump(k8s,openshift) to address CVE-2023-44487
+- machine-config-operator embedded-component 5ac7b4ae0bca76358e4d40f546306775a8e0ea2c to f86362b7e020e181e6cbfa4359061c0f474eda03
+  - 7e1fb719 2023-10-24T10:54:35+02:00 templates: update default featureGates to be in sync with opnehsift/api
+  - bce22a67 2023-10-23T15:43:32+02:00 metrics: only allow http/1.1 request and allowable CipherSuites
+  - 52f960f4 2023-10-23T13:33:23+02:00 vendor: Update library-go and k8s dependencies to latest version
+  - d5cdfe4e 2023-10-03T18:08:07+00:00 Fix OCPBUGS-19708
 
-- cluster-openshift-controller-manager-operator embedded-component d6ded7f422c87ceea152a22976833f4148d9b954 to 04cec68a4cd060be0f324db5d30f02476a85d20e
-  - 5d7e3fb 2023-10-24T18:35:37+02:00 go mod vendor
-  - a760fcd 2023-10-24T18:35:36+02:00 bump(k8s,openshift) to address CVE-2023-44487
+- oc image-amd64 0c63f9da2694c080257111616c60005f32a5bf47 to 035884cf4ed582a84b261830f9a265a71b11e2fa
+  - 4955b096 2023-10-12T17:49:08+00:00 regeneratemco: explicitly check for PlatformStatus field
 
-- cluster-policy-controller embedded-component 8af8cf302764c912993869db399b22f6c53b52c5 to 219f6f6f072d867201d4923d39fd8bcaecbe7c59
-  - ed750a3 2023-10-24T18:26:09+02:00 go mod vendor
-  - 0bac2b0 2023-10-24T18:26:08+02:00 bump(k8s,openshift) to address CVE-2023-44487
-
-- etcd embedded-component ce96982907bdf2568473debfcff662793f366028 to 497a17f227c4cacf2fc16626c38f57879ec648be
-  - 3f4128d1 2023-10-19T09:20:24-04:00 Merge pull request #16790 from chaochn47/3.5-grpc-update
-  - 5f7848ee 2023-10-18T12:13:55-04:00 Merge pull request #16781 from chaochn47/release-3.5-backport-gRPC-update
-  - fb86de9c 2023-10-18T12:13:49-04:00 Merge pull request #16625 from chaochn47/release-3.5-backport-gRPC-go-updates
-  - 0e7f053a 2023-10-18T12:13:39-04:00 Merge pull request #16743 from dusk125/3.5-http2
-
-- route-controller-manager embedded-component 0a976ea8bb9f7bf1d0b22730dc0825f976b27ccc to 1a5e72f41b21f5ebcd6f9dd8227d92ad1fffbb1e
-  - 4a20672 2023-10-24T18:30:51+02:00 go mod vendor
-  - a506a70 2023-10-24T18:30:51+02:00 bump(k8s,openshift) to address CVE-2023-44487
-
-- coredns image-amd64 fd70cf1b81d3d3a907663f61b651201de5f8e4e7 to 8341fa72820062869d3a01429ec20a79aebeded0
-  - 1f947c6 2023-10-17T14:36:30-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
-
-- router image-amd64 7cbd1526a359392ead30aa050dc9e2e81ffcc753 to b3af193f191b8d20c0b7bac328cb2c397d5c2c27
-  - 86a3a54 2023-10-20T15:45:51+00:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
-
-- coredns image-arm64 fd70cf1b81d3d3a907663f61b651201de5f8e4e7 to 8341fa72820062869d3a01429ec20a79aebeded0
-  - 1f947c6 2023-10-17T14:36:30-04:00 UPSTREAM: <carry>: openshift: Address CVE-2023-39325
-
-- router image-arm64 7cbd1526a359392ead30aa050dc9e2e81ffcc753 to b3af193f191b8d20c0b7bac328cb2c397d5c2c27
-  - 86a3a54 2023-10-20T15:45:51+00:00 Bump golang.org/x/net to v0.17.0 to address CVE-2023-39325
+- oc image-arm64 0c63f9da2694c080257111616c60005f32a5bf47 to 035884cf4ed582a84b261830f9a265a71b11e2fa
+  - 4955b096 2023-10-12T17:49:08+00:00 regeneratemco: explicitly check for PlatformStatus field
 
