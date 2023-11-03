@@ -58,9 +58,10 @@ if [ -v CI_JOB_NAME ] ; then
     bash -x ./bin/build_images.sh -g ./image-blueprints/group1
     bash -x ./bin/build_images.sh -g ./image-blueprints/group2
     # Group 3 only contains images used in periodic CI jobs
-    if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
-        bash -x ./bin/build_images.sh -g ./image-blueprints/group3
-    fi
+#  FIXME - re-enable branch logic after merging PR 2378 which cannot pass tests b/c the ISO is not built.
+#    if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
+    bash -x ./bin/build_images.sh -g ./image-blueprints/group3
+#    fi
 else
     # Fall back to full build when not running in CI
     bash -x ./bin/build_images.sh
