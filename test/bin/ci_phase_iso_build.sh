@@ -1,13 +1,12 @@
 #!/bin/bash
 #
-# This script runs on the hypervisor, from the iso-build step.
+# This script runs on the build host to create all test artifacts.
 
 set -xeuo pipefail
 
-SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Cannot use common.sh because virsh is not installed, but we only
-# need ROOTDIR to set up logging in this script.
-ROOTDIR="$(cd "${SCRIPTDIR}/../.." && pwd)"
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# shellcheck source=test/bin/common.sh
+source "${SCRIPTDIR}/common.sh"
 
 # Log output automatically
 LOGDIR="${ROOTDIR}/_output/ci-logs"
@@ -21,50 +20,132 @@ exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${
 
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 
+# Allow for a dry-run option to save on testing time
+BUILD_DRY_RUN=${BUILD_DRY_RUN:-false}
+dry_run() {
+    ${BUILD_DRY_RUN} && echo "echo"
+}
+
+# Try downloading the 'last' build cache.
+# Return 0 on success or 1 otherwise.
+download_build_cache() {
+    local -r cache_last="$(\
+        ./bin/manage_build_cache.sh getlast \
+            -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" | \
+            awk '/LAST:/ {print $NF}' \
+        )"
+
+    if ./bin/manage_build_cache.sh verify -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}" ; then
+        # Download the cached images
+        ./bin/manage_build_cache.sh download -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}"
+        return 0
+    fi
+    return 1
+}
+
+# Run image build for installer images only and update the cache:
+# - Upload build artifacts
+# - Update 'last' to point to the current build tag
+# - Clean up older images, preserving the 'last' and the previous build tag
+update_build_cache() {
+    # Build the images to be cached
+    $(dry_run) bash -x ./bin/build_images.sh -i -g ./image-blueprints/group1
+    $(dry_run) bash -x ./bin/build_images.sh -i -g ./image-blueprints/group2
+
+    # Upload the images and update the 'last' setting
+    ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
+    ./bin/manage_build_cache.sh setlast -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
+
+    # Cleanup older images in the cache, preserving the previous cache if any
+    # The 'last' cache is preserved by default
+    ./bin/manage_build_cache.sh keep -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG_PREV}"
+}
+
+# Run image build, skipping the installer images if instructed.
+# If 'with_cached_data' argument is 'true', do not build installer images.
+run_image_build() {
+    local -r with_cached_data=$1
+    local build_opts
+
+    build_opts=""
+    if ${with_cached_data} ; then
+        # Skip installer image builds as they were downloaded from cache
+        build_opts="-I"
+    fi
+
+    # Build the images
+    # Image build can be optimized in CI based on the job type
+    if [ -v CI_JOB_NAME ] ; then
+        $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group1
+        $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group2
+        # Group 3 only contains images used in periodic CI jobs
+        if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
+            $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group3
+        fi
+    else
+        # Fall back to full build when not running in CI
+        $(dry_run) bash -x ./bin/build_images.sh ${build_opts}
+    fi
+}
+
 # Clean the dnf cache to avoid corruption
-sudo dnf clean all
+$(dry_run) sudo dnf clean all
 
 # Show what other dnf commands have been run to try to debug why we
 # sometimes see cache collisons.
-sudo dnf history --reverse
+$(dry_run) sudo dnf history --reverse
 
 cd "${ROOTDIR}"
 
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
-bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
-bash -x ./scripts/image-builder/configure.sh
+$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
+$(dry_run) bash -x ./scripts/image-builder/configure.sh
 
 cd "${ROOTDIR}/test/"
 
 # Re-build from source.
-bash -x ./bin/build_rpms.sh
+$(dry_run) bash -x ./bin/build_rpms.sh
 
 # Set up for scenario tests
-bash -x ./bin/create_local_repo.sh
+$(dry_run) bash -x ./bin/create_local_repo.sh
 
 # Start the web server to host the ostree commit repository for parent images
-bash -x ./bin/start_webserver.sh
+$(dry_run) bash -x ./bin/start_webserver.sh
 
-# Build all of the images
+# Figure out an optimal number of osbuild workers
 CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
 MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
 CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
 
-bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
+$(dry_run) bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
 
-# Image build can be optimized in CI based on the job type
-if [ -v CI_JOB_NAME ] ; then
-    bash -x ./bin/build_images.sh -g ./image-blueprints/group1
-    bash -x ./bin/build_images.sh -g ./image-blueprints/group2
-    # Group 3 only contains images used in periodic CI jobs
-#  FIXME - re-enable branch logic after merging PR 2378 which cannot pass tests b/c the ISO is not built.
-#    if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
-    bash -x ./bin/build_images.sh -g ./image-blueprints/group3
-#    fi
+# Check if cache can be used for builds
+# This will fail when AWS S3 connection is not configured, or there is no cache bucket
+HAS_CACHE_ACCESS=false
+if ./bin/manage_build_cache.sh getlast -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" &>/dev/null ; then
+    HAS_CACHE_ACCESS=true
+fi
+
+# Check the build mode: "try using cache" (default) or "update cache"
+if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
+    if ${HAS_CACHE_ACCESS} ; then
+        update_build_cache
+    else
+        echo "ERROR: Access to the build cache is not available"
+        exit 1
+    fi
 else
-    # Fall back to full build when not running in CI
-    bash -x ./bin/build_images.sh
+    GOT_CACHED_DATA=false
+    if ${HAS_CACHE_ACCESS} ; then
+        if download_build_cache ; then
+            GOT_CACHED_DATA=true
+        fi
+    fi
+    if ! ${GOT_CACHED_DATA} ; then
+        echo "WARNING: Build cache is not available, rebuilding all the artifacts"
+    fi
+    run_image_build ${GOT_CACHED_DATA}
 fi
 
 echo "Build phase complete"

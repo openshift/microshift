@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This script runs on the CI cluster, from the metal-tests step.
+# This script runs on the hypervisor to execute all scenario tests.
 
 set -xeuo pipefail
 

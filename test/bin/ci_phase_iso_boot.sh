@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This script runs on the hypervisor, from the iso-build step.
+# This script runs on the hypervisor to boot all scenario VMs.
 
 set -xeuo pipefail
 PS4='+ $(date "+%T.%N")\011 '
