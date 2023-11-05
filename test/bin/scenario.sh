@@ -24,6 +24,29 @@ full_vm_name() {
     echo "${SCENARIO//@/-}-${base}"
 }
 
+vm_property_filename() {
+    local -r vmname="$1"
+    local -r property="$2"
+
+    echo "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/${property}"
+}
+
+get_vm_property() {
+    local -r vmname="$1"
+    local -r property="$2"
+    local -r property_file="$(vm_property_filename "${vmname}" "${property}")"
+    cat "${property_file}"
+}
+
+set_vm_property() {
+    local -r vmname="$1"
+    local -r property="$2"
+    local -r value="$3"
+    local -r property_file="$(vm_property_filename "${vmname}" "${property}")"
+    mkdir -p "$(dirname "${property_file}")"
+    echo "${value}" > "${property_file}"
+}
+
 sos_report() {
     if "${SKIP_SOS}"; then
         echo "Skipping sos reports"
@@ -356,21 +379,20 @@ launch_vm() {
 
         # Record the IP of this VM so our caller can use it to configure
         # port forwarding and the firewall.
-        mkdir -p "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
-        echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
+        set_vm_property "${vmname}" "ip" "${ip}"
         # Record the _public_ IP of the VM so the test suite can use it to
         # access the host. This is useful when the public IP is the
         # hypervisor forwarding connections. If we have no PUBLIC_IP, use
         # the VM IP and assume a local connection.
         if [ -n "${PUBLIC_IP}" ]; then
-            echo "${PUBLIC_IP}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+            set_vm_property "${vmname}" "public_ip" "${PUBLIC_IP}"
         else
-            echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+            set_vm_property "${vmname}" "public_ip" "${ip}"
             # Set the defaults for the various ports so that connections
             # from the hypervisor to the VM work.
-            echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-            echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
-            echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
+            set_vm_property "${vmname}" "ssh_port" "22"
+            set_vm_property "${vmname}" "api_port" "6443"
+            set_vm_property "${vmname}" "lb_port" "5678"
         fi
 
         if wait_for_ssh "${ip}"; then
@@ -463,22 +485,19 @@ run_tests() {
         exit 1
     fi
 
-    local -r ssh_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-    local -r api_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
-    local -r lb_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
-    local -r public_ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
-    local -r ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
-    for f in "${ssh_port_file}" "${api_port_file}" "${lb_port_file}" "${public_ip_file}" "${ip_file}"; do
+    local f
+    for p in "ssh_port" "api_port" "lb_port" "public_ip" "ip"; do
+        f="$(vm_property_filename "${vmname}" "${p}")"
         if [ ! -f "${f}" ]; then
             error "Cannot read ${f}"
             exit 1
         fi
     done
-    local -r ssh_port=$(cat "${ssh_port_file}")
-    local -r api_port=$(cat "${api_port_file}")
-    local -r lb_port=$(cat "${lb_port_file}")
-    local -r public_ip=$(cat "${public_ip_file}")
-    local -r vm_ip=$(cat "${ip_file}")
+    local -r ssh_port=$(get_vm_property "${vmname}" "ssh_port")
+    local -r api_port=$(get_vm_property "${vmname}" "api_port")
+    local -r lb_port=$(get_vm_property "${vmname}" "lb_port")
+    local -r public_ip=$(get_vm_property "${vmname}" "public_ip")
+    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
 
     local -r variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
     echo "Writing variables to ${variable_file}"
@@ -576,11 +595,9 @@ action_login() {
     else
         vmname="$1"
     fi
-    local ssh_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-    local ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
 
-    ssh_port=$(cat "${ssh_port_file}")
-    ip=$(cat "${ip_file}")
+    ssh_port=$(get_vm_property "${vmname}" "ssh_port")
+    ip=$(get_vm_property "${vmname}" "ip")
 
     ssh "redhat@${ip}" -p "${ssh_port}"
 }
