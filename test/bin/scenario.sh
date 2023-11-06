@@ -525,6 +525,31 @@ configure_vm_firewall() {
 
     run_command_on_vm "${vmname}" "sudo firewall-cmd --reload"
 }
+
+# Enable subscription in the VM
+subscription_manager_register() {
+    local -r vmname="$1"
+
+    if [ -f /tmp/subscription-manager-org ]; then
+        # CI workflow
+        cat <<EOF > /tmp/sub.sh
+#!/bin/bash
+set -xeuo pipefail
+
+if ! sudo subscription-manager status >&/dev/null; then
+    sudo subscription-manager register \
+        --org="\$(cat /tmp/subscription-manager-org)" \
+        --activationkey="\$(cat /tmp/subscription-manager-act-key)"
+fi
+EOF
+        copy_file_to_vm "${vmname}" /tmp/sub.sh /tmp/sub.sh
+        copy_file_to_vm "${vmname}" /tmp/subscription-manager-org /tmp/subscription-manager-org
+        copy_file_to_vm "${vmname}" /tmp/subscription-manager-act-key /tmp/subscription-manager-act-key
+        run_command_on_vm "${vmname}" "chmod +x /tmp/sub.sh && sudo /tmp/sub.sh"
+    else
+        # Local developer workflow
+        run_command_on_vm "${vmname}" "sudo subscription-manager register"
+    fi
 }
 
 # Function to report the full current version, e.g. "4.13.5"
