@@ -9,6 +9,9 @@ PODS_NS_LIST=(openshift-service-ca openshift-ingress openshift-dns openshift-sto
 FULL_CLEAN=false
 KEEP_IMAGE=false
 OVN_CLEAN=false
+# Flags used for generating a user summary message
+SERVICE_STOPPED=false
+SERVICE_DISABLED=false
 
 function usage() {
     if [ $# -gt 0 ] ; then
@@ -29,11 +32,13 @@ function stop_disable_services() {
     for service in microshift microshift-etcd ; do
         systemctl stop --now   ${service} 2>/dev/null || true
         systemctl reset-failed ${service} 2>/dev/null || true
+        SERVICE_STOPPED=true
     done
 
     if ${FULL_CLEAN} ; then
         echo Disabling MicroShift services
-        systemctl disable microshift 2>/dev/null
+        systemctl disable microshift 2>/dev/null || true
+        SERVICE_DISABLED=true
     fi
 
     # Killing the processes is the last resort after stopping the services with the 'systemctl stop' command.
@@ -105,6 +110,15 @@ function clean_data() {
     rm -f /opt/cni/bin/ovn-k8s-cni-overlay
 }
 
+function report_status() {
+    if ${SERVICE_STOPPED} ; then
+        echo "MicroShift service was stopped"
+    fi
+    if ${SERVICE_DISABLED} ; then
+        echo "MicroShift service was disabled"
+    fi
+}
+
 # Parse command line
 [ $# -lt 1 ] && usage
 
@@ -156,4 +170,5 @@ stop_clean_pods
 clean_processes
 clean_data
 
+report_status
 echo Cleanup succeeded
