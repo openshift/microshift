@@ -12,20 +12,44 @@ keywords:
     - wait_guest_for_process
     - run_guest_process
     - terminate_guest_process
+    - read_from_file
+    - write_to_file
+    - guest_agent_is_ready
 
 If you are looking for keywords to control the guest VM itself, see ./libvirt.resource
 """
 from __future__ import annotations  # Support for Python 3.7 and earlier
 
-import base64
 import json
+from base64 import b64decode, b64encode
 
 from robot.libraries.BuiltIn import BuiltIn, DotDict
 from robot.libraries.Process import Process, ExecutionResult
 from robot.utils.robottime import timestr_to_secs
 
 
-def _do_guest_exec(vm_name: str, cmd: str, *args) -> int:
+def _execute(vm_name: str, agent_message: dict) -> dict | int:
+    virsh_args = f'virsh --connect=qemu:///system qemu-agent-command --domain={vm_name} --cmd='
+    msg = json.dumps(agent_message)
+    virsh_args += f'\'{msg}\''
+
+    result: ExecutionResult = Process().run_process(virsh_args, shell=True)
+    # Only raise an error if the virsh command itself fails.  The guest-agent may return a non-zero exit code which
+    # should be handled by the keyword caller.
+    if result.rc != 0:
+        raise RuntimeError(f'virsh command failed:\nstdout={result.stdout}'
+                           f'\nstderr={result.stderr}'
+                           f'\nrc={result.rc}')
+    #  qemu-agent-command returns data to stdout as:
+    #  {
+    #    return: {
+    #      pid: int
+    #    }
+    #  }
+    return json.loads(result.stdout)['return']
+
+
+def _do_guest_exec(vm_name: str, cmd: str, *args, env: dict, stdin: str) -> int:
     # _do_guest_exec wraps a given command and arg list into a qemu-guest-agent guest-exec API call.  For more info this
     # API, see https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-211. For more information on the
     # guest-exec return message, see https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-201
@@ -34,28 +58,16 @@ def _do_guest_exec(vm_name: str, cmd: str, *args) -> int:
         'arguments': {
             'path': cmd,
             'arg': args,
+            'env': [f'{k}={v}' for k, v in env.items()] if env is not None else [],
+            'input-data': b64encode(stdin.encode('utf-8')).decode('utf-8') if stdin is not None else '',
             'capture-output': True,
         }
     }
-    virsh_args = f'--connect=qemu:///system qemu-agent-command --domain={vm_name} --cmd='.split()
-    virsh_args.append(json.dumps(agent_cmd_wrapper))
-
-    #  qemu-agent-command "guest-exec" returns data to stdout as:
-    #  {
-    #    return: {
-    #      pid: int
-    #    }
-    #  }
-    result: ExecutionResult = Process().run_process('virsh', *virsh_args)
-    # check that the "virsh" process exited cleanly.  This is not the same as the guest process's exit code.
-    if result.rc != 0:
-        raise RuntimeError(f'virsh command failed:'
-                           f'\nstdout={result.stdout}'
-                           f'\nstderr={result.stderr}'
-                           f'\nrc={result.rc}')
-    content = json.loads(result.stdout)['return']
-    BuiltIn().log(f'guest-exec result: {content}')
-
+    #  _execute() returns "guest-exec" as dict containing only the PID of the command executed on the guest.
+    # {
+    #   pid: int
+    # }
+    content = _execute(vm_name, agent_cmd_wrapper)
     return content['pid']
 
 
@@ -69,9 +81,6 @@ def _do_guest_exec_status(vm_name: str, pid: int) -> (dict, bool):
             'pid': pid,
         }
     }
-    virsh_args = f'--connect=qemu:///system qemu-agent-command --domain={vm_name} --cmd='.split()
-    virsh_args.append(json.dumps(agent_cmd_wrapper))
-
     #  qemu-agent-command "guest-exec" returns data to stdout as the example below. Fields marked (optional) will be
     #  undefined if exited is False. optional keys may not exist even if exited is True.
     #  {
@@ -85,19 +94,12 @@ def _do_guest_exec_status(vm_name: str, pid: int) -> (dict, bool):
     #      err-truncated: boolean (optional)
     #    }
     #  }
-    result: ExecutionResult = Process().run_process('virsh', *virsh_args)
-    # check that the "virsh" process exited cleanly.  This is not the same as the guest process's exit code.
-    if result.rc != 0:
-        raise RuntimeError(f'virsh command failed:'
-                           f'\nstdout={result.stdout}'
-                           f'\nstderr={result.stderr}'
-                           f'\nrc={result.rc}')
-    content = json.loads(result.stdout)['return']
+    content = _execute(vm_name, agent_cmd_wrapper)
     BuiltIn().log(f'guest-exec-status result: {content}')
     return {
         'rc': content['exitcode'] if 'exitcode' in content else None,
-        'stdout': base64.decodebytes(content['out-data'].encode('utf-8')) if 'out-data' in content else '',
-        'stderr': base64.decodebytes(content['err-data'].encode('utf-8')) if 'err-data' in content else '',
+        'stdout': b64decode(content['out-data']).decode("utf-8").strip() if 'out-data' in content else '',
+        'stderr': b64decode(content['err-data']).decode("utf-8").strip() if 'err-data' in content else '',
     }, content['exited']
 
 
@@ -166,7 +168,8 @@ def get_guest_process_result(vm_name: str, pid: int) -> (DotDict, bool):
     return DotDict(_do_guest_exec_status(vm_name, pid))
 
 
-def wait_for_guest_process(vm_name: str, pid: int, timeout: int = None, on_timeout: str = "continue") -> (DotDict, bool):
+def wait_for_guest_process(vm_name: str, pid: int, timeout: int = None, on_timeout: str = "continue") -> (
+        DotDict, bool):
     """
     :param vm_name:         The name of the VM to execute the command on
     :type vm_name:          str
@@ -237,7 +240,8 @@ def wait_for_guest_process(vm_name: str, pid: int, timeout: int = None, on_timeo
     return DotDict(status), exited
 
 
-def run_guest_process(vm_name: str, cmd: str, *args, timeout: int = None, on_timeout: str = "continue") -> (DotDict, bool):
+def run_guest_process(vm_name: str, cmd: str, *args, env: dict = None, stdin: str = None, timeout: int = None,
+                      on_timeout: str = "continue") -> (DotDict, bool):
     """
     :param vm_name:     The name of the VM to execute the command on
     :type vm_name:      str
@@ -246,6 +250,10 @@ def run_guest_process(vm_name: str, cmd: str, *args, timeout: int = None, on_tim
     :param args:        The arguments to pass to the command, separated into a list of strings, e.g. ["-l", "/tmp"]
                         Command arguments which take a value must be passed as a single string, e.g. ["-f /tmp""]
     :type args:         list
+    :param env:         A dictionary of environment variables to set for the command, e.g. {"PATH": "/bin:/usr/bin"}
+    :type env:          dict
+    :param stdin:       The input to pass to the command.  If None, no input is passed to the command. (default: None)
+    :type stdin:        str
     :param timeout:     The maximum amount of time to wait for the process to complete, in seconds.  If None,
                         wait indefinitely (default).
     :type timeout:      int
@@ -257,11 +265,12 @@ def run_guest_process(vm_name: str, cmd: str, *args, timeout: int = None, on_tim
 
     ``run_guest_process`` excepts a given command and optional arg list to execute on a given VM using the
     qemu-agent-command. The command is executed by using virsh qemu-guest-command. This is a blocking call unless
-    qemu-agent-timeout is set to anything but the default (must be configured externally).
+    qemu-agent-timeout is set to anything but the default (must be configured externally with virsh, see
+    https://www.libvirt.org/manpages/virsh.html#guest-agent-timeout).
 
     Usage: ${stdout}    ${stderr}    ${rc}=    Run Guest Process    vm_name    cmd    *args
     Examples:
-    ${stdout}    ${stderr}    ${rc}=    Run Guest Process    vm-host-1    /bin/ls    -l    /tmp
+    ${stdout}    ${stderr}    ${rc}=    Run Guest Process    vm-host-1    /bin/ls    -l    /tmp    --color=never
     Log Many   ${stdout}    ${stderr}
     Should Be Equal As Integers    ${rc}    0
 
@@ -274,11 +283,11 @@ def run_guest_process(vm_name: str, cmd: str, *args, timeout: int = None, on_tim
     if not cmd:
         raise ValueError('cmd is not specified')
 
-    pid = _do_guest_exec(vm_name, cmd, *args)
+    pid = _do_guest_exec(vm_name, cmd, *args, env=env, stdin=stdin)
     return wait_for_guest_process(vm_name, pid, timeout, on_timeout)
 
 
-def start_guest_process(vm_name: str, cmd: str, *args) -> int:
+def start_guest_process(vm_name: str, cmd: str, *args, env: dict, stdin: str = None) -> int:
     """
     :param vm_name:         The name of the VM to execute the command on
     :type vm_name:          str
@@ -287,6 +296,10 @@ def start_guest_process(vm_name: str, cmd: str, *args) -> int:
     :param args:            The arguments to pass to the command, separated into a list of strings, e.g. ["-l", "/tmp"]
                             Command arguments which take a value must be passed as a single string, e.g. ["-f /tmp""]
     :type args:             list
+    :param env:             A dictionary of environment variables to set for the command, e.g. {"PATH": "/bin:/usr/bin"}
+    :type env:              dict
+    :param stdin:           The input to pass to the command.  If None, no input is passed to the command. (default: None)
+    :type stdin:            str
     :return:                The guest's process ID of the command
     :rtype:                 int | None
     :raises ValueError      If the VM name or command path is not specified
@@ -306,6 +319,115 @@ def start_guest_process(vm_name: str, cmd: str, *args) -> int:
         raise ValueError('vm name is not specified')
     if not cmd:
         raise ValueError('cmd is not specified')
+    return _do_guest_exec(vm_name, cmd, *args, env=env, stdin=stdin)
 
-    content = _do_guest_exec(vm_name, cmd, *args)
-    return content
+
+def _open_file(vm_name: str, path: str, mode: str) -> int:
+    agent_cmd_wrapper = {
+        'execute': 'guest-file-open',
+        'arguments': {
+            'path': path,
+            'mode': mode,
+        }
+    }
+    # guest-file-open returns an integer handle to the file opened on the guest
+    return _execute(vm_name, agent_cmd_wrapper)
+
+
+def _close_file(vm_name, handle):
+    agent_cmd_wrapper = {
+        'execute': 'guest-file-close',
+        'arguments': {
+            'handle': handle,
+        }
+    }
+    # guest-file-close returns nothing on success, raises an error on failure
+    _execute(vm_name, agent_cmd_wrapper)
+
+
+def read_from_file(vm_name: str, path: str) -> str:
+    """
+    :param vm_name:         The name of the VM to execute the command on
+    :type vm_name:          str
+    :param path:            The absolute path to a file on the guest, e.g. "/tmp/foo"
+    :type path:             str
+    :return:                The contents of the file
+    :rtype:                 str
+    :raises ValueError:     If the VM name or file path is not specified
+    :raises RuntimeError:   If the qemu-agent-command returns a non-zero exit code
+    :raises RuntimeError:   If the file cannot be opened on the guest
+
+    ``qemu-guest-read`` reads from a file on the guest VM. The file is opened using the qemu-agent-command
+    guest-file-open API call, and read using the guest-file-read API call.  The file is unconditionally closed using the
+    guest-file-close API call. See  https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-54 for more
+    information on the guest-file-read API call. See https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-54
+    for more information on the guest-file-close API call.
+    """
+    handle = _open_file(vm_name, path, 'r')
+    try:
+        content = _execute(vm_name, {
+            'execute': 'guest-file-read',
+            'arguments': {
+                'handle': handle,
+                'count': 40960
+            }
+        })
+    finally:
+        _close_file(vm_name, handle)
+
+    return b64decode(content['buf-b64']).decode('utf-8')
+
+
+def write_to_file(vm_name: str, path: str, content: str, append=False) -> int:
+    """
+    :param vm_name:         The name of the VM to execute the command on
+    :type vm_name:          str
+    :param path:            The absolute path to a file on the guest, e.g. "/tmp/foo"
+    :type path:             str
+    :param content:         The contents to write to the file
+    :type content:          str
+    :param append:          If True, append to the file. Otherwise, overwrite the file. (default: False)
+    :type append:           bool
+    :return:                The number of bytes written to the file
+    :rtype:                 int
+    :raises ValueError:     If the VM name or file path is not specified
+    :raises RuntimeError:   If the qemu-agent-command returns a non-zero exit code.
+
+    ``write_to_file`` writes to a file on the guest VM. The file is opened using the qemu-agent-command guest-file-open
+    API call, and written to using the guest-file-write API call.  The file is unconditionally closed using the
+    guest-file-close API call. See https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-54 for more
+    information on the guest-file-write API call.
+    """
+    if not vm_name:
+        raise ValueError('vm name is not specified')
+    if not path:
+        raise ValueError('path is not specified')
+    handle = _open_file(vm_name, path, mode='a' if append else 'w')
+    try:
+        content = _execute(vm_name, {
+            'execute': 'guest-file-write',
+            'arguments': {
+                'handle': handle,
+                'buf-b64': b64encode(content.encode('utf-8')).decode('utf-8'),
+            }
+        })
+    finally:
+        _close_file(vm_name, handle)
+    # ``guest-file-write`` returns the number of bytes written to the file and boolean 'eof' if the end of file was
+    # encountered while writing.  Only return the number of bytes written. Returning "EOF" on a write command is not
+    # useful information.
+    return content['count']
+
+
+def guest_agent_is_ready(vm_name: str):
+    """
+    :param vm_name:         The name of the VM to execute the command on
+    :type vm_name:          str
+    :raises ValueError:     If the VM name is not specified
+    :raises RuntimeError:   If the guest-ping fails or qemu-guest-command returns a non-zero exit code
+    """
+    if vm_name is None:
+        raise ValueError('vm name is not specified')
+    _execute(vm_name, {
+        'execute': 'guest-ping',
+    })

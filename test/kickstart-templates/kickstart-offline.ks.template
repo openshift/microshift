@@ -63,4 +63,7 @@ EOF
 # and system needing much more time to roll back.
 ln -sf /dev/null /etc/systemd/user/grub-boot-success.timer
 
+# Disable SELinux enforcement for the qemu-guest-agent
+sudo semanage permissive -a virt_qemu_ga_t
+
 %end

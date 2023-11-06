@@ -76,3 +76,11 @@ Systemctl With Retry
     [Arguments]    ${verb}    ${unit_name}
     Wait Until Keyword Succeeds    10x    10s
     ...    Systemctl    ${verb}    ${unit_name}
+
+Systemctl Daemon Reload
+    [Documentation]    Reload the systemd daemon.
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    systemctl daemon-reload
+    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    Log Many    ${stdout}    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
