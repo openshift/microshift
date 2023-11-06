@@ -118,6 +118,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 
 	// Ensures microshift-etcd unit stopped after microshift
 	defer func() {
+		klog.Info("stopping microshift-etcd")
 		cmd := exec.Command("systemctl", "stop", "microshift-etcd.scope", "--no-block")
 
 		if err = cmd.Run(); err != nil {
@@ -150,6 +151,9 @@ func checkIfEtcdIsReady(ctx context.Context) error {
 			return nil
 		} else {
 			klog.Infof("etcd not ready yet: %v", err)
+			if err == context.Canceled {
+				return err
+			}
 		}
 	}
 	return fmt.Errorf("etcd still not healthy after checking %d times", HealthCheckRetries)
