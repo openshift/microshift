@@ -78,9 +78,10 @@ run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
         $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group1
         $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group2
-        # Group 3 only contains images used in periodic CI jobs
+        # Groups 3 and 4 contains images exclusively used in periodic CI jobs
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group3
+            $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group4
         fi
     else
         # Fall back to full build when not running in CI
