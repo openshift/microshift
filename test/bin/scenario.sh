@@ -18,6 +18,7 @@ PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=900
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
+TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 
 full_vm_name() {
     local base="${1}"
@@ -525,7 +526,7 @@ EOF
 
     "${rf_binary}" \
         --name "${SCENARIO}" \
-        --randomize all \
+        --randomize "${TEST_RANDOMIZATION}" \
         --loglevel TRACE \
         --outputdir "${SCENARIO_INFO_DIR}/${SCENARIO}" \
         -x junit.xml \
