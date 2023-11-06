@@ -3,5 +3,7 @@ kind: ConfigMap
 metadata:
   namespace: openshift-service-ca
   name: signing-cabundle
+  annotations:
+    openshift.io/owning-component: service-ca
 data:
   ca-bundle.crt:
