@@ -1,0 +1,6 @@
+# cluster-kube-controller-manager-operator embedded-component cc6a31430749e2e0a1b0d9db18c6e664dd4b626e to 5dcd2221fae708cc47b2ca73e535724514e46730
+cc5dc3a39acecf44651af179a23aade6b06422f8 2023-10-27T16:30:16+02:00 go mod vendor
+b2192b652ecbd28d260c0c5ecb8ddfaa13c022b0 2023-10-27T16:30:16+02:00 bump(k8s,openshift) to address CVE-2023-44487
+# machine-config-operator embedded-component 935b199a2b6168de8f3304de55379ef3b62e5b96 to a3ecc9b242dce12d59d038844fcc894f695d14c7
+d2fd72d8a71d447a3290e804041f15e578deb358 2023-10-20T16:15:32+00:00 OCPBUGS-18771: Consider ingress VIPs when selecting node IP
+e0d8325da41cab19ba418c3ce18165d4b79dfaae 2023-08-23T17:03:55+00:00 OCPBUGS-16733: on-prem: run resolv-prepender on NM reapply event
