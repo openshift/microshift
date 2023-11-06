@@ -1,6 +1,7 @@
 from robot.libraries.BuiltIn import BuiltIn
 from libostree import remote_sudo_rc, remote_sudo
 from typing import List
+from packaging.version import Version
 import re
 
 ACCESS_CHECK_MAP = {
@@ -62,6 +63,10 @@ EXPECTED_FCONTEXT_LIST = [
     "/var/lib/registry(/.*)?",
 ]
 
+EXPECTED_FCONTEXT_LIST_EL93 = [
+    "/var/cache/containers(/.*)?",
+]
+
 SOURCE_TARGET_TRANSITION = {
     "container_t": ["container_var_lib_t"]
 }
@@ -74,6 +79,10 @@ DOMAIN_PERMISSION_IGNORE_REGEX = {
 
 
 def get_expected_ocp_microshift_fcontext_list() -> List[str]:
+    host_version = Version(remote_sudo("bash -c 'source /etc/os-release && echo $VERSION_ID'"))
+    if host_version >= Version("9.3"):
+        return EXPECTED_FCONTEXT_LIST + EXPECTED_FCONTEXT_LIST_EL93
+
     return EXPECTED_FCONTEXT_LIST
 
 

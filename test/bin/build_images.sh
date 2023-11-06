@@ -318,7 +318,8 @@ do_group() {
         if [ "${status}" != "FINISHED" ]; then
             failed_builds+=("${buildid}")
             record_junit "${groupdir}" "${build_name}" "compose" "${status}"
-            sudo composer-cli compose info "${buildid}"
+            sudo composer-cli compose info --json "${buildid}"
+            sudo composer-cli compose log "${buildid}"
             continue
         fi
 
