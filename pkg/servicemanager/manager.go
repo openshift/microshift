@@ -76,6 +76,9 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 		select {
 		case <-sigchannel.And(depsReadyList):
 		case <-ctx.Done():
+			// Wait for all services to stop before returning
+			// so MicroShift doesn't quit abruptly
+			<-sigchannel.And(values(stoppedMap))
 			return ctx.Err()
 		}
 
