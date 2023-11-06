@@ -17,6 +17,7 @@ PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=900
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
+SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 
@@ -169,6 +170,11 @@ wait_for_ssh() {
 wait_for_greenboot() {
     local -r vmname="${1}"
     local -r ip="${2}"
+
+    if "${SKIP_GREENBOOT}"; then
+        echo "Skipping greenboot check"
+        return 0
+    fi
 
     echo "Waiting ${VM_BOOT_TIMEOUT} for greenboot on ${vmname} to complete"
 
