@@ -1,3 +1,6 @@
 Microshift origin fork.
 
 Current code synchronised with github.com/openshift/origin@90bcab071d
+
+List of changes that should be carried to openshift/origin:
+- https://github.com/openshift/microshift/pull/2497
