@@ -27,6 +27,7 @@ SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
+SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 
 full_vm_name() {
     local base="${1}"
@@ -583,7 +584,6 @@ configure_vm_firewall() {
 
     run_command_on_vm "${vmname}" "sudo firewall-cmd --reload"
 }
-}
 
 # Function to report the full current version, e.g. "4.13.5"
 current_version() {
@@ -769,6 +769,26 @@ load_scenario_script() {
     source "${SCENARIO_SCRIPT}"
 }
 
+# Load the plugin for registering with subscription
+# manager. SUBSCRIPTION_MANAGER_PLUGIN should point to a bash script
+# that can be sourced to provide a function called
+# `subscription_manager_register`. The function must take 1 argument,
+# the name of the VM within the current scenario. It should update
+# that VM so that it is registered with a Red Hat software
+# subscription to allow packages to be installed. The default
+# implementation handles the automated workflow used in CI and a
+# manual workflow useful for developers running a single scenario
+# interactively.
+load_subscription_manager_plugin() {
+    if [ ! -f "${SUBSCRIPTION_MANAGER_PLUGIN}" ]; then
+        error "No subscription manager plugin at ${SUBSCRIPTION_MANAGER_PLUGIN}"
+        exit 1
+    fi
+
+    # shellcheck source=/dev/null
+    source "${SUBSCRIPTION_MANAGER_PLUGIN}"
+}
+
 action_create() {
     start_junit
     trap "close_junit" EXIT
@@ -778,6 +798,12 @@ action_create() {
         return 1
     fi
     record_junit "setup" "load_global_settings" "OK"
+
+    if ! load_subscription_manager_plugin; then
+        record_junit "setup" "load_subscription_manager_plugin" "FAILED"
+        return 1
+    fi
+    record_junit "setup" "load_subscription_manager_plugin" "OK"
 
     if ! load_scenario_script; then
         record_junit "setup" "load_scenario_script" "FAILED"
