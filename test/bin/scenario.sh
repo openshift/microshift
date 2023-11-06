@@ -535,6 +535,7 @@ EOF
         --randomize "${TEST_RANDOMIZATION}" \
         --loglevel TRACE \
         --outputdir "${SCENARIO_INFO_DIR}/${SCENARIO}" \
+        --debugfile "${SCENARIO_INFO_DIR}/${SCENARIO}/rf-debug.log" \
         -x junit.xml \
         -V "${variable_file}" \
         "$@"
