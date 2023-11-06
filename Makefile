@@ -295,7 +295,7 @@ commit: image-build-configure image-build-commit
 .PHONY: commit
 
 rpm-podman:
-	RPM_BUILDER_IMAGE_TAG="rhel-8-release-golang-1.20-openshift-4.14"; \
+	RPM_BUILDER_IMAGE_TAG="rhel-9-release-golang-1.20-openshift-4.15"; \
 	podman build \
 		--volume /etc/pki/entitlement/:/etc/pki/entitlement \
 		--build-arg TAG=$$RPM_BUILDER_IMAGE_TAG \
