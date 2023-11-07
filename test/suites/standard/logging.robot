@@ -82,8 +82,8 @@ Expect logLevel
     [Documentation]    Verify that the logLevel matches the expected value
     [Arguments]    ${expected}
 
-    ${stdout}=    Execute Command
-    ...    microshift show-config | awk '/logLevel/{print $2}'
-    ...    sudo=True    return_rc=False
-
-    Should Be Equal As Strings   ${expected}    ${stdout} 
+    ${output}        ${stdout}=    Execute Command
+    ...    microshift show-config
+    ...    sudo=True    return_rc=True
+    ${config}=   Yaml Parse    ${output}
+    Should Be Equal As Strings   ${expected}    ${config.debugging.logLevel}
