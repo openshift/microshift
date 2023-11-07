@@ -3,6 +3,7 @@
 # This script runs on the build host to create all test artifacts.
 
 set -xeuo pipefail
+export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh

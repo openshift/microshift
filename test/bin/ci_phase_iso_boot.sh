@@ -3,7 +3,7 @@
 # This script runs on the hypervisor to boot all scenario VMs.
 
 set -xeuo pipefail
-PS4='+ $(date "+%T.%N")\011 '
+export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
