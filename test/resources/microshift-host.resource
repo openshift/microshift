@@ -109,3 +109,16 @@ Change Hostname
     Should Be Equal As Integers    0    ${rc}
 
     RETURN    ${old_hostname}
+
+Command Should Work
+    [Documentation]    Run a command remotely, log stderr, fail if RC is not 0, return stdout
+    [Arguments]    ${command}
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    ${command}
+    ...    sudo=True
+    ...    return_rc=True
+    ...    return_stderr=True
+    ...    return_stdout=True
+    Log    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
+    RETURN    ${stdout}
