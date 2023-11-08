@@ -5,6 +5,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/ostree.resource
 Resource            ../../resources/ostree-data.resource
 Library             Collections
+Library             ../../resources/libostree.py
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -30,6 +31,15 @@ Rebooting Healthy System Should Not Delete Unknown Directories
     [Documentation]    Check that MicroShift backup logic does not delete unknown directories
 
     Validate Unknown Directories Exist
+
+Restarting MicroShift Should Not Result In Backup Creation
+    [Documentation]    Check that backup won't be created on MicroShift restart
+    ...    (which would block creating right backup after reboot)
+
+    ${deploy_id}=    Get Booted Deployment ID
+    ${boot_id}=    Get Current Boot Id
+    Restart MicroShift
+    Backup Should Not Exist    ${deploy_id}    ${boot_id}
 
 
 *** Keywords ***
