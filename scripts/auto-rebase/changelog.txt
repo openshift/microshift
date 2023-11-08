@@ -1,18 +1,4 @@
-- cluster-kube-apiserver-operator embedded-component edaeaedba6a90aa6ada77b7c86356432abb8e10e to d52dbad1177fdb0d27077be5b6e8d9fe0d41b30e
-  - 870cd87 2023-10-27T15:51:58+02:00 vendor: update
-  - 04f1d79 2023-10-27T15:51:46+02:00 bump(library-go)
-
-- cluster-network-operator embedded-component 5572bce9c04feaf970862db03fe4c4fe03b912b4 to 1504d2a16032cd3637f5c9a338f8f48a82614cca
-  - 2419499 2023-09-28T19:41:54+00:00 HyperShift: Use the local konnectivity proxy when checking proxy readiness
-
-- machine-config-operator embedded-component f86362b7e020e181e6cbfa4359061c0f474eda03 to d871f53d54a8ed35cd9a8909f6523ed75e2437af
-  - fa44f3c5 2023-10-25T12:56:17+00:00 Switch kubelet nodename service to use environment file
-  - 0ccffcd7 2023-10-25T12:56:17+00:00 Require a hostname override for AWS
-  - f7b0772b 2023-10-11T13:26:49-04:00 Introduce kubelet-dependencies.target and firstboot-osupdate.target
-
-- oc image-amd64 035884cf4ed582a84b261830f9a265a71b11e2fa to 9b1e0d27df3cf7b2ea878cd668ce709cc4e4c41a
-  - 111c7d7a 2023-10-30T18:22:27+00:00 Reflect container's exit code for long running tasks not attached to terminal
-
-- oc image-arm64 035884cf4ed582a84b261830f9a265a71b11e2fa to 9b1e0d27df3cf7b2ea878cd668ce709cc4e4c41a
-  - 111c7d7a 2023-10-30T18:22:27+00:00 Reflect container's exit code for long running tasks not attached to terminal
+- machine-config-operator embedded-component d871f53d54a8ed35cd9a8909f6523ed75e2437af to f57144e1ffc7904dd34722da07ccb471adaa8954
+  - f5bc6aa1 2023-11-01T16:05:40-04:00 update go.mod
+  - e09b26dc 2023-11-01T16:04:24-04:00 [release-4.14] support icsp and idms objects
 
