@@ -12,7 +12,6 @@ Suite Teardown      Teardown
 
 Test Tags           configuration    etcd    restart    slow
 
-
 *** Variables ***
 ${LEVELNORMAL}          SEPARATOR=\n
 ...                     ---
@@ -29,29 +28,29 @@ ${LEVELUNKNOWN}          SEPARATOR=\n
 ...                     debugging:
 ...                     \ \ logLevel: Normal
 *** Test Cases ***
-Test logLevel Normal
+Test loglevel Normal
     [Documentation]    Set logLevel to NORMAL
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELNORMAL}
-    Expect logLevel   NORMAL
+    Expect loglevel   NORMAL
 
-Test logLevel Debug
+Test loglevel Debug
     [Documentation]    Set logLevel to debug
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELdebug}
-    Expect logLevel   debug
+    Expect loglevel   debug
 
-Test logLevel UNKNOWN
+Test loglevel UNKNOWN
     [Documentation]    Set logLevel to unknown
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELUNKNOWN}
-    Expect logLevel   Normal
+    Expect loglevel   Normal
 *** Keywords ***
 Setup
     [Documentation]    Test suite setup
@@ -78,7 +77,7 @@ Setup With Custom Config
     Upload MicroShift Config    ${merged}
     Restart MicroShift
 
-Expect logLevel
+Expect loglevel
     [Documentation]    Verify that the logLevel matches the expected value
     [Arguments]    ${expected}
 
