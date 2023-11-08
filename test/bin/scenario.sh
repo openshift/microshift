@@ -76,14 +76,16 @@ sos_report() {
         echo "Skipping sos reports"
         return
     fi
+    local vmname
+    local ip
     echo "Creating sos reports"
     for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
         if [ ! -d "${vmdir}" ]; then
             # skip log files, etc.
             continue
         fi
-        local -r vmname=$(basename "${vmdir}")
-        local -r ip=$(get_vm_property "${vmname}" ip)
+        vmname=$(basename "${vmdir}")
+        ip=$(get_vm_property "${vmname}" ip)
         if [ -z "${ip}" ]; then
             # skip hosts without NICs
             # FIXME: use virsh to copy sos report files
