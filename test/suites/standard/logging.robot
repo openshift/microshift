@@ -28,23 +28,21 @@ ${LEVELUNKNOWN}          SEPARATOR=\n
 ...                     debugging:
 ...                     \ \ logLevel: Normal
 *** Test Cases ***
-Test loglevel Normal
+Test LogLevel Normal
     [Documentation]    Set logLevel to NORMAL
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELNORMAL}
     Expect loglevel   NORMAL
-
-Test loglevel Debug
+Test LogLevel Debug
     [Documentation]    Set logLevel to debug
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELdebug}
     Expect loglevel   debug
-
-Test loglevel UNKNOWN
+Test LogLevel UNKNOWN
     [Documentation]    Set logLevel to unknown
     ...
     ...    Test various spellings of the logLevelkeyword
@@ -77,7 +75,7 @@ Setup With Custom Config
     Upload MicroShift Config    ${merged}
     Restart MicroShift
 
-Expect loglevel
+Expect LogLevel
     [Documentation]    Verify that the logLevel matches the expected value
     [Arguments]    ${expected}
 
