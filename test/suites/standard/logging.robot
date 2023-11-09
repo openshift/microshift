@@ -16,39 +16,39 @@ Test Tags           configuration    etcd    restart    slow
 ${LEVELNORMAL}          SEPARATOR=\n
 ...                     ---
 ...                     debugging:
-...                     \ \ logLevel: NORMAL
+...                     \ \ LogLevel: NORMAL
 
 ${LEVELdebug}          SEPARATOR=\n
 ...                     ---
 ...                     debugging:
-...                     \ \ logLevel: debug
+...                     \ \ LogLevel: debug
 
 ${LEVELUNKNOWN}          SEPARATOR=\n
 ...                     ---
 ...                     debugging:
-...                     \ \ logLevel: Normal
+...                     \ \ LogLevel: Normal
 *** Test Cases ***
 Test LogLevel Normal
-    [Documentation]    Set logLevel to NORMAL
+    [Documentation]    Set LogLevel to NORMAL
     ...
-    ...    Test various spellings of the logLevelkeyword
+    ...    Test various spellings of the LogLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELNORMAL}
-    Expect loglevel   NORMAL
+    Expect LogLevel   NORMAL
 Test LogLevel Debug
-    [Documentation]    Set logLevel to debug
+    [Documentation]    Set LogLevel to debug
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELdebug}
-    Expect loglevel   debug
+    Expect LogLevel   debug
 Test LogLevel UNKNOWN
     [Documentation]    Set logLevel to unknown
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELUNKNOWN}
-    Expect loglevel   Normal
+    Expect LogLevel   Normal
 *** Keywords ***
 Setup
     [Documentation]    Test suite setup
