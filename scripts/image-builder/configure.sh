@@ -28,13 +28,6 @@ sudo dnf install -y \
     createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
     containernetworking-plugins expect
 
-VID=$(source /etc/os-release && echo "${VERSION_ID}")
-if [[ "${VID}" == "9.2" ]] || { [[ "${VID}" == "9.3" ]] && grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; }; then
-    # If the system 9.2 or 9.3 beta: switch 9.3 repos to use beta packages
-    # Otherwise (like non-beta 9.3): keep original contents of the file
-    sudo sed -i "s,dist/rhel9/9.3,beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-93.json
-fi
-
 sudo systemctl enable osbuild-composer.socket --now
 sudo systemctl enable cockpit.socket --now
 sudo firewall-cmd --add-service=cockpit --permanent
