@@ -72,31 +72,62 @@ copy_file_to_vm() {
 }
 
 sos_report() {
+    local -r junit="${1:-false}"
+
     if "${SKIP_SOS}"; then
         echo "Skipping sos reports"
+        if "${junit}"; then
+            record_junit "post_setup" "sos-report" "SKIP"
+        fi
         return
     fi
+
+    echo "Creating sos reports"
     local vmname
     local ip
-    echo "Creating sos reports"
+    local scenario_result=0
     for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
         if [ ! -d "${vmdir}" ]; then
             # skip log files, etc.
             continue
         fi
+
         vmname=$(basename "${vmdir}")
         ip=$(get_vm_property "${vmname}" ip)
         if [ -z "${ip}" ]; then
             # skip hosts without NICs
             # FIXME: use virsh to copy sos report files
+            if "${junit}"; then
+                record_junit "${vmname}" "sos-report" "SKIP"
+            fi
             continue
         fi
-        # Some scenarios do not start with MicroShift installed, so we
-        # can't rely on the wrapper being there or working if it
-        # is. Copy the script to the host, just in case, along with a
-        # wrapper that knows how to execute it or the installed
-        # version.
-        cat - >/tmp/sos-wrapper.sh <<EOF
+
+        if ! sos_report_for_vm "${vmdir}" "${vmname}" "${ip}"; then
+            scenario_result=1
+            if "${junit}"; then
+                record_junit "${vmname}" "sos-report" "FAILED"
+            fi
+        else
+            if "${junit}"; then
+                record_junit "${vmname}" "sos-report" "OK"
+            fi
+        fi
+    done
+    return "${scenario_result}"
+}
+
+sos_report_for_vm() {
+    local -r vmdir="${1}"
+    local -r vmname="${2}"
+    local -r ip="${3}"
+
+    # Some scenarios do not start with MicroShift installed, so we
+    # can't rely on the wrapper being there or working if it
+    # is. Copy the script to the host, just in case, along with a
+    # wrapper that knows how to execute it or the installed
+    # version.
+    cat - >/tmp/sos-wrapper.sh <<EOF
 #!/usr/bin/env bash
 if [ -f /usr/bin/microshift-sos-report ]; then
     sudo /usr/bin/microshift-sos-report
@@ -106,12 +137,11 @@ else
 fi
 sudo chmod +r /tmp/sosreport*
 EOF
-        copy_file_to_vm "${vmname}" "/tmp/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
-        copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
-        run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
-        mkdir -p "${vmdir}/sos"
-        scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
-    done
+    copy_file_to_vm "${vmname}" "/tmp/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
+    copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
+    run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
+    mkdir -p "${vmdir}/sos"
+    scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
 }
 
 # Public function to render a unique kickstart from a template for a
@@ -612,7 +642,7 @@ load_scenario_script() {
 
 action_create() {
     start_junit
-    trap close_junit RETURN
+    trap "close_junit" EXIT
 
     if ! load_global_settings; then
         record_junit "setup" "load_global_settings" "FAILED"
@@ -626,7 +656,8 @@ action_create() {
     fi
     record_junit "setup" "load_scenario_script" "OK"
 
-    trap "sos_report" EXIT
+    # shellcheck disable=SC2154 # var is referenced but not assigned
+    trap 'res=0; sos_report true || res=$?; close_junit && exit "${res}"' EXIT
 
     if ! scenario_create_vms; then
         record_junit "setup" "scenario_create_vms" "FAILED"
