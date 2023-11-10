@@ -12,21 +12,24 @@ Suite Teardown      Teardown
 
 Test Tags           configuration    etcd    restart    slow
 
+
 *** Variables ***
-${LEVELNORMAL}          SEPARATOR=\n
-...                     ---
-...                     debugging:
-...                     \ \ LogLevel: NORMAL
+${LEVELNORMAL}      SEPARATOR=\n
+...                 ---
+...                 debugging:
+...                 \ \ LogLevel: NORMAL
 
-${LEVELdebug}          SEPARATOR=\n
-...                     ---
-...                     debugging:
-...                     \ \ LogLevel: debug
+${LEVELDEBUG}       SEPARATOR=\n
+...                 ---
+...                 debugging:
+...                 \ \ LogLevel: debug
 
-${LEVELUNKNOWN}          SEPARATOR=\n
-...                     ---
-...                     debugging:
-...                     \ \ LogLevel: Normal
+${LEVELUNKNOWN}     SEPARATOR=\n
+...                 ---
+...                 debugging:
+...                 \ \ LogLevel: Normal
+
+
 *** Test Cases ***
 Test LogLevel Normal
     [Documentation]    Set LogLevel to NORMAL
@@ -34,21 +37,25 @@ Test LogLevel Normal
     ...    Test various spellings of the LogLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELNORMAL}
-    Expect LogLevel   NORMAL
+    Expect LogLevel    NORMAL
+
 Test LogLevel Debug
     [Documentation]    Set LogLevel to debug
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
-    [Setup]    Setup With Custom Config    ${LEVELdebug}
-    Expect LogLevel   debug
+    [Setup]    Setup With Custom Config    ${LEVELDEBUG}
+    Expect LogLevel    debug
+
 Test LogLevel UNKNOWN
     [Documentation]    Set logLevel to unknown
     ...
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELUNKNOWN}
-    Expect LogLevel   Normal
+    Expect LogLevel    Normal
+
+
 *** Keywords ***
 Setup
     [Documentation]    Test suite setup
@@ -79,8 +86,8 @@ Expect LogLevel
     [Documentation]    Verify that the logLevel matches the expected value
     [Arguments]    ${expected}
 
-    ${output}        ${stdout}=    Execute Command
+    ${output}    ${stdout}=    Execute Command
     ...    microshift show-config
     ...    sudo=True    return_rc=True
-    ${config}=   Yaml Parse    ${output}
-    Should Be Equal As Strings   ${expected}    ${config.debugging.logLevel}
+    ${config}=    Yaml Parse    ${output}
+    Should Be Equal As Strings    ${expected}    ${config.debugging.logLevel}
