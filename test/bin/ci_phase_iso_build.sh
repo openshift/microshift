@@ -50,8 +50,7 @@ download_build_cache() {
 # - Clean up older images, preserving the 'last' and the previous build tag
 update_build_cache() {
     # Build the images to be cached
-    $(dry_run) bash -x ./bin/build_images.sh -i -g ./image-blueprints/group1
-    $(dry_run) bash -x ./bin/build_images.sh -i -g ./image-blueprints/group2
+    $(dry_run) bash -x ./bin/build_images.sh -i -l ./image-blueprints/layer1-base
 
     # Upload the images and update the 'last' setting
     ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
@@ -76,13 +75,13 @@ run_image_build() {
 
     # Build the images
     # Image build can be optimized in CI based on the job type
+    # - Always build 'base' and 'presubmit' layers
+    # - Only build 'periodic' layer in periodic jobs
     if [ -v CI_JOB_NAME ] ; then
-        $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group1
-        $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group2
-        # Groups 3 and 4 contains images exclusively used in periodic CI jobs
+        $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -l ./image-blueprints/layer1-base
+        $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -l ./image-blueprints/layer2-presubmit
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
-            $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group3
-            $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -g ./image-blueprints/group4
+            $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -l ./image-blueprints/layer3-periodic
         fi
     else
         # Fall back to full build when not running in CI
