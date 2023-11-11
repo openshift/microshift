@@ -376,8 +376,13 @@ do_group() {
 }
 
 usage() {
+    if [ $# -gt 0 ] ; then
+        echo "ERROR: $*"
+        echo
+    fi
+
     cat - <<EOF
-build_images.sh [-Is] [-g group-dir] [-t template]
+build_images.sh [-iIs] [-l layer-dir | -g group-dir] [-t template]
 
   -h      Show this help
 
@@ -387,20 +392,28 @@ build_images.sh [-Is] [-g group-dir] [-t template]
 
   -s      Only build source images (implies -I).
 
-  -g DIR  Build only one group.
+  -l DIR  Build only one layer (cannot be used with -g or -t).
+          The DIR should be the path to the layer to build.
 
-  -t FILE Build only one template. The FILE should be the path to
-          the template to build. Implies -g based on filename.
+  -g DIR  Build only one group (cannot be used with -l or -t).
+          The DIR should be the path to the group to build.
+          Implies -l based on the path.
+
+  -t FILE Build only one template (cannot be used with -l or -g). 
+          The FILE should be the path to the template to build. 
+          Implies -l and -g based on the filename.
 
 EOF
 }
 
 BUILD_INSTALLER=true
 ONLY_SOURCE=false
+LAYER=""
 GROUP=""
 TEMPLATE=""
 
-while getopts "iIg:st:h" opt; do
+selCount=0
+while getopts "iIl:g:st:h" opt; do
     case "${opt}" in
         h)
             usage
@@ -412,25 +425,34 @@ while getopts "iIg:st:h" opt; do
         I)
             BUILD_INSTALLER=false
             ;;
-        g)
-            GROUP="$(realpath "${OPTARG}")"
-            ;;
         s)
             BUILD_INSTALLER=false
             ONLY_SOURCE=true
             ;;
+        l)
+            LAYER="$(realpath "${OPTARG}")"
+            selCount=$((selCount+1))
+            ;;
+        g)
+            GROUP="$(realpath "${OPTARG}")"
+            selCount=$((selCount+1))
+            ;;
         t)
             TEMPLATE="${OPTARG}"
             GROUP="$(basename "$(dirname "$(realpath "${OPTARG}")")")"
+            selCount=$((selCount+1))
             ;;
         *)
-            echo "ERROR: Unknown option ${opt}"
-            echo
-            usage
+            usage "ERROR: Unknown option ${opt}"
             exit 1
             ;;
     esac
 done
+
+if [ ${selCount} -gt 1 ] ; then
+    usage "The layer, group and template options are mutually exclusive"
+    exit 1
+fi
 
 if [ ! -f "${GOMPLATE}" ]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" gomplate
@@ -478,10 +500,14 @@ configure_package_sources
 
 trap 'osbuild_logs' EXIT
 
-if [ -n "${GROUP}" ]; then
+if [ -n "${LAYER}" ]; then
+    for group in "${LAYER}"/group*; do
+        do_group "${group}" ""
+    done
+elif [ -n "${GROUP}" ]; then
     do_group "${GROUP}" "${TEMPLATE}"
 else
-    for group in "${TESTDIR}"/image-blueprints/group*; do
+    for group in "${TESTDIR}"/image-blueprints/layer*/group*; do
         do_group "${group}" ""
     done
 fi
