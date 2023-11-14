@@ -57,23 +57,54 @@ EOF
 }
 
 action_upload() {
-    local -r src_dir="${IMAGEDIR}/${VM_POOL_BASENAME}"
-    local -r dst_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}/${VM_POOL_BASENAME}"
-    local -r src_size=$(du -csh "${IMAGEDIR}/${VM_POOL_BASENAME}" | awk 'END{print $1}')
+    local -r src_base="${IMAGEDIR}"
+    local -r dst_base="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
 
-    echo "Uploading ${src_size} of data to '${dst_dir}'"
-    "${AWSCLI}" s3 sync --quiet --include '*.iso' "${src_dir}" "${dst_dir}"
+    # Upload ISO images
+    local -r iso_base="${src_base}/${VM_POOL_BASENAME}"
+    local -r iso_size="$(du -csh "${iso_base}" | awk 'END{print $1}')"
+    local -r iso_dest="${dst_base}/${VM_POOL_BASENAME}"
+
+    echo "Uploading ${iso_size} of ISO images to '${iso_dest}'"
+    "${AWSCLI}" s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
+
+    # Upload ostree commits
+    local -r repo_base="${src_base}/repo"
+    local -r repo_size="$(du -csh "${repo_base}" | awk 'END{print $1}')"
+    local -r repo_dest="${dst_base}/repo"
+
+    # Create dummy files in empty directories
+    find "${repo_base}" -type d -empty | while IFS= read -r dir; do
+        touch "${dir}/.s3-sync-empty-dir"
+    done
+
+    echo "Uploading ${repo_size} of ostree commits to '${repo_dest}'"
+    "${AWSCLI}" s3 sync --quiet "${repo_base}" "${repo_dest}"
 }
 
 action_download() {
-    local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}/${VM_POOL_BASENAME}"
-    local -r dst_dir="${IMAGEDIR}/${VM_POOL_BASENAME}"
+    local -r src_base="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
+    local -r dst_base="${IMAGEDIR}"
 
-    echo "Downloading data from '${src_dir}'"
-    "${AWSCLI}" s3 sync --quiet --include '*.iso' "${src_dir}" "${dst_dir}"
+    # Download ISO images
+    local -r iso_base="${src_base}/${VM_POOL_BASENAME}"
+    local -r iso_dest="${dst_base}/${VM_POOL_BASENAME}"
 
-    local -r dst_size=$(du -csh "${IMAGEDIR}/${VM_POOL_BASENAME}" | awk 'END{print $1}')
-    echo "Downloaded ${dst_size} data"
+    echo "Downloading ISO images from '${iso_base}'"
+    "${AWSCLI}" s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
+
+    local -r iso_size="$(du -csh "${iso_dest}" | awk 'END{print $1}')"
+    echo "Downloaded ${iso_size} of ISO images"
+
+    # Download ostree commits
+    local -r repo_base="${src_base}/repo"
+    local -r repo_dest="${dst_base}/repo"
+
+    echo "Downloading ostree commits from '${repo_base}'"
+    "${AWSCLI}" s3 sync --quiet "${repo_base}" "${repo_dest}"
+
+    local -r repo_size="$(du -csh "${repo_dest}" | awk 'END{print $1}')"
+    echo "Downloaded ${repo_size} of ostree commits"
 }
 
 action_verify() {

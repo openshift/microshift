@@ -44,13 +44,13 @@ download_build_cache() {
     return 1
 }
 
-# Run image build for installer images only and update the cache:
+# Run image build for the 'base' layer and update the cache:
 # - Upload build artifacts
 # - Update 'last' to point to the current build tag
 # - Clean up older images, preserving the 'last' and the previous build tag
 update_build_cache() {
-    # Build the images to be cached
-    $(dry_run) bash -x ./bin/build_images.sh -i -l ./image-blueprints/layer1-base
+    # Build the base layer to be cached
+    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
 
     # Upload the images and update the 'last' setting
     ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
@@ -61,31 +61,32 @@ update_build_cache() {
     ./bin/manage_build_cache.sh keep -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG_PREV}"
 }
 
-# Run image build, skipping the installer images if instructed.
-# If 'with_cached_data' argument is 'true', do not build installer images.
+# Run image build, potentially skipping the 'base' and 'periodic' layers in CI builds.
+# Full builds are run if the 'CI_JOB_NAME' environment variable is not set.
+#
+# When the 'CI_JOB_NAME' environment variable is set:
+# - If the 'with_cached_data' argument is 'true', only dry run the 'base' layer.
+# - Always build the 'presubmit' layer.
+# - Only build the 'periodic' layer when 'CI_JOB_NAME' contains 'periodic' token.
 run_image_build() {
     local -r with_cached_data=$1
-    local build_opts
 
-    build_opts=""
-    if ${with_cached_data} ; then
-        # Skip installer image builds as they were downloaded from cache
-        build_opts="-I"
-    fi
-
-    # Build the images
-    # Image build can be optimized in CI based on the job type
-    # - Always build 'base' and 'presubmit' layers
-    # - Only build 'periodic' layer in periodic jobs
     if [ -v CI_JOB_NAME ] ; then
-        $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -l ./image-blueprints/layer1-base
-        $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -l ./image-blueprints/layer2-presubmit
+        # Conditional per-layer builds when running in CI
+        if ${with_cached_data} ; then
+            $(dry_run) bash -x ./bin/build_images.sh -d -l ./image-blueprints/layer1-base
+        else
+            $(dry_run) bash -x ./bin/build_images.sh    -l ./image-blueprints/layer1-base
+        fi
+
+        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
+
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
-            $(dry_run) bash -x ./bin/build_images.sh ${build_opts} -l ./image-blueprints/layer3-periodic
+            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
         fi
     else
         # Fall back to full build when not running in CI
-        $(dry_run) bash -x ./bin/build_images.sh ${build_opts}
+        $(dry_run) bash -x ./bin/build_images.sh
     fi
 }
 
