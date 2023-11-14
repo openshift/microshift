@@ -1,40 +1,18 @@
-- cluster-csi-snapshot-controller-operator embedded-component 298461bab5bbb51f47695ed772583ac5fc319974 to 0929c76c5d2ed00b8175c95435586908a27c6495
-  - 876f60a 2023-11-02T13:19:07+01:00 CVE-2023-45142: bump go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp to v0.45.0
+- cluster-ingress-operator embedded-component 23ee5bea964b757cfd4a7b1f66581b6ec7cf7647 to 9e775905596fbfcbce19ff0018ea8398693da714
+  - 49eb058 2023-10-25T01:02:40-04:00 Revert "OCPBUGS-16762: Bump openshift/api for container.maxLength fix"
 
-- cluster-kube-apiserver-operator embedded-component 5ac4554d4ad0f1331f3fb9b437e936e3b29fb735 to 13bd0c1f2f2697b09966bc19093f79094e965046
-  - 98ab15d 2023-09-16T17:19:45+00:00 Updating ose-cluster-kube-apiserver-operator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/da6a5af1fa96762cc8410f09fc28c0457280f59a/images/ose-cluster-kube-apiserver-operator.yml
+- machine-config-operator embedded-component f41e20d6ba3951ac9ce9411f0511558c34e60e53 to 8e2f5441df5225bcf068f60bbe07bfae5a33f437
+  - a953f3b2 2023-11-03T11:46:24-05:00 OCPBUGS-22721: Don't retry node-ip show in resolv-prepender
+  - 2750c2f2 2023-11-02T15:27:38-04:00 controller: allow custom pool configs to take priority
+  - c738160e 2023-10-20T14:23:51+01:00 Retry fetching OpenStack hostname if it fails
 
-- cluster-openshift-controller-manager-operator embedded-component f45b3c501fcb9923814d5da0558bf31d1b86a15e to e6f885abcd9923abf87c3b96908e69393b06efef
-  - ee8bdec 2023-10-31T12:15:52-04:00 assume enabled until config exists & keep in-use secrets
-  - 2d1cc08 2023-10-30T09:28:22-04:00 Revert "Merge pull request #313 from neisw/revert-300-1698599424767"
+- oc image-amd64 7bce4b95745afecbbe31b5921828fdc9796090d0 to 1d4a9afe8cf066b4c34018b3e0f4919d0157f091
+  - 57e98449 2023-11-09T16:03:55+01:00 `adm upgrade status`: add fixture test
+  - b6558a1a 2023-11-02T16:08:23+01:00 adm update status: emit `<none>` on empty reason or message
+  - d88dcb27 2023-11-02T16:08:23+01:00 adm update status: add mocking input capabilities
 
-- kubernetes embedded-component 6c8041c1ecaac48c0c1fb220a6d273550c5b2297 to 4cbdd29250f42f7294c94d5ba60f4b168f6d58a2
-  - 60171d1f5 2023-11-02T10:01:40-04:00 UPSTREAM: <carry>: Disable e2e tests related to AdmissionWebhookMatchConditions
-
-- kubernetes-kube-storage-version-migrator embedded-component 8558e14a116804168506d06e96eac5a79913a6eb to 95ad20fc390cd34e0e5ba5135d5048bc0f008c0d
-  - e88aac5 2023-09-17T10:37:02+00:00 UPSTREAM: <carry>: Updating ose-kube-storage-version-migrator images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/da6a5af1fa96762cc8410f09fc28c0457280f59a/images/ose-kube-storage-version-migrator.yml
-
-- service-ca-operator embedded-component df8d9d01827dc37e54f1babbac35ec94d9c7b257 to fe887613d031435fb0c76eb397764ba68fe09014
-  - 565b605 2023-11-02T14:16:24-04:00 add ownership for unshared secrets and configmaps
-  - 5d43ef6 2023-11-02T14:16:24-04:00 update openshift/api for const
-
-- oc image-amd64 f67a45d28df578b29be8f539dd614f1497865082 to 7bce4b95745afecbbe31b5921828fdc9796090d0
-  - 7b646063 2023-11-02T13:39:48+01:00 Drop the experimental info for registry login and must-gather commands
-
-- kubernetes image-amd64 6c8041c1ecaac48c0c1fb220a6d273550c5b2297 to 4cbdd29250f42f7294c94d5ba60f4b168f6d58a2
-  - 60171d1f5 2023-11-02T10:01:40-04:00 UPSTREAM: <carry>: Disable e2e tests related to AdmissionWebhookMatchConditions
-
-- service-ca-operator image-amd64 df8d9d01827dc37e54f1babbac35ec94d9c7b257 to fe887613d031435fb0c76eb397764ba68fe09014
-  - 565b605 2023-11-02T14:16:24-04:00 add ownership for unshared secrets and configmaps
-  - 5d43ef6 2023-11-02T14:16:24-04:00 update openshift/api for const
-
-- oc image-arm64 f67a45d28df578b29be8f539dd614f1497865082 to 7bce4b95745afecbbe31b5921828fdc9796090d0
-  - 7b646063 2023-11-02T13:39:48+01:00 Drop the experimental info for registry login and must-gather commands
-
-- kubernetes image-arm64 6c8041c1ecaac48c0c1fb220a6d273550c5b2297 to 4cbdd29250f42f7294c94d5ba60f4b168f6d58a2
-  - 60171d1f5 2023-11-02T10:01:40-04:00 UPSTREAM: <carry>: Disable e2e tests related to AdmissionWebhookMatchConditions
-
-- service-ca-operator image-arm64 df8d9d01827dc37e54f1babbac35ec94d9c7b257 to fe887613d031435fb0c76eb397764ba68fe09014
-  - 565b605 2023-11-02T14:16:24-04:00 add ownership for unshared secrets and configmaps
-  - 5d43ef6 2023-11-02T14:16:24-04:00 update openshift/api for const
+- oc image-arm64 7bce4b95745afecbbe31b5921828fdc9796090d0 to 1d4a9afe8cf066b4c34018b3e0f4919d0157f091
+  - 57e98449 2023-11-09T16:03:55+01:00 `adm upgrade status`: add fixture test
+  - b6558a1a 2023-11-02T16:08:23+01:00 adm update status: emit `<none>` on empty reason or message
+  - d88dcb27 2023-11-02T16:08:23+01:00 adm update status: add mocking input capabilities
 
