@@ -113,7 +113,14 @@ get_image_parent() {
     base=$(basename "${blueprint_filename}" .toml)
     if [[ "${base}" =~ '-' ]]; then
         base="${base//-*/}"
-        get_blueprint_name "${IMAGEDIR}/blueprints/${base}.toml"
+
+        local name
+        name=$(find "${TESTDIR}/image-blueprints" -name "${base}.toml")
+        if [ -n "${name}" ] ; then
+            get_blueprint_name "${name}"
+        else
+            echo ""
+        fi
     else
         echo ""
     fi
@@ -251,6 +258,11 @@ do_group() {
             record_junit "${groupdir}" "${blueprint}" "depsolve" "FAILED"
         fi
 
+        if ${COMPOSER_DRY_RUN} ; then
+            echo "Skipping the composer start operation"
+            continue
+        fi
+
         parent_args=""
         parent=$(get_image_parent "${template}")
         if [ -n "${parent}" ]; then
@@ -271,7 +283,7 @@ do_group() {
         buildid_list="${buildid_list} ${buildid}"
     done
 
-    if ${BUILD_INSTALLER}; then
+    if ${BUILD_INSTALLER} && ! ${COMPOSER_DRY_RUN}; then
         for image_installer in "${groupdir}"/*.image-installer; do
             blueprint=$("${GOMPLATE}" --file "${image_installer}")
             echo "Building image-installer from ${blueprint}"
@@ -382,7 +394,7 @@ usage() {
     fi
 
     cat - <<EOF
-build_images.sh [-iIs] [-l layer-dir | -g group-dir] [-t template]
+build_images.sh [-iIsd] [-l layer-dir | -g group-dir] [-t template]
 
   -h      Show this help
 
@@ -391,6 +403,8 @@ build_images.sh [-iIs] [-l layer-dir | -g group-dir] [-t template]
   -I      Do not build the installer image(s).
 
   -s      Only build source images (implies -I).
+
+  -d      Dry run by skipping the composer start commands.
 
   -l DIR  Build only one layer (cannot be used with -g or -t).
           The DIR should be the path to the layer to build.
@@ -408,12 +422,13 @@ EOF
 
 BUILD_INSTALLER=true
 ONLY_SOURCE=false
+COMPOSER_DRY_RUN=false
 LAYER=""
 GROUP=""
 TEMPLATE=""
 
 selCount=0
-while getopts "iIl:g:st:h" opt; do
+while getopts "iIl:g:sdt:h" opt; do
     case "${opt}" in
         h)
             usage
@@ -428,6 +443,9 @@ while getopts "iIl:g:st:h" opt; do
         s)
             BUILD_INSTALLER=false
             ONLY_SOURCE=true
+            ;;
+        d)
+            COMPOSER_DRY_RUN=true
             ;;
         l)
             LAYER="$(realpath "${OPTARG}")"
