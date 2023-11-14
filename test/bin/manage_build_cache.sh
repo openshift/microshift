@@ -25,6 +25,9 @@ The cache directory structure is '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>'.
 
   upload:   Upload build artifacts from the local disk to the specified
             '${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/<tag>' AWS S3 bucket.
+            The 'verify' operation is run before the upload attempt. If
+            data already exists at the destination, the upload is skipped
+            and the script exits with 0 status.
 
   download: Download build artifacts from the specified
             '${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/<tag>' AWS S3 bucket
@@ -56,9 +59,26 @@ Options:
 EOF
 }
 
+check_contents() {
+    local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
+
+    echo "Checking contents of '${src_dir}'"
+    if "${AWSCLI}" s3 ls "${src_dir}/${VM_POOL_BASENAME}/" | awk '{print $NF}' | grep -Eq '.iso$' ; then
+        if "${AWSCLI}" s3 ls "${src_dir}/" | awk '{print $NF}' | grep -Eq 'repo.tar$' ; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
 action_upload() {
     local -r src_base="${IMAGEDIR}"
     local -r dst_base="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
+
+    if check_contents ; then
+        echo "The '${dst_base}' already exists with valid contents"
+        return
+    fi
 
     # Upload ISO images
     local -r iso_base="${src_base}/${VM_POOL_BASENAME}"
@@ -115,14 +135,9 @@ action_download() {
 }
 
 action_verify() {
-    local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
-
-    echo "Checking contents of '${src_dir}'"
-    if "${AWSCLI}" s3 ls "${src_dir}/${VM_POOL_BASENAME}/" | awk '{print $NF}' | grep -Eq '.iso$' ; then
-        if "${AWSCLI}" s3 ls "${src_dir}/" | awk '{print $NF}' | grep -Eq 'repo.tar$' ; then
-            echo OK
-            exit 0
-        fi
+    if check_contents ; then
+        echo OK
+        exit 0
     fi
 
     echo KO
