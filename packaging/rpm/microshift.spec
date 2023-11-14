@@ -188,9 +188,6 @@ install -p -m644 packaging/crio.conf.d/microshift_amd64.conf %{buildroot}%{_sysc
 
 install -p -m644 packaging/crio.conf.d/microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
 
-install -d -m755  %{buildroot}%{_sysconfdir}/NetworkManager/conf.d
-install -p -m644  packaging/network-manager-conf/microshift-nm.conf %{buildroot}%{_sysconfdir}/NetworkManager/conf.d/microshift-nm.conf
-
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 
@@ -335,7 +332,6 @@ systemctl enable --now --quiet openvswitch || true
 
 %files networking
 %{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
-%{_sysconfdir}/NetworkManager/conf.d/microshift-nm.conf
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
