@@ -69,17 +69,17 @@ action_upload() {
     "${AWSCLI}" s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
 
     # Upload ostree commits
-    local -r repo_base="${src_base}/repo"
-    local -r repo_size="$(du -csh "${repo_base}" | awk 'END{print $1}')"
-    local -r repo_dest="${dst_base}/repo"
+    local -r repo_src="${src_base}/repo.tar"
+    local -r repo_dst="${dst_base}/repo.tar"
 
-    # Create dummy files in empty directories
-    find "${repo_base}" -type d -empty | while IFS= read -r dir; do
-        touch "${dir}/.s3-sync-empty-dir"
-    done
+    # Archive the repo files before the upload
+    rm -f "${repo_src}"
+    tar cf "${repo_src}" -C "${src_base}" repo
 
-    echo "Uploading ${repo_size} of ostree commits to '${repo_dest}'"
-    "${AWSCLI}" s3 sync --quiet "${repo_base}" "${repo_dest}"
+    local -r repo_size="$(du -csh "${repo_src}" | awk 'END{print $1}')"
+    echo "Uploading ${repo_size} of ostree commits to '${repo_dst}'"
+    "${AWSCLI}" s3 cp --quiet "${repo_src}" "${repo_dst}"
+    rm -f "${repo_src}"
 }
 
 action_download() {
@@ -97,23 +97,32 @@ action_download() {
     echo "Downloaded ${iso_size} of ISO images"
 
     # Download ostree commits
-    local -r repo_base="${src_base}/repo"
-    local -r repo_dest="${dst_base}/repo"
+    local -r repo_src="${src_base}/repo.tar"
+    local -r repo_dst="${dst_base}/repo.tar"
+    local -r repo_dir="${dst_base}/repo"
 
-    echo "Downloading ostree commits from '${repo_base}'"
-    "${AWSCLI}" s3 sync --quiet "${repo_base}" "${repo_dest}"
+    echo "Downloading ostree commits from '${repo_src}'"
+    rm -f "${repo_dst}"
+    "${AWSCLI}" s3 cp --quiet "${repo_src}" "${repo_dst}"
 
-    local -r repo_size="$(du -csh "${repo_dest}" | awk 'END{print $1}')"
+    # Unarchive the repo files after the download
+    rm -rf "${repo_dir}"
+    tar xf "${repo_dst}" -C "${dst_base}"
+    rm -f "${repo_dst}"
+
+    local -r repo_size="$(du -csh "${repo_dir}" | awk 'END{print $1}')"
     echo "Downloaded ${repo_size} of ostree commits"
 }
 
 action_verify() {
-    local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}/${VM_POOL_BASENAME}"
+    local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
 
     echo "Checking contents of '${src_dir}'"
-    if "${AWSCLI}" s3 ls "${src_dir}/" | awk '{print $NF}' | grep -Eq '.iso$' ; then
-        echo OK
-        exit 0
+    if "${AWSCLI}" s3 ls "${src_dir}/${VM_POOL_BASENAME}/" | awk '{print $NF}' | grep -Eq '.iso$' ; then
+        if "${AWSCLI}" s3 ls "${src_dir}/" | awk '{print $NF}' | grep -Eq 'repo.tar$' ; then
+            echo OK
+            exit 0
+        fi
     fi
 
     echo KO
