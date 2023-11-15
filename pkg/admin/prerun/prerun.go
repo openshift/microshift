@@ -86,6 +86,20 @@ func (dm *dataManagement) backup() error {
 	}
 	klog.InfoS("Contents of version file", "contents", versionFile)
 
+	currentBootID, err := getCurrentBootID()
+	if err != nil {
+		return err
+	}
+	if currentBootID == versionFile.BootID {
+		// We don't want to create a backup if versionFile has current boot ID:
+		// backup would be created for current boot - in the middle of it.
+		// Because backups are not updated/overwritten, existence of such backup would prevent
+		// creation of proper backup, i.e. backup for previous boot after reboot.
+		klog.InfoS("Current boot ID and one stored in version file are the same - skipping backup",
+			"current", currentBootID)
+		return nil
+	}
+
 	existingBackups, err := getBackups(dm.dataManager)
 	if err != nil {
 		return err
