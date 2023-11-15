@@ -48,7 +48,14 @@ download_build_cache() {
 # - Upload build artifacts
 # - Update 'last' to point to the current build tag
 # - Clean up older images, preserving the 'last' and the previous build tag
+# Note that the build and upload are skipped if valid cached data already exists.
 update_build_cache() {
+    if ./bin/manage_build_cache.sh verify -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" ; then
+        echo "Valid build cache already exists for the '${SCENARIO_BUILD_BRANCH}' branch and '${SCENARIO_BUILD_TAG}' tag"
+        echo "WARNING: Skipping cache build, update and cleanup procedures"
+        return
+    fi
+
     # Build the base layer to be cached
     $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
 
