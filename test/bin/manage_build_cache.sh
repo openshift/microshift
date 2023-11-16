@@ -59,17 +59,21 @@ Options:
 EOF
 }
 
-check_contents() {
+check_contents(){
     local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
+    local s3_stdout="$(aws s3 ls $src_dir --recursive)"
+    
+    local must_contain_array=("repo.tar" "${VM_POOL_BASENAME}/.*.iso" "rpm-source-cache.tar")
 
-    echo "Checking contents of '${src_dir}'"
-    if "${AWSCLI}" s3 ls "${src_dir}/${VM_POOL_BASENAME}/" | awk '{print $NF}' | grep -Eq '.iso$' ; then
-        if "${AWSCLI}" s3 ls "${src_dir}/" | awk '{print $NF}' | grep -Eq 'repo.tar$' ; then
-            return 0
+    for item in "${must_contain_array[@]}"; do 
+        if echo $s3_stdout | grep -v $item;  then
+            return 1
         fi
-    fi
-    return 1
+    done
+
+    return 0
 }
+
 
 action_upload() {
     local -r src_base="${IMAGEDIR}"
@@ -100,6 +104,19 @@ action_upload() {
     echo "Uploading ${repo_size} of ostree commits to '${repo_dst}'"
     "${AWSCLI}" s3 cp --quiet "${repo_src}" "${repo_dst}"
     rm -f "${repo_src}"
+
+    # Upload RPMs
+    local -r rpm_src="${src_base}/rpm-source-cache.tar"
+    local -r rpm_dst="${dst_base}/rpm-source-cache.tar"
+
+    # Archive the rpms files before the upload
+    rm -f "${rpm_src}"
+    tar cf "${rpm_src}" -C "${RPM_SOURCE}" RPMS --transform s/RPMS/rpm-source-cache/
+
+    local -r rpm_size="$(du -csh "${rpm_src}" | awk 'END{print $1}')"
+    echo "Uploading ${rpm_size} of RPMs to '${rpm_dst}'"
+    "${AWSCLI}" s3 cp --quiet "${rpm_src}" "${rpm_dst}"
+    rm -f "${rpm_src}"
 }
 
 action_download() {
@@ -131,7 +148,21 @@ action_download() {
     rm -f "${repo_dst}"
 
     local -r repo_size="$(du -csh "${repo_dir}" | awk 'END{print $1}')"
-    echo "Downloaded ${repo_size} of ostree commits"
+    echo "Downloaded ${repo_size} of RPMs"
+
+    # Download RPMs
+    local -r rpm_src="${src_base}/rpm-source-cache.tar"
+    local -r rpm_dst="${dst_base}/rpm-source-cache.tar"
+    local -r rpm_dir="${dst_base}/rpm-source-cache"
+
+    # Unarchive the RPM files after the download
+    rm -rf "${rpm_dir}"
+    tar xf "${rpm_dst}" -C "${dst_base}"
+    rm -f "${rpm_dst}"
+
+    local -r rpm_size="$(du -csh "${rpm_dir}" | awk 'END{print $1}')"
+    echo "Downloaded ${rpm_size} of ostree commits"
+
 }
 
 action_verify() {
