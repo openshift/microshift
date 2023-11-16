@@ -1,6 +1,3 @@
-- etcd embedded-component 9651438be519d3d4f1b34b4f8d166778aaa3e5ce to 969d7afab8258b4610569d001e9a06b677acd021
-  - 21d700c3 2023-09-18T00:34:16+00:00 Updating ose-etcd images to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/da6a5af1fa96762cc8410f09fc28c0457280f59a/images/ose-etcd.yml
-
-- machine-config-operator embedded-component 8e2f5441df5225bcf068f60bbe07bfae5a33f437 to d469addcb699ab2a8aba28e2bd3834474d1ba55a
-  - b19a1c08 2023-11-13T13:15:27+01:00 CNV-34844: workaround nmstate bug by configuring ipv{4,6} addresses
+- cluster-network-operator embedded-component d25562d4a52220b7ed3be76bc848ba26eae068f2 to 17cbb7944bb0a0de28b6555526f984333a036cb9
+  - 491a6b4 2023-11-08T14:38:44-05:00 set automountServiceAccountToken to false for hypershift managed network node identity
 
