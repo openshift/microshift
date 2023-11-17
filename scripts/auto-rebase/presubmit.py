@@ -50,7 +50,7 @@ def check_assets_dir_against_instructions(recipe):
     Returns boolean indicating whether an issue was found.
     """
     assets_filelist = set(build_assets_filelist_from_recipe(recipe))
-    realfiles = {f.replace('assets/', '') for f in glob.glob('assets/**/*.*', recursive=True)}
+    realfiles = {f.replace('assets/', '') for f in glob.glob('assets/**/*', recursive=True) if not os.path.isdir(f)}
 
     missing_in_recipe = realfiles - assets_filelist
     superfluous_in_recipe = assets_filelist - realfiles
