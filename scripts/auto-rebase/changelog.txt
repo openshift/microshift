@@ -1,24 +1,12 @@
-- kubernetes embedded-component f67aeb31c9b95fd8998de8b895ac91bfdf733b2e to b49f9d1356bca4e8dd206a3b019184beffd88153
-  - f38b33f81 2023-11-06T11:43:28-05:00 UPSTREAM: <carry>: update vendor hack/update-vendor.sh
-  - 357a40a1b 2023-11-06T11:43:15-05:00 UPSTREAM: <carry>: support for both icsp and idms objects
+- cluster-network-operator embedded-component 1504d2a16032cd3637f5c9a338f8f48a82614cca to 4cd5c10d6423582ceef639a822b929788ac2c9a0
+  - 626820b 2023-11-15T15:53:30+00:00 set automountServiceAccountToken to false for hypershift managed network node identity
 
-- service-ca-operator embedded-component 030a429b314d772b7cc7a1dd9af2073988a5b0a5 to 3c3f82f7112ee4b5656e5c554f9887acdf881175
-  - 56bc16f 2023-10-19T13:48:07+02:00 go mod vendor
-  - 3d8d2db 2023-10-19T13:47:56+02:00 go.mod: bump library-go
-  - 9c08b83 2023-10-18T12:32:52+02:00 go mod vendor
-  - dff50b7 2023-10-18T12:32:45+02:00 go.mod: bump golang.org/x/net to v0.17.0
+- kubernetes embedded-component b49f9d1356bca4e8dd206a3b019184beffd88153 to d5480521eb5a02f9633b20260f166981905b33f5
+  - 62f7ffb41 2023-11-14T13:27:07-05:00 UPSTREAM: 121881: Use golang library instead of mklink
 
-- kubernetes image-amd64 f67aeb31c9b95fd8998de8b895ac91bfdf733b2e to b49f9d1356bca4e8dd206a3b019184beffd88153
-  - f38b33f81 2023-11-06T11:43:28-05:00 UPSTREAM: <carry>: update vendor hack/update-vendor.sh
-  - 357a40a1b 2023-11-06T11:43:15-05:00 UPSTREAM: <carry>: support for both icsp and idms objects
+- kubernetes image-amd64 b49f9d1356bca4e8dd206a3b019184beffd88153 to d5480521eb5a02f9633b20260f166981905b33f5
+  - 62f7ffb41 2023-11-14T13:27:07-05:00 UPSTREAM: 121881: Use golang library instead of mklink
 
-- service-ca-operator image-amd64 030a429b314d772b7cc7a1dd9af2073988a5b0a5 to 3c3f82f7112ee4b5656e5c554f9887acdf881175
-  - 56bc16f 2023-10-19T13:48:07+02:00 go mod vendor
-  - 3d8d2db 2023-10-19T13:47:56+02:00 go.mod: bump library-go
-  - 9c08b83 2023-10-18T12:32:52+02:00 go mod vendor
-  - dff50b7 2023-10-18T12:32:45+02:00 go.mod: bump golang.org/x/net to v0.17.0
-
-- kubernetes image-arm64 f67aeb31c9b95fd8998de8b895ac91bfdf733b2e to b49f9d1356bca4e8dd206a3b019184beffd88153
-  - f38b33f81 2023-11-06T11:43:28-05:00 UPSTREAM: <carry>: update vendor hack/update-vendor.sh
-  - 357a40a1b 2023-11-06T11:43:15-05:00 UPSTREAM: <carry>: support for both icsp and idms objects
+- kubernetes image-arm64 b49f9d1356bca4e8dd206a3b019184beffd88153 to d5480521eb5a02f9633b20260f166981905b33f5
+  - 62f7ffb41 2023-11-14T13:27:07-05:00 UPSTREAM: 121881: Use golang library instead of mklink
 
