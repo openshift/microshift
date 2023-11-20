@@ -1,50 +1,7 @@
-- cluster-kube-scheduler-operator embedded-component 00304850028f5e65c9d6eea1dc7be04b85cb09e0 to 835a25b7431d6a80ca488553dd8e9a55b021797c
-  - 954bdfc 2023-11-16T13:35:57+01:00 Migrate from kubescheduler.config.k8s.io/v1beta3 to v1
+- cluster-kube-apiserver-operator embedded-component 13bd0c1f2f2697b09966bc19093f79094e965046 to 5e63d3dabe8798b40ff36e5afcce280e156c1577
+  - d765d0a 2023-11-16T18:04:32+01:00 manifests: set owning component for TLS artifacts
 
-- cluster-network-operator embedded-component d25562d4a52220b7ed3be76bc848ba26eae068f2 to 17cbb7944bb0a0de28b6555526f984333a036cb9
-  - 491a6b4 2023-11-08T14:38:44-05:00 set automountServiceAccountToken to false for hypershift managed network node identity
-
-- kubernetes embedded-component 4cbdd29250f42f7294c94d5ba60f4b168f6d58a2 to 20a57641f83e54f94737cfc9830de5e270b0fa9e
-  - f59457bea 2023-11-14T13:27:18-05:00 UPSTREAM: 121881: Use golang library instead of mklink
-
-- openshift-controller-manager embedded-component 1d4fb5b041da1728a0ce499088abc339579b302f to 2a28a78279b127075b399a3442a2042f4a7d190d
-  - 540a69a 2023-11-15T14:24:46-05:00 OCPBUGS-22471: Mitigate CVE-2023-30551 (rekor)
-
-- ovn-kubernetes image-amd64 814535a6dbae0124d34a6461355055108aa4e54d to 0e8096fd1d4fba9dec2db2f6af879112e78c48ad
-  - 469c4e8 2023-11-03T17:57:35+01:00 kubevirt: Ignore completed virt-launcher pods
-  - 51b2596 2023-11-03T13:53:40+01:00 kubevirt, e2e: Replace kv client with cr client
-  - eedcc94 2023-11-03T13:53:40+01:00 kind: Pin kubevirt to latest stable version
-  - f94332f 2023-11-03T10:33:44+01:00 Update egress firewall to use namespaced port group instead of cluster port group + address set match to reduce the number of OVS flows. Previously, all EF ACLs were applied to the clusterPortGroup, and matched source on address set. In that case, all node will have the same set of OVS flows, matching sources that are not scheduled on that node at all. When using port group as a source match, only flow for local ports will be present on every node. The port group is created, updated and deleted by namespace handler similar to the namespace address set.
-  - 5e9a5b3 2023-11-03T10:33:44+01:00 Move multicast port group management to the namespace similar to namespace address set. Existing port groups don't need any change, since port group name always was a namespace name. Set ErrNotFound to false for delete acls and ports from port group ops. Namespace handler will create, update and delete namespace port group similar to the namespace address set.
-  - e8ca078 2023-11-02T15:37:35+01:00 Wait for egress firewall applied status before running connectivity check
-  - fbd2924 2023-11-02T10:43:14+01:00 Prevent multiple encap-ips per single chassis
-  - 0d0b446 2023-11-02T10:43:14+01:00 model_client: Allow Update and Mutate Insert on the same row
-  - 5a08eb2 2023-10-31T14:38:38+01:00 Fix pod creation with sriov interfaces
-  - b6c7ce6 2023-10-30T15:38:26+00:00 Bump github.com/docker/docker in /test/e2e
-  - 469e752 2023-10-27T11:08:11+02:00 Update ACL syncer: make default deny acls filter more strict, delete all acls that were not synced since they should be stale. Add unit test for a specific multicast leftover acl that was a result of libovsdb migration.
-  - 15b075a 2023-10-26T16:15:22+02:00 multi network: Support NAD plugin list in addition to single plugin configuration
-  - fc3ff2f 2023-10-26T09:24:00+02:00 Update leaderelection config to allow retries for an overloaded cluster. With the previous params we only allowed 1 retry in case tryAcquireOrRenew failed within 10 seconds, and no retry otherwise. When etcd is overloaded, lease requests may timeout in 10 seconds, and that will result in giving up the leadership without retry.
-  - c1b6e20 2023-10-25T22:30:50+00:00 Bump google.golang.org/grpc from 1.53.0 to 1.56.3 in /test/e2e
-
-- kubernetes image-amd64 4cbdd29250f42f7294c94d5ba60f4b168f6d58a2 to 20a57641f83e54f94737cfc9830de5e270b0fa9e
-  - f59457bea 2023-11-14T13:27:18-05:00 UPSTREAM: 121881: Use golang library instead of mklink
-
-- ovn-kubernetes image-arm64 814535a6dbae0124d34a6461355055108aa4e54d to 0e8096fd1d4fba9dec2db2f6af879112e78c48ad
-  - 469c4e8 2023-11-03T17:57:35+01:00 kubevirt: Ignore completed virt-launcher pods
-  - 51b2596 2023-11-03T13:53:40+01:00 kubevirt, e2e: Replace kv client with cr client
-  - eedcc94 2023-11-03T13:53:40+01:00 kind: Pin kubevirt to latest stable version
-  - f94332f 2023-11-03T10:33:44+01:00 Update egress firewall to use namespaced port group instead of cluster port group + address set match to reduce the number of OVS flows. Previously, all EF ACLs were applied to the clusterPortGroup, and matched source on address set. In that case, all node will have the same set of OVS flows, matching sources that are not scheduled on that node at all. When using port group as a source match, only flow for local ports will be present on every node. The port group is created, updated and deleted by namespace handler similar to the namespace address set.
-  - 5e9a5b3 2023-11-03T10:33:44+01:00 Move multicast port group management to the namespace similar to namespace address set. Existing port groups don't need any change, since port group name always was a namespace name. Set ErrNotFound to false for delete acls and ports from port group ops. Namespace handler will create, update and delete namespace port group similar to the namespace address set.
-  - e8ca078 2023-11-02T15:37:35+01:00 Wait for egress firewall applied status before running connectivity check
-  - fbd2924 2023-11-02T10:43:14+01:00 Prevent multiple encap-ips per single chassis
-  - 0d0b446 2023-11-02T10:43:14+01:00 model_client: Allow Update and Mutate Insert on the same row
-  - 5a08eb2 2023-10-31T14:38:38+01:00 Fix pod creation with sriov interfaces
-  - b6c7ce6 2023-10-30T15:38:26+00:00 Bump github.com/docker/docker in /test/e2e
-  - 469e752 2023-10-27T11:08:11+02:00 Update ACL syncer: make default deny acls filter more strict, delete all acls that were not synced since they should be stale. Add unit test for a specific multicast leftover acl that was a result of libovsdb migration.
-  - 15b075a 2023-10-26T16:15:22+02:00 multi network: Support NAD plugin list in addition to single plugin configuration
-  - fc3ff2f 2023-10-26T09:24:00+02:00 Update leaderelection config to allow retries for an overloaded cluster. With the previous params we only allowed 1 retry in case tryAcquireOrRenew failed within 10 seconds, and no retry otherwise. When etcd is overloaded, lease requests may timeout in 10 seconds, and that will result in giving up the leadership without retry.
-  - c1b6e20 2023-10-25T22:30:50+00:00 Bump google.golang.org/grpc from 1.53.0 to 1.56.3 in /test/e2e
-
-- kubernetes image-arm64 4cbdd29250f42f7294c94d5ba60f4b168f6d58a2 to 20a57641f83e54f94737cfc9830de5e270b0fa9e
-  - f59457bea 2023-11-14T13:27:18-05:00 UPSTREAM: 121881: Use golang library instead of mklink
+- cluster-network-operator embedded-component 17cbb7944bb0a0de28b6555526f984333a036cb9 to 1434926cf634c1993a748809bc324bec018c762f
+  - d77fe83 2023-11-16T18:02:58+01:00 hypershift, hosted clusters: enable multi-homing/multi-net features
+  - 979fd95 2023-11-15T16:22:44-05:00 add ownership of the proxy-ca
 
