@@ -2,6 +2,7 @@
 Documentation       Keywords for working with the MicroShift on a non-ostree system
 
 Resource            common.resource
+Library             String
 Library             SSHLibrary
 
 
@@ -52,3 +53,18 @@ Update Dnf Cache
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
+
+Get Version Of MicroShift RPM
+    [Documentation]    Returns the version of the installed MicroShift RPM as a string
+    ${rpm_cmd_output}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    rpm -q microshift
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Log    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
+    # rpm_cmd_output will look like:
+    # microshift-4.15.0_0.nightly_2023_11_01_080931_20231103152813_3f5593fca_dirty-1.el9.x86_64
+    ${ignored}    ${version_string_raw}=    Split String    ${rpm_cmd_output}    -    1
+    # version_string_raw should be:
+    # 4.15.0_0.nightly_2023_11_01_080931_20231103152813_3f5593fca_dirty-1.el9.x86_64
+    ${version_string}=    Strip String    ${version_string_raw}
+    RETURN    ${version_string}
