@@ -139,7 +139,7 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	}()
 
 	if err := s.applyFn(); err != nil {
-		klog.Fatalf("failed to apply openshift namespaces %v", err)
+		return fmt.Errorf("failed to apply openshift namespaces: %w", err)
 	}
 	return <-errorChannel
 }

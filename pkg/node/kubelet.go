@@ -154,10 +154,10 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 
 	kubeletDeps, err := kubelet.UnsecuredDependencies(kubeletServer, utilfeature.DefaultFeatureGate)
 	if err != nil {
-		klog.Fatalf("Error in fetching depenedencies: %v", err)
+		return fmt.Errorf("error fetching dependencies: %w", err)
 	}
 	if err := kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate); err != nil {
-		klog.Fatalf("Kubelet failed to start: %v", err)
+		return fmt.Errorf("kubelet failed to start: %w", err)
 	}
 	return ctx.Err()
 }

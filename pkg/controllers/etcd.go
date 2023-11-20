@@ -121,8 +121,8 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		klog.Info("stopping microshift-etcd")
 		cmd := exec.Command("systemctl", "stop", "microshift-etcd.scope", "--no-block")
 
-		if err = cmd.Run(); err != nil {
-			klog.Warningf("failed to stop microshift-etcd: %v", err)
+		if out, err := cmd.CombinedOutput(); err != nil {
+			klog.ErrorS(err, "failed to stop microshift-etcd", "output", string(out))
 			return
 		}
 	}()
