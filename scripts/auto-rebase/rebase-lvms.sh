@@ -11,7 +11,7 @@ shopt -s extglob
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
-STAGING_DIR="$REPOROOT/_output/staging"
+STAGING_DIR="${REPOROOT}/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
@@ -25,19 +25,25 @@ check_preconditions() {
         title "Installing yq"
 
         local YQ_VER=4.26.1
+        # shellcheck disable=SC2034  # appears unused
         local YQ_HASH_amd64=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582
+        # shellcheck disable=SC2034  # appears unused
         local YQ_HASH_arm64=8966f9698a9bc321eae6745ffc5129b5e1b509017d3f710ee0eccec4f5568766
-        local YQ_HASH="YQ_HASH_$(go env GOARCH)"
-        local YQ_URL=https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_$(go env GOARCH)
-        local YQ_EXE=$(mktemp /tmp/yq-exe.XXXXX)
-        local YQ_SUM=$(mktemp /tmp/yq-sum.XXXXX)
-        echo -n "${!YQ_HASH} -" > ${YQ_SUM}
-        if ! (curl -Ls "${YQ_URL}" | tee ${YQ_EXE} | sha256sum -c ${YQ_SUM} &>/dev/null); then
-            echo "ERROR: Expected file at ${YQ_URL} to have checksum ${!YQ_HASH} but instead got $(sha256sum <${YQ_EXE} | cut -d' ' -f1)"
+        local YQ_HASH
+        YQ_HASH="YQ_HASH_$(go env GOARCH)"
+        local YQ_URL
+        YQ_URL="https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_$(go env GOARCH)"
+        local YQ_EXE
+        YQ_EXE=$(mktemp /tmp/yq-exe.XXXXX)
+        local YQ_SUM
+        YQ_SUM=$(mktemp /tmp/yq-sum.XXXXX)
+        echo -n "${!YQ_HASH} -" > "${YQ_SUM}"
+        if ! (curl -Ls "${YQ_URL}" | tee "${YQ_EXE}" | sha256sum -c "${YQ_SUM}" &>/dev/null); then
+            echo "ERROR: Expected file at ${YQ_URL} to have checksum ${!YQ_HASH} but instead got $(sha256sum <"${YQ_EXE}" | cut -d' ' -f1)"
             exit 1
         fi
-        chmod +x ${YQ_EXE} && sudo cp ${YQ_EXE} /usr/bin/yq
-        rm -f ${YQ_EXE} ${YQ_SUM}
+        chmod +x "${YQ_EXE}" && sudo cp "${YQ_EXE}" /usr/bin/yq
+        rm -f "${YQ_EXE}" "${YQ_SUM}"
     fi
 
     if ! hash python3; then
@@ -105,14 +111,15 @@ download_lvms_operator_bundle_manifest(){
         >&2 echo "Warning: no pull secret found at ${PULL_SECRET_FILE}"
     fi
 
-    for arch in ${ARCHS[@]}; do
-        mkdir -p "$LVMS_STAGING/$arch"
-        pushd "$LVMS_STAGING/$arch" || return 1
-        title "extracting lvms operator bundle for \"$arch\" architecture"
+    for arch in "${ARCHS[@]}"; do
+        mkdir -p "${LVMS_STAGING}/${arch}"
+        pushd "${LVMS_STAGING}/${arch}" || return 1
+        title "extracting lvms operator bundle for \"${arch}\" architecture"
+        # shellcheck disable=SC2086  # Double quote to prevent globbing and word splitting.
         oc image extract \
             ${authentication} \
-            --path /manifests/:. "$bundle_manifest" \
-            --filter-by-os "$arch" \
+            --path /manifests/:. "${bundle_manifest}" \
+            --filter-by-os "${arch}" \
             ||  {
                     popd
                     return 1
@@ -120,7 +127,7 @@ download_lvms_operator_bundle_manifest(){
 
         local csv="lvms-operator.clusterserviceversion.yaml"
         local namespace="openshift-storage"
-        extract_lvms_rbac_from_cluster_service_version ${PWD} ${csv} ${namespace}
+        extract_lvms_rbac_from_cluster_service_version "${PWD}" "${csv}" "${namespace}"
 
         popd || return 1
     done
@@ -129,8 +136,8 @@ download_lvms_operator_bundle_manifest(){
 write_lvms_images_for_arch(){
     local arch="$1"
     arch_dir="${STAGING_DIR}/lvms/${arch}"
-    [ -d "$arch_dir" ] || {
-        echo "dir $arch_dir not found"
+    [ -d "${arch_dir}" ] || {
+        echo "dir ${arch_dir} not found"
         return 1
     }
 
@@ -145,36 +152,36 @@ write_lvms_images_for_arch(){
     local csv_manifest="${arch_dir}/lvms-operator.clusterserviceversion.yaml"
     local image_file="${arch_dir}/images"
 
-    parse_images "$csv_manifest" "$image_file"
+    parse_images "${csv_manifest}" "${image_file}"
 
-    if [ $(wc -l "$image_file" | cut -d' ' -f1) -eq 0 ]; then
-        >$2 echo "error: image file ($image_file) has fewer images than expected (${#include_images})"
+    if [ "$(wc -l "${image_file}" | cut -d' ' -f1)" -eq 0 ]; then
+        >&2 echo "error: image file (${image_file}) has fewer images than expected (${#include_images})"
         exit 1
     fi
     while read -ers LINE; do
         name=${LINE%,*}
         img=${LINE#*,}
         for included in "${include_images[@]}"; do
-            if [[ "$name" == "$included" ]]; then
-                name="$(echo "$name" | tr '-' '_')"
-                yq -iP -o=json e '.images["'"$name"'"] = "'"$img"'"' "${REPOROOT}/assets/release/release-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
+            if [[ "${name}" == "${included}" ]]; then
+                name="$(echo "${name}" | tr '-' '_')"
+                yq -iP -o=json e '.images["'"${name}"'"] = "'"${img}"'"' "${REPOROOT}/assets/release/release-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
                 break;
             fi
         done
-    done < "$image_file"
+    done < "${image_file}"
 }
 
 update_lvms_images(){
     title "Updating LVMS images"
 
-    local workdir="$STAGING_DIR/lvms"
-    [ -d "$workdir" ] || {
+    local workdir="${STAGING_DIR}/lvms"
+    [ -d "${workdir}" ] || {
         >&2 echo 'lvms staging dir not found, aborting image update'
         return 1
     }
-    pushd "$workdir"
-    for arch in ${ARCHS[@]}; do
-        write_lvms_images_for_arch "$arch"
+    pushd "${workdir}"
+    for arch in "${ARCHS[@]}"; do
+        write_lvms_images_for_arch "${arch}"
     done
     popd
 }
@@ -182,13 +189,13 @@ update_lvms_images(){
 update_lvms_manifests() {
     title "Copying LVMS manifests"
 
-    local workdir="$STAGING_DIR/lvms"
-    [ -d "$workdir" ] || {
+    local workdir="${STAGING_DIR}/lvms"
+    [ -d "${workdir}" ] || {
         >&2 echo 'lvms staging dir not found, aborting asset update'
         return 1
     }
 
-    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/lvms_assets.yaml"
+    "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/lvms_assets.yaml
 }
 
 update_last_lvms_rebase() {
@@ -358,7 +365,7 @@ EOL
 parse_images() {
     local src="$1"
     local dest="$2"
-    yq '.spec.relatedImages[]? | [.name, .image] | @csv' $src > "$dest"
+    yq '.spec.relatedImages[]? | [.name, .image] | @csv' "${src}" > "${dest}"
 }
 
 usage() {
@@ -373,7 +380,7 @@ usage() {
 check_preconditions
 
 command=${1:-help}
-case "$command" in
+case "${command}" in
     to)
         rebase_lvms_to "$2"
         ;;
