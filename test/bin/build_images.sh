@@ -1,9 +1,7 @@
 #!/bin/bash
 #
 # This script should be run on the image build server (usually the
-# same as the hypervisor).
-
-set -euo pipefail
+# same as the hyperviset -euo pipefail
 
 # If a glob pattern does not match anything, return a null value
 # instead of the pattern. This ensures for loops over files do not

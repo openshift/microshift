@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # This script should be run on the build host to manage cache of build artifacts
+
 set -euo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
