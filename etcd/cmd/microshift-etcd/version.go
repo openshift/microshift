@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
 
+	etcdversion "go.etcd.io/etcd/api/v3/version"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
@@ -34,7 +35,8 @@ var (
 
 type Info struct {
 	version.Info
-	Patch string `json:"patch"`
+	Patch       string `json:"patch"`
+	EtcdVersion string `json:"etcdVersion"`
 }
 
 type VersionOptions struct {
@@ -77,12 +79,14 @@ func (o *VersionOptions) Run() error {
 			Compiler:     runtime.Compiler,
 			Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
 		},
-		Patch: patchFromGit,
+		Patch:       patchFromGit,
+		EtcdVersion: etcdversion.Version,
 	}
 
 	switch o.Output {
 	case "":
 		fmt.Fprintf(o.Out, "MicroShift-etcd Version: %s\n", versionInfo.String())
+		fmt.Fprintf(o.Out, "Base etcd Version: %s\n", versionInfo.EtcdVersion)
 	case "yaml":
 		marshalled, err := yaml.Marshal(&versionInfo)
 		if err != nil {
