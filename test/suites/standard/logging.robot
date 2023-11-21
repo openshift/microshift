@@ -6,14 +6,17 @@ Resource            ../../resources/systemd.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Library             Collections
+Library             ../../resources/journalctl.py
 
 Suite Setup         Setup
 Suite Teardown      Teardown
 
-Test Tags           configuration    etcd    restart    slow
+Test Tags           configuration    logging    restart
 
 
 *** Variables ***
+${CURSOR}           ${EMPTY}    # The journal cursor before restarting MicroShift
+
 ${LEVELNORMAL}      SEPARATOR=\n
 ...                 ---
 ...                 debugging:
@@ -34,9 +37,10 @@ ${LEVELUNKNOWN}     SEPARATOR=\n
 Test LogLevel Normal
     [Documentation]    Set LogLevel to NORMAL
     ...
-    ...    Test various spellings of the LogLevelkeyword
+    ...    Test various spellings of the LogLevel keyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELNORMAL}
+    Pattern Should Appear In Log Output    ${CURSOR}    NORMAL
     Expect LogLevel    NORMAL
 
 Test LogLevel Debug
@@ -45,6 +49,7 @@ Test LogLevel Debug
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELDEBUG}
+    Pattern Should Appear In Log Output    ${CURSOR}    debug
     Expect LogLevel    debug
 
 Test LogLevel UNKNOWN
@@ -53,6 +58,7 @@ Test LogLevel UNKNOWN
     ...    Test various spellings of the logLevelkeyword
     ...    uppercase, lowercase, Capitol, and camelcase are supported
     [Setup]    Setup With Custom Config    ${LEVELUNKNOWN}
+    Pattern Should Appear In Log Output    ${CURSOR}    Normal
     Expect LogLevel    Normal
 
 
@@ -79,6 +85,10 @@ Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift
     [Arguments]    ${config_content}
     ${merged}=    Extend MicroShift Config    ${config_content}
+    # Save the journal cursor then restart MicroShift so we capture
+    # the shutdown messages and startup messages.
+    ${cursor}=    Get Journal Cursor
+    Set Suite Variable    \${CURSOR}    ${cursor}
     Upload MicroShift Config    ${merged}
     Restart MicroShift
 
