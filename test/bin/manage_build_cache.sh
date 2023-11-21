@@ -59,16 +59,21 @@ Options:
 EOF
 }
 
-check_contents() {
+check_contents(){
     local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
-
+    local -r must_contain_array=("repo\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
+    
     echo "Checking contents of '${src_dir}'"
-    if "${AWSCLI}" s3 ls "${src_dir}/${VM_POOL_BASENAME}/" | awk '{print $NF}' | grep -Eq '.iso$' ; then
-        if "${AWSCLI}" s3 ls "${src_dir}/" | awk '{print $NF}' | grep -Eq 'repo.tar$' ; then
-            return 0
+    local s3_stdout
+    s3_stdout=$(${AWSCLI} s3 ls "${src_dir}" --recursive) || return 1
+
+    for item in "${must_contain_array[@]}"; do 
+        if ! echo "${s3_stdout}" | grep -qE "${item}";  then
+            return 1
         fi
-    fi
-    return 1
+    done
+
+    return 0
 }
 
 action_upload() {
