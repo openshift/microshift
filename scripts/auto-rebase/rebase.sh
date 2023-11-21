@@ -464,6 +464,13 @@ update_go_mod() {
 
 # Updates go.mod file in dirs defined in GO_MOD_DIRS
 update_go_mods() {
+    # Update Go versions in the go.mod based on values in kubernetes' and etcd's go.mod
+    kubernetes_go_version=$(go mod edit -json "${STAGING_DIR}/kubernetes/go.mod" | jq -r '.Go')
+    go mod edit -go="${kubernetes_go_version}" "${REPOROOT}/go.mod"
+
+    etcd_go_version=$(go mod edit -json "${STAGING_DIR}/etcd/go.mod" | jq -r '.Go')
+    go mod edit -go="${etcd_go_version}" "${REPOROOT}/etcd/go.mod"
+
     for d in "${GO_MOD_DIRS[@]}"; do
         pushd "${d}" > /dev/null
         update_go_mod
