@@ -136,7 +136,7 @@ if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     # This version might not match the version under development because we need
     # to pull in dependencies that are already released
-    OCPVERSION=4.13
+    OCPVERSION=4.14
     sudo subscription-manager config --rhsm.manage_repos=1
 
     if ! ${RHEL_BETA_VERSION} ; then
