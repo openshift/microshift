@@ -31,6 +31,8 @@ var (
 	buildDate string
 	// state of git tree, either "clean" or "dirty"
 	gitTreeState string
+	// etcd version information structure
+	EtcdVersionInfo Info
 )
 
 type Info struct {
@@ -52,22 +54,7 @@ func NewVersionOptions(ioStreams genericclioptions.IOStreams) *VersionOptions {
 }
 
 func NewVersionCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
-	o := NewVersionOptions(ioStreams)
-	cmd := &cobra.Command{
-		Use:   "version",
-		Short: "Print MicroShift-etcd version information",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmdutil.CheckErr(o.Run())
-		},
-	}
-
-	cmd.Flags().StringVarP(&o.Output, "output", "o", o.Output, "One of 'yaml' or 'json'.")
-
-	return cmd
-}
-
-func (o *VersionOptions) Run() error {
-	versionInfo := Info{
+	EtcdVersionInfo = Info{
 		Info: version.Info{
 			Major:        majorFromGit,
 			Minor:        minorFromGit,
@@ -83,18 +70,33 @@ func (o *VersionOptions) Run() error {
 		EtcdVersion: etcdversion.Version,
 	}
 
+	o := NewVersionOptions(ioStreams)
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "Print MicroShift-etcd version information",
+		Run: func(cmd *cobra.Command, args []string) {
+			cmdutil.CheckErr(o.Run())
+		},
+	}
+
+	cmd.Flags().StringVarP(&o.Output, "output", "o", o.Output, "One of 'yaml' or 'json'.")
+
+	return cmd
+}
+
+func (o *VersionOptions) Run() error {
 	switch o.Output {
 	case "":
-		fmt.Fprintf(o.Out, "MicroShift-etcd Version: %s\n", versionInfo.String())
-		fmt.Fprintf(o.Out, "Base etcd Version: %s\n", versionInfo.EtcdVersion)
+		fmt.Fprintf(o.Out, "MicroShift-etcd Version: %s\n", EtcdVersionInfo.String())
+		fmt.Fprintf(o.Out, "Base etcd Version: %s\n", EtcdVersionInfo.EtcdVersion)
 	case "yaml":
-		marshalled, err := yaml.Marshal(&versionInfo)
+		marshalled, err := yaml.Marshal(&EtcdVersionInfo)
 		if err != nil {
 			return err
 		}
 		fmt.Fprintln(o.Out, string(marshalled))
 	case "json":
-		marshalled, err := json.MarshalIndent(&versionInfo, "", "  ")
+		marshalled, err := json.MarshalIndent(&EtcdVersionInfo, "", "  ")
 		if err != nil {
 			return err
 		}

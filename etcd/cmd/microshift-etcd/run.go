@@ -107,6 +107,9 @@ func (s *EtcdService) Run() error {
 		klog.Fatalf("microshift-etcd must be run privileged")
 	}
 
+	versionInfo := EtcdVersionInfo
+	klog.InfoS("Version", "microshift-etcd", versionInfo.String(), "etcd-base", versionInfo.EtcdVersion)
+
 	e, err := etcd.StartEtcd(s.etcdCfg)
 	if err != nil {
 		return fmt.Errorf("microshift-etcd failed to start: %v", err)
