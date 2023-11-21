@@ -38,15 +38,18 @@ function print_boot_status() {
 
     local grub_vars
     local boot_vars
+    local ostr_stat
     grub_vars=$(grub2-editenv - list | grep ^boot_ || true)
     boot_vars=$(set | grep -E '^GREENBOOT_|^MICROSHIFT_' || true)
+    ostr_stat=$(ostree admin status 2>/dev/null || true)
 
-    [ -z "${grub_vars}" ] && grub_vars=None
-    [ -z "${boot_vars}" ] && boot_vars=None
+    [ -z "${grub_vars}" ] && grub_vars="None"
+    [ -z "${boot_vars}" ] && boot_vars="None"
+    [ -z "${ostr_stat}" ] && ostr_stat="Not an ostree system"
 
     echo -e "GRUB boot variables:\n${grub_vars}"
     echo -e "Greenboot variables:\n${boot_vars}"
-    echo -e "The ostree status:\n$(ostree admin status || true)"
+    echo -e "The ostree status:\n${ostr_stat}"
 }
 
 # Get the recommended wait timeout to be used for running health check operations.
