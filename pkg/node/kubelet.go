@@ -135,16 +135,6 @@ func (s *KubeletServer) writeConfig(cfg *config.Config) error {
 
 func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
-	// run readiness check
-	go func() {
-		// This endpoint does not use TLS, but reusing the same function without verification.
-		healthcheckStatus := util.RetryInsecureGet(ctx, "http://localhost:10248/healthz")
-		if healthcheckStatus != 200 {
-			klog.Fatalf("", fmt.Errorf("%s failed to start", s.Name()))
-		}
-		klog.Infof("%s is ready", s.Name())
-		close(ready)
-	}()
 
 	// construct a KubeletServer from kubeletFlags and kubeletConfig
 	kubeletServer := &kubeletoptions.KubeletServer{
@@ -156,10 +146,32 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	if err != nil {
 		return fmt.Errorf("error fetching dependencies: %w", err)
 	}
-	if err := kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate); err != nil {
-		return fmt.Errorf("kubelet failed to start: %w", err)
-	}
-	return ctx.Err()
+
+	errc := make(chan error)
+
+	// Run healthcheck probe and kubelet in parallel.
+	// No matter which ends first - if it ends with an error,
+	// it'll cause ServiceManager to trigger graceful shutdown.
+
+	// run readiness check
+	go func() {
+		// This endpoint does not use TLS, but reusing the same function without verification.
+		healthcheckStatus := util.RetryInsecureGet(ctx, "http://localhost:10248/healthz")
+		if healthcheckStatus != 200 {
+			e := fmt.Errorf("%s failed to start", s.Name())
+			klog.Error(e)
+			errc <- e
+			return
+		}
+		klog.Infof("%s is ready", s.Name())
+		close(ready)
+	}()
+
+	go func() {
+		errc <- kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate)
+	}()
+
+	return <-errc
 }
 
 func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
