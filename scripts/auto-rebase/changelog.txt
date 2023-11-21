@@ -1,12 +1,3 @@
-- cluster-network-operator embedded-component 1504d2a16032cd3637f5c9a338f8f48a82614cca to 4cd5c10d6423582ceef639a822b929788ac2c9a0
-  - 626820b 2023-11-15T15:53:30+00:00 set automountServiceAccountToken to false for hypershift managed network node identity
-
-- kubernetes embedded-component b49f9d1356bca4e8dd206a3b019184beffd88153 to d5480521eb5a02f9633b20260f166981905b33f5
-  - 62f7ffb41 2023-11-14T13:27:07-05:00 UPSTREAM: 121881: Use golang library instead of mklink
-
-- kubernetes image-amd64 b49f9d1356bca4e8dd206a3b019184beffd88153 to d5480521eb5a02f9633b20260f166981905b33f5
-  - 62f7ffb41 2023-11-14T13:27:07-05:00 UPSTREAM: 121881: Use golang library instead of mklink
-
-- kubernetes image-arm64 b49f9d1356bca4e8dd206a3b019184beffd88153 to d5480521eb5a02f9633b20260f166981905b33f5
-  - 62f7ffb41 2023-11-14T13:27:07-05:00 UPSTREAM: 121881: Use golang library instead of mklink
+- machine-config-operator embedded-component f57144e1ffc7904dd34722da07ccb471adaa8954 to a6cdd850c44f8809b10a057202ccd502a21c33fc
+  - b4e2e4f0 2023-11-13T15:21:41+01:00 CNV-34844: workaround nmstate bug by configuring ipv{4,6} addresses
 
