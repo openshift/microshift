@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component f57144e1ffc7904dd34722da07ccb471adaa8954 to a6cdd850c44f8809b10a057202ccd502a21c33fc
-  - b4e2e4f0 2023-11-13T15:21:41+01:00 CNV-34844: workaround nmstate bug by configuring ipv{4,6} addresses
-
