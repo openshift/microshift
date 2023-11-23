@@ -34,9 +34,8 @@ PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd kube-storage-version-migrator"
-EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
-LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator
-cluster-csi-snapshot-controller-operator"
+EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator operator-lifecycle-manager"
+LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator cluster-csi-snapshot-controller-operator"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
@@ -539,6 +538,8 @@ update_images() {
             "${REPOROOT}/packaging/crio.conf.d/microshift_${goarch}.conf"
     done
 
+    update_olm_images
+
     popd >/dev/null
 
     go fmt "${REPOROOT}"/pkg/release
@@ -860,6 +861,36 @@ checkout_rebase_branch() {
     rebase_branch="rebase${onto_branch:+"-$onto_branch"}-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
+}
+
+update_olm_images() {
+    title "Rebasing operator-lifecycle-manager manifests"
+    for goarch in amd64 arm64; do
+        # Get the images for the OLM operator from ${STAGING_DIR}/release_${arch}.json:
+        # - operator-lifecycle-manager
+        # - operator-registry
+        # - kube-rbac-proxy
+        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
+        base_release=$(jq -r ".metadata.version" "${STAGING_DIR}/release_${goarch}.json")
+
+        # Create the OLM release-${arch}.json file, this is the file included on the RPM.
+        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json"
+        
+        # Read from the global release file, to find the images we need to use.
+        release_file="${STAGING_DIR}/release_${goarch}.json"
+        containers=$(yq -r '.spec.tags[].name' "${REPOROOT}/assets/optional/operator-lifecycle-manager/image-references")
+        for container in ${containers[@]}; do
+            # Get the images we need to use.
+            image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
+            # Now get the image we need to replace.
+            image_to_replace=$(yq -r ".spec.tags[] | select(.name == \"${container}\") | .from.name" "${REPOROOT}/assets/optional/operator-lifecycle-manager/image-references")
+            # Replace the images in the manifests.
+            sed -i "s|${image_to_replace}|${image}|g" ${REPOROOT}/assets/optional/operator-lifecycle-manager/*.${arch}.yaml
+            # Append a new container and image to the release-${arch}.json file.
+            jq ".images += {\"${container}\": \"${image}\"}" "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json" > "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json.tmp"
+            mv "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json.tmp" "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json" 
+        done
+    done
 }
 
 # Runs each OCP rebase step in sequence, commiting the step's output to git
