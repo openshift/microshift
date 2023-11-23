@@ -183,6 +183,8 @@ assets:
         ignore: "it's a priority class needed for oc debug node command - not available in any repo that rebase is using"
       - file: securityv1-local-apiservice.yaml
         ignore: "it's a local API service for security API group, needed if OpenShift API server is not present"
+      - file: kubelet.yaml
+        ignore: "manually crafted"
 
   - dir: crd/
     src: release-manifests/

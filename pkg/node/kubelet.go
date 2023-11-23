@@ -17,14 +17,17 @@ package node
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"k8s.io/klog/v2"
 
+	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
@@ -92,50 +95,40 @@ func (s *KubeletServer) writeConfig(cfg *config.Config) error {
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	servingCertDir := cryptomaterial.KubeletServingCertDir(certsDir)
 
-	data := []byte(`
-kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-authentication:
-  x509:
-    clientCAFile: ` + cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(config.DataDir)) + `
-  anonymous:
-    enabled: false
-tlsCertFile: ` + cryptomaterial.ServingCertPath(servingCertDir) + `
-tlsPrivateKeyFile: ` + cryptomaterial.ServingKeyPath(servingCertDir) + `
-cgroupDriver: "systemd"
-failSwapOn: false
-volumePluginDir: ` + config.DataDir + `/kubelet-plugins/volume/exec
-clusterDNS:
-  - ` + cfg.Network.DNS + `
-clusterDomain: cluster.local
-containerLogMaxSize: 50Mi
-maxPods: 250
-kubeAPIQPS: 50
-kubeAPIBurst: 100
-cgroupsPerQOS: true
-enforceNodeAllocatable: []
-rotateCertificates: false  #TODO
-serializeImagePulls: false
-# staticPodPath: /etc/kubernetes/manifests
-containerRuntimeEndpoint: unix:///var/run/crio/crio.sock
-featureGates:
-  APIPriorityAndFairness: true
-  PodSecurity: true
-  DownwardAPIHugePages: true
-  RotateKubeletServerCertificate: false #TODO
-serverTLSBootstrap: false #TODO`)
+	tplData, err := embedded.Asset("core/kubelet.yaml")
+	if err != nil {
+		return fmt.Errorf("loading kubelet.yaml asset failed: %w", err)
+	}
+
+	tpl, err := template.New("").Option("missingkey=error").Parse(string(tplData))
+	if err != nil {
+		return fmt.Errorf("creating a template for kubelet config failed: %w", err)
+	}
+
+	tplParams := map[string]string{
+		"clientCAFile":      cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(config.DataDir)),
+		"tlsCertFile":       cryptomaterial.ServingCertPath(servingCertDir),
+		"tlsPrivateKeyFile": cryptomaterial.ServingKeyPath(servingCertDir),
+		"volumePluginDir":   config.DataDir + "/kubelet-plugins/volume/exec",
+		"clusterDNSIP":      cfg.Network.DNS,
+	}
+
+	var data bytes.Buffer
+	if err := tpl.Execute(&data, tplParams); err != nil {
+		return fmt.Errorf("templating kubelet config failed: %w", err)
+	}
 
 	// Load real resolv.conf in case systemd-resolved is used
 	// https://github.com/coredns/coredns/blob/master/plugin/loop/README.md#troubleshooting-loops-in-kubernetes-clusters
 	if _, err := os.Stat(config.DefaultSystemdResolvedFile); err == nil {
-		data = append(data, fmt.Sprintf("\nresolvConf: %s\n", config.DefaultSystemdResolvedFile)...)
+		data.WriteString(fmt.Sprintf("\nresolvConf: %s\n", config.DefaultSystemdResolvedFile))
 	}
 
 	path := filepath.Join(config.DataDir, "resources", "kubelet", "config", "config.yaml")
 	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0700)); err != nil {
 		return fmt.Errorf("failed to create dir %q: %w", path, err)
 	}
-	return os.WriteFile(path, data, 0400)
+	return os.WriteFile(path, data.Bytes(), 0400)
 }
 
 func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {

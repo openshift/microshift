@@ -1,0 +1,31 @@
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+authentication:
+  x509:
+    clientCAFile: "{{ .clientCAFile }}"
+  anonymous:
+    enabled: false
+tlsCertFile: "{{ .tlsCertFile }}"
+tlsPrivateKeyFile: "{{ .tlsPrivateKeyFile }}"
+cgroupDriver: "systemd"
+failSwapOn: false
+volumePluginDir: "{{ .volumePluginDir }}"
+clusterDNS:
+  - "{{ .clusterDNSIP }}"
+clusterDomain: cluster.local
+containerLogMaxSize: 50Mi
+maxPods: 250
+kubeAPIQPS: 50
+kubeAPIBurst: 100
+cgroupsPerQOS: true
+enforceNodeAllocatable: []
+rotateCertificates: false  #TODO
+serializeImagePulls: false
+# staticPodPath: /etc/kubernetes/manifests
+containerRuntimeEndpoint: unix:///var/run/crio/crio.sock
+featureGates:
+  APIPriorityAndFairness: true
+  PodSecurity: true
+  DownwardAPIHugePages: true
+  RotateKubeletServerCertificate: false #TODO
+serverTLSBootstrap: false #TODO
