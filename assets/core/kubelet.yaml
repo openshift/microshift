@@ -25,7 +25,6 @@ maxPods: 250
 rotateCertificates: false # TODO
 serializeImagePulls: false
 serverTLSBootstrap: false # TODO
-# staticPodPath: /etc/kubernetes/manifests
 tlsCertFile: "{{ .tlsCertFile }}"
 tlsPrivateKeyFile: "{{ .tlsPrivateKeyFile }}"
 volumePluginDir: "{{ .volumePluginDir }}"
