@@ -1,6 +1,6 @@
 module github.com/openshift/microshift/etcd
 
-go 1.18
+go 1.20
 
 require github.com/openshift/microshift v0.0.0
 

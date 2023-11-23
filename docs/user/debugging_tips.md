@@ -109,3 +109,37 @@ OpenShift result in pod security admission errors when run on
 MicroShift. Refer to the [pod security HowTo](howto_pod_security.md)
 for a detailed example of configuring a workload to run with a custom
 security context.
+
+## Configure Log Verbosity for OVN-Kubernetes
+
+The default log verbosity level in MicroShift is set to `4` for OVN-Kubernetes
+and `info` for OVN. You have the option to configure the log verbosity for
+debugging and troubleshooting purposes. To do so, you can create a ConfigMap
+named `env-overrides` with specific keys in the `openshift-ovn-kubernetes`
+namespace and restart the corresponding OVN-Kubernetes pods.
+
+Here's an example:
+
+```yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: env-overrides
+  namespace: openshift-ovn-kubernetes
+  annotations:
+data:
+  # To set the log levels for the ovnkube-node pod
+  # replace this with the node's name (from oc get nodes)
+  ip-10-0-135-96.us-east-2.compute.internal: |
+    # To enable debug logging for ovn-controller:
+    # Logging verbosity level: off, emer, err, warn, info, or  dbg (default: info)
+    OVN_LOG_LEVEL=dbg
+  # To adjust the log levels for the ovnkube-master pod, use _master
+  _master: |
+    # This sets the log level for the ovn-kubernetes process
+    # Logging verbosity level: 5=debug, 4=info, 3=warn, 2=error, 1=fatal (default: 4).
+    OVN_KUBE_LOG_LEVEL=5
+    # To enable debug logging for OVN northd, nbdb and sbdb processes:
+    # Logging verbosity level: off, emer, err, warn, info, or  dbg (default: info)
+    OVN_LOG_LEVEL=dbg
+```
