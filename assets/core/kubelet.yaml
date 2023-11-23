@@ -5,7 +5,7 @@ authentication:
     enabled: false
   x509:
     clientCAFile: "{{ .clientCAFile }}"
-cgroupDriver: "systemd"
+cgroupDriver: systemd
 cgroupsPerQOS: true
 clusterDNS:
   - "{{ .clusterDNSIP }}"
@@ -18,13 +18,13 @@ featureGates:
   APIPriorityAndFairness: true
   DownwardAPIHugePages: true
   PodSecurity: true
-  RotateKubeletServerCertificate: false #TODO
+  RotateKubeletServerCertificate: false # TODO
 kubeAPIBurst: 100
 kubeAPIQPS: 50
 maxPods: 250
-rotateCertificates: false #TODO
+rotateCertificates: false # TODO
 serializeImagePulls: false
-serverTLSBootstrap: false #TODO
+serverTLSBootstrap: false # TODO
 # staticPodPath: /etc/kubernetes/manifests
 tlsCertFile: "{{ .tlsCertFile }}"
 tlsPrivateKeyFile: "{{ .tlsPrivateKeyFile }}"
