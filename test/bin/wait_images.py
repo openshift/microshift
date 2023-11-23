@@ -7,7 +7,10 @@
 import argparse
 import json
 import logging
+import os
+import shutil
 import subprocess
+import sys
 import time
 
 logging.basicConfig(
@@ -79,42 +82,105 @@ def flattened_status():
                 yield job
 
 
+def restart_job(cmd):
+    result = subprocess.run(cmd, shell=True, text=True, stdout=subprocess.PIPE)
+    if result.returncode != 0:
+        return ""
+    return result.stdout.split(" ")[1]
+
+
+def copy_build_metadata(old_id, new_id):
+    imagedir = os.environ['IMAGEDIR']
+    shutil.copy(f'{imagedir}/builds/{old_id}.build', f'{imagedir}/builds/{new_id}.build')
+
+
 def main(build_ids):
     ignore_ids = set()
-    known_ids = set(build_ids)
+    known_ids = set(build_ids.keys())
     found_ids = set()
+    # IDs that the script will print out after waiting.
+    # If any job failed, its ID will be replaced with ID of retry job
+    finished_ids = set()
+
     while build_ids:
-        logging.info(f'Waiting for {build_ids}')
+        logging.info(f'Waiting for {list(build_ids.keys())}')
         for job in flattened_status():
             job_id = job["id"]
             found_ids.add(job_id)
             status_text = f'{job_id} {job["compose_type"]} for {job["blueprint"]} - {job["queue_status"]}'
             if job_id in build_ids:
                 logging.info(status_text)
-                if job["queue_status"] in {"FAILED", "FINISHED"}:
-                    # After a job fails or finishes, stop reporting its status.
-                    build_ids.remove(job_id)
+
+                if job["queue_status"] == "FAILED":
+                    cmd = build_ids[job_id]
+
+                    # After a job fails, stop reporting its status.
+                    del build_ids[job_id]
+
+                    if cmd != "":
+                        logging.info(f'Job {job_id} failed - restarting once ({cmd})')
+                        new_id = restart_job(cmd)
+                        if new_id == "":
+                            # Failed to restart job, print it at the end so the caller can handle it.
+                            finished_ids.add(job_id)
+                            continue
+
+                        logging.info(f'Job {job_id} restarted as {new_id}')
+                        copy_build_metadata(job_id, new_id)
+                        # Adding empty cmd means it won't be retried anymore - if fails again, it'll be final.
+                        build_ids[new_id] = ""
+                        known_ids.add(new_id)
+                        found_ids.add(new_id)
+                    else:
+                        logging.error(f'Job {job_id} failed - not restarting anymore (empty cmd)')
+                        finished_ids.add(job_id)
+
+                elif job["queue_status"] == "FINISHED":
+                    # After a job finishes, stop reporting its status.
+                    del build_ids[job_id]
+                    finished_ids.add(job_id)
+
             elif job_id not in ignore_ids and job_id not in known_ids:
                 # Report any unknown jobs one time, then ignore them.
                 logging.info(f'{status_text} (unknown job)')
                 ignore_ids.add(job_id)
+
         to_ignore = []
         for build_id in build_ids:
             if build_id not in found_ids:
                 logging.info(f'{build_id} is not a known build, ignoring')
                 to_ignore.append(build_id)
         for i in to_ignore:
-            build_ids.remove(i)
+            del build_ids[i]
+
         if build_ids:
             time.sleep(30)
+
+    # Print to stdout list of builds that caller script should handle.
+    # It might be different from the list this script received initially, if any of the build had to be restarted.
+    print(' '.join(finished_ids))
+
+
+def pair(arg):
+    return tuple(arg.split(','))
 
 
 if __name__ == '__main__':
     cli_parser = argparse.ArgumentParser(add_help=True)
     cli_parser.add_argument(
-        'build_id',
+        'id_cmd',
+        type=pair,
         nargs='+',
-        help="a build id (UUID) from composer",
+        help="""a build id (UUID) from composer and a command to retry build in case of failure (separated with a comma), e.g.:
+        'UUID,sudo composer-cli compose start-ostree --parent rhel-9.2 --url http://IP:8080/repo --ref rhel-9.2-microshift-source rhel-9.2-microshift-source edge-commit'""",
     )
     args = cli_parser.parse_args()
-    main(args.build_id)
+
+    # Make sure it exists as soon as possible, instead of waiting until it's needed.
+    imagedir = os.getenv('IMAGEDIR')
+    if imagedir is None:
+        sys.exit('Script requires IMAGEDIR env var to be set')
+
+    input = dict(args.id_cmd)
+    logging.info(f'Received arguments: {input}')
+    main(input)

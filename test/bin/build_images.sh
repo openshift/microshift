@@ -197,7 +197,8 @@ do_group() {
     local blueprint_file
     local build_name
     local buildid
-    local buildid_list=""
+    local buildid_list=()
+    local builds_to_get=""
     local parent
     local parent_args
     local template
@@ -270,39 +271,34 @@ do_group() {
         fi
         echo "Building edge-commit from ${blueprint} ${parent_args}"
         # shellcheck disable=SC2086  # quote to avoid glob expansion
-        buildid=$(sudo composer-cli compose start-ostree \
-                       ${parent_args} \
-                       --ref "${blueprint}" \
-                       "${blueprint}" \
-                       edge-commit \
-                      | awk '{print $2}')
+        build_cmd="sudo composer-cli compose start-ostree ${parent_args} --ref ${blueprint} ${blueprint} edge-commit"
+        buildid=$(${build_cmd} | awk '{print $2}')
         echo "Build ID ${buildid}"
         # Record a "build name" to be used as part of the unique
         # filename for the log we download next.
         echo "${blueprint}-edge-commit" > "${IMAGEDIR}/builds/${buildid}.build"
-        buildid_list="${buildid_list} ${buildid}"
+        buildid_list+=("${buildid},${build_cmd}")
     done
 
     if ${BUILD_INSTALLER} && ! ${COMPOSER_DRY_RUN}; then
         for image_installer in "${groupdir}"/*.image-installer; do
             blueprint=$("${GOMPLATE}" --file "${image_installer}")
             echo "Building image-installer from ${blueprint}"
-            buildid=$(sudo composer-cli compose start \
-                           "${blueprint}" \
-                           image-installer \
-                          | awk '{print $2}')
+            build_cmd="sudo composer-cli compose start ${blueprint} image-installer"
+            buildid=$(${build_cmd} | awk '{print $2}')
             echo "Build ID ${buildid}"
             # Record a "build name" to be used as part of the unique
             # filename for the log we download next.
             echo "${blueprint}-image-installer" > "${IMAGEDIR}/builds/${buildid}.build"
-            buildid_list="${buildid_list} ${buildid}"
+            buildid_list+=("${buildid},${build_cmd}")
         done
     fi
 
-    if [ -n "${buildid_list}" ]; then
+    if (( ${#buildid_list[@]} )); then
         echo "Waiting for builds to complete..."
-        # shellcheck disable=SC2086  # pass command arguments quotes to allow word splitting
-        time "${SCRIPTDIR}/wait_images.py" ${buildid_list}
+        # wait_images.py returns possibly updated list of builds that must be handled
+        # "update" means replacing initial build ID with retry build ID
+        builds_to_get=$(time "${SCRIPTDIR}/wait_images.py" "${buildid_list[@]}")
     fi
 
     echo "Downloading build logs, metadata, and image"
@@ -310,7 +306,7 @@ do_group() {
 
     failed_builds=()
     # shellcheck disable=SC2231  # allow glob expansion without quotes in for loop
-    for buildid in ${buildid_list}; do
+    for buildid in ${builds_to_get}; do
         # shellcheck disable=SC2086  # pass glob args without quotes
         rm -f ${buildid}-*.tar
 
