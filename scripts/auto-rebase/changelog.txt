@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component a6cdd850c44f8809b10a057202ccd502a21c33fc to 612c6f6bfa3ca777f9f1e260596b801c3e66375f
+  - 4ec9bb19 2023-11-21T03:36:58+00:00 OCPBUGS-23432: Use shorter IP label for keepalived VIP
+
