@@ -7,8 +7,8 @@ Library             libostree.py
 
 
 *** Variables ***
-${DATA_DIR}             "/var/lib/microshift"
-${BACKUP_STORAGE}       "/var/lib/microshift-backups"
+${DATA_DIR}             /var/lib/microshift
+${BACKUP_STORAGE}       /var/lib/microshift-backups
 
 
 *** Keywords ***
@@ -52,6 +52,13 @@ Backup Should Exist
     [Arguments]    ${deployment_id}    ${boot_id}=${EMPTY}
     ${exists}=    Does Backup Exist    ${deployment_id}    ${boot_id}
     Should Be True    ${exists}
+
+Backup Should Not Exist
+    [Documentation]    Checks if backup identified by deployment ID
+    ...    and (optionally) boot ID does not exist
+    [Arguments]    ${deployment_id}    ${boot_id}=${EMPTY}
+    ${exists}=    Does Backup Exist    ${deployment_id}    ${boot_id}
+    Should Not Be True    ${exists}
 
 Remove Existing Backup For Current Deployment
     [Documentation]    Remove any existing backup for currently running deployment

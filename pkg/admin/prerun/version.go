@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/version"
@@ -25,6 +26,10 @@ type versionFile struct {
 	Version      versionMetadata `json:"version"`
 	DeploymentID string          `json:"deployment_id,omitempty"`
 	BootID       string          `json:"boot_id"`
+}
+
+func (hi *versionFile) BackupName() data.BackupName {
+	return data.BackupName(fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID))
 }
 
 func VersionMetadataManagement() error {
@@ -155,6 +160,12 @@ func updateVersionFile(ver versionMetadata) error {
 
 	if err := os.WriteFile(versionFilePath, data, 0600); err != nil {
 		return fmt.Errorf("writing %q to %q failed: %w", string(data), versionFilePath, err)
+	}
+
+	if isOstree {
+		if err := updateHealthInfo(v); err != nil {
+			return fmt.Errorf("failed to update health.json: %w", err)
+		}
 	}
 
 	return nil

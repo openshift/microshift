@@ -9,7 +9,8 @@
 }
 
 # golang specifics
-%global golang_version 1.20.3
+# Needs to match go.mod go directive
+%global golang_version 1.20
 #debuginfo not supported with Go
 %global debug_package %{nil}
 # modifying the Go binaries breaks the DWARF debugging
@@ -30,7 +31,8 @@
    restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
    restorecon -R /var/lib/microshift-backups; \
    restorecon -R /etc/microshift; \
-   restorecon -R /usr/lib/microshift; \
+   restorecon -R /usr/lib/microshift
+%define microshift_relabel_exes() \
    restorecon -v /usr/bin/microshift; \
    restorecon -v /usr/bin/microshift-etcd
 
@@ -127,7 +129,7 @@ The microshift-greenboot package provides the Greenboot scripts used for verifyi
 
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
-golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]')
+golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
 golang_required=%{golang_version}
 if [[ "${golang_detected}" < "${golang_required}" ]] ; then
   echo "The detected go version ${golang_detected} is less than the required version ${golang_required}" > /dev/stderr
@@ -185,9 +187,6 @@ install -p -m644 packaging/crio.conf.d/microshift_amd64.conf %{buildroot}%{_sysc
 %endif
 
 install -p -m644 packaging/crio.conf.d/microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
-
-install -d -m755  %{buildroot}%{_sysconfdir}/NetworkManager/conf.d
-install -p -m644  packaging/network-manager-conf/microshift-nm.conf %{buildroot}%{_sysconfdir}/NetworkManager/conf.d/microshift-nm.conf
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
@@ -249,10 +248,6 @@ install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_
 
 install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
 install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
-install -p -m755 packaging/greenboot/microshift_set_unhealthy.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_set_unhealthy.sh
-
-install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/green.d
-install -p -m755 packaging/greenboot/microshift_set_healthy.sh %{buildroot}%{_sysconfdir}/greenboot/green.d/40_microshift_set_healthy.sh
 
 %pre networking
 
@@ -260,6 +255,9 @@ getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
 usermod -a -G hugetlbfs openvswitch
 
 %post
+
+# This can be called only after microshift executable files are installed
+%microshift_relabel_exes
 
 %systemd_post microshift.service
 
@@ -334,7 +332,6 @@ systemctl enable --now --quiet openvswitch || true
 
 %files networking
 %{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
-%{_sysconfdir}/NetworkManager/conf.d/microshift-nm.conf
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
@@ -347,13 +344,14 @@ systemctl enable --now --quiet openvswitch || true
 %files greenboot
 %{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
-%{_sysconfdir}/greenboot/red.d/40_microshift_set_unhealthy.sh
-%{_sysconfdir}/greenboot/green.d/40_microshift_set_healthy.sh
 %{_datadir}/microshift/functions/greenboot.sh
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Nov 01 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
+- Fix selinux labeling for microshift executable files
+
 * Wed Sep 06 2023 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.14.0
 - Add microshift-sos-report binary
 

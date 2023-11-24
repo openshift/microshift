@@ -51,16 +51,6 @@ func (bs Backups) getForDeployment(deploymentID string) Backups {
 	return backups
 }
 
-func (bs Backups) getOnlyHealthyBackups() Backups {
-	backups := bs.filter(func(backupName data.BackupName) bool {
-		return !strings.HasSuffix(string(backupName), "unhealthy")
-	})
-	klog.InfoS("Filtered list of healthy backups",
-		"backups", backups,
-	)
-	return backups
-}
-
 func (bs Backups) has(backup data.BackupName) bool {
 	for _, b := range bs {
 		if b == backup {

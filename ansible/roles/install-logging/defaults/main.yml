@@ -9,6 +9,7 @@ logging_services:
   - prometheus
   - grafana-server
 
+grafana_setup: false
 grafana_username: admin
 grafana_password: admin
 grafana_port: 3000

@@ -38,8 +38,9 @@ Simulate Service Failure
     Restart Greenboot And Wait For Success
     Disrupt Service
     Cleanup MicroShift    --all    --keep-images
+    # not using 'Start MicroShift' kw because it retries
     Run Keyword And Expect Error    0 != 1
-    ...    Systemctl    enable    --now microshift
+    ...    Systemctl    start    microshift
     Run Keyword And Expect Error    0 != 1
     ...    Restart Greenboot And Wait For Success
 
@@ -133,6 +134,6 @@ Disrupt Pod Network
 Cleanup And Start
     [Documentation]    Wipe Microshift data and start it.
     Cleanup MicroShift    --all    --keep-images
-    Systemctl    enable    --now microshift
+    Start MicroShift
     Setup Kubeconfig
     Restart Greenboot And Wait For Success

@@ -347,7 +347,7 @@ if [ -n "${CUSTOM_RPM_FILES}" ] ; then
 fi
 
 title "Loading package sources"
-PACKAGE_SOURCES="microshift-local rhocp-4.13 fast-datapath"
+PACKAGE_SOURCES="microshift-local rhocp-4.14 fast-datapath"
 if [ -n "${CUSTOM_RPM_FILES}" ] ; then
     PACKAGE_SOURCES+=" custom-rpms"
 fi

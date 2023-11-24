@@ -26,3 +26,11 @@
   ansible.builtin.command: sshpass -p {{ microshift_pass }} ssh-copy-id {{ ansible_user }}@{{ item }}
   with_inventory_hostnames:
     - microshift
+
+- name: install local ansible prereq pacakges
+  ansible.builtin.dnf:
+    name: "{{ local_packages }}"
+    state: present
+    update_cache: true
+  when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat") or (ansible_distribution == "Fedora")
+  become: yes

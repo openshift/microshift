@@ -21,7 +21,7 @@ Increase Running Pod PV Size
     [Documentation]    Increase Running Pod PV size by changing the PVC spec.
     [Setup]    Test Case Setup
     Oc Patch    pvc/${PVC_CLAIM_NAME}    '{"spec":{"resources":{"requests":{"storage":"${RESIZE_TO}"}}}}'
-    Oc Wait For    pvc/${PVC_CLAIM_NAME}    jsonpath\="{.spec.resources.requests.storage}"=${RESIZE_TO}    timeout=3m
+    Named PVC Should Be Resized    ${PVC_CLAIM_NAME}    ${RESIZE_TO}
     [Teardown]    Test Case Teardown
 
 
@@ -29,7 +29,7 @@ Increase Running Pod PV Size
 Test Case Setup
     [Documentation]    Prepare the cluster env and test pod workload.
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
-    Oc Wait For    pod/${POD_NAME_STATIC}    condition\=Ready    timeout=120s
+    Named Pod Should Be Ready    ${POD_NAME_STATIC}
 
 Test Case Teardown
     [Documentation]    Clean up test suite resources

@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    capability.openshift.io/name: "OperatorLifecycleManager"
+  name: collect-profiles
+  namespace: openshift-operator-lifecycle-manager
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: "Replace"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+        spec:
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          serviceAccountName: collect-profiles
+          priorityClassName: openshift-user-critical
+          containers:
+            - name: collect-profiles
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              image: quay.io/operator-framework/olm@sha256:de396b540b82219812061d0d753440d5655250c621c753ed1dc67d6154741607
+              imagePullPolicy: IfNotPresent
+              command:
+                - bin/collect-profiles
+              args:
+                - -n
+                - openshift-operator-lifecycle-manager
+                - --config-mount-path
+                - /etc/config
+                - --cert-mount-path
+                - /var/run/secrets/serving-cert
+                - olm-operator-heap-:https://olm-operator-metrics:8443/debug/pprof/heap
+                - catalog-operator-heap-:https://catalog-operator-metrics:8443/debug/pprof/heap
+              volumeMounts:
+                - mountPath: /etc/config
+                  name: config-volume
+                - mountPath: /var/run/secrets/serving-cert
+                  name: secret-volume
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 80Mi
+          volumes:
+            - name: config-volume
+              configMap:
+                name: collect-profiles-config
+            - name: secret-volume
+              secret:
+                secretName: pprof-cert
+          restartPolicy: Never

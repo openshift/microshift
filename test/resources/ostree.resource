@@ -65,7 +65,6 @@ System Is Running Right Ref And Healthy
 
     Should Be Equal As Strings    ${expected_deploy}    ${current_deploy}
     Greenboot Health Check Exited
-    System Should Be Healthy
 
 Wait For Transaction To End
     [Documentation]    Wait for any ostree transaction to end.
@@ -91,3 +90,13 @@ Journal Should Have Information About Failed Version Comparison
         Log Many    ${stdout}    ${rc}
         Should Be Equal As Integers    0    ${rc}
     END
+
+Expected Boot Count
+    [Documentation]    Validate that the host rebooted only the specified number of times
+    [Arguments]    ${reboot_count}
+
+    ${stdout}=    Execute Command
+    ...    journalctl --list-boots --quiet | wc -l
+    ...    sudo=True    return_rc=False
+
+    Should Be Equal As Integers    ${reboot_count}    ${stdout}

@@ -42,8 +42,10 @@ func NewClusterPolicyController(cfg *config.Config) *ClusterPolicyController {
 	return s
 }
 
-func (s *ClusterPolicyController) Name() string           { return "cluster-policy-controller" }
-func (s *ClusterPolicyController) Dependencies() []string { return []string{"kube-apiserver"} }
+func (s *ClusterPolicyController) Name() string { return "cluster-policy-controller" }
+func (s *ClusterPolicyController) Dependencies() []string {
+	return []string{"kube-apiserver", "infrastructure-services-manager"}
+}
 
 func (s *ClusterPolicyController) configure(cfg *config.Config) error {
 	s.kubeconfig = cfg.KubeConfigPath(config.ClusterPolicyController)

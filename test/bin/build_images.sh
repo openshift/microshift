@@ -14,23 +14,35 @@ shopt -s nullglob
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+# shellcheck source=test/bin/get_rel_version_repo.sh
+source "${SCRIPTDIR}/get_rel_version_repo.sh"
+
+osbuild_logs() {
+    workers_services=$(sudo systemctl list-units | awk '/osbuild-worker@/ {print $1} /osbuild-composer\.service/ {print $1}')
+    for service in ${workers_services}; do
+        # shellcheck disable=SC2024  # redirect and sudo
+        sudo journalctl -u "${service}" &> "${LOGDIR}/${service}.log"
+    done
+}
 
 configure_package_sources() {
     ## TEMPLATE VARIABLES
-    #
-    # Machine platform type ("x86_64")
-    UNAME_M=$(uname -m)
-    export UNAME_M
+    export UNAME_M                 # defined in common.sh
     export LOCAL_REPO              # defined in common.sh
     export NEXT_REPO               # defined in common.sh
     export BASE_REPO               # defined in common.sh
     export YPLUS2_REPO             # defined in common.sh
+    export CURRENT_RELEASE_REPO
+    export PREVIOUS_RELEASE_REPO
+
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
     export FAKE_YPLUS2_MINOR_VERSION
     export MINOR_VERSION
     export PREVIOUS_MINOR_VERSION
     export SOURCE_VERSION_BASE
+    export CURRENT_RELEASE_VERSION
+    export PREVIOUS_RELEASE_VERSION
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -41,7 +53,7 @@ configure_package_sources() {
         outfile="${IMAGEDIR}/package-sources/${name}.toml"
 
         echo "Rendering ${template} to ${outfile}"
-        ${GOMPLATE} --file "${template}" >"${outfile}" 
+        ${GOMPLATE} --file "${template}" >"${outfile}"
         if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
             echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
             continue
@@ -62,7 +74,7 @@ configure_package_sources() {
     done
 }
 
-# Reads release-info RPM for provided version to obtain images 
+# Reads release-info RPM for provided version to obtain images
 # and returns them as comma-separated list.
 get_container_images() {
     local -r version="${1}"
@@ -101,7 +113,14 @@ get_image_parent() {
     base=$(basename "${blueprint_filename}" .toml)
     if [[ "${base}" =~ '-' ]]; then
         base="${base//-*/}"
-        get_blueprint_name "${IMAGEDIR}/blueprints/${base}.toml"
+
+        local name
+        name=$(find "${TESTDIR}/image-blueprints" -name "${base}.toml")
+        if [ -n "${name}" ] ; then
+            get_blueprint_name "${name}"
+        else
+            echo ""
+        fi
     else
         echo ""
     fi
@@ -204,12 +223,21 @@ do_group() {
 
         blueprint_file="${IMAGEDIR}/blueprints/$(basename "${template}")"
 
+        # Check for the file to exist, in case the user passed a
+        # template on the command line.
+        if [ ! -f "${template}" ]; then
+            echo "ERROR: Template ${template} does not exist"
+            record_junit "${groupdir}" "${template}" "render" "FAILED"
+            return 1
+        fi
+
         echo "Rendering ${template} to ${blueprint_file}"
         ${GOMPLATE} --file "${template}" >"${blueprint_file}"
-        if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
+        if [[ "$(wc -l "${blueprint_file}" | cut -d ' ' -f1)" -eq 0 ]]; then
             echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
             continue
         fi
+        record_junit "${groupdir}" "${template}" "render" "OK"
 
         blueprint=$(get_blueprint_name "${blueprint_file}")
 
@@ -228,6 +256,11 @@ do_group() {
             record_junit "${groupdir}" "${blueprint}" "depsolve" "OK"
         else
             record_junit "${groupdir}" "${blueprint}" "depsolve" "FAILED"
+        fi
+
+        if ${COMPOSER_DRY_RUN} ; then
+            echo "Skipping the composer start operation"
+            continue
         fi
 
         parent_args=""
@@ -250,7 +283,7 @@ do_group() {
         buildid_list="${buildid_list} ${buildid}"
     done
 
-    if ${BUILD_INSTALLER}; then
+    if ${BUILD_INSTALLER} && ! ${COMPOSER_DRY_RUN}; then
         for image_installer in "${groupdir}"/*.image-installer; do
             blueprint=$("${GOMPLATE}" --file "${image_installer}")
             echo "Building image-installer from ${blueprint}"
@@ -297,7 +330,8 @@ do_group() {
         if [ "${status}" != "FINISHED" ]; then
             failed_builds+=("${buildid}")
             record_junit "${groupdir}" "${build_name}" "compose" "${status}"
-            sudo composer-cli compose info "${buildid}"
+            sudo composer-cli compose info --json "${buildid}"
+            sudo composer-cli compose log "${buildid}"
             continue
         fi
 
@@ -354,8 +388,13 @@ do_group() {
 }
 
 usage() {
+    if [ $# -gt 0 ] ; then
+        echo "ERROR: $*"
+        echo
+    fi
+
     cat - <<EOF
-build_images.sh [-Is] [-g group-dir] [-t template]
+build_images.sh [-iIsd] [-l layer-dir | -g group-dir] [-t template]
 
   -h      Show this help
 
@@ -365,18 +404,31 @@ build_images.sh [-Is] [-g group-dir] [-t template]
 
   -s      Only build source images (implies -I).
 
-  -g DIR  Build only one group.
+  -d      Dry run by skipping the composer start commands.
 
-  -t FILE Build only one template. Implies -g based on filename.
+  -l DIR  Build only one layer (cannot be used with -g or -t).
+          The DIR should be the path to the layer to build.
+
+  -g DIR  Build only one group (cannot be used with -l or -t).
+          The DIR should be the path to the group to build.
+          Implies -l based on the path.
+
+  -t FILE Build only one template (cannot be used with -l or -g). 
+          The FILE should be the path to the template to build. 
+          Implies -l and -g based on the filename.
+
 EOF
 }
 
 BUILD_INSTALLER=true
 ONLY_SOURCE=false
+COMPOSER_DRY_RUN=false
+LAYER=""
 GROUP=""
 TEMPLATE=""
 
-while getopts "iIg:st:h" opt; do
+selCount=0
+while getopts "iIl:g:sdt:h" opt; do
     case "${opt}" in
         h)
             usage
@@ -388,25 +440,37 @@ while getopts "iIg:st:h" opt; do
         I)
             BUILD_INSTALLER=false
             ;;
-        g)
-            GROUP="${OPTARG}"
-            ;;
         s)
             BUILD_INSTALLER=false
             ONLY_SOURCE=true
             ;;
+        d)
+            COMPOSER_DRY_RUN=true
+            ;;
+        l)
+            LAYER="$(realpath "${OPTARG}")"
+            selCount=$((selCount+1))
+            ;;
+        g)
+            GROUP="$(realpath "${OPTARG}")"
+            selCount=$((selCount+1))
+            ;;
         t)
             TEMPLATE="${OPTARG}"
             GROUP="$(basename "$(dirname "$(realpath "${OPTARG}")")")"
+            selCount=$((selCount+1))
             ;;
         *)
-            echo "ERROR: Unknown option ${opt}"
-            echo
-            usage
+            usage "ERROR: Unknown option ${opt}"
             exit 1
             ;;
     esac
 done
+
+if [ ${selCount} -gt 1 ] ; then
+    usage "The layer, group and template options are mutually exclusive"
+    exit 1
+fi
 
 if [ ! -f "${GOMPLATE}" ]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" gomplate
@@ -435,6 +499,14 @@ FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 FAKE_YPLUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" + 2 ))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
 
+current_version_repo=$(get_rel_version_repo "${MINOR_VERSION}")
+CURRENT_RELEASE_VERSION=$(echo "${current_version_repo}" | cut -d, -f1)
+CURRENT_RELEASE_REPO=$(echo "${current_version_repo}" | cut -d, -f2)
+
+previous_version_repo=$(get_rel_version_repo "${PREVIOUS_MINOR_VERSION}")
+PREVIOUS_RELEASE_VERSION=$(echo "${previous_version_repo}" | cut -d, -f1)
+PREVIOUS_RELEASE_REPO=$(echo "${previous_version_repo}" | cut -d, -f2)
+
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"
 mkdir -p "${LOGDIR}"
@@ -444,10 +516,16 @@ mkdir -p "${VM_DISK_BASEDIR}"
 
 configure_package_sources
 
-if [ -n "${GROUP}" ]; then
+trap 'osbuild_logs' EXIT
+
+if [ -n "${LAYER}" ]; then
+    for group in "${LAYER}"/group*; do
+        do_group "${group}" ""
+    done
+elif [ -n "${GROUP}" ]; then
     do_group "${GROUP}" "${TEMPLATE}"
 else
-    for group in "${TESTDIR}"/image-blueprints/group*; do
+    for group in "${TESTDIR}"/image-blueprints/layer*/group*; do
         do_group "${group}" ""
     done
 fi

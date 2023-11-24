@@ -26,6 +26,8 @@ assets:
     files:
       - file: cluster-role-binding.yaml
       - file: cluster-role.yaml
+      - file: cluster-role-system-router.yaml
+        git_restore: True
       - file: configmap.yaml
         git_restore: True
       - file: deployment.yaml
@@ -106,6 +108,8 @@ assets:
       - file: namespace-security-allocation-controller-clusterrolebinding.yaml
       - file: podsecurity-admission-label-syncer-controller-clusterrole.yaml
       - file: podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml
+      - file: podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrole.yaml
+      - file: podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrolebinding.yaml
 
   - dir: controllers/kube-apiserver/
     src: cluster-kube-apiserver-operator/bindata/assets/config/
@@ -149,7 +153,7 @@ assets:
       - file: 0000_20_kube-apiserver-operator_00_scc-restricted.yaml
 
   - dir: controllers/route-controller-manager/
-    src: cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/
+    src: cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/
     files:
       - file: ns.yaml
       - file: sa.yaml
@@ -172,7 +176,7 @@ assets:
     no_clean: True
     files:
       - file: 0000_50_cluster-openshift-controller-manager_00_namespace.yaml
-        src: /cluster-openshift-controller-manager-operator/bindata/v3.11.0/openshift-controller-manager/ns.yaml
+        src: /cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/ns.yaml
       - file: namespace-openshift-infra.yaml
         src: /cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/
       - file: priority-class-openshift-user-critical.yaml
@@ -204,3 +208,50 @@ assets:
 
   - file: embed.go
     ignore: "it's a MicroShift specific Go file that embeds into a binary"
+
+  - dir: optional/operator-lifecycle-manager/
+    src: operator-framework-olm/microshift-manifests/
+    files:
+      - file: 0000_50_olm_00-catalogsources.crd.yaml
+      - file: 0000_50_olm_00-clusterserviceversions.crd.yaml
+      - file: 0000_50_olm_00-installplans.crd.yaml
+      - file: 0000_50_olm_00-namespace.yaml
+      - file: 0000_50_olm_00-olmconfigs.crd.yaml
+      - file: 0000_50_olm_00-operatorconditions.crd.yaml
+      - file: 0000_50_olm_00-operatorgroups.crd.yaml
+      - file: 0000_50_olm_00-operators.crd.yaml
+      - file: 0000_50_olm_00-packageserver.pdb.yaml
+      - file: 0000_50_olm_00-pprof-config.yaml
+      - file: 0000_50_olm_00-pprof-rbac.yaml
+      - file: 0000_50_olm_00-pprof-secret.yaml
+      - file: 0000_50_olm_00-subscriptions.crd.yaml
+      - file: 0000_50_olm_01-olm-operator.serviceaccount.yaml
+      - file: 0000_50_olm_02-olmconfig.yaml
+      - file: 0000_50_olm_02-services.yaml
+      - file: 0000_50_olm_06-psm-operator.deployment.yaml
+      - file: 0000_50_olm_06-psm-operator.servicemonitor.yaml
+      - file: 0000_50_olm_06-psm-operator.service.yaml
+      - file: 0000_50_olm_07-collect-profiles.cronjob.yaml
+      - file: 0000_50_olm_07-olm-operator.deployment.x86_64.yaml
+        src: 0000_50_olm_07-olm-operator.deployment.yaml
+      - file: 0000_50_olm_07-olm-operator.deployment.aarch64.yaml
+        src: 0000_50_olm_07-olm-operator.deployment.yaml
+      - file: 0000_50_olm_08-catalog-operator.deployment.x86_64.yaml
+        src: 0000_50_olm_08-catalog-operator.deployment.yaml
+      - file: 0000_50_olm_08-catalog-operator.deployment.aarch64.yaml
+        src: 0000_50_olm_08-catalog-operator.deployment.yaml
+      - file: 0000_50_olm_09-aggregated.clusterrole.yaml
+      - file: 0000_50_olm_11-olm-operators.configmap.removed.yaml
+      - file: 0000_50_olm_12-olm-operators.catalogsource.removed.yaml
+      - file: 0000_50_olm_13-operatorgroup-default.yaml
+      - file: 0000_50_olm_14-packageserver.subscription.removed.yaml
+      - file: 0000_50_olm_15-csv-viewer.rbac.yaml
+      - file: 0000_50_olm_99-operatorstatus.yaml
+      - file: 0000_90_olm_00-service-monitor.yaml
+      - file: 0000_90_olm_01-prometheus-rule.yaml
+      - file: image-references
+      - file: kustomization.yaml
+      - file: release-aarch64.json
+        ignore: "gets generated during image rebase"
+      - file: release-x86_64.json
+        ignore: "gets generated during image rebase"

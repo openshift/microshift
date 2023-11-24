@@ -3,8 +3,8 @@
 set -euo pipefail
 
 SCRIPT_NAME=$(basename "$0")
-PROFILES="network,security,microshift"
-PLUGINS="container_log,crio,logs,rpmostree,rpm"
+PROFILES="${PROFILES:-network,security,microshift}"
+PLUGINS="${PLUGINS:-container_log,crio,logs,rpmostree,rpm}"
 TEMPDIR="/tmp"
 
 function usage() {

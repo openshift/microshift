@@ -48,6 +48,7 @@ func (s *OpenShiftCRDManager) Run(ctx context.Context, ready chan<- struct{}, st
 	klog.Infof("%s waiting for CRDs acceptance before proceeding", s.Name())
 	if err := assets.WaitForCrdsEstablished(ctx, s.cfg); err != nil {
 		klog.Errorf("%s unable to confirm all CRDs are ready: %v", s.Name(), err)
+		return ctx.Err()
 	}
 	klog.Infof("%s all CRDs are ready", s.Name())
 	close(ready)

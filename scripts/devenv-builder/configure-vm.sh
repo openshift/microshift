@@ -5,6 +5,7 @@ BUILD_AND_RUN=true
 INSTALL_BUILD_DEPS=true
 FORCE_FIREWALL=false
 RHEL_SUBSCRIPTION=false
+RHEL_BETA_VERSION=false
 SET_RHEL_RELEASE=true
 
 start=$(date +%s)
@@ -70,6 +71,10 @@ fi
 if grep -q 'Red Hat Enterprise Linux' /etc/redhat-release; then
     RHEL_SUBSCRIPTION=true
 fi
+# Detect RHEL Beta versions
+if grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; then
+    RHEL_BETA_VERSION=true
+fi
 
 OCP_PULL_SECRET=$1
 [ ! -e "${OCP_PULL_SECRET}" ] && usage "OpenShift pull secret file '${OCP_PULL_SECRET}' does not exist"
@@ -84,7 +89,7 @@ if ${RHEL_SUBSCRIPTION}; then
         sudo subscription-manager register --auto-attach
     fi
 
-    if ${SET_RHEL_RELEASE}; then
+    if ${SET_RHEL_RELEASE} && ! ${RHEL_BETA_VERSION} ; then
         # https://access.redhat.com/solutions/238533
         source /etc/os-release
         sudo subscription-manager release --set ${VERSION_ID}
@@ -100,7 +105,7 @@ if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     sudo systemctl enable --now cockpit.socket
 fi
 
-GO_VER=1.20.4
+GO_VER=1.20.10
 GO_ARCH=$([ "$(uname -m)" == "x86_64" ] && echo "amd64" || echo "arm64")
 GO_INSTALL_DIR="/usr/local/go${GO_VER}"
 if ${INSTALL_BUILD_DEPS} && [ ! -d "${GO_INSTALL_DIR}" ]; then
@@ -131,11 +136,24 @@ if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     # This version might not match the version under development because we need
     # to pull in dependencies that are already released
-    OCPVERSION=4.13
+    OCPVERSION=4.14
     sudo subscription-manager config --rhsm.manage_repos=1
-    sudo subscription-manager repos \
-        --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
-        --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+
+    if ! ${RHEL_BETA_VERSION} ; then
+        sudo subscription-manager repos \
+            --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
+            --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+    else
+        OCP_REPO_NAME="rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms"
+        sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
+[${OCP_REPO_NAME}]
+name=Beta rhocp-${OCPVERSION} RPMs for RHEL ${OSVERSION}
+baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/${OCPVERSION}-el${OSVERSION}-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+    fi
 else
     dnf_retry install centos-release-nfv-common
     sudo dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"

@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 # shellcheck disable=all
 #   Copyright 2022 The MicroShift authors
 #
@@ -34,9 +34,8 @@ PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd kube-storage-version-migrator"
-EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator"
-LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator
-cluster-csi-snapshot-controller-operator"
+EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator operator-lifecycle-manager"
+LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator cluster-csi-snapshot-controller-operator"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
@@ -73,255 +72,6 @@ check_preconditions() {
         echo "ERROR: missing python's yaml library - please install"
         exit 1
     fi
-}
-
-# LVMS is not integrated into the ocp release image, so the work flow does not fit with core component rebase.  LVMS'
-# operator bundle is the authoritative source for manifest and image digests.
-download_lvms_operator_bundle_manifest(){
-    bundle_manifest="$1"
-
-    title "downloading LVMS operator bundles ${bundle_manifest}"
-    local LVMS_STAGING="${STAGING_DIR}/lvms"
-
-    authentication=""
-    if [ -f "${PULL_SECRET_FILE}" ]; then
-        authentication="--registry-config ${PULL_SECRET_FILE}"
-    else
-        >&2 echo "Warning: no pull secret found at ${PULL_SECRET_FILE}"
-    fi
-
-    for arch in ${ARCHS[@]}; do
-        mkdir -p "$LVMS_STAGING/$arch"
-        pushd "$LVMS_STAGING/$arch" || return 1
-        title "extracting lvms operator bundle for \"$arch\" architecture"
-        oc image extract \
-            ${authentication} \
-            --path /manifests/:. "$bundle_manifest" \
-            --filter-by-os "$arch" \
-            ||  {
-                    popd
-                    return 1
-                }
-
-        local csv="lvms-operator.clusterserviceversion.yaml"
-        local namespace="openshift-storage"
-        extract_lvms_rbac_from_cluster_service_version ${PWD} ${csv} ${namespace}
-
-        popd || return 1
-    done
-}
-
-parse_images() {
-    local src="$1"
-    local dest="$2"
-    yq '.spec.relatedImages[]? | [.name, .image] | @csv' $src > "$dest"
-}
-
-write_lvms_images_for_arch(){
-    local arch="$1"
-    arch_dir="${STAGING_DIR}/lvms/${arch}"
-    [ -d "$arch_dir" ] || {
-        echo "dir $arch_dir not found"
-        return 1
-    }
-
-    declare -a include_images=(
-        "topolvm-csi"
-        "topolvm-csi-provisioner"
-        "topolvm-csi-resizer"
-        "topolvm-csi-registrar"
-        "topolvm-csi-livenessprobe"
-    )
-
-    local csv_manifest="${arch_dir}/lvms-operator.clusterserviceversion.yaml"
-    local image_file="${arch_dir}/images"
-
-    parse_images "$csv_manifest" "$image_file"
-
-    if [ $(wc -l "$image_file" | cut -d' ' -f1) -eq 0 ]; then
-        >$2 echo "error: image file ($image_file) has fewer images than expected (${#include_images})"
-        exit 1
-    fi
-    while read -ers LINE; do
-        name=${LINE%,*}
-        img=${LINE#*,}
-        for included in "${include_images[@]}"; do
-            if [[ "$name" == "$included" ]]; then
-                name="$(echo "$name" | tr '-' '_')"
-                yq -iP -o=json e '.images["'"$name"'"] = "'"$img"'"' "${REPOROOT}/assets/release/release-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
-                break;
-            fi
-        done
-    done < "$image_file"
-}
-
-update_lvms_images(){
-    title "Updating LVMS images"
-
-    local workdir="$STAGING_DIR/lvms"
-    [ -d "$workdir" ] || {
-        >&2 echo 'lvms staging dir not found, aborting image update'
-        return 1
-    }
-    pushd "$workdir"
-    for arch in ${ARCHS[@]}; do
-        write_lvms_images_for_arch "$arch"
-    done
-    popd
-}
-
-update_lvms_manifests() {
-    title "Copying LVMS manifests"
-
-    local workdir="$STAGING_DIR/lvms"
-    [ -d "$workdir" ] || {
-        >&2 echo 'lvms staging dir not found, aborting asset update'
-        return 1
-    }
-
-    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/lvms_assets.yaml"
-}
-
-
-# In the ClusterServiceVersion there are encoded RBAC information for OLM deployments.
-# Since microshift skips this installation and uses a custom one based on the bundle, we have to extract the RBAC
-# manifests from the CSV by reading them out into separate files.
-# shellcheck disable=SC2207
-extract_lvms_rbac_from_cluster_service_version() {
-  local dest="$1"
-  local csv="$2"
-  local namespace="$3"
-
-  title "extracting lvms clusterserviceversion.yaml into separate RBAC"
-
-  local clusterPermissions=($(yq eval '.spec.install.spec.clusterPermissions[].serviceAccountName' < "${csv}"))
-  for service_account_name in "${clusterPermissions[@]}"; do
-    echo "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
-
-    local clusterrole="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-    echo "generating ${clusterrole}"
-    extract_lvms_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
-
-    local clusterrolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-    echo "generating ${clusterrolebinding}"
-    extract_lvms_clusterrolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${clusterrolebinding}"
-
-    local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
-    echo "generating ${service_account}"
-    extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
-  done
-
-  local permissions=($(yq eval '.spec.install.spec.permissions[].serviceAccountName' < "${csv}"))
-  for service_account_name in "${permissions[@]}"; do
-    echo "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
-
-    local role="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_role.yaml"
-    echo "generating ${role}"
-    extract_lvms_role_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${csv}" "${role}"
-
-    local rolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_rolebinding.yaml"
-    echo "generating ${rolebinding}"
-    extract_lvms_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
-
-    local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
-    echo "generating ${service_account}"
-    extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
-  done
-}
-
-extract_lvms_clusterrole_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local csv="$2"
-  local target="$3"
-  yq eval "
-    .spec.install.spec.clusterPermissions[] |
-    select(.serviceAccountName == \"${service_account_name}\") |
-    .apiVersion = \"rbac.authorization.k8s.io/v1\" |
-    .kind = \"ClusterRole\" |
-    .metadata.name = \"${service_account_name}\" |
-    del(.serviceAccountName)
-    " "${csv}" > "${target}"
-}
-
-extract_lvms_role_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local csv="$3"
-  local target="$4"
-  yq eval "
-    .spec.install.spec.permissions[] |
-    select(.serviceAccountName == \"${service_account_name}\") |
-    .apiVersion = \"rbac.authorization.k8s.io/v1\" |
-    .kind = \"Role\" |
-    .metadata.name = \"${service_account_name}\" |
-    .metadata.namespace = \"${namespace}\" |
-    del(.serviceAccountName)
-    " "${csv}" > "${target}"
-}
-
-extract_lvms_clusterrolebinding_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
-
-  crb=$(cat <<EOL
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: ${service_account_name}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ${service_account_name}
-subjects:
-- kind: ServiceAccount
-  name: ${service_account_name}
-  namespace: ${namespace}
-EOL
-)
-  echo "${crb}" > "${target}"
-}
-
-extract_lvms_rolebinding_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
-
-  crb=$(cat <<EOL
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: ${service_account_name}
-  namespace: ${namespace}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: ${service_account_name}
-  namespace: ${namespace}
-subjects:
-- kind: ServiceAccount
-  name: ${service_account_name}
-  namespace: ${namespace}
-EOL
-)
-  echo "${crb}" > "${target}"
-}
-
-extract_lvms_service_account_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
-
-  serviceAccount=$(cat <<EOL
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  creationTimestamp: null
-  name: ${service_account_name}
-  namespace: ${namespace}
-EOL
-)
-    echo "${serviceAccount}" > "${target}"
 }
 
 # Clone a repo at a commit
@@ -713,6 +463,13 @@ update_go_mod() {
 
 # Updates go.mod file in dirs defined in GO_MOD_DIRS
 update_go_mods() {
+    # Update Go versions in the go.mod based on values in kubernetes' and etcd's go.mod
+    kubernetes_go_version=$(go mod edit -json "${STAGING_DIR}/kubernetes/go.mod" | jq -r '.Go')
+    go mod edit -go="${kubernetes_go_version}" "${REPOROOT}/go.mod"
+
+    etcd_go_version=$(go mod edit -json "${STAGING_DIR}/etcd/go.mod" | jq -r '.Go')
+    go mod edit -go="${etcd_go_version}" "${REPOROOT}/etcd/go.mod"
+
     for d in "${GO_MOD_DIRS[@]}"; do
         pushd "${d}" > /dev/null
         update_go_mod
@@ -780,6 +537,8 @@ update_images() {
         sed -i "s|pause_image =.*|pause_image = \"${pause_image_digest}\"|g" \
             "${REPOROOT}/packaging/crio.conf.d/microshift_${goarch}.conf"
     done
+
+    update_olm_images
 
     popd >/dev/null
 
@@ -1081,15 +840,7 @@ update_changelog() {
 
 }
 
-
-# Runs each OCP rebase step in sequence, commiting the step's output to git
-rebase_to() {
-    local release_image_amd64=$1
-    local release_image_arm64=$2
-
-    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
-    download_release "${release_image_amd64}" "${release_image_arm64}"
-
+checkout_rebase_branch() {
     ver_stream="$(cat ${STAGING_DIR}/release_amd64.json | jq -r '.config.config.Labels["io.openshift.release"]')"
     amd64_date="$(cat ${STAGING_DIR}/release_amd64.json | jq -r .config.created | cut -f1 -dT)"
     arm64_date="$(cat ${STAGING_DIR}/release_arm64.json | jq -r .config.created | cut -f1 -dT)"
@@ -1110,6 +861,47 @@ rebase_to() {
     rebase_branch="rebase${onto_branch:+"-$onto_branch"}-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
+}
+
+update_olm_images() {
+    title "Rebasing operator-lifecycle-manager manifests"
+    for goarch in amd64 arm64; do
+        # Get the images for the OLM operator from ${STAGING_DIR}/release_${arch}.json:
+        # - operator-lifecycle-manager
+        # - operator-registry
+        # - kube-rbac-proxy
+        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
+        base_release=$(jq -r ".metadata.version" "${STAGING_DIR}/release_${goarch}.json")
+
+        # Create the OLM release-${arch}.json file, this is the file included on the RPM.
+        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json"
+        
+        # Read from the global release file, to find the images we need to use.
+        release_file="${STAGING_DIR}/release_${goarch}.json"
+        containers=$(yq -r '.spec.tags[].name' "${REPOROOT}/assets/optional/operator-lifecycle-manager/image-references")
+        for container in ${containers[@]}; do
+            # Get the images we need to use.
+            image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
+            # Now get the image we need to replace.
+            image_to_replace=$(yq -r ".spec.tags[] | select(.name == \"${container}\") | .from.name" "${REPOROOT}/assets/optional/operator-lifecycle-manager/image-references")
+            # Replace the images in the manifests.
+            sed -i "s|${image_to_replace}|${image}|g" ${REPOROOT}/assets/optional/operator-lifecycle-manager/*.${arch}.yaml
+            # Append a new container and image to the release-${arch}.json file.
+            jq ".images += {\"${container}\": \"${image}\"}" "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json" > "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json.tmp"
+            mv "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json.tmp" "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json" 
+        done
+    done
+}
+
+# Runs each OCP rebase step in sequence, commiting the step's output to git
+rebase_to() {
+    local release_image_amd64=$1
+    local release_image_arm64=$2
+
+    title "# Rebasing to ${release_image_amd64} and ${release_image_arm64}"
+    download_release "${release_image_amd64}" "${release_image_arm64}"
+
+    checkout_rebase_branch
 
     update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
 
@@ -1167,69 +959,38 @@ rebase_to() {
     rm -rf "${STAGING_DIR}"
 }
 
-update_last_lvms_rebase() {
-    local lvms_operator_bundle_manifest="$1"
+to_just_images() {
+    local release_image_amd64=$1
+    local release_image_arm64=$2
 
-    title "## Updating last_lvms_rebase.sh"
+    download_release "${release_image_amd64}" "${release_image_arm64}"
+    checkout_rebase_branch
+    update_images
 
-    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_lvms_rebase.sh"
-
-    rm -f "${last_rebase_script}"
-    cat - >"${last_rebase_script}" <<EOF
-#!/bin/bash -x
-./scripts/auto-rebase/rebase.sh lvms-to "${lvms_operator_bundle_manifest}"
+    if [[ -n "$(git status -s assets/release packaging/crio.conf.d)" ]]; then
+        local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase.sh"
+        rm -f "${last_rebase_script}"
+        cat - >"${last_rebase_script}" <<EOF
+    #!/bin/bash -x
+    ./scripts/auto-rebase/rebase.sh images-to "${release_image_amd64}" "${release_image_arm64}"
 EOF
-    chmod +x "${last_rebase_script}"
+        chmod +x "${last_rebase_script}"
 
-    (cd "${REPOROOT}" && \
-         if test -n "$(git status -s scripts/auto-rebase/last_lvms_rebase.sh)"; then \
-             title "## Committing changes to last_lvms_rebase.sh" && \
-             git add scripts/auto-rebase/last_lvms_rebase.sh && \
-             git commit -m "update last_lvms_rebase.sh"; \
-         fi)
-}
-
-# Runs each LVMS rebase step in sequence, commiting the step's output to git
-rebase_lvms_to() {
-    local lvms_operator_bundle_manifest="$1"
-
-    title "# Rebasing LVMS to ${lvms_operator_bundle_manifest}"
-
-    download_lvms_operator_bundle_manifest "${lvms_operator_bundle_manifest}"
-
-    # LVMS image names may include `/` and `:`, which make messy branch names.
-    rebase_branch="rebase-lvms-${lvms_operator_bundle_manifest//[:\/]/-}"
-    git branch -D "${rebase_branch}" || true
-    git checkout -b "${rebase_branch}"
-
-    update_last_lvms_rebase "${lvms_operator_bundle_manifest}"
-
-    update_lvms_images
-    if [[ -n "$(git status -s pkg/release)" ]]; then
-        title "## Committing changes to pkg/release"
-        git add pkg/release
-        git commit -m "update LVMS images"
+        title "## Committing new image references"
+        git add assets/release
+        git add packaging/crio.conf.d
+        git add scripts/auto-rebase/last_rebase.sh
+        git commit -m "update component images"
     else
-        echo "No changes in LVMS images."
+        echo "No changes in component images."
     fi
-
-    update_lvms_manifests
-    if [[ -n "$(git status -s assets)" ]]; then
-        title "## Committing changes to assets and pkg/assets"
-        git add assets pkg/assets
-        git commit -m "update LVMS manifests"
-    else
-        echo "No changes to LVMS assets."
-    fi
-
-    title "# Removing staging directory"
-    rm -rf "${STAGING_DIR}"
 }
 
 usage() {
     echo "Usage:"
     echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM         Performs all the steps to rebase to a release image. Specify both amd64 and arm64 OCP releases."
     echo "$(basename "$0") download RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM   Downloads the content of a release image to disk in preparation for rebasing. Specify both amd64 and arm64 OCP releases."
+    echo "$(basename "$0") images-to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM  Downloads release image and only updates image references. Specify both amd64 and arm64 OCP releases."
     echo "$(basename "$0") buildfiles                                       Updates build files (Makefile, Dockerfile, .spec)"
     echo "$(basename "$0") go.mod                                           Updates the go.mod file to the downloaded release"
     echo "$(basename "$0") generated-apis                                   Regenerates OpenAPIs"
@@ -1259,21 +1020,12 @@ case "$command" in
     images)
         update_images
         ;;
+    images-to)
+        to_just_images "$2" "$3"
+        ;;
     manifests)
         copy_manifests
         update_openshift_manifests
-        ;;
-    lvms-to)
-        rebase_lvms_to "$2"
-        ;;
-    lvms-download)
-        download_lvms_operator_bundle_manifest "$2"
-        ;;
-    lvms-images)
-        update_lvms_images
-        ;;
-    lvms-manifests)
-        update_lvms_manifests
         ;;
     *) usage;;
 esac

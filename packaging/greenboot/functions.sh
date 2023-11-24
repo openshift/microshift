@@ -3,11 +3,22 @@
 # Functions used by MicroShift in Greenboot health check procedures.
 # This library may also be used for user workload health check verification.
 #
+SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
 
 OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
 OCGET_OPT="--no-headers"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
+
+# Note about the output
+# This file runs as part of a systemd unit, greenboot-healthcheck. All of the
+# output is captured by journald, and in order to link it to the unit it
+# belongs to, it needs to be printed in a certain way. Any foreground `echo`
+# command will automatically get picked up. External commands, such as `cat`
+# or running in the background requires special care. In order for journald
+# to take the output as part of the unit it needs to be channeled through
+# systemd-cat, which will propagate all the required configuration for it.
+# To keep it runable without systemd, it is also printed to regular stdout.
 
 # Space separated list of log file locations to be printed out in case of
 # a health check failure
@@ -27,15 +38,18 @@ function print_boot_status() {
 
     local grub_vars
     local boot_vars
+    local ostr_stat
     grub_vars=$(grub2-editenv - list | grep ^boot_ || true)
     boot_vars=$(set | grep -E '^GREENBOOT_|^MICROSHIFT_' || true)
+    ostr_stat=$(ostree admin status 2>/dev/null || true)
 
-    [ -z "${grub_vars}" ] && grub_vars=None
-    [ -z "${boot_vars}" ] && boot_vars=None
+    [ -z "${grub_vars}" ] && grub_vars="None"
+    [ -z "${boot_vars}" ] && boot_vars="None"
+    [ -z "${ostr_stat}" ] && ostr_stat="Not an ostree system"
 
     echo -e "GRUB boot variables:\n${grub_vars}"
     echo -e "Greenboot variables:\n${boot_vars}"
-    echo -e "The ostree status:\n$(ostree admin status || true)"
+    echo -e "The ostree status:\n${ostr_stat}"
 }
 
 # Get the recommended wait timeout to be used for running health check operations.
@@ -145,7 +159,7 @@ function namespace_pods_ready() {
 
     # Terminate the script in case more pods are ready than expected - nothing to wait for
     if [ "${tcount}" -gt "${ct}" ] ; then
-        echo "The number of ready pods in the '${ns}' namespace is greater than the expected '${ct}' count. Terminating..."
+        echo "The number of ready pods in the '${ns}' namespace is greater than the expected '${ct}' count. Terminating..." | tee >(systemd-cat -t "${SCRIPT_NAME}")
         kill -TERM ${SCRIPT_PID}
     fi
     # Exit with error if any pods are not ready yet
@@ -200,7 +214,7 @@ function print_failure_logs() {
         if [ -f "${file}" ]; then
             echo "Failure log in: '${file}'"
             echo "------"
-            cat "${file}"
+            echo "$(<"${file}")"
             echo "------"
         else
             echo "Info: Log file '${file}' does not exist"

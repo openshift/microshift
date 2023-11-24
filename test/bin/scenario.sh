@@ -17,32 +17,131 @@ PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=900
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
+SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
+TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 
 full_vm_name() {
     local base="${1}"
     echo "${SCENARIO//@/-}-${base}"
 }
 
+vm_property_filename() {
+    local -r vmname="$1"
+    local -r property="$2"
+
+    echo "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/${property}"
+}
+
+get_vm_property() {
+    local -r vmname="$1"
+    local -r property="$2"
+    local -r property_file="$(vm_property_filename "${vmname}" "${property}")"
+    cat "${property_file}"
+}
+
+set_vm_property() {
+    local -r vmname="$1"
+    local -r property="$2"
+    local -r value="$3"
+    local -r property_file="$(vm_property_filename "${vmname}" "${property}")"
+    mkdir -p "$(dirname "${property_file}")"
+    echo "${value}" > "${property_file}"
+}
+
+run_command_on_vm() {
+    local -r vmname="$1"
+    shift
+    local -r command="$*"
+
+    local -r ip=$(get_vm_property "${vmname}" ip)
+    local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
+
+    ssh "redhat@${ip}" -p "${ssh_port}" -t "${command}"
+}
+
+copy_file_to_vm() {
+    local -r vmname="$1"
+    local -r local_filename="$2"
+    local -r remote_filename="$3"
+
+    local -r ip=$(get_vm_property "${vmname}" ip)
+    local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
+
+    scp -P "${ssh_port}" "${local_filename}" "redhat@${ip}:${remote_filename}"
+}
+
 sos_report() {
+    local -r junit="${1:-false}"
+
     if "${SKIP_SOS}"; then
         echo "Skipping sos reports"
+        if "${junit}"; then
+            record_junit "post_setup" "sos-report" "SKIP"
+        fi
         return
     fi
+
     echo "Creating sos reports"
+    local vmname
+    local ip
+    local scenario_result=0
     for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
         if [ ! -d "${vmdir}" ]; then
             # skip log files, etc.
             continue
         fi
-        ip=$(cat "${vmdir}/ip")
-        # Copy the sos helper for compatibility, it is only available in 4.14 RPMs
-        scp "${ROOTDIR}/scripts/microshift-sos-report.sh" "redhat@${ip}":/tmp
-        ssh "redhat@${ip}" \
-            "[ -f /usr/bin/microshift-sos-report ] && sudo /usr/bin/microshift-sos-report || sudo /tmp/microshift-sos-report.sh ; sudo chmod +r /tmp/sosreport*"
-        mkdir -p "${vmdir}/sos"
-        scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
+
+        vmname=$(basename "${vmdir}")
+        ip=$(get_vm_property "${vmname}" ip)
+        if [ -z "${ip}" ]; then
+            # skip hosts without NICs
+            # FIXME: use virsh to copy sos report files
+            if "${junit}"; then
+                record_junit "${vmname}" "sos-report" "SKIP"
+            fi
+            continue
+        fi
+
+        if ! sos_report_for_vm "${vmdir}" "${vmname}" "${ip}"; then
+            scenario_result=1
+            if "${junit}"; then
+                record_junit "${vmname}" "sos-report" "FAILED"
+            fi
+        else
+            if "${junit}"; then
+                record_junit "${vmname}" "sos-report" "OK"
+            fi
+        fi
     done
+    return "${scenario_result}"
+}
+
+sos_report_for_vm() {
+    local -r vmdir="${1}"
+    local -r vmname="${2}"
+    local -r ip="${3}"
+
+    # Some scenarios do not start with MicroShift installed, so we
+    # can't rely on the wrapper being there or working if it
+    # is. Copy the script to the host, just in case, along with a
+    # wrapper that knows how to execute it or the installed
+    # version.
+    cat - >/tmp/sos-wrapper.sh <<EOF
+#!/usr/bin/env bash
+if [ -f /usr/bin/microshift-sos-report ]; then
+    sudo /usr/bin/microshift-sos-report
+else
+    sudo chmod +x /tmp/microshift-sos-report.sh
+    sudo PROFILES=network,security /tmp/microshift-sos-report.sh
+fi
+sudo chmod +r /tmp/sosreport*
+EOF
+    copy_file_to_vm "${vmname}" "/tmp/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
+    copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
+    run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
+    mkdir -p "${vmdir}/sos"
+    scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
 }
 
 # Public function to render a unique kickstart from a template for a
@@ -89,6 +188,17 @@ prepare_kickstart() {
     record_junit "${vmname}" "prepare_kickstart" "OK"
 }
 
+# Checks if provided commit exists in local ostree repository
+does_commit_exist() {
+    local -r commit="${1}"
+
+    if ostree refs --repo "${IMAGEDIR}/repo" | grep -q "${commit}"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Show the IP address of the VM
 function get_vm_ip {
     local -r vmname="${1}"
@@ -129,6 +239,11 @@ wait_for_ssh() {
 wait_for_greenboot() {
     local -r vmname="${1}"
     local -r ip="${2}"
+
+    if "${SKIP_GREENBOOT}"; then
+        echo "Skipping greenboot check"
+        return 0
+    fi
 
     echo "Waiting ${VM_BOOT_TIMEOUT} for greenboot on ${vmname} to complete"
 
@@ -175,12 +290,19 @@ record_junit() {
 <testcase classname="${SCENARIO} ${vmname}" name="${step}">
 EOF
 
-    if [ "${results}" != "OK" ]; then
+    case "${results}" in
+        OK)
+        ;;
+        SKIP*)
         cat - >>"${outputfile}" <<EOF
-<failure message="${results}" type="${step}-failure">
-</failure>
+<skipped message="${results}" type="${step}-skipped" />
 EOF
-    fi
+        ;;
+        *)
+        cat - >>"${outputfile}" <<EOF
+<failure message="${results}" type="${step}-failure" />
+EOF
+    esac
 
     cat - >>"${outputfile}" <<EOF
 </testcase>
@@ -241,13 +363,30 @@ launch_vm() {
         sudo virsh pool-autostart "${vm_pool_name}"
     fi
 
-    # Prepare network arguments for the VM creation depending on
+    # Prepare network and extra arguments for the VM creation depending on
     # the number of requested NICs
     local vm_network_args
+    local vm_extra_args
+    local vm_initrd_inject
     vm_network_args=""
+    vm_extra_args="console=tty0 console=ttyS0,115200n8 inst.notmux"
+    vm_initrd_inject=""
+
     for _ in $(seq "${vm_nics}") ; do
         vm_network_args+="--network network=${network_name},model=virtio "
     done
+    if [ -z "${vm_network_args}" ] ; then
+        vm_network_args="--network none"
+
+        # Kickstart should be downloaded and injected into the ISO
+        local -r kickstart_file=$(mktemp /tmp/kickstart.XXXXXXXX.ks)
+        curl -s "${kickstart_url}" > "${kickstart_file}"
+
+        vm_extra_args+=" inst.ks=file:/$(basename "${kickstart_file}")"
+        vm_initrd_inject="--initrd-inject ${kickstart_file}"
+    else
+        vm_extra_args+=" inst.ks=${kickstart_url}"
+    fi
 
     # Implement retries on VM creation until the problem is fixed
     # See https://github.com/virt-manager/virt-manager/issues/498
@@ -278,7 +417,8 @@ launch_vm() {
             --events on_reboot=restart \
             --noreboot \
             --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
-            --extra-args "inst.ks=${kickstart_url} console=tty0 console=ttyS0,115200n8 inst.notmux" \
+            --extra-args "${vm_extra_args}" \
+            ${vm_initrd_inject} \
             --wait ${vm_wait_timeout} ; then
 
             # Check if the command exited within 15s due to a failure
@@ -306,42 +446,53 @@ launch_vm() {
     fi
     sudo virsh start "${full_vmname}"
 
-    # Wait for an IP to be assigned
-    echo "Waiting for VM ${full_vmname} to have an IP"
-    local -r ip=$(get_vm_ip "${full_vmname}")
-    echo "VM ${full_vmname} has IP ${ip}"
-    record_junit "${vmname}" "ip-assignment" "OK"
+    # If there is at least 1 NIC attached, wait for an IP to be assigned and poll for SSH access
+    if  [ "${vm_nics}" -gt 0 ]; then
+        # Wait for an IP to be assigned
+        echo "Waiting for VM ${full_vmname} to have an IP"
+        local -r ip=$(get_vm_ip "${full_vmname}")
+        echo "VM ${full_vmname} has IP ${ip}"
+        record_junit "${vmname}" "ip-assignment" "OK"
 
-    # Remove any previous key info for the host
-    if [ -f "${HOME}/.ssh/known_hosts" ]; then
-        echo "Clearing known_hosts entry for ${ip}"
-        ssh-keygen -R "${ip}"
-    fi
+        # Remove any previous key info for the host
+        if [ -f "${HOME}/.ssh/known_hosts" ]; then
+            echo "Clearing known_hosts entry for ${ip}"
+            ssh-keygen -R "${ip}"
+        fi
 
-    # Record the IP of this VM so our caller can use it to configure
-    # port forwarding and the firewall.
-    mkdir -p "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
-    echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
-    # Record the _public_ IP of the VM so the test suite can use it to
-    # access the host. This is useful when the public IP is the
-    # hypervisor forwarding connections. If we have no PUBLIC_IP, use
-    # the VM IP and assume a local connection.
-    if [ -n "${PUBLIC_IP}" ]; then
-        echo "${PUBLIC_IP}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+        # Record the IP of this VM so our caller can use it to configure
+        # port forwarding and the firewall.
+        set_vm_property "${vmname}" "ip" "${ip}"
+        # Record the _public_ IP of the VM so the test suite can use it to
+        # access the host. This is useful when the public IP is the
+        # hypervisor forwarding connections. If we have no PUBLIC_IP, use
+        # the VM IP and assume a local connection.
+        if [ -n "${PUBLIC_IP}" ]; then
+            set_vm_property "${vmname}" "public_ip" "${PUBLIC_IP}"
+        else
+            set_vm_property "${vmname}" "public_ip" "${ip}"
+            # Set the defaults for the various ports so that connections
+            # from the hypervisor to the VM work.
+            set_vm_property "${vmname}" "ssh_port" "22"
+            set_vm_property "${vmname}" "api_port" "6443"
+            set_vm_property "${vmname}" "lb_port" "5678"
+        fi
+
+        if wait_for_ssh "${ip}"; then
+            record_junit "${vmname}" "ssh-access" "OK"
+        else
+            record_junit "${vmname}" "ssh-access" "FAILED"
+            return 1
+        fi
     else
-        echo "${ip}" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
-        # Set the defaults for the various ports so that connections
-        # from the hypervisor to the VM work.
-        echo "22" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-        echo "6443" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
-        echo "5678" > "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
-    fi
+        # Record no-IP for offline VMs to signal special sos report collection technique
+        mkdir -p "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
+        touch "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
 
-    if wait_for_ssh "${ip}"; then
+        echo "VM ${full_vmname} has no NICs, skipping IP assignment and ssh polling"
+        # Anything other than "OK" status is reported as an error
+        record_junit "${vmname}" "ip-assignment" "OK"
         record_junit "${vmname}" "ssh-access" "OK"
-    else
-        record_junit "${vmname}" "ssh-access" "FAILED"
-        return 1
     fi
 
     echo "${full_vmname} is up and ready"
@@ -399,6 +550,31 @@ next_minor_version() {
     echo $(( $(current_minor_version) + 1 ))
 }
 
+# Enable/Disable Stress Condition
+stress_testing() {
+    local -r vmname="${1}"
+    local -r action="${2}"
+    local -r condition="${3}"
+    local -r value="${4}"
+
+    local -r ssh_host="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+    local -r ssh_user=redhat
+    local -r ssh_port="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+    local -r ssh_pkey="${SSH_PRIVATE_KEY:-}"
+
+
+	if [ "${action}" == "enable" ]; then
+        echo "${action}d stress condition: ${condition} ${value}"
+        "${SCRIPTDIR}/stress_testing.sh" -e "${condition}" -v "${value}" -h "${ssh_host}" -u "${ssh_user}" -p "${ssh_port}" -k "${ssh_pkey}"
+    elif [ "${action}" == "disable" ]; then
+        echo "${action}d stress condition: ${condition}"
+        "${SCRIPTDIR}/stress_testing.sh" -d "${condition}" -h "${ssh_host}" -u "${ssh_user}" -p "${ssh_port}" -k "${ssh_pkey}"
+    else
+        error "Invalid Stress Testing action"
+        exit 1
+    fi
+}
+
 # Run the tests for the current scenario
 run_tests() {
     local -r vmname="${1}"
@@ -417,22 +593,19 @@ run_tests() {
         exit 1
     fi
 
-    local -r ssh_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-    local -r api_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/api_port"
-    local -r lb_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/lb_port"
-    local -r public_ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
-    local -r ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
-    for f in "${ssh_port_file}" "${api_port_file}" "${lb_port_file}" "${public_ip_file}" "${ip_file}"; do
+    local f
+    for p in "ssh_port" "api_port" "lb_port" "public_ip" "ip"; do
+        f="$(vm_property_filename "${vmname}" "${p}")"
         if [ ! -f "${f}" ]; then
             error "Cannot read ${f}"
             exit 1
         fi
     done
-    local -r ssh_port=$(cat "${ssh_port_file}")
-    local -r api_port=$(cat "${api_port_file}")
-    local -r lb_port=$(cat "${lb_port_file}")
-    local -r public_ip=$(cat "${public_ip_file}")
-    local -r vm_ip=$(cat "${ip_file}")
+    local -r ssh_port=$(get_vm_property "${vmname}" "ssh_port")
+    local -r api_port=$(get_vm_property "${vmname}" "api_port")
+    local -r lb_port=$(get_vm_property "${vmname}" "lb_port")
+    local -r public_ip=$(get_vm_property "${vmname}" "public_ip")
+    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
 
     local -r variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
     echo "Writing variables to ${variable_file}"
@@ -453,9 +626,10 @@ EOF
 
     "${rf_binary}" \
         --name "${SCENARIO}" \
-        --randomize all \
+        --randomize "${TEST_RANDOMIZATION}" \
         --loglevel TRACE \
         --outputdir "${SCENARIO_INFO_DIR}/${SCENARIO}" \
+        --debugfile "${SCENARIO_INFO_DIR}/${SCENARIO}/rf-debug.log" \
         -x junit.xml \
         -V "${variable_file}" \
         "$@"
@@ -493,7 +667,7 @@ load_scenario_script() {
 
 action_create() {
     start_junit
-    trap close_junit RETURN
+    trap "close_junit" EXIT
 
     if ! load_global_settings; then
         record_junit "setup" "load_global_settings" "FAILED"
@@ -507,7 +681,8 @@ action_create() {
     fi
     record_junit "setup" "load_scenario_script" "OK"
 
-    trap "sos_report" EXIT
+    # shellcheck disable=SC2154 # var is referenced but not assigned
+    trap 'res=0; sos_report true || res=$?; close_junit && exit "${res}"' EXIT
 
     if ! scenario_create_vms; then
         record_junit "setup" "scenario_create_vms" "FAILED"
@@ -530,11 +705,9 @@ action_login() {
     else
         vmname="$1"
     fi
-    local ssh_port_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
-    local ip_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ip"
 
-    ssh_port=$(cat "${ssh_port_file}")
-    ip=$(cat "${ip_file}")
+    ssh_port=$(get_vm_property "${vmname}" "ssh_port")
+    ip=$(get_vm_property "${vmname}" "ip")
 
     ssh "redhat@${ip}" -p "${ssh_port}"
 }
@@ -566,11 +739,11 @@ Settings
 
 Login
 
-  scenario.sh login <scenario-script> <host>
+  scenario.sh login <scenario-script> [<host>]
 EOF
 }
 
-if [ $# -ne 2 ]; then
+if [ $# -lt 2 ]; then
     usage
     exit 1
 fi

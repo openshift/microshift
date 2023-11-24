@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+  name: system:openshift:controller:privileged-namespaces-psa-label-syncer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resourceNames:
+  - default
+  - kube-system
+  - kube-public
+  resources:
+  - namespaces
+  verbs:
+  - patch

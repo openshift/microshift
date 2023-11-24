@@ -41,11 +41,11 @@ ARM64_RELEASE=${pullspec_release_arm64} \
 #  For example, ocp-release at 4.13 will more often than not
 #  correspond to 4.12 LVMS, until the official 4.13 release when both
 #  components will be 4.13.
-release_lvms="v4.13.1-5"
+release_lvms="v4.14.1-4"
 
 # Since LVMS is not part of the release payload, it is not kept in
 # CI. Use the latest z-stream that coincides with the release
 # payload's X.Y version
 pullspec_release_lvms="registry.access.redhat.com/lvms4/lvms-operator-bundle:${release_lvms}"
 
-./scripts/auto-rebase/rebase.sh lvms-to "${pullspec_release_lvms}"
+./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms}"

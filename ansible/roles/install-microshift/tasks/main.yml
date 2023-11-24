@@ -17,12 +17,11 @@
           - cri-tools
         state: present
 
-    - name: start & enable crio service
+    - name: start crio service
       become: yes
       ansible.builtin.systemd:
         name: crio
         state: started
-        enabled: yes
 
     - name: check if microshift dir exists
       ansible.builtin.stat:
@@ -33,6 +32,7 @@
       ansible.builtin.git:
         repo: "{{ microshift_repo }}"
         dest: "{{ microshift_dir }}"
+        version: "{{ microshift_version }}"
       when: not ms_dir.stat.exists
 
     - name: make clean
@@ -63,7 +63,21 @@
         name: "{{ microshift_rpms }}"
         state: present
         disable_gpg_check: yes
-  when: ansible_distribution == "RedHat"
+  when:
+    - ansible_distribution == "RedHat"
+    - build_microshift | bool
+
+- name: install microshift package on RHEL
+  block:
+    - name: install microshift package
+      become: yes
+      ansible.builtin.dnf:
+        name: microshift
+        state: present
+        disable_gpg_check: yes
+  when:
+    - ansible_distribution == "RedHat"
+    - not build_microshift
 
 - name: build & install etcd
   block:
@@ -100,7 +114,9 @@
         daemon_reload: yes
         state: started
         name: etcd
-  when: build_etcd_binary | bool
+  when:
+    - build_etcd_binary | bool
+    - not build_microshift
 
 - name: check if pull-secret is present
   ansible.builtin.stat:

@@ -28,6 +28,7 @@ import (
 	"github.com/openshift/microshift/pkg/version"
 	"github.com/spf13/cobra"
 
+	logsAPIV1 "k8s.io/component-base/logs/api/v1"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 )
@@ -76,6 +77,10 @@ func NewRunMicroshiftCommand() *cobra.Command {
 		}
 
 		cfg = config.ConfigMultiNode(cfg, multinode)
+
+		for _, w := range cfg.Warnings {
+			klog.Warningf("Configuration warning: %s", w)
+		}
 
 		// Things to very badly if the node's name has changed
 		// since the last time the server started.
@@ -128,6 +133,16 @@ func RunMicroshift(cfg *config.Config) error {
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
+
+	// Tell the logging code that it's OK to receive reconfiguration
+	// instructions unless those instructions are different. This
+	// overrides the default behavior of erroring out if any
+	// instructions are received a second time. That default behavior
+	// causes issues with embedded components that all use the same
+	// logging code and are not expecting to be compiled together into
+	// the same process, as they are in MicroShift. See comments in
+	// k8s.io/component-base/logs/api/v1/options.go for details.
+	logsAPIV1.ReapplyHandling = logsAPIV1.ReapplyHandlingIgnoreUnchanged
 
 	cleanUpPreviousLogFiles()
 
@@ -185,10 +200,10 @@ func RunMicroshift(cfg *config.Config) error {
 	util.Must(m.AddService(controllers.NewKubeControllerManager(runCtx, cfg)))
 	util.Must(m.AddService(controllers.NewOpenShiftCRDManager(cfg)))
 	util.Must(m.AddService(controllers.NewRouteControllerManager(cfg)))
-	util.Must(m.AddService(controllers.NewClusterPolicyController(cfg)))
 	util.Must(m.AddService(controllers.NewOpenShiftDefaultSCCManager(cfg)))
 	util.Must(m.AddService(mdns.NewMicroShiftmDNSController(cfg)))
 	util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
+	util.Must(m.AddService(controllers.NewClusterPolicyController(cfg)))
 	util.Must(m.AddService(controllers.NewVersionManager(cfg)))
 	util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	util.Must(m.AddService(node.NewKubeletServer(cfg)))

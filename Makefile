@@ -57,6 +57,8 @@ GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
 # Build to a place we can ignore
 GO_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
+GO_CACHE :=$(shell go env GOCACHE)
+
 ifeq ($(DEBUG),true)
 	# throw all the debug info in!
 	LD_FLAGS =
@@ -183,7 +185,7 @@ verify-rf:
 .PHONY: verify-containers
 verify-containers:
 	./scripts/fetch_tools.sh hadolint && \
-	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output")
+	./_output/bin/hadolint $$(find . -iname 'Containerfile*' -o -iname 'Dockerfile*'| grep -v "vendor\|_output\|origin")
 
 # Vulnerability check is not run in any default verify target
 # It should be run explicitly before the release to track and fix known vulnerabilities
@@ -293,15 +295,15 @@ commit: image-build-configure image-build-commit
 .PHONY: commit
 
 rpm-podman:
-	RPM_BUILDER_IMAGE_TAG="rhel-8-release-golang-1.19-openshift-4.13"; \
+	RPM_BUILDER_IMAGE_TAG="rhel-9-release-golang-1.20-openshift-4.15"; \
 	podman build \
 		--volume /etc/pki/entitlement/:/etc/pki/entitlement \
 		--build-arg TAG=$$RPM_BUILDER_IMAGE_TAG \
 		--tag microshift-builder:$$RPM_BUILDER_IMAGE_TAG - < ./packaging/images/Containerfile.rpm-builder ; \
 	podman run \
 		--rm -ti \
-		--volume $$(pwd):/opt/microshift \
-		--volume $$(go env GOCACHE):/go/.cache \
+		--volume $$(pwd):/opt/microshift:z \
+		--volume $(GO_CACHE):/go/.cache:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
 		microshift-builder:$$RPM_BUILDER_IMAGE_TAG \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; trap "pkill $${pid}" INT ; wait $${pid}'

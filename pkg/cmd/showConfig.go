@@ -52,6 +52,10 @@ func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command 
 			cmdutil.CheckErr(err)
 
 			fmt.Fprintf(ioStreams.Out, "%s\n", string(marshalled))
+
+			for _, w := range cfg.Warnings {
+				fmt.Fprintf(ioStreams.Out, "# WARNING: %s\n", w)
+			}
 		},
 	}
 

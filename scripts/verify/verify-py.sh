@@ -28,7 +28,7 @@ run_flake8() {
     fi
 
     local pyfiles
-    pyfiles=$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor \) -prune -o -name '*.py' -print)
+    pyfiles=$(find . -type d \( -path ./_output -o -path ./vendor -o -path ./assets -o -path ./etcd/vendor -o -path ./origin \) -prune -o -name '*.py' -print)
     echo "Checking: ${pyfiles}"
 
     # shellcheck disable=SC2086

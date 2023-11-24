@@ -13,7 +13,17 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 fi
 
-sudo dnf install -y git osbuild-composer composer-cli ostree rpm-ostree \
+# osbuild from COPR to install version that:
+# 1. can build rhel-93 images
+# 2. doesn't have issues with unexpected mirror's RPM verification
+#    (like the one in 9.3 beta at the moment of writing this comment)
+sudo dnf copr enable -y @osbuild/osbuild epel-9-"$(uname -m)"
+sudo dnf copr enable -y @osbuild/osbuild-composer rhel-9-"$(uname -m)"
+
+sudo dnf install -y \
+    osbuild-composer-94-1.20231115082551336419.main.1.g12d35fedc.el9 \
+    osbuild-99-1.20231120170407538318.main.47.g9cece6b.el9 \
+    git composer-cli ostree rpm-ostree \
     cockpit-composer bash-completion podman runc genisoimage \
     createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
     containernetworking-plugins expect

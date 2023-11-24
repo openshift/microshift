@@ -13,9 +13,13 @@ digests:
       - title: Enhancements
         search: repo:openshift/enhancements is:pr is:open ( microshift OR USHIFT )
 
-      # Include all pull requests against MicroShift itself
-      - title: Code Changes
-        url: https://github.com/openshift/microshift
+      # Pull requests not on main (backports, etc.)
+      - title: Release Branches
+        search: repo:openshift/microshift is:pr is:open -base:main
+
+      # Pull requests on main
+      - title: Reviewable Main Branch Code Changes
+        search: repo:openshift/microshift is:pr is:open base:main -label:do-not-merge/hold -label:do-not-merge/work-in-progress
 
       # Include changes to MicroShift CI
       - title: CI Changes

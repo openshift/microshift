@@ -10,6 +10,9 @@ manage_repos: false
 setup_microshift_host: false
 install_microshift: "{{ install_microshift_arg | default('false') }}"
 build_etcd_binary: false
+build_microshift: false
+
+sa_token_file: sa-token
 
 install_pbench: false
 pbench_configuration_environment: ec2

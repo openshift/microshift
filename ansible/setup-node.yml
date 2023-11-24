@@ -9,7 +9,7 @@
 - name: create vm and set up localhost
   hosts: localhost
   vars:
-    ansible_become: no
+    become: no
     ansible_connection: local
   vars_files:
   - vars/all.yml
@@ -72,3 +72,20 @@
     - vars/all.yml
   roles:
     - role: add-kubelet-logging
+
+- name: pull kubeconfig from microshift host
+  hosts: microshift
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: fetch-kubeconfig
+
+- name: run performance workloads
+  hosts: localhost
+  vars:
+    ansible_become: no
+    ansible_connection: local
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: run-workloads

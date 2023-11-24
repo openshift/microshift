@@ -1,5 +1,8 @@
 #!/bin/bash
 
+UNAME_M=$(uname -m)
+export UNAME_M
+
 # The location of the test directory, relative to the script.
 TESTDIR="$(cd "${SCRIPTDIR}/.." && pwd)"
 
@@ -150,3 +153,50 @@ get_vm_bridge_ip() {
 # default network for libvirt VMs.
 # shellcheck disable=SC2034  # used elsewhere
 VM_BRIDGE_IP="$(get_vm_bridge_ip "default")"
+
+get_build_branch() {
+    local -r ocp_ver="$(grep ^OCP_VERSION "${ROOTDIR}/Makefile.version.$(uname -m).var"  | awk '{print $NF}' | awk -F. '{print $1"."$2}')"
+    local -r cur_branch="$(git branch --show-current 2>/dev/null)"
+
+    # Check if the current branch is derived from "main"
+    local -r main_top=$(git rev-parse main 2>/dev/null)
+    local -r main_base="$(git merge-base "${cur_branch}" main 2>/dev/null)"
+    if [ "${main_top}" = "${main_base}" ] ; then
+        echo "main"
+        return
+    fi
+
+    # Check if the current branch is derived from "release-${ocp-ver}"
+    local -r rel_top=$(git rev-parse "release-${ocp_ver}" 2>/dev/null)
+    local -r rel_base="$(git merge-base "${cur_branch}" "release-${ocp_ver}" 2>/dev/null)"
+    if [ "${rel_top}" = "${rel_base}" ] ; then
+        echo "release-${ocp_ver}"
+        return
+    fi
+
+    # Fallback to main if none of the above works
+    echo "main"
+}
+
+# The branch identifier of the current scenario repository,
+# i.e. "main", "release-4.14", etc.
+# Used for top-level directory names when caching build artifacts,
+# i.e. <bucket_name>/<branch>
+# shellcheck disable=SC2034  # used elsewhere
+SCENARIO_BUILD_BRANCH="$(get_build_branch)"
+
+# The tag identifier of a scenario used in directory
+# names when caching today's build artifacts,
+# i.e. <bucket_name>/<branch>/<tag>
+# shellcheck disable=SC2034  # used elsewhere
+SCENARIO_BUILD_TAG="$(date '+%y%m%d')"
+
+# The tag identifier of a scenario used in directory
+# names when caching build artifacts from a day before,
+# i.e. <bucket_name>/<branch>/<tag>
+# shellcheck disable=SC2034  # used elsewhere
+SCENARIO_BUILD_TAG_PREV="$(date -d "yesterday" '+%y%m%d')"
+
+# The location of the awscli binary.
+# shellcheck disable=SC2034  # used elsewhere
+AWSCLI=${ROOTDIR}/_output/bin/aws
