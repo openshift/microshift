@@ -577,24 +577,32 @@ run_tests() {
         exit 1
     fi
 
-    local f
-    for p in "ssh_port" "api_port" "lb_port" "public_ip" "ip"; do
-        f="$(vm_property_filename "${vmname}" "${p}")"
-        if [ ! -f "${f}" ]; then
-            error "Cannot read ${f}"
-            exit 1
-        fi
-    done
-    local -r ssh_port=$(get_vm_property "${vmname}" "ssh_port")
-    local -r api_port=$(get_vm_property "${vmname}" "api_port")
-    local -r lb_port=$(get_vm_property "${vmname}" "lb_port")
-    local -r public_ip=$(get_vm_property "${vmname}" "public_ip")
-    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+    # The IP file is created empty during the launch VM phase if the VM is has no NICs. This is the queue to skip
+    # the variable file creation and greenboot check.
+    local test_is_online="true"
+    if  [ -z "$(cat "$(vm_property_filename "${vmname}" "ip")")" ]; then
+        test_is_online="false"
+    fi
 
-    local -r variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
-    echo "Writing variables to ${variable_file}"
-    mkdir -p "$(dirname "${variable_file}")"
-    cat - <<EOF | tee "${variable_file}"
+    local variable_file
+    if [ "${test_is_online}" == "true" ]; then
+        for p in "ssh_port" "api_port" "lb_port" "public_ip" "ip"; do
+            f="$(vm_property_filename "${vmname}" "${p}")"
+            if [ ! -f "${f}" ]; then
+                error "Cannot read ${f}"
+                exit 1
+            fi
+        done
+        local -r ssh_port=$(get_vm_property "${vmname}" "ssh_port")
+        local -r api_port=$(get_vm_property "${vmname}" "api_port")
+        local -r lb_port=$(get_vm_property "${vmname}" "lb_port")
+        local -r public_ip=$(get_vm_property "${vmname}" "public_ip")
+        local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+
+        local variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
+        echo "Writing variables to ${variable_file}"
+        mkdir -p "$(dirname "${variable_file}")"
+        cat - <<EOF | tee "${variable_file}"
 VM_IP: ${vm_ip}
 API_PORT: ${api_port}
 LB_PORT: ${lb_port}
@@ -603,11 +611,13 @@ USHIFT_USER: redhat
 SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
-
-    if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
-        return 1
+        if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
+            return 1
+        fi
     fi
 
+    local var_arg=${variable_file:+-V "${variable_file}"}
+    # shellcheck disable=SC2086
     "${rf_binary}" \
         --name "${SCENARIO}" \
         --randomize "${TEST_RANDOMIZATION}" \
@@ -615,7 +625,7 @@ EOF
         --outputdir "${SCENARIO_INFO_DIR}/${SCENARIO}" \
         --debugfile "${SCENARIO_INFO_DIR}/${SCENARIO}/rf-debug.log" \
         -x junit.xml \
-        -V "${variable_file}" \
+        ${var_arg} \
         "$@"
 }
 

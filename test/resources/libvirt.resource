@@ -10,6 +10,7 @@ Reboot MicroShift Host
     [Documentation]    Reboot the MicroShift host.
     [Arguments]    ${vm_name}
     ${result}=    Virsh    ${vm_name}    reboot
+    Wait For MicroShift Host To Reboot    ${vm_name}
     RETURN    ${result}
 
 Shutdown MicroShift Host
@@ -24,16 +25,11 @@ Start MicroShift Host
     ${result}=    Virsh    ${vm_name}    start
     RETURN    ${result}
 
-Get MicroShift Host Operational State
-    [Documentation]    Get the operational state of the MicroShift host.
-    ...    State values may be one of 'running', 'idle', 'paused', 'in shutdown', 'shut off', 'crashed, 'pm-suspended'.
-    ...    See `man virsh`, search 'STATES' for more information.
-    [Arguments]    ${vm_name}
-    ${result}=    Virsh    ${vm_name}    domstate
-    ${state}=    Remove String    ${result.stdout}    ${vm_name}\:    \"
-    ${state}=    Strip String    ${state}
-    Should Not Be Empty    ${state}
-    RETURN    ${state}
+Wait For MicroShift Host To Reboot
+    [Documentation]    Wait for the MicroShift host to reboot.
+    [Arguments]    ${vm_name}    ${timeout}=300
+    Wait Until Keyword Succeeds    ${timeout}s    5s
+    ...    MicroShift Host Should Be Running    ${vm_name}
 
 MicroShift Host Should Be Running
     [Documentation]    Verify that the MicroShift host rebooted successfully.
