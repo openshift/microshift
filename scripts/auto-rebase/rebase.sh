@@ -932,6 +932,11 @@ update_olm_images() {
         -e '/--util-image/{n;s,-.*,- \$\(OLM_IMAGE\),;}' \
         "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_08-catalog-operator.deployment.yaml"
 
+    # Remove tag/digest from images so they don't change on rebase unless the image name itself changes.
+    # This way, check_for_manifests_changes() will be able to focus on limited list of files.
+    sed -i -r 's,(image: [a-z./-]*)[@:].*,\1,' "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_07-olm-operator.deployment.yaml"
+    sed -i -r 's,(image: [a-z./-]*)[@:].*,\1,' "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_08-catalog-operator.deployment.yaml"
+
     for goarch in amd64 arm64; do
         arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
 
@@ -1006,6 +1011,24 @@ EOF
     done  # for goarch
 }
 
+check_for_manifests_changes() {
+    # Changes to ignore:
+    # - `release-$ARCH.json` files
+    # - OLM's image-references and kustomization.$ARCH.yaml files
+    local ignores="(release-(aarch64|x86_64).json|image-references|kustomization.(aarch64|x86_64).yaml)"
+
+    title "Checking assets for unexpected changes"
+    git status -s assets
+
+    if [[ "$(git status -s assets | grep -vE "${ignores}" | wc -l)" -eq 0 ]]; then
+        return 0
+    fi
+
+    title "\nERROR: Unexpected changes in assets"
+    git --no-pager diff --unified=0 $(git status -s assets | grep -vE "${ignores}" | cut -d' ' -f3)
+    return 1
+}
+
 # Runs each OCP rebase step in sequence, commiting the step's output to git
 rebase_to() {
     local release_image_amd64=$1
@@ -1052,6 +1075,9 @@ rebase_to() {
     copy_manifests
     update_openshift_manifests
     if [[ -n "$(git status -s assets)" ]]; then
+        if [[ -n "${FAIL_ON_MANIFEST_CHANGE+x}" ]] && [[ "${FAIL_ON_MANIFEST_CHANGE}" == "1" ]]; then
+            check_for_manifests_changes
+        fi
         title "## Committing changes to assets and pkg/assets"
         git add assets pkg/assets
         git commit -m "update manifests"
