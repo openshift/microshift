@@ -538,8 +538,6 @@ update_images() {
             "${REPOROOT}/packaging/crio.conf.d/microshift_${goarch}.conf"
     done
 
-    update_olm_images
-
     popd >/dev/null
 
     go fmt "${REPOROOT}"/pkg/release
@@ -711,6 +709,8 @@ update_openshift_manifests() {
     # snapshotter's rbac is defined as a multidoc, which MicroShift is too picky to work with. Split into separate files
     yq 'select(.kind == "ClusterRole")' $target > "$(dirname $target)/clusterrole.yaml"
     yq 'select(.kind == "ClusterRoleBinding")' $target > "$(dirname $target)/clusterrolebinding.yaml"
+
+    update_olm_images
 
     popd >/dev/null
 }
