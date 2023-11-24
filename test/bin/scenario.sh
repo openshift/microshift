@@ -561,9 +561,8 @@ stress_testing() {
     local -r ssh_user=redhat
     local -r ssh_port="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
     local -r ssh_pkey="${SSH_PRIVATE_KEY:-}"
-
-
-	if [ "${action}" == "enable" ]; then
+    
+    if [ "${action}" == "enable" ]; then
         echo "${action}d stress condition: ${condition} ${value}"
         "${SCRIPTDIR}/stress_testing.sh" -e "${condition}" -v "${value}" -h "${ssh_host}" -u "${ssh_user}" -p "${ssh_port}" -k "${ssh_pkey}"
     elif [ "${action}" == "disable" ]; then
