@@ -49,3 +49,9 @@ release_lvms="v4.14.1-4"
 pullspec_release_lvms="registry.access.redhat.com/lvms4/lvms-operator-bundle:${release_lvms}"
 
 ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms}"
+
+if [[ "${JOB_TYPE}" == "presubmit" ]]; then
+    # Verify the assets after the rebase to make sure
+    # nightly job will not fail on assets verification.
+    make verify-assets
+fi
