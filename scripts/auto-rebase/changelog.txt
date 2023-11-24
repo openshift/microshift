@@ -1,0 +1,6 @@
+- cluster-network-operator embedded-component 4cd5c10d6423582ceef639a822b929788ac2c9a0 to 75a0a6c043df981dcf8e23e78b5254d3a68bd5ee
+  - 57ecd29 2023-11-22T10:00:01+01:00 Block upgrades to 4.15 with Kuryr
+
+- machine-config-operator embedded-component a6cdd850c44f8809b10a057202ccd502a21c33fc to 612c6f6bfa3ca777f9f1e260596b801c3e66375f
+  - 4ec9bb19 2023-11-21T03:36:58+00:00 OCPBUGS-23432: Use shorter IP label for keepalived VIP
+
