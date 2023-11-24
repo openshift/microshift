@@ -252,6 +252,4 @@ assets:
       - file: image-references
       - file: kustomization.yaml
       - file: release-aarch64.json
-        ignore: "gets generated during image rebase"
       - file: release-x86_64.json
-        ignore: "gets generated during image rebase"
