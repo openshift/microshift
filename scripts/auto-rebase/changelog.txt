@@ -1,0 +1,10 @@
+- cluster-openshift-controller-manager-operator embedded-component e6f885abcd9923abf87c3b96908e69393b06efef to e87e15acee1bbdbc1663aec1bda9517a876023f2
+  - cd70163 2023-11-20T19:13:17+03:00 Remove blockage of ConfigObserver by build informer has synced flag
+
+- machine-config-operator embedded-component d469addcb699ab2a8aba28e2bd3834474d1ba55a to 216760b69d5c78122c17631abcd6a085abaebb6f
+  - e2bbdc40 2023-11-20T17:31:03+01:00 OCPBUGS-23432: Use shorter IP label for keepalived VIP
+  - 85c369dd 2023-11-16T15:46:45+01:00 kubevirt: Activate nodeip-configuration.service
+  - 3a39f6f2 2023-11-15T14:31:44+01:00 Fix syntax in vsphere-hostname.yaml for CAPI machines
+
+- operator-framework-olm is a new embedded-component dependency
+

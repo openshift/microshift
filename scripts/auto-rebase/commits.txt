@@ -5,14 +5,15 @@ https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 839167b47a547bc10658fda1d89f2f80b8b66cb2
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 835a25b7431d6a80ca488553dd8e9a55b021797c
 https://github.com/openshift/cluster-network-operator embedded-component 1434926cf634c1993a748809bc324bec018c762f
-https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component e6f885abcd9923abf87c3b96908e69393b06efef
+https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component e87e15acee1bbdbc1663aec1bda9517a876023f2
 https://github.com/openshift/cluster-policy-controller embedded-component 50c2a8337f08856bbae4cd419bb8ffcbdf92567c
 https://github.com/openshift/csi-external-snapshotter embedded-component 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5
 https://github.com/openshift/etcd embedded-component 969d7afab8258b4610569d001e9a06b677acd021
 https://github.com/openshift/kubernetes embedded-component 20a57641f83e54f94737cfc9830de5e270b0fa9e
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 95ad20fc390cd34e0e5ba5135d5048bc0f008c0d
-https://github.com/openshift/machine-config-operator embedded-component d469addcb699ab2a8aba28e2bd3834474d1ba55a
+https://github.com/openshift/machine-config-operator embedded-component 216760b69d5c78122c17631abcd6a085abaebb6f
 https://github.com/openshift/openshift-controller-manager embedded-component 2a28a78279b127075b399a3442a2042f4a7d190d
+https://github.com/openshift/operator-framework-olm embedded-component 639fc12035292dec74a16b306226946c8da404a2
 https://github.com/openshift/route-controller-manager embedded-component c5cc7a73705e4086759e2a36811b055b7716def4
 https://github.com/openshift/service-ca-operator embedded-component fe887613d031435fb0c76eb397764ba68fe09014
 https://github.com/openshift/oc image-amd64 1d4a9afe8cf066b4c34018b3e0f4919d0157f091
