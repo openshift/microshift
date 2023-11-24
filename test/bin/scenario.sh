@@ -154,14 +154,17 @@ EOF
 #  boot_commit_ref -- The reference to the image that should be booted
 #                     first on the host. This usually matches an image
 #                     blueprint name.
+#  fips_enabled -- Enable FIPS mode (true or false).
 prepare_kickstart() {
     local vmname="$1"
     local template="$2"
     local boot_commit_ref="$3"
+    local fips_enabled=${4:-false}
 
     local full_vmname
     local output_file
-    local vm_hostname
+    local vm_hostname 
+    local fips_command=""
 
     full_vmname="$(full_vm_name "${vmname}")"
     output_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/kickstart.ks"
@@ -175,6 +178,9 @@ prepare_kickstart() {
         exit 1
     fi
     mkdir -p "$(dirname "${output_file}")"
+    if "${fips_enabled}"; then
+        fips_command="fips-mode-setup --enable"
+    fi
     # shellcheck disable=SC2002   # useless cat
     cat "${KICKSTART_TEMPLATE_DIR}/${template}" \
         | sed -e "s/REPLACE_LVM_SYSROOT_SIZE/${LVM_SYSROOT_SIZE}/g" \
@@ -184,6 +190,7 @@ prepare_kickstart() {
               -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
               -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
               -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
+              -e "s|REPLACE_FIPS_COMMAND|${fips_command}|g" \
               > "${output_file}"
     record_junit "${vmname}" "prepare_kickstart" "OK"
 }
@@ -329,6 +336,7 @@ EOF
 #  vm_memory -- Size of RAM in MB for the VM.
 #  vm_disksize -- Size of disk in GB for the VM.
 #  vm_nics -- Number of network interfaces for the VM.
+#  fips_mode -- Enable FIPS mode (0 - disabled, 1 - enabled).
 launch_vm() {
     local -r vmname="$1"
     local -r boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
@@ -337,6 +345,7 @@ launch_vm() {
     local -r vm_memory="${5:-4096}"
     local -r vm_disksize="${6:-20}"
     local -r vm_nics="${7:-1}"
+    local -r fips_mode="${8:-0}"
 
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
@@ -369,7 +378,7 @@ launch_vm() {
     local vm_extra_args
     local vm_initrd_inject
     vm_network_args=""
-    vm_extra_args="console=tty0 console=ttyS0,115200n8 inst.notmux"
+    vm_extra_args="console=tty0 console=ttyS0,115200n8 inst.notmux fips=${fips_mode}"
     vm_initrd_inject=""
 
     for _ in $(seq "${vm_nics}") ; do

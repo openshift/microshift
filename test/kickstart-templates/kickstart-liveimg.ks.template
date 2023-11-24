@@ -105,4 +105,8 @@ done
 # and system needing much more time to roll back.
 ln -sf /dev/null /etc/systemd/user/grub-boot-success.timer
 
+
+# configure FIPs
+REPLACE_FIPS_COMMAND
+
 %end
