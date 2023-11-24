@@ -11,23 +11,23 @@ RF_VARIABLES="${SCRIPTDIR}/variables.yaml"
 DRYRUN=false
 OUTDIR="${ROOTDIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
 
-
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [test suite files]
+${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [-s name-value] [test suite files]
 
 Options:
 
-  -h       Print this help text.
-  -n       Dry-run, do not run the tests.
-  -o DIR   The output directory. (${OUTDIR})
-  -v DIR   The venv directory. (${RF_VENV})
-  -i PATH  The variables file. (${RF_VARIABLES})
+  -h                 Print this help text.
+  -n                 Dry-run, do not run the tests.
+  -o DIR             The output directory. (${OUTDIR})
+  -v DIR             The venv directory. (${RF_VENV})
+  -i PATH            The variables file. (${RF_VARIABLES})
+  -s NAME-VALUE      To enable an stress condition.
 EOF
 }
 
-while getopts "hno:v:i:" opt; do
+while getopts "hno:v:i:s:" opt; do
     case ${opt} in
         h)
             usage
@@ -45,6 +45,9 @@ while getopts "hno:v:i:" opt; do
         i)
             RF_VARIABLES=${OPTARG}
             ;;
+        s)
+            STRESS_TESTING=${OPTARG}
+            ;;
         *)
             usage
             exit 1
@@ -61,7 +64,8 @@ if [ ! -f "${RF_VARIABLES}" ]; then
     exit 1
 fi
 
-DEST_DIR="${RF_VENV}" "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
+"${ROOTDIR}/scripts/fetch_tools.sh" robotframework
+"${ROOTDIR}/scripts/fetch_tools.sh" yq
 
 cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
 
@@ -69,6 +73,19 @@ TESTS="$*"
 # if TESTS is not set - run the standard suite.
 if [ -z "${TESTS}" ]; then
     TESTS="./suites/standard"
+fi
+
+# enable stress condition
+if [ "${STRESS_TESTING:-}" ]; then
+    CONDITION="${STRESS_TESTING%-*}"
+    VALUE="${STRESS_TESTING#*-}"
+
+    SSH_HOST=$(yq '.USHIFT_HOST' "${SCRIPTDIR}"/rf_variables.yaml)
+    SSH_USER=$(yq '.USHIFT_USER' "${SCRIPTDIR}"/rf_variables.yaml)
+    SSH_PORT=$(yq '.SSH_PORT' "${SCRIPTDIR}"/rf_variables.yaml)
+    SSH_PKEY=$(yq '.SSH_PRIV_KEY' "${SCRIPTDIR}"/rf_variables.yaml)
+
+    "${SCRIPTDIR}"/bin/stress_testing.sh -e "${CONDITION}" -v "${VALUE}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi
 
 set -x
@@ -87,4 +104,10 @@ else
         -x junit.xml \
         --outputdir "${OUTDIR}" \
         ${TESTS}
+fi
+set +x
+
+# disable stress condition
+if [ "${STRESS_TESTING:-}" ]; then
+    "${SCRIPTDIR}"/bin/stress_testing.sh -d "${CONDITION}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi

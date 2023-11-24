@@ -53,6 +53,10 @@ version = "*"
 name = "strace"
 version = "*"
 
+[[packages]]
+name = "iproute-tc"
+version = "*"
+
 # customizations
 
 [customizations]

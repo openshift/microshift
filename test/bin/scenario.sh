@@ -550,6 +550,31 @@ next_minor_version() {
     echo $(( $(current_minor_version) + 1 ))
 }
 
+# Enable/Disable Stress Condition
+stress_testing() {
+    local -r vmname="${1}"
+    local -r action="${2}"
+    local -r condition="${3}"
+    local -r value="${4}"
+
+    local -r ssh_host="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/public_ip"
+    local -r ssh_user=redhat
+    local -r ssh_port="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+    local -r ssh_pkey="${SSH_PRIVATE_KEY:-}"
+
+
+	if [ "${action}" == "enable" ]; then
+        echo "${action}d stress condition: ${condition} ${value}"
+        "${SCRIPTDIR}/stress_testing.sh" -e "${condition}" -v "${value}" -h "${ssh_host}" -u "${ssh_user}" -p "${ssh_port}" -k "${ssh_pkey}"
+    elif [ "${action}" == "disable" ]; then
+        echo "${action}d stress condition: ${condition}"
+        "${SCRIPTDIR}/stress_testing.sh" -d "${condition}" -h "${ssh_host}" -u "${ssh_user}" -p "${ssh_port}" -k "${ssh_pkey}"
+    else
+        error "Invalid Stress Testing action"
+        exit 1
+    fi
+}
+
 # Run the tests for the current scenario
 run_tests() {
     local -r vmname="${1}"
