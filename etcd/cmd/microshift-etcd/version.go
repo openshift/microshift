@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
 
+	etcdversion "go.etcd.io/etcd/api/v3/version"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
@@ -30,11 +31,14 @@ var (
 	buildDate string
 	// state of git tree, either "clean" or "dirty"
 	gitTreeState string
+	// etcd version information structure
+	EtcdVersionInfo Info
 )
 
 type Info struct {
 	version.Info
-	Patch string `json:"patch"`
+	Patch       string `json:"patch"`
+	EtcdVersion string `json:"etcdVersion"`
 }
 
 type VersionOptions struct {
@@ -50,6 +54,22 @@ func NewVersionOptions(ioStreams genericclioptions.IOStreams) *VersionOptions {
 }
 
 func NewVersionCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
+	EtcdVersionInfo = Info{
+		Info: version.Info{
+			Major:        majorFromGit,
+			Minor:        minorFromGit,
+			GitCommit:    commitFromGit,
+			GitVersion:   versionFromGit,
+			GitTreeState: gitTreeState,
+			BuildDate:    buildDate,
+			GoVersion:    runtime.Version(),
+			Compiler:     runtime.Compiler,
+			Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
+		},
+		Patch:       patchFromGit,
+		EtcdVersion: etcdversion.Version,
+	}
+
 	o := NewVersionOptions(ioStreams)
 	cmd := &cobra.Command{
 		Use:   "version",
@@ -65,32 +85,18 @@ func NewVersionCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 }
 
 func (o *VersionOptions) Run() error {
-	versionInfo := Info{
-		Info: version.Info{
-			Major:        majorFromGit,
-			Minor:        minorFromGit,
-			GitCommit:    commitFromGit,
-			GitVersion:   versionFromGit,
-			GitTreeState: gitTreeState,
-			BuildDate:    buildDate,
-			GoVersion:    runtime.Version(),
-			Compiler:     runtime.Compiler,
-			Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
-		},
-		Patch: patchFromGit,
-	}
-
 	switch o.Output {
 	case "":
-		fmt.Fprintf(o.Out, "MicroShift-etcd Version: %s\n", versionInfo.String())
+		fmt.Fprintf(o.Out, "MicroShift-etcd Version: %s\n", EtcdVersionInfo.String())
+		fmt.Fprintf(o.Out, "Base etcd Version: %s\n", EtcdVersionInfo.EtcdVersion)
 	case "yaml":
-		marshalled, err := yaml.Marshal(&versionInfo)
+		marshalled, err := yaml.Marshal(&EtcdVersionInfo)
 		if err != nil {
 			return err
 		}
 		fmt.Fprintln(o.Out, string(marshalled))
 	case "json":
-		marshalled, err := json.MarshalIndent(&versionInfo, "", "  ")
+		marshalled, err := json.MarshalIndent(&EtcdVersionInfo, "", "  ")
 		if err != nil {
 			return err
 		}
