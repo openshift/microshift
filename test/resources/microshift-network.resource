@@ -45,6 +45,11 @@ Access Hello Microshift
     ...    shell=True
     ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
+    Run With Kubeconfig    oc get pod -n ${NAMESPACE} hello-microshift -o yaml    allow_fail=True
+    Run With Kubeconfig    oc get pod -A    allow_fail=True
+    Run With Kubeconfig    oc get svc -A    allow_fail=True
+    Run With Kubeconfig    oc logs -n openshift-ingress $(oc get pods -n openshift-ingress -o name)    allow_fail=True
+
     Should Be Equal As Integers    ${result.rc}    0
     Should Match Regexp    ${result.stdout}    HTTP.*200
     Should Match    ${result.stdout}    *Hello MicroShift*

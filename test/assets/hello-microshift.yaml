@@ -14,6 +14,11 @@ spec:
     ports:
     - containerPort: 8080
       protocol: TCP
+    # readinessProbe:
+    #   httpGet:
+    #     path: /
+    #     port: 8080
+    #   periodSeconds: 5
     securityContext:
       allowPrivilegeEscalation: false
       capabilities:
