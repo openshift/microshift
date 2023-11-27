@@ -10,6 +10,8 @@ Resource            ../../resources/systemd.resource
 Suite Setup         Setup
 Suite Teardown      Teardown
 
+Test Tags           slow
+
 
 *** Variables ***
 ${KUBELET_CONFIG_FILE}      /var/lib/microshift/resources/kubelet/config/config.yaml
@@ -129,6 +131,7 @@ Stop Systemd-Resolved
 
     Systemctl    stop    systemd-resolved
     Reboot MicroShift Host
+    Wait Until Greenboot Health Check Exited
 
 Uninstall Systemd-Resolved
     [Documentation]    Remove the systemd-resolved package
@@ -141,6 +144,7 @@ Uninstall Systemd-Resolved
         Should Be Equal As Integers    0    ${rc}
 
         Reboot MicroShift Host
+        Wait Until Greenboot Health Check Exited
     ELSE
         ${stdout}    ${stderr}    ${rc}=    Execute Command
         ...    dnf remove -y systemd-resolved
@@ -159,6 +163,7 @@ Restore Systemd-Resolved
         Should Be Equal As Integers    0    ${rc}
 
         Reboot MicroShift Host
+        Wait Until Greenboot Health Check Exited
     ELSE
         ${stdout}    ${stderr}    ${rc}=    Execute Command
         ...    dnf install -y systemd-resolved
