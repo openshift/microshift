@@ -1,0 +1,35 @@
+- cluster-csi-snapshot-controller-operator embedded-component 0929c76c5d2ed00b8175c95435586908a27c6495 to 7eccf6c8ffe18ae1eda748218eba9246431287d3
+  - b97a8c5 2023-11-20T10:59:26-07:00 STOR-1402: Chore: update libraries in all operators [4.15]
+
+- cluster-openshift-controller-manager-operator embedded-component e6f885abcd9923abf87c3b96908e69393b06efef to e87e15acee1bbdbc1663aec1bda9517a876023f2
+  - cd70163 2023-11-20T19:13:17+03:00 Remove blockage of ConfigObserver by build informer has synced flag
+
+- csi-external-snapshotter embedded-component 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
+  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
+
+- machine-config-operator embedded-component d469addcb699ab2a8aba28e2bd3834474d1ba55a to fef687ef2b939014ce0fcb1c662874f81931b168
+  - e2bbdc40 2023-11-20T17:31:03+01:00 OCPBUGS-23432: Use shorter IP label for keepalived VIP
+  - b76257e0 2023-11-20T13:32:22+02:00 OCPBUGS-23255: Add FIPS information to oldconfig when checking if reboot is needed When trying to avoid reboot, current FIPS setting needs to be set into the running machine config configuration.
+  - 85c369dd 2023-11-16T15:46:45+01:00 kubevirt: Activate nodeip-configuration.service
+  - 3a39f6f2 2023-11-15T14:31:44+01:00 Fix syntax in vsphere-hostname.yaml for CAPI machines
+
+- operator-framework-olm is a new embedded-component dependency
+
+- csi-external-snapshotter image-amd64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
+  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
+
+- csi-external-snapshotter image-amd64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
+  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
+
+- csi-external-snapshotter image-amd64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
+  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
+
+- csi-external-snapshotter image-arm64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
+  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
+
+- csi-external-snapshotter image-arm64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
+  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
+
+- csi-external-snapshotter image-arm64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
+  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
+
