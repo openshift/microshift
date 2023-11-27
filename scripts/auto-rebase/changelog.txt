@@ -1,6 +1,7 @@
-- cluster-network-operator embedded-component 4cd5c10d6423582ceef639a822b929788ac2c9a0 to 75a0a6c043df981dcf8e23e78b5254d3a68bd5ee
-  - 57ecd29 2023-11-22T10:00:01+01:00 Block upgrades to 4.15 with Kuryr
+- cluster-csi-snapshot-controller-operator embedded-component 5d8bae88fdceefd3cc6e9befe3da641839403d9c to 73dc400fbbbd7dc131c98199e3b5c5cac957ee83
+  - fa7d1b2 2023-11-08T13:24:44-05:00 CVE-2023-44487: bump github.com/openshift/library-go to release-4.14
 
-- machine-config-operator embedded-component a6cdd850c44f8809b10a057202ccd502a21c33fc to 612c6f6bfa3ca777f9f1e260596b801c3e66375f
-  - 4ec9bb19 2023-11-21T03:36:58+00:00 OCPBUGS-23432: Use shorter IP label for keepalived VIP
+- cluster-network-operator embedded-component 75a0a6c043df981dcf8e23e78b5254d3a68bd5ee to 73a1db2e64e320fd2584b85c68c0bc8bfe6010cc
+  - 67929e9 2023-10-25T01:48:51+00:00 OCPBUGS-19370: Added HCP labels to CNO pods
+  - 599c168 2023-10-23T22:10:32+00:00 hypershift: adjust backoff on infrastructure name retry
 
