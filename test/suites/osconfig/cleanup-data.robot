@@ -101,8 +101,9 @@ Setup Suite
     Start MicroShift And Wait Until Ready
 
 Start MicroShift And Wait Until Ready
-    [Documentation]    Start the service and wait until full initialized
-    Systemctl    enable    --now microshift
+    [Documentation]    Start the service and wait until fully initialized
+    Systemctl    enable    microshift
+    Systemctl    start    microshift
     Restart Greenboot And Wait For Success
 
 Run MicroShift Cleanup Data

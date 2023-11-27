@@ -52,7 +52,7 @@ Systemctl    # robocop: disable=too-long-keyword
         ...    sudo=True
         ...    return_stdout=True
         ${log_text}=    Execute Command
-        ...    journalctl -u ${unit_name} -o short | tail -n 100
+        ...    journalctl -u ${unit_name} -o short | tail -c 32000
         ...    sudo=True
         ...    return_stdout=True
     END
@@ -74,7 +74,9 @@ Systemctl    # robocop: disable=too-long-keyword
 Systemctl With Retry
     [Documentation]    Run Systemctl keyword but retry 10 times
     [Arguments]    ${verb}    ${unit_name}
-    Wait Until Keyword Succeeds    10x    10s
+    # Need to wait for more than 10s between the attempts not to
+    # trigger the service start limit condition (10s by default)
+    Wait Until Keyword Succeeds    6x    15s
     ...    Systemctl    ${verb}    ${unit_name}
 
 Systemctl Daemon Reload
