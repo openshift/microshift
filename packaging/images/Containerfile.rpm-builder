@@ -1,12 +1,12 @@
 ARG TAG
-FROM registry.ci.openshift.org/openshift/release:$TAG
+FROM registry.ci.openshift.org/ocp/builder:$TAG
 
 RUN rm -rfv /etc/yum.repos.d/ci-rpm-mirrors.repo /etc/yum.repos.d/localdev* && \
     dnf install \
         --setopt=tsflags=nodocs \
         --setopt=install_weak_deps=False \
         -y \
-          selinux-policy-devel \
+          selinux-policy-devel rpmdevtools \
     && \
     dnf clean all && \
     rm -rf /var/cache/dnf/*

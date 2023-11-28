@@ -112,6 +112,12 @@ GO_TEST_PACKAGES=./cmd/... ./pkg/...
 # Use an environment variable to allow CI to disable when cross-compiling.
 export CGO_ENABLED ?= 1
 
+# Specify OCP build tools image tag when building rpm with podman
+RPM_BUILDER_IMAGE_TAG := rhel-9-golang-1.20-openshift-4.15
+ifeq "$(strip $(shell uname -m))" "aarch64"
+	RPM_BUILDER_IMAGE_TAG := $(RPM_BUILDER_IMAGE_TAG).art-arm64
+endif
+
 all: generate-config microshift etcd
 
 microshift: build
@@ -295,17 +301,17 @@ commit: image-build-configure image-build-commit
 .PHONY: commit
 
 rpm-podman:
-	RPM_BUILDER_IMAGE_TAG="rhel-9-release-golang-1.20-openshift-4.15"; \
 	podman build \
 		--volume /etc/pki/entitlement/:/etc/pki/entitlement \
-		--build-arg TAG=$$RPM_BUILDER_IMAGE_TAG \
-		--tag microshift-builder:$$RPM_BUILDER_IMAGE_TAG - < ./packaging/images/Containerfile.rpm-builder ; \
+		--build-arg TAG=$(RPM_BUILDER_IMAGE_TAG) \
+		--authfile $(PULLSECRET) \
+		--tag microshift-builder:$(RPM_BUILDER_IMAGE_TAG) - < ./packaging/images/Containerfile.rpm-builder ; \
 	podman run \
 		--rm -ti \
 		--volume $$(pwd):/opt/microshift:z \
 		--volume $(GO_CACHE):/go/.cache:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
-		microshift-builder:$$RPM_BUILDER_IMAGE_TAG \
+		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; trap "pkill $${pid}" INT ; wait $${pid}'
 .PHONY: rpm-podman
 
