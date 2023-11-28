@@ -60,7 +60,7 @@ spec:
             - /profile-collector-cert/tls.crt
             - --protectedCopiedCSVNamespaces
             - openshift
-          image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:357d66fc39efbb970a697bcf7777b766f9af1762818350c35dd07bc3ed924870
+          image: quay.io/operator-framework/olm@sha256:de396b540b82219812061d0d753440d5655250c621c753ed1dc67d6154741607
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8443
