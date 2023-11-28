@@ -561,6 +561,64 @@ update_openshift_manifests() {
 
     title "Modifying OpenShift manifests"
 
+    #-- Kubelet -------------------------------------------
+    # Drop MCO's boilerplate and keep KubeletConfiguration only
+    yq -i '.contents.inline' "${REPOROOT}/assets/core/kubelet.yaml"
+
+    yq -i '.authentication.x509.clientCAFile = "{{ .clientCAFile }}" | .authentication.x509.clientCAFile style="double"' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.clusterDNS = [ "{{ .clusterDNSIP }}" ] | .clusterDNS[] style="double"' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.tlsCertFile = "{{ .tlsCertFile }}" | .tlsCertFile style="double"' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.tlsPrivateKeyFile = "{{ .tlsPrivateKeyFile }}" | .tlsPrivateKeyFile style="double"' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.volumePluginDir = "{{ .volumePluginDir }}" | .volumePluginDir style="double"' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.failSwapOn = false' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.enforceNodeAllocatable = []' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.containerRuntimeEndpoint = "unix:///var/run/crio/crio.sock"' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.cgroupsPerQOS = true' "${REPOROOT}/assets/core/kubelet.yaml"
+
+    yq -i 'del(.podPidsLimit)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.protectKernelDefaults)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.staticPodPath)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.cgroupRoot)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.enableSystemLogQuery)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.podPidsLimit)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.protectKernelDefaults)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.systemCgroups)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.nodeStatusUpdateFrequency)' "${REPOROOT}/assets/core/kubelet.yaml"
+
+    yq -i '.rotateCertificates = false | .rotateCertificates line_comment="TODO"' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.serverTLSBootstrap = false | .serverTLSBootstrap line_comment="TODO"' "${REPOROOT}/assets/core/kubelet.yaml"
+
+    yq -i 'del(.tlsMinVersion)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.tlsCipherSuites)' "${REPOROOT}/assets/core/kubelet.yaml"
+
+    # Clear and re-create featureGates
+    yq -i 'del(.featureGates.AlibabaPlatform)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.AzureWorkloadIdentity)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.BuildCSIVolumes)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.CloudDualStackNodeIPs)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.ExternalCloudProvider)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.ExternalCloudProviderAzure)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.ExternalCloudProviderGCP)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.ExternalCloudProviderExternal)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.OpenShiftPodSecurityAdmission)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.PrivateHostedZoneAWS)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'del(.featureGates.RetroactiveDefaultStorageClass)' "${REPOROOT}/assets/core/kubelet.yaml"
+
+    yq -i '.featureGates.APIPriorityAndFairness = true' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.featureGates.PodSecurity = true' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.featureGates.DownwardAPIHugePages = true' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i '.featureGates.RotateKubeletServerCertificate = false | .featureGates.RotateKubeletServerCertificate line_comment="TODO"' "${REPOROOT}/assets/core/kubelet.yaml"
+
+    # Sort the document, except for kind and apiVersion
+    yq -i 'sort_keys(..) | pick((["kind","apiVersion"] + keys) | unique)' "${REPOROOT}/assets/core/kubelet.yaml"
+
+    # Add optional resolvConf
+    cat << 'EOF' >> "${REPOROOT}/assets/core/kubelet.yaml"
+{{- if .resolvConf }}
+resolvConf: "{{ .resolvConf }}"
+{{- end }}
+EOF
+
     #-- OpenShift control plane ---------------------------
     yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults;
         .enforce = "restricted" | .audit = "restricted" | .warn = "restricted" |
