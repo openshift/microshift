@@ -613,6 +613,13 @@ update_openshift_manifests() {
     # Sort the document, except for kind and apiVersion
     yq -i 'sort_keys(..) | pick((["kind","apiVersion"] + keys) | unique)' "${REPOROOT}/assets/core/kubelet.yaml"
 
+    # Add optional resolvConf
+    cat << 'EOF' >> "${REPOROOT}/assets/core/kubelet.yaml"
+{{- if .resolvConf }}
+resolvConf: "{{ .resolvConf }}"
+{{- end }}
+EOF
+
     #-- OpenShift control plane ---------------------------
     yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults;
         .enforce = "restricted" | .audit = "restricted" | .warn = "restricted" |

@@ -28,3 +28,6 @@ serverTLSBootstrap: false # TODO
 tlsCertFile: "{{ .tlsCertFile }}"
 tlsPrivateKeyFile: "{{ .tlsPrivateKeyFile }}"
 volumePluginDir: "{{ .volumePluginDir }}"
+{{- if .resolvConf }}
+resolvConf: "{{ .resolvConf }}"
+{{- end }}

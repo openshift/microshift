@@ -105,23 +105,25 @@ func (s *KubeletServer) writeConfig(cfg *config.Config) error {
 		return fmt.Errorf("creating a template for kubelet config failed: %w", err)
 	}
 
+	resolvConf := ""
+	// Load real resolv.conf in case systemd-resolved is used
+	// https://github.com/coredns/coredns/blob/master/plugin/loop/README.md#troubleshooting-loops-in-kubernetes-clusters
+	if _, err := os.Stat(config.DefaultSystemdResolvedFile); err == nil {
+		resolvConf = config.DefaultSystemdResolvedFile
+	}
+
 	tplParams := map[string]string{
 		"clientCAFile":      cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(config.DataDir)),
 		"tlsCertFile":       cryptomaterial.ServingCertPath(servingCertDir),
 		"tlsPrivateKeyFile": cryptomaterial.ServingKeyPath(servingCertDir),
 		"volumePluginDir":   config.DataDir + "/kubelet-plugins/volume/exec",
 		"clusterDNSIP":      cfg.Network.DNS,
+		"resolvConf":        resolvConf,
 	}
 
 	var data bytes.Buffer
 	if err := tpl.Execute(&data, tplParams); err != nil {
 		return fmt.Errorf("templating kubelet config failed: %w", err)
-	}
-
-	// Load real resolv.conf in case systemd-resolved is used
-	// https://github.com/coredns/coredns/blob/master/plugin/loop/README.md#troubleshooting-loops-in-kubernetes-clusters
-	if _, err := os.Stat(config.DefaultSystemdResolvedFile); err == nil {
-		data.WriteString(fmt.Sprintf("\nresolvConf: %s\n", config.DefaultSystemdResolvedFile))
 	}
 
 	path := filepath.Join(config.DataDir, "resources", "kubelet", "config", "config.yaml")
