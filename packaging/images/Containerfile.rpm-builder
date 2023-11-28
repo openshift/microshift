@@ -1,5 +1,5 @@
 ARG TAG
-FROM registry.ci.openshift.org/ocp/builder:$TAG
+FROM registry.ci.openshift.org/ocp-multi/builder:$TAG
 
 RUN rm -rfv /etc/yum.repos.d/ci-rpm-mirrors.repo /etc/yum.repos.d/localdev* && \
     dnf install \
