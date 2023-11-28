@@ -37,6 +37,7 @@ BUILD_CMDS+=(
 )
 NUM_BUILD_CMDS="${#BUILD_CMDS[@]}"
 BUILD_RPMS_LOG="${IMAGEDIR}/build_rpms.json"
+BUILD_RPMS_JOB_LOG="${IMAGEDIR}/build_rpms_jobs.txt"
 mkdir -p "${IMAGEDIR}"
 
 # Disable the GNU Parallel citation
@@ -48,10 +49,14 @@ echo "Starting parallel builds:"
 printf -- "  - %s\n" "${BUILD_CMDS[@]}"
 BUILD_OK=true
 if ! parallel --results "${BUILD_RPMS_LOG}" \
+        --joblog "${BUILD_RPMS_JOB_LOG}" \
         --jobs "${NUM_BUILD_CMDS}" \
         ::: "${BUILD_CMDS[@]}" ; then
     BUILD_OK=false
 fi
+
+# Show the summary of the output of the parallel jobs.
+cat "${BUILD_RPMS_JOB_LOG}"
 
 if [ -f "${BUILD_RPMS_LOG}" ] ; then
     jq < "${BUILD_RPMS_LOG}"
