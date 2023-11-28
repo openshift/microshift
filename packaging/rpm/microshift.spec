@@ -117,7 +117,6 @@ Requires: jq
 %description networking
 The microshift-networking package provides the networking components necessary for the MicroShift default CNI driver.
 
-
 %package greenboot
 Summary: Greenboot components for MicroShift
 BuildArch: noarch
@@ -126,6 +125,13 @@ Requires: greenboot
 
 %description greenboot
 The microshift-greenboot package provides the Greenboot scripts used for verifying that MicroShift is up and running.
+
+%package olm
+Summary: Operator Lifecycle Manager components for MicroShift
+ExclusiveArch: x86_64 aarch64
+
+%description olm
+The microshift-olm package provides the required manifests for the Operator Lifecycle Manager to be installed on MicroShift.
 
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
@@ -249,6 +255,22 @@ install -p -m755 packaging/greenboot/microshift-running-check.sh %{buildroot}%{_
 install -d -m755 %{buildroot}%{_sysconfdir}/greenboot/red.d
 install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
 
+# OLM manifests
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
+# Copy all the OLM manifests except the arch specific ones
+install -p -m644 assets/optional/operator-lifecycle-manager/* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
+
+# Copy the arch specific OLM manifests, rename them to remove the arch suffix
+%ifarch %{arm} aarch64
+rename ".aarch64.yaml" ".yaml" %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
+find %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm -name "*x86_64*.yaml" -delete
+%endif
+
+%ifarch x86_64
+rename ".x86_64.yaml" ".yaml" %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
+find %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm -name "*aarch64*.yaml" -delete
+%endif
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -346,9 +368,19 @@ systemctl enable --now --quiet openvswitch || true
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
 %{_datadir}/microshift/functions/greenboot.sh
 
+%files olm
+%dir %{_prefix}/lib/microshift/manifests.d/001-microshift-olm
+%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
+
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Nov 28 2023 Joaquim Moreno Prusi <joaquim@redhat.com> 4.15.0
+- Extend microshift.spec to build microshift-olm rpm
+
+* Mon Nov 13 2023 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.15.0
+- USHIFT-1872: Remove keyfile nm plugin force when installing
+
 * Wed Nov 01 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
 - Fix selinux labeling for microshift executable files
 
