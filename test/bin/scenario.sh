@@ -5,6 +5,11 @@
 
 set -euo pipefail
 
+SCENARIO_MERGE_OUTPUT_STREAMS=${SCENARIO_MERGE_OUTPUT_STREAMS:-false}
+if "${SCENARIO_MERGE_OUTPUT_STREAMS}"; then
+    exec 2>&1
+fi
+
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
