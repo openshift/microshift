@@ -134,6 +134,9 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
 
+	klog.InfoS("MICROSHIFT STARTING")
+	microshiftStart := time.Now()
+
 	// Tell the logging code that it's OK to receive reconfiguration
 	// instructions unless those instructions are different. This
 	// overrides the default behavior of erroring out if any
@@ -214,7 +217,7 @@ func RunMicroshift(cfg *config.Config) error {
 	notifySocket := os.Getenv("NOTIFY_SOCKET")
 	os.Unsetenv("NOTIFY_SOCKET")
 
-	klog.Infof("Starting MicroShift")
+	klog.InfoS("MICROSHIFT STARTING SERVICES", "since-start", time.Since(microshiftStart))
 
 	_, rotationDate, err := certchains.WhenToRotateAtEarliest(certChains)
 	if err != nil {
@@ -256,7 +259,7 @@ func RunMicroshift(cfg *config.Config) error {
 
 	select {
 	case <-ready:
-		klog.Infof("MicroShift is ready")
+		klog.InfoS("MICROSHIFT READY", "since-start", time.Since(microshiftStart))
 		os.Setenv("NOTIFY_SOCKET", notifySocket)
 		if supported, err := daemon.SdNotify(false, daemon.SdNotifyReady); err != nil {
 			klog.Warningf("error sending sd_notify readiness message: %v", err)
@@ -276,14 +279,15 @@ func RunMicroshift(cfg *config.Config) error {
 		// We might end up here if the certificate rotation is
 		// triggered and we exit on our own, instead of via a signal.
 	}
-	klog.Info("Stopping services")
+	klog.Info("MICROSHIFT STOPPING")
+	microshiftStop := time.Now()
 	runCancel()
 
 	select {
 	case <-stopped:
 	case <-time.After(time.Duration(gracefulShutdownTimeout) * time.Second):
-		klog.Infof("Timed out waiting for services to stop")
+		klog.InfoS("MICROSHIFT STOP TIMED OUT", "since-stop", time.Since(microshiftStop))
 	}
-	klog.Infof("MicroShift stopped")
+	klog.InfoS("MICROSHIFT STOPPED", "since-stop", time.Since(microshiftStop))
 	return nil
 }
