@@ -77,3 +77,4 @@ if ! "${LAUNCH_OK}"; then
 fi
 
 echo "Boot phase complete"
+exit 0

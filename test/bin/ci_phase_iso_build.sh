@@ -160,3 +160,4 @@ else
 fi
 
 echo "Build phase complete"
+exit 0

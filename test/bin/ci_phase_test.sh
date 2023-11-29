@@ -40,5 +40,7 @@ cat "${TEST_JOB_LOG}"
 
 echo "Test phase complete"
 if ! "${TEST_OK}"; then
+    echo "Some tests failed"
     exit 1
 fi
+exit 0
