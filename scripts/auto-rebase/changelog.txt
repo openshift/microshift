@@ -1,7 +1,3 @@
-- cluster-csi-snapshot-controller-operator embedded-component 5d8bae88fdceefd3cc6e9befe3da641839403d9c to 73dc400fbbbd7dc131c98199e3b5c5cac957ee83
-  - fa7d1b2 2023-11-08T13:24:44-05:00 CVE-2023-44487: bump github.com/openshift/library-go to release-4.14
-
-- cluster-network-operator embedded-component 75a0a6c043df981dcf8e23e78b5254d3a68bd5ee to 73a1db2e64e320fd2584b85c68c0bc8bfe6010cc
-  - 67929e9 2023-10-25T01:48:51+00:00 OCPBUGS-19370: Added HCP labels to CNO pods
-  - 599c168 2023-10-23T22:10:32+00:00 hypershift: adjust backoff on infrastructure name retry
+- cluster-openshift-controller-manager-operator embedded-component 04cec68a4cd060be0f324db5d30f02476a85d20e to 77e0d6a07854665a7e9c8458db67e25d02da934a
+  - 90449dd 2023-11-21T12:13:08+03:00 Remove blockage of ConfigObserver by build informer has synced flag
 
