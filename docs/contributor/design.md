@@ -1,5 +1,5 @@
 # Design Documentation
-The is a documentation of MicroShift's design goals, design principles, and fundamental design decisions. For details on specific feature enhancements, please refer to the corresponding low-level design documents.
+This is a documentation of MicroShift's design goals, design principles, and fundamental design decisions. For details on specific feature enhancements, please refer to the corresponding low-level design documents.
 
 
 ## Design Goals
@@ -12,7 +12,7 @@ MicroShift aims at meeting all of the following design goals:
     * e.g. disconnected or rarely connected, NAT'ed or firewalled, changing IP addresses, IPv4 or v6, high latency / low bandwidth, no control over local network (DNS, DHCP, LBN, GW), connectivity via LTE dongle (i.e. no LAN)
   * MicroShift operates autonomously; it does not require external orchestration.
   * MicroShift is safe to change<sup>1</sup>; it has means to automatically recover from faulty software or configuration updates that would render it unmanageable or non-operational.
-  * MicroShift is secure<sup>1</sup> even in environments without physical accesss security.
+  * MicroShift is secure<sup>1</sup> even in environments without physical access security.
 
   <sup>1) when used in combination with an edge-optimized OS like RHEL 4 Edge or Fedora IoT</sup>
 
@@ -57,7 +57,7 @@ When deciding between different design options, we follow the following principl
 * **Production over Development**: We engineer for production-deployments, not Kubernetes application development environments.
 * **Frugal use of resources**: We are mindful of MicroShift's resources consumption, considering all resources (memory, CPU, storage I/O, network I/O).
 * **No premature resouce optimization**: We do not attempt to squeeze out the last 20% of resouces, e.g. by patching or compressing code, inventing lighter-weight components, etc.
-* **Ease-of-Use**: We make MicroShift intutive and simple to use, even if that means providing fewer features and options.
+* **Ease-of-Use**: We make MicroShift intuitive and simple to use, even if that means providing fewer features and options.
 * **Prefer well-established mechanisms**: We meet users where they are by letting them use well-established tools and patterns rather than requiring them to learn new ones.
 * **Cheap Control Plane Restarts**: We keep MicroShift restarts cheap (= fast, low resource consumption, low workload impact, etc.) as it is our default model for software and configuration changes.
 * **Alignment with OpenShift**: We reuse OpenShift's code, operational logic, and production chain tools and processes where possible with reasonable effort, unless this would conflict with MicroShift's goals.
@@ -69,7 +69,7 @@ When deciding between different design options, we follow the following principl
 * MicroShift runs as a single systemd unit. The main binary embeds as goroutines only those services strictly necessary to bring up a *minimal Kubernetes/OpenShift control and data plane*. Etcd is run as a separate process, managed by the main binary. Motivation:
   * Maximizes reproducibility; cluster will come up fully or not at all.
   * Does not require external orchestration, for example through operators, and allows for very fast start-up/update times.
-  * Makes it simple to grok as workload for a a Linux admin persona, works well / easier to implement with systemd.
+  * Makes it simple to grok as workload for a Linux admin persona, works well / easier to implement with systemd.
   * Reduces resource footprint by downloading and running "less stuff".
   * Minimizes go library dependency compatibility challenges.
 * MicroShift provides a small, optional set of infrastructure services to support common use cases and reuses OpenShift's container images for these:
@@ -80,7 +80,7 @@ When deciding between different design options, we follow the following principl
 * See [enabled apis](./enabled_apis.md) for the subset of OpenShift APIs enabled in MicroShift.
 
 ### CLI
-* The `microshift` binary runs the Control Plane / Node process, it is not a tool to manage or be clients to those processes (like `oc` or `kubeadmin`). This is reflected in the sub-commands and paraemters offered by it, e.g. using the `run` verb (which implies run-to-cancel/run-to-completion) instead of `start`/`stop` verb-pairs (which imply asynch commands that return immediately).
+* The `microshift` binary runs the Control Plane / Node process, it is not a tool to manage or be clients to those processes (like `oc` or `kubeadmin`). This is reflected in the sub-commands and parameters offered by it, e.g. using the `run` verb (which implies run-to-cancel/run-to-completion) instead of `start`/`stop` verb-pairs (which imply asynch commands that return immediately).
 * For consistency and to play nicely with systemd, we avoid command line parameters that would need to be different between invocations (e.g. first-run vs subsequent runs).
 
 ### Configuration
