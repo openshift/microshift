@@ -30,9 +30,7 @@ Verify Kubelet Config With Systemd-Resolved Running
     Restart MicroShift
 
     # Verify the presence of the kubelet option
-    ${rc}=    Execute Command
-    ...    grep -q "resolvConf: ${RESOLVE_CONF_FILE}" ${KUBELET_CONFIG_FILE}
-    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    ${rc}=    Check ResolveConf Option Presence
     Should Be Equal As Integers    0    ${rc}
 
     [Teardown]    Run Keywords
@@ -48,9 +46,7 @@ Verify Kubelet Config With Systemd-Resolved Disabled
     Restart MicroShift
 
     # Verify the absence of the kubelet option
-    ${rc}=    Execute Command
-    ...    grep -q "resolvConf: ${RESOLVE_CONF_FILE}" ${KUBELET_CONFIG_FILE}
-    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    ${rc}=    Check ResolveConf Option Presence
     Should Not Be Equal As Integers    0    ${rc}
 
 Verify Kubelet Config With Systemd-Resolved Uninstalled
@@ -64,9 +60,7 @@ Verify Kubelet Config With Systemd-Resolved Uninstalled
     Restart MicroShift
 
     # Verify the absence of the kubelet option
-    ${rc}=    Execute Command
-    ...    grep -q "resolvConf: ${RESOLVE_CONF_FILE}" ${KUBELET_CONFIG_FILE}
-    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    ${rc}=    Check ResolveConf Option Presence
     Should Not Be Equal As Integers    0    ${rc}
 
     # Revert the system to the original configuration
@@ -170,3 +164,12 @@ Restore Systemd-Resolved
         ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
         Should Be Equal As Integers    0    ${rc}
     END
+
+Check ResolveConf Option Presence
+    [Documentation]    Check if the 'resolvConf' option is present in the kubelet
+    ...    configuration file. Return a none-zero code if not present.
+
+    ${rc}=    Execute Command
+    ...    grep -qE "^resolvConf:.*${RESOLVE_CONF_FILE}" ${KUBELET_CONFIG_FILE}
+    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    RETURN    ${rc}
