@@ -574,13 +574,17 @@ run_tests() {
 
     if [ ! -d "${RF_VENV}" ]; then
         error "RF_VENV (${RF_VENV}) does not exist, create it with: ${ROOTDIR}/scripts/fetch_tools.sh robotframework"
+        record_junit "${vmname}" "robot_framework_environment" "FAILED"
         exit 1
     fi
+    record_junit "${vmname}" "robot_framework_environment" "OK"
     local rf_binary="${RF_VENV}/bin/robot"
     if [ ! -f "${rf_binary}" ]; then
         error "robot is not installed to ${rf_binary}"
+        record_junit "${vmname}" "robot_framework_installed" "FAILED"
         exit 1
     fi
+    record_junit "${vmname}" "robot_framework_installed" "OK"
 
     # The IP file is created empty during the launch VM phase if the VM is has no NICs. This is the queue to skip
     # the variable file creation and greenboot check.
@@ -595,8 +599,10 @@ run_tests() {
             f="$(vm_property_filename "${vmname}" "${p}")"
             if [ ! -f "${f}" ]; then
                 error "Cannot read ${f}"
+                record_junit "${vmname}" "access_vm_property ${p}" "FAILED"
                 exit 1
             fi
+            record_junit "${vmname}" "access_vm_property ${p}" "OK"
         done
         local -r ssh_port=$(get_vm_property "${vmname}" "ssh_port")
         local -r api_port=$(get_vm_property "${vmname}" "api_port")
@@ -617,8 +623,10 @@ SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
         if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
+            record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
             return 1
         fi
+        record_junit "${vmname}" "pre_test_greenboot_check" "OK"
     fi
 
     local var_arg=${variable_file:+-V "${variable_file}"}
