@@ -40,18 +40,25 @@ BUILD_RPMS_LOG="${IMAGEDIR}/build_rpms.json"
 BUILD_RPMS_JOB_LOG="${IMAGEDIR}/build_rpms_jobs.txt"
 mkdir -p "${IMAGEDIR}"
 
+# Show progress for interactive mode when stdin is a terminal
+if [ -t 0 ]; then
+    progress="--progress"
+else
+    progress=""
+fi
+
 # Disable the GNU Parallel citation
 echo will cite | parallel --citation &>/dev/null
 # Run the commands in parallel
-# Avoid --progress option because it requires tty and
-# it slows down execution in interactive shells
 echo "Starting parallel builds:"
 printf -- "  - %s\n" "${BUILD_CMDS[@]}"
 BUILD_OK=true
-if ! parallel --results "${BUILD_RPMS_LOG}" \
-        --joblog "${BUILD_RPMS_JOB_LOG}" \
-        --jobs "${NUM_BUILD_CMDS}" \
-        ::: "${BUILD_CMDS[@]}" ; then
+if ! parallel \
+     ${progress} \
+     --results "${BUILD_RPMS_LOG}" \
+     --joblog "${BUILD_RPMS_JOB_LOG}" \
+     --jobs "${NUM_BUILD_CMDS}" \
+     ::: "${BUILD_CMDS[@]}" ; then
     BUILD_OK=false
 fi
 
