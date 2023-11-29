@@ -212,6 +212,7 @@ assets:
     ignore: "it's a MicroShift specific Go file that embeds into a binary"
 
   - dir: optional/operator-lifecycle-manager/
+    ignore: "temporal ignore - waiting for release image to include the new files"
     src: operator-framework-olm/microshift-manifests/
     files:
       - file: 0000_50_olm_00-catalogsources.crd.yaml
