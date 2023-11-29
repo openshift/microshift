@@ -274,21 +274,18 @@ wait_for_greenboot() {
 }
 
 start_junit() {
-    local outputfile="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/junit.xml"
-    mkdir -p "$(dirname "${outputfile}")"
+    mkdir -p "$(dirname "${JUNIT_OUTPUT_FILE}")"
 
-    echo "Creating ${outputfile}"
+    echo "Creating ${JUNIT_OUTPUT_FILE}"
 
-    cat - >"${outputfile}" <<EOF
+    cat - >"${JUNIT_OUTPUT_FILE}" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="infrastructure for ${SCENARIO}" timestamp="$(date --iso-8601=ns)">
 EOF
 }
 
 close_junit() {
-    local outputfile="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/junit.xml"
-
-    echo '</testsuite>' >>"${outputfile}"
+    echo '</testsuite>' >>"${JUNIT_OUTPUT_FILE}"
 }
 
 record_junit() {
@@ -296,9 +293,7 @@ record_junit() {
     local step="$2"
     local results="$3"
 
-    local outputfile="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/junit.xml"
-
-    cat - >>"${outputfile}" <<EOF
+    cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
 <testcase classname="${SCENARIO} ${vmname}" name="${step}">
 EOF
 
@@ -306,17 +301,17 @@ EOF
         OK)
         ;;
         SKIP*)
-        cat - >>"${outputfile}" <<EOF
+        cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
 <skipped message="${results}" type="${step}-skipped" />
 EOF
         ;;
         *)
-        cat - >>"${outputfile}" <<EOF
+        cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
 <failure message="${results}" type="${step}-failure" />
 EOF
     esac
 
-    cat - >>"${outputfile}" <<EOF
+    cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
 </testcase>
 EOF
 }
@@ -570,6 +565,9 @@ run_tests() {
     local -r full_vmname="$(full_vm_name "${vmname}")"
     shift
 
+    start_junit
+    trap "close_junit" EXIT
+
     echo "Running tests with $# args" "$@"
 
     if [ ! -d "${RF_VENV}" ]; then
@@ -760,6 +758,7 @@ shift
 SCENARIO_SCRIPT="$(realpath "$1")"
 shift
 SCENARIO=$(basename "${SCENARIO_SCRIPT}" .sh)
+JUNIT_OUTPUT_FILE="${SCENARIO_INFO_DIR}/${SCENARIO}/phase_${action}/junit.xml"
 
 # Change directory to the test root
 cd "${SCRIPTDIR}/.."
