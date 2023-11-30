@@ -284,7 +284,7 @@ wait_for_greenboot() {
                 echo "Deleting TopoLVM pods and retrying the greenboot checks (${retry_count} attempts remaining)"
                 (( retry_count-- ))
 
-                if ! ${ssh_cmd} "sudo oc ${kube_opt} delete pods -n openshift-storage --all" ; then
+                if ! ${ssh_cmd} "sudo oc ${kube_opt} delete pods -n openshift-storage --all --grace-period=1 --timeout=15s" ; then
                     echo "WARNING: TopoLVM pod deletion returned an error"
                 fi
                 if ! ${ssh_cmd} "sudo systemctl restart --no-block greenboot-healthcheck.service" ; then
