@@ -9,27 +9,38 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+TEST_JOB_LOG="${IMAGEDIR}/test_jobs.txt"
+
 cd "${TESTDIR}"
 
 if [ ! -d "${RF_VENV}" ]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 fi
 
-for scenario in "${SCENARIO_SOURCES}"/*.sh; do
-    scenario_name="$(basename "${scenario}" .sh)"
-    logfile="${SCENARIO_INFO_DIR}/${scenario_name}/run.log"
-    mkdir -p "$(dirname "${logfile}")"
-    SSH_PRIVATE_KEY="${HOME}/.ssh/id_rsa" bash -x ./bin/scenario.sh run "${scenario}" >"${logfile}" 2>&1 &
-done
+# Tell scenario.sh to merge stderr into stdout
+export SCENARIO_MERGE_OUTPUT_STREAMS=true
 
-FAIL=0
-for job in $(jobs -p) ; do
-    jobs -l
-    echo "Waiting for job: ${job}"
-    wait "${job}" || ((FAIL+=1))
-done
+# Show the summary of the output of the parallel jobs.
+if [ -t 0 ]; then
+    progress="--progress"
+else
+    progress=""
+fi
+
+TEST_OK=true
+if ! parallel \
+    ${progress} \
+    --results "${SCENARIO_INFO_DIR}/{/.}/run.log" \
+    --joblog "${TEST_JOB_LOG}" \
+    bash -x ./bin/scenario.sh run ::: "${SCENARIO_SOURCES}"/*.sh ; then
+   TEST_OK=false
+fi
+
+cat "${TEST_JOB_LOG}"
 
 echo "Test phase complete"
-if [[ ${FAIL} -ne 0 ]]; then
+if ! "${TEST_OK}"; then
+    echo "Some tests failed"
     exit 1
 fi
+exit 0

@@ -19,6 +19,8 @@ echo "Logging to ${LOGFILE}"
 # Set fd 1 and 2 to write to the log file
 exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${LOGFILE}"))
 
+LAUNCH_VMS_JOB_LOG="${IMAGEDIR}/launch_vm_jobs.txt"
+
 cd "${ROOTDIR}"
 
 # Make sure libvirtd is running. We do this here, because some of the
@@ -37,31 +39,28 @@ bash -x ./bin/manage_hypervisor_config.sh create
 # repository.
 bash -x ./bin/start_webserver.sh
 
-declare -A pidToScenario
+# Show the summary of the output of the parallel jobs.
+if [ -t 0 ]; then
+    progress="--progress"
+else
+    progress=""
+fi
 
-# Build all of the needed VMs
-for scenario in "${SCENARIO_SOURCES}"/*.sh; do
-    scenario_name=$(basename "${scenario}" .sh)
-    logfile="${SCENARIO_INFO_DIR}/${scenario_name}/boot.log"
-    mkdir -p "$(dirname "${logfile}")"
-    bash -x ./bin/scenario.sh create "${scenario}" >"${logfile}" 2>&1 &
-    pidToScenario["$!"]="${scenario}"
-    sleep 5
-done
+# Tell scenario.sh to merge stderr into stdout
+export SCENARIO_MERGE_OUTPUT_STREAMS=true
 
-set +x
-for pid in "${!pidToScenario[@]}"; do echo "${pid} - ${pidToScenario[${pid}]}"; done
-set -x
+LAUNCH_OK=true
+if ! parallel \
+    ${progress} \
+    --results "${SCENARIO_INFO_DIR}/{/.}/boot.log" \
+    --joblog "${LAUNCH_VMS_JOB_LOG}" \
+    --delay 5 \
+    bash -x ./bin/scenario.sh create ::: "${SCENARIO_SOURCES}"/*.sh ; then
+   LAUNCH_OK=false
+fi
 
-FAIL=0
-for job in $(jobs -p); do
-    jobs -l
-    echo "Waiting for job: ${job}"
-    if ! wait "${job}"; then
-        ((FAIL += 1))
-        echo "Failed to boot VMs for scenario: ${pidToScenario[${job}]}"
-    fi
-done
+# Show the summary of the output of the parallel jobs.
+cat "${LAUNCH_VMS_JOB_LOG}"
 
 echo "===================================="
 echo "System information after booting VMs"
@@ -72,9 +71,10 @@ sudo du -sk "${IMAGEDIR}"/* | sort -n
 sudo virsh list --all
 echo "===================================="
 
-if [ ${FAIL} -ne 0 ]; then
+if ! "${LAUNCH_OK}"; then
     echo "Failed to boot all VMs"
     exit 1
 fi
 
 echo "Boot phase complete"
+exit 0
