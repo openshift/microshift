@@ -168,7 +168,7 @@ prepare_kickstart() {
 
     local full_vmname
     local output_file
-    local vm_hostname 
+    local vm_hostname
     local fips_command=""
 
     full_vmname="$(full_vm_name "${vmname}")"
@@ -254,22 +254,54 @@ wait_for_greenboot() {
 
     if "${SKIP_GREENBOOT}"; then
         echo "Skipping greenboot check"
+        record_junit "${vmname}" "greenboot-check" "SKIPPED"
         return 0
     fi
 
     echo "Waiting ${VM_BOOT_TIMEOUT} for greenboot on ${vmname} to complete"
 
     local -r start_time=$(date +%s)
+    local -r ssh_cmd="ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip}"
+    local -r kube_opt="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
+    local retry_count=2
     while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
-        if ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new "redhat@${ip}" \
-                "sudo journalctl -n 5 -u greenboot-healthcheck; \
-                 systemctl show --property=SubState --value greenboot-healthcheck | grep -w exited" ; then
+        local svc_state
+
+        svc_state="$(${ssh_cmd} systemctl show --property=SubState --value greenboot-healthcheck || true)"
+        if [ "${svc_state}" = "exited" ] ; then
+            record_junit "${vmname}" "greenboot-check" "OK"
             return 0
         fi
+
+        # Print the last log and check for terminal failure
+        ${ssh_cmd} "sudo journalctl -n 10 -u greenboot-healthcheck" || true
+        if [ "${svc_state}" = "failed" ] ; then
+            # FIXME: See OCPBUGS-24222
+            # Workaround for TopoLVM images getting stuck
+            # Delete the TopoLVM pods and retry greenboot check
+            # Remove this code when the problem is addressed
+            if [ ${retry_count} -gt 0 ] ; then
+                echo "Deleting TopoLVM pods and retrying the greenboot checks (${retry_count} attempts remaining)"
+                (( retry_count-- ))
+
+                if ! ${ssh_cmd} "sudo oc ${kube_opt} delete pods -n openshift-storage --all" ; then
+                    echo "WARNING: TopoLVM pod deletion returned an error"
+                fi
+                if ! ${ssh_cmd} "sudo systemctl restart --no-block greenboot-healthcheck.service" ; then
+                    echo "WARNING: Greenboot service restart returned an error"
+                fi
+            else
+                echo "The greenboot service reported a failed state, no need to wait any longer"
+                break
+            fi
+        fi
+
         date
         sleep 10
     done
-    # Return an error if non of the ssh attempts succeeded
+
+    # Return an error if none of the ssh attempts succeeded
+    record_junit "${vmname}" "greenboot-check" "FAILED"
     return 1
 }
 
