@@ -1,97 +1,29 @@
-- cluster-csi-snapshot-controller-operator embedded-component 0929c76c5d2ed00b8175c95435586908a27c6495 to 7eccf6c8ffe18ae1eda748218eba9246431287d3
-  - b97a8c5 2023-11-20T10:59:26-07:00 STOR-1402: Chore: update libraries in all operators [4.15]
+- oc image-arm64 3b3f931a46f44b4e6fdf8630cb45dbbfc108239e to b372ea0eba0bf9e611a67e111306817ad8ad4464
+  - 1ca28460 2023-11-29T16:15:47+01:00 `adm update status`: add control plane duration
+  - e3e35b4d 2023-11-29T16:15:47+01:00 `adm update status`: add control plane completion
+  - 2a2e8050 2023-11-29T16:15:47+01:00 `adm update status`: add example test for update
+  - 45382b04 2023-11-29T16:15:47+01:00 `adm update status`: Add control plane cluster operator status
+  - 17c0df1c 2023-11-27T12:58:03+01:00 Add client version in must-gather summary
+  - e3adee0d 2023-11-23T10:51:46+03:00 Mention inspection completion in the error message
 
-- cluster-ingress-operator embedded-component 9e775905596fbfcbce19ff0018ea8398693da714 to 30833ad0e9e7bc8c561602dfe62f55f6c6423edd
-  - 21971b4 2023-11-27T15:31:43+01:00 Implemented service overrides
-  - 8c50e51 2023-11-27T15:25:23+01:00 Bump github.com/openshift/api for IBM Cloud service override API (NE-1402)
+- csi-external-snapshotter image-arm64 4f8e8d54ed112b01f063e13414f2685f9343a059 to 0df9df26f4ca99c160423cbe0bb6267c1ca7ad4e
+  - 9642e40 2023-11-27T23:12:24+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/ose-csi-snapshot-controller.yml
 
-- cluster-kube-apiserver-operator embedded-component 5e63d3dabe8798b40ff36e5afcce280e156c1577 to 1828e16c2004122396e7418c1ade2b665456d86f
-  - bbeb165 2023-11-07T09:28:32-05:00 use external load balancer url for jwks-uri
+- csi-external-snapshotter image-arm64 4f8e8d54ed112b01f063e13414f2685f9343a059 to 0df9df26f4ca99c160423cbe0bb6267c1ca7ad4e
+  - 9642e40 2023-11-27T23:12:24+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/ose-csi-snapshot-controller.yml
 
-- cluster-kube-scheduler-operator embedded-component 835a25b7431d6a80ca488553dd8e9a55b021797c to 73fad8331837a6ad26e052079510949f8e361b94
-  - dc5b1a9 2023-11-15T16:39:30+01:00 README.md: steps for enabling profiling, collecting heap and running go tool pprof
+- csi-external-snapshotter image-arm64 4f8e8d54ed112b01f063e13414f2685f9343a059 to 0df9df26f4ca99c160423cbe0bb6267c1ca7ad4e
+  - 9642e40 2023-11-27T23:12:24+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/ose-csi-snapshot-controller.yml
 
-- cluster-network-operator embedded-component 1434926cf634c1993a748809bc324bec018c762f to ce7b11d00a5f306cba3735c046d5218de8553442
-  - 5b31237 2023-11-24T13:08:08+01:00 Bump kubernetes dependencies to v0.28.4
-  - 9c2f627 2023-11-24T13:08:08+01:00 Remove HyperShift dependency from go.mod
-  - f5757f9 2023-11-24T13:08:06+01:00 Remove HyperShift API dependency
-  - ce9414f 2023-11-23T16:48:59+01:00 Move hypershift.go to a separate module
+- router image-arm64 fb70ac4d547954e7f96c12b4bc329917f1695d35 to b7001137f832d02d4ed68cba27fe3001ff523fa6
+  - 449ecd8 2023-11-27T20:33:54-05:00 Bump k8s.io/* packages to v0.28.3
 
-- cluster-openshift-controller-manager-operator embedded-component e6f885abcd9923abf87c3b96908e69393b06efef to e87e15acee1bbdbc1663aec1bda9517a876023f2
-  - cd70163 2023-11-20T19:13:17+03:00 Remove blockage of ConfigObserver by build informer has synced flag
+- ovn-kubernetes image-arm64 6ec3f5cab9cf1ed2d477eaf013073804832af89e to 3906c6bf8f4914f3e59950875ce6d4e6c4266064
+  - 51fc946 2023-11-22T11:40:18-06:00 ovn: remove unused CommonNetworkControllerInfo UpdateNodeAnnotationWithRetry() function
+  - 7198fad 2023-11-22T11:40:18-06:00 factory: strip Managed Fields and some Pod fields to reduce memory usage
+  - aa4b720 2023-11-22T11:40:18-06:00 CARRY: Add 'WithTransform' SharedInformerOption
+  - b9b23be 2023-11-22T17:32:40+01:00 Account for the new VIP address label
 
-- csi-external-snapshotter embedded-component 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
-  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
-
-- machine-config-operator embedded-component d469addcb699ab2a8aba28e2bd3834474d1ba55a to fef687ef2b939014ce0fcb1c662874f81931b168
-  - e2bbdc40 2023-11-20T17:31:03+01:00 OCPBUGS-23432: Use shorter IP label for keepalived VIP
-  - b76257e0 2023-11-20T13:32:22+02:00 OCPBUGS-23255: Add FIPS information to oldconfig when checking if reboot is needed When trying to avoid reboot, current FIPS setting needs to be set into the running machine config configuration.
-  - 85c369dd 2023-11-16T15:46:45+01:00 kubevirt: Activate nodeip-configuration.service
-  - 3a39f6f2 2023-11-15T14:31:44+01:00 Fix syntax in vsphere-hostname.yaml for CAPI machines
-
-- operator-framework-olm is a new embedded-component dependency
-
-- oc image-amd64 1d4a9afe8cf066b4c34018b3e0f4919d0157f091 to 3b3f931a46f44b4e6fdf8630cb45dbbfc108239e
-  - 1edd27f1 2023-11-03T15:10:38+01:00 Promote some experimental commands, deprecate others
-  - 79f87646 2023-11-02T15:01:42+03:00 Add volume usage percentage checker script in must-gather's gather container
-
-- csi-external-snapshotter image-amd64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
-  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
-
-- csi-external-snapshotter image-amd64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
-  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
-
-- csi-external-snapshotter image-amd64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
-  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
-
-- ovn-kubernetes image-amd64 0e8096fd1d4fba9dec2db2f6af879112e78c48ad to 6ec3f5cab9cf1ed2d477eaf013073804832af89e
-  - d5f2fd9 2023-11-21T18:56:58+01:00 APB External Route: Add IPv4 and IPv6 validation in CRD schema for static hop IP field
-  - 5967229 2023-11-21T15:45:54+01:00 Fix race condition between Encap row update and retrieval
-  - 47bf026 2023-11-20T07:54:51-06:00 replace j2cli with jinjanator
-  - df442d2 2023-11-17T22:09:05+01:00 Use /usr/sbin/iptables6 instead of /sbin/iptables6
-  - 3e749a0 2023-11-17T11:01:25+01:00 Use /usr/sbin/iptables instead of /sbin/iptables
-  - ec898cb 2023-11-17T03:50:12-06:00 APB: Ensure last transition time is always updated in status regardless of success of failure
-  - cdbd7ab 2023-11-14T09:39:46+01:00 dist/templates: [RBAC] Allow ovnkube-node-dpu-host to update pods
-  - 3ad5fb6 2023-11-14T09:39:46+01:00 dist/templates: Allow ovn_enable_ovnkube_identity to be set in ovnkube-node in DPU mode
-  - 1301d9d 2023-11-14T02:46:34+08:00 Update INSTALL.OPENSHIFT.md
-  - d861a76 2023-11-13T10:38:10+01:00 go-controller/Makefile: Fix make check on Ubuntu
-  - 94eeac6 2023-11-10T16:36:25-05:00 Add test for pods in running status on no node
-  - a5c095d 2023-11-09T17:41:06-05:00 Fail louder
-  - 3b61d02 2023-11-07T18:13:30+01:00 sriovnet_linux: Make GetVdpaDeviceByPci errors non fatal
-  - 9e64535 2023-11-06T17:18:39+01:00 Dockerfile.ubuntu: Update the Ubuntu Dockerfile image to have a newer version of OVN
-  - 3e0ac43 2023-11-06T17:11:25+01:00 Dockerfile.ubuntu: Add ovnkube-identity to the generated image
-  - 641dd5e 2023-10-31T18:01:05-04:00 Use the correct CIDR address for the DPU.
-  - df942e2 2023-10-16T18:40:34-04:00 Fix DPU deployment issues in DPU Host mode for OVN-IC
-
-- oc image-arm64 1d4a9afe8cf066b4c34018b3e0f4919d0157f091 to 3b3f931a46f44b4e6fdf8630cb45dbbfc108239e
-  - 1edd27f1 2023-11-03T15:10:38+01:00 Promote some experimental commands, deprecate others
-  - 79f87646 2023-11-02T15:01:42+03:00 Add volume usage percentage checker script in must-gather's gather container
-
-- csi-external-snapshotter image-arm64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
-  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
-
-- csi-external-snapshotter image-arm64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
-  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
-
-- csi-external-snapshotter image-arm64 11bb38ff1192d6b4e7b9f5f0db0bd24a7536b1c5 to 4f8e8d54ed112b01f063e13414f2685f9343a059
-  - d493736 2023-11-20T13:34:49+01:00 UPSTREAM: 958: Re-queue SnapshotContents that are readyToUse: false
-
-- ovn-kubernetes image-arm64 0e8096fd1d4fba9dec2db2f6af879112e78c48ad to 6ec3f5cab9cf1ed2d477eaf013073804832af89e
-  - d5f2fd9 2023-11-21T18:56:58+01:00 APB External Route: Add IPv4 and IPv6 validation in CRD schema for static hop IP field
-  - 5967229 2023-11-21T15:45:54+01:00 Fix race condition between Encap row update and retrieval
-  - 47bf026 2023-11-20T07:54:51-06:00 replace j2cli with jinjanator
-  - df442d2 2023-11-17T22:09:05+01:00 Use /usr/sbin/iptables6 instead of /sbin/iptables6
-  - 3e749a0 2023-11-17T11:01:25+01:00 Use /usr/sbin/iptables instead of /sbin/iptables
-  - ec898cb 2023-11-17T03:50:12-06:00 APB: Ensure last transition time is always updated in status regardless of success of failure
-  - cdbd7ab 2023-11-14T09:39:46+01:00 dist/templates: [RBAC] Allow ovnkube-node-dpu-host to update pods
-  - 3ad5fb6 2023-11-14T09:39:46+01:00 dist/templates: Allow ovn_enable_ovnkube_identity to be set in ovnkube-node in DPU mode
-  - 1301d9d 2023-11-14T02:46:34+08:00 Update INSTALL.OPENSHIFT.md
-  - d861a76 2023-11-13T10:38:10+01:00 go-controller/Makefile: Fix make check on Ubuntu
-  - 94eeac6 2023-11-10T16:36:25-05:00 Add test for pods in running status on no node
-  - a5c095d 2023-11-09T17:41:06-05:00 Fail louder
-  - 3b61d02 2023-11-07T18:13:30+01:00 sriovnet_linux: Make GetVdpaDeviceByPci errors non fatal
-  - 9e64535 2023-11-06T17:18:39+01:00 Dockerfile.ubuntu: Update the Ubuntu Dockerfile image to have a newer version of OVN
-  - 3e0ac43 2023-11-06T17:11:25+01:00 Dockerfile.ubuntu: Add ovnkube-identity to the generated image
-  - 641dd5e 2023-10-31T18:01:05-04:00 Use the correct CIDR address for the DPU.
-  - df942e2 2023-10-16T18:40:34-04:00 Fix DPU deployment issues in DPU Host mode for OVN-IC
+- kubernetes image-arm64 20a57641f83e54f94737cfc9830de5e270b0fa9e to 59b90bd188d5389527a81d17e5787877d8c5746b
+  - 8dc712b53 2023-11-08T11:32:45-05:00 UPSTREAM: <carry>: APIRequestCount Handler
 
