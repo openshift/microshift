@@ -1,3 +1,0 @@
-- cluster-openshift-controller-manager-operator embedded-component 04cec68a4cd060be0f324db5d30f02476a85d20e to 77e0d6a07854665a7e9c8458db67e25d02da934a
-  - 90449dd 2023-11-21T12:13:08+03:00 Remove blockage of ConfigObserver by build informer has synced flag
-
