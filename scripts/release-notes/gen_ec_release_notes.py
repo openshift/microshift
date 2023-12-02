@@ -74,7 +74,7 @@ VERSION_RE = re.compile(
 # Include the major.minor version string in this list to ignore
 # processing very old versions for which we do not anticipate future
 # candidate builds.
-OLD_VERSIONS = ['4.12', '4.13']
+OLD_VERSIONS = ['4.12', '4.13', '4.14']
 
 
 # Representation of one release
