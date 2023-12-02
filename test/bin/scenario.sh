@@ -262,7 +262,6 @@ wait_for_greenboot() {
 
     local -r start_time=$(date +%s)
     local -r ssh_cmd="ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip}"
-    local -r kube_opt="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
     local retry_count=2
     while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
         local svc_state
@@ -278,14 +277,14 @@ wait_for_greenboot() {
         if [ "${svc_state}" = "failed" ] ; then
             # FIXME: See OCPBUGS-24222
             # Workaround for TopoLVM images getting stuck
-            # Delete the TopoLVM pods and retry greenboot check
+            # Delete the pods (TopoLVM included) and retry greenboot check
             # Remove this code when the problem is addressed
             if [ ${retry_count} -gt 0 ] ; then
-                echo "Deleting TopoLVM pods and retrying the greenboot checks (${retry_count} attempts remaining)"
+                echo "Deleting MicroShift pods and retrying the greenboot checks (${retry_count} attempts remaining)"
                 (( retry_count-- ))
-
-                if ! ${ssh_cmd} "sudo oc ${kube_opt} delete pods -n openshift-storage --all --grace-period=1 --timeout=15s" ; then
-                    echo "WARNING: TopoLVM pod deletion returned an error"
+                # The '--ovn' option keeps the data, but deletes all pods and networking components
+                if ! ${ssh_cmd} "sudo microshift-cleanup-data --ovn ; sudo systemctl enable --now microshift" ; then
+                    echo "WARNING: MicroShift data cleanup returned an error"
                 fi
                 if ! ${ssh_cmd} "sudo systemctl restart --no-block greenboot-healthcheck.service" ; then
                     echo "WARNING: Greenboot service restart returned an error"
