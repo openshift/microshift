@@ -57,6 +57,62 @@ if [ -n "REPLACE_PUBLIC_IP" ]; then
     echo "    - REPLACE_PUBLIC_IP" >>/etc/microshift/config.yaml
 fi
 
+if REPLACE_ENABLE_MIRROR; then
+    # Setup mirror registries configuration here, as the hostname is dynamic and the file is verbose.
+    cat > /etc/containers/registries.conf.d/999-microshift-mirror.conf <<EOF
+[[registry]]
+    prefix = ""
+    location = "REPLACE_HOSTNAME:8443"
+    mirror-by-digest-only = true
+
+[[registry]]
+    prefix = ""
+    location = "quay.io"
+    mirror-by-digest-only = true
+[[registry.mirror]]
+    location = "REPLACE_HOSTNAME:8443"
+
+[[registry]]
+    prefix = ""
+    location = "registry.redhat.io"
+    mirror-by-digest-only = true
+[[registry.mirror]]
+    location = "REPLACE_HOSTNAME:8443"
+
+[[registry]]
+    prefix = ""
+    location = "registry.access.redhat.com"
+    mirror-by-digest-only = true
+[[registry.mirror]]
+    location = "REPLACE_HOSTNAME:8443"
+EOF
+
+    # Skip signature verifying for red hat registries, since the signatures are bound the original
+    # registry name and mirroring images changes that.
+    cat > /etc/containers/policy.json <<EOF
+{
+    "default": [
+        {
+            "type": "insecureAcceptAnything"
+        }
+    ],
+    "transports":
+        {
+            "docker-daemon":
+                {
+                    "": [{"type":"insecureAcceptAnything"}]
+                }
+        }
+}
+EOF
+
+    # setup TLS certs for the registry
+    cat > /etc/pki/ca-trust/source/anchors/mirror-registry.pem <<EOF
+REPLACE_MIRROR_CERTIFICATE
+EOF
+    sudo update-ca-trust
+fi
+
 # The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
 # The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
 mkdir -p /etc/crio
