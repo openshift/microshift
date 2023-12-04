@@ -5,5 +5,6 @@ metadata:
   name: signing-cabundle
   annotations:
     openshift.io/owning-component: service-ca
+    openshift.io/description: "Service CA configmap contains the data for the PEM-encoded CA signing bundle which will be injected to resources annotated with 'service.beta.openshift.io/inject-cabundle=true'"
 data:
   ca-bundle.crt:
