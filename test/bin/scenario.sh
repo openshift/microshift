@@ -597,7 +597,7 @@ run_tests() {
     shift
 
     start_junit
-    trap "close_junit" EXIT
+    trap "close_junit; sos_report" EXIT
 
     echo "Running tests with $# args" "$@"
 
@@ -751,7 +751,6 @@ action_login() {
 action_run() {
     load_global_settings
     load_scenario_script
-    trap "sos_report" EXIT
     scenario_run_tests
 }
 
