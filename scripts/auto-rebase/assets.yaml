@@ -212,7 +212,6 @@ assets:
     ignore: "it's a MicroShift specific Go file that embeds into a binary"
 
   - dir: optional/operator-lifecycle-manager/
-    ignore: "temporal ignore - waiting for release image to include the new files"
     src: operator-framework-olm/microshift-manifests/
     files:
       - file: 0000_50_olm_00-catalogsources.crd.yaml
@@ -231,27 +230,11 @@ assets:
       - file: 0000_50_olm_01-olm-operator.serviceaccount.yaml
       - file: 0000_50_olm_02-olmconfig.yaml
       - file: 0000_50_olm_02-services.yaml
-      - file: 0000_50_olm_06-psm-operator.deployment.yaml
-      - file: 0000_50_olm_06-psm-operator.servicemonitor.yaml
-      - file: 0000_50_olm_06-psm-operator.service.yaml
-      - file: 0000_50_olm_07-collect-profiles.cronjob.yaml
-      - file: 0000_50_olm_07-olm-operator.deployment.x86_64.yaml
-        src: 0000_50_olm_07-olm-operator.deployment.yaml
-      - file: 0000_50_olm_07-olm-operator.deployment.aarch64.yaml
-        src: 0000_50_olm_07-olm-operator.deployment.yaml
-      - file: 0000_50_olm_08-catalog-operator.deployment.x86_64.yaml
-        src: 0000_50_olm_08-catalog-operator.deployment.yaml
-      - file: 0000_50_olm_08-catalog-operator.deployment.aarch64.yaml
-        src: 0000_50_olm_08-catalog-operator.deployment.yaml
+      - file: 0000_50_olm_07-olm-operator.deployment.yaml
+      - file: 0000_50_olm_08-catalog-operator.deployment.yaml
       - file: 0000_50_olm_09-aggregated.clusterrole.yaml
-      - file: 0000_50_olm_11-olm-operators.configmap.removed.yaml
-      - file: 0000_50_olm_12-olm-operators.catalogsource.removed.yaml
       - file: 0000_50_olm_13-operatorgroup-default.yaml
-      - file: 0000_50_olm_14-packageserver.subscription.removed.yaml
       - file: 0000_50_olm_15-csv-viewer.rbac.yaml
-      - file: 0000_50_olm_99-operatorstatus.yaml
-      - file: 0000_90_olm_00-service-monitor.yaml
-      - file: 0000_90_olm_01-prometheus-rule.yaml
       - file: image-references
       - file: kustomization.yaml
       - file: release-aarch64.json

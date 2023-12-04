@@ -52,10 +52,10 @@ spec:
           args:
             - '--namespace'
             - openshift-marketplace
-            - --configmapServerImage=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:a5cdd220ac2eb4c619c64687f284819f29e00c99e211530659d2a1baa29d0719
-            - --opmImage=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:a5cdd220ac2eb4c619c64687f284819f29e00c99e211530659d2a1baa29d0719
+            - --configmapServerImage=quay.io/operator-framework/configmap-operator-registry:latest
+            - --opmImage=quay.io/operator-framework/configmap-operator-registry:latest
             - --util-image
-            - quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:357d66fc39efbb970a697bcf7777b766f9af1762818350c35dd07bc3ed924870
+            - quay.io/operator-framework/olm@sha256:de396b540b82219812061d0d753440d5655250c621c753ed1dc67d6154741607
             - --writeStatusName
             - operator-lifecycle-manager-catalog
             - --tls-cert
@@ -65,7 +65,7 @@ spec:
             - --client-ca
             - /profile-collector-cert/tls.crt
             - --set-workload-user-id=false
-          image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:357d66fc39efbb970a697bcf7777b766f9af1762818350c35dd07bc3ed924870
+          image: quay.io/operator-framework/olm@sha256:de396b540b82219812061d0d753440d5655250c621c753ed1dc67d6154741607
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8443

@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: catalog-operator
+  name: olm-operator
   namespace: openshift-operator-lifecycle-manager
   labels:
-    app: catalog-operator
+    app: olm-operator
   annotations:
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
@@ -14,11 +14,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: catalog-operator
+      app: olm-operator
   template:
     metadata:
       labels:
-        app: catalog-operator
+        app: olm-operator
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
     spec:
@@ -30,12 +30,12 @@ spec:
       volumes:
         - name: srv-cert
           secret:
-            secretName: catalog-operator-serving-cert
+            secretName: olm-operator-serving-cert
         - name: profile-collector-cert
           secret:
             secretName: pprof-cert
       containers:
-        - name: catalog-operator
+        - name: olm-operator
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -48,24 +48,19 @@ spec:
               mountPath: "/profile-collector-cert"
               readOnly: true
           command:
-            - /bin/catalog
+            - /bin/olm
           args:
-            - '--namespace'
-            - openshift-marketplace
-            - --configmapServerImage=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7a35f0f65d0f969d6e397e399d49f2bccefafd506d0af9ad128c68bad03cf6e9
-            - --opmImage=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7a35f0f65d0f969d6e397e399d49f2bccefafd506d0af9ad128c68bad03cf6e9
-            - --util-image
-            - quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6b8caafd322ff365a8982186c886aedf16b77cb4e0ea80a76027903394798c31
-            - --writeStatusName
-            - operator-lifecycle-manager-catalog
+            - --namespace
+            - $(OPERATOR_NAMESPACE)
             - --tls-cert
             - /srv-cert/tls.crt
             - --tls-key
             - /srv-cert/tls.key
             - --client-ca
             - /profile-collector-cert/tls.crt
-            - --set-workload-user-id=false
-          image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6b8caafd322ff365a8982186c886aedf16b77cb4e0ea80a76027903394798c31
+            - --protectedCopiedCSVNamespaces
+            - openshift
+          image: quay.io/operator-framework/olm@sha256:de396b540b82219812061d0d753440d5655250c621c753ed1dc67d6154741607
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8443
@@ -81,13 +76,19 @@ spec:
               port: 8443
               scheme: HTTPS
           terminationMessagePolicy: FallbackToLogsOnError
+          env:
+            - name: OPERATOR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPERATOR_NAME
+              value: olm-operator
+            - name: RELEASE_VERSION
+              value: "0.0.1-snapshot"
           resources:
             requests:
               cpu: 10m
-              memory: 80Mi
-          env:
-            - name: RELEASE_VERSION
-              value: "0.0.1-snapshot"
+              memory: 160Mi
       nodeSelector:
         kubernetes.io/os: linux
         node-role.kubernetes.io/master: ""
