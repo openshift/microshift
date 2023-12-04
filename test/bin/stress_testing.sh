@@ -164,34 +164,36 @@ function post_check {
 
 # usage
 function help {
-  echo -e "USAGE: "
-  echo -e "       ${SCRIPT_NAME} -e CONDITION -v value [-i interface] [-h hostname [-u ssh_user] [-p ssh_port]]"
-  echo -e "       ${SCRIPT_NAME} -d CONDITION [-i interface] [-h hostname [-u ssh_user] [-p ssh_port]]"
-  echo -e "       ${SCRIPT_NAME} -g CONDITION [-i interface] [-h hostname [-u ssh_user] [-p ssh_port]]"
-  echo -e "       ${SCRIPT_NAME} --help\n"
-  echo -e "PARAMS:"
-  echo -e "       -e,     Enable condition"
-  echo -e "       -d,     Disable condition"
-  echo -e "       -g,     Returns the current real value for the condition"
-  echo -e "       -v,     Target value when enable a condition"
-  echo -e "       -i,     Network interface for network conditions, default one is set if ommited"
-  echo -e "       -h,     Hostname to perform action in a remote host"
-  echo -e "       -u,     ssh user to perform action in a remote host"
-  echo -e "       -p,     ssh port to perform in a remote host"
-  echo -e "       -k,     ssh private key path"
-  echo -e "       --help, Shows this help\n"
-  echo -e "CONDITION: { cpu | memory | disk | bandwidth | packet_loss | latency }"
-  echo -e "        cpu: limit the usage cpu % to the value"
-  echo -e "        memory: limit the available memory to the value"
-  echo -e "        disk: limit the free space to the value"
-  echo -e "        bandwidth: limit the max download and upload bandwidth to the value in Kbps"
-  echo -e "        packet_loss: set packet loss % to the value"
-  echo -e "        latency: limit minimun latency to the value in ms\n"
-  echo -e "EXAMPLE: "
-  echo -e "        ${SCRIPT_NAME} --help"
-  echo -e "        ${SCRIPT_NAME} --e latency 100 -h 192.168.1.1 -u root -p 22 -k ~/key.pem"
-  echo -e "        ${SCRIPT_NAME} --d latency -h 192.168.1.1 -u root -p 22 -k ~/key.pem"
-  echo -e "        ${SCRIPT_NAME} --g latency"
+  cat - <<EOF
+USAGE: 
+    ${SCRIPT_NAME} -e CONDITION -v value [-i interface] [-h hostname [-u ssh_user] [-p ssh_port]]
+    ${SCRIPT_NAME} -d CONDITION [-i interface] [-h hostname [-u ssh_user] [-p ssh_port]]
+    ${SCRIPT_NAME} -g CONDITION [-i interface] [-h hostname [-u ssh_user] [-p ssh_port]]
+    ${SCRIPT_NAME} --help\n
+PARAMS:
+    -e,     Enable condition
+    -d,     Disable condition
+    -g,     Returns the current real value for the condition
+    -v,     Target value when enable a condition
+    -i,     Network interface for network conditions, default one is set if ommited
+    -h,     Hostname to perform action in a remote host
+    -u,     ssh user to perform action in a remote host
+    -p,     ssh port to perform in a remote host
+    -k,     ssh private key path
+    --help, Shows this help\n
+CONDITION: { cpu | memory | disk | bandwidth | packet_loss | latency }
+    cpu: limit the usage cpu % to the value
+    memory: limit the available memory to the value
+    disk: limit the free space to the value
+    bandwidth: limit the max download and upload bandwidth to the value in Kbps
+    packet_loss: set packet loss % to the value
+    latency: limit minimun latency to the value in ms\n
+EXAMPLE: 
+    ${SCRIPT_NAME} --help
+    ${SCRIPT_NAME} --e latency 100 -h 192.168.1.1 -u root -p 22 -k ~/key.pem
+    ${SCRIPT_NAME} --d latency -h 192.168.1.1 -u root -p 22 -k ~/key.pem
+    ${SCRIPT_NAME} --g latency
+EOF
 }
 
 pre_check "$@"
