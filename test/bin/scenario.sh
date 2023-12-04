@@ -559,7 +559,7 @@ stress_testing() {
 
     local -r ssh_host="$(get_vm_property "${vmname}" public_ip)"
     local -r ssh_user=redhat
-    local -r ssh_port="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/ssh_port"
+    local -r ssh_port="$(get_vm_property "${vmname}" ssh_port)"
     local -r ssh_pkey="${SSH_PRIVATE_KEY:-}"
     
     if [ "${action}" == "enable" ]; then
