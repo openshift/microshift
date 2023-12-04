@@ -14,7 +14,7 @@ OUTDIR="${ROOTDIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [-s name-value] [test suite files]
+${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [-s name=value] [test suite files]
 
 Options:
 
@@ -23,7 +23,7 @@ Options:
   -o DIR             The output directory. (${OUTDIR})
   -v DIR             The venv directory. (${RF_VENV})
   -i PATH            The variables file. (${RF_VARIABLES})
-  -s NAME-VALUE      To enable an stress condition.
+  -s NAME=VALUE      To enable an stress condition.
 EOF
 }
 
@@ -79,8 +79,8 @@ fi
 
 # enable stress condition
 if [ "${STRESS_TESTING:-}" ]; then
-    CONDITION="${STRESS_TESTING%-*}"
-    VALUE="${STRESS_TESTING#*-}"
+    CONDITION="${STRESS_TESTING%=*}"
+    VALUE="${STRESS_TESTING#*=}"
 
     SSH_HOST=$("${YQ_BINARY}" '.USHIFT_HOST' "${SCRIPTDIR}"/rf_variables.yaml)
     SSH_USER=$("${YQ_BINARY}" '.USHIFT_USER' "${SCRIPTDIR}"/rf_variables.yaml)
