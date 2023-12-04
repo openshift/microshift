@@ -56,16 +56,18 @@ while getopts "hno:v:i:s:" opt; do
 done
 shift $((OPTIND-1))
 
-RF_BINARY="${RF_VENV}/bin/robot"
-
 if [ ! -f "${RF_VARIABLES}" ]; then
     echo "Please create or provide a variables file at ${RF_VARIABLES}" 1>&2
     echo "See ${SCRIPTDIR}/variables.yaml.example for the expected content." 1>&2
     exit 1
 fi
 
+DEST_DIR="${RF_VENV}" 
 "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 "${ROOTDIR}/scripts/fetch_tools.sh" yq
+
+RF_BINARY="${RF_VENV}/bin/robot"
+YQ_BINARY="${RF_VENV}/bin/yq"
 
 cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
 
@@ -80,10 +82,10 @@ if [ "${STRESS_TESTING:-}" ]; then
     CONDITION="${STRESS_TESTING%-*}"
     VALUE="${STRESS_TESTING#*-}"
 
-    SSH_HOST=$(yq '.USHIFT_HOST' "${SCRIPTDIR}"/rf_variables.yaml)
-    SSH_USER=$(yq '.USHIFT_USER' "${SCRIPTDIR}"/rf_variables.yaml)
-    SSH_PORT=$(yq '.SSH_PORT' "${SCRIPTDIR}"/rf_variables.yaml)
-    SSH_PKEY=$(yq '.SSH_PRIV_KEY' "${SCRIPTDIR}"/rf_variables.yaml)
+    SSH_HOST=$("${YQ_BINARY}" '.USHIFT_HOST' "${SCRIPTDIR}"/rf_variables.yaml)
+    SSH_USER=$("${YQ_BINARY}" '.USHIFT_USER' "${SCRIPTDIR}"/rf_variables.yaml)
+    SSH_PORT=$("${YQ_BINARY}" '.SSH_PORT' "${SCRIPTDIR}"/rf_variables.yaml)
+    SSH_PKEY=$("${YQ_BINARY}" '.SSH_PRIV_KEY' "${SCRIPTDIR}"/rf_variables.yaml)
 
     "${SCRIPTDIR}"/bin/stress_testing.sh -e "${CONDITION}" -v "${VALUE}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi
