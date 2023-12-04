@@ -125,21 +125,11 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		return fmt.Errorf("configuration failed: %w", s.configErr)
 	}
 
-	// run readiness check
-	go func() {
-		healthcheckStatus := util.RetryTCPConnection(ctx, "localhost", "8445")
-		if !healthcheckStatus {
-			klog.Fatalf("initial healthcheck on %s failed", s.Name())
-		}
-		klog.Infof("%s is ready", s.Name())
-		close(ready)
-	}()
-
 	if err := assets.ApplyNamespaces(ctx, []string{
 		"controllers/route-controller-manager/route-controller-manager-ns.yaml",
 		"controllers/route-controller-manager/ns.yaml",
 	}, s.kubeadmconfig); err != nil {
-		klog.Fatalf("failed to apply openshift namespaces %v", err)
+		return fmt.Errorf("failed to apply openshift namespaces: %w", err)
 	}
 	if err := assets.ApplyClusterRoles(ctx, []string{
 		"controllers/route-controller-manager/informer-clusterrole.yaml",
@@ -147,7 +137,7 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		"controllers/route-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrole.yaml",
 		"controllers/route-controller-manager/route-controller-manager-clusterrole.yaml",
 	}, s.kubeadmconfig); err != nil {
-		klog.Fatalf("failed to apply route controller manager cluster roles %v", err)
+		return fmt.Errorf("failed to apply route controller manager cluster roles: %w", err)
 	}
 
 	if err := assets.ApplyClusterRoleBindings(ctx, []string{
@@ -156,28 +146,50 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		"controllers/route-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrolebinding.yaml",
 		"controllers/route-controller-manager/route-controller-manager-clusterrolebinding.yaml",
 	}, s.kubeadmconfig); err != nil {
-		klog.Fatalf("failed to apply route controller manager cluster role bindings %v", err)
+		return fmt.Errorf("failed to apply route controller manager cluster role bindings: %w", err)
 	}
 
 	if err := assets.ApplyRoles(ctx, []string{
 		"controllers/route-controller-manager/route-controller-manager-separate-sa-role.yaml",
 	}, s.kubeadmconfig); err != nil {
-		klog.Fatalf("failed to apply route controller manager roles %v", err)
+		return fmt.Errorf("failed to apply route controller manager roles: %w", err)
 	}
 
 	if err := assets.ApplyRoleBindings(ctx, []string{
 		"controllers/route-controller-manager/route-controller-manager-authentication-reader-rolebinding.yaml",
 		"controllers/route-controller-manager/route-controller-manager-separate-sa-rolebinding.yaml",
 	}, s.kubeadmconfig); err != nil {
-		klog.Fatalf("failed to apply route controller manager role bindings %v", err)
+		return fmt.Errorf("failed to apply route controller manager role bindings: %w", err)
 	}
 
 	if err := assets.ApplyServiceAccounts(ctx, []string{
 		"controllers/route-controller-manager/route-controller-manager-sa.yaml",
 		"controllers/route-controller-manager/sa.yaml",
 	}, s.kubeadmconfig); err != nil {
-		klog.Fatalf("failed to apply route controller manager service account %v", err)
+		return fmt.Errorf("failed to apply route controller manager service account: %w", err)
 	}
 
-	return s.run(ctx)
+	// Run healthcheck probe and controller in parallel.
+	// No matter which ends first - if it ends with an error,
+	// it'll cause ServiceManager to trigger graceful shutdown.
+
+	errc := make(chan error)
+
+	go func() {
+		healthcheckStatus := util.RetryTCPConnection(ctx, "localhost", "8445")
+		if !healthcheckStatus {
+			e := fmt.Errorf("initial healthcheck on %s failed", s.Name())
+			klog.Error(e)
+			errc <- e
+			return
+		}
+		klog.Infof("%s is ready", s.Name())
+		close(ready)
+	}()
+
+	go func() {
+		errc <- s.run(ctx)
+	}()
+
+	return <-errc
 }

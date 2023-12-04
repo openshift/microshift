@@ -23,9 +23,9 @@ Login MicroShift Host
     # login to the host. Otherwise assume that the ssh agent is running
     # and configured properly.
     IF    '${SSH_PRIV_KEY}'
-        SSHLibrary.Login With Public Key    ${USHIFT_USER}    ${SSH_PRIV_KEY}
+        SSHLibrary.Login With Public Key    ${USHIFT_USER}    ${SSH_PRIV_KEY}    keep_alive_interval=30
     ELSE
-        SSHLibrary.Login    ${USHIFT_USER}    allow_agent=True
+        SSHLibrary.Login    ${USHIFT_USER}    allow_agent=True    keep_alive_interval=30
     END
 
 Logout MicroShift Host

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"syscall"
+	"time"
 
 	"github.com/openshift/microshift/pkg/util/sigchannel"
 	"k8s.io/klog/v2"
@@ -76,6 +77,9 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 		select {
 		case <-sigchannel.And(depsReadyList):
 		case <-ctx.Done():
+			// Wait for all services to stop before returning
+			// so MicroShift doesn't quit abruptly
+			<-sigchannel.And(values(stoppedMap))
 			return ctx.Err()
 		}
 
@@ -113,14 +117,24 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 				}
 			}()
 
-			klog.Infof("Starting %s", service.Name())
+			klog.InfoS("SERVICE STARTING", "service", service.Name())
+			svcStart := time.Now()
+			go func() {
+				<-ready
+				klog.InfoS("SERVICE READY", "service", service.Name(), "since-start", time.Since(svcStart))
+			}()
+			go func() {
+				<-stopped
+				klog.InfoS("SERVICE STOPPED", "service", service.Name(), "since-start", time.Since(svcStart))
+			}()
+
 			if err := service.Run(ctx, ready, stopped); err != nil && !errors.Is(err, context.Canceled) {
-				klog.Errorf("service %s exited with error: %s, stopping MicroShift", service.Name(), err)
+				klog.ErrorS(err, "SERVICE FAILED - stopping MicroShift", "service", service.Name(), "since-start", time.Since(svcStart))
 				if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
 					klog.Warningf("error killing process: %v", err)
 				}
 			} else {
-				klog.Infof("%s completed", service.Name())
+				klog.InfoS("SERVICE COMPLETED", "service", service.Name(), "since-start", time.Since(svcStart))
 			}
 		}()
 	})

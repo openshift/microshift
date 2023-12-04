@@ -33,8 +33,8 @@ Should Find Etcd Is Ready
     Pattern Should Appear In Log Output    ${CURSOR}    etcd is ready
 
 Should Find MicroShift Is Ready
-    [Documentation]    Logs should say "microshift is ready"
-    Pattern Should Appear In Log Output    ${CURSOR}    microshift is ready
+    [Documentation]    Logs should say "MICROSHIFT READY"
+    Pattern Should Appear In Log Output    ${CURSOR}    MICROSHIFT READY
 
 
 *** Keywords ***
