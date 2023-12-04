@@ -39,6 +39,12 @@ bash -x ./bin/manage_hypervisor_config.sh create
 # repository.
 bash -x ./bin/start_webserver.sh
 
+# Setup a container registry and mirror images.
+if [ -f "${MIRROR_CONTAINERS_LIST}" ]; then
+    export ENABLE_MIRROR=true
+    bash -x ./bin/mirror_registry.sh
+fi
+
 # Show the summary of the output of the parallel jobs.
 if [ -t 0 ]; then
     progress="--progress"
