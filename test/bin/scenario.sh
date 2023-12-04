@@ -205,7 +205,7 @@ prepare_kickstart() {
         mirror_cert_content=$(awk '{printf "%s\\n", $0}' "${cert}")
         sed -i \
           -e "s|REPLACE_MIRROR_CERTIFICATE|${mirror_cert_content}|g" \
-          -e "s|REPLACE_HOSTNAME|${hostname}|g" \
+          -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
           "${output_file}"
     fi
     record_junit "${vmname}" "prepare_kickstart" "OK"
