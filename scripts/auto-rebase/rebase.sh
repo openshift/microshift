@@ -923,32 +923,87 @@ checkout_rebase_branch() {
 
 update_olm_images() {
     title "Rebasing operator-lifecycle-manager manifests"
+
+    # Replace hardcoded image refs with variables. Variables will be provided via kustomize's patches (added to `env`).
+    # Expr with --util-image finds line with --util-image and edits the line after.
+    sed -i \
+        -e 's,--configmapServerImage=.*$,--configmapServerImage=$(OPERATOR_REGISTRY_IMAGE),g' \
+        -e 's,--opmImage=.*$,--opmImage=$(OPERATOR_REGISTRY_IMAGE),g' \
+        -e '/--util-image/{n;s,-.*,- \$\(OLM_IMAGE\),;}' \
+        "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_08-catalog-operator.deployment.yaml"
+
     for goarch in amd64 arm64; do
+        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
+
         # Get the images for the OLM operator from ${STAGING_DIR}/release_${arch}.json:
         # - operator-lifecycle-manager
         # - operator-registry
         # - kube-rbac-proxy
-        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
-        base_release=$(jq -r ".metadata.version" "${STAGING_DIR}/release_${goarch}.json")
+        local release_file="${STAGING_DIR}/release_${goarch}.json"
+        local olm_image_refs_file="${REPOROOT}/assets/optional/operator-lifecycle-manager/image-references"
+        local kustomization_arch_file="${REPOROOT}/assets/optional/operator-lifecycle-manager/kustomization.${arch}.yaml"
+        local olm_release_json="${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json"
 
         # Create the OLM release-${arch}.json file, this is the file included on the RPM.
-        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json"
-        
+        local base_release
+        base_release=$(jq -r ".metadata.version" "${release_file}")
+        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${olm_release_json}"
+
+        # Create extra kustomization for each arch in separate file.
+        # Right file (depending on arch) should be appended during rpmbuild to kustomization.yaml.
+        cat <<EOF > "${kustomization_arch_file}"
+
+images:
+EOF
+
         # Read from the global release file, to find the images we need to use.
-        release_file="${STAGING_DIR}/release_${goarch}.json"
-        containers=$(yq -r '.spec.tags[].name' "${REPOROOT}/assets/optional/operator-lifecycle-manager/image-references")
+        local containers=$(yq -r '.spec.tags[].name' "${olm_image_refs_file}")
         for container in ${containers[@]}; do
-            # Get the images we need to use.
-            image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
-            # Now get the image we need to replace.
-            image_to_replace=$(yq -r ".spec.tags[] | select(.name == \"${container}\") | .from.name" "${REPOROOT}/assets/optional/operator-lifecycle-manager/image-references")
-            # Replace the images in the manifests.
-            sed -i "s|${image_to_replace}|${image}|g" ${REPOROOT}/assets/optional/operator-lifecycle-manager/*.${arch}.yaml
-            # Append a new container and image to the release-${arch}.json file.
-            jq ".images += {\"${container}\": \"${image}\"}" "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json" > "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json.tmp"
-            mv "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json.tmp" "${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json" 
-        done
-    done
+            # Get image (registry.com/image) without the tag or digest that is present in OLM's yamls and image-references.
+            local orig_image_name
+            orig_image_name=$(yq -r ".spec.tags[] | select(.name == \"${container}\") | .from.name" "${olm_image_refs_file}" | awk -F '[@:]' '{ print $1; }')
+
+            # Get name and digest to replace OLM's image
+            local new_image
+            new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
+            local new_image_name="${new_image%@*}"
+            local new_image_digest="${new_image#*@}"
+
+            cat <<EOF >> "${kustomization_arch_file}"
+  - name: ${orig_image_name}
+    newName: ${new_image_name}
+    digest: ${new_image_digest}
+EOF
+
+            yq -i -o json ".images += {\"${container}\": \"${new_image}\"}" "${olm_release_json}"
+        done  # for container
+
+        # kustomize's `images` transformer does not replace image refs outside `image: ` fields.
+        # Following builds a patch to add required images as envs to be used with sed expressions executed above.
+        local olm_image
+        olm_image=$(jq -r '.references.spec.tags[] | select(.name == "operator-lifecycle-manager") | .from.name' "${release_file}")
+        local registry_image
+        registry_image=$(jq -r '.references.spec.tags[] | select(.name == "operator-registry") | .from.name' "${release_file}")
+
+        cat << EOF >> "${kustomization_arch_file}"
+
+patches:
+  - patch: |-
+     - op: add
+       path: /spec/template/spec/containers/0/env/-
+       value:
+         name: OPERATOR_REGISTRY_IMAGE 
+         value: ${registry_image}
+     - op: add
+       path: /spec/template/spec/containers/0/env/-
+       value:
+         name: OLM_IMAGE 
+         value: ${olm_image}
+    target:
+      kind: Deployment
+      labelSelector: app=catalog-operator
+EOF
+    done  # for goarch
 }
 
 # Runs each OCP rebase step in sequence, commiting the step's output to git

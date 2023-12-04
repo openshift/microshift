@@ -258,17 +258,15 @@ install -p -m755 packaging/greenboot/microshift-pre-rollback.sh %{buildroot}%{_s
 # OLM manifests
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 # Copy all the OLM manifests except the arch specific ones
-install -p -m644 assets/optional/operator-lifecycle-manager/* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
+install -p -m644 assets/optional/operator-lifecycle-manager/0000* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
+install -p -m644 assets/optional/operator-lifecycle-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 
-# Copy the arch specific OLM manifests, rename them to remove the arch suffix
 %ifarch %{arm} aarch64
-rename ".aarch64.yaml" ".yaml" %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
-find %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm -name "*x86_64*.yaml" -delete
+cat assets/optional/operator-lifecycle-manager/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
 %endif
 
 %ifarch x86_64
-rename ".x86_64.yaml" ".yaml" %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
-find %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm -name "*aarch64*.yaml" -delete
+cat assets/optional/operator-lifecycle-manager/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
 %endif
 
 %pre networking
@@ -375,6 +373,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Dec 04 2023 Patryk Matuszak <305846+pmtk@users.noreply.github.com> 4.15.0
+- Change way of assembling microshift-olm RPM
+
 * Tue Nov 28 2023 Joaquim Moreno Prusi <joaquim@redhat.com> 4.15.0
 - Extend microshift.spec to build microshift-olm rpm
 
