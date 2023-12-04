@@ -550,7 +550,17 @@ next_minor_version() {
     echo $(( $(current_minor_version) + 1 ))
 }
 
-# Enable/Disable Stress Condition
+# Public function to enable or disable a Stress Condition
+#
+# Enables or disables a Condition to limit a resource
+# at OS level limiting resources (latency, bandwidth, packet loss, memory, disk...)
+# to a given value for development and testing purposes.
+#
+# Arguments
+#  vmname -- The short name of the VM in the scenario (e.g., "host1")
+#  action -- "enable" or "disable"
+#  condition -- The name of the resource to be be limited
+#  value  -- The target value for the Stress Condition
 stress_testing() {
     local -r vmname="${1}"
     local -r action="${2}"
