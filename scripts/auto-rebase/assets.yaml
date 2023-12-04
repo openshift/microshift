@@ -237,6 +237,10 @@ assets:
       - file: 0000_50_olm_15-csv-viewer.rbac.yaml
       - file: image-references
       - file: kustomization.yaml
+      - file: kustomization.x86_64.yaml
+        ignore: "gets generated during image rebase"
+      - file: kustomization.aarch64.yaml
+        ignore: "gets generated during image rebase"
       - file: release-aarch64.json
         ignore: "gets generated during image rebase"
       - file: release-x86_64.json
