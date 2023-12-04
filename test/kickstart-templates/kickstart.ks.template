@@ -62,7 +62,7 @@ if REPLACE_ENABLE_MIRROR; then
     cat > /etc/containers/registries.conf.d/999-microshift-mirror.conf <<EOF
 [[registry]]
     prefix = ""
-    location = "REPLACE_HOSTNAME:8443"
+    location = "REPLACE_MIRROR_HOSTNAME:8443"
     mirror-by-digest-only = true
 
 [[registry]]
@@ -70,21 +70,21 @@ if REPLACE_ENABLE_MIRROR; then
     location = "quay.io"
     mirror-by-digest-only = true
 [[registry.mirror]]
-    location = "REPLACE_HOSTNAME:8443"
+    location = "REPLACE_MIRROR_HOSTNAME:8443"
 
 [[registry]]
     prefix = ""
     location = "registry.redhat.io"
     mirror-by-digest-only = true
 [[registry.mirror]]
-    location = "REPLACE_HOSTNAME:8443"
+    location = "REPLACE_MIRROR_HOSTNAME:8443"
 
 [[registry]]
     prefix = ""
     location = "registry.access.redhat.com"
     mirror-by-digest-only = true
 [[registry.mirror]]
-    location = "REPLACE_HOSTNAME:8443"
+    location = "REPLACE_MIRROR_HOSTNAME:8443"
 EOF
 
     # Skip signature verifying for red hat registries, since the signatures are bound the original
@@ -110,7 +110,7 @@ EOF
     cat > /etc/pki/ca-trust/source/anchors/mirror-registry.pem <<EOF
 REPLACE_MIRROR_CERTIFICATE
 EOF
-    sudo update-ca-trust
+    update-ca-trust
 fi
 
 # The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD

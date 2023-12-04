@@ -21,12 +21,12 @@ prereqs() {
 }
 
 setup_registry() {
-    cd "${REGISTRY_ROOT}"
+    pushd "${REGISTRY_ROOT}" &>/dev/null
     ./mirror-registry install -r "${REGISTRY_ROOT}" --initUser microshift --initPassword microshift
     sudo cp "${REGISTRY_ROOT}/quay-rootCA/rootCA.pem" /etc/pki/ca-trust/source/anchors/mirror-registry.pem
     sudo update-ca-trust
     podman login -u microshift -p microshift "${REGISTRY_HOST}" --authfile "${REGISTRY_ROOT}/local-auth.json"
-    cd -
+    popd &>/dev/null
 }
 
 mirror_images() {
@@ -34,7 +34,7 @@ mirror_images() {
     "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --dir-to-reg "${REGISTRY_ROOT}/local-auth.json" "${REGISTRY_CONTAINERS}" "${REGISTRY_HOST}"
     jq -s '.[0] * .[1]' "${PULL_SECRET}" "${REGISTRY_ROOT}/local-auth.json" > "${PULL_SECRET}.tmp"
     mv "${PULL_SECRET}.tmp" "${PULL_SECRET}"
-    rm -r "${REGISTRY_CONTAINERS}"
+    rm -rf "${REGISTRY_CONTAINERS}"
 }
 
 prereqs
