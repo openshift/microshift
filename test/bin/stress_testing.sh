@@ -190,9 +190,9 @@ CONDITION: { cpu | memory | disk | bandwidth | packet_loss | latency }
     latency: limit minimun latency to the value in ms\n
 EXAMPLE: 
     ${SCRIPT_NAME} --help
-    ${SCRIPT_NAME} --e latency 100 -h 192.168.1.1 -u root -p 22 -k ~/key.pem
-    ${SCRIPT_NAME} --d latency -h 192.168.1.1 -u root -p 22 -k ~/key.pem
-    ${SCRIPT_NAME} --g latency
+    ${SCRIPT_NAME} -e latency 100 -h 192.168.1.1 -u root -p 22 -k ~/key.pem
+    ${SCRIPT_NAME} -d latency -h 192.168.1.1 -u root -p 22 -k ~/key.pem
+    ${SCRIPT_NAME} -g latency
 EOF
 }
 
