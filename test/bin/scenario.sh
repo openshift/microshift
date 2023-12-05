@@ -662,7 +662,7 @@ EOF
     # shellcheck disable=SC2086
     "${rf_binary}" \
         --name "${SCENARIO}" \
-        --randomize "${TEST_RANDOMIZATION}" \
+        --randomize "${TEST_RANDOMIZATION}":7664814770562402535 \
         --loglevel TRACE \
         --outputdir "${SCENARIO_INFO_DIR}/${SCENARIO}" \
         --debugfile "${SCENARIO_INFO_DIR}/${SCENARIO}/rf-debug.log" \
