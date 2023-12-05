@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -120,6 +121,12 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	defer func() {
 		klog.Info("stopping microshift-etcd")
 		cmd := exec.Command("systemctl", "stop", "microshift-etcd.scope", "--no-block")
+		// Run cmd in its own process group to avoid getting signals preventing command
+		// from running to completion and not stopping the etcd.
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Setpgid: true,
+			Pgid:    0,
+		}
 
 		if out, err := cmd.CombinedOutput(); err != nil {
 			klog.ErrorS(err, "failed to stop microshift-etcd", "output", string(out))
