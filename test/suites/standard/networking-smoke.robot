@@ -45,7 +45,7 @@ Ingress Smoke Test
     ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift
     ...    Create Hello MicroShift Ingress
-
+    sleep    1d
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}    path="/principal"
 
