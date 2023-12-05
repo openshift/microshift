@@ -322,6 +322,26 @@ MICROSHIFT_HOST=microshift-dev
 mkdir -p _output/test-images
 scp -r microshift@${MICROSHIFT_HOST}:microshift/_output/test-images/ _output/
 ```
+#### Mirroring the container registry
+In order to avoid possible disruptions from external sources such as container
+registries, there is an option to mirror the registry locally for all the
+images MicroShift requires.
+
+`ENABLE_REGISTRY_MIRROR` -- Boolean value controlling whether there will be a
+local mirror for all MicroShift container images configured in the hypervisor.
+
+The registry will contain all images extracted from previously built MicroShift
+RPMs in the `build` phase (taken from `microshift-release-info`).
+A quay mirror is configured in the hypervisor, all images are downloaded from
+their original registry and pushed into the new one. Each of the scenarios
+will inject the mirror's configuration automatically. Access to the mirror
+uses credentials and TLS.
+
+This is enabled by default in `./test/bin/ci_phase_iso_boot.sh`, as it makes
+pipelines more robust.
+It is disabled by default in each of the scenarios to ease development cycle.
+It is uncommon to run the full `./test/bin/ci_phase_iso_boot.sh` outside of
+CI as it requires a powerful machine.
 
 #### Global Settings
 
