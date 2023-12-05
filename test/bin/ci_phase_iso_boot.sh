@@ -43,8 +43,12 @@ bash -x ./bin/start_webserver.sh
 
 # Setup a container registry and mirror images.
 if ${ENABLE_REGISTRY_MIRROR}; then
-    export ENABLE_REGISTRY_MIRROR
-    bash -x ./bin/mirror_registry.sh
+    # Quay mirror does not provide an arm binary, temporarily run
+    # on x86 only.
+    if [ "$(uname -m)" == "x86_64" ]; then
+        export ENABLE_REGISTRY_MIRROR
+        bash -x ./bin/mirror_registry.sh
+    fi
 fi
 
 # Show the summary of the output of the parallel jobs.
