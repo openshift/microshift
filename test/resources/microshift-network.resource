@@ -53,6 +53,7 @@ Verify Hello MicroShift LB
     [Documentation]    Run Hello MicroShift Load Balancer verification
     Create Hello MicroShift Pod
     Expose Hello MicroShift Pod Via LB
+    Sleep    1d
     Wait Until Keyword Succeeds    30x    10s
     ...    Access Hello Microshift    ${LB_PORT}
 
