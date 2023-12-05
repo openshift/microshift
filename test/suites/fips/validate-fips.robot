@@ -48,9 +48,9 @@ Teardown
 
 Microshift Binary Should Dynamically Link FIPS Ossl Module
     [Documentation]    Check if Microshift binary is FIPS compliant.
-    ${stdout}    ${rc}=    Execute Command
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    LD_DEBUG_OUTPUT=${USHIFT_LIBS_DUMP_FILE} LD_DEBUG=libs microshift run
-    ...    sudo=False    return_rc=True    return_stdout=True
+    ...    sudo=False    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    1    ${rc}
     ${stdout}    ${rc}=    Execute Command
     ...    grep ${FIPS_PATTERN} ${USHIFT_LIBS_DUMP_FILE}*
@@ -61,6 +61,6 @@ Fips Should Be Enabled
     [Documentation]    Check if FIPS is enabled on RHEL.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    bash -x fips-mode-setup --check
-    ...    sudo=True    return_rc=True    return_stderr=True
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
     Should Match    ${stdout}    FIPS mode is enabled.
