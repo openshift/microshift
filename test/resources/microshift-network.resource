@@ -41,7 +41,7 @@ Access Hello Microshift
     ${url_path}=    Set Variable    "http://hello-microshift.cluster.local${path}"
 
     ${result}=    Run Process
-    ...    curl -i ${url_path} --connect-to ${connect_to}
+    ...    curl -vi ${url_path} --connect-to ${connect_to}
     ...    shell=True
     ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
