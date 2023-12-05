@@ -42,10 +42,11 @@ Load Balancer Smoke Test
 Ingress Smoke Test
     [Documentation]    Verify a simple ingress rule correctly exposes HTTP service
     [Setup]    Run Keywords
+    ...    Sleep    5m
     ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift
     ...    Create Hello MicroShift Ingress
-    Sleep    1d
+
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}    path="/principal"
 
