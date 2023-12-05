@@ -21,7 +21,7 @@ PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=900
-ENABLE_MIRROR=${ENABLE_MIRROR:-false}
+ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-false}
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
@@ -199,10 +199,15 @@ prepare_kickstart() {
               -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
               -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
               -e "s|REPLACE_FIPS_COMMAND|${fips_command}|g" \
-              -e "s|REPLACE_ENABLE_MIRROR|${ENABLE_MIRROR}|g" \
+              -e "s|REPLACE_ENABLE_MIRROR|${ENABLE_REGISTRY_MIRROR}|g" \
               > "${output_file}"
-    if [ "${ENABLE_MIRROR}" ]; then
-        mirror_cert_content=$(awk '{printf "%s\\n", $0}' "${cert}")
+    if ${ENABLE_REGISTRY_MIRROR}; then
+        if [ ! -f "${cert}" ]; then
+            error "No ${cert} was found. Did you run mirror_registry.sh?"
+            record_junit "${vmname}" "prepare_kickstart" "no-mirror-cert"
+            exit 1
+        fi
+        local -r mirror_cert_content=$(awk '{printf "%s\\n", $0}' "${cert}")
         sed -i \
           -e "s|REPLACE_MIRROR_CERTIFICATE|${mirror_cert_content}|g" \
           -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \

@@ -9,7 +9,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-ENABLE_MIRROR=${ENABLE_MIRROR:-true}
+ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-true}
 
 # Log output automatically
 LOGDIR="${ROOTDIR}/_output/ci-logs"
@@ -42,8 +42,8 @@ bash -x ./bin/manage_hypervisor_config.sh create
 bash -x ./bin/start_webserver.sh
 
 # Setup a container registry and mirror images.
-if [ "${ENABLE_MIRROR}" ]; then
-    export ENABLE_MIRROR
+if ${ENABLE_REGISTRY_MIRROR}; then
+    export ENABLE_REGISTRY_MIRROR
     bash -x ./bin/mirror_registry.sh
 fi
 
