@@ -1,0 +1,35 @@
+name = "microshift-${REPLACE_USHIFT_VERSION}-${REPLACE_USHIFT_ARCH}"
+description = "MicroShift ${REPLACE_USHIFT_VERSION} on ${REPLACE_USHIFT_ARCH} platform"
+version = "0.0.1"
+modules = []
+groups = []
+
+[[packages]]
+name = "microshift"
+version = "${REPLACE_USHIFT_VERSION}"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "${REPLACE_USHIFT_VERSION}"
+
+[[packages]]
+name = "microshift-networking"
+version = "${REPLACE_USHIFT_VERSION}"
+
+[[packages]]
+name = "microshift-selinux"
+version = "${REPLACE_USHIFT_VERSION}"
+
+[customizations.services]
+enabled = ["microshift"]
+
+[customizations.firewall]
+ports = ["22:tcp", "80:tcp", "443:tcp", "5353:udp", "6443:tcp", "30000-32767:tcp", "30000-32767:udp"]
+
+[customizations.firewall.services]
+enabled = ["mdns", "ssh", "http", "https"]
+
+[[customizations.firewall.zones]]
+name = "trusted"
+sources = ["10.42.0.0/16", "169.254.169.1"]
+

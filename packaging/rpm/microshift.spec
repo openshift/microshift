@@ -85,12 +85,15 @@ The microshift package provides an OpenShift Kubernetes distribution optimized f
 %package release-info
 Summary: Release information for MicroShift
 BuildArch: noarch
-Requires: microshift = %{version}
+BuildRequires: jq
+BuildRequires: gettext
 
 %description release-info
 The microshift-release package provides release information files for this
 release. These files contain the list of container image references used by
 MicroShift and can be used to embed those images into osbuilder blueprints.
+An example of such osbuilder blueprints for x86_64 and aarch64 platforms are
+also included in the package.
 
 
 %package selinux
@@ -168,8 +171,24 @@ cp ./_output/bin/${GOOS}_${GOARCH}/microshift-etcd ./_output/microshift-etcd
 
 # SELinux modules build
 
-cd packaging/selinux
-make
+make --directory packaging/selinux
+
+# osbuilder sample blueprints build
+function create_blueprint() {
+  local -r larch="$1"
+
+  REPLACE_USHIFT_VERSION="%{version}" \
+    REPLACE_USHIFT_ARCH="${larch}" \
+    envsubst < "packaging/blueprint/blueprint.toml.template" > "packaging/blueprint/blueprint-${larch}.toml"
+
+  jq -r \
+    '.images | .[] | ("[[containers]]\nsource = \"" + . + "\"\n")' \
+    "assets/release/release-${larch}.json" \
+    >> "packaging/blueprint/blueprint-${larch}.toml"
+}
+
+create_blueprint x86_64
+create_blueprint aarch64
 
 %install
 
@@ -212,6 +231,8 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d
 # release-info files
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/release/release*.json %{buildroot}%{_datadir}/microshift/release
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/blueprint
+install -p -m644 packaging/blueprint/blueprint*.toml %{buildroot}%{_datadir}/microshift/blueprint
 
 # spec validation files
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/spec
@@ -336,12 +357,19 @@ systemctl enable --now --quiet openvswitch || true
 %config(noreplace) %{_sysconfdir}/microshift/lvmd.yaml.default
 %config(noreplace) %{_sysconfdir}/microshift/ovn.yaml.default
 
+%dir %{_datadir}/microshift
+%dir %{_datadir}/microshift/spec
 %dir %{_prefix}/lib/microshift
 %dir %{_prefix}/lib/microshift/manifests
 %dir %{_prefix}/lib/microshift/manifests.d
 
 %files release-info
+%dir %{_datadir}/microshift
+%dir %{_datadir}/microshift/release
+%dir %{_datadir}/microshift/blueprint
+
 %{_datadir}/microshift/release/release*.json
+%{_datadir}/microshift/blueprint/blueprint*.toml
 
 %files selinux
 /var/run/kubelet
@@ -365,6 +393,9 @@ systemctl enable --now --quiet openvswitch || true
 %{_sysconfdir}/greenboot/check/required.d/40_microshift_running_check.sh
 %{_sysconfdir}/greenboot/red.d/40_microshift_pre_rollback.sh
 %{_datadir}/microshift/functions/greenboot.sh
+%dir %{_datadir}/microshift
+%dir %{_datadir}/microshift/functions
+
 
 %files olm
 %dir %{_prefix}/lib/microshift/manifests.d/001-microshift-olm
@@ -373,6 +404,11 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Dec 05 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
+- The microshift-release-info RPM is no longer required
+- The microshift-release-info RPM contains sample blueprints including container image references
+- Fix package uninstall logic to clean up all the directories created on installation
+
 * Mon Dec 04 2023 Patryk Matuszak <305846+pmtk@users.noreply.github.com> 4.15.0
 - Change way of assembling microshift-olm RPM
 
