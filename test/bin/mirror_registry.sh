@@ -39,6 +39,8 @@ setup_registry() {
     ./mirror-registry install -r "${REGISTRY_ROOT}" --initUser microshift --initPassword microshift
     sudo cp "${REGISTRY_ROOT}/quay-rootCA/rootCA.pem" /etc/pki/ca-trust/source/anchors/mirror-registry.pem
     sudo update-ca-trust
+    # The mirror does not allow anonymous access, therefore we need the user and password configured in the
+    # pull secrets.
     podman login -u microshift -p microshift "${REGISTRY_HOST}" --authfile "${REGISTRY_ROOT}/local-auth.json"
     popd &>/dev/null
 }
