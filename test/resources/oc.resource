@@ -20,6 +20,15 @@ Oc Get
 
     RETURN    ${yaml_data}
 
+Oc Get JsonPath
+    [Documentation]    Run 'oc get' for a specific instance of a type in a namespace
+    ...    with jsonpath provided. Returns output of the command without any parsing.
+    [Arguments]    ${type}    ${namespace}    ${resource}    ${jsonpath}
+
+    ${text}=    Run With Kubeconfig    oc get -n ${namespace} -o=jsonpath='{ ${jsonpath} }' ${type} ${resource}
+
+    RETURN    ${text}
+
 Oc Apply
     [Documentation]    Run 'oc apply' on a specific pod in the curret test namespace
     ...    Returns the command's combined STDOUT/STDER
