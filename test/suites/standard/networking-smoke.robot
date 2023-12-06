@@ -42,7 +42,6 @@ Load Balancer Smoke Test
 Ingress Smoke Test
     [Documentation]    Verify a simple ingress rule correctly exposes HTTP service
     [Setup]    Run Keywords
-    ...    Sleep    5m
     ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift
     ...    Create Hello MicroShift Ingress
@@ -84,6 +83,7 @@ Network APIs With Test Label Are Gone
 
 Create Hello MicroShift Ingress
     [Documentation]    Create ingress rule.
+    Sleep    5m
     Oc Create    -f ${HELLO_USHIFT_INGRESS} -n ${NAMESPACE}
 
 Delete Hello MicroShift Ingress
