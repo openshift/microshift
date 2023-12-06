@@ -1,7 +1,0 @@
-- cluster-kube-apiserver-operator embedded-component d52dbad1177fdb0d27077be5b6e8d9fe0d41b30e to 37fc6f91227f01076cbdc48e2b9965da10793862
-  - 4820379 2023-11-28T16:30:02+01:00 vendor: update
-  - 45af23e 2023-11-28T16:29:43+01:00 bump(library-go)
-
-- machine-config-operator embedded-component 612c6f6bfa3ca777f9f1e260596b801c3e66375f to 39fed68c8248640775a9de643e2d9985f8382f3d
-  - 25c14147 2023-10-13T10:44:01+00:00 Ensure gcp-routes hack for internalLB hairpin traffic works for SGW
-
