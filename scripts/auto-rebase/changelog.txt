@@ -85,8 +85,7 @@
   - 2d44a24 2023-11-28T02:20:53+00:00 Use unique name for hybrid overlay per node router static routes and policies
   - aeb9817 2023-11-28T02:12:36+00:00 Allow a node switching between OVN node and hybrid overlay node
 
-- kubernetes image-arm64 59b90bd188d5389527a81d17e5787877d8c5746b to 9f68be2cf5bfbad35ae98eec0531169e11877973
-  - 1d709af2b 2023-12-03T10:17:45+02:00 UPSTREAM: <carry>: advertise shared cpus for mixed cpus feature
+- kubernetes image-arm64 59b90bd188d5389527a81d17e5787877d8c5746b to 9698040e5c77dfcea40649cc73d1ae2ac98a0423
   - e0ac58a03 2023-11-22T16:18:16+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - 677fa23b0 2023-11-22T16:02:48+01:00 UPSTREAM: <drop>: manually resolve conflicts
   - bae2c6267 2023-11-15T16:48:52+00:00 Release commit for Kubernetes v1.28.4
