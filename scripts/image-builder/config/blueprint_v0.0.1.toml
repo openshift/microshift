@@ -16,6 +16,10 @@ name = "microshift-greenboot"
 version = "REPLACE_MICROSHIFT_VERSION"
 
 [[packages]]
+name = "microshift-olm"
+version = "REPLACE_MICROSHIFT_VERSION"
+
+[[packages]]
 name = "microshift-networking"
 version = "REPLACE_MICROSHIFT_VERSION"
 
