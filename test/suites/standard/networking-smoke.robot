@@ -83,7 +83,6 @@ Network APIs With Test Label Are Gone
 
 Create Hello MicroShift Ingress
     [Documentation]    Create ingress rule.
-    Sleep    5m
     Oc Create    -f ${HELLO_USHIFT_INGRESS} -n ${NAMESPACE}
 
 Delete Hello MicroShift Ingress
