@@ -304,7 +304,7 @@ rpm-podman:
 		--authfile $(PULLSECRET) \
 		--tag microshift-builder:$(RPM_BUILDER_IMAGE_TAG) - < ./packaging/images/Containerfile.rpm-builder ; \
 	podman run \
-		--rm -ti \
+		--rm -i \
 		--volume $$(pwd):/opt/microshift:z \
 		--volume $(GO_CACHE):/go/.cache:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
