@@ -1,8 +1,10 @@
 *** Settings ***
 Documentation       Keywords for testing the MicroShift network
 
-Resource            common.resource
+Library             Process
 Library             SSHLibrary
+Resource            oc.resource
+Resource            common.resource
 
 
 *** Variables ***
@@ -16,7 +18,7 @@ ${HTTP_PORT}        80
 Create Hello MicroShift Pod
     [Documentation]    Create a pod running the "hello microshift" application
     Oc Create    -f ${HELLO_USHIFT} -n ${NAMESPACE}
-    Oc Wait For    pods -l app=hello-microshift    condition\=Ready    timeout=300s
+    Labeled Pod Should Be Ready    app\=hello-microshift    timeout=120s
 
 Expose Hello MicroShift
     [Documentation]    Expose the "hello microshift" application via cluster ip service

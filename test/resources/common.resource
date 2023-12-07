@@ -52,11 +52,11 @@ Upload String To File    # robocop: disable=too-many-calls-in-keyword
     ${remote_tmp}=    Join Path    /tmp    ${rand}
     Put File    ${local_tmp}    ${remote_tmp}    mode=0644
     Remove File    ${local_tmp}
-    ${stdout}    ${rc}=    Execute Command
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    mv ${remote_tmp} ${remote_filename}
-    ...    sudo=True    return_rc=True
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
-    ${stdout}    ${rc}=    Execute Command
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    chown root:root ${remote_filename}
-    ...    sudo=True    return_rc=True
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}

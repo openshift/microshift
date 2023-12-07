@@ -203,6 +203,17 @@ get_robotframework() {
     fi
 }
 
+get_awscli() {
+    # Download AWS CLI
+    pushd "${WORK_DIR}" &>/dev/null
+
+    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "awscliv2.zip" && \
+        unzip -q awscliv2.zip
+    ./aws/install --update --install-dir "$(realpath "${DEST_DIR}/../awscli")" --bin-dir "${DEST_DIR}"
+
+    popd &>/dev/null
+}
+
 tool_getters=$(declare -F |  cut -d' ' -f3 | grep "get_" | sed 's/get_//g')
 
 usage() {

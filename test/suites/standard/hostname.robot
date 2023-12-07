@@ -21,7 +21,7 @@ Verify local name resolution
     [Documentation]    Verify correct name resolution through mDNS
     [Setup]    Configure New Hostname
 
-    Oc Wait For    deployment/router-default    condition\=Available    120s    ns=openshift-ingress
+    Named Deployment Should Be Available    router-default    timeout=120s    ns=openshift-ingress
     Oc Logs    namespace="openshift-ingress"    opts="deployment/router-default"
 
     [Teardown]    Restore Old Hostname

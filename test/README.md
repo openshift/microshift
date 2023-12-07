@@ -97,7 +97,7 @@ By default, all of the test suites will be run. To run a subset,
 specify the filenames as arguments on the command line.
 
 ```
-$ ./test/run.sh suites/show-config.robot
+$ ./test/run.sh suites/standard/show-config.robot
 ```
 
 > The test suite file names should be relative to the `test` directory.
@@ -112,13 +112,13 @@ files must also be specified explicitly in all of these cases.
 To run tests with names matching a pattern, use the `-t` option:
 
 ```
-$ ./test/run.sh -- -t '*No Mode*' suites/show-config.robot
+$ ./test/run.sh -- -t '*No Mode*' suites/standard/show-config.robot
 ```
 
 To run tests with specific tags, use the `-i` option:
 
 ```
-$ ./test/run.sh -- -i etcd suites/*.robot
+$ ./test/run.sh -- -i etcd suites/*/*.robot
 ```
 
 For more options, see the help output for the `robot` command.
@@ -158,25 +158,26 @@ rhsm = true
 ### Image Blueprints
 
 The image blueprints are independent of the test scenarios so that
-images can be reused. Be careful making changes to specific images in
-case the change affects the way the image is used in different
-scenarios. Be careful adding unnecessary new images, since each image
-takes time to build and may slow down the overall test job.
+images can be reused.
 
-Images are organized into "groups". Each group is built in order and
-all of the images in a group are built in parallel.
+Images are organized into "layers" that contain "groups".
 
-Add blueprints as TOML files in the appropriate group directory in the
-`./test/image-blueprints` directory, then add a short description of the
-image here for reference.
+Each layer has its designation:
+- `base` layer is a prerequisite for all the subsequent ones
+- `presubmit` layer contains images used in presubmit CI jobs
+- `periodic` layer contains images used in periodic CI jobs
 
-Blueprint | Group | Image Name | Purpose
---------- | ----- | ---------- | -------
-rhel92.toml | group1 | rhel-9.2 | A simple RHEL image without MicroShift.
-rhel92-microshift-previous-minor.toml | group2 | rhel-9.2-microshift-4.13 | A RHEL 9.2 image with the latest MicroShift from the previous y-stream installed and enabled.
-rhel92-source.toml | group2 | rhel-9.2-microshift-source | A RHEL 9.2 image with the RPMs built from source.
-rhel92-source-fake-next-minor.toml | group2 | rhel-9.2-microshift-4.15 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream.
-rhel92-source-fake-yplus2-minor.toml | group2 | rhel-9.2-microshift-4.16 | A RHEL 9.2 image with the RPMs built from source from the current PR but with the _version_ set to the current+2 y-stream.
+Layers are built one after the other. Each group in a given layer is built
+sequentially and all of the images in a group are built in parallel.
+
+New blueprints can be added as TOML files in the appropriate layer and
+group directories under `./test/image-blueprints`.
+
+> **Warning**
+> - Making changes to specific images may affect the way the image is used
+> in different scenarios.
+> - Each image takes time to build and adding unnecessary new images may
+> slow down the overall test job.
 
 #### Blueprint Customization
 
@@ -198,18 +199,16 @@ RENDER_CONTAINER_IMAGES="${SOURCE_VERSION}"
 
 #### Blueprint Naming
 
-Blueprint names must be globally unique, regardless of the group that
-contains the blueprint template.
+Blueprint names must be globally unique, regardless of the layer and group
+that contains the blueprint template.
 
 Blueprint names should clearly identify the combination of operating
 system and MicroShift versions. The convention is to put the operating
-system first, followed by `microshift`. For example,
-`rhel-9.2-microshift-4.13`.
+system first, followed by `microshift` (i.e `rhel-9.2-microshift-4.13`).
 
 Regardless of the branch, the blueprints using MicroShift built from
 the source PR should use `source` in the name to facilitate rebuilding
-only the source-based images. For example,
-`rhel-9.2-microshift-source`.
+only the source-based images (i.e `rhel-9.2-microshift-source`).
 
 To make it easy to include the right image in a test scenario, each
 blueprint produces an edge-commit image identified with a `ref` that
@@ -224,8 +223,8 @@ before the first dash (`-`) in the filename and then using that to find
 the blueprint **template** file, and ultimately the blueprint **name**.
 
 For example, `rhel92-microshift-source` has prefix `rhel92`. There is
-a blueprint template `./test/image-blueprints/group1/rhel92.toml` that
-contains the name `rhel-9.2`, so when the image for
+a blueprint template `./test/image-blueprints/layer1-base/group1/rhel92.toml`
+that contains the name `rhel-9.2`, so when the image for
 `rhel92-microshift-source` is built, the parent is configured as the
 `rhel-9.2` image.
 
@@ -239,7 +238,7 @@ example, to create an alias `rhel-9.2-microshift-source-aux` for
 `rhel-9.2-microshift-source`:
 
 ```
-$ cat ./test/image-blueprints/group2/rhel-9.2-microshift-source-aux.alias
+$ cat ./test/image-blueprints/layer2-presubmit/group1/rhel-9.2-microshift-source-aux.alias
 rhel-9.2-microshift-source
 ```
 
@@ -251,7 +250,7 @@ blueprint to base the image on. For example, to create a `rhel92.iso`
 file from the `rhel-9.2` blueprint:
 
 ```
-$ cat ./test/image-blueprints/group1/rhel92.image-installer
+$ cat ./test/image-blueprints/layer1-base/group1/rhel92.image-installer
 rhel-9.2
 ```
 
@@ -383,7 +382,7 @@ with the `create` argument and a scenario directory name as input.
 
 ```
 $ ./test/bin/scenario.sh create \
-      ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
+      ./test/scenarios/el92-src@standard-suite.sh
 ```
 
 #### Enabling Connections to VMs
@@ -415,7 +414,7 @@ the scenario.
 ```
 $ ./scripts/fetch_tools.sh robotframework
 $ ./test/bin/scenario.sh run \
-      ./test/scenarios/rhel-9.2-microshift-source-standard-suite.sh
+      ./test/scenarios/el92-src@standard-suite.sh
 ```
 
 ### Scenario Definitions
@@ -428,18 +427,17 @@ combination of images and tests that make up the scenario.
 
 The scenario script should be defined with a combination of the RHEL
 version(s), MicroShift version(s), and an indication of what sort of
-tests are being run. For example,
-`rhel-9.2-microshift-source-standard-suite.sh` runs the standard test
-suite (not the `ostree` upgrade tests) against MicroShift built from
-source running on a RHEL 9.2 image.
+tests are being run. For example, `el92-src@standard-suite.sh` runs
+the standard test suite (not the `ostree` upgrade tests) against
+MicroShift built from source running on a RHEL 9.2 image.
 
 Scenarios define VMs using short names, like `host1`, which are made
 unique across the entire set of scenarios. VMs are not reused across
 scenarios.
 
-Scenarios use images defined by the blueprints created
-earlier. Blueprints and images are reused between scenarios. Refer to
-"Image Blueprints" above for details.
+Scenarios use images defined by the blueprints created earlier. Blueprints
+and images are reused between scenarios. Refer to "Image Blueprints" above
+for details.
 
 Scenarios use kickstart templates from the `./test/kickstart-templates`
 directory. Kickstart templates are reused between scenarios.
@@ -454,20 +452,16 @@ Scenarios utilize following distinct MicroShift sources:
 - `src`: built from source (code in PR)
 - `base`: built from base branch (PR's target branch)
 - `prel`: previous MicroShift minor release
+- `crel`: current MicroShift minor release (already built and released
+   RPMs like ECs, RCs, Z-stream). It is optional meaning that shortly after
+   branch cut, before first EC is released, it will be skipped.
 
 | Starting ref | End ref | Successful upgrade scenario | Failed upgrade scenario |
 |--------------|---------|-----------------------------|-------------------------|
 | `base` | `src` |`el92-base@upgrade-ok.sh` | **MISSING** |
 | `prel` | `src` |`el92-prel@upgrade-ok.sh` | **MISSING** |
 | `src` | `src` | **MISSING** | `el92-src@upgrade-failing-cannot-backup.sh` |
-
-In future, another source of MicroShift should be added which is
-most recent MicroShift RPMs built by ART (EC, then RC, and finally
-Z stream releases matching version of currently tested code).
-The source will have tag `crel` which stands for "current release".
-Both successful and failed upgrades scenarios should be added:
-- presubmit: upgrade from `crel` to code under test (PR)
-- periodic: upgrade from `crel` to `release-4.YY` branch
+| `crel` | `src` | `el92-crel@upgrade-ok.sh` | `el92-crel@upgrade-fails.sh` |
 
 #### scenario_create_vms
 
@@ -537,6 +531,21 @@ needed images. Rebuilds MicroShift RPMs from source, sets up RPM repo,
 sets up Image Builder workers, builds the images, and creates the web
 server to host the images.
 
+The script implements the following build time optimizations depending
+on the runtime environment:
+* When the `CI_JOB_NAME` environment variable is defined
+  * The `layer3-periodic` groups are built only if the job name contains
+    the`periodic` substring.
+* When access to the `microshift-build-cache` AWS S3 Bucket is configured
+  * If the script is run with the `-update_cache` command line argument, it
+    builds `layer1-base` groups and uploads them to the S3 bucket.
+  * If the script is run without command line arguments, it attempts to
+    download cached `layer1-base` artifacts instead of building them.
+* In any case, the fallback is to perform full builds on all layers.
+
+> See [Image Caching in AWS S3 Bucket](#image-caching-in-aws-s3-bucket)
+> for more information.
+
 ### ci_phase_iso_boot.sh
 
 Runs on the hypervisor. Responsible for launching all of the VMs that
@@ -548,3 +557,89 @@ variable, which defaults to `./test/scenarios`.
 Runs on the hypervisor. Responsible for running all of the scenarios from
 `SCENARIO_SOURCES`, waiting for them to complete and exiting with an
 error code if at least one test failed.
+
+### Image Caching in AWS S3 Bucket
+
+The `ci_phase_iso_build.sh` script attempts to optimizes image build times
+when access to the `microshift-build-cache` AWS S3 Bucket is configured in
+the current environment.
+
+```
+$ ./scripts/fetch_tools.sh awscli
+You can now run: /home/microshift/microshift/_output/bin/aws --version
+
+$ ./_output/bin/aws configure list
+      Name                    Value             Type    Location
+      ----                    -----             ----    --------
+   profile                <not set>             None    None
+access_key     ****************TCBI shared-credentials-file
+secret_key     ****************pc5/ shared-credentials-file
+    region                eu-west-1      config-file    ~/.aws/config
+
+$ ./_output/bin/aws s3 ls
+2023-10-29 08:38:40 microshift-build-cache
+```
+
+#### manage_build_cache.sh
+
+The script abstracts build cache manipulation by implementing an interface
+allowing to `upload`, `download`, `verify` and `cleanup` image build artifact
+data using AWS S3 for storage.
+
+The default name of the bucket is `microshift-build-cache` and it can be
+overriden by setting the `AWS_BUCKET_NAME` environment variable.
+
+The script uses `branch` and `tag` arguments to determine the sub-directories
+for storing the data at `${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/<tag>`. Those
+arguments are set in the `common.sh` script using the following environment
+variables:
+
+* `SCENARIO_BUILD_BRANCH`: the name of the current branch, i.e `main`,
+  `release-4.14`, etc.
+* `SCENARIO_BUILD_TAG`: the current build tag using the `yymmdd` format.
+* `SCENARIO_BUILD_TAG_PREV`: the previous build tag using yesterday's date.
+
+A special `${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/last` file can be set and
+retrieved using `setlast` and `getlast` operations. The file contains the
+name of the last tag with the valid cached data.
+
+The cleanup operation is implemented using the `keep` operation, which deletes
+data from all the tags in the current branch and architecture, except those
+pointed by the `last` file and the `tag` argument.
+
+> Deleting the `last` file and data pointed by it is possible by manipulating
+> the AWS S3 bucket contents directly, using other tools.
+
+#### Update CI Cache Job
+
+Cache update is scheduled as periodic CI jobs named `microshift-metal-cache-nightly`
+and `microshift-metal-cache-nightly-arm`. The jobs run nightly by executing the
+`test/bin/ci_phase_iso_build.sh -update_cache` command.
+
+There are also pre-submit CI jobs named `microshift-metal-cache` and 
+`microshift-metal-cache-arm`. The jobs are executed automatically in pull requests
+when any scripts affecting the caching are updated.
+
+> The cache upload operation does not overwrite existing valid cache to avoid
+> race conditions with running jobs. The procedure exits normally in this case.
+> Manual deletion of a cache tag in the AWS S3 bucket is required for forcing
+> an existing cache update.
+
+The job cannot use its current AWS CI account because it is regularly purged of
+all objects older than 1-3 days. Instead, the cached data is stored in the
+MicroShift development AWS account, which does not have the automatic cleanup
+scheduled.
+
+Environment variables are set to affect the AWS CLI command behavior:
+- `AWS_BUCKET_NAME` is set to `microshift-build-cache-${EC2_REGION}` for
+  ensuring that S3 traffic is local to a given region for saving costs.
+- `AWS_PROFILE` is set to `microshift-ci` to ensure that all the AWS CLI
+  commands are using the right credendials and region.
+
+The credentials for accessing the MicroShift development AWS account are stored
+in the vault as described at [Adding a New Secret to CI](https://docs.ci.openshift.org/docs/how-tos/adding-a-new-secret-to-ci/).
+The keys are then mounted for the job and copied to the `~/.aws/config` and
+`~/.aws/credentials` files under the `microshift-ci` profile name.
+
+> The procedure assumes that the `microshift-build-cache-<region>` bucket exists
+> in the appropriate region.

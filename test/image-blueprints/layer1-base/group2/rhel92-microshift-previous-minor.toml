@@ -1,5 +1,5 @@
-name = "rhel-9.2-microshift-source-isolated"
-description = "A RHEL 9.2 image with the RPMs built from source with embedded container images."
+name = "rhel-9.2-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+description = "RHEL 9.2 with MicroShift from the previous minor version (y-stream) installed."
 version = "0.0.1"
 modules = []
 groups = []
@@ -7,19 +7,19 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
 
 [[packages]]
 name = "microshift-networking"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
 
 [[packages]]
 name = "microshift-selinux"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
 
 [[packages]]
 name = "microshift-test-agent"
@@ -37,10 +37,3 @@ enabled = ["mdns", "ssh", "http", "https"]
 [[customizations.firewall.zones]]
 name = "trusted"
 sources = ["10.42.0.0/16", "169.254.169.1"]
-
-{{- if env.Getenv "SOURCE_IMAGES" "" }}
-{{ range (.Env.SOURCE_IMAGES | strings.Split ",") }}
-[[containers]]
-source = "{{ . }}"
-{{ end }}
-{{- end -}}

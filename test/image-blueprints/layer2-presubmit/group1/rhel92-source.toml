@@ -1,5 +1,5 @@
-name = "rhel-9.2-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
-description = "RHEL 9.2 with MicroShift from the previous minor version (y-stream) installed."
+name = "rhel-9.2-microshift-source"
+description = "A RHEL 9.2 image with the RPMs built from source."
 version = "0.0.1"
 modules = []
 groups = []
@@ -7,22 +7,26 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "4.{{ .Env.PREVIOUS_MINOR_VERSION }}*"
+version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "4.{{ .Env.PREVIOUS_MINOR_VERSION }}*"
+version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-networking"
-version = "4.{{ .Env.PREVIOUS_MINOR_VERSION }}*"
+version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "4.{{ .Env.PREVIOUS_MINOR_VERSION }}*"
+version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-test-agent"
+version = "*"
+
+[[packages]]
+name = "systemd-resolved"
 version = "*"
 
 [customizations.services]

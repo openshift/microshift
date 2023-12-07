@@ -3,6 +3,7 @@ set -e -o pipefail
 
 ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )"
 BUILDDIR="${ROOTDIR}/_output/image-builder/"
+OSBUILDER_ENABLED=true
 
 title() {
     echo -e "\E[34m\n# $1\E[00m";
@@ -24,6 +25,9 @@ clean_podman_images() {
 }
 
 clean_composer_jobs() {
+    if ! ${OSBUILDER_ENABLED} ; then
+        return
+    fi
     if ! which composer-cli &>/dev/null ; then
         return
     fi
@@ -50,7 +54,7 @@ clean_composer_jobs() {
 }
 
 clean_osbuilder_services() {
-    if ! sudo systemctl is-enabled osbuild-composer.socket &>/dev/null ; then
+    if ! ${OSBUILDER_ENABLED} ; then
         return
     fi
 
@@ -68,10 +72,18 @@ clean_osbuilder_services() {
     title "Cleaning osbuild worker cache"
     sleep 5
     sudo rm -rf /var/cache/osbuild-worker/* /var/lib/osbuild-composer/*
+}
 
-    title "Starting osbuild services"
-    sudo systemctl start osbuild-composer.socket
-    sudo systemctl start osbuild-worker@1.service
+restart_osbuilder_services() {
+    if ! ${OSBUILDER_ENABLED} ; then
+        return
+    fi
+
+    if ! systemctl is-active -q osbuild-composer.socket &>/dev/null ; then
+        title "Starting osbuild services"
+        sudo systemctl start osbuild-composer.socket
+        sudo systemctl start osbuild-worker@1.service
+    fi
 }
 
 # Parse command line
@@ -85,6 +97,12 @@ if [ $# -ge 1 ] ; then
         exit 0
         ;;
     esac
+fi
+
+if ! sudo systemctl is-enabled osbuild-composer.socket &>/dev/null ; then
+    OSBUILDER_ENABLED=false
+else
+    trap 'restart_osbuilder_services' EXIT
 fi
 
 clean_podman_images

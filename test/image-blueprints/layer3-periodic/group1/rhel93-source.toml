@@ -1,9 +1,9 @@
-name = "rhel-9.2-microshift-source"
-description = "A RHEL 9.2 image with the RPMs built from source."
+name = "rhel-9.3-microshift-source"
+description = "A RHEL 9.3 image with the RPMs built from source."
 version = "0.0.1"
 modules = []
 groups = []
-distro = "rhel-92"
+distro = "rhel-93"
 
 [[packages]]
 name = "microshift"
@@ -23,6 +23,10 @@ version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
 name = "microshift-test-agent"
+version = "*"
+
+[[packages]]
+name = "systemd-resolved"
 version = "*"
 
 [customizations.services]

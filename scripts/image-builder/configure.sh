@@ -13,7 +13,17 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 fi
 
-sudo dnf install -y git osbuild-composer composer-cli ostree rpm-ostree \
+# osbuild from COPR to install version that:
+# 1. can build rhel-93 images
+# 2. doesn't have issues with unexpected mirror's RPM verification
+#    (like the one in 9.3 beta at the moment of writing this comment)
+sudo dnf copr enable -y @osbuild/osbuild epel-9-"$(uname -m)"
+sudo dnf copr enable -y @osbuild/osbuild-composer rhel-9-"$(uname -m)"
+
+sudo dnf install -y \
+    osbuild-composer-95-1.20231129082828614539.main.1.g2a6bad728.el9 \
+    osbuild-100-1.20231129093945362742.main.30.ge191dc1d.el9 \
+    git composer-cli ostree rpm-ostree \
     cockpit-composer bash-completion podman runc genisoimage \
     createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
     containernetworking-plugins expect
@@ -24,7 +34,7 @@ sudo firewall-cmd --add-service=cockpit --permanent
 
 # The mock utility comes from the EPEL repository
 sudo dnf install -y "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OSVERSION}.noarch.rpm"
-sudo dnf install -y mock nginx tomcli
+sudo dnf install -y mock nginx tomcli parallel
 sudo usermod -a -G mock "$(whoami)"
 
 # Verify umask and home directory permissions
