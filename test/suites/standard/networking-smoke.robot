@@ -46,16 +46,34 @@ Ingress Smoke Test
     ...    Expose Hello MicroShift
     ...    Create Hello MicroShift Ingress
 
+    Log    PRE-TEST-LOGS    level=WARN
+    Dump hello-microshift Logs From Namespace ${NAMESPACE}
+    Dump Pod Logs From openshift-ingress With ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default
+    Dump Pod Logs From openshift-ovn-kubernetes With app=ovnkube-node
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}    path="/principal"
+    Log    POST-TEST-LOGS    level=WARN
+    Log    hello-microshift log should contain http response    level=WARN
+    Dump hello-microshift Logs From Namespace ${NAMESPACE}
+    Dump Pod Logs From openshift-ingress With ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default
+    Dump Pod Logs From openshift-ovn-kubernetes With app=ovnkube-node
 
-#    [Teardown]    Run Keywords
-#    ...    Delete Hello MicroShift Ingress
-#    ...    Delete Hello MicroShift Pod And Service
-#    ...    Wait For Service Deletion With Timeout
-
+    [Teardown]    Run Keywords
+    ...    Delete Hello MicroShift Ingress
+    ...    Delete Hello MicroShift Pod And Service
+    ...    Wait For Service Deletion With Timeout
 
 *** Keywords ***
+Dump ${POD} Logs From Namespace ${NS}
+    [Documentation]    Dump logs from a pod
+    ${resp}=    Run With Kubeconfig    oc logs ${POD} -n ${NS}
+    Log    Pod ${NS}/${POD} logs:\n${resp}    level=WARN
+
+Dump Pod Logs From ${NS} With ${LABEL}
+    [Documentation]    Dump logs from a pod with a label
+    ${resp}=    Run With Kubeconfig    oc logs -l ${LABEL} -n ${NS}
+    Log    Pods in ${NS} labeled ${LABEL} logs:\n${resp}    level=WARN
+
 Expose Hello MicroShift Service Via Route
     [Documentation]    Expose the "hello microshift" application through the Route
     Oc Expose    pod hello-microshift -n ${NAMESPACE}
