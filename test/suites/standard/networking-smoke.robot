@@ -49,10 +49,10 @@ Ingress Smoke Test
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}    path="/principal"
 
-    [Teardown]    Run Keywords
-    ...    Delete Hello MicroShift Ingress
-    ...    Delete Hello MicroShift Pod And Service
-    ...    Wait For Service Deletion With Timeout
+#    [Teardown]    Run Keywords
+#    ...    Delete Hello MicroShift Ingress
+#    ...    Delete Hello MicroShift Pod And Service
+#    ...    Wait For Service Deletion With Timeout
 
 
 *** Keywords ***
