@@ -102,7 +102,7 @@ debug:
 	@echo PATCH:"$(PATCH)"
 
 # These tags make sure we can statically link and avoid shared dependencies
-GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netcgo osusergo'
+GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netcgo osusergo strictfipsruntime'
 
 # Set variables for test-unit target
 GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
@@ -228,6 +228,15 @@ validate-cluster:
 OS := $(shell go env GOOS)
 ARCH := $(shell go env GOARCH)
 
+
+# check if FIPS supported
+ifeq (, $(shell go doc goexperiment.Flags | grep -i strictfipsruntime))
+	GOEXPERIMENT =
+else
+	GOEXPERIMENT = "strictfipsruntime"
+endif
+
+
 ###############################
 # host build targets          #
 ###############################
@@ -246,6 +255,7 @@ _build_local:
                    -X main.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
                    -X main.buildDate=$(BIN_TIMESTAMP) \
 					$(LD_FLAGS)\"" \
+					GOEXPERIMENT=${GOEXPERIMENT} \
 		$(MAKE) -C etcd --no-print-directory build \
 			GO_BUILD_PACKAGES:=./cmd/microshift-etcd \
 			GO_BUILD_BINDIR:=../$(CROSS_BUILD_BINDIR)/$(GOOS)_$(GOARCH)
