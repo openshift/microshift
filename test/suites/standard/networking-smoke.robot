@@ -25,8 +25,24 @@ Router Smoke Test
     ...    AND
     ...    Expose Hello MicroShift Service Via Route
 
+    Dump Pod Logs From Namespace    hello-microshift    ${NAMESPACE}
+    Dump Pod Logs With Label
+    ...    ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default    openshift-ingress
+    Dump Pod Logs With Label    app=ovnkube-node    openshift-ovn-kubernetes
+    ${desc}=    Run With Kubeconfig    oc describe pod hello-microshift -n ${NAMESPACE}
+    Log    ${desc}    level=WARN
+
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}
+
+    ${desc}=    Run With Kubeconfig    oc describe pod hello-microshift -n ${NAMESPACE}
+    Log    ${desc}    level=WARN
+    Log    hello-microshift log should contain http response    level=WARN
+    Run With Kubeconfig    oc describe pod hello-microshift -n ${NAMESPACE}
+    Dump Pod Logs From Namespace    hello-microshift    ${NAMESPACE}
+    Dump Pod Logs With Label
+    ...    ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default    openshift-ingress
+    Dump Pod Logs With Label    app=ovnkube-node    openshift-ovn-kubernetes
 
     DNS Entry For Route Should Resolve
 
@@ -46,8 +62,25 @@ Ingress Smoke Test
     ...    Expose Hello MicroShift
     ...    Create Hello MicroShift Ingress
 
+    # robotcop disable case convention check
+    # robotcop disable
+    Dump Pod Logs From Namespace    hello-microshift    ${NAMESPACE}
+    Dump Pod Logs With Label
+    ...    ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default    openshift-ingress
+    Dump Pod Logs With Label    app=ovnkube-node    openshift-ovn-kubernetes
+    ${desc}=    Run With Kubeconfig    oc describe pod hello-microshift -n ${NAMESPACE}
+    Log    ${desc}    level=WARN
+
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}    path="/principal"
+
+    ${desc}=    Run With Kubeconfig    oc describe pod hello-microshift -n ${NAMESPACE}
+    Log    ${desc}    level=WARN
+    Log    hello-microshift log should contain http response    level=WARN
+    Dump Pod Logs From Namespace    hello-microshift    ${NAMESPACE}
+    Dump Pod Logs With Label
+    ...    ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default    openshift-ingress
+    Dump Pod Logs With Label    app=ovnkube-node    openshift-ovn-kubernetes
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Ingress
@@ -56,6 +89,18 @@ Ingress Smoke Test
 
 
 *** Keywords ***
+Dump Pod Logs From Namespace
+    [Documentation]    Dump logs from a pod
+    [Arguments]    ${pod}    ${ns}
+    ${resp}=    Run With Kubeconfig    oc logs ${pod} -n ${ns}
+    Log    Pod ${ns}/${pod} logs:\n${resp}    level=WARN
+
+Dump Pod Logs With Label
+    [Documentation]    Dump logs from a pod with a label
+    [Arguments]    ${label}    ${ns}
+    ${resp}=    Run With Kubeconfig    oc logs -l ${label} -n ${ns}
+    Log    Pods in ${ns} labeled ${label} logs:\n${resp}    level=WARN
+
 Expose Hello MicroShift Service Via Route
     [Documentation]    Expose the "hello microshift" application through the Route
     Oc Expose    pod hello-microshift -n ${NAMESPACE}
