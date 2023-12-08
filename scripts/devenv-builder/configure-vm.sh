@@ -40,6 +40,26 @@ function dnf_retry() {
     return ${retVal}
 }
 
+function enable_rhocp_repo() {
+    local -r ocp_version="${1}"
+
+    if ! ${RHEL_BETA_VERSION} ; then
+        sudo subscription-manager repos \
+            --enable "rhocp-${ocp_version}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
+            --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+    else
+        OCP_REPO_NAME="rhocp-${ocp_version}-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms"
+        sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
+[${OCP_REPO_NAME}]
+name=Beta rhocp-${ocp_version} RPMs for RHEL ${OSVERSION}
+baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/${ocp_version}-el${OSVERSION}-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+    fi
+}
+
 while [ $# -gt 1 ]; do
     case "$1" in
     --no-build)
@@ -134,26 +154,13 @@ fi
 
 if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-    # This version might not match the version under development because we need
-    # to pull in dependencies that are already released
-    OCPVERSION=4.14
     sudo subscription-manager config --rhsm.manage_repos=1
 
-    if ! ${RHEL_BETA_VERSION} ; then
-        sudo subscription-manager repos \
-            --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
-            --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
-    else
-        OCP_REPO_NAME="rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms"
-        sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
-[${OCP_REPO_NAME}]
-name=Beta rhocp-${OCPVERSION} RPMs for RHEL ${OSVERSION}
-baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/${OCPVERSION}-el${OSVERSION}-beta/
-enabled=1
-gpgcheck=0
-skip_if_unavailable=0
-EOF
-    fi
+    # Enabling both repos because `get_rel_version_repo.sh` expects repository to be enabled.
+    # Otherwise it will provide RC RPM from mirror instead of latest Z-stream.
+    for ocp_version in 4.13 4.14; do
+        enable_rhocp_repo "${ocp_version}"
+    done
 else
     dnf_retry install centos-release-nfv-common
     sudo dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"
