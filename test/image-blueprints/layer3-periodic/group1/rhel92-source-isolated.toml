@@ -29,6 +29,10 @@ version = "*"
 name = "qemu-guest-agent"
 version = "*"
 
+[[packages]]
+name = "podman"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent", "qemu-guest-agent"]
 
