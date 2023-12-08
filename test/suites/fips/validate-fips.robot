@@ -16,6 +16,7 @@ ${USHIFT_HOST}              ${EMPTY}
 ${USHIFT_USER}              ${EMPTY}
 ${USHIFT_LIBS_DUMP_FILE}    /tmp/microshift-libs
 ${FIPS_PATTERN}             ossl-modules/fips.so$
+${CHECK_PAYLOAD_IMAGE}      registry.ci.openshift.org/ci/check-payload:latest
 
 
 *** Test Cases ***
@@ -26,6 +27,10 @@ Verify Host Is FIPS Enabled
 Verify Binary Is FIPS Compliant
     [Documentation]    Performs a FIPS validation against the Microshift binary
     Microshift Binary Should Dynamically Link FIPS Ossl Module
+
+Verify Node RPMs FIPS Compliant
+    [Documentation]    Performs a FIPS validation against the Installed RPMs
+    Check Payload Tool Must Pass
 
 
 *** Keywords ***
@@ -42,9 +47,23 @@ Teardown
     # Download the binary Libs dump files to the artifacts
     Run Keyword And Ignore Error
     ...    SSHLibrary.Get File    ${USHIFT_LIBS_DUMP_FILE}*    ${OUTPUTDIR}/
+    Run Keyword And Ignore Error
+    ...    SSHLibrary.Get File    ${CHECK_PAYLOAD_OUTPUT_FILE}    ${OUTPUTDIR}/check-payload.log
     Start MicroShift
     Wait For MicroShift
     Logout MicroShift Host
+
+Check Payload Tool Must Pass
+    [Documentation]    Run check-paylod Tool
+    ${podman_args}=    Set Variable    --authfile /etc/crio/openshift-pull-secret --privileged -i -v /:/myroot
+    ${scan_command}=    Set Variable    scan node --root /myroot
+    ${rand}=    Generate Random String
+    ${path}=    Join Path    /tmp    ${rand}
+    Set Global Variable    ${CHECK_PAYLOAD_OUTPUT_FILE}    ${path}
+    ${rc}=    Execute Command
+    ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
+    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    Should Be Equal As Integers    0    ${rc}
 
 Microshift Binary Should Dynamically Link FIPS Ossl Module
     [Documentation]    Check if Microshift binary is FIPS compliant.
