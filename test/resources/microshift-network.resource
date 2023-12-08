@@ -2,6 +2,7 @@
 Documentation       Keywords for testing the MicroShift network
 
 Library             Process
+Library             RequestsLibrary
 Library             SSHLibrary
 Resource            oc.resource
 Resource            common.resource
@@ -36,18 +37,21 @@ Expose Hello MicroShift Pod Via NodePort
 Access Hello Microshift
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
     [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}
-
-    ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${ushift_ip}:${ushift_port}"
-    ${url_path}=    Set Variable    "http://hello-microshift.cluster.local${path}"
-
-    ${result}=    Run Process
-    ...    curl -i ${url_path} --connect-to ${connect_to}
-    ...    shell=True
-    ...    timeout=15s
-    Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
-    Should Be Equal As Integers    ${result.rc}    0
-    Should Match Regexp    ${result.stdout}    HTTP.*200
-    Should Match    ${result.stdout}    *Hello MicroShift*
+    # We do not set up DNS on the hypervisor in a way that allows
+    # connections with only the URL, so we add the 'proxies' argument
+    # with a per-host proxy for the VM under test using the URL that
+    # will be recognized by ingress mapped to the host IP and port
+    # created by the test harness. Note the use of '&' instead of '$'
+    # in the variable name here and where the value is passed to GET.
+    &{proxies}=    Create Dictionary    http://hello-microshift.cluster.local=http://${ushift_ip}:${ushift_port}
+    ${response}=    GET
+    ...    http://hello-microshift.cluster.local${path}
+    ...    expected_status=200
+    ...    verify=False
+    ...    proxies=&{proxies}
+    ...    timeout=15
+    Log Many    ${response}
+    Should Match    ${response.text}    *Hello MicroShift*
 
 Verify Hello MicroShift LB
     [Documentation]    Run Hello MicroShift Load Balancer verification
