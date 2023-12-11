@@ -101,7 +101,6 @@ debug:
 	@echo MINOR:"$(MINOR)"
 	@echo PATCH:"$(PATCH)"
 
-# These tags make sure we can statically link and avoid shared dependencies
 GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netcgo osusergo strictfipsruntime'
 
 # Set variables for test-unit target
