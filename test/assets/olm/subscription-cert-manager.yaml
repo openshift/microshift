@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: my-cert-manager
+  namespace: openshift-operators
+spec:
+  channel: stable
+  name: cert-manager
+  source: operatorhubio-catalog
+  sourceNamespace: openshift-operators
