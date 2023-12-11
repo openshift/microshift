@@ -8,6 +8,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/microshift-config.resource
+Resource            ../../resources/ostree-health.resource
 
 Suite Setup         Test Suite Setup
 Suite Teardown      Test Suite Teardown
@@ -55,6 +56,7 @@ Test Suite Teardown
     Restore Lvmd Config
     Delete Thin Storage Pool
     Restart Microshift
+    Restart Greenboot And Wait For Success
     Teardown Suite With Namespace
 
 Test Case Setup
