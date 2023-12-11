@@ -20,9 +20,10 @@ get_container_images() {
         exit 1
     fi
     for package in ${release_info_rpm}; do
+        echo "Getting image references from RPM ${package}..."
         containers="$(rpm2cpio "${package}" | cpio  -i --to-stdout "*release-$(uname -m).json" 2> /dev/null | jq -r '[ .images[] ] | join("\n")')\n${containers}"
     done
-    echo -n -e "${containers}" | sort -u
+    echo -n -e "${containers}" | sort -u > "${REGISTRY_CONTAINER_LIST}"
 }
 
 prereqs() {
@@ -42,15 +43,15 @@ setup_registry() {
     # The mirror does not allow anonymous access, therefore we need the user and password configured in the
     # pull secrets.
     podman login -u microshift -p microshift "${REGISTRY_HOST}" --authfile "${REGISTRY_ROOT}/local-auth.json"
+    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${REGISTRY_ROOT}/local-auth.json" > "${PULL_SECRET}.tmp"
+    mv "${PULL_SECRET}.tmp" "${PULL_SECRET}"
     popd &>/dev/null
 }
 
 mirror_images() {
-    get_container_images > "${REGISTRY_CONTAINER_LIST}"
+    get_container_images
     "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --reg-to-dir "${PULL_SECRET}" "${REGISTRY_CONTAINER_LIST}" "${REGISTRY_CONTAINER_DIR}"
     "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --dir-to-reg "${REGISTRY_ROOT}/local-auth.json" "${REGISTRY_CONTAINER_DIR}" "${REGISTRY_HOST}"
-    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${REGISTRY_ROOT}/local-auth.json" > "${PULL_SECRET}.tmp"
-    mv "${PULL_SECRET}.tmp" "${PULL_SECRET}"
     rm -rf "${REGISTRY_CONTAINER_DIR}"
 }
 
