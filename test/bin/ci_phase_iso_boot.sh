@@ -10,6 +10,15 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-true}
+if ${ENABLE_REGISTRY_MIRROR}; then
+    # Quay mirror does not provide an arm binary, temporarily run
+    # on x86 only.
+    if [ "$(uname -m)" != "x86_64" ]; then
+        echo "Registry mirror disabled in non-x86 architectures. Quay mirror does not provide a binary for them"
+        ENABLE_REGISTRY_MIRROR=false
+    fi
+fi
+export ENABLE_REGISTRY_MIRROR
 
 # Log output automatically
 LOGDIR="${ROOTDIR}/_output/ci-logs"
@@ -43,12 +52,7 @@ bash -x ./bin/start_webserver.sh
 
 # Setup a container registry and mirror images.
 if ${ENABLE_REGISTRY_MIRROR}; then
-    # Quay mirror does not provide an arm binary, temporarily run
-    # on x86 only.
-    if [ "$(uname -m)" == "x86_64" ]; then
-        export ENABLE_REGISTRY_MIRROR
-        bash -x ./bin/mirror_registry.sh
-    fi
+    bash -x ./bin/mirror_registry.sh
 fi
 
 # Show the summary of the output of the parallel jobs.
