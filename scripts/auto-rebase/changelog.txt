@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component 39fed68c8248640775a9de643e2d9985f8382f3d to d46f420c591a079c89a799c02ae2494da2600b3e
+  - cebbbdbc 2023-12-04T18:37:46+00:00 gcp-routes: don't exit on crictl failures
+
