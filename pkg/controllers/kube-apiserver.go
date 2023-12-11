@@ -76,10 +76,12 @@ type KubeAPIServer struct {
 	masterURL        string
 	servingCAPath    string
 	advertiseAddress string
+
+	kasShutdownSignal chan struct{}
 }
 
-func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {
-	s := &KubeAPIServer{}
+func NewKubeAPIServer(cfg *config.Config, kasShutdownSignal chan struct{}) *KubeAPIServer {
+	s := &KubeAPIServer{kasShutdownSignal: kasShutdownSignal}
 	if err := s.configure(cfg); err != nil {
 		s.configureErr = err
 	}
@@ -302,6 +304,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return fmt.Errorf("configuration failed: %w", s.configureErr)
 	}
 
+	defer close(s.kasShutdownSignal)
 	defer close(stopped)
 	errorChannel := make(chan error, 1)
 	ctx, cancel := context.WithCancel(ctx)

@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -37,12 +38,14 @@ var (
 )
 
 type EtcdService struct {
-	memoryLimit uint64
+	memoryLimit       uint64
+	kasShutdownSignal chan struct{}
 }
 
-func NewEtcd(cfg *config.Config) *EtcdService {
+func NewEtcd(cfg *config.Config, kasShutdownSignal chan struct{}) *EtcdService {
 	return &EtcdService{
-		memoryLimit: cfg.Etcd.MemoryLimitMB,
+		memoryLimit:       cfg.Etcd.MemoryLimitMB,
+		kasShutdownSignal: kasShutdownSignal,
 	}
 }
 
@@ -104,27 +107,44 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		return fmt.Errorf("%s failed to start: %v", s.Name(), err)
 	}
 
-	// Handle microshift-etcd termination before microshift process exits
+	waitErr := make(chan error)
 	go func() {
-		if err := cmd.Wait(); err != nil {
-			klog.Warningf("%v failed waiting on process to finish: %+v", s.Name(), err)
-		}
-		klog.Infof("%v process quit: %v", s.Name(), cmd.ProcessState.String())
-
-		// Exit microshift to trigger microshift-etcd restart
-		klog.Warning("microshift-etcd process terminated prematurely, restarting MicroShift")
-		os.Exit(0)
+		waitErr <- cmd.Wait()
 	}()
 
-	// Ensures microshift-etcd unit stopped after microshift
-	defer func() {
-		klog.Info("stopping microshift-etcd")
-		cmd := exec.Command("systemctl", "stop", "microshift-etcd.scope", "--no-block")
+	stopWatchingForUnexpectedShutdown := make(chan struct{})
 
-		if out, err := cmd.CombinedOutput(); err != nil {
-			klog.ErrorS(err, "failed to stop microshift-etcd", "output", string(out))
+	// Handle microshift-etcd termination if it happens before MicroShift shutdown process.
+	go func() {
+		select {
+		case <-stopWatchingForUnexpectedShutdown:
+			klog.Info("Stopping watch for unexpected shutdown of microshift-etcd.scope")
 			return
+
+		case err := <-waitErr:
+			klog.ErrorS(err, "microshift-etcd.scope terminated unexpectedly - restarting MicroShift", "state", cmd.ProcessState.String())
+			os.Exit(0)
 		}
+	}()
+
+	// Ensures microshift-etcd unit is stopped during MicroShift shutdown.
+	defer func() {
+		stopWatchingForUnexpectedShutdown <- struct{}{}
+
+		klog.Info("Waiting for kube-apiserver shutdown before terminating microshift-etcd")
+		<-s.kasShutdownSignal
+
+		// Send SIGTERM instead of using `systemctl stop` because of systemd's internal job queue.
+		// If MicroShift is being restarted, running `systemctl stop` can get immediately
+		// terminated or queued (and will wait until MicroShift is restarted which is too late).
+		klog.Info("Kube-apiserver finished running, sending SIGTERM to microshift-etcd")
+		if err := syscall.Kill(cmd.Process.Pid, syscall.SIGTERM); err != nil {
+			klog.ErrorS(err, "Failed to SIGTERM microshift-etcd")
+		}
+
+		klog.Info("Waiting for microshift-etcd.scope to terminate")
+		err := <-waitErr
+		klog.InfoS("microshift-etcd.scope terminated", "state", cmd.ProcessState.String(), "err", err)
 	}()
 
 	if err := checkIfEtcdIsReady(ctx); err != nil {

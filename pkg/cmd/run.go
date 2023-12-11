@@ -194,11 +194,14 @@ func RunMicroshift(cfg *config.Config) error {
 	// Establish the context we will use to control execution
 	runCtx, runCancel := context.WithCancel(context.Background())
 
+	// Channel to close when KAS stops, which is a signal that microshift-etcd can be stopped.
+	kasShutdownSignal := make(chan struct{})
+
 	m := servicemanager.NewServiceManager()
 	util.Must(m.AddService(node.NewNetworkConfiguration(cfg)))
-	util.Must(m.AddService(controllers.NewEtcd(cfg)))
+	util.Must(m.AddService(controllers.NewEtcd(cfg, kasShutdownSignal)))
 	util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
-	util.Must(m.AddService(controllers.NewKubeAPIServer(cfg)))
+	util.Must(m.AddService(controllers.NewKubeAPIServer(cfg, kasShutdownSignal)))
 	util.Must(m.AddService(controllers.NewKubeScheduler(cfg)))
 	util.Must(m.AddService(controllers.NewKubeControllerManager(runCtx, cfg)))
 	util.Must(m.AddService(controllers.NewOpenShiftCRDManager(cfg)))
