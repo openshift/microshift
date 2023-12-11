@@ -9,12 +9,17 @@ import (
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccadmission"
 	securityv1client "github.com/openshift/client-go/security/clientset/versioned"
 	securityv1informer "github.com/openshift/client-go/security/informers/externalversions"
+	userclient "github.com/openshift/client-go/user/clientset/versioned"
+	userinformer "github.com/openshift/client-go/user/informers/externalversions"
 	"github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig"
 	"github.com/openshift/library-go/pkg/apiserver/apiserverconfig"
 	"k8s.io/apiserver/pkg/admission"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	clientgoinformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/kubernetes/openshift-kube-apiserver/admission/authorization/restrictusers"
+	"k8s.io/kubernetes/openshift-kube-apiserver/admission/authorization/restrictusers/usercache"
 	"k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/nodeenv"
 	"k8s.io/kubernetes/openshift-kube-apiserver/enablement"
 
@@ -44,6 +49,7 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
 
 	*pluginInitializers = append(*pluginInitializers,
 		imagepolicy.NewInitializer(imagereferencemutators.KubeImageMutators{}, enablement.OpenshiftConfig().ImagePolicyConfig.InternalRegistryHostname),
+		restrictusers.NewInitializer(openshiftInformers.getOpenshiftUserInformers()),
 		sccadmission.NewInitializer(openshiftInformers.getOpenshiftSecurityInformers().Security().V1().SecurityContextConstraints()),
 		nodeenv.NewInitializer(enablement.OpenshiftConfig().ProjectConfig.DefaultNodeSelector),
 		admissionrestconfig.NewInitializer(*rest.CopyConfig(genericConfig.LoopbackClientConfig)),
@@ -101,6 +107,10 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
 	if err != nil {
 		return nil, err
 	}
+	userClient, err := userclient.NewForConfig(loopbackClientConfig)
+	if err != nil {
+		return nil, err
+	}
 
 	// TODO find a single place to create and start informers.  During the 1.7 rebase this will come more naturally in a config object,
 	// before then we should try to eliminate our direct to storage access.  It's making us do weird things.
@@ -108,6 +118,12 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
 
 	ret := &kubeAPIServerInformers{
 		OpenshiftSecurityInformers: securityv1informer.NewSharedInformerFactory(securityClient, defaultInformerResyncPeriod),
+		OpenshiftUserInformers:     userinformer.NewSharedInformerFactory(userClient, defaultInformerResyncPeriod),
+	}
+	if err := ret.OpenshiftUserInformers.User().V1().Groups().Informer().AddIndexers(cache.Indexers{
+		usercache.ByUserIndexName: usercache.ByUserIndexKeys,
+	}); err != nil {
+		return nil, err
 	}
 
 	return ret, nil
@@ -115,12 +131,17 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
 
 type kubeAPIServerInformers struct {
 	OpenshiftSecurityInformers securityv1informer.SharedInformerFactory
+	OpenshiftUserInformers     userinformer.SharedInformerFactory
 }
 
 func (i *kubeAPIServerInformers) getOpenshiftSecurityInformers() securityv1informer.SharedInformerFactory {
 	return i.OpenshiftSecurityInformers
 }
+func (i *kubeAPIServerInformers) getOpenshiftUserInformers() userinformer.SharedInformerFactory {
+	return i.OpenshiftUserInformers
+}
 
 func (i *kubeAPIServerInformers) Start(stopCh <-chan struct{}) {
 	i.OpenshiftSecurityInformers.Start(stopCh)
+	i.OpenshiftUserInformers.Start(stopCh)
 }
