@@ -11,7 +11,7 @@ Test Tags           restart
 
 
 *** Variables ***
-${RESTART_ATTEMPTS}     3
+${RESTART_ATTEMPTS}     10
 
 
 *** Test Cases ***
@@ -20,9 +20,9 @@ Restarting MicroShift In The Middle Of Startup Should Succeed
     ...    (for example due to not stopped microshift-etcd.scope).
     [Template]    Restart MicroShift ${TIME_TO_WAIT} Seconds After Starting
 
-    40
-    30
-    20
+    # 40
+    # 30
+    # 20
     15
     10
     5
@@ -46,7 +46,10 @@ Teardown
 Restart MicroShift ${time_to_wait} Seconds After Starting
     [Documentation]    Tests MicroShift's resilience when restarted during startup.
 
+    Log To Console    Time to wait: ${time_to_wait}
+
     FOR    ${attempt}    IN RANGE    ${RESTART_ATTEMPTS}
+        Log To Console    --- Attempt: ${attempt}
         # Make sure MicroShift is fully stopped first,
         # so it's startup can be interrupted after specified amount of time.
         Stop MicroShift

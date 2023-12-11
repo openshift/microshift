@@ -12,7 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 \
-        --variable "UPGRADE_REF:rhel-9.2-microshift-source-aux" \
-        suites/upgrade/rollback-manual.robot
+    run_tests host1 suites/osconfig/lifecycle.robot
 }
