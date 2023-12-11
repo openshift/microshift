@@ -107,7 +107,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 			defer func() {
 				if r := recover(); r != nil {
 					klog.Errorf("%s panicked: %s", service.Name(), r)
-					klog.Error("Stopping MicroShift")
+					klog.Error("Stopping MicroShift with SIGTERM")
 					if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
 						klog.Warningf("error killing process: %v", err)
 					}
@@ -128,13 +128,20 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 				klog.InfoS("SERVICE STOPPED", "service", service.Name(), "since-start", time.Since(svcStart))
 			}()
 
-			if err := service.Run(ctx, ready, stopped); err != nil && !errors.Is(err, context.Canceled) {
-				klog.ErrorS(err, "SERVICE FAILED - stopping MicroShift", "service", service.Name(), "since-start", time.Since(svcStart))
-				if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
-					klog.Warningf("error killing process: %v", err)
-				}
-			} else {
+			err := service.Run(ctx, ready, stopped)
+			if err == nil || errors.Is(err, context.Canceled) {
 				klog.InfoS("SERVICE COMPLETED", "service", service.Name(), "since-start", time.Since(svcStart))
+				return
+			}
+
+			if errors.Is(ctx.Err(), context.Canceled) {
+				klog.ErrorS(err, "SERVICE FAILED - MicroShift is already mid-shutdown", "service", service.Name(), "since-start", time.Since(svcStart))
+				return
+			}
+
+			klog.ErrorS(err, "SERVICE FAILED - stopping MicroShift with SIGTERM", "service", service.Name(), "since-start", time.Since(svcStart))
+			if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
+				klog.ErrorS(err, "Failed to SIGTERM MicroShift")
 			}
 		}()
 	})
