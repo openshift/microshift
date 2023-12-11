@@ -21,8 +21,10 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"runtime/debug"
 	"sort"
 	"strconv"
+	"strings"
 
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/assets"
@@ -135,6 +137,31 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	cmd := kubecm.NewControllerManagerCommand()
 	cmd.SetArgs(s.args)
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				klog.InfoS("kube-controller-manager panicked!", "panic", r, "stacktrace", debug.Stack())
+
+				// It was observed that stopping MicroShift mid startup can cause KCM to panic (nil ptr)
+				// and bring MicroShift down before other components complete stopping.
+				// Seems that some parts of KCM stop, but other parts continue
+				// to run because they did not notice cancelled context yet and try to use stopped components.
+				//
+				// To avoid crashing MicroShift, recover that panic and only ignore if:
+				//  - MicroShift is mid shutdown (context is canceled),
+				//  - panic is in fact nil ptr dereference.
+				// Otherwise re-panic.
+				if e, ok := r.(error); ok &&
+					strings.Contains(e.Error(), "invalid memory address or nil pointer dereference") &&
+					errors.Is(ctx.Err(), context.Canceled) {
+					klog.Info("KCM panic observed during MicroShift shutdown - ignoring")
+					errorChannel <- nil
+				} else {
+					klog.Info("KCM panic did not happened during shutdown - re-raising panic")
+					panic(r)
+				}
+			}
+		}()
+
 		errorChannel <- cmd.ExecuteContext(ctx)
 	}()
 
