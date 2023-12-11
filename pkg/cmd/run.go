@@ -242,6 +242,10 @@ func RunMicroshift(cfg *config.Config) error {
 		}
 	}()
 
+	// Connect signal handler
+	sigTerm := make(chan os.Signal, 1)
+	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
+
 	// Start everything up
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	go func() {
@@ -252,10 +256,6 @@ func RunMicroshift(cfg *config.Config) error {
 			klog.Infof("%s completed", m.Name())
 		}
 	}()
-
-	// Connect signal handler
-	sigTerm := make(chan os.Signal, 1)
-	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case <-ready:
