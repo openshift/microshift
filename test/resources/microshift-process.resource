@@ -80,7 +80,7 @@ Restart MicroShift
     [Documentation]    Restart the MicroShift service
     ${ushift_pid}=    MicroShift Process ID
     ${ushift_etcd_pid}=    MicroShift Etcd Process ID
-    Systemctl With Retry    restart    microshift.service
+    Systemctl    restart    microshift.service
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait Until MicroShift Etcd Process ID Changes    ${ushift_etcd_pid}
     # Kubeconfig may change between restarts, ensure we are taking the latest one.
@@ -89,11 +89,11 @@ Restart MicroShift
 
 Stop MicroShift
     [Documentation]    Stop the MicroShift service
-    Systemctl With Retry    stop    microshift.service
+    Systemctl    stop    microshift.service
 
 Start MicroShift
     [Documentation]    Start the MicroShift service
-    Systemctl With Retry    start    microshift.service
+    Systemctl    start    microshift.service
     # Kubeconfig may change between restarts, ensure we are taking the latest one.
     Setup Kubeconfig
 
