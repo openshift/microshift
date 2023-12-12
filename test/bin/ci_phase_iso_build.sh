@@ -134,9 +134,9 @@ $(dry_run) bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
 # Check if cache can be used for builds
 # This will fail when AWS S3 connection is not configured, or there is no cache bucket
 HAS_CACHE_ACCESS=false
-if ./bin/manage_build_cache.sh getlast -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" &>/dev/null ; then
-    HAS_CACHE_ACCESS=true
-fi
+#if ./bin/manage_build_cache.sh getlast -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" &>/dev/null ; then
+#    HAS_CACHE_ACCESS=true
+#fi
 
 # Check the build mode: "try using cache" (default) or "update cache"
 if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
