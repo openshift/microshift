@@ -47,7 +47,7 @@ Ingress Smoke Test
     ...    Create Hello MicroShift Ingress
 
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift    ${HTTP_PORT}    path="/principal"
+    ...    Access Hello Microshift    ${HTTP_PORT}    path=/principal
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Ingress

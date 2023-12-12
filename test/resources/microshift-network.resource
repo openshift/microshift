@@ -37,6 +37,8 @@ Access Hello Microshift
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
     [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}
 
+    Run With Kubeconfig    oc get all -n ${NAMESPACE}
+
     ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${ushift_ip}:${ushift_port}"
     ${url_path}=    Set Variable    "http://hello-microshift.cluster.local${path}"
 

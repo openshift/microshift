@@ -19,7 +19,7 @@ Setup Suite With Namespace
     Setup Kubeconfig
     ${rand}=    Generate Random String
     ${rand}=    Convert To Lower Case    ${rand}
-    ${ns}=    Catenate    SEPARATOR=-    "test"    ${rand}
+    ${ns}=    Catenate    SEPARATOR=-    test    ${rand}
     Set Suite Variable    \${NAMESPACE}    ${ns}
     Create Namespace    ${ns}
 
