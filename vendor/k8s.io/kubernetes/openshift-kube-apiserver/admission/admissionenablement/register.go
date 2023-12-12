@@ -31,7 +31,6 @@ func RegisterOpenshiftKubeAdmissionPlugins(plugins *admission.Plugins) {
 	imagepolicy.Register(plugins)
 	ingressadmission.Register(plugins)
 	managementcpusoverride.Register(plugins)
-	managednode.Register(plugins)
 	mixedcpus.Register(plugins)
 	projectnodeenv.Register(plugins)
 	quotaclusterresourceoverride.Register(plugins)
@@ -74,7 +73,6 @@ var (
 		"route.openshift.io/IngressAdmission",
 		hostassignment.PluginName,          // "route.openshift.io/RouteHostAssignment"
 		csiinlinevolumesecurity.PluginName, // "storage.openshift.io/CSIInlineVolumeSecurity"
-		managednode.PluginName,             // "autoscaling.openshift.io/ManagedNode"
 		mixedcpus.PluginName,               // "autoscaling.openshift.io/MixedCPUs"
 	}
 
