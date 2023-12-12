@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_NAME=$(basename "$0")
 # The 'openshift-ovn-kubernetes' namespace must be in the end of the list
 # to allow for pod deletion when MicroShift is stopped
-PODS_NS_LIST=(openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system openshift-ovn-kubernetes)
+PODS_NS_LIST=(openshift-operator-lifecycle-manager openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system openshift-ovn-kubernetes)
 FULL_CLEAN=false
 KEEP_IMAGE=false
 OVN_CLEAN=false
