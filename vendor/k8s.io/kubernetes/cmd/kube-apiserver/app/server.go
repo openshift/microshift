@@ -156,7 +156,7 @@ cluster's shared state through which all other components interact.`,
 			}
 			// add feature enablement metrics
 			utilfeature.DefaultMutableFeatureGate.AddMetrics()
-			return Run(completedOptions, genericapiserver.SetupSignalHandlerIgnoringFurtherSignals())
+			return Run(completedOptions, cmd.Context().Done())
 		},
 		Args: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
