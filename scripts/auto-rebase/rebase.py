@@ -406,7 +406,7 @@ def cleanup_branches(gh_repo):
     associated with closed pull requests for a given github repo.
     """
     logging.info("Cleaning up branches for closed PRs")
-    rebase_branches = [b for b in gh_repo.get_branches() if b.name.startswith("rebase-4")]
+    rebase_branches = [b for b in gh_repo.get_branches() if b.name.startswith("rebase-")]
     deleted_branches = []
     for branch in rebase_branches:
         prs = gh_repo.get_pulls(head=f"{gh_repo.owner.login}:{branch.name}", state="all")
