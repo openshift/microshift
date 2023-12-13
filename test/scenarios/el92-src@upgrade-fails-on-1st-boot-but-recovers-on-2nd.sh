@@ -12,7 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 \
-        --variable "TARGET_REF:rhel-9.2-microshift-source-fake-next-minor" \
-        suites/upgrade/upgrade-fails-on-1st-boot-but-recovers-on-2nd.robot
+    run_tests host1 suites/standard
 }

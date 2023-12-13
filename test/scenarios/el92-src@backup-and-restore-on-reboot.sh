@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/backup/backup-restore-on-reboot.robot
+    run_tests host1 suites/standard
 }

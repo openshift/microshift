@@ -17,8 +17,5 @@ scenario_run_tests() {
     local -r vm_ip1=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
     local -r vm_ip2=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | tail -1)
 
-    run_tests host1 \
-        --variable "USHIFT_HOST_IP1:${vm_ip1}" \
-        --variable "USHIFT_HOST_IP2:${vm_ip2}" \
-        suites/network/multi-nic.robot
+    run_tests host1 suites/standard
 }

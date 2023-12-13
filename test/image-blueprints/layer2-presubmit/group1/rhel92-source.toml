@@ -29,10 +29,6 @@ version = "*"
 name = "systemd-resolved"
 version = "*"
 
-[[packages]]
-name = "rsyslog"
-version = "*"
-
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent"]
 

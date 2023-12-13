@@ -12,7 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 \
-        --variable "OLDER_MICROSHIFT_REF:rhel-9.2-microshift-source" \
-        suites/upgrade/downgrade-block.robot
+    run_tests host1 suites/standard
 }
