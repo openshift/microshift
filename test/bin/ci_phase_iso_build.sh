@@ -110,7 +110,8 @@ cd "${ROOTDIR}"
 
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
-$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
+# TODO temporarily disable setting RHEL release to deconflict pythoncoreutils version not found during ci_phase_iso_build
+$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-set-release-version --no-build --force-firewall "${PULL_SECRET}"
 $(dry_run) bash -x ./scripts/image-builder/configure.sh
 
 cd "${ROOTDIR}/test/"
