@@ -62,8 +62,8 @@ if [ ! -f "${RF_VARIABLES}" ]; then
     exit 1
 fi
 
-# shellcheck disable=SC2034
-DEST_DIR="${RF_VENV}" 
+# DEST_DIR var is the python env dir used by fetch_tools.sh to install the tools
+export DEST_DIR="${RF_VENV}"
 "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 "${ROOTDIR}/scripts/fetch_tools.sh" yq
 
