@@ -78,7 +78,6 @@ copy_file_to_vm() {
 
 sos_report() {
     local -r junit="${1:-false}"
-    SKIP_SOS=true
 
     if "${SKIP_SOS}"; then
         echo "Skipping sos reports"
