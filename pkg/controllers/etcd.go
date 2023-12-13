@@ -70,6 +70,10 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	// tied to the MicroShift service lifetime.
 	var exe string
 	if runningAsSvc {
+		if err := stopMicroshiftEtcdScopeIfExists(); err != nil {
+			return err
+		}
+
 		args = append(args,
 			"--uid=root",
 			"--scope",
@@ -136,6 +140,26 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	// Wait for MicroShift to be done
 	<-ctx.Done()
 	return ctx.Err()
+}
+
+func stopMicroshiftEtcdScopeIfExists() error {
+	// There are several codes that systemctl can return like
+	// 0 - unit is active, 3 - unit is not active, 4 - no such unit.
+	// Because microshift-etcd.scope is transient unit it's either active or doesn't exist,
+	// just check for active (existing) to simplify procedure.
+	statusCmd := exec.Command("systemctl", "status", "microshift-etcd.scope")
+	if err := statusCmd.Run(); err != nil {
+		// nolint:nilerr
+		return nil
+	}
+
+	klog.InfoS("microshift-etcd.scope is already active - stopping")
+	stopCmd := exec.Command("systemctl", "stop", "microshift-etcd.scope")
+	if out, err := stopCmd.CombinedOutput(); err != nil {
+		klog.ErrorS(err, "failed to stop microshift-etcd", "output", string(out))
+		return err
+	}
+	return nil
 }
 
 func checkIfEtcdIsReady(ctx context.Context) error {
