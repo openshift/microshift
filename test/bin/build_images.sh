@@ -247,6 +247,7 @@ do_group() {
         ${GOMPLATE} --file "${template}" >"${blueprint_file}"
         if [[ "$(wc -l "${blueprint_file}" | cut -d ' ' -f1)" -eq 0 ]]; then
             echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
+            record_junit "${groupdir}" "${template}" "compose" "SKIPPED"
             continue
         fi
         record_junit "${groupdir}" "${template}" "render" "OK"
