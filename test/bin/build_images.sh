@@ -167,12 +167,19 @@ record_junit() {
 <testcase classname="${group} ${image_reference}" name="${step}">
 EOF
 
-    if [ "${results}" != "OK" ]; then
+    case "${results}" in
+        OK)
+        ;;
+        SKIP*)
         cat - >>"${outputfile}" <<EOF
-<failure message="${results}" type="createImageFailure">
-</failure>
+<skipped message="${results}" type="${step}-skipped" />
 EOF
-    fi
+        ;;
+        FAIL*)
+        cat - >>"${outputfile}" <<EOF
+<failure message="${results}" type="${step}-failure" />
+EOF
+    esac
 
     cat - >>"${outputfile}" <<EOF
 </testcase>
