@@ -77,7 +77,9 @@ update_build_cache() {
 # - Only build the 'periodic' layer when 'CI_JOB_NAME' contains 'periodic' token.
 run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
-        # Conditional per-layer builds when running in CI
+        # Conditional per-layer builds when running in
+        # CI. build_images.sh skips any images that have been
+        # downloaded from the cache.
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
 

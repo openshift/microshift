@@ -187,6 +187,20 @@ EOF
 
 }
 
+should_skip() {
+    local -r blueprint="${1}"
+
+    if "${FORCE_REBUILD}"; then
+        echo "Forcing all rebuilds"
+        return 1
+    fi
+    if [[ "${blueprint}" =~ source ]] && "${FORCE_SOURCE}"; then
+        echo "Forcing source rebuild"
+        return 1
+    fi
+    return 0
+}
+
 # Process a set of blueprint templates to create edge commit images
 # for them.
 do_group() {
@@ -254,6 +268,16 @@ do_group() {
 
         blueprint=$(get_blueprint_name "${blueprint_file}")
 
+        # Check if the image for this blueprint already exists, in
+        # case it was downloaded from the cache.
+        if ostree summary --view --repo="${IMAGEDIR}/repo" | grep -q " ${blueprint}\$"; then
+            echo "Found ${blueprint} in existing images"
+            if should_skip "${blueprint}"; then
+                record_junit "${groupdir}" "${template}" "compose" "SKIPPED"
+                continue
+            fi
+        fi
+
         if sudo composer-cli blueprints list | grep -q "^${blueprint}$"; then
             echo "Removing existing definition of ${blueprint}"
             sudo composer-cli blueprints delete "${blueprint}"
@@ -295,6 +319,14 @@ do_group() {
     if ${BUILD_INSTALLER} && ! ${COMPOSER_DRY_RUN}; then
         for image_installer in "${groupdir}"/*.image-installer; do
             blueprint=$("${GOMPLATE}" --file "${image_installer}")
+            local expected_iso_file="${VM_DISK_BASEDIR}/${blueprint}.iso"
+            if [ -f "${expected_iso_file}" ]; then
+                echo "${expected_iso_file} already exists"
+                if should_skip "${blueprint}"; then
+                    record_junit "${groupdir}" "${image_installer}" "compose" "SKIPPED"
+                    continue
+                fi
+            fi
             echo "Building image-installer from ${blueprint}"
             build_cmd="sudo composer-cli compose start ${blueprint} image-installer"
             buildid=$(${build_cmd} | awk '{print $2}')
@@ -402,7 +434,7 @@ usage() {
     fi
 
     cat - <<EOF
-build_images.sh [-iIsd] [-l layer-dir | -g group-dir] [-t template]
+build_images.sh [-iIsdf] [-l layer-dir | -g group-dir] [-t template]
 
   -h      Show this help
 
@@ -410,9 +442,11 @@ build_images.sh [-iIsd] [-l layer-dir | -g group-dir] [-t template]
 
   -I      Do not build the installer image(s).
 
-  -s      Only build source images (implies -I).
+  -s      Only build source images (implies -I). Ignores cached images.
 
   -d      Dry run by skipping the composer start commands.
+
+  -f      Force rebuilding images that already exist.
 
   -l DIR  Build only one layer (cannot be used with -g or -t).
           The DIR should be the path to the layer to build.
@@ -421,9 +455,9 @@ build_images.sh [-iIsd] [-l layer-dir | -g group-dir] [-t template]
           The DIR should be the path to the group to build.
           Implies -l based on the path.
 
-  -t FILE Build only one template (cannot be used with -l or -g). 
-          The FILE should be the path to the template to build. 
-          Implies -l and -g based on the filename.
+  -t FILE Build only one template (cannot be used with -l or -g).
+          The FILE should be the path to the template to build.
+          Implies -f along with -l and -g based on the filename.
 
 EOF
 }
@@ -434,9 +468,11 @@ COMPOSER_DRY_RUN=false
 LAYER=""
 GROUP=""
 TEMPLATE=""
+FORCE_REBUILD=false
+FORCE_SOURCE=false
 
 selCount=0
-while getopts "iIl:g:sdt:h" opt; do
+while getopts "iIl:g:sdt:hf:" opt; do
     case "${opt}" in
         h)
             usage
@@ -451,6 +487,7 @@ while getopts "iIl:g:sdt:h" opt; do
         s)
             BUILD_INSTALLER=false
             ONLY_SOURCE=true
+            FORCE_SOURCE=true
             ;;
         d)
             COMPOSER_DRY_RUN=true
@@ -467,6 +504,10 @@ while getopts "iIl:g:sdt:h" opt; do
             TEMPLATE="${OPTARG}"
             GROUP="$(basename "$(dirname "$(realpath "${OPTARG}")")")"
             selCount=$((selCount+1))
+            FORCE_REBUILD=true
+            ;;
+        f)
+            FORCE_REBUILD=true
             ;;
         *)
             usage "ERROR: Unknown option ${opt}"
