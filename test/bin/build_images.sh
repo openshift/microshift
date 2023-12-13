@@ -214,6 +214,10 @@ do_group() {
     SOURCE_IMAGES="$(get_container_images "${SOURCE_VERSION}")"
     export SOURCE_IMAGES
 
+    echo "Existing images:"
+    ls "${VM_DISK_BASEDIR}"/*.iso || echo "No ISO files in ${VM_DISK_BASEDIR}"
+    ostree summary --view --repo="${IMAGEDIR}/repo" || echo "Could not get image list from ${IMAGEDIR}/repo"
+
     # Upload the blueprint definitions
     if [ -n "${template_arg}" ]; then
         template_list="${template_arg}"
