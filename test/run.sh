@@ -62,8 +62,10 @@ if [ ! -f "${RF_VARIABLES}" ]; then
     exit 1
 fi
 
-DEST_DIR="${RF_VENV}" "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
-DEST_DIR="${RF_VENV}" "${ROOTDIR}/scripts/fetch_tools.sh" yq
+# DEST_DIR var is the python env dir used by fetch_tools.sh to install the tools
+export DEST_DIR="${RF_VENV}"
+"${ROOTDIR}/scripts/fetch_tools.sh" robotframework
+"${ROOTDIR}/scripts/fetch_tools.sh" yq
 
 RF_BINARY="${RF_VENV}/bin/robot"
 YQ_BINARY="${RF_VENV}/bin/yq"
