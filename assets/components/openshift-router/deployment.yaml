@@ -20,6 +20,8 @@ spec:
             allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
           terminationMessagePolicy: FallbackToLogsOnError
+          args:
+            - "-v=4"
           env:
             - name: ROUTER_SERVICE_NAMESPACE
               value: openshift-ingress
