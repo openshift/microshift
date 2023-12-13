@@ -5,9 +5,10 @@
 set -xeuo pipefail
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
+# Cannot use common.sh yet because some dependencies may be missing,
+# but we only need ROOTDIR at this time.
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck source=test/bin/common.sh
-source "${SCRIPTDIR}/common.sh"
+ROOTDIR="$(cd "${SCRIPTDIR}/../.." && pwd)"
 
 # Log output automatically
 LOGDIR="${ROOTDIR}/_output/ci-logs"
@@ -114,6 +115,10 @@ $(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-f
 $(dry_run) bash -x ./scripts/image-builder/configure.sh
 
 cd "${ROOTDIR}/test/"
+
+# Source common.sh only after all dependencies are installed.
+# shellcheck source=test/bin/common.sh
+source "${SCRIPTDIR}/common.sh"
 
 # Re-build from source.
 $(dry_run) bash -x ./bin/build_rpms.sh
