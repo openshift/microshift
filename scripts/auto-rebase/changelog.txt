@@ -1,111 +1,71 @@
-- ovn-kubernetes image-amd64 3906c6bf8f4914f3e59950875ce6d4e6c4266064 to b8f65b42a31a9f113996d77562d56f6d5946ab8d
-  - 0de2919 2023-12-01T16:35:51+01:00 Add hybrid-overlay-node binary to the container image
-  - 27d1fb5 2023-12-01T12:54:18+01:00 Adds join subnet SNAT rule to GR
-  - 4414248 2023-12-01T12:54:18+01:00 Revert "Enable gateway_mtu on rtoe port of GR"
-  - 4b0b914 2023-12-01T12:54:18+01:00 Ensure no MTU route cache for UDP Host network services
-  - 49d0036 2023-11-30T21:46:00+01:00 Make status subresource fields optional for apbroute and egressfirewall
-  - d44890c 2023-11-30T19:36:55+01:00 Fix issue with eatmydata
-  - c1b6b62 2023-11-30T15:17:25+01:00 Update update-codegen to copy zz_generated files. Hopefully that is the last missing piece for this script
-  - 3d5a949 2023-11-29T15:45:24+01:00 Fix linter bug
-  - c363223 2023-11-29T15:45:24+01:00 Make StatusManager zone-aware. It will only set accumulated status when all zones have reported their statuses. To do so, ZoneTracker was added to StatusManager, which tracks existing zones and notifies its subscriber about zones changes. StatusManager will also cleanup status messages left by deleted zones.
-  - 1cc1f45 2023-11-29T15:45:24+01:00 Add distributed status management for EgressFirewall. Add Status.Messages field to record statuses from zones, make egressfirewall status a subresource.
-  - 13e6f30 2023-11-29T15:45:24+01:00 Create StatusManager - a centralized component responsible for updating the centralized status of an object, based on zone-specific statuses. Created as a part of cluster manager, handles only apbroutepolicy objects for now.
-  - 72b8620 2023-11-29T15:45:24+01:00 Create a generic level-driven controller functionality
-  - c74b05a 2023-11-29T15:45:24+01:00 Add generic functionality to create fake clients and basic objects.
-  - fc615a5 2023-11-29T15:45:24+01:00 Update code generation to include Apply client API. Update `update-codegen` script to always install latest controller-gen, so that `controller-gen.kubebuilder.io/version` on the generate object doesn't decrease. Also overwrite v1/apis folder for every crd to ensure the latest version is applied (deleting is required to ensure stale files will be deleted).
-  - 0384de6 2023-11-29T10:59:47+01:00 Skip ETP=local+terminating EPs+LGW
-  - 4aeb480 2023-11-29T10:59:47+01:00 Consume conformance-profiles
-  - b57b21c 2023-11-29T10:59:47+01:00 Update network-policy-api to 0.1.2 and controller-gen to 0.13.0
-  - d1c7511 2023-11-29T10:59:47+01:00 Change e2e's to accommodate 1.28 test binary changes
-  - df79ab0 2023-11-29T10:59:47+01:00 Bump K8s Version for e2e's
-  - 6bcb960 2023-11-29T10:59:47+01:00 Bump K8sVersion for KIND and CI
-  - 1d5d3b1 2023-11-29T10:59:47+01:00 Update golang and k8s versions
-  - 2d44a24 2023-11-28T02:20:53+00:00 Use unique name for hybrid overlay per node router static routes and policies
-  - aeb9817 2023-11-28T02:12:36+00:00 Allow a node switching between OVN node and hybrid overlay node
+- cluster-network-operator embedded-component 4f14d361a8464a515411cd2f175b7f2d6b215072 to 08960c011ecf1f4fe4c65cd601bfd0ad6dc1e5c0
+  - 6045ca4 2023-12-05T13:21:54+01:00 Operconfig controller should not own spec.migration
+  - cd51b5b 2023-12-05T13:21:47+01:00 Bump github.com/openshift/api
 
-- oc image-arm64 b372ea0eba0bf9e611a67e111306817ad8ad4464 to 4b1a57ef30aadb3c23fe04a86338b2dba832f11d
-  - d368b948 2023-12-01T17:40:12+03:00 Use random string instead a part of token
-  - c8630afc 2023-12-01T16:03:08+03:00 Add explanation about why archive is excluded
-  - a2d39337 2023-12-01T16:03:08+03:00 Add explanation about why inspect/util is excluded
-  - 47eb386c 2023-12-01T16:03:07+03:00 Add explanation of the excluded git.go
-  - c769f26d 2023-12-01T16:03:07+03:00 Rename PathBasedPassthroughErr to PathBasedPthroughErr
-  - 77e684a0 2023-12-01T16:03:07+03:00 Extract unused username from token not from hardcoded
-  - 5179129c 2023-12-01T16:03:07+03:00 ignore some of false positives
-  - 076e3a36 2023-12-01T16:03:07+03:00 Bump containers/image/v5 to v5.29.0
-  - 5887b6ad 2023-12-01T16:03:07+03:00 Clean filepath for path traversal
-  - b5d5cf7e 2023-12-01T16:03:07+03:00 Add .snyk file to exclude vendor and ignore unit tests
-  - a6378af9 2023-10-30T09:52:46-04:00 Handle invalid related objects with errors
+- kubernetes embedded-component 9698040e5c77dfcea40649cc73d1ae2ac98a0423 to 9f68be2cf5bfbad35ae98eec0531169e11877973
+  - 1d709af2b 2023-12-03T10:17:45+02:00 UPSTREAM: <carry>: advertise shared cpus for mixed cpus feature
 
-- csi-external-snapshotter image-arm64 0df9df26f4ca99c160423cbe0bb6267c1ca7ad4e to 202f48ebffc01cb6cce720875b538d7d739844aa
-  - 043d21a 2023-12-01T17:38:56+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/0a0227f15d4cb7366996aa649c87acbca3d3d221/images/csi-snapshot-validation-webhook.yml
-  - cd1cafd 2023-12-01T15:55:21+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/5ce4a5ad6cc08e447d635be582601b8544a93184/images/ose-csi-external-snapshotter.yml
-  - f0f54bf 2023-12-01T13:12:52+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/58b4487135e2ad50601ae7d595cad5f36101477f/images/ose-csi-snapshot-controller.yml
-  - 9f4604b 2023-11-30T16:57:08+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/3af369afe4b44f4d17fa432026e107be365944ef/images/ose-csi-external-snapshotter.yml
-  - 2ff7ad9 2023-11-30T09:25:24+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/3af369afe4b44f4d17fa432026e107be365944ef/images/ose-csi-external-snapshotter.yml
-  - 060e373 2023-11-28T20:54:43+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/csi-snapshot-validation-webhook.yml
+- machine-config-operator embedded-component cc572a0f8d63410ffcff8b969bdf746f06346e4a to f691dcd2599659cb36f96a3df12d8dc336ab47d1
+  - 006c0529 2023-12-04T16:19:33-06:00 Restrict cgroup version updates to master and worker pools only
+  - ce5f22e5 2023-12-04T16:19:33-06:00 do not update the node object by default, empty string is cgroupv2 by default
 
-- csi-external-snapshotter image-arm64 0df9df26f4ca99c160423cbe0bb6267c1ca7ad4e to 202f48ebffc01cb6cce720875b538d7d739844aa
-  - 043d21a 2023-12-01T17:38:56+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/0a0227f15d4cb7366996aa649c87acbca3d3d221/images/csi-snapshot-validation-webhook.yml
-  - cd1cafd 2023-12-01T15:55:21+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/5ce4a5ad6cc08e447d635be582601b8544a93184/images/ose-csi-external-snapshotter.yml
-  - f0f54bf 2023-12-01T13:12:52+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/58b4487135e2ad50601ae7d595cad5f36101477f/images/ose-csi-snapshot-controller.yml
-  - 9f4604b 2023-11-30T16:57:08+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/3af369afe4b44f4d17fa432026e107be365944ef/images/ose-csi-external-snapshotter.yml
-  - 2ff7ad9 2023-11-30T09:25:24+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/3af369afe4b44f4d17fa432026e107be365944ef/images/ose-csi-external-snapshotter.yml
-  - 060e373 2023-11-28T20:54:43+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/csi-snapshot-validation-webhook.yml
+- operator-framework-olm embedded-component 42b679b84c0d18fdddaca36b16b4495fe652133e to 85c579f9be61aaea11e90b6c870452c72107300a
+  - 98d78fea 2023-11-30T10:18:09-05:00 [carry] Add ownership annotations to new and existing olm-managed secrets
 
-- csi-external-snapshotter image-arm64 0df9df26f4ca99c160423cbe0bb6267c1ca7ad4e to 202f48ebffc01cb6cce720875b538d7d739844aa
-  - 043d21a 2023-12-01T17:38:56+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/0a0227f15d4cb7366996aa649c87acbca3d3d221/images/csi-snapshot-validation-webhook.yml
-  - cd1cafd 2023-12-01T15:55:21+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/5ce4a5ad6cc08e447d635be582601b8544a93184/images/ose-csi-external-snapshotter.yml
-  - f0f54bf 2023-12-01T13:12:52+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/58b4487135e2ad50601ae7d595cad5f36101477f/images/ose-csi-snapshot-controller.yml
-  - 9f4604b 2023-11-30T16:57:08+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/3af369afe4b44f4d17fa432026e107be365944ef/images/ose-csi-external-snapshotter.yml
-  - 2ff7ad9 2023-11-30T09:25:24+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/3af369afe4b44f4d17fa432026e107be365944ef/images/ose-csi-external-snapshotter.yml
-  - 060e373 2023-11-28T20:54:43+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/csi-snapshot-validation-webhook.yml
+- oc image-amd64 4b1a57ef30aadb3c23fe04a86338b2dba832f11d to f2953f3e0fb3bcf2bfd835d7823337257bdcf426
+  - d5b9ce83 2023-12-05T11:28:20+03:00 Drop template overwrite in direct usage
+  - 22b07947 2023-12-05T09:20:48+03:00 Overwrite template's namespace with the explicit one
 
-- ovn-kubernetes image-arm64 3906c6bf8f4914f3e59950875ce6d4e6c4266064 to b8f65b42a31a9f113996d77562d56f6d5946ab8d
-  - 0de2919 2023-12-01T16:35:51+01:00 Add hybrid-overlay-node binary to the container image
-  - 27d1fb5 2023-12-01T12:54:18+01:00 Adds join subnet SNAT rule to GR
-  - 4414248 2023-12-01T12:54:18+01:00 Revert "Enable gateway_mtu on rtoe port of GR"
-  - 4b0b914 2023-12-01T12:54:18+01:00 Ensure no MTU route cache for UDP Host network services
-  - 49d0036 2023-11-30T21:46:00+01:00 Make status subresource fields optional for apbroute and egressfirewall
-  - d44890c 2023-11-30T19:36:55+01:00 Fix issue with eatmydata
-  - c1b6b62 2023-11-30T15:17:25+01:00 Update update-codegen to copy zz_generated files. Hopefully that is the last missing piece for this script
-  - 3d5a949 2023-11-29T15:45:24+01:00 Fix linter bug
-  - c363223 2023-11-29T15:45:24+01:00 Make StatusManager zone-aware. It will only set accumulated status when all zones have reported their statuses. To do so, ZoneTracker was added to StatusManager, which tracks existing zones and notifies its subscriber about zones changes. StatusManager will also cleanup status messages left by deleted zones.
-  - 1cc1f45 2023-11-29T15:45:24+01:00 Add distributed status management for EgressFirewall. Add Status.Messages field to record statuses from zones, make egressfirewall status a subresource.
-  - 13e6f30 2023-11-29T15:45:24+01:00 Create StatusManager - a centralized component responsible for updating the centralized status of an object, based on zone-specific statuses. Created as a part of cluster manager, handles only apbroutepolicy objects for now.
-  - 72b8620 2023-11-29T15:45:24+01:00 Create a generic level-driven controller functionality
-  - c74b05a 2023-11-29T15:45:24+01:00 Add generic functionality to create fake clients and basic objects.
-  - fc615a5 2023-11-29T15:45:24+01:00 Update code generation to include Apply client API. Update `update-codegen` script to always install latest controller-gen, so that `controller-gen.kubebuilder.io/version` on the generate object doesn't decrease. Also overwrite v1/apis folder for every crd to ensure the latest version is applied (deleting is required to ensure stale files will be deleted).
-  - 0384de6 2023-11-29T10:59:47+01:00 Skip ETP=local+terminating EPs+LGW
-  - 4aeb480 2023-11-29T10:59:47+01:00 Consume conformance-profiles
-  - b57b21c 2023-11-29T10:59:47+01:00 Update network-policy-api to 0.1.2 and controller-gen to 0.13.0
-  - d1c7511 2023-11-29T10:59:47+01:00 Change e2e's to accommodate 1.28 test binary changes
-  - df79ab0 2023-11-29T10:59:47+01:00 Bump K8s Version for e2e's
-  - 6bcb960 2023-11-29T10:59:47+01:00 Bump K8sVersion for KIND and CI
-  - 1d5d3b1 2023-11-29T10:59:47+01:00 Update golang and k8s versions
-  - 2d44a24 2023-11-28T02:20:53+00:00 Use unique name for hybrid overlay per node router static routes and policies
-  - aeb9817 2023-11-28T02:12:36+00:00 Allow a node switching between OVN node and hybrid overlay node
+- kubernetes image-amd64 9698040e5c77dfcea40649cc73d1ae2ac98a0423 to 9f68be2cf5bfbad35ae98eec0531169e11877973
+  - 1d709af2b 2023-12-03T10:17:45+02:00 UPSTREAM: <carry>: advertise shared cpus for mixed cpus feature
 
-- kubernetes image-arm64 59b90bd188d5389527a81d17e5787877d8c5746b to 9698040e5c77dfcea40649cc73d1ae2ac98a0423
-  - e0ac58a03 2023-11-22T16:18:16+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 677fa23b0 2023-11-22T16:02:48+01:00 UPSTREAM: <drop>: manually resolve conflicts
-  - bae2c6267 2023-11-15T16:48:52+00:00 Release commit for Kubernetes v1.28.4
-  - 4a15ef25b 2023-11-14T17:06:10+00:00 Use golang library instead of mklink
-  - ceec3579f 2023-11-08T08:44:08-06:00 [go] Bump images, dependencies and versions to go 1.20.11
-  - 7dc8b9443 2023-10-31T10:55:57-07:00 Fixing attempt to deploy past allocatable memory limits test on Windows
-  - 93b91ceea 2023-10-26T12:00:32-04:00 bump golang.org/grpc to v1.56.3
-  - 4276a60b6 2023-10-26T12:35:33+02:00 Add more test cases ensuring nextScheduleTimeDuration is never < 0
-  - 0ccb8f88e 2023-10-26T12:35:33+02:00 Modify mostRecentScheduleTime to return more detailed information about missed schedules
-  - 3b1e906e7 2023-10-26T12:35:33+02:00 Fix spelling
-  - a94a9eade 2023-10-20T18:36:35+03:00 removing the import of "k8s.io/utils/ptr" because it was introduced after 1.28
-  - beb6d65a2 2023-10-20T17:18:07+03:00 Fixing CurrentReplicas and CurrentRevision in completeRollingUpdate
-  - 951a96df2 2023-10-20T09:01:23+02:00 Use Patch instead of SSA for Pod Disruption condition
-  - 86c241ba3 2023-10-18T18:44:42+02:00 KCCM: fix GCP ILB by reintroducing readiness predicate for eTP:Local
-  - 4ad1d3231 2023-10-18T12:08:39+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.3
-  - 9822b084c 2023-09-29T23:44:07+00:00 Fix panic testing intree vSphere dynamic PV.
-  - 62aaeb6e8 2023-09-29T17:41:34+02:00 service controller: improve node lifecycle updates - update nodes if providerID has changed
-  - 688ea394e 2023-09-14T16:13:18+08:00 implement Stringer for podActions
-  - 8a5879840 2023-09-13T20:00:09+00:00 Retry operations if CSI Driver Isn't Found by Treating this Error as Transient
+- oc image-arm64 4b1a57ef30aadb3c23fe04a86338b2dba832f11d to ce8d65e62c4226f0796c90d76a70286f4b2c2201
+  - d6ec97cb 2023-12-11T14:54:38+03:00 Bump ocp images to 4.16 in addition to go 1.21
+  - 6bd74a1a 2023-12-11T08:58:55+03:00 oc release extract: Introduce --idms-file and deprecate icsp-file
+  - f03ac6d9 2023-12-10T03:04:12+08:00 Skip network.openshift.io/v1alpha1 in describer unit test
+  - e2ff164f 2023-12-09T20:21:24+08:00 Bump openshift/api to include to the new CloudCredential capability
+  - a2da305a 2023-12-07T15:24:26+03:00 Remove deprecated password defaulting in default config flag
+  - d5b9ce83 2023-12-05T11:28:20+03:00 Drop template overwrite in direct usage
+  - 22b07947 2023-12-05T09:20:48+03:00 Overwrite template's namespace with the explicit one
 
-- service-ca-operator image-arm64 fe887613d031435fb0c76eb397764ba68fe09014 to 4d3d966edaaafcae7c9d4a1aa87a67ac627a6ebd
-  - f24c4b0 2023-11-30T15:58:52-05:00 Add description annotations to service CA secret and configmap
+- csi-external-snapshotter image-arm64 202f48ebffc01cb6cce720875b538d7d739844aa to c303fc4922dfbdc9f81b9bef7a7f731a04736b47
+  - 9971aab 2023-12-11T16:21:12+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e5df10e41b14c724468c8f78e2690f219279bfc4/images/ose-csi-snapshot-controller.yml
+  - 65badb9 2023-12-11T02:18:19+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/csi-snapshot-validation-webhook.yml
+  - bc906f6 2023-12-10T19:09:36+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/ose-csi-external-snapshotter.yml
+  - b79b670 2023-12-09T20:04:43+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/ose-csi-snapshot-controller.yml
+
+- csi-external-snapshotter image-arm64 202f48ebffc01cb6cce720875b538d7d739844aa to c303fc4922dfbdc9f81b9bef7a7f731a04736b47
+  - 9971aab 2023-12-11T16:21:12+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e5df10e41b14c724468c8f78e2690f219279bfc4/images/ose-csi-snapshot-controller.yml
+  - 65badb9 2023-12-11T02:18:19+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/csi-snapshot-validation-webhook.yml
+  - bc906f6 2023-12-10T19:09:36+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/ose-csi-external-snapshotter.yml
+  - b79b670 2023-12-09T20:04:43+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/ose-csi-snapshot-controller.yml
+
+- csi-external-snapshotter image-arm64 202f48ebffc01cb6cce720875b538d7d739844aa to c303fc4922dfbdc9f81b9bef7a7f731a04736b47
+  - 9971aab 2023-12-11T16:21:12+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e5df10e41b14c724468c8f78e2690f219279bfc4/images/ose-csi-snapshot-controller.yml
+  - 65badb9 2023-12-11T02:18:19+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/csi-snapshot-validation-webhook.yml
+  - bc906f6 2023-12-10T19:09:36+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/ose-csi-external-snapshotter.yml
+  - b79b670 2023-12-09T20:04:43+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/c78b2b27f47b41d5d59449c863f3dea6eaa988b7/images/ose-csi-snapshot-controller.yml
+
+- ovn-kubernetes image-arm64 b8f65b42a31a9f113996d77562d56f6d5946ab8d to 2c98ee245fcddadd19863ee4f7e754be8975e7f8
+  - 3b621a5 2023-12-05T10:36:16-05:00 Clear RTOE GR MTU on upgrade
+  - f22307b 2023-12-04T14:49:26-06:00 vendor: bump google.golang.org/grpc from 1.53.0 to 1.56.3
+  - f8d0d32 2023-12-04T14:46:14+00:00 Fragment oversized reply packets in LGW mode
+  - 7049e55 2023-12-04T14:44:51+00:00 Add egress IP MTU e2e test
+  - 0f6330d 2023-12-04T14:04:23+01:00 Introduce ovnkube-node-dpu[.yaml]
+  - 94ddca1 2023-12-04T13:27:28+01:00 ovnkube.sh: Make metric ports configurable
+  - 422546a 2023-12-04T11:55:27+01:00 kubevirt, live migration: check the VMI migration object fails
+  - 2a64186 2023-12-04T11:55:27+01:00 kubevirt, live migration: ensure VM tolerates migration failure
+  - 7447607 2023-12-04T10:57:47+01:00 kube: use paging when List-ing API objects directly
+  - 3e1e055 2023-12-02T08:45:15-06:00 go-controller: added missing space to description of metric
+  - 7f1d28f 2023-12-01T00:20:48+01:00 Fix service.go NodePort cleanup
+  - 3a76cf2 2023-12-01T00:20:48+01:00 Retrieve subnet mask for client subnet
+  - 134a2c7 2023-12-01T00:20:48+01:00 Do not use sudo to remove metallb directory
+  - c44dbde 2023-12-01T00:20:48+01:00 Fix style issue in external_gateways.go for klog.Infof
+  - 0611d45 2023-12-01T00:20:48+01:00 Fix implementation of FakeIPTables List() method
+  - 04c6af5 2023-12-01T00:20:48+01:00 Add ovnkube-ipsec to gitignore
+  - 1274ef7 2023-11-03T01:56:52+08:00 Update INSTALL.OPENSHIFT.md
+
+- kubernetes image-arm64 9698040e5c77dfcea40649cc73d1ae2ac98a0423 to 7aa0a745c4363fdecb2b5afc69a8a647471d8651
+  - ac7efb459 2023-12-07T15:57:11+02:00 UPSTREAM: <carry>: add new admission for handling shared cpus
+  - 1d709af2b 2023-12-03T10:17:45+02:00 UPSTREAM: <carry>: advertise shared cpus for mixed cpus feature
 
