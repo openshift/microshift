@@ -70,10 +70,10 @@ index 545e1a04..39b266a0 100644
 -	i.OpenshiftConfigInformers.Start(stopCh)
  }
 diff --git a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
-index 1b6e863c..510c99f9 100644
+index 2427e502d..a75cdfdde 100644
 --- a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
 +++ b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
-@@ -12,7 +12,6 @@ import (
+@@ -13,7 +13,6 @@ import (
  	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccadmission"
  	authorizationrestrictusers "k8s.io/kubernetes/openshift-kube-apiserver/admission/authorization/restrictusers"
  	quotaclusterresourceoverride "k8s.io/kubernetes/openshift-kube-apiserver/admission/autoscaling/clusterresourceoverride"
@@ -81,19 +81,21 @@ index 1b6e863c..510c99f9 100644
  	"k8s.io/kubernetes/openshift-kube-apiserver/admission/autoscaling/managementcpusoverride"
  	quotarunonceduration "k8s.io/kubernetes/openshift-kube-apiserver/admission/autoscaling/runonceduration"
  	"k8s.io/kubernetes/openshift-kube-apiserver/admission/customresourcevalidation/customresourcevalidationregistration"
-@@ -31,7 +30,6 @@ func RegisterOpenshiftKubeAdmissionPlugins(plugins *admission.Plugins) {
+@@ -31,7 +31,6 @@ func RegisterOpenshiftKubeAdmissionPlugins(plugins *admission.Plugins) {
  	imagepolicy.Register(plugins)
  	ingressadmission.Register(plugins)
  	managementcpusoverride.Register(plugins)
 -	managednode.Register(plugins)
+ 	mixedcpus.Register(plugins)
  	projectnodeenv.Register(plugins)
  	quotaclusterresourceoverride.Register(plugins)
- 	quotaclusterresourcequota.Register(plugins)
-@@ -73,7 +71,6 @@ var (
+@@ -74,7 +73,6 @@ var (
  		"route.openshift.io/IngressAdmission",
  		hostassignment.PluginName,          // "route.openshift.io/RouteHostAssignment"
  		csiinlinevolumesecurity.PluginName, // "storage.openshift.io/CSIInlineVolumeSecurity"
 -		managednode.PluginName,             // "autoscaling.openshift.io/ManagedNode"
+ 		mixedcpus.PluginName,               // "autoscaling.openshift.io/MixedCPUs"
  	}
  
  	// openshiftAdmissionPluginsForKubeAfterResourceQuota are the plugins to add after ResourceQuota plugin
+
