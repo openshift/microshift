@@ -62,10 +62,8 @@ if [ ! -f "${RF_VARIABLES}" ]; then
     exit 1
 fi
 
-# shellcheck disable=SC2034
-DEST_DIR="${RF_VENV}" 
-"${ROOTDIR}/scripts/fetch_tools.sh" robotframework
-"${ROOTDIR}/scripts/fetch_tools.sh" yq
+DEST_DIR="${RF_VENV}" "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
+DEST_DIR="${RF_VENV}" "${ROOTDIR}/scripts/fetch_tools.sh" yq
 
 RF_BINARY="${RF_VENV}/bin/robot"
 YQ_BINARY="${RF_VENV}/bin/yq"
