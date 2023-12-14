@@ -5,7 +5,7 @@ SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
 PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system)
 PODS_CT_LIST=(2                        1                    1                 2             2                 2)
-RETRIEVE_PODS=false
+LOG_POD_EVENTS=false
 
 # Source the MicroShift health check functions library
 # shellcheck source=packaging/greenboot/functions.sh
@@ -15,7 +15,7 @@ source /usr/share/microshift/functions/greenboot.sh
 trap 'forced_termination' TERM SIGINT
 
 # Set the exit handler to log the exit status
-trap 'script_exit' EXIT
+trap 'log_script_exit' EXIT
 
 # Handler that will be called when the script is terminated by sending TERM or
 # INT signals. To override default exit codes it forces returning 1 like the
@@ -23,44 +23,6 @@ trap 'script_exit' EXIT
 function forced_termination() {
     echo "Signal received, terminating."
     exit 1
-}
-
-# The script exit handler logging the FAILURE or FINISHED message depending
-# on the exit status of the last command
-#
-# args: None
-# return: None
-function script_exit() {
-    if [ "$?" -ne 0 ] ; then
-        if ${RETRIEVE_PODS}; then
-            log_failure_cmd "pod-list" "${OCGET_CMD} pods -A -o wide"
-            log_failure_cmd "pod-events" "${OCGET_CMD} events -A"
-        fi
-        print_failure_logs
-        echo "FAILURE"
-    else
-        echo "FINISHED"
-    fi
-}
-
-# Run a command specified in the arguments, redirect its output to a temporary
-# file and add this file to 'LOG_FAILURE_FILES' setting so that is it printed
-# in the logs if the script exits with failure.
-#
-# All the command output including stdout and stderr is redirected to its log file.
-#
-# arg1: A name to be used when creating "/tmp/${name}.XXXXXXXXXX" temporary files
-# arg2: A command to be run
-# return: None
-function log_failure_cmd() {
-    local -r logName="$1"
-    local -r logCmd="$2"
-    local -r logFile=$(mktemp "/tmp/${logName}.XXXXXXXXXX")
-
-    # Run the command ignoring errors and log its output
-    (${logCmd}) &> "${logFile}" || true
-    # Save the log file name in the list to be printed
-    LOG_FAILURE_FILES+=("${logFile}")
 }
 
 # Check the microshift.service systemd unit activity, terminating the script
@@ -152,7 +114,7 @@ fi
 
 # Starting pod-specific checks
 # Log list of pods and their events on failure
-RETRIEVE_PODS=true
+LOG_POD_EVENTS=true
 
 # Wait for any pods to enter running state
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for any pods to be running"
