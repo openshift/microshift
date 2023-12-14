@@ -17,6 +17,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -115,9 +116,13 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		}
 		klog.Infof("%v process quit: %v", s.Name(), cmd.ProcessState.String())
 
-		// Exit microshift to trigger microshift-etcd restart
-		klog.Warning("microshift-etcd process terminated prematurely, restarting MicroShift")
-		os.Exit(0)
+		if !errors.Is(ctx.Err(), context.Canceled) {
+			// Exit microshift to trigger microshift-etcd restart
+			klog.Warning("microshift-etcd process terminated prematurely, restarting MicroShift")
+			os.Exit(0)
+		} else {
+			klog.Info("MicroShift is mid shutdown - ignoring etcd termination")
+		}
 	}()
 
 	// Ensures microshift-etcd unit stopped after microshift
