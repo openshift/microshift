@@ -29,9 +29,9 @@ Snapshotter Smoke Test
     [Tags]    smoke    snapshot
     [Setup]    Test Case Setup
     Oc Apply    -f ${SNAPSHOT} -n ${NAMESPACE}
-    Oc Wait For    volumesnapshot/my-snap    jsonpath\='{.status.readyToUse}=true'
+    Named VolumeSnapshot Should Be Ready    my-snap
     Oc Apply    -k ${RESTORE_KUSTOMIZE} -n ${NAMESPACE}
-    Oc Wait For    pod/${POD_NAME_STATIC}    condition\=Ready
+    Named Pod Should Be Ready    ${POD_NAME_STATIC}
     ${data}=    Read From Volume    ${POD_NAME_STATIC}
     Should Be Equal As Strings    ${TESTDATA}    ${data}
     [Teardown]    Test Case Teardown
@@ -60,21 +60,21 @@ Test Suite Teardown
 Test Case Setup
     [Documentation]    Prepare the cluster-level APIs and a data-volume with some simple text
     Oc Apply    -k ${SOURCE_KUSTOMIZE} -n ${NAMESPACE}
-    Oc Wait For    pod/${POD_NAME_STATIC}    condition\=Ready    timeout=60s
+    Named Pod Should Be Ready    ${POD_NAME_STATIC}
     Write To Volume    ${POD_NAME_STATIC}    ${TEST_DATA}
     Oc Delete    pod ${POD_NAME_STATIC} -n ${NAMESPACE}
-    Oc Wait For    pod/${POD_NAME_STATIC}    delete
+    Named Pod Should Be Deleted    ${POD_NAME_STATIC}
 
 Test Case Teardown
     [Documentation]    Remove cluster-scoped test APIs
     Oc Delete    pod ${POD_NAME_STATIC} -n ${NAMESPACE}
-    Oc Wait For    pod/${POD_NAME_STATIC}    delete
+    Named Pod Should Be Deleted    ${POD_NAME_STATIC}
     Oc Delete    volumesnapshot my-snap -n ${NAMESPACE}
-    Oc Wait For    volumesnapshot/my-snap    delete
+    Named VolumeSnapshot Should Be Deleted    my-snap
     Oc Delete    pvc test-claim-thin -n ${NAMESPACE}
     Oc Delete    pvc snapshot-restore -n ${NAMESPACE}
-    Oc Wait For    pvc/test-claim-thin    delete    timeout=120s
-    Oc Wait For    pvc/snapshot-restore    delete    timeout=120s
+    Named PVC Should Be Deleted    test-claim-thin
+    Named PVC Should Be Deleted    snapshot-restore
 
 Write To Volume
     [Documentation]    Write some simple text to the data volume

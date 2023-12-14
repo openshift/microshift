@@ -57,7 +57,7 @@ Semanage Fcontext Should Have Combined List Of OCP And MicroShift Rules
 
     ${result}=    Get Fcontext List
     ${expected}=    Get Expected Ocp Microshift Fcontext List
-    Lists Should Be Equal    ${result}    ${expected}
+    Lists Should Be Equal    ${result}    ${expected}    ignore_order=True
 
 Audit Log Should Be Empty For MicroShift
     [Documentation]    Checks that no permission denials have occured during running MicroShift

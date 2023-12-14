@@ -1,0 +1,9 @@
+{{- if env.Getenv "CURRENT_RELEASE_REPO" "" -}}
+id = "microshift-crel"
+name = "Repository with already existing RPMs for current release"
+type = "yum-baseurl"
+url = "{{ .Env.CURRENT_RELEASE_REPO }}"
+check_gpg = false
+check_ssl = true
+system = false
+{{- end -}}

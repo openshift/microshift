@@ -24,6 +24,7 @@ http {
     server {
         listen 0.0.0.0:${WEB_SERVER_PORT};
         root   ${IMAGEDIR};
+        autoindex on;
     }
 }
 pid ${IMAGEDIR}/nginx.pid;

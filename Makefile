@@ -57,6 +57,8 @@ GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
 # Build to a place we can ignore
 GO_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
+GO_CACHE :=$(shell go env GOCACHE)
+
 ifeq ($(DEBUG),true)
 	# throw all the debug info in!
 	LD_FLAGS =
@@ -109,6 +111,9 @@ GO_TEST_PACKAGES=./cmd/... ./pkg/...
 # Enable CGO when building microshift binary for access to local libraries.
 # Use an environment variable to allow CI to disable when cross-compiling.
 export CGO_ENABLED ?= 1
+
+# Specify OCP build tools image tag when building rpm with podman
+RPM_BUILDER_IMAGE_TAG := rhel-9-release-golang-1.20-openshift-4.14
 
 all: generate-config microshift etcd
 
@@ -293,17 +298,17 @@ commit: image-build-configure image-build-commit
 .PHONY: commit
 
 rpm-podman:
-	RPM_BUILDER_IMAGE_TAG="rhel-8-release-golang-1.19-openshift-4.13"; \
 	podman build \
 		--volume /etc/pki/entitlement/:/etc/pki/entitlement \
-		--build-arg TAG=$$RPM_BUILDER_IMAGE_TAG \
-		--tag microshift-builder:$$RPM_BUILDER_IMAGE_TAG - < ./packaging/images/Containerfile.rpm-builder ; \
+		--build-arg TAG=$(RPM_BUILDER_IMAGE_TAG) \
+		--authfile $(PULLSECRET) \
+		--tag microshift-builder:$(RPM_BUILDER_IMAGE_TAG) - < ./packaging/images/Containerfile.rpm-builder ; \
 	podman run \
-		--rm -ti \
-		--volume $$(pwd):/opt/microshift \
-		--volume $$(go env GOCACHE):/go/.cache \
+		--rm -i \
+		--volume $$(pwd):/opt/microshift:z \
+		--volume $(GO_CACHE):/go/.cache:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
-		microshift-builder:$$RPM_BUILDER_IMAGE_TAG \
+		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; trap "pkill $${pid}" INT ; wait $${pid}'
 .PHONY: rpm-podman
 
