@@ -1,35 +1,13 @@
-- cluster-network-operator embedded-component 73a1db2e64e320fd2584b85c68c0bc8bfe6010cc to 34cf2de860d0c4947c1a273d134fce0165451ecb
-  - 24bf4c0 2023-12-09T10:26:53+00:00 hypershift, hosted clusters: enable multi-homing/multi-net features
-  - d057e81 2023-12-08T05:50:48+02:00 ipsec: add pluto restart
-  - 2cf0924 2023-11-22T15:00:37+01:00 Bump library-go
-  - c9df37e 2023-11-22T14:56:37+01:00 Bump golang.org/x/net
+- ovn-kubernetes image-amd64 82cc229fe209434fe26dc8d9016d69487d523b76 to c7ebb732b48328d836b12b1b8ccfb7f12f693a8e
+  - 6ecf31f 2023-12-11T12:10:39+00:00 Fragment oversized reply packets in LGW mode
+  - be30f41 2023-12-11T12:10:33+00:00 Add egress IP MTU e2e test
 
-- machine-config-operator embedded-component d46f420c591a079c89a799c02ae2494da2600b3e to 7649b9274cde2fb50a61a579e3891c8ead2d79c5
-  - 6e975588 2023-12-07T10:26:26-05:00 execute cert related processes to ensure proper rotation
+- oc image-arm64 16100fe02885d4d7eb344568a1b1410d14543cd6 to 33a7a8bcccdd1c7c0e2f51609d832d31232d2f26
+  - 545a4784 2023-11-29T12:40:48+00:00 Add client version in must-gather summary
 
-- oc image-amd64 9b1e0d27df3cf7b2ea878cd668ce709cc4e4c41a to 16100fe02885d4d7eb344568a1b1410d14543cd6
-  - c849d46e 2023-12-05T19:51:05+00:00 Drop template overwrite in direct usage
-  - c82dcc15 2023-12-05T19:51:05+00:00 Overwrite template's namespace with the explicit one
-
-- ovn-kubernetes image-amd64 2cd252490affeaf7579a4e659e93f35bc82f3a93 to 82cc229fe209434fe26dc8d9016d69487d523b76
-  - 65839f5 2023-12-07T15:50:23-05:00 CARRY: modfications to e2e test for clearing mtu
-  - 34c6620 2023-12-07T15:46:41-05:00 CARRY: adds datapath for updates SNAT test
-  - 02b0a4a 2023-12-07T15:46:41-05:00 Clear RTOE GR MTU on upgrade
-  - c7f9b99 2023-12-05T08:56:15+01:00 OVNK/GW: Ignore headless services in syncServices
-  - dae57ad 2023-12-03T00:33:42-05:00 Adds join subnet SNAT rule to GR
-  - 4841aa6 2023-12-03T00:33:34-05:00 Revert "Enable gateway_mtu on rtoe port of GR"
-  - 71c1f20 2023-12-03T00:33:25-05:00 Ensure no MTU route cache for UDP Host network services
-
-- oc image-arm64 9b1e0d27df3cf7b2ea878cd668ce709cc4e4c41a to 16100fe02885d4d7eb344568a1b1410d14543cd6
-  - c849d46e 2023-12-05T19:51:05+00:00 Drop template overwrite in direct usage
-  - c82dcc15 2023-12-05T19:51:05+00:00 Overwrite template's namespace with the explicit one
-
-- ovn-kubernetes image-arm64 2cd252490affeaf7579a4e659e93f35bc82f3a93 to 82cc229fe209434fe26dc8d9016d69487d523b76
-  - 65839f5 2023-12-07T15:50:23-05:00 CARRY: modfications to e2e test for clearing mtu
-  - 34c6620 2023-12-07T15:46:41-05:00 CARRY: adds datapath for updates SNAT test
-  - 02b0a4a 2023-12-07T15:46:41-05:00 Clear RTOE GR MTU on upgrade
-  - c7f9b99 2023-12-05T08:56:15+01:00 OVNK/GW: Ignore headless services in syncServices
-  - dae57ad 2023-12-03T00:33:42-05:00 Adds join subnet SNAT rule to GR
-  - 4841aa6 2023-12-03T00:33:34-05:00 Revert "Enable gateway_mtu on rtoe port of GR"
-  - 71c1f20 2023-12-03T00:33:25-05:00 Ensure no MTU route cache for UDP Host network services
+- ovn-kubernetes image-arm64 82cc229fe209434fe26dc8d9016d69487d523b76 to 0d0b66f68cdf8609e1b316fd2f4162603eb0b80f
+  - 6ecf31f 2023-12-11T12:10:39+00:00 Fragment oversized reply packets in LGW mode
+  - be30f41 2023-12-11T12:10:33+00:00 Add egress IP MTU e2e test
+  - 8d3a153 2023-11-17T10:35:13+01:00 kubevirt: Ignore completed virt-launcher pods
+  - d4090f7 2023-11-17T10:35:05+01:00 kubevirt: Refactor unit test
 
