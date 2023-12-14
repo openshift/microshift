@@ -5,6 +5,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/ostree-health.resource
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -21,8 +22,8 @@ ${HOSTNAME}                 hello-microshift.cluster.local
 Router Smoke Test
     [Documentation]    Run a router smoke test
     [Setup]    Run Keywords
+    ...    Restart Greenboot And Wait For Success
     ...    Create Hello MicroShift Pod
-    ...    AND
     ...    Expose Hello MicroShift Service Via Route
 
     Wait Until Keyword Succeeds    10x    6s
@@ -42,6 +43,7 @@ Load Balancer Smoke Test
 Ingress Smoke Test
     [Documentation]    Verify a simple ingress rule correctly exposes HTTP service
     [Setup]    Run Keywords
+    ...    Restart Greenboot And Wait For Success
     ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift
     ...    Create Hello MicroShift Ingress
