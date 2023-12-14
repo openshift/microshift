@@ -9,6 +9,7 @@ SCRIPT_PID=$$
 OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
 OCGET_OPT="--no-headers"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
+OCROLLOUT_CMD="oc rollout ${OCCONFIG_OPT}"
 
 # Note about the output
 # This file runs as part of a systemd unit, greenboot-healthcheck. All of the
@@ -142,6 +143,22 @@ function namespace_images_downloaded() {
     return 0
 }
 
+# Check the deployment rollout status in a given namespace is successful.
+#
+# args: None
+# env: 'CHECK_DEPLOY_NS' environment variable for the namespace to check
+# return: 0 if deployment rollout is successful, or 1 otherwise
+function namespace_deployment_ready() {
+    local -r ns="${CHECK_DEPLOY_NS}"
+
+    if ${OCROLLOUT_CMD} status deployment -n "${ns}" \
+            --watch=false --timeout=1s &>/dev/null ; then
+        return 0
+    fi
+
+    return 1
+}
+
 # Check if a given number of pods in a given namespace are in the 'Ready' status,
 # terminating the script with the SIGTERM signal if more pods are ready than expected.
 #
@@ -220,4 +237,44 @@ function print_failure_logs() {
             echo "Info: Log file '${file}' does not exist"
         fi
     done
+}
+
+# Run a command specified in the arguments, redirect its output to a temporary
+# file and add this file to 'LOG_FAILURE_FILES' setting so that is it printed
+# in the logs if the script exits with failure.
+#
+# All the command output including stdout and stderr is redirected to its log file.
+#
+# arg1: A name to be used when creating "/tmp/${name}.XXXXXXXXXX" temporary files
+# arg2: A command to be run
+# return: None
+function log_failure_cmd() {
+    local -r logName="$1"
+    local -r logCmd="$2"
+    local -r logFile=$(mktemp "/tmp/${logName}.XXXXXXXXXX")
+
+    # Run the command ignoring errors and log its output
+    (${logCmd}) &> "${logFile}" || true
+    # Save the log file name in the list to be printed
+    LOG_FAILURE_FILES+=("${logFile}")
+}
+
+# The script exit handler logging the FAILURE or FINISHED message depending
+# on the exit status of the last command. If the 'LOG_POD_EVENTS' environment
+# variable is set, also log the list of pods and their events on failure.
+#
+# args: None
+# env: 'LOG_POD_EVENTS' environment variable to enable pod-specific logging
+# return: None
+function log_script_exit() {
+    if [ "$?" -ne 0 ] ; then
+        if ${LOG_POD_EVENTS}; then
+            log_failure_cmd "pod-list" "${OCGET_CMD} pods -A -o wide"
+            log_failure_cmd "pod-events" "${OCGET_CMD} events -A --sort-by='.metadata.creationTimestamp'"
+        fi
+        print_failure_logs
+        echo "FAILURE"
+    else
+        echo "FINISHED"
+    fi
 }
