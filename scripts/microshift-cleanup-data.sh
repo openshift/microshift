@@ -9,6 +9,7 @@ PODS_NS_LIST=(openshift-operator-lifecycle-manager openshift-service-ca openshif
 FULL_CLEAN=false
 KEEP_IMAGE=false
 OVN_CLEAN=false
+CERT_CLEAN=false
 # Flags used for generating a user summary message
 SERVICE_STOPPED=false
 SERVICE_DISABLED=false
@@ -20,10 +21,11 @@ function usage() {
         echo "Stop all MicroShift services, also cleaning their data"
     fi
     echo ""
-    echo "Usage: ${SCRIPT_NAME} <--all [--keep-images] | --ovn>"
+    echo "Usage: ${SCRIPT_NAME} <--all [--keep-images] | --ovn | --cert>"
     echo "   --all         Clean all MicroShift and OVN data"
     echo "   --keep-images Keep container images when cleaning all data"
     echo "   --ovn         Clean OVN data only"
+    echo "   --cert        Clean certificates only"
     exit 1
 }
 
@@ -94,24 +96,31 @@ function clean_processes() {
         fi
     fi
 
-    echo Killing conmon, pause and OVN processes
-    systemctl stop --now ovsdb-server.service 2>/dev/null || true
-    for pname in conmon pause ovn-controller ovn-northd ; do
-        pkill -9 --exact ${pname} || true
-    done
+    if ${FULL_CLEAN} || ${OVN_CLEAN} ; then
+        echo Killing conmon, pause and OVN processes
+        systemctl stop --now ovsdb-server.service 2>/dev/null || true
+        for pname in conmon pause ovn-controller ovn-northd ; do
+            pkill -9 --exact ${pname} || true
+        done
+    fi
 }
 
 function clean_data() {
     if ${FULL_CLEAN} ; then
         echo Removing MicroShift configuration
         rm -rf /var/lib/microshift
+    elif ${CERT_CLEAN} ; then
+        echo Removing MicroShift certificates
+        rm -rf /var/lib/microshift/certs
     fi
 
-    echo Removing OVN configuration
-    rm -rf /var/run/ovn
-    rm -rf /var/run/ovn-kubernetes
-    rm -f /etc/cni/net.d/10-ovn-kubernetes.conf
-    rm -f /opt/cni/bin/ovn-k8s-cni-overlay
+    if ${FULL_CLEAN} || ${OVN_CLEAN} ; then
+        echo Removing OVN configuration
+        rm -rf /var/run/ovn
+        rm -rf /var/run/ovn-kubernetes
+        rm -f /etc/cni/net.d/10-ovn-kubernetes.conf
+        rm -f /opt/cni/bin/ovn-k8s-cni-overlay
+    fi
 }
 
 function report_status() {
@@ -137,6 +146,9 @@ while [ $# -gt 0 ] ; do
     --ovn)
         OVN_CLEAN=true
         ;;
+    --cert)
+        CERT_CLEAN=true
+        ;;
     *)
         usage
         ;;
@@ -145,9 +157,11 @@ while [ $# -gt 0 ] ; do
 done
 
 # Verify valid option combination
-! ${FULL_CLEAN} && ! ${OVN_CLEAN}  && usage "Either --all or --ovn option must be specified"
-! ${FULL_CLEAN} &&   ${KEEP_IMAGE} && usage "The --keep-images option can only be used with --all"
-  ${FULL_CLEAN} &&   ${OVN_CLEAN}  && usage "The --all and --ovn options are mutually exclusive"
+! ${FULL_CLEAN} && ! ${OVN_CLEAN}  && ! ${CERT_CLEAN} && usage "Either --all, --ovn or --cert option must be specified"
+! ${FULL_CLEAN} &&   ${KEEP_IMAGE}                    && usage "The --keep-images option can only be used with --all"
+  ${FULL_CLEAN} &&   ${OVN_CLEAN}                     && usage "The --all and --ovn options are mutually exclusive"
+  ${FULL_CLEAN} &&   ${CERT_CLEAN}                    && usage "The --all and --cert options are mutually exclusive"
+  ${OVN_CLEAN}  &&   ${CERT_CLEAN}                    && usage "The --ovn and --cert options are mutually exclusive"
 
 # Exit if the current user is not 'root'
 if [ "$(id -u)" -ne 0 ] ; then

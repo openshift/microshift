@@ -3,6 +3,7 @@ Documentation       Keywords common to many test suites
 
 Library             OperatingSystem
 Library             String
+Library             SSHLibrary
 Resource            ../resources/kubeconfig.resource
 
 
@@ -60,3 +61,39 @@ Upload String To File    # robocop: disable=too-many-calls-in-keyword
     ...    chown root:root ${remote_filename}
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
+
+Verify Remote Directory Exists With Sudo
+    [Documentation]    Use sudo to verify that the specified directory exists
+    [Arguments]    ${remote_dir}
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    test -d ${remote_dir}
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    0    ${rc}
+
+Verify Remote Directory Does Not Exist With Sudo
+    [Documentation]    Use sudo to verify that the specified directory does not exist
+    [Arguments]    ${remote_dir}
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    test -d ${remote_dir}
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Should Not Be Equal As Integers    0    ${rc}
+
+Verify Remote File Exists With Sudo
+    [Documentation]    Use sudo to verify that the specified file exists
+    [Arguments]    ${remote_file}
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    test -f ${remote_file}
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    0    ${rc}
+
+Verify Remote File Does Not Exist With Sudo
+    [Documentation]    Use sudo to verify that the specified file does not exist
+    [Arguments]    ${remote_file}
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    test -f ${remote_file}
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Should Not Be Equal As Integers    0    ${rc}
