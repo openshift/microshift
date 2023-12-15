@@ -102,6 +102,8 @@ spec:
             - name: metrics
               containerPort: 1936
               protocol: TCP
+          args:
+            - -v=4
       volumes:
         - name: default-certificate
           secret:
