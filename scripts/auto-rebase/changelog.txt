@@ -1,13 +1,38 @@
-- ovn-kubernetes image-amd64 82cc229fe209434fe26dc8d9016d69487d523b76 to c7ebb732b48328d836b12b1b8ccfb7f12f693a8e
-  - 6ecf31f 2023-12-11T12:10:39+00:00 Fragment oversized reply packets in LGW mode
-  - be30f41 2023-12-11T12:10:33+00:00 Add egress IP MTU e2e test
+- cluster-kube-apiserver-operator embedded-component 37fc6f91227f01076cbdc48e2b9965da10793862 to 2a07e2dc098b9bea4e3e27279c692da10a6a519e
+  - 5ddf356 2023-12-13T10:19:17+01:00 add k8s.io/psa
+  - 603570c 2023-12-13T10:11:33+01:00 pkg/operator: add pod-security-readiness-controller
+  - c78c543 2023-12-13T10:11:09+01:00 bump library-go
 
-- oc image-arm64 16100fe02885d4d7eb344568a1b1410d14543cd6 to 33a7a8bcccdd1c7c0e2f51609d832d31232d2f26
+- cluster-network-operator embedded-component 34cf2de860d0c4947c1a273d134fce0165451ecb to 0ede33d163bc29ae52661d9e6db4838452a104c1
+  - 0d21e57 2023-11-21T15:59:34-06:00 ovnkube: check for IC enabled by matching script lib
+  - ad4bbbb 2023-11-21T15:59:34-06:00 ovnkube: disable conntrack on Hybrid Overlay VXLAN port for multizone
+  - 38c7ded 2023-11-21T15:59:34-06:00 ovnkube: clean up manifest subdirs path handling
+  - 6dd81c1 2023-11-21T15:59:34-06:00 ovnkube: ensure ovnkube-node daemonset updates when script library does
+  - aead1dd 2023-11-21T15:59:34-06:00 ovnkube: make acl-logging wait a bit for ovn-controller to start
+  - a4be665 2023-11-21T15:59:34-06:00 ovnkube: no longer need ovn-ca and ovn-cert volumes
+  - 02a0208 2023-11-21T15:59:34-06:00 ovnkube: move ovnkube container script to common library
+  - 362dc0e 2023-11-21T15:59:34-06:00 ovnkube: move sbdb container script to common library
+  - e7d824b 2023-11-21T15:59:34-06:00 ovnkube: move nbdb container script to common library
+  - ce6c6b9 2023-11-21T15:59:34-06:00 ovnkube: move rbac proxy container script to common library
+  - 4cdfda9 2023-11-21T15:59:34-06:00 ovnkube: move audit log rotation container script to common library
+  - 0771f29 2023-11-21T15:59:34-06:00 ovnkube: move northd container script to common library
+  - 79fa1b8 2023-11-21T15:59:34-06:00 ovnkube: move ovn-controller container script to common library
+  - 9716e32 2023-11-21T15:59:34-06:00 ovnkube: reduce diff between self-hosted and managed
+  - 8f1d19a 2023-11-21T15:59:34-06:00 ovnkube: set all NB_Global options in one go
+  - 9290b17 2023-11-21T15:59:34-06:00 ovnkube: stop setting a pssl connection
+  - 4d70aa3 2023-11-21T15:59:34-06:00 ovnkube: don't need to "kill time" while the cluster converges
+  - 6abf7e5 2023-11-21T15:59:34-06:00 ovnkube: move trim-on-compaction to postStart
+  - 31518d6 2023-11-21T15:59:34-06:00 ovnkube: reduce readiness probe initialDelaySeconds to 10
+  - a118c37 2023-11-21T15:59:34-06:00 ovnkube: ovn-ctl upgrades the DB for us
+  - 133c45e 2023-11-21T15:59:34-06:00 ovnkube: remove pointless OVN_ARGS shell variable
+  - 2efcadb 2023-11-21T15:59:34-06:00 ovnkube: remove unused bracketify() function
+  - 3048933 2023-11-21T15:59:34-06:00 ovnkube: disable conntrack on hybrid overlay VXLAN ports
+  - f91a102 2023-11-21T15:59:34-06:00 Disable weak SSH cipher suites
+
+- oc image-amd64 16100fe02885d4d7eb344568a1b1410d14543cd6 to 33a7a8bcccdd1c7c0e2f51609d832d31232d2f26
   - 545a4784 2023-11-29T12:40:48+00:00 Add client version in must-gather summary
 
-- ovn-kubernetes image-arm64 82cc229fe209434fe26dc8d9016d69487d523b76 to 0d0b66f68cdf8609e1b316fd2f4162603eb0b80f
-  - 6ecf31f 2023-12-11T12:10:39+00:00 Fragment oversized reply packets in LGW mode
-  - be30f41 2023-12-11T12:10:33+00:00 Add egress IP MTU e2e test
+- ovn-kubernetes image-amd64 c7ebb732b48328d836b12b1b8ccfb7f12f693a8e to 0d0b66f68cdf8609e1b316fd2f4162603eb0b80f
   - 8d3a153 2023-11-17T10:35:13+01:00 kubevirt: Ignore completed virt-launcher pods
   - d4090f7 2023-11-17T10:35:05+01:00 kubevirt: Refactor unit test
 
