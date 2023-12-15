@@ -137,9 +137,9 @@ CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_C
 $(dry_run) bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
 
 # Check if cache can be used for builds
-# This will fail when AWS S3 connection is not configured, or there is no cache bucket
+# This may fail when AWS S3 connection is not configured, or there is no cache bucket
 HAS_CACHE_ACCESS=false
-if ./bin/manage_build_cache.sh getlast -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" &>/dev/null ; then
+if ./bin/manage_build_cache.sh getlast -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" ; then
     HAS_CACHE_ACCESS=true
 fi
 
