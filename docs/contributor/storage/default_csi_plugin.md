@@ -37,15 +37,20 @@ The user provided lvmd config should be written to the same directory as the Mic
 
 ### Default Volume Group
 
-If there is only one volume group on the system, LVMS uses it by
-default. If there are multiple volume groups, and no configuration
-file, LVMS looks for a volume group named `microshift`. If there is no
-volume group named `microshift`, LVMS is disabled.
+When an LVMS configuration is not found on the MicroShift host, the service will proceed through a list of cases to
+determine a default volume group. MicroShift uses `vgs` to volume groups. The result of this command will trigger one 
+of the following cases:
 
-LVMS expects all volume groups to exist prior to launching the
-service. If LVMS is configured to use a volume group that does not
-exist, the node-controller Pod will fail and enter a CrashLoopBackoff
-state.
+* **No VolumeGroups Exist:** If no volume groups are discovered, LVMS will not be deployed. If a volume group is created
+after MicroShift has started, LVMS will not be deployed until the next service restart.
+
+* **One VolumeGroup Exists:** If there is only one volume group on the system, LVMS uses it by default. MicroShift does
+not verify the unallocated space on the volume group. If this volume group is fully allocated, PVCs will hang in the 
+`Pending` state.
+
+* **Multiple VolumeGroups Exist:** When MicroShift discovers more than one volume group, it checks for a volume group
+named `microshift`, and if found, will deploy LVMS with this volume group. If the `microshift` volume group does not 
+exist, LVMS will not be deployed. This prevents the nondeterministic adoption of a volume group by LVMS.  
 
 ### Volume Size Increments
 
