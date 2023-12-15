@@ -281,6 +281,7 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshi
 # Copy all the OLM manifests except the arch specific ones
 install -p -m644 assets/optional/operator-lifecycle-manager/0000* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 install -p -m644 assets/optional/operator-lifecycle-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
+install -p -m755 packaging/greenboot/microshift-running-check-olm.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
 %ifarch %{arm} aarch64
 cat assets/optional/operator-lifecycle-manager/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
@@ -400,10 +401,14 @@ systemctl enable --now --quiet openvswitch || true
 %files olm
 %dir %{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 %{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
+%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Dec 14 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
+- Implement greenboot check for microshift-olm RPM
+
 * Tue Dec 05 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
 - The microshift-release-info RPM is no longer required
 - The microshift-release-info RPM contains sample blueprints including container image references
