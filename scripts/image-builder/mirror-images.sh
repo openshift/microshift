@@ -18,6 +18,19 @@ function usage() {
     exit 1
 }
 
+function skopeo_retry() {
+    for attempt in $(seq 3) ; do
+        if ! skopeo "$@" ; then
+            echo "WARNING: Failed to run skopeo, retry #${attempt}"
+        else
+            return 0
+        fi
+    done
+
+    echo "ERROR: Failed to run skopeo, quitting after 3 tries"
+    return 1
+}
+
 function mirror_registry() {
     local img_pull_file=$1
     local img_file_list=$2
@@ -38,7 +51,7 @@ function mirror_registry() {
 
         # Run the image copy command
         echo "Mirroring '${src_img}' to '${dst_img}'"
-        skopeo copy --all --quiet \
+        skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             docker://"${src_img}" docker://"${dst_img}:${image_tag}-${image_cnt}"
@@ -61,7 +74,7 @@ function registry_to_dir() {
         # Run the image download command
         echo "Downloading '${src_img}' to '${local_dir}'"
         mkdir -p "${local_dir}/${dst_img}"
-        skopeo copy --all --quiet \
+        skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             docker://"${src_img}" dir://"${local_dir}/${dst_img}"
@@ -91,7 +104,7 @@ function dir_to_registry() {
 
         # Run the image upload command
         echo "Uploading '${src_img}' to '${dst_img}'"
-        skopeo copy --all --quiet \
+        skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             dir://"${local_dir}/${src_img}" docker://"${dst_img}:${image_tag}-${image_cnt}"
