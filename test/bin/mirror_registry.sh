@@ -5,8 +5,8 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-QUAY_VERSION=1.3.9
-REGISTRY_HOST=${REGISTRY_HOST:-$(hostname):8443}
+DISTRIBUTION_VERSION=2.8.3
+REGISTRY_HOST=${REGISTRY_HOST:-$(hostname):5000}
 REGISTRY_ROOT=${REGISTRY_ROOT:-${HOME}/mirror-registry}
 REGISTRY_CONTAINER_DIR=${REGISTRY_CONTAINER_DIR:-${REGISTRY_ROOT}/containers}
 REGISTRY_CONTAINER_LIST=${REGISTRY_CONTAINER_LIST:-${REGISTRY_ROOT}/mirror-list.txt}
@@ -29,23 +29,19 @@ get_container_images() {
 prereqs() {
     mkdir -p "${REGISTRY_ROOT}"
     mkdir -p "${REGISTRY_CONTAINER_DIR}"
-    curl -L https://github.com/quay/mirror-registry/releases/download/v${QUAY_VERSION}/mirror-registry-offline.tar.gz -o /tmp/mirror-registry-offline.tar.gz
-    tar xf /tmp/mirror-registry-offline.tar.gz -C "${REGISTRY_ROOT}"
-    rm -f /tmp/mirror-registry-offline.tar.gz
     sudo dnf install -y podman skopeo jq
+    podman run -d -p 5000:5000 --restart always --name registry "docker.io/distribution/distribution:${DISTRIBUTION_VERSION}"
 }
 
 setup_registry() {
-    pushd "${REGISTRY_ROOT}" &>/dev/null
-    ./mirror-registry install -r "${REGISTRY_ROOT}" --initUser microshift --initPassword microshift
-    sudo cp "${REGISTRY_ROOT}/quay-rootCA/rootCA.pem" /etc/pki/ca-trust/source/anchors/mirror-registry.pem
-    sudo update-ca-trust
-    # The mirror does not allow anonymous access, therefore we need the user and password configured in the
-    # pull secrets.
-    podman login -u microshift -p microshift "${REGISTRY_HOST}" --authfile "${REGISTRY_ROOT}/local-auth.json"
-    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${REGISTRY_ROOT}/local-auth.json" > "${PULL_SECRET}.tmp"
-    mv "${PULL_SECRET}.tmp" "${PULL_SECRET}"
-    popd &>/dev/null
+    # Docker distribution does not support TLS authentication. The mirror-images.sh helper uses skopeo without tls options
+    # and it defaults to https. Since this is not supported we need to configure registries.conf so that skopeo tries http instead.
+    sudo bash -c 'cat >> /etc/containers/registries.conf' << EOF
+[[registry]]
+location = "$(hostname)"
+insecure = true
+EOF
+    sudo systemctl restart podman
 }
 
 mirror_images() {
