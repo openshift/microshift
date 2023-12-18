@@ -347,7 +347,9 @@ if [ -n "${CUSTOM_RPM_FILES}" ] ; then
 fi
 
 title "Loading package sources"
-PACKAGE_SOURCES="microshift-local rhocp-4.14 fast-datapath"
+
+LATEST_RHOCP_MINOR=$("${ROOTDIR}/scripts/get-latest-rhocp-repo.sh")
+PACKAGE_SOURCES="microshift-local rhocp fast-datapath"
 if [ -n "${CUSTOM_RPM_FILES}" ] ; then
     PACKAGE_SOURCES+=" custom-rpms"
 fi
@@ -355,6 +357,7 @@ fi
 for f in ${PACKAGE_SOURCES} ; do
     sed -e "s;REPLACE_IMAGE_BUILDER_DIR;${BUILDDIR};g" \
         -e "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
+        -e "s;REPLACE_OCP_MINOR;${LATEST_RHOCP_MINOR};g" \
         "${SCRIPTDIR}/config/${f}.toml.template" \
         > ${f}.toml
     sudo composer-cli sources delete ${f} 2>/dev/null || true
