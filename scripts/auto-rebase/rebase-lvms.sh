@@ -226,83 +226,83 @@ EOF
 # manifests from the CSV by reading them out into separate files.
 # shellcheck disable=SC2207
 extract_lvms_rbac_from_cluster_service_version() {
-  local dest="$1"
-  local csv="$2"
-  local namespace="$3"
+    local dest="$1"
+    local csv="$2"
+    local namespace="$3"
 
-  title "extracting lvms clusterserviceversion.yaml into separate RBAC"
+    title "extracting lvms clusterserviceversion.yaml into separate RBAC"
 
-  local clusterPermissions=($(yq eval '.spec.install.spec.clusterPermissions[].serviceAccountName' < "${csv}"))
-  for service_account_name in "${clusterPermissions[@]}"; do
-    echo "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
+    local clusterPermissions=($(yq eval '.spec.install.spec.clusterPermissions[].serviceAccountName' < "${csv}"))
+    for service_account_name in "${clusterPermissions[@]}"; do
+        echo "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
 
-    local clusterrole="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrole.yaml"
-    echo "generating ${clusterrole}"
-    extract_lvms_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
+        local clusterrole="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrole.yaml"
+        echo "generating ${clusterrole}"
+        extract_lvms_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
 
-    local clusterrolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
-    echo "generating ${clusterrolebinding}"
-    extract_lvms_clusterrolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${clusterrolebinding}"
+        local clusterrolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml"
+        echo "generating ${clusterrolebinding}"
+        extract_lvms_clusterrolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${clusterrolebinding}"
 
-    local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
-    echo "generating ${service_account}"
-    extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
-  done
+        local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
+        echo "generating ${service_account}"
+        extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
+    done
 
-  local permissions=($(yq eval '.spec.install.spec.permissions[].serviceAccountName' < "${csv}"))
-  for service_account_name in "${permissions[@]}"; do
-    echo "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
+    local permissions=($(yq eval '.spec.install.spec.permissions[].serviceAccountName' < "${csv}"))
+    for service_account_name in "${permissions[@]}"; do
+        echo "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
 
-    local role="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_role.yaml"
-    echo "generating ${role}"
-    extract_lvms_role_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${csv}" "${role}"
+        local role="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_role.yaml"
+        echo "generating ${role}"
+        extract_lvms_role_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${csv}" "${role}"
 
-    local rolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_rolebinding.yaml"
-    echo "generating ${rolebinding}"
-    extract_lvms_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
+        local rolebinding="${dest}/${service_account_name}_rbac.authorization.k8s.io_v1_rolebinding.yaml"
+        echo "generating ${rolebinding}"
+        extract_lvms_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
 
-    local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
-    echo "generating ${service_account}"
-    extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
-  done
+        local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
+        echo "generating ${service_account}"
+        extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
+    done
 }
 
 extract_lvms_clusterrole_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local csv="$2"
-  local target="$3"
-  yq eval "
-    .spec.install.spec.clusterPermissions[] |
-    select(.serviceAccountName == \"${service_account_name}\") |
-    .apiVersion = \"rbac.authorization.k8s.io/v1\" |
-    .kind = \"ClusterRole\" |
-    .metadata.name = \"${service_account_name}\" |
-    del(.serviceAccountName)
-    " "${csv}" > "${target}"
+    local service_account_name="$1"
+    local csv="$2"
+    local target="$3"
+    yq eval "
+        .spec.install.spec.clusterPermissions[] |
+        select(.serviceAccountName == \"${service_account_name}\") |
+        .apiVersion = \"rbac.authorization.k8s.io/v1\" |
+        .kind = \"ClusterRole\" |
+        .metadata.name = \"${service_account_name}\" |
+        del(.serviceAccountName)
+        " "${csv}" > "${target}"
 }
 
 extract_lvms_role_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local csv="$3"
-  local target="$4"
-  yq eval "
-    .spec.install.spec.permissions[] |
-    select(.serviceAccountName == \"${service_account_name}\") |
-    .apiVersion = \"rbac.authorization.k8s.io/v1\" |
-    .kind = \"Role\" |
-    .metadata.name = \"${service_account_name}\" |
-    .metadata.namespace = \"${namespace}\" |
-    del(.serviceAccountName)
-    " "${csv}" > "${target}"
+    local service_account_name="$1"
+    local namespace="$2"
+    local csv="$3"
+    local target="$4"
+    yq eval "
+        .spec.install.spec.permissions[] |
+        select(.serviceAccountName == \"${service_account_name}\") |
+        .apiVersion = \"rbac.authorization.k8s.io/v1\" |
+        .kind = \"Role\" |
+        .metadata.name = \"${service_account_name}\" |
+        .metadata.namespace = \"${namespace}\" |
+        del(.serviceAccountName)
+        " "${csv}" > "${target}"
 }
 
 extract_lvms_clusterrolebinding_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
+    local service_account_name="$1"
+    local namespace="$2"
+    local target="$3"
 
-  crb=$(cat <<EOL
+    crb=$(cat <<EOL
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -317,15 +317,15 @@ subjects:
   namespace: ${namespace}
 EOL
 )
-  echo "${crb}" > "${target}"
+    echo "${crb}" > "${target}"
 }
 
 extract_lvms_rolebinding_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
+    local service_account_name="$1"
+    local namespace="$2"
+    local target="$3"
 
-  crb=$(cat <<EOL
+    crb=$(cat <<EOL
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -342,15 +342,15 @@ subjects:
   namespace: ${namespace}
 EOL
 )
-  echo "${crb}" > "${target}"
+    echo "${crb}" > "${target}"
 }
 
 extract_lvms_service_account_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
+    local service_account_name="$1"
+    local namespace="$2"
+    local target="$3"
 
-  serviceAccount=$(cat <<EOL
+    serviceAccount=$(cat <<EOL
 apiVersion: v1
 kind: ServiceAccount
 metadata:
