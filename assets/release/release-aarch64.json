@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "4.16.0-0.nightly-arm64-2023-12-13-142542"
+    "base": "4.16.0-0.nightly-arm64-2023-12-15-195644"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:a0972b63869c0710e31d28a0faaf30785a41d2eeefe6d5f15d890d2c89440d48",
@@ -16,8 +16,8 @@
     "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:829a8e4d34404abbd22fddb6ebfa0f74daa55f2697fb147da77b83fc8b473d8c",
     "topolvm_csi_resizer": "registry.redhat.io/openshift4/ose-csi-external-resizer@sha256:7ee0257998b7f804fcde9c095b4dc240c510eb316d7223e8485f701b5c9f2fbf",
     "topolvm_csi_provisioner": "registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:b453a5c76ba4e975a978e31a51531b1d6233723b0d944622caf7844dedf9ad5a",
-    "csi-external-snapshotter": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6f327d92ce008f512988941687f2e051e57a3b690b3d523b090499f97bda896c",
-    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c9564251f345c15004bafb0488f57ebe17678218ff41648a214f351e68c1ebda",
-    "csi-snapshot-validation-webhook": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dcf645f78962b17fc93f17c4be55eb53ce18e2fba6ed77e49d2fc0a903a852b9"
+    "csi-external-snapshotter": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e39d21dff89bd72f12f5a7af9409557548766087a5dea7e811c1e7fb2b8d44f8",
+    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:322396bc9955445fea0abb9771948944b2e058b68ff2dc0f7eeba8078601505d",
+    "csi-snapshot-validation-webhook": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9cb6cc6698370177f438cdabb65010126ada4692ec233df4f247c62950cec130"
   }
 }
