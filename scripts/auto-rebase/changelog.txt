@@ -1,30 +1,6 @@
-- cluster-csi-snapshot-controller-operator embedded-component c45e94fb557ce448508787a23a8cc42f3a6c98a3 to 1afe553a46159bd5b65061c98e15138bf48327cc
-  - 9011f43 2023-12-12T15:39:22+00:00 CVE-2023-47108: bump go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp to v0.46
+- cluster-network-operator embedded-component 371583742c06f2c99d28c33f3fd13942598381b2 to c12c45c65c40101d0d11bf8690edc088bb4bc82a
+  - efac845 2023-12-11T18:35:41+00:00 Set enable-multi-external-gateway flag in ovnkube.conf to pass to both ovnkube-node and control-plane pods. There is no feature gate, so it is set unconditionally. Set the same flag for both master and node configMaps in managed env.
 
-- cluster-dns-operator embedded-component da2a4b8dd2ba8258ee934e62ad3a6e0f5a815068 to b8c175340dcc27ec1b7bff3da69ac9d52af6592a
-  - 96eba67 2023-11-28T02:04:11+00:00 Updating ose-cluster-dns-operator-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/ose-cluster-dns-operator.yml
-
-- cluster-ingress-operator embedded-component d49eeece699253ba943631c035672d50e1ce871c to 70b608deace24e4ded73278f086a87ef4565a63d
-  - c43451e 2023-12-10T17:45:47+00:00 annotate credentials request manifests
-  - 45e1195 2023-11-28T22:48:44+00:00 Updating ose-cluster-ingress-operator-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/ose-cluster-ingress-operator.yml
-
-- machine-config-operator embedded-component 16b3381b21d405a4eab12c71a7fba43454559649 to 6457fc9a0c23702f8b0756b543a286ed4d2f9874
-  - e777cd7e 2023-12-12T15:07:09+00:00 crio: drop automatic image cleanup on upgrades
-
-- operator-framework-olm embedded-component 85c579f9be61aaea11e90b6c870452c72107300a to b4d2b70c34e9654afe30cf724f1dc85a1ce5c683
-  - ff361cd3 2023-11-28T11:23:22+00:00 Updating operator-registry-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/operator-registry.yml
-
-- oc image-amd64 f2953f3e0fb3bcf2bfd835d7823337257bdcf426 to e31bee5089f458c915a6343c172d984e69d776ba
-  - 91f9d3d6 2023-12-11T05:53:34+00:00 Skip network.openshift.io/v1alpha1 in describer unit test
-  - c2aa3095 2023-12-11T05:53:34+00:00 Bump openshift/api to include to the new CloudCredential capability
-  - e61e8e79 2023-12-08T17:00:52+00:00 Remove deprecated password defaulting in default config flag
-
-- coredns image-amd64 68ef945a78841a4a1be007fcefa929cc30eb9553 to 44797b00e47789c9a15960773806dccc1612fff7
-  - 393f6c6 2023-11-28T14:00:29+00:00 Updating coredns-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/coredns.yml
-
-- oc image-arm64 39acc2e3f11951632b2e08ffaf3f803d1d03b0ac to e31bee5089f458c915a6343c172d984e69d776ba
-  - e61e8e79 2023-12-08T17:00:52+00:00 Remove deprecated password defaulting in default config flag
-
-- coredns image-arm64 68ef945a78841a4a1be007fcefa929cc30eb9553 to 44797b00e47789c9a15960773806dccc1612fff7
-  - 393f6c6 2023-11-28T14:00:29+00:00 Updating coredns-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/coredns.yml
+- operator-framework-olm embedded-component b4d2b70c34e9654afe30cf724f1dc85a1ce5c683 to 8d9fd047c014877b5d3285acb8516a7494a24026
+  - da687730 2023-12-13T23:39:06-05:00 [CARRY] Fix panic issue when annotations map is nil
 
