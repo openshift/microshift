@@ -49,7 +49,7 @@ _install() {
     mv "${WORK_DIR}/${initial_filename}" "${dest}"
 }
 
-get_golangci-lint() {
+gettool_golangci-lint() {
     local ver="1.52.1"
     declare -A checksums=(
         ["x86_64"]="f31a6dc278aff92843acdc2671f17c753c6e2cb374d573c336479e92daed161f"
@@ -68,7 +68,7 @@ get_golangci-lint() {
     _install "${url}" "${checksum}" "${filename}" "${filename}"
 }
 
-get_shellcheck() {
+gettool_shellcheck() {
     local ver="v0.9.0"
     declare -A checksums=(
         ["x86_64"]="700324c6dd0ebea0117591c6cc9d7350d9c7c5c287acbad7630fa17b1d4d9e2f"
@@ -86,7 +86,7 @@ get_shellcheck() {
     _install "${url}" "${checksum}" "${filename}" "${filename}"
 }
 
-get_kuttl() {
+gettool_kuttl() {
     local ver="0.15.0"
     declare -A checksums=(
         ["x86_64"]="f6edcf22e238fc71b5aa389ade37a9efce596017c90f6994141c45215ba0f862"
@@ -104,7 +104,7 @@ get_kuttl() {
     _install "${url}" "${checksum}" "${filename}" "kubectl-kuttl_${ver}_linux_${arch}"
 }
 
-get_yq() {
+gettool_yq() {
     local ver="4.26.1"
     declare -A checksums=(
         ["x86_64"]="4d3afe5ddf170ac7e70f4c23eea2969eca357947b56d5d96b8516bdf9ce56577"
@@ -122,7 +122,7 @@ get_yq() {
     _install "${url}" "${checksum}" "${filename}" "yq_linux_${arch}"
 }
 
-get_hadolint() {
+gettool_hadolint() {
     local ver="2.12.0"
     declare -A checksums=(
         ["x86_64"]="56de6d5e5ec427e17b74fa48d51271c7fc0d61244bf5c90e828aab8362d55010"
@@ -150,23 +150,23 @@ get_hadolint() {
     fi
 }
 
-get_lichen() {
+gettool_lichen() {
     local ver="v0.1.7"
     GOBIN=${DEST_DIR} GOFLAGS="" go install github.com/uw-labs/lichen@${ver}
 }
 
-get_govulncheck() {
+gettool_govulncheck() {
     # Must use latest to get up-to-date vulnerability checks
     local ver="latest"
     GOBIN=${DEST_DIR} GOFLAGS="" go install -mod=mod golang.org/x/vuln/cmd/govulncheck@${ver}
 }
 
-get_controller-gen() {
+gettool_controller-gen() {
     local ver="v0.11.3"
     GOBIN=${DEST_DIR} GOFLAGS="" go install sigs.k8s.io/controller-tools/cmd/controller-gen@${ver}
 }
 
-get_gomplate() {
+gettool_gomplate() {
     local ver="v3.11.5"
     declare -A checksums=(
         ["x86_64"]="16f6a01a0ff22cae1302980c42ce4f98ca20f8c55443ce5a8e62e37fc23487b3"
@@ -184,7 +184,7 @@ get_gomplate() {
     _install "${url}" "${checksum}" "${filename}" "gomplate_linux-${arch}"
 }
 
-get_robotframework() {
+gettool_robotframework() {
     local venv
 
     if [ "${DEST_DIR}" = "${DEFAULT_DEST_DIR}" ]; then
@@ -203,7 +203,7 @@ get_robotframework() {
     fi
 }
 
-get_awscli() {
+gettool_awscli() {
     # Download AWS CLI
     pushd "${WORK_DIR}" &>/dev/null
 
@@ -214,7 +214,7 @@ get_awscli() {
     popd &>/dev/null
 }
 
-tool_getters=$(declare -F |  cut -d' ' -f3 | grep "get_" | sed 's/get_//g')
+tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
 
 usage() {
     local msg="${1:-}"
@@ -237,11 +237,11 @@ usage() {
 [ $# -eq 0 ] && usage "Expected at least one argument"
 
 tools_to_install=()
-if echo "$@" | grep -q all; then
+if grep -qw all <<<"$@"; then
     readarray -t tools_to_install <<<"${tool_getters}"
 else
     for arg in "$@"; do
-        if ! echo "${tool_getters}" | grep -q "${arg}" || [ "$(echo "${tool_getters}" | grep "${arg}")" != "${arg}" ]; then
+        if ! grep -wq "${arg}" <<<"${tool_getters}" ; then
             usage "Unknown tool: \"${arg}\""
         fi
         tools_to_install+=("${arg}")
@@ -249,5 +249,5 @@ else
 fi
 
 for f in "${tools_to_install[@]}"; do
-    "get_${f}"
+    "gettool_${f}"
 done
