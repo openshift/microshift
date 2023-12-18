@@ -315,7 +315,6 @@ rpm-podman:
 	podman run \
 		--rm -i \
 		--volume $$(pwd):/opt/microshift:z \
-		--volume $(GO_CACHE):/go/.cache:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
 		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; trap "pkill $${pid}" INT ; wait $${pid}'
