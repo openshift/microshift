@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eo pipefail
 
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REPOROOT="$(cd "${SCRIPTDIR}/../.." && pwd)"
+
 BUILD_AND_RUN=true
 INSTALL_BUILD_DEPS=true
 FORCE_FIREWALL=false
@@ -132,11 +135,13 @@ if ${BUILD_AND_RUN}; then
     make srpm
 fi
 
+# This version might not match the version under development because we need
+# to pull in dependencies that are already released
+LATEST_RHOCP_MINOR=$("${REPOROOT}/scripts/get-latest-rhocp-repo.sh")
+OCPVERSION="4.${LATEST_RHOCP_MINOR}"
+
 if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-    # This version might not match the version under development because we need
-    # to pull in dependencies that are already released
-    OCPVERSION=4.14
     sudo subscription-manager config --rhsm.manage_repos=1
 
     if ! ${RHEL_BETA_VERSION} ; then
@@ -171,7 +176,7 @@ fi
 if ${RHEL_SUBSCRIPTION}; then
     dnf_retry install openshift-clients
 else
-    OCC_SRC="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.14-el9-beta"
+    OCC_SRC="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/${OCPVERSION}-el9-beta"
     OCC_RPM="$(curl -s "${OCC_SRC}/" | grep -o "openshift-clients-4[^\"']*.rpm" | sort | uniq)"
     OCC_LOC="$(mktemp /tmp/openshift-client-XXXXX.rpm)"
     OCC_REM="${OCC_SRC}/${OCC_RPM}"
