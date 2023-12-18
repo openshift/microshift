@@ -57,7 +57,7 @@ check_preconditions() {
     fi
 }
 
-# Runs each LVMS rebase step in sequence, commiting the step's output to git
+# Runs each LVMS rebase step in sequence, committing the step's output to git
 rebase_lvms_to() {
     local lvms_operator_bundle_manifest="$1"
 
@@ -89,6 +89,8 @@ rebase_lvms_to() {
     else
         echo "No changes to LVMS assets."
     fi
+
+#    update_lvms_release "${lvms_operator_bundle_manifest}"
 
     title "# Removing staging directory"
     rm -rf "${STAGING_DIR}"
@@ -168,6 +170,41 @@ write_lvms_images_for_arch(){
             fi
         done
     done < "${image_file}"
+}
+
+update_lvms_release() {
+    # lvms_release should be the semver of the LVMS release
+    local lvms_release="${1}"
+    local image_file="${arch_dir}/images"
+    local arch_dir="${STAGING_DIR}/${arch}"
+
+    for arch in "${ARCHS[@]}"; do
+        go_arch=${GOARCH_TO_UNAME_MAP[${arch}]}
+        lvms_release_file="${STAGING_DIR}/release_${go_arch}.json"/
+        lvms_release_tmp="${STAGING_DIR}/release_${go_arch}.json.tmp"
+
+        jq --arg "version" "${lvms_release}" '.release.base="$version"' "${lvms_release_file}" \
+            >"${lvms_release_tmp}"
+        # jq command parses images files (formated as name,image\n) and replaces images in the lvms_release_file by name with the new image
+        jq --arg "version" "${lvms_release}" '.release.base="$version"' "${lvms_release_file}" \
+            >"${lvms_release_tmp}"
+        while read -ers LINE; do
+            name=${LINE%,*}
+            name="$(tr '-' '_' <<< "${name}")"
+            img=${LINE#*,}
+            for included in "${include_images[@]}"; do
+                if [[ "${name}" == "${included}" ]]; then
+                    # use jq to replace an an object in .images array with name == $name with the new image
+                    jq --arg "name" "${name}" --arg "image" "${img}" \
+                        '.images[] | select(.name == $name) | .image = $image' "${lvms_release_tmp}" \
+                        >"${lvms_release_tmp}.tmp"
+                    mv "${lvms_release_tmp}.tmp" "${lvms_release_tmp}"
+                    break;
+                fi
+            done
+        done < "${image_file}"  # image_file is written by write_lvms_images_for_arch()
+        mv "${lvms_release_tmp}" "${lvms_release_file}"
+    done
 }
 
 update_lvms_images(){
