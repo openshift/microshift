@@ -11,7 +11,7 @@ shopt -s extglob
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
-STAGING_DIR="${REPOROOT}/_output/staging"
+STAGING_DIR="${REPOROOT}/_output/staging/lvms"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
@@ -100,9 +100,8 @@ download_lvms_operator_bundle_manifest(){
     bundle_manifest="$1"
 
     title "downloading LVMS operator bundles ${bundle_manifest}"
-    local LVMS_STAGING="${STAGING_DIR}/lvms"
-    rm -rf "${LVMS_STAGING}"
-    mkdir -p "${LVMS_STAGING}"
+    rm -rf "${STAGING_DIR}"
+    mkdir -p "${STAGING_DIR}"
 
     authentication=""
     if [ -f "${PULL_SECRET_FILE}" ]; then
@@ -112,8 +111,8 @@ download_lvms_operator_bundle_manifest(){
     fi
 
     for arch in "${ARCHS[@]}"; do
-        mkdir -p "${LVMS_STAGING}/${arch}"
-        pushd "${LVMS_STAGING}/${arch}" || return 1
+        mkdir -p "${STAGING_DIR}/${arch}"
+        pushd "${STAGING_DIR}/${arch}" || return 1
         title "extracting lvms operator bundle for \"${arch}\" architecture"
         # shellcheck disable=SC2086  # Double quote to prevent globbing and word splitting.
         oc image extract \
@@ -135,7 +134,7 @@ download_lvms_operator_bundle_manifest(){
 
 write_lvms_images_for_arch(){
     local arch="$1"
-    arch_dir="${STAGING_DIR}/lvms/${arch}"
+    arch_dir="${STAGING_DIR}/${arch}"
     [ -d "${arch_dir}" ] || {
         echo "dir ${arch_dir} not found"
         return 1
@@ -174,7 +173,7 @@ write_lvms_images_for_arch(){
 update_lvms_images(){
     title "Updating LVMS images"
 
-    local workdir="${STAGING_DIR}/lvms"
+    local workdir="${STAGING_DIR}"
     [ -d "${workdir}" ] || {
         >&2 echo 'lvms staging dir not found, aborting image update'
         return 1
@@ -189,7 +188,7 @@ update_lvms_images(){
 update_lvms_manifests() {
     title "Copying LVMS manifests"
 
-    local workdir="${STAGING_DIR}/lvms"
+    local workdir="${STAGING_DIR}"
     [ -d "${workdir}" ] || {
         >&2 echo 'lvms staging dir not found, aborting asset update'
         return 1
