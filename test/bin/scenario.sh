@@ -289,6 +289,11 @@ wait_for_greenboot() {
         # Print the last log and check for terminal failure
         ${ssh_cmd} "sudo journalctl -n 10 -u greenboot-healthcheck" || true
 
+        if [ "${svc_state}" = "failed" ] ; then
+            echo "The greenboot service reported a failed state, no need to wait any longer"
+            break
+        fi
+
         date
         sleep 10
     done
