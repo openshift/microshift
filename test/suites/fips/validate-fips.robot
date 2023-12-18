@@ -60,8 +60,11 @@ Check Payload Tool Must Pass
     ${rand}=    Generate Random String
     ${path}=    Join Path    /tmp    ${rand}
     Set Global Variable    ${CHECK_PAYLOAD_OUTPUT_FILE}    ${path}
+    ${rc}=    Execute Command    rpm -qi microshift >${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
+    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    Should Be Equal As Integers    0    ${rc}
     ${rc}=    Execute Command
-    ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
+    ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >>${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
     ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
     Should Be Equal As Integers    0    ${rc}
 
