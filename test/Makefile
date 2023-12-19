@@ -31,7 +31,8 @@ build-base-branch: TMP_REPO !=mktemp -d
 build-base-branch:
 	if ! [ -d "$(REPO)/_output" ]; then mkdir $(REPO)/_output; fi
 	git clone --single-branch --branch $(BASE_BRANCH) https://github.com/openshift/microshift.git $(TMP_REPO)
-	cd $(TMP_REPO) && $(MAKE) rpm
+	MICROSHIFT_VERSION="$(MAJOR).$(MINOR).$(PATCH)_base_branch" \
+		$(MAKE) -C $(TMP_REPO) rpm
 	mv $(TMP_REPO)/_output/rpmbuild $(REPO)/_output/rpmbuild-base
 	rm -rf "$(TMP_REPO)"
 
