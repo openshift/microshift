@@ -39,7 +39,7 @@ prereqs() {
 setup_registry() {
     # Docker distribution does not support TLS authentication. The mirror-images.sh helper uses skopeo without tls options
     # and it defaults to https. Since this is not supported we need to configure registries.conf so that skopeo tries http instead.
-    sudo bash -c 'cat >> /etc/containers/registries.conf' << EOF
+    sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' << EOF
 [[registry]]
 location = "$(hostname)"
 insecure = true
