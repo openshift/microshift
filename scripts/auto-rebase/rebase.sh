@@ -709,6 +709,9 @@ EOF
     yq -i '.metadata += {"name": "router-internal-default", "namespace": "openshift-ingress"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
     yq -i '.spec.selector = {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
     sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
+    yq -i '.metadata += {"name": "router-default"}' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    sed -i '/#.*at runtime/d' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
+    yq -i '.spec.selector = {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
 
     # MicroShift-specific changes
     #-- ingress ----------------------------------------

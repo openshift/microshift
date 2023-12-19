@@ -34,6 +34,7 @@ assets:
       - file: namespace.yaml
       - file: service-account.yaml
       - file: service-internal.yaml
+      - file: service-cloud.yaml
       - file: serving-certificate.yaml
         git_restore: True
       - file: cluster-role-aggregate-route.yaml
