@@ -93,7 +93,7 @@ rebase_lvms_to() {
 #    update_lvms_release "${lvms_operator_bundle_manifest}"
 
     title "# Removing staging directory"
-    rm -rf "${STAGING_DIR}"
+#    rm -rf "${STAGING_DIR}"
 }
 
 # LVMS is not integrated into the ocp release image, so the work flow does not fit with core component rebase.  LVMS'
@@ -102,7 +102,7 @@ download_lvms_operator_bundle_manifest(){
     bundle_manifest="$1"
 
     title "downloading LVMS operator bundles ${bundle_manifest}"
-    rm -rf "${STAGING_DIR}"
+#    rm -rf "${STAGING_DIR}"
     mkdir -p "${STAGING_DIR}"
 
     authentication=""
@@ -182,27 +182,16 @@ update_lvms_release() {
         go_arch=${GOARCH_TO_UNAME_MAP[${arch}]}
         lvms_release_file="${STAGING_DIR}/release_${go_arch}.json"/
         lvms_release_tmp="${STAGING_DIR}/release_${go_arch}.json.tmp"
-
-        jq --arg "version" "${lvms_release}" '.release.base="$version"' "${lvms_release_file}" \
-            >"${lvms_release_tmp}"
-        # jq command parses images files (formated as name,image\n) and replaces images in the lvms_release_file by name with the new image
-        jq --arg "version" "${lvms_release}" '.release.base="$version"' "${lvms_release_file}" \
-            >"${lvms_release_tmp}"
-        while read -ers LINE; do
-            name=${LINE%,*}
-            name="$(tr '-' '_' <<< "${name}")"
-            img=${LINE#*,}
-            for included in "${include_images[@]}"; do
-                if [[ "${name}" == "${included}" ]]; then
-                    # use jq to replace an an object in .images array with name == $name with the new image
-                    jq --arg "name" "${name}" --arg "image" "${img}" \
-                        '.images[] | select(.name == $name) | .image = $image' "${lvms_release_tmp}" \
-                        >"${lvms_release_tmp}.tmp"
-                    mv "${lvms_release_tmp}.tmp" "${lvms_release_tmp}"
-                    break;
-                fi
-            done
-        done < "${image_file}"  # image_file is written by write_lvms_images_for_arch()
+        # Ingest the raw images files, convert to a json formatted array, and build a new release file with it
+        patch="$(jq --slurp  -nR --arg ver "4.14" \
+        'reduce (
+            inputs | split("\n") | map(select(length > 0))[] | split(",") | {
+               (.[0] | gsub("-";"_")): .[1]
+            }
+        ) as $item ({}; .images += $item) |
+        .release.base=$ver' <_output/staging/lvms/amd64/images)"
+        # must filter out excluded images (operator, etc)
+        jq --slurp '.[0] * .[1]' $REPOROOT/assets/release/release-${go_arch}.json <(<<<$patch) > "${lvms_release_tmp}"
         mv "${lvms_release_tmp}" "${lvms_release_file}"
     done
 }
