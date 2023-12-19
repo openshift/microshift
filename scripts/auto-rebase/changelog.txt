@@ -1,6 +1,6 @@
-- cluster-network-operator embedded-component 371583742c06f2c99d28c33f3fd13942598381b2 to c12c45c65c40101d0d11bf8690edc088bb4bc82a
-  - efac845 2023-12-11T18:35:41+00:00 Set enable-multi-external-gateway flag in ovnkube.conf to pass to both ovnkube-node and control-plane pods. There is no feature gate, so it is set unconditionally. Set the same flag for both master and node configMaps in managed env.
+- ovn-kubernetes image-amd64 2c98ee245fcddadd19863ee4f7e754be8975e7f8 to 8e1584d7ea3e342a5032f7e4358979c8960aa044
+  - 7839276 2023-12-04T08:45:19+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/a242df15444ce0e1ac1fba2bd9d4caf82cb74819/images/ose-ovn-kubernetes.yml
 
-- operator-framework-olm embedded-component b4d2b70c34e9654afe30cf724f1dc85a1ce5c683 to 8d9fd047c014877b5d3285acb8516a7494a24026
-  - da687730 2023-12-13T23:39:06-05:00 [CARRY] Fix panic issue when annotations map is nil
+- ovn-kubernetes image-arm64 2c98ee245fcddadd19863ee4f7e754be8975e7f8 to 8e1584d7ea3e342a5032f7e4358979c8960aa044
+  - 7839276 2023-12-04T08:45:19+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/a242df15444ce0e1ac1fba2bd9d4caf82cb74819/images/ose-ovn-kubernetes.yml
 
