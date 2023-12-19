@@ -11,6 +11,7 @@ REGISTRY_ROOT=${REGISTRY_ROOT:-${HOME}/mirror-registry}
 REGISTRY_CONTAINER_DIR=${REGISTRY_CONTAINER_DIR:-${REGISTRY_ROOT}/containers}
 REGISTRY_CONTAINER_LIST=${REGISTRY_CONTAINER_LIST:-${REGISTRY_ROOT}/mirror-list.txt}
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
+LOCAL_REGISTRY_NAME="microshift-local-registry"
 
 get_container_images() {
     containers=""
@@ -30,7 +31,9 @@ prereqs() {
     mkdir -p "${REGISTRY_ROOT}"
     mkdir -p "${REGISTRY_CONTAINER_DIR}"
     sudo dnf install -y podman skopeo jq
-    podman run -d -p 5000:5000 --restart always --name registry "quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
+    podman stop "${LOCAL_REGISTRY_NAME}" || true
+    podman rm "${LOCAL_REGISTRY_NAME}" || true
+    podman run -d -p 5000:5000 --restart always --name "${LOCAL_REGISTRY_NAME}" "quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
 }
 
 setup_registry() {
