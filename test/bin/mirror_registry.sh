@@ -30,7 +30,7 @@ prereqs() {
     mkdir -p "${REGISTRY_ROOT}"
     mkdir -p "${REGISTRY_CONTAINER_DIR}"
     sudo dnf install -y podman skopeo jq
-    podman run -d -p 5000:5000 --restart always --name registry "docker.io/distribution/distribution:${DISTRIBUTION_VERSION}"
+    podman run -d -p 5000:5000 --restart always --name registry "quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
 }
 
 setup_registry() {
