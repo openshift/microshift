@@ -1,0 +1,3 @@
+- ovn-kubernetes image-arm64 0d0b66f68cdf8609e1b316fd2f4162603eb0b80f to aa8d03cf0c55f02625ab40e9c0528c552a282c8b
+  - 945ca0a 2023-11-17T13:05:51+01:00 Update leaderelection config to allow retries for an overloaded cluster. With the previous params we only allowed 1 retry in case tryAcquireOrRenew failed within 10 seconds, and no retry otherwise. When etcd is overloaded, lease requests may timeout in 10 seconds, and that will result in giving up the leadership without retry.
+
