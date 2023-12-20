@@ -43,6 +43,7 @@ configure_package_sources() {
     export SOURCE_VERSION_BASE
     export CURRENT_RELEASE_VERSION
     export PREVIOUS_RELEASE_VERSION
+    export LATEST_RHOCP_MINOR
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -502,6 +503,8 @@ CURRENT_RELEASE_REPO=$(echo "${current_version_repo}" | cut -d, -f2)
 previous_version_repo=$(get_rel_version_repo "${PREVIOUS_MINOR_VERSION}")
 PREVIOUS_RELEASE_VERSION=$(echo "${previous_version_repo}" | cut -d, -f1)
 PREVIOUS_RELEASE_REPO=$(echo "${previous_version_repo}" | cut -d, -f2)
+
+LATEST_RHOCP_MINOR="$("${SCRIPTDIR}/../../scripts/get-latest-rhocp-repo.sh")"
 
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"
