@@ -9,6 +9,9 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-true}
+export ENABLE_REGISTRY_MIRROR
+
 # Log output automatically
 LOGDIR="${ROOTDIR}/_output/ci-logs"
 LOGFILE="${LOGDIR}/$(basename "$0" .sh).log"
@@ -38,6 +41,11 @@ bash -x ./bin/manage_hypervisor_config.sh create
 # Start the web server to host the kickstart files and ostree commit
 # repository.
 bash -x ./bin/start_webserver.sh
+
+# Setup a container registry and mirror images.
+if ${ENABLE_REGISTRY_MIRROR}; then
+    bash -x ./bin/mirror_registry.sh
+fi
 
 # Show the summary of the output of the parallel jobs.
 if [ -t 0 ]; then

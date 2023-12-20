@@ -21,6 +21,7 @@ PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=900
+ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-false}
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
@@ -170,6 +171,7 @@ prepare_kickstart() {
     local output_file
     local vm_hostname
     local fips_command=""
+    local -r hostname=$(hostname)
 
     full_vmname="$(full_vm_name "${vmname}")"
     output_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}/kickstart.ks"
@@ -196,6 +198,8 @@ prepare_kickstart() {
               -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
               -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
               -e "s|REPLACE_FIPS_COMMAND|${fips_command}|g" \
+              -e "s|REPLACE_ENABLE_MIRROR|${ENABLE_REGISTRY_MIRROR}|g" \
+              -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
               > "${output_file}"
     record_junit "${vmname}" "prepare_kickstart" "OK"
 }
@@ -262,10 +266,8 @@ wait_for_greenboot() {
 
     local -r start_time=$(date +%s)
     local -r ssh_cmd="ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip}"
-    local retry_count=2
     while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
         local svc_state
-
         svc_state="$(${ssh_cmd} systemctl show --property=SubState --value greenboot-healthcheck || true)"
         if [ "${svc_state}" = "exited" ] ; then
             record_junit "${vmname}" "greenboot-check" "OK"
@@ -274,25 +276,10 @@ wait_for_greenboot() {
 
         # Print the last log and check for terminal failure
         ${ssh_cmd} "sudo journalctl -n 10 -u greenboot-healthcheck" || true
+
         if [ "${svc_state}" = "failed" ] ; then
-            # FIXME: See OCPBUGS-24222
-            # Workaround for TopoLVM images getting stuck
-            # Delete the pods (TopoLVM included) and retry greenboot check
-            # Remove this code when the problem is addressed
-            if [ ${retry_count} -gt 0 ] ; then
-                echo "Deleting MicroShift pods and retrying the greenboot checks (${retry_count} attempts remaining)"
-                (( retry_count-- ))
-                # The '--ovn' option keeps the data, but deletes all pods and networking components
-                if ! ${ssh_cmd} "sudo microshift-cleanup-data --ovn ; sudo systemctl enable --now microshift" ; then
-                    echo "WARNING: MicroShift data cleanup returned an error"
-                fi
-                if ! ${ssh_cmd} "sudo systemctl restart --no-block greenboot-healthcheck.service" ; then
-                    echo "WARNING: Greenboot service restart returned an error"
-                fi
-            else
-                echo "The greenboot service reported a failed state, no need to wait any longer"
-                break
-            fi
+            echo "The greenboot service reported a failed state, no need to wait any longer"
+            break
         fi
 
         date
