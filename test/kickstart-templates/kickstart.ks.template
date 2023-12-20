@@ -64,6 +64,7 @@ if REPLACE_ENABLE_MIRROR; then
     prefix = ""
     location = "REPLACE_MIRROR_HOSTNAME:5000"
     mirror-by-digest-only = true
+    insecure = true
 
 [[registry]]
     prefix = ""
@@ -71,6 +72,7 @@ if REPLACE_ENABLE_MIRROR; then
     mirror-by-digest-only = true
 [[registry.mirror]]
     location = "REPLACE_MIRROR_HOSTNAME:5000"
+    insecure = true
 
 [[registry]]
     prefix = ""
@@ -78,6 +80,7 @@ if REPLACE_ENABLE_MIRROR; then
     mirror-by-digest-only = true
 [[registry.mirror]]
     location = "REPLACE_MIRROR_HOSTNAME:5000"
+    insecure = true
 
 [[registry]]
     prefix = ""
@@ -85,6 +88,7 @@ if REPLACE_ENABLE_MIRROR; then
     mirror-by-digest-only = true
 [[registry.mirror]]
     location = "REPLACE_MIRROR_HOSTNAME:5000"
+    insecure = true
 EOF
 
     # Skip signature verifying for red hat registries, since the signatures are bound the original
