@@ -10,6 +10,7 @@
     "topolvm_csi_provisioner": "registry.redhat.io/openshift4/ose-csi-external-provisioner@sha256:b453a5c76ba4e975a978e31a51531b1d6233723b0d944622caf7844dedf9ad5a",
     "csi-external-snapshotter": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:eec88140f0682ee23e0b71d8f73ad896ad39646402f699b8d573e0baeeef29d8",
     "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dc3bcb302b0d627eca8aae9eef075d75d8b17cbb1e28fb47bfc99ee662d390a0",
-    "csi-snapshot-validation-webhook": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:95dade18260977aa9b19920d92d62155da0cbacba8a0caea5d5bdf71e23e0602"
+    "csi-snapshot-validation-webhook": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:95dade18260977aa9b19920d92d62155da0cbacba8a0caea5d5bdf71e23e0602",
+    "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671"
   }
 }
