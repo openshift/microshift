@@ -3,8 +3,8 @@ set -e
 
 SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
-PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system)
-PODS_CT_LIST=(2                        1                    1                 2             2                 2)
+PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns kube-system)
+PODS_CT_LIST=(2                        1                    1                 2             2)
 LOG_POD_EVENTS=false
 
 # Source the MicroShift health check functions library
@@ -23,6 +23,33 @@ trap 'log_script_exit' EXIT
 function forced_termination() {
     echo "Signal received, terminating."
     exit 1
+}
+
+# Check preconditions for existence of topolvm deployment.
+# Adapted from MicroShift code.
+#
+# args: None
+# return: 0 if topolvm readiness should be checked, 1 otherwise
+function topolvmShouldBeDeployed() {
+    if ! hash vgs 2>/dev/null; then
+        return 1
+    fi
+
+    if [ -f /etc/microshift/lvmd.yaml ]; then
+        return 0
+    fi
+
+    local -r volume_groups=$(vgs --readonly --options=name --noheadings)
+    local -r volume_groups_count=$(echo "${volume_groups}" | wc -w)
+    if [ "${volume_groups_count}" -eq 0 ]; then
+        return 1
+    elif [ "${volume_groups_count}" -eq 1 ]; then
+        return 0
+    elif echo "${volume_groups}" | grep -qw "microshift"; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 # Check the microshift.service systemd unit activity, terminating the script
@@ -110,6 +137,11 @@ if ! wait_for "${WAIT_TIMEOUT_SECS}" microshift_health_endpoints_ok ; then
 
     echo "Error: Timed out waiting for MicroShift API health endpoints to be OK"
     exit 1
+fi
+
+if topolvmShouldBeDeployed; then
+    PODS_NS_LIST+=(openshift-storage)
+    PODS_CT_LIST+=(2)
 fi
 
 # Starting pod-specific checks
