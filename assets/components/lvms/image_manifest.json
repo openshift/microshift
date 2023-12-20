@@ -1,9 +1,9 @@
 [
-  "topolvm_csi",
-  "topolvm_csi_registrar",
-  "topolvm_csi_livenessprobe",
-  "topolvm_csi_resizer",
-  "topolvm_csi_provisioner",
+  "topolvm-csi",
+  "topolvm-csi-registrar",
+  "topolvm-csi-livenessprobe",
+  "topolvm-csi-resizer",
+  "topolvm-csi-provisioner",
   "csi-external-snapshotter",
   "csi-snapshot-controller",
   "csi-snapshot-validation-webhook"

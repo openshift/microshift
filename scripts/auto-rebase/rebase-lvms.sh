@@ -13,18 +13,10 @@ export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="${REPOROOT}/_output/staging/lvms"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
-IMAGE_MANIFEST="${REPOROOT}/assets/components/lvms/image_manifest.json"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
-# Images to include in the release.  These are the images that are built by the LVMS operator.
-declare -a INCLUDED_IMAGES=(
-    "topolvm-csi"
-    "topolvm-csi-provisioner"
-    "topolvm-csi-resizer"
-    "topolvm-csi-registrar"
-    "topolvm-csi-livenessprobe"
-)
+INCLUDED_IMAGES="$(cat "${REPOROOT}/assets/components/lvms/image_manifest.json")"
 
 title() {
     echo -e "\E[34m$1\E[00m";
