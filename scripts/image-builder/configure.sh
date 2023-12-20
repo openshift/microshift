@@ -13,20 +13,31 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 fi
 
-# osbuild from COPR to install version that:
-# 1. can build rhel-93 images
-# 2. doesn't have issues with unexpected mirror's RPM verification
-#    (like the one in 9.3 beta at the moment of writing this comment)
-sudo dnf copr enable -y @osbuild/osbuild epel-9-"$(uname -m)"
-sudo dnf copr enable -y @osbuild/osbuild-composer rhel-9-"$(uname -m)"
+source /etc/os-release
+if [ "${ID}" == "rhel" ] && [ "${VERSION_ID}" == "9.3" ]; then
+    # osbuild from COPR to install version that:
+    # 1. can build rhel-93 images
+    # 2. doesn't have issues with unexpected mirror's RPM verification
+    #    (like the one in 9.3 beta at the moment of writing this comment)
+    sudo dnf copr enable -y @osbuild/osbuild epel-9-"$(uname -m)"
+    sudo dnf copr enable -y @osbuild/osbuild-composer rhel-9-"$(uname -m)"
+    composer_packages="
+    osbuild-composer-96-1.20231213092324044071.main.10.g991293a89.el9
+    osbuild-101-1.20231213161521815551.main.24.g05c0fd31.el9
+    "
+else
+    # osbuild from the standard RPM repository, limits about which os
+    # versions can be built apply
+    composer_packages="osbuild-composer osbuild"
+fi
 
+# shellcheck disable=SC2086
 sudo dnf install -y \
-    osbuild-composer-96-1.20231213092324044071.main.10.g991293a89.el9 \
-    osbuild-101-1.20231213161521815551.main.24.g05c0fd31.el9 \
-    git composer-cli ostree rpm-ostree \
-    cockpit-composer bash-completion podman runc genisoimage \
-    createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
-    containernetworking-plugins expect
+     ${composer_packages} \
+     git composer-cli ostree rpm-ostree \
+     cockpit-composer bash-completion podman runc genisoimage \
+     createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
+     containernetworking-plugins expect
 
 sudo systemctl enable osbuild-composer.socket --now
 sudo systemctl enable cockpit.socket --now
