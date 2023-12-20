@@ -13,8 +13,18 @@ export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="${REPOROOT}/_output/staging/lvms"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
+IMAGE_MANIFEST="${REPOROOT}/assets/components/lvms/image_manifest.json"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
+
+# Images to include in the release.  These are the images that are built by the LVMS operator.
+declare -a INCLUDED_IMAGES=(
+    "topolvm-csi"
+    "topolvm-csi-provisioner"
+    "topolvm-csi-resizer"
+    "topolvm-csi-registrar"
+    "topolvm-csi-livenessprobe"
+)
 
 title() {
     echo -e "\E[34m$1\E[00m";
@@ -90,7 +100,7 @@ rebase_lvms_to() {
         echo "No changes to LVMS assets."
     fi
 
-#    update_lvms_release "${lvms_operator_bundle_manifest}"
+    update_lvms_release "${lvms_operator_bundle_manifest}"
 
     title "# Removing staging directory"
 #    rm -rf "${STAGING_DIR}"
@@ -142,27 +152,19 @@ write_lvms_images_for_arch(){
         return 1
     }
 
-    declare -a include_images=(
-        "topolvm-csi"
-        "topolvm-csi-provisioner"
-        "topolvm-csi-resizer"
-        "topolvm-csi-registrar"
-        "topolvm-csi-livenessprobe"
-    )
-
     local csv_manifest="${arch_dir}/lvms-operator.clusterserviceversion.yaml"
     local image_file="${arch_dir}/images"
 
     parse_images "${csv_manifest}" "${image_file}"
 
     if [ "$(wc -l "${image_file}" | cut -d' ' -f1)" -eq 0 ]; then
-        >&2 echo "error: image file (${image_file}) has fewer images than expected (${#include_images})"
+        >&2 echo "error: image file (${image_file}) has fewer images than expected (${#INCLUDED_IMAGES})"
         exit 1
     fi
     while read -ers LINE; do
         name=${LINE%,*}
         img=${LINE#*,}
-        for included in "${include_images[@]}"; do
+        for included in "${INCLUDED_IMAGES[@]}"; do
             if [[ "${name}" == "${included}" ]]; then
                 name="$(echo "${name}" | tr '-' '_')"
                 yq -iP -o=json e '.images["'"${name}"'"] = "'"${img}"'"' "${REPOROOT}/assets/release/release-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
@@ -174,25 +176,30 @@ write_lvms_images_for_arch(){
 
 update_lvms_release() {
     # lvms_release should be the semver of the LVMS release
-    local lvms_release="${1}"
-    local image_file="${arch_dir}/images"
+    local ver="${1}"
     local arch_dir="${STAGING_DIR}/${arch}"
+    local image_file="${arch_dir}/images"
+    local lvms_dir="${REPOROOT}/assets/components/lvms"
 
+    # For each arch, read the base release file, and merge in the images from the staged image file.  Filter out
+    # unused images.
     for arch in "${ARCHS[@]}"; do
         go_arch=${GOARCH_TO_UNAME_MAP[${arch}]}
-        lvms_release_file="${STAGING_DIR}/release_${go_arch}.json"/
-        lvms_release_tmp="${STAGING_DIR}/release_${go_arch}.json.tmp"
-        # Ingest the raw images files, convert to a json formatted array, and build a new release file with it
-        patch="$(jq --slurp  -nR --arg ver "4.14" \
-        'reduce (
-            inputs | split("\n") | map(select(length > 0))[] | split(",") | {
-               (.[0] | gsub("-";"_")): .[1]
-            }
-        ) as $item ({}; .images += $item) |
-        .release.base=$ver' <_output/staging/lvms/amd64/images)"
-        # must filter out excluded images (operator, etc)
-        jq --slurp '.[0] * .[1]' $REPOROOT/assets/release/release-${go_arch}.json <(<<<$patch) > "${lvms_release_tmp}"
-        mv "${lvms_release_tmp}" "${lvms_release_file}"
+        local lvms_release_json="${REPOROOT}/assets/components/lvms/release-${go_arch}.json"
+        lvms_release_tmp="${STAGING_DIR}/release-${go_arch}.json.tmp"
+
+        # Ingest the raw images files, convert to a json formatted array, drop unwanted images, and assign to "patch" var
+        patch="$(
+            jq --arg KEYS "${INCLUDED_IMAGES[*]}" --arg VER "${ver}"\
+            'with_entries(
+               select(.key as $k | $KEYS | split(" ") | map(gsub("-";"_")) | index($k))
+             ) as $IMAGES |  {"release": {"base": $VER} , "images": ($IMAGES)}' "${image_file}"
+        )"
+        # generate a patched version of the release file, then overwrite the original
+        set -x
+        jq --slurp '.[0] * .[1]' <(echo "${patch}") "${lvms_dir}/release-${go_arch}.json" > "${lvms_release_tmp}"
+        set +x
+        mv "${lvms_release_tmp}" "${lvms_release_json}"
     done
 }
 
@@ -390,7 +397,7 @@ EOL
 parse_images() {
     local src="$1"
     local dest="$2"
-    yq '.spec.relatedImages[]? | [.name, .image] | @csv' "${src}" > "${dest}"
+    yq -o json '.spec.relatedImages[]? as $item ireduce ({}; .[$item | .name | sub("-", "_") ] = ($item.image))' "${src}" > "${dest}"
 }
 
 usage() {

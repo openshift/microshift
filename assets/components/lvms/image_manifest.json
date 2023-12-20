@@ -1,0 +1,10 @@
+[
+  "topolvm_csi",
+  "topolvm_csi_registrar",
+  "topolvm_csi_livenessprobe",
+  "topolvm_csi_resizer",
+  "topolvm_csi_provisioner",
+  "csi-external-snapshotter",
+  "csi-snapshot-controller",
+  "csi-snapshot-validation-webhook"
+]
