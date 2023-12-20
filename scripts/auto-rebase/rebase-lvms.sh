@@ -168,7 +168,7 @@ write_lvms_images_for_arch(){
 
 update_lvms_release() {
     # lvms_release should be the semver of the LVMS release
-    local ver="${1}"
+    local ver="${1#*:}"
     local arch_dir="${STAGING_DIR}/${arch}"
     local image_file="${arch_dir}/images"
     local lvms_dir="${REPOROOT}/assets/components/lvms"
@@ -177,22 +177,22 @@ update_lvms_release() {
     # unused images.
     for arch in "${ARCHS[@]}"; do
         go_arch=${GOARCH_TO_UNAME_MAP[${arch}]}
-        local lvms_release_json="${REPOROOT}/assets/components/lvms/release-${go_arch}.json"
+        local lvms_release_json="${lvms_dir}/release-${go_arch}.json"
         lvms_release_tmp="${STAGING_DIR}/release-${go_arch}.json.tmp"
 
         # Ingest the raw images files, convert to a json formatted array, drop unwanted images, and assign to "patch" var
         patch="$(
-            jq --arg KEYS "${INCLUDED_IMAGES[*]}" --arg VER "${ver}"\
+            jq --argjson KEYS "${INCLUDED_IMAGES[*]}" --arg VER "${ver}"\
             'with_entries(
-               select(.key as $k | $KEYS | split(" ") | map(gsub("-";"_")) | index($k))
+               select(.key as $k | $KEYS | map(gsub("-";"_")) | index($k))
              ) as $IMAGES |  {"release": {"base": $VER} , "images": ($IMAGES)}' "${image_file}"
         )"
         # generate a patched version of the release file, then overwrite the original
-        set -x
-        jq --slurp '.[0] * .[1]' <(echo "${patch}") "${lvms_dir}/release-${go_arch}.json" > "${lvms_release_tmp}"
-        set +x
+        jq -r --slurp '.[1] * .[0]' <(echo "${patch}") "${lvms_dir}/release-${go_arch}.json" > "${lvms_release_tmp}"
         mv "${lvms_release_tmp}" "${lvms_release_json}"
     done
+    git add "${lvms_dir}"
+    git commit -m "update LVMS release files"
 }
 
 update_lvms_images(){
