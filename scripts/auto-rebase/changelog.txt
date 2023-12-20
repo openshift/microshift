@@ -1,6 +1,3 @@
-- ovn-kubernetes image-amd64 2c98ee245fcddadd19863ee4f7e754be8975e7f8 to 8e1584d7ea3e342a5032f7e4358979c8960aa044
-  - 7839276 2023-12-04T08:45:19+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/a242df15444ce0e1ac1fba2bd9d4caf82cb74819/images/ose-ovn-kubernetes.yml
-
-- ovn-kubernetes image-arm64 2c98ee245fcddadd19863ee4f7e754be8975e7f8 to 8e1584d7ea3e342a5032f7e4358979c8960aa044
-  - 7839276 2023-12-04T08:45:19+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/a242df15444ce0e1ac1fba2bd9d4caf82cb74819/images/ose-ovn-kubernetes.yml
+- cluster-kube-apiserver-operator embedded-component 03c5a03d1bd0a952655aa180bd2708802e8cc1a4 to a9c35df9c83f45eea69090311a4ade770be932a6
+  - 260a20e 2023-12-11T09:22:54-05:00 revert dev cert rotation in 4.15
 
