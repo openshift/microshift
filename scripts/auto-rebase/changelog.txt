@@ -1,3 +1,12 @@
-- cluster-kube-apiserver-operator embedded-component 03c5a03d1bd0a952655aa180bd2708802e8cc1a4 to a9c35df9c83f45eea69090311a4ade770be932a6
-  - 260a20e 2023-12-11T09:22:54-05:00 revert dev cert rotation in 4.15
+- csi-external-snapshotter image-arm64 202f48ebffc01cb6cce720875b538d7d739844aa to 090cd57847b98aebe42ecd5091c3a626eb870022
+  - 84c55f9 2023-12-16T01:10:43+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e263fefe43744bb4a377c93acbc0ae3f1d119b22/images/ose-csi-external-snapshotter.yml
+
+- csi-external-snapshotter image-arm64 202f48ebffc01cb6cce720875b538d7d739844aa to 090cd57847b98aebe42ecd5091c3a626eb870022
+  - 84c55f9 2023-12-16T01:10:43+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e263fefe43744bb4a377c93acbc0ae3f1d119b22/images/ose-csi-external-snapshotter.yml
+
+- csi-external-snapshotter image-arm64 202f48ebffc01cb6cce720875b538d7d739844aa to 090cd57847b98aebe42ecd5091c3a626eb870022
+  - 84c55f9 2023-12-16T01:10:43+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e263fefe43744bb4a377c93acbc0ae3f1d119b22/images/ose-csi-external-snapshotter.yml
+
+- ovn-kubernetes image-arm64 8e1584d7ea3e342a5032f7e4358979c8960aa044 to a62756b08e496b3690db3cfee39052c54f931d14
+  - 4220488 2023-12-20T00:42:20+00:00 Dockerfile: Bump OVN to ovn-23.09.0-88.el9fdp
 
