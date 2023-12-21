@@ -2,7 +2,11 @@ package version
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
 	"runtime"
+	"strings"
 
 	// "k8s.io/component-base/metrics"
 	// "k8s.io/component-base/metrics/legacyregistry"
@@ -27,11 +31,14 @@ var (
 	buildDate string
 	// state of git tree, either "clean" or "dirty"
 	gitTreeState string
+	// cluster ID read from /usr/share/microshift/cluster-id file
+	clusterIDFromDisk string
 )
 
 type Info struct {
 	version.Info
-	Patch string `json:"patch"`
+	Patch     string `json:"patch"`
+	ClusterID string `json:"clusterid"`
 }
 
 // Get returns the overall codebase version. It's for detecting
@@ -49,20 +56,25 @@ func Get() Info {
 			Compiler:     runtime.Compiler,
 			Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
 		},
-		Patch: patchFromGit,
+		Patch:     patchFromGit,
+		ClusterID: clusterIDFromDisk,
 	}
 }
 
 func init() {
-	// buildInfo := metrics.NewGaugeVec(
-	// 	&metrics.GaugeOpts{
-	// 		Name: "openshift_build_info",
-	// 		Help: "A metric with a constant '1' value labeled by major, minor, git commit & git version from which OpenShift was built.",
-	// 	},
-	// 	[]string{"major", "minor", "gitCommit", "gitVersion"},
-	// )
-	// buildInfo.WithLabelValues(majorFromGit, minorFromGit, commitFromGit, versionFromGit).Set(1)
+	fileName := "/usr/share/microshift/cluster-id"
+	var content []byte
+	var err error
 
-	// // we're ok with an error here for now because test-integration illegally runs the same process
-	// legacyregistry.Register(buildInfo)
+	_, err = os.Stat(fileName)
+	if os.IsNotExist(err) {
+		content = []byte("unknown-cluster-id")
+	} else {
+		// Read the cluster ID from the disk
+		content, err = ioutil.ReadFile(fileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	clusterIDFromDisk = strings.TrimSpace(string(content))
 }

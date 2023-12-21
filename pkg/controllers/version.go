@@ -47,10 +47,11 @@ func (s *VersionManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 
 	versionInfo := version.Get()
 	var data = map[string]string{
-		"major":   versionInfo.Major,
-		"minor":   versionInfo.Minor,
-		"patch":   versionInfo.Patch,
-		"version": versionInfo.String(),
+		"major":     versionInfo.Major,
+		"minor":     versionInfo.Minor,
+		"patch":     versionInfo.Patch,
+		"version":   versionInfo.String(),
+		"clusterid": versionInfo.ClusterID,
 	}
 
 	kubeConfigPath := s.cfg.KubeConfigPath(config.KubeAdmin)
