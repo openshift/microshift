@@ -58,7 +58,7 @@ EXPECTED_FCONTEXT_LIST = [
     "/var/lib/lxd(/.*)?",
     "/var/lib/microshift(/.*)?",
     "/var/lib/microshift-backups(/.*)?",
-    "/var/lib/microshift.saved(/.*)?",
+    r"/var/lib/microshift\.saved(/.*)?",
     "/var/lib/ocid(/.*)?",
     "/var/lib/registry(/.*)?",
 ]
