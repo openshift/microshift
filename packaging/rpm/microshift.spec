@@ -72,6 +72,7 @@ Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
 Requires: microshift-greenboot = %{version}
 Requires: conntrack-tools
+Requires: util-linux
 Requires: sos
 Requires: crun
 Requires: openshift-clients
@@ -298,6 +299,9 @@ usermod -a -G hugetlbfs openvswitch
 
 %post
 
+# Create the cluster ID file
+uuidgen > %{_datadir}/microshift/cluster-id
+
 # This can be called only after microshift executable files are installed
 %microshift_relabel_exes
 
@@ -359,6 +363,8 @@ systemctl enable --now --quiet openvswitch || true
 %config(noreplace) %{_sysconfdir}/microshift/ovn.yaml.default
 
 %dir %{_datadir}/microshift
+# This file is created during the installation, not build
+%ghost %{_datadir}/microshift/cluster-id
 %dir %{_datadir}/microshift/spec
 %dir %{_prefix}/lib/microshift
 %dir %{_prefix}/lib/microshift/manifests
