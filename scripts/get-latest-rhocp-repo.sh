@@ -10,7 +10,7 @@
 #
 # Output is just the minor (Y) version number.
 
-set -o pipefail
+set -euo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPOROOT="$(cd "${SCRIPTDIR}/.." && pwd)"
@@ -26,7 +26,7 @@ key=$(find /etc/pki/entitlement -iname '*-key.pem')
 
 # Get minor version of currently checked out branch.
 # It's based on values stored in Makefile.version.$ARCH.var.
-current_minor=$(make -C "${REPOROOT}" debug | grep "MINOR:" | cut -d':' -f2)
+current_minor=$(cut -d'.' -f2 "${REPOROOT}/Makefile.version.$(uname -m).var")
 stop=$(( current_minor - 3 ))
 
 # Go through minor versions, starting from current_mirror counting down
