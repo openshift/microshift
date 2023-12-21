@@ -28,6 +28,14 @@ metadata:
   namespace: kube-public
 ```
 
+## Checking the LVMS Version
+
+Like the MicroShift version, the LVM version is available via a configmap. To get the version, run:
+
+```bash
+$ oc get configmap -n openshift-storage lvms-version -ojsonpath='{.data.version}'
+```
+
 ## Generating an SOS Report
 
 The MicroShift RPMs have an explicit dependency on the `sos` utility allowing to collect

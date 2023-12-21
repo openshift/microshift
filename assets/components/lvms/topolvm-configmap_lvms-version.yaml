@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lvms-version
+  namespace: kube-public
+data:
+    version: v4.14.0-10
