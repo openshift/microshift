@@ -1,15 +1,77 @@
-- coredns image-arm64 68ef945a78841a4a1be007fcefa929cc30eb9553 to c92bb1a6b9d061c4e5693c29b56ed19b87106f2f
+- cluster-dns-operator embedded-component da2a4b8dd2ba8258ee934e62ad3a6e0f5a815068 to dee10d916e60d9758f7f93e2f451f18abec7fac6
+  - 6f695b1 2023-12-11T15:34:45-05:00 Enable topology-aware hints iff nodes in >=2 zones
+
+- cluster-kube-apiserver-operator embedded-component c56defbbb88389abff742de0d3b0551acdbe71e6 to e636b82dc5e7296eb8cb5803eafb5d5e01ab551b
+  - a0161b2 2023-12-19T16:11:27+01:00 Set flag to skip setting cloud-provider=external
+  - 30c76aa 2023-12-19T16:09:53+01:00 Bump openshift/* to pick revision_controller revert and k8s 1.29
+  - b43289c 2023-12-19T13:11:28+01:00 Revert "bump(openshift/*)"
+  - 5ff96a3 2023-12-19T13:11:20+01:00 Revert "Set flag to skip setting cloud-provider=external"
+  - 62b93bd 2023-12-19T13:11:10+01:00 Revert "Bump k8s api to v0.29.0"
+  - a0d19eb 2023-12-18T20:52:48+05:30 Bump k8s api to v0.29.0
+  - aa5d5ed 2023-12-18T15:20:52+01:00 webhookcontroller: report when a webhook resource is missing a caBundle provided by the service-ca-operator
+  - fadc221 2023-12-14T19:14:57+01:00 Set flag to skip setting cloud-provider=external
+  - 55611f5 2023-12-14T19:14:57+01:00 bump(openshift/*)
+  - 119a16f 2023-11-27T10:07:48+01:00 webhookcontroller: update degraded webhook condition types to errors
+
+- cluster-kube-controller-manager-operator embedded-component b033b8e7e405417afe95235c4cce6ba5ac0af7b4 to 1b5dc9bcaf9f854cfdeab6469886f726f252bad6
+  - 3a2e979 2023-12-19T17:22:07+01:00 Make render unit pass consistently
+  - eed7905 2023-12-19T16:06:04+01:00 Bump openshift/library-go to pick up revision_controller revert
+  - a05a23b 2023-12-18T21:24:02+05:30 Allow setting of the `cloud-provider=external` flag
+  - 9dbc827 2023-12-18T20:54:09+05:30 Bump k8s api to v0.29.0
+
+- cluster-kube-scheduler-operator embedded-component c068b4d921b746a4308f5e954ac38da50149eedd to fa45c1f57ea5673bb5bfa702f2b095e0dd4abd83
+  - ab694ce 2023-12-19T16:07:17+01:00 Bump openshift/library-go to pick up revision_controller revert
+  - fdf75a8 2023-12-18T20:55:18+05:30 Bump k8s api to v0.29.0
+  - d4598e7 2023-12-14T12:57:32+01:00 debump(go.mod)=go1.20
+  - 1dc6407 2023-12-11T21:13:07+00:00 Updating ose-cluster-kube-scheduler-operator-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/e5df10e41b14c724468c8f78e2690f219279bfc4/images/ose-cluster-kube-scheduler-operator.yml
+
+- cluster-network-operator embedded-component 0d15e45035c82747f6ee00efee9cfbaac7dd905b to 95e2d18859e973788885eed1802d8addcc3f6b72
+  - 711f8ff 2023-12-12T11:10:11-08:00 remove deprecated field mgr before apply patch
+
+- csi-external-snapshotter embedded-component 116406baaa164f02706ca2dd89edd1f3660bbe85 to 35aafb7c5eebf48f4ce08ec5325a636bf5d5fac4
+  - b559ba8 2023-12-17T02:02:03+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-csi-external-snapshotter.yml
+  - 67d4d9e 2023-12-16T16:48:50+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-csi-snapshot-controller.yml
+  - 5262edc 2023-12-13T15:08:10-07:00 UPSTREAM: <carry>: STOR-1688: Chore: add .snyk file to ignore false positives
+
+- machine-config-operator embedded-component 9f284caa52e5defece449b59029130e6bfbb43d6 to de164fb72347abd17741f4f4da2b8d38775a79b2
+  - d15d2d68 2023-12-19T14:16:31-08:00 docs/MachineOSBuilderDesign: 'Known Limitations' links
+
+- operator-framework-olm embedded-component 748ebaab7a185e030f9d6e94a42e23046c951de3 to 844fc2258256a1c1ccc09c1ae66b53b7b257dea1
+  - 6b955026 2023-12-19T09:40:52-05:00 Update verified directories for microshift-manifests
+
+- coredns image-amd64 68ef945a78841a4a1be007fcefa929cc30eb9553 to c92bb1a6b9d061c4e5693c29b56ed19b87106f2f
   - 59f7d2f 2023-12-04T08:45:49-05:00 UPSTREAM: 6354: openshift: Fix OCPBUGS-15755
 
-- csi-external-snapshotter image-arm64 116406baaa164f02706ca2dd89edd1f3660bbe85 to b0968cda624d4ddb45ecb9385322cb126d35162f
+- csi-external-snapshotter image-amd64 116406baaa164f02706ca2dd89edd1f3660bbe85 to 35aafb7c5eebf48f4ce08ec5325a636bf5d5fac4
   - b559ba8 2023-12-17T02:02:03+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-csi-external-snapshotter.yml
   - 67d4d9e 2023-12-16T16:48:50+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-csi-snapshot-controller.yml
+  - 5262edc 2023-12-13T15:08:10-07:00 UPSTREAM: <carry>: STOR-1688: Chore: add .snyk file to ignore false positives
 
-- csi-external-snapshotter image-arm64 116406baaa164f02706ca2dd89edd1f3660bbe85 to b0968cda624d4ddb45ecb9385322cb126d35162f
+- csi-external-snapshotter image-amd64 116406baaa164f02706ca2dd89edd1f3660bbe85 to 35aafb7c5eebf48f4ce08ec5325a636bf5d5fac4
   - b559ba8 2023-12-17T02:02:03+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-csi-external-snapshotter.yml
   - 67d4d9e 2023-12-16T16:48:50+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-csi-snapshot-controller.yml
+  - 5262edc 2023-12-13T15:08:10-07:00 UPSTREAM: <carry>: STOR-1688: Chore: add .snyk file to ignore false positives
 
-- csi-external-snapshotter image-arm64 116406baaa164f02706ca2dd89edd1f3660bbe85 to b0968cda624d4ddb45ecb9385322cb126d35162f
+- csi-external-snapshotter image-amd64 116406baaa164f02706ca2dd89edd1f3660bbe85 to 35aafb7c5eebf48f4ce08ec5325a636bf5d5fac4
   - b559ba8 2023-12-17T02:02:03+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-csi-external-snapshotter.yml
   - 67d4d9e 2023-12-16T16:48:50+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-csi-snapshot-controller.yml
+  - 5262edc 2023-12-13T15:08:10-07:00 UPSTREAM: <carry>: STOR-1688: Chore: add .snyk file to ignore false positives
+
+- ovn-kubernetes image-amd64 2c98ee245fcddadd19863ee4f7e754be8975e7f8 to 447d9b43cc75c7aebf1854574da232dc4d90d012
+  - 5beb671 2023-12-18T21:42:49+01:00 Dockerfile: Bump OVN to ovn-23.09.0-88.el9fdp
+
+- csi-external-snapshotter image-arm64 b0968cda624d4ddb45ecb9385322cb126d35162f to 1e876f976503b343c7a9939d9ba30e3010abc6b9
+  - d86f44d 2023-12-17T05:10:53+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/csi-snapshot-validation-webhook.yml
+  - 5262edc 2023-12-13T15:08:10-07:00 UPSTREAM: <carry>: STOR-1688: Chore: add .snyk file to ignore false positives
+
+- csi-external-snapshotter image-arm64 b0968cda624d4ddb45ecb9385322cb126d35162f to 1e876f976503b343c7a9939d9ba30e3010abc6b9
+  - d86f44d 2023-12-17T05:10:53+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/csi-snapshot-validation-webhook.yml
+  - 5262edc 2023-12-13T15:08:10-07:00 UPSTREAM: <carry>: STOR-1688: Chore: add .snyk file to ignore false positives
+
+- csi-external-snapshotter image-arm64 b0968cda624d4ddb45ecb9385322cb126d35162f to 1e876f976503b343c7a9939d9ba30e3010abc6b9
+  - d86f44d 2023-12-17T05:10:53+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/csi-snapshot-validation-webhook.yml
+  - 5262edc 2023-12-13T15:08:10-07:00 UPSTREAM: <carry>: STOR-1688: Chore: add .snyk file to ignore false positives
+
+- ovn-kubernetes image-arm64 2c98ee245fcddadd19863ee4f7e754be8975e7f8 to 447d9b43cc75c7aebf1854574da232dc4d90d012
+  - 5beb671 2023-12-18T21:42:49+01:00 Dockerfile: Bump OVN to ovn-23.09.0-88.el9fdp
 
