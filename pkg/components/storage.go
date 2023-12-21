@@ -53,8 +53,9 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		cd = []string{
 			"components/lvms/csi-driver.yaml",
 		}
-		cm = "components/lvms/topolvm-lvmd-config_configmap_v1.yaml"
-		ds = []string{
+		cm     = "components/lvms/topolvm-lvmd-config_configmap_v1.yaml"
+		cm_ver = "components/lvms/topolvm-configmap_lvms-version.yaml"
+		ds     = []string{
 			"components/lvms/topolvm-node_daemonset.yaml",
 		}
 		deploy = []string{
@@ -121,6 +122,10 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		return err
 	}
 	if err := assets.ApplyConfigMapWithData(ctx, cm, map[string]string{"lvmd.yaml": lvmdRenderParams["lvmd"].(string)}, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
+		return err
+	}
+	if err := assets.ApplyConfigMaps(ctx, []string{cm_ver}, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
