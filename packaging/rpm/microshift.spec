@@ -283,6 +283,9 @@ install -p -m644 assets/optional/operator-lifecycle-manager/0000* %{buildroot}/%
 install -p -m644 assets/optional/operator-lifecycle-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 install -p -m755 packaging/greenboot/microshift-running-check-olm.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/operator-lifecycle-manager/release-olm* %{buildroot}%{_datadir}/microshift/release/
+
 %ifarch %{arm} aarch64
 cat assets/optional/operator-lifecycle-manager/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
 %endif
@@ -397,15 +400,19 @@ systemctl enable --now --quiet openvswitch || true
 %dir %{_datadir}/microshift
 %dir %{_datadir}/microshift/functions
 
-
 %files olm
 %dir %{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 %{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
 %{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
+%{_datadir}/microshift/release/release-olm-*
+
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Dec 21 2023 Patryk Matuszak <pmatusza@redhat.com> 4.15.0
+- Add OLM release info to microshift-olm RPMs
+
 * Thu Dec 14 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
 - Implement greenboot check for microshift-olm RPM
 
