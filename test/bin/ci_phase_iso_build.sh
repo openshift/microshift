@@ -77,16 +77,11 @@ update_build_cache() {
 # - Always build the 'presubmit' layer.
 # - Only build the 'periodic' layer when 'CI_JOB_NAME' contains 'periodic' token.
 run_image_build() {
-    local -r with_cached_data=$1
-
     if [ -v CI_JOB_NAME ] ; then
-        # Conditional per-layer builds when running in CI
-        if ${with_cached_data} ; then
-            $(dry_run) bash -x ./bin/build_images.sh -d -l ./image-blueprints/layer1-base
-        else
-            $(dry_run) bash -x ./bin/build_images.sh    -l ./image-blueprints/layer1-base
-        fi
-
+        # Conditional per-layer builds when running in
+        # CI. build_images.sh skips any images that have been
+        # downloaded from the cache.
+        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
@@ -161,7 +156,7 @@ else
     if ! ${GOT_CACHED_DATA} ; then
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
-    run_image_build ${GOT_CACHED_DATA}
+    run_image_build
 fi
 
 echo "Build phase complete"
