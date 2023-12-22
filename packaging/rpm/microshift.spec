@@ -299,8 +299,10 @@ usermod -a -G hugetlbfs openvswitch
 
 %post
 
-# Create the cluster ID file
-uuidgen > %{_datadir}/microshift/cluster-id
+# Create the cluster ID file if not already exists
+if [ ! -e "%{_datadir}/microshift/cluster-id" ] ; then
+  uuidgen > %{_datadir}/microshift/cluster-id
+fi
 
 # This can be called only after microshift executable files are installed
 %microshift_relabel_exes
