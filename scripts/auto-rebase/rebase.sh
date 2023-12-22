@@ -948,7 +948,7 @@ update_olm_images() {
         local release_file="${STAGING_DIR}/release_${goarch}.json"
         local olm_image_refs_file="${REPOROOT}/assets/optional/operator-lifecycle-manager/image-references"
         local kustomization_arch_file="${REPOROOT}/assets/optional/operator-lifecycle-manager/kustomization.${arch}.yaml"
-        local olm_release_json="${REPOROOT}/assets/optional/operator-lifecycle-manager/release-${arch}.json"
+        local olm_release_json="${REPOROOT}/assets/optional/operator-lifecycle-manager/release-olm-${arch}.json"
 
         # Create the OLM release-${arch}.json file, this is the file included on the RPM.
         local base_release
