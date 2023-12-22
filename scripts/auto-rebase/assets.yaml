@@ -241,7 +241,7 @@ assets:
         ignore: "gets generated during image rebase"
       - file: kustomization.aarch64.yaml
         ignore: "gets generated during image rebase"
-      - file: release-aarch64.json
+      - file: release-olm-aarch64.json
         ignore: "gets generated during image rebase"
-      - file: release-x86_64.json
+      - file: release-olm-x86_64.json
         ignore: "gets generated during image rebase"
