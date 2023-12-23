@@ -26,6 +26,7 @@ SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
+TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 
 full_vm_name() {
     local base="${1}"
@@ -598,7 +599,7 @@ stress_testing() {
     local -r ssh_user=redhat
     local -r ssh_port="$(get_vm_property "${vmname}" ssh_port)"
     local -r ssh_pkey="${SSH_PRIVATE_KEY:-}"
-    
+
     if [ "${action}" == "enable" ]; then
         echo "${action}d stress condition: ${condition} ${value}"
         "${SCRIPTDIR}/stress_testing.sh" -e "${condition}" -v "${value}" -h "${ssh_host}" -u "${ssh_user}" -p "${ssh_port}" -k "${ssh_pkey}"
@@ -679,9 +680,19 @@ EOF
         record_junit "${vmname}" "pre_test_greenboot_check" "OK"
     fi
 
+    # Make sure the test execution times out after a predefined period.
+    # The 'timeout' command sends the HUP signal and, if the test does not
+    # exit after 5m, it sends the KILL signal to terminate the process.
     local var_arg=${variable_file:+-V "${variable_file}"}
+    local timeout_robot="timeout -v --kill-after=5m ${TEST_EXECUTION_TIMEOUT} ${rf_binary}"
+    if [ -t 0 ]; then
+        # Disable timeout for interactive mode when stdin is a terminal.
+        # This is necessary for proper handling of test interruption by user.
+        timeout_robot="${rf_binary}"
+    fi
+
     # shellcheck disable=SC2086
-    "${rf_binary}" \
+    if ! ${timeout_robot} \
         --name "${SCENARIO}" \
         --randomize "${TEST_RANDOMIZATION}" \
         --loglevel TRACE \
@@ -689,7 +700,13 @@ EOF
         --debugfile "${SCENARIO_INFO_DIR}/${SCENARIO}/rf-debug.log" \
         -x junit.xml \
         ${var_arg} \
-        "$@"
+        "$@" ; then
+        # Log junit message on the command timeout
+        if [ $? -ge 124 ] ; then
+            record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
+        fi
+        return 1
+    fi
 }
 
 load_global_settings() {

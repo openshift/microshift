@@ -526,6 +526,14 @@ the primary host to use for connecting and any arguments to be given
 to `robot`, including the test suites and any unique variables that
 are not saved to the default variables file by the framework.
 
+The `robot` command uses the following options that can be overridden
+as an environment setting in scenario files:
+* `TEST_RANDOMIZATION=all` for running the tests in a random order
+* `TEST_EXECUTION_TIMEOUT=30m` for timing out on tests that run longer than expected
+
+> Execution timeout is disabled with running the scenario script in the
+> interactive mode to allow convenient interruption from the terminal.
+
 ## Troubleshooting
 
 ### Accessing VMs
