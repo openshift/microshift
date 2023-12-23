@@ -1,9 +1,0 @@
-- cluster-network-operator embedded-component 0ede33d163bc29ae52661d9e6db4838452a104c1 to 2d7ced4536c90a4c848ae9a67caf4c0766cfde78
-  - c8c2587 2023-12-01T12:33:03+00:00 Add apbroute/status patch rights for ovnkube-node to update status
-
-- ovn-kubernetes image-amd64 aa8d03cf0c55f02625ab40e9c0528c552a282c8b to 95ae29d23194711297419fe43ff1c83fed3f9828
-  - 5ffd654 2023-11-30T14:52:15-05:00 APB: Ensure last transition time is always updated in status regardless of success of failure
-
-- ovn-kubernetes image-arm64 aa8d03cf0c55f02625ab40e9c0528c552a282c8b to 95ae29d23194711297419fe43ff1c83fed3f9828
-  - 5ffd654 2023-11-30T14:52:15-05:00 APB: Ensure last transition time is always updated in status regardless of success of failure
-
