@@ -62,7 +62,8 @@ Change System Date To
 Compute Date After Days
     [Documentation]    return system date after number of days elapsed
     [Arguments]    ${number_of_days}    ${date_format}
-    ${future_date}=    Get Current Date    UTC    ${number_of_days} days    result_format=${date_format}
+    # date command is used here because we need to consider the remote vm timezone .
+    ${future_date}=    Command Should Work    TZ=UTC date "+${date_format}" -d "$(date) + ${number_of_days} day"
     RETURN    ${future_date}
 
 Certs Should Expire On
