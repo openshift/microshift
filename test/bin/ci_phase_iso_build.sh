@@ -95,9 +95,6 @@ run_image_build() {
 
 cat /etc/os-release
 
-# Clean the dnf cache to avoid corruption
-$(dry_run) sudo dnf clean all
-
 # Show what other dnf commands have been run to try to debug why we
 # sometimes see cache collisons.
 $(dry_run) sudo dnf history --reverse

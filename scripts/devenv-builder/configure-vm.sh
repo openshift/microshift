@@ -11,6 +11,7 @@ RHEL_SUBSCRIPTION=false
 RHEL_BETA_VERSION=false
 SET_RHEL_RELEASE=true
 DNF_UPDATE=true
+DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
 
 start=$(date +%s)
 
@@ -25,24 +26,6 @@ function usage() {
 
     [ -n "$1" ] && echo -e "\nERROR: $1"
     exit 1
-}
-
-function dnf_retry() {
-    local -r mode=$1
-    local -r args=$2
-
-    local retVal=1
-    for _ in $(seq 3) ; do
-        # shellcheck disable=SC2086
-        if ! sudo dnf "${mode}" -y ${args} ; then
-            sudo dnf clean -y all
-        else
-            retVal=0
-            break
-        fi
-    done
-
-    return ${retVal}
 }
 
 while [ $# -gt 1 ]; do
@@ -76,6 +59,15 @@ if [ $# -ne 1 ]; then
     usage "Wrong number of arguments"
 fi
 
+# The conditional check for dnf_retry.sh script presence is required 
+# because configure-vm.sh can be used as a standalone script when
+# bootstrapping the development environment
+if [ ! -x "${DNF_RETRY}" ] ; then
+    DNF_RETRY=$(mktemp /tmp/dnf_retry.XXXXXXXX.sh)
+    curl -s https://raw.githubusercontent.com/openshift/microshift/main/scripts/dnf_retry.sh -o "${DNF_RETRY}"
+    chmod 755 "${DNF_RETRY}"
+fi
+
 # Only RHEL requires a subscription
 if grep -q 'Red Hat Enterprise Linux' /etc/redhat-release; then
     RHEL_SUBSCRIPTION=true
@@ -103,7 +95,7 @@ if ${RHEL_SUBSCRIPTION}; then
         source /etc/os-release
         sudo subscription-manager release --set ${VERSION_ID}
         sudo subscription-manager release --show
-        dnf_retry clean all
+        "${DNF_RETRY}" "clean" "all"
     fi
 
     # Enable RHEL CDN repos to avoid problems with incomplete RHUI mirrors
@@ -115,11 +107,11 @@ if ${RHEL_SUBSCRIPTION}; then
 fi
 
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
-    dnf_retry clean all
+    "${DNF_RETRY}" "clean" "all"
     if ${DNF_UPDATE}; then
-        dnf_retry update
+        "${DNF_RETRY}" "update"
     fi
-    dnf_retry install "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools"
+    "${DNF_RETRY}" "install" "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools"
     sudo systemctl enable --now cockpit.socket
 fi
 
@@ -175,7 +167,7 @@ skip_if_unavailable=0
 EOF
     fi
 else
-    dnf_retry install centos-release-nfv-common
+    "${DNF_RETRY}" "install" "centos-release-nfv-common"
     sudo dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"
     sudo tee "/etc/yum.repos.d/openvswitch2-$(uname -m)-rpms.repo" >/dev/null <<EOF
 [sig-nfv]
@@ -189,7 +181,7 @@ EOF
 fi
 
 if ${RHEL_SUBSCRIPTION}; then
-    dnf_retry install openshift-clients
+    "${DNF_RETRY}" "install" "openshift-clients"
 else
     OCC_SRC="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/${OCPVERSION}-el9-beta"
     OCC_RPM="$(curl -s "${OCC_SRC}/" | grep -o "openshift-clients-4[^\"']*.rpm" | sort | uniq)"
@@ -197,12 +189,12 @@ else
     OCC_REM="${OCC_SRC}/${OCC_RPM}"
 
     curl -s "${OCC_REM}" --output "${OCC_LOC}"
-    dnf_retry localinstall "${OCC_LOC}"
+    "${DNF_RETRY}" "localinstall" "${OCC_LOC}"
     rm -f "${OCC_LOC}"
 fi
 
 if ${BUILD_AND_RUN}; then
-    dnf_retry localinstall "$(ls -1 ~/microshift/_output/rpmbuild/RPMS/*/*.rpm)"
+    "${DNF_RETRY}" "localinstall" "$(ls -1 ~/microshift/_output/rpmbuild/RPMS/*/*.rpm)"
 fi
 
 # Configure OpenShift pull secret
@@ -231,7 +223,7 @@ EOF
 fi
 
 if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
-    dnf_retry install firewalld
+    "${DNF_RETRY}" "install" "firewalld"
     sudo systemctl enable firewalld --now
     sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
     sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
