@@ -61,23 +61,9 @@ function get_base_isofile {
 }
 
 function action_config() {
-    local tries=0
-    local failed=true
-    local deps="libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass"
-
-    set +e  # retry because we see errors caching different RPMs in CI
-    while [ ${tries} -lt 5 ]; do
-        # shellcheck disable=SC2086
-        if sudo dnf install -y ${deps}; then
-            failed=false
-            break
-        fi
-        ((tries+=1))
-    done
-    if ${failed}; then
-        exit 1
-    fi
-    set -e
+    local -r deps="libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass"
+    
+    "${SCRIPTDIR}/../dnf_retry.sh" "install" "${deps}"
 
     if [ "$(systemctl is-active libvirtd.socket)" != "active" ] ; then
         echo "Enabling libvirtd"
