@@ -10,6 +10,7 @@ FORCE_FIREWALL=false
 RHEL_SUBSCRIPTION=false
 RHEL_BETA_VERSION=false
 SET_RHEL_RELEASE=true
+DNF_UPDATE=true
 
 start=$(date +%s)
 
@@ -20,6 +21,7 @@ function usage() {
     echo "  --no-build-deps           Do not install dependencies for building binaries and RPMs (implies --no-build)"
     echo "  --force-firewall          Install and configure firewalld regardless of other options"
     echo "  --no-set-release-version  Do NOT set the release subscription to the current release version"
+    echo "  --skip-dnf-update         Do NOT run dnf update"
 
     [ -n "$1" ] && echo -e "\nERROR: $1"
     exit 1
@@ -60,6 +62,10 @@ while [ $# -gt 1 ]; do
         ;;
     --no-set-release-version)
         SET_RHEL_RELEASE=false
+        shift
+        ;;
+    --skip-dnf-update)
+        DNF_UPDATE=false
         shift
         ;;
     *) usage ;;
@@ -103,7 +109,9 @@ fi
 
 if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     dnf_retry clean all
-    dnf_retry update
+    if ${DNF_UPDATE}; then
+        dnf_retry update
+    fi
     dnf_retry install "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools"
     sudo systemctl enable --now cockpit.socket
 fi
