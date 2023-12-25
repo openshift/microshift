@@ -1,0 +1,6 @@
+- ovn-kubernetes image-amd64 95ae29d23194711297419fe43ff1c83fed3f9828 to 8114b59e7f4548167e942fdcf6a96a60f14b6327
+  - 13af051 2023-12-20T16:50:22+00:00 Dockerfile: Bump OVN to ovn-23.09.0-88.el9fdp
+
+- ovn-kubernetes image-arm64 95ae29d23194711297419fe43ff1c83fed3f9828 to 8114b59e7f4548167e942fdcf6a96a60f14b6327
+  - 13af051 2023-12-20T16:50:22+00:00 Dockerfile: Bump OVN to ovn-23.09.0-88.el9fdp
+
