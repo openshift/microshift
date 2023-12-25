@@ -22,7 +22,7 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.9
 	golang.org/x/sys v0.13.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.28.3
+	k8s.io/api v0.0.0
 	k8s.io/apiextensions-apiserver v0.28.2
 	k8s.io/apimachinery v0.28.3
 	k8s.io/apiserver v0.28.3
@@ -237,7 +237,7 @@ require (
 
 replace (
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230811135323-13a5964cc98e // from kubernetes
-	k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231207212114-7aa0a745c436 // staging kubernetes
+	k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api b0d609f08083d7a8aa3426540d6d5f9090944906 // staging kubernetes
 	k8s.io/apiextensions-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231207212114-7aa0a745c436 // staging kubernetes
 	k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231207212114-7aa0a745c436 // staging kubernetes
 	k8s.io/apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20231207212114-7aa0a745c436 // staging kubernetes
