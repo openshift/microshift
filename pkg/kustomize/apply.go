@@ -69,7 +69,7 @@ func (s *Kustomizer) applyKustomizationPath(ctx context.Context, path string) {
 
 		klog.Infof("Applying kustomization at %v ", kustomization)
 		if err := applyKustomizationWithRetries(ctx, path, s.kubeconfig); err != nil {
-			klog.Errorf("Applying kustomization at %v failed: %w. Giving up.", kustomization, err)
+			klog.Errorf("Applying kustomization at %v failed: %v. Giving up.", kustomization, err)
 		} else {
 			klog.Infof("Kustomization at %v applied successfully.", kustomization)
 		}

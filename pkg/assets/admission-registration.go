@@ -3,6 +3,7 @@ package assets
 import (
 	"context"
 	"fmt"
+
 	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 	arV1 "k8s.io/api/admissionregistration/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -44,7 +45,7 @@ func (v *validationWebhookCfg) Applier(ctx context.Context) error {
 func admissionRegistrationClient(kubeconfigPath string) *arClientV1.AdmissionregistrationV1Client {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
-		klog.Fatalf("failed to create admission-registration client: %w", err)
+		klog.Fatalf("failed to create admission-registration client: %v", err)
 	}
 	return arClientV1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "admission-registration"))
 }
