@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/openshift/library-go/pkg/controller/factory"
+	"github.com/openshift/library-go/pkg/operator/certrotation"
 	"github.com/openshift/library-go/pkg/operator/events"
 
 	certificates "k8s.io/api/certificates/v1"
@@ -63,6 +64,10 @@ type ClientCertOption struct {
 	SecretName string
 	// AdditonalSecretData contains data that will be added into client certificate secret besides tls.key/tls.crt
 	AdditonalSecretData map[string][]byte
+	// JiraComponent annotates tls artifacts so that owner could be easily found
+	JiraComponent string
+	// Description is a human-readable one sentence description of certificate purpose
+	Description string
 }
 
 // clientCertificateController implements the common logic of hub client certification creation/rotation. It
@@ -146,13 +151,20 @@ func (c *clientCertificateController) sync(ctx context.Context, syncCtx factory.
 	switch {
 	case errors.IsNotFound(err):
 		secret = &corev1.Secret{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: c.SecretNamespace,
-				Name:      c.SecretName,
-			},
+			ObjectMeta: certrotation.NewTLSArtifactObjectMeta(
+				c.SecretName,
+				c.SecretNamespace,
+				c.JiraComponent,
+				c.Description,
+			),
 		}
 	case err != nil:
 		return fmt.Errorf("unable to get secret %q: %w", c.SecretNamespace+"/"+c.SecretName, err)
+	}
+
+	needsMetadataUpdate := false
+	if len(c.JiraComponent) > 0 || len(c.Description) > 0 {
+		needsMetadataUpdate = certrotation.EnsureTLSMetadataUpdate(&secret.ObjectMeta, c.JiraComponent, c.Description)
 	}
 
 	// reconcile pending csr if exists
@@ -177,6 +189,10 @@ func (c *clientCertificateController) sync(ctx context.Context, syncCtx factory.
 		syncCtx.Recorder().Eventf("ClientCertificateCreated", "A new client certificate for %s is available", c.controllerName)
 		c.reset()
 		return nil
+	} else if needsMetadataUpdate && len(secret.ResourceVersion) > 0 {
+		if err := c.saveSecret(secret); err != nil {
+			return err
+		}
 	}
 
 	// create a csr to request new client certificate if

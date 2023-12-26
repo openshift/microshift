@@ -144,7 +144,7 @@ func UpdateSpec(ctx context.Context, client OperatorClient, updateFuncs ...Updat
 	return operatorSpec, updated, err
 }
 
-// UpdateSpecConfigFn returns a func to update the config.
+// UpdateObservedConfigFn returns a func to update the config.
 func UpdateObservedConfigFn(config map[string]interface{}) UpdateOperatorSpecFunc {
 	return func(oldSpec *operatorv1.OperatorSpec) error {
 		oldSpec.ObservedConfig = runtime.RawExtension{Object: &unstructured.Unstructured{Object: config}}
@@ -186,7 +186,7 @@ func UpdateStatus(ctx context.Context, client OperatorClient, updateFuncs ...Upd
 	return updatedOperatorStatus, updated, err
 }
 
-// UpdateConditionFunc returns a func to update a condition.
+// UpdateConditionFn returns a func to update a condition.
 func UpdateConditionFn(cond operatorv1.OperatorCondition) UpdateStatusFunc {
 	return func(oldStatus *operatorv1.OperatorStatus) error {
 		SetOperatorCondition(&oldStatus.Conditions, cond)
@@ -194,7 +194,7 @@ func UpdateConditionFn(cond operatorv1.OperatorCondition) UpdateStatusFunc {
 	}
 }
 
-// UpdateStatusFunc is a func that mutates an operator status.
+// UpdateStaticPodStatusFunc is a func that mutates an operator status.
 type UpdateStaticPodStatusFunc func(status *operatorv1.StaticPodOperatorStatus) error
 
 // UpdateStaticPodStatus applies the update funcs to the oldStatus abd tries to update via the client.

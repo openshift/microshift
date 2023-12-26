@@ -64,6 +64,9 @@ type ControllerCommandConfig struct {
 	// between tries of actions.
 	RetryPeriod metav1.Duration
 
+	// TopologyDetector is used to plug in topology detection.
+	TopologyDetector TopologyDetector
+
 	ComponentOwnerReference *corev1.ObjectReference
 	healthChecks            []healthz.HealthChecker
 }
@@ -91,6 +94,11 @@ func (c *ControllerCommandConfig) WithComponentOwnerReference(reference *corev1.
 
 func (c *ControllerCommandConfig) WithHealthChecks(healthChecks ...healthz.HealthChecker) *ControllerCommandConfig {
 	c.healthChecks = append(c.healthChecks, healthChecks...)
+	return c
+}
+
+func (c *ControllerCommandConfig) WithTopologyDetector(topologyDetector TopologyDetector) *ControllerCommandConfig {
+	c.TopologyDetector = topologyDetector
 	return c
 }
 
@@ -320,6 +328,10 @@ func (c *ControllerCommandConfig) StartController(ctx context.Context) error {
 		if c.EnableHTTP2 {
 			builder = builder.WithHTTP2()
 		}
+	}
+
+	if c.TopologyDetector != nil {
+		builder = builder.WithTopologyDetector(c.TopologyDetector)
 	}
 
 	return builder.Run(controllerCtx, unstructuredConfig)
