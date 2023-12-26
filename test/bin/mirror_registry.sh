@@ -30,7 +30,7 @@ get_container_images() {
 prereqs() {
     mkdir -p "${REGISTRY_ROOT}"
     mkdir -p "${REGISTRY_CONTAINER_DIR}"
-    sudo dnf install -y podman skopeo jq
+    "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     podman stop "${LOCAL_REGISTRY_NAME}" || true
     podman rm "${LOCAL_REGISTRY_NAME}" || true
     podman run -d -p 5000:5000 --restart always --name "${LOCAL_REGISTRY_NAME}" "quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
