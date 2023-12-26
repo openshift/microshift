@@ -3,9 +3,6 @@
 set -euo pipefail
 
 SCRIPT_NAME=$(basename "$0")
-# The 'openshift-ovn-kubernetes' namespace must be in the end of the list
-# to allow for pod deletion when MicroShift is stopped
-PODS_NS_LIST=(openshift-operator-lifecycle-manager openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system openshift-ovn-kubernetes)
 FULL_CLEAN=false
 KEEP_IMAGE=false
 OVN_CLEAN=false
@@ -57,15 +54,23 @@ function stop_clean_pods() {
         echo "crio.sock is not present, not attempting to clean up pods"
         return 0
     fi
+
     echo Removing MicroShift pods
-    for i in "${!PODS_NS_LIST[@]}"; do
-        local ns
-        ns=${PODS_NS_LIST[${i}]}
+    # The 'openshift-ovn-kubernetes' namespace must be in the end of the list
+    # to allow for pod deletion when MicroShift is stopped
+    local namespaces
+    namespaces=$(crictl pods --output json | jq -r '.items[].metadata.namespace' | sort -u)
+    if [ -n "${namespaces}" ] ; then
+        namespaces=$(grep -vw openshift-ovn-kubernetes <<<"${namespaces}" || true)
+        namespaces+=" openshift-ovn-kubernetes"
+    fi
+
+    for ns in ${namespaces} ; do
         retries=5
         while [ ${retries} -gt 0 ] ; do
             local ocp_pods
             ocp_pods=$(crictl pods --namespace "${ns}" -q)
-            if [ "$(echo "${ocp_pods}" | wc -w)" -eq 0 ] ; then
+            if [ -z "${ocp_pods}" ] ; then
                 break
             fi
             # shellcheck disable=SC2086
