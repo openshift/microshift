@@ -9,3 +9,4 @@ data:
   minor: ""
   patch: ""
   version: ""
+  clusterid: ""
