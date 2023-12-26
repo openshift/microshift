@@ -1,11 +1,11 @@
 diff --git a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
-index 087b5f50b..092a1bdb5 100644
+index 588865dae..53d7c3c97 100644
 --- a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
 +++ b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
 @@ -36,7 +36,6 @@ import (
+ 	"k8s.io/apimachinery/pkg/util/sets"
  	"k8s.io/apimachinery/pkg/util/uuid"
  	"k8s.io/apimachinery/pkg/util/wait"
- 	genericfeatures "k8s.io/apiserver/pkg/features"
 -	"k8s.io/apiserver/pkg/server"
  	"k8s.io/apiserver/pkg/server/healthz"
  	"k8s.io/apiserver/pkg/server/mux"
