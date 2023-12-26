@@ -144,6 +144,8 @@ func (buf *Buffer) FormatHeader(s severity.Severity, file string, line int, now 
 	buf.Tmp[21] = ' '
 	buf.nDigits(7, 22, Pid, ' ') // TODO: should be TID
 	buf.Tmp[29] = ' '
+	buf.WriteString(getMicroshiftLoggerComponent())
+	buf.WriteByte(' ')
 	buf.Write(buf.Tmp[:30])
 	buf.WriteString(file)
 	buf.Tmp[0] = ':'
