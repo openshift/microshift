@@ -57,7 +57,7 @@ func (s *KubeScheduler) configure(cfg *config.Config) {
 }
 
 func (s *KubeScheduler) writeConfig(cfg *config.Config) error {
-	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta3
+	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1
 kind: KubeSchedulerConfiguration
 clientConnection:
   kubeconfig: ` + cfg.KubeConfigPath(config.KubeScheduler) + `
