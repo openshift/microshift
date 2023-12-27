@@ -10,7 +10,7 @@ set -euo pipefail
 # DNF_RETRY=$(mktemp /tmp/dnf_retry.XXXXXXXX.sh)
 # curl -s https://raw.githubusercontent.com/openshift/microshift/main/scripts/dnf_retry.sh -o "${DNF_RETRY}"
 # chmod 755 "${DNF_RETRY}"
-# 
+#
 if [ $# -ne 1 ] && [ $# -ne 2 ] ; then
     echo "Usage: $(basename "$0") <dnf_mode> [packages_to_install]"
     exit 1
@@ -22,11 +22,12 @@ DNF_PACK=""
 
 rc=0
 for _ in $(seq 3) ; do
-    # shellcheck disable=SC2086   
+    # shellcheck disable=SC2086
     sudo dnf "${DNF_MODE}" -y ${DNF_PACK} || rc=$?
     if [ "${rc}" -ne 0 ] ; then
-        sudo dnf clean -y all        
+        sudo dnf clean -y all
     else
+        rc=0
         break
     fi
 done
