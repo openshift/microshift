@@ -63,11 +63,11 @@ func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserve
 
 func (s *KubeletServer) configure(cfg *config.Config) {
 	if err := s.writeConfig(cfg); err != nil {
-		klog.Fatalf("Failed to write kubelet config", err)
+		klog.Fatalf("Failed to write kubelet config %v", err)
 	}
 	osID, err := loadOSID()
 	if err != nil {
-		klog.Fatalf("Failed to read OS ID", err)
+		klog.Fatalf("Failed to read OS ID %v", err)
 	}
 
 	kubeletFlags := kubeletoptions.NewKubeletFlags()
@@ -84,7 +84,7 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	kubeletConfig, err := loadConfigFile(filepath.Join(config.DataDir, "/resources/kubelet/config/config.yaml"))
 
 	if err != nil {
-		klog.Fatalf("Failed to load Kubelet Configuration", err)
+		klog.Fatalf("Failed to load Kubelet Configuration %v", err)
 	}
 
 	s.kubeconfig = kubeletConfig

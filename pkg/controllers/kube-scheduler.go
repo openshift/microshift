@@ -57,7 +57,7 @@ func (s *KubeScheduler) configure(cfg *config.Config) {
 }
 
 func (s *KubeScheduler) writeConfig(cfg *config.Config) error {
-	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1beta3
+	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1
 kind: KubeSchedulerConfiguration
 clientConnection:
   kubeconfig: ` + cfg.KubeConfigPath(config.KubeScheduler) + `
@@ -80,7 +80,7 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		// This endpoint uses a self-signed certificate on purpose, we need to skip verification.
 		healthcheckStatus := util.RetryInsecureGet(ctx, "https://localhost:10259/healthz")
 		if healthcheckStatus != 200 {
-			klog.Errorf("%s healthcheck failed", s.Name(), fmt.Errorf("kube-scheduler failed to start"))
+			klog.Errorf("%s healthcheck failed due to kube-scheduler failure to start", s.Name())
 			errorChannel <- errors.New("kube-scheduler healthcheck failed")
 		}
 

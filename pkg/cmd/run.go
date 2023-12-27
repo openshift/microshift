@@ -72,7 +72,7 @@ func NewRunMicroshiftCommand() *cobra.Command {
 		if vFlag := flags.Lookup("v"); vFlag != nil {
 			verbosity := strconv.Itoa(cfg.GetVerbosity())
 			if err := vFlag.Value.Set(verbosity); err != nil {
-				klog.Errorf("Failed to set log verbosity: %w", err)
+				klog.Errorf("Failed to set log verbosity: %v", err)
 			}
 		}
 

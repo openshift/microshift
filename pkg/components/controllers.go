@@ -209,7 +209,7 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 		}
 	)
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply", "namespace", ns, "err", err)
+		klog.Warningf("Failed to apply namespace %q due to error %v", ns, err)
 		return err
 	}
 
