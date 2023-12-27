@@ -434,7 +434,7 @@ launch_vm() {
         # If the TTY is not provided, virt-install refuses
         # to attach to the console. `unbuffer` provides the TTY.
         # shellcheck disable=SC2086
-        if ! sudo unbuffer virt-install \
+        if ! unbuffer sudo virt-install \
             --autoconsole text \
             --graphics "${graphics_args}" \
             --name "${full_vmname}" \
