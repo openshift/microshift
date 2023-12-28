@@ -55,7 +55,7 @@ Change System Date To
     [Arguments]    ${future_date}
     ${ushift_pid}=    MicroShift Process ID
     Systemctl    stop    chronyd
-    Command Should Work    timedatectl set-time "${future_date}"
+    Command Should Work    TZ=UTC timedatectl set-time "${future_date}"
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait For MicroShift
 
