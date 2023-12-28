@@ -25,8 +25,8 @@ if [ "${ID}" == "rhel" ] && [ "${VERSION_ID}" == "9.3" ]; then
     sudo dnf copr enable -y @osbuild/osbuild epel-9-"$(uname -m)"
     sudo dnf copr enable -y @osbuild/osbuild-composer rhel-9-"$(uname -m)"
     composer_packages="
-    osbuild-composer-96-1.20231213092324044071.main.10.g991293a89.el9
-    osbuild-101-1.20231213161521815551.main.24.g05c0fd31.el9
+        osbuild-composer-97-1.20231227082411892620.main.1.gdf3d66117.el9
+        osbuild-102-1.20231222184854846294.main.17.g1b297ad0.el9
     "
 else
     # osbuild from the standard RPM repository, limits about which os
