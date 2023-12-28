@@ -2306,7 +2306,7 @@ k8s.io/kubelet/pkg/cri/streaming
 k8s.io/kubelet/pkg/cri/streaming/portforward
 k8s.io/kubelet/pkg/cri/streaming/remotecommand
 k8s.io/kubelet/pkg/types
-# k8s.io/kubernetes v1.29.0 => github.com/openshift/kubernetes v1.29.0-rc.1.0.20231221005046-b0d609f08083
+# k8s.io/kubernetes v1.29.0 => github.com/openshift/kubernetes v0.0.0-20231221005046-b0d609f08083
 ## explicit; go 1.20
 k8s.io/kubernetes/cmd/kube-apiserver/app
 k8s.io/kubernetes/cmd/kube-apiserver/app/options
@@ -3315,7 +3315,7 @@ sigs.k8s.io/structured-merge-diff/v4/value
 # sigs.k8s.io/yaml v1.3.0
 ## explicit; go 1.12
 sigs.k8s.io/yaml
-# github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230811135323-13a5964cc98e
+# github.com/onsi/ginkgo/v2 => github.com/openshift/ginkgo/v2 v2.6.1-0.20231031162821-c5e24be53ea7
 # k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231221005046-b0d609f08083
 # k8s.io/apiextensions-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231221005046-b0d609f08083
 # k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231221005046-b0d609f08083
@@ -3338,7 +3338,7 @@ sigs.k8s.io/yaml
 # k8s.io/kube-scheduler => github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20231221005046-b0d609f08083
 # k8s.io/kubectl => github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20231221005046-b0d609f08083
 # k8s.io/kubelet => github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20231221005046-b0d609f08083
-# k8s.io/kubernetes => github.com/openshift/kubernetes v1.29.0-rc.1.0.20231221005046-b0d609f08083
+# k8s.io/kubernetes => github.com/openshift/kubernetes v0.0.0-20231221005046-b0d609f08083
 # k8s.io/legacy-cloud-providers => github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers v0.0.0-20231221005046-b0d609f08083
 # k8s.io/metrics => github.com/openshift/kubernetes/staging/src/k8s.io/metrics v0.0.0-20231221005046-b0d609f08083
 # k8s.io/mount-utils => github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20231221005046-b0d609f08083

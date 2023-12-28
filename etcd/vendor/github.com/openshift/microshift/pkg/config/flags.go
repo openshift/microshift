@@ -17,11 +17,11 @@ func HideUnsupportedFlags(flags *pflag.FlagSet) {
 	loggingFlags.VisitAll(func(pf *pflag.Flag) {
 		if !supportedLoggingFlags.Has(pf.Name) {
 			if err := flags.MarkHidden(pf.Name); err != nil {
-				klog.Error("failed to hide flag %q: %v", pf.Name, err)
+				klog.Errorf("failed to hide flag %q: %v", pf.Name, err)
 			}
 		}
 	})
 	if err := flags.MarkHidden("version"); err != nil {
-		klog.Error("failed to hide flag %q: %v", "version", err)
+		klog.Errorf("failed to hide flag %q: %v", "version", err)
 	}
 }

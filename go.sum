@@ -484,8 +484,9 @@ github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20231113184257-969d7afab825 h1:
 github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20231113184257-969d7afab825/go.mod h1:DYivfIviIuQ8+/lCq4vcxuseg2P2XbHygkKwFo9fc8U=
 github.com/openshift/etcd/client/v3 v3.5.1-0.20231113184257-969d7afab825 h1:96tKoeGbC45QqBHAR/8M7R7Y+ZySEPnGvU0WwGL7Va0=
 github.com/openshift/etcd/client/v3 v3.5.1-0.20231113184257-969d7afab825/go.mod h1:RVeBnDz2PUEZqTpgqwAtUd8nAPf5kjyFyND7P1VkOKc=
-github.com/openshift/kubernetes v1.29.0-rc.1.0.20231221005046-b0d609f08083 h1:toge7ZOXA3XjF/IpebuLch80h6rx9a8vxSu6WIfx8b4=
-github.com/openshift/kubernetes v1.29.0-rc.1.0.20231221005046-b0d609f08083/go.mod h1:jntrW7pw09O5/MwCHMk5p6zF0jRC/f175thGZGop9Mc=
+github.com/openshift/ginkgo/v2 v2.6.1-0.20231031162821-c5e24be53ea7 h1:jUM9Fdf+fT0LTccN58jrypOyzcfQUs1v2UH6f8vdBTA=
+github.com/openshift/kubernetes v0.0.0-20231221005046-b0d609f08083 h1:uwOe1NaeSSMGmT989PV6xTF4OBqwJXVazb1DtqDCz9M=
+github.com/openshift/kubernetes v0.0.0-20231221005046-b0d609f08083/go.mod h1:jntrW7pw09O5/MwCHMk5p6zF0jRC/f175thGZGop9Mc=
 github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20231101162358-95ad20fc390c h1:vbvIGFN00qK2rza+XN9VStgidRHXWBBSIadulHg5ges=
 github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20231101162358-95ad20fc390c/go.mod h1:nc9vh1Bd8i4OnTM+uoZeFbRaJJ9uOs1AzaN69SdVnd8=
 github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231221005046-b0d609f08083 h1:oRXkYfhOyKh5GumDgD1s+J3sjsea54oSGn1sahUglCg=
@@ -540,7 +541,6 @@ github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0
 github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20231221005046-b0d609f08083/go.mod h1:qYhx4A7YDlDFxdOjBQC5cXYZVavthnNYiOYIPkOwM0Y=
 github.com/openshift/library-go v0.0.0-20231218143352-99cedb2a141c h1:Onc1C9RWubJj88Jye/giWg2dbbTdMkRGvdekIWBzqTE=
 github.com/openshift/library-go v0.0.0-20231218143352-99cedb2a141c/go.mod h1:3taNPDhXab1SAcKteUtv5T7VEYeHJxa5xfHqfnHPEKY=
-github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230811135323-13a5964cc98e h1:WgaylNSIB4uff7ieewaqIiEG3mP6jSMER8LCkoOEkys=
 github.com/openshift/route-controller-manager v0.0.0-20231025213326-c5cc7a73705e h1:kUlA/DehfYV+Zh1jA108I02uY/3JIy+3e+Pe9KmMipI=
 github.com/openshift/route-controller-manager v0.0.0-20231025213326-c5cc7a73705e/go.mod h1:nY9avgM0wDae1X7F/ugeyBHiJC/cAppNotwLSne71MA=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
