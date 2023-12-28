@@ -234,7 +234,7 @@ require (
 )
 
 replace (
-	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20230811135323-13a5964cc98e // from kubernetes
+	github.com/onsi/ginkgo/v2 => github.com/openshift/ginkgo/v2 v2.6.1-0.20231031162821-c5e24be53ea7 // from kubernetes
 	k8s.io/api => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20231221005046-b0d609f08083 // staging kubernetes
 	k8s.io/apiextensions-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20231221005046-b0d609f08083 // staging kubernetes
 	k8s.io/apimachinery => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20231221005046-b0d609f08083 // staging kubernetes
@@ -257,7 +257,7 @@ replace (
 	k8s.io/kube-scheduler => github.com/openshift/kubernetes/staging/src/k8s.io/kube-scheduler v0.0.0-20231221005046-b0d609f08083 // from kubernetes
 	k8s.io/kubectl => github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20231221005046-b0d609f08083 // from kubernetes
 	k8s.io/kubelet => github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20231221005046-b0d609f08083 // from kubernetes
-	k8s.io/kubernetes => github.com/openshift/kubernetes v1.29.0-rc.1.0.20231221005046-b0d609f08083 // release kubernetes
+	k8s.io/kubernetes => github.com/openshift/kubernetes v0.0.0-20231221005046-b0d609f08083 // release kubernetes
 	k8s.io/legacy-cloud-providers => github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers v0.0.0-20231221005046-b0d609f08083 // from kubernetes
 	k8s.io/metrics => github.com/openshift/kubernetes/staging/src/k8s.io/metrics v0.0.0-20231221005046-b0d609f08083 // from kubernetes
 	k8s.io/mount-utils => github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20231221005046-b0d609f08083 // from kubernetes
