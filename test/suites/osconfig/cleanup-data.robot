@@ -6,6 +6,8 @@ Resource            ../../resources/systemd.resource
 Resource            ../../resources/ostree.resource
 Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/microshift-config.resource
+Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/kubeconfig.resource
 
 Suite Setup         Setup Suite
 
@@ -38,6 +40,9 @@ Verify Invalid Command Line
 
 Verify Full Cleanup Data
     [Documentation]    Verify full data clean scenarios
+    [Setup]    Run Keywords
+    ...    Setup Suite With Namespace
+    ...    Create Hello MicroShift Pod
 
     ${rc}=    Run MicroShift Cleanup Data    --all
     Should Be Equal As Integers    ${rc}    0
@@ -54,11 +59,14 @@ Verify Full Cleanup Data
     OVN Data Should Not Exist
     OVN Internal Bridge Should Not Exist
 
-    [Teardown]
-    ...    Start MicroShift And Wait Until Ready
+    [Teardown]    Run Keywords
+    ...    Run MicroShift Test Case Teardown
 
 Verify Keep Images Cleanup Data
     [Documentation]    Verify keep images data clean scenario
+    [Setup]    Run Keywords
+    ...    Setup Suite With Namespace
+    ...    Create Hello MicroShift Pod
 
     ${rc}=    Run MicroShift Cleanup Data    --keep-images    --all
     Should Be Equal As Integers    ${rc}    0
@@ -75,11 +83,14 @@ Verify Keep Images Cleanup Data
     OVN Data Should Not Exist
     OVN Internal Bridge Should Not Exist
 
-    [Teardown]
-    ...    Start MicroShift And Wait Until Ready
+    [Teardown]    Run Keywords
+    ...    Run MicroShift Test Case Teardown
 
 Verify OVN Cleanup Data
     [Documentation]    Verify OVN data cleanup scenario
+    [Setup]    Run Keywords
+    ...    Setup Suite With Namespace
+    ...    Create Hello MicroShift Pod
 
     ${rc}=    Run MicroShift Cleanup Data    --ovn
     Should Be Equal As Integers    ${rc}    0
@@ -97,11 +108,14 @@ Verify OVN Cleanup Data
     OVN Data Should Not Exist
     OVN Internal Bridge Should Not Exist
 
-    [Teardown]
-    ...    Start MicroShift And Wait Until Ready
+    [Teardown]    Run Keywords
+    ...    Run MicroShift Test Case Teardown
 
 Verify Cert Cleanup Data
     [Documentation]    Verify certificate data cleanup scenario
+    [Setup]    Run Keywords
+    ...    Setup Suite With Namespace
+    ...    Create Hello MicroShift Pod
 
     ${rc}=    Run MicroShift Cleanup Data    --cert
     Should Be Equal As Integers    ${rc}    0
@@ -119,8 +133,8 @@ Verify Cert Cleanup Data
     OVN Data Should Exist
     OVN Internal Bridge Should Exist
 
-    [Teardown]
-    ...    Start MicroShift And Wait Until Ready
+    [Teardown]    Run Keywords
+    ...    Run MicroShift Test Case Teardown
 
 
 *** Keywords ***
@@ -144,6 +158,14 @@ Run MicroShift Cleanup Data
     ...    echo 1 | sudo microshift-cleanup-data ${cmd} ${opt}
     ...    return_stdout=True    return_stderr=True    return_rc=True
     RETURN    ${rc}
+
+Run MicroShift Test Case Teardown
+    [Documentation]    Run the microshift-cleanup-data script and restart
+    ...    the service to ensure clean startup of other tests
+    # Try keeping the images to save on restart times
+    ${rc}=    Run MicroShift Cleanup Data    --keep-images    --all
+    Should Be Equal As Integers    ${rc}    0
+    Start MicroShift And Wait Until Ready
 
 MicroShift Processes Should Not Exist
     [Documentation]    Make sure that MicroShift and Etcd services are not running
