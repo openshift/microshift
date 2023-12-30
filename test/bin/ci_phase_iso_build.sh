@@ -103,7 +103,7 @@ cd "${ROOTDIR}"
 
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
-$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
+$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --skip-dnf-update --force-firewall "${PULL_SECRET}"
 $(dry_run) bash -x ./scripts/image-builder/configure.sh
 
 cd "${ROOTDIR}/test/"
