@@ -4,6 +4,7 @@ Documentation       Tests verifying hostname resolution
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/oc.resource
+Resource            ../../resources/ostree-health.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -55,4 +56,5 @@ Setup Hostname
     ${old}=    Change Hostname    ${hostname}
     Cleanup MicroShift    --all    --keep-images
     Start MicroShift
+    Restart Greenboot And Wait For Success
     RETURN    ${old}
