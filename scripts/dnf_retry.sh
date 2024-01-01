@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -xuo pipefail
 #
 # Use this script to avoid intermittent DNF errors due to local cache
 # inconsistencies or RPM CDN errors.
@@ -23,13 +23,11 @@ DNF_PACK=""
 rc=0
 for _ in $(seq 3) ; do
     # shellcheck disable=SC2086
-    sudo dnf "${DNF_MODE}" -y ${DNF_PACK} || rc=$?
-    if [ "${rc}" -ne 0 ] ; then
-        sudo dnf clean -y all
-    else
-        rc=0
-        break
-    fi
+    sudo dnf "${DNF_MODE}" -y ${DNF_PACK} && exit 0
+    # If unsuccessful, save the return code for exit
+    rc=$?
+    # Clean cache and retry
+    sudo dnf clean -y all
 done
 
 exit "${rc}"
