@@ -36,12 +36,16 @@ build-base-branch:
 	mv $(TMP_REPO)/_output/rpmbuild $(REPO)/_output/rpmbuild-base
 	rm -rf "$(TMP_REPO)"
 
-.PHONY: build-offline-networking-rpm
-build-offline-networking-rpm: TMP_REPO !=mktemp -d
-build-offline-networking-rpm:
-	mkdir -p "$(TMP_REPO)"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-	tar -C "$(REPO)/test/assets/microshift-offline-config" -czvf "$(TMP_REPO)/SOURCES/microshift-offline-config.tar.gz" .
-	rpmbuild --debug -ta --define "name microshift-offline-config" --define "_topdir $(TMP_REPO)"  "$(TMP_REPO)/SOURCES/microshift-offline-config.tar.gz"
+.PHONY: build-offline-config
+build-offline-config: TMP_RPMBUILD_DIR !=mktemp -d
+build-offline-config: RPMBUILD_DIR="$(REPO)/_output/rpmbuild-offline-config"
+build-offline-config:
+	rm -rf "$(RPMBUILD_DIR)"
+	mkdir -p "$(TMP_RPMBUILD_DIR)"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+	tar -C "$(REPO)/test/assets/microshift-offline-config" -czvf "$(TMP_RPMBUILD_DIR)/SOURCES/microshift-offline-config.tar.gz" .
+	rpmbuild -ta --define "name microshift-offline-config" --define "_topdir $(TMP_RPMBUILD_DIR)"  "$(TMP_RPMBUILD_DIR)/SOURCES/microshift-offline-config.tar.gz"
+	mv $(TMP_RPMBUILD_DIR) $(REPO)/_output/rpmbuild-offline-config
+	rm -rf "$(TMP_RPMBUILD_DIR)"
 
 .PHONY: robotidy
 robotidy:

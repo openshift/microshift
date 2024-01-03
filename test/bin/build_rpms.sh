@@ -34,10 +34,12 @@ BUILD_CMDS+=(
     # Build microshift-test-agent helping with creating unhealthy system scenarios
     # such as: microshift being unable to make a backup or greenboot checks failing
     './test/agent/build.sh' \
+    # Build the offline config RPMs, which contain system config patches to enable an offline Microshift cluster.
+    'make -C test/ build-offline-config' \
 )
 NUM_BUILD_CMDS="${#BUILD_CMDS[@]}"
 BUILD_RPMS_LOG="${IMAGEDIR}/build_rpms.json"
-BUILD_RPMS_JOB_LOG="${IMAGEDIR}/build_rpms_jobs.txt"
+0BUILD_RPMS_JOB_LOG="${IMAGEDIR}/build_rpms_jobs.txt"
 mkdir -p "${IMAGEDIR}"
 
 # Show progress for interactive mode when stdin is a terminal

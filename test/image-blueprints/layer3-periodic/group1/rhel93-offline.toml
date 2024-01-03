@@ -1,9 +1,0 @@
-name = "rhel-9.3-microshift-source"
-description = "RHEL 9.3 Offline Network Configuration"
-version = "0.0.1"
-modules = []
-groups = []
-distro = "rhel-93"
-
-[connection]
-id = ""
