@@ -20,10 +20,6 @@ if ! sudo subscription-manager status >&/dev/null; then
     exit 1
 fi
 
-cacert="/etc/rhsm/ca/redhat-uep.pem"
-cert=$(find /etc/pki/entitlement -iname '*.pem' -not -iname '*-key.pem')
-key=$(find /etc/pki/entitlement -iname '*-key.pem')
-
 # Get minor version of currently checked out branch.
 # It's based on values stored in Makefile.version.$ARCH.var.
 current_minor=$(cut -d'.' -f2 "${REPOROOT}/Makefile.version.$(uname -m).var")
@@ -35,18 +31,9 @@ stop=$(( current_minor - 3 ))
 # and following code will try to access rhocp-4.15 (which is not released yet)
 # and then rhocp-4.14 (which will be returned from the script because it's usable).
 for ver in $(seq "${current_minor}" -1 "${stop}"); do
-    repository="https://cdn.redhat.com/content/dist/layered/rhel9/$(uname -m)/rhocp/4.${ver}"
-    exit_code=$(curl \
-        --silent \
-        --location \
-        --output /dev/null \
-        --write-out "%{http_code}" \
-        --cacert "${cacert}" \
-        --cert "${cert}" \
-        --key "${key}" \
-        "${repository}/os/repodata/repomd.xml")
-
-    if [[ "${exit_code}" == "200" ]]; then 
+    repository="rhocp-4.${ver}-for-rhel-9-$(uname -m)-rpms"
+    if sudo dnf -v repository-packages "${repository}" info cri-o 1>&2;
+    then
         echo "${ver}"
         exit 0
     fi
