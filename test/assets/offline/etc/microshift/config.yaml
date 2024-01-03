@@ -1,0 +1,3 @@
+node:
+  hostnameOverride: host1
+  nodeIP: 10.44.0.1
