@@ -1,3 +1,3 @@
-- ovn-kubernetes image-arm64 a62756b08e496b3690db3cfee39052c54f931d14 to e6ba47f4986f2165c09668d97067f011caa0f4cf
+- ovn-kubernetes image-amd64 a62756b08e496b3690db3cfee39052c54f931d14 to e6ba47f4986f2165c09668d97067f011caa0f4cf
   - 56d1fe4 2023-12-21T14:53:45+00:00 Fix Egress IP Deletion Handler to Prevent OVN Policy Leaks
 
