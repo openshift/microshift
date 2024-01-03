@@ -15,7 +15,12 @@ Requires: NetworkManager
 Host and MicroShift service configuration for offline environments
 
 %prep
-%setup
+%setup -n microshift-offline-config
+
+%build
+
+%install
+install -m 0755 %{_builddir} %{buildroot}
 
 %files
 %config(noreplace) %{nmscriptdir}/system-connections/lo.connection
@@ -24,7 +29,3 @@ Host and MicroShift service configuration for offline environments
 %config(noreplace) %{_sysconfdir}/resolv.conf
 %config(noreplace) %{_sysconfdir}/hosts
 
-%build
-
-%install
-install -m 0755 %{_builddir} %{buildroot}

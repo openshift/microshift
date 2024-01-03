@@ -40,9 +40,8 @@ build-base-branch:
 build-offline-networking-rpm: TMP_REPO !=mktemp -d
 build-offline-networking-rpm:
 	mkdir -p "$(TMP_REPO)"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-	cp "$(REPO)/test/assets/offline.spec" "$(TMP_REPO)/SPECS/offline.spec"
-	tar -C "$(REPO)/test/assets/offline" -cvf "$(TMP_REPO)/SOURCES/microshift-offline-config.tar" .
-	rpmbuild -ti --define "_topdir $(TMP_REPO)" "$(TMP_REPO)/SPECS/offline.spec"
+	tar -C "$(REPO)/test/assets/microshift-offline-config" -czvf "$(TMP_REPO)/SOURCES/microshift-offline-config.tar.gz" .
+	rpmbuild -ti --define "_topdir $(TMP_REPO)"
 
 .PHONY: robotidy
 robotidy:
