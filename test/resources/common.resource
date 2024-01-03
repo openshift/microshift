@@ -43,6 +43,14 @@ Check Required Env Variables
         Fatal Error    USHIFT_USER variable is required
     END
 
+Create Random Temp File
+    [Documentation]    Create a random temp file
+    [Arguments]    ${content}=""
+    ${rand}=    Generate Random String
+    ${path}=    Join Path    /tmp    ${rand}
+    Create File    ${path}    ${content}
+    RETURN    ${path}
+
 Upload String To File    # robocop: disable=too-many-calls-in-keyword
     [Documentation]    Write the string to a remote file
     [Arguments]    ${content}    ${remote_filename}

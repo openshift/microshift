@@ -5,6 +5,7 @@ Library             OperatingSystem
 Library             String
 Library             DataFormats.py
 Resource            ../resources/microshift-host.resource
+Resource            ../resources/common.resource
 
 
 *** Variables ***
@@ -34,9 +35,7 @@ Setup Kubeconfig
         ...    ${kubeconfig}
         ...    https://${USHIFT_HOST}:${API_PORT}
     END
-    ${rand}=    Generate Random String
-    ${path}=    Join Path    /tmp    ${rand}
-    Create File    ${path}    ${kubeconfig}
+    ${path}=    Create Random Temp File    ${kubeconfig}
     Set Suite Variable    \${KUBECONFIG}    ${path}
 
 Remove Kubeconfig
@@ -46,13 +45,19 @@ Remove Kubeconfig
 Run With Kubeconfig
     [Documentation]    Run a command using KUBECONFIG from the test suite.
     [Arguments]    ${cmd}    ${allow_fail}=False
-    ${result}=    Run Process    ${cmd}    env:KUBECONFIG=${KUBECONFIG}    stderr=STDOUT    shell=True
+    ${stdout_file}=    Create Random Temp File
+    ${result}=    Run Process    ${cmd}    env:KUBECONFIG=${KUBECONFIG}
+    ...    stderr=STDOUT    shell=True
+    ...    stdout=${stdout_file}
+
     Log    ${result.stdout}
     Log    ${result.stderr}
     IF    ${allow_fail} == False
         Should Be Equal As Integers    ${result.rc}    0
     END
-    RETURN    ${result.stdout}
+    ${stdout}=    OperatingSystem.Get File    ${stdout_file}
+    ${stdout}=    Strip String    ${stdout}    # strip \n character at the end
+    RETURN    ${stdout}
 
 Create Namespace
     [Documentation]    Creates a namespace with the given name.
