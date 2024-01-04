@@ -1,0 +1,7 @@
+id = "microshift-base"
+name = "MicroShift {{ .Env.BASE_REPO }} Repo"
+type = "yum-baseurl"
+url = "file://{{ .Env.BASE_REPO }}/"
+check_gpg = false
+check_ssl = false
+system = false
