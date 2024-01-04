@@ -66,4 +66,47 @@ ln -sf /dev/null /etc/systemd/user/grub-boot-success.timer
 # Disable SELinux enforcement for the qemu-guest-agent
 sudo semanage permissive -a virt_qemu_ga_t
 
+# Configure etc hosts to resolve the hostname to the ip assigned to lo. This subnet was arbitrarily chosen
+cat /etc/hosts >> /etc/hosts.save
+echo "10.44.0.1    REPLACE_HOST_NAME" >> /etc/hosts
+
+# Configure nameserver to route to cluster DNS via lo
+cat /etc/resolv.conf >> /etc/resolv.conf.save
+echo "nameserver  10.44.1.1" >> /etc/resolv.conf
+
+# Configure lo.connection with fake IP addr
+cat > /etc/NetworkManager/system-connections/lo.nmconnection <<'EOF'
+[connection]
+id=lo
+type=loopback
+interface-name=lo
+timestamp=1704399951
+
+[loopback]
+
+[ipv4]
+address1=127.0.0.1/8
+address2=10.44.0.1/32
+method=manual
+
+[ipv6]
+addr-gen-mode=default
+address1=::1/128
+method=manual
+
+[proxy]
+EOF
+chmod 600 /etc/NetworkManager/system-connections/lo.nmconnection
+sudo systemctl restart NetworkManager
+# Lastly, configure microshift to use the lo ip address
+cat <<'EOF' > /etc/microshift/config.yaml
+node:
+  hostnameOverride: REPLACE_HOST_NAME
+  nodeIP: 10.44.0.1
+EOF
+sudo systemctl restart microshift
+
+sudo restorecon /etc/NetworkManager/system-connections/lo.connection
+sudo restorecon /etc/resolv.conf
+sudo restorecon /etc/hosts
 %end

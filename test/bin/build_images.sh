@@ -34,6 +34,7 @@ configure_package_sources() {
     export YPLUS2_REPO             # defined in common.sh
     export CURRENT_RELEASE_REPO
     export PREVIOUS_RELEASE_REPO
+    export OFFLINE_REPO="${IMAGEDIR}/rpm-repos/microshift-offline"
 
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
@@ -44,6 +45,7 @@ configure_package_sources() {
     export CURRENT_RELEASE_VERSION
     export PREVIOUS_RELEASE_VERSION
     export LATEST_RHOCP_MINOR
+    export OFFLINE_CONFIG_VERSION="1"
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -225,10 +227,10 @@ do_group() {
     local parent_args
     local template
     local template_list
-
+    set -x
     SOURCE_IMAGES="$(get_container_images "${SOURCE_VERSION}")"
     export SOURCE_IMAGES
-
+    set +x
     echo "Existing images:"
     ls "${VM_DISK_BASEDIR}"/*.iso || echo "No ISO files in ${VM_DISK_BASEDIR}"
     ostree summary --view --repo="${IMAGEDIR}/repo" || echo "Could not get image list from ${IMAGEDIR}/repo"
@@ -245,6 +247,7 @@ do_group() {
         fi
     fi
     for template in ${template_list}; do
+        set -x
         echo
         echo "Blueprint ${template}"
 
@@ -315,6 +318,7 @@ do_group() {
         # filename for the log we download next.
         echo "${blueprint}-edge-commit" > "${IMAGEDIR}/builds/${buildid}.build"
         buildid_list+=("${buildid},${build_cmd}")
+        set +x
     done
 
     if ${BUILD_INSTALLER} && ! ${COMPOSER_DRY_RUN}; then
