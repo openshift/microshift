@@ -1,0 +1,18 @@
+- kubernetes image-arm64 4fab27b79307fcf0c6301964f3212d7d101f48cc to 0f0272f4e3a8d8a43e88e963e072c79e2e46c70f
+  - c6f50265d 2024-01-02T17:51:29-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - b4def7f82 2024-01-02T15:10:36-03:00 UPSTREAM: <drop>: manually resolve conflicts
+  - d15213f69 2023-12-19T13:32:13+00:00 Release commit for Kubernetes v1.27.9
+  - a169e9ed6 2023-12-14T09:23:20-08:00 run update-vendor script
+  - 23d10364a 2023-12-07T13:40:39+01:00 [go] Bump images, dependencies and versions to go 1.20.12
+  - 10aa4e028 2023-11-27T14:19:27-08:00 pass GOTOOLCHAIN to build containers
+  - 430f4a5c8 2023-11-27T14:19:26-08:00 handle GOTOOLCHAIN in kube::golang::verify_go_version
+  - 39df88c3b 2023-11-27T19:04:03+00:00 Move adding GroupVersion log until after an update is confirmed
+  - f899a310e 2023-11-26T08:02:14+00:00 fix: requeue pods rejected by Extenders properly
+  - 4296f2022 2023-11-21T09:21:32+01:00 Bump distroless-iptables to 0.2.8 based on Go 1.20.11
+  - f7e235c03 2023-11-16T11:26:42+01:00 Make StatefulSet restart pods with phase Succeeded
+  - f4f01e743 2023-11-15T17:23:41+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.8
+  - f757fadbe 2023-11-14T13:03:25-08:00 run hack scripts to update cyphar/filepath-securejoin to v0.2.4 correctly
+  - 7a34f59d1 2023-11-14T13:03:25-08:00 update filepath-securejoin dependency to 0.2.4 to fix security vulnerability
+  - de94d863d 2023-11-01T16:41:50+08:00 Fix panic when process RunScorePlugins for cap out of range
+  - 910da6677 2023-10-02T10:48:47+02:00 e2e: bootstrap vsphere tests earlier
+
