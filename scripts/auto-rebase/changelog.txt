@@ -1,38 +1,10 @@
-- cluster-dns-operator embedded-component dee10d916e60d9758f7f93e2f451f18abec7fac6 to 75c5dc17111dc498efd849f5a905b006681d8ddf
-  - ab4ef94 2023-12-21T02:10:10+00:00 Updating ose-cluster-dns-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/af2133c5194e28075efb48f4b508a98759b079d2/images/ose-cluster-dns-operator.yml
+- oc image-arm64 91fb882c2dc90fdc80082b61e7047f20e3332128 to dff7dc3aeb8cb96c31cef67db5ef9925f928aee6
+  - 34d81e47 2023-09-26T15:04:45-07:00 pkg/cli/admin/release/extract: Log a warning on --credentials-requests without --included
 
-- cluster-ingress-operator embedded-component f9dd81ab522f72233e2608f5e57a43e79a5079b5 to d09611e1ce3aea4663d4b9d790514d3f09e90769
-  - 1ad6f3b 2023-12-21T05:07:27+00:00 Updating ose-cluster-ingress-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/af2133c5194e28075efb48f4b508a98759b079d2/images/ose-cluster-ingress-operator.yml
-
-- cluster-kube-scheduler-operator embedded-component cb424ffda592913ec480fef8fdd467abda762989 to ecd8b763aaade0abf29a310cfcb5faf8a5eb2eac
-  - 6c0bfbe 2024-01-03T12:45:36+01:00 Add .snyk file to exclude vendor and ignore unit tests
-
-- cluster-openshift-controller-manager-operator embedded-component e87e15acee1bbdbc1663aec1bda9517a876023f2 to 83d2ca92d4cb9b242849590fd5d6530d31aeba5f
-  - 9945045 2023-11-29T14:24:15+03:00 fix unit tests
-  - 4032245 2023-11-29T13:51:29+03:00 Disable deployer-controller when deploymentconfig is disabled
-
-- kubernetes embedded-component b0d609f08083d7a8aa3426540d6d5f9090944906 to 9368fcd3c5031f6b35805c07fc3ea14da2e89b1f
-  - 81ae3b081 2024-01-02T16:13:37+01:00 UPSTREAM: <carry>: temporarily disable reporting e2e text bugs and enforce 2nd labeling to make tests work
-
-- machine-config-operator embedded-component 0d53a7e82cf33f102dc22bd81d8ac492b6af05c2 to e0dda8272f54efbf738ef43ea4b0e7b21450b7bf
-  - 9c500da3 2023-09-20T12:16:36-05:00 OCPBUGS-18541: Log network service output to console
-
-- operator-framework-olm embedded-component 1edd6f365fd93d18844d1f15f3b5ebef818c7cd6 to 2a986f1ec7940f601e40c6ba5532d4d0f3ef8e4c
-  - b9a83d02 2023-12-21T20:39:42+00:00 events: filter spammy events for the same object and reason (#3139)
-
-- route-controller-manager embedded-component c5cc7a73705e4086759e2a36811b055b7716def4 to 02ed219b616f6f6a5d1a4095fc00372de6efb7d0
-  - 2893cec 2023-12-16T13:53:55+00:00 Updating ose-route-controller-manager-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-route-controller-manager.yml
-
-- oc image-amd64 edc84d3c1de2c13aa6fdee72df7d1a2cb846f457 to 91fb882c2dc90fdc80082b61e7047f20e3332128
-  - 95918f9a 2023-12-22T09:09:08+03:00 Sanitize path using filepath Clean
-
-- ovn-kubernetes image-amd64 2e3e1e67b4e4bb14f564462ce9c0111c82de35c7 to caf102fa15195c39f0f356080f610a1b7e22a2b6
-  - db11bef 2023-12-21T10:09:30-05:00 CARRY: Updates owners and adds Surya
-  - 8c70a58 2023-12-20T14:54:34+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/116f80bac322c817859ae6d2e6923b6dd916c2e4/images/ovn-kubernetes-base.yml
-
-- kubernetes image-amd64 b0d609f08083d7a8aa3426540d6d5f9090944906 to 9368fcd3c5031f6b35805c07fc3ea14da2e89b1f
-  - 81ae3b081 2024-01-02T16:13:37+01:00 UPSTREAM: <carry>: temporarily disable reporting e2e text bugs and enforce 2nd labeling to make tests work
-
-- ovn-kubernetes image-arm64 cc8a27d07783ab52dcce40d0cf088c2619025fe6 to caf102fa15195c39f0f356080f610a1b7e22a2b6
-  - 8c70a58 2023-12-20T14:54:34+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/116f80bac322c817859ae6d2e6923b6dd916c2e4/images/ovn-kubernetes-base.yml
+- kubernetes image-arm64 9368fcd3c5031f6b35805c07fc3ea14da2e89b1f to 1de6a149075761f852d856f48dfb3663a6575751
+  - 460bfb62e 2024-01-04T15:21:57+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 3f7a50f38 2023-12-13T08:45:02+00:00 Release commit for Kubernetes v1.29.0
+  - 3b8f25dfd 2023-12-13T04:16:43+00:00 fix: disable SchedulerQueueingHints feature flag by default
+  - 0c645922e 2023-12-07T12:00:56+00:00 CHANGELOG: Update directory for v1.29.0-rc.2 release
+  - a2115acba 2023-12-07T12:00:56+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.0-rc.2
 
