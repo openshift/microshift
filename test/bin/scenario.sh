@@ -599,6 +599,10 @@ configure_vm_firewall() {
 
 # Function to report the full current version, e.g. "4.13.5"
 current_version() {
+    if [ ! -d "${LOCAL_REPO}" ]; then
+        error "Run ${SCRIPTDIR}/create_local_repo.sh before running this scenario."
+        return 1
+    fi
     "${SCRIPTDIR}/get_latest_rpm_version.sh"
 }
 
