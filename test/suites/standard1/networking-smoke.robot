@@ -9,7 +9,7 @@ Resource            ../../resources/microshift-network.resource
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
 
-Test Tags           smoke
+Test Tags           slow
 
 
 *** Variables ***

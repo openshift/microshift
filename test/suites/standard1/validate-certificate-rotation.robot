@@ -10,6 +10,8 @@ Library             Collections
 Suite Setup         Setup
 Suite Teardown      Teardown
 
+Test Tags           restart
+
 
 *** Variables ***
 ${KUBE_SCHEDULER_CLIENT_CERT}       /var/lib/microshift/certs/kube-control-plane-signer/kube-scheduler/client.crt
