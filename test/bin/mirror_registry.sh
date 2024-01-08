@@ -6,12 +6,27 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 DISTRIBUTION_VERSION=2.8.3
+REGISTRY_IMAGE="quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
 REGISTRY_HOST=${REGISTRY_HOST:-$(hostname):5000}
 REGISTRY_ROOT=${REGISTRY_ROOT:-${HOME}/mirror-registry}
 REGISTRY_CONTAINER_DIR=${REGISTRY_CONTAINER_DIR:-${REGISTRY_ROOT}/containers}
 REGISTRY_CONTAINER_LIST=${REGISTRY_CONTAINER_LIST:-${REGISTRY_ROOT}/mirror-list.txt}
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 LOCAL_REGISTRY_NAME="microshift-local-registry"
+
+retry_pull_image() {
+    for attempt in $(seq 3) ; do
+        if ! podman pull "$@" ; then
+            echo "WARNING: Failed to pull image, retry #${attempt}"
+        else
+            return 0
+        fi
+        sleep 10
+    done
+
+    echo "ERROR: Failed to pull image, quitting after 3 tries"
+    return 1
+}
 
 get_container_images() {
     containers=""
@@ -33,7 +48,8 @@ prereqs() {
     "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     podman stop "${LOCAL_REGISTRY_NAME}" || true
     podman rm "${LOCAL_REGISTRY_NAME}" || true
-    podman run -d -p 5000:5000 --restart always --name "${LOCAL_REGISTRY_NAME}" "quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
+    retry_pull_image "${REGISTRY_IMAGE}"
+    podman run -d -p 5000:5000 --restart always --name "${LOCAL_REGISTRY_NAME}" "${REGISTRY_IMAGE}"
 }
 
 setup_registry() {
