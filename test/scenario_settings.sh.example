@@ -24,3 +24,9 @@ SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-${HOME}/.ssh/id_rsa.pub}
 # local developer settings where cockpit can be used to login to the
 # host. Set to `true` to enable. Defaults to `false`.
 #VNC_CONSOLE=true
+
+# SUBSCRIPTION_MANAGER_PLUGIN should be the full path to a bash script
+# that can be sourced to provide a function called
+# `subscription_manager_register`. See
+# `load_subscription_manager_plugin` in scenario.sh for details.
+# SUBSCRIPTION_MANAGER_PLUGIN="${SCRIPTDIR}/subscription_manager_register.sh"
