@@ -2,7 +2,7 @@ apiVersion: v1
 data:
   Corefile: |
     .:5353 {
-        bufsize 512
+        bufsize 1232
         errors
         log . {
             class error
