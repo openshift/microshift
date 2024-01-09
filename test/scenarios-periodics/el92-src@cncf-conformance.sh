@@ -37,7 +37,7 @@ run_sonobuoy() {
     oc adm policy add-scc-to-group privileged system:authenticated system:serviceaccounts
     oc adm policy add-scc-to-group anyuid     system:authenticated system:serviceaccounts
 
-    go install github.com/vmware-tanzu/sonobuoy@v0.56.16
+    go install github.com/vmware-tanzu/sonobuoy@v0.57.1
     ~/go/bin/sonobuoy gen \
         --mode=certified-conformance \
         --dns-namespace=openshift-dns \
