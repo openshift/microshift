@@ -14,17 +14,8 @@ PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 LOCAL_REGISTRY_NAME="microshift-local-registry"
 
 get_container_images() {
-    containers=""
-    local -r release_info_rpm=$(find "${IMAGEDIR}/rpm-repos" -name "microshift-release-info-*.rpm" | sort)
-    if [ -z "${release_info_rpm}" ] ; then
-        echo "Error: missing microshift-release-info RPMs"
-        exit 1
-    fi
-    for package in ${release_info_rpm}; do
-        echo "Getting image references from RPM ${package}..."
-        containers="$(rpm2cpio "${package}" | cpio  -i --to-stdout "*release-$(uname -m).json" 2> /dev/null | jq -r '[ .images[] ] | join("\n")')\n${containers}"
-    done
-    echo -n -e "${containers}" | sort -u > "${REGISTRY_CONTAINER_LIST}"
+    local -r container_file=$1
+    sort -u "${container_file}" > "${REGISTRY_CONTAINER_LIST}"
 }
 
 prereqs() {
@@ -48,12 +39,40 @@ EOF
 }
 
 mirror_images() {
-    get_container_images
+    local -r list_file=$1
+    get_container_images "${list_file}"
     "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --reg-to-dir "${PULL_SECRET}" "${REGISTRY_CONTAINER_LIST}" "${REGISTRY_CONTAINER_DIR}"
     "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --dir-to-reg "${REGISTRY_ROOT}/local-auth.json" "${REGISTRY_CONTAINER_DIR}" "${REGISTRY_HOST}"
     rm -rf "${REGISTRY_CONTAINER_DIR}"
 }
 
+usage() {
+    echo ""
+    echo "Usage: ${0} [-f PATH]"
+    echo "   -f PATH    File containing the containers to mirror. Defaults to ${CONTAINER_LIST}"
+    exit 1
+}
+
+LIST_FILE="${CONTAINER_LIST}"
+
+while [ $# -gt 0 ]; do
+    case $1 in
+    -f)
+        shift
+        LIST_FILE=$1
+        ;;
+    *)
+        usage
+        ;;
+    esac
+    shift
+done
+
+if [ ! -f "${LIST_FILE}" ]; then
+    echo "File ${LIST_FILE} does not exist"
+    exit 1
+fi
+
 prereqs
 setup_registry
-mirror_images
+mirror_images "${LIST_FILE}"
