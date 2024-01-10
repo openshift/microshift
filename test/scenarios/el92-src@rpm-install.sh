@@ -44,10 +44,11 @@ scenario_run_tests() {
     local -r previous_version_repo=$(get_rel_version_repo "${previous_minor_version}")
     local -r previous_version_repo_url=$(echo "${previous_version_repo}" | cut -d, -f2)
 
-    # Enable the repositories with the dependencies using the most
-    # recent GA OCP version. This value is used to build the repo
-    # name, so should include the major and minor version number.
-    local -r dependency_version="4.$("${ROOTDIR}/scripts/get-latest-rhocp-repo.sh")"
+    # Newer branches have to determine this value dynamically, but we
+    # know that there is a good 4.14 dependency repo so instead of
+    # backporting the logic to figure that out we just hard-code the
+    # version here.
+    local -r dependency_version="4.14"
 
     run_tests host1 \
         --exitonfailure \
