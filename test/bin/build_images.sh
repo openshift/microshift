@@ -473,8 +473,18 @@ FORCE_REBUILD=false
 FORCE_SOURCE=false
 
 selCount=0
-while getopts "iIl:g:sdt:hf:" opt; do
+while getopts "df:g:hiIl:st:" opt; do
     case "${opt}" in
+        d)
+            COMPOSER_DRY_RUN=true
+            ;;
+        f)
+            FORCE_REBUILD=true
+            ;;
+        g)
+            GROUP="$(realpath "${OPTARG}")"
+            selCount=$((selCount+1))
+            ;;
         h)
             usage
             exit 0
@@ -485,29 +495,19 @@ while getopts "iIl:g:sdt:hf:" opt; do
         I)
             BUILD_INSTALLER=false
             ;;
+        l)
+            LAYER="$(realpath "${OPTARG}")"
+            selCount=$((selCount+1))
+            ;;
         s)
             BUILD_INSTALLER=false
             ONLY_SOURCE=true
             FORCE_SOURCE=true
             ;;
-        d)
-            COMPOSER_DRY_RUN=true
-            ;;
-        l)
-            LAYER="$(realpath "${OPTARG}")"
-            selCount=$((selCount+1))
-            ;;
-        g)
-            GROUP="$(realpath "${OPTARG}")"
-            selCount=$((selCount+1))
-            ;;
         t)
             TEMPLATE="${OPTARG}"
             GROUP="$(basename "$(dirname "$(realpath "${OPTARG}")")")"
             selCount=$((selCount+1))
-            FORCE_REBUILD=true
-            ;;
-        f)
             FORCE_REBUILD=true
             ;;
         *)
