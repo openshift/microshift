@@ -473,7 +473,7 @@ FORCE_REBUILD=false
 FORCE_SOURCE=false
 
 selCount=0
-while getopts "df:g:hiIl:st:" opt; do
+while getopts "dfg:hiIl:st:" opt; do
     case "${opt}" in
         d)
             COMPOSER_DRY_RUN=true
