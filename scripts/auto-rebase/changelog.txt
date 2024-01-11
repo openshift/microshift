@@ -1,0 +1,44 @@
+- etcd embedded-component 969d7afab8258b4610569d001e9a06b677acd021 to 5acb4f3078adbea40d050365ac5294229e574c67
+  - 51dffdbd 2023-12-10T13:24:58+01:00 Merge pull request #215 from openshift-bot/art-consistency-openshift-4.15-ose-etcd
+  - 792d4fb5 2023-12-10T13:23:56+01:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - 3b252db4 2023-12-07T11:29:12+01:00 version: bump up to 3.5.11
+  - ebb7e796 2023-12-06T11:12:14-08:00 etcdserver: add linearizable_read check to readyz.
+  - 13bafdff 2023-12-06T20:02:25+01:00 etcd: Update go version to 1.20.12
+  - 98aa4669 2023-12-05T10:59:25-08:00 server: disable redirects in peer communication
+  - 293fc21c 2023-11-27T12:52:15-08:00 etcdserver: add metric counters for livez/readyz health checks.
+  - f5d7f997 2023-11-27T12:52:15-08:00 etcdserver: add livez and ready http endpoints for etcd.
+  - 2b54660a 2023-11-27T12:52:15-08:00 http health check bug fixes
+  - 46e39424 2023-11-27T09:31:00-08:00 server: Split metrics and health code
+  - 8ab1c0f2 2023-11-27T09:31:00-08:00 server: Cover V3 health with tests
+  - 9db8ddbb 2023-11-27T09:31:00-08:00 server: Refactor health checks
+  - eed94f6f 2023-11-27T09:31:00-08:00 server: Run health check tests in subtests
+  - 2f6c84e9 2023-11-27T09:31:00-08:00 server: Rename test case expect fields
+  - c6784a7e 2023-11-27T09:31:00-08:00 server: Use named struct initialization in healthcheck test
+  - 9e21048c 2023-11-27T21:48:50+13:00 Backport server: Don't follow redirects when checking peer urls.
+  - f9521978 2023-11-26T10:30:49+13:00 Backport embed: Add tracing integration test.
+  - 5a564d56 2023-11-26T10:22:10+13:00 Backport server: Have tracingExporter own resources it initialises.
+  - 3a54851f 2023-11-26T10:22:10+13:00 Backport server: Add sampling rate to distributed tracing.
+  - 7f7b9150 2023-11-15T17:10:40+01:00 upgrade github.com/stretchr/testify,google.golang.org/genproto/googleapis/api,google.golang.org/grpc to make it consistent
+  - f26074ae 2023-11-15T14:09:07+01:00 CVE-2023-47108: Backport go.opentelemetry.io/otel@v1.20.0 and go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.46.0
+  - f9f38bc9 2023-11-13T16:56:29-08:00 github workflow: run arm64 tests on every push
+  - e1aa1b97 2023-11-12T17:45:27-06:00 etcd: upgrade go version from 1.20.10 to 1.20.11
+
+- kubernetes embedded-component 9605db49fe85405b9448edf78cdd0c78d53b41c9 to b400f2077ca1e5191282c53a64bd650209a430af
+  - a5bbb429d 2024-01-08T13:20:11+00:00 UPSTREAM: <carry>: Update IP/CIDR CEL for 1.28 compatibility
+  - 6f4ce59cb 2024-01-04T14:06:27+00:00 UPSTREAM: <carry>: Backport IP and CIDR CEL base for 1.28
+  - 4da6e9fc0 2024-01-04T14:06:25+00:00 UPSTREAM: 121912: Add IP address CEL extension
+
+- machine-config-operator embedded-component 6457fc9a0c23702f8b0756b543a286ed4d2f9874 to 860ecd31f1b68d021b316a0793b6cc3eadacece1
+  - 7ae9b61a 2024-01-05T19:10:51+00:00 Azure: Run ovs-configuration.service before dnsmasq.service
+  - 153fa048 2024-01-02T18:43:22+00:00 kubelet: fix kubelet labels and turn off selinux execstack
+
+- kubernetes image-amd64 9605db49fe85405b9448edf78cdd0c78d53b41c9 to b400f2077ca1e5191282c53a64bd650209a430af
+  - a5bbb429d 2024-01-08T13:20:11+00:00 UPSTREAM: <carry>: Update IP/CIDR CEL for 1.28 compatibility
+  - 6f4ce59cb 2024-01-04T14:06:27+00:00 UPSTREAM: <carry>: Backport IP and CIDR CEL base for 1.28
+  - 4da6e9fc0 2024-01-04T14:06:25+00:00 UPSTREAM: 121912: Add IP address CEL extension
+
+- kubernetes image-arm64 9605db49fe85405b9448edf78cdd0c78d53b41c9 to b400f2077ca1e5191282c53a64bd650209a430af
+  - a5bbb429d 2024-01-08T13:20:11+00:00 UPSTREAM: <carry>: Update IP/CIDR CEL for 1.28 compatibility
+  - 6f4ce59cb 2024-01-04T14:06:27+00:00 UPSTREAM: <carry>: Backport IP and CIDR CEL base for 1.28
+  - 4da6e9fc0 2024-01-04T14:06:25+00:00 UPSTREAM: 121912: Add IP address CEL extension
+
