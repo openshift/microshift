@@ -30,16 +30,17 @@ extract_container_images() {
     local -r repo_url=$2
     local -r outfile=$3
 
+    echo "Extracting images from ${version}"
     mkdir -p "${IMAGEDIR}/release-info-rpms"
     pushd "${IMAGEDIR}/release-info-rpms"
     sudo bash -c 'cat > /etc/yum.repos.d/microshift.repo' << EOF
-[microshift]
+[microshift-test]
 name="microshift ${version}"
 baseurl="${repo_url}"
 enabled=1
 check_gpg=false
 EOF
-    sudo dnf download microshift-release-info
+    sudo dnf download microshift-release-info-"${version}" --repo microshift-test
     get_container_images "${version}" "${IMAGEDIR}/release-info-rpms" | sed 's/,/\n/g' >> "${outfile}"
     sudo rm -f microshift-release-info-*.rpm
     sudo rm -f /etc/yum.repos.d/microshift.repo
@@ -540,8 +541,8 @@ configure_package_sources
 # Prepare container lists for mirroring registries.
 rm -f "${CONTAINER_LIST}"
 extract_container_images "${SOURCE_VERSION}" "${LOCAL_REPO}" "${CONTAINER_LIST}"
-extract_container_images 4."${FAKE_NEXT_MINOR_VERSION}" "${NEXT_REPO}" "${CONTAINER_LIST}"
-extract_container_images 4."${FAKE_YPLUS2_MINOR_VERSION}" "${YPLUS2_REPO}" "${CONTAINER_LIST}"
+extract_container_images "4.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
+extract_container_images "4.${FAKE_YPLUS2_MINOR_VERSION}.*" "${YPLUS2_REPO}" "${CONTAINER_LIST}"
 extract_container_images "${PREVIOUS_RELEASE_VERSION}" "${PREVIOUS_RELEASE_REPO}" "${CONTAINER_LIST}"
 
 trap 'osbuild_logs' EXIT
