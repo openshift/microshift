@@ -545,6 +545,8 @@ build_images.sh [-iIsdf] [-l layer-dir | -g group-dir] [-t template]
 
   -d      Dry run by skipping the composer start commands.
 
+  -E      Do not extract container images.
+
   -f      Force rebuilding images that already exist.
 
   -g DIR  Build only one group (cannot be used with -l or -t).
@@ -580,12 +582,15 @@ GROUP=""
 TEMPLATE=""
 FORCE_REBUILD=false
 FORCE_SOURCE=false
+EXTRACT_CONTAINER_IMAGES=true
 
 selCount=0
-while getopts "dfg:hiIl:sSt:" opt; do
+while getopts "dEfg:hiIl:sSt:" opt; do
     case "${opt}" in
         d)
             COMPOSER_DRY_RUN=true
+            ;;
+        E)  EXTRACT_CONTAINER_IMAGES=false
             ;;
         f)
             FORCE_REBUILD=true
@@ -682,10 +687,13 @@ configure_package_sources
 
 # Prepare container lists for mirroring registries.
 rm -f "${CONTAINER_LIST}"
-extract_container_images "${SOURCE_VERSION}" "${LOCAL_REPO}" "${CONTAINER_LIST}"
-extract_container_images "4.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
-extract_container_images "4.${FAKE_YPLUS2_MINOR_VERSION}.*" "${YPLUS2_REPO}" "${CONTAINER_LIST}"
-extract_container_images "${PREVIOUS_RELEASE_VERSION}" "${PREVIOUS_RELEASE_REPO}" "${CONTAINER_LIST}"
+if ${EXTRACT_CONTAINER_IMAGES}; then
+    extract_container_images "${SOURCE_VERSION}" "${LOCAL_REPO}" "${CONTAINER_LIST}"
+    # The following images are specific to layers that use fake rpms built from source.
+    extract_container_images "4.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
+    extract_container_images "4.${FAKE_YPLUS2_MINOR_VERSION}.*" "${YPLUS2_REPO}" "${CONTAINER_LIST}"
+    extract_container_images "${PREVIOUS_RELEASE_VERSION}" "${PREVIOUS_RELEASE_REPO}" "${CONTAINER_LIST}"
+fi
 
 trap 'osbuild_logs' EXIT
 
