@@ -29,21 +29,22 @@ extract_container_images() {
     local -r version=$1
     local -r repo_url=$2
     local -r outfile=$3
+    local -r repo_name="microshift-extract-images"
 
     echo "Extracting images from ${version}"
     mkdir -p "${IMAGEDIR}/release-info-rpms"
     pushd "${IMAGEDIR}/release-info-rpms"
-    sudo bash -c 'cat > /etc/yum.repos.d/microshift.repo' << EOF
-[microshift-test]
+    sudo bash -c "cat > /etc/yum.repos.d/${repo_name}.repo" << EOF
+[${repo_name}]
 name="microshift ${version}"
 baseurl="${repo_url}"
 enabled=1
 check_gpg=false
 EOF
-    sudo dnf download microshift-release-info-"${version}" --repo microshift-test
+    sudo dnf download microshift-release-info-"${version}" --repo "${repo_name}"
     get_container_images "${version}" "${IMAGEDIR}/release-info-rpms" | sed 's/,/\n/g' >> "${outfile}"
     sudo rm -f microshift-release-info-*.rpm
-    sudo rm -f /etc/yum.repos.d/microshift.repo
+    sudo rm -f /etc/yum.repos.d/"${repo_name}".repo
     popd
 }
 
