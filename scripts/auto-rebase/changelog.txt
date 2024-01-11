@@ -1,0 +1,78 @@
+- cluster-csi-snapshot-controller-operator embedded-component 31981b970773fd9abb8f561a5a74a3bc905a1fc1 to b054b5ca0b3b4e5f27f62cc7e308a1adf8e5921b
+  - f2656d0 2024-01-08T10:51:04+00:00 HOSTEDCP-1308: Revert
+  - 328535e 2024-01-04T14:20:36+00:00 HOSTEDCP-1308: Add KAS access label to csi-snapshot-controller and csi-snapshot-webhook
+
+- cluster-network-operator embedded-component e23d612d00c74985ba1a4bfb84580dfbf19d77f0 to 873b3290a2de28fb7fb41ad498fc9872dcb1a93b
+  - 353e4d6 2023-10-20T14:08:06+02:00 Use specific permissions for CNCC in GCP
+
+- etcd embedded-component 969d7afab8258b4610569d001e9a06b677acd021 to 66af0e5d532b10a23f6e40ec8cbafa0f275f6ee5
+  - d7e04189 2023-12-10T12:41:34+01:00 Merge pull request #215 from openshift-bot/art-consistency-openshift-4.15-ose-etcd
+  - 23843791 2023-12-10T12:41:17+01:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - 3b252db4 2023-12-07T11:29:12+01:00 version: bump up to 3.5.11
+  - ebb7e796 2023-12-06T11:12:14-08:00 etcdserver: add linearizable_read check to readyz.
+  - 13bafdff 2023-12-06T20:02:25+01:00 etcd: Update go version to 1.20.12
+  - 98aa4669 2023-12-05T10:59:25-08:00 server: disable redirects in peer communication
+  - 293fc21c 2023-11-27T12:52:15-08:00 etcdserver: add metric counters for livez/readyz health checks.
+  - f5d7f997 2023-11-27T12:52:15-08:00 etcdserver: add livez and ready http endpoints for etcd.
+  - 2b54660a 2023-11-27T12:52:15-08:00 http health check bug fixes
+  - 46e39424 2023-11-27T09:31:00-08:00 server: Split metrics and health code
+  - 8ab1c0f2 2023-11-27T09:31:00-08:00 server: Cover V3 health with tests
+  - 9db8ddbb 2023-11-27T09:31:00-08:00 server: Refactor health checks
+  - eed94f6f 2023-11-27T09:31:00-08:00 server: Run health check tests in subtests
+  - 2f6c84e9 2023-11-27T09:31:00-08:00 server: Rename test case expect fields
+  - c6784a7e 2023-11-27T09:31:00-08:00 server: Use named struct initialization in healthcheck test
+  - 9e21048c 2023-11-27T21:48:50+13:00 Backport server: Don't follow redirects when checking peer urls.
+  - f9521978 2023-11-26T10:30:49+13:00 Backport embed: Add tracing integration test.
+  - 5a564d56 2023-11-26T10:22:10+13:00 Backport server: Have tracingExporter own resources it initialises.
+  - 3a54851f 2023-11-26T10:22:10+13:00 Backport server: Add sampling rate to distributed tracing.
+  - 7f7b9150 2023-11-15T17:10:40+01:00 upgrade github.com/stretchr/testify,google.golang.org/genproto/googleapis/api,google.golang.org/grpc to make it consistent
+  - f26074ae 2023-11-15T14:09:07+01:00 CVE-2023-47108: Backport go.opentelemetry.io/otel@v1.20.0 and go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.46.0
+  - f9f38bc9 2023-11-13T16:56:29-08:00 github workflow: run arm64 tests on every push
+  - e1aa1b97 2023-11-12T17:45:27-06:00 etcd: upgrade go version from 1.20.10 to 1.20.11
+
+- kubernetes embedded-component 1de6a149075761f852d856f48dfb3663a6575751 to e58658f67791cc808b5218b87423035e18045d39
+  - 42a81f901 2024-01-08T13:53:43+01:00 UPSTREAM: 122643: Add a new neverTerminate job behavior just for upgrade
+  - 91f24200f 2023-12-21T10:38:10+00:00 UPSTREAM: <carry>: Backport IP and CIDR CEL base for 1.28
+  - 871c0d908 2023-12-21T10:38:09+00:00 UPSTREAM: 121912: Add IP address CEL extension
+
+- machine-config-operator embedded-component e0dda8272f54efbf738ef43ea4b0e7b21450b7bf to 7dae64aaa1edede1149c2d3b40f0fe1c39896076
+  - d638d968 2024-01-03T16:25:01-05:00 Azure: Run ovs-configuration.service before dnsmasq.service
+  - bf9193a7 2023-12-19T16:19:05-05:00 controller: add feature gate detection
+  - 61bc2f85 2023-12-19T16:19:05-05:00 controller: add ver check before boot image update
+  - 99595633 2023-12-19T16:17:46-05:00 controller: add gcp support
+  - a312a73d 2023-12-19T16:17:46-05:00 controller: add arch detect, platform stubs, rbac
+  - 2aba1c03 2023-12-15T15:54:26-05:00 make go-deps
+
+- operator-framework-olm embedded-component 2a986f1ec7940f601e40c6ba5532d4d0f3ef8e4c to e5030f3ef73b758d9d94383478f014fa25417b31
+  - 64287d32 2024-01-05T00:06:47+00:00 Improve condition check for installplan (#3145)
+  - 814bb7e3 2024-01-05T00:05:56+00:00 Fix Create InstallPlan with Permissions test (#3129)
+  - 57bbee9d 2024-01-05T00:05:04+00:00 bump go-git/v5 to 5.11.0 (#1175)
+
+- route-controller-manager embedded-component 02ed219b616f6f6a5d1a4095fc00372de6efb7d0 to 95aa561e93876a3542db3c6aa64773ee98fefe39
+  - 88ab312 2024-01-05T09:50:43+01:00 Add .snyk file to exclude vendor and ignore unit tests
+
+- ovn-kubernetes image-amd64 caf102fa15195c39f0f356080f610a1b7e22a2b6 to 00ebd11d646c014771420e6eeaab26d5cacb7b65
+  - 473922a 2024-01-04T10:36:00+01:00 Fix informer_test: adds existing pod and processes an update event
+  - da8c60b 2024-01-04T10:36:00+01:00 Trivial: replace wait.PollImmediate with wait.PollUntilContextTimeout
+  - 1ab9bc3 2023-12-24T00:04:07+05:30 Clarify and expand PMTUD e2e test topology
+  - 3948000 2023-12-20T17:46:47-05:00 Add Surya Seetharaman as committer
+  - 6ed5d48 2023-12-20T17:26:55-05:00 Adds MAC migration e2e test
+  - 32490b3 2023-12-19T21:50:20-05:00 Updates node ip migration e2e test
+  - d5c62be 2023-12-19T15:01:38-05:00 Ensures service flows are updated when node IP/MAC updates
+  - 5f2fef3 2023-12-18T16:52:04-05:00 Add netlink subscriber for link manager
+  - 815d6f8 2023-12-18T15:29:17-05:00 Clean up OFM locking, encapsulation, etc
+  - 5e813e4 2023-12-18T15:25:24-05:00 fedora: Update Dockerfile for latest OVN ovn-23.09.0-91.
+  - d4f2706 2023-12-18T12:17:27+01:00 Reset EnableMulticast for unit test config to clean up before every test
+  - b46ada4 2023-12-15T17:27:32+01:00 Fix "invalid version: unknown revision v0.0.0"
+  - 1e53aea 2023-12-05T16:13:06-05:00 Exposes link manager to track MAC address changes
+  - 16dc318 2023-12-05T16:09:00-05:00 Ensure required flows are present at node start
+  - b40ff65 2023-12-05T16:09:00-05:00 Implement port security for OVN patch port and GR
+
+- kubernetes image-amd64 1de6a149075761f852d856f48dfb3663a6575751 to e58658f67791cc808b5218b87423035e18045d39
+  - 42a81f901 2024-01-08T13:53:43+01:00 UPSTREAM: 122643: Add a new neverTerminate job behavior just for upgrade
+  - 91f24200f 2023-12-21T10:38:10+00:00 UPSTREAM: <carry>: Backport IP and CIDR CEL base for 1.28
+  - 871c0d908 2023-12-21T10:38:09+00:00 UPSTREAM: 121912: Add IP address CEL extension
+
+- kubernetes image-arm64 e74ad9773809c2dedba4a566dd13979321a47010 to e58658f67791cc808b5218b87423035e18045d39
+  - 42a81f901 2024-01-08T13:53:43+01:00 UPSTREAM: 122643: Add a new neverTerminate job behavior just for upgrade
+
