@@ -40,9 +40,6 @@ Wait For MicroShift
     ...    MicroShift Is Ready
     Wait Until Keyword Succeeds    30x    10s
     ...    MicroShift Is Live
-    # We could also wait for relevant pods. Can we restructure the
-    # greenboot check script to let us use it even when not on a
-    # greenboot host?
 
 MicroShift Process ID
     [Documentation]    Return the current MicroShift process ID
@@ -80,6 +77,16 @@ Restart MicroShift
     [Documentation]    Restart the MicroShift service
     ${ushift_pid}=    MicroShift Process ID
     ${ushift_etcd_pid}=    MicroShift Etcd Process ID
+    # Force delete of core pods to avoid extended downtime after a restart.
+    # Whenever there is apiserver unavailability some of these pods enter a
+    # crash loop because they can not update/get resources they need from the
+    # cluster. This backoff may cap at 5min and trigger greenboot failures.
+    # Manifests must be deleted or they may be lingering pods trying to query
+    # apiserver when its up again, triggering transient errors regarding access
+    # to certain resources. The safest option is to remove them before restart
+    # and start clean.
+    Setup Kubeconfig
+    Delete Core Components
     Systemctl    restart    microshift.service
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait Until MicroShift Etcd Process ID Changes    ${ushift_etcd_pid}
@@ -112,3 +119,12 @@ Cleanup MicroShift
     Should Be Equal As Integers    ${rc}    0
 
     Enable MicroShift
+
+Delete Core Components
+    [Documentation]    Delete core components pods from MicroShift's control
+    ...    plane.
+    Run With Kubeconfig    oc delete deployment topolvm-controller -n openshift-storage
+    Run With Kubeconfig    oc delete daemonset topolvm-node -n openshift-storage
+    Run With Kubeconfig    oc delete deployment service-ca -n openshift-service-ca
+    Run With Kubeconfig    oc wait --for delete pod --selector=app.kubernetes.io/name=topolvm-csi-driver -n openshift-storage --timeout=120s
+    Run With Kubeconfig    oc wait --for delete pod --selector=app=service-ca -n openshift-service-ca --timeout=120s
