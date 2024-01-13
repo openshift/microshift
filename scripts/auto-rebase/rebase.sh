@@ -763,6 +763,13 @@ EOF
 
     yq -i '.metadata.namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/serviceaccount.yaml"
 
+    #-- openshift-storage
+    yq -i '.spec.template.spec.containers[0].env += {"name": "TIMESTAMP", "value": "{{ .timestamp }}"}' "${REPOROOT}/assets/components/lvms/topolvm-controller_deployment.yaml"
+    yq -i '.spec.template.spec.containers[0].env += {"name": "TIMESTAMP", "value": "{{ .timestamp }}"}' "${REPOROOT}/assets/components/lvms/topolvm-node_daemonset.yaml"
+
+    #-- openshift-service-ca
+    yq -i '.spec.template.spec.containers[0].env += {"name": "TIMESTAMP", "value": "{{ .timestamp }}"}' "${REPOROOT}/assets/components/service-ca/deployment.yaml"
+
     local target="${REPOROOT}/assets/components/csi-snapshot-controller/05_operand_rbac.yaml"
     yq -i '(.. | select(has("namespace")).namespace) = "kube-system"' $target
     # snapshotter's rbac is defined as a multidoc, which MicroShift is too picky to work with. Split into separate files

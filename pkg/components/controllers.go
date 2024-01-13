@@ -3,6 +3,7 @@ package components
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
@@ -94,6 +95,7 @@ func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfi
 	extraParams := assets.RenderParams{
 		"CAConfigMap": cmName,
 		"TLSSecret":   secretName,
+		"timestamp":   time.Now().Unix(),
 	}
 	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)

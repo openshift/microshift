@@ -57,6 +57,9 @@ spec:
           name: socket-dir
         - mountPath: /certs
           name: certs
+        env:
+        - name: TIMESTAMP
+          value: '{{ .timestamp }}'
       - args:
         - --csi-address=/run/topolvm/csi-topolvm.sock
         - --enable-capacity

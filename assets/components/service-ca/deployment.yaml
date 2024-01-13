@@ -43,6 +43,9 @@ spec:
               name: signing-cabundle
           args:
             - -v=2
+          env:
+          - name: TIMESTAMP
+            value: '{{ .timestamp }}'
       volumes:
         - name: signing-key
           secret:

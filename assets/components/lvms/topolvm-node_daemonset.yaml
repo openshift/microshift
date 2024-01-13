@@ -47,6 +47,9 @@ spec:
           name: lvmd-socket-dir
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
+        env:
+        - name: TIMESTAMP
+          value: '{{ .timestamp }}'
       - command:
         - /topolvm-node
         - --lvmd-socket={{ .SocketName }}

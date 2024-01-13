@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"testing"
 	"text/template"
+	"time"
 
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/assets"
@@ -66,6 +67,8 @@ func Test_renderLvmdParams(t *testing.T) {
 func Test_renderTopolvmDaemonsetTemplate(t *testing.T) {
 	tb := embedded.MustAsset("components/lvms/topolvm-node_daemonset.yaml")
 
+	now := time.Now().Unix()
+
 	fm := template.FuncMap{
 		"Dir": filepath.Dir,
 		"Sha256sum": func(s string) string {
@@ -100,12 +103,13 @@ func Test_renderTopolvmDaemonsetTemplate(t *testing.T) {
 			name: "renders lvmd-socket-name path",
 			args: args{
 				tb:   tb,
-				data: renderParamsFromConfig(config.NewDefault(), assets.RenderParams{"SocketName": "/run/lvmd/lvmd.socket", "lvmd": "foobar"}),
+				data: renderParamsFromConfig(config.NewDefault(), assets.RenderParams{"SocketName": "/run/lvmd/lvmd.socket", "lvmd": "foobar", "timestamp": now}),
 			},
 			want: wantBytes(tpl, map[string]interface{}{
 				"ReleaseImage": release.Image,
 				"SocketName":   "/run/lvmd/lvmd.socket",
 				"lvmd":         "foobar",
+				"timestamp":    now,
 			}),
 			wantErr: false,
 		},

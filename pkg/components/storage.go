@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"k8s.io/klog/v2"
 
@@ -124,10 +125,12 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+	now := time.Now().Unix()
+	if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, assets.RenderParams{"timestamp": now}), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
+	lvmdRenderParams["timestamp"] = now
 	if err := assets.ApplyDaemonSets(ctx, ds, renderTemplate, renderParamsFromConfig(cfg, lvmdRenderParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
 		return err
