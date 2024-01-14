@@ -40,6 +40,8 @@ ostreesetup --nogpg --osname=rhel --remote=edge --url=REPLACE_OSTREE_SERVER_URL 
 # Set the configuration of MicroShift to include subjectAltNames
 mkdir -p /etc/microshift
 cat - >/etc/microshift/config.yaml <<EOF
+debugging:
+  logLevel: Debug
 apiServer:
   subjectAltNames:
 EOF

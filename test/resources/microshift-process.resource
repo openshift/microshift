@@ -77,6 +77,7 @@ Restart MicroShift
     [Documentation]    Restart the MicroShift service
     ${ushift_pid}=    MicroShift Process ID
     ${ushift_etcd_pid}=    MicroShift Etcd Process ID
+    Systemctl    stop    kubepods.slice
     Systemctl    restart    microshift.service
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait Until MicroShift Etcd Process ID Changes    ${ushift_etcd_pid}
