@@ -1,33 +1,19 @@
-- cluster-network-operator embedded-component 2d7ced4536c90a4c848ae9a67caf4c0766cfde78 to 8cf22aa40d9ac748da5c486c500ea341c9a49c5d
-  - 7256803 2023-12-18T16:12:29-08:00 remove deprecated field mgr before apply patch
+- cluster-kube-controller-manager-operator embedded-component bc9ef03545147204bf6692d02db8e167a023ff44 to 03242d287adbaf5798a611c319aa2ae813ac6d68
+  - d427ce7 2024-01-12T10:57:41+01:00 bump(library-go)=release-4.14
 
-- etcd embedded-component ba21c5bca59afce3800577c1cbb073c5556ca990 to 77303c479ae9cb45b5a1b481f54ec5b62d89246f
-  - a830cfab 2023-12-10T14:31:21+01:00 DOWNSTREAM <carry>: resolve merge conflicts
-  - 3b252db4 2023-12-07T11:29:12+01:00 version: bump up to 3.5.11
-  - ebb7e796 2023-12-06T11:12:14-08:00 etcdserver: add linearizable_read check to readyz.
-  - 13bafdff 2023-12-06T20:02:25+01:00 etcd: Update go version to 1.20.12
-  - 98aa4669 2023-12-05T10:59:25-08:00 server: disable redirects in peer communication
-  - 293fc21c 2023-11-27T12:52:15-08:00 etcdserver: add metric counters for livez/readyz health checks.
-  - f5d7f997 2023-11-27T12:52:15-08:00 etcdserver: add livez and ready http endpoints for etcd.
-  - 2b54660a 2023-11-27T12:52:15-08:00 http health check bug fixes
-  - 46e39424 2023-11-27T09:31:00-08:00 server: Split metrics and health code
-  - 8ab1c0f2 2023-11-27T09:31:00-08:00 server: Cover V3 health with tests
-  - 9db8ddbb 2023-11-27T09:31:00-08:00 server: Refactor health checks
-  - eed94f6f 2023-11-27T09:31:00-08:00 server: Run health check tests in subtests
-  - 2f6c84e9 2023-11-27T09:31:00-08:00 server: Rename test case expect fields
-  - c6784a7e 2023-11-27T09:31:00-08:00 server: Use named struct initialization in healthcheck test
-  - 9e21048c 2023-11-27T21:48:50+13:00 Backport server: Don't follow redirects when checking peer urls.
-  - f9521978 2023-11-26T10:30:49+13:00 Backport embed: Add tracing integration test.
-  - 5a564d56 2023-11-26T10:22:10+13:00 Backport server: Have tracingExporter own resources it initialises.
-  - 3a54851f 2023-11-26T10:22:10+13:00 Backport server: Add sampling rate to distributed tracing.
-  - 7f7b9150 2023-11-15T17:10:40+01:00 upgrade github.com/stretchr/testify,google.golang.org/genproto/googleapis/api,google.golang.org/grpc to make it consistent
-  - f26074ae 2023-11-15T14:09:07+01:00 CVE-2023-47108: Backport go.opentelemetry.io/otel@v1.20.0 and go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.46.0
-  - f9f38bc9 2023-11-13T16:56:29-08:00 github workflow: run arm64 tests on every push
-  - e1aa1b97 2023-11-12T17:45:27-06:00 etcd: upgrade go version from 1.20.10 to 1.20.11
+- cluster-kube-scheduler-operator embedded-component 6e43991c07e36757a00c4ec26888e040917cf2df to 33f630dc1f890ca59c5e57fb5b6cc24a3f22a1d4
+  - 4a58041 2024-01-11T16:27:53+01:00 bump(library-go)=release-4.14
 
-- ovn-kubernetes image-amd64 f27cd40338356e2e979e82b0151d0ed3246d36da to 6f46a67b85333d8ff729ed0001685efdf15410f5
-  - eb8b514 2023-11-30T14:47:37-05:00 APB External Route: Add IPv4 and IPv6 validation in CRD schema for static hop IP field
+- kubernetes embedded-component 5c56cc35e3edc1f34290e7aaaec57e9c88c91859 to e36e183cfa03dce65497c845faaff6550f25dafb
+  - b06dbd9a8 2023-12-19T07:49:28-05:00 UPSTREAM: 122211: Fix device uncertain errors on reboot
 
-- ovn-kubernetes image-arm64 f27cd40338356e2e979e82b0151d0ed3246d36da to 6f46a67b85333d8ff729ed0001685efdf15410f5
-  - eb8b514 2023-11-30T14:47:37-05:00 APB External Route: Add IPv4 and IPv6 validation in CRD schema for static hop IP field
+- machine-config-operator embedded-component 7649b9274cde2fb50a61a579e3891c8ead2d79c5 to d7450472821e802f07e455013599f7c9db93b281
+  - f4445b0c 2024-01-10T03:30:05+00:00 Azure: Run ovs-configuration.service before dnsmasq.service
+  - 411d8d6f 2024-01-09T19:51:30+00:00 kubelet: fix kubelet labels and turn off selinux execstack
+
+- kubernetes image-amd64 5c56cc35e3edc1f34290e7aaaec57e9c88c91859 to e36e183cfa03dce65497c845faaff6550f25dafb
+  - b06dbd9a8 2023-12-19T07:49:28-05:00 UPSTREAM: 122211: Fix device uncertain errors on reboot
+
+- kubernetes image-arm64 5c56cc35e3edc1f34290e7aaaec57e9c88c91859 to e36e183cfa03dce65497c845faaff6550f25dafb
+  - b06dbd9a8 2023-12-19T07:49:28-05:00 UPSTREAM: 122211: Fix device uncertain errors on reboot
 
