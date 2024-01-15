@@ -14,8 +14,8 @@ ${REPO_FILE_NAME}       "/etc/yum.repos.d/microshift-local.repo"
 *** Keywords ***
 Install MicroShift RPM Packages From System Repo
     [Documentation]    Installs MicroShift RPM packages from a system repository
-    [Arguments]    ${check_warnings}=True
-    ${stdout}=    Command Should Work    dnf install -y microshift
+    [Arguments]    ${version}    ${check_warnings}=True
+    ${stdout}=    Command Should Work    dnf install -y 'microshift-${version}'
     IF    ${check_warnings}
         # Look for all warnings and errors before testing so that the log
         # shows the output for both.
@@ -27,9 +27,9 @@ Install MicroShift RPM Packages From System Repo
 
 Install MicroShift RPM Packages From Repo
     [Documentation]    Installs MicroShift RPM packages from the specified URL
-    [Arguments]    ${repo_url}
+    [Arguments]    ${repo_url}    ${version}
     Configure MicroShift Repository    ${repo_url}
-    Install MicroShift RPM Packages From System Repo
+    Install MicroShift RPM Packages From System Repo    ${version}
     Unconfigure MicroShift Repository
 
 Configure MicroShift Repository
