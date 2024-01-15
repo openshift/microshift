@@ -309,7 +309,23 @@ do_group() {
         echo "Building edge-commit from ${blueprint} ${parent_args}"
         # shellcheck disable=SC2086  # quote to avoid glob expansion
         build_cmd="sudo composer-cli compose start-ostree ${parent_args} --ref ${blueprint} ${blueprint} edge-commit"
-        buildid=$(${build_cmd} | awk '{print $2}')
+        for _ in $(seq 3); do
+            set +e
+            build_cmd_output=$(${build_cmd})
+            rc=$?
+            set -e
+            if [[ "${rc}" -eq 0 ]]; then
+                buildid=$(echo "${build_cmd_output}" | awk '{print $2}')
+                break
+            fi
+            sleep 15
+        done
+
+        if [[ "${rc}" -ne 0 ]]; then
+            echo "Command failed consistently: ${build_cmd}"
+            exit 1
+        fi
+
         echo "Build ID ${buildid}"
         # Record a "build name" to be used as part of the unique
         # filename for the log we download next.
