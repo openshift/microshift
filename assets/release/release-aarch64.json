@@ -1,16 +1,16 @@
 {
   "release": {
-    "base": "4.16.0-0.nightly-arm64-2024-01-09-085007"
+    "base": "4.16.0-0.nightly-arm64-2024-01-14-231716"
   },
   "images": {
-    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cb83c236c37774df2ae9add0b4dd5b19ecb5cc60931f4a0b0ee460f148e072ed",
-    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4e411bc6dc46223dc4a31c29943d524309ff10d626931730d81ce1f33990e9b6",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:fc13491a1ef82400d01aaf47a7289f04a24a8735889e03a1b8e5152915218a77",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:21ea815e5af3e80df6f593131ef72ecef7b3746b4373fc09f69dfd362dced046",
+    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:94e71c06e4e967800a41a6bb40e31b667db39ef4c0aa55e5ac32db3d3b4b3558",
+    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6935800648ee93b824da5ebd308f44b857f271aa2f755c90a7ff10f65c6ce846",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:982c6ba27174f7903f8bd89a53d761159e7f435d74d6be6a199255e80255e474",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1d2d77842f4d1e9c94689eddace81c1985f7073bab53a46a2fa2c42dce5f43ec",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
-    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b0664d14f0e5e5603b86cc9d666280d73ac7f11f9dfe4c0a4b659b4280358547",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:59db01824fed6b3872049c2accc10b67c0306c8e2611f3b16e4830ecc02ea601",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e931ca29ef143a96c56dc49ed4f7891133649dbeed5c9b6276fa03dbbb4309b0",
+    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4e842fcca88d31d0e3ada74d51fdad0c5c635913107623288d2b5a3c09e02ffa",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:91d57e2ebecad8708832cf05b6aa272e1d3e97650fbe4b3d37b91b6799413428",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:74b7aa34c9e6ac601883f083636d62921838e5a817daee3d2493bf528369a75b",
     "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel9@sha256:d0c039eba8157965b0a7971ad4e01576d2c1e31b09fe938554163b324cc4dc73",
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:caa0bbab808d8cbed476e8fa3e296ceb90f8d7d253e36588fa77e639ea389d55",
     "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:829a8e4d34404abbd22fddb6ebfa0f74daa55f2697fb147da77b83fc8b473d8c",
