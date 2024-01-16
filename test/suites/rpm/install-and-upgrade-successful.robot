@@ -49,34 +49,6 @@ Install Source Version
     Wait For MicroShift
     [Teardown]    Clean Up Test
 
-Upgrade From Previous Version
-    [Documentation]    Install the previous version, then upgrade
-    # Depending on where we are in the current release cycle, we might
-    # need to install from an unofficial repository if the previous
-    # release only has EC and RC builds.
-    IF    '${PREVIOUS_VERSION_REPO_URL}' != '${EMPTY}'
-        Install MicroShift RPM Packages From Repo
-        ...    ${PREVIOUS_VERSION_REPO_URL}
-        ...    4.${PREVIOUS_MINOR_VERSION}.*
-    ELSE
-        # Ignore warnings when installing the previous version because we
-        # know some of our older RPMs generate warnings. We care more
-        # about warnings on the new RPM.
-        Install MicroShift RPM Packages From System Repo
-        ...    4.${PREVIOUS_MINOR_VERSION}.*
-        ...    check_warnings=False
-    END
-    ${version}=    MicroShift Version
-    Should Be Equal As Integers    ${version.minor}    ${PREVIOUS_MINOR_VERSION}
-    Start MicroShift
-    Wait For MicroShift
-    Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
-    # Restart MicroShift
-    Reboot MicroShift Host
-    # Health of the system is implicitly checked by greenboot successful exit
-    Wait Until Greenboot Health Check Exited
-    [Teardown]    Clean Up Test
-
 
 *** Keywords ***
 Setup
