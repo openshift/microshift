@@ -19,27 +19,22 @@ ${CURSOR}       ${EMPTY}    # The journal cursor before restarting MicroShift
 *** Test Cases ***
 Should Not Find Forbidden
     [Documentation]    Logs should not say "forbidden"
-    [Tags]    robot:exclude
     Pattern Should Not Appear In Log Output    ${CURSOR}    forbidden
 
 Should Not Find Cannot Patch Resource
     [Documentation]    Logs should not say "cannot patch resource"
-    [Tags]    robot:exclude
     Pattern Should Not Appear In Log Output    ${CURSOR}    cannot patch resource
 
 Services Should Not Timeout When Stopping
     [Documentation]    Logs should not say "Timed out waiting for services to stop"
-    [Tags]    robot:exclude
     Pattern Should Not Appear In Log Output    ${CURSOR}    Timed out waiting for services to stop
 
 Should Find Etcd Is Ready
     [Documentation]    Logs should say "etcd is ready"
-    [Tags]    robot:exclude
     Pattern Should Appear In Log Output    ${CURSOR}    etcd is ready
 
 Should Find MicroShift Is Ready
     [Documentation]    Logs should say "MICROSHIFT READY"
-    [Tags]    robot:exclude
     Pattern Should Appear In Log Output    ${CURSOR}    MICROSHIFT READY
 
 

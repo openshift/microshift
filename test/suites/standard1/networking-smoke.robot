@@ -20,7 +20,6 @@ ${HOSTNAME}                 hello-microshift.cluster.local
 *** Test Cases ***
 Router Smoke Test
     [Documentation]    Run a router smoke test
-    [Tags]    robot:exclude
     [Setup]    Run Keywords
     ...    Restart Greenboot And Wait For Success
     ...    Create Hello MicroShift Pod
@@ -43,7 +42,6 @@ Load Balancer Smoke Test
 
 Ingress Smoke Test
     [Documentation]    Verify a simple ingress rule correctly exposes HTTP service
-    [Tags]    robot:exclude
     [Setup]    Run Keywords
     ...    Restart Greenboot And Wait For Success
     ...    Create Hello MicroShift Pod
