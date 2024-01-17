@@ -9,6 +9,11 @@ The format of the `config.yaml` configuration file is as follows.
 ```yaml
 apiServer:
     advertiseAddress: ""
+    namedCertificates:
+        - certPath: ""
+          keyPath: ""
+          names:
+            - ""
     subjectAltNames:
         - ""
 debugging:
@@ -52,6 +57,11 @@ In case `config.yaml` is not provided, the following default settings will be us
 ```yaml
 apiServer:
     advertiseAddress: ""
+    namedCertificates:
+        - certPath: ""
+          keyPath: ""
+          names:
+            - ""
     subjectAltNames:
         - ""
 debugging:

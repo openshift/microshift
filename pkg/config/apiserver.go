@@ -9,6 +9,8 @@ type ApiServer struct {
 	// a reachable IP from pods. Defaults to service network CIDR first
 	// address.
 	AdvertiseAddress string `json:"advertiseAddress,omitempty"`
+	// List of custom certificates used to secure requests to specific host names
+	NamedCertificates []NamedCertificateEntry `json:"namedCertificates"`
 	// Determines if kube-apiserver controller should configure the
 	// AdvertiseAddress in the loopback interface. Automatically computed.
 	SkipInterface bool `json:"-"`
@@ -16,4 +18,11 @@ type ApiServer struct {
 	// The URL and Port of the API server cannot be changed by the user.
 	URL  string `json:"-"`
 	Port int    `json:"-"`
+}
+
+// NamedCertificateEntry provides certificate details
+type NamedCertificateEntry struct {
+	Names    []string `json:"names"`
+	CertPath string   `json:"certPath"`
+	KeyPath  string   `json:"keyPath"`
 }
