@@ -129,6 +129,36 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			}(),
 		},
 		{
+			name: "api-server-named-certificates",
+			config: dedent(`
+			        apiServer:
+			          namedCertificates:
+			          - names: 
+                  - fqdn-server-1
+			            certPath: /tmp/fqdn-server-1.pem
+			            keyPath: /tmp/fqdn-server-1.key
+			          - certPath: /tmp/fqdn-server-2.pem
+			            keyPath: /tmp/fqdn-server-2.key
+			        `),
+
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.NamedCertificates = []NamedCertificateEntry{
+					{
+						Names:    []string{"fqdn-server-1"},
+						CertPath: "/tmp/fqdn-server-1.pem",
+						KeyPath:  "/tmp/fqdn-server-1.key",
+					},
+					{
+						CertPath: "/tmp/fqdn-server-2.pem",
+						KeyPath:  "/tmp/fqdn-server-2.key",
+					},
+				}
+				return c
+			}(),
+		},
+
+		{
 			name: "api-server-advertise-address",
 			config: dedent(`
             apiServer:
