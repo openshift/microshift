@@ -193,6 +193,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if len(u.Ingress.AdmissionPolicy.NamespaceOwnership) != 0 {
 		c.Ingress.AdmissionPolicy.NamespaceOwnership = u.Ingress.AdmissionPolicy.NamespaceOwnership
 	}
+
+	if len(u.ApiServer.NamedCertificates) != 0 {
+		c.ApiServer.NamedCertificates = u.ApiServer.NamedCertificates
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any
