@@ -1,19 +1,3 @@
-- cluster-ingress-operator embedded-component 70b608deace24e4ded73278f086a87ef4565a63d to 611011bdc0586878923efe69a3c2f6caa885dbc4
-  - 9a8d6db 2024-01-09T11:23:09-05:00 Replace GCP role with explicit permissions
-
-- cluster-network-operator embedded-component 46c093451347d31a7461cd2c116db85587da9c6f to 4b65785fd1ef99aa53f5ca2aa0481591388c64b6
-  - cb927b8 2023-12-22T16:24:48+00:00 Set log level for network-node-identity in HyperShift
-  - 7c97f88 2023-12-22T16:24:48+00:00 HyperShift, network node identity: Check the deployment in the management cluster
-
-- kubernetes embedded-component b400f2077ca1e5191282c53a64bd650209a430af to c84a6b8ba1ed969f496f70d630aaa525c5ecd41a
-  - 43be4ef70 2023-12-19T07:48:53-05:00 UPSTREAM: 122211: Fix device uncertain errors on reboot
-
-- machine-config-operator embedded-component 860ecd31f1b68d021b316a0793b6cc3eadacece1 to eaab8f3562b864ef0cc7758a6b19cc48c6d09ed8
-  - d3776b33 2023-12-14T19:19:45+00:00 Add \n in cert_writer for old cert methods and skip cloudCA validation
-
-- kubernetes image-amd64 b400f2077ca1e5191282c53a64bd650209a430af to c84a6b8ba1ed969f496f70d630aaa525c5ecd41a
-  - 43be4ef70 2023-12-19T07:48:53-05:00 UPSTREAM: 122211: Fix device uncertain errors on reboot
-
-- kubernetes image-arm64 b400f2077ca1e5191282c53a64bd650209a430af to c84a6b8ba1ed969f496f70d630aaa525c5ecd41a
-  - 43be4ef70 2023-12-19T07:48:53-05:00 UPSTREAM: 122211: Fix device uncertain errors on reboot
+- ovn-kubernetes image-arm64 e6ba47f4986f2165c09668d97067f011caa0f4cf to 4d32f126e4e09f2499aa61176fb0631e3364bee9
+  - 457c5c4 2024-01-15T13:17:20+01:00 Update namespace-owned port group (that used to be managed by multicast) to only create port group if it doesn't exist and don't update ports or acls, since they should be updated by other handlers (pod/multicast/ egressfirewall/etc). Add namespace and pod unit tests to cover new port group functionality.
 
