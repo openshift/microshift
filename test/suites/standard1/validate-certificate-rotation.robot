@@ -4,6 +4,7 @@ Documentation       Tests related to MicroShift automated certificate rotation.
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-host.resource
+Resource            ../../resources/ostree-health.resource
 Library             DateTime
 Library             Collections
 
@@ -39,6 +40,7 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig    # for readiness checks
+    Restart Greenboot And Wait For Success
 
 Teardown
     [Documentation]    Test suite teardown
