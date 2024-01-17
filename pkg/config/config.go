@@ -184,6 +184,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Manifests.KustomizePaths != nil {
 		c.Manifests.KustomizePaths = u.Manifests.KustomizePaths
 	}
+
+	if len(u.ApiServer.NamedCertificates) != 0 {
+		c.ApiServer.NamedCertificates = u.ApiServer.NamedCertificates
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any
