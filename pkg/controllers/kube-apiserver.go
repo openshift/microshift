@@ -42,6 +42,7 @@ import (
 	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	hostassignmentv1 "k8s.io/kubernetes/openshift-kube-apiserver/admission/route/apis/hostassignment/v1"
 )
@@ -110,6 +111,54 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	s.masterURL = cfg.ApiServer.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 	s.advertiseAddress = cfg.ApiServer.AdvertiseAddress
+
+	namedCerts := []configv1.NamedCertificate{
+		{
+			CertInfo: configv1.CertInfo{
+				CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
+				KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
+			},
+		},
+		{
+			CertInfo: configv1.CertInfo{
+				CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
+				KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
+			},
+		},
+		{
+			CertInfo: configv1.CertInfo{
+				CertFile: servingCert,
+				KeyFile:  servingKey,
+			},
+		},
+	}
+	if len(cfg.ApiServer.NamedCertificates) > 0 {
+		for _, namedCertsCfg := range cfg.ApiServer.NamedCertificates {
+			//Validate the cert is non-destructive
+			certAllowed, err := util.IsCertAllowed(cfg.ApiServer.AdvertiseAddress, cfg.Network.ClusterNetwork, cfg.Network.ServiceNetwork, namedCertsCfg.CertPath, namedCertsCfg.Names)
+			if err != nil {
+				klog.Warningf("Failed to read NamedCertificate from %s - ignoring: %v", namedCertsCfg.CertPath, err)
+				continue
+			}
+
+			if !certAllowed {
+				klog.Warningf("Certificate %v is not allowed - ignoring", namedCertsCfg)
+				continue
+			}
+
+			cert := []configv1.NamedCertificate{
+				{
+					Names: namedCertsCfg.Names,
+					CertInfo: configv1.CertInfo{
+						CertFile: namedCertsCfg.CertPath,
+						KeyFile:  namedCertsCfg.KeyPath,
+					},
+				},
+			}
+			// prepend the named certs to the beginning of the slice (so it will take precedence for same SNI)
+			namedCerts = append(cert, namedCerts...)
+		}
+	}
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
@@ -185,29 +234,10 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			},
 			ServingInfo: configv1.HTTPServingInfo{
 				ServingInfo: configv1.ServingInfo{
-					BindAddress:   net.JoinHostPort("0.0.0.0", strconv.Itoa(cfg.ApiServer.Port)),
-					MinTLSVersion: string(fixedTLSProfile.MinTLSVersion),
-					CipherSuites:  crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
-					NamedCertificates: []configv1.NamedCertificate{
-						{
-							CertInfo: configv1.CertInfo{
-								CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
-								KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
-							},
-						},
-						{
-							CertInfo: configv1.CertInfo{
-								CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
-								KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
-							},
-						},
-						{
-							CertInfo: configv1.CertInfo{
-								CertFile: servingCert,
-								KeyFile:  servingKey,
-							},
-						},
-					},
+					BindAddress:       net.JoinHostPort("0.0.0.0", strconv.Itoa(cfg.ApiServer.Port)),
+					MinTLSVersion:     string(fixedTLSProfile.MinTLSVersion),
+					CipherSuites:      crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
+					NamedCertificates: namedCerts,
 				},
 			},
 		},
