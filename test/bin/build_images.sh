@@ -34,9 +34,14 @@ extract_container_images() {
     echo "Extracting images from ${version}"
     mkdir -p "${IMAGEDIR}/release-info-rpms"
     pushd "${IMAGEDIR}/release-info-rpms"
-    dnf download --repofrompath "${repo_name}","${repo_url}" --disablerepo '*' --enablerepo "${repo_name}" microshift-release-info-"${version}"
+    dnf_options=""
+    if [[ -n ${repo_url} ]]; then
+        dnf_options="--repofrompath ${repo_name},${repo_url} --repo ${repo_name}"
+    fi
+    # shellcheck disable=SC2086  # double quotes
+    sudo dnf download ${dnf_options} microshift-release-info-"${version}"
     get_container_images "${version}" "${IMAGEDIR}/release-info-rpms" | sed 's/,/\n/g' >> "${outfile}"
-    rm -f microshift-release-info-*.rpm
+    sudo rm -f microshift-release-info-*.rpm
     popd
 }
 
