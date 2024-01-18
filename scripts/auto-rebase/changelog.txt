@@ -1,3 +1,3 @@
-- ovn-kubernetes image-arm64 e6ba47f4986f2165c09668d97067f011caa0f4cf to 4d32f126e4e09f2499aa61176fb0631e3364bee9
+- ovn-kubernetes image-amd64 e6ba47f4986f2165c09668d97067f011caa0f4cf to 4d32f126e4e09f2499aa61176fb0631e3364bee9
   - 457c5c4 2024-01-15T13:17:20+01:00 Update namespace-owned port group (that used to be managed by multicast) to only create port group if it doesn't exist and don't update ports or acls, since they should be updated by other handlers (pod/multicast/ egressfirewall/etc). Add namespace and pod unit tests to cover new port group functionality.
 
