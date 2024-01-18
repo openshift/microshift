@@ -65,7 +65,13 @@ run_command_on_vm() {
     local -r ip=$(get_vm_property "${vmname}" ip)
     local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
 
-    ssh "redhat@${ip}" -p "${ssh_port}" -t "${command}"
+    local term_opt=""
+    if [ -t 0 ] ; then
+        # Allocate pseudo-terminal for SSH commands when stdin is a terminal
+        # Necessary in devenv for entering input i.e. system registration, etc.
+        term_opt="-t"
+    fi
+    ssh "redhat@${ip}" -p "${ssh_port}" ${term_opt} "${command}"
 }
 
 copy_file_to_vm() {
@@ -137,19 +143,21 @@ sos_report_for_vm() {
     # version.
     cat - >/tmp/sos-wrapper.sh <<EOF
 #!/usr/bin/env bash
-if [ -f /usr/bin/microshift-sos-report ]; then
-    sudo /usr/bin/microshift-sos-report
+if ! hash sos ; then
+    echo "WARNING: The sos command does not exist"
+elif [ -f /usr/bin/microshift-sos-report ]; then
+    /usr/bin/microshift-sos-report || echo "WARNING: The /usr/bin/microshift-sos-report script failed"
 else
-    sudo chmod +x /tmp/microshift-sos-report.sh
-    sudo PROFILES=network,security /tmp/microshift-sos-report.sh
+    chmod +x /tmp/microshift-sos-report.sh
+    PROFILES=network,security /tmp/microshift-sos-report.sh || echo "WARNING: The /tmp/microshift-sos-report.sh script failed"
 fi
-sudo chmod +r /tmp/sosreport*
+chmod +r /tmp/sosreport-* || echo "WARNING: The sos report files do not exist in /tmp"
 EOF
     copy_file_to_vm "${vmname}" "/tmp/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
     copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
     run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
     mkdir -p "${vmdir}/sos"
-    scp "redhat@${ip}:/tmp/sosreport*.tar.xz" "${vmdir}/sos/"
+    scp "redhat@${ip}:/tmp/sosreport-*" "${vmdir}/sos/" || echo "WARNING: Ignoring an error when copying sos report files"
 }
 
 # Public function to render a unique kickstart from a template for a
