@@ -111,6 +111,41 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 	s.advertiseAddress = cfg.ApiServer.AdvertiseAddress
 
+	namedCerts := []configv1.NamedCertificate{
+		{
+			CertInfo: configv1.CertInfo{
+				CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
+				KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
+			},
+		},
+		{
+			CertInfo: configv1.CertInfo{
+				CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
+				KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
+			},
+		},
+		{
+			CertInfo: configv1.CertInfo{
+				CertFile: servingCert,
+				KeyFile:  servingKey,
+			},
+		},
+	}
+	if len(cfg.ApiServer.NamedCertificates) > 0 {
+		for _, namedCertsCfg := range cfg.ApiServer.NamedCertificates {
+			cert := []configv1.NamedCertificate{
+				{
+					CertInfo: configv1.CertInfo{
+						CertFile: namedCertsCfg.CertPath,
+						KeyFile:  namedCertsCfg.KeyPath,
+					},
+				},
+			}
+			// prepend the named certs to the beginning of the slice (so it will take precedence for same SNI)
+			namedCerts = append(cert, namedCerts...)
+		}
+	}
+
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
 			"advertise-address": {s.advertiseAddress},
@@ -185,29 +220,10 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			},
 			ServingInfo: configv1.HTTPServingInfo{
 				ServingInfo: configv1.ServingInfo{
-					BindAddress:   net.JoinHostPort("0.0.0.0", strconv.Itoa(cfg.ApiServer.Port)),
-					MinTLSVersion: string(fixedTLSProfile.MinTLSVersion),
-					CipherSuites:  crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
-					NamedCertificates: []configv1.NamedCertificate{
-						{
-							CertInfo: configv1.CertInfo{
-								CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
-								KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
-							},
-						},
-						{
-							CertInfo: configv1.CertInfo{
-								CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
-								KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
-							},
-						},
-						{
-							CertInfo: configv1.CertInfo{
-								CertFile: servingCert,
-								KeyFile:  servingKey,
-							},
-						},
-					},
+					BindAddress:       net.JoinHostPort("0.0.0.0", strconv.Itoa(cfg.ApiServer.Port)),
+					MinTLSVersion:     string(fixedTLSProfile.MinTLSVersion),
+					CipherSuites:      crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
+					NamedCertificates: namedCerts,
 				},
 			},
 		},
