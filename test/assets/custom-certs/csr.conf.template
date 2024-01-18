@@ -1,0 +1,28 @@
+[ req ]
+default_bits = 2048
+prompt = no
+default_md = sha256
+req_extensions = req_ext
+distinguished_name = dn
+
+[ dn ]
+C = il
+ST = il
+L = raanana
+O = redhat
+OU = eng
+CN = ${CERT_CN}
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+${CERT_SAN_DNS}
+${CERT_SAN_IP}
+
+[ v3_ext ]
+authorityKeyIdentifier=keyid,issuer:always
+basicConstraints=CA:FALSE
+keyUsage=keyEncipherment,dataEncipherment
+extendedKeyUsage=serverAuth,clientAuth
+subjectAltName=@alt_names
