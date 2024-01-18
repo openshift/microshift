@@ -132,11 +132,11 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			name: "api-server-advertise-address",
 			config: dedent(`
             apiServer:
-              advertiseAddress: 4.3.2.1
+              advertiseAddress: 127.0.0.1
             `),
 			expected: func() *Config {
 				c := mkDefaultConfig()
-				c.ApiServer.AdvertiseAddress = "4.3.2.1"
+				c.ApiServer.AdvertiseAddress = "127.0.0.1"
 				c.ApiServer.SkipInterface = true
 				return c
 			}(),
@@ -281,7 +281,7 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 func TestValidate(t *testing.T) {
 	mkDefaultConfig := func() *Config {
 		c := NewDefault()
-		c.ApiServer.SkipInterface = true
+		c.ApiServer.SkipInterface = false
 		return c
 	}
 
@@ -339,6 +339,16 @@ func TestValidate(t *testing.T) {
 				return c
 			}(),
 			expectErr: false,
+		},
+		{
+			name: "advertise-address-not-present",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.AdvertiseAddress = "8.8.8.8"
+				c.ApiServer.SkipInterface = true
+				return c
+			}(),
+			expectErr: true,
 		},
 	}
 	for _, tt := range ttests {
