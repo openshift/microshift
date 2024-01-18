@@ -1,0 +1,6 @@
+- machine-config-operator embedded-component d7450472821e802f07e455013599f7c9db93b281 to b6e329c6e3c8c53c36e682f5a5dc47ad1c9fad53
+  - 89ff6a9c 2024-01-08T21:21:26+00:00 crio: drop automatic image cleanup on upgrades
+
+- ovn-kubernetes image-arm64 6f46a67b85333d8ff729ed0001685efdf15410f5 to 445d84b988057c940dc4b15feda84d064c68cfdd
+  - 4e6fbc6 2024-01-10T09:31:28+01:00 Synchronize node primary address update
+
