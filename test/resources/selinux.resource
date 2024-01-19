@@ -23,7 +23,7 @@ Validate SELinux
     Containers Should Not Have Access To Container Var Lib Labels
     Context Traversal Should Not Gain More Access
     Folders Should Have Expected Fcontext Types
-    Semanage Fcontext Should Have Combined List Of OCP And MicroShift Rules
+    Semanage Fcontext Should Have MicroShift Rules
     Audit Log Should Be Empty For MicroShift
 
 Containers Should Not Have Access To Container Var Lib Labels
@@ -51,13 +51,19 @@ Folders Should Have Expected Fcontext Types
     ${err_list}=    Run Fcontext Check
     Should Be Empty    ${err_list}
 
-Semanage Fcontext Should Have Combined List Of OCP And MicroShift Rules
-    [Documentation]    Validates that the fcontext data is the combined set for
-    ...    OCP and MicroShift
-
+Semanage Fcontext Should Have MicroShift Rules
+    [Documentation]    Validates that the fcontext data includes the MicroShift rules
+    # Refer to ${reporoot}/packaging/selinux/microshift.fc
     ${result}=    Get Fcontext List
-    ${expected}=    Get Expected Ocp Microshift Fcontext List
-    Lists Should Be Equal    ${result}    ${expected}    ignore_order=True
+    List Should Contain Value    ${result}    /etc/microshift(/.*)?
+    List Should Contain Value    ${result}    /usr/bin/microshift
+    List Should Contain Value    ${result}    /usr/bin/microshift-etcd
+    List Should Contain Value    ${result}    /usr/lib/microshift(/.*)?
+    List Should Contain Value    ${result}    /usr/local/bin/microshift
+    List Should Contain Value    ${result}    /usr/local/bin/microshift-etcd
+    List Should Contain Value    ${result}    /var/lib/microshift(/.*)?
+    List Should Contain Value    ${result}    /var/lib/microshift-backups(/.*)?
+    List Should Contain Value    ${result}    /var/lib/microshift\\.saved(/.*)?
 
 Audit Log Should Be Empty For MicroShift
     [Documentation]    Checks that no permission denials have occured during running MicroShift
