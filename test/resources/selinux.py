@@ -1,8 +1,9 @@
-from robot.libraries.BuiltIn import BuiltIn
-from libostree import remote_sudo_rc, remote_sudo
-from typing import List
-from packaging.version import Version
 import re
+from typing import List
+
+from robot.libraries.BuiltIn import BuiltIn
+
+from libostree import remote_sudo, remote_sudo_rc
 
 ACCESS_CHECK_MAP = {
     "/var/lib/microshift/version": ["cat"],
@@ -76,14 +77,6 @@ SOURCE_TARGET_TRANSITION = {
 DOMAIN_PERMISSION_IGNORE_REGEX = {
     "^file_type [a-z_]+:filesystem$": ["associate"],
 }
-
-
-def get_expected_ocp_microshift_fcontext_list() -> List[str]:
-    host_version = Version(remote_sudo("bash -c 'source /etc/os-release && echo $VERSION_ID'"))
-    if host_version >= Version("9.3"):
-        return EXPECTED_FCONTEXT_LIST + EXPECTED_FCONTEXT_LIST_EL93
-
-    return EXPECTED_FCONTEXT_LIST
 
 
 # Here we care about matching what our SELinux policy says with what the host says for contexts.
