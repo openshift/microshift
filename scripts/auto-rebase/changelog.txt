@@ -1,3 +1,14 @@
-- ovn-kubernetes image-arm64 e6ba47f4986f2165c09668d97067f011caa0f4cf to 4d32f126e4e09f2499aa61176fb0631e3364bee9
+- cluster-network-operator embedded-component 4b65785fd1ef99aa53f5ca2aa0481591388c64b6 to 8965586077a2b5648ad5127f44796d6c2c0bcda5
+  - 5d9b1c2 2024-01-16T16:57:47+02:00 Add the implementation of the new IPsec enablement API
+  - 4ca006d 2024-01-16T16:57:37+02:00 Bump openshift/api to latest
+  - 3371244 2024-01-16T16:28:09+02:00 Remove check not allowing to change ipsecConfig
+  - 88571ea 2024-01-16T16:26:24+02:00 Render IPsec MachineConfig after cluster settles with MachineConfigs
+  - 949e39d 2024-01-11T11:55:50+00:00 Keep the live migration annotation consistant with the enhancement doc
+
+- ovn-kubernetes image-amd64 e6ba47f4986f2165c09668d97067f011caa0f4cf to 00d9aeb42013387a87ba289953bb81966bad14bc
   - 457c5c4 2024-01-15T13:17:20+01:00 Update namespace-owned port group (that used to be managed by multicast) to only create port group if it doesn't exist and don't update ports or acls, since they should be updated by other handlers (pod/multicast/ egressfirewall/etc). Add namespace and pod unit tests to cover new port group functionality.
+  - d7d9f14 2024-01-02T15:42:54+00:00 CARRY: Updates owners and adds Surya
+
+- ovn-kubernetes image-arm64 4d32f126e4e09f2499aa61176fb0631e3364bee9 to 00d9aeb42013387a87ba289953bb81966bad14bc
+  - d7d9f14 2024-01-02T15:42:54+00:00 CARRY: Updates owners and adds Surya
 
