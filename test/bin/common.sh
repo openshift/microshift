@@ -65,6 +65,10 @@ YPLUS2_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-yplus2-minor"
 # shellcheck disable=SC2034  # used elsewhere
 BASE_REPO="${IMAGEDIR}/rpm-repos/microshift-base"
 
+# Location of container images list for all the built images
+# shellcheck disable=SC2034  # used elsewhere
+CONTAINER_LIST="${IMAGEDIR}/container-images-list"
+
 # Location of data files created by the tools for managing scenarios
 # as they are run.
 #
