@@ -347,6 +347,15 @@ necessary. Do not enable this option in CI.
 is useful in local developer settings where cockpit can be used to
 login to the host. Set to `true` to enable. Defaults to `false`.
 
+`SUBSCRIPTION_MANAGER_PLUGIN` -- Should be the full path to a bash
+script that can be sourced to provide a function called
+`subscription_manager_register`. The function must take 1 argument,
+the name of the VM within the current scenario. It should update that
+VM so that it is registered with a Red Hat software subscription to
+allow packages to be installed. The default implementation handles the
+automated workflow used in CI and a manual workflow useful for
+developers running a single scenario interactively.
+
 #### Configuring Hypervisor
 
 Use `./test/bin/manage_hypervisor_config.sh` to manage the following
