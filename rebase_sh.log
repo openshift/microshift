@@ -1,0 +1,207 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.16.0-0.nightly-2024-01-21-154905 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.16.0-0.nightly-arm64-2024-01-15-061927[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.16.0-0.nightly-2024-01-21-154905 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.16.0-0.nightly-arm64-2024-01-15-061927 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.16.0-0.nightly-2024-01-21-154905 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.16.0-0.nightly-2024-01-21-154905 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at cc14f55 Merge pull request #187 from jsafrane/fix-lease-origin-master
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 75c5dc1 Merge pull request #397 from openshift-bot/art-consistency-openshift-4.16-ose-cluster-dns-operator
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at 9c62f2b Merge pull request #1012 from candita/NE-1490-Update-to-go1.20
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at 31380bd Merge pull request #1584 from deads2k/more-cert-ownership
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at fc039eb Merge pull request #786 from ingvagabund/sync-library-go
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at 0966d5f Merge pull request #531 from ingvagabund/readme-log-levels
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at e53cc19 Merge pull request #2206 from danwinship/node-updates
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at 83d2ca9 Merge pull request #320 from ardaguclu/ocpbugs-24190
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at efafeb4 Merge pull request #145 from ingvagabund/snyk
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/csi-external-snapshotter/.git/
+HEAD is now at 1e876f9 Merge pull request #137 from openshift-bot/art-consistency-openshift-4.16-csi-snapshot-validation-webhook
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at 66af0e5d Merge pull request #237 from Elbehery/rebase-etcd-3.5.11-openshift-4.16
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+HEAD is now at f629574cc Merge pull request #1845 from soltysh/golang_1.21
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes-kube-storage-version-migrator/.git/
+HEAD is now at 2646eac Merge pull request #202 from openshift-bot/art-consistency-openshift-4.16-ose-kube-storage-version-migrator
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/machine-config-operator/.git/
+HEAD is now at 139e1d0c Merge pull request #4125 from QiWang19/mirror-source-policy
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/openshift-controller-manager/.git/
+HEAD is now at 2a28a78 Merge pull request #280 from coreydaley/2023-11-15-rekor
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/operator-framework-olm/.git/
+HEAD is now at a9ea0bb2 Merge pull request #658 from openshift-bot/art-consistency-openshift-4.16-operator-lifecycle-manager
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager/.git/
+HEAD is now at 95aa561 Merge pull request #37 from ingvagabund/snyk
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/service-ca-operator/.git/
+HEAD is now at 4d3d966 Merge pull request #225 from dinhxuanvu/cert-description
+
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.16.0-0.nightly-2024-01-21-154905 image repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/oc/.git/
+HEAD is now at 96c31d99 Merge pull request #1654 from petr-muller/ota-1087-upgrade-health-section-todos
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/coredns/.git/
+HEAD is now at b6a657d Merge pull request #107 from openshift-bot/art-consistency-openshift-4.16-coredns
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/csi-external-snapshotter/.git/
+HEAD is now at 1e876f9 Merge pull request #137 from openshift-bot/art-consistency-openshift-4.16-csi-snapshot-validation-webhook
+
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/router/.git/
+HEAD is now at fcead81 Merge pull request #550 from openshift-bot/art-consistency-openshift-4.16-ose-haproxy-router-base
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kube-rbac-proxy/.git/
+HEAD is now at e8e8c84 Merge pull request #80 from ibihim/CVE-2023-44487-trimming-http2
+
+openssl not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/ovn-kubernetes/.git/
+HEAD is now at 824ac10 Merge pull request #1995 from JacobTanenbaum/update-ovs
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kubernetes/.git/
+HEAD is now at f629574cc Merge pull request #1845 from soltysh/golang_1.21
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/service-ca-operator/.git/
+HEAD is now at 4d3d966 Merge pull request #225 from dinhxuanvu/cert-description
+
+topolvm_csi not from release payload, skipping
+
+topolvm_csi_livenessprobe not from release payload, skipping
+
+topolvm_csi_provisioner not from release payload, skipping
+
+topolvm_csi_registrar not from release payload, skipping
+
+topolvm_csi_resizer not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/oc/.git/
+HEAD is now at f5542cb4 Merge pull request #1650 from deads2k/release-info
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/coredns/.git/
+HEAD is now at b6a657d Merge pull request #107 from openshift-bot/art-consistency-openshift-4.16-coredns
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/csi-external-snapshotter/.git/
+HEAD is now at 1e876f9 Merge pull request #137 from openshift-bot/art-consistency-openshift-4.16-csi-snapshot-validation-webhook
+
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/router/.git/
+HEAD is now at fcead81 Merge pull request #550 from openshift-bot/art-consistency-openshift-4.16-ose-haproxy-router-base
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kube-rbac-proxy/.git/
+HEAD is now at e8e8c84 Merge pull request #80 from ibihim/CVE-2023-44487-trimming-http2
+
+openssl not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/ovn-kubernetes/.git/
+HEAD is now at be6c5c5 Merge pull request #1979 from openshift-bot/art-consistency-openshift-4.16-ovn-kubernetes-microshift
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kubernetes/.git/
+HEAD is now at 913d16a5d Merge pull request #1849 from soltysh/fix_skips
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/service-ca-operator/.git/
+HEAD is now at 4d3d966 Merge pull request #225 from dinhxuanvu/cert-description
+
+topolvm_csi not from release payload, skipping
+
+topolvm_csi_livenessprobe not from release payload, skipping
+
+topolvm_csi_provisioner not from release payload, skipping
+
+topolvm_csi_registrar not from release payload, skipping
+
+topolvm_csi_resizer not from release payload, skipping
+
+Warning: env var PULL_BASE_REF not found or empty, falling back to local active branch.
+error: branch 'rebase-main-4.16.0-0.nightly-2024-01-21-154905_amd64-2024-01-21_arm64-2024-01-15' not found.
+Switched to a new branch 'rebase-main-4.16.0-0.nightly-2024-01-21-154905_amd64-2024-01-21_arm64-2024-01-15'
+[34m## Updating last_rebase.sh[00m
+[34m## Committing changes to last_rebase.sh[00m
+[rebase-main-4.16.0-0.nightly-2024-01-21-154905_amd64-2024-01-21_arm64-2024-01-15 2d38a638f] update last_rebase.sh
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+cluster-csi-snapshot-controller-operator embedded-component no change
+
+cluster-dns-operator embedded-component no change
+
+cluster-ingress-operator embedded-component no change
+
+cluster-kube-controller-manager-operator embedded-component no change
+
+cluster-openshift-controller-manager-operator embedded-component no change
+
+cluster-policy-controller embedded-component no change
+
+csi-external-snapshotter embedded-component no change
+
+etcd embedded-component no change
+
+kubernetes-kube-storage-version-migrator embedded-component no change
+
+openshift-controller-manager embedded-component no change
+
+route-controller-manager embedded-component no change
+
+service-ca-operator embedded-component no change
+
+coredns image-amd64 no change
+
+csi-external-snapshotter image-amd64 no change
+
+csi-external-snapshotter image-amd64 no change
+
+csi-external-snapshotter image-amd64 no change
+
+router image-amd64 no change
+
+kube-rbac-proxy image-amd64 no change
+
+service-ca-operator image-amd64 no change
+
+oc image-arm64 no change
+
+coredns image-arm64 no change
+
+csi-external-snapshotter image-arm64 no change
+
+csi-external-snapshotter image-arm64 no change
+
+csi-external-snapshotter image-arm64 no change
+
+router image-arm64 no change
+
+kube-rbac-proxy image-arm64 no change
+
+ovn-kubernetes image-arm64 no change
+
+kubernetes image-arm64 no change
+
+service-ca-operator image-arm64 no change
+
+[34m## Committing changes to changelog[00m
+[rebase-main-4.16.0-0.nightly-2024-01-21-154905_amd64-2024-01-21_arm64-2024-01-15 c04da5320] update changelog
+ 2 files changed, 98 insertions(+), 38 deletions(-)
+[34m# Updating microshift/go.mod[00m
+go mod edit -require github.com/openshift/cluster-policy-controller@efafeb428cb5fb95eb997873dc0d7c9d306df8f1
+go: go.mod file indicates go 1.21, but maximum version supported by tidy is 1.20

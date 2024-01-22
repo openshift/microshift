@@ -1,6 +1,6 @@
 module github.com/openshift/microshift
 
-go 1.20
+go 1.21
 
 require (
 	github.com/apparentlymart/go-cidr v1.1.0
@@ -10,7 +10,7 @@ require (
 	github.com/openshift/api v0.0.0-20231218131639-7a5aa77cc72d
 	github.com/openshift/build-machinery-go v0.0.0-20230824093055-6a18da01283c
 	github.com/openshift/client-go v0.0.0-20231218155125-ff7d9f9bf415
-	github.com/openshift/cluster-policy-controller v0.0.0-20240105091254-efafeb428cb5
+	github.com/openshift/cluster-policy-controller efafeb428cb5fb95eb997873dc0d7c9d306df8f1
 	github.com/openshift/library-go v0.0.0-20231218143352-99cedb2a141c
 	github.com/openshift/route-controller-manager v0.0.0-20240105122523-95aa561e9387
 	github.com/pkg/errors v0.9.1 // indirect
