@@ -1,67 +1,12 @@
-lang en_US.UTF-8
-keyboard us
-timezone UTC
-text
-reboot
+%include /main-prologue.cfg
+%include /main-liveimg.cfg
 
 # Do not enable a network device
 network --no-activate --nodefroute --hostname=REPLACE_HOST_NAME
 
-# Partition disk with a 1GB boot XFS partition and an LVM volume containing a 10GB+ system root
-# The remainder of the volume will be used by the CSI driver for storing data
-#
-# For example, a 20GB disk would be partitioned in the following way:
-#
-# NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-# sda             8:0    0  20G  0 disk
-# ├─sda1          8:1    0 200M  0 part /boot/efi
-# ├─sda1          8:1    0 800M  0 part /boot
-# └─sda2          8:2    0  19G  0 part
-#  └─rhel-root  253:0    0  10G  0 lvm  /sysroot
-#
-zerombr
-clearpart --all --initlabel
-part /boot/efi --fstype=efi --size=200
-part /boot --fstype=xfs --asprimary --size=800
-# Uncomment this line to add a SWAP partition of the recommended size
-#part swap --fstype=swap --recommended
-part pv.01 --grow
-volgroup rhel pv.01
-logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
-
-# Lock root user account
-rootpw --lock
-
-# Configure non-ostree filesystem
-liveimg --url file:///run/install/repo/liveimg.tar.gz
-
 %post --log=/var/log/anaconda/post-install.log --erroronfail
 
-# Create a default redhat user, allowing it to run sudo commands without password
-useradd -m -d /home/redhat -p \$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0 redhat
-echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
-
-# Make sure redhat user directory contents ownership is correct
-chown -R redhat:redhat /home/redhat/
-
-# Make the KUBECONFIG from MicroShift directly available for the root user
-echo -e 'export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig' >> /root/.profile
-
-# Configure systemd journal service to persist logs between boots and limit their size to 1G
-sudo mkdir -p /etc/systemd/journald.conf.d
-cat > /etc/systemd/journald.conf.d/microshift.conf <<EOF
-[Journal]
-Storage=persistent
-SystemMaxUse=1G
-RuntimeMaxUse=1G
-EOF
-
-# Disable a timer that sets boot_success to 1 after two minutes from a user login.
-# It impacts greenboot checks because grub script decrementing boot_counter works
-# only if boot_success is 0 (see /etc/grub.d/08_fallback_counting). In case of a
-# user login, this results in more than requested amount of red-boot-induced reboots
-# and system needing much more time to roll back.
-ln -sf /dev/null /etc/systemd/user/grub-boot-success.timer
+%include /post-system.cfg
 
 # Disable SELinux enforcement for the qemu-guest-agent
 sudo semanage permissive -a virt_qemu_ga_t
