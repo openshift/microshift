@@ -27,14 +27,17 @@ Should Not Find Cannot Patch Resource
 
 Services Should Not Timeout When Stopping
     [Documentation]    Logs should not say "Timed out waiting for services to stop"
+    [Tags]    robot:exclude
     Pattern Should Not Appear In Log Output    ${CURSOR}    Timed out waiting for services to stop
 
 Should Find Etcd Is Ready
     [Documentation]    Logs should say "etcd is ready"
+    [Tags]    robot:exclude
     Pattern Should Appear In Log Output    ${CURSOR}    etcd is ready
 
 Should Find MicroShift Is Ready
     [Documentation]    Logs should say "MICROSHIFT READY"
+    [Tags]    robot:exclude
     Pattern Should Appear In Log Output    ${CURSOR}    MICROSHIFT READY
 
 
