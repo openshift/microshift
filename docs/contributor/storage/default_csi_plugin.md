@@ -276,3 +276,17 @@ Once the new pod enters the Running state, verify that the data we wrote early w
 oc exec base -- cat /data/demo.txt
 FOOBAR
 ```
+
+# LVMS Versioning
+
+LVMS is released at a different cadence that MicroShift and is not couple to the MicroShift version.  This is primarily
+because LVMS is a subcomponent of MicroShift and deployed as a workload on the cluster.  The version of LVMS is tracked
+by image tag, with only the major version correlating the major MicroShift version.
+
+The LVMS version is not exposed by LVMS itself. For troubleshooting purposes, MicroShift exposes the LVMS version 
+via a configmap in the `kube-public` namespace. To get the LVMS version, run the following command:
+
+```shell
+$ oc get configmap -n kube-public lvms-version -o jsonpath='{.data.version}'
+v4.14.0-10
+```
