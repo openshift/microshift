@@ -2,8 +2,6 @@
 set -eo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPOROOT="$(cd "${SCRIPTDIR}/../.." && pwd)"
-
 BUILD_AND_RUN=true
 INSTALL_BUILD_DEPS=true
 FORCE_FIREWALL=false
@@ -12,6 +10,8 @@ RHEL_BETA_VERSION=false
 SET_RHEL_RELEASE=true
 DNF_UPDATE=true
 DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
+RHOCP_REPO="${SCRIPTDIR}/../get-latest-rhocp-repo.sh"
+MAKE_VERSION="${SCRIPTDIR}/../../Makefile.version.$(uname -m).var"
 
 start=$(date +%s)
 
@@ -59,13 +59,23 @@ if [ $# -ne 1 ]; then
     usage "Wrong number of arguments"
 fi
 
-# The conditional check for dnf_retry.sh script presence is required 
-# because configure-vm.sh can be used as a standalone script when
-# bootstrapping the development environment
+# The conditional check for presence of the used scripts and files
+# is required because configure-vm.sh can be run as a standalone
+# script when bootstrapping the development environment
 if [ ! -x "${DNF_RETRY}" ] ; then
     DNF_RETRY=$(mktemp /tmp/dnf_retry.XXXXXXXX.sh)
-    curl -s https://raw.githubusercontent.com/openshift/microshift/main/scripts/dnf_retry.sh -o "${DNF_RETRY}"
+    curl -s "https://raw.githubusercontent.com/openshift/microshift/main/scripts/dnf_retry.sh" -o "${DNF_RETRY}"
     chmod 755 "${DNF_RETRY}"
+fi
+if [ ! -x "${RHOCP_REPO}" ] ; then
+    RHOCP_REPO=$(mktemp /tmp/get-latest-rhocp-repo.XXXXXXXX.sh)
+    curl -s "https://raw.githubusercontent.com/openshift/microshift/main/scripts/get-latest-rhocp-repo.sh" -o "${RHOCP_REPO}"
+    chmod 755 "${RHOCP_REPO}"
+fi
+if [ ! -f "${MAKE_VERSION}" ] ; then
+    MAKE_VERSION=$(mktemp /tmp/Makefile.version.XXXXXXXX.var)
+    curl -s "https://raw.githubusercontent.com/openshift/microshift/main/Makefile.version.$(uname -m).var" -o "${MAKE_VERSION}"
+    chmod 644 "${MAKE_VERSION}"
 fi
 
 # Only RHEL requires a subscription
@@ -142,9 +152,14 @@ if ${BUILD_AND_RUN}; then
     make srpm
 fi
 
-# This version might not match the version under development because we need
-# to pull in dependencies that are already released
-LATEST_RHOCP_MINOR=$("${REPOROOT}/scripts/get-latest-rhocp-repo.sh")
+if ${RHEL_SUBSCRIPTION}; then
+    # This version might not match the version under development because we need
+    # to pull in dependencies that are already released
+    LATEST_RHOCP_MINOR=$("${RHOCP_REPO}")
+else
+    # Assume the current development version on non-RHEL OS
+    LATEST_RHOCP_MINOR=$(cut -d'.' -f2 "${MAKE_VERSION}")
+fi
 OCPVERSION="4.${LATEST_RHOCP_MINOR}"
 
 if ${RHEL_SUBSCRIPTION}; then
