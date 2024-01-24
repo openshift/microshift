@@ -16,26 +16,8 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 fi
 
-source /etc/os-release
-if [ "${ID}" == "rhel" ] && [ "${VERSION_ID}" == "9.3" ]; then
-    # osbuild from COPR to install version that:
-    # 1. can build rhel-93 images
-    # 2. doesn't have issues with unexpected mirror's RPM verification
-    #    (like the one in 9.3 beta at the moment of writing this comment)
-    sudo dnf copr enable -y @osbuild/osbuild epel-9-"$(uname -m)"
-    sudo dnf copr enable -y @osbuild/osbuild-composer rhel-9-"$(uname -m)"
-    composer_packages="
-        osbuild-composer-98-1.20240118204836970732.main.21.g4d241b684.el9
-        osbuild-104-1.20240119221921257138.main.10.g408b1017.el9
-    "
-else
-    # osbuild from the standard RPM repository, limits about which os
-    # versions can be built apply
-    composer_packages="osbuild-composer osbuild"
-fi
-
 "${DNF_RETRY}" "install" \
-     "${composer_packages} \
+     "osbuild osbuild-composer \
      git composer-cli ostree rpm-ostree \
      cockpit-composer bash-completion podman runc genisoimage \
      createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
