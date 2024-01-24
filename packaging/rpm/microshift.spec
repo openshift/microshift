@@ -132,6 +132,7 @@ The microshift-greenboot package provides the Greenboot scripts used for verifyi
 %package olm
 Summary: Operator Lifecycle Manager components for MicroShift
 ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
 
 %description olm
 The microshift-olm package provides the required manifests for the Operator Lifecycle Manager to be installed on MicroShift.
@@ -410,6 +411,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Jan 24 2024 Patryk Matuszak <pmatusza@redhat.com> 4.15.0
+- Add missing dependency of microshift-olm on microshift package
+
 * Thu Dec 21 2023 Patryk Matuszak <pmatusza@redhat.com> 4.15.0
 - Add OLM release info to microshift-olm RPMs
 
