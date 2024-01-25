@@ -1,148 +1,26 @@
-- cluster-kube-apiserver-operator embedded-component 72a91de0baf62173c9d873165f6faf08deeb7214 to 31380bd1f08416d27b8978bcd91df27ea01419c3
-  - 806b367 2024-01-10T15:32:53-05:00 update library-go to deconflict updates
-  - 1056020 2023-11-17T10:49:04-05:00 Add ownership for the admin kubeconfig
-  - 9612e26 2023-09-13T12:32:18+02:00 manifest: drop slo latency metrics in favor of sli
-  - 4304f3e 2023-09-13T12:26:16+02:00 bindata: update recording rules to use sli metric
+- cluster-network-operator embedded-component 2e23c82248121e693706f4f97480570b5b7c4d54 to 9b7973758c653b1f7d4224edb4051878ca6e3a2e
+  - 1b4d11d 2024-01-19T12:41:39-05:00 Add knobs in cno referencing api change
+  - 4cc091e 2024-01-18T20:47:08+02:00 Add ConfigMap mount to the whereabouts-reconciler
 
-- cluster-kube-scheduler-operator embedded-component 092925fffd900a5ca71cd5075cd8d9e401b460be to 0966d5f841219e8732d469198ec2442de55b9350
-  - 7a832d4 2024-01-18T10:24:42+01:00 readme: describe mapping between logLevel and log level
-  - 75af70a 2024-01-15T11:33:26+01:00 README: add notes about dumping KS's node cache
+- cluster-openshift-controller-manager-operator embedded-component 83d2ca92d4cb9b242849590fd5d6530d31aeba5f to 28f84ab13dcc81749100fdeed4545453c611d7c4
+  - d48d516 2024-01-23T10:00:43+01:00 Add .snyk file to exclude vendor and ignore unit tests
+  - 4665993 2024-01-22T09:57:06+03:00 Implement new GetOperatorStateWithQuorum function to satisfy interface
+  - cc74f14 2024-01-22T09:33:55+03:00 Bump k8s dependencies to 1.29.0
 
-- cluster-network-operator embedded-component 45bc1ab8881c23f6bde187ea544861240925f632 to 2e23c82248121e693706f4f97480570b5b7c4d54
-  - 1bbc97b 2024-01-18T11:02:20+01:00 Deploy CNO IPsec MC even if user already have one
-  - b81354d 2024-01-16T21:51:01-05:00 Only reconcile on Node updates with Label changes
-  - a8e1208 2024-01-15T16:24:57+02:00 Add the implementation of the new IPsec enablement API
-  - 621fb76 2024-01-12T20:09:08+02:00 Bump openshift/api and kubernetes dependencies to latest v0.29.0
-  - 8bf8aa9 2024-01-12T20:09:08+02:00 Remove check not allowing to change ipsecConfig
-  - 133872b 2024-01-12T11:42:13-05:00 Fix jira component info
-  - c5aa153 2023-12-19T11:26:23+01:00 Remove egressip write permissions from ovn-kubernetes-node
-  - 94287c4 2023-12-08T11:06:27+01:00 Network node identity: tolarate all taints
+- machine-config-operator embedded-component 139e1d0c2fa83658482bb37e443dec523d68c6dc to 2092cd37b9956c52b2cdf921eec0ee88a6d5384b
+  - 0f13b7a3 2024-01-15T14:45:43-05:00 Bump k8s api to v0.29.0
+  - 81b20835 2024-01-11T16:32:47-05:00 crio: add support for LinkLogs annotation by default
 
-- kubernetes embedded-component 913d16a5d9fb76dfb617551d46b8c361a7128d3f to 0e0d15b865ffc36177dc8770b4723dc14476a630
-  - 62b616961 2024-01-20T06:58:18+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8e5e43d85 2024-01-20T06:31:36+05:30 UPSTREAM: <drop>: manually resolve conflicts
-  - bc401b91f 2024-01-17T15:41:11+00:00 Release commit for Kubernetes v1.29.1
-  - 79cb0c11b 2024-01-15T19:46:52+01:00 UPSTREAM: <drop>: use go.1.20 - revert
-  - dd2ebd8a2 2024-01-15T19:46:52+01:00 UPSTREAM: <carry>: switch to go1.21
-  - 5350f0829 2024-01-12T10:15:45+08:00 Revert "Graduate Evented PLEG to Beta"
-  - 5b1e14468 2024-01-11T14:33:46+01:00 [go] Bump images, dependencies and versions to go 1.21.6 and distroless iptables to 0.4.4
-  - acdc24336 2024-01-11T11:44:10+01:00 UPSTREAM: <carry>: Update management webhook pod admission logic
-  - 0da29848c 2024-01-02T14:19:33-05:00 Make OpenAPIGetter tolerant of nil
-  - 865f214fe 2023-12-25T13:27:49+00:00 use context for lazy evaluation.
-  - cde050c4d 2023-12-22T13:45:45+03:00 Initialize default attach func regardless of the value of flag
-  - b05512653 2023-12-21T11:14:00+05:30 .*: bump golang.org/x/tools to v0.16.1
-  - 05937cba4 2023-12-20T01:54:36+00:00 add ut
-  - 00045c3c9 2023-12-20T01:54:36+00:00 fix
-  - b10ad75ab 2023-12-20T01:54:36+00:00 fix
-  - 4b8554018 2023-12-20T01:54:36+00:00 fix: 119921
-  - a5f64b743 2023-12-18T18:03:20+00:00 Address comment
-  - ed501c1f0 2023-12-18T18:03:20+00:00 Keep presence cost to 0 to ensure backward compatibility.
-  - 37717c1bc 2023-12-19T01:36:03+08:00 fix(scheduler): fix incorrect loop logic in MultiPoint to avoid a plugin being loaded multiple times
-  - 4a597425b 2023-12-18T13:52:34+08:00 fix falky test pkg/registry/core/persistentvolume/storage TestUpdateStatus
-  - 40d8e405b 2023-12-15T13:01:29-05:00 Use a separate function for checking if device was reconstructed
-  - d30fda3c6 2023-12-15T13:01:29-05:00 Add tests for checking of uncertain device paths
-  - 910fa603a 2023-12-15T13:01:29-05:00 Fix device uncertain errors on reboot
-  - 62d0bd726 2023-12-15T18:58:31+01:00 Fix CSI migration for vSphere volumes
-  - ce513803c 2023-12-15T12:53:40-05:00 Wire in field dropping for CRDs
-  - 9abd608b9 2023-12-15T01:51:00+00:00 Revert "scheduler/nodeaffinity: reduce pod scheduling latency"
-  - 95751b4df 2023-12-15T01:50:27+00:00 Revert "scheduler/NodeUnschedulable: reduce pod scheduling latency"
-  - 85ff8c0b0 2023-12-14T17:23:58+01:00 kube-proxy: Fix etp:Local for externalIPs
-  - ee9a55c25 2023-12-14T09:17:26+01:00 Add unit test for Job Controller for panic when PodFailurePolicy is used on 1.28
-  - e1e60c9b6 2023-12-13T09:09:47+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.0
-
-- machine-config-operator embedded-component 81b767ca8e0379863bde61ba40f318afe57d292e to 139e1d0c2fa83658482bb37e443dec523d68c6dc
-  - 7b84adad 2024-01-17T12:33:08+00:00 Fix typo in AWS node env unit
-  - 43e668fe 2024-01-16T17:16:03-05:00 Fix mirrorSourcePolicy error prompt imagecontentsourcepolicies
-  - 2da4c764 2024-01-16T09:29:00+00:00 Add Image Credential Provider flags for Kubelet on AWS
-  - b2e9c86e 2024-01-12T09:36:26-06:00 add crio-kube-rbac-proxy
-  - 66004cdc 2024-01-10T11:42:20-05:00 use machine client instead of oc for teardown
-  - 98434a2b 2024-01-08T12:22:28-05:00 controller: change machineset arch detection
-  - a5f2eeec 2024-01-04T16:27:21-05:00 Update the design doc dual support icsp and idms
-  - a1e6058c 2024-01-02T14:46:50-08:00 pkg/operator/sync: Set apiVersion and kind in pool list response
-  - 0d57de27 2024-01-02T12:29:33-08:00 pkg/operator/sync: Set ownerReferences on *-user-data-managed Secrets
-  - d20ba0e9 2023-12-16T13:10:20+00:00 Updating ose-machine-config-operator-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-machine-config-operator.yml
-  - ba67a9c1 2023-12-05T10:48:50+01:00 OCPBUGS-22664: Mount /run/nodeip-configuration into coredns containers
-
-- operator-framework-olm embedded-component a6d77a19bec8c667695df8ef8ddc234b2e63dfd3 to a9ea0bb2e0cb1479f70a19cca695d18c793e2aed
-  - 19ce0f19 2024-01-19T19:07:47+00:00 go.mod: bump to golang 1.21
-  - 7ab63ab0 2024-01-19T19:06:57+00:00 go.mod: update golang to 1.21 (#1213)
-  - 8748220b 2024-01-19T19:06:10+00:00 include composite template builder's output path (#1208)
-  - ba34916d 2024-01-19T19:05:21+00:00 go.mod: bump golang to 1.21 (#3158)
-  - 751abffd 2024-01-19T19:04:32+00:00 Update golangci-lint to 1.54 (#3160)
-  - 42591fb3 2024-01-19T19:03:42+00:00 operators/olm: filter RBAC lists by namespace (#3157)
-  - 53871a37 2024-01-16T11:31:44-05:00 UPSTREAM: <carry>: Fix PSM
-  - 56ef2715 2024-01-16T11:26:46-05:00 Catch whitespace csv.spec.provider.name values (#272)
-  - 4e5c6dac 2024-01-16T11:26:46-05:00 [chore]: Re-bump opentelemetry to v1.20.0 (#310)
-  - 38f48707 2024-01-16T11:26:45-05:00 k8s 1.28 version update and go 1.20 (#292)
-  - fad53760 2024-01-16T11:26:45-05:00 build(deps): bump github.com/containers/common from 0.56.0 to 0.57.1 (#1200)
-  - 1add15c0 2024-01-16T11:26:45-05:00 build(deps): bump github.com/onsi/ginkgo/v2 from 2.12.0 to 2.13.2 (#1198)
-  - ce15db03 2024-01-16T11:26:45-05:00 build(deps): bump github.com/grpc-ecosystem/grpc-health-probe (#1197)
-  - c156a8fe 2024-01-16T11:26:45-05:00 build(deps): bump go.etcd.io/bbolt from 1.3.7 to 1.3.8 (#1196)
-  - f8f4ab83 2024-01-16T11:26:44-05:00 build(deps): bump github.com/otiai10/copy from 1.2.0 to 1.14.0 (#1194)
-  - 9c60b163 2024-01-16T11:26:44-05:00 build(deps): bump github.com/mattn/go-sqlite3 from 1.14.17 to 1.14.19 (#1195)
-  - 604cdfd0 2024-01-16T11:26:44-05:00 updating operator-framework/api dependency which has k8s 1.28 changes (#1189)
-  - 0fe64d6e 2024-01-16T11:26:44-05:00 build(deps): bump actions/{download,upload}-artifact to v4 (#1193)
-  - a8b19cc2 2024-01-16T11:26:44-05:00 build(deps): bump docker/setup-qemu-action from 1 to 3 (#1181)
-  - 717074ec 2024-01-16T11:26:44-05:00 Update k8s dependencies to v0.28.5 (#1176)
-  - da7fcac5 2024-01-16T11:26:44-05:00 build(deps): bump golang.org/x/net from 0.19.0 to 0.20.0 (#1190)
-  - 78fdd4d6 2024-01-16T11:26:43-05:00 build(deps): bump github.com/golang-migrate/migrate/v4 (#1191)
-  - 40d4c06e 2024-01-16T11:26:43-05:00 build(deps): bump sigs.k8s.io/yaml from 1.3.0 to 1.4.0 (#1187)
-  - c85d8456 2024-01-16T11:26:43-05:00 build(deps): bump google.golang.org/grpc from 1.59.0 to 1.60.1 (#1186)
-  - fb21f428 2024-01-16T11:26:43-05:00 build(deps): bump actions/checkout from 3 to 4 (#1180)
-  - 14dcc083 2024-01-16T11:26:43-05:00 build(deps): bump docker/login-action from 1 to 3 (#1192)
-  - 9eec4b45 2024-01-16T11:26:42-05:00 build(deps): bump github.com/containerd/containerd from 1.7.6 to 1.7.11 (#1188)
-  - 35c8e6fc 2024-01-16T11:26:42-05:00 build(deps): bump github.com/h2non/filetype from 1.1.1 to 1.1.3 (#1185)
-  - 27bd4bd1 2024-01-16T11:26:42-05:00 build(deps): bump actions/setup-go from 4 to 5 (#1183)
-  - 7004d1c1 2024-01-16T11:26:42-05:00 enable dependabot (#1178)
-  - 746bbf17 2024-01-16T11:26:38-05:00 Update to k8s v0.28.5 and other operator-framework components (#3155)
-  - d0e80d64 2024-01-16T10:55:39-05:00 Fix Condition check for Reconcile InstallPlan status (#3153)
-  - 4667e9e8 2024-01-16T10:55:07-05:00 Add finalizer for CSV cleanup (#3148)
-  - c1744a00 2024-01-16T10:54:34-05:00 build(deps): bump github.com/containerd/containerd from 1.7.6 to 1.7.11 (#3135)
-  - 43b8f7e6 2024-01-16T10:54:00-05:00 build(deps): bump golang.org/x/crypto from 0.14.0 to 0.17.0 (#3134)
-  - 4626e196 2024-01-15T09:02:43+00:00 Updating operator-lifecycle-manager-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/4e1dc90e7fea4a86a748a2b25810d7a92641b2b5/images/operator-lifecycle-manager.yml
-
-- oc image-amd64 f5542cb40b186c17de4a2b7377584094f14fac97 to 89dc9400e779b56f832720286f64e83fff15d3e8
-  - 8649ef51 2024-01-19T17:26:30+03:00 Wire oc login external OIDC issuer to oc get-token cred exec plugin
-  - 779cb594 2024-01-19T17:26:30+03:00 Add coreos/go-oidc and int128/oauth2cli and bump oauth2 dependencies
-  - 5131a46a 2024-01-19T17:26:25+03:00 Add get-token command as cred exec plugin
-  - 7d23cbb6 2024-01-18T17:37:54+01:00 Write oc adm must-gather logs into a file
-  - 6348e4a0 2024-01-18T15:50:16+01:00 oc adm must-gather: pull gather container logs
-  - 1fc5c7d7 2024-01-17T16:45:47+01:00 pkg/cli/admin/mustgather: add since and since-time flags to limit logs
-  - ac637ff2 2024-01-16T17:35:04+01:00 adm update status: add TODOs to remind us to revise early decisions
-  - 7909d0dc 2024-01-16T12:30:23+01:00 pkg/cli/admin/inspect: use since/since-time for rotated logs
-
-- ovn-kubernetes image-amd64 be6c5c5ce948c6549b4b1308e770c3897dcd5576 to 824ac1002a4730bb2f93e4b371939f068948a35a
-  - f5865e2 2023-12-20T14:10:08-05:00  Dockerfile: Bump OVS to openvswitch3.1-3.1.0-73.el9fdp
-
-- kubernetes image-amd64 913d16a5d9fb76dfb617551d46b8c361a7128d3f to 0e0d15b865ffc36177dc8770b4723dc14476a630
-  - 62b616961 2024-01-20T06:58:18+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8e5e43d85 2024-01-20T06:31:36+05:30 UPSTREAM: <drop>: manually resolve conflicts
-  - bc401b91f 2024-01-17T15:41:11+00:00 Release commit for Kubernetes v1.29.1
-  - 79cb0c11b 2024-01-15T19:46:52+01:00 UPSTREAM: <drop>: use go.1.20 - revert
-  - dd2ebd8a2 2024-01-15T19:46:52+01:00 UPSTREAM: <carry>: switch to go1.21
-  - 5350f0829 2024-01-12T10:15:45+08:00 Revert "Graduate Evented PLEG to Beta"
-  - 5b1e14468 2024-01-11T14:33:46+01:00 [go] Bump images, dependencies and versions to go 1.21.6 and distroless iptables to 0.4.4
-  - acdc24336 2024-01-11T11:44:10+01:00 UPSTREAM: <carry>: Update management webhook pod admission logic
-  - 0da29848c 2024-01-02T14:19:33-05:00 Make OpenAPIGetter tolerant of nil
-  - 865f214fe 2023-12-25T13:27:49+00:00 use context for lazy evaluation.
-  - cde050c4d 2023-12-22T13:45:45+03:00 Initialize default attach func regardless of the value of flag
-  - b05512653 2023-12-21T11:14:00+05:30 .*: bump golang.org/x/tools to v0.16.1
-  - 05937cba4 2023-12-20T01:54:36+00:00 add ut
-  - 00045c3c9 2023-12-20T01:54:36+00:00 fix
-  - b10ad75ab 2023-12-20T01:54:36+00:00 fix
-  - 4b8554018 2023-12-20T01:54:36+00:00 fix: 119921
-  - a5f64b743 2023-12-18T18:03:20+00:00 Address comment
-  - ed501c1f0 2023-12-18T18:03:20+00:00 Keep presence cost to 0 to ensure backward compatibility.
-  - 37717c1bc 2023-12-19T01:36:03+08:00 fix(scheduler): fix incorrect loop logic in MultiPoint to avoid a plugin being loaded multiple times
-  - 4a597425b 2023-12-18T13:52:34+08:00 fix falky test pkg/registry/core/persistentvolume/storage TestUpdateStatus
-  - 40d8e405b 2023-12-15T13:01:29-05:00 Use a separate function for checking if device was reconstructed
-  - d30fda3c6 2023-12-15T13:01:29-05:00 Add tests for checking of uncertain device paths
-  - 910fa603a 2023-12-15T13:01:29-05:00 Fix device uncertain errors on reboot
-  - 62d0bd726 2023-12-15T18:58:31+01:00 Fix CSI migration for vSphere volumes
-  - ce513803c 2023-12-15T12:53:40-05:00 Wire in field dropping for CRDs
-  - 9abd608b9 2023-12-15T01:51:00+00:00 Revert "scheduler/nodeaffinity: reduce pod scheduling latency"
-  - 95751b4df 2023-12-15T01:50:27+00:00 Revert "scheduler/NodeUnschedulable: reduce pod scheduling latency"
-  - 85ff8c0b0 2023-12-14T17:23:58+01:00 kube-proxy: Fix etp:Local for externalIPs
-  - ee9a55c25 2023-12-14T09:17:26+01:00 Add unit test for Job Controller for panic when PodFailurePolicy is used on 1.28
-  - e1e60c9b6 2023-12-13T09:09:47+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.0
+- oc image-amd64 89dc9400e779b56f832720286f64e83fff15d3e8 to 3eb5a63182e45979bba72c77354ecad2aa6166a7
+  - d0d89a87 2024-01-23T10:52:50-06:00 Revert "WRKLDS-1016: Bump kube dependencies to 1.29.0"
+  - 0a2a960f 2024-01-22T13:49:19+03:00 Add missing resources for describer test
+  - b2a28d04 2024-01-22T13:49:19+03:00 React to argument order change in library-go func
+  - 47999cf2 2024-01-22T13:49:19+03:00 Bump openshift dependencies to align with 1.29.0
+  - d52f69e9 2024-01-22T13:49:19+03:00 React to plugin resolution to beta promotion
+  - 51e11559 2024-01-22T13:49:19+03:00 Wire warning printer to configflags for shortname warnings
+  - 7aa08ac9 2024-01-22T13:49:19+03:00 Change type to VolumeResourceRequirements
+  - 01def08d 2024-01-22T13:49:13+03:00 Bump to 1.29.0
+  - 70a8b370 2024-01-19T17:41:14+05:30 Unit tests for must-gather all-images
+  - 888c1cf4 2024-01-19T17:41:14+05:30 Add --all-images flag to must-gather
+  - c0e5f198 2024-01-19T14:34:50+03:00 Consider kubectl version checks only in cli and cli-artifact images
 

@@ -18,6 +18,7 @@ featureGates:
   APIPriorityAndFairness: true
   DisableKubeletCloudCredentialProviders: false
   DownwardAPIHugePages: true
+  KMSv1: true
   PodSecurity: true
   RotateKubeletServerCertificate: false # TODO
 kubeAPIBurst: 100
