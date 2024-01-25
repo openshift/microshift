@@ -535,7 +535,7 @@ update_images() {
             .references.spec.tags[] | select(.name == "pod") | .from.name
             ' "release_${goarch}.json")
         sed -i "s|pause_image =.*|pause_image = \"${pause_image_digest}\"|g" \
-            "${REPOROOT}/packaging/crio.conf.d/microshift_${goarch}.conf"
+            "${REPOROOT}/packaging/crio.conf.d/10-microshift_${goarch}.conf"
     done
 
     popd >/dev/null

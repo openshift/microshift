@@ -205,14 +205,14 @@ install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-backups
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
 %ifarch %{arm} aarch64
-install -p -m644 packaging/crio.conf.d/microshift_arm64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift.conf
+install -p -m644 packaging/crio.conf.d/10-microshift_arm64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %endif
 
 %ifarch x86_64
-install -p -m644 packaging/crio.conf.d/microshift_amd64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift.conf
+install -p -m644 packaging/crio.conf.d/10-microshift_amd64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %endif
 
-install -p -m644 packaging/crio.conf.d/microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
+install -p -m644 packaging/crio.conf.d/11-microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/11-microshift-ovn.conf
 
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
@@ -353,7 +353,7 @@ systemctl enable --now --quiet openvswitch || true
 %{_bindir}/microshift-cleanup-data
 %{_bindir}/microshift-sos-report
 %{_unitdir}/microshift.service
-%{_sysconfdir}/crio/crio.conf.d/microshift.conf
+%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %{_datadir}/microshift/spec/config-openapi-spec.json
 %dir %{_sysconfdir}/microshift
 %dir %{_sysconfdir}/microshift/manifests
@@ -384,7 +384,7 @@ systemctl enable --now --quiet openvswitch || true
 %ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
 
 %files networking
-%{_sysconfdir}/crio/crio.conf.d/microshift-ovn.conf
+%{_sysconfdir}/crio/crio.conf.d/11-microshift-ovn.conf
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
@@ -411,6 +411,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jan 25 2024 Patryk Matuszak <pmatusza@redhat.com> 4.16.0
+- Rename CRI-O configs to include prefix
+
 * Thu Jan 25 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
 - OLM release info files are no longer included in the base release-info RPM package
 
