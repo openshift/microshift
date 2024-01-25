@@ -279,6 +279,13 @@ func (c *Config) validate() error {
 		)
 	}
 
+	if c.ApiServer.SkipInterface {
+		err := checkAdvertiseAddressConfigured(c.ApiServer.AdvertiseAddress)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -315,4 +322,22 @@ func getAllHostnames() ([]string, error) {
 	set := sets.NewString(names...)
 	allHostnames = set.List()
 	return allHostnames, nil
+}
+
+func checkAdvertiseAddressConfigured(advertiseAddress string) error {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return err
+	}
+	for _, addr := range addrs {
+		// interface addresses come with the mask at the end.
+		addrStr := addr.String()
+		if idx := strings.Index(addrStr, "/"); idx != -1 {
+			addrStr = addrStr[:idx]
+		}
+		if addrStr == advertiseAddress {
+			return nil
+		}
+	}
+	return fmt.Errorf("Advertise address: %s not present in any interface", advertiseAddress)
 }
