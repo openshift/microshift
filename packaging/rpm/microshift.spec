@@ -231,7 +231,7 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d
 
 # release-info files
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
-install -p -m644 assets/release/release*.json %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/release/release-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/blueprint
 install -p -m644 packaging/blueprint/blueprint*.toml %{buildroot}%{_datadir}/microshift/blueprint
 
@@ -285,7 +285,7 @@ install -p -m644 assets/optional/operator-lifecycle-manager/kustomization.yaml %
 install -p -m755 packaging/greenboot/microshift-running-check-olm.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
-install -p -m644 assets/optional/operator-lifecycle-manager/release-olm* %{buildroot}%{_datadir}/microshift/release/
+install -p -m644 assets/optional/operator-lifecycle-manager/release-olm-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
 %ifarch %{arm} aarch64
 cat assets/optional/operator-lifecycle-manager/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
@@ -373,7 +373,7 @@ systemctl enable --now --quiet openvswitch || true
 %dir %{_datadir}/microshift/release
 %dir %{_datadir}/microshift/blueprint
 
-%{_datadir}/microshift/release/release*.json
+%{_datadir}/microshift/release/release-{x86_64,aarch64}.json
 %{_datadir}/microshift/blueprint/blueprint*.toml
 
 %files selinux
@@ -405,12 +405,15 @@ systemctl enable --now --quiet openvswitch || true
 %dir %{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 %{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
 %{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
-%{_datadir}/microshift/release/release-olm-*
+%{_datadir}/microshift/release/release-olm-{x86_64,aarch64}.json
 
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jan 25 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
+- OLM release info files are no longer included in the base release-info RPM package
+
 * Wed Jan 24 2024 Patryk Matuszak <pmatusza@redhat.com> 4.15.0
 - Add missing dependency of microshift-olm on microshift package
 
