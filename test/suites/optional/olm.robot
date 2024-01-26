@@ -11,6 +11,7 @@ Suite Teardown      Teardown
 *** Variables ***
 ${CATALOG_SOURCE}           ./assets/olm/catalog-source.yaml
 ${SUB_CERT_MANAGER}         ./assets/olm/subscription-cert-manager.yaml
+${MARKETPLACE_NAMESPACE}    openshift-marketplace
 ${OPERATORS_NAMESPACE}      openshift-operators
 
 
@@ -58,7 +59,7 @@ Create OperatorHub CatalogSource
     [Documentation]    Create CatalogSource resource pointing to OperatorHub.io catalog.
     Oc Create    -f ${CATALOG_SOURCE}
     Wait Until Keyword Succeeds    120s    5s
-    ...    CatalogSource Should Be Ready    ${OPERATORS_NAMESPACE}    operatorhubio-catalog
+    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    operatorhubio-catalog
 
 CatalogSource Should Be Ready
     [Documentation]    Checks if CatalogSource is ready.
