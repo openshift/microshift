@@ -17,7 +17,12 @@ source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/get_rel_version_repo.sh
 source "${SCRIPTDIR}/get_rel_version_repo.sh"
 
+SKIP_LOG_COLLECTION=${SKIP_LOG_COLLECTION:-false}
+
 osbuild_logs() {
+    if ${SKIP_LOG_COLLECTION}; then
+        return
+    fi
     workers_services=$(sudo systemctl list-units | awk '/osbuild-worker@/ {print $1} /osbuild-composer\.service/ {print $1}')
     for service in ${workers_services}; do
         # shellcheck disable=SC2024  # redirect and sudo
@@ -474,24 +479,27 @@ usage() {
     cat - <<EOF
 build_images.sh [-iIsdf] [-l layer-dir | -g group-dir] [-t template]
 
+  -d      Dry run by skipping the composer start commands.
+
+  -f      Force rebuilding images that already exist.
+
+  -g DIR  Build only one group (cannot be used with -l or -t).
+          The DIR should be the path to the group to build.
+          Implies -l based on the path.
+
   -h      Show this help
 
   -i      Build the installer image(s).
 
   -I      Do not build the installer image(s).
 
-  -s      Only build source images (implies -I). Ignores cached images.
-
-  -d      Dry run by skipping the composer start commands.
-
-  -f      Force rebuilding images that already exist.
-
   -l DIR  Build only one layer (cannot be used with -g or -t).
           The DIR should be the path to the layer to build.
 
-  -g DIR  Build only one group (cannot be used with -l or -t).
-          The DIR should be the path to the group to build.
-          Implies -l based on the path.
+  -s      Only build source images (implies -I). Ignores cached images.
+
+  -S      Skip collecting builder logs when there is a failure. Speeds
+          up local development cycle.
 
   -t FILE Build only one template (cannot be used with -l or -g).
           The FILE should be the path to the template to build.
@@ -510,7 +518,7 @@ FORCE_REBUILD=false
 FORCE_SOURCE=false
 
 selCount=0
-while getopts "dfg:hiIl:st:" opt; do
+while getopts "dfg:hiIl:sSt:" opt; do
     case "${opt}" in
         d)
             COMPOSER_DRY_RUN=true
@@ -540,6 +548,9 @@ while getopts "dfg:hiIl:st:" opt; do
             BUILD_INSTALLER=false
             ONLY_SOURCE=true
             FORCE_SOURCE=true
+            ;;
+        S)
+            SKIP_LOG_COLLECTION=true
             ;;
         t)
             TEMPLATE="${OPTARG}"
