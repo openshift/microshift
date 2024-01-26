@@ -10,6 +10,6 @@ metadata:
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
   annotations:
-    openshift.io/node-selector: "" #override default node selector
+    openshift.io/node-selector: ""
     openshift.io/description: "Multus network plugin components"
     workload.openshift.io/allowed: "management"

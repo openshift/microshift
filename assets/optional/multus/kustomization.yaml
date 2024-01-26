@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 00-namespace.yaml
+  - 01-crd-networkattachmentdefinition.yaml
+  - 02-service-account.yaml
+  - 03-cluster-role.yaml
+  - 04-cluster-role-binding.yaml
+  - 05-configmap.yaml
+  - 06-daemonset.yaml
+
+# TODO: Follow pattern from OLM: image file per arch appended to base kustomize during RPM build
+# x86_64
+images:
+  - name: multus-cni
+    newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+    digest: sha256:8031fdf9a6fdd56e5191dbcbe8bc6eabb361ec5f2e5ff86017b76040c52ebbaa
+  - name: container-networking-plugins
+    newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+    digest: sha256:30b3337836b9ac6bf86f6d2f1dbc1992602f4c98d7f6495c091175f0f399e044
