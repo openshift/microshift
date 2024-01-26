@@ -63,11 +63,14 @@ configure_package_sources() {
     export FAKE_NEXT_MINOR_VERSION
     export MINOR_VERSION
     export PREVIOUS_MINOR_VERSION
+    export YMINUS2_MINOR_VERSION
     export SOURCE_VERSION_BASE
     export CURRENT_RELEASE_VERSION
     export PREVIOUS_RELEASE_VERSION
+    export YMINUS2_RELEASE_VERSION
     export RHOCP_MINOR_Y
     export RHOCP_MINOR_Y1
+    export RHOCP_MINOR_Y2
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -679,6 +682,7 @@ fi
 SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
 MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
 PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
+YMINUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" - 2 ))
 FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
 
@@ -699,6 +703,13 @@ if is_rhocp_available "${PREVIOUS_MINOR_VERSION}"; then
     RHOCP_MINOR_Y1="${PREVIOUS_MINOR_VERSION}"
 fi
 
+# For Y-2, there will always be a real repository, so we can always
+# set the template variable for enabling that package source.
+yminus2_version_repo=$(get_rel_version_repo "${YMINUS2_MINOR_VERSION}")
+YMINUS2_RELEASE_VERSION=$(echo "${yminus2_version_repo}" | cut -d, -f1)
+YMINUS2_RELEASE_REPO=$(echo "${yminus2_version_repo}" | cut -d, -f1)
+RHOCP_MINOR_Y2="${YMINUS2_MINOR_VERSION}"
+
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"
 mkdir -p "${LOGDIR}"
@@ -715,6 +726,7 @@ if ${EXTRACT_CONTAINER_IMAGES}; then
     # The following images are specific to layers that use fake rpms built from source.
     extract_container_images "4.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
     extract_container_images "${PREVIOUS_RELEASE_VERSION}" "${PREVIOUS_RELEASE_REPO}" "${CONTAINER_LIST}"
+    extract_container_images "${YMINUS2_RELEASE_VERSION}" "${YMINUS2_RELEASE_REPO}" "${CONTAINER_LIST}"
 fi
 
 trap 'osbuild_logs' EXIT
