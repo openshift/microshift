@@ -25,7 +25,6 @@ Router Smoke Test
     ...    Expose Hello MicroShift Service Via Route
     ...    Restart Router
 
-    Skip
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}
 
