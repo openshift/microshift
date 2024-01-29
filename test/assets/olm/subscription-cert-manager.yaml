@@ -7,4 +7,4 @@ spec:
   channel: stable
   name: cert-manager
   source: operatorhubio-catalog
-  sourceNamespace: openshift-operators
+  sourceNamespace: openshift-marketplace

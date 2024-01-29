@@ -2,7 +2,7 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
   name: operatorhubio-catalog
-  namespace: openshift-operators
+  namespace: openshift-marketplace
 spec:
   sourceType: grpc
   image: quay.io/operatorhubio/catalog:latest
