@@ -1,60 +1,19 @@
-- cluster-kube-apiserver-operator embedded-component a9c35df9c83f45eea69090311a4ade770be932a6 to 9f6208d68b7207e819767ffbad8bb95e6b8b7bb2
-  - 9062aac 2023-11-28T05:39:49+00:00 Updating ose-cluster-kube-apiserver-operator-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/ose-cluster-kube-apiserver-operator.yml
+- cluster-network-operator embedded-component 0e8926147d3bfeb1750c31f5912b01083231cc70 to f092c967f8c6a32acd1f40cb92ff8c1e6244a486
+  - f071ad7 2024-01-23T14:08:35+02:00 Add ConfigMap mount to the whereabouts-reconciler
+  - 554cb2b 2024-01-16T12:18:32+01:00 update ovn-k managed control-plane to use the same service account as self-hosted control-plane. Based on 20ec0344851a766e5fc6e3c394f93af2acd9ac6a ovn-kubernetes-controller should only be used for microshift (since single-zone doesn't exist anymore).
 
-- cluster-network-operator embedded-component 8965586077a2b5648ad5127f44796d6c2c0bcda5 to 0e8926147d3bfeb1750c31f5912b01083231cc70
-  - 8ad4a05 2024-01-08T20:54:45+00:00 Use specific permissions for CNCC in GCP
+- operator-framework-olm embedded-component c17320571b51e06e023926aef3edfe7a8fedd2d7 to b66c6693482904e415a3effcbcc2eec250f8a1d0
+  - c2be2236 2024-01-19T17:44:40-07:00 operators/olm: filter RBAC lists by namespace (#3157)
 
-- kubernetes embedded-component c84a6b8ba1ed969f496f70d630aaa525c5ecd41a to 0fb47263bee9d427fb36e6581023d40bce8933d1
-  - ee4060060 2024-01-18T19:30:13+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 5c91f708e 2024-01-18T19:18:06+01:00 UPSTREAM: <drop>: manually resolve conflicts
-  - be3af46a4 2024-01-17T13:38:58+00:00 Release commit for Kubernetes v1.28.6
-  - 75e6651a3 2024-01-12T10:18:00+08:00 Revert "Graduate Evented PLEG to Beta"
-  - c26f67f9f 2024-01-11T14:37:37+01:00 [go] Bump images, dependencies and versions to go 1.20.13 and distroless iptables to 0.2.9
-  - 93701b8c1 2024-01-04T11:33:49+01:00 e2e framework: adapt unit test to Go 1.22
-  - 435b74180 2023-12-28T14:09:31-08:00 use context for lazy evaluation.
-  - d3e3a5980 2023-12-28T08:59:12-08:00 Handle edge cases in seat demand stats
-  - ad5cf7432 2023-12-21T11:08:40+05:30 .*: bump golang.org/x/tools to v0.16.1
-  - 385c0d5f7 2023-12-20T01:55:28+00:00 add ut
-  - cc8f943de 2023-12-20T01:55:28+00:00 fix
-  - 6dbccab64 2023-12-20T01:55:28+00:00 fix
-  - f7ce155cb 2023-12-20T01:55:28+00:00 fix: 119921
-  - 8e18ebd13 2023-12-19T15:44:14-05:00 Use a separate function for checking if device was reconstructed
-  - 32d800b4a 2023-12-19T15:44:14-05:00 Add tests for checking of uncertain device paths
-  - 51847f240 2023-12-19T15:44:13-05:00 Fix device uncertain errors on reboot
-  - fd7bd7123 2023-12-19T14:09:39+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.5
-  - cb88673d1 2023-12-19T01:59:17+08:00 fix(scheduler): fix incorrect loop logic in MultiPoint to avoid a plugin being loaded multiple times
-  - 56855b1ce 2023-12-14T11:54:19+01:00 Add unit test for Job Controller for panic when PodFailurePolicy is used on 1.28
-  - ccb11abc7 2023-11-22T10:57:35+01:00 etcd: Update to version 3.5.10
-  - 5d9488661 2023-11-16T16:22:22+01:00 kube-proxy: Fix etp:Local for externalIPs
-
-- machine-config-operator embedded-component eaab8f3562b864ef0cc7758a6b19cc48c6d09ed8 to fd594960f56ce9ad4c5f61abc61b4094457d86b9
-  - c93c3702 2024-01-17T20:41:00+00:00 Fix typo in AWS node env unit
-
-- kubernetes image-amd64 c84a6b8ba1ed969f496f70d630aaa525c5ecd41a to 0fb47263bee9d427fb36e6581023d40bce8933d1
-  - ee4060060 2024-01-18T19:30:13+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 5c91f708e 2024-01-18T19:18:06+01:00 UPSTREAM: <drop>: manually resolve conflicts
-  - be3af46a4 2024-01-17T13:38:58+00:00 Release commit for Kubernetes v1.28.6
-  - 75e6651a3 2024-01-12T10:18:00+08:00 Revert "Graduate Evented PLEG to Beta"
-  - c26f67f9f 2024-01-11T14:37:37+01:00 [go] Bump images, dependencies and versions to go 1.20.13 and distroless iptables to 0.2.9
-  - 93701b8c1 2024-01-04T11:33:49+01:00 e2e framework: adapt unit test to Go 1.22
-  - 435b74180 2023-12-28T14:09:31-08:00 use context for lazy evaluation.
-  - d3e3a5980 2023-12-28T08:59:12-08:00 Handle edge cases in seat demand stats
-  - ad5cf7432 2023-12-21T11:08:40+05:30 .*: bump golang.org/x/tools to v0.16.1
-  - 385c0d5f7 2023-12-20T01:55:28+00:00 add ut
-  - cc8f943de 2023-12-20T01:55:28+00:00 fix
-  - 6dbccab64 2023-12-20T01:55:28+00:00 fix
-  - f7ce155cb 2023-12-20T01:55:28+00:00 fix: 119921
-  - 8e18ebd13 2023-12-19T15:44:14-05:00 Use a separate function for checking if device was reconstructed
-  - 32d800b4a 2023-12-19T15:44:14-05:00 Add tests for checking of uncertain device paths
-  - 51847f240 2023-12-19T15:44:13-05:00 Fix device uncertain errors on reboot
-  - fd7bd7123 2023-12-19T14:09:39+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.5
-  - cb88673d1 2023-12-19T01:59:17+08:00 fix(scheduler): fix incorrect loop logic in MultiPoint to avoid a plugin being loaded multiple times
-  - 56855b1ce 2023-12-14T11:54:19+01:00 Add unit test for Job Controller for panic when PodFailurePolicy is used on 1.28
-  - ccb11abc7 2023-11-22T10:57:35+01:00 etcd: Update to version 3.5.10
-  - 5d9488661 2023-11-16T16:22:22+01:00 kube-proxy: Fix etp:Local for externalIPs
-
-- oc image-arm64 e31bee5089f458c915a6343c172d984e69d776ba to 9ff9bd754ea6e530ffc31865fce334f3c58cadc0
+- oc image-amd64 e31bee5089f458c915a6343c172d984e69d776ba to 9ff9bd754ea6e530ffc31865fce334f3c58cadc0
   - e1b92943 2024-01-22T12:14:41+03:00 Wire oc login external OIDC issuer to oc get-token cred exec plugin
   - adec4837 2024-01-22T12:13:26+03:00 Add coreos/go-oidc and int128/oauth2cli and bump oauth2 dependencies
   - e1769c95 2024-01-22T12:10:18+03:00 Add get-token command as cred exec plugin
+
+- coredns image-arm64 44797b00e47789c9a15960773806dccc1612fff7 to 22f950eae53fcba187c2303ac4f1a8305b6c1c8a
+  - 969220a 2024-01-24T14:57:26+00:00 UPSTREAM: 6277: openshift: Fix OCPBUGS-27397
+
+- ovn-kubernetes image-arm64 00d9aeb42013387a87ba289953bb81966bad14bc to 2476c75ade680f6324391be71a6edfe15fb60d98
+  - 8185be7 2024-01-17T11:38:05+01:00 Dockerfile: Bump OVN to ovn-23.09.0-100.el9fdp
+  - 5c4c45c 2024-01-17T11:38:05+01:00 Add e2e test for session affinity after the chosen backend pod is deleted.
 
