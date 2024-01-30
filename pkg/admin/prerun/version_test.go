@@ -33,14 +33,20 @@ func TestCheckVersionDiff(t *testing.T) {
 			errExpected: true,
 		},
 		{
-			name:        "binary must be newer only by one minor version",
+			name:        "binary may be newer by one minor version",
 			execVer:     versionMetadata{Major: 4, Minor: 15},
 			dataVer:     versionMetadata{Major: 4, Minor: 14},
 			errExpected: false,
 		},
 		{
-			name:        "binary newer more than one minor version is not supported",
-			execVer:     versionMetadata{Major: 4, Minor: 15},
+			name:        "binary may be newer by two minor versions",
+			execVer:     versionMetadata{Major: 4, Minor: 16},
+			dataVer:     versionMetadata{Major: 4, Minor: 14},
+			errExpected: false,
+		},
+		{
+			name:        "binary must not be newer by more than 2 minor versions",
+			execVer:     versionMetadata{Major: 4, Minor: 16},
 			dataVer:     versionMetadata{Major: 4, Minor: 13},
 			errExpected: true,
 		},

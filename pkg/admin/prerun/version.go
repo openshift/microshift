@@ -28,6 +28,8 @@ type versionFile struct {
 	BootID       string          `json:"boot_id"`
 }
 
+const MAX_VERSION_SKEW = 2
+
 func (hi *versionFile) BackupName() data.BackupName {
 	return data.BackupName(fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID))
 }
@@ -317,12 +319,13 @@ func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
 	}
 
 	if execVer.Minor > dataVer.Minor {
-		if execVer.Minor-1 == dataVer.Minor {
-			klog.InfoS("Executable is newer than data by 1 - continuing")
+		versionSkew := execVer.Minor - dataVer.Minor
+		if versionSkew <= MAX_VERSION_SKEW {
+			klog.Infof("Executable is newer than data by %d minor versions, continuing", versionSkew)
 			return nil
 		} else {
-			return fmt.Errorf("executable (%s) is too recent compared to existing data (%s): version difference is %d, maximum allowed difference is 1",
-				execVer.String(), dataVer.String(), execVer.Minor-dataVer.Minor)
+			return fmt.Errorf("executable (%s) is too recent compared to existing data (%s): minor version difference is %d, maximum allowed difference is %d",
+				execVer.String(), dataVer.String(), versionSkew, MAX_VERSION_SKEW)
 		}
 	}
 
