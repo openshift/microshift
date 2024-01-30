@@ -29,13 +29,13 @@ extract_container_images() {
     local -r version=$1
     local -r repo_url=$2
     local -r outfile=$3
-    local -r repo_name="microshift-extract-images"
 
     echo "Extracting images from ${version}"
     mkdir -p "${IMAGEDIR}/release-info-rpms"
     pushd "${IMAGEDIR}/release-info-rpms"
     dnf_options=""
     if [[ -n ${repo_url} ]]; then
+        local -r repo_name="$(basename "${repo_url}")"
         dnf_options="--repofrompath ${repo_name},${repo_url} --repo ${repo_name}"
     fi
     # shellcheck disable=SC2086  # double quotes
