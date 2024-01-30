@@ -28,3 +28,18 @@ metadata:
     include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-marketplace
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: "v1.24"
+    openshift.io/scc: ""
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    capability.openshift.io/name: "OperatorLifecycleManager"

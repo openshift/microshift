@@ -938,6 +938,28 @@ update_olm_images() {
     sed -i -r 's,(image: [a-z./-]*)[@:].*,\1,' "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_07-olm-operator.deployment.yaml"
     sed -i -r 's,(image: [a-z./-]*)[@:].*,\1,' "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_08-catalog-operator.deployment.yaml"
 
+    # If namespaces sourced from openshift/operator-lifecycle-manager do not contain openshift-marketplace - add it.
+    # This conditional will make the transition easier when the namespace is added in upstream manifests.
+    if ! grep -qw "openshift-marketplace" "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_00-namespace.yaml"; then
+        cat <<EOF >> "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_00-namespace.yaml"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-marketplace
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: "v1.24"
+    openshift.io/scc: ""
+  annotations:
+    openshift.io/node-selector: ""
+    workload.openshift.io/allowed: "management"
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    capability.openshift.io/name: "OperatorLifecycleManager"
+EOF
+    fi
+
     for goarch in amd64 arm64; do
         arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
 
