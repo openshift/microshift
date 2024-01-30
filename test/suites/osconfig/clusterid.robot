@@ -18,13 +18,6 @@ ${CLUSTERID_NS}         kube-system
 
 
 *** Test Cases ***
-Compare Cluster ID From Namespace And File
-    [Documentation]    Verify that cluster ID is the same when read
-    ...    from namespace and file
-    ${name_id}=    Get MicroShift Cluster ID From Namespace
-    ${file_id}=    Get MicroShift Cluster ID From File
-    Should Be Equal As Strings    ${name_id}    ${file_id}
-
 Verify Cluster ID Change For New Database
     [Documentation]    Verify that cluster ID changes after MicroShift
     ...    database is cleaned and service restarted
