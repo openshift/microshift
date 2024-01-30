@@ -51,38 +51,38 @@ func (s *ClusterID) Run(ctx context.Context, ready chan<- struct{}, stopped chan
 	// Read the 'kube-system' namespace attributes
 	restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.KubeConfigPath(config.KubeAdmin))
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to build kubeconfig admin path: %v", err)
 	}
 	coreClient := clientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "core-agent"))
 	namespace, err := coreClient.Namespaces().Get(ctx, "kube-system", metav1.GetOptions{})
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to read 'kube-system' namespace attributes: %v", err)
 	}
 
 	// Use the 'kube-system' namespace metadata UID as the MicroShift Cluster ID
 	clusterID := string(namespace.ObjectMeta.UID)
 	// Write <config.DataDir>/cluster-id file if it does not already exist
-	initClusterIDFile(clusterID)
+	err = initClusterIDFile(clusterID)
+	if err != nil {
+		return fmt.Errorf("Failed to initialize cluster ID file: %v", err)
+	}
 	// Log the cluster ID
 	klog.Infof("MicroShift Cluster ID: %v", clusterID)
 
 	return ctx.Err()
 }
 
-func initClusterIDFile(clusterID string) {
+func initClusterIDFile(clusterID string) error {
 	// The location of the cluster ID file
 	fileName := filepath.Join(config.DataDir, "cluster-id")
 
 	// Do not create the cluster ID file if it already exists
 	_, err := os.Stat(fileName)
 	if !os.IsNotExist(err) {
-		return
+		return nil
 	}
 
 	// Write the cluster ID to a new file
 	klog.Infof("Writing MicroShift Cluster ID '%v' to '%v'", clusterID, fileName)
-	err = os.WriteFile(fileName, []byte(clusterID), 0400)
-	if err != nil {
-		panic(err)
-	}
+	return os.WriteFile(fileName, []byte(clusterID), 0400)
 }
