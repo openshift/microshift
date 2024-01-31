@@ -1,0 +1,16 @@
+- cluster-network-operator embedded-component d4eeaeb5be0de538fcf8ccc915d4e21eaa73cbde to ccc258af4f2f05bec45cc109f60d53297b9c9750
+  - e916dd4 2024-01-26T16:10:25+00:00 add kyrtapz as reviewer and approver for release 4.14
+
+- machine-config-operator embedded-component 02a6260d730bae5995e3bde6c6792a75db9ec025 to b235299029fe6af5677a1bf610f7c07778353c3b
+  - 41d10998 2024-01-25T10:13:28+00:00 Add Image Credential Provider flags for Kubelet on AWS
+
+- ovn-kubernetes image-amd64 b050c8f87b6414d2d75c594e7a08277e85375c78 to 09ddd420708defb4cb1e77877051e73ca0224cfa
+  - 36575a3 2024-01-16T12:04:54+01:00 Update namespace-owned port group (that used to be managed by multicast) to only create port group if it doesn't exist and don't update ports or acls, since they should be updated by other handlers (pod/multicast/ egressfirewall/etc). Add namespace and pod unit tests to cover new port group functionality.
+  - 24b0167 2023-11-17T13:51:26+01:00 Update egress firewall to use namespaced port group instead of cluster port group + address set match to reduce the number of OVS flows. Previously, all EF ACLs were applied to the clusterPortGroup, and matched source on address set. In that case, all node will have the same set of OVS flows, matching sources that are not scheduled on that node at all. When using port group as a source match, only flow for local ports will be present on every node. The port group is created, updated and deleted by namespace handler similar to the namespace address set.
+  - 14cabbe 2023-11-17T13:50:56+01:00 Move multicast port group management to the namespace similar to namespace address set. Existing port groups don't need any change, since port group name always was a namespace name. Set ErrNotFound to false for delete acls and ports from port group ops. Namespace handler will create, update and delete namespace port group similar to the namespace address set.
+
+- ovn-kubernetes image-arm64 b050c8f87b6414d2d75c594e7a08277e85375c78 to 09ddd420708defb4cb1e77877051e73ca0224cfa
+  - 36575a3 2024-01-16T12:04:54+01:00 Update namespace-owned port group (that used to be managed by multicast) to only create port group if it doesn't exist and don't update ports or acls, since they should be updated by other handlers (pod/multicast/ egressfirewall/etc). Add namespace and pod unit tests to cover new port group functionality.
+  - 24b0167 2023-11-17T13:51:26+01:00 Update egress firewall to use namespaced port group instead of cluster port group + address set match to reduce the number of OVS flows. Previously, all EF ACLs were applied to the clusterPortGroup, and matched source on address set. In that case, all node will have the same set of OVS flows, matching sources that are not scheduled on that node at all. When using port group as a source match, only flow for local ports will be present on every node. The port group is created, updated and deleted by namespace handler similar to the namespace address set.
+  - 14cabbe 2023-11-17T13:50:56+01:00 Move multicast port group management to the namespace similar to namespace address set. Existing port groups don't need any change, since port group name always was a namespace name. Set ErrNotFound to false for delete acls and ports from port group ops. Namespace handler will create, update and delete namespace port group similar to the namespace address set.
+
