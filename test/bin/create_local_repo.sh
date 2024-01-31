@@ -38,5 +38,4 @@ cd "${IMAGEDIR}"
 
 make_repo "${LOCAL_REPO}" "${RPM_SOURCE}"
 make_repo "${NEXT_REPO}" "${NEXT_RPM_SOURCE}"
-make_repo "${YPLUS2_REPO}" "${YPLUS2_RPM_SOURCE}"
 make_repo "${BASE_REPO}" "${BASE_RPM_SOURCE}"

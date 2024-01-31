@@ -56,13 +56,11 @@ configure_package_sources() {
     export LOCAL_REPO              # defined in common.sh
     export NEXT_REPO               # defined in common.sh
     export BASE_REPO               # defined in common.sh
-    export YPLUS2_REPO             # defined in common.sh
     export CURRENT_RELEASE_REPO
     export PREVIOUS_RELEASE_REPO
 
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
-    export FAKE_YPLUS2_MINOR_VERSION
     export MINOR_VERSION
     export PREVIOUS_MINOR_VERSION
     export SOURCE_VERSION_BASE
@@ -682,7 +680,6 @@ SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
 MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
 PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
-FAKE_YPLUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" + 2 ))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
 
 current_version_repo=$(get_rel_version_repo "${MINOR_VERSION}")
@@ -717,7 +714,6 @@ if ${EXTRACT_CONTAINER_IMAGES}; then
     extract_container_images "${SOURCE_VERSION}" "${LOCAL_REPO}" "${CONTAINER_LIST}"
     # The following images are specific to layers that use fake rpms built from source.
     extract_container_images "4.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
-    extract_container_images "4.${FAKE_YPLUS2_MINOR_VERSION}.*" "${YPLUS2_REPO}" "${CONTAINER_LIST}"
     extract_container_images "${PREVIOUS_RELEASE_VERSION}" "${PREVIOUS_RELEASE_REPO}" "${CONTAINER_LIST}"
 fi
 
