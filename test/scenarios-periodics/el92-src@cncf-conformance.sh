@@ -46,17 +46,19 @@ run_sonobuoy() {
 
     # Wait for up to 5m until tests start
     WAIT_FAILURE=true
+    local status=""
+    local status_readable=""
     for _ in $(seq 1 150) ; do
-        local status=""
         status="$(~/go/bin/sonobuoy status --json)"
-        if [ "$(echo "$status" | jq '.status')" = "running" ]; then
+        if [ "$(echo "${status}" | jq '.status')" = "running" ]; then
             WAIT_FAILURE=false
+            status_readable="$(~/go/bin/sonobuoy status)"
             break
         fi
         sleep 2
     done
     if ${WAIT_FAILURE}; then
-        echo "Failed to start tests after 5m: got sonobuoy status: $(~/go/bin/sonobuoy status)"
+        printf "Failed to start tests after 5m: got sonobuoy status:\n%s\n" "${status_readable}"
         exit 1
     fi
 
