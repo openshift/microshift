@@ -17,6 +17,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -51,20 +52,21 @@ func (s *ClusterID) Run(ctx context.Context, ready chan<- struct{}, stopped chan
 	// Read the 'kube-system' namespace attributes
 	restConfig, err := clientcmd.BuildConfigFromFlags("", s.cfg.KubeConfigPath(config.KubeAdmin))
 	if err != nil {
-		return fmt.Errorf("Failed to build kubeconfig admin path: %v", err)
+		return fmt.Errorf("failed to build kubeconfig admin path: %v", err)
 	}
 	coreClient := clientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "core-agent"))
 	namespace, err := coreClient.Namespaces().Get(ctx, "kube-system", metav1.GetOptions{})
 	if err != nil {
-		return fmt.Errorf("Failed to read 'kube-system' namespace attributes: %v", err)
+		return fmt.Errorf("failed to read 'kube-system' namespace attributes: %v", err)
 	}
 
 	// Use the 'kube-system' namespace metadata UID as the MicroShift Cluster ID
 	clusterID := string(namespace.ObjectMeta.UID)
 	// Write <config.DataDir>/cluster-id file if it does not already exist
+	// or has inconsistent contents
 	err = initClusterIDFile(clusterID)
 	if err != nil {
-		return fmt.Errorf("Failed to initialize cluster ID file: %v", err)
+		return fmt.Errorf("failed to initialize cluster ID file: %v", err)
 	}
 	// Log the cluster ID
 	klog.Infof("MicroShift Cluster ID: %v", clusterID)
@@ -76,10 +78,21 @@ func initClusterIDFile(clusterID string) error {
 	// The location of the cluster ID file
 	fileName := filepath.Join(config.DataDir, "cluster-id")
 
-	// Do not create the cluster ID file if it already exists
+	// Read and verify the cluster ID file if it already exists,
+	// logging a warning if the cluster ID is inconsistent
 	_, err := os.Stat(fileName)
 	if !os.IsNotExist(err) {
-		return nil
+		data, err := os.ReadFile(fileName)
+		if err != nil {
+			// Ignore the error, the file will be overwritten
+			klog.Warningf("Failed to read '%v' file: %v", fileName, err)
+		} else {
+			// Return if the cluster ID is consistent
+			if string(data) == clusterID {
+				return nil
+			}
+			klog.Warningf("Overwriting an inconsistent MicroShift Cluster ID '%v' in '%v' file", string(data), fileName)
+		}
 	}
 
 	// Write the cluster ID to a new file

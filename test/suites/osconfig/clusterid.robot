@@ -34,6 +34,17 @@ Verify Cluster ID Change For New Database
     Should Not Be Equal As Strings    ${old_nid}    ${new_nid}
     Should Not Be Equal As Strings    ${old_fid}    ${new_fid}
 
+Verify Inconsistent Cluster ID Recovery
+    [Documentation]    Verify that cluster ID is correctly rewritten on the
+    ...    service restart after manual tampering by a user.
+
+    Tamper With Cluster ID File
+    Restart MicroShift
+
+    ${nid}=    Get MicroShift Cluster ID From Namespace
+    ${fid}=    Get MicroShift Cluster ID From File
+    Should Be Equal As Strings    ${nid}    ${fid}
+
 
 *** Keywords ***
 Setup
@@ -71,3 +82,11 @@ Get MicroShift Cluster ID From Namespace
 
     Should Not Be Empty    ${clusterid}
     RETURN    ${clusterid}
+
+Tamper With Cluster ID File
+    [Documentation]    Append invalid characters to the cluster ID file.
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    echo -n 123 >> ${CLUSTERID_FILE}
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+
+    Should Be Equal As Integers    0    ${rc}
