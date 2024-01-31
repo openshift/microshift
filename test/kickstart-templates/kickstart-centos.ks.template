@@ -1,0 +1,15 @@
+%include /main-prologue.cfg
+%include /main-network.cfg
+%include /main-cdrom.cfg
+
+%post --log=/var/log/anaconda/post-install.log --erroronfail
+
+%include /post-microshift.cfg
+%include /post-containers.cfg
+%include /post-system.cfg
+%include /post-network.cfg
+
+%include /post-cos9rpm.cfg
+%include /post-firewall.cfg
+
+%end

@@ -241,6 +241,7 @@ do_group() {
     local build_name
     local buildid
     local buildid_list=()
+    local download_opts=()
     local builds_to_get=""
     local parent
     local parent_args
@@ -376,7 +377,31 @@ do_group() {
         done
     fi
 
-    if (( ${#buildid_list[@]} )); then
+    if ${BUILD_INSTALLER} && ! ${COMPOSER_DRY_RUN}; then
+        for download_file in "${groupdir}"/*.image-fetcher; do
+            local download_url
+            download_url=$("${GOMPLATE}" --file "${download_file}")
+            blueprint="$(basename -s .image-fetcher "${download_file}")"
+            local expected_iso_file="${VM_DISK_BASEDIR}/${blueprint}.iso"
+            if [ -f "${expected_iso_file}" ]; then
+                echo "${expected_iso_file} already exists"
+                if should_skip "${blueprint}"; then
+                    record_junit "${groupdir}" "${download_file}" "download" "SKIPPED"
+                    continue
+                fi
+            fi
+
+            echo "Adding image-fetcher for ${download_file}"
+            download_opts+=("${expected_iso_file} ${download_url}")
+        done
+    fi
+
+    # Run image-fetcher while osbuilder is running in background
+    if [ ${#download_opts[@]} -ne 0 ]; then
+        echo "Waiting for image-fetcher to complete..."
+        parallel --colsep ' ' wget -nv -O "{1}" "{2}" ::: "${download_opts[@]}"
+    fi
+    if [ ${#buildid_list[@]} -ne 0 ]; then
         echo "Waiting for builds to complete..."
         # wait_images.py returns possibly updated list of builds that must be handled
         # "update" means replacing initial build ID with retry build ID

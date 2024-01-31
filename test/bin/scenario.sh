@@ -139,17 +139,23 @@ sos_report_for_vm() {
     # Some scenarios do not start with MicroShift installed, so we
     # can't rely on the wrapper being there or working if it
     # is. Copy the script to the host, just in case, along with a
-    # wrapper that knows how to execute it or the installed
-    # version.
+    # wrapper that knows how to execute it or the installed version.
+    # Add anaconda to the list of the plugins to collect information
+    # about failed image installations.
     cat - >/tmp/sos-wrapper.sh <<EOF
 #!/usr/bin/env bash
+PLUGINS=container_log,crio,logs,rpmostree,rpm,anaconda
 if ! hash sos ; then
     echo "WARNING: The sos command does not exist"
 elif [ -f /usr/bin/microshift-sos-report ]; then
-    /usr/bin/microshift-sos-report || echo "WARNING: The /usr/bin/microshift-sos-report script failed"
+    PLUGINS="\${PLUGINS}" /usr/bin/microshift-sos-report || {
+        echo "WARNING: The /usr/bin/microshift-sos-report script failed"
+    }
 else
     chmod +x /tmp/microshift-sos-report.sh
-    PROFILES=network,security /tmp/microshift-sos-report.sh || echo "WARNING: The /tmp/microshift-sos-report.sh script failed"
+    PLUGINS="\${PLUGINS}" PROFILES=network,security /tmp/microshift-sos-report.sh || {
+        echo "WARNING: The /tmp/microshift-sos-report.sh script failed"
+    }
 fi
 chmod +r /tmp/sosreport-* || echo "WARNING: The sos report files do not exist in /tmp"
 EOF
@@ -206,6 +212,8 @@ prepare_kickstart() {
 
         sed -e "s|REPLACE_LVM_SYSROOT_SIZE|${LVM_SYSROOT_SIZE}|g" \
             -e "s|REPLACE_OSTREE_SERVER_URL|${WEB_SERVER_URL}/repo|g" \
+            -e "s|REPLACE_RPM_SERVER_URL|${WEB_SERVER_URL}/rpm-repos|g" \
+            -e "s|REPLACE_PREVIOUS_MINOR_VERSION|$(previous_minor_version)|g" \
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
             -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
             -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
@@ -486,6 +494,14 @@ launch_vm() {
     if ${vm_created} ; then
         record_junit "${vmname}" "install_vm" "OK"
     else
+        # Make sure to stop the VM on error before the control is returned.
+        # This is necessary not to leave running qemu child processes so that
+        # the caller considers the script fully complete.
+        # Note: this option is disabled automatically in interactive sessions
+        # for easier troubleshooting of failed installations.
+        if [ ! -t 0 ] ; then
+            sudo virsh destroy "${full_vmname}" || true
+        fi
         record_junit "${vmname}" "install_vm" "FAILED"
         return 1
     fi
