@@ -16,6 +16,31 @@ PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
+VER_FILE="${STAGING_DIR}/lvms/version"
+
+dump_version(){
+    local version="${1}"
+    echo "${version}" > "${VER_FILE}"
+}
+
+load_version(){
+    if [ -f "${VER_FILE}" ]; then
+        cat "${VER_FILE}"
+    else
+        >&2 echo "error: version file not found at ${VER_FILE}"
+    fi
+}
+
+parse_version(){
+    local image_tag="$1"
+    local v
+    v="${image_tag#*:}"
+    if [ -z "${v}" ]; then
+        >&2 echo "error: version not found in image tag ${image_tag}"
+        return 1
+    fi
+}
+
 title() {
     echo -e "\E[34m$1\E[00m";
 }
@@ -81,7 +106,7 @@ rebase_lvms_to() {
         echo "No changes in LVMS images."
     fi
 
-    update_lvms_manifests
+    update_lvms_manifests "${lvms_operator_bundle_manifest}"
     if [[ -n "$(git status -s assets)" ]]; then
         title "## Committing changes to assets and pkg/assets"
         git add assets pkg/assets
@@ -94,6 +119,24 @@ rebase_lvms_to() {
     rm -rf "${STAGING_DIR}"
 }
 
+# create a function to generate a k8s config map with a key-value pair containing a version string
+# shellcheck disable=SC2034  # appears unused
+generate_version_config_map() {
+    local version="$1"
+    local name="$2"
+    local namespace="$3"
+
+    cat <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${name}
+  namespace: ${namespace}
+data:
+  version: ${version}
+EOF
+}
+
 # LVMS is not integrated into the ocp release image, so the work flow does not fit with core component rebase.  LVMS'
 # operator bundle is the authoritative source for manifest and image digests.
 download_lvms_operator_bundle_manifest(){
@@ -103,6 +146,15 @@ download_lvms_operator_bundle_manifest(){
     local LVMS_STAGING="${STAGING_DIR}/lvms"
     rm -rf "${LVMS_STAGING}"
     mkdir -p "${LVMS_STAGING}"
+
+    # Persist the version of the LVMS operator bundle for use in manifest steps
+    local version
+    version="$(parse_version "${bundle_manifest}")"
+    dump_version "${version}"
+
+    # Push the configMap to the kube-public namespace so that it is available to all users/apps
+    generate_version_config_map "${version}" "lvms-version" "kube-public"\
+        > "${REPOROOT}/assets/components/lvms/topolvm-configmap_lvms-version.yaml"
 
     authentication=""
     if [ -f "${PULL_SECRET_FILE}" ]; then
@@ -188,14 +240,17 @@ update_lvms_images(){
 
 update_lvms_manifests() {
     title "Copying LVMS manifests"
-
     local workdir="${STAGING_DIR}/lvms"
     [ -d "${workdir}" ] || {
         >&2 echo 'lvms staging dir not found, aborting asset update'
         return 1
     }
-
     "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/lvms_assets.yaml
+
+    local version
+    version="$(load_version)"
+    generate_version_config_map "${version}" "lvms-version" "openshift-storage"\
+        > "${REPOROOT}/assets/components/lvms/topolvm-configmap_lvms-version.yaml"
 }
 
 update_last_lvms_rebase() {

@@ -31,3 +31,5 @@ assets:
         ignore: "provided by MicroShift"
       - file: topolvm_default-storage-class.yaml
         ignore: "provided by MicroShift"
+      - file: topolvm-configmap_lvms-version.yaml
+        ignore: "provided by MicroShift"
