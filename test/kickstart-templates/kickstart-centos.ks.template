@@ -10,6 +10,5 @@
 %include /post-network.cfg
 
 %include /post-cos9rpm.cfg
-%include /post-firewall.cfg
 
 %end

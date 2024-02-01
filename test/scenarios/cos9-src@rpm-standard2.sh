@@ -5,6 +5,13 @@
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-centos.ks.template ""
     launch_vm host1 "centos9"
+
+    # Open the firewall ports. Other scenarios get this behavior by
+    # embedding settings in the blueprint, but there is no blueprint
+    # for this scenario. We need do this step before running the RF
+    # suite so that suite can assume it can reach all of the same
+    # ports as for any other test.
+    configure_vm_firewall host1
 }
 
 scenario_remove_vms() {
