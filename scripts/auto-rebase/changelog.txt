@@ -1,31 +1,4 @@
-- cluster-kube-apiserver-operator embedded-component 9f6208d68b7207e819767ffbad8bb95e6b8b7bb2 to 90d35d617b6b87004530fb974cbc6eb39bc3fe3b
-  - eecfa10 2024-01-22T14:36:59+00:00 webhookcontroller: report when a webhook resource is missing a caBundle provided by the service-ca-operator
-  - 5c22848 2024-01-22T14:36:59+00:00 webhookcontroller: update degraded webhook condition types to errors
-
-- cluster-kube-controller-manager-operator embedded-component 8a3e677c03f7e821f5b9e2639eb6621b15f96edb to 642fb08461913d9352b781693311727da42ffc0a
-  - e97a1fa 2024-01-16T15:57:30+00:00 fix: remove deprecated exclude annotation
-  - a5d8f36 2024-01-16T15:57:30+00:00 fix: add internal-openshift-hosted
-
-- cluster-network-operator embedded-component f092c967f8c6a32acd1f40cb92ff8c1e6244a486 to d4ebd6af6ca400f22acd071532be50da7eae0f4b
-  - ef4d793 2024-01-23T15:14:18+00:00 Deploy CNO IPsec MC even if user already have one
-  - b8f203d 2023-12-19T01:19:05+00:00 OCPBUGS-19830: fix whereabouts conformance test failures
-
-- machine-config-operator embedded-component fd594960f56ce9ad4c5f61abc61b4094457d86b9 to 90cab989d0062333daea41c24596e35385ef1ea0
-  - 9f33506c 2024-01-26T00:14:50+00:00 daemon: allow the user to override drains on IR changes
-  - fc7b1795 2024-01-22T17:22:32+00:00 Add Image Credential Provider flags for Kubelet on AWS
-
-- operator-framework-olm embedded-component b66c6693482904e415a3effcbcc2eec250f8a1d0 to 8b7ee21aa330b9bd60505c0b51caf2ce7c9e7de1
-  - 57473dbd 2024-01-24T23:25:25+05:30 Bump go-git/v5 version to 5.11.0
-  - 2b9b74f1 2024-01-24T10:50:44-05:00 Fix Condition check for Reconcile InstallPlan status (#3153)
-  - dadbd656 2024-01-24T10:49:16-05:00 Fix snapshot failure when catalogSourceNamespace does not contain OperatorGroup. (#3149)
-  - 8e8426b0 2024-01-24T10:48:30-05:00 Fix Create InstallPlan with Permissions test (#3129)
-  - 79f565eb 2024-01-24T10:48:14-05:00 Improve condition check for installplan (#3145)
-  - 04a2206f 2024-01-23T17:24:02-05:00 bump go-git/v5 to 5.11.0 (#1175)
-
-- coredns image-amd64 44797b00e47789c9a15960773806dccc1612fff7 to 22f950eae53fcba187c2303ac4f1a8305b6c1c8a
-  - 969220a 2024-01-24T14:57:26+00:00 UPSTREAM: 6277: openshift: Fix OCPBUGS-27397
-
-- ovn-kubernetes image-amd64 00d9aeb42013387a87ba289953bb81966bad14bc to 2476c75ade680f6324391be71a6edfe15fb60d98
-  - 8185be7 2024-01-17T11:38:05+01:00 Dockerfile: Bump OVN to ovn-23.09.0-100.el9fdp
-  - 5c4c45c 2024-01-17T11:38:05+01:00 Add e2e test for session affinity after the chosen backend pod is deleted.
+- cluster-network-operator embedded-component d4ebd6af6ca400f22acd071532be50da7eae0f4b to a1ddc470cb58e599d16b7a7878cc37a339b47b0f
+  - 5f4573e 2024-01-25T16:04:26+00:00 Add unit tests for function ensureMachineConfigPools
+  - e5071b4 2024-01-25T16:04:26+00:00 Not update migration conditions when any MCP is updating
 
