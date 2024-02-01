@@ -1,56 +1,144 @@
-- oc image-arm64 f5542cb40b186c17de4a2b7377584094f14fac97 to 3eb5a63182e45979bba72c77354ecad2aa6166a7
-  - d0d89a87 2024-01-23T10:52:50-06:00 Revert "WRKLDS-1016: Bump kube dependencies to 1.29.0"
-  - 0a2a960f 2024-01-22T13:49:19+03:00 Add missing resources for describer test
-  - b2a28d04 2024-01-22T13:49:19+03:00 React to argument order change in library-go func
-  - 47999cf2 2024-01-22T13:49:19+03:00 Bump openshift dependencies to align with 1.29.0
-  - d52f69e9 2024-01-22T13:49:19+03:00 React to plugin resolution to beta promotion
-  - 51e11559 2024-01-22T13:49:19+03:00 Wire warning printer to configflags for shortname warnings
-  - 7aa08ac9 2024-01-22T13:49:19+03:00 Change type to VolumeResourceRequirements
-  - 01def08d 2024-01-22T13:49:13+03:00 Bump to 1.29.0
-  - 8649ef51 2024-01-19T17:26:30+03:00 Wire oc login external OIDC issuer to oc get-token cred exec plugin
-  - 779cb594 2024-01-19T17:26:30+03:00 Add coreos/go-oidc and int128/oauth2cli and bump oauth2 dependencies
-  - 5131a46a 2024-01-19T17:26:25+03:00 Add get-token command as cred exec plugin
-  - 70a8b370 2024-01-19T17:41:14+05:30 Unit tests for must-gather all-images
-  - 888c1cf4 2024-01-19T17:41:14+05:30 Add --all-images flag to must-gather
-  - c0e5f198 2024-01-19T14:34:50+03:00 Consider kubectl version checks only in cli and cli-artifact images
-  - 7d23cbb6 2024-01-18T17:37:54+01:00 Write oc adm must-gather logs into a file
-  - 6348e4a0 2024-01-18T15:50:16+01:00 oc adm must-gather: pull gather container logs
-  - 1fc5c7d7 2024-01-17T16:45:47+01:00 pkg/cli/admin/mustgather: add since and since-time flags to limit logs
-  - ac637ff2 2024-01-16T17:35:04+01:00 adm update status: add TODOs to remind us to revise early decisions
-  - 7909d0dc 2024-01-16T12:30:23+01:00 pkg/cli/admin/inspect: use since/since-time for rotated logs
+- cluster-csi-snapshot-controller-operator embedded-component cc14f55465a7600b4f4f2944fcb8cc4991486ecf to 359cff0f9fbf86fabd63ee9633a04e0ba1b7955e
+  - 26a7645 2024-01-19T13:31:23+01:00 Bump library-go
 
-- ovn-kubernetes image-arm64 be6c5c5ce948c6549b4b1308e770c3897dcd5576 to 824ac1002a4730bb2f93e4b371939f068948a35a
-  - f5865e2 2023-12-20T14:10:08-05:00  Dockerfile: Bump OVS to openvswitch3.1-3.1.0-73.el9fdp
+- cluster-ingress-operator embedded-component 9c62f2b499cc3d2f793370f42f85a9f158b3bf57 to 1938e2cbf206769e6195729ee751443b5c0afdaa
+  - 3dd24b5 2024-01-26T12:20:08-05:00 add FallbackToLogsOnError on kube-rbac-proxy for easier debugging
 
-- kubernetes image-arm64 913d16a5d9fb76dfb617551d46b8c361a7128d3f to 0e0d15b865ffc36177dc8770b4723dc14476a630
-  - 62b616961 2024-01-20T06:58:18+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8e5e43d85 2024-01-20T06:31:36+05:30 UPSTREAM: <drop>: manually resolve conflicts
-  - bc401b91f 2024-01-17T15:41:11+00:00 Release commit for Kubernetes v1.29.1
-  - 79cb0c11b 2024-01-15T19:46:52+01:00 UPSTREAM: <drop>: use go.1.20 - revert
-  - dd2ebd8a2 2024-01-15T19:46:52+01:00 UPSTREAM: <carry>: switch to go1.21
-  - 5350f0829 2024-01-12T10:15:45+08:00 Revert "Graduate Evented PLEG to Beta"
-  - 5b1e14468 2024-01-11T14:33:46+01:00 [go] Bump images, dependencies and versions to go 1.21.6 and distroless iptables to 0.4.4
-  - acdc24336 2024-01-11T11:44:10+01:00 UPSTREAM: <carry>: Update management webhook pod admission logic
-  - 0da29848c 2024-01-02T14:19:33-05:00 Make OpenAPIGetter tolerant of nil
-  - 865f214fe 2023-12-25T13:27:49+00:00 use context for lazy evaluation.
-  - cde050c4d 2023-12-22T13:45:45+03:00 Initialize default attach func regardless of the value of flag
-  - b05512653 2023-12-21T11:14:00+05:30 .*: bump golang.org/x/tools to v0.16.1
-  - 05937cba4 2023-12-20T01:54:36+00:00 add ut
-  - 00045c3c9 2023-12-20T01:54:36+00:00 fix
-  - b10ad75ab 2023-12-20T01:54:36+00:00 fix
-  - 4b8554018 2023-12-20T01:54:36+00:00 fix: 119921
-  - a5f64b743 2023-12-18T18:03:20+00:00 Address comment
-  - ed501c1f0 2023-12-18T18:03:20+00:00 Keep presence cost to 0 to ensure backward compatibility.
-  - 37717c1bc 2023-12-19T01:36:03+08:00 fix(scheduler): fix incorrect loop logic in MultiPoint to avoid a plugin being loaded multiple times
-  - 4a597425b 2023-12-18T13:52:34+08:00 fix falky test pkg/registry/core/persistentvolume/storage TestUpdateStatus
-  - 40d8e405b 2023-12-15T13:01:29-05:00 Use a separate function for checking if device was reconstructed
-  - d30fda3c6 2023-12-15T13:01:29-05:00 Add tests for checking of uncertain device paths
-  - 910fa603a 2023-12-15T13:01:29-05:00 Fix device uncertain errors on reboot
-  - 62d0bd726 2023-12-15T18:58:31+01:00 Fix CSI migration for vSphere volumes
-  - ce513803c 2023-12-15T12:53:40-05:00 Wire in field dropping for CRDs
-  - 9abd608b9 2023-12-15T01:51:00+00:00 Revert "scheduler/nodeaffinity: reduce pod scheduling latency"
-  - 95751b4df 2023-12-15T01:50:27+00:00 Revert "scheduler/NodeUnschedulable: reduce pod scheduling latency"
-  - 85ff8c0b0 2023-12-14T17:23:58+01:00 kube-proxy: Fix etp:Local for externalIPs
-  - ee9a55c25 2023-12-14T09:17:26+01:00 Add unit test for Job Controller for panic when PodFailurePolicy is used on 1.28
-  - e1e60c9b6 2023-12-13T09:09:47+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.0
+- cluster-kube-apiserver-operator embedded-component 31380bd1f08416d27b8978bcd91df27ea01419c3 to 1c6d106ee87c21756d383a9369c37fd856202077
+  - aa098be 2024-01-24T14:38:12+01:00 webhook/controller: when skipping a check because of missing CA log the name of the webhook
+
+- cluster-network-operator embedded-component 9b7973758c653b1f7d4224edb4051878ca6e3a2e to 1d9dca6ceb5506280f01c8fcd7ce2606bb3be26c
+  - 277d2a9 2024-01-26T16:08:00+00:00 add kyrtapz as reviewer and approver
+  - 68c2f1c 2024-01-25T03:03:59-05:00 Add unit tests for function ensureMachineConfigPools
+  - 55e4236 2024-01-25T02:59:50-05:00 Not update migration conditions when any MCP is updating
+  - cc3b303 2024-01-17T23:50:00+05:30 Prevent NoRunningOvnControlPlane alert getting fired continuously for managed cluster
+  - 7a7848a 2023-12-21T04:05:44+00:00 Updating cluster-network-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/af2133c5194e28075efb48f4b508a98759b079d2/images/cluster-network-operator.yml
+
+- cluster-policy-controller embedded-component efafeb428cb5fb95eb997873dc0d7c9d306df8f1 to 15c068ab02d7fd767cccb1d7bfb2c8ab5e529647
+  - f0dc19d 2023-12-16T17:33:08+00:00 Updating ose-cluster-policy-controller-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/cluster-policy-controller.yml
+
+- kubernetes embedded-component 0e0d15b865ffc36177dc8770b4723dc14476a630 to 5a4819c6048e42515c3c5538b723ba6272440eee
+  - 1e9f274de 2024-01-26T08:25:25-06:00 UPSTREAM: <carry>: revert "OCPBUGS-24404: add ignore for SAST scan"
+  - 2311d09de 2024-01-25T16:41:43-06:00 UPSTREAM: <carry>: use snyk file
+  - 49f915424 2024-01-23T09:09:36-08:00 UPSTREAM: <carry>: permanently disable NodeLogQuery e2e test
+  - 532272c56 2024-01-04T11:27:28+01:00 UPSTREAM: <carry>: watch-termination: termination.log file with resticted permissions
+
+- kubernetes-kube-storage-version-migrator embedded-component 2646eac05dc16eac71d1d79509ed5800c437e0de to 969a60e9e2466c44f5b3ffd43fe3ecab11bf1e51
+  - 2e6940f 2024-01-24T23:28:50+00:00 UPSTREAM: <carry>: Updating ose-kube-storage-version-migrator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/16fcb965e08aba14bb4ea6caaeeaa99fe31141bd/images/ose-kube-storage-version-migrator.yml
+
+- machine-config-operator embedded-component 2092cd37b9956c52b2cdf921eec0ee88a6d5384b to c5f53e25f337f003a388d9108713a6230f197044
+  - bee2519c 2024-01-25T15:13:40-05:00 add FallbackToLogsOnError for easier debugging
+  - 9e0bc360 2024-01-25T14:31:46-05:00 OCPBUGS-17788: Improved error handling for missing MC
+  - 9db484eb 2024-01-25T11:28:49+01:00 OCPBUGS-24366: Delete state files on reboot only
+  - df610a6b 2024-01-24T16:10:50-06:00  added feature gate to mco for on cluster builds
+  - 0f4daa30 2024-01-24T10:45:25-05:00 daemon: allow the user to override drains on IR changes
+
+- operator-framework-olm embedded-component a9ea0bb2e0cb1479f70a19cca695d18c793e2aed to 57904773441fd8e71e36abd6dd66ab6556fbfb84
+  - 641f0f42 2024-01-28T00:04:24+00:00 build(deps): bump github.com/docker/docker (#3080)
+  - 52d4f662 2024-01-28T00:03:33+00:00 build(deps): bump github.com/onsi/gomega from 1.30.0 to 1.31.1 (#1215)
+  - 7d121c7c 2024-01-28T00:02:43+00:00 Add field Subscription.Spec.Config.Annotations (#312)
+  - 7cd0d210 2024-01-23T19:14:34+00:00 build(deps): bump github.com/maxbrunsfeld/counterfeiter/v6 (#1205)
+  - 25f0ebc3 2024-01-23T19:13:55+00:00 build(deps): bump golang.org/x/sync from 0.5.0 to 0.6.0 (#1203)
+  - a2d6a9b6 2024-01-23T19:13:15+00:00 build(deps): bump github.com/docker/docker (#3080)
+
+- service-ca-operator embedded-component 4d3d966edaaafcae7c9d4a1aa87a67ac627a6ebd to f409fb9e308ace1e5f8596add187d2239b073e23
+  - 31a084d 2024-01-26T08:54:15-05:00 add FallbackToLogsOnError for easier debugging
+
+- oc image-amd64 3eb5a63182e45979bba72c77354ecad2aa6166a7 to 6d67575448725bb154dcdaf5f78787c8516d47bf
+  - d3888d23 2024-01-25T15:24:39-05:00 add FallbackToLogsOnError for easier debugging
+  - 2212856b 2024-01-25T17:12:35+01:00 pkg/cli/admin/inspect: use since/since-time for previous container logs
+  - d6762a7c 2024-01-25T13:33:24+01:00 Fix --parallelism flag formatting in help
+  - b5174c0f 2024-01-25T10:44:40+01:00 pkg/cli/admin/inspect: format RFC3339 parse error
+  - 295e4c3e 2024-01-24T10:13:52+03:00 Simplified kubectl component version check
+  - 48b63d03 2024-01-24T10:03:06+03:00 Revert "Revert "WRKLDS-1016: Bump kube dependencies to 1.29.0""
+  - 93729f45 2024-01-23T14:53:01+03:00 Use correct hash sum of extracted tarball after re-signing with codesign
+
+- coredns image-amd64 b6a657d656bef2631c4675a819ce25a4662b0978 to 022a0530038602605b8f3e8866c2a6ded97708cc
+  - ad20b18 2024-01-24T23:12:59+00:00 Updating coredns-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/16fcb965e08aba14bb4ea6caaeeaa99fe31141bd/images/coredns.yml
+  - 37a9afe 2024-01-23T13:45:17-05:00 UPSTREAM: 6277: openshift: Fix OCPBUGS-27397
+
+- kube-rbac-proxy image-amd64 e8e8c84bcc6d4419970726f3028df4b178c0b1c9 to 6ea01c5c6e0c56d07b66c90e27caeda58b4ce872
+  - 8c209d4 2023-12-16T11:57:24+00:00 Updating kube-rbac-proxy-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/kube-rbac-proxy.yml
+
+- ovn-kubernetes image-amd64 824ac1002a4730bb2f93e4b371939f068948a35a to e8f87e81e05164cc0a93a2d90d17c43fda35ecb2
+  - 4f73a26 2024-01-25T00:19:13+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/16fcb965e08aba14bb4ea6caaeeaa99fe31141bd/images/ose-ovn-kubernetes.yml
+  - b7a32c1 2024-01-23T11:27:43+01:00 Dockerfile: Bump OVN to ovn-23.09.0-100.el9fdp
+  - 8579756 2024-01-19T09:42:38+01:00 docs, multi-homing: layer2/localnet topologies are supported in IC
+  - 63641aa 2024-01-16T17:32:39+01:00 Ignore hybrid-overlay nodes from EgressIP controller
+  - 418043c 2024-01-16T12:24:23+01:00 Full implementation of KEP-1669 ProxyTerminatingEndpoints
+  - 7c76475 2024-01-16T09:40:55+01:00 fedora: Update Dockerfile for latest OVN ovn-23.09.0-100.
+  - 24f9357 2024-01-16T09:40:52+01:00 Add e2e test for session affinity after the chosen backend pod is deleted.
+  - e80a1da 2024-01-10T17:37:47+01:00 community: rename the meeting info file
+  - 729e41a 2024-01-10T17:37:47+01:00 tasks.md: update community meeting info
+  - c22ddd4 2024-01-07T12:55:13+02:00 Fix LGW ETP=Local on IPv6
+  - 6c00291 2024-01-05T18:50:42+00:00 Don't remove HO static routes from incorrect routers
+  - 63fb665 2024-01-05T18:46:18+00:00 Don't delete QOS rows that might be referenced
+  - fc9792d 2024-01-05T12:19:00-05:00 Ensuring correct case for the project name for consistency
+  - 442747f 2023-12-20T01:35:24+01:00 drop-forwarding: Add ClusterSubnets to allowed forwarding CIDRs
+  - f89fb5c 2023-12-19T23:43:39+01:00 Boost EgressIP retryTimeout by factor 3
+  - ffed5d1 2023-12-19T23:43:39+01:00 Enable github tests for --drop-forwarding
+  - a12d1d8 2023-12-19T23:43:39+01:00 Fix ovnkube-single-node-zone templates for disable-forwarding
+  - 9d21c46 2023-12-19T02:49:28+01:00 kind.sh: Improve metallb installation
+  - f1feee9 2023-12-18T22:21:48+01:00 kind.sh: Use absolute path for ingress
+  - 87a4fb7 2023-12-18T22:21:48+01:00 Fix non-interconnect kind.sh error
+  - 61424ae 2023-12-18T22:21:48+01:00 Revert "Temporary fix for metallb issue"
+  - 21e37cf 2023-12-18T22:21:48+01:00 Fix ineffectual assignment warnings in gateway_init_linux_test.go
+
+- kubernetes image-amd64 0e0d15b865ffc36177dc8770b4723dc14476a630 to 5a4819c6048e42515c3c5538b723ba6272440eee
+  - 1e9f274de 2024-01-26T08:25:25-06:00 UPSTREAM: <carry>: revert "OCPBUGS-24404: add ignore for SAST scan"
+  - 2311d09de 2024-01-25T16:41:43-06:00 UPSTREAM: <carry>: use snyk file
+  - 49f915424 2024-01-23T09:09:36-08:00 UPSTREAM: <carry>: permanently disable NodeLogQuery e2e test
+  - 532272c56 2024-01-04T11:27:28+01:00 UPSTREAM: <carry>: watch-termination: termination.log file with resticted permissions
+
+- service-ca-operator image-amd64 4d3d966edaaafcae7c9d4a1aa87a67ac627a6ebd to f409fb9e308ace1e5f8596add187d2239b073e23
+  - 31a084d 2024-01-26T08:54:15-05:00 add FallbackToLogsOnError for easier debugging
+
+- oc image-arm64 3eb5a63182e45979bba72c77354ecad2aa6166a7 to 6d67575448725bb154dcdaf5f78787c8516d47bf
+  - d3888d23 2024-01-25T15:24:39-05:00 add FallbackToLogsOnError for easier debugging
+  - 2212856b 2024-01-25T17:12:35+01:00 pkg/cli/admin/inspect: use since/since-time for previous container logs
+  - d6762a7c 2024-01-25T13:33:24+01:00 Fix --parallelism flag formatting in help
+  - b5174c0f 2024-01-25T10:44:40+01:00 pkg/cli/admin/inspect: format RFC3339 parse error
+  - 295e4c3e 2024-01-24T10:13:52+03:00 Simplified kubectl component version check
+  - 48b63d03 2024-01-24T10:03:06+03:00 Revert "Revert "WRKLDS-1016: Bump kube dependencies to 1.29.0""
+  - 93729f45 2024-01-23T14:53:01+03:00 Use correct hash sum of extracted tarball after re-signing with codesign
+
+- coredns image-arm64 b6a657d656bef2631c4675a819ce25a4662b0978 to 022a0530038602605b8f3e8866c2a6ded97708cc
+  - ad20b18 2024-01-24T23:12:59+00:00 Updating coredns-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/16fcb965e08aba14bb4ea6caaeeaa99fe31141bd/images/coredns.yml
+  - 37a9afe 2024-01-23T13:45:17-05:00 UPSTREAM: 6277: openshift: Fix OCPBUGS-27397
+
+- kube-rbac-proxy image-arm64 e8e8c84bcc6d4419970726f3028df4b178c0b1c9 to 6ea01c5c6e0c56d07b66c90e27caeda58b4ce872
+  - 8c209d4 2023-12-16T11:57:24+00:00 Updating kube-rbac-proxy-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/kube-rbac-proxy.yml
+
+- ovn-kubernetes image-arm64 824ac1002a4730bb2f93e4b371939f068948a35a to e8f87e81e05164cc0a93a2d90d17c43fda35ecb2
+  - 4f73a26 2024-01-25T00:19:13+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/16fcb965e08aba14bb4ea6caaeeaa99fe31141bd/images/ose-ovn-kubernetes.yml
+  - b7a32c1 2024-01-23T11:27:43+01:00 Dockerfile: Bump OVN to ovn-23.09.0-100.el9fdp
+  - 8579756 2024-01-19T09:42:38+01:00 docs, multi-homing: layer2/localnet topologies are supported in IC
+  - 63641aa 2024-01-16T17:32:39+01:00 Ignore hybrid-overlay nodes from EgressIP controller
+  - 418043c 2024-01-16T12:24:23+01:00 Full implementation of KEP-1669 ProxyTerminatingEndpoints
+  - 7c76475 2024-01-16T09:40:55+01:00 fedora: Update Dockerfile for latest OVN ovn-23.09.0-100.
+  - 24f9357 2024-01-16T09:40:52+01:00 Add e2e test for session affinity after the chosen backend pod is deleted.
+  - e80a1da 2024-01-10T17:37:47+01:00 community: rename the meeting info file
+  - 729e41a 2024-01-10T17:37:47+01:00 tasks.md: update community meeting info
+  - c22ddd4 2024-01-07T12:55:13+02:00 Fix LGW ETP=Local on IPv6
+  - 6c00291 2024-01-05T18:50:42+00:00 Don't remove HO static routes from incorrect routers
+  - 63fb665 2024-01-05T18:46:18+00:00 Don't delete QOS rows that might be referenced
+  - fc9792d 2024-01-05T12:19:00-05:00 Ensuring correct case for the project name for consistency
+  - 442747f 2023-12-20T01:35:24+01:00 drop-forwarding: Add ClusterSubnets to allowed forwarding CIDRs
+  - f89fb5c 2023-12-19T23:43:39+01:00 Boost EgressIP retryTimeout by factor 3
+  - ffed5d1 2023-12-19T23:43:39+01:00 Enable github tests for --drop-forwarding
+  - a12d1d8 2023-12-19T23:43:39+01:00 Fix ovnkube-single-node-zone templates for disable-forwarding
+  - 9d21c46 2023-12-19T02:49:28+01:00 kind.sh: Improve metallb installation
+  - f1feee9 2023-12-18T22:21:48+01:00 kind.sh: Use absolute path for ingress
+  - 87a4fb7 2023-12-18T22:21:48+01:00 Fix non-interconnect kind.sh error
+  - 61424ae 2023-12-18T22:21:48+01:00 Revert "Temporary fix for metallb issue"
+  - 21e37cf 2023-12-18T22:21:48+01:00 Fix ineffectual assignment warnings in gateway_init_linux_test.go
+
+- kubernetes image-arm64 0e0d15b865ffc36177dc8770b4723dc14476a630 to 5a4819c6048e42515c3c5538b723ba6272440eee
+  - 1e9f274de 2024-01-26T08:25:25-06:00 UPSTREAM: <carry>: revert "OCPBUGS-24404: add ignore for SAST scan"
+  - 2311d09de 2024-01-25T16:41:43-06:00 UPSTREAM: <carry>: use snyk file
+  - 49f915424 2024-01-23T09:09:36-08:00 UPSTREAM: <carry>: permanently disable NodeLogQuery e2e test
+  - 532272c56 2024-01-04T11:27:28+01:00 UPSTREAM: <carry>: watch-termination: termination.log file with resticted permissions
+
+- service-ca-operator image-arm64 4d3d966edaaafcae7c9d4a1aa87a67ac627a6ebd to f409fb9e308ace1e5f8596add187d2239b073e23
+  - 31a084d 2024-01-26T08:54:15-05:00 add FallbackToLogsOnError for easier debugging
 
