@@ -1,0 +1,7 @@
+- coredns image-arm64 8341fa72820062869d3a01429ec20a79aebeded0 to 7d3fa777871ed2e5a70715e7f3e71d3f01785330
+  - 7a0f883 2024-01-25T09:51:42-05:00 UPSTREAM: 6277: openshift: Fix OCPBUGS-27397
+
+- ovn-kubernetes image-arm64 09ddd420708defb4cb1e77877051e73ca0224cfa to 3b0c69d70279c1ce35cb6d8c7f2bf0dba98f0dbe
+  - dfe036d 2024-01-17T12:32:34+01:00 Dockerfile: Bump OVN to ovn-23.09.0-100.el9fdp
+  - ceb7183 2024-01-17T12:30:52+01:00 Add e2e test for session affinity after the chosen backend pod is deleted.
+
