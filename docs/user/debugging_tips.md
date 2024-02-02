@@ -33,7 +33,7 @@ metadata:
 Like the MicroShift version, the LVM version is available via a configmap. To get the version, run:
 
 ```bash
-$ oc get configmap -n openshift-storage lvms-version -ojsonpath='{.data.version}'
+$ oc get configmap -n kube-public lvms-version -ojsonpath='{.data.version}'
 ```
 
 ## Generating an SOS Report
