@@ -1,4 +1,3 @@
-- cluster-network-operator embedded-component d4ebd6af6ca400f22acd071532be50da7eae0f4b to a1ddc470cb58e599d16b7a7878cc37a339b47b0f
-  - 5f4573e 2024-01-25T16:04:26+00:00 Add unit tests for function ensureMachineConfigPools
-  - e5071b4 2024-01-25T16:04:26+00:00 Not update migration conditions when any MCP is updating
+- ovn-kubernetes image-arm64 2476c75ade680f6324391be71a6edfe15fb60d98 to e61d7efcc919d441e223d9be34fad8457c25a125
+  - 7a62709 2024-01-25T10:09:10+02:00 Fix LGW ETP=Local on IPv6
 
