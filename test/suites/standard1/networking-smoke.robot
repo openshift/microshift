@@ -20,13 +20,11 @@ ${HOSTNAME}                 hello-microshift.cluster.local
 *** Test Cases ***
 Router Smoke Test
     [Documentation]    Run a router smoke test
-    [Tags]    robot:exclude
     [Setup]    Run Keywords
-    ...    Restart Greenboot And Wait For Success
     ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift Service Via Route
+    ...    Restart Router
 
-    Skip
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}
 
@@ -43,12 +41,11 @@ Load Balancer Smoke Test
 
 Ingress Smoke Test
     [Documentation]    Verify a simple ingress rule correctly exposes HTTP service
-    [Tags]    robot:exclude
     [Setup]    Run Keywords
-    ...    Restart Greenboot And Wait For Success
     ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift
     ...    Create Hello MicroShift Ingress
+    ...    Restart Router
 
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift    ${HTTP_PORT}    path=/principal
@@ -76,6 +73,12 @@ Wait For Service Deletion With Timeout
     ...    of the next. This produces flakey failures when the service or endpoint names collide.
     Wait Until Keyword Succeeds    30s    1s
     ...    Network APIs With Test Label Are Gone
+
+Restart Router
+    [Documentation]    Restart the router and wait for readiness again. The router is sensitive to apiserver
+    ...    downtime and might need a restart (after the apiserver is ready) to resync all the routes.
+    Run With Kubeconfig    oc rollout restart deployment router-default -n openshift-ingress
+    Named Deployment Should Be Available    router-default    openshift-ingress    5m
 
 Network APIs With Test Label Are Gone
     [Documentation]    Check for service and endpoint by "app=hello-microshift" label. Succeeds if response matches

@@ -19,12 +19,10 @@ ${CURSOR}       ${EMPTY}    # The journal cursor before restarting MicroShift
 *** Test Cases ***
 Should Not Find Forbidden
     [Documentation]    Logs should not say "forbidden"
-    [Tags]    robot:exclude
     Pattern Should Not Appear In Log Output    ${CURSOR}    forbidden
 
 Should Not Find Cannot Patch Resource
     [Documentation]    Logs should not say "cannot patch resource"
-    [Tags]    robot:exclude
     Pattern Should Not Appear In Log Output    ${CURSOR}    cannot patch resource
 
 Services Should Not Timeout When Stopping
