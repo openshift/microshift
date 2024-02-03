@@ -80,22 +80,20 @@ func initClusterIDFile(clusterID string) error {
 
 	// Read and verify the cluster ID file if it already exists,
 	// logging a warning if the cluster ID is inconsistent
-	_, err := os.Stat(fileName)
-	if !os.IsNotExist(err) {
-		data, err := os.ReadFile(fileName)
-		if err != nil {
-			// Ignore the error, the file will be overwritten
-			klog.Warningf("Failed to read '%v' file: %v", fileName, err)
-		} else {
-			// Return if the cluster ID is consistent
-			if string(data) == clusterID {
-				return nil
-			}
-			klog.Warningf("Overwriting an inconsistent MicroShift Cluster ID '%v' in '%v' file", string(data), fileName)
+	data, err := os.ReadFile(fileName)
+	if err != nil && !os.IsNotExist(err) {
+		// File exists, but cannot be read
+		return err
+	}
+	if len(data) > 0 {
+		if string(data) == clusterID {
+			// Consistent cluster ID file exists
+			return nil
 		}
+		klog.Warningf("Overwriting an inconsistent MicroShift Cluster ID '%v' in '%v' file", string(data), fileName)
 	}
 
-	// Write the cluster ID to a new file
+	// Write a new cluster ID file
 	klog.Infof("Writing MicroShift Cluster ID '%v' to '%v'", clusterID, fileName)
 	return os.WriteFile(fileName, []byte(clusterID), 0400)
 }
