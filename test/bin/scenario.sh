@@ -140,20 +140,17 @@ sos_report_for_vm() {
     # can't rely on the wrapper being there or working if it
     # is. Copy the script to the host, just in case, along with a
     # wrapper that knows how to execute it or the installed version.
-    # Add anaconda to the list of the plugins to collect information
-    # about failed image installations.
     cat - >/tmp/sos-wrapper.sh <<EOF
 #!/usr/bin/env bash
-PLUGINS=container_log,crio,logs,rpmostree,rpm,anaconda
 if ! hash sos ; then
     echo "WARNING: The sos command does not exist"
 elif [ -f /usr/bin/microshift-sos-report ]; then
-    PLUGINS="\${PLUGINS}" /usr/bin/microshift-sos-report || {
+    /usr/bin/microshift-sos-report || {
         echo "WARNING: The /usr/bin/microshift-sos-report script failed"
     }
 else
     chmod +x /tmp/microshift-sos-report.sh
-    PLUGINS="\${PLUGINS}" PROFILES=network,security /tmp/microshift-sos-report.sh || {
+    PROFILES=network,security /tmp/microshift-sos-report.sh || {
         echo "WARNING: The /tmp/microshift-sos-report.sh script failed"
     }
 fi
@@ -163,7 +160,22 @@ EOF
     copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
     run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
     mkdir -p "${vmdir}/sos"
-    scp "redhat@${ip}:/tmp/sosreport-*" "${vmdir}/sos/" || echo "WARNING: Ignoring an error when copying sos report files"
+    scp "redhat@${ip}:/tmp/sosreport-*" "${vmdir}/sos/" || {
+        echo "WARNING: Ignoring an error when copying sos report files"
+    }
+    # Also copy the logs from the /var/log/anaconda directory to
+    # collect information about potentially failed installations.
+    # Note: we cannot use `anaconda` sos report plugin because
+    # it also includes the kickstart files that may expose the
+    # OpenShift Pull Secret and SSH keys.
+    run_command_on_vm "${vmname}" \
+        "sudo mkdir /tmp/var-log-anaconda && \
+         sudo cp /var/log/anaconda/*.log /tmp/var-log-anaconda/ && \
+         sudo chmod +r /tmp/var-log-anaconda/*.log"
+    mkdir -p "${vmdir}/anaconda"
+    scp "redhat@${ip}:/tmp/var-log-anaconda/*.log" "${vmdir}/anaconda/" || {
+        echo "WARNING: Ignoring an error when copying anaconda logs"
+    }
 }
 
 # Public function to render a unique kickstart from a template for a
