@@ -16,6 +16,7 @@ enforceNodeAllocatable: []
 failSwapOn: false
 featureGates:
   APIPriorityAndFairness: true
+  DisableKubeletCloudCredentialProviders: false
   DownwardAPIHugePages: true
   PodSecurity: true
   RotateKubeletServerCertificate: false # TODO
