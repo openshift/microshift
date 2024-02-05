@@ -1,0 +1,769 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cni-copy-resources
+  namespace: openshift-multus
+  annotations:
+    kubernetes.io/description: |
+      This is a script used to copy CNI binaries based on host OS
+    release.openshift.io/version: "{{.ReleaseVersion}}"
+data:
+  cnibincopy.sh: |-
+    #!/bin/bash
+    set -e
+
+    function log()
+    {
+        echo "$(date --iso-8601=seconds) [cnibincopy] ${1}"
+    }
+
+    DESTINATION_DIRECTORY=/host/opt/cni/bin/
+
+    # Perform validation of usage
+    if [ -z "$RHEL8_SOURCE_DIRECTORY" ] ||
+       [ -z "$RHEL9_SOURCE_DIRECTORY" ] ||
+       [ -z "$DEFAULT_SOURCE_DIRECTORY" ]; then
+      log "FATAL ERROR: You must set env variables: RHEL8_SOURCE_DIRECTORY, RHEL9_SOURCE_DIRECTORY, DEFAULT_SOURCE_DIRECTORY"
+      exit 1
+    fi
+
+    if [ ! -d "$DESTINATION_DIRECTORY" ]; then
+      log "FATAL ERROR: Destination directory ($DESTINATION_DIRECTORY) does not exist"
+      exit 1
+    fi
+
+    # Collect host OS information
+    . /host/etc/os-release
+    rhelmajor=
+    # detect which version we're using in order to copy the proper binaries
+    case "${ID}" in
+      rhcos|scos)
+        RHEL_VERSION=$(echo "${CPE_NAME}" | cut -f 5 -d :)
+        rhelmajor=$(echo $RHEL_VERSION | sed -E 's/([0-9]+)\.{1}[0-9]+(\.[0-9]+)?/\1/')
+      ;;
+      rhel) rhelmajor=$(echo "${VERSION_ID}" | cut -f 1 -d .)
+      ;;
+      fedora)
+        if [ "${VARIANT_ID}" == "coreos" ]; then
+          rhelmajor=8
+        else
+          log "FATAL ERROR: Unsupported Fedora variant=${VARIANT_ID}"
+          exit 1
+        fi
+      ;;
+      *) log "FATAL ERROR: Unsupported OS ID=${ID}"; exit 1
+      ;;
+    esac
+
+    # Set which directory we'll copy from, detect if it exists
+    sourcedir=
+    founddir=false
+    case "${rhelmajor}" in
+      8)
+        if [ -d "${RHEL8_SOURCE_DIRECTORY}" ]; then
+          sourcedir=${RHEL8_SOURCE_DIRECTORY}
+          founddir=true
+        fi
+      ;;
+      9)
+        if [ -d "${RHEL9_SOURCE_DIRECTORY}" ]; then
+          sourcedir=${RHEL9_SOURCE_DIRECTORY}
+          founddir=true
+        fi
+      ;;
+      *)
+        log "ERROR: RHEL Major Version Unsupported, rhelmajor=${rhelmajor}"
+      ;;
+    esac
+
+    # When it doesn't exist, fall back to the original directory.
+    if [ "$founddir" == false ]; then
+      log "Source directory unavailable for OS version: ${rhelmajor}"
+      sourcedir=$DEFAULT_SOURCE_DIRECTORY
+    fi
+
+    # Use a subdirectory called "upgrade" so we can atomically move fully copied files.
+    # We now use --remove-destination after running into an issue with -f not working over symlinks
+    UPGRADE_DIRECTORY=${DESTINATION_DIRECTORY}upgrade_$(uuidgen)
+    rm -Rf $UPGRADE_DIRECTORY
+    mkdir -p $UPGRADE_DIRECTORY
+    cp -r --remove-destination ${sourcedir}* $UPGRADE_DIRECTORY
+    if [ $? -eq 0 ]; then
+      log "Successfully copied files in ${sourcedir} to $UPGRADE_DIRECTORY"
+    else
+      log "Failed to copy files in ${sourcedir} to $UPGRADE_DIRECTORY"
+      rm -Rf $UPGRADE_DIRECTORY
+      exit 1
+    fi
+    mv -f $UPGRADE_DIRECTORY/* ${DESTINATION_DIRECTORY}/
+    if [ $? -eq 0 ]; then
+      log "Successfully moved files in $UPGRADE_DIRECTORY to ${DESTINATION_DIRECTORY}"
+    else
+      log "Failed to move files in $UPGRADE_DIRECTORY to ${DESTINATION_DIRECTORY}"
+      rm -Rf $UPGRADE_DIRECTORY
+      exit 1
+    fi
+    rm -Rf $UPGRADE_DIRECTORY
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: multus-daemon-config
+  namespace: openshift-multus
+  labels:
+    tier: node
+    app: multus
+data:
+  daemon-config.json: |
+    {
+        "cniVersion": "0.3.1",
+        "chrootDir": "/hostroot",
+        "logToStderr": true,
+        "logLevel": "verbose",
+        "binDir": "{{ .CNIBinDir }}",
+{{ if .NETWORK_NODE_IDENTITY_ENABLE }}
+        "perNodeCertificate": {
+          "enabled": true,
+          "bootstrapKubeconfig": "{{ .KubeletKubeconfigPath }}",
+          "certDir": "/etc/cni/multus/certs",
+          "certDuration": "24h"
+        },
+{{ end }}
+        "cniConfigDir": "/host/etc/cni/net.d",
+        "multusConfigFile": "auto",
+        "multusAutoconfigDir": "/host/run/multus/cni/net.d",
+        "namespaceIsolation": true,
+        "globalNamespaces": "default,openshift-multus,openshift-sriov-network-operator",
+{{- if eq .DefaultNetworkType "OpenShiftSDN"}}
+        "readinessindicatorfile": "/host/run/multus/cni/net.d/80-openshift-network.conf",
+{{- else if eq .DefaultNetworkType "OVNKubernetes"}}
+        "readinessindicatorfile": "/host/run/multus/cni/net.d/10-ovn-kubernetes.conf",
+{{- end}}
+        "daemonSocketDir": "/run/multus/socket",
+        "socketDir": "/host{{ .MultusSocketParentDir }}/socket"
+    }
+{{- if .IsNetworkTypeLiveMigration}}
+  daemon-config-lm-ovn.json: |
+    {
+        "cniVersion": "0.3.1",
+        "chrootDir": "/hostroot",
+        "logToStderr": true,
+        "logLevel": "verbose",
+        "binDir": "{{ .CNIBinDir }}",
+{{ if .NETWORK_NODE_IDENTITY_ENABLE }}
+        "perNodeCertificate": {
+          "enabled": true,
+          "bootstrapKubeconfig": "{{ .KubeletKubeconfigPath }}",
+          "certDir": "/etc/cni/multus/certs",
+          "certDuration": "24h"
+        },
+{{ end }}
+        "cniConfigDir": "/host/etc/cni/net.d",
+        "multusConfigFile": "auto",
+        "multusAutoconfigDir": "/host/run/multus/cni/net.d",
+        "namespaceIsolation": true,
+        "globalNamespaces": "default,openshift-multus,openshift-sriov-network-operator",
+        "readinessindicatorfile": "/host/run/multus/cni/net.d/10-ovn-kubernetes.conf",
+        "daemonSocketDir": "/run/multus/socket",
+        "socketDir": "/host{{ .MultusSocketParentDir }}/socket"
+    }
+  daemon-config-lm-sdn.json: |
+    {
+        "cniVersion": "0.3.1",
+        "chrootDir": "/hostroot",
+        "logToStderr": true,
+        "logLevel": "verbose",
+        "binDir": "{{ .CNIBinDir }}",
+{{ if .NETWORK_NODE_IDENTITY_ENABLE }}
+        "perNodeCertificate": {
+          "enabled": true,
+          "bootstrapKubeconfig": "{{ .KubeletKubeconfigPath }}",
+          "certDir": "/etc/cni/multus/certs",
+          "certDuration": "24h"
+        },
+{{ end }}
+        "cniConfigDir": "/host/etc/cni/net.d",
+        "multusConfigFile": "auto",
+        "multusAutoconfigDir": "/host/run/multus/cni/net.d",
+        "namespaceIsolation": true,
+        "globalNamespaces": "default,openshift-multus,openshift-sriov-network-operator",
+        "readinessindicatorfile": "/host/run/multus/cni/net.d/80-openshift-network.conf",
+        "daemonSocketDir": "/run/multus/socket",
+        "socketDir": "/host{{ .MultusSocketParentDir }}/socket"
+    }
+{{- end}}
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: multus
+  namespace: openshift-multus
+  annotations:
+    kubernetes.io/description: |
+      This daemon set launches the Multus networking component on each node.
+    release.openshift.io/version: "{{.ReleaseVersion}}"
+spec:
+  selector:
+    matchLabels:
+      app: multus
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: multus
+        component: network
+        type: infra
+        openshift.io/component: network
+    spec:
+      hostNetwork: true
+      hostPID: true
+      nodeSelector:
+        kubernetes.io/os: linux
+{{ if not .NETWORK_NODE_IDENTITY_ENABLE }}
+      serviceAccountName: multus
+{{ end }}
+      priorityClassName: "system-node-critical"
+      tolerations:
+      - operator: Exists
+      containers:
+      - name: kube-multus
+        image: {{.MultusImage}}
+        command: [ "/bin/bash", "-ec", "--" ]
+        args:
+          - >
+            MULTUS_DAEMON_OPT=""
+{{ if .IsNetworkTypeLiveMigration }}
+            if ip link show br-ex; then
+              MULTUS_DAEMON_OPT="--config /etc/cni/net.d/multus.d/daemon-config-lm-ovn.json"
+            else
+              MULTUS_DAEMON_OPT="--config /etc/cni/net.d/multus.d/daemon-config-lm-sdn.json"
+            fi
+{{ end }}
+            /entrypoint/cnibincopy.sh;
+            exec /usr/src/multus-cni/bin/multus-daemon $MULTUS_DAEMON_OPT
+        resources:
+          requests:
+            cpu: 10m
+            memory: 65Mi
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /entrypoint
+          name: cni-binary-copy
+        - mountPath: /host/etc/os-release
+          name: os-release
+        - name: system-cni-dir
+          mountPath: /host/etc/cni/net.d
+        - name: multus-cni-dir
+          mountPath: /host/run/multus/cni/net.d
+        - name: cnibin
+          mountPath: /host/opt/cni/bin
+        - name: multus-socket-dir-parent
+          mountPath: /host{{ .MultusSocketParentDir }}
+          mountPropagation: HostToContainer
+        # device-info
+        - name: host-run-k8s-cni-cncf-io
+          mountPath: /run/k8s.cni.cncf.io
+        - name: host-run-netns
+          mountPath: /run/netns
+          mountPropagation: HostToContainer
+        - name: host-var-lib-cni-bin
+          mountPath: /var/lib/cni/bin
+        # cni cache dir
+        - name: host-var-lib-cni-multus
+          mountPath: /var/lib/cni/multus
+        # kubelet socket
+        - name: host-var-lib-kubelet
+          mountPath: /var/lib/kubelet
+        - name: hostroot
+          mountPath: /hostroot
+          mountPropagation: HostToContainer
+        - name: multus-conf-dir
+          mountPath: /etc/cni/multus/net.d
+        - name: multus-daemon-config
+          mountPath: /etc/cni/net.d/multus.d
+          readOnly: true
+        - name: host-run-multus-certs
+          mountPath: /etc/cni/multus/certs
+        - name: etc-kubernetes
+          mountPath: /etc/kubernetes
+        env:
+        - name: RHEL8_SOURCE_DIRECTORY
+          value: "/usr/src/multus-cni/rhel8/bin/"
+        - name: RHEL9_SOURCE_DIRECTORY
+          value: "/usr/src/multus-cni/rhel9/bin/"
+        - name: DEFAULT_SOURCE_DIRECTORY
+          value: "/usr/src/multus-cni/bin/"
+        - name: KUBERNETES_SERVICE_PORT
+          value: "{{.KUBERNETES_SERVICE_PORT}}"
+        - name: KUBERNETES_SERVICE_HOST
+          value: "{{.KUBERNETES_SERVICE_HOST}}"
+        - name: MULTUS_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+{{ if .HTTP_PROXY }}
+        - name: "HTTP_PROXY"
+          value: "{{ .HTTP_PROXY}}"
+{{ end }}
+{{ if .HTTPS_PROXY }}
+        - name: "HTTPS_PROXY"
+          value: "{{ .HTTPS_PROXY}}"
+{{ end }}
+{{ if .NO_PROXY }}
+        - name: "NO_PROXY"
+          value: "{{ .NO_PROXY}}"
+{{ end }}
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: system-cni-dir
+          hostPath:
+            path: {{ .SystemCNIConfDir }}
+            type: Directory
+        - name: multus-cni-dir
+          hostPath:
+            path: {{ .MultusCNIConfDir }}
+            type: Directory
+        - name: cnibin
+          hostPath:
+            path: {{ .CNIBinDir }}
+            type: Directory
+        - name: os-release
+          hostPath:
+            path: /etc/os-release
+            type: File
+        - name: cni-binary-copy
+          configMap:
+            name: cni-copy-resources
+            defaultMode: 0744
+        - name: multus-socket-dir-parent
+          hostPath:
+            path: {{ .MultusSocketParentDir }}
+            type: DirectoryOrCreate
+        # device-info
+        - name: host-run-k8s-cni-cncf-io
+          hostPath:
+            path: /run/k8s.cni.cncf.io
+        - name: host-run-netns
+          hostPath:
+            path: /run/netns/
+        - name: host-var-lib-cni-bin
+          hostPath:
+            path: /var/lib/cni/bin
+        # cni cache dir
+        - name: host-var-lib-cni-multus
+          hostPath:
+            path: /var/lib/cni/multus
+        # kubelet socket
+        - name: host-var-lib-kubelet
+          hostPath:
+            path: /var/lib/kubelet
+        - name: hostroot
+          hostPath:
+            path: /
+        - name: multus-conf-dir
+          hostPath:
+            path: /etc/cni/multus/net.d
+        - name: multus-daemon-config
+          configMap:
+            name: multus-daemon-config
+            items:
+            - key: daemon-config.json
+              path: daemon-config.json
+{{ if .IsNetworkTypeLiveMigration }}
+            - key: daemon-config-lm-ovn.json
+              path: daemon-config-lm-ovn.json
+            - key: daemon-config-lm-sdn.json
+              path: daemon-config-lm-sdn.json
+{{ end }}
+        - name: host-run-multus-certs
+          hostPath:
+            path: /etc/cni/multus/certs
+        - name: etc-kubernetes
+          hostPath:
+            path: /etc/kubernetes
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: multus-additional-cni-plugins
+  namespace: openshift-multus
+  annotations:
+    kubernetes.io/description: |
+      This daemon installs and configures auxiliary CNI plugins on each node.
+    release.openshift.io/version: "{{.ReleaseVersion}}"
+spec:
+  selector:
+    matchLabels:
+      app: multus-additional-cni-plugins
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: multus-additional-cni-plugins
+        component: network
+        type: infra
+        openshift.io/component: network
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: "system-node-critical"
+      tolerations:
+      - operator: Exists
+      serviceAccountName: multus-ancillary-tools
+      initContainers:
+      - name: egress-router-binary-copy
+        image: {{.EgressRouterImage}}
+        command: ["/entrypoint/cnibincopy.sh"]
+        volumeMounts:
+        - mountPath: /entrypoint
+          name: cni-binary-copy
+        - mountPath: /host/opt/cni/bin
+          name: cnibin
+        - mountPath: /host/etc/os-release
+          name: os-release
+          readOnly: true
+        env:
+        - name: RHEL8_SOURCE_DIRECTORY
+          value: "/usr/src/egress-router-cni/rhel8/bin/"
+        - name: RHEL9_SOURCE_DIRECTORY
+          value: "/usr/src/egress-router-cni/rhel9/bin/"
+        - name: DEFAULT_SOURCE_DIRECTORY
+          value: "/usr/src/egress-router-cni/bin/"
+      - name: cni-plugins
+        image: {{.CNIPluginsImage}}
+        command: ["/bin/bash", "-c", "/entrypoint/cnibincopy.sh && cp -n /sysctls/allowlist.conf /host/etc/cni/tuning/"]
+        volumeMounts:
+        - mountPath: /entrypoint
+          name: cni-binary-copy
+        - mountPath: /host/opt/cni/bin
+          name: cnibin
+        - mountPath: /host/etc/os-release
+          name: os-release
+          readOnly: true
+        - mountPath: /host/etc/cni/tuning/
+          name: tuning-conf-dir
+          readOnly: false
+        - mountPath: /sysctls
+          name: cni-sysctl-allowlist
+        env:
+        - name: RHEL8_SOURCE_DIRECTORY
+          value: "/usr/src/plugins/rhel8/bin/"
+        - name: RHEL9_SOURCE_DIRECTORY
+          value: "/usr/src/plugins/rhel9/bin/"
+        - name: DEFAULT_SOURCE_DIRECTORY
+          value: "/usr/src/plugins/bin/"
+      - name: bond-cni-plugin
+        image: {{.BondCNIPluginImage}}
+        command: ["/entrypoint/cnibincopy.sh"]
+        volumeMounts:
+        - mountPath: /entrypoint
+          name: cni-binary-copy
+        - mountPath: /host/opt/cni/bin
+          name: cnibin
+        - mountPath: /host/etc/os-release
+          name: os-release
+          readOnly: true
+        env:
+        - name: RHEL8_SOURCE_DIRECTORY
+          value: "/bondcni/rhel8/"
+        - name: RHEL9_SOURCE_DIRECTORY
+          value: "/bondcni/rhel9/"
+        - name: DEFAULT_SOURCE_DIRECTORY
+          value: "/bondcni/rhel9/"
+      - name: routeoverride-cni
+        image: {{.RouteOverrideImage}}
+        command: ["/entrypoint/cnibincopy.sh"]
+        volumeMounts:
+        - mountPath: /entrypoint
+          name: cni-binary-copy
+        - mountPath: /host/opt/cni/bin
+          name: cnibin
+        - mountPath: /host/etc/os-release
+          name: os-release
+          readOnly: true
+        env:
+        - name: RHEL8_SOURCE_DIRECTORY
+          value: "/usr/src/route-override/rhel8/bin/"
+        - name: RHEL9_SOURCE_DIRECTORY
+          value: "/usr/src/route-override/rhel9/bin/"
+        - name: DEFAULT_SOURCE_DIRECTORY
+          value: "/usr/src/route-override/bin/"
+      - name: whereabouts-cni-bincopy
+        image: {{.WhereaboutsImage}}
+        command: ["/entrypoint/cnibincopy.sh"]
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - mountPath: /entrypoint
+          name: cni-binary-copy
+        - mountPath: /host/opt/cni/bin
+          name: cnibin
+        - mountPath: /host/etc/os-release
+          name: os-release
+          readOnly: true
+        env:
+        - name: RHEL8_SOURCE_DIRECTORY
+          value: "/usr/src/whereabouts/rhel8/bin/"
+        - name: RHEL9_SOURCE_DIRECTORY
+          value: "/usr/src/whereabouts/rhel9/bin/"
+        - name: DEFAULT_SOURCE_DIRECTORY
+          value: "/usr/src/whereabouts/bin/"
+      - name: whereabouts-cni
+        image: {{.WhereaboutsImage}}
+        command:
+          - /bin/sh
+          - -c
+          - |
+            #!/bin/sh
+
+            set -u -e
+
+            CNI_BIN_DIR=${CNI_BIN_DIR:-"/host/opt/cni/bin/"}
+            WHEREABOUTS_KUBECONFIG_FILE_HOST=${WHEREABOUTS_KUBECONFIG_FILE_HOST:-"/etc/cni/net.d/whereabouts.d/whereabouts.kubeconfig"}
+            CNI_CONF_DIR=${CNI_CONF_DIR:-"/host/etc/cni/net.d"}
+
+            # Make a whereabouts.d directory (for our kubeconfig)
+
+            mkdir -p $CNI_CONF_DIR/whereabouts.d
+            WHEREABOUTS_KUBECONFIG=$CNI_CONF_DIR/whereabouts.d/whereabouts.kubeconfig
+            WHEREABOUTS_GLOBALCONFIG=$CNI_CONF_DIR/whereabouts.d/whereabouts.conf
+
+            # ------------------------------- Generate a "kube-config"
+            SERVICE_ACCOUNT_PATH=/var/run/secrets/kubernetes.io/serviceaccount
+            KUBE_CA_FILE=${KUBE_CA_FILE:-$SERVICE_ACCOUNT_PATH/ca.crt}
+            SERVICEACCOUNT_TOKEN=$(cat $SERVICE_ACCOUNT_PATH/token)
+            SKIP_TLS_VERIFY=${SKIP_TLS_VERIFY:-false}
+
+
+            # Check if we're running as a k8s pod.
+            if [ -f "$SERVICE_ACCOUNT_PATH/token" ]; then
+              # We're running as a k8d pod - expect some variables.
+              if [ -z ${KUBERNETES_SERVICE_HOST} ]; then
+                error "KUBERNETES_SERVICE_HOST not set"; exit 1;
+              fi
+              if [ -z ${KUBERNETES_SERVICE_PORT} ]; then
+                error "KUBERNETES_SERVICE_PORT not set"; exit 1;
+              fi
+
+              if [ "$SKIP_TLS_VERIFY" == "true" ]; then
+                TLS_CFG="insecure-skip-tls-verify: true"
+              elif [ -f "$KUBE_CA_FILE" ]; then
+                TLS_CFG="certificate-authority-data: $(cat $KUBE_CA_FILE | base64 | tr -d '\n')"
+              fi
+
+              # Write a kubeconfig file for the CNI plugin.  Do this
+              # to skip TLS verification for now.  We should eventually support
+              # writing more complete kubeconfig files. This is only used
+              # if the provided CNI network config references it.
+              touch $WHEREABOUTS_KUBECONFIG
+              chmod ${KUBECONFIG_MODE:-600} $WHEREABOUTS_KUBECONFIG
+              cat > $WHEREABOUTS_KUBECONFIG <<EOF
+            # Kubeconfig file for Multus CNI plugin.
+            apiVersion: v1
+            kind: Config
+            clusters:
+            - name: local
+              cluster:
+                server: ${KUBERNETES_SERVICE_PROTOCOL:-https}://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}
+                $TLS_CFG
+            users:
+            - name: whereabouts
+              user:
+                token: "${SERVICEACCOUNT_TOKEN}"
+            contexts:
+            - name: whereabouts-context
+              context:
+                cluster: local
+                user: whereabouts
+                namespace: ${WHEREABOUTS_NAMESPACE}
+            current-context: whereabouts-context
+            EOF
+
+            # Kubeconfig file for Whereabouts CNI plugin.
+            cat > $WHEREABOUTS_GLOBALCONFIG <<EOF
+            {
+              "datastore": "kubernetes",
+              "kubernetes": {
+                "kubeconfig": "/etc/kubernetes/cni/net.d/whereabouts.d/whereabouts.kubeconfig"
+              },
+              "reconciler_cron_expression": "30 4 * * *",
+              "log_level": "debug"
+            }
+            EOF
+
+            else
+              warn "Doesn't look like we're running in a kubernetes environment (no serviceaccount token)"
+            fi
+
+            # copy whereabouts to the cni bin dir
+            # SKIPPED DUE TO FIPS COPY.
+            # cp -f /whereabouts $CNI_BIN_DIR
+
+            # ---------------------- end Generate a "kube-config".
+
+            # Unless told otherwise, sleep forever.
+            # This prevents Kubernetes from restarting the pod repeatedly.
+            should_sleep=${SLEEP:-"true"}
+            echo "Done configuring CNI.  Sleep=$should_sleep"
+            while [ "$should_sleep" == "true"  ]; do
+                sleep 1000000000000
+            done
+
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - mountPath: /host/opt/cni/bin
+          name: cnibin
+        - name: system-cni-dir
+          mountPath: /host/etc/cni/net.d
+        env:
+        - name: KUBERNETES_SERVICE_PORT
+          value: "{{.KUBERNETES_SERVICE_PORT}}"
+        - name: KUBERNETES_SERVICE_HOST
+          value: "{{.KUBERNETES_SERVICE_HOST}}"
+        - name: CNI_BIN_DIR
+          value: "/host/opt/cni/bin/"
+        - name: CNI_CONF_DIR
+          value: "/host/etc/cni/net.d"
+        - name: SLEEP
+          value: "false"
+        - name: WHEREABOUTS_NAMESPACE
+          value: "openshift-multus"
+      containers:
+      - name: kube-multus-additional-cni-plugins
+        image: {{.MultusImage}}
+        command: [ "/bin/bash", "-ec", "--" ]
+        args:
+          - >
+            trap : TERM INT; sleep infinity & wait
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        securityContext:
+          privileged: true
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: system-cni-dir
+          hostPath:
+            path: {{ .SystemCNIConfDir }}
+        - name: multus-cni-dir
+          hostPath:
+            path: {{ .MultusCNIConfDir }}
+        - name: cnibin
+          hostPath:
+            path: {{ .CNIBinDir }}
+        - name: os-release
+          hostPath:
+            path: /etc/os-release
+            type: File
+        - name: cni-binary-copy
+          configMap:
+            name: cni-copy-resources
+            defaultMode: 0744
+        - hostPath:
+            path: /etc/cni/tuning/
+            type: DirectoryOrCreate
+          name: tuning-conf-dir
+        - name: cni-sysctl-allowlist
+          configMap:
+            name: {{.CniSysctlAllowlist}}
+            defaultMode: 0744
+{{if .RenderIpReconciler}}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: whereabouts-reconciler
+  namespace: openshift-multus
+  annotations:
+    release.openshift.io/version: "{{.ReleaseVersion}}"
+spec:
+  selector:
+    matchLabels:
+      name: whereabouts-reconciler
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app: whereabouts-reconciler
+        name: whereabouts-reconciler
+    spec:
+      hostNetwork: true      
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: multus-ancillary-tools
+      priorityClassName: "system-node-critical"
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: whereabouts
+        command: [ "/bin/sh" ]
+        args:
+          - -c
+          - >
+            /usr/src/whereabouts/bin/entrypoint.sh -log-level debug
+        image: {{.WhereaboutsImage}}
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "50Mi"
+        volumeMounts:
+          - name: cni-net-dir
+            mountPath: /host/etc/cni/net.d
+          - name: cron-scheduler-configmap
+            mountPath: /cron-schedule
+        env:
+        - name: NODENAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: WHEREABOUTS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KUBERNETES_SERVICE_PORT
+          value: "{{.KUBERNETES_SERVICE_PORT}}"
+        - name: KUBERNETES_SERVICE_HOST
+          value: "{{.KUBERNETES_SERVICE_HOST}}"
+      volumes:
+        - name: cni-net-dir
+          hostPath:
+            path: {{ .SystemCNIConfDir }}
+        - name: cron-scheduler-configmap
+          configMap:
+            name: whereabouts-config
+            optional: true
+            defaultMode: 0744
+            items:
+            - key: reconciler_cron_expression
+              path: config
+{{- end}}
