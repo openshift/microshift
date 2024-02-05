@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 
@@ -53,6 +54,8 @@ func (s *KubeScheduler) configure(cfg *config.Config) {
 	s.options.ConfigFile = filepath.Join(config.DataDir, "/resources/kube-scheduler/config/config.yaml")
 	s.options.Authentication.RemoteKubeConfigFile = cfg.KubeConfigPath(config.KubeScheduler)
 	s.options.Authorization.RemoteKubeConfigFile = cfg.KubeConfigPath(config.KubeScheduler)
+	s.options.SecureServing.MinTLSVersion = string(fixedTLSProfile.MinTLSVersion)
+	s.options.SecureServing.CipherSuites = crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers)
 	s.kubeconfig = cfg.KubeConfigPath(config.KubeScheduler)
 }
 
