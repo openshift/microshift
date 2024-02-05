@@ -56,6 +56,7 @@ Verify MicroShift Runs Only On Primary NIC
     Disable Interface    ${NIC2_NAME}
 
     Restart MicroShift
+    Restart Greenboot And Wait For Success
 
     Verify MicroShift On Single NIC    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
 

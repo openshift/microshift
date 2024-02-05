@@ -66,4 +66,11 @@ ln -sf /dev/null /etc/systemd/user/grub-boot-success.timer
 # Disable SELinux enforcement for the qemu-guest-agent
 sudo semanage permissive -a virt_qemu_ga_t
 
+
+# Force configuration for inotify watches, which are used when interacting with the
+# apiserver, as in getting logs, for example. These are the same defaults as OCP uses.
+echo "fs.inotify.max_user_watches = 65536" >> /etc/sysctl.conf
+echo "fs.inotify.max_user_instances = 8192" >> /etc/sysctl.conf
+sysctl --system
+
 %end
