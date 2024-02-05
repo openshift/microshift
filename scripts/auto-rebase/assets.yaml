@@ -245,3 +245,15 @@ assets:
         ignore: "gets generated during image rebase"
       - file: release-olm-x86_64.json
         ignore: "gets generated during image rebase"
+
+  - dir: optional/multus/
+    ignore: "they don't exist in upstream repository - only in microshift"
+    files:
+      - file: kustomization.yaml
+      - file: 00-namespace.yaml
+      - file: 01-crd-networkattachmentdefinition.yaml
+      - file: 02-service-account.yaml
+      - file: 03-cluster-role.yaml
+      - file: 04-cluster-role-binding.yaml
+      - file: 05-configmap.yaml
+      - file: 06-daemonset.yaml

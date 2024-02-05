@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cni-copy-resources
+  namespace: openshift-multus
+  annotations:
+    kubernetes.io/description: |
+      This is a script used to copy CNI binaries based on host OS
+data:
+  cnibincopy.sh: |-
+    #!/bin/bash
+    set -ex
+    function log()
+    {
+        echo "$(date --iso-8601=seconds) [cnibincopy] ${1}"
+    }
+    DESTINATION_DIRECTORY=/host/opt/cni/bin/
+    # Perform validation of usage
+    if [ -z "$DEFAULT_SOURCE_DIRECTORY" ]; then
+      log "FATAL ERROR: You must set env variables: DEFAULT_SOURCE_DIRECTORY"
+      exit 1
+    fi
+    if [ -z "$BINARIES_TO_COPY" ]; then
+      log "FATAL ERROR: You must set env variables: BINARIES_TO_COPY"
+      exit 1
+    fi
+    if [ ! -d "$DESTINATION_DIRECTORY" ]; then
+      log "FATAL ERROR: Destination directory ($DESTINATION_DIRECTORY) does not exist"
+      exit 1
+    fi
+    # Set which directory we'll copy from, detect if it exists
+    sourcedir="$DEFAULT_SOURCE_DIRECTORY"
+    # Use a subdirectory called "upgrade" so we can atomically move fully copied files.
+    # We now use --remove-destination after running into an issue with -f not working over symlinks
+    UPGRADE_DIRECTORY=${DESTINATION_DIRECTORY}upgrade_$(uuidgen)
+    rm -Rf $UPGRADE_DIRECTORY
+    mkdir -p $UPGRADE_DIRECTORY
+    eval cp --remove-destination ${sourcedir}/${BINARIES_TO_COPY} $UPGRADE_DIRECTORY
+    if [ $? -eq 0 ]; then
+      log "Successfully copied files in ${sourcedir}/${BINARIES_TO_COPY} to $UPGRADE_DIRECTORY"
+    else
+      log "Failed to copy files in ${sourcedir}/${BINARIES_TO_COPY} to $UPGRADE_DIRECTORY"
+      rm -Rf $UPGRADE_DIRECTORY
+      exit 1
+    fi
+    mv -f $UPGRADE_DIRECTORY/* ${DESTINATION_DIRECTORY}/
+    if [ $? -eq 0 ]; then
+      log "Successfully moved files in $UPGRADE_DIRECTORY to ${DESTINATION_DIRECTORY}"
+    else
+      log "Failed to move files in $UPGRADE_DIRECTORY to ${DESTINATION_DIRECTORY}"
+      rm -Rf $UPGRADE_DIRECTORY
+      exit 1
+    fi
+    rm -Rf $UPGRADE_DIRECTORY
