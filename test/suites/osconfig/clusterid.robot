@@ -86,7 +86,7 @@ Get MicroShift Cluster ID From Namespace
 Tamper With Cluster ID File
     [Documentation]    Append invalid characters to the cluster ID file.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    echo -n 123 >> ${CLUSTERID_FILE}
+    ...    sed -i '$ s/$/123/' ${CLUSTERID_FILE}
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
 
     Should Be Equal As Integers    0    ${rc}
