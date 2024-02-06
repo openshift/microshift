@@ -40,21 +40,25 @@ Should Find MicroShift Is Ready
     [Tags]    robot:exclude
     Pattern Should Appear In Log Output    ${CURSOR}    MICROSHIFT READY
 
-
 *** Keywords ***
 Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
     Login MicroShift Host
-    Setup Kubeconfig    # for readiness checks
+    Stop MicroShift
+    Cleanup MicroShift    --all    --keep-images
     # Save the journal cursor then restart MicroShift so we capture
     # the shutdown messages and startup messages.
     ${cursor}=    Get Journal Cursor
     Set Suite Variable    \${CURSOR}    ${cursor}
-    Restart MicroShift
+    Setup Kubeconfig    # for readiness checks
+    Start MicroShift
+    Wait For MicroShift Service
     Restart Greenboot And Wait For Success
+    Stop MicroShift
 
 Teardown
     [Documentation]    Test suite teardown
+    Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
