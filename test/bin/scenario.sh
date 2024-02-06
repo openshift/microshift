@@ -478,6 +478,14 @@ launch_vm() {
     if ${vm_created} ; then
         record_junit "${vmname}" "install_vm" "OK"
     else
+        # Make sure to stop the VM on error before the control is returned.
+        # This is necessary not to leave running qemu child processes so that
+        # the caller considers the script fully complete.
+        # Note: this option is disabled automatically in interactive sessions
+        # for easier troubleshooting of failed installations.
+        if [ ! -t 0 ] ; then
+            sudo virsh destroy "${full_vmname}" || true
+        fi
         record_junit "${vmname}" "install_vm" "FAILED"
         return 1
     fi
