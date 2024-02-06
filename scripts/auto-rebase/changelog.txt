@@ -1,33 +1,13 @@
-- cluster-ingress-operator embedded-component 611011bdc0586878923efe69a3c2f6caa885dbc4 to 0106cb99b340a2f266a88700b4250f11457ffb05
-  - 712833e 2024-02-01T19:04:16-05:00 Add/Update unit tests
-  - 6ff9dfe 2024-02-01T19:04:16-05:00 Set DNSManagementPolicy to Unmanaged when BYO DNS is enabled
-  - 25b11d7 2024-02-01T19:04:16-05:00 Update GCPPlatformStatus with Ingress LB IPs when BYO DNS is enabled
-  - 13a81e9 2024-02-01T19:04:16-05:00 Updating openshift/api to bring in changes for BYO DNS for GCP
+- cluster-network-operator embedded-component 27b1909acb2089081586a0b98accab42d13877cb to ae281369ae346035cab4d917fc66a2fe73c8f3ca
+  - a0e8b19 2024-02-05T10:01:13+01:00 Bump openshift API
 
-- cluster-network-operator embedded-component a1ddc470cb58e599d16b7a7878cc37a339b47b0f to 27b1909acb2089081586a0b98accab42d13877cb
-  - fb1463e 2024-02-01T08:58:26+00:00 Only allow live migration on managed clusters excl. hypershift
-  - 5098043 2024-01-26T16:09:42+00:00 add kyrtapz as reviewer and approver for release 4.15
+- cluster-openshift-controller-manager-operator embedded-component e87e15acee1bbdbc1663aec1bda9517a876023f2 to 1ba446b3a9003d6069a7a2f55b2616b6892729bc
+  - 39a2554 2024-02-04T02:46:05+00:00 Replace 'coreydaley' with 'sayan-biswas'
 
-- kubernetes embedded-component 0fb47263bee9d427fb36e6581023d40bce8933d1 to a373c1b300997632785f46d5b570216df6c006ef
-  - 5c9c252a5 2024-02-02T16:41:10+00:00 UPSTREAM: <carry>: loosen authentication.spec.type validation
+- machine-config-operator embedded-component 16924e6a734a74060f844834b1ab5b0101b1bf41 to 10d332cfb4863f76fcba02b892180d848fff486d
+  - 6935443e 2024-02-02T15:58:20+00:00 Add quotes around image reference in resolv-prepender
+  - 465db3fc 2024-02-02T15:58:20+00:00 OCPBUGS-25753: Run resolv-prepender entirely async
 
-- machine-config-operator embedded-component 90cab989d0062333daea41c24596e35385ef1ea0 to 16924e6a734a74060f844834b1ab5b0101b1bf41
-  - 7d1b8cf7 2024-02-01T08:53:54-05:00 Annotate coreDNS static pods for workload partitioning
-  - 381fc2ae 2024-02-01T02:08:03-05:00 Add tests to verify rendering of cloud-platforms-alt-dns manifests
-  - fc5f4be9 2024-02-01T02:07:13-05:00 Start in-cluster CoreDNS pod for some cloud platforms
-  - 0d753af9 2024-02-01T02:05:50-05:00 Add new namespace openshift-cloud-platform-infra
-  - 20882ed6 2024-02-01T02:02:36-05:00 Start in-cluster CoreDNS pod on bootstrap node for some cloud platforms
-  - 34fa68d7 2024-01-31T18:56:54-05:00 Update manifests
-  - ac34c238 2024-01-31T16:11:38-05:00 Update list of featureGates
-  - f62944f0 2024-01-31T11:34:12-05:00 Update vendoring
-  - a8c59c0c 2024-01-31T11:32:06-05:00 Update go.mod to bring the latest from openshift/api
-
-- ovn-kubernetes image-amd64 2476c75ade680f6324391be71a6edfe15fb60d98 to e61d7efcc919d441e223d9be34fad8457c25a125
-  - 7a62709 2024-01-25T10:09:10+02:00 Fix LGW ETP=Local on IPv6
-
-- kubernetes image-amd64 0fb47263bee9d427fb36e6581023d40bce8933d1 to a373c1b300997632785f46d5b570216df6c006ef
-  - 5c9c252a5 2024-02-02T16:41:10+00:00 UPSTREAM: <carry>: loosen authentication.spec.type validation
-
-- kubernetes image-arm64 0fb47263bee9d427fb36e6581023d40bce8933d1 to a373c1b300997632785f46d5b570216df6c006ef
-  - 5c9c252a5 2024-02-02T16:41:10+00:00 UPSTREAM: <carry>: loosen authentication.spec.type validation
+- openshift-controller-manager embedded-component 2a28a78279b127075b399a3442a2042f4a7d190d to 87d251169278f61434749fc17991b45cbcb53b15
+  - b7dcbda 2024-02-04T02:46:28+00:00 Update OWNERS
 
