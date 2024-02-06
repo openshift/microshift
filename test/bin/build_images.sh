@@ -246,6 +246,7 @@ do_group() {
     local build_name
     local buildid
     local buildid_list=()
+    local download_opts=()
     local builds_to_get=""
     local parent
     local parent_args
@@ -381,7 +382,70 @@ do_group() {
         done
     fi
 
-    if (( ${#buildid_list[@]} )); then
+    if ${BUILD_INSTALLER} && ! ${COMPOSER_DRY_RUN}; then
+        for download_file in "${groupdir}"/*.image-fetcher; do
+            local download_url
+            download_url=$("${GOMPLATE}" --file "${download_file}")
+            blueprint="$(basename -s .image-fetcher "${download_file}")"
+            local expected_iso_file="${VM_DISK_BASEDIR}/${blueprint}.iso"
+            if [ -f "${expected_iso_file}" ]; then
+                echo "${expected_iso_file} already exists"
+                if should_skip "${blueprint}"; then
+                    record_junit "${groupdir}" "${download_file}" "download" "SKIPPED"
+                    continue
+                fi
+            fi
+
+            echo "Adding image-fetcher for ${download_file}"
+            download_opts+=("${expected_iso_file} ${download_url}")
+        done
+    fi
+
+    # Run image-fetcher while osbuilder is running in background
+    if [ ${#download_opts[@]} -ne 0 ]; then
+        local -r wget_tmp="wget.part"
+        local -r wget_res="${IMAGEDIR}/image_fetcher_result.json"
+        local -r wget_job="${IMAGEDIR}/image_fetcher_jobs.txt"
+
+        local fetch_ok=true
+        local progress=""
+        if [ -t 0 ]; then
+            progress="--progress"
+        fi
+        # Download the files under temporary names
+        echo "Waiting for image-fetcher to complete..."
+        if parallel \
+            ${progress} \
+            --colsep ' ' \
+            --results "${wget_res}" \
+            --joblog "${wget_job}" \
+            --jobs $(( ${#download_opts[@]} / 2 )) \
+            wget -c -nv -O "{1}.${wget_tmp}" "{2}" ::: "${download_opts[@]}" ; then
+            # On successful download, rename the files to their original names
+            for fwget in "${VM_DISK_BASEDIR}"/*."${wget_tmp}" ; do
+                local forig
+                forig="$(basename -s ".${wget_tmp}" "${fwget}")"
+                mv "${fwget}" "${VM_DISK_BASEDIR}/${forig}"
+            done
+        else
+            fetch_ok=false
+        fi
+
+        # Show the summary of the output of the parallel jobs.
+        cat "${wget_job}"
+        if [ -f "${wget_res}" ] ; then
+            jq < "${wget_res}"
+        else
+            echo "The image-fetcher results file does not exist"
+            fetch_ok=false
+        fi
+
+        if ! ${fetch_ok} ; then
+            echo "ERROR: The image-fetcher failed to complete successfully"
+            exit 1
+        fi
+    fi
+    if [ ${#buildid_list[@]} -ne 0 ]; then
         echo "Waiting for builds to complete..."
         # wait_images.py returns possibly updated list of builds that must be handled
         # "update" means replacing initial build ID with retry build ID
