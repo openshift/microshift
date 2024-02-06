@@ -7,6 +7,7 @@ DEFAULT_DEST_DIR="${ROOT_DIR}/_output/conformance-tests"
 DEST_DIR="${DEST_DIR:-${DEFAULT_DEST_DIR}}"
 [ -d "${DEST_DIR}" ] || mkdir -p "${DEST_DIR}"
 DEST_DIR="$(realpath "${DEST_DIR}")"
+RESTRICTED="${RESTRICTED:-true}"
 
 cd "${SCRIPT_DIR}"
 
@@ -25,4 +26,9 @@ fi
 
 echo "Executing conformance tests. Using Kubeconfig ${KUBECONFIG}. Writing output to ${DEST_DIR}"
 
-"${SCRIPT_DIR}"/openshift-tests run openshift/conformance -v 2 --provider=none -f "${SCRIPT_DIR}/suite.txt" -o "${DEST_DIR}/e2e.log" --junit-dir "${DEST_DIR}/junit"
+SUITE_FILE=""
+if [ "${RESTRICTED}" = "true" ]; then
+    SUITE_FILE="-f ${SCRIPT_DIR}/suite.txt"
+fi
+
+"${SCRIPT_DIR}"/openshift-tests run openshift/conformance -v 2 --provider=none ${SUITE_FILE} -o "${DEST_DIR}/e2e.log" --junit-dir "${DEST_DIR}/junit"
