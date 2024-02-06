@@ -42,7 +42,9 @@ NOTE:
 
 import argparse
 import collections
+import datetime
 import html.parser
+import os
 import re
 import subprocess
 import textwrap
@@ -323,6 +325,27 @@ def tag_exists(release_name):
         return False
 
 
+def tag_release(tag, sha, buildtime):
+    env = {}
+    # Include our existing environment settings to ensure values like
+    # HOME and other git settings are propagated.
+    env.update(os.environ)
+    timestamp = buildtime.strftime('%Y-%m-%d %H:%M')
+    env['GIT_COMMITTER_DATE'] = timestamp
+    print(f'GIT_COMMITTER_DATE={timestamp} git tag -s {tag} {sha}')
+    subprocess.run(
+        ['git', 'tag', '-s', '-m', tag, tag, sha],
+        env=env,
+        check=True,
+    )
+    print(f'git push origin {tag}')
+    subprocess.run(
+        ['git', 'push', 'origin', tag],
+        env=env,
+        check=True,
+    )
+
+
 def publish_release(new_release, take_action):
     """Does the work to tag and publish a release.
     """
@@ -334,18 +357,14 @@ def publish_release(new_release, take_action):
     release_type = new_release.release_type
     release_date = new_release.release_date
 
-    if not tag_exists(release_name):
-        print(f"Tag {release_name} on commit {commit_sha} by running:")
-        print("")
-        print(f"git tag -s -m '{product_version} {candidate_type.upper()} {candidate_number} {release_date}' {release_name} {commit_sha}")
-        print(f"git push origin {release_name}")
-        print()
-        print("Then run the script again.")
+    if not take_action:
+        print('Dry run for new release {new_release} on commit {commit_sha} from {release_date}')
         return
 
-    if not take_action:
-        print('Dry run')
-        return
+    if not tag_exists(release_name):
+        # release_date looks like 202402022103
+        buildtime = datetime.datetime.strptime(release_date, '%Y%m%d%H%M')
+        tag_release(release_name, commit_sha, buildtime)
 
     # Set up the release notes preamble with download links
     notes = textwrap.dedent(f"""
