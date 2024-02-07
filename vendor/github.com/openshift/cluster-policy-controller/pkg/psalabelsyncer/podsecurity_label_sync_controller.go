@@ -379,7 +379,7 @@ func (c *PodSecurityAdmissionLabelSynchronizationController) syncNamespace(ctx c
 	_, err = c.namespaceClient.Apply(ctx, nsApplyConfig, metav1.ApplyOptions{FieldManager: controllerName, Force: mustSync})
 	if err != nil {
 		if apierrors.IsConflict(err) {
-			klog.Warning("someone else is already managing the PSa labels: %v", err)
+			klog.Warningf("someone else is already managing the PSa labels: %v", err)
 			return nil
 		}
 		return fmt.Errorf("failed to update the namespace: %w", err)
@@ -410,7 +410,7 @@ func (c *PodSecurityAdmissionLabelSynchronizationController) queueKeysRuntimeFor
 func (c *PodSecurityAdmissionLabelSynchronizationController) queueKeysForObj(obj interface{}) []string {
 	metaObj, ok := obj.(metav1.ObjectMetaAccessor)
 	if !ok {
-		klog.Error("unable to access metadata of the handled object: %v", obj)
+		klog.Errorf("unable to access metadata of the handled object: %v", obj)
 		return nil
 	}
 

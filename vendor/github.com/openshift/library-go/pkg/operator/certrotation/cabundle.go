@@ -1,10 +1,12 @@
 package certrotation
 
 import (
+	"bytes"
 	"context"
 	"crypto/x509"
 	"fmt"
 	"reflect"
+	"sort"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -42,7 +44,7 @@ type CABundleConfigMap struct {
 	EventRecorder events.Recorder
 }
 
-func (c CABundleConfigMap) ensureConfigMapCABundle(ctx context.Context, signingCertKeyPair *crypto.CA) ([]*x509.Certificate, error) {
+func (c CABundleConfigMap) EnsureConfigMapCABundle(ctx context.Context, signingCertKeyPair *crypto.CA) ([]*x509.Certificate, error) {
 	// by this point we have current signing cert/key pair.  We now need to make sure that the ca-bundle configmap has this cert and
 	// doesn't have any expired certs
 	originalCABundleConfigMap, err := c.Lister.ConfigMaps(c.Namespace).Get(c.Name)
@@ -139,6 +141,10 @@ func manageCABundleConfigMap(caBundleConfigMap *corev1.ConfigMap, currentSigner 
 		}
 	}
 
+	// sorting ensures we don't continuously swap the certificates in the bundle, which might cause revision rollouts
+	sort.SliceStable(finalCertificates, func(i, j int) bool {
+		return bytes.Compare(finalCertificates[i].Raw, finalCertificates[j].Raw) < 0
+	})
 	caBytes, err := crypto.EncodeCertificates(finalCertificates...)
 	if err != nil {
 		return nil, err
