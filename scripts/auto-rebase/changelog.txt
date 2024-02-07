@@ -1,11 +1,64 @@
-- oc image-arm64 6d67575448725bb154dcdaf5f78787c8516d47bf to 79dc671bdaeafa74b92f14ad9f6d84e344608034
+- cluster-ingress-operator embedded-component 1938e2cbf206769e6195729ee751443b5c0afdaa to d31546e05cc00021e5fbd441ba6dc6739c1bf274
+  - 777f2ee 2024-01-31T10:18:22-05:00 Add unit tests to verify update of Infra CR with Ingress LB IPs
+  - 20f46c5 2024-01-31T10:18:22-05:00 Update tests for GCP that verify the EndpointPublishingStrategy
+  - c17c658 2024-01-31T10:18:22-05:00 Set DNSManagementPolicy to Unmanaged when BYO DNS is enabled
+  - 009644a 2024-01-31T10:18:22-05:00 Update GCPPlatformStatus with Ingress LB IPs when BYO DNS is enabled
+  - b724782 2024-01-31T10:18:22-05:00 Updating openshift/api to bring in changes for BYO DNS for GCP
+  - 7cb3de6 2024-01-29T19:20:41+00:00 Updating ose-cluster-ingress-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/d71d9d276b011b4ff305c07f21fc68f5866d5a5d/images/ose-cluster-ingress-operator.yml
+
+- cluster-kube-apiserver-operator embedded-component 1c6d106ee87c21756d383a9369c37fd856202077 to f030d54cd90ee454460d9dfda9427e004fe9a712
+  - 29d75ea 2024-02-02T12:25:33+03:00 Add sno section to alert description
+  - e7b6c86 2024-02-01T16:26:29+01:00 Add Vu and Vadim to OWNERS
+
+- cluster-network-operator embedded-component 1d9dca6ceb5506280f01c8fcd7ce2606bb3be26c to 08b4ff95dcb3aef9ec2b1739afb5f9391d287d6d
+  - 85534c8 2024-02-01T15:45:35+01:00 Bump openshift API
+  - 37442fe 2024-01-31T20:45:13+00:00 Only allow live migration on managed clusters excl. hypershift
+  - c45e5c1 2024-01-29T14:32:39-05:00 ovnkube: simplify northd threading and SNO templating
+  - 73aa7b6 2023-12-19T12:44:10+01:00 Limit write permissions for egressservices
+
+- cluster-openshift-controller-manager-operator embedded-component 28f84ab13dcc81749100fdeed4545453c611d7c4 to 4e5864575c5c447d28b5f1bb68806b9a96843e71
+  - a06285b 2024-01-30T12:30:51-05:00 Replace 'coreydaley' with 'sayan-biswas'
+
+- cluster-policy-controller embedded-component 15c068ab02d7fd767cccb1d7bfb2c8ab5e529647 to 7ed07d5ee710a3c450f2134f41030f59c48c5176
+  - 9aecdee 2024-01-31T14:16:07+01:00 fix Printf formatting directives
+  - 4b9ea76 2024-01-31T14:16:07+01:00 go mod vendor
+  - 4a0d67b 2024-01-31T14:16:06+01:00 bump k8s to 1.29.1 and go to 1.21
+
+- etcd embedded-component 66af0e5d532b10a23f6e40ec8cbafa0f275f6ee5 to 351cd86d3228c5617aec8031ed583aa684d1f84f
+  - 1d8e1f31 2023-12-17T04:41:32+00:00 Updating ose-etcd-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/4022cd290f00a44d667dda03f2d78d84a488c7ed/images/ose-etcd.yml
+
+- kubernetes embedded-component 5a4819c6048e42515c3c5538b723ba6272440eee to 2f773e8d16da18d91d717cb7e1aca3d000396e2d
+  - 5b264b55f 2024-01-31T10:14:51+00:00 UPSTREAM: <carry>: Add Dockerfile to buld kube-apiserver for openshift-install architectures
+
+- machine-config-operator embedded-component c5f53e25f337f003a388d9108713a6230f197044 to 87268155896563f95fa21defbb271210ec913e8e
+  - 11c67c3a 2024-02-01T08:42:21-05:00 Annotate coreDNS static pods for workload partitioning
+  - ab7377ab 2024-01-31T18:32:06-05:00 Update the ControllerConfig manifest
+  - 44603d00 2024-01-31T10:11:38-05:00 Add tests to verify rendering of cloud-platforms-alt-dns manifests
+  - 257a4796 2024-01-31T10:11:38-05:00 Start in-cluster CoreDNS pod for some cloud platforms
+  - f5ec7532 2024-01-31T10:11:38-05:00 Add new namespace `openshift-cloud-platform-infra`
+  - b40db5b4 2024-01-31T10:11:38-05:00 Start in-cluster CoreDNS pod on bootstrap node for some cloud platforms
+  - 1fdd741e 2024-01-29T23:20:56+01:00 feat: add same logic for vsphere
+  - 0f07d73a 2024-01-29T17:55:05+01:00 feat: enable nodeip service for single node
+  - a9b96f55 2024-01-25T17:49:02+01:00 ovs-configure: fix `vlan_parent` calculation
+  - 124dd45d 2024-01-22T14:02:29-05:00 OCPBUGS-24705: consider current and desired image annotations
+  - 4609fda3 2024-01-19T10:38:44-06:00 Add quotes around image reference in resolv-prepender
+  - 10a4774e 2024-01-12T10:43:35-06:00 OCPBUGS-25753: Run resolv-prepender entirely async
+
+- openshift-controller-manager embedded-component 2a28a78279b127075b399a3442a2042f4a7d190d to 1e9726851f9cd4f184b24c4714563c3983fc68d2
+  - c76191c 2024-01-30T12:28:35-05:00 Update OWNERS
+
+- operator-framework-olm embedded-component 57904773441fd8e71e36abd6dd66ab6556fbfb84 to ebfa3c10696e670d36c7b98fc75b88b973c05892
+  - 743b59e2 2024-01-30T00:04:52+00:00 build(deps): bump github.com/docker/docker (#3080)
+  - 2d135e57 2024-01-30T00:03:50+00:00 switch to default-DCO instead of actioned (#1217)
+
+- oc image-amd64 6d67575448725bb154dcdaf5f78787c8516d47bf to 79dc671bdaeafa74b92f14ad9f6d84e344608034
   - d1e57c01 2024-01-30T16:25:01+03:00 Copy oc.rhel8 instead of symlink
   - 7333b720 2024-01-30T08:14:36+03:00 Bump joelanford/ignore to bump go-git to 5.11.0
 
-- router image-arm64 fcead817a0181a6326c15c8bd2e31b5fb3acdc14 to ba0be509f8cf8ea0d30540d69bbb20ae5087cc08
+- router image-amd64 fcead817a0181a6326c15c8bd2e31b5fb3acdc14 to ba0be509f8cf8ea0d30540d69bbb20ae5087cc08
   - 5a5b3e2 2024-01-31T20:48:45-05:00 OCPBUGS-26539: Reject routes with MD5 certs
 
-- ovn-kubernetes image-arm64 e8f87e81e05164cc0a93a2d90d17c43fda35ecb2 to 0ef25f9bee6edc008e3742ae4d6299f9e3cad0e9
+- ovn-kubernetes image-amd64 e8f87e81e05164cc0a93a2d90d17c43fda35ecb2 to 0ef25f9bee6edc008e3742ae4d6299f9e3cad0e9
   - 71d6716 2024-01-30T11:18:51+01:00 Use full datapath name when querying datapaths with ovs-appctl
   - fd5fafa 2024-01-30T00:48:11+01:00 github: Remove pointless Install KIND step from periodic jobs.
   - 0396f39 2024-01-30T00:05:48+01:00 github: Remove periodic k8s job.
@@ -29,6 +82,26 @@
   - 26bdeca 2024-01-10T16:07:02+01:00 Separate stale acls testing and building from the policy_test. We used to build new acl and update it to make it "stale". That means we have to change stale acls generation with every current acl format change.
   - c2588eb 2024-01-10T16:06:58+01:00 Namespace address sets don't have hostNetwork pod ips, while Network Policies do add hostNetwork pods to their own address sets. An attempt to unify this behaviour ended up breaking customers relying on the previous logic, so we have to keep it. The logic on when to use namespace address sets was restored. It is applied when podSelector is nil. That means that peer ``` to:     - namespaceSelector: <ns selector> ``` won't include hostNetwork pods, while peer ``` to:     - namespaceSelector: <ns selector>       podSelector: {} ``` will. You can find 2 new unit tests verifying this behaviour.
 
-- kubernetes image-arm64 5a4819c6048e42515c3c5538b723ba6272440eee to 2f773e8d16da18d91d717cb7e1aca3d000396e2d
+- kubernetes image-amd64 5a4819c6048e42515c3c5538b723ba6272440eee to 2f773e8d16da18d91d717cb7e1aca3d000396e2d
   - 5b264b55f 2024-01-31T10:14:51+00:00 UPSTREAM: <carry>: Add Dockerfile to buld kube-apiserver for openshift-install architectures
+
+- ovn-kubernetes image-arm64 0ef25f9bee6edc008e3742ae4d6299f9e3cad0e9 to 614dc4369c060a62a0ccf49cefbe57817004cc7c
+  - 7f99281 2024-02-01T11:08:21+01:00 kubevirt: Replace routes on migration
+  - 3abe49d 2024-01-29T11:49:42+00:00 EIP multi NIC: in LGW mode, skip IP rules when dst is node IP
+  - 1f52e7d 2024-01-29T11:49:42+00:00 Rename non-OVN eips to secondary host eips
+  - ca60832 2024-01-29T11:49:42+00:00 EIP multi NIC: do not remove node IP SNAT
+  - c7c3f27 2024-01-29T11:49:42+00:00 EIP E2E: add multi NIC test where EIP IPs hosted on same inf
+  - d4956d5 2024-01-29T11:49:42+00:00 Refactor egress IP controller update 'config' to match current 'state'
+  - 250e23e 2024-01-29T11:49:38+00:00 EIP E2Es: add multi NIC test cases for enable/disable egress
+  - dde0471 2024-01-29T11:47:55+00:00 EIP multi NIC: copy routes from main routing table
+  - 5740350 2024-01-29T11:47:55+00:00 EIP multi NIC: start dependent controllers before repair
+  - 4b35522 2024-01-29T11:47:55+00:00 EIP multi NIC: filter only global unicast addresses from host-cidrs
+  - cae91d9 2024-01-29T11:47:55+00:00 EIP multi NIC: Add IPV6 support
+  - 942c27b 2024-01-29T11:47:55+00:00 EIP multi NIC: continue repairing even if an egress IP is not on link
+  - c7a5946 2024-01-29T11:47:55+00:00 EIP multi NIC: rename struct field
+  - 38bbb63 2024-01-29T11:47:55+00:00 Refactor net util to allow passing a netlink.Link obj instead of name
+  - 3ac94f0 2024-01-29T11:47:55+00:00 improve iptables manager code quality and add IPv6 tests
+  - 14f5f18 2024-01-29T11:47:55+00:00 Fix how detect any network following lib change
+  - 7ef3537 2024-01-29T11:47:55+00:00 Refactor route manager and fix panic
+  - 2b97bea 2024-01-29T11:47:55+00:00 Upgrade netlink lib to consume default route fix
 
