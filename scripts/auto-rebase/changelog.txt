@@ -1,10 +1,18 @@
-- cluster-network-operator embedded-component ccc258af4f2f05bec45cc109f60d53297b9c9750 to 41930d54e9e28d670444b22bea1d56dc04c76bce
-  - 5045f12 2024-01-30T01:14:03+00:00 OCPBUGS-19830: fix whereabouts conformance test failures
+- cluster-openshift-controller-manager-operator embedded-component 77e0d6a07854665a7e9c8458db67e25d02da934a to 3985c55f99e1ea013be2db096059c09b2ed98118
+  - 28427f2 2024-02-04T02:53:13+00:00 Replace 'coreydaley' with 'sayan-biswas'
 
-- coredns image-amd64 8341fa72820062869d3a01429ec20a79aebeded0 to 7d3fa777871ed2e5a70715e7f3e71d3f01785330
-  - 7a0f883 2024-01-25T09:51:42-05:00 UPSTREAM: 6277: openshift: Fix OCPBUGS-27397
+- machine-config-operator embedded-component b235299029fe6af5677a1bf610f7c07778353c3b to 4f0f7a14c63e3cf9bd349f3230bc860af0be3db7
+  - 40b71650 2024-01-26T22:16:08+00:00 daemon: allow the user to override drains on IR changes
+  - d67ada66 2024-01-26T18:21:02+00:00 fix nodeStatusUpdateFrequency
 
-- ovn-kubernetes image-amd64 09ddd420708defb4cb1e77877051e73ca0224cfa to 3b0c69d70279c1ce35cb6d8c7f2bf0dba98f0dbe
-  - dfe036d 2024-01-17T12:32:34+01:00 Dockerfile: Bump OVN to ovn-23.09.0-100.el9fdp
-  - ceb7183 2024-01-17T12:30:52+01:00 Add e2e test for session affinity after the chosen backend pod is deleted.
+- openshift-controller-manager embedded-component 69bd018865f9a729001244d0ae2ad0a444f59eb0 to 27209ef14fcfca236ddba24ac7289bb3d01be8e6
+  - d01a577 2024-02-04T02:52:53+00:00 Update OWNERS
+
+- ovn-kubernetes image-amd64 3b0c69d70279c1ce35cb6d8c7f2bf0dba98f0dbe to db114cf496d811a72ee724659f77cad5ecb677e8
+  - 8a7a3cd 2024-02-01T07:05:20+00:00 Fix LGW ETP=Local on IPv6
+  - 704c7b9 2024-01-24T14:26:54-08:00 dont quit if node does not have subnet annotation
+
+- ovn-kubernetes image-arm64 3b0c69d70279c1ce35cb6d8c7f2bf0dba98f0dbe to db114cf496d811a72ee724659f77cad5ecb677e8
+  - 8a7a3cd 2024-02-01T07:05:20+00:00 Fix LGW ETP=Local on IPv6
+  - 704c7b9 2024-01-24T14:26:54-08:00 dont quit if node does not have subnet annotation
 
