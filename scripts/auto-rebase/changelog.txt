@@ -1,13 +1,20 @@
-- cluster-network-operator embedded-component 27b1909acb2089081586a0b98accab42d13877cb to ae281369ae346035cab4d917fc66a2fe73c8f3ca
-  - a0e8b19 2024-02-05T10:01:13+01:00 Bump openshift API
+- cluster-network-operator embedded-component ae281369ae346035cab4d917fc66a2fe73c8f3ca to 3584d79cb2c6f25e7984b393ac8ff9e59e684627
+  - 057111b 2024-01-19T15:52:01+00:00 Only reconcile on Node updates with Label changes
+  - 4019afe 2024-01-16T08:34:23+00:00 Remove egressip write permissions from ovn-kubernetes-node
+  - 268f05d 2024-01-15T16:13:08+00:00 Network node identity: tolarate all taints
 
-- cluster-openshift-controller-manager-operator embedded-component e87e15acee1bbdbc1663aec1bda9517a876023f2 to 1ba446b3a9003d6069a7a2f55b2616b6892729bc
-  - 39a2554 2024-02-04T02:46:05+00:00 Replace 'coreydaley' with 'sayan-biswas'
+- kubernetes embedded-component a373c1b300997632785f46d5b570216df6c006ef to f1618d54a81f9f1bc0c3bf326454ab8e107eea87
+  - bb069bbb3 2024-01-26T17:48:47+00:00 UPSTREAM: <carry>: use snyk file
 
-- machine-config-operator embedded-component 16924e6a734a74060f844834b1ab5b0101b1bf41 to 10d332cfb4863f76fcba02b892180d848fff486d
-  - 6935443e 2024-02-02T15:58:20+00:00 Add quotes around image reference in resolv-prepender
-  - 465db3fc 2024-02-02T15:58:20+00:00 OCPBUGS-25753: Run resolv-prepender entirely async
+- ovn-kubernetes image-amd64 e61d7efcc919d441e223d9be34fad8457c25a125 to 6a4ea849d86943dde92ca14cc796b0f811cb9312
+  - 5738f0a 2024-02-05T15:06:36+01:00 kubevirt: Replace routes on migration
 
-- openshift-controller-manager embedded-component 2a28a78279b127075b399a3442a2042f4a7d190d to 87d251169278f61434749fc17991b45cbcb53b15
-  - b7dcbda 2024-02-04T02:46:28+00:00 Update OWNERS
+- kubernetes image-amd64 a373c1b300997632785f46d5b570216df6c006ef to f1618d54a81f9f1bc0c3bf326454ab8e107eea87
+  - bb069bbb3 2024-01-26T17:48:47+00:00 UPSTREAM: <carry>: use snyk file
+
+- ovn-kubernetes image-arm64 e61d7efcc919d441e223d9be34fad8457c25a125 to 6a4ea849d86943dde92ca14cc796b0f811cb9312
+  - 5738f0a 2024-02-05T15:06:36+01:00 kubevirt: Replace routes on migration
+
+- kubernetes image-arm64 a373c1b300997632785f46d5b570216df6c006ef to f1618d54a81f9f1bc0c3bf326454ab8e107eea87
+  - bb069bbb3 2024-01-26T17:48:47+00:00 UPSTREAM: <carry>: use snyk file
 
