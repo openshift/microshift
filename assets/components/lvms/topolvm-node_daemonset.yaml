@@ -30,26 +30,8 @@ spec:
                 - linux
       containers:
       - command:
-        - /lvmd
-        - --config=/etc/topolvm/lvmd.yaml
-        - --container=true
-        image: '{{ .ReleaseImage.topolvm_csi }}'
-        name: lvmd
-        resources:
-          requests:
-            cpu: 1m
-            memory: 22Mi
-        securityContext:
-          privileged: true
-          runAsUser: 0
-        volumeMounts:
-        - mountPath: '{{ Dir .SocketName  }}'
-          name: lvmd-socket-dir
-        - mountPath: /etc/topolvm
-          name: lvmd-config-dir
-      - command:
         - /topolvm-node
-        - --lvmd-socket={{ .SocketName }}
+        - --embed-lvmd
         env:
         - name: NODE_NAME
           valueFrom:
@@ -78,16 +60,16 @@ spec:
           protocol: TCP
         resources:
           requests:
-            cpu: 1m
-            memory: 16Mi
+            cpu: 2m
+            memory: 35Mi
         securityContext:
           privileged: true
           runAsUser: 0
         volumeMounts:
+        - mountPath: /etc/topolvm
+          name: lvmd-config-dir
         - mountPath: /run/topolvm
           name: node-plugin-dir
-        - mountPath: '{{ Dir .SocketName  }}'
-          name: lvmd-socket-dir
         - mountPath: /var/lib/kubelet/pods
           mountPropagation: Bidirectional
           name: pod-volumes-dir
@@ -163,8 +145,5 @@ spec:
             path: lvmd.yaml
           name: lvmd
         name: lvmd-config-dir
-      - emptyDir:
-          medium: Memory
-        name: lvmd-socket-dir
   updateStrategy:
     type: RollingUpdate
