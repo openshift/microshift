@@ -137,6 +137,17 @@ Requires: microshift = %{version}
 %description olm
 The microshift-olm package provides the required manifests for the Operator Lifecycle Manager to be installed on MicroShift.
 
+%package olm-release-info
+Summary: Release information for Operator Lifecycle Manager components for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description olm-release-info
+The microshift-olm-release-info package provides release information files for this
+release. These files contain the list of container image references used by
+the Operator Lifecycle Manager for MicroShift and can be used to embed those
+images into osbuilder blueprints.
+
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
 golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
@@ -284,9 +295,6 @@ install -p -m644 assets/optional/operator-lifecycle-manager/0000* %{buildroot}/%
 install -p -m644 assets/optional/operator-lifecycle-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 install -p -m755 packaging/greenboot/microshift-running-check-olm.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
-mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
-install -p -m644 assets/optional/operator-lifecycle-manager/release-olm-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
-
 %ifarch %{arm} aarch64
 cat assets/optional/operator-lifecycle-manager/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
 %endif
@@ -294,6 +302,10 @@ cat assets/optional/operator-lifecycle-manager/kustomization.aarch64.yaml >> %{b
 %ifarch x86_64
 cat assets/optional/operator-lifecycle-manager/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
 %endif
+
+# olm-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/operator-lifecycle-manager/release-olm-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
 %pre networking
 
@@ -405,6 +417,8 @@ systemctl enable --now --quiet openvswitch || true
 %dir %{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 %{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
 %{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
+
+%files olm-release-info
 %{_datadir}/microshift/release/release-olm-{x86_64,aarch64}.json
 
 
@@ -413,6 +427,9 @@ systemctl enable --now --quiet openvswitch || true
 %changelog
 * Thu Jan 25 2024 Patryk Matuszak <pmatusza@redhat.com> 4.16.0
 - Rename CRI-O configs to include prefix
+
+* Thu Jan 25 2024 Patryk Matuszak <pmatusza@redhat.com> 4.15.0
+- Create microshift-olm-release-info RPM containing OLM release info files
 
 * Thu Jan 25 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.15.0
 - OLM release info files are no longer included in the base release-info RPM package
