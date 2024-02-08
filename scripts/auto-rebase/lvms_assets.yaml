@@ -4,6 +4,7 @@ assets:
     src: lvms/amd64/
     no_clean: True
     files:
+      - file: topolvm-configmap_lvms-version.yaml
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
       - file: topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
@@ -30,6 +31,4 @@ assets:
       - file: topolvm-openshift-storage_namespace.yaml
         ignore: "provided by MicroShift"
       - file: topolvm_default-storage-class.yaml
-        ignore: "provided by MicroShift"
-      - file: topolvm-configmap_lvms-version.yaml
         ignore: "provided by MicroShift"
