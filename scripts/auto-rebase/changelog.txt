@@ -1,18 +1,4 @@
-- cluster-openshift-controller-manager-operator embedded-component 77e0d6a07854665a7e9c8458db67e25d02da934a to 3985c55f99e1ea013be2db096059c09b2ed98118
-  - 28427f2 2024-02-04T02:53:13+00:00 Replace 'coreydaley' with 'sayan-biswas'
-
-- machine-config-operator embedded-component b235299029fe6af5677a1bf610f7c07778353c3b to 4f0f7a14c63e3cf9bd349f3230bc860af0be3db7
-  - 40b71650 2024-01-26T22:16:08+00:00 daemon: allow the user to override drains on IR changes
-  - d67ada66 2024-01-26T18:21:02+00:00 fix nodeStatusUpdateFrequency
-
-- openshift-controller-manager embedded-component 69bd018865f9a729001244d0ae2ad0a444f59eb0 to 27209ef14fcfca236ddba24ac7289bb3d01be8e6
-  - d01a577 2024-02-04T02:52:53+00:00 Update OWNERS
-
-- ovn-kubernetes image-amd64 3b0c69d70279c1ce35cb6d8c7f2bf0dba98f0dbe to db114cf496d811a72ee724659f77cad5ecb677e8
-  - 8a7a3cd 2024-02-01T07:05:20+00:00 Fix LGW ETP=Local on IPv6
-  - 704c7b9 2024-01-24T14:26:54-08:00 dont quit if node does not have subnet annotation
-
-- ovn-kubernetes image-arm64 3b0c69d70279c1ce35cb6d8c7f2bf0dba98f0dbe to db114cf496d811a72ee724659f77cad5ecb677e8
-  - 8a7a3cd 2024-02-01T07:05:20+00:00 Fix LGW ETP=Local on IPv6
-  - 704c7b9 2024-01-24T14:26:54-08:00 dont quit if node does not have subnet annotation
+- ovn-kubernetes image-arm64 db114cf496d811a72ee724659f77cad5ecb677e8 to a7471a148e419f40503c63c2bb27fbe83f383a77
+  - 4639956 2024-02-02T10:34:29+01:00 model_client: Allow Update and Mutate Insert on the same row
+  - efe82ed 2024-02-02T10:34:29+01:00 Prevent multiple encap-ips per single chassis
 
