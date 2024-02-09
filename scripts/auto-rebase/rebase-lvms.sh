@@ -16,21 +16,6 @@ PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
-VER_FILE="${STAGING_DIR}/lvms/version"
-
-dump_version(){
-    local version="${1}"
-    echo "${version}" > "${VER_FILE}"
-}
-
-load_version(){
-    if [ -f "${VER_FILE}" ]; then
-        cat "${VER_FILE}"
-    else
-        >&2 echo "error: version file not found at ${VER_FILE}"
-    fi
-}
-
 title() {
     echo -e "\E[34m$1\E[00m";
 }
