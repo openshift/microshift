@@ -43,7 +43,7 @@ ${PREVIOUS_VERSION_REPO_URL}    ${EMPTY}
 *** Test Cases ***
 Install Source Version
     [Documentation]    Install the version built from source
-    Install NetworkManager-ovs
+    Install Third Party Packages With Warnings
     Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
     Start MicroShift
     Wait For MicroShift
@@ -124,10 +124,10 @@ Clean Up Test
     Cleanup MicroShift
     Uninstall MicroShift RPM Packages
 
-Install NetworkManager-ovs
-    [Documentation]    We install this separately to avoid having warnings
-    ...    it may report show up in the warning check when installing microshift.
-    Command Should Work    dnf install -y NetworkManager-ovs
+Install Third Party Packages With Warnings
+    [Documentation]    Install these separately to avoid having warnings
+    ...    show up in the warning check when installing MicroShift.
+    Command Should Work    dnf install -y NetworkManager-ovs containers-common
 
 Version Should Match
     [Documentation]    Compare the installed version against expectations

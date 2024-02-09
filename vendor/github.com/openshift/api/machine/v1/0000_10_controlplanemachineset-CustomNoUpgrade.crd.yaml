@@ -335,9 +335,10 @@ spec:
                                   name:
                                     description: name of the failure domain in which the vSphere machine provider will create the VM. Failure domains are defined in a cluster's config.openshift.io/Infrastructure resource. When balancing machines across failure domains, the control plane machine set will inject configuration from the Infrastructure resource into the machine providerSpec to allocate the machine to a failure domain.
                                     type: string
+                              x-kubernetes-list-map-keys:
+                                - name
+                              x-kubernetes-list-type: map
                           x-kubernetes-validations:
-                            - rule: 'has(self.platform) && self.platform == ''VSphere'' ?  has(self.vsphere) : !has(self.vsphere)'
-                              message: vsphere configuration is required when platform is VSphere, and forbidden otherwise
                             - rule: 'has(self.platform) && self.platform == ''AWS'' ?  has(self.aws) : !has(self.aws)'
                               message: aws configuration is required when platform is AWS, and forbidden otherwise
                             - rule: 'has(self.platform) && self.platform == ''Azure'' ?  has(self.azure) : !has(self.azure)'
@@ -346,6 +347,8 @@ spec:
                               message: gcp configuration is required when platform is GCP, and forbidden otherwise
                             - rule: 'has(self.platform) && self.platform == ''OpenStack'' ?  has(self.openstack) : !has(self.openstack)'
                               message: openstack configuration is required when platform is OpenStack, and forbidden otherwise
+                            - rule: 'has(self.platform) && self.platform == ''VSphere'' ?  has(self.vsphere) : !has(self.vsphere)'
+                              message: vsphere configuration is required when platform is VSphere, and forbidden otherwise
                             - rule: 'has(self.platform) && self.platform == ''Nutanix'' ?  has(self.nutanix) : !has(self.nutanix)'
                               message: nutanix configuration is required when platform is Nutanix, and forbidden otherwise
                         metadata:

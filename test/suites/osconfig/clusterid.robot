@@ -34,9 +34,17 @@ Verify Cluster ID Change For New Database
     Should Not Be Equal As Strings    ${old_nid}    ${new_nid}
     Should Not Be Equal As Strings    ${old_fid}    ${new_fid}
 
+Verify Sos Report Contains ID In kube-system Namespace
+    [Documentation]    Verify that cluster ID can be retrieved from Sos Report
+
+    ${sos_report_tarfile}=    Create Sos Report
+    ${sos_report_id}=    Get MicroShift Cluster ID From Sos Report    ${sos_report_tarfile}
+    ${id}=    Get MicroShift Cluster ID From Namespace
+    Should Be Equal As Strings    ${sos_report_id}    ${id}
+
 Verify Inconsistent Cluster ID Recovery
-    [Documentation]    Verify that cluster ID is correctly rewritten on the
-    ...    service restart after manual tampering by a user.
+    [Documentation]    Verify that cluster ID file is correctly rewritten
+    ...    on the service restart after manual tampering by a user.
 
     Tamper With Cluster ID File
     Restart MicroShift
@@ -45,6 +53,16 @@ Verify Inconsistent Cluster ID Recovery
     ${fid}=    Get MicroShift Cluster ID From File
     Should Be Equal As Strings    ${nid}    ${fid}
 
+Verify Missing Cluster ID Recovery
+    [Documentation]    Verify that cluster ID file is correctly recreated
+    ...    on the service restart after manual removing by a user.
+
+    Remove Cluster ID File
+    Restart MicroShift
+
+    ${nid}=    Get MicroShift Cluster ID From Namespace
+    ${fid}=    Get MicroShift Cluster ID From File
+    Should Be Equal As Strings    ${nid}    ${fid}
 
 *** Keywords ***
 Setup
@@ -83,10 +101,69 @@ Get MicroShift Cluster ID From Namespace
     Should Not Be Empty    ${clusterid}
     RETURN    ${clusterid}
 
+Get MicroShift Cluster ID From Sos Report
+    [Documentation]    Read and return the Cluster ID from the kube-system namespace yaml description in the Sos Report.
+    [Arguments]    ${sos_report_tarfile}
+
+    ${sos_report_dir}    ${rc}=    Execute Command
+    ...    dirname ${sos_report_tarfile}
+    ...    sudo=True    return_rc=True    return_stdout=True
+    Log    ${sos_report_dir}
+    Should Be Equal As Integers    0    ${rc}
+
+    ${rc}=    Execute Command
+    ...    tar xf ${sos_report_tarfile} -C ${sos_report_dir}
+    ...    sudo=True    return_rc=True    return_stdout=False
+    Should Be Equal As Integers    0    ${rc}
+
+    ${sos_report_untared}    ${rc}=    Execute Command
+    ...    find ${sos_report_dir} -type d -name "sosreport-microshift*"
+    ...    sudo=True    return_rc=True    return_stdout=True
+    Should Be Equal As Integers    0    ${rc}
+
+    ${clusterid}    ${rc}=    Execute Command
+    ...    cat ${sos_report_untared}/sos_commands/microshift/namespaces/kube-system/kube-system.yaml | sed -n 's/\\s\\suid:\\s//p'
+    ...    sudo=True    return_rc=True    return_stdout=True
+    Should Be Equal As Integers    0    ${rc}
+
+    Should Not Be Empty    ${clusterid}
+    RETURN    ${clusterid}
+
 Tamper With Cluster ID File
     [Documentation]    Append invalid characters to the cluster ID file.
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ${rc}=    Execute Command
     ...    sed -i '$ s/$/123/' ${CLUSTERID_FILE}
-    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    ...    sudo=True    return_rc=True    return_stdout=False
 
     Should Be Equal As Integers    0    ${rc}
+
+Remove Cluster ID File
+    [Documentation]    Append invalid characters to the cluster ID file.
+    ${rc}=    Execute Command
+    ...    rm -rf ${CLUSTERID_FILE}
+    ...    sudo=True    return_rc=True    return_stdout=False
+
+    Should Be Equal As Integers    0    ${rc}
+
+Create Sos Report
+    [Documentation]    Create a MicroShift Sos Report and return the tar file path
+
+    ${rand_str}=    Generate Random String  4  [NUMBERS]
+    ${sos_report_dir}=    Catenate    SEPARATOR=    /tmp/rf-test/sos-report_    ${rand_str}
+
+    ${rc}=    Execute Command
+    ...    mkdir -p ${sos_report_dir}
+    ...    sudo=True    return_rc=True    return_stdout=False
+    Should Be Equal As Integers    0    ${rc}
+
+    ${rc}=    Execute Command
+    ...    sos report --batch --all-logs --tmp-dir ${sos_report_dir} -p microshift -o logs
+    ...    sudo=True    return_rc=True    return_stdout=False
+    Should Be Equal As Integers    0    ${rc}
+
+    ${sos_report_tarfile}    ${rc}=    Execute Command
+    ...    find ${sos_report_dir} -type f -name "sosreport-microshift*.tar.xz"
+    ...    sudo=True    return_rc=True    return_stdout=True
+    Should Be Equal As Integers    0    ${rc}
+
+    RETURN    ${sos_report_tarfile}

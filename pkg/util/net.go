@@ -75,7 +75,7 @@ found:
 
 func RetryInsecureGet(ctx context.Context, url string) int {
 	status := 0
-	err := wait.PollUntilContextTimeout(ctx, 100*time.Millisecond, 120*time.Second, false, func(ctx context.Context) (bool, error) {
+	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, 120*time.Second, false, func(ctx context.Context) (bool, error) {
 		c := http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
@@ -101,7 +101,7 @@ func RetryInsecureGet(ctx context.Context, url string) int {
 
 func RetryTCPConnection(ctx context.Context, host string, port string) bool {
 	status := false
-	err := wait.PollUntilContextTimeout(ctx, 100*time.Millisecond, 120*time.Second, false, func(ctx context.Context) (bool, error) {
+	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, 120*time.Second, false, func(ctx context.Context) (bool, error) {
 		timeout := 30 * time.Second
 		_, err := tcpnet.DialTimeout("tcp", tcpnet.JoinHostPort(host, port), timeout)
 

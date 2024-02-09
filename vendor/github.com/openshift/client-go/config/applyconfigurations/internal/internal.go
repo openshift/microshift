@@ -367,16 +367,25 @@ var schemaYAML = typed.YAMLObject(`types:
     - discriminator: type
 - name: com.github.openshift.api.config.v1.BareMetalPlatformSpec
   map:
-    elementType:
-      scalar: untyped
-      list:
-        elementType:
-          namedType: __untyped_atomic_
-        elementRelationship: atomic
-      map:
-        elementType:
-          namedType: __untyped_deduced_
-        elementRelationship: separable
+    fields:
+    - name: apiServerInternalIPs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: ingressIPs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: machineNetworks
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
 - name: com.github.openshift.api.config.v1.BareMetalPlatformStatus
   map:
     fields:
@@ -403,6 +412,12 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.openshift.api.config.v1.BareMetalPlatformLoadBalancer
       default:
         type: OpenShiftManagedDefault
+    - name: machineNetworks
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
     - name: nodeDNSIP
       type:
         scalar: string
@@ -2505,16 +2520,25 @@ var schemaYAML = typed.YAMLObject(`types:
     - discriminator: type
 - name: com.github.openshift.api.config.v1.OpenStackPlatformSpec
   map:
-    elementType:
-      scalar: untyped
-      list:
-        elementType:
-          namedType: __untyped_atomic_
-        elementRelationship: atomic
-      map:
-        elementType:
-          namedType: __untyped_deduced_
-        elementRelationship: separable
+    fields:
+    - name: apiServerInternalIPs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: ingressIPs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: machineNetworks
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
 - name: com.github.openshift.api.config.v1.OpenStackPlatformStatus
   map:
     fields:
@@ -2544,6 +2568,12 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.openshift.api.config.v1.OpenStackPlatformLoadBalancer
       default:
         type: OpenShiftManagedDefault
+    - name: machineNetworks
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
     - name: nodeDNSIP
       type:
         scalar: string
@@ -3355,6 +3385,12 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.openshift.api.config.v1.VSpherePlatformSpec
   map:
     fields:
+    - name: apiServerInternalIPs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
     - name: failureDomains
       type:
         list:
@@ -3363,6 +3399,18 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+    - name: ingressIPs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: machineNetworks
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
     - name: nodeNetworking
       type:
         namedType: com.github.openshift.api.config.v1.VSpherePlatformNodeNetworking
@@ -3399,6 +3447,12 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.openshift.api.config.v1.VSpherePlatformLoadBalancer
       default:
         type: OpenShiftManagedDefault
+    - name: machineNetworks
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
     - name: nodeDNSIP
       type:
         scalar: string

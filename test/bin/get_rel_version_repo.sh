@@ -50,7 +50,7 @@ dnf_repo_is_enabled() {
 
 get_current_release_from_sub_repos() {
 	local -r minor="${1}"
-	local -r rhsm_repo="rhocp-4.${minor}-for-rhel-9-x86_64-rpms"
+	local -r rhsm_repo="rhocp-4.${minor}-for-rhel-9-${UNAME_M}-rpms"
 
 	# getting version of RPM within a rhocp repo depends on the repo being enabled,
 	# which is done in configure_vm.sh
