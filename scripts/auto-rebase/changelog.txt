@@ -1,20 +1,3 @@
-- cluster-network-operator embedded-component ae281369ae346035cab4d917fc66a2fe73c8f3ca to 3584d79cb2c6f25e7984b393ac8ff9e59e684627
-  - 057111b 2024-01-19T15:52:01+00:00 Only reconcile on Node updates with Label changes
-  - 4019afe 2024-01-16T08:34:23+00:00 Remove egressip write permissions from ovn-kubernetes-node
-  - 268f05d 2024-01-15T16:13:08+00:00 Network node identity: tolarate all taints
-
-- kubernetes embedded-component a373c1b300997632785f46d5b570216df6c006ef to f1618d54a81f9f1bc0c3bf326454ab8e107eea87
-  - bb069bbb3 2024-01-26T17:48:47+00:00 UPSTREAM: <carry>: use snyk file
-
-- ovn-kubernetes image-amd64 e61d7efcc919d441e223d9be34fad8457c25a125 to 6a4ea849d86943dde92ca14cc796b0f811cb9312
-  - 5738f0a 2024-02-05T15:06:36+01:00 kubevirt: Replace routes on migration
-
-- kubernetes image-amd64 a373c1b300997632785f46d5b570216df6c006ef to f1618d54a81f9f1bc0c3bf326454ab8e107eea87
-  - bb069bbb3 2024-01-26T17:48:47+00:00 UPSTREAM: <carry>: use snyk file
-
-- ovn-kubernetes image-arm64 e61d7efcc919d441e223d9be34fad8457c25a125 to 6a4ea849d86943dde92ca14cc796b0f811cb9312
-  - 5738f0a 2024-02-05T15:06:36+01:00 kubevirt: Replace routes on migration
-
-- kubernetes image-arm64 a373c1b300997632785f46d5b570216df6c006ef to f1618d54a81f9f1bc0c3bf326454ab8e107eea87
-  - bb069bbb3 2024-01-26T17:48:47+00:00 UPSTREAM: <carry>: use snyk file
+- cluster-network-operator embedded-component 3584d79cb2c6f25e7984b393ac8ff9e59e684627 to 89a197f63cd2b4d04729484109bcf00e985be61c
+  - 869d5a5 2024-02-01T02:25:59+00:00 Remove extra env section in whereabouts-reconciler daemonset
 
