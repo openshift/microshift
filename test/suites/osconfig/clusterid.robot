@@ -87,13 +87,10 @@ Create New MicroShift Cluster
 
 Get MicroShift Cluster ID From File
     [Documentation]    Read and return the cluster ID from the file.
-    ${stdout}    ${rc}=    Execute Command
-    ...    cat ${CLUSTERID_FILE}
-    ...    sudo=True    return_rc=True    return_stdout=True
-    Should Be Equal As Integers    0    ${rc}
+    ${id}=    Command Should Work    cat ${CLUSTERID_FILE}
 
-    Should Not Be Empty    ${stdout}
-    RETURN    ${stdout}
+    Should Not Be Empty    ${id}
+    RETURN    ${id}
 
 Get MicroShift Cluster ID From Namespace
     [Documentation]    Read and return the cluster ID from the kube-system namespace.
@@ -102,79 +99,46 @@ Get MicroShift Cluster ID From Namespace
     Should Not Be Empty    ${clusterid}
     RETURN    ${clusterid}
 
-Extract Sos Report
-    [Documentation]    Extract Sos Report from the tar file
-    [Arguments]    ${sos_report_tarfile}
-
-    ${sos_report_dir}    ${rc}=    Execute Command
-    ...    dirname ${sos_report_tarfile}
-    ...    sudo=True    return_rc=True    return_stdout=True
-    Log    ${sos_report_dir}
-    Should Be Equal As Integers    0    ${rc}
-
-    ${rc}=    Execute Command
-    ...    tar xf ${sos_report_tarfile} -C ${sos_report_dir}
-    ...    sudo=True    return_rc=True    return_stdout=False
-    Should Be Equal As Integers    0    ${rc}
-
-    ${sos_report_untared}    ${rc}=    Execute Command
-    ...    find ${sos_report_dir} -type d -name "sosreport-*"
-    ...    sudo=True    return_rc=True    return_stdout=True
-    Should Be Equal As Integers    0    ${rc}
-
-    RETURN    ${sos_report_untared}
-
-Get MicroShift Cluster ID From Sos Report
-    [Documentation]    Read and return the Cluster ID from the kube-system namespace yaml description in the Sos Report.
-    [Arguments]    ${sos_report_tarfile}
-
-    ${sos_report_untared}=    Extract Sos Report    ${sos_report_tarfile}
-
-    ${namespace_yaml_path}=    Set Variable
-    ...    ${sos_report_untared}/sos_commands/microshift/namespaces/${CLUSTERID_NS}/${CLUSTERID_NS}.yaml
-    ${clusterid}    ${rc}=    Execute Command
-    ...    cat ${namespace_yaml_path} | sed -n 's/\\s\\suid:\\s//p'
-    ...    sudo=True    return_rc=True    return_stdout=True
-    Should Be Equal As Integers    0    ${rc}
-
-    Should Not Be Empty    ${clusterid}
-    RETURN    ${clusterid}
-
-Tamper With Cluster ID File
-    [Documentation]    Append invalid characters to the cluster ID file.
-    ${rc}=    Execute Command
-    ...    sed -i '$ s/$/123/' ${CLUSTERID_FILE}
-    ...    sudo=True    return_rc=True    return_stdout=False
-
-    Should Be Equal As Integers    0    ${rc}
-
-Remove Cluster ID File
-    [Documentation]    Append invalid characters to the cluster ID file.
-    ${rc}=    Execute Command
-    ...    rm -rf ${CLUSTERID_FILE}
-    ...    sudo=True    return_rc=True    return_stdout=False
-
-    Should Be Equal As Integers    0    ${rc}
-
 Create Sos Report
     [Documentation]    Create a MicroShift Sos Report and return the tar file path
 
     ${rand_str}=    Generate Random String    4    [NUMBERS]
     ${sos_report_dir}=    Catenate    SEPARATOR=    /tmp/rf-test/sos-report_    ${rand_str}
 
-    ${rc}=    Execute Command
-    ...    mkdir -p ${sos_report_dir}
-    ...    sudo=True    return_rc=True    return_stdout=False
-    Should Be Equal As Integers    0    ${rc}
+    Command Should Work    mkdir -p ${sos_report_dir}
+    Command Should Work    sos report --batch --all-logs --tmp-dir ${sos_report_dir} -p microshift -o logs
+    ${sos_report_tarfile}=    Command Should Work    find ${sos_report_dir} -type f -name "sosreport-*.tar.xz"
 
-    ${rc}=    Execute Command
-    ...    sos report --batch --all-logs --tmp-dir ${sos_report_dir} -p microshift -o logs
-    ...    sudo=True    return_rc=True    return_stdout=False
-    Should Be Equal As Integers    0    ${rc}
-
-    ${sos_report_tarfile}    ${rc}=    Execute Command
-    ...    find ${sos_report_dir} -type f -name "sosreport-*.tar.xz"
-    ...    sudo=True    return_rc=True    return_stdout=True
-    Should Be Equal As Integers    0    ${rc}
-
+    Should Not Be Empty    ${sos_report_tarfile}
     RETURN    ${sos_report_tarfile}
+
+Get MicroShift Cluster ID From Sos Report
+    [Documentation]    Read and return the Cluster ID from the kube-system namespace yaml description in the Sos Report.
+    [Arguments]    ${sos_report_tarfile}
+
+    ${sos_report_untared}=    Extract Sos Report    ${sos_report_tarfile}
+    ${output_yaml}=    Command Should Work
+    ...    cat ${sos_report_untared}/sos_commands/microshift/namespaces/${CLUSTERID_NS}/${CLUSTERID_NS}.yaml
+    ${namespace_yaml}=    Yaml Parse    ${output_yaml}
+
+    Should Not Be Empty    ${namespace_yaml.metadata.uid}
+    RETURN    ${namespace_yaml.metadata.uid}
+
+Extract Sos Report
+    [Documentation]    Extract Sos Report from the tar file
+    [Arguments]    ${sos_report_tarfile}
+
+    ${sos_report_dir}=    Command Should Work    dirname ${sos_report_tarfile}
+    Command Should Work    tar xf ${sos_report_tarfile} -C ${sos_report_dir}
+    ${sos_report_untared}=    Command Should Work    find ${sos_report_dir} -type d -name "sosreport-*"
+
+    Should Not Be Empty    ${sos_report_untared}
+    RETURN    ${sos_report_untared}
+
+Tamper With Cluster ID File
+    [Documentation]    Append invalid characters to the cluster ID file.
+    Command Should Work    sed -i '$ s/$/123/' ${CLUSTERID_FILE}
+
+Remove Cluster ID File
+    [Documentation]    Append invalid characters to the cluster ID file.
+    Command Should Work    rm -f ${CLUSTERID_FILE}
