@@ -84,7 +84,7 @@ run_sonobuoy() {
     RESULTS_DIR=$(mktemp -d -p /tmp)
     ~/go/bin/sonobuoy retrieve "${RESULTS_DIR}" -f results.tar.gz
     tar xf "${RESULTS_DIR}/results.tar.gz" -C "${RESULTS_DIR}"
-    cp "${RESULTS_DIR}/plugins/e2e/results/global/junit_01.xml" "${SCENARIO_INFO_DIR}/${SCENARIO}/"
+    cp "${RESULTS_DIR}/plugins/e2e/results/global/"{e2e.log,junit_01.xml} "${SCENARIO_INFO_DIR}/${SCENARIO}/"
     rm -r "${RESULTS_DIR}"
 
     if [ "$(~/go/bin/sonobuoy status --json | jq -r '.plugins[] | select(.plugin=="e2e") | .progress.failed')" != "null" ] ; then
