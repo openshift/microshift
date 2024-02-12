@@ -1,8 +1,4 @@
-- ovn-kubernetes image-amd64 db114cf496d811a72ee724659f77cad5ecb677e8 to a7471a148e419f40503c63c2bb27fbe83f383a77
-  - 4639956 2024-02-02T10:34:29+01:00 model_client: Allow Update and Mutate Insert on the same row
-  - efe82ed 2024-02-02T10:34:29+01:00 Prevent multiple encap-ips per single chassis
-
-- ovn-kubernetes image-arm64 db114cf496d811a72ee724659f77cad5ecb677e8 to a7471a148e419f40503c63c2bb27fbe83f383a77
-  - 4639956 2024-02-02T10:34:29+01:00 model_client: Allow Update and Mutate Insert on the same row
-  - efe82ed 2024-02-02T10:34:29+01:00 Prevent multiple encap-ips per single chassis
+- machine-config-operator embedded-component 4f0f7a14c63e3cf9bd349f3230bc860af0be3db7 to 43bb134a55f5ccefcb548f8ce1c6d3515d92cee2
+  - 8b9093fa 2024-01-04T14:48:35+00:00 Restrict cgroup version updates to master and worker pools only
+  - b20aad56 2024-01-04T14:48:35+00:00 do not update the node object by default, empty string is cgroupv2 by default
 
