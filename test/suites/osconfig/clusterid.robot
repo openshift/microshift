@@ -64,6 +64,7 @@ Verify Missing Cluster ID Recovery
     ${fid}=    Get MicroShift Cluster ID From File
     Should Be Equal As Strings    ${nid}    ${fid}
 
+
 *** Keywords ***
 Setup
     [Documentation]    Set up all of the tests in this suite
@@ -101,8 +102,8 @@ Get MicroShift Cluster ID From Namespace
     Should Not Be Empty    ${clusterid}
     RETURN    ${clusterid}
 
-Get MicroShift Cluster ID From Sos Report
-    [Documentation]    Read and return the Cluster ID from the kube-system namespace yaml description in the Sos Report.
+Extract Sos Report
+    [Documentation]    Extract Sos Report from the tar file
     [Arguments]    ${sos_report_tarfile}
 
     ${sos_report_dir}    ${rc}=    Execute Command
@@ -121,8 +122,18 @@ Get MicroShift Cluster ID From Sos Report
     ...    sudo=True    return_rc=True    return_stdout=True
     Should Be Equal As Integers    0    ${rc}
 
+    RETURN    ${sos_report_untared}
+
+Get MicroShift Cluster ID From Sos Report
+    [Documentation]    Read and return the Cluster ID from the kube-system namespace yaml description in the Sos Report.
+    [Arguments]    ${sos_report_tarfile}
+
+    ${sos_report_untared}=    Extract Sos Report    ${sos_report_tarfile}
+
+    ${namespace_yaml_path}=    Set Variable
+    ...    ${sos_report_untared}/sos_commands/microshift/namespaces/${CLUSTERID_NS}/${CLUSTERID_NS}.yaml
     ${clusterid}    ${rc}=    Execute Command
-    ...    cat ${sos_report_untared}/sos_commands/microshift/namespaces/kube-system/kube-system.yaml | sed -n 's/\\s\\suid:\\s//p'
+    ...    cat ${namespace_yaml_path} | sed -n 's/\\s\\suid:\\s//p'
     ...    sudo=True    return_rc=True    return_stdout=True
     Should Be Equal As Integers    0    ${rc}
 
@@ -148,7 +159,7 @@ Remove Cluster ID File
 Create Sos Report
     [Documentation]    Create a MicroShift Sos Report and return the tar file path
 
-    ${rand_str}=    Generate Random String  4  [NUMBERS]
+    ${rand_str}=    Generate Random String    4    [NUMBERS]
     ${sos_report_dir}=    Catenate    SEPARATOR=    /tmp/rf-test/sos-report_    ${rand_str}
 
     ${rc}=    Execute Command
