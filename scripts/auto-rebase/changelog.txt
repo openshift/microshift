@@ -1,3 +1,62 @@
-- cluster-network-operator embedded-component 3584d79cb2c6f25e7984b393ac8ff9e59e684627 to 89a197f63cd2b4d04729484109bcf00e985be61c
-  - 869d5a5 2024-02-01T02:25:59+00:00 Remove extra env section in whereabouts-reconciler daemonset
+- cluster-kube-apiserver-operator embedded-component 90d35d617b6b87004530fb974cbc6eb39bc3fe3b to 689a2bdc377383c774cc353c8e643dfcbb40159e
+  - a1758b1 2024-02-02T12:52:46+00:00 Add sno section to alert description
+
+- cluster-network-operator embedded-component 89a197f63cd2b4d04729484109bcf00e985be61c to b45e7181271ba2b5e3766e3a9bc08e4e48ff11b6
+  - 63afbbd 2024-02-08T14:56:37+01:00 Fix CloudPrivateIPConfig CRD in common
+  - dcdb8db 2024-02-07T03:48:32+00:00 Remove libreswan rpm existence checks
+
+- csi-external-snapshotter embedded-component 090cd57847b98aebe42ecd5091c3a626eb870022 to 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13
+  - 8bcec53 2024-02-07T16:50:47-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- machine-config-operator embedded-component 10d332cfb4863f76fcba02b892180d848fff486d to 6305fca334948e9ed37b078884d96051f8859b99
+  - 52cd3064 2024-02-07T15:54:58-05:00 crio: enable log linking by default in 4.15
+  - d9516501 2024-02-06T15:46:16+00:00 Make sure on-prem coredns manifests are not generated for GCP
+
+- operator-framework-olm embedded-component 8b7ee21aa330b9bd60505c0b51caf2ce7c9e7de1 to 711336ec8ded4b51cc93d5d68b152e5db71aa9a6
+  - bcb66cb5 2024-02-06T14:42:12-05:00 Reflect BundleUnpacking cond removal in missed e2e test (#3170)
+  - 1bd293d0 2024-02-06T14:41:47-05:00 Clear (existing) error cond from Subscription, once error resolved (#3166)
+  - fc893899 2024-02-06T07:17:48-07:00 olm,catalog: only validate the resources we label (#3165)
+  - b1986315 2023-11-28T20:40:28+00:00 Updating operator-lifecycle-manager-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/operator-lifecycle-manager.yml
+
+- oc image-amd64 9ff9bd754ea6e530ffc31865fce334f3c58cadc0 to 48dcf5980a6671b5933707e5a055def023c7a13a
+  - 8091c7fd 2024-01-30T09:39:31+03:00 Add RHEL9 and RHEL8 based oc as new targets in command extraction
+
+- csi-external-snapshotter image-amd64 090cd57847b98aebe42ecd5091c3a626eb870022 to 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13
+  - 8bcec53 2024-02-07T16:50:47-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- csi-external-snapshotter image-amd64 090cd57847b98aebe42ecd5091c3a626eb870022 to 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13
+  - 8bcec53 2024-02-07T16:50:47-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- csi-external-snapshotter image-amd64 090cd57847b98aebe42ecd5091c3a626eb870022 to 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13
+  - 8bcec53 2024-02-07T16:50:47-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- ovn-kubernetes image-amd64 6a4ea849d86943dde92ca14cc796b0f811cb9312 to c5c63305c632169beb0d97a9d988514933d99a7e
+  - 259f9d6 2024-02-08T11:46:36+01:00 Do not resync services during node tracker startup
+  - 7f8f79e 2024-02-08T11:46:32+01:00 Separate timeout for handler sync from informer sync
+  - 5d60632 2024-02-05T12:29:48+01:00 Namespace address sets don't have hostNetwork pod ips, while Network Policies do add hostNetwork pods to their own address sets. An attempt to unify this behaviour ended up breaking customers relying on the previous logic, so we have to keep it. The logic on when to use namespace address sets was restored. It is applied when podSelector is nil. That means that peer ``` to:     - namespaceSelector: <ns selector> ``` won't include hostNetwork pods, while peer ``` to:     - namespaceSelector: <ns selector>       podSelector: {} ``` will. You can find 2 new unit tests verifying this behaviour.
+  - 86a0457 2024-02-01T12:59:29+01:00 Add UTs for session affinity config's
+  - 1759d33 2024-02-01T12:59:23+01:00 Vendor in the files from k8s
+  - 85e3fdf 2024-02-01T12:59:19+01:00 Support permanent session affinity
+  - b04f276 2024-01-31T13:47:24+01:00 Ignore hybrid-overlay nodes from EgressIP controller
+
+- oc image-arm64 9ff9bd754ea6e530ffc31865fce334f3c58cadc0 to 48dcf5980a6671b5933707e5a055def023c7a13a
+  - 8091c7fd 2024-01-30T09:39:31+03:00 Add RHEL9 and RHEL8 based oc as new targets in command extraction
+
+- csi-external-snapshotter image-arm64 090cd57847b98aebe42ecd5091c3a626eb870022 to 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13
+  - 8bcec53 2024-02-07T16:50:47-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- csi-external-snapshotter image-arm64 090cd57847b98aebe42ecd5091c3a626eb870022 to 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13
+  - 8bcec53 2024-02-07T16:50:47-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- csi-external-snapshotter image-arm64 090cd57847b98aebe42ecd5091c3a626eb870022 to 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13
+  - 8bcec53 2024-02-07T16:50:47-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- ovn-kubernetes image-arm64 6a4ea849d86943dde92ca14cc796b0f811cb9312 to c5c63305c632169beb0d97a9d988514933d99a7e
+  - 259f9d6 2024-02-08T11:46:36+01:00 Do not resync services during node tracker startup
+  - 7f8f79e 2024-02-08T11:46:32+01:00 Separate timeout for handler sync from informer sync
+  - 5d60632 2024-02-05T12:29:48+01:00 Namespace address sets don't have hostNetwork pod ips, while Network Policies do add hostNetwork pods to their own address sets. An attempt to unify this behaviour ended up breaking customers relying on the previous logic, so we have to keep it. The logic on when to use namespace address sets was restored. It is applied when podSelector is nil. That means that peer ``` to:     - namespaceSelector: <ns selector> ``` won't include hostNetwork pods, while peer ``` to:     - namespaceSelector: <ns selector>       podSelector: {} ``` will. You can find 2 new unit tests verifying this behaviour.
+  - 86a0457 2024-02-01T12:59:29+01:00 Add UTs for session affinity config's
+  - 1759d33 2024-02-01T12:59:23+01:00 Vendor in the files from k8s
+  - 85e3fdf 2024-02-01T12:59:19+01:00 Support permanent session affinity
+  - b04f276 2024-01-31T13:47:24+01:00 Ignore hybrid-overlay nodes from EgressIP controller
 
