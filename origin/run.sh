@@ -11,8 +11,30 @@ RESTRICTED="${RESTRICTED:-true}"
 
 cd "${SCRIPT_DIR}"
 
+echo "Preparing submodule"
+git submodule update --init
+pushd origin
+git reset --hard HEAD
+popd
+
+echo "Applying MicroShift patches"
+pushd origin
+for patch_file in "${SCRIPT_DIR}"/patches/*.patch; do
+    echo "Checking patch ${patch_file}"
+    if git apply --check "${patch_file}" 2> /dev/null; then
+        git apply "${patch_file}"
+        echo "Patch applied"
+    else
+        echo "Patch was already applied"
+    fi
+done
+popd
+
 echo "Building openshift-tests"
-make build
+pushd origin
+make openshift-tests
+mv openshift-tests "${DEST_DIR}/"
+popd
 
 if ! which oc &>/dev/null; then
     echo "oc binary not found"
@@ -31,4 +53,4 @@ if [ "${RESTRICTED}" = "true" ]; then
     SUITE_FILE="-f ${SCRIPT_DIR}/suite.txt"
 fi
 
-"${SCRIPT_DIR}"/openshift-tests run openshift/conformance -v 2 --provider=none ${SUITE_FILE} -o "${DEST_DIR}/e2e.log" --junit-dir "${DEST_DIR}/junit"
+"${DEST_DIR}"/openshift-tests run openshift/conformance -v 2 --provider=none ${SUITE_FILE} -o "${DEST_DIR}/e2e.log" --junit-dir "${DEST_DIR}/junit"

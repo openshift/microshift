@@ -1,0 +1,17 @@
+diff --git a/test/extended/router/metrics.go b/test/extended/router/metrics.go
+index 284c8dde2c..69b840ede8 100644
+--- a/test/extended/router/metrics.go
++++ b/test/extended/router/metrics.go
+@@ -49,6 +49,12 @@ var _ = g.Describe("[sig-network][Feature:Router]", func() {
+ 	)
+ 
+ 	g.BeforeEach(func() {
++		isMicroShift, err := exutil.IsMicroShiftCluster(oc.AdminKubeClient())
++		o.Expect(err).NotTo(o.HaveOccurred())
++		if isMicroShift {
++			g.Skip("MicroShift does not have Prometheus")
++		}
++
+ 		infra, err := oc.AdminConfigClient().ConfigV1().Infrastructures().Get(context.Background(), "cluster", metav1.GetOptions{})
+ 		o.Expect(err).NotTo(o.HaveOccurred())
+ 		platformType := infra.Status.Platform
