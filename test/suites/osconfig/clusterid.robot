@@ -129,6 +129,7 @@ Extract Sos Report
     [Arguments]    ${sos_report_tarfile}
 
     ${sos_report_dir}    ${file}=    Split Path    ${sos_report_tarfile}
+    ${sos_report_dir}=    Command Should Work    dirname ${sos_report_tarfile}
     Command Should Work    tar xf ${sos_report_tarfile} -C ${sos_report_dir}
     ${sos_report_untared}=    Command Should Work    find ${sos_report_dir} -type d -name "sosreport-*"
 
