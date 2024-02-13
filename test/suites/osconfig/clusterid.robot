@@ -118,7 +118,7 @@ Extract Sos Report
     Should Be Equal As Integers    0    ${rc}
 
     ${sos_report_untared}    ${rc}=    Execute Command
-    ...    find ${sos_report_dir} -type d -name "sosreport-*"
+    ...    find ${sos_report_dir} -type d -name "sosreport-microshift*"
     ...    sudo=True    return_rc=True    return_stdout=True
     Should Be Equal As Integers    0    ${rc}
 
@@ -173,7 +173,7 @@ Create Sos Report
     Should Be Equal As Integers    0    ${rc}
 
     ${sos_report_tarfile}    ${rc}=    Execute Command
-    ...    find ${sos_report_dir} -type f -name "sosreport-*.tar.xz"
+    ...    find ${sos_report_dir} -type f -name "sosreport-microshift*.tar.xz"
     ...    sudo=True    return_rc=True    return_stdout=True
     Should Be Equal As Integers    0    ${rc}
 
