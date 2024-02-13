@@ -3,14 +3,16 @@
 This directory contains the scripts and tools for running the
 documentation preview server.
 
-1. Check out `openshift/microshift` repository.
-2. Set the `BRANCH` variable in
-   `scripts/docs-preview/common.sh`. Typically in `main` this is set
-   to the _previous_ release branch. Note that the branches in the
-   docs repo use `enterprise` as a prefix instead of `release`.
-3. Run `scripts/docs-preview/build.sh` to ensure the build works
-   properly on your host.
-4. Run `scripts/docs-preview/serve.sh` to set up the server. This
-   requires port 8081 be open in the firewall, if you are serving to
-   anyone else.
-5. Set up a cron job to run `build.sh` regularly.
+1. Set the `DOCS_BRANCH` environment variable. Typically in `main` this
+   is set to the _previous_ release branch. Note that the branches in the
+   docs repository use `enterprise` as a prefix instead of `release`.
+1. Run `scripts/docs-preview/build.sh` to build the documentation.
+1. Run `scripts/docs-preview/serve.sh` to set up the server. 
+1. Open the http://0.0.0.0:8081/microshift_welcome/ URL.
+
+> Notes:
+> - To view up-to-date documentation, set up a cron job to run the
+> `scripts/docs-preview/build.sh` script regularly.
+> - Open port 8081 in the firewall if you are serving to anyone else.
+> - Run `scripts/docs-preview/clean.sh` to delete all the documentation
+> podman images, containers and artifacts.
