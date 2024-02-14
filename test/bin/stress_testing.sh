@@ -228,4 +228,3 @@ case ${CONDITION:-} in
   "")               echo -e "ERROR: condition is missing"; exit 1;;
   *)                echo -e "ERROR: condition is not valid '${CONDITION}'"; exit 1;;
 esac
-
