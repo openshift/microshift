@@ -1,4 +1,4 @@
-FROM fedora:37
+FROM registry.fedoraproject.org/fedora:37
 
 # glibc-all-langpacks is needed to make asciibinder read UTF-8 properly
 RUN dnf -y install ruby-devel gcc-c++ redhat-rpm-config make git glibc-all-langpacks && dnf clean all
@@ -6,12 +6,10 @@ RUN dnf -y install ruby-devel gcc-c++ redhat-rpm-config make git glibc-all-langp
 # install the tools for building documentation
 RUN gem install ascii_binder:1.2 asciidoctor-diagram:2.3.0
 
-COPY build-in-container.sh /
-
 ENV LANG="en_US.UTF-8"
 
 # When run via podman, the openshift-docs source directory should be
 # mounted as /docs
 WORKDIR /docs
 
-ENTRYPOINT ["/bin/bash", "/build-in-container.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "asciibinder build --distro microshift"]

@@ -10,4 +10,10 @@ OUTPUTDIR="${ROOTDIR}/_output"
 PREVIEWDIR="${OUTPUTDIR}/openshift-docs-preview"
 
 # shellcheck disable=SC2034  # used elsewhere
-BRANCH=enterprise-4.15
+PODMAN_IMAGE_TAG="ushift-docs-asciibinder"
+
+# shellcheck disable=SC2034  # used elsewhere
+PODMAN_CONTAINER_NAME="ushift-docs-httpd"
+
+# shellcheck disable=SC2034  # used elsewhere
+DOCS_BRANCH=${DOCS_BRANCH:-enterprise-4.15}
