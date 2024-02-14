@@ -1,14 +1,10 @@
-- router image-arm64 ba0be509f8cf8ea0d30540d69bbb20ae5087cc08 to d5b0316dd32280e52b1ef5476cafa55a6abbf1c5
-  - 6be0189 2024-02-08T19:13:48+00:00 Disable ALPN by default on fe_sni and fe_no_sni TLS Listeners (HAProxy 2.8)
-  - 5de9e85 2024-02-08T19:13:48+00:00 hack/Dockerfile.debug: Switch to transient HAProxy 2.8 RPM package
-  - e33dc37 2024-02-08T19:13:48+00:00 container builds: switch to haproxy28 RPM package
+- oc image-arm64 222f413938f89de9d9c80d41fa25fc35cfd2a4ec to cf7b09cd29f1c0f56b2c6cd8193092c57c7730ff
+  - 94337536 2024-02-12T14:39:22-05:00 Tools image no longer has python;adding
+  - 13bae02c 2024-02-12T17:41:06+03:00 Revert "NO-JIRA: Bump k8s dependencies to 1.29.1"
+  - de626471 2024-02-09T16:02:37+03:00 Bump k8s dependencies to 1.29.1
 
-- ovn-kubernetes image-arm64 614dc4369c060a62a0ccf49cefbe57817004cc7c to c74dcd47ba293344110bf68bc8b040ee4c696226
-  - 77d44e9 2024-02-07T13:02:57+01:00 Rename cm to clusterManager and networkControllerManager for the corresponding objects.
-  - 89e27ae 2024-02-07T13:02:57+01:00 Add stopChannel to queued Map to ensure new events are not added after stop channel is closed.
-  - a5ef4ee 2024-02-07T13:02:57+01:00 Wait for ovnkube controller to start before checking result error. Otherwise, on node start failure, ovnkube controller may not be started yet, and ovnkubeControllerStartErr will be nil just because it is unassigned yet.
-  - f7b7583 2024-02-07T11:36:12+01:00 Do not resync services during node tracker startup
-  - 369895c 2024-02-07T11:36:12+01:00 Separate timeout for handler sync from informer sync
-  - c6e8755 2024-02-06T10:35:43+00:00 Fix HO unit test flake
-  - 96ba5b3 2024-02-05T19:37:35+08:00 Updating ovn kubernetes microshift image to golang-1.21
+- ovn-kubernetes image-arm64 c74dcd47ba293344110bf68bc8b040ee4c696226 to 780c5a21ac104787c0caf8897a3045aa45023e74
+  - 2233344 2024-02-08T15:26:41+00:00 Ignore missing live migratable pod annotation on AddNode
+  - 8a1da8a 2024-02-07T17:31:11+01:00 actions: Free space by removing android-sdk
+  - 38b21b6 2024-02-07T17:31:11+01:00 actions: Remove android sdk
 
