@@ -33,8 +33,8 @@ function run {
 
 # install dependecies
 function install_kernel-modules-extra {
-  if (! run rpm-ostree status &> /dev/null); then
-    if ( ! run tc -V &> /dev/null); then
+  if ( ! run rpm-ostree status &> /dev/null); then
+    if ( ! run rpm -q kernel-modules-extra &> /dev/null); then
       run sudo dnf -y install kernel-modules-extra &> /dev/null
       
       run sudo reboot &
@@ -44,8 +44,8 @@ function install_kernel-modules-extra {
           sleep 10
       done
     fi
+    check_command "rpm -q kernel-modules-extra"
   fi
-  check_command "rpm -q kernel-modules-extra"
   check_command "tc -V"
 }
 
@@ -135,7 +135,7 @@ function tbd {
 function check_command {
   if ( ! run $1 &> /dev/null ) ; then
     echo -e "ERROR: $1: command not found"
-    return 1
+    exit 1
   fi
 }
 
