@@ -1,0 +1,6 @@
+- ovn-kubernetes image-amd64 a7471a148e419f40503c63c2bb27fbe83f383a77 to eba0ec12760444392a68f361c59d9617203d21fb
+  - 647b589 2024-02-08T13:15:40+01:00 Ignore hybrid-overlay nodes from EgressIP controller
+
+- ovn-kubernetes image-arm64 a7471a148e419f40503c63c2bb27fbe83f383a77 to eba0ec12760444392a68f361c59d9617203d21fb
+  - 647b589 2024-02-08T13:15:40+01:00 Ignore hybrid-overlay nodes from EgressIP controller
+
