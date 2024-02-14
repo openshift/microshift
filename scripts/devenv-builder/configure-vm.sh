@@ -11,7 +11,9 @@ RHEL_SUBSCRIPTION=false
 RHEL_BETA_VERSION=false
 SET_RHEL_RELEASE=true
 DNF_UPDATE=true
+PULL_IMAGES=false
 DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
+PULL_RETRY="${SCRIPTDIR}/../pull_retry.sh"
 
 start=$(date +%s)
 
@@ -23,6 +25,7 @@ function usage() {
     echo "  --force-firewall          Install and configure firewalld regardless of other options"
     echo "  --no-set-release-version  Do NOT set the release subscription to the current release version"
     echo "  --skip-dnf-update         Do NOT run dnf update"
+    echo "  --pre-pull-images         Force pulling of container images before starting MicroShift"
 
     [ -n "$1" ] && echo -e "\nERROR: $1"
     exit 1
@@ -49,6 +52,10 @@ while [ $# -gt 1 ]; do
         ;;
     --skip-dnf-update)
         DNF_UPDATE=false
+        shift
+        ;;
+    --pre-pull-images)
+        PULL_IMAGES=true
         shift
         ;;
     *) usage ;;
@@ -238,6 +245,11 @@ if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
 fi
 
 if ${BUILD_AND_RUN}; then
+    if ${PULL_IMAGES}; then
+        # shellcheck disable=SC2046
+        "${PULL_RETRY}" $(jq -r '.images | values[]' $(rpm -ql microshift-release-info | grep "release-$(uname -m)"))
+    fi
+
     sudo systemctl enable crio
     sudo systemctl start microshift
 
