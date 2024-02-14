@@ -362,6 +362,15 @@ do_group() {
 
     if ${BUILD_INSTALLER} && ! ${COMPOSER_DRY_RUN}; then
         for image_installer in "${groupdir}"/*.image-installer; do
+            # If a template arg was given, only build the image installer for the
+            # matching template.
+            if [ -n "${template_arg}" ]; then
+                installer_file=$(basename "${image_installer}")
+                template_file=$(basename "${template_arg}")
+                if [ "${installer_file%.image-installer}" != "${template_file%.toml}" ]; then
+                    continue
+                fi
+            fi
             blueprint=$("${GOMPLATE}" --file "${image_installer}")
             local expected_iso_file="${VM_DISK_BASEDIR}/${blueprint}.iso"
             if [ -f "${expected_iso_file}" ]; then
@@ -623,7 +632,7 @@ while getopts "dEfg:hiIl:sSt:" opt; do
             ;;
         t)
             TEMPLATE="${OPTARG}"
-            GROUP="$(basename "$(dirname "$(realpath "${OPTARG}")")")"
+            GROUP="$(dirname "$(realpath "${OPTARG}")")"
             selCount=$((selCount+1))
             FORCE_REBUILD=true
             ;;
