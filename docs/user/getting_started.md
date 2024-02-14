@@ -86,7 +86,7 @@ Enable the MicroShift RPM repos and install MicroShift and the `oc` and `kubectl
 
 ```bash
 sudo subscription-manager repos \
-    --enable rhocp-4.13-for-rhel-9-$(uname -m)-rpms \
+    --enable rhocp-4.14-for-rhel-9-$(uname -m)-rpms \
     --enable fast-datapath-for-rhel-9-$(uname -m)-rpms
 sudo dnf install -y microshift openshift-clients
 ```
