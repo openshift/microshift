@@ -3,7 +3,7 @@
 # This script enable Stress conditions at OS level in local or remote host
 # limiting resources (latency, bandwidth, packet loss, memory, disk...)
 
-set -uo pipefail
+set -xuo pipefail
 
 SCRIPT_NAME=$(basename "$0")
 WONDERSHAPER="/usr/local/bin/wondershaper"
@@ -12,7 +12,7 @@ SPEEDTEST_CLI="/usr/local/bin/speedtest-cli"
 # run commands
 function run {
   if [ "${SSH_PORT:-}" ]; then
-    SSH_PORT_PARAM+="-p ${SSH_PORT}"
+    SSH_PORT_PARAM="-p ${SSH_PORT}"
   fi
 
   if [ "${SSH_PKEY:-}" ]; then
@@ -25,10 +25,44 @@ function run {
 
   if [ "${SSH_HOSTNAME:-}" ]; then
     # shellcheck disable=SC2086
-    ssh -o LogLevel=ERROR ${SSH_PORT_PARAM:-} ${SSH_PKEY_PARAM:-} ${SSH_USER_PARAM:-}${SSH_HOSTNAME} "$@"
+    ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${SSH_PORT_PARAM:-} ${SSH_PKEY_PARAM:-} ${SSH_USER_PARAM:-}${SSH_HOSTNAME} "$@"
   else
     "$@"
   fi
+}
+
+# install dependecies
+function install_kernel-modules-extra {
+  if (! run rpm-ostree status &> /dev/null); then
+    if ( ! run tc -V &> /dev/null); then
+      run sudo dnf -y install kernel-modules-extra &> /dev/null
+      
+      run sudo reboot &
+      sleep 10
+      TIMEOUT_LIMIT=$(( SECONDS + 300 ))
+      until run true || (( SECONDS > TIMEOUT_LIMIT )); do
+          sleep 10
+      done
+    fi
+  fi
+  check_command "rpm -q kernel-modules-extra"
+  check_command "tc -V"
+}
+
+function install_wondershaper {
+  if ( ! run sudo ${WONDERSHAPER} -v  &> /dev/null); then
+    run sudo curl -Lo ${WONDERSHAPER} https://raw.githubusercontent.com/magnific0/wondershaper/master/wondershaper &> /dev/null
+    run sudo chmod +x ${WONDERSHAPER} &> /dev/null
+  fi
+  check_command "sudo ${WONDERSHAPER} -v"
+}
+
+function install_speedtest-cli {
+  if ( ! run ${SPEEDTEST_CLI} --version &> /dev/null); then
+    run sudo curl -Lo ${SPEEDTEST_CLI} https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py &> /dev/null
+    run sudo chmod +x ${SPEEDTEST_CLI} &> /dev/null
+  fi
+  check_command "${SPEEDTEST_CLI} --version"
 }
 
 # bandwidth condition
@@ -44,22 +78,9 @@ function bandwidth_condition {
 }
 
 function bandwidth_condition_ready { 
-  # tc command
-  check_command "tc -V"
-
-  # wondershaper
-  if ( ! sudo ${WONDERSHAPER} -v  &> /dev/null);  then
-    run sudo curl -Lo ${WONDERSHAPER} https://raw.githubusercontent.com/magnific0/wondershaper/master/wondershaper &> /dev/null
-    run sudo chmod +x ${WONDERSHAPER} &> /dev/null
-    check_command "sudo ${WONDERSHAPER} -v"
-  fi
-
-  # speedtest-cli
-  if ( ! ${SPEEDTEST_CLI} --version &> /dev/null);  then
-    run sudo curl -Lo ${SPEEDTEST_CLI} https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py &> /dev/null
-    run sudo chmod +x ${SPEEDTEST_CLI} &> /dev/null
-    check_command "${SPEEDTEST_CLI} --version"
-  fi
+  install_kernel-modules-extra
+  install_wondershaper
+  install_speedtest-cli
 }
 
 function enable_bandwidth {
@@ -89,8 +110,7 @@ function latency_condition {
 }
 
 function latency_condition_ready {
-  # tc command
-  check_command "tc -V"
+  install_kernel-modules-extra
 }
 
 function enable_latency {
@@ -115,7 +135,7 @@ function tbd {
 function check_command {
   if ( ! run $1 &> /dev/null ) ; then
     echo -e "ERROR: $1: command not found"
-    exit 1
+    return 1
   fi
 }
 
@@ -195,6 +215,11 @@ EXAMPLE:
     ${SCRIPT_NAME} -g latency
 EOF
 }
+
+if [ "${EUID}" -ne 0 ]
+  then echo "Please run as root"
+  exit 1
+fi
 
 pre_check "$@"
 

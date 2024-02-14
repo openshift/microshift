@@ -254,6 +254,24 @@ $ cat ./test/image-blueprints/layer1-base/group1/rhel92.image-installer
 rhel-9.2
 ```
 
+### Downloaded ISO Images
+
+To download a pre-built ISO image from the Internet, create a file with
+the extension `.image-fetcher` containing the URL of the image to be fetched.
+The name of the downloaded image will be derived from the base name of the
+file with the `.iso` extension.
+
+For example, create a `centos9.image-fetcher` file with a link to the CentOS 9
+ISO image. The downloaded file will be named `centos9.iso`.
+
+```
+$ cat ./test/image-blueprints/layer1-base/group1/centos9.image-fetcher
+https://mirrors.centos.org/mirrorlist?path=/9-stream/BaseOS/{{ .Env.UNAME_M }}/iso/CentOS-Stream-9-latest-{{ .Env.UNAME_M }}-dvd1.iso&redirect=1&protocol=https
+```
+
+> Note that the `.image-fetcher` file contents may contain Go template expressions
+> that will be expanded at runtime.
+
 ### Preparing to Run Test Scenarios
 
 The steps in this section need to be executed on a `development host`.
@@ -653,7 +671,7 @@ Cache update is scheduled as periodic CI jobs named `microshift-metal-cache-nigh
 and `microshift-metal-cache-nightly-arm`. The jobs run nightly by executing the
 `test/bin/ci_phase_iso_build.sh -update_cache` command.
 
-There are also pre-submit CI jobs named `microshift-metal-cache` and 
+There are also pre-submit CI jobs named `microshift-metal-cache` and
 `microshift-metal-cache-arm`. The jobs are executed automatically in pull requests
 when any scripts affecting the caching are updated.
 

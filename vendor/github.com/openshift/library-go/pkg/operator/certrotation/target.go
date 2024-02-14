@@ -89,14 +89,14 @@ type TargetCertRechecker interface {
 	RecheckChannel() <-chan struct{}
 }
 
-func (c RotatedSelfSignedCertKeySecret) ensureTargetCertKeyPair(ctx context.Context, signingCertKeyPair *crypto.CA, caBundleCerts []*x509.Certificate) error {
+func (c RotatedSelfSignedCertKeySecret) EnsureTargetCertKeyPair(ctx context.Context, signingCertKeyPair *crypto.CA, caBundleCerts []*x509.Certificate) (*corev1.Secret, error) {
 	// at this point our trust bundle has been updated.  We don't know for sure that consumers have updated, but that's why we have a second
 	// validity percentage.  We always check to see if we need to sign.  Often we are signing with an old key or we have no target
 	// and need to mint one
 	// TODO do the cross signing thing, but this shows the API consumers want and a very simple impl.
 	originalTargetCertKeyPairSecret, err := c.Lister.Secrets(c.Namespace).Get(c.Name)
 	if err != nil && !apierrors.IsNotFound(err) {
-		return err
+		return nil, err
 	}
 	targetCertKeyPairSecret := originalTargetCertKeyPairSecret.DeepCopy()
 	if apierrors.IsNotFound(err) {
@@ -120,26 +120,26 @@ func (c RotatedSelfSignedCertKeySecret) ensureTargetCertKeyPair(ctx context.Cont
 	if needsMetadataUpdate && len(targetCertKeyPairSecret.ResourceVersion) > 0 {
 		_, _, err := resourceapply.ApplySecret(ctx, c.Client, c.EventRecorder, targetCertKeyPairSecret)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	if reason := needNewTargetCertKeyPair(targetCertKeyPairSecret.Annotations, signingCertKeyPair, caBundleCerts, c.Refresh, c.RefreshOnlyWhenExpired); len(reason) > 0 {
+	if reason := c.CertCreator.NeedNewTargetCertKeyPair(targetCertKeyPairSecret.Annotations, signingCertKeyPair, caBundleCerts, c.Refresh, c.RefreshOnlyWhenExpired); len(reason) > 0 {
 		c.EventRecorder.Eventf("TargetUpdateRequired", "%q in %q requires a new target cert/key pair: %v", c.Name, c.Namespace, reason)
 		if err := setTargetCertKeyPairSecret(targetCertKeyPairSecret, c.Validity, signingCertKeyPair, c.CertCreator, c.JiraComponent, c.Description); err != nil {
-			return err
+			return nil, err
 		}
 
 		LabelAsManagedSecret(targetCertKeyPairSecret, CertificateTypeTarget)
 
 		actualTargetCertKeyPairSecret, _, err := resourceapply.ApplySecret(ctx, c.Client, c.EventRecorder, targetCertKeyPairSecret)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		targetCertKeyPairSecret = actualTargetCertKeyPairSecret
 	}
 
-	return nil
+	return targetCertKeyPairSecret, nil
 }
 
 func needNewTargetCertKeyPair(annotations map[string]string, signer *crypto.CA, caBundleCerts []*x509.Certificate, refresh time.Duration, refreshOnlyWhenExpired bool) string {

@@ -258,7 +258,7 @@ func (c *saToSCCCache) addToExternalJobQueue(obj interface{}) {
 func (c *saToSCCCache) handleRoleModified(obj interface{}) {
 	sccs, err := c.sccLister.List(labels.Everything())
 	if err != nil {
-		klog.Warning("failed to list SCCs: %v", err)
+		klog.Warningf("failed to list SCCs: %v", err)
 		return
 	}
 
@@ -341,7 +341,7 @@ func (c *saToSCCCache) handleSCCAdded(obj interface{}) {
 func (c *saToSCCCache) handleSCCDeleted(obj interface{}) {
 	scc, ok := obj.(*securityv1.SecurityContextConstraints)
 	if !ok {
-		klog.Error("expected obj to be of type SecurityContextConstraints, got %T", obj)
+		klog.Errorf("expected obj to be of type SecurityContextConstraints, got %T", obj)
 		return
 	}
 

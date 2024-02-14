@@ -30,10 +30,27 @@ metadata:
 
 ## Checking the LVMS Version
 
-Like the MicroShift version, the LVM version is available via a configmap. To get the version, run:
+Like the MicroShift version, the LVM version is available via a configmap.
+To get the version, run the following command.
 
 ```bash
-$ oc get configmap -n kube-public lvms-version -ojsonpath='{.data.version}'
+$ oc get configmap -n kube-public lvms-version -o jsonpath='{.data.version}'
+```
+
+## Checking the MicroShift Cluster ID
+
+MicroShift uses the `kube-system` namespace metadata UID value as a unique cluster identifier.
+To get the cluster ID, run the following command.
+
+```bash
+$ oc get namespaces kube-system -o jsonpath='{.metadata.uid}'
+```
+
+If the cluster is not running, examine the `/var/lib/microshift/cluster-id` file contents to
+get the cluster ID.
+
+```bash
+$ sudo cat /var/lib/microshift/cluster-id
 ```
 
 ## Generating an SOS Report
