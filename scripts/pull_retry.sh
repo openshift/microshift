@@ -21,8 +21,7 @@ if [ $# -lt 1 ] ; then
     exit 1
 fi
 
-for img in "$@"
-do
+for img in "$@"; do
     echo "Pulling ${img}"
     pull_image "${img}"
 done
