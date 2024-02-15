@@ -38,11 +38,11 @@ run_sonobuoy() {
     oc adm policy add-scc-to-group anyuid     system:authenticated system:serviceaccounts
 
     go install github.com/vmware-tanzu/sonobuoy@v0.57.1
-    ~/go/bin/sonobuoy gen \
+    ~/go/bin/sonobuoy run \
         --mode=certified-conformance \
         --dns-namespace=openshift-dns \
         --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default \
-        --e2e-parallel=y | oc apply -f -
+        --e2e-parallel=y 
 
     # Wait for up to 5m until tests start
     WAIT_FAILURE=true
