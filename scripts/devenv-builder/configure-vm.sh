@@ -245,12 +245,11 @@ if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
 fi
 
 if ${BUILD_AND_RUN}; then
+    sudo systemctl enable --now crio
     if ${PULL_IMAGES}; then
         # shellcheck disable=SC2046
         "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
     fi
-
-    sudo systemctl enable crio
     sudo systemctl start microshift
 
     echo ""
