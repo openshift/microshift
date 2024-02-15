@@ -9,7 +9,7 @@ function pull_image() {
     local -r image=$1
     local rc=0
     for _ in $(seq 3); do
-        sudo timeout 5m crictl pull "${image}" && return
+        timeout 5m sudo crictl pull "${image}" && return
         rc=$?
         sleep 1
     done
