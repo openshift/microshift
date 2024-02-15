@@ -1,14 +1,18 @@
-- router image-arm64 ba0be509f8cf8ea0d30540d69bbb20ae5087cc08 to d5b0316dd32280e52b1ef5476cafa55a6abbf1c5
-  - 6be0189 2024-02-08T19:13:48+00:00 Disable ALPN by default on fe_sni and fe_no_sni TLS Listeners (HAProxy 2.8)
-  - 5de9e85 2024-02-08T19:13:48+00:00 hack/Dockerfile.debug: Switch to transient HAProxy 2.8 RPM package
-  - e33dc37 2024-02-08T19:13:48+00:00 container builds: switch to haproxy28 RPM package
+- oc image-arm64 222f413938f89de9d9c80d41fa25fc35cfd2a4ec to 95004751c637a034872c0d6f17495bb8b45d514c
+  - 94337536 2024-02-12T14:39:22-05:00 Tools image no longer has python;adding
+  - 13bae02c 2024-02-12T17:41:06+03:00 Revert "NO-JIRA: Bump k8s dependencies to 1.29.1"
+  - de626471 2024-02-09T16:02:37+03:00 Bump k8s dependencies to 1.29.1
+  - 4b176dc4 2023-09-13T07:35:08+02:00 Do not force the ancient OS version dist tag, just use whatever the OS in question sets.
 
-- ovn-kubernetes image-arm64 614dc4369c060a62a0ccf49cefbe57817004cc7c to c74dcd47ba293344110bf68bc8b040ee4c696226
-  - 77d44e9 2024-02-07T13:02:57+01:00 Rename cm to clusterManager and networkControllerManager for the corresponding objects.
-  - 89e27ae 2024-02-07T13:02:57+01:00 Add stopChannel to queued Map to ensure new events are not added after stop channel is closed.
-  - a5ef4ee 2024-02-07T13:02:57+01:00 Wait for ovnkube controller to start before checking result error. Otherwise, on node start failure, ovnkube controller may not be started yet, and ovnkubeControllerStartErr will be nil just because it is unassigned yet.
-  - f7b7583 2024-02-07T11:36:12+01:00 Do not resync services during node tracker startup
-  - 369895c 2024-02-07T11:36:12+01:00 Separate timeout for handler sync from informer sync
-  - c6e8755 2024-02-06T10:35:43+00:00 Fix HO unit test flake
-  - 96ba5b3 2024-02-05T19:37:35+08:00 Updating ovn kubernetes microshift image to golang-1.21
+- router image-arm64 d5b0316dd32280e52b1ef5476cafa55a6abbf1c5 to 4c436c604e093a8cadcee72c8a45b214e24f40ac
+  - e746a9e 2024-02-13T09:13:13-04:00 Revert "Merge pull request #551 from frobware/validate-haproxy28-2.8.5-1.rhaos4.16.el9.x86_64.rpm"
+
+- ovn-kubernetes image-arm64 c74dcd47ba293344110bf68bc8b040ee4c696226 to 780c5a21ac104787c0caf8897a3045aa45023e74
+  - 2233344 2024-02-08T15:26:41+00:00 Ignore missing live migratable pod annotation on AddNode
+  - 8a1da8a 2024-02-07T17:31:11+01:00 actions: Free space by removing android-sdk
+  - 38b21b6 2024-02-07T17:31:11+01:00 actions: Remove android sdk
+
+- kubernetes image-arm64 2f773e8d16da18d91d717cb7e1aca3d000396e2d to 2f0465f49e8bd5cf98419321a1ec5c57a9474160
+  - aa6a9d6f3 2024-02-13T15:15:23-05:00 UPSTREAM: 121622: add StructuredAuthenticationConfiguration feature to kube feature gates file
+  - a84af6199 2024-02-13T13:42:07-05:00 UPSTREAM: 123165: Add AudienceMatchPolicy and support multiple audiences in AuthenticationConfiguration
 
