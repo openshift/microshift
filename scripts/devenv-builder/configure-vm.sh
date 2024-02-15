@@ -262,7 +262,7 @@ fi
 if ${BUILD_AND_RUN}; then
     if ${PULL_IMAGES}; then
         # shellcheck disable=SC2046
-        "${PULL_RETRY}" $(jq -r '.images | values[]' $(rpm -ql microshift-release-info | grep "release-$(uname -m)"))
+        "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
     fi
 
     sudo systemctl enable crio
