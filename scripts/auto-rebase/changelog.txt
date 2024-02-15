@@ -1,6 +1,17 @@
-- ovn-kubernetes image-amd64 a7471a148e419f40503c63c2bb27fbe83f383a77 to eba0ec12760444392a68f361c59d9617203d21fb
-  - 647b589 2024-02-08T13:15:40+01:00 Ignore hybrid-overlay nodes from EgressIP controller
+- cluster-kube-controller-manager-operator embedded-component 03242d287adbaf5798a611c319aa2ae813ac6d68 to 4e059638c2cbf003551ee699106dc024760eece3
+  - 9798571 2024-01-26T10:36:08+00:00 fix: remove deprecated exclude annotation
+  - ec95d2e 2024-01-26T10:36:08+00:00 fix: add internal-openshift-hosted
 
-- ovn-kubernetes image-arm64 a7471a148e419f40503c63c2bb27fbe83f383a77 to eba0ec12760444392a68f361c59d9617203d21fb
-  - 647b589 2024-02-08T13:15:40+01:00 Ignore hybrid-overlay nodes from EgressIP controller
+- cluster-network-operator embedded-component 41930d54e9e28d670444b22bea1d56dc04c76bce to b7ebd9409da7772b202e721948baf435a374e4a6
+  - c98b61b 2024-02-09T15:18:50+01:00 Update ingressconfig_controller to use subcontroller "ingress_controller" for field management on Patch calls. It used to apply changes with deprecated cluster-network-operator field manager, that was overridden and removed by ApplyObject. Thus, labels applied to openshift-host-network namespace were periodically removed.
+
+- ovn-kubernetes image-amd64 eba0ec12760444392a68f361c59d9617203d21fb to 243fa48adf67ddbabf2dafe082bb715ee671a2d9
+  - 13e934a 2024-02-13T14:02:50+00:00 Rename cm to clusterManager and networkControllerManager for the corresponding objects.
+  - f11af46 2024-02-13T14:02:49+00:00 Add stopChannel to queued Map to ensure new events are not added after stop channel is closed.
+  - f889966 2024-02-13T14:02:49+00:00 Wait for ovnkube controller to start before checking result error. Otherwise, on node start failure, ovnkube controller may not be started yet, and ovnkubeControllerStartErr will be nil just because it is unassigned yet.
+
+- ovn-kubernetes image-arm64 eba0ec12760444392a68f361c59d9617203d21fb to 243fa48adf67ddbabf2dafe082bb715ee671a2d9
+  - 13e934a 2024-02-13T14:02:50+00:00 Rename cm to clusterManager and networkControllerManager for the corresponding objects.
+  - f11af46 2024-02-13T14:02:49+00:00 Add stopChannel to queued Map to ensure new events are not added after stop channel is closed.
+  - f889966 2024-02-13T14:02:49+00:00 Wait for ovnkube controller to start before checking result error. Otherwise, on node start failure, ovnkube controller may not be started yet, and ovnkubeControllerStartErr will be nil just because it is unassigned yet.
 
