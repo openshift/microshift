@@ -13,16 +13,8 @@ auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
 fi
 
-# Temporary workaround for broken selinux-policy
-# dependencies of osbuild package on RHEL 9.3
-OSBUILD_VER=""
-source /etc/os-release
-if [ "${ID}" == "rhel" ] && [ "${VERSION_ID}" == "9.3" ]; then
-    OSBUILD_VER="-93-1.el9"
-fi
-
 sudo dnf install -y \
-     "osbuild${OSBUILD_VER}" osbuild-composer \
+     osbuild osbuild-composer \
      git composer-cli ostree rpm-ostree \
      cockpit-composer bash-completion podman runc genisoimage \
      createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
