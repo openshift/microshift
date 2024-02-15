@@ -25,7 +25,7 @@ function usage() {
     echo "  --force-firewall          Install and configure firewalld regardless of other options"
     echo "  --no-set-release-version  Do NOT set the release subscription to the current release version"
     echo "  --skip-dnf-update         Do NOT run dnf update"
-    echo "  --pre-pull-images         Force pulling of container images before starting MicroShift"
+    echo "  --pull-images         Force pulling of container images before starting MicroShift"
 
     [ -n "$1" ] && echo -e "\nERROR: $1"
     exit 1
@@ -54,7 +54,7 @@ while [ $# -gt 1 ]; do
         DNF_UPDATE=false
         shift
         ;;
-    --pre-pull-images)
+    --pull-images)
         PULL_IMAGES=true
         shift
         ;;
