@@ -34,5 +34,5 @@ https://github.com/openshift/csi-external-snapshotter image-arm64 50fa049ccaa48d
 https://github.com/openshift/router image-arm64 b7001137f832d02d4ed68cba27fe3001ff523fa6
 https://github.com/openshift/kube-rbac-proxy image-arm64 e8e8c84bcc6d4419970726f3028df4b178c0b1c9
 https://github.com/openshift/ovn-kubernetes image-arm64 3fdc9242e361a5e5007556054f5b0cc68a5be3d4
-https://github.com/openshift/kubernetes image-arm64 f1618d54a81f9f1bc0c3bf326454ab8e107eea87
+https://github.com/openshift/kubernetes image-arm64 6216ea1e51a2126f5b843a4ae7c1f414161cca8b
 https://github.com/openshift/service-ca-operator image-arm64 f5972cc74670c274bdc2b29d0903c4ed0432b9ca
