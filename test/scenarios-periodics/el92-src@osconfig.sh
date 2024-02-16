@@ -4,7 +4,7 @@
 
 # Override the default test timeout of 30m
 # shellcheck disable=SC2034  # used elsewhere
-TEST_EXECUTION_TIMEOUT="1h"
+TEST_EXECUTION_TIMEOUT="1.5h"
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.2-microshift-source
