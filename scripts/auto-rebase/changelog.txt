@@ -1,18 +1,3 @@
-- oc image-arm64 222f413938f89de9d9c80d41fa25fc35cfd2a4ec to 95004751c637a034872c0d6f17495bb8b45d514c
-  - 94337536 2024-02-12T14:39:22-05:00 Tools image no longer has python;adding
-  - 13bae02c 2024-02-12T17:41:06+03:00 Revert "NO-JIRA: Bump k8s dependencies to 1.29.1"
-  - de626471 2024-02-09T16:02:37+03:00 Bump k8s dependencies to 1.29.1
-  - 4b176dc4 2023-09-13T07:35:08+02:00 Do not force the ancient OS version dist tag, just use whatever the OS in question sets.
-
-- router image-arm64 d5b0316dd32280e52b1ef5476cafa55a6abbf1c5 to 4c436c604e093a8cadcee72c8a45b214e24f40ac
-  - e746a9e 2024-02-13T09:13:13-04:00 Revert "Merge pull request #551 from frobware/validate-haproxy28-2.8.5-1.rhaos4.16.el9.x86_64.rpm"
-
-- ovn-kubernetes image-arm64 c74dcd47ba293344110bf68bc8b040ee4c696226 to 780c5a21ac104787c0caf8897a3045aa45023e74
-  - 2233344 2024-02-08T15:26:41+00:00 Ignore missing live migratable pod annotation on AddNode
-  - 8a1da8a 2024-02-07T17:31:11+01:00 actions: Free space by removing android-sdk
-  - 38b21b6 2024-02-07T17:31:11+01:00 actions: Remove android sdk
-
-- kubernetes image-arm64 2f773e8d16da18d91d717cb7e1aca3d000396e2d to 2f0465f49e8bd5cf98419321a1ec5c57a9474160
-  - aa6a9d6f3 2024-02-13T15:15:23-05:00 UPSTREAM: 121622: add StructuredAuthenticationConfiguration feature to kube feature gates file
-  - a84af6199 2024-02-13T13:42:07-05:00 UPSTREAM: 123165: Add AudienceMatchPolicy and support multiple audiences in AuthenticationConfiguration
+- oc image-arm64 95004751c637a034872c0d6f17495bb8b45d514c to f44cf7a21666d1f2fab3ef16e36d9b7ecbc758ee
+  - 99cb08ec 2024-02-15T09:42:56+03:00 Print log rather than returning an error when kubectl version mistmaches
 
