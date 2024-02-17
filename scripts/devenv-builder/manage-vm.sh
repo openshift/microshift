@@ -169,7 +169,7 @@ function action_delete {
     fi
 
     sudo virsh destroy "${VMNAME}"
-    sudo virsh undefine "${VMNAME}"
+    sudo virsh undefine --nvram "${VMNAME}"
 
     # FIXME: The volume pool here may not be standard. How do we
     # figure out what it should be?
