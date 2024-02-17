@@ -594,7 +594,7 @@ remove_vm() {
         if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
             sudo virsh destroy "${full_vmname}"
         fi
-        sudo virsh undefine "${full_vmname}"
+        sudo virsh undefine --nvram "${full_vmname}"
     fi
 
     # Remove the VM storage pool
