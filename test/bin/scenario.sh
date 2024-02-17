@@ -406,8 +406,21 @@ launch_vm() {
     local vm_extra_args
     local vm_initrd_inject
     vm_network_args=""
-    vm_extra_args="console=tty0 console=ttyS0,115200n8 inst.notmux fips=${fips_mode}"
+    vm_extra_args="fips=${fips_mode}"
     vm_initrd_inject=""
+
+    # Specify the right console device per each platform. The baud rate
+    # setting boost may result in slightly improved speed.
+    # The device name is a mandatory option on x86_64 to get the console
+    # output from virt-install, but optional on aarch64 platform.
+    case "${UNAME_M}" in
+    x86_64)
+        vm_extra_args+=" console=ttyS0,115200n8 inst.notmux"
+        ;;
+    aarch64)
+        vm_extra_args+=" console=ttyAMA0,115200n8 inst.notmux"
+        ;;
+    esac
 
     for _ in $(seq "${vm_nics}") ; do
         vm_network_args+="--network network=${network_name},model=virtio "
