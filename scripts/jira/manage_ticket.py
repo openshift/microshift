@@ -164,7 +164,7 @@ def command_start(args):
         server=SERVER_URL,
         token_auth=os.environ.get('JIRA_API_TOKEN'),
     )
-    _, setter = custom_field_manager(server)
+    getter, setter = custom_field_manager(server)
 
     print(f'finding ticket {args.ticket_id}')
     ticket = server.issue(args.ticket_id)
@@ -187,6 +187,12 @@ def command_start(args):
     if args.story_points:
         print(f'...setting the story points to "{args.story_points}"')
         setter(ticket, 'Story Points', args.story_points)
+    else:
+        points = getter(ticket, 'Story Points')
+        if not points:
+            print('...WARNING: story points unset')
+        else:
+            print(f'...story points set to "{points}"')
 
     if args.sprint:
         active_sprint = get_active_sprint(server, sprint_project_id)
@@ -229,7 +235,7 @@ def command_close(args):
         server=SERVER_URL,
         token_auth=os.environ.get('JIRA_API_TOKEN'),
     )
-    getter, _ = custom_field_manager(server)
+    getter, setter = custom_field_manager(server)
     active_sprint = get_active_sprint(server, 'USHIFT')
     jira_id = server.myself()['name']
     gh_auth = github.Auth.Token(os.environ['GITHUB_TOKEN'])
@@ -246,6 +252,8 @@ def command_close(args):
         print('  Status:', ticket.fields.status)
         if ticket.fields.labels:
             print('  Labels:', ticket.fields.labels)
+        points = getter(ticket, 'Story Points')
+        print(f'  Story Points: {points}')
 
         all_merged = True
         links = server.remote_links(ticket.id)
@@ -275,8 +283,11 @@ def command_close(args):
             next_state = 'Review'
         print(f'  Transition: {next_state}')
         if args.dry_run:
-            print('f  DRY RUN')
+            print('  DRY RUN')
         else:
+            if not points:
+                print('  SKIPPING: story points are not set')
+                continue
             server.transition_issue(
                 issue=ticket,
                 transition=next_state,
