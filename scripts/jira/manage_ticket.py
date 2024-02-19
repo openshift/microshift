@@ -313,6 +313,7 @@ def main():
     )
     start_parser.add_argument(
         '--target-version',
+        default=os.environ.get('DEFAULT_TARGET_VERSION'),
         help='the target version',
     )
     start_parser.add_argument(
