@@ -40,6 +40,12 @@ Target Version
 The `--target-version` flag can be used to set a target version if one
 is not set already.
 
+Story Points
+------------
+
+The `--story-points` flag can be used to set the number of points the
+work represents, if it was not pre-planned.
+
 Status
 ------
 
@@ -178,6 +184,10 @@ def command_start(args):
         print(f'...setting the target version to "{args.target_version}"')
         setter(ticket, 'Target Version', [{'name': args.target_version}])
 
+    if args.story_points:
+        print(f'...setting the story points to "{args.story_points}"')
+        setter(ticket, 'Story Points', args.story_points)
+
     if args.sprint:
         active_sprint = get_active_sprint(server, sprint_project_id)
         if not active_sprint:
@@ -293,6 +303,12 @@ def main():
     start_parser.add_argument(
         '--target-version',
         help='the target version',
+    )
+    start_parser.add_argument(
+        '--story-points',
+        help='the story points',
+        default=None,
+        type=int,
     )
     start_parser.add_argument(
         '--no-sprint',
