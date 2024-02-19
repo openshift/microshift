@@ -1,15 +1,9 @@
-- cluster-network-operator embedded-component b7ebd9409da7772b202e721948baf435a374e4a6 to 837a9e1feba344828b9cb599c81df93fec55d636
-  - 3276879 2024-02-08T14:08:50-05:00 reduce the number of replicas for clusterManager
+- cluster-network-operator embedded-component 837a9e1feba344828b9cb599c81df93fec55d636 to acd87541954fdc56dc1785e8c0f26e0f86cd1548
+  - 40299ac 2024-02-05T21:52:47+00:00 Network node identity: tolarate all taints
 
-- ovn-kubernetes image-amd64 243fa48adf67ddbabf2dafe082bb715ee671a2d9 to 87016e74e1e6ed438e03d8fa2d9b4ee1a8241756
-  - b84bbbc 2024-02-08T11:57:28+01:00 Do not resync services during node tracker startup
-  - 8d557dc 2024-02-08T11:56:47+01:00 Separate timeout for handler sync from informer sync
-
-- ovn-kubernetes image-arm64 243fa48adf67ddbabf2dafe082bb715ee671a2d9 to 4d6dd53d3eee7b39f4b851f8a5e32dbd278274d8
+- ovn-kubernetes image-amd64 87016e74e1e6ed438e03d8fa2d9b4ee1a8241756 to 4d6dd53d3eee7b39f4b851f8a5e32dbd278274d8
   - 3e6cc2a 2024-02-08T15:31:40+01:00 Run go mod vendor && go mod tidy
   - a273640 2024-02-08T15:31:40+01:00 Add UTs for session affinity config's
   - 4d92442 2024-02-08T15:31:40+01:00 Vendor in the files from k8s
   - 5daa77d 2024-02-08T15:31:40+01:00 Support permanent session affinity
-  - b84bbbc 2024-02-08T11:57:28+01:00 Do not resync services during node tracker startup
-  - 8d557dc 2024-02-08T11:56:47+01:00 Separate timeout for handler sync from informer sync
 
