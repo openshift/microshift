@@ -4,6 +4,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.8.0
     include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/hypershift: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
   creationTimestamp: null
