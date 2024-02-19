@@ -194,6 +194,15 @@ def command_start(args):
         else:
             print(f'...story points set to "{points}"')
 
+    if args.no_qe:
+        labels = ticket.fields.labels
+        if 'no-qe-needed' not in labels:
+            labels.append('no-qe-needed')
+            ticket.update(fields={'labels': labels})
+            print('...added no-qe-needed label')
+        else:
+            print('...already have no-qe-needed')
+
     if args.sprint:
         active_sprint = get_active_sprint(server, sprint_project_id)
         if not active_sprint:
@@ -328,6 +337,13 @@ def main():
         default=True,
         action='store_false',
         help='set the sprint to the active sprint',
+    )
+    start_parser.add_argument(
+        '--no-qe',
+        dest='no_qe',
+        default=False,
+        action='store_true',
+        help='add the no-qe-needed label',
     )
     start_parser.add_argument(
         '--review',
