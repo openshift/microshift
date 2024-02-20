@@ -1,5 +1,5 @@
 name = "rhel-92-microshift-ext"
-description = "A RHEL 9.2 image with the RPMs built from ART."
+description = "A RHEL 9.2 image built from external RPMs."
 version = "0.0.1"
 modules = []
 groups = []

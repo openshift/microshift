@@ -1,5 +1,5 @@
 name = "rhel-93-microshift-ext
-description = "A RHEL 9.3 image with the RPMs built from ART."
+description = "A RHEL 9.3 image built with external RPMs."
 version = "0.0.1"
 modules = []
 groups = []
