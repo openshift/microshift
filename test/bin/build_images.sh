@@ -57,6 +57,7 @@ configure_package_sources() {
     export NEXT_REPO               # defined in common.sh
     export BASE_REPO               # defined in common.sh
     export YPLUS2_REPO             # defined in common.sh
+    export EXTERNAL_REPO           # defined in common.sh
     export CURRENT_RELEASE_REPO
     export PREVIOUS_RELEASE_REPO
 
@@ -68,6 +69,7 @@ configure_package_sources() {
     export SOURCE_VERSION_BASE
     export CURRENT_RELEASE_VERSION
     export PREVIOUS_RELEASE_VERSION
+    export EXTERNAL_VERSION
     export LATEST_RHOCP_MINOR
 
     # Add our sources. It is OK to run these steps repeatedly, if the
@@ -654,6 +656,12 @@ if [ -z "${release_info_rpm_base}" ]; then
     error "Failed to find microshift-release-info RPM in ${BASE_REPO}"
     exit 1
 fi
+# External RPM files may not exist
+release_info_rpm_external=$(find "${EXTERNAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
+if [ -n "${release_info_rpm_external}" ]; then
+    EXTERNAL_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm_external}")
+fi
+
 SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
 MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
 PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
@@ -686,6 +694,9 @@ extract_container_images "${SOURCE_VERSION}" "${LOCAL_REPO}" "${CONTAINER_LIST}"
 extract_container_images "4.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
 extract_container_images "4.${FAKE_YPLUS2_MINOR_VERSION}.*" "${YPLUS2_REPO}" "${CONTAINER_LIST}"
 extract_container_images "${PREVIOUS_RELEASE_VERSION}" "${PREVIOUS_RELEASE_REPO}" "${CONTAINER_LIST}"
+if [ -n "$EXTERNAL_VERSION" ] ; then
+    extract_container_images "${EXTERNAL_VERSION}" "${EXTERNAL_REPO}" "${CONTAINER_LIST}"
+fi
 
 trap 'osbuild_logs' EXIT
 

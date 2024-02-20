@@ -21,10 +21,13 @@ make_repo() {
     fi
     mkdir -p "${repodir}"
 
-    # Create the local RPM repository for whatever was built from source.
+    # Create the local RPM repository for whatever was built from source or downloaded
     echo "Copying RPMs from ${builddir} to ${repodir}"
-    # shellcheck disable=SC2086  # no quotes for command arguments to allow word splitting
-    cp -R ${builddir}/{RPMS,SPECS,SRPMS} "${repodir}/"
+    if [ -d "${builddir}/RPMS" ] && [ -d "${builddir}/SPECS" ] && [ -d "${builddir}/SRPMS" ] ; then
+        cp -R "${builddir}"/{RPMS,SPECS,SRPMS} "${repodir}/"
+    else
+        find "${builddir}" -name \*.rpm -exec cp -f {} "${repodir}/" \;
+    fi
 
     createrepo "${repodir}"
 
@@ -40,3 +43,4 @@ make_repo "${LOCAL_REPO}" "${RPM_SOURCE}"
 make_repo "${NEXT_REPO}" "${NEXT_RPM_SOURCE}"
 make_repo "${YPLUS2_REPO}" "${YPLUS2_RPM_SOURCE}"
 make_repo "${BASE_REPO}" "${BASE_RPM_SOURCE}"
+make_repo "${EXTERNAL_REPO}" "${EXTERNAL_RPM_SOURCE}"
