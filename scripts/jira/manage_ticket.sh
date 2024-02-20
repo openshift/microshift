@@ -14,4 +14,8 @@ if [ ! -d "${ENVDIR}" ]; then
     "${ENVDIR}/bin/pip3" install -r "${SCRIPTDIR}/requirements.txt"
 fi
 
+version_file="${REPOROOT}/Makefile.version.$(uname -m).var"
+version=$(cut -f2 -d= "${version_file}" | cut -f1-2 -d. | sed -e 's/ //g')
+export DEFAULT_TARGET_VERSION="openshift-${version}"
+
 "${ENVDIR}/bin/python3" "${SCRIPTDIR}/manage_ticket.py" "$@"

@@ -40,6 +40,12 @@ Target Version
 The `--target-version` flag can be used to set a target version if one
 is not set already.
 
+Story Points
+------------
+
+The `--story-points` flag can be used to set the number of points the
+work represents, if it was not pre-planned.
+
 Status
 ------
 
@@ -158,7 +164,7 @@ def command_start(args):
         server=SERVER_URL,
         token_auth=os.environ.get('JIRA_API_TOKEN'),
     )
-    _, setter = custom_field_manager(server)
+    getter, setter = custom_field_manager(server)
 
     print(f'finding ticket {args.ticket_id}')
     ticket = server.issue(args.ticket_id)
@@ -177,6 +183,25 @@ def command_start(args):
             raise ValueError('Unknown version')
         print(f'...setting the target version to "{args.target_version}"')
         setter(ticket, 'Target Version', [{'name': args.target_version}])
+
+    if args.story_points:
+        print(f'...setting the story points to "{args.story_points}"')
+        setter(ticket, 'Story Points', args.story_points)
+    else:
+        points = getter(ticket, 'Story Points')
+        if not points:
+            print('...WARNING: story points unset')
+        else:
+            print(f'...story points set to "{points}"')
+
+    if args.no_qe:
+        labels = ticket.fields.labels
+        if 'no-qe-needed' not in labels:
+            labels.append('no-qe-needed')
+            ticket.update(fields={'labels': labels})
+            print('...added no-qe-needed label')
+        else:
+            print('...already have no-qe-needed')
 
     if args.sprint:
         active_sprint = get_active_sprint(server, sprint_project_id)
@@ -219,7 +244,7 @@ def command_close(args):
         server=SERVER_URL,
         token_auth=os.environ.get('JIRA_API_TOKEN'),
     )
-    getter, _ = custom_field_manager(server)
+    getter, setter = custom_field_manager(server)
     active_sprint = get_active_sprint(server, 'USHIFT')
     jira_id = server.myself()['name']
     gh_auth = github.Auth.Token(os.environ['GITHUB_TOKEN'])
@@ -236,6 +261,8 @@ def command_close(args):
         print('  Status:', ticket.fields.status)
         if ticket.fields.labels:
             print('  Labels:', ticket.fields.labels)
+        points = getter(ticket, 'Story Points')
+        print(f'  Story Points: {points}')
 
         all_merged = True
         links = server.remote_links(ticket.id)
@@ -265,8 +292,11 @@ def command_close(args):
             next_state = 'Review'
         print(f'  Transition: {next_state}')
         if args.dry_run:
-            print('f  DRY RUN')
+            print('  DRY RUN')
         else:
+            if not points:
+                print('  SKIPPING: story points are not set')
+                continue
             server.transition_issue(
                 issue=ticket,
                 transition=next_state,
@@ -292,7 +322,14 @@ def main():
     )
     start_parser.add_argument(
         '--target-version',
+        default=os.environ.get('DEFAULT_TARGET_VERSION'),
         help='the target version',
+    )
+    start_parser.add_argument(
+        '--story-points',
+        help='the story points',
+        default=None,
+        type=int,
     )
     start_parser.add_argument(
         '--no-sprint',
@@ -300,6 +337,13 @@ def main():
         default=True,
         action='store_false',
         help='set the sprint to the active sprint',
+    )
+    start_parser.add_argument(
+        '--no-qe',
+        dest='no_qe',
+        default=False,
+        action='store_true',
+        help='add the no-qe-needed label',
     )
     start_parser.add_argument(
         '--review',
