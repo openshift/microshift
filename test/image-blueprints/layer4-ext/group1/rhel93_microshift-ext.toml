@@ -25,6 +25,34 @@ version = "{{ .Env.SOURCE_VERSION }}"
 name = "systemd-resolved"
 version = "*"
 
+[[packages]]
+name = "iputils"
+version = "*"
+
+[[packages]]
+name = "bind-utils"
+version = "*"
+
+[[packages]]
+name = "net-tools"
+version = "*"
+
+[[packages]]
+name = "iotop"
+version = "*"
+
+[[packages]]
+name = "strace"
+version = "*"
+
+[[packages]]
+name = "iproute-tc"
+version = "*"
+
+[[packages]]
+name = "kernel-modules-extra"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift"]
 
