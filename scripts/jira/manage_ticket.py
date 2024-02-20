@@ -291,12 +291,12 @@ def command_close(args):
         else:
             next_state = 'Review'
         print(f'  Transition: {next_state}')
+        if not points:
+            print('  SKIPPING: story points are not set')
+            continue
         if args.dry_run:
             print('  DRY RUN')
         else:
-            if not points:
-                print('  SKIPPING: story points are not set')
-                continue
             server.transition_issue(
                 issue=ticket,
                 transition=next_state,
