@@ -8,6 +8,7 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
   annotations:
     include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/hypershift: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
 rules:
@@ -29,6 +30,7 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-view: "true"
   annotations:
     include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/hypershift: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
 rules:
