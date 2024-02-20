@@ -1,9 +1,6 @@
-- cluster-network-operator embedded-component 837a9e1feba344828b9cb599c81df93fec55d636 to acd87541954fdc56dc1785e8c0f26e0f86cd1548
-  - 40299ac 2024-02-05T21:52:47+00:00 Network node identity: tolarate all taints
-
-- ovn-kubernetes image-amd64 87016e74e1e6ed438e03d8fa2d9b4ee1a8241756 to 4d6dd53d3eee7b39f4b851f8a5e32dbd278274d8
-  - 3e6cc2a 2024-02-08T15:31:40+01:00 Run go mod vendor && go mod tidy
-  - a273640 2024-02-08T15:31:40+01:00 Add UTs for session affinity config's
-  - 4d92442 2024-02-08T15:31:40+01:00 Vendor in the files from k8s
-  - 5daa77d 2024-02-08T15:31:40+01:00 Support permanent session affinity
+- cluster-network-operator embedded-component acd87541954fdc56dc1785e8c0f26e0f86cd1548 to d24dc3330e59f52a2bb5ea4586ae0c4778826680
+  - 0aa346b 2024-02-07T08:07:40+00:00 Remove extra env section in whereabouts-reconciler daemonset
+  - 5983b44 2023-12-05T19:41:09+01:00 Remove "ongoing-upgrade" field from interconnect configmap
+  - ab2547c 2023-10-23T18:51:11+02:00 Remove "temporary" field from interconnect configmap
+  - c9b793b 2023-10-23T18:51:06+02:00 Enable fast-forwarding to multizone for troubleshooting IC upgrades
 
