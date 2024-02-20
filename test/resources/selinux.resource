@@ -63,7 +63,7 @@ Semanage Fcontext Should Have MicroShift Rules
     List Should Contain Value    ${result}    /usr/local/bin/microshift-etcd
     List Should Contain Value    ${result}    /var/lib/microshift(/.*)?
     List Should Contain Value    ${result}    /var/lib/microshift-backups(/.*)?
-    List Should Contain Value    ${result}    /var/lib/microshift\\.saved(/.*)?
+    List Should Contain Value    ${result}    /var/lib/microshift\.saved(/.*)?
 
 Audit Log Should Be Empty For MicroShift
     [Documentation]    Checks that no permission denials have occured during running MicroShift
