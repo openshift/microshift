@@ -91,7 +91,6 @@ if [ "${STRESS_TESTING:-}" ]; then
     "${SCRIPTDIR}"/bin/stress_testing.sh -e "${CONDITION}" -v "${VALUE}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi
 
-set -x
 if ${DRYRUN}; then
     # shellcheck disable=SC2086
     "${RF_BINARY}" \
@@ -108,7 +107,6 @@ else
         --outputdir "${OUTDIR}" \
         "${TESTS[@]}"
 fi
-set +x
 
 # disable stress condition
 if [ "${STRESS_TESTING:-}" ]; then
