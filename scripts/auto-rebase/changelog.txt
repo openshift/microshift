@@ -1,4 +1,12 @@
-- kubernetes image-arm64 f1618d54a81f9f1bc0c3bf326454ab8e107eea87 to 6216ea1e51a2126f5b843a4ae7c1f414161cca8b
+- kubernetes embedded-component f1618d54a81f9f1bc0c3bf326454ab8e107eea87 to 6216ea1e51a2126f5b843a4ae7c1f414161cca8b
+  - d9ac8bc14 2024-02-13T17:15:56-05:00 UPSTREAM: 123165: Add AudienceMatchPolicy and support multiple audiences in AuthenticationConfiguration
+  - 47cdefa50 2024-02-13T17:15:56-05:00 UPSTREAM: 121622: add StructuredAuthenticationConfiguration feature to kube feature gates file
+  - 232906ad7 2024-02-13T15:23:51-05:00 UPSTREAM: 120183: [StructuredAuthnConfig] use local variables in oidc pkg
+  - 6042f241d 2024-02-13T15:23:28-05:00 UPSTREAM: 119142: [StructuredAuthenticationConfig] Add feature flag and wire up --authentication-config flag
+  - 2fe9b7959 2024-02-13T15:22:02-05:00 UPSTREAM: 118984: [StructuredAuthenticationConfig] Create struct for authn config and re-wire OIDC flags to use it
+  - 5aa64c6fa 2024-01-18T12:42:45+00:00 UPSTREAM: <carry>: Update management webhook pod admission logic
+
+- kubernetes image-amd64 f1618d54a81f9f1bc0c3bf326454ab8e107eea87 to 6216ea1e51a2126f5b843a4ae7c1f414161cca8b
   - d9ac8bc14 2024-02-13T17:15:56-05:00 UPSTREAM: 123165: Add AudienceMatchPolicy and support multiple audiences in AuthenticationConfiguration
   - 47cdefa50 2024-02-13T17:15:56-05:00 UPSTREAM: 121622: add StructuredAuthenticationConfiguration feature to kube feature gates file
   - 232906ad7 2024-02-13T15:23:51-05:00 UPSTREAM: 120183: [StructuredAuthnConfig] use local variables in oidc pkg
