@@ -32,8 +32,8 @@ stop=$(( current_minor - 3 ))
 # and then rhocp-4.14 (which will be returned from the script because it's usable).
 for ver in $(seq "${current_minor}" -1 "${stop}"); do
     repository="rhocp-4.${ver}-for-rhel-9-$(uname -m)-rpms"
-    if sudo dnf -v repository-packages "${repository}" info cri-o 1>&2;
-    then
+    >&2 echo "Checking '${repository}' repository"
+    if sudo dnf repository-packages "${repository}" info cri-o 1>&2; then
         echo "${ver}"
         exit 0
     fi

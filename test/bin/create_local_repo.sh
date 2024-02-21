@@ -14,6 +14,12 @@ make_repo() {
     local repodir="$1"
     local builddir="$2"
 
+    # Skip repo creation for non-existent builds
+    if [ ! -d "${builddir}" ] ; then
+        echo "Skipping repo creation for '${builddir}'"
+        return
+    fi
+
     title "Creating RPM repo at ${repodir}"
     if [ -d "${repodir}" ]; then
         echo "Cleaning up existing repository"
@@ -26,6 +32,7 @@ make_repo() {
     if [ -d "${builddir}/RPMS" ] && [ -d "${builddir}/SPECS" ] && [ -d "${builddir}/SRPMS" ] ; then
         cp -R "${builddir}"/{RPMS,SPECS,SRPMS} "${repodir}/"
     else
+        mkdir -p "${repodir}"
         find "${builddir}" -name \*.rpm -exec cp -f {} "${repodir}/" \;
     fi
 
