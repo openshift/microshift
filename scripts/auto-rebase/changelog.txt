@@ -1,6 +1,9 @@
-- cluster-network-operator embedded-component acd87541954fdc56dc1785e8c0f26e0f86cd1548 to d24dc3330e59f52a2bb5ea4586ae0c4778826680
-  - 0aa346b 2024-02-07T08:07:40+00:00 Remove extra env section in whereabouts-reconciler daemonset
-  - 5983b44 2023-12-05T19:41:09+01:00 Remove "ongoing-upgrade" field from interconnect configmap
-  - ab2547c 2023-10-23T18:51:11+02:00 Remove "temporary" field from interconnect configmap
-  - c9b793b 2023-10-23T18:51:06+02:00 Enable fast-forwarding to multizone for troubleshooting IC upgrades
+- csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96 to a6834536936b16dcd9ee81a8753a2ef6dc208541
+  - 886b5cc 2024-02-07T16:50:45-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96 to a6834536936b16dcd9ee81a8753a2ef6dc208541
+  - 886b5cc 2024-02-07T16:50:45-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+
+- csi-external-snapshotter image-arm64 0bf9276611e57cb87a05576c974fea1c38e3eb96 to a6834536936b16dcd9ee81a8753a2ef6dc208541
+  - 886b5cc 2024-02-07T16:50:45-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
 
