@@ -75,8 +75,7 @@ cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
 TESTS="$*"
 # if TESTS is not set - run the standard suite.
 if [ -z "${TESTS}" ]; then
-    # TESTS=(./suites/standard1 ./suites/standard2)
-    TESTS=(./suites/standard2)
+    TESTS=(./suites/standard1 ./suites/standard2)
 fi
 
 # enable stress condition
@@ -89,7 +88,7 @@ if [ "${STRESS_TESTING:-}" ]; then
     SSH_PORT=$("${YQ_BINARY}" '.SSH_PORT' "${RF_VARIABLES}")
     SSH_PKEY=$("${YQ_BINARY}" '.SSH_PRIV_KEY' "${RF_VARIABLES}")
 
-    sudo "${SCRIPTDIR}"/bin/stress_testing.sh -e "${CONDITION}" -v "${VALUE}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
+    "${SCRIPTDIR}"/bin/stress_testing.sh -e "${CONDITION}" -v "${VALUE}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi
 
 set -x
@@ -113,5 +112,5 @@ set +x
 
 # disable stress condition
 if [ "${STRESS_TESTING:-}" ]; then
-    sudo "${SCRIPTDIR}"/bin/stress_testing.sh -d "${CONDITION}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
+    "${SCRIPTDIR}"/bin/stress_testing.sh -d "${CONDITION}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi
