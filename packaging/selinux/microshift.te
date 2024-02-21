@@ -4,8 +4,7 @@ type microshift_t;
 domain_type(microshift_t);
 
 gen_require(`
-    type kubelet_t, var_lib_t, container_var_lib_t, init_exec_t;
-    class file { open read };
+	type kubelet_t, var_lib_t, container_var_lib_t;
 ')
 
 # When microshift creates backup folders in /var/lib/microshift-backups, the correct labels are applied
