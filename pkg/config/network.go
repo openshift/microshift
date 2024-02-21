@@ -3,8 +3,11 @@ package config
 import (
 	"fmt"
 	"net"
+	"slices"
 
 	"github.com/apparentlymart/go-cidr/cidr"
+	"github.com/openshift/microshift/pkg/config/ovn"
+	"github.com/vishvananda/netlink"
 )
 
 type Network struct {
@@ -57,4 +60,29 @@ func getClusterDNS(serviceCIDR string) (string, error) {
 	}
 
 	return dnsClusterIP.String(), nil
+}
+
+func (c *Config) EnsureNetworksDontOverlap() error {
+	linkList, err := netlink.LinkList()
+	if err != nil {
+		return fmt.Errorf("unable to load NIC list: %v", err)
+	}
+	for _, link := range linkList {
+		if link.Attrs().Name == ovn.OVNGatewayInterface || ovn.IsOVNKubernetesInternalInterface(link.Attrs().Name) {
+			continue
+		}
+		routes, err := netlink.RouteList(link, netlink.FAMILY_ALL)
+		if err != nil {
+			return fmt.Errorf("unable to determine routes for NIC %q: %v", link.Attrs().Name, err)
+		}
+		for _, route := range routes {
+			if slices.Contains(c.Network.ClusterNetwork, route.Dst.String()) {
+				return fmt.Errorf("route %v in the system overlaps with clusterNetwork entries", route.Dst.String())
+			}
+			if slices.Contains(c.Network.ServiceNetwork, route.Dst.String()) {
+				return fmt.Errorf("route %v in the system overlaps with serviceNetwork entries", route.Dst.String())
+			}
+		}
+	}
+	return nil
 }

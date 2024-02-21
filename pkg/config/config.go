@@ -286,6 +286,10 @@ func (c *Config) validate() error {
 		}
 	}
 
+	if err := c.EnsureNetworksDontOverlap(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
