@@ -19,8 +19,10 @@ featureGates:
   DisableKubeletCloudCredentialProviders: false
   DownwardAPIHugePages: true
   KMSv1: true
+  NetworkLiveMigration: true
   PodSecurity: true
   RotateKubeletServerCertificate: false # TODO
+  VSphereControlPlaneMachineSet: true
 kubeAPIBurst: 100
 kubeAPIQPS: 50
 maxPods: 250

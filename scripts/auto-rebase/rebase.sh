@@ -469,6 +469,9 @@ update_go_mods() {
 
     etcd_go_version=$(go mod edit -json "${STAGING_DIR}/etcd/go.mod" | jq -r '.Go')
     go mod edit -go="${etcd_go_version}" "${REPOROOT}/etcd/go.mod"
+    # Remove the toolchain to avoid downloading a different golang version when building with
+    # ART images.
+    go mod edit -toolchain=none "${REPOROOT}/etcd/go.mod"
 
     for d in "${GO_MOD_DIRS[@]}"; do
         pushd "${d}" > /dev/null
@@ -758,6 +761,7 @@ EOF
     yq -i 'with(.spec.template.spec.containers[0].securityContext; .runAsUser = 65534)' $target
 
     yq -i '.metadata.namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_service.yaml"
+    yq -i '.metadata.namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_serviceaccount.yaml"
 
     yq -i '.webhooks[0].clientConfig.service.namespace="kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_config.yaml"
 
