@@ -32,7 +32,7 @@ function run {
 }
 
 function reboot_and_wait {
-  PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
+  local -r PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
   run sudo reboot &
   sleep 10
   TIMEOUT_LIMIT=$(( SECONDS + 300 ))
