@@ -169,7 +169,7 @@ EOF
     # it also includes the kickstart files that may expose the
     # OpenShift Pull Secret and SSH keys.
     run_command_on_vm "${vmname}" \
-        "sudo mkdir /tmp/var-log-anaconda && \
+        "sudo mkdir -p /tmp/var-log-anaconda && \
          sudo cp /var/log/anaconda/*.log /tmp/var-log-anaconda/ && \
          sudo chmod +r /tmp/var-log-anaconda/*.log"
     mkdir -p "${vmdir}/anaconda"
