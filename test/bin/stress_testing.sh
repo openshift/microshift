@@ -35,7 +35,7 @@ function reboot_and_wait {
   local -r PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
   run sudo reboot &
   sleep 10
-  TIMEOUT_LIMIT=$(( SECONDS + 300 ))
+  local -r TIMEOUT_LIMIT=$(( SECONDS + 300 ))
   while true; do
     NEW_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
     if [ "${NEW_BOOT_ID:-}" ] && [ "${PREV_BOOT_ID}" != "${NEW_BOOT_ID}" ]; then
