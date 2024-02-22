@@ -37,6 +37,7 @@ function reboot_and_wait {
   sleep 10
   local -r TIMEOUT_LIMIT=$(( SECONDS + 300 ))
   while true; do
+    local NEW_BOOT_ID
     NEW_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
     if [ "${NEW_BOOT_ID:-}" ] && [ "${PREV_BOOT_ID}" != "${NEW_BOOT_ID}" ]; then
       break
