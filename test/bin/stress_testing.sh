@@ -31,18 +31,30 @@ function run {
   fi
 }
 
+function reboot_and_wait {
+  PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
+  run sudo reboot &
+  sleep 10
+  TIMEOUT_LIMIT=$(( SECONDS + 300 ))
+  while true; do
+    NEW_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
+    if [ "${NEW_BOOT_ID:-}" ] && [ "${PREV_BOOT_ID}" != "${NEW_BOOT_ID}" ]; then
+      break
+    fi
+    if (( SECONDS > TIMEOUT_LIMIT )); then
+      echo "ERROR: Timed out waiting for the VM to boot"
+      exit 1
+    fi
+    sleep 10
+  done
+}
+
 # install dependecies
 function install_kernel-modules-extra {
   if ! run rpm-ostree status &> /dev/null ; then
     if ! run rpm -q kernel-modules-extra &> /dev/null ; then
       run sudo dnf -y install kernel-modules-extra &> /dev/null
-      
-      run sudo reboot &
-      sleep 10
-      TIMEOUT_LIMIT=$(( SECONDS + 300 ))
-      until run true || (( SECONDS > TIMEOUT_LIMIT )); do
-          sleep 10
-      done
+      reboot_and_wait
     fi
     check_command "rpm -q kernel-modules-extra"
   fi
@@ -248,3 +260,5 @@ case ${CONDITION:-} in
   "")               echo -e "ERROR: condition is missing"; exit 1;;
   *)                echo -e "ERROR: condition is not valid '${CONDITION}'"; exit 1;;
 esac
+
+reboot_and_wait
