@@ -33,8 +33,8 @@ function run {
 
 # install dependecies
 function install_kernel-modules-extra {
-  if ( ! run rpm-ostree status &> /dev/null); then
-    if ( ! run rpm -q kernel-modules-extra &> /dev/null); then
+  if ! run rpm-ostree status &> /dev/null ; then
+    if ! run rpm -q kernel-modules-extra &> /dev/null ; then
       run sudo dnf -y install kernel-modules-extra &> /dev/null
       
       run sudo reboot &
@@ -50,7 +50,7 @@ function install_kernel-modules-extra {
 }
 
 function install_wondershaper {
-  if ( ! run sudo ${WONDERSHAPER} -v  &> /dev/null); then
+  if ! run sudo ${WONDERSHAPER} -v  &> /dev/null ; then
     run sudo curl -Lo ${WONDERSHAPER} https://raw.githubusercontent.com/magnific0/wondershaper/master/wondershaper &> /dev/null
     run sudo chmod +x ${WONDERSHAPER} &> /dev/null
   fi
@@ -58,7 +58,7 @@ function install_wondershaper {
 }
 
 function install_speedtest-cli {
-  if ( ! run ${SPEEDTEST_CLI} --version &> /dev/null); then
+  if ! run ${SPEEDTEST_CLI} --version &> /dev/null ; then
     run sudo curl -Lo ${SPEEDTEST_CLI} https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py &> /dev/null
     run sudo chmod +x ${SPEEDTEST_CLI} &> /dev/null
   fi
@@ -133,7 +133,7 @@ function tbd {
 }
 
 function check_command {
-  if ( ! run $1 &> /dev/null ) ; then
+  if ! run $1 &> /dev/null ; then
     echo -e "ERROR: $1: command not found"
     exit 1
   fi
