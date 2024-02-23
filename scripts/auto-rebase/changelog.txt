@@ -1,19 +1,6 @@
-- csi-external-snapshotter embedded-component 0bf9276611e57cb87a05576c974fea1c38e3eb96 to a6834536936b16dcd9ee81a8753a2ef6dc208541
-  - 886b5cc 2024-02-07T16:50:45-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
+- kubernetes embedded-component 28ed2d70d51caa9146362e3d268e24198731f6b7 to c79e5e24edc51d7f12894ad4b326e7f0e191e767
+  - 4c490f22c 2024-01-18T13:57:10+00:00 UPSTREAM: <carry>: Update management webhook pod admission logic
 
-- machine-config-operator embedded-component 43bb134a55f5ccefcb548f8ce1c6d3515d92cee2 to 17291ddae80eb8abba61d1cd0359089dd8f318b8
-  - 1be0cdb5 2024-02-14T10:33:05+00:00 Add existing kubeletconfig suffix key
-  - bb358e95 2023-10-03T13:30:01+00:00 Add v6-primary dual stack support to VSphere UPI
-
-- csi-external-snapshotter image-amd64 0bf9276611e57cb87a05576c974fea1c38e3eb96 to a6834536936b16dcd9ee81a8753a2ef6dc208541
-  - 886b5cc 2024-02-07T16:50:45-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
-
-- csi-external-snapshotter image-amd64 0bf9276611e57cb87a05576c974fea1c38e3eb96 to a6834536936b16dcd9ee81a8753a2ef6dc208541
-  - 886b5cc 2024-02-07T16:50:45-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
-
-- csi-external-snapshotter image-amd64 0bf9276611e57cb87a05576c974fea1c38e3eb96 to a6834536936b16dcd9ee81a8753a2ef6dc208541
-  - 886b5cc 2024-02-07T16:50:45-05:00 UPSTREAM: 876: VolumeSnapshot and VolumeSnapshotContent using JSON patch.
-
-- kubernetes image-arm64 28ed2d70d51caa9146362e3d268e24198731f6b7 to c79e5e24edc51d7f12894ad4b326e7f0e191e767
+- kubernetes image-amd64 28ed2d70d51caa9146362e3d268e24198731f6b7 to c79e5e24edc51d7f12894ad4b326e7f0e191e767
   - 4c490f22c 2024-01-18T13:57:10+00:00 UPSTREAM: <carry>: Update management webhook pod admission logic
 
