@@ -379,7 +379,6 @@ def publish_release(new_release, take_action):
     # Create draft release with message that includes download URLs and history
     try:
         subprocess.run(["gh", "release", "create",
-                        "--draft",
                         "--prerelease",
                         "--notes", notes,
                         "--generate-notes",
