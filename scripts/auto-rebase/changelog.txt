@@ -1,8 +1,27 @@
-- oc image-arm64 f44cf7a21666d1f2fab3ef16e36d9b7ecbc758ee to 7cfdaceb43f2558619301f2a7172a608599e8d59
-  - bb4e96f8 2024-02-20T09:56:34+03:00 Update some commands incorrect examples
+- cluster-csi-snapshot-controller-operator embedded-component 4b8c0563a8d45d59e58697088724479061388ca3 to ed8a8bcc29ba79e5abedd41deaee9747d0fe14cf
+  - 86a2291 2024-02-21T15:19:36-05:00 Update 07_deployment.yaml-patch
+  - 1c24e98 2024-02-21T15:18:48-05:00 apply hypershift cluster-profile
+  - d21611c 2024-02-18T13:44:29+08:00 Fix: typo of volumegroupsnapshots
 
-- kubernetes image-arm64 edc2c1207eef244c3f9fe9c9c4c1f87da7dfb49f to ac404b951b609a750286eab19c05c08cbfc880fd
+- cluster-kube-controller-manager-operator embedded-component fc039eb97932f5a4b1bcd4721860fe88eee36a08 to 5b0bd0ddf922db3161c83b028790b2f5d91bd10d
+  - d97f65d 2024-02-15T16:00:35-05:00 apply hypershift cluster-profile
+
+- cluster-kube-scheduler-operator embedded-component fa4405d613d798d5a0eb9f105dbf6d0da58e0740 to d08bc07830237e2abcd75c2a34e6651fd3a5514b
+  - 69542f8 2024-02-15T16:04:35-05:00 apply hypershift cluster-profile
+
+- cluster-network-operator embedded-component 7c7c54d0d9bb84c641592b9ec2648aa040f42a26 to 1263b5673c09d22fe696b9c87c64b3b6a87fe078
+  - 1036438 2024-02-21T11:41:11+01:00 Do not redeploy pods when IPForwarding changes from "" to "Restricted"
+  - 857339d 2024-02-20T03:30:48-05:00 Run dhcp-daemon pods as system-node-critical priority
+  - 1e0685a 2024-02-19T20:24:42+01:00 Bump openshift/api for valid values for ipForwarding
+  - 21a564c 2024-02-07T11:09:45+01:00 getMultusAdmissionControllerReplicas for non-hypershift externalTopology clusters
+  - ad94f41 2024-01-31T18:55:36+01:00 Disable network-node-identity on ROKS
+
+- cluster-openshift-controller-manager-operator embedded-component 4e5864575c5c447d28b5f1bb68806b9a96843e71 to d97bdefe3d5c1cb83d63f732fd35732a83ba7708
+  - d9dd1fc 2023-12-21T02:10:49+00:00 Updating ose-cluster-openshift-controller-manager-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/af2133c5194e28075efb48f4b508a98759b079d2/images/ose-cluster-openshift-controller-manager-operator.yml
+
+- kubernetes embedded-component edc2c1207eef244c3f9fe9c9c4c1f87da7dfb49f to 2eba5a9a34b4e3ac7f3cb5f03cf04282f7464356
   - 8ade471b1 2024-02-19T18:16:47+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - e66d14e75 2024-02-14T11:37:02-05:00 UPSTREAM: <carry>: RPM: Split apiserver, scheduler, k-c-m, kubelet into subpackages
   - 4b8e81935 2024-02-14T10:32:39+00:00 Release commit for Kubernetes v1.29.2
   - b4e9ff63e 2024-02-09T15:10:44+01:00 [go] Bump images, dependencies and versions to go 1.21.7 / setcap/debian-base to bookworm-v1.0.1 and distroless-iptables to v0.4.5
   - 3dbf97d91 2024-02-03T09:36:02+08:00 Revert "kubeadm: fix a bug where the uploaded kubelet configuration in kube-system/kubelet-config ConfigMap does not respect user patch"
@@ -17,4 +36,35 @@
   - f6cce58d6 2024-01-15T18:47:41+01:00 Fix kubeadm init regression
   - 221c1ad67 2024-01-13T12:50:18+02:00 Drop PendingChanges methods from change trackers, move into UpdateResults
   - 288776227 2024-01-13T12:30:29+02:00 Squash some unnecessarily-chained methods in the change trackers
+
+- machine-config-operator embedded-component 54cf6ad21230d373b6870d7fd5cfebe76f5cd7df to 4805507d1735dd848cafd4f0b9a1d916bbafd028
+  - f9534f3c 2024-02-20T16:27:12-06:00 OCPBUGS-29732: Always touch resolv-prepender file at end of script
+  - 601d2300 2024-02-20T10:49:33-05:00 set nodeStatusReportFrequency
+  - 41301288 2024-02-19T12:23:39-05:00 MCO-998: sets up MCO repository for Snyk CI scans
+  - 416ca923 2024-02-19T17:57:28+01:00 OCPBUGS-29624: Restart resolv-prepender on failure
+  - de16a877 2024-02-19T11:18:12+01:00 OPNET-469: Apply new DNS configuration only if changed
+
+- oc image-amd64 f44cf7a21666d1f2fab3ef16e36d9b7ecbc758ee to 7cfdaceb43f2558619301f2a7172a608599e8d59
+  - bb4e96f8 2024-02-20T09:56:34+03:00 Update some commands incorrect examples
+
+- kubernetes image-amd64 edc2c1207eef244c3f9fe9c9c4c1f87da7dfb49f to 2eba5a9a34b4e3ac7f3cb5f03cf04282f7464356
+  - 8ade471b1 2024-02-19T18:16:47+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - e66d14e75 2024-02-14T11:37:02-05:00 UPSTREAM: <carry>: RPM: Split apiserver, scheduler, k-c-m, kubelet into subpackages
+  - 4b8e81935 2024-02-14T10:32:39+00:00 Release commit for Kubernetes v1.29.2
+  - b4e9ff63e 2024-02-09T15:10:44+01:00 [go] Bump images, dependencies and versions to go 1.21.7 / setcap/debian-base to bookworm-v1.0.1 and distroless-iptables to v0.4.5
+  - 3dbf97d91 2024-02-03T09:36:02+08:00 Revert "kubeadm: fix a bug where the uploaded kubelet configuration in kube-system/kubelet-config ConfigMap does not respect user patch"
+  - c81b4829a 2024-02-02T19:29:46+02:00 kubeadm: better checks if the node is CP during "upgrade node"
+  - 6ff755193 2024-02-01T12:19:43-08:00 test: remove unnecessary skip healthz check from test
+  - cc819ed4a 2024-02-01T11:05:33-08:00 bugfix: dont skip reconcile for unchanged policy if last sync failed
+  - 60a564c92 2024-01-31T15:18:49-08:00 Add processStartTime in metrics/slis
+  - 8b5f64fbc 2024-01-31T00:06:16+00:00 Fix deprecated version for pod_scheduling_duration_seconds
+  - 4a0a7e809 2024-01-25T10:31:20+01:00 flag PersistentVolumeLastPhaseTransitionTime field as beta
+  - ea32a7d6b 2024-01-19T11:10:22+08:00 If a pvc has an empty storageclass name, don't try to assign a default StorageClass to it.
+  - a02da6331 2024-01-17T16:16:22+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.1
+  - f6cce58d6 2024-01-15T18:47:41+01:00 Fix kubeadm init regression
+  - 221c1ad67 2024-01-13T12:50:18+02:00 Drop PendingChanges methods from change trackers, move into UpdateResults
+  - 288776227 2024-01-13T12:30:29+02:00 Squash some unnecessarily-chained methods in the change trackers
+
+- kubernetes image-arm64 ac404b951b609a750286eab19c05c08cbfc880fd to 2eba5a9a34b4e3ac7f3cb5f03cf04282f7464356
+  - e66d14e75 2024-02-14T11:37:02-05:00 UPSTREAM: <carry>: RPM: Split apiserver, scheduler, k-c-m, kubelet into subpackages
 
