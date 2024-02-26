@@ -1,6 +1,6 @@
-- cluster-network-operator embedded-component acd87541954fdc56dc1785e8c0f26e0f86cd1548 to d24dc3330e59f52a2bb5ea4586ae0c4778826680
-  - 0aa346b 2024-02-07T08:07:40+00:00 Remove extra env section in whereabouts-reconciler daemonset
-  - 5983b44 2023-12-05T19:41:09+01:00 Remove "ongoing-upgrade" field from interconnect configmap
-  - ab2547c 2023-10-23T18:51:11+02:00 Remove "temporary" field from interconnect configmap
-  - c9b793b 2023-10-23T18:51:06+02:00 Enable fast-forwarding to multizone for troubleshooting IC upgrades
+- kubernetes embedded-component 28ed2d70d51caa9146362e3d268e24198731f6b7 to c79e5e24edc51d7f12894ad4b326e7f0e191e767
+  - 4c490f22c 2024-01-18T13:57:10+00:00 UPSTREAM: <carry>: Update management webhook pod admission logic
+
+- kubernetes image-amd64 28ed2d70d51caa9146362e3d268e24198731f6b7 to c79e5e24edc51d7f12894ad4b326e7f0e191e767
+  - 4c490f22c 2024-01-18T13:57:10+00:00 UPSTREAM: <carry>: Update management webhook pod admission logic
 

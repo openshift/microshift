@@ -31,43 +31,6 @@ CONTEXT_CHECK_MAP = {
     ],
 }
 
-# This list should only ever change if we alter the SELinux policy or
-# upstream container linux package changes something in these contexts,
-# those events should be rare. However, if anything changes these contexts, the test should
-# fail so we can decide what that means for MicroShift and update the list then.
-EXPECTED_FCONTEXT_LIST = [
-    "/etc/kubernetes(/.*)?",
-    "/etc/microshift(/.*)?",
-    "/exports(/.*)?",
-    "/usr/bin/microshift",
-    "/usr/bin/microshift-etcd",
-    "/usr/lib/microshift(/.*)?",
-    "/usr/local/bin/microshift",
-    "/usr/local/bin/microshift-etcd",
-    "/usr/local/s?bin/hyperkube.*",
-    "/usr/local/s?bin/kubelet.*",
-    "/usr/s?bin/hyperkube.*",
-    "/usr/s?bin/kubelet.*",
-    "/var/lib/buildkit(/.*)?",
-    "/var/lib/cni(/.*)?",
-    "/var/lib/containerd(/.*)?",
-    "/var/lib/containers(/.*)?",
-    "/var/lib/docker(/.*)?",
-    "/var/lib/docker-latest(/.*)?",
-    "/var/lib/kubelet(/.*)?",
-    "/var/lib/lxc(/.*)?",
-    "/var/lib/lxd(/.*)?",
-    "/var/lib/microshift(/.*)?",
-    "/var/lib/microshift-backups(/.*)?",
-    "/var/lib/microshift.saved(/.*)?",
-    "/var/lib/ocid(/.*)?",
-    "/var/lib/registry(/.*)?",
-]
-
-EXPECTED_FCONTEXT_LIST_EL93 = [
-    "/var/cache/containers(/.*)?",
-]
-
 SOURCE_TARGET_TRANSITION = {
     "container_t": ["container_var_lib_t"]
 }
