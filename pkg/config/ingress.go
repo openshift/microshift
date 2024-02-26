@@ -1,6 +1,6 @@
 package config
 
 type IngressConfig struct {
-	ServingCertificate []byte
-	ServingKey         []byte
+	ServingCertificate []byte `json:"-"`
+	ServingKey         []byte `json:"-"`
 }
