@@ -679,7 +679,7 @@ EOF
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CIPHERS", "value": "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CIPHERSUITES", "value": "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DISABLE_HTTP2", "value": "true"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK", "value": "false"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK", "value": "{{.RouterNamespaceOwnership}}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_LOAD_BALANCE_ALGORITHM", "value": "random"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     # TODO: Generate and volume mount the metrics-certs secret
     # yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_METRICS_TLS_CERT_FILE", "value": "/etc/pki/tls/metrics-certs/tls.crt"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
