@@ -159,6 +159,22 @@ function namespace_deployment_ready() {
     return 1
 }
 
+# Check if the DaemonSet rollout status in a given namespace is successful.
+#
+# args: None
+# env: 'CHECK_DAEMONSET_NS' environment variable for the namespace to check
+# return: 0 if deployment rollout is successful, or 1 otherwise
+function namespace_daemonset_ready() {
+    local -r ns="${CHECK_DAEMONSET_NS}"
+
+    if ${OCROLLOUT_CMD} status daemonset -n "${ns}" \
+            --watch=false --timeout=1s &>/dev/null ; then
+        return 0
+    fi
+
+    return 1
+}
+
 # Check if a given number of pods in a given namespace are in the 'Ready' status,
 # terminating the script with the SIGTERM signal if more pods are ready than expected.
 #
