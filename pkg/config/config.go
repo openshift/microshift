@@ -116,6 +116,11 @@ func (c *Config) fillDefaults() error {
 			defaultManifestDirEtcGlob,
 		},
 	}
+	c.Ingress = IngressConfig{
+		AdmissionPolicy: RouteAdmissionPolicy{
+			NamespaceOwnership: NamespaceOwnershipAllowed,
+		},
+	}
 
 	c.MultiNode.Enabled = false
 
@@ -183,6 +188,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	// disabling the manifest loader.
 	if u.Manifests.KustomizePaths != nil {
 		c.Manifests.KustomizePaths = u.Manifests.KustomizePaths
+	}
+
+	if len(u.Ingress.AdmissionPolicy.NamespaceOwnership) != 0 {
+		c.Ingress.AdmissionPolicy.NamespaceOwnership = u.Ingress.AdmissionPolicy.NamespaceOwnership
 	}
 }
 
