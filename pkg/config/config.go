@@ -25,17 +25,17 @@ const (
 )
 
 type Config struct {
-	DNS       DNS        `json:"dns"`
-	Network   Network    `json:"network"`
-	Node      Node       `json:"node"`
-	ApiServer ApiServer  `json:"apiServer"`
-	Etcd      EtcdConfig `json:"etcd"`
-	Debugging Debugging  `json:"debugging"`
-	Manifests Manifests  `json:"manifests"`
+	DNS       DNS           `json:"dns"`
+	Network   Network       `json:"network"`
+	Node      Node          `json:"node"`
+	ApiServer ApiServer     `json:"apiServer"`
+	Etcd      EtcdConfig    `json:"etcd"`
+	Debugging Debugging     `json:"debugging"`
+	Manifests Manifests     `json:"manifests"`
+	Ingress   IngressConfig `json:"ingress"`
 
 	// Internal-only fields
-	Ingress      IngressConfig `json:"-"`
-	userSettings *Config       `json:"-"` // the values read from the config file
+	userSettings *Config `json:"-"` // the values read from the config file
 
 	MultiNode MultiNodeConfig `json:"-"` // the value read from commond line
 
