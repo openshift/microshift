@@ -295,6 +295,12 @@ func (c *Config) validate() error {
 		}
 	}
 
+	switch c.Ingress.AdmissionPolicy.NamespaceOwnership {
+	case NamespaceOwnershipAllowed, NamespaceOwnershipStrict:
+	default:
+		return fmt.Errorf("unsupported namespaceOwnership value %v", c.Ingress.AdmissionPolicy.NamespaceOwnership)
+	}
+
 	return nil
 }
 
