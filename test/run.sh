@@ -68,7 +68,7 @@ cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
 TESTS="$*"
 # if TESTS is not set - run the standard suite.
 if [ -z "${TESTS}" ]; then
-    TESTS="./suites/standard"
+    TESTS=(./suites/standard1 ./suites/standard2)
 fi
 
 set -x
@@ -77,7 +77,7 @@ if ${DRYRUN}; then
     "${RF_BINARY}" \
         --dryrun \
         --outputdir "${OUTDIR}" \
-        ${TESTS}
+        "${TESTS[@]}"
 else
     # shellcheck disable=SC2086
     "${RF_BINARY}" \
@@ -86,5 +86,5 @@ else
         -V "${RF_VARIABLES}" \
         -x junit.xml \
         --outputdir "${OUTDIR}" \
-        ${TESTS}
+        "${TESTS[@]}"
 fi
