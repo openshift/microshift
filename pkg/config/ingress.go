@@ -14,5 +14,6 @@ type IngressConfig struct {
 }
 
 type RouteAdmissionPolicy struct {
+	// +kubebuilder:default="InterNamespaceAllowed"
 	NamespaceOwnership NamespaceOwnershipEnum `json:"namespaceOwnership"`
 }
