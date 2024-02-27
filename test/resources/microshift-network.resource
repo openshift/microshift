@@ -17,12 +17,14 @@ ${HTTP_PORT}        80
 *** Keywords ***
 Create Hello MicroShift Pod
     [Documentation]    Create a pod running the "hello microshift" application
-    Oc Create    -f ${HELLO_USHIFT} -n ${NAMESPACE}
-    Labeled Pod Should Be Ready    app\=hello-microshift    timeout=120s
+    [Arguments]    ${ns}=${NAMESPACE}
+    Oc Create    -f ${HELLO_USHIFT} -n ${ns}
+    Labeled Pod Should Be Ready    app\=hello-microshift    timeout=120s    ns=${ns}
 
 Expose Hello MicroShift
     [Documentation]    Expose the "hello microshift" application via cluster ip service
-    Run With Kubeconfig    oc expose pod hello-microshift -n ${NAMESPACE}
+    [Arguments]    ${ns}=${NAMESPACE}
+    Run With Kubeconfig    oc expose pod hello-microshift -n ${ns}
 
 Expose Hello MicroShift Pod Via LB
     [Documentation]    Expose the "hello microshift" application through the load balancer
@@ -63,5 +65,6 @@ Verify Hello MicroShift LB
 
 Delete Hello MicroShift Pod And Service
     [Documentation]    Delete service and pod for cleanup.
-    Oc Delete    service/hello-microshift -n ${NAMESPACE}
-    Oc Delete    -f ${HELLO_USHIFT} -n ${NAMESPACE}
+    [Arguments]    ${ns}=${NAMESPACE}
+    Oc Delete    service/hello-microshift -n ${ns}
+    Oc Delete    -f ${HELLO_USHIFT} -n ${ns}
