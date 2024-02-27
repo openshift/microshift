@@ -1,6 +1,0 @@
-- kubernetes embedded-component 28ed2d70d51caa9146362e3d268e24198731f6b7 to c79e5e24edc51d7f12894ad4b326e7f0e191e767
-  - 4c490f22c 2024-01-18T13:57:10+00:00 UPSTREAM: <carry>: Update management webhook pod admission logic
-
-- kubernetes image-amd64 28ed2d70d51caa9146362e3d268e24198731f6b7 to c79e5e24edc51d7f12894ad4b326e7f0e191e767
-  - 4c490f22c 2024-01-18T13:57:10+00:00 UPSTREAM: <carry>: Update management webhook pod admission logic
-
