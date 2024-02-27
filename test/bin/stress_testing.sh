@@ -53,7 +53,7 @@ function reboot_and_wait {
 function install_kernel-modules-extra {
   if ! run rpm-ostree status &> /dev/null ; then
     if ! run rpm -q kernel-modules-extra &> /dev/null ; then
-      run sudo dnf -y install kernel-modules-extra &> /dev/null
+      run sudo dnf -y --nogpgcheck install kernel-modules-extra &> /dev/null
       reboot_and_wait
     fi
     check_command "rpm -q kernel-modules-extra"
