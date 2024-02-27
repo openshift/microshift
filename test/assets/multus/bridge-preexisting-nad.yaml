@@ -1,0 +1,25 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: bridge-preexisting-conf
+spec:
+  config: '{
+      "cniVersion": "0.4.0",
+      "type": "bridge",
+      "bridge": "br-preexisting",
+      "mode": "bridge",
+      "ipam": {
+        "type": "host-local",
+        "ranges": [
+          [
+            {
+              "subnet": "10.10.1.0/24",
+              "rangeStart": "10.10.1.20",
+              "rangeEnd": "10.10.1.50",
+              "gateway": "10.10.1.254"
+            }
+          ]
+        ],
+        "dataDir": "/var/lib/cni/br-preexisting"
+      }
+    }'

@@ -26,6 +26,10 @@ name = "microshift-olm"
 version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
+name = "microshift-multus"
+version = "{{ .Env.SOURCE_VERSION }}"
+
+[[packages]]
 name = "microshift-test-agent"
 version = "*"
 

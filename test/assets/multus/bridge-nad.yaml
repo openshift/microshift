@@ -1,0 +1,25 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: bridge-conf
+spec:
+  config: '{
+      "cniVersion": "0.4.0",
+      "type": "bridge",
+      "bridge": "br-test",
+      "mode": "bridge",
+      "ipam": {
+        "type": "host-local",
+        "ranges": [
+          [
+            {
+              "subnet": "10.10.0.0/24",
+              "rangeStart": "10.10.0.20",
+              "rangeEnd": "10.10.0.50",
+              "gateway": "10.10.0.254"
+            }
+          ]
+        ],
+        "dataDir": "/var/lib/cni/br-test"
+      }
+    }'
