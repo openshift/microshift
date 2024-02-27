@@ -952,7 +952,7 @@ kind: Namespace
 metadata:
   name: openshift-marketplace
   labels:
-    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce: baseline
     pod-security.kubernetes.io/enforce-version: "v1.24"
     openshift.io/scc: ""
   annotations:
