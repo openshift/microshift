@@ -774,6 +774,7 @@ EOF
     yq 'select(.kind == "ClusterRoleBinding")' $target > "$(dirname $target)/clusterrolebinding.yaml"
 
     update_olm_images
+    update_multus_images
 
     popd >/dev/null
 }
@@ -924,6 +925,44 @@ checkout_rebase_branch() {
     rebase_branch="rebase${onto_branch:+"-$onto_branch"}-${ver_stream}_amd64-${amd64_date}_arm64-${arm64_date}"
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
+}
+
+update_multus_images() {
+    title "Rebasing Multus images"
+
+    for goarch in amd64 arm64; do
+        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
+
+        local release_file="${STAGING_DIR}/release_${goarch}.json"
+        local kustomization_arch_file="${REPOROOT}/assets/optional/multus/kustomization.${arch}.yaml"
+        local multus_release_json="${REPOROOT}/assets/optional/multus/release-multus-${arch}.json"
+
+        local base_release
+        base_release=$(jq -r ".metadata.version" "${release_file}")
+        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${multus_release_json}"
+
+        # Create extra kustomization for each arch in separate file.
+        # Right file (depending on arch) should be appended during rpmbuild to kustomization.yaml.
+        cat <<EOF > "${kustomization_arch_file}"
+
+images:
+EOF
+
+        for container in multus-cni container-networking-plugins; do
+            local new_image
+            new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
+            local new_image_name="${new_image%@*}"
+            local new_image_digest="${new_image#*@}"
+
+            cat <<EOF >> "${kustomization_arch_file}"
+  - name: ${container}
+    newName: ${new_image_name}
+    digest: ${new_image_digest}
+EOF
+
+            yq -i -o json ".images += {\"${container}\": \"${new_image}\"}" "${multus_release_json}"
+        done  # for container
+    done  # for goarch
 }
 
 update_olm_images() {

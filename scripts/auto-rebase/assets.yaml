@@ -251,6 +251,8 @@ assets:
     ignore: "they don't exist in upstream repository - only in microshift"
     files:
       - file: kustomization.yaml
+      - file: kustomization.aarch64.yaml
+      - file: kustomization.x86_64.yaml
       - file: 00-namespace.yaml
       - file: 01-crd-networkattachmentdefinition.yaml
       - file: 02-service-account.yaml
@@ -258,3 +260,5 @@ assets:
       - file: 04-cluster-role-binding.yaml
       - file: 05-configmap.yaml
       - file: 06-daemonset.yaml
+      - file: release-multus-aarch64.json
+      - file: release-multus-x86_64.json
