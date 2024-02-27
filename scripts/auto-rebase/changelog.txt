@@ -1,9 +1,24 @@
-- oc image-arm64 7cfdaceb43f2558619301f2a7172a608599e8d59 to a36a8e36c0eaec9c6905becac2f5a941b78b5123
+- cluster-network-operator embedded-component 1263b5673c09d22fe696b9c87c64b3b6a87fe078 to ca3854fa9475d7558027ab44fb514e8d64b3cf0c
+  - 79ba96a 2024-02-13T10:16:42+01:00 Update EgressQoS permissions for ovnkube-node pod
+  - 00ca43d 2024-02-13T10:15:09+01:00 Update EgressFirewall permissions for ovnkube pods
+  - c3c1e72 2024-02-13T10:05:50+01:00 Update APBExternalRoutes permissions for ovnkube pods
+  - 7f96a98 2024-02-07T19:46:54+05:30 memory-trim-on-compaction is enabled by default
+
+- operator-framework-olm embedded-component 12a2e2fc24a9dd1f2106c8253cddc62b873acad8 to aec0f1d5ef04a85cb95849f5fd4ba04c3228bf6d
+  - ac771e7a 2024-02-23T00:08:31+00:00 moving codecov to token-based (#1228)
+  - b4ca2449 2024-02-23T00:07:37+00:00 build(deps): bump github.com/opencontainers/image-spec (#1220)
+  - eb4756f0 2024-02-23T00:06:39+00:00 use contributions path as fallback search for template inputs (#1221)
+  - be9c2e56 2024-02-23T00:05:42+00:00 change dco policy to enable merge queues (#3179)
+  - 6a1be313 2024-02-23T00:04:43+00:00 Fixes log line for pod creation (#3178)
+  - d1975ef0 2024-02-23T00:03:50+00:00 Apply Subscription.Spec.Config.Annotations to Deployments, Pods, ApiServices (#3169)
+  - b3bff9c1 2024-02-23T00:02:56+00:00 add related objects to ClusterOperator for better OpenShift must-gather collection (#3175)
+
+- oc image-amd64 7cfdaceb43f2558619301f2a7172a608599e8d59 to a36a8e36c0eaec9c6905becac2f5a941b78b5123
   - 1cf4ed16 2024-02-09T16:22:49-08:00 pkg/cli/admin/inspectalerts/OWNERS: Assign to monitoring team
   - f1a623fb 2024-02-09T16:20:42-08:00 pkg/cli/admin/inspectalerts: Pivot to Thanos /api/v1/alerts
   - 229c2a84 2024-02-09T16:20:42-08:00 pkg/cli/admin/inspectalerts: New tech-preview inspect-alerts subcommand
 
-- ovn-kubernetes image-arm64 1140b953f3ce650920f3b13ae6142630df441c00 to 9c7e3fa5d194d41af88cc381b081ff5572366a79
+- ovn-kubernetes image-amd64 1140b953f3ce650920f3b13ae6142630df441c00 to 9c7e3fa5d194d41af88cc381b081ff5572366a79
   - 642e8b0 2024-02-21T14:43:32+00:00 Deprecate IPv6 host masq IP in-order to use it for svc only
   - 723b1f4 2024-02-20T15:17:52+02:00 e2e, multi network policy: Add egress allow / deny all tests
   - 8740f30 2024-02-19T17:56:01+02:00 multi-homing, tests: skip failing test OCPBUGS-25928
