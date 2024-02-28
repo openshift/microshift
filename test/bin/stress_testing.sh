@@ -48,7 +48,7 @@ function reboot_and_wait {
     fi
     sleep 10
   done
-  run sudo oc wait --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig -A --all --for=condition=Ready pods --timeout 120s
+  run 'sudo oc wait --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig -A --all --for=condition=Ready pods --timeout 120s'
 }
 
 # install dependecies
