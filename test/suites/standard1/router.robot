@@ -1,5 +1,6 @@
 *** Settings ***
 Documentation       Router configuration tests
+
 Resource            ../../resources/common.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/ostree-health.resource
@@ -13,9 +14,9 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${NS_OWNERSHIP_1}
-${NS_OWNERSHIP_2}
-${HOSTNAME}    hello-microshift.cluster.local
+${NS_OWNERSHIP_1}       ${EMPTY}
+${NS_OWNERSHIP_2}       ${EMPTY}
+${HOSTNAME}             hello-microshift.cluster.local
 ${OWNERSHIP_ALLOW}      SEPARATOR=\n
 ...                     ---
 ...                     ingress:
@@ -26,6 +27,7 @@ ${OWNERSHIP_STRICT}     SEPARATOR=\n
 ...                     ingress:
 ...                     \ \ routeAdmissionPolicy:
 ...                     \ \ \ \ namespaceOwnership: Strict
+
 
 *** Test Cases ***
 Router Namespace Ownership Allowed
@@ -61,15 +63,20 @@ Router Namespace Ownership Strict
     ...    Setup Hello MicroShift Pods In Multiple Namespaces
     ...    Restart Router
 
-    ${result_1}=    Run Keyword And Return Status    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_1}    ns=${NS_OWNERSHIP_1}
-    ${result_2}=    Run Keyword And Return Status    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_2}    ns=${NS_OWNERSHIP_2}
+    ${result_1}=    Run Keyword And Return Status
+    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_1}    ns=${NS_OWNERSHIP_1}
+    ${result_2}=    Run Keyword And Return Status
+    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_2}    ns=${NS_OWNERSHIP_2}
 
-    Run Keyword If    (${result_1}==True and ${result_2}==True) or (${result_1}==False and ${result_2}==False)    Fail
+    IF    (${result_1}==True and ${result_2}==True) or (${result_1}==False and ${result_2}==False)
+        Fail
+    END
 
     [Teardown]    Run Keywords
     ...    Delete Namespaces
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
+
 
 *** Keywords ***
 Configure Namespace Ownership Allowed

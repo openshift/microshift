@@ -56,7 +56,11 @@ Access Hello MicroShift Success
     [Documentation]    Expect 200 OK when accessing "hello microshift" through the router.
     [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
 
-    ${result}=    Access Hello MicroShift    ushift_port=${ushift_port}    ushift_ip=${ushift_ip}    path=${path}    ns=${ns}
+    ${result}=    Access Hello MicroShift
+    ...    ushift_port=${ushift_port}
+    ...    ushift_ip=${ushift_ip}
+    ...    path=${path}
+    ...    ns=${ns}
     Should Match Regexp    ${result}    HTTP.*200
     Should Match    ${result}    *Hello MicroShift*
 
@@ -64,7 +68,11 @@ Access Hello MicroShift Unavailable
     [Documentation]    Expect 503 Service Unavailable when accessing "hello microshift" through the router.
     [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
 
-    ${result}=    Access Hello MicroShift    ushift_port=${ushift_port}    ushift_ip=${ushift_ip}    path=${path}    ns=${ns}
+    ${result}=    Access Hello MicroShift
+    ...    ushift_port=${ushift_port}
+    ...    ushift_ip=${ushift_ip}
+    ...    path=${path}
+    ...    ns=${ns}
     Should Match Regexp    ${result}    HTTP.*503
 
 Verify Hello MicroShift LB
