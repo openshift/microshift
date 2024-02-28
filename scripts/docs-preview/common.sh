@@ -16,4 +16,4 @@ PODMAN_IMAGE_TAG="ushift-docs-asciibinder"
 PODMAN_CONTAINER_NAME="ushift-docs-httpd"
 
 # shellcheck disable=SC2034  # used elsewhere
-DOCS_BRANCH=${DOCS_BRANCH:-enterprise-4.15}
+DOCS_BRANCH=${DOCS_BRANCH:-enterprise-4.16}
