@@ -32,35 +32,6 @@ function run {
 }
 
 # reboot and wait
-function wait_for() {
-    local timeout=$1
-    shift 1
-    local -r start=$(date +%s)
-    until ("$@"); do
-        sleep 1
-        echo -n " ."
-        local now
-        now=$(date +%s)
-        if [ $(( now - start )) -ge "${timeout}" ]; then
-            echo "The timeout value of ${timeout} expired while running:"
-            echo "$@"
-            return 1
-        fi
-    done
-    return 0
-}
-
-function check_pods_ready_status() {
-    local pod_status="sudo oc get --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig --no-headers pod -A -o 'jsonpath={..status.conditions[?(@.type==\"Ready\")].status}'"
-    if [ -z "$( run "${pod_status}")" ]; then
-        echo "There are no pods on Ready status"
-        return 1
-    fi
-    for desired_status in $( run "${pod_status}"); do
-        [ "${desired_status}" == True ] || return 2
-    done
-}
-
 function reboot_and_wait {
   local -r PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
   run sudo reboot &
@@ -77,7 +48,7 @@ function reboot_and_wait {
     fi
     sleep 10
   done
-  wait_for 120 check_pods_ready_status
+  run sudo oc wait --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig -A --all --for=condition=Ready pods --timeout 120s
 }
 
 # install dependecies
