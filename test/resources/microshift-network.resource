@@ -37,9 +37,9 @@ Expose Hello MicroShift Pod Via NodePort
 
 Access Hello Microshift
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
 
-    Run With Kubeconfig    oc get all -n ${NAMESPACE}
+    Run With Kubeconfig    oc get all -n ${ns}
 
     ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${ushift_ip}:${ushift_port}"
     ${url_path}=    Set Variable    "http://hello-microshift.cluster.local${path}"
@@ -50,8 +50,22 @@ Access Hello Microshift
     ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
     Should Be Equal As Integers    ${result.rc}    0
-    Should Match Regexp    ${result.stdout}    HTTP.*200
-    Should Match    ${result.stdout}    *Hello MicroShift*
+    RETURN    ${result.stdout}
+
+Access Hello MicroShift Success
+    [Documentation]    Expect 200 OK when accessing "hello microshift" through the router.
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
+
+    ${result}=    Access Hello MicroShift    ushift_port=${ushift_port}    ushift_ip=${ushift_ip}    path=${path}    ns=${ns}
+    Should Match Regexp    ${result}    HTTP.*200
+    Should Match    ${result}    *Hello MicroShift*
+
+Access Hello MicroShift Unavailable
+    [Documentation]    Expect 503 Service Unavailable when accessing "hello microshift" through the router.
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
+
+    ${result}=    Access Hello MicroShift    ushift_port=${ushift_port}    ushift_ip=${ushift_ip}    path=${path}    ns=${ns}
+    Should Match Regexp    ${result}    HTTP.*503
 
 Verify Hello MicroShift LB
     [Documentation]    Run Hello MicroShift Load Balancer verification
