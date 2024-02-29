@@ -8,3 +8,4 @@ resources:
   - 04-cluster-role-binding.yaml
   - 05-configmap.yaml
   - 06-daemonset.yaml
+  - 07-daemonset-dhcp.yaml

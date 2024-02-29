@@ -260,5 +260,6 @@ assets:
       - file: 04-cluster-role-binding.yaml
       - file: 05-configmap.yaml
       - file: 06-daemonset.yaml
+      - file: 07-daemonset-dhcp.yaml
       - file: release-multus-aarch64.json
       - file: release-multus-x86_64.json
