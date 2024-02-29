@@ -1,0 +1,3 @@
+- ovn-kubernetes image-arm64 4d6dd53d3eee7b39f4b851f8a5e32dbd278274d8 to f7b6551eff3f5f234b895a4fd643b017a3079d7e
+  - bdf1b23 2024-02-13T17:47:15+01:00 Namespace address sets don't have hostNetwork pod ips, while Network Policies do add hostNetwork pods to their own address sets. An attempt to unify this behaviour ended up breaking customers relying on the previous logic, so we have to keep it. The logic on when to use namespace address sets was restored. It is applied when podSelector is nil. That means that peer ``` to:     - namespaceSelector: <ns selector> ``` won't include hostNetwork pods, while peer ``` to:     - namespaceSelector: <ns selector>       podSelector: {} ``` will. You can find 2 new unit tests verifying this behaviour.
+
