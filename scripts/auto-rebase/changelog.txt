@@ -1,0 +1,14 @@
+- oc image-arm64 a36a8e36c0eaec9c6905becac2f5a941b78b5123 to 91ba77aaeedb6810a30eaf7418ee76e9fb45f8ee
+  - 846ce4d7 2024-02-26T10:16:41+03:00 Extract oc also for linux/ppc64le
+  - 6e766588 2024-02-13T10:14:26+03:00 Revert "Revert "NO-JIRA: Bump k8s dependencies to 1.29.1""
+
+- router image-arm64 4c436c604e093a8cadcee72c8a45b214e24f40ac to cf0442b1850b94b4bf123eb0a37b5491513e0b70
+  - 34cf2a7 2024-02-14T13:53:53+00:00 container builds: add socat package
+  - 6c58af9 2024-02-14T13:49:35+00:00 Revert "Merge pull request #561 from dgoodwin/revert-551-1707829993043"
+
+- kube-rbac-proxy image-arm64 6ea01c5c6e0c56d07b66c90e27caeda58b4ce872 to 49a835a819d735f5e0b059471f9c1ec0b447c995
+  - ca2ca5b 2024-02-27T10:13:15+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/7e3c85650685dcd13127a6bf27372dece89b5cc8/images/kube-rbac-proxy.yml
+
+- kubernetes image-arm64 2eba5a9a34b4e3ac7f3cb5f03cf04282f7464356 to 6116860ab8000581009cd889e4cc1a1985207ddf
+  - 1a9c833e8 2024-02-26T14:11:59-05:00 UPSTREAM: 123055: Fix race condition between resizer and kubelet
+
