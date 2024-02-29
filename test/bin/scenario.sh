@@ -403,7 +403,6 @@ launch_vm() {
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
 
-    local -r vm_wait_timeout=$(( VM_BOOT_TIMEOUT / 60 ))
     local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
     local -r vm_pool_dir="${VM_DISK_BASEDIR}/${vm_pool_name}"
 
@@ -479,12 +478,18 @@ launch_vm() {
             graphics_args="vnc,listen=0.0.0.0"
         fi
 
+        # Make sure the virt-install command times out after a predefined period.
+        # The 'timeout' command sends the HUP signal and, if the process does not
+        # exit after 1m, it sends the KILL signal to terminate the process.
+        # Note: Using the '--wait <time>' virt-install options may not work for
+        # failed installations when 'unbuffer' command is used.
+        local timeout_install="timeout -v --kill-after=1m ${VM_BOOT_TIMEOUT}s"
         # When bash creates a background job (using `&`),
         # the bg job does not get its own TTY.
         # If the TTY is not provided, virt-install refuses
         # to attach to the console. `unbuffer` provides the TTY.
         # shellcheck disable=SC2086
-        if ! unbuffer sudo virt-install \
+        if ! ${timeout_install} unbuffer sudo virt-install \
             --autoconsole text \
             --graphics "${graphics_args}" \
             --name "${full_vmname}" \
@@ -497,7 +502,7 @@ launch_vm() {
             --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
             --extra-args "${vm_extra_args}" \
             ${vm_initrd_inject} \
-            --wait ${vm_wait_timeout} ; then
+            --wait ; then
 
             # Check if the command exited within 15s due to a failure
             local vm_create_end
