@@ -720,9 +720,6 @@ EOF
     yq -i '.spec.replicas = 1' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Set deployment strategy type to Recreate.
     yq -i '.spec.strategy.type = "Recreate"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    #    Add hostPorts for routes and metrics (needed as long as there is no load balancer)
-    yq -i '.spec.template.spec.containers[0].ports[0].hostPort = 80' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].ports[1].hostPort = 443' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Not use proxy protocol due to lack of load balancer support
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_USE_PROXY_PROTOCOL", "value": "false"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "GRACEFUL_SHUTDOWN_DELAY", "value": "1s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
