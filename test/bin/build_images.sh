@@ -68,7 +68,8 @@ configure_package_sources() {
     export SOURCE_VERSION_BASE
     export CURRENT_RELEASE_VERSION
     export PREVIOUS_RELEASE_VERSION
-    export LATEST_RHOCP_MINOR
+    export RHOCP_MINOR_Y
+    export RHOCP_MINOR_Y1
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -543,6 +544,15 @@ do_group() {
     ostree summary --view --repo=repo
 }
 
+is_rhocp_available() {
+    local -r ver="${1}"
+    repository="rhocp-4.${ver}-for-rhel-9-$(uname -m)-rpms"
+    if sudo dnf -v repository-packages "${repository}" info cri-o 1>&2; then
+        return 0
+    fi
+    return 1
+}
+
 usage() {
     if [ $# -gt 0 ] ; then
         echo "ERROR: $*"
@@ -683,7 +693,14 @@ previous_version_repo=$(get_rel_version_repo "${PREVIOUS_MINOR_VERSION}")
 PREVIOUS_RELEASE_VERSION=$(echo "${previous_version_repo}" | cut -d, -f1)
 PREVIOUS_RELEASE_REPO=$(echo "${previous_version_repo}" | cut -d, -f2)
 
-LATEST_RHOCP_MINOR="$("${SCRIPTDIR}/../../scripts/get-latest-rhocp-repo.sh")"
+RHOCP_MINOR_Y=""
+RHOCP_MINOR_Y1=""
+if is_rhocp_available "${MINOR_VERSION}"; then
+    RHOCP_MINOR_Y="${MINOR_VERSION}"
+fi
+if is_rhocp_available "${PREVIOUS_MINOR_VERSION}"; then
+    RHOCP_MINOR_Y1="${PREVIOUS_MINOR_VERSION}"
+fi
 
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"
