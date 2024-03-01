@@ -1,0 +1,9 @@
+- cluster-network-operator embedded-component c1d987e7a93910a4f09c4183f9434e0f697f8c3f to b285fc43f84cecea40019f10cebce6f7f97025f1
+  - 4193961 2024-02-19T13:40:12+01:00 getMultusAdmissionControllerReplicas for non-hypershift externalTopology clusters
+  - 8283f85 2024-02-19T09:40:44+01:00 Disable network-node-identity on ROKS
+  - fdd4421 2024-02-15T13:06:53+00:00 Not set CNO to degraded if API server returns conflict error
+  - 1bfde0f 2024-02-13T02:54:39+00:00 ipsec: fix openssl typo
+
+- machine-config-operator embedded-component c7981fcb54fcae3976818479a01f19f3fef40cd9 to 5118dd96571993dac366c230bc96ecda469f81f2
+  - 6d6aa0eb 2024-02-16T08:57:45+00:00 nmstate: Configure nmstate to keep service yamls
+
