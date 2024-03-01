@@ -14,6 +14,7 @@
     "apiServer": {
       "type": "object",
       "required": [
+        "auditLog",
         "namedCertificates",
         "subjectAltNames"
       ],
@@ -21,6 +22,37 @@
         "advertiseAddress": {
           "description": "Kube apiserver advertise address to work around the certificates issue when requiring external access using the node IP. This will turn into the IP configured in the endpoint slice for kubernetes service. Must be a reachable IP from pods. Defaults to service network CIDR first address.",
           "type": "string"
+        },
+        "auditLog": {
+          "type": "object",
+          "required": [
+            "maxFileAge",
+            "maxFileSize",
+            "maxFiles",
+            "profile"
+          ],
+          "properties": {
+            "maxFileAge": {
+              "description": "maxFileAge is the maximum number of days to retain old audit log files",
+              "type": "integer",
+              "default": 10
+            },
+            "maxFileSize": {
+              "description": "maxFileSize is the maximum size in megabytes of the audit log file before it gets rotated",
+              "type": "integer",
+              "default": 200
+            },
+            "maxFiles": {
+              "description": "maxFiles is the maximum number of rotated audit log files to retain",
+              "type": "integer",
+              "default": 10
+            },
+            "profile": {
+              "description": "profile is the OpenShift profile specifying a specific logging policy",
+              "type": "string",
+              "default": "Default"
+            }
+          }
         },
         "namedCertificates": {
           "description": "List of custom certificates used to secure requests to specific host names",

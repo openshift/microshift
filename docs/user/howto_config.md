@@ -9,6 +9,11 @@ The format of the `config.yaml` configuration file is as follows.
 ```yaml
 apiServer:
     advertiseAddress: ""
+    auditLog:
+        maxFileAge: 0
+        maxFileSize: 0
+        maxFiles: 0
+        profile: ""
     namedCertificates:
         - certPath: ""
           keyPath: ""
@@ -59,6 +64,11 @@ In case `config.yaml` is not provided, the following default settings will be us
 ```yaml
 apiServer:
     advertiseAddress: ""
+    auditLog:
+        maxFileAge: 10
+        maxFileSize: 200
+        maxFiles: 10
+        profile: Default
     namedCertificates:
         - certPath: ""
           keyPath: ""

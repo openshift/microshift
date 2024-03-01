@@ -22,6 +22,20 @@ ${DEBUG_LOG_LEVEL}      SEPARATOR=\n
 ...                     ---
 ...                     debugging:
 ...                     \ \ logLevel: debug
+${BAD_AUDIT_PROFILE}    SEPARATOR=\n
+...                     apiServer:
+...                     \ \ auditLog:
+...                     \ \ \ \ profile: BAD_PROFILE
+${AUDIT_PROFILE}        SEPARATOR=\n
+...                     apiServer:
+...                     \ \ auditLog:
+...                     \ \ \ \ profile: WriteRequestBodies
+${AUDIT_FLAGS}          SEPARATOR=\n
+...                     apiServer:
+...                     \ \ auditLog:
+...                     \ \ \ \ maxFileSize: 1000
+...                     \ \ \ \ maxFiles: 1000
+...                     \ \ \ \ maxFileAge: 1000
 
 
 *** Test Cases ***
@@ -34,6 +48,20 @@ Debug Log Level Produces No Warning
     [Documentation]    Logs should not warn that the log level setting is unknown
     Setup With Debug Log Level
     Pattern Should Not Appear In Log Output    ${CURSOR}    Unrecognized log level "debug", defaulting to "Normal"
+
+Known Audit Log Profile Produces No Warning
+    [Documentation]    A recognized kube-apiserver audit log profile will not produce a message in logs
+    Setup Known Audit Log Profile
+    Pattern Should Not Appear In Log Output    ${CURSOR}    unknown audit profile \\\\"WriteRequestBodies\\\\"
+
+Config Flags Are Logged in Audit Flags
+    [Documentation]    Check that flags specified in the MicroShift audit config are passed to and logged by the
+    ...    kube-apiserver. It is not essential that we test the kube-apiserver functionality as that is
+    ...    already rigorously tested by upstream k8s and by OCP.
+    Setup Audit Flags
+    Pattern Should Appear In Log Output    ${CURSOR}    FLAG: --audit-log-maxsize=\"1000\"
+    Pattern Should Appear In Log Output    ${CURSOR}    FLAG: --audit-log-maxbackup=\"1000\"
+    Pattern Should Appear In Log Output    ${CURSOR}    FLAG: --audit-log-maxage=\"1000\"
 
 
 *** Keywords ***
@@ -68,5 +96,17 @@ Setup With Bad Log Level
 Setup With Debug Log Level
     [Documentation]    Set log level to debug and restart
     ${merged}=    Extend MicroShift Config    ${BAD_LOG_LEVEL}
+    Upload MicroShift Config    ${merged}
+    Restart MicroShift
+
+Setup Known Audit Log Profile
+    [Documentation]    Setup audit
+    ${merged}=    Extend MicroShift Config    ${AUDIT_PROFILE}
+    Upload MicroShift Config    ${merged}
+    Restart MicroShift
+
+Setup Audit Flags
+    [Documentation]    Apply the audit config values set in ${AUDIT_FLAGS}
+    ${merged}=    Extend MicroShift Config    ${AUDIT_FLAGS}
     Upload MicroShift Config    ${merged}
     Restart MicroShift
