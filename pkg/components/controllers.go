@@ -128,6 +128,15 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		cm                   = "components/openshift-router/configmap.yaml"
 		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"
 	)
+
+	if cfg.Ingress.Status == config.StatusDisabled {
+		if err := assets.DeleteNamespaces(ctx, ns, kubeconfigPath); err != nil {
+			klog.Warningf("Failed to delete namespaces %v: %v", ns, err)
+			return err
+		}
+		return nil
+	}
+
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply namespaces %v: %v", ns, err)
 		return err
