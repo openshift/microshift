@@ -33,7 +33,7 @@ func pcClient(kubeconfigPath string) *scv1.SchedulingV1Client {
 	return scv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "pc-agent"))
 }
 
-func (s *pcApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (s *pcApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -48,7 +48,7 @@ func (s *pcApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	s.pc = obj.(*sv1.PriorityClass)
 }
 
-func (s *pcApplier) Applier(ctx context.Context) error {
+func (s *pcApplier) Handle(ctx context.Context) error {
 	// adapted from cvo
 	existing, err := s.Client.PriorityClasses().Get(ctx, s.pc.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
@@ -69,7 +69,7 @@ func (s *pcApplier) Applier(ctx context.Context) error {
 	return err
 }
 
-func applyPriorityClasses(ctx context.Context, pcs []string, applier readerApplier) error {
+func applyPriorityClasses(ctx context.Context, pcs []string, handler resourceHandler) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -79,8 +79,8 @@ func applyPriorityClasses(ctx context.Context, pcs []string, applier readerAppli
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", pc, err)
 		}
-		applier.Reader(objBytes, nil, nil)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, nil, nil)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply PriorityClass CR %s: %v", pc, err)
 			return err
 		}

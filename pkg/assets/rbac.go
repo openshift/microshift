@@ -42,7 +42,7 @@ func (crb *clusterRoleBindingApplier) New(kubeconfigPath string) {
 	crb.client = kubernetes.NewForConfigOrDie(rest.AddUserAgent(restConfig, "rbac-agent"))
 }
 
-func (crb *clusterRoleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
+func (crb *clusterRoleBindingApplier) Read(objBytes []byte, _ RenderFunc, _ RenderParams) {
 	obj, err := runtime.Decode(rbacCodecs.UniversalDecoder(rbacv1.SchemeGroupVersion), objBytes)
 	if err != nil {
 		panic(err)
@@ -50,7 +50,7 @@ func (crb *clusterRoleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ Re
 	crb.crb = obj.(*rbacv1.ClusterRoleBinding)
 }
 
-func (crb *clusterRoleBindingApplier) Applier(ctx context.Context) error {
+func (crb *clusterRoleBindingApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyClusterRoleBinding(ctx, crb.client.RbacV1(), assetsEventRecorder, crb.crb)
 	return err
 }
@@ -69,7 +69,7 @@ func (cr *clusterRoleApplier) New(kubeconfigPath string) {
 	cr.client = kubernetes.NewForConfigOrDie(rest.AddUserAgent(restConfig, "rbac-agent"))
 }
 
-func (cr *clusterRoleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
+func (cr *clusterRoleApplier) Read(objBytes []byte, _ RenderFunc, _ RenderParams) {
 	obj, err := runtime.Decode(rbacCodecs.UniversalDecoder(rbacv1.SchemeGroupVersion), objBytes)
 	if err != nil {
 		panic(err)
@@ -77,7 +77,7 @@ func (cr *clusterRoleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderPara
 	cr.cr = obj.(*rbacv1.ClusterRole)
 }
 
-func (cr *clusterRoleApplier) Applier(ctx context.Context) error {
+func (cr *clusterRoleApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyClusterRole(ctx, cr.client.RbacV1(), assetsEventRecorder, cr.cr)
 	return err
 }
@@ -96,7 +96,7 @@ func (rb *roleBindingApplier) New(kubeconfigPath string) {
 	rb.client = kubernetes.NewForConfigOrDie(rest.AddUserAgent(restConfig, "rbac-agent"))
 }
 
-func (rb *roleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
+func (rb *roleBindingApplier) Read(objBytes []byte, _ RenderFunc, _ RenderParams) {
 	obj, err := runtime.Decode(rbacCodecs.UniversalDecoder(rbacv1.SchemeGroupVersion), objBytes)
 	if err != nil {
 		panic(err)
@@ -104,7 +104,7 @@ func (rb *roleBindingApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderPara
 	rb.rb = obj.(*rbacv1.RoleBinding)
 }
 
-func (rb *roleBindingApplier) Applier(ctx context.Context) error {
+func (rb *roleBindingApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyRoleBinding(ctx, rb.client.RbacV1(), assetsEventRecorder, rb.rb)
 	return err
 }
@@ -123,7 +123,7 @@ func (r *roleApplier) New(kubeconfigPath string) {
 	r.client = kubernetes.NewForConfigOrDie(rest.AddUserAgent(restConfig, "rbac-agent"))
 }
 
-func (r *roleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
+func (r *roleApplier) Read(objBytes []byte, _ RenderFunc, _ RenderParams) {
 	obj, err := runtime.Decode(rbacCodecs.UniversalDecoder(rbacv1.SchemeGroupVersion), objBytes)
 	if err != nil {
 		panic(err)
@@ -131,12 +131,12 @@ func (r *roleApplier) Reader(objBytes []byte, _ RenderFunc, _ RenderParams) {
 	r.r = obj.(*rbacv1.Role)
 }
 
-func (r *roleApplier) Applier(ctx context.Context) error {
+func (r *roleApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyRole(ctx, r.client.RbacV1(), assetsEventRecorder, r.r)
 	return err
 }
 
-func applyRbac(ctx context.Context, rbacs []string, applier readerApplier) error {
+func applyRbac(ctx context.Context, rbacs []string, handler resourceHandler) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -146,8 +146,8 @@ func applyRbac(ctx context.Context, rbacs []string, applier readerApplier) error
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", rbac, err)
 		}
-		applier.Reader(objBytes, nil, nil)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, nil, nil)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply rbac %s: %v", rbac, err)
 			return err
 		}
