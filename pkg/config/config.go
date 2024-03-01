@@ -191,13 +191,12 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Manifests.KustomizePaths = u.Manifests.KustomizePaths
 	}
 
-<<<<<<< HEAD
-	if len(u.Ingress.AdmissionPolicy.NamespaceOwnership) != 0 {
-		c.Ingress.AdmissionPolicy.NamespaceOwnership = u.Ingress.AdmissionPolicy.NamespaceOwnership
-=======
 	if len(u.Ingress.Status) != 0 {
 		c.Ingress.Status = u.Ingress.Status
->>>>>>> 9e6515a2d (USHIFT-2444: Add ingress status config parameter)
+	}
+
+	if len(u.Ingress.AdmissionPolicy.NamespaceOwnership) != 0 {
+		c.Ingress.AdmissionPolicy.NamespaceOwnership = u.Ingress.AdmissionPolicy.NamespaceOwnership
 	}
 }
 
@@ -301,17 +300,16 @@ func (c *Config) validate() error {
 		}
 	}
 
-<<<<<<< HEAD
-	switch c.Ingress.AdmissionPolicy.NamespaceOwnership {
-	case NamespaceOwnershipAllowed, NamespaceOwnershipStrict:
-	default:
-		return fmt.Errorf("unsupported namespaceOwnership value %v", c.Ingress.AdmissionPolicy.NamespaceOwnership)
-=======
 	switch c.Ingress.Status {
 	case StatusEnabled, StatusDisabled:
 	default:
 		return fmt.Errorf("unsupported ingress.status value %v", c.Ingress.Status)
->>>>>>> 9e6515a2d (USHIFT-2444: Add ingress status config parameter)
+	}
+
+	switch c.Ingress.AdmissionPolicy.NamespaceOwnership {
+	case NamespaceOwnershipAllowed, NamespaceOwnershipStrict:
+	default:
+		return fmt.Errorf("unsupported namespaceOwnership value %v", c.Ingress.AdmissionPolicy.NamespaceOwnership)
 	}
 
 	return nil
