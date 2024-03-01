@@ -33,13 +33,20 @@ function run {
 
 # reboot and wait
 function reboot_and_wait {
-  local -r PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
   run sudo reboot &
+  wait_for_vm
+  wait_for_k8s
+  wait_for_pods
+}
+
+function wait_for_vm {
+  local -r PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
   local -r TIMEOUT_LIMIT=$(( SECONDS + 300 ))
   while true; do
     local NEW_BOOT_ID
     NEW_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
     if [ "${NEW_BOOT_ID:-}" ] && [ "${PREV_BOOT_ID}" != "${NEW_BOOT_ID}" ]; then
+      echo "VM booted with a different boot id"
       break
     fi
     if (( SECONDS > TIMEOUT_LIMIT )); then
@@ -48,7 +55,25 @@ function reboot_and_wait {
     fi
     sleep 10
   done
-  run 'sudo oc get --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig --raw=/livez'
+}
+
+function wait_for_k8s {
+  local -r TIMEOUT_LIMIT=$(( SECONDS + 300 ))
+  while true; do
+    HEALTHZ_CHECK="$(run 'sudo oc get --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig --raw=/livez')"
+    if [ "${HEALTHZ_CHECK:-}" == "ok" ]; then
+      echo "k8s is up and running"
+      break
+    fi
+    if (( SECONDS > TIMEOUT_LIMIT )); then
+      echo "ERROR: Timed out waiting for k8s to be ready"
+      exit 1
+    fi
+    sleep 10
+  done
+}
+
+function wait_for_pods {
   run 'sudo oc wait --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig -A --all --for=condition=Ready pods --timeout 120s'
 }
 
