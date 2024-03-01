@@ -66,6 +66,20 @@ func (ns *nsApplier) Handle(ctx context.Context) error {
 	return err
 }
 
+type nsDeleter struct {
+	Client *coreclientv1.CoreV1Client
+	ns     *corev1.Namespace
+}
+
+func (ns *nsDeleter) Read(objBytes []byte, render RenderFunc, params RenderParams) {
+	ns.ns = readCore(objBytes, render, params).(*corev1.Namespace)
+}
+
+func (ns *nsDeleter) Handle(ctx context.Context) error {
+	_, _, err := resourceapply.DeleteNamespace(ctx, ns.Client, assetsEventRecorder, ns.ns)
+	return err
+}
+
 type secretApplier struct {
 	Client *coreclientv1.CoreV1Client
 	secret *corev1.Secret
@@ -144,6 +158,12 @@ func handleCore(ctx context.Context, cores []string, handler resourceHandler, re
 
 func ApplyNamespaces(ctx context.Context, cores []string, kubeconfigPath string) error {
 	ns := &nsApplier{}
+	ns.Client = coreClient(kubeconfigPath)
+	return handleCore(ctx, cores, ns, nil, nil)
+}
+
+func DeleteNamespaces(ctx context.Context, cores []string, kubeconfigPath string) error {
+	ns := &nsDeleter{}
 	ns.Client = coreClient(kubeconfigPath)
 	return handleCore(ctx, cores, ns, nil, nil)
 }
