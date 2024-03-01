@@ -130,6 +130,14 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 	)
 
 	if cfg.Ingress.Status == config.StatusDisabled {
+		if err := assets.DeleteClusterRoleBindings(ctx, clusterRoleBinding, kubeconfigPath); err != nil {
+			klog.Warningf("Failed to delete cluster role bindings %v: %v", clusterRoleBinding, err)
+			return err
+		}
+		if err := assets.DeleteClusterRoles(ctx, clusterRole, kubeconfigPath); err != nil {
+			klog.Warningf("Failed to delete cluster roles %v: %v", clusterRole, err)
+			return err
+		}
 		if err := assets.DeleteNamespaces(ctx, ns, kubeconfigPath); err != nil {
 			klog.Warningf("Failed to delete namespaces %v: %v", ns, err)
 			return err
