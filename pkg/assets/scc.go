@@ -43,7 +43,7 @@ func sccClient(kubeconfigPath string) *sccclientv1.SecurityV1Client {
 	return sccclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "scc-agent"))
 }
 
-func (s *sccApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (s *sccApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -58,7 +58,7 @@ func (s *sccApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	s.scc = obj.(*sccv1.SecurityContextConstraints)
 }
 
-func (s *sccApplier) Applier(ctx context.Context) error {
+func (s *sccApplier) Handle(ctx context.Context) error {
 	// adapted from cvo
 	existing, err := s.Client.SecurityContextConstraints().Get(ctx, s.scc.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
@@ -79,7 +79,7 @@ func (s *sccApplier) Applier(ctx context.Context) error {
 	return err
 }
 
-func applySCCs(ctx context.Context, sccs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applySCCs(ctx context.Context, sccs []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -89,8 +89,8 @@ func applySCCs(ctx context.Context, sccs []string, applier readerApplier, render
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", scc, err)
 		}
-		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, render, params)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply scc api %s: %v", scc, err)
 			return err
 		}

@@ -42,7 +42,7 @@ func coreClient(kubeconfigPath string) *coreclientv1.CoreV1Client {
 	return coreclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "core-agent"))
 }
 
-func (ns *nsApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (ns *nsApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -57,7 +57,7 @@ func (ns *nsApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	ns.ns = obj.(*corev1.Namespace)
 }
 
-func (ns *nsApplier) Applier(ctx context.Context) error {
+func (ns *nsApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyNamespace(ctx, ns.Client, assetsEventRecorder, ns.ns)
 	return err
 }
@@ -67,7 +67,7 @@ type secretApplier struct {
 	secret *corev1.Secret
 }
 
-func (secret *secretApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (secret *secretApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -82,7 +82,7 @@ func (secret *secretApplier) Reader(objBytes []byte, render RenderFunc, params R
 	secret.secret = obj.(*corev1.Secret)
 }
 
-func (secret *secretApplier) Applier(ctx context.Context) error {
+func (secret *secretApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplySecret(ctx, secret.Client, assetsEventRecorder, secret.secret)
 	return err
 }
@@ -92,7 +92,7 @@ type svcApplier struct {
 	svc    *corev1.Service
 }
 
-func (svc *svcApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (svc *svcApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -107,7 +107,7 @@ func (svc *svcApplier) Reader(objBytes []byte, render RenderFunc, params RenderP
 	svc.svc = obj.(*corev1.Service)
 }
 
-func (svc *svcApplier) Applier(ctx context.Context) error {
+func (svc *svcApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyService(ctx, svc.Client, assetsEventRecorder, svc.svc)
 	return err
 }
@@ -117,7 +117,7 @@ type saApplier struct {
 	sa     *corev1.ServiceAccount
 }
 
-func (sa *saApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (sa *saApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -132,7 +132,7 @@ func (sa *saApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	sa.sa = obj.(*corev1.ServiceAccount)
 }
 
-func (sa *saApplier) Applier(ctx context.Context) error {
+func (sa *saApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyServiceAccount(ctx, sa.Client, assetsEventRecorder, sa.sa)
 	return err
 }
@@ -142,7 +142,7 @@ type cmApplier struct {
 	cm     *corev1.ConfigMap
 }
 
-func (cm *cmApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (cm *cmApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -157,12 +157,12 @@ func (cm *cmApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	cm.cm = obj.(*corev1.ConfigMap)
 }
 
-func (cm *cmApplier) Applier(ctx context.Context) error {
+func (cm *cmApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyConfigMap(ctx, cm.Client, assetsEventRecorder, cm.cm)
 	return err
 }
 
-func applyCore(ctx context.Context, cores []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applyCore(ctx context.Context, cores []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -172,8 +172,8 @@ func applyCore(ctx context.Context, cores []string, applier readerApplier, rende
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", core, err)
 		}
-		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, render, params)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply corev1 api %s: %v", core, err)
 			return err
 		}
@@ -213,7 +213,7 @@ func ApplyConfigMapWithData(ctx context.Context, cmPath string, data map[string]
 	if err != nil {
 		return err
 	}
-	cm.Reader(cmBytes, nil, nil)
+	cm.Read(cmBytes, nil, nil)
 	cm.cm.Data = data
 	_, _, err = resourceapply.ApplyConfigMap(ctx, cm.Client, assetsEventRecorder, cm.cm)
 	return err
@@ -226,7 +226,7 @@ func ApplySecretWithData(ctx context.Context, secretPath string, data map[string
 	if err != nil {
 		return err
 	}
-	secret.Reader(secretBytes, nil, nil)
+	secret.Read(secretBytes, nil, nil)
 	secret.secret.Data = data
 	_, _, err = resourceapply.ApplySecret(ctx, secret.Client, assetsEventRecorder, secret.secret)
 	return err
