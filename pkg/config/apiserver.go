@@ -13,7 +13,20 @@ type ApiServer struct {
 	// AdvertiseAddress in the loopback interface. Automatically computed.
 	SkipInterface bool `json:"-"`
 
+	AuditLog AuditLog `json:"auditLog"`
+
 	// The URL and Port of the API server cannot be changed by the user.
 	URL  string `json:"-"`
 	Port int    `json:"-"`
+}
+
+type AuditLog struct {
+	// maxFileAge is the maximum number of days to retain old audit log files
+	MaxFileAge  int    `json:"maxAge"`
+	// maxFiles is the maximum number of audit log files to retain
+	MaxFiles    int    `json:"maxBackup"`
+	// maxFileSize is the maximum size in megabytes of the audit log file before it gets rotated
+	MaxFileSize int    `json:"maxSize"`
+	// profile is the OpenShift profile specifying a specific logging policy
+	Profile     string `json:"profile"`
 }

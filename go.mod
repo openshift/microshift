@@ -11,7 +11,7 @@ require (
 	github.com/openshift/build-machinery-go v0.0.0-20231128094528-1e9b1b0595c8
 	github.com/openshift/client-go v0.0.0-20240115204758-e6bf7d631d5e
 	github.com/openshift/cluster-policy-controller v0.0.0-20240311102810-eaea543f4c84
-	github.com/openshift/library-go v0.0.0-20240124134907-4dfbf6bc7b11
+	github.com/openshift/library-go v0.0.0-20240126152712-771c6734dc24
 	github.com/openshift/route-controller-manager v0.0.0-20240306200724-3112b458983c
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.7.0

@@ -1,0 +1,12 @@
+# exclude resources where the body is security-sensitive
+- level: Metadata
+  resources:
+  - group: "route.openshift.io"
+    resources: ["routes", "routes/status"]
+  - resources: ["secrets", "serviceaccounts/token"]
+  - group: "authentication.k8s.io"
+    resources: ["tokenreviews", "tokenrequests"]
+  - group: "oauth.openshift.io"
+    resources: ["oauthclients", "tokenreviews"]
+# catch-all rule to log all other requests with request and response payloads
+- level: RequestResponse

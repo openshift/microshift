@@ -60,9 +60,9 @@ func (s *StaticPodConditionStatusReporter) Report(ctx context.Context, controlle
 // 3) continuously create a target cert and key signed by the latest signing CA and store it in a secret.
 type CertRotationController struct {
 	// controller name
-	Name string
-	// RotatedSigningCASecret rotates a self-signed signing CA stored in a secret.
-	RotatedSigningCASecret RotatedSigningCASecret
+	name string
+	// rotatedSigningCASecret rotates a self-signed signing CA stored in a secret.
+	rotatedSigningCASecret RotatedSigningCASecret
 	// CABundleConfigMap maintains a CA bundle config map, by adding new CA certs coming from rotatedSigningCASecret, and by removing expired old ones.
 	CABundleConfigMap CABundleConfigMap
 	// RotatedSelfSignedCertKeySecret rotates a key and cert signed by a signing CA and stores it in a secret.
@@ -81,8 +81,8 @@ func NewCertRotationController(
 	reporter StatusReporter,
 ) factory.Controller {
 	c := &CertRotationController{
-		Name:                           name,
-		RotatedSigningCASecret:         rotatedSigningCASecret,
+		name:                           name,
+		rotatedSigningCASecret:         rotatedSigningCASecret,
 		CABundleConfigMap:              caBundleConfigMap,
 		RotatedSelfSignedCertKeySecret: rotatedSelfSignedCertKeySecret,
 		StatusReporter:                 reporter,
@@ -102,7 +102,7 @@ func NewCertRotationController(
 }
 
 func (c CertRotationController) Sync(ctx context.Context, syncCtx factory.SyncContext) error {
-	syncErr := c.SyncWorker(ctx)
+	syncErr := c.syncWorker(ctx)
 
 	// running this function with RunOnceContextKey value context will make this "run-once" without updating status.
 	isRunOnce, ok := ctx.Value(RunOnceContextKey).(bool)
@@ -110,7 +110,7 @@ func (c CertRotationController) Sync(ctx context.Context, syncCtx factory.SyncCo
 		return syncErr
 	}
 
-	updated, updateErr := c.StatusReporter.Report(ctx, c.Name, syncErr)
+	updated, updateErr := c.StatusReporter.Report(ctx, c.name, syncErr)
 	if updateErr != nil {
 		return updateErr
 	}
@@ -121,18 +121,18 @@ func (c CertRotationController) Sync(ctx context.Context, syncCtx factory.SyncCo
 	return syncErr
 }
 
-func (c CertRotationController) SyncWorker(ctx context.Context) error {
-	signingCertKeyPair, err := c.RotatedSigningCASecret.EnsureSigningCertKeyPair(ctx)
+func (c CertRotationController) syncWorker(ctx context.Context) error {
+	signingCertKeyPair, err := c.rotatedSigningCASecret.ensureSigningCertKeyPair(ctx)
 	if err != nil {
 		return err
 	}
 
-	cabundleCerts, err := c.CABundleConfigMap.EnsureConfigMapCABundle(ctx, signingCertKeyPair)
+	cabundleCerts, err := c.CABundleConfigMap.ensureConfigMapCABundle(ctx, signingCertKeyPair)
 	if err != nil {
 		return err
 	}
 
-	if _, err := c.RotatedSelfSignedCertKeySecret.EnsureTargetCertKeyPair(ctx, signingCertKeyPair, cabundleCerts); err != nil {
+	if err := c.RotatedSelfSignedCertKeySecret.ensureTargetCertKeyPair(ctx, signingCertKeyPair, cabundleCerts); err != nil {
 		return err
 	}
 

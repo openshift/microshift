@@ -4,6 +4,12 @@ apiServer:
     # SubjectAltNames added to API server certs
     subjectAltNames:
         - ""
+    auditLog:
+      # TODO add explanation comments
+      profile: "Default"
+      maxSize: 200 # Megabytes
+      maxFiles: 10
+      maxAge: 0 # indef
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll". Defaults to "Normal".
     logLevel: Normal
