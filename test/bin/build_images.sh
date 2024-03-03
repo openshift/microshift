@@ -27,7 +27,7 @@ osbuild_logs() {
 
 extract_container_images() {
     local -r version=$1
-    local -r repo_url=$2
+    local -r repo=$2
     local -r outfile=$3
     local -r repo_name="microshift-extract-images"
 
@@ -35,8 +35,12 @@ extract_container_images() {
     mkdir -p "${IMAGEDIR}/release-info-rpms"
     pushd "${IMAGEDIR}/release-info-rpms"
     dnf_options=""
-    if [[ -n ${repo_url} ]]; then
-        dnf_options="--repofrompath ${repo_name},${repo_url} --repo ${repo_name}"
+    if [[ -n ${repo} ]]; then
+        if [[ "${repo}" == rhocp* ]]; then
+            dnf_options="--repo ${repo}"
+        else
+            dnf_options="--repofrompath ${repo_name},${repo} --repo ${repo_name}"
+        fi
     fi
     # shellcheck disable=SC2086  # double quotes
     sudo dnf download ${dnf_options} microshift-release-info-"${version}"
@@ -52,8 +56,6 @@ configure_package_sources() {
     export NEXT_REPO               # defined in common.sh
     export BASE_REPO               # defined in common.sh
     export YPLUS2_REPO             # defined in common.sh
-    export CURRENT_RELEASE_REPO
-    export PREVIOUS_RELEASE_REPO
 
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
@@ -63,7 +65,6 @@ configure_package_sources() {
     export SOURCE_VERSION_BASE
     export CURRENT_RELEASE_VERSION
     export PREVIOUS_RELEASE_VERSION
-    export LATEST_RHOCP_MINOR
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -517,15 +518,12 @@ FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 FAKE_YPLUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" + 2 ))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
 
+# Get exact version of 4.15 rpm from the RHOCP that's enabled on the host.
 current_version_repo=$(get_rel_version_repo "${MINOR_VERSION}")
 CURRENT_RELEASE_VERSION=$(echo "${current_version_repo}" | cut -d, -f1)
-CURRENT_RELEASE_REPO=$(echo "${current_version_repo}" | cut -d, -f2)
 
-previous_version_repo=$(get_rel_version_repo "${PREVIOUS_MINOR_VERSION}")
-PREVIOUS_RELEASE_VERSION=$(echo "${previous_version_repo}" | cut -d, -f1)
-PREVIOUS_RELEASE_REPO=$(echo "${previous_version_repo}" | cut -d, -f2)
-
-LATEST_RHOCP_MINOR="$("${SCRIPTDIR}/../../scripts/get-latest-rhocp-repo.sh")"
+PREVIOUS_RELEASE_VERSION="4.14.*"
+PREVIOUS_RELEASE_REPO="rhocp-4.14-for-rhel-9-${UNAME_M}-rpms"
 
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"

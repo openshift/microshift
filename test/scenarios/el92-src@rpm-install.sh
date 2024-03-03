@@ -41,20 +41,16 @@ scenario_run_tests() {
     local -r source_repo_url="${WEB_SERVER_URL}/rpm-repos/${source_reponame}"
     local -r target_version=$(current_version)
     local -r previous_minor_version=$(previous_minor_version)
-    local -r previous_version_repo=$(get_rel_version_repo "${previous_minor_version}")
-    local -r previous_version_repo_url=$(echo "${previous_version_repo}" | cut -d, -f2)
 
-    # Enable the repositories with the dependencies using the most
-    # recent GA OCP version. This value is used to build the repo
-    # name, so should include the major and minor version number.
-    local -r dependency_version="4.$("${ROOTDIR}/scripts/get-latest-rhocp-repo.sh")"
+    run_command_on_vm host1 "sudo subscription-manager repos \
+        --enable rhocp-4.14-for-rhel-9-${UNAME_M}-rpms \
+        --enable rhocp-4.15-for-rhel-9-${UNAME_M}-rpms \
+        --enable fast-datapath-for-rhel-9-${UNAME_M}-rpms"
 
     run_tests host1 \
         --exitonfailure \
         --variable "SOURCE_REPO_URL:${source_repo_url}" \
         --variable "TARGET_VERSION:${target_version}" \
         --variable "PREVIOUS_MINOR_VERSION:${previous_minor_version}" \
-        --variable "PREVIOUS_VERSION_REPO_URL:${previous_version_repo_url}" \
-        --variable "DEPENDENCY_VERSION:${dependency_version}" \
         suites/rpm/install-and-upgrade-successful.robot
 }
