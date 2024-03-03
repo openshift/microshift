@@ -2,7 +2,7 @@
 #
 # This script runs on the hypervisor to boot all scenario VMs.
 
-set -xeuo pipefail
+set -euo pipefail
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -28,23 +28,23 @@ cd "${ROOTDIR}"
 
 # Make sure libvirtd is running. We do this here, because some of the
 # other scripts use virsh.
-bash -x ./scripts/devenv-builder/manage-vm.sh config
+./scripts/devenv-builder/manage-vm.sh config
 
 # Clean up the image builder cache to free disk for virtual machines
-bash -x ./scripts/image-builder/cleanup.sh -full
+./scripts/image-builder/cleanup.sh -full
 
 cd "${ROOTDIR}/test"
 
 # Set up the hypervisor configuration for the tests
-bash -x ./bin/manage_hypervisor_config.sh create
+./bin/manage_hypervisor_config.sh create
 
 # Start the web server to host the kickstart files and ostree commit
 # repository.
-bash -x ./bin/start_webserver.sh
+./bin/start_webserver.sh
 
 # Setup a container registry and mirror images.
 if ${ENABLE_REGISTRY_MIRROR}; then
-    bash -x ./bin/mirror_registry.sh
+    ./bin/mirror_registry.sh
 fi
 
 # Show the summary of the output of the parallel jobs.
@@ -63,7 +63,7 @@ if ! parallel \
     --results "${SCENARIO_INFO_DIR}/{/.}/boot.log" \
     --joblog "${LAUNCH_VMS_JOB_LOG}" \
     --delay 5 \
-    bash -x ./bin/scenario.sh create ::: "${SCENARIO_SOURCES}"/*.sh ; then
+    ./bin/scenario.sh create ::: "${SCENARIO_SOURCES}"/*.sh ; then
    LAUNCH_OK=false
 fi
 

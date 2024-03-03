@@ -2,7 +2,7 @@
 #
 # This script runs on the build host to create all test artifacts.
 
-set -xeuo pipefail
+set -euo pipefail
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 # Cannot use common.sh yet because some dependencies may be missing,
@@ -58,7 +58,7 @@ update_build_cache() {
     fi
 
     # Build the base layer to be cached
-    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
+    $(dry_run) ./bin/build_images.sh -l ./image-blueprints/layer1-base
 
     # Upload the images and update the 'last' setting
     ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
@@ -81,15 +81,15 @@ run_image_build() {
         # Conditional per-layer builds when running in
         # CI. build_images.sh skips any images that have been
         # downloaded from the cache.
-        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
+        $(dry_run) ./bin/build_images.sh -l ./image-blueprints/layer1-base
+        $(dry_run) ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
-            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
+            $(dry_run) ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
         fi
     else
         # Fall back to full build when not running in CI
-        $(dry_run) bash -x ./bin/build_images.sh
+        $(dry_run) ./bin/build_images.sh
     fi
 }
 
@@ -103,8 +103,8 @@ cd "${ROOTDIR}"
 
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
-$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
-$(dry_run) bash -x ./scripts/image-builder/configure.sh
+$(dry_run) ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
+$(dry_run) ./scripts/image-builder/configure.sh
 
 cd "${ROOTDIR}/test/"
 
@@ -113,20 +113,20 @@ cd "${ROOTDIR}/test/"
 source "${SCRIPTDIR}/common.sh"
 
 # Re-build from source.
-$(dry_run) bash -x ./bin/build_rpms.sh
+$(dry_run) ./bin/build_rpms.sh
 
 # Set up for scenario tests
-$(dry_run) bash -x ./bin/create_local_repo.sh
+$(dry_run) ./bin/create_local_repo.sh
 
 # Start the web server to host the ostree commit repository for parent images
-$(dry_run) bash -x ./bin/start_webserver.sh
+$(dry_run) ./bin/start_webserver.sh
 
 # Figure out an optimal number of osbuild workers
 CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
 MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
 CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
 
-$(dry_run) bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
+$(dry_run) ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
 
 # Check if cache can be used for builds
 # This may fail when AWS S3 connection is not configured, or there is no cache bucket

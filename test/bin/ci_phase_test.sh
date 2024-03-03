@@ -2,7 +2,7 @@
 #
 # This script runs on the hypervisor to execute all scenario tests.
 
-set -xeuo pipefail
+set -euo pipefail
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -32,7 +32,7 @@ if ! parallel \
     ${progress} \
     --results "${SCENARIO_INFO_DIR}/{/.}/run.log" \
     --joblog "${TEST_JOB_LOG}" \
-    bash -x ./bin/scenario.sh run ::: "${SCENARIO_SOURCES}"/*.sh ; then
+    ./bin/scenario.sh run ::: "${SCENARIO_SOURCES}"/*.sh ; then
    TEST_OK=false
 fi
 
