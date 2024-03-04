@@ -1,6 +1,3 @@
-- machine-config-operator embedded-component 17291ddae80eb8abba61d1cd0359089dd8f318b8 to 8f8dbba0d13657e88b1b90b7015b70e05db78b32
-  - e4ccde8f 2024-02-28T09:26:17+00:00 Always persist the existing node name on 4.14
-
-- ovn-kubernetes image-amd64 4d6dd53d3eee7b39f4b851f8a5e32dbd278274d8 to f7b6551eff3f5f234b895a4fd643b017a3079d7e
-  - bdf1b23 2024-02-13T17:47:15+01:00 Namespace address sets don't have hostNetwork pod ips, while Network Policies do add hostNetwork pods to their own address sets. An attempt to unify this behaviour ended up breaking customers relying on the previous logic, so we have to keep it. The logic on when to use namespace address sets was restored. It is applied when podSelector is nil. That means that peer ``` to:     - namespaceSelector: <ns selector> ``` won't include hostNetwork pods, while peer ``` to:     - namespaceSelector: <ns selector>       podSelector: {} ``` will. You can find 2 new unit tests verifying this behaviour.
+- cluster-network-operator embedded-component d24dc3330e59f52a2bb5ea4586ae0c4778826680 to e84a82d82c1fbab237fbaf6efaa3fbc40bb948e8
+  - e4f52cf 2024-02-29T18:34:41+00:00 ipsec: fix openssl typo
 
