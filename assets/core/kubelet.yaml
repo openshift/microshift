@@ -23,6 +23,7 @@ featureGates:
 kubeAPIBurst: 100
 kubeAPIQPS: 50
 maxPods: 250
+nodeStatusReportFrequency: 5m
 rotateCertificates: false # TODO
 serializeImagePulls: false
 serverTLSBootstrap: false # TODO
