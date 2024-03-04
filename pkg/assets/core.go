@@ -37,7 +37,7 @@ func coreClient(kubeconfigPath string) *coreclientv1.CoreV1Client {
 	return coreclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "core-agent"))
 }
 
-func readCore(objBytes []byte, render RenderFunc, params RenderParams) runtime.Object {
+func readCore[T any](objBytes []byte, render RenderFunc, params RenderParams) T {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -49,7 +49,7 @@ func readCore(objBytes []byte, render RenderFunc, params RenderParams) runtime.O
 	if err != nil {
 		panic(err)
 	}
-	return obj
+	return obj.(T)
 }
 
 type nsApplier struct {
@@ -58,7 +58,7 @@ type nsApplier struct {
 }
 
 func (ns *nsApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
-	ns.ns = readCore(objBytes, render, params).(*corev1.Namespace)
+	ns.ns = readCore[*corev1.Namespace](objBytes, render, params)
 }
 
 func (ns *nsApplier) Handle(ctx context.Context) error {
@@ -72,7 +72,7 @@ type nsDeleter struct {
 }
 
 func (ns *nsDeleter) Read(objBytes []byte, render RenderFunc, params RenderParams) {
-	ns.ns = readCore(objBytes, render, params).(*corev1.Namespace)
+	ns.ns = readCore[*corev1.Namespace](objBytes, render, params)
 }
 
 func (ns *nsDeleter) Handle(ctx context.Context) error {
@@ -86,7 +86,7 @@ type secretApplier struct {
 }
 
 func (secret *secretApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
-	secret.secret = readCore(objBytes, render, params).(*corev1.Secret)
+	secret.secret = readCore[*corev1.Secret](objBytes, render, params)
 }
 
 func (secret *secretApplier) Handle(ctx context.Context) error {
@@ -100,7 +100,7 @@ type svcApplier struct {
 }
 
 func (svc *svcApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
-	svc.svc = readCore(objBytes, render, params).(*corev1.Service)
+	svc.svc = readCore[*corev1.Service](objBytes, render, params)
 }
 
 func (svc *svcApplier) Handle(ctx context.Context) error {
@@ -114,7 +114,7 @@ type saApplier struct {
 }
 
 func (sa *saApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
-	sa.sa = readCore(objBytes, render, params).(*corev1.ServiceAccount)
+	sa.sa = readCore[*corev1.ServiceAccount](objBytes, render, params)
 }
 
 func (sa *saApplier) Handle(ctx context.Context) error {
@@ -128,7 +128,7 @@ type cmApplier struct {
 }
 
 func (cm *cmApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
-	cm.cm = readCore(objBytes, render, params).(*corev1.ConfigMap)
+	cm.cm = readCore[*corev1.ConfigMap](objBytes, render, params)
 }
 
 func (cm *cmApplier) Handle(ctx context.Context) error {
