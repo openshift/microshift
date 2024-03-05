@@ -1,3 +1,0 @@
-- cluster-network-operator embedded-component d24dc3330e59f52a2bb5ea4586ae0c4778826680 to e84a82d82c1fbab237fbaf6efaa3fbc40bb948e8
-  - e4f52cf 2024-02-29T18:34:41+00:00 ipsec: fix openssl typo
-
