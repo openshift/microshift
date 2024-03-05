@@ -31,16 +31,6 @@ load_version(){
     fi
 }
 
-parse_version(){
-    local image_tag="$1"
-    local v
-    v="${image_tag#*:}"
-    if [ -z "${v}" ]; then
-        >&2 echo "error: version not found in image tag ${image_tag}"
-        return 1
-    fi
-}
-
 title() {
     echo -e "\E[34m$1\E[00m";
 }
@@ -149,12 +139,10 @@ download_lvms_operator_bundle_manifest(){
 
     # Persist the version of the LVMS operator bundle for use in manifest steps
     local version
-    version="$(parse_version "${bundle_manifest}")"
-    dump_version "${version}"
+    version=$(echo "${bundle_manifest}" | awk -F':' '{print $2}')
 
-    # Push the configMap to the kube-public namespace so that it is available to all users/apps
-    generate_version_config_map "${version}" "lvms-version" "kube-public"\
-        > "${REPOROOT}/assets/components/lvms/topolvm-configmap_lvms-version.yaml"
+    title "recognized version: ${version}"
+
 
     authentication=""
     if [ -f "${PULL_SECRET_FILE}" ]; then
@@ -180,6 +168,10 @@ download_lvms_operator_bundle_manifest(){
         local csv="lvms-operator.clusterserviceversion.yaml"
         local namespace="openshift-storage"
         extract_lvms_rbac_from_cluster_service_version "${PWD}" "${csv}" "${namespace}"
+
+        # Push the configMap to the kube-public namespace so that it is available to all users/apps
+        generate_version_config_map "${version}" "lvms-version" "kube-public"\
+            > "${PWD}/topolvm-configmap_lvms-version.yaml"
 
         popd || return 1
     done
@@ -246,11 +238,6 @@ update_lvms_manifests() {
         return 1
     }
     "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/lvms_assets.yaml
-
-    local version
-    version="$(load_version)"
-    generate_version_config_map "${version}" "lvms-version" "openshift-storage"\
-        > "${REPOROOT}/assets/components/lvms/topolvm-configmap_lvms-version.yaml"
 }
 
 update_last_lvms_rebase() {
