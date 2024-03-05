@@ -1,13 +1,14 @@
-- cluster-network-operator embedded-component c1d987e7a93910a4f09c4183f9434e0f697f8c3f to 4ad3c08b7b9f35224bdad111fc7b0205e0732f93
-  - 4193961 2024-02-19T13:40:12+01:00 getMultusAdmissionControllerReplicas for non-hypershift externalTopology clusters
-  - 8283f85 2024-02-19T09:40:44+01:00 Disable network-node-identity on ROKS
-  - fdd4421 2024-02-15T13:06:53+00:00 Not set CNO to degraded if API server returns conflict error
-  - 1bfde0f 2024-02-13T02:54:39+00:00 ipsec: fix openssl typo
-  - 81a05ca 2024-02-06T14:52:46+00:00 OCPBUGS-23397: network-node-identity mounts secrets with mode 0640
+- cluster-kube-apiserver-operator embedded-component 689a2bdc377383c774cc353c8e643dfcbb40159e to 1a0ab60403ccf253f0f651866418592eb533773d
+  - 31eac23 2024-02-09T11:48:58+00:00 OBSDA-553: add provider name to cluster_infrastructure_provider when platform external
 
-- machine-config-operator embedded-component c7981fcb54fcae3976818479a01f19f3fef40cd9 to b081c89e013f10f28c54307d5a499b6b16b024fc
-  - eb73d5c4 2024-02-21T23:43:01+00:00 set nodeStatusReportFrequency
-  - 6d6aa0eb 2024-02-16T08:57:45+00:00 nmstate: Configure nmstate to keep service yamls
-  - ad37a621 2024-02-10T04:54:50+00:00 OCPBUGS-26951: annotate on-prem static pods for workload partitioning
-  - 62e58d9f 2024-02-07T07:27:38+00:00 ovs-configure: fix `vlan_parent` calculation
+- operator-framework-olm embedded-component 0e8b957251ce3edb82ca8d9139380b18df1fe55c to 9537a6ac615d152b3079b87a4a7ed11c5319ee6f
+  - 7572c6c8 2024-03-02T00:37:43+00:00 UPSTREAM: <carry>: Add object cache for psm resource queries
+  - cf925f97 2024-03-02T00:37:43+00:00 (psm) Wait for required RBAC before creating packageserver CSV
+  - af148353 2024-03-01T10:22:14-08:00 Modify installation steps for ClusterRoleBindings and Services to use SSA in order to avoid race conditions. (#3182)
+
+- ovn-kubernetes image-amd64 3fdc9242e361a5e5007556054f5b0cc68a5be3d4 to 42b1cc427538a736f8c056171b4de7e6c6a366fb
+  - 9958671 2024-02-16T10:35:05+01:00 Update HostNetworkNamespace address_set for remote zone nodes
+
+- ovn-kubernetes image-arm64 3fdc9242e361a5e5007556054f5b0cc68a5be3d4 to 42b1cc427538a736f8c056171b4de7e6c6a366fb
+  - 9958671 2024-02-16T10:35:05+01:00 Update HostNetworkNamespace address_set for remote zone nodes
 
