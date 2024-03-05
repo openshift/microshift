@@ -11,6 +11,8 @@ type NamespaceOwnershipEnum string
 type IngressStatusEnum string
 
 type IngressConfig struct {
+	// Default router status, can be Enabled or Disabled.
+	// +kubebuilder:default=Enabled
 	Status             IngressStatusEnum    `json:"status"`
 	AdmissionPolicy    RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
 	ServingCertificate []byte               `json:"-"`

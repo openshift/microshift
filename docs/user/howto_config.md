@@ -20,6 +20,7 @@ etcd:
 ingress:
     routeAdmissionPolicy:
         namespaceOwnership: ""
+    status: ""
 manifests:
     kustomizePaths:
         - ""
@@ -59,6 +60,7 @@ etcd:
 ingress:
     routeAdmissionPolicy:
         namespaceOwnership: InterNamespaceAllowed
+    status: Enabled
 manifests:
     kustomizePaths:
         - /usr/lib/microshift/manifests
