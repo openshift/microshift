@@ -34,3 +34,12 @@ linters:
   - usestdlibvars
   - wastedassign
   - whitespace
+
+linters-settings:
+  ireturn:
+    allow:
+      - anon
+      - error
+      - empty
+      - stdlib
+      - generic
