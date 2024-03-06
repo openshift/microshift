@@ -1,14 +1,3 @@
-- cluster-kube-apiserver-operator embedded-component 689a2bdc377383c774cc353c8e643dfcbb40159e to 1a0ab60403ccf253f0f651866418592eb533773d
-  - 31eac23 2024-02-09T11:48:58+00:00 OBSDA-553: add provider name to cluster_infrastructure_provider when platform external
-
-- operator-framework-olm embedded-component 0e8b957251ce3edb82ca8d9139380b18df1fe55c to 9537a6ac615d152b3079b87a4a7ed11c5319ee6f
-  - 7572c6c8 2024-03-02T00:37:43+00:00 UPSTREAM: <carry>: Add object cache for psm resource queries
-  - cf925f97 2024-03-02T00:37:43+00:00 (psm) Wait for required RBAC before creating packageserver CSV
-  - af148353 2024-03-01T10:22:14-08:00 Modify installation steps for ClusterRoleBindings and Services to use SSA in order to avoid race conditions. (#3182)
-
-- ovn-kubernetes image-amd64 3fdc9242e361a5e5007556054f5b0cc68a5be3d4 to 42b1cc427538a736f8c056171b4de7e6c6a366fb
-  - 9958671 2024-02-16T10:35:05+01:00 Update HostNetworkNamespace address_set for remote zone nodes
-
-- ovn-kubernetes image-arm64 3fdc9242e361a5e5007556054f5b0cc68a5be3d4 to 42b1cc427538a736f8c056171b4de7e6c6a366fb
-  - 9958671 2024-02-16T10:35:05+01:00 Update HostNetworkNamespace address_set for remote zone nodes
+- cluster-kube-apiserver-operator embedded-component 1a0ab60403ccf253f0f651866418592eb533773d to 2fa2e622ae4a54614d44df400ac1a1d205781b33
+  - 353b9f8 2024-02-21T12:30:36+00:00 webhook/controller: when skipping a check because of missing CA log the name of the webhook
 
