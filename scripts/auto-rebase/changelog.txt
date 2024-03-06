@@ -1,30 +1,45 @@
-- cluster-ingress-operator embedded-component d31546e05cc00021e5fbd441ba6dc6739c1bf274 to a96d79f525b81ecf99f89ad37be4946abc5db6a6
-  - 4b56133 2024-02-26T18:09:48+05:30 Use RouterExternalCertificate feature gate and add ROUTER_ENABLE_EXTERNAL_CERTIFICATE env var to the router pod based on the feature gate.
+- cluster-ingress-operator embedded-component a96d79f525b81ecf99f89ad37be4946abc5db6a6 to 34839c74c651e6147f20fbb86e2e4c9c1c1da9a5
+  - 032983d 2024-02-29T11:39:21-05:00 TestHostNetworkPortBinding: Delete t.Parallel()
+  - 6557c06 2024-02-07T19:18:29-05:00 Include recent errors in canary status when failing
 
-- kubernetes embedded-component 2eba5a9a34b4e3ac7f3cb5f03cf04282f7464356 to 6116860ab8000581009cd889e4cc1a1985207ddf
-  - 1a9c833e8 2024-02-26T14:11:59-05:00 UPSTREAM: 123055: Fix race condition between resizer and kubelet
+- cluster-kube-apiserver-operator embedded-component 152682fb84ae60b95da77f39274300b030093912 to 087d314bfe30022cec8db85e1e97e612053581e1
+  - 0ec6bbf 2024-03-01T10:29:43+00:00 FGAccess no longer required for cloud provider observer
+  - b71fc22 2024-03-01T10:29:31+00:00 Fix cert additional annotations changes
+  - e5e163d 2024-03-01T10:29:11+00:00 Update library-go
 
-- machine-config-operator embedded-component 4805507d1735dd848cafd4f0b9a1d916bbafd028 to 398c1710f12622e9c0f94f99b12abeabed3ac5f7
-  - 98d6a374 2024-02-22T15:38:57+01:00 ovs-configfuration: Run after nmstate.service
+- cluster-kube-controller-manager-operator embedded-component 5b0bd0ddf922db3161c83b028790b2f5d91bd10d to 5a8a98f06fe9d3ff9f26e2657db5bf5a68112147
+  - a083870 2024-02-28T18:06:35+00:00 Update cloud observers to no longer observe featuregates
+  - ac63829 2024-02-28T18:06:18+00:00 Update controllers based on certrotation changes
+  - 71f6370 2024-02-28T17:52:59+00:00 Update library-go
 
-- operator-framework-olm embedded-component aec0f1d5ef04a85cb95849f5fd4ba04c3228bf6d to b3bfaa4b69bf7dfe8254cdadd8a6c8fc450e2b97
-  - ccee496f 2024-02-28T00:05:36+00:00 enabling merge queues by adjusting dco policy, workflows (#314)
-  - c4535ea0 2024-02-28T00:04:27+00:00 render: support rendering FBC from bundle directories (#748)
-  - 42e4347e 2024-02-28T00:03:25+00:00 supporting merge queues in CI workflows (#1229)
-  - 301e9c83 2024-02-27T00:04:09+00:00 add missing comments for status fields (#316)
-  - 7d004c02 2024-02-27T00:03:19+00:00 bump codecov to v4 (#315)
+- kubernetes embedded-component 6116860ab8000581009cd889e4cc1a1985207ddf to 0c6e8cce586d04bab413b1f8ff5838425fe59e44
+  - ceb5ec1cd 2024-02-27T10:47:05+01:00 UPSTREAM: 123512: system:kube-scheduler: extend the RBAC with pods/finalizers
 
-- oc image-amd64 a36a8e36c0eaec9c6905becac2f5a941b78b5123 to 91ba77aaeedb6810a30eaf7418ee76e9fb45f8ee
-  - 846ce4d7 2024-02-26T10:16:41+03:00 Extract oc also for linux/ppc64le
-  - 6e766588 2024-02-13T10:14:26+03:00 Revert "Revert "NO-JIRA: Bump k8s dependencies to 1.29.1""
+- machine-config-operator embedded-component 398c1710f12622e9c0f94f99b12abeabed3ac5f7 to a6c488a5529a479ab15dfd20418893e048012201
+  - 43ada445 2024-03-01T11:59:56-05:00 APIVersion and Kind sometimes are empty when listing objects
+  - fdf150e2 2024-02-28T10:44:00-05:00 MCO-1051: add node owner to MCN
+  - c87cdbf1 2024-02-28T10:59:34+01:00 Check if the pivot image is present before to pull it
+  - 7b5ba714 2024-02-26T17:57:04-05:00 Add HostToContainer propogataion for coreDNS pods on cloud platforms
+  - d8e28cea 2024-02-21T13:18:09-05:00 OCPBUGS-18670: OCPBUGS-18535: MCO-809: rendercontroller should also reconcile machineconfigs
 
-- router image-amd64 4c436c604e093a8cadcee72c8a45b214e24f40ac to cf0442b1850b94b4bf123eb0a37b5491513e0b70
-  - 34cf2a7 2024-02-14T13:53:53+00:00 container builds: add socat package
-  - 6c58af9 2024-02-14T13:49:35+00:00 Revert "Merge pull request #561 from dgoodwin/revert-551-1707829993043"
+- operator-framework-olm embedded-component b3bfaa4b69bf7dfe8254cdadd8a6c8fc450e2b97 to 78da9884165ec1e5354292091003cadd32823dfb
+  - 3641f017 2024-03-01T21:42:29+00:00 registry/reconciler: use appropriate image pull policy for catalog (#3184)
+  - 6771690e 2024-03-01T16:11:03-05:00 UPSTREAM: <carry>: Add object cache for psm resource queries
+  - 3ea925f1 2024-03-01T15:55:58-05:00 (psm) Wait for required RBAC before creating packageserver CSV
+  - 978852d8 2024-02-29T00:03:19+00:00 Modify installation steps for ClusterRoleBindings and Services to use SSA in order to avoid race conditions. (#3182)
+  - 8a89b449 2024-02-29T00:02:24+00:00 Fix finalizer processing (#3180)
 
-- kube-rbac-proxy image-amd64 6ea01c5c6e0c56d07b66c90e27caeda58b4ce872 to 49a835a819d735f5e0b059471f9c1ec0b447c995
-  - ca2ca5b 2024-02-27T10:13:15+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/7e3c85650685dcd13127a6bf27372dece89b5cc8/images/kube-rbac-proxy.yml
+- kube-rbac-proxy image-amd64 49a835a819d735f5e0b059471f9c1ec0b447c995 to 04d0a78154b45ce300e176836bd47c6004603e88
+  - a0e8703 2024-02-26T18:26:44+01:00 test/e2e: add hardcodedauthorizer tests
+  - 613fbc1 2024-02-26T18:26:04+01:00 test/kubetest: add namespace manifest handling
 
-- kubernetes image-amd64 2eba5a9a34b4e3ac7f3cb5f03cf04282f7464356 to 6116860ab8000581009cd889e4cc1a1985207ddf
-  - 1a9c833e8 2024-02-26T14:11:59-05:00 UPSTREAM: 123055: Fix race condition between resizer and kubelet
+- kubernetes image-amd64 6116860ab8000581009cd889e4cc1a1985207ddf to 0c6e8cce586d04bab413b1f8ff5838425fe59e44
+  - ceb5ec1cd 2024-02-27T10:47:05+01:00 UPSTREAM: 123512: system:kube-scheduler: extend the RBAC with pods/finalizers
+
+- kube-rbac-proxy image-arm64 49a835a819d735f5e0b059471f9c1ec0b447c995 to 04d0a78154b45ce300e176836bd47c6004603e88
+  - a0e8703 2024-02-26T18:26:44+01:00 test/e2e: add hardcodedauthorizer tests
+  - 613fbc1 2024-02-26T18:26:04+01:00 test/kubetest: add namespace manifest handling
+
+- kubernetes image-arm64 6116860ab8000581009cd889e4cc1a1985207ddf to 0c6e8cce586d04bab413b1f8ff5838425fe59e44
+  - ceb5ec1cd 2024-02-27T10:47:05+01:00 UPSTREAM: 123512: system:kube-scheduler: extend the RBAC with pods/finalizers
 
