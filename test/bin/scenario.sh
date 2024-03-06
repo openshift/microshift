@@ -714,9 +714,6 @@ run_tests() {
     local -r full_vmname="$(full_vm_name "${vmname}")"
     shift
 
-    start_junit
-    trap "close_junit; sos_report" EXIT
-
     echo "Running tests with $# args" "$@"
 
     if [ ! -d "${RF_VENV}" ]; then
@@ -909,6 +906,9 @@ action_login() {
 }
 
 action_run() {
+    start_junit
+    trap "close_junit; sos_report" EXIT
+
     load_global_settings
     load_scenario_script
     scenario_run_tests

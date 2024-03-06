@@ -169,9 +169,6 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    start_junit
-    trap "close_junit" EXIT
-
     if prepare_hosts ; then
         run_sonobuoy
     fi
