@@ -4,7 +4,7 @@
 
 KUBECONFIG="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
 # Timeout in seconds
-TIMEOUT_TEST=5400
+TIMEOUT_TEST=7400
 TIMEOUT_RESULTS=300
 
 prepare_hosts() {
@@ -41,8 +41,7 @@ run_sonobuoy() {
     ~/go/bin/sonobuoy run \
         --mode=certified-conformance \
         --dns-namespace=openshift-dns \
-        --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default \
-        --e2e-parallel=y
+        --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default 
 
     # Wait for up to 5m until tests start
     WAIT_FAILURE=true
