@@ -23,7 +23,9 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 
+	"github.com/openshift/library-go/pkg/crypto"
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
@@ -95,6 +97,8 @@ func configure(ctx context.Context, cfg *config.Config) (args []string, applyFn 
 			"cluster-signing-cert-file":        {clusterSigningCert},
 			"cluster-signing-key-file":         {clusterSigningKey},
 			"v":                                {strconv.Itoa(cfg.GetVerbosity())},
+			"tls-cipher-suites":                {strings.Join(crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers), ",")},
+			"tls-min-version":                  {string(fixedTLSProfile.MinTLSVersion)},
 		},
 	}
 
