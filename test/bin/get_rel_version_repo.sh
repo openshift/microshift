@@ -50,7 +50,7 @@ dnf_repo_is_enabled() {
 
 get_current_release_from_sub_repos() {
 	local -r minor="${1}"
-	local -r rhsm_repo="rhocp-4.${minor}-for-rhel-9-${UNAME_M}-rpms"
+	local -r rhsm_repo="$(get_ocp_repo_name_for_version "${minor}")"
 
 	local newest
 	newest=$(sudo dnf repoquery microshift --quiet --queryformat '%{version}-%{release}' --repo "${rhsm_repo}" | sort --version-sort | tail -n1)
@@ -88,4 +88,10 @@ get_rel_version_repo() {
 	if [ -n "${version}" ]; then
 		echo "${version},${repo}"
 	fi
+}
+
+# Build the repository name for a minor version.
+get_ocp_repo_name_for_version() {
+    local -r version="${1}"
+    echo "rhocp-4.${version}-for-rhel-9-${UNAME_M}-rpms"
 }
