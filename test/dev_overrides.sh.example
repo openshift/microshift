@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Variables used by ci_phase_iso_build.sh
+export AWS_BUCKET_NAME=microshift-build-cache-us-west-2
+export CI_JOB_NAME=local-dev
+
+# Variables used by build_images.sh
+export SKIP_LOG_COLLECTION=true

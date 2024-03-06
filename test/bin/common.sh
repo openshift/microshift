@@ -207,3 +207,11 @@ SCENARIO_BUILD_TAG_PREV="$(date -d "yesterday" '+%y%m%d')"
 # The location of the awscli binary.
 # shellcheck disable=SC2034  # used elsewhere
 AWSCLI="${OUTPUTDIR}/bin/aws"
+
+# The location of developer overrides files.
+DEV_OVERRIDES="${TESTDIR}/dev_overrides.sh"
+if [ -f "${DEV_OVERRIDES}" ]; then
+    # The file will not exist, so we should not ask shellcheck to look for it.
+    # shellcheck disable=SC1090
+    source "${DEV_OVERRIDES}"
+fi
