@@ -5,4 +5,4 @@ images:
     digest: sha256:d1900af9b3f763702a20602871a3a96ad7ad7e86a2d75b6017302ce754737b00
   - name: container-networking-plugins
     newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-    digest: sha256:079d305fb9e30cf83dd0225e6e181fb892918d16771ba545627716942fa2e329
+    digest: sha256:7b6fbd4f092ec28c3b0f183c6a5b64a7afb235b7645341977f71a69a6ee97523
