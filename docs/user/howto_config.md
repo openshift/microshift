@@ -17,6 +17,9 @@ dns:
     baseDomain: ""
 etcd:
     memoryLimitMB: 0
+ingress:
+    routeAdmissionPolicy:
+        namespaceOwnership: ""
 manifests:
     kustomizePaths:
         - ""
@@ -53,6 +56,9 @@ dns:
     baseDomain: example.com
 etcd:
     memoryLimitMB: 0
+ingress:
+    routeAdmissionPolicy:
+        namespaceOwnership: InterNamespaceAllowed
 manifests:
     kustomizePaths:
         - /usr/lib/microshift/manifests

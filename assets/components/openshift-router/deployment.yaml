@@ -42,7 +42,7 @@ spec:
             - name: ROUTER_DISABLE_HTTP2
               value: "true"
             - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
-              value: "false"
+              value: '{{.RouterNamespaceOwnership}}'
             - name: ROUTER_LOAD_BALANCE_ALGORITHM
               value: random
             - name: ROUTER_METRICS_TYPE

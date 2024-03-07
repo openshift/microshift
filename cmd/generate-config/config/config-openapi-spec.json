@@ -5,6 +5,7 @@
     "debugging",
     "dns",
     "etcd",
+    "ingress",
     "manifests",
     "network",
     "node"
@@ -66,6 +67,26 @@
           "description": "Set a memory limit on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.",
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "required": [
+        "routeAdmissionPolicy"
+      ],
+      "properties": {
+        "routeAdmissionPolicy": {
+          "type": "object",
+          "required": [
+            "namespaceOwnership"
+          ],
+          "properties": {
+            "namespaceOwnership": {
+              "type": "string",
+              "default": "InterNamespaceAllowed"
+            }
+          }
         }
       }
     },

@@ -158,7 +158,7 @@ Verify Hello MicroShift NodePort
     Expose Hello MicroShift Pod Via NodePort
 
     Wait Until Keyword Succeeds    30x    10s
-    ...    Access Hello Microshift    ${NP_PORT}    ${ip}
+    ...    Access Hello Microshift Success    ${NP_PORT}    ${ip}
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Pod And Service
