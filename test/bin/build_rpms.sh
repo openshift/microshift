@@ -25,9 +25,6 @@ BUILD_CMDS+=(
     # Build RPMs with the version number of the next minor release,
     # but using the same source code as the normal build.
     'make -C test/ fake-next-minor-rpm' \
-    # Build RPMs with the version number of the y+2 minor release,
-    # but using the same source code as the normal build.
-    'make -C test/ fake-yplus2-minor-rpm' \
     # Build RPMs from release-$MAJOR.$MINOR of this repo.
     # These RPMs are useful in providing a layer to upgrade from.
     'make -C test/ build-base-branch' \

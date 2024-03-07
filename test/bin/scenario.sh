@@ -668,6 +668,12 @@ previous_minor_version() {
     echo $(( $(current_minor_version) - 1 ))
 }
 
+# Function to report the minor version for 2 releases back. If the current
+# version is "4.16.0", reports "14".
+yminus2_minor_version() {
+    echo $(( $(current_minor_version) - 2 ))
+}
+
 # Function to report the *next* minor version. If the current
 # version is "4.14.5", reports "15".
 next_minor_version() {
