@@ -46,7 +46,7 @@ NEXT_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-fake-next-minor"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-BASE_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-base"
+BASE_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-base"
 
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
