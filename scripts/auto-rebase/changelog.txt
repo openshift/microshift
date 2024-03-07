@@ -1,3 +1,13 @@
-- cluster-kube-apiserver-operator embedded-component 1a0ab60403ccf253f0f651866418592eb533773d to 2fa2e622ae4a54614d44df400ac1a1d205781b33
-  - 353b9f8 2024-02-21T12:30:36+00:00 webhook/controller: when skipping a check because of missing CA log the name of the webhook
+- cluster-openshift-controller-manager-operator embedded-component 1ba446b3a9003d6069a7a2f55b2616b6892729bc to f189a00839491e166cd0220afe11d35cdb844754
+  - 2e3529b 2023-11-28T03:01:07+00:00 Updating ose-cluster-openshift-controller-manager-operator-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/ose-cluster-openshift-controller-manager-operator.yml
+
+- machine-config-operator embedded-component b081c89e013f10f28c54307d5a499b6b16b024fc to 6eb0e07f062c0c06965da711454d1eaa12934f78
+  - 754d26b0 2024-02-29T15:55:30+09:00 Add missing Devices annotation to CRI-O configuration
+
+- operator-framework-olm embedded-component 9537a6ac615d152b3079b87a4a7ed11c5319ee6f to cb0c5f2728e412f595cceeb11104af206421daec
+  - d4e87b7c 2024-03-04T14:16:34+00:00 registry/reconciler: use appropriate image pull policy for catalog (#3184)
+
+- oc image-arm64 48dcf5980a6671b5933707e5a055def023c7a13a to d6175ebd387c07d8fd6354b476f6b1092f15ee1d
+  - d9a0ef1b 2024-03-05T17:18:58+00:00 Drop issuer-url extraction instead rely on issuer-url flag
+  - 5c37de0f 2024-03-05T17:18:58+00:00 Introduce --issuer-url flag in oc login
 
