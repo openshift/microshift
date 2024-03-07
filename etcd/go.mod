@@ -2,7 +2,7 @@ module github.com/openshift/microshift/etcd
 
 go 1.21
 
-toolchain go1.21.3
+toolchain go1.21.7
 
 require github.com/openshift/microshift v0.0.0
 
