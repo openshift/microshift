@@ -406,6 +406,13 @@ launch_vm() {
     local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
     local -r vm_pool_dir="${VM_DISK_BASEDIR}/${vm_pool_name}"
 
+    # See if the VM already exists
+    if sudo virsh dominfo "${full_vmname}" 2>/dev/null; then
+        echo "${full_vmname} already exists"
+        record_junit "${vmname}" "install_vm" "SKIP"
+        return 0
+    fi
+
     echo "Creating ${full_vmname}"
 
     # Create the pool if it does not exist
