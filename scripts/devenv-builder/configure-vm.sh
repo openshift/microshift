@@ -10,6 +10,7 @@ RHEL_BETA_VERSION=false
 SET_RHEL_RELEASE=true
 DNF_UPDATE=true
 PULL_IMAGES=false
+OPTIONAL_RPMS=false
 DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
 PULL_RETRY="${SCRIPTDIR}/../pull_retry.sh"
 RHOCP_REPO="${SCRIPTDIR}/../get-latest-rhocp-repo.sh"
@@ -25,7 +26,8 @@ function usage() {
     echo "  --force-firewall          Install and configure firewalld regardless of other options"
     echo "  --no-set-release-version  Do NOT set the release subscription to the current release version"
     echo "  --skip-dnf-update         Do NOT run dnf update"
-    echo "  --pull-images         Force pulling of container images before starting MicroShift"
+    echo "  --pull-images             Force pulling of container images before starting MicroShift"
+    echo "  --optional-rpms           Install optional RPMs (OLM, Multus) along with core MicroShift RPMs"
 
     [ -n "$1" ] && echo -e "\nERROR: $1"
     exit 1
@@ -56,6 +58,10 @@ while [ $# -gt 1 ]; do
         ;;
     --pull-images)
         PULL_IMAGES=true
+        shift
+        ;;
+    --optional-rpms)
+        OPTIONAL_RPMS=true
         shift
         ;;
     *) usage ;;
@@ -128,7 +134,7 @@ if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     if ${DNF_UPDATE}; then
         "${DNF_RETRY}" "update"
     fi
-    "${DNF_RETRY}" "install" "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools"
+    "${DNF_RETRY}" "install" "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools createrepo"
     sudo systemctl enable --now cockpit.socket
 fi
 
@@ -216,7 +222,15 @@ else
 fi
 
 if ${BUILD_AND_RUN}; then
-    "${DNF_RETRY}" "localinstall" "$(ls -1 ~/microshift/_output/rpmbuild/RPMS/*/*.rpm)"
+    if ${OPTIONAL_RPMS}; then
+        "${DNF_RETRY}" "localinstall" "$(ls -1 ~/microshift/_output/rpmbuild/RPMS/*/*.rpm)"
+    else
+        createrepo "${HOME}/microshift/_output/rpmbuild"
+        "${DNF_RETRY}" "install" \
+            "microshift microshift-release-info \
+            --repofrompath=microshift-local,${HOME}/microshift/_output/rpmbuild \
+            --setopt=microshift-local.gpgcheck=0"
+    fi
 fi
 
 # Configure OpenShift pull secret
