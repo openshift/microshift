@@ -150,7 +150,7 @@ fi
 
 if ${BUILD_AND_RUN}; then
     if [ ! -e ~/microshift ]; then
-        git clone https://github.com/openshift/microshift.git ~/microshift
+        git clone https://github.com/ggiguash/microshift.git -b disable_ci_tracing ~/microshift
     fi
     cd ~/microshift
 
