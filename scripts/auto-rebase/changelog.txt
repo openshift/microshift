@@ -1,8 +1,0 @@
-- cluster-kube-apiserver-operator embedded-component 2a07e2dc098b9bea4e3e27279c692da10a6a519e to 052be42a385155ed8bbb77151c9d7fe1f943f2e9
-  - eeead4e 2024-03-05T14:32:23+00:00 webhook/controller: when skipping a check because of missing CA log the name of the webhook
-  - 6f8bc84 2024-02-20T16:56:35+00:00 webhookcontroller: report when a webhook resource is missing a caBundle provided by the service-ca-operator
-  - 062492f 2024-02-20T16:56:35+00:00 webhookcontroller: update degraded webhook condition types to errors
-
-- machine-config-operator embedded-component 8f8dbba0d13657e88b1b90b7015b70e05db78b32 to c15ec9ce2646231f4c227584d29c4487371febf9
-  - 42304273 2024-03-05T01:07:58+00:00 set nodeStatusReportFrequency
-
