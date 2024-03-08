@@ -4,12 +4,18 @@ apiServer:
     # SubjectAltNames added to API server certs
     subjectAltNames:
         - ""
+    # auditLog parameters are a subset of kube-apiserver options for controlling the depth of logged events and log file
+    # rotation.
     auditLog:
-      # TODO add explanation comments
+      # profile may be one of the "Default", "WriteRequestBodies", "AllRequestBodies", "None". If unset or an empty-string
+      # "Default" is assumed.
       profile: "Default"
-      maxSize: 200 # Megabytes
+      # maxSize specifies the file size at which the active log is rotated.
+      maxSize: 200
+      # maxFiles sets the maximum number of rotated log files to retain. A 0 value removes the limit. Defaults to 10 if unset.
       maxFiles: 10
-      maxAge: 0 # indef
+      # maxAge sets the time in days to retain log files. A 0 value removes the limit. Defaults to 0 if unset.
+      maxAge: 0
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll". Defaults to "Normal".
     logLevel: Normal

@@ -22,6 +22,14 @@ ${DEBUG_LOG_LEVEL}      SEPARATOR=\n
 ...                     ---
 ...                     debugging:
 ...                     \ \ logLevel: debug
+${BAD_AUDIT_PROFILE}    SEPERATOR=\n
+...                     apiServer:
+...                     \ \ auditLog:
+...                     \ \ \ \ profile: BAD_PROFILE
+${AUDIT_PROFILE}        SEPERATOR=\n
+...                     apiServer:
+...                     \ \ auditLog:
+...                     \ \ \ \ profile: WriteRequestBodies
 
 
 *** Test Cases ***
@@ -34,6 +42,17 @@ Debug Log Level Produces No Warning
     [Documentation]    Logs should not warn that the log level setting is unknown
     Setup With Debug Log Level
     Pattern Should Not Appear In Log Output    ${CURSOR}    Unrecognized log level "debug", defaulting to "Normal"
+
+Unknown Audit Log Profile Should Fail
+    [Documentation]    Unrecognized kube-apiserver audit log profile should prevent kube-apiserver from starting
+    Setup With Unknown Audit Log Profile
+    Pattern Should Appear In Log Output    ${CURSOR}
+    ...    "SERVICE FAILED - stopping MicroShift" err="configuration failed: failed to configure kube-apiserver audit policy: unknown audit profile \"BAD_PROFILE\"" service="kube-apiserver"
+
+Known Audit Log Profile Produces No Warning
+    [Documentation]    A recognized kube-apiserver audit log profile will not produce a message in logs
+    Setup Known Audit Log Profile    ${AUDIT_PROFILE}
+    Pattern Should Not Appear In Log Output    "failed to configure kube-apiserver audit policy: unknown audit profile"
 
 
 *** Keywords ***
@@ -68,5 +87,17 @@ Setup With Bad Log Level
 Setup With Debug Log Level
     [Documentation]    Set log level to debug and restart
     ${merged}=    Extend MicroShift Config    ${BAD_LOG_LEVEL}
+    Upload MicroShift Config    ${merged}
+    Restart MicroShift
+
+Setup With Unknown Audit Log Profile
+    [Documentation]    Set audit log profile to unknown value
+    ${merged}=    Extend MicroShift Config    ${BAD_AUDIT_PROFILE}
+    Upload MicroShift Config    ${merged}
+    Restart MicroShift
+    
+Setup Known Audit Log Profile
+    [Documentation]    Setup audit
+    ${merged}=    Extend MicroShift Config    ${AUDIT_PROFILE}
     Upload MicroShift Config    ${merged}
     Restart MicroShift
