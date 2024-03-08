@@ -53,7 +53,12 @@ get_current_release_from_sub_repos() {
 	local -r rhsm_repo="$(get_ocp_repo_name_for_version "${minor}")"
 
 	local newest
-	newest=$(sudo dnf repoquery microshift --quiet --queryformat '%{version}-%{release}' --repo "${rhsm_repo}" | sort --version-sort | tail -n1)
+	newest=$(sudo dnf repoquery microshift \
+                  --quiet \
+                  --queryformat '%{version}-%{release}' \
+                  --repo "${rhsm_repo}" \
+                  --latest-limit 1 \
+          )
 	if [ -n "${newest}" ]; then
 		echo "${newest}"
 		return
