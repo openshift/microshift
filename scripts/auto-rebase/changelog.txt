@@ -1,45 +1,87 @@
-- cluster-ingress-operator embedded-component a96d79f525b81ecf99f89ad37be4946abc5db6a6 to 34839c74c651e6147f20fbb86e2e4c9c1c1da9a5
-  - 032983d 2024-02-29T11:39:21-05:00 TestHostNetworkPortBinding: Delete t.Parallel()
-  - 6557c06 2024-02-07T19:18:29-05:00 Include recent errors in canary status when failing
+- cluster-kube-apiserver-operator embedded-component 087d314bfe30022cec8db85e1e97e612053581e1 to 2f8d114706347f5343ac9a142404c10dd88daa97
+  - c9a36fd 2024-03-05T15:53:25+01:00 Bump library-go to latest master
 
-- cluster-kube-apiserver-operator embedded-component 152682fb84ae60b95da77f39274300b030093912 to 087d314bfe30022cec8db85e1e97e612053581e1
-  - 0ec6bbf 2024-03-01T10:29:43+00:00 FGAccess no longer required for cloud provider observer
-  - b71fc22 2024-03-01T10:29:31+00:00 Fix cert additional annotations changes
-  - e5e163d 2024-03-01T10:29:11+00:00 Update library-go
+- machine-config-operator embedded-component a6c488a5529a479ab15dfd20418893e048012201 to 11d5151a784c7d4be5255ea41acfbf5092eda592
+  - 4d447c5c 2024-03-05T14:39:18-05:00 backportable version of api-int cert work
+  - b1522506 2024-02-29T17:58:47+00:00 Add Image Credential Provider flags for Kubelet on GCP
+  - b96ee236 2024-02-27T11:54:16-05:00 controller: add alert on MSBIC failures & errors
 
-- cluster-kube-controller-manager-operator embedded-component 5b0bd0ddf922db3161c83b028790b2f5d91bd10d to 5a8a98f06fe9d3ff9f26e2657db5bf5a68112147
-  - a083870 2024-02-28T18:06:35+00:00 Update cloud observers to no longer observe featuregates
-  - ac63829 2024-02-28T18:06:18+00:00 Update controllers based on certrotation changes
-  - 71f6370 2024-02-28T17:52:59+00:00 Update library-go
+- operator-framework-olm embedded-component 78da9884165ec1e5354292091003cadd32823dfb to c84b6ad72f4e3e8670b72e27b217044fe8a58713
+  - a3992fb6 2024-03-01T22:13:29-06:00 build all CLIs in one image
 
-- kubernetes embedded-component 6116860ab8000581009cd889e4cc1a1985207ddf to 0c6e8cce586d04bab413b1f8ff5838425fe59e44
-  - ceb5ec1cd 2024-02-27T10:47:05+01:00 UPSTREAM: 123512: system:kube-scheduler: extend the RBAC with pods/finalizers
+- oc image-amd64 91ba77aaeedb6810a30eaf7418ee76e9fb45f8ee to 1c257b86f033d8b8d51d62167594d0e2882e2e5d
+  - 3e8e0cdf 2024-03-05T09:43:37+03:00 Add images mismatching kubectl version into warning to track
+  - 68e0597d 2024-03-04T17:54:40+03:00 Drop issuer-url extraction instead rely on issuer-url flag
+  - 854344d2 2024-03-04T12:16:34+03:00 Introduce --issuer-url flag in oc login
+  - 66284bca 2024-02-17T11:26:56+01:00 oc adm catalog mirror: reconstruct the original digest with ':' for sha256 and sha512 algorithms on Windows
+  - 2046ed19 2024-02-12T11:25:42+01:00 oc adm catalog mirror: use ToSlash and FromSlash to unify the path separators
 
-- machine-config-operator embedded-component 398c1710f12622e9c0f94f99b12abeabed3ac5f7 to a6c488a5529a479ab15dfd20418893e048012201
-  - 43ada445 2024-03-01T11:59:56-05:00 APIVersion and Kind sometimes are empty when listing objects
-  - fdf150e2 2024-02-28T10:44:00-05:00 MCO-1051: add node owner to MCN
-  - c87cdbf1 2024-02-28T10:59:34+01:00 Check if the pivot image is present before to pull it
-  - 7b5ba714 2024-02-26T17:57:04-05:00 Add HostToContainer propogataion for coreDNS pods on cloud platforms
-  - d8e28cea 2024-02-21T13:18:09-05:00 OCPBUGS-18670: OCPBUGS-18535: MCO-809: rendercontroller should also reconcile machineconfigs
+- ovn-kubernetes image-amd64 9c7e3fa5d194d41af88cc381b081ff5572366a79 to d4f6ab30b9c38a027da5dc28bf3d213cb21f4a69
+  - 7680fe6 2024-02-29T09:59:47+00:00 Node IP handler: allow skipping tcs that require root
+  - dafa183 2024-02-28T18:17:57+01:00 Fix EgressService test race
+  - 6ecd2a3 2024-02-28T17:19:05+01:00 Custom v4 and v6 transit switch subnets while creating kind cluster
+  - 7a9819b 2024-02-28T14:40:07+00:00 Node IP handler: enable V6 mode for tcs
+  - 6402f56 2024-02-28T11:20:00+00:00 Node IP handler: fix fake ovs ctl calls
+  - 49be374 2024-02-28T11:20:00+00:00 Node IP handler: add test cases for uniq link local, secondary and OVN reserved IPs
+  - 93bbba2 2024-02-28T11:20:00+00:00 Node IP handler: add test case to ensure keepalived vips are allowed
+  - 976eff3 2024-02-28T11:20:00+00:00 Node IP handler: extract sub func call into its own func
+  - ee35bba 2024-02-28T11:20:00+00:00 Node IP handler: setup test env in a func
+  - ebb2665 2024-02-28T11:20:00+00:00 Node IP handler: allow sync period to be customizable for testing
+  - b9bc73d 2024-02-28T11:20:00+00:00 Node IP handler: extract spawning go routine from within internal func
+  - 9e5b429 2024-02-28T11:20:00+00:00 Node IP handler: extract handling node primary addr change from runInternal
+  - 0dddfd8 2024-02-28T11:20:00+00:00 Node IP handler: do not exclude keepalived vips
+  - 1ee81c1 2024-02-27T11:07:42+01:00 Remove OVN topology version reporting/detection from OVN db
+  - 416a132 2024-02-27T11:07:42+01:00 Remove the configmap based OVN topology version reporting/detection
+  - 8cf27a9 2024-02-27T10:17:51+01:00 Run ipv6 lane in control plane jobs
+  - 45b97fd 2024-02-26T10:55:17+01:00 kubevirt: Disable guest console log container
+  - 0e0af75 2024-02-26T09:24:05+00:00 Bump libovsdb with test server that supports referential integrity
+  - 3a4b4e8 2024-02-26T07:39:16+00:00 Fix metrics server nil pointer
+  - 9a548b4 2024-02-26T07:39:16+00:00 Fix default node network controller stop
+  - fb0a2a0 2024-02-26T07:39:16+00:00 refactor and clean up runOvnKube
+  - ae38f07 2024-02-14T16:26:46+01:00 Fix ensureTransitSwitch from failing if there are no nodes
 
-- operator-framework-olm embedded-component b3bfaa4b69bf7dfe8254cdadd8a6c8fc450e2b97 to 78da9884165ec1e5354292091003cadd32823dfb
-  - 3641f017 2024-03-01T21:42:29+00:00 registry/reconciler: use appropriate image pull policy for catalog (#3184)
-  - 6771690e 2024-03-01T16:11:03-05:00 UPSTREAM: <carry>: Add object cache for psm resource queries
-  - 3ea925f1 2024-03-01T15:55:58-05:00 (psm) Wait for required RBAC before creating packageserver CSV
-  - 978852d8 2024-02-29T00:03:19+00:00 Modify installation steps for ClusterRoleBindings and Services to use SSA in order to avoid race conditions. (#3182)
-  - 8a89b449 2024-02-29T00:02:24+00:00 Fix finalizer processing (#3180)
+- oc image-arm64 91ba77aaeedb6810a30eaf7418ee76e9fb45f8ee to 45fe5d4c22dc44b82f7d8bc556759e9769fe61c6
+  - 092156a7 2024-03-06T14:48:16+01:00 vendor: Add machineconfiguration client and API
+  - 754a9c9f 2024-03-06T14:48:16+01:00 adm update status: Add MCO logic needed for worker node status
+  - d7f858e5 2024-03-06T14:48:16+01:00 adm update status: Fix "Omitted additional... nodes" text
+  - 571811d0 2024-03-06T14:48:16+01:00 adm update status: Fix update duration after control plane is updated
+  - 5e651bc5 2024-03-06T14:48:16+01:00 adm update status: Add worker pool status
+  - 1fac3a21 2024-03-06T14:48:03+01:00 pkg/cli/admin/upgrade/status/examples: Add examples for worker pool status
+  - 3e8e0cdf 2024-03-05T09:43:37+03:00 Add images mismatching kubectl version into warning to track
+  - cf7a1699 2024-03-04T19:13:33+01:00 pkg/cli/admin/upgrade/status/examples: Update examples
+  - 68e0597d 2024-03-04T17:54:40+03:00 Drop issuer-url extraction instead rely on issuer-url flag
+  - 854344d2 2024-03-04T12:16:34+03:00 Introduce --issuer-url flag in oc login
+  - fcb7a153 2024-02-27T13:57:34+03:00 Introduce certificate-authority flag for image related commands
+  - 66284bca 2024-02-17T11:26:56+01:00 oc adm catalog mirror: reconstruct the original digest with ':' for sha256 and sha512 algorithms on Windows
+  - 2046ed19 2024-02-12T11:25:42+01:00 oc adm catalog mirror: use ToSlash and FromSlash to unify the path separators
 
-- kube-rbac-proxy image-amd64 49a835a819d735f5e0b059471f9c1ec0b447c995 to 04d0a78154b45ce300e176836bd47c6004603e88
-  - a0e8703 2024-02-26T18:26:44+01:00 test/e2e: add hardcodedauthorizer tests
-  - 613fbc1 2024-02-26T18:26:04+01:00 test/kubetest: add namespace manifest handling
+- router image-arm64 cf0442b1850b94b4bf123eb0a37b5491513e0b70 to 0eac295017532f95410aa66f83a4d41d1c41e3cc
+  - e2ca147 2024-03-06T12:48:30+00:00 OCPBUGS-30314: Refactor logging in DoHTTPProbe to avoid serialisation errors
 
-- kubernetes image-amd64 6116860ab8000581009cd889e4cc1a1985207ddf to 0c6e8cce586d04bab413b1f8ff5838425fe59e44
-  - ceb5ec1cd 2024-02-27T10:47:05+01:00 UPSTREAM: 123512: system:kube-scheduler: extend the RBAC with pods/finalizers
+- ovn-kubernetes image-arm64 9c7e3fa5d194d41af88cc381b081ff5572366a79 to d4f6ab30b9c38a027da5dc28bf3d213cb21f4a69
+  - 7680fe6 2024-02-29T09:59:47+00:00 Node IP handler: allow skipping tcs that require root
+  - dafa183 2024-02-28T18:17:57+01:00 Fix EgressService test race
+  - 6ecd2a3 2024-02-28T17:19:05+01:00 Custom v4 and v6 transit switch subnets while creating kind cluster
+  - 7a9819b 2024-02-28T14:40:07+00:00 Node IP handler: enable V6 mode for tcs
+  - 6402f56 2024-02-28T11:20:00+00:00 Node IP handler: fix fake ovs ctl calls
+  - 49be374 2024-02-28T11:20:00+00:00 Node IP handler: add test cases for uniq link local, secondary and OVN reserved IPs
+  - 93bbba2 2024-02-28T11:20:00+00:00 Node IP handler: add test case to ensure keepalived vips are allowed
+  - 976eff3 2024-02-28T11:20:00+00:00 Node IP handler: extract sub func call into its own func
+  - ee35bba 2024-02-28T11:20:00+00:00 Node IP handler: setup test env in a func
+  - ebb2665 2024-02-28T11:20:00+00:00 Node IP handler: allow sync period to be customizable for testing
+  - b9bc73d 2024-02-28T11:20:00+00:00 Node IP handler: extract spawning go routine from within internal func
+  - 9e5b429 2024-02-28T11:20:00+00:00 Node IP handler: extract handling node primary addr change from runInternal
+  - 0dddfd8 2024-02-28T11:20:00+00:00 Node IP handler: do not exclude keepalived vips
+  - 1ee81c1 2024-02-27T11:07:42+01:00 Remove OVN topology version reporting/detection from OVN db
+  - 416a132 2024-02-27T11:07:42+01:00 Remove the configmap based OVN topology version reporting/detection
+  - 8cf27a9 2024-02-27T10:17:51+01:00 Run ipv6 lane in control plane jobs
+  - 45b97fd 2024-02-26T10:55:17+01:00 kubevirt: Disable guest console log container
+  - 0e0af75 2024-02-26T09:24:05+00:00 Bump libovsdb with test server that supports referential integrity
+  - 3a4b4e8 2024-02-26T07:39:16+00:00 Fix metrics server nil pointer
+  - 9a548b4 2024-02-26T07:39:16+00:00 Fix default node network controller stop
+  - fb0a2a0 2024-02-26T07:39:16+00:00 refactor and clean up runOvnKube
+  - ae38f07 2024-02-14T16:26:46+01:00 Fix ensureTransitSwitch from failing if there are no nodes
 
-- kube-rbac-proxy image-arm64 49a835a819d735f5e0b059471f9c1ec0b447c995 to 04d0a78154b45ce300e176836bd47c6004603e88
-  - a0e8703 2024-02-26T18:26:44+01:00 test/e2e: add hardcodedauthorizer tests
-  - 613fbc1 2024-02-26T18:26:04+01:00 test/kubetest: add namespace manifest handling
-
-- kubernetes image-arm64 6116860ab8000581009cd889e4cc1a1985207ddf to 0c6e8cce586d04bab413b1f8ff5838425fe59e44
-  - ceb5ec1cd 2024-02-27T10:47:05+01:00 UPSTREAM: 123512: system:kube-scheduler: extend the RBAC with pods/finalizers
+- kubernetes image-arm64 0c6e8cce586d04bab413b1f8ff5838425fe59e44 to a0beecc776d492e0e7ea103af3aa4b75e5f69c67
+  - 461eacd92 2024-03-06T09:13:31-05:00 UPSTREAM: <carry>: openshift-hack/images/os: delete
 
