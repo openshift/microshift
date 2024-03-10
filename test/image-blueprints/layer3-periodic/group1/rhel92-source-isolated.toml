@@ -26,6 +26,10 @@ name = "microshift-test-agent"
 version = "*"
 
 [[packages]]
+name = "microshift-release-info"
+version = "*"
+
+[[packages]]
 name = "qemu-guest-agent"
 version = "*"
 
