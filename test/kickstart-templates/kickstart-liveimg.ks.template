@@ -2,7 +2,7 @@
 %include /main-network.cfg
 %include /main-liveimg.cfg
 
-%post --log=/var/log/anaconda/post-install.log --erroronfail
+%post --log=/dev/console --erroronfail
 
 %include /post-microshift.cfg
 %include /post-containers.cfg
