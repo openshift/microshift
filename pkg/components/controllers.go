@@ -123,6 +123,7 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		}
 		svc = []string{
 			"components/openshift-router/service-internal.yaml",
+			"components/openshift-router/service-cloud.yaml",
 		}
 		cm                   = "components/openshift-router/configmap.yaml"
 		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"

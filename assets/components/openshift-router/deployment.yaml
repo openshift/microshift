@@ -94,11 +94,9 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-              hostPort: 80
             - name: https
               containerPort: 443
               protocol: TCP
-              hostPort: 443
             - name: metrics
               containerPort: 1936
               protocol: TCP
