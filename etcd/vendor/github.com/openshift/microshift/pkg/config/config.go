@@ -25,17 +25,17 @@ const (
 )
 
 type Config struct {
-	DNS       DNS        `json:"dns"`
-	Network   Network    `json:"network"`
-	Node      Node       `json:"node"`
-	ApiServer ApiServer  `json:"apiServer"`
-	Etcd      EtcdConfig `json:"etcd"`
-	Debugging Debugging  `json:"debugging"`
-	Manifests Manifests  `json:"manifests"`
+	DNS       DNS           `json:"dns"`
+	Network   Network       `json:"network"`
+	Node      Node          `json:"node"`
+	ApiServer ApiServer     `json:"apiServer"`
+	Etcd      EtcdConfig    `json:"etcd"`
+	Debugging Debugging     `json:"debugging"`
+	Manifests Manifests     `json:"manifests"`
+	Ingress   IngressConfig `json:"ingress"`
 
 	// Internal-only fields
-	Ingress      IngressConfig `json:"-"`
-	userSettings *Config       `json:"-"` // the values read from the config file
+	userSettings *Config `json:"-"` // the values read from the config file
 
 	MultiNode MultiNodeConfig `json:"-"` // the value read from commond line
 
@@ -116,6 +116,11 @@ func (c *Config) fillDefaults() error {
 			defaultManifestDirEtcGlob,
 		},
 	}
+	c.Ingress = IngressConfig{
+		AdmissionPolicy: RouteAdmissionPolicy{
+			NamespaceOwnership: NamespaceOwnershipAllowed,
+		},
+	}
 
 	c.MultiNode.Enabled = false
 
@@ -183,6 +188,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	// disabling the manifest loader.
 	if u.Manifests.KustomizePaths != nil {
 		c.Manifests.KustomizePaths = u.Manifests.KustomizePaths
+	}
+
+	if len(u.Ingress.AdmissionPolicy.NamespaceOwnership) != 0 {
+		c.Ingress.AdmissionPolicy.NamespaceOwnership = u.Ingress.AdmissionPolicy.NamespaceOwnership
 	}
 }
 
@@ -284,6 +293,12 @@ func (c *Config) validate() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	switch c.Ingress.AdmissionPolicy.NamespaceOwnership {
+	case NamespaceOwnershipAllowed, NamespaceOwnershipStrict:
+	default:
+		return fmt.Errorf("unsupported namespaceOwnership value %v", c.Ingress.AdmissionPolicy.NamespaceOwnership)
 	}
 
 	return nil
