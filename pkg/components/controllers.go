@@ -195,6 +195,8 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 
 	extraParams := assets.RenderParams{
 		"RouterNamespaceOwnership": cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
+		"RouterHttpPort":           cfg.Ingress.Ports.Http,
+		"RouterHttpsPort":          cfg.Ingress.Ports.Https,
 	}
 	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)
