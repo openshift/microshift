@@ -20,9 +20,9 @@ spec:
   ports:
     - name: http
       protocol: TCP
-      port: 80
+      port: {{ .RouterHttpPort }}
       targetPort: http
     - name: https
       protocol: TCP
-      port: 443
+      port: {{ .RouterHttpsPort }}
       targetPort: https
