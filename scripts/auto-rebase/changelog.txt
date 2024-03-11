@@ -1,12 +1,19 @@
-- cluster-kube-apiserver-operator embedded-component 2fa2e622ae4a54614d44df400ac1a1d205781b33 to 9fe0ab100bc6241030bf6ad1fc3f554ad0b0faf1
-  - 7f03359 2024-03-07T07:52:58+01:00 Fix cert additional annotations changes
-  - d232d25 2024-03-07T07:52:11+01:00 Bump library-go to latest release-4.15
+- kubernetes embedded-component 6216ea1e51a2126f5b843a4ae7c1f414161cca8b to 6e2789bbd5893851c8bc4423e0090cd71b64f436
+  - 161280a1c 2024-02-20T14:29:50-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - c8dcb00be 2024-02-14T10:32:12+00:00 Release commit for Kubernetes v1.28.7
+  - 613b3b73f 2024-02-10T17:01:14+01:00 [go] Bump images, dependencies and versions to go 1.21.7 / setcap/debian-base to bookworm-v1.0.1 and distroless-iptables to v0.4.5
+  - e47dca7e0 2024-02-08T09:24:02-08:00 Add processStartTime in metrics/slis
+  - 8bc39af02 2024-02-03T09:35:27+08:00 Revert "kubeadm: fix a bug where the uploaded kubelet configuration in kube-system/kubelet-config ConfigMap does not respect user patch"
+  - bb18c26d1 2024-02-02T19:30:08+02:00 kubeadm: better checks if the node is CP during "upgrade node"
+  - 0f0503478 2024-01-19T18:16:01+08:00 If a pvc has an empty storageclass name, don't try to assign a default StorageClass to it.
+  - cf41bef1f 2024-01-17T14:14:19+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.6
+  - d9825ecf2 2024-01-13T15:55:23+02:00 Drop PendingChanges methods from change trackers, move into UpdateResults
+  - a63fcb488 2024-01-13T12:40:35+02:00 Squash some unnecessarily-chained methods in the change trackers
 
-- oc image-amd64 48dcf5980a6671b5933707e5a055def023c7a13a to d6175ebd387c07d8fd6354b476f6b1092f15ee1d
-  - d9a0ef1b 2024-03-05T17:18:58+00:00 Drop issuer-url extraction instead rely on issuer-url flag
-  - 5c37de0f 2024-03-05T17:18:58+00:00 Introduce --issuer-url flag in oc login
+- openshift-controller-manager embedded-component 87d251169278f61434749fc17991b45cbcb53b15 to edbf7353e21a286cac85867ec13d6cf937dd9c33
+  - b83410f 2023-11-28T06:08:17+00:00 Updating ose-openshift-controller-manager-container image to be consistent with ART Reconciling with https://github.com/openshift/ocp-build-data/tree/9dc2a375bf335e7e4e3d7e75abc5c3bdbb0c0e98/images/ose-openshift-controller-manager.yml
 
-- kubernetes image-arm64 6216ea1e51a2126f5b843a4ae7c1f414161cca8b to 6e2789bbd5893851c8bc4423e0090cd71b64f436
+- kubernetes image-amd64 6216ea1e51a2126f5b843a4ae7c1f414161cca8b to 6e2789bbd5893851c8bc4423e0090cd71b64f436
   - 161280a1c 2024-02-20T14:29:50-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - c8dcb00be 2024-02-14T10:32:12+00:00 Release commit for Kubernetes v1.28.7
   - 613b3b73f 2024-02-10T17:01:14+01:00 [go] Bump images, dependencies and versions to go 1.21.7 / setcap/debian-base to bookworm-v1.0.1 and distroless-iptables to v0.4.5
