@@ -79,6 +79,17 @@ SCENARIO_INFO_DIR="${SCENARIO_INFO_DIR:-${IMAGEDIR}/scenario-info}"
 # The CI system will override this depending on the job its running.
 SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
 
+# Directory where all the scenarios will be copied for execution
+#
+# shellcheck disable=SC2034  # used elsewhere
+SCENARIOS_TO_RUN="${OUTPUTDIR}/scenarios-to-run"
+
+# Exclude CNCF Conformance tests from execution. These tests run
+# in serial mode and they need a significant amount of time to
+# complete. Setting this variable to true will exclude them from
+# the scenario test list.
+EXCLUDE_CNCF_CONFORMANCE="${EXCLUDE_CNCF_CONFORMANCE:-false}"
+
 # The location of the robot framework virtualenv.
 # The CI system will override this.
 # shellcheck disable=SC2034  # used elsewhere
