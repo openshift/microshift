@@ -15,6 +15,7 @@ type IngressConfig struct {
 	// +kubebuilder:default=Managed
 	Status             IngressStatusEnum    `json:"status"`
 	AdmissionPolicy    RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
+	Ports              IngressPortsConfig   `json:"ports"`
 	ServingCertificate []byte               `json:"-"`
 	ServingKey         []byte               `json:"-"`
 }
@@ -32,4 +33,11 @@ type RouteAdmissionPolicy struct {
 	// If empty, the default is InterNamespaceAllowed.
 	// +kubebuilder:default="InterNamespaceAllowed"
 	NamespaceOwnership NamespaceOwnershipEnum `json:"namespaceOwnership"`
+}
+
+type IngressPortsConfig struct {
+	// +kubebuilder:default=80
+	Http uint16 `json:"http"`
+	// +kubebuilder:default=443
+	Https uint16 `json:"https"`
 }

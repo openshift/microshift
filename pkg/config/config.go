@@ -121,6 +121,10 @@ func (c *Config) fillDefaults() error {
 		AdmissionPolicy: RouteAdmissionPolicy{
 			NamespaceOwnership: NamespaceOwnershipAllowed,
 		},
+		Ports: IngressPortsConfig{
+			Http:  80,
+			Https: 443,
+		},
 	}
 
 	c.MultiNode.Enabled = false
@@ -197,6 +201,14 @@ func (c *Config) incorporateUserSettings(u *Config) {
 
 	if len(u.Ingress.AdmissionPolicy.NamespaceOwnership) != 0 {
 		c.Ingress.AdmissionPolicy.NamespaceOwnership = u.Ingress.AdmissionPolicy.NamespaceOwnership
+	}
+
+	if u.Ingress.Ports.Http != 0 {
+		c.Ingress.Ports.Http = u.Ingress.Ports.Http
+	}
+
+	if u.Ingress.Ports.Https != 0 {
+		c.Ingress.Ports.Https = u.Ingress.Ports.Https
 	}
 }
 
