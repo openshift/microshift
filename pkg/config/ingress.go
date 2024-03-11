@@ -9,6 +9,7 @@ type NamespaceOwnershipEnum string
 
 type IngressConfig struct {
 	AdmissionPolicy    RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
+	Ports              IngressPortsConfig   `json:"ports"`
 	ServingCertificate []byte               `json:"-"`
 	ServingKey         []byte               `json:"-"`
 }
@@ -16,4 +17,11 @@ type IngressConfig struct {
 type RouteAdmissionPolicy struct {
 	// +kubebuilder:default="InterNamespaceAllowed"
 	NamespaceOwnership NamespaceOwnershipEnum `json:"namespaceOwnership"`
+}
+
+type IngressPortsConfig struct {
+	// +kubebuilder:default=80
+	Http uint16 `json:"http"`
+	// +kubebuilder:default=443
+	Https uint16 `json:"https"`
 }
