@@ -1,0 +1,33 @@
+- kubernetes embedded-component c79e5e24edc51d7f12894ad4b326e7f0e191e767 to d8e449a2a95f1f99e19c09d1ee57d8b5362632df
+  - 50ea65f97 2024-02-20T10:23:13+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
+  - b9e2ad67a 2024-02-14T10:31:54+00:00 Release commit for Kubernetes v1.27.11
+  - 7eda87e2b 2024-02-10T17:02:08+01:00 [go] Bump images, dependencies and versions to go 1.21.7 / distroless-iptables to v0.4.5
+  - 6774eb0db 2024-02-03T09:33:55+08:00 Revert "kubeadm: fix a bug where the uploaded kubelet configuration in kube-system/kubelet-config ConfigMap does not respect user patch"
+  - 329d709ce 2024-01-31T15:18:09-08:00 Add processStartTime in metrics/slis
+  - 9fdcdd7a7 2024-01-19T18:25:39+08:00 If a pvc has an empty storageclass name, don't try to assign a default StorageClass to it.
+  - a923537a1 2024-01-17T14:08:15+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.10
+  - 46a2ce222 2024-01-16T13:13:29-08:00 Drop PendingChanges methods from change trackers, move into UpdateResults
+  - 33d35f12a 2024-01-16T12:51:17-08:00 Squash some unnecessarily-chained methods in the change trackers
+
+- kubernetes image-amd64 c79e5e24edc51d7f12894ad4b326e7f0e191e767 to d8e449a2a95f1f99e19c09d1ee57d8b5362632df
+  - 50ea65f97 2024-02-20T10:23:13+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
+  - b9e2ad67a 2024-02-14T10:31:54+00:00 Release commit for Kubernetes v1.27.11
+  - 7eda87e2b 2024-02-10T17:02:08+01:00 [go] Bump images, dependencies and versions to go 1.21.7 / distroless-iptables to v0.4.5
+  - 6774eb0db 2024-02-03T09:33:55+08:00 Revert "kubeadm: fix a bug where the uploaded kubelet configuration in kube-system/kubelet-config ConfigMap does not respect user patch"
+  - 329d709ce 2024-01-31T15:18:09-08:00 Add processStartTime in metrics/slis
+  - 9fdcdd7a7 2024-01-19T18:25:39+08:00 If a pvc has an empty storageclass name, don't try to assign a default StorageClass to it.
+  - a923537a1 2024-01-17T14:08:15+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.10
+  - 46a2ce222 2024-01-16T13:13:29-08:00 Drop PendingChanges methods from change trackers, move into UpdateResults
+  - 33d35f12a 2024-01-16T12:51:17-08:00 Squash some unnecessarily-chained methods in the change trackers
+
+- kubernetes image-arm64 c79e5e24edc51d7f12894ad4b326e7f0e191e767 to d8e449a2a95f1f99e19c09d1ee57d8b5362632df
+  - 50ea65f97 2024-02-20T10:23:13+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
+  - b9e2ad67a 2024-02-14T10:31:54+00:00 Release commit for Kubernetes v1.27.11
+  - 7eda87e2b 2024-02-10T17:02:08+01:00 [go] Bump images, dependencies and versions to go 1.21.7 / distroless-iptables to v0.4.5
+  - 6774eb0db 2024-02-03T09:33:55+08:00 Revert "kubeadm: fix a bug where the uploaded kubelet configuration in kube-system/kubelet-config ConfigMap does not respect user patch"
+  - 329d709ce 2024-01-31T15:18:09-08:00 Add processStartTime in metrics/slis
+  - 9fdcdd7a7 2024-01-19T18:25:39+08:00 If a pvc has an empty storageclass name, don't try to assign a default StorageClass to it.
+  - a923537a1 2024-01-17T14:08:15+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.10
+  - 46a2ce222 2024-01-16T13:13:29-08:00 Drop PendingChanges methods from change trackers, move into UpdateResults
+  - 33d35f12a 2024-01-16T12:51:17-08:00 Squash some unnecessarily-chained methods in the change trackers
+
