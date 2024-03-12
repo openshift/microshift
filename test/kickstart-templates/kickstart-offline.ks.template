@@ -4,7 +4,7 @@
 # Do not enable a network device
 network --no-activate --nodefroute --hostname=REPLACE_HOST_NAME
 
-%post --log=/var/log/anaconda/post-install.log --erroronfail
+%post --log=/dev/console --erroronfail
 
 %include /post-system.cfg
 
