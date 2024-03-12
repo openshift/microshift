@@ -1,10 +1,10 @@
 package config
 
 const (
-	NamespaceOwnershipStrict  = "Strict"
-	NamespaceOwnershipAllowed = "InterNamespaceAllowed"
-	StatusEnabled             = "Enabled"
-	StatusDisabled            = "Disabled"
+	NamespaceOwnershipStrict  NamespaceOwnershipEnum = "Strict"
+	NamespaceOwnershipAllowed NamespaceOwnershipEnum = "InterNamespaceAllowed"
+	StatusEnabled             IngressStatusEnum      = "Enabled"
+	StatusDisabled            IngressStatusEnum      = "Disabled"
 )
 
 type NamespaceOwnershipEnum string
