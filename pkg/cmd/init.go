@@ -408,6 +408,60 @@ func initKubeconfigs(
 		klog.Warningf("Unable to remove stale kubeconfigs: %v", err)
 	}
 
+	// Generate kubeconfigs for named certificates
+	for _, customCert := range cfg.ApiServer.NamedCertificates {
+		klog.Infof("Parsing certificate file: %s", customCert.CertPath)
+
+		certsSNIs, err := util.GetSNIsFromCert(customCert.CertPath, customCert.Names)
+		if err != nil {
+			klog.Warningf("Unparsable certificates are ignored, error: %v", err)
+			continue
+		}
+
+		nonWildcardSNI := 0
+		// check for wildcard only certificate
+		for _, sni := range certsSNIs {
+			if !util.IsWildcardDNS(sni) {
+				nonWildcardSNI++
+			}
+		}
+
+		if nonWildcardSNI == 0 {
+			klog.Infof("Only wildcard SNI found - placing NodeIP (%s) in kubeconfig API address (server)", cfg.Node.NodeIP)
+			certsSNIs = []string{cfg.Node.NodeIP}
+		}
+
+		// iterate over the SNIs and generate kubeconfig files
+		for _, dns := range certsSNIs {
+			// check if SNI is allowed
+			if !util.VerifyAllowedSNI(cfg.ApiServer.AdvertiseAddress, cfg.Network.ClusterNetwork, cfg.Network.ServiceNetwork, dns) {
+				klog.Infof("Skipping kubeconfig generation, Certificate SNI is not allowed for %s", dns)
+				continue
+			}
+
+			if util.IsWildcardDNS(dns) {
+				klog.Infof("Skipping kubeconfig generation for wildcard DNS %s", dns)
+				continue
+			}
+			klog.Infof("Generating kubeconfig for DNS %s", dns)
+			ul, err := url.Parse("https://" + net.JoinHostPort(dns, strconv.Itoa(cfg.ApiServer.Port)))
+			if err != nil {
+				klog.Errorf("Error generating kubeconfig for %s: %v", ul, err)
+				continue
+			}
+
+			if err := util.KubeConfigWithClientCerts(
+				cfg.KubeConfigAdminPath(dns),
+				ul.String(),
+				[]byte{},
+				adminKubeconfigCertPEM,
+				adminKubeconfigKeyPEM,
+			); err != nil {
+				return err
+			}
+		}
+	}
+
 	if err := util.KubeConfigWithClientCerts(
 		cfg.KubeConfigPath(config.KubeAdmin),
 		cfg.ApiServer.URL,
