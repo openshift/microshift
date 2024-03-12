@@ -148,6 +148,24 @@ release. These files contain the list of container image references used by
 the Operator Lifecycle Manager for MicroShift and can be used to embed those
 images into osbuilder blueprints.
 
+%package multus
+Summary: Multus CNI for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description multus
+The microshift-multus package provides the required manifests for the Multus CNI to be installed on MicroShift.
+
+%package multus-release-info
+Summary: Release information for Multus CNI for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description multus-release-info
+The microshift-multus-release-info package provides release information files for this
+release. These files contain the list of container image references used by
+the Multus CNI for MicroShift and can be used to embed those images into osbuilder blueprints.
+
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
 golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
@@ -307,6 +325,26 @@ cat assets/optional/operator-lifecycle-manager/kustomization.x86_64.yaml >> %{bu
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/operator-lifecycle-manager/release-olm-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# multus
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
+# Copy all the Multus manifests except the arch specific ones
+install -p -m644 assets/optional/multus/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
+install -p -m644 assets/optional/multus/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
+install -p -m755 packaging/greenboot/microshift-running-check-multus.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
+install -p -m755 packaging/crio.conf.d/12-microshift-multus.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/12-microshift-multus.conf
+
+%ifarch %{arm} aarch64
+cat assets/optional/multus/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus/kustomization.yaml
+%endif
+
+%ifarch x86_64
+cat assets/optional/multus/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus/kustomization.yaml
+%endif
+
+# multus-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -421,10 +459,22 @@ systemctl enable --now --quiet openvswitch || true
 %files olm-release-info
 %{_datadir}/microshift/release/release-olm-{x86_64,aarch64}.json
 
+%files multus
+%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-multus
+%{_prefix}/lib/microshift/manifests.d/000-microshift-multus/*
+%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
+%{_sysconfdir}/crio/crio.conf.d/12-microshift-multus.conf
+
+%files multus-release-info
+%{_datadir}/microshift/release/release-multus-{x86_64,aarch64}.json
+
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Feb 26 2024 Patryk Matuszak <pmatusza@redhat.com> 4.16.0
+- RPM packages for Multus CNI
+
 * Thu Jan 25 2024 Patryk Matuszak <pmatusza@redhat.com> 4.16.0
 - Rename CRI-O configs to include prefix
 

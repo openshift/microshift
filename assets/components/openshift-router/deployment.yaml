@@ -42,7 +42,7 @@ spec:
             - name: ROUTER_DISABLE_HTTP2
               value: "true"
             - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
-              value: "false"
+              value: '{{.RouterNamespaceOwnership}}'
             - name: ROUTER_LOAD_BALANCE_ALGORITHM
               value: random
             - name: ROUTER_METRICS_TYPE
@@ -94,11 +94,9 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-              hostPort: 80
             - name: https
               containerPort: 443
               protocol: TCP
-              hostPort: 443
             - name: metrics
               containerPort: 1936
               protocol: TCP

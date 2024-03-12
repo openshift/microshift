@@ -32,7 +32,7 @@ if ! parallel \
     ${progress} \
     --results "${SCENARIO_INFO_DIR}/{/.}/run.log" \
     --joblog "${TEST_JOB_LOG}" \
-    ./bin/scenario.sh run ::: "${SCENARIO_SOURCES}"/*.sh ; then
+    ./bin/scenario.sh run ::: "${SCENARIOS_TO_RUN}"/*.sh ; then
    TEST_OK=false
 fi
 

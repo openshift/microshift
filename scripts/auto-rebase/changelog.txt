@@ -1,14 +1,49 @@
-- oc image-arm64 a36a8e36c0eaec9c6905becac2f5a941b78b5123 to 91ba77aaeedb6810a30eaf7418ee76e9fb45f8ee
-  - 846ce4d7 2024-02-26T10:16:41+03:00 Extract oc also for linux/ppc64le
-  - 6e766588 2024-02-13T10:14:26+03:00 Revert "Revert "NO-JIRA: Bump k8s dependencies to 1.29.1""
+- cluster-csi-snapshot-controller-operator embedded-component ed8a8bcc29ba79e5abedd41deaee9747d0fe14cf to 7d0230dcd8eaeed205c7ee0d23a299f300e98a92
+  - 3e68828 2024-03-07T17:18:28-07:00 CVE-2024-24786: bump google.golang.org/protobuf to v1.33.0
 
-- router image-arm64 4c436c604e093a8cadcee72c8a45b214e24f40ac to cf0442b1850b94b4bf123eb0a37b5491513e0b70
-  - 34cf2a7 2024-02-14T13:53:53+00:00 container builds: add socat package
-  - 6c58af9 2024-02-14T13:49:35+00:00 Revert "Merge pull request #561 from dgoodwin/revert-551-1707829993043"
+- cluster-kube-apiserver-operator embedded-component 2f8d114706347f5343ac9a142404c10dd88daa97 to e6cba0a210714e935ac20c95873cc63e1175bb43
+  - 6f3faa4 2024-03-05T16:33:03+01:00 certrotationcontroller: set AutoRegenerateAfterOfflineExpiry for generated certificates
 
-- kube-rbac-proxy image-arm64 6ea01c5c6e0c56d07b66c90e27caeda58b4ce872 to 49a835a819d735f5e0b059471f9c1ec0b447c995
-  - ca2ca5b 2024-02-27T10:13:15+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/7e3c85650685dcd13127a6bf27372dece89b5cc8/images/kube-rbac-proxy.yml
+- cluster-kube-scheduler-operator embedded-component d08bc07830237e2abcd75c2a34e6651fd3a5514b to 81808652c748a608f54435f186833e74e6b9cf30
+  - 306e515 2024-03-04T21:40:02+01:00 bump(library-go)=release-4.16
 
-- kubernetes image-arm64 2eba5a9a34b4e3ac7f3cb5f03cf04282f7464356 to 6116860ab8000581009cd889e4cc1a1985207ddf
-  - 1a9c833e8 2024-02-26T14:11:59-05:00 UPSTREAM: 123055: Fix race condition between resizer and kubelet
+- cluster-network-operator embedded-component ca3854fa9475d7558027ab44fb514e8d64b3cf0c to 8108f7a3b62db9be50b934a177e11df5326e4790
+  - 00927f0 2024-03-06T10:44:58+01:00 Fix managed cluster detection on ARO
+  - f56eab6 2024-03-05T17:20:38+01:00 infraconfig: use single interface for all field synchronizers
+  - 88b5265 2024-03-05T17:20:38+01:00 test: add tests for SpecStatusSynchronizer
+  - ca8cab0 2024-03-05T17:20:37+01:00 OPNET-358, OPNET-360: Allow VIP mutation in Infra CR
+  - d09404a 2024-03-05T16:57:16+01:00 util: add helpers for converting IP and CIDR to String
+  - abe7f5b 2024-03-05T10:45:56+01:00 Remove field manager migration code
+  - 54e6ce4 2024-03-05T10:45:38+01:00 Set the default UserAgent
+  - acd67b4 2024-03-04T17:49:53+01:00 Bump controller-runtime to v0.16.0
+
+- kubernetes embedded-component 0c6e8cce586d04bab413b1f8ff5838425fe59e44 to a0beecc776d492e0e7ea103af3aa4b75e5f69c67
+  - 461eacd92 2024-03-06T09:13:31-05:00 UPSTREAM: <carry>: openshift-hack/images/os: delete
+
+- machine-config-operator embedded-component 11d5151a784c7d4be5255ea41acfbf5092eda592 to a07395300232d2dd00fd86dca0a14068f0d8cdc2
+  - 7701e259 2024-03-06T17:03:53+00:00 Add Image Credential Provider flags for Kubelet on Azure
+  - 757befbd 2024-03-05T07:28:49-06:00 OCPNODE-2098: add static pods for rbacproxy
+
+- route-controller-manager embedded-component ed4f94eaa5f3fea6eb8d4f06d1c0d94855ff1ec6 to 3112b458983c6fca6f77d5a945fb0026186dace6
+  - bb2f7c9 2024-02-28T12:15:06-05:00 OCPBUGS-30048 Fix OWNERS file to reflect the correct team
+
+- oc image-amd64 1c257b86f033d8b8d51d62167594d0e2882e2e5d to 45fe5d4c22dc44b82f7d8bc556759e9769fe61c6
+  - 092156a7 2024-03-06T14:48:16+01:00 vendor: Add machineconfiguration client and API
+  - 754a9c9f 2024-03-06T14:48:16+01:00 adm update status: Add MCO logic needed for worker node status
+  - d7f858e5 2024-03-06T14:48:16+01:00 adm update status: Fix "Omitted additional... nodes" text
+  - 571811d0 2024-03-06T14:48:16+01:00 adm update status: Fix update duration after control plane is updated
+  - 5e651bc5 2024-03-06T14:48:16+01:00 adm update status: Add worker pool status
+  - 1fac3a21 2024-03-06T14:48:03+01:00 pkg/cli/admin/upgrade/status/examples: Add examples for worker pool status
+  - cf7a1699 2024-03-04T19:13:33+01:00 pkg/cli/admin/upgrade/status/examples: Update examples
+  - fcb7a153 2024-02-27T13:57:34+03:00 Introduce certificate-authority flag for image related commands
+
+- router image-amd64 cf0442b1850b94b4bf123eb0a37b5491513e0b70 to 19e6365d90d0540c138267091235005ad32c238b
+  - fee293d 2024-03-06T13:09:33+00:00 NO-JIRA: hack/Dockerfile.debug: use ubi9 for base image
+  - e2ca147 2024-03-06T12:48:30+00:00 OCPBUGS-30314: Refactor logging in DoHTTPProbe to avoid serialisation errors
+
+- kubernetes image-amd64 0c6e8cce586d04bab413b1f8ff5838425fe59e44 to a0beecc776d492e0e7ea103af3aa4b75e5f69c67
+  - 461eacd92 2024-03-06T09:13:31-05:00 UPSTREAM: <carry>: openshift-hack/images/os: delete
+
+- router image-arm64 0eac295017532f95410aa66f83a4d41d1c41e3cc to 19e6365d90d0540c138267091235005ad32c238b
+  - fee293d 2024-03-06T13:09:33+00:00 NO-JIRA: hack/Dockerfile.debug: use ubi9 for base image
 

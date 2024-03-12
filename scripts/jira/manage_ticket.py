@@ -264,25 +264,31 @@ def command_close(args):
         points = getter(ticket, 'Story Points')
         print(f'  Story Points: {points}')
 
-        all_merged = True
+        num_merged = 0
+        num_closed = 0
         links = server.remote_links(ticket.id)
         print(f'  PRs: {len(links)}')
-        if not links:
-            all_merged = False
-        else:
-            for link in links:
-                url = link.object.url
-                if not is_pr_link(url):
-                    continue
-                org_name, repo_name, pr_num = parse_pr_link(url)
-                repo = gh.get_repo(f'{org_name}/{repo_name}')
-                pr = repo.get_pull(int(pr_num))
-                print(f'  Link: {url} ({pr.merged})')
-                if not pr.merged:
-                    all_merged = False
+        for link in links:
+            url = link.object.url
+            if not is_pr_link(url):
+                continue
+            org_name, repo_name, pr_num = parse_pr_link(url)
+            repo = gh.get_repo(f'{org_name}/{repo_name}')
+            pr = repo.get_pull(int(pr_num))
+            state = pr.state
+            if pr.merged:
+                state = 'merged'
+            print(f'  Link: {url} ({state})')
+            if pr.merged:
+                num_merged += 1
+            elif pr.closed_at:
+                num_closed += 1
+        # We can close the ticket if we have at least 1 merged PR and
+        # no open PRs.
+        is_closable = num_merged and ((num_merged + num_closed) == len(links))
 
         actual_project_id = get_project_id_from_ticket_id(ticket.key)
-        if actual_project_id == 'OCPBUGS' or not all_merged:
+        if actual_project_id == 'OCPBUGS' or not is_closable:
             print('  Transition: none')
             continue
 

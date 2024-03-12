@@ -19,7 +19,9 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/openshift/library-go/pkg/crypto"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -68,6 +70,8 @@ func TestConfigure(t *testing.T) {
 		fmt.Sprintf("--root-ca-file=%s", kcmRootCAFile()),
 		"--secure-port=10257",
 		fmt.Sprintf("--service-account-private-key-file=%s", kcmServiceAccountPrivateKeyFile()),
+		fmt.Sprintf("--tls-cipher-suites=%s", strings.Join(crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers), ",")),
+		fmt.Sprintf("--tls-min-version=%s", string(fixedTLSProfile.MinTLSVersion)),
 		"--use-service-account-credentials=true",
 		"-v=2",
 	}

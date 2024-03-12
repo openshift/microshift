@@ -698,3 +698,26 @@ The keys are then mounted for the job and copied to the `~/.aws/config` and
 
 > The procedure assumes that the `microshift-build-cache-<region>` bucket exists
 > in the appropriate region.
+
+### Local Developer Overrides
+
+In some cases, it is necessary to override default values used by the
+CI scripts to make them work in the local environment. If the file
+`./test/dev_overrides.sh` exists, it is sourced by the test framework
+scripts after initializing the common defaults and before computing
+any per-script defaults.
+
+For example, creating the file with this content
+
+```
+#!/bin/bash
+export AWS_BUCKET_NAME=microshift-build-cache-us-west-2
+export CI_JOB_NAME=local-dev
+```
+
+will ensure that a valid AWS bucket is used as the source of image
+cache data and that scripts that check for the CI job name will have a
+name pattern set to compare.
+
+NOTE: Include the shebang line with the shell set and export variables
+to avoid issues with the shellcheck linter.

@@ -31,14 +31,22 @@ function run {
   fi
 }
 
+# reboot and wait
 function reboot_and_wait {
-  local -r PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
   run sudo reboot &
+  wait_for_vm
+  wait_for_k8s
+  wait_for_pods
+}
+
+function wait_for_vm {
+  local -r PREV_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
   local -r TIMEOUT_LIMIT=$(( SECONDS + 300 ))
   while true; do
     local NEW_BOOT_ID
     NEW_BOOT_ID=$(run cat /proc/sys/kernel/random/boot_id)
     if [ "${NEW_BOOT_ID:-}" ] && [ "${PREV_BOOT_ID}" != "${NEW_BOOT_ID}" ]; then
+      echo "VM booted with a different boot id"
       break
     fi
     if (( SECONDS > TIMEOUT_LIMIT )); then
@@ -49,11 +57,31 @@ function reboot_and_wait {
   done
 }
 
+function wait_for_k8s {
+  local -r TIMEOUT_LIMIT=$(( SECONDS + 300 ))
+  while true; do
+    HEALTHZ_CHECK="$(run 'sudo oc get --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig --raw=/livez')"
+    if [ "${HEALTHZ_CHECK:-}" == "ok" ]; then
+      echo "k8s is up and running"
+      break
+    fi
+    if (( SECONDS > TIMEOUT_LIMIT )); then
+      echo "ERROR: Timed out waiting for k8s to be ready"
+      exit 1
+    fi
+    sleep 10
+  done
+}
+
+function wait_for_pods {
+  run 'sudo oc wait --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig -A --all --for=condition=Ready pods --timeout 120s'
+}
+
 # install dependecies
 function install_kernel-modules-extra {
   if ! run rpm-ostree status &> /dev/null ; then
     if ! run rpm -q kernel-modules-extra &> /dev/null ; then
-      run sudo dnf -y install kernel-modules-extra &> /dev/null
+      run sudo dnf -y --nogpgcheck install kernel-modules-extra &> /dev/null
       reboot_and_wait
     fi
     check_command "rpm -q kernel-modules-extra"
@@ -260,5 +288,3 @@ case ${CONDITION:-} in
   "")               echo -e "ERROR: condition is missing"; exit 1;;
   *)                echo -e "ERROR: condition is not valid '${CONDITION}'"; exit 1;;
 esac
-
-reboot_and_wait

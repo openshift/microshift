@@ -4,6 +4,7 @@ metadata:
   name: storageversionmigrations.migration.k8s.io
   annotations:
     "api-approved.kubernetes.io": "https://github.com/kubernetes/community/pull/2524"
+    include.release.openshift.io/hypershift: "true"
     include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
 spec:

@@ -17,12 +17,14 @@ ${HTTP_PORT}        80
 *** Keywords ***
 Create Hello MicroShift Pod
     [Documentation]    Create a pod running the "hello microshift" application
-    Oc Create    -f ${HELLO_USHIFT} -n ${NAMESPACE}
-    Labeled Pod Should Be Ready    app\=hello-microshift    timeout=120s
+    [Arguments]    ${ns}=${NAMESPACE}
+    Oc Create    -f ${HELLO_USHIFT} -n ${ns}
+    Labeled Pod Should Be Ready    app\=hello-microshift    timeout=120s    ns=${ns}
 
 Expose Hello MicroShift
     [Documentation]    Expose the "hello microshift" application via cluster ip service
-    Run With Kubeconfig    oc expose pod hello-microshift -n ${NAMESPACE}
+    [Arguments]    ${ns}=${NAMESPACE}
+    Run With Kubeconfig    oc expose pod hello-microshift -n ${ns}
 
 Expose Hello MicroShift Pod Via LB
     [Documentation]    Expose the "hello microshift" application through the load balancer
@@ -35,9 +37,9 @@ Expose Hello MicroShift Pod Via NodePort
 
 Access Hello Microshift
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
 
-    Run With Kubeconfig    oc get all -n ${NAMESPACE}
+    Run With Kubeconfig    oc get all -n ${ns}
 
     ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${ushift_ip}:${ushift_port}"
     ${url_path}=    Set Variable    "http://hello-microshift.cluster.local${path}"
@@ -48,8 +50,30 @@ Access Hello Microshift
     ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
     Should Be Equal As Integers    ${result.rc}    0
-    Should Match Regexp    ${result.stdout}    HTTP.*200
-    Should Match    ${result.stdout}    *Hello MicroShift*
+    RETURN    ${result.stdout}
+
+Access Hello MicroShift Success
+    [Documentation]    Expect 200 OK when accessing "hello microshift" through the router.
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
+
+    ${result}=    Access Hello MicroShift
+    ...    ushift_port=${ushift_port}
+    ...    ushift_ip=${ushift_ip}
+    ...    path=${path}
+    ...    ns=${ns}
+    Should Match Regexp    ${result}    HTTP.*200
+    Should Match    ${result}    *Hello MicroShift*
+
+Access Hello MicroShift Unavailable
+    [Documentation]    Expect 503 Service Unavailable when accessing "hello microshift" through the router.
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
+
+    ${result}=    Access Hello MicroShift
+    ...    ushift_port=${ushift_port}
+    ...    ushift_ip=${ushift_ip}
+    ...    path=${path}
+    ...    ns=${ns}
+    Should Match Regexp    ${result}    HTTP.*503
 
 Verify Hello MicroShift LB
     [Documentation]    Run Hello MicroShift Load Balancer verification
@@ -63,5 +87,6 @@ Verify Hello MicroShift LB
 
 Delete Hello MicroShift Pod And Service
     [Documentation]    Delete service and pod for cleanup.
-    Oc Delete    service/hello-microshift -n ${NAMESPACE}
-    Oc Delete    -f ${HELLO_USHIFT} -n ${NAMESPACE}
+    [Arguments]    ${ns}=${NAMESPACE}
+    Oc Delete    service/hello-microshift -n ${ns}
+    Oc Delete    -f ${HELLO_USHIFT} -n ${ns}

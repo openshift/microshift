@@ -123,6 +123,7 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		}
 		svc = []string{
 			"components/openshift-router/service-internal.yaml",
+			"components/openshift-router/service-cloud.yaml",
 		}
 		cm                   = "components/openshift-router/configmap.yaml"
 		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"
@@ -175,7 +176,10 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		return err
 	}
 
-	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+	extraParams := assets.RenderParams{
+		"RouterNamespaceOwnership": cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
+	}
+	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}

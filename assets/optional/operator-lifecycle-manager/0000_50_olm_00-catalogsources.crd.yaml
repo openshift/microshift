@@ -684,6 +684,7 @@ spec:
                     - type
                   x-kubernetes-list-type: map
                 configMapReference:
+                  description: ConfigMapReference (deprecated) is the reference to the ConfigMap containing the catalog source's configuration, when the catalog source is a ConfigMap
                   type: object
                   required:
                     - name
@@ -702,6 +703,7 @@ spec:
                       description: UID is a type that holds unique ID values, including UUIDs.  Because we don't ONLY use UUIDs, this is an alias to string.  Being a type captures intent and helps make sure that UIDs and names do not get conflated.
                       type: string
                 connectionState:
+                  description: ConnectionState represents the current state of the CatalogSource's connection to the registry
                   type: object
                   required:
                     - lastObservedState
@@ -724,6 +726,7 @@ spec:
                   description: Reason is the reason the CatalogSource was transitioned to its current state.
                   type: string
                 registryService:
+                  description: RegistryService represents the current state of the GRPC service used to serve the catalog
                   type: object
                   properties:
                     createdAt:

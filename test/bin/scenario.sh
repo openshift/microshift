@@ -406,6 +406,13 @@ launch_vm() {
     local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
     local -r vm_pool_dir="${VM_DISK_BASEDIR}/${vm_pool_name}"
 
+    # See if the VM already exists
+    if sudo virsh dominfo "${full_vmname}" 2>/dev/null; then
+        echo "${full_vmname} already exists"
+        record_junit "${vmname}" "install_vm" "SKIP"
+        return 0
+    fi
+
     echo "Creating ${full_vmname}"
 
     # Create the pool if it does not exist
@@ -668,6 +675,12 @@ previous_minor_version() {
     echo $(( $(current_minor_version) - 1 ))
 }
 
+# Function to report the minor version for 2 releases back. If the current
+# version is "4.16.0", reports "14".
+yminus2_minor_version() {
+    echo $(( $(current_minor_version) - 2 ))
+}
+
 # Function to report the *next* minor version. If the current
 # version is "4.14.5", reports "15".
 next_minor_version() {
@@ -713,9 +726,6 @@ run_tests() {
     local -r vmname="${1}"
     local -r full_vmname="$(full_vm_name "${vmname}")"
     shift
-
-    start_junit
-    trap "close_junit; sos_report" EXIT
 
     echo "Running tests with $# args" "$@"
 
@@ -877,13 +887,17 @@ action_create() {
     fi
     record_junit "setup" "load_scenario_script" "OK"
 
-    # shellcheck disable=SC2154 # var is referenced but not assigned
-    trap 'res=0; sos_report true || res=$?; close_junit && exit "${res}"' EXIT
+    # Set the exit handler to attempt the sos report collection and error logging
+    # - Preserve the original exit code
+    # - Log junit message on failure
+    # - Override the exit code if sos report collection fails
+    # shellcheck disable=SC2154
+    trap 'rc=$? ; \
+        [ "${rc}" -ne 0 ] && record_junit "setup" "scenario_create_vms" "FAILED" ; \
+        sos_report true || rc=1 ; \
+        close_junit ; exit "${rc}"' EXIT
 
-    if ! scenario_create_vms; then
-        record_junit "setup" "scenario_create_vms" "FAILED"
-        return 1
-    fi
+    scenario_create_vms
     record_junit "setup" "scenario_create_vms" "OK"
 }
 
@@ -909,9 +923,33 @@ action_login() {
 }
 
 action_run() {
-    load_global_settings
-    load_scenario_script
+    start_junit
+    trap "close_junit" EXIT
+
+    if ! load_global_settings; then
+        record_junit "run" "load_global_settings" "FAILED"
+        return 1
+    fi
+    record_junit "run" "load_global_settings" "OK"
+
+    if ! load_scenario_script; then
+        record_junit "run" "load_scenario_script" "FAILED"
+        return 1
+    fi
+    record_junit "run" "load_scenario_script" "OK"
+
+    # Set the exit handler to attempt the sos report collection and error logging
+    # - Preserve the original exit code
+    # - Log junit message on failure
+    # - Override the exit code if sos report collection fails
+    # shellcheck disable=SC2154
+    trap 'rc=$? ; \
+        [ "${rc}" -ne 0 ] && record_junit "run" "scenario_run_tests" "FAILED" ; \
+        sos_report true || rc=1 ; \
+        close_junit ; exit "${rc}"' EXIT
+
     scenario_run_tests
+    record_junit "run" "scenario_run_tests" "OK"
 }
 
 usage() {

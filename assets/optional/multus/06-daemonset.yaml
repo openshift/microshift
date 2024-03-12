@@ -57,6 +57,17 @@ spec:
         args:
           - >
             /entrypoint/cnibincopy.sh;
+            echo "$(date --iso-8601=seconds) Waiting for /etc/cni/net.d/10-ovn-kubernetes.conf";
+            start=$(date +%s);
+            while [ ! -f /host/etc/cni/net.d/10-ovn-kubernetes.conf ]; do
+              now=$(date +%s);
+              if $(( now - start > 5 * 60 )); then
+                echo "$(date --iso-8601=seconds) Timed out waiting for /etc/cni/net.d/10-ovn-kubernetes.conf";
+                exit 1;
+              fi;
+              sleep 2;
+            done;
+            echo "$(date --iso-8601=seconds) /etc/cni/net.d/10-ovn-kubernetes.conf exists - proceeding";
             exec /usr/src/multus-cni/bin/thin_entrypoint
             --multus-conf-file=auto
             --multus-autoconfig-dir=/host/etc/cni/net.d

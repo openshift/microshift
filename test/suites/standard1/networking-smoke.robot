@@ -26,7 +26,7 @@ Router Smoke Test
     ...    Restart Router
 
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift    ${HTTP_PORT}
+    ...    Access Hello Microshift Success    ${HTTP_PORT}
 
     DNS Entry For Route Should Resolve
 
@@ -48,7 +48,7 @@ Ingress Smoke Test
     ...    Restart Router
 
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift    ${HTTP_PORT}    path=/principal
+    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/principal
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Ingress

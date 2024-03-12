@@ -46,10 +46,6 @@ NEXT_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-fake-next-minor"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-YPLUS2_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-fake-yplus2-minor"
-
-# Location of RPMs built from source
-# shellcheck disable=SC2034  # used elsewhere
 BASE_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-base"
 
 # Location of local repository used by composer
@@ -59,10 +55,6 @@ LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
 NEXT_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-next-minor"
-
-# Location of local repository used by composer
-# shellcheck disable=SC2034  # used elsewhere
-YPLUS2_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-yplus2-minor"
 
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
@@ -86,6 +78,17 @@ SCENARIO_INFO_DIR="${SCENARIO_INFO_DIR:-${IMAGEDIR}/scenario-info}"
 #
 # The CI system will override this depending on the job its running.
 SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
+
+# Directory where all the scenarios will be copied for execution
+#
+# shellcheck disable=SC2034  # used elsewhere
+SCENARIOS_TO_RUN="${OUTPUTDIR}/scenarios-to-run"
+
+# Exclude CNCF Conformance tests from execution. These tests run
+# in serial mode and they need a significant amount of time to
+# complete. Setting this variable to true will exclude them from
+# the scenario test list.
+EXCLUDE_CNCF_CONFORMANCE="${EXCLUDE_CNCF_CONFORMANCE:-false}"
 
 # The location of the robot framework virtualenv.
 # The CI system will override this.
@@ -207,3 +210,11 @@ SCENARIO_BUILD_TAG_PREV="$(date -d "yesterday" '+%y%m%d')"
 # The location of the awscli binary.
 # shellcheck disable=SC2034  # used elsewhere
 AWSCLI="${OUTPUTDIR}/bin/aws"
+
+# The location of developer overrides files.
+DEV_OVERRIDES="${TESTDIR}/dev_overrides.sh"
+if [ -f "${DEV_OVERRIDES}" ]; then
+    # The file will not exist, so we should not ask shellcheck to look for it.
+    # shellcheck disable=SC1090
+    source "${DEV_OVERRIDES}"
+fi

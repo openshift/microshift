@@ -31,17 +31,27 @@ osbuild_logs() {
 }
 
 extract_container_images() {
-    local -r version=$1
-    local -r repo_url=$2
-    local -r outfile=$3
+    local -r version=$1    # full version
+    local -r repo_spec=$2  # repo name, path, or URL
+    local -r outfile=$3    # destination file
 
     echo "Extracting images from ${version}"
     mkdir -p "${IMAGEDIR}/release-info-rpms"
     pushd "${IMAGEDIR}/release-info-rpms"
     dnf_options=""
-    if [[ -n ${repo_url} ]]; then
-        local -r repo_name="$(basename "${repo_url}")"
-        dnf_options="--repofrompath ${repo_name},${repo_url} --repo ${repo_name}"
+    local -r repo_name="$(basename "${repo_spec}")"
+    if [[ "${repo_spec}" =~ ^https://.* ]]; then
+        # If the spec is a URL, set up the arguments to point to that location.
+        dnf_options="--repofrompath ${repo_name},${repo_spec} --repo ${repo_name}"
+    elif [[ "${repo_spec}" =~ ^/.* ]]; then
+        # If the spec is a path, set up the arguments to point to that path.
+        dnf_options="--repofrompath ${repo_name},${repo_spec} --repo ${repo_name}"
+    elif [[ -n ${repo_spec} ]]; then
+        # If the spec is a name, assume it is already known to the
+        # system through normal configuration. The repo does not need
+        # to be enabled in order for dnf to download a package from
+        # it.
+        dnf_options="--repo ${repo_spec}"
     fi
     # shellcheck disable=SC2086  # double quotes
     sudo dnf download ${dnf_options} microshift-release-info-"${version}"
@@ -56,20 +66,21 @@ configure_package_sources() {
     export LOCAL_REPO              # defined in common.sh
     export NEXT_REPO               # defined in common.sh
     export BASE_REPO               # defined in common.sh
-    export YPLUS2_REPO             # defined in common.sh
     export CURRENT_RELEASE_REPO
     export PREVIOUS_RELEASE_REPO
 
     export SOURCE_VERSION
     export FAKE_NEXT_MINOR_VERSION
-    export FAKE_YPLUS2_MINOR_VERSION
     export MINOR_VERSION
     export PREVIOUS_MINOR_VERSION
+    export YMINUS2_MINOR_VERSION
     export SOURCE_VERSION_BASE
     export CURRENT_RELEASE_VERSION
     export PREVIOUS_RELEASE_VERSION
+    export YMINUS2_RELEASE_VERSION
     export RHOCP_MINOR_Y
     export RHOCP_MINOR_Y1
+    export RHOCP_MINOR_Y2
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -681,8 +692,8 @@ fi
 SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
 MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
 PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
+YMINUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" - 2 ))
 FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
-FAKE_YPLUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" + 2 ))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
 
 current_version_repo=$(get_rel_version_repo "${MINOR_VERSION}")
@@ -702,6 +713,14 @@ if is_rhocp_available "${PREVIOUS_MINOR_VERSION}"; then
     RHOCP_MINOR_Y1="${PREVIOUS_MINOR_VERSION}"
 fi
 
+# For Y-2, there will always be a real repository, so we can always
+# set the template variable for enabling that package source and use
+# the well-known name of that repo instead of figuring out the URL.
+yminus2_version_repo=$(get_rel_version_repo "${YMINUS2_MINOR_VERSION}")
+YMINUS2_RELEASE_VERSION=$(echo "${yminus2_version_repo}" | cut -d, -f1)
+YMINUS2_RELEASE_REPO="$(get_ocp_repo_name_for_version ${YMINUS2_MINOR_VERSION})"
+RHOCP_MINOR_Y2="${YMINUS2_MINOR_VERSION}"
+
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"
 mkdir -p "${LOGDIR}"
@@ -717,8 +736,8 @@ if ${EXTRACT_CONTAINER_IMAGES}; then
     extract_container_images "${SOURCE_VERSION}" "${LOCAL_REPO}" "${CONTAINER_LIST}"
     # The following images are specific to layers that use fake rpms built from source.
     extract_container_images "4.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
-    extract_container_images "4.${FAKE_YPLUS2_MINOR_VERSION}.*" "${YPLUS2_REPO}" "${CONTAINER_LIST}"
     extract_container_images "${PREVIOUS_RELEASE_VERSION}" "${PREVIOUS_RELEASE_REPO}" "${CONTAINER_LIST}"
+    extract_container_images "${YMINUS2_RELEASE_VERSION}" "${YMINUS2_RELEASE_REPO}" "${CONTAINER_LIST}"
 fi
 
 trap 'osbuild_logs' EXIT
