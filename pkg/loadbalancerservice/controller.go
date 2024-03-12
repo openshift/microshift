@@ -154,7 +154,7 @@ func (c *LoadbalancerServiceController) updateServiceStatus(key string) error {
 		klog.Infof("Service %s does not exist anymore", key)
 	} else {
 		svc := obj.(*corev1.Service)
-		if svc.Spec.Type != corev1.ServiceTypeLoadBalancer || (svc.Spec.LoadBalancerClass != nil && *svc.Spec.LoadBalancerClass != "microshift-internal") {
+		if svc.Spec.Type != corev1.ServiceTypeLoadBalancer || svc.Spec.LoadBalancerClass != nil {
 			return nil
 		}
 		klog.Infof("Process service %s/%s", svc.Namespace, svc.Name)
