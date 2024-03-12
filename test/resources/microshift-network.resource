@@ -41,8 +41,8 @@ Access Hello Microshift
 
     Run With Kubeconfig    oc get all -n ${ns}
 
-    ${connect_to}=    Set Variable    "hello-microshift.cluster.local:${HTTP_PORT}:${ushift_ip}:${ushift_port}"
-    ${url_path}=    Set Variable    "http://hello-microshift.cluster.local${path}"
+    ${connect_to}=    Set Variable    "hello-microshift.cluster.local::${ushift_ip}:"
+    ${url_path}=    Set Variable    "http://hello-microshift.cluster.local:${ushift_port}${path}"
 
     ${result}=    Run Process
     ...    curl -i ${url_path} --connect-to ${connect_to}
