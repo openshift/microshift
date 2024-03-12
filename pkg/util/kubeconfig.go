@@ -33,7 +33,10 @@ func KubeConfigWithClientCerts(
 
 	cluster := clientcmdapi.NewCluster()
 	cluster.Server = clusterURL
-	cluster.CertificateAuthorityData = clusterTrustBundle
+
+	if len(clusterTrustBundle) > 0 {
+		cluster.CertificateAuthorityData = clusterTrustBundle
+	}
 
 	msContext := clientcmdapi.NewContext()
 	msContext.Cluster = microshiftName
