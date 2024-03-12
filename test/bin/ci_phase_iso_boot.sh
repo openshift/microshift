@@ -32,7 +32,7 @@ prepare_scenario_sources() {
     mkdir -p "${SCENARIOS_TO_RUN}"
     cp "${SCENARIO_SOURCES}"/*.sh "${SCENARIOS_TO_RUN}"/
     if ${EXCLUDE_CNCF_CONFORMANCE}; then
-        rm -f "${SCENARIOS_TO_RUN}/*cncf-conformance.sh"
+        find "${SCENARIOS_TO_RUN}" -name "*cncf-conformance.sh" -delete
     fi
 }
 
