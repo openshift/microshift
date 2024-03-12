@@ -18,6 +18,9 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    ports:
+        http: 0
+        https: 0
     routeAdmissionPolicy:
         namespaceOwnership: ""
 manifests:
@@ -57,6 +60,9 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    ports:
+        http: 80
+        https: 443
     routeAdmissionPolicy:
         namespaceOwnership: InterNamespaceAllowed
 manifests:
