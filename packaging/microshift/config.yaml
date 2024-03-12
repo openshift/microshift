@@ -18,6 +18,9 @@ etcd:
     # Set a memory limit on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
     memoryLimitMB: 0
 ingress:
+    ports:
+        http: 80
+        https: 443
     routeAdmissionPolicy:
         # Describes how host name claims across namespaces should be handled. 
         #  Value must be one of: 
