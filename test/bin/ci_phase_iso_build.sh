@@ -3,7 +3,6 @@
 # This script runs on the build host to create all test artifacts.
 
 set -euo pipefail
-export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 # Cannot use common.sh yet because some dependencies may be missing,
 # but we only need ROOTDIR at this time.
