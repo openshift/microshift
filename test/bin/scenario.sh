@@ -815,13 +815,17 @@ action_create() {
     fi
     record_junit "setup" "load_scenario_script" "OK"
 
-    # shellcheck disable=SC2154 # var is referenced but not assigned
-    trap 'res=0; sos_report true || res=$?; close_junit && exit "${res}"' EXIT
+    # Set the exit handler to attempt the sos report collection and error logging
+    # - Preserve the original exit code
+    # - Log junit message on failure
+    # - Override the exit code if sos report collection fails
+    # shellcheck disable=SC2154
+    trap 'rc=$? ; \
+        [ "${rc}" -ne 0 ] && record_junit "setup" "scenario_create_vms" "FAILED" ; \
+        sos_report true || rc=1 ; \
+        close_junit ; exit "${rc}"' EXIT
 
-    if ! scenario_create_vms; then
-        record_junit "setup" "scenario_create_vms" "FAILED"
-        return 1
-    fi
+    scenario_create_vms
     record_junit "setup" "scenario_create_vms" "OK"
 }
 
@@ -847,9 +851,33 @@ action_login() {
 }
 
 action_run() {
-    load_global_settings
-    load_scenario_script
+    start_junit
+    trap "close_junit" EXIT
+
+    if ! load_global_settings; then
+        record_junit "run" "load_global_settings" "FAILED"
+        return 1
+    fi
+    record_junit "run" "load_global_settings" "OK"
+
+    if ! load_scenario_script; then
+        record_junit "run" "load_scenario_script" "FAILED"
+        return 1
+    fi
+    record_junit "run" "load_scenario_script" "OK"
+
+    # Set the exit handler to attempt the sos report collection and error logging
+    # - Preserve the original exit code
+    # - Log junit message on failure
+    # - Override the exit code if sos report collection fails
+    # shellcheck disable=SC2154
+    trap 'rc=$? ; \
+        [ "${rc}" -ne 0 ] && record_junit "run" "scenario_run_tests" "FAILED" ; \
+        sos_report true || rc=1 ; \
+        close_junit ; exit "${rc}"' EXIT
+
     scenario_run_tests
+    record_junit "run" "scenario_run_tests" "OK"
 }
 
 usage() {
