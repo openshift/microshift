@@ -3,11 +3,12 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: router-default
+  # Name is set at runtime.
   namespace: openshift-ingress
   labels:
     app: router
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+    ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
+  name: router-default
 spec:
   type: LoadBalancer
   selector:
@@ -17,11 +18,11 @@ spec:
   externalTrafficPolicy: Local
   internalTrafficPolicy: Cluster
   ports:
-  - name: http
-    protocol: TCP
-    port: 80
-    targetPort: http
-  - name: https
-    protocol: TCP
-    port: 443
-    targetPort: https
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: https
