@@ -16,6 +16,7 @@ Test Tags           restart    slow
 *** Variables ***
 ${NS_OWNERSHIP_1}       ${EMPTY}
 ${NS_OWNERSHIP_2}       ${EMPTY}
+${ALTERNATIVE_HTTP_PORT}    8000
 ${HOSTNAME}             hello-microshift.cluster.local
 ${ROUTER_MANAGED}       SEPARATOR=\n
 ...                     ---
@@ -37,6 +38,12 @@ ${OWNERSHIP_STRICT}     SEPARATOR=\n
 ...                     \ \ status: Managed
 ...                     \ \ routeAdmissionPolicy:
 ...                     \ \ \ \ namespaceOwnership: Strict
+${ROUTER_CUSTOM_PORT}       SEPARATOR=\n
+...                         ---
+...                         ingress:
+...                         \ \ status: Enabled
+...                         \ \ ports:
+...                         \ \ \ \ http: ${ALTERNATIVE_HTTP_PORT}
 
 
 *** Test Cases ***
@@ -90,7 +97,7 @@ Router Enabled
     [Setup]    Run Keywords
     ...    Save Default MicroShift Config
     ...    Enable Router
-    ...    Create Hello MicroShift Pod
+    ...        ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift Service Via Route
     ...    Restart Router
 
@@ -116,6 +123,23 @@ Router Disabled
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
 
+Router Listen Custom Port
+    [Documentation]    Change default listening ports in the router and check they work.
+    [Setup]    Run Keywords
+    ...    Save Default MicroShift Config
+    ...    Configure Listening Ports
+    ...    Create Hello MicroShift Pod
+    ...    Expose Hello MicroShift Service Via Route
+    ...    Restart Router
+
+    Access Hello Microshift Success    ${ALTERNATIVE_HTTP_PORT}
+
+    [Teardown]    Run Keywords
+    ...    Delete Hello MicroShift Route
+    ...    Delete Hello MicroShift Pod And Service
+    ...    Wait For Service Deletion With Timeout
+    ...    Restore Default MicroShift Config
+    ...    Restart MicroShift
 
 *** Keywords ***
 Configure Namespace Ownership Allowed
@@ -165,6 +189,10 @@ Enable Router
     [Documentation]    Disable router
     Setup With Custom Config    ${ROUTER_MANAGED}
 
+Configure Listening Ports
+    [Documentation]    Enable router and change the default listening ports
+    Setup With Custom Config    ${ROUTER_CUSTOM_PORT}
+
 Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift
     [Arguments]    ${config_content}
@@ -192,3 +220,34 @@ Setup Hello MicroShift Pods In Multiple Namespaces
     Expose Hello MicroShift    ${NS_OWNERSHIP_2}
     Oc Expose    svc hello-microshift --hostname ${HOSTNAME} --path /${NS_OWNERSHIP_1} -n ${NS_OWNERSHIP_1}
     Oc Expose    svc hello-microshift --hostname ${HOSTNAME} --path /${NS_OWNERSHIP_2} -n ${NS_OWNERSHIP_2}
+
+Restart Router
+    [Documentation]    Restart the router and wait for readiness again. The router is sensitive to apiserver
+    ...    downtime and might need a restart (after the apiserver is ready) to resync all the routes.
+    Run With Kubeconfig    oc rollout restart deployment router-default -n openshift-ingress
+    Named Deployment Should Be Available    router-default    openshift-ingress    5m
+
+Expose Hello MicroShift Service Via Route
+    [Documentation]    Expose the "hello microshift" application through the Route
+    Oc Expose    pod hello-microshift -n ${NAMESPACE}
+    Oc Expose    svc hello-microshift --hostname hello-microshift.cluster.local -n ${NAMESPACE}
+
+Delete Hello MicroShift Route
+    [Documentation]    Delete route for cleanup.
+    Oc Delete    route/hello-microshift -n ${NAMESPACE}
+
+Wait For Service Deletion With Timeout
+    [Documentation]    Polls for service and endpoint by "app=hello-microshift" label. Fails if timeout
+    ...    expires. This check is unique to this test suite because each test here reuses the same namespace. Since
+    ...    the tests reuse the service name, a small race window exists between the teardown of one test and the setup
+    ...    of the next. This produces flakey failures when the service or endpoint names collide.
+    Wait Until Keyword Succeeds    30s    1s
+    ...    Network APIs With Test Label Are Gone
+
+Network APIs With Test Label Are Gone
+    [Documentation]    Check for service and endpoint by "app=hello-microshift" label. Succeeds if response matches
+    ...    "No resources found in <namespace> namespace." Fail if not.
+    ${match_string}=    Catenate    No resources found in    ${NAMESPACE}    namespace.
+    ${match_string}=    Remove String    ${match_string}    "
+    ${response}=    Run With Kubeconfig    oc get svc,ep -l app\=hello-microshift -n ${NAMESPACE}
+    Should Be Equal As Strings    ${match_string}    ${response}    strip_spaces=True
