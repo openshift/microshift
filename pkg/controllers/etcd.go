@@ -78,6 +78,7 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 		args = append(args,
 			"--uid=root",
 			"--scope",
+			"--collect",
 			"--unit", "microshift-etcd",
 			"--property", "Before=microshift.service",
 			"--property", "BindsTo=microshift.service",
