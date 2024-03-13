@@ -244,6 +244,30 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				return c
 			}(),
 		},
+		{
+			name: "router-enable",
+			config: dedent(`
+            ingress:
+              status: Enabled
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Status = StatusEnabled
+				return c
+			}(),
+		},
+		{
+			name: "router-disable",
+			config: dedent(`
+            ingress:
+              status: Disabled
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Status = StatusDisabled
+				return c
+			}(),
+		},
 	}
 
 	for _, tt := range ttests {
