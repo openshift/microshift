@@ -19,6 +19,11 @@ etcd:
     memoryLimitMB: 0
 ingress:
     routeAdmissionPolicy:
+        # Describes how host name claims across namespaces should be handled. 
+        #  Value must be one of: 
+        #  - Strict: Do not allow routes in different namespaces to claim the same host. 
+        #  - InterNamespaceAllowed: Allow routes to claim different paths of the same host name across namespaces. 
+        #  If empty, the default is InterNamespaceAllowed.
         namespaceOwnership: InterNamespaceAllowed
 manifests:
     # The locations on the filesystem to scan for kustomization files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests. The entries in the list can be glob patterns to match multiple subdirectories.
