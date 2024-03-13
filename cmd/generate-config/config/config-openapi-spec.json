@@ -86,10 +86,12 @@
           ],
           "properties": {
             "http": {
+              "description": "Default router http port.",
               "type": "integer",
               "default": 80
             },
             "https": {
+              "description": "Default router https port.",
               "type": "integer",
               "default": 443
             }

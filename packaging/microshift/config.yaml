@@ -19,7 +19,9 @@ etcd:
     memoryLimitMB: 0
 ingress:
     ports:
+        # Default router http port.
         http: 80
+        # Default router https port.
         https: 443
     routeAdmissionPolicy:
         # Describes how host name claims across namespaces should be handled. 
