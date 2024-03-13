@@ -1,0 +1,3 @@
+- oc image-arm64 45fe5d4c22dc44b82f7d8bc556759e9769fe61c6 to c92b50721e5b12fc1edb6cd4cb2390d8622d1f1e
+  - b0226705 2024-03-11T16:16:30+01:00 tools: extend the image with sosreport
+
