@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component c15ec9ce2646231f4c227584d29c4487371febf9 to 1c8361d152c92d2ce4f9eaa524610b10849d4f31
-  - cdae1abb 2024-03-01T05:34:40+00:00 OCPBUGS-26951: annotate on-prem static pods for workload partitioning
-
