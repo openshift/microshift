@@ -268,12 +268,26 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				return c
 			}(),
 		},
+		{
+			name: "router-ports",
+			config: dedent(`
+			ingress:
+			  ports:
+			    http: 1234
+			    https: 9876
+			`),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Http = 1234
+				c.Ingress.Ports.Https = 9876
+				return c
+			}(),
+		},
 	}
 
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
 			config, err := getActiveConfigFromYAML([]byte(tt.config))
-
 			// If we have any warnings, drop them. Use an empty array
 			// instead of nil so that we can differentiate between
 			// unexpected warnings (where we get an array instead of
