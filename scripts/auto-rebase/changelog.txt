@@ -1,3 +1,6 @@
-- machine-config-operator embedded-component 6eb0e07f062c0c06965da711454d1eaa12934f78 to b693d2ffbac7ddab712901662fabffe2fda81562
-  - 07185813 2024-03-11T07:55:08-05:00 OCPNODE-2098: add static pods for rbacproxy
+- machine-config-operator embedded-component b693d2ffbac7ddab712901662fabffe2fda81562 to 0a87601533db14d99ab94d921f809586e814e594
+  - da7569ad 2024-02-29T17:01:52+01:00 OCPBUGS-22664: Mount /run/nodeip-configuration into coredns containers
+
+- operator-framework-olm embedded-component cb0c5f2728e412f595cceeb11104af206421daec to 59aa935ebbe6948921ea3292603cbdce898e0091
+  - 6238f809 2024-03-10T20:16:01-05:00 bump grpc to 1.60.1, reconnect idle connections (#3147)
 
