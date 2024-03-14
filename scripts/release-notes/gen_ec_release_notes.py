@@ -34,9 +34,17 @@ use the web interface to review and then publish the release.
 
 NOTE:
 
-  To use this script, you must have a GitHub token configured in the
-  environment variable GITHUB_TOKEN with enough privileges on the
-  openshift/microshift repository to create releases.
+  To use this script, you must have either
+
+    A GitHub token configured in the environment variable GITHUB_TOKEN
+    with enough privileges on the openshift/microshift repository to
+    create releases.
+
+  OR
+
+    A GitHub application ID configured in the environment variable
+    APP_ID and a client key with the file name configured in the
+    CLIENT_KEY environment variable.
 
 """
 
@@ -46,13 +54,18 @@ import datetime
 import html.parser
 import json
 import os
+import pathlib
 import re
 import subprocess
 import textwrap
 from urllib import request
 
+import github
+
 URL_BASE = "https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift"
 URL_BASE_X86 = "https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
+GITHUB_ORG = 'openshift'
+GITHUB_REPO = 'microshift'
 
 # An EC RPM filename looks like
 # microshift-4.13.0~ec.4-202303070857.p0.gcf0bce2.assembly.ec.4.el9.aarch64.rpm
@@ -95,6 +108,7 @@ def main():
     The main function of the script. It runs the `check_one()` function for both 'ocp-dev-preview'
     and 'ocp' release types and for a specified version depending upon provided arguments.
     """
+    global GITHUB_TOKEN
 
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -135,6 +149,9 @@ def main():
     args = parser.parse_args()
 
     if not GITHUB_TOKEN:
+        print('GITHUB_TOKEN is not set, trying to authenticate using application credentials')
+        GITHUB_TOKEN = get_access_token_for_app()
+    if not GITHUB_TOKEN:
         raise RuntimeError('GITHUB_TOKEN does not appear to be set')
 
     new_releases = []
@@ -158,6 +175,27 @@ def main():
 
     for new_release in unique_releases.values():
         publish_release(new_release, not args.dry_run)
+
+
+def get_access_token_for_app():
+    """Return an access token for a GitHub App."""
+    app_id = os.environ.get('APP_ID')
+    if not app_id:
+        raise RuntimeError('APP_ID is not set')
+    key_path = os.environ.get('CLIENT_KEY')
+    if not key_path:
+        raise RuntimeError('CLIENT_KEY is not set')
+    integration = github.GithubIntegration(
+        app_id,
+        pathlib.Path(key_path).read_text(encoding='utf-8'),
+    )
+    app_installation = integration.get_installation(GITHUB_ORG, GITHUB_REPO)
+    if app_installation is None:
+        raise RuntimeError(
+            f"Failed to get app_installation for {GITHUB_ORG}/{GITHUB_REPO}. " +
+            f"Response: {app_installation.raw_data}"
+        )
+    return integration.get_access_token(app_installation.id).token
 
 
 class VersionListParser(html.parser.HTMLParser):
@@ -409,7 +447,7 @@ def publish_release(new_release, take_action):
 
 
 def github_release_create(tag, notes_header):
-    results = github(
+    results = github_api(
         '/repos/openshift/microshift/releases',
         tag_name=tag,
         name=tag,
@@ -427,13 +465,13 @@ def github_release_create(tag, notes_header):
 
 def github_release_exists(tag):
     try:
-        github(f'/repos/openshift/microshift/releases/tags/{tag}')
+        github_api(f'/repos/openshift/microshift/releases/tags/{tag}')
         return True
     except Exception:
         return False
 
 
-def github(path, **data):
+def github_api(path, **data):
     url = f'https://api.github.com/{path.lstrip("/")}'
     if data:
         r = request.Request(
