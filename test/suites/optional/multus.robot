@@ -25,6 +25,10 @@ ${MACVLAN_NAD_YAML}         ./assets/multus/macvlan-nad.yaml
 ${MACVLAN_POD_YAML}         ./assets/multus/macvlan-pod.yaml
 ${MACVLAN_POD_NAME}         test-macvlan
 
+${IPVLAN_NAD_YAML}          ./assets/multus/ipvlan-nad.yaml
+${IPVLAN_POD_YAML}          ./assets/multus/ipvlan-pod.yaml
+${IPVLAN_POD_NAME}          test-ipvlan
+
 
 *** Test Cases ***
 Pre-Existing Bridge Interface
@@ -82,6 +86,18 @@ Macvlan
     Connect To Pod From The Hypervisor    ${MACVLAN_POD_NAME}    ${NAMESPACE}    ${NAMESPACE}/macvlan-conf
 
     [Teardown]    Remove NAD And Pod    ${MACVLAN_NAD_YAML}    ${MACVLAN_POD_YAML}
+
+Ipvlan
+    [Documentation]    Tests if Pod with ipvlan plugin interface is accessible
+    ...    from outside the MicroShift host.
+    [Setup]    Run Keywords
+    ...    Create NAD And Pod    ${IPVLAN_NAD_YAML}    ${IPVLAN_POD_YAML}
+    ...    AND
+    ...    Named Pod Should Be Ready    ${IPVLAN_POD_NAME}    ${NAMESPACE}
+
+    Connect To Pod From The Hypervisor    ${IPVLAN_POD_NAME}    ${NAMESPACE}    ${NAMESPACE}/ipvlan-conf
+
+    [Teardown]    Remove NAD And Pod    ${IPVLAN_NAD_YAML}    ${IPVLAN_POD_YAML}
 
 
 *** Keywords ***

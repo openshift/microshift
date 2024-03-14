@@ -4,7 +4,8 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.2-microshift-source-optionals
-    launch_vm host1
+    # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
+    launch_vm host1 "" "" "" "" "" 2
 }
 
 scenario_remove_vms() {

@@ -67,6 +67,12 @@ action_create() {
         sudo virsh net-autostart "${VM_ISOLATED_NETWORK}"
     fi
 
+    # Reconfigure `default` network's DHCP range to accomodate for Multus-ipvlan test's static IPs
+    if sudo virsh net-dumpxml default | grep -q "start='192.168.122.2'"; then
+        sudo virsh net-update default delete ip-dhcp-range "<range start='192.168.122.2' end='192.168.122.254'/>" --config --live
+        sudo virsh net-update default add ip-dhcp-range "<range start='192.168.122.10' end='192.168.122.254'/>" --config --live
+    fi
+
     # Firewall
     firewall_settings "add"
 }
