@@ -21,6 +21,18 @@ exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${
 
 LAUNCH_VMS_JOB_LOG="${IMAGEDIR}/launch_vm_jobs.txt"
 
+# Copy the scenario definition files to a temporary location from
+# which they will be read. This allows filtering the tests from a
+# specific $SCENARIO_SOURCES directory.
+prepare_scenario_sources() {
+    rm -rf "${SCENARIOS_TO_RUN}"
+    mkdir -p "${SCENARIOS_TO_RUN}"
+    cp "${SCENARIO_SOURCES}"/*.sh "${SCENARIOS_TO_RUN}"/
+    if ${EXCLUDE_CNCF_CONFORMANCE}; then
+        find "${SCENARIOS_TO_RUN}" -name "*cncf-conformance.sh" -delete
+    fi
+}
+
 cd "${ROOTDIR}"
 
 # Make sure libvirtd is running. We do this here, because some of the
@@ -49,13 +61,16 @@ fi
 # Tell scenario.sh to merge stderr into stdout
 export SCENARIO_MERGE_OUTPUT_STREAMS=true
 
+# Prepare all the scenarios that need to run into a special directory
+prepare_scenario_sources
+
 LAUNCH_OK=true
 if ! parallel \
     ${progress} \
     --results "${SCENARIO_INFO_DIR}/{/.}/boot.log" \
     --joblog "${LAUNCH_VMS_JOB_LOG}" \
     --delay 5 \
-    bash -x ./bin/scenario.sh create ::: "${SCENARIO_SOURCES}"/*.sh ; then
+    bash -x ./bin/scenario.sh create ::: "${SCENARIOS_TO_RUN}"/*.sh ; then
    LAUNCH_OK=false
 fi
 
