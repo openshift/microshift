@@ -358,15 +358,6 @@ def publish_release(new_release, take_action):
     release_type = new_release.release_type
     release_date = new_release.release_date
 
-    if not take_action:
-        print('Dry run for new release {new_release} on commit {commit_sha} from {release_date}')
-        return
-
-    if not tag_exists(release_name):
-        # release_date looks like 202402022103
-        buildtime = datetime.datetime.strptime(release_date, '%Y%m%d%H%M')
-        tag_release(release_name, commit_sha, buildtime)
-
     # Set up the release notes preamble with download links
     notes = textwrap.dedent(f"""
     This is a candidate release for {product_version}.
@@ -375,7 +366,39 @@ def publish_release(new_release, take_action):
     - {URL_BASE_X86}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/
     - {URL_BASE}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/
 
+    Or add this RPM repository to your x86 systems:
+
+    ```
+    [microshift-{product_version}-{candidate_type}-{candidate_number}]
+    name=MicroShift {product_version} EarlyAccess {candidate_type}.{candidate_number} RPMs
+    baseurl={URL_BASE_X86}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/el9/os/
+    enabled=1
+    gpgcheck=0
+    skip_if_unavailable=0
+    ```
+
+    or for aarch64 systems:
+
+    ```
+    [microshift-{product_version}-{candidate_type}-{candidate_number}]
+    name=MicroShift {product_version} EarlyAccess {candidate_type}.{candidate_number} RPMs
+    baseurl={URL_BASE}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/el9/os/
+    enabled=1
+    gpgcheck=0
+    skip_if_unavailable=0
+    ```
+
     """)
+
+    if not take_action:
+        print(f'Dry run for new release {new_release} on commit {commit_sha} from {release_date}')
+        print(notes)
+        return
+
+    if not tag_exists(release_name):
+        # release_date looks like 202402022103
+        buildtime = datetime.datetime.strptime(release_date, '%Y%m%d%H%M')
+        tag_release(release_name, commit_sha, buildtime)
 
     # Create draft release with message that includes download URLs and history
     try:
