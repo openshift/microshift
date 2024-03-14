@@ -36,6 +36,10 @@ VM_DISK_BASEDIR="${IMAGEDIR}/${VM_POOL_BASENAME}"
 # shellcheck disable=SC2034  # used elsewhere
 export VM_ISOLATED_NETWORK="isolated"
 
+# Libvirt network for Multus tests
+# shellcheck disable=SC2034  # used elsewhere
+export VM_MULTUS_NETWORK="multus"
+
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
 RPM_SOURCE="${OUTPUTDIR}/rpmbuild"

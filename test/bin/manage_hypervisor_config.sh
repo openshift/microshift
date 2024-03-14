@@ -28,7 +28,7 @@ firewall_settings() {
 
     sudo firewall-cmd --permanent --zone=libvirt "--${action}-service=mdns"
 
-    for netname in default "${VM_ISOLATED_NETWORK}" ; do
+    for netname in default "${VM_ISOLATED_NETWORK}" "${VM_MULTUS_NETWORK}" ; do
         if ! sudo virsh net-info "${netname}" &>/dev/null ; then
             continue
         fi
@@ -65,6 +65,18 @@ action_create() {
         sudo virsh net-define    "${netconfig_file}"
         sudo virsh net-start     "${VM_ISOLATED_NETWORK}"
         sudo virsh net-autostart "${VM_ISOLATED_NETWORK}"
+    fi
+
+    if ! sudo sudo virsh net-info "${VM_MULTUS_NETWORK}" &>/dev/null ; then
+        local -r multus_netconfig_tmpl="${SCRIPTDIR}/../assets/multus-network.xml"
+        local -r multus_netconfig_file="${IMAGEDIR}/infra/multus-network.xml"
+
+        mkdir -p "$(dirname "${multus_netconfig_file}")"
+        envsubst <"${multus_netconfig_tmpl}" >"${multus_netconfig_file}"
+
+        sudo virsh net-define    "${multus_netconfig_file}"
+        sudo virsh net-start     "${VM_MULTUS_NETWORK}"
+        sudo virsh net-autostart "${VM_MULTUS_NETWORK}"
     fi
 
     # Firewall
