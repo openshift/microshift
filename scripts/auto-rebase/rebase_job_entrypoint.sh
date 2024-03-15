@@ -13,7 +13,7 @@ if [[ "$JOB_NAME" == rehearse* ]]; then
     export DRY_RUN=y
 fi
 
-cp /secrets/ci-pull-secret/.dockercfg "$HOME/.pull-secret.json" || {
+cp /secrets/import-secret/.dockercfg "$HOME/.pull-secret.json" || {
     echo "WARN: Could not copy registry secret file"
 }
 
@@ -41,12 +41,12 @@ ARM64_RELEASE=${pullspec_release_arm64} \
 #  For example, ocp-release at 4.13 will more often than not
 #  correspond to 4.12 LVMS, until the official 4.13 release when both
 #  components will be 4.13.
-release_lvms="v4.14.1-4"
+release_lvms="v4.15.0"
 
 # Since LVMS is not part of the release payload, it is not kept in
 # CI. Use the latest z-stream that coincides with the release
 # payload's X.Y version
-pullspec_release_lvms="registry.access.redhat.com/lvms4/lvms-operator-bundle:${release_lvms}"
+pullspec_release_lvms="registry.redhat.io/lvms4/lvms-operator-bundle:${release_lvms}"
 
 ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms}"
 
