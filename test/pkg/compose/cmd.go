@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/osbuild/weldr-client/v2/weldr"
 	"github.com/spf13/cobra"
@@ -11,6 +14,8 @@ import (
 
 func NewComposeCmd() *cobra.Command {
 	templatingDataInput := ""
+	buildInstallers := true
+	sourceOnly := false
 
 	cmd := &cobra.Command{
 		Use:   "compose target",
@@ -18,12 +23,17 @@ func NewComposeCmd() *cobra.Command {
 	}
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 {
+			return fmt.Errorf("argument must be provided")
+		}
+
 		repoFlag := cmd.Flag("repo")
 		if repoFlag == nil {
 			return fmt.Errorf("repo flag is nil")
 		}
+		microshiftRepo := repoFlag.Value.String()
 
-		td, err := NewTemplatingData(repoFlag.Value.String(), templatingDataInput)
+		td, err := NewTemplatingData(microshiftRepo, templatingDataInput)
 		if err != nil {
 			return err
 		}
@@ -32,10 +42,39 @@ func NewComposeCmd() *cobra.Command {
 		if err := NewSourceConfigurer(composer, td).ConfigureSources(); err != nil {
 			return err
 		}
+
+		blueprintPath := filepath.Join(microshiftRepo, "test/image-blueprints")
+		blueprints, err := filepath.Abs(blueprintPath)
+		if err != nil {
+			return err
+		}
+		blueprintsDirfilesys := os.DirFS(blueprints)
+
+		buildPath, err := filepath.Abs(filepath.Join(microshiftRepo, args[0]))
+		if err != nil {
+			return err
+		}
+		buildPath = strings.TrimLeft(strings.ReplaceAll(buildPath, blueprints, ""), "/")
+		buildPlanner := BuildPlanner{
+			Opts: &BuildOpts{
+				Filesys:         blueprintsDirfilesys,
+				BuildInstallers: buildInstallers,
+				SourceOnly:      sourceOnly,
+				TplData:         td,
+			},
+		}
+
+		toBuild, err := buildPlanner.ConstructBuildTree(buildPath)
+		if err != nil {
+			return err
+		}
+		_ = toBuild
 		return nil
 	}
 
 	cmd.PersistentFlags().StringVar(&templatingDataInput, "templating-data", "", "Provide path to partial templating data to skip querying remote repository.")
+	cmd.PersistentFlags().BoolVarP(&buildInstallers, "build-installers", "I", true, "Build ISO image installers.")
+	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints.")
 
 	cmd.AddCommand(templatingDataSubCmd())
 
