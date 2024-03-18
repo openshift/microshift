@@ -68,7 +68,13 @@ func NewComposeCmd() *cobra.Command {
 		if err != nil {
 			return err
 		}
-		_ = toBuild
+
+		builder := BuildRunner{Composer: composer}
+		err = builder.Build(toBuild)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 
