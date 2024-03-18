@@ -82,6 +82,9 @@ type TemplatingData struct {
 	// to be newer than what we're currently working on.
 	// These are needed for various ostree upgrade tests.
 	FakeNext Release
+
+	// External stores metadata of RPMs supplied from external source, like private builds.
+	External Release
 }
 
 func NewTemplatingData(testDirPath, templatingDataInputPath string) (*TemplatingData, error) {
@@ -97,6 +100,7 @@ func NewTemplatingData(testDirPath, templatingDataInputPath string) (*Templating
 	localRepo := path.Join(rpmRepos, "microshift-local")
 	fakeNextRepo := path.Join(rpmRepos, "microshift-fake-next-minor")
 	baseRepo := path.Join(rpmRepos, "microshift-base")
+	externalRepo := path.Join(rpmRepos, "microshift-external")
 
 	if exists, err := util.PathExists(localRepo); err != nil {
 		return nil, fmt.Errorf("failed to check if %s exists: %w", localRepo, err)
@@ -136,6 +140,19 @@ func NewTemplatingData(testDirPath, templatingDataInputPath string) (*Templating
 		td.FakeNext, err = getReleaseFromLocalFs(fakeNextRepo)
 		if err != nil {
 			return nil, err
+		}
+	}
+
+	if td.External.Repository == "" {
+		exists, err := util.PathExistsAndIsNotEmpty(externalRepo)
+		if err != nil {
+			return nil, err
+		}
+		if exists {
+			td.External, err = getReleaseFromLocalFs(externalRepo)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

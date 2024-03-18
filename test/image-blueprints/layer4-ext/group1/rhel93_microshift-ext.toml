@@ -7,19 +7,19 @@ distro = "rhel-93"
 
 [[packages]]
 name = "microshift"
-version = "{{ .Source.Version }}"
+version = "{{ .External.Version }}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "{{ .Source.Version }}"
+version = "{{ .External.Version }}"
 
 [[packages]]
 name = "microshift-networking"
-version = "{{ .Source.Version }}"
+version = "{{ .External.Version }}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "{{ .Source.Version }}"
+version = "{{ .External.Version }}"
 
 [[packages]]
 name = "systemd-resolved"
