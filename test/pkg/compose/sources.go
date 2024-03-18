@@ -9,16 +9,15 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/osbuild/weldr-client/v2/weldr"
 	"k8s.io/klog/v2"
 )
 
 type SourceConfigurer struct {
-	composer weldr.Client
+	composer Composer
 	tplData  *TemplatingData
 }
 
-func NewSourceConfigurer(composer weldr.Client, tplData *TemplatingData) *SourceConfigurer {
+func NewSourceConfigurer(composer Composer, tplData *TemplatingData) *SourceConfigurer {
 	return &SourceConfigurer{
 		composer: composer,
 		tplData:  tplData,
@@ -26,7 +25,7 @@ func NewSourceConfigurer(composer weldr.Client, tplData *TemplatingData) *Source
 }
 
 func (sc *SourceConfigurer) ConfigureSources() error {
-	existingSources, err := sc.getComposerSources()
+	existingSources, err := sc.composer.ListSources()
 	if err != nil {
 		return err
 	}
@@ -67,7 +66,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		if len(result) == 0 {
 			if slices.Contains(existingSources, name) {
 				klog.InfoS("Template is empty but exists in composer - removing", "name", name)
-				if err := sc.deleteComposerSource(name); err != nil {
+				if err := sc.composer.DeleteSource(name); err != nil {
 					klog.ErrorS(err, "Deleting composer source failed")
 					return err
 				}
@@ -78,7 +77,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		}
 
 		klog.InfoS("Adding source", "name", name)
-		if err := sc.addComposerSource(result); err != nil {
+		if err := sc.composer.AddSource(result); err != nil {
 			klog.ErrorS(err, "Adding composer source failed")
 			return err
 		}
@@ -89,39 +88,5 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		return fmt.Errorf("failed to add sources to the composer: %w", err)
 	}
 
-	return nil
-}
-
-func (sc *SourceConfigurer) getComposerSources() ([]string, error) {
-	existingSources, rsp, err := sc.composer.ListSources()
-	if err != nil {
-		return nil, fmt.Errorf("listing composer sources failed: %w", err)
-	}
-	if rsp != nil {
-		return nil, fmt.Errorf("listing composer sources returned wrong response: %v", rsp)
-	}
-	klog.InfoS("Existing sources of the composer-cli", "sources", existingSources)
-	return existingSources, nil
-}
-
-func (sc *SourceConfigurer) deleteComposerSource(id string) error {
-	rsp, err := sc.composer.DeleteSource(id)
-	if err != nil {
-		return fmt.Errorf("deleting composer source failed: %w", err)
-	}
-	if rsp != nil && !rsp.Status {
-		return fmt.Errorf("deleting composer source returned wrong response: %v", rsp)
-	}
-	return nil
-}
-
-func (sc *SourceConfigurer) addComposerSource(source string) error {
-	rsp, err := sc.composer.NewSourceTOML(source)
-	if err != nil {
-		return fmt.Errorf("adding composer source failed: %w", err)
-	}
-	if rsp != nil && !rsp.Status {
-		return fmt.Errorf("adding composer source returned wrong response: %v", rsp)
-	}
 	return nil
 }

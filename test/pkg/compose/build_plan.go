@@ -9,12 +9,11 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/osbuild/weldr-client/v2/weldr"
 	"k8s.io/klog/v2"
 )
 
 type Build interface {
-	Execute(weldr.Client) error
+	Execute(Composer) error
 }
 
 // BuildGroup is a collection of Builds than can run in parallel
@@ -215,7 +214,7 @@ func NewBlueprintBuild(path string, opts *BuildOpts) (*BlueprintBuild, error) {
 	return bb, nil
 }
 
-func (b *BlueprintBuild) Execute(weldr.Client) error {
+func (b *BlueprintBuild) Execute(Composer) error {
 	klog.InfoS("Building blueprint", "name", b.Name)
 	time.Sleep(1 * time.Second)
 	klog.InfoS("Blueprint done", "name", b.Name)
@@ -265,7 +264,7 @@ func NewImageFetcher(path string, opts *BuildOpts) (*ImageFetcher, error) {
 	}, nil
 }
 
-func (i *ImageFetcher) Execute(weldr.Client) error {
+func (i *ImageFetcher) Execute(Composer) error {
 	klog.InfoS("Downloading image", "name", i.Name)
 	time.Sleep(1 * time.Second)
 	klog.InfoS("Image downloaded", "name", i.Name)

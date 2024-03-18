@@ -3,12 +3,11 @@ package compose
 import (
 	"context"
 
-	"github.com/osbuild/weldr-client/v2/weldr"
 	"golang.org/x/sync/errgroup"
 )
 
 type BuildRunner struct {
-	Composer weldr.Client
+	Composer Composer
 }
 
 func (ib *BuildRunner) Build(toBuild BuildPlan) error {

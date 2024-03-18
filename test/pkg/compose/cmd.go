@@ -1,14 +1,12 @@
 package compose
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/osbuild/weldr-client/v2/weldr"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +14,7 @@ func NewComposeCmd() *cobra.Command {
 	templatingDataInput := ""
 	buildInstallers := true
 	sourceOnly := false
+	dryRun := false
 
 	cmd := &cobra.Command{
 		Use:   "compose target",
@@ -38,7 +37,13 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
-		composer := weldr.InitClientUnixSocket(context.Background(), 1, "/run/weldr/api.socket")
+		var composer Composer
+		if dryRun {
+			composer = NewDryRunComposer()
+		} else {
+			composer = NewComposer()
+		}
+
 		if err := NewSourceConfigurer(composer, td).ConfigureSources(); err != nil {
 			return err
 		}
@@ -81,6 +86,7 @@ func NewComposeCmd() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&templatingDataInput, "templating-data", "", "Provide path to partial templating data to skip querying remote repository.")
 	cmd.PersistentFlags().BoolVarP(&buildInstallers, "build-installers", "I", true, "Build ISO image installers.")
 	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints.")
+	cmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
 
 	cmd.AddCommand(templatingDataSubCmd())
 
