@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	microshiftRepo = ""
+	testDir = ""
 )
 
 func main() {
@@ -21,30 +21,29 @@ func main() {
 		Short: "",
 
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			repo, err := filepath.Abs(microshiftRepo)
+			dir, err := filepath.Abs(testDir)
 			if err != nil {
 				return err
 			}
 
-			gomodPath := filepath.Join(repo, "go.mod")
-			if exists, err := util.PathExists(gomodPath); err != nil {
-				return fmt.Errorf("failed checking if %s exists: %w", gomodPath, err)
+			// Verify if parent dir is MicroShift's repo root
+			varPath := filepath.Join(dir, "..", "Makefile.kube_git.var")
+			if exists, err := util.PathExists(varPath); err != nil {
+				return fmt.Errorf("failed checking if %s exists: %w", varPath, err)
 			} else if !exists {
-				return fmt.Errorf("%s does not exists - is the program executed in MicroShift repository root dir? Alternatively use --repo", gomodPath)
+				return fmt.Errorf("could not find Makefile.kube_git.var in working directory's parent (%q) - is the program executed in MicroShift repository test/ dir? Alternatively use --test-dir", varPath)
 			}
-			microshiftRepo = repo
+
 			return nil
 		},
 
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("MicroShift repo: %q\n", microshiftRepo)
-
 			_ = cmd.Help()
 			os.Exit(1)
 		},
 	}
 
-	cmd.PersistentFlags().StringVarP(&microshiftRepo, "repo", "r", ".", "Path to the MicroShift repository")
+	cmd.PersistentFlags().StringVar(&testDir, "test-dir", ".", "Path to the `test/` directory in the MicroShift repository")
 
 	cmd.AddCommand(compose.NewComposeCmd())
 
