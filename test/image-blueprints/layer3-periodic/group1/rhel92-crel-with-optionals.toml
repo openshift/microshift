@@ -1,4 +1,4 @@
-{{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
+{{- if .Current.Repository -}}
 {{- /*
 
   We wrap this template in a test so that the body of the output is
@@ -17,27 +17,27 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+version = "{{ .Current.Version }}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+version = "{{ .Current.Version }}"
 
 [[packages]]
 name = "microshift-networking"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+version = "{{ .Current.Version }}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+version = "{{ .Current.Version }}"
 
 [[packages]]
 name = "microshift-olm"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+version = "{{ .Current.Version }}"
 
 [[packages]]
 name = "microshift-multus"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+version = "{{ .Current.Version }}"
 
 [[packages]]
 name = "microshift-test-agent"

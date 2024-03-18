@@ -7,19 +7,19 @@ distro = "rhel-94"
 
 [[packages]]
 name = "microshift"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-networking"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-test-agent"
@@ -67,8 +67,8 @@ FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook"""
 [[containers]]
 source = "quay.io/microshift/busybox:1.36"
 
-{{- if env.Getenv "SOURCE_IMAGES" "" }}
-{{ range (.Env.SOURCE_IMAGES | strings.Split ",") }}
+{{- if .Source.Images }}
+{{ range .Source.Images }}
 [[containers]]
 source = "{{ . }}"
 {{ end }}
