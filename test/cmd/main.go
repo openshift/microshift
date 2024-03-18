@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/test/pkg/compose"
 	"github.com/spf13/cobra"
 	"k8s.io/component-base/cli"
 )
@@ -44,6 +45,8 @@ func main() {
 	}
 
 	cmd.PersistentFlags().StringVarP(&microshiftRepo, "repo", "r", ".", "Path to the MicroShift repository")
+
+	cmd.AddCommand(compose.NewComposeCmd())
 
 	os.Exit(cli.Run(cmd))
 }
