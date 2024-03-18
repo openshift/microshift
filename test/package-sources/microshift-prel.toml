@@ -1,4 +1,4 @@
-{{- if .Previous.Repository -}}
+{{- if hasPrefix .Previous.Repository "http" -}}
 id = "microshift-prel"
 name = "Repository with RPMs for previous release"
 type = "yum-baseurl"

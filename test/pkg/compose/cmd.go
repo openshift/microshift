@@ -1,9 +1,11 @@
 package compose
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
+	"github.com/osbuild/weldr-client/v2/weldr"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +27,11 @@ func NewComposeCmd() *cobra.Command {
 		if err != nil {
 			return err
 		}
-		_ = td
+
+		composer := weldr.InitClientUnixSocket(context.Background(), 1, "/run/weldr/api.socket")
+		if err := NewSourceConfigurer(composer, td).ConfigureSources(); err != nil {
+			return err
+		}
 		return nil
 	}
 
