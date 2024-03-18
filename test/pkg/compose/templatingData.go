@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
+	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -83,7 +84,7 @@ type TemplatingData struct {
 	FakeNext Release
 }
 
-func NewTemplatingData(microshiftRepoPath string) (*TemplatingData, error) {
+func NewTemplatingData(microshiftRepoPath, templatingDataInputPath string) (*TemplatingData, error) {
 	outputDir := path.Join(microshiftRepoPath, "_output")
 	imageDir := path.Join(outputDir, "test-images")
 	rpmRepos := path.Join(imageDir, "rpm-repos")
@@ -98,53 +99,99 @@ func NewTemplatingData(microshiftRepoPath string) (*TemplatingData, error) {
 		return nil, fmt.Errorf("%s does not exist", localRepo)
 	}
 
-	sourceRelease, err := getReleaseFromLocalFs(localRepo)
-	if err != nil {
-		return nil, err
-	}
-	baseRelease, err := getReleaseFromLocalFs(baseRepo)
-	if err != nil {
-		return nil, err
-	}
-	fakeNextRelease, err := getReleaseFromLocalFs(fakeNextRepo)
-	if err != nil {
-		return nil, err
-	}
-	currentRelease, err := getReleaseFromRemoteRepo(sourceRelease.Minor)
-	if err != nil {
-		return nil, err
-	}
-	previousRelease, err := getReleaseFromRemoteRepo(sourceRelease.Minor - 1)
-	if err != nil {
-		return nil, err
-	}
-	yMinus2Release, err := getReleaseFromRemoteRepo(sourceRelease.Minor - 2)
-	if err != nil {
-		return nil, err
+	var td *TemplatingData
+	var err error
+
+	if templatingDataInputPath != "" {
+		td, err = unmarshalTemplatingData(templatingDataInputPath)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		td = &TemplatingData{}
 	}
 
-	td := &TemplatingData{
-		MicroShiftRepoPath: microshiftRepoPath,
-		Arch:               getArch(),
-		Source:             sourceRelease,
-		Base:               baseRelease,
-		FakeNext:           fakeNextRelease,
-		Current:            currentRelease,
-		Previous:           previousRelease,
-		YMinus2:            yMinus2Release,
+	td.MicroShiftRepoPath = microshiftRepoPath
+	td.Arch = getArch()
+
+	if td.Source.Repository == "" {
+		td.Source, err = getReleaseFromLocalFs(localRepo)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	if isRHOCPAvailable(td.Source.Minor) {
-		td.RHOCPMinorY = td.Source.Minor
+	if td.Base.Repository == "" {
+		td.Base, err = getReleaseFromLocalFs(baseRepo)
+		if err != nil {
+			return nil, err
+		}
 	}
-	if isRHOCPAvailable(td.Previous.Minor) {
-		td.RHOCPMinorY1 = td.Previous.Minor
+
+	if td.FakeNext.Repository == "" {
+		td.FakeNext, err = getReleaseFromLocalFs(fakeNextRepo)
+		if err != nil {
+			return nil, err
+		}
 	}
-	if isRHOCPAvailable(td.YMinus2.Minor) {
-		td.RHOCPMinorY2 = td.YMinus2.Minor
+
+	if td.Current.Repository == "" {
+		td.Current, err = getReleaseFromRemoteRepo(td.Source.Minor)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if td.Previous.Repository == "" {
+		td.Previous, err = getReleaseFromRemoteRepo(td.Source.Minor - 1)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if td.YMinus2.Repository == "" {
+		td.YMinus2, err = getReleaseFromRemoteRepo(td.Source.Minor - 2)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// If templatingDataInputPath was provided, assume the 0 is
+	// already "calculated" value and repo is not available yet.
+	if td.RHOCPMinorY == 0 && templatingDataInputPath == "" {
+		if isRHOCPAvailable(td.Source.Minor) {
+			td.RHOCPMinorY = td.Source.Minor
+		}
+	}
+
+	if td.RHOCPMinorY1 == 0 {
+		if isRHOCPAvailable(td.Previous.Minor) {
+			td.RHOCPMinorY1 = td.Previous.Minor
+		}
+	}
+	if td.RHOCPMinorY2 == 0 {
+		if isRHOCPAvailable(td.YMinus2.Minor) {
+			td.RHOCPMinorY2 = td.YMinus2.Minor
+		}
 	}
 
 	klog.InfoS("Constructed TemplatingData", "results", td)
+
+	return td, nil
+}
+
+func unmarshalTemplatingData(path string) (*TemplatingData, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file %q: %w", path, err)
+	}
+
+	td := &TemplatingData{}
+
+	err = json.Unmarshal(data, td)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal partial templating data from %q: %w", path, err)
+	}
 
 	return td, nil
 }
