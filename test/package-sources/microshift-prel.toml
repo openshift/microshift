@@ -1,8 +1,8 @@
-{{- if env.Getenv "PREVIOUS_RELEASE_REPO" "" -}}
+{{- if .Previous.Repository -}}
 id = "microshift-prel"
 name = "Repository with RPMs for previous release"
 type = "yum-baseurl"
-url = "{{ .Env.PREVIOUS_RELEASE_REPO }}"
+url = "{{ .Previous.Repository }}"
 check_gpg = false
 check_ssl = true
 system = false
