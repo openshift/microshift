@@ -26,13 +26,13 @@ func NewComposeCmd() *cobra.Command {
 			return fmt.Errorf("argument must be provided")
 		}
 
-		repoFlag := cmd.Flag("repo")
-		if repoFlag == nil {
+		testDirFlag := cmd.Flag("test-dir")
+		if testDirFlag == nil {
 			return fmt.Errorf("repo flag is nil")
 		}
-		microshiftRepo := repoFlag.Value.String()
+		testDir := testDirFlag.Value.String()
 
-		td, err := NewTemplatingData(microshiftRepo, templatingDataInput)
+		td, err := NewTemplatingData(testDir, templatingDataInput)
 		if err != nil {
 			return err
 		}
@@ -48,14 +48,14 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
-		blueprintPath := filepath.Join(microshiftRepo, "test/image-blueprints")
+		blueprintPath := filepath.Join(testDir, "image-blueprints")
 		blueprints, err := filepath.Abs(blueprintPath)
 		if err != nil {
 			return err
 		}
 		blueprintsDirfilesys := os.DirFS(blueprints)
 
-		buildPath, err := filepath.Abs(filepath.Join(microshiftRepo, args[0]))
+		buildPath, err := filepath.Abs(filepath.Join(testDir, args[0]))
 		if err != nil {
 			return err
 		}
@@ -100,12 +100,13 @@ func templatingDataSubCmd() *cobra.Command {
 		Use:   "templating-data",
 		Short: "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			repoFlag := cmd.Flag("repo")
-			if repoFlag == nil {
+			testDirFlag := cmd.Flag("test-dir")
+			if testDirFlag == nil {
 				return fmt.Errorf("repo flag is nil")
 			}
+			testDir := testDirFlag.Value.String()
 
-			td, err := NewTemplatingData(repoFlag.Value.String(), "")
+			td, err := NewTemplatingData(testDir, "")
 			if err != nil {
 				return err
 			}

@@ -30,7 +30,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		return err
 	}
 
-	sourcesDir := filepath.Join(sc.tplData.MicroShiftRepoPath, "test", "package-sources")
+	sourcesDir := filepath.Join(sc.tplData.MicroShiftTestDirPath, "package-sources")
 	err = filepath.Walk(sourcesDir, func(path string, fileInfo fs.FileInfo, _ error) error {
 		if fileInfo.IsDir() {
 			return nil

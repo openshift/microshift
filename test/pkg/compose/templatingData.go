@@ -45,7 +45,7 @@ type Release struct {
 // TemplatingData contains all values needed for templating Composer's Sources & Blueprints,
 // and other templated artifacts within a MicroShift's test harness.
 type TemplatingData struct {
-	MicroShiftRepoPath string
+	MicroShiftTestDirPath string
 
 	Arch string
 
@@ -84,8 +84,13 @@ type TemplatingData struct {
 	FakeNext Release
 }
 
-func NewTemplatingData(microshiftRepoPath, templatingDataInputPath string) (*TemplatingData, error) {
-	outputDir := path.Join(microshiftRepoPath, "_output")
+func NewTemplatingData(testDirPath, templatingDataInputPath string) (*TemplatingData, error) {
+	absTestDir, err := filepath.Abs(testDirPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get absolute path of %q: %w", testDirPath, err)
+	}
+	outputDir := path.Join(absTestDir, "..", "_output")
+
 	imageDir := path.Join(outputDir, "test-images")
 	rpmRepos := path.Join(imageDir, "rpm-repos")
 
@@ -100,7 +105,6 @@ func NewTemplatingData(microshiftRepoPath, templatingDataInputPath string) (*Tem
 	}
 
 	var td *TemplatingData
-	var err error
 
 	if templatingDataInputPath != "" {
 		td, err = unmarshalTemplatingData(templatingDataInputPath)
@@ -111,7 +115,7 @@ func NewTemplatingData(microshiftRepoPath, templatingDataInputPath string) (*Tem
 		td = &TemplatingData{}
 	}
 
-	td.MicroShiftRepoPath = microshiftRepoPath
+	td.MicroShiftTestDirPath = absTestDir
 	td.Arch = getArch()
 
 	if td.Source.Repository == "" {
