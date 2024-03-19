@@ -44,20 +44,16 @@ RUN bash -c '\
     rm -rf "${OCC_LOC}" \
 '
 
-# Make sure /opt is not a symlink
-# See https://github.com/CentOS/centos-bootc-dev/pull/27
-#RUN rm -rf /opt && \
-#    mkdir -p /opt/cni
-
 # The crio dependency from OKD copr repository
-# Install the NFV package certificate
-# Install and enable MicroShift
-RUN bash -c '\
-    dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)" && \
+# - Install the NFV package certificate
+# - Install and enable MicroShift
+# - Clean up the copied repository
+RUN bash -c 'dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"' && \
     dnf install -y centos-release-nfv-common && \
     dnf install -y microshift && \
-    systemctl enable microshift.service \
-'
+    systemctl enable microshift.service && \
+    rm -rf $MICROSHIFT_REPO_PATH && \
+    dnf clean all
 
 # Configure crun runtime for crio, required on CentOS 9
 RUN mkdir -p /etc/crio/crio.conf.d/ && \
@@ -72,6 +68,3 @@ monitor_cgroup = "system.slice"
 monitor_exec_cgroup = ""
 privileged_without_host_devices = false
 EOF
-
-# Cleanup the copied repository
-RUN rm -rf $MICROSHIFT_REPO_PATH
