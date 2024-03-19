@@ -14,12 +14,9 @@ type Build interface {
 }
 
 type build struct {
-	Name  string
-	Path  string
-	Force bool
-
-	Composer Composer
-	Ostree   Ostree
+	Name string
+	Path string
+	Opts *BuildOpts
 }
 
 // BuildGroup is a collection of Builds than can run in parallel
@@ -29,15 +26,7 @@ type BuildGroup []Build
 type BuildPlan []BuildGroup
 
 type BuildOpts struct {
-	// BuildInstallers decides with ISO images should be built.
-	BuildInstallers bool
-
-	// SourceOnly decides if only blueprints with `source` in the filename should be built.
-	// Such blueprints are typically built using currently checked out code.
-	SourceOnly bool
-
-	// Force causes images to be rebuilt even if they exist already in ostree repo or vm-storage (ISO)
-	Force bool
+	ComposeOpts *ComposeOpts
 
 	// Filesys is filesystem used to obtain files by given path.
 	Filesys fs.FS
@@ -140,7 +129,7 @@ func (b *BuildPlanner) group(path string) (BuildGroup, error) {
 func (b *BuildPlanner) file(path string) (Build, error) {
 	filename := filepath.Base(path)
 
-	if b.Opts.SourceOnly && !strings.Contains(filename, "source") {
+	if b.Opts.ComposeOpts.SourceOnly && !strings.Contains(filename, "source") {
 		klog.InfoS("SourceOnly mode - skipping image", "path", path)
 		return nil, nil
 	}

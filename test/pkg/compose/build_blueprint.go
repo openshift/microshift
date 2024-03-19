@@ -63,11 +63,9 @@ func NewBlueprintBuild(path string, opts *BuildOpts) (*BlueprintBuild, error) {
 
 	bb := &BlueprintBuild{
 		build: build{
-			Name:     name,
-			Path:     path,
-			Composer: opts.Composer,
-			Ostree:   opts.Ostree,
-			Force:    opts.Force,
+			Name: name,
+			Path: path,
+			Opts: opts,
 		},
 		Contents: templatedData.String()}
 
@@ -83,7 +81,7 @@ func NewBlueprintBuild(path string, opts *BuildOpts) (*BlueprintBuild, error) {
 		bb.Aliases = slices.DeleteFunc(strings.Split(string(data), "\n"), func(line string) bool { return line == "" })
 	}
 
-	if opts.BuildInstallers {
+	if opts.ComposeOpts.BuildInstallers {
 		// If blueprint.image-installer exists, then ISO installer can be built.
 		if exists, err := fileExistsInDir(opts.Filesys, dir, fmt.Sprintf("%s.image-installer", withoutExt)); err != nil {
 			return nil, err
@@ -129,16 +127,16 @@ func NewBlueprintBuild(path string, opts *BuildOpts) (*BlueprintBuild, error) {
 
 func (b *BlueprintBuild) Execute() error {
 	// TODO: Do we need to remove Blueprint before to adding? It's not required and it only bumps blueprint's version
-	err := b.Composer.AddBlueprint(b.Contents)
+	err := b.Opts.Composer.AddBlueprint(b.Contents)
 	if err != nil {
 		return err
 	}
-	err = b.Composer.DepsolveBlueprint(b.Name)
+	err = b.Opts.Composer.DepsolveBlueprint(b.Name)
 	if err != nil {
 		return err
 	}
 
-	refExists, err := b.Ostree.DoesRefExists(b.Name)
+	refExists, err := b.Opts.Ostree.DoesRefExists(b.Name)
 	if err != nil {
 		return err
 	}
@@ -146,11 +144,11 @@ func (b *BlueprintBuild) Execute() error {
 
 	eg, _ := errgroup.WithContext(context.TODO())
 
-	if refExists && !b.Force {
+	if refExists && !b.Opts.ComposeOpts.Force {
 		klog.InfoS("Commit already present in the ostree repository and --force wasn't present - skipping", "blueprint", b.Name)
 	}
 
-	if !refExists || b.Force {
+	if !refExists || b.Opts.ComposeOpts.Force {
 		eg.Go(func() error {
 			if err := b.composeCommit(); err != nil {
 				klog.ErrorS(err, "Composing commit failed", "blueprint", b.Name)
@@ -179,7 +177,7 @@ func (b *BlueprintBuild) Execute() error {
 
 	if len(b.Aliases) != 0 {
 		klog.InfoS("Adding aliases", "name", b.Name)
-		err = b.Ostree.CreateAlias(b.Name, b.Aliases...)
+		err = b.Opts.Ostree.CreateAlias(b.Name, b.Aliases...)
 		if err != nil {
 			return err
 		}
@@ -193,9 +191,9 @@ func (b *BlueprintBuild) composeCommit() error {
 	var err error
 
 	if b.Parent == "" {
-		commitID, err = b.Composer.StartOSTreeCompose(b.Name, "edge-commit", b.Name, "", "", 0)
+		commitID, err = b.Opts.Composer.StartOSTreeCompose(b.Name, "edge-commit", b.Name, "", "", 0)
 	} else {
-		commitID, err = b.Composer.StartOSTreeCompose(b.Name, "edge-commit", b.Name, b.Parent, "http://127.0.0.1:8080/repo", 0)
+		commitID, err = b.Opts.Composer.StartOSTreeCompose(b.Name, "edge-commit", b.Name, b.Parent, "http://127.0.0.1:8080/repo", 0)
 	}
 	if err != nil {
 		return err
@@ -203,21 +201,21 @@ func (b *BlueprintBuild) composeCommit() error {
 
 	friendlyName := fmt.Sprintf("%s_edge-commit_%s", b.Name, commitID)
 
-	waitErr := b.Composer.WaitForCompose(commitID, friendlyName, 15*time.Minute)
+	waitErr := b.Opts.Composer.WaitForCompose(commitID, friendlyName, 15*time.Minute)
 
 	// Get metadata and logs even if composing failed
-	metadataErr := b.Composer.SaveComposeMetadata(commitID, friendlyName)
-	logsErr := b.Composer.SaveComposeLogs(commitID, friendlyName)
+	metadataErr := b.Opts.Composer.SaveComposeMetadata(commitID, friendlyName)
+	logsErr := b.Opts.Composer.SaveComposeLogs(commitID, friendlyName)
 
 	if err := errors.Join(waitErr, metadataErr, logsErr); err != nil {
 		return err
 	}
 
-	commitArchivePath, err := b.Composer.SaveComposeImage(commitID, friendlyName, ".tar")
+	commitArchivePath, err := b.Opts.Composer.SaveComposeImage(commitID, friendlyName, ".tar")
 	if err != nil {
 		return err
 	}
-	err = b.Ostree.ExtractCommit(commitArchivePath)
+	err = b.Opts.Ostree.ExtractCommit(commitArchivePath)
 	if err != nil {
 		return err
 	}
@@ -226,29 +224,29 @@ func (b *BlueprintBuild) composeCommit() error {
 }
 
 func (b *BlueprintBuild) composeInstaller() error {
-	installerID, err := b.Composer.StartCompose(b.Name, "image-installer", 0)
+	installerID, err := b.Opts.Composer.StartCompose(b.Name, "image-installer", 0)
 	if err != nil {
 		return err
 	}
 
 	friendlyName := fmt.Sprintf("%s_image-installer_%s", b.Name, installerID)
 
-	waitErr := b.Composer.WaitForCompose(installerID, friendlyName, 25*time.Minute)
+	waitErr := b.Opts.Composer.WaitForCompose(installerID, friendlyName, 25*time.Minute)
 
 	// Get metadata and logs even if composing failed
-	metadataErr := b.Composer.SaveComposeMetadata(installerID, friendlyName)
-	logsErr := b.Composer.SaveComposeLogs(installerID, friendlyName)
+	metadataErr := b.Opts.Composer.SaveComposeMetadata(installerID, friendlyName)
+	logsErr := b.Opts.Composer.SaveComposeLogs(installerID, friendlyName)
 
 	if err := errors.Join(waitErr, metadataErr, logsErr); err != nil {
 		return err
 	}
 
-	installerPath, err := b.Composer.SaveComposeImage(installerID, friendlyName, ".iso")
+	installerPath, err := b.Opts.Composer.SaveComposeImage(installerID, friendlyName, ".iso")
 	if err != nil {
 		return err
 	}
 
-	dest := filepath.Join("/host/dev/microshift/_output/test-images/vm-storage", b.Name+".iso")
+	dest := filepath.Join(b.Opts.ComposeOpts.ArtifactsMainDir, "vm-storage", b.Name+".iso")
 	err = os.Rename(installerPath, dest)
 	if err != nil {
 		return fmt.Errorf("failed to move installer from %q to %q: %w", installerPath, dest, err)
