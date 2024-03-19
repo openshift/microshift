@@ -1,0 +1,12 @@
+%include /main-prologue.cfg
+%include /main-network.cfg
+%include /main-ostreecontainer.cfg
+
+%post --log=/dev/console --erroronfail
+
+%include /post-microshift.cfg
+%include /post-containers.cfg
+%include /post-system.cfg
+%include /post-network.cfg
+
+%end

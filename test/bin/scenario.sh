@@ -390,6 +390,7 @@ EOF
 #  vm_disksize -- Size of disk in GB for the VM.
 #  vm_nics -- Number of network interfaces for the VM.
 #  fips_mode -- Enable FIPS mode (0 - disabled, 1 - enabled).
+#  bootc_mode -- Enable bootc mode (0 - disabled, 1 - enabled).
 launch_vm() {
     local -r vmname="$1"
     local -r boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
@@ -399,6 +400,7 @@ launch_vm() {
     local -r vm_disksize="${6:-20}"
     local -r vm_nics="${7:-1}"
     local -r fips_mode="${8:-0}"
+    local -r bootc_mode="${9:-0}"
 
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
@@ -426,14 +428,22 @@ launch_vm() {
         sudo virsh pool-autostart "${vm_pool_name}"
     fi
 
-    # Prepare network and extra arguments for the VM creation depending on
-    # the number of requested NICs
+    # Prepare file system, network and extra arguments for the VM creation
+    # depending on the number of requested NICs and other parameters
+    local vm_fs_args
     local vm_network_args
     local vm_extra_args
     local vm_initrd_inject
+    vm_fs_args=""
     vm_network_args=""
     vm_extra_args="fips=${fips_mode}"
     vm_initrd_inject=""
+
+    # Add support of bootc image directory sharing with virtual machines
+    if [ "${bootc_mode}" -ne 0 ] ; then
+        vm_fs_args+=" --filesystem=${IMAGEDIR}/bootc-images,bootc-images,driver.type=virtiofs"
+        vm_fs_args+=" --memorybacking=source.type=memfd,access.mode=shared"
+    fi
 
     # Specify the right console device per each platform. The baud rate
     # setting boost may result in slightly improved speed.
@@ -507,6 +517,7 @@ launch_vm() {
             --events on_reboot=restart \
             --noreboot \
             --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
+            ${vm_fs_args} \
             --extra-args "${vm_extra_args}" \
             ${vm_initrd_inject} \
             --wait ; then
