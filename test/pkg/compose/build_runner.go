@@ -6,9 +6,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type BuildRunner struct {
-	Composer Composer
-}
+type BuildRunner struct{}
 
 func (ib *BuildRunner) Build(toBuild BuildPlan) error {
 	for _, group := range toBuild {
@@ -24,7 +22,7 @@ func (ib *BuildRunner) buildGroup(group BuildGroup) error {
 
 	for _, build := range group {
 		build := build
-		eg.Go(func() error { return build.Execute(ib.Composer) })
+		eg.Go(func() error { return build.Execute() })
 	}
 
 	err := eg.Wait()
