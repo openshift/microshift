@@ -44,6 +44,13 @@ func NewComposeCmd() *cobra.Command {
 			composer = NewComposer()
 		}
 
+		var ostree Ostree
+		if dryRun {
+			ostree = NewDryRunOstree()
+		} else {
+			ostree = NewOstree(filepath.Join(testDir, "..", "_output", "test-images", "repo"))
+		}
+
 		if err := NewSourceConfigurer(composer, td).ConfigureSources(); err != nil {
 			return err
 		}
@@ -66,6 +73,8 @@ func NewComposeCmd() *cobra.Command {
 				BuildInstallers: buildInstallers,
 				SourceOnly:      sourceOnly,
 				TplData:         td,
+				Composer:        composer,
+				Ostree:          ostree,
 			},
 		}
 
