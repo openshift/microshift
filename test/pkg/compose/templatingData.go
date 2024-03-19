@@ -45,8 +45,6 @@ type Release struct {
 // TemplatingData contains all values needed for templating Composer's Sources & Blueprints,
 // and other templated artifacts within a MicroShift's test harness.
 type TemplatingData struct {
-	MicroShiftTestDirPath string
-
 	Arch string
 
 	// Minor version of current release's RHOCP. If RHOCP is not available yet, it defaults to 0.
@@ -87,16 +85,8 @@ type TemplatingData struct {
 	External Release
 }
 
-func NewTemplatingData(testDirPath, templatingDataInputPath string) (*TemplatingData, error) {
-	absTestDir, err := filepath.Abs(testDirPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get absolute path of %q: %w", testDirPath, err)
-	}
-	outputDir := path.Join(absTestDir, "..", "_output")
-
-	imageDir := path.Join(outputDir, "test-images")
-	rpmRepos := path.Join(imageDir, "rpm-repos")
-
+func NewTemplatingData(opts *ComposeOpts) (*TemplatingData, error) {
+	rpmRepos := path.Join(opts.ArtifactsMainDir, "rpm-repos")
 	localRepo := path.Join(rpmRepos, "microshift-local")
 	fakeNextRepo := path.Join(rpmRepos, "microshift-fake-next-minor")
 	baseRepo := path.Join(rpmRepos, "microshift-base")
@@ -109,9 +99,10 @@ func NewTemplatingData(testDirPath, templatingDataInputPath string) (*Templating
 	}
 
 	var td *TemplatingData
+	var err error
 
-	if templatingDataInputPath != "" {
-		td, err = unmarshalTemplatingData(templatingDataInputPath)
+	if opts.TemplatingDataFragmentFilepath != "" {
+		td, err = unmarshalTemplatingData(opts.TemplatingDataFragmentFilepath)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +110,6 @@ func NewTemplatingData(testDirPath, templatingDataInputPath string) (*Templating
 		td = &TemplatingData{}
 	}
 
-	td.MicroShiftTestDirPath = absTestDir
 	td.Arch = getArch()
 
 	if td.Source.Repository == "" {
@@ -179,7 +169,7 @@ func NewTemplatingData(testDirPath, templatingDataInputPath string) (*Templating
 
 	// If templatingDataInputPath was provided, assume the 0 is
 	// already "calculated" value and repo is not available yet.
-	if td.RHOCPMinorY == 0 && templatingDataInputPath == "" {
+	if td.RHOCPMinorY == 0 && opts.TemplatingDataFragmentFilepath == "" {
 		if isRHOCPAvailable(td.Source.Minor) {
 			td.RHOCPMinorY = td.Source.Minor
 		}
