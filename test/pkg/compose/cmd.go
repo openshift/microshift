@@ -15,6 +15,7 @@ func NewComposeCmd() *cobra.Command {
 	buildInstallers := true
 	sourceOnly := false
 	dryRun := false
+	force := false
 
 	cmd := &cobra.Command{
 		Use:   "compose target",
@@ -72,6 +73,7 @@ func NewComposeCmd() *cobra.Command {
 				Filesys:         blueprintsDirfilesys,
 				BuildInstallers: buildInstallers,
 				SourceOnly:      sourceOnly,
+				Force:           force,
 				TplData:         td,
 				Composer:        composer,
 				Ostree:          ostree,
@@ -96,6 +98,7 @@ func NewComposeCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&buildInstallers, "build-installers", "I", true, "Build ISO image installers.")
 	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints.")
 	cmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
+	cmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Rebuild existing artifacts (ostree commits, ISO images)")
 
 	cmd.AddCommand(templatingDataSubCmd())
 
