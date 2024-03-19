@@ -63,6 +63,7 @@ func NewBlueprintBuild(path string, opts *BuildOpts) (*BlueprintBuild, error) {
 			Path:     path,
 			Composer: opts.Composer,
 			Ostree:   opts.Ostree,
+			Force:    opts.Force,
 		},
 		Contents: templatedData.String()}
 

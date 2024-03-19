@@ -36,8 +36,9 @@ func NewImageFetcher(path string, opts *BuildOpts) (*ImageFetcher, error) {
 
 	return &ImageFetcher{
 		build: build{
-			Name: withoutExt,
-			Path: path,
+			Name:  withoutExt,
+			Path:  path,
+			Force: opts.Force,
 		},
 		Url: templatedData.String(),
 	}, nil

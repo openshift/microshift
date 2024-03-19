@@ -14,8 +14,9 @@ type Build interface {
 }
 
 type build struct {
-	Name string
-	Path string
+	Name  string
+	Path  string
+	Force bool
 
 	Composer Composer
 	Ostree   Ostree
@@ -34,6 +35,9 @@ type BuildOpts struct {
 	// SourceOnly decides if only blueprints with `source` in the filename should be built.
 	// Such blueprints are typically built using currently checked out code.
 	SourceOnly bool
+
+	// Force causes images to be rebuilt even if they exist already in ostree repo or vm-storage (ISO)
+	Force bool
 
 	// Filesys is filesystem used to obtain files by given path.
 	Filesys fs.FS
