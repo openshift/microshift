@@ -441,7 +441,7 @@ launch_vm() {
 
     # Add support of bootc image directory sharing with virtual machines
     if [ "${bootc_mode}" -ne 0 ] ; then
-        vm_fs_args+=" --filesystem=${IMAGEDIR}/bootc-images,bootc-images,driver.type=virtiofs"
+        vm_fs_args+=" --filesystem=${BOOTC_IMAGE_DIR},bootc-images,driver.type=virtiofs"
         vm_fs_args+=" --memorybacking=source.type=memfd,access.mode=shared"
     fi
 

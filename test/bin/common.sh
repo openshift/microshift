@@ -64,6 +64,10 @@ BASE_REPO="${IMAGEDIR}/rpm-repos/microshift-base"
 # shellcheck disable=SC2034  # used elsewhere
 CONTAINER_LIST="${IMAGEDIR}/container-images-list"
 
+# Location of container images in oci-dir formar for all the bootc images
+# shellcheck disable=SC2034  # used elsewhere
+BOOTC_IMAGE_DIR="${IMAGEDIR}/bootc-images"
+
 # Location of data files created by the tools for managing scenarios
 # as they are run.
 #
