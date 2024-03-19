@@ -42,7 +42,7 @@ func NewComposeCmd() *cobra.Command {
 		if dryRun {
 			composer = NewDryRunComposer()
 		} else {
-			composer = NewComposer()
+			composer = NewComposer(testDir)
 		}
 
 		var ostree Ostree
