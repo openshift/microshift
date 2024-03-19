@@ -150,6 +150,7 @@ type BlueprintBuild struct {
 	// Commit    bool // TODO: Build ISO without commit
 	Installer bool
 	Contents  string
+	Parent    string
 	Aliases   []string
 }
 
@@ -211,6 +212,39 @@ func NewBlueprintBuild(path string, opts *BuildOpts) (*BlueprintBuild, error) {
 			bb.Installer = true
 		}
 	}
+
+	// looking for parent commit
+	if strings.Contains(withoutExt, "-") {
+		parts := strings.Split(withoutExt, "-")
+		expectedParentFilename := parts[0] + ".toml"
+
+		parentPath := ""
+		err = fs.WalkDir(opts.Filesys, ".", func(p string, d fs.DirEntry, err error) error {
+			if parentPath != "" {
+				return nil
+			}
+			if d.Name() == expectedParentFilename {
+				parentPath = p
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, fmt.Errorf("walking through dirs to find parent of %q failed: %w", path, err)
+		}
+
+		if parentPath != "" {
+			parentData, err := fs.ReadFile(opts.Filesys, parentPath)
+			if err != nil {
+				return nil, fmt.Errorf("failed to read parent of %q which is %q: %w", path, parentPath, err)
+			}
+			parentName, err := getTOMLFieldValue(string(parentData), "name")
+			if err != nil {
+				return nil, fmt.Errorf("failed to read name from %q: %w", parentPath, err)
+			}
+			bb.Parent = parentName
+		}
+	}
+
 	return bb, nil
 }
 
