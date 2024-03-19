@@ -13,7 +13,7 @@ import (
 )
 
 type Build interface {
-	Execute(Composer) error
+	Execute() error
 }
 
 // BuildGroup is a collection of Builds than can run in parallel
@@ -35,6 +35,12 @@ type BuildOpts struct {
 
 	// TplData is a struct used as templating input.
 	TplData *TemplatingData
+
+	// Composer is an interface to the composer remote API
+	Composer Composer
+
+	// Composer is an interface to the ostree repository
+	Ostree Ostree
 }
 
 type BuildPlanner struct {
@@ -143,6 +149,9 @@ func (b *BuildPlanner) file(path string) (Build, error) {
 type build struct {
 	Name string
 	Path string
+
+	Composer Composer
+	Ostree   Ostree
 }
 
 type BlueprintBuild struct {
@@ -190,7 +199,14 @@ func NewBlueprintBuild(path string, opts *BuildOpts) (*BlueprintBuild, error) {
 		return nil, fmt.Errorf("failed to execute template %q: %w", path, err)
 	}
 
-	bb := &BlueprintBuild{build: build{Name: name, Path: path}, Contents: templatedData.String()}
+	bb := &BlueprintBuild{
+		build: build{
+			Name:     name,
+			Path:     path,
+			Composer: opts.Composer,
+			Ostree:   opts.Ostree,
+		},
+		Contents: templatedData.String()}
 
 	// blueprint.alias file contains aliases for commit defined in blueprint.toml
 	potentialAliasFile := fmt.Sprintf("%s.alias", withoutExt)
@@ -248,7 +264,7 @@ func NewBlueprintBuild(path string, opts *BuildOpts) (*BlueprintBuild, error) {
 	return bb, nil
 }
 
-func (b *BlueprintBuild) Execute(Composer) error {
+func (b *BlueprintBuild) Execute() error {
 	klog.InfoS("Building blueprint", "name", b.Name)
 	time.Sleep(1 * time.Second)
 	klog.InfoS("Blueprint done", "name", b.Name)
@@ -298,7 +314,7 @@ func NewImageFetcher(path string, opts *BuildOpts) (*ImageFetcher, error) {
 	}, nil
 }
 
-func (i *ImageFetcher) Execute(Composer) error {
+func (i *ImageFetcher) Execute() error {
 	klog.InfoS("Downloading image", "name", i.Name)
 	time.Sleep(1 * time.Second)
 	klog.InfoS("Image downloaded", "name", i.Name)
