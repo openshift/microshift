@@ -56,7 +56,13 @@ func NewComposeCmd() *cobra.Command {
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
-			return fmt.Errorf("argument must be provided")
+			args = []string{
+				"./image-blueprints/layer1-base",
+				"./image-blueprints/layer2-presubmit",
+				"./image-blueprints/layer3-periodic",
+			}
+
+			fmt.Printf("No argument provided - running following layers: %v\n", args)
 		}
 
 		var composer helpers.Composer
