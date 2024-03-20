@@ -12,6 +12,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/openshift/microshift/test/pkg/testutil"
+
 	"golang.org/x/sync/errgroup"
 	"k8s.io/klog/v2"
 )
@@ -37,7 +39,7 @@ func NewBlueprintBuild(path string, opts *BuildPlanOpts) (*BlueprintBuild, error
 		return nil, fmt.Errorf("failed to read %s: %w", path, err)
 	}
 	data := string(dataBytes)
-	name, err := getTOMLFieldValue(data, "name")
+	name, err := testutil.GetTOMLFieldValue(data, "name")
 	if err != nil {
 		return nil, fmt.Errorf("failed to obtain value of field %q in file %q", "name", path)
 	}
@@ -115,7 +117,7 @@ func NewBlueprintBuild(path string, opts *BuildPlanOpts) (*BlueprintBuild, error
 			if err != nil {
 				return nil, fmt.Errorf("failed to read parent of %q which is %q: %w", path, parentPath, err)
 			}
-			parentName, err := getTOMLFieldValue(string(parentData), "name")
+			parentName, err := testutil.GetTOMLFieldValue(string(parentData), "name")
 			if err != nil {
 				return nil, fmt.Errorf("failed to read name from %q: %w", parentPath, err)
 			}

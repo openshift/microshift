@@ -1,17 +1,17 @@
-package compose
+package testutil
 
 import (
 	"fmt"
 	"strings"
 )
 
-// getTOMLFieldValue obtains value of first variable named `field`.
+// GetTOMLFieldValue obtains value of first variable named `field`.
 // It does not use the TOML parser as it is expected to be used on
 // TOML files that are yet to be templated.
 //
 // Primary goal is to stop relying on assumption that filename without extension is the name/id of Blueprint/Source.
 // Because Blueprints/Sources are removed prior re-adding, the name/id must be precise.
-func getTOMLFieldValue(data, field string) (string, error) {
+func GetTOMLFieldValue(data, field string) (string, error) {
 	lines := strings.Split(data, "\n")
 	for _, line := range lines {
 		if strings.HasPrefix(line, field) {

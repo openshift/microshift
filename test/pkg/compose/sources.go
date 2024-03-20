@@ -9,6 +9,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/openshift/microshift/test/pkg/testutil"
+
 	"k8s.io/klog/v2"
 )
 
@@ -44,7 +46,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		}
 		data := string(dataBytes)
 
-		name, err := getTOMLFieldValue(data, "id")
+		name, err := testutil.GetTOMLFieldValue(data, "id")
 		if err != nil {
 			return err
 		}
