@@ -146,11 +146,32 @@ func (c *composer) StartCompose(blueprint, composeType string, size uint) (strin
 }
 
 func (c *composer) WaitForCompose(id, friendlyName string, timeout time.Duration) error {
-	klog.InfoS("Waiting for compose", "id", id, "timeout", timeout)
+	start := time.Now()
 
-	aborted, info, apiResponse, err := c.client.ComposeWait(id, timeout, 30*time.Second)
-	klog.InfoS("Wait for compose complete", "id", id)
-	_ = info
+	var aborted bool
+	var info weldr.ComposeInfoV0
+	var apiResponse *weldr.APIResponse
+	var err error
+
+	done := make(chan struct{})
+	go func() {
+		aborted, info, apiResponse, err = c.client.ComposeWait(id, timeout, 30*time.Second)
+		done <- struct{}{}
+	}()
+
+	ticker := time.NewTicker(time.Second * 30)
+outer:
+	for {
+		select {
+		case <-done:
+			break outer
+		case <-ticker.C:
+			klog.InfoS("Waiting for compose", "id", id, "timeout", timeout, "friendlyName", friendlyName, "elapsed", time.Since(start))
+		}
+	}
+	ticker.Stop()
+
+	klog.InfoS("Wait for compose complete", "id", id, "timeout", timeout, "friendlyName", friendlyName, "elapsed", time.Since(start))
 
 	// info should always be set, even if compose failed
 	infoJson, infoErr := json.MarshalIndent(info, "", "    ")
