@@ -41,6 +41,11 @@ func NewComposeCmd() *cobra.Command {
 				return err
 			}
 
+			if sourceOnly {
+				buildInstallers = true
+				force = true
+			}
+
 			testDirPath = testDirAbs
 			microShiftRepoRootPath = filepath.Join(testDirAbs, "..")
 			artifactsMainDir = filepath.Join(microShiftRepoRootPath, "_output", "test-images")
@@ -134,7 +139,7 @@ func NewComposeCmd() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&templatingDataFragmentFilepath, "templating-data", "", "Provide path to partial templating data to skip querying remote repository.")
 	cmd.PersistentFlags().BoolVarP(&buildInstallers, "build-installers", "I", true, "Build ISO image installers.")
-	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints.")
+	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints. Implies --build-installers and --force.")
 	cmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
 	cmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Rebuild existing artifacts (ostree commits, ISO images)")
 
