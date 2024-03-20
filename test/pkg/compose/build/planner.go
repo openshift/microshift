@@ -33,32 +33,34 @@ type Planner struct {
 	Opts *PlannerOpts
 }
 
-func (b *Planner) ConstructBuildTree(path string) (Plan, error) {
+func (b *Planner) ConstructBuildTree(paths []string) (Plan, error) {
 	var toBuild Plan
 
-	base := filepath.Base(path)
-	if strings.Contains(base, "layer") {
-		if layer, err := b.layer(path); err != nil {
-			return nil, err
+	for _, path := range paths {
+		base := filepath.Base(path)
+		if strings.Contains(base, "layer") {
+			if layer, err := b.layer(path); err != nil {
+				return nil, err
+			} else {
+				toBuild = append(toBuild, layer...)
+			}
+		} else if strings.Contains(base, "group") {
+			if grp, err := b.group(path); err != nil {
+				return nil, err
+			} else {
+				toBuild = append(toBuild, grp)
+			}
+		} else if strings.Contains(base, ".toml") || strings.Contains(base, ".image-fetcher") {
+			if build, err := b.file(path); err != nil {
+				return nil, err
+			} else if build != nil {
+				toBuild = append(toBuild, Group{build})
+			}
+		} else if strings.Contains(base, ".image-installer") || strings.Contains(base, ".alias") {
+			return nil, fmt.Errorf("passing .image-installer or .alias files directly is not supported - only .toml and .image-fetcher file are supported")
 		} else {
-			toBuild = layer
+			return nil, fmt.Errorf("unknown artifact to build")
 		}
-	} else if strings.Contains(base, "group") {
-		if grp, err := b.group(path); err != nil {
-			return nil, err
-		} else {
-			toBuild = Plan{grp}
-		}
-	} else if strings.Contains(base, ".toml") || strings.Contains(base, ".image-fetcher") {
-		if build, err := b.file(path); err != nil {
-			return nil, err
-		} else if build != nil {
-			toBuild = Plan{Group{build}}
-		}
-	} else if strings.Contains(base, ".image-installer") || strings.Contains(base, ".alias") {
-		return nil, fmt.Errorf("passing .image-installer or .alias files directly is not supported - only .toml and .image-fetcher file are supported")
-	} else {
-		return nil, fmt.Errorf("unknown artifact to build")
 	}
 
 	klog.InfoS("Constructed BuildRequest", "groups", len(toBuild), "build-request", toBuild)

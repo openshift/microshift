@@ -23,15 +23,16 @@ type Runner struct {
 
 func (ib *Runner) Build(toBuild Plan) error {
 	klog.InfoS("Running preparation phase of all the builds in all the groups")
-	for _, group := range toBuild {
+	for idx, group := range toBuild {
+		klog.InfoS("Running Prepare phase group", "index", idx)
 		if err := ib.prepareGroup(group); err != nil {
 			return err
 		}
 	}
 	klog.InfoS("Completed preparation phase of all the builds in all the groups")
 
-	return nil
-	for _, group := range toBuild {
+	for idx, group := range toBuild {
+		klog.InfoS("Running Execute phase group", "index", idx)
 		if err := ib.executeGroup(group); err != nil {
 			return err
 		}
@@ -42,8 +43,7 @@ func (ib *Runner) Build(toBuild Plan) error {
 func (ib *Runner) prepareGroup(group Group) error {
 	eg, _ := errgroup.WithContext(context.TODO())
 
-	for idx, build := range group {
-		klog.InfoS("Running Prepare phase group", "index", idx)
+	for _, build := range group {
 		build := build
 		eg.Go(func() error {
 			err := build.Prepare(ib.Opts)
@@ -60,8 +60,7 @@ func (ib *Runner) prepareGroup(group Group) error {
 func (ib *Runner) executeGroup(group Group) error {
 	eg, _ := errgroup.WithContext(context.TODO())
 
-	for idx, build := range group {
-		klog.InfoS("Running Execute phase group", "index", idx)
+	for _, build := range group {
 		build := build
 		eg.Go(func() error {
 			err := build.Execute(ib.Opts)
