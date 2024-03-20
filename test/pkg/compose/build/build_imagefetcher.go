@@ -88,10 +88,24 @@ func (i *ImageFetcher) Execute(opts *Opts) error {
 		return fmt.Errorf("failed to create file %q for downloading: %w", i.Destination, err)
 	}
 
-	n, err := io.Copy(f, resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to copy %q to %q: %w", i.Url, i.Destination, err)
+	var n int64
+	done := make(chan struct{})
+	go func() {
+		n, err = io.Copy(f, resp.Body)
+		done <- struct{}{}
+	}()
+
+	ticker := time.NewTicker(time.Second * 30)
+outer:
+	for {
+		select {
+		case <-done:
+			break outer
+		case <-ticker.C:
+			klog.InfoS("Waiting for image download", "name", i.Name, "timeout", timeout, "elapsed", time.Since(start))
+		}
 	}
+	ticker.Stop()
 
 	err = os.Rename(tmpDest, i.Destination)
 	if err != nil {
