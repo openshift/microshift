@@ -208,28 +208,36 @@ func getReleaseFromLocalFs(repo string) (Release, error) {
 // It looks for MicroShift RPM in following order:
 // RHOCP, Release Candidates on OpenShift mirror, Engineering Candidates on OpenShift mirror.
 func getReleaseFromRemoteRepo(minor int) (Release, error) {
-	if r, err := getReleaseFromRHOCP(minor); err != nil && !errors.Is(err, errNoRemoteRelease) {
+	klog.InfoS("Looking for a Release for minor version", "minor", minor)
+
+	r, err := getReleaseFromRHOCP(minor)
+	if err != nil && !errors.Is(err, errNoRemoteRelease) {
 		return Release{}, err
-	} else if err == nil {
+	}
+	if err == nil {
 		klog.InfoS("Found release in RHOCP repository", "minor", minor, "release", r)
 		return r, nil
 	}
 
-	if r, err := getReleaseFromTheMirror(minor, false); err != nil && !errors.Is(err, errNoRemoteRelease) {
+	r, err = getReleaseFromTheMirror(minor, false)
+	if err != nil && !errors.Is(err, errNoRemoteRelease) {
 		return Release{}, err
-	} else if err == nil {
+	}
+	if err == nil {
 		klog.InfoS("Found release in RC mirror", "minor", minor, "release", r)
 		return r, nil
 	}
 
-	if r, err := getReleaseFromTheMirror(minor, true); err != nil && !errors.Is(err, errNoRemoteRelease) {
+	r, err = getReleaseFromTheMirror(minor, true)
+	if err != nil && !errors.Is(err, errNoRemoteRelease) {
 		return Release{}, err
-	} else if err == nil {
+	}
+	if err == nil {
 		klog.InfoS("Found release in EC mirror", "minor", minor, "release", r)
 		return r, nil
 	}
 
-	klog.InfoS("No RPMs for the minor found", "minor", minor)
+	klog.InfoS("No RPMs for the minor version found", "minor", minor)
 
 	return Release{}, errNoRemoteRelease
 }
@@ -247,7 +255,7 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 	if err != nil {
 		return Release{}, err
 	}
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != 200 { // TODO: Maybe this should compare to 404?
 		return Release{}, errNoRemoteRelease
 	}
 	sout, _, err := testutil.RunCommand(
@@ -269,7 +277,7 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 // getReleaseFromRHOCP looks for MicroShift RPM in RHOCP
 func getReleaseFromRHOCP(minor int) (Release, error) {
 	rhocp := fmt.Sprintf("rhocp-4.%d-for-rhel-9-%s-rpms", minor, getArch())
-	sout, _, err := testutil.RunCommand("sudo", "dnf", "repoquery", "microshift",
+	sout, serr, err := testutil.RunCommand("sudo", "dnf", "repoquery", "microshift",
 		"--quiet",
 		"--queryformat", "%{version}-%{release}",
 		"--repo", rhocp,
@@ -282,7 +290,10 @@ func getReleaseFromRHOCP(minor int) (Release, error) {
 			Minor:      minor,
 		}, nil
 	}
-	return Release{}, errNoRemoteRelease
+	if strings.Contains(serr, "Cannot download repomd.xml: Cannot download repodata/repomd.xml: All mirrors were tried") {
+		return Release{}, errNoRemoteRelease
+	}
+	return Release{}, err
 }
 
 // isRHOCPAvailable checks if RHOCP of a given `minor` is available for usage by attempting

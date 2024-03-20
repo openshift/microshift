@@ -15,16 +15,12 @@ func RunCommand(c ...string) (string, string, error) {
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
-	klog.V(2).InfoS("Running command", "cmd", cmd)
+	klog.InfoS("Running command", "cmd", cmd)
 	err := cmd.Run()
 	out := strings.Trim(outb.String(), "\n")
 	serr := errb.String()
 	klog.InfoS("Command complete", "cmd", cmd, "stdout", redactOutput(out), "stderr", redactOutput(serr), "err", err)
-	if err != nil {
-		return "", "", err
-	}
-
-	return out, serr, nil
+	return out, serr, err
 }
 
 // redactOutput overwrites sensitive data when logging command outputs
