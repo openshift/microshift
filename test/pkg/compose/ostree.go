@@ -6,6 +6,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/openshift/microshift/test/pkg/testutil"
+
 	"k8s.io/klog/v2"
 )
 
@@ -35,7 +37,7 @@ func (o *ostree) CreateAlias(ref string, aliases ...string) error {
 	defer o.mutex.Unlock()
 
 	for _, alias := range aliases {
-		_, _, err := runCommand(
+		_, _, err := testutil.RunCommand(
 			"ostree", "refs",
 			fmt.Sprintf("--repo=%s", o.OstreeRepoPath),
 			"--force",
@@ -56,7 +58,7 @@ func (o *ostree) DoesRefExists(ref string) (bool, error) {
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
 
-	sout, _, err := runCommand(
+	sout, _, err := testutil.RunCommand(
 		"ostree", "refs",
 		fmt.Sprintf("--repo=%s", o.OstreeRepoPath))
 	if err != nil {
@@ -77,7 +79,7 @@ func (o *ostree) ExtractCommit(path string) error {
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
 
-	_, _, err := runCommand("tar",
+	_, _, err := testutil.RunCommand("tar",
 		"--strip-components=2",
 		"-C", o.OstreeRepoPath,
 		"-xf", path,
@@ -94,7 +96,7 @@ func (o *ostree) ExtractCommit(path string) error {
 func (o *ostree) updateSummary() error {
 	klog.InfoS("Updating ostree repository summary")
 
-	_, _, err := runCommand(
+	_, _, err := testutil.RunCommand(
 		"ostree", "summary",
 		fmt.Sprintf("--repo=%s", o.OstreeRepoPath),
 		"--update")
@@ -102,8 +104,8 @@ func (o *ostree) updateSummary() error {
 		return fmt.Errorf("failed to update ostree repository's summary: %w", err)
 	}
 
-	// output is logged by runCommand()
-	_, _, err = runCommand(
+	// output is logged by testutil.RunCommand()
+	_, _, err = testutil.RunCommand(
 		"ostree", "summary",
 		fmt.Sprintf("--repo=%s", o.OstreeRepoPath),
 		"--view")
