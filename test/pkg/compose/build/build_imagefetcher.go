@@ -51,6 +51,10 @@ func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
 	}, nil
 }
 
+func (i *ImageFetcher) Prepare(opts *Opts) error {
+	return nil
+}
+
 func (i *ImageFetcher) Execute(opts *Opts) error {
 	if opts.DryRun {
 		klog.InfoS("DRY RUN: Downloaded image", "name", i.Name)
