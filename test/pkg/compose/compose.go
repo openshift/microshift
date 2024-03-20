@@ -142,6 +142,8 @@ func NewComposeCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints. Implies --build-installers and --force.")
 	cmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
 	cmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Rebuild existing artifacts (ostree commits, ISO images)")
+	// TODO: EXTRACT_CONTAINER_IMAGES
+	// TODO: trap 'osbuild_logs' EXIT + SKIP_LOG_COLLECTION
 
 	cmd.AddCommand(templatingDataSubCmd())
 
