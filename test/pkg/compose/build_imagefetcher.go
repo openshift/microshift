@@ -15,12 +15,15 @@ import (
 	"k8s.io/klog/v2"
 )
 
+var _ Build = (*ImageFetcher)(nil)
+
 type ImageFetcher struct {
 	build
-	Url string
+	Url         string
+	Destination string
 }
 
-func NewImageFetcher(path string, opts *BuildOpts) (*ImageFetcher, error) {
+func NewImageFetcher(path string, opts *BuildPlanOpts) (*ImageFetcher, error) {
 	filename := filepath.Base(path)
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 
@@ -42,31 +45,35 @@ func NewImageFetcher(path string, opts *BuildOpts) (*ImageFetcher, error) {
 		build: build{
 			Name: withoutExt,
 			Path: path,
-			Opts: opts,
 		},
-		Url: templatedData.String(),
+		Url:         templatedData.String(),
+		Destination: filepath.Join(opts.ArtifactsMainDir, "vm-storage", withoutExt+".iso"),
 	}, nil
 }
 
-func (i *ImageFetcher) Execute() error {
-	dest := filepath.Join(i.Opts.ComposeOpts.ArtifactsMainDir, "vm-storage", i.Name+".iso")
-	tmpDest := dest + ".download"
+func (i *ImageFetcher) Execute(opts *BuildOpts) error {
+	if opts.DryRun {
+		klog.InfoS("DRY RUN: Downloaded image", "name", i.Name)
+		return nil
+	}
 
-	if exists, err := util.PathExistsAndIsNotEmpty(dest); err != nil {
+	tmpDest := i.Destination + ".download"
+
+	if exists, err := util.PathExistsAndIsNotEmpty(i.Destination); err != nil {
 		return err
 	} else if exists {
-		klog.InfoS("Image for download already exists", "path", dest)
-		if !i.Opts.ComposeOpts.Force {
+		klog.InfoS("Image for download already exists", "path", i.Destination)
+		if !opts.Force {
 			return nil
 		}
-		klog.InfoS("Force mode: removing and re-downloading file", "path", dest)
-		if err := os.RemoveAll(dest); err != nil {
-			return fmt.Errorf("failed to remove %q: %w", dest, err)
+		klog.InfoS("Force mode: removing and re-downloading file", "path", i.Destination)
+		if err := os.RemoveAll(i.Destination); err != nil {
+			return fmt.Errorf("failed to remove %q: %w", i.Destination, err)
 		}
 	}
 
 	timeout := 20 * time.Minute
-	klog.InfoS("Downloading image", "name", i.Name, "destination", dest, "timeout", timeout)
+	klog.InfoS("Downloading image", "name", i.Name, "destination", i.Destination, "timeout", timeout)
 	start := time.Now()
 
 	client := http.Client{Timeout: timeout}
@@ -78,20 +85,20 @@ func (i *ImageFetcher) Execute() error {
 
 	f, err := os.Create(tmpDest)
 	if err != nil {
-		return fmt.Errorf("failed to create file %q for downloading: %w", dest, err)
+		return fmt.Errorf("failed to create file %q for downloading: %w", i.Destination, err)
 	}
 
 	n, err := io.Copy(f, resp.Body)
 	if err != nil {
-		return fmt.Errorf("failed to copy %q to %q: %w", i.Url, dest, err)
+		return fmt.Errorf("failed to copy %q to %q: %w", i.Url, i.Destination, err)
 	}
 
-	err = os.Rename(tmpDest, dest)
+	err = os.Rename(tmpDest, i.Destination)
 	if err != nil {
-		return fmt.Errorf("failed to rename %q to %q: %w", tmpDest, dest, err)
+		return fmt.Errorf("failed to rename %q to %q: %w", tmpDest, i.Destination, err)
 	}
 
-	klog.InfoS("Downloaded image", "destination", dest, "url", i.Url, "sizeMB", n/1_048_576, "duration", time.Since(start))
+	klog.InfoS("Downloaded image", "destination", i.Destination, "url", i.Url, "sizeMB", n/1_048_576, "duration", time.Since(start))
 
 	return nil
 }

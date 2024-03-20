@@ -250,7 +250,7 @@ func (c *composer) SaveComposeImage(id, friendlyName, ext string) (string, error
 		return "", fmt.Errorf("unsuccessful get compose's %q image: %w", id, err)
 	}
 
-	klog.InfoS("Got compose image", "id", id, "filename", filename, "path", path)
+	klog.InfoS("Got compose image", "id", id, "filename", filename)
 	return filename, nil
 }
 
