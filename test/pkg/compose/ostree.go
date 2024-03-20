@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 
 	"k8s.io/klog/v2"
 )
 
 type Ostree interface {
-	UpdateSummary() error
 	DoesRefExists(ref string) (bool, error)
 	CreateAlias(origin string, aliases ...string) error
 	ExtractCommit(path string) error
@@ -19,6 +19,7 @@ var _ Ostree = (*ostree)(nil)
 
 type ostree struct {
 	OstreeRepoPath string
+	mutex          sync.Mutex
 }
 
 func NewOstree(repo string) *ostree {
@@ -29,6 +30,10 @@ func NewOstree(repo string) *ostree {
 // CreateAlias creates aliases for the reference.
 func (o *ostree) CreateAlias(ref string, aliases ...string) error {
 	klog.InfoS("Creating aliases for ostree reference", "ref", ref, "aliases", aliases)
+
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+
 	for _, alias := range aliases {
 		_, _, err := runCommand(
 			"ostree", "refs",
@@ -41,12 +46,16 @@ func (o *ostree) CreateAlias(ref string, aliases ...string) error {
 	}
 
 	klog.InfoS("Created aliases for ostree reference", "ref", ref, "aliases", aliases)
-	return o.UpdateSummary()
+	return o.updateSummary()
 }
 
 // DoesRefExists checks if ref is present in the ostree repository.
 func (o *ostree) DoesRefExists(ref string) (bool, error) {
 	klog.InfoS("Checking if ostree ref exists", "ref", ref)
+
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+
 	sout, _, err := runCommand(
 		"ostree", "refs",
 		fmt.Sprintf("--repo=%s", o.OstreeRepoPath))
@@ -61,8 +70,28 @@ func (o *ostree) DoesRefExists(ref string) (bool, error) {
 	return exists, nil
 }
 
-// UpdateSummary updates summary of the ostree repository.
-func (o *ostree) UpdateSummary() error {
+// ExtractCommit extracts given tar archive to the ostree repository.
+func (o *ostree) ExtractCommit(path string) error {
+	klog.InfoS("Extracting commit to the repository", "repo", o.OstreeRepoPath, "commit", path)
+
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+
+	_, _, err := runCommand("tar",
+		"--strip-components=2",
+		"-C", o.OstreeRepoPath,
+		"-xf", path,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to extract commit tar archive (%q) to ostree repo (%q): %w", path, o.OstreeRepoPath, err)
+	}
+
+	klog.InfoS("Extracted commit to the repository", "repo", o.OstreeRepoPath, "commit", path)
+	return o.updateSummary()
+}
+
+// updateSummary updates summary of the ostree repository.
+func (o *ostree) updateSummary() error {
 	klog.InfoS("Updating ostree repository summary")
 
 	_, _, err := runCommand(
@@ -86,23 +115,6 @@ func (o *ostree) UpdateSummary() error {
 	return nil
 }
 
-// ExtractCommit extracts given tar archive to the ostree repository.
-func (o *ostree) ExtractCommit(path string) error {
-	klog.InfoS("Extracting commit to the repository", "repo", o.OstreeRepoPath, "commit", path)
-
-	_, _, err := runCommand("tar",
-		"--strip-components=2",
-		"-C", o.OstreeRepoPath,
-		"-xf", path,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to extract commit tar archive (%q) to ostree repo (%q): %w", path, o.OstreeRepoPath, err)
-	}
-
-	klog.InfoS("Extracted commit to the repository", "repo", o.OstreeRepoPath, "commit", path)
-	return o.UpdateSummary()
-}
-
 var _ Ostree = (*dryrunOstree)(nil)
 
 type dryrunOstree struct{}
@@ -122,12 +134,6 @@ func (d *dryrunOstree) DoesRefExists(ref string) (bool, error) {
 	return false, nil
 }
 
-func (d *dryrunOstree) UpdateSummary() error {
-	klog.InfoS("DRY RUN OSTREE: Updating ostree repository summary")
-	return nil
-}
-
-// ExtractCommit implements Ostree.
 func (d *dryrunOstree) ExtractCommit(path string) error {
 	klog.InfoS("DRY RUN OSTREE: Extracting commit to the repository", "repo", "", "commit", path)
 	return nil
