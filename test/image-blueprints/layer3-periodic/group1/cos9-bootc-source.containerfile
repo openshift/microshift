@@ -1,3 +1,4 @@
+#FROM registry-proxy.engineering.redhat.com/rh-osbs/rhel9-rhel_bootc:rhel-9.4
 FROM quay.io/centos-bootc/centos-bootc:stream9
 
 # Build arguments with default values
@@ -17,40 +18,19 @@ gpgcheck=0
 skip_if_unavailable=0
 EOF
 
-# The openvswitch3.1 dependency
-RUN cat > "/etc/yum.repos.d/openvswitch2-rpms.repo" <<EOF
-[sig-nfv]
-name=CentOS Stream 9 - SIG NFV
-baseurl=http://mirror.stream.centos.org/SIGs/9-stream/nfv/\$basearch/openvswitch-2/
-gpgcheck=1
+# OpenShift Mirror beta RPM repository
+# Only the released previous minor version is guaranteed to be available
+# TODO: make repository y-ver dynamic
+RUN cat > "/etc/yum.repos.d/openshift-mirror-beta.repo" <<EOF
+[openshift-mirror-beta]
+name=OpenShift Mirror Beta Repository
+baseurl=https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.15-el9-beta/
 enabled=1
+gpgcheck=0
 skip_if_unavailable=0
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-NFV
 EOF
 
-# The openshift-client dependency from OpenShift Mirror
-# Only the released previous minor version is guaranteed to be available
-# Note: Do not remove the trailing slash in the URL or some downloads
-# may fail depending on a region
-# TODO: Make the y-ver dynamic
-RUN bash -c '\
-    OCPVERSION=4.15 ; \
-    OCC_SRC="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/${OCPVERSION}-el9-beta/" ; \
-    OCC_LOC="$(mktemp -d /tmp/openshift-client-XXXXXXXX)" ; \
-    dnf install -y wget &&  \
-    wget -r -nd -l 1 -A "openshift-clients-${OCPVERSION}*.rpm" -P "${OCC_LOC}" "${OCC_SRC}" && \
-    ls -l "${OCC_LOC}"/ && \
-    dnf localinstall -y "${OCC_LOC}"/*.rpm && \
-    rm -rf "${OCC_LOC}" \
-'
-
-# The crio dependency from OKD copr repository
-# - Install the NFV package certificate
-# - Install and enable MicroShift
-# - Clean up the copied repository
-RUN bash -c 'dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"' && \
-    dnf install -y centos-release-nfv-common && \
-    dnf install -y microshift && \
+RUN dnf install -y vi microshift && \
     systemctl enable microshift.service && \
     rm -rf $MICROSHIFT_REPO_PATH && \
     dnf clean all
