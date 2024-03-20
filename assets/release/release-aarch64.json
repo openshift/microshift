@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "4.16.0-0.nightly-arm64-2024-03-13-041907"
+    "base": "4.16.0-0.nightly-arm64-2024-03-19-230218"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:50269cc837068c349985e5d7fd5d04960dd9a41d60e546aad7be1aa1fad8c2dc",
@@ -8,9 +8,9 @@
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0604edb6fa59f12753d16bb3c2f481b29f8ccdf09280ff6cbfe3b658ffe9a514",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9ab208049a53ade7d06e8ea3f676331ab66255aa46cf535da84a5651c00a7e88",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
-    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:001b36c22502c4690b9cbdce56a544b345be61d1cea1486bd298b29a826a6fef",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8544a049e783ff4273848fa2861ee83c79c5261ff7d4d67c17428fba6f09dca3",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:599de1b06d0d43e9f6bd07195352f891dd281ace8ef54c871227dfec5c8d7b7d",
+    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:297a87dadabda7fbd9fe32c9d90cbb8f518763cbdf41f3d49fe023b6a7da8c02",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3e3d1c6964480c36ed94689f1effb0671847f05f015f3312830e2452003a5775",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f034eda7cb24f562cd4a18e8d316306f9d0a10750058042c52acde52631991f7",
     "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel9@sha256:ce0c78c2867fb0b73c4911ae6afd5aaf9a413480cfcf4f31f46f2387c3df97e0",
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:95691c21198e20d11777d592806fa00c018c17443d9b3aee853891dac6090470",
     "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:98ad03919da81c910aaa8a4f12fcae3048f2119735aeb7ca5271f7c16cf5e4e6",
