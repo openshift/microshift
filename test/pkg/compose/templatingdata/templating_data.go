@@ -1,5 +1,12 @@
 package templatingdata
 
+import (
+	"strings"
+	"text/template"
+
+	"k8s.io/klog/v2"
+)
+
 // TemplatingData contains all values needed for templating Composer's Sources & Blueprints,
 // and other templated artifacts within a MicroShift's test harness.
 type TemplatingData struct {
@@ -58,4 +65,30 @@ type Release struct {
 	// Currently only for local repositories.
 	// TODO: Extend to remote for local image mirroring.
 	Images []string
+}
+
+func (td *TemplatingData) Template(name, data string) (string, error) {
+	klog.InfoS("Templating input text", "template", name, "preTemplating", data)
+
+	funcs := map[string]any{
+		"hasPrefix": strings.HasPrefix,
+	}
+
+	tpl, err := template.New(name).Funcs(funcs).Parse(data)
+	if err != nil {
+		klog.ErrorS(err, "Failed to parse template file", "template", name)
+		return "", err
+	}
+
+	b := &strings.Builder{}
+	err = tpl.Execute(b, td)
+	if err != nil {
+		klog.ErrorS(err, "Executing template failed", "template", name)
+		return "", err
+	}
+
+	result := b.String()
+	klog.InfoS("Templating successful", "template", name, "postTemplating", result)
+
+	return result, nil
 }
