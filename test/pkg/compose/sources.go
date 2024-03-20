@@ -10,6 +10,7 @@ import (
 	"text/template"
 
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
+	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
 	"github.com/openshift/microshift/test/pkg/testutil"
 
 	"k8s.io/klog/v2"
@@ -17,11 +18,11 @@ import (
 
 type SourceConfigurer struct {
 	composer    helpers.Composer
-	tplData     *TemplatingData
+	tplData     *templatingdata.TemplatingData
 	composeOpts *ComposeOpts
 }
 
-func NewSourceConfigurer(composer helpers.Composer, tplData *TemplatingData, composeOpts *ComposeOpts) *SourceConfigurer {
+func NewSourceConfigurer(composer helpers.Composer, tplData *templatingdata.TemplatingData, composeOpts *ComposeOpts) *SourceConfigurer {
 	return &SourceConfigurer{
 		composer:    composer,
 		tplData:     tplData,

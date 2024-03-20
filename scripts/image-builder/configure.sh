@@ -24,6 +24,8 @@ fi
      containernetworking-plugins expect"
 
 sudo systemctl enable osbuild-composer.socket --now
+sudo usermod -a -G weldr "$(whoami)"
+
 sudo systemctl enable cockpit.socket --now
 sudo firewall-cmd --add-service=cockpit --permanent
 
