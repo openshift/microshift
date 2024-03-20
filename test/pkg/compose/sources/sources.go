@@ -44,6 +44,8 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		}
 		data := string(dataBytes)
 
+		// Get source name/id directly from the TOML file to not operate on assumption
+		// that filename without extension is name of the composer Source.
 		name, err := testutil.GetTOMLFieldValue(data, "id")
 		if err != nil {
 			return err
@@ -78,7 +80,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 			return nil
 		}
 
-		klog.InfoS("Adding source", "name", name)
+		klog.InfoS("Adding source to the composer", "name", name)
 		if err := sc.Opts.Composer.AddSource(result); err != nil {
 			klog.ErrorS(err, "Adding composer source failed")
 			return err

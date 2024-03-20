@@ -34,6 +34,8 @@ type BlueprintBuild struct {
 }
 
 func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) {
+	klog.InfoS("Constructing BlueprintBuild", "path", path)
+
 	filename := filepath.Base(path)
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 	dir := filepath.Dir(path)
@@ -43,11 +45,16 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 		return nil, fmt.Errorf("failed to read %s: %w", path, err)
 	}
 	data := string(dataBytes)
+
+	// Get `name` directly from the TOML file to not operate on assumption
+	// that filename without extension is name of the blueprint.
+	// Also, if we template the whole file and it ends up blank we cannot get the name.
 	name, err := testutil.GetTOMLFieldValue(data, "name")
 	if err != nil {
 		return nil, fmt.Errorf("failed to obtain value of field %q in file %q", "name", path)
 	}
 
+	// If name has contains templating syntax, it needs to be templated to get true name
 	if strings.Contains(name, "{{") {
 		nameTpl, err := template.New(fmt.Sprintf("name-of-%s", filename)).Parse(name)
 		if err != nil {
