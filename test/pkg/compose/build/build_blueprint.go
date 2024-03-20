@@ -12,6 +12,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/testutil"
 
 	"golang.org/x/sync/errgroup"
@@ -23,10 +24,13 @@ var _ Build = (*BlueprintBuild)(nil)
 type BlueprintBuild struct {
 	build
 	// Commit    bool // TODO: Build ISO without commit
-	Installer bool
-	Contents  string
-	Parent    string
-	Aliases   []string
+
+	Installer            bool
+	InstallerDestination string
+
+	Contents string
+	Parent   string
+	Aliases  []string
 }
 
 func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) {
@@ -90,6 +94,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 			return nil, err
 		} else if exists {
 			bb.Installer = true
+			bb.InstallerDestination = filepath.Join(opts.ArtifactsMainDir, "vm-storage", name+".iso")
 		}
 	}
 
@@ -149,11 +154,11 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 
 	eg, _ := errgroup.WithContext(context.TODO())
 
-	if refExists && !opts.Force {
-		klog.InfoS("Commit already present in the ostree repository and --force wasn't present - skipping", "blueprint", b.Name)
-	}
+	skipCommit := refExists && !opts.Force
 
-	if !refExists || opts.Force {
+	if skipCommit {
+		klog.InfoS("Commit already present in the ostree repository and --force wasn't present - skipping", "blueprint", b.Name)
+	} else {
 		eg.Go(func() error {
 			if err := b.composeCommit(opts); err != nil {
 				klog.ErrorS(err, "Composing commit failed", "blueprint", b.Name)
@@ -163,16 +168,21 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 		})
 	}
 
-	// TODO: Check if ISO exists
-
 	if b.Installer {
-		eg.Go(func() error {
-			if err := b.composeInstaller(opts); err != nil {
-				klog.ErrorS(err, "Composing installer failed", "blueprint", b.Name)
-				return err
-			}
-			return nil
-		})
+		if isoExists, err := util.PathExistsAndIsNotEmpty(b.InstallerDestination); err != nil {
+			return err
+		} else if isoExists && !opts.Force {
+			klog.InfoS("ISO installer already present in vm-storage and --force wasn't present - skipping", "blueprint", b.Name)
+		} else {
+			eg.Go(func() error {
+				// TODO: Retry
+				if err := b.composeInstaller(opts); err != nil {
+					klog.ErrorS(err, "Composing installer failed", "blueprint", b.Name)
+					return err
+				}
+				return nil
+			})
+		}
 	}
 
 	err = eg.Wait()
@@ -180,7 +190,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 		return err
 	}
 
-	if len(b.Aliases) != 0 {
+	if !skipCommit && len(b.Aliases) != 0 {
 		klog.InfoS("Adding aliases", "name", b.Name)
 		err = opts.Ostree.CreateAlias(b.Name, b.Aliases...)
 		if err != nil {
