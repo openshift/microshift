@@ -22,32 +22,55 @@ type Runner struct {
 }
 
 func (ib *Runner) Build(toBuild Plan) error {
+	klog.InfoS("Running preparation phase of all the builds in all the groups")
 	for _, group := range toBuild {
-		if err := ib.buildGroup(group); err != nil {
+		if err := ib.prepareGroup(group); err != nil {
+			return err
+		}
+	}
+	klog.InfoS("Completed preparation phase of all the builds in all the groups")
+
+	return nil
+	for _, group := range toBuild {
+		if err := ib.executeGroup(group); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (ib *Runner) buildGroup(group Group) error {
+func (ib *Runner) prepareGroup(group Group) error {
 	eg, _ := errgroup.WithContext(context.TODO())
 
-	for _, build := range group {
+	for idx, build := range group {
+		klog.InfoS("Running Prepare phase group", "index", idx)
 		build := build
 		eg.Go(func() error {
-			err := build.Execute(ib.Opts)
+			err := build.Prepare(ib.Opts)
 			if err != nil {
-				klog.ErrorS(err, "Build error")
+				klog.ErrorS(err, "Build preparation error")
 			}
 			return err
 		})
 	}
 
-	err := eg.Wait()
-	if err != nil {
-		return err
+	return eg.Wait()
+}
+
+func (ib *Runner) executeGroup(group Group) error {
+	eg, _ := errgroup.WithContext(context.TODO())
+
+	for idx, build := range group {
+		klog.InfoS("Running Execute phase group", "index", idx)
+		build := build
+		eg.Go(func() error {
+			err := build.Execute(ib.Opts)
+			if err != nil {
+				klog.ErrorS(err, "Build execution error")
+			}
+			return err
+		})
 	}
 
-	return nil
+	return eg.Wait()
 }

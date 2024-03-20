@@ -128,7 +128,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 	return bb, nil
 }
 
-func (b *BlueprintBuild) Execute(opts *Opts) error {
+func (b *BlueprintBuild) Prepare(opts *Opts) error {
 	// TODO: Do we need to remove Blueprint before to adding? It's not required and it only bumps blueprint's version
 	err := opts.Composer.AddBlueprint(b.Contents)
 	if err != nil {
@@ -138,7 +138,10 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
 
+func (b *BlueprintBuild) Execute(opts *Opts) error {
 	refExists, err := opts.Ostree.DoesRefExists(b.Name)
 	if err != nil {
 		return err
