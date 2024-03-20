@@ -195,11 +195,7 @@ func (b *BlueprintBuild) composeCommit(opts *Opts) error {
 	start := time.Now()
 	klog.InfoS("Starting commit compose procedure", "blueprint", b.Name)
 
-	if b.Parent == "" {
-		commitID, err = opts.Composer.StartOSTreeCompose(b.Name, "edge-commit", b.Name, "", "", 0)
-	} else {
-		commitID, err = opts.Composer.StartOSTreeCompose(b.Name, "edge-commit", b.Name, b.Parent, "http://127.0.0.1:8080/repo", 0)
-	}
+	commitID, err = opts.Composer.StartOSTreeCompose(b.Name, "edge-commit", b.Name, b.Parent)
 	if err != nil {
 		return err
 	}
@@ -234,7 +230,7 @@ func (b *BlueprintBuild) composeInstaller(opts *Opts) error {
 	start := time.Now()
 	klog.InfoS("Starting installer compose procedure", "blueprint", b.Name)
 
-	installerID, err := opts.Composer.StartCompose(b.Name, "image-installer", 0)
+	installerID, err := opts.Composer.StartCompose(b.Name, "image-installer")
 	if err != nil {
 		return err
 	}
