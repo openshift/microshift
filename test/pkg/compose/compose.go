@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/compose/build"
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/compose/sources"
@@ -20,6 +21,8 @@ var (
 	artifactsMainDir       string
 
 	templatingDataFragmentFilepath string
+
+	hostIP string
 
 	force           bool
 	dryRun          bool
@@ -42,6 +45,11 @@ func NewComposeCmd() *cobra.Command {
 			microShiftRepoRootPath = filepath.Join(testDirAbs, "..")
 			artifactsMainDir = filepath.Join(microShiftRepoRootPath, "_output", "test-images")
 
+			hostIP, err = util.GetHostIP("")
+			if err != nil {
+				return err
+			}
+
 			return nil
 		},
 	}
@@ -58,7 +66,7 @@ func NewComposeCmd() *cobra.Command {
 			composer = helpers.NewDryRunComposer()
 		} else {
 			ostree = helpers.NewOstree(filepath.Join(artifactsMainDir, "repo"))
-			composer = helpers.NewComposer(testDirPath)
+			composer = helpers.NewComposer(testDirPath, fmt.Sprintf("http://%s:8080/repo", hostIP))
 		}
 
 		td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{

@@ -21,8 +21,8 @@ type Composer interface {
 	AddBlueprint(toml string) error
 	DepsolveBlueprint(name string) error
 
-	StartOSTreeCompose(blueprint, composeType, ref, parent, url string, size uint) (string, error)
-	StartCompose(blueprint, composeType string, size uint) (string, error)
+	StartOSTreeCompose(blueprint, composeType, ref, parent string) (string, error)
+	StartCompose(blueprint, composeType string) (string, error)
 
 	WaitForCompose(id, friendlyName string, timeout time.Duration) error
 
@@ -34,14 +34,16 @@ type Composer interface {
 var _ Composer = (*composer)(nil)
 
 type composer struct {
-	client       weldr.Client
-	artifactsDir string
+	client        weldr.Client
+	artifactsDir  string
+	ostreeRepoURL string
 }
 
-func NewComposer(testDirPath string) Composer {
+func NewComposer(testDirPath string, ostreeRepoURL string) Composer {
 	return &composer{
-		client:       weldr.InitClientUnixSocket(context.Background(), 1, "/run/weldr/api.socket"),
-		artifactsDir: filepath.Join(testDirPath, "..", "_output", "test-images"),
+		client:        weldr.InitClientUnixSocket(context.Background(), 1, "/run/weldr/api.socket"),
+		artifactsDir:  filepath.Join(testDirPath, "..", "_output", "test-images"),
+		ostreeRepoURL: ostreeRepoURL,
 	}
 }
 
@@ -118,9 +120,13 @@ func (c *composer) DepsolveBlueprint(name string) error {
 	return nil
 }
 
-func (c *composer) StartOSTreeCompose(blueprint, composeType, ref, parent, url string, size uint) (string, error) {
+func (c *composer) StartOSTreeCompose(blueprint, composeType, ref, parent string) (string, error) {
+	url := ""
+	if parent != "" {
+		url = c.ostreeRepoURL
+	}
 	klog.InfoS("Starting ostree compose", "blueprint", blueprint, "type", composeType, "ref", ref, "parent", parent, "url", url)
-	id, apiResponse, err := c.client.StartOSTreeCompose(blueprint, composeType, ref, parent, url, size)
+	id, apiResponse, err := c.client.StartOSTreeCompose(blueprint, composeType, ref, parent, url, 0)
 	if err != nil {
 		return "", fmt.Errorf("error starting ostree compose: %w", err)
 	}
@@ -132,9 +138,9 @@ func (c *composer) StartOSTreeCompose(blueprint, composeType, ref, parent, url s
 	return id, nil
 }
 
-func (c *composer) StartCompose(blueprint, composeType string, size uint) (string, error) {
+func (c *composer) StartCompose(blueprint, composeType string) (string, error) {
 	klog.InfoS("Starting compose", "blueprint", blueprint, "type", composeType)
-	id, apiResponse, err := c.client.StartCompose(blueprint, composeType, size)
+	id, apiResponse, err := c.client.StartCompose(blueprint, composeType, 0)
 	if err != nil {
 		return "", fmt.Errorf("error starting ostree compose: %w", err)
 	}

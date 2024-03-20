@@ -47,8 +47,8 @@ func (c *dryrunComposer) DepsolveBlueprint(name string) error {
 	return nil
 }
 
-func (c *dryrunComposer) StartOSTreeCompose(blueprint, composeType, ref, parent, url string, size uint) (string, error) {
-	klog.InfoS("DRYRUN: Starting ostree compose", "blueprint", blueprint, "type", composeType, "ref", ref, "parent", parent, "url", url)
+func (c *dryrunComposer) StartOSTreeCompose(blueprint, composeType, ref, parent string) (string, error) {
+	klog.InfoS("DRYRUN: Starting ostree compose", "blueprint", blueprint, "type", composeType, "ref", ref, "parent", parent)
 	return "dummy-dry-run-id", nil
 }
 
@@ -67,7 +67,7 @@ func (c *dryrunComposer) SaveComposeMetadata(id string, friendlyName string) err
 	return nil
 }
 
-func (c *dryrunComposer) StartCompose(blueprint string, composeType string, size uint) (string, error) {
+func (c *dryrunComposer) StartCompose(blueprint string, composeType string) (string, error) {
 	klog.InfoS("DRYRUN: Starting compose", "blueprint", blueprint, "type", composeType)
 	return "dummy-dry-run-id", nil
 }
