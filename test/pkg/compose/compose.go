@@ -32,7 +32,7 @@ var (
 
 func NewComposeCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "compose target",
+		Use:   "compose targets...",
 		Short: "",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			testDir := cmd.Flag("test-dir").Value.String()
@@ -55,7 +55,7 @@ func NewComposeCmd() *cobra.Command {
 	}
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		if len(args) != 1 {
+		if len(args) == 0 {
 			return fmt.Errorf("argument must be provided")
 		}
 
@@ -97,9 +97,14 @@ func NewComposeCmd() *cobra.Command {
 			},
 		}
 
-		buildPath := filepath.Join(testDirPath, args[0])
-		buildPath = strings.TrimLeft(strings.ReplaceAll(buildPath, blueprintsPath, ""), "/")
-		toBuild, err := buildPlanner.ConstructBuildTree(buildPath)
+		buildPaths := []string{}
+		for _, arg := range args {
+			// As a result of using os.DirFS starting at ./test/image-blueprints these paths need to be carefully crafted
+			buildPath := filepath.Join(testDirPath, arg)
+			buildPath = strings.TrimLeft(strings.ReplaceAll(buildPath, blueprintsPath, ""), "/")
+			buildPaths = append(buildPaths, buildPath)
+		}
+		toBuild, err := buildPlanner.ConstructBuildTree(buildPaths)
 		if err != nil {
 			return err
 		}
