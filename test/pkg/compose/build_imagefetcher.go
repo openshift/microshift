@@ -2,12 +2,16 @@ package compose
 
 import (
 	"fmt"
+	"io"
 	"io/fs"
+	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
 
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
@@ -45,9 +49,50 @@ func NewImageFetcher(path string, opts *BuildOpts) (*ImageFetcher, error) {
 }
 
 func (i *ImageFetcher) Execute() error {
-	klog.InfoS("Downloading image", "name", i.Name)
-	time.Sleep(1 * time.Second)
-	klog.InfoS("Image downloaded", "name", i.Name)
+	dest := filepath.Join(i.Opts.ComposeOpts.ArtifactsMainDir, "vm-storage", i.Name+".iso")
+	tmpDest := dest + ".download"
+
+	if exists, err := util.PathExistsAndIsNotEmpty(dest); err != nil {
+		return err
+	} else if exists {
+		klog.InfoS("Image for download already exists", "path", dest)
+		if !i.Opts.ComposeOpts.Force {
+			return nil
+		}
+		klog.InfoS("Force mode: removing and re-downloading file", "path", dest)
+		if err := os.RemoveAll(dest); err != nil {
+			return fmt.Errorf("failed to remove %q: %w", dest, err)
+		}
+	}
+
+	timeout := 20 * time.Minute
+	klog.InfoS("Downloading image", "name", i.Name, "destination", dest, "timeout", timeout)
+	start := time.Now()
+
+	client := http.Client{Timeout: timeout}
+	resp, err := client.Get(i.Url)
+	if err != nil {
+		return fmt.Errorf("client.Get(%q) failed: %w", i.Url, err)
+	}
+	defer resp.Body.Close()
+
+	f, err := os.Create(tmpDest)
+	if err != nil {
+		return fmt.Errorf("failed to create file %q for downloading: %w", dest, err)
+	}
+
+	n, err := io.Copy(f, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to copy %q to %q: %w", i.Url, dest, err)
+	}
+
+	err = os.Rename(tmpDest, dest)
+	if err != nil {
+		return fmt.Errorf("failed to rename %q to %q: %w", tmpDest, dest, err)
+	}
+
+	klog.InfoS("Downloaded image", "destination", dest, "url", i.Url, "sizeMB", n/1_048_576, "duration", time.Since(start))
+
 	return nil
 }
 
