@@ -115,7 +115,7 @@ func NewComposeCmd() *cobra.Command {
 			buildPath = strings.TrimLeft(strings.ReplaceAll(buildPath, blueprintsPath, ""), "/")
 			buildPaths = append(buildPaths, buildPath)
 		}
-		toBuild, err := buildPlanner.ConstructBuildTree(buildPaths)
+		toBuild, err := buildPlanner.CreateBuildPlan(buildPaths)
 		if err != nil {
 			return err
 		}

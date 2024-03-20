@@ -24,6 +24,8 @@ type ImageFetcher struct {
 }
 
 func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
+	klog.InfoS("Constructing ImageFetcher", "path", path)
+
 	filename := filepath.Base(path)
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 

@@ -33,7 +33,7 @@ type Planner struct {
 	Opts *PlannerOpts
 }
 
-func (b *Planner) ConstructBuildTree(paths []string) (Plan, error) {
+func (b *Planner) CreateBuildPlan(paths []string) (Plan, error) {
 	var toBuild Plan
 
 	for _, path := range paths {
@@ -63,13 +63,13 @@ func (b *Planner) ConstructBuildTree(paths []string) (Plan, error) {
 		}
 	}
 
-	klog.InfoS("Constructed BuildRequest", "groups", len(toBuild), "build-request", toBuild)
+	klog.InfoS("Constructed build plan", "groups", len(toBuild), "build-request", toBuild)
 
 	return toBuild, nil
 }
 
 func (b *Planner) layer(path string) (Plan, error) {
-	klog.InfoS("Constructing BuildTree of the layer", "path", path)
+	klog.InfoS("Constructing build plan from provided blueprint layer", "path", path)
 
 	entries, err := fs.ReadDir(b.Opts.Filesys, path)
 	if err != nil {
@@ -92,7 +92,7 @@ func (b *Planner) layer(path string) (Plan, error) {
 }
 
 func (b *Planner) group(path string) (Group, error) {
-	klog.InfoS("Constructing BuiltTree of the group", "path", path)
+	klog.InfoS("Constructing build group from provided blueprint group", "path", path)
 
 	entries, err := fs.ReadDir(b.Opts.Filesys, path)
 	if err != nil {
@@ -117,6 +117,8 @@ func (b *Planner) group(path string) (Group, error) {
 }
 
 func (b *Planner) file(path string) (Build, error) {
+	klog.InfoS("Constructing build", "path", path)
+
 	filename := filepath.Base(path)
 
 	if b.Opts.SourceOnly && !strings.Contains(filename, "source") {
