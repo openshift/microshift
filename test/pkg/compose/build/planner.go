@@ -1,4 +1,4 @@
-package compose
+package build
 
 import (
 	"fmt"
@@ -10,22 +10,13 @@ import (
 	"k8s.io/klog/v2"
 )
 
-type Build interface {
-	Execute(*BuildOpts) error
-}
+// Group is a collection of Builds than can run in parallel
+type Group []Build
 
-type build struct {
-	Name string
-	Path string
-}
+// Plan is collection of BuildGroups that run sequentially
+type Plan []Group
 
-// BuildGroup is a collection of Builds than can run in parallel
-type BuildGroup []Build
-
-// BuildPlan is collection of BuildGroups that run sequentially
-type BuildPlan []BuildGroup
-
-type BuildPlanOpts struct {
+type PlannerOpts struct {
 	// Filesys is filesystem used to obtain files by given path.
 	Filesys fs.FS
 
@@ -38,12 +29,12 @@ type BuildPlanOpts struct {
 	ArtifactsMainDir string
 }
 
-type BuildPlanner struct {
-	Opts *BuildPlanOpts
+type Planner struct {
+	Opts *PlannerOpts
 }
 
-func (b *BuildPlanner) ConstructBuildTree(path string) (BuildPlan, error) {
-	var toBuild BuildPlan
+func (b *Planner) ConstructBuildTree(path string) (Plan, error) {
+	var toBuild Plan
 
 	base := filepath.Base(path)
 	if strings.Contains(base, "layer") {
@@ -56,13 +47,13 @@ func (b *BuildPlanner) ConstructBuildTree(path string) (BuildPlan, error) {
 		if grp, err := b.group(path); err != nil {
 			return nil, err
 		} else {
-			toBuild = BuildPlan{grp}
+			toBuild = Plan{grp}
 		}
 	} else if strings.Contains(base, ".toml") || strings.Contains(base, ".image-fetcher") {
 		if build, err := b.file(path); err != nil {
 			return nil, err
 		} else if build != nil {
-			toBuild = BuildPlan{BuildGroup{build}}
+			toBuild = Plan{Group{build}}
 		}
 	} else if strings.Contains(base, ".image-installer") || strings.Contains(base, ".alias") {
 		return nil, fmt.Errorf("passing .image-installer or .alias files directly is not supported - only .toml and .image-fetcher file are supported")
@@ -75,7 +66,7 @@ func (b *BuildPlanner) ConstructBuildTree(path string) (BuildPlan, error) {
 	return toBuild, nil
 }
 
-func (b *BuildPlanner) layer(path string) (BuildPlan, error) {
+func (b *Planner) layer(path string) (Plan, error) {
 	klog.InfoS("Constructing BuildTree of the layer", "path", path)
 
 	entries, err := fs.ReadDir(b.Opts.Filesys, path)
@@ -83,7 +74,7 @@ func (b *BuildPlanner) layer(path string) (BuildPlan, error) {
 		return nil, err
 	}
 
-	toBuild := make(BuildPlan, 0, len(entries))
+	toBuild := make(Plan, 0, len(entries))
 
 	for _, e := range entries {
 		if e.IsDir() && strings.HasPrefix(e.Name(), "group") {
@@ -98,7 +89,7 @@ func (b *BuildPlanner) layer(path string) (BuildPlan, error) {
 	return toBuild, nil
 }
 
-func (b *BuildPlanner) group(path string) (BuildGroup, error) {
+func (b *Planner) group(path string) (Group, error) {
 	klog.InfoS("Constructing BuiltTree of the group", "path", path)
 
 	entries, err := fs.ReadDir(b.Opts.Filesys, path)
@@ -106,7 +97,7 @@ func (b *BuildPlanner) group(path string) (BuildGroup, error) {
 		return nil, err
 	}
 
-	toBuild := make(BuildGroup, 0, len(entries))
+	toBuild := make(Group, 0, len(entries))
 	for _, e := range entries {
 		entryPath := filepath.Join(path, e.Name())
 		if e.IsDir() {
@@ -123,7 +114,7 @@ func (b *BuildPlanner) group(path string) (BuildGroup, error) {
 	return toBuild, nil
 }
 
-func (b *BuildPlanner) file(path string) (Build, error) {
+func (b *Planner) file(path string) (Build, error) {
 	filename := filepath.Base(path)
 
 	if b.Opts.SourceOnly && !strings.Contains(filename, "source") {
