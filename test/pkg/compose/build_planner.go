@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
 	"k8s.io/klog/v2"
 )
 
@@ -29,7 +30,7 @@ type BuildPlanOpts struct {
 	Filesys fs.FS
 
 	// TplData is a struct used as templating input.
-	TplData *TemplatingData
+	TplData *templatingdata.TemplatingData
 
 	SourceOnly      bool
 	BuildInstallers bool

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
+	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
 	"github.com/spf13/cobra"
 )
 
@@ -64,7 +65,10 @@ func NewComposeCmd() *cobra.Command {
 			composer = helpers.NewComposer(opts.TestDirPath)
 		}
 
-		td, err := NewTemplatingData(opts)
+		td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
+			ArtifactsMainDir:               opts.ArtifactsMainDir,
+			TemplatingDataFragmentFilepath: opts.TemplatingDataFragmentFilepath,
+		})
 		if err != nil {
 			return err
 		}
@@ -126,7 +130,10 @@ func templatingDataSubCmd() *cobra.Command {
 		Use:   "templating-data",
 		Short: "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			td, err := NewTemplatingData(opts)
+			td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
+				ArtifactsMainDir:               opts.ArtifactsMainDir,
+				TemplatingDataFragmentFilepath: opts.TemplatingDataFragmentFilepath,
+			})
 			if err != nil {
 				return err
 			}
