@@ -1,4 +1,4 @@
-package compose
+package build
 
 import (
 	"context"
@@ -29,7 +29,7 @@ type BlueprintBuild struct {
 	Aliases   []string
 }
 
-func NewBlueprintBuild(path string, opts *BuildPlanOpts) (*BlueprintBuild, error) {
+func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) {
 	filename := filepath.Base(path)
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 	dir := filepath.Dir(path)
@@ -128,7 +128,7 @@ func NewBlueprintBuild(path string, opts *BuildPlanOpts) (*BlueprintBuild, error
 	return bb, nil
 }
 
-func (b *BlueprintBuild) Execute(opts *BuildOpts) error {
+func (b *BlueprintBuild) Execute(opts *Opts) error {
 	// TODO: Do we need to remove Blueprint before to adding? It's not required and it only bumps blueprint's version
 	err := opts.Composer.AddBlueprint(b.Contents)
 	if err != nil {
@@ -188,7 +188,7 @@ func (b *BlueprintBuild) Execute(opts *BuildOpts) error {
 	return nil
 }
 
-func (b *BlueprintBuild) composeCommit(opts *BuildOpts) error {
+func (b *BlueprintBuild) composeCommit(opts *Opts) error {
 	var commitID string
 	var err error
 
@@ -225,7 +225,7 @@ func (b *BlueprintBuild) composeCommit(opts *BuildOpts) error {
 	return nil
 }
 
-func (b *BlueprintBuild) composeInstaller(opts *BuildOpts) error {
+func (b *BlueprintBuild) composeInstaller(opts *Opts) error {
 	installerID, err := opts.Composer.StartCompose(b.Name, "image-installer", 0)
 	if err != nil {
 		return err

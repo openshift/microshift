@@ -1,4 +1,4 @@
-package compose
+package build
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type BuildOpts struct {
+type Opts struct {
 	Composer helpers.Composer
 	Ostree   helpers.Ostree
 
@@ -16,11 +16,11 @@ type BuildOpts struct {
 	ArtifactsMainDir string
 }
 
-type BuildRunner struct {
-	Opts *BuildOpts
+type Runner struct {
+	Opts *Opts
 }
 
-func (ib *BuildRunner) Build(toBuild BuildPlan) error {
+func (ib *Runner) Build(toBuild Plan) error {
 	for _, group := range toBuild {
 		if err := ib.buildGroup(group); err != nil {
 			return err
@@ -29,7 +29,7 @@ func (ib *BuildRunner) Build(toBuild BuildPlan) error {
 	return nil
 }
 
-func (ib *BuildRunner) buildGroup(group BuildGroup) error {
+func (ib *Runner) buildGroup(group Group) error {
 	eg, _ := errgroup.WithContext(context.TODO())
 
 	for _, build := range group {

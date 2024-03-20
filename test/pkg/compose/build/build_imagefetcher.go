@@ -1,4 +1,4 @@
-package compose
+package build
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ type ImageFetcher struct {
 	Destination string
 }
 
-func NewImageFetcher(path string, opts *BuildPlanOpts) (*ImageFetcher, error) {
+func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
 	filename := filepath.Base(path)
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 
@@ -51,7 +51,7 @@ func NewImageFetcher(path string, opts *BuildPlanOpts) (*ImageFetcher, error) {
 	}, nil
 }
 
-func (i *ImageFetcher) Execute(opts *BuildOpts) error {
+func (i *ImageFetcher) Execute(opts *Opts) error {
 	if opts.DryRun {
 		klog.InfoS("DRY RUN: Downloaded image", "name", i.Name)
 		return nil

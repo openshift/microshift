@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/openshift/microshift/test/pkg/compose/build"
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/compose/sources"
 	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
@@ -84,8 +85,8 @@ func NewComposeCmd() *cobra.Command {
 		}
 
 		blueprintsPath := filepath.Join(opts.TestDirPath, "image-blueprints")
-		buildPlanner := BuildPlanner{
-			Opts: &BuildPlanOpts{
+		buildPlanner := build.Planner{
+			Opts: &build.PlannerOpts{
 				Filesys:          os.DirFS(blueprintsPath),
 				TplData:          td,
 				SourceOnly:       opts.SourceOnly,
@@ -101,8 +102,8 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
-		builder := BuildRunner{
-			Opts: &BuildOpts{
+		builder := build.Runner{
+			Opts: &build.Opts{
 				Composer:         composer,
 				Ostree:           ostree,
 				Force:            opts.Force,
