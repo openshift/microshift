@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-	"strings"
-	"text/template"
 
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
@@ -51,21 +49,10 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 			return err
 		}
 
-		funcs := map[string]any{"hasPrefix": strings.HasPrefix}
-		tpl, err := template.New(name).Funcs(funcs).Parse(data)
+		result, err := sc.Opts.TplData.Template(name, data)
 		if err != nil {
-			klog.ErrorS(err, "Failed to parse template file", "template", name, "filepath", path)
 			return err
 		}
-
-		b := &strings.Builder{}
-		err = tpl.Execute(b, sc.Opts.TplData)
-		if err != nil {
-			klog.ErrorS(err, "Executing template failed", "template", path)
-			return err
-		}
-		result := b.String()
-		klog.InfoS("Template templatized", "name", name, "result", result)
 
 		if len(result) == 0 {
 			if slices.Contains(existingSources, name) {

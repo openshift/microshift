@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/openshift/microshift/pkg/util"
@@ -56,24 +55,15 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 
 	// If name has contains templating syntax, it needs to be templated to get true name
 	if strings.Contains(name, "{{") {
-		nameTpl, err := template.New(fmt.Sprintf("name-of-%s", filename)).Parse(name)
+		name, err = opts.TplData.Template(fmt.Sprintf("name-of-%s", filename), name)
 		if err != nil {
-			return nil, fmt.Errorf("failed to template name of %q: %q", filename, name)
+			return nil, err
 		}
-		templatedName := strings.Builder{}
-		if err := nameTpl.Execute(&templatedName, opts.TplData); err != nil {
-			return nil, fmt.Errorf("failed to execute template %q: %w", name, err)
-		}
-		name = templatedName.String()
 	}
 
-	tpl, err := template.New(name).Parse(data)
+	templatedData, err := opts.TplData.Template(name, data)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse template %s: %w", "", err)
-	}
-	templatedData := strings.Builder{}
-	if err := tpl.Execute(&templatedData, opts.TplData); err != nil {
-		return nil, fmt.Errorf("failed to execute template %q: %w", path, err)
+		return nil, err
 	}
 
 	bb := &BlueprintBuild{
@@ -81,7 +71,8 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 			Name: name,
 			Path: path,
 		},
-		Contents: templatedData.String()}
+		Contents: templatedData,
+	}
 
 	// blueprint.alias file contains aliases for commit defined in blueprint.toml
 	potentialAliasFile := fmt.Sprintf("%s.alias", withoutExt)

@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/openshift/microshift/pkg/util"
@@ -34,13 +33,9 @@ func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
 		return nil, fmt.Errorf("failed to read %s: %w", path, err)
 	}
 
-	tpl, err := template.New(withoutExt).Parse(string(dataBytes))
+	templatedData, err := opts.TplData.Template(filename, string(dataBytes))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse template %s: %w", "", err)
-	}
-	templatedData := strings.Builder{}
-	if err := tpl.Execute(&templatedData, opts.TplData); err != nil {
-		return nil, fmt.Errorf("failed to execute template %q: %w", path, err)
+		return nil, err
 	}
 
 	return &ImageFetcher{
@@ -48,7 +43,7 @@ func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
 			Name: withoutExt,
 			Path: path,
 		},
-		Url:         templatedData.String(),
+		Url:         templatedData,
 		Destination: filepath.Join(opts.ArtifactsMainDir, "vm-storage", withoutExt+".iso"),
 	}, nil
 }
