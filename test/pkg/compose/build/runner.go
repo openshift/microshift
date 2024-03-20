@@ -5,6 +5,7 @@ import (
 
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"golang.org/x/sync/errgroup"
+	"k8s.io/klog/v2"
 )
 
 type Opts struct {
@@ -34,7 +35,13 @@ func (ib *Runner) buildGroup(group Group) error {
 
 	for _, build := range group {
 		build := build
-		eg.Go(func() error { return build.Execute(ib.Opts) })
+		eg.Go(func() error {
+			err := build.Execute(ib.Opts)
+			if err != nil {
+				klog.ErrorS(err, "Build error")
+			}
+			return err
+		})
 	}
 
 	err := eg.Wait()
