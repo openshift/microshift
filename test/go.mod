@@ -2,8 +2,14 @@ module github.com/openshift/microshift/test
 
 go 1.21.3
 
+require github.com/openshift/microshift v0.0.0
+
+replace (
+	github.com/openshift/microshift => ../
+	github.com/openshift/microshift/pkg/util => ../pkg/util
+)
+
 require (
-	github.com/openshift/microshift v0.0.0-20240320090712-d4ee06678732
 	github.com/osbuild/weldr-client/v2 v2.0.0-20240312082831-2b01b2b0a13b
 	github.com/spf13/cobra v1.8.0
 	golang.org/x/sync v0.6.0
