@@ -1,4 +1,4 @@
-package compose
+package sources
 
 import (
 	"fmt"
@@ -16,27 +16,23 @@ import (
 	"k8s.io/klog/v2"
 )
 
-type SourceConfigurer struct {
-	composer    helpers.Composer
-	tplData     *templatingdata.TemplatingData
-	composeOpts *ComposeOpts
+type SourceConfigurerOpts struct {
+	Composer    helpers.Composer
+	TplData     *templatingdata.TemplatingData
+	TestDirPath string
 }
 
-func NewSourceConfigurer(composer helpers.Composer, tplData *templatingdata.TemplatingData, composeOpts *ComposeOpts) *SourceConfigurer {
-	return &SourceConfigurer{
-		composer:    composer,
-		tplData:     tplData,
-		composeOpts: composeOpts,
-	}
+type SourceConfigurer struct {
+	Opts *SourceConfigurerOpts
 }
 
 func (sc *SourceConfigurer) ConfigureSources() error {
-	existingSources, err := sc.composer.ListSources()
+	existingSources, err := sc.Opts.Composer.ListSources()
 	if err != nil {
 		return err
 	}
 
-	sourcesDir := filepath.Join(sc.composeOpts.TestDirPath, "package-sources")
+	sourcesDir := filepath.Join(sc.Opts.TestDirPath, "package-sources")
 	err = filepath.Walk(sourcesDir, func(path string, fileInfo fs.FileInfo, _ error) error {
 		if fileInfo.IsDir() {
 			return nil
@@ -61,7 +57,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		}
 
 		b := &strings.Builder{}
-		err = tpl.Execute(b, sc.tplData)
+		err = tpl.Execute(b, sc.Opts.TplData)
 		if err != nil {
 			klog.ErrorS(err, "Executing template failed", "template", path)
 			return err
@@ -72,7 +68,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		if len(result) == 0 {
 			if slices.Contains(existingSources, name) {
 				klog.InfoS("Template is empty but exists in composer - removing", "name", name)
-				if err := sc.composer.DeleteSource(name); err != nil {
+				if err := sc.Opts.Composer.DeleteSource(name); err != nil {
 					klog.ErrorS(err, "Deleting composer source failed")
 					return err
 				}
@@ -83,7 +79,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		}
 
 		klog.InfoS("Adding source", "name", name)
-		if err := sc.composer.AddSource(result); err != nil {
+		if err := sc.Opts.Composer.AddSource(result); err != nil {
 			klog.ErrorS(err, "Adding composer source failed")
 			return err
 		}

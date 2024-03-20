@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
+	"github.com/openshift/microshift/test/pkg/compose/sources"
 	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
 	"github.com/spf13/cobra"
 )
@@ -73,7 +74,12 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
-		if err := NewSourceConfigurer(composer, td, opts).ConfigureSources(); err != nil {
+		sourceConfigurer := sources.SourceConfigurer{Opts: &sources.SourceConfigurerOpts{
+			Composer:    composer,
+			TplData:     td,
+			TestDirPath: opts.TestDirPath,
+		}}
+		if err := sourceConfigurer.ConfigureSources(); err != nil {
 			return err
 		}
 
