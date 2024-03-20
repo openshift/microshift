@@ -14,21 +14,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type ComposeOpts struct {
-	MicroShiftRepoRootPath string
-	TestDirPath            string
-	ArtifactsMainDir       string
-
-	TemplatingDataFragmentFilepath string
-
-	Force           bool
-	DryRun          bool
-	BuildInstallers bool
-	SourceOnly      bool
-}
-
 var (
-	opts = &ComposeOpts{}
+	microShiftRepoRootPath string
+	testDirPath            string
+	artifactsMainDir       string
+
+	templatingDataFragmentFilepath string
+
+	force           bool
+	dryRun          bool
+	buildInstallers bool
+	sourceOnly      bool
 )
 
 func NewComposeCmd() *cobra.Command {
@@ -36,17 +32,15 @@ func NewComposeCmd() *cobra.Command {
 		Use:   "compose target",
 		Short: "",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// Add missing dynamic fields to the `opts`
-
 			testDir := cmd.Flag("test-dir").Value.String()
 			testDirAbs, err := filepath.Abs(testDir)
 			if err != nil {
 				return err
 			}
 
-			opts.TestDirPath = testDirAbs
-			opts.MicroShiftRepoRootPath = filepath.Join(testDirAbs, "..")
-			opts.ArtifactsMainDir = filepath.Join(opts.MicroShiftRepoRootPath, "_output", "test-images")
+			testDirPath = testDirAbs
+			microShiftRepoRootPath = filepath.Join(testDirAbs, "..")
+			artifactsMainDir = filepath.Join(microShiftRepoRootPath, "_output", "test-images")
 
 			return nil
 		},
@@ -59,17 +53,17 @@ func NewComposeCmd() *cobra.Command {
 
 		var composer helpers.Composer
 		var ostree helpers.Ostree
-		if opts.DryRun {
+		if dryRun {
 			ostree = helpers.NewDryRunOstree()
 			composer = helpers.NewDryRunComposer()
 		} else {
-			ostree = helpers.NewOstree(filepath.Join(opts.ArtifactsMainDir, "repo"))
-			composer = helpers.NewComposer(opts.TestDirPath)
+			ostree = helpers.NewOstree(filepath.Join(artifactsMainDir, "repo"))
+			composer = helpers.NewComposer(testDirPath)
 		}
 
 		td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
-			ArtifactsMainDir:               opts.ArtifactsMainDir,
-			TemplatingDataFragmentFilepath: opts.TemplatingDataFragmentFilepath,
+			ArtifactsMainDir:               artifactsMainDir,
+			TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
 		})
 		if err != nil {
 			return err
@@ -78,24 +72,24 @@ func NewComposeCmd() *cobra.Command {
 		sourceConfigurer := sources.SourceConfigurer{Opts: &sources.SourceConfigurerOpts{
 			Composer:    composer,
 			TplData:     td,
-			TestDirPath: opts.TestDirPath,
+			TestDirPath: testDirPath,
 		}}
 		if err := sourceConfigurer.ConfigureSources(); err != nil {
 			return err
 		}
 
-		blueprintsPath := filepath.Join(opts.TestDirPath, "image-blueprints")
+		blueprintsPath := filepath.Join(testDirPath, "image-blueprints")
 		buildPlanner := build.Planner{
 			Opts: &build.PlannerOpts{
 				Filesys:          os.DirFS(blueprintsPath),
 				TplData:          td,
-				SourceOnly:       opts.SourceOnly,
-				BuildInstallers:  opts.BuildInstallers,
-				ArtifactsMainDir: opts.ArtifactsMainDir,
+				SourceOnly:       sourceOnly,
+				BuildInstallers:  buildInstallers,
+				ArtifactsMainDir: artifactsMainDir,
 			},
 		}
 
-		buildPath := filepath.Join(opts.TestDirPath, args[0])
+		buildPath := filepath.Join(testDirPath, args[0])
 		buildPath = strings.TrimLeft(strings.ReplaceAll(buildPath, blueprintsPath, ""), "/")
 		toBuild, err := buildPlanner.ConstructBuildTree(buildPath)
 		if err != nil {
@@ -106,9 +100,9 @@ func NewComposeCmd() *cobra.Command {
 			Opts: &build.Opts{
 				Composer:         composer,
 				Ostree:           ostree,
-				Force:            opts.Force,
-				DryRun:           opts.DryRun,
-				ArtifactsMainDir: opts.ArtifactsMainDir,
+				Force:            force,
+				DryRun:           dryRun,
+				ArtifactsMainDir: artifactsMainDir,
 			},
 		}
 		err = builder.Build(toBuild)
@@ -119,11 +113,11 @@ func NewComposeCmd() *cobra.Command {
 		return nil
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.TemplatingDataFragmentFilepath, "templating-data", "", "Provide path to partial templating data to skip querying remote repository.")
-	cmd.PersistentFlags().BoolVarP(&opts.BuildInstallers, "build-installers", "I", true, "Build ISO image installers.")
-	cmd.PersistentFlags().BoolVarP(&opts.SourceOnly, "source-only", "s", false, "Build only source blueprints.")
-	cmd.PersistentFlags().BoolVarP(&opts.DryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
-	cmd.PersistentFlags().BoolVarP(&opts.Force, "force", "f", false, "Rebuild existing artifacts (ostree commits, ISO images)")
+	cmd.PersistentFlags().StringVar(&templatingDataFragmentFilepath, "templating-data", "", "Provide path to partial templating data to skip querying remote repository.")
+	cmd.PersistentFlags().BoolVarP(&buildInstallers, "build-installers", "I", true, "Build ISO image installers.")
+	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints.")
+	cmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
+	cmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Rebuild existing artifacts (ostree commits, ISO images)")
 
 	cmd.AddCommand(templatingDataSubCmd())
 
@@ -138,8 +132,8 @@ func templatingDataSubCmd() *cobra.Command {
 		Short: "",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
-				ArtifactsMainDir:               opts.ArtifactsMainDir,
-				TemplatingDataFragmentFilepath: opts.TemplatingDataFragmentFilepath,
+				ArtifactsMainDir:               artifactsMainDir,
+				TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
 			})
 			if err != nil {
 				return err
