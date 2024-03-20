@@ -10,13 +10,12 @@ import (
 )
 
 type Build interface {
-	Execute() error
+	Execute(*BuildOpts) error
 }
 
 type build struct {
 	Name string
 	Path string
-	Opts *BuildOpts
 }
 
 // BuildGroup is a collection of Builds than can run in parallel
@@ -25,24 +24,21 @@ type BuildGroup []Build
 // BuildPlan is collection of BuildGroups that run sequentially
 type BuildPlan []BuildGroup
 
-type BuildOpts struct {
-	ComposeOpts *ComposeOpts
-
+type BuildPlanOpts struct {
 	// Filesys is filesystem used to obtain files by given path.
 	Filesys fs.FS
 
 	// TplData is a struct used as templating input.
 	TplData *TemplatingData
 
-	// Composer is an interface to the composer remote API
-	Composer Composer
+	SourceOnly      bool
+	BuildInstallers bool
 
-	// Composer is an interface to the ostree repository
-	Ostree Ostree
+	ArtifactsMainDir string
 }
 
 type BuildPlanner struct {
-	Opts *BuildOpts
+	Opts *BuildPlanOpts
 }
 
 func (b *BuildPlanner) ConstructBuildTree(path string) (BuildPlan, error) {
@@ -129,7 +125,7 @@ func (b *BuildPlanner) group(path string) (BuildGroup, error) {
 func (b *BuildPlanner) file(path string) (Build, error) {
 	filename := filepath.Base(path)
 
-	if b.Opts.ComposeOpts.SourceOnly && !strings.Contains(filename, "source") {
+	if b.Opts.SourceOnly && !strings.Contains(filename, "source") {
 		klog.InfoS("SourceOnly mode - skipping image", "path", path)
 		return nil, nil
 	}

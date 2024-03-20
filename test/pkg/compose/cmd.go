@@ -74,12 +74,12 @@ func NewComposeCmd() *cobra.Command {
 
 		blueprintsPath := filepath.Join(opts.TestDirPath, "image-blueprints")
 		buildPlanner := BuildPlanner{
-			Opts: &BuildOpts{
-				ComposeOpts: opts,
-				Filesys:     os.DirFS(blueprintsPath),
-				TplData:     td,
-				Composer:    composer,
-				Ostree:      ostree,
+			Opts: &BuildPlanOpts{
+				Filesys:          os.DirFS(blueprintsPath),
+				TplData:          td,
+				SourceOnly:       opts.SourceOnly,
+				BuildInstallers:  opts.BuildInstallers,
+				ArtifactsMainDir: opts.ArtifactsMainDir,
 			},
 		}
 
@@ -90,7 +90,15 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
-		builder := BuildRunner{}
+		builder := BuildRunner{
+			Opts: &BuildOpts{
+				Composer:         composer,
+				Ostree:           ostree,
+				Force:            opts.Force,
+				DryRun:           opts.DryRun,
+				ArtifactsMainDir: opts.ArtifactsMainDir,
+			},
+		}
 		err = builder.Build(toBuild)
 		if err != nil {
 			return err
