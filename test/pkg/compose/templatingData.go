@@ -1,14 +1,12 @@
 package compose
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -17,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/test/pkg/testutil"
 	"k8s.io/klog/v2"
 )
 
@@ -236,7 +235,7 @@ func getReleaseFromLocalFs(repo string) (Release, error) {
 		return Release{}, err
 	}
 
-	rpmVersion, _, err := runCommand("rpm", "-q", "--queryformat", "%{version}", releaseInfoFile)
+	rpmVersion, _, err := testutil.RunCommand("rpm", "-q", "--queryformat", "%{version}", releaseInfoFile)
 	if err != nil {
 		return Release{}, err
 	}
@@ -306,7 +305,7 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 	if resp.StatusCode != 200 {
 		return Release{}, errNoRemoteRelease
 	}
-	sout, _, err := runCommand(
+	sout, _, err := testutil.RunCommand(
 		"sudo", "dnf", "repoquery", "microshift", "--quiet",
 		"--queryformat", "%{version}-%{release}",
 		"--disablerepo", "*",
@@ -325,7 +324,7 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 // getReleaseFromRHOCP looks for MicroShift RPM in RHOCP
 func getReleaseFromRHOCP(minor int) (Release, error) {
 	rhocp := fmt.Sprintf("rhocp-4.%d-for-rhel-9-%s-rpms", minor, getArch())
-	sout, _, err := runCommand("sudo", "dnf", "repoquery", "microshift",
+	sout, _, err := testutil.RunCommand("sudo", "dnf", "repoquery", "microshift",
 		"--quiet",
 		"--queryformat", "%{version}-%{release}",
 		"--repo", rhocp,
@@ -345,13 +344,13 @@ func getReleaseFromRHOCP(minor int) (Release, error) {
 // to query the repository for cri-o package
 func isRHOCPAvailable(minor int) bool {
 	repo := fmt.Sprintf("rhocp-4.%d-for-rhel-9-%s-rpms", minor, "x86_64")
-	_, _, err := runCommand("sudo", "dnf", "repository-packages", repo, "info", "cri-o")
+	_, _, err := testutil.RunCommand("sudo", "dnf", "repository-packages", repo, "info", "cri-o")
 	return err == nil
 }
 
 // getContainerImages extracts list of images from release.json file inside given release-info RPM
 func getContainerImages(releaseInfoFilePath string) ([]string, error) {
-	sout, _, err := runCommand(
+	sout, _, err := testutil.RunCommand(
 		"bash", "-c",
 		fmt.Sprintf("rpm2cpio %s | cpio  -i --to-stdout '*release-%s.json'", releaseInfoFilePath, getArch()),
 	)
@@ -372,28 +371,4 @@ func getContainerImages(releaseInfoFilePath string) ([]string, error) {
 	}
 
 	return images, nil
-}
-
-// redactOutput overwrites sensitive data when logging command outputs
-func redactOutput(output string) string {
-	rx := regexp.MustCompile("gpgkeys.*")
-	return rx.ReplaceAllString(output, "gpgkeys = REDACTED")
-}
-
-func runCommand(c ...string) (string, string, error) {
-	cmd := exec.Command(c[0], c[1:]...)
-
-	var outb, errb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &errb
-	klog.V(2).InfoS("Running command", "cmd", cmd)
-	err := cmd.Run()
-	out := strings.Trim(outb.String(), "\n")
-	serr := errb.String()
-	klog.InfoS("Command complete", "cmd", cmd, "stdout", redactOutput(out), "stderr", redactOutput(serr), "err", err)
-	if err != nil {
-		return "", "", err
-	}
-
-	return out, serr, nil
 }
