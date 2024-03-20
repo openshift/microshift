@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -53,14 +54,14 @@ func NewComposeCmd() *cobra.Command {
 			return fmt.Errorf("argument must be provided")
 		}
 
-		var composer Composer
-		var ostree Ostree
+		var composer helpers.Composer
+		var ostree helpers.Ostree
 		if opts.DryRun {
-			ostree = NewDryRunOstree()
-			composer = NewDryRunComposer()
+			ostree = helpers.NewDryRunOstree()
+			composer = helpers.NewDryRunComposer()
 		} else {
-			ostree = NewOstree(filepath.Join(opts.ArtifactsMainDir, "repo"))
-			composer = NewComposer(opts.TestDirPath)
+			ostree = helpers.NewOstree(filepath.Join(opts.ArtifactsMainDir, "repo"))
+			composer = helpers.NewComposer(opts.TestDirPath)
 		}
 
 		td, err := NewTemplatingData(opts)

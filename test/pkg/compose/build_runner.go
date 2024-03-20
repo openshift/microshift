@@ -3,12 +3,13 @@ package compose
 import (
 	"context"
 
+	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"golang.org/x/sync/errgroup"
 )
 
 type BuildOpts struct {
-	Composer Composer
-	Ostree   Ostree
+	Composer helpers.Composer
+	Ostree   helpers.Ostree
 
 	Force            bool
 	DryRun           bool

@@ -9,18 +9,19 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/testutil"
 
 	"k8s.io/klog/v2"
 )
 
 type SourceConfigurer struct {
-	composer    Composer
+	composer    helpers.Composer
 	tplData     *TemplatingData
 	composeOpts *ComposeOpts
 }
 
-func NewSourceConfigurer(composer Composer, tplData *TemplatingData, composeOpts *ComposeOpts) *SourceConfigurer {
+func NewSourceConfigurer(composer helpers.Composer, tplData *TemplatingData, composeOpts *ComposeOpts) *SourceConfigurer {
 	return &SourceConfigurer{
 		composer:    composer,
 		tplData:     tplData,
