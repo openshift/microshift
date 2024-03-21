@@ -19,4 +19,4 @@ source "${SCRIPTDIR}/common.sh"
 "${SCRIPTDIR}/start_webserver.sh"
 
 # Rebuild the images
-"${SCRIPTDIR}/build_images.sh" -s
+"${SCRIPTDIR}/microshift-tests" compose -s

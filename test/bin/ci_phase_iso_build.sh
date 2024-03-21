@@ -63,11 +63,11 @@ update_build_cache() {
         return
     fi
 
-    # Build the composer-cli base layer to be cached
-    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
+    # Build the base layer to be cached
+    #$(dry_run) ./bin/microshift-tests ./image-blueprints/layer1-base
+    $(dry_run) exec sg "weldr" "./bin/microshift-tests compose ./image-blueprints/layer1-base"
     # Build the bootc base groups to be cached
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints/layer5-bootc/group0
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints/layer5-bootc/group1
+    $(dry_run) exec sg "weldr" "./bin/microshift-tests compose ./image-blueprints/layer5-bootc/group0 ./image-blueprints/layer5-bootc/group1"
 
     # Upload the images and update the 'last' setting
     ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
@@ -88,15 +88,18 @@ run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
         # Conditional per-layer builds when running in CI.
         # The build_images.sh script skips any images that have been downloaded from the cache.
-        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
+        targets="./image-blueprints/layer1-base ./image-blueprints/layer2-presubmit"
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
-            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
+            targets="${targets} ./image-blueprints/layer3-periodic"
         fi
+
+        $(dry_run) exec sg "weldr" "./bin/microshift-tests compose ${targets}"
+        #$(dry_run) ./bin/microshift-tests ${targets}
     else
         # Fall back to full build when not running in CI
-        $(dry_run) bash -x ./bin/build_images.sh
+        #$(dry_run) ./bin/microshift-tests
+        $(dry_run) exec sg "weldr" "./bin/microshift-tests compose"
     fi
 }
 
@@ -119,6 +122,8 @@ $(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-f
 $(dry_run) bash -x ./scripts/image-builder/configure.sh
 
 cd "${ROOTDIR}/test/"
+
+go build -o ./bin/microshift-tests ./cmd
 
 # Source common.sh only after all dependencies are installed.
 # shellcheck source=test/bin/common.sh
