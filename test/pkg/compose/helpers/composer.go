@@ -53,6 +53,8 @@ func NewComposer(testDirPath string, ostreeRepoURL string) (Composer, error) {
 		return nil, err
 	}
 
+	// TODO: Check if ostree http repo is up
+
 	return &composer{
 		client:        weldr.InitClientUnixSocket(context.Background(), 1, "/run/weldr/api.socket"),
 		ostreeRepoURL: ostreeRepoURL,

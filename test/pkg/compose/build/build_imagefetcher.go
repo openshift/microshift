@@ -57,6 +57,7 @@ func (i *ImageFetcher) Execute(opts *Opts) error {
 		klog.InfoS("DRY RUN: Downloaded image", "name", i.Name)
 		return nil
 	}
+	// TODO: Retry
 
 	tmpDest := i.Destination + ".download"
 
