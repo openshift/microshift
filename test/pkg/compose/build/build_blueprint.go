@@ -158,6 +158,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 		klog.InfoS("Commit already present in the ostree repository and --force wasn't present - skipping", "blueprint", b.Name)
 	} else {
 		eg.Go(func() error {
+			// TODO: Retry
 			if err := b.composeCommit(opts); err != nil {
 				klog.ErrorS(err, "Composing commit failed", "blueprint", b.Name)
 				return err
