@@ -91,7 +91,7 @@ configure_package_sources() {
         outfile="${IMAGEDIR}/package-sources/${name}.toml"
 
         echo "Rendering ${template} to ${outfile}"
-        ${GOMPLATE} --file "${template}" >"${outfile}"
+        "${GOMPLATE}" --file "${template}" >"${outfile}"
         if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
             echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
             continue
@@ -419,6 +419,41 @@ do_group() {
 
             echo "Adding image-fetcher for ${download_file}"
             download_opts+=("${expected_iso_file} ${download_url}")
+        done
+    fi
+
+    # Run the container image builds while osbuilder is running in background
+    if ! ${COMPOSER_DRY_RUN}; then
+        for containerfile in "${groupdir}"/*.containerfile; do
+            local cf_outname
+            local cf_outdir
+            cf_outname=$(basename -s .containerfile "${containerfile}")
+            cf_outdir="${BOOTC_IMAGE_DIR}/${cf_outname}"
+
+            mkdir -p "${BOOTC_IMAGE_DIR}"
+            if [ -e "${cf_outdir}" ] ; then
+                echo "${cf_outdir} already exists"
+                if should_skip "${cf_outname}"; then
+                    record_junit "${groupdir}" "${containerfile}" "containerfile" "SKIPPED"
+                    continue
+                fi
+            fi
+
+            echo "Processing ${containerfile}"
+            # Run build in the 'rpm-repos' directory because the process may
+            # copy RPM repositories into the image to install them locally
+            podman build \
+                -t "${cf_outname}" \
+                -f "${containerfile}" \
+                "${IMAGEDIR}/rpm-repos"
+            # Export the container image to a directory in oci-dir format
+            rm -rf "${cf_outdir}"
+            podman save \
+                --format oci-dir \
+                -o "${cf_outdir}" \
+                "${cf_outname}"
+            # Delete the image to avoid duplication
+            podman rmi -f "${cf_outname}"
         done
     fi
 
