@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/testutil"
 
 	"k8s.io/klog/v2"
@@ -57,6 +58,14 @@ func (o *ostree) DoesRefExists(ref string) (bool, error) {
 
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
+
+	if exists, err := util.PathExistsAndIsNotEmpty(o.OstreeRepoPath); err != nil {
+		return false, fmt.Errorf("failed to check if ostree repo %q exists: %w", o.OstreeRepoPath, err)
+	} else if !exists {
+		// If repo doesn't exist (yet), the ref also doesn't exist
+		klog.InfoS("Ostree repository doesn't exist yet, therefore ref also doesn't exist", "ref", ref, "exists", false)
+		return false, nil
+	}
 
 	sout, _, err := testutil.RunCommand(
 		"ostree", "refs",
