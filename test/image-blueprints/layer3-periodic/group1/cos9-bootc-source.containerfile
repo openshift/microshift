@@ -1,7 +1,7 @@
-#FROM registry-proxy.engineering.redhat.com/rh-osbs/rhel9-rhel_bootc:rhel-9.4
 FROM quay.io/centos-bootc/centos-bootc:stream9
 
-# Build arguments with default values
+# Build arguments
+ARG PREVIOUS_MINOR_VERSION=15
 ARG MICROSHIFT_REPO_NAME=microshift-local
 ARG MICROSHIFT_REPO_PATH=/tmp/$MICROSHIFT_REPO_NAME
 
@@ -18,21 +18,33 @@ gpgcheck=0
 skip_if_unavailable=0
 EOF
 
-# OpenShift Mirror beta RPM repository
+# OpenShift Mirror beta RPM repository for MicroShift dependencies
 # Only the released previous minor version is guaranteed to be available
-# TODO: make repository y-ver dynamic
 RUN cat > "/etc/yum.repos.d/openshift-mirror-beta.repo" <<EOF
 [openshift-mirror-beta]
 name=OpenShift Mirror Beta Repository
-baseurl=https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.15-el9-beta/
+baseurl=https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.${PREVIOUS_MINOR_VERSION}-el9-beta/
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
 
-RUN dnf install -y vi microshift && \
-    systemctl enable microshift.service && \
+# Implement workarounds necessary for the successful MicroShift operation
+# - OVN-k copies an executable to /opt/cni/bin directory on the host, which is
+#   read-only on bootc images. Create the /opt/cni/bin -> /var/opt/cni/bin
+#   symbolic link as a workaround.
+# - The /var/run directory must be a symbolic link to /run, which is not
+#   the case in bootc images. This cases problems with services like DBus 
+#   and NetworkManager. DBus creates its socket in /run/dbus directory, which
+#   is accessed by NetworkManager at /var/run/dbus.
+RUN mkdir -p /opt/cni && mkdir -p /var/opt/cni/bin && ln -s /var/opt/cni/bin /opt/cni/ ; \
+    [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
+
+# Install MicroShift, few helper utilities and cleanup
+RUN dnf install -y vi firewalld microshift && \
+    systemctl enable microshift && \
     rm -rf $MICROSHIFT_REPO_PATH && \
+    rm -f /etc/yum.repos.d/{microshift,openshift}*.repo && \
     dnf clean all
 
 # Configure crun runtime for crio, required on CentOS 9
