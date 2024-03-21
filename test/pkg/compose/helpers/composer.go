@@ -35,16 +35,31 @@ var _ Composer = (*composer)(nil)
 
 type composer struct {
 	client        weldr.Client
-	artifactsDir  string
 	ostreeRepoURL string
+
+	logsDir   string
+	buildsDir string
 }
 
-func NewComposer(testDirPath string, ostreeRepoURL string) Composer {
+func NewComposer(testDirPath string, ostreeRepoURL string) (Composer, error) {
+	artifactsDir := filepath.Join(testDirPath, "..", "_output", "test-images")
+	logsDir := filepath.Join(artifactsDir, "build-logs")
+	buildsDir := filepath.Join(artifactsDir, "builds")
+
+	if err := os.MkdirAll(logsDir, 0755); err != nil {
+		return nil, err
+	}
+	if err := os.MkdirAll(buildsDir, 0755); err != nil {
+		return nil, err
+	}
+
 	return &composer{
 		client:        weldr.InitClientUnixSocket(context.Background(), 1, "/run/weldr/api.socket"),
-		artifactsDir:  filepath.Join(testDirPath, "..", "_output", "test-images"),
 		ostreeRepoURL: ostreeRepoURL,
-	}
+
+		logsDir:   logsDir,
+		buildsDir: buildsDir,
+	}, nil
 }
 
 func (c *composer) ListSources() ([]string, error) {
@@ -184,10 +199,10 @@ outer:
 	if infoErr != nil {
 		return fmt.Errorf("failed to marshal compose info: %w", err)
 	}
-	infoFilepath := filepath.Join(c.artifactsDir, "build-logs", friendlyName+"_info.log")
+	infoFilepath := filepath.Join(c.logsDir, friendlyName+"_info.log")
 	infoErr = os.WriteFile(infoFilepath, infoJson, 0644)
 	if infoErr != nil {
-		return fmt.Errorf("failed to write compose info to file: %w", err)
+		return fmt.Errorf("failed to write compose info to file: %w", infoErr)
 	}
 
 	if err != nil {
@@ -205,8 +220,8 @@ outer:
 func (c *composer) SaveComposeLogs(id, friendlyName string) error {
 	klog.InfoS("Saving compose logs archive", "id", id, "friendlyName", friendlyName)
 
-	archiveFilepath := filepath.Join(c.artifactsDir, "build-logs", friendlyName+".tar")
-	logFilepath := filepath.Join(c.artifactsDir, "build-logs", friendlyName+".log")
+	archiveFilepath := filepath.Join(c.logsDir, friendlyName+".tar")
+	logFilepath := filepath.Join(c.logsDir, friendlyName+".log")
 
 	err := os.RemoveAll(archiveFilepath)
 	if err != nil {
@@ -234,8 +249,8 @@ func (c *composer) SaveComposeLogs(id, friendlyName string) error {
 func (c *composer) SaveComposeMetadata(id, friendlyName string) error {
 	klog.InfoS("Getting compose metadata", "id", id, "friendlyName", friendlyName)
 
-	archiveFilepath := filepath.Join(c.artifactsDir, "build-logs", friendlyName+"_metadata.tar")
-	logFilepath := filepath.Join(c.artifactsDir, "build-logs", friendlyName+"_metadata.log")
+	archiveFilepath := filepath.Join(c.logsDir, friendlyName+"_metadata.tar")
+	logFilepath := filepath.Join(c.logsDir, friendlyName+"_metadata.log")
 
 	err := os.RemoveAll(archiveFilepath)
 	if err != nil {
@@ -263,7 +278,7 @@ func (c *composer) SaveComposeMetadata(id, friendlyName string) error {
 func (c *composer) SaveComposeImage(id, friendlyName, ext string) (string, error) {
 	klog.InfoS("Getting compose image", "id", id, "friendlyName", friendlyName, "ext", ext)
 
-	path := filepath.Join(c.artifactsDir, "builds", friendlyName+ext)
+	path := filepath.Join(c.buildsDir, friendlyName+ext)
 	err := os.RemoveAll(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to remove existing %q before downloading it: %w", path, err)

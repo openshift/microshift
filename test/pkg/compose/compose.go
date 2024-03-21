@@ -73,12 +73,16 @@ func NewComposeCmd() *cobra.Command {
 
 		var composer helpers.Composer
 		var ostree helpers.Ostree
+		var err error
 		if dryRun {
 			ostree = helpers.NewDryRunOstree()
 			composer = helpers.NewDryRunComposer()
 		} else {
 			ostree = helpers.NewOstree(filepath.Join(artifactsMainDir, "repo"))
-			composer = helpers.NewComposer(testDirPath, fmt.Sprintf("http://%s:8080/repo", hostIP))
+			composer, err = helpers.NewComposer(testDirPath, fmt.Sprintf("http://%s:8080/repo", hostIP))
+			if err != nil {
+				return err
+			}
 		}
 
 		td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
