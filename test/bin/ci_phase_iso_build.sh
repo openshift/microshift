@@ -58,7 +58,8 @@ update_build_cache() {
     fi
 
     # Build the base layer to be cached
-    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
+    #$(dry_run) ./bin/microshift-tests ./image-blueprints/layer1-base
+    $(dry_run) exec sg "weldr" "./bin/microshift-tests compose ./image-blueprints/layer1-base"
 
     # Upload the images and update the 'last' setting
     ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
@@ -81,15 +82,18 @@ run_image_build() {
         # Conditional per-layer builds when running in
         # CI. build_images.sh skips any images that have been
         # downloaded from the cache.
-        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
+        targets="./image-blueprints/layer1-base ./image-blueprints/layer2-presubmit"
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
-            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
+            targets="${targets} ./image-blueprints/layer3-periodic"
         fi
+
+        $(dry_run) exec sg "weldr" "./bin/microshift-tests compose ${targets}"
+        #$(dry_run) ./bin/microshift-tests ${targets}
     else
         # Fall back to full build when not running in CI
-        $(dry_run) bash -x ./bin/build_images.sh
+        #$(dry_run) ./bin/microshift-tests
+        $(dry_run) exec sg "weldr" "./bin/microshift-tests compose"
     fi
 }
 
@@ -107,6 +111,8 @@ $(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-f
 $(dry_run) bash -x ./scripts/image-builder/configure.sh
 
 cd "${ROOTDIR}/test/"
+
+go build -o ./bin/microshift-tests ./cmd
 
 # Source common.sh only after all dependencies are installed.
 # shellcheck source=test/bin/common.sh
