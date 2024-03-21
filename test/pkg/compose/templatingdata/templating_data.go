@@ -63,7 +63,6 @@ type Release struct {
 
 	// Images is a list of images stored in release-info RPM.
 	// Currently only for local repositories.
-	// TODO: Extend to remote for local image mirroring.
 	Images []string
 }
 
