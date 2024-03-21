@@ -8,7 +8,6 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/compose"
 	"github.com/spf13/cobra"
-	"k8s.io/component-base/cli"
 )
 
 var (
@@ -17,8 +16,9 @@ var (
 
 func main() {
 	cmd := &cobra.Command{
-		Use:   "microshift-tests",
-		Short: "",
+		Use:          "microshift-tests",
+		Short:        "",
+		SilenceUsage: true,
 
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			dir, err := filepath.Abs(testDir)
@@ -47,5 +47,7 @@ func main() {
 
 	cmd.AddCommand(compose.NewComposeCmd())
 
-	os.Exit(cli.Run(cmd))
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }

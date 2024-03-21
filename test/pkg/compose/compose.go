@@ -13,6 +13,7 @@ import (
 	"github.com/openshift/microshift/test/pkg/compose/sources"
 	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
 	"github.com/spf13/cobra"
+	"k8s.io/klog/v2"
 )
 
 var (
@@ -67,7 +68,7 @@ func NewComposeCmd() *cobra.Command {
 				"./image-blueprints/layer3-periodic",
 			}
 
-			fmt.Printf("No argument provided - running following layers: %v\n", args)
+			klog.InfoS("No argument provided - running default set of layers", "layers", args)
 		}
 
 		var composer helpers.Composer
