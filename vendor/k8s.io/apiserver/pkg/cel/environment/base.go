@@ -83,7 +83,7 @@ var baseOpts = []VersionedOptions{
 	},
 	// TODO: switch to ext.Strings version 2 once format() is fixed to work with HomogeneousAggregateLiterals.
 	{
-		IntroducedVersion: version.MajorMinor(1, 28),
+		IntroducedVersion: version.MajorMinor(1, 27),
 		EnvOptions: []cel.EnvOption{
 			library.IP(),
 			library.CIDR(),
