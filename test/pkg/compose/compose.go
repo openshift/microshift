@@ -96,6 +96,11 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
+		err = persistImages(td)
+		if err != nil {
+			return err
+		}
+
 		sourceConfigurer := sources.SourceConfigurer{Opts: &sources.SourceConfigurerOpts{
 			Composer:    composer,
 			TplData:     td,
@@ -150,7 +155,7 @@ func NewComposeCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints. Implies --build-installers and --force.")
 	cmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
 	cmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Rebuild existing artifacts (ostree commits, ISO images)")
-	// TODO: EXTRACT_CONTAINER_IMAGES
+	// TODO: -E EXTRACT_CONTAINER_IMAGES=false
 	// TODO: trap 'osbuild_logs' EXIT + SKIP_LOG_COLLECTION
 
 	cmd.AddCommand(templatingDataSubCmd())
@@ -205,4 +210,37 @@ func templatingDataSubCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&full, "full", false, "Obtain full templating data, including local RPM information (source, base, fake)")
 
 	return cmd
+}
+
+func persistImages(td *templatingdata.TemplatingData) error {
+	dest := filepath.Join(artifactsMainDir, "container-images-list")
+	klog.InfoS("Writing all image references from TemplatingData to a file", "path", dest)
+
+	images := []string{}
+	images = append(images, td.Base.Images...)
+	images = append(images, td.FakeNext.Images...)
+	images = append(images, td.Source.Images...)
+	images = append(images, td.Current.Images...)
+	images = append(images, td.Previous.Images...)
+	images = append(images, td.YMinus2.Images...)
+
+	imageSet := make(map[string]struct{})
+	for _, img := range images {
+		imageSet[img] = struct{}{}
+	}
+
+	f, err := os.Create(dest)
+	if err != nil {
+		return fmt.Errorf("failed to create file %q: %w", dest, err)
+	}
+	defer f.Close()
+
+	for img := range imageSet {
+		_, err := f.WriteString(img + "\n")
+		if err != nil {
+			return fmt.Errorf("failed to write %q to file %q: %w", img, dest, err)
+		}
+	}
+
+	return nil
 }

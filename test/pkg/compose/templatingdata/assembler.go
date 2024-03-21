@@ -258,7 +258,7 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 	if resp.StatusCode != 200 { // TODO: Maybe this should compare to 404?
 		return Release{}, errNoRemoteRelease
 	}
-	sout, _, err := testutil.RunCommand(
+	version, _, err := testutil.RunCommand(
 		"sudo", "dnf", "repoquery", "microshift", "--quiet",
 		"--queryformat", "%{version}-%{release}",
 		"--disablerepo", "*",
@@ -267,33 +267,70 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 	if err != nil {
 		return Release{}, err
 	}
+	relInfo, err := downloadReleaseInfoRPM(version, "--repofrompath", fmt.Sprintf("this,%s", repo))
+	if err != nil {
+		return Release{}, err
+	}
+	imgs, err := getContainerImages(relInfo)
+	if err != nil {
+		return Release{}, err
+	}
+
 	return Release{
 		Repository: repo,
-		Version:    sout,
+		Version:    version,
 		Minor:      minor,
+		Images:     imgs,
 	}, nil
 }
 
 // getReleaseFromRHOCP looks for MicroShift RPM in RHOCP
 func getReleaseFromRHOCP(minor int) (Release, error) {
 	rhocp := fmt.Sprintf("rhocp-4.%d-for-rhel-9-%s-rpms", minor, getArch())
-	sout, serr, err := testutil.RunCommand("sudo", "dnf", "repoquery", "microshift",
+	version, serr, err := testutil.RunCommand("sudo", "dnf", "repoquery", "microshift",
 		"--quiet",
 		"--queryformat", "%{version}-%{release}",
 		"--repo", rhocp,
 		"--latest-limit", "1",
 	)
 	if err == nil {
+		relInfo, err := downloadReleaseInfoRPM(version, "--repo", rhocp)
+		if err != nil {
+			return Release{}, err
+		}
+		imgs, err := getContainerImages(relInfo)
+		if err != nil {
+			return Release{}, err
+		}
 		return Release{
 			Repository: rhocp,
-			Version:    sout,
+			Version:    version,
 			Minor:      minor,
+			Images:     imgs,
 		}, nil
 	}
 	if strings.Contains(serr, "Cannot download repomd.xml: Cannot download repodata/repomd.xml: All mirrors were tried") {
 		return Release{}, errNoRemoteRelease
 	}
 	return Release{}, err
+}
+
+func downloadReleaseInfoRPM(version string, repoOpts ...string) (string, error) {
+	klog.InfoS("Downloading microshift-release-info", "version", version)
+
+	destDir := "/tmp"
+	cmd := append([]string{"sudo", "dnf", "download", fmt.Sprintf("microshift-release-info-%s", version),
+		"--destdir", "/tmp"}, repoOpts...)
+	_, _, err := testutil.RunCommand(cmd...)
+	if err != nil {
+		return "", err
+	}
+
+	// Because of `dnf download` superfluous output we cannot use the stdout.
+	// Using --quiet would also cause RPM name to not be printed.
+	path := filepath.Join(destDir, "microshift-release-info-"+version+".noarch.rpm")
+	klog.InfoS("Downloaded microshift-release-info", "version", version, "destination", path)
+	return path, nil
 }
 
 // isRHOCPAvailable checks if RHOCP of a given `minor` is available for usage by attempting
