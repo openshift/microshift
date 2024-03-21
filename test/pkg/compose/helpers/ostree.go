@@ -2,6 +2,8 @@ package helpers
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"sync"
@@ -25,9 +27,20 @@ type ostree struct {
 	mutex          sync.Mutex
 }
 
-func NewOstree(repo string) *ostree {
-	// TODO: Check if repo exists and create
-	return &ostree{OstreeRepoPath: repo}
+func NewOstree(repo string) (*ostree, error) {
+	if exists, err := util.PathExists(repo); err != nil {
+		return nil, err
+	} else if !exists {
+		if err := os.MkdirAll(filepath.Join(repo, ".."), 0755); err != nil {
+			return nil, err
+		}
+		_, _, err := testutil.RunCommand("ostree", "init", "--repo", repo)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create ostree repo %q: %w", repo, err)
+		}
+	}
+
+	return &ostree{OstreeRepoPath: repo}, nil
 }
 
 // CreateAlias creates aliases for the reference.
@@ -40,7 +53,7 @@ func (o *ostree) CreateAlias(ref string, aliases ...string) error {
 	for _, alias := range aliases {
 		_, _, err := testutil.RunCommand(
 			"ostree", "refs",
-			fmt.Sprintf("--repo=%s", o.OstreeRepoPath),
+			"--repo", o.OstreeRepoPath,
 			"--force",
 			"--create", alias, ref)
 		if err != nil {
@@ -67,9 +80,7 @@ func (o *ostree) DoesRefExists(ref string) (bool, error) {
 		return false, nil
 	}
 
-	sout, _, err := testutil.RunCommand(
-		"ostree", "refs",
-		fmt.Sprintf("--repo=%s", o.OstreeRepoPath))
+	sout, _, err := testutil.RunCommand("ostree", "refs", "--repo", o.OstreeRepoPath)
 	if err != nil {
 		return false, fmt.Errorf("failed to obtain refs of the ostree repository: %w", err)
 	}
@@ -107,7 +118,7 @@ func (o *ostree) updateSummary() error {
 
 	_, _, err := testutil.RunCommand(
 		"ostree", "summary",
-		fmt.Sprintf("--repo=%s", o.OstreeRepoPath),
+		"--repo", o.OstreeRepoPath,
 		"--update")
 	if err != nil {
 		return fmt.Errorf("failed to update ostree repository's summary: %w", err)
@@ -116,7 +127,7 @@ func (o *ostree) updateSummary() error {
 	// output is logged by testutil.RunCommand()
 	_, _, err = testutil.RunCommand(
 		"ostree", "summary",
-		fmt.Sprintf("--repo=%s", o.OstreeRepoPath),
+		"--repo", o.OstreeRepoPath,
 		"--view")
 	if err != nil {
 		return fmt.Errorf("failed to view ostree repository's summary: %w", err)
