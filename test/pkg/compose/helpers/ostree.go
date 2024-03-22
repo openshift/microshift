@@ -32,7 +32,7 @@ func NewOstree(repo string) (*ostree, error) {
 		return nil, err
 	} else if !exists {
 		if err := os.MkdirAll(filepath.Join(repo, ".."), 0755); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to create path %q: %w", filepath.Join(repo, ".."), err)
 		}
 		_, _, err := testutil.RunCommand("ostree", "init", "--repo", repo)
 		if err != nil {

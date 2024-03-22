@@ -30,6 +30,8 @@ type TemplatingDataOpts struct {
 }
 
 func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
+	klog.InfoS("Constructing TemplatingData")
+
 	rpmRepos := path.Join(opts.ArtifactsMainDir, "rpm-repos")
 	localRepo := path.Join(rpmRepos, "microshift-local")
 	fakeNextRepo := path.Join(rpmRepos, "microshift-fake-next-minor")
@@ -39,7 +41,7 @@ func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
 	if exists, err := util.PathExists(localRepo); err != nil {
 		return nil, fmt.Errorf("failed to check if %s exists: %w", localRepo, err)
 	} else if !exists {
-		return nil, fmt.Errorf("%s does not exist", localRepo)
+		return nil, fmt.Errorf("%s does not exist - did you run build_rpms.sh and create_local_repos.sh?", localRepo)
 	}
 
 	var td *TemplatingData
@@ -50,6 +52,7 @@ func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
 		if err != nil {
 			return nil, err
 		}
+		klog.InfoS("TemplatingData fragment was provided and loaded", "intermediateTeplatingData", td)
 	} else {
 		td = &TemplatingData{}
 	}
@@ -167,7 +170,7 @@ func getReleaseFromLocalFs(repo string) (Release, error) {
 		}
 
 		if err != nil {
-			fmt.Printf("err: %v\n", err)
+			klog.ErrorS(err, "Error during WalkDir - ignoring")
 			return nil
 		}
 
@@ -180,15 +183,20 @@ func getReleaseFromLocalFs(repo string) (Release, error) {
 		return Release{}, err
 	}
 
+	if releaseInfoFile == "" {
+		return Release{}, fmt.Errorf("could not find microshift-release-info RPM in directory %q", repo)
+	}
+	klog.InfoS("Found microshift-release-info RPM for local repository", "repo", repo)
+
 	rpmVersion, _, err := testutil.RunCommand("rpm", "-q", "--queryformat", "%{version}", releaseInfoFile)
 	if err != nil {
-		return Release{}, err
+		return Release{}, fmt.Errorf("failed to get version of the microshift-release-info (%q) RPM: %w", releaseInfoFile, err)
 	}
 
 	minorStr := strings.Split(rpmVersion, ".")[1]
 	minor, err := strconv.Atoi(minorStr)
 	if err != nil {
-		return Release{}, err
+		return Release{}, fmt.Errorf("failed to convert %q to int: %w", minorStr, err)
 	}
 
 	images, err := getContainerImages(releaseInfoFile)
@@ -253,7 +261,7 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 
 	resp, err := http.Get(repo)
 	if err != nil {
-		return Release{}, err
+		return Release{}, fmt.Errorf("http.Get(%s) failed: %w", repo, err)
 	}
 	if resp.StatusCode != 200 { // TODO: Maybe this should compare to 404?
 		return Release{}, errNoRemoteRelease
@@ -265,7 +273,7 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 		"--repofrompath", fmt.Sprintf("this,%s", repo),
 	)
 	if err != nil {
-		return Release{}, err
+		return Release{}, fmt.Errorf("failed to repoquery %q for microshift RPM: %w", repo, err)
 	}
 	relInfo, err := downloadReleaseInfoRPM(version, "--repofrompath", fmt.Sprintf("this,%s", repo))
 	if err != nil {
@@ -323,7 +331,7 @@ func downloadReleaseInfoRPM(version string, repoOpts ...string) (string, error) 
 		"--destdir", "/tmp"}, repoOpts...)
 	_, _, err := testutil.RunCommand(cmd...)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to download %q RPM: %w", fmt.Sprintf("microshift-release-info-%s", version), err)
 	}
 
 	// Because of `dnf download` superfluous output we cannot use the stdout.
