@@ -3,7 +3,6 @@ package build
 import (
 	"fmt"
 	"io"
-	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -28,7 +27,7 @@ func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
 	filename := filepath.Base(path)
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 
-	dataBytes, err := fs.ReadFile(opts.Filesys, path)
+	dataBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read %s: %w", path, err)
 	}
@@ -119,8 +118,8 @@ outer:
 	return nil
 }
 
-func fileExistsInDir(filesys fs.FS, dir, filename string) (bool, error) {
-	entries, err := fs.ReadDir(filesys, dir)
+func fileExistsInDir(dir, filename string) (bool, error) {
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return false, err
 	}

@@ -2,7 +2,7 @@ package build
 
 import (
 	"fmt"
-	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -17,9 +17,6 @@ type Group []Build
 type Plan []Group
 
 type PlannerOpts struct {
-	// Filesys is filesystem used to obtain files by given path.
-	Filesys fs.FS
-
 	// TplData is a struct used as templating input.
 	TplData *templatingdata.TemplatingData
 
@@ -27,6 +24,7 @@ type PlannerOpts struct {
 	BuildInstallers bool
 
 	ArtifactsMainDir string
+	TestDir          string
 }
 
 type Planner struct {
@@ -34,6 +32,7 @@ type Planner struct {
 }
 
 func (b *Planner) CreateBuildPlan(paths []string) (Plan, error) {
+	klog.InfoS("Constructing build plan", "paths", paths)
 	var toBuild Plan
 
 	for _, path := range paths {
@@ -71,7 +70,7 @@ func (b *Planner) CreateBuildPlan(paths []string) (Plan, error) {
 func (b *Planner) layer(path string) (Plan, error) {
 	klog.InfoS("Constructing build plan from provided blueprint layer", "path", path)
 
-	entries, err := fs.ReadDir(b.Opts.Filesys, path)
+	entries, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +93,7 @@ func (b *Planner) layer(path string) (Plan, error) {
 func (b *Planner) group(path string) (Group, error) {
 	klog.InfoS("Constructing build group from provided blueprint group", "path", path)
 
-	entries, err := fs.ReadDir(b.Opts.Filesys, path)
+	entries, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
