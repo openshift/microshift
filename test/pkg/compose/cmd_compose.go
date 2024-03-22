@@ -24,10 +24,11 @@ var (
 
 	hostIP string
 
-	force           bool
-	dryRun          bool
-	buildInstallers bool
-	sourceOnly      bool
+	force                         bool
+	dryRun                        bool
+	buildInstallers               bool
+	sourceOnly                    bool
+	skipContainerImagesExtraction bool
 )
 
 func NewComposeCmd() *cobra.Command {
@@ -87,17 +88,19 @@ func NewComposeCmd() *cobra.Command {
 			}
 		}
 
-		td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
+		td, err := (&templatingdata.TemplatingDataOpts{
 			ArtifactsMainDir:               artifactsMainDir,
 			TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
-		})
+			SkipContainerImagesExtraction:  skipContainerImagesExtraction,
+		}).Construct()
 		if err != nil {
 			return err
 		}
 
-		err = persistImages(td)
-		if err != nil {
-			return err
+		if !skipContainerImagesExtraction {
+			if err := persistImages(td); err != nil {
+				return err
+			}
 		}
 
 		sourceConfigurer := sources.SourceConfigurer{Opts: &sources.SourceConfigurerOpts{
@@ -150,7 +153,7 @@ func NewComposeCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&sourceOnly, "source-only", "s", false, "Build only source blueprints. Implies --build-installers and --force.")
 	cmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
 	cmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Rebuild existing artifacts (ostree commits, ISO images)")
-	// TODO: -E EXTRACT_CONTAINER_IMAGES=false
+	cmd.PersistentFlags().BoolVarP(&skipContainerImagesExtraction, "skip-container-images-extraction", "E", false, "Skip extraction of images from microshift-release-info RPMs")
 	// TODO: trap 'osbuild_logs' EXIT + SKIP_LOG_COLLECTION
 
 	cmd.AddCommand(templatingDataSubCmd())
@@ -166,10 +169,11 @@ func templatingDataSubCmd() *cobra.Command {
 		Use:   "templating-data",
 		Short: "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
+			td, err := (&templatingdata.TemplatingDataOpts{
 				ArtifactsMainDir:               artifactsMainDir,
 				TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
-			})
+				SkipContainerImagesExtraction:  skipContainerImagesExtraction,
+			}).Construct()
 			if err != nil {
 				return err
 			}
@@ -223,10 +227,10 @@ func buildPlanSubCmd() *cobra.Command {
 				klog.InfoS("No argument provided - running default set of layers", "layers", args)
 			}
 
-			td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
+			td, err := (&templatingdata.TemplatingDataOpts{
 				ArtifactsMainDir:               artifactsMainDir,
 				TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
-			})
+			}).Construct()
 			if err != nil {
 				return err
 			}
